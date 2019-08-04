@@ -211,7 +211,7 @@ Port(hex)  Role       Comment
 ToDo:
 - Fix Paste: Shift operates randomly (only super80m is suitable, the others drop characters because
        of the horrible inline editor they use)
-- Get disk system to work (no disk images available) only connected to super80r atm
+- Disk system works, only connected to super80r atm - is it needed for super80v?
 
 
 ***********************************************************************************************************/
@@ -692,7 +692,7 @@ void super80_state::machine_start()
 
 static void super80_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("s80flop", FLOPPY_525_QD);
 }
 
 
@@ -734,7 +734,6 @@ void super80_state::super80(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
@@ -751,12 +750,12 @@ void super80_state::super80(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(super80_state, super80), this), "bin", attotime::from_seconds(3));
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb), this);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("super80_cass");
 
 	TIMER(config, "kansas_r").configure_periodic(FUNC(super80_state::kansas_r), attotime::from_hz(40000)); // cass read
@@ -828,7 +827,6 @@ void super80_state::super80v(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
@@ -845,12 +843,12 @@ void super80_state::super80v(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(super80_state, super80), this), "bin", attotime::from_seconds(3));
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb), this);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("super80_cass");
 
 	TIMER(config, "kansas_r").configure_periodic(FUNC(super80_state::kansas_r), attotime::from_hz(40000)); // cass read
@@ -876,8 +874,8 @@ void super80_state::super80r(machine_config &config)
 
 	WD2793(config, m_fdc, 2_MHz_XTAL);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
 }
 
 /**************************** ROMS *****************************************************************/

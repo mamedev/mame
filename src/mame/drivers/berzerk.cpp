@@ -1273,20 +1273,55 @@ ROM_START( berzerks )
 ROM_END
 
 
+/*
+
+Frenzy program labels follow this format:
+
+FRENZY    (c)    <-- ROM socket silkscreened ROM5
+RA1 ROM5(10)
+1982 STERN
+
+So PCB location and silkscreen are as follows as they appear on an actual PCB:
+
+                  1D <--> ROM1
+
+3C <--> ROM6      3D <--> ROM2
+
+5C <--> ROM5      5D <--> ROM3
+
+                  6D <--> ROM4
+
+NOTE: No known set uses ROM6 & there is NO socket for a ROM0
+
+Sound ROMs for Berzerk / Frenzy have been found labeled as:
+
+BERZERK        BERZERK
+R VO 1C        R VO 2C
+1980  STERN    1980  STERN
+
+as well as
+
+E169-1CVO      E169-2CVO
+RVO 1C (-9)    RVO 2C (-9)
+1982  STERN    1982  STERN
+
+Both sets of ROMs contain the same data.
+
+*/
 ROM_START( frenzy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1c-0",         0x0000, 0x1000, CRC(abdd25b8) SHA1(e6a3ab826b51b2c6ddd63d55681848fccad800dd) ) /* Need to verify ROM labels for this set */
-	ROM_LOAD( "1d-1",         0x1000, 0x1000, CRC(536e4ae8) SHA1(913385c43b8902d3d3ad2194a3137e19e61c6573) )
-	ROM_LOAD( "3d-2",         0x2000, 0x1000, CRC(3eb9bc9b) SHA1(1e43e76ae0606a6d41d9006005d6001bdee48694) )
-	ROM_LOAD( "5d-3",         0x3000, 0x1000, CRC(e1d3133c) SHA1(2af4a9bc2b29735a548ae770f872127bc009cc42) )
-	ROM_LOAD( "6d-4",         0xc000, 0x1000, CRC(5581a7b1) SHA1(1f633c1c29d3b64f701c601feba26da66a6c6f23) )
+	ROM_LOAD( "frenzy_ra1_rom1.1d", 0x0000, 0x1000, CRC(abdd25b8) SHA1(e6a3ab826b51b2c6ddd63d55681848fccad800dd) )
+	ROM_LOAD( "frenzy_ra1_rom2.3d", 0x1000, 0x1000, CRC(536e4ae8) SHA1(913385c43b8902d3d3ad2194a3137e19e61c6573) )
+	ROM_LOAD( "frenzy_ra1_rom3.5d", 0x2000, 0x1000, CRC(3eb9bc9b) SHA1(1e43e76ae0606a6d41d9006005d6001bdee48694) )
+	ROM_LOAD( "frenzy_ra1_rom4.6d", 0x3000, 0x1000, CRC(e1d3133c) SHA1(2af4a9bc2b29735a548ae770f872127bc009cc42) )
+	ROM_LOAD( "frenzy_ra1_rom5.5c", 0xc000, 0x1000, CRC(5581a7b1) SHA1(1f633c1c29d3b64f701c601feba26da66a6c6f23) )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "e169-1cvo.1c", 0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) ) /* VSU-1000 board */
 	ROM_LOAD( "e169-2cvo.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) ) /* ditto */
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/ROM select PROM (N82S123N) */
+	ROM_LOAD( "frenzy_decoder_6ea1.6e", 0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/ROM select PROM (N82S123N) */
 ROM_END
 
 
@@ -1305,22 +1340,25 @@ Sound ROMs for Moon War:
 MOON WAR       MOON WAR
 RVO  1C        RVO  2C
 1981 STERN     1981 STERN
+
+NOTE: The BPROM from the sound board set is most likely correct.  The program ROM board reportedly had ORIGINAL program
+      ROMs transferred over to a standard Frenzy PCB due to damage of the original Moon War PCB.
 */
 ROM_START( moonwarp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1d.bin",      0x0000, 0x1000, CRC(75470634) SHA1(1a811fef39724fd227e06b694841d3dad5659622) )
-	ROM_LOAD( "3d.bin",      0x1000, 0x1000, CRC(a9d046dc) SHA1(88afccd09d2809cafd12dd40ab3be77e3707cfc5) )
-	ROM_LOAD( "5d.bin",      0x2000, 0x1000, CRC(bf671737) SHA1(cdfae1eb8995c2251813cc5633fc809aa9e6a36f) )
-	ROM_LOAD( "6d.bin",      0x3000, 0x1000, CRC(cef2d697) SHA1(5c31c6e7002f0d944b3028d1b804480acf3af042) )
-	ROM_LOAD( "5c.bin",      0xc000, 0x1000, CRC(a3d551ab) SHA1(a32352727b5475a6ec6c495c55f01ccd6e024f98) )
+	ROM_LOAD( "1d.bin", 0x0000, 0x1000, CRC(75470634) SHA1(1a811fef39724fd227e06b694841d3dad5659622) )
+	ROM_LOAD( "3d.bin", 0x1000, 0x1000, CRC(a9d046dc) SHA1(88afccd09d2809cafd12dd40ab3be77e3707cfc5) )
+	ROM_LOAD( "5d.bin", 0x2000, 0x1000, CRC(bf671737) SHA1(cdfae1eb8995c2251813cc5633fc809aa9e6a36f) )
+	ROM_LOAD( "6d.bin", 0x3000, 0x1000, CRC(cef2d697) SHA1(5c31c6e7002f0d944b3028d1b804480acf3af042) )
+	ROM_LOAD( "5c.bin", 0xc000, 0x1000, CRC(a3d551ab) SHA1(a32352727b5475a6ec6c495c55f01ccd6e024f98) )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "moon_war_rv0_1c.1c", 0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) ) /* VSU-1000 board */
 	ROM_LOAD( "moon_war_rv0_2c.2c", 0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) ) /* ditto */
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "n82s123.6e",    0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/ROM select PROM - from board with prg ROMs, same as Frenzy */
-	ROM_LOAD( "prom.6e",       0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/ROM select PROM - from the sound ROM only set, is it bad? */
+	ROM_LOAD( "n82s123.6e", 0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/ROM select PROM - from board with prg ROMs, same as Frenzy */
+	ROM_LOAD( "prom.6e",    0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/ROM select PROM - from the sound ROM only set */
 ROM_END
 
 void berzerk_state::init_moonwarp()

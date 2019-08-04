@@ -51,6 +51,8 @@ files {
 	MAME_DIR .. "src/devices/imagedev/harddriv.h",
 	MAME_DIR .. "src/devices/imagedev/mfmhd.cpp",
 	MAME_DIR .. "src/devices/imagedev/mfmhd.h",
+	MAME_DIR .. "src/devices/imagedev/microdrv.cpp",
+	MAME_DIR .. "src/devices/imagedev/microdrv.h",
 	MAME_DIR .. "src/devices/imagedev/midiin.cpp",
 	MAME_DIR .. "src/devices/imagedev/midiin.h",
 	MAME_DIR .. "src/devices/imagedev/midiout.cpp",
@@ -59,7 +61,11 @@ files {
 	MAME_DIR .. "src/devices/imagedev/printer.h",
 	MAME_DIR .. "src/devices/imagedev/snapquik.cpp",
 	MAME_DIR .. "src/devices/imagedev/snapquik.h",
+	MAME_DIR .. "src/devices/imagedev/wafadrive.cpp",
+	MAME_DIR .. "src/devices/imagedev/wafadrive.h",
 }
+
+
 ---------------------------------------------------
 --
 --@src/devices/machine/akiko.h,MACHINES["AKIKO"] = true
@@ -2222,9 +2228,6 @@ end
 --
 --@src/devices/machine/nscsi_bus.h,MACHINES["NSCSI"] = true
 --@src/devices/machine/nscsi_cb.h,MACHINES["NSCSI"] = true
---@src/devices/machine/nscsi_cd.h,MACHINES["NSCSI"] = true
---@src/devices/machine/nscsi_hd.h,MACHINES["NSCSI"] = true
---@src/devices/machine/nscsi_s1410.h,MACHINES["NSCSI"] = true
 ---------------------------------------------------
 
 if (MACHINES["NSCSI"]~=null) then
@@ -2233,12 +2236,6 @@ if (MACHINES["NSCSI"]~=null) then
 		MAME_DIR .. "src/devices/machine/nscsi_bus.h",
 		MAME_DIR .. "src/devices/machine/nscsi_cb.cpp",
 		MAME_DIR .. "src/devices/machine/nscsi_cb.h",
-		MAME_DIR .. "src/devices/machine/nscsi_cd.cpp",
-		MAME_DIR .. "src/devices/machine/nscsi_cd.h",
-		MAME_DIR .. "src/devices/machine/nscsi_hd.cpp",
-		MAME_DIR .. "src/devices/machine/nscsi_hd.h",
-		MAME_DIR .. "src/devices/machine/nscsi_s1410.cpp",
-		MAME_DIR .. "src/devices/machine/nscsi_s1410.h",
 	}
 end
 
@@ -2663,18 +2660,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
----------------------------------------------------
-
-if (MACHINES["SERFLASH"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/serflash.cpp",
-		MAME_DIR .. "src/devices/machine/serflash.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/sda2006.h,MACHINES["SDA2006"] = true
 ---------------------------------------------------
 
@@ -2682,6 +2667,30 @@ if (MACHINES["SDA2006"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/sda2006.cpp",
 		MAME_DIR .. "src/devices/machine/sda2006.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sensorboard.h,MACHINES["SENSORBOARD"] = true
+---------------------------------------------------
+
+if (MACHINES["SENSORBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sensorboard.cpp",
+		MAME_DIR .. "src/devices/machine/sensorboard.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
+---------------------------------------------------
+
+if (MACHINES["SERFLASH"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/serflash.cpp",
+		MAME_DIR .. "src/devices/machine/serflash.h",
 	}
 end
 
@@ -4063,5 +4072,29 @@ if (MACHINES["XC1700E"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/xc1700e.cpp",
 		MAME_DIR .. "src/devices/machine/xc1700e.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/edlc.h,MACHINES["EDLC"] = true
+---------------------------------------------------
+
+if (MACHINES["EDLC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/edlc.cpp",
+		MAME_DIR .. "src/devices/machine/edlc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/wtl3132.h,MACHINES["WTL3132"] = true
+---------------------------------------------------
+
+if (MACHINES["WTL3132"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/wtl3132.cpp",
+		MAME_DIR .. "src/devices/machine/wtl3132.h",
 	}
 end

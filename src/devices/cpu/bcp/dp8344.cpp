@@ -96,6 +96,7 @@ dp8344_device::dp8344_device(const machine_config &mconfig, const char *tag, dev
 	, m_bb(false)
 	, m_ric(0)
 	, m_hib(false)
+	, m_latched_instr(0)
 	, m_auto_start(true)
 	, m_nmi_state(false)
 	, m_rfifo{0, 0, 0}
@@ -212,6 +213,7 @@ void dp8344_device::device_start()
 	save_item(NAME(m_bb));
 	save_item(NAME(m_ric));
 	save_item(NAME(m_hib));
+	save_item(NAME(m_latched_instr));
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_rfifo)); // 3-frame Receive FIFO
 	save_item(NAME(m_tfifo)); // 3-frame Transmit FIFO
@@ -1245,11 +1247,22 @@ void dp8344_device::execute_run()
 //**************************************************************************
 
 //-------------------------------------------------
-//  ric_w - write to Remote Interface Control
-//  Register from off-chip
+//  cmd_r - read from Remote Interface Control
+//  Register (off-chip access only)
 //-------------------------------------------------
 
-void dp8344_device::ric_w(u8 data)
+u8 dp8344_device::cmd_r()
+{
+	return m_ric;
+}
+
+
+//-------------------------------------------------
+//  cmd_w - write to Remote Interface Control
+//  Register (off-chip access only)
+//-------------------------------------------------
+
+void dp8344_device::cmd_w(u8 data)
 {
 	// Bit 7 = Bidirectional Interrupt Status
 	// Bit 6 = Single-Step
@@ -1259,30 +1272,107 @@ void dp8344_device::ric_w(u8 data)
 	// Bit 2 = STaRT
 	// Bits 1-0 = Memory Select
 
+	logerror("%s: %s %s read, %s write; CPU %s\n", machine().describe_context(),
+		(data & 0x03) == 0x00 ? "Data memory" :
+			(data & 0x03) == 0x01 ? "Instruction memory" :
+			(data & 0x03) == 0x02 ? "PC low byte" : "PC high byte",
+		BIT(data, 4) ? "latched" : "buffered",
+		BIT(data, 3) ? "latched" : BIT(data, 5) ? "fast buffered" : "slow buffered",
+		BIT(data, 6) ? "single step" : BIT(data, 2) ? "start" : "stop");
+
 	m_ric = data;
+	set_input_line(INPUT_LINE_HALT, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 //-------------------------------------------------
-//  remote_read -
+//  remote_read - off-chip memory read
 //-------------------------------------------------
 
-void dp8344_device::remote_read()
+u8 dp8344_device::remote_read(offs_t offset)
 {
+	u8 data = 0;
+
 	// TODO: stop CPU if not accessing DMEM or RIC
+
+	switch (m_ric & 0x03)
+	{
+	case 0x00:
+		// Read from data memory
+		data = m_data_space->read_byte(offset);
+		break;
+
+	case 0x01:
+		// Read from instruction memory
+		if (!m_hib && !machine().side_effects_disabled())
+			m_latched_instr = m_inst_space->read_word(m_pc);
+		data = m_hib ? m_latched_instr >> 8 : m_latched_instr & 0xff;
+		if (!machine().side_effects_disabled())
+		{
+			m_hib = !m_hib;
+			if (!m_hib)
+				m_pc++;
+		}
+		break;
+
+	case 0x02:
+		// Read PC low byte
+		data = m_pc & 0x00ff;
+		break;
+
+	case 0x03:
+		// Read PC high byte
+		data = m_pc >> 8;
+		break;
+	}
 
 	// set Remote Read bit in CCR
-	m_ccr |= 0x40;
+	if (!machine().side_effects_disabled())
+		m_ccr |= 0x40;
+
+	return data;
 }
 
 
 //-------------------------------------------------
-//  remote_write -
+//  remote_write - off-chip memory write
 //-------------------------------------------------
 
-void dp8344_device::remote_write()
+void dp8344_device::remote_write(offs_t offset, u8 data)
 {
 	// TODO: stop CPU if not accessing DMEM or RIC
+
+	switch (m_ric & 0x03)
+	{
+	case 0x00:
+		// Write to data memory
+		m_data_space->write_byte(offset, data);
+		break;
+
+	case 0x01:
+		// Write to instruction memory
+		if (m_hib)
+			m_latched_instr = (data << 8) | (m_latched_instr & 0x00ff);
+		else
+			m_latched_instr = data | (m_latched_instr & 0xff00);
+		if (!machine().side_effects_disabled())
+		{
+			m_hib = !m_hib;
+			if (!m_hib)
+				m_inst_space->write_word(m_pc++, m_latched_instr);
+		}
+		break;
+
+	case 0x02:
+		// Write PC low byte
+		m_pc = data | (m_pc & 0xff00);
+		break;
+
+	case 0x03:
+		// Write PC high byte
+		m_pc = data << 8 | (m_pc & 0x00ff);
+		break;
+	}
 
 	// set Remote Write bit in CCR
 	m_ccr |= 0x20;

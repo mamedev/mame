@@ -24,9 +24,8 @@ TODO:
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
-  verification is wanted for: gnw_bfight, gnw_bjack, gnw_climber, gnw_dkjrp,
-  gnw_zelda
-- identify lcd segments for tgaiden
+  verification is wanted for: gnw_bfight, gnw_bjack, gnw_bsweep, gnw_climber,
+  gnw_dkjrp, gnw_gcliff, gnw_sbuster, gnw_zelda
 
 ****************************************************************************
 
@@ -34,7 +33,7 @@ Misc Nintendo Game & Watch notes:
 
 Trivia: Most of the Nintendo G&W have built-in cheats, likely kept in by
 Nintendo to test the game. These were not accessible to users of course,
-but for the sake of fun they're (usually) available on MAME.
+but for the sake of fun they're available on MAME.
 
 BTANB: On some of the earlier G&W games, eg. gnw_fire, gnw_mmouse, gnw_pchute,
 gnw_popeye, the controls still work after game over, this happens on the real
@@ -73,9 +72,9 @@ TC-58     ms   SM510   Life Boat
 PB-59*    ms   SM511?  Pinball
 BJ-60     ms   SM512   Black Jack
 MG-61     ms   SM510   Squish
-BD-62*    ms   SM512   Bomb Sweeper
-JB-63*    ms   SM511?  Safe Buster
-MV-64*    ms   SM511?  Gold Cliff
+BD-62     ms   SM512   Bomb Sweeper
+JB-63     ms   SM511   Safe Buster
+MV-64     ms   SM512   Gold Cliff
 ZL-65     ms   SM512   Zelda
 CJ-71*    tt   SM511?  Donkey Kong Jr.
 CM-72*    tt   SM511?  Mario's Cement Factory
@@ -1245,7 +1244,7 @@ static INPUT_PORTS_START( gnw_ball )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)") // disable after boot
+	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
@@ -1322,7 +1321,7 @@ static INPUT_PORTS_START( gnw_pchute )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // disable after boot
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1405,7 +1404,7 @@ public:
 
 static INPUT_PORTS_START( gnw_octopus )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1493,7 +1492,7 @@ public:
 
 static INPUT_PORTS_START( gnw_popeye )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // when cheat is activated, not all segments are lit on the ACL reset screen
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1601,7 +1600,7 @@ static INPUT_PORTS_START( gnw_chef )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1720,7 +1719,7 @@ static INPUT_PORTS_START( gnw_mmouse )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1856,7 +1855,7 @@ public:
 
 static INPUT_PORTS_START( gnw_fire )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1957,12 +1956,12 @@ static INPUT_PORTS_START( gnw_tbridge )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2043,12 +2042,12 @@ static INPUT_PORTS_START( gnw_fireatk )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2129,12 +2128,12 @@ static INPUT_PORTS_START( gnw_stennis )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2215,12 +2214,12 @@ static INPUT_PORTS_START( gnw_opanic )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2315,7 +2314,7 @@ static INPUT_PORTS_START( gnw_dkong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2405,7 +2404,7 @@ static INPUT_PORTS_START( gnw_mickdon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2499,12 +2498,12 @@ static INPUT_PORTS_START( gnw_ghouse )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2599,7 +2598,7 @@ static INPUT_PORTS_START( gnw_dkong2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2689,12 +2688,12 @@ static INPUT_PORTS_START( gnw_mario )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2791,12 +2790,12 @@ static INPUT_PORTS_START( gnw_rshower )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2851,7 +2850,7 @@ ROM_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Lifeboat (model TC-58)
+  Nintendo Game & Watch: Life Boat (model TC-58)
   * PCB labels: TC-58-M (left), TC-58-S (right)
   * Sharp SM510 label TC-58 281D (no decap)
   * horizontal dual lcd screens with custom segments, 1-bit sound
@@ -2887,12 +2886,12 @@ static INPUT_PORTS_START( gnw_lboat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3069,12 +3068,12 @@ static INPUT_PORTS_START( gnw_squish )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3129,6 +3128,303 @@ ROM_END
 
 /***************************************************************************
 
+  Nintendo Game & Watch: Bomb Sweeper (model BD-62)
+  * PCB label BD-62
+  * Sharp SM512 label BD-62 8727 A (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_bsweep_state : public hh_sm510_state
+{
+public:
+	gnw_bsweep_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_bsweep(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_bsweep )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Controller keys skips level when activated
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_bsweep_state::gnw_bsweep(machine_config &config)
+{
+	/* basic machine hardware */
+	SM512(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_refresh_hz(60);
+	screen_top.set_size(1920/2, 1291/2);
+	screen_top.set_visarea_full();
+
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_refresh_hz(60);
+	screen_bottom.set_size(1920/2, 1239/2);
+	screen_bottom.set_visarea_full();
+
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_bsweep )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bd-62.program", 0x0000, 0x1000, CRC(f3ac66ea) SHA1(3fbf444ade5bc96cf0073ca72f1d583cb0f48fc5) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bd-62.melody", 0x000, 0x100, BAD_DUMP CRC(addc0368) SHA1(fc488bdf1c2ea5ca84cc66762126bb5874659d8f) ) // decap needed for verification
+
+	ROM_REGION( 218009, "screen_top", 0)
+	ROM_LOAD( "gnw_bsweep_top.svg", 0, 218009, CRC(240d0b2a) SHA1(f1b321fe0446f71e563732f5b8cdb8a043f00361) )
+
+	ROM_REGION( 277261, "screen_bottom", 0)
+	ROM_LOAD( "gnw_bsweep_bottom.svg", 0, 277261, CRC(e7028dbf) SHA1(546446ce2545424fdd319ddfb5fb8977d5ff94db) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Safe Buster (model JB-63)
+  * PCB label JB-63
+  * Sharp SM511 label JB-63 8841 B (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_sbuster_state : public hh_sm510_state
+{
+public:
+	gnw_sbuster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_sbuster(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_sbuster )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_sbuster_state::gnw_sbuster(machine_config &config)
+{
+	/* basic machine hardware */
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_refresh_hz(60);
+	screen_top.set_size(1920/2, 1246/2);
+	screen_top.set_visarea_full();
+
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_refresh_hz(60);
+	screen_bottom.set_size(1920/2, 1269/2);
+	screen_bottom.set_visarea_full();
+
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_sbuster )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "jb-63.program", 0x0000, 0x1000, CRC(231d358d) SHA1(c748788da125e77b9d0fe1228f64de71f41af42b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "jb-63.melody", 0x000, 0x100, BAD_DUMP CRC(28cb2914) SHA1(52d34265611f786b597653193752d16563dd5e82) ) // decap needed for verification
+
+	ROM_REGION( 221735, "screen_top", 0)
+	ROM_LOAD( "gnw_sbuster_top.svg", 0, 221735, CRC(38b8e39c) SHA1(2e07ea057b2c78c956898ee2587926188498dfc0) )
+
+	ROM_REGION( 282423, "screen_bottom", 0)
+	ROM_LOAD( "gnw_sbuster_bottom.svg", 0, 282423, CRC(89659f2a) SHA1(47db203908249cb96a949799cf85fbd1af601874) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Gold Cliff (model MV-64)
+  * PCB label MV-64
+  * Sharp SM512 label MV-64 9027 A (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_gcliff_state : public hh_sm510_state
+{
+public:
+	gnw_gcliff_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_gcliff(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_gcliff )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Jump
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Continue")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Left or right skips level when activated
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_gcliff_state::gnw_gcliff(machine_config &config)
+{
+	/* basic machine hardware */
+	SM512(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_refresh_hz(60);
+	screen_top.set_size(1920/2, 1257/2);
+	screen_top.set_visarea_full();
+
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_refresh_hz(60);
+	screen_bottom.set_size(1920/2, 1239/2);
+	screen_bottom.set_visarea_full();
+
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_gcliff )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mv-64.program", 0x0000, 0x1000, CRC(2448a3bf) SHA1(bfb1a1b500321f8ee0b6f07ef8503e64fe6d37c0) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "mv-64.melody", 0x000, 0x100, BAD_DUMP CRC(cb938709) SHA1(516dcc8a1edffe02f50d349389caac0676de1eba) ) // decap needed for verification
+
+	ROM_REGION( 530558, "screen_top", 0)
+	ROM_LOAD( "gnw_gcliff_top.svg", 0, 530558, CRC(a0207f25) SHA1(763519d163bc6924e92dde501c785286f5949072) )
+
+	ROM_REGION( 519157, "screen_bottom", 0)
+	ROM_LOAD( "gnw_gcliff_bottom.svg", 0, 519157, CRC(af120931) SHA1(fd27a89368c9ba533852fd3bc2554a1268624f67) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Nintendo Game & Watch: Zelda (model ZL-65)
   * PCB label ZL-65
   * Sharp SM512 label ZL-65 8935 A (no decap)
@@ -3169,12 +3465,12 @@ static INPUT_PORTS_START( gnw_zelda )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // Invincibility when playing on bottom screen only
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // " -- Invincibility when playing on bottom screen only
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3277,12 +3573,12 @@ static INPUT_PORTS_START( gnw_dkjrp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3371,12 +3667,12 @@ static INPUT_PORTS_START( gnw_dkjr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3458,12 +3754,12 @@ static INPUT_PORTS_START( gnw_mariocm )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3546,12 +3842,12 @@ static INPUT_PORTS_START( gnw_manhole )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3632,7 +3928,7 @@ static INPUT_PORTS_START( gnw_tfish )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3722,7 +4018,7 @@ static INPUT_PORTS_START( gnw_smb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3818,7 +4114,7 @@ static INPUT_PORTS_START( gnw_climber )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3930,7 +4226,7 @@ static INPUT_PORTS_START( gnw_bfight )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4035,12 +4331,12 @@ static INPUT_PORTS_START( gnw_boxing )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)") // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)") // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4539,9 +4835,10 @@ public:
 		inp_fixed_last();
 	}
 
+	// R2 connects to a single LED behind the screen
+	DECLARE_WRITE8_MEMBER(led_w) { m_led_out = data >> 1 & 1; }
 	output_finder<> m_led_out;
 
-	DECLARE_WRITE8_MEMBER(write_r);
 	void tgaiden(machine_config &config);
 
 protected:
@@ -4551,20 +4848,7 @@ protected:
 void tgaiden_state::machine_start()
 {
 	hh_sm510_state::machine_start();
-
-	// resolve handlers
 	m_led_out.resolve();
-}
-
-// handlers
-
-WRITE8_MEMBER(tgaiden_state::write_r)
-{
-	// R1: speaker out
-	piezo_r1_w(space, 0, data & 1);
-
-	// R2: led
-	m_led_out = data >> 1 & 1;
 }
 
 // config
@@ -4614,14 +4898,15 @@ void tgaiden_state::tgaiden(machine_config &config)
 	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(tgaiden_state::write_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->write_r().append(FUNC(tgaiden_state::led_w));
 	m_maincpu->read_ba().set_ioport("BA");
 	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920, 1080);
+	screen.set_size(1476, 1080);
 	screen.set_visarea_full();
 
 	/* sound hardware */
@@ -4636,8 +4921,8 @@ ROM_START( tgaiden )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m82", 0x0000, 0x1000, CRC(278eafb0) SHA1(14396a0010bade0fde705969151200ed432321e7) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "tgaiden.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 588818, "screen", 0)
+	ROM_LOAD( "tgaiden.svg", 0, 588818, CRC(f2b94ded) SHA1(45ba57e16921849cf27e14a81a04b3cdce753726) )
 ROM_END
 
 
@@ -8609,6 +8894,108 @@ ROM_END
 
 /***************************************************************************
 
+  Tiger Kazaam (model 78-613)
+  * Sharp SM510 under epoxy (die label KMS10, 18)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class tkazaam_state : public hh_sm510_state
+{
+public:
+	tkazaam_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tkazaam(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( tkazaam )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Kick")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick/Rescue")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Punch Forward")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Punch Back")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void tkazaam_state::tkazaam(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu); // no external XTAL
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1452, 1080);
+	screen.set_visarea_full();
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tkazaam )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "10_18", 0x0000, 0x1000, CRC(aa796372) SHA1(fdaea736e1df46c19fca08ed981e9659e038d15a) )
+
+	ROM_REGION( 929011, "screen", 0)
+	ROM_LOAD( "tkazaam.svg", 0, 929011, CRC(b7fd49ba) SHA1(c769db87f1d4586ff7fc0bff7b146d1da05bdddc) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Space Jam (model 78-621)
   * Sharp SM510 under epoxy (die label KMS10, 23)
   * lcd screen with custom segments, 1-bit sound
@@ -9259,9 +9646,12 @@ CONS( 1982, gnw_ghouse,  0,          0, gnw_ghouse,  gnw_ghouse,  gnw_ghouse_sta
 CONS( 1983, gnw_dkong2,  0,          0, gnw_dkong2,  gnw_dkong2,  gnw_dkong2_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_state,   empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_rshower, 0,          0, gnw_rshower, gnw_rshower, gnw_rshower_state, empty_init, "Nintendo", "Game & Watch: Rain Shower", MACHINE_SUPPORTS_SAVE)
-CONS( 1983, gnw_lboat,   0,          0, gnw_lboat,   gnw_lboat,   gnw_lboat_state,   empty_init, "Nintendo", "Game & Watch: Lifeboat", MACHINE_SUPPORTS_SAVE)
+CONS( 1983, gnw_lboat,   0,          0, gnw_lboat,   gnw_lboat,   gnw_lboat_state,   empty_init, "Nintendo", "Game & Watch: Life Boat", MACHINE_SUPPORTS_SAVE)
 CONS( 1985, gnw_bjack,   0,          0, gnw_bjack,   gnw_bjack,   gnw_bjack_state,   empty_init, "Nintendo", "Game & Watch: Black Jack", MACHINE_SUPPORTS_SAVE)
 CONS( 1986, gnw_squish,  0,          0, gnw_squish,  gnw_squish,  gnw_squish_state,  empty_init, "Nintendo", "Game & Watch: Squish", MACHINE_SUPPORTS_SAVE )
+CONS( 1987, gnw_bsweep,  0,          0, gnw_bsweep,  gnw_bsweep,  gnw_bsweep_state,  empty_init, "Nintendo", "Game & Watch: Bomb Sweeper", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_sbuster, 0,          0, gnw_sbuster, gnw_sbuster, gnw_sbuster_state, empty_init, "Nintendo", "Game & Watch: Safe Buster", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_gcliff,  0,          0, gnw_gcliff,  gnw_gcliff,  gnw_gcliff_state,  empty_init, "Nintendo", "Game & Watch: Gold Cliff", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, gnw_zelda,   0,          0, gnw_zelda,   gnw_zelda,   gnw_zelda_state,   empty_init, "Nintendo", "Game & Watch: Zelda", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: new wide screen / crystal screen
@@ -9286,7 +9676,7 @@ CONS( 1991, trobhood,    tgaunt,     0, trobhood,    trobhood,    tgaunt_state, 
 CONS( 1989, tddragon,    0,          0, tddragon,    tddragon,    tddragon_state,    empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, tkarnov,     0,          0, tkarnov,     tkarnov,     tkarnov_state,     empty_init, "Tiger Electronics (licensed from Data East)", "Karnov (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, tvindictr,   0,          0, tvindictr,   tvindictr,   tvindictr_state,   empty_init, "Tiger Electronics (licensed from Tengen)", "Vindicators (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, tgaiden,     0,          0, tgaiden,     tgaiden,     tgaiden_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1989, tgaiden,     0,          0, tgaiden,     tgaiden,     tgaiden_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, tbatman,     0,          0, tbatman,     tbatman,     tbatman_state,     empty_init, "Tiger Electronics", "Batman (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1990, tsharr2,     0,          0, tsharr2,     tsharr2,     tsharr2_state,     empty_init, "Tiger Electronics (licensed from Sega)", "Space Harrier II (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1990, tstrider,    0,          0, tstrider,    tstrider,    tstrider_state,    empty_init, "Tiger Electronics (licensed from Capcom)", "Strider (handheld)", MACHINE_SUPPORTS_SAVE )
@@ -9327,6 +9717,7 @@ CONS( 1995, tbatfor,     0,          0, tbatfor,     tbatfor,     tbatfor_state,
 CONS( 1995, tjdredd,     0,          0, tjdredd,     tjdredd,     tjdredd_state,     empty_init, "Tiger Electronics", "Judge Dredd (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1995, tapollo13,   0,          0, tapollo13,   tapollo13,   tapollo13_state,   empty_init, "Tiger Electronics", "Apollo 13 (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1995, tgoldeye,    0,          0, tgoldeye,    tgoldeye,    tgoldeye_state,    empty_init, "Tiger Electronics", "007: GoldenEye (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1996, tkazaam,     0,          0, tkazaam,     tkazaam,     tkazaam_state,     empty_init, "Tiger Electronics", "Kazaam (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, tsjam,       0,          0, tsjam,       tsjam,       tsjam_state,       empty_init, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state,      empty_init, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE )
 

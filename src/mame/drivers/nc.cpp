@@ -1376,7 +1376,8 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
-MACHINE_CONFIG_START(nc_state::nc_base)
+void nc_state::nc_base(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, /*6000000*/ 4606000);        /* Russell Marks says this is more accurate */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nc_state::nc_map);
@@ -1409,9 +1410,9 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	uart_clock.signal_handler().set(FUNC(nc_state::write_uart_clock));
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, nullptr)
-	MCFG_GENERIC_LOAD(nc_state, nc_pcmcia_card)
-	MCFG_GENERIC_UNLOAD(nc_state, nc_pcmcia_card)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cardslot", generic_plain_slot, nullptr));
+	cartslot.set_device_load(FUNC(nc_state::load_pcmcia_card), this);
+	cartslot.set_device_unload(FUNC(nc_state::unload_pcmcia_card), this);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
@@ -1419,7 +1420,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 
 	/* dummy timer */
 	TIMER(config, "dummy_timer").configure_periodic(FUNC(nc_state::dummy_timer_callback), attotime::from_hz(50));
-MACHINE_CONFIG_END
+}
 
 void nc100_state::nc100(machine_config &config)
 {

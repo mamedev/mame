@@ -32,7 +32,6 @@ For BIOS CRC confirmation
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 #include "imagedev/cassette.h"
 #include "bus/generic/slot.h"
@@ -72,7 +71,7 @@ private:
 	uint8_t m_cass_conf;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void pv2000_io_map(address_map &map);
 	void pv2000_map(address_map &map);
 };
@@ -368,7 +367,7 @@ void pv2000_state::machine_reset()
 	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);    // initialize RAM
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pv2000_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -385,7 +384,8 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 }
 
 /* Machine Drivers */
-MACHINE_CONFIG_START(pv2000_state::pv2000)
+void pv2000_state::pv2000(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(7'159'090)/2); // 3.579545 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &pv2000_state::pv2000_map);
@@ -400,23 +400,19 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-
 	SN76489A(config, "sn76489a", XTAL(7'159'090)/2).add_route(ALL_OUTPUTS, "mono", 1.00); /* 3.579545 MHz */
-
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pv2000_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom,col")
-	MCFG_GENERIC_LOAD(pv2000_state, pv2000_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pv2000_cart", "bin,rom,col").set_device_load(FUNC(pv2000_state::cart_load), this);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pv2000");
-MACHINE_CONFIG_END
+}
 
 
 

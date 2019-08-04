@@ -187,7 +187,7 @@ void goupil_g1_state::mem(address_map &map)
 
 	map(0xE400, 0xE7FF).ram();
 	map(0xE800, 0xE80F).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
-	map(0xE810, 0xE81F).rw(m_via_video, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE810, 0xE81F).m(m_via_video, FUNC(via6522_device::map));
 
 	map(0xE820, 0xE820).rw("i8279_kb1", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0xE821, 0xE821).rw("i8279_kb1", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
@@ -195,9 +195,9 @@ void goupil_g1_state::mem(address_map &map)
 	map(0xE830, 0xE830).rw("i8279_kb2", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0xE831, 0xE831).rw("i8279_kb2", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 
-	map(0xE840, 0xE84F).rw(m_via_keyb, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE840, 0xE84F).m(m_via_keyb, FUNC(via6522_device::map));
 
-	map(0xE860, 0xE86F).rw(m_via_modem, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE860, 0xE86F).m(m_via_modem, FUNC(via6522_device::map));
 
 	map(0xE8F0, 0xE8FF).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
 
@@ -216,7 +216,7 @@ void goupil_g2_state::mem(address_map &map)
 	map(0xE400, 0xE7FF).ram();
 
 	map(0xE800, 0xE80F).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
-	map(0xE810, 0xE81F).rw(m_via_video, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE810, 0xE81F).m(m_via_video, FUNC(via6522_device::map));
 
 	map(0xE820, 0xE820).rw("i8279_kb1", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0xE821, 0xE821).rw("i8279_kb1", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
@@ -224,9 +224,9 @@ void goupil_g2_state::mem(address_map &map)
 	map(0xE830, 0xE830).rw("i8279_kb2", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0xE831, 0xE831).rw("i8279_kb2", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 
-	map(0xE840, 0xE84F).rw(m_via_keyb, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE840, 0xE84F).m(m_via_keyb, FUNC(via6522_device::map));
 
-	map(0xE860, 0xE86F).rw(m_via_modem, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE860, 0xE86F).m(m_via_modem, FUNC(via6522_device::map));
 
 	map(0xE870, 0xE870).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xE871, 0xE871).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));

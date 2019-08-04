@@ -1022,7 +1022,7 @@ void itech8_state::sound3812_external_map(address_map &map)
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0x3000, 0x37ff).ram();
 	map(0x4000, 0x4000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x5000, 0x500f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x5000, 0x500f).m("via6522_0", FUNC(via6522_device::map));
 	map(0x8000, 0xffff).rom();
 }
 

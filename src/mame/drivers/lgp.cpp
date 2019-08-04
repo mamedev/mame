@@ -124,8 +124,6 @@ private:
 /* VIDEO GOODS */
 uint32_t lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int charx, chary;
-
 	/* make color 0 transparent */
 	m_palette->set_pen_color(0, rgb_t(0,0,0,0));
 
@@ -133,18 +131,18 @@ uint32_t lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitma
 	bitmap.fill(0, cliprect);
 
 	/* Draw tiles */
-	for (charx = 0; charx < 32; charx++)
+	for (int charx = 0; charx < 32; charx++)
 	{
-		for (chary = 0; chary < 32; chary++)
+		for (int chary = 0; chary < 32; chary++)
 		{
-			int current_screen_character = (chary*32) + charx;
+			int current_screen_character = (chary * 32) + charx;
 
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 					m_tile_ram[current_screen_character],
 					0,
-					0, 0, charx*8, chary*8, 0);
+					0, 0, charx * 8, chary * 8, 0);
 		}
 	}
 
@@ -410,7 +408,8 @@ void lgp_state::lgp_palette(palette_device &palette) const
 }
 
 /* DRIVER */
-MACHINE_CONFIG_START(lgp_state::lgp)
+void lgp_state::lgp(machine_config &config)
+{
 	/* main cpu */
 	Z80(config, m_maincpu, CPU_PCB_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lgp_state::main_program_map);
@@ -425,12 +424,11 @@ MACHINE_CONFIG_START(lgp_state::lgp)
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->command_strobe_callback().set(FUNC(lgp_state::ld_command_strobe_cb));
 	m_laserdisc->set_overlay(256, 256, FUNC(lgp_state::screen_update_lgp));
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	PALETTE(config, m_palette, FUNC(lgp_state::lgp_palette), 256);
 
@@ -439,7 +437,7 @@ MACHINE_CONFIG_START(lgp_state::lgp)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( lgp )

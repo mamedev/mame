@@ -132,6 +132,7 @@ public:
 		, m_sio(*this, "sio")
 		, m_alarm(*this, "alarm")
 		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 		, m_keyboard(*this, "keyboard")
 		, m_printer(*this, "printer")
 		, m_p_chargen(*this, "chargen")
@@ -180,7 +181,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(loopback_rxcb_w);
 	DECLARE_WRITE_LINE_MEMBER(porte6_w);
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -195,6 +196,7 @@ private:
 	required_device<z80sio_device>  m_sio;
 	required_device<speaker_sound_device> m_alarm;
 	required_device<screen_device>  m_screen;
+	required_device<palette_device> m_palette;
 
 	required_device<uts_keyboard_port_device> m_keyboard;
 	required_device<rs232_port_device> m_printer;
@@ -481,7 +483,7 @@ void univac_state::machine_start()
 	save_item(NAME(m_sio_wrdyb));
 }
 
-uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t univac_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!m_display_enable)
 	{
@@ -489,29 +491,29 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		return 0;
 	}
 
-	u8 y,ra,chr;
-	uint16_t sy=0,x,ma=0,gfx;
+	const pen_t *pen = m_palette->pens();
+
+	uint16_t sy=0,ma=0;
 
 	m_framecnt++;
 
-	for (y = 0; y < 25; y++)
+	for (u8 y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 14; ra++)
+		for (u8 ra = 0; ra < 14; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
-			for (x = ma; x < ma + 80; x++)
+			for (uint16_t x = ma; x < ma + 80; x++)
 			{
-				chr = ram_r(x ^ m_disp_mask);    // bit 7 = rv attribute (or dim, depending on control-page setting)
+				u8 chr = ram_r(x ^ m_disp_mask);    // bit 7 = rv attribute (or dim, depending on control-page setting)
 
-				gfx = m_p_chargen[((chr & 0x7f)<<4) | ra];
+				uint16_t gfx = m_p_chargen[((chr & 0x7f)<<4) | ra];
 
 				// chars 1C, 1D, 1F need special handling
 				if ((chr >= 0x1c) && (chr <= 0x1f) && BIT(gfx, 7))
 				{
 					gfx &= 0x7f;
-				// They also blink
-					if (m_framecnt & 16)
+					if (m_framecnt & 16) // They also blink
 						gfx = 0;
 				}
 
@@ -520,18 +522,13 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					gfx = ~gfx;
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 8);
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
+				for (int bit = 8; bit >= 0; bit--)
+				{
+					*p++ = pen[BIT(gfx, bit)];
+				}
 			}
 		}
-		ma+=80;
+		ma += 80;
 	}
 	return 0;
 }
@@ -588,9 +585,8 @@ void univac_state::uts20(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_screen_update(FUNC(univac_state::screen_update));
-	m_screen->set_palette("palette");
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_uts);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_uts);
 
 	dp835x_device &crtc(DP835X_A(config, "crtc", 19'980'000));
 	crtc.set_screen("screen");

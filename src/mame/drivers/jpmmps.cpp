@@ -265,7 +265,7 @@ void jpmmps_state::jpmmps(machine_config &config)
 	mainlatch.q_out_cb<6>().set_nop(); // bb
 	mainlatch.q_out_cb<7>().set_nop(); // diagnostic led
 
-	//MCFG_DEVICE_ADD("reelmcu", TMS7041, XTAL(5'000'000))
+	//TMS7041(config, "reelmcu", XTAL(5'000'000));
 
 	i8255_device &ic26(I8255(config, "ppi8255_ic26"));
 	// Port B 0 is coin lockout

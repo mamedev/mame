@@ -1897,7 +1897,7 @@ ROM_START( puyo ) /* Puyo Puyo  (c)1992 Sega / Compile */
 ROM_END
 
 
-ROM_START( puyoj ) /* Puyo Puyo (Rev B)  (c)1992 Sega / Compile */
+ROM_START( puyoj ) /* Puyo Puyo (Rev B)  (c)1992 Sega / Compile - 834-9029 (EMP5032 labeled 317-0203) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-15036b.ic32", 0x000000, 0x020000, CRC(5310ca1b) SHA1(dcfe2bf7476b640dfb790e8716e75b483d535e48) )
 	ROM_LOAD16_BYTE( "epr-15035b.ic31", 0x000001, 0x020000, CRC(bc62e400) SHA1(12bb6031574838a28889f6edb31dbb689265287c) )
@@ -1916,7 +1916,7 @@ ROM_START( puyoj ) /* Puyo Puyo (Rev B)  (c)1992 Sega / Compile */
 ROM_END
 
 
-ROM_START( puyoja ) /* Puyo Puyo (Rev A)  (c)1992 Sega / Compile */
+ROM_START( puyoja ) /* Puyo Puyo (Rev A)  (c)1992 Sega / Compile - 834-9029 (EMP5032 labeled 317-0203) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-15036a.ic32", 0x000000, 0x020000, CRC(61b35257) SHA1(e09a7e992999befc88fc7928a478d1e2d14d7b08) )
 	ROM_LOAD16_BYTE( "epr-15035a.ic31", 0x000001, 0x020000, CRC(dfebb6d9) SHA1(6f685729ef4660c2eba409c5236c6d2f313eef5b) )
@@ -2019,7 +2019,7 @@ ROM_START( puyopuy2 ) /* Puyo Puyo 2  (c)1994 Compile */
 ROM_END
 
 
-ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega */
+ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega - 834-10778 (EMP5032 labeled 317-0218) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16662a.ic32", 0x000000, 0x040000, CRC(bbd305d6) SHA1(1a4f4869fefac188c69bc67df0b625e43a0c3f1f) )
 	ROM_LOAD16_BYTE( "epr-16661a.ic31", 0x000001, 0x040000, CRC(5a7d14f4) SHA1(a615b5f481256366db7b1c6302a8dcb69708102b) )

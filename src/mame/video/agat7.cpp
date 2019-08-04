@@ -94,7 +94,9 @@ void agat7video_device::device_reset()
 
 READ8_MEMBER(agat7video_device::read)
 {
-	do_io(offset);
+	if(!machine().side_effects_disabled())
+		do_io(offset);
+
 	return 0;
 }
 
@@ -110,7 +112,7 @@ void agat7video_device::do_io(int offset)
 	{
 	case 0:
 		m_video_mode = GRAPHICS_LORES;
-		m_start_address = (offset) << 9;
+		m_start_address = (offset & 0x30) << 9;
 		logerror("offset %04X, video mode 0 (GRAPHICS_LORES)\n", m_start_address);
 		break;
 
@@ -134,7 +136,7 @@ void agat7video_device::do_io(int offset)
 
 	case 3:
 		m_video_mode = GRAPHICS_MONO;
-		m_start_address = ((offset & 0x3f) - 0x03) << 9;
+		m_start_address = ((offset - 0x03) & 0x30) << 9;
 		logerror("offset %04X, video mode 3 (GRAPHICS_MONO)\n", m_start_address);
 		break;
 	}
@@ -184,14 +186,12 @@ void agat7video_device::text_update_lores(screen_device &screen, bitmap_ind16 &b
 			address = m_start_address + (col * 2) + (row * 8);
 			ch = m_ram_dev->read(address);
 			attr = m_ram_dev->read(address + 1);
+			fg = bitswap<8>(attr,7,6,5,3,4,2,1,0) & 15;
 			if (BIT(attr, 5)) {
-				fg = bitswap<8>(attr,7,6,5,3,4,2,1,0) & 15;
-				bg = 0;
+				plot_text_character(bitmap, col * 16, row, 2, ch, m_char_ptr, m_char_size, fg, bg);
 			} else {
-				fg = 0;
-				bg = bitswap<8>(attr,7,6,5,3,4,2,1,0) & 15;
+				plot_text_character(bitmap, col * 16, row, 2, ch, m_char_ptr, m_char_size, bg, fg);
 			}
-			plot_text_character(bitmap, col * 16, row, 2, ch, m_char_ptr, m_char_size, fg, bg);
 		}
 	}
 }
@@ -352,25 +352,3 @@ uint32_t agat7video_device::screen_update(screen_device &screen, bitmap_ind16 &b
 
 	return 0;
 }
-
-#if 0
-static const rgb_t agat7_palette[] =
-{
-	rgb_t::black(),
-	rgb_t(0xFF, 0x00, 0x00),  /* White */
-	rgb_t(0x00, 0xFF, 0x00),  /* White */
-	rgb_t(0xFF, 0xFF, 0x00),  /* White */
-	rgb_t(0x00, 0x00, 0xFF),  /* White */
-	rgb_t(0xFF, 0x00, 0xFF),  /* White */
-	rgb_t(0xFF, 0xFF, 0x00),  /* White */
-	rgb_t(0xFF, 0xFF, 0xFF),  /* White */
-	rgb_t::black(),
-	rgb_t(0x7F, 0x00, 0x00),  /* White */
-	rgb_t(0x00, 0x7F, 0x00),  /* White */
-	rgb_t(0x7F, 0x7F, 0x00),  /* White */
-	rgb_t(0x00, 0x00, 0x7F),  /* White */
-	rgb_t(0x7F, 0x00, 0x7F),  /* White */
-	rgb_t(0x7F, 0x7F, 0x00),  /* White */
-	rgb_t(0x7F, 0x7F, 0x7F)   /* White */
-};
-#endif

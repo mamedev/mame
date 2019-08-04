@@ -195,7 +195,8 @@ static void kaypro_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(kaypro_state::kayproii)
+void kaypro_state::kayproii(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 20_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaypro_state::kaypro_map);
@@ -224,7 +225,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* piezo-device needs to be measured */
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", attotime::from_seconds(3))
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kaypro_state::quickload_cb), this);
 
 	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
 	kbd.rxd_cb().set("sio", FUNC(z80sio_device::rxb_w));
@@ -270,7 +271,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("kayproii");
-MACHINE_CONFIG_END
+}
 
 void kaypro_state::kayproiv(machine_config &config)
 {
@@ -283,7 +284,8 @@ void kaypro_state::kayproiv(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats);
 }
 
-MACHINE_CONFIG_START(kaypro_state::kaypro484)
+void kaypro_state::kaypro484(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaypro_state::kaypro_map);
@@ -316,7 +318,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	m_crtc->set_char_width(7);
 	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row), this);
 
-	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", attotime::from_seconds(3))
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kaypro_state::quickload_cb), this);
 
 	kaypro_10_keyboard_device &kbd(KAYPRO_10_KEYBOARD(config, "kbd"));
 	kbd.rxd_cb().set("sio_1", FUNC(z80sio_device::rxb_w));
@@ -364,7 +366,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	m_fdc->set_force_ready(true);
 	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-MACHINE_CONFIG_END
+}
 
 void kaypro_state::kaypro10(machine_config &config)
 {

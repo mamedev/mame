@@ -10478,10 +10478,11 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="simearth">
-		<description>SimEarth: The Living Planet</description>
+		<description>SimEarth: The Living Planet (3.5", v1.4)</description>
 		<year>1990</year>
 		<publisher>Maxis Software</publisher>
 		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.4" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="SimEarth [Maxis] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="cdd4e652" sha1="4024b10089787a7c76ca01b773fbb48325cd807e"/>
@@ -10490,6 +10491,96 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="SimEarth [Maxis] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="72ebd131" sha1="4a3aabedfe6df4920b1f24fbcc9e88d7a116ea46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simeartha" cloneof="simearth">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>SimEarth: The Living Planet (3.5", v1.3)</description>
+		<year>1990</year>
+		<publisher>Maxis Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.3" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk, Data Disk #1" />
+			<feature name="disk_serial" value="010-09-605" />
+			<dataarea name="flop" size = "737280">
+				<rom name="simeartha_1.img" size="737280" crc="96e54064" sha1="0779b278ca89060a439ef055b9a4c0f1821690d8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk #2 &amp; #3" />
+			<feature name="disk_serial" value="010-09-606" />
+			<dataarea name="flop" size = "737280">
+				<rom name="simeartha_2.img" size="737280" crc="7d133b8e" sha1="9b98f185333ad8ff5d48fd22cb44f8c00f5061ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simearthb" cloneof="simearth">
+		<description>SimEarth: The Living Planet (5.25", v1.1)</description>
+		<year>1990</year>
+		<publisher>Maxis Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="SimEarth - The Living Planet (USA) (5.25'') (Disk 1).img" size="368640" crc="343bffef" sha1="dd936c849b98db99757e7f2f0494e699f37855cf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="SimEarth - The Living Planet (USA) (5.25'') (Disk 2).img" size="368640" crc="d6d6c0a3" sha1="9404dd3acd717dfac59f0b898380c168b76749f1"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="SimEarth - The Living Planet (USA) (5.25'') (Disk 3).img" size="368640" crc="365d9eb4" sha1="422281fb9cbdd1bbb58199400484424ebb75f947"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="SimEarth - The Living Planet (USA) (5.25'') (Disk 4).img" size="368640" crc="10bee441" sha1="14359d18518fbad98724b3ff4d8871f810070599"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simearthb35" cloneof="simearth">
+		<description>SimEarth: The Living Planet (3.5", v1.1)</description>
+		<year>1990</year>
+		<publisher>Maxis Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimEarth - The Living Planet (USA) (3.5'') (Disk 1).img" size="737280" crc="e95402e7" sha1="e7f22ccf3220110e23a5e9f2fe18bf34611f1e36"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimEarth - The Living Planet (USA) (3.5'') (Disk 2).img" size="737280" crc="6bb45f7b" sha1="90df8dc1323efcb531ed072861972182b83c8081"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simearthc" cloneof="simearth">
+		<description>SimEarth: The Living Planet (Europe, 3.5", v1.0)</description>
+		<year>1990</year>
+		<publisher>Maxis Software</publisher>
+		<info name="developer" value="Maxis Software" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimEarth - The Living Planet (Europe) (3.5'') (Disk 1).img" size="737280" crc="0b84dfe7" sha1="5243ac6b091f184491349ebe548b49610da32ae4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimEarth - The Living Planet (Europe) (3.5'') (Disk 2).img" size="737280" crc="78ab310c" sha1="ba2358ac6d7695449cc6ca4136f73c4d5482da39"/>
 			</dataarea>
 		</part>
 	</software>

@@ -177,14 +177,10 @@ uint32_t att4425_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					gfx ^= 255;
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7) ? fg : bg;
-				*p++ = BIT(gfx, 6) ? fg : bg;
-				*p++ = BIT(gfx, 5) ? fg : bg;
-				*p++ = BIT(gfx, 4) ? fg : bg;
-				*p++ = BIT(gfx, 3) ? fg : bg;
-				*p++ = BIT(gfx, 2) ? fg : bg;
-				*p++ = BIT(gfx, 1) ? fg : bg;
-				*p++ = BIT(gfx, 0) ? fg : bg;
+				for (int i = 7; i >= 0; i--)
+				{
+					*p++ = BIT(gfx, i) ? fg : bg;
+				}
 				*p++ = bg;
 			}
 		}

@@ -273,9 +273,12 @@ void coco3_state::coco3(machine_config &config)
 	// Becker Port device
 	COCO_DWSOCK(config, DWSOCK_TAG, 0);
 
+	// sound hardware
+	coco_sound(config);
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "printer"));
 	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
@@ -315,9 +318,6 @@ void coco3_state::coco3(machine_config &config)
 	rgb_screen.set_size(640, 243);
 	rgb_screen.set_visarea(0, 640-1, 1, 241-1);
 	rgb_screen.set_vblank_time(0);
-
-	// sound hardware
-	coco_sound(config);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K,2M,8M");

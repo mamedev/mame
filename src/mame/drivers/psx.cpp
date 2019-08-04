@@ -66,7 +66,7 @@ protected:
 	int load_psf(std::vector<uint8_t> buffer);
 	DECLARE_READ16_MEMBER(parallel_r);
 	DECLARE_WRITE16_MEMBER(parallel_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(psx_exe_load);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_exe);
 	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
@@ -482,7 +482,7 @@ WRITE16_MEMBER(psx1_state::parallel_w)
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER(psx1_state, psx_exe_load)
+QUICKLOAD_LOAD_MEMBER(psx1_state::quickload_exe)
 {
 	m_exe_buffer.resize(quickload_size);
 
@@ -543,8 +543,7 @@ void psx1_state::psx_base(machine_config &config)
 	spu.add_route(0, "lspeaker", 1.00);
 	spu.add_route(1, "rspeaker", 1.00);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(psx1_state, psx_exe_load), this), "cpe,exe,psf,psx");
+	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe), this);
 
 	PSX_PARALLEL_SLOT(config, "parallel", psx_parallel_devices, nullptr);
 

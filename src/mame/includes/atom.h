@@ -117,7 +117,7 @@ public:
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device &slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, *m_cart); }
-	DECLARE_QUICKLOAD_LOAD_MEMBER(atom_atm);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void atombb(machine_config &config);
 	void atom(machine_config &config);
 	void atom_mem(address_map &map);

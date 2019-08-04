@@ -16,7 +16,6 @@
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #include "bus/generic/carts.h"
@@ -94,7 +93,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( ramdis_w );
 	DECLARE_WRITE_LINE_MEMBER( ctrl1_w );
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void svi3x8_io(address_map &map);
 	void svi3x8_io_bank(address_map &map);
@@ -459,7 +458,7 @@ void svi3x8_state::ppi_port_c_w(uint8_t data)
 	// bit 4-6, cassette
 	m_cassette->change_state(BIT(data, 4) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 	m_cassette->output(BIT(data, 5) ? -1.0 : +1.0);
-	m_cassette->change_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+	//m_cassette->change_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 
 	// bit 7, mix psg sound (keyboard click)
 	m_speaker->level_w(BIT(data, 7));
@@ -498,7 +497,7 @@ WRITE_LINE_MEMBER( svi3x8_state::ctrl1_w )
 //  CARTRIDGE
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
+DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state::cart_load )
 {
 	uint32_t size = m_cart_rom->common_get_size("rom");
 
@@ -513,7 +512,8 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(svi3x8_state::svi318)
+void svi3x8_state::svi318(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(10'738'635) / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &svi3x8_state::svi3x8_mem);
@@ -530,8 +530,7 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'635) / 6));
 	psg.port_a_read_callback().set_ioport("JOY");
 	psg.port_b_write_callback().set(FUNC(svi3x8_state::bank_w));
@@ -539,15 +538,14 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 
 	// cassette
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(svi_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_formats(svi_cassette_formats);
 	m_cassette->set_interface("svi318_cass");
 	SOFTWARE_LIST(config, "cass_list").set_original("svi318_cass");
 
 	// cartridge slot
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "svi318_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(svi3x8_state, cartridge)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "svi318_cart", "bin,rom").set_device_load(FUNC(svi3x8_state::cart_load), this);
 	SOFTWARE_LIST(config, "cart_list").set_original("svi318_cart");
 
 	// expander bus
@@ -558,7 +556,7 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	m_expander->ctrl1_handler().set(FUNC(svi3x8_state::ctrl1_w));
 	m_expander->excsr_handler().set(m_vdp, FUNC(tms9928a_device::read));
 	m_expander->excsw_handler().set(m_vdp, FUNC(tms9928a_device::write));
-MACHINE_CONFIG_END
+}
 
 void svi3x8_state::svi318p(machine_config &config)
 {

@@ -224,10 +224,12 @@ Usage:
       (you will see the memory editor) then choose a command (0 for example).
     - If you load a chip-8 cart, press R twice. If it doesn't do anything you may
       need to do a hard reset, then hit R twice. R toggles between the CPU running
-      or stopped.
+      or stopped. Only about half of the chip-8 programs in my collection work.
     - There's also support for Super-Chip8 carts, but none seem to work.
     - There's a slot option to use Tiny Basic, this starts up, but unable to type
       anything.
+    - Cassette records and plays back, however about 10% of the data is
+      consistently loaded wrongly.
 
 */
 
@@ -554,7 +556,7 @@ static const discrete_555_desc vip_ca555_a =
 
 static DISCRETE_SOUND_START( vip_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
-	DISCRETE_555_ASTABLE_CV(NODE_02, NODE_01, 470, (int) RES_M(1), (int) CAP_P(470), NODE_01, &vip_ca555_a)
+	DISCRETE_555_ASTABLE_CV(NODE_02, NODE_01, 470, RES_M(1), CAP_P(470), NODE_01, &vip_ca555_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
 DISCRETE_SOUND_END
 
@@ -663,7 +665,7 @@ void vip_state::machine_reset()
 //  QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //-------------------------------------------------
 
-QUICKLOAD_LOAD_MEMBER( vip_state, vip )
+QUICKLOAD_LOAD_MEMBER(vip_state::quickload_cb)
 {
 	uint8_t *ram = m_ram->pointer();
 	uint8_t *chip8_ptr = nullptr;
@@ -710,7 +712,8 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //  machine_config( vip )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vip_state::vip)
+void vip_state::vip(machine_config &config)
+{
 	// basic machine hardware
 	CDP1802(config, m_maincpu, 3.52128_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vip_state::vip_mem);
@@ -751,9 +754,9 @@ MACHINE_CONFIG_START(vip_state::vip)
 	m_exp->dma_in_wr_callback().set(FUNC(vip_state::exp_dma_in_w));
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x")
+	QUICKLOAD(config, "quickload", "bin,c8,c8x").set_load_callback(FUNC(vip_state::quickload_cb), this);
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("vip_cass");
 
 	// software lists
@@ -761,7 +764,7 @@ MACHINE_CONFIG_START(vip_state::vip)
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("2K").set_extra_options("4K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

@@ -79,8 +79,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_pcmcia_card );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_pcmcia_card );
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

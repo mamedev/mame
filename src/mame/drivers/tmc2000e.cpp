@@ -311,7 +311,8 @@ void tmc2000e_state::tmc2000e(machine_config &config)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("40K");

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-/***************************************************************************
+/************************************************************************************************
 
         Unior
 
@@ -18,23 +18,23 @@ key; using spacebar and the correct parameters is enough.
 If you press Shift, indicators for numlock and capslock will appear.
 
 Monitor commands:
-C
+C - ?
 D - hex dump
 E - save
-F
-G
+F - fill memory
+G - go
 H - set register
 I - load
 J - modify memory
-K
+K - ?
 L - list registers
-M
+M - ?
 
 ToDo:
-- Cassette
+- Cassette (coded but unable to test as the i8251 device needs work to support syndet)
 - Colour
 
-****************************************************************************/
+**********************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -43,6 +43,7 @@ ToDo:
 #include "machine/i8255.h"
 #include "machine/i8257.h"
 #include "video/i8275.h"
+#include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
@@ -57,9 +58,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pit(*this, "pit")
 		, m_dma(*this, "dma")
+		, m_uart(*this, "uart")
+		, m_cass(*this, "cassette")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
 		, m_p_vram(*this, "vram")
+		, m_io_keyboard(*this, "X%d", 0)
 	{ }
 
 	void unior(machine_config &config);
@@ -75,32 +79,37 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi1_a_w);
 	DECLARE_WRITE8_MEMBER(ppi1_c_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	void unior_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	void unior_io(address_map &map);
-	void unior_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	uint8_t m_4c;
 	uint8_t m_4e;
+	bool m_txe, m_txd;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
+	required_device<i8251_device> m_uart;
+	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
 	required_region_ptr<u8> m_p_vram;
+	required_ioport_array<11> m_io_keyboard;
 };
 
-void unior_state::unior_mem(address_map &map)
+void unior_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xf7ff).ram();
 	map(0xf800, 0xffff).rom().w(FUNC(unior_state::vram_w)); // main video
 }
 
-void unior_state::unior_io(address_map &map)
+void unior_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -110,7 +119,7 @@ void unior_state::unior_io(address_map &map)
 	map(0x50, 0x50).w(FUNC(unior_state::scroll_w));
 	map(0x60, 0x61).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xdc, 0xdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xec, 0xed).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xec, 0xed).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */
@@ -215,7 +224,7 @@ static INPUT_PORTS_START( unior )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 
-	PORT_START("XA")
+	PORT_START("X10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
@@ -299,6 +308,20 @@ void unior_state::unior_palette(palette_device &palette) const
     i8255
 
 *************************************************/
+WRITE_LINE_MEMBER(unior_state::ctc_z1_w)
+{
+	// write
+	if (m_txe)
+		m_cass->output(1);
+	else
+		m_cass->output((m_txd ^ state) ? 1 : 0);
+
+	m_uart->write_txc(state);
+
+	// read - untested
+	m_uart->write_rxd((m_cass->input() > 0.04) ? 1 : 0);
+	m_uart->write_rxc(state);
+}
 
 
 READ8_MEMBER( unior_state::ppi0_b_r )
@@ -317,9 +340,11 @@ READ8_MEMBER( unior_state::ppi1_a_r )
 
 READ8_MEMBER( unior_state::ppi1_b_r )
 {
-	char kbdrow[6];
-	sprintf(kbdrow,"X%X", m_4c&15);
-	return ioport(kbdrow)->read();
+	u8 t = m_4c & 15;
+	if (t < 11)
+		return m_io_keyboard[t]->read();
+	else
+		return 0xff;
 }
 
 READ8_MEMBER( unior_state::ppi1_c_r )
@@ -375,14 +400,15 @@ WRITE_LINE_MEMBER( unior_state::hrq_w )
 void unior_state::machine_reset()
 {
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xF800);
+	m_uart->write_cts(0);
 }
 
 void unior_state::unior(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(20'000'000) / 9);
-	m_maincpu->set_addrmap(AS_PROGRAM, &unior_state::unior_mem);
-	m_maincpu->set_addrmap(AS_IO, &unior_state::unior_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unior_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &unior_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -397,14 +423,19 @@ void unior_state::unior(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
+
 	/* Devices */
-	I8251(config, "uart", 0);
+	I8251(config, m_uart, 20_MHz_XTAL / 9);
+	m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
+	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(20_MHz_XTAL / 12);
 	m_pit->set_clk<1>(20_MHz_XTAL / 9);
-	m_pit->out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
-	m_pit->out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
+	m_pit->out_handler<1>().set(FUNC(unior_state::ctc_z1_w));
 	m_pit->set_clk<2>(16_MHz_XTAL / 9 / 64); // unknown frequency
 	m_pit->out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 

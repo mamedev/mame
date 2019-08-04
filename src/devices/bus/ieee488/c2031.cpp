@@ -64,8 +64,8 @@ const tiny_rom_entry *c2031_device::device_rom_region() const
 void c2031_device::c2031_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x1c00, 0x1c0f).mirror(0x63f0).rw(M6522_1_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
+	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
 	map(0x8000, 0xbfff).mirror(0x4000).rom().region(M6502_TAG, 0);
 }
 

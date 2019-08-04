@@ -3,15 +3,9 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* novag_presto.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
+Novag Presto / Novag Octo
 
-TODO:
-- is led handling correct? mux data needs to be auto cleared
-  similar to diablo/sexpert
-
-*******************************************************************************
-
-Novag Presto overview:
+Hardware notes (Presto):
 - NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
 - buzzer, 16+4 LEDs, 8*8 chessboard buttons
 
@@ -19,13 +13,19 @@ Octo has a NEC D80C49HC MCU(serial 111), OSC from LC circuit measured ~12MHz
 The buzzer has a little electronic circuit going on, not sure whatfor.
 Otherwise, it's identical to Presto. The MCU internal ROM is same too.
 
+TODO:
+- controls are too sensitive, is there a bug in the CPU core timer emulation?
+  6MHz: valid (single) button press registered between 307ms and 436ms,
+  12MHz: between 154ms and 218ms, 15MHz: between 123ms and 174ms.
+
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/novagbase.h"
-
 #include "cpu/mcs48/mcs48.h"
+#include "machine/sensorboard.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -34,12 +34,18 @@ Otherwise, it's identical to Presto. The MCU internal ROM is same too.
 
 namespace {
 
-class presto_state : public novagbase_state
+// Presto / shared
+
+class presto_state : public driver_device
 {
 public:
 	presto_state(const machine_config &mconfig, device_type type, const char *tag) :
-		novagbase_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_board(*this, "board"),
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.0")
 	{ }
 
 	// machine drivers
@@ -47,14 +53,40 @@ public:
 	void octo(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
+	required_device<sensorboard_device> m_board;
+	optional_device<dac_bit_interface> m_dac;
+	required_ioport m_inputs;
 
 	// I/O handlers
+	void update_display();
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	bool m_kp_select;
+	u8 m_inp_mux;
+	u8 m_led_select;
 };
+
+void presto_state::machine_start()
+{
+	// zerofill
+	m_kp_select = false;
+	m_inp_mux = 0;
+	m_led_select = 0;
+
+	// register for savestates
+	save_item(NAME(m_kp_select));
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_select));
+}
+
+// Octo
 
 class octo_state : public presto_state
 {
@@ -83,36 +115,53 @@ void octo_state::octo_set_cpu_freq()
 }
 
 
+
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // MCU ports/generic
 
+void presto_state::update_display()
+{
+	m_display->matrix(m_led_select, m_inp_mux);
+}
+
 WRITE8_MEMBER(presto_state::mux_w)
 {
-	// D0-D7: input mux low, led data
-	m_inp_mux = (m_inp_mux & ~0xff) | (~data & 0xff);
-	display_matrix(8, 3, m_inp_mux, m_led_select);
+	// D0-D7: input mux, led data
+	m_inp_mux = ~data;
+	update_display();
 }
 
 WRITE8_MEMBER(presto_state::control_w)
 {
-	// P21: input mux high
-	m_inp_mux = (m_inp_mux & 0xff) | (~data << 7 & 0x100);
+	// P21: keypad select
+	m_kp_select = bool(~data & 2);
 
 	// P22,P23: speaker lead 1,2
 	m_dac->write(BIT(data, 2) & BIT(~data, 3));
 
 	// P24-P26: led select
 	m_led_select = ~data >> 4 & 7;
-	m_inp_mux &= ~0xff; // ?
+	update_display();
 }
 
 READ8_MEMBER(presto_state::input_r)
 {
+	u8 data = 0;
+
 	// P10-P17: multiplexed inputs
-	return ~read_inputs(9) & 0xff;
+	// read chessboard buttons
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_board->read_rank(i);
+
+	// read sidepanel keypad
+	if (m_kp_select)
+		data |= m_inputs->read();
+
+	return ~data;
 }
 
 
@@ -122,9 +171,7 @@ READ8_MEMBER(presto_state::input_r)
 ******************************************************************************/
 
 static INPUT_PORTS_START( presto )
-	PORT_INCLUDE( generic_cb_buttons )
-
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Black/White") // Octo calls it "Change Color"
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Verify / Pawn")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Set Up / Rook")
@@ -158,7 +205,12 @@ void presto_state::presto(machine_config &config)
 	m_maincpu->p2_out_cb().set(FUNC(presto_state::control_w));
 	m_maincpu->bus_out_cb().set(FUNC(presto_state::mux_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(presto_state::display_decay_tick), attotime::from_msec(1));
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(320));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3, 8);
 	config.set_default_layout(layout_novag_presto);
 
 	/* sound hardware */
@@ -173,6 +225,8 @@ void presto_state::octo(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(12000000); // LC circuit, measured, see octo_set_cpu_freq
+
+	m_board->set_delay(attotime::from_msec(160));
 }
 
 
@@ -200,5 +254,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1984, npresto, 0,       0,      presto,  presto, presto_state, empty_init, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, nocto,   npresto, 0,      octo,    octo,   octo_state,   empty_init, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, npresto, 0,       0,      presto,  presto, presto_state, empty_init, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, nocto,   npresto, 0,      octo,    octo,   octo_state,   empty_init, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

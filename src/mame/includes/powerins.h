@@ -22,9 +22,12 @@ public:
 		m_okibank(*this, "okibank")
 	{ }
 
+	void powerins(machine_config &config);
 	void powerinsa(machine_config &config);
 	void powerinsb(machine_config &config);
-	void powerins(machine_config &config);
+	void powerinsc(machine_config &config);
+
+	void init_powerinsc();
 
 private:
 	required_device<cpu_device> m_maincpu;

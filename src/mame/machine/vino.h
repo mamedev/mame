@@ -34,7 +34,7 @@ private:
 		CHAN_COUNT
 	};
 
-	enum
+	enum : u64
 	{
 		CTRL_MASK                   = 0x7fffffff,
 

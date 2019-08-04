@@ -22,13 +22,16 @@ TODO:
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/timer.h"
-#include "machine/tms6100.h"
-#include "sound/votrax.h"
 #include "video/mm5445.h"
+#include "video/pwm.h"
+#include "machine/tms6100.h"
+#include "machine/timer.h"
+#include "sound/votrax.h"
 #include "speaker.h"
 
+// internal artwork
 #include "k28.lh"
+
 
 namespace {
 
@@ -38,14 +41,12 @@ public:
 	k28_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_vfd(*this, "vfd"),
+		m_display(*this, "display"),
 		m_tms6100(*this, "tms6100"),
 		m_speech(*this, "speech"),
-		m_vfd(*this, "vfd"),
-		m_vfd_delay(*this, "led_delay_%u", 0),
 		m_onbutton_timer(*this, "on_button"),
-		m_inputs(*this, "IN.%u", 0),
-		m_out_x(*this, "%u.%u", 0U, 0U),
-		m_out_digit(*this, "digit%u", 0U)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void k28(machine_config &config);
@@ -59,16 +60,12 @@ protected:
 private:
 	// devices/pointers
 	required_device<i8021_device> m_maincpu;
+	required_device<mm5445_device> m_vfd;
+	required_device<pwm_display_device> m_display;
 	required_device<tms6100_device> m_tms6100;
 	required_device<votrax_sc01_device> m_speech;
-	required_device<mm5445_device> m_vfd;
-	required_device_array<timer_device, 9> m_vfd_delay;
 	required_device<timer_device> m_onbutton_timer;
 	required_ioport_array<7> m_inputs;
-	output_finder<9, 16> m_out_x;
-	output_finder<9> m_out_digit;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(vfd_delay_off);
 
 	bool m_power_on;
 	u8 m_inp_mux;
@@ -90,10 +87,6 @@ private:
 
 void k28_state::machine_start()
 {
-	// resolve handlers
-	m_out_x.resolve();
-	m_out_digit.resolve();
-
 	// zerofill
 	m_power_on = false;
 	m_inp_mux = 0;
@@ -133,44 +126,17 @@ void k28_state::power_off()
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
-// VFD handling
-
-TIMER_DEVICE_CALLBACK_MEMBER(k28_state::vfd_delay_off)
-{
-	// clear VFD outputs
-	if (!BIT(m_vfd_data, param+16))
-	{
-		m_out_digit[param] = 0;
-
-		for (int i = 0; i < 16; i++)
-			m_out_x[param][i] = 0;
-	}
-}
+// MM5445 VFD
 
 WRITE64_MEMBER(k28_state::vfd_output_w)
 {
 	// O1-O16: digit segment data
-	u16 seg_data = bitswap<16>(data,15,14,2,6,5,3,1,7,12,11,10,13,0,4,9,8);
-
 	// O17-O25: digit select
-	for (int i = 0; i < 9; i++)
-	{
-		if (BIT(data, i+16))
-		{
-			m_out_digit[i] = seg_data & 0x3fff;
-
-			// output individual segments (2 of them are not in MAME's 16seg)
-			for (int j = 0; j < 16; j++)
-				m_out_x[i][j] = seg_data >> j & 1;
-		}
-
-		// they're strobed, so on falling edge, delay them going off to prevent flicker
-		else if (BIT(m_vfd_data, i+16))
-			m_vfd_delay[i]->adjust(attotime::from_msec(50), i);
-	}
+	u16 seg_data = bitswap<16>(data,15,14,2,6,5,3,1,7,12,11,10,13,0,4,9,8);
+	m_display->matrix(data >> 16, seg_data);
 
 	// O26: power-off request on falling edge
 	if (~data & m_vfd_data & 0x2000000)
@@ -343,10 +309,9 @@ void k28_state::k28(machine_config &config)
 
 	/* video hardware */
 	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
+	m_display->set_segmask(0x1ff, 0x3fff);
 	config.set_default_layout(layout_k28);
-
-	for (int i = 0; i < 9; i++)
-		TIMER(config, m_vfd_delay[i]).configure_generic(FUNC(k28_state::vfd_delay_off));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

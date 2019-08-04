@@ -54,7 +54,9 @@ class xtom3d_state : public pcat_base_state
 public:
 	xtom3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
-			{ }
+		, m_pcibus(*this, "pcibus")
+	{
+	}
 
 	void xtom3d(machine_config &config);
 
@@ -93,6 +95,8 @@ private:
 	void piix4_config_w(int function, int reg, uint8_t data);
 	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
 	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+
+	required_device<pci_bus_legacy_device> m_pcibus;
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -407,7 +411,8 @@ void xtom3d_state::machine_reset()
 	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
-MACHINE_CONFIG_START(xtom3d_state::xtom3d)
+void xtom3d_state::xtom3d(machine_config &config)
+{
 	PENTIUM2(config, m_maincpu, 450000000/16);  // actually Pentium II 450
 	m_maincpu->set_addrmap(AS_PROGRAM, &xtom3d_state::xtom3d_map);
 	m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
@@ -416,13 +421,15 @@ MACHINE_CONFIG_START(xtom3d_state::xtom3d)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, xtom3d_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, xtom3d_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	PCI_BUS_LEGACY(config, m_pcibus, 0, 0);
+	m_pcibus->set_device_read (0, FUNC(xtom3d_state::intel82439tx_pci_r), this);
+	m_pcibus->set_device_write(0, FUNC(xtom3d_state::intel82439tx_pci_w), this);
+	m_pcibus->set_device_read (7, FUNC(xtom3d_state::intel82371ab_pci_r), this);
+	m_pcibus->set_device_write(7, FUNC(xtom3d_state::intel82371ab_pci_w), this);
 
 	/* video hardware */
 	pcvideo_vga(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( xtom3d )

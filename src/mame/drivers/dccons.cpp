@@ -594,9 +594,9 @@ INPUT_PORTS_END
 
 void dc_cons_state::gdrom_config(device_t *device)
 {
-	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^aica", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^aica", 1.0)
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "^^aica", 1.0);
+	cdda->add_route(1, "^^aica", 1.0);
 }
 
 void dc_cons_state::dc(machine_config &config)

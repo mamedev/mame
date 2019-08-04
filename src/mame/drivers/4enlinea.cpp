@@ -177,6 +177,15 @@
 
 **************************************************************************
 
+  Known games on this or similar hardware:
+
+  - [DUMPED]  4 en Línea (Compumatic)
+  - [DUMPED]  Olympic Darts (K7 Kursaal. At least three different hardware revisions)
+  - [MISSING] Sport Dart TV (Compumatic)
+  - [MISSING] Dart Queen (Compumatic / Daryde)
+
+**************************************************************************
+
   TODO:
 
   - Proper UM487F device emulation.
@@ -688,6 +697,7 @@ ROM_START( k7_olym )
 	ROM_LOAD( "a1_gal16v8a.ic11", 0x0000, 0x0117, NO_DUMP ) // protected
 	ROM_LOAD( "b1_gal16v8a.ic4",  0x0117, 0x0117, NO_DUMP ) // protected
 ROM_END
+
 
 /***********************************
 *           Game Drivers           *

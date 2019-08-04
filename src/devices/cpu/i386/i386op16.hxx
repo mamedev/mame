@@ -799,6 +799,7 @@ void i386_device::i386_iret16()            // Opcode 0xcf
 		i386_load_segment_descriptor(CS);
 		CHANGE_PC(m_eip);
 	}
+	m_auto_clear_RF = false;
 	CYCLES(CYCLES_IRET);
 }
 
@@ -1752,6 +1753,8 @@ void i386_device::i386_popf()              // Opcode 0x9d
 	else
 		FAULT(FAULT_SS,0)
 	CYCLES(CYCLES_POPF);
+
+	m_auto_clear_RF = false;
 }
 
 void i386_device::i386_push_ax()           // Opcode 0x50

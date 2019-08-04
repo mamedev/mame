@@ -764,7 +764,7 @@ void nano_state::machine_reset()
 
 /* Machine Drivers */
 
-QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
+QUICKLOAD_LOAD_MEMBER(tmc1800_base_state::quickload_cb)
 {
 	uint8_t *ptr = m_rom->base();
 	int size = image.length();
@@ -779,7 +779,8 @@ QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(tmc1800_state::tmc1800)
+void tmc1800_state::tmc1800(machine_config &config)
+{
 	// basic system hardware
 	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmc1800_state::tmc1800_map);
@@ -796,19 +797,20 @@ MACHINE_CONFIG_START(tmc1800_state::tmc1800)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-
 	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin")
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb), this);
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("2K").set_extra_options("4K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(osc1000b_state::osc1000b)
+void osc1000b_state::osc1000b(machine_config &config)
+{
 	// basic system hardware
 	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &osc1000b_state::osc1000b_map);
@@ -824,19 +826,20 @@ MACHINE_CONFIG_START(osc1000b_state::osc1000b)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-
 	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin")
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb), this);
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("2K").set_extra_options("4K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tmc2000_state::tmc2000)
+void tmc2000_state::tmc2000(machine_config &config)
+{
 	// basic system hardware
 	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmc2000_state::tmc2000_map);
@@ -852,15 +855,17 @@ MACHINE_CONFIG_START(tmc2000_state::tmc2000)
 	tmc2000_video(config);
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin")
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb), this);
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("16K,32K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nano_state::nano)
+void nano_state::nano(machine_config &config)
+{
 	// basic system hardware
 	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nano_state::nano_map);
@@ -876,13 +881,14 @@ MACHINE_CONFIG_START(nano_state::nano)
 	nano_video(config);
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin")
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb), this);
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("4K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

@@ -38,6 +38,7 @@ public:
 	void matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata, bool upd = true);
 	void matrix(u64 rowsel, u64 rowdata, bool upd = true) { matrix_partial(0, m_height, rowsel, rowdata, upd); }
 	void update(); // apply changes to m_rowdata
+	void clear() { matrix(0, 0); }
 
 	// directly handle individual element (does not affect m_rowsel), y = row num, x = row bit
 	int read_element(u8 y, u8 x) { return BIT(m_rowdata[y], x); }
@@ -58,6 +59,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_pre_save() override;
+	virtual void device_post_load() override;
 
 private:
 	output_finder<0x40, 0x40> m_out_x;
@@ -85,8 +88,10 @@ private:
 	u64 m_rowdata_prev[0x40];
 
 	double m_bri[0x40][0x41];
-	attotime m_acc[0x40][0x41];
 	attotime m_update_time;
+	attotime m_acc[0x40][0x41];
+	attoseconds_t m_acc_attos[0x40][0x41];
+	seconds_t m_acc_secs[0x40][0x41];
 
 	emu_timer *m_frame_timer;
 	TIMER_CALLBACK_MEMBER(frame_tick);

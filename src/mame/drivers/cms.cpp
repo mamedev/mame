@@ -93,7 +93,7 @@ void cms_state::cms6502_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();  /* socket M1 43256C-12 32K RAM */
 	map(0x8000, 0xbfff).bankr("bank1").w(FUNC(cms_state::page_select_w));
 	map(0xc000, 0xffff).rom().region("mos", 0);
-	map(0xfc00, 0xfc0f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xfc00, 0xfc0f).m(m_via, FUNC(via6522_device::map));
 	map(0xfc30, 0xfc3f).rw(FUNC(cms_state::cms_rtc_r), FUNC(cms_state::cms_rtc_w));
 	map(0xfc70, 0xfc7f).w(FUNC(cms_state::map_select_w));
 }

@@ -359,6 +359,7 @@ DEFINE_DEVICE_TYPE(WD33C93B, wd33c93b_device, "wd33c93b", "Western Digital WD33C
 
 wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_device{ mconfig, type, tag, owner, clock }
+	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_addr{ 0 }
 	, m_regs{ 0 }
 	, m_command_length{ 0 }
@@ -619,7 +620,7 @@ void wd33c9x_base_device::indir_reg_w(uint8_t data)
 
 	case COMMAND: {
 		if (m_regs[AUXILIARY_STATUS] & (AUXILIARY_STATUS_INT | AUXILIARY_STATUS_CIP)) {
-			fatalerror("%s: The host should never write to the command register when INT or CIP are set.\n", shortname());
+			logerror("%s: The host should never write to the command register when INT or CIP are set.\n", shortname());
 		}
 
 		const uint8_t cc = (data & COMMAND_CC);
@@ -667,7 +668,13 @@ WRITE_LINE_MEMBER(wd33c9x_base_device::reset_w)
 {
 	if (state) {
 		LOGMASKED(LOG_LINES, "Reset via MR line\n");
+		// FIXME: hardware reset is not the same as software reset, and
+		// wd33c93a behaves differently to wd33c93
 		device_reset();
+
+		// hardware reset produces an interrupt
+		m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_INT;
+		m_irq_cb(ASSERT_LINE);
 	}
 }
 

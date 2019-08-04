@@ -3,10 +3,6 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-* fidel_sc9.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
-*******************************************************************************
-
 Fidelity Sensory Chess Challenger "9" (SC9) overview:
 - 8*(8+1) buttons, 8*8+1 LEDs
 - 36-pin edge connector, assume same as SC12
@@ -23,13 +19,31 @@ I/O is via TTL, not further documented here
 The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
 with magnet sensors and came with CB9 and CB16.
 
+Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant for
+extra book opening databases and recorded games.
+
+Known modules (*denotes undumped):
+- CB9: Challenger Book Openings 1 - 8KB (label not known)
+- CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02
+- *CG64: 64 Greatest Games
+- *EOA-EOE: Challenger Book Openings - Chess Encyclopedia A-E (5 modules)
+
+The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ line.
+IRQ and write strobe are unused. Maximum known size is 16KB.
+
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m6502/m6502.h"
+#include "machine/sensorboard.h"
+#include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
@@ -39,11 +53,20 @@ with magnet sensors and came with CB9 and CB16.
 
 namespace {
 
-class sc9_state : public fidelbase_state
+// SC9 / shared
+
+class sc9_state : public driver_device
 {
 public:
 	sc9_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "IN.0")
 	{ }
 
 	// machine drivers
@@ -53,9 +76,26 @@ public:
 	void playmatic(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_irq_on;
+	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_display;
+	required_device<dac_bit_interface> m_dac;
+	required_device<generic_slot_device> m_cart;
+	required_ioport m_inputs;
+
 	// address maps
 	void sc9_map(address_map &map);
 	void sc9d_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// I/O handlers
 	void update_display();
@@ -63,7 +103,23 @@ protected:
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(input_d7_r);
+
+	u8 m_inp_mux;
+	u8 m_led_data;
 };
+
+void sc9_state::machine_start()
+{
+	// zerofill
+	m_inp_mux = 0;
+	m_led_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_data));
+}
+
+// SC9C
 
 class sc9c_state : public sc9_state
 {
@@ -93,28 +149,40 @@ void sc9c_state::sc9c_set_cpu_freq()
 }
 
 
+
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
+
+// cartridge
+
+DEVICE_IMAGE_LOAD_MEMBER(sc9_state::cart_load)
+{
+	u32 size = m_cart->common_get_size("rom");
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
 
 // TTL/generic
 
 void sc9_state::update_display()
 {
 	// 8*8 chessboard leds + 1 corner led
-	display_matrix(8, 9, m_led_data, m_inp_mux);
+	m_display->matrix(1 << m_inp_mux, m_led_data);
 }
 
 WRITE8_MEMBER(sc9_state::control_w)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
-	u16 sel = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux = sel & 0x1ff;
+	m_inp_mux = data & 0xf;
 	update_display();
 
 	// 74245 Q9: speaker out
-	m_dac->write(BIT(sel, 9));
+	m_dac->write(BIT(1 << m_inp_mux, 9));
 
 	// d4,d5: ?
 	// d6,d7: N/C
@@ -123,20 +191,30 @@ WRITE8_MEMBER(sc9_state::control_w)
 WRITE8_MEMBER(sc9_state::led_w)
 {
 	// a0-a2,d0: led data via NE591N
-	m_led_data = (data & 1) << offset;
+	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
 READ8_MEMBER(sc9_state::input_r)
 {
-	// multiplexed inputs (active low)
-	return read_inputs(9) ^ 0xff;
+	u8 data = 0;
+
+	// d0-d7: multiplexed inputs (active low)
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_board->read_file(m_inp_mux);
+
+	// read button panel
+	else if (m_inp_mux == 8)
+		data = m_inputs->read();
+
+	return ~data;
 }
 
 READ8_MEMBER(sc9_state::input_d7_r)
 {
-	// a0-a2,d7: multiplexed inputs (active low)
-	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+	// a0-a2,d7: multiplexed inputs
+	return (input_r(space, 0) >> offset & 1) ? 0x80 : 0;
 }
 
 
@@ -149,7 +227,7 @@ void sc9_state::sc9_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x2000, 0x5fff).r(FUNC(sc9_state::cartridge_r));
+	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(sc9_state::control_w));
 	map(0x8000, 0x8007).mirror(0x1ff8).w(FUNC(sc9_state::led_w)).nopr();
 	map(0xa000, 0xa000).mirror(0x1fff).r(FUNC(sc9_state::input_r));
@@ -168,8 +246,8 @@ void sc9_state::sc9d_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( sc9_sidepanel )
-	PORT_START("IN.8")
+static INPUT_PORTS_START( sc9 )
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("DM / Knight")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("TB / Bishop")
@@ -178,16 +256,6 @@ static INPUT_PORTS_START( sc9_sidepanel )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sc9 )
-	PORT_INCLUDE( generic_cb_buttons )
-	PORT_INCLUDE( sc9_sidepanel )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( playmatic )
-	PORT_INCLUDE( generic_cb_magnets )
-	PORT_INCLUDE( sc9_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc9c )
@@ -217,7 +285,12 @@ void sc9_state::sc9d(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
 	TIMER(config, "irq_off").configure_periodic(FUNC(sc9_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(sc9_state::display_decay_tick), attotime::from_msec(1));
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(200));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	config.set_default_layout(layout_fidel_sc9);
 
 	/* sound hardware */
@@ -227,7 +300,7 @@ void sc9_state::sc9d(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(device_image_load_delegate(&sc9_state::device_image_load_scc_cartridge, this));
+	m_cart->set_device_load(FUNC(sc9_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
@@ -246,7 +319,9 @@ void sc9_state::playmatic(machine_config &config)
 	sc9b(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(3100000); // approximation
+	m_maincpu->set_clock(1500000 * 2); // advertised as double the speed of SC9
+	m_board->set_type(sensorboard_device::MAGNETS);
+
 	config.set_default_layout(layout_fidel_playmatic);
 }
 
@@ -288,8 +363,8 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  CMP MACHINE    INPUT      STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, fscc9,   0,       0, sc9d,      sc9,       sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // aka version "B"
-CONS( 1982, fscc9b,  fscc9,   0, sc9b,      sc9,       sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1982, fscc9c,  fscc9,   0, sc9b,      sc9c,      sc9c_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, fscc9ps, fscc9,   0, playmatic, playmatic, sc9_state,  empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME     PARENT  CMP MACHINE    INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1982, fscc9,   0,       0, sc9d,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
+CONS( 1982, fscc9b,  fscc9,   0, sc9b,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9c,  fscc9,   0, sc9b,      sc9c,  sc9c_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, fscc9ps, fscc9,   0, playmatic, sc9,   sc9_state,  empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

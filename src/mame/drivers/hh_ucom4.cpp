@@ -298,8 +298,6 @@ static INPUT_PORTS_START( ufombs )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const s16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
-
 void ufombs_state::ufombs(machine_config &config)
 {
 	/* basic machine hardware */
@@ -325,7 +323,8 @@ void ufombs_state::ufombs(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, ufombs_speaker_levels);
+	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -455,8 +454,6 @@ static INPUT_PORTS_START( ssfball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
-static const s16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
-
 void ssfball_state::ssfball(machine_config &config)
 {
 	/* basic machine hardware */
@@ -482,7 +479,8 @@ void ssfball_state::ssfball(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, ssfball_speaker_levels);
+	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -879,8 +877,6 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const s16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
-
 void splasfgt_state::splasfgt(machine_config &config)
 {
 	/* basic machine hardware */
@@ -906,7 +902,8 @@ void splasfgt_state::splasfgt(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, splasfgt_speaker_levels);
+	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 

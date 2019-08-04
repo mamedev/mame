@@ -1526,6 +1526,7 @@ void px4_state::px4(machine_config &config)
 	// external cassette
 	CASSETTE(config, m_ext_cas);
 	m_ext_cas->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_ext_cas->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	TIMER(config, m_ext_cas_timer).configure_generic(FUNC(px4_state::ext_cassette_read));
 

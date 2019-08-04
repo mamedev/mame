@@ -26,11 +26,13 @@ Splendor Blast            1985   8303 (post)
 Gekisou                   1985   8304 (post)
 The Koukou Yakyuu         1985   8304 (post)
 High Voltage              1985   8304?(post says 8404, but readme says 8304)
+unknown CLS bingo game    1986   8505
 
 ALPHA-8201: "44801A75" -> HD44801, ROM code = A75
 ALPHA-8302: "44801B35" -> HD44801, ROM code = B35
 ALPHA-8303: "44801B42" -> HD44801, ROM code = B42
 ALPHA-8304: ?
+ALPHA-8505: "44801C57" -> HD44801, ROM code = C57
 
 
 package / pin assign

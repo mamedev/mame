@@ -43,7 +43,6 @@ ToDo:
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -237,7 +236,6 @@ void z9001_state::z9001(machine_config &config)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	BEEP(config, "beeper", 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
@@ -258,6 +256,7 @@ void z9001_state::z9001(machine_config &config)
 	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg3));
 
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

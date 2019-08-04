@@ -2,19 +2,14 @@
 // copyright-holders:hap
 /******************************************************************************
 
-* fidel_phantom.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
-TODO:
-- everything, this is a skeleton driver
-
-*******************************************************************************
+Fidelity Phantom (model 6100)
 
 Fidelity licensed the design of the Milton/Phantom motorized chessboard and released
 their own version. It has a small LCD panel added, the rest looks nearly the same from
 the outside. After Fidelity was taken over by H&G, it was rereleased in 1990 as the
 Mephisto Phantom. This is assumed to be identical.
 
-Fidelity Phantom (model 6100) overview:
+Hardware notes:
 - R65C02P4, XTAL marked 4.91?200
 - 2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
 - LCD driver, display panel for digits
@@ -22,12 +17,14 @@ Fidelity Phantom (model 6100) overview:
 - piezo speaker, LEDs, 8*8 chessboard buttons
 - PCB label 510.1128A01
 
+TODO:
+- everything, this is a skeleton driver
+
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m6502/r65c02.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -37,11 +34,14 @@ Fidelity Phantom (model 6100) overview:
 
 namespace {
 
-class phantom_state : public fidelbase_state
+class phantom_state : public driver_device
 {
 public:
 	phantom_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_rombank(*this, "rombank"),
+		m_dac(*this, "dac")
 	{ }
 
 	void fphantom(machine_config &config);
@@ -51,12 +51,16 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_memory_bank m_rombank;
+	required_device<dac_bit_interface> m_dac;
+
 	void main_map(address_map &map);
 };
 
 void phantom_state::machine_reset()
 {
-	fidelbase_state::machine_reset();
 	m_rombank->set_entry(0);
 }
 
@@ -66,8 +70,9 @@ void phantom_state::init_fphantom()
 }
 
 
+
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 //..
@@ -92,7 +97,6 @@ void phantom_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( fphantom )
-	PORT_INCLUDE( generic_cb_buttons )
 INPUT_PORTS_END
 
 
@@ -108,7 +112,6 @@ void phantom_state::fphantom(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(phantom_state::irq0_line_hold), attotime::from_hz(600)); // guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &phantom_state::main_map);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(phantom_state::display_decay_tick), attotime::from_msec(1));
 	//config.set_default_layout(layout_fidel_phantom);
 
 	/* sound hardware */

@@ -64,34 +64,34 @@ public:
 	auto cb2_handler() { return m_cb2_handler.bind(); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	virtual void map(address_map &map);
+	void map(address_map &map);
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_pa0 ) { set_pa_line(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa1 ) { set_pa_line(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa2 ) { set_pa_line(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa3 ) { set_pa_line(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa4 ) { set_pa_line(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa5 ) { set_pa_line(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa6 ) { set_pa_line(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa7 ) { set_pa_line(7, state); }
+	void write_pa0(int state) { set_pa_line(0, state); }
+	void write_pa1(int state) { set_pa_line(1, state); }
+	void write_pa2(int state) { set_pa_line(2, state); }
+	void write_pa3(int state) { set_pa_line(3, state); }
+	void write_pa4(int state) { set_pa_line(4, state); }
+	void write_pa5(int state) { set_pa_line(5, state); }
+	void write_pa6(int state) { set_pa_line(6, state); }
+	void write_pa7(int state) { set_pa_line(7, state); }
 	void write_pa( u8 data );
-	DECLARE_WRITE_LINE_MEMBER( write_ca1 );
-	DECLARE_WRITE_LINE_MEMBER( write_ca2 );
+	void write_ca1(int state);
+	void write_ca2(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( write_pb0 ) { set_pb_line(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb1 ) { set_pb_line(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb2 ) { set_pb_line(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb3 ) { set_pb_line(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb4 ) { set_pb_line(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb5 ) { set_pb_line(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb6 ) { set_pb_line(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb7 ) { set_pb_line(7, state); }
+	void write_pb0(int state) { set_pb_line(0, state); }
+	void write_pb1(int state) { set_pb_line(1, state); }
+	void write_pb2(int state) { set_pb_line(2, state); }
+	void write_pb3(int state) { set_pb_line(3, state); }
+	void write_pb4(int state) { set_pb_line(4, state); }
+	void write_pb5(int state) { set_pb_line(5, state); }
+	void write_pb6(int state) { set_pb_line(6, state); }
+	void write_pb7(int state) { set_pb_line(7, state); }
 	void write_pb( u8 data );
-	DECLARE_WRITE_LINE_MEMBER( write_cb1 );
-	DECLARE_WRITE_LINE_MEMBER( write_cb2 );
+	void write_cb1(int state);
+	void write_cb2(int state);
 
 protected:
 	// device-level overrides

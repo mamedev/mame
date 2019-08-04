@@ -10,6 +10,7 @@
 #define SET_V_ADD16(r,s,d)  (m_ccr |= (((r) ^ (s)) & ((r) ^ (d)) & 0x8000) ? CC_V : 0)
 #define SET_V_SUB16(r,s,d)  (m_ccr |= (((d) ^ (s)) & ((d) ^ (r)) & 0x8000) ? CC_V : 0)
 #define SET_H(r,s,d)        (m_ccr |= (((r) ^ (s) ^ (d)) & 0x10) ? CC_H : 0)
+#define SET_C1(x)           (m_ccr |= ((x) & 0x01) ? CC_C : 0)
 #define SET_C8(x)           (m_ccr |= ((x) & 0x100) ? CC_C : 0)
 #define SET_C16(x)          (m_ccr |= ((x) & 0x10000) ? CC_C : 0)
 #define CLEAR_Z()           (m_ccr &= ~(CC_Z))
@@ -147,7 +148,8 @@ void HC11OP(adca_ext)()
 void HC11OP(adca_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_A + i + ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_HNZVC();
 	SET_H(r, i, REG_A);
@@ -163,7 +165,8 @@ void HC11OP(adca_indx)()
 void HC11OP(adca_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_A + i + ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_HNZVC();
 	SET_H(r, i, REG_A);
@@ -227,7 +230,8 @@ void HC11OP(adcb_ext)()
 void HC11OP(adcb_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_B + i + ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_HNZVC();
 	SET_H(r, i, REG_B);
@@ -243,7 +247,8 @@ void HC11OP(adcb_indx)()
 void HC11OP(adcb_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_B + i + ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_HNZVC();
 	SET_H(r, i, REG_B);
@@ -307,7 +312,8 @@ void HC11OP(adda_ext)()
 void HC11OP(adda_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_A + i;
 	CLEAR_HNZVC();
 	SET_H(r, i, REG_A);
@@ -323,7 +329,8 @@ void HC11OP(adda_indx)()
 void HC11OP(adda_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_A + i;
 	CLEAR_HNZVC();
 	SET_H(r, i, REG_A);
@@ -387,7 +394,8 @@ void HC11OP(addb_ext)()
 void HC11OP(addb_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_B + i;
 	CLEAR_HNZVC();
 	SET_H(r, i, REG_B);
@@ -403,7 +411,8 @@ void HC11OP(addb_indx)()
 void HC11OP(addb_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_B + i;
 	CLEAR_HNZVC();
 	SET_H(r, i, REG_B);
@@ -464,7 +473,8 @@ void HC11OP(addd_ext)()
 void HC11OP(addd_indx)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint32_t r = REG_D + i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -479,7 +489,8 @@ void HC11OP(addd_indx)()
 void HC11OP(addd_indy)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint32_t r = REG_D + i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -530,7 +541,8 @@ void HC11OP(anda_ext)()
 void HC11OP(anda_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_A &= i;
 	SET_N8(REG_A);
@@ -542,7 +554,8 @@ void HC11OP(anda_indx)()
 void HC11OP(anda_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_A &= i;
 	SET_N8(REG_A);
@@ -590,7 +603,8 @@ void HC11OP(andb_ext)()
 void HC11OP(andb_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_B &= i;
 	SET_N8(REG_B);
@@ -602,7 +616,8 @@ void HC11OP(andb_indx)()
 void HC11OP(andb_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_B &= i;
 	SET_N8(REG_B);
@@ -656,7 +671,6 @@ void HC11OP(asl_ext)()
 	uint16_t r = i << 1;
 	CLEAR_NZVC();
 	SET_C8(r);
-	WRITE8(adr, r);
 	SET_N8(r);
 	SET_Z8(r);
 
@@ -665,9 +679,164 @@ void HC11OP(asl_ext)()
 	{
 		m_ccr |= CC_V;
 	}
+	WRITE8(adr, r);
 
 	CYCLES(6);
 }
+
+/* ASL IND, X      0x68 */
+void HC11OP(asl_indx)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = i << 1;
+	CLEAR_NZVC();
+	SET_C8(r);
+	SET_N8(r);
+	SET_Z8(r);
+
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+	WRITE8(adr, r);
+
+	CYCLES(6);
+}
+
+/* ASL IND, Y      0x18, 0x68 */
+void HC11OP(asl_indy)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = i << 1;
+	CLEAR_NZVC();
+	SET_C8(r);
+	SET_N8(r);
+	SET_Z8(r);
+
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+	WRITE8(adr, r);
+
+	CYCLES(7);
+}
+
+
+/* ASRA             0x47 */
+void HC11OP(asra)()
+{
+	uint16_t r = REG_A >> 1;
+	CLEAR_NZVC();
+	SET_C1(REG_A);
+	r |= (r & 0x40) << 1;
+	REG_A = (uint16_t)(r);
+	SET_N8(REG_A);
+	SET_Z8(REG_A);
+
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+
+	CYCLES(2);
+}
+
+/* ASRB             0x57 */
+void HC11OP(asrb)()
+{
+	uint16_t r = REG_B >> 1;
+	CLEAR_NZVC();
+	SET_C1(REG_B);
+	r |= (r & 0x40) << 1;
+	REG_B = (uint16_t)(r);
+	SET_N8(REG_B);
+	SET_Z8(REG_B);
+
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+
+	CYCLES(2);
+}
+
+/* ASR EXT             0x77 */
+void HC11OP(asr_ext)()
+{
+	uint16_t adr = FETCH16();
+	uint8_t i = READ8(adr);
+	uint16_t r = i >> 1;
+	CLEAR_NZVC();
+	SET_C1(i);
+	r |= (r & 0x40) << 1;
+	SET_N8(r);
+	SET_Z8(r);
+
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+	WRITE8(adr, r);
+
+	CYCLES(6);
+}
+
+/* ASR IND, X      0x67 */
+void HC11OP(asr_indx)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = i >> 1;
+	CLEAR_NZVC();
+	SET_C1(i);
+	r |= (r & 0x40) << 1;
+	SET_N8(r);
+	SET_Z8(r);
+
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+	WRITE8(adr, r);
+
+	CYCLES(6);
+}
+
+/* ASR IND, Y      0x18, 0x67 */
+void HC11OP(asr_indy)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = i >> 1;
+	CLEAR_NZVC();
+	SET_C1(i);
+	r |= (r & 0x40) << 1;
+	SET_N8(r);
+	SET_Z8(r);
+
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+	WRITE8(adr, r);
+
+	CYCLES(7);
+}
+
 
 /* BITA IMM         0x85 */
 void HC11OP(bita_imm)()
@@ -708,7 +877,8 @@ void HC11OP(bita_ext)()
 void HC11OP(bita_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint8_t r = REG_A & i;
 	CLEAR_NZV();
 	SET_N8(r);
@@ -720,7 +890,8 @@ void HC11OP(bita_indx)()
 void HC11OP(bita_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint8_t r = REG_A & i;
 	CLEAR_NZV();
 	SET_N8(r);
@@ -768,7 +939,8 @@ void HC11OP(bitb_ext)()
 void HC11OP(bitb_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint8_t r = REG_B & i;
 	CLEAR_NZV();
 	SET_N8(r);
@@ -780,7 +952,8 @@ void HC11OP(bitb_indx)()
 void HC11OP(bitb_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint8_t r = REG_B & i;
 	CLEAR_NZV();
 	SET_N8(r);
@@ -805,10 +978,10 @@ void HC11OP(bclr_dir)()
 	uint8_t d = FETCH();
 	uint8_t mask = FETCH();
 	uint8_t r = READ8(d) & ~mask;
-	WRITE8(d, r);
 	CLEAR_NZV();
 	SET_N8(r);
 	SET_Z8(r);
+	WRITE8(d, r);
 	CYCLES(6);
 }
 
@@ -817,13 +990,27 @@ void HC11OP(bclr_indx)()
 {
 	uint8_t offset = FETCH();
 	uint8_t mask = FETCH();
-	uint8_t r = READ8(m_ix + offset) & ~mask;
-	WRITE8(m_ix + offset, r);
+	uint16_t adr = m_ix + offset;
+	uint8_t r = READ8(adr) & ~mask;
 	CLEAR_NZV();
 	SET_N8(r);
 	SET_Z8(r);
-
+	WRITE8(adr, r);
 	CYCLES(7);
+}
+
+/* BCLR INDY       0x18, 0x1d */
+void HC11OP(bclr_indy)()
+{
+	uint8_t offset = FETCH();
+	uint8_t mask = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t r = READ8(adr) & ~mask;
+	CLEAR_NZV();
+	SET_N8(r);
+	SET_Z8(r);
+	WRITE8(adr, r);
+	CYCLES(8);
 }
 
 /* BCS              0x25 */
@@ -843,6 +1030,34 @@ void HC11OP(beq)()
 {
 	int8_t rel = FETCH();
 	if (m_ccr & CC_Z)           /* Branch if Z flag set */
+	{
+		SET_PC(m_ppc + rel + 2);
+	}
+	CYCLES(3);
+}
+
+
+/* BGE              0x2C */
+void HC11OP(bge)()
+{
+	uint8_t n = (m_ccr & CC_N) ? 1 : 0;
+	uint8_t v = (m_ccr & CC_V) ? 1 : 0;
+	int8_t rel = FETCH();
+	if (!(n ^ v))  /* Branch if (N ^ V) = 0 */
+	{
+		SET_PC(m_ppc + rel + 2);
+	}
+	CYCLES(3);
+}
+
+
+/* BGT              0x2E */
+void HC11OP(bgt)()
+{
+	uint8_t n = (m_ccr & CC_N) ? 1 : 0;
+	uint8_t v = (m_ccr & CC_V) ? 1 : 0;
+	int8_t rel = FETCH();
+	if (!((m_ccr & CC_Z) || (n ^ v)))  /* Branch if Z flag set or (N ^ V) = 0 */
 	{
 		SET_PC(m_ppc + rel + 2);
 	}
@@ -892,6 +1107,19 @@ void HC11OP(bls)()
 {
 	int8_t rel = FETCH();
 	if (m_ccr & CC_C || m_ccr & CC_Z)   /* Branch if C or Z flag set */
+	{
+		SET_PC(m_ppc + rel + 2);
+	}
+	CYCLES(3);
+}
+
+/* BLT              0x2D */
+void HC11OP(blt)()
+{
+	uint8_t n = (m_ccr & CC_N) ? 1 : 0;
+	uint8_t v = (m_ccr & CC_V) ? 1 : 0;
+	int8_t rel = FETCH();
+	if (n ^ v)  /* Branch if (N ^ V) = 1 */
 	{
 		SET_PC(m_ppc + rel + 2);
 	}
@@ -952,7 +1180,8 @@ void HC11OP(brclr_indx)()
 	uint8_t offset = FETCH();
 	uint8_t mask = FETCH();
 	int8_t rel = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 
 	if ((i & mask) == 0)
 	{
@@ -960,6 +1189,23 @@ void HC11OP(brclr_indx)()
 	}
 
 	CYCLES(7);
+}
+
+/* BRCLR INDX       0x18, 0x1F */
+void HC11OP(brclr_indy)()
+{
+	uint8_t offset = FETCH();
+	uint8_t mask = FETCH();
+	int8_t rel = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
+
+	if ((i & mask) == 0)
+	{
+		SET_PC(m_ppc + rel + 4);
+	}
+
+	CYCLES(8);
 }
 
 /* BRSET DIR       0x12 */
@@ -985,7 +1231,8 @@ void HC11OP(brset_indx)()
 	uint8_t offset = FETCH();
 	uint8_t mask = FETCH();
 	int8_t rel = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 
 	if ((~i & mask) == 0)
 	{
@@ -993,6 +1240,23 @@ void HC11OP(brset_indx)()
 	}
 
 	CYCLES(7);
+}
+
+/* BRSET INDY       0x18, 0x1E */
+void HC11OP(brset_indy)()
+{
+	uint8_t offset = FETCH();
+	uint8_t mask = FETCH();
+	int8_t rel = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
+
+	if ((~i & mask) == 0)
+	{
+		SET_PC(m_ppc + rel + 4);
+	}
+
+	CYCLES(8);
 }
 
 
@@ -1010,10 +1274,10 @@ void HC11OP(bset_dir)()
 	uint8_t d = FETCH();
 	uint8_t mask = FETCH();
 	uint8_t r = READ8(d) | mask;
-	WRITE8(d, r);
 	CLEAR_NZV();
 	SET_N8(r);
 	SET_Z8(r);
+	WRITE8(d, r);
 	CYCLES(6);
 }
 
@@ -1022,13 +1286,27 @@ void HC11OP(bset_indx)()
 {
 	uint8_t offset = FETCH();
 	uint8_t mask = FETCH();
-	uint8_t r = READ8(m_ix + offset) | mask;
-	WRITE8(m_ix + offset, r);
+	uint16_t adr = m_ix + offset;
+	uint8_t r = READ8(adr) | mask;
 	CLEAR_NZV();
 	SET_N8(r);
 	SET_Z8(r);
-
+	WRITE8(adr, r);
 	CYCLES(7);
+}
+
+/* BSET INDY       0x18, 0x1c */
+void HC11OP(bset_indy)()
+{
+	uint8_t offset = FETCH();
+	uint8_t mask = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t r = READ8(adr) | mask;
+	CLEAR_NZV();
+	SET_N8(r);
+	SET_Z8(r);
+	WRITE8(adr, r);
+	CYCLES(8);
 }
 
 /* BSR              0x8D */
@@ -1113,9 +1391,9 @@ void HC11OP(clrb)()
 void HC11OP(clr_ext)()
 {
 	uint16_t adr = FETCH16();
-	WRITE8(adr, 0);
 	CLEAR_NZVC();
 	SET_ZFLAG();
+	WRITE8(adr, 0);
 	CYCLES(6);
 }
 
@@ -1123,9 +1401,10 @@ void HC11OP(clr_ext)()
 void HC11OP(clr_indx)()
 {
 	uint8_t offset = FETCH();
-	WRITE8(m_ix + offset, 0);
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZVC();
 	SET_ZFLAG();
+	WRITE8(adr, 0);
 	CYCLES(6);
 }
 
@@ -1133,9 +1412,10 @@ void HC11OP(clr_indx)()
 void HC11OP(clr_indy)()
 {
 	uint8_t offset = FETCH();
-	WRITE8(m_iy + offset, 0);
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZVC();
 	SET_ZFLAG();
+	WRITE8(adr, 0);
 	CYCLES(7);
 }
 
@@ -1193,7 +1473,8 @@ void HC11OP(cmpa_ext)()
 void HC11OP(cmpa_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_A - i;
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -1207,7 +1488,8 @@ void HC11OP(cmpa_indx)()
 void HC11OP(cmpa_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_A - i;
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -1263,7 +1545,8 @@ void HC11OP(cmpb_ext)()
 void HC11OP(cmpb_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_B - i;
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -1277,7 +1560,8 @@ void HC11OP(cmpb_indx)()
 void HC11OP(cmpb_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_B - i;
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -1285,6 +1569,51 @@ void HC11OP(cmpb_indy)()
 	SET_V_SUB8(r, i, REG_B);
 	SET_C8(r);
 	CYCLES(5);
+}
+
+
+/* COM EXT          0x73 */
+void HC11OP(com_ext)()
+{
+	uint16_t adr = FETCH16();
+	uint8_t i = READ8(adr);
+	uint16_t r = 0xff - i;
+	CLEAR_NZVC();
+	SET_N8(r);
+	SET_Z8(r);
+	m_ccr |= CC_C; //always set for M6800 compatibility
+	WRITE8(adr, r);
+	CYCLES(6);
+}
+
+/* COM IND, X        0x63 */
+void HC11OP(com_indx)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = 0xff - i;
+	CLEAR_NZVC();
+	SET_N8(r);
+	SET_Z8(r);
+	m_ccr |= CC_C; //always set for M6800 compatibility
+	WRITE8(adr, r);
+	CYCLES(6);
+}
+
+/* COM IND, Y        0x18, 0x63 */
+void HC11OP(com_indy)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = 0xff - i;
+	CLEAR_NZVC();
+	SET_N8(r);
+	SET_Z8(r);
+	m_ccr |= CC_C; //always set for M6800 compatibility
+	WRITE8(adr, r);
+	CYCLES(7);
 }
 
 
@@ -1299,7 +1628,6 @@ void HC11OP(coma)()
 	REG_A = r;
 	CYCLES(2);
 }
-
 
 /* COMB              , 0x53 */
 void HC11OP(comb)()
@@ -1359,7 +1687,8 @@ void HC11OP(cpd_ext)()
 void HC11OP(cpd_indx)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint16_t i = READ16(adr);
 	uint32_t r = REG_D - i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -1373,7 +1702,8 @@ void HC11OP(cpd_indx)()
 void HC11OP(cpd_indy)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint16_t i = READ16(adr);
 	uint32_t r = REG_D - i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -1429,7 +1759,8 @@ void HC11OP(cpx_ext)()
 void HC11OP(cpx_indx)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint16_t i = READ16(adr);
 	uint32_t r = m_ix - i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -1443,7 +1774,8 @@ void HC11OP(cpx_indx)()
 void HC11OP(cpx_indy)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint16_t i = READ16(adr);
 	uint32_t r = m_ix - i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -1498,7 +1830,8 @@ void HC11OP(cpy_ext)()
 void HC11OP(cpy_indx)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint16_t i = READ16(adr);
 	uint32_t r = m_iy - i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -1512,7 +1845,8 @@ void HC11OP(cpy_indx)()
 void HC11OP(cpy_indy)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint16_t i = READ16(adr);
 	uint32_t r = m_iy - i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -1520,6 +1854,24 @@ void HC11OP(cpy_indy)()
 	SET_V_SUB16(r, i, m_iy);
 	SET_C16(r);
 	CYCLES(7);
+}
+
+/* DAA              0x19 */
+void HC11OP(daa)()
+{
+	uint8_t msn = REG_A & 0xf0;
+	uint8_t lsn = REG_A & 0x0f;
+	uint16_t t, cf = 0;
+	if (lsn > 0x09 || m_ccr & CC_H) cf |= 0x06;
+	if (msn > 0x80 && lsn > 0x09) cf |= 0x60;
+	if (msn > 0x90 || m_ccr & CC_C) cf |= 0x60;
+	t = REG_A + cf;
+	CLEAR_NZV();
+	SET_N8((uint8_t)t);
+	SET_Z8((uint8_t)t);
+	SET_C8(t);
+	REG_A = t;
+	CYCLES(2);
 }
 
 /* DECA             0x4A */
@@ -1566,7 +1918,8 @@ void HC11OP(dec_ext)()
 void HC11OP(dec_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 
 	CLEAR_NZV();
 	if (i == 0x80)
@@ -1574,7 +1927,7 @@ void HC11OP(dec_indx)()
 	i--;
 	SET_N8(i);
 	SET_Z8(i);
-	WRITE8(m_ix + offset, i);
+	WRITE8(adr, i);
 	CYCLES(6);
 }
 
@@ -1582,7 +1935,8 @@ void HC11OP(dec_indx)()
 void HC11OP(dec_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 
 	CLEAR_NZV();
 	if (i == 0x80)
@@ -1590,8 +1944,16 @@ void HC11OP(dec_indy)()
 	i--;
 	SET_N8(i);
 	SET_Z8(i);
-	WRITE8(m_iy + offset, i);
+	WRITE8(adr, i);
 	CYCLES(7);
+}
+
+
+/* DES              0x34 */
+void HC11OP(des)()
+{
+	m_ix--;
+	CYCLES(3);
 }
 
 /* DEX              0x09 */
@@ -1653,7 +2015,8 @@ void HC11OP(eora_ext)()
 void HC11OP(eora_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_A ^= i;
 	SET_N8(REG_A);
@@ -1665,7 +2028,8 @@ void HC11OP(eora_indx)()
 void HC11OP(eora_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_A ^= i;
 	SET_N8(REG_A);
@@ -1713,7 +2077,8 @@ void HC11OP(eorb_ext)()
 void HC11OP(eorb_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_B ^= i;
 	SET_N8(REG_B);
@@ -1725,7 +2090,8 @@ void HC11OP(eorb_indx)()
 void HC11OP(eorb_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_B ^= i;
 	SET_N8(REG_B);
@@ -1805,7 +2171,8 @@ void HC11OP(inc_ext)()
 void HC11OP(inc_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 
 	CLEAR_NZV();
 	if (i == 0x7f)
@@ -1813,7 +2180,7 @@ void HC11OP(inc_indx)()
 	i++;
 	SET_N8(i);
 	SET_Z8(i);
-	WRITE8(m_ix + offset, i);
+	WRITE8(adr, i);
 	CYCLES(6);
 }
 
@@ -1822,7 +2189,8 @@ void HC11OP(inc_indx)()
 void HC11OP(inc_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 
 	CLEAR_NZV();
 	if (i == 0x7f)
@@ -1830,8 +2198,16 @@ void HC11OP(inc_indy)()
 	i++;
 	SET_N8(i);
 	SET_Z8(i);
-	WRITE8(m_iy + offset, i);
+	WRITE8(adr, i);
 	CYCLES(7);
+}
+
+
+/* INS              0x31 */
+void HC11OP(ins)()
+{
+	m_sp++;
+	CYCLES(3);
 }
 
 
@@ -1856,16 +2232,18 @@ void HC11OP(iny)()
 /* JMP IND X        0x6E */
 void HC11OP(jmp_indx)()
 {
-	uint16_t adr = FETCH();
-	SET_PC(m_ix + adr);
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
+	SET_PC(adr);
 	CYCLES(3);
 }
 
 /* JMP IND Y        0x18 0x6E */
 void HC11OP(jmp_indy)()
 {
-	uint16_t adr = FETCH();
-	SET_PC(m_iy + adr);
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
+	SET_PC(adr);
 	CYCLES(4);
 }
 
@@ -1903,8 +2281,9 @@ void HC11OP(jsr_indx)()
 {
 	uint8_t offset = FETCH();
 	uint16_t rt_adr = m_pc;
+	uint16_t adr = m_ix + offset;
 	PUSH16(rt_adr);
-	SET_PC(m_ix + offset);
+	SET_PC(adr);
 	CYCLES(6);
 }
 
@@ -1913,8 +2292,9 @@ void HC11OP(jsr_indy)()
 {
 	uint8_t offset = FETCH();
 	uint16_t rt_adr = m_pc;
+	uint16_t adr = m_iy + offset;
 	PUSH16(rt_adr);
-	SET_PC(m_iy + offset);
+	SET_PC(adr);
 	CYCLES(6);
 }
 
@@ -1955,8 +2335,9 @@ void HC11OP(ldaa_ext)()
 void HC11OP(ldaa_indx)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZV();
-	REG_A = READ8(m_ix + offset);
+	REG_A = READ8(adr);
 	SET_N8(REG_A);
 	SET_Z8(REG_A);
 	CYCLES(4);
@@ -1966,8 +2347,9 @@ void HC11OP(ldaa_indx)()
 void HC11OP(ldaa_indy)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZV();
-	REG_A = READ8(m_iy + offset);
+	REG_A = READ8(adr);
 	SET_N8(REG_A);
 	SET_Z8(REG_A);
 	CYCLES(5);
@@ -2009,8 +2391,9 @@ void HC11OP(ldab_ext)()
 void HC11OP(ldab_indx)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZV();
-	REG_B = READ8(m_ix + offset);
+	REG_B = READ8(adr);
 	SET_N8(REG_B);
 	SET_Z8(REG_B);
 	CYCLES(4);
@@ -2020,8 +2403,9 @@ void HC11OP(ldab_indx)()
 void HC11OP(ldab_indy)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZV();
-	REG_B = READ8(m_iy + offset);
+	REG_B = READ8(adr);
 	SET_N8(REG_B);
 	SET_Z8(REG_B);
 	CYCLES(5);
@@ -2064,8 +2448,9 @@ void HC11OP(ldd_ext)()
 void HC11OP(ldd_indx)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZV();
-	REG_D = READ16(m_ix + offset);
+	REG_D = READ16(adr);
 	SET_N16(REG_D);
 	SET_Z16(REG_D);
 	CYCLES(5);
@@ -2075,8 +2460,9 @@ void HC11OP(ldd_indx)()
 void HC11OP(ldd_indy)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZV();
-	REG_D = READ16(m_iy + offset);
+	REG_D = READ16(adr);
 	SET_N16(REG_D);
 	SET_Z16(REG_D);
 	CYCLES(6);
@@ -2119,8 +2505,9 @@ void HC11OP(lds_ext)()
 void HC11OP(lds_indx)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZV();
-	m_sp = READ16(m_ix + offset);
+	m_sp = READ16(adr);
 	SET_N16(m_sp);
 	SET_Z16(m_sp);
 	CYCLES(5);
@@ -2130,8 +2517,9 @@ void HC11OP(lds_indx)()
 void HC11OP(lds_indy)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZV();
-	m_sp = READ16(m_iy + offset);
+	m_sp = READ16(adr);
 	SET_N16(m_sp);
 	SET_Z16(m_sp);
 	CYCLES(6);
@@ -2174,8 +2562,9 @@ void HC11OP(ldx_ext)()
 void HC11OP(ldx_indx)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZV();
-	m_ix = READ16(m_ix + offset);
+	m_ix = READ16(adr);
 	SET_N16(m_ix);
 	SET_Z16(m_ix);
 	CYCLES(5);
@@ -2185,8 +2574,9 @@ void HC11OP(ldx_indx)()
 void HC11OP(ldx_indy)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZV();
-	m_ix = READ16(m_iy + offset);
+	m_ix = READ16(adr);
 	SET_N16(m_ix);
 	SET_Z16(m_ix);
 	CYCLES(6);
@@ -2229,8 +2619,9 @@ void HC11OP(ldy_ext)()
 void HC11OP(ldy_indx)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZV();
-	m_iy = READ16(m_ix + offset);
+	m_iy = READ16(adr);
 	SET_N16(m_iy);
 	SET_Z16(m_iy);
 	CYCLES(6);
@@ -2240,8 +2631,9 @@ void HC11OP(ldy_indx)()
 void HC11OP(ldy_indy)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZV();
-	m_iy = READ16(m_iy + offset);
+	m_iy = READ16(adr);
 	SET_N16(m_iy);
 	SET_Z16(m_iy);
 	CYCLES(6);
@@ -2290,6 +2682,50 @@ void HC11OP(lsrb)()
 	SET_Z8(REG_B);
 
 	CYCLES(2);
+}
+
+/* LSR EXT            0x74 */
+void HC11OP(lsr_ext)()
+{
+	uint16_t adr = FETCH16();
+	uint8_t i = READ8(adr);
+	uint16_t r = i >> 1;
+	CLEAR_NZVC();
+	m_ccr |= (i & 1) ? CC_C : 0;
+	m_ccr |= ((m_ccr & CC_C)) ? CC_V : 0;
+	SET_Z8(REG_B);
+	WRITE8(adr, r);
+	CYCLES(6);
+}
+
+/* LSR INDX           0x64 */
+void HC11OP(lsr_indx)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = i >> 1;
+	CLEAR_NZVC();
+	m_ccr |= (i & 1) ? CC_C : 0;
+	m_ccr |= ((m_ccr & CC_C)) ? CC_V : 0;
+	SET_Z8(REG_B);
+	WRITE8(adr, r);
+	CYCLES(6);
+}
+
+/* LSR INDY           0x18, 0x64 */
+void HC11OP(lsr_indy)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = i >> 1;
+	CLEAR_NZVC();
+	m_ccr |= (i & 1) ? CC_C : 0;
+	m_ccr |= ((m_ccr & CC_C)) ? CC_V : 0;
+	SET_Z8(REG_B);
+	WRITE8(adr, r);
+	CYCLES(7);
 }
 
 /* LSRD             0x04 */
@@ -2360,13 +2796,14 @@ void HC11OP(neg_ext)()
 void HC11OP(neg_indx)()
 {
 	uint16_t offset = FETCH();
-	uint8_t i = 0x00 - READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = 0x00 - READ8(adr);
 	CLEAR_NZVC();
 	SET_N8(i);
 	SET_Z8(i);
 	m_ccr |= (i == 0x80) ? CC_V : 0;
 	m_ccr |= (i != 0x00) ? CC_C : 0;
-	WRITE8(m_ix + offset, i);
+	WRITE8(adr, i);
 	CYCLES(6);
 }
 
@@ -2375,13 +2812,14 @@ void HC11OP(neg_indx)()
 void HC11OP(neg_indy)()
 {
 	uint16_t offset = FETCH();
-	uint8_t i = 0x00 - READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = 0x00 - READ8(adr);
 	CLEAR_NZVC();
 	SET_N8(i);
 	SET_Z8(i);
 	m_ccr |= (i == 0x80) ? CC_V : 0;
 	m_ccr |= (i != 0x00) ? CC_C : 0;
-	WRITE8(m_iy + offset, i);
+	WRITE8(adr, i);
 	CYCLES(7);
 }
 
@@ -2438,7 +2876,8 @@ void HC11OP(oraa_ext)()
 void HC11OP(oraa_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_A |= i;
 	SET_N8(REG_A);
@@ -2450,7 +2889,8 @@ void HC11OP(oraa_indx)()
 void HC11OP(oraa_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_A |= i;
 	SET_N8(REG_A);
@@ -2498,7 +2938,8 @@ void HC11OP(orab_ext)()
 void HC11OP(orab_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_B |= i;
 	SET_N8(REG_B);
@@ -2510,7 +2951,8 @@ void HC11OP(orab_indx)()
 void HC11OP(orab_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZV();
 	REG_B |= i;
 	SET_N8(REG_B);
@@ -2623,14 +3065,12 @@ void HC11OP(rol_ext)()
 	m_ccr |= (c & 0x80) ? CC_C : 0;
 	SET_N8(r);
 	SET_Z8(r);
-	WRITE8(adr, r);
-
 	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
 		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
 	{
 		m_ccr |= CC_V;
 	}
-
+	WRITE8(adr, r);
 	CYCLES(6);
 }
 
@@ -2638,21 +3078,20 @@ void HC11OP(rol_ext)()
 void HC11OP(rol_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint8_t c = (i & 0x80);
 	i = ((i & 0x7f) << 1) | ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_NZVC();
 	m_ccr |= (c & 0x80) ? CC_C : 0;
 	SET_N8(i);
 	SET_Z8(i);
-	WRITE8(m_ix + offset, i);
-
 	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
 		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
 	{
 		m_ccr |= CC_V;
 	}
-
+	WRITE8(adr, i);
 	CYCLES(6);
 }
 
@@ -2660,21 +3099,20 @@ void HC11OP(rol_indx)()
 void HC11OP(rol_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint8_t c = (i & 0x80);
 	i = ((i & 0x7f) << 1) | ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_NZVC();
 	m_ccr |= (c & 0x80) ? CC_C : 0;
 	SET_N8(i);
 	SET_Z8(i);
-	WRITE8(m_iy + offset, i);
-
 	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
 		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
 	{
 		m_ccr |= CC_V;
 	}
-
+	WRITE8(adr, i);
 	CYCLES(6);
 }
 
@@ -2715,6 +3153,66 @@ void HC11OP(rorb)()
 	}
 
 	CYCLES(2);
+}
+
+/* ROR EXT           0x76 */
+void HC11OP(ror_ext)()
+{
+	uint16_t adr = FETCH16();
+	uint8_t i = READ8(adr);
+	uint16_t r = ((i & 0xfe) >> 1) | ((m_ccr & CC_C) ? 0x80 : 0);
+	CLEAR_NZVC();
+	m_ccr |= (i & 1) ? CC_C : 0;
+	SET_N8(REG_B);
+	SET_Z8(REG_B);
+
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+	WRITE8(adr, r);
+	CYCLES(6);
+}
+
+/* ROR INDX           0x66 */
+void HC11OP(ror_indx)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = ((i & 0xfe) >> 1) | ((m_ccr & CC_C) ? 0x80 : 0);
+	CLEAR_NZVC();
+	m_ccr |= (i & 1) ? CC_C : 0;
+	SET_N8(REG_B);
+	SET_Z8(REG_B);
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+	WRITE8(adr, r);
+	CYCLES(6);
+}
+
+/* ROR INDY           0x18, 0x66 */
+void HC11OP(ror_indy)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
+	uint16_t r = ((i & 0xfe) >> 1) | ((m_ccr & CC_C) ? 0x80 : 0);
+	CLEAR_NZVC();
+	m_ccr |= (i & 1) ? CC_C : 0;
+	SET_N8(REG_B);
+	SET_Z8(REG_B);
+	if (((m_ccr & CC_N) && (m_ccr & CC_C) == 0) ||
+		((m_ccr & CC_N) == 0 && (m_ccr & CC_C)))
+	{
+		m_ccr |= CC_V;
+	}
+	WRITE8(adr, r);
+	CYCLES(6);
 }
 
 /* RTI              0x3B */
@@ -2771,11 +3269,42 @@ void HC11OP(sbca_imm)()
 	CYCLES(2);
 }
 
+/* SBCA DIR         0x92 */
+void HC11OP(sbca_dir)()
+{
+	uint8_t d = FETCH();
+	uint8_t i = READ8(d);
+	uint16_t r = (REG_A - i) - ((m_ccr & CC_C) ? 1 : 0);
+	CLEAR_NZVC();
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i, REG_A);
+	SET_C8(r);
+	REG_A = (uint8_t)r;
+	CYCLES(3);
+}
+
+/* SBCA EXT         0xB2 */
+void HC11OP(sbca_ext)()
+{
+	uint16_t adr = FETCH16();
+	uint8_t i = READ8(adr);
+	uint16_t r = (REG_A - i) - ((m_ccr & CC_C) ? 1 : 0);
+	CLEAR_NZVC();
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i, REG_A);
+	SET_C8(r);
+	REG_A = (uint8_t)r;
+	CYCLES(4);
+}
+
 /* SBCA IND, X      0xA2 */
 void HC11OP(sbca_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = (REG_A - i) - ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -2790,7 +3319,8 @@ void HC11OP(sbca_indx)()
 void HC11OP(sbca_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = (REG_A - i) - ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -2815,11 +3345,42 @@ void HC11OP(sbcb_imm)()
 	CYCLES(2);
 }
 
+/* SBCB DIR         0xD2 */
+void HC11OP(sbcb_dir)()
+{
+	uint8_t d = FETCH();
+	uint8_t i = READ8(d);
+	uint16_t r = (REG_B - i) - ((m_ccr & CC_C) ? 1 : 0);
+	CLEAR_NZVC();
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i, REG_B);
+	SET_C8(r);
+	REG_B = (uint8_t)r;
+	CYCLES(3);
+}
+
+/* SBCB EXT         0xF2 */
+void HC11OP(sbcb_ext)()
+{
+	uint16_t adr = FETCH16();
+	uint8_t i = READ8(adr);
+	uint16_t r = (REG_B - i) - ((m_ccr & CC_C) ? 1 : 0);
+	CLEAR_NZVC();
+	SET_N8(r);
+	SET_Z8(r);
+	SET_V_SUB8(r, i, REG_B);
+	SET_C8(r);
+	REG_B = (uint8_t)r;
+	CYCLES(4);
+}
+
 /* SBCB IND, X      0xE2 */
 void HC11OP(sbcb_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = (REG_B - i) - ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -2834,7 +3395,8 @@ void HC11OP(sbcb_indx)()
 void HC11OP(sbcb_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = (REG_B - i) - ((m_ccr & CC_C) ? 1 : 0);
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -2892,10 +3454,11 @@ void HC11OP(staa_ext)()
 void HC11OP(staa_indx)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZV();
 	SET_N8(REG_A);
 	SET_Z8(REG_A);
-	WRITE8(m_ix + offset, REG_A);
+	WRITE8(adr, REG_A);
 	CYCLES(4);
 }
 
@@ -2903,10 +3466,11 @@ void HC11OP(staa_indx)()
 void HC11OP(staa_indy)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZV();
 	SET_N8(REG_A);
 	SET_Z8(REG_A);
-	WRITE8(m_iy + offset, REG_A);
+	WRITE8(adr, REG_A);
 	CYCLES(5);
 }
 
@@ -2936,10 +3500,11 @@ void HC11OP(stab_ext)()
 void HC11OP(stab_indx)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZV();
 	SET_N8(REG_B);
 	SET_Z8(REG_B);
-	WRITE8(m_ix + offset, REG_B);
+	WRITE8(adr, REG_B);
 	CYCLES(4);
 }
 
@@ -2947,10 +3512,11 @@ void HC11OP(stab_indx)()
 void HC11OP(stab_indy)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZV();
 	SET_N8(REG_B);
 	SET_Z8(REG_B);
-	WRITE8(m_iy + offset, REG_B);
+	WRITE8(adr, REG_B);
 	CYCLES(5);
 }
 
@@ -2960,9 +3526,9 @@ void HC11OP(std_dir)()
 {
 	uint8_t d = FETCH();
 	CLEAR_NZV();
-	WRITE16(d, REG_D);
 	SET_N16(REG_D);
 	SET_Z16(REG_D);
+	WRITE16(d, REG_D);
 	CYCLES(4);
 }
 
@@ -2971,9 +3537,9 @@ void HC11OP(std_ext)()
 {
 	uint16_t adr = FETCH16();
 	CLEAR_NZV();
-	WRITE16(adr, REG_D);
 	SET_N16(REG_D);
 	SET_Z16(REG_D);
+	WRITE16(adr, REG_D);
 	CYCLES(5);
 }
 
@@ -2981,10 +3547,11 @@ void HC11OP(std_ext)()
 void HC11OP(std_indx)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	CLEAR_NZV();
-	WRITE16(m_ix + offset, REG_D);
 	SET_N16(REG_D);
 	SET_Z16(REG_D);
+	WRITE16(adr, REG_D);
 	CYCLES(5);
 }
 
@@ -2992,10 +3559,11 @@ void HC11OP(std_indx)()
 void HC11OP(std_indy)()
 {
 	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	CLEAR_NZV();
-	WRITE16(m_iy + offset, REG_D);
 	SET_N16(REG_D);
 	SET_Z16(REG_D);
+	WRITE16(adr, REG_D);
 	CYCLES(6);
 }
 
@@ -3005,11 +3573,52 @@ void HC11OP(sts_dir)()
 	uint8_t d = FETCH();
 	uint16_t r = m_sp;
 	CLEAR_NZV();
-	WRITE8(d, (r & 0xff00) >> 8);
-	WRITE8(d + 1, (r & 0xff));
 	SET_N16(r);
 	SET_Z16(r);
+	WRITE8(d, (r & 0xff00) >> 8);
+	WRITE8(d + 1, (r & 0xff));
 	CYCLES(4);
+}
+/* STS EXT          0xBF */
+void HC11OP(sts_ext)()
+{
+	uint16_t adr = FETCH16();
+	uint16_t r = m_sp;
+	CLEAR_NZV();
+	SET_N16(r);
+	SET_Z16(r);
+	WRITE8(adr, (r & 0xff00) >> 8);
+	WRITE8(adr + 1, (r & 0xff));
+	CYCLES(5);
+}
+
+/* STS INDX         0xAF */
+void HC11OP(sts_indx)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
+	uint16_t r = m_sp;
+	CLEAR_NZV();
+	SET_N16(r);
+	SET_Z16(r);
+	WRITE8(adr, (r & 0xff00) >> 8);
+	WRITE8(adr + 1, (r & 0xff));
+	CYCLES(5);
+}
+
+
+/* STS INDY         0x18 0xAF */
+void HC11OP(sts_indy)()
+{
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint16_t r = m_sp;
+	CLEAR_NZV();
+	SET_N16(r);
+	SET_Z16(r);
+	WRITE8(adr, (r & 0xff00) >> 8);
+	WRITE8(adr + 1, (r & 0xff));
+	CYCLES(6);
 }
 
 
@@ -3043,11 +3652,12 @@ void HC11OP(stx_ext)()
 /* STX INDX         0xEF */
 void HC11OP(stx_indx)()
 {
-	uint16_t adr = FETCH();
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	uint16_t r = m_ix;
 	CLEAR_NZV();
-	WRITE8(m_ix + adr, (r & 0xff00) >> 8);
-	WRITE8(m_ix + adr + 1, (r & 0xff));
+	WRITE8(adr, (r & 0xff00) >> 8);
+	WRITE8(adr + 1, (r & 0xff));
 	SET_N16(r);
 	SET_Z16(r);
 	CYCLES(5);
@@ -3057,11 +3667,12 @@ void HC11OP(stx_indx)()
 /* STX INDY         0xCD 0xEF */
 void HC11OP(stx_indy)()
 {
-	uint16_t adr = FETCH();
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	uint16_t r = m_ix;
 	CLEAR_NZV();
-	WRITE8(m_iy + adr, (r & 0xff00) >> 8);
-	WRITE8(m_iy + adr + 1, (r & 0xff));
+	WRITE8(adr, (r & 0xff00) >> 8);
+	WRITE8(adr + 1, (r & 0xff));
 	SET_N16(r);
 	SET_Z16(r);
 	CYCLES(6);
@@ -3097,11 +3708,12 @@ void HC11OP(sty_ext)()
 /* STY INDX         0x1A 0xEF */
 void HC11OP(sty_indx)()
 {
-	uint16_t adr = FETCH();
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
 	uint16_t r = m_iy;
 	CLEAR_NZV();
-	WRITE8(m_ix + adr, (r & 0xff00) >> 8);
-	WRITE8(m_ix + adr + 1, (r & 0xff));
+	WRITE8(adr, (r & 0xff00) >> 8);
+	WRITE8(adr + 1, (r & 0xff));
 	SET_N16(r);
 	SET_Z16(r);
 	CYCLES(6);
@@ -3110,11 +3722,12 @@ void HC11OP(sty_indx)()
 /* STY INDY         0x18 0xEF */
 void HC11OP(sty_indy)()
 {
-	uint16_t adr = FETCH();
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
 	uint16_t r = m_iy;
 	CLEAR_NZV();
-	WRITE8(m_iy + adr, (r & 0xff00) >> 8);
-	WRITE8(m_iy + adr + 1, (r & 0xff));
+	WRITE8(adr, (r & 0xff00) >> 8);
+	WRITE8(adr + 1, (r & 0xff));
 	SET_N16(r);
 	SET_Z16(r);
 	CYCLES(6);
@@ -3192,8 +3805,9 @@ void HC11OP(suba_ext)()
 /* SUBA INDX        0xA0 */
 void HC11OP(suba_indx)()
 {
-	uint16_t adr = FETCH();
-	uint8_t i = READ8(m_ix + adr);
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_A - i;
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -3208,8 +3822,9 @@ void HC11OP(suba_indx)()
 /* SUBA INDY        0x18 0xA0 */
 void HC11OP(suba_indy)()
 {
-	uint16_t adr = FETCH();
-	uint8_t i = READ8(m_iy + adr);
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_A - i;
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -3271,8 +3886,9 @@ void HC11OP(subb_ext)()
 /* SUBB INDX        0xE0 */
 void HC11OP(subb_indx)()
 {
-	uint16_t adr = FETCH();
-	uint8_t i = READ8(m_ix + adr);
+	uint8_t offset = FETCH();
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_B - i;
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -3286,8 +3902,9 @@ void HC11OP(subb_indx)()
 /* SUBB INDY        0x18 0xE0 */
 void HC11OP(subb_indy)()
 {
-	uint16_t adr = FETCH();
-	uint8_t i = READ8(m_iy + adr);
+	uint8_t offset = FETCH();
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	uint16_t r = REG_B - i;
 	CLEAR_NZVC();
 	SET_N8(r);
@@ -3330,8 +3947,8 @@ void HC11OP(subd_dir)()
 /* SUBD EXT        0xB3 */
 void HC11OP(subd_ext)()
 {
-	uint16_t addr = FETCH16();
-	uint16_t i = READ16(addr);
+	uint16_t adr = FETCH16();
+	uint16_t i = READ16(adr);
 	uint32_t r = REG_D - i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -3346,7 +3963,8 @@ void HC11OP(subd_ext)()
 void HC11OP(subd_indx)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint16_t i = READ16(adr);
 	uint32_t r = REG_D - i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -3361,7 +3979,8 @@ void HC11OP(subd_indx)()
 void HC11OP(subd_indy)()
 {
 	uint8_t offset = FETCH();
-	uint16_t i = READ16(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint16_t i = READ16(adr);
 	uint32_t r = REG_D - i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -3474,7 +4093,8 @@ void HC11OP(tst_ext)()
 void HC11OP(tst_indx)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_ix + offset);
+	uint16_t adr = m_ix + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZVC();
 	SET_N8(i);
 	SET_Z8(i);
@@ -3485,7 +4105,8 @@ void HC11OP(tst_indx)()
 void HC11OP(tst_indy)()
 {
 	uint8_t offset = FETCH();
-	uint8_t i = READ8(m_iy + offset);
+	uint16_t adr = m_iy + offset;
+	uint8_t i = READ8(adr);
 	CLEAR_NZVC();
 	SET_N8(i);
 	SET_Z8(i);

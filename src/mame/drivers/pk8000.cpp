@@ -16,7 +16,6 @@
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "machine/ram.h"
 
 #include "screen.h"
@@ -393,11 +392,11 @@ void pk8000_state::pk8000(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(fmsx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

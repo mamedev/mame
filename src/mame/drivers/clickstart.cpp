@@ -74,7 +74,7 @@ private:
 
 	void mem_map(address_map &map);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	DECLARE_READ16_MEMBER(rom_r);
 
@@ -155,7 +155,7 @@ void clickstart_state::machine_reset()
 	m_unk_portc_toggle = 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(clickstart_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(clickstart_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -423,7 +423,7 @@ void clickstart_state::clickstart(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "clickstart_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&clickstart_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(clickstart_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("clickstart_cart");
 }

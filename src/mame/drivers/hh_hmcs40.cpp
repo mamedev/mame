@@ -1975,8 +1975,6 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static s16 cdkong_speaker_levels[0x8000];
-
 void cdkong_state::cdkong(machine_config &config)
 {
 	/* basic machine hardware */
@@ -2006,9 +2004,10 @@ void cdkong_state::cdkong(machine_config &config)
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(cdkong_state::speaker_decay_sim), attotime::from_msec(1));
 
 	// set volume levels (set_output_gain is too slow for sub-frame intervals)
+	static s16 speaker_levels[0x8000];
 	for (int i = 0; i < 0x8000; i++)
-		cdkong_speaker_levels[i] = i;
-	m_speaker->set_levels(0x8000, cdkong_speaker_levels);
+		speaker_levels[i] = i;
+	m_speaker->set_levels(0x8000, speaker_levels);
 }
 
 // roms
@@ -3647,8 +3646,6 @@ static INPUT_PORTS_START( mwcbaseb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
 INPUT_PORTS_END
 
-static const s16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
-
 void mwcbaseb_state::mwcbaseb(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3674,7 +3671,8 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	m_speaker->set_levels(8, mwcbaseb_speaker_levels);
+	static const s16 speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
+	m_speaker->set_levels(8, speaker_levels);
 }
 
 // roms

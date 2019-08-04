@@ -9,24 +9,6 @@
 #include "emu.h"
 #include "includes/nitedrvr.h"
 
-WRITE8_MEMBER(nitedrvr_state::nitedrvr_videoram_w)
-{
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-
-TILE_GET_INFO_MEMBER(nitedrvr_state::get_bg_tile_info)
-{
-	int code = m_videoram[tile_index] & 0x3f;
-
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
-}
-
-void nitedrvr_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nitedrvr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 4);
-}
 
 void nitedrvr_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int bx, int by, int ex, int ey)
 {
@@ -51,15 +33,23 @@ void nitedrvr_state::draw_roadway(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
+void nitedrvr_state::draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// draw tiles manually, note that tile rows are ignored on V&8, V&64, V&128
+	for (int offs = 0; offs < 0x80; offs++)
+	{
+		int code = m_videoram[offs];
+		int sx = (offs & 0x1f) * 8;
+		int sy = (offs >> 5) * 2 * 8;
+
+		m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, code, 0, 0, 0, sx, sy);
+	}
+}
+
 uint32_t nitedrvr_state::screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-
-	// don't wrap playfield
-	rectangle clip = cliprect;
-	if (clip.max_y > 31) clip.max_y = 31;
-
-	m_bg_tilemap->draw(screen, bitmap, clip, 0, 0);
+	draw_tiles(bitmap, cliprect);
 	draw_roadway(bitmap, cliprect);
 
 	return 0;

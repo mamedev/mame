@@ -16,14 +16,14 @@ Other: LED, 20MHz crystal. Next to the MC68901P is another chip just as large (4
 ************************************************************************************************************************************/
 
 #include "emu.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/mc68901.h"
 #include "machine/ncr5390.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
 
 class tti_state : public driver_device
 {

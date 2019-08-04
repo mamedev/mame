@@ -23,8 +23,7 @@ of a hard drive of up to 88MB.
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/ncr5380n.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/devices.h"
 #include "machine/output_latch.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
@@ -160,12 +159,6 @@ static void ampro_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-static void scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr", NCR5380N);
-}
-
 /* Input ports */
 static INPUT_PORTS_START( ampro )
 	PORT_START("ID")
@@ -247,14 +240,14 @@ void ampro_state::ampro(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("ampro");
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, "ncr", true).set_option_machine_config("ncr", [] (device_t *device) {
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr", NCR5380N).machine_config([] (device_t *device) {
 		//downcast<ncr5380n_device &>(*device).irq_handler().set(m_ctc, FUNC(z80ctc_device::trg2)); // only if JMP3 shorted
 		//downcast<ncr5380n_device &>(*device).drq_handler().set(m_dart, FUNC(z80dart_device::dcda_w)); // only if JMP8 shorted
 	});

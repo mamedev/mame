@@ -108,7 +108,7 @@ void spectrum_state::page_basicrom()
 }
 
 
-SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
+SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 {
 	std::vector<uint8_t> snapshot_data(snapshot_size);
 
@@ -2415,7 +2415,7 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
+QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
 {
 	std::vector<uint8_t> quickload_data(quickload_size);
 

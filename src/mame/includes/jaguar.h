@@ -272,10 +272,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( external_int );
 
-	image_init_result quickload(device_image_interface &image, const char *file_type, int quickload_size);
+	image_init_result quickload_cb(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	void cpu_space_map(address_map &map);
 	void dsp_map(address_map &map);
 	void dsp_rom_map(address_map &map);

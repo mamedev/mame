@@ -178,7 +178,7 @@ protected:
 
 		// artifacting config
 		void setup_config(device_t *device);
-		void poll_config() { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
+		bool poll_config();
 		void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
 		bool get_pal_artifacting() { return m_palartifacting; }
 		void create_color_blend_table( const pixel_t *palette );

@@ -111,8 +111,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void fruitpc_state::fruitpc_sb_conf(device_t *device)
 {
-	device = device->subdevice("pc_joy");
-	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
+	device->subdevice<pc_joy_device>("pc_joy")->set_default_option(nullptr); // remove joystick
 }
 
 void fruitpc_state::fruitpc(machine_config &config)

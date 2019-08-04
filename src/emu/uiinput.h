@@ -78,6 +78,10 @@ public:
 	/* return true if a key down for the given user interface sequence is detected */
 	bool pressed(int code);
 
+	// enable/disable UI key presses
+	bool presses_enabled() const { return m_presses_enabled; }
+	void set_presses_enabled(bool enabled) { m_presses_enabled = enabled; }
+
 	/* return true if a key down for the given user interface sequence is detected, or if
 	autorepeat at the given speed is triggered */
 	bool pressed_repeat(int code, int speed);
@@ -104,6 +108,7 @@ private:
 	running_machine &   m_machine;                  // reference to our machine
 
 	/* pressed states; retrieved with ui_input_pressed() */
+	bool                        m_presses_enabled;
 	osd_ticks_t                 m_next_repeat[IPT_COUNT];
 	u8                          m_seqpressed[IPT_COUNT];
 

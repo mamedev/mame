@@ -12,7 +12,6 @@
 #include "machine/ram.h"
 #include "machine/i8251.h"
 #include "bus/epson_sio/pf10.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 #include "bus/generic/slot.h"

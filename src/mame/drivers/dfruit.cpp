@@ -357,4 +357,4 @@ ROM_START( gemcrush )
 ROM_END
 
 GAME( 1993, dfruit,    0,   dfruit,  dfruit,   dfruit_state, empty_init, ROT0,   "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", 0 )
-GAME( 1996, gemcrush,  0,   dfruit,  gemcrush, dfruit_state, empty_init, ROT270, "Star Fish", "Gemcrush (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1996, gemcrush,  0,   dfruit,  gemcrush, dfruit_state, empty_init, ROT270, "Star Fish", "Gemcrush (Japan, prototype)", MACHINE_NO_COCKTAIL )

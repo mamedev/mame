@@ -140,6 +140,7 @@ blackt96.cpp
 bladestl.cpp
 blitz68k.cpp
 blktiger.cpp
+blktiger_ms.cpp
 blmbycar.cpp
 blockade.cpp
 blockhl.cpp
@@ -211,6 +212,7 @@ champbwl.cpp
 chanbara.cpp
 chance32.cpp
 changela.cpp
+changyu.cpp
 cheekyms.cpp
 chexx.cpp
 chicago.cpp
@@ -659,6 +661,7 @@ lsasquad.cpp
 ltcasino.cpp
 ltd.cpp
 luckgrln.cpp
+lucky37.cpp
 lucky74.cpp
 luckybal.cpp
 lvcards.cpp
@@ -1301,6 +1304,7 @@ turbo.cpp
 turrett.cpp
 tutankhm.cpp
 tvcapcom.cpp
+tvg01.cpp
 twin16.cpp
 twincobr.cpp
 twinkle.cpp

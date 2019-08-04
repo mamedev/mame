@@ -622,7 +622,7 @@ void mbee_state::init_mbeett()
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
+QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t i, j;
@@ -712,10 +712,10 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 
 
 /*-------------------------------------------------
-    QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
+    QUICKLOAD_LOAD_MEMBER( mbee_state::quickload_bin )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
+QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bin)
 {
 	uint16_t execute_address, start_addr, end_addr;
 	int autorun;

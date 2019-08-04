@@ -419,6 +419,116 @@ if (machine.input().code_pressed(KEYCODE_D))
 #endif
 }
 
+void k053936_device::zoom_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, uint32_t priority, int glfgreat_hack )
+{
+	if (!tmap)
+		return;
+
+	if (m_ctrl[0x07] & 0x0040)
+	{
+		uint32_t startx, starty;
+		int incxx, incxy;
+		rectangle my_clip;
+		int y, maxy;
+
+		// Racin' Force will get to here if glfgreat_hack is enabled, and it ends
+		// up setting a maximum y value of '13', thus causing nothing to be drawn.
+		// It looks like the roz output should be flipped somehow as it seems to be
+		// displaying the wrong areas of the tilemap and is rendered upside down,
+		// although due to the additional post-processing the voxel renderer performs
+		// it's difficult to know what the output SHOULD be.  (hold W in Racin' Force
+		// to see the chip output)
+
+		if (((m_ctrl[0x07] & 0x0002) && m_ctrl[0x09]) && (glfgreat_hack)) /* wrong, but fixes glfgreat */
+		{
+			my_clip.min_x = m_ctrl[0x08] + m_xoff + 2;
+			my_clip.max_x = m_ctrl[0x09] + m_xoff + 2 - 1;
+			if (my_clip.min_x < cliprect.min_x)
+				my_clip.min_x = cliprect.min_x;
+			if (my_clip.max_x > cliprect.max_x)
+				my_clip.max_x = cliprect.max_x;
+
+			y = m_ctrl[0x0a] + m_yoff - 2;
+			if (y < cliprect.min_y)
+				y = cliprect.min_y;
+			maxy = m_ctrl[0x0b] + m_yoff - 2 - 1;
+			if (maxy > cliprect.max_y)
+				maxy = cliprect.max_y;
+		}
+		else
+		{
+			my_clip.min_x = cliprect.min_x;
+			my_clip.max_x = cliprect.max_x;
+
+			y = cliprect.min_y;
+			maxy = cliprect.max_y;
+		}
+
+		while (y <= maxy)
+		{
+			uint16_t *lineaddr = m_linectrl.get() + 4 * ((y - m_yoff) & 0x1ff);
+
+			my_clip.min_y = my_clip.max_y = y;
+
+			startx = 256 * (int16_t)(lineaddr[0] + m_ctrl[0x00]);
+			starty = 256 * (int16_t)(lineaddr[1] + m_ctrl[0x01]);
+			incxx  =       (int16_t)(lineaddr[2]);
+			incxy  =       (int16_t)(lineaddr[3]);
+
+			if (m_ctrl[0x06] & 0x8000)
+				incxx *= 256;
+
+			if (m_ctrl[0x06] & 0x0080)
+				incxy *= 256;
+
+			startx -= m_xoff * incxx;
+			starty -= m_xoff * incxy;
+
+			tmap->draw_roz(screen, bitmap, my_clip, startx << 5,starty << 5,
+					incxx << 5,incxy << 5,0,0,
+					m_wrap,
+					flags,priority);
+
+			y++;
+		}
+	}
+	else    /* "simple" mode */
+	{
+		uint32_t startx, starty;
+		int incxx, incxy, incyx, incyy;
+
+		startx = 256 * (int16_t)(m_ctrl[0x00]);
+		starty = 256 * (int16_t)(m_ctrl[0x01]);
+		incyx  =       (int16_t)(m_ctrl[0x02]);
+		incyy  =       (int16_t)(m_ctrl[0x03]);
+		incxx  =       (int16_t)(m_ctrl[0x04]);
+		incxy  =       (int16_t)(m_ctrl[0x05]);
+
+		if (m_ctrl[0x06] & 0x4000)
+		{
+			incyx *= 256;
+			incyy *= 256;
+		}
+
+		if (m_ctrl[0x06] & 0x0040)
+		{
+			incxx *= 256;
+			incxy *= 256;
+		}
+
+		startx -= m_yoff * incyx;
+		starty -= m_yoff * incyy;
+
+		startx -= m_xoff * incxx;
+		starty -= m_xoff * incxy;
+
+		tmap->draw_roz(screen, bitmap, cliprect, startx << 5,starty << 5,
+				incxx << 5,incxy << 5,incyx << 5,incyy << 5,
+				m_wrap,
+				flags,priority);
+	}
+}
+
 
 
 

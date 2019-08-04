@@ -1,0 +1,813 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+	Microdrive 'cartridges'
+	These are infinite tape loop based devices that act like discs
+-->
+<softwarelist name="spectrum_microdrive" description="Sinclair ZX Microdrive tapes/cartridges">
+
+	<software name="outl001" supported="no"> 
+		<description>Outlet (Issue 001)</description>
+		<year>1987</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 001).mdr" size="137923" crc="72140119" sha1="2289c623b2eac1247ba68106d00301be20fb3ba6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl002" supported="no">
+		<description>Outlet (Issue 002)</description>
+		<year>1987</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 002).mdr" size="137923" crc="b9fc8e8c" sha1="c238cfb8a845bd8eb7d3581a3f6a944ff2107d3d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl003" supported="no">
+		<description>Outlet (Issue 003)</description>
+		<year>1987</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 003).mdr" size="137923" crc="34984328" sha1="0c65873be60070c192bfed1c0b1ea4b6c8ea6649"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl004" supported="no">
+		<description>Outlet (Issue 004)</description>
+		<year>1987</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 004).mdr" size="137923" crc="4e794fee" sha1="a450a650b36d3c912695a6a6a0741ab815878728"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl005a" supported="no">
+		<description>Outlet (Issue 005a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 005a).mdr" size="137923" crc="9cb77d3e" sha1="edb8bef1c3152769f6315142ff90a31ff2a76ab2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl005b" supported="no">
+		<description>Outlet (Issue 005b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 005b).mdr" size="137923" crc="ef14c78a" sha1="e1a70203a96cb93150ddb8b810baaefa97e1738f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl006a" supported="no">
+		<description>Outlet (Issue 006a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 006a).mdr" size="137923" crc="6e51cc02" sha1="5eeb2c04d50d39ec09daeaa6b55d52e84d51e95d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl006b" supported="no">
+		<description>Outlet (Issue 006b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 006b).mdr" size="137923" crc="6cb20433" sha1="08a92834e5fc618155bffa0588c3c3b12eee4ca2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl007a" supported="no">
+		<description>Outlet (Issue 007a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 007a).mdr" size="137923" crc="8e4f73aa" sha1="a41c30ae56c3b8455bd5f7d86cb47c801535dc80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl007b" supported="no">
+		<description>Outlet (Issue 007b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 007b).mdr" size="137923" crc="8984d42c" sha1="cd82df621b52544517d1c62547b9a4ab25652fcd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl008a" supported="no">
+		<description>Outlet (Issue 008a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 008a).mdr" size="137923" crc="c3520758" sha1="a09efe5ccb0796ef483f3ce43773baa2c218dd95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl008b" supported="no">
+		<description>Outlet (Issue 008b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 008b).mdr" size="137923" crc="8a566f1b" sha1="6191440aaca5a3b11dc791b71258135ea29efbcd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl009a" supported="no">
+		<description>Outlet (Issue 009a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 009a).mdr" size="137923" crc="38a69b30" sha1="410be3577aad858709afca2b97a5263dca63e56a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl009b" supported="no">
+		<description>Outlet (Issue 009b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 009b).mdr" size="137923" crc="1ff1a612" sha1="a3740d743fd2454bae50acf8dcadd954449464c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl009bx" supported="no">
+		<description>Outlet (Issue 009bx)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 009bx).mdr" size="137923" crc="e13436a4" sha1="d9d1c97a2d5ed8c210410ee1549b3fd5ff7d63f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl010a" supported="no">
+		<description>Outlet (Issue 010a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 010a).mdr" size="137923" crc="3b8a14ad" sha1="c4450e00e19d4b8e17907e9aefb3dbd76c2a70d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl010b" supported="no">
+		<description>Outlet (Issue 010b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 010b).mdr" size="137923" crc="6919bdd3" sha1="4c5ecf469440194fa7bc115f3df6cb95b809bab7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl011a" supported="no">
+		<description>Outlet (Issue 011a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 011a).mdr" size="137923" crc="ef4ce378" sha1="b750dc6f52a87028e83cbcf47b88326b6759fbff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl011b" supported="no">
+		<description>Outlet (Issue 011b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 011b).mdr" size="137923" crc="360ae313" sha1="174eccf7818e9b7685db6eed2167519ecc85e1eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl012a" supported="no">
+		<description>Outlet (Issue 012a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 012a).mdr" size="137923" crc="4b2c60de" sha1="d5b43f69b5dac9f3aa024973bb4f9e11c5c2b6c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl012b" supported="no">
+		<description>Outlet (Issue 012b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 012b).mdr" size="137923" crc="43bc3578" sha1="3bac15652dae67236b792f8ee9736cd53ef8375a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl013a" supported="no">
+		<description>Outlet (Issue 013a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 013a).mdr" size="137923" crc="f610e7fa" sha1="4a9063fcc8e1186d99a4edc4ea02d315e80a2246"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl013b" supported="no">
+		<description>Outlet (Issue 013b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 013b).mdr" size="137923" crc="81355e67" sha1="4b317335fdd1649c69282d912a522df79e95056e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl014a" supported="no">
+		<description>Outlet (Issue 014a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 014a).mdr" size="137923" crc="94ef50bf" sha1="8df6e237eb96b0930cf63deaf04d57fcdbc6a473"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl014b" supported="no">
+		<description>Outlet (Issue 014b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 014b).mdr" size="137923" crc="acec3cf5" sha1="13c6a6806d4982948591fd00d61ebf4217d91032"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl015a" supported="no">
+		<description>Outlet (Issue 015a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 015a).mdr" size="137923" crc="3218da10" sha1="951a0df879706b40b96b95d0dac05e3a71800b6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl015b" supported="no">
+		<description>Outlet (Issue 015b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 015b).mdr" size="137923" crc="d90a0e6b" sha1="1c8902bcb0bf7e2b3895d11a4b0f4ebe54be6a8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl016a" supported="no">
+		<description>Outlet (Issue 016a)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 016a).mdr" size="137923" crc="6baa42f8" sha1="d89f4ad0941d8de42dba1063961c1d01f6ca34b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl016b" supported="no">
+		<description>Outlet (Issue 016b)</description>
+		<year>1988</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 016b).mdr" size="137923" crc="8944fd90" sha1="ad91dd55fe55c979294bb15b5dbf2625f109326e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl017a" supported="no">
+		<description>Outlet (Issue 017a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 017a).mdr" size="137923" crc="bf35dfc4" sha1="8223f9c83961c66cd6a6411cc653cc742a9f9a77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl017b" supported="no">
+		<description>Outlet (Issue 017b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 017b).mdr" size="137923" crc="242b54a8" sha1="738b6fbcb0a8a85b052c26ba05f07757886fdeb5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl018a" supported="no">
+		<description>Outlet (Issue 018a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 018a).mdr" size="137923" crc="c380540e" sha1="6f6fe0e751edd3d7db40b11148d9d15f74052de1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl018b" supported="no">
+		<description>Outlet (Issue 018b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 018b).mdr" size="137923" crc="59f7446d" sha1="3bd6eaf3cb8c9b86113d74bb5004c00adee5487e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl019a" supported="no">
+		<description>Outlet (Issue 019a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 019a).mdr" size="137923" crc="fc09bffa" sha1="c599c203bcdfb217edcbc216ec5896aa83fdbaf8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl019b" supported="no">
+		<description>Outlet (Issue 019b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 019b).mdr" size="137923" crc="a1e78cf5" sha1="6a2fdad7c4e25c96383db65fb84566543c25882b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl020a" supported="no">
+		<description>Outlet (Issue 020a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 020a).mdr" size="137923" crc="8442b009" sha1="5d3e03b46954a0841c61965c8566554d4081802a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl020b" supported="no">
+		<description>Outlet (Issue 020b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 020b).mdr" size="137923" crc="36f53c1b" sha1="a906d840096a2d73107381730ab616d336c22edc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl021a" supported="no">
+		<description>Outlet (Issue 021a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 021a).mdr" size="137923" crc="981d48dc" sha1="a77d20df81d7ef7cb79a61a60aace21e86689b24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl021b" supported="no">
+		<description>Outlet (Issue 021b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 021b).mdr" size="137923" crc="33fa5641" sha1="363aaf70f39afd41149b08d15bd384e008b1ab15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl022a" supported="no">
+		<description>Outlet (Issue 022a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 022a).mdr" size="137923" crc="5c0b851f" sha1="8e2ef91fe01796e9bd29919d90d4f38fc902ffd4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl022b" supported="no">
+		<description>Outlet (Issue 022b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 022b).mdr" size="137923" crc="32583176" sha1="c3b5c10b7810f2ae76e2afab3367d62dcf04ef72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl023a" supported="no">
+		<description>Outlet (Issue 023a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 023a).mdr" size="137923" crc="bdf2f83b" sha1="acea2c404bf502573562bafba9d30c4999c6c2fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl023b" supported="no">
+		<description>Outlet (Issue 023b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 023b).mdr" size="137923" crc="394e2629" sha1="b9447df6abe8280a0aaf48d33fbc533ec390107b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl024a" supported="no">
+		<description>Outlet (Issue 024a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 024a).mdr" size="137923" crc="7899613a" sha1="3a4ab59b99fe0e3ccd890cd171db98876624a82d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl024b" supported="no">
+		<description>Outlet (Issue 024b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 024b).mdr" size="137923" crc="38b59619" sha1="7f87b6ae4ff81c2d1a36eb0da7656769b848c279"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl025a" supported="no">
+		<description>Outlet (Issue 025a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 025a).mdr" size="137923" crc="12b87473" sha1="084dc863c7366d4b964b5d22ca7b2ad0917af258"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl025b" supported="no">
+		<description>Outlet (Issue 025b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 025b).mdr" size="137923" crc="f5aa4cdb" sha1="da06b7d8c2baed80eefb779eb987b71f794c08b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl026a" supported="no">
+		<description>Outlet (Issue 026a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 026a).mdr" size="137923" crc="e41d4ce4" sha1="6b7eb4b3002932ea76c4d7e645f11618ef3ecf0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl026b" supported="no">
+		<description>Outlet (Issue 026b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 026b).mdr" size="137923" crc="98aceddb" sha1="80b4b7bbc3e03b8fed9107fe14ad0705c0c2b9c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl027a" supported="no">
+		<description>Outlet (Issue 027a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 027a).mdr" size="137923" crc="31ce0cd5" sha1="d8a49c2ad3d29d6bf664d27d5a30c71915b1933e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl027b" supported="no">
+		<description>Outlet (Issue 027b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 027b).mdr" size="137923" crc="fc3ea927" sha1="db1261cc0852d78c0eb28c64f287c326a0d24b9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl028a" supported="no">
+		<description>Outlet (Issue 028a)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 028a).mdr" size="137923" crc="9aef7d04" sha1="e65329aefb71d9cba2fbdc0760ff9b2cb08ce6fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl028b" supported="no">
+		<description>Outlet (Issue 028b)</description>
+		<year>1989</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 028b).mdr" size="137923" crc="38a6bc13" sha1="e9d3b253d0d0d1218fa065de53c73320648c32e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl029a" supported="no">
+		<description>Outlet (Issue 029a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 029a).mdr" size="137923" crc="9666ac84" sha1="eaf6444419395a921fe3ac7499cf58998ec84826"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl029b" supported="no">
+		<description>Outlet (Issue 029b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 029b).mdr" size="137923" crc="223404d6" sha1="6152aebfbc18da8a1d4b08477dd804f89d7f6d56"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl030a" supported="no">
+		<description>Outlet (Issue 030a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 030a).mdr" size="137923" crc="c5e54d1d" sha1="a3e9c11e5d486597648b5bc70616026eb1aa6f7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl030b" supported="no">
+		<description>Outlet (Issue 030b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 030b).mdr" size="137923" crc="b21985e1" sha1="437af3e2bb52c1fbe75b5bbe034342556af31647"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl031a" supported="no">
+		<description>Outlet (Issue 031a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 031a).mdr" size="137923" crc="79eb5140" sha1="71a1ae5bd344f9426ce876ca0c7469b9568dc0b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl031b" supported="no">
+		<description>Outlet (Issue 031b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 031b).mdr" size="137923" crc="36c7848f" sha1="b5642fe2a7d49b4df75e31373093976467e6fb6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl032a" supported="no">
+		<description>Outlet (Issue 032a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 032a).mdr" size="137923" crc="52325161" sha1="38bdb25bb5098bc2aef8d8bd049cf7701a6f8d31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl032b" supported="no">
+		<description>Outlet (Issue 032b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 032b).mdr" size="137923" crc="caaae604" sha1="4f912bc7c8ab3af08dc6c19c2c8c21cccfe48c4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl033a" supported="no">
+		<description>Outlet (Issue 033a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 033a).mdr" size="137923" crc="d04a0ff0" sha1="bc85e2e1a222dd7ddc12ace899f5f8c86f36c7c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl033b" supported="no">
+		<description>Outlet (Issue 033b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 033b).mdr" size="137923" crc="b7d30aa1" sha1="b619ddf4e7ee2d28382e916a2c1d53333d71e833"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl034a" supported="no">
+		<description>Outlet (Issue 034a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 034a).mdr" size="137923" crc="00f51e51" sha1="ca1066743639c547b5386073d7599e9eff137a50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl034b" supported="no">
+		<description>Outlet (Issue 034b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 034b).mdr" size="137923" crc="589b2366" sha1="bcfa0bd46214eb24e13b9766e956e2845f5212f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl035a" supported="no">
+		<description>Outlet (Issue 035a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 035a).mdr" size="137923" crc="202a88b6" sha1="dd5664644fde9bef793a98d1444e41ce27132cd9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl035b" supported="no">
+		<description>Outlet (Issue 035b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 035b).mdr" size="137923" crc="fda82f9e" sha1="16ac0d2355531966f63f22100ad6e4bc9434dff7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl036a" supported="no">
+		<description>Outlet (Issue 036a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 036a).mdr" size="137923" crc="c0d45c9c" sha1="083a5176c4df08a7c96aaebf2d4101b8abaab123"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl036b" supported="no">
+		<description>Outlet (Issue 036b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 036b).mdr" size="137923" crc="73988143" sha1="d90bb38e4be53b0c58bf52b5beccc1672e9303ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl037a" supported="no">
+		<description>Outlet (Issue 037a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 037a).mdr" size="137923" crc="9d8eeb24" sha1="b2ce5ff001c686406900e6bb41a307fd1f3a88f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl037b" supported="no">
+		<description>Outlet (Issue 037b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 037b).mdr" size="137923" crc="95616194" sha1="7a2329383b70dae10d919e2591a6499f76b31a11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl038a" supported="no">
+		<description>Outlet (Issue 038a)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 038a).mdr" size="137923" crc="5b326911" sha1="7752e74e8b1ba2b7a88a4837899b3d758307d7dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outl038b" supported="no">
+		<description>Outlet (Issue 038b)</description>
+		<year>1990</year>
+		<publisher>Outlet</publisher>
+		<part name="cass" interface="ql_cass">
+			<dataarea name="cass" size="137923">
+				<rom name="outlet (issue 038b).mdr" size="137923" crc="b4c772fa" sha1="1059d30ab0b091a806cbdee4446bcd998ba592b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

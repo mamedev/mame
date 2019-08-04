@@ -141,7 +141,7 @@ private:
 	DECLARE_READ8_MEMBER(pia_keyboard_r);
 	DECLARE_WRITE8_MEMBER(pia_display_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_display_gate_w);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( apple1 );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	TIMER_CALLBACK_MEMBER(ready_start_cb);
 	TIMER_CALLBACK_MEMBER(ready_end_cb);
 	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
@@ -172,7 +172,7 @@ static const uint8_t apple1_keymap[] =
 };
 
 // header is "LOAD:abcdDATA:" where abcd is the starting address
-SNAPSHOT_LOAD_MEMBER( apple1_state, apple1 )
+SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 {
 	uint64_t snapsize;
 	uint8_t *data;
@@ -594,7 +594,8 @@ static void apple1_cards(device_slot_interface &device)
 	device.option_add("cffa", A1BUS_CFFA);
 }
 
-MACHINE_CONFIG_START(apple1_state::apple1)
+void apple1_state::apple1(machine_config &config)
+{
 	M6502(config, m_maincpu, 960000);        // effective CPU speed
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple1_state::apple1_map);
 
@@ -614,12 +615,12 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 	A1BUS(config, A1_BUS_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
 	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
 
-	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp")
+	SNAPSHOT(config, "snapshot", "snp").set_load_callback(FUNC(apple1_state::snapshot_cb), this);
 
 	SOFTWARE_LIST(config, "cass_list").set_original("apple1");
 
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K");
-MACHINE_CONFIG_END
+}
 
 ROM_START(apple1)
 	ROM_REGION(0x100, A1_CPU_TAG, 0)

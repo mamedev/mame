@@ -51,7 +51,6 @@
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -90,9 +89,9 @@ private:
 	DECLARE_WRITE8_MEMBER( d6800_keyboard_w );
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
 	uint32_t screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(d6800_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void d6800_map(address_map &map);
 
@@ -239,7 +238,7 @@ uint32_t d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &b
 
 /* NE556 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_c)
+TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::kansas_w)
 {
 	m_cass_data[3]++;
 
@@ -257,7 +256,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_c)
 
 /* PIA6821 Interface */
 
-TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
+TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::kansas_r)
 {
 	m_rtc++;
 	if (m_rtc > 159)
@@ -367,7 +366,7 @@ void d6800_state::machine_reset()
 
 /* Machine Drivers */
 
-QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
+QUICKLOAD_LOAD_MEMBER(d6800_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -407,7 +406,8 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	return result;
 }
 
-MACHINE_CONFIG_START(d6800_state::d6800)
+void d6800_state::d6800(machine_config &config)
+{
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(4'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &d6800_state::d6800_map);
@@ -425,7 +425,6 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.50);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -439,14 +438,15 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	TIMER(config, "d6800_c").configure_periodic(FUNC(d6800_state::d6800_c), attotime::from_hz(4800));
-	TIMER(config, "d6800_p").configure_periodic(FUNC(d6800_state::d6800_p), attotime::from_hz(40000));
+	TIMER(config, "kansas_w").configure_periodic(FUNC(d6800_state::kansas_w), attotime::from_hz(4800));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(d6800_state::kansas_r), attotime::from_hz(40000));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "bin,c8,ch8", attotime::from_seconds(1))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(1)).set_load_callback(FUNC(d6800_state::quickload_cb), this);
+}
 
 /* ROMs */
 

@@ -43,7 +43,6 @@ TODO:
 #include "machine/i8251.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "emupal.h"
@@ -531,7 +530,6 @@ void fc100_state::fc100(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 	ay8910_device &psg(AY8910(config, "psg", XTAL(7'159'090)/3/2));  /* AY-3-8910 - clock not verified */
 	psg.port_a_read_callback().set_ioport("JOY0");
 	psg.port_b_read_callback().set_ioport("JOY1");
@@ -543,6 +541,7 @@ void fc100_state::fc100(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(fc100_cassette_formats);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 
+<!-- NOTE: no chesspieces simulation here, Novag MK I didn't have a built-in chessboard -->
+
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.12" green="0.12" blue="0.12" /></rect></element>
@@ -13,14 +15,8 @@
 	</element>
 
 	<element name="hl" defstate="0">
-		<text string=" ">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-		<rect state="1">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
+		<text string=" "/>
+		<rect state="1"><color red="0" green="0" blue="0" /></rect>
 	</element>
 
 	<element name="reset" defstate="0">
@@ -247,22 +243,22 @@
 		<bezel element="text_b16b"><bounds x="46.1" y="66.5" width="5.5" height="3" /></bezel>
 		<bezel element="text_b16a"><bounds x="50.5" y="70.5" width="3.5" height="4" /></bezel>
 
-		<bezel element="hl" inputtag="LINE1" inputmask="0x80"><bounds x="10" y="30" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE1" inputmask="0x40"><bounds x="22" y="30" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE1" inputmask="0x20"><bounds x="34" y="30" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE1" inputmask="0x10"><bounds x="46" y="30" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE2" inputmask="0x80"><bounds x="10" y="42" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE2" inputmask="0x40"><bounds x="22" y="42" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE2" inputmask="0x20"><bounds x="34" y="42" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE2" inputmask="0x10"><bounds x="46" y="42" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE3" inputmask="0x80"><bounds x="10" y="54" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE3" inputmask="0x40"><bounds x="22" y="54" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE3" inputmask="0x20"><bounds x="34" y="54" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE3" inputmask="0x10"><bounds x="46" y="54" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE4" inputmask="0x80"><bounds x="10" y="66" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE4" inputmask="0x40"><bounds x="22" y="66" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE4" inputmask="0x20"><bounds x="34" y="66" width="9" height="9" /><color alpha="0.25" /></bezel>
-		<bezel element="hl" inputtag="LINE4" inputmask="0x10"><bounds x="46" y="66" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x08"><bounds x="10" y="30" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x04"><bounds x="22" y="30" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x02"><bounds x="34" y="30" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x01"><bounds x="46" y="30" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x08"><bounds x="10" y="42" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x04"><bounds x="22" y="42" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x02"><bounds x="34" y="42" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x01"><bounds x="46" y="42" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x08"><bounds x="10" y="54" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x04"><bounds x="22" y="54" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x02"><bounds x="34" y="54" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x01"><bounds x="46" y="54" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.3" inputmask="0x08"><bounds x="10" y="66" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.3" inputmask="0x04"><bounds x="22" y="66" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.3" inputmask="0x02"><bounds x="34" y="66" width="9" height="9" /><color alpha="0.25" /></bezel>
+		<bezel element="hl" inputtag="IN.3" inputmask="0x01"><bounds x="46" y="66" width="9" height="9" /><color alpha="0.25" /></bezel>
 
 	</view>
 </mamelayout>

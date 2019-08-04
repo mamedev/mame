@@ -1004,6 +1004,9 @@ ROM_START(starridr)
 
 	ROM_REGION(0x200, "horz", 0)
 	ROM_LOAD("u74.6349", 0x000, 0x200, CRC(362ec0f9) SHA1(0304a36d038436e9f5e817dfc2c40b6421953cad))
+
+	DISK_REGION( "ld_pr8210a" )
+	DISK_IMAGE_READONLY( "starrider", 0, NO_DUMP )
 ROM_END
 
 } // anonymous namespace

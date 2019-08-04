@@ -108,6 +108,16 @@ void spectrum_expansion_slot_device::opcode_fetch(offs_t offset)
 }
 
 //-------------------------------------------------
+// fetch_r
+//-------------------------------------------------
+
+void spectrum_expansion_slot_device::opcode_fetch_post(offs_t offset)
+{
+	if (m_card)
+		 m_card->opcode_fetch_post(offset);
+}
+
+//-------------------------------------------------
 //  iorq_r
 //-------------------------------------------------
 
@@ -175,7 +185,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "uslot.h"
 #include "usource.h"
 #include "uspeech.h"
-
+#include "wafa.h"
 
 void spectrum_expansion_devices(device_slot_interface &device)
 {
@@ -197,6 +207,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("uslot", SPECTRUM_USLOT);
 	device.option_add("usource", SPECTRUM_USOURCE);
 	device.option_add("uspeech", SPECTRUM_USPEECH);
+	device.option_add("wafadrive", SPECTRUM_WAFA);
 }
 
 void spec128_expansion_devices(device_slot_interface &device)
@@ -213,6 +224,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
+	device.option_add("wafadrive", SPECTRUM_WAFA);
 }
 
 void specpls3_expansion_devices(device_slot_interface &device)

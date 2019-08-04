@@ -23,11 +23,11 @@
 #include "emu.h"
 #include "tekram_dc820.h"
 
+#include "bus/nscsi/devices.h"
 #include "cpu/i86/i186.h"
 #include "machine/i82355.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 DEFINE_DEVICE_TYPE(TEKRAM_DC320B, tekram_dc320b_device, "dc320b", "Tekram DC-320B SCSI Controller")
 DEFINE_DEVICE_TYPE(TEKRAM_DC320E, tekram_dc320e_device, "dc320e", "Tekram DC-320E SCSI Controller")
@@ -192,12 +192,6 @@ void tekram_dc820_device::mpu_map(address_map &map)
 	map(0xf0000, 0xfffff).rom().region("firmware", 0);
 }
 
-static void tekram_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("scsic", NCR53CF94); // or Emulex FAS216
-}
-
 void tekram_eisa_scsi_device::scsic_config(device_t *device)
 {
 	device->set_clock(40_MHz_XTAL);
@@ -207,15 +201,15 @@ void tekram_eisa_scsi_device::scsic_config(device_t *device)
 void tekram_eisa_scsi_device::scsi_add(machine_config &config)
 {
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", tekram_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", tekram_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", tekram_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", tekram_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", tekram_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", tekram_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", tekram_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", tekram_scsi_devices, "scsic", true)
-		.set_option_machine_config("scsic", [this] (device_t *device) { scsic_config(device); });
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", NCR53CF94) // or Emulex FAS216
+		.machine_config([this] (device_t *device) { scsic_config(device); });
 }
 
 void tekram_dc320b_device::device_add_mconfig(machine_config &config)

@@ -854,7 +854,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	const pixel_t *palette = m_palette;
 
 	/* if the video didn't change, indicate as much */
-	if (!has_video_changed())
+	if (!m_artifacter.poll_config() && !has_video_changed())
 		return UPDATE_HAS_NOT_CHANGED;
 
 	/* top border */
@@ -1701,9 +1701,22 @@ mc6847_base_device::artifacter::artifacter()
 
 void mc6847_base_device::artifacter::setup_config(device_t *device)
 {
-	char port_name[32];
-	snprintf(port_name, ARRAY_LENGTH(port_name), "%s:%s", device->tag(), ARTIFACTING_TAG);
+	std::string port_name = util::string_format("%s:%s", device->tag(), ARTIFACTING_TAG);
 	m_config = device->ioport(port_name);
+}
+
+
+
+//-------------------------------------------------
+//  artifacter::poll_config
+//-------------------------------------------------
+
+bool mc6847_base_device::artifacter::poll_config()
+{
+	ioport_value new_artifacting = m_config ? m_config->read() : 0;
+	bool changed = new_artifacting != m_artifacting;
+	m_artifacting = new_artifacting;
+	return changed;
 }
 
 

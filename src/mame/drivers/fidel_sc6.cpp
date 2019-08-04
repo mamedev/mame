@@ -3,11 +3,9 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-* fidel_sc6.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity Sensory Chess Challenger 6 (model SC6)
 
-*******************************************************************************
-
-Fidelity Sensory Chess Challenger 6 (model SC6) overview:
+Hardware notes:
 - PCB label 510-1045B01
 - INS8040N-11 MCU, 11MHz XTAL
 - external 4KB ROM 2332 101-1035A01, in module slot
@@ -23,10 +21,15 @@ SC6 program is contained in BO6 and CG6.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/mcs48/mcs48.h"
+#include "machine/sensorboard.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
@@ -35,43 +38,73 @@ SC6 program is contained in BO6 and CG6.
 
 namespace {
 
-class sc6_state : public fidelbase_state
+class sc6_state : public driver_device
 {
 public:
 	sc6_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "IN.0")
 	{ }
 
 	// machine drivers
 	void sc6(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
+	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_display;
+	required_device<dac_bit_interface> m_dac;
+	required_device<generic_slot_device> m_cart;
+	required_ioport m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// I/O handlers
 	void update_display();
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(select_w);
+
+	u8 read_inputs();
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ_LINE_MEMBER(input6_r);
 	DECLARE_READ_LINE_MEMBER(input7_r);
+
+	u8 m_led_select;
+	u8 m_inp_mux;
 };
+
+void sc6_state::machine_start()
+{
+	// zerofill
+	m_led_select = 0;
+	m_inp_mux = 0;
+
+	// register for savestates
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_inp_mux));
+}
+
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(sc6_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(sc6_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 
@@ -94,22 +127,18 @@ DEVICE_IMAGE_LOAD_MEMBER(sc6_state, cartridge)
 void sc6_state::update_display()
 {
 	// 2 7seg leds
-	set_display_segmask(3, 0x7f);
-	display_matrix(7, 2, m_7seg_data, m_led_select);
+	m_display->matrix(m_led_select, 1 << m_inp_mux);
 }
 
 WRITE8_MEMBER(sc6_state::mux_w)
 {
 	// P24-P27: 7442 A-D
-	u16 sel = 1 << (data >> 4 & 0xf) & 0x3ff;
-
 	// 7442 0-8: input mux, 7seg data
-	m_inp_mux = sel & 0x1ff;
-	m_7seg_data = sel & 0x7f;
+	m_inp_mux = data >> 4 & 0xf;
 	update_display();
 
 	// 7442 9: speaker out
-	m_dac->write(BIT(sel, 9));
+	m_dac->write(BIT(1 << m_inp_mux, 9));
 }
 
 WRITE8_MEMBER(sc6_state::select_w)
@@ -119,22 +148,37 @@ WRITE8_MEMBER(sc6_state::select_w)
 	update_display();
 }
 
+u8 sc6_state::read_inputs()
+{
+	u8 data = 0;
+
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_board->read_file(m_inp_mux);
+
+	// read button panel
+	else if (m_inp_mux == 8)
+		data = m_inputs->read();
+
+	return ~data;
+}
+
 READ8_MEMBER(sc6_state::input_r)
 {
 	// P10-P15: multiplexed inputs low
-	return (~read_inputs(9) & 0x3f) | 0xc0;
+	return (read_inputs() & 0x3f) | 0xc0;
 }
 
 READ_LINE_MEMBER(sc6_state::input6_r)
 {
 	// T0: multiplexed inputs bit 6
-	return ~read_inputs(9) >> 6 & 1;
+	return read_inputs() >> 6 & 1;
 }
 
 READ_LINE_MEMBER(sc6_state::input7_r)
 {
 	// T1: multiplexed inputs bit 7
-	return ~read_inputs(9) >> 7 & 1;
+	return read_inputs() >> 7 & 1;
 }
 
 
@@ -155,9 +199,7 @@ void sc6_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( sc6 )
-	PORT_INCLUDE( generic_cb_buttons )
-
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("DM / Knight")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("TB / Bishop")
@@ -185,7 +227,13 @@ void sc6_state::sc6(machine_config &config)
 	m_maincpu->t0_in_cb().set(FUNC(sc6_state::input6_r));
 	m_maincpu->t1_in_cb().set(FUNC(sc6_state::input7_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(sc6_state::display_decay_tick), attotime::from_msec(1));
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(150));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2, 7);
+	m_display->set_segmask(0x3, 0x7f);
 	config.set_default_layout(layout_fidel_sc6);
 
 	/* sound hardware */
@@ -195,7 +243,7 @@ void sc6_state::sc6(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_sc6", "bin");
-	m_cart->set_device_load(device_image_load_delegate(&sc6_state::device_image_load_cartridge, this));
+	m_cart->set_device_load(FUNC(sc6_state::cart_load), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_sc6");
@@ -221,4 +269,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT  CMP MACHINE  INPUT  CLASS      INIT        COMPANY                 FULLNAME                      FLAGS
-CONS( 1982, fscc6, 0,       0, sc6,     sc6,   sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fscc6, 0,       0, sc6,     sc6,   sc6_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

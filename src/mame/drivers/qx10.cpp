@@ -123,7 +123,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(qx10);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void qx10_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
@@ -337,7 +337,7 @@ WRITE8_MEMBER( qx10_state::cmos_sel_w )
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( qx10_state, qx10 )
+QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -721,7 +721,8 @@ static void keyboard(device_slot_interface &device)
 	device.option_add("qx10", QX10_KEYBOARD);
 }
 
-MACHINE_CONFIG_START(qx10_state::qx10)
+void qx10_state::qx10(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CLK / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qx10_state::qx10_mem);
@@ -826,9 +827,8 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("qx10_flop");
 
-	MCFG_QUICKLOAD_ADD("quickload", qx10_state, qx10, "com,cpm", attotime::from_seconds(3))
-
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(qx10_state::quickload_cb), this);
+}
 
 /* ROM definition */
 ROM_START( qx10 )

@@ -6,14 +6,12 @@
 
 void usgames_state::usgames_palette(palette_device &palette) const
 {
-	for (int j = 0; j < 0x200; j++)
+	for (int j = 0; j < 16; j++)
 	{
-		int const data = (j >> ((j & 0x01) ? 5 : 1)) & 0x0f;
-
-		int r = BIT(data, 0);
-		int g = BIT(data, 1);
-		int b = BIT(data, 2);
-		int const i = BIT(data, 3);
+		int r = BIT(j, 0);
+		int g = BIT(j, 1);
+		int b = BIT(j, 2);
+		int const i = BIT(j, 3);
 
 		r = 0xff * r;
 		g = 0x7f * g * (i + 1);
@@ -23,27 +21,9 @@ void usgames_state::usgames_palette(palette_device &palette) const
 	}
 }
 
-
-
-TILE_GET_INFO_MEMBER(usgames_state::get_tile_info)
-{
-	int const tileno = m_videoram[tile_index*2];
-	int const colour = m_videoram[tile_index*2+1];
-
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
-}
-
 void usgames_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(usgames_state::get_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	m_gfxdecode->gfx(0)->set_source(m_charram);
-}
-
-
-WRITE8_MEMBER(usgames_state::videoram_w)
-{
-	m_videoram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_MEMBER(usgames_state::charram_w)
@@ -52,9 +32,22 @@ WRITE8_MEMBER(usgames_state::charram_w)
 	m_gfxdecode->gfx(0)->mark_dirty(offset/8);
 }
 
-
-uint32_t usgames_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+MC6845_UPDATE_ROW(usgames_state::update_row)
 {
-	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	return 0;
+	uint32_t *pix = &bitmap.pix32(y);
+	ra &= 0x07;
+
+	for (int x = 0; x < x_count; x++)
+	{
+		int tile_index = (x + ma) & (m_videoram.mask()/2);
+		int tile = m_videoram[tile_index*2];
+		int attr = m_videoram[tile_index*2+1];
+		uint8_t bg_color = attr & 0xf;
+		uint8_t fg_color = (attr & 0xf0) >> 4;
+
+		const uint8_t plane = m_charram[(tile << 3) | ra];
+		for (int n = 7; n >= 0; n--)
+			*pix++ = m_palette->pen(BIT(plane, n) ? fg_color : bg_color);
+	}
 }
+

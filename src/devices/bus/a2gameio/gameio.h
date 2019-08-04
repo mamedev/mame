@@ -43,6 +43,7 @@ public:
 
 	// standard options
 	static void default_options(device_slot_interface &slot);
+	static void iiandplus_options(device_slot_interface &slot);
 
 	// analog paddles
 	u8 pdl0_r();

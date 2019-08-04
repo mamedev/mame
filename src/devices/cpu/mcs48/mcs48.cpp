@@ -5,7 +5,7 @@
     - EA pin - defined by architecture, must implement:
       1 means external access, bypassing internal ROM
       reimplement as a push, not a pull
-    - add CMOS devices, 1 new opcode (01 HALT)
+    - add CMOS devices, 1 new opcode (01 IDL)
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
     - make timer update cleaner:
       timer is updated on S4 while I/O happens on S5
@@ -13,6 +13,7 @@
       right now this is implemented with a hack in the mov_a_t handler
       in theory it should also be possible to see the timer flag before the interrupt is taken
       mov_t_a should also update the T register after it's incremented
+    - IRQ timing is similarly hacked due to WY-100 needing to take JNI branch before servicing interrupt
 */
 
 /***************************************************************************
@@ -48,6 +49,9 @@
     8749   128   2k   27  (EPROM)
     M58715 128    0       (external ROM)
 
+    8040   256   4k   27  (external ROM)
+    8050   256   4k   27  (ROM)
+
 ****************************************************************************
 
     UPI-41/42 chips are MCS-48 derived, with some opcode changes:
@@ -75,11 +79,13 @@
     ----   ---  ---  ---
     8041A   64   1k       (ROM)
     8041AH 128   1k       (ROM)
+    8641A   64   1k       (OTPROM)
     8741A   64   1k       (EPROM)
     8741AH 128   1k       (EPROM)
 
     8042   128   2k       (ROM)
     8042AH 256   2k       (ROM)
+    8642   128   2k       (OTPROM)
     8742   128   2k       (EPROM)
     8742AH 256   2k       (EPROM)
 
@@ -749,8 +755,8 @@ OPHANDLER( jc )             { execute_jcc((m_psw & C_FLAG) != 0); return 2; }
 OPHANDLER( jf0 )            { execute_jcc((m_psw & F_FLAG) != 0); return 2; }
 OPHANDLER( jf1 )            { execute_jcc((m_sts & STS_F1) != 0); return 2; }
 OPHANDLER( jnc )            { execute_jcc((m_psw & C_FLAG) == 0); return 2; }
-OPHANDLER( jni )            { execute_jcc(m_irq_state != 0); return 2; }
-OPHANDLER( jnibf )          { execute_jcc((m_sts & STS_IBF) == 0); return 2; }
+OPHANDLER( jni )            { m_irq_polled = (m_irq_state == 0); execute_jcc(m_irq_state != 0); return 2; }
+OPHANDLER( jnibf )          { m_irq_polled = (m_sts & STS_IBF) != 0; execute_jcc((m_sts & STS_IBF) == 0); return 2; }
 OPHANDLER( jnt_0 )          { execute_jcc(test_r(0) == 0); return 2; }
 OPHANDLER( jnt_1 )          { execute_jcc(test_r(1) == 0); return 2; }
 OPHANDLER( jnz )            { execute_jcc(m_a != 0); return 2; }
@@ -1102,6 +1108,7 @@ void mcs48_cpu_device::device_start()
 	m_dbbi = 0;
 	m_dbbo = 0;
 	m_irq_state = 0;
+	m_irq_polled = 0;
 
 	/* FIXME: Current implementation suboptimal */
 	m_ea = (m_int_rom_size ? 0 : 1);
@@ -1173,6 +1180,7 @@ void mcs48_cpu_device::device_start()
 	save_item(NAME(m_dbbo));
 
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_polled));
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_timer_overflow));
 	save_item(NAME(m_timer_flag));
@@ -1234,6 +1242,10 @@ int mcs48_cpu_device::check_irqs()
 	if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
 		m_irq_in_progress = true;
+
+		// force JNI to be taken (hack)
+		if (m_irq_polled)
+			m_pc = ((m_pc - 1) & 0xf00) | m_cache->read_byte(m_pc - 1);
 
 		/* transfer to location 0x03 */
 		push_pc_psw();
@@ -1328,6 +1340,7 @@ void mcs48_cpu_device::execute_run()
 
 		/* fetch next opcode */
 		m_prevpc = m_pc;
+		m_irq_polled = false;
 		debugger_instruction_hook(m_pc);
 		opcode = opcode_fetch();
 

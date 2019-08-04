@@ -104,7 +104,7 @@ private:
 	DECLARE_WRITE8_MEMBER(hwreg_w);
 	DECLARE_READ8_MEMBER(hwreg_r);
 	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void pokemini_mem_map(address_map &map);
 
@@ -1509,7 +1509,7 @@ READ8_MEMBER(pokemini_state::hwreg_r)
 	return data;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pokemini_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1789,8 +1789,7 @@ void pokemini_state::pokemini(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pokemini_cart", "bin,min"));
-	cartslot.set_device_load(device_image_load_delegate(&pokemini_state::device_image_load_pokemini_cart, this));
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pokemini_cart", "bin,min").set_device_load(FUNC(pokemini_state::cart_load), this);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pokemini");

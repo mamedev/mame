@@ -63,7 +63,7 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi_1_portb_w);
 	DECLARE_WRITE8_MEMBER(ppi_1_portc_w);
 
-	DECLARE_SNAPSHOT_LOAD_MEMBER(lviv);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void update_palette(uint8_t pal);
 

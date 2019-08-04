@@ -48,7 +48,6 @@
 #include "machine/z80scc.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -470,7 +469,7 @@ void applix_state::applix_mem(address_map &map)
 	map(0x600180, 0x6001ff).w(FUNC(applix_state::analog_latch_w));
 	map(0x700000, 0x700007).mirror(0x78).rw("scc", FUNC(scc8530_device::ab_dc_r), FUNC(scc8530_device::ab_dc_w)).umask16(0xff00).cswidth(16);
 	map(0x700080, 0x7000ff).r(FUNC(applix_state::applix_inputs_r));
-	map(0x700100, 0x70011f).mirror(0x60).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0xff00).cswidth(16);
+	map(0x700100, 0x70011f).mirror(0x60).m(m_via, FUNC(via6522_device::map)).umask16(0xff00).cswidth(16);
 	map(0x700180, 0x700180).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w)).cswidth(16);
 	map(0x700182, 0x700182).mirror(0x7c).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w)).cswidth(16);
 	map(0xffffc0, 0xffffc1).rw(FUNC(applix_state::fdc_data_r), FUNC(applix_state::fdc_data_w));
@@ -892,8 +891,6 @@ void applix_state::applix(machine_config &config)
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT).add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-
 	/* Devices */
 	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
 	m_crtc->set_screen("screen");
@@ -920,7 +917,8 @@ void applix_state::applix(machine_config &config)
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
 
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2); //connected to Z80H clock pin
 	FLOPPY_CONNECTOR(config, "fdc:0", applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);

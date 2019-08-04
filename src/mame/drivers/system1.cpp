@@ -3091,8 +3091,7 @@ ROM_START( bullfgt )
 	ROM_LOAD( "epr-6070.93",    0x4000, 0x4000, CRC(34f080df) SHA1(0e7d28e3325c8c3f06438fde29ea0ffe57fc325f) ) /* epr-6070.93 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( thetogyu )
@@ -3145,8 +3144,7 @@ ROM_START( spatter )
 	ROM_LOAD( "epr-6309.110",   0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( spattera )
@@ -3173,8 +3171,7 @@ ROM_START( spattera )
 	ROM_LOAD( "epr-6309.110",   0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( ssanchan )
@@ -3201,8 +3198,7 @@ ROM_START( ssanchan )
 	ROM_LOAD( "epr-6309.110",   0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 
@@ -3390,8 +3386,7 @@ ROM_START( nprinces )
 	ROM_LOAD( "epr-6549.05",    0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) ) /* epr-6549.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( nprinceso )
@@ -3957,7 +3952,7 @@ ROM_START( choplift )
 	ROM_LOAD( "epr-7130.ic126", 0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "315-5151.ic74",  0x00000, 0x1000, BAD_DUMP CRC(7bd11a6c) SHA1(2d75a2276e572f97f269af062536c1c58e1c8eaf) )
+	ROM_LOAD( "315-5151.ic74",  0x00000, 0x1000, CRC(1377a6ef) SHA1(b85acd7292e5480c98af1a0492b6b5d3f9b1716c) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "epr-7127.ic4",   0x00000, 0x8000, CRC(1e708f6d) SHA1(b975e13bdc44105e7a15c2694e3ec53b60e23e5e) )
@@ -4273,8 +4268,7 @@ ROM_START( wboy2 )
 	ROM_LOAD( "epr-7488.05",    0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( wboy2u )
@@ -4304,8 +4298,7 @@ ROM_START( wboy2u )
 	ROM_LOAD( "epr-7488.05",    0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( wboy3 )
@@ -4533,7 +4526,7 @@ ROM_START( wbdeluxe )
 	ROM_LOAD( "epr-7488.05",    0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 
@@ -4621,7 +4614,11 @@ ROM_START( gardiaj ) /* Sega game ID# 834-6119-02 GARDIA */
 	ROM_LOAD( "pr-7343.ic8",       0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.ic28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+	ROM_LOAD( "pr5317.ic28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* MB7114E */
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "315-5137.bin",   0x00000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN Located at IC10 */
+	ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4ACN Located at IC11 */
 ROM_END
 
 
@@ -5524,19 +5521,6 @@ void system1_state::init_bootsys2d()
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x10000, 0x4000);
 }
 
-
-void system1_state::init_choplift()
-{
-	uint8_t *mcurom = memregion("mcu")->base();
-
-	/* the ROM dump we have is bad; the following patches make it work */
-	mcurom[0x100] = 0x55;       /* D5 in current dump */
-	mcurom[0x27b] = 0xfb;       /* F2 in current dump */
-	mcurom[0x2ff] = 0xff - 9;   /* fix up checksum; means there's still something incorrect */
-
-	init_bank0c();
-}
-
 void system1_state::init_shtngmst()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -5623,7 +5607,7 @@ GAME( 1986, gardia,     0,        sys1piox_317_0006, gardia,    system1_state, i
 GAME( 1986, brain,      0,        sys1pio,           brain,     system1_state, init_bank44,       ROT0,   "Coreland / Sega", "Brain", MACHINE_SUPPORTS_SAVE )
 
 /* System 2 */
-GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_choplift,     ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, chopliftbl, choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "bootleg", "Choplifter (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

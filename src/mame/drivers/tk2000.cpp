@@ -614,6 +614,7 @@ void tk2000_state::tk2000(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CENTRONICS(config, m_printer, centronics_devices, nullptr);
 	m_printer->busy_handler().set(FUNC(tk2000_state::printer_busy_w));

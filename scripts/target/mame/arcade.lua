@@ -136,6 +136,7 @@ CPUS["DSPP"] = true
 CPUS["HPC"] = true
 --CPUS["RII"] = true
 --CPUS["BCP"] = true
+--CPUS["CR16B"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -283,6 +284,7 @@ SOUNDS["LC7535"] = true
 
 VIDEOS["SEGA315_5124"] = true
 VIDEOS["SEGA315_5313"] = true
+--VIDEOS["AM8052"] = true
 VIDEOS["BUFSPRITE"] = true
 --VIDEOS["CDP1861"] = true
 --VIDEOS["CDP1862"] = true
@@ -588,8 +590,9 @@ MACHINES["SATURN"] = true
 MACHINES["SCC68070"] = true
 MACHINES["SCSI"] = true
 MACHINES["SCUDSP"] = true
---MACHINES["SECFLASH"] = true
 MACHINES["SDA2006"] = true
+--MACHINES["SECFLASH"] = true
+--MACHINES["SENSORBOARD"] = true
 MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
 MACHINES["SEGA_SCU"] = true
@@ -730,6 +733,7 @@ BUSES["MIDI"] = true
 BUSES["NEOGEO"] = true
 BUSES["NEOGEO_CTRL"] = true
 --BUSES["NES"] = true
+BUSES["NSCSI"] = true
 --BUSES["NUBUS"] = true
 --BUSES["O2"] = true
 --BUSES["ORICEXT"] = true
@@ -1427,14 +1431,13 @@ files {
 	MAME_DIR .. "src/mame/video/1943.cpp",
 	MAME_DIR .. "src/mame/drivers/alien.cpp",
 	MAME_DIR .. "src/mame/drivers/bionicc.cpp",
-	MAME_DIR .. "src/mame/includes/bionicc.h",
-	MAME_DIR .. "src/mame/video/bionicc.cpp",
 	MAME_DIR .. "src/mame/drivers/supduck.cpp",
 	MAME_DIR .. "src/mame/video/tigeroad_spr.cpp",
 	MAME_DIR .. "src/mame/video/tigeroad_spr.h",
 	MAME_DIR .. "src/mame/drivers/blktiger.cpp",
 	MAME_DIR .. "src/mame/includes/blktiger.h",
 	MAME_DIR .. "src/mame/video/blktiger.cpp",
+	MAME_DIR .. "src/mame/drivers/blktiger_ms.cpp",
 	MAME_DIR .. "src/mame/drivers/cbasebal.cpp",
 	MAME_DIR .. "src/mame/includes/cbasebal.h",
 	MAME_DIR .. "src/mame/video/cbasebal.cpp",
@@ -4372,6 +4375,7 @@ files {
 
 createMAMEProjects(_target, _subtarget, "wing")
 files {
+	MAME_DIR .. "src/mame/drivers/lucky37.cpp",
 	MAME_DIR .. "src/mame/drivers/lucky74.cpp",
 	MAME_DIR .. "src/mame/includes/lucky74.h",
 	MAME_DIR .. "src/mame/video/lucky74.cpp",
@@ -4617,6 +4621,7 @@ files {
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",
 	MAME_DIR .. "src/mame/machine/cdicdic.h",
 	MAME_DIR .. "src/mame/drivers/chance32.cpp",
+	MAME_DIR .. "src/mame/drivers/changyu.cpp",
 	MAME_DIR .. "src/mame/drivers/chexx.cpp",
 	MAME_DIR .. "src/mame/drivers/chicago.cpp",
 	MAME_DIR .. "src/mame/drivers/chsuper.cpp",
@@ -4898,6 +4903,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/trvquest.cpp",
 	MAME_DIR .. "src/mame/drivers/ttchamp.cpp",
 	MAME_DIR .. "src/mame/drivers/tugboat.cpp",
+	MAME_DIR .. "src/mame/drivers/tvg01.cpp",
 	MAME_DIR .. "src/mame/drivers/ice_bozopail.cpp",
 	MAME_DIR .. "src/mame/drivers/ice_tbd.cpp",
 	MAME_DIR .. "src/mame/drivers/umipoker.cpp",

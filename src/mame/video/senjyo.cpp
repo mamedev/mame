@@ -164,7 +164,9 @@ WRITE8_MEMBER(senjyo_state::bg3videoram_w)
 
 void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_bgstripes == 0xff) /* off */
+	// assume +1 from disabling layer being 0xff
+	uint8_t stripe_width = m_bgstripesram[0]+1;
+	if (stripe_width == 0)
 		bitmap.fill(m_palette->pen_color(0), cliprect);
 	else
 	{
@@ -172,7 +174,7 @@ void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 		int pen = 0;
 		int count = 0;
-		int strwid = m_bgstripes;
+		int strwid = stripe_width;
 		if (strwid == 0) strwid = 0x100;
 		if (flip) strwid ^= 0xff;
 

@@ -38,7 +38,6 @@ Todo:
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "softlist.h"
@@ -93,7 +92,7 @@ private:
 	DECLARE_WRITE8_MEMBER(vtech1_video_bank_w);
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 
-	DECLARE_SNAPSHOT_LOAD_MEMBER( vtech1 );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void laser110_mem(address_map &map);
 	void laser210_mem(address_map &map);
@@ -119,7 +118,7 @@ private:
     SNAPSHOT LOADING
 ***************************************************************************/
 
-SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
+SNAPSHOT_LOAD_MEMBER(vtech1_state::snapshot_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t header[24];
@@ -446,7 +445,6 @@ void vtech1_state::laser110(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, m_speaker).set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.75);
 
@@ -459,12 +457,12 @@ void vtech1_state::laser110(machine_config &config)
 	m_memexp->set_io_space(m_maincpu, AS_IO);
 
 	// snapshot
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(vtech1_state, vtech1), this), "vz", attotime::from_double(1.5));
+	SNAPSHOT(config, "snapshot", "vz", attotime::from_double(1.5)).set_load_callback(FUNC(vtech1_state::snapshot_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vtech1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("vtech1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("vz_cass");

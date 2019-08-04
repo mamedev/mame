@@ -1,12 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-/***************************************************************************
+/*****************************************************************************************
 
-        PP-01 driver by Miodrag Milanovic
+PP-01 driver by Miodrag Milanovic
 
-        08/09/2008 Preliminary driver.
+2008-09-08 Preliminary driver.
 
-****************************************************************************/
+MONIT to enter the Monitor
+M - ?
+N - ?
+P - to return
+S - ?
+Z - ?
+
+ToDo:
+- Cassette (coded but unable to test as the i8251 device needs work to support syndet)
+- Interrupt controller
+
+*****************************************************************************************/
 
 #include "emu.h"
 #include "includes/pp01.h"
@@ -38,8 +49,8 @@ void pp01_state::pp01_mem(address_map &map)
 
 void pp01_state::pp01_io(address_map &map)
 {
-	map(0xc0, 0xc3).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
-	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // user
+	map(0xc0, 0xc3).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
+	//map(0xc4, 0xc7).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // user
 	map(0xc8, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xcc, 0xcf).w(FUNC(pp01_state::pp01_video_write_mode_w));
 	map(0xd0, 0xd3).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -220,30 +231,30 @@ void pp01_state::pp01(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	//WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	I8251(config, "uart", 0);
+	I8251(config, m_uart, 2000000);
+	m_uart->txd_handler().set([this] (bool state) { m_cass->output(state ? 1.0 : -1.0); });
 	// when rts and dtr are both high, the uart is being used for cassette operations
 
 	PIT8253(config, m_pit, 0);
-	m_pit->set_clk<0>(0);
-	m_pit->out_handler<0>().set(FUNC(pp01_state::pp01_pit_out0));
-	m_pit->set_clk<1>(2000000);
-	m_pit->out_handler<1>().set(FUNC(pp01_state::pp01_pit_out1));
 	m_pit->set_clk<2>(2000000);
-	m_pit->out_handler<2>().set(m_pit, FUNC(pit8253_device::write_clk0));
+	m_pit->out_handler<2>().set(FUNC(pp01_state::z2_w));
 
-	i8255_device &ppi(I8255A(config, "ppi8255"));
-	ppi.in_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_r));
-	ppi.out_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_w));
-	ppi.in_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_r));
-	ppi.out_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_w));
-	ppi.in_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_r));
-	ppi.out_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_w));
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.in_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_r));
+	ppi1.out_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_w));
+	ppi1.in_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_r));
+	ppi1.out_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_w));
+	ppi1.in_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_r));
+	ppi1.out_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 /* ROM definition */

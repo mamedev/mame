@@ -97,6 +97,7 @@
 #include "formats/dmk_dsk.h"
 #include "machine/ram.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Layout */
 #include "z80ne.lh"
@@ -430,12 +431,16 @@ void z80ne_state::z80ne(machine_config &config)
 	m_uart_clock->signal_handler().set(FUNC(z80ne_state::lx385_uart_tx_clock_w));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
+	SPEAKER(config, "mono").front_center();
+
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette1->set_interface("z80ne_cass");
 
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette2->set_interface("z80ne_cass");
 
 	config.set_default_layout(layout_z80ne);
@@ -507,12 +512,16 @@ void z80ne_state::z80netb(machine_config &config)
 	m_uart_clock->signal_handler().set(FUNC(z80ne_state::lx385_uart_tx_clock_w));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
+	SPEAKER(config, "mono").front_center();
+
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette1->set_interface("z80ne_cass");
 
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette2->set_interface("z80ne_cass");
 
 	lx387(config);
@@ -550,12 +559,16 @@ void z80netf_state::z80netf(machine_config &config)
 	m_uart_clock->signal_handler().set(FUNC(z80netf_state::lx385_uart_tx_clock_w));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
+	SPEAKER(config, "mono").front_center();
+
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette1->set_interface("z80ne_cass");
 
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette2->set_interface("z80ne_cass");
 
 	lx387(config);

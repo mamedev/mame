@@ -2531,6 +2531,9 @@ void model2o_state::model2o(machine_config &config)
 
 	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
+	model2_timers(config);
+	model2_screen(config);
+
 	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
 	ioboard.set_default_bios_tag("epr14869c");
 	ioboard.read_callback().set("dpram", FUNC(mb8421_device::left_r));
@@ -2539,9 +2542,6 @@ void model2o_state::model2o(machine_config &config)
 	ioboard.in_callback<1>().set_ioport("IN1");
 
 	MB8421(config, "dpram", 0);
-
-	model2_timers(config);
-	model2_screen(config);
 
 	SEGAM1AUDIO(config, m_m1audio, 0);
 	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
@@ -3623,16 +3623,13 @@ ROM_START( srallycdx ) /* Sega Rally Championship DX Revision A, Model 2A - Sing
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17763.30", 0x000000, 0x040000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
-	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x000000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) ) /* REMOVE when EPR-17763 & EPR-17758 is dumped & added */
+	ROM_LOAD16_WORD_SWAP( "epr-17763.30",  0x000000, 0x040000, CRC(b490028e) SHA1(e1e7b7f54f0b1072f6344327a8232a0dbbdf27a1) ) /* Number verified via Sega Rally Champ DX manual */
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
 	ROM_LOAD16_WORD_SWAP( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
-	ROM_LOAD16_WORD_SWAP( "mpr-17758.36", 0x400000, 0x200000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
+	ROM_LOAD16_WORD_SWAP( "mpr-17758.36", 0x400000, 0x200000, CRC(47e0fa82) SHA1(f71acecef4f3c8e7d5106a9c160abf8ed4ed01af) ) /* Number verified via Sega Rally Champ DX manual */
 	/* The DX version doesn't have any sound rom at IC37 */
-	ROM_LOAD16_WORD_SWAP( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
-	ROM_LOAD16_WORD_SWAP( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3673,16 +3670,13 @@ ROM_START( srallycdxa ) // Sega Rally Championship DX, Model 2A? - Single player
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-17763.30", 0x000000, 0x040000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
-	ROM_LOAD16_WORD_SWAP( "epr-17890a.30", 0x000000, 0x040000, CRC(5bac3fa1) SHA1(3635333d36463b6fab25560ed918e05138f964dc) ) /* REMOVE when EPR-17763 & EPR-17758 is dumped & added */
+	ROM_LOAD16_WORD_SWAP( "epr-17763.30",  0x000000, 0x040000, CRC(b490028e) SHA1(e1e7b7f54f0b1072f6344327a8232a0dbbdf27a1) ) /* Number verified via Sega Rally Champ DX manual */
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP( "mpr-17756.31", 0x000000, 0x200000, CRC(7725f111) SHA1(1f1ee3f19a6bcf57bc5a1c7dd64ee83f8b81f084) )
 	ROM_LOAD16_WORD_SWAP( "mpr-17757.32", 0x200000, 0x200000, CRC(1616e649) SHA1(1d3a0e441d150ada0535a9d50e2f69dd4b99c584) )
-	ROM_LOAD16_WORD_SWAP( "mpr-17758.36", 0x400000, 0x200000, NO_DUMP ) /* Number verified via Sega Rally Champ DX manual */
+	ROM_LOAD16_WORD_SWAP( "mpr-17758.36", 0x400000, 0x200000, CRC(47e0fa82) SHA1(f71acecef4f3c8e7d5106a9c160abf8ed4ed01af) ) /* Number verified via Sega Rally Champ DX manual */
 	/* The DX version doesn't have any sound rom at IC37 */
-	ROM_LOAD16_WORD_SWAP( "mpr-17886.36", 0x400000, 0x200000, CRC(54a72923) SHA1(103c4838b27378c834c08d29d6fb6ba95e7f9d03) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
-	ROM_LOAD16_WORD_SWAP( "mpr-17887.37", 0x600000, 0x200000, CRC(38c31fdd) SHA1(a85f05160b060d9d4a431aaa73cfc03f24214fb9) ) /* REMOVE when EPR-17758 & EPR-17763 is dumped & added */
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3941,7 +3935,7 @@ ROM_START( motoraiddx ) /* Motor Raid DX, Model 2A, Sega ROM board ID# 834-13231
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( skytargt ) /* Sky Target, Model 2A */
+ROM_START( skytargt ) /* Sky Target, Model 2A, Sega game ID# 833-12178, Sega ROM board ID# 834-12179 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18406.12", 0x000000, 0x080000, CRC(fde9c00a) SHA1(01cd519daaf6138d9df4940bf8bb5923a1f163df) )
 	ROM_LOAD32_WORD( "epr-18407.13", 0x000002, 0x080000, CRC(35f8b529) SHA1(faf6dcf8f345c1e7968823f2dba60afcd88f37c2) )

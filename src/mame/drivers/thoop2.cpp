@@ -135,7 +135,7 @@ void thoop2_state::thoop2_map(address_map &map)
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
 	map(0x700008, 0x700009).portr("SYSTEM");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 3, data); });
+	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
 	map(0x70000d, 0x70000d).w(FUNC(thoop2_state::oki_bankswitch_w));               /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                  /* OKI6295 data register */
 	map(0xfe0000, 0xfe7fff).ram();                                          /* Work RAM */

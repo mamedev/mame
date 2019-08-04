@@ -19,6 +19,10 @@ public:
 	void init_happy6();
 
 	void pgm_arm_type3(machine_config &config);
+	void pgm_arm_type3_22m(machine_config &config);
+	void pgm_arm_type3_24m(machine_config &config);
+	void pgm_arm_type3_33m(machine_config &config);
+	void pgm_arm_type3_33_8688m(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;

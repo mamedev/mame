@@ -767,34 +767,36 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 	return image_init_result::PASS;
 }
 
-#define MCFG_MEGATECH_CARTSLOT_ADD(_tag, _load) \
-	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "megatech_cart") \
-	MCFG_GENERIC_LOAD(mtech_state, _load)
+#define MEGATECH_CARTSLOT(_tag, _load) \
+	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "megatech_cart").set_device_load(FUNC(mtech_state::_load), this)
 
-MACHINE_CONFIG_START(mtech_state::megatech_multislot)
+void mtech_state::megatech_multislot(machine_config &config)
+{
 	megatech(config);
 
 	// add cart slots
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot2", mt_cart2)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot3", mt_cart3)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot4", mt_cart4)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot5", mt_cart5)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot6", mt_cart6)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot7", mt_cart7)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot8", mt_cart8)
+	MEGATECH_CARTSLOT("mt_slot1", mt_cart1);
+	MEGATECH_CARTSLOT("mt_slot2", mt_cart2);
+	MEGATECH_CARTSLOT("mt_slot3", mt_cart3);
+	MEGATECH_CARTSLOT("mt_slot4", mt_cart4);
+	MEGATECH_CARTSLOT("mt_slot5", mt_cart5);
+	MEGATECH_CARTSLOT("mt_slot6", mt_cart6);
+	MEGATECH_CARTSLOT("mt_slot7", mt_cart7);
+	MEGATECH_CARTSLOT("mt_slot8", mt_cart8);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("megatech");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(mtech_state::megatech_fixedslot)
+void mtech_state::megatech_fixedslot(machine_config &config)
+{
 	megatech(config);
 
 	// add cart slots
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
-	MCFG_SET_IMAGE_LOADABLE(false)
-MACHINE_CONFIG_END
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "mt_slot1", generic_plain_slot, "megatech_cart"));
+	cartslot.set_device_load(FUNC(mtech_state::mt_cart1), this);
+	cartslot.set_user_loadable(false);
+}
 
 
 /* MegaTech Games - Genesis & sms! Games with a timer */

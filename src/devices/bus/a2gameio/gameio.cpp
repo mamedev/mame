@@ -50,6 +50,7 @@
 #include "emu.h"
 #include "bus/a2gameio/gameio.h"
 #include "bus/a2gameio/joystick.h"
+#include "bus/a2gameio/joyport.h"
 
 
 //**************************************************************************
@@ -64,6 +65,12 @@ apple2_gameio_device::apple2_gameio_device(const machine_config &mconfig, const 
 	, device_slot_interface(mconfig, *this)
 	, m_intf(nullptr)
 {
+}
+
+void apple2_gameio_device::iiandplus_options(device_slot_interface &slot)
+{
+	slot.option_add("joy", APPLE2_JOYSTICK);
+	slot.option_add("joyport", APPLE2_JOYPORT);
 }
 
 void apple2_gameio_device::default_options(device_slot_interface &slot)

@@ -47,6 +47,7 @@
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -137,14 +138,15 @@
 public:
 	can09t_state(const machine_config &mconfig, device_type type, const char * tag)
 		: driver_device(mconfig, type, tag)
-		,m_maincpu(*this, "maincpu")
-		,m_syspia(*this, SYSPIA_TAG)
-		,m_usrpia(*this, USRPIA_TAG)
-		,m_pia3(*this, PIA3_TAG)
-		,m_pia4(*this, PIA4_TAG)
-		,m_ptm(*this, "ptm")
-		,m_acia(*this, "acia")
-		,m_banksel(1)
+		, m_maincpu(*this, "maincpu")
+		, m_syspia(*this, SYSPIA_TAG)
+		, m_usrpia(*this, USRPIA_TAG)
+		, m_pia3(*this, PIA3_TAG)
+		, m_pia4(*this, PIA4_TAG)
+		, m_ptm(*this, "ptm")
+		, m_acia(*this, "acia")
+		, m_cass(*this, "cassette")
+		, m_banksel(1)
 	{ }
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_start() override;
@@ -165,6 +167,7 @@ protected:
 	required_device<pia6821_device> m_pia4;
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;
+	required_device<cassette_image_device> m_cass;
 
 	uint8_t m_banksel;
 	uint8_t *m_plap;
@@ -426,7 +429,8 @@ READ8_MEMBER( can09t_state::syspia_A_r )
 READ8_MEMBER( can09t_state::syspia_B_r )
 {
 	LOG("%s()\n", FUNCNAME);
-	return 0;
+	u8 data = (m_cass->input() > 0.04) ? 0x80 : 0;
+	return data;
 }
 
 WRITE8_MEMBER( can09t_state::syspia_B_w )
@@ -435,6 +439,7 @@ WRITE8_MEMBER( can09t_state::syspia_B_w )
 
 	m_banksel = (data & 0x20) ? 0x10 : 0;
 	LOGBANK("Bank select: %d", (m_banksel >> 4) & 1);
+	m_cass->output(BIT(data, 6) ? 1.0 : -1.0);
 }
 
 WRITE_LINE_MEMBER(can09t_state::syspia_cb2_w)
@@ -711,6 +716,11 @@ void can09t_state::can09t(machine_config &config)
 	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
 	CLOCK(config, "acia_clock", CAN09T_ACIA_CLOCK).signal_handler().set(FUNC(can09t_state::write_acia_clock));
+
+	SPEAKER(config, "mono").front_center();
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 #define CAN09_X1_CLOCK 22.1184_MHz_XTAL        /* UKI 22118.40 Khz */

@@ -189,8 +189,8 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
 #include "machine/ncr5380n.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"

@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_CASPER, bbc_tube_casper_device, "bbc_tube_casper", "
 void bbc_tube_casper_device::tube_casper_mem(address_map &map)
 {
 	map(0x00000, 0x03fff).rom().region("casper_rom", 0);
-	map(0x10000, 0x1001f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+	map(0x10000, 0x1001f).m("via6522_1", FUNC(via6522_device::map)).umask16(0x00ff);
 	map(0x20000, 0x3ffff).ram();
 }
 

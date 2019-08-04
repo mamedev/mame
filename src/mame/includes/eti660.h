@@ -53,7 +53,7 @@ private:
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( eti660 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	required_shared_ptr<uint8_t> m_p_videoram;
 
 	void io_map(address_map &map);

@@ -62,4 +62,1548 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- This begins the Rainbow On Disk archives. Rainbow Magazine was a TRS-80
+	Color Computer-focused magazine published in the USA that received
+	worldwide distribution. For an additional fee, you could receive a
+	floppy with the programs from that issue so you wouldn't have to type
+	them in.
+
+	For instructions on the use of these programs, reference the Rainbow
+	Magazine issue of the same month and year as the disk.
+
+	Compatibility for all of these will be tagged as both CoCo1/2 and 3. This
+	is because many of these programs will run on all three types of machine,
+	even well after the introduction of the CoCo 3 to market. -->
+
+	<software name="rbwd1086">
+		<description>Rainbow on Disk 1986-10 issue</description>
+		<year>1986</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-86 side a.dsk" size="161280" crc="b66c1c44" sha1="4cc252c747e589e9b7a56f7a423697245eb9ad06"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-86 side b.dsk" size="161280" crc="40230205" sha1="4f8a99d00c861e2b7d5d8a082ff195814588479b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1186">
+		<description>Rainbow on Disk 1986-11 issue</description>
+		<year>1986</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-86 side a.dsk" size="161280" crc="30840afc" sha1="efd590917698272bb15d30947d254082dbff2df8"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-86 side b.dsk" size="161280" crc="f8bad12b" sha1="b99f9a048049b405a3a591008901656ac488b9f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1286">
+		<description>Rainbow on Disk 1986-12 issue</description>
+		<year>1986</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-86 side a.dsk" size="161280" crc="40ca8a87" sha1="c0ef5c838de6493d4352549b2c18baa765e2414f"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-86 side b.dsk" size="161280" crc="d6db9d78" sha1="d024b699f4747277b897c51880f4117aed52cd7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0187">
+		<description>Rainbow on Disk 1987-01 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-87 side a.dsk" size="161280" crc="86bf77ce" sha1="150b9e7d2e9d340cfb49a823492b650c3c90310e"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-87 side b.dsk" size="161280" crc="6e8e9aec" sha1="5228ab4678bd6ca68455fadee336dfc77484c165"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0287">
+		<description>Rainbow on Disk 1987-02 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-87 side a.dsk" size="161280" crc="d75b5aed" sha1="6d22a09e97929ab994c0fc5707904b7a4776511d"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-87 side b.dsk" size="161280" crc="86e7c50b" sha1="b9be9c3f030bc0757e295f0756398a2358c96ced"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0387">
+		<description>Rainbow on Disk 1987-03 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-87 side a.dsk" size="161280" crc="560f1a8e" sha1="6c2888fa278861877bb82fb9a6e71874b6191c98"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-87 side b.dsk" size="161280" crc="82688551" sha1="955bedf51c942f09e665cb11fb5b6e61da06448f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0487">
+		<description>Rainbow on Disk 1987-04 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-87 side a.dsk" size="161280" crc="2937cc79" sha1="9f7601372e4adfb096947695bf97aa0bce596568"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-87 side b.dsk" size="161280" crc="0738130c" sha1="7e4d41f7ec79b095f3ee6d1ae5ff46d8b84db9f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0587">
+		<description>Rainbow on Disk 1987-05 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-87 side a.dsk" size="161280" crc="6eb5e46d" sha1="4c7fc34522de8a74f66b9ce69c73c788b95b21d0"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-87 side b.dsk" size="161280" crc="3ae0e536" sha1="8f88bff8c443516ed03ec6c66c5be2177c747073"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0687">
+		<description>Rainbow on Disk 1987-06 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-87 side a.dsk" size="161280" crc="ab6ad07f" sha1="7877dab59dd763e4bdb55de812517cdaffa1be9f"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-87 side b.dsk" size="161280" crc="17b15fbd" sha1="6d82023aaa79a16d9602d63b92f243fcff31d2de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0787">
+		<description>Rainbow on Disk 1987-07 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-87 side a.dsk" size="161280" crc="af310f46" sha1="8773ab4e3773c7b94dcb99539213e0500beb3117"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-87 side b.dsk" size="161280" crc="2f6526ac" sha1="98750903a904db42f7d3b7ce90e2262862f4edac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0887">
+		<description>Rainbow on Disk 1987-08 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-87 side a.dsk" size="161280" crc="711f992e" sha1="9d6b2e514d3da6e6d893b6a4039ff384431d9125"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-87 side b.dsk" size="161280" crc="a6b8e19f" sha1="71d134532b2974d582b4a6102da468f7426f3fd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0987">
+		<description>Rainbow on Disk 1987-09 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-87 side a.dsk" size="161280" crc="7db76ab4" sha1="867e783ae462101955b7afdc73c4df97d4ea83d0"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-87 side b.dsk" size="161280" crc="493911f5" sha1="9c37158d63ab45a329c22b59ff7424b7176a600c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1087">
+		<description>Rainbow on Disk 1987-10 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-87 side a.dsk" size="161280" crc="6739250b" sha1="9f73e50a12d65a790d9aa905c0ea2df9edef303b"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-87 side b.dsk" size="161280" crc="cbe4b382" sha1="585a68d894e9a9e996b88b0c7fe13986a3277d51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1187">
+		<description>Rainbow on Disk 1987-11 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-87 side a.dsk" size="161280" crc="c81d93c3" sha1="a88af9058b77346b5ad5724cf161fd7f0904f332"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-87 side b.dsk" size="161280" crc="014ea6d6" sha1="691bc9ecad1f05a3a6a5830f4d3e34685871e679"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1287">
+		<description>Rainbow on Disk 1987-12 issue</description>
+		<year>1987</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-87 side a.dsk" size="161280" crc="d6eabb85" sha1="f8b59fdf34eb638498316635e9ddb06545fed76c"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-87 side b.dsk" size="161280" crc="6df3e493" sha1="dd62a30d150e9fbc7aaaaebbc13413ad49a6104b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0188">
+		<description>Rainbow on Disk 1988-01 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-88 side a.dsk" size="161280" crc="526dbd10" sha1="86623cc2385bf2bfae67f88d6e98036d2cc3581e"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-88 side b.dsk" size="161280" crc="72df008f" sha1="cea107e236cb5b3879f404e9fd63bbc9d2cec177"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0288">
+		<description>Rainbow on Disk 1988-02 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-88 side a.dsk" size="161280" crc="7678eb5c" sha1="fe17166963e4256c6fcf0975d04fa1f15562511e"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-88 side b.dsk" size="161280" crc="1541c74f" sha1="569d0ea4e915c3bb8813e036c7ab2d5290acec33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0388">
+		<description>Rainbow on Disk 1988-03 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-88 side a.dsk" size="161280" crc="51d4a6e7" sha1="0c01cdd574a06f3772986200abf4c5f84f8963a1"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-88 side b.dsk" size="161280" crc="6eed1641" sha1="f56e658a72525102db91aa7777132a008b978614"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0488">
+		<description>Rainbow on Disk 1988-04 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-88 side a.dsk" size="161280" crc="b923e785" sha1="c1e7ec297f05e8de107708057462f12db2d93da6"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-88 side b.dsk" size="161280" crc="0ee4f961" sha1="b1d7c96f142e97ae713af2c02f80c43fa3467926"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0588">
+		<description>Rainbow on Disk 1988-05 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-88 side a.dsk" size="161280" crc="9eaa56e5" sha1="1a6e9d80c7c7ba2048cf137311e89480b4f41a1a"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-88 side b.dsk" size="161280" crc="6cbbeb96" sha1="1f9beae7d4588839f08472b1dbcb04ad7bf3b93d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0688">
+		<description>Rainbow on Disk 1988-06 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-88 side a.dsk" size="161280" crc="3dc370d0" sha1="ef00d842f1e993824e313f8a366f4ff64e2bf0df"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-88 side b.dsk" size="161280" crc="f3ad3ba3" sha1="0e0d73bc19b91910fcbfd13147bbda505eeac159"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0788">
+		<description>Rainbow on Disk 1988-07 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-88 side a.dsk" size="161280" crc="74ddd8b5" sha1="71c583e05c1e9eb563699cc4830177b9d3ce1ad3"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-88 side b.dsk" size="161280" crc="044d51e0" sha1="989f9d164f0f785938a76d8ad53275b49151525a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0888">
+		<description>Rainbow on Disk 1988-08 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-88 side a.dsk" size="161280" crc="b7bf22b8" sha1="3b51d8ba0f9665831b57eb9f28a285fc5a750d8c"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-88 side b.dsk" size="161280" crc="972ca55f" sha1="c8eacffd2c51725299f638a9caa386c6a4aa5985"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0988">
+		<description>Rainbow on Disk 1988-09 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-88 side a.dsk" size="161280" crc="e20dd3d2" sha1="fa3927986b5150aaf0a84ba95b6ebd68305aab65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1088">
+		<description>Rainbow on Disk 1988-10 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-88 side a.dsk" size="161280" crc="001d50d8" sha1="fb269f201de6cc2264fc238f512806c64198325c"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-88 side b.dsk" size="161280" crc="02dfd7f8" sha1="a357942708a46435c3b1daaf86ee745ef9542a7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1188">
+		<description>Rainbow on Disk 1988-11 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-88 side a.dsk" size="161280" crc="6f0e971d" sha1="9e489a72ed3fc4bd5a7e60dcf79daccc0d83c5dd"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-88 side b.dsk" size="161280" crc="2a5bf260" sha1="2c872991f17c45076734f6d72425a9af492e59aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1288">
+		<description>Rainbow on Disk 1988-12 issue</description>
+		<year>1988</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-88 side a.dsk" size="161280" crc="32a2f0c7" sha1="2537904deef10d59d5c9d5d8303bf91f03466dfa"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-88 side b.dsk" size="161280" crc="e5cf9d00" sha1="f6af0468be872c59c148d018c3330c276116a07c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0189">
+		<description>Rainbow on Disk 1989-01 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-89 side a.dsk" size="161280" crc="6d18e9ee" sha1="7ea8e4de0dc62d80bce925907e243052dc89779b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0289">
+		<description>Rainbow on Disk 1989-02 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-89 side a.dsk" size="161280" crc="1405ea0c" sha1="73a149a47c8a92e2f3c787740f908f2fd5b0a455"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-89 side b.dsk" size="161280" crc="e0cb8ead" sha1="ace67d725b874f23f58e04640a96e56de8884d25"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0389">
+		<description>Rainbow on Disk 1989-03 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-89 side a.dsk" size="161280" crc="465d7d36" sha1="d8f67962832466b68fe3c394e71a6d4726f5309c"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-89 side b.dsk" size="161280" crc="26545f75" sha1="5b9fcc726fb6849d72a564f224c486ee91377f3a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0489">
+		<description>Rainbow on Disk 1989-04 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-89 side a.dsk" size="161280" crc="feb67af3" sha1="53202ee4c297f72481abef2d5a388a7ff756c8de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0589">
+		<description>Rainbow on Disk 1989-05 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-89 side a.dsk" size="161280" crc="4293c719" sha1="8db1cd52de93491f8e11c1d552e9d27672a41dc8"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-89 side b.dsk" size="161280" crc="34e4ecac" sha1="35cdc7f429c6bd815ce29f8cbb0bab7dc629cf61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0689">
+		<description>Rainbow on Disk 1989-06 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-89 side a.dsk" size="161280" crc="f4425df5" sha1="268e449e085d00accf176eb513fab8da5a919537"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-89 side b.dsk" size="161280" crc="cad63167" sha1="3b1aaefacf905e942db277c12734abb0ab3bf8ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0789">
+		<description>Rainbow on Disk 1989-07 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This disk has a specially partitioned Side B with both Disk Basic and
+		OS9 filesystems. Writing to Side B will damage it. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-89 side a.dsk" size="161280" crc="0aaca4b5" sha1="10d13f09a7ea7f38249b2f2db5cc7a1cc28e3596"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Disk Basic+OS9 dual format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-89 side b.dsk" size="161280" crc="8f4768f7" sha1="63aba667615a7b3c50282bbe10fbee851125f4aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0889">
+		<description>Rainbow on Disk 1989-08 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-89 side a.dsk" size="161280" crc="1ff10eaa" sha1="25b9acd4dafd8a0355ff8a70c742c446414b800e"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-89 side b.dsk" size="161280" crc="312fbdf1" sha1="1de11a69ae283d2ea4e8ae8a4224ccbc96820ed0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0989">
+		<description>Rainbow on Disk 1989-09 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-89 side a.dsk" size="161280" crc="83d55e37" sha1="b83ecba4b7aa369940766a2d07347a5409100b47"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-89 side b.dsk" size="161280" crc="ccd2906e" sha1="ea12c7d53056c4f36767876588e062efb3b452e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1089">
+		<description>Rainbow on Disk 1989-10 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-89 side a.dsk" size="161280" crc="fa846193" sha1="c11003f51cb839a5023f898a978b16541f9a4422"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-89 side b.dsk" size="161280" crc="08733535" sha1="7aaa451f4c3e73576f2a28c00b30565d12a21100"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1189">
+		<description>Rainbow on Disk 1989-11 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-89 side a.dsk" size="161280" crc="87f1450d" sha1="8a2af9d37d6fc6471e499a623c3bef47a706e787"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-89 side b.dsk" size="161280" crc="84432d83" sha1="0c307756e3894e2662a2ca0436145401f88a20d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1289">
+		<description>Rainbow on Disk 1989-12 issue</description>
+		<year>1989</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-89 side a.dsk" size="161280" crc="3167e8fd" sha1="6fa3460eb16f037ccec21ce80c3381177eb499bd"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-89 side b.dsk" size="161280" crc="e6233a2d" sha1="f955d2c63866d364fe0a7de20b550daaf266c441"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0190">
+		<description>Rainbow on Disk 1990-01 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-90 side a.dsk" size="161280" crc="ae2f57d6" sha1="abb790077ad338eae5950d1e0ff4ba52cb188cff"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-90 side b.dsk" size="161280" crc="97611b9c" sha1="b98d4c2a9aec647e0a1454301af4fcfdf38bdfab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0290">
+		<description>Rainbow on Disk 1990-02 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-90 side a.dsk" size="161280" crc="a4f353a5" sha1="d4a35b8e4e20142fc372243d1e4769ca587f277c"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-90 side b.dsk" size="161280" crc="98cf7585" sha1="2b7d5be65ea1e524b7c1b7cff839da438549ecd7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0390">
+		<description>Rainbow on Disk 1990-03 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-90 side a.dsk" size="161280" crc="96e3ed75" sha1="b2b6a00cbd702957d2408b63a6028487357d49e9"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-90 side b.dsk" size="161280" crc="4d9c9132" sha1="6c4580aded6361a6d9e8b5059e1770db2b21c6a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0490">
+		<description>Rainbow on Disk 1990-04 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-90 side a.dsk" size="161280" crc="a20be81b" sha1="c6a1b0d6f13b9fd7724016673ee72bb2d3d63cc1"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-90 side b.dsk" size="161280" crc="ffc7729f" sha1="97896f3640a47be7b8115a28428fa99c62806fbe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0590">
+		<description>Rainbow on Disk 1990-05 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-90 side a.dsk" size="161280" crc="dd94b5c7" sha1="5389f91043151242bcda82dc76286a93864b7946"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-90 side b.dsk" size="161280" crc="0f11b3c4" sha1="2dc46ea7c3a1bab1256294bfe7f155daa4affd10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0690">
+		<description>Rainbow on Disk 1990-06 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-90 side a.dsk" size="161280" crc="26e33e7b" sha1="bdc2515e1ecb527799c96406ad8aeacadfdac97b"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-90 side b.dsk" size="161280" crc="23bab30a" sha1="d2ffc94bbcce67d5521af9a25ccfa1352f283525"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0790">
+		<description>Rainbow on Disk 1990-07 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-90 side a.dsk" size="161280" crc="7cec3d95" sha1="ef7f9e3ce38e3ab5da9c274de60353a9ef29af9f"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-90 side b.dsk" size="161280" crc="e7576e37" sha1="ccdbe4d700ae08a0081338507ecd4b1df935d74a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0890">
+		<description>Rainbow on Disk 1990-08 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-90 side a.dsk" size="161280" crc="81234807" sha1="ca3fa3cbad655ee3f9b38148c3a49ffbdb37b1f9"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-90 side b.dsk" size="161280" crc="fdcbefe9" sha1="17155d4eb3e87d8439b961d13b600abd7f6b314d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0990">
+		<description>Rainbow on Disk 1990-09 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-90 side a.dsk" size="161280" crc="68a5db88" sha1="893036f22d5384de8cde1660f75a4d72d6238a62"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-90 side b.dsk" size="161280" crc="91063e01" sha1="72bad984bd80de96eba342cdfe36cfce77871538"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1090">
+		<description>Rainbow on Disk 1990-10 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-90 side a.dsk" size="161280" crc="163a42b8" sha1="20ce7d6288ead2d91477c94cf14b7feab21b8419"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-90 side b.dsk" size="161280" crc="72a2aaa8" sha1="180b12382cdf207fa4c2ee039234e56d37327f07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1190">
+		<description>Rainbow on Disk 1990-11 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-90 side a.dsk" size="161280" crc="99ae46f0" sha1="9791e3c01874565eff3e8a30d39c712b254e23fc"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-90 side b.dsk" size="161280" crc="94018ad9" sha1="d480d7d0326facb62a9a5f7e1566032075c4436f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1290">
+		<description>Rainbow on Disk 1990-12 issue</description>
+		<year>1990</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-90 side a.dsk" size="161280" crc="9c653eee" sha1="68f7ec02937acb9918370b7d0cb5b05b255eff4c"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-90 side b.dsk" size="161280" crc="216847ac" sha1="18ff86c3c25ea3afac77056af7d436c32bb34dce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0191">
+		<description>Rainbow on Disk 1991-01 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-91 side a.dsk" size="161280" crc="8705effd" sha1="2e0283624c47f2c9708714b9b9a656acc55cae84"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-91 side b.dsk" size="161280" crc="40929619" sha1="b56d271e4d3bb2155bf1640ce05df1c19ac51cae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0291">
+		<description>Rainbow on Disk 1991-02 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-91 side a.dsk" size="161280" crc="5861e7b6" sha1="56d019db17b5aca3d646a6bdf8c06ee796ecb521"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-91 side b.dsk" size="161280" crc="328d2497" sha1="932c93320bb8316cda58f52ac7bda0b570367c0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0391">
+		<description>Rainbow on Disk 1991-03 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-91 side a.dsk" size="161280" crc="fe3ca742" sha1="535e0fc3063c7296b9cb3f3ad46ac6395259b504"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-91 side b.dsk" size="161280" crc="723dfff5" sha1="01a7f7df900d9d7b28a3d07967b3888625f08ecf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0491">
+		<description>Rainbow on Disk 1991-04 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-91 side a.dsk" size="161280" crc="16ae8870" sha1="7c97a8bbcea61529308694c9742ab243259ae93b"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-91 side b.dsk" size="161280" crc="7928afb5" sha1="7288cfbcd22ab6e62786f872474b467ed55ffb33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0591">
+		<description>Rainbow on Disk 1991-05 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-91 side a.dsk" size="161280" crc="8d8845db" sha1="deb188e9072fa25d1876158948aa33fba7fd8153"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-91 side b.dsk" size="161280" crc="69b6ae9f" sha1="417d632a59dcea08c8578889c3749dc0941a3324"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0691">
+		<description>Rainbow on Disk 1991-06 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-91 side a.dsk" size="161280" crc="0e296d8b" sha1="d6c8f5d04d71681d30a6c76af7f23dc0f240a038"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-91 side b.dsk" size="161280" crc="a7756809" sha1="2bc42bf51057a6cac845b92675ad4db19af475d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0791">
+		<description>Rainbow on Disk 1991-07 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-91 side a.dsk" size="161280" crc="59b0bd1b" sha1="fadb81c76b10c9245e1fac26b281d58b9059a420"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0891">
+		<description>Rainbow on Disk 1991-08 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-91 side a.dsk" size="161280" crc="842d2aa2" sha1="faf78981256b35c9c7024cae77f74bbb4ed5581f"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-91 side b.dsk" size="161280" crc="20cfc7d0" sha1="965bb7642e91af0c8c79af311586b385e0b6bbd1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0991">
+		<description>Rainbow on Disk 1991-09 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-91 side a.dsk" size="161280" crc="aef253b3" sha1="06a0506d2240c5b5ef4d0f0668cc24b96383b7a3"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-91 side b.dsk" size="161280" crc="0db913fc" sha1="9b7817abfa8f11b0558ca704f82276a3063d5204"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1091">
+		<description>Rainbow on Disk 1991-10 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-91 side a.dsk" size="161280" crc="9DCEC55F" sha1="673BE61FEC4696DE00772DCC0B8337DC319F6BD0"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-91 side b.dsk" size="161280" crc="A25E1663" sha1="4AEAB5C1F11A99E9C2391080ECE978869C6207EF"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1191">
+		<description>Rainbow on Disk 1991-11 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-91 side a.dsk" size="161280" crc="7C034DE1" sha1="0CC719D3BD07480B203D7D180BC900A44129344A"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-91 side b.dsk" size="161280" crc="342715F1" sha1="4B514A88395A1B5786F3CB950A489663B066B285"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1291">
+		<description>Rainbow on Disk 1991-12 issue</description>
+		<year>1991</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-91 side a.dsk" size="161280" crc="bfa65a81" sha1="56f69938440f024d2f9763cd4adc258744c1ddd2"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-91 side b.dsk" size="161280" crc="1d03821e" sha1="ba1388f6049ff28c282044c097f434a4782c91c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0192">
+		<description>Rainbow on Disk 1992-01 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-92 side a.dsk" size="161280" crc="723f70d2" sha1="c934155b6308c81ff1b9319c8ea01a61cd60ef72"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-92 side b.dsk" size="161280" crc="ce643ced" sha1="7dcb40ba4eb91291522d00a7dced191c9b408f09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0292">
+		<description>Rainbow on Disk 1992-02 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-92 side a.dsk" size="161280" crc="1969a27e" sha1="2f81460ed6e28cca17de176de4e4a2aa568e24e7"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-92 side b.dsk" size="161280" crc="83d2909d" sha1="16626478e104e9bcf42150ba7f0e2880ef133f1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0392">
+		<description>Rainbow on Disk 1992-03 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-92 side a.dsk" size="161280" crc="81F3990B" sha1="7D9E37E699F5BE89D8F3AA20F57128524031D05E"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-92 side b.dsk" size="161280" crc="B878F777" sha1="282E3A898C91CB8FE4671FA864EE855601EA0392"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0492">
+		<description>Rainbow on Disk 1992-04 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-92 side a.dsk" size="161280" crc="4fec6324" sha1="7f87008972cf79a34b28bc519e7ec6cbe3b77e9f"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 04-92 side b.dsk" size="161280" crc="6eb4729c" sha1="15b97a286b38a191110822f4876114b6dc04a989"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0592">
+		<description>Rainbow on Disk 1992-05 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-92 side a.dsk" size="161280" crc="70db4cd3" sha1="a52bb01cf5818fb5cac5b8b3bac81113233924ac"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - OS9 format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 05-92 side b.dsk" size="161280" crc="496d06db" sha1="8b8a96618985036d52b9d24901417ed79114ef0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0692">
+		<description>Rainbow on Disk 1992-06 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 06-92 side a.dsk" size="161280" crc="a8e316ab" sha1="e669140ac55b097df7f8583a69f8f6cc5a75a77f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0792">
+		<description>Rainbow on Disk 1992-07 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 07-92 side a.dsk" size="161280" crc="b0e9c1ae" sha1="b6c5104709c2666f516c3a11c6918c675b2d480d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0892">
+		<description>Rainbow on Disk 1992-08 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 08-92 side a.dsk" size="161280" crc="0a03fbf1" sha1="973b5861d7c00031cd4414366033d2c2418a12d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0992">
+		<description>Rainbow on Disk 1992-09 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 09-92 side a.dsk" size="161280" crc="ca8f2f66" sha1="a20f43b152422a908edcec9337599de8518cf63f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1092">
+		<description>Rainbow on Disk 1992-10 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 10-92 side a.dsk" size="161280" crc="428c6037" sha1="ad8188aca5ec3ac7a29adb3d97b4abad76217c7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1192">
+		<description>Rainbow on Disk 1992-11 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 11-92 side a.dsk" size="161280" crc="da89ac56" sha1="f31364be999b7d49ed17c957d1029f21c18358a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd1292">
+		<description>Rainbow on Disk 1992-12 issue</description>
+		<year>1992</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 12-92 side a.dsk" size="161280" crc="fccc9e58" sha1="fd695df4c935daf810e4f868f40c46b6b363795e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0193">
+		<description>Rainbow on Disk 1993-01 issue</description>
+		<year>1993</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-93 side a.dsk" size="161280" crc="ae47406a" sha1="a39d565f7d0b794aff9a41aae59cca20ff15a329"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0293">
+		<description>Rainbow on Disk 1993-02 issue</description>
+		<year>1993</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 02-93 side a.dsk" size="161280" crc="8f71287f" sha1="377486705c1c88b2b9e3ec785974b9517a76323a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0393">
+		<description>Rainbow on Disk 1993-03 issue</description>
+		<year>1993</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 03-93 side a.dsk" size="161280" crc="0b957a01" sha1="93028f33c24fce31aa9faa4e6ea5c47bf4d03bc5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbwd0493">
+		<description>Rainbow on Disk 1994-01 issue</description>
+		<year>1993</year>
+		<publisher>Falsoft</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- The second side either doesn't exist or is missing. -->
+		<!-- This is the final issue of Rainbow Magazine. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Disk Basic format"/>
+			<dataarea name="flop" size="161280">
+				<rom name="rainbow on disk 01-94 side a.dsk" size="161280" crc="6c6235c4" sha1="dedac166ec67d581dd6affd135ea84d6da4bc40e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This ends the Rainbow On Disk archives. -->
+
 </softwarelist>

@@ -465,6 +465,7 @@ void cgenie_state::cgenie(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cgenie_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("cgenie_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("cgenie_cass");

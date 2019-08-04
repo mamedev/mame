@@ -116,6 +116,7 @@ private:
 	inline int get_port_mode(int port);
 	inline uint8_t read_port(int port);
 	inline void write_port(int port, uint8_t data);
+	void write_command(uint8_t data);
 
 	void register_w(int offset, uint8_t data);
 };

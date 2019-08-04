@@ -119,6 +119,9 @@ WRITE8_MEMBER(shaolins_state::nmi_w)
 		flip_screen_set(data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
+
+	machine().bookkeeping().coin_counter_w(0,data & 0x08);
+	machine().bookkeeping().coin_counter_w(1,data & 0x10);
 }
 
 TILE_GET_INFO_MEMBER(shaolins_state::get_bg_tile_info)
@@ -144,7 +147,14 @@ void shaolins_state::video_start()
 
 void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 32; offs >= 0; offs -= 32 ) /* max 24 sprites */
+	// area $3000-1f is written and never read to.
+	// Its values are filled to 0x00 when it's expected to have no sprites (cross hatch, service mode, between level transitions ...)
+	// May be a rudimentary per-sprite disable
+	// TODO: understand actual disabling conditions (either by schematics or by probing the real HW)
+	if (m_spriteram[0] == 0)
+		return;
+
+	for (int offs = m_spriteram.bytes() - 32; offs >= 0x100; offs -= 32 ) /* max 24 sprites */
 	{
 		if (m_spriteram[offs] && m_spriteram[offs + 6]) /* stop rogue sprites on high score screen */
 		{

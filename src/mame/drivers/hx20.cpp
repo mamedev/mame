@@ -829,7 +829,7 @@ uint32_t hx20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 //  OPTIONAL ROMS
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER(hx20_state, optrom)
+DEVICE_IMAGE_LOAD_MEMBER(hx20_state::optrom_load)
 {
 	uint32_t size = m_optrom->common_get_size("rom");
 
@@ -941,7 +941,7 @@ void hx20_state::hx20(machine_config &config)
 
 	// optional rom
 	GENERIC_SOCKET(config, m_optrom, generic_plain_slot, "opt_rom", "bin,rom");
-	m_optrom->set_device_load(device_image_load_delegate(&hx20_state::device_image_load_optrom, this));
+	m_optrom->set_device_load(FUNC(hx20_state::optrom_load), this);
 
 	// software lists
 	SOFTWARE_LIST(config, "hx20_opt_list").set_original("hx20_rom");

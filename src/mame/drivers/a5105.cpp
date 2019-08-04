@@ -30,7 +30,6 @@ ToDo:
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 #include "video/upd7220.h"
 
 #include "emupal.h"
@@ -173,11 +172,11 @@ READ8_MEMBER( a5105_state::pio_pb_r )
 
 	    PIO Channel B
 
-	    0  W    PAR12
-	    1  ?    SER1
-	    2  ?    SER2
-	    3  ?    SER3
-	    4  ?    SER4
+	    0  R    PAR12
+	    1  W    SER1
+	    2  W    SER2
+	    3  R    SER3
+	    4  R    SER4
 	    5  W    JOY2
 	    6  W    /JOYEN
 	    7  R    Cassette Data
@@ -608,7 +607,6 @@ void a5105_state::a5105(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	BEEP(config, "beeper", 500).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
@@ -627,6 +625,8 @@ void a5105_state::a5105(machine_config &config)
 	pio.out_int_callback().set_inputline(m_maincpu, 0);
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	FLOPPY_CONNECTOR(config, "upd765a:0", a5105_floppies, "525qd", a5105_state::floppy_formats);

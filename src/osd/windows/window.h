@@ -122,7 +122,7 @@ public:
 	int                                    m_lastclicky;
 
 private:
-	void draw_video_contents(HDC dc, int update);
+	void draw_video_contents(HDC dc, bool update);
 	int complete_create();
 	void set_starting_view(int index, const char *defview, const char *view);
 	int wnd_extra_width();
@@ -157,7 +157,7 @@ struct osd_draw_callbacks
 //  PROTOTYPES
 //============================================================
 
-BOOL winwindow_has_focus(void);
+bool winwindow_has_focus(void);
 void winwindow_update_cursor_state(running_machine &machine);
 
 extern LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);

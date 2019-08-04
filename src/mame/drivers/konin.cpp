@@ -11,32 +11,7 @@ No information has been found. All code is guesswork.
 2011-12-29 Skeleton driver.
 2016-07-15 Added terminal and uart.
 
-'maincpu' (0384): unmapped i/o memory write to 00F8 = 56 & FF
-'maincpu' (0388): unmapped i/o memory write to 00F8 = B6 & FF
-'maincpu' (038C): unmapped i/o memory write to 0024 = 00 & FF
-'maincpu' (0A0B): unmapped i/o memory write to 0080 = BE & FF
-'maincpu' (0A0F): unmapped i/o memory write to 0080 = 08 & FF
-'maincpu' (0A13): unmapped i/o memory write to 0080 = 0C & FF
-'maincpu' (0A15): unmapped i/o memory read from 0082 & FF
-'maincpu' (0A19): unmapped i/o memory write to 0080 = 05 & FF
-'maincpu' (04DE): unmapped i/o memory write to 00F6 = 27 & FF
-'maincpu' (04E2): unmapped i/o memory write to 00F6 = 40 & FF
-'maincpu' (04E6): unmapped i/o memory write to 00F6 = CE & FF
-'maincpu' (04EA): unmapped i/o memory write to 00F6 = 27 & FF
-'maincpu' (043B): unmapped i/o memory write to 00F8 = B6 & FF
-'maincpu' (043F): unmapped i/o memory write to 00F6 = 27 & FF
-'maincpu' (2AA3): unmapped i/o memory write to 00F8 = 14 & FF
-'maincpu' (2AA7): unmapped i/o memory write to 00FB = C0 & FF
-'maincpu' (2AC2): unmapped i/o memory write to 00F8 = 56 & FF
-'maincpu' (2AC6): unmapped i/o memory write to 00FA = 03 & FF
-'maincpu' (0082): unmapped i/o memory write to 0024 = 06 & FF
-
-Debug stuff:
-- Start it up
-- Write FF to 7D57 to see some messages
-- Write 00 to 7D57 to silence it
-
-Even though it gives an input prompt, there's no code to accept anything
+Press E to see some messages.
 
 Terminal settings: 8 data bits, 2 stop bits, no parity @ 9600
 

@@ -169,6 +169,7 @@ class f38t56_device : public f3856_device
 public:
 	f38t56_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 };
 

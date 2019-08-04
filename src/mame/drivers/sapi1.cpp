@@ -2,27 +2,33 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        SAPI-1 driver by Miodrag Milanovic
+SAPI-1 driver by Miodrag Milanovic
 
-        2008-09-09 Preliminary driver.
+2008-09-09 Preliminary driver.
 
-        2010-12-07 Added some code to allow sapizps3 to read its rom.
-        With no available docs, the i/o ports are a guess. The ram
-        allocation is based on the actions of the various bios roms.
-        Port 25 is used as a jump vector. in a,(25); ld l,a; jp(hl).
+2010-12-07 Added some code to allow sapizps3 to read its rom.
+With no available docs, the i/o ports are a guess. The ram
+allocation is based on the actions of the various bios roms.
+Port 25 is used as a jump vector. in a,(25); ld l,a; jp(hl).
 
-        2012-04-19 Connected sapizps3 to a terminal. It is trying to
-        load a 128-byte boot sector from a floppy disk.
-        Modernised driver.
-        Connected sapizps2 to ascii keyboard. System is now usable.
-        According to wikipedia, sapi1 & 2 have cassette facility,
-        while sapi3 uses 8 inch floppy disk.
+2012-04-19 Connected sapizps3 to a terminal. It is trying to
+load a 128-byte boot sector from a floppy disk.
+Modernised driver.
+Connected sapizps2 to ascii keyboard. System is now usable.
+According to wikipedia, sapi1 & 2 have cassette facility,
+while sapi3 uses 8 inch floppy disk.
+
+Cassette:
+2019-07-26 Cassette implemented @ 1200 baud.
+- sapi1 -bios 1 and sapizps2 -bios 2 have a common system allowing
+  files to be shared among them. (working)
+- sapi1 -bios 0 uses its own system on ports 40-43, not compatible
+  with the above. (working)
+- sapizps2 -bios 0 and -bios 1: unknown how to save a file. They cannot
+  load files from any of the above working systems. (not working)
+
 
 ToDo:
-- Add cassette to sapi1 and 2
--- UART on port 12, save and load bytes
--- port 11 bit 7 for load, chr available
--- port 11 bit 6 for save, tx buffer empty
 - sapi3 is trying to read a disk, so there is no response after showing the logo
 
 Unable to proceed due to no info available (& in English).
@@ -34,35 +40,33 @@ ZPS stands for "Základní Počítačová Sestava" (basic computer system).
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-//#include "cpu/z80/z80.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
+#include "imagedev/cassette.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
+#include "machine/timer.h"
+#include "speaker.h"
 
-class sapi1_state : public driver_device
+class sapi_state : public driver_device
 {
 public:
-	sapi1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_bank1(*this, "bank1"),
-		m_line0(*this, "LINE0"),
-		m_line1(*this, "LINE1"),
-		m_line2(*this, "LINE2"),
-		m_line3(*this, "LINE3"),
-		m_line4(*this, "LINE4"),
-		m_maincpu(*this, "maincpu"),
-		m_uart(*this, "uart"),
-		m_uart_clock(*this, "uart_clock"),
-		m_v24(*this, "v24"),
-		m_palette(*this, "palette")
-	{
-	}
+	sapi_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_bank1(*this, "bank1")
+		, m_io_keyboard(*this, "LINE%u", 0)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_uart(*this, "uart")
+		, m_uart_clock(*this, "uart_clock")
+		, m_v24(*this, "v24")
+		, m_palette(*this, "palette")
+	{ }
 
 	void sapi3(machine_config &config);
 	void sapi1(machine_config &config);
@@ -76,6 +80,7 @@ public:
 
 private:
 	optional_shared_ptr<uint8_t> m_p_videoram;
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(sapi1_keyboard_r);
 	DECLARE_WRITE8_MEMBER(sapi1_keyboard_w);
 	DECLARE_READ8_MEMBER(sapi2_keyboard_status_r);
@@ -84,20 +89,26 @@ private:
 	DECLARE_WRITE8_MEMBER(sapi3_00_w);
 	DECLARE_READ8_MEMBER(sapi3_25_r);
 	DECLARE_WRITE8_MEMBER(sapi3_25_w);
-	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(uart_status_r);
-	DECLARE_WRITE8_MEMBER(modem_control_w);
-	DECLARE_READ8_MEMBER(uart_ready_r);
-	DECLARE_WRITE8_MEMBER(uart_mode_w);
-	DECLARE_WRITE8_MEMBER(uart_reset_w);
+	DECLARE_WRITE8_MEMBER(port10_w);
+	DECLARE_WRITE8_MEMBER(port11_w);
+	DECLARE_WRITE8_MEMBER(port13_w);
+	DECLARE_WRITE8_MEMBER(port43_w);
+	DECLARE_READ8_MEMBER(port10_r);
+	DECLARE_READ8_MEMBER(port11_r);
+	DECLARE_READ8_MEMBER(port40_r);
+	DECLARE_READ8_MEMBER(port41_r);
 	DECLARE_MACHINE_RESET(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	DECLARE_READ_LINE_MEMBER(si);
+	DECLARE_WRITE_LINE_MEMBER(so);
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void sapi1_mem(address_map &map);
+	void sapi1_io(address_map &map);
 	void sapi2_mem(address_map &map);
+	void sapi2_io(address_map &map);
 	void sapi3_io(address_map &map);
 	void sapi3_mem(address_map &map);
 	void sapi3a_io(address_map &map);
@@ -109,17 +120,18 @@ private:
 	uint8_t m_keyboard_mask;
 	uint8_t m_refresh_counter;
 	uint8_t m_zps3_25;
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	DECLARE_WRITE_LINE_MEMBER(kansas_w);
+	u8 m_cass_data[4];
+	bool m_cassinbit, m_cassoutbit, m_cassold;
+	bool m_ier, m_iet;
 	optional_memory_bank m_bank1;   // Only for sapi3
-	required_ioport m_line0;
-	required_ioport m_line1;
-	required_ioport m_line2;
-	required_ioport m_line3;
-	required_ioport m_line4;
+	required_ioport_array<5> m_io_keyboard;
 	required_device<cpu_device> m_maincpu;
+	optional_device<cassette_image_device> m_cass;
 	optional_device<ay31015_device> m_uart;
 	optional_device<clock_device> m_uart_clock;
 	optional_device<rs232_port_device> m_v24;
-
 	optional_device<palette_device> m_palette;
 };
 
@@ -199,33 +211,59 @@ static const uint8_t MHB2501[] = {
 
 
 /* Address maps */
-void sapi1_state::sapi1_mem(address_map &map)
+void sapi_state::sapi1_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x1fff).rom(); // Extension ROM
 	map(0x2000, 0x23ff).ram();
-	map(0x2400, 0x27ff).rw(FUNC(sapi1_state::sapi1_keyboard_r), FUNC(sapi1_state::sapi1_keyboard_w)); // PORT 0 - keyboard
-	//AM_RANGE(0x2800, 0x2bff) AM_NOP // PORT 1
-	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
-	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
+	map(0x2400, 0x27ff).rw(FUNC(sapi_state::sapi1_keyboard_r), FUNC(sapi_state::sapi1_keyboard_w)); // PORT 0 - keyboard
+	//map(0x2800, 0x2bff) AM_NOP // PORT 1
+	//map(0x2c00, 0x2fff) AM_NOP // PORT 2
+	//map(0x3000, 0x33ff) AM_NOP // 3214
 	map(0x3800, 0x3fff).ram().share("videoram"); // AND-1 (video RAM)
 	map(0x4000, 0x7fff).ram(); // REM-1
 }
 
-void sapi1_state::sapi2_mem(address_map &map)
+void sapi_state::sapi1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	// -bios 1
+	map(0x10, 0x10).rw(FUNC(sapi_state::port10_r),FUNC(sapi_state::port10_w));
+	map(0x11, 0x11).rw(FUNC(sapi_state::port11_r),FUNC(sapi_state::port11_w));
+	map(0x12, 0x12).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0x13, 0x13).w(FUNC(sapi_state::port13_w));
+	// -bios 0
+	map(0x40, 0x40).r(FUNC(sapi_state::port40_r)); // get inverted byte
+	map(0x41, 0x41).r(FUNC(sapi_state::port41_r)); // get status
+	map(0x42, 0x42).nopw();   // strobe DS
+	map(0x43, 0x43).w(FUNC(sapi_state::port43_w)); // send inverted byte
+}
+
+void sapi_state::sapi2_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x1fff).rom(); // Extension ROM
 	map(0x2000, 0x23ff).ram();
-	map(0x2400, 0x27ff).r(FUNC(sapi1_state::sapi2_keyboard_status_r));
-	map(0x2800, 0x28ff).r(FUNC(sapi1_state::sapi2_keyboard_data_r));
+	map(0x2400, 0x27ff).r(FUNC(sapi_state::sapi2_keyboard_status_r));
+	map(0x2800, 0x28ff).r(FUNC(sapi_state::sapi2_keyboard_data_r));
 	map(0x3800, 0x3fff).ram().share("videoram"); // AND-1 (video RAM)
 	map(0x4000, 0x7fff).ram(); // REM-1
 }
 
-void sapi1_state::sapi3_mem(address_map &map)
+void sapi_state::sapi2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x10, 0x10).rw(FUNC(sapi_state::port10_r),FUNC(sapi_state::port10_w));
+	map(0x11, 0x11).rw(FUNC(sapi_state::port11_r),FUNC(sapi_state::port11_w));
+	map(0x12, 0x12).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0x13, 0x13).w(FUNC(sapi_state::port13_w));
+}
+
+void sapi_state::sapi3_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).ram().bankrw("bank1");
@@ -233,7 +271,7 @@ void sapi1_state::sapi3_mem(address_map &map)
 	map(0xf800, 0xffff).ram().share("videoram");
 }
 
-void sapi1_state::sapi3a_mem(address_map &map)
+void sapi_state::sapi3a_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).ram().bankrw("bank1");
@@ -242,7 +280,7 @@ void sapi1_state::sapi3a_mem(address_map &map)
 	map(0xfe00, 0xffff).ram();
 }
 
-void sapi1_state::sapi3b_mem(address_map &map)
+void sapi_state::sapi3b_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).ram().bankrw("bank1");
@@ -251,33 +289,33 @@ void sapi1_state::sapi3b_mem(address_map &map)
 	map(0xb800, 0xffff).ram();
 }
 
-void sapi1_state::sapi3_io(address_map &map)
+void sapi_state::sapi3_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
-	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0x00, 0x00).w(FUNC(sapi_state::sapi3_00_w));
+	map(0x25, 0x25).rw(FUNC(sapi_state::sapi3_25_r), FUNC(sapi_state::sapi3_25_w));
 }
 
-void sapi1_state::sapi3a_io(address_map &map)
+void sapi_state::sapi3a_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
-	map(0x10, 0x10).rw(FUNC(sapi1_state::uart_status_r), FUNC(sapi1_state::modem_control_w));
-	map(0x11, 0x11).rw(FUNC(sapi1_state::uart_ready_r), FUNC(sapi1_state::uart_mode_w));
+	map(0x00, 0x00).w(FUNC(sapi_state::sapi3_00_w));
+	map(0x10, 0x10).rw(FUNC(sapi_state::port10_r), FUNC(sapi_state::port10_w));
+	map(0x11, 0x11).rw(FUNC(sapi_state::port11_r), FUNC(sapi_state::port11_w));
 	map(0x12, 0x12).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
-	map(0x13, 0x13).w(FUNC(sapi1_state::uart_reset_w));
-	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0x13, 0x13).w(FUNC(sapi_state::port13_w));
+	map(0x25, 0x25).rw(FUNC(sapi_state::sapi3_25_r), FUNC(sapi_state::sapi3_25_w));
 }
 
-void sapi1_state::sapi3b_io(address_map &map)
+void sapi_state::sapi3b_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
-	map(0x0c, 0x0c).r(FUNC(sapi1_state::sapi3_0c_r));
-	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0x00, 0x00).w(FUNC(sapi_state::sapi3_00_w));
+	map(0x0c, 0x0c).r(FUNC(sapi_state::sapi3_0c_r));
+	map(0x25, 0x25).rw(FUNC(sapi_state::sapi3_25_r), FUNC(sapi_state::sapi3_25_w));
 	map(0xe0, 0xe0).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe1, 0xe1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -343,7 +381,7 @@ INPUT_PORTS_END
 
 **************************************/
 
-uint32_t sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sapi_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool val;
 	uint16_t addr,xpos;
@@ -396,7 +434,7 @@ uint32_t sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &b
 }
 
 // The attributes seem to be different on this one, they need to be understood, so disabled for now
-uint32_t sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sapi_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool val;
 	uint16_t addr,xpos;
@@ -450,7 +488,7 @@ uint32_t sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-MC6845_UPDATE_ROW( sapi1_state::crtc_update_row )
+MC6845_UPDATE_ROW( sapi_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx,inv;
@@ -483,71 +521,77 @@ MC6845_UPDATE_ROW( sapi1_state::crtc_update_row )
 
 **************************************/
 
-READ8_MEMBER( sapi1_state::sapi1_keyboard_r )
+READ8_MEMBER( sapi_state::sapi1_keyboard_r )
 {
 	uint8_t key = 0xff;
-	if (BIT(m_keyboard_mask, 0)) { key &= m_line0->read(); }
-	if (BIT(m_keyboard_mask, 1)) { key &= m_line1->read(); }
-	if (BIT(m_keyboard_mask, 2)) { key &= m_line2->read(); }
-	if (BIT(m_keyboard_mask, 3)) { key &= m_line3->read(); }
-	if (BIT(m_keyboard_mask, 4)) { key &= m_line4->read(); }
+	if (BIT(m_keyboard_mask, 0)) key &= m_io_keyboard[0]->read();
+	if (BIT(m_keyboard_mask, 1)) key &= m_io_keyboard[1]->read();
+	if (BIT(m_keyboard_mask, 2)) key &= m_io_keyboard[2]->read();
+	if (BIT(m_keyboard_mask, 3)) key &= m_io_keyboard[3]->read();
+	if (BIT(m_keyboard_mask, 4)) key &= m_io_keyboard[4]->read();
 	return key;
 }
 
-WRITE8_MEMBER( sapi1_state::sapi1_keyboard_w )
+WRITE8_MEMBER( sapi_state::sapi1_keyboard_w )
 {
 	m_keyboard_mask = (data ^ 0xff ) & 0x1f;
 }
 
-READ8_MEMBER( sapi1_state::sapi2_keyboard_status_r)
+READ8_MEMBER( sapi_state::sapi2_keyboard_status_r)
 {
 	return (m_term_data) ? 0 : 1;
 }
 
-READ8_MEMBER( sapi1_state::sapi2_keyboard_data_r)
+READ8_MEMBER( sapi_state::sapi2_keyboard_data_r)
 {
 	uint8_t ret = ~m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-void sapi1_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
-
-READ8_MEMBER(sapi1_state::uart_status_r)
+READ8_MEMBER(sapi_state::port10_r)
 {
 	uint8_t result = 0;
 	result |= m_uart->tbmt_r() || m_uart->dav_r();
 	result |= m_uart->or_r() << 1;
 	result |= m_uart->fe_r() << 2;
 	result |= m_uart->pe_r() << 3;
-	// RD4 = RI (= SI)
-	result |= m_v24->dcd_r() << 5;
-	result |= m_v24->dsr_r() << 6;
-	result |= m_v24->cts_r() << 7;
+	result |= m_cassinbit    << 4;
+	if (m_v24)
+	{
+		result |= m_v24->dcd_r() << 5;
+		result |= m_v24->dsr_r() << 6;
+		result |= m_v24->cts_r() << 7;
+	}
 	return result;
 }
 
-WRITE8_MEMBER(sapi1_state::modem_control_w)
+WRITE8_MEMBER(sapi_state::port10_w)
 {
-	m_v24->write_rts(BIT(data, 0));
-	m_v24->write_dtr(BIT(data, 1));
+	if (m_v24)
+	{
+		m_v24->write_rts(BIT(data, 0));
+		m_v24->write_dtr(BIT(data, 1));
+	}
 	// WD2 = BRK
-	// WD3 = S1
-	// WD4 = KAZ
-	// WD5 = START
-	// WD6 = IET
-	// WD7 = IER
+	// WD3 = S1 - allow cassin?
+	// WD4 = KAZ - cass or rs232
+	// WD5 = START - motor
+	// WD6 = IET - allow tmbt to cause irq
+	// WD7 = IER - allow dav to cause irq
+	m_iet = BIT(data, 6);
+	m_ier = BIT(data, 7);
 }
 
-READ8_MEMBER(sapi1_state::uart_ready_r)
+READ8_MEMBER(sapi_state::port11_r)
 {
-	return (m_uart->dav_r() << 7) | (m_uart->tbmt_r() << 6) | 0x3f;
+	u8 data = 0x3f;
+	data |= m_uart->dav_r() ? 0x80 : 0;
+	data |= m_uart->tbmt_r() ? 0x40 : 0;
+	return data;
 }
 
-WRITE8_MEMBER(sapi1_state::uart_mode_w)
+WRITE8_MEMBER(sapi_state::port11_w)
 {
 	m_uart->write_np(BIT(data, 0));
 	m_uart->write_tsb(BIT(data, 1));
@@ -558,11 +602,93 @@ WRITE8_MEMBER(sapi1_state::uart_mode_w)
 	m_uart->write_cs(0);
 }
 
-WRITE8_MEMBER(sapi1_state::uart_reset_w)
+WRITE8_MEMBER(sapi_state::port13_w)
 {
 	// really pulsed by K155AG3 (=74123N): R29=22k, C16=220 (output combined with master reset)
 	m_uart->write_xr(0);
 	m_uart->write_xr(1);
+}
+
+READ8_MEMBER( sapi_state::port40_r )
+{
+	return ~m_uart->get_received_data();
+}
+
+READ8_MEMBER(sapi_state::port41_r)
+{
+	u8 data = 0x7e;
+	data |= m_uart->dav_r() ? 0 : 1;
+	data |= m_uart->tbmt_r() ? 0x80 : 0;
+	return data;
+}
+
+WRITE8_MEMBER( sapi_state::port43_w )
+{
+	m_uart->set_transmit_data(~data);
+}
+
+READ_LINE_MEMBER( sapi_state::si )
+{
+	return m_cassinbit;
+}
+
+WRITE_LINE_MEMBER( sapi_state::so )
+{
+	m_cassoutbit = state;
+}
+
+WRITE_LINE_MEMBER( sapi_state::kansas_w )
+{
+	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
+	{
+		// incoming @19200Hz
+		u8 twobit = m_cass_data[3] & 15;
+
+		if (state)
+		{
+			if (twobit == 0)
+				m_cassold = m_cassoutbit;
+
+			if (m_cassold)
+				m_cass->output(BIT(m_cass_data[3], 2) ? -1.0 : +1.0); // 2400Hz
+			else
+				m_cass->output(BIT(m_cass_data[3], 3) ? -1.0 : +1.0); // 1200Hz
+
+			m_cass_data[3]++;
+		}
+	}
+
+	m_uart->write_tcp(state);
+	m_uart->write_rcp(state);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( sapi_state::kansas_r )
+{
+	// no tape - set to idle
+	m_cass_data[1]++;
+	if (m_cass_data[1] > 48)
+	{
+		m_cass_data[1] = 48;
+		m_cassinbit = 1;
+	}
+
+	// check for interrupts  (not needed)
+//  if ((m_uart->tbmt_r() && m_iet) || (m_uart->dav_r() && m_ier))
+//      m_maincpu->set_input_line(I8085_INTR_LINE, HOLD_LINE);
+
+	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY)
+		return;
+
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cassinbit = (m_cass_data[1] < 24) ? 1 : 0;
+		m_cass_data[1] = 0;
+	}
 }
 
 /**************************************
@@ -571,54 +697,67 @@ WRITE8_MEMBER(sapi1_state::uart_reset_w)
 
 **************************************/
 
-READ8_MEMBER( sapi1_state::sapi3_0c_r )
+void sapi_state::kbd_put(u8 data)
+{
+	m_term_data = data;
+}
+
+READ8_MEMBER( sapi_state::sapi3_0c_r )
 {
 	return 0xc0;
 }
 
 /* switch out the rom shadow */
-WRITE8_MEMBER( sapi1_state::sapi3_00_w )
+WRITE8_MEMBER( sapi_state::sapi3_00_w )
 {
 	m_bank1->set_entry(0);
 }
 
 /* to stop execution in random ram */
-READ8_MEMBER( sapi1_state::sapi3_25_r )
+READ8_MEMBER( sapi_state::sapi3_25_r )
 {
 	return m_zps3_25;
 }
 
-WRITE8_MEMBER( sapi1_state::sapi3_25_w )
+WRITE8_MEMBER( sapi_state::sapi3_25_w )
 {
 	m_zps3_25 = data & 0xfc; //??
 }
 
-MACHINE_RESET_MEMBER( sapi1_state, sapi1 )
+MACHINE_RESET_MEMBER( sapi_state, sapi1 )
 {
 	m_keyboard_mask = 0;
 	m_refresh_counter = 0x20;
+	// setup uart to 8N2 for sapi1 -bios 0
+	m_uart->write_np(1);
+	m_uart->write_tsb(1);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_eps(1);
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
-MACHINE_RESET_MEMBER( sapi1_state, sapizps3 )
+MACHINE_RESET_MEMBER( sapi_state, sapizps3 )
 {
 	m_keyboard_mask = 0;
 	m_bank1->set_entry(1);
 }
 
-void sapi1_state::init_sapizps3()
+void sapi_state::init_sapizps3()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-void sapi1_state::init_sapizps3a()
+void sapi_state::init_sapizps3a()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 	m_uart->write_swe(0);
 }
 
-void sapi1_state::init_sapizps3b()
+void sapi_state::init_sapizps3b()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
@@ -626,12 +765,13 @@ void sapi1_state::init_sapizps3b()
 
 
 /* Machine driver */
-void sapi1_state::sapi1(machine_config &config)
+void sapi_state::sapi1(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080A(config, m_maincpu, 18_MHz_XTAL / 9); // Tesla MHB8080A + MHB8224 + MHB8228
-	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi1_mem);
-	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi1_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi1_io);
+	MCFG_MACHINE_RESET_OVERRIDE(sapi_state, sapi1)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -639,51 +779,74 @@ void sapi1_state::sapi1(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(40*6, 24*9);
 	screen.set_visarea(0, 40*6-1, 0, 24*9-1);
-	screen.set_screen_update(FUNC(sapi1_state::screen_update_sapi1));
+	screen.set_screen_update(FUNC(sapi_state::screen_update_sapi1));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
+
+	// cassette is connected to the uart
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	SPEAKER(config, "mono").front_center();
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	// uart
+	AY31015(config, m_uart);   // MHB1012
+	m_uart->read_si_callback().set(FUNC(sapi_state::si));
+	m_uart->write_so_callback().set(FUNC(sapi_state::so));
+	m_uart->set_auto_rdav(true);
+
+	CLOCK(config, m_uart_clock, 12.288_MHz_XTAL / 640);   // 19200
+	m_uart_clock->signal_handler().set(FUNC(sapi_state::kansas_w));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(sapi_state::kansas_r), attotime::from_hz(40000));
 }
 
-void sapi1_state::sapi2(machine_config &config)
+void sapi_state::sapi2(machine_config &config)
 {
 	sapi1(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi2_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi2_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi2_io);
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(sapi1_state::kbd_put));
+	keyboard.set_keyboard_callback(FUNC(sapi_state::kbd_put));
 }
 
-void sapi1_state::sapi3(machine_config &config)
+void sapi_state::sapi3(machine_config &config)
 {
 	sapi2(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi3_mem);
-	m_maincpu->set_addrmap(AS_IO, &sapi1_state::sapi3_io);
-	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi3_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi3_io);
+	MCFG_MACHINE_RESET_OVERRIDE(sapi_state, sapizps3 )
 
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.set_size(40*6, 20*9);
 	screen.set_visarea(0, 40*6-1, 0, 20*9-1);
-	screen.set_screen_update(FUNC(sapi1_state::screen_update_sapi3));
+	screen.set_screen_update(FUNC(sapi_state::screen_update_sapi3));
+
+	config.device_remove("cassette");
+	config.device_remove("uart_clock");
+	config.device_remove("kansas_r");
+	config.device_remove("mono");
+	config.device_remove("uart");
 }
 
-void sapi1_state::sapi3b(machine_config &config)
+void sapi_state::sapi3b(machine_config &config)
 {
 	sapi3(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi3b_mem);
-	m_maincpu->set_addrmap(AS_IO, &sapi1_state::sapi3b_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi3b_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi3b_io);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // guess
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(6);
-	crtc.set_update_row_callback(FUNC(sapi1_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(sapi_state::crtc_update_row), this);
 
 	subdevice<screen_device>("screen")->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	subdevice<screen_device>("screen")->set_palette(finder_base::DUMMY_TAG);
@@ -698,13 +861,13 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-void sapi1_state::sapi3a(machine_config &config)
+void sapi_state::sapi3a(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080A(config, m_maincpu, 18_MHz_XTAL / 9); // Tesla MHB8080A + MHB8224 + MHB8228
-	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi3a_mem);
-	m_maincpu->set_addrmap(AS_IO, &sapi1_state::sapi3a_io);
-	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi3a_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi3a_io);
+	MCFG_MACHINE_RESET_OVERRIDE(sapi_state, sapizps3 )
 
 	/* video hardware */
 	AY51013(config, m_uart); // Tesla MHB1012
@@ -779,9 +942,9 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT            COMPANY  FULLNAME                   FLAGS
-COMP( 1985, sapi1,     0,      0,      sapi1,   sapi1, sapi1_state, empty_init,     "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps2,  sapi1,  0,      sapi2,   sapi1, sapi1_state, empty_init,     "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3,  sapi1,  0,      sapi3,   sapi1, sapi1_state, init_sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3a, sapi1,  0,      sapi3a,  sapi1, sapi1_state, init_sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3b, sapi1,  0,      sapi3b,  sapi1, sapi1_state, init_sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapi1,     0,      0,      sapi1,   sapi1, sapi_state, empty_init,     "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps2,  sapi1,  0,      sapi2,   sapi1, sapi_state, empty_init,     "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3,  sapi1,  0,      sapi3,   sapi1, sapi_state, init_sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3a, sapi1,  0,      sapi3a,  sapi1, sapi_state, init_sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3b, sapi1,  0,      sapi3b,  sapi1, sapi_state, init_sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 

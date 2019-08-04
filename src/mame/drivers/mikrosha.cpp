@@ -15,7 +15,6 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "sound/wave.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -241,7 +240,6 @@ void mikrosha_state::mikrosha(machine_config &config)
 	PALETTE(config, m_palette, FUNC(mikrosha_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
 	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
@@ -253,6 +251,7 @@ void mikrosha_state::mikrosha(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rkm_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mikrosha_cass");
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "mikrosha_cart", "bin,rom");

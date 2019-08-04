@@ -93,7 +93,6 @@ void senjyo_state::machine_start()
 	save_item(NAME(m_sound_cmd));
 	save_item(NAME(m_single_volume));
 	save_item(NAME(m_sound_state));
-	save_item(NAME(m_bgstripes));
 }
 
 void senjyo_state::machine_reset()
@@ -101,7 +100,6 @@ void senjyo_state::machine_reset()
 	m_sound_cmd = 0;
 	m_single_volume = 0;
 	m_sound_state = 0;
-	m_bgstripes = 0;
 }
 
 WRITE8_MEMBER(senjyo_state::irq_ctrl_w)

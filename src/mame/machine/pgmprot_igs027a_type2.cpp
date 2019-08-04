@@ -127,7 +127,7 @@ void pgm_arm_type2_state::_55857F_arm7_map(address_map &map)
 
 /******* ARM 55857F *******/
 
-void pgm_arm_type2_state::pgm_arm_type2(machine_config &config)
+void pgm_arm_type2_state::pgm_arm_type2(machine_config &config) // ARM7 Shared motherboard XTAL
 {
 	pgmbase(config);
 
@@ -136,6 +136,13 @@ void pgm_arm_type2_state::pgm_arm_type2(machine_config &config)
 	/* protection CPU */
 	ARM7(config, m_prot, 20000000);    // 55857F
 	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type2_state::_55857F_arm7_map);
+}
+
+void pgm_arm_type2_state::pgm_arm_type2_22m(machine_config &config) // ARM7 uses 22MHz XTAL (martmast dw2001 dwpc)
+{
+	pgm_arm_type2(config);
+
+	m_prot->set_clock(22000000);
 }
 
 

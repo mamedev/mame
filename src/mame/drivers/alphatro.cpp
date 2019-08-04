@@ -39,7 +39,6 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -728,7 +727,8 @@ static void alphatro_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(alphatro_state::alphatro)
+void alphatro_state::alphatro(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphatro_state::alphatro_map);
@@ -748,7 +748,6 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 16_MHz_XTAL / 4 / 13 / 128).add_route(ALL_OUTPUTS, "mono", 1.00); // nominally 2.4 kHz
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true); // clocked through SED-9420C
@@ -781,15 +780,14 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cass->set_interface("alphatro_cass");
 	SOFTWARE_LIST(config, "cass_list").set_original("alphatro_cass");
 
 	RAM(config, "ram").set_default_size("64K");
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "alphatro_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(alphatro_state, cart_load)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "alphatro_cart", "bin").set_device_load(FUNC(alphatro_state::cart_load), this);
 	SOFTWARE_LIST(config, "cart_list").set_original("alphatro_cart");
 
 	/* 0000 banking */
@@ -800,7 +798,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 
 	/* F000 banking */
 	ADDRESS_MAP_BANK(config, "monbank").set_map(&alphatro_state::monbank_map).set_options(ENDIANNESS_BIG, 8, 32, 0x1000);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

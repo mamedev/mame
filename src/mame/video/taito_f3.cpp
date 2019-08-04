@@ -2769,6 +2769,9 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 			/*  cntrl & 0x1000 = disabled?  (From F2 driver, doesn't seem used anywhere)
 			    cntrl & 0x0010 = ???
 			    cntrl & 0x0020 = ???
+			    cntrl & 0x0002 = enabled when Darius Gaiden sprite trail effect should occur (MT #1922)
+			                     Notice that sprites also completely disappear due of a bug/missing feature in the
+			             alpha routines.
 			*/
 
 			m_sprite_extra_planes = (cntrl & 0x0300) >> 8;   // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp

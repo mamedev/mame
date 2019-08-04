@@ -417,7 +417,8 @@ void midqslvr_state::machine_reset()
 	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
-MACHINE_CONFIG_START(midqslvr_state::midqslvr)
+void midqslvr_state::midqslvr(machine_config &config)
+{
 	PENTIUM(config, m_maincpu, 333000000); // actually Celeron 333
 	m_maincpu->set_addrmap(AS_PROGRAM, &midqslvr_state::midqslvr_map);
 	m_maincpu->set_addrmap(AS_IO, &midqslvr_state::midqslvr_io);
@@ -425,16 +426,18 @@ MACHINE_CONFIG_START(midqslvr_state::midqslvr)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE( 0, DEVICE_SELF, midqslvr_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(31, DEVICE_SELF, midqslvr_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read ( 0, FUNC(midqslvr_state::intel82439tx_pci_r), this);
+	pcibus.set_device_write( 0, FUNC(midqslvr_state::intel82439tx_pci_w), this);
+	pcibus.set_device_read (31, FUNC(midqslvr_state::intel82371ab_pci_r), this);
+	pcibus.set_device_write(31, FUNC(midqslvr_state::intel82371ab_pci_w), this);
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
 	pcvideo_vga(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( offrthnd )

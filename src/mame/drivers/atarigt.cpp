@@ -807,8 +807,8 @@ static const atari_rle_objects_config modesc =
  *
  *************************************/
 
-MACHINE_CONFIG_START(atarigt_state::atarigt)
-
+void atarigt_state::atarigt(machine_config &config)
+{
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, ATARI_CLOCK_50MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarigt_state::main_map);
@@ -822,7 +822,9 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarigt);
 	PALETTE(config, m_palette).set_entries(MRAM_ENTRIES);
 
-	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8);
+	m_playfield_tilemap->set_layout(FUNC(atarigt_state::atarigt_playfield_scan), 128,64);
+	m_playfield_tilemap->set_info_callback(FUNC(atarigt_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(atarigt_state::get_alpha_tile_info));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -840,8 +842,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	/* sound hardware */
 	ATARI_CAGE(config, m_cage, 0);
 	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
-
-MACHINE_CONFIG_END
+}
 
 void atarigt_state::tmek(machine_config &config)
 {

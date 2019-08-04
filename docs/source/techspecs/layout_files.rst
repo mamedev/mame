@@ -99,7 +99,7 @@ gamuts, so colours will typically be interpreted as sRGB with your system's
 target gamma (usually 2.2).  Channel values are specified as floating-point
 numbers.  Red, green and blue channel values range from 0.0 (off) to 1.0 (full
 intensity).  Alpha ranges from 0.0 (fully transparent) to 1.0 (opaque).  Colour
-channels values are not pre-multiplied by the alpha value.
+channel values are not pre-multiplied by the alpha value.
 
 Component and view item colour is specified using ``color`` elements.
 Meaningful attributes are ``red``, ``green``, ``blue`` and ``alpha``.  This
@@ -123,9 +123,9 @@ parameter is not defined, no substitution occurs.  Here is an examples showing
 two instances of parameter use -- the values of the ``digitno`` and ``x``
 parameters will be substituted for ``~digitno~`` and ``~x~``::
 
-    <bezel name="digit~digitno~" element="digit">
+    <element name="digit~digitno~" ref="digit">
         <bounds x="~x~" y="80" width="25" height="40" />
-    </bezel>
+    </element>
 
 A parameter name is a sequence of uppercase English letters A-Z, lowercase
 English letters a-z, decimal digits 0-9, and/or underscore (_) characters.
@@ -317,64 +317,6 @@ Y/height refer to the horizontal and vertical dimensions of the screen *before*
 rotation is applied.  Values based on the visible area are calculated at the
 end of configuration.  Values are not updated and layouts are not recomputed if
 the system reconfigures the screen while running.
-
-
-.. _layout-concepts-layers:
-
-Layers
-~~~~~~
-
-Views are rendered as a stack of layers, named after parts of an arcade cabinet.
-The layout supplies elements to be drawn in all layers besides the screen layer,
-which is reserved for emulated screens.  With the exception of the screen layer,
-users can enable or disable layers using the in-emulation menu or command-line
-options.
-
-The following layers are available:
-
-backdrop
-    Intended for use in situations were the screen image is projected over a
-    backdrop using a semi-reflective mirror (Pepper's ghost).  This arrangement
-    is famously used in the Space Invaders deluxe cabinet.
-screen
-    This layer is reserved for emulated screen images, and cannot be disabled by
-    the user.  It is drawn using additive blending.
-overlay
-    This layer is intended for use translucent overlays used to add colour to
-    games using monochrome monitors like Circus, Gee Bee, and of course Space
-    Invaders.  It is drawn using RGB multiplication.
-bezel
-    This layer is for elements that surround and potentially obscure the screen
-    image.  It is drawn with standard alpha blending.
-cpanel
-    This layer is intended for displaying controls/input devices (control
-    panels).  It is drawn using standard alpha blending.
-marquee
-    This layer is intended for displaying arcade cabinet marquee images.  It is
-    drawn using standard alpha blending.
-
-By default, layers are drawn in this order (from back to front):
-
-* screen (add)
-* overlay (multiply)
-* backdrop (add)
-* bezel (alpha)
-* cpanel (alpha)
-* marquee (alpha)
-
-If a view has multiple backdrop elements and no overlay elements, a different
-order is used (from back to front):
-
-* backdrop (alpha)
-* screen (add)
-* bezel (alpha)
-* cpanel (alpha)
-* marquee (alpha)
-
-The alternate drawing order makes it simpler to build a backdrop from multiple
-scanned/traced pieces of art, as they can have opaque parts.  It can't be used
-with overlay elements because colour overlays are conventionally placed between
-the screen and mirror, and as such do not affect the backdrop.
 
 
 .. _layout-parts:
@@ -651,15 +593,14 @@ bounds
 param
     Defines or reassigns a value parameter in the view's scope.  See
     :ref:`layout-concepts-params` for details.
-backdrop overlay bezel cpanel marquee
-    Adds an element to the relevant layer (see :ref:`layout-parts-elements` and
-    :ref:`layout-concepts-layers`).  The name of the element to add is specified
-    using the required ``element`` attribute.  It is an error if no element with
-    this name is defined in the layout file.  May optionally be connected to an
-    emulated I/O port using ``inputtag`` and ``inputmask`` attributes, and/or an
-    emulated output using a ``name`` attribute.  Within a layer, elements are
-    drawn in the order they appear in the layout file, from front to back.  See
-    below for more details.
+element
+    Adds an element to the view (see :ref:`layout-parts-elements`).  The name of
+    the element to add is specified using the required ``ref`` attribute.  It is
+    an error if no element with this name is defined in the layout file.  May
+    optionally be connected to an emulated I/O port using ``inputtag`` and
+    ``inputmask`` attributes, and/or an emulated output using a ``name``
+    attribute.  Within a layer, elements are drawn in the order they appear in
+    the layout file, from front to back.  See below for more details.
 screen
     Adds an emulated screen image to the view.  The screen must be identified
     using either an ``index`` attribute or a ``tag`` attribute (it is an error
@@ -677,18 +618,16 @@ group
 repeat
     Repeats its contents the number of times specified by the required ``count``
     attribute.  The ``count`` attribute must be a positive integer.  A
-    ``repeat`` element in a view may contain ``backdrop``, ``screen``,
-    ``overlay``, ``bezel``, ``cpanel``, ``marquee``, ``group``, and further
-    ``repeat`` elements, which function the same way they do when placed in a
-    view directly.  See :ref:`layout-parts-repeats` for discussion on using
-    ``repeat`` elements.
+    ``repeat`` element in a view may contain ``element``, ``screen``, ``group``,
+    and further ``repeat`` elements, which function the same way they do when
+    placed in a view directly.  See :ref:`layout-parts-repeats` for discussion
+    on using ``repeat`` elements.
 
-Screens (``screen`` elements), layout elements (``backdrop``, ``overlay``,
-``bezel``, ``cpanel`` or ``marquee`` elements) and groups (``group`` elements)
-may be have their orientation altered using an ``orientation`` child element.
-For screens, the orientation modifiers are applied in addition to the
-orientation modifiers specified on the screen device and on the machine.  The
-``orientation`` element supports the following attributes, all of which are
+Screens (``screen`` elements), layout elements (``element`` elements) and groups
+(``group`` elements) may have their orientation altered using an ``orientation``
+child element.  For screens, the orientation modifiers are applied in addition
+to the orientation modifiers specified on the screen device and on the machine.
+The ``orientation`` element supports the following attributes, all of which are
 optional:
 
 rotate
@@ -708,63 +647,65 @@ flipy
     axis, from top to bottom.  Must be either ``yes`` or ``no`` if present.
     Mirroring applies logically after rotation.
 
-Screens (``screen`` elements), layout elements (``backdrop``, ``overlay``,
-``bezel``, ``cpanel`` or ``marquee`` elements) and groups (``group`` elements)
-may be positioned and sized using a ``bounds`` child element (see
-:ref:`layout-concepts-coordinates` for details).  In the absence of a ``bounds``
-child element, screens' and layout elements' bounds default to a unit square
-(origin at 0,0 and height and width both equal to 1).  In the absence of a
-``bounds`` child element, groups are expanded with no translation/scaling (note
-that groups may position screens/elements outside their bounds).  This example
-shows a view instantiating and positioning a screen, an individual layout
-element, and two element groups::
+Screens (``screen`` elements) and layout elements (``element`` elements) may
+have a ``blend`` attribute to set the blending mode.  Supported values are
+``none`` (no blending), ``alpha`` (alpha blending), ``multiply`` (RGB
+multiplication), and ``add`` (additive blending).  The default for screens is to
+allow the driver to specify blending per layer; the default blending mode for
+layout elements is alpha blending.
+
+Screens (``screen`` elements), layout elements (``element`` elements) and groups
+(``group`` elements) may be positioned and sized using a ``bounds`` child
+element (see :ref:`layout-concepts-coordinates` for details).  In the absence of
+a ``bounds`` child element, screens' and layout elements' bounds default to a
+unit square (origin at 0,0 and height and width both equal to 1).  In the
+absence of a ``bounds`` child element, groups are expanded with no
+translation/scaling (note that groups may position screens/elements outside
+their bounds).  This example shows a view instantiating and positioning a
+screen, an individual layout element, and two element groups::
 
     <view name="LED Displays, Terminal and Keypad">
-        <cpanel element="beige"><bounds x="320" y="0" width="172" height="372" /></cpanel>
+        <screen index="0"><bounds x="0" y="132" width="320" height="240" /></screen>
+        <element ref="beige"><bounds x="320" y="0" width="172" height="372" /></element>
         <group ref="displays"><bounds x="0" y="0" width="320" height="132" /></group>
         <group ref="keypad"><bounds x="336" y="16" width="140" height="260" /></group>
-        <screen index="0"><bounds x="0" y="132" width="320" height="240" /></screen>
     </view>
 
-Screens (``screen`` elements), layout elements (``backdrop``, ``overlay``,
-``bezel``, ``cpanel`` or ``marquee`` elements) and groups (``group`` elements)
-may have a ``color`` child element (see :ref:`layout-concepts-colours`)
-specifying a modifier colour.  The components colours of the screen or layout
-element(s) are multiplied by this colour.
+Screens (``screen`` elements), layout elements (``element`` elements) and groups
+(``group`` elements) may have a ``color`` child element (see
+:ref:`layout-concepts-colours`) specifying a modifier colour.  The component
+colours of the screen or layout element(s) are multiplied by this colour.
 
-If an element instantiating a layout element (``backdrop``, ``overlay``,
-``bezel``, ``cpanel`` or ``marquee``) has ``inputtag`` and ``inputmask``
-attributes, clicking it is equivalent to pressing a key/button mapped to the
-corresponding input(s).  The ``inputtag`` specifies the tag path of an I/O port
-relative to the device that caused the layout file to be loaded.  The
-``inputmask`` attribute must be an integer specifying the bits of the I/O port
-that the element should activate.  This sample is shows instantiation of
-clickable buttons::
+If an ``element`` element has ``inputtag`` and ``inputmask`` attributes,
+clicking it is equivalent to pressing a key/button mapped to the corresponding
+input(s).  The ``inputtag`` specifies the tag path of an I/O port relative to
+the device that caused the layout file to be loaded.  The ``inputmask``
+attribute must be an integer specifying the bits of the I/O port that the
+element should activate.  This sample shows instantiation of clickable buttons::
 
-    <cpanel element="btn_3" inputtag="X2" inputmask="0x10">
+    <element ref="btn_3" inputtag="X2" inputmask="0x10">
         <bounds x="2.30" y="4.325" width="1.0" height="1.0" />
-    </cpanel>
-    <cpanel element="btn_0" inputtag="X0" inputmask="0x20">
-        <bounds x="0.725" y="5.375" width="1.0" height="1.0" /></cpanel>
-    <cpanel element="btn_rst" inputtag="RESET" inputmask="0x01">
+    </element>
+    <element ref="btn_0" inputtag="X0" inputmask="0x20">
+        <bounds x="0.725" y="5.375" width="1.0" height="1.0" />
+    </element>
+    <element ref="btn_rst" inputtag="RESET" inputmask="0x01">
         <bounds x="1.775" y="5.375" width="1.0" height="1.0" />
-    </cpanel>
+    </element>
 
+If an ``element`` element has a ``name`` attribute, it will take its state from
+the value of the correspondingly named emulated output.  Note that output names
+are global, which can become an issue when a machine uses multiple instances of
+the same type of device.  See :ref:`layout-parts-elements` for details on how an
+element's state affects its appearance.  This example shows how digital displays
+may be connected to emulated outputs::
 
-If an element instantiating a layout element (``backdrop``, ``overlay``,
-``bezel``, ``cpanel`` or ``marquee``) has a ``name`` attribute, it will take its
-state from the value of the correspondingly named emulated output.  Note that
-output names are global, which can become an issue when a machine uses multiple
-instances of the same type of device.  See :ref:`layout-parts-elements` for
-details on how an element's state affects its appearance.  This example shows
-how digital displays may be connected to emulated outputs::
-
-    <cpanel name="digit6" element="digit"><bounds x="16" y="16" width="48" height="80" /></cpanel>
-    <cpanel name="digit5" element="digit"><bounds x="64" y="16" width="48" height="80" /></cpanel>
-    <cpanel name="digit4" element="digit"><bounds x="112" y="16" width="48" height="80" /></cpanel>
-    <cpanel name="digit3" element="digit"><bounds x="160" y="16" width="48" height="80" /></cpanel>
-    <cpanel name="digit2" element="digit"><bounds x="208" y="16" width="48" height="80" /></cpanel>
-    <cpanel name="digit1" element="digit"><bounds x="256" y="16" width="48" height="80" /></cpanel>
+    <element name="digit6" ref="digit"><bounds x="16" y="16" width="48" height="80" /></element>
+    <element name="digit5" ref="digit"><bounds x="64" y="16" width="48" height="80" /></element>
+    <element name="digit4" ref="digit"><bounds x="112" y="16" width="48" height="80" /></element>
+    <element name="digit3" ref="digit"><bounds x="160" y="16" width="48" height="80" /></element>
+    <element name="digit2" ref="digit"><bounds x="208" y="16" width="48" height="80" /></element>
+    <element name="digit1" ref="digit"><bounds x="256" y="16" width="48" height="80" /></element>
 
 If an element instantiating a layout element has ``inputtag`` and ``inputmask``
 attributes but lacks a ``name`` attribute, it will take its state from the value
@@ -829,8 +770,8 @@ To demonstrate how bounds calculation works, consider this example::
 
     <group name="autobounds">
         <!-- bounds automatically calculated with origin at (5,10), width 30, and height 15 -->
-        <cpanel element="topleft"><bounds x="5" y="10" width="10" height="10" /></cpanel>
-        <cpanel element="bottomright"><bounds x="25" y="15" width="10" height="10" /></cpanel>
+        <element ref="topleft"><bounds x="5" y="10" width="10" height="10" /></element>
+        <element ref="bottomright"><bounds x="25" y="15" width="10" height="10" /></element>
     </group>
 
     <view name="Test">
@@ -850,8 +791,8 @@ positions elements outside its explicit bounds::
     <group name="periphery">
         <!-- elements are above the top edge and to the right of the right edge of the bounds -->
         <bounds x="10" y="10" width="20" height="25" />
-        <cpanel element="topleft"><bounds x="10" y="0" width="10" height="10" /></cpanel>
-        <cpanel element="bottomright"><bounds x="30" y="20" width="10" height="10" /></cpanel>
+        <element ref="topleft"><bounds x="10" y="0" width="10" height="10" /></element>
+        <element ref="bottomright"><bounds x="30" y="20" width="10" height="10" /></element>
     </group>
 
     <view name="Test">
@@ -902,8 +843,8 @@ elements allowed inside a ``repeat`` element depend on where it appears:
 * A repeating block inside the top-level ``mamelayout`` element may contain
   ``param``, ``element``, ``group`` (definition), and ``repeat`` elements.
 * A repeating block inside a ``group`` or ``view`` element may contain
-  ``param``, ``backdrop``, ``screen``, ``overlay``, ``bezel``, ``cpanel``,
-  ``marquee``, ``group`` (reference), and ``repeat`` elements.
+  ``param``, ``element`` (reference), ``screen``, ``group`` (reference), and
+  ``repeat`` elements.
 
 A repeating block effectively repeats its contents the number of times specified
 by its ``count`` attribute.  See the relevant sections for details on how the
@@ -928,9 +869,9 @@ element)::
     <repeat count="40">
         <param name="i" start="0" increment="1" />
         <param name="x" start="5" increment="30" />
-        <bezel name="digit~i~" element="digit">
+        <element name="digit~i~" ref="digit">
             <bounds x="~x~" y="5" width="25" height="50" />
-        </bezel>
+        </element>
     </repeat>
 
 Eight five-by-seven dot matrix displays in a row, with pixels controlled by
@@ -945,9 +886,9 @@ outputs ``Dot_000`` to ``Dot_764`` (inside a ``group`` or ``view`` element)::
             <repeat count="5"> <!-- 5 columns in each digit -->
                 <param name="colno" start="1" increment="1" />
                 <param name="colx" start="~digitx~" increment="111" /> <!-- horizontal distance between LEDs -->
-                <bezel name="Dot_~digitno~~rowno~~colno~" element="Pixel" state="0">
+                <element name="Dot_~digitno~~rowno~~colno~" ref="Pixel" state="0">
                     <bounds x="~colx~" y="~rowy~" width="100" height="100" /> <!-- size of each LED -->
-                </bezel>
+                </element>
             </repeat>
         </repeat>
     </repeat>
@@ -966,9 +907,9 @@ or ``view`` element)::
                 <param name="col" start="~group~" increment="1" />
                 <param name="btnx" start="~padx~" increment="110" />
                 <param name="mask" start="~mask~" lshift="1" />
-                <bezel element="btn~row~~col~" inputtag="row~row~" inputmask="~mask~">
+                <element ref="btn~row~~col~" inputtag="row~row~" inputmask="~mask~">
                     <bounds x="~btnx~" y="~y~" width="80" height="80" />
-                </bezel>
+                </element>
             </repeat>
         </repeat>
     </repeat>
@@ -998,14 +939,14 @@ Generating a chequerboard pattern with alternating alpha values 0.4 and 0.2
                 <param name="rx" start="13" increment="20" />
                 <param name="lmask" start="0x01" lshift="2" />
                 <param name="rmask" start="0x02" lshift="2" />
-                <bezel element="hl" inputtag="board:IN.~rowno~" inputmask="~lmask~">
+                <element ref="hl" inputtag="board:IN.~rowno~" inputmask="~lmask~">
                     <bounds x="~lx~" y="~rowy~" width="10" height="10" />
                     <color alpha="~lalpha~" />
-                </bezel>
-                <bezel element="hl" inputtag="board:IN.~rowno~" inputmask="~rmask~">
+                </element>
+                <element ref="hl" inputtag="board:IN.~rowno~" inputmask="~rmask~">
                     <bounds x="~rx~" y="~rowy~" width="10" height="10" />
                     <color alpha="~ralpha~" />
-                </bezel>
+                </element>
             </repeat>
         </repeat>
     </repeat>

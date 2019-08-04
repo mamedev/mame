@@ -14,15 +14,8 @@
  *
  *****************************************************************************/
 
-/* Core includes */
 #include "emu.h"
 #include "includes/microtan.h"
-
-/* Components */
-#include "cpu/m6502/m6502.h"
-#include "machine/mos6551.h"
-
-//#include "imagedev/snapquik.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -120,86 +113,6 @@ static const char keyboard[8][9][8] = {
 };
 
 
-/**************************************************************
- * VIA callback functions for VIA #0
- **************************************************************/
-READ8_MEMBER(microtan_state::via_0_in_a)
-{
-	int data = ioport("JOY")->read();
-	LOG("via_0_in_a %02X\n", data);
-	return data;
-}
-
-WRITE8_MEMBER(microtan_state::via_0_out_a)
-{
-	LOG("via_0_out_a %02X\n", data);
-}
-
-WRITE8_MEMBER(microtan_state::via_0_out_b)
-{
-	LOG("via_0_out_b %02X\n", data);
-	/* bit #7 is the cassette output signal */
-	m_cassette->output(data & 0x80 ? +1.0 : -1.0);
-}
-
-WRITE_LINE_MEMBER(microtan_state::via_0_out_ca2)
-{
-	LOG("via_0_out_ca2 %d\n", state);
-}
-
-WRITE_LINE_MEMBER(microtan_state::via_0_out_cb2)
-{
-	LOG("via_0_out_cb2 %d\n", state);
-}
-
-/**************************************************************
- * VIA callback functions for VIA #1
- **************************************************************/
-
-WRITE8_MEMBER(microtan_state::via_1_out_a)
-{
-	LOG("via_1_out_a %02X\n", data);
-}
-
-WRITE8_MEMBER(microtan_state::via_1_out_b)
-{
-	LOG("via_1_out_b %02X\n", data);
-}
-
-WRITE_LINE_MEMBER(microtan_state::via_1_out_ca2)
-{
-	LOG("via_1_out_ca2 %d\n", state);
-}
-
-WRITE_LINE_MEMBER(microtan_state::via_1_out_cb2)
-{
-	LOG("via_1_out_cb2 %d\n", state);
-}
-
-void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_PULSE_NMI:
-		pulse_nmi(ptr, param);
-		break;
-	default:
-		assert_always(false, "Unknown id in microtan_state::device_timer");
-	}
-}
-
-
-TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::read_cassette)
-{
-	double level = m_cassette->input();
-
-	LOG("read_cassette: %g\n", level);
-	if (level < -0.07)
-		m_via6522[0]->write_cb2(0);
-	else if (level > +0.07)
-		m_via6522[0]->write_cb2(1);
-}
-
 READ8_MEMBER(microtan_state::sound_r)
 {
 	int data = 0xff;
@@ -228,9 +141,26 @@ READ8_MEMBER(microtan_state::bffx_r)
 	case  2: /* BFF2: read undefined (?) */
 		LOG("bff2_r: -> %02x\n", data);
 		break;
-	default: /* BFF3: read keyboard ASCII value */
-		data = m_keyboard_ascii;
+	case 3: /* BFF3: read keyboard/keypad */
+		switch (m_config->read() & 3)
+		{
+		case 0: /* ASCII Keyboard */
+			data = m_keyboard_ascii;
+			break;
+		case 1: /* Hex Keypad */
+			data = 0x00;
+			for (int i = 0; i < 4; i++)
+			{
+				if (m_keypad_column & (1 << i))
+					data |= m_io_keypad[i]->read();
+			}
+			break;
+		case 2: /* ETI Keypad */
+			data = (m_keypad->read() & 0x1f) | (m_config->read() & 0x60);
+			break;
+		}
 		LOG("bff3_r: -> %02x (keyboard ASCII)\n", data);
+		break;
 	}
 	return data;
 }
@@ -256,25 +186,43 @@ WRITE8_MEMBER(microtan_state::bffx_w)
 		LOG("bff1_w: %d <- %02x (delayed NMI)\n", offset, data);
 		m_pulse_nmi_timer->adjust(m_maincpu->cycles_to_attotime(8));
 		break;
-	case 2: /* BFF2: write keypad column write (what is this meant for?) */
-		LOG("bff2_w: %d <- %02x (keypad column)\n", offset, data);
-		m_keypad_column = data;
+	case 2: /* BFF2: write keypad */
+		LOG("bff2_w: %d <- %02x (keypad column)\n", offset, data); // 1, 2, 4, 7, f
+		m_keypad_column = data & 0x0f;
 		break;
-	default: /* BFF3: write disable chunky graphics */
+	case 3: /* BFF3: write disable chunky graphics */
 		LOG("bff3_w: %d <- %02x (chunky graphics off)\n", offset, data);
 		m_chunky_graphics = 0;
+		break;
 	}
+}
+
+READ8_MEMBER(mt6809_state::keyboard_r)
+{
+	uint8_t data = m_keyboard_ascii;
+
+	m_keyboard_ascii = 0x00;
+
+	return data;
+	}
+
+void mt6809_state::store_key(int key)
+{
+	m_keyboard_ascii = key | 0x80;
 }
 
 void microtan_state::store_key(int key)
 {
-	LOG("microtan: store key '%c'\n", key);
 	m_keyboard_ascii = key | 0x80;
 	m_irq_line->in_w<IRQ_KBD>(1);
 }
 
-INTERRUPT_GEN_MEMBER(microtan_state::interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::kbd_scan)
 {
+	/* ASCII Keyboard only */
+	if ((m_config->read() & 3) != 0)
+		return;
+
 	int mod, row, col, chg, newvar;
 
 	if( m_repeat )
@@ -360,7 +308,25 @@ INTERRUPT_GEN_MEMBER(microtan_state::interrupt)
 	}
 }
 
-void microtan_state::init_microtan()
+
+WRITE8_MEMBER(microtan_state::pgm_chargen_w)
+{
+	switch (offset & 0x200)
+	{
+	case 0x000:
+		/* update char &80-&1F */
+		m_gfx1->base()[offset | 0x800] = data;
+		m_gfxdecode->gfx(0)->mark_dirty(0x80 | (offset >> 4));
+		break;
+	case 0x200:
+		/* update char &E0-&FF */
+		m_gfx1->base()[offset | 0xc00] = data;
+		m_gfxdecode->gfx(0)->mark_dirty(0xc0 | (offset >> 4));
+		break;
+	}
+}
+
+void microtan_state::init_gfx2()
 {
 	uint8_t *dst = memregion("gfx2")->base();
 
@@ -399,24 +365,13 @@ void microtan_state::init_microtan()
 		}
 		dst += 4;
 	}
+}
 
+void microtan_state::init_microtan()
+{
+	init_gfx2();
 
-	m_pulse_nmi_timer = timer_alloc(TIMER_PULSE_NMI);
-
-	m_via6522[0]->write_ca1(1);
-	m_via6522[0]->write_ca2(1);
-
-	m_via6522[0]->write_pb(0xff);
-	m_via6522[0]->write_cb1(1);
-	m_via6522[0]->write_cb2(1);
-
-	m_via6522[1]->write_pa(0xff);
-	m_via6522[1]->write_ca1(1);
-	m_via6522[1]->write_ca2(1);
-
-	m_via6522[1]->write_pb(0xff);
-	m_via6522[1]->write_cb1(1);
-	m_via6522[1]->write_cb2(1);
+	m_pulse_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microtan_state::pulse_nmi), this));
 }
 
 void microtan_state::machine_start()
@@ -435,24 +390,10 @@ void microtan_state::machine_start()
 
 void microtan_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	switch (ioport("DSW")->read() & 3)
-	{
-		case 0:  // 1K only :)
-			space.nop_readwrite(0x0400, 0xbbff);
-			break;
-		case 1:  // +7K TANEX
-			space.install_ram(0x0400, 0x1fff,nullptr);
-			space.nop_readwrite(0x2000, 0xbbff);
-			break;
-		default: // +7K TANEX + 40K TANRAM
-			space.install_ram(0x0400, 0xbbff, nullptr);
-			break;
-	}
-
 	for (int i = 1; i < 10;  i++)
-		m_keyrows[i] = m_io_keyboard[i-1]->read();
-
+	{
+		m_keyrows[i] = m_io_keyboard[i-1].read_safe(0);
+	}
 	m_led = BIT(~m_keyrows[3], 7);
 }
 
@@ -749,7 +690,7 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 	}
 }
 
-SNAPSHOT_LOAD_MEMBER( microtan_state, microtan )
+SNAPSHOT_LOAD_MEMBER(microtan_state::snapshot_cb)
 {
 	uint8_t *snapshot_buff = (uint8_t*)image.ptr();
 	if (!snapshot_buff)
@@ -762,7 +703,7 @@ SNAPSHOT_LOAD_MEMBER( microtan_state, microtan )
 	return image_init_result::PASS;
 }
 
-QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
+QUICKLOAD_LOAD_MEMBER(microtan_state::quickload_cb)
 {
 	int snapshot_size = 8263;   /* magic size */
 	std::vector<uint8_t> snapshot_buff(snapshot_size, 0);

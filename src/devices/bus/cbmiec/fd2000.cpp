@@ -92,7 +92,7 @@ const tiny_rom_entry *fd4000_device::device_rom_region() const
 void fd2000_device::fd2000_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x4000, 0x400f).mirror(0xbf0).rw(G65SC22P2_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x4000, 0x400f).mirror(0xbf0).m(G65SC22P2_TAG, FUNC(via6522_device::map));
 	map(0x4e00, 0x4e07).mirror(0x1f8).m(DP8473V_TAG, FUNC(dp8473_device::map));
 	map(0x5000, 0x7fff).ram();
 	map(0x8000, 0xffff).rom().region(G65SC02PI2_TAG, 0);
@@ -106,7 +106,7 @@ void fd2000_device::fd2000_mem(address_map &map)
 void fd4000_device::fd4000_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x4000, 0x400f).mirror(0xbf0).rw(G65SC22P2_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x4000, 0x400f).mirror(0xbf0).m(G65SC22P2_TAG, FUNC(via6522_device::map));
 	map(0x4e00, 0x4e07).mirror(0x1f8).m(PC8477AV1_TAG, FUNC(pc8477a_device::map));
 	map(0x5000, 0x7fff).ram();
 	map(0x8000, 0xffff).rom().region(R65C02P4_TAG, 0);
@@ -239,7 +239,7 @@ void fd4000_device::device_add_mconfig(machine_config &config)
 	add_common_devices(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fd4000_device::fd4000_mem);
 	PC8477A(config, m_fdc, 24_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
 }
 
 

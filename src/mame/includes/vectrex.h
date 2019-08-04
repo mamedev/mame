@@ -76,7 +76,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(v_via_pa_w);
 	DECLARE_WRITE_LINE_MEMBER(v_via_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(v_via_cb2_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vectrex_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	DECLARE_WRITE_LINE_MEMBER(vectrex_via_irq);
 
 	void vectrex_base(machine_config &config);

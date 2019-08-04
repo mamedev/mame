@@ -85,7 +85,6 @@
 #include "imagedev/cassette.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "dolphunk.lh"
@@ -242,10 +241,10 @@ void dauphin_state::dauphin(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(dauphin_state::kansas_w), attotime::from_hz(4000));
 }
 

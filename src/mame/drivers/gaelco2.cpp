@@ -617,7 +617,7 @@ ROM_END
   SW1 = 4 dipswitches (default all open)
   J6 = 12V out for fan
   J5 = 6 pin connector (unused)
-  MCU-1 = ST62T15C6 labeled as "1"
+  MCU-1 = ST62T15B6-HWD labeled as "1"
 */
 ROM_START( sltpstep )
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
@@ -632,7 +632,7 @@ ROM_START( sltpstep )
 	ROM_FILL(                              0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 
 	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
-	ROM_LOAD( "cpu_6022-1-st62t15c6.ic4", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
+	ROM_LOAD( "cpu_6022-1-st62t15b6.ic4", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
 	ROM_REGION( 0x0104, "pals", 0 )
 	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )

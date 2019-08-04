@@ -445,7 +445,6 @@ void hyprduel_state::i4220_config(machine_config &config)
 	screen.set_visarea(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE);
 	screen.set_screen_update("vdp", FUNC(imagetek_i4100_device::screen_update));
 	screen.screen_vblank().set("vdp", FUNC(imagetek_i4100_device::screen_eof));
-	screen.set_palette(":vdp:palette");
 }
 
 void hyprduel_state::hyprduel(machine_config &config)

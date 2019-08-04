@@ -3,7 +3,7 @@
 // thanks-to:Berger, Sean Riddle
 /******************************************************************************
 
-* fidel_cc10.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity CC10 / Fidelity ACR
 
 TODO:
 - What is cc10 8255 PB.7 for? When set, maximum levels is 3, like in CC3. But
@@ -25,11 +25,12 @@ Checker Challenger 4 (ACR) is on the same PCB, twice less RAM and the beeper gon
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -39,25 +40,39 @@ Checker Challenger 4 (ACR) is on the same PCB, twice less RAM and the beeper gon
 
 namespace {
 
-class ccx_state : public fidelbase_state
+class ccx_state : public driver_device
 {
 public:
 	ccx_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_mainmap(*this, "mainmap"),
 		m_ppi8255(*this, "ppi8255"),
+		m_display(*this, "display"),
 		m_beeper_off(*this, "beeper_off"),
-		m_beeper(*this, "beeper")
+		m_beeper(*this, "beeper"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
+
+	// RE button is tied to Z80 RESET pin
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 	// machine drivers
 	void acr(machine_config &config);
 	void ccx(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_mainmap;
 	required_device<i8255_device> m_ppi8255;
+	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
+	required_ioport_array<4> m_inputs;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
 
@@ -76,24 +91,38 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
 	DECLARE_READ8_MEMBER(ppi_portc_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+
+	u8 m_inp_mux;
+	u8 m_led_select;
+	u8 m_7seg_data;
 };
+
+void ccx_state::machine_start()
+{
+	// zerofill
+	m_inp_mux = 0;
+	m_led_select = 0;
+	m_7seg_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_7seg_data));
+}
+
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
-// misc handlers
+// I8255 PPI
 
 void ccx_state::update_display()
 {
 	// 4 7segs + 2 leds
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 6, m_7seg_data, m_led_select);
+	m_display->matrix(m_led_select, m_7seg_data);
 }
-
-
-// I8255 PPI
 
 WRITE8_MEMBER(ccx_state::ppi_porta_w)
 {
@@ -119,8 +148,14 @@ WRITE8_MEMBER(ccx_state::ppi_portb_w)
 
 READ8_MEMBER(ccx_state::ppi_portc_r)
 {
+	u8 data = 0;
+
 	// d0-d3: multiplexed inputs (active low)
-	return ~read_inputs(4) & 0xf;
+	for (int i = 0; i < 4; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read();
+
+	return ~data & 0xf;
 }
 
 WRITE8_MEMBER(ccx_state::ppi_portc_w)
@@ -270,7 +305,9 @@ void ccx_state::acr(machine_config &config)
 	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ppi_portc_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(ccx_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_acr);
 }
 

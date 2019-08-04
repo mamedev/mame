@@ -764,9 +764,10 @@ ROM_START( bagmans )
 	ROM_LOAD( "a2_1c.bin",    0x0000, 0x1000, CRC(f3e11bd7) SHA1(43ee00ff777008c89f619eb183e7c5e63f6c7694) )
 	ROM_LOAD( "a2_1f.bin",    0x1000, 0x1000, CRC(d0f7105b) SHA1(fb382703850a4ded567706e02ebb7f3e22531b7c) )
 
+	// according to MT #02508 Stern/Seeburg logos should have different colors.
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "p3.bin",       0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "r3.bin",       0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
@@ -793,9 +794,10 @@ ROM_START( bagmans2 )
 	ROM_LOAD( "a2_1c.bin",    0x0000, 0x1000, CRC(f3e11bd7) SHA1(43ee00ff777008c89f619eb183e7c5e63f6c7694) )
 	ROM_LOAD( "a2_1f.bin",    0x1000, 0x1000, CRC(d0f7105b) SHA1(fb382703850a4ded567706e02ebb7f3e22531b7c) )
 
+	// according to MT #02508 Stern/Seeburg logos should have different colors.
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "p3.bin",       0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "r3.bin",       0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
 	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
@@ -823,11 +825,11 @@ ROM_START( bagmanj )
 	ROM_LOAD( "bf8_04-1.f1",  0x1000, 0x1000, CRC(3f5c991e) SHA1(853c629ba0b4739dcb1af669fd600a3d83fb2072) ) // 2732
 
 	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "p3.bin",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
-	ROM_LOAD( "r3.bin",       0x0020, 0x0020, CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
+	ROM_LOAD( "p3.bin",       0x0000, 0x0020, BAD_DUMP CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "r3.bin",       0x0020, 0x0020, BAD_DUMP CRC(ae6f1019) SHA1(fd711882b670380cb4bd909c840ba06277b8fbe3) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0) // not dumped for this set
-	ROM_LOAD( "r6.bin",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
+	ROM_LOAD( "r6.bin",       0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
 
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
 	ROM_LOAD( "bf8_12.r9",    0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) ) // 2732

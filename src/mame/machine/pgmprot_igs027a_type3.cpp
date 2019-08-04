@@ -182,15 +182,43 @@ void pgm_arm_type3_state::machine_reset()
 
 /******* ARM 55857G *******/
 
-void pgm_arm_type3_state::pgm_arm_type3(machine_config &config)
+void pgm_arm_type3_state::pgm_arm_type3(machine_config &config) // ARM7 Shared motherboard XTAL
 {
 	pgmbase(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::svg_68k_mem);
 
 	/* protection CPU */
-	ARM7(config, m_prot, XTAL(33'000'000));    // 55857G - 33Mhz Xtal, at least on SVG
+	ARM7(config, m_prot, 20000000);    // 55857G
 	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::_55857G_arm7_map);
+}
+
+void pgm_arm_type3_state::pgm_arm_type3_22m(machine_config &config) // ARM7 uses 22MHz XTAL (dmnfrnt theglad)
+{
+	pgm_arm_type3(config);
+
+	m_prot->set_clock(22000000);
+}
+
+void pgm_arm_type3_state::pgm_arm_type3_24m(machine_config &config) // ARM7 uses 24MHz XTAL (dmnfrntpcb happy6)
+{
+	pgm_arm_type3(config);
+
+	m_prot->set_clock(24000000);
+}
+
+void pgm_arm_type3_state::pgm_arm_type3_33m(machine_config &config) // ARM7 uses 33MHz XTAL (thegladpcb svg)
+{
+	pgm_arm_type3(config);
+
+	m_prot->set_clock(XTAL(33'000'000));
+}
+
+void pgm_arm_type3_state::pgm_arm_type3_33_8688m(machine_config &config) // ARM7 uses 33.8688MHz XTAL (killbldp)
+{
+	pgm_arm_type3(config);
+
+	m_prot->set_clock(XTAL(33'868'800));
 }
 
 

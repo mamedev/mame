@@ -3,13 +3,12 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* ave_arb.cpp, subdriver of machine/chessbase.cpp
-
 AVE Micro Systems ARB chess computer driver, in some regions redistributed
 by Chafitz, and in Germany by Sandy Electronic.
 
 TODO:
 - verify gms40 module memory layout
+- need to add checkers pieces and custom initial position when Avelan gets dumped
 
 *******************************************************************************
 
@@ -19,7 +18,7 @@ Auto Response Board (ARB) overview:
 - magnetic chessboard, 8*8+12 leds
 - PCB label AV001C01 REV A
 
-The electronic magnetic chessboard is the first of is kind. AVE later licensed
+The electronic magnetic chessboard is the first of its kind. AVE later licensed
 it to Fidelity (see fidel_elite.cpp).
 ARB is a romless system, the program ROM is on a cartridge.
 
@@ -41,10 +40,10 @@ running at 16MHz.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/chessbase.h"
-
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
+#include "video/pwm.h"
+#include "machine/sensorboard.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
@@ -60,19 +59,22 @@ running at 16MHz.
 
 namespace {
 
-class arb_state : public chessbase_state
+class arb_state : public driver_device
 {
 public:
 	arb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		chessbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_board(*this, "board"),
 		m_via(*this, "via"),
 		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// halt button is tied to NMI, reset button to RESET(but only if halt button is held)
-	void update_reset() { m_maincpu->set_input_line(INPUT_LINE_RESET, (m_inp_matrix[9]->read() == 3) ? ASSERT_LINE : CLEAR_LINE); }
+	void update_reset() { m_maincpu->set_input_line(INPUT_LINE_RESET, (m_inputs[1]->read() == 3) ? ASSERT_LINE : CLEAR_LINE); }
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { update_reset(); }
 	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); update_reset(); }
 
@@ -80,19 +82,25 @@ public:
 	void arb(machine_config &config);
 	void v2(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
+	required_device<sensorboard_device> m_board;
 	required_device<via6522_device> m_via;
 	required_device<dac_bit_interface> m_dac;
 	optional_device<generic_slot_device> m_cart;
+	required_ioport_array<2> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 	void v2_map(address_map &map);
 
 	// cartridge
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	DECLARE_READ8_MEMBER(cartridge_r);
 	u32 m_cart_mask;
 
@@ -101,16 +109,40 @@ private:
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	u16 m_inp_mux;
+	u16 m_led_select;
+	u8 m_led_group;
+	u8 m_led_latch;
+	u16 m_led_data;
 };
+
+void arb_state::machine_start()
+{
+	// zerofill
+	m_inp_mux = 0;
+	m_led_select = 0;
+	m_led_group = 0;
+	m_led_latch = 0;
+	m_led_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_led_group));
+	save_item(NAME(m_led_latch));
+	save_item(NAME(m_led_data));
+}
+
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(arb_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0x7fff;
@@ -137,11 +169,11 @@ void arb_state::update_display()
 {
 	// 12 led column data lines via 3 7475
 	u16 mask = 0;
-	mask |= (m_led_select & 1) ? 0xf00 : 0;
-	mask |= (m_led_select & 2) ? 0x0ff : 0;
+	mask |= (m_led_group & 1) ? 0xf00 : 0;
+	mask |= (m_led_group & 2) ? 0x0ff : 0;
 
 	m_led_data = (m_led_data & ~mask) | ((m_led_latch << 8 | m_led_latch) & mask);
-	display_matrix(12, 9+1, m_led_data, m_inp_mux | 0x200);
+	m_display->matrix(m_led_select | 0x200, m_led_data);
 }
 
 WRITE8_MEMBER(arb_state::leds_w)
@@ -155,10 +187,11 @@ WRITE8_MEMBER(arb_state::control_w)
 {
 	// PB0-PB3: 74145 A-D
 	// 74145 0-8: input mux, led row select
-	m_inp_mux = 1 << (data & 0xf) & 0x1ff;
+	m_inp_mux = data & 0xf;
+	m_led_select = 1 << (data & 0xf) & 0x1ff;
 
 	// PB4,PB5: led group select
-	m_led_select = data >> 4 & 3;
+	m_led_group = data >> 4 & 3;
 	update_display();
 
 	// PB7: speaker out
@@ -167,8 +200,15 @@ WRITE8_MEMBER(arb_state::control_w)
 
 READ8_MEMBER(arb_state::input_r)
 {
+	u8 data = 0;
+
 	// PA0-PA7: multiplexed inputs
-	return ~read_inputs(9);
+	if (m_inp_mux < 8)
+		data = m_board->read_file(m_inp_mux);
+	else if (m_inp_mux < 9)
+		data = m_inputs[m_inp_mux - 8]->read();
+
+	return ~data;
 }
 
 
@@ -182,13 +222,13 @@ void arb_state::main_map(address_map &map)
 	// external slot is A0-A14, potential bus conflict with RAM/VIA
 	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(arb_state::cartridge_r));
 	map(0x0000, 0x07ff).mirror(0x1000).ram().share("nvram");
-	map(0x8000, 0x800f).mirror(0x1ff0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x800f).mirror(0x1ff0).m(m_via, FUNC(via6522_device::map));
 }
 
 void arb_state::v2_map(address_map &map)
 {
 	map(0x0000, 0x7fff).ram().share("nvram"); // BS62LV256
-	map(0x8000, 0x800f).mirror(0x1ff0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x800f).mirror(0x1ff0).m(m_via, FUNC(via6522_device::map));
 	map(0xa000, 0xffff).rom();
 }
 
@@ -199,9 +239,7 @@ void arb_state::v2_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( arb )
-	PORT_INCLUDE( generic_cb_magnets )
-
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_7) PORT_NAME("Hint / Black")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_CODE(KEYCODE_6) PORT_NAME("Variable / Clear / White / 6")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_5) PORT_NAME("Monitor / Take Back / King / 5")
@@ -211,9 +249,9 @@ static INPUT_PORTS_START( arb )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_1) PORT_NAME("Change Level / Knight / 1")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_0) PORT_NAME("New Game / Options / Pawn / 0")
 
-	PORT_START("IN.9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F2) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F2) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, nullptr)
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, nullptr)
 INPUT_PORTS_END
 
 
@@ -236,7 +274,12 @@ void arb_state::v2(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(arb_state::display_decay_tick), attotime::from_msec(1));
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9+1, 12);
 	config.set_default_layout(layout_ave_arb);
 
 	/* sound hardware */
@@ -257,7 +300,7 @@ void arb_state::arb(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb", "bin");
-	m_cart->set_device_load(device_image_load_delegate(&arb_state::device_image_load_cartridge, this));
+	m_cart->set_device_load(FUNC(arb_state::cart_load), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("arb");
@@ -288,5 +331,5 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1980, arb,   0,      0, arb,     arb,   arb_state, empty_init, "AVE Micro Systems", "Auto Response Board", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 2012, arbv2, arb,    0, v2,      arb,   arb_state, empty_init, "hack (Steve Braid)", "ARB V2 Sargon 4.0", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1980, arb,   0,      0, arb,     arb,   arb_state, empty_init, "AVE Micro Systems", "Auto Response Board", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 2012, arbv2, arb,    0, v2,      arb,   arb_state, empty_init, "hack (Steve Braid)", "ARB V2 Sargon 4.0", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

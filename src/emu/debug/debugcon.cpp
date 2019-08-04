@@ -58,6 +58,9 @@ debugger_console::debugger_console(running_machine &machine)
 	/* listen in on the errorlog */
 	using namespace std::placeholders;
 	m_machine.add_logerror_callback(std::bind(&debugger_console::errorlog_write_line, this, _1));
+
+	/* register our own custom-command help */
+	register_command("helpcustom", CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_console::execute_help_custom, this, _1, _2));
 }
 
 
@@ -91,6 +94,28 @@ void debugger_console::exit()
     Command Handling
 
 ***************************************************************************/
+
+/*------------------------------------------------------------
+    execute_help_custom - execute the helpcustom command
+------------------------------------------------------------*/
+
+void debugger_console::execute_help_custom(int ref, const std::vector<std::string> &params)
+{
+	debug_command *cmd = m_commandlist;
+	char buf[64];
+	while (cmd)
+	{
+		if (cmd->flags & CMDFLAG_CUSTOM_HELP)
+		{
+			snprintf(buf, 63, "%s help", cmd->command);
+			buf[63] = 0;
+			char *temp_params[1] = { buf };
+			internal_execute_command(true, 1, &temp_params[0]);
+		}
+		cmd = cmd->next;
+	}
+}
+
 
 /*-------------------------------------------------
     trim_parameter - executes a

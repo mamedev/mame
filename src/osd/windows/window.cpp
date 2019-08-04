@@ -100,9 +100,6 @@ static int win_physical_height;
 // event handling
 static std::chrono::system_clock::time_point last_event_check;
 
-// debugger
-static int in_background;
-
 static int ui_temp_pause;
 static int ui_temp_was_paused;
 
@@ -661,16 +658,16 @@ void winwindow_toggle_full_screen(void)
 //  (main or window thread)
 //============================================================
 
-BOOL winwindow_has_focus(void)
+bool winwindow_has_focus(void)
 {
 	HWND focuswnd = GetFocus();
 
 	// see if one of the video windows has focus
 	for (auto window : osd_common_t::s_window_list)
 		if (focuswnd == std::static_pointer_cast<win_window_info>(window)->platform_window())
-			return TRUE;
+			return true;
 
-	return FALSE;
+	return false;
 }
 
 
@@ -1150,7 +1147,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		{
 			PAINTSTRUCT pstruct;
 			HDC hdc = BeginPaint(wnd, &pstruct);
-			window->draw_video_contents(hdc, TRUE);
+			window->draw_video_contents(hdc, true);
 			if (window->win_has_menu())
 				DrawMenuBar(window->platform_window());
 			EndPaint(wnd, &pstruct);
@@ -1293,11 +1290,6 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			return DefWindowProc(wnd, message, wparam, lparam);
 		}
 
-		// track whether we are in the foreground
-		case WM_ACTIVATEAPP:
-			in_background = !wparam;
-			break;
-
 		// close: cause MAME to exit
 		case WM_CLOSE:
 			window->machine().schedule_exit();
@@ -1315,7 +1307,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			HDC hdc = GetDC(wnd);
 
 			window->m_primlist = (render_primitive_list *)lparam;
-			window->draw_video_contents(hdc, FALSE);
+			window->draw_video_contents(hdc, false);
 
 			ReleaseDC(wnd, hdc);
 			break;
@@ -1370,7 +1362,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 //  (window thread)
 //============================================================
 
-void win_window_info::draw_video_contents(HDC dc, int update)
+void win_window_info::draw_video_contents(HDC dc, bool update)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 

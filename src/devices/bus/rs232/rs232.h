@@ -24,7 +24,7 @@
 #define RS232_BAUD_115200 (0x0d)
 #define RS232_BAUD_7200 (0x0e)
 
-#define MCFG_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
+#define PORT_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_BAUD_110, "110") \
@@ -46,7 +46,7 @@
 #define RS232_STARTBITS_0 (0x00)
 #define RS232_STARTBITS_1 (0x01)
 
-#define MCFG_RS232_STARTBITS(_tag, _default_startbits, _description, _class, _write_line) \
+#define PORT_RS232_STARTBITS(_tag, _default_startbits, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_startbits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_STARTBITS_0, "0") \
@@ -57,7 +57,7 @@
 #define RS232_DATABITS_7 (0x02)
 #define RS232_DATABITS_8 (0x03)
 
-#define MCFG_RS232_DATABITS(_tag, _default_databits, _description, _class, _write_line) \
+#define PORT_RS232_DATABITS(_tag, _default_databits, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_databits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_DATABITS_5, "5") \
@@ -71,7 +71,7 @@
 #define RS232_PARITY_MARK (0x03)
 #define RS232_PARITY_SPACE (0x04)
 
-#define MCFG_RS232_PARITY(_tag, _default_parity, _description, _class, _write_line) \
+#define PORT_RS232_PARITY(_tag, _default_parity, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_parity, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_PARITY_NONE, "None") \
@@ -85,7 +85,7 @@
 #define RS232_STOPBITS_1_5 (0x02)
 #define RS232_STOPBITS_2 (0x03)
 
-#define MCFG_RS232_STOPBITS(_tag, _default_stopbits, _description, _class, _write_line) \
+#define PORT_RS232_STOPBITS(_tag, _default_stopbits, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, 0x01, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_STOPBITS_0, "0") \

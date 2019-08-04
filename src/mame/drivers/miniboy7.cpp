@@ -79,34 +79,55 @@
   - 2x pots to handle the B-G background color/intensity.
 
 
-  * Super Mini-Boy:
+  * Super Mini-Boy, Joker Poker
 
   Board silkscreened on top:
   be MVX-001-02  ('be' is a Bonanza Enterprises logo).
 
-  - CPU:            1x R6502P.
-  - Sound:          1x AY-3-8910.
-  - Video:          1x HD46505SP HD6845SP.
-  - RAM:            4x MSM2128-15
-  - I/O             1x MC6821P PIA.
-  - PRG ROMs:       5x 2764 (8Kb).
+ +------------------------------------------------------+
+ |                                     *CN-HEX          |
+ |      6  SW2        MSM2128-15   HD46505SP  JDX 3-92  |
+ |      8             MSM2128-15              JDX 2-92  |
+ |      2             MSM2128-15              JDX 1-92  |
+ |      1             MSM2128-15               *28pin   |
+++        8    J1                              *28pin   |
+|         9                          R6502AP   *28pin   |
+|         1                                    *22pin   |
+|         0                                    *22pin   |
+|   L        JDX                                        |
+|   M                                                   |
+|   3  VR2              JDX 0                           |
+|   8  VR4              JDX 1                           |
+|   0  VR5  SW3         JDX 2                           |
+|      VR6              JDX 3                           |
+++ VR1  VR3   TC4020                              SW1   |
+ |     NE555P TC4020   10MHz                        BAT |
+ +------------------------------------------------------+
+
+    CPU: Rockwell R6502P
+  Video: Hitachi HD46505SP CRT Controller (CRTC) 1MHz
+  Sound: AY-3-8910
+         LM380N 2.5W Amp
+    OSC: 10.000MHz
+    RAM: MSM2128-15 2KBx8 SRAM x 4
+    DSW: 1 8-switch dipswitches
+         1 4-switch dipswitches
+VR1-VR6: variable resistor to handle B-G background color/intensity & sound
+  Other: Motorola MC6821P 1MHz NMOS Peripheral Interface Adapter (PIA)
+         NE555P Texas Instruments Precision Timer
+         TC4020BP Toshiba 14 stage ripple carry binary counter
+         3.6v Battery
+         SW1 - Reset switch
+         56 pin edge connector
+         CN-HEX 40 pin edge connector
+
+* Denotes unpopulated
+
+  - PRG ROMs:       5x 2764 (8Kb) - 3 for Joker Poker
   - GFX ROMs:       1x 2764 (8Kb) for text layer.
                     3x 2764 (8Kb) for gfx tiles.
 
-  - Clock:          1x 12.4725 MHz. Crystal.
-
-  - Battery backup: (unknown)
-
-  - 1x normal switch (SW1)
-  - 1x 8 DIP switches bank (SW2)
-  - 1x 4 DIP switches bank (SW3)
-
-  - 1x 2x28 pins edge connector.
-  - 1x 2x20 pins female connector.
-
-  - 6x variable resistor to handle B-G background color/intensity
-    and other things.
-
+NOTE: 10MHz XTAL verified for Joker Poker, Super Mini-Boy is stated as 12.4725MHz
 
 *******************************************************************************
 
@@ -183,6 +204,7 @@
   TODO:
 
   - Find the Super Mini-Boy missing input(s): HOLD 1 and SMALL.
+  - Find & map 4 switch DSW
     maybe these are the same line/button.
   - Lamps support for Super Mini-Boy.
   - Implement fake pots for B-G background color
@@ -734,7 +756,7 @@ ROM_START( miniboy7a ) /* The term CREDIT has been changed to POINT is this vers
 	ROM_LOAD( "mb7_6-11.a1",  0xe000, 0x2000, CRC(ca9b9b20) SHA1(c6cd793a15948601faa051a4643b14fd3d8bda0b) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "mb7_0.11d",   0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )    /* text layer */
+	ROM_LOAD( "mb7_0.11d",   0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )  /* text layer */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "mb7_1.12d",   0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )  /* bitplane 1 */
@@ -756,7 +778,7 @@ ROM_END
   1x AY8910
 
 */
-ROM_START( sminiboy )
+ROM_START( sminiboy ) /* MVX-001-02 PCB */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sm5_1-9.7a",  0x6000, 0x2000, CRC(e245e1d4) SHA1(69266bbc0a0d3acb98cecebf931f42d5e8ff29f5) )
 	ROM_LOAD( "sm5_2-9.6a",  0x8000, 0x2000, CRC(0b240c50) SHA1(af53a969d34aaf959b5a8e74f920fe895f6c68a0) )
@@ -765,7 +787,7 @@ ROM_START( sminiboy )
 	ROM_LOAD( "sm5_5-9.1a",  0xe000, 0x2000, CRC(c518b16c) SHA1(3f6249fa40a5e95ad3d565f73cfc45fcad4c5a6e) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "sm5_0.11d",   0x0000, 0x2000, CRC(295d8146) SHA1(c5b55e10d04d55ba3a5087b588e697a7a89dd02e) )    /* text layer */
+	ROM_LOAD( "sm5_0.11d",   0x0000, 0x2000, CRC(295d8146) SHA1(c5b55e10d04d55ba3a5087b588e697a7a89dd02e) )  /* text layer */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "sm5_1.12d",   0x0000, 0x2000, CRC(1967974e) SHA1(66e06f549d413dcd84d82245cf3bd918bf012209) )  /* bitplane 1 */
@@ -777,12 +799,45 @@ ROM_START( sminiboy )
 	ROM_LOAD( "j-3.10f",  0x0100, 0x0100, CRC(042ae2c5) SHA1(dad6ace493a2e36c6e8ac1f35e871e1e5071c1ed) )
 ROM_END
 
+/*
+Same PCB as Super Mini-Boy, but with a 10MHz XTAL installed
+
+Does JDX stand for Joker Draw Extreme (or 10) or something different???
+
+There is no Company or year mentioned or shown during game.
+The card backs have the Bonanza Enterprises logo
+Bets of 3 to 5 coins adds 1 Joker to the deck.
+Bets of 6 to 10 coins adds 1 more Joker to the deck.
+Max bet limitted to 10 coins
+There is some type of Bonus for 3's or 7's
+
+*/
+ROM_START( bejpoker ) /* MVX-001-02 PCB */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jdx_1-92.4a",  0xa000, 0x2000, CRC(40600e8c) SHA1(7f26fec5ccfc99e37c4fcfc7ee25461584af693e) ) /* JDX 1-92, is "92" the year??? */
+	ROM_LOAD( "jdx_2-92.3a",  0xc000, 0x2000, CRC(21150010) SHA1(e8757d7a846473232e9bc370a673ddfc36b8ea68) )
+	ROM_LOAD( "jdx_3-92.1a",  0xe000, 0x2000, CRC(07497a88) SHA1(2770e77692cb7a0addf80c7955cbb6354e9ed5ec) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "jdx_0.11d",   0x0000, 0x2000, CRC(9a39520c) SHA1(090a94f193b62aa546e5db3399748c298d88794f) ) /* text layer */
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "jdx_1.12d",   0x0000, 0x2000, CRC(c5fe5f09) SHA1(dfa6d486d053e4648471f6b057ea4b2fe01a7348) ) /* bitplane 1 */
+	ROM_LOAD( "jdx_2.13d",   0x2000, 0x2000, CRC(cbcf6e85) SHA1(3805d81f41149b61756667470d1df13f691f0ea7) ) /* bitplane 2 */
+	ROM_LOAD( "jdx_3.14d",   0x4000, 0x2000, CRC(bf98104d) SHA1(157d71f0a30e15e91f4c8385a7a26af15729c713) ) /* bitplane 3 */
+
+	ROM_REGION( 0x0200, "proms", ROMREGION_INVERT )    /* bipolar PROMs */
+	ROM_LOAD( "j1.7e",    0x0000, 0x0100, CRC(a89e1d80) SHA1(f3f4842729df1fc379a7281edcceb67c4e9558b4) ) /* TBP24S10 BPROM (same data as BPROM from Super Mini-Boy) */
+	ROM_LOAD( "jdx.10f",  0x0100, 0x0100, CRC(2dd8d3ce) SHA1(6e3d67f9c5ccc210963e02e32fceee4859d8e651) ) /* 63S141 BPROM */
+ROM_END
+
 
 /***********************************
 *           Game Drivers           *
 ***********************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                     FULLNAME             FLAGS                LAYOUT
-GAME(  1984, sminiboy,  0,        miniboy7, sminiboy, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Super Mini-Boy",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
 GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
+GAME(  1984, sminiboy,  0,        miniboy7, sminiboy, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Super Mini-Boy",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, bejpoker,  0,        miniboy7, sminiboy, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Bonanza Enterprises' Joker Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

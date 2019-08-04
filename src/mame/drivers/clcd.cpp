@@ -543,8 +543,8 @@ void clcd_state::clcd_mem(address_map &map)
 	map(0x4000, 0x7fff).rw(m_bankdev[1], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0x8000, 0xbfff).rw(m_bankdev[2], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0xc000, 0xf7ff).rw(m_bankdev[3], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xf800, 0xf80f).mirror(0x70).rw(m_via0, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xf880, 0xf88f).mirror(0x70).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xf800, 0xf80f).mirror(0x70).m(m_via0, FUNC(via6522_device::map));
+	map(0xf880, 0xf88f).mirror(0x70).m("via1", FUNC(via6522_device::map));
 	map(0xf980, 0xf983).mirror(0x7c).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xfa00, 0xffff).rom().region("maincpu", 0x1fa00);
 	map(0xfa00, 0xfa00).mirror(0x7f).w(FUNC(clcd_state::mmu_mode_kern_w));

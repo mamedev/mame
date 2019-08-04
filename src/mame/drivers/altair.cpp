@@ -44,7 +44,7 @@ public:
 	void altair(machine_config &config);
 
 private:
-	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	virtual void machine_reset() override;
 	void io_map(address_map &map);
@@ -77,7 +77,7 @@ static INPUT_PORTS_START( altair )
 INPUT_PORTS_END
 
 
-QUICKLOAD_LOAD_MEMBER( altair_state,altair)
+QUICKLOAD_LOAD_MEMBER(altair_state::quickload_cb)
 {
 	int quick_length;
 	int read_;
@@ -119,7 +119,7 @@ void altair_state::altair(machine_config &config)
 	uart_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(altair_state, altair), this), "bin");
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(altair_state::quickload_cb), this);
 }
 
 /* ROM definition */

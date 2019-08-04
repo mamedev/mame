@@ -33,8 +33,7 @@ enum screen_type_enum
 enum texture_format
 {
 	TEXFORMAT_UNDEFINED = 0,                            // require a format to be specified
-	TEXFORMAT_PALETTE16,                                // 16bpp palettized, alpha ignored
-	TEXFORMAT_PALETTEA16,                               // 16bpp palettized, alpha respected
+	TEXFORMAT_PALETTE16,                                // 16bpp palettized, no alpha
 	TEXFORMAT_RGB32,                                    // 32bpp 8-8-8 RGB
 	TEXFORMAT_ARGB32,                                   // 32bpp 8-8-8-8 ARGB
 	TEXFORMAT_YUY16                                     // 16bpp 8-8 Y/Cb, Y/Cr in sequence
@@ -354,7 +353,7 @@ private:
 	screen_type_enum    m_type;                     // type of screen
 	int                 m_orientation;              // orientation flags combined with system flags
 	std::pair<unsigned, unsigned> m_phys_aspect;    // physical aspect ratio
-	bool                m_oldstyle_vblank_supplied; // MCFG_SCREEN_VBLANK_TIME macro used
+	bool                m_oldstyle_vblank_supplied; // set_vblank_time call used
 	attoseconds_t       m_refresh;                  // default refresh period
 	attoseconds_t       m_vblank;                   // duration of a VBLANK
 	float               m_xoffset, m_yoffset;       // default X/Y offsets
@@ -440,24 +439,15 @@ DECLARE_DEVICE_TYPE(SCREEN, screen_device)
 typedef device_type_iterator<screen_device> screen_device_iterator;
 
 /*!
- @defgroup Screen device configuration macros
+ @defgroup Screen device configuration functions
  @{
- @def MCFG_SCREEN_ADD
-  Add a new legacy screen color device
-
- @def MCFG_SCREEN_ADD_MONOCHROME
-  Add a new legacy monochrome screen device
-
- @def MCFG_SCREEN_MODIFY
-  Modify a legacy screen device
-
- @def MCFG_SCREEN_TYPE
+ @def set_type
   Modify the screen device type
   @see screen_type_enum
 
- @def MCFG_SCREEN_RAW_PARAMS
+ @def set_raw
   Configures screen parameters for the given screen.
-  @remark It's better than using @see MCFG_SCREEN_REFRESH_RATE and @see MCFG_SCREEN_VBLANK_TIME but still not enough.
+  @remark It's better than using @see set_refresh_hz and @see set_vblank_time but still not enough.
 
   @param _pixclock
   Pixel Clock frequency value
@@ -480,23 +470,23 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
   @param _vbstart
   Vertical pixel position for VBlank start event, also last pixel where screen rectangle is visible.
 
- @def MCFG_SCREEN_REFRESH_RATE
+ @def set_refresh_hz
   Sets the number of Frames Per Second for this screen
-  @remarks Please use @see MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+  @remarks Please use @see set_raw instead. Gives imprecise timings.
 
   @param _rate
   FPS number
 
- @def MCFG_SCREEN_VBLANK_TIME
+ @def set_vblank_time
   Sets the vblank time of the given screen
   @remarks Please use @see MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
 
   @param _time
   Time parameter, in attotime value
 
- @def MCFG_SCREEN_SIZE
+ @def set_size
   Sets total screen size, including H/V-Blanks
-  @remarks Please use @see MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+  @remarks Please use @see set_raw instead. Gives imprecise timings.
 
   @param _width
   Screen horizontal size
@@ -504,9 +494,9 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
   @param _height
   Screen vertical size
 
- @def MCFG_SCREEN_VISIBLE_AREA
+ @def set_visarea
   Sets screen visible area
-  @remarks Please use MCFG_SCREEN_RAW_PARAMS instead. Gives imprecise timings.
+  @remarks Please use @see set_raw instead. Gives imprecise timings.
 
   @param _minx
   Screen left border
@@ -522,39 +512,5 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 
  @}
  */
-
-#define MCFG_SCREEN_ADD(_tag, _type) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, SCREEN_TYPE_##_type)
-
-#define MCFG_SCREEN_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-
-#define MCFG_SCREEN_TYPE(_type) \
-	downcast<screen_device &>(*device).set_type(SCREEN_TYPE_##_type);
-
-#define MCFG_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
-	downcast<screen_device &>(*device).set_raw(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart);
-
-#define MCFG_SCREEN_REFRESH_RATE(_rate) \
-	downcast<screen_device &>(*device).set_refresh(HZ_TO_ATTOSECONDS(_rate));
-
-#define MCFG_SCREEN_VBLANK_TIME(_time) \
-	downcast<screen_device &>(*device).set_vblank_time(_time);
-
-#define MCFG_SCREEN_SIZE(_width, _height) \
-	downcast<screen_device &>(*device).set_size(_width, _height);
-
-#define MCFG_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
-	downcast<screen_device &>(*device).set_visarea(_minx, _maxx, _miny, _maxy);
-#define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
-	downcast<screen_device &>(*device).set_screen_update(&_class::_method, #_class "::" #_method);
-#define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
-	downcast<screen_device &>(*device).set_screen_update(_device, &_class::_method, #_class "::" #_method);
-#define MCFG_SCREEN_PALETTE(_palette_tag) \
-	downcast<screen_device &>(*device).set_palette(_palette_tag);
-#define MCFG_SCREEN_NO_PALETTE \
-	downcast<screen_device &>(*device).set_palette(finder_base::DUMMY_TAG);
-#define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
-	downcast<screen_device &>(*device).set_video_attributes(_flags);
 
 #endif // MAME_EMU_SCREEN_H

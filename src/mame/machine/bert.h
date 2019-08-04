@@ -14,22 +14,25 @@ public:
 
 	bert_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 	void map(address_map &map);
+	void set_qlc_mode(bool state);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	u16 read(offs_t offset);
-	void write(offs_t offset, u16 data);
+	void write(offs_t offset, u16 data, u16 mem_mask);
 
 private:
 	required_address_space m_memory_space;
 	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_memory;
 
 	u16 m_control;
-	u16 m_shifter;
+	u16 m_history;
+	u32 m_step;
+	bool m_qlc_mode;
+	u32 m_qlc_src;
 };
 
 DECLARE_DEVICE_TYPE(BERT, bert_device)

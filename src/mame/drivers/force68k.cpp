@@ -495,14 +495,14 @@ void force68k_state::write_acia_clocks(int id, int state)
 */
 // Implementation of static 2 x 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier
 // software handling. TODO: make configurable according to table above.
-MACHINE_CONFIG_START(force68k_state::fccpu1_eprom_sockets)
-	MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_plain_slot, "fccpu1_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-	MCFG_GENERIC_LOAD(force68k_state, exp1_load)
+void force68k_state::fccpu1_eprom_sockets(machine_config &config)
+{
+	generic_cartslot_device &exp_rom1(GENERIC_CARTSLOT(config, "exp_rom1", generic_plain_slot, "fccpu1_cart", "bin,rom"));
+	exp_rom1.set_width(GENERIC_ROM16_WIDTH);
+	exp_rom1.set_endian(ENDIANNESS_BIG);
+	exp_rom1.set_device_load(FUNC(force68k_state::exp1_load), this);
 //  SOFTWARE_LIST(config, "cart_list").set_original("fccpu1_cart");
-MACHINE_CONFIG_END
+}
 
 /***************************
    Rom loading functions

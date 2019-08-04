@@ -393,8 +393,6 @@ void coco_state::coco_sound(machine_config &config)
 
 	// Single-bit sound: R22 = 10K
 	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
@@ -464,9 +462,12 @@ void coco12_state::coco(machine_config &config)
 	// Becker Port device
 	COCO_DWSOCK(config, DWSOCK_TAG, 0);
 
+	// sound hardware
+	coco_sound(config);
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "printer"));
 	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
@@ -485,9 +486,6 @@ void coco12_state::coco(machine_config &config)
 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
 	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
-
-	// sound hardware
-	coco_sound(config);
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("4K,16K,32K");

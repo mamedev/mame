@@ -2,12 +2,10 @@
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 /******************************************************************************
 
-* fidel_vcc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity Voice Chess Challenger series hardware
 - Voice Chess Challenger (VCC) (version A and B?)
 - Advanced Voice Chess Challenger (UVC)
-- *Grandmaster Voice Chess Challenger
+- *Grandmaster Voice Chess Challenger (Fidelity Deutschland product)
 - *Decorator Challenger (FCC)
 
 *: not dumped yet
@@ -103,10 +101,10 @@ determination and give you a language option on power up or something.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "sound/s14001a.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -115,13 +113,22 @@ determination and give you a language option on power up or something.
 
 namespace {
 
-class vcc_state : public fidelbase_state
+class vcc_state : public driver_device
 {
 public:
 	vcc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
-		m_ppi8255(*this, "ppi8255")
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ppi8255(*this, "ppi8255"),
+		m_display(*this, "display"),
+		m_speech(*this, "speech"),
+		m_speech_rom(*this, "speech"),
+		m_language(*this, "language"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
+
+	// RE button is tied to Z80 RESET pin
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 	// machine drivers
 	void vcc(machine_config &config);
@@ -131,7 +138,13 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
+	required_device<pwm_display_device> m_display;
+	required_device<s14001a_device> m_speech;
+	required_region_ptr<u8> m_speech_rom;
+	required_region_ptr<u8> m_language;
+	required_ioport_array<4> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -145,11 +158,26 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
 	DECLARE_READ8_MEMBER(ppi_portc_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+
+	u8 m_led_select;
+	u8 m_7seg_data;
+	u8 m_inp_mux;
+	u8 m_speech_bank;
 };
 
 void vcc_state::machine_start()
 {
-	fidelbase_state::machine_start();
+	// zerofill
+	m_led_select = 0;
+	m_7seg_data = 0;
+	m_inp_mux = 0;
+	m_speech_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_speech_bank));
 
 	// game relies on RAM filled with FF at power-on
 	for (int i = 0; i < 0x400; i++)
@@ -157,8 +185,9 @@ void vcc_state::machine_start()
 }
 
 
+
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // misc handlers
@@ -167,8 +196,7 @@ void vcc_state::update_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
 	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
+	m_display->matrix(m_led_select >> 2 & 0xf, outdata);
 }
 
 READ8_MEMBER(vcc_state::speech_r)
@@ -215,11 +243,19 @@ WRITE8_MEMBER(vcc_state::ppi_portb_w)
 
 READ8_MEMBER(vcc_state::ppi_portc_r)
 {
+	u8 data = 0;
+
 	// d0-d3: multiplexed inputs (active low)
+	for (int i = 0; i < 4; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read();
+
 	// also language switches, hardwired with 4 jumpers
 	// 0(none wired): English, 1: German, 2: French, 4: Spanish, 8:Special(unused)
-	u8 lan = (~m_led_select & 0x40) ? *m_language : 0;
-	return ~(lan | read_inputs(4)) & 0xf;
+	if (~m_led_select & 0x40)
+		data |= *m_language;
+
+	return ~data & 0xf;
 }
 
 WRITE8_MEMBER(vcc_state::ppi_portc_w)
@@ -304,7 +340,9 @@ void vcc_state::vcc(machine_config &config)
 	m_ppi8255->in_pc_callback().set(FUNC(vcc_state::ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(vcc_state::ppi_portc_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(vcc_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_vcc);
 
 	/* sound hardware */

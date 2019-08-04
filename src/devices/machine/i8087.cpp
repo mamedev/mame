@@ -3415,27 +3415,7 @@ void i8087_device::fscale(u8 modrm)
 	else
 	{
 		m_sw &= ~X87_SW_C1;
-		value = ST(0);
-
-		// Set the rounding mode to truncate
-		u16 old_cw = m_cw;
-		u16 new_cw = (old_cw & ~(X87_CW_RC_MASK << X87_CW_RC_SHIFT)) | (X87_CW_RC_ZERO << X87_CW_RC_SHIFT);
-		write_cw(new_cw);
-
-		// Interpret ST(1) as an integer
-		u32 st1 = floatx80_to_int32(floatx80_round_to_int(ST(1)));
-
-		// Restore the rounding mode
-		write_cw(old_cw);
-
-		// Get the unbiased exponent of ST(0)
-		int16_t exp = (ST(0).high & 0x7fff) - 0x3fff;
-
-		// Calculate the new exponent
-		exp = (exp + st1 + 0x3fff) & 0x7fff;
-
-		// Write it back
-		value.high = (value.high & ~0x7fff) + exp;
+		value = floatx80_scale(ST(0), ST(1));
 	}
 
 	if (check_exceptions())

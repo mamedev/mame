@@ -2585,9 +2585,9 @@ void segas32_state::system32_cd_map(address_map &map)
 
 void segas32_cd_state::cdrom_config(device_t *device)
 {
-	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE( 0, "^^lspeaker", 0.30 )
-	MCFG_SOUND_ROUTE( 1, "^^rspeaker", 0.30 )
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "^^lspeaker", 1.0);
+	cdda->add_route(1, "^^rspeaker", 1.0);
 }
 
 void segas32_cd_state::device_add_mconfig(machine_config &config)
@@ -2828,6 +2828,7 @@ public:
 	void init_darkedge();
 	void init_radr();
 	void init_f1lap();
+	void init_f1lapt();
 	void init_orunners();
 
 private:
@@ -3856,6 +3857,40 @@ ROM_START( f1lap )
 	ROM_LOAD_x4( "epr-15611.ic8",         0x080000, 0x020000, CRC(0d8c97c2) SHA1(863c606c58faddc2bdaeb69f9079266155ff9a96) )
 	ROM_LOAD16_BYTE_x2( "epr-15596.ic18", 0x100000, 0x040000, CRC(20e92909) SHA1(b974c79e11bfbd1cee61f9041cf79971fd96db3a) )
 	ROM_LOAD16_BYTE_x2( "epr-15597.ic9",  0x100001, 0x040000, CRC(cd1ccddb) SHA1(ff0371a8010141d1ab81b5eba555ae7c64e5da37) )
+
+	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x8( "epr-15592.ic36", 0x000000, 0x020000, CRC(7c055cc8) SHA1(169beb83dfae86dd408aa92b3c214b8f607825fc) )
+	ROM_LOAD( "mpr-15593.ic35",    0x100000, 0x100000, CRC(e7300441) SHA1(33c264f0e6326689ba75026932c0932868e83b25) )
+	ROM_LOAD( "mpr-15594.ic34",    0x200000, 0x100000, CRC(7f4ca3bb) SHA1(dc53a1857d619e574acb4c0587a6ba844df2d283) )
+	ROM_LOAD( "mpr-15595.ic24",    0x300000, 0x100000, CRC(3fbdad9a) SHA1(573ea2242f79c7d3b6bf0e6745f6b07a621834ac) )
+
+	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "mpr-15608.ic14", 0x000000, 0x200000, CRC(64462c69) SHA1(9501e83c52e3e16f73b94cef975b5a31b2ee5476) )
+	ROM_LOAD16_BYTE( "mpr-15609.ic5",  0x000001, 0x200000, CRC(d586e455) SHA1(aea190d31c590216eb19766ba749b1e9b710bdce) )
+
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
+	ROMX_LOAD( "mpr-15600.ic32", 0x000000, 0x200000, CRC(d2698d23) SHA1(996fbcc1d0814e6f14fa7e4870ece077ecda54e6) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15602.ic30", 0x000002, 0x200000, CRC(1674764d) SHA1(bc39757a5d25df1a088f874ca2442854eb551e48) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15604.ic28", 0x000004, 0x200000, CRC(1552bbb9) SHA1(77edd3f9d8dec87fa0445d264309e6164eba9313) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15606.ic26", 0x000006, 0x200000, CRC(2b4f5265) SHA1(48b4ccdedb52fbf80661ff380e5a273201fc0a12) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15601.ic31", 0x800000, 0x200000, CRC(31a8f40a) SHA1(62798346750dea87e43c8a8b01c33bf886bb50f4) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15603.ic29", 0x800002, 0x200000, CRC(3805ecbc) SHA1(54d29250441160f282c70adfd515adb21d2cda33) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15605.ic27", 0x800004, 0x200000, CRC(cbdbf35e) SHA1(a1c0900ac3210e72f5848561a6c4a77c804782c6) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15607.ic25", 0x800006, 0x200000, CRC(6c8817c9) SHA1(f5d493ed4237caf5042e95373bf9abd1fd16f873) , ROM_SKIP(6)|ROM_GROUPWORD )
+
+	ROM_REGION( 0x20000, "user2", 0 ) /*  comms board  */
+	ROM_LOAD( "15612", 0x00000, 0x20000, CRC(9d204617) SHA1(8db57121065f5d1ac52fcfb88459bdbdc30e645b) )
+ROM_END
+
+/**************************************************************************************************************************
+    F1 Super Lap (Export) - Unprotected (Test version?)
+*/
+ROM_START( f1lapt )
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
+	ROM_LOAD_x4( "epr-15598.ic17",         0x000000, 0x020000, CRC(9feab7cd) SHA1(2a14c0df39e7bdae12a34679fabc6abb7618e27d) )
+	ROM_LOAD_x4( "epr-15611t.ic8",         0x080000, 0x020000, CRC(7a57b792) SHA1(77c96c841e90e9292182875822c85a2014d2d125) )
+	ROM_LOAD16_BYTE_x2( "epr-15596t.ic18", 0x100000, 0x040000, CRC(20e92909) SHA1(b974c79e11bfbd1cee61f9041cf79971fd96db3a) )
+	ROM_LOAD16_BYTE_x2( "epr-15597t.ic9",  0x100001, 0x040000, CRC(cd1ccddb) SHA1(ff0371a8010141d1ab81b5eba555ae7c64e5da37) )
 
 	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-15592.ic36", 0x000000, 0x020000, CRC(7c055cc8) SHA1(169beb83dfae86dd408aa92b3c214b8f607825fc) )
@@ -5658,6 +5693,10 @@ void segas32_new_state::init_f1lap()
 	m_mainpcb->init_f1lap();
 }
 
+void segas32_new_state::init_f1lapt()
+{
+	m_mainpcb->init_f1lapt();
+}
 
 void segas32_state::init_alien3(void)
 {
@@ -5723,6 +5762,7 @@ void segas32_state::init_darkedge(void)
 	m_system32_prot_vblank = &segas32_state::darkedge_fd1149_vblank;
 }
 
+
 void segas32_state::init_dbzvrvs(void)
 {
 	segas32_common_init();
@@ -5742,12 +5782,20 @@ void segas32_state::init_f1en(void)
 }
 
 
-
-
 void segas32_state::init_f1lap(void)
 {
 	segas32_common_init();
 	m_system32_prot_vblank = &segas32_state::f1lap_fd1149_vblank;
+
+	m_sw1_output = &segas32_state::f1lap_sw1_output;
+
+	m_s32comm->set_linktype(15612); // EPR-15612
+}
+
+
+void segas32_state::init_f1lapt(void)
+{
+	segas32_common_init();
 
 	m_sw1_output = &segas32_state::f1lap_sw1_output;
 
@@ -5909,6 +5957,7 @@ GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_ne
 GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, f1lap,     0,        sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, f1lapt,    f1lap,    sega_system32_analog,      f1lap,    segas32_new_state, init_f1lapt,   ROT0, "Sega",   "F1 Super Lap (World, Unprotected)", MACHINE_IMPERFECT_GRAPHICS ) /* Factory unprotected */
 GAME( 1993, f1lapj,    f1lap,    sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1992, ga2,       0,        sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", MACHINE_IMPERFECT_GRAPHICS )

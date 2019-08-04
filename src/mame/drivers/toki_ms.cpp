@@ -175,9 +175,6 @@ ROM_START( tokims )
 	ROM_LOAD( "8_tk_804.ic37",     0x060000, 0x10000, CRC(e15c1d0f) SHA1(d0d571dd1055d7307379850313216da86b0704e6) )
 	ROM_LOAD( "8_tk_808.ic36",     0x070000, 0x10000, CRC(6f4b878a) SHA1(4560b1e705a0eb9fad7fdc11fadf952ff67eb264) )
 
-	ROM_REGION( 0x100, "prom", ROMREGION_ERASEFF )
-	ROM_LOAD( "1_10110_82s123.ic20",     0x0000, 0x0100, NO_DUMP )
-
 	ROM_REGION( 0x100, "protpal", 0 ) // all read protected
 	ROM_LOAD( "5_5140_palce16v8h-25pc.ic9", 0, 1, NO_DUMP )
 	ROM_LOAD( "5_5240_palce16v8h-25pc.ic8", 0, 1, NO_DUMP )
@@ -192,9 +189,10 @@ ROM_START( tokims )
 	ROM_LOAD( "51_503_palce16v8h-25pc.ic46", 0, 1, NO_DUMP )
 
 	ROM_REGION( 0x100, "proms", ROMREGION_ERASEFF )
+	ROM_LOAD( "1_10110_82s123.ic20",  0x0000, 0x020, CRC(e26e680a) SHA1(9bbe30e98e952a6113c64e1171330153ddf22ce7) )
 	ROM_LOAD( "51_502_82s129an.ic10", 0x0000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) ) // same as every other modular bootleg
-	ROM_LOAD( "21_201_82s129.ic4",  0x0000, 0x100, CRC(2697da58) SHA1(e62516b886ff6e204b718e5f0c6ce2712e4b7fc5) )
-	ROM_LOAD( "21_202_82s129.ic12", 0x0000, 0x100, CRC(e434128a) SHA1(ef0f6d8daef8b25211095577a182cdf120a272c1) )
+	ROM_LOAD( "21_201_82s129.ic4",    0x0000, 0x100, CRC(2697da58) SHA1(e62516b886ff6e204b718e5f0c6ce2712e4b7fc5) )
+	ROM_LOAD( "21_202_82s129.ic12",   0x0000, 0x100, CRC(e434128a) SHA1(ef0f6d8daef8b25211095577a182cdf120a272c1) )
 ROM_END
 
 GAME( 1991, tokims,  toki,  tokim,  tokim,  toki_ms_state, empty_init, ROT0, "bootleg", "Toki (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

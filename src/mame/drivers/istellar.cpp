@@ -77,23 +77,20 @@ private:
 /* VIDEO GOODS */
 uint32_t istellar_state::screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	/* clear */
 	bitmap.fill(0, cliprect);
 
 	/* Draw tiles */
-	for (y = 0; y < 32; y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 32; x++)
+		for (int x = 0; x < 32; x++)
 		{
-			int tile = m_tile_ram[x+y*32];
-			int attr = m_tile_control_ram[x+y*32];
+			int tile = m_tile_ram[x + y * 32];
+			int attr = m_tile_control_ram[x + y * 32];
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tile,attr & 0x0f,0, 0, x*8, y*8, 0);
+			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, attr & 0x0f, 0, 0, x * 8, y * 8, 0);
 		}
 	}
-
 
 	/* Draw sprites */
 
@@ -273,7 +270,8 @@ WRITE_LINE_MEMBER(istellar_state::vblank_irq)
 
 
 /* DRIVER */
-MACHINE_CONFIG_START(istellar_state::istellar)
+void istellar_state::istellar(machine_config &config)
+{
 	/* main cpu */
 	Z80(config, m_maincpu, GUESSED_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &istellar_state::z80_0_mem);
@@ -297,12 +295,11 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(istellar_state::screen_update_istellar));
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(istellar_state::vblank_irq));
 
 	// Daphne says "TODO: get the real interstellar resistor values"
@@ -313,7 +310,7 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 
 /* There is a photo of the PCB with blurry IC locations and labels.  Comments reflect what I can (barely) see. */

@@ -1036,7 +1036,7 @@ static const char *const alphamc07_sample_names[] =
 
 #define MSM5232_BASE_VOLUME 1.0
 
-// the sound board is the same in all games
+// the sound board is the same in all games but bngotime
 void equites_state::common_sound(machine_config &config)
 {
 	I8085A(config, m_audiocpu, 6.144_MHz_XTAL); /* verified on pcb */
@@ -1199,6 +1199,14 @@ void gekisou_state::gekisou(machine_config &config)
 
 	// gekisou has battery-backed RAM to store settings
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
+void gekisou_state::bngotime(machine_config &config)
+{
+	gekisou(config);
+
+	// TODO: emulate different sound board with Z80 + AY8910
+	m_audiocpu->set_disable();
 }
 
 void splndrbt_state::splndrbt(machine_config &config)
@@ -1940,7 +1948,60 @@ ROM_START( hvoltage )
 	ROM_LOAD( "3.8l",   0x0100, 0x0100, CRC(1314b0b5) SHA1(31ef4b916110581390afc1ba90c5dca7c08c619f) ) // y
 ROM_END
 
+/*
+Unknown bingo game
+(c)1986 CLS?
 
+68K55-2
+CPU:MC68000P8
+OSC:12.000MHz
+
+SOUND BOARD NO.60 MC 01
+CPU  :Z80A
+Sound:AY-3-8910A (unpopulated: another 8910 and a YM2203)
+OSC  :6.000MHz
+*/
+
+ROM_START( bngotime )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 68000 ROMs
+	ROM_LOAD16_BYTE( "1.b15", 0x00001, 0x4000, CRC(34a27f5c) SHA1(d30ac37d8665ccc92f6a10f6b0f55783096df687) )
+	ROM_LOAD16_BYTE( "0.d15", 0x00000, 0x4000, CRC(21c738ee) SHA1(8c14265fe1ea44945555b37cb13ff6b72c747053) )
+	ROM_LOAD16_BYTE( "3.b14", 0x08001, 0x4000, CRC(e22555ab) SHA1(5c533b0b99ef600e2bc42c21b79a1a6914b1fc1e) )
+	ROM_LOAD16_BYTE( "2.d14", 0x08000, 0x4000, CRC(0f328bde) SHA1(30a98924600fc2beec8227100adfa6dfbbce5d67) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "11.sub", 0x00000, 0x2000, CRC(9b063c07) SHA1(c9fe7fe10bd204cb82066db7b576072df7787046) )
+
+	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
+	ROM_LOAD( "alpha-8505_44801c57.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
+	ROM_LOAD( "9.d5",  0x00000, 0x1000, CRC(3c356e82) SHA1(55a58f1335206a0996caf8967b4ee962d2373db4) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) // tiles
+	ROM_LOAD( "6.r18",   0x00000, 0x2000, CRC(e85790f2) SHA1(473d5074e506cfe9ccc8d2a86ee64328b6cefa5f) )
+	// empty space to unpack previous ROM
+	ROM_CONTINUE(        0x04000, 0x2000)
+	// empty space to unpack previous ROM
+	ROM_LOAD( "4.r16",   0x08000, 0x2000, CRC(58479aaf) SHA1(916f6b193da7ed223831ca30d3ec8c57f5f1fa7f) )
+	ROM_CONTINUE(        0x0c000, 0x2000)
+	ROM_LOAD( "5.r15",   0x0a000, 0x2000, CRC(561dbbf6) SHA1(7a294b744ed96962e2d69bfd5d92b690c16b6371) )
+	ROM_CONTINUE(        0x0e000, 0x2000)
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
+	ROM_LOAD( "8.r9",   0x00000, 0x2000, CRC(067fd3a1) SHA1(8aeeb5c9a79db4e624de6203ce3810d715cbb35c) )
+	// empty space to unpack previous ROM
+	ROM_LOAD( "7.r8",    0x08000, 0x2000, CRC(4f50006a) SHA1(2e501181678b904577f457129e6c5e00542e3996) )
+
+	ROM_REGION( 0x0700, "proms", 0 )
+	ROM_LOAD( "82s129_br.b1",  0x0000, 0x100, CRC(fd98b98a) SHA1(754797272338adf36c951fa4cfc40dbcd3429c18) ) // R
+	ROM_LOAD( "82s129_bg.b4",  0x0100, 0x100, CRC(68d61fca) SHA1(4143587c3e68157e488093efabb7d182cdece111) ) // G
+	ROM_LOAD( "82s129_bb.b2",  0x0200, 0x100, CRC(839bc7a3) SHA1(54289fb75676a30640babf831edf659d84d1616d) ) // B
+	ROM_LOAD( "82s129_bs.n2",  0x0300, 0x100, CRC(1ecbeb37) SHA1(c4a139bc81f31b668c80c2cf150ce44b9b181e8a) ) // CLUT(same PROM x 4)
+	ROM_LOAD( "82s129_bs.n3",  0x0400, 0x100, CRC(1ecbeb37) SHA1(c4a139bc81f31b668c80c2cf150ce44b9b181e8a) )
+	ROM_LOAD( "82s129_bs.n4",  0x0500, 0x100, CRC(1ecbeb37) SHA1(c4a139bc81f31b668c80c2cf150ce44b9b181e8a) )
+	ROM_LOAD( "82s129_bs.n5",  0x0600, 0x100, CRC(1ecbeb37) SHA1(c4a139bc81f31b668c80c2cf150ce44b9b181e8a) )
+ROM_END
 
 /******************************************************************************/
 // Initializations
@@ -1987,6 +2048,7 @@ GAME( 1984, bullfgtr,  0,        equites,  bullfgtr, equites_state,  init_equite
 GAME( 1984, bullfgtrs, bullfgtr, equites,  bullfgtr, equites_state,  init_equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state,  init_equites,  ROT0,  "Alpha Denshi Co.", "The Koukou Yakyuu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  gekisou_state,  init_equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bngotime,  0,        bngotime, gekisou,  gekisou_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 8505 MCU isn't dumped
 
 // Splendor Blast Hardware
 GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, splndrbt_state, init_splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

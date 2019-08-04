@@ -229,6 +229,22 @@ namespace sol
 	}
 }
 
+
+//-------------------------------------------------
+// parse_seq_type - parses a string into an input_seq_type
+//-------------------------------------------------
+
+static input_seq_type parse_seq_type(const std::string &s)
+{
+	input_seq_type result = SEQ_TYPE_STANDARD;
+	if (s == "increment")
+		result = SEQ_TYPE_INCREMENT;
+	else if (s == "decrement")
+		result = SEQ_TYPE_DECREMENT;
+	return result;
+}
+
+
 //-------------------------------------------------
 //  mem_read - templated memory readers for <sign>,<size>
 //  -> manager:machine().devices[":maincpu"].spaces["program"]:read_i8(0xC000)
@@ -576,7 +592,7 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 	sol::object obj = sol().registry()[field];
 	if(obj.is<sol::protected_function>())
 	{
-		auto res = (obj.as<sol::protected_function>())(in);
+		auto res = invoke(obj.as<sol::protected_function>(), in);
 		if(!res.valid())
 		{
 			sol::error err = res;
@@ -594,7 +610,7 @@ void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<s
 	sol::object obj = sol().registry()[field];
 	if(obj.is<sol::protected_function>())
 	{
-		auto res = (obj.as<sol::protected_function>())();
+		auto res = invoke(obj.as<sol::protected_function>());
 		if(!res.valid())
 		{
 			sol::error err = res;
@@ -622,7 +638,7 @@ bool lua_engine::menu_callback(const std::string &menu, int index, const std::st
 	sol::object obj = sol().registry()[field];
 	if(obj.is<sol::protected_function>())
 	{
-		auto res = (obj.as<sol::protected_function>())(index, event);
+		auto res = invoke(obj.as<sol::protected_function>(), index, event);
 		if(!res.valid())
 		{
 			sol::error err = res;
@@ -643,7 +659,7 @@ bool lua_engine::execute_function(const char *id)
 		{
 			if(func.second.is<sol::protected_function>())
 			{
-				auto ret = (func.second.as<sol::protected_function>())();
+				auto ret = invoke(func.second.as<sol::protected_function>());
 				if(!ret.valid())
 				{
 					sol::error err = ret;
@@ -942,7 +958,7 @@ void lua_engine::initialize()
  *
  * emu.thread()
  *
- * thread:start(scr) - run scr (lua code as string) in a seperate thread
+ * thread:start(scr) - run scr (lua code as string) in a separate thread
  *                     in a new empty (other than modules) lua context.
  *                     thread runs until yield() and/or terminates on return.
  * thread:continue(val) - resume thread that has yielded and pass val to it
@@ -1218,6 +1234,7 @@ void lua_engine::initialize()
 			"load", &running_machine::schedule_load,
 			"system", &running_machine::system,
 			"video", &running_machine::video,
+			"sound", &running_machine::sound,
 			"render", &running_machine::render,
 			"ioport", &running_machine::ioport,
 			"parameters", &running_machine::parameters,
@@ -1670,6 +1687,7 @@ void lua_engine::initialize()
 
 	sol().registry().new_usertype<ioport_manager>("ioport", "new", sol::no_constructor,
 			"count_players", &ioport_manager::count_players,
+			"natkeyboard", &ioport_manager::natkeyboard,
 			"ports", sol::property([this](ioport_manager &im) {
 					sol::table port_table = sol().create_table();
 					for (auto &port : im.ports())
@@ -1677,6 +1695,23 @@ void lua_engine::initialize()
 					return port_table;
 				}));
 
+/*  natkeyboard library
+ *
+ * manager:machine():ioport():natkeyboard()
+ *
+ * natkeyboard.empty - is the natural keyboard buffer empty?
+ * natkeyboard.in_use - is the natural keyboard in use?
+ * natkeyboard:paste() - paste clipboard data
+ * natkeyboard:post() - post data to natural keyboard
+ * natkeyboard:post_coded() - post data to natural keyboard
+ */
+
+	sol().registry().new_usertype<natural_keyboard>("natkeyboard", "new", sol::no_constructor,
+			"empty", sol::property(&natural_keyboard::empty),
+			"in_use", sol::property(&natural_keyboard::in_use, &natural_keyboard::set_in_use),
+			"paste", &natural_keyboard::paste,
+			"post", [](natural_keyboard &nat, const std::string &text)          { nat.post_utf8(text); },
+			"post_coded", [](natural_keyboard &nat, const std::string &text)    { nat.post_coded(text); });
 
 /*  ioport_port library
  *
@@ -1726,6 +1761,8 @@ void lua_engine::initialize()
  * manager:machine():ioport().ports[port_tag].fields[field_name]
  *
  * field:set_value(value)
+ * field:set_input_seq(seq_type, seq)
+ * field:input_seq(seq_type)
  *
  * field.device - get associated device_t
  * field.live - get ioport_field_live
@@ -1737,6 +1774,7 @@ void lua_engine::initialize()
  * field.defvalue
  * field.sensitivity
  * field.way - amount of available directions
+ * field.type_class
  * field.is_analog
  * field.is_digital_joystick
  * field.enabled
@@ -1752,10 +1790,22 @@ void lua_engine::initialize()
  * field.type
  * field.crosshair_scale
  * field.crosshair_offset
+ * field.user_value
  */
 
 	sol().registry().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
 			"set_value", &ioport_field::set_value,
+			"set_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				settings.seq[seq_type] = seq;
+				f.set_user_settings(settings);
+			},
+			"input_seq", [](ioport_field &f, const std::string &seq_type_string) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				return sol::make_user(f.seq(seq_type));
+			},
 			"device", sol::property(&ioport_field::device),
 			"name", sol::property(&ioport_field::name),
 			"default_name", sol::property([](ioport_field &f) {
@@ -1766,6 +1816,18 @@ void lua_engine::initialize()
 			"defvalue", sol::property(&ioport_field::defvalue),
 			"sensitivity", sol::property(&ioport_field::sensitivity),
 			"way", sol::property(&ioport_field::way),
+			"type_class", sol::property([](ioport_field &f) {
+					switch (f.type_class())
+					{
+					case INPUT_CLASS_KEYBOARD:      return "keyboard";
+					case INPUT_CLASS_CONTROLLER:    return "controller";
+					case INPUT_CLASS_CONFIG:        return "config";
+					case INPUT_CLASS_DIPSWITCH:     return "dipswitch";
+					case INPUT_CLASS_MISC:          return "misc";
+					default:                        break;
+					}
+					throw false;
+				}),
 			"is_analog", sol::property(&ioport_field::is_analog),
 			"is_digital_joystick", sol::property(&ioport_field::is_digital_joystick),
 			"enabled", sol::property(&ioport_field::enabled),
@@ -1781,7 +1843,17 @@ void lua_engine::initialize()
 			"type", sol::property(&ioport_field::type),
 			"live", sol::property(&ioport_field::live),
 			"crosshair_scale", sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale),
-			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset));
+			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset),
+			"user_value", sol::property([](ioport_field &f) {
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				return settings.value;
+			}, [](ioport_field &f, ioport_value val) {
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				settings.value = val;
+				f.set_user_settings(settings);
+			}));
 
 
 /*  ioport_field_live library
@@ -1819,7 +1891,9 @@ void lua_engine::initialize()
  * video:skip_this_frame() - is current frame going to be skipped
  * video:speed_factor() - get speed factor
  * video:speed_percent() - get percent from realtime
- * video:frame_update()
+ * video:frame_update() - render a frame
+ * video:size() - get width and height of snapshot bitmap in pixels
+ * video:pixels() - get binary bitmap of all screens as string
  *
  * video.frameskip - current frameskip
  * video.throttled - throttle state
@@ -1847,11 +1921,45 @@ void lua_engine::initialize()
 			"skip_this_frame", &video_manager::skip_this_frame,
 			"speed_factor", &video_manager::speed_factor,
 			"speed_percent", &video_manager::speed_percent,
+			"effective_frameskip", &video_manager::effective_frameskip,
 			"frame_update", &video_manager::frame_update,
+			"size", [](video_manager &vm) {
+					s32 width, height;
+					vm.compute_snapshot_size(width, height);
+					return std::tuple<s32, s32>(width, height);
+				},
+			"pixels", [](video_manager &vm, sol::this_state s) {
+					lua_State *L = s;
+					luaL_Buffer buff;
+					s32 width, height;
+					vm.compute_snapshot_size(width, height);
+					int size = width * height * 4;
+					u32 *ptr = (u32 *)luaL_buffinitsize(L, &buff, size);
+					vm.pixels(ptr);
+					luaL_pushresultsize(&buff, size);
+					return sol::make_reference(L, sol::stack_reference(L, -1));
+				},
 			"frameskip", sol::property(&video_manager::frameskip, &video_manager::set_frameskip),
 			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
 
+/*  sound_manager library
+ *
+ * manager:machine():sound()
+ *
+ * sound:start_recording() - begin audio recording
+ * sound:stop_recording() - end audio recording
+ * sound:ui_mute(turn_off) - turns on/off UI sound
+ * sound:system_mute() - turns on/off system sound
+ * sound:attenuation - sound attenuation
+ */
+	sol().registry().new_usertype<sound_manager>("sound", "new", sol::no_constructor,
+			"start_recording", &sound_manager::start_recording,
+			"stop_recording", &sound_manager::stop_recording,
+			"ui_mute", &sound_manager::ui_mute,
+			"debugger_mute", &sound_manager::debugger_mute,
+			"system_mute", &sound_manager::system_mute,
+			"attenuation", sol::property(&sound_manager::attenuation, &sound_manager::set_attenuation));
 
 /*  input_manager library
  *
@@ -1896,6 +2004,7 @@ void lua_engine::initialize()
  *
  * uiinput:find_mouse() - return x, y, button state, ui render target
  * uiinput:pressed(key) - get pressed state for ui key
+ * uiinput.presses_enabled - enable/disable ui key presses
  */
 
 	sol().registry().new_usertype<ui_input_manager>("uiinput", "new", sol::no_constructor,
@@ -1905,7 +2014,8 @@ void lua_engine::initialize()
 					render_target *rt = ui.find_mouse(&x, &y, &button);
 					return std::tuple<int32_t, int32_t, bool, render_target *>(x, y, button, rt);
 				},
-			"pressed", &ui_input_manager::pressed);
+			"pressed", &ui_input_manager::pressed,
+			"presses_enabled", sol::property(&ui_input_manager::presses_enabled, &ui_input_manager::set_presses_enabled));
 
 
 /*  render_target library
@@ -1920,14 +2030,11 @@ void lua_engine::initialize()
  * target:hidden() - is target hidden
  * target:is_ui_target() - is ui render target
  * target:index() - target index
- * target:view_name(index) - current target layout view name
+ * target:view_name([opt] index) - current target layout view name
  *
  * target.max_update_rate -
  * target.view - current target layout view
  * target.orientation - current target orientation
- * target.backdrops - enable backdrops
- * target.bezels - enable bezels
- * target.marquees - enable marquees
  * target.screen_overlay - enable overlays
  * target.zoom - enable zoom
  */
@@ -1947,10 +2054,6 @@ void lua_engine::initialize()
 			"max_update_rate", sol::property(&render_target::max_update_rate, &render_target::set_max_update_rate),
 			"view", sol::property(&render_target::view, &render_target::set_view),
 			"orientation", sol::property(&render_target::orientation, &render_target::set_orientation),
-			"backdrops", sol::property(&render_target::backdrops_enabled, &render_target::set_backdrops_enabled),
-			"overlays", sol::property(&render_target::overlays_enabled, &render_target::set_overlays_enabled),
-			"bezels", sol::property(&render_target::bezels_enabled, &render_target::set_bezels_enabled),
-			"marquees", sol::property(&render_target::marquees_enabled, &render_target::set_marquees_enabled),
 			"screen_overlay", sol::property(&render_target::screen_overlay_enabled, &render_target::set_screen_overlay_enabled),
 			"zoom", sol::property(&render_target::zoom_to_screen, &render_target::set_zoom_to_screen));
 
@@ -2012,8 +2115,9 @@ void lua_engine::initialize()
  * screen:height() - screen height
  * screen:width() - screen width
  * screen:orientation() - screen angle, flipx, flipy
- * screen:refresh() - screen refresh rate
- * screen:snapshot() - save snap shot
+ * screen:refresh() - screen refresh rate in Hz
+ * screen:refresh_attoseconds() - screen refresh rate in attoseconds
+ * screen:snapshot([opt] filename) - save snap shot
  * screen:type() - screen drawing type
  * screen:frame_number() - screen frame count
  * screen:name() - screen device full name
@@ -2067,7 +2171,7 @@ void lua_engine::initialize()
 						luaL_error(m_lua_state, "Error in param 1 to draw_text");
 						return;
 					}
-					rgb_t textcolor = UI_TEXT_COLOR;
+					rgb_t textcolor = mame_machine_manager::instance()->ui().colors().text_color();
 					rgb_t bgcolor = 0;
 					if(color.is<uint32_t>())
 						textcolor = rgb_t(color.as<uint32_t>());
@@ -2102,20 +2206,33 @@ void lua_engine::initialize()
 					return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
 				},
 			"refresh", [](screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); },
+			"refresh_attoseconds", [](screen_device &sdev) { return sdev.refresh_attoseconds(); },
 			"snapshot", [this](screen_device &sdev, sol::object filename) -> sol::object {
-					emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-					osd_file::error filerr;
-					if(filename.is<const char *>())
+					std::string snapstr;
+					bool is_absolute_path = false;
+					if (filename.is<const char *>())
 					{
-						std::string snapstr(filename.as<const char *>());
-						strreplace(snapstr, "/", PATH_SEPARATOR);
-						strreplace(snapstr, "%g", machine().basename());
-						filerr = file.open(snapstr.c_str());
+						// a filename was specified; if it isn't absolute postprocess it
+						snapstr = filename.as<const char *>();
+						is_absolute_path = osd_is_absolute_path(snapstr);
+						if (!is_absolute_path)
+						{
+							strreplace(snapstr, "/", PATH_SEPARATOR);
+							strreplace(snapstr, "%g", machine().basename());
+						}
 					}
+
+					// open the file
+					emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					osd_file::error filerr;
+					if (!snapstr.empty())
+						filerr = file.open(snapstr);
 					else
 						filerr = machine().video().open_next(file, "png");
-					if(filerr != osd_file::error::NONE)
+					if (filerr != osd_file::error::NONE)
 						return sol::make_object(sol(), filerr);
+
+					// and save the snapshot
 					machine().video().save_snapshot(&sdev, file);
 					return sol::make_object(sol(), sol::nil);
 				},
@@ -2336,14 +2453,19 @@ void lua_engine::initialize()
  * image:image_type_name() - floppy/cart/cdrom/tape/hdd etc
  * image:load()
  * image:unload()
+ * image:create()
  * image:crc()
+ * image:display()
  *
  * image.device - get associated device_t
+ * image.instance_name
+ * image.brief_instance_name
  * image.software_parent
  * image.is_readable
  * image.is_writeable
  * image.is_creatable
  * image.is_reset_on_load
+ * image.must_be_loaded
  */
 
 	sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor,
@@ -2357,12 +2479,18 @@ void lua_engine::initialize()
 			"image_type_name", &device_image_interface::image_type_name,
 			"load", &device_image_interface::load,
 			"unload", &device_image_interface::unload,
+			"create", [](device_image_interface &di, const std::string &filename) { return di.create(filename); },
 			"crc", &device_image_interface::crc,
+			"display", [](device_image_interface &di) { return di.call_display(); },
 			"device", sol::property(static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device)),
+			"instance_name", sol::property(&device_image_interface::instance_name),
+			"brief_instance_name", sol::property(&device_image_interface::brief_instance_name),
 			"is_readable", sol::property(&device_image_interface::is_readable),
 			"is_writeable", sol::property(&device_image_interface::is_writeable),
 			"is_creatable", sol::property(&device_image_interface::is_creatable),
-			"is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
+			"is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load),
+			"must_be_loaded", sol::property(&device_image_interface::must_be_loaded)
+		);
 
 
 /*  mame_machine_manager library
@@ -2379,7 +2507,20 @@ void lua_engine::initialize()
 	sol().registry().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
 			"machine", &machine_manager::machine,
 			"options", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.options()); },
-			"plugins", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.plugins()); },
+			"plugins", [this](mame_machine_manager &m) {
+				sol::table table = sol().create_table();
+				for (auto &curentry : m.plugins().plugins())
+				{
+					sol::table plugin_table = sol().create_table();
+					plugin_table["name"] = curentry.m_name;
+					plugin_table["description"] = curentry.m_description;
+					plugin_table["type"] = curentry.m_type;
+					plugin_table["directory"] = curentry.m_directory;
+					plugin_table["start"] = curentry.m_start;
+					table[curentry.m_name] = plugin_table;
+				}
+				return table;
+			},
 			"ui", &mame_machine_manager::ui);
 	sol()["manager"] = std::ref(*mame_machine_manager::instance());
 	sol()["mame_manager"] = std::ref(*mame_machine_manager::instance());
@@ -2426,7 +2567,7 @@ void lua_engine::run(sol::load_result res)
 {
 	if(res.valid())
 	{
-		auto ret = (res.get<sol::protected_function>())();
+		auto ret = invoke(res.get<sol::protected_function>());
 		if(!ret.valid())
 		{
 			sol::error err = ret;
@@ -2453,4 +2594,17 @@ void lua_engine::load_script(const char *filename)
 void lua_engine::load_string(const char *value)
 {
 	run(sol().load(value));
+}
+
+//-------------------------------------------------
+//  invoke - invokes a function, wrapping profiler
+//-------------------------------------------------
+
+template<typename TFunc, typename... TArgs>
+sol::protected_function_result lua_engine::invoke(TFunc &&func, TArgs&&... args)
+{
+	g_profiler.start(PROFILER_LUA);
+	sol::protected_function_result result = func(std::forward<TArgs>(args)...);
+	g_profiler.stop();
+	return result;
 }

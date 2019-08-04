@@ -49,6 +49,9 @@ dpb7000_brushproc_card_device::dpb7000_brushproc_card_device(const machine_confi
 	, m_prom_addr(0)
 	, m_prom_base(nullptr)
 	, m_prom_out(0)
+	, m_pal_in(0)
+	, m_pal_base(nullptr)
+	, m_pal_out(0)
 	, m_store1(*this)
 	, m_store2(*this)
 	, m_mult_fa(*this, "mult_fa")
@@ -59,6 +62,7 @@ dpb7000_brushproc_card_device::dpb7000_brushproc_card_device(const machine_confi
 	, m_alu_fe(*this, "alu_fe")
 	, m_alu_ee(*this, "alu_ee")
 	, m_prom(*this, "prom")
+	, m_pal(*this, "pal")
 {
 }
 
@@ -97,6 +101,9 @@ void dpb7000_brushproc_card_device::device_start()
 
 	save_item(NAME(m_prom_addr));
 	save_item(NAME(m_prom_out));
+
+	save_item(NAME(m_pal_in));
+	save_item(NAME(m_pal_out));
 
 	m_store1.resolve_safe();
 	m_store2.resolve_safe();
@@ -139,6 +146,10 @@ void dpb7000_brushproc_card_device::device_reset()
 	m_prom_base = m_prom->base();
 	m_prom_out = 0;
 
+	m_pal_in = 0;
+	m_pal_base = m_pal->base();
+	m_pal_out = 0;
+
 	m_mult_fa->xm_w(0);
 	m_mult_fa->ym_w(0);
 	m_mult_fa->rs_w(0);
@@ -170,6 +181,9 @@ void dpb7000_brushproc_card_device::device_add_mconfig(machine_config &config)
 ROM_START( dpb7000_brushproc )
 	ROM_REGION(0x200, "prom", 0)
 	ROM_LOAD("pb-02c-17593-baa.bin", 0x000, 0x200, CRC(a74cc1f5) SHA1(3b789d5a29c70c93dec56f44be8c14b41915bdef))
+
+	ROM_REGION16_BE(0x800, "pal", 0)
+	ROMX_LOAD("pb-02c-17593-hba.bin", 0x000, 0x800, CRC(76018e4f) SHA1(73d995e2e78410676061d45857756d5305a9984a), ROM_GROUPWORD)
 ROM_END
 
 const tiny_rom_entry *dpb7000_brushproc_card_device::device_rom_region() const

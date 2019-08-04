@@ -8,6 +8,13 @@
 
     Uses a TC0091LVC, a variant of the one used on Taito L HW
 
+    Undumped games on similar hardware (ES-9402 or ES-9410):
+    * Gold Strike
+    * Lucky Pierrot / Wonder Circus
+    * Miracle Seven - Heaven's Gate
+    * Miracle Seven - Heaven's Gate Turbo
+    * Ukiyo Box
+
 ***************************************************************************/
 
 #include "emu.h"

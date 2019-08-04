@@ -222,7 +222,7 @@ void econet_e01_device::e01_mem(address_map &map)
 	map(0xfc04, 0xfc04).mirror(0x00c3).rw(FUNC(econet_e01_device::rtc_data_r), FUNC(econet_e01_device::rtc_data_w));
 	map(0xfc08, 0xfc08).mirror(0x00c0).r(FUNC(econet_e01_device::ram_select_r)).w(FUNC(econet_e01_device::floppy_w));
 	map(0xfc0c, 0xfc0f).mirror(0x00c0).rw(WD2793_TAG, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
-	map(0xfc10, 0xfc1f).mirror(0x00c0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xfc10, 0xfc1f).mirror(0x00c0).m(R6522_TAG, FUNC(via6522_device::map));
 	map(0xfc20, 0xfc23).mirror(0x00c0).rw(MC6854_TAG, FUNC(mc6854_device::read), FUNC(mc6854_device::write));
 	map(0xfc24, 0xfc24).mirror(0x00c3).rw(FUNC(econet_e01_device::network_irq_disable_r), FUNC(econet_e01_device::network_irq_disable_w));
 	map(0xfc28, 0xfc28).mirror(0x00c3).rw(FUNC(econet_e01_device::network_irq_enable_r), FUNC(econet_e01_device::network_irq_enable_w));

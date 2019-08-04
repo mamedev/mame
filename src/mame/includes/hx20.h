@@ -95,7 +95,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( sio_rx_w ) { m_sio_rx = state; }
 	DECLARE_WRITE_LINE_MEMBER( sio_pin_w ) { m_sio_pin = state; }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( optrom );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( optrom_load );
 	DECLARE_READ8_MEMBER( optrom_r );
 
 	void update_interrupt();

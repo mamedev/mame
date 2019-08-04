@@ -321,8 +321,8 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR, flags_ui);
 
 	// configure the custom rendering
-	customtop = 4.0f * ui().get_line_height() + 5.0f * UI_BOX_TB_BORDER;
-	custombottom = 5.0f * ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
+	customtop = 4.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
+	custombottom = 5.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
 
 	if (old_software != -1)
 	{

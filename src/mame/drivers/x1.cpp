@@ -2263,11 +2263,11 @@ void x1_state::x1(machine_config &config)
 	ay.add_route(0, "rspeaker", 0.25);
 	ay.add_route(1, "lspeaker", 0.5);
 	ay.add_route(2, "rspeaker", 0.5);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 	m_cassette->set_interface("x1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");

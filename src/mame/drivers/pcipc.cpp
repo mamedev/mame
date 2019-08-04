@@ -536,7 +536,7 @@ void pcipc_state::pcipc(machine_config &config)
 	i82371sb_ide_device &ide(I82371SB_IDE(config, ":pci:07.1", 0));
 	ide.irq_pri().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq15_w));
-//  MCFG_DEVICE_ADD(      ":pci:12.0", MGA2064W, 0)
+//  MGA2064W(config, ":pci:12.0", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, "svga_et4k", false);

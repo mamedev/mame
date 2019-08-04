@@ -54,6 +54,8 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_wheel_board_output));
 	save_item(NAME(m_wheel_board_last));
 	save_item(NAME(m_wheel_board_u8_latch));
+	save_item(NAME(m_comm_flags));
+	save_item(NAME(m_comm_data));
 
 	m_optional_drivers.resolve();
 }
@@ -498,6 +500,58 @@ DECLARE_CUSTOM_INPUT_MEMBER(midvunit_state::motion_r)
 }
 
 
+READ32_MEMBER(midvunit_state::midvunit_intcs_r)
+{
+	return 4;
+}
+
+uint16_t midvunit_state::comm_bus_out()
+{
+	uint16_t mask = 0;
+	if (m_comm_flags & 0x20) // COMCOE
+		mask |= (m_comm_data >> 4) & 0xf00;
+	if (m_comm_flags & 0x40) // COMDOE
+		mask |= 0xff;
+	return m_comm_data & mask;
+}
+
+// To link multiple machines together will require comm_bus_out()
+// to be called on each machine and bitwise ORed here.
+// This must be done in real time with proper synchronization.
+uint16_t midvunit_state::comm_bus_in()
+{
+	return comm_bus_out();
+}
+
+READ32_MEMBER(midvunit_state::midvunit_comcs_r)
+{
+	if (offset != 0)
+	{
+		logerror("midvunit_comcs_r(%d)\n", offset);
+		return 0;
+	}
+	else
+	{
+		uint16_t data = comm_bus_in();
+		if (m_comm_flags & 0x20) // COMCOE
+			data &= ~((m_comm_data >> 4) & 0xf00);
+		if (m_comm_flags & 0x40) // COMDOE
+			data &= ~0xff;
+		return data << 16;
+	}
+}
+
+WRITE32_MEMBER(midvunit_state::midvunit_comcs_w)
+{
+	switch (offset)
+	{
+		default: logerror("midvunit_comcs_w(%d) = %08X\n", offset, data); break;
+		case 0: m_comm_data = data >> 16; break;
+		case 1: m_comm_flags = (data >> 24) & 0xe0; break;
+	}
+}
+
+
 /*************************************
  *
  *  War Gods I/O ASICs
@@ -595,7 +649,7 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x980040, 0x980040).rw(FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
 	map(0x980080, 0x980080).noprw();
 	map(0x980082, 0x980083).r(FUNC(midvunit_state::midvunit_dma_trigger_r));
-	map(0x990000, 0x990000).nopr(); // link PAL (low 4 bits must == 4)
+	map(0x990000, 0x990000).r(FUNC(midvunit_state::midvunit_intcs_r));
 	map(0x991030, 0x991030).lr16("991030", [this]() { return uint16_t(m_in1->read()); });
 //  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
 	map(0x991060, 0x991060).r(FUNC(midvunit_state::port0_r));
@@ -604,7 +658,7 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x994000, 0x994000).w(FUNC(midvunit_state::midvunit_control_w));
 	map(0x995000, 0x995000).rw(FUNC(midvunit_state::midvunit_wheel_board_r), FUNC(midvunit_state::midvunit_wheel_board_w));
 	map(0x995020, 0x995020).w(FUNC(midvunit_state::midvunit_cmos_protect_w));
-	map(0x997000, 0x997000).noprw(); // communications
+	map(0x997000, 0x997008).rw(FUNC(midvunit_state::midvunit_comcs_r), FUNC(midvunit_state::midvunit_comcs_w));
 	map(0x9a0000, 0x9a0000).w(FUNC(midvunit_state::midvunit_sound_w));
 	map(0x9c0000, 0x9c1fff).rw(FUNC(midvunit_state::midvunit_cmos_r), FUNC(midvunit_state::midvunit_cmos_w)).share("nvram");
 	map(0x9e0000, 0x9e7fff).ram().w(FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");

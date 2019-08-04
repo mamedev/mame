@@ -59,7 +59,7 @@ private:
 	void microvision_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvsn_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	// i8021 interface
 	DECLARE_WRITE8_MEMBER(i8021_p0_write);
@@ -505,7 +505,7 @@ static const u16 microvision_output_pla_1[0x20] =
 };
 
 
-DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
+DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 {
 	uint8_t *rom1 = memregion("maincpu1")->base();
 	uint8_t *rom2 = memregion("maincpu2")->base();
@@ -633,7 +633,8 @@ static INPUT_PORTS_START( microvision )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(microvision_state::microvision)
+void microvision_state::microvision(machine_config &config)
+{
 	I8021(config, m_i8021, 2000000);    // approximately
 	m_i8021->bus_out_cb().set(FUNC(microvision_state::i8021_p0_write));
 	m_i8021->p1_out_cb().set(FUNC(microvision_state::i8021_p1_write));
@@ -667,13 +668,13 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "microvision_cart")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(microvision_state, microvsn_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "microvision_cart"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(FUNC(microvision_state::cart_load), this);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("microvision");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( microvsn )

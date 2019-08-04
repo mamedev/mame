@@ -643,7 +643,8 @@ static void mbee_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(mbee_state::mbee)
+void mbee_state::mbee(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 12_MHz_XTAL / 6);         /* 2 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee_mem);
@@ -674,7 +675,6 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -686,8 +686,8 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", attotime::from_seconds(3))
-	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", attotime::from_seconds(3))
+	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bee), this);
+	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bin), this);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
@@ -698,10 +698,12 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(mbee_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-MACHINE_CONFIG_END
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 
-MACHINE_CONFIG_START(mbee_state::mbeeic)
+void mbee_state::mbeeic(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 13.5_MHz_XTAL / 4);         /* 3.37500 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeeic_mem);
@@ -732,7 +734,6 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -744,8 +745,8 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", attotime::from_seconds(2))
-	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", attotime::from_seconds(2))
+	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bee), this);
+	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bin), this);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
@@ -756,7 +757,8 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(mbee_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-MACHINE_CONFIG_END
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 void mbee_state::mbeepc(machine_config &config)
 {

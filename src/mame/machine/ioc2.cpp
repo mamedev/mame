@@ -750,3 +750,12 @@ WRITE_LINE_MEMBER(ioc2_device::scsi1_int_w)
 	else
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
 }
+
+WRITE_LINE_MEMBER(ioc2_device::enet_int_w)
+{
+	if (state)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_ETHERNET);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_ETHERNET);
+}
+

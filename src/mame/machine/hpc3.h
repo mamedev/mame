@@ -42,6 +42,15 @@ public:
 	template <typename T> void set_gio64_space(T &&tag, int spacenum) { m_gio64_space.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_hal2_tag(T &&tag) { m_hal2.set_tag(std::forward<T>(tag)); }
 
+	auto enet_rd_cb() { return m_enet_rd_cb.bind(); }
+	auto enet_wr_cb() { return m_enet_wr_cb.bind(); }
+	auto enet_rxrd_cb() { return m_enet_rxrd_cb.bind(); }
+	auto enet_txwr_cb() { return m_enet_txwr_cb.bind(); }
+	auto enet_d8_rd_cb() { return m_enet_d8_rd_cb.bind(); }
+	auto enet_d8_wr_cb() { return m_enet_d8_wr_cb.bind(); }
+	auto enet_reset_cb() { return m_enet_reset_cb.bind(); }
+	auto enet_loopback_cb() { return m_enet_loopback_cb.bind(); }
+	auto enet_intr_out_cb() { return m_enet_intr_out_cb.bind(); }
 	template <int N> auto hd_rd_cb() { return m_hd_rd_cb[N].bind(); }
 	template <int N> auto hd_wr_cb() { return m_hd_wr_cb[N].bind(); }
 	template <int N> auto hd_dma_rd_cb() { return m_hd_dma_rd_cb[N].bind(); }
@@ -57,6 +66,12 @@ public:
 	auto dma_complete_int_cb() { return m_dma_complete_int_cb.bind(); }
 
 	void map(address_map &map);
+
+	DECLARE_WRITE_LINE_MEMBER(enet_txrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_rxrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_rxdc_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_txret_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_intr_in_w);
 
 	DECLARE_WRITE_LINE_MEMBER(scsi0_drq);
 	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
@@ -173,6 +188,15 @@ protected:
 	address_space *m_pio_space[10];
 	required_device<hal2_device> m_hal2;
 
+	devcb_read8 m_enet_rd_cb;
+	devcb_write8 m_enet_wr_cb;
+	devcb_read8 m_enet_rxrd_cb;
+	devcb_write8 m_enet_txwr_cb;
+	devcb_read_line m_enet_d8_rd_cb;
+	devcb_write_line m_enet_d8_wr_cb;
+	devcb_write_line m_enet_reset_cb;
+	devcb_write_line m_enet_loopback_cb;
+	devcb_write_line m_enet_intr_out_cb;
 	devcb_read8 m_hd_rd_cb[2];
 	devcb_write8 m_hd_wr_cb[2];
 	devcb_read8 m_hd_dma_rd_cb[2];

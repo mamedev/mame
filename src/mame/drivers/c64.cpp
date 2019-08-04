@@ -130,7 +130,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c64);
 
 	DECLARE_READ8_MEMBER( cia2_pb_r );
 	DECLARE_WRITE8_MEMBER( cia2_pb_w );
@@ -409,7 +409,7 @@ enum
 };
 
 
-QUICKLOAD_LOAD_MEMBER( c64_state, cbm_c64 )
+QUICKLOAD_LOAD_MEMBER(c64_state::quickload_c64)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
@@ -1536,8 +1536,7 @@ void c64_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
@@ -1713,8 +1712,7 @@ void c64_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
@@ -1864,8 +1862,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c64_state, cbm_c64), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");

@@ -59,12 +59,13 @@
 #include "cpu/mips/r4000.h"
 
 #include "machine/ds1386.h"
+#include "machine/edlc.h"
 #include "machine/eepromser.h"
 #include "machine/hpc3.h"
 #include "machine/ioc2.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "machine/sgi.h"
 #include "machine/vino.h"
 #include "machine/wd33c9x.h"
@@ -83,6 +84,7 @@ public:
 		, m_mainram(*this, "mainram")
 		, m_mem_ctrl(*this, "memctrl")
 		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
+		, m_edlc(*this, "edlc")
 		, m_eeprom(*this, "eeprom")
 		, m_hal2(*this, "hal2")
 		, m_hpc3(*this, "hpc3")
@@ -129,6 +131,7 @@ protected:
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
+	required_device<seeq8003_device> m_edlc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<hal2_device> m_hal2;
 	required_device<hpc3_device> m_hpc3;
@@ -335,6 +338,14 @@ void ip24_state::ip24_base(machine_config &config)
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO0, &ip24_state::pio0_map);
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO1, &ip24_state::pio1_map);
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO2, &ip24_state::pio2_map);
+	m_hpc3->enet_rd_cb().set(m_edlc, FUNC(seeq8003_device::read));
+	m_hpc3->enet_wr_cb().set(m_edlc, FUNC(seeq8003_device::write));
+	m_hpc3->enet_rxrd_cb().set(m_edlc, FUNC(seeq8003_device::fifo_r));
+	m_hpc3->enet_txwr_cb().set(m_edlc, FUNC(seeq8003_device::fifo_w));
+	m_hpc3->enet_d8_rd_cb().set(m_edlc, FUNC(seeq8003_device::rxeof_r));
+	m_hpc3->enet_d8_wr_cb().set(m_edlc, FUNC(seeq8003_device::txeof_w));
+	m_hpc3->enet_reset_cb().set(m_edlc, FUNC(seeq8003_device::reset_w));
+	m_hpc3->enet_intr_out_cb().set(m_ioc2, FUNC(ioc2_device::enet_int_w));
 	m_hpc3->hd_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_r));
 	m_hpc3->hd_wr_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_w));
 	m_hpc3->hd_dma_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::dma_r));
@@ -348,6 +359,13 @@ void ip24_state::ip24_base(machine_config &config)
 	m_hpc3->eeprom_cs_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write));
 	//m_hpc3->eeprom_pre_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::pre_write));
 	m_hpc3->dma_complete_int_cb().set(m_ioc2, FUNC(ioc2_device::hpc_dma_done_w));
+
+	SEEQ8003(config, m_edlc);
+	m_edlc->out_int_cb().set(m_hpc3, FUNC(hpc3_device::enet_intr_in_w));
+	m_edlc->out_rxrdy_cb().set(m_hpc3, FUNC(hpc3_device::enet_rxrdy_w));
+	m_edlc->out_txrdy_cb().set(m_hpc3, FUNC(hpc3_device::enet_txrdy_w));
+	//m_edlc->out_rxdc_cb().set(m_hpc3, FUNC(hpc3_device::enet_rxdc_w));
+	//m_edlc->out_txret_cb().set(m_hpc3, FUNC(hpc3_device::enet_txret_w));
 
 	SGI_HAL2(config, m_hal2);
 	EEPROM_93C56_16BIT(config, m_eeprom);

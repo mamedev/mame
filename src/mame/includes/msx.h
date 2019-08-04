@@ -17,7 +17,6 @@
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/wave.h"
 #include "sound/ym2413.h"
 #include "video/v9938.h"
 #include "video/tms9928a.h"

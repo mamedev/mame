@@ -77,7 +77,7 @@ void usgames_state::usgames_map(address_map &map)
 	map(0x2070, 0x2070).portr("UNK2");
 	map(0x2400, 0x2401).w("aysnd", FUNC(ay8912_device::address_data_w));
 	map(0x2800, 0x2fff).ram().w(FUNC(usgames_state::charram_w)).share("charram");
-	map(0x3000, 0x3fff).ram().w(FUNC(usgames_state::videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().share("videoram");
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
 }
@@ -97,7 +97,7 @@ void usgames_state::usg185_map(address_map &map)
 	map(0x2460, 0x2460).w(FUNC(usgames_state::rombank_w));
 	map(0x2470, 0x2470).portr("UNK2");
 	map(0x2800, 0x2fff).ram().w(FUNC(usgames_state::charram_w)).share("charram");
-	map(0x3000, 0x3fff).ram().w(FUNC(usgames_state::videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().share("videoram");
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
 }
@@ -214,7 +214,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gfx_usgames )
-	GFXDECODE_ENTRY( nullptr, 0x2800, charlayout, 0, 256 )
+	GFXDECODE_ENTRY( nullptr, 0x2800, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -233,15 +233,16 @@ void usgames_state::usg32(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(7*8, 57*8-1, 0*8, 31*8-1);
-	screen.set_screen_update(FUNC(usgames_state::screen_update));
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_usgames);
-	PALETTE(config, "palette", FUNC(usgames_state::usgames_palette), 2*256);
+	PALETTE(config, "palette", FUNC(usgames_state::usgames_palette), 16);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 18_MHz_XTAL / 16));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(usgames_state::update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

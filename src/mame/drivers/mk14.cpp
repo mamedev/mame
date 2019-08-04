@@ -26,9 +26,8 @@ Example program: ("organ" from p82 of the manual)
 Pressing keys will produces different tones.
 
 
-ToDo:
+TODO:
 - VDU optional attachment (we are missing the chargen rom)
-- The original version of the bios is missing (we have version 2)
 
 *********************************************************************************************************************************/
 
@@ -39,7 +38,6 @@ ToDo:
 #include "machine/ins8154.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "mk14.lh"
@@ -205,7 +203,7 @@ void mk14_state::mk14(machine_config &config)
 {
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
-	INS8060(config, m_maincpu, XTAL(4'433'619));
+	INS8060(config, m_maincpu, 4.433619_MHz_XTAL);
 	m_maincpu->flag_out().set(FUNC(mk14_state::cass_w));
 	m_maincpu->s_out().set_nop();
 	m_maincpu->s_in().set(FUNC(mk14_state::cass_r));
@@ -219,7 +217,6 @@ void mk14_state::mk14(machine_config &config)
 
 	// sound
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.05);
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	ZN425E(config, "dac8", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // Ferranti ZN425E
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
@@ -233,13 +230,19 @@ void mk14_state::mk14(machine_config &config)
 	ic8.out_b().set("dac8", FUNC(dac_byte_interface::data_w));
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 }
 
 /* ROM definition */
 ROM_START( mk14 )
 	ROM_REGION( 0x200, "maincpu", 0 )
 	// IC2,3 74S571 512 x 4 bit ROM
-	ROM_LOAD( "scios.bin", 0x0000, 0x0200, CRC(8b667daa) SHA1(802dc637ce5391a2a6627f76f919b12a869b56ef)) // V2 bios, V1 is missing
+	ROM_DEFAULT_BIOS("v2")
+	ROM_SYSTEM_BIOS(0, "v2", "SCIOS V2")
+	ROMX_LOAD( "scios_v2.bin", 0x0000, 0x0200, CRC(8b667daa) SHA1(802dc637ce5391a2a6627f76f919b12a869b56ef), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v1", "SCIOS V1")
+	ROMX_LOAD( "scios_v1.bin", 0x0000, 0x0200, CRC(3d2477e7) SHA1(795829a2025e24d87a413e245d72a284f872e0db), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
