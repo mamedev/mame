@@ -34823,4 +34823,29 @@
 		</part>
 	</software>
 
+	<software name="addfacts">
+		<description>The Addition Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the addition facts (4am crack).dsk" size="143360" crc="3c6b27dc" sha1="246226f17617f98c223ef794f7a1d93cc4f795f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mulfacts">
+		<description>The Multiplication Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the multiplication facts (4am crack).dsk" size="143360" crc="a45e2e14" sha1="99b0bc274136a37ab5632edaf89d17f88258bc82" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
