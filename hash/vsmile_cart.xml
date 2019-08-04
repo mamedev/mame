@@ -7,6 +7,7 @@ V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
 V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
 V.Smile Baby                  80-099***  (Smartridges are yellow, incompatible with TV based V.Smile consoles)
+V.Baby                        80-22****  (Smartridges are orange, incompatible with other V.Smile consoles, including V.Smile Baby)
 
 Language:
 ********0 = US                (White labels on back)
@@ -37,7 +38,7 @@ Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
 |   XX   | 80-036800(US)     | V.Smile PC Pal Island (cart serial)                                        |
 |        | 80-036822(SP)     | V.Smile PC Pal Island (cart serial)                                        |
-|   XX   | 80-036804(GE)     | V.Smile Mein erster Mausklick (52-036804 on back label, blue label "P ○○○○")
+|   XX   | 80-036804(GE)     | V.Smile Mein erster Mausklick (52-036804 on back label, blue sticker "P ○○○○")
 +========+===================+============================================================================+
 |   XX   | 80-067000(US)     | V.Smile Art Studio                                                         |
 |        | 80-067003(UK)     | V.Smile Art Studio                                                         |
@@ -59,7 +60,7 @@ Addons (w/ yellow Smartridges)
 |   XX   | 80-091327(SP)     | V.Smile Gimnasio Interactivo                                               |
 +========+===================+============================================================================+
 
-Game cartridges
+Regular game cartridges
 +========+===================+================================================================================================+
 | Dumped |      Serial       |                                    Name                                                        |
 +========+===================+================================================================================================+
@@ -231,7 +232,7 @@ Game cartridges
 |        | 80-092146(PT)     | Spider-man & Amigos - Missoes Secretas                                                         |
 |   XX   | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs, 2005, green sticker: "518 ○○○○")          |
 |        | 80-092147-122(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2007)                                    |
-|        | 80-092147-222(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2008)                                    |
+|  SOON  | 80-092147-222(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2008)                                    |
 +========+===================+================================================================================================+
 |   XX   | 80-092160(US)     | Scooby-Doo! - Funland Frenzy                                                                   |
 |        | 80-092160-101(US) | Scooby-Doo! - Funland Frenzy (ALT)                                                             |
@@ -244,7 +245,7 @@ Game cartridges
 |   XX   | 80-092164(GE)     | Scooby-Doo! - Im Lernpark                                                                      |
 |   XX   | 80-092165(FR)     | Scooby-Doo! - Panique à Funland                                                                |
 |        | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (translucent purple, packin)                                   |
-|        | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent purple)                                        |
+|  SOON  | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent purple)                                        |
 |   XX   | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (purple, # on back label)                                   |
 |   XX   | 80-092173(DK)     | Scooby-Doo! - Sjov i forlystelsesparken                                                        |
 |   XX   | 80-092174(SE)     | Scooby-Doo! - Tivoli-tokerier                                                                  |
@@ -550,6 +551,20 @@ Game cartridges
 |  SOON  | 80-092987(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal                                   |
 +========+===================+================================================================================================+
 |        |          (CN)     | 小学英语 - Primary English                                                                      |
++========+===================+================================================================================================+
+
+V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regular V.Smile console)
++========+===================+================================================================================================+
+| Dumped |      Serial       |                                    Name                                                        |
++========+===================+================================================================================================+
+|        | 80-089000(US)     | Spider-Man &amp; Friends - Where is Hulk?                                                      |
++========+===================+================================================================================================+
+|        | 80-089020(US)     | Toy Story 2                                                                                    |
++========+===================+================================================================================================+
+|        | 80-089040(US)     | Dora the Explorer - Dora's Got a Puppy                                                         |
+|        | 80-089045(FR)     | Dora's ??????                                                                                  |
++========+===================+================================================================================================+
+|   XX   | 80-089060(US)     | Scooby-Doo! - A Night Of Fright Is No Delight (52-089060(US) on back label, white sticker: "P ○●○○")
 +========+===================+================================================================================================+
 
 -->
@@ -3606,6 +3621,26 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="091444.u1" size="8388608" crc="1fcf586f" sha1="e13d229887ea31bfd9fea43683f65162b9626ffa" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- *********** V.Smile Smartbook games *********** -->
+        <!-- Will need to emulate and add the Smartbook touch tablet as a bus/controller on MAME and then add it as a shared feature on the XML -->
+
+	<software name="scoobynsb" supported="no">
+		<description>Scooby-Doo! - A Night Of Fright Is No Delight (Smartbook) (USA)</description>
+		<year>2007</year> <!-- (s07) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-089060(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180"/>
+			<feature name="pcb_model" value="707180-3"/>
+			<feature name="cart_type" value="red" />
+			<dataarea name="rom" size="8388608">
+				<rom name="80-089060 - Scooby-Doo! - A Night Of Fright Is No Delight (US).bin" size="8388608" crc="4bf757be" sha1="8436b8e1e0cf20c93dbc9d0e887d4a3f28612aac" />
 			</dataarea>
 		</part>
 	</software>

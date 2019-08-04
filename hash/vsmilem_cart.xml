@@ -7,6 +7,7 @@ V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
 V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
 V.Smile Baby                  80-099***  (Smartridges are yellow, incompatible with TV based V.Smile consoles)
+V.Baby                        80-22****  (Smartridges are orange, incompatible with other V.Smile consoles, including V.Smile Baby)
 
 Language:
 ********0 = US                (White labels on back)
@@ -47,7 +48,7 @@ Language:
 |        | 80-084043(UK)     | Scooby-Doo! - Funland Frenzy                                                              |
 |        | 80-084044(GE)     | Scooby-Doo! - Im Lernpark                                                                 |
 |        | 80-084045(FR)     | Scooby-Doo - Panique A Funland                                                            |
-|        | 80-084047(SP)     | Scooby-Doo - Misterio en el Parque                                                        |
+|  SOON  | 80-084047(SP)     | Scooby-Doo - Misterio en el Parque                                                        |
 +========+===================+===========================================================================================+
 |        | 80-084060(US)     | Thomas and Friends - Engines Working Together                                             |
 |        | 80-084063(UK)     | Thomas and Friends - Engines Working Together                                             |
@@ -166,7 +167,7 @@ Language:
 |        | 80-084423(UK)     | Toy Story 3                                                                               |
 |   XX   | 80-084424(GE)     | Toy Story 3                                                                               |
 |        | 80-084425(FR)     | Toy Story 3                                                                               |
-|        | 80-084427(SP)     | Toy Story 3                                                                               |
+|  SOON  | 80-084427(SP)     | Toy Story 3                                                                               |
 +========+===================+===========================================================================================+
 |   XX   | 80-084440(US)     | Monsters vs. Aliens                                                                       |
 |        | 80-084442(NL)     | Monsters vs. Aliens                                                                       |
@@ -224,19 +225,6 @@ Language:
 |   XX   | 80-084644(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                              |
 |        | 80-084647(SP)     | Bob Esponja - Un día en la vida de una esponja                                            |
 +========+===================+===========================================================================================+
-
-V.Smile Smartbooks
-Smartbooks currently have no dumps available, hence they are temporarily listed here.
-+========+===================+============================================================================+
-|        | 80-089000(US)     | Spider-Man &amp; Friends Where is Hulk?                                    |
-+========+===================+============================================================================+
-|        | 80-089020(US)     | Toy Story 2                                                                |
-+========+===================+============================================================================+
-|        | 80-089040(US)     | Dora the Explorer - Dora's Got a Puppy                                     |
-|        | 80-089045(FR)     | Dora's ??????                                                              |
-+========+===================+============================================================================+
-|        | 80-089060(US)     | Scooby-Doo! - A Night of Fright is no Delight                              |
-+========+===================+============================================================================+
 
 -->
 

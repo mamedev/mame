@@ -7,6 +7,7 @@ V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
 V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
 V.Smile Baby                  80-099***  (Smartridges are yellow, incompatible with TV based V.Smile consoles)
+V.Baby                        80-22****  (Smartridges are orange, incompatible with other V.Smile consoles, including V.Smile Baby)
 
 Language:
 ********0 = US                (White labels on back)
@@ -86,10 +87,17 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 +========+===================+============================================================================+
 | Dumped |      Serial       |                                    Name                                    |
 +========+===================+============================================================================+
-|        | 80-107100-001(US) | Meet Me at the Zoo (Orange, V.Baby packin)                                 |
+|        | 80-107100-001(US) | Meet Me at the Zoo                                                         |
+|   **   | 80-107122-022(US) | Aventuras en el Zoo (cart without ROM)                                     |
++========+===================+============================================================================+
 |        | 80-220000(US)     | The World of Eric Carle - The Very Hungry Caterpillar                      |
++========+===================+============================================================================+
+|  SOON  | 80-220507-022(SP) | El jardín de los sueños (green sticker: "P ○○○○")                          |
++========+===================+============================================================================+
 |        | 80-220600(US)     | Backyardigans                                                              |
++========+===================+============================================================================+
 |        | 80-220700(US)     | Noah's Ark - Animal Adventures                                             |
++========+===================+============================================================================+
 |        | 80-220800(US)     | Mother Goose                                                               |
 +========+===================+============================================================================+
 
@@ -98,7 +106,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 <softwarelist name="vsmileb_cart" description="VTech V.Smile Baby cartridges">
 
 	<software name="dayfarmg" supported="no">
-		<description>Mein erster Bauernhof (Ger)</description>
+		<description>Mein erster Bauernhof (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099064(GE)" />
@@ -113,7 +121,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 	</software>
 
 	<software name="dayfarms" cloneof="dayfarmg" supported="no">
-		<description>Un Día en la Granja (Spa)</description>
+		<description>Un Día en la Granja (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099067(SP)" />
@@ -128,7 +136,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 	</software>
 
 	<software name="mktierf" supported="no">
-		<description>Meine kleinen Tierfreunde (Ger)</description>
+		<description>Meine kleinen Tierfreunde (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099004(GE)" />
@@ -155,7 +163,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 	</software>
 
 	<software name="poohhawasw" cloneof="poohhawa" supported="no">
-		<description>Nalle Puhs Äventyr i Sjumilaskogen (Swe)</description>
+		<description>Nalle Puhs Äventyr i Sjumilaskogen (Sweden)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099034(SE)" />
