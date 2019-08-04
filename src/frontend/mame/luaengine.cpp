@@ -2278,6 +2278,7 @@ void lua_engine::initialize()
  * ui:get_line_height() - current ui font height
  * ui:get_string_width(str, scale) - get str width with ui font at scale factor of current font size
  * ui:get_char_width(char) - get width of utf8 glyph char with ui font
+ * ui:set_aggressive_input_focus(bool)
  *
  * ui.single_step
  * ui.show_fps - fps display enabled
@@ -2293,7 +2294,8 @@ void lua_engine::initialize()
 			"get_line_height", &mame_ui_manager::get_line_height,
 			"get_string_width", &mame_ui_manager::get_string_width,
 			// sol converts char32_t to a string
-			"get_char_width", [](mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); });
+			"get_char_width", [](mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); },
+			"set_aggressive_input_focus", [](mame_ui_manager &m, bool aggressive_focus) { osd_set_aggressive_input_focus(aggressive_focus); });
 
 
 /*  device_state_entry library

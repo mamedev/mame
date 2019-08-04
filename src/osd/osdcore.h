@@ -1053,4 +1053,7 @@ std::vector<std::string> osd_get_command_line(int argc, char *argv[]);
 #define printf !MUST_USE_osd_printf_*_CALLS_WITHIN_THE_CORE!
 */
 
+// specifies "aggressive focus" - should MAME capture input for any windows co-habiting a MAME window?
+void osd_set_aggressive_input_focus(bool aggressive_focus);
+
 #endif // MAME_OSD_OSDCORE_H
