@@ -45,6 +45,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/am9513.h"
 #include "machine/bankdev.h"
 #include "machine/mos6551.h"    // debug tty
@@ -242,7 +243,7 @@ void tek440x_state::tek4404(machine_config &config)
 	m_vm->set_addr_width(23);
 	m_vm->set_endianness(ENDIANNESS_BIG);
 
-	M6502(config, m_fdccpu, 1000000);
+	M6502(config, m_fdccpu, 16_MHz_XTAL / 8);
 	m_fdccpu->set_addrmap(AS_PROGRAM, &tek440x_state::fdccpu_map);
 
 	/* video hardware */
@@ -261,7 +262,12 @@ void tek440x_state::tek4404(machine_config &config)
 	mc68681_device &duart(MC68681(config, "duart", 3.6864_MHz_XTAL));
 	duart.irq_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 
+	I8048(config, "kbdmcu", 4.608_MHz_XTAL).set_disable();
+
 	AM9513(config, "timer", 40_MHz_XTAL / 4 / 10); // from CPU E output
+
+	//MC146818(config, "calendar", 32.768_MHz_XTAL);
+	//NCR5385(config, "scsic", 40_MHz_XTAL / 4);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set("aica", FUNC(mos6551_device::write_rxd));
@@ -292,6 +298,9 @@ ROM_START( tek4404 )
 
 	ROM_REGION( 0x2000, "scsimfm", 0 )
 	ROM_LOAD( "scsi_mfm.bin", 0x000000, 0x002000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
+
+	ROM_REGION( 0x400, "kbdmcu", 0 )
+	ROM_LOAD( "keytronic_8x48.bin", 0x000, 0x400, NO_DUMP )
 ROM_END
 
 /*************************************
