@@ -128,7 +128,8 @@ extern "C" {
 
 /* LIGHTGUN device is similar to Guncon-2 for PlayStation 2.
  * It reports X/Y coordinates in screen space (similar to the pointer)
- * in the range [-0x8000, 0x7fff] in both axes, with zero being center.
+ * in the range [-0x8000, 0x7fff] in both axes, with zero being center and
+ * -0x8000 being out of bounds.
  * As well as reporting on/off screen state. It features a trigger,
  * start/select buttons, auxiliary action buttons and a
  * directional pad. A forced off-screen shot can be requested for
@@ -139,7 +140,8 @@ extern "C" {
 /* The ANALOG device is an extension to JOYPAD (RetroPad).
  * Similar to DualShock2 it adds two analog sticks and all buttons can
  * be analog. This is treated as a separate device type as it returns
- * axis values in the full analog range of [-0x8000, 0x7fff].
+ * axis values in the full analog range of [-0x7fff, 0x7fff],
+ * although some devices may return -0x8000.
  * Positive X axis is right. Positive Y axis is down.
  * Buttons are returned in the range [0, 0x7fff].
  * Only use ANALOG type when polling for analog values.
@@ -199,6 +201,8 @@ extern "C" {
 #define RETRO_DEVICE_ID_JOYPAD_R2      13
 #define RETRO_DEVICE_ID_JOYPAD_L3      14
 #define RETRO_DEVICE_ID_JOYPAD_R3      15
+
+#define RETRO_DEVICE_ID_JOYPAD_MASK    256
 
 /* Index / Id values for ANALOG device. */
 #define RETRO_DEVICE_INDEX_ANALOG_LEFT       0
@@ -272,6 +276,8 @@ enum retro_language
    RETRO_LANGUAGE_POLISH              = 14,
    RETRO_LANGUAGE_VIETNAMESE          = 15,
    RETRO_LANGUAGE_ARABIC              = 16,
+   RETRO_LANGUAGE_GREEK               = 17,
+   RETRO_LANGUAGE_TURKISH             = 18,
    RETRO_LANGUAGE_LAST,
 
    /* Ensure sizeof(enum) == sizeof(int) */
@@ -483,11 +489,13 @@ enum retro_mod
 /* Environment commands. */
 #define RETRO_ENVIRONMENT_SET_ROTATION  1  /* const unsigned * --
                                             * Sets screen rotation of graphics.
-                                            * Is only implemented if rotation can be accelerated by hardware.
                                             * Valid values are 0, 1, 2, 3, which rotates screen by 0, 90, 180,
                                             * 270 degrees counter-clockwise respectively.
                                             */
 #define RETRO_ENVIRONMENT_GET_OVERSCAN  2  /* bool * --
+                                            * NOTE: As of 2019 this callback is considered deprecated in favor of
+                                            * using core options to manage overscan in a more nuanced, core-specific way.
+                                            *
                                             * Boolean value whether or not the implementation should use overscan,
                                             * or crop away overscan.
                                             */
@@ -606,7 +614,7 @@ enum retro_mod
                                             * Afterward it may be called again for the core to communicate
                                             * updated options to the frontend, but the number of core
                                             * options must not change from the number in the initial call.
-					    *
+                                            *
                                             * 'data' points to an array of retro_variable structs
                                             * terminated by a { NULL, NULL } element.
                                             * retro_variable::key should be namespaced to not collide
@@ -873,12 +881,12 @@ enum retro_mod
                                             * types already defined in the libretro API.
                                             *
                                             * The core must pass an array of const struct retro_controller_info which
-                                            * is terminated with a blanked out struct. Each element of the 
+                                            * is terminated with a blanked out struct. Each element of the
                                             * retro_controller_info struct corresponds to the ascending port index
                                             * that is passed to retro_set_controller_port_device() when that function
                                             * is called to indicate to the core that the frontend has changed the
                                             * active device subclass. SEE ALSO: retro_set_controller_port_device()
-                                            * 
+                                            *
                                             * The ascending input port indexes provided by the core in the struct
                                             * are generally presented by frontends as ascending User # or Player #,
                                             * such as Player 1, Player 2, Player 3, etc. Which device subclasses are
@@ -890,7 +898,7 @@ enum retro_mod
                                             * User or Player, beginning with the generic Libretro device that the
                                             * subclasses are derived from. The second inner element of each entry is the
                                             * total number of subclasses that are listed in the retro_controller_description.
-                                            * 
+                                            *
                                             * NOTE: Even if special device types are set in the libretro core,
                                             * libretro should only poll input based on the base input device types.
                                             */
@@ -1077,10 +1085,173 @@ enum retro_mod
                                             * fastforwarding mode.
                                             */
 
+#define RETRO_ENVIRONMENT_GET_TARGET_REFRESH_RATE (50 | RETRO_ENVIRONMENT_EXPERIMENTAL)
+                                            /* float * --
+                                            * Float value that lets us know what target refresh rate 
+                                            * is curently in use by the frontend.
+                                            *
+                                            * The core can use the returned value to set an ideal 
+                                            * refresh rate/framerate.
+                                            */
+
+#define RETRO_ENVIRONMENT_GET_INPUT_BITMASKS (51 | RETRO_ENVIRONMENT_EXPERIMENTAL)
+                                            /* bool * --
+                                            * Boolean value that indicates whether or not the frontend supports
+                                            * input bitmasks being returned by retro_input_state_t. The advantage
+                                            * of this is that retro_input_state_t has to be only called once to 
+                                            * grab all button states instead of multiple times.
+                                            *
+                                            * If it returns true, you can pass RETRO_DEVICE_ID_JOYPAD_MASK as 'id'
+                                            * to retro_input_state_t (make sure 'device' is set to RETRO_DEVICE_JOYPAD).
+                                            * It will return a bitmask of all the digital buttons.
+                                            */
+
+#define RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION 52
+                                           /* unsigned * --
+                                            * Unsigned value is the API version number of the core options
+                                            * interface supported by the frontend. If callback return false,
+                                            * API version is assumed to be 0.
+                                            *
+                                            * In legacy code, core options are set by passing an array of
+                                            * retro_variable structs to RETRO_ENVIRONMENT_SET_VARIABLES.
+                                            * This may be still be done regardless of the core options
+                                            * interface version.
+                                            *
+                                            * If version is 1 however, core options may instead be set by
+                                            * passing an array of retro_core_option_definition structs to
+                                            * RETRO_ENVIRONMENT_SET_CORE_OPTIONS, or a 2D array of
+                                            * retro_core_option_definition structs to RETRO_ENVIRONMENT_SET_CORE_OPTIONS_INTL.
+                                            * This allows the core to additionally set option sublabel information
+                                            * and/or provide localisation support.
+                                            */
+
+#define RETRO_ENVIRONMENT_SET_CORE_OPTIONS 53
+                                           /* const struct retro_core_option_definition ** --
+                                            * Allows an implementation to signal the environment
+                                            * which variables it might want to check for later using
+                                            * GET_VARIABLE.
+                                            * This allows the frontend to present these variables to
+                                            * a user dynamically.
+                                            * This should only be called if RETRO_ENVIRONMENT_GET_ENHANCED_CORE_OPTIONS
+                                            * returns an API version of 1.
+                                            * This should be called instead of RETRO_ENVIRONMENT_SET_VARIABLES.
+                                            * This should be called the first time as early as
+                                            * possible (ideally in retro_set_environment).
+                                            * Afterwards it may be called again for the core to communicate
+                                            * updated options to the frontend, but the number of core
+                                            * options must not change from the number in the initial call.
+                                            *
+                                            * 'data' points to an array of retro_core_option_definition structs
+                                            * terminated by a { NULL, NULL, NULL, {{0}}, NULL } element.
+                                            * retro_core_option_definition::key should be namespaced to not collide
+                                            * with other implementations' keys. e.g. A core called
+                                            * 'foo' should use keys named as 'foo_option'.
+                                            * retro_core_option_definition::desc should contain a human readable
+                                            * description of the key.
+                                            * retro_core_option_definition::info should contain any additional human
+                                            * readable information text that a typical user may need to
+                                            * understand the functionality of the option.
+                                            * retro_core_option_definition::values is an array of retro_core_option_value
+                                            * structs terminated by a { NULL, NULL } element.
+                                            * > retro_core_option_definition::values[index].value is an expected option
+                                            *   value.
+                                            * > retro_core_option_definition::values[index].label is a human readable
+                                            *   label used when displaying the value on screen. If NULL,
+                                            *   the value itself is used.
+                                            * retro_core_option_definition::default_value is the default core option
+                                            * setting. It must match one of the expected option values in the
+                                            * retro_core_option_definition::values array. If it does not, or the
+                                            * default value is NULL, the first entry in the
+                                            * retro_core_option_definition::values array is treated as the default.
+                                            *
+                                            * The number of possible options should be very limited,
+                                            * and must be less than RETRO_NUM_CORE_OPTION_VALUES_MAX.
+                                            * i.e. it should be feasible to cycle through options
+                                            * without a keyboard.
+                                            *
+                                            * First entry should be treated as a default.
+                                            *
+                                            * Example entry:
+                                            * {
+                                            *     "foo_option",
+                                            *     "Speed hack coprocessor X",
+                                            *     "Provides increased performance at the expense of reduced accuracy",
+                                            * 	  {
+                                            *         { "false",    NULL },
+                                            *         { "true",     NULL },
+                                            *         { "unstable", "Turbo (Unstable)" },
+                                            *         { NULL, NULL },
+                                            *     },
+                                            *     "false"
+                                            * }
+                                            *
+                                            * Only strings are operated on. The possible values will
+                                            * generally be displayed and stored as-is by the frontend.
+                                            */
+
+#define RETRO_ENVIRONMENT_SET_CORE_OPTIONS_INTL 54
+                                           /* const struct retro_core_options_intl * --
+                                            * Allows an implementation to signal the environment
+                                            * which variables it might want to check for later using
+                                            * GET_VARIABLE.
+                                            * This allows the frontend to present these variables to
+                                            * a user dynamically.
+                                            * This should only be called if RETRO_ENVIRONMENT_GET_ENHANCED_CORE_OPTIONS
+                                            * returns an API version of 1.
+                                            * This should be called instead of RETRO_ENVIRONMENT_SET_VARIABLES.
+                                            * This should be called the first time as early as
+                                            * possible (ideally in retro_set_environment).
+                                            * Afterwards it may be called again for the core to communicate
+                                            * updated options to the frontend, but the number of core
+                                            * options must not change from the number in the initial call.
+                                            *
+                                            * This is fundamentally the same as RETRO_ENVIRONMENT_SET_CORE_OPTIONS,
+                                            * with the addition of localisation support. The description of the
+                                            * RETRO_ENVIRONMENT_SET_CORE_OPTIONS callback should be consulted
+                                            * for further details.
+                                            *
+                                            * 'data' points to a retro_core_options_intl struct.
+                                            *
+                                            * retro_core_options_intl::us is a pointer to an array of
+                                            * retro_core_option_definition structs defining the US English
+                                            * core options implementation. It must point to a valid array.
+                                            *
+                                            * retro_core_options_intl::local is a pointer to an array of
+                                            * retro_core_option_definition structs defining core options for
+                                            * the current frontend language. It may be NULL (in which case
+                                            * retro_core_options_intl::us is used by the frontend). Any items
+                                            * missing from this array will be read from retro_core_options_intl::us
+                                            * instead.
+                                            *
+                                            * NOTE: Default core option values are always taken from the
+                                            * retro_core_options_intl::us array. Any default values in
+                                            * retro_core_options_intl::local array will be ignored.
+                                            */
+
+#define RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY 55
+                                           /* struct retro_core_option_display * --
+                                            *
+                                            * Allows an implementation to signal the environment to show
+                                            * or hide a variable when displaying core options. This is
+                                            * considered a *suggestion*. The frontend is free to ignore
+                                            * this callback, and its implementation not considered mandatory.
+                                            *
+                                            * 'data' points to a retro_core_option_display struct
+                                            *
+                                            * retro_core_option_display::key is a variable identifier
+                                            * which has already been set by SET_VARIABLES/SET_CORE_OPTIONS.
+                                            *
+                                            * retro_core_option_display::visible is a boolean, specifying
+                                            * whether variable should be displayed
+                                            *
+                                            * Note that all core option variables will be set visible by
+                                            * default when calling SET_VARIABLES/SET_CORE_OPTIONS.
+                                            */
+
 /* VFS functionality */
 
 /* File paths:
- * File paths passed as parameters when using this api shall be well formed unix-style,
+ * File paths passed as parameters when using this API shall be well formed UNIX-style,
  * using "/" (unquoted forward slash) as directory separator regardless of the platform's native separator.
  * Paths shall also include at least one forward slash ("game.bin" is an invalid path, use "./game.bin" instead).
  * Other than the directory separator, cores shall not make assumptions about path format:
@@ -1097,6 +1268,10 @@ enum retro_mod
 /* Opaque file handle
  * Introduced in VFS API v1 */
 struct retro_vfs_file_handle;
+
+/* Opaque directory handle
+ * Introduced in VFS API v3 */
+struct retro_vfs_dir_handle;
 
 /* File open flags
  * Introduced in VFS API v1 */
@@ -1117,6 +1292,12 @@ struct retro_vfs_file_handle;
 #define RETRO_VFS_SEEK_POSITION_CURRENT  1
 #define RETRO_VFS_SEEK_POSITION_END      2
 
+/* stat() result flags
+ * Introduced in VFS API v3 */
+#define RETRO_VFS_STAT_IS_VALID               (1 << 0)
+#define RETRO_VFS_STAT_IS_DIRECTORY           (1 << 1)
+#define RETRO_VFS_STAT_IS_CHARACTER_SPECIAL   (1 << 2)
+
 /* Get path from opaque handle. Returns the exact same path passed to file_open when getting the handle
  * Introduced in VFS API v1 */
 typedef const char *(RETRO_CALLCONV *retro_vfs_get_path_t)(struct retro_vfs_file_handle *stream);
@@ -1126,7 +1307,7 @@ typedef const char *(RETRO_CALLCONV *retro_vfs_get_path_t)(struct retro_vfs_file
  * Introduced in VFS API v1 */
 typedef struct retro_vfs_file_handle *(RETRO_CALLCONV *retro_vfs_open_t)(const char *path, unsigned mode, unsigned hints);
 
-/* Close the file and release its resources. Must be called if open_file returns non-NULL. Returns 0 on succes, -1 on failure.
+/* Close the file and release its resources. Must be called if open_file returns non-NULL. Returns 0 on success, -1 on failure.
  * Whether the call succeeds ot not, the handle passed as parameter becomes invalid and should no longer be used.
  * Introduced in VFS API v1 */
 typedef int (RETRO_CALLCONV *retro_vfs_close_t)(struct retro_vfs_file_handle *stream);
@@ -1139,7 +1320,7 @@ typedef int64_t (RETRO_CALLCONV *retro_vfs_size_t)(struct retro_vfs_file_handle 
  * Introduced in VFS API v2 */
 typedef int64_t (RETRO_CALLCONV *retro_vfs_truncate_t)(struct retro_vfs_file_handle *stream, int64_t length);
 
-/* Get the current read / write position for the file. Returns - 1 for error.
+/* Get the current read / write position for the file. Returns -1 for error.
  * Introduced in VFS API v1 */
 typedef int64_t (RETRO_CALLCONV *retro_vfs_tell_t)(struct retro_vfs_file_handle *stream);
 
@@ -1167,6 +1348,39 @@ typedef int (RETRO_CALLCONV *retro_vfs_remove_t)(const char *path);
  * Introduced in VFS API v1 */
 typedef int (RETRO_CALLCONV *retro_vfs_rename_t)(const char *old_path, const char *new_path);
 
+/* Stat the specified file. Retruns a bitmask of RETRO_VFS_STAT_* flags, none are set if path was not valid.
+ * Additionally stores file size in given variable, unless NULL is given.
+ * Introduced in VFS API v3 */
+typedef int (RETRO_CALLCONV *retro_vfs_stat_t)(const char *path, int32_t *size);
+
+/* Create the specified directory. Returns 0 on success, -1 on unknown failure, -2 if already exists.
+ * Introduced in VFS API v3 */
+typedef int (RETRO_CALLCONV *retro_vfs_mkdir_t)(const char *dir);
+
+/* Open the specified directory for listing. Returns the opaque dir handle, or NULL for error.
+ * Support for the include_hidden argument may vary depending on the platform.
+ * Introduced in VFS API v3 */
+typedef struct retro_vfs_dir_handle *(RETRO_CALLCONV *retro_vfs_opendir_t)(const char *dir, bool include_hidden);
+
+/* Read the directory entry at the current position, and move the read pointer to the next position.
+ * Returns true on success, false if already on the last entry.
+ * Introduced in VFS API v3 */
+typedef bool (RETRO_CALLCONV *retro_vfs_readdir_t)(struct retro_vfs_dir_handle *dirstream);
+
+/* Get the name of the last entry read. Returns a string on success, or NULL for error.
+ * The returned string pointer is valid until the next call to readdir or closedir.
+ * Introduced in VFS API v3 */
+typedef const char *(RETRO_CALLCONV *retro_vfs_dirent_get_name_t)(struct retro_vfs_dir_handle *dirstream);
+
+/* Check if the last entry read was a directory. Returns true if it was, false otherwise (or on error).
+ * Introduced in VFS API v3 */
+typedef bool (RETRO_CALLCONV *retro_vfs_dirent_is_dir_t)(struct retro_vfs_dir_handle *dirstream);
+
+/* Close the directory and release its resources. Must be called if opendir returns non-NULL. Returns 0 on success, -1 on failure.
+ * Whether the call succeeds ot not, the handle passed as parameter becomes invalid and should no longer be used.
+ * Introduced in VFS API v3 */
+typedef int (RETRO_CALLCONV *retro_vfs_closedir_t)(struct retro_vfs_dir_handle *dirstream);
+
 struct retro_vfs_interface
 {
    /* VFS API v1 */
@@ -1183,6 +1397,14 @@ struct retro_vfs_interface
 	retro_vfs_rename_t rename;
    /* VFS API v2 */
    retro_vfs_truncate_t truncate;
+   /* VFS API v3 */
+   retro_vfs_stat_t stat;
+   retro_vfs_mkdir_t mkdir;
+   retro_vfs_opendir_t opendir;
+   retro_vfs_readdir_t readdir;
+   retro_vfs_dirent_get_name_t dirent_get_name;
+   retro_vfs_dirent_is_dir_t dirent_is_dir;
+   retro_vfs_closedir_t closedir;
 };
 
 struct retro_vfs_interface_info
@@ -1205,6 +1427,7 @@ enum retro_hw_render_interface_type
 	RETRO_HW_RENDER_INTERFACE_D3D10  = 2,
 	RETRO_HW_RENDER_INTERFACE_D3D11  = 3,
 	RETRO_HW_RENDER_INTERFACE_D3D12  = 4,
+   RETRO_HW_RENDER_INTERFACE_GSKIT_PS2  = 5,
    RETRO_HW_RENDER_INTERFACE_DUMMY  = INT_MAX
 };
 
@@ -1290,14 +1513,17 @@ struct retro_hw_render_context_negotiation_interface
  * dependence */
 #define RETRO_SERIALIZATION_QUIRK_PLATFORM_DEPENDENT (1 << 6)
 
-#define RETRO_MEMDESC_CONST     (1 << 0)   /* The frontend will never change this memory area once retro_load_game has returned. */
-#define RETRO_MEMDESC_BIGENDIAN (1 << 1)   /* The memory area contains big endian data. Default is little endian. */
-#define RETRO_MEMDESC_ALIGN_2   (1 << 16)  /* All memory access in this area is aligned to their own size, or 2, whichever is smaller. */
-#define RETRO_MEMDESC_ALIGN_4   (2 << 16)
-#define RETRO_MEMDESC_ALIGN_8   (3 << 16)
-#define RETRO_MEMDESC_MINSIZE_2 (1 << 24)  /* All memory in this region is accessed at least 2 bytes at the time. */
-#define RETRO_MEMDESC_MINSIZE_4 (2 << 24)
-#define RETRO_MEMDESC_MINSIZE_8 (3 << 24)
+#define RETRO_MEMDESC_CONST      (1 << 0)   /* The frontend will never change this memory area once retro_load_game has returned. */
+#define RETRO_MEMDESC_BIGENDIAN  (1 << 1)   /* The memory area contains big endian data. Default is little endian. */
+#define RETRO_MEMDESC_SYSTEM_RAM (1 << 2)   /* The memory area is system RAM.  This is main RAM of the gaming system. */
+#define RETRO_MEMDESC_SAVE_RAM   (1 << 3)   /* The memory area is save RAM. This RAM is usually found on a game cartridge, backed up by a battery. */
+#define RETRO_MEMDESC_VIDEO_RAM  (1 << 4)   /* The memory area is video RAM (VRAM) */
+#define RETRO_MEMDESC_ALIGN_2    (1 << 16)  /* All memory access in this area is aligned to their own size, or 2, whichever is smaller. */
+#define RETRO_MEMDESC_ALIGN_4    (2 << 16)
+#define RETRO_MEMDESC_ALIGN_8    (3 << 16)
+#define RETRO_MEMDESC_MINSIZE_2  (1 << 24)  /* All memory in this region is accessed at least 2 bytes at the time. */
+#define RETRO_MEMDESC_MINSIZE_4  (2 << 24)
+#define RETRO_MEMDESC_MINSIZE_8  (3 << 24)
 struct retro_memory_descriptor
 {
    uint64_t flags;
@@ -2265,6 +2491,64 @@ struct retro_variable
 
    /* Value to be obtained. If key does not exist, it is set to NULL. */
    const char *value;
+};
+
+struct retro_core_option_display
+{
+   /* Variable to configure in RETRO_ENVIRONMENT_SET_CORE_OPTIONS_DISPLAY */
+   const char *key;
+
+   /* Specifies whether variable should be displayed
+    * when presenting core options to the user */
+   bool visible;
+};
+
+/* Maximum number of values permitted for a core option
+ * NOTE: This may be increased on a core-by-core basis
+ * if required (doing so has no effect on the frontend) */
+#define RETRO_NUM_CORE_OPTION_VALUES_MAX 128
+
+struct retro_core_option_value
+{
+   /* Expected option value */
+   const char *value;
+
+   /* Human-readable value label. If NULL, value itself
+    * will be displayed by the frontend */
+   const char *label;
+};
+
+struct retro_core_option_definition
+{
+   /* Variable to query in RETRO_ENVIRONMENT_GET_VARIABLE. */
+   const char *key;
+
+   /* Human-readable core option description (used as menu label) */
+   const char *desc;
+
+   /* Human-readable core option information (used as menu sublabel) */
+   const char *info;
+
+   /* Array of retro_core_option_value structs, terminated by NULL */
+   struct retro_core_option_value values[RETRO_NUM_CORE_OPTION_VALUES_MAX];
+
+   /* Default core option value. Must match one of the values
+    * in the retro_core_option_value array, otherwise will be
+    * ignored */
+   const char *default_value;
+};
+
+struct retro_core_options_intl
+{
+   /* Pointer to an array of retro_core_option_definition structs
+    * - US English implementation
+    * - Must point to a valid array */
+   struct retro_core_option_definition *us;
+
+   /* Pointer to an array of retro_core_option_definition structs
+    * - Implementation for current frontend language
+    * - May be NULL */
+   struct retro_core_option_definition *local;
 };
 
 struct retro_game_info
