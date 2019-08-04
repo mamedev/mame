@@ -4,7 +4,7 @@
 	<software name="hg240">
 		<description>Mephisto HG 240 Opening Library</description>
 		<year>1984</year>
-		<publisher>Hegener &amp; Glaser</publisher>
+		<publisher>Hegener + Glaser</publisher>
 		<sharedfeat name="compatibility" value="MM2" />
 		<part name="cart" interface="mephisto_cart">
 			<dataarea name="rom" size="0x4000">
@@ -16,7 +16,7 @@
 	<software name="hg440">
 		<description>Mephisto HG 440 Opening Library</description>
 		<year>1987</year>
-		<publisher>Hegener &amp; Glaser</publisher>
+		<publisher>Hegener + Glaser</publisher>
 		<sharedfeat name="compatibility" value="MM4" />
 		<part name="cart" interface="mephisto_cart">
 			<dataarea name="rom" size="0x4000">
@@ -28,7 +28,7 @@
 	<software name="hg550">
 		<description>Mephisto HG 550 Opening Library</description>
 		<year>1990</year>
-		<publisher>Hegener &amp; Glaser</publisher>
+		<publisher>Hegener + Glaser</publisher>
 		<sharedfeat name="compatibility" value="MM5" />
 		<part name="cart" interface="mephisto_cart">
 			<dataarea name="rom" size="0x4000">

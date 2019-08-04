@@ -8,11 +8,11 @@
 	<element name="text_mode"><text string="Mode" align="1"><color red="0.36" green="0.35" blue="0.35" /></text></element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
+		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
 	</element>
 	<element name="ldot" defstate="0">
-		<rect state="1"><color red="0.31" green="0.28" blue="0.29" /></rect>
-		<rect state="0"><color red="0.5098" green="0.5333" blue="0.5412" /></rect>
+		<rect state="1"><color red="0.2" green="0.16" blue="0.16" /></rect>
+		<rect state="0"><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
 	</element>
 
 	<element name="ledo">

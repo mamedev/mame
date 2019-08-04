@@ -458,6 +458,7 @@ mdisk.cpp
 megadriv.cpp
 megadriv_rad.cpp
 mekd2.cpp
+mephisto_brikett.cpp
 mephisto_glasgow.cpp
 mephisto_mm2.cpp
 mephisto_modena.cpp

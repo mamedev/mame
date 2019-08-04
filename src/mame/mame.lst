@@ -12608,7 +12608,7 @@ klondkp                         // (c) 1999 Eolith
 @source:ep64.cpp
 ep128                           // Enterprise 128
 ep64                            // Enterprise 64
-phc64                           // Hegener & Glaser Mephisto PHC 64
+phc64                           // Hegener + Glaser Mephisto PHC 64
 
 @source:epic14e.cpp
 epic14e                         //
@@ -21407,13 +21407,19 @@ meijinsn                        // (c) 1986 SNK
 @source:mekd2.cpp
 mekd2                           // 1977 Motorola Evaluation Kit
 
+@source:mephisto_brikett.cpp
+mephisto
+mephisto2
+mephisto3
+
 @source:mephisto_glasgow.cpp
 amsterd                         // Amsterdam
-dallas                          // Dallas
+amsterda                        // Amsterdam
 dallas16                        // Dallas
+dallas16a                       // Dallas
 dallas32                        // Dallas
 glasgow                         // Glasgow
-roma                            // Roma
+roma16                          // Roma
 roma32                          // Roma
 
 @source:mephisto_mm2.cpp
@@ -21428,17 +21434,18 @@ rebel5                          // Mephisto Rebell 5.0
 modena                          // 1992 Mephisto Modena
 
 @source:mephisto_modular.cpp
-alm16                           // 1988 Mephisto Almeria 68000
-alm32                           // 1988 Mephisto Almeria 68020
-port16                          // 1989 Mephisto Portorose 68000
-port32                          // 1989 Mephisto Portorose 68020
-lyon16                          // 1990 Mephisto Lyon 68000
-lyon32                          // 1990 Mephisto Lyon 68020
-van16                           // 1991 Mephisto Vancouver 68000
-van32                           // 1991 Mephisto Vancouver 68020
+alm16                           // 1988 Mephisto Almeria 16 Bit
+alm32                           // 1988 Mephisto Almeria 32 Bit
+port16                          // 1989 Mephisto Portorose 16 Bit
+port32                          // 1989 Mephisto Portorose 32 Bit
+lyon16                          // 1990 Mephisto Lyon 16 Bit
+lyon32                          // 1990 Mephisto Lyon 32 Bit
+van16                           // 1991 Mephisto Vancouver 16 Bit
+van32                           // 1991 Mephisto Vancouver 32 Bit
 gen32                           // 1993 Mephisto Genius 68030
-lond020                         // 1996 Mephisto London 68020
-lond030                         // 1996 Mephisto Genius 68030 London Upgrade
+gen32l                          // 1996 Mephisto Genius 68030 London Upgrade
+lond16                          // 1996 Mephisto London 16 Bit
+lond32                          // 1996 Mephisto London 32 Bit
 berl16                          // 1992 Mephisto Berlin 68000
 berlinp                         // 1994 Mephisto Berlin Pro 68020
 berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade

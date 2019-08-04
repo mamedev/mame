@@ -3,7 +3,7 @@
 <!-- define elements -->
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
+		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
 	</element>
 
 	<element name="led" defstate="0">
