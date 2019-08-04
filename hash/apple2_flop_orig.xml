@@ -6604,4 +6604,100 @@
 		</part>
 	</software>
 
+	<software name="cstlwolf">
+		<description>Castle Wolfenstein (1981 Version)</description>
+		<year>1981</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="castle wolfenstein.woz" size="234776" crc="9ee71212" sha1="0abb3a2431eccfd83da01c40c4639e66aae6f9a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf0684">
+		<description>Castle Wolfenstein (Version 06/19/84)</description>
+		<year>1984</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- This is the 1984 re-release, dated 06/19/1984. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235492">
+				<rom name="castle wolfenstein 061984.woz" size="235492" crc="351b55c9" sha1="ad7da9d718c15ab820eed973be79515c41a4ff27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="byndwolf">
+		<description>Beyond Castle Wolfenstein</description>
+		<year>1984</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234756">
+				<rom name="beyond castle wolfenstein.woz" size="234756" crc="5ef4f4a5" sha1="e2f48c957dda8117b8069a17e70b5a7b1465e141" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlches">
+		<description>Battle Chess</description>
+		<year>1990</year>
+		<publisher>Interplay Productions</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234739">
+				<rom name="battle chess side a.woz" size="234739" crc="2cca2ba1" sha1="091148e230f5a1a95b1195360dc852447d48951c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234739">
+				<rom name="battle chess side b.woz" size="234739" crc="ca593d39" sha1="051edd15eb032897d32543fd400c564347ebacb4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="essex">
+		<description>Essex</description>
+		<year>1985</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235499">
+				<rom name="essex side 1.woz" size="235499" crc="d4371622" sha1="3dd75760252ac1e87f71e9294694c6afb1f10e9a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235499">
+				<rom name="essex side 2.woz" size="235499" crc="f5d88e20" sha1="8e8fe1e8499dbe11ad228b68080f9973f6379978" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="235499">
+				<rom name="essex side 3.woz" size="235499" crc="8b57c044" sha1="031a2ce43a020c937447ddf1ee572d3b83dbeb36" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
