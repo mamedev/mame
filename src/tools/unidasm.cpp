@@ -451,7 +451,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "saturn",          le,  0, []() -> util::disasm_interface * { return new saturn_disassembler(&saturn_unidasm); } },
 	{ "sc61860",         le,  0, []() -> util::disasm_interface * { return new sc61860_disassembler; } },
 	{ "scmp",            le,  0, []() -> util::disasm_interface * { return new scmp_disassembler; } },
-	{ "scudsp",          be,  0, []() -> util::disasm_interface * { return new scudsp_disassembler; } },
+	{ "scudsp",          be, -2, []() -> util::disasm_interface * { return new scudsp_disassembler; } },
 	{ "se3208",          le,  0, []() -> util::disasm_interface * { return new se3208_disassembler; } },
 	{ "sh2",             be,  0, []() -> util::disasm_interface * { return new sh_disassembler(false); } },
 	{ "sh4",             le,  0, []() -> util::disasm_interface * { return new sh_disassembler(true); } },

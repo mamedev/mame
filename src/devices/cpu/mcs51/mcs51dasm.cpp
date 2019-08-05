@@ -1101,7 +1101,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 		//Unable to test
 		//DA A
 		case 0xd4:                      /* 1: 1101 0100 */
-			util::stream_format(stream, "da   a");
+			util::stream_format(stream, "da    a");
 			break;
 
 		//DJNZ data addr, code addr
