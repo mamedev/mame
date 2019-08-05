@@ -602,13 +602,11 @@ void menu_export::handle()
 					};
 
 					// do we want to show devices?
-					info_xml_creator::devices_disposition devdisp = (uintptr_t(menu_event->itemref) == 1)
-						? info_xml_creator::devices_disposition::FILTERED
-						: info_xml_creator::devices_disposition::NONE;
+					bool include_devices = uintptr_t(menu_event->itemref) == 1;
 
 					// and do the dirty work
 					info_xml_creator creator(machine().options());
-					creator.output(pfile, filter, devdisp);
+					creator.output(pfile, filter, include_devices);
 					fclose(pfile);
 					machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
 				}

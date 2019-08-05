@@ -222,11 +222,7 @@ void info_xml_creator::output(FILE *out, const std::vector<std::string> &pattern
 	if (patterns.empty())
 	{
 		// no patterns specified - show everything
-		auto filter = [](const char *, bool &) -> bool
-		{
-			return true;
-		};
-		output(out, filter, devices_disposition::ALL);
+		output(out);
 	}
 	else
 	{
@@ -262,7 +258,7 @@ void info_xml_creator::output(FILE *out, const std::vector<std::string> &pattern
 			}
 			return result;
 		};
-		output(out, filter, devices_disposition::FILTERED);
+		output(out, filter);
 
 		// throw an error if there were unmatched patterns
 		auto iter = std::find(matched.begin(), matched.end(), false);
@@ -280,11 +276,10 @@ void info_xml_creator::output(FILE *out, const std::vector<std::string> &pattern
 //	known (and filtered) machines
 //-------------------------------------------------
 
-void info_xml_creator::output(FILE *out, const std::function<bool(const char *shortname, bool &done)> &filter, devices_disposition devdisp)
+void info_xml_creator::output(FILE *out, const std::function<bool(const char *shortname, bool &done)> &filter, bool include_devices)
 {
 	// sanity checks
 	assert(out);
-	assert(filter);
 
 	// set up output
 	m_output = out;
@@ -297,7 +292,7 @@ void info_xml_creator::output(FILE *out, const std::function<bool(const char *sh
 
 	// only keep a device set when we're asked to track it
 	std::unique_ptr<device_type_set> devfilter;
-	if (devdisp == devices_disposition::FILTERED)
+	if (include_devices && filter)
 		devfilter = std::make_unique<device_type_set>();
 
 	// try enumerating drivers and outputting them
@@ -309,7 +304,7 @@ void info_xml_creator::output(FILE *out, const std::function<bool(const char *sh
 			// longer safe to call next(), so record that we're done
 			drivlist_done = true;
 		}
-		else if (filter(drivlist.driver().name, filter_done))
+		else if (!filter || filter(drivlist.driver().name, filter_done))
 		{
 			// output the header if we have to
 			if (!header_outputted)
@@ -328,7 +323,7 @@ void info_xml_creator::output(FILE *out, const std::function<bool(const char *sh
 	{
 		for (device_type type : registered_device_types)
 		{
-			if (filter(type.shortname(), filter_done))
+			if (!filter || filter(type.shortname(), filter_done))
 				devfilter->insert(&type);
 
 			if (filter_done)
@@ -337,7 +332,7 @@ void info_xml_creator::output(FILE *out, const std::function<bool(const char *sh
 	}
 
 	// output devices (both devices with roms and slot devices)
-	if (devdisp != devices_disposition::NONE && (!devfilter || !devfilter->empty()))
+	if (include_devices && (!devfilter || !devfilter->empty()))
 	{
 		if (!header_outputted)
 		{
