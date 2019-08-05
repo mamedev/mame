@@ -140,6 +140,10 @@ public:
 	void pc30iii(machine_config &config);
 	void k286i(machine_config &config);
 	void ibm5170(machine_config &config);
+	void at(machine_config &config);
+	void atega(machine_config &config);
+	void atherc(machine_config &config);
+	void atvga(machine_config &config);
 	void ct386sx(machine_config &config);
 	void xb42639(machine_config &config);
 	void at486l(machine_config &config);
@@ -160,7 +164,6 @@ public:
 	void c286lt(machine_config &config);
 	void csl286(machine_config &config);
 	void c386sx16(machine_config &config);
-	void atvga(machine_config &config);
 	void at386(machine_config &config);
 	void m290(machine_config &config);
 	void ncrpc8(machine_config &config);
@@ -503,6 +506,40 @@ void at_state::ibm5170(machine_config &config)
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,1024K,2M,4M,8M,15M");
 }
 
+void at_state::at(machine_config &config)
+{
+	ibm5170(config);
+	m_maincpu->set_clock(6000000);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("cga");
+}
+
+// ATEGA
+void at_state::atega(machine_config &config)
+{
+	at(config);
+	m_maincpu->set_clock(6000000);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("ega");
+}
+
+
+// ATHERC
+void at_state::atherc(machine_config &config)
+{
+	at(config);
+	m_maincpu->set_clock(6000000);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("hercules");
+}
+
+// ATVGA
+void at_state::atvga(machine_config &config)
+{
+	at(config);
+	m_maincpu->set_clock(12000000);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("svga_et4k");
+	subdevice<pc_kbdc_slot_device>("kbd")->set_default_option(STR_KBD_MICROSOFT_NATURAL);
+	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false); // FIXME: determine ISA bus clock
+}
+
 void at_state::ibm5170a(machine_config &config)
 {
 	ibm5170(config);
@@ -545,15 +582,6 @@ void at_vrom_fix_state::ibmps1(machine_config &config)
 	subdevice<isa16_slot_device>("isa1")->set_default_option("vga");
 	subdevice<isa16_slot_device>("isa1")->set_fixed(true);
 	subdevice<pc_kbdc_slot_device>("kbd")->set_default_option(STR_KBD_MICROSOFT_NATURAL);
-}
-
-void at_state::atvga(machine_config &config)
-{
-	ibm5170(config);
-	m_maincpu->set_clock(12000000);
-	subdevice<isa16_slot_device>("isa1")->set_default_option("svga_et4k");
-	subdevice<pc_kbdc_slot_device>("kbd")->set_default_option(STR_KBD_MICROSOFT_NATURAL);
-	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false); // FIXME: determine ISA bus clock
 }
 
 void at_state::neat(machine_config &config)
@@ -1551,61 +1579,17 @@ ROM_START( at )
 	ROM_SYSTEM_BIOS(34, "at6m8m10m", "AT SYSTEM 6M/8M/10M") 
 	ROMX_LOAD( "286-at system 6m8m10m-l_32k.bin", 0x10000, 0x8000, CRC(37e0e1c1) SHA1(f5cd17658554a73bb86c5c8e630dac3e34b38e51), ROM_SKIP(1) | ROM_BIOS(34) )
 	ROMX_LOAD( "286-at system 6m8m10m-r_32k.bin", 0x10001, 0x8000, CRC(c672efff) SHA1(7224bb6b4d25ef34bc0aa9d7c450baf9b47fd917), ROM_SKIP(1) | ROM_BIOS(34) )
-ROM_END
-
-ROM_START( atvga )
-	ROM_REGION(0x20000,"bios", 0)
-	// 0: BIOS-String: 20-0001-001223-00101111-050591-KB-8042--0
-	ROM_SYSTEM_BIOS(0, "vl82c", "VL82C311L-FC4")/*(Motherboard Manufacturer: Biostar Microtech Corp.) (BIOS release date: 05-05-1991)*/
-	ROMX_LOAD( "2vlm001.bin",     0x10000, 0x10000, CRC(f34d800a) SHA1(638aca592a0e525f957beb525e95ca666a994ee8), ROM_BIOS(0) )
-	// 1: same as BIOS '0' in at
-	ROM_SYSTEM_BIOS(1, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
-	ROMX_LOAD( "ami211.bin",     0x10000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(1))
-	// 2: same as BIOS '2' in at
-	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
-	ROMX_LOAD( "amic206.bin",    0x10000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(2) )
-	// 3: same as BIOS '3' in at
-	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1")
-	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(3) )
-	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(3) )
-	// 4: same as BIOS '4' in at
-	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* Quadtel Enhanced 286 Bios Version 3.04.02 */
-	ROMX_LOAD( "amiht-h.bin",   0x10001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(4) )
-	ROMX_LOAD( "amiht-l.bin",   0x10000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(4) )
-	// 5: same as BIOS '5' in at
-	ROM_SYSTEM_BIOS(5, "ami121", "AMI HT 12.1")
-	ROMX_LOAD( "ami2od86.bin",  0x10001, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(5) )
-	ROMX_LOAD( "ami2ev86.bin",  0x10000, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(5) )
-	// 6: same as BIOS '6' in at
-	ROM_SYSTEM_BIOS(6, "ami122", "AMI HT 12.2")
-	ROMX_LOAD( "ami2od89.bin",  0x10001, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(6) )
-	ROMX_LOAD( "ami2ev89.bin",  0x10000, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(6) )
-	// 7: same as BIOS '7' in at
-	ROM_SYSTEM_BIOS(7, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
-	ROMX_LOAD( "ht12h.bin",     0x10001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(7) )
-	ROMX_LOAD( "ht12l.bin",     0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(7) )
-	// 8: same as BIOS '8' in at
-	ROM_SYSTEM_BIOS(8, "ami181", "AMI HT 18.1") /* not a bad dump, sets unknown probably chipset related registers at 0x1e8 before failing post */
-	ROMX_LOAD( "ht18.bin",     0x10000, 0x10000, CRC(f65a6f9a) SHA1(7dfdf7d243f9f645165dc009c5097dd515f86fbb), ROM_BIOS(8) )
-	// 9: same as BIOS '9' in at
-	ROM_SYSTEM_BIOS(9, "amiht21", "AMI HT 21.1") /* as above */
-	ROMX_LOAD( "ht21e.bin",    0x10000, 0x10000, CRC(e80f7fed) SHA1(62d958d98c95e9e4d1b290a6c1054ae98770f276), ROM_BIOS(9) )
-	// 10: same as BIOS '10' in at
-	ROM_SYSTEM_BIOS(10, "amip1", "AMI P.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 09-04-1990)*/
-	ROMX_LOAD( "poisk-h.bin",   0x10001, 0x8000, CRC(83fd3f8c) SHA1(ca94850bbd949b97b11710629886b0ee69489a81),ROM_SKIP(1) | ROM_BIOS(10) )
-	ROMX_LOAD( "poisk-l.bin",   0x10000, 0x8000, CRC(0b2ed291) SHA1(bb51a3f317cf4d429a6cfb44a46ca0ac39d9aaa7),ROM_SKIP(1) | ROM_BIOS(10) )
-	// 11: BIOS-String: DG22-1131-040990-K11 / 286-BIOS G2 V1.1 6-28-90
-	ROM_SYSTEM_BIOS(11, "ami1131", "AMI-1131") /*(Motherboard Manufacturer: Elitegroup Computer Co., Ltd.) (BIOS release date:: 09-04-1990)*/
-	ROMX_LOAD( "2hlm003h.bin",   0x10001, 0x8000, CRC(2babb42b) SHA1(3da6538f44b434cdec0cbdddd392ccfd34666f06),ROM_SKIP(1) | ROM_BIOS(11) )
-	ROMX_LOAD( "2hlm003l.bin",   0x10000, 0x8000, CRC(317cbcbf) SHA1(1adad6280d8b07c2921fc5fc13ecaa10e6bfebdc),ROM_SKIP(1) | ROM_BIOS(11) )
-	// 12: same as BIOS '1' in at
-	ROM_SYSTEM_BIOS(12, "at", "PC 286") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 03-11-1987)*/
-	ROMX_LOAD( "at110387.1", 0x10001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(12) )
-	ROMX_LOAD( "at110387.0", 0x10000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(12) )
-	// 13
-	ROM_SYSTEM_BIOS(13, "bravo", "AST Bravo/286") // fails with keyboard controller test, probably expects specific kbdc rom
-	ROMX_LOAD( "107000-704.bin", 0x10000, 0x8000, CRC(94faf87e) SHA1(abaafa6c2ae9b9fba95b244dcbcc1c752ac6c0a0),ROM_SKIP(1) | ROM_BIOS(13) )
-	ROMX_LOAD( "107000-705.bin", 0x10001, 0x8000, CRC(e1263c1e) SHA1(b564f1043ef45ecbdf4f06bb500150ad992c2931),ROM_SKIP(1) | ROM_BIOS(13) )
+	// 35: BIOS-String: 20-0001-001223-00101111-050591-KB-8042--0 - used to be atvga BIOS #0
+	ROM_SYSTEM_BIOS(35, "vl82c", "VL82C311L-FC4")/*(Motherboard Manufacturer: Biostar Microtech Corp.) (BIOS release date: 05-05-1991)*/
+	ROMX_LOAD( "2vlm001.bin",     0x10000, 0x10000, CRC(f34d800a) SHA1(638aca592a0e525f957beb525e95ca666a994ee8), ROM_BIOS(35) )
+	// 36: BIOS-String: DG22-1131-040990-K11 / 286-BIOS G2 V1.1 6-28-90 - used to be atvga BIOS #11
+	ROM_SYSTEM_BIOS(36, "ami1131", "AMI-1131") /*(Motherboard Manufacturer: Elitegroup Computer Co., Ltd.) (BIOS release date:: 09-04-1990)*/
+	ROMX_LOAD( "2hlm003h.bin",   0x10001, 0x8000, CRC(2babb42b) SHA1(3da6538f44b434cdec0cbdddd392ccfd34666f06),ROM_SKIP(1) | ROM_BIOS(36) )
+	ROMX_LOAD( "2hlm003l.bin",   0x10000, 0x8000, CRC(317cbcbf) SHA1(1adad6280d8b07c2921fc5fc13ecaa10e6bfebdc),ROM_SKIP(1) | ROM_BIOS(36) )
+	// 37: used to atvga BIOS #13
+	ROM_SYSTEM_BIOS(37, "bravo", "AST Bravo/286") // fails with keyboard controller test, probably expects specific kbdc rom
+	ROMX_LOAD( "107000-704.bin", 0x10000, 0x8000, CRC(94faf87e) SHA1(abaafa6c2ae9b9fba95b244dcbcc1c752ac6c0a0),ROM_SKIP(1) | ROM_BIOS(37) )
+	ROMX_LOAD( "107000-705.bin", 0x10001, 0x8000, CRC(e1263c1e) SHA1(b564f1043ef45ecbdf4f06bb500150ad992c2931),ROM_SKIP(1) | ROM_BIOS(37) )
 ROM_END
 
 // Chips & Technologies CS8221 NEAT chipset: P82C211 + P82C212 + P82C215 + P82C206
@@ -2335,6 +2319,15 @@ ROM_START( lion3500 )
 	ROM_LOAD( "lion3500.bin", 0x00000, 0x20000, CRC(fc409ac3) SHA1(9a7aa08b981dedffff31fda5d3496469ae2ec3a5) )
 ROM_END
 
+
+// ROM substitutions
+
+#define rom_atega   rom_at
+
+#define rom_atherc  rom_at
+
+#define rom_atvga   rom_at
+
 /***************************************************************************
 
   Game driver(s)
@@ -2346,8 +2339,10 @@ COMP( 1984, ibm5170,   0,       ibm5150, ibm5170,   0,     at_state,     init_at
 COMP( 1985, ibm5170a,  ibm5170, 0,       ibm5170a,  0,     at_state,     init_at,        "International Business Machines",  "PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
 COMP( 1985, ibm5162,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "International Business Machines",  "PC/XT-286 5162", MACHINE_NOT_WORKING )
 COMP( 1989, ibmps1es,  ibm5170, 0,       ibmps1,    0,     at_vrom_fix_state, init_at,   "International Business Machines",  "PS/1 (Spanish)", MACHINE_NOT_WORKING )
-COMP( 1987, at,        ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<generic>",   "PC/AT (CGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP( 1987, atvga,     ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<generic>",   "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
+COMP( 1987, at,        0, 		ibm5150, at,        0,     at_state,     init_at,        "<generic>",   "PC/AT (CGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1987, atega,     at,      0,       atega,     0,     at_state,     init_at,        "<generic>",   "PC/AT (EGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1987, atherc,    at,      0,       atherc,    0,     at_state,     init_at,        "<generic>",   "PC/AT (Hercules, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1987, atvga,     at,      0,       atvga,     0,     at_state,     init_at,        "<generic>",   "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
 COMP( 1988, at386,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "<generic>",   "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1988, ecs38632,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Elitegroup Computer Systems",      "ECS-386/32", MACHINE_NOT_WORKING )
 COMP( 1992, ecsum386,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Elitegroup Computer Systems",      "UM386 (Rev 1.1)", MACHINE_NOT_WORKING )
