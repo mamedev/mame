@@ -50,6 +50,8 @@ public:
 
 	virtual void ui_initialize(running_machine& machine) override;
 
+	std::vector<std::reference_wrapper<const std::string>> missing_mandatory_images();
+
 	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 	int execute();
 	void start_luaengine();

@@ -50,6 +50,7 @@ public:
 	void attach_notifiers();
 	void on_frame_done();
 	void on_periodic();
+	bool on_missing_mandatory_image(const std::string &instance_name);
 
 	template<typename T, typename U>
 	bool call_plugin(const std::string &name, const T in, U &out)
@@ -126,6 +127,7 @@ private:
 
 	void resume(void *ptr, int nparam);
 	void register_function(sol::function func, const char *id);
+	int enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback);
 	bool execute_function(const char *id);
 	sol::object call_plugin(const std::string &name, sol::object in);
 

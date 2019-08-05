@@ -341,6 +341,32 @@ void mame_machine_manager::load_cheatfiles(running_machine& machine)
 	m_cheat = std::make_unique<cheat_manager>(machine);
 }
 
+//-------------------------------------------------
+//  missing_mandatory_images - search for devices
+//  which need an image to be loaded
+//-------------------------------------------------
+
+std::vector<std::reference_wrapper<const std::string>> mame_machine_manager::missing_mandatory_images()
+{
+	std::vector<std::reference_wrapper<const std::string>> results;
+	assert(m_machine);
+
+	// make sure that any required image has a mounted file
+	for (device_image_interface &image : image_interface_iterator(m_machine->root_device()))
+	{
+		if (image.must_be_loaded())
+		{
+			if (m_machine->options().image_option(image.instance_name()).value().empty())
+			{
+				// this is a missing image; give LUA plugins a chance to handle it
+				if (!lua()->on_missing_mandatory_image(image.instance_name()))
+					results.push_back(std::reference_wrapper<const std::string>(image.instance_name()));
+			}
+		}
+	}
+	return results;
+}
+
 const char * emulator_info::get_bare_build_version() { return bare_build_version; }
 const char * emulator_info::get_build_version() { return build_version; }
 
