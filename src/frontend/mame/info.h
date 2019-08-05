@@ -45,7 +45,7 @@ private:
 	void output_header(std::ostream &out);
 	void output_footer(std::ostream &out);
 
-	void output_one(std::ostream &out, driver_enumerator &drivlist, device_type_set *devtypes);
+	void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes);
 	void output_sampleof(std::ostream &out, device_t &device);
 	void output_bios(std::ostream &out, device_t const &device);
 	void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device);
