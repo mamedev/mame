@@ -31,19 +31,12 @@ class driver_enumerator;
 class info_xml_creator
 {
 public:
-	enum class devices_disposition
-	{
-		NONE,
-		FILTERED,
-		ALL
-	};
-
 	// construction/destruction
 	info_xml_creator(emu_options const &options, bool dtd = true);
 
 	// output
 	void output(FILE *out, const std::vector<std::string> &patterns);
-	void output(FILE *out, const std::function<bool(const char *shortname, bool &done)> &filter, devices_disposition devdisp);
+	void output(FILE *out, const std::function<bool(const char *shortname, bool &done)> &filter = { }, bool include_devices = true);
 
 private:
 	typedef std::unordered_set<std::add_pointer_t<device_type> > device_type_set;
