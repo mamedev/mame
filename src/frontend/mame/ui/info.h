@@ -76,7 +76,6 @@ public:
 	// text generators
 	std::string warnings_string() const;
 	std::string game_info_string() const;
-	std::string mandatory_images() const;
 	std::string get_screen_desc(screen_device &screen) const;
 
 private:
