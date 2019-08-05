@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Angelo Salese
 /************************************************************
 
 PC Engine CD HW notes:
@@ -228,6 +228,7 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_adpcm_latch_address));
 	save_item(NAME(m_adpcm_control));
 	save_item(NAME(m_fade_reg));
+	save_item(NAME(m_adpcm_dma_reg));
 }
 
 void pce_cd_device::device_reset()
@@ -1261,7 +1262,7 @@ WRITE8_MEMBER(pce_cd_device::adpcm_data_w)
 // CD interface Register 0x0b - ADPCM DMA control
 READ8_MEMBER(pce_cd_device::adpcm_dma_control_r)
 {
-	return m_adpcm_status;
+	return m_adpcm_dma_reg;
 }
 
 WRITE8_MEMBER(pce_cd_device::adpcm_dma_control_w)
@@ -1271,7 +1272,7 @@ WRITE8_MEMBER(pce_cd_device::adpcm_dma_control_w)
 		m_adpcm_dma_timer->adjust(attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND * 2048), 0, attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND * 2048));
 		m_adpcm_status |= 4;
 	}
-	m_adpcm_status = data;
+	m_adpcm_dma_reg = data;
 }
 
 // CD Interface Register 0x0c - ADPCM status
@@ -1439,7 +1440,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::clear_ack)
 	update();
 	if (m_scsi_CD)
 	{
-		m_adpcm_status &= 0xFC;
+		m_adpcm_dma_reg &= 0xFC;
 	}
 }
 

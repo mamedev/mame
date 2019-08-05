@@ -102,6 +102,7 @@ private:
 	uint8_t m_adpcm_status;
 	uint16_t m_adpcm_latch_address;
 	uint8_t m_adpcm_control;
+	uint8_t m_adpcm_dma_reg;
 	uint8_t m_fade_reg;
 
 	void regs_map(address_map &map);
