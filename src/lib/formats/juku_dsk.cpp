@@ -31,8 +31,12 @@ const char *juku_format::extensions() const
 
 const juku_format::format juku_format::formats[] =
 {
-	{   //  800k 3 1/2 inch double density double sided - gaps unverified (CP/M)
-		floppy_image::FF_35, floppy_image::DSDD, floppy_image::MFM,
+	{   //  800k 5 1/4 inch double density single sided - gaps unverified (CP/M)
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000, 10, 80, 1, 512, {}, 1, {}, 32, 22, 35
+	},
+	{   //  800k 5 1/4 inch double density double sided - gaps unverified (CP/M)
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, 10, 80, 2, 512, {}, 1, {}, 32, 22, 35
 	},
 	{}

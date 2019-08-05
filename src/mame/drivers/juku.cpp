@@ -18,6 +18,13 @@
 	Note:
 	- In the monitor, enter A to start BASIC and T to boot from disk/network
 
+	TODO:
+	- Display mode 384x200
+	- Work out how the floppy interface really works
+	- Sound
+	- Tape?
+	- Network?
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -69,7 +76,7 @@ private:
 	required_device_array<pit8253_device, 3> m_pit;
 	required_device_array<i8255_device, 2> m_pio;
 	required_device_array<i8251_device, 2> m_sio;
-	required_device<fd1793_device> m_fdc;
+	required_device<kr1818vg93_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<ttl74148_device> m_key_encoder;
 	required_ioport_array<16> m_keys;
@@ -82,10 +89,15 @@ private:
 	void pio0_porta_w(uint8_t data);
 	uint8_t pio0_portb_r();
 	void pio0_portc_w(uint8_t data);
+	uint8_t m_prev_portc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	void fdc_drq_w(int state);
+	void fdc_cmd_w(uint8_t data);
+	uint8_t fdc_data_r();
+	void fdc_data_w(uint8_t data);
 
 	std::unique_ptr<uint8_t[]> m_ram;
 };
@@ -127,6 +139,8 @@ void juku_state::io_map(address_map &map)
 	map(0x14, 0x17).rw(m_pit[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x18, 0x1b).rw(m_pit[2], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x1c, 0x1f).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x1c, 0x1c).w(FUNC(juku_state::fdc_cmd_w));
+	map(0x1f, 0x1f).rw(FUNC(juku_state::fdc_data_r), FUNC(juku_state::fdc_data_w));
 //	map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
@@ -305,7 +319,42 @@ FLOPPY_FORMATS_END
 
 static void juku_floppies(device_slot_interface &device)
 {
-	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
+
+void juku_state::fdc_drq_w(int state)
+{
+	if (state)
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+}
+
+void juku_state::fdc_cmd_w(uint8_t data)
+{
+	if (BIT(data, 7))
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
+	m_fdc->cmd_w(data);
+}
+
+uint8_t juku_state::fdc_data_r()
+{
+	if (m_fdc->drq_r() == 0)
+	{
+		// cpu tries to read data without drq active. halt it and reset the
+		// pc back to the beginning of the instruction
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, m_maincpu->pc() - 2);
+
+		return 0;
+	}
+
+	return m_fdc->data_r();
+}
+
+void juku_state::fdc_data_w(uint8_t data)
+{
+	m_fdc->data_w(data);
 }
 
 
@@ -351,15 +400,27 @@ void juku_state::pio0_portc_w(uint8_t data)
 {
 	// 7-------  (cas?) pof
 	// -6------  (cas?) stop
-	// --5-----  (cas?) rn / floppy
-	// ---4----  (cas?) ff
+	// --5-----  (cas?) rn / floppy drive select
+	// ---4----  (cas?) ff / floppy?
 	// ----3---  (cas?) play
-	// -----2--  (cas?) rec / floppy
+	// -----2--  (cas?) rec / floppy?
 	// ------10  memory mode
+
+	for (int i = 2; i < 8; i++)
+		if (BIT(data, i) !=  BIT(m_prev_portc, i))
+			logerror("pio0: c%d = %d\n", i, BIT(data, i));
+
+	floppy_image_device *floppy = m_floppy[BIT(data, 5)]->get_device();
+	m_fdc->set_floppy(floppy);
+
+	// the motor is always running for now
+	floppy->mon_w(0);
 
 //	m_floppy[0]->get_device()->ss_w(BIT(data, 6));
 
 	m_bank->set_bank(data & 0x03);
+
+	m_prev_portc = data;
 }
 
 void juku_state::machine_start()
@@ -374,16 +435,14 @@ void juku_state::machine_start()
 
 	// register for save states
 	save_pointer(NAME(m_ram), 0x10000);
+	save_item(NAME(m_prev_portc));
 }
 
 void juku_state::machine_reset()
 {
 	m_bank->set_bank(0);
 	m_key_encoder->enable_input_w(0);
-
-	// disk select and motor are probably at pio0 portc
-	m_floppy[0]->get_device()->mon_w(0);
-	m_fdc->set_floppy(m_floppy[0]->get_device());
+	m_prev_portc = 0;
 }
 
 
@@ -443,7 +502,7 @@ void juku_state::juku(machine_config &config)
 	m_sio[0]->rxrdy_handler().set("pic", FUNC(pic8259_device::ir2_w));
 	m_sio[0]->txrdy_handler().set("pic", FUNC(pic8259_device::ir3_w));
 
-	// КР580ВВ51A
+	// КР580ВВ51A (instead of FDC?)
 	I8251(config, m_sio[1], 0);
 	m_sio[1]->rxrdy_handler().set("pic", FUNC(pic8259_device::ir0_w));
 	m_sio[1]->txrdy_handler().set("pic", FUNC(pic8259_device::ir1_w));
@@ -457,9 +516,13 @@ void juku_state::juku(machine_config &config)
 
 	TTL74148(config, m_key_encoder, 0);
 
-	FD1793(config, m_fdc, 1000000);
-	FLOPPY_CONNECTOR(config, "fdc:0", juku_floppies, "35dd", juku_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", juku_floppies, "35dd", juku_state::floppy_formats);
+	KR1818VG93(config, m_fdc, 1000000);
+//	m_fdc->intrq_wr_callback().set(FUNC(juku_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(juku_state::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", juku_floppies, "525qd", juku_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", juku_floppies, "525qd", juku_state::floppy_formats);
+
+	SOFTWARE_LIST(config, "floppy_list").set_original("juku");
 }
 
 
