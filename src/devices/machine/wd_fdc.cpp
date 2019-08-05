@@ -85,6 +85,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	drq_cb(*this),
 	hld_cb(*this),
 	enp_cb(*this),
+	sso_cb(*this),
 	ready_cb(*this), // actually output by the drive, not by the FDC
 	enmf_cb(*this)
 {
@@ -108,6 +109,7 @@ void wd_fdc_device_base::device_start()
 	drq_cb.resolve();
 	hld_cb.resolve();
 	enp_cb.resolve();
+	sso_cb.resolve();
 	ready_cb.resolve();
 	enmf_cb.resolve();
 
@@ -475,8 +477,8 @@ void wd_fdc_device_base::read_sector_start()
 	main_state = READ_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_sector_continue();
@@ -576,8 +578,8 @@ void wd_fdc_device_base::read_track_start()
 	main_state = READ_TRACK;
 	status &= ~(S_LOST|S_RNF);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_track_continue();
@@ -655,8 +657,8 @@ void wd_fdc_device_base::read_id_start()
 	main_state = READ_ID;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_id_continue();
@@ -732,8 +734,8 @@ void wd_fdc_device_base::write_track_start()
 	main_state = WRITE_TRACK;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 
@@ -843,8 +845,8 @@ void wd_fdc_device_base::write_sector_start()
 	main_state = WRITE_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control  ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	write_sector_continue();
@@ -2203,6 +2205,31 @@ void wd_fdc_device_base::drop_drq()
 			if(!intrq_cb.isnull())
 				intrq_cb(intrq);
 		}
+	}
+}
+
+void wd_fdc_device_base::update_sso()
+{
+	// The 'side_control' flag is interpreted as meaning that the FDC has
+	// a SSO output feature, not that it necessarily controls the floppy.
+	if(!side_control)
+		return;
+
+	uint8_t side = (command & 0x02) ? 1 : 0;
+
+	// If a SSO callback is defined then it is assumed that this callback
+	// will update the floppy side if that is the connection. There are
+	// some machines that use the SSO output for other purposes.
+	if(!sso_cb.isnull()) {
+		sso_cb(side);
+		return;
+	}
+
+	// If a SSO callback is not defined then assume that the machine
+	// intended the driver to update the floppy side which appears to be
+	// the case in most cases.
+	if(floppy) {
+		floppy->ss_w((command & 0x02) ? 1 : 0);
 	}
 }
 
