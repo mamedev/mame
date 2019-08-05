@@ -355,7 +355,7 @@ void cli_frontend::listxml(const std::vector<std::string> &args)
 {
 	// create the XML and print it to stdout
 	info_xml_creator creator(m_options, m_options.bool_value(CLIOPTION_DTD));
-	creator.output(stdout, args);
+	creator.output(std::cout, args);
 }
 
 

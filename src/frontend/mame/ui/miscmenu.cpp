@@ -25,6 +25,8 @@
 #include "ui/inifile.h"
 #include "ui/submenu.h"
 
+#include <fstream>
+
 namespace ui {
 /***************************************************************************
     MENU HANDLERS
@@ -585,10 +587,9 @@ void menu_export::handle()
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 				if (file.open(filename.c_str(), ".xml") == osd_file::error::NONE)
 				{
-					FILE *pfile;
 					std::string fullpath(file.fullpath());
 					file.close();
-					pfile = fopen(fullpath.c_str(), "w");
+					std::ofstream pfile(fullpath);
 
 					// prepare a filter for the drivers we want to show
 					std::unordered_set<const game_driver *> driver_list(m_list.begin(), m_list.end());
@@ -607,7 +608,6 @@ void menu_export::handle()
 					// and do the dirty work
 					info_xml_creator creator(machine().options());
 					creator.output(pfile, filter, include_devices);
-					fclose(pfile);
 					machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
 				}
 			}
