@@ -54,9 +54,9 @@ Language:
 |        | 80-084063(UK)     | Thomas and Friends - Engines Working Together                                             |
 |   XX   | 80-084064(GE)     | Thomas - Freunde halten zusammen                                                          |
 +========+===================+===========================================================================================+
-|        | 80-084080(US)     | Wall-E                                                                                    |
+|   XX   | 80-084080(US)     | Wall-E                                                                                    |
 |        | 80-084083(UK)     | Wall-E                                                                                    |
-|        | 80-084084(GE)     | Wall-E                                                                                    |
+|   XX   | 80-084084(GE)     | Wall-E                                                                                    |
 |        | 80-084085(FR)     | Wall-E                                                                                    |
 |        | 80-084087(SP)     | Wall-E                                                                                    |
 +========+===================+===========================================================================================+
@@ -172,7 +172,7 @@ Language:
 |   XX   | 80-084440(US)     | Monsters vs. Aliens                                                                       |
 |        | 80-084442(NL)     | Monsters vs. Aliens                                                                       |
 |        | 80-084443(UK)     | Monsters vs. Aliens                                                                       |
-|        | 80-084444(GE)     | Monsters vs. Aliens                                                                       |
+|   XX   | 80-084444(GE)     | Monsters vs. Aliens                                                                       |
 |        | 80-084445(FR)     | Monsters vs. Aliens                                                                       |
 |  SOON  | 80-084447(SP)     | Monstruos contra Alienígenas                                                              |
 +========+===================+===========================================================================================+
@@ -536,6 +536,21 @@ Language:
 		</part>
 	</software>
 
+	<software name="monvsalienmg" supported="no" cloneof="monvsalienm">
+		<description>DreamWorks Monsters vs. Aliens (Germany)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084444(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-6" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084444 - Monsters vs Aliens (GER) (Motion).bin" size="8388608" crc="25760320" sha1="6cddb7a2b733b366609e33e1ebec3385e10a834e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mypuppymnl" supported="no">
 		<description>Mijn Puppy! (Netherlands)</description>
 		<year>200?</year>
@@ -780,6 +795,21 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x0800000">
 				<rom name="vsmile84080-2.bin" size="0x0800000" crc="63b0ae95" sha1="0ae362c743e690175d07b61822f897fc16094eb9" offset="0x0000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallemg" cloneof="wallem" supported="no">
+		<description>Disney/Pixar Wall-E (Germany)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084084(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="80-084084 - Wall-E (Ger) (Motion).bin" size="0x0800000" crc="038dd57c" sha1="698bbe384d9019217b58efefe927262e40d34e1b" offset="0x0000000" />
 			</dataarea>
 		</part>
 	</software>
