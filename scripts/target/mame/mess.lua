@@ -3073,6 +3073,7 @@ files {
 	MAME_DIR .. "src/mame/includes/saitek_stratos.h",
 	MAME_DIR .. "src/mame/drivers/saitek_stratos.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_corona.cpp", -- subdriver of saitek_stratos
+	MAME_DIR .. "src/mame/drivers/saitek_superstar.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "samcoupe")
