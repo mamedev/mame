@@ -101,6 +101,8 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/okim6376.h"
+#include "speaker.h"
 
 class maygayew_state : public driver_device
 {
@@ -136,6 +138,9 @@ void maygayew_state::maygayew(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 8000000); // MC68306FC16 - standard 68000 core + peripherals
 	m_maincpu->set_addrmap(AS_PROGRAM, &maygayew_state::maygayew_map);
+
+	SPEAKER(config, "mono").front_center();
+	OKIM6650(config, "snd", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 ROM_START( mg_gbr )
@@ -383,6 +388,9 @@ ROM_START( mg_ewg )
 	ROM_LOAD16_BYTE( "sa6-283.u2", 0x00000, 0x020000, CRC(49b59728) SHA1(b9728e63a5453b66469af2457e258761dbc21927) )
 	ROM_LOAD16_BYTE( "sa6-284.u1", 0x00001, 0x020000, CRC(bd16cd1e) SHA1(fcb9314f83d60d84ed4ff17d2c02c29f20e15fdf) )
 	ROM_LOAD16_BYTE( "sa6-284.u2", 0x00000, 0x020000, CRC(fc40c076) SHA1(825fec1f768fd2442a5de89d627609f3b133dc5b) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd.u3", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
 ROM_START( mg_jv )
@@ -397,6 +405,9 @@ ROM_START( mg_jv )
 	ROM_LOAD16_BYTE( "sa6-610.u2", 0x0000, 0x020000, CRC(bb3cbd6f) SHA1(1642712bc3afbf9675639280667d27a74833863d) )
 	ROM_LOAD16_BYTE( "sa6-611.u1", 0x0000, 0x020000, CRC(c65af93d) SHA1(bd4a83d3405be39fb61d8d5b59e19c40b81a841f) )
 	ROM_LOAD16_BYTE( "sa6-611.u2", 0x0000, 0x020000, CRC(c75a0135) SHA1(bb4aba84894d95458720f26703622622efbffb7d) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd.u3", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
 ROM_START( mg_kf )
@@ -407,6 +418,9 @@ ROM_START( mg_kf )
 	ROM_REGION( 0x1000000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "sw6-100.u27", 0x0000, 0x020000, CRC(ea5b6583) SHA1(70f1fd73d6e422cf0e9d39c8fcd9650085801953) )
 	ROM_LOAD16_BYTE( "sw6-100.u28", 0x0000, 0x020000, CRC(a90f949b) SHA1(4d8d92e78da69628b12e418e61a073f17d97ed8a) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd.u3", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
 
@@ -420,6 +434,9 @@ ROM_START( mg_pbw )
 	ROM_LOAD16_BYTE( "sw8-149.u28", 0x00001, 0x020000, CRC(0a9f0fd6) SHA1(7841cbb4997e0f244164072790b8936d49910879) )
 	ROM_LOAD16_BYTE( "pwizu27", 0x00000, 0x080000, CRC(84af9df8) SHA1(f31fd5721cac97f17476fb71bb0071ad6c44091b) )
 	ROM_LOAD16_BYTE( "pwizu28", 0x00001, 0x080000, CRC(ba00fecd) SHA1(9e78626b2f611ecd3b62fa5035041b231d53c26f) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd.u3", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
 
@@ -433,6 +450,9 @@ ROM_START( mg_scl )
 	ROM_LOAD16_BYTE( "sw8-153.u28", 0x00001, 0x020000, CRC(8afd96f1) SHA1(db3b4ef58c293cddddefeed9e3ba8b936d682dc4) )
 	ROM_LOAD16_BYTE( "sclue.u27", 0x00000, 0x080000, CRC(1296124a) SHA1(502de898fee639fa7917a607ce451bc3a3374c5b) )
 	ROM_LOAD16_BYTE( "sclue.u28", 0x00001, 0x080000, CRC(1330b949) SHA1(11736865f7524a1de7da235d85c4aafd7199ed62) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd.u3", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
 // complete(?) dump
