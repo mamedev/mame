@@ -1413,7 +1413,7 @@ ROM_END
 
 ROM_START( at )
 	ROM_REGION(0x20000,"bios", 0)
-	// 0: BIOS-String: ENET-1107-040990-K0
+	// 0: BIOS-String: ENET-1107-040990-K0 
 	ROM_SYSTEM_BIOS(0, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "ami211.bin",     0x10000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(0))
 	// 1: BIOS-String: D286-0011-110387
@@ -1424,29 +1424,29 @@ ROM_START( at )
 	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1")  /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
 	ROMX_LOAD( "amic206.bin",    0x10000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(2) )
 	//3: BIOS-String: ENET-1230-043089-K0
-	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1")
+	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1") /* (Motherboard Manufacturer: Unknown.) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 30-04-1989) */
 	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(3) )
-	// 4: Quadtel Enhanced 286 BIOS Version 3.04.02
-	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* Quadtel Enhanced 286 Bios Version 3.04.02 */
+	// 4: Quadtel Enhanced 286 BIOS Version 3.04.02 - Headland HT101, HT102
+	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* (Quadtel Enhanced 286 Bios Version 3.04.02) (BIOS release date:: 09/11/1989) */ 
 	ROMX_LOAD( "amiht-h.bin",   0x10001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "amiht-l.bin",   0x10000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(4) )
 	// 5: BIOS-String: DH12-1211-061390-K0
-	ROM_SYSTEM_BIOS(5, "ami121", "AMI HT 12.1")
+	ROM_SYSTEM_BIOS(5, "ami121", "AMI HT 12.1") /* (BIOS release date:: 13-06-1990) */
 	ROMX_LOAD( "ami2od86.bin",  0x10001, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "ami2ev86.bin",  0x10000, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(5) )
 	// 6: BIOS-String: DH12-1120-061390-K0
-	ROM_SYSTEM_BIOS(6, "ami122", "AMI HT 12.2")
+	ROM_SYSTEM_BIOS(6, "ami122", "AMI HT 12.2") /* (BIOS release date:: 13-06-1990) */
 	ROMX_LOAD( "ami2od89.bin",  0x10001, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(6) )
 	ROMX_LOAD( "ami2ev89.bin",  0x10000, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(6) )
 	// 7: BIOS-String: DH12-1112-061390-K0
 	ROM_SYSTEM_BIOS(7, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
 	ROMX_LOAD( "ht12h.bin",     0x10001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(7) )
 	ROMX_LOAD( "ht12l.bin",     0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(7) )
-	// 8
+	// 8: (BIOS release date:: 07-07-1991)
 	ROM_SYSTEM_BIOS(8, "ami181", "AMI HT 18.1") /* not a bad dump, sets unknown probably chipset related registers at 0x1e8 before failing post */
 	ROMX_LOAD( "ht18.bin",     0x10000, 0x10000, CRC(f65a6f9a) SHA1(7dfdf7d243f9f645165dc009c5097dd515f86fbb), ROM_BIOS(8) )
-	// 9
+	// 9: (BIOS release date:: 07-07-1991)
 	ROM_SYSTEM_BIOS(9, "amiht21", "AMI HT 21.1") /* as above */
 	ROMX_LOAD( "ht21e.bin",    0x10000, 0x10000, CRC(e80f7fed) SHA1(62d958d98c95e9e4d1b290a6c1054ae98770f276), ROM_BIOS(9) )
 	// 10: BIOS-String: D286-1430-040990-K0
@@ -1454,101 +1454,101 @@ ROM_START( at )
 	ROMX_LOAD( "poisk-h.bin",   0x10001, 0x8000, CRC(83fd3f8c) SHA1(ca94850bbd949b97b11710629886b0ee69489a81),ROM_SKIP(1) | ROM_BIOS(10) )
 	ROMX_LOAD( "poisk-l.bin",   0x10000, 0x8000, CRC(0b2ed291) SHA1(bb51a3f317cf4d429a6cfb44a46ca0ac39d9aaa7),ROM_SKIP(1) | ROM_BIOS(10) )
 	// 11: Award 286 Modular BIOS Version 3.11 - WINBOND
-	ROM_SYSTEM_BIOS(11, "aw201", "Award 201")
+	ROM_SYSTEM_BIOS(11, "aw201", "Award 201") /* (BIOS release date:: 21-11-1990) */
 	ROMX_LOAD( "83201-5h.bin",  0x10001, 0x8000, CRC(968d1fc0) SHA1(dc4122a6c696f0b43e7894dc1b669346eed755d5),ROM_SKIP(1) | ROM_BIOS(11) )
 	ROMX_LOAD( "83201-5l.bin",  0x10000, 0x8000, CRC(bf50a89a) SHA1(2349a1db6017a7fb0673e99d3680c8753407be8d),ROM_SKIP(1) | ROM_BIOS(11) )
 	// 12: Award 286 Modular BIOS V3.03 NFS 11/10/87" - T.M.C
-	ROM_SYSTEM_BIOS(12, "aw303", "Award 303 NFS")
+	ROM_SYSTEM_BIOS(12, "aw303", "Award 303 NFS") /* (BIOS release date:: 15-11-1985) */
 	ROMX_LOAD( "aw303-hi.bin",  0x18001, 0x4000, CRC(78f32d7e) SHA1(1c88398fb171b33b7e6191bad63704ae85bfed8b), ROM_SKIP(1) | ROM_BIOS(12) )
 	ROMX_LOAD( "aw303-lo.bin",  0x18000, 0x4000, CRC(3d2a70c0) SHA1(1329113bec514ed2a6d803067b1132744ef534dd), ROM_SKIP(1) | ROM_BIOS(12) )
 	// 13: Award 286 Modular BIOS Version 3.03GS
-	ROM_SYSTEM_BIOS(13, "aw303gs", "Award 303GS")
+	ROM_SYSTEM_BIOS(13, "aw303gs", "Award 303GS") /* (BIOS release date:: 15-11-1985) */
 	ROMX_LOAD( "aw303gs-hi.bin",  0x18001, 0x4000, CRC(82392e18) SHA1(042453b7b29933a1b72301d21fcf8fa6b293c9c9), ROM_SKIP(1) | ROM_BIOS(13) )
 	ROMX_LOAD( "aw303gs-lo.bin",  0x18000, 0x4000, CRC(a4cf8ba1) SHA1(b73e34be3b2754aaed1ac06471f4441fea06c67c), ROM_SKIP(1) | ROM_BIOS(13) )
 	// 14: BIOS-String: D286-6069-040990-K0
-	ROM_SYSTEM_BIOS(14, "ami_200960", "AMI 200960")
+	ROM_SYSTEM_BIOS(14, "ami_200960", "AMI 200960") /* (BIOS release date:: 09-04-1990 */
 	ROMX_LOAD( "ami_286_bios_sn200960_even.bin", 0x10000, 0x8000, CRC(67745815) SHA1(ca6886c7a0716a92a8720fc71ff2d95328c467a5), ROM_SKIP(1) | ROM_BIOS(14) )
 	ROMX_LOAD( "ami_286_bios_sn200960_odd.bin", 0x10001, 0x8000, CRC(360a5f73) SHA1(1b1980fd99779d0cdc4764928a641e081b35ee9f), ROM_SKIP(1) | ROM_BIOS(14) )
 	// 15: Award 286 Modular BIOS Version 3.03 - GCH
-	ROM_SYSTEM_BIOS(15, "ev1815303", "Everex EV-1815 V3.03")
+	ROM_SYSTEM_BIOS(15, "ev1815303", "Everex EV-1815 V3.03")  /* (BIOS release date:: 15-11-1985) */
 	ROMX_LOAD( "award_v3.03_ev1815_even.bin", 0x18000, 0x4000, CRC(dd64bdd6) SHA1(b3108b692d2aa03701ac894602e9418ae0779702), ROM_SKIP(1) | ROM_BIOS(15) )
 	ROMX_LOAD( "award_v3.03_ev1815_odd.bin", 0x18001, 0x4000, CRC(29f023fb) SHA1(873561bb7087483c0c763ef9cd32c1adf0f7cb5e), ROM_SKIP(1) | ROM_BIOS(15) )
-	// 16: Award 286 Modular BIOS Version 3.03GS
-	ROM_SYSTEM_BIOS(16, "ev1815303gs", "Everex EV-1815 V3.03GS")
+	// 16: Award 286 Modular BIOS Version 3.03GS 
+	ROM_SYSTEM_BIOS(16, "ev1815303gs", "Everex EV-1815 V3.03GS") /* (BIOS release date:: 15-11-1985) */
 	ROMX_LOAD( "award_v3.03gs_ev1815_even.bin", 0x10000, 0x8000, CRC(59489ec2) SHA1(b3c13ba53d4c4ee75a15703236a748121102ce84), ROM_SKIP(1) | ROM_BIOS(16) )
 	ROMX_LOAD( "award_v3.03gs_ev1815_odd.bin", 0x10001, 0x8000, CRC(5bcd9421) SHA1(f32e5a39da593c6982f964fb05b0802d54c3de45), ROM_SKIP(1) | ROM_BIOS(16) )
 	// 17: BIOS-String: DVL2-1160-040990-K0
-	ROM_SYSTEM_BIOS(17, "dvl2", "DVL2")
+	ROM_SYSTEM_BIOS(17, "dvl2", "DVL2") /* (BIOS release date:: 09-04-1990) */
 	ROMX_LOAD( "ami_dvl2-1160-040990-k8_even.bin", 0x10000, 0x8000, CRC(86093016) SHA1(f60b2679c8c23a34bdd64f25d83cb5a5a337bd57), ROM_SKIP(1) | ROM_BIOS(17) )
 	ROMX_LOAD( "ami_dvl2-1160-040990-k8_odd.bin", 0x10001, 0x8000, CRC(4e1c944a) SHA1(0763a0a1002baced071fea301f627d2e550878b8), ROM_SKIP(1) | ROM_BIOS(17) )
 	// 18: DTK 286 BIOS Ver 3.18 07/01/88
-	ROM_SYSTEM_BIOS(18, "dtk318", "DTK v3.18")
+	ROM_SYSTEM_BIOS(18, "dtk318", "DTK v3.18") /* (BIOS release date:: 11-03-1986) */
 	ROMX_LOAD( "dtk_286_bios_ver3.18.bin", 0x18000, 0x8000, CRC(b4b8b59a) SHA1(73c12222f5003fdc8bbfee178b20c8dda2fe5cb4), ROM_BIOS(18) )
 	// 19: BIOS-String: D286-6061-040990-K0
-	ROM_SYSTEM_BIOS(19, "d286-k0", "AMI D286-K0")
+	ROM_SYSTEM_BIOS(19, "d286-k0", "AMI D286-K0") /* (BIOS release date:: 09-04-1990) */
 	ROMX_LOAD( "ami_d286-6061-040990-k0.bin", 0x10000, 0x10000, CRC(1679c1b5) SHA1(9d95da3b40c5f13d096823f383aba099b3a77183), ROM_BIOS(19) )
 	// 20: BIOS-String: S286-1169-030389-K0 for ACHIEVE MICROSYSTEMS
-	ROM_SYSTEM_BIOS(20, "s286-k0", "Achieve S286-K0")
+	ROM_SYSTEM_BIOS(20, "s286-k0", "Achieve S286-K0") /* (BIOS release date:: 03-03-1989) */
 	ROMX_LOAD( "ach_s286-1169-030389-k0_ev.bin", 0x10000, 0x8000, CRC(58f1f29c) SHA1(42f5189d12b75fad5e53ff472b4603c6fcbd46cd), ROM_SKIP(1) | ROM_BIOS(20) )
 	ROMX_LOAD( "ach_s286-1169-030389-k0_od.bin", 0x10001, 0x8000, CRC(84bfc180) SHA1(2daa51b09c449712c9a737793b83754951e53a41), ROM_SKIP(1) | ROM_BIOS(20) )
 	// 21: Award BIOS Version 3.01B
-	ROM_SYSTEM_BIOS(21, "awa301b", "Award BIOS Version 3.01B")
+	ROM_SYSTEM_BIOS(21, "awa301b", "Award BIOS Version 3.01B") /* (BIOS release date:: 01-01-1988) */
 	ROMX_LOAD( "aw286lo.rom", 0x18000, 0x4000, CRC(5afbb4a2) SHA1(513fd75d90720820484fdd280e4a6c22a0ef238c), ROM_SKIP(1) | ROM_BIOS(21) )
 	ROMX_LOAD( "aw286hi.rom", 0x18001, 0x4000, CRC(b2551251) SHA1(0c8bd12a3d54ae6d2ad0210b9ca4deca94be10ed), ROM_SKIP(1) | ROM_BIOS(21) )
-	// 22
-	ROM_SYSTEM_BIOS(22, "awa286", "awa286") // no screen display
+	// 22: no screen display
+	ROM_SYSTEM_BIOS(22, "awa286", "awa286") /* (BIOS release date:: 21-11-1990) */
 	ROMX_LOAD( "awd286lo.rom", 0x18000, 0x4000, CRC(d1a9c01f) SHA1(9123c6f76d85725036a0f8b9c6480142abea478f), ROM_SKIP(1) | ROM_BIOS(22) )
 	ROMX_LOAD( "awd286hi.rom", 0x18001, 0x4000, CRC(b0bde4cc) SHA1(9c3fd2c0f69dde905d4e8f3be421374ef99682df), ROM_SKIP(1) | ROM_BIOS(22) )
-	// 23: DTK 286 BIOS Ver. 3.01 07/24/87
-	ROM_SYSTEM_BIOS(23, "dtk286", "dtk286") // no screen display
+	// 23: DTK 286 BIOS Ver. 3.01 07/24/87 - no screen display
+	ROM_SYSTEM_BIOS(23, "dtk286", "dtk286") /* (BIOS release date:: 11-03-1986) */ 
 	ROMX_LOAD( "dtk286lo.rom", 0x18000, 0x4000, CRC(dfc70856) SHA1(39158e6ed50236d371277631e77d06f77fb0531e), ROM_SKIP(1) | ROM_BIOS(23) )
 	ROMX_LOAD( "dtk286hi.rom", 0x18001, 0x4000, CRC(a98fc743) SHA1(fb9e330148cb5584f61c1febea71c53b6f9d61b7), ROM_SKIP(1) | ROM_BIOS(23) )
 	// 24: Phoenix 80286 ROM BIOS Version 3.07 (R04)
-	ROM_SYSTEM_BIOS(24, "mitph307", "Mitac Phoenix v3.07")
+	ROM_SYSTEM_BIOS(24, "mitph307", "Mitac Phoenix v3.07") /* (BIOS release date:: 30-07-1987) */
 	ROMX_LOAD( "mitac_phoenix_v3.07_even.bin", 0x10000, 0x8000, CRC(1c4becc9) SHA1(bfdea3f2a248312ed8cf4765a1a7dc1a2f7cecd8), ROM_SKIP(1) | ROM_BIOS(24) )
 	ROMX_LOAD( "mitac_phoenix_v3.07_odd.bin", 0x10001, 0x8000, CRC(3ee16ed1) SHA1(b77e18e10e9187a01cb55c05b2a6e5311981ab56), ROM_SKIP(1) | ROM_BIOS(24) )
 	// 25: BIOS-String: Pyramid Software Development Personal Computer AT Bios Version 2.14
-	ROM_SYSTEM_BIOS(25, "precise", "Precise")
+	ROM_SYSTEM_BIOS(25, "precise", "Precise")  /* (no regular BIOS release date) */
 	ROMX_LOAD( "precise 860407_low.bin", 0x10000, 0x8000, CRC(d839c074) SHA1(473ca7b42914ce12f2d6c91afb0b2c2e65194489), ROM_SKIP(1) | ROM_BIOS(25) )
 	ROMX_LOAD( "precise 860407_high.bin", 0x10001, 0x8000, CRC(b5e13c54) SHA1(07f5806fb53d0cb7ef7b54312fd6aa163d58b9a5), ROM_SKIP(1) | ROM_BIOS(25) )
 	// ROM_LOAD( "precise_860407_keyboard_mcu.bin", 0x0000, 0x800, CRC(d1faad5c) SHA1(cb315a3da632c969012c298bb8e1cf8883b70501))
-	// Access Methods Inc. for Flying Triumph (AMI before they became American Megatrends) - BIOS String: Ref. no. 1406-061296
+	// 26:  Access Methods Inc. for Flying Triumph (AMI before they became American Megatrends) - BIOS String: Ref. no. 1406-061296
 	// complains about "Channel-2 timer not funcional but boots
-	ROM_SYSTEM_BIOS(26, "ami_ft", "AMI Flying Triumph")
+	ROM_SYSTEM_BIOS(26, "ami_ft", "AMI Flying Triumph") /* (BIOS release date:: 12-06-1986) */
 	ROMX_LOAD( "286_access_methods_rom2_32k.bin", 0x10000, 0x8000, CRC(749c65af) SHA1(7c6e9e217afe020b7b36785549fdbfb89de8f872), ROM_SKIP(1) | ROM_BIOS(26) )
 	ROMX_LOAD( "286_access_methods_rom4_32k.bin", 0x10001, 0x8000, CRC(0f15581a) SHA1(2a22635f30388ca371f0f1f31652cfa647bb322d), ROM_SKIP(1) | ROM_BIOS(26) )
-	// BIOS ROMs are marked TCI, Award 286 Modular BIOS Version 3.03HLS
+	// 27: BIOS ROMs are marked TCI, Award 286 Modular BIOS Version 3.03HLS
 	// complains about "refresh timing error, but works
-	ROM_SYSTEM_BIOS(27, "tci_suntac", "tci_suntac")
+	ROM_SYSTEM_BIOS(27, "tci_suntac", "tci_suntac") /* (BIOS release date:: 15-11-1985) */
 	ROMX_LOAD( "suntac_80286_lo.bin", 0x18000, 0x4000, CRC(f7bf6c49) SHA1(d8e813c264008f096006f46b90769c0927e44da9), ROM_SKIP(1) | ROM_BIOS(27) )
 	ROMX_LOAD( "suntac_80286_hi.bin", 0x18001, 0x4000, CRC(5f382e78) SHA1(8ba222df9d7028513e37978598d8139906e8834c), ROM_SKIP(1) | ROM_BIOS(27) )
 	// 28: 286 board with Headland GC101A-PC; GC102-PC chipset and Phoenix BIOS 2493119, ISA8: 2, ISA16: 5
-	ROM_SYSTEM_BIOS(28, "head_ph_1", "Headland/Phoenix #1") // Phoenix 80286 ROM BIOS PLUS Version 3.10.21
+	ROM_SYSTEM_BIOS(28, "head_ph_1", "Headland/Phoenix #1") // Phoenix 80286 ROM BIOS PLUS Version 3.10.21 ((BIOS release date:: 15-01-1988)
 	ROMX_LOAD( "286-headland-lo_32k.bin", 0x10000, 0x8000, CRC(21b68bed) SHA1(1e4acda50b12ad463c169ba615805f5dcf257b18), ROM_SKIP(1) | ROM_BIOS(28) )
 	ROMX_LOAD( "286-headland-hi_32k.bin", 0x10001, 0x8000, CRC(04c8ab12) SHA1(b46c14528aca15464e4050b423c2f621a4313a85), ROM_SKIP(1) | ROM_BIOS(28) )
 	// 29: 286 board with Headland Headland HT12/A chipset, one ROM market IQS, Phoenix BIOS 3479808 - ISA8: 1, ISA16: 6
-	ROM_SYSTEM_BIOS(29, "head_ph_2", "Headland/Phoenix #2") // Phoenix BIOS A286 Version 1.01 - BIOS ID JLI01101 - IT9109 - Reference ID 01
+	ROM_SYSTEM_BIOS(29, "head_ph_2", "Headland/Phoenix #2") // Phoenix BIOS A286 Version 1.01 - BIOS ID JLI01101 - IT9109 - Reference ID 01 - (BIOS release date:: 19-04-1990)
 	ROMX_LOAD( "286-headland-iqs-lo_32k.bin", 0x10000, 0x8000, CRC(60424e9d) SHA1(aa813bf48939fe7fcbbfec3133e702bfdff6234e), ROM_SKIP(1) | ROM_BIOS(29) )
 	ROMX_LOAD( "286-headland-iqs-hi_32k.bin", 0x10001, 0x8000, CRC(e56212e0) SHA1(2441845d632d19adc0592e094beb5ec1fbe074f6), ROM_SKIP(1) | ROM_BIOS(29) )
 	// 30: MS-0010-2 - Phoenix ROM BIOS Version 3.06 
-	ROM_SYSTEM_BIOS(30, "ms-0010-2", "MS-0010-2") // ISA8: 3, ISA16: 5
+	ROM_SYSTEM_BIOS(30, "ms-0010-2", "MS-0010-2") /* (BIOS release date:: 19-01-1987) (ISA8: 3, ISA16: 5) */
 	ROMX_LOAD( "286-ms0010-2-lo_32k.bin", 0x10000, 0x8000, CRC(2c381474) SHA1(94b9825d412ea39d67857102a0375852b349fcd6), ROM_SKIP(1) | ROM_BIOS(30) )
 	ROMX_LOAD( "286-ms0010-2-hi_32k.bin", 0x10001, 0x8000, CRC(4fdb8c64) SHA1(c2e7f88f0ac97ee5eed0c97864b7f1810e99ea26), ROM_SKIP(1) | ROM_BIOS(30) )
 	// 31: MG Products (Japanese) - Chipset: VLSI VL82C102A; VLSI VL82C101B; VLSI VL82C104; VLSI VL82C103A; VLSI VL82C100; (VLSI 8908BT; 8906BT; 8852BT; 8907BT; 8906BT)
 	// BIOS: AMI 286 BIOS+ - BIOS-String: D286-9987-092588-K0 - ISA8: 2, ISA16: 8
-	ROM_SYSTEM_BIOS(31, "286vlsij", "Japanese 286 VLSI") // ISA8: 3, ISA16: 5
+	ROM_SYSTEM_BIOS(31, "286vlsij", "Japanese 286 VLSI") /* (BIOS release date:: 25-09-1988) (ISA8: 3, ISA16: 5) */
 	ROMX_LOAD( "286-vlsi_japan-2-even_32k.bin", 0x10000, 0x8000, CRC(e3e64cbc) SHA1(5259e3c8686f2239a5fb0dc38aa80380ef9ec5fa), ROM_SKIP(1) | ROM_BIOS(31) )
 	ROMX_LOAD( "286-vlsi_japan-2-odd_32k.bin", 0x10001, 0x8000, CRC(aa533f39) SHA1(d88c7d4029a283b94b99e2017d29fbf9eb9105b1), ROM_SKIP(1) | ROM_BIOS(31) )
 	// 32: CMP enterprise CO.LTD. Phoenix 80286 ROM BIOS Version 3.00
-	ROM_SYSTEM_BIOS(32, "cmpa286", "CPM A286") // ISA8: 2, ISA16: 6 - Chipset Acer (ALi) M1207-12
+	ROM_SYSTEM_BIOS(32, "cmpa286", "CPM A286") /* (Chipset Acer (ALi) M1207-12) (BIOS release date:: 01-09-1986) (ISA8: 2, ISA16: 6) */ 
 	ROMX_LOAD( "286-a286-even_16k.bin", 0x18000, 0x4000, CRC(30809487) SHA1(413de43ca7e1930cdf3c006718d8baf743a9ff1e), ROM_SKIP(1) | ROM_BIOS(32) )
 	ROMX_LOAD( "286-a286-odd_16k.bin", 0x18001, 0x4000, CRC(3a11aacf) SHA1(23185531ae10912b974048d3607b563e55d3fa96), ROM_SKIP(1) | ROM_BIOS(32) )
 	// 33: AL-6410 (found online, no markings on the board itself), Chipset: Chips P82A204, P82A203, P82A205, P82C201, P82C202
-	ROM_SYSTEM_BIOS(33, "al6410", "AL-6410") // BIOS-String: D286-1103-110387-K0 - ISA8: 2, ISA16: 6
-	ROMX_LOAD( "al-6410_ami_bios_low.bin", 0x10000, 0x8000, CRC(50c4e121) SHA1(5f9c27aabdc6bb810e90bced2053b7c21c4994dd), ROM_SKIP(1) | ROM_BIOS(33) )
+	ROM_SYSTEM_BIOS(33, "al6410", "AL-6410") /* (BIOS-String: D286-1103-110387-K0) (BIOS release date:: 03-11-1987) (ISA8: 2, ISA16: 6) */ 
+	ROMX_LOAD( "al-6410_ami_bios_low.bin", 0x10000, 0x8000, CRC(50c4e121) SHA1(5f9c27aabdc6bb810e90bced2053b7c21c4994dd), ROM_SKIP(1) |  ROM_BIOS(33) )
 	ROMX_LOAD( "al-6410_ami_bios_high.bin", 0x10001, 0x8000, CRC(a44be083) SHA1(99f73d7ceb315eb3770c94d90228f8859cadc610), ROM_SKIP(1) | ROM_BIOS(33) )		
 	// 34: AT SYSTEM 6M/8M/10M - Chipset: Chips P82A205; P82C201; P82A203; P82A204
-	ROM_SYSTEM_BIOS(34, "at6m8m10m", "AT SYSTEM 6M/8M/10M") 
+	ROM_SYSTEM_BIOS(34, "at6m8m10m", "AT SYSTEM 6M/8M/10M") /* (BIOS release date:: 04-02-1987) */
 	ROMX_LOAD( "286-at system 6m8m10m-l_32k.bin", 0x10000, 0x8000, CRC(37e0e1c1) SHA1(f5cd17658554a73bb86c5c8e630dac3e34b38e51), ROM_SKIP(1) | ROM_BIOS(34) )
 	ROMX_LOAD( "286-at system 6m8m10m-r_32k.bin", 0x10001, 0x8000, CRC(c672efff) SHA1(7224bb6b4d25ef34bc0aa9d7c450baf9b47fd917), ROM_SKIP(1) | ROM_BIOS(34) )
 ROM_END
