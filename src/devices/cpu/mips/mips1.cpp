@@ -1335,6 +1335,8 @@ void mips1_device_base::handle_cop1(u32 const op)
 	if (!m_fcr0)
 		return;
 
+	softfloat_exceptionFlags = 0;
+
 	switch (op >> 26)
 	{
 	case 0x11: // COP1
