@@ -303,13 +303,13 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	const int maxstate = 3;
 	int str = machine().options().seconds_to_run();
 	bool show_gameinfo = !machine().options().skip_gameinfo();
-	bool show_warnings = true;
+	bool show_warnings = true, show_mandatory_fileman = true;
 	bool video_none = strcmp(downcast<osd_options &>(machine().options()).video(), "none") == 0;
 
 	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
 	// or if we are debugging, or if there's no mame window to send inputs to
 	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 || video_none)
-		show_gameinfo = show_warnings = false;
+		show_gameinfo = show_warnings = show_mandatory_fileman = false;
 
 #if defined(EMSCRIPTEN)
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
@@ -347,7 +347,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 		case 2:
 			std::vector<std::reference_wrapper<const std::string>> mandatory_images = mame_machine_manager::instance()->missing_mandatory_images();
-			if (!mandatory_images.empty())
+			if (!mandatory_images.empty() && show_mandatory_fileman)
 			{
 				std::ostringstream warning;
 				warning << _("This driver requires images to be loaded in the following device(s): ");
