@@ -294,24 +294,12 @@ void v25_common_device::nec_trap()
 	nec_interrupt(NEC_TRAP_VECTOR, BRK);
 }
 
-#define INTERRUPT(source, vector, priority) \
-	if(pending & (source)) {                \
-		m_IRQS = vector;               \
-		m_ISPR |= (1 << (priority));   \
-		m_pending_irq &= ~(source);    \
-		if(m_bankswitch_irq & (source))    \
-			nec_bankswitch(priority);    \
-		else                                    \
-			nec_interrupt(vector, source);   \
-		break;  /* break out of loop */ \
-	}
-
-/* interrupt sources subject to priority control */
-#define SOURCES (INTTU0 | INTTU1 | INTTU2 | INTD0 | INTD1 | INTP0 | INTP1 | INTP2 \
-				| INTSER0 | INTSR0 | INTST0 | INTSER1 | INTSR1 | INTST1 | INTTB)
-
 void v25_common_device::external_int()
 {
+	// interrupt sources subject to priority control
+	constexpr uint32_t SOURCES = INTTU0 | INTTU1 | INTTU2 | INTD0 | INTD1 | INTP0 | INTP1 | INTP2
+				| INTSER0 | INTSR0 | INTST0 | INTSER1 | INTSR1 | INTST1 | INTTB;
+
 	int pending = m_pending_irq & m_unmasked_irq;
 
 	if (pending & NMI_IRQ)
@@ -321,46 +309,149 @@ void v25_common_device::external_int()
 	}
 	else if (pending & SOURCES)
 	{
-		for(int i = 0; i < 8; i++)
+		int i = -1;
+		uint32_t source = 0;
+		uint8_t vector = 0;
+		uint8_t ms = 0;
+		while (++i < 8)
 		{
 			if (m_ISPR & (1 << i)) break;
 
 			if (m_priority_inttu == i)
 			{
-				INTERRUPT(INTTU0, NEC_INTTU0_VECTOR, i)
-				INTERRUPT(INTTU1, NEC_INTTU1_VECTOR, i)
-				INTERRUPT(INTTU2, NEC_INTTU2_VECTOR, i)
+				if (pending & INTTU0)
+				{
+					source = INTTU0;
+					vector = NEC_INTTU0_VECTOR;
+					ms = m_tmms[0];
+					break;
+				}
+				if (pending & INTTU1)
+				{
+					source = INTTU1;
+					vector = NEC_INTTU1_VECTOR;
+					ms = m_tmms[1];
+					break;
+				}
+				if (pending & INTTU2)
+				{
+					source = INTTU2;
+					vector = NEC_INTTU2_VECTOR;
+					ms = m_tmms[2];
+					break;
+				}
 			}
 
 			if (m_priority_intd == i)
 			{
-				INTERRUPT(INTD0, NEC_INTD0_VECTOR, i)
-				INTERRUPT(INTD1, NEC_INTD1_VECTOR, i)
+				if (pending & INTD0)
+				{
+					source = INTD0;
+					vector = NEC_INTD0_VECTOR;
+					break;
+				}
+				if (pending & INTD1)
+				{
+					source = INTD1;
+					vector = NEC_INTD1_VECTOR;
+					break;
+				}
 			}
 
 			if (m_priority_intp == i)
 			{
-				INTERRUPT(INTP0, NEC_INTP0_VECTOR, i)
-				INTERRUPT(INTP1, NEC_INTP1_VECTOR, i)
-				INTERRUPT(INTP2, NEC_INTP2_VECTOR, i)
+				if (pending & INTP0)
+				{
+					source = INTP0;
+					vector = NEC_INTP0_VECTOR;
+					break;
+				}
+				if (pending & INTP1)
+				{
+					source = INTP1;
+					vector = NEC_INTP1_VECTOR;
+					break;
+				}
+				if (pending & INTP2)
+				{
+					source = INTP2;
+					vector = NEC_INTP2_VECTOR;
+					break;
+				}
 			}
 
 			if (m_priority_ints0 == i)
 			{
-				INTERRUPT(INTSER0, NEC_INTSER0_VECTOR, i)
-				INTERRUPT(INTSR0, NEC_INTSR0_VECTOR, i)
-				INTERRUPT(INTST0, NEC_INTST0_VECTOR, i)
+				if (pending & INTSER0)
+				{
+					source = INTSER0;
+					vector = NEC_INTSER0_VECTOR;
+					break;
+				}
+				if (pending & INTSR0)
+				{
+					source = INTSR0;
+					vector = NEC_INTSR0_VECTOR;
+					ms = m_srms[0];
+					break;
+				}
+				if (pending & INTST0)
+				{
+					source = INTST0;
+					vector = NEC_INTST0_VECTOR;
+					ms = m_stms[0];
+					break;
+				}
 			}
 
 			if (m_priority_ints1 == i)
 			{
-				INTERRUPT(INTSER1, NEC_INTSER1_VECTOR, i)
-				INTERRUPT(INTSR1, NEC_INTSR1_VECTOR, i)
-				INTERRUPT(INTST1, NEC_INTST1_VECTOR, i)
+				if (pending & INTSER1)
+				{
+					source = INTSER1;
+					vector = NEC_INTSER1_VECTOR;
+					break;
+				}
+				if (pending & INTSR1)
+				{
+					source = INTSR1;
+					vector = NEC_INTSR1_VECTOR;
+					ms = m_srms[1];
+					break;
+				}
+				if (pending & INTST1)
+				{
+					source = INTST1;
+					vector = NEC_INTST1_VECTOR;
+					ms = m_stms[1];
+					break;
+				}
 			}
 
-			if (i == 7)
-				INTERRUPT(INTTB, NEC_INTTB_VECTOR, 7)
+			if (i == 7 && (pending & INTTB))
+			{
+				source = INTTB;
+				vector = NEC_INTTB_VECTOR;
+				break;
+			}
+		}
+
+		if (source != 0)
+		{
+			m_pending_irq &= ~source;
+			if (m_macro_service & source)
+			{
+				logerror("Unhandled macro service %02x\n", ms);
+			}
+			else
+			{
+				m_IRQS = vector;
+				m_ISPR |= (1 << i);
+				if (m_bankswitch_irq & source)
+					nec_bankswitch(i);
+				else
+					nec_interrupt(vector, source);
+			}
 		}
 	}
 	else if (pending & INT_IRQ)

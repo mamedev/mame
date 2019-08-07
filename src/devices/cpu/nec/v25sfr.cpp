@@ -82,7 +82,8 @@ void v25_common_device::write_irqcontrol(int /*INTSOURCES*/ source, uint8_t d)
 
 	if (BIT(d, 5))
 	{
-		logerror("%06x: Warning: macro service function not implemented\n",PC());
+		if ((m_macro_service & source) == 0)
+			logerror("%06x: Warning: macro service function not implemented\n",PC());
 		m_macro_service |= source;
 	}
 	else
@@ -253,7 +254,7 @@ uint8_t v25_common_device::seic0_r()
 void v25_common_device::seic0_w(uint8_t d)
 {
 	// no macro service for error interrupt
-	write_irqcontrol(INTSER0, d & 0xbf);
+	write_irqcontrol(INTSER0, d & 0xd0);
 	m_priority_ints0 = d & 0x7;
 }
 
@@ -309,7 +310,7 @@ uint8_t v25_common_device::seic1_r()
 void v25_common_device::seic1_w(uint8_t d)
 {
 	// no macro service for error interrupt
-	write_irqcontrol(INTSER1, d & 0xbf);
+	write_irqcontrol(INTSER1, d & 0xd0);
 	m_priority_ints1 = d & 0x7;
 }
 
