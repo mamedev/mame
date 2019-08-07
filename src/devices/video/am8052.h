@@ -33,7 +33,7 @@ protected:
 
 private:
 	// internal state
-	u16 m_pointer;
+	u8 m_pointer;
 };
 
 // device type declarations
