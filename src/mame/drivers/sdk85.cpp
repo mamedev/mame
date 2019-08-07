@@ -194,8 +194,8 @@ ROM_START( sdk85 )
 	ROM_SYSTEM_BIOS(1, "mastermind", "Mastermind")
 	ROMX_LOAD( "mastermind.a14", 0x0000, 0x0800, CRC(36b694ae) SHA1(4d8a5ae5d10e8f72a6e349c7eeaf1aa00c4e45e1), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "empty", "Empty")
-	
 	ROMX_LOAD( "empty.a14", 0x0000, 0x0800, CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e), ROM_BIOS(2) )
+
 	ROM_REGION( 0x800, "expromio", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL( "mastermind.a15", 0x0000, 0x0800, CRC(0538e162) SHA1(c351975e2cf515cee29fcaeb04ef47189afe5250) )
 ROM_END
