@@ -194,6 +194,7 @@ void v25_common_device::device_reset()
 	m_ParityVal = 1;
 	m_pending_irq = 0;
 	m_unmasked_irq = INT_IRQ | NMI_IRQ;
+	m_macro_service = 0;
 	m_bankswitch_irq = 0;
 	m_priority_inttu = 7;
 	m_priority_intd = 7;
@@ -205,9 +206,7 @@ void v25_common_device::device_reset()
 	m_irq_state = 0;
 	m_poll_state = 1;
 	m_mode_state = m_MF = (m_v25v35_decryptiontable) ? 0 : 1;
-	m_intp_state[0] = 0;
-	m_intp_state[1] = 0;
-	m_intp_state[2] = 0;
+	m_intm = 0;
 	m_halted = 0;
 
 	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
@@ -464,6 +463,12 @@ void v25_common_device::device_start()
 	for (i = 0; i < 4; i++)
 		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v25_common_device::v25_timer_callback),this));
 
+	std::fill_n(&m_intp_state[0], 3, 0);
+	std::fill_n(&m_ems[0], 3, 0);
+	std::fill_n(&m_srms[0], 2, 0);
+	std::fill_n(&m_stms[0], 2, 0);
+	std::fill_n(&m_tmms[0], 3, 0);
+
 	save_item(NAME(m_intp_state));
 
 	save_item(NAME(m_ip));
@@ -484,12 +489,17 @@ void v25_common_device::device_start()
 	save_item(NAME(m_ParityVal));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_unmasked_irq));
+	save_item(NAME(m_macro_service));
 	save_item(NAME(m_bankswitch_irq));
 	save_item(NAME(m_priority_inttu));
 	save_item(NAME(m_priority_intd));
 	save_item(NAME(m_priority_intp));
 	save_item(NAME(m_priority_ints0));
 	save_item(NAME(m_priority_ints1));
+	save_item(NAME(m_ems));
+	save_item(NAME(m_srms));
+	save_item(NAME(m_stms));
+	save_item(NAME(m_tmms));
 	save_item(NAME(m_IRQS));
 	save_item(NAME(m_ISPR));
 	save_item(NAME(m_nmi_state));
@@ -497,6 +507,7 @@ void v25_common_device::device_start()
 	save_item(NAME(m_poll_state));
 	save_item(NAME(m_mode_state));
 	save_item(NAME(m_no_interrupt));
+	save_item(NAME(m_intm));
 	save_item(NAME(m_halted));
 	save_item(NAME(m_TM0));
 	save_item(NAME(m_MD0));
