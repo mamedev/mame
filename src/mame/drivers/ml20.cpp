@@ -45,7 +45,6 @@
  Display = Hyundai HC16203-A (Hitachi HD44780A00 based).
 
    Status:
-   - Shows current date and time, then presumably waits for keypad input
    - Needs currently unimplemented V25 features (serial etc.)
 
 ***************************************************************************/
@@ -54,8 +53,10 @@
 #include "cpu/nec/v25.h"
 #include "machine/msm6242.h"
 #include "video/hd44780.h"
+#include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 class ml20_state : public driver_device
 {
@@ -63,7 +64,10 @@ public:
 	ml20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_lcdc(*this, "lcdc")
+		m_lcdc(*this, "lcdc"),
+		m_speaker(*this, "speaker"),
+		m_keys(*this, "COL.%d", 0U),
+		m_dsw(*this, "DSW")
 		{}
 
 	void ml20(machine_config &config);
@@ -72,13 +76,29 @@ public:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
+	void machine_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<v25_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
+	required_device<speaker_sound_device> m_speaker;
+	required_ioport_array<4> m_keys;
+	required_ioport m_dsw;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+
+	uint8_t p0_r();
+	uint8_t p1_r();
+	uint8_t p2_r();
+	void p0_w(uint8_t data);
+	void p1_w(uint8_t data);
+	void p2_w(uint8_t data);
+	uint8_t pt_r();
+
+	uint8_t m_p0;
+	uint8_t m_p1;
+	uint8_t m_p2;
 };
 
 void ml20_state::mem_map(address_map &map)
@@ -95,6 +115,43 @@ void ml20_state::io_map(address_map &map)
 }
 
 static INPUT_PORTS_START( ml20 )
+	PORT_START("COL.0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_NAME("ENTER")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)     PORT_NAME("0")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL)   PORT_NAME("CLEAR")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)     PORT_NAME("ler. MARC")
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("COL.1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_NAME("9")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_NAME("8")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_NAME("7")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_NAME("MENSAJ.")
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("COL.2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_NAME("6")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_NAME("5")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_NAME("4")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_NAME("SALDOS")
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("COL.3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_NAME("3")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_NAME("2")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_NAME("1")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_NAME("ANULAR")
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("DSW")
+	PORT_DIPUNKNOWN(0x01, 0x01)
+	PORT_DIPUNKNOWN(0x02, 0x02)
+	PORT_DIPUNKNOWN(0x04, 0x04)
+	PORT_DIPUNKNOWN(0x08, 0x08)
+	PORT_DIPUNKNOWN(0x10, 0x10)
+	PORT_DIPUNKNOWN(0x20, 0x20)
+	PORT_DIPUNKNOWN(0x40, 0x40)
+	PORT_DIPUNKNOWN(0x80, 0x80)
 INPUT_PORTS_END
 
 void ml20_state::lcd_palette(palette_device &palette) const
@@ -114,11 +171,92 @@ HD44780_PIXEL_UPDATE( ml20_state::lcd_pixel_update )
 		bitmap.pix16(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
 }
 
+// 7654----  unknown (set to input)
+// ----3210  keypad column
+
+uint8_t ml20_state::p0_r()
+{
+	return m_p0;
+}
+
+void ml20_state::p0_w(uint8_t data)
+{
+	if (0)
+		logerror("p0_w: %d %d %d %d  %d %d %d %d\n", BIT(data, 7), BIT(data, 6), BIT(data, 5), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+
+	m_p0 = data;
+}
+
+// 765-----  unknown (set to output)
+// ---43210  unknown (set to input)
+
+uint8_t ml20_state::p1_r()
+{
+	return m_p1;
+}
+
+void ml20_state::p1_w(uint8_t data)
+{
+	if (0)
+		logerror("p1_w: %d %d %d %d  %d %d %d %d\n", BIT(data, 7), BIT(data, 6), BIT(data, 5), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+
+	m_p1 = data;
+}
+
+// 7-------  some kind of heartbeat? led?
+// -6------  unknown (set to output)
+// --543---  unknown (set to input)
+// -----2--  set when waiting for keypad or other data?
+// ------1-  toggles continously
+// -------0  unknown (set to output)
+
+uint8_t ml20_state::p2_r()
+{
+	return m_p2;
+}
+
+void ml20_state::p2_w(uint8_t data)
+{
+	if (0)
+		logerror("p2_w: %d %d %d %d  %d %d %d %d\n", BIT(data, 7), BIT(data, 6), BIT(data, 5), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+
+	m_p2 = data;
+}
+
+uint8_t ml20_state::pt_r()
+{
+	uint8_t data = 0xff;
+
+	if (BIT(m_p0, 0) == 0) data &= m_keys[0]->read();
+	if (BIT(m_p0, 1) == 0) data &= m_keys[1]->read();
+	if (BIT(m_p0, 2) == 0) data &= m_keys[2]->read();
+	if (BIT(m_p0, 3) == 0) data &= m_keys[3]->read();
+
+	return data;
+}
+
+void ml20_state::machine_start()
+{
+	// register for save states
+	save_item(NAME(m_p0));
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p2));
+}
+
 void ml20_state::ml20(machine_config &config)
 {
 	V25(config, m_maincpu, 16_MHz_XTAL / 2); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &ml20_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &ml20_state::io_map);
+	m_maincpu->p0_in_cb().set(FUNC(ml20_state::p0_r));
+	m_maincpu->p0_out_cb().set(FUNC(ml20_state::p0_w));
+	m_maincpu->p1_in_cb().set(FUNC(ml20_state::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(ml20_state::p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(ml20_state::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(ml20_state::p2_w));
+	m_maincpu->pt_in_cb().set(FUNC(ml20_state::pt_r));
+
+	MSM6242(config, "rtc", 32.768_kHz_XTAL);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -135,7 +273,9 @@ void ml20_state::ml20(machine_config &config)
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(ml20_state::lcd_pixel_update), this);
 
-	MSM6242(config, "rtc", 32.768_kHz_XTAL);
+	// sound
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 ROM_START( ml20 )
