@@ -1606,4 +1606,171 @@
 
 	<!-- This ends the Rainbow On Disk archives. -->
 
+  <!-- Start the OS-9 section.
+	The big problem with getting dates on the OS-9 disks is that nearly every L1
+	version of OS-9 shows a copyright date of 1980, and what version you got out
+	of the box from the store could vary quite a bit! In some cases, disks would
+	have a disk label showing a version, then have a smaller sticker below with an
+	updated version number (e.g. disk label says 01.00.00 but the sticker says
+	it's actually 01.01.00) and since Radio Shack didn't advertise the updates
+	it's essentially impossible to know the exact release dates.
+
+	To make matters worse, Radio Shack also released interim updates to OS-9
+	that were only released as part of Radio Shack-released game disks. You
+	could build these into working OS-9 Boot/Master disks using official tools,
+	but they were never officially released by Radio Shack in such a form.
+
+	A guess on release dates would be between 1980-1984 for official
+	released 01.xx.xx versions -->
+
+	<!-- OS-9 Level 1 for CoCo 1/2, also runs on CoCo 3 -->
+	<software name="os9l110">
+		<description>OS-9 Level 1 (Version 01.00.00)</description>
+		<year>198?</year>
+		<publisher>Radio Shack</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9l1v1b.dsk" size="161280" crc="dc8644f7" sha1="9205245b11ecb39bd6ff593e14f0620e55988634"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - OS-9 Master"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9l1v1m.dsk" size="161280" crc="9ed46ba8" sha1="92a27eb08f69e5368ac2735174c07c417e0d243b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="os9l1101">
+		<description>OS-9 Level 1 (Version 01.01.00)</description>
+		<year>198?</year>
+		<publisher>Radio Shack</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9l1v1b.dsk" size="161280" crc="dc8644f7" sha1="9205245b11ecb39bd6ff593e14f0620e55988634"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - OS-9 Master"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9l1v1m.dsk" size="161280" crc="735e66c9" sha1="899783d197110e045260dd3bd79143026e93fc9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="os9l120">
+		<description>OS-9 Level 1 (Version 02.00.00)</description>
+		<year>198?</year>
+		<publisher>Radio Shack</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9l1v2b.dsk" size="161280" crc="302f897c" sha1="64a11f11b350ee46ce71d5734cb054a8ae8d0cdd"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - OS-9 Master"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9l1v2m.dsk" size="161280" crc="5528f5a2" sha1="521740e7a00eefb4b92a6c803391df31c004fdf9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="os9l1201">
+		<description>OS-9 Level 1 (Version 02.01.00 'Phoenix' Release)</description>
+		<year>2002</year>
+		<publisher>None</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This is a community modified version of OS-9 Level 1. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9-l1v201b.dsk" size="161280" crc="a3c947c1" sha1="0ade5dec3cdc0f34654e5ebfc779fb41c2a92737"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - OS-9 Master"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9-l1v201m.dsk" size="161280" crc="60da53f4" sha1="7019d3b476a3f944a6dab77c7c4c8e1d67b18863"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- OS-9 Level 2 for CoCo 3 -->
+	<software name="os9l2v2">
+		<description>OS-9 Level 2 (Version 02.00.01)</description>
+		<year>1986</year>
+		<publisher>Radio Shack</publisher>
+		<sharedfeat name="compatibility" value="COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9-l2v201b.dsk" size="161280" crc="deb68619" sha1="b87f9518c4f1cd601bf3ec65a0913fa8114b094c"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - OS-9 Master"/>
+			<dataarea name="flop" size="161280">
+				<rom name="os9-l2v201m.dsk" size="161280" crc="a14b5c49" sha1="6b8208b9e072acd1f8de687150af0a8b758bb924"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- End OS-9 section -->
+
+	<software name="mw16lpic">
+		<description>Micro Works 16-Level Picture Display Utility</description>
+		<year>1987</year>
+		<publisher>Micro Works</publisher>
+		<sharedfeat name="compatibility" value="COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="pixview.dsk" size="161280" crc="3bd423e2" sha1="3614f80dd07f4a83a8e413321eadf1da95ad6568"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c512ktst">
+		<description>512K CoCo 3 Memory Test</description>
+		<year>1987</year>
+		<publisher>Performance Peripherals</publisher>
+		<sharedfeat name="compatibility" value="COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="512ktest.dsk" size="161280" crc="5a7ec53d" sha1="413461495af04add66760cfb82cff3809572906d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfall2">
+		<description>Pitfall II: Lost Caverns</description>
+		<year>1985</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="SRB Software" />
+		<info name="author" value="Steve Bjork" />
+		<info name="serial" value="26-3287" />
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- This game supports the Speech/Sound Cartridge. Suggested config is
+		multi-pak interface, floppy controller in slot 4, SSC in slot 3.
+		Game wants 'red' artifacting (MAME considers this 'normal' artifacting) -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="pitfall ii (1985-10)(tandy)[26-3287].dsk" size="161280" crc="cf499786" sha1="9a17cb240737b13d05f84b396c637729aa4e2f7d"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
