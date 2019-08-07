@@ -893,7 +893,7 @@ void at_state::n8810m55(machine_config &config)
 //  IBM systems
 //**************************************************************************
 ROM_START( ibm5170 )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION(0x20000,"bios", 0) // - IBM 5170, 6 Mhz, one wait state RAM or 8 Mhz, one wait state RAM
 
 	ROM_SYSTEM_BIOS( 0, "rev1", "IBM PC/AT 5170 01/10/84")
 	ROMX_LOAD( "6181028.u27", 0x10000, 0x8000, CRC(f6573f2a) SHA1(3e52cfa6a6a62b4e8576f4fe076c858c220e6c1a), ROM_SKIP(1) | ROM_BIOS(0)) /* T 6181028 8506AAA // TMM23256P-5878 // (C)IBM CORP 1981,-1984 */
@@ -920,25 +920,6 @@ ROM_START( ibm5170 )
 	ROM_LOAD( "55x8041.82s147an.u72", 0x0020, 0x0200, CRC(f2cc4fe6) SHA1(e285468516bd05083155a8a272583deef655315a)) /* S N82S147AN 8709 // V-C55X8041 */
 ROM_END
 
-ROM_START( ec1842 )
-	ROM_REGION16_LE(0x20000,"bios", 0)
-	ROM_LOAD16_BYTE( "4202004.bin", 0x1c001, 0x2000, CRC(33fb5382) SHA1(35eb62328324d93e7a06f2f9d1ad0002f83fc99b))
-	ROM_LOAD16_BYTE( "4202005.bin", 0x1c000, 0x2000, CRC(8e05c119) SHA1(9d81613b4fc305c14ae9fda0b1dd97a290715530))
-	ROM_LOAD16_BYTE( "4202006.bin", 0x18001, 0x2000, CRC(6da537ef) SHA1(f79feb433dcf41f5cdef52b845e3550d5f0fb5c0))
-	ROM_LOAD16_BYTE( "4202007.bin", 0x18000, 0x2000, CRC(d6ee0e95) SHA1(6fd4c42190e879501198fede70ae43bc420681d0))
-	// EGA ROM
-	//ROM_LOAD16_BYTE( "4200009.bin", 0xc0000, 0x2000, CRC(9deeb39f) SHA1(255b859d3ea05891aa65a4a742ecaba744dfc923))
-	//ROM_LOAD16_BYTE( "4200010.bin", 0xc0001, 0x2000, CRC(f2c38d93) SHA1(dcb3741d06089bf1a80cb766a6b94029ad698d73))
-ROM_END
-
-ROM_START( ec1849 )
-	ROM_REGION16_LE(0x20000,"bios", 0)
-	ROM_LOAD16_BYTE( "cpu-card_27c256_015.rom", 0x10000, 0x8000, CRC(68eadf0a) SHA1(903a7f1c3ebc6b27c31b512b2908c483608b5c13))
-	ROM_LOAD16_BYTE( "cpu-card_27c256_016.rom", 0x10001, 0x8000, CRC(bc3924d6) SHA1(596be415e6c2bc4ff30a187f146664531565712c))
-	//ROM_LOAD16_BYTE( "video-card_573rf6( 2764)_040.rom", 0xc0001, 0x2000, CRC(a3ece315) SHA1(e800e11c3b1b6fcaf41bfb7d4058a9d34fdd2b3f))
-	//ROM_LOAD16_BYTE( "video-card_573rf6( 2764)_041.rom", 0xc0000, 0x2000, CRC(b0a2ba7f) SHA1(c8160e8bc97cd391558f1dddd3fd3ec4a19d030c))
-ROM_END
-
 ROM_START( ibm5170a )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "rev3", "IBM PC/AT 5170 11/15/85")
@@ -962,7 +943,7 @@ ROM_START( ibm5170a )
 ROM_END
 
 
-ROM_START( ibm5162 ) //MB p/n 62x1168
+ROM_START( ibm5162 ) //MB p/n 62x1168 - IBM 5162, 6 Mhz, zero wait state RAM
 	ROM_REGION16_LE(0x20000,"bios", 0)
 
 	ROM_LOAD16_BYTE( "78x7460.u34", 0x10000, 0x8000, CRC(1db4bd8f) SHA1(7be669fbb998d8b4626fefa7cd1208d3b2a88c31)) /* 78X7460 U34 // (C) IBM CORP // 1981-1986 */
@@ -1209,7 +1190,7 @@ ROM_END
 //  Commodore systems
 //**************************************************************************
 
-// Commodore Laptop C286-LT - screen remains blank
+// Commodore Laptop C286-LT - screen remains blank - CPU: AMD N80C286-12 - Chipset: OAK OTI054 (J9105), OTI055 (FOY 107), OTI053 (J9105), OTI051(J9107)
 ROM_START( c286lt )
 	ROM_REGION(0x20000, "bios", 0) // BIOS contains Cirrus Logic VGA firmware, rebadged Sanyo MBC-17NB
 	ROM_SYSTEM_BIOS(0, "c286lt13", "C286-LT V1.3")
@@ -1220,9 +1201,9 @@ ROM_START( c286lt )
 	ROMX_LOAD( "cbm-c286lt-bios-v1.7-390940-04.bin", 0x00000, 0x20000, CRC(22d45839) SHA1(bc7159440c52c1f69957da8fdfa76ac0a42ebd16), ROM_BIOS(2))
 ROM_END
 
-// Commodore SL 286-16
-ROM_START( csl286 ) // continuous short beeps after POST
-	ROM_REGION(0x20000, "bios", 0)
+// Commodore SL 286-16 - this is the wider one, the "slimline model" has only two ISA slots on a riser, an online OTI VGA and a Headland chipset
+ROM_START( csl286 ) // continuous short beeps after POST - Chipset is marked "Chips", one IC is P82C212B-12 (16MHz) - system has a WDC VGA card
+	ROM_REGION(0x20000, "bios", 0) // one ISA slot with a riser providing five slots - is or is similar to a DTK PTM 1661c
 	ROM_LOAD16_BYTE( "cbm-sl286-16-bios-lo-v1.02-390958-03.bin", 0x10000, 0x8000, CRC(7d0c9472) SHA1(1d614f6835a388f67ece73f40d8a9f65cca3e855))
 	ROM_LOAD16_BYTE( "cbm-sl286-16-bios-hi-v1.02-390959-03.bin", 0x10001, 0x8000, CRC(b6d81ddd) SHA1(9478bb846bd1e0dc1904f21d43c6df01ecbc9c83))
 ROM_END
@@ -1232,6 +1213,7 @@ ROM_START( c386sx16 )
 	ROM_REGION(0x20000, "bios", 0)
 	// actual VGA BIOS not dumped - uses a WD Paradise according to http://www.cbmhardware.de/pc/pc.php
 	// complains "Time-of-day clock stopped"
+	// photos of the system show one ISA16 slot for a riser card, an Acumos AVGA2 chip, a VLSI 82C311 IC, one other VLSI and an Acer chip.
 	ROM_SYSTEM_BIOS(0, "c386sxv100", "SL 386SX V1.00") // Commodore 80386SX BIOS Rev. 1.00 - 390914-01/390915-01 - continuous beeps after POST
 	ROMX_LOAD( "cbm-sl386sx-bios-lo-v1.0-390914-01.bin", 0x10000, 0x8000, CRC(03e00583) SHA1(8be8478cabd9de3d547a08207ffdcd39bf1bcd94), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "cbm-sl386sx-bios-hi-v1.0-390915-01.bin", 0x10001, 0x8000, CRC(cbe31594) SHA1(d6ace0b5ae4a0f63d047c2918210188f4c77c0c0), ROM_SKIP(1) | ROM_BIOS(0))
@@ -1278,7 +1260,7 @@ ROM_START( dt386 )
 	ROMX_LOAD( "cbm-dt386dx-33c-bios-hi-v1.01-391560-02.bin", 0x10000, 0x10000, CRC(b3157f57) SHA1(a1a96c8d111e3c1da8f655b4b7e1c5be4af140e9), ROM_BIOS(3))
 ROM_END
 
-// Commodore DT486 - BIOS contains VGA ROM - Keyboard error
+// Commodore DT486 - BIOS contains Paradise VGA ROM - Keyboard error
 ROM_START( dt486 ) // BIOS string: 41-0102-001283-00111111-060692-SYM_486-0 - Commodore 486DX-33 BIOS Version 1.01 391521-02
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "dt486", "DT486")
@@ -1286,7 +1268,7 @@ ROM_START( dt486 ) // BIOS string: 41-0102-001283-00111111-060692-SYM_486-0 - Co
 ROM_END
 
 // Commodore PC 30-III
-ROM_START( pc30iii )
+ROM_START( pc30iii ) // Chipset: MOS 5720 1788 41, Faraday FE3010B, FE3020, FE3000A, FE3030 - ISA8: 1, ISA16: 3
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "pc30iii_v200", "PC 30-III v2.00")
 	ROMX_LOAD( "pc30iii_390339-02_3e58.bin", 0x18000, 0x4000, CRC(f4a5860e) SHA1(b843744fe928bcfd8e037b0208cc85c0746535cf),ROM_SKIP(1) | ROM_BIOS(0) )
@@ -1297,6 +1279,7 @@ ROM_START( pc30iii )
 ROM_END
 
 // Commodore PC 40-III
+// Chipset: MOS 5720 3888 41, Faraday FE3010B, FE3000A, FE3030, FE3020 - onboard VGA is a Paradise PVGA1A - ISA8: 1, ISA16: 3
 ROM_START( pc40iii )
 	// VGA BIOS
 	// ROM_LOAD( "pc40iii_390337-01_v2.0_f930.bin", 0x00000, 0x4000, CRC(82b210d3) SHA1(1380107deef02455c6ce4d12162fdc32e375cbde))
@@ -1319,8 +1302,8 @@ ROM_START( pc45iii )
 ROM_END
 
 // Commodore PC 50-II - a photo of the mainboard shows four ROMs (two each for BIOS and VGA), so the 128K dumps available were probably made from a running system.
-ROM_START( pc50ii )
-	ROM_REGION(0x20000, "bios", 0)
+ROM_START( pc50ii ) // Chipset: Chips P82C211-12 C(16MHz), P82C212B-12 (16MHz), P82C215-12, P82C206, VLSI 8942VT - ISA8: 1, ISA16: 5
+	ROM_REGION(0x20000, "bios", 0) // keyboard MCU is P8042AH MITAC V2.48 (undumped), onboard video PVGA1A-JK
 	// 0: Commodore PC50-II BIOS Rev1.0 - 609200-03
 	ROM_SYSTEM_BIOS(0, "pc50iiv100", "PC 50-II V1.00") // complains "Time-of-day clock stopped" and reboots
 	ROMX_LOAD( "cbm-pc50b-bios-lo-v1.00-390339-01.bin", 0x10001, 0x8000, CRC(0f0e2fd6) SHA1(61a8043ac919c2a8fe668bf25e5f0b67868d11ae),ROM_SKIP(1) | ROM_BIOS(0) )
@@ -1339,9 +1322,9 @@ ROM_START( pc50ii )
 	// ROM_LOAD( "m_pc50-ii_54e3_pvgadk_even.bin", 0x00001, 0x8000, CRC(01f6b964) SHA1(799a84ddde8a7672a6df9439bad6198ec3ff98ec))
 ROM_END
 
-// Commodore PC-60-III - complaining "time-of-day-clock stopped"
-ROM_START( pc60iii )
-	ROM_REGION(0x20000, "bios", 0)
+// Commodore PC-60-III - complaining "time-of-day-clock stopped" - Phoenix P8242 '87 keyboard BIOS 
+ROM_START( pc60iii ) // onboard Paradise PVGA1A-JK, 2xRS232, 1xparallel, keyboard
+	ROM_REGION(0x20000, "bios", 0) // Chipset: Chips P82C301C, P82B305, P82A303, P82A304, Chips F82307, 25531/390423-1 COMBO SMC B9016, Commodore CSG, four MOSEL MS82C308-35JC, ISA16: 7, RAM card: 2 (up to 8MB, extended ISA connector)
 	// 0: Commodore PC60-III 80386 BIOS Rev. 1.2 - 390473-01/390474-01
 	ROM_SYSTEM_BIOS(0, "pc60iiiv12", "PC60-III V1.2")
 	ROMX_LOAD( "cbm-pc60c-bios-lo_u73-v1.2-390473-01.bin", 0x00000, 0x10000, CRC(ff2cd8b3) SHA1(62e95f818c5016f4be2741872dc644999dee33ce),ROM_SKIP(1) | ROM_BIOS(0) )
@@ -1720,6 +1703,24 @@ ROM_START( mat286 )
 	ROMX_LOAD( "9221gjf_imp23256_ami-h.bin", 0x10001, 0x08000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8), ROM_SKIP(1) )
 ROM_END
 
+ROM_START( ec1842 )
+	ROM_REGION16_LE(0x20000,"bios", 0)
+	ROM_LOAD16_BYTE( "4202004.bin", 0x1c001, 0x2000, CRC(33fb5382) SHA1(35eb62328324d93e7a06f2f9d1ad0002f83fc99b))
+	ROM_LOAD16_BYTE( "4202005.bin", 0x1c000, 0x2000, CRC(8e05c119) SHA1(9d81613b4fc305c14ae9fda0b1dd97a290715530))
+	ROM_LOAD16_BYTE( "4202006.bin", 0x18001, 0x2000, CRC(6da537ef) SHA1(f79feb433dcf41f5cdef52b845e3550d5f0fb5c0))
+	ROM_LOAD16_BYTE( "4202007.bin", 0x18000, 0x2000, CRC(d6ee0e95) SHA1(6fd4c42190e879501198fede70ae43bc420681d0))
+	// EGA ROM
+	//ROM_LOAD16_BYTE( "4200009.bin", 0xc0000, 0x2000, CRC(9deeb39f) SHA1(255b859d3ea05891aa65a4a742ecaba744dfc923))
+	//ROM_LOAD16_BYTE( "4200010.bin", 0xc0001, 0x2000, CRC(f2c38d93) SHA1(dcb3741d06089bf1a80cb766a6b94029ad698d73))
+ROM_END
+
+ROM_START( ec1849 )
+	ROM_REGION16_LE(0x20000,"bios", 0)
+	ROM_LOAD16_BYTE( "cpu-card_27c256_015.rom", 0x10000, 0x8000, CRC(68eadf0a) SHA1(903a7f1c3ebc6b27c31b512b2908c483608b5c13))
+	ROM_LOAD16_BYTE( "cpu-card_27c256_016.rom", 0x10001, 0x8000, CRC(bc3924d6) SHA1(596be415e6c2bc4ff30a187f146664531565712c))
+	//ROM_LOAD16_BYTE( "video-card_573rf6( 2764)_040.rom", 0xc0001, 0x2000, CRC(a3ece315) SHA1(e800e11c3b1b6fcaf41bfb7d4058a9d34fdd2b3f))
+	//ROM_LOAD16_BYTE( "video-card_573rf6( 2764)_041.rom", 0xc0000, 0x2000, CRC(b0a2ba7f) SHA1(c8160e8bc97cd391558f1dddd3fd3ec4a19d030c))
+ROM_END
 
 //**************************************************************************
 //  80286 Desktop
