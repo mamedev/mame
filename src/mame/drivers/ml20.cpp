@@ -41,7 +41,7 @@
  CN6 = Magnetic stripe reader
  CN2 = Display (dot-matrix, 2 lines x 16 characters, 5x7 each character)
  CN7 = Keypad
- 
+
  Display = Hyundai HC16203-A (Hitachi HD44780A00 based).
 
    Status:
@@ -57,6 +57,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "ml20.lh"
 
 class ml20_state : public driver_device
 {
@@ -272,6 +274,8 @@ void ml20_state::ml20(machine_config &config)
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(ml20_state::lcd_pixel_update), this);
+
+	config.set_default_layout(layout_ml20);
 
 	// sound
 	SPEAKER(config, "mono").front_center();
