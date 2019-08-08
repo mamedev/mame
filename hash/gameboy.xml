@@ -3339,7 +3339,7 @@
 		<description>Castelian (Euro)</description>
 		<year>1991</year>
 		<publisher>Sales Curve</publisher>
-		<info name="serial" value="DMG-CJ-(NOE/ESP)"/>
+		<info name="serial" value="DMG-CJ-NOE, DMG-CJ-ESP, DMG-CJ-FRG"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="castelian (europe).bin" size="32768" crc="2f752404" sha1="6720d86d420831a0a4865d4a59c4ba6fe98fa34d"/>
@@ -3376,11 +3376,14 @@
 		<description>The Castlevania Adventure (Euro)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="DMG-CV-NOE, DMG-CV-UKV, DMG-CV-ESP)"/>
+		<info name="serial" value="DMG-CV-NOE, DMG-CV-UKV, DMG-CV-ESP"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="castlevania adventure, the (europe).bin" size="65536" crc="6977c265" sha1="d54888039344597fa038f2c5eedc0726dd35cc46"/>
+				<rom name="dmg-cvx-0.u1" size="65536" crc="6977c265" sha1="d54888039344597fa038f2c5eedc0726dd35cc46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3546,14 +3549,20 @@
 	</software>
 
 	<software name="chasehq">
-		<description>Chase H.Q. (Euro, USA, Aus)</description>
+		<description>Chase H.Q. (Euro, USA, Aus, Chn)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
-		<info name="serial" value="DMG-HQ-USA, DMG-HQ-AUS, DMG-HQ-(NOE/ESP)"/>
+		<info name="serial" value="DMG-HQ-USA, DMG-HQ-AUS, DMG-HQ-NOE, DMG-HQ-ESP, DMG-119 CHN"/>
+		<info name="alt_title" value="CHASE H.Q. 神探追踪H.Q. 神探追蹤H.Q."/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1-B]" />
+			<!-- Chinese cart
+			<feature name="pcb" value="DMG-BEAN-M11" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
+			-->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-hqe-0.u1" size="131072" crc="67a45d19" sha1="cbcd6254b1b0227ba6aa8d95c979abb7fe8e4d38"/>
@@ -3760,7 +3769,7 @@
 		<description>Choplifter II - Rescue &amp; Survive (Euro)</description>
 		<year>1991</year>
 		<publisher>JVC</publisher>
-		<info name="serial" value="DMG-V4-(ESP/UKV)"/>
+		<info name="serial" value="DMG-V4-ESP, DMG-V4-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -3843,9 +3852,15 @@
 		<info name="release" value="19980807"/>
 		<info name="alt_title" value="超魔神英雄伝ワタル まぜっこモンスター2"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="chou mashin eiyuuden wataru - mazekko monster 2 (japan).bin" size="524288" crc="e5520693" sha1="54d2672d9720fa4322a7a45244aa898d321c1dd1"/>
+				<rom name="dmg-awmj-0.u1" size="524288" crc="e5520693" sha1="54d2672d9720fa4322a7a45244aa898d321c1dd1"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
