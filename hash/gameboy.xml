@@ -4294,14 +4294,17 @@
 
 	<software name="daffy">
 		<!-- Notes: SGB enhanced -->
-		<description>Daffy Duck - The Marvin Missions (Euro, USA)</description>
+		<description>Daffy Duck - The Marvin Missions (USA)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-YS-USA, DMG-YS-NOE"/>
+		<info name="serial" value="DMG-YS-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="daffy duck - the marvin missions (europe).bin" size="262144" crc="c47671f3" sha1="75b384222d07947baed2213c288385c4b91e1911"/>
+				<rom name="dmg-yse-0.u1" size="262144" crc="c47671f3" sha1="75b384222d07947baed2213c288385c4b91e1911"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4322,15 +4325,14 @@
 		</part>
 	</software>
 
-<!-- This dump has been verified from an European cart by NoIntro guys, the duffy set is still unverified (maybe a Rev.1?) -->
-	<software name="daffya" cloneof="daffy">
+	<software name="daffye" cloneof="daffy">
 		<!-- Notes: SGB enhanced -->
-		<description>Daffy Duck - The Marvin Missions (Euro, Alt)</description>
+		<description>Daffy Duck - The Marvin Missions (Euro)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-YS-NOE"/>
+		<info name="serial" value="DMG-YS-NOE, DMG-YS-NOE-1"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- Also with DMG-BEAN-10 and DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
@@ -4349,9 +4351,15 @@
 		<info name="release" value="19950630"/>
 		<info name="alt_title" value="第2次スーパーロボット大戦G"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
+			<feature name="u3" value="U3 RAM [LH5268ANF-10PLL]" />
+			<feature name="u4" value="U4 26A [6129A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="dai-2-ji super robot taisen g (japan).bin" size="524288" crc="df8b2b20" sha1="0baa751363c05f9830656f98e77902d543822656"/>
+				<rom name="dmg-ag2j-0.u1" size="524288" crc="df8b2b20" sha1="0baa751363c05f9830656f98e77902d543822656"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4388,16 +4396,19 @@
 	</software>
 
 	<software name="daigensn" cloneof="hharry">
-		<description>Daiku no Gen-san - Ghost Building Company (Jpn)</description>
+		<description>Daiku no Gen-san - Ghost Building Company (Jpn, Chn)</description>
 		<year>1992</year>
 		<publisher>Irem</publisher>
-		<info name="serial" value="DMG-DIJ (IG-07)"/>
+		<info name="serial" value="DMG-DIJ (IG-07), DMG-208 CHN"/>
 		<info name="release" value="19920731"/>
-		<info name="alt_title" value="大工の源さん ゴースト ビルディング カンパニー"/>
+		<info name="alt_title" value="大工の源さん ゴースト ビルディング カンパニー (Japan), 大工の源さん CARPENTER GENZO - GHOST KINGDOM 大工源之幽灵王国·大工源之幽靈王國 (China)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-M13" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="daiku no gen-san - ghost building company (japan).bin" size="262144" crc="9e0d2b45" sha1="90574cc899210515e83dec714eb4d69416dcf3a3"/>
+				<rom name="u2" size="262144" crc="9e0d2b45" sha1="90574cc899210515e83dec714eb4d69416dcf3a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4506,9 +4517,12 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-DC-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="darkwing duck (usa).bin" size="131072" crc="238b9646" sha1="cc1f12f3ec3852657a14d11c13d1ef91fbdda5bb"/>
+				<rom name="dmg-dce-0.u1" size="131072" crc="238b9646" sha1="cc1f12f3ec3852657a14d11c13d1ef91fbdda5bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4586,11 +4600,14 @@
 		<description>Desert Strike - Return to the Gulf (Euro)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="DMG-ADSP-UKV"/>
+		<info name="serial" value="DMG-ADSP-UKV, DMG-ADSP-ESP"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="desert strike - return to the gulf (europe).bin" size="262144" crc="b700f7f7" sha1="b49bc8f5d292f0e2b71957c8c4af37b20cfead80"/>
+				<rom name="dmg-adsp-0.u1" size="262144" crc="b700f7f7" sha1="b49bc8f5d292f0e2b71957c8c4af37b20cfead80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4678,16 +4695,21 @@
 
 	<software name="dinobred">
 		<!-- Notes: SGB enhanced -->
-		<description>Dino Breeder (Jpn, Rev. A)</description>
+		<description>Dino Breeder (Jpn, Rev. 1)</description>
 		<year>1997</year>
 		<publisher>J-Wing</publisher>
-		<info name="serial" value="DMG-AWDJ-JPN"/>
+		<info name="serial" value="DMG-AWDJ-JPN-1"/>
 		<info name="release" value="19970822"/>
 		<info name="alt_title" value="ディノブリーダー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-GDAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC2A" />
+			<feature name="u3" value="U3 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
-				<rom name="dino breeder (japan) (rev a).bin" size="262144" crc="5b289ab4" sha1="a6e24e442de0541c3f5ec4d28650256c5d25f751"/>
+				<rom name="dmg-awdj-1.u1" size="262144" crc="5b289ab4" sha1="a6e24e442de0541c3f5ec4d28650256c5d25f751"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4773,16 +4795,22 @@
 
 	<software name="dkong">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
-		<description>Donkey Kong (World, Rev. A)</description>
+		<description>Donkey Kong (World, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-QDA, DMG-QD-USA, DMG-QD-(NOE/FRG/ESP-1/SCN)"/>
+		<info name="serial" value="DMG-QDA, DMG-QD-USA, DMG-QD-NOE, DMG-QD-FRG, DMG-QD-ESP-1, DMG-QD-SCN, DMG-QD-EUR"/>
 		<info name="release" value="19940614 (JPN)"/>
 		<info name="alt_title" value="ドンキーコング"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="donkey kong (world) (rev a).bin" size="524288" crc="f777a5d8" sha1="397ad2ff25627b83e02c71b54c72bb4deb39e0c0"/>
+				<rom name="dmg-qda-1.u1" size="524288" crc="f777a5d8" sha1="397ad2ff25627b83e02c71b54c72bb4deb39e0c0"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -4836,12 +4864,12 @@
 		<description>Donkey Kong Land (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-YT-USA, DMG-YT-NOE"/>
+		<info name="serial" value="DMG-YT-USA, DMG-YT-NOE, DMG-YT-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN(K)-02" />   <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
-			<feature name="u3" value="U3 RAM" />
+			<feature name="u3" value="U3 RAM [XLJ6265BF-10SL]" />
 			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
@@ -4858,7 +4886,7 @@
 		<description>Donkey Kong Land 2 (Euro, USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-ADDE-USA, DMG-ADDP-(EUR/EUR-1)"/>
+		<info name="serial" value="DMG-ADDE-USA, DMG-ADDP-EUR, DMG-ADDP-EUR-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />  <!-- USA cart, EUR-1 on DMG-DECN(K)-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
@@ -4868,6 +4896,7 @@
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
+				<!-- DMG-ADDP-0 on European cart -->
 				<rom name="dmg-adde-0.u1" size="524288" crc="2827e5d4" sha1="89cc4f01653a6105ee5c00e10fc65aa1437fd320"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
@@ -5099,7 +5128,7 @@
 		<info name="release" value="1998xxxx"/>
 		<info name="alt_title" value="ドラえもんのスタディボーイ6 学習漢字マスター1006"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-20" />
+			<feature name="pcb" value="DMG-BFAN-20" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -5161,7 +5190,7 @@
 		<description>Double Dragon II (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-D2-USA, DMG-D2-(NOE/ESP)"/>
+		<info name="serial" value="DMG-D2-USA, DMG-D2-NOE, DMG-D2-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -5302,7 +5331,7 @@
 
 	<software name="drmario">
 		<!-- Notes: Also released by NP in 2000-03 -->
-		<description>Dr. Mario (World, Rev. A)</description>
+		<description>Dr. Mario (World, Rev. 1)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-VUA, DMG-VU-USA, DMG-VU-EUR"/>
@@ -5322,12 +5351,14 @@
 		<description>Dr. Mario (World)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-VUA, DMG-VU-USA, DMG-VU-(NOE/UKV/SCN)"/>
+		<info name="serial" value="DMG-VUA, DMG-VU-USA, DMG-VU-NOE, DMG-VU-UKV, DMG-VU-SCN"/>
 		<info name="release" value="19900727 (JPN)"/>
 		<info name="alt_title" value="ドクターマリオ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-AAA-03" />
+			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
-				<rom name="dr. mario (world).bin" size="32768" crc="10c98dd1" sha1="f1006d6cf77469092f3b9f266d0a65da9c91ac42"/>
+				<rom name="dmg-vua-0.u1" size="32768" crc="10c98dd1" sha1="f1006d6cf77469092f3b9f266d0a65da9c91ac42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5514,7 +5545,7 @@
 		<description>DragonHeart (Euro, USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-ADHE-USA , DMG-ADHP-(EUR/FAH)"/>
+		<info name="serial" value="DMG-ADHE-USA, DMG-ADHP-EUR, DMG-ADHP-FAH"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- EURO cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -5572,7 +5603,7 @@
 		<description>DuckTales (Euro)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
-		<info name="serial" value="DMG-DT-(NOE/UKV/ESP/EUR)"/>
+		<info name="serial" value="DMG-DT-NOE, DMG-DT-UKV, DMG-DT-ESP, DMG-DT-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
@@ -5714,11 +5745,14 @@
 		<description>Dynablaster (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-HB-UKV"/>
+		<info name="serial" value="DMG-HB-UKV, DMG-HB-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dynablaster (europe).bin" size="131072" crc="9677d157" sha1="3c284831353be165e20b56f3728b0421eaea274a"/>
+				<rom name="dmg-hbx-0.u1" size="131072" crc="9677d157" sha1="3c284831353be165e20b56f3728b0421eaea274a"/>
 			</dataarea>
 		</part>
 	</software>
