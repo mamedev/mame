@@ -1628,18 +1628,19 @@
 		<description>OS-9 Level 1 (Version 01.00.00)</description>
 		<year>198?</year>
 		<publisher>Radio Shack</publisher>
+		<info name="serial" value="26-3030" />
 		<sharedfeat name="compatibility" value="COCO,COCO3" />
 
 		<part name="flop0" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Boot"/>
-			<dataarea name="flop" size="161280">
-				<rom name="os9l1v1b.dsk" size="161280" crc="dc8644f7" sha1="9205245b11ecb39bd6ff593e14f0620e55988634"/>
+			<dataarea name="flop" size="224016">
+				<rom name="os9 disk software (198x)(tandy)[boot][26-3030].dsk" size="224016" crc="4498b1a9" sha1="efacc6d3e75ebd58c4e7b58755a1e4f4a0142363"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 - OS-9 Master"/>
-			<dataarea name="flop" size="161280">
-				<rom name="os9l1v1m.dsk" size="161280" crc="9ed46ba8" sha1="92a27eb08f69e5368ac2735174c07c417e0d243b"/>
+			<dataarea name="flop" size="224016">
+				<rom name="os9 disk software (198x)(tandy)[system][26-3030].dsk" size="224016" crc="0f4e73d6" sha1="d9537760ed0f5c06a6f3b918d53a1c0025c9cd8a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1648,12 +1649,15 @@
 		<description>OS-9 Level 1 (Version 01.01.00)</description>
 		<year>198?</year>
 		<publisher>Radio Shack</publisher>
+		<info name="serial" value="26-3030" />
 		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<!-- Master disk could use a redump from a trusted source for
+		verification. Boot disk was same across all Level 1 versions. -->
 
 		<part name="flop0" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Boot"/>
-			<dataarea name="flop" size="161280">
-				<rom name="os9l1v1b.dsk" size="161280" crc="dc8644f7" sha1="9205245b11ecb39bd6ff593e14f0620e55988634"/>
+			<dataarea name="flop" size="224016">
+				<rom name="os9 disk software (198x)(tandy)[boot][26-3030].dsk" size="224016" crc="4498b1a9" sha1="efacc6d3e75ebd58c4e7b58755a1e4f4a0142363"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
@@ -1668,18 +1672,19 @@
 		<description>OS-9 Level 1 (Version 02.00.00)</description>
 		<year>198?</year>
 		<publisher>Radio Shack</publisher>
+		<info name="serial" value="26-3030" />
 		<sharedfeat name="compatibility" value="COCO,COCO3" />
 
 		<part name="flop0" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Boot"/>
-			<dataarea name="flop" size="161280">
-				<rom name="os9l1v2b.dsk" size="161280" crc="302f897c" sha1="64a11f11b350ee46ce71d5734cb054a8ae8d0cdd"/>
+			<dataarea name="flop" size="224016">
+				<rom name="os9 disk software (198x)(tandy)[boot][26-3030].dsk" size="224016" crc="4498b1a9" sha1="efacc6d3e75ebd58c4e7b58755a1e4f4a0142363"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2 - OS-9 Master"/>
-			<dataarea name="flop" size="161280">
-				<rom name="os9l1v2m.dsk" size="161280" crc="5528f5a2" sha1="521740e7a00eefb4b92a6c803391df31c004fdf9"/>
+			<dataarea name="flop" size="224016">
+				<rom name="os9 disk software (198x)(tandy)[system1][26-3030].dsk" size="224016" crc="21e4da3c" sha1="6e82d05b48fcf43710467fe641ca6301468e3c2b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1710,18 +1715,19 @@
 		<description>OS-9 Level 2 (Version 02.00.01)</description>
 		<year>1986</year>
 		<publisher>Radio Shack</publisher>
+		<info name="serial" value="26-3031" />
 		<sharedfeat name="compatibility" value="COCO3" />
 
 		<part name="flop0" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Boot"/>
-			<dataarea name="flop" size="161280">
-				<rom name="os9-l2v201b.dsk" size="161280" crc="deb68619" sha1="b87f9518c4f1cd601bf3ec65a0913fa8114b094c"/>
+			<feature name="part_id" value="Disk 2 - OS-9 Master"/>
+			<dataarea name="flop" size="224016">
+				<rom name="os9 level 2 (198x)(tandy)(disk 1 of 2)[26-3031].dsk" size="224016" crc="8225a149" sha1="d8351cc29c9c80b809a878b1e362636949a1c3e1"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - OS-9 Master"/>
-			<dataarea name="flop" size="161280">
-				<rom name="os9-l2v201m.dsk" size="161280" crc="a14b5c49" sha1="6b8208b9e072acd1f8de687150af0a8b758bb924"/>
+			<feature name="part_id" value="Disk 2 - Boot"/>
+			<dataarea name="flop" size="224016">
+				<rom name="os9 level 2 (198x)(tandy)(disk 2 of 2)[26-3031].dsk" size="224016" crc="14db7a6a" sha1="f25ccd421322b3c92bea5e688b696f62967cc733"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1769,6 +1775,46 @@
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
 				<rom name="pitfall ii (1985-10)(tandy)[26-3287].dsk" size="161280" crc="cf499786" sha1="9a17cb240737b13d05f84b396c637729aa4e2f7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cnewsrm">
+		<description>CoCo Newsroom</description>
+		<year>1987</year>
+		<publisher>Spectrum Publishing</publisher>
+		<info name="author" value="Erik A. Wolf" />
+		<sharedfeat name="compatibility" value="COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="184320">
+				<rom name="coco newsroom (1987)(spectrum publishing)(disk 1 of 3).dsk" size="184320" crc="008772ee" sha1="97b30e0c898d1828e0abbc53b3368c6ec23380ef" />
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Art"/>
+			<dataarea name="flop" size="161280">
+				<rom name="coco newsroom (1987)(spectrum publishing)(disk 2 of 3)[art].dsk" size="161280" crc="3e3c47d2" sha1="61c2713a11b130623009451fff634287168a9605" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Fonts"/>
+			<dataarea name="flop" size="161280">
+				<rom name="coco newsroom (1987)(spectrum publishing)(disk 3 of 3)[fonts].dsk" size="161280" crc="72a8b66b" sha1="718413b7f1a969eb250445918671f10d97a6750e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twritr64">
+		<description>Telewriter-64</description>
+		<year>1983</year>
+		<publisher>Computer Hut Software</publisher>
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="telewriter-64 (1983)(computer hut software).dsk" size="161280" crc="338ce0c4" sha1="0b770e1f8596e3827708b5141755534599fecac4" />
 			</dataarea>
 		</part>
 	</software>
