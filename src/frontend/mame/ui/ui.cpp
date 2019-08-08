@@ -311,7 +311,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 || video_none)
 		show_gameinfo = show_warnings = show_mandatory_fileman = false;
 
-#if defined(EMSCRIPTEN)
+#if defined(__EMSCRIPTEN__)
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
 	show_gameinfo = show_warnings = false;
 #endif

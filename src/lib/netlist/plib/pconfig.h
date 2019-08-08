@@ -141,7 +141,7 @@ typedef __int128_t INT128;
 		#define MEMBER_ABI _thiscall
 	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
 		#define PHAS_PMF_INTERNAL 0
-	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(EMSCRIPTEN)
+	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(__EMSCRIPTEN__)
 		#define PHAS_PMF_INTERNAL 2
 	#else
 		#define PHAS_PMF_INTERNAL 1

@@ -396,7 +396,7 @@ private:
 	// configuration state
 	dummy_space_device m_dummy_space;
 
-#if defined(EMSCRIPTEN)
+#if defined(__EMSCRIPTEN__)
 private:
 	static running_machine *emscripten_running_machine;
 	static void emscripten_main_loop();
