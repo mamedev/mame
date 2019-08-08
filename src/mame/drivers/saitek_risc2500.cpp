@@ -67,6 +67,7 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void install_boot_rom();
 	void remove_boot_rom();
+	void lcd_palette(palette_device &palette) const;
 
 	void risc2500_mem(address_map &map);
 
@@ -98,8 +99,17 @@ void risc2500_state::remove_boot_rom()
 	m_maincpu->space(AS_PROGRAM).install_ram(0x00000000, m_ram->size() - 1, m_ram->pointer());
 }
 
+void risc2500_state::lcd_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(131, 136, 139)); // lcd pixel off
+	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(138, 146, 148)); // background
+}
+
 uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(2, cliprect);
+
 	for(int c=0; c<12; c++)
 	{
 		// 12 characters 5 x 7
@@ -284,7 +294,7 @@ void risc2500_state::risc2500(machine_config &config)
 
 	config.set_default_layout(layout_saitek_risc2500);
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, "palette", FUNC(risc2500_state::lcd_palette), 3);
 
 	SENSORBOARD(config, m_board);
 	m_board->set_type(sensorboard_device::BUTTONS);
