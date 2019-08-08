@@ -363,7 +363,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "h8s2600",         be,  0, []() -> util::disasm_interface * { return new h8s2600_disassembler; } },
 	{ "hc11",            be,  0, []() -> util::disasm_interface * { return new hc11_disassembler; } },
 	{ "hcd62121",        le,  0, []() -> util::disasm_interface * { return new hcd62121_disassembler; } },
-	{ "hd61700",         le,  0, []() -> util::disasm_interface * { return new hd61700_disassembler; } },
+	{ "hd61700",         le, -1, []() -> util::disasm_interface * { return new hd61700_disassembler; } },
 	{ "hd6301",          be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(6301); } },
 	{ "hd6309",          be,  0, []() -> util::disasm_interface * { return new hd6309_disassembler; } },
 	{ "hd63701",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(63701); } },
