@@ -8908,6 +8908,7 @@ michkit1                        //
 michkitb                        //
 michnew                         //
 michstake                       //
+missamer                        //
 montana                         //
 newdixie                        //
 penalty                         //
@@ -9251,6 +9252,7 @@ fball_ii                        //
 fbclass                         //
 flashgdn                        //
 flashgdnf                       //
+flashgdnfv                      //
 flashgdnv                       //
 frontier                        //
 futrquen                        //
@@ -11298,6 +11300,7 @@ play_a24                        //
 poto_a29                        //
 poto_a32                        //
 poto_a31                        //
+robo_a29                        //
 robo_a30                        //
 robo_a34                        //
 simp_a20                        //
@@ -11371,6 +11374,7 @@ trek_120                        //
 trek_200                        //
 trek_201                        //
 wwfr_103                        //
+wwfr_103f                       //
 wwfr_106                        //
 
 @source:de_3b.cpp
@@ -14726,6 +14730,7 @@ attila                          //
 coneyis                         //
 cpthook                         //
 cyclopes                        //
+cyclopes1                       //
 gwarfare                        //
 ladyshot                        //
 ladyshota                       //
@@ -22048,6 +22053,9 @@ mk90                            //
 @source:mkit09.cpp
 mkit09                          //
 mkit09a                         //
+
+@source:ml20.cpp
+ml20                            //
 
 @source:mlanding.cpp
 mlanding                        // B09 (c) 1987 Taito America Corporation (US)
@@ -33987,6 +33995,7 @@ mousn_l1                        //
 mousn_l4                        //
 mousn_lu                        //
 mousn_lx                        //
+polic_g4                        //
 polic_l2                        //
 polic_l3                        //
 polic_l4                        //
@@ -34167,6 +34176,9 @@ stratosa
 tking
 tkinga
 tkingb
+
+@source:saitek_superstar.cpp
+sstar28k
 
 @source:sam.cpp
 24_130                          //
@@ -39073,7 +39085,7 @@ startrks                        // Sidam bootleg
 subhunt                         // ?   [1977 Taito]
 supcrash                        // bootleg
 tranqgun                        // 413-428 (c) 1980 Sega
-wantsega						// ? (c) 1982 Sega
+wantsega                        // ? (c) 1982 Sega
 
 @source:victor9k.cpp
 victor9k                        //
@@ -40126,6 +40138,7 @@ dw_p5                           //
 ft_l3                           //
 ft_l4                           //
 ft_l5                           //
+ft_p2                           //
 ft_p4                           //
 gw_l1                           //
 gw_l2                           //

@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /******************************************************************************
 
-Hegener + Glaser AG Mephisto (I)/1X/II/ESB II/III
+Hegener + Glaser Mephisto (I)/1X/II/ESB II/III
 The base device is nicknamed the "Brikett"
 
 Mephisto is the 1st chess computer by H+G, chess engine by Thomas Nitsche & Elmar Henne.
@@ -172,8 +172,12 @@ void brikett_state::machine_reset()
 
 void brikett_state::set_cpu_freq()
 {
-	// 2nd hardware model has 2 XTALs, it will increase CPU voltage (and speed) when running on mains power
-	m_maincpu->set_unscaled_clock((m_inputs[4].read_safe(0) & 1) ? 6.144_MHz_XTAL : 3.579545_MHz_XTAL);
+	// 2nd hardware model has 2 XTALs, it will increase CPU voltage (and speed) when running on mains power,
+	// the 3.579545MHz XTAL is still used for IRQ. Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz
+	// and a newer CDP1805CE CPU by H+G's service department on request.
+	// (It is unexpected that the 1805 accepts such a high overclock, but tests show that it is indeed twice faster)
+	u8 inp = m_inputs[4].read_safe(0);
+	m_maincpu->set_unscaled_clock((inp & 2) ? 12_MHz_XTAL : ((inp & 1) ? 6.144_MHz_XTAL : 3.579545_MHz_XTAL));
 }
 
 
@@ -372,6 +376,12 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_CONFNAME( 0x01, 0x01, "ESB 6000" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_MODIFY("IN.4")
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, nullptr)
+	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
+	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
+	PORT_CONFSETTING(    0x02, "12MHz (Special)" )
 INPUT_PORTS_END
 
 

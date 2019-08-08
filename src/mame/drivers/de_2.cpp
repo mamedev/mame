@@ -818,6 +818,17 @@ ROM_START(robo_a30)
 	ROM_LOAD("robof4.rom", 0x10000, 0x10000, CRC(27d31df3) SHA1(1611a508ce74eb62a07296d69782ea4fa14503fc))
 ROM_END
 
+ROM_START(robo_a29)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("robob5.a29", 0x0000, 0x8000, CRC(72497d0b) SHA1(8a970c879cd0aaef5970a77778f71c0f3d6da049))
+	ROM_LOAD("roboc5.a29", 0x8000, 0x8000, CRC(b251b0b6) SHA1(3d340070494b102703e282ae3a7970f6f8aaede9))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("robof7.rom", 0x8000, 0x8000, CRC(fa0891bd) SHA1(332d03c7802989abf717564230993b54819ebc0d))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("robof6.rom", 0x00000, 0x10000, CRC(9246e107) SHA1(e8e72c0d099b17ea9e59ea7794011bad4c072c5e))
+	ROM_LOAD("robof4.rom", 0x10000, 0x10000, CRC(27d31df3) SHA1(1611a508ce74eb62a07296d69782ea4fa14503fc))
+ROM_END
+
 /*-------------------------------------------------------------------------
 / Secret Service - CPU Rev 2 /Alpha Type 2 - 32K Roms - 32K/64K Sound Roms
 /-------------------------------------------------------------------------*/
@@ -958,6 +969,7 @@ GAME( 1990, poto_a29, poto_a32, de_type2_alpha3, de_2, de_2_state, empty_init, R
 GAME( 1989, play_a24, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Playboy 35th Anniversary (2.4)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1989, robo_a34, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.4)",                        MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1989, robo_a30, robo_a34, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.0)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, robo_a29, robo_a34, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (2.9)",                        MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, ssvc_a26, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6)",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, ssvc_b26, ssvc_a26, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, ssvc_a42, ssvc_a26, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (4.2 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)

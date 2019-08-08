@@ -426,7 +426,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		}
 		if (BIT(opcode, 14))
 		{
-			stream << ",0(";
+			stream << ", 0(";
 			format_reg(stream, (opcode & 0x0120) >> 5);
 			stream << ")";
 			return 2 | SUPPORTED;

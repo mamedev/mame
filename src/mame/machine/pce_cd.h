@@ -40,7 +40,8 @@ enum {
 
 // ======================> pce_cd_device
 
-class pce_cd_device : public device_t
+class pce_cd_device : public device_t,
+           			  public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -62,8 +63,49 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_reset() override;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
+	const address_space_config m_space_config;
+	
+	DECLARE_READ8_MEMBER(cdc_status_r);
+	DECLARE_WRITE8_MEMBER(cdc_status_w);
+	DECLARE_READ8_MEMBER(cdc_reset_r);
+	DECLARE_WRITE8_MEMBER(cdc_reset_w);
+	DECLARE_READ8_MEMBER(irq_mask_r);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_READ8_MEMBER(irq_status_r);
+	DECLARE_READ8_MEMBER(cdc_data_r);
+	DECLARE_WRITE8_MEMBER(cdc_data_w);
+	DECLARE_READ8_MEMBER(bram_status_r);
+	DECLARE_WRITE8_MEMBER(bram_unlock_w);
+	DECLARE_READ8_MEMBER(cdda_data_r);
+	DECLARE_READ8_MEMBER(cd_data_r);
+	DECLARE_READ8_MEMBER(adpcm_dma_control_r);
+	DECLARE_WRITE8_MEMBER(adpcm_dma_control_w);
+	DECLARE_READ8_MEMBER(adpcm_status_r);
+	DECLARE_READ8_MEMBER(adpcm_data_r);
+	DECLARE_WRITE8_MEMBER(adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(adpcm_address_lo_w);
+	DECLARE_WRITE8_MEMBER(adpcm_address_hi_w);
+	DECLARE_READ8_MEMBER(adpcm_address_control_r);
+	DECLARE_WRITE8_MEMBER(adpcm_address_control_w);
+	DECLARE_WRITE8_MEMBER(adpcm_playback_rate_w);
+	DECLARE_WRITE8_MEMBER(fade_register_w);
+	
+	uint8_t m_reset_reg;
+	uint8_t m_irq_mask;
+	uint8_t m_irq_status;
+	uint8_t m_cdc_status;
+	uint8_t m_cdc_data;
+	uint8_t m_bram_status;
+	uint8_t m_adpcm_status;
+	uint16_t m_adpcm_latch_address;
+	uint8_t m_adpcm_control;
+	uint8_t m_adpcm_dma_reg;
+	uint8_t m_fade_reg;
+
+	void regs_map(address_map &map);
 	void adpcm_stop(uint8_t irq_flag);
 	void adpcm_play();
 	void reply_status_byte(uint8_t status);
@@ -94,7 +136,6 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 
-	uint8_t   m_regs[16];
 	std::unique_ptr<uint8_t[]>   m_bram;
 	std::unique_ptr<uint8_t[]>   m_adpcm_ram;
 	int     m_bram_locked;

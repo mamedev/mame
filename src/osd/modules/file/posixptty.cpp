@@ -25,7 +25,7 @@
 #elif defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
 #include <termios.h>
 #include <util.h>
-#elif defined(__linux__) || defined(EMSCRIPTEN)
+#elif defined(__linux__) || defined(__EMSCRIPTEN__)
 #include <pty.h>
 #elif defined(__HAIKU__)
 #include <bsd/pty.h>

@@ -93,7 +93,7 @@ public:
 	{
 		ssize_t result;
 
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(EMSCRIPTEN) || defined(__ANDROID__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__EMSCRIPTEN__) || defined(__ANDROID__)
 		result = ::pread(m_fd, buffer, size_t(count), off_t(std::make_unsigned_t<off_t>(offset)));
 #elif defined(WIN32) || defined(SDLMAME_NO64BITIO)
 		if (lseek(m_fd, off_t(std::make_unsigned_t<off_t>(offset)), SEEK_SET) < 0)
@@ -114,7 +114,7 @@ public:
 	{
 		ssize_t result;
 
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(EMSCRIPTEN) || defined(__ANDROID__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__EMSCRIPTEN__) || defined(__ANDROID__)
 		result = ::pwrite(m_fd, buffer, size_t(count), off_t(std::make_unsigned_t<off_t>(offset)));
 #elif defined(WIN32) || defined(SDLMAME_NO64BITIO)
 		if (lseek(m_fd, off_t(std::make_unsigned_t<off_t>(offset)), SEEK_SET) < 0)
@@ -135,7 +135,7 @@ public:
 	{
 		int result;
 
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(EMSCRIPTEN) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__EMSCRIPTEN__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 		result = ::ftruncate(m_fd, off_t(std::make_unsigned_t<off_t>(offset)));
 #else
 		result = ::ftruncate64(m_fd, off64_t(offset));

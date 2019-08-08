@@ -4651,6 +4651,7 @@ ROM_END
 //  Altered Beast, Sega System 16B
 //  CPU: 68000 + i8751 (317-0076)
 //  ROM Board type: 171-5521
+//  Sega ID# for ROM board: 834-6661-08
 //
 ROM_START( altbeast6 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -4694,7 +4695,7 @@ ROM_END
 //  Altered Beast, Sega System 16B
 //  CPU: FD1094 (317-0069)
 //  ROM Board type: 171-5521
-//  Sega game ID: 833-6660-07
+//  Sega game ID: 833-6660-07 ALTERED BEAST
 //    Main board: 837-6662-05
 //     ROM board: 834-6661-07
 //
@@ -4775,7 +4776,9 @@ ROM_END
 //  Altered Beast, Sega System 16B
 //  CPU: 68000 + MC-8123B 317-0066
 //  ROM Board type: 171-5521
-//  Sega ID# for ROM board: 834-6661-06
+//  Sega game ID: 833-6660-06 ALTERED BEAST
+//    Main board: 837-6662-01
+//     ROM board: 834-6661-06
 //
 ROM_START( altbeast4 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -6878,7 +6881,9 @@ ROM_END
 //  Golden Axe (Japan), Sega System 16B
 //  CPU: FD1094 (317-0121)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-7002-04
+//  Sega game ID: 833-7001-04 GOLDEN AXE
+//    Main board: 837-7003-04
+//     ROM board: 834-7002-04
 //
 // NOTE: ROM board 834-7002-04EP has EPROMs for EPR-12383, EPR-12378, EPR-12379 & EPR-12384 instead of MPR mask ROMs
 //

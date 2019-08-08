@@ -53,6 +53,7 @@
 
 #include "formats/dvk_mx_dsk.h"
 #include "formats/aim_dsk.h"
+#include "formats/m20_dsk.h"
 
 
 static floppy_format_type floppy_formats[] = {
@@ -96,7 +97,8 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_HPI_FORMAT,
 
 	FLOPPY_DVK_MX_FORMAT,
-	FLOPPY_AIM_FORMAT
+	FLOPPY_AIM_FORMAT,
+	FLOPPY_M20_FORMAT
 };
 
 void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)

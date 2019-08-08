@@ -35,6 +35,15 @@ On the right you'll get a "clue", slightly different than on the standard game (
 Once you find the number, you'll see it flashing.   Press the 2 key and you'll get your score (number of attempts before guessing).
 Press 0 to restart.
 
+Notes on expansion rom with default content Mastermind.
+Original authors: see above (Paolo Forlani and Stefano Bodrato)
+Ported to option rom: NASZVADI Peter
+
+The game can be started from monitor by defining SP as 20FFh and PC as 0800h and starting execution.
+When setting register values in monitor, SPH, SPL, PCH and PCL values must be set to 20, FF, 08, 00 respectively before start!
+Stefano's bios had been altered in order to use lower ram bank and the option rom slot.
+When selecting "Empty" a14, which is basically 2kbytes of zeros, the default option rom will be launched directly.
+
 *************************************************************************************************************************************/
 
 #include "emu.h"
@@ -184,8 +193,11 @@ ROM_START( sdk85 )
 	ROMX_LOAD( "sdk85.a14", 0x0000, 0x0800, CRC(9d5a983f) SHA1(54e218560fbec009ac3de5cfb64b920241ef2eeb), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "mastermind", "Mastermind")
 	ROMX_LOAD( "mastermind.a14", 0x0000, 0x0800, CRC(36b694ae) SHA1(4d8a5ae5d10e8f72a6e349c7eeaf1aa00c4e45e1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "empty", "Empty")
+	ROMX_LOAD( "empty.a14", 0x0000, 0x0800, CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, "expromio", ROMREGION_ERASEFF )
+	ROM_LOAD_OPTIONAL( "mastermind.a15", 0x0000, 0x0800, CRC(0538e162) SHA1(c351975e2cf515cee29fcaeb04ef47189afe5250) )
 ROM_END
 
 /* Driver */

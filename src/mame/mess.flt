@@ -497,6 +497,7 @@ mk14.cpp
 mk85.cpp
 mk90.cpp
 mkit09.cpp
+ml20.cpp
 mmd1.cpp
 mod8.cpp
 modellot.cpp
@@ -703,6 +704,7 @@ saitek_cp2000.cpp
 saitek_delta1.cpp
 saitek_risc2500.cpp
 saitek_stratos.cpp
+saitek_superstar.cpp
 samcoupe.cpp
 sansa_fuze.cpp
 sapi1.cpp

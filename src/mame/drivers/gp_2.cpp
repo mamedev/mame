@@ -694,6 +694,18 @@ ROM_START(cyclopes)
 	ROM_RELOAD (0xf000, 0x1000)
 ROM_END
 
+ROM_START(cyclopes1)
+	ROM_REGION(0x4000, "roms", 0)
+	ROM_LOAD( "800a.111585", 0x0000, 0x1000, CRC(13131b90) SHA1(33f6c4aaaa2511a9c78e68f8df9a6461cd92c23f))
+	ROM_LOAD( "800b.111585", 0x1000, 0x1000, CRC(3d515632) SHA1(2c4a7f18760b591a85331fa0304177a730540489))
+	ROM_LOAD( "800c.111585", 0x2000, 0x1000, CRC(2078bd3f) SHA1(fed719ffdbd71242393c0786ad6e763a9e25ff8e))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD ("800.snd", 0x3800, 0x0800, CRC(290db3d2) SHA1(a236594f7a89969981bd5707d6dfbb5120fb8f46))
+	ROM_CONTINUE(0x7800, 0x0800)
+	ROM_RELOAD (0xf000, 0x1000)
+ROM_END
+
 /*-------------------------------------------------------------------
 / Global Warfare (June 1981)  - Model #240
 /-------------------------------------------------------------------*/
@@ -841,4 +853,5 @@ GAME( 1985, ladyshota, ladyshot, gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game
 // credit (start) button not working
 GAME( 1985, andromep,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Andromeda (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1985, andromepa, andromep, gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Andromeda (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, cyclopes,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Cyclopes",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, cyclopes,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Cyclopes (12/85)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1985, cyclopes1, cyclopes, gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Cyclopes (11/85)",  MACHINE_IS_SKELETON_MECHANICAL)

@@ -40,10 +40,7 @@ void dp8573_device::device_start()
 
 	m_irq.resolve_safe();
 	m_pfail.resolve_safe();
-}
 
-void dp8573_device::device_reset()
-{
 	memset(m_ram, 0, 32);
 
 	m_tscr = 0;
@@ -61,7 +58,10 @@ void dp8573_device::device_reset()
 	m_ram[REG_YEAR] = time_helper::make_bcd(systime.local_time.year % 100);
 	m_ram[REG_DAYOFWEEK] = time_helper::make_bcd(systime.local_time.weekday + 1);
 	m_ram[REG_RTMR] = RTMR_CSS;
+}
 
+void dp8573_device::device_reset()
+{
 	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 }
 

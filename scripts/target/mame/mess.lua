@@ -3073,6 +3073,7 @@ files {
 	MAME_DIR .. "src/mame/includes/saitek_stratos.h",
 	MAME_DIR .. "src/mame/drivers/saitek_stratos.cpp",
 	MAME_DIR .. "src/mame/drivers/saitek_corona.cpp", -- subdriver of saitek_stratos
+	MAME_DIR .. "src/mame/drivers/saitek_superstar.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "samcoupe")
@@ -4004,6 +4005,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mini2440.cpp",
 	MAME_DIR .. "src/mame/drivers/miniframe.cpp",
 	MAME_DIR .. "src/mame/drivers/minitel_2_rpic.cpp",
+	MAME_DIR .. "src/mame/drivers/ml20.cpp",
 	MAME_DIR .. "src/mame/drivers/mmd1.cpp",
 	MAME_DIR .. "src/mame/drivers/mod8.cpp",
 	MAME_DIR .. "src/mame/drivers/modellot.cpp",
