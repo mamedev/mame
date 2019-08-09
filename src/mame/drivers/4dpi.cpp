@@ -424,7 +424,7 @@ void pi4d2x_state::map(address_map &map)
 
 	map(0x1fa80000, 0x1fa80003).lr8("scsirdy", [this]() { m_scsi->reset_w(0); return 0; }).umask32(0xff000000);
 	map(0x1fa80004, 0x1fa80007).lr8("scsirst", [this]() { m_scsi->reset_w(1); return 0; }).umask32(0xff000000);
-	map(0x1fa80008, 0x1fa8000b).lr8("scsibstat", [this]() { return 0; }).umask32(0x00ff0000);
+	map(0x1fa80008, 0x1fa8000b).lr8("scsibstat", []() { return 0; }).umask32(0x00ff0000);
 
 	// TODO: IOC2 configuration register, bus error on IOC1
 	//map(0x1fa80008, 0x1fa8000b).rw(FUNC(pi4d2x_state::buserror_r), FUNC(pi4d2x_state::buserror_w));
