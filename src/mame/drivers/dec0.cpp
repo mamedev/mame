@@ -2281,10 +2281,10 @@ ROM_START( hbarrel ) /* DE-0297-1 main board, DE-0299-0 sub/rom board */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "heavy_barrel_08.2c", 0x0000, 0x10000, CRC(645c5b68) SHA1(096ca5d7b5df752df6d2c856b3f94b29eea7c3de) )
-	
-	ROM_REGION( 0xc00, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, NO_DUMP )
-	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( hbarrelw ) /* DE-0289-2 main board, DE-0293-1 sub/rom board */
@@ -2334,10 +2334,10 @@ ROM_START( hbarrelw ) /* DE-0289-2 main board, DE-0293-1 sub/rom board */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ec08.2c", 0x0000, 0x10000, CRC(2159a609) SHA1(cae503e446c7164a44b59886680f554a4cb1eef2) )
-	
-	ROM_REGION( 0xc00, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, NO_DUMP )
-	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( baddudes ) /* DE-0297-1 main board, DE-0299-1 sub/rom board */
@@ -2381,10 +2381,10 @@ ROM_START( baddudes ) /* DE-0297-1 main board, DE-0299-1 sub/rom board */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ei08.2c",   0x0000, 0x10000, CRC(3c87463e) SHA1(f17c98507b562e91e9b27599614b3249fe68ff7a) )
-	
-	ROM_REGION( 0xc00, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, NO_DUMP )
-	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( drgninja )
@@ -2434,10 +2434,10 @@ ROM_START( drgninja )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "eg08.2c",   0x0000, 0x10000, CRC(92f2c916) SHA1(38b4ed81edcc2069b096591bdc5baab8b9edfa9a) ) // different to baddudes
-	
-	ROM_REGION( 0xc00, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, NO_DUMP )
-	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( drgninjab )
@@ -2577,11 +2577,11 @@ ROM_START( drgninjab2 )
 	ROM_LOAD( "a30.10b",   0x0000, 0x10000, CRC(f6806826) SHA1(e2c6a0682f34d30c63dab8715729151cc3657387) ) //  99.218750%
 
 	ROM_REGION( 0x40000, "proms", 0 ) /* proms */
-	ROM_LOAD( "n82s129an.12c",   0x0000, 0x100, CRC(78994fdb) SHA1(cd52bff11b81f19eeb2683ed94b236f1464a5ea9) )
-	ROM_LOAD( "n82s129an.2q",    0x0000, 0x100, CRC(af46d1ee) SHA1(281bcc61d9d67b007c1399e228ec6baf6ab5d4ff) )
-	ROM_LOAD( "n82s129an.3p",    0x0000, 0x100, CRC(9f6aa3e5) SHA1(518247d4581eee3a078269fcf0c86d182cf622cd) )
-	ROM_LOAD( "n82s131n.5q",   0x0000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "n82s137n.8u",   0x0000, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "n82s129an.12c", 0x0000, 0x100, CRC(78994fdb) SHA1(cd52bff11b81f19eeb2683ed94b236f1464a5ea9) )
+	ROM_LOAD( "n82s129an.2q",  0x0000, 0x100, CRC(af46d1ee) SHA1(281bcc61d9d67b007c1399e228ec6baf6ab5d4ff) )
+	ROM_LOAD( "n82s129an.3p",  0x0000, 0x100, CRC(9f6aa3e5) SHA1(518247d4581eee3a078269fcf0c86d182cf622cd) )
+	ROM_LOAD( "n82s131n.5q",   0x0000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )  // == mb7116e.12c
+	ROM_LOAD( "n82s137n.8u",   0x0000, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )  // == mb7122e.17e
 ROM_END
 
 
@@ -2684,9 +2684,9 @@ intro graphics appear on starting a game, then
 nothing, it won't even play blind (although the
 coin up sound still plays on coin insert)
 */
-	ROM_REGION( 0xc00, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, CRC(c288a256) SHA1(cb6813507cfa6fa0b74f4692247fd1d4466c659b) )
-	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, CRC(64764ecf) SHA1(9385a8a2fae8b8f6310194331a77d97eca7917bd) )
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopw ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
@@ -2730,10 +2730,10 @@ ROM_START( robocopw ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
-	
-	ROM_REGION( 0xc00, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, CRC(c288a256) SHA1(cb6813507cfa6fa0b74f4692247fd1d4466c659b) )
-	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, CRC(64764ecf) SHA1(9385a8a2fae8b8f6310194331a77d97eca7917bd) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopj ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
@@ -2777,10 +2777,10 @@ ROM_START( robocopj ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
-	
-	ROM_REGION( 0xc00, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, CRC(c288a256) SHA1(cb6813507cfa6fa0b74f4692247fd1d4466c659b) )
-	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, CRC(64764ecf) SHA1(9385a8a2fae8b8f6310194331a77d97eca7917bd) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopu ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
@@ -2824,10 +2824,10 @@ ROM_START( robocopu ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
-	
-	ROM_REGION( 0xc00, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, CRC(c288a256) SHA1(cb6813507cfa6fa0b74f4692247fd1d4466c659b) )
-	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, CRC(64764ecf) SHA1(9385a8a2fae8b8f6310194331a77d97eca7917bd) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopu0 ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
@@ -2871,10 +2871,10 @@ ROM_START( robocopu0 ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
-	
-	ROM_REGION( 0xc00, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x400, CRC(c288a256) SHA1(cb6813507cfa6fa0b74f4692247fd1d4466c659b) )
-	ROM_LOAD( "mb7122e.17e", 0x400, 0x800, CRC(64764ecf) SHA1(9385a8a2fae8b8f6310194331a77d97eca7917bd) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopb )
