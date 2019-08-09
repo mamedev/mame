@@ -247,7 +247,7 @@ WRITE8_MEMBER( super6_state::fdc_w )
 	m_fdc->dden_w(!BIT(data, 3));
 
 	// disk size
-	m_fdc->set_unscaled_clock (BIT(data, 4) ? 1'000'000 : 2'000'000);  // division occurs inside fdc depending on ENMF
+	m_fdc->enmf_w(!BIT(data, 4));
 }
 
 
