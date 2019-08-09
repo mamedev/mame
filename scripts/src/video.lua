@@ -687,6 +687,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/virge_pci.h,VIDEOS["VIRGE_PCI"] = true
+--------------------------------------------------
+
+if (VIDEOS["VIRGE_PCI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/virge_pci.cpp",
+		MAME_DIR .. "src/devices/video/virge_pci.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pcd8544.h,VIDEOS["PCD8544"] = true
 --------------------------------------------------
 

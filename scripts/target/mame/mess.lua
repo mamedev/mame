@@ -382,6 +382,7 @@ VIDEOS["UPD7220"] = true
 VIDEOS["UPD7227"] = true
 VIDEOS["V9938"] = true
 VIDEOS["VIC4567"] = true
+VIDEOS["VIRGE_PCI"] = true
 --VIDEOS["VOODOO"] = true
 VIDEOS["SCN2674"] = true
 VIDEOS["GB_LCD"] = true
