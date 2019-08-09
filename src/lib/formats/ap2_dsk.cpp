@@ -673,6 +673,10 @@ bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 			else if (!memcmp(subnod_block1, &sector_data[0x100], 8))
 			{
 				m_prodos_order = true;
+			}	// check for ProDOS 2.5's new boot block
+			else if (!memcmp("PRODOS", &sector_data[0x3a], 6))
+			{
+				m_prodos_order = true;
 			}
 		}
 
