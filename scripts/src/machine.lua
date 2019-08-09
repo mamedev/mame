@@ -57,6 +57,8 @@ files {
 	MAME_DIR .. "src/devices/imagedev/midiin.h",
 	MAME_DIR .. "src/devices/imagedev/midiout.cpp",
 	MAME_DIR .. "src/devices/imagedev/midiout.h",
+	MAME_DIR .. "src/devices/imagedev/picture.cpp",
+	MAME_DIR .. "src/devices/imagedev/picture.h",
 	MAME_DIR .. "src/devices/imagedev/printer.cpp",
 	MAME_DIR .. "src/devices/imagedev/printer.h",
 	MAME_DIR .. "src/devices/imagedev/snapquik.cpp",

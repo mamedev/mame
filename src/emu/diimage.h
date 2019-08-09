@@ -50,7 +50,8 @@ enum iodevice_t
 	IO_ROM,         /* 16 - Individual ROM image - the Amstrad CPC has a few applications that were sold on 16kB ROMs */
 	IO_MIDIIN,      /* 17 - MIDI In port */
 	IO_MIDIOUT,     /* 18 - MIDI Out port */
-	IO_COUNT        /* 19 - Total Number of IO_devices for searching */
+	IO_PICTURE,     /* 19 - A single-frame image */
+	IO_COUNT        /* 20 - Total Number of IO_devices for searching */
 };
 
 enum image_error_t

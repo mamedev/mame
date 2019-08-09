@@ -45,7 +45,8 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 		{ IO_MAGTAPE,   "magtape",      "magt" }, /* 14 */
 		{ IO_ROM,       "romimage",     "rom"  }, /* 15 */
 		{ IO_MIDIIN,    "midiin",       "min"  }, /* 16 */
-		{ IO_MIDIOUT,   "midiout",      "mout" }  /* 17 */
+		{ IO_MIDIOUT,   "midiout",      "mout" }, /* 17 */
+		{ IO_PICTURE,   "picture",      "pic"  }  /* 18 */
 	};
 
 
