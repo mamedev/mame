@@ -222,6 +222,9 @@ private:
 
 void pi4d2x_state::map(address_map &map)
 {
+	// silence local memory
+	map(0x00000000, 0x0fffffff).noprw();
+
 	// vme address space produces bus errors by default
 	map(0x10000000, 0x1effffff).rw(FUNC(pi4d2x_state::buserror_r), FUNC(pi4d2x_state::buserror_w));
 
@@ -235,7 +238,7 @@ void pi4d2x_state::map(address_map &map)
 
 	//map(0x1f000000, 0x1fbfffff); // local I/O (duarts, timers, etc.)
 
-	map(0x1f800000, 0x1f800003).lrw8("memcfg", [this]() { return m_memcfg; }, [this](u8 data) { logerror("memcfg 0x%02x\n", data); m_memcfg = data; }).umask32(0xff000000);
+	map(0x1f800000, 0x1f800003).lrw8("memcfg", [this]() { return m_memcfg; }, [this](u8 data) { m_memcfg = data; }).umask32(0xff000000);
 	map(0x1f800000, 0x1f800003).r(FUNC(pi4d2x_state::sysid_r)).umask32(0x00ff0000);
 
 	map(0x1f840000, 0x1f840003).lrw8("vme_isr", [this]() { return m_vme_isr; }, [this](u8 data) { m_vme_isr = data; }).umask32(0x000000ff);
@@ -409,25 +412,24 @@ void pi4d2x_state::map(address_map &map)
 
 	//map(0x1fa40008, 0x1fa4000b); // GDMA_DABR_PHYS descriptor array base register
 	//map(0x1fa4000c, 0x1fa4000f); // GDMA_BUFADR_PHYS buffer address register
-	//map(0x1fa40010, 0x1fa40013).umask32(0xffff0000); // GDMA_BURST_PHYS burst/delay register
+	map(0x1fa40010, 0x1fa40013).nopw().umask32(0xffff0000); // GDMA_BURST_PHYS burst/delay register (FIXME: silenced)
 	//map(0x1fa40010, 0x1fa40013).umask32(0x0000ffff); // GDMA_BUFLEN_PHYS buffer length register
 
 	map(0x1fa60000, 0x1fa60003).lrw8("vmermw", [this]() { m_sysid |= SYSID_VMERMW; return 0; }, [this](u8 data) { m_sysid |= SYSID_VMERMW; }).umask32(0xff000000);
 	//map(0x1fa60004, 0x1fa60007).rw("actpup").umask32(0xff000000); // turn on active bus pullup
 	map(0x1fa60018, 0x1fa6001b).lrw8("vmefbon", [this]() { m_sysid |= SYSID_VMEFBT; return 0; }, [this](u8 data) { m_sysid |= SYSID_VMEFBT; }).umask32(0xff000000);
 	map(0x1fa6001c, 0x1fa6001f).lrw8("vmefbof", [this]() { m_sysid &= ~SYSID_VMEFBT; return 0; }, [this](u8 data) { m_sysid &= ~SYSID_VMEFBT; }).umask32(0xff000000);
+	map(0x1fa60020, 0x1fa60023).nopr(); // reload gfx dma burst/delay reg (FIXME: silenced)
 	//map(0x1fa60024, 0x1fa60027).rw("enraso").umask32(0xff000000); // enable ctl ras decoder
 
-	//map(0x1fa60020, 0x1fa60023).nopr().umask32(0xff000000); // reload gfx dma burst/delay reg
-
-	map(0x1fa80000, 0x1fa80003).lr32("scsirdy", [this]() { m_scsi->reset_w(0); return 0; }).umask32(0xff000000);
-	map(0x1fa80004, 0x1fa80007).lr32("scsirst", [this]() { m_scsi->reset_w(1); return 0; }).umask32(0xff000000);
+	map(0x1fa80000, 0x1fa80003).lr8("scsirdy", [this]() { m_scsi->reset_w(0); return 0; }).umask32(0xff000000);
+	map(0x1fa80004, 0x1fa80007).lr8("scsirst", [this]() { m_scsi->reset_w(1); return 0; }).umask32(0xff000000);
 	map(0x1fa80008, 0x1fa8000b).lr8("scsibstat", [this]() { return 0; }).umask32(0x00ff0000);
 
 	// TODO: IOC2 configuration register, bus error on IOC1
 	//map(0x1fa80008, 0x1fa8000b).rw(FUNC(pi4d2x_state::buserror_r), FUNC(pi4d2x_state::buserror_w));
 
-	map(0x1faa0000, 0x1faa0003).lw8("clrerr", [this](offs_t offset, u8 data) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); });
+	map(0x1faa0000, 0x1faa0003).lrw8("clrerr", [this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); return 0; }, [this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); });
 	map(0x1faa0004, 0x1faa0007).lr8("parerr", [this]() { return m_parerr; }).umask32(0x00ff0000);
 
 	map(0x1fb00000, 0x1fb00003).rw(m_scsi, FUNC(wd33c93_device::indir_addr_r), FUNC(wd33c93_device::indir_addr_w)).umask32(0x00ff0000);
