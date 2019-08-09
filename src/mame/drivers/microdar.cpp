@@ -46,7 +46,7 @@ INPUT_PORTS_END
 
 void microdar_state::microdar(machine_config &config)
 {
-	I80C51(config, m_maincpu, 12'000'000); // XT1 not verified
+	I80C51(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &microdar_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &microdar_state::ext_map);
 
@@ -142,4 +142,4 @@ ROM_START(microdar)
 	ROM_LOAD("24lc16b.ic8", 0x000, 0x800, CRC(1cae70db) SHA1(575d4c787fd65950417e85fdb34d2961fc327c74))
 ROM_END
 
-GAME(199?, microdar, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic", "Microdar SPD", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, microdar, 0, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Microdar SPD", MACHINE_IS_SKELETON_MECHANICAL)
