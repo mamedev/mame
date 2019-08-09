@@ -21715,6 +21715,9 @@ f15se                           // (c) 1991 Microprose Games Inc.
 f15se21                         // (c) 1991 Microprose Games Inc.
 tankbatl                        // (c) 1992 Microprose Games Inc.
 
+@source:microdar.cpp
+microdar                        //
+
 @source:microdec.cpp
 md2                             //
 md3                             //
