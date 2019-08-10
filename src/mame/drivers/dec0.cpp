@@ -25,12 +25,12 @@
     * Midnight Resistance                     (World set)
     * Midnight Resistance                     (USA set)
     * Midnight Resistance                     (Japanese set)
-    * Boulderdash                             (World set)
+    * Boulder Dash                            (World set)
     * Bandit                                  (USA set)
 
     Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome use the 'MEC-M1'
 motherboard and varying game boards.  Sly Spy, Midnight Resistance and
-Boulderdash use the same graphics chips but are different pcbs.
+Boulder Dash use the same graphics chips but are different pcbs.
 
     Bandit (USA) is almost certainly a field test prototype, the software runs
     on a Heavy Barrel board including the original Heavy Barrel MCU (which is effectively
@@ -109,18 +109,18 @@ Fighting Fantasy
 Secret Agent
 Sly Spy
 Midnight Resistance
-Boulderdash
+Boulder Dash
 
 Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome/Fighting Fantasy use the 'MEC-M1'
 motherboard and another plug-in game board containing all the ROMs.
-Sly Spy, Midnight Resistance and Boulderdash use the same graphics chips but are single pcbs.
+Sly Spy, Midnight Resistance and Boulder Dash use the same graphics chips but are single pcbs.
 
 PCB Layouts
 -----------
 
 Main Board:
 
-This board is used with Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome/Fighting Fantasy
+This board is used with Heavy Barrel, Bad Dudes, Robocop, Birdie Try, Bandit & Hippodrome/Fighting Fantasy
 
 PCB number: MEC-M1 DE-0297-3 (uses QFP custom chips)
 or
@@ -174,7 +174,7 @@ Notes:
 
 ROM Board Type 1:
 
-This board is used with Heavy Barrel, Bad Dudes & Birdie Try
+This board is used with Heavy Barrel, Bad Dudes, Bandit & Birdie Try
 All ROMs are in sockets. Boards that do not use some positions
 do not have the socket populated (i.e. Bad Dudes)
 
@@ -366,7 +366,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 				m_soundlatch->write(data & 0xff);
 			break;
 
-		case 6: /* Intel 8751 microcontroller - Bad Dudes, Heavy Barrel, Birdy Try only */
+		case 6: /* Intel 8751 microcontroller - Bad Dudes, Heavy Barrel, Birdie Try, Bandit only */
 			dec0_i8751_write(data);
 			break;
 
@@ -534,12 +534,12 @@ READ16_MEMBER(dec0_state::slyspy_protection_r)
 {
 	switch (offset<<1)
 	{
-		/* These values are for Boulderdash, I have no idea what they do in Slyspy */
+		/* These values are for Boulder Dash, I have no idea what they do in Sly Spy */
 		case 0:     return 0;
 		case 2:     return 0x13;
 		case 4:     return 0;
 		case 6:     return 0x2;
-		// sly spy uses this port as RNG, for now let's do same thing as bootleg (i.e. reads 0x306028)
+		// Sly Spy uses this port as RNG, for now let's do same thing as bootleg (i.e. reads 0x306028)
 		// chances are that it actually ties to the main CPU xtal instead.
 		// (reads at 6958 6696)
 		case 0xc:   return m_ram[0x2028/2] >> 8;
@@ -639,7 +639,7 @@ void dec0_state::slyspy_map(address_map &map)
 	map(0x300c00, 0x300fff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
 	map(0x301000, 0x3017ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 
-	map(0x304000, 0x307fff).ram().share("ram"); /* Sly spy main ram */
+	map(0x304000, 0x307fff).ram().share("ram"); /* Sly Spy main ram */
 	map(0x308000, 0x3087ff).ram().share("spriteram");   /* Sprites */
 	map(0x310000, 0x3107ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -712,7 +712,7 @@ void dec0_state::slyspy_s_map(address_map &map)
 	map(0x1f0000, 0x1f1fff).ram();
 }
 
-// sly spy sound state protection machine emulation
+// Sly Spy sound state protection machine emulation
 // similar to the video state machine
 // current bank is at 0x1f0045, incremented by 1 then here is read
 READ8_MEMBER(dec0_state::slyspy_sound_state_r)
@@ -843,17 +843,17 @@ void dec0_automat_state::automat_map(address_map &map)
 void dec0_automat_state::secretab_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-//  AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_0_w)
-//  AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_1_w)
+//  map(0x240000, 0x240007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));
+//  map(0x240010, 0x240017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
 	map(0x246000, 0x247fff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-//  AM_RANGE(0x240000, 0x24007f) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_colscroll_r, pf_colscroll_w)
-//  AM_RANGE(0x240400, 0x2407ff) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
+//  map(0x240000, 0x24007f).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+//  map(0x240400, 0x2407ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
 
-//  AM_RANGE(0x200000, 0x300007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)
-//  AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
+//  map(0x200000, 0x300007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));
+//  map(0x300010, 0x300017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
 	map(0x24e000, 0x24ffff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-//  AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_colscroll_r, pf_colscroll_w)
-//  AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
+//  map(0x340000, 0x34007f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+//  map(0x340400, 0x3407ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
 
 	map(0x314008, 0x31400f).r(FUNC(dec0_automat_state::slyspy_controls_r));
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -863,7 +863,7 @@ void dec0_automat_state::secretab_map(address_map &map)
 	map(0x300800, 0x30087f).ram();
 	map(0x300c00, 0x300fff).ram();
 	map(0x301000, 0x3017ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-	map(0x301800, 0x307fff).ram().share("ram"); /* Sly spy main ram */
+	map(0x301800, 0x307fff).ram().share("ram"); /* Sly Spy main ram */
 	map(0x310000, 0x3107ff).rw(FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
 	map(0xb08000, 0xb08fff).ram().share("spriteram"); /* Sprites */
 }
@@ -2283,8 +2283,8 @@ ROM_START( hbarrel ) /* DE-0297-1 main board, DE-0299-0 sub/rom board */
 	ROM_LOAD( "heavy_barrel_08.2c", 0x0000, 0x10000, CRC(645c5b68) SHA1(096ca5d7b5df752df6d2c856b3f94b29eea7c3de) )
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( hbarrelw ) /* DE-0289-2 main board, DE-0293-1 sub/rom board */
@@ -2336,8 +2336,8 @@ ROM_START( hbarrelw ) /* DE-0289-2 main board, DE-0293-1 sub/rom board */
 	ROM_LOAD( "ec08.2c", 0x0000, 0x10000, CRC(2159a609) SHA1(cae503e446c7164a44b59886680f554a4cb1eef2) )
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 
@@ -2384,8 +2384,8 @@ ROM_START( baddudes ) /* DE-0297-1 main board, DE-0299-1 sub/rom board */
 	ROM_LOAD( "ei08.2c",   0x0000, 0x10000, CRC(3c87463e) SHA1(f17c98507b562e91e9b27599614b3249fe68ff7a) )
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( drgninja )
@@ -2437,8 +2437,8 @@ ROM_START( drgninja )
 	ROM_LOAD( "eg08.2c",   0x0000, 0x10000, CRC(92f2c916) SHA1(38b4ed81edcc2069b096591bdc5baab8b9edfa9a) ) // different to baddudes
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( drgninjab )
@@ -2502,7 +2502,7 @@ QTY     Type    clock   position    function
 2x  YM3014B         main PCB 13d, 13e   D/A Converter (DAC) - sound
 1x  YM3812      main PCB 9b     FM Operator Type-L II (OPL II) - sound
 1x  MC68705R3P      ROMs PCB 1l     8-bit EPROM Microcomputer Unit - main (not dumped)
-1x  M5205       ROMs PCB 12c    ADPCM Speech Syntesis IC - sound
+1x  M5205       ROMs PCB 12c    ADPCM Speech Synthesis IC - sound
 1x  oscillator  24.000MHz   main PCB 2a
 1x  oscillator  16.0000     main PCB 12n
 1x  blu resonator   CSB-400P    ROMs PCB 12b
@@ -2630,8 +2630,8 @@ ROM_START( birdtry ) /* DE-0311-0 main board, DE-0299-2 sub/rom board */
 	ROM_LOAD( "ek-08.2c", 0x0000, 0x10000, CRC(be3db6cb) SHA1(4e8b8e0bef3a3f36d7e641e27b5f48c8fe9a8b7f) )
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 
@@ -2689,8 +2689,8 @@ nothing, it won't even play blind (although the
 coin up sound still plays on coin insert)
 */
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopw ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
@@ -2736,8 +2736,8 @@ ROM_START( robocopw ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopj ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
@@ -2783,8 +2783,8 @@ ROM_START( robocopj ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopu ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
@@ -2830,8 +2830,8 @@ ROM_START( robocopu ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopu0 ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
@@ -2877,8 +2877,9 @@ ROM_START( robocopu0 ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
-	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( robocopb )
@@ -2936,22 +2937,22 @@ http://www.andys-arcade.com
 *************************************************
 
 Take a look at the photos in the archive, the roms
-should be failry explanatory, and you should be
+should be fairly explanatory, and you should be
 able to pick out the chips it uses.
 
 The most striking thing about this bootleg apart
 from the obviously changed title screen is that
 the music/melody is not right, they've copied the
-digital sound effects, but appear to have ripepd
+digital sound effects, but appear to have ripped
 the music and circuit design from an earlier
-capcom game, i can't work out whcih one, but
+capcom game, I can't work out which one, but
 what an odd thing to do!
 
 you can see a youtube video of it running here:
 http://uk.youtube.com/watch?v=Y-KvbKtqzaQ
 
-Rom 21 is full of 0's... i cleaned and re-dumped
-it numerous times, but i just got 0's everytime.
+Rom 21 is full of 0's... I cleaned and re-dumped
+it numerous times, but I just got 0's every time.
 It contains some of the graphics for enemies on
 the opening stage at the very least.
 
@@ -3038,7 +3039,7 @@ ROM_START( automat )
 ROM_END
 
 
-ROM_START( bandit )
+ROM_START( bandit )  /* DE-0289-2 main board, DE-0293-1 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "4.4",     0x00000, 0x10000, CRC(01a29133) SHA1(6a8e9b959828f82333ca17dbc751a9fbafae6935) )
 	ROM_LOAD16_BYTE( "1.1",     0x00001, 0x10000, CRC(dc61b11f) SHA1(3178a1247d2ef4d30f9c6c55b53db658214d2861) )
@@ -3082,6 +3083,10 @@ ROM_START( bandit )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "8.8",     0x0000, 0x10000, CRC(b0e79b9f) SHA1(6613c41234b8305d8959d06d6b4e9127bfc5eebe) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 
@@ -3126,6 +3131,10 @@ ROM_START( hippodrm )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ew03",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( ffantasyj )
@@ -3169,6 +3178,10 @@ ROM_START( ffantasyj )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ew03",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 // I believe 'EX' is the world (export) release, but it still shows a 'ONLY FOR USE IN JAPAN' screen
@@ -3215,6 +3228,10 @@ ROM_START( ffantasy )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ew03",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( ffantasya )
@@ -3258,6 +3275,10 @@ ROM_START( ffantasya )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ew03",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 ROM_START( ffantasyb )  // DE-0297-3 PCB. All EX labels.
@@ -3301,6 +3322,10 @@ ROM_START( ffantasyb )  // DE-0297-3 PCB. All EX labels.
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "ex03",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
+	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
 /* this is probably a bootleg of an undumped original revision */
