@@ -59,7 +59,6 @@ class hitpoker_state : public driver_device
 public:
 	hitpoker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_sys_regs(*this, "sys_regs"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
@@ -69,7 +68,7 @@ public:
 	void init_hitpoker();
 
 private:
-	required_shared_ptr<uint8_t> m_sys_regs;
+	uint8_t m_sys_regs;
 
 	uint8_t m_pic_data;
 	std::unique_ptr<uint8_t[]> m_videoram;
@@ -97,7 +96,6 @@ private:
 	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void hitpoker_io(address_map &map);
 	void hitpoker_map(address_map &map);
 };
 
@@ -243,7 +241,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 		return (m_pic_data & 0x7f) | (m_pic_data & 0x40 ? 0x80 : 0x00);
 	}
 
-	return m_sys_regs[offset];
+	return m_sys_regs;
 }
 
 WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
@@ -251,7 +249,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
 	if(offset == 0)
 		m_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
 //  logerror("%02x W\n",data);
-	m_sys_regs[offset] = data;
+	m_sys_regs = data;
 }
 
 #if 0
@@ -297,11 +295,6 @@ void hitpoker_state::hitpoker_map(address_map &map)
 //  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
 	map(0xc000, 0xdfff).rw(FUNC(hitpoker_state::hitpoker_cram_r), FUNC(hitpoker_state::hitpoker_cram_w));
 	map(0xe000, 0xefff).rw(FUNC(hitpoker_state::hitpoker_paletteram_r), FUNC(hitpoker_state::hitpoker_paletteram_w));
-}
-
-void hitpoker_state::hitpoker_io(address_map &map)
-{
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(FUNC(hitpoker_state::hitpoker_pic_r), FUNC(hitpoker_state::hitpoker_pic_w)).share("sys_regs");
 }
 
 static INPUT_PORTS_START( hitpoker )
@@ -464,10 +457,10 @@ GFXDECODE_END
 
 void hitpoker_state::hitpoker(machine_config &config)
 {
-	MC68HC11(config, m_maincpu, 1000000);
+	MC68HC11A1(config, m_maincpu, 1000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hitpoker_state::hitpoker_map);
-	m_maincpu->set_addrmap(AS_IO, &hitpoker_state::hitpoker_io);
-	m_maincpu->set_config(0, 0x100, 0x01);
+	m_maincpu->in_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_r));
+	m_maincpu->out_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

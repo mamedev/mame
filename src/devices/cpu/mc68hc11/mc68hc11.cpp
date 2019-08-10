@@ -40,17 +40,62 @@ enum
 static const int div_tab[4] = { 1, 4, 8, 16 };
 
 
-DEFINE_DEVICE_TYPE(MC68HC11, mc68hc11_cpu_device, "mc68hc11", "Motorola MC68HC11")
+DEFINE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device, "mc68hc11a1", "Motorola MC68HC11A1")
+DEFINE_DEVICE_TYPE(MC68HC11D0, mc68hc11d0_device, "mc68hc11d0", "Motorola MC68HC11D0")
+DEFINE_DEVICE_TYPE(MC68HC11K1, mc68hc11k1_device, "mc68hc11k1", "Motorola MC68HC11K1")
+DEFINE_DEVICE_TYPE(MC68HC11M0, mc68hc11m0_device, "mc68hc11m0", "Motorola MC68HC11M0")
 
 
-mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MC68HC11, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0 )
-	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
+mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int reg_bits, uint16_t internal_ram_size, uint8_t init_value, address_map_constructor reg_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
+	, m_data_config("data", ENDIANNESS_BIG, 8, internal_ram_size > 1024 ? 11
+		: internal_ram_size > 512 ? 10
+		: internal_ram_size > 256 ? 9 : 8, 0, address_map_constructor(FUNC(mc68hc11_cpu_device::ram_map), this))
+	, m_io_config("I/O", ENDIANNESS_BIG, 8, reg_bits, 0, reg_map)
+	, m_port_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_analog_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_spi2_data_input_cb(*this)
+	, m_spi2_data_output_cb(*this)
+	, m_reg_block_size(1 << reg_bits)
+	, m_internal_ram_size(internal_ram_size)
+	, m_init_value(init_value)
+{
+}
+
+void mc68hc11_cpu_device::ram_map(address_map &map)
+{
+	map(0, m_internal_ram_size - 1).ram();
+}
+
+void mc68hc11_cpu_device::io_map(address_map &map)
+{
 	/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
-	, m_has_extended_io(1)
-	, m_internal_ram_size(1280)
-	, m_init_value(0x01)
+	map(0, m_reg_block_size - 1).rw(FUNC(mc68hc11_cpu_device::hc11_regs_r), FUNC(mc68hc11_cpu_device::hc11_regs_w));
+}
+
+mc68hc11a1_device::mc68hc11a1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68hc11_cpu_device(mconfig, MC68HC11A1, tag, owner, clock, 6, 256, 0x01,
+		address_map_constructor(FUNC(mc68hc11a1_device::io_map), this)) // TODO: also has 512 bytes EEPROM
+{
+}
+
+mc68hc11d0_device::mc68hc11d0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68hc11_cpu_device(mconfig, MC68HC11D0, tag, owner, clock, 6, 192, 0x00,
+		address_map_constructor(FUNC(mc68hc11d0_device::io_map), this))
+{
+}
+
+mc68hc11k1_device::mc68hc11k1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68hc11_cpu_device(mconfig, MC68HC11K1, tag, owner, clock, 7, 768, 0x00,
+		address_map_constructor(FUNC(mc68hc11k1_device::io_map), this)) // TODO: also has 640 bytes EEPROM
+{
+}
+
+mc68hc11m0_device::mc68hc11m0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68hc11_cpu_device(mconfig, MC68HC11M0, tag, owner, clock, 8, 1280, 0x00,
+		address_map_constructor(FUNC(mc68hc11m0_device::io_map), this))
 {
 }
 
@@ -58,8 +103,21 @@ device_memory_interface::space_config_vector mc68hc11_cpu_device::memory_space_c
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
+		std::make_pair(AS_DATA, &m_data_config),
+		std::make_pair(AS_IO, &m_io_config)
 	};
+}
+
+void mc68hc11_cpu_device::device_resolve_objects()
+{
+	for (auto &cb : m_port_input_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_output_cb)
+		cb.resolve_safe();
+	for (auto &cb : m_analog_cb)
+		cb.resolve_safe(0);
+	m_spi2_data_input_cb.resolve_safe(0xff);
+	m_spi2_data_output_cb.resolve_safe();
 }
 
 std::unique_ptr<util::disasm_interface> mc68hc11_cpu_device::create_disassembler()
@@ -80,21 +138,21 @@ uint8_t mc68hc11_cpu_device::hc11_regs_r(uint32_t address)
 	switch(reg)
 	{
 		case 0x00:      /* PORTA */
-			return m_io->read_byte(MC68HC11_IO_PORTA);
+			return m_port_input_cb[0]();
 		case 0x01:      /* DDRA */
 			return 0;
 		case 0x02:      /* PIOC */
 			return 0;
 		case 0x03:      /* PORTC */
-			return m_io->read_byte(MC68HC11_IO_PORTC);
+			return m_port_input_cb[2]();
 		case 0x04:      /* PORTB */
-			return m_io->read_byte(MC68HC11_IO_PORTB);
+			return m_port_input_cb[1]();
 		case 0x08:      /* PORTD */
-			return m_io->read_byte(MC68HC11_IO_PORTD);
+			return m_port_input_cb[3]();
 		case 0x09:      /* DDRD */
 			return 0;
 		case 0x0a:      /* PORTE */
-			return m_io->read_byte(MC68HC11_IO_PORTE);
+			return m_port_input_cb[4]();
 		case 0x0e:      /* TCNT */
 			return m_tcnt >> 8;
 		case 0x0f:
@@ -113,44 +171,44 @@ uint8_t mc68hc11_cpu_device::hc11_regs_r(uint32_t address)
 		{
 			if (m_adctl & 0x10)
 			{
-				return m_io->read_byte((m_adctl & 0x4) + MC68HC11_IO_AD0);
+				return m_analog_cb[m_adctl & 0x4]();
 			}
 			else
 			{
-				return m_io->read_byte((m_adctl & 0x7) + MC68HC11_IO_AD0);
+				return m_analog_cb[m_adctl & 0x7]();
 			}
 		}
 		case 0x32:      /* ADR2 */
 		{
 			if (m_adctl & 0x10)
 			{
-				return m_io->read_byte((m_adctl & 0x4) + MC68HC11_IO_AD1);
+				return m_analog_cb[m_adctl & 0x4]();
 			}
 			else
 			{
-				return m_io->read_byte((m_adctl & 0x7) + MC68HC11_IO_AD0);
+				return m_analog_cb[m_adctl & 0x7]();
 			}
 		}
 		case 0x33:      /* ADR3 */
 		{
 			if (m_adctl & 0x10)
 			{
-				return m_io->read_byte((m_adctl & 0x4) + MC68HC11_IO_AD2);
+				return m_analog_cb[m_adctl & 0x4]();
 			}
 			else
 			{
-				return m_io->read_byte((m_adctl & 0x7) + MC68HC11_IO_AD0);
+				return m_analog_cb[m_adctl & 0x7]();
 			}
 		}
 		case 0x34:      /* ADR4 */
 		{
 			if (m_adctl & 0x10)
 			{
-				return m_io->read_byte((m_adctl & 0x4) + MC68HC11_IO_AD3);
+				return m_analog_cb[m_adctl & 0x4]();
 			}
 			else
 			{
-				return m_io->read_byte((m_adctl & 0x7) + MC68HC11_IO_AD0);
+				return m_analog_cb[m_adctl & 0x7]();
 			}
 		}
 		case 0x38:      /* OPT2 */
@@ -166,9 +224,9 @@ uint8_t mc68hc11_cpu_device::hc11_regs_r(uint32_t address)
 		case 0x74:      /* SCSR1 */
 			return 0x40;
 		case 0x7c:      /* PORTH */
-			return m_io->read_byte(MC68HC11_IO_PORTH);
+			return m_port_input_cb[7]();
 		case 0x7e:      /* PORTG */
-			return m_io->read_byte(MC68HC11_IO_PORTG);
+			return m_port_input_cb[6]();
 		case 0x7f:      /* DDRG */
 			return 0;
 
@@ -177,13 +235,14 @@ uint8_t mc68hc11_cpu_device::hc11_regs_r(uint32_t address)
 		case 0x89:      /* SPSR2 */
 			return 0x80;
 		case 0x8a:      /* SPDR2 */
-			return m_io->read_byte(MC68HC11_IO_SPI2_DATA);
+			return m_spi2_data_input_cb();
 
 		case 0x8b:      /* OPT4 */
 			return 0;
 	}
 
-	logerror("HC11: regs_r %02X\n", reg);
+	if (!machine().side_effects_disabled())
+		logerror("HC11: regs_r %02X\n", reg);
 	return 0; // Dummy
 }
 
@@ -194,25 +253,25 @@ void mc68hc11_cpu_device::hc11_regs_w(uint32_t address, uint8_t value)
 	switch(reg)
 	{
 		case 0x00:      /* PORTA */
-			m_io->write_byte(MC68HC11_IO_PORTA, value);
+			m_port_output_cb[0](value);
 			return;
 		case 0x01:      /* DDRA */
 			//osd_printf_debug("HC11: ddra = %02X\n", value);
 			return;
 		case 0x03:      /* PORTC */
-			m_io->write_byte(MC68HC11_IO_PORTC, value);
+			m_port_output_cb[2](value);
 			return;
 		case 0x04:      /* PORTC */
-			m_io->write_byte(MC68HC11_IO_PORTB, value);
+			m_port_output_cb[1](value);
 			return;
 		case 0x08:      /* PORTD */
-			m_io->write_byte(MC68HC11_IO_PORTD, value); //mask & 0x3f?
+			m_port_output_cb[3](value); //mask & 0x3f?
 			return;
 		case 0x09:      /* DDRD */
 			//osd_printf_debug("HC11: ddrd = %02X\n", value);
 			return;
 		case 0x0a:      /* PORTE */
-			m_io->write_byte(MC68HC11_IO_PORTE, value);
+			m_port_output_cb[4](value);
 			return;
 		case 0x0e:      /* TCNT */
 		case 0x0f:
@@ -251,9 +310,9 @@ void mc68hc11_cpu_device::hc11_regs_w(uint32_t address, uint8_t value)
 			int reg_page = value & 0xf;
 			int ram_page = (value >> 4) & 0xf;
 
-			if (reg_page == ram_page) {
+			if (reg_page == ram_page && m_init_value == 0x00) {
 				m_reg_position = reg_page << 12;
-				m_ram_position = (ram_page << 12) + ((m_has_extended_io) ? 0x100 : 0x80);
+				m_ram_position = (ram_page << 12) + m_reg_block_size;
 			} else {
 				m_reg_position = reg_page << 12;
 				m_ram_position = ram_page << 12;
@@ -275,13 +334,13 @@ void mc68hc11_cpu_device::hc11_regs_w(uint32_t address, uint8_t value)
 		case 0x77:      /* SCDRL */
 			return;
 		case 0x7c:      /* PORTH */
-			m_io->write_byte(MC68HC11_IO_PORTH, value);
+			m_port_output_cb[7](value);
 			return;
 		case 0x7d:      /* DDRH */
 			//osd_printf_debug("HC11: ddrh = %02X at %04X\n", value, m_pc);
 			return;
 		case 0x7e:      /* PORTG */
-			m_io->write_byte(MC68HC11_IO_PORTG, value);
+			m_port_output_cb[6](value);
 			return;
 		case 0x7f:      /* DDRG */
 			//osd_printf_debug("HC11: ddrg = %02X at %04X\n", value, m_pc);
@@ -292,7 +351,7 @@ void mc68hc11_cpu_device::hc11_regs_w(uint32_t address, uint8_t value)
 		case 0x89:      /* SPSR2 */
 			return;
 		case 0x8a:      /* SPDR2 */
-			m_io->write_byte(MC68HC11_IO_SPI2_DATA, value);
+			m_spi2_data_output_cb(value);
 			return;
 
 		case 0x8b:      /* OPT4 */
@@ -320,27 +379,27 @@ uint16_t mc68hc11_cpu_device::FETCH16()
 
 uint8_t mc68hc11_cpu_device::READ8(uint32_t address)
 {
-	if(address >= m_reg_position && address < m_reg_position+(m_has_extended_io ? 0x100 : 0x40))
+	if(address >= m_reg_position && (address - m_reg_position) < m_reg_block_size)
 	{
-		return hc11_regs_r(address);
+		return m_io->read_byte(address-m_reg_position);
 	}
 	else if(address >= m_ram_position && address < m_ram_position+m_internal_ram_size)
 	{
-		return m_internal_ram[address-m_ram_position];
+		return m_data->read_byte(address-m_ram_position);
 	}
 	return m_program->read_byte(address);
 }
 
 void mc68hc11_cpu_device::WRITE8(uint32_t address, uint8_t value)
 {
-	if(address >= m_reg_position && address < m_reg_position+(m_has_extended_io ? 0x100 : 0x40))
+	if(address >= m_reg_position && (address - m_reg_position) < m_reg_block_size)
 	{
-		hc11_regs_w(address, value);
+		m_io->write_byte(address-m_reg_position, value);
 		return;
 	}
 	else if(address >= m_ram_position && address < m_ram_position+m_internal_ram_size)
 	{
-		m_internal_ram[address-m_ram_position] = value;
+		m_data->write_byte(address-m_ram_position, value);
 		return;
 	}
 	m_program->write_byte(address, value);
@@ -394,10 +453,9 @@ void mc68hc11_cpu_device::device_start()
 		}
 	}
 
-	m_internal_ram.resize(m_internal_ram_size);
-
 	m_program = &space(AS_PROGRAM);
 	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
+	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_pc));
@@ -413,10 +471,6 @@ void mc68hc11_cpu_device::device_start()
 	save_item(NAME(m_ram_position));
 	save_item(NAME(m_reg_position));
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_has_extended_io));
-	save_item(NAME(m_internal_ram_size));
-	save_item(NAME(m_init_value));
-	save_item(NAME(m_internal_ram));
 	save_item(NAME(m_wait_state));
 	save_item(NAME(m_stop_state));
 	save_item(NAME(m_tflg1));

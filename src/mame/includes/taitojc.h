@@ -109,7 +109,7 @@ private:
 	DECLARE_READ8_MEMBER(hc11_data_r);
 	DECLARE_READ8_MEMBER(hc11_output_r);
 	DECLARE_WRITE8_MEMBER(hc11_data_w);
-	DECLARE_READ8_MEMBER(hc11_analog_r);
+	template <int Ch> uint8_t hc11_analog_r();
 
 	DECLARE_READ16_MEMBER(dsp_shared_r);
 	DECLARE_WRITE16_MEMBER(dsp_shared_w);
@@ -149,7 +149,6 @@ private:
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
 
 	void dendego_map(address_map &map);
-	void hc11_io_map(address_map &map);
 	void hc11_pgm_map(address_map &map);
 	void taitojc_map(address_map &map);
 	void tms_data_map(address_map &map);

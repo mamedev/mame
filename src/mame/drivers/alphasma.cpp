@@ -64,7 +64,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(port_d_w);
 	void update_lcdc(bool lcdc0, bool lcdc1);
 
-	void alphasmart_io(address_map &map);
 	void alphasmart_mem(address_map &map);
 
 	uint8_t           m_matrix[2];
@@ -182,12 +181,6 @@ void alphasmart_state::alphasmart_mem(address_map &map)
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
 	map(0x8000, 0x8000).rw(FUNC(alphasmart_state::kb_r), FUNC(alphasmart_state::kb_matrixh_w));
 	map(0xc000, 0xc000).w(FUNC(alphasmart_state::kb_matrixl_w));
-}
-
-void alphasmart_state::alphasmart_io(address_map &map)
-{
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(FUNC(alphasmart_state::port_a_r), FUNC(alphasmart_state::port_a_w));
-	map(MC68HC11_IO_PORTD, MC68HC11_IO_PORTD).rw(FUNC(alphasmart_state::port_d_r), FUNC(alphasmart_state::port_d_w));
 }
 
 READ8_MEMBER(asma2k_state::io_r)
@@ -434,10 +427,12 @@ void alphasmart_state::machine_reset()
 void alphasmart_state::alphasmart(machine_config &config)
 {
 	/* basic machine hardware */
-	MC68HC11(config, m_maincpu, XTAL(8'000'000)/2);  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
+	MC68HC11D0(config, m_maincpu, XTAL(8'000'000)/2);  // XTAL is 8 Mhz, unknown divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart_state::alphasmart_mem);
-	m_maincpu->set_addrmap(AS_IO, &alphasmart_state::alphasmart_io);
-	m_maincpu->set_config(0, 192, 0x00);
+	m_maincpu->in_pa_callback().set(FUNC(alphasmart_state::port_a_r));
+	m_maincpu->out_pa_callback().set(FUNC(alphasmart_state::port_a_w));
+	m_maincpu->in_pd_callback().set(FUNC(alphasmart_state::port_d_r));
+	m_maincpu->out_pd_callback().set(FUNC(alphasmart_state::port_d_w));
 
 	KS0066_F05(config, m_lcdc0, 0);
 	m_lcdc0->set_lcd_size(2, 40);
