@@ -406,6 +406,14 @@ ROM_START( roma16 )
 	ROM_LOAD16_BYTE("roma16-l.bin", 0x00001, 0x08000, CRC(8245ddd2) SHA1(ab048b60fdc4358913a5d07b6fee863b66dd6734) )
 ROM_END
 
+ROM_START( roma16a )
+	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("roma_r_low",  0x00000, 0x04000, CRC(f2312170) SHA1(82a50ba59f74365aa77478adaadbbace6693dcc1) )
+	ROM_LOAD16_BYTE("roma_l_low",  0x00001, 0x04000, CRC(5fbb72cc) SHA1(458473a62f9f7394c9d02a6ad0939d8e19bae78b) )
+	ROM_LOAD16_BYTE("roma_r_high", 0x08000, 0x04000, CRC(a55917db) SHA1(df9a9a96cdc1c9a7ed0dc70c4ddbb4278236a15f) )
+	ROM_LOAD16_BYTE("roma_l_high", 0x08001, 0x04000, CRC(0b20617b) SHA1(f0296c486ce9009a69de1e50b90b0e1b7555f468) )
+ROM_END
+
 
 /***************************************************************************
   Game drivers
@@ -413,10 +421,14 @@ ROM_END
 
 /*    YEAR, NAME,      PARENT    COMPAT  MACHINE   INPUT         CLASS          INIT        COMPANY             FULLNAME                  FLAGS */
 CONS( 1984, glasgow,   0,        0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1985, amsterd,   0,        0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, amsterda,  amsterd,  0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (older)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, amsterda,  amsterd,  0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1986, dallas32,  0,        0,      dallas32, new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, dallas16,  dallas32, 0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, dallas16a, dallas32, 0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (older)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, dallas16a, dallas32, 0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1987, roma32,    0,        0,      dallas32, new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020",    MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, roma16,    roma32,   0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000",    MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, roma16a,   roma32,   0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

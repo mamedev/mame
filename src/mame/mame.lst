@@ -21426,6 +21426,7 @@ dallas16a                       // Dallas
 dallas32                        // Dallas
 glasgow                         // Glasgow
 roma16                          // Roma
+roma16a                         // Roma
 roma32                          // Roma
 
 @source:mephisto_mm2.cpp

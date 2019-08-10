@@ -51,6 +51,9 @@ ESB 6000 chessboard:
 ESB 3000 hardware is probably same as ESB 6000.
 There are no other known external port peripherals.
 
+The Brikett was also used in the 1983 Mephisto Excalibur, but the hardware
+is completely different, based on a 68000.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -165,7 +168,7 @@ void brikett_state::set_cpu_freq()
 {
 	// 2nd hardware model has 2 XTALs, it will increase CPU voltage (and speed) when running on mains power,
 	// the 3.579545MHz XTAL is still used for IRQ. Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz
-	// and a newer CDP1805CE CPU by H+G's service department on request.
+	// and a newer CDP1805CE CPU by Hobby Computer Centrale on request.
 	// (It is unexpected that the 1805 accepts such a high overclock, but tests show that it is indeed twice faster)
 	u8 inp = m_inputs[4].read_safe(0);
 	m_maincpu->set_unscaled_clock((inp & 2) ? 12_MHz_XTAL : ((inp & 1) ? 6.144_MHz_XTAL : 3.579545_MHz_XTAL));
