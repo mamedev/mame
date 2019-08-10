@@ -427,6 +427,10 @@ project ("osd_" .. _OPTIONS["osd"])
 	end
 
 	files {
+		MAME_DIR .. "src/osd/modules/debugger/debuggdbstub.cpp",
+	}
+
+	files {
 		MAME_DIR .. "src/osd/sdl/osdsdl.h",
 		MAME_DIR .. "src/osd/sdl/sdlprefix.h",
 		MAME_DIR .. "src/osd/sdl/sdlmain.cpp",

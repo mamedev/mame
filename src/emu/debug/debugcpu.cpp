@@ -1299,6 +1299,8 @@ device_debug::device_debug(device_t &device)
 	, m_pc_history_index(0)
 	, m_bplist(nullptr)
 	, m_rplist(nullptr)
+	, m_triggered_breakpoint(nullptr)
+	, m_triggered_watchpoint(nullptr)
 	, m_trace(nullptr)
 	, m_hotspot_threshhold(0)
 	, m_track_pc_set()
@@ -2551,7 +2553,10 @@ void device_debug::breakpoint_check(offs_t pc)
 
 			// print a notification, unless the action made us go again
 			if (debugcpu.is_stopped())
+			{
 				m_device.machine().debugger().console().printf("Stopped at breakpoint %X\n", bp->m_index);
+				m_triggered_breakpoint = bp;
+			}
 			break;
 		}
 
@@ -3071,6 +3076,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 							   pc);
 		debug.console().printf("%s\n", buffer);
 		m_debugInterface->compute_debug_flags();
+		m_debugInterface->set_triggered_watchpoint(this);
 	}
 
 	debug.cpu().set_within_instruction(false);
