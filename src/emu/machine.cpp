@@ -329,6 +329,10 @@ int running_machine::run(bool quiet)
 		// display the startup screens
 		manager().ui_initialize(*this);
 
+		// invoke prestart and start callbacks
+		call_notifiers(MACHINE_NOTIFY_PRESTART);
+		call_notifiers(MACHINE_NOTIFY_START);
+
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
 
@@ -767,15 +771,12 @@ void running_machine::toggle_pause()
 //  given type
 //-------------------------------------------------
 
-void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback, bool first)
+void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback)
 {
 	assert_always(m_current_phase == machine_phase::INIT, "Can only call add_notifier at init time!");
 
-	if(first)
-		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
-
 	// exit notifiers are added to the head, and executed in reverse order
-	else if (event == MACHINE_NOTIFY_EXIT)
+	if (event == MACHINE_NOTIFY_EXIT)
 		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
 
 	// all other notifiers are added to the tail, and executed in the order registered

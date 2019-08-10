@@ -120,6 +120,7 @@ private:
 
 	void on_machine_prestart();
 	void on_machine_start();
+	void on_machine_reset();
 	void on_machine_stop();
 	void on_machine_pause();
 	void on_machine_resume();

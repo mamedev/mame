@@ -40,6 +40,8 @@ enum class machine_phase
 enum machine_notification
 {
 	MACHINE_NOTIFY_FRAME,
+	MACHINE_NOTIFY_PRESTART,
+	MACHINE_NOTIFY_START,
 	MACHINE_NOTIFY_RESET,
 	MACHINE_NOTIFY_PAUSE,
 	MACHINE_NOTIFY_RESUME,
@@ -218,7 +220,7 @@ public:
 	void pause();
 	void resume();
 	void toggle_pause();
-	void add_notifier(machine_notification event, machine_notify_delegate callback, bool first = false);
+	void add_notifier(machine_notification event, machine_notify_delegate callback);
 	void call_notifiers(machine_notification which);
 	void add_logerror_callback(logerror_callback callback);
 	void set_ui_active(bool active) { m_ui_active = active; }

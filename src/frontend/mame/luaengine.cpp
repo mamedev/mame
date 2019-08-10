@@ -712,6 +712,11 @@ void lua_engine::on_machine_start()
 	execute_function("LUA_ON_START");
 }
 
+void lua_engine::on_machine_reset()
+{
+	execute_function("LUA_ON_RESET");
+}
+
 void lua_engine::on_machine_stop()
 {
 	execute_function("LUA_ON_STOP");
@@ -765,8 +770,9 @@ bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 
 void lua_engine::attach_notifiers()
 {
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_prestart, this), true);
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_start, this));
+	machine().add_notifier(MACHINE_NOTIFY_PRESTART, machine_notify_delegate(&lua_engine::on_machine_prestart, this));
+	machine().add_notifier(MACHINE_NOTIFY_START, machine_notify_delegate(&lua_engine::on_machine_start, this));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_reset, this));
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&lua_engine::on_machine_stop, this));
 	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&lua_engine::on_machine_pause, this));
 	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&lua_engine::on_machine_resume, this));
@@ -799,8 +805,9 @@ void lua_engine::initialize()
  * emu.wait(len) - wait for len within coroutine
  * emu.lang_translate(str) - get translation for str if available
  *
- * emu.register_prestart(callback) - register callback before reset
- * emu.register_start(callback) - register callback after reset
+ * emu.register_prestart(callback) - register callback before start
+ * emu.register_start(callback) - register callback after start
+ * emu.register_reset(callback) - register callback after reset
  * emu.register_stop(callback) - register callback after stopping
  * emu.register_pause(callback) - register callback at pause
  * emu.register_resume(callback) - register callback at resume
@@ -843,6 +850,7 @@ void lua_engine::initialize()
 		};
 	emu["register_prestart"] = [this](sol::function func){ register_function(func, "LUA_ON_PRESTART"); };
 	emu["register_start"] = [this](sol::function func){ register_function(func, "LUA_ON_START"); };
+	emu["register_reset"] = [this](sol::function func) { register_function(func, "LUA_ON_RESET"); };
 	emu["register_stop"] = [this](sol::function func){ register_function(func, "LUA_ON_STOP"); };
 	emu["register_pause"] = [this](sol::function func){ register_function(func, "LUA_ON_PAUSE"); };
 	emu["register_resume"] = [this](sol::function func){ register_function(func, "LUA_ON_RESUME"); };
