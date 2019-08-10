@@ -53,6 +53,8 @@ void microdar_state::microdar(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // GM76C88ALK-15 + battery
 
 	I2CMEM(config, m_eeprom).set_page_size(16).set_data_size(0x800);
+
+	// IC7 might be some sort of I2C RTC?
 }
 
 
