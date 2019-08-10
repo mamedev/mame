@@ -161,7 +161,7 @@ bbr_zpb
 	TMP = read_pc();
 	TMP2 = read(TMP);
 	read(TMP);
-	read_pc_noinc();
+	TMP = read_pc();
 	if(!(TMP2 & (1 << ((inst_state >> 4) & 7)))) {
 		PC += int8_t(TMP);
 	}
@@ -171,7 +171,7 @@ bbs_zpb
 	TMP = read_pc();
 	TMP2 = read(TMP);
 	read(TMP);
-	read_pc_noinc();
+	TMP = read_pc();
 	if(TMP2 & (1 << ((inst_state >> 4) & 7))) {
 		PC += int8_t(TMP);
 	}
