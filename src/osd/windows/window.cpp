@@ -88,10 +88,6 @@ using namespace Windows::UI::Core;
 
 static DWORD main_threadid;
 
-// actual physical resolution
-static int win_physical_width;
-static int win_physical_height;
-
 
 
 //============================================================
@@ -1797,11 +1793,7 @@ void win_window_info::adjust_window_position_after_major_change()
 
 	// take note of physical window size (used for lightgun coordinate calculation)
 	if (m_index == 0)
-	{
-		win_physical_width = newrect.width();
-		win_physical_height = newrect.height();
-		osd_printf_verbose("Physical width %d, height %d\n",win_physical_width,win_physical_height);
-	}
+		osd_printf_verbose("Physical width %d, height %d\n", newrect.width(), newrect.height());
 }
 
 
