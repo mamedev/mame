@@ -51,6 +51,7 @@
 #include "bus/a2gameio/gameio.h"
 #include "bus/a2gameio/joystick.h"
 #include "bus/a2gameio/joyport.h"
+#include "bus/a2gameio/computereyes.h"
 
 
 //**************************************************************************
@@ -71,11 +72,13 @@ void apple2_gameio_device::iiandplus_options(device_slot_interface &slot)
 {
 	slot.option_add("joy", APPLE2_JOYSTICK);
 	slot.option_add("joyport", APPLE2_JOYPORT);
+	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
 }
 
 void apple2_gameio_device::default_options(device_slot_interface &slot)
 {
 	slot.option_add("joy", APPLE2_JOYSTICK);
+	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
 }
 
 void apple2_gameio_device::device_config_complete()

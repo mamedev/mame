@@ -1474,8 +1474,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 					break;
 			}
 		}
-
-		return;
+// ComputerEyes seems to indicate that the annuciators get tickled regardless of the IOUDIS state.
 	}
 
 	if ((offset & 0xf0) == 0x30) // speaker, $C030 is really 30-3f

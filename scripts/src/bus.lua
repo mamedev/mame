@@ -2145,6 +2145,8 @@ end
 
 if (BUSES["A2GAMEIO"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/a2gameio/computereyes.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/computereyes.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/gameio.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/gameio.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/joystick.cpp",
