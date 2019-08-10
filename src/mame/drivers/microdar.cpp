@@ -63,8 +63,17 @@ ROM_START(microdar)
 	ROM_FILL(0x0000, 1, 0x02) // temporary LJMP to external init code
 	ROM_FILL(0x0001, 1, 0x10)
 	ROM_FILL(0x0002, 1, 0x1b)
-	ROM_FILL(0x000b, 1, 0x32) // RETI stubs
-	ROM_FILL(0x001b, 1, 0x32)
+	ROM_FILL(0x000b, 1, 0x02) // temporary LJMP to interrupt handler
+	ROM_FILL(0x000c, 1, 0x10)
+	ROM_FILL(0x000d, 1, 0x15)
+	ROM_FILL(0x001b, 1, 0x02) // temporary LJMP to interrupt handler
+	ROM_FILL(0x001c, 1, 0x10)
+	ROM_FILL(0x001d, 1, 0x18)
+	ROM_FILL(0x0058, 1, 0x32) // RETI stubs
+	ROM_FILL(0x00af, 1, 0x32)
+	ROM_FILL(0x00c9, 1, 0x02) // temporary LJMP to end of interrupt handler
+	ROM_FILL(0x00ca, 1, 0x12)
+	ROM_FILL(0x00cb, 1, 0xd1)
 	ROM_FILL(0x0135, 1, 0x22) // RET stubs
 	ROM_FILL(0x0163, 1, 0x22)
 	ROM_FILL(0x0185, 1, 0x22)
