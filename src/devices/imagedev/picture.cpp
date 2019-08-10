@@ -61,4 +61,9 @@ image_init_result picture_image_device::call_load()
 
 void picture_image_device::call_unload()
 {
+	if (m_picture)
+	{
+		delete m_picture;
+		m_picture = nullptr;
+	}
 }
