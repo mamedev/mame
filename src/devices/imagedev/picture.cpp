@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(IMAGE_PICTURE, picture_image_device, "picture_image", "Still Image")
 
 //-------------------------------------------------
-//  microdrive_image_device - constructor
+//  picture_image_device - constructor
 //-------------------------------------------------
 
 picture_image_device::picture_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -31,7 +31,7 @@ picture_image_device::picture_image_device(const machine_config &mconfig, const 
 }
 
 //-------------------------------------------------
-//  microdrive_image_device - destructor
+//  picture_image_device - destructor
 //-------------------------------------------------
 
 picture_image_device::~picture_image_device()
@@ -53,6 +53,10 @@ image_init_result picture_image_device::call_load()
 	m_picture = new bitmap_argb32;
 	if (png_read_bitmap(image_core_file(), *m_picture) != PNGERR_NONE)
 	{
+		delete m_picture;
+		m_picture = nullptr;
+
+		// todo: try JPEG here.
 		return image_init_result::FAIL;
 	}
 
