@@ -22,7 +22,7 @@ _______________________________
 | | |   |_| ______   BATT   __ |
 | | |   __  |IC12_|         | | CN
 | | |   IC8 ______________  | ||
-| |_|   __  |ICXX REF34VA | | ||
+| |_|   __  |IC1  REF34VA | | ||
 | __    IC7 |______9818h-_|XT1||
 | |CN   ______  __________  | ||
 | | |   |IC5__||IC4_______| | ||
@@ -41,12 +41,12 @@ _______________________________
 
 IC19, IC20, IC18, IC21 = Toshiba TD62703AP
 IC25, IC24 = ST ULN2803A
-IC17 = REF0032 9817K0552
+IC17 = REF0032 9817K0552 (40-pin DIP: display controller?)
 IC23, IC22, IC12 = Hitachi HD74HC273P
 IC15 = Natsemi CD4514BCN
 IC8 = Microchip 24LC16B
 IC7 = TI TL7705ACP
-IC1 = Philips REF34VA 9818h-
+IC1 = Philips REF34VA 9818h- (40-pin DIP: 80C51?)
 XT1 = 20.000 MHz
 IC5 = Hitachi HD74HC08P
 IC6 = Hitachi HD74HC138P
@@ -106,11 +106,10 @@ void microdar_state::microdar(machine_config &config)
 
 	I2CMEM(config, m_eeprom).set_page_size(16).set_data_size(0x800);
 
-	// IC7 might be some sort of I2C RTC?
+	// Code also references some sort of serial RTC?
 }
 
 
-// Display controller (IC17) is 40-pin DIP labeled "REF0032 9317K0552"
 ROM_START(microdar)
 	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD("ref34va_k7v5534_9818h-.ic1", 0x0000, 0x1000, NO_DUMP)
