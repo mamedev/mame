@@ -53,7 +53,7 @@ debugger_console::debugger_console(running_machine &machine)
 	printf("Currently targeting %s (%s)\n", m_machine.system().name, m_machine.system().type.fullname());
 
 	/* request callback upon exiting */
-	m_machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&debugger_console::exit, this));
+	m_machine.add_notifier(MACHINE_NOTIFY_EXIT, [this]() { exit(); });
 
 	/* listen in on the errorlog */
 	using namespace std::placeholders;

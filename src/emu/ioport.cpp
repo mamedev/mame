@@ -1693,8 +1693,8 @@ ioport_manager::ioport_manager(running_machine &machine)
 time_t ioport_manager::initialize()
 {
 	// add an exit callback and a frame callback
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&ioport_manager::exit, this));
-	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&ioport_manager::frame_update_callback, this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, [this]() { exit(); });
+	machine().add_notifier(MACHINE_NOTIFY_FRAME, [this]() { frame_update_callback(); });
 
 	// initialize the default port info from the OSD
 	init_port_types();

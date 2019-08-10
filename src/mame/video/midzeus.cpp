@@ -292,7 +292,7 @@ VIDEO_START_MEMBER(midzeus_state,midzeus)
 	poly = auto_alloc(machine(), midzeus_renderer(*this));
 
 	/* we need to cleanup on exit */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&midzeus_state::exit_handler, this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, [this]() { exit_handler(); });
 
 	yoffs = 0;
 	texel_width = 256;

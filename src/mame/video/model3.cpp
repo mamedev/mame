@@ -177,7 +177,7 @@ void model3_state::video_start()
 	m_tri_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_BUFFER_SIZE);
 	m_tri_alpha_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_ALPHA_BUFFER_SIZE);
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&model3_state::model3_exit, this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, [this]() { model3_exit(); });
 
 	m_m3_char_ram = make_unique_clear<uint64_t[]>(0x100000/8);
 	m_m3_tile_ram = make_unique_clear<uint64_t[]>(0x8000/8);

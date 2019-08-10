@@ -201,7 +201,7 @@ void menu::init(running_machine &machine, ui_options &mopt)
 		auto const ins(s_global_states.emplace(&machine, std::make_shared<global_state>(machine, mopt)));
 		assert(ins.second); // calling init twice is bad
 		if (ins.second)
-			machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&menu::exit, &machine)); // add an exit callback to free memory
+			machine.add_notifier(MACHINE_NOTIFY_EXIT, [&machine]() { exit(machine); }); // add an exit callback to free memory
 		else
 			ins.first->second->stack_reset();
 	}

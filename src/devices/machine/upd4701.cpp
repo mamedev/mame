@@ -64,7 +64,7 @@ void upd4701_device::device_start()
 
 	// register special callback for analog inputs
 	if (m_portx.found() || m_porty.found())
-		machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&upd4701_device::analog_update, this));
+		machine().add_notifier(MACHINE_NOTIFY_FRAME, [this]() { analog_update(); });
 }
 
 //-------------------------------------------------

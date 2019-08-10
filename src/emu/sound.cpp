@@ -867,10 +867,10 @@ sound_manager::sound_manager(running_machine &machine)
 
 	// register callbacks
 	machine.configuration().config_register("mixer", config_load_delegate(&sound_manager::config_load, this), config_save_delegate(&sound_manager::config_save, this));
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&sound_manager::pause, this));
-	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&sound_manager::resume, this));
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&sound_manager::reset, this));
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sound_manager::stop_recording, this));
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, [this]() { pause(); });
+	machine.add_notifier(MACHINE_NOTIFY_RESUME, [this]() { resume(); });
+	machine.add_notifier(MACHINE_NOTIFY_RESET, [this]() { reset(); });
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, [this]() { stop_recording(); });
 
 	// register global states
 	machine.save().save_item(NAME(m_last_update));

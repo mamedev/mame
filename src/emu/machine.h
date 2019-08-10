@@ -138,8 +138,6 @@ private:
 
 // ======================> running_machine
 
-typedef delegate<void ()> machine_notify_delegate;
-
 // description of the currently-running machine
 class running_machine
 {
@@ -218,7 +216,7 @@ public:
 	void pause();
 	void resume();
 	void toggle_pause();
-	void add_notifier(machine_notification event, machine_notify_delegate callback, bool first = false);
+	void add_notifier(machine_notification event, std::function<void()> &&callback, bool first = false);
 	void call_notifiers(machine_notification which);
 	void add_logerror_callback(logerror_callback callback);
 	void set_ui_active(bool active) { m_ui_active = active; }
@@ -361,15 +359,7 @@ private:
 	const char *            m_saveload_searchpath;
 
 	// notifier callbacks
-	struct notifier_callback_item
-	{
-		// construction/destruction
-		notifier_callback_item(machine_notify_delegate func);
-
-		// state
-		machine_notify_delegate     m_func;
-	};
-	std::list<std::unique_ptr<notifier_callback_item>> m_notifier_list[MACHINE_NOTIFY_COUNT];
+	std::list<std::function<void()>> m_notifier_list[MACHINE_NOTIFY_COUNT];
 
 	// logerror callbacks
 	class logerror_callback_item

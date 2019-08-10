@@ -1124,7 +1124,7 @@ void cobra_state::cobra_video_exit()
 
 void cobra_state::video_start()
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&cobra_state::cobra_video_exit, this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, [this]() { cobra_video_exit(); });
 
 	m_renderer = std::make_unique<cobra_renderer>(*m_screen);
 	m_renderer->gfx_init();

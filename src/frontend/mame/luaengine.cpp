@@ -702,35 +702,6 @@ void lua_engine::register_function(sol::function func, const char *id)
 		sol().registry().create_named(id, 1, func);
 }
 
-void lua_engine::on_machine_prestart()
-{
-	execute_function("LUA_ON_PRESTART");
-}
-
-void lua_engine::on_machine_start()
-{
-	execute_function("LUA_ON_START");
-}
-
-void lua_engine::on_machine_stop()
-{
-	execute_function("LUA_ON_STOP");
-}
-
-void lua_engine::on_machine_pause()
-{
-	execute_function("LUA_ON_PAUSE");
-}
-
-void lua_engine::on_machine_resume()
-{
-	execute_function("LUA_ON_RESUME");
-}
-
-void lua_engine::on_machine_frame()
-{
-	execute_function("LUA_ON_FRAME");
-}
 
 void lua_engine::on_frame_done()
 {
@@ -765,12 +736,12 @@ bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 
 void lua_engine::attach_notifiers()
 {
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_prestart, this), true);
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_start, this));
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&lua_engine::on_machine_stop, this));
-	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&lua_engine::on_machine_pause, this));
-	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&lua_engine::on_machine_resume, this));
-	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&lua_engine::on_machine_frame, this));
+	machine().add_notifier(MACHINE_NOTIFY_RESET,	[this]() { execute_function("LUA_ON_PRESTART"); }, true);
+	machine().add_notifier(MACHINE_NOTIFY_RESET,	[this]() { execute_function("LUA_ON_START"); });
+	machine().add_notifier(MACHINE_NOTIFY_EXIT,		[this]() { execute_function("LUA_ON_STOP"); });
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE,	[this]() { execute_function("LUA_ON_PAUSE"); });
+	machine().add_notifier(MACHINE_NOTIFY_RESUME,	[this]() { execute_function("LUA_ON_RESUME"); });
+	machine().add_notifier(MACHINE_NOTIFY_FRAME,	[this]() { execute_function("LUA_ON_FRAME"); });
 }
 
 //-------------------------------------------------

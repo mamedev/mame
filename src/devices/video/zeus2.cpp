@@ -82,7 +82,7 @@ void zeus2_device::device_start()
 	m_irq.resolve_safe();
 
 	/* we need to cleanup on exit */
-	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&zeus2_device::exit_handler2, this));
+	//machine().add_notifier(MACHINE_NOTIFY_EXIT, [this](){ exit_handler2(); });
 
 	int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::int_timer_callback), this));
 

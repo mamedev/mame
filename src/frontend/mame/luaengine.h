@@ -118,13 +118,6 @@ private:
 
 	running_machine &machine() const { return *m_machine; }
 
-	void on_machine_prestart();
-	void on_machine_start();
-	void on_machine_stop();
-	void on_machine_pause();
-	void on_machine_resume();
-	void on_machine_frame();
-
 	void resume(void *ptr, int nparam);
 	void register_function(sol::function func, const char *id);
 	int enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback);

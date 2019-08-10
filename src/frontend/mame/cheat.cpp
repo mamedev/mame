@@ -1071,7 +1071,7 @@ cheat_manager::cheat_manager(running_machine &machine)
 	m_justify.resize(target_font_rows * 2);
 
 	// request a callback
-	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&cheat_manager::frame_update, this));
+	machine.add_notifier(MACHINE_NOTIFY_FRAME, [this]() { frame_update(); });
 
 	// create a global symbol table
 	m_symtable.add("frame", symbol_table::READ_ONLY, &m_framecount);

@@ -308,7 +308,7 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	m_ui = std::make_unique<mame_ui_manager>(machine);
 	m_ui->init();
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&mame_machine_manager::reset, this));
+	machine.add_notifier(MACHINE_NOTIFY_RESET, [this]() { reset(); });
 
 	m_ui->set_startup_text("Initializing...", true);
 

@@ -108,7 +108,7 @@ video_manager::video_manager(running_machine &machine)
 	, m_timecode_total(attotime::zero)
 {
 	// request a callback upon exiting
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&video_manager::exit, this));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, [this]() { exit(); });
 	machine.save().register_postload(save_prepost_delegate(FUNC(video_manager::postload), this));
 
 	// extract initial execution state from global configuration settings

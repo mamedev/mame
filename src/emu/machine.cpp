@@ -257,8 +257,8 @@ void running_machine::start()
 		device.resolve_post_map();
 
 	// register callbacks for the devices, then start them
-	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&running_machine::reset_all_devices, this));
-	add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&running_machine::stop_all_devices, this));
+	add_notifier(MACHINE_NOTIFY_RESET, [this]() { reset_all_devices(); });
+	add_notifier(MACHINE_NOTIFY_EXIT, [this]() { stop_all_devices(); }); 
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
@@ -767,20 +767,20 @@ void running_machine::toggle_pause()
 //  given type
 //-------------------------------------------------
 
-void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback, bool first)
+void running_machine::add_notifier(machine_notification event, std::function<void()> &&callback, bool first)
 {
 	assert_always(m_current_phase == machine_phase::INIT, "Can only call add_notifier at init time!");
 
 	if(first)
-		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
+		m_notifier_list[event].push_front(std::move(callback));
 
 	// exit notifiers are added to the head, and executed in reverse order
 	else if (event == MACHINE_NOTIFY_EXIT)
-		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
+		m_notifier_list[event].push_front(std::move(callback));
 
 	// all other notifiers are added to the tail, and executed in the order registered
 	else
-		m_notifier_list[event].push_back(std::make_unique<notifier_callback_item>(callback));
+		m_notifier_list[event].push_back(std::move(callback));
 }
 
 
@@ -881,7 +881,7 @@ u32 running_machine::rand()
 void running_machine::call_notifiers(machine_notification which)
 {
 	for (auto& cb : m_notifier_list[which])
-		cb->m_func();
+		cb();
 }
 
 
@@ -1205,16 +1205,6 @@ void running_machine::popup_message(util::format_argument_pack<std::ostream> con
 //**************************************************************************
 //  CALLBACK ITEMS
 //**************************************************************************
-
-//-------------------------------------------------
-//  notifier_callback_item - constructor
-//-------------------------------------------------
-
-running_machine::notifier_callback_item::notifier_callback_item(machine_notify_delegate func)
-	: m_func(std::move(func))
-{
-}
-
 
 //-------------------------------------------------
 //  logerror_callback_item - constructor

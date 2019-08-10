@@ -191,7 +191,7 @@ void mame_ui_manager::init()
 	m_mouse_show = machine().system().flags & machine_flags::CLICKABLE_ARTWORK ? true : false;
 
 	// request a callback upon exiting
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mame_ui_manager::exit, this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, [this]() { exit(); });
 
 	// create mouse bitmap
 	uint32_t *dst = &m_mouse_bitmap.pix32(0);

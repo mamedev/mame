@@ -250,5 +250,5 @@ void image_manager::postdevice_init()
 		}
 	}
 	/* add a callback for when we shut down */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&image_manager::unload_all, this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, [this]() { unload_all(); });
 }
