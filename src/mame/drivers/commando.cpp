@@ -547,7 +547,7 @@ ROM_START( commandob3 )
 	ROM_LOAD( "b10.8h",  0x10000, 0x4000, CRC(98703982) SHA1(ba9a9b0dcadd4f52502828408c4a19b0bd518351) )   // 9c.8h
 	ROM_LOAD( "b11.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )   // 10c.9h
 
-	ROM_REGION( 0x600, "proms", 0 ) // not dumped for this set, assumed to match since they are the same for all sets
+	ROM_REGION( 0x600, "proms", 0 )
 	ROM_LOAD( "vtb1.1d", 0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
 	ROM_LOAD( "vtb2.2d", 0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
 	ROM_LOAD( "vtb3.3d", 0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
