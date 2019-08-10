@@ -2877,7 +2877,6 @@ ROM_START( robocopu0 ) /* DE-0297-3 main board, DE-0316-3 sub/rom board */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 
 	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
-	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
 	ROM_LOAD( "mb7116e_a-1.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) )
 	ROM_LOAD( "mb7122e_a-2.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
