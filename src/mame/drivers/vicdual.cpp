@@ -1564,7 +1564,7 @@ static INPUT_PORTS_START( wantsega )
 
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // teleport
-		
+
 	PORT_MODIFY("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "6" )
@@ -3927,27 +3927,34 @@ ROM_START( alphaho )
 	ROM_LOAD( "alphaho.col",  0x0000, 0x0020, NO_DUMP )
 ROM_END
 
+// Wanted uses 2 sound boards. One from Head On and one from Space Attack. The sound board has the name printed on the bottom
+// together with the Sega Gremlin logo and other numbers.
+
 ROM_START( wantsega )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1",           0x0000, 0x0800, CRC(fc2ccf14) SHA1(345ed91ce74615a89b4ea0a5dc38489b36a4cc6e) )
-	ROM_LOAD( "2",           0x0800, 0x0800, CRC(c1c59576) SHA1(5174c769390438d05682a4999439b2f5659cbda8) )
-	ROM_LOAD( "3",           0x1000, 0x0800, CRC(862b7303) SHA1(8e89311ca23ca89d258744de393ecd88fc8d3bfb) )
-	ROM_LOAD( "4",           0x1800, 0x0800, CRC(0dfab42b) SHA1(723bda17dfaeec90545a0e8ef9ac83e5d92eec1e) )
-	ROM_LOAD( "5",           0x2000, 0x0800, CRC(530b9a43) SHA1(af07c2dbfe45c10ef3bd06efe56f780b6afbc9fc) )
-	ROM_LOAD( "6",           0x2800, 0x0800, CRC(d038b76e) SHA1(b72031b1a6010d70a1db66fc825cb9046fb98330) )
-	ROM_LOAD( "7",           0x3000, 0x0800, CRC(e1bf29bd) SHA1(541e9e83f05e764f9bb6026ba21e15627a9f3cb7) )
-	ROM_LOAD( "8",           0x3800, 0x0800, CRC(1b8a52cf) SHA1(59ecff36406191a5b92892147f6d84d9a501b697) )
-	ROM_LOAD( "9",           0x4000, 0x0800, CRC(bd84a06a) SHA1(c60f6c915f01f8f474bcb2f4ebb65be06c51b7f8) )
-	ROM_LOAD( "10",          0x4800, 0x0800, CRC(bd321dd9) SHA1(25e18f4a35ece041a20e5dc1cd6bc529d3ba2719) )
-	ROM_LOAD( "11",          0x5000, 0x0800, CRC(2cb222ca) SHA1(74717c194cdf07dd5b6d99552881a64ab7ef4886) )
-	ROM_LOAD( "12",          0x5800, 0x0800, CRC(390e3c32) SHA1(1fd219bf8c09472c337b2f33052092eb8c970f5d) )
-	ROM_LOAD( "13",          0x6000, 0x0800, CRC(3779e91c) SHA1(0b338ba1558d4b7b1faa7fb1354b39764b1a43cb) )
-	ROM_LOAD( "14",          0x6800, 0x0800, CRC(7e70b2f7) SHA1(d3986716e8447f258186fafd1a95ce9c52f61033) )
-	ROM_LOAD( "15",          0x7000, 0x0800, CRC(46b71a75) SHA1(a512ebee6020fd2ccbff9342a956131911177b08) )
-	ROM_LOAD( "16",          0x7800, 0x0800, CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e) )
+	ROM_LOAD( "4-19_1_9afc.u33",       0x0000, 0x0800, CRC(fc2ccf14) SHA1(345ed91ce74615a89b4ea0a5dc38489b36a4cc6e) )
+	ROM_LOAD( "4-19_2_d170.u32",       0x0800, 0x0800, CRC(c1c59576) SHA1(5174c769390438d05682a4999439b2f5659cbda8) )
+	ROM_LOAD( "4-19_3_f291.u31",       0x1000, 0x0800, CRC(862b7303) SHA1(8e89311ca23ca89d258744de393ecd88fc8d3bfb) )
+	ROM_LOAD( "4-19_4_a49b.u30",       0x1800, 0x0800, CRC(0dfab42b) SHA1(723bda17dfaeec90545a0e8ef9ac83e5d92eec1e) )
+	ROM_LOAD( "4-19_5_7b35.u29",       0x2000, 0x0800, CRC(530b9a43) SHA1(af07c2dbfe45c10ef3bd06efe56f780b6afbc9fc) )
+	ROM_LOAD( "4-19_6_bc98.u28",       0x2800, 0x0800, CRC(d038b76e) SHA1(b72031b1a6010d70a1db66fc825cb9046fb98330) )
+	ROM_LOAD( "4-19_7_f852.u27",       0x3000, 0x0800, CRC(e1bf29bd) SHA1(541e9e83f05e764f9bb6026ba21e15627a9f3cb7) )
+	ROM_LOAD( "4-19_8_35df.u26",       0x3800, 0x0800, CRC(1b8a52cf) SHA1(59ecff36406191a5b92892147f6d84d9a501b697) )
+	ROM_LOAD( "4-19_9_ffa9.u8",        0x4000, 0x0800, CRC(bd84a06a) SHA1(c60f6c915f01f8f474bcb2f4ebb65be06c51b7f8) )
+	ROM_LOAD( "4-19_10_b2be.u7",       0x4800, 0x0800, CRC(bd321dd9) SHA1(25e18f4a35ece041a20e5dc1cd6bc529d3ba2719) )
+	ROM_LOAD( "4-19_11_d8fb.u6",       0x5000, 0x0800, CRC(2cb222ca) SHA1(74717c194cdf07dd5b6d99552881a64ab7ef4886) )
+	ROM_LOAD( "4-19_12_0bc6.u5",       0x5800, 0x0800, CRC(390e3c32) SHA1(1fd219bf8c09472c337b2f33052092eb8c970f5d) )
+	ROM_LOAD( "4-19_13_e95d.u4",       0x6000, 0x0800, CRC(3779e91c) SHA1(0b338ba1558d4b7b1faa7fb1354b39764b1a43cb) )
+	ROM_LOAD( "4-19_14_dfca.u3",       0x6800, 0x0800, CRC(7e70b2f7) SHA1(d3986716e8447f258186fafd1a95ce9c52f61033) )
+	ROM_LOAD( "4-19_15_7032.u2",       0x7000, 0x0800, CRC(46b71a75) SHA1(a512ebee6020fd2ccbff9342a956131911177b08) )
+	ROM_LOAD( "4-19_16_0000.u1",       0x7800, 0x0800, CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "wantsega.col",  0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "82s123.u49",  0x0000, 0x0020, CRC(3470a4b6) SHA1(8ccca436bf24246729ac62d196087704d4d3310c) )
+
+	ROM_REGION( 0x0040, "timing_proms", 0 )
+	ROM_LOAD( "pr3_82s123.u14",   0x0000, 0x0020, CRC(c6452647) SHA1(9a9e21bc578523106a6bf7270b37c453c7098f35) )
+	ROM_LOAD( "pr33_82s123.u15",  0x0020, 0x0020, CRC(98579402) SHA1(1a5fa9b31aba83408f255e64799fd6bdd51d647e) )
 ROM_END
 
 /*************************************
@@ -4003,4 +4010,4 @@ GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,  empty_in
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,  empty_init, ROT270, "Sega", "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,  empty_init, ROT270, "Denki Onkyo", "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, alphaho,    0,        alphaho,   alphaho,   vicdual_state,  empty_init, ROT270, "Data East Corporation", "Alpha Fighter / Head On", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wantsega,     0,      carhntds,  wantsega,  vicdual_state,  empty_init, ROT270, "Sega", "Wanted (Sega)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wantsega,     0,      carhntds,  wantsega,  vicdual_state,  empty_init, ROT270, "Sega", "Wanted (Sega)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
