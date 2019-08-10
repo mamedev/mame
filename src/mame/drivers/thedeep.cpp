@@ -29,7 +29,7 @@ Notes:
 #include "emu.h"
 #include "includes/thedeep.h"
 
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/r65c02.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "screen.h"
@@ -408,7 +408,7 @@ void thedeep_state::thedeep(machine_config &config)
 
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(thedeep_state::interrupt), "screen", 0, 1);
 
-	M65C02(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
+	R65C02(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thedeep_state::audio_map);
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
