@@ -415,6 +415,8 @@ void wd33c9x_base_device::device_start()
 
 void wd33c9x_base_device::device_reset()
 {
+	// This is a hardware reset.  Software reset is handled
+	// under COMMAND_CC_RESET.
 	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 	m_addr = 0;
@@ -433,6 +435,10 @@ void wd33c9x_base_device::device_reset()
 	m_irq_cb(CLEAR_LINE);
 	m_drq_cb(CLEAR_LINE);
 	m_drq_state = false;
+
+	// Hardware reset triggers a SCSI_STATUS_RESET interrupt.
+	irq_fifo_push(SCSI_STATUS_RESET);
+	update_irq();
 }
 
 
@@ -668,13 +674,7 @@ WRITE_LINE_MEMBER(wd33c9x_base_device::reset_w)
 {
 	if (state) {
 		LOGMASKED(LOG_LINES, "Reset via MR line\n");
-		// FIXME: hardware reset is not the same as software reset, and
-		// wd33c93a behaves differently to wd33c93
 		device_reset();
-
-		// hardware reset produces an interrupt
-		m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_INT;
-		m_irq_cb(ASSERT_LINE);
 	}
 }
 
