@@ -21429,6 +21429,9 @@ roma16                          // Roma
 roma16a                         // Roma
 roma32                          // Roma
 
+@source:mephisto_mm1.cpp
+mm1
+
 @source:mephisto_mm2.cpp
 mm2                             // Mephisto MM II
 bup                             // Mephisto B&P
