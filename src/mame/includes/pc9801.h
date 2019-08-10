@@ -116,9 +116,10 @@ public:
 	void pc9801vm(machine_config &config);
 	void pc9801(machine_config &config);
 	void pc9801bx2(machine_config &config);
-	void pc9821ap2(machine_config &config);
-	void pc9821(machine_config &config);
 	void pc9801rs(machine_config &config);
+	void pc9821(machine_config &config);
+	void pc9821as(machine_config &config);
+	void pc9821ap2(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	void init_pc9801_kanji();
 	void init_pc9801vm_kanji();
@@ -256,6 +257,10 @@ private:
 	DECLARE_WRITE8_MEMBER(sdip_9_w);
 	DECLARE_WRITE8_MEMBER(sdip_a_w);
 	DECLARE_WRITE8_MEMBER(sdip_b_w);
+	
+	DECLARE_READ8_MEMBER(as_unkdev_data_r);
+	DECLARE_WRITE8_MEMBER(as_unkdev_data_w);
+	DECLARE_WRITE8_MEMBER(as_unkdev_addr_w);
 
 	DECLARE_READ8_MEMBER(window_bank_r);
 	DECLARE_WRITE8_MEMBER(window_bank_w);
@@ -322,6 +327,7 @@ private:
 	void pc9801ux_map(address_map &map);
 	void pc9821_io(address_map &map);
 	void pc9821_map(address_map &map);
+	void pc9821as_io(address_map &map);
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
 	void upd7220_grcg_2_map(address_map &map);
@@ -394,6 +400,7 @@ private:
 
 	/* PC9821 specific */
 	uint8_t m_sdip[24], m_sdip_bank;
+	uint8_t m_unkdev0468[0x100], m_unkdev0468_addr;
 	uint8_t m_pc9821_window_bank;
 	uint8_t m_ext2_ff;
 	uint8_t m_sys_type;
