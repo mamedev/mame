@@ -3819,8 +3819,27 @@ INPUT_PORTS_END
 /***************************************************************************
                                 Athena no Hatena?
 ***************************************************************************/
+/*
+		Athena no Hatena uses four buttons whose bits are actually equivalent to
+		the joystick input on the other games on this system. However, the
+		hidden "Test Program" menu makes use of the standard stick/3-button
+		input layout. With the standard input mapping, the menus are unusable as
+		the three SHOT buttons are unmapped. Building with ATEHATE_DEBUG defined
+		will use the standard joystick/button mapping for working with the debug
+		functions.
+
+		More information about the Test Program menu:
+		http://sudden-desu.net/entry/athena-no-hatena-debug-menu-and-functions
+*/
 
 static INPUT_PORTS_START( atehate )
+#ifdef ATEHATE_DEBUG
+	PORT_START("P1")    // Player 1
+	JOY_TYPE1_3BUTTONS(1)
+
+	PORT_START("P2")    // Player 2
+	JOY_TYPE1_3BUTTONS(2)
+#else
 	PORT_START("P1")    // Player 1
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -3840,6 +3859,7 @@ static INPUT_PORTS_START( atehate )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2  )
+#endif
 
 	PORT_START("COINS") // Coins
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
