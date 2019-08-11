@@ -314,8 +314,6 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
-
-	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -357,8 +355,6 @@ uint32_t midnrun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
-
-	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -739,7 +735,10 @@ WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
 WRITE_LINE_MEMBER(zr107_state::vblank)
 {
 	if (state)
+	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_dsp->set_flag_input(1, ASSERT_LINE);
+	}
 }
 
 void zr107_state::machine_reset()
