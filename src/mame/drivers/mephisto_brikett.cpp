@@ -430,6 +430,8 @@ void brikett_state::mephisto(machine_config &config)
 void brikett_state::mephisto2(machine_config &config)
 {
 	mephisto(config);
+
+	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto2_map);
 }
 

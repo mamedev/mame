@@ -20,8 +20,19 @@ Hardware notes:
 It supports the HG 170 opening book module.
 LCD module is assumed to be same as MM II and others.
 
+Mephisto Mirage is on similar hardware, but it's a single module (LCD is included
+on the main PCB). Like MM I, the module by itself didn't have a name at first.
+The boards that were included with the product were either Mephisto Mobil, or
+Mephisto Mirage (both ledless, push-sensory). The module also works on the more
+expensive wooden chessboards like Modular Exclusive or Muenchen, as long as it
+supports the higher voltage.
+
 TODO:
-- doesn't work, MAME doesn't emulate 1806 CPU
+- doesn't work, MAME doesn't emulate 1806 CPU (it uses RLDI, RLXA, RSXD, and
+  counter interrupt opcodes)
+- mmirage unknown_w
+- add mm1 opening book
+- add mm1 STP/ON buttons? (they're off/on, with RAM chips remaining powered)
 
 ******************************************************************************/
 
@@ -51,7 +62,10 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(mirage_switch_sensor_type);
+
 	// machine drivers
+	void mirage(machine_config &config);
 	void mm1(machine_config &config);
 
 protected:
@@ -67,6 +81,7 @@ private:
 	required_ioport_array<8> m_inputs;
 
 	// address maps
+	void mirage_map(address_map &map);
 	void mm1_map(address_map &map);
 	void mm1_io(address_map &map);
 
@@ -76,6 +91,7 @@ private:
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_WRITE_LINE_MEMBER(q_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(unknown_w);
 	DECLARE_WRITE8_MEMBER(lcd_w);
 	DECLARE_WRITE8_MEMBER(board_w);
 	DECLARE_WRITE8_MEMBER(led_w);
@@ -169,6 +185,11 @@ WRITE8_MEMBER(mm1_state::sound_w)
 	m_dac->write(~data & 1);
 }
 
+WRITE8_MEMBER(mm1_state::unknown_w)
+{
+	// mmirage: unused serial device?
+}
+
 void mm1_state::update_display()
 {
 	// 64 chessboard leds
@@ -226,10 +247,16 @@ READ_LINE_MEMBER(mm1_state::keypad_r)
     Address Maps
 ******************************************************************************/
 
-void mm1_state::mm1_map(address_map &map)
+void mm1_state::mirage_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().nopw();
 	map(0xd000, 0xdfff).mirror(0x2000).ram();
+}
+
+void mm1_state::mm1_map(address_map &map)
+{
+	mirage_map(map);
+	map(0xc000, 0xcfff).unmapr(); // bookrom?
 }
 
 void mm1_state::mm1_io(address_map &map)
@@ -240,6 +267,7 @@ void mm1_state::mm1_io(address_map &map)
 	map(0x04, 0x04).w(FUNC(mm1_state::board_w));
 	map(0x05, 0x05).w(FUNC(mm1_state::led_w));
 	map(0x06, 0x06).w(FUNC(mm1_state::lcd_w));
+	map(0x07, 0x07).w(FUNC(mm1_state::unknown_w));
 }
 
 
@@ -282,26 +310,70 @@ static INPUT_PORTS_START( mm1 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // b2
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mirage )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // cl?
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // list?
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // a1
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // e5
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // ent
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // white?
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // b2
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // f6
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // sta?
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // black?
+
+	PORT_START("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // c3
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // g7
+
+	PORT_START("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // lev
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // rev?
+
+	PORT_START("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // d4
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // h8
+
+	PORT_START("FAKE") // module came with buttons sensorboard by default
+	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mm1_state, mirage_switch_sensor_type, nullptr)
+	PORT_CONFSETTING(    0x00, "Buttons" )
+	PORT_CONFSETTING(    0x01, "Magnets" )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(mm1_state::mirage_switch_sensor_type)
+{
+	m_board->set_type(newval ?  sensorboard_device::MAGNETS : sensorboard_device::BUTTONS);
+}
+
 
 
 /******************************************************************************
     Machine Drivers
 ******************************************************************************/
 
-void mm1_state::mm1(machine_config &config)
+void mm1_state::mirage(machine_config &config)
 {
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mirage_map);
 	m_maincpu->set_addrmap(AS_IO, &mm1_state::mm1_io);
 	m_maincpu->clear_cb().set(FUNC(mm1_state::clear_r));
-	m_maincpu->q_cb().set(FUNC(mm1_state::q_w));
+	m_maincpu->q_cb().set(FUNC(mm1_state::q_w)).invert();
 	m_maincpu->ef3_cb().set(FUNC(mm1_state::keypad_r<0>));
 	m_maincpu->ef4_cb().set(FUNC(mm1_state::keypad_r<1>));
 
 	m_maincpu->set_periodic_int(FUNC(mm1_state::interrupt), attotime::from_hz(150)); // fake
 
-	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
 
@@ -316,6 +388,17 @@ void mm1_state::mm1(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
+void mm1_state::mm1(machine_config &config)
+{
+	mirage(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
+	m_maincpu->q_cb().set(FUNC(mm1_state::q_w));
+
+	m_board->set_type(sensorboard_device::MAGNETS);
+}
+
 
 
 /******************************************************************************
@@ -328,6 +411,12 @@ ROM_START( mm1 )
 	ROM_LOAD("214", 0x4000, 0x4000, CRC(93734e49) SHA1(9ad6c191074c4122300f059e2ef9cfeff7b81463) ) // "
 ROM_END
 
+
+ROM_START( mmirage )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("g79", 0x0000, 0x8000, CRC(8cbaff40) SHA1(693086ae179f1ada4ac403b3a6bc7ea718b4e71e) ) // HN613256P, 2nd half empty
+ROM_END
+
 } // anonymous namespace
 
 
@@ -336,5 +425,7 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, mm1,  0,      0, mm1,    mm1,  mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT CMP MACHINE INPUT   STATE      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1983, mm1,     0,      0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+CONS( 1984, mmirage, 0,      0, mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
