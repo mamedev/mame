@@ -1750,7 +1750,7 @@
 
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
-				<rom name="deskmate (1985)(tandy)[26-3259].dsk" size="161280" crc="b467a8cb" sha1="38376b074a40158e606be7a0da7d2c2804dc0d58" />
+				<rom name="deskmate v1.0 (1985)(tandy)[26-3259].dsk" size="161280" crc="b467a8cb" sha1="38376b074a40158e606be7a0da7d2c2804dc0d58" />
 			</dataarea>
 		</part>
 	</software>
@@ -1765,13 +1765,13 @@
 		<part name="flop0" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="161280">
-				<rom name="deskmate 3 (1987)(tandy)[26-3262](disk 1 of 2).dsk" size="161280" crc="c24535a7" sha1="c0a294af0bb594f3af52163b70aef5d313d0b0fb" />
+				<rom name="deskmate 3 v1.0 (1987)(tandy)[26-3262](disk 1 of 2).dsk" size="161280" crc="c24535a7" sha1="c0a294af0bb594f3af52163b70aef5d313d0b0fb" />
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="161280">
-				<rom name="deskmate 3 (1987)(tandy)[26-3262](disk 2 of 2).dsk" size="161280" crc="0af29e0d" sha1="934d1d0a3664dbb21da3682a805a067ac07b1530" />
+				<rom name="deskmate 3 1.0 (1987)(tandy)[26-3262](disk 2 of 2).dsk" size="161280" crc="0af29e0d" sha1="934d1d0a3664dbb21da3682a805a067ac07b1530" />
 			</dataarea>
 		</part>
 	</software>
@@ -1785,7 +1785,7 @@
 		<part name="flop0" interface="floppy_5_25">
 			<feature name="part_id" value="Program disk"/>
 			<dataarea name="flop" size="161280">
-				<rom name="coco max iii version 3.0 (1987)(colorware).dsk" size="161280" crc="1ddcc32c" sha1="3d009e5bb4bebdd48e1dc49d269ffd45b9f23b36" />
+				<rom name="coco max iii v3.0 (1987)(colorware).dsk" size="161280" crc="1ddcc32c" sha1="3d009e5bb4bebdd48e1dc49d269ffd45b9f23b36" />
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
@@ -1839,7 +1839,7 @@
 		<part name="flop9" interface="floppy_5_25">
 			<feature name="part_id" value="Demo disk"/>
 			<dataarea name="flop" size="161280">
-				<rom name="coco max iii demo (1987)(colorware).dsk" size="161280" crc="bf43d9fc" sha1="a97eb0eee3f5e5190ea73384ad389dec4c6a43ea" />
+				<rom name="coco max iii (demo-slideshow) (1987)(colorware).dsk" size="161280" crc="bf43d9fc" sha1="a97eb0eee3f5e5190ea73384ad389dec4c6a43ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -1853,7 +1853,7 @@
 		<part name="flop0" interface="floppy_5_25">
 			<feature name="part_id" value="Program disk"/>
 			<dataarea name="flop" size="161280">
-				<rom name="coco max iii version 3.1 (1987)(colorware).dsk" size="161280" crc="a140cd90" sha1="54472296e8457fc99ad9e22f017f01898589d173" />
+				<rom name="coco max iii v3.1 (1987)(colorware).dsk" size="161280" crc="a140cd90" sha1="54472296e8457fc99ad9e22f017f01898589d173" />
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">
@@ -1907,75 +1907,34 @@
 		<part name="flop9" interface="floppy_5_25">
 			<feature name="part_id" value="Demo disk"/>
 			<dataarea name="flop" size="161280">
-				<rom name="coco max iii demo (1987)(colorware).dsk" size="161280" crc="bf43d9fc" sha1="a97eb0eee3f5e5190ea73384ad389dec4c6a43ea" />
+				<rom name="coco max iii (demo-slideshow) (1987)(colorware).dsk" size="161280" crc="bf43d9fc" sha1="a97eb0eee3f5e5190ea73384ad389dec4c6a43ea" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ccmax35">
-		<description>CoCo Max III (Version 3.5)</description>
-		<year>1987</year>
+	<software name="ccmax2">
+		<description>CoCo Max II (Version 51016)</description>
+		<year>1985</year>
 		<publisher>Colorware</publisher>
-		<sharedfeat name="compatibility" value="COCO3" />
+		<sharedfeat name="compatibility" value="COCO" />
 
 		<part name="flop0" interface="floppy_5_25">
-			<feature name="part_id" value="Program disk"/>
 			<dataarea name="flop" size="161280">
-				<rom name="coco max iii version 3.5 (1987)(colorware)[hi-res adapter].dsk" size="161280" crc="2c51c14f" sha1="60e98dfe102295468c7b7176b56b9e819dd3edaf" />
+				<rom name="coco max ii v51016 (1985)(colorware).dsk" size="161280" crc="c636cd17" sha1="83b7d09ec056856cf5d82d1aa1dc8bf7fe318309" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Fonts disk 1"/>
+	</software>
+
+	<software name="ccmax2is">
+		<description>CoCo Max II (Input Selector Modified)</description>
+		<year>1985</year>
+		<publisher>Colorware</publisher>
+		<sharedfeat name="compatibility" value="COCO" />
+		<!-- While input selector mods were common, this appears to be pirate. -->
+
+		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
-				<rom name="coco max iii (1987)(colorware)(fonts disk 1).dsk" size="161280" crc="b47bd8a1" sha1="a77caf78e0e43544f293df21cf043295a6e9c9e9" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Fonts disk 2"/>
-			<dataarea name="flop" size="161280">
-				<rom name="coco max iii (1987)(colorware)(fonts disk 2).dsk" size="161280" crc="50bc4c56" sha1="3d702a4f5bcbf3a649704a423514e0fccae0bb82" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Fonts disk 3"/>
-			<dataarea name="flop" size="161280">
-				<rom name="coco max iii (1987)(colorware)(fonts disk 3).dsk" size="161280" crc="c7b48812" sha1="408b424523911c2ee01fa9abcab5569dd971cb56" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Fonts disk 4"/>
-			<dataarea name="flop" size="161280">
-				<rom name="coco max iii (1987)(colorware)(fonts disk 4).dsk" size="161280" crc="70f2615b" sha1="1545c5051bac2290700a854d1ab12c9a31e2e9e6" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Pictures disk 1"/>
-			<dataarea name="flop" size="161280">
-				<rom name="coco max iii (1987)(colorware)(pictures 1).dsk" size="161280" crc="8f8f4786" sha1="1629e2e967445c7d25fbb15b5497c25a0b64a92e" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Pictures disk 2"/>
-			<dataarea name="flop" size="161280">
-				<rom name="coco max iii (1987)(colorware)(pictures 2).dsk" size="161280" crc="5f7a6474" sha1="c783b09d19932b74be5a3dfe8c1d978450ef0204" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Work disk for 128K machines"/>
-			<dataarea name="flop" size="161280">
-				<rom name="coco max iii (1987)(colorware)(work disk).dsk" size="161280" crc="03fa7207" sha1="09bb5ae09ea722a719fd9c52cc8adbb8a46aa587" />
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Printer driver source code disk"/>
-			<dataarea name="flop" size="161280">
-				<rom name="coco max iii (1987)(colorware)(printer drivers source code).dsk" size="161280" crc="6a5892a4" sha1="464dce40d53052324853c1d08d8884860105aab1" />
-			</dataarea>
-		</part>
-		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Demo disk"/>
-			<dataarea name="flop" size="161280">
-				<rom name="coco max iii demo (1987)(colorware).dsk" size="161280" crc="bf43d9fc" sha1="a97eb0eee3f5e5190ea73384ad389dec4c6a43ea" />
+				<rom name="coco max ii (1985)(colorware)[m input selection][p].dsk" size="161280" crc="92725c9c" sha1="a02867e80563f243dd632e8c4e4a459b17869e50" />
 			</dataarea>
 		</part>
 	</software>
