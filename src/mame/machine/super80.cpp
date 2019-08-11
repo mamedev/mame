@@ -159,7 +159,7 @@ WRITE8_MEMBER( super80_state::port3f_w )
 	if (floppy)
 	{
 		floppy->mon_w(0);
-		floppy->ss_w(!BIT(data, 6));
+		floppy->ss_w(BIT(data, 6));
 	}
 
 	m_fdc->dden_w(BIT(data, 7));
