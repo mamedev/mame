@@ -6579,7 +6579,7 @@
 		<year>1985</year>
 		<publisher>Paramount Pictures</publisher>
 		<!-- This was mailed out to customers who complained about bugs in the
-		original release of the game. -->
+		original release of the game. The disk appears to be unprotected. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
