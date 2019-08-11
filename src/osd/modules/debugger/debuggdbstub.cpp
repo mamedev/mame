@@ -167,10 +167,48 @@ static const gdb_register_map gdb_register_map_ppc601 =
 };
 
 //-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_z80 =
+{
+	"z80",
+	"mame.z80",
+	{
+		{ "AF",  "af",  false, TYPE_INT },
+		{ "BC",  "bc",  false, TYPE_INT },
+		{ "DE",  "de",  false, TYPE_INT },
+		{ "HL",  "hl",  false, TYPE_INT },
+		{ "AF2", "af'", false, TYPE_INT },
+		{ "BC2", "bc'", false, TYPE_INT },
+		{ "DE2", "de'", false, TYPE_INT },
+		{ "HL2", "hl'", false, TYPE_INT },
+		{ "IX",  "ix",  false, TYPE_INT },
+		{ "IY",  "iy",  false, TYPE_INT },
+		{ "SP",  "sp",  true,  TYPE_DATA_POINTER },
+		{ "PC",  "pc",  true,  TYPE_CODE_POINTER },
+	}
+};
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_m6502 =
+{
+	"m6502",
+	"mame.m6502",
+	{
+		{ "A",  "a",   false, TYPE_INT },
+		{ "X",  "x",   false, TYPE_INT },
+		{ "Y",  "y",   false, TYPE_INT },
+		{ "P",  "p",   false, TYPE_INT },
+		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
+		{ "SP", "sp",  true,  TYPE_DATA_POINTER },
+	}
+};
+
+//-------------------------------------------------------------------------
 static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
 	{ "i486",    gdb_register_map_i486 },
 	{ "arm7_le", gdb_register_map_arm7 },
 	{ "ppc601",  gdb_register_map_ppc601 },
+	{ "z80",     gdb_register_map_z80 },
+	{ "m6502",   gdb_register_map_m6502 },
 };
 
 //-------------------------------------------------------------------------
@@ -416,6 +454,18 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 
 		m_is_be = m_address_space->endianness() == ENDIANNESS_BIG;
 
+#if 0
+		for ( const auto &entry: m_state->state_entries() )
+		{
+			const char *symbol = entry->symbol();
+			uint8_t datasize = entry->datasize();
+			uint64_t datamask = entry->datamask();
+			int index = entry->index();
+			const std::string &format_string = entry->format_string();
+			osd_printf_info("[%3d] datasize %d mask %016" PRIx64 " [%s] [%s]\n", index, datasize, datamask, symbol, format_string.c_str());
+		}
+#endif
+
 		const gdb_register_map &register_map = it->second;
 		m_gdb_arch = register_map.arch;
 		m_gdb_feature = register_map.feature;
@@ -631,6 +681,9 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 	offs_t offset = address;
 	if ( !m_memory->translate(m_address_space->spacenum(), TRANSLATE_READ_DEBUG, offset) )
 		return REPLY_ENN;
+
+	// Disable side effects while reading memory.
+	auto dis = m_machine->disable_side_effects();
 
 	std::string reply;
 	reply.reserve(length * 2);
