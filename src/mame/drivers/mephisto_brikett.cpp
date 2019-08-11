@@ -130,9 +130,10 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
 
+	bool m_reset;
 	u8 m_lcd_mask;
 	u8 m_digit_idx;
-	bool m_reset;
+	u8 m_digit_data[4];
 
 	u8 m_esb_led;
 	u8 m_esb_row;
@@ -142,15 +143,21 @@ private:
 void brikett_state::machine_start()
 {
 	// zerofill
+	m_reset = false;
 	m_lcd_mask = 0;
 	m_digit_idx = 0;
+	memset(m_digit_data, 0, sizeof(m_digit_data));
+
 	m_esb_led = 0;
 	m_esb_row = 0;
 	m_esb_select = 0;
 
 	// register for savestates
+	save_item(NAME(m_reset));
 	save_item(NAME(m_lcd_mask));
 	save_item(NAME(m_digit_idx));
+	save_item(NAME(m_digit_data));
+
 	save_item(NAME(m_esb_led));
 	save_item(NAME(m_esb_row));
 	save_item(NAME(m_esb_select));
@@ -170,7 +177,7 @@ void brikett_state::set_cpu_freq()
 	// the 3.579545MHz XTAL is still used for IRQ. Mephisto III could be fitted with a 12MHz XTAL instead of 6.144MHz
 	// and a newer CDP1805CE CPU by Hobby Computer Centrale on request.
 	// (It is unexpected that the 1805 accepts such a high overclock, but tests show that it is indeed twice faster)
-	u8 inp = m_inputs[4].read_safe(0);
+	u8 inp = m_inputs[4]->read() >> 4 & m_inputs[4]->read();
 	m_maincpu->set_unscaled_clock((inp & 2) ? 12_MHz_XTAL : ((inp & 1) ? 6.144_MHz_XTAL : 3.579545_MHz_XTAL));
 }
 
@@ -196,16 +203,22 @@ READ_LINE_MEMBER(brikett_state::clear_r)
 WRITE_LINE_MEMBER(brikett_state::q_w)
 {
 	// Q: LCD digit data mask
-	m_lcd_mask = state ? 0 : 0xff;
+	// also assume LCD update on rising edge
+	if (state && !m_lcd_mask)
+	{
+		for (int i = 0; i < 4; i++)
+			m_display->write_row(i, m_digit_data[i]);
+		m_display->update();
+	}
+
+	m_lcd_mask = state ? 0xff : 0;
 }
 
 WRITE8_MEMBER(brikett_state::lcd_w)
 {
-	// write/shift LCD digit (4*CD4015)
+	// d0-d7: write/shift LCD digit (4*CD4015)
 	// note: last digit "dp" is the colon in the middle
-	m_display->write_row(m_digit_idx, data ^ m_lcd_mask);
-	m_display->update();
-
+	m_digit_data[m_digit_idx] = data ^ m_lcd_mask;
 	m_digit_idx = (m_digit_idx + 1) & 3;
 }
 
@@ -338,25 +351,19 @@ static INPUT_PORTS_START( mephisto )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H / 8")
 
 	PORT_START("IN.4") // 2nd model main PCB has 2 XTALs on PCB
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, nullptr)
-	PORT_CONFSETTING(    0x00, "3.579MHz (Battery / Model 1)" )
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, nullptr) PORT_CONDITION("IN.4", 0x30, NOTEQUALS, 0x00)
+	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
+	PORT_CONFNAME( 0x30, 0x00, "Base Hardware" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, nullptr)
+	PORT_CONFSETTING(    0x00, "1st Model (1980)" )
+	PORT_CONFSETTING(    0x30, "2nd Model (1982)" )
 
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mephisto2 )
-	PORT_INCLUDE( mephisto )
-
-	PORT_MODIFY("IN.4") // default to 6.144MHz
-	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, nullptr)
-	PORT_CONFSETTING(    0x00, "3.579MHz (Battery / Model 1)" )
-	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( mephisto3 )
-	PORT_INCLUDE( mephisto2 )
+	PORT_INCLUDE( mephisto )
 
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INFO")
@@ -379,6 +386,7 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_CONFSETTING(    0x00, "3.579MHz (Battery)" )
 	PORT_CONFSETTING(    0x01, "6.144MHz (Mains)" )
 	PORT_CONFSETTING(    0x02, "12MHz (Special)" )
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -390,11 +398,11 @@ INPUT_PORTS_END
 void brikett_state::mephisto(machine_config &config)
 {
 	/* basic machine hardware */
-	CDP1802(config, m_maincpu, 3.579545_MHz_XTAL);
+	CDP1802(config, m_maincpu, 3.579545_MHz_XTAL); // see set_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto_map);
 	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephisto_io);
 	m_maincpu->clear_cb().set(FUNC(brikett_state::clear_r));
-	m_maincpu->q_cb().set(FUNC(brikett_state::q_w));
+	m_maincpu->q_cb().set(FUNC(brikett_state::q_w)).invert();
 	m_maincpu->tpb_cb().set(m_extport, FUNC(cdp1852_device::clock_w));
 	m_maincpu->ef1_cb().set_constant(0); // external port
 	m_maincpu->ef3_cb().set_constant(0); // external port, but unused
@@ -422,9 +430,6 @@ void brikett_state::mephisto(machine_config &config)
 void brikett_state::mephisto2(machine_config &config)
 {
 	mephisto(config);
-
-	/* basic machine hardware */
-	m_maincpu->set_clock(6.144_MHz_XTAL); // see set_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto2_map);
 }
 
@@ -434,7 +439,7 @@ void brikett_state::mephisto3(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto3_map);
-	m_maincpu->q_cb().set(FUNC(brikett_state::q_w)).invert();
+	m_maincpu->q_cb().set(FUNC(brikett_state::q_w));
 	m_maincpu->ef1_cb().set(FUNC(brikett_state::esb_r));
 	m_extport->do_cb().set(FUNC(brikett_state::esb_w));
 
@@ -487,5 +492,5 @@ ROM_END
 
 //    YEAR  NAME       PARENT CMP MACHINE    INPUT      STATE          INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1980, mephisto,  0,      0, mephisto,  mephisto,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, mephisto2, 0,      0, mephisto2, mephisto2, brikett_state, empty_init, "Hegener + Glaser", "Mephisto II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, mephisto2, 0,      0, mephisto2, mephisto,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1983, mephisto3, 0,      0, mephisto3, mephisto3, brikett_state, empty_init, "Hegener + Glaser", "Mephisto III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
