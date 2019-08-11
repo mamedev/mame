@@ -36148,7 +36148,9 @@ sonsonj                         // 7/1984 (c) 1984 (Japan)
 @source:sorcerer.cpp
 sorcerer                        // Sorcerer
 sorcerer2                       // monitor 1.1 1979
-sorcererd                       // Sorcerer with floppies
+sorcerera                       // Sorcerer with Dreamdisk fdc
+sorcererb                       // Sorcerer with Digitrio fdc
+sorcererd                       // Sorcerer with Micropolis fdc
 
 @source:storio.cpp
 vreader                         // (c) 2011 V.Tech
