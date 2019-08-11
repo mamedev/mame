@@ -223,6 +223,7 @@ public:
 	void breakpoint_clear_all();
 	bool breakpoint_enable(int index, bool enable = true);
 	void breakpoint_enable_all(bool enable = true);
+	breakpoint *triggered_breakpoint(void) { breakpoint *ret = m_triggered_breakpoint; m_triggered_breakpoint = nullptr; return ret; }
 
 	// watchpoints
 	int watchpoint_space_count() const { return m_wplist.size(); }
@@ -232,6 +233,8 @@ public:
 	void watchpoint_clear_all();
 	bool watchpoint_enable(int index, bool enable = true);
 	void watchpoint_enable_all(bool enable = true);
+	void set_triggered_watchpoint(watchpoint *wp) { m_triggered_watchpoint = wp; }
+	watchpoint *triggered_watchpoint(void) { watchpoint *ret = m_triggered_watchpoint; m_triggered_watchpoint = nullptr; return ret; }
 
 	// registerpoints
 	registerpoint *registerpoint_first() const { return m_rplist; }
@@ -340,6 +343,9 @@ private:
 	breakpoint *            m_bplist;                   // list of breakpoints
 	std::vector<std::vector<std::unique_ptr<watchpoint>>> m_wplist;  // watchpoint lists for each address space
 	registerpoint *         m_rplist;                   // list of registerpoints
+
+	breakpoint *            m_triggered_breakpoint;     // latest breakpoint that was triggered
+	watchpoint *            m_triggered_watchpoint;     // latest watchpoint that was triggered
 
 	// tracing
 	class tracer
