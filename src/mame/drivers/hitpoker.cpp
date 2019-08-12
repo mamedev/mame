@@ -278,8 +278,6 @@ void hitpoker_state::hitpoker_map(address_map &map)
 	map(0x0000, 0xbdff).rom();
 	map(0xbf00, 0xffff).rom();
 
-	map(0x0000, 0x00ff).ram(); // stack ram
-	map(0x1000, 0x103f).ram(); // internal I/O
 	map(0x8000, 0xb5ff).rw(FUNC(hitpoker_state::hitpoker_vram_r), FUNC(hitpoker_state::hitpoker_vram_w));
 	map(0xb600, 0xbdff).ram();
 	map(0xbe0a, 0xbe0a).portr("IN0");
@@ -461,6 +459,7 @@ void hitpoker_state::hitpoker(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hitpoker_state::hitpoker_map);
 	m_maincpu->in_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_r));
 	m_maincpu->out_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_w));
+	m_maincpu->in_pe_callback().set_constant(0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
