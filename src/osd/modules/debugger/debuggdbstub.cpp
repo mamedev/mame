@@ -7,7 +7,9 @@
 //============================================================
 
 #include "emu.h"
+#include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/textbuf.h"
 #include "debug_module.h"
 #include "debugger.h"
 #include "modules/lib/osdobj_common.h"
@@ -306,6 +308,7 @@ public:
 		m_memory(nullptr),
 		m_address_space(nullptr),
 		m_debugger_cpu(nullptr),
+		m_debugger_console(nullptr),
 		m_debugger_port(0),
 		m_socket(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE),
 		m_is_be(false),
@@ -398,6 +401,7 @@ private:
 	device_memory_interface *m_memory;
 	address_space *m_address_space;
 	debugger_cpu *m_debugger_cpu;
+	debugger_console *m_debugger_console;
 	int m_debugger_port;
 	emu_file m_socket;
 	bool m_is_be;
@@ -535,6 +539,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		m_memory = &m_maincpu->memory();
 		m_address_space = &m_memory->space(AS_PROGRAM);
 		m_debugger_cpu = &m_machine->debugger().cpu();
+		m_debugger_console = &m_machine->debugger().console();
 
 		m_is_be = m_address_space->endianness() == ENDIANNESS_BIG;
 
@@ -783,6 +788,22 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 }
 
 //-------------------------------------------------------------------------
+static bool hex_decode(std::vector<uint8_t> *_data, const char *buf, size_t length)
+{
+	std::vector<uint8_t> &data = *_data;
+	data.resize(length);
+	for ( int i = 0; i < length; i++ )
+	{
+		if ( sscanf(buf, "%02hhx", &data[i]) != 1 )
+			return false;
+		buf += 2;
+	}
+	if ( *buf != '\0' )
+		return false;
+	return true;
+}
+
+//-------------------------------------------------------------------------
 // Write memory.
 debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 {
@@ -797,15 +818,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 		return REPLY_ENN;
 
 	std::vector<uint8_t> data;
-	data.reserve(length);
-	buf += buf_offset;
-	for ( int i = 0; i < length; i++ )
-	{
-		if ( sscanf(buf, "%02hhx", &data[i]) != 1 )
-			return REPLY_ENN;
-		buf += 2;
-	}
-	if ( *buf != '\0' )
+	if ( !hex_decode(&data, buf + buf_offset, length) )
 		return REPLY_ENN;
 
 	for ( int i = 0; i < length; i++ )
@@ -866,6 +879,33 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 	{
 		// Obtain thread information from RTOS.
 		return REPLY_UNSUPPORTED;
+	}
+
+	// Check packets that use qname,params convention.
+	if ( strncmp(buf, "Rcmd,", 5) == 0 )
+	{
+		buf += 5;
+		std::vector<uint8_t> data;
+		if ( !hex_decode(&data, buf, strlen(buf) / 2) )
+			return REPLY_ENN;
+		std::string command(data.begin(), data.end());
+		text_buffer *textbuf = m_debugger_console->get_console_textbuf();
+		text_buffer_clear(textbuf);
+		m_debugger_console->execute_command(command, false);
+		uint32_t nlines = text_buffer_num_lines(textbuf);
+		if ( nlines == 0 )
+			return REPLY_OK;
+		std::string reply;
+		for ( uint32_t i = 0; i < nlines; i++ )
+		{
+			const char *line = text_buffer_get_seqnum_line(textbuf, i);
+			reply.reserve(reply.length() + (strlen(line)+1)*2);
+			while ( *line != '\0' )
+				reply += string_format("%02x", *line++);
+			reply += "0A";
+		}
+		send_reply(reply.c_str());
+		return REPLY_NONE;
 	}
 
 	// Split name and parameters
