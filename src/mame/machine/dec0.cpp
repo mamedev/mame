@@ -38,7 +38,7 @@ READ16_MEMBER(dec0_state::dec0_controls_r)
 		case 4: /* Byte 4: Dipswitch bank 2, Byte 5: Dipswitch Bank 1 */
 			return ioport("DSW")->read();
 
-		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
+		case 8: /* Intel 8751 mc, Bad Dudes, Heavy Barrel & Birdie Try only */
 			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", m_maincpu->pc(), 0x30c000+offset, m_i8751_return);
 			return m_i8751_return;
 	}
@@ -171,6 +171,7 @@ WRITE8_MEMBER(dec0_state::dec0_mcu_port0_w)
 
 WRITE8_MEMBER(dec0_state::dec0_mcu_port1_w)
 {
+	logerror("dec0_mcu_port1_w: %02x\n", data);
 	m_i8751_ports[1] = data;
 }
 
@@ -190,6 +191,7 @@ WRITE8_MEMBER(dec0_state::dec0_mcu_port2_w)
 
 WRITE8_MEMBER(dec0_state::dec0_mcu_port3_w)
 {
+	logerror("dec0_mcu_port3_w: %02x\n", data);
 	m_i8751_ports[3] = data;
 }
 
@@ -221,78 +223,6 @@ void dec0_state::baddudes_i8751_write(int data)
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-void dec0_state::birdtry_i8751_write(int data)
-{
-	static int  pwr,
-				hgt;
-
-	m_i8751_return = 0;
-
-	switch (data & 0xffff)
-	{
-		/*"Sprite control"*/
-		case 0x22a: m_i8751_return = 0x200;    break;
-
-		/* velocity of the ball, controlled by power and height formula? */
-		case 0x3c7: m_i8751_return = 0x2fff;    break;
-
-		/*Enables shot checks*/
-		case 0x33c: m_i8751_return = 0x200;     break;
-
-		/*Used on the title screen only(???)*/
-		case 0x31e: m_i8751_return = 0x200;     break;
-
-/*  0x100-0x10d values are for club power meters(1W=0x100<<-->>PT=0x10d).    *
- *  Returned value to i8751 doesn't matter,but send the result to 0x481.     *
- *  Lower the value,stronger is the power.                                   */
-		case 0x100: pwr = 0x30;             break; /*1W*/
-		case 0x101: pwr = 0x34;             break; /*3W*/
-		case 0x102: pwr = 0x38;             break; /*4W*/
-		case 0x103: pwr = 0x3c;             break; /*1I*/
-		case 0x104: pwr = 0x40;             break; /*3I*/
-		case 0x105: pwr = 0x44;             break; /*4I*/
-		case 0x106: pwr = 0x48;             break; /*5I*/
-		case 0x107: pwr = 0x4c;             break; /*6I*/
-		case 0x108: pwr = 0x50;             break; /*7I*/
-		case 0x109: pwr = 0x54;             break; /*8I*/
-		case 0x10a: pwr = 0x58;             break; /*9I*/
-		case 0x10b: pwr = 0x5c;             break; /*PW*/
-		case 0x10c: pwr = 0x60;             break; /*SW*/
-		case 0x10d: pwr = 0x80;             break; /*PT*/
-		case 0x481: m_i8751_return = pwr*9;     break; /*Power meter*/
-
-/*  0x200-0x20f values are for shot height(STRONG=0x200<<-->>WEAK=0x20f).    *
- *  Returned value to i8751 doesn't matter,but send the result to 0x534.     *
- *  Higher the value,stronger is the height.                                 */
-		case 0x200: hgt = 0x5c0;            break; /*H*/
-		case 0x201: hgt = 0x580;            break; /*|*/
-		case 0x202: hgt = 0x540;            break; /*|*/
-		case 0x203: hgt = 0x500;            break; /*|*/
-		case 0x204: hgt = 0x4c0;            break; /*|*/
-		case 0x205: hgt = 0x480;            break; /*|*/
-		case 0x206: hgt = 0x440;            break; /*|*/
-		case 0x207: hgt = 0x400;            break; /*M*/
-		case 0x208: hgt = 0x3c0;            break; /*|*/
-		case 0x209: hgt = 0x380;            break; /*|*/
-		case 0x20a: hgt = 0x340;            break; /*|*/
-		case 0x20b: hgt = 0x300;            break; /*|*/
-		case 0x20c: hgt = 0x2c0;            break; /*|*/
-		case 0x20d: hgt = 0x280;            break; /*|*/
-		case 0x20e: hgt = 0x240;            break; /*|*/
-		case 0x20f: hgt = 0x200;            break; /*L*/
-		case 0x534: m_i8751_return = hgt;    break; /*Shot height*/
-
-		/*At the ending screen(???)*/
-		//case 0x3b4: m_i8751_return = 0;       break;
-
-		/*These are activated after a shot (???)*/
-		case 0x6ca: m_i8751_return = 0xff;      break;
-		case 0x7ff: m_i8751_return = 0x200;     break;
-		default: logerror("%s: warning - write unknown command %02x to 8571\n",machine().describe_context(),data);
-	}
-	m_maincpu->set_input_line(5, HOLD_LINE);
-}
-
 void dec0_state::dec0_i8751_write(int data)
 {
 	m_i8751_command = data;
@@ -306,9 +236,6 @@ void dec0_state::dec0_i8751_write(int data)
 		break;
 	case mcu_type::BADDUDES_SIM:
 		baddudes_i8751_write(data);
-		break;
-	case mcu_type::BIRDTRY_SIM:
-		birdtry_i8751_write(data);
 		break;
 	}
 
@@ -390,9 +317,4 @@ void dec0_state::init_drgninja()
 void dec0_state::init_hbarrel()
 {
 	m_game = mcu_type::EMULATED;
-}
-
-void dec0_state::init_birdtry()
-{
-	m_game = mcu_type::BIRDTRY_SIM;
 }

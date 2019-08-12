@@ -61,7 +61,6 @@ public:
 	void init_hippodrm();
 	void init_hbarrel();
 	void init_slyspy();
-	void init_birdtry();
 	void init_drgninja();
 	void init_midresb();
 	void init_ffantasybl();
@@ -94,8 +93,7 @@ protected:
 private:
 	enum class mcu_type {
 		EMULATED,
-		BADDUDES_SIM,
-		BIRDTRY_SIM
+		BADDUDES_SIM
 	};
 
 	optional_device<h6280_device> m_subcpu;
@@ -156,7 +154,6 @@ private:
 	void midres_colpri_cb(u32 &colour, u32 &pri_mask);
 
 	void baddudes_i8751_write(int data);
-	void birdtry_i8751_write(int data);
 	void dec0_i8751_write(int data);
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
