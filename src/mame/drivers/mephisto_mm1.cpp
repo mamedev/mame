@@ -28,9 +28,9 @@ expensive wooden chessboards like Modular Exclusive or Muenchen, as long as it
 supports the higher voltage.
 
 TODO:
-- doesn't work, MAME doesn't emulate 1806 CPU (it uses RLDI, RLXA, RSXD, and
-  counter interrupt opcodes)
+- remove external interrupt hack when timer interrupt is added to CDP1806 device
 - mmirage unknown_w
+- mm1 unknown expansion rom at $c000?
 - add mm1 opening book
 - add mm1 STP/ON buttons? (they're off/on, with RAM chips remaining powered)
 
@@ -74,7 +74,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<cdp1802_device> m_maincpu;
+	required_device<cdp1806_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -256,7 +256,8 @@ void mm1_state::mirage_map(address_map &map)
 void mm1_state::mm1_map(address_map &map)
 {
 	mirage_map(map);
-	map(0xc000, 0xcfff).unmapr(); // bookrom?
+	map(0x8000, 0xbfff).unmapr(); // bookrom?
+	map(0xc000, 0xc000).nopr(); // looks for $c0, jumps to $c003 if true
 }
 
 void mm1_state::mm1_io(address_map &map)
@@ -345,8 +346,8 @@ static INPUT_PORTS_START( mirage )
 
 	PORT_START("FAKE") // module came with buttons sensorboard by default
 	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mm1_state, mirage_switch_sensor_type, nullptr)
-	PORT_CONFSETTING(    0x00, "Buttons" )
-	PORT_CONFSETTING(    0x01, "Magnets" )
+	PORT_CONFSETTING(    0x00, "Buttons (Mirage)" )
+	PORT_CONFSETTING(    0x01, "Magnets (Modular)" )
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(mm1_state::mirage_switch_sensor_type)
@@ -363,7 +364,7 @@ INPUT_CHANGED_MEMBER(mm1_state::mirage_switch_sensor_type)
 void mm1_state::mirage(machine_config &config)
 {
 	/* basic machine hardware */
-	CDP1802(config, m_maincpu, 8_MHz_XTAL);
+	CDP1806(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mirage_map);
 	m_maincpu->set_addrmap(AS_IO, &mm1_state::mm1_io);
 	m_maincpu->clear_cb().set(FUNC(mm1_state::clear_r));
@@ -371,7 +372,9 @@ void mm1_state::mirage(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(mm1_state::keypad_r<0>));
 	m_maincpu->ef4_cb().set(FUNC(mm1_state::keypad_r<1>));
 
-	m_maincpu->set_periodic_int(FUNC(mm1_state::interrupt), attotime::from_hz(150)); // fake
+	// wrong! uses internal timer interrupt
+	const attotime irq_period = attotime::from_ticks(8 * 32 * 0x71, 8_MHz_XTAL); // LDC = 0x71
+	m_maincpu->set_periodic_int(FUNC(mm1_state::interrupt), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -395,6 +398,10 @@ void mm1_state::mm1(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
 	m_maincpu->q_cb().set(FUNC(mm1_state::q_w));
+
+	// wrong! uses internal timer interrupt
+	const attotime irq_period = attotime::from_ticks(8 * 32 * 0xfa, 8_MHz_XTAL); // LDC = 0xFA
+	m_maincpu->set_periodic_int(FUNC(mm1_state::interrupt), irq_period);
 
 	m_board->set_type(sensorboard_device::MAGNETS);
 }

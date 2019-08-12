@@ -2,7 +2,14 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    RCA COSMAC CPU emulation
+RCA COSMAC CPU emulation
+
+TODO:
+- is it useful to emulate I and N registers or can they just be defined as (m_op >> x & 0xf)?
+- 1804/5/6: extended opcode timing is wrong, multiple execute states
+- 1804/5/6: add more extended opcodes (05/06 supports more than 04)
+- 1804/5/6: add counter/timer
+- 1804/5: add internal address map (ram/rom)
 
 **********************************************************************/
 
@@ -150,9 +157,9 @@ const cosmac_device::ophandler cdp1801_device::s_opcodetable[256] =
 	&cdp1801_device::adi,    &cdp1801_device::sdi,    &cdp1801_device::und,    &cdp1801_device::smi
 };
 
-cosmac_device::ophandler cdp1801_device::get_ophandler(uint8_t opcode) const
+cosmac_device::ophandler cdp1801_device::get_ophandler(uint16_t opcode) const
 {
-	return s_opcodetable[opcode];
+	return s_opcodetable[opcode & 0xff];
 }
 
 const cosmac_device::ophandler cdp1802_device::s_opcodetable[256] =
@@ -238,9 +245,100 @@ const cosmac_device::ophandler cdp1802_device::s_opcodetable[256] =
 	&cdp1802_device::adi,    &cdp1802_device::sdi,    &cdp1802_device::shl,    &cdp1802_device::smi
 };
 
-cosmac_device::ophandler cdp1802_device::get_ophandler(uint8_t opcode) const
+cosmac_device::ophandler cdp1802_device::get_ophandler(uint16_t opcode) const
 {
-	return s_opcodetable[opcode];
+	return s_opcodetable[opcode & 0xff];
+}
+
+const cosmac_device::ophandler cdp1804_device::s_opcodetable_ex[256] =
+{
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::ldc,    &cdp1804_device::und,
+	&cdp1804_device::gec,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::bci,    &cdp1804_device::bxi,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::rlxa,   &cdp1804_device::rlxa,   &cdp1804_device::rlxa,   &cdp1804_device::rlxa,
+	&cdp1804_device::rlxa,   &cdp1804_device::rlxa,   &cdp1804_device::rlxa,   &cdp1804_device::rlxa,
+	&cdp1804_device::rlxa,   &cdp1804_device::rlxa,   &cdp1804_device::rlxa,   &cdp1804_device::rlxa,
+	&cdp1804_device::rlxa,   &cdp1804_device::rlxa,   &cdp1804_device::rlxa,   &cdp1804_device::rlxa,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,
+	&cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,
+	&cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,
+	&cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,
+
+	&cdp1804_device::rnx,    &cdp1804_device::rnx,    &cdp1804_device::rnx,    &cdp1804_device::rnx,
+	&cdp1804_device::rnx,    &cdp1804_device::rnx,    &cdp1804_device::rnx,    &cdp1804_device::rnx,
+	&cdp1804_device::rnx,    &cdp1804_device::rnx,    &cdp1804_device::rnx,    &cdp1804_device::rnx,
+	&cdp1804_device::rnx,    &cdp1804_device::rnx,    &cdp1804_device::rnx,    &cdp1804_device::rnx,
+
+	&cdp1804_device::rldi,   &cdp1804_device::rldi,   &cdp1804_device::rldi,   &cdp1804_device::rldi,
+	&cdp1804_device::rldi,   &cdp1804_device::rldi,   &cdp1804_device::rldi,   &cdp1804_device::rldi,
+	&cdp1804_device::rldi,   &cdp1804_device::rldi,   &cdp1804_device::rldi,   &cdp1804_device::rldi,
+	&cdp1804_device::rldi,   &cdp1804_device::rldi,   &cdp1804_device::rldi,   &cdp1804_device::rldi,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+};
+
+cosmac_device::ophandler cdp1804_device::get_ophandler(uint16_t opcode) const
+{
+	if ((opcode & 0xff00) == 0x6800)
+		return s_opcodetable_ex[opcode & 0xff];
+	else
+		return cdp1802_device::get_ophandler(opcode);
 }
 
 
@@ -252,6 +350,9 @@ cosmac_device::ophandler cdp1802_device::get_ophandler(uint8_t opcode) const
 // device type definition
 DEFINE_DEVICE_TYPE(CDP1801, cdp1801_device, "cdp1801", "RCA CDP1801")
 DEFINE_DEVICE_TYPE(CDP1802, cdp1802_device, "cdp1802", "RCA CDP1802")
+DEFINE_DEVICE_TYPE(CDP1804, cdp1804_device, "cdp1804", "RCA CDP1804")
+DEFINE_DEVICE_TYPE(CDP1805, cdp1805_device, "cdp1805", "RCA CDP1805")
+DEFINE_DEVICE_TYPE(CDP1806, cdp1806_device, "cdp1806", "RCA CDP1806")
 
 
 //-------------------------------------------------
@@ -294,20 +395,57 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 //  cdp1801_device - constructor
 //-------------------------------------------------
 
-cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cosmac_device(mconfig, CDP1801, tag, owner, clock)
-{
-}
+cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cosmac_device(mconfig, CDP1801, tag, owner, clock)
+{ }
 
 
 //-------------------------------------------------
 //  cdp1802_device - constructor
 //-------------------------------------------------
 
-cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cosmac_device(mconfig, CDP1802, tag, owner, clock)
-{
-}
+cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cdp1802_device(mconfig, CDP1802, tag, owner, clock)
+{ }
+
+cdp1802_device::cdp1802_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	cosmac_device(mconfig, type, tag, owner, clock)
+{ }
+
+
+//-------------------------------------------------
+//  cdp1804_device - constructor
+//-------------------------------------------------
+
+cdp1804_device::cdp1804_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cdp1804_device(mconfig, CDP1804, tag, owner, clock)
+{ }
+
+cdp1804_device::cdp1804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	cdp1802_device(mconfig, type, tag, owner, clock)
+{ }
+
+
+//-------------------------------------------------
+//  cdp1805_device - constructor
+//-------------------------------------------------
+
+cdp1805_device::cdp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cdp1805_device(mconfig, CDP1805, tag, owner, clock)
+{ }
+
+cdp1805_device::cdp1805_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	cdp1804_device(mconfig, type, tag, owner, clock)
+{ }
+
+
+//-------------------------------------------------
+//  cdp1806_device - constructor
+//-------------------------------------------------
+
+cdp1806_device::cdp1806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cdp1805_device(mconfig, CDP1806, tag, owner, clock)
+{ }
 
 
 //-------------------------------------------------
@@ -717,6 +855,9 @@ inline void cosmac_device::run_state()
 	switch (m_state)
 	{
 	case cosmac_state::STATE_0_FETCH:
+		m_op = 0;
+
+	case cosmac_state::STATE_0_FETCH_2ND:
 		fetch_instruction();
 		break;
 
@@ -795,7 +936,7 @@ inline void cosmac_device::sample_ef_lines()
 
 inline void cosmac_device::output_state_code()
 {
-	if (m_state == cosmac_state::STATE_0_FETCH)
+	if (m_state == cosmac_state::STATE_0_FETCH || m_state == cosmac_state::STATE_0_FETCH_2ND)
 	{
 		// S0 fetch
 		m_write_sc(0, COSMAC_STATE_CODE_S0_FETCH);
@@ -813,13 +954,13 @@ inline void cosmac_device::output_state_code()
 	else
 	{
 		// S1 execute
-		m_write_sc(I == 0x6 ? (N & 7) : 0, COSMAC_STATE_CODE_S1_EXECUTE);
+		m_write_sc((m_op >> 4) == 0x6 ? (N & 7) : 0, COSMAC_STATE_CODE_S1_EXECUTE);
 	}
 }
 
 void cdp1801_device::output_state_code()
 {
-	if (m_state == cosmac_state::STATE_0_FETCH)
+	if (m_state == cosmac_state::STATE_0_FETCH || m_state == cosmac_state::STATE_0_FETCH_2ND)
 	{
 		// S0 fetch
 		m_write_sc(0, 4);
@@ -834,7 +975,7 @@ void cdp1801_device::output_state_code()
 		// S3 interrupt
 		m_write_sc(0, 3);
 	}
-	else if (I == 0x6)
+	else if ((m_op >> 4) == 0x6)
 	{
 		// S1 execute (I/O)
 		m_write_sc(N, 1);
@@ -889,15 +1030,19 @@ inline void cosmac_device::fetch_instruction()
 	// instruction fetch
 	offs_t addr = R[P]++;
 	m_write_tpb(1);
-	m_op = read_opcode(addr);
+	m_op = m_op << 8 | read_opcode(addr);
 	m_write_tpb(0);
 
-	I = m_op >> 4;
+	I = m_op >> 4 & 0x0f;
 	N = m_op & 0x0f;
 
 	m_icount -= CLOCKS_FETCH;
 
-	m_state = cosmac_state::STATE_1_EXECUTE;
+	// CDP1804 and up: 0x68 for extended opcodes
+	if (m_op == 0x68 && has_extended_opcodes())
+		m_state = cosmac_state::STATE_0_FETCH_2ND;
+	else
+		m_state = cosmac_state::STATE_1_EXECUTE;
 }
 
 
@@ -963,7 +1108,7 @@ inline void cosmac_device::execute_instruction()
 
 	m_icount -= CLOCKS_EXECUTE;
 
-	if (I == 0xc && m_state == cosmac_state::STATE_1_EXECUTE)
+	if (m_state == cosmac_state::STATE_1_EXECUTE && (m_op >> 4) == 0xc) // "long" opcodes
 	{
 		m_state = cosmac_state::STATE_1_EXECUTE_2ND;
 	}
@@ -979,7 +1124,7 @@ inline void cosmac_device::execute_instruction()
 	{
 		m_state = cosmac_state::STATE_3_INT;
 	}
-	else if ((I > 0) || (N > 0)) // not idling
+	else if (m_op != 0) // not idling
 	{
 		m_state = cosmac_state::STATE_0_FETCH;
 	}
@@ -1298,3 +1443,16 @@ void cosmac_device::out()   { IO_W(N, RAM_R(R[X])); R[X]++; }
 
 */
 void cosmac_device::inp()   { D = IO_R(N & 0x07); RAM_W(R[X], D); }
+
+// CDP1804(and up) extended opcodes
+void cosmac_device::rldi()  { put_high_reg(N, RAM_R(R[P])); R[P]++; put_low_reg(N, RAM_R(R[P])); R[P]++; }
+void cosmac_device::rlxa()  { put_high_reg(N, RAM_R(R[X])); R[X]++; put_low_reg(N, RAM_R(R[X])); R[X]++; }
+void cosmac_device::rsxd()  { RAM_W(R[X], R[N] >> 0 & 0xff); R[X]--; RAM_W(R[X], R[N] >> 8 & 0xff); R[X]--; }
+
+void cosmac_device::rnx()   { R[X] = R[N]; }
+
+void cosmac_device::bci()   { short_branch(1); } // wrong! tests CI flag
+void cosmac_device::bxi()   { short_branch(0); } // wrong! tests XI flag
+
+void cosmac_device::ldc()   { /* logerror("LDC counter set: %X\n", D); */ }
+void cosmac_device::gec()   { D = machine().rand() & 0xf; } // wrong!
