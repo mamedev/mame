@@ -42,6 +42,16 @@ struct gdb_register_map
 		const char *gdb_name;
 		bool stop_packet;
 		gdb_register_type gdb_type;
+		int override_bitsize;
+
+		gdb_register_description(const char *_state_name=nullptr, const char *_gdb_name=nullptr, bool _stop_packet=false, gdb_register_type _gdb_type=TYPE_INT, int _override_bitsize=-1)
+		: state_name(_state_name)
+		, gdb_name(_gdb_name)
+		, stop_packet(_stop_packet)
+		, gdb_type(_gdb_type)
+		, override_bitsize(_override_bitsize)
+		{
+		}
 	};
 	std::vector<gdb_register_description> registers;
 };
@@ -167,6 +177,50 @@ static const gdb_register_map gdb_register_map_ppc601 =
 };
 
 //-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_r4600 =
+{
+	"mips",
+	"org.gnu.gdb.mips.cpu",
+	{
+		{ "zero", "r0",   false, TYPE_INT, 32 },
+		{ "at",   "r1",   false, TYPE_INT, 32 },
+		{ "v0",   "r2",   false, TYPE_INT, 32 },
+		{ "v1",   "r3",   false, TYPE_INT, 32 },
+		{ "a0",   "r4",   false, TYPE_INT, 32 },
+		{ "a1",   "r5",   false, TYPE_INT, 32 },
+		{ "a2",   "r6",   false, TYPE_INT, 32 },
+		{ "a3",   "r7",   false, TYPE_INT, 32 },
+		{ "t0",   "r8",   false, TYPE_INT, 32 },
+		{ "t1",   "r9",   false, TYPE_INT, 32 },
+		{ "t2",   "r10",  false, TYPE_INT, 32 },
+		{ "t3",   "r11",  false, TYPE_INT, 32 },
+		{ "t4",   "r12",  false, TYPE_INT, 32 },
+		{ "t5",   "r13",  false, TYPE_INT, 32 },
+		{ "t6",   "r14",  false, TYPE_INT, 32 },
+		{ "t7",   "r15",  false, TYPE_INT, 32 },
+		{ "s0",   "r16",  false, TYPE_INT, 32 },
+		{ "s1",   "r17",  false, TYPE_INT, 32 },
+		{ "s2",   "r18",  false, TYPE_INT, 32 },
+		{ "s3",   "r19",  false, TYPE_INT, 32 },
+		{ "s4",   "r20",  false, TYPE_INT, 32 },
+		{ "s5",   "r21",  false, TYPE_INT, 32 },
+		{ "s6",   "r22",  false, TYPE_INT, 32 },
+		{ "s7",   "r23",  false, TYPE_INT, 32 },
+		{ "t8",   "r24",  false, TYPE_INT, 32 },
+		{ "t9",   "r25",  false, TYPE_INT, 32 },
+		{ "k0",   "r26",  false, TYPE_INT, 32 },
+		{ "k1",   "r27",  false, TYPE_INT, 32 },
+		{ "gp",   "r28",  false, TYPE_INT, 32 },
+		{ "sp",   "r29",  false, TYPE_INT, 32 },
+		{ "fp",   "r30",  false, TYPE_INT, 32 },
+		{ "ra",   "r31",  false, TYPE_INT, 32 },
+		{ "LO",   "lo",   false, TYPE_INT, 32 },
+		{ "HI",   "hi",   false, TYPE_INT, 32 },
+		{ "PC",   "pc",   true,  TYPE_CODE_POINTER, 32 },
+	}
+};
+
+//-------------------------------------------------------------------------
 static const gdb_register_map gdb_register_map_z80 =
 {
 	"z80",
@@ -206,6 +260,7 @@ static const gdb_register_map gdb_register_map_m6502 =
 static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
 	{ "i486",    gdb_register_map_i486 },
 	{ "arm7_le", gdb_register_map_arm7 },
+	{ "r4600",   gdb_register_map_r4600 },
 	{ "ppc601",  gdb_register_map_ppc601 },
 	{ "z80",     gdb_register_map_z80 },
 	{ "m6502",   gdb_register_map_m6502 },
@@ -483,7 +538,10 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 					new_reg.gdb_name = reg.gdb_name;
 					new_reg.gdb_regnum = cur_gdb_regnum;
 					new_reg.gdb_type = reg.gdb_type;
-					new_reg.gdb_bitsize = entry->datasize() * 8;
+					if ( reg.override_bitsize != -1 )
+						new_reg.gdb_bitsize = reg.override_bitsize;
+					else
+						new_reg.gdb_bitsize = entry->datasize() * 8;
 					new_reg.state_index = entry->index();
 					m_gdb_registers.push_back(std::move(new_reg));
 					if ( reg.stop_packet )
@@ -1059,6 +1117,8 @@ std::string debug_gdbstub::get_register_string(int gdb_regnum)
 					: (reg.gdb_bitsize == 16) ? "%04"  PRIx64
 					:                           "%02"  PRIx64;
 	uint64_t value = m_state->state_int(reg.state_index);
+	if ( reg.gdb_bitsize < 64 )
+		value &= (1ULL << reg.gdb_bitsize) - 1;
 	if ( !m_is_be )
 	{
 		value = (reg.gdb_bitsize == 64) ? BYTESWAP_64(value)
