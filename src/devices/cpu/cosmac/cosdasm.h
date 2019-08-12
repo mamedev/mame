@@ -20,7 +20,8 @@ public:
 	enum
 	{
 		TYPE_1801,
-		TYPE_1802
+		TYPE_1802,
+		TYPE_1805
 	};
 
 	cosmac_disassembler(int variant);
@@ -34,10 +35,13 @@ private:
 
 	offs_t implied(const uint8_t opcode);
 	offs_t immediate(offs_t &pc, const data_buffer &params);
+	offs_t double_immediate(offs_t &pc, const data_buffer &params);
 	offs_t short_branch(offs_t base_pc, offs_t &pc, const data_buffer &params);
 	offs_t long_branch(offs_t &pc, const data_buffer &params);
 	offs_t short_skip(offs_t pc);
 	offs_t long_skip(offs_t pc);
+
+	void disassemble_68(std::ostream &stream, offs_t base_pc, offs_t &pc, const data_buffer &opcodes, const data_buffer &params);
 };
 
 #endif

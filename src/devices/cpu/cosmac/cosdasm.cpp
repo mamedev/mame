@@ -28,6 +28,13 @@ offs_t cosmac_disassembler::immediate(offs_t &pc, const data_buffer &params)
 	return params.r8(pc++);
 }
 
+offs_t cosmac_disassembler::double_immediate(offs_t &pc, const data_buffer &params)
+{
+	u16 res = params.r8(pc) << 8 | params.r8(pc + 1);
+	pc += 2;
+	return res;
+}
+
 offs_t cosmac_disassembler::short_branch(offs_t base_pc, offs_t &pc, const data_buffer &params)
 {
 	return (base_pc & 0xff00) | immediate(pc, params);
@@ -58,6 +65,69 @@ u32 cosmac_disassembler::opcode_alignment() const
 
 cosmac_disassembler::cosmac_disassembler(int variant) : m_variant(variant)
 {
+}
+
+void cosmac_disassembler::disassemble_68(std::ostream &stream, offs_t base_pc, offs_t &pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	if (m_variant < TYPE_1802)
+		stream << "INP 0";
+	else if (m_variant < TYPE_1805)
+		stream << "illegal";
+	else
+	{
+		uint8_t op2 = opcodes.r8(pc++);
+
+		switch (op2)
+		{
+		case 0x00: stream << "STPC"; break;
+		case 0x01: stream << "DTC"; break;
+		case 0x02: stream << "SPM2"; break;
+		case 0x03: stream << "SCM2"; break;
+		case 0x04: stream << "SPM1"; break;
+		case 0x05: stream << "SCM1"; break;
+		case 0x06: stream << "LDC"; break;
+		case 0x07: stream << "STM"; break;
+		case 0x08: stream << "GEC"; break;
+		case 0x09: stream << "ETQ"; break;
+		case 0x0a: stream << "XIE"; break;
+		case 0x0b: stream << "XID"; break;
+		case 0x0c: stream << "CIE"; break;
+		case 0x0d: stream << "CID"; break;
+		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
+		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
+			util::stream_format(stream, "DJNZ R%01X, %04X", implied(op2), short_branch(base_pc, pc, params)); break;
+		case 0x3e: util::stream_format(stream, "BCI %04X", short_branch(base_pc, pc, params)); break;
+		case 0x3f: util::stream_format(stream, "BXI %04X", short_branch(base_pc, pc, params)); break;
+		case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
+		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
+			util::stream_format(stream, "RLXA R%01X", implied(op2)); break;
+		case 0x74: stream << "DADC"; break;
+		case 0x76: stream << "DSAV"; break;
+		case 0x77: stream << "DSMB"; break;
+		case 0x7c: util::stream_format(stream, "DACI #%02X", immediate(pc, params)); break;
+		case 0x7f: util::stream_format(stream, "DSBI #%02X", immediate(pc, params)); break;
+		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
+		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
+			util::stream_format(stream, "SCAL R%01X, %04X", implied(op2), long_branch(pc, params)); break;
+		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
+		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+			util::stream_format(stream, "SRET R%01X", implied(op2)); break;
+		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
+			util::stream_format(stream, "RSXD R%01X", implied(op2)); break;
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+			util::stream_format(stream, "RNX R%01X", implied(op2)); break;
+		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+		case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
+			util::stream_format(stream, "RLDI R%01X, #%04X", implied(op2), double_immediate(pc, params)); break;
+		case 0xf4: stream << "DADD"; break;
+		case 0xf7: stream << "DSM"; break;
+		case 0xfc: util::stream_format(stream, "DADI #%02X", immediate(pc, params)); break;
+		case 0xff: util::stream_format(stream, "DSMI #%02X", immediate(pc, params)); break;
+		default: stream << "illegal"; break;
+		}
+	}
 }
 
 offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -153,7 +223,7 @@ offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x31: CDP1802_OPCODE("BQ %04X", short_branch(base_pc, pc, params)); break;
 	case 0x39: CDP1802_OPCODE("BNQ %04X", short_branch(base_pc, pc, params)); break;
 	case 0x60: util::stream_format(stream, m_variant < TYPE_1802 ? "OUT 0" : "IRX"); break;
-	case 0x68: util::stream_format(stream, m_variant < TYPE_1802 ? "INP 0" : "illegal"); break;
+	case 0x68: disassemble_68(stream, base_pc, pc, opcodes, params); break;
 	case 0x72: CDP1802_OPCODE("LDXA"); break;
 	case 0x73: CDP1802_OPCODE("STXD"); break;
 	case 0x74: CDP1802_OPCODE("ADC"); break;
