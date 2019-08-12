@@ -322,7 +322,7 @@ private:
 	bool m_dettached;
 	bool m_extended_mode;
 	bool m_send_stop_packet;
-	bool m_target_xml_sent;
+	bool m_target_xml_sent;     // the 'g', 'G', 'p', and 'P' commands only work once target.xml has been sent
 
 	struct gdb_register
 	{
@@ -419,6 +419,8 @@ static std::string escape_packet(const std::string src)
 //-------------------------------------------------------------------------
 void debug_gdbstub::generate_target_xml(void)
 {
+	// Note: we do not attempt to replicate the regnum values from old
+	//       GDB clients that did not support target.xml.
 	std::string target_xml;
 	target_xml += "<?xml version=\"1.0\"?>\n";
 	target_xml += "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">\n";
@@ -426,8 +428,7 @@ void debug_gdbstub::generate_target_xml(void)
 	target_xml += string_format("<architecture>%s</architecture>\n", m_gdb_arch.c_str());
 	target_xml += string_format("  <feature name=\"%s\">\n", m_gdb_feature.c_str());
 	for ( const auto &reg: m_gdb_registers )
-		if ( !reg.gdb_name.empty() )
-			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name.c_str(), reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
+		target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name.c_str(), reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
 	target_xml += "  </feature>\n";
 	target_xml += "</target>\n";
 	m_target_xml = escape_packet(target_xml);
@@ -498,8 +499,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 
 #if 0
 		for ( const auto &reg: m_gdb_registers )
-			if ( !reg.gdb_name.empty() )
-				osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name.c_str());
+			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name.c_str());
 #endif
 
 		m_initialized = true;
@@ -622,8 +622,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_g(const char *buf)
 		return REPLY_UNSUPPORTED;
 	std::string reply;
 	for ( const auto &reg: m_gdb_registers )
-		if ( !reg.gdb_name.empty() )
-			reply += get_register_string(reg.gdb_regnum);
+		reply += get_register_string(reg.gdb_regnum);
 	send_reply(reply.c_str());
 	return REPLY_NONE;
 }
