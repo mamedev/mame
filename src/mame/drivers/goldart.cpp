@@ -213,9 +213,9 @@ WRITE8_MEMBER(goldart_state::hostmem_w)
 			m_ram2[offset] = (m_ram2[offset] & 0x0f) | (m_ram[0xfffe] & 0xf0);
 		}
 	}
-	else if (offset < 0xfff0)
+	else if (offset < 0xffe0)
 	{
-		// fe00 - ffef is the palette (15 palettes)
+		// fe00 - ffdf is the palette (15 palettes)
 		m_ram[offset] = data;
 
 		int index = (offset & 0x1fe)>>1;
@@ -226,6 +226,7 @@ WRITE8_MEMBER(goldart_state::hostmem_w)
 	}
 	else
 	{
+		// ffe0 - ffef unused?
 		// fff0 - ffff are control registers
 		m_ram[offset] = data;
 
@@ -246,7 +247,7 @@ WRITE8_MEMBER(goldart_state::hostmem_w)
 		logerror("%s: hostmem_w %04x: %02x (to VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
 	else if (offset<0xfe00)
 		logerror("%s: hostmem_w %04x: %02x (to non-screen VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
-	else if (offset<0xfff0)
+	else if (offset<0xffe0)
 		logerror("%s: hostmem_w %04x: %02x (to palette)\n", machine().describe_context(), offset, data);
 	else
 		logerror("%s: hostmem_w %04x: %02x (to REGS?)\n", machine().describe_context(), offset, data);
