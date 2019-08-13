@@ -38,7 +38,7 @@ Notes:
 
 /***************************************************************************
 
-                            Main CPU + MCU simulation
+                            Main CPU
 
 ***************************************************************************/
 
@@ -53,92 +53,45 @@ WRITE8_MEMBER(thedeep_state::nmi_w)
 void thedeep_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+
 	save_item(NAME(m_nmi_enable));
-	save_item(NAME(m_protection_command));
-	save_item(NAME(m_protection_data));
-	save_item(NAME(m_protection_index));
-	save_item(NAME(m_protection_irq));
-	save_item(NAME(m_mcu_p3_reg));
+	save_item(NAME(m_maincpu_to_mcu));
+	save_item(NAME(m_mcu_to_maincpu));
+	save_item(NAME(m_mcu_p2));
+	save_item(NAME(m_mcu_p3));
+	save_item(NAME(m_coin_result));
 }
 
 void thedeep_state::machine_reset()
 {
-	membank("bank1")->set_entry(0);
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
 	m_scroll[2] = 0;
 	m_scroll[3] = 0;
-	m_protection_command = 0;
-	m_protection_index = -1;
-	m_protection_irq = 0;
-}
-
-WRITE8_MEMBER(thedeep_state::protection_w)
-{
-	m_protection_command = data;
-	switch (m_protection_command)
-	{
-		case 0x11:
-			flip_screen_set(1);
-			m_spritegen->set_flip_screen(true);
-		break;
-
-		case 0x20:
-			flip_screen_set(0);
-			m_spritegen->set_flip_screen(false);
-		break;
-
-		case 0x30:
-		case 0x31:
-		case 0x32:
-		case 0x33:
-			membank("bank1")->set_entry(m_protection_command & 3);
-		break;
-
-		case 0x59:
-		{
-			if (m_protection_index < 0)
-				m_protection_index = 0;
-
-			if ( m_protection_index < 0x19b )
-// d000-d00c:   hl += a * b
-// d00d-d029:   input a (e.g. $39) output hl (e.g. h=$03 l=$09).
-//              Replace trainling 0's with space ($10). 00 -> '  '
-// d02a-d039:   input a (e.g. $39) output hl (e.g. h=$03 l=$09).
-//              Replace trainling 0's with space ($10). 00 -> ' 0'
-// d03a-d046:   input a (e.g. $39) output hl (e.g. h=$03 l=$09). 00 -> '00'
-// d047-d086:   a /= e (e can be 0!)
-// d087-d0a4:   print ASCII string from HL to IX (sub $30 to every char)
-// d0a4-d0be:   print any string from HL to IX
-// d0bf-d109:   print ASCII string from HL to IX. Color is in c. (e.g. "game over")
-// d10a-d11f:   print 2 digit decimal number in hl to ix, color c. change ix
-// d120-d157:   update score: add 3 BCD bytes at ix to those at iy, then clear those at ix
-// d158-d165:   print digit: (IX+0) <- H; (IX+1) <-L. ix+=40
-// d166-d174:   hl = (hl + 2*a)
-// d175-d181:   hl *= e (e must be non zero)
-// d182-d19a:   hl /= de
-				m_protection_data = memregion("mcu")->base()[0x185+m_protection_index++];
-			else
-				m_protection_data = 0xc9;
-
-			m_protection_irq  = 1;
-		}
-		break;
-
-		default:
-			logerror( "pc %04x: protection_command %02x\n", m_maincpu->pc(),m_protection_command);
-	}
-}
-
-READ8_MEMBER(thedeep_state::e004_r)
-{
-	return m_protection_irq ? 1 : 0;
 }
 
 READ8_MEMBER(thedeep_state::protection_r)
 {
-	m_protection_irq = 0;
-	return m_protection_data;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return m_mcu_to_maincpu;
+}
+
+WRITE8_MEMBER(thedeep_state::protection_w)
+{
+	m_maincpu_to_mcu = data;
+	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
+}
+
+READ8_MEMBER(thedeep_state::e004_r)
+{
+	// 7654321-  unused?
+	// -------0  coin status from mcu ready
+
+	uint8_t data = m_coin_result;
+
+	m_coin_result = 0;
+
+	return data;
 }
 
 WRITE8_MEMBER(thedeep_state::e100_w)
@@ -153,8 +106,8 @@ void thedeep_state::main_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");    // ROM (banked)
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram();                             // RAM (MCU data copied here)
-	map(0xe000, 0xe000).rw(FUNC(thedeep_state::protection_r), FUNC(thedeep_state::protection_w));   // To MCU
-	map(0xe004, 0xe004).rw(FUNC(thedeep_state::e004_r), FUNC(thedeep_state::nmi_w));    //
+	map(0xe000, 0xe000).rw(FUNC(thedeep_state::protection_r), FUNC(thedeep_state::protection_w));
+	map(0xe004, 0xe004).rw(FUNC(thedeep_state::e004_r), FUNC(thedeep_state::nmi_w));
 	map(0xe008, 0xe008).portr("e008");           // P1 (Inputs)
 	map(0xe009, 0xe009).portr("e009");           // P2
 	map(0xe00a, 0xe00a).portr("e00a");           // DSW1
@@ -191,54 +144,59 @@ void thedeep_state::audio_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(thedeep_state::p1_w)
+uint8_t thedeep_state::mcu_p0_r()
 {
+	// 7654----  unused
+	// ----3---  coin2
+	// -----2--  coin1
+	// ------1-  service coin
+	// -------0  coin inserted
+
+	int coin_inserted = ((m_coins->read() & 0x0e) == 0x0e) ? 1 : 0;
+
+	return (m_coins->read() & 0x0e) | coin_inserted;
+}
+
+void thedeep_state::mcu_p1_w(uint8_t data)
+{
+	// 76543---  unused
+	// -----21-  bank
+	// -------0  flip screen
+
+	membank("bank1")->set_entry((data >> 1) & 0x03);
+
 	flip_screen_set(!BIT(data, 0));
 	m_spritegen->set_flip_screen(!BIT(data, 0));
-	membank("bank1")->set_entry((data & 6) >> 1);
-	logerror("P1 %02x\n",data);
 }
 
-READ8_MEMBER(thedeep_state::from_main_r)
+uint8_t thedeep_state::mcu_p2_r()
 {
-	static uint8_t res;
-
-	res = 0x11;
-
-	logerror("From Main read = %02x\n",res);
-	return 0x20;
+	return m_maincpu_to_mcu;
 }
 
-WRITE8_MEMBER(thedeep_state::to_main_w)
+void thedeep_state::mcu_p2_w(uint8_t data)
 {
-	// ...
+	m_mcu_p2 = data;
 }
 
-WRITE8_MEMBER(thedeep_state::p3_w)
+void thedeep_state::mcu_p3_w(uint8_t data)
 {
-	/* bit 0 0->1 transition IRQ0 to main */
-	if((!(m_mcu_p3_reg & 0x01)) && data & 0x01)
-		m_maincpu->set_input_line(0, HOLD_LINE);
+	if (BIT(m_mcu_p3, 0) == 1 && BIT(data, 0) == 0)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 
-	/* bit 6 0->1 transition INT1 IRQ ACK */
-	if((!(m_mcu_p3_reg & 0x40)) && data & 0x40)
-		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
-
-	/* bit 7 0->1 transition INT0 IRQ ACK */
-	if((!(m_mcu_p3_reg & 0x80)) && data & 0x80)
+	if (BIT(m_mcu_p3, 1) == 1 && BIT(data, 1) == 0)
 		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
-	m_mcu_p3_reg = data;
-	logerror("P3 %02x\n",data);
-}
+	if (BIT(m_mcu_p3, 4) == 1 && BIT(data, 4) == 0)
+		m_coin_result = 1;
 
-READ8_MEMBER(thedeep_state::p0_r)
-{
-	uint8_t coin_mux;
+	if (BIT(m_mcu_p3, 6) == 1 && BIT(data, 6) == 0)
+		m_mcu_to_maincpu = m_mcu_p2;
 
-	coin_mux = ((ioport("COINS")->read() & 0x0e) == 0x0e); // bit 0 is hard-wired to ALL three coin latches
+	if (BIT(m_mcu_p3, 7) == 1 && BIT(data, 7) == 0)
+		m_mcu->set_port_forced_input(2, m_maincpu_to_mcu);
 
-	return (ioport("COINS")->read() & 0xfe) | (coin_mux & 1);
+	m_mcu_p3 = data;
 }
 
 
@@ -268,6 +226,12 @@ static INPUT_PORTS_START( thedeep )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2  )
+
+	PORT_START("COINS")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // any coin input active
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN2)
 
 	PORT_START("e00a")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2")
@@ -311,18 +275,6 @@ static INPUT_PORTS_START( thedeep )
 	PORT_DIPSETTING(    0x10, "80k 100k" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" ) /* Listed as "Unused" in the manual */
 	PORT_SERVICE_DIPLOC(  0x80, IP_ACTIVE_LOW, "SW2:8" )
-
-	PORT_START("MCU")   // Read by the mcu
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
-
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // mux of bits 1-2-3
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -370,57 +322,39 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(thedeep_state::interrupt)
 {
-	int scanline = param;
+	if (param == 0 && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	if (scanline == 124) // TODO: clean this
-	{
-		if (m_protection_command != 0x59)
-		{
-			int coins = ioport("MCU")->read();
-			if      (coins & 1) m_protection_data = 1;
-			else if (coins & 2) m_protection_data = 2;
-			else if (coins & 4) m_protection_data = 3;
-			else                m_protection_data = 0;
+	// actual scanline unknown, but can't happen at the same time as the nmi
+	if (param == 127)
+		m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 
-			if (m_protection_data)
-				m_protection_irq = 1;
-		}
-		if (m_protection_irq)
-			m_maincpu->set_input_line(0, HOLD_LINE);
-	}
-	else if(scanline == 0)
-	{
-		if (m_nmi_enable)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
-}
-
-INTERRUPT_GEN_MEMBER(thedeep_state::mcu_irq)
-{
-	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	if (param == 128)
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 }
 
 void thedeep_state::thedeep(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2); /* verified on pcb */
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &thedeep_state::main_map);
 
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(thedeep_state::interrupt), "screen", 0, 1);
 
-	R65C02(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
+	R65C02(config, m_audiocpu, 12_MHz_XTAL / 8); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thedeep_state::audio_map);
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
-	/* MCU is a i8751 running at 8Mhz (8mhz xtal)*/
-	I8751(config, m_mcu, XTAL(8'000'000));
-	m_mcu->port_in_cb<0>().set(FUNC(thedeep_state::p0_r));
-	m_mcu->port_out_cb<1>().set(FUNC(thedeep_state::p1_w));
-	m_mcu->port_in_cb<1>().set(FUNC(thedeep_state::from_main_r));
-	m_mcu->port_out_cb<2>().set(FUNC(thedeep_state::to_main_w));
-	m_mcu->port_out_cb<3>().set(FUNC(thedeep_state::p3_w));
-	m_mcu->set_vblank_int("screen", FUNC(thedeep_state::mcu_irq)); // unknown source, but presumably vblank
-	m_mcu->set_disable();
+	// needs a tight sync with the mcu
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+
+	// Intel C8751H-88 @ 8 MHz
+	I8751(config, m_mcu, 8_MHz_XTAL);
+	m_mcu->port_in_cb<0>().set(FUNC(thedeep_state::mcu_p0_r));
+	m_mcu->port_out_cb<1>().set(FUNC(thedeep_state::mcu_p1_w));
+	m_mcu->port_in_cb<2>().set(FUNC(thedeep_state::mcu_p2_r));
+	m_mcu->port_out_cb<2>().set(FUNC(thedeep_state::mcu_p2_w));
+	m_mcu->port_out_cb<3>().set(FUNC(thedeep_state::mcu_p3_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

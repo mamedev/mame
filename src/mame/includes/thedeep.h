@@ -24,6 +24,7 @@ public:
 		m_palette(*this, "palette"),
 		m_spritegen(*this, "spritegen"),
 		m_soundlatch(*this, "soundlatch"),
+		m_coins(*this, "COINS"),
 		m_spriteram(*this, "spriteram"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
@@ -46,6 +47,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_ioport m_coins;
 
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_vram_0;
@@ -54,24 +56,28 @@ private:
 	required_shared_ptr<uint8_t> m_scroll2;
 
 	int m_nmi_enable;
-	uint8_t m_protection_command;
-	uint8_t m_protection_data;
-	int m_protection_index;
-	int m_protection_irq;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
-	uint8_t m_mcu_p3_reg;
 
-	DECLARE_WRITE8_MEMBER(nmi_w);
+	// protection mcu
+	uint8_t mcu_p0_r();
+	void mcu_p1_w(uint8_t data);
+	uint8_t mcu_p2_r();
+	void mcu_p2_w(uint8_t data);
+	void mcu_p3_w(uint8_t data);
+
+	uint8_t m_maincpu_to_mcu;
+	uint8_t m_mcu_to_maincpu;
+	uint8_t m_mcu_p2;
+	uint8_t m_mcu_p3;
+	int m_coin_result;
+
+	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_READ8_MEMBER(e004_r);
-	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_WRITE8_MEMBER(nmi_w);
 	DECLARE_WRITE8_MEMBER(e100_w);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(from_main_r);
-	DECLARE_WRITE8_MEMBER(to_main_w);
-	DECLARE_WRITE8_MEMBER(p3_w);
-	DECLARE_READ8_MEMBER(p0_r);
+
 	DECLARE_WRITE8_MEMBER(vram_0_w);
 	DECLARE_WRITE8_MEMBER(vram_1_w);
 
@@ -83,7 +89,6 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void audio_map(address_map &map);
