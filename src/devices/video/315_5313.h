@@ -118,7 +118,10 @@ private:
 		u16 colour;
 		u16 pri;
 	};
+	void get_window_tilebase(int &tile_base, u16 base, int vcolumn, int window_hsize, int hcolumn);
+	void get_vcolumn_tilebase(int &vcolumn, int &tile_base, u16 base, int vscroll, int scanline, int vsize, int hsize, int hcolumn);
 	void get_nametable(u16 tile_base, nametable_t &tile, int vcolumn);
+	inline void draw_tile(nametable_t tile, int start, int end, int &dpos, bool is_fg);
 
 	int m_command_pending; // 2nd half of command pending..
 	u16 m_command_part1;
