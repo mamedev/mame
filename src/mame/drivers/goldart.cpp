@@ -34,6 +34,9 @@
  U7 = Oki
  U10 = Unpopulated socket for Max 202
 
+ The UM611024AK-20 is a '128K X 8BIT HIGH SPEED CMOS SRAM' so likely the video RAM
+ http://www.datasheetcatalog.com/datasheets_pdf/U/T/6/1/UT611024.shtml
+
 */
 
 #include "emu.h"
@@ -76,6 +79,8 @@ private:
 	void dallas_ram(address_map& map);
 
 	uint8_t m_ram[0x10000];
+	uint8_t m_ram2[0x10000];
+
 	uint8_t m_port1;
 
 	DECLARE_READ8_MEMBER(hostmem_r);
@@ -101,24 +106,19 @@ void goldart_state::video_start()
 
 uint32_t goldart_state::screen_update_goldart(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-
-	for (int i = 0; i < 256; i++)
-	{
-		// paletteram might be separate, but for now our memory setup means the data is at the end of the m_ram area
-		uint16_t pal = (m_ram[0xfe00 + (i * 2)] << 8) | (m_ram[0xfe01 + (i * 2)] << 0);
-		m_palette->set_pen_color(i, ((pal >> 10) & 0x1f)<<3, ((pal >> 5) & 0x1f)<<3, (pal & 0x1f)<<3);
-	}
-
-	int count = 16*192;
-	for (int y = 0; y < 256; y++)
+	int count = 0;
+	for (int y = 0; y < 288; y++)
 	{
 		for (int x = 0; x < 192; x++)
 		{
 			uint16_t* dstptr_bitmap  =  &bitmap.pix16(y);
 			uint8_t data = m_ram[count];
+			uint8_t data2 = m_ram2[count];
+
 			count++;
 
-			dstptr_bitmap[x] = data^0xff;
+			dstptr_bitmap[x*2] = ((data&0xf0)>>4)  | (data2 & 0xf0);;
+			dstptr_bitmap[(x*2)+1] = (data&0x0f) | ((data2 & 0x0f)<<4);
 		}
 	}
 
@@ -130,9 +130,59 @@ READ8_MEMBER(goldart_state::hostmem_r)
 	// must be some control bits (or DS5002FP memory access isn't correct) as registers map over ROM/RAM with no obvious way to select at the moment
 	// and we need to be able to access full range of each ROM bank at least
 
+	// sometimes bit 0x40 is set in port1, but it doesn't seem a simple RAM/ROM select
+	// also bit 0x20 has been seen set too
+
 	int bank = m_port1 & 0x07;
-	uint8_t ret = m_data[(bank * 0x10000) + offset];
-	logerror("%s: hostmem_r %04x: %02x (from ROM?)\n", machine().describe_context(), offset, ret);
+	uint8_t ret = 0x00;
+
+	ret = m_data[(bank * 0x10000) + offset];
+	logerror("%s: hostmem_r %02x:%04x: %02x (from ROM?)\n", machine().describe_context(), m_port1, offset, ret);
+
+	if (offset == 0xfff3)
+	{
+	//	logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		return machine().rand();
+	}
+
+	if (offset == 0xfff4)
+	{
+	//	logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		return machine().rand();
+	}
+
+	if (offset == 0xfff8)
+	{
+	//	logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		return machine().rand();
+	}
+
+	if (offset == 0xfffb)
+	{
+	//	logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		return machine().rand();
+	}
+
+	if (offset == 0xfffc)
+	{
+	//	logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		// oki?
+		return machine().rand();
+	}
+
+	if (offset == 0xfffd)
+	{
+	//	logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		// oki?
+		return machine().rand();
+	}
+	
+	if (offset == 0xfffe)
+	{
+	//	logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		return ioport("IN0")->read();
+	}
+
 	return ret;
 }
 
@@ -143,8 +193,76 @@ WRITE8_MEMBER(goldart_state::hostmem_w)
 	// address fffe appears to be significant as it gets set with data fetched from a the same table as
 	// the source gfx addresses (1 byte to bank register, 2 bytes to data pointer, 1 byte to fffe)
 
-	logerror("%s: hostmem_w %04x: %02x (to RAM?)\n", machine().describe_context(), offset, data);
-	m_ram[offset] = data;
+	// TODO: bugs(?) in ds5002 memory partitioning emulation mean that from 0x7000-0x7fff at least never
+	// actually hit VRAM, hence the first gap in the title screen
+
+	if (offset < 0xfe00)
+	{
+		/* below 0xfe00 (or up to 0xd800 at least - 192*288) is the bitmap area
+		  the code at 0D42 writes each pixel as 4 bits in a byte write, two writes for each address
+		  with the 4 bits that shouldn't change being set to 0xf
+		  before this, the palette select for the object being drawn is written to 0xfffe
+		  there is 128kb of video ram, so this makes sense */
+
+		if ((m_ram[0xfffe] & 0xf0) != 0xf0) // maybe, there is no 16th palette? but this gets set on the lower part of the title screen (incorrectly due to memory access errors, or changes data fetches?)
+		{
+			if ((data & 0x0f) != 0x0f)
+			{
+				m_ram[offset] = (m_ram[offset] & 0xf0) | (data & 0x0f);
+				m_ram2[offset] = (m_ram2[offset] & 0xf0) | (m_ram[0xfffe] & 0xf0) >> 4;
+			}
+
+			if ((data & 0xf0) != 0xf0)
+			{
+				m_ram[offset] = (m_ram[offset] & 0x0f) | (data & 0xf0);
+				m_ram2[offset] = (m_ram2[offset] & 0x0f) | (m_ram[0xfffe] & 0xf0);
+			}
+		}
+		else
+		{
+			m_ram[offset] = machine().rand();
+		}
+	}
+	else if (offset < 0xffe0)
+	{
+		// fe00 - ffdf is the palette (15 palettes)
+		m_ram[offset] = data;
+
+		int index = (offset & 0x1fe)>>1;
+
+		uint16_t pal = (m_ram[(offset&0xfffe)] << 8) | (m_ram[(offset&0xfffe)+1]);
+
+		m_palette->set_pen_color(index, ((pal >> 10) & 0x1f)<<3, ((pal >> 5) & 0x1f)<<3, (pal & 0x1f)<<3);
+	}
+	else
+	{
+		// ffe0 - ffef unused?
+		// fff0 - ffff are control registers
+		m_ram[offset] = data;
+
+		// fff3 / fff4 : written just after below
+
+		// fff8 / fff9 / fffa : written together in a single piece of code at 34C1
+
+		// fffb :  code to write 01/02/04/08
+
+		// fffc :   oki?
+		// fffd :   oki? 
+
+		// fffe :   xxxx ----   x = pen value to be copied to other ram area on pixel wirtes 
+	}
+
+
+	if (offset<0xd800)
+		logerror("%s: hostmem_w %04x: %02x (to VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	else if (offset<0xfe00)
+		logerror("%s: hostmem_w %04x: %02x (to non-screen VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	else if (offset<0xffe0)
+		logerror("%s: hostmem_w %04x: %02x (to palette)\n", machine().describe_context(), offset, data);
+	else
+		logerror("%s: hostmem_w %04x: %02x (to REGS?)\n", machine().describe_context(), offset, data);
+
+
 }
 
 
@@ -160,12 +278,34 @@ void goldart_state::dallas_ram(address_map &map)
 }
 
 static INPUT_PORTS_START( goldart )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // not sure what these are but pressing them on the Covielsa screen brings up something different
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 void goldart_state::machine_start()
 {
 	save_item(NAME(m_ram));
+	save_item(NAME(m_ram2));
 }
 
 void goldart_state::machine_reset()
@@ -189,8 +329,8 @@ void goldart_state::goldart(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 512);
-	screen.set_visarea(0, 192-1, 0, 256-1);
+	screen.set_size(256*2, 512);
+	screen.set_visarea(0, (192*2)-1, 0, 288-1);
 	screen.set_screen_update(FUNC(goldart_state::screen_update_goldart));
 	screen.set_palette("palette");
 
