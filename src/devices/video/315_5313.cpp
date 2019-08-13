@@ -1712,16 +1712,16 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 					vscroll = m_vsram[1];
 				}
 
-				int hcolumn = ((column * 2 - 1) - (hscroll_b >> 3))&(hsize - 1);
+				int hcolumn = ((column * 2 - 1) - (hscroll_b >> 3)) & (hsize - 1);
 
 				if (m_imode == 3)
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 16) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 16) - 1);
 					tile_base = (base_b >> 1) + ((vcolumn >> 4)*hsize) + hcolumn;
 				}
 				else
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 8) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 8) - 1);
 					tile_base = (base_b >> 1) + ((vcolumn >> 3)*hsize) + hcolumn;
 				}
 
@@ -1776,16 +1776,16 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 					vscroll = m_vsram[1];
 				}
 
-				hcolumn = ((column * 2) - (hscroll_b >> 3))&(hsize - 1);
+				hcolumn = ((column * 2) - (hscroll_b >> 3)) & (hsize - 1);
 
 				if (m_imode == 3)
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 16) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 16) - 1);
 					tile_base = (base_b >> 1) + ((vcolumn >> 4)*hsize) + hcolumn;
 				}
 				else
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 8) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 8) - 1);
 					tile_base = (base_b >> 1) + ((vcolumn >> 3)*hsize) + hcolumn;
 				}
 
@@ -1840,16 +1840,16 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 					vscroll = m_vsram[1];
 				}
 
-				hcolumn = ((column * 2 + 1) - (hscroll_b >> 3))&(hsize - 1);
+				hcolumn = ((column * 2 + 1) - (hscroll_b >> 3)) & (hsize - 1);
 
 				if (m_imode == 3)
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 16) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 16) - 1);
 					tile_base = (base_b >> 1) + ((vcolumn >> 4)*hsize) + hcolumn;
 				}
 				else
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 8) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 8) - 1);
 					tile_base = (base_b >> 1) + ((vcolumn >> 3)*hsize) + hcolumn;
 				}
 
@@ -1912,18 +1912,14 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 			int tile_colour;
 			int tile_pri;
 
-			int vcolumn = scanline&((window_vsize * 8) - 1);
+			int vcolumn = scanline & ((window_vsize * 8) - 1);
 			int dpos = column * 16;
-			int hcolumn = (column * 2)&(window_hsize - 1);
+			int hcolumn = (column * 2) & (window_hsize - 1);
 
 			if (m_imode == 3)
-			{
-				tile_base = (base_w >> 1) + ((vcolumn >> 4)*window_hsize) + hcolumn;
-			}
+				tile_base = (base_w >> 1) + ((vcolumn >> 4) * window_hsize) + hcolumn;
 			else
-			{
-				tile_base = (base_w >> 1) + ((vcolumn >> 3)*window_hsize) + hcolumn;
-			}
+				tile_base = (base_w >> 1) + ((vcolumn >> 3) * window_hsize) + hcolumn;
 
 			tile_base &= 0x7fff;
 			tile_dat = MEGADRIV_VDP_VRAM(tile_base);
@@ -1986,16 +1982,12 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 				}
 			}
 
-			hcolumn = (column * 2 + 1)&(window_hsize - 1);
+			hcolumn = (column * 2 + 1) & (window_hsize - 1);
 
 			if (m_imode == 3)
-			{
-				tile_base = (base_w >> 1) + ((vcolumn >> 4)*window_hsize) + hcolumn;
-			}
+				tile_base = (base_w >> 1) + ((vcolumn >> 4) * window_hsize) + hcolumn;
 			else
-			{
-				tile_base = (base_w >> 1) + ((vcolumn >> 3)*window_hsize) + hcolumn;
-			}
+				tile_base = (base_w >> 1) + ((vcolumn >> 3) * window_hsize) + hcolumn;
 
 			tile_base &= 0x7fff;
 			tile_dat = MEGADRIV_VDP_VRAM(tile_base);
@@ -2088,20 +2080,19 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 					vscroll = m_vsram[0];
 				}
 
-				if ((!window_is_bugged) || ((hscroll_a & 0xf)==0) || (column>non_window_firstcol/16)) hcolumn = ((column * 2 - 1) - (hscroll_a >> 3))&(hsize - 1);
-				else hcolumn = ((column * 2 + 1) - (hscroll_a >> 3))&(hsize - 1);
+				if ((!window_is_bugged) || ((hscroll_a & 0xf)==0) || (column>non_window_firstcol/16)) hcolumn = ((column * 2 - 1) - (hscroll_a >> 3)) & (hsize - 1);
+				else hcolumn = ((column * 2 + 1) - (hscroll_a >> 3)) & (hsize - 1);
 
 				if (m_imode == 3)
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 16) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 16) - 1);
 					tile_base = (base_a >> 1) + ((vcolumn >> 4)*hsize) + hcolumn;
 				}
 				else
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 8) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 8) - 1);
 					tile_base = (base_a >> 1) + ((vcolumn >> 3)*hsize) + hcolumn;
 				}
-
 
 				tile_base &= 0x7fff;
 				tile_dat = MEGADRIV_VDP_VRAM(tile_base);
@@ -2173,21 +2164,21 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 					vscroll = m_vsram[0];
 				}
 
-				if ((!window_is_bugged) || ((hscroll_a & 0xf)==0) || (column>non_window_firstcol/16)) hcolumn = ((column * 2) - (hscroll_a >> 3))&(hsize - 1); // not affected by bug?
+				if ((!window_is_bugged) || ((hscroll_a & 0xf)==0) || (column>non_window_firstcol/16)) hcolumn = ((column * 2) - (hscroll_a >> 3)) & (hsize - 1); // not affected by bug?
 				else
 				{
-					if ((hscroll_a & 0xf) < 8) hcolumn = ((column * 2) - (hscroll_a >> 3))&(hsize - 1);
-					else hcolumn = ((column * 2+2) - (hscroll_a >> 3))&(hsize - 1);
+					if ((hscroll_a & 0xf) < 8) hcolumn = ((column * 2) - (hscroll_a >> 3)) & (hsize - 1);
+					else hcolumn = ((column * 2+2) - (hscroll_a >> 3)) & (hsize - 1);
 				}
 
 				if (m_imode == 3)
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 16) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 16) - 1);
 					tile_base = (base_a >> 1) + ((vcolumn >> 4)*hsize) + hcolumn;
 				}
 				else
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 8) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 8) - 1);
 					tile_base = (base_a >> 1) + ((vcolumn >> 3)*hsize) + hcolumn;
 				}
 
@@ -2259,17 +2250,17 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 					vscroll = m_vsram[0];
 				}
 
-				if ((!window_is_bugged) || ((hscroll_a & 0xf)==0) || (column>non_window_firstcol/16)) hcolumn = ((column * 2 + 1) - (hscroll_a >> 3))&(hsize - 1);
-				else hcolumn = ((column * 2 + 1) - (hscroll_a >> 3))&(hsize - 1);
+				if ((!window_is_bugged) || ((hscroll_a & 0xf)==0) || (column>non_window_firstcol/16)) hcolumn = ((column * 2 + 1) - (hscroll_a >> 3)) & (hsize - 1);
+				else hcolumn = ((column * 2 + 1) - (hscroll_a >> 3)) & (hsize - 1);
 
 				if (m_imode == 3)
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 16) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 16) - 1);
 					tile_base = (base_a >> 1) + ((vcolumn >> 4)*hsize) + hcolumn;
 				}
 				else
 				{
-					vcolumn = (vscroll + scanline)&((vsize * 8) - 1);
+					vcolumn = (vscroll + scanline) & ((vsize * 8) - 1);
 					tile_base = (base_a >> 1) + ((vcolumn >> 3)*hsize) + hcolumn;
 				}
 
