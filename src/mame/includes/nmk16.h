@@ -264,9 +264,7 @@ private:
 	void spec2k_oki1_banking_w(u8 data);
 	template<unsigned Scroll> void afega_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info_4bit);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info_8bit);
-	DECLARE_VIDEO_START(afega);
 	DECLARE_VIDEO_START(grdnstrm);
 	u32 screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

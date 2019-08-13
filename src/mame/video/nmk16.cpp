@@ -99,7 +99,7 @@ VIDEO_START_MEMBER(nmk16_state, bioship)
 	// ROM Based Tilemap
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::bioship_get_bg_tile_info), this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&nmk16_state::common_get_bg_tile_info<1, 1>, "bg1_gfx1", this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this),TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_bg_tilemap[1]->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
@@ -113,7 +113,7 @@ VIDEO_START_MEMBER(nmk16_state,macross)
 {
 	m_sprlimit = 384 * 263;
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&nmk16_state::common_get_bg_tile_info<0, 1>, "bg0_gfx1", this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this),TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 
@@ -133,7 +133,7 @@ VIDEO_START_MEMBER(nmk16_state,macross2)
 {
 	m_sprlimit = 512 * 263; // not verified
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&nmk16_state::common_get_bg_tile_info<0, 1>, "bg0_gfx1", this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this),TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 
@@ -151,7 +151,7 @@ VIDEO_START_MEMBER(nmk16_state,gunnail)
 VIDEO_START_MEMBER(nmk16_state, bjtwin)
 {
 	m_sprlimit = 512 * 263; // not verified
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::bjtwin_get_bg_tile_info), this),TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::bjtwin_get_bg_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	video_init();
 	m_videoshift = 64;  /* 384x224 screen, leftmost 64 pixels have to be retrieved */
@@ -500,67 +500,22 @@ u32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitma
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(afega_state::get_bg_tile_info_4bit)
-{
-	const u16 code = m_bgvideoram[0][tile_index];
-	SET_TILE_INFO_MEMBER(1, code & 0xfff, code >> 12, 0);
-}
-
 TILE_GET_INFO_MEMBER(afega_state::get_bg_tile_info_8bit)
 {
 	const u16 code = m_bgvideoram[0][tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
-VIDEO_START_MEMBER(afega_state,afega)
-{
-	m_sprlimit = 384 * 263;
-	m_sprclk = 0;
-	m_spriteram_old = make_unique_clear<u16[]>(0x1000/2);
-	m_spriteram_old2 = make_unique_clear<u16[]>(0x1000/2);
-
-	m_bg_tilemap[0] = &machine().tilemap().create(
-			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(afega_state::get_bg_tile_info_4bit), this),
-			tilemap_mapper_delegate(FUNC(afega_state::tilemap_scan_pages), this),
-			16, 16, 256, 32);
-
-	m_tx_tilemap = &machine().tilemap().create(
-			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(afega_state::common_get_tx_tile_info), this),
-			TILEMAP_SCAN_COLS,
-			8, 8, 32, 32);
-
-	m_tx_tilemap->set_transparent_pen(0xf);
-	save_pointer(NAME(m_spriteram_old), 0x1000/2);
-	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
-	save_item(NAME(m_sprclk));
-}
-
-
 VIDEO_START_MEMBER(afega_state,grdnstrm)
 {
 	m_sprlimit = 384 * 263;
-	m_sprclk = 0;
-	m_spriteram_old = make_unique_clear<u16[]>(0x1000/2);
-	m_spriteram_old2 = make_unique_clear<u16[]>(0x1000/2);
+	// 8bpp Tilemap
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(afega_state::get_bg_tile_info_8bit), this), tilemap_mapper_delegate(FUNC(afega_state::tilemap_scan_pages), this), 16, 16, 256, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(afega_state::common_get_tx_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
-	m_bg_tilemap[0] = &machine().tilemap().create(
-			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(afega_state::get_bg_tile_info_8bit), this),
-			tilemap_mapper_delegate(FUNC(afega_state::tilemap_scan_pages), this),
-			16, 16, 256, 32);
+	m_tx_tilemap->set_transparent_pen(15);
 
-	m_tx_tilemap = &machine().tilemap().create(
-			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(afega_state::common_get_tx_tile_info), this),
-			TILEMAP_SCAN_COLS,
-			8, 8, 32, 32);
-
-	m_tx_tilemap->set_transparent_pen(0xf);
-	save_pointer(NAME(m_spriteram_old), 0x1000/2);
-	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
-	save_item(NAME(m_sprclk));
+	video_init();
 }
 
 
