@@ -116,7 +116,6 @@ private:
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_irq);
 
 	void mephisto_mem(address_map &map);
 	void mm2_mem(address_map &map);
@@ -288,11 +287,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_irq)//only mm2
-{
-	m_maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
-}
-
 void mephisto_state::machine_start()
 {
 	m_digits.resolve();
@@ -365,7 +359,8 @@ void mephisto_state::mm2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mm2_mem);
 
 	config.device_remove("nmi_timer");
-	TIMER(config, "irq_timer").configure_periodic(FUNC(mephisto_state::update_irq), attotime::from_hz(450));
+	const attotime irq_period = attotime::from_hz(7.3728_MHz_XTAL / 0x4000); // 450Hz(4020 Q14, TLow = ~22us)
+	m_maincpu->set_periodic_int(FUNC(mephisto_state::irq0_line_hold), irq_period);
 
 	m_outlatch->q_out_cb<7>().set(FUNC(mephisto_state::write_led7)).invert();
 }
