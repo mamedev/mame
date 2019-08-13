@@ -79,6 +79,7 @@
 #include "emu.h"
 #include "bus/ss50/interface.h"
 
+#include "bus/ss50/dc5.h"
 #include "bus/ss50/mpc.h"
 //#include "bus/ss50/mpl.h"
 //#include "bus/ss50/mpr.h"
@@ -220,6 +221,7 @@ ss50_card_interface::ss50_card_interface(const machine_config &mconfig, device_t
 
 void ss50_default_2rs_devices(device_slot_interface &device)
 {
+	device.option_add("dc5", SS50_DC5);
 	device.option_add("mpc", SS50_MPC);
 	//device.option_add("mpl", SS50_MPL);
 	//device.option_add("mpn", SS50_MPN);
