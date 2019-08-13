@@ -12,8 +12,9 @@
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "emupal.h"
+#include "screen.h"
 
-class sega_32x_device : public device_t, public device_palette_interface
+class sega_32x_device : public device_t, public device_palette_interface, public device_video_interface
 {
 public:
 	void pause_cpu();
@@ -22,6 +23,7 @@ public:
 	void set_framerate(int rate) { m_framerate = rate; }
 	void set_32x_pal(bool pal) { m_32x_pal = pal ? 1 : 0; }
 	void set_total_scanlines(int total) { m_base_total_scanlines = total; }     // this get set at start only
+	double get_framerate() { return has_screen() ? screen().frame_period().as_hz() : double(m_framerate); }
 
 	void screen_eof(bool mode3)
 	{

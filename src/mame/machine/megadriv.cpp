@@ -703,21 +703,37 @@ WRITE8_MEMBER(md_base_state::megadriv_z80_vdp_write )
 		case 0x15:
 		case 0x17:
 			// accessed by either segapsg_device or sn76496_device
-			m_vdp->vdp_w(space, offset >> 1, data, 0x00ff);
+			m_vdp->vdp_w(offset >> 1, data, 0x00ff);
 			break;
 
 		default:
 			osd_printf_debug("unhandled z80 vdp write %02x %02x\n",offset,data);
 	}
-
 }
-
 
 
 READ8_MEMBER(md_base_state::megadriv_z80_vdp_read )
 {
-	osd_printf_debug("megadriv_z80_vdp_read %02x\n",offset);
-	return machine().rand();
+	u8 ret = 0;
+	u8 shift = ((~offset & 1) << 3);
+	switch (offset & ~1)
+	{
+		case 0x04: // ctrl_port_r
+		case 0x06:
+		case 0x08: // H/V counter
+		case 0x0a:
+		case 0x0c:
+		case 0x0e:
+			ret = m_vdp->vdp_r(offset >> 1, 0xff << shift) >> shift;
+			break;
+
+		default:
+			if (!machine().side_effects_disabled())
+				osd_printf_debug("unhandled z80 vdp read %02x\n",offset);
+			ret = machine().rand();
+			break;
+	}
+	return ret;
 }
 
 READ8_MEMBER(md_base_state::megadriv_z80_unmapped_read )
@@ -906,11 +922,12 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_vdp->lv6_irq().set(FUNC(md_base_state::vdp_lv6irqline_callback_genesis_68k));
 	m_vdp->lv4_irq().set(FUNC(md_base_state::vdp_lv4irqline_callback_genesis_68k));
 	m_vdp->set_screen("megadriv");
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(double(MASTER_CLOCK_NTSC) / 10.0 / 262.0 / 342.0); // same as SMS?
+//  screen.set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
 	screen.set_size(64*8, 620);
 	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
@@ -960,11 +977,12 @@ void md_base_state::md_pal(machine_config &config)
 	m_vdp->lv6_irq().set(FUNC(md_base_state::vdp_lv6irqline_callback_genesis_68k));
 	m_vdp->lv4_irq().set(FUNC(md_base_state::vdp_lv4irqline_callback_genesis_68k));
 	m_vdp->set_screen("megadriv");
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(double(MASTER_CLOCK_PAL) / 10.0 / 313.0 / 342.0); // same as SMS?
+//  screen.set_refresh_hz(double(MASTER_CLOCK_PAL) / 8.0 / 313.0 / 423.0); // or 423 Htotal?
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
 	screen.set_size(64*8, 620);
 	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
