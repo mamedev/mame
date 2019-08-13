@@ -39,7 +39,13 @@ public:
 	void output(std::ostream &out, const std::function<bool(const char *shortname, bool &done)> &filter = { }, bool include_devices = true);
 
 private:
-	typedef std::unordered_set<std::add_pointer_t<device_type> > device_type_set;
+	class device_type_compare
+	{
+	public:
+		bool operator()(const std::add_pointer_t<device_type> &lhs, const std::add_pointer_t<device_type> &rhs) const;
+	};
+
+	typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
 
 	// internal helper
 	void output_header(std::ostream &out);
