@@ -627,6 +627,12 @@ std::unique_ptr<util::disasm_interface> cdp1802_device::create_disassembler()
 	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1802);
 }
 
+
+std::unique_ptr<util::disasm_interface> cdp1805_device::create_disassembler()
+{
+	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1805);
+}
+
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
