@@ -395,18 +395,20 @@ ROM_END
 
 ROM_START(mm2)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_DEFAULT_BIOS("v4") // no official versioning, chronological order is assumed here from hex compare
-	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
+	ROM_DEFAULT_BIOS("v42") // no official versioning, chronological order is assumed here from hex compare
+	ROM_SYSTEM_BIOS( 0, "v1", "V1 (2 EPROMs)" )
 	ROMX_LOAD("mm2_v1_1.bin", 0x8000, 0x4000, CRC(b91dab77) SHA1(67762304afe51fb8f1eb91259567b2451bf9bbfd), ROM_BIOS(0))
 	ROMX_LOAD("mm2_v1_2.bin", 0xc000, 0x4000, CRC(01143cc1) SHA1(f78474b410dbecb209aa23ef81e9f894e8b54942), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
+	ROM_SYSTEM_BIOS( 1, "v2", "V2 (2 EPROMs)" )
 	ROMX_LOAD("mm2_v2_1.bin", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad), ROM_BIOS(1))
 	ROMX_LOAD("mm2_v2_2.bin", 0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 2, "v3", "V3" )
+	ROM_SYSTEM_BIOS( 2, "v3", "V3 (1 EPROM)" )
 	ROMX_LOAD("300",          0x8000, 0x8000, CRC(60c777d4) SHA1(a77d678be60094073275558b4e8f0d34b43dd9ae), ROM_BIOS(2)) // D27C256D-20
-	ROM_SYSTEM_BIOS( 3, "v4", "V4" )
-	ROMX_LOAD("mm2_1_v2a.bin", 0x8000, 0x4000, CRC(e9adcb8f) SHA1(498f48f96678f7bf429fd43e4f392ec6dd649fc6), ROM_BIOS(3))
-	ROMX_LOAD("mm2_2_v2a.bin", 0xc000, 0x4000, CRC(d40cbfc2) SHA1(4e9b19b1a0ad97868b31d7a55143a1778110cc96), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 3, "v41", "V4 (1 EPROM)" ) // v41 and v42 are binary identical
+	ROMX_LOAD("400",          0x8000, 0x8000, CRC(e8c1f431) SHA1(c32dfa66eefbf3e539438d2fe6e6916f78a128be), ROM_BIOS(3)) // HN27C256G-20
+	ROM_SYSTEM_BIOS( 4, "v42", "V4 (2 EPROMs)" )
+	ROMX_LOAD("mm2_v4_1.bin", 0x8000, 0x4000, CRC(e9adcb8f) SHA1(498f48f96678f7bf429fd43e4f392ec6dd649fc6), ROM_BIOS(4))
+	ROMX_LOAD("mm2_v4_2.bin", 0xc000, 0x4000, CRC(d40cbfc2) SHA1(4e9b19b1a0ad97868b31d7a55143a1778110cc96), ROM_BIOS(4))
 ROM_END
 
 ROM_START(bup)
