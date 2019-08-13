@@ -53,10 +53,10 @@
                   _MRD   7 |             | 34  TPA
                  BUS 7   8 |             | 33  TPB
                  BUS 6   9 |   CDP1802   | 32  MA7
-                 BUS 5  10 |   CDP1803   | 31  MA6
-                 BUS 4  11 |   CDP1804   | 30  MA5
-                 BUS 3  12 |   CDP1805   | 29  MA4
-                 BUS 2  13 |   CDP1806   | 28  MA3
+                 BUS 5  10 |   CDP1804   | 31  MA6
+                 BUS 4  11 |   CDP1805   | 30  MA5
+                 BUS 3  12 |   CDP1806   | 29  MA4
+                 BUS 2  13 |             | 28  MA3
                  BUS 1  14 |             | 27  MA2
                  BUS 0  15 |             | 26  MA1
                      *  16 |             | 25  MA0
@@ -68,9 +68,9 @@
 
     Type            Internal ROM    Internal RAM    Timer   Pin 16 (*)
     ------------------------------------------------------------------
+    CDP1801         none            none            no          Vcc
     CDP1802         none            none            no          Vcc
-    CDP1803         ?               ?               ?           ?       does not exist?
-    CDP1804         2 KB            64 bytes        yes         ?
+    CDP1804         2 KB            64 bytes        yes         _EMS
     CDP1805         none            64 bytes        yes         _ME
     CDP1806         none            none            yes         Vdd
 
@@ -141,12 +141,12 @@ public:
 		COSMAC_R7,
 		COSMAC_R8,
 		COSMAC_R9,
-		COSMAC_Ra,
-		COSMAC_Rb,
-		COSMAC_Rc,
-		COSMAC_Rd,
-		COSMAC_Re,
-		COSMAC_Rf,
+		COSMAC_R10,
+		COSMAC_R11,
+		COSMAC_R12,
+		COSMAC_R13,
+		COSMAC_R14,
+		COSMAC_R15,
 		COSMAC_DF,
 		COSMAC_IE,
 		COSMAC_Q,

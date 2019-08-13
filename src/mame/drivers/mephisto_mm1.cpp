@@ -28,11 +28,13 @@ expensive wooden chessboards like Modular Exclusive or Muenchen, as long as it
 supports the higher voltage.
 
 TODO:
+- add buttons to artwork
 - remove external interrupt hack when timer interrupt is added to CDP1806 device
 - mmirage unknown_w
 - mm1 unknown expansion rom at $c000?
 - add mm1 opening book
-- add mm1 STP/ON buttons? (they're off/on, with RAM chips remaining powered)
+- add mm1 "B" version (1 mask rom)
+- add mm1 STP/ON buttons? (they're off/on, game continues when ON again)
 
 ******************************************************************************/
 
@@ -45,7 +47,8 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "mephisto_mm1.lh" // clickable
+#include "mephisto_mm1.lh" // clickable
+#include "mephisto_mirage.lh" // clickable
 
 
 namespace {
@@ -383,7 +386,7 @@ void mm1_state::mirage(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4+8, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	//config.set_default_layout(layout_mephisto_mm1);
+	config.set_default_layout(layout_mephisto_mirage);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -404,6 +407,8 @@ void mm1_state::mm1(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(mm1_state::interrupt), irq_period);
 
 	m_board->set_type(sensorboard_device::MAGNETS);
+
+	config.set_default_layout(layout_mephisto_mm1);
 }
 
 
@@ -433,6 +438,6 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE INPUT   STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, mm1,     0,      0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, mm1,     0,      0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1984, mmirage, 0,      0, mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1984, mmirage, 0,      0, mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

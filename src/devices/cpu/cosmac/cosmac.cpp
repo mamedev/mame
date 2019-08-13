@@ -2,9 +2,11 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-RCA COSMAC CPU emulation
+RCA "COSMAC" CDP1800 series CPU emulation
+CDP1801, CDP1802, CDP1804, CDP1805, CDP1806
 
 TODO:
+- does CDP1803 exist?
 - is it useful to emulate I and N registers or can they just be defined as (m_op >> x & 0xf)?
 - 1804/5/6: extended opcode timing is wrong, multiple execute states
 - 1804/5/6: add more extended opcodes (05/06 supports more than 04)
@@ -960,7 +962,8 @@ inline void cosmac_device::output_state_code()
 	else
 	{
 		// S1 execute
-		m_write_sc((m_op >> 4) == 0x6 ? (N & 7) : 0, COSMAC_STATE_CODE_S1_EXECUTE);
+		bool is_io = (m_op >> 4) == 0x6; // (unextended) 0x6N: I/O opcodes
+		m_write_sc(is_io ? (N & 7) : 0, COSMAC_STATE_CODE_S1_EXECUTE);
 	}
 }
 
@@ -1453,7 +1456,7 @@ void cosmac_device::inp()   { D = IO_R(N & 0x07); RAM_W(R[X], D); }
 // CDP1804(and up) extended opcodes
 void cosmac_device::rldi()  { put_high_reg(N, RAM_R(R[P])); R[P]++; put_low_reg(N, RAM_R(R[P])); R[P]++; }
 void cosmac_device::rlxa()  { put_high_reg(N, RAM_R(R[X])); R[X]++; put_low_reg(N, RAM_R(R[X])); R[X]++; }
-void cosmac_device::rsxd()  { RAM_W(R[X], R[N] >> 0 & 0xff); R[X]--; RAM_W(R[X], R[N] >> 8 & 0xff); R[X]--; }
+void cosmac_device::rsxd()  { RAM_W(R[X], R[N] & 0xff); R[X]--; RAM_W(R[X], R[N] >> 8 & 0xff); R[X]--; }
 
 void cosmac_device::rnx()   { R[X] = R[N]; }
 
@@ -1462,3 +1465,6 @@ void cosmac_device::bxi()   { short_branch(0); } // wrong! tests XI flag
 
 void cosmac_device::ldc()   { /* logerror("LDC counter set: %X\n", D); */ }
 void cosmac_device::gec()   { D = machine().rand() & 0xf; } // wrong!
+
+// CDP1805/06 additional extended opcodes
+// TODO
