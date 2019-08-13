@@ -15,15 +15,15 @@ class sega315_5313_device : public sega315_5313_mode4_device
 {
 public:
 	template <typename T>
-	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
 		: sega315_5313_device(mconfig, tag, owner, clock)
 	{
 		m_cpu68k.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	typedef device_delegate<void (int x, uint32_t priority, uint32_t &lineptr)> md_32x_scanline_delegate;
+	typedef device_delegate<void (int x, u32 priority, u32 &lineptr)> md_32x_scanline_delegate;
 	typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
 	typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
 
@@ -44,8 +44,8 @@ public:
 
 	int m_palwrite_base; // if we want to write to the actual MAME palette..
 
-	DECLARE_READ16_MEMBER( vdp_r );
-	DECLARE_WRITE16_MEMBER( vdp_w );
+	u16 vdp_r(offs_t offset, u16 mem_mask = ~0);
+	void vdp_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	int get_scanline_counter();
 
@@ -65,9 +65,8 @@ public:
 	void set_vdp_pal(bool pal) { m_vdp_pal = pal ? 1 : 0; }
 	void set_use_cram(int cram) { m_use_cram = cram; }
 	void set_dma_delay(int delay) { m_dma_delay = delay; }
-	int get_framerate() { return m_framerate; }
+	double get_framerate() { return has_screen() ? screen().frame_period().as_hz() : double(m_framerate); }
 	int get_imode() { return m_imode; }
-
 
 	void vdp_clear_bitmap()
 	{
@@ -76,14 +75,14 @@ public:
 	}
 
 	std::unique_ptr<bitmap_rgb32> m_render_bitmap;
-	std::unique_ptr<uint32_t[]> m_render_line;
-	std::unique_ptr<uint16_t[]> m_render_line_raw;
+	std::unique_ptr<u32[]> m_render_line;
+	std::unique_ptr<u16[]> m_render_line_raw;
 
-	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback_alt_timing );
-	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback );
+	TIMER_DEVICE_CALLBACK_MEMBER(megadriv_scanline_timer_callback_alt_timing);
+	TIMER_DEVICE_CALLBACK_MEMBER(megadriv_scanline_timer_callback);
 	timer_device* m_megadriv_scanline_timer;
 
-	inline uint16_t vdp_get_word_from_68k_mem(uint32_t source);
+	inline u16 vdp_get_word_from_68k_mem(u32 source);
 
 protected:
 	virtual void device_start() override;
@@ -100,13 +99,37 @@ protected:
 	md_32x_scanline_helper_delegate m_32x_scanline_helper_func;
 
 private:
+	// vdp code defines
+	const u8 CODE_DMA()         { return m_vdp_code & 0x20; }
+	const u8 CODE_VRAM_COPY()   { return m_vdp_code & 0x10; }
+	const u8 CODE_VRAM_READ()   { return (m_vdp_code & 0x0f) == 0x00; }
+	const u8 CODE_VRAM_WRITE()  { return (m_vdp_code & 0x0f) == 0x01; }
+	const u8 CODE_CRAM_WRITE()  { return (m_vdp_code & 0x0f) == 0x03; }
+	const u8 CODE_VSRAM_READ()  { return (m_vdp_code & 0x0f) == 0x04; }
+	const u8 CODE_VSRAM_WRITE() { return (m_vdp_code & 0x0f) == 0x05; }
+	const u8 CODE_CRAM_READ()   { return (m_vdp_code & 0x0f) == 0x08; }
+	//const u8 CODE_VRAM_READ_BYTE() { return (m_vdp_code & 0x0f) == 0x0c; } // undocumented, unhandled
+
+	// nametable
+	struct nametable_t {
+		u16 addr;
+		bool xflip;
+		bool yflip;
+		u16 colour;
+		u16 pri;
+	};
+	void get_window_tilebase(int &tile_base, u16 base, int vcolumn, int window_hsize, int hcolumn);
+	void get_vcolumn_tilebase(int &vcolumn, int &tile_base, u16 base, int vscroll, int scanline, int vsize, int hsize, int hcolumn);
+	void get_nametable(u16 tile_base, nametable_t &tile, int vcolumn);
+	inline void draw_tile(nametable_t tile, int start, int end, int &dpos, bool is_fg);
+
 	int m_command_pending; // 2nd half of command pending..
-	uint16_t m_command_part1;
-	uint16_t m_command_part2;
-	uint8_t  m_vdp_code;
-	uint16_t m_vdp_address;
-	uint8_t m_vram_fill_pending;
-	uint16_t m_vram_fill_length;
+	u16 m_command_part1;
+	u16 m_command_part2;
+	u8  m_vdp_code;
+	u16 m_vdp_address;
+	u8  m_vram_fill_pending;
+	u16 m_vram_fill_length;
 	int m_irq4counter;
 	int m_imode_odd_frame;
 	int m_sprite_collision;
@@ -129,13 +152,13 @@ private:
 	int m_use_cram; // c2 uses it's own palette ram, so it sets this to 0
 	int m_dma_delay;    // SVP and SegaCD have some 'lag' in DMA transfers
 
-	std::unique_ptr<uint16_t[]> m_regs;
-	std::unique_ptr<uint16_t[]> m_vram;
-	std::unique_ptr<uint16_t[]> m_cram;
-	std::unique_ptr<uint16_t[]> m_vsram;
+	std::unique_ptr<u16[]> m_regs;
+	std::unique_ptr<u16[]> m_vram;
+	std::unique_ptr<u16[]> m_cram;
+	std::unique_ptr<u16[]> m_vsram;
 	/* The VDP keeps a 0x400 byte on-chip cache of the Sprite Attribute Table
 	   to speed up processing, Castlevania Bloodlines abuses this on the upside down level */
-	std::unique_ptr<uint16_t[]> m_internal_sprite_attribute_table;
+	std::unique_ptr<u16[]> m_internal_sprite_attribute_table;
 
 	// these are used internally by the VDP to schedule when after the start of a scanline
 	// to trigger the various interrupts / rendering to our bitmap, bit of a hack really
@@ -143,29 +166,30 @@ private:
 	emu_timer* m_irq4_on_timer;
 	emu_timer* m_render_timer;
 
-	uint16_t vdp_vram_r(void);
-	uint16_t vdp_vsram_r(void);
-	uint16_t vdp_cram_r(void);
+	u16 vdp_vram_r(void);
+	u16 vdp_vsram_r(void);
+	u16 vdp_cram_r(void);
 
-	void insta_68k_to_cram_dma(uint32_t source,uint16_t length);
-	void insta_68k_to_vsram_dma(uint32_t source,uint16_t length);
-	void insta_68k_to_vram_dma(uint32_t source,int length);
-	void insta_vram_copy(uint32_t source, uint16_t length);
+	void insta_68k_to_cram_dma(u32 source, u16 length);
+	void insta_68k_to_vsram_dma(u32 source, u16 length);
+	void insta_68k_to_vram_dma(u32 source, int length);
+	void insta_vram_copy(u32 source, u16 length);
 
-	void vdp_vram_write(uint16_t data);
-	void vdp_cram_write(uint16_t data);
+	void vdp_vram_write(u16 data);
+	void vdp_cram_write(u16 data);
 	void write_cram_value(int offset, int data);
-	void vdp_vsram_write(uint16_t data);
+	void vdp_vsram_write(u16 data);
 
-	void vdp_set_register(int regnum, uint8_t value);
+	void vdp_address_inc();
+	void vdp_set_register(int regnum, u8 value);
 
 	void handle_dma_bits();
 
-	uint16_t get_hposition();
-	uint16_t megadriv_read_hv_counters();
+	u16 get_hposition();
+	u16 megadriv_read_hv_counters();
 
-	uint16_t ctrl_port_r();
-	uint16_t data_port_r();
+	u16 ctrl_port_r();
+	u16 data_port_r();
 	void data_port_w(int data);
 	void ctrl_port_w(int data);
 	void update_code_and_address(void);
@@ -176,10 +200,10 @@ private:
 	void render_videobuffer_to_screenbuffer(int scanline);
 
 	/* variables used during emulation - not saved */
-	std::unique_ptr<uint8_t[]> m_sprite_renderline;
-	std::unique_ptr<uint8_t[]> m_highpri_renderline;
-	std::unique_ptr<uint32_t[]> m_video_renderline;
-	std::unique_ptr<uint16_t[]> m_palette_lookup;
+	std::unique_ptr<u8[]> m_sprite_renderline;
+	std::unique_ptr<u8[]> m_highpri_renderline;
+	std::unique_ptr<u32[]> m_video_renderline;
+	std::unique_ptr<u16[]> m_palette_lookup;
 
 	address_space *m_space68k;
 	required_device<m68000_base_device> m_cpu68k;

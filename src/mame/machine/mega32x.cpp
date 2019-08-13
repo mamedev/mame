@@ -225,6 +225,7 @@ DEFINE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device,  "sega_32x_pal",  "Sega 3
 sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this, false)
 	, m_sh2_shared(*this, "sh2_shared")
 	, m_main_cpu(*this, finder_base::DUMMY_TAG)
 	, m_master_cpu(*this, "32x_master_sh2")
@@ -942,21 +943,25 @@ WRITE16_MEMBER( sega_32x_device::m68k_pwm_w )
 
 uint16_t sega_32x_device::get_hposition(void)
 {
-	attotime time_elapsed_since_megadriv_scanline_timer;
-	uint16_t value4;
-
-	time_elapsed_since_megadriv_scanline_timer = m_scan_timer->time_elapsed();
-
-	if (time_elapsed_since_megadriv_scanline_timer.attoseconds() < (ATTOSECONDS_PER_SECOND/m_framerate /m_total_scanlines))
+	if (get_framerate() > 0.0)
 	{
-		value4 = (uint16_t)(MAX_HPOSITION*((double)(time_elapsed_since_megadriv_scanline_timer.attoseconds()) / (double)(ATTOSECONDS_PER_SECOND/m_framerate /m_total_scanlines)));
-	}
-	else /* in some cases (probably due to rounding errors) we get some stupid results (the odd huge value where the time elapsed is much higher than the scanline time??!).. hopefully by clamping the result to the maximum we limit errors */
-	{
-		value4 = MAX_HPOSITION;
-	}
+		attotime time_elapsed_since_megadriv_scanline_timer;
+		uint16_t value4;
 
-	return value4;
+		time_elapsed_since_megadriv_scanline_timer = m_scan_timer->time_elapsed();
+
+		if (time_elapsed_since_megadriv_scanline_timer.attoseconds() < (ATTOSECONDS_PER_SECOND/get_framerate() /double(m_total_scanlines)))
+		{
+			value4 = (uint16_t)(MAX_HPOSITION*((double)(time_elapsed_since_megadriv_scanline_timer.attoseconds()) / (double)(ATTOSECONDS_PER_SECOND/get_framerate() /double(m_total_scanlines))));
+		}
+		else /* in some cases (probably due to rounding errors) we get some stupid results (the odd huge value where the time elapsed is much higher than the scanline time??!).. hopefully by clamping the result to the maximum we limit errors */
+		{
+			value4 = MAX_HPOSITION;
+		}
+
+		return value4;
+	}
+	return MAX_HPOSITION;
 }
 
 READ16_MEMBER( sega_32x_device::common_vdp_regs_r )

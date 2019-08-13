@@ -10,8 +10,9 @@
 #include "machine/lc89510.h"
 #include "machine/megacdcd.h"
 #include "sound/rf5c68.h"
+#include "screen.h"
 
-class sega_segacd_device : public device_t, public device_gfx_interface
+class sega_segacd_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
 	template <typename T> void set_hostcpu(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
@@ -20,6 +21,7 @@ public:
 	void set_framerate(int rate) { m_framerate = rate; }
 	void set_total_scanlines(int total) { m_base_total_scanlines = total; }     // this gets set at start only
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
+	double get_framerate() { return has_screen() ? screen().frame_period().as_hz() : double(m_framerate); }
 
 	DECLARE_READ16_MEMBER( segacd_dmaaddr_r );
 	DECLARE_WRITE16_MEMBER( segacd_dmaaddr_w );

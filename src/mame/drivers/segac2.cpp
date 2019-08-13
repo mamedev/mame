@@ -1577,7 +1577,8 @@ void segac2_state::segac(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
 	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(double(XL2_CLOCK.value()) / 10.0 / 262.0 / 342.0); // same as SMS?
+//  screen.set_refresh_hz(double(XL2_CLOCK.value()) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
 	screen.set_size(512, 262);
 	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
 	screen.set_screen_update(FUNC(segac2_state::screen_update_segac2_new));
