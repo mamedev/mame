@@ -77,15 +77,12 @@ class asma2k_state : public alphasmart_state
 public:
 	asma2k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alphasmart_state(mconfig, type, tag)
-		, m_intram(*this, "internal_ram")
 	{
 	}
 
 	void asma2k(machine_config &config);
 
 private:
-	required_shared_ptr<uint8_t> m_intram;
-
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
@@ -176,8 +173,6 @@ void alphasmart_state::alphasmart_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).bankrw("rambank");
-	map(0x0000, 0x003f).noprw();   // internal registers
-	map(0x0040, 0x00ff).ram();   // internal RAM
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
 	map(0x8000, 0x8000).rw(FUNC(alphasmart_state::kb_r), FUNC(alphasmart_state::kb_matrixh_w));
 	map(0xc000, 0xc000).w(FUNC(alphasmart_state::kb_matrixl_w));
@@ -217,10 +212,6 @@ WRITE8_MEMBER(asma2k_state::port_a_w)
 			space.install_readwrite_bank(0x0000, 0x7fff, "rambank");
 		else
 			space.install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(asma2k_state::io_r), this), write8_delegate(FUNC(asma2k_state::io_w), this));
-
-		// internal registers / RAM
-		space.nop_readwrite(0x00, 0x3f);
-		space.install_ram(0x40, 0xff, m_intram.target());
 	}
 
 	m_rambank->set_entry(((data>>4) & 0x03));
@@ -232,8 +223,6 @@ void asma2k_state::asma2k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).bankrw("rambank");
-	map(0x0000, 0x003f).noprw();   // internal registers
-	map(0x0040, 0x00ff).ram().share("internal_ram");   // internal RAM
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
 	map(0x9000, 0x9000).w(FUNC(asma2k_state::kb_matrixl_w));
 }
