@@ -37,10 +37,11 @@ DEFINE_DEVICE_TYPE(C64_BUSCARD2, buscard2_t, "c64_buscard2", "C64 BusCard II car
 //  ROM( buscard2 )
 //-------------------------------------------------
 
-ROM_START( buscard2 ) // dumps coming soon
+ROM_START( buscard2 )
 	ROM_REGION( 0x2000, "rom", 0 )
-	ROM_LOAD( "2764.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "v2.12.bin", 0x0000, 0x2000, CRC(1c9b2edb) SHA1(04f0a248370281fd42389928e32d11aba597cf01) )
 
+	// dumps coming soon
 	ROM_REGION( 0x200, "prom", 0 )
 	ROM_LOAD( "82s129.1", 0x000, 0x100, NO_DUMP )
 	ROM_LOAD( "82s129.2", 0x100, 0x100, NO_DUMP )
