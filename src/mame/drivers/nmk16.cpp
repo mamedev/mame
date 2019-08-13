@@ -4110,6 +4110,7 @@ void nmk16_state::set_hacky_interrupt_timing(machine_config &config)
 void nmk16_state::set_hacky_screen_lowres(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//m_screen->set_raw(XTAL(12'000'000)/2, 384, 0, 256, 278, 16, 240); // confirmed
 	m_screen->set_refresh_hz(56.18);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
 	m_screen->set_size(256, 256);
@@ -4120,6 +4121,7 @@ void nmk16_state::set_hacky_screen_lowres(machine_config &config)
 void nmk16_state::set_hacky_screen_hires(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//m_screen->set_raw(XTAL(16'000'000)/2, 512, 0, 384, 278, 16, 240); // confirmed
 	m_screen->set_refresh_hz(56.18);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
 	m_screen->set_size(512, 256);
@@ -5417,7 +5419,7 @@ void afega_state::stagger1(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,afega)
+	MCFG_VIDEO_START_OVERRIDE(afega_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
