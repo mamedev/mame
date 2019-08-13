@@ -1606,7 +1606,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 		non_window_firstcol = window_lastcol;
 		non_window_lastcol = numcolumns * 8;
 
-		if (window_lastcol != 0) window_is_bugged=1;
+		if (window_lastcol != 0) window_is_bugged = 1;
 	}
 
 	if (window_down)
@@ -2530,7 +2530,7 @@ void sega315_5313_device::vdp_handle_eof()
 	if (!m_use_alt_timing) m_scanline_counter =  - 1;
 	m_sprite_collision = 0;//? when to reset this ..
 	m_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
-	m_imode_odd_frame^=1;
+	m_imode_odd_frame ^= 1;
 //      m_genesis_snd_z80->set_input_line(0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
 	if (MEGADRIVE_REG01_240_LINE)
