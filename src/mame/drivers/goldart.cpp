@@ -137,7 +137,7 @@ READ8_MEMBER(goldart_state::hostmem_r)
 	uint8_t ret = 0x00;
 
 	ret = m_data[(bank * 0x10000) + offset];
-	logerror("%s: hostmem_r %04x: %02x (from ROM?)\n", machine().describe_context(), offset, ret);
+	logerror("%s: hostmem_r %02x:%04x: %02x (from ROM?)\n", machine().describe_context(), m_port1, offset, ret);
 
 	if (offset == 0xfff3)
 	{
