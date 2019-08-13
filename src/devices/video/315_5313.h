@@ -110,6 +110,16 @@ private:
 	const u8 CODE_CRAM_READ()   { return (m_vdp_code & 0x0f) == 0x08; }
 	//const u8 CODE_VRAM_READ_BYTE() { return (m_vdp_code & 0x0f) == 0x0c; } // undocumented, unhandled
 
+	// nametable
+	struct nametable_t {
+		u16 addr;
+		bool xflip;
+		bool yflip;
+		u16 colour;
+		u16 pri;
+	};
+	void get_nametable(u16 tile_base, nametable_t &tile, int vcolumn);
+
 	int m_command_pending; // 2nd half of command pending..
 	u16 m_command_part1;
 	u16 m_command_part2;
