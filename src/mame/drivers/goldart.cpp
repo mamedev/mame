@@ -241,12 +241,16 @@ WRITE8_MEMBER(goldart_state::hostmem_w)
 		// fffe :   xxxx ----   x = pen value to be copied to other ram area on pixel wirtes 
 	}
 
-/*
-	if (offset<0xfff0)
-		logerror("%s: hostmem_w %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+
+	if (offset<0xd800)
+		logerror("%s: hostmem_w %04x: %02x (to VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	else if (offset<0xfe00)
+		logerror("%s: hostmem_w %04x: %02x (to non-screen VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	else if (offset<0xfff0)
+		logerror("%s: hostmem_w %04x: %02x (to palette)\n", machine().describe_context(), offset, data);
 	else
-		logerror("%s: hostmem_w %04x: %02x (to RAM?)\n", machine().describe_context(), offset, data);
-*/
+		logerror("%s: hostmem_w %04x: %02x (to REGS?)\n", machine().describe_context(), offset, data);
+
 
 }
 
