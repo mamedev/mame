@@ -303,6 +303,7 @@ static void pce_cart(device_slot_interface &device)
 	device.option_add_internal("cdsys3j", PCE_ROM_CDSYS3);
 	device.option_add_internal("populous", PCE_ROM_POPULOUS);
 	device.option_add_internal("sf2", PCE_ROM_SF2);
+	device.option_add_internal("tennokoe", PCE_ROM_TENNOKOE);
 }
 
 void pce_state::pce_common(machine_config &config)
