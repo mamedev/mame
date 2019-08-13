@@ -144,14 +144,14 @@ DE-0289-2 (uses PGA custom chips and MEC-M1 not written on PCB)
 |    DSW2      |   68000P10  |                                     |
 |    DSW1      |-------------|            |---------|  |---------| |
 |                                         |L7B0073  |  |L7B0072  | |
-|UPC3403      TC5565          RP65C02     |DATAEAST |  |DATAEAST | |
+|UPC3403      TC5565           6502A      |DATAEAST |  |DATAEAST | |
 |CN4   YM3014 TC5565        TMM2018       |MXC 06   |  |BAC 06   | |
 |VOL   YM3014 YM3812                      |---------|  |---------| |
 |MB3730      YM2203             CN2                CN1             |
 |------------------------------------------------------------------|
 Notes:
       68000   - Clock input 10.000MHz [20/2]
-      65C02   - Clock input 1.500MHz [12/8]
+      6502A   - Clock input 1.500MHz [12/8]
       YM2203  - Clock input 1.500MHz [12/8]
       YM3812  - Clock input 3.000MHz [12/4]
       TMM2018 - 2k x8 SRAM
@@ -170,6 +170,10 @@ Notes:
       HSync - 15.6172kHz
       OSC1  - 20.00006MHz (20MHz)
       XTAL1 - 11.9938MHz (12MHz)
+
+The "6502A" (so identified on Robocop schematics) is typically a Ricoh
+RP65C02A, but Rockwell R6502AP is found on some Japanese boards as well
+as bootlegs.
 
 
 ROM Board Type 1:
