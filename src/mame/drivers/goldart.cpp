@@ -193,6 +193,9 @@ WRITE8_MEMBER(goldart_state::hostmem_w)
 	// address fffe appears to be significant as it gets set with data fetched from a the same table as
 	// the source gfx addresses (1 byte to bank register, 2 bytes to data pointer, 1 byte to fffe)
 
+	// TODO: bugs(?) in ds5002 memory partitioning emulation mean that from 0x7000-0x7fff at least never
+	// actually hit VRAM, hence the first gap in the title screen
+
 	if (offset < 0xfe00)
 	{
 		/* below 0xfe00 (or up to 0xd800 at least - 192*288) is the bitmap area
@@ -201,16 +204,23 @@ WRITE8_MEMBER(goldart_state::hostmem_w)
 		  before this, the palette select for the object being drawn is written to 0xfffe
 		  there is 128kb of video ram, so this makes sense */
 
-		if ((data & 0x0f) != 0x0f)
+		if ((m_ram[0xfffe] & 0xf0) != 0xf0) // maybe, there is no 16th palette? but this gets set on the lower part of the title screen (incorrectly due to memory access errors, or changes data fetches?)
 		{
-			m_ram[offset] = (m_ram[offset] & 0xf0) | (data & 0x0f);
-			m_ram2[offset] = (m_ram2[offset] & 0xf0) | (m_ram[0xfffe] & 0xf0)>>4;
-		}
+			if ((data & 0x0f) != 0x0f)
+			{
+				m_ram[offset] = (m_ram[offset] & 0xf0) | (data & 0x0f);
+				m_ram2[offset] = (m_ram2[offset] & 0xf0) | (m_ram[0xfffe] & 0xf0) >> 4;
+			}
 
-		if ((data & 0xf0) != 0xf0)
+			if ((data & 0xf0) != 0xf0)
+			{
+				m_ram[offset] = (m_ram[offset] & 0x0f) | (data & 0xf0);
+				m_ram2[offset] = (m_ram2[offset] & 0x0f) | (m_ram[0xfffe] & 0xf0);
+			}
+		}
+		else
 		{
-			m_ram[offset] = (m_ram[offset] & 0x0f) | (data & 0xf0);
-			m_ram2[offset] = (m_ram2[offset] & 0x0f) | (m_ram[0xfffe] & 0xf0);
+			m_ram[offset] = machine().rand();
 		}
 	}
 	else if (offset < 0xffe0)
@@ -295,6 +305,7 @@ INPUT_PORTS_END
 void goldart_state::machine_start()
 {
 	save_item(NAME(m_ram));
+	save_item(NAME(m_ram2));
 }
 
 void goldart_state::machine_reset()
