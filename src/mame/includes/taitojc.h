@@ -33,7 +33,6 @@ public:
 		m_lamps(*this, "lamp%u", 0U),
 		m_counters(*this, "counter%u", 0U)
 	{
-		m_mcu_output = 0;
 		m_speed_meter = 0;
 		m_brake_meter = 0;
 	}
@@ -85,7 +84,6 @@ private:
 	uint8_t m_mcu_comm_hc11;
 	uint8_t m_mcu_data_main;
 	uint8_t m_mcu_data_hc11;
-	uint8_t m_mcu_output;
 
 	uint8_t m_has_dsp_hack;
 
@@ -107,7 +105,6 @@ private:
 	DECLARE_WRITE8_MEMBER(hc11_comm_w);
 	DECLARE_WRITE8_MEMBER(hc11_output_w);
 	DECLARE_READ8_MEMBER(hc11_data_r);
-	DECLARE_READ8_MEMBER(hc11_output_r);
 	DECLARE_WRITE8_MEMBER(hc11_data_w);
 	template <int Ch> uint8_t hc11_analog_r();
 

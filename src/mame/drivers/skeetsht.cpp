@@ -53,7 +53,6 @@ private:
 	DECLARE_WRITE16_MEMBER(ramdac_w);
 	DECLARE_WRITE8_MEMBER(tms_w);
 	DECLARE_READ8_MEMBER(tms_r);
-	DECLARE_READ8_MEMBER(hc11_porta_r);
 	DECLARE_WRITE8_MEMBER(hc11_porta_w);
 	DECLARE_WRITE8_MEMBER(ay8910_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
@@ -161,11 +160,6 @@ READ8_MEMBER(skeetsht_state::tms_r)
  *
  *************************************/
 
-READ8_MEMBER(skeetsht_state::hc11_porta_r)
-{
-	return m_porta_latch;
-}
-
 WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 {
 	if (!(data & 0x8) && (m_porta_latch & 8))
@@ -233,7 +227,6 @@ void skeetsht_state::skeetsht(machine_config &config)
 {
 	MC68HC11A1(config, m_68hc11, 4000000); // ?
 	m_68hc11->set_addrmap(AS_PROGRAM, &skeetsht_state::hc11_pgm_map);
-	m_68hc11->in_pa_callback().set(FUNC(skeetsht_state::hc11_porta_r));
 	m_68hc11->out_pa_callback().set(FUNC(skeetsht_state::hc11_porta_w));
 
 	TMS34010(config, m_tms, 48000000);

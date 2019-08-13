@@ -713,11 +713,6 @@ WRITE8_MEMBER(taitojc_state::hc11_data_w)
 	m_mcu_data_main = data;
 }
 
-READ8_MEMBER(taitojc_state::hc11_output_r)
-{
-	return m_mcu_output;
-}
-
 WRITE8_MEMBER(taitojc_state::hc11_output_w)
 {
 /*
@@ -741,8 +736,6 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
 */
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
-
-	m_mcu_output = data;
 }
 
 template <int Ch>
@@ -1065,7 +1058,6 @@ void taitojc_state::machine_start()
 	save_item(NAME(m_mcu_comm_hc11));
 	save_item(NAME(m_mcu_data_main));
 	save_item(NAME(m_mcu_data_hc11));
-	save_item(NAME(m_mcu_output));
 
 	save_item(NAME(m_speed_meter));
 	save_item(NAME(m_brake_meter));
@@ -1088,7 +1080,6 @@ void taitojc_state::taitojc(machine_config &config)
 	sub.in_pa_callback().set_constant(0); // ?
 	sub.in_pg_callback().set(FUNC(taitojc_state::hc11_comm_r));
 	sub.out_pg_callback().set(FUNC(taitojc_state::hc11_comm_w));
-	sub.in_ph_callback().set(FUNC(taitojc_state::hc11_output_r));
 	sub.out_ph_callback().set(FUNC(taitojc_state::hc11_output_w));
 	sub.in_spi2_data_callback().set(FUNC(taitojc_state::hc11_data_r));
 	sub.out_spi2_data_callback().set(FUNC(taitojc_state::hc11_data_w));

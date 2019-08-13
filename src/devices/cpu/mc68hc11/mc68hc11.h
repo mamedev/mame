@@ -71,7 +71,36 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	void io_map(address_map &map);
+	template <int P> uint8_t port_r();
+	template <int P> void port_w(uint8_t data);
+	template <int P> uint8_t ddr_r();
+	template <int P> void ddr_w(uint8_t data);
+	uint8_t pioc_r();
+	uint8_t tcnt_r(offs_t offset);
+	void tcnt_w(offs_t offset, uint8_t data);
+	uint8_t toc1_r(offs_t offset);
+	void toc1_w(offs_t offset, uint8_t data);
+	uint8_t tmsk1_r();
+	void tmsk1_w(uint8_t data);
+	uint8_t tflg1_r();
+	void tflg1_w(uint8_t data);
+	void tmsk2_w(uint8_t data);
+	template <int N> uint8_t spcr_r();
+	template <int N> uint8_t spsr_r();
+	template <int N> uint8_t spdr_r();
+	template <int N> void spdr_w(uint8_t data);
+	uint8_t adctl_r();
+	void adctl_w(uint8_t data);
+	uint8_t adr_r(offs_t offset);
+	uint8_t opt2_r();
+	uint8_t init_r();
+	void init_w(uint8_t data);
+	uint8_t scbd_r(offs_t offset);
+	uint8_t sccr1_r();
+	uint8_t sccr2_r();
+	uint8_t scsr1_r();
+	uint8_t scrdl_r();
+	uint8_t opt4_r();
 
 private:
 	address_space_config m_program_config;
@@ -97,6 +126,11 @@ private:
 	uint16_t m_pc;
 	uint16_t m_ppc;
 	uint8_t m_ccr;
+
+protected:
+	uint8_t m_port_data[8];
+private:
+	uint8_t m_port_dir[8];
 
 	uint8_t m_adctl;
 	int m_ad_channel;
@@ -147,8 +181,8 @@ private:
 	ophandler hc11_optable_page4[256];
 
 	void ram_map(address_map &map);
-	uint8_t hc11_regs_r(uint32_t address);
 	void hc11_regs_w(uint32_t address, uint8_t value);
+
 	uint8_t FETCH();
 	uint16_t FETCH16();
 	uint8_t READ8(uint32_t address);
@@ -480,6 +514,14 @@ class mc68hc11a1_device : public mc68hc11_cpu_device
 public:
 	// construction/destruction
 	mc68hc11a1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+
+	uint8_t pactl_r();
+	void pactl_w(uint8_t data);
+
+	void io_map(address_map &map);
 };
 
 class mc68hc11d0_device : public mc68hc11_cpu_device
@@ -487,6 +529,14 @@ class mc68hc11d0_device : public mc68hc11_cpu_device
 public:
 	// construction/destruction
 	mc68hc11d0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+
+	uint8_t pactl_r();
+	void pactl_w(uint8_t data);
+
+	void io_map(address_map &map);
 };
 
 class mc68hc11k1_device : public mc68hc11_cpu_device
@@ -494,6 +544,9 @@ class mc68hc11k1_device : public mc68hc11_cpu_device
 public:
 	// construction/destruction
 	mc68hc11k1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void io_map(address_map &map);
 };
 
 class mc68hc11m0_device : public mc68hc11_cpu_device
@@ -501,6 +554,9 @@ class mc68hc11m0_device : public mc68hc11_cpu_device
 public:
 	// construction/destruction
 	mc68hc11m0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void io_map(address_map &map);
 };
 
 #endif // MAME_CPU_MC68HC11_MC68HC11_H
