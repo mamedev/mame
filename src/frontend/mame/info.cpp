@@ -1951,3 +1951,13 @@ const char *info_xml_creator::get_merge_name(driver_enumerator &drivlist, const 
 
 	return nullptr;
 }
+
+
+//-------------------------------------------------
+//  device_type_compare::operator()
+//-------------------------------------------------
+
+bool info_xml_creator::device_type_compare::operator()(const std::add_pointer_t<device_type> &lhs, const std::add_pointer_t<device_type> &rhs) const
+{
+	return strcmp(lhs->shortname(), rhs->shortname()) < 0;
+}
