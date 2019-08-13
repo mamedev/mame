@@ -259,6 +259,12 @@ files {
 	MAME_DIR .. "src/emu/video/rgbvmx.h",
 }
 
+pchsource(MAME_DIR .. "src/emu/main.cpp")
+-- 3 files do not inlcude emu.h
+nopch(MAME_DIR .. "src/emu/emualloc.cpp")
+nopch(MAME_DIR .. "src/emu/attotime.cpp")
+nopch(MAME_DIR .. "src/emu/debug/textbuf.cpp")
+
 dependency {
 	--------------------------------------------------
 	-- additional dependencies
@@ -306,6 +312,9 @@ includedirs {
 files {
 	MAME_DIR .. "src/emu/drivers/empty.cpp",
 }
+
+pchsource(MAME_DIR .. "src/emu/drivers/empty.cpp")
+
 dependency {
 	{ "$(OBJDIR)/src/emu/drivers/empty.o", "$(GCH)", true  },
 }

@@ -19,6 +19,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "util/disasmintf.h"
 #include "cr16bdasm.h"
 

@@ -4,8 +4,10 @@
 
     ELAN Microelectronics RISC II (RII) Series disassembler
 
+
 ***************************************************************************/
 
+#include "emu.h"
 #include "util/disasmintf.h"
 #include "riidasm.h"
 

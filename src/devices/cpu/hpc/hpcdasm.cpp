@@ -10,6 +10,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "util/disasmintf.h"
 #include "hpcdasm.h"
 
