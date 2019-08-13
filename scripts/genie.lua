@@ -80,7 +80,7 @@ end
 function precompiledheaders_novs()
 	precompiledheaders()
 	if string.sub(_ACTION,1,4) == "vs20" then
-		print("Disabling pch for Visual Studio")
+		--print("Disabling pch for Visual Studio")
 		flags {
 			"NoPCH"
 		}
