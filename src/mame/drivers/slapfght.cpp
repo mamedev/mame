@@ -13,7 +13,7 @@
     Tiger Heli
 
   TODO:
-  - proper MCU emulation (mame/machine/slapfght.c)
+  - proper MCU emulation (mame/machine/slapfght.cpp)
   - alcon cocktail/flipscreen, it doesn't write to the flipscreen reg
 
 
@@ -1010,6 +1010,19 @@ void slapfght_state::tigerhb2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::tigerhb2_map);
 }
 
+void slapfght_state::tigerhb4(machine_config &config)
+{
+	tigerhb2(config);
+
+	// TODO: hook up
+	m68705p_device &mcu(M68705P5(config, "mcu", 6000000)); // unverified clock
+	mcu.porta_r().set_log("port A read");
+	mcu.portb_r().set_log("port B read");
+	mcu.portc_r().set_log("port C read");
+	mcu.porta_w().set([this](uint8_t data) { logerror("port a write: %02x\n", data); });
+	mcu.portb_w().set([this](uint8_t data) { logerror("port b write: %02x\n", data); });
+	mcu.portc_w().set([this](uint8_t data) { logerror("port c write: %02x\n", data); });
+}
 
 void slapfght_state::slapfigh(machine_config &config)
 {
@@ -1423,6 +1436,41 @@ ROM_START( tigerhb3 )
 	ROM_LOAD( "82s129.12q", 0x0000, 0x0100, CRC(2c69350d) SHA1(658bf63c6d1e718f99494cd1c9346c3622913beb) )
 	ROM_LOAD( "82s129.12m", 0x0100, 0x0100, CRC(7142e972) SHA1(4a854c2fdd006077aecb695832110ae6bf5819c1) )
 	ROM_LOAD( "82s129.12n", 0x0200, 0x0100, CRC(25f273f2) SHA1(2c696745f42fa09b64295a39536aeba08ab58d67) )
+ROM_END
+
+// this bootleg has a 68705P5S MCU
+ROM_START( tigerhb4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0", 0x00000, 0x4000, CRC(ba5a31e0) SHA1(88c2cf07b36d8a2439fa04b5cc68fb5fe7683a30) )
+	ROM_LOAD( "1", 0x04000, 0x4000, CRC(65df2152) SHA1(8e1516905a4af379cb0d0b9d42ff1cc3179c3589) )
+	ROM_LOAD( "2", 0x08000, 0x4000, CRC(36e250b9) SHA1(79bd86bde81981e4d0dbee420bc0a10c80b5241e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a47_03.12d", 0x0000, 0x2000, CRC(d105260f) SHA1(f6a0e393e29354bb37fb723828f3267d030a45ea) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "68705p5s.bin", 0x0000, 0x0800, CRC(062eb9d7) SHA1(8337c24a63564c3698d04c723fcb6c067f7f5060) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "a47_05.6f", 0x00000, 0x2000, CRC(c5325b49) SHA1(6df9051e7545dcac4995340f80957510457aaf64) ) /* Chars */
+	ROM_LOAD( "a47_04.6g", 0x02000, 0x2000, CRC(cd59628e) SHA1(7be6479f20eb51b79b93e6fd65ab219096d54984) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "a47_09.4m", 0x00000, 0x4000, CRC(31fae8a8) SHA1(ef8c23776431f00a74b25c5800755b6fa8d585ec) ) /* Tiles */
+	ROM_LOAD( "a47_08.6m", 0x04000, 0x4000, CRC(e539af2b) SHA1(0c8369a0fac1cbe40c07b51e16e8f8a9b8ed03b8) )
+	ROM_LOAD( "a47_07.6n", 0x08000, 0x4000, CRC(02fdd429) SHA1(fa392f2e57cfb6af4c124e0c151a4652f83e5577) )
+	ROM_LOAD( "a47_06.6p", 0x0c000, 0x4000, CRC(11fbcc8c) SHA1(b4fdb9ee00b749e1a54cfc0cdf55cc5e9bee3662) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "a47_13.8j", 0x00000, 0x4000, CRC(739a7e7e) SHA1(5fee71d9e1540903a6cf7bcaab30acaa088d35ed) ) /* Sprites */
+	ROM_LOAD( "a47_12.6j", 0x04000, 0x4000, CRC(c064ecdb) SHA1(fa8d712e2b2bda78b9375d96c93a4d7549c94075) )
+	ROM_LOAD( "a47_11.8h", 0x08000, 0x4000, CRC(744fae9b) SHA1(b324350469c51043e1d90ce58808d966467435b9) )
+	ROM_LOAD( "a47_10.6h", 0x0c000, 0x4000, CRC(e1cf844e) SHA1(eeb8eff09f96c693e147d155a8c0a87416d64603) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "82s129.12q", 0x0000,  0x0100, CRC(2c69350d) SHA1(658bf63c6d1e718f99494cd1c9346c3622913beb) )
+	ROM_LOAD( "82s129.12m", 0x0100,  0x0100, CRC(7142e972) SHA1(4a854c2fdd006077aecb695832110ae6bf5819c1) )
+	ROM_LOAD( "82s129.12n", 0x0200,  0x0100, CRC(25f273f2) SHA1(2c696745f42fa09b64295a39536aeba08ab58d67) )
 ROM_END
 
 /*
@@ -2006,6 +2054,7 @@ GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    slapfght_state, empty_i
 GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb4,   tigerh,   tigerhb4,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // MCU not hooked up
 
 GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito America Corp.",   "Alcon (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito",                 "Slap Fight (A77 set, 8606M PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

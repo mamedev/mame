@@ -34,9 +34,10 @@ public:
 		m_fixcolorram(*this, "fixcolorram")
 	{ }
 
-	void tigerhb2(machine_config &config);
-	void tigerhb1(machine_config &config);
 	void tigerh(machine_config &config);
+	void tigerhb1(machine_config &config);
+	void tigerhb2(machine_config &config);
+	void tigerhb4(machine_config &config);
 	void getstarb2(machine_config &config);
 	void slapfighb2(machine_config &config);
 	void getstarb1(machine_config &config);

@@ -35910,6 +35910,7 @@ tigerh                          // A47 (c) 1985 Taito America  Corporation   GX-
 tigerhb1                        // bootleg but (c) 1985 Taito Corporation
 tigerhb2                        // bootleg but (c) 1985 Taito Corporation
 tigerhb3                        // bootleg but (c) 1985 Taito Corporation
+tigerhb4                        // bootleg but (c) 1985 Taito Corporation
 tigerhj                         // A47 (c) 1985 Taito Corporation   GX-551 [not a Konami board!]
 
 @source:slapshot.cpp
