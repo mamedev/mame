@@ -6,7 +6,7 @@
 
 **********************************************************************/
 #ifndef MAME_DEVICE_BUS_SS50_MPS2_H
-#define MAME_DEVICE_BUS_SS50_MPS2H
+#define MAME_DEVICE_BUS_SS50_MPS2_H
 
 #include "interface.h"
 
