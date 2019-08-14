@@ -22,6 +22,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
+#include "machine/pc9801_memsw.h"
 #include "machine/upd765.h"
 
 #include "bus/scsi/pc9801_sasi.h"
@@ -90,6 +91,7 @@ public:
 		m_fdc_2hd(*this, "upd765_2hd"),
 		m_fdc_2dd(*this, "upd765_2dd"),
 		m_rtc(*this, UPD1990A_TAG),
+		m_memsw(*this, "memsw"),
 		m_keyb(*this, "keyb"),
 		m_sio(*this, UPD8251_TAG),
 		m_hgdc1(*this, "upd7220_chr"),
@@ -140,6 +142,7 @@ private:
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
 	required_device<upd1990a_device> m_rtc;
+	required_device<pc9801_memsw_device> m_memsw;
 	required_device<pc9801_kbd_device> m_keyb;
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;

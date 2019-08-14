@@ -2752,6 +2752,8 @@ files {
 	MAME_DIR .. "src/mame/machine/pc9801_kbd.h",
 	MAME_DIR .. "src/mame/machine/pc9801_cd.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_cd.h",
+	MAME_DIR .. "src/mame/machine/pc9801_memsw.cpp",
+	MAME_DIR .. "src/mame/machine/pc9801_memsw.h",
 	MAME_DIR .. "src/mame/drivers/tk80bs.cpp",
 }
 

@@ -2131,18 +2131,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
 	memset(m_tvram.get(), 0, sizeof(uint16_t) * 0x2000);
-	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
-	{
-		int i;
-		static const uint8_t default_memsw_data[0x10] =
-		{
-			0xe1, 0x48, 0xe1, 0x05, 0xe1, 0x04, 0xe1, 0x00, 0xe1, 0x01, 0xe1, 0x00, 0xe1, 0x00, 0xe1, 0x6e
-//          0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff
-		};
-
-		for(i=0;i<0x10;i++)
-			m_tvram[(0x3fe0>>1)+i] = default_memsw_data[i];
-	}
 
 	m_beeper->set_state(0);
 
@@ -2381,6 +2369,8 @@ void pc9801_state::pc9801_common(machine_config &config)
 	pc9801_cbus(config);
 
 	I8251(config, m_sio, 0);
+
+	PC9801_MEMSW(config, m_memsw, 0);
 
 	UPD765A(config, m_fdc_2hd, 8'000'000, true, true);
 	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));
