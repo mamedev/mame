@@ -15,6 +15,7 @@
  madmotor.cpp
  stadhero.cpp
  pcktgal.cpp
+ thedeep.cpp
 
  Notes (from dec0.cpp)
 
@@ -94,6 +95,7 @@ deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *
 	, m_bppmult_16x16(0)
 	, m_bppmask_16x16(0)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, m_thedeep_kludge(0)
 {
 	std::fill(std::begin(m_pf_control_0), std::end(m_pf_control_0), 0);
 	std::fill(std::begin(m_pf_control_1), std::end(m_pf_control_1), 0);
@@ -207,7 +209,7 @@ TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf16x16_tile_info)
 	if (m_rambank & 1) tile_index += 0x1000;
 	int tile = m_pf_data[tile_index];
 	int colourpri = (tile >> 12);
-	int flags = (m_pf_control_0[0] & 2) ? 0 : TILE_FLIPX;
+	int flags = (BIT(m_pf_control_0[0], 1) ^ m_thedeep_kludge) ? 0 : TILE_FLIPX;
 	SET_TILE_INFO_MEMBER(m_tile_region_16,tile & 0xfff,0,flags);
 	tileinfo.category = colourpri;
 }
@@ -302,7 +304,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 	Nb2:  Real hardware exhibits a strange bug with column scroll on 'mode 2'
 	(256*1024) - the first column has a strange additional offset, but
 	curiously the first 'wrap' (at scroll offset 256) does not have this offset,
-	it is displayed as expected.  The bug is confimed to only affect this mode,
+	it is displayed as expected.  The bug is confirmed to only affect this mode,
 	the other two modes work as expected.  This bug is not emulated, as it
 	doesn't affect any games.
 	*/
@@ -601,6 +603,22 @@ void deco_bac06_device::pf_rowscroll_8bit_swap_w(offs_t offset, u8 data)
 		pf_rowscroll_w(offset / 2, data, 0x00ff);
 }
 
+// used by thedeep
+u8 deco_bac06_device::pf_colscroll_8bit_swap_r(offs_t offset)
+{
+	if (offset & 1)
+		return pf_colscroll_r(offset / 2)>>8;
+	else
+		return pf_colscroll_r(offset / 2);
+}
+
+void deco_bac06_device::pf_colscroll_8bit_swap_w(offs_t offset, u8 data)
+{
+	if (offset & 1)
+		pf_colscroll_w(offset / 2, data << 8, 0xff00);
+	else
+		pf_colscroll_w(offset / 2, data, 0x00ff);
+}
 
 /* used by hippodrm */
 void deco_bac06_device::pf_control0_8bit_packed_w(offs_t offset, u8 data)

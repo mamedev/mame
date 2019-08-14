@@ -62,14 +62,6 @@ void thedeep_state::machine_start()
 	save_item(NAME(m_coin_result));
 }
 
-void thedeep_state::machine_reset()
-{
-	m_scroll[0] = 0;
-	m_scroll[1] = 0;
-	m_scroll[2] = 0;
-	m_scroll[3] = 0;
-}
-
 READ8_MEMBER(thedeep_state::protection_r)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -114,11 +106,12 @@ void thedeep_state::main_map(address_map &map)
 	map(0xe00b, 0xe00b).portr("e00b");           // DSW2
 	map(0xe00c, 0xe00c).w(m_soundlatch, FUNC(generic_latch_8_device::write));  // To Sound CPU
 	map(0xe100, 0xe100).w(FUNC(thedeep_state::e100_w));   // ?
-	map(0xe210, 0xe213).writeonly().share("scroll");    // Scroll
-	map(0xe400, 0xe7ff).ram().share("spriteram");   // Sprites
-	map(0xe800, 0xefff).ram().w(FUNC(thedeep_state::vram_1_w)).share("vram_1");  // Text Layer
-	map(0xf000, 0xf7ff).ram().w(FUNC(thedeep_state::vram_0_w)).share("vram_0");  // Background Layer
-	map(0xf800, 0xf83f).ram().share("scroll2"); // Column Scroll
+	map(0xe200, 0xe207).w(m_tilegen, FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0xe210, 0xe217).w(m_tilegen, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
+	map(0xe400, 0xe7ff).ram().share(m_spriteram);   // Sprites
+	map(0xe800, 0xefff).ram().w(FUNC(thedeep_state::textram_w)).share(m_textram);  // Text Layer
+	map(0xf000, 0xf7ff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));  // Background Layer
+	map(0xf800, 0xf83f).rw(m_tilegen, FUNC(deco_bac06_device::pf_colscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_colscroll_8bit_swap_w));
 	map(0xf840, 0xffff).ram();
 }
 
@@ -166,6 +159,7 @@ void thedeep_state::mcu_p1_w(uint8_t data)
 	membank("bank1")->set_entry((data >> 1) & 0x03);
 
 	flip_screen_set(!BIT(data, 0));
+	m_tilegen->set_flip_screen(!BIT(data, 0));
 	m_spritegen->set_flip_screen(!BIT(data, 0));
 }
 
@@ -369,6 +363,11 @@ void thedeep_state::thedeep(machine_config &config)
 	PALETTE(config, m_palette, FUNC(thedeep_state::thedeep_palette), 512);
 
 	DECO_MXC06(config, m_spritegen, 0);
+
+	DECO_BAC06(config, m_tilegen, 0);
+	m_tilegen->set_gfx_region_wide(1, 1, 0);
+	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen->set_thedeep_kludge();  // TODO: this game wants TILE_FLIPX always set. Investigate why.
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

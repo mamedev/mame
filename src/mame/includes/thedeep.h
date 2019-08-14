@@ -8,6 +8,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "video/decbac06.h"
 #include "video/decmxc06.h"
 #include "emupal.h"
 
@@ -22,21 +23,18 @@ public:
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_tilegen(*this, "tilegen"),
 		m_spritegen(*this, "spritegen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_coins(*this, "COINS"),
 		m_spriteram(*this, "spriteram"),
-		m_vram_0(*this, "vram_0"),
-		m_vram_1(*this, "vram_1"),
-		m_scroll(*this, "scroll"),
-		m_scroll2(*this, "scroll2")
+		m_textram(*this, "textram")
 	{ }
 
 	void thedeep(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
@@ -45,19 +43,16 @@ private:
 	required_device<i8751_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<deco_bac06_device> m_tilegen;
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport m_coins;
 
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_vram_0;
-	required_shared_ptr<uint8_t> m_vram_1;
-	required_shared_ptr<uint8_t> m_scroll;
-	required_shared_ptr<uint8_t> m_scroll2;
+	required_shared_ptr<uint8_t> m_textram;
 
 	int m_nmi_enable;
-	tilemap_t *m_tilemap_0;
-	tilemap_t *m_tilemap_1;
+	tilemap_t *m_text_tilemap;
 
 	// protection mcu
 	uint8_t mcu_p0_r();
@@ -78,12 +73,9 @@ private:
 	DECLARE_WRITE8_MEMBER(nmi_w);
 	DECLARE_WRITE8_MEMBER(e100_w);
 
-	DECLARE_WRITE8_MEMBER(vram_0_w);
-	DECLARE_WRITE8_MEMBER(vram_1_w);
+	DECLARE_WRITE8_MEMBER(textram_w);
 
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_back);
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	void thedeep_palette(palette_device &palette) const;
 
