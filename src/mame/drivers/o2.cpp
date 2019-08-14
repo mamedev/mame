@@ -22,6 +22,7 @@ NOTE: The default Sgi O2 Keyboard (Model No. RT6856T, Part No. 121472-101-B,
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
+#include "machine/ds17x85.h"
 #include "machine/mace.h"
 #include "video/crime.h"
 
@@ -78,8 +79,12 @@ void o2_state::o2(machine_config &config)
 	m_maincpu->set_force_no_drc(true);
 
 	SGI_MACE(config, m_mace, m_maincpu);
+	m_mace->rtc_read_callback().set("rtc", FUNC(ds17x85_device::read_direct));
+	m_mace->rtc_write_callback().set("rtc", FUNC(ds17x85_device::write_direct));
 
 	SGI_CRIME(config, m_crime, m_maincpu);
+
+	DS1687(config, "rtc", 32768);
 }
 
 ROM_START( o2 )

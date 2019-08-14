@@ -19,7 +19,7 @@ ds12885_device::ds12885_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-int ds12885_device::get_timer_bypass()
+int ds12885_device::get_timer_bypass() const
 {
 	if( !( m_data[REG_A] & REG_A_DV0 ) ) //DV0 must be 0 for timekeeping
 	{
