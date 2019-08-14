@@ -94,7 +94,6 @@ private:
 	bitmap_ind16 m_sprites_bitmap;
 	bitmap_ind8 m_sprites_bitmap_pri;
 	int m_prev_sprites_count;
-	u8 m_spotty_sound_cmd;
 
 	void coincounter_w(u32 data);
 	void bg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
