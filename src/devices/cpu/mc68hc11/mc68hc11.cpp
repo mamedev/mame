@@ -160,23 +160,35 @@ uint8_t mc68hc11_cpu_device::pioc_r()
 	return 0;
 }
 
+uint8_t mc68hc11_cpu_device::pactl_r()
+{
+	return m_pactl;
+}
+
+void mc68hc11_cpu_device::pactl_w(uint8_t data)
+{
+	m_pactl = data & 0x73;
+}
+
 uint8_t mc68hc11a1_device::pactl_r()
 {
-	return ddr_r<0>() & 0x80;
+	return (ddr_r<0>() & 0x80) | mc68hc11_cpu_device::pactl_r();
 }
 
 void mc68hc11a1_device::pactl_w(uint8_t data)
 {
+	mc68hc11_cpu_device::pactl_w(data & 0x73);
 	ddr_w<0>((data & 0x80) | 0x78);
 }
 
 uint8_t mc68hc11d0_device::pactl_r()
 {
-	return ddr_r<0>() & 0x88;
+	return (ddr_r<0>() & 0x88) | mc68hc11_cpu_device::pactl_r();
 }
 
 void mc68hc11d0_device::pactl_w(uint8_t data)
 {
+	mc68hc11_cpu_device::pactl_w(data & 0x73);
 	ddr_w<0>((data & 0x88) | 0x70);
 }
 
@@ -411,6 +423,7 @@ void mc68hc11k1_device::io_map(address_map &map)
 	map(0x22, 0x22).rw(FUNC(mc68hc11k1_device::tmsk1_r), FUNC(mc68hc11k1_device::tmsk1_w)); // TMSK1
 	map(0x23, 0x23).rw(FUNC(mc68hc11k1_device::tflg1_r), FUNC(mc68hc11k1_device::tflg1_w)); // TFLG1
 	map(0x24, 0x24).w(FUNC(mc68hc11k1_device::tmsk2_w)); // TMSK2
+	map(0x26, 0x26).rw(FUNC(mc68hc11k1_device::pactl_r), FUNC(mc68hc11k1_device::pactl_w)); // PACTL
 	map(0x28, 0x28).r(FUNC(mc68hc11k1_device::spcr_r<0>)).nopw(); // SPCR
 	map(0x29, 0x29).r(FUNC(mc68hc11k1_device::spsr_r<0>)).nopw(); // SPSR
 	map(0x2a, 0x2a).rw(FUNC(mc68hc11k1_device::spdr_r<0>), FUNC(mc68hc11k1_device::spdr_w<0>)); // SPDR
@@ -451,6 +464,7 @@ void mc68hc11m0_device::io_map(address_map &map)
 	map(0x22, 0x22).rw(FUNC(mc68hc11m0_device::tmsk1_r), FUNC(mc68hc11m0_device::tmsk1_w)); // TMSK1
 	map(0x23, 0x23).rw(FUNC(mc68hc11m0_device::tflg1_r), FUNC(mc68hc11m0_device::tflg1_w)); // TFLG1
 	map(0x24, 0x24).w(FUNC(mc68hc11m0_device::tmsk2_w)); // TMSK2
+	map(0x26, 0x26).rw(FUNC(mc68hc11m0_device::pactl_r), FUNC(mc68hc11m0_device::pactl_w)); // PACTL
 	map(0x28, 0x28).r(FUNC(mc68hc11m0_device::spcr_r<0>)).nopw(); // SPCR1
 	map(0x29, 0x29).r(FUNC(mc68hc11m0_device::spsr_r<0>)).nopw(); // SPSR1
 	map(0x2a, 0x2a).rw(FUNC(mc68hc11m0_device::spdr_r<0>), FUNC(mc68hc11m0_device::spdr_w<0>)); // SPDR1
@@ -593,6 +607,7 @@ void mc68hc11_cpu_device::device_start()
 	save_item(NAME(m_tcnt));
 //  save_item(NAME(m_por));
 	save_item(NAME(m_pr));
+	save_item(NAME(m_pactl));
 	save_item(NAME(m_frc_base));
 	save_item(NAME(m_port_data));
 	save_item(NAME(m_port_dir));
@@ -657,6 +672,7 @@ void mc68hc11_cpu_device::device_reset()
 	m_tcnt = 0xffff;
 //  m_por = 1; // for first timer overflow / compare stuff
 	m_pr = 3; // timer prescale
+	m_pactl = 0;
 	m_frc_base = 0;
 	std::fill(std::begin(m_port_dir), std::end(m_port_dir), 0x00);
 }

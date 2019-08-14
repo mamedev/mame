@@ -85,6 +85,8 @@ protected:
 	uint8_t tflg1_r();
 	void tflg1_w(uint8_t data);
 	void tmsk2_w(uint8_t data);
+	uint8_t pactl_r();
+	void pactl_w(uint8_t data);
 	template <int N> uint8_t spcr_r();
 	template <int N> uint8_t spsr_r();
 	template <int N> uint8_t spdr_r();
@@ -163,6 +165,7 @@ private:
 	uint16_t m_tcnt;
 //  uint8_t m_por;
 	uint8_t m_pr;
+	uint8_t m_pactl;
 
 	uint64_t m_frc_base;
 
@@ -181,7 +184,6 @@ private:
 	ophandler hc11_optable_page4[256];
 
 	void ram_map(address_map &map);
-	void hc11_regs_w(uint32_t address, uint8_t value);
 
 	uint8_t FETCH();
 	uint16_t FETCH16();
