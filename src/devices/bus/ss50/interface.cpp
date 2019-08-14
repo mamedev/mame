@@ -85,6 +85,7 @@
 #include "bus/ss50/mps.h"
 #include "bus/ss50/mps2.h"
 #include "bus/ss50/mpt.h"
+#include "bus/ss50/piaide.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -225,4 +226,5 @@ void ss50_default_2rs_devices(device_slot_interface &device)
 	device.option_add("mps", SS50_MPS);
 	device.option_add("mps2", SS50_MPS2);
 	device.option_add("mpt", SS50_MPT);
+	device.option_add("piaide", SS50_PIAIDE);
 }
