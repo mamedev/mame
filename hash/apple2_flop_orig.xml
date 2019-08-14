@@ -6944,4 +6944,19 @@
 		</part>
 	</software>
 
+	<software name="msnastrd">
+		<description>Mission: Asteroid</description>
+		<year>1980</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2019-08-13"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235519">
+				<rom name="mission asteroid.woz" size="235519" crc="2553d240" sha1="8476b22d74a18f40836d17276c9b7ebbf45567b9" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
