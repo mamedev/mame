@@ -83,6 +83,7 @@
 //#include "bus/ss50/mpl.h"
 //#include "bus/ss50/mpr.h"
 #include "bus/ss50/mps.h"
+#include "bus/ss50/mps2.h"
 #include "bus/ss50/mpt.h"
 
 //**************************************************************************
@@ -222,5 +223,6 @@ void ss50_default_2rs_devices(device_slot_interface &device)
 	//device.option_add("mpl", SS50_MPL);
 	//device.option_add("mpn", SS50_MPN);
 	device.option_add("mps", SS50_MPS);
+	device.option_add("mps2", SS50_MPS2);
 	device.option_add("mpt", SS50_MPT);
 }

@@ -1732,6 +1732,8 @@ if (BUSES["SS50"]~=null) then
 		MAME_DIR .. "src/devices/bus/ss50/mpc.h",
 		MAME_DIR .. "src/devices/bus/ss50/mps.cpp",
 		MAME_DIR .. "src/devices/bus/ss50/mps.h",
+		MAME_DIR .. "src/devices/bus/ss50/mps2.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/mps2.h",
 		MAME_DIR .. "src/devices/bus/ss50/mpt.cpp",
 		MAME_DIR .. "src/devices/bus/ss50/mpt.h",
 	}
