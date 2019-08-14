@@ -231,6 +231,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 {
 	chd_error err = CHDERR_NONE;
 	m_chd = nullptr;
+	uint8_t header[64];
 
 	if (m_hard_disk_handle != nullptr)
 	{
@@ -245,7 +246,11 @@ image_init_result harddisk_image_device::internal_load_hd()
 	}
 	else
 	{
-		if (is_filetype("chd"))
+		fseek(0, SEEK_SET);
+		fread(header, 64);
+		fseek(0, SEEK_SET);
+
+		if (!memcmp("MComprHD", header, 8))
 		{
 			err = m_origchd.open(image_core_file(), true);
 
@@ -280,16 +285,12 @@ image_init_result harddisk_image_device::internal_load_hd()
 		if (is_open())
 		{
 			uint32_t skip = 0;
-			uint8_t header[64];
-
-			fseek(0, SEEK_SET);
-			fread(header, 64);
 
 			// check for 2MG format
 			if (!memcmp(header, "2IMG", 4))
 			{
 				skip = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
-				osd_printf_verbose("harddriv: found 2MG, creator is %c%c%c%c, data at %08x\n", header[4], header[5], header[6], header[7], skip);
+				osd_printf_verbose("harddriv: detected 2MG, creator is %c%c%c%c, data at %08x\n", header[4], header[5], header[6], header[7], skip);
 			}
 			// check for HDI format
 			else if (is_filetype("hdi"))
