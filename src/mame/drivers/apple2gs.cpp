@@ -623,7 +623,7 @@ private:
 {   \
 	if (m_last_speed) \
 	{\
-		m_slow_counter += 0x0003cccc; \
+		m_slow_counter += 0x0001999a; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \
 		m_slow_counter &= 0xffff; \
 		m_maincpu->adjust_icount(-cycles); \
