@@ -59,7 +59,7 @@
 #include <algorithm>
 
 
-DEFINE_DEVICE_TYPE(DECO_ACE, deco_ace_device, "deco_ace", "Data East 99 'ACE' Chip")
+DEFINE_DEVICE_TYPE(DECO_ACE, deco_ace_device, "deco_ace", "DECO 99 'ACE' Chip")
 
 deco_ace_device::deco_ace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_ACE, tag, owner, clock),
