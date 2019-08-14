@@ -22,49 +22,49 @@
 #include "busmouse.h"
 #include "bus/ti99/ti99defs.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_COLORBUS, bus::ti99::colorbus, ti99_colorbus_device, "ti99_colorbus", "v9938 Color bus")
+DEFINE_DEVICE_TYPE_NS(V9938_COLORBUS, bus::ti99::colorbus, v9938_colorbus_device, "v9938_colorbus", "V9938 Color bus")
 
 namespace bus { namespace ti99 { namespace colorbus {
 
-ti99_colorbus_device::ti99_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   device_t(mconfig, TI99_COLORBUS, tag, owner, clock),
+v9938_colorbus_device::v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	:   device_t(mconfig, V9938_COLORBUS, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
-		m_connected(nullptr),
 		m_v9938(*owner, TI_VDP_TAG),
-		m_left_button_pressed(false)
+		m_extra_button(*this)
 {
 }
 
-void ti99_colorbus_device::poll()
+void v9938_colorbus_device::movex(int delta)
 {
-	int delta_x, delta_y, buttons;
-
-	// only middle and right button go to V9938
-	m_connected->poll(delta_x, delta_y, buttons);
-	m_v9938->update_mouse_state(delta_x, delta_y, buttons & 0x03);
-	m_left_button_pressed = (buttons & 0x04)!=0;
+	m_v9938->colorbus_x_input(delta);
 }
 
-line_state ti99_colorbus_device::left_button()
+void v9938_colorbus_device::movey(int delta)
 {
-	return m_left_button_pressed? ASSERT_LINE : CLEAR_LINE;
+	m_v9938->colorbus_y_input(delta);
 }
 
-void ti99_colorbus_device::device_config_complete()
+void v9938_colorbus_device::buttons(int bstate)
 {
-	m_connected = dynamic_cast<device_ti99_colorbus_interface*>(subdevices().first());
+	m_v9938->colorbus_button_input(bstate & 1, bstate & 2);
+	m_extra_button((bstate & 4)? ASSERT_LINE : CLEAR_LINE);
+}
+
+void v9938_colorbus_device::device_start()
+{
+	m_extra_button.resolve_safe();
 }
 
 /*****************************************************************************/
 
-void device_ti99_colorbus_interface::interface_config_complete()
+void device_v9938_colorbus_interface::interface_config_complete()
 {
-	m_colorbus = dynamic_cast<ti99_colorbus_device*>(device().owner());
+	m_colorbus = dynamic_cast<v9938_colorbus_device*>(device().owner());
 }
 
 } } } // end namespace bus::ti99::colorbus
 
 void ti99_colorbus_options(device_slot_interface &device)
 {
-	device.option_add("busmouse", TI99_BUSMOUSE);
+	device.option_add("busmouse", V9938_BUSMOUSE);
 }

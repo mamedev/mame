@@ -218,7 +218,8 @@ public:
 		m_mapper(*this, GENEVE_MAPPER_TAG),
 		m_peribox(*this, TI_PERIBOX_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
-		m_colorbus(*this, COLORBUS_TAG)
+		m_colorbus(*this, COLORBUS_TAG),
+		m_left_button(0)
 	{
 	}
 
@@ -240,6 +241,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(joystick_select);
 	DECLARE_WRITE_LINE_MEMBER(extbus_wait_states);
 	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
+	DECLARE_WRITE_LINE_MEMBER(left_mouse_button);
 
 	DECLARE_WRITE_LINE_MEMBER(clock_out);
 
@@ -255,7 +257,7 @@ private:
 	required_device<bus::ti99::internal::geneve_mapper_device>   m_mapper;
 	required_device<bus::ti99::peb::peribox_device>         m_peribox;
 	required_device<bus::ti99::joyport::joyport_device>    m_joyport;
-	required_device<bus::ti99::colorbus::ti99_colorbus_device>   m_colorbus;
+	required_device<bus::ti99::colorbus::v9938_colorbus_device>   m_colorbus;
 
 	DECLARE_WRITE_LINE_MEMBER( inta );
 	DECLARE_WRITE_LINE_MEMBER( intb );
@@ -275,6 +277,8 @@ private:
 
 	int m_ready_line;
 	int m_ready_line1;
+
+	int m_left_button;
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
@@ -479,8 +483,8 @@ uint8_t geneve_state::psi_input(offs_t offset)
 
 	// Left mouse button
 	case tms9901_device::INT10_P12:
-		LOG("Mouse button = %d\n", m_colorbus->left_button());
-		return (m_colorbus->left_button()==CLEAR_LINE)? 1 : 0;
+		LOGMASKED(LOG_CRU, "Mouse button = %d\n", m_left_button);
+		return (m_left_button==CLEAR_LINE)? 1 : 0;
 
 	// TODO: Real time clock interrupt
 	case tms9901_device::INT11_P11:
@@ -491,65 +495,17 @@ uint8_t geneve_state::psi_input(offs_t offset)
 		return (m_intb==CLEAR_LINE)? 1 : 0;
 
 	default:
-		LOG("Unknown pin %d\n", offset);
+		// Pin 9 seems to be queried although there is no connection, maybe
+		// by CRU multi-bit operation (STCR)
+		// LOGMASKED(LOG_WARN, "Unknown pin %d\n", offset);
 		return 1;
 	}
 }
 
-/*
-    switch (offset & 0x03)
-    {
-    case tms9901_device::CB_INT7:
-        //
-        // Read pins INT3*-INT7* of Geneve's 9901.
-        // bit 1: INTA status
-        // bit 2: INT2 status
-        // bit 3-7: joystick status
-        //
-        // |K|K|K|K|K|I2|I1|C|
-        // negative logic
-        if (m_inta==CLEAR_LINE) answer |= 0x02;
-        if (m_int2==CLEAR_LINE) answer |= 0x04;
-        answer |= m_joyport->read_port()<<3;
-        break;
-
-    case tms9901_device::INT8_INT15:
-        // Read pins int8_t*-INT15* of Geneve 9901.
-        //
-        // bit 0: keyboard interrupt
-        // bit 1: unused
-        // bit 2: mouse left button
-        // (bit 3: clock interrupt)
-        // bit 4: INTB from PE-bus
-        // bit 5 & 7: used as output
-        // bit 6: unused
-        if (m_keyint==CLEAR_LINE) answer |= 0x01;
-        if (m_colorbus->left_button()==CLEAR_LINE) answer |= 0x04;
-        // TODO: add clock interrupt
-        if (m_intb==CLEAR_LINE) answer |= 0x10;
-        if (m_video_wait==ASSERT_LINE) answer |= 0x20;
-        // TODO: PAL pin 5
-        LOGMASKED(LOG_LINES, "INT15-8 = %02x\n", answer);
-        break;
-
-    case tms9901_device::P0_P7:
-        // Read pins P0-P7 of TMS9901. All pins are configured as outputs, so nothing here.
-        break;
-
-    case tms9901_device::P8_P15:
-        // Read pins P8-P15 of TMS 9901.
-        // bit 4: mouse left button
-        // video wait is an output; no input possible here
-        if (m_intb==CLEAR_LINE) answer |= 0x04;     // mirror from above
-        // TODO: 0x08 = real-time clock int
-        if (m_colorbus->left_button()==CLEAR_LINE) answer |= 0x10; // mirror from above
-        if (m_keyint==CLEAR_LINE) answer |= 0x40;
-
-        // Joystick up (mirror of bit 7)
-        if ((m_joyport->read_port() & 0x10)==0) answer |= 0x80;
-        break;
-    }
-    */
+WRITE_LINE_MEMBER( geneve_state::left_mouse_button )
+{
+	m_left_button = state;
+}
 
 /*
     Write PE bus reset line
@@ -654,10 +610,6 @@ WRITE_LINE_MEMBER(geneve_state::set_tms9901_INT2_from_v9938)
 	{
 		m_int2 = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 		m_tms9901->set_int_line(2, state);
-		if (state!=0)
-		{
-			m_colorbus->poll();
-		}
 	}
 }
 
@@ -699,6 +651,7 @@ void geneve_state::machine_start()
 	save_item(NAME(m_video_wait)); // reflects the line to the mapper for CRU query
 	save_item(NAME(m_ready_line));
 	save_item(NAME(m_ready_line1));
+	save_item(NAME(m_left_button));
 }
 
 /*
@@ -804,7 +757,8 @@ void geneve_state::geneve_common(machine_config &config)
 	// User interface devices
 	GENEVE_KEYBOARD(config, m_keyboard, 0).int_cb().set(FUNC(geneve_state::keyboard_interrupt));
 	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
-	TI99_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, "busmouse");
+	V9938_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, nullptr);
+	m_colorbus->extra_button_cb().set(FUNC(geneve_state::left_mouse_button));
 
 	// PFM expansion
 	AT29C040(config, GENEVE_PFM512_TAG);

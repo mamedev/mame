@@ -19,24 +19,26 @@
 
 namespace bus { namespace ti99 { namespace colorbus {
 
-class geneve_busmouse_device : public device_t, public device_ti99_colorbus_interface
+class v9938_busmouse_device : public device_t, public device_v9938_colorbus_interface
 {
 public:
-	geneve_busmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void poll(int& delta_x, int& delta_y, int& buttons) override;
+	v9938_busmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_changed );
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_pos_changed );
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	void device_start() override;
+	void device_reset() override;
+	ioport_constructor device_input_ports() const override;
 
 private:
 	required_ioport m_buttons, m_xaxis, m_yaxis;
-	int             m_last_mx;
-	int             m_last_my;
+	int m_last_x;
+	int m_last_y;
+	int m_bstate;
 };
 } } } // end namespace bus::ti99::colorbus
 
-DECLARE_DEVICE_TYPE_NS(TI99_BUSMOUSE, bus::ti99::colorbus, geneve_busmouse_device)
+DECLARE_DEVICE_TYPE_NS(V9938_BUSMOUSE, bus::ti99::colorbus, v9938_busmouse_device)
 
 #endif // MAME_BUS_TI99_COLORBUS_BUSMOUSE_H

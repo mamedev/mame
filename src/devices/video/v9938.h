@@ -49,7 +49,9 @@ public:
 	}
 
 	bitmap_rgb32 &get_bitmap() { return m_bitmap; }
-	void update_mouse_state(int mx_delta, int my_delta, int button_state);
+	void colorbus_x_input(int mx_delta);
+	void colorbus_y_input(int my_delta);
+	void colorbus_button_input(bool button1, bool button2);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -210,7 +212,7 @@ private:
 	// blinking
 	int m_blink, m_blink_count;
 	// mouse
-	uint8_t m_mx_delta, m_my_delta;
+	int16_t m_mx_delta, m_my_delta;
 	// mouse & lightpen
 	uint8_t m_button_state;
 	// render bitmap

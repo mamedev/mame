@@ -440,8 +440,6 @@ WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
 		m_intlevel = state;
 		if (m_console_conn != nullptr) m_console_conn->vclock_line(state);
 		else m_slot->lcp_line(state);
-
-		if (state!=0) m_colorbus->poll();
 	}
 }
 
@@ -508,8 +506,8 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 	soundgen.ready_cb().set(FUNC(snug_enhanced_video_device::ready_line));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
-	// Mouse connected to the color bus of the v9938
-	TI99_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, "busmouse");
+	// Mouse connected to the color bus of the v9938; default: none
+	V9938_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, nullptr);
 }
 
 } } } // end namespace bus::ti99::peb
