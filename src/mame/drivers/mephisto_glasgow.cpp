@@ -10,17 +10,17 @@ sp_rinter@gmx.de
 16 KB RAM
 4 Digit LCD
 
-3* 74LS138  Decoder/Multiplexer
-1*74LS74    Dual positive edge triggered D Flip Flop
+3*74LS138 Decoder/Multiplexer
+1*74LS74  Dual positive edge triggered D Flip Flop
 1*74LS139 1of4 Demultiplexer
-1*74LS05    HexInverter
-1*NE555     R=100K C=10uF
+1*74LS05  Hex Inverter
+1*NE555   R=100K C=10uF
 2*74LS04  Hex Inverter
-1*74LS164   8 Bit Shift register
-1*74121 Monostable Multivibrator with Schmitt Trigger Inputs
-1*74LS20 Dual 4 Input NAND GAte
+1*74LS164 8 Bit Shift register
+1*74121   Monostable Multivibrator with Schmitt Trigger Inputs
+1*74LS20  Dual 4 Input NAND GAte
 1*74LS367 3 State Hex Buffers
-
+1*SG-10   Seiko 4-pin plastic XTAL chip "50H", to IPL0+2
 
 Made playable by Robbbert in Nov 2009.
 
@@ -33,13 +33,16 @@ How to play (quick guide)
 6. You'll need to read the official user manual for advanced features, or if
     you get messages such as "Err1".
 
+TODO:
+- add waitstates(applies to glasgow, amsterd, others?), CPU is 12MHz but with DTACK
+  waitstates for slow EPROMs, effective speed is less than 10MHz
+- LCD module is 8.8.:8.8 like mephisto_brikett/mm1 (so, add ":" in the middle)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mmboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -68,7 +71,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(glasgow_lcd_flag_w);
 	DECLARE_READ8_MEMBER(glasgow_keys_r);
 	DECLARE_WRITE8_MEMBER(glasgow_keys_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -97,12 +99,10 @@ public:
 
 protected:
 	DECLARE_WRITE8_MEMBER(write_lcd);
-	DECLARE_WRITE8_MEMBER(write_lcd32);
 	DECLARE_WRITE8_MEMBER(write_lcd_flag);
 	DECLARE_WRITE8_MEMBER(write_beeper);
 	DECLARE_WRITE8_MEMBER(write_board);
 	DECLARE_READ8_MEMBER(read_newkeys);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);
 
 	void amsterd_mem(address_map &map);
 	void dallas32_mem(address_map &map);
@@ -153,15 +153,6 @@ WRITE8_MEMBER( glasgow_state::glasgow_keys_w )
 WRITE8_MEMBER( amsterd_state::write_lcd )
 {
 	if (m_lcd_shift_counter & 4)
-		m_digits[m_lcd_shift_counter & 3] = data ^ 0xff;
-
-	m_lcd_shift_counter--;
-	m_lcd_shift_counter &= 7;
-}
-
-WRITE8_MEMBER( amsterd_state::write_lcd32 )
-{
-	if (m_lcd_shift_counter & 4)
 		m_digits[m_lcd_shift_counter & 3] = data;
 
 	m_lcd_shift_counter--;
@@ -170,13 +161,11 @@ WRITE8_MEMBER( amsterd_state::write_lcd32 )
 
 WRITE8_MEMBER( amsterd_state::write_lcd_flag )
 {
-	//beep_set_state(0, (data & 1) ? 1 : 0);
 	m_key_select = 1;
 
 	// The key function in the rom expects after writing to
 	// the  a value from the second key row;
 	m_led7 = data ? 255 : 0;
-
 }
 
 WRITE8_MEMBER( amsterd_state::write_board )
@@ -191,19 +180,9 @@ WRITE8_MEMBER( amsterd_state::write_beeper )
 	m_dac->write(BIT(data, 0));
 }
 
-READ8_MEMBER( amsterd_state::read_newkeys )  //Amsterdam, Roma, Dallas 32, Roma 32
+READ8_MEMBER( amsterd_state::read_newkeys )
 {
 	return m_keyboard[m_key_select & 1]->read();
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( glasgow_state::update_nmi)
-{
-	m_maincpu->set_input_line(7, HOLD_LINE);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( amsterd_state::update_nmi32 )
-{
-	m_maincpu->set_input_line(6, HOLD_LINE); // this was 7 in the old code, which is correct?
 }
 
 void glasgow_state::machine_start()
@@ -253,7 +232,7 @@ void amsterd_state::dallas32_mem(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x010000, 0x01ffff).ram(); // 64KB
-	map(0x800002, 0x800002).w(FUNC(amsterd_state::write_lcd32));
+	map(0x800002, 0x800002).w(FUNC(amsterd_state::write_lcd));
 	map(0x800004, 0x800004).w(FUNC(amsterd_state::write_beeper));
 	map(0x800008, 0x800008).w(FUNC(amsterd_state::write_lcd_flag));
 	map(0x800010, 0x800010).w(FUNC(amsterd_state::write_board));
@@ -311,12 +290,11 @@ void glasgow_state::glasgow(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL);
+	m_maincpu->set_periodic_int(FUNC(glasgow_state::irq5_line_hold), attotime::from_hz(50));
 	m_maincpu->set_addrmap(AS_PROGRAM, &glasgow_state::glasgow_mem);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board);
 	m_board->set_delay(attotime::from_msec(200));
-
-	TIMER(config, "nmi_timer").configure_periodic(FUNC(glasgow_state::update_nmi), attotime::from_hz(50));
 
 	/* video hardware */
 	config.set_default_layout(layout_mephisto_glasgow);
@@ -343,10 +321,8 @@ void amsterd_state::dallas32(machine_config &config)
 
 	/* basic machine hardware */
 	M68020(config.replace(), m_maincpu, 14_MHz_XTAL);
+	m_maincpu->set_periodic_int(FUNC(amsterd_state::irq5_line_hold), attotime::from_hz(50));
 	m_maincpu->set_addrmap(AS_PROGRAM, &amsterd_state::dallas32_mem);
-
-	config.device_remove("nmi_timer");
-	TIMER(config, "nmi_timer").configure_periodic(FUNC(amsterd_state::update_nmi32), attotime::from_hz(50));
 }
 
 

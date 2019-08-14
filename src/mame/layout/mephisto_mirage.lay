@@ -181,16 +181,16 @@
 		</repeat>
 
 		<repeat count="4">
-			<param name="y1" start="8.2" increment="20" />
-			<param name="y2" start="18.2" increment="20" />
+			<param name="y1" start="8.3" increment="20" />
+			<param name="y2" start="18.3" increment="20" />
 
 			<repeat count="4">
-				<param name="x1" start="8.2" increment="20" />
-				<param name="x2" start="18.2" increment="20" />
-				<bezel element="hidew" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="~x1~" y="~y1~" width="1.7" height="1.7" /></bezel>
-				<bezel element="hidew" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="~x2~" y="~y2~" width="1.7" height="1.7" /></bezel>
-				<bezel element="hideb" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="~x1~" y="~y2~" width="1.7" height="1.7" /></bezel>
-				<bezel element="hideb" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="~x2~" y="~y1~" width="1.7" height="1.7" /></bezel>
+				<param name="x1" start="8.3" increment="20" />
+				<param name="x2" start="18.3" increment="20" />
+				<bezel element="hidew" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="~x1~" y="~y1~" width="1.5" height="1.5" /></bezel>
+				<bezel element="hidew" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="~x2~" y="~y2~" width="1.5" height="1.5" /></bezel>
+				<bezel element="hideb" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="~x1~" y="~y2~" width="1.5" height="1.5" /></bezel>
+				<bezel element="hideb" inputtag="FAKE" inputmask="0x01" inputraw="1"><bounds x="~x2~" y="~y1~" width="1.5" height="1.5" /></bezel>
 			</repeat>
 		</repeat>
 
@@ -487,7 +487,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-11.5" right="88" top="-1" bottom="107" />
+		<bounds left="-11.5" right="87" top="0" bottom="107" />
 
 		<group ref="sb_board"><bounds x="4" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-10" y="3" width="10" height="80" /></group>
