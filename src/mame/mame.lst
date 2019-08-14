@@ -21465,6 +21465,9 @@ berlinp                         // 1994 Mephisto Berlin Pro 68020
 berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
 bpl32                           // 1996 Mephisto Berlin Pro London Upgrade
 
+@source:mephisto_mondial68k.cpp
+mondl68k                        // 1988 Mephisto Mondial 68000XL
+
 @source:mephisto_montec.cpp
 mondial                         // 1985 Mephisto Mondial
 smondial                        // 1986 Mephisto Super Mondial (Ver A)
