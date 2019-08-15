@@ -52,20 +52,22 @@ void v9938_busmouse_device::device_reset()
 
 INPUT_CHANGED_MEMBER( v9938_busmouse_device::mouse_button_changed )
 {
-	LOGMASKED(LOG_BUTTON, "Button %d: %d\n", (long)param, newval);
+	const int mask((int)(uint64_t)param);
+	LOGMASKED(LOG_BUTTON, "Button %d: %d\n", mask, newval);
 	if (newval==1)
-		m_bstate |= (long)param;
+		m_bstate |= mask;
 	else
-		m_bstate &= ~(long)param;
+		m_bstate &= ~mask;
 	m_colorbus->buttons(m_bstate);
 }
 
 INPUT_CHANGED_MEMBER( v9938_busmouse_device::mouse_pos_changed )
 {
+	const int mask((int)(uint64_t)param);
 	int16_t pos = (int16_t)newval;
 	int delta;
 
-	if ((long)param==1)
+	if (mask==1)
 	{
 		delta = pos - m_last_x;
 		LOGMASKED(LOG_MOVEX, "posx = %d, delta x = %d\n", pos, delta);
