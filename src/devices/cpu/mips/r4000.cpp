@@ -40,7 +40,7 @@
 #define LOG_SYSCALL   (1U << 4)
 #define LOG_STATS     (1U << 5)
 
-#define VERBOSE       (LOG_GENERAL|LOG_TLB|LOG_EXCEPTION)
+#define VERBOSE       (LOG_GENERAL)
 
 // operating system specific system call logging
 #define SYSCALL_IRIX53 (1U << 0)
@@ -304,7 +304,6 @@ void r4000_base_device::execute_run()
 
 void r4000_base_device::execute_set_input(int inputnum, int state)
 {
-	logerror("interrupt %d state %d\n", inputnum, state);
 	if (state)
 		m_cp0[CP0_Cause] |= (CAUSE_IPEX0 << inputnum);
 	else
