@@ -571,7 +571,7 @@ void debug_gdbstub::send_reply(const char *str)
 
 //-------------------------------------------------------------------------
 // Enable extended mode.
-debug_gdbstub::cmd_reply debug_gdbstub::handle_exclamation(const char */*buf*/)
+debug_gdbstub::cmd_reply debug_gdbstub::handle_exclamation(const char *buf)
 {
 	m_extended_mode = true;
 	return REPLY_OK;
@@ -579,7 +579,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_exclamation(const char */*buf*/)
 
 //-------------------------------------------------------------------------
 // Indicate the reason the target halted.
-debug_gdbstub::cmd_reply debug_gdbstub::handle_question(const char */*buf*/)
+debug_gdbstub::cmd_reply debug_gdbstub::handle_question(const char *buf)
 {
 	send_stop_packet();
 	return REPLY_NONE;
@@ -660,7 +660,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_H(const char *buf)
 
 //-------------------------------------------------------------------------
 // Kill request.
-debug_gdbstub::cmd_reply debug_gdbstub::handle_k(const char */*buf*/)
+debug_gdbstub::cmd_reply debug_gdbstub::handle_k(const char *buf)
 {
 	m_machine->schedule_exit();
 	m_debugger_cpu->get_visible_cpu()->debug()->go();
