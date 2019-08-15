@@ -317,7 +317,7 @@ void ti99_gkracker_device::cruwrite(offs_t offset, uint8_t data)
 
 INPUT_CHANGED_MEMBER( ti99_gkracker_device::gk_changed )
 {
-	LOGMASKED(LOG_GKRACKER, "Input changed %d - %d\n", (int)((uintptr_t)param & 0x07), newval);
+	LOGMASKED(LOG_GKRACKER, "Input changed %d - %d\n", int(param & 0x07), newval);
 	m_gk_switch[param & 0x07] = newval;
 }
 
