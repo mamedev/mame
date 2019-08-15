@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dirk Verwiebe, Robbbert, Cowering
+// copyright-holders:Dirk Verwiebe, Cowering
 /***************************************************************************
 Mephisto Glasgow 3 S chess computer
 Dirk V.
@@ -22,7 +22,6 @@ sp_rinter@gmx.de
 1*74LS367 3 State Hex Buffers
 1*SG-10   Seiko 4-pin plastic XTAL chip "50H", to IPL0+2
 
-Made playable by Robbbert in Nov 2009.
 
 How to play (quick guide)
 1. You are the white player.
