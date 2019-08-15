@@ -52,7 +52,7 @@ void v9938_busmouse_device::device_reset()
 
 INPUT_CHANGED_MEMBER( v9938_busmouse_device::mouse_button_changed )
 {
-	const int mask((uint64_t)param);
+	const int mask((uintptr_t)param);
 	LOGMASKED(LOG_BUTTON, "Button %d: %d\n", mask, newval);
 	if (newval==1)
 		m_bstate |= mask;
@@ -63,7 +63,7 @@ INPUT_CHANGED_MEMBER( v9938_busmouse_device::mouse_button_changed )
 
 INPUT_CHANGED_MEMBER( v9938_busmouse_device::mouse_pos_changed )
 {
-	const int axis((uint64_t)param);
+	const int axis((uintptr_t)param);
 	int16_t pos = (int16_t)newval;
 	int delta;
 
