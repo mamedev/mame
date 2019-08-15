@@ -2571,7 +2571,9 @@ WRITE8_MEMBER( h6280_device::timer_w )
 	switch (offset & 1)
 	{
 		case 0: /* Counter preload */
-			m_timer_load = m_timer_value = ((data & 127) + 1) * 1024;
+			//m_timer_load = m_timer_value = ((data & 127) + 1) * 1024;
+			// matches HW behaviour, value is latched only with 0->1 counter enable transition
+			m_timer_load = ((data & 127) + 1) * 1024;
 			return;
 
 		case 1: /* Counter enable */
