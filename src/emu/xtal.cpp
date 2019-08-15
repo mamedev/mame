@@ -158,6 +158,7 @@ const double XTAL::known_xtals[] = {
 	 10'717'200, /* 10.7172_MHz_XTAL       Eltec EurocomII */
 	 10'730'000, /* 10.73_MHz_XTAL         Ruleta RE-900 VDP Clock */
 	 10'733'000, /* 10.733_MHz_XTAL        The Fairyland Story */
+	 10'738'000, /* 10.738_MHz_XTAL        Pokerout (poker+breakout) TMS9129 VDP Clock */
 	 10'738'635, /* 10.738635_MHz_XTAL     TMS9918 family (3x NTSC subcarrier) */
 	 10'816'000, /* 10.816_MHz_XTAL        Universal 1979-1980 (Cosmic Alien, etc) */
 	 10'886'400, /* 10.8864_MHz_XTAL       Systel System 100 */
