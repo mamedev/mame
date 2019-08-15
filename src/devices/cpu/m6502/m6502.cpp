@@ -9,6 +9,8 @@
 TODO:
 - device_start SP = 0x01bd; can't be right. At power-on, SP = 0(0x100)
   and at RESET, it is decremented 3 times without writing to the stack
+  see: https://www.pagetable.com/?p=410
+  In other words, the first couple of cycles of STATE_RESET aren't emulated
 
 ***************************************************************************/
 
@@ -116,7 +118,6 @@ void m6502_device::init()
 
 void m6502_device::device_reset()
 {
-	P |= F_I;
 	inst_state = STATE_RESET;
 	inst_substate = 0;
 	inst_state_base = 0;
