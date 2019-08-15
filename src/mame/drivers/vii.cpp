@@ -134,6 +134,7 @@
 #include "cpu/unsp/unsp.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
+#include "machine/eepromser.h"
 #include "machine/spg2xx.h"
 
 #include "bus/generic/slot.h"
@@ -370,12 +371,16 @@ class dreamlif_state : public spg2xx_game_state
 public:
 	dreamlif_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spg2xx_game_state(mconfig, type, tag)
+		, m_eeprom(*this, "eeprom")
 	{ }
 
 	void dreamlif(machine_config &config);
 
+private:
 	DECLARE_READ16_MEMBER(portb_r);
 	DECLARE_WRITE16_MEMBER(portb_w);
+
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
@@ -1601,15 +1606,18 @@ INPUT_PORTS_END
 
 READ16_MEMBER(dreamlif_state::portb_r)
 {
-	// some kind of EEPROM device?  has a HT93LC66A
+	uint16_t ret = 0x0000;
 	logerror("%s: portb_r\n", machine().describe_context());
-	return 0x0000;
+	ret |= m_eeprom->do_read() << 3;
+	return ret;
 }
 
 WRITE16_MEMBER(dreamlif_state::portb_w)
 {
-	// some kind of EEPROM device? see above
 	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+	m_eeprom->di_write(BIT(data, 2));
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2209,6 +2217,8 @@ void dreamlif_state::dreamlif(machine_config &config)
 
 	spg2xx_base(config);
 
+	EEPROM_93C66_16BIT(config, m_eeprom); // HT93LC66A
+
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set(FUNC(dreamlif_state::portb_r));
 	m_maincpu->portb_out().set(FUNC(dreamlif_state::portb_w));
@@ -2576,7 +2586,7 @@ CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, ini
 CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",     MACHINE_IMPERFECT_SOUND )
 
 // Hasbro games
-CONS( 2005, dreamlif,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Dream Life (Version 1.0, Feb 07 2005)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, dreamlif,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Dream Life (Version 1.0, Feb 07 2005)",  MACHINE_IMPERFECT_SOUND )
 
 // Fisher-Price games
 CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
