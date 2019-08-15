@@ -113,14 +113,6 @@ if (CPUS["ARCOMPACT"]~=null) then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.h",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp",
 	}
-	dependency {
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact.cpp",       GEN_DIR .. "emu/cpu/arcompact/arcompact.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp", GEN_DIR .. "emu/cpu/arcompact/arcompact.hxx" },
-	}
-
-	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact_make.py" , GEN_DIR .. "emu/cpu/arcompact/arcompact.hxx",   { MAME_DIR .. "src/devices/cpu/arcompact/arcompact_make.py" }, {"@echo Generating ARCOMPACT source files...", PYTHON .. " $(1)  $(@)" }},
-	}
 end
 
 if (CPUS["ARCOMPACT"]~=null or _OPTIONS["with-tools"]) then
