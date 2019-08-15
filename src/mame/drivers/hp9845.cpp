@@ -713,7 +713,7 @@ WRITE_LINE_MEMBER(hp9845_base_state::prt_irl_w)
 
 INPUT_CHANGED_MEMBER(hp9845_base_state::togglekey_changed)
 {
-	uintptr_t togglekey = (uintptr_t)param;
+	uint32_t togglekey = param;
 	switch (togglekey) {
 	case 0: // Shift lock
 		{

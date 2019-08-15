@@ -403,7 +403,7 @@ INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 	/* coin insertion causes an IRQ */
 	if(newval)
 	{
-		m_coin_command_pending = (uint8_t)(uintptr_t)(param);
+		m_coin_command_pending = uint8_t(param);
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
 		    definitely doesn't expect them as it locks out the coin routine */

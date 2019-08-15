@@ -712,7 +712,7 @@ static INPUT_PORTS_START( nascom2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                            PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(']') PORT_CHAR('_')
 
 	PORT_START("DSW0")
-	PORT_DIPNAME(0x01, 0x00, "Cassette Baud Rate") PORT_CHANGED_MEMBER(DEVICE_SELF, nascom2_state, cass_speed, nullptr)
+	PORT_DIPNAME(0x01, 0x00, "Cassette Baud Rate") PORT_CHANGED_MEMBER(DEVICE_SELF, nascom2_state, cass_speed, 0)
 	PORT_DIPSETTING(0x00, "300")
 	PORT_DIPSETTING(0x01, "1200")
 

@@ -364,7 +364,7 @@ INPUT_CHANGED_MEMBER(pc100_state::key_stroke)
 {
 	if(newval != oldval)
 	{
-		m_key = ((uint8_t)(uintptr_t)(param) & 0xff);
+		m_key = uint8_t(param & 0xff);
 		if(!((newval ^ oldval) & newval))
 			m_key |= 0x80;
 		m_pic->ir3_w(1);

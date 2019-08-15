@@ -206,8 +206,8 @@ void aa310_state::aa310_mem(address_map &map)
 
 INPUT_CHANGED_MEMBER(aa310_state::key_stroke)
 {
-	uint8_t row_val = (uint8_t)(uintptr_t)(param) >> 4;
-	uint8_t col_val = (uint8_t)(uintptr_t)(param) & 0xf;
+	uint8_t row_val = uint8_t(param) >> 4;
+	uint8_t col_val = uint8_t(param) & 0xf;
 
 	if(newval && !oldval)
 		m_kart->send_keycode_down(row_val,col_val);

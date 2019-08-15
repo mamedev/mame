@@ -48,10 +48,10 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 INPUT_CHANGED_MEMBER(pc9801_kbd_device::key_stroke)
 {
 	if(newval && !oldval)
-		m_rx_buf[(uint8_t)(uintptr_t)(param) & 0x7f] = 1;
+		m_rx_buf[uint8_t(param) & 0x7f] = 1;
 
 	if(oldval && !newval)
-		m_rx_buf[(uint8_t)(uintptr_t)(param) & 0x7f] = 2;
+		m_rx_buf[uint8_t(param) & 0x7f] = 2;
 }
 
 static INPUT_PORTS_START( pc9801_kbd )

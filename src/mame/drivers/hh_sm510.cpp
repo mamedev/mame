@@ -339,7 +339,7 @@ WRITE8_MEMBER(hh_sm510_state::piezo2bit_input_w)
 namespace {
 
 #define PORT_CHANGED_CB(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, nullptr)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, 0)
 
 /***************************************************************************
 

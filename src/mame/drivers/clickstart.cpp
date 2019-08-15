@@ -197,7 +197,7 @@ void clickstart_state::uart_tx_fifo_push(uint8_t value)
 
 INPUT_CHANGED_MEMBER(clickstart_state::key_update)
 {
-	const size_t keycode = reinterpret_cast<size_t>(param);
+	const size_t keycode = static_cast<size_t>(param);
 	printf("keycode:%02x, oldval:%02x, newval:%02x\n", (uint8_t)keycode, oldval, newval);
 
 	uint8_t buffer[5] = {};

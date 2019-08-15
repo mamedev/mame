@@ -51,7 +51,7 @@ INPUT_CHANGED_MEMBER(vsmileb_state::pad_button_changed)
 	}
 	else
 	{
-		value |= (uint16_t)(uintptr_t)param;
+		value |= (uint16_t)param;
 	}
 	m_maincpu->uart_rx((uint8_t)(value >> 8));
 	m_maincpu->uart_rx((uint8_t)value);
@@ -103,9 +103,9 @@ static INPUT_PORTS_START( vsmileb )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, pad_button_changed, vsmileb_state::BUTTON_EXIT)   PORT_NAME("Exit")
 
 	PORT_START("MODE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Play Time")       PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0400>, nullptr) // three-position function switch
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Watch & Learn")   PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0800>, nullptr)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Learn & Explore") PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0c00>, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Play Time")       PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0400>, 0) // three-position function switch
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Watch & Learn")   PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0800>, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Learn & Explore") PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0c00>, 0)
 
 	PORT_START("LOGO")
 	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )

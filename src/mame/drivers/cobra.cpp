@@ -3167,7 +3167,7 @@ INPUT_CHANGED_MEMBER(cobra_state::coin_inserted)
 {
 	if(newval)
 	{
-		uint8_t coin_chute = (uint8_t)(uintptr_t)param & 1;
+		uint8_t coin_chute = (uint8_t)param & 1;
 		m_jvs1->increase_coin_counter(coin_chute);
 		m_jvs2->increase_coin_counter(coin_chute);
 		m_jvs3->increase_coin_counter(coin_chute);

@@ -70,7 +70,7 @@ INPUT_CHANGED_MEMBER(magnum_state::keypress)
 {
 	if(newval != oldval)
 	{
-		m_key = ((uint8_t)(uintptr_t)(param) & 0xff) | (m_shift->read() & 0xc ? 0 : 0x80);
+		m_key = (uint8_t)(param & 0xff) | (m_shift->read() & 0xc ? 0 : 0x80);
 		m_keybirq = true;
 		check_irq();
 	}

@@ -403,7 +403,7 @@ void cc40_state::main_map(address_map &map)
 
 INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
 {
-	init_sysram((int)(uintptr_t)param, newval << 11);
+	init_sysram((int)param, newval << 11);
 }
 
 static INPUT_PORTS_START( cc40 )

@@ -424,7 +424,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 	if (m_sensorpos != -1 || (m_inp_ui->read() & 1 && !m_inductive && !m_nosensors))
 		return;
 
-	u8 pos = (u8)(uintptr_t)param;
+	u8 pos = (u8)param;
 	u8 x = pos & 0xf;
 	u8 y = pos >> 4 & 0xf;
 	if (x >= m_width || y >= m_height)
@@ -458,7 +458,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 
 INPUT_CHANGED_MEMBER(sensorboard_device::ui_spawn)
 {
-	u8 pos = (newval) ? (u8)(uintptr_t)param : 32 - count_leading_zeros(m_inp_spawn->read());
+	u8 pos = (newval) ? (u8)param : 32 - count_leading_zeros(m_inp_spawn->read());
 	if (pos == 0 || pos > m_maxspawn)
 		return;
 
@@ -533,7 +533,7 @@ TIMER_CALLBACK_MEMBER(sensorboard_device::undo_tick)
 
 INPUT_CHANGED_MEMBER(sensorboard_device::ui_undo)
 {
-	u8 select = (u8)(uintptr_t)param;
+	u8 select = (u8)param;
 
 	if (newval)
 	{
@@ -549,7 +549,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_init)
 	if (!newval)
 		return;
 
-	u8 init = (u8)(uintptr_t)param;
+	u8 init = (u8)param;
 	cancel_sensor();
 	cancel_hand();
 

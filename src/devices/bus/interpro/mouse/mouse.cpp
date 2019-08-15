@@ -26,14 +26,14 @@ DEFINE_DEVICE_TYPE(INTERPRO_MOUSE, interpro_mouse_device, "interpro_mouse", "Int
 
 static INPUT_PORTS_START(interpro_mouse)
 	PORT_START("mouse_buttons")
-	PORT_BIT(interpro_mouse_device::MOUSE_LBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, nullptr)
-	PORT_BIT(interpro_mouse_device::MOUSE_MBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, nullptr)
-	PORT_BIT(interpro_mouse_device::MOUSE_RBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, nullptr)
+	PORT_BIT(interpro_mouse_device::MOUSE_LBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, 0)
+	PORT_BIT(interpro_mouse_device::MOUSE_MBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, 0)
+	PORT_BIT(interpro_mouse_device::MOUSE_RBUTTON, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_button, 0)
 
 	PORT_START("mouse_x")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_x, nullptr)
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_x, 0)
 	PORT_START("mouse_y")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_y, nullptr)
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_y, 0)
 INPUT_PORTS_END
 
 interpro_mouse_port_device::interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)

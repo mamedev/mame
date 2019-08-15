@@ -3133,7 +3133,7 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 	if (!newval)
 		return;
 
-	int val = (uint8_t)(uintptr_t)param;
+	int val = (uint8_t)param;
 	switch (val)
 	{
 	case VGMPLAY_STOP:

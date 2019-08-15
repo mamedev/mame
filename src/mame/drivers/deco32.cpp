@@ -952,7 +952,7 @@ void dragngun_state::lightgun_w(offs_t offset, u32 data)
 
 INPUT_CHANGED_MEMBER( dragngun_state::lockload_gun_trigger )
 {
-	switch ((u8)(uintptr_t)param)
+	switch (param)
 	{
 	case 0: m_deco_irq->lightgun1_trigger_w(!newval); break;
 	case 1: m_deco_irq->lightgun2_trigger_w(!newval); break;

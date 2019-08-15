@@ -106,7 +106,7 @@ void blockade_state::main_io_map(address_map &map)
 
 static INPUT_PORTS_START( blockade )
 	PORT_START("coin")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, blockade_state, coin_inserted, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, blockade_state, coin_inserted, 0)
 
 	// These are not dip switches, they are mapped to connectors on the board.  Different games
 	// had different harnesses which plugged in here, and some pins were unused.

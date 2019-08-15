@@ -186,7 +186,7 @@ static INPUT_PORTS_START( octo )
 	PORT_INCLUDE( presto )
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, octo_state, octo_cpu_freq, nullptr) // factory set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, octo_state, octo_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "12MHz" )
 	PORT_CONFSETTING(    0x01, "15MHz" )
 INPUT_PORTS_END
