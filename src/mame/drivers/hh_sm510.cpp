@@ -1837,7 +1837,9 @@ ROM_END
   * lcd screen with custom segments, 1-bit sound
 
   This is the wide screen version, there's also a silver version.
-  Also copied by Elektronika as "Space Bridge", with different LCD.
+  
+  In 1989 Elektronika(USSR) release a clone: Space Bridge. This game shares
+  the same ROM, though the graphics are slightly different.
 
 ***************************************************************************/
 
@@ -1848,6 +1850,7 @@ public:
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
+	void spacebridge(machine_config &config);
 	void gnw_fire(machine_config &config);
 };
 
@@ -1904,6 +1907,25 @@ void gnw_fire_state::gnw_fire(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void gnw_fire_state::spacebridge(machine_config & config)
+{
+	gnw_fire(config);
+
+	/* basic machine hardware */
+	KB1013VK12(config.replace(), m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device *screen = subdevice<screen_device>("screen");
+	screen->set_size(1673, 1080);
+	screen->set_visarea_full();
+}
+
 // roms
 
 ROM_START( gnw_fire )
@@ -1912,6 +1934,14 @@ ROM_START( gnw_fire )
 
 	ROM_REGION( 163753, "screen", 0)
 	ROM_LOAD( "gnw_fire.svg", 0, 163753, CRC(d546fa42) SHA1(492c785aa0ed33ff1ac8c84066e5b6d7cb7d1566) )
+ROM_END
+
+ROM_START( spacebridge )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "spacebridge.bin", 0x0000, 0x0740, CRC(f4c53ef0) SHA1(6b57120a0f9d2fd4dcd65ad57a5f32def71d905f) )
+
+	ROM_REGION( 124408, "screen", 0)
+	ROM_LOAD( "spacebridge.svg", 0, 124408, CRC(4d1c770a) SHA1(ba9c88f2a6e65e60bed692eaea3c6be4142ecf93) )
 ROM_END
 
 
@@ -9634,6 +9664,7 @@ CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_sta
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_fire,    0,          0, gnw_fire,    gnw_fire,    gnw_fire_state,    empty_init, "Nintendo", "Game & Watch: Fire (wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, spacebridge, gnw_fire,   0, spacebridge, gnw_fire,    gnw_fire_state,    empty_init, "Elektronika", "Space Bridge", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_tbridge, 0,          0, gnw_tbridge, gnw_tbridge, gnw_tbridge_state, empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_fireatk, 0,          0, gnw_fireatk, gnw_fireatk, gnw_fireatk_state, empty_init, "Nintendo", "Game & Watch: Fire Attack", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_stennis, 0,          0, gnw_stennis, gnw_stennis, gnw_stennis_state, empty_init, "Nintendo", "Game & Watch: Snoopy Tennis", MACHINE_SUPPORTS_SAVE )
