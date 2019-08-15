@@ -61,7 +61,7 @@ int uniflex_format::find_size(io_generic *io, uint32_t form_factor)
 	uint16_t swap_size = pick_integer_be(sir, 0x3f, 2);
 
 	LOG_FORMATS("UniFLEX floppy dsk size %d\n", (uint32_t)size);
-	LOG_FORMATS(" time = %lu %lu\n", pick_integer_be(sir, 0x08, 4), pick_integer_be(sir, 0x0c, 4));
+	LOG_FORMATS(" time = %u %u\n", (uint32_t) pick_integer_be(sir, 0x08, 4), (uint32_t) pick_integer_be(sir, 0x0c, 4));
 	LOG_FORMATS(" fdn_block_count: %d\n", fdn_block_count);
 
 	LOG_FORMATS(" file system name: ");
