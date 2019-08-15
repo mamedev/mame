@@ -376,6 +376,7 @@ public:
 
 	void dreamlif(machine_config &config);
 
+private:
 	DECLARE_READ16_MEMBER(portb_r);
 	DECLARE_WRITE16_MEMBER(portb_w);
 
@@ -1606,21 +1607,14 @@ INPUT_PORTS_END
 READ16_MEMBER(dreamlif_state::portb_r)
 {
 	uint16_t ret = 0x0000;
-
 	logerror("%s: portb_r\n", machine().describe_context());
-
 	ret |= m_eeprom->do_read() << 3;
-
 	return ret;
-
-
 }
 
 WRITE16_MEMBER(dreamlif_state::portb_w)
 {
-	// some kind of EEPROM device? see above
 	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
-
 	m_eeprom->di_write(BIT(data, 2));
 	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
