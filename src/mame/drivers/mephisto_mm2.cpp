@@ -4,7 +4,7 @@
  Mephisto 4 + 5 Chess Computer
  2007 Dirk V.
 
-CPU 65C02 P4
+CPU 65C02 P4 (also seen: R65C02P3, G65SC02P-4)
 Clock 4.9152 MHz
 NMI CLK 600 Hz
 IRQ Line is set to VSS
@@ -91,6 +91,8 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
 	void rebel5(machine_config &config);
 	void mm4tk(machine_config &config);
 	void mm2(machine_config &config);
@@ -125,11 +127,13 @@ private:
 
 WRITE8_MEMBER(mephisto_state::write_lcd)
 {
-	if (m_led7 == 0) m_digits[m_lcd_shift_counter] = data;  // 0x109 MM IV // 0x040 MM V
+	if (m_led7 == 0)
+		m_digits[m_lcd_shift_counter] = data; // 0x109 MM IV // 0x040 MM V
 
-	//m_digits[m_lcd_shift_counter] = data ^ m_p_ram[0x165];    // 0x109 MM IV // 0x040 MM V
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
+
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(mephisto_state::mephisto_NMI)
@@ -150,7 +154,6 @@ READ8_MEMBER(mephisto_state::read_keys)
 		data = m_key2[offset]->read();
 	}
 
-	//logerror("Keyboard Port = %d-%d Data = %d\n  ", !m_outlatch->q7_r() ? 0 : 1, offset, data);
 	return data | 0x7f;
 }
 
@@ -161,7 +164,7 @@ WRITE_LINE_MEMBER(mephisto_state::write_led7)
 
 void mephisto_state::rebel5_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).ram();                        // AM_BASE(m_p_ram)
+	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2007).w("outlatch", FUNC(hc259_device::write_d7));           // Status LEDs+ buzzer
 	map(0x3000, 0x4000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x3000, 0x3007).r(FUNC(mephisto_state::read_keys));            // Rebel 5.0
@@ -174,7 +177,7 @@ void mephisto_state::rebel5_mem(address_map &map)
 
 void mephisto_state::mephisto_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).ram(); //AM_BASE(m_p_ram)
+	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2000).w(FUNC(mephisto_state::write_lcd));
 	map(0x2400, 0x2407).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
@@ -188,7 +191,7 @@ void mephisto_state::mephisto_mem(address_map &map)
 
 void mephisto_state::mm2_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).ram(); //AM_BASE(m_p_ram)
+	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7));       //Status LEDs
 	map(0x1800, 0x1807).r(FUNC(mephisto_state::read_keys));
 	map(0x2000, 0x2000).r("board", FUNC(mephisto_board_device::input_r));
@@ -234,6 +237,10 @@ static INPUT_PORTS_START( mephisto )
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("C / 3 / Bishop") PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
 	PORT_START("KEY2_7") //Port $2c0f
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("D / 4 / Rook") PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mephisto_state, reset_button, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mephisto_state, reset_button, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bup )
@@ -270,6 +277,10 @@ static INPUT_PORTS_START( bup )
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LEV") PORT_CODE(KEYCODE_L)
 	PORT_START("KEY2_7")
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("MEM") PORT_CODE(KEYCODE_M)
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mephisto_state, reset_button, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mephisto_state, reset_button, 0)
 INPUT_PORTS_END
 
 
@@ -294,16 +305,23 @@ void mephisto_state::machine_start()
 	save_item(NAME(m_lcd_shift_counter));
 	save_item(NAME(m_led7));
 	save_item(NAME(m_allowNMI));
-
-	m_lcd_shift_counter = 3;
-	m_allowNMI = 1;
-	m_led7 = 0xff;
 }
 
 void mephisto_state::machine_reset()
 {
 	m_lcd_shift_counter = 3;
 	m_allowNMI = 1;
+	m_led7 = 0xff;
+}
+
+INPUT_CHANGED_MEMBER(mephisto_state::reset_button)
+{
+	// RES buttons in serial tied to CPU RESET
+	if (ioport("RESET")->read() == 3)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		machine_reset();
+	}
 }
 
 
@@ -359,8 +377,8 @@ void mephisto_state::mm2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mm2_mem);
 
 	config.device_remove("nmi_timer");
-	const attotime irq_period = attotime::from_hz(7.3728_MHz_XTAL / 0x4000); // 450Hz(4020 Q14, TLow = ~22us)
-	m_maincpu->set_periodic_int(FUNC(mephisto_state::irq0_line_hold), irq_period);
+	const attotime irq_period = attotime::from_hz(7.3728_MHz_XTAL / 2 / 0x2000); // 450Hz from 4020 Q13
+	m_maincpu->set_periodic_int(FUNC(mephisto_state::irq0_line_assert), irq_period);
 
 	m_outlatch->q_out_cb<7>().set(FUNC(mephisto_state::write_led7)).invert();
 }
