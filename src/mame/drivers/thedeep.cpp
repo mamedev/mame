@@ -6,16 +6,20 @@
 
                     driver by   Luca Elia (l.elia@tin.it)
 
-Main CPU    :   Z80 (LH0080B @ 6MHz) + i8751 (Intel C8751H-88, protection)
 
-Sound CPU   :   65C02 (R65C02P2 @ 2MHz)
+Board       :   DE-0298-1
 
-Sound Chips :   YM2203C
+Main CPU    :   Z80 (LH0080B @ 6MHz) + i8751 (Intel C8751H-88 @ 8MHz, protection)
+
+Sound CPU   :   65C02 (R65C02P2 @ 1.5MHz)
+
+Sound Chips :   YM2203C (@ 3MHz)
 
 Video Chips :   L7B0073 DATA EAST MXC 06 8746
                 L7A0072 DATA EAST BAC 06 VAE8713
 
-Board       :   DE-0298-1
+XTAL        :   12.000MHz, 8.000MHz
+
 
 Notes:
 
@@ -23,6 +27,9 @@ Notes:
   It additionally provides some z80 code that is copied to ram.
 
 - One ROM (FI-1) is not used.
+
+NOTE: There is manual for Run Deep which is (c) 1988 by World Games. Is Cream Co, Ltd
+      the legitimate license and World Games the US distributors?
 
 ***************************************************************************/
 
@@ -388,24 +395,6 @@ void thedeep_state::thedeep(machine_config &config)
 
 ***************************************************************************/
 
-/***************************************************************************
-
-Here are the proms for The Deep!
-NOTE: This game is Vertical.
-I couldn't test this board so I don't know the manufacturer, sorry.
-1 Z80
-1 R6502
-1 YM 2203
-1 OSC 12 Mhz
-1 OSC 8 Mhz
-1 MPU 8751 (which is read-protected)
-
-If you need more info or if this package doesn't
-Work, mail me.
-
-..............CaBBe!...................................
-
-***************************************************************************/
 
 ROM_START( thedeep )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* Z80 Code */
@@ -471,5 +460,5 @@ ROM_START( rundeep )
 	ROM_LOAD( "fi-3", 0x400, 0x200, CRC(f61a9686) SHA1(24082f60b72268d240ceca6999bdf18872625cd2) )
 ROM_END
 
-GAME( 1987, thedeep, 0,       thedeep, thedeep, thedeep_state, empty_init, ROT270, "Wood Place Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rundeep, thedeep, thedeep, thedeep, thedeep_state, empty_init, ROT270, "bootleg (Cream)", "Run Deep",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thedeep, 0,       thedeep, thedeep, thedeep_state, empty_init, ROT270, "Woodplace Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rundeep, thedeep, thedeep, thedeep, thedeep_state, empty_init, ROT270, "Cream Co, Ltd.", "Run Deep",         MACHINE_SUPPORTS_SAVE )
