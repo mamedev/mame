@@ -84,7 +84,7 @@ Notes:
       054986A - Audio DAC/filter + sound latch + Z80 memory mapper/banker (large ceramic SDIP64 module)
                 This module contains several surface mounted capacitors and resistors, 4558 OP amp,
                 Analog Devices AD1868 dual 18-bit audio DAC and a Konami 054321 QFP44 IC. Clock input 8.000MHz [32/4]
-      054983  - MMI PAL16L8
+      055983  - MMI PAL16L8
       056371  - MMI PAL20L10
 
       Sync Measurements
