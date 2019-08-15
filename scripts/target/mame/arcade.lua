@@ -3069,6 +3069,7 @@ files {
 	MAME_DIR .. "src/mame/video/punchout.cpp",
 	MAME_DIR .. "src/mame/drivers/famibox.cpp",
 	MAME_DIR .. "src/mame/drivers/sfcbox.cpp",
+	MAME_DIR .. "src/mame/drivers/snesb51.cpp",
 	MAME_DIR .. "src/mame/drivers/snesb.cpp",
 	MAME_DIR .. "src/mame/drivers/spacefb.cpp",
 	MAME_DIR .. "src/mame/includes/spacefb.h",
