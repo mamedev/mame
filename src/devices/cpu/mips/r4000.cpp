@@ -20,7 +20,6 @@
  *   - it's very very very slow
  *
  * TODO
- *   - find a better way to deal with software interrupts
  *   - enforce mode checks for cp1
  *   - cache instructions
  *   - check/improve instruction timing
@@ -257,18 +256,18 @@ std::unique_ptr<util::disasm_interface> r4000_base_device::create_disassembler()
 
 void r4000_base_device::execute_run()
 {
-	// check interrupts
-	if ((CAUSE & SR & CAUSE_IP) && (SR & SR_IE) && !(SR & (SR_EXL | SR_ERL)))
-		cpu_exception(EXCEPTION_INT);
-
-	while (m_icount > 0)
+	while (m_icount-- > 0)
 	{
 		debugger_instruction_hook(m_pc);
 
 		fetch(m_pc,
 			[this](u32 const op)
 			{
-				cpu_execute(op);
+				// check interrupts
+				if ((CAUSE & SR & CAUSE_IP) && (SR & SR_IE) && !(SR & (SR_EXL | SR_ERL)))
+					cpu_exception(EXCEPTION_INT);
+				else
+					cpu_execute(op);
 
 				// zero register zero
 				m_r[0] = 0;
@@ -300,8 +299,6 @@ void r4000_base_device::execute_run()
 			m_pc += 8;
 			break;
 		}
-
-		m_icount--;
 	}
 }
 
@@ -1408,19 +1405,11 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 	case CP0_Status:
 		m_cp0[CP0_Status] = u32(data) & ~u32(0x01a80000);
 
-		// FIXME: software interrupt check
-		if (CAUSE & SR & SR_IMSW)
-			m_icount = 0;
-
 		if (data & SR_RE)
 			fatalerror("unimplemented reverse endian mode enabled (%s)\n", machine().describe_context().c_str());
 		break;
 	case CP0_Cause:
 		m_cp0[CP0_Cause] = (m_cp0[CP0_Cause] & ~CAUSE_IPSW) | (data & CAUSE_IPSW);
-
-		// FIXME: software interrupt check
-		if (CAUSE & SR & SR_IMSW)
-			m_icount = 0;
 		break;
 	case CP0_EPC:
 		m_cp0[CP0_EPC] = data;
