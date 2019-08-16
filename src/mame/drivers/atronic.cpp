@@ -15,6 +15,9 @@
 
  see parts list with IC Money description below
 
+ some of these fill up the log with 
+ BLMOVE with unaligned src and aligned dst
+
 */
 
 
