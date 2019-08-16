@@ -317,22 +317,21 @@ public:
 	{ }
 
 	void icanguit(machine_config &config);
-	void icanpian(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_icanguit);
 
 	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_READ16_MEMBER(portc_r);
-	DECLARE_WRITE16_MEMBER(porta_w);
-	DECLARE_WRITE16_MEMBER(portb_w);
-	DECLARE_WRITE16_MEMBER(portc_w);
+	virtual DECLARE_WRITE16_MEMBER(porta_w);
 
-	DECLARE_WRITE16_MEMBER(guit_porta_w);
+	virtual DECLARE_READ16_MEMBER(portb_r);
+	virtual DECLARE_WRITE16_MEMBER(portb_w);
+
+	DECLARE_READ16_MEMBER(portc_r);
+	DECLARE_WRITE16_MEMBER(portc_w);
 
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
@@ -342,6 +341,25 @@ private:
 	optional_ioport_array<6> m_porta_in;
 	optional_ioport_array<6> m_portc_in;
 
+};
+
+class icanpian_state : public icanguit_state
+{
+public:
+	icanpian_state(const machine_config &mconfig, device_type type, const char *tag)
+		: icanguit_state(mconfig, type, tag)
+	//	, m_eeprom(*this, "eeprom")
+	{ }
+
+	void icanpian(machine_config &config);
+
+protected:
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+
+	virtual DECLARE_READ16_MEMBER(portb_r) override;
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+
+	//optional_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 class tvgogo_state : public spg2xx_game_state
@@ -1624,63 +1642,36 @@ WRITE16_MEMBER(dreamlif_state::portb_w)
 
 READ16_MEMBER(icanguit_state::porta_r)
 {
-	//logerror("%s: porta_r\n", machine().describe_context());
+	logerror("%s: porta_r\n", machine().describe_context());
 	return m_inlatch_a;
 }
 
 
 READ16_MEMBER(icanguit_state::portc_r)
 {
-	//logerror("%s: portc_r\n", machine().describe_context());
+	logerror("%s: portc_r\n", machine().describe_context());
 	return m_inlatch_c;
 }
 
-WRITE16_MEMBER(icanguit_state::porta_w)
-{
-	if (data == 0x0000)
-	{
-		m_inlatch_a = m_inlatch_c = 0x0000;
-	}
-	else if (data == 0x1000)
-	{
-		m_inlatch_a = m_porta_in[2]->read();
-		m_inlatch_c = m_portc_in[2]->read();
-	}
-	else if (data == 0x2000)
-	{
-		m_inlatch_a = m_porta_in[1]->read();
-		m_inlatch_c = m_portc_in[1]->read();
-	}
-	else if (data == 0x4000)
-	{
-		m_inlatch_a = m_porta_in[0]->read();
-		m_inlatch_c = m_portc_in[0]->read();
-	}
-	else
-	{
-		logerror("%s: unknown porta_w (%04x)\n", machine().describe_context(), data);
-	}
-}
 
 WRITE16_MEMBER(icanguit_state::portc_w)
 {
-	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
+	logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
 }
 
 
-// portb is used on startup, something serial?
 READ16_MEMBER(icanguit_state::portb_r)
 {
-	//logerror("%s: portb_r\n", machine().describe_context());
+	logerror("%s: portb_r\n", machine().describe_context());
 	return m_io_p2->read();
 }
 
 WRITE16_MEMBER(icanguit_state::portb_w)
 {
-	//logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(icanguit_state::guit_porta_w)
+WRITE16_MEMBER(icanguit_state::porta_w)
 {
 	//logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
 
@@ -1724,7 +1715,57 @@ WRITE16_MEMBER(icanguit_state::guit_porta_w)
 	}
 }
 
+// icanpian differences
 
+WRITE16_MEMBER(icanpian_state::porta_w)
+{
+	if (data == 0x0000)
+	{
+		m_inlatch_a = m_inlatch_c = 0x0000;
+	}
+	else if (data == 0x1000)
+	{
+		m_inlatch_a = m_porta_in[2]->read();
+		m_inlatch_c = m_portc_in[2]->read();
+	}
+	else if (data == 0x2000)
+	{
+		m_inlatch_a = m_porta_in[1]->read();
+		m_inlatch_c = m_portc_in[1]->read();
+	}
+	else if (data == 0x4000)
+	{
+		m_inlatch_a = m_porta_in[0]->read();
+		m_inlatch_c = m_portc_in[0]->read();
+	}
+	else
+	{
+		logerror("%s: unknown porta_w (%04x)\n", machine().describe_context(), data);
+	}
+}
+
+// accesses are made for what appears to be a serial eeprom on port B, very similar to dreamlif, but beyond blanking it at the start it doesn't
+// seem to ever be used, maybe it was never added to hardware, or just never used?
+READ16_MEMBER(icanpian_state::portb_r)
+{
+/*
+	uint16_t ret = 0x0000;
+	logerror("%s: portbxx_r\n", machine().describe_context());
+	ret |= m_eeprom->do_read() ? 0xffff : 0x0000;
+	return ret;
+*/
+	return 0x0000;
+}
+
+WRITE16_MEMBER(icanpian_state::portb_w)
+{
+/*
+	logerror("%s: portbxx_w (%04x)\n", machine().describe_context(), data);
+	m_eeprom->di_write(BIT(data, 2));
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+*/
+}
 
 void icanguit_state::machine_start()
 {
@@ -1959,10 +2000,10 @@ void icanguit_state::icanguit(machine_config &config)
 	spg2xx_base(config);
 
 	m_maincpu->porta_in().set(FUNC(icanguit_state::porta_r));
+	m_maincpu->porta_out().set(FUNC(icanguit_state::porta_w));
 	m_maincpu->portb_in().set(FUNC(icanguit_state::portb_r));
-	m_maincpu->portc_in().set(FUNC(icanguit_state::portc_r));
-	m_maincpu->porta_out().set(FUNC(icanguit_state::guit_porta_w));
 	m_maincpu->portb_out().set(FUNC(icanguit_state::portb_w));
+	m_maincpu->portc_in().set(FUNC(icanguit_state::portc_r));
 	m_maincpu->portc_out().set(FUNC(icanguit_state::portc_w));
 
 
@@ -1974,23 +2015,27 @@ void icanguit_state::icanguit(machine_config &config)
 	SOFTWARE_LIST(config, "icanguit_cart").set_original("icanguit");
 }
 
-void icanguit_state::icanpian(machine_config &config)
+void icanpian_state::icanpian(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &icanguit_state::mem_map_4m);
+	m_maincpu->set_addrmap(AS_PROGRAM, &icanpian_state::mem_map_4m);
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_in().set(FUNC(icanguit_state::porta_r));
-	m_maincpu->portb_in().set(FUNC(icanguit_state::portb_r));
-	m_maincpu->portc_in().set(FUNC(icanguit_state::portc_r));
-	m_maincpu->porta_out().set(FUNC(icanguit_state::porta_w));
-	m_maincpu->portb_out().set(FUNC(icanguit_state::portb_w));
-	m_maincpu->portc_out().set(FUNC(icanguit_state::portc_w));
+	m_maincpu->porta_in().set(FUNC(icanpian_state::porta_r));
+	m_maincpu->porta_out().set(FUNC(icanpian_state::porta_w));
+	m_maincpu->portb_in().set(FUNC(icanpian_state::portb_r));
+	m_maincpu->portb_out().set(FUNC(icanpian_state::portb_w));
+	m_maincpu->portc_in().set(FUNC(icanpian_state::portc_r));
+	m_maincpu->portc_out().set(FUNC(icanpian_state::portc_w));
+
+//	EEPROM_93C66_16BIT(config, m_eeprom); // unknown part
+//	m_eeprom->erase_time(attotime::from_usec(1));
+//	m_eeprom->write_time(attotime::from_usec(1));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanpian_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(icanguit_state::cart_load_icanguit), this);
+	m_cart->set_device_load(FUNC(icanpian_state::cart_load_icanguit), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "icanpian_cart").set_original("icanpian");
@@ -2589,8 +2634,8 @@ CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, emp
 CONS( 2005, dreamlif,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Dream Life (Version 1.0, Feb 07 2005)",  MACHINE_IMPERFECT_SOUND )
 
 // Fisher-Price games
-CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Piano",  MACHINE_IMPERFECT_SOUND ) // 2006 date from Manual
+CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_init, "Fisher-Price", "I Can Play Guitar",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // how is data saved?
+CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanpian_state, empty_init, "Fisher-Price", "I Can Play Piano",  MACHINE_IMPERFECT_SOUND ) // 2006 date from Manual
 
 // Toyquest games
 CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "TV Go Go",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
