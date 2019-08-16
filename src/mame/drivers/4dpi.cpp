@@ -22,6 +22,7 @@
 ****************************************************************************/
 /*
  * Sources:
+ *   - http://bitsavers.org/pdf/sgi/personal_iris/VME-Eclipse_CPU_VIP10_Specification.pdf
  *   - http://www.bitsavers.org/pdf/sgi/personal_iris/SGI_IP-6_Schematic.pdf
  *   - http://www.futuretech.blinkenlights.nl/pitechrep.html
  *   - https://hardware.majix.org/computers/sgi.pi/index.shtml
@@ -30,13 +31,16 @@
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/sgimips/
  *
  * TODO:
- *   - IOC1 and CTL1
- *   - graphics, audio
+ *   - graphics, audio, printer
+ *   - devicify ioc1 and ctl1
  *
  * Status:
  *   - parity and cache diagnostics fail
- *   - boots monitor and fx/sash from cdrom or network
- *   - hangs after booting irix from miniroot
+ *   - irix 4.0.5 working
+ *   - ide test failures
+ *     - lca2 (unimplemented fpga program/readback)
+ *     - nvram4 (security mode?)
+ *     - fpu (cvt.?.? invalid operation exceptions)
  */
 
 #include "emu.h"
@@ -136,7 +140,7 @@ private:
 	enum sysid_mask : u8
 	{
 		SYSID_SERDATA = 0x01, // serial memory data output state
-		SYSID_FPPRES  = 0x02, // floating point processor present (active low?)
+		SYSID_FPPRES  = 0x02, // floating point processor present (active low)
 		SYSID_SERCLK  = 0x04, // serial memory clock
 		SYSID_VMEFBT  = 0x04, // vme fast bus timeout
 		SYSID_GDMAERR = 0x08, // error in graphics dma
@@ -499,8 +503,8 @@ void pi4d2x_state::common(machine_config &config)
 
 	PIT8254(config, m_pit);
 	m_pit->set_clk<2>(3.6864_MHz_XTAL);
-	m_pit->out_handler<0>().set_inputline(m_cpu, INPUT_LINE_IRQ2);
-	m_pit->out_handler<1>().set_inputline(m_cpu, INPUT_LINE_IRQ4);
+	m_pit->out_handler<0>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ2, 1); });
+	m_pit->out_handler<1>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ4, 1); });
 	m_pit->out_handler<2>().set(m_pit, FUNC(pit8254_device::write_clk0));
 	m_pit->out_handler<2>().append(m_pit, FUNC(pit8254_device::write_clk1));
 
