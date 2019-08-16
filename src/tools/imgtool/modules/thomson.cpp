@@ -1522,6 +1522,102 @@ thom_basic_specialchar(imgtool::stream::ptr &src,
 	/* invalid data */
 }
 
+struct {
+	const char *utf8;
+	const char *thom;
+} special_chars[] = {
+	{ "\xc2\xa3", "\x16" "#" }, /* £ */
+	{ "$", "\x16" "$" },
+	{ "#", "\x16" "&" },
+	{ "\xe2\x86\x90", "\x16" "," }, /* arrow left */
+	{ "\xe2\x86\x91", "\x16" "-" }, /* arrow up */
+	{ "\xe2\x86\x92", "\x16" "." }, /* arrow right */
+	{ "\xe2\x86\x93", "\x16" "/" }, /* arrow down */
+	{ "\xc2\xb0", "\x16" "0" }, /* ° */
+	{ "\xc2\xb1", "\x16" "1" }, /* ± */
+	{ "\xc3\xb7", "\x16" "8" }, /* ÷ */
+	{ "\xc2\xbc", "\x16" "<" }, /* ¼ */
+	{ "\xc2\xbd", "\x16" "=" }, /* ½ */
+	{ "\xc2\xbe", "\x16" ">" }, /* ¾ */
+	{ "\xc5\x92", "\x16" "j" }, /* Œ */
+	{ "\xc5\x93", "\x16" "z" }, /* œ */
+	{ "\xc3\x9f", "\x16" "{" }, /* ß */
+	{ "\xc2\xa7", "\x16" "'" }, /* § */
+
+	/* accent grave */
+	{ "\xc3\xa0", "\x16" "Aa" },
+	{ "\xc3\xa8", "\x16" "Ae" },
+	{ "\xc3\xac", "\x16" "Ai" },
+	{ "\xc3\xb2", "\x16" "Ao" },
+	{ "\xc3\xb9", "\x16" "Au" },
+	{ "\xc3\x80", "\x16" "AA" },
+	{ "\xc3\x88", "\x16" "AE" },
+	{ "\xc3\x8c", "\x16" "AI" },
+	{ "\xc3\x92", "\x16" "AO" },
+	{ "\xc3\x99", "\x16" "AU" },
+
+	/* accent acute */
+	{ "\xc3\xa1", "\x16" "Ba" },
+	{ "\xc3\xa9", "\x16" "Be" },
+	{ "\xc3\xad", "\x16" "Bi" },
+	{ "\xc3\xb3", "\x16" "Bo" },
+	{ "\xc3\xba", "\x16" "Bu" },
+	{ "\xc3\x81", "\x16" "BA" },
+	{ "\xc3\x89", "\x16" "BE" },
+	{ "\xc3\x8d", "\x16" "BI" },
+	{ "\xc3\x93", "\x16" "BO" },
+	{ "\xc3\x9a", "\x16" "BU" },
+
+	/* circumflex */
+	{ "\xc3\xa2", "\x16" "Ca" },
+	{ "\xc3\xaa", "\x16" "Ce" },
+	{ "\xc3\xae", "\x16" "Ci" },
+	{ "\xc3\xb4", "\x16" "Co" },
+	{ "\xc3\xbb", "\x16" "Cu" },
+	{ "\xc3\x82", "\x16" "CA" },
+	{ "\xc3\x8a", "\x16" "CE" },
+	{ "\xc3\x8e", "\x16" "CI" },
+	{ "\xc3\x94", "\x16" "CO" },
+	{ "\xc3\x9b", "\x16" "CU" },
+
+	/* umlaut */
+	{ "\xc3\xa4", "\x16" "Ha" },
+	{ "\xc3\xab", "\x16" "He" },
+	{ "\xc3\xaf", "\x16" "Hi" },
+	{ "\xc3\xb6", "\x16" "Ho" },
+	{ "\xc3\xbc", "\x16" "Hu" },
+	{ "\xc3\x84", "\x16" "HA" },
+	{ "\xc3\x8b", "\x16" "HE" },
+	{ "\xc3\x8f", "\x16" "HI" },
+	{ "\xc3\x96", "\x16" "HO" },
+	{ "\xc3\x9c", "\x16" "HU" },
+
+	/* cedilla */
+	{ "\xc3\xa7", "\x16" "Kc" },
+	{ "\xc3\x87", "\x16" "KC" },
+
+	{ NULL, NULL }
+};
+
+static bool thom_basic_is_specialchar(const char *buf,
+					int *pos,
+					const char **thom)
+{
+	int i;
+
+	for (i = 0; special_chars[i].utf8 != NULL; i++)
+	{
+		if (!strncmp(&buf[*pos], special_chars[i].utf8, strlen(special_chars[i].utf8)))
+		{
+			*pos += strlen(special_chars[i].utf8);
+			*thom = special_chars[i].thom;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /* untokenization automatically decrypt protected files */
 static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 						const char *name,
@@ -1726,6 +1822,11 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition &partition,
 					if (token_shift != 0)
 						mem_stream->write(&token_shift, 1);
 					mem_stream->write(&token_value, 1);
+				}
+				else if (thom_basic_is_specialchar(buf, &pos, &token))
+				{
+					/* emit the escaped accent */
+					mem_stream->write(token, strlen(token));
 				}
 				else
 				{
