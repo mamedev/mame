@@ -313,7 +313,6 @@ private:
 
 	DECLARE_READ32_MEMBER(FlipCount_r);
 	DECLARE_WRITE32_MEMBER(FlipCount_w);
-	DECLARE_WRITE32_MEMBER(IntAck_w);
 	template<int Which> DECLARE_WRITE32_MEMBER(Timer_w);
 	template<int Which> DECLARE_READ32_MEMBER(Timer_r);
 	template<int Which> DECLARE_READ32_MEMBER(DMA_r);
@@ -353,17 +352,47 @@ private:
 	void crzyddz2_mem(address_map &map);
 	void internal_map(address_map &map);
 	void trivrus_mem(address_map &map);
+
+	// To move into SoC own device
+	uint32_t m_inten;
+	DECLARE_READ32_MEMBER(inten_r);
+	DECLARE_WRITE32_MEMBER(inten_w);
+
+	DECLARE_READ32_MEMBER(intvec_r);
+	DECLARE_WRITE32_MEMBER(intvec_w);
+	
+	uint32_t m_intst;
+	DECLARE_READ32_MEMBER(intst_r);
+	DECLARE_WRITE32_MEMBER(intst_w);
 };
 
-void crystal_state::IntReq( int num )
+READ32_MEMBER( crystal_state::inten_r )
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint32_t IntEn = space.read_dword(0x01800c08);
-	uint32_t IntPend = space.read_dword(0x01800c0c);
-	if (IntEn & (1 << num))
+	return m_inten;
+}
+
+WRITE32_MEMBER( crystal_state::inten_w )
+{
+	COMBINE_DATA(&m_inten);
+	// ...
+}
+
+READ32_MEMBER( crystal_state::intst_r )
+{
+	return m_intst;
+}
+
+WRITE32_MEMBER( crystal_state::intst_w )
+{
+	// TODO: contradicts with documentation, games writes to this?
+	// ...
+}
+
+void crystal_state::IntReq( int num )
+{	
+	if (m_inten & (1 << num))
 	{
-		IntPend |= (1 << num);
-		space.write_dword(0x01800c0c, IntPend);
+		m_intst |= (1 << num);
 		m_maincpu->set_input_line(SE3208_INT, ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
@@ -375,9 +404,8 @@ void crystal_state::IntReq( int num )
 READ32_MEMBER(crystal_state::FlipCount_r)
 {
 #ifdef IDLE_LOOP_SPEEDUP
-	uint32_t IntPend = space.read_dword(0x01800c0c);
 	m_FlipCntRead++;
-	if (m_FlipCntRead >= 16 && !IntPend && m_FlipCount != 0)
+	if (m_FlipCntRead >= 16 && !m_intst && m_FlipCount != 0)
 		m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
 #endif
 	return ((uint32_t) m_FlipCount) << 16;
@@ -395,15 +423,17 @@ WRITE32_MEMBER(crystal_state::FlipCount_w)
 	}
 }
 
-WRITE32_MEMBER(crystal_state::IntAck_w)
+READ32_MEMBER(crystal_state::intvec_r)
 {
-	uint32_t IntPend = space.read_dword(0x01800c0c);
+	return (m_IntHigh & 7) << 8;
+}
 
+WRITE32_MEMBER(crystal_state::intvec_w)
+{
 	if (ACCESSING_BITS_0_7)
 	{
-		IntPend &= ~(1 << (data & 0x1f));
-		space.write_dword(0x01800c0c, IntPend);
-		if (!IntPend)
+		m_intst &= ~(1 << (data & 0x1f));
+		if (!m_intst)
 			m_maincpu->set_input_line(SE3208_INT, CLEAR_LINE);
 	}
 	if (ACCESSING_BITS_8_15)
@@ -412,12 +442,9 @@ WRITE32_MEMBER(crystal_state::IntAck_w)
 
 IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint32_t IntPend = space.read_dword(0x01800c0c);
-
 	for (int i = 0; i < 32; ++i)
 	{
-		if (BIT(IntPend, i))
+		if (BIT(m_intst, i))
 		{
 			return (m_IntHigh << 5) | i;
 		}
@@ -662,7 +689,9 @@ void crystal_state::internal_map(address_map &map)
 	map(0x01800800, 0x01800803).rw(FUNC(crystal_state::DMA_r<0>), FUNC(crystal_state::DMA_w<0>));
 	map(0x01800810, 0x01800813).rw(FUNC(crystal_state::DMA_r<1>), FUNC(crystal_state::DMA_w<1>));
 //  map(0x01800c00, 0x01800fff)                            // Interrupt Controller
-	map(0x01800c04, 0x01800c07).w(FUNC(crystal_state::IntAck_w));
+	map(0x01800c04, 0x01800c07).rw(FUNC(crystal_state::intvec_r), FUNC(crystal_state::intvec_w));
+	map(0x01800c08, 0x01800c0b).rw(FUNC(crystal_state::inten_r), FUNC(crystal_state::inten_w));
+	map(0x01800c0c, 0x01800c0f).rw(FUNC(crystal_state::intst_r), FUNC(crystal_state::intst_w));
 //  map(0x01801000, 0x018013ff)                            // UART
 //  map(0x01801400, 0x018017ff)                            // Timer & Counter
 	map(0x01801400, 0x01801403).rw(FUNC(crystal_state::Timer_r<0>), FUNC(crystal_state::Timer_w<0>));
