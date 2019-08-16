@@ -27,6 +27,7 @@
 
 #include <ctype.h>
 #include <cstring>
+#include <unordered_set>
 #include <queue>
 #include <future>
 
@@ -36,11 +37,59 @@
 
 
 //**************************************************************************
+//  ANONYMOUS NAMESPACE PROTOTYPES
+//**************************************************************************
+
+namespace
+{
+	class device_type_compare
+	{
+	public:
+		bool operator()(const std::add_pointer_t<device_type> &lhs, const std::add_pointer_t<device_type> &rhs) const;
+	};
+
+	typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
+
+	std::string normalize_string(const char *string);
+
+	// internal helper
+	void output_header(std::ostream &out, bool dtd);
+	void output_footer(std::ostream &out);
+
+	void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes);
+	void output_sampleof(std::ostream &out, device_t &device);
+	void output_bios(std::ostream &out, device_t const &device);
+	void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device);
+	void output_device_refs(std::ostream &out, device_t &root);
+	void output_sample(std::ostream &out, device_t &device);
+	void output_chips(std::ostream &out, device_t &device, const char *root_tag);
+	void output_display(std::ostream &out, device_t &device, machine_flags::type const *flags, const char *root_tag);
+	void output_sound(std::ostream &out, device_t &device);
+	void output_ioport_condition(std::ostream &out, const ioport_condition &condition, unsigned indent);
+	void output_input(std::ostream &out, const ioport_list &portlist);
+	void output_switches(std::ostream &out, const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag);
+	void output_ports(std::ostream &out, const ioport_list &portlist);
+	void output_adjusters(std::ostream &out, const ioport_list &portlist);
+	void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect);
+	void output_features(std::ostream &out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect);
+	void output_images(std::ostream &out, device_t &device, const char *root_tag);
+	void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
+	void output_software_list(std::ostream &out, device_t &root);
+	void output_ramoptions(std::ostream &out, device_t &root);
+
+	void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag);
+	void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter);
+
+	const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes);
+};
+
+
+//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 // DTD string describing the data
-const char info_xml_creator::s_dtd_string[] =
+static const char s_dtd_string[] =
 "<!DOCTYPE __XML_ROOT__ [\n"
 "<!ELEMENT __XML_ROOT__ (__XML_TOP__+)>\n"
 "\t<!ATTLIST __XML_ROOT__ build CDATA #IMPLIED>\n"
@@ -204,35 +253,6 @@ const char info_xml_creator::s_dtd_string[] =
 //**************************************************************************
 
 //-------------------------------------------------
-//  normalize_string
-//-------------------------------------------------
-
-static std::string normalize_string(const char *string)
-{
-	std::ostringstream stream;
-
-	if (string != nullptr)
-	{
-		while (*string)
-		{
-			switch (*string)
-			{
-			case '\"': stream << "&quot;"; break;
-			case '&': stream << "&amp;"; break;
-			case '<': stream << "&lt;"; break;
-			case '>': stream << "&gt;"; break;
-			default:
-				stream << *string;
-				break;
-			}
-			++string;
-		}
-	}
-	return stream.str();
-}
-
-
-//-------------------------------------------------
 //  info_xml_creator - constructor
 //-------------------------------------------------
 
@@ -324,7 +344,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 	{
 		if (!header_outputted)
 		{
-			output_header(out);
+			output_header(out, m_dtd);
 			header_outputted = true;
 		}
 	};
@@ -352,7 +372,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 			else if (!filter || filter(drivlist.driver().name, filter_done))
 			{
 				const game_driver &driver(drivlist.driver());
-				std::future<prepared_info> future_pi = std::async(std::launch::async, [this, &drivlist, &driver, &devfilter]
+				std::future<prepared_info> future_pi = std::async(std::launch::async, [&drivlist, &driver, &devfilter]
 				{
 					prepared_info result;
 					std::ostringstream stream;
@@ -402,11 +422,47 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 	if (include_devices && (!devfilter || !devfilter->empty()))
 	{
 		output_header_if_necessary(out);
-		output_devices(out, devfilter.get());
+		output_devices(out, m_lookup_options, devfilter.get());
 	}
 
 	if (header_outputted)
 		output_footer(out);
+}
+
+
+//**************************************************************************
+//  ANONYMOUS NAMESPACE IMPLEMENTATION
+//**************************************************************************
+
+namespace
+{
+
+//-------------------------------------------------
+//  normalize_string
+//-------------------------------------------------
+
+std::string normalize_string(const char *string)
+{
+	std::ostringstream stream;
+
+	if (string != nullptr)
+	{
+		while (*string)
+		{
+			switch (*string)
+			{
+			case '\"': stream << "&quot;"; break;
+			case '&': stream << "&amp;"; break;
+			case '<': stream << "&lt;"; break;
+			case '>': stream << "&gt;"; break;
+			default:
+				stream << *string;
+				break;
+			}
+			++string;
+		}
+	}
+	return stream.str();
 }
 
 
@@ -415,9 +471,9 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 //  the root element
 //-------------------------------------------------
 
-void info_xml_creator::output_header(std::ostream &out)
+void output_header(std::ostream &out, bool dtd)
 {
-	if (m_dtd)
+	if (dtd)
 	{
 		// output the DTD
 		out << "<?xml version=\"1.0\"?>\n";
@@ -446,7 +502,7 @@ void info_xml_creator::output_header(std::ostream &out)
 //  output_header - close the root element
 //-------------------------------------------------
 
-void info_xml_creator::output_footer(std::ostream &out)
+void output_footer(std::ostream &out)
 {
 	// close the top level tag
 	out << util::string_format("</%s>\n", XML_ROOT);
@@ -458,7 +514,7 @@ void info_xml_creator::output_footer(std::ostream &out)
 //  for one particular machine driver
 //-------------------------------------------------
 
-void info_xml_creator::output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes)
+void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes)
 {
 	machine_config config(driver, drivlist.options());
 	device_iterator iter(config.root_device());
@@ -576,7 +632,7 @@ void info_xml_creator::output_one(std::ostream &out, driver_enumerator &drivlist
 //  a single device
 //-------------------------------------------------
 
-void info_xml_creator::output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag)
+void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag)
 {
 	bool has_speaker = false, has_input = false;
 	// check if the device adds speakers to the system
@@ -641,12 +697,12 @@ void info_xml_creator::output_one_device(std::ostream &out, machine_config &conf
 //  registered device types
 //-------------------------------------------------
 
-void info_xml_creator::output_devices(std::ostream &out, device_type_set const *filter)
+void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter)
 {
 	// get config for empty machine
-	machine_config config(GAME_NAME(___empty), m_lookup_options);
+	machine_config config(GAME_NAME(___empty), lookup_options);
 
-	auto const action = [this, &config, &out] (device_type type)
+	auto const action = [&config, &out] (device_type type)
 			{
 				// add it at the root of the machine config
 				device_t *dev;
@@ -683,7 +739,7 @@ void info_xml_creator::output_devices(std::ostream &out, device_type_set const *
 //  subdevice, print a reference
 //-------------------------------------------------
 
-void info_xml_creator::output_device_refs(std::ostream &out, device_t &root)
+void output_device_refs(std::ostream &out, device_t &root)
 {
 	for (device_t &device : device_iterator(root))
 		if (&device != &root)
@@ -696,7 +752,7 @@ void info_xml_creator::output_device_refs(std::ostream &out, device_t &root)
 //  attribute, if appropriate
 //-------------------------------------------------
 
-void info_xml_creator::output_sampleof(std::ostream &out, device_t &device)
+void output_sampleof(std::ostream &out, device_t &device)
 {
 	// iterate over sample devices
 	for (samples_device &samples : samples_device_iterator(device))
@@ -717,7 +773,7 @@ void info_xml_creator::output_sampleof(std::ostream &out, device_t &device)
 //  output_bios - print BIOS sets for a device
 //-------------------------------------------------
 
-void info_xml_creator::output_bios(std::ostream &out, device_t const &device)
+void output_bios(std::ostream &out, device_t const &device)
 {
 	// first determine the default BIOS name
 	char const *defaultname(nullptr);
@@ -746,7 +802,7 @@ void info_xml_creator::output_bios(std::ostream &out, device_t const &device)
 //  the XML output
 //-------------------------------------------------
 
-void info_xml_creator::output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device)
+void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device)
 {
 	enum class type { BIOS, NORMAL, DISK };
 	std::map<u32, char const *> biosnames;
@@ -881,7 +937,7 @@ void info_xml_creator::output_rom(std::ostream &out, driver_enumerator *drivlist
 //  samples referenced by a game_driver
 //-------------------------------------------------
 
-void info_xml_creator::output_sample(std::ostream &out, device_t &device)
+void output_sample(std::ostream &out, device_t &device)
 {
 	// iterate over sample devices
 	for (samples_device &samples : samples_device_iterator(device))
@@ -906,7 +962,7 @@ void info_xml_creator::output_sample(std::ostream &out, device_t &device)
     sound chips used by a game
 -------------------------------------------------*/
 
-void info_xml_creator::output_chips(std::ostream &out, device_t &device, const char *root_tag)
+void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 {
 	// iterate over executable devices
 	for (device_execute_interface &exec : execute_interface_iterator(device))
@@ -950,7 +1006,7 @@ void info_xml_creator::output_chips(std::ostream &out, device_t &device, const c
 //  displays
 //-------------------------------------------------
 
-void info_xml_creator::output_display(std::ostream &out, device_t &device, machine_flags::type const *flags, const char *root_tag)
+void output_display(std::ostream &out, device_t &device, machine_flags::type const *flags, const char *root_tag)
 {
 	// iterate over screens
 	for (const screen_device &screendev : screen_device_iterator(device))
@@ -1036,7 +1092,7 @@ void info_xml_creator::output_display(std::ostream &out, device_t &device, machi
 //  speakers
 //------------------------------------------------
 
-void info_xml_creator::output_sound(std::ostream &out, device_t &device)
+void output_sound(std::ostream &out, device_t &device)
 {
 	speaker_device_iterator spkiter(device);
 	int speakers = spkiter.count();
@@ -1055,7 +1111,7 @@ void info_xml_creator::output_sound(std::ostream &out, device_t &device)
 //  required to use I/O port field/setting
 //-------------------------------------------------
 
-void info_xml_creator::output_ioport_condition(std::ostream &out, const ioport_condition &condition, unsigned indent)
+void output_ioport_condition(std::ostream &out, const ioport_condition &condition, unsigned indent)
 {
 	for (unsigned i = 0; indent > i; ++i)
 		out << '\t';
@@ -1080,7 +1136,7 @@ void info_xml_creator::output_ioport_condition(std::ostream &out, const ioport_c
 //  input
 //-------------------------------------------------
 
-void info_xml_creator::output_input(std::ostream &out, const ioport_list &portlist)
+void output_input(std::ostream &out, const ioport_list &portlist)
 {
 	// enumerated list of control types
 	// NOTE: the order is chosen so that 'spare' button inputs are assigned to the
@@ -1574,7 +1630,7 @@ void info_xml_creator::output_input(std::ostream &out, const ioport_list &portli
 //  DIP switch settings
 //-------------------------------------------------
 
-void info_xml_creator::output_switches(std::ostream &out, const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag)
+void output_switches(std::ostream &out, const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag)
 {
 	// iterate looking for DIP switches
 	for (auto &port : portlist)
@@ -1627,7 +1683,7 @@ void info_xml_creator::output_switches(std::ostream &out, const ioport_list &por
 //  output_ports - print the structure of input
 //  ports in the driver
 //-------------------------------------------------
-void info_xml_creator::output_ports(std::ostream &out, const ioport_list &portlist)
+void output_ports(std::ostream &out, const ioport_list &portlist)
 {
 	// cycle through ports
 	for (auto &port : portlist)
@@ -1648,7 +1704,7 @@ void info_xml_creator::output_ports(std::ostream &out, const ioport_list &portli
 //  Adjusters for a game
 //-------------------------------------------------
 
-void info_xml_creator::output_adjusters(std::ostream &out, const ioport_list &portlist)
+void output_adjusters(std::ostream &out, const ioport_list &portlist)
 {
 	// iterate looking for Adjusters
 	for (auto &port : portlist)
@@ -1664,7 +1720,7 @@ void info_xml_creator::output_adjusters(std::ostream &out, const ioport_list &po
 //  output_driver - print driver status
 //-------------------------------------------------
 
-void info_xml_creator::output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect)
+void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect)
 {
 	out << "\t\t<driver";
 
@@ -1711,7 +1767,7 @@ void info_xml_creator::output_driver(std::ostream &out, game_driver const &drive
 //
 //-------------------------------------------------
 
-void info_xml_creator::output_features(std::ostream &out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect)
+void output_features(std::ostream &out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect)
 {
 	static constexpr std::pair<device_t::feature_type, char const *> features[] = {
 			{ device_t::feature::PROTECTION,    "protection"    },
@@ -1766,7 +1822,7 @@ void info_xml_creator::output_features(std::ostream &out, device_type type, devi
 //  image devices
 //-------------------------------------------------
 
-void info_xml_creator::output_images(std::ostream &out, device_t &device, const char *root_tag)
+void output_images(std::ostream &out, device_t &device, const char *root_tag)
 {
 	for (const device_image_interface &imagedev : image_interface_iterator(device))
 	{
@@ -1826,7 +1882,7 @@ void info_xml_creator::output_images(std::ostream &out, device_t &device, const 
 //  output_slots - prints all info about slots
 //-------------------------------------------------
 
-void info_xml_creator::output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes)
+void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes)
 {
 	for (device_slot_interface &slot : slot_interface_iterator(device))
 	{
@@ -1879,7 +1935,7 @@ void info_xml_creator::output_slots(std::ostream &out, machine_config &config, d
 //  for all known software lists for this system
 //-------------------------------------------------
 
-void info_xml_creator::output_software_list(std::ostream &out, device_t &root)
+void output_software_list(std::ostream &out, device_t &root)
 {
 	for (const software_list_device &swlist : software_list_device_iterator(root))
 	{
@@ -1897,7 +1953,7 @@ void info_xml_creator::output_software_list(std::ostream &out, device_t &root)
 //  options for this system
 //-------------------------------------------------
 
-void info_xml_creator::output_ramoptions(std::ostream &out, device_t &root)
+void output_ramoptions(std::ostream &out, device_t &root)
 {
 	for (const ram_device &ram : ram_device_iterator(root, 1))
 	{
@@ -1931,7 +1987,7 @@ void info_xml_creator::output_ramoptions(std::ostream &out, device_t &root)
 //  parent set
 //-------------------------------------------------
 
-const char *info_xml_creator::get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes)
+const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes)
 {
 	// walk the parent chain
 	for (int clone_of = drivlist.find(driver.parent); 0 <= clone_of; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
@@ -1957,7 +2013,9 @@ const char *info_xml_creator::get_merge_name(driver_enumerator &drivlist, const 
 //  device_type_compare::operator()
 //-------------------------------------------------
 
-bool info_xml_creator::device_type_compare::operator()(const std::add_pointer_t<device_type> &lhs, const std::add_pointer_t<device_type> &rhs) const
+bool device_type_compare::operator()(const std::add_pointer_t<device_type> &lhs, const std::add_pointer_t<device_type> &rhs) const
 {
 	return strcmp(lhs->shortname(), rhs->shortname()) < 0;
+}
+
 }
