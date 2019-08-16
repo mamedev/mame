@@ -160,7 +160,7 @@ void jazz_mct_adr_device::device_reset()
 	m_isr = 0;
 	m_imr = 0; // 0x10;
 
-	m_interval_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
+	m_interval_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 }
 
 void jazz_mct_adr_device::set_irq_line(int irq, int state)
@@ -211,12 +211,12 @@ void jazz_mct_adr_device::imr_w(u16 data)
 
 TIMER_CALLBACK_MEMBER(jazz_mct_adr_device::interval_timer)
 {
-	//m_out_int_timer(CLEAR_LINE);
-	if (!m_out_int_timer_asserted)
-	{
+	if (m_out_int_timer_asserted)
+		m_out_int_timer(0);
+	else
 		m_out_int_timer_asserted = true;
-		m_out_int_timer(1);
-	}
+
+	m_out_int_timer(1);
 }
 
 void jazz_mct_adr_device::set_drq_line(int channel, int state)
