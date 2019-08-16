@@ -1386,6 +1386,142 @@ void filter_thomcrypt_getinfo(uint32_t state, union filterinfo *info)
 	}
 }
 
+static void
+thom_accent_grave(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'a': dst.printf("\xc3\xa0"); break;
+	case 'e': dst.printf("\xc3\xa8"); break;
+	case 'i': dst.printf("\xc3\xac"); break;
+	case 'o': dst.printf("\xc3\xb2"); break;
+	case 'u': dst.printf("\xc3\xb9"); break;
+	case 'A': dst.printf("\xc3\x80"); break;
+	case 'E': dst.printf("\xc3\x88"); break;
+	case 'I': dst.printf("\xc3\x8c"); break;
+	case 'O': dst.printf("\xc3\x92"); break;
+	case 'U': dst.printf("\xc3\x99"); break;
+	default: break; /* invalid data */
+	}
+}
+
+static void
+thom_accent_acute(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'a': dst.printf("\xc3\xa1"); break;
+	case 'e': dst.printf("\xc3\xa9"); break;
+	case 'i': dst.printf("\xc3\xad"); break;
+	case 'o': dst.printf("\xc3\xb3"); break;
+	case 'u': dst.printf("\xc3\xba"); break;
+	case 'A': dst.printf("\xc3\x81"); break;
+	case 'E': dst.printf("\xc3\x89"); break;
+	case 'I': dst.printf("\xc3\x8d"); break;
+	case 'O': dst.printf("\xc3\x93"); break;
+	case 'U': dst.printf("\xc3\x9a"); break;
+	default: break;
+	}
+}
+
+static void
+thom_accent_circ(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'a': dst.printf("\xc3\xa2"); break;
+	case 'e': dst.printf("\xc3\xaa"); break;
+	case 'i': dst.printf("\xc3\xae"); break;
+	case 'o': dst.printf("\xc3\xb4"); break;
+	case 'u': dst.printf("\xc3\xbb"); break;
+	case 'A': dst.printf("\xc3\x82"); break;
+	case 'E': dst.printf("\xc3\x8a"); break;
+	case 'I': dst.printf("\xc3\x8e"); break;
+	case 'O': dst.printf("\xc3\x94"); break;
+	case 'U': dst.printf("\xc3\x9b"); break;
+	default: break; /* invalid data */
+	}
+}
+
+static void
+thom_accent_uml(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'a': dst.printf("\xc3\xa4"); break;
+	case 'e': dst.printf("\xc3\xab"); break;
+	case 'i': dst.printf("\xc3\xaf"); break;
+	case 'o': dst.printf("\xc3\xb6"); break;
+	case 'u': dst.printf("\xc3\xbc"); break;
+	case 'A': dst.printf("\xc3\x84"); break;
+	case 'E': dst.printf("\xc3\x8b"); break;
+	case 'I': dst.printf("\xc3\x8f"); break;
+	case 'O': dst.printf("\xc3\x96"); break;
+	case 'U': dst.printf("\xc3\x9c"); break;
+	default: break; /* invalid data */
+	}
+}
+
+static void
+thom_accent_cedil(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'c': dst.printf("\xc3\xa7"); break;
+	case 'C': dst.printf("\xc3\x87"); break;
+	default: break; /* invalid data */
+	}
+}
+
+static void
+thom_basic_specialchar(imgtool::stream::ptr &src,
+			imgtool::stream &dst,
+			uint8_t c)
+{
+	uint8_t l;
+
+	/* special characters */
+	switch ( c ) {
+	case '#': dst.printf("\xc2\xa3"); return;  /* pound */
+	case '$': dst.printf("$"); return;  /* dollar */
+	case '&': dst.printf("#"); return;  /* diesis */
+	case ',': dst.printf("\xe2\x86\x90"); return;  /* arrow left */
+	case '-': dst.printf("\xe2\x86\x91"); return;  /* arrow up */
+	case '.': dst.printf("\xe2\x86\x92"); return;  /* arrow right */
+	case '/': dst.printf("\xe2\x86\x93"); return;  /* arrow down */
+	case '0': dst.printf("\xc2\xb0"); return; /* ° */
+	case '1': dst.printf("\xc2\xb1"); return; /* ± */
+	case '8': dst.printf("\xc3\xb7"); return; /* ÷ */
+	case '<': dst.printf("\xc2\xbc"); return; /* ¼ */
+	case '=': dst.printf("\xc2\xbd"); return; /* ½ */
+	case '>': dst.printf("\xc2\xbe"); return; /* ¾ */
+	case 'j': dst.printf("\xc5\x92"); return; /* Œ */
+	case 'z': dst.printf("\xc5\x93"); return; /* œ */
+	case '{': dst.printf("\xc3\x9f"); return; /* ß */
+	case '\'': dst.printf("\xc2\xa7"); return; /* § */
+	case 'A':
+	case 'B':
+	case 'C':
+	case 'H':
+	case 'K': break; /* accents */
+	default: return; /* invalid data */
+	}
+
+	if ( src->read(&l, 1 ) < 1 ) return;
+
+	/* accents */
+	switch ( c ) {
+	case 'A': thom_accent_grave(dst, l); return;
+	case 'B': thom_accent_acute(dst, l); return;
+	case 'C': thom_accent_circ(dst, l); return;
+	case 'H': thom_accent_uml(dst, l); return;
+	case 'K': thom_accent_cedil(dst, l); return;
+	default: break;
+	}
+
+	/* invalid data */
+}
+
 /* untokenization automatically decrypt protected files */
 static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 						const char *name,
@@ -1444,6 +1580,14 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 					const char* token = table[ in_fun ][ c - 0x80 ];
 					if ( token ) dst.puts(token );
 					else dst.puts("???" );
+				}
+				else if ( c == '\x16' )
+				{
+					uint64_t l;
+					l = org->tell();
+					if ( org->read(&c, 1 ) < 1 ) break;
+					thom_basic_specialchar(org, dst, c);
+					i += org->tell() - l; /* update i */
 				}
 				else
 				{
