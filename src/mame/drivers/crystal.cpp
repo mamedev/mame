@@ -231,6 +231,7 @@ GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
 #include "cpu/se3208/se3208.h"
 #include "machine/ds1302.h"
 #include "machine/nvram.h"
+#include "machine/eepromser.h"
 #include "sound/vrender0.h"
 #include "video/vrender0.h"
 #include "emupal.h"
@@ -258,7 +259,8 @@ public:
 		m_vr0vid(*this, "vr0vid"),
 		m_vr0snd(*this, "vr0snd"),
 		m_ds1302(*this, "rtc"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	void init_topbladv();
@@ -293,6 +295,7 @@ private:
 	required_device<vr0sound_device> m_vr0snd;
 	required_device<ds1302_device> m_ds1302;
 	required_device<screen_device> m_screen;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 #ifdef IDLE_LOOP_SPEEDUP
 	uint8_t     m_FlipCntRead;
@@ -303,38 +306,28 @@ private:
 	uint8_t     m_FlipCount;
 	uint8_t     m_IntHigh;
 	uint32_t    m_FlashCmd;
-	uint32_t    m_PIO;
-	uint32_t    m_DMActrl[2];
 	uint8_t     m_OldPort4;
 
 	DECLARE_READ32_MEMBER(FlipCount_r);
 	DECLARE_WRITE32_MEMBER(FlipCount_w);
-	template<int Which> DECLARE_READ32_MEMBER(DMA_r);
-	template<int Which> DECLARE_WRITE32_MEMBER(DMA_w);
 	DECLARE_READ32_MEMBER(crtc_r);
 	DECLARE_WRITE32_MEMBER(crtc_w);
 	void crtc_update();
 
 	DECLARE_READ32_MEMBER(system_input_r);
 	DECLARE_WRITE32_MEMBER(Banksw_w);
-	DECLARE_READ32_MEMBER(PIO_r);
-	DECLARE_WRITE32_MEMBER(PIO_w);
 	DECLARE_READ32_MEMBER(FlashCmd_r);
 	DECLARE_WRITE32_MEMBER(FlashCmd_w);
 
 	DECLARE_READ8_MEMBER(trivrus_input_r);
 	DECLARE_WRITE8_MEMBER(trivrus_input_w);
 	uint8_t m_trivrus_input;
-
 	DECLARE_READ32_MEMBER(crzyddz2_key_r);
-	DECLARE_WRITE32_MEMBER(crzyddz2_PIO_w);
-	uint8_t m_crzyddz2_prot;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	inline void DMA_w( address_space &space, int which, uint32_t data, uint32_t mem_mask );
 	void PatchReset(  );
 	uint16_t GetVidReg( address_space &space, uint16_t reg );
 	void SetVidReg( address_space &space, uint16_t reg, uint16_t val );
@@ -371,6 +364,33 @@ private:
 	uint16_t m_timer_count[4];
 	emu_timer  *m_Timer[4];
 	void TimerStart(int which);
+	
+	// DMAC
+	template<int Which> DECLARE_READ32_MEMBER(dmac_r);
+	template<int Which> DECLARE_WRITE32_MEMBER(dmac_w);
+	template<int Which> DECLARE_READ32_MEMBER(dmatc_r);
+	template<int Which> DECLARE_WRITE32_MEMBER(dmatc_w);
+	template<int Which> DECLARE_READ32_MEMBER(dmasa_r);
+	template<int Which> DECLARE_WRITE32_MEMBER(dmasa_w);
+	template<int Which> DECLARE_READ32_MEMBER(dmada_r);
+	template<int Which> DECLARE_WRITE32_MEMBER(dmada_w);
+
+	struct {
+		uint32_t src;
+		uint32_t dst;
+		uint32_t size;
+		uint32_t ctrl;
+	}m_dma[2];
+	
+	// PIO
+	DECLARE_READ32_MEMBER(PIOldat_r);
+	DECLARE_WRITE32_MEMBER(PIOldat_w);
+	DECLARE_READ32_MEMBER(PIOedat_r);
+	uint32_t    m_PIO;
+	DECLARE_WRITE32_MEMBER(crzyddz2_PIOldat_w);
+	DECLARE_READ32_MEMBER(crzyddz2_PIOedat_r);
+	uint8_t m_crzyddz2_prot;
+
 };
 
 /*
@@ -535,21 +555,25 @@ WRITE16_MEMBER(crystal_state::tmcnt_w)
 	COMBINE_DATA(&m_timer_count[Which]);
 }
 
+template<int Which> READ32_MEMBER(crystal_state::dmasa_r) { return m_dma[Which].src; }
+template<int Which> WRITE32_MEMBER(crystal_state::dmasa_w) { COMBINE_DATA(&m_dma[Which].src); }
+template<int Which> READ32_MEMBER(crystal_state::dmada_r) { return m_dma[Which].dst; }
+template<int Which> WRITE32_MEMBER(crystal_state::dmada_w) { COMBINE_DATA(&m_dma[Which].dst); }
+template<int Which> READ32_MEMBER(crystal_state::dmatc_r) { return m_dma[Which].size; }
+template<int Which> WRITE32_MEMBER(crystal_state::dmatc_w) { COMBINE_DATA(&m_dma[Which].size); }
+template<int Which> READ32_MEMBER(crystal_state::dmac_r) { return m_dma[Which].ctrl; }
 template<int Which>
-READ32_MEMBER(crystal_state::DMA_r)
+WRITE32_MEMBER(crystal_state::dmac_w)
 {
-	return m_DMActrl[Which];
-}
-
-template<int Which>
-WRITE32_MEMBER(crystal_state::DMA_w)
-{
-	if (((data ^ m_DMActrl[Which]) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
+	if (((data ^ m_dma[Which].ctrl) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
 	{
 		uint32_t const CTR = data;
-		uint32_t const SRC = space.read_dword(0x01800804 + Which * 0x10);
-		uint32_t const DST = space.read_dword(0x01800808 + Which * 0x10);
-		uint32_t const CNT = space.read_dword(0x0180080C + Which * 0x10);
+		uint32_t const SRC = m_dma[Which].src;
+		uint32_t const DST = m_dma[Which].dst;
+		uint32_t const CNT = m_dma[Which].size;
+
+		if ((CTR & 0xfc) != 0)
+			popmessage("DMA%d with unhandled mode %02x, contact MAMEdev",Which,CTR);
 
 		if (CTR & 0x2)  //32 bits
 		{
@@ -576,10 +600,11 @@ WRITE32_MEMBER(crystal_state::DMA_w)
 			}
 		}
 		data &= ~(1 << 10);
-		space.write_dword(0x0180080C + Which * 0x10, 0);
+		// TODO: insta-DMA
+		m_dma[Which].size = 0;
 		IntReq(7 + Which);
 	}
-	COMBINE_DATA(&m_DMActrl[Which]);
+	COMBINE_DATA(&m_dma[Which].ctrl);
 }
 
 READ32_MEMBER(crystal_state::crtc_r)
@@ -708,8 +733,15 @@ void crystal_state::internal_map(address_map &map)
 //  map(0x01800000, 0x018003ff)                            // System/General
 //  map(0x01800400, 0x018007ff)                            // Local Memory Controller
 //  map(0x01800800, 0x01800bff)                            // DMA
-	map(0x01800800, 0x01800803).rw(FUNC(crystal_state::DMA_r<0>), FUNC(crystal_state::DMA_w<0>));
-	map(0x01800810, 0x01800813).rw(FUNC(crystal_state::DMA_r<1>), FUNC(crystal_state::DMA_w<1>));
+	map(0x01800800, 0x01800803).rw(FUNC(crystal_state::dmac_r<0>), FUNC(crystal_state::dmac_w<0>));
+	map(0x01800804, 0x01800807).rw(FUNC(crystal_state::dmasa_r<0>), FUNC(crystal_state::dmasa_w<0>));
+	map(0x01800808, 0x0180080b).rw(FUNC(crystal_state::dmada_r<0>), FUNC(crystal_state::dmada_w<0>));
+	map(0x0180080c, 0x0180080f).rw(FUNC(crystal_state::dmatc_r<0>), FUNC(crystal_state::dmatc_w<0>));
+	map(0x01800810, 0x01800813).rw(FUNC(crystal_state::dmac_r<1>), FUNC(crystal_state::dmac_w<1>));
+	map(0x01800814, 0x01800817).rw(FUNC(crystal_state::dmasa_r<1>), FUNC(crystal_state::dmasa_w<1>));
+	map(0x01800818, 0x0180081b).rw(FUNC(crystal_state::dmada_r<1>), FUNC(crystal_state::dmada_w<1>));
+	map(0x0180081c, 0x0180081f).rw(FUNC(crystal_state::dmatc_r<1>), FUNC(crystal_state::dmatc_w<1>));
+
 //  map(0x01800c00, 0x01800fff)                            // Interrupt Controller
 	map(0x01800c04, 0x01800c07).rw(FUNC(crystal_state::intvec_r), FUNC(crystal_state::intvec_w));
 	map(0x01800c08, 0x01800c0b).rw(FUNC(crystal_state::inten_r), FUNC(crystal_state::inten_w));
@@ -765,12 +797,13 @@ WRITE32_MEMBER(crystal_state::Banksw_w)
 	m_mainbank->set_entry(m_Bank);
 }
 
-READ32_MEMBER(crystal_state::PIO_r)
+READ32_MEMBER(crystal_state::PIOldat_r)
 {
 	return m_PIO;
 }
 
-WRITE32_MEMBER(crystal_state::PIO_w)
+// PIO Latched output DATa Register
+WRITE32_MEMBER(crystal_state::PIOldat_w)
 {
 	uint32_t RST = data & 0x01000000;
 	uint32_t CLK = data & 0x02000000;
@@ -780,12 +813,13 @@ WRITE32_MEMBER(crystal_state::PIO_w)
 	m_ds1302->io_w(DAT ? 1 : 0);
 	m_ds1302->sclk_w(CLK ? 1 : 0);
 
-	if (m_ds1302->io_r())
-		space.write_dword(0x01802008, space.read_dword(0x01802008) | 0x10000000);
-	else
-		space.write_dword(0x01802008, space.read_dword(0x01802008) & (~0x10000000));
-
 	COMBINE_DATA(&m_PIO);
+}
+
+// PIO External DATa Register
+READ32_MEMBER(crystal_state::PIOedat_r)
+{
+	return m_ds1302->io_r() << 28;
 }
 
 READ32_MEMBER(crystal_state::FlashCmd_r)
@@ -827,7 +861,8 @@ void crystal_state::crystal_mem(address_map &map)
 	map(0x01280000, 0x01280003).w(FUNC(crystal_state::Banksw_w));
 	map(0x01400000, 0x0140ffff).ram().share("nvram");
 
-	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIO_r), FUNC(crystal_state::PIO_w));
+	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIOldat_r), FUNC(crystal_state::PIOldat_w));
+	map(0x01802008, 0x0180200b).r(FUNC(crystal_state::PIOedat_r));
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
 
@@ -878,7 +913,8 @@ void crystal_state::trivrus_mem(address_map &map)
 //  0x0150001c & 0x000000ff = year - 2000
 	map(0x01600000, 0x01607fff).ram().share("nvram");
 
-	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIO_r), FUNC(crystal_state::PIO_w));
+	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIOldat_r), FUNC(crystal_state::PIOldat_w));
+	map(0x01802008, 0x0180200b).r(FUNC(crystal_state::PIOedat_r));
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
 
@@ -904,11 +940,18 @@ void crystal_state::crospuzl_mem(address_map &map)
 }
 
 // Crazy Dou Di Zhu II
-// To do: HY04 (pic?) protection
+// To do: HY04 (pic?) protection, 93C46 hookup
 
-WRITE32_MEMBER(crystal_state::crzyddz2_PIO_w)
+WRITE32_MEMBER(crystal_state::crzyddz2_PIOldat_w)
 {
 	COMBINE_DATA(&m_PIO);
+	//uint32_t RST = data & 0x01000000;
+	//uint32_t CLK = data & 0x02000000;
+	//uint32_t DAT = data & 0x10000000;
+
+//	m_eeprom->cs_write(RST ? 1 : 0);
+//	m_eeprom->di_write(DAT ? 1 : 0);
+//	m_eeprom->clk_write(CLK ? 1 : 0);
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -919,6 +962,11 @@ WRITE32_MEMBER(crystal_state::crzyddz2_PIO_w)
 			logerror("%s: PIO = %08x, prot = %02x\n", machine().describe_context(), m_PIO, m_crzyddz2_prot);
 		}
 	}
+}
+
+READ32_MEMBER(crystal_state::crzyddz2_PIOedat_r)
+{
+	return 0;//m_eeprom->do_read();
 }
 
 READ32_MEMBER(crystal_state::crzyddz2_key_r)
@@ -954,7 +1002,8 @@ void crystal_state::crzyddz2_mem(address_map &map)
 	map(0x01500000, 0x01500003).portr("P1_P2");
 	map(0x01500004, 0x01500007).r(FUNC(crystal_state::crzyddz2_key_r));
 
-	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIO_r), FUNC(crystal_state::crzyddz2_PIO_w));
+	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIOldat_r), FUNC(crystal_state::crzyddz2_PIOldat_w));
+	map(0x01802008, 0x0180200b).r(FUNC(crystal_state::crzyddz2_PIOedat_r));
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
 
@@ -1051,7 +1100,8 @@ void crystal_state::machine_start()
 	save_item(NAME(m_IntHigh));
 	save_item(NAME(m_FlashCmd));
 	save_item(NAME(m_PIO));
-	save_item(NAME(m_DMActrl));
+	save_item(NAME(m_dma[0].ctrl));
+	save_item(NAME(m_dma[1].ctrl));
 	save_item(NAME(m_OldPort4));
 	save_item(NAME(m_trivrus_input));
 }
@@ -1070,8 +1120,8 @@ void crystal_state::machine_reset()
 	m_FlashCmd = 0xff;
 	m_OldPort4 = 0;
 
-	m_DMActrl[0] = 0;
-	m_DMActrl[1] = 0;
+	m_dma[0].ctrl = 0;
+	m_dma[1].ctrl = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -1665,6 +1715,8 @@ void crystal_state::crzyddz2(machine_config &config)
 {
 	crystal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::crzyddz2_mem);
+	
+	EEPROM_93C46_16BIT(config, "eeprom");
 }
 
 #define CRYSBIOS \
@@ -2046,7 +2098,7 @@ void crystal_state::init_psattack()
 void crystal_state::init_maldaiza()
 {
 	//uint16_t *Rom = (uint16_t*)memregion("flash")->base();
-
+	// ...
 }
 
 
@@ -2061,7 +2113,7 @@ GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,  
 GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Crazy Dou Di Zhu II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, empty_init,    ROT0, "AGT",                 "Trivia R Us (v1.07)", 0 )
 GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, empty_init,    ROT0, "<unknown>",           "Cross Puzzle", MACHINE_NOT_WORKING )
-GAME( 200?, wulybuly, crysbios, crystal,  crystal,  crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // hangs during POST, also there's no PIC protection
+GAME( 200?, wulybuly, crysbios, crystal,  crystal,  crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // hangs during POST, with no PIC protection so ...?
 GAME( 200?, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "<unknown>",           "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) 
 
 GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, init_psattack, ROT0, "Uniana",              "P's Attack", MACHINE_IS_SKELETON ) // has a CF card instead of flash roms
