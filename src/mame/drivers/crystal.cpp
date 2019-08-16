@@ -247,8 +247,8 @@ class crystal_state : public driver_device
 public:
 	crystal_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_sysregs(*this, "sysregs"),
 		m_workram(*this, "workram"),
+		m_crtcregs(*this, "crtcregs"),
 		m_vidregs(*this, "vidregs"),
 		m_textureram(*this, "textureram"),
 		m_frameram(*this, "frameram"),
@@ -278,9 +278,8 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<uint32_t> m_sysregs;
-	uint32_t *m_crtcregs;
 	required_shared_ptr<uint32_t> m_workram;
+	required_shared_ptr<uint32_t> m_crtcregs;
 	required_shared_ptr<uint32_t> m_vidregs;
 	required_shared_ptr<uint32_t> m_textureram;
 	required_shared_ptr<uint32_t> m_frameram;
@@ -310,9 +309,6 @@ private:
 
 	DECLARE_READ32_MEMBER(FlipCount_r);
 	DECLARE_WRITE32_MEMBER(FlipCount_w);
-	DECLARE_READ32_MEMBER(crtc_r);
-	DECLARE_WRITE32_MEMBER(crtc_w);
-	void crtc_update();
 
 	DECLARE_READ32_MEMBER(system_input_r);
 	DECLARE_WRITE32_MEMBER(Banksw_w);
@@ -391,6 +387,12 @@ private:
 	DECLARE_READ32_MEMBER(crzyddz2_PIOedat_r);
 	uint8_t m_crzyddz2_prot;
 
+	// CRTC
+	DECLARE_READ32_MEMBER(crtc_r);
+	DECLARE_WRITE32_MEMBER(crtc_w);
+	void crtc_update();
+	inline bool crt_is_interlaced();
+	inline bool crt_active_vblank_irq();
 };
 
 /*
@@ -615,7 +617,7 @@ READ32_MEMBER(crystal_state::crtc_r)
 	switch (offset)
 	{
 		case 0: // CRTC Status / Mode
-			if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interlace
+			if (crt_is_interlaced()) // Interlace
 				vdisp <<= 1;
 
 			if (m_screen->vpos() <= vdisp) // Vertical display enable status
@@ -699,17 +701,34 @@ WRITE32_MEMBER(crystal_state::crtc_w)
 			return;
 	}
 	COMBINE_DATA(&m_crtcregs[offset]);
-	if (((offset == (0xc / 4)) || (offset == (0x1c / 4)) || (offset == (0x30 / 4))) && (old ^ m_crtcregs[offset]))
+	if (old ^ m_crtcregs[offset])
 		crtc_update();
 
+}
+
+inline bool crystal_state::crt_is_interlaced()
+{
+	return (m_crtcregs[0x30 / 4] & 1) == 0;
+}
+
+inline bool crystal_state::crt_active_vblank_irq()
+{
+	if (crt_is_interlaced() == false)
+		return true;
+	
+	// bit 3 of CRTC reg -> select display start
+	return (m_screen->frame_number() & 1) ^ ((m_crtcregs[0] & 8) >> 3);
 }
 
 void crystal_state::crtc_update()
 {
 	// TODO : Implement other CRTC parameters
 	uint32_t hdisp = m_crtcregs[0x0c / 4] + 1;
-	uint32_t vdisp = m_crtcregs[0x1c / 4] + 1;
-	if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interlace
+	uint32_t vdisp = m_crtcregs[0x1c / 4];
+	if (hdisp == 0 || vdisp == 0)
+		return;
+	
+	if (crt_is_interlaced()) // Interlace
 		vdisp <<= 1;
 
 	rectangle const visarea(0, hdisp - 1, 0, vdisp - 1);
@@ -729,8 +748,9 @@ void crystal_state::internal_map(address_map &map)
 //  map(0x01700000, 0x017fffff)                            // Peripheral Device 7
 //  map(0x01800000, 0x01ffffff)                            // Internal Registers(VRender0, or Amazon)
 
-	map(0x01800000, 0x0180ffff).ram().share("sysregs");
+//	map(0x01800000, 0x0180ffff).ram().share("sysregs");
 //  map(0x01800000, 0x018003ff)                            // System/General
+	map(0x01800010, 0x01800017).noprw(); // watchdog
 //  map(0x01800400, 0x018007ff)                            // Local Memory Controller
 //  map(0x01800800, 0x01800bff)                            // DMA
 	map(0x01800800, 0x01800803).rw(FUNC(crystal_state::dmac_r<0>), FUNC(crystal_state::dmac_w<0>));
@@ -764,7 +784,7 @@ void crystal_state::internal_map(address_map &map)
 //  map(0x01802400, 0x018027ff)                            // Peripheral Chip Select
 //  map(0x01802800, 0x01802bff)                            // SIO
 //  map(0x01803400, 0x018037ff)                            // CRT Controller
-	map(0x01803400, 0x018037ff).rw(FUNC(crystal_state::crtc_r), FUNC(crystal_state::crtc_w));
+	map(0x01803400, 0x018037ff).rw(FUNC(crystal_state::crtc_r), FUNC(crystal_state::crtc_w)).share("crtcregs");
 //  map(0x01804000, 0x018043ff)                            // RAMDAC & PLL
 
 //  map(0x02000000, 0x02ffffff).ram().share("workram");    // Local RAM/DRAM (Max.16MB)
@@ -1108,9 +1128,7 @@ void crystal_state::machine_start()
 
 void crystal_state::machine_reset()
 {
-	std::fill_n(&m_sysregs[0], m_sysregs.bytes() / 4, 0);
 	std::fill_n(&m_vidregs[0], m_vidregs.bytes() / 4, 0);
-	m_crtcregs = &m_sysregs[0x3400/4];
 	m_crtcregs[1] = 0x00000022;
 
 	m_FlipCount = 0;
@@ -1247,7 +1265,9 @@ WRITE_LINE_MEMBER(crystal_state::screen_vblank)
 				m_FlipCount--;
 
 		}
-		IntReq(24);      //VRender0 VBlank
+		
+		if (crt_active_vblank_irq() == true)
+			IntReq(24);      //VRender0 VBlank
 	}
 }
 
