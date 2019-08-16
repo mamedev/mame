@@ -75,14 +75,38 @@ private:
 	required_device<mcs51_cpu_device> m_mcu;
 
 	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 	void mcu_p1_w(uint8_t data);
+	uint8_t mcu_p3_r();
 	void mcu_p3_w(uint8_t data);
+
+	void ram_address_high_w(uint8_t data);
+	void ram_address_low_w(uint8_t data);
+	void ram_w(uint8_t data);
+
+	std::unique_ptr<uint8_t[]> m_ram;
+	uint16_t m_ram_address;
 };
 
 void snesb51_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("mcu", 0);
+}
+
+void snesb51_state::io_map(address_map &map)
+{
+//	map(0x8000, 0x8000).r
+//	map(0x8200, 0x8200).r
+//	map(0x8401, 0x8401).w
+	map(0x8c00, 0x8c00).w(FUNC(snesb51_state::ram_address_high_w));
+	map(0x8e00, 0x8e00).w(FUNC(snesb51_state::ram_address_low_w));
+//	map(0x9000, 0xafff).ram();
+	map(0xa000, 0xa000).w(FUNC(snesb51_state::ram_w));
+//	map(0xb000, 0xb000).w
+//	map(0xd000, 0xd000).w
+//	map(0xd400, 0xd400).w
+//	map(0xd800, 0xd800).r
 }
 
 static INPUT_PORTS_START( mk3snes )
@@ -121,20 +145,45 @@ void snesb51_state::mcu_p1_w(uint8_t data)
 	logerror("mcu_p1_w: %02x\n", data);
 }
 
+uint8_t snesb51_state::mcu_p3_r()
+{
+	logerror("mcu_p3_r\n");
+	return machine().rand();
+}
+
 void snesb51_state::mcu_p3_w(uint8_t data)
 {
 	logerror("mcu_p3_w: %02x\n", data);
 }
 
+void snesb51_state::ram_address_high_w(uint8_t data)
+{
+	data &= 0x1f;
+	m_ram_address = (data << 8) | (m_ram_address & 0x00ff);
+}
+
+void snesb51_state::ram_address_low_w(uint8_t data)
+{
+	m_ram_address = (m_ram_address & 0xff00) | data;
+}
+
+void snesb51_state::ram_w(uint8_t data)
+{
+	m_ram[m_ram_address] = data;
+}
+
 void snesb51_state::machine_start()
 {
-
+	m_ram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_ram), 0x2000);
 }
 
 void snesb51_state::mk3snes(machine_config &config)
 {
 	I8751(config, m_mcu, 12_MHz_XTAL / 6);
+	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
+	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
 	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));
 }
 
@@ -143,7 +192,9 @@ void snesb51_state::snes4sl(machine_config &config)
 	// exact type and clock unknown
 	I8031(config, m_mcu, 12_MHz_XTAL / 6);
 	m_mcu->set_addrmap(AS_PROGRAM, &snesb51_state::mem_map);
+	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
+	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
 	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
