@@ -302,19 +302,13 @@ private:
 	uint32_t    m_maxbank;
 	uint8_t     m_FlipCount;
 	uint8_t     m_IntHigh;
-	emu_timer  *m_Timer[4];
 	uint32_t    m_FlashCmd;
 	uint32_t    m_PIO;
 	uint32_t    m_DMActrl[2];
 	uint8_t     m_OldPort4;
 
-	uint32_t *TimerRegsPtr(int which) const;
-	void TimerStart(int which);
-
 	DECLARE_READ32_MEMBER(FlipCount_r);
 	DECLARE_WRITE32_MEMBER(FlipCount_w);
-	template<int Which> DECLARE_WRITE32_MEMBER(Timer_w);
-	template<int Which> DECLARE_READ32_MEMBER(Timer_r);
 	template<int Which> DECLARE_READ32_MEMBER(DMA_r);
 	template<int Which> DECLARE_WRITE32_MEMBER(DMA_w);
 	DECLARE_READ32_MEMBER(crtc_r);
@@ -340,9 +334,6 @@ private:
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	TIMER_CALLBACK_MEMBER(Timercb);
-	IRQ_CALLBACK_MEMBER(icallback);
-	void IntReq( int num );
 	inline void DMA_w( address_space &space, int which, uint32_t data, uint32_t mem_mask );
 	void PatchReset(  );
 	uint16_t GetVidReg( address_space &space, uint16_t reg );
@@ -354,6 +345,7 @@ private:
 	void trivrus_mem(address_map &map);
 
 	// To move into SoC own device
+	// INTC
 	uint32_t m_inten;
 	DECLARE_READ32_MEMBER(inten_r);
 	DECLARE_WRITE32_MEMBER(inten_w);
@@ -364,7 +356,28 @@ private:
 	uint32_t m_intst;
 	DECLARE_READ32_MEMBER(intst_r);
 	DECLARE_WRITE32_MEMBER(intst_w);
+	
+	IRQ_CALLBACK_MEMBER(icallback);
+	void IntReq( int num );
+
+	// Timer
+	template<int Which> DECLARE_WRITE32_MEMBER(tmcon_w);
+	template<int Which> DECLARE_READ32_MEMBER(tmcon_r);
+	template<int Which> DECLARE_WRITE16_MEMBER(tmcnt_w);
+	template<int Which> DECLARE_READ16_MEMBER(tmcnt_r);
+	TIMER_CALLBACK_MEMBER(Timercb);
+
+	uint32_t m_timer_control[4];
+	uint16_t m_timer_count[4];
+	emu_timer  *m_Timer[4];
+	void TimerStart(int which);
 };
+
+/*
+ *
+ * INT Controller
+ *
+ */
 
 READ32_MEMBER( crystal_state::inten_r )
 {
@@ -452,17 +465,18 @@ IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 	return 0;       //This should never happen
 }
 
-uint32_t *crystal_state::TimerRegsPtr(int which) const
-{
-	return &m_sysregs[0x1400/4 + which * 8/4];
-}
+
+/*
+ *
+ * Timer
+ *
+ */
+
 
 void crystal_state::TimerStart(int which)
 {
-	uint32_t *regs = TimerRegsPtr(which);
-
-	int PD = (regs[0] >> 8) & 0xff;
-	int TCV = regs[1] & 0xffff;
+	int PD = (m_timer_control[which] >> 8) & 0xff;
+	int TCV = m_timer_count[which] & 0xffff;
 	attotime period = attotime::from_hz(14318180 * 3) * ((PD + 1) * (TCV + 1)); // TODO : related to CPU clock
 	m_Timer[which]->adjust(period);
 
@@ -474,23 +488,25 @@ TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
 	int which = (int)(uintptr_t)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
-	uint32_t *regs = TimerRegsPtr(which);
-
-	if (regs[0] & 2)
+	if (m_timer_control[which] & 2)
 		TimerStart(which);
 	else
-		regs[0] &= ~1;
+		m_timer_control[which] &= ~1;
 
 	IntReq(num[which]);
 }
 
 template<int Which>
-WRITE32_MEMBER(crystal_state::Timer_w)
+READ32_MEMBER(crystal_state::tmcon_r)
 {
-	uint32_t *regs = TimerRegsPtr(Which);
+	return m_timer_control[Which];
+}
 
-	uint32_t old = regs[0];
-	data = COMBINE_DATA(&regs[0]);
+template<int Which>
+WRITE32_MEMBER(crystal_state::tmcon_w)
+{
+	uint32_t old = m_timer_control[Which];
+	data = COMBINE_DATA(&m_timer_control[Which]);
 
 	if ((data ^ old) & 1)
 	{
@@ -508,9 +524,15 @@ WRITE32_MEMBER(crystal_state::Timer_w)
 }
 
 template<int Which>
-READ32_MEMBER(crystal_state::Timer_r)
+READ16_MEMBER(crystal_state::tmcnt_r)
 {
-	return *TimerRegsPtr(Which);
+	return m_timer_count[Which] & 0xffff;
+}
+
+template<int Which>
+WRITE16_MEMBER(crystal_state::tmcnt_w)
+{
+	COMBINE_DATA(&m_timer_count[Which]);
 }
 
 template<int Which>
@@ -694,10 +716,15 @@ void crystal_state::internal_map(address_map &map)
 	map(0x01800c0c, 0x01800c0f).rw(FUNC(crystal_state::intst_r), FUNC(crystal_state::intst_w));
 //  map(0x01801000, 0x018013ff)                            // UART
 //  map(0x01801400, 0x018017ff)                            // Timer & Counter
-	map(0x01801400, 0x01801403).rw(FUNC(crystal_state::Timer_r<0>), FUNC(crystal_state::Timer_w<0>));
-	map(0x01801408, 0x0180140b).rw(FUNC(crystal_state::Timer_r<1>), FUNC(crystal_state::Timer_w<1>));
-	map(0x01801410, 0x01801413).rw(FUNC(crystal_state::Timer_r<2>), FUNC(crystal_state::Timer_w<2>));
-	map(0x01801418, 0x0180141b).rw(FUNC(crystal_state::Timer_r<3>), FUNC(crystal_state::Timer_w<3>));
+	map(0x01801400, 0x01801403).rw(FUNC(crystal_state::tmcon_r<0>), FUNC(crystal_state::tmcon_w<0>));
+	map(0x01801404, 0x01801407).rw(FUNC(crystal_state::tmcnt_r<0>), FUNC(crystal_state::tmcnt_w<0>)).umask32(0x0000ffff);
+	map(0x01801408, 0x0180140b).rw(FUNC(crystal_state::tmcon_r<1>), FUNC(crystal_state::tmcon_w<1>));
+	map(0x0180140c, 0x0180140f).rw(FUNC(crystal_state::tmcnt_r<1>), FUNC(crystal_state::tmcnt_w<1>)).umask32(0x0000ffff);
+	map(0x01801410, 0x01801413).rw(FUNC(crystal_state::tmcon_r<2>), FUNC(crystal_state::tmcon_w<2>));
+	map(0x01801414, 0x01801417).rw(FUNC(crystal_state::tmcnt_r<2>), FUNC(crystal_state::tmcnt_w<2>)).umask32(0x0000ffff);
+	map(0x01801418, 0x0180141b).rw(FUNC(crystal_state::tmcon_r<3>), FUNC(crystal_state::tmcon_w<3>));
+	map(0x0180141c, 0x0180141f).rw(FUNC(crystal_state::tmcnt_r<3>), FUNC(crystal_state::tmcnt_w<3>)).umask32(0x0000ffff);
+	
 //  map(0x01801800, 0x01801bff)                            // Pulse Width Modulation
 //  map(0x01802000, 0x018023ff)                            // PIO (Port)
 //  map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIO_r), FUNC(crystal_state::PIO_w)); // PIOLDAT
@@ -1048,7 +1075,7 @@ void crystal_state::machine_reset()
 
 	for (int i = 0; i < 4; i++)
 	{
-		*TimerRegsPtr(i) = 0xff << 8;
+		m_timer_control[i] = 0xff << 8;
 		m_Timer[i]->adjust(attotime::never);
 	}
 
