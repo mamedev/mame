@@ -266,6 +266,7 @@ public:
 	void init_crysking();
 	void init_evosocc();
 	void init_donghaer();
+	void init_maldaiza();
 	void init_psattack();
 
 	void crospuzl(machine_config &config);
@@ -321,7 +322,7 @@ private:
 	DECLARE_WRITE32_MEMBER(crtc_w);
 	void crtc_update();
 
-	DECLARE_READ32_MEMBER(Input_r);
+	DECLARE_READ32_MEMBER(system_input_r);
 	DECLARE_WRITE32_MEMBER(Banksw_w);
 	DECLARE_READ32_MEMBER(PIO_r);
 	DECLARE_WRITE32_MEMBER(PIO_w);
@@ -690,23 +691,16 @@ void crystal_state::internal_map(address_map &map)
 }
 
 
-READ32_MEMBER(crystal_state::Input_r)
+READ32_MEMBER(crystal_state::system_input_r)
 {
-	if (offset == 0)
-		return ioport("P1_P2")->read();
-	else if (offset == 1)
-		return ioport("P3_P4")->read();
-	else if( offset == 2)
-	{
-		uint8_t Port4 = ioport("SYSTEM")->read();
-		if (!(Port4 & 0x10) && ((m_OldPort4 ^ Port4) & 0x10))   //coin buttons trigger IRQs
-			IntReq(12);
-		if (!(Port4 & 0x20) && ((m_OldPort4 ^ Port4) & 0x20))
-			IntReq(19);
-		m_OldPort4 = Port4;
-		return /*dips*/ioport("DSW")->read() | (Port4 << 16);
-	}
-	return 0;
+	// TODO: move this in i/o system
+	uint8_t Port4 = ioport("SYSTEM")->read();
+	if (!(Port4 & 0x10) && ((m_OldPort4 ^ Port4) & 0x10))   //coin buttons trigger IRQs
+		IntReq(12);
+	if (!(Port4 & 0x20) && ((m_OldPort4 ^ Port4) & 0x20))
+		IntReq(19);
+	m_OldPort4 = Port4;
+	return /*dips*/ioport("DSW")->read() | (Port4 << 16);
 }
 
 WRITE32_MEMBER(crystal_state::Banksw_w)
@@ -770,7 +764,10 @@ void crystal_state::crystal_mem(address_map &map)
 	internal_map(map);
 	map(0x00000000, 0x0001ffff).rom().nopw();
 
-	map(0x01200000, 0x0120000f).r(FUNC(crystal_state::Input_r));
+	map(0x01200000, 0x01200003).portr("P1_P2");
+	map(0x01200004, 0x01200007).portr("P3_P4");
+	map(0x01200008, 0x0120000b).r(FUNC(crystal_state::system_input_r));
+
 	map(0x01280000, 0x01280003).w(FUNC(crystal_state::Banksw_w));
 	map(0x01400000, 0x0140ffff).ram().share("nvram");
 
@@ -1104,6 +1101,7 @@ uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			break;
 	}
 
+	// TODO: !!! remove this from rendering loop !!! >.>
 	if (DoFlip)
 		SetVidReg(space, 0x8e, GetVidReg(space, 0x8e) ^ 1);
 
@@ -1227,7 +1225,30 @@ static INPUT_PORTS_START(crystal)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( urachamu )
+	PORT_INCLUDE( crystal )
+	
+	// TODO: player 2 inputs are nowhere to be found
+	// lamps test also gives only p1 and p3, and after crediting up only p1 and p3 starts are lighted on ($01320000 address writes)
+	// I guess game is currently in 2 players mode, is there anything that enables 3 players mode?
+	PORT_MODIFY("P1_P2")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_MODIFY("P3_P4")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START(officeye)
 	PORT_START("P1_P2")
@@ -1631,6 +1652,42 @@ ROM_START( topbladv )
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
 ROM_END
 
+ROM_START( wulybuly )
+	CRYSBIOS
+	
+	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF ) // empty socket
+	
+	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
+	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(7406f5db) SHA1(dd53afb08d0567241d08d2422c672d429ef9b78f) )
+ROM_END
+
+ROM_START( urachamu )
+	CRYSBIOS
+	
+	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF ) // empty socket
+	
+	ROM_REGION32_LE( 0x4000000, "flash", 0 ) // Flash
+	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(f341d6fc) SHA1(23ecd9f3e5e20fc2a293cc735c8c4d60d01b68c0) )
+	ROM_LOAD( "u2",           0x1000000, 0x1000000,  CRC(ad81d61f) SHA1(5872c1d96e25d1b2a1b8a35c8ff163d67cfdabe4) )
+	ROM_LOAD( "u3",           0x2000000, 0x1000000,  CRC(3c7e32a4) SHA1(8a26e745eccc00a2c622062c8ad027781dfc1969) )
+	ROM_LOAD( "u4",           0x3000000, 0x1000000,  CRC(c5505627) SHA1(5229f435b4cf218d50ae4a4ae65a6ae13d7b7080) )
+	
+	// without this game defaults in free play mode, with no demo sound and 0 lives count. 
+	ROM_REGION( 0x10000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x00000, 0x10000, CRC(66df826d) SHA1(09260b76cb17082c841e7e37b89cb076e54ffb8d) )
+ROM_END
+
+ROM_START( maldaiza )
+	CRYSBIOS
+	
+	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF ) 
+	ROM_LOAD("maldaliza_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION32_LE( 0x4000000, "flash", 0 ) // Flash
+	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(f484d12b) SHA1(29641cda9138b5bf02c2ece34f8289385fd2ba29) )
+	ROM_LOAD( "u2",           0x1000000, 0x1000000,  CRC(86175ebf) SHA1(c1800f7339dafd3ec6c0302eebc8406582a46b04) ) // $ff filled
+ROM_END
+
 ROM_START( officeye )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios (not the standard one)
 	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
@@ -1930,19 +1987,28 @@ void crystal_state::init_psattack()
 {
 }
 
+void crystal_state::init_maldaiza()
+{
+	//uint16_t *Rom = (uint16_t*)memregion("flash")->base();
 
-GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
-GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
-GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
-GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
+}
+
+
+GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings", 0 )
+GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer", 0 )
 GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
-GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, empty_init,    ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
-GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, empty_init,    ROT0, "<unknown>",           "Cross Puzzle",                         MACHINE_NOT_WORKING )
+GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // timing is slightly too fast, player 2 inputs if they exists, lamps, not extensively tested
+GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
+GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Meng Hong Lou", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Crazy Dou Di Zhu II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, empty_init,    ROT0, "AGT",                 "Trivia R Us (v1.07)", 0 )
+GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, empty_init,    ROT0, "<unknown>",           "Cross Puzzle", MACHINE_NOT_WORKING )
+GAME( 200?, wulybuly, crysbios, crystal,  crystal,  crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // hangs during POST, also there's no PIC protection
+GAME( 200?, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "<unknown>",           "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) 
 
-GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, init_psattack, ROT0, "Uniana",              "P's Attack",                           MACHINE_IS_SKELETON ) // has a CF card instead of flash roms
+GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, init_psattack, ROT0, "Uniana",              "P's Attack", MACHINE_IS_SKELETON ) // has a CF card instead of flash roms
 // looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
-GAME( 200?, ddz,      0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "IGS?",                "Dou Di Zhu",                           MACHINE_IS_SKELETON )
-GAME( 200?, crzclass, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "TJF",                 "Zhaoji Fengdou",                       MACHINE_IS_SKELETON ) // 'Crazy Class'
+GAME( 200?, ddz,      0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "IGS?",                "Dou Di Zhu", MACHINE_IS_SKELETON )
+GAME( 200?, crzclass, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "TJF",                 "Zhaoji Fengdou", MACHINE_IS_SKELETON ) // 'Crazy Class'
