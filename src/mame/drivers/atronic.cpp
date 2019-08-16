@@ -16,7 +16,8 @@
  see parts list with IC Money description below
 
  some of these fill up the log with 
- BLMOVE with unaligned src and aligned dst
+
+ 'BLMOVE with unaligned src and aligned dst' from the 34020
 
 */
 
@@ -1208,7 +1209,7 @@ ROM_START( atricmon )
 	ROM_REGION( 0x2e5, "mbpals", 0 )
 	ROM_LOAD( "mb-u22-d.bin", 0x000, 0x117, CRC(dc097847) SHA1(305294284d0ffd578f9115b836ef1f9e906c1599) )
 	ROM_LOAD( "mb-u32-d.bin", 0x000, 0x2e5, CRC(996854bc) SHA1(647d2f49b739f7ca55c0b85290b6a21256834fd8) )
-	ROM_LOAD( "mb-u35-65994077_icm-S.bin", 0x000, 0x2e5, CRC(996854bc) SHA1(647d2f49b739f7ca55c0b85290b6a21256834fd8) )
+	ROM_LOAD( "mb-u35-65994077_icm-s.bin", 0x000, 0x2e5, CRC(996854bc) SHA1(647d2f49b739f7ca55c0b85290b6a21256834fd8) )
 
 	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "gb-u9.bin",  0x000000, 0x100000, CRC(eff83f95) SHA1(743f2fb0dd84a83387919db70175aa62f5f6f858) )
