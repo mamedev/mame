@@ -84,7 +84,6 @@ void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	m_pfr ^= PFR_1MS;
 
-	m_millis++;
 	bool carry = false;
 	bool tens_carry = false;
 	time_helper::inc_bcd(&m_millis, 0xff, 0x00, 0x09, &tens_carry);
