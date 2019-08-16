@@ -833,6 +833,7 @@ void cpc464_exp_cards(device_slot_interface &device)
 	device.option_add("hd20", CPC_HD20);
 	device.option_add("doubler", CPC_DOUBLER);
 	device.option_add("transtape", CPC_TRANSTAPE);
+	device.option_add("musicmachine", CPC_MUSICMACHINE);
 }
 
 void cpc_exp_cards(device_slot_interface &device)
@@ -852,6 +853,7 @@ void cpc_exp_cards(device_slot_interface &device)
 	device.option_add("hd20", CPC_HD20);
 	device.option_add("doubler", CPC_DOUBLER);
 	device.option_add("transtape", CPC_TRANSTAPE);
+	device.option_add("musicmachine", CPC_MUSICMACHINE);
 }
 
 void cpcplus_exp_cards(device_slot_interface &device)
@@ -869,6 +871,7 @@ void cpcplus_exp_cards(device_slot_interface &device)
 	device.option_add("hd20", CPC_HD20);
 	device.option_add("doubler", CPC_DOUBLER);
 	device.option_add("transtape", CPC_TRANSTAPE);  // Plus compatible?
+	device.option_add("musicmachine", CPC_MUSICMACHINE);
 }
 
 void aleste_exp_cards(device_slot_interface &device)
@@ -888,6 +891,7 @@ void aleste_exp_cards(device_slot_interface &device)
 	device.option_add("hd20", CPC_HD20);
 	device.option_add("doubler", CPC_DOUBLER);
 	device.option_add("transtape", CPC_TRANSTAPE);
+	device.option_add("musicmachine", CPC_MUSICMACHINE);
 	device.option_add("magicsound", AL_MAGICSOUND);
 }
 

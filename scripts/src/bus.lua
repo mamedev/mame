@@ -3130,6 +3130,8 @@ if (BUSES["CPC"]~=null) then
 		MAME_DIR .. "src/devices/bus/cpc/doubler.h",
 		MAME_DIR .. "src/devices/bus/cpc/transtape.cpp",
 		MAME_DIR .. "src/devices/bus/cpc/transtape.h",
+		MAME_DIR .. "src/devices/bus/cpc/musicmachine.cpp",
+		MAME_DIR .. "src/devices/bus/cpc/musicmachine.h",
 	}
 end
 
