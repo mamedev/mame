@@ -673,9 +673,13 @@ WRITE32_MEMBER(crystal_state::crtc_w)
 			break;
 		case 0x20: // Horizontal Total Register (HTOT)
 			mem_mask &= ~0xffffe000; // Bit 31-13 Reserved
+			if (BIT(data, 10) == 0) // enable bit
+				return;
 			break;
 		case 0x24: // Vertical Total Register (VTOT)
 			mem_mask &= ~0xfffff000; // Bit 31-12 Reserved
+			if (BIT(data, 11) == 0) // enable bit
+				return;
 			break;
 		case 0x28: // Horizontal Line Back Porch Register (HLBP)
 			mem_mask &= ~0xfffffc00; // Bit 31-10 Reserved
@@ -726,17 +730,74 @@ inline bool crystal_state::crt_active_vblank_irq()
 
 void crystal_state::crtc_update()
 {
-	// TODO : Implement other CRTC parameters
 	uint32_t hdisp = m_crtcregs[0x0c / 4] + 1;
 	uint32_t vdisp = m_crtcregs[0x1c / 4];
 	if (hdisp == 0 || vdisp == 0)
 		return;
 	
-	if (crt_is_interlaced()) // Interlace
+	bool interlace_mode = crt_is_interlaced();
+	
+	if (interlace_mode)
 		vdisp <<= 1;
 
+	uint32_t htot = (m_crtcregs[0x20 / 4] & 0x3ff) + 1;
+	uint32_t vtot = (m_crtcregs[0x24 / 4] & 0x7ff);	
+	
+	// adjust htotal in case it's not setup by the game 
+	// (datasheet mentions that it can be done automatically shrug):
+	// - the two Sealy games do that
+	// - Cross Puzzle sets up an HTotal of 400 with 640x480 display
+	// - donghaer writes a 0 to the htot when entering interlace mode
+	if (htot <= 1 || htot <= hdisp)
+	{
+		uint32_t hbp = (m_crtcregs[0x08 / 4] & 0xff00) >> 8;
+		uint32_t hsw = (m_crtcregs[0x08 / 4] & 0xff);
+		uint32_t hsfp = m_crtcregs[0x10 / 4] & 0xff;
+		if (hbp == 0 && hsw == 0 && hsfp == 0)
+			return;
+		
+		htot = hdisp + (hbp+1) + (hsw+1) + (hsfp+1);
+		m_crtcregs[0x20 / 4] = ((htot & 0x3ff) - 1);
+	}
+	
+	// urachamu
+	if (vtot == 0)
+	{
+		uint32_t vbp = (m_crtcregs[0x08 / 4] & 0xff);
+		if (vbp == 0)
+			return;
+		
+		vtot = vdisp + (vbp + 1);
+		m_crtcregs[0x24 / 4] = ((vtot & 0x7ff) - 1);
+	}
+	
+	// TODO: the two Sealy games doesn't set this, eventually need to parametrize this one up
+	uint32_t pixel_clock = (BIT(m_crtcregs[0x04 / 4], 3)) ? 14318180 : 14318180*2;
+	if (BIT(m_crtcregs[0x04 / 4], 7))
+		pixel_clock *= 2;
+	// TODO: divider setting = 0 is reserved, guess it just desyncs the signal?
+	pixel_clock /= (m_crtcregs[0x04 / 4] & 7) + 1;
+
+	//printf("DCLK divider %d\n",(m_crtcregs[0x04 / 4] & 7) + 1);
+	//printf("VCLK select %d\n",(m_crtcregs[0x04 / 4] & 8));
+	//printf("CBCLK divider %d\n",((m_crtcregs[0x04 / 4] & 0x70) >> 4) + 1);
+	//printf("ivclk speed %d\n",(m_crtcregs[0x04 / 4] & 0x80));
+
+	if (interlace_mode == false)
+	{
+		vtot >>= 1;
+		vtot += 1;
+	}
+	//else
+	//	pixel_clock >>= 1; 
+
+
+	vtot += 9;
+
+	//printf("%dX%d %dX%d %d\n",htot, vtot, hdisp, vdisp, pixel_clock);
+
 	rectangle const visarea(0, hdisp - 1, 0, vdisp - 1);
-	m_screen->configure(hdisp, vdisp, visarea, m_screen->frame_period().attoseconds());
+	m_screen->configure(htot, vtot, visarea, HZ_TO_ATTOSECONDS(pixel_clock) * vtot * htot);
 }
 
 // accessed by cross puzzle
@@ -1720,10 +1781,8 @@ void crystal_state::crystal(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea(0, 639, 0, 479);
+	// evolution soccer defaults
+	m_screen->set_raw((XTAL(14'318'180)*2)/4, 455, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(crystal_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(crystal_state::screen_vblank));
 	m_screen->set_palette("palette");
