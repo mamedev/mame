@@ -61,6 +61,7 @@ protected:
 	O(trb_aba); O(trb_zpg);
 	O(tsb_aba); O(tsb_zpg);
 	O(wai_imp);
+	O(reset_c);
 
 #undef O
 };

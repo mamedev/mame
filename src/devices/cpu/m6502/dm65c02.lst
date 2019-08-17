@@ -17,4 +17,4 @@ cpy_imm     cmp_idx     nop_imm     nop_c_imp   cpy_zpg     cmp_zpg     dec_c_zp
 bne_rel     cmp_idy     cmp_zpi     nop_c_imp   nop_zpx     cmp_zpx     dec_c_zpx   nop_c_imp   cld_imp     cmp_aby     phx_imp     nop_c_imp   nop_c_abx   cmp_abx     dec_c_abx   nop_c_imp
 cpx_imm     sbc_c_idx   nop_imm     nop_c_imp   cpx_zpg     sbc_c_zpg   inc_c_zpg   nop_c_imp   inx_imp     sbc_c_imm   nop_imp     nop_c_imp   cpx_aba     sbc_c_aba   inc_c_aba   nop_c_imp
 beq_rel     sbc_c_idy   sbc_c_zpi   nop_c_imp   nop_zpx     sbc_c_zpx   inc_c_zpx   nop_c_imp   sed_imp     sbc_c_aby   plx_imp     nop_c_imp   nop_c_abx   sbc_c_abx   inc_c_abx   nop_c_imp
-reset
+reset_c

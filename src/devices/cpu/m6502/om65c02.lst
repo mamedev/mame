@@ -762,3 +762,11 @@ wai_imp
 		eat-all-cycles;
 	}
 	prefetch();
+
+#   exceptions
+reset_c
+	P = (P | F_I) & ~F_D;
+	PC = read_arg(0xfffc);
+	PC = set_h(PC, read_arg(0xfffd));
+	prefetch();
+	inst_state = -1;
