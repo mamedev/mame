@@ -32,8 +32,6 @@ TODO:
 - remove external interrupt hack when timer interrupt is added to CDP1806 device
 - mmirage unknown_w
 - mm1 unknown expansion rom at $c000?
-- add mm1 opening book
-- add mm1 "B" version (1 mask rom)
 - add mm1 STP/ON buttons? (they're off/on, game continues when ON again)
 
 ******************************************************************************/
@@ -44,6 +42,8 @@ TODO:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pwm.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "speaker.h"
 
 // internal artwork
@@ -259,7 +259,7 @@ void mm1_state::mirage_map(address_map &map)
 void mm1_state::mm1_map(address_map &map)
 {
 	mirage_map(map);
-	map(0x8000, 0xbfff).unmapr(); // bookrom?
+	map(0x8000, 0xbfff).r("cartslot", FUNC(generic_slot_device::read_rom)); // opening library
 	map(0xc000, 0xc000).nopr(); // looks for $c0, jumps to $c003 if true
 }
 
@@ -409,6 +409,9 @@ void mm1_state::mm1(machine_config &config)
 	m_board->set_type(sensorboard_device::MAGNETS);
 
 	config.set_default_layout(layout_mephisto_mm1);
+
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mephisto_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mm1");
 }
 
 
@@ -421,6 +424,11 @@ ROM_START( mm1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("114", 0x0000, 0x4000, CRC(208b4c43) SHA1(48f891d614fa643f47d099f94aff15a44c2efc07) ) // D27128
 	ROM_LOAD("214", 0x4000, 0x4000, CRC(93734e49) SHA1(9ad6c191074c4122300f059e2ef9cfeff7b81463) ) // "
+ROM_END
+
+ROM_START( mm1b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("mm1b.bin", 0x0000, 0x8000, CRC(90bf840e) SHA1(cdec6b02c1352b2a00d66964989a17c2b81ec79e) ) // HN613256P
 ROM_END
 
 
@@ -438,6 +446,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE INPUT   STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, mm1,     0,      0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mm1,     0,      0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mm1b,    mm1,    0, mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1984, mmirage, 0,      0, mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
