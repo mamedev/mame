@@ -2011,7 +2011,7 @@ void lua_engine::initialize()
 			"ui_mute", &sound_manager::ui_mute,
 			"debugger_mute", &sound_manager::debugger_mute,
 			"system_mute", &sound_manager::system_mute,
-			"samples", [this](sound_manager &sm, sol::this_state s) {
+			"samples", [](sound_manager &sm, sol::this_state s) {
 					lua_State *L = s;
 					luaL_Buffer buff;
 					s32 count = sm.sample_count() * 2 * 2; // 2 channels, 2 bytes per sample
