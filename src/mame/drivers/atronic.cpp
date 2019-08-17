@@ -111,7 +111,7 @@ U1: TMS34020APCM-40
 U4: AHCT574
 U5: AHCT574
 U6: TL16C550CFN
-U7: Bt481AKPJ110
+U7: Bt481AKPJ110  (palette RAMDAC)
 .
 U16: TMS55160DGH-60 
 U17: TMS55160DGH-60
@@ -319,7 +319,7 @@ Markings bottom: 6 470.5020 00.07
 #include "cpu/tms34010/tms34010.h"
 #include "emupal.h"
 #include "screen.h"
-
+#include "video/ramdac.h"
 
 class atronic_state : public driver_device
 {
@@ -327,6 +327,7 @@ public:
 	atronic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_screen(*this, "screen"),
+			m_palette(*this, "palette"),
 			m_maincpu(*this, "maincpu"),
 			m_videocpu(*this, "tms"),
 			m_vidram(*this, "vidram")
@@ -340,8 +341,11 @@ private:
 
 	void video_map(address_map& map);
 
+	void ramdac_map(address_map& map);
+
 	// devices
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34020_device> m_videocpu;
 
@@ -391,25 +395,29 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(atronic_state::scanline_update)
 	uint16_t* bg0_base = &m_vidram[(fulladdr & 0xffc00)]; // this probably isn't screen ram, but some temp gfx are copied on startup
 	uint32_t* dst = &bitmap.pix32(scanline);
 	int coladdr = fulladdr & 0x3ff;
+	const pen_t *pens = m_palette->pens();
 
 	for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 	{
-		// todo, need to use palette, this isn't an rgb value
 		uint16_t bg0pix = bg0_base[coladdr & 0x3ff];
-		dst[x + 0] = (bg0pix & 0x00ff);
-		dst[x + 1] = (bg0pix & 0xff00) >> 8;
+		dst[x + 0] = pens[(bg0pix & 0x00ff)];
+		dst[x + 1] = pens[(bg0pix & 0xff00) >> 8];
 	}
 }
 
 void atronic_state::video_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("vidram");
-	                    
+	
+	map(0xa0000010, 0xa000001f).w("ramdac", FUNC(ramdac_device::index_w)).umask16(0x00ff);
+	map(0xa0000020, 0xa000002f).w("ramdac", FUNC(ramdac_device::pal_w)).umask16(0x00ff);
+	map(0xa0000030, 0xa000003f).w("ramdac", FUNC(ramdac_device::mask_w)).umask16(0x00ff);
+
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
 
 
-#define VIDEO_CLOCK         XTAL(40'000'000)
+#define VIDEO_CLOCK     XTAL(40'000'000)
 #define PIXEL_CLOCK     XTAL(25'000'000)
 
 // CPU BOARD
@@ -418,6 +426,11 @@ void atronic_state::video_map(address_map &map)
 // VIDEO BOARD
 // OSZ1: 40.000MHz
 // OSZ2: 25.000MHz
+
+void atronic_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
+}
 
 void atronic_state::atronic(machine_config &config)
 {
@@ -431,7 +444,9 @@ void atronic_state::atronic(machine_config &config)
 	m_screen->set_raw(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224); // ??
 	m_screen->set_screen_update("tms", FUNC(tms34020_device::tms340x0_rgb32));
 
-	PALETTE(config, "palette").set_entries(8);
+	PALETTE(config, "palette").set_entries(256);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &atronic_state::ramdac_map);
 
 	TMS34020(config, m_videocpu, VIDEO_CLOCK);
 	m_videocpu->set_addrmap(AS_PROGRAM, &atronic_state::video_map);
@@ -757,29 +772,7 @@ ROM_START( shpinxii )
 ROM_END
 
 
-ROM_START( bearnec )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
-	ROM_LOAD( "u2_0_-bene01-afaaa-ce-rus_b178.bin", 0x0000, 0x100000, CRC(fc71f0b8) SHA1(6c124211614101ef151fe405bef0ee88277b8d2b) )
 
-	ROM_REGION( 0x020000, "u6", 0 ) // config?
-	ROM_LOAD( "u6_bene21-e-zg-std_-5-xx-xx-axx_0f78.bin", 0x0000, 0x020000, CRC(d956484f) SHA1(d2d659a4350d7204666234a511ebd4dd7a021d89) )
-
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
-	ROM_LOAD32_BYTE( "u09_a632.bin", 0x000000, 0x100000, CRC(a671b6e8) SHA1(86b97ba98fdd09575a371b5b7f7d42bf2916fe17) )
-	ROM_LOAD32_BYTE( "u11_947b.bin", 0x000001, 0x100000, CRC(3dc60963) SHA1(d824cd4fbe4116744727180762fbf0ffe22e6398) )
-	ROM_LOAD32_BYTE( "u13_60e8.bin", 0x000002, 0x100000, CRC(11b25ede) SHA1(07d4901e985ed9b83d8630b748b82a408e26bac6) )
-	ROM_LOAD32_BYTE( "u15_6c49.bin", 0x000003, 0x100000, CRC(f56e40ac) SHA1(7c5e0bb7a8bafea6ae57b5933c93230478ac74b2) )
-	ROM_LOAD32_BYTE( "u08_f54f.bin", 0x400000, 0x100000, CRC(ce601695) SHA1(585b9e7c57072e7bff03fd34748fdadab6ff1b08) )
-	ROM_LOAD32_BYTE( "u10_d622.bin", 0x400001, 0x100000, CRC(4ac9e636) SHA1(35d0bfd6c456e2cd5d1f950ea58edc8e92e05933) )
-	ROM_LOAD32_BYTE( "u12_8bfa.bin", 0x400002, 0x100000, CRC(fa722d3f) SHA1(1275d0f6f06604e736a03b6031b7aeb46d7c6f07) )
-	ROM_LOAD32_BYTE( "u14_d9c6.bin", 0x400003, 0x100000, CRC(fd9e0ebf) SHA1(0c6b2ddb397994ca62e80cd7c802a778fc287549) )
-
-	ROM_REGION( 0x400000, "u18u21", 0 ) // sound
-	ROM_LOAD( "u18_96c0.bin", 0x0000, 0x100000, CRC(0cf7eb95) SHA1(96e6f21b359198b0f893ed69d2bc23ad2db34f33) )
-	ROM_LOAD( "u19_7c1c.bin", 0x0000, 0x100000, CRC(17ca92ee) SHA1(cdc4297c591db33a75ab716db7cf5620c13e8a84) )
-	ROM_LOAD( "u20_3123.bin", 0x0000, 0x100000, CRC(0932857c) SHA1(a30c1e40811581230da72c384679c0c21cced4c2) )
-	ROM_LOAD( "u21_8bb6.bin", 0x0000, 0x100000, CRC(c1a25921) SHA1(d54eb230c8ebde69f00bfab1088b7a39809e5ee2) )
-ROM_END
 
 
 ROM_START( beachpt )
@@ -834,29 +827,7 @@ ROM_START( beetleup )
 	ROM_LOAD( "u21_ea59.bin", 0x0000, 0x100000, CRC(0bd2f188) SHA1(f29a67c3cd36e7ee6fd7ef72a7724dc9df5b5657) )
 ROM_END
 
-ROM_START( abigchs )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
-	ROM_LOAD( "o_-bigc01-afbaa-cc-rus_.8mu02", 0x0000, 0x100000, CRC(969082d8) SHA1(f3bcdc631ac1c346993a8d7300ba6687a32669f7) )
 
-	ROM_REGION( 0x020000, "u6", 0 ) // config?
-	ROM_LOAD( "bigc21-d-zf-std_-5-xx-xx-axx.1mu06", 0x0000, 0x020000, CRC(0eb376fb) SHA1(34e1f28e71503ffb0e1e922bd3ba17bad0d37d99) )
-
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
-	ROM_LOAD32_BYTE( "bigc01-a_-f-rus_-5_-g101.wigu09", 0x000000, 0x100000, CRC(c87e6bb4) SHA1(387e2498625ff718fccaa7701dd595ee787b9a83) )
-	ROM_LOAD32_BYTE( "bigc01-a_-f-rus_-5_-g101.wigu11", 0x000001, 0x100000, CRC(c9e9fa7f) SHA1(1698215845f21cfde0274e880d89c66fb3226f04) )
-	ROM_LOAD32_BYTE( "bigc01-a_-f-rus_-5_-g101.wigu13", 0x000002, 0x100000, CRC(d5f5bb9a) SHA1(d8ecdb16ef4f18c200a1d3c3cdfe4db37292cf6f) )
-	ROM_LOAD32_BYTE( "bigc01-a_-f-rus_-5_-g101.wigu15", 0x000003, 0x060600, CRC(b223662f) SHA1(0bc9cb6d33935d80365cc1e13869bea4fd98fbd1) )
-	ROM_LOAD32_BYTE( "bigc01-a_-f-rus_-5_-g101.wigu08", 0x400000, 0x100000, CRC(f65c48a9) SHA1(4fec0fdcc13cf1fe26cf539518c4f0102ce4f2cb) )
-	ROM_LOAD32_BYTE( "bigc01-a_-f-rus_-5_-g101.wigu10", 0x400001, 0x100000, CRC(b941669a) SHA1(70e13f8dff92f3821ef72789a7ef2e622c6c8ba3) )
-	ROM_LOAD32_BYTE( "bigc01-a_-f-rus_-5_-g101.wigu12", 0x400002, 0x100000, CRC(e5c5ca4c) SHA1(4b1b4d73266a269697e54f0fada5c2c2e197c3be) )
-	ROM_LOAD32_BYTE( "bigc01-a_-f-rus_-5_-g101.wigu14", 0x400003, 0x100000, CRC(5cf1c75a) SHA1(951289b5cad7ede582da93103acacc41af7622d9) )
-
-	ROM_REGION( 0x400000, "u18u21", 0 ) // sound
-	ROM_LOAD( "bigc01-ba-a-std_-_.8su18", 0x0000, 0x100000, CRC(79c99749) SHA1(bcdd61ff287877833ab6ca56a278b1d68e47608f) )
-	ROM_LOAD( "bigc01-ba-a-std_-_.8su19", 0x0000, 0x100000, CRC(deb7a0b5) SHA1(d8526e42273003f8249007df2d8b6ba33b727324) )
-	ROM_LOAD( "bigc01-ba-a-std_-_.8su20", 0x0000, 0x100000, CRC(f94998a7) SHA1(c0fced89584ce5b67ba68cd93f1f8348ac36fd26) )
-	ROM_LOAD( "bigc01-ba-a-std_-_.8su21", 0x0000, 0x100000, CRC(08a34088) SHA1(009311d126eb78514133f0f6ef28548c42d50b1c) )
-ROM_END
 
 ROM_START( bigblue )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
@@ -915,20 +886,21 @@ ROM_START( castawaya ) // bad dump? (roms all look incorrect size to me)
 	ROM_LOAD( "u-6 m27c801.bin", 0x0000, 0x080000, CRC(86538b30) SHA1(6b8d732b59af2cc1a6524989f8cf12a4d4dac484) )
 
 	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
-	ROM_LOAD32_BYTE( "u-9 m27c801.bin",  0x000000, 0x080000, CRC(4a5efe38) SHA1(23e82eeadccdd0224858686b1d96bd5d184904cb) )
-	ROM_LOAD32_BYTE( "u-11 m27c801.bin", 0x000001, 0x080000, CRC(099e27e2) SHA1(4419ac8090ccab673e61f4f73c837971e341e7e2) )
-	ROM_LOAD32_BYTE( "u-13 m27c801.bin", 0x000002, 0x080000, CRC(f65eb71f) SHA1(9e116cc2b6768c1525759735eecc05db5906f2dc) )
-	ROM_LOAD32_BYTE( "u-15 m27c801.bin", 0x000003, 0x080000, CRC(319c8bb6) SHA1(8de3c66b375f0ff200ff240765c6f37609c4935e) )
-	ROM_LOAD32_BYTE( "u-8 m27c801.bin",  0x400000, 0x080000, CRC(74e21aeb) SHA1(dce3b413c6efdc2d85357dd1f9e4e2808aef4f7e) )
-	ROM_LOAD32_BYTE( "u-10 m27c801.bin", 0x400001, 0x080000, CRC(45294960) SHA1(1b5b33ef730c44a4800e80891369d4e21e1729d2) )
-	ROM_LOAD32_BYTE( "u-12 m27c801.bin", 0x400002, 0x080000, CRC(be19a02c) SHA1(8968d4ec5ff58dcf50c3c9ac9601c6416399091d) )
-	ROM_LOAD32_BYTE( "u-14 m27c801.bin", 0x400003, 0x080000, CRC(cda73f12) SHA1(dd5556d7e19ef1a9fec1b914a7464fbc4f97effe) )
+	// seem to be half size, doesn't have the TMS vectors
+	ROM_LOAD32_BYTE( "u-9 m27c801.bin",  0x000000, 0x080000, BAD_DUMP CRC(4a5efe38) SHA1(23e82eeadccdd0224858686b1d96bd5d184904cb) )
+	ROM_LOAD32_BYTE( "u-11 m27c801.bin", 0x000001, 0x080000, BAD_DUMP CRC(099e27e2) SHA1(4419ac8090ccab673e61f4f73c837971e341e7e2) )
+	ROM_LOAD32_BYTE( "u-13 m27c801.bin", 0x000002, 0x080000, BAD_DUMP CRC(f65eb71f) SHA1(9e116cc2b6768c1525759735eecc05db5906f2dc) )
+	ROM_LOAD32_BYTE( "u-15 m27c801.bin", 0x000003, 0x080000, BAD_DUMP CRC(319c8bb6) SHA1(8de3c66b375f0ff200ff240765c6f37609c4935e) )
+	ROM_LOAD32_BYTE( "u-8 m27c801.bin",  0x400000, 0x080000, BAD_DUMP CRC(74e21aeb) SHA1(dce3b413c6efdc2d85357dd1f9e4e2808aef4f7e) )
+	ROM_LOAD32_BYTE( "u-10 m27c801.bin", 0x400001, 0x080000, BAD_DUMP CRC(45294960) SHA1(1b5b33ef730c44a4800e80891369d4e21e1729d2) )
+	ROM_LOAD32_BYTE( "u-12 m27c801.bin", 0x400002, 0x080000, BAD_DUMP CRC(be19a02c) SHA1(8968d4ec5ff58dcf50c3c9ac9601c6416399091d) )
+	ROM_LOAD32_BYTE( "u-14 m27c801.bin", 0x400003, 0x080000, BAD_DUMP CRC(cda73f12) SHA1(dd5556d7e19ef1a9fec1b914a7464fbc4f97effe) )
 
 	ROM_REGION( 0x400000, "u18u21", 0 ) // sound
-	ROM_LOAD( "u-18 m27c801.bin", 0x0000, 0x080000, CRC(2e3d7181) SHA1(eed1a1594405f416efb379e134c12be89d495402) )
-	ROM_LOAD( "u-19 m27c801.bin", 0x0000, 0x080000, CRC(a3c906f6) SHA1(25314d79f420c177424bf1de492ba8d9a928f643) )
-	ROM_LOAD( "u-20 m27c801.bin", 0x0000, 0x080000, CRC(ec395eaa) SHA1(fa27b928971c039fb1586631f136bd7577be1c57) )
-	ROM_LOAD( "u-21 m27c801.bin", 0x0000, 0x080000, CRC(324d0539) SHA1(71639e3fc40c09e07221524580046dc2447b43f1) )
+	ROM_LOAD( "u-18 m27c801.bin", 0x0000, 0x080000, BAD_DUMP CRC(2e3d7181) SHA1(eed1a1594405f416efb379e134c12be89d495402) )
+	ROM_LOAD( "u-19 m27c801.bin", 0x0000, 0x080000, BAD_DUMP CRC(a3c906f6) SHA1(25314d79f420c177424bf1de492ba8d9a928f643) )
+	ROM_LOAD( "u-20 m27c801.bin", 0x0000, 0x080000, BAD_DUMP CRC(ec395eaa) SHA1(fa27b928971c039fb1586631f136bd7577be1c57) )
+	ROM_LOAD( "u-21 m27c801.bin", 0x0000, 0x080000, BAD_DUMP CRC(324d0539) SHA1(71639e3fc40c09e07221524580046dc2447b43f1) )
 
 	ROM_REGION( 0x400000, "others", 0 )
 	ROM_LOAD( "ds1225y.bin", 0x0000, 0x002000, CRC(76af0395) SHA1(ce6aef5349b155f8e103bb4dd33933c501a490ae) )
@@ -986,32 +958,7 @@ ROM_START( drmmake )
 ROM_END
 
 
-ROM_START( goldcity )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
-	ROM_LOAD( "o_-goci01-afaaa-cd-rus_.8mu02", 0x0000, 0x100000, CRC(59c19539) SHA1(7c40eee8e534795a44b33140535284b2bc2a9ac5) )
 
-	ROM_REGION( 0x020000, "u6", 0 ) // config?
-	ROM_LOAD( "goci21-e-zf-std_-5-xx-xx-axx.1mu06", 0x0000, 0x020000, CRC(73ab9c41) SHA1(0888923bdaede83f264979c0757894f5cb2e0ec8) )
-
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
-	ROM_LOAD32_BYTE( "goci01-a_-c-rus_-5_-g101.wigu09", 0x000000, 0x100000, CRC(72c9b584) SHA1(1345e7ea34a819fbc01b9a64e9f9c1a2de927dda) )
-	ROM_LOAD32_BYTE( "goci01-a_-c-rus_-5_-g101.wigu11", 0x000001, 0x100000, CRC(2ebe1d71) SHA1(1b540c3bb9b232f475c3fe2b56c55f473d8c09ee) )
-	ROM_LOAD32_BYTE( "goci01-a_-c-rus_-5_-g101.wigu13", 0x000002, 0x100000, CRC(26103a89) SHA1(322d377918e708b0e4ddda0d5cfb19eba8945219) )
-	ROM_LOAD32_BYTE( "goci01-a_-c-rus_-5_-g101.wigu15", 0x000003, 0x100000, CRC(1346284a) SHA1(8975248a4566d0a14451aca71e337058676b6ae5) )
-	ROM_LOAD32_BYTE( "goci01-a_-c-rus_-5_-g101.wigu08", 0x400000, 0x100000, CRC(4a0b3af2) SHA1(5fd2cb52ea5403347f6a0d54ce1d7c36bd012364) )
-	ROM_LOAD32_BYTE( "goci01-a_-c-rus_-5_-g101.wigu10", 0x400001, 0x100000, CRC(9ae4af09) SHA1(6d85ab9a91308762171b7b3efccd42737d516ebd) )
-	ROM_LOAD32_BYTE( "goci01-a_-c-rus_-5_-g101.wigu12", 0x400002, 0x100000, CRC(e60075f1) SHA1(5674a9bdbb3ce98a75f214620209973f3d42d5c7) )
-	ROM_LOAD32_BYTE( "goci01-a_-c-rus_-5_-g101.wigu14", 0x400003, 0x100000, CRC(da4b5130) SHA1(872cdf862e1a989fbd451e10ea9cc46d8e129766) )
-
-	// sound (missing or not needed here? there is an OKI M6585 on the mainboard)
-	/*
-	ROM_REGION( 0x400000, "u18u21", 0 )
-	ROM_LOAD( "u18", 0x0000, 0x100000, NO_DUMP )
-	ROM_LOAD( "u19", 0x0000, 0x100000, NO_DUMP )
-	ROM_LOAD( "u20", 0x0000, 0x100000, NO_DUMP )
-	ROM_LOAD( "u21", 0x0000, 0x100000, NO_DUMP )
-	*/
-ROM_END
 
 ROM_START( jumpjkpt )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
@@ -1061,31 +1008,6 @@ ROM_START( mushmagi )
 	ROM_LOAD( "sb-u19.bin", 0x0000, 0x100000, CRC(70279081) SHA1(15933d81af85b2c6f831e765f2a4e4f0e44fdc18) )
 	ROM_LOAD( "sb-u20.bin", 0x0000, 0x100000, CRC(f92276e5) SHA1(62628e9ef166607c42e873d116116dee6bf9b623) )
 	ROM_LOAD( "sb-u21.bin", 0x0000, 0x100000, CRC(3c168653) SHA1(ce77851f64cf14e5b074f667d3a723097f78496f) )
-ROM_END
-
-
-ROM_START( santam )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
-	ROM_LOAD( "u02_8m_m27c801-100f1_d6f7h.bin", 0x0000, 0x100000, CRC(8c0ed828) SHA1(e24cd0783a4290799db11ca8764b70cd380f2879) )
-
-	ROM_REGION( 0x020000, "u6", 0 ) // config?
-	ROM_LOAD( "u06_1m_m27c1001-10f_da21h.bin", 0x0000, 0x020000, CRC(51c0a380) SHA1(861c8b4f825f4bc11dd02ac03dcc2cc7e8c65129) )
-
-	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
-	ROM_LOAD32_BYTE( "gb_u09_8m_m27c801-100f1_9df6h.bin", 0x000000, 0x100000, CRC(470ccae5) SHA1(0521af7830cc59102edcc658df4d21a3d669d6db) )
-	ROM_LOAD32_BYTE( "gb_u11_8m_m27c801-100f1_7621h.bin", 0x000001, 0x100000, CRC(8f9a1031) SHA1(1aca654b62e73f3005e627625bea2b4198c04a99) )
-	ROM_LOAD32_BYTE( "gb_u13_8m_m27c801-100f1_be61h.bin", 0x000002, 0x100000, CRC(8b65f945) SHA1(40077a7d7ab13945df96f2483cb4f11ad8ae525c) )
-	ROM_LOAD32_BYTE( "gb_u15_8m_m27c801-100f1_2857h.bin", 0x000003, 0x100000, CRC(8b688a66) SHA1(a343d8039b1c1c8edc717f3bf8a101a8d3069d23) )	
-	ROM_LOAD32_BYTE( "gb_u08_8m_m27c801-100f1_ac13h.bin", 0x400000, 0x100000, CRC(84a6f213) SHA1(296b8b8d97b0bc543b9e747c751a6e9f4a6dc26f) )
-	ROM_LOAD32_BYTE( "gb_u10_8m_m27c801-100f1_03abh.bin", 0x400001, 0x100000, CRC(736acaa0) SHA1(1b2a4da15deba54dab76bf1fe88f0f4986217a31) )
-	ROM_LOAD32_BYTE( "gb_u12_8m_m27c801-100f1_5953h.bin", 0x400002, 0x100000, CRC(cc0b9bce) SHA1(30e0594c6890deddb665b6169c47e640508c6b7f) )
-	ROM_LOAD32_BYTE( "gb_u14_8m_m27c801-100f1_2a48h.bin", 0x400003, 0x100000, CRC(bd1fdca3) SHA1(b4bc73ff6900c14525d10fb10ca7f5371351a198) )
-
-	ROM_REGION( 0x400000, "u18u21", 0 ) // sound
-	ROM_LOAD( "sb_u18_8m_m27c801-100f1_a52eh.bin", 0x0000, 0x100000, CRC(95fe949d) SHA1(953f730a37d8d661cbc8c212c459db3769ac502b) )
-	ROM_LOAD( "sb_u19_8m_m27c801-100f1_a71bh.bin", 0x0000, 0x100000, CRC(6eae31f3) SHA1(08fcd8c49b31de874906205a47035a71f87f12d6) )
-	ROM_LOAD( "sb_u20_8m_m27c801-100f1_7870h.bin", 0x0000, 0x100000, CRC(27639c24) SHA1(7fdc7e5e684dfbef00450e4c8fa998d73c035895) )
-	ROM_LOAD( "sb_u21_8m_m27c801-100f1_94cch.bin", 0x0000, 0x100000, CRC(c740b5be) SHA1(dafe80431197fe22cddd0fc295436edc37256603) )
 ROM_END
 
 
@@ -1265,6 +1187,111 @@ ROM_START( atrbonpk )
 ROM_END
 
 
+ROM_START( abigchs )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
+	ROM_LOAD( "o_-bigc01-afbaa-cc-rus_.8mu02", 0x0000, 0x100000, CRC(969082d8) SHA1(f3bcdc631ac1c346993a8d7300ba6687a32669f7) )
+
+	ROM_REGION( 0x020000, "u6", 0 ) // config?
+	ROM_LOAD( "bigc21-d-zf-std_-5-xx-xx-axx.1mu06", 0x0000, 0x020000, CRC(0eb376fb) SHA1(34e1f28e71503ffb0e1e922bd3ba17bad0d37d99) )
+
+	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	// not valid TMS code, looks like some x86 drive image split into ROMs?
+	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu09", 0x000000, 0x100000, CRC(c87e6bb4) SHA1(387e2498625ff718fccaa7701dd595ee787b9a83) )
+	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu11", 0x100000, 0x100000, CRC(c9e9fa7f) SHA1(1698215845f21cfde0274e880d89c66fb3226f04) )
+	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu13", 0x200000, 0x100000, CRC(d5f5bb9a) SHA1(d8ecdb16ef4f18c200a1d3c3cdfe4db37292cf6f) )
+	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu15", 0x300000, 0x060600, CRC(b223662f) SHA1(0bc9cb6d33935d80365cc1e13869bea4fd98fbd1) )
+	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu08", 0x400000, 0x100000, CRC(f65c48a9) SHA1(4fec0fdcc13cf1fe26cf539518c4f0102ce4f2cb) )
+	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu10", 0x500000, 0x100000, CRC(b941669a) SHA1(70e13f8dff92f3821ef72789a7ef2e622c6c8ba3) )
+	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu12", 0x600000, 0x100000, CRC(e5c5ca4c) SHA1(4b1b4d73266a269697e54f0fada5c2c2e197c3be) )
+	ROM_LOAD( "bigc01-a_-f-rus_-5_-g101.wigu14", 0x700000, 0x100000, CRC(5cf1c75a) SHA1(951289b5cad7ede582da93103acacc41af7622d9) )
+
+	ROM_REGION( 0x400000, "u18u21", 0 ) // sound
+	ROM_LOAD( "bigc01-ba-a-std_-_.8su18", 0x0000, 0x100000, CRC(79c99749) SHA1(bcdd61ff287877833ab6ca56a278b1d68e47608f) )
+	ROM_LOAD( "bigc01-ba-a-std_-_.8su19", 0x0000, 0x100000, CRC(deb7a0b5) SHA1(d8526e42273003f8249007df2d8b6ba33b727324) )
+	ROM_LOAD( "bigc01-ba-a-std_-_.8su20", 0x0000, 0x100000, CRC(f94998a7) SHA1(c0fced89584ce5b67ba68cd93f1f8348ac36fd26) )
+	ROM_LOAD( "bigc01-ba-a-std_-_.8su21", 0x0000, 0x100000, CRC(08a34088) SHA1(009311d126eb78514133f0f6ef28548c42d50b1c) )
+ROM_END
+
+ROM_START( bearnec )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
+	ROM_LOAD( "u2_0_-bene01-afaaa-ce-rus_b178.bin", 0x0000, 0x100000, CRC(fc71f0b8) SHA1(6c124211614101ef151fe405bef0ee88277b8d2b) )
+
+	ROM_REGION( 0x020000, "u6", 0 ) // config?
+	ROM_LOAD( "u6_bene21-e-zg-std_-5-xx-xx-axx_0f78.bin", 0x0000, 0x020000, CRC(d956484f) SHA1(d2d659a4350d7204666234a511ebd4dd7a021d89) )
+
+	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	// not valid TMS code, looks like some x86 drive image split into ROMs?
+	ROM_LOAD( "u09_a632.bin", 0x000000, 0x100000, CRC(a671b6e8) SHA1(86b97ba98fdd09575a371b5b7f7d42bf2916fe17) )
+	ROM_LOAD( "u11_947b.bin", 0x100000, 0x100000, CRC(3dc60963) SHA1(d824cd4fbe4116744727180762fbf0ffe22e6398) )
+	ROM_LOAD( "u13_60e8.bin", 0x200000, 0x100000, CRC(11b25ede) SHA1(07d4901e985ed9b83d8630b748b82a408e26bac6) )
+	ROM_LOAD( "u15_6c49.bin", 0x300000, 0x100000, CRC(f56e40ac) SHA1(7c5e0bb7a8bafea6ae57b5933c93230478ac74b2) )
+	ROM_LOAD( "u08_f54f.bin", 0x400000, 0x100000, CRC(ce601695) SHA1(585b9e7c57072e7bff03fd34748fdadab6ff1b08) )
+	ROM_LOAD( "u10_d622.bin", 0x500000, 0x100000, CRC(4ac9e636) SHA1(35d0bfd6c456e2cd5d1f950ea58edc8e92e05933) )
+	ROM_LOAD( "u12_8bfa.bin", 0x600000, 0x100000, CRC(fa722d3f) SHA1(1275d0f6f06604e736a03b6031b7aeb46d7c6f07) )
+	ROM_LOAD( "u14_d9c6.bin", 0x700000, 0x100000, CRC(fd9e0ebf) SHA1(0c6b2ddb397994ca62e80cd7c802a778fc287549) )
+
+	ROM_REGION( 0x400000, "u18u21", 0 ) // sound
+	ROM_LOAD( "u18_96c0.bin", 0x0000, 0x100000, CRC(0cf7eb95) SHA1(96e6f21b359198b0f893ed69d2bc23ad2db34f33) )
+	ROM_LOAD( "u19_7c1c.bin", 0x0000, 0x100000, CRC(17ca92ee) SHA1(cdc4297c591db33a75ab716db7cf5620c13e8a84) )
+	ROM_LOAD( "u20_3123.bin", 0x0000, 0x100000, CRC(0932857c) SHA1(a30c1e40811581230da72c384679c0c21cced4c2) )
+	ROM_LOAD( "u21_8bb6.bin", 0x0000, 0x100000, CRC(c1a25921) SHA1(d54eb230c8ebde69f00bfab1088b7a39809e5ee2) )
+ROM_END
+
+ROM_START( goldcity )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
+	ROM_LOAD( "o_-goci01-afaaa-cd-rus_.8mu02", 0x0000, 0x100000, CRC(59c19539) SHA1(7c40eee8e534795a44b33140535284b2bc2a9ac5) )
+
+	ROM_REGION( 0x020000, "u6", 0 ) // config?
+	ROM_LOAD( "goci21-e-zf-std_-5-xx-xx-axx.1mu06", 0x0000, 0x020000, CRC(73ab9c41) SHA1(0888923bdaede83f264979c0757894f5cb2e0ec8) )
+
+	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	// not valid TMS code, looks like some x86 drive image split into ROMs?
+	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu09", 0x000000, 0x100000, CRC(72c9b584) SHA1(1345e7ea34a819fbc01b9a64e9f9c1a2de927dda) )
+	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu11", 0x100000, 0x100000, CRC(2ebe1d71) SHA1(1b540c3bb9b232f475c3fe2b56c55f473d8c09ee) )
+	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu13", 0x200000, 0x100000, CRC(26103a89) SHA1(322d377918e708b0e4ddda0d5cfb19eba8945219) )
+	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu15", 0x300000, 0x100000, CRC(1346284a) SHA1(8975248a4566d0a14451aca71e337058676b6ae5) )
+	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu08", 0x400000, 0x100000, CRC(4a0b3af2) SHA1(5fd2cb52ea5403347f6a0d54ce1d7c36bd012364) )
+	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu10", 0x500000, 0x100000, CRC(9ae4af09) SHA1(6d85ab9a91308762171b7b3efccd42737d516ebd) )
+	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu12", 0x600000, 0x100000, CRC(e60075f1) SHA1(5674a9bdbb3ce98a75f214620209973f3d42d5c7) )
+	ROM_LOAD( "goci01-a_-c-rus_-5_-g101.wigu14", 0x700000, 0x100000, CRC(da4b5130) SHA1(872cdf862e1a989fbd451e10ea9cc46d8e129766) )
+
+	// sound (missing or not needed here? there is an OKI M6585 on the mainboard)
+	/*
+	ROM_REGION( 0x400000, "u18u21", 0 )
+	ROM_LOAD( "u18", 0x0000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u19", 0x0000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u20", 0x0000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u21", 0x0000, 0x100000, NO_DUMP )
+	*/
+ROM_END
+
+ROM_START( santam )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Z8018010VSC code (Z180) */
+	ROM_LOAD( "u02_8m_m27c801-100f1_d6f7h.bin", 0x0000, 0x100000, CRC(8c0ed828) SHA1(e24cd0783a4290799db11ca8764b70cd380f2879) )
+
+	ROM_REGION( 0x020000, "u6", 0 ) // config?
+	ROM_LOAD( "u06_1m_m27c1001-10f_da21h.bin", 0x0000, 0x020000, CRC(51c0a380) SHA1(861c8b4f825f4bc11dd02ac03dcc2cc7e8c65129) )
+
+	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
+	// not valid TMS code, looks like some x86 drive image split into ROMs?
+	ROM_LOAD( "gb_u09_8m_m27c801-100f1_9df6h.bin", 0x000000, 0x100000, CRC(470ccae5) SHA1(0521af7830cc59102edcc658df4d21a3d669d6db) )
+	ROM_LOAD( "gb_u11_8m_m27c801-100f1_7621h.bin", 0x100000, 0x100000, CRC(8f9a1031) SHA1(1aca654b62e73f3005e627625bea2b4198c04a99) )
+	ROM_LOAD( "gb_u13_8m_m27c801-100f1_be61h.bin", 0x200000, 0x100000, CRC(8b65f945) SHA1(40077a7d7ab13945df96f2483cb4f11ad8ae525c) )
+	ROM_LOAD( "gb_u15_8m_m27c801-100f1_2857h.bin", 0x300000, 0x100000, CRC(8b688a66) SHA1(a343d8039b1c1c8edc717f3bf8a101a8d3069d23) )	
+	ROM_LOAD( "gb_u08_8m_m27c801-100f1_ac13h.bin", 0x400000, 0x100000, CRC(84a6f213) SHA1(296b8b8d97b0bc543b9e747c751a6e9f4a6dc26f) )
+	ROM_LOAD( "gb_u10_8m_m27c801-100f1_03abh.bin", 0x500000, 0x100000, CRC(736acaa0) SHA1(1b2a4da15deba54dab76bf1fe88f0f4986217a31) )
+	ROM_LOAD( "gb_u12_8m_m27c801-100f1_5953h.bin", 0x600000, 0x100000, CRC(cc0b9bce) SHA1(30e0594c6890deddb665b6169c47e640508c6b7f) )
+	ROM_LOAD( "gb_u14_8m_m27c801-100f1_2a48h.bin", 0x700000, 0x100000, CRC(bd1fdca3) SHA1(b4bc73ff6900c14525d10fb10ca7f5371351a198) )
+
+	ROM_REGION( 0x400000, "u18u21", 0 ) // sound
+	ROM_LOAD( "sb_u18_8m_m27c801-100f1_a52eh.bin", 0x0000, 0x100000, CRC(95fe949d) SHA1(953f730a37d8d661cbc8c212c459db3769ac502b) )
+	ROM_LOAD( "sb_u19_8m_m27c801-100f1_a71bh.bin", 0x0000, 0x100000, CRC(6eae31f3) SHA1(08fcd8c49b31de874906205a47035a71f87f12d6) )
+	ROM_LOAD( "sb_u20_8m_m27c801-100f1_7870h.bin", 0x0000, 0x100000, CRC(27639c24) SHA1(7fdc7e5e684dfbef00450e4c8fa998d73c035895) )
+	ROM_LOAD( "sb_u21_8m_m27c801-100f1_94cch.bin", 0x0000, 0x100000, CRC(c740b5be) SHA1(dafe80431197fe22cddd0fc295436edc37256603) )
+ROM_END
+
+
+
 GAME( 1999, atronic,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Atronic SetUp/Clear Chips (Russia, set 1)", MACHINE_IS_SKELETON)
 GAME( 1999, atronica,  atronic,  atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Atronic SetUp/Clear Chips (Russia, set 2)", MACHINE_IS_SKELETON)
 
@@ -1279,23 +1306,25 @@ GAME( 2002, aclown,    0,        atronic, atronic, atronic_state, empty_init, RO
 GAME( 2002, goldglen,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Golden Glenn (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, iccash,    0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "I C Cash (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, shpinxii,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Sphinx II (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, bearnec,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Bear Necessities (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, beachpt,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Beach Patrol (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, beetleup,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Beetles Unplugged (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, abigchs,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Big Cheese (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, bigblue,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Big Blue (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, castaway,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Castaway (Russia) (Atronic) (set 1)", MACHINE_IS_SKELETON)
 GAME( 2002, castawaya, castaway, atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Castaway (Russia) (Atronic) (set 2)", MACHINE_IS_SKELETON)
 GAME( 2002, dncsprt,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Dancing Spirit (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, drmmake,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Dream Maker (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, goldcity,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Gold City (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, jumpjkpt,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Jumping Jackpots (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, mushmagi,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Mushroom Magic (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, santam,    0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Santa Maria (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, splmastr,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Spell Master (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, tajmah,    0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Tajmahal (Russia) (Atronic)", MACHINE_IS_SKELETON)
 GAME( 2002, 3wishrd,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Three Wishes Red (Russia) (Atronic)", MACHINE_IS_SKELETON)
-
 GAME( 200?, atrwild,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Wild Thing (Atronic)", MACHINE_IS_SKELETON)
 GAME( 200?, atricmon,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "I C Money (Atronic)", MACHINE_IS_SKELETON) // related to I C Cash ?
 GAME( 200?, atrbonpk,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Bonus Poker (Atronic)", MACHINE_IS_SKELETON)
+
+
+// could be different hardware (or just bad dumps) they don't seem to have valid TMS code, instead the video ROMs seem to be some x86 drive image?
+GAME( 2002, abigchs,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Big Cheese (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, bearnec,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Bear Necessities (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, goldcity,  0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Gold City (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, santam,    0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Santa Maria (Russia) (Atronic)", MACHINE_IS_SKELETON)
