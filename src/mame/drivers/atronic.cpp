@@ -111,7 +111,7 @@ U1: TMS34020APCM-40
 U4: AHCT574
 U5: AHCT574
 U6: TL16C550CFN
-U7: Bt481AKPJ110
+U7: Bt481AKPJ110  (palette RAMDAC)
 .
 U16: TMS55160DGH-60 
 U17: TMS55160DGH-60
@@ -319,7 +319,7 @@ Markings bottom: 6 470.5020 00.07
 #include "cpu/tms34010/tms34010.h"
 #include "emupal.h"
 #include "screen.h"
-
+#include "video/ramdac.h"
 
 class atronic_state : public driver_device
 {
@@ -327,6 +327,7 @@ public:
 	atronic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_screen(*this, "screen"),
+			m_palette(*this, "palette"),
 			m_maincpu(*this, "maincpu"),
 			m_videocpu(*this, "tms"),
 			m_vidram(*this, "vidram")
@@ -340,8 +341,11 @@ private:
 
 	void video_map(address_map& map);
 
+	void ramdac_map(address_map& map);
+
 	// devices
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34020_device> m_videocpu;
 
@@ -391,25 +395,29 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(atronic_state::scanline_update)
 	uint16_t* bg0_base = &m_vidram[(fulladdr & 0xffc00)]; // this probably isn't screen ram, but some temp gfx are copied on startup
 	uint32_t* dst = &bitmap.pix32(scanline);
 	int coladdr = fulladdr & 0x3ff;
+	const pen_t *pens = m_palette->pens();
 
 	for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 	{
-		// todo, need to use palette, this isn't an rgb value
 		uint16_t bg0pix = bg0_base[coladdr & 0x3ff];
-		dst[x + 0] = (bg0pix & 0x00ff);
-		dst[x + 1] = (bg0pix & 0xff00) >> 8;
+		dst[x + 0] = pens[(bg0pix & 0x00ff)];
+		dst[x + 1] = pens[(bg0pix & 0xff00) >> 8];
 	}
 }
 
 void atronic_state::video_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("vidram");
-	                    
+	
+	map(0xa0000010, 0xa000001f).w("ramdac", FUNC(ramdac_device::index_w)).umask16(0x00ff);
+	map(0xa0000020, 0xa000002f).w("ramdac", FUNC(ramdac_device::pal_w)).umask16(0x00ff);
+	map(0xa0000030, 0xa000003f).w("ramdac", FUNC(ramdac_device::mask_w)).umask16(0x00ff);
+
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
 
 
-#define VIDEO_CLOCK         XTAL(40'000'000)
+#define VIDEO_CLOCK     XTAL(40'000'000)
 #define PIXEL_CLOCK     XTAL(25'000'000)
 
 // CPU BOARD
@@ -418,6 +426,11 @@ void atronic_state::video_map(address_map &map)
 // VIDEO BOARD
 // OSZ1: 40.000MHz
 // OSZ2: 25.000MHz
+
+void atronic_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
+}
 
 void atronic_state::atronic(machine_config &config)
 {
@@ -431,7 +444,9 @@ void atronic_state::atronic(machine_config &config)
 	m_screen->set_raw(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224); // ??
 	m_screen->set_screen_update("tms", FUNC(tms34020_device::tms340x0_rgb32));
 
-	PALETTE(config, "palette").set_entries(8);
+	PALETTE(config, "palette").set_entries(256);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &atronic_state::ramdac_map);
 
 	TMS34020(config, m_videocpu, VIDEO_CLOCK);
 	m_videocpu->set_addrmap(AS_PROGRAM, &atronic_state::video_map);
