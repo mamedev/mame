@@ -94,10 +94,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	void rebel5(machine_config &config);
+	void mm4(machine_config &config);
 	void mm4tk(machine_config &config);
+	void mm5(machine_config &config);
 	void mm2(machine_config &config);
 	void bup(machine_config &config);
-	void mephisto(machine_config &config);
 
 private:
 	required_device<m65c02_device> m_maincpu;
@@ -108,7 +109,7 @@ private:
 	output_finder<4> m_digits;
 
 	DECLARE_WRITE8_MEMBER(write_lcd);
-	DECLARE_WRITE8_MEMBER(mephisto_NMI);
+	DECLARE_WRITE8_MEMBER(mephisto_nmi_w);
 	DECLARE_READ8_MEMBER(read_keys);
 	DECLARE_WRITE_LINE_MEMBER(write_led7);
 	uint8_t m_lcd_shift_counter;
@@ -119,11 +120,47 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);
 
-	void mephisto_mem(address_map &map);
+	void bup_mem(address_map &map);
 	void mm2_mem(address_map &map);
+	void mm4_mem(address_map &map);
 	void rebel5_mem(address_map &map);
 };
 
+void mephisto_state::machine_start()
+{
+	m_digits.resolve();
+
+	save_item(NAME(m_lcd_shift_counter));
+	save_item(NAME(m_led7));
+	save_item(NAME(m_allowNMI));
+}
+
+void mephisto_state::machine_reset()
+{
+	m_lcd_shift_counter = 3;
+	m_allowNMI = 1;
+	m_led7 = 0xff;
+}
+
+
+
+/******************************************************************************
+    I/O
+******************************************************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi)
+{
+	if (m_allowNMI)
+	{
+		m_allowNMI = 0;
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
+{
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
 
 WRITE8_MEMBER(mephisto_state::write_lcd)
 {
@@ -136,7 +173,7 @@ WRITE8_MEMBER(mephisto_state::write_lcd)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mephisto_state::mephisto_NMI)
+WRITE8_MEMBER(mephisto_state::mephisto_nmi_w)
 {
 	m_allowNMI = 1;
 }
@@ -162,20 +199,43 @@ WRITE_LINE_MEMBER(mephisto_state::write_led7)
 	m_led7 = state ? 0x00 : 0xff;
 }
 
+
+
+/******************************************************************************
+    Address Maps
+******************************************************************************/
+
+void mephisto_state::bup_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7));
+	map(0x1800, 0x1807).r(FUNC(mephisto_state::read_keys));
+	map(0x2000, 0x2000).r("board", FUNC(mephisto_board_device::input_r));
+	map(0x2800, 0x2800).w(FUNC(mephisto_state::write_lcd));
+	map(0x3000, 0x3000).w("board", FUNC(mephisto_board_device::led_w));
+	map(0x3800, 0x3800).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0x8000, 0xffff).rom();
+}
+
+void mephisto_state::mm2_mem(address_map &map)
+{
+	bup_mem(map);
+	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom)); // opening library
+}
+
 void mephisto_state::rebel5_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).w("outlatch", FUNC(hc259_device::write_d7));           // Status LEDs+ buzzer
+	map(0x2000, 0x2007).w("outlatch", FUNC(hc259_device::write_d7));
 	map(0x3000, 0x4000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3000, 0x3007).r(FUNC(mephisto_state::read_keys));            // Rebel 5.0
+	map(0x3000, 0x3007).r(FUNC(mephisto_state::read_keys));
 	map(0x5000, 0x5000).w(FUNC(mephisto_state::write_lcd));
 	map(0x6000, 0x6000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x7000, 0x7000).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x8000, 0xffff).rom();
 }
 
-
-void mephisto_state::mephisto_mem(address_map &map)
+void mephisto_state::mm4_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2000).w(FUNC(mephisto_state::write_lcd));
@@ -183,25 +243,17 @@ void mephisto_state::mephisto_mem(address_map &map)
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c07).r(FUNC(mephisto_state::read_keys));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));           // Status LEDs+ buzzer
-	map(0x3800, 0x3800).w(FUNC(mephisto_state::mephisto_NMI));            // NMI enable
-	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));  // Opening Library
+	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));
+	map(0x3800, 0x3800).w(FUNC(mephisto_state::mephisto_nmi_w));
+	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x8000, 0xffff).rom();
 }
 
-void mephisto_state::mm2_mem(address_map &map)
-{
-	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1007).w("outlatch", FUNC(hc259_device::write_d7));       //Status LEDs
-	map(0x1800, 0x1807).r(FUNC(mephisto_state::read_keys));
-	map(0x2000, 0x2000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x2800, 0x2800).w(FUNC(mephisto_state::write_lcd));
-	map(0x3000, 0x3000).w("board", FUNC(mephisto_board_device::led_w));
-	map(0x3800, 0x3800).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));  // Opening Library
-	map(0x8000, 0xffff).rom();
-}
 
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
 
 static INPUT_PORTS_START( mephisto )
 	PORT_START("KEY1_0") //Port $2c00
@@ -283,37 +335,6 @@ static INPUT_PORTS_START( bup )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mephisto_state, reset_button, 0)
 INPUT_PORTS_END
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi)
-{
-	if (m_allowNMI)
-	{
-		m_allowNMI = 0;
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
-{
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-void mephisto_state::machine_start()
-{
-	m_digits.resolve();
-
-	save_item(NAME(m_lcd_shift_counter));
-	save_item(NAME(m_led7));
-	save_item(NAME(m_allowNMI));
-}
-
-void mephisto_state::machine_reset()
-{
-	m_lcd_shift_counter = 3;
-	m_allowNMI = 1;
-	m_led7 = 0xff;
-}
-
 INPUT_CHANGED_MEMBER(mephisto_state::reset_button)
 {
 	// RES buttons in serial tied to CPU RESET
@@ -325,11 +346,18 @@ INPUT_CHANGED_MEMBER(mephisto_state::reset_button)
 }
 
 
-void mephisto_state::mephisto(machine_config &config)
+
+/******************************************************************************
+    Machine Drivers
+******************************************************************************/
+
+void mephisto_state::rebel5(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 4.9152_MHz_XTAL);  /* 65C02 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mephisto_mem);
+	M65C02(config, m_maincpu, 9.8304_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::rebel5_mem);
+
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(mephisto_state::update_nmi_r5), attotime::from_hz(600));
 
 	HC259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set_output("led100");
@@ -341,61 +369,76 @@ void mephisto_state::mephisto(machine_config &config)
 	m_outlatch->q_out_cb<6>().set(m_dac, FUNC(dac_bit_interface::write));
 	m_outlatch->q_out_cb<7>().set(FUNC(mephisto_state::write_led7));
 
+	MEPHISTO_SENSORS_BOARD(config, "board");
+	config.set_default_layout(layout_mephisto_mm2);
+
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
-	TIMER(config, "nmi_timer").configure_periodic(FUNC(mephisto_state::update_nmi), attotime::from_hz(600));
+void mephisto_state::mm4(machine_config &config)
+{
+	rebel5(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_clock(4.9152_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mm4_mem);
+
+	TIMER(config.replace(), "nmi_timer").configure_periodic(FUNC(mephisto_state::update_nmi), attotime::from_hz(600));
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mephisto_cart");
-	SOFTWARE_LIST(config, "cart_list").set_original("mephisto");
-
-	MEPHISTO_SENSORS_BOARD(config, "board");
-	config.set_default_layout(layout_mephisto_mm2);
+	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mm4");
 }
 
-void mephisto_state::rebel5(machine_config &config)
+void mephisto_state::mm4tk(machine_config &config)
 {
-	mephisto(config);
-
-	m_maincpu->set_clock(9.8304_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::rebel5_mem);
-
-	config.device_remove("cartslot");
-	config.device_remove("cart_list");
-
-	config.device_remove("nmi_timer");
-	TIMER(config, "nmi_timer_r5").configure_periodic(FUNC(mephisto_state::update_nmi_r5), attotime::from_hz(600));
+	mm4(config);
+	m_maincpu->set_clock(18000000);
 }
 
-void mephisto_state::mm2(machine_config &config)
+void mephisto_state::mm5(machine_config &config)
 {
-	mephisto(config);
+	mm4(config);
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("mephisto_mm5");
+}
 
+void mephisto_state::bup(machine_config &config)
+{
+	rebel5(config);
+
+	/* basic machine hardware */
 	m_maincpu->set_clock(7.3728_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mm2_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::bup_mem);
 
 	config.device_remove("nmi_timer");
 	const attotime irq_period = attotime::from_hz(7.3728_MHz_XTAL / 2 / 0x2000); // 450Hz from 4020 Q13
 	m_maincpu->set_periodic_int(FUNC(mephisto_state::irq0_line_assert), irq_period);
 
 	m_outlatch->q_out_cb<7>().set(FUNC(mephisto_state::write_led7)).invert();
-}
 
-void mephisto_state::bup(machine_config &config)
-{
-	mm2(config);
 	config.set_default_layout(layout_mephisto_bup);
 }
 
-void mephisto_state::mm4tk(machine_config &config)
+void mephisto_state::mm2(machine_config &config)
 {
-	mephisto(config);
+	bup(config);
 
-	m_maincpu->set_clock(18000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mephisto_mem);
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mm2_mem);
+
+	config.set_default_layout(layout_mephisto_mm2);
+
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mephisto_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mm2");
 }
+
+
+
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
 
 ROM_START(rebel5)
 	ROM_REGION(0x10000,"maincpu",0)
@@ -455,16 +498,15 @@ ROM_START(mm5)
 ROM_END
 
 
-/***************************************************************************
 
-    Game driver(s)
-
-***************************************************************************/
+/******************************************************************************
+    Drivers
+******************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
 CONS( 1984, mm2,    0,      0,      mm2,      mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, bup,    0,      0,      bup,      bup,      mephisto_state, empty_init, "Hegener + Glaser", "Mephisto Blitz- und Problemloesungs-Modul", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, rebel5, 0,      0,      rebel5,   mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4,    0,      0,      mephisto, mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mm4,    0,      0,      mm4,      mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, mm4tk,  mm4,    0,      mm4tk,    mephisto, mephisto_state, empty_init, "hack",             "Mephisto MM IV (TurboKit)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm5,    0,      0,      mephisto, mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM V",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, mm5,    0,      0,      mm5,      mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM V",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
