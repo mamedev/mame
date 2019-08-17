@@ -1742,15 +1742,16 @@ void lua_engine::initialize()
 					return port_table;
 				}));
 
-/*  natkeyboard library
+/*  natural_keyboard library
  *
  * manager:machine():ioport():natkeyboard()
  *
- * natkeyboard.empty - is the natural keyboard buffer empty?
- * natkeyboard.in_use - is the natural keyboard in use?
  * natkeyboard:paste() - paste clipboard data
  * natkeyboard:post() - post data to natural keyboard
  * natkeyboard:post_coded() - post data to natural keyboard
+ *
+ * natkeyboard.empty - is the natural keyboard buffer empty?
+ * natkeyboard.in_use - is the natural keyboard in use?
  */
 
 	sol().registry().new_usertype<natural_keyboard>("natkeyboard", "new", sol::no_constructor,
@@ -1759,6 +1760,7 @@ void lua_engine::initialize()
 			"paste", &natural_keyboard::paste,
 			"post", [](natural_keyboard &nat, const std::string &text)          { nat.post_utf8(text); },
 			"post_coded", [](natural_keyboard &nat, const std::string &text)    { nat.post_coded(text); });
+
 
 /*  ioport_port library
  *
