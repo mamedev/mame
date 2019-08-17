@@ -16,8 +16,9 @@
  see parts list with IC Money description below
 
  some of these fill up the log with 
-
  'BLMOVE with unaligned src and aligned dst' from the 34020
+ which softlocks MAME as the PC no longer advances, see "void tms340x0_device::blmove(uint16_t op)" in 34010ops.hxx
+ this appears to be valid code, just unsupported in the 34020 core
 
 */
 
@@ -325,35 +326,32 @@ class atronic_state : public driver_device
 public:
 	atronic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_screen(*this, "screen"),
 			m_maincpu(*this, "maincpu"),
-			m_videocpu(*this, "tms")
+			m_videocpu(*this, "tms"),
+			m_vidram(*this, "vidram")
 	{ }
 
 	void atronic(machine_config &config);
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void atronic_map(address_map &map);
 	void atronic_portmap(address_map &map);
 
 	void video_map(address_map& map);
 
 	// devices
+	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34020_device> m_videocpu;
+
+	required_shared_ptr<uint16_t> m_vidram;
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
 };
-
-uint32_t atronic_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	return 0;
-}
-
 
 void atronic_state::atronic_map(address_map &map)
 {
@@ -389,17 +387,30 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(atronic_state::from_shiftreg)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(atronic_state::scanline_update)
 {
+	uint32_t fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 4;
+	uint16_t* bg0_base = &m_vidram[(fulladdr & 0xffc00)]; // this probably isn't screen ram, but some temp gfx are copied on startup
+	uint32_t* dst = &bitmap.pix32(scanline);
+	int coladdr = fulladdr & 0x3ff;
+
+	for (int x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+	{
+		// todo, need to use palette, this isn't an rgb value
+		uint16_t bg0pix = bg0_base[coladdr & 0x3ff];
+		dst[x + 0] = (bg0pix & 0x00ff);
+		dst[x + 1] = (bg0pix & 0xff00) >> 8;
+	}
 }
 
 void atronic_state::video_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).ram();
+	map(0x00000000, 0x01ffffff).ram().share("vidram");
 	                    
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
 
 
 #define VIDEO_CLOCK         XTAL(40'000'000)
+#define PIXEL_CLOCK     XTAL(25'000'000)
 
 // CPU BOARD
 // OSC1: 18.432MHz
@@ -416,21 +427,17 @@ void atronic_state::atronic(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &atronic_state::atronic_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(atronic_state::irq0_line_hold));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(atronic_state::screen_update));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea_full();
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224); // ??
+	m_screen->set_screen_update("tms", FUNC(tms34020_device::tms340x0_rgb32));
 
 	PALETTE(config, "palette").set_entries(8);
 
 	TMS34020(config, m_videocpu, VIDEO_CLOCK);
 	m_videocpu->set_addrmap(AS_PROGRAM, &atronic_state::video_map);
 	m_videocpu->set_halt_on_reset(false);
-	m_videocpu->set_pixel_clock(VIDEO_CLOCK/4);
-	m_videocpu->set_pixels_per_clock(1);
+	m_videocpu->set_pixel_clock(PIXEL_CLOCK/4);
+	m_videocpu->set_pixels_per_clock(4);
 	m_videocpu->set_scanline_rgb32_callback(FUNC(atronic_state::scanline_update));
 	m_videocpu->set_shiftreg_in_callback(FUNC(atronic_state::to_shiftreg));
 	m_videocpu->set_shiftreg_out_callback(FUNC(atronic_state::from_shiftreg));
