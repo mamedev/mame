@@ -6574,4 +6574,33 @@
 		</part>
 	</software>
 
+	<software name="stkoba40">
+		<description>Star Trek: The Kobayashi Alternative (Version 4.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Paramount Pictures</publisher>
+		<!-- This was mailed out to customers who complained about bugs in the
+		original release of the game. The disk appears to be unprotected. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="star trek - the kobayashi alternative (version 4.0) disk 1 side a.dsk" size="143360" crc="c76cef82" sha1="c9a0818740be1f748fca0121a2448a6a13f45e0d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="star trek - the kobayashi alternative (version 4.0) disk 1 side b.dsk" size="143360" crc="501819ab" sha1="c71a01ea772e9471194347b3608f05d93e0f88cf" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="star trek - the kobayashi alternative (version 4.0) disk 2 side a.dsk" size="143360" crc="6b1b4e17" sha1="7b0910548fe187b69dd492cef299886ba28c34f3" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="star trek - the kobayashi alternative (version 4.0) disk 2 side b.dsk" size="143360" crc="260780a2" sha1="0e659c73d9472e94d3feeb203664bb24ce8dec97" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

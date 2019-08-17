@@ -34823,4 +34823,50 @@
 		</part>
 	</software>
 
+	<software name="addfacts">
+		<description>The Addition Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the addition facts (4am crack).dsk" size="143360" crc="3c6b27dc" sha1="246226f17617f98c223ef794f7a1d93cc4f795f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mulfacts">
+		<description>The Multiplication Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the multiplication facts (4am crack).dsk" size="143360" crc="a45e2e14" sha1="99b0bc274136a37ab5632edaf89d17f88258bc82" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theorems">
+		<description>Theorems and Proofs of Theorems (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="release" value="2019-08-15"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="theorems and proofs of theorems (4am crack) disk 1.dsk" size="143360" crc="ad7ed7dd" sha1="e5f8fbeb9067f5f659f6c814319c385ce3e3156a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="theorems and proofs of theorems (4am crack) disk 2.dsk" size="143360" crc="3e52785c" sha1="58225c032534c9eabf771825c03818e0d474e4cc" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
