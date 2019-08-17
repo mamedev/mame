@@ -393,6 +393,10 @@ private:
 	void crtc_update();
 	inline bool crt_is_interlaced();
 	inline bool crt_active_vblank_irq();
+	
+	// Misc
+	DECLARE_READ32_MEMBER( sysid_r );
+	DECLARE_READ32_MEMBER( cfgr_r );
 };
 
 /*
@@ -735,6 +739,24 @@ void crystal_state::crtc_update()
 	m_screen->configure(hdisp, vdisp, visarea, m_screen->frame_period().attoseconds());
 }
 
+// accessed by cross puzzle
+READ32_MEMBER(crystal_state::sysid_r)
+{
+	// Device ID: VRender0+ -> 0x0a
+	// Revision Number -> 0x00
+	return 0x00000a00;
+}
+
+READ32_MEMBER(crystal_state::cfgr_r)
+{
+	// TODO: this truly needs real HW verification
+	// -x-- ---- Main Clock select (0 -> External Clock)
+	// --xx x--- Reserved for Chip Test Mode
+	// ---- -xx- Local ROM Data Bus Width (01 -> 16 bit)
+	// ---- ---x Local Memory Bus Width (0 -> 16 bit)
+	return 0x00000002;
+}
+
 void crystal_state::internal_map(address_map &map)
 {
 //  map(0x00000000, 0x00ffffff)                            // Local ROM
@@ -750,6 +772,8 @@ void crystal_state::internal_map(address_map &map)
 
 //	map(0x01800000, 0x0180ffff).ram().share("sysregs");
 //  map(0x01800000, 0x018003ff)                            // System/General
+	map(0x01800000, 0x01800003).r(FUNC(crystal_state::sysid_r));
+	map(0x01800004, 0x01800007).r(FUNC(crystal_state::cfgr_r));
 	map(0x01800010, 0x01800017).noprw(); // watchdog
 //  map(0x01800400, 0x018007ff)                            // Local Memory Controller
 //  map(0x01800800, 0x01800bff)                            // DMA
