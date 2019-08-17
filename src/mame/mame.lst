@@ -22085,6 +22085,8 @@ mmagic                          // (c) 1979 Nintendo
 
 @source:mmd1.cpp
 mmd1                            //
+
+@source:mmd2.cpp
 mmd2                            //
 
 @source:mmm.cpp

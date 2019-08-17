@@ -4013,6 +4013,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/minitel_2_rpic.cpp",
 	MAME_DIR .. "src/mame/drivers/ml20.cpp",
 	MAME_DIR .. "src/mame/drivers/mmd1.cpp",
+	MAME_DIR .. "src/mame/drivers/mmd2.cpp",
 	MAME_DIR .. "src/mame/drivers/mod8.cpp",
 	MAME_DIR .. "src/mame/drivers/modellot.cpp",
 	MAME_DIR .. "src/mame/drivers/molecular.cpp",
