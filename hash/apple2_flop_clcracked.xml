@@ -34869,19 +34869,6 @@
 		</part>
 	</software>
 
-	<software name="bignlitl">
-		<description>BIG &amp; little (cleanly cracked)</description>
-		<year>1990</year>
-		<publisher>Sunburst Communications</publisher>
-		<info name="release" value="2019-08-17"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="big & little (4am crack).dsk" size="143360" crc="3d30f609" sha1="3414a3ba8e8ab189c64536b68316a3aaf217d07c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mslat101">
 		<description>Muppet Slate (Version 1.01) (cleanly cracked)</description>
 		<year>1989</year>
@@ -34910,6 +34897,52 @@
 			<feature name="part_id" value="Disk 4 - More special days"/>
 			<dataarea name="flop" size="143360">
 				<rom name="muppet slate v1.01 (4am crack) disk 4 - more special days.dsk" size="143360" crc="486aea9b" sha1="7fae54f5e54b53d39b816a4d2988d057b1443309" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bignlitl">
+		<description>BIG &amp; little (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="big and little (4am crack).dsk" size="143360" crc="3d30f609" sha1="3414a3ba8e8ab189c64536b68316a3aaf217d07c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flficftl">
+		<description>Flights Into Fiction: Fairy Tales (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program only"/>
+			<dataarea name="flop" size="143360">
+				<rom name="flights into fiction- fairy tales (4am crack) side a - program only.dsk" size="143360" crc="2a62967a" sha1="b0f6dda1adbd7cf51de1cf23fe4a606764e97052" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Program plus editor"/>
+			<dataarea name="flop" size="143360">
+				<rom name="flights into fiction- fairy tales (4am crack) side b - program plus editor.dsk" size="143360" crc="a1e861f8" sha1="859f0f12d44ace48b622fd2ad64211b0eb773195" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="divfacts">
+		<description>The Division Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the division facts (4am crack).dsk" size="143360" crc="b9e08fd8" sha1="ffa9105be822543526f7ed63de8d2789d5746f4e" />
 			</dataarea>
 		</part>
 	</software>
