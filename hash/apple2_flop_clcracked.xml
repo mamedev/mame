@@ -34869,4 +34869,49 @@
 		</part>
 	</software>
 
+	<software name="bignlitl">
+		<description>BIG &amp; little (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="big & little (4am crack).dsk" size="143360" crc="3d30f609" sha1="3414a3ba8e8ab189c64536b68316a3aaf217d07c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslat101">
+		<description>Muppet Slate (Version 1.01) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Teacher disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="muppet slate v1.01 (4am crack) disk 1 - teacher disk.dsk" size="143360" crc="3c2145cc" sha1="eebdb82b0fdd231e38a8528fed37e08bfa6c6946" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Master student disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="muppet slate v1.01 (4am crack) disk 2 - master student disk.dsk" size="143360" crc="b5647cd7" sha1="f2d5c724a8412e450344f43b10d977728cf52b19" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Seasons and special days"/>
+			<dataarea name="flop" size="143360">
+				<rom name="muppet slate v1.01 (4am crack) disk 3 - seasons and special days.dsk" size="143360" crc="0a353a3d" sha1="6029f36906448b6d1fe31ddfe0a2b206dc2530ec" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - More special days"/>
+			<dataarea name="flop" size="143360">
+				<rom name="muppet slate v1.01 (4am crack) disk 4 - more special days.dsk" size="143360" crc="486aea9b" sha1="7fae54f5e54b53d39b816a4d2988d057b1443309" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
