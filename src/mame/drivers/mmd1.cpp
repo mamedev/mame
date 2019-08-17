@@ -113,7 +113,6 @@ private:
 	void mem_map(address_map &map);
 	virtual void machine_reset() override;
 	uint8_t m_return_code;
-	uint8_t m_digit;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
