@@ -102,7 +102,7 @@ private:
 	DECLARE_WRITE8_MEMBER(vsync_irq_enable_w);
 	void smc777_palette(palette_device &palette) const;
 	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vsync_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
 	DECLARE_READ8_MEMBER(fdc_r);
@@ -1092,11 +1092,11 @@ void smc777_state::smc777_palette(palette_device &palette) const
 }
 
 
-INTERRUPT_GEN_MEMBER(smc777_state::vblank_irq)
+WRITE_LINE_MEMBER(smc777_state::vsync_w)
 {
-	if(m_vsync_ief)
+	if (state && m_vsync_ief)
 	{
-		device.execute().set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0,HOLD_LINE);
 		m_vsync_idf = true;
 	}
 }
@@ -1114,7 +1114,6 @@ void smc777_state::smc777(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::smc777_mem);
 	m_maincpu->set_addrmap(AS_IO, &smc777_state::smc777_io);
-	m_maincpu->set_vblank_int("screen", FUNC(smc777_state::vblank_irq));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1133,6 +1132,7 @@ void smc777_state::smc777(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
+	m_crtc->out_vsync_callback().set(FUNC(smc777_state::vsync_w));
 
 	// floppy controller
 	MB8876(config, m_fdc, 1_MHz_XTAL);
