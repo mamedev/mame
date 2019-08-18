@@ -333,6 +333,7 @@ public:
 			m_palette(*this, "palette"),
 			m_maincpu(*this, "maincpu"),
 			m_videocpu(*this, "tms"),
+			m_ramdac(*this, "ramdac"),
 			m_vidram(*this, "vidram")
 	{ }
 
@@ -356,6 +357,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34020_device> m_videocpu;
+	required_device<ramdac_device> m_ramdac;
 
 	required_shared_ptr<uint16_t> m_vidram;
 
@@ -438,9 +440,9 @@ void atronic_state::video_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("vidram");
 	
-	map(0xa0000010, 0xa000001f).w("ramdac", FUNC(ramdac_device::index_w)).umask16(0x00ff);
-	map(0xa0000020, 0xa000002f).w("ramdac", FUNC(ramdac_device::pal_w)).umask16(0x00ff);
-	map(0xa0000030, 0xa000003f).w("ramdac", FUNC(ramdac_device::mask_w)).umask16(0x00ff);
+	map(0xa0000010, 0xa000001f).w(m_ramdac, FUNC(ramdac_device::index_w)).umask16(0x00ff);
+	map(0xa0000020, 0xa000002f).w(m_ramdac, FUNC(ramdac_device::pal_w)).umask16(0x00ff);
+	map(0xa0000030, 0xa000003f).w(m_ramdac, FUNC(ramdac_device::mask_w)).umask16(0x00ff);
 
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
@@ -458,7 +460,7 @@ void atronic_state::video_map(address_map &map)
 
 void atronic_state::ramdac_map(address_map &map)
 {
-	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
+	map(0x000, 0x2ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
 }
 
 void atronic_state::atronic(machine_config &config)
@@ -480,8 +482,8 @@ void atronic_state::atronic(machine_config &config)
 	m_screen->set_screen_update("tms", FUNC(tms34020_device::tms340x0_rgb32));
 
 	PALETTE(config, "palette").set_entries(256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
-	ramdac.set_addrmap(0, &atronic_state::ramdac_map);
+	RAMDAC(config, m_ramdac, 0, m_palette);
+	m_ramdac->set_addrmap(0, &atronic_state::ramdac_map);
 
 	TMS34020(config, m_videocpu, VIDEO_CLOCK);
 	m_videocpu->set_addrmap(AS_PROGRAM, &atronic_state::video_map);
