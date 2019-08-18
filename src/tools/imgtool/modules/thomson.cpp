@@ -1386,6 +1386,238 @@ void filter_thomcrypt_getinfo(uint32_t state, union filterinfo *info)
 	}
 }
 
+static void
+thom_accent_grave(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'a': dst.printf("\xc3\xa0"); break;
+	case 'e': dst.printf("\xc3\xa8"); break;
+	case 'i': dst.printf("\xc3\xac"); break;
+	case 'o': dst.printf("\xc3\xb2"); break;
+	case 'u': dst.printf("\xc3\xb9"); break;
+	case 'A': dst.printf("\xc3\x80"); break;
+	case 'E': dst.printf("\xc3\x88"); break;
+	case 'I': dst.printf("\xc3\x8c"); break;
+	case 'O': dst.printf("\xc3\x92"); break;
+	case 'U': dst.printf("\xc3\x99"); break;
+	default: break; /* invalid data */
+	}
+}
+
+static void
+thom_accent_acute(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'a': dst.printf("\xc3\xa1"); break;
+	case 'e': dst.printf("\xc3\xa9"); break;
+	case 'i': dst.printf("\xc3\xad"); break;
+	case 'o': dst.printf("\xc3\xb3"); break;
+	case 'u': dst.printf("\xc3\xba"); break;
+	case 'A': dst.printf("\xc3\x81"); break;
+	case 'E': dst.printf("\xc3\x89"); break;
+	case 'I': dst.printf("\xc3\x8d"); break;
+	case 'O': dst.printf("\xc3\x93"); break;
+	case 'U': dst.printf("\xc3\x9a"); break;
+	default: break;
+	}
+}
+
+static void
+thom_accent_circ(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'a': dst.printf("\xc3\xa2"); break;
+	case 'e': dst.printf("\xc3\xaa"); break;
+	case 'i': dst.printf("\xc3\xae"); break;
+	case 'o': dst.printf("\xc3\xb4"); break;
+	case 'u': dst.printf("\xc3\xbb"); break;
+	case 'A': dst.printf("\xc3\x82"); break;
+	case 'E': dst.printf("\xc3\x8a"); break;
+	case 'I': dst.printf("\xc3\x8e"); break;
+	case 'O': dst.printf("\xc3\x94"); break;
+	case 'U': dst.printf("\xc3\x9b"); break;
+	default: break; /* invalid data */
+	}
+}
+
+static void
+thom_accent_uml(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'a': dst.printf("\xc3\xa4"); break;
+	case 'e': dst.printf("\xc3\xab"); break;
+	case 'i': dst.printf("\xc3\xaf"); break;
+	case 'o': dst.printf("\xc3\xb6"); break;
+	case 'u': dst.printf("\xc3\xbc"); break;
+	case 'A': dst.printf("\xc3\x84"); break;
+	case 'E': dst.printf("\xc3\x8b"); break;
+	case 'I': dst.printf("\xc3\x8f"); break;
+	case 'O': dst.printf("\xc3\x96"); break;
+	case 'U': dst.printf("\xc3\x9c"); break;
+	default: break; /* invalid data */
+	}
+}
+
+static void
+thom_accent_cedil(imgtool::stream &dst,
+			uint8_t c)
+{
+	switch ( c ) {
+	case 'c': dst.printf("\xc3\xa7"); break;
+	case 'C': dst.printf("\xc3\x87"); break;
+	default: break; /* invalid data */
+	}
+}
+
+static void
+thom_basic_specialchar(imgtool::stream::ptr &src,
+			imgtool::stream &dst,
+			uint8_t c)
+{
+	uint8_t l;
+
+	/* special characters */
+	switch ( c ) {
+	case '#': dst.printf("\xc2\xa3"); return;  /* pound */
+	case '$': dst.printf("$"); return;  /* dollar */
+	case '&': dst.printf("#"); return;  /* diesis */
+	case ',': dst.printf("\xe2\x86\x90"); return;  /* arrow left */
+	case '-': dst.printf("\xe2\x86\x91"); return;  /* arrow up */
+	case '.': dst.printf("\xe2\x86\x92"); return;  /* arrow right */
+	case '/': dst.printf("\xe2\x86\x93"); return;  /* arrow down */
+	case '0': dst.printf("\xc2\xb0"); return; /* ° */
+	case '1': dst.printf("\xc2\xb1"); return; /* ± */
+	case '8': dst.printf("\xc3\xb7"); return; /* ÷ */
+	case '<': dst.printf("\xc2\xbc"); return; /* ¼ */
+	case '=': dst.printf("\xc2\xbd"); return; /* ½ */
+	case '>': dst.printf("\xc2\xbe"); return; /* ¾ */
+	case 'j': dst.printf("\xc5\x92"); return; /* Œ */
+	case 'z': dst.printf("\xc5\x93"); return; /* œ */
+	case '{': dst.printf("\xc3\x9f"); return; /* ß */
+	case '\'': dst.printf("\xc2\xa7"); return; /* § */
+	case 'A':
+	case 'B':
+	case 'C':
+	case 'H':
+	case 'K': break; /* accents */
+	default: return; /* invalid data */
+	}
+
+	if ( src->read(&l, 1 ) < 1 ) return;
+
+	/* accents */
+	switch ( c ) {
+	case 'A': thom_accent_grave(dst, l); return;
+	case 'B': thom_accent_acute(dst, l); return;
+	case 'C': thom_accent_circ(dst, l); return;
+	case 'H': thom_accent_uml(dst, l); return;
+	case 'K': thom_accent_cedil(dst, l); return;
+	default: break;
+	}
+
+	/* invalid data */
+}
+
+struct {
+	const char *utf8;
+	const char *thom;
+} special_chars[] = {
+	{ "\xc2\xa3", "\x16" "#" }, /* £ */
+	{ "$", "\x16" "$" },
+	{ "#", "\x16" "&" },
+	{ "\xe2\x86\x90", "\x16" "," }, /* arrow left */
+	{ "\xe2\x86\x91", "\x16" "-" }, /* arrow up */
+	{ "\xe2\x86\x92", "\x16" "." }, /* arrow right */
+	{ "\xe2\x86\x93", "\x16" "/" }, /* arrow down */
+	{ "\xc2\xb0", "\x16" "0" }, /* ° */
+	{ "\xc2\xb1", "\x16" "1" }, /* ± */
+	{ "\xc3\xb7", "\x16" "8" }, /* ÷ */
+	{ "\xc2\xbc", "\x16" "<" }, /* ¼ */
+	{ "\xc2\xbd", "\x16" "=" }, /* ½ */
+	{ "\xc2\xbe", "\x16" ">" }, /* ¾ */
+	{ "\xc5\x92", "\x16" "j" }, /* Œ */
+	{ "\xc5\x93", "\x16" "z" }, /* œ */
+	{ "\xc3\x9f", "\x16" "{" }, /* ß */
+	{ "\xc2\xa7", "\x16" "'" }, /* § */
+
+	/* accent grave */
+	{ "\xc3\xa0", "\x16" "Aa" },
+	{ "\xc3\xa8", "\x16" "Ae" },
+	{ "\xc3\xac", "\x16" "Ai" },
+	{ "\xc3\xb2", "\x16" "Ao" },
+	{ "\xc3\xb9", "\x16" "Au" },
+	{ "\xc3\x80", "\x16" "AA" },
+	{ "\xc3\x88", "\x16" "AE" },
+	{ "\xc3\x8c", "\x16" "AI" },
+	{ "\xc3\x92", "\x16" "AO" },
+	{ "\xc3\x99", "\x16" "AU" },
+
+	/* accent acute */
+	{ "\xc3\xa1", "\x16" "Ba" },
+	{ "\xc3\xa9", "\x16" "Be" },
+	{ "\xc3\xad", "\x16" "Bi" },
+	{ "\xc3\xb3", "\x16" "Bo" },
+	{ "\xc3\xba", "\x16" "Bu" },
+	{ "\xc3\x81", "\x16" "BA" },
+	{ "\xc3\x89", "\x16" "BE" },
+	{ "\xc3\x8d", "\x16" "BI" },
+	{ "\xc3\x93", "\x16" "BO" },
+	{ "\xc3\x9a", "\x16" "BU" },
+
+	/* circumflex */
+	{ "\xc3\xa2", "\x16" "Ca" },
+	{ "\xc3\xaa", "\x16" "Ce" },
+	{ "\xc3\xae", "\x16" "Ci" },
+	{ "\xc3\xb4", "\x16" "Co" },
+	{ "\xc3\xbb", "\x16" "Cu" },
+	{ "\xc3\x82", "\x16" "CA" },
+	{ "\xc3\x8a", "\x16" "CE" },
+	{ "\xc3\x8e", "\x16" "CI" },
+	{ "\xc3\x94", "\x16" "CO" },
+	{ "\xc3\x9b", "\x16" "CU" },
+
+	/* umlaut */
+	{ "\xc3\xa4", "\x16" "Ha" },
+	{ "\xc3\xab", "\x16" "He" },
+	{ "\xc3\xaf", "\x16" "Hi" },
+	{ "\xc3\xb6", "\x16" "Ho" },
+	{ "\xc3\xbc", "\x16" "Hu" },
+	{ "\xc3\x84", "\x16" "HA" },
+	{ "\xc3\x8b", "\x16" "HE" },
+	{ "\xc3\x8f", "\x16" "HI" },
+	{ "\xc3\x96", "\x16" "HO" },
+	{ "\xc3\x9c", "\x16" "HU" },
+
+	/* cedilla */
+	{ "\xc3\xa7", "\x16" "Kc" },
+	{ "\xc3\x87", "\x16" "KC" },
+
+	{ NULL, NULL }
+};
+
+static bool thom_basic_is_specialchar(const char *buf,
+					int *pos,
+					const char **thom)
+{
+	int i;
+
+	for (i = 0; special_chars[i].utf8 != NULL; i++)
+	{
+		if (!strncmp(&buf[*pos], special_chars[i].utf8, strlen(special_chars[i].utf8)))
+		{
+			*pos += strlen(special_chars[i].utf8);
+			*thom = special_chars[i].thom;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /* untokenization automatically decrypt protected files */
 static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 						const char *name,
@@ -1444,6 +1676,14 @@ static imgtoolerr_t thom_basic_read_file(imgtool::partition &part,
 					const char* token = table[ in_fun ][ c - 0x80 ];
 					if ( token ) dst.puts(token );
 					else dst.puts("???" );
+				}
+				else if ( c == '\x16' )
+				{
+					uint64_t l;
+					l = org->tell();
+					if ( org->read(&c, 1 ) < 1 ) break;
+					thom_basic_specialchar(org, dst, c);
+					i += org->tell() - l; /* update i */
 				}
 				else
 				{
@@ -1582,6 +1822,11 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition &partition,
 					if (token_shift != 0)
 						mem_stream->write(&token_shift, 1);
 					mem_stream->write(&token_value, 1);
+				}
+				else if (thom_basic_is_specialchar(buf, &pos, &token))
+				{
+					/* emit the escaped accent */
+					mem_stream->write(token, strlen(token));
 				}
 				else
 				{
