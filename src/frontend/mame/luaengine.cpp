@@ -145,33 +145,6 @@ namespace sol
 			}
 		};
 		template <>
-		struct checker<input_item_class>
-		{
-			template <typename Handler>
-			static bool check (lua_State* L, int index, Handler&& handler, record& tracking)
-			{
-				return stack::check<const std::string &>(L, index, handler);
-			}
-		};
-		template <>
-		struct getter<input_item_class>
-		{
-			static input_item_class get(lua_State* L, int index, record& tracking)
-			{
-				const std::string item_class =  stack::get<const std::string &>(L, index);
-				if(item_class == "switch")
-					return ITEM_CLASS_SWITCH;
-				else if(item_class == "absolute" || item_class == "abs")
-					return ITEM_CLASS_ABSOLUTE;
-				else if(item_class == "relative" || item_class == "rel")
-					return ITEM_CLASS_RELATIVE;
-				else if(item_class == "maximum" || item_class == "max")
-					return ITEM_CLASS_MAXIMUM;
-				else
-					return ITEM_CLASS_INVALID;
-			}
-		};
-		template <>
 		struct pusher<sol::buffer *>
 		{
 			static int push(lua_State* L, sol::buffer *buff)
@@ -2052,12 +2025,24 @@ void lua_engine::initialize()
 			"seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); },
 			"seq_to_tokens", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_to_tokens(seq); },
 			"seq_name", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_name(seq); },
-			"seq_poll_start", [](input_manager &input, input_item_class cls, sol::object seq) {
-					input_seq *start = nullptr;
-					if(seq.is<sol::user<input_seq>>())
-						start = &seq.as<sol::user<input_seq>>();
-					input.seq_poll_start(cls, start);
-				},
+			"seq_poll_start", [](input_manager &input, const char *cls_string, sol::object seq) {
+				input_item_class cls;
+				if (!strcmp(cls_string, "switch"))
+					cls = ITEM_CLASS_SWITCH;
+				else if (!strcmp(cls_string, "absolute") || !strcmp(cls_string, "abs"))
+					cls = ITEM_CLASS_ABSOLUTE;
+				else if (!strcmp(cls_string, "relative") || !strcmp(cls_string, "rel"))
+					cls = ITEM_CLASS_RELATIVE;
+				else if (!strcmp(cls_string, "maximum") || !strcmp(cls_string, "max"))
+					cls = ITEM_CLASS_MAXIMUM;
+				else
+					cls = ITEM_CLASS_INVALID;
+
+				input_seq *start = nullptr;
+				if(seq.is<sol::user<input_seq>>())
+					start = &seq.as<sol::user<input_seq>>();
+				input.seq_poll_start(cls, start);
+			},
 			"seq_poll", &input_manager::seq_poll,
 			"seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); },
 			"device_classes", sol::property([this](input_manager &input)
