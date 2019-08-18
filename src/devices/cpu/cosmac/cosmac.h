@@ -81,6 +81,7 @@
 
 #pragma once
 
+#include "cosdasm.h"
 
 
 //**************************************************************************
@@ -119,7 +120,7 @@ enum cosmac_state_code
 
 // ======================> cosmac_device
 
-class cosmac_device : public cpu_device
+class cosmac_device : public cpu_device, public cosmac_disassembler::config
 {
 public:
 	// registers
@@ -202,6 +203,10 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// cosmac_disassembler::config overrides
+	virtual uint8_t get_p() const override { return m_p; }
+	virtual uint8_t get_x() const override { return m_x; }
 
 	// helpers
 	inline uint8_t read_opcode(offs_t pc);

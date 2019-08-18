@@ -63,7 +63,7 @@ u32 cosmac_disassembler::opcode_alignment() const
 	return 1;
 }
 
-cosmac_disassembler::cosmac_disassembler(int variant) : m_variant(variant)
+cosmac_disassembler::cosmac_disassembler(int variant, cosmac_disassembler::config *conf) : m_variant(variant), m_config(conf)
 {
 }
 
@@ -169,20 +169,13 @@ offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
 	case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 		CDP1801_OPCODE("STR R%d", implied(opcode)); break;
-	case 0x61: CDP1801_OPCODE("OUT 1"); break;
-	case 0x62: CDP1801_OPCODE("OUT 2"); break;
-	case 0x63: CDP1801_OPCODE("OUT 3"); break;
-	case 0x64: CDP1801_OPCODE("OUT 4"); break;
-	case 0x65: CDP1801_OPCODE("OUT 5"); break;
-	case 0x66: CDP1801_OPCODE("OUT 6"); break;
-	case 0x67: CDP1801_OPCODE("OUT 7"); break;
-	case 0x69: CDP1801_OPCODE("INP 1"); break;
-	case 0x6a: CDP1801_OPCODE("INP 2"); break;
-	case 0x6b: CDP1801_OPCODE("INP 3"); break;
-	case 0x6c: CDP1801_OPCODE("INP 4"); break;
-	case 0x6d: CDP1801_OPCODE("INP 5"); break;
-	case 0x6e: CDP1801_OPCODE("INP 6"); break;
-	case 0x6f: CDP1801_OPCODE("INP 7"); break;
+	case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
+		CDP1801_OPCODE("OUT %d", opcode & 7);
+		if (m_config && m_config->get_p() == m_config->get_x())
+			util::stream_format(stream, "; DB #%02X", immediate(pc, params));
+		break;
+	case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
+		CDP1801_OPCODE("INP %d", opcode & 7); break;
 	case 0x70: CDP1801_OPCODE("RET"); flags = STEP_OUT; break;
 	case 0x71: CDP1801_OPCODE("DIS"); flags = STEP_OUT; break;
 	case 0x78: CDP1801_OPCODE("SAV"); break;
@@ -222,7 +215,11 @@ offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	// CDP1802
 	case 0x31: CDP1802_OPCODE("BQ %04X", short_branch(base_pc, pc, params)); break;
 	case 0x39: CDP1802_OPCODE("BNQ %04X", short_branch(base_pc, pc, params)); break;
-	case 0x60: util::stream_format(stream, m_variant < TYPE_1802 ? "OUT 0" : "IRX"); break;
+	case 0x60:
+		util::stream_format(stream, m_variant < TYPE_1802 ? "OUT 0" : "IRX");
+		if (m_config && m_config->get_p() == m_config->get_x())
+			util::stream_format(stream, "; DB #%02X", immediate(pc, params));
+		break;
 	case 0x68: disassemble_68(stream, base_pc, pc, opcodes, params); break;
 	case 0x72: CDP1802_OPCODE("LDXA"); break;
 	case 0x73: CDP1802_OPCODE("STXD"); break;

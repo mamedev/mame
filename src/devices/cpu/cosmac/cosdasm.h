@@ -24,7 +24,14 @@ public:
 		TYPE_1805
 	};
 
-	cosmac_disassembler(int variant);
+	class config {
+	public:
+		virtual ~config() = default;
+		virtual uint8_t get_p() const = 0;
+		virtual uint8_t get_x() const = 0;
+	};
+
+	cosmac_disassembler(int variant, config *conf = nullptr);
 	virtual ~cosmac_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
@@ -42,6 +49,8 @@ private:
 	offs_t long_skip(offs_t pc);
 
 	void disassemble_68(std::ostream &stream, offs_t base_pc, offs_t &pc, const data_buffer &opcodes, const data_buffer &params);
+
+	config *const m_config;
 };
 
 #endif

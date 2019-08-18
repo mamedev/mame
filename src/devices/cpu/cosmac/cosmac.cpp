@@ -18,7 +18,6 @@ TODO:
 #include "emu.h"
 #include "debugger.h"
 #include "cosmac.h"
-#include "cosdasm.h"
 #include "coreutil.h"
 
 // permit our enums to be saved
@@ -363,6 +362,7 @@ DEFINE_DEVICE_TYPE(CDP1806, cdp1806_device, "cdp1806", "RCA CDP1806")
 
 cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
+		cosmac_disassembler::config(),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
 		m_read_wait(*this),
@@ -620,19 +620,19 @@ void cosmac_device::state_string_export(const device_state_entry &entry, std::st
 
 std::unique_ptr<util::disasm_interface> cdp1801_device::create_disassembler()
 {
-	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1801);
+	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1801, this);
 }
 
 
 std::unique_ptr<util::disasm_interface> cdp1802_device::create_disassembler()
 {
-	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1802);
+	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1802, this);
 }
 
 
 std::unique_ptr<util::disasm_interface> cdp1805_device::create_disassembler()
 {
-	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1805);
+	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1805, this);
 }
 
 //**************************************************************************
