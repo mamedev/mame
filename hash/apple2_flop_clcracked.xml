@@ -34947,4 +34947,30 @@
 		</part>
 	</software>
 
+	<software name="subfacts">
+		<description>The Subtraction Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the subtraction facts (4am crack).dsk" size="143360" crc="2601b318" sha1="e505996ea77d65d5dfb451282bc4bebe57ffb638" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z1bfdemo">
+		<description>Zork I Demo (Catch A Butterfly) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zork i demo (4am crack).dsk" size="143360" crc="b2fd73b0" sha1="ace8b7dca76c5048cf03b4d5fc6179c4844bbfa4" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
