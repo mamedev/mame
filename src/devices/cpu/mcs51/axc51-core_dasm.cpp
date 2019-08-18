@@ -197,8 +197,8 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 };
 
 
-// based on extracted symbol table, note 0x8000 - 0x8ca3 is likely boot codee, interrupt code, kernel etc.
-// this should be the same for all ax208 CPUs
+// based on extracted symbol table, note 0x8000 - 0x8ca3 is likely boot code, interrupt code, kernel etc.
+// this should be the same for all ax208 CPUs as they are thought to all use the same internal ROM
 const axc51core_disassembler::ax208_bios_info axc51core_disassembler::bios_call_names[] = {
 	{ 0x8000, "entry point" },
 
