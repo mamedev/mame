@@ -25,7 +25,16 @@ public:
 
 	static const mem_info axc51core_names[];
 
+	struct ax208_bios_info {
+		int addr;
+		const char *name;
+	};
+
+	static const ax208_bios_info bios_call_names[];
+
 protected:
+	virtual void disassemble_op_ljmp(std::ostream& stream, unsigned &PC, const data_buffer& params) override;
+	virtual void disassemble_op_lcall(std::ostream& stream, unsigned &PC, const data_buffer& params) override;
 	virtual offs_t disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op) override;
 
 private:
