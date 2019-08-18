@@ -1100,7 +1100,7 @@ crzyddz2    in      out
 void crystal_state::crzyddz2_mem(address_map &map)
 {
 	internal_map(map);
-	map(0x00000000, 0x00ffffff).rom().nopw();
+	map(0x00000000, 0x003fffff).rom().nopw();
 
 	map(0x01280000, 0x01280003).w(FUNC(crystal_state::Banksw_w));
 	map(0x01400000, 0x0140ffff).ram().share("nvram");
@@ -2046,10 +2046,9 @@ ROM_START( crzyddz2 )
 	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
 	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(0f3a1987) SHA1(6cad943846c79db31226676c7391f32216cfff79) )
 
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
-	ROM_COPY( "flash",      0x000000, 0x000000, 0x1000000 ) // copy flash here
-	ROM_LOAD( "27c322.u49", 0x000000, 0x0200000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(           0x000000, 0x0200000 )
+	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF )
+	//ROM_COPY( "flash",      0x000000, 0x000000, 0x1000000 ) // copy flash here
+	ROM_LOAD( "27c322.u49", 0x000000, 0x0400000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04
 	ROM_LOAD("hy04", 0x000000, 0x4280, NO_DUMP )
@@ -2068,9 +2067,10 @@ ROM_START( menghong )
 	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
 	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
 
-	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "flash",      0x000000, 0x000000, 0x1000000 ) // copy flash here
-	ROM_LOAD( "060511_08-01-18.u49",  0x000000, 0x0200000, CRC(b0c12107) SHA1(b1753757bbdb7d996df563ac6abdc6b46676704b) ) // 27C160
+	ROM_REGION( 0x0400000, "maincpu", 0 )
+	//ROM_COPY( "flash",      0x000000, 0x000000, 0x1000000 ) // copy flash here
+	ROM_LOAD( "060511_08-01-18.u49",  0x0000000, 0x0200000, CRC(b0c12107) SHA1(b1753757bbdb7d996df563ac6abdc6b46676704b) ) // 27C160
+	ROM_RELOAD(                       0x0200000, 0x0200000 )
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04
 	ROM_LOAD("menghong_hy04", 0x000000, 0x4280, NO_DUMP )
