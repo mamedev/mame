@@ -2019,6 +2019,8 @@ ROM_END
 //**************************************************************************
 
 // Siemens-Nixdorf PCD-3Nsx notebook
+// Intel NG680386SX-16, DP8473V, CHIPS F82C601, DS??87, unknown QFP100, ADC0833BCN (on PCU sub)
+// Microcontrollers: N8042AH (KBC),  N80C51BH (KBE)
 ROM_START( pcd3nsx )
 	ROM_REGION( 0x20000, "bios", 0 )
 	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - failure at 100000-10FFFF - Resume memory backup failure
@@ -2027,6 +2029,12 @@ ROM_START( pcd3nsx )
 	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - Memory high address failure at 100000-10FFFF - Resume memory backup failure
 	ROM_SYSTEM_BIOS(1, "pcd3nsxno2", "pcd3nsxno2")
 	ROMX_LOAD( "3n120l40.bin", 0x00000, 0x20000, CRC(1336dd75) SHA1(80306d85f417c51a5235ac2f02ceb58bdb51205f), ROM_BIOS(1) )
+
+	ROM_REGION( 0x800, "kbc", 0 )
+	ROM_LOAD("kbc_c3f.bin", 0x000, 0x800, NO_DUMP)
+
+	ROM_REGION( 0x1000, "kbe", 0 )
+	ROM_LOAD("kbe_e3d.bin", 0x0000, 0x1000, NO_DUMP)
 ROM_END
 
 // Toshiba T2000SX
@@ -2417,7 +2425,7 @@ COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 1992, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING ) // Complains about missing mouse hardware
 COMP( 199?, sarcpc,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<unknown>",   "80286 Standard System (SARC RC2015 chipset)", MACHINE_NOT_WORKING )
 COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
-COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx", MACHINE_NOT_WORKING )
+COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx Notebook Computer", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
 COMP( 1995, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
 COMP( 1993, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
