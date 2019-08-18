@@ -204,7 +204,6 @@ const axc51core_disassembler::ax208_bios_info axc51core_disassembler::bios_call_
 
 	{ 0x8006, "unknown, used" },
 	{ 0x8009, "unknown, used" },
-	{ 0x804A, "unknown, used" },
 
 	{ 0x8ca4, "_STRCHR" },
 	{ 0x8dd6, "_STRLEN" },
