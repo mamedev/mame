@@ -303,7 +303,6 @@ private:
 	uint32_t    m_Bank;
 	uint32_t    m_maxbank;
 	uint8_t     m_FlipCount;
-	uint8_t     m_IntHigh;
 	uint32_t    m_FlashCmd;
 	uint8_t     m_OldPort4;
 
@@ -324,7 +323,7 @@ private:
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	void PatchReset(  );
+	void PatchReset();
 	uint16_t GetVidReg( address_space &space, uint16_t reg );
 	void SetVidReg( address_space &space, uint16_t reg, uint16_t val );
 	void crospuzl_mem(address_map &map);
@@ -342,6 +341,7 @@ private:
 	DECLARE_READ32_MEMBER(intvec_r);
 	DECLARE_WRITE32_MEMBER(intvec_w);
 	
+	uint8_t m_IntHigh;
 	uint32_t m_intst;
 	DECLARE_READ32_MEMBER(intst_r);
 	DECLARE_WRITE32_MEMBER(intst_w);
@@ -382,7 +382,7 @@ private:
 	DECLARE_READ32_MEMBER(PIOldat_r);
 	DECLARE_WRITE32_MEMBER(PIOldat_w);
 	DECLARE_READ32_MEMBER(PIOedat_r);
-	uint32_t    m_PIO;
+	uint32_t m_PIO;
 	DECLARE_WRITE32_MEMBER(crzyddz2_PIOldat_w);
 	DECLARE_READ32_MEMBER(crzyddz2_PIOedat_r);
 	uint8_t m_crzyddz2_prot;
@@ -1200,13 +1200,29 @@ void crystal_state::machine_start()
 	save_item(NAME(m_FlipCntRead));
 #endif
 
-	save_item(NAME(m_Bank));
-	save_item(NAME(m_FlipCount));
+	save_item(NAME(m_inten));
+	save_item(NAME(m_intst));
 	save_item(NAME(m_IntHigh));
+
+	save_pointer(NAME(m_timer_control), 4);
+	save_pointer(NAME(m_timer_count), 4);
+
+	save_item(NAME(m_FlipCount));
+
+	save_item(NAME(m_Bank));
 	save_item(NAME(m_FlashCmd));
 	save_item(NAME(m_PIO));
+
+	save_item(NAME(m_dma[0].src));
+	save_item(NAME(m_dma[0].dst));
+	save_item(NAME(m_dma[0].size));
 	save_item(NAME(m_dma[0].ctrl));
+
 	save_item(NAME(m_dma[1].ctrl));
+	save_item(NAME(m_dma[1].src));
+	save_item(NAME(m_dma[1].dst));
+	save_item(NAME(m_dma[1].size));
+	
 	save_item(NAME(m_OldPort4));
 	save_item(NAME(m_trivrus_input));
 }
