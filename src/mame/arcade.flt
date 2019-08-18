@@ -1123,6 +1123,7 @@ slotcarn.cpp
 smsmcorp.cpp
 sms_bootleg.cpp
 snesb.cpp
+snesb51.cpp
 snk.cpp
 snk6502.cpp
 snk68.cpp
