@@ -17,6 +17,7 @@
   1x AY-3-8910.
   1x TI TMS9129NL (Video Display Processor).
   1x Altera EP310-DC (EPLD).
+  1x TBA820 (2 Watt Audio Amplifier).
 
   2x 27128 EPROMS.
 
@@ -32,12 +33,13 @@
 
   The following components made me suspect that there is some sort of
   TX-RX circuitry to connect with an external device for unknown purposes.
+  Maybe a kind of device to trigger remote credits...
 
-  1x TBA820      ; 2 Watt Audio Amplifier.
   1x HEF4528BP   ; Dual Monostable Multivibrator 3/15V.
   1x MM53200N    ; Encoder/Decoder. Digital Code Transmitter-Receiver System.
   1x L200C       ; 2.8 -> 36V. Voltage Regulator.
   1x SN94501N    ; Unknown... No Data.
+  1x BC237B      ; NPN transistor.
 
 
   PCB layer:
@@ -47,18 +49,18 @@
   |   .----------.                                                                                           |
   |   |DM74LS139N|                                                                                           |
   |   '----------'     .-------------.      .---------. .---------. .---------. .----------. .----------.    |
-  |                    | Z8430AB1    |      |SN74LS32N| |SN74LS00N| | 74LS02? | |SN74LS74AN| | 74LS0??  |    |
+  |                    | Z8430AB1    |      |SN74LS32N| |SN74LS00N| | 74LS02  | |SN74LS74AN| |  74LS08  |    |
   |                    |     Z80ACTC |      '---------' '---------' '---------' '----------' '----------'    |
   |   .----------.     '-------------'                                                                       |
   |   |SN74LS74AN|                                                                                           |
   |   '----------'                                                     .----.                                |
   |                                                                    |DIP |                           .----'
   |   .---------.  .-------------------.    .---------------------.    |SWIT|                           |
-  |   | ???     |  | Z8400AB1          |    | AY-3-8910           |    |CHES|                           |
+  |   | 74LS175 |  | Z8400AB1          |    | AY-3-8910           |    |CHES|                           |
   |   '---------'  |           Z80ACPU |    |                 PSG |    | #1 |                           '----.
   |                '-------------------'    '---------------------'    '----'        .------------.      ====|
   |   .---------.                                                                    | T74LS244B1 |   2  ====|
-  |   | ???     |                                                                    '------------'   x  ====|
+  |   | 74LS273 |                                                                    '------------'   x  ====|
   |   '---------'                                                                                     2  ====|
   |                                                                                                   2  ====|
   |   .---------.                                                                                        ====|
@@ -86,11 +88,11 @@
   |   '----------'                                                                                           |
   |                                                                                                          |
   |                                                                                                          |
-  |                             .---------.                                           .-------.              |
+  |                             .---------.                                           .--|||--.              |
   |   .---------.               | TBA820  |                                           | L200C |              |
-  |   |HEF4528BP|               '---------'                                        .--+-------+--.           |
-  |   '---------'                                                                  |  HEATSINK   |           |
-  |                                                                                '-------------'           |
+  |   |HEF4528BP|   .------.    '---------'                                        .--+-------+--.           |
+  |   '---------'   |BC237B|                                                       |  HEATSINK   |           |
+  |                 '-|||--'                                                       '-------------'           |
   | 5981-A                                                                                                   |
   '----------------------------------------------------------------------------------------------------------'
 
@@ -176,7 +178,8 @@
   TODO:
 
   - Trace/analysis of inputs out of test mode, but used by the code
-    (Port 90h D0-D3).  
+    (Port 90h D0-D3)
+  - Identify the writes to ports 80h, 90h & A0h.
 
 *******************************************************************************/
 
