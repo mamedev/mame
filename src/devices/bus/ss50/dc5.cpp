@@ -6,6 +6,25 @@
 
     See: http://www.swtpc.com/mholley/DC_5/DC5_Index.htm
 
+    The DC5 features an extra control register compared with the DC4. This
+    extra register can be enabled or disabled via a jumper setting. This
+    register is write only, and reading back gives a version number of 0x02.
+
+    This register can be useful for setting the clock rate, and particular
+    clock rates are needed for difference floppy disk sizes and formats. The
+    clock rates are control by bits bits 2 and 3 as follows: 0x00 gives 1MHz,
+    0x04 gives 1.2MHz, 0x80 gives 2MHz, and 0xC0 gives 2.4MHz.
+
+    This register also controls the single versus double density format
+    selection, via bit 5, so 0x00 gives double density and 0x20 gives single
+    density.
+
+    Software is typically not written for this DC5 extended control register,
+    but typically does not touch it. Thus is can be practical to work with a
+    purely single or double density disk by setting that format in this
+    control register. Most virtual disks appear to fit this pattern, rather
+    than mixing single and double density in the one disk.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -25,10 +44,11 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_floppy2(*this, "fdc:2")
 		, m_floppy3(*this, "fdc:3")
-		, m_clock(*this, "clock")
 		, m_interrupt_select(*this, "interrupt_select")
 		, m_address_mode(*this, "address_mode")
 		, m_two_control_regs(*this, "two_control_regs")
+		, m_ctrl_reg_bit7_side_select(*this, "ctrl_reg_bit7_side_select")
+		, m_expected_clock(*this, "expected_clock")
 		, m_expected_density(*this, "expected_density")
 		, m_expected_sectors(*this, "expected_sectors")
 		, m_track_zero_expected_sectors(*this, "track_zero_expected_sectors")
@@ -51,17 +71,20 @@ private:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	uint8_t m_fdc_status;              // for floppy controller
-	int m_floppy_motor_on;
+	uint8_t m_control_register;
+	uint8_t m_motor_timer_out;
 	emu_timer *m_floppy_motor_timer;
-	floppy_image_device *m_fdc_floppy; // Current selected floppy.
+	floppy_image_device *m_fdc_selected_floppy; // Current selected floppy.
 	uint8_t m_fdc_side;                // Current floppy side.
 	uint32_t m_fdc_clock;		   // Current clock frequency.
 
 	TIMER_CALLBACK_MEMBER(floppy_motor_callback);
 
 	void floppy_motor_trigger();
-
+	void control_register_update();
 	void validate_floppy_side(uint8_t cmd);
+	uint8_t validate_fdc_dden(uint8_t dden);
+	uint8_t validate_fdc_sso(uint8_t cmd);
 	uint8_t validate_fdc_sector_size(uint8_t cmd);
 
 	required_device<wd2797_device> m_fdc;
@@ -69,10 +92,11 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
-	required_ioport m_clock;
 	required_ioport m_interrupt_select;
 	required_ioport m_address_mode;
 	required_ioport m_two_control_regs;
+	required_ioport m_ctrl_reg_bit7_side_select;
+	required_ioport m_expected_clock;
 	required_ioport m_expected_density;
 	required_ioport m_expected_sectors;
 	required_ioport m_track_zero_expected_sectors;
@@ -96,16 +120,34 @@ static INPUT_PORTS_START( dc5 )
 	PORT_DIPSETTING(0, "No, DC4 compatible")
 	PORT_DIPSETTING(1, "Yes, DC5 extension")
 
-	// single or double density 5.24"  -  1.0MHz
-	// 'standard' 3.5"  -  1.2MHz
-	// 3.5" hd  -  2.0MHz
+	// This config setting allows checking of the FDC clock rate and
+	// overriding it to assist driver development. The DC5 supports
+	// programming of the clock rate via the second control register, and
+	// that setting can be validate using this setting. This setting also
+	// sets overrides the initial clock rate which is otherwise 1MHz.
+	//
+	// Some common rates:
+	// 5.25" single or double density  -  1.0MHz
+	// 3.5" 'standard'  -  1.2MHz
+	// 3.5" HD  -  2.0MHz
 	// 8" 360rpm  -  2.4MHz
-	PORT_START("clock")
-	PORT_DIPNAME(0xffffff, 1000000, "FDC clock")
-	PORT_DIPSETTING(1000000, "1.0 MHz")
-	PORT_DIPSETTING(1200000, "1.2 MHz")
-	PORT_DIPSETTING(2000000, "2.0 MHz")
-	PORT_DIPSETTING(2400000, "2.4 MHz")
+	PORT_START("expected_clock")
+	PORT_CONFNAME(0xffffff, 0, "FDC expected clock rate")
+	PORT_CONFSETTING(0, "-")
+	PORT_CONFSETTING(1000000, "1.0 MHz")
+	PORT_CONFSETTING(1200000, "1.2 MHz")
+	PORT_CONFSETTING(2000000, "2.0 MHz")
+	PORT_CONFSETTING(2400000, "2.4 MHz")
+
+	// It is not uncommon to see drivers using bit 7 of the control
+	// register as a side selection. This conflicts with the DC5, and
+	// earlier controllers in this series, which use bit 7 to inhibit
+	// drive selection. These drivers need to be corrected, but this
+	// option helps identify this issue and work around it.
+	PORT_START("ctrl_reg_bit7_side_select")
+	PORT_CONFNAME(0x01, 0, "Control register bit 7")
+	PORT_CONFSETTING(0, "Inhibits drive selection")
+	PORT_CONFSETTING(1, "Erroneous side select")
 
 	// Debug aid to hard code the density. The FLEX format uses single
 	// density for track zero. Many virtual disks 'fix' the format to be
@@ -206,17 +248,23 @@ void ss50_dc5_device::device_add_mconfig(machine_config &config)
 
 void ss50_dc5_device::device_reset()
 {
-	uint32_t clock = m_clock->read();
+	// Initialize to the expected rate if any, otherwise to 1MHz.
+	uint32_t clock = m_expected_clock->read();
+	clock = clock ? clock : 1000000;
 	m_fdc->set_unscaled_clock(clock);
 	m_fdc_clock = clock;
+
+	// The reset state of DDEN for the DC5 is one, so selecting single density.
+	m_fdc->dden_w(1);
 }
 
 void ss50_dc5_device::device_start()
 {
 	m_fdc_status = 0;
+	m_control_register = 0;
 	m_fdc_side = 0;
 	m_floppy_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ss50_dc5_device::floppy_motor_callback),this));
-	m_floppy_motor_on = 0;
+	m_motor_timer_out = 0;
 }
 
 
@@ -224,21 +272,21 @@ void ss50_dc5_device::device_start()
 
 void ss50_dc5_device::floppy_motor_trigger()
 {
-	m_floppy0->get_device()->mon_w(CLEAR_LINE);
-	m_floppy1->get_device()->mon_w(CLEAR_LINE);
-	m_floppy2->get_device()->mon_w(CLEAR_LINE);
-	m_floppy3->get_device()->mon_w(CLEAR_LINE);
 	m_floppy_motor_timer->adjust(attotime::from_msec(30000));
-	m_floppy_motor_on = 1;
+	if (!m_motor_timer_out)
+	{
+		m_motor_timer_out = 1;
+		control_register_update();
+	}
 }
 
 TIMER_CALLBACK_MEMBER(ss50_dc5_device::floppy_motor_callback)
 {
-	m_floppy0->get_device()->mon_w(ASSERT_LINE);
-	m_floppy1->get_device()->mon_w(ASSERT_LINE);
-	m_floppy2->get_device()->mon_w(ASSERT_LINE);
-	m_floppy3->get_device()->mon_w(ASSERT_LINE);
-	m_floppy_motor_on = 0;
+	if (m_motor_timer_out)
+	{
+		m_motor_timer_out = 0;
+		control_register_update();
+	}
 }
 
 // On a FDC command write, check that the floppy side is as expected given
@@ -261,9 +309,10 @@ void ss50_dc5_device::validate_floppy_side(uint8_t cmd)
 
 			if (m_fdc_side != expected_side)
 			{
-				if (m_fdc_floppy)
+				logerror("%s Unexpected size %d for track %d sector %d expected side %d\n", machine().describe_context(), m_fdc_side, track, sector, expected_side);
+				if (m_fdc_selected_floppy)
 				{
-					m_fdc_floppy->ss_w(expected_side);
+					m_fdc_selected_floppy->ss_w(expected_side);
 					m_fdc_side = expected_side;
 				}
 			}
@@ -275,9 +324,10 @@ void ss50_dc5_device::validate_floppy_side(uint8_t cmd)
 
 			if (m_fdc_side != expected_side)
 			{
-				if (m_fdc_floppy)
+				logerror("%s Unexpected side %d for track %d sector %d expected side %d\n", machine().describe_context(), m_fdc_side, track, sector, expected_side);
+				if (m_fdc_selected_floppy)
 				{
-					m_fdc_floppy->ss_w(expected_side);
+					m_fdc_selected_floppy->ss_w(expected_side);
 					m_fdc_side = expected_side;
 				}
 			}
@@ -285,16 +335,91 @@ void ss50_dc5_device::validate_floppy_side(uint8_t cmd)
 	}
 }
 
+// Note the dden line is low for double density.
+uint8_t ss50_dc5_device::validate_fdc_dden(uint8_t dden)
+{
+	uint8_t expected_density = m_expected_density->read();
+	switch (expected_density)
+	{
+		case 1:
+			// Single density.
+			if (!dden)
+				logerror("%s Unexpected DDEN %d for single density\n", machine().describe_context(), dden);
+			return 1;
+		case 2:
+		{
+			// Double density with track zero single density.
+			uint8_t track = m_fdc->track_r();
+
+			if (track == 0)
+			{
+				// If this path is call on an update of the
+				// second control register then the track need
+				// not be accurate so this message might not
+				// be accurate.
+				if (!dden)
+					logerror("%s Unexpected DDEN %d for single density trak 0\n", machine().describe_context(), dden);
+				return 1;
+			}
+			if (dden)
+				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
+			return 0;
+		}
+		case 3:
+			// Pure double density.
+			if (dden)
+				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
+			return 0;
+		default:
+			return dden;
+	}
+}
+
+uint8_t ss50_dc5_device::validate_fdc_sso(uint8_t cmd)
+{
+	// The DC4 and DC5 invert the SSO output and wire it to the DDEN input
+	// to allow selection of single or double density.
+
+	// In the DC5 two-register mode the SSO pin does not control DDEN.
+	uint32_t two_regs = m_two_control_regs->read();
+	if (two_regs)
+	{
+		// How if drivers are attempting to use SSO to control the
+		// density then that might need correcting so report such
+		// usage.
+		logerror("%s Unexpected SSO flag set in two control registers mode\n", machine().describe_context());
+		return cmd;
+	}
+
+	// The SSO is only loaded for type II and III commands.
+	if ((cmd & 0xe1) == 0x80 ||
+	    (cmd & 0xe0) == 0xa0 ||
+	    (cmd & 0xf9) == 0xc0 ||
+	    (cmd & 0xf9) == 0xe0 ||
+	    (cmd & 0xf9) == 0xf0)
+	{
+		// The SSO output is inverted and input to DDEN.
+		uint8_t dden = !BIT(cmd, 1);
+		uint8_t sso = !validate_fdc_dden(dden);
+		cmd = (cmd & 0xfd) | (sso << 1);
+	}
+
+	return cmd;
+}
+
 // The WD2797 supports an alternate interpretation of the sector size. Check
-// that the flag is as expected and return the corrected command if necessary.
+// that the flag is as expected for FLEX and return the corrected command if
+// necessary.
 uint8_t ss50_dc5_device::validate_fdc_sector_size(uint8_t cmd)
 {
 	if ((cmd & 0xe1) == 0x80 || (cmd & 0xe0) == 0xa0)
 	{
-		// Check that the sector size L flag is set, as expected.
+		// Check that the sector length flag is set as expected.
 		uint8_t sector_length_default = cmd & 0x08;
-		if (!sector_length_default)
+		if (sector_length_default != 0x08)
 		{
+			logerror("%s Unexpected sector length default %02x\n", machine().describe_context(), sector_length_default);
+			// Patch the sector length flag.
 			cmd |= 0x08;
 		}
 	}
@@ -330,48 +455,120 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_drq_w )
 
 WRITE_LINE_MEMBER( ss50_dc5_device::fdc_sso_w )
 {
-		// The DC4 and DC5 invert the SSO output and wire it to the
-		// DDEN input to allow selection of single or double density.
+	// The DC4 and DC5 invert the SSO output and wire it to the DDEN input
+	// to allow selection of single or double density.
 
-		// A DC5 extension. In two-register mode the SSO pin does not
-		// control DDEN.
-		uint32_t two_regs = m_two_control_regs->read();
-		if (two_regs)
-			return;
+	// A DC5 extension. In two-register mode the SSO pin does not control
+	// DDEN.
+	uint32_t two_regs = m_two_control_regs->read();
+	if (two_regs)
+		return;
 
-		// However there are a lot of boot loaders that will
-		// not work properly with this, so allow other options.
-		uint8_t expected_density = m_expected_density->read();
-		switch (expected_density)
+	// However there are a lot of boot loaders that will
+	// not work properly with this, so allow other options.
+	uint8_t expected_density = m_expected_density->read();
+	switch (expected_density)
+	{
+		case 1:
+			// Single density.
+			if (state)
+				logerror("Unexpected SSO %d for single density\n", state);
+			m_fdc->dden_w(1);
+			break;
+		case 2:
 		{
-			case 1:
-				// Single density.
-				m_fdc->dden_w(1);
-				break;
-			case 2:
-			{
-				// Double density with track zero single density.
-				uint8_t track = m_fdc->track_r();
+			// Double density with track zero single density.
+			uint8_t track = m_fdc->track_r();
 
-				if (track == 0)
-				{
-					m_fdc->dden_w(1);
-				}
-				else
-				{
-					m_fdc->dden_w(0);
-				}
-				break;
+			if (track == 0)
+			{
+				if (state)
+					logerror("Unexpected SSO %d for single density trak 0\n", state);
+				m_fdc->dden_w(1);
 			}
-			case 3:
-				// Pure double density.
+			else
+			{
+				if (!state)
+					logerror("Unexpected SSO %d for double density\n", state);
 				m_fdc->dden_w(0);
-				break;
-			default:
-				m_fdc->dden_w(!state);
-				break;
+			}
+			break;
 		}
+		case 3:
+			// Pure double density.
+			if (!state)
+				logerror("Unexpected SSO %d for double density\n", state);
+			m_fdc->dden_w(0);
+			break;
+		default:
+			m_fdc->dden_w(!state);
+			break;
+	}
 }
+
+// Called when state affected by the control register changes, when the
+// control register is modified, or when the motor starts or stops.
+void ss50_dc5_device::control_register_update()
+{
+	// The floppy drives do not gate the motor based on the select input,
+	// so the motors run, or not, irrespective of the drive selection.
+	uint8_t motor = m_motor_timer_out ? CLEAR_LINE : ASSERT_LINE;
+	m_floppy0->get_device()->mon_w(motor);
+	m_floppy1->get_device()->mon_w(motor);
+	m_floppy2->get_device()->mon_w(motor);
+	m_floppy3->get_device()->mon_w(motor);
+
+	// The DC2, DC3, DC4, DC5 have a drive inhibit feature controlled by
+	// bit 7, and the drives are de-selected if the motor timer has timed
+	// out.
+	uint8_t inhibit = BIT(m_control_register, 7);
+
+	// However it is common to see drivers using bit 7 for side selection,
+	// so offer any alternative interpretation as a work around.
+	uint8_t bit7_side_select = m_ctrl_reg_bit7_side_select->read();
+
+	floppy_image_device *floppy = nullptr;
+
+	if ((bit7_side_select || !inhibit) && m_motor_timer_out)
+	{
+		uint8_t drive = m_control_register & 3;
+		if (drive == 0) floppy = m_floppy0->get_device();
+		if (drive == 1) floppy = m_floppy1->get_device();
+		if (drive == 2) floppy = m_floppy2->get_device();
+		if (drive == 3) floppy = m_floppy3->get_device();
+	}
+
+	if (floppy != m_fdc_selected_floppy)
+	{
+		m_fdc->set_floppy(floppy);
+		m_fdc_selected_floppy = floppy;
+	}
+
+	if (floppy)
+	{
+		// The DC3, DC4, DC5 have a side select feature that is
+		// controlled by bit 6. The DC1 and DC2 do not have a floppy
+		// side output so did not support double sided disks.
+		uint8_t side = BIT(m_control_register, 6);
+
+		if (bit7_side_select)
+		{
+			uint8_t bit7 = BIT(m_control_register, 7);
+			if (bit7)
+				logerror("%s Unexpected use of DC5 control register bit 7 for side selection.\n", machine().describe_context());
+			// OR together the side selection bits. This appears
+			// the most useful choice because drivers in error are
+			// most likely just writing to the wrong bit rather
+			// than inconsistently to both bits. This allows
+			// incremental correction of driver while spotting
+			// remaining uses of bit 7 for side selection.
+			side |= bit7;
+		}
+		floppy->ss_w(side);
+		m_fdc_side = side;
+	}
+}
+
 
 //-------------------------------------------------
 //  register_read - read from a port register
@@ -395,6 +592,9 @@ uint8_t ss50_dc5_device::register_read(offs_t offset)
 	if ((offset & 0x4) == 0x0)
 	{
 		uint32_t two_regs = m_two_control_regs->read();
+
+		// Note: access to this control register does not trigger the
+		// motor on and and does not reset the motor timer.
 
 		if (!two_regs || (offset & 2) == 0)
 		{
@@ -444,60 +644,69 @@ void ss50_dc5_device::register_write(offs_t offset, uint8_t data)
 		// Control register(s) 8014-8017 E014-E017
 		uint32_t two_regs = m_two_control_regs->read();
 
+		// Note: access to this control register does not trigger the
+		// motor on and and does not reset the motor timer.
+
 		if (!two_regs || (offset & 2) == 0)
 		{
 			// Control register 8014 / e014 write.
-			floppy_image_device *floppy = nullptr;
-			uint8_t drive = data & 3;
-
-			// The DC2, DC3, DC4, DC5 have a drive inhibit feature
-			// controlled by bit 7. Have not seen software use that?
-
-			if (drive == 0) floppy = m_floppy0->get_device();
-			if (drive == 1) floppy = m_floppy1->get_device();
-			if (drive == 2) floppy = m_floppy2->get_device();
-			if (drive == 3) floppy = m_floppy3->get_device();
-
-			if (floppy != m_fdc_floppy)
-			{
-				m_fdc->set_floppy(floppy);
-				m_fdc_floppy = floppy;
-			}
-
-			if (floppy)
-			{
-				// The DC3, DC4, DC5 have a side select feature that
-				// is controlled by bit 6. The DC1 and DC2 do not have
-				// a floppy side output.
-				uint8_t side = BIT(data, 6);
-				floppy->ss_w(side);
-				m_fdc_side = side;
-			}
+			m_control_register = data;
+			control_register_update();
 		}
 
 		if (two_regs && (offset & 2) == 2)
 		{
 			// DC5 extended control register 8016 / E016.
-#if 0
-			// TODO DC5 clocking extensions.
+
 			// Osc20 and osc12 control a clock divider.
 			uint8_t osc12 = BIT(data, 2);
 			uint8_t osc20 = BIT(data, 3);
 			uint32_t clock = 1000000;
-			if (osc20)
+
+			// Note: supporting 2.4MHz is here is an extension to
+			// the published DC5 design, and appears necessary to
+			// support 360 rpm 8" drives. The case in which osc20
+			// and osc12 are high generates 2.0MHz in the
+			// published design, and that is redundant and is used
+			// here to generate 2.4MHz. The DC5 is an open design
+			// using a PLD and this variation can be programmed
+			// into the DC5 hardware. The 2.4MHz rate appears to
+			// be outside the limit for the WD2797 which appears
+			// to be 2.173MHz. TODO explore this further; were the
+			// 8" drives run at 300rpm; is there an error in the
+			// rates elsewhere?
+			if (osc20 && osc12)
+				clock = 2400000;
+			else if (osc20)
 				clock = 2000000;
 			else if (osc12)
 				clock = 1200000;
-			m_fdc->set_unscaled_clock(clock);
-			m_fdc_clock = clock;
 
+			// Compare to the expected clock rate if any.
+			uint32_t expected_clock = m_expected_clock->read();
+			if (expected_clock && clock != expected_clock)
+			{
+				logerror("%s Unexpected clock rate of %dHz expected %dHz.\n", machine().describe_context(), clock, expected_clock);
+				clock = expected_clock;
+			}
+
+			if (clock != m_fdc_clock)
+			{
+				m_fdc->set_unscaled_clock(clock);
+				m_fdc_clock = clock;
+			}
+
+#if 0
 			// Connects to the WD2979 5/8 pin.
 			// TODO is this needed for the emulator?
 			uint8_t five_or_eight = BIT(data, 4);
 #endif
+
 			// In this two-register mode the FDC SSO output pin
-			// does not control DDEN.
-			uint8_t dden = BIT(data, 5);
+			// does not control DDEN. The bit 5 value is inverted
+			// and input to DDEN.
+			uint8_t dden = !BIT(data, 5);
+			dden = validate_fdc_dden(dden);
 			m_fdc->dden_w(dden);
 		}
 	}
@@ -511,6 +720,7 @@ void ss50_dc5_device::register_write(offs_t offset, uint8_t data)
 		if (offset == 0) {
 			validate_floppy_side(data);
 			data = validate_fdc_sector_size(data);
+			data = validate_fdc_sso(data);
 		}
 
 		m_fdc->wd2797_device::write(offset, data);
