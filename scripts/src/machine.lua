@@ -2267,6 +2267,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pcf8584.h,MACHINES["PCF8584"] = true
+---------------------------------------------------
+
+if (MACHINES["PCF8584"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pcf8584.cpp",
+		MAME_DIR .. "src/devices/machine/pcf8584.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pcf8593.h,MACHINES["PCF8593"] = true
 ---------------------------------------------------
 
