@@ -25,6 +25,7 @@
 #include "uiinput.h"
 #include "pluginopts.h"
 #include "softlist.h"
+#include "inputdev.h"
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
@@ -2039,6 +2040,7 @@ void lua_engine::initialize()
  *                                                (switch/abs[olute]/rel[ative]/max[imum])
  * input:seq_poll() - poll once, returns true if input was fetched
  * input:seq_poll_final() - get final input_seq
+ * input.device_classes - returns device classes
  */
 
 	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,
@@ -2057,8 +2059,84 @@ void lua_engine::initialize()
 					input.seq_poll_start(cls, start);
 				},
 			"seq_poll", &input_manager::seq_poll,
-			"seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); });
+			"seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); },
+			"device_classes", sol::property([this](input_manager &input)
+			{
+				sol::table result = sol().create_table();
+				for (input_device_class devclass_id = DEVICE_CLASS_FIRST_VALID; devclass_id <= DEVICE_CLASS_LAST_VALID; devclass_id++)
+				{
+					input_class &devclass = input.device_class(devclass_id);
+					result[devclass.name()] = &devclass;
+				}
+				return result;
+			}));
 
+/*  input_class library
+ *
+ * manager:machine():input().device_classes[devclass]
+ *
+ * devclass.name
+ * devclass.enabled
+ * devclass.multi
+ * devclass.devices[]
+ */
+	sol().registry().new_usertype<input_class>("input_class", "new", sol::no_constructor,
+		"name", sol::property(&input_class::name),
+		"enabled", sol::property(&input_class::enabled, &input_class::enable),
+		"multi", sol::property(&input_class::multi, &input_class::set_multi),
+		"devices", sol::property([this](input_class &devclass)
+			{
+				sol::table result = sol().create_table();
+				int index = 1;
+				for (int devindex = 0; devindex <= devclass.maxindex(); devindex++)
+				{
+					input_device *dev = devclass.device(devindex);
+					if (dev)
+						result[index++] = dev;
+				}
+				return result;
+			}));
+
+/*  input_device library
+ *
+ * manager:machine():input().device_classes[devclass].devices[index]
+ * device.name
+ * device.id
+ * device.devindex
+ * device.items[]
+ */
+
+	sol().registry().new_usertype<input_device>("input_device", "new", sol::no_constructor,
+		"name", sol::property(&input_device::name),
+		"id", sol::property(&input_device::id),
+		"devindex", sol::property(&input_device::devindex),
+		"items", sol::property([this](input_device &dev)
+		{
+			sol::table result = sol().create_table();
+			for (input_item_id id = ITEM_ID_FIRST_VALID; id < dev.maxitem(); id++)
+			{
+				input_device_item *item = dev.item(id);
+				if (item)
+					result[id] = dev.item(id);
+			}
+			return result;
+		}));
+
+/*  input_device_item library
+ *
+ * manager:machine():input().device_classes[devclass].devices[index].items[item_id]
+ * item.name
+ * item.token
+ * item:code()
+ */
+	sol().registry().new_usertype<input_device_item>("input_device_item", "new", sol::no_constructor,
+		"name", sol::property(&input_device_item::name),
+		"token", sol::property(&input_device_item::token),
+		"code", [](input_device_item &item)
+		{
+			input_code code(item.device().devclass(), item.device().devindex(), item.itemclass(), ITEM_MODIFIER_NONE, item.itemid());
+			return sol::make_user(code);
+		});
 
 /*  ui_input_manager library
  *
