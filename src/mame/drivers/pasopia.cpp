@@ -7,6 +7,10 @@
     TODO:
     - machine emulation needs merging with Pasopia 7 (video emulation is
       completely different tho)
+    - screen resolution switching
+    - Centronics printer interface
+    - RS-232C serial interface
+    - FDC and other I/O expansions
 
 ****************************************************************************/
 
@@ -289,24 +293,20 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 void pasopia_state::pasopia(machine_config &config)
 {
 	/* basic machine hardware */
-
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, 15.9744_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pasopia_state::pasopia_map);
 	m_maincpu->set_addrmap(AS_IO, &pasopia_state::pasopia_io);
 	m_maincpu->set_daisy_config(pasopia_daisy);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_raw(14.318181_MHz_XTAL / 2, 456, 0, 296, 262, 0, 192);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia);
 	PALETTE(config, m_palette).set_entries(8);
 
 	/* Devices */
-	MC6845(config, m_crtc, XTAL(4'000'000)/4);   /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	HD6845S(config, m_crtc, 14.318181_MHz_XTAL / 16);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -325,13 +325,13 @@ void pasopia_state::pasopia(machine_config &config)
 	I8255A(config, m_ppi2);
 	m_ppi2->in_pc_callback().set(FUNC(pasopia_state::rombank_r));
 
-	Z80CTC(config, m_ctc, XTAL(4'000'000));
+	Z80CTC(config, m_ctc, 15.9744_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<1>().set(m_ctc, FUNC(z80ctc_device::trg2));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 
-	Z80PIO(config, m_pio, XTAL(4'000'000));
+	Z80PIO(config, m_pio, 15.9744_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->out_pa_callback().set(FUNC(pasopia_state::mux_w));
 	m_pio->in_pb_callback().set(FUNC(pasopia_state::keyb_r));
@@ -351,4 +351,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME   FLAGS
-COMP( 1986, pasopia, 0,      0,      pasopia, pasopia, pasopia_state, init_pasopia, "Toshiba", "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, pasopia, 0,      0,      pasopia, pasopia, pasopia_state, init_pasopia, "Toshiba", "Personal Computer Pasopia PA7010", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
