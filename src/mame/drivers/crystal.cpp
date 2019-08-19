@@ -249,7 +249,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_crtcregs(*this, "crtcregs"),
-		m_vidregs(*this, "vidregs"),
 		m_textureram(*this, "textureram"),
 		m_frameram(*this, "frameram"),
 		m_reset_patch(*this, "reset_patch"),
@@ -280,7 +279,6 @@ private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_workram;
 	required_shared_ptr<uint32_t> m_crtcregs;
-	required_shared_ptr<uint32_t> m_vidregs;
 	required_shared_ptr<uint32_t> m_textureram;
 	required_shared_ptr<uint32_t> m_frameram;
 	optional_shared_ptr<uint32_t> m_reset_patch; // not needed for trivrus
@@ -302,12 +300,8 @@ private:
 
 	uint32_t    m_Bank;
 	uint32_t    m_maxbank;
-	uint8_t     m_FlipCount;
 	uint32_t    m_FlashCmd;
 	uint8_t     m_OldPort4;
-
-	DECLARE_READ32_MEMBER(FlipCount_r);
-	DECLARE_WRITE32_MEMBER(FlipCount_w);
 
 	DECLARE_READ32_MEMBER(system_input_r);
 	DECLARE_WRITE32_MEMBER(Banksw_w);
@@ -324,8 +318,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void PatchReset();
-	uint16_t GetVidReg( address_space &space, uint16_t reg );
-	void SetVidReg( address_space &space, uint16_t reg, uint16_t val );
 	void crospuzl_mem(address_map &map);
 	void crystal_mem(address_map &map);
 	void crzyddz2_mem(address_map &map);
@@ -397,6 +389,31 @@ private:
 	// Misc
 	DECLARE_READ32_MEMBER( sysid_r );
 	DECLARE_READ32_MEMBER( cfgr_r );
+	
+	// Vrender0 video
+	DECLARE_READ16_MEMBER( cmd_queue_front_r );
+	DECLARE_WRITE16_MEMBER( cmd_queue_front_w );
+
+	DECLARE_READ16_MEMBER( cmd_queue_rear_r );
+	uint16_t m_queue_rear, m_queue_front;
+	
+	DECLARE_READ16_MEMBER( bank1_select_r );
+	DECLARE_WRITE16_MEMBER( bank1_select_w );
+	bool m_bank1_select;
+	
+	DECLARE_READ16_MEMBER( display_bank_r );
+	uint8_t m_display_bank;
+	
+	DECLARE_READ16_MEMBER( render_control_r );
+	DECLARE_WRITE16_MEMBER( render_control_w );
+	bool m_draw_select;
+	bool m_render_reset;
+	bool m_render_start;
+	uint8_t m_dither_mode;
+	
+	DECLARE_READ16_MEMBER(flip_count_r);
+	DECLARE_WRITE16_MEMBER(flip_count_w);
+	uint8_t     m_FlipCount;
 };
 
 /*
@@ -440,21 +457,21 @@ void crystal_state::IntReq( int num )
 #endif
 }
 
-READ32_MEMBER(crystal_state::FlipCount_r)
+READ16_MEMBER(crystal_state::flip_count_r)
 {
 #ifdef IDLE_LOOP_SPEEDUP
 	m_FlipCntRead++;
 	if (m_FlipCntRead >= 16 && !m_intst && m_FlipCount != 0)
 		m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
 #endif
-	return ((uint32_t) m_FlipCount) << 16;
+	return m_FlipCount;
 }
 
-WRITE32_MEMBER(crystal_state::FlipCount_w)
+WRITE16_MEMBER(crystal_state::flip_count_w)
 {
-	if (ACCESSING_BITS_16_23)
+	if (ACCESSING_BITS_0_7)
 	{
-		int fc = (data >> 16) & 0xff;
+		int fc = (data) & 0xff;
 		if (fc == 1)
 			m_FlipCount++;
 		else if (fc == 0)
@@ -818,6 +835,57 @@ READ32_MEMBER(crystal_state::cfgr_r)
 	return 0x00000002;
 }
 
+READ16_MEMBER(crystal_state::cmd_queue_front_r)
+{
+	return m_queue_front & 0x7ff;
+}
+
+WRITE16_MEMBER(crystal_state::cmd_queue_front_w)
+{
+	COMBINE_DATA(&m_queue_front);
+}
+
+READ16_MEMBER(crystal_state::cmd_queue_rear_r)
+{
+	return m_queue_rear & 0x7ff;
+}
+
+READ16_MEMBER(crystal_state::render_control_r)
+{
+	return (m_draw_select<<7) | (m_render_reset<<3) | (m_render_start<<2) | (m_dither_mode);
+}
+
+WRITE16_MEMBER(crystal_state::render_control_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_draw_select = BIT(data, 7);
+		m_render_reset = BIT(data, 3);
+		m_render_start = BIT(data, 2);
+		m_dither_mode = data & 3;
+		
+		// initialize pipeline
+		// TODO: what happens if reset and start are both 1? Datasheet advises against it.
+		if (m_render_reset == true)
+			m_queue_front = m_queue_rear = 0;
+	}
+}
+
+READ16_MEMBER(crystal_state::display_bank_r)
+{
+	return m_display_bank;
+}
+
+READ16_MEMBER(crystal_state::bank1_select_r)
+{
+	return (m_bank1_select)<<15;
+}
+
+WRITE16_MEMBER(crystal_state::bank1_select_w)
+{
+	m_bank1_select = BIT(data,15);
+}
+
 void crystal_state::internal_map(address_map &map)
 {
 //  map(0x00000000, 0x00ffffff)                            // Local ROM
@@ -874,8 +942,15 @@ void crystal_state::internal_map(address_map &map)
 
 //  map(0x02000000, 0x02ffffff).ram().share("workram");    // Local RAM/DRAM (Max.16MB)
 
-	map(0x03000000, 0x0300ffff).ram().share("vidregs");
-	map(0x030000a4, 0x030000a7).rw(FUNC(crystal_state::FlipCount_r), FUNC(crystal_state::FlipCount_w));
+//	map(0x03000000, 0x0300ffff)								// Video Registers
+	map(0x03000080, 0x03000083).rw(FUNC(crystal_state::cmd_queue_front_r), FUNC(crystal_state::cmd_queue_front_w)).umask32(0x0000ffff);
+	map(0x03000080, 0x03000083).r(FUNC(crystal_state::cmd_queue_rear_r)).umask32(0xffff0000);
+
+	map(0x0300008c, 0x0300008f).rw(FUNC(crystal_state::render_control_r), FUNC(crystal_state::render_control_w)).umask32(0x0000ffff);
+	map(0x0300008c, 0x0300008f).r(FUNC(crystal_state::display_bank_r)).umask32(0xffff0000);
+
+	map(0x03000090, 0x03000093).rw(FUNC(crystal_state::bank1_select_r), FUNC(crystal_state::bank1_select_w)).umask32(0x0000ffff);
+	map(0x030000a4, 0x030000a7).rw(FUNC(crystal_state::flip_count_r), FUNC(crystal_state::flip_count_w)).umask32(0xffff0000);
 //  map(0x03800000, 0x03ffffff).ram().share("textureram"); // Texture Buffer Memory (Max.8MB)
 //  map(0x04000000, 0x047fffff).ram().share("frameram");   // Frame Buffer Memory (Max.8MB)
 	map(0x04800000, 0x04800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
@@ -1229,7 +1304,7 @@ void crystal_state::machine_start()
 
 void crystal_state::machine_reset()
 {
-	std::fill_n(&m_vidregs[0], m_vidregs.bytes() / 4, 0);
+	// TODO: this is a wrong default
 	m_crtcregs[1] = 0x00000022;
 
 	m_FlipCount = 0;
@@ -1258,17 +1333,6 @@ void crystal_state::machine_reset()
 	m_crzyddz2_prot = 0x00;
 }
 
-uint16_t crystal_state::GetVidReg( address_space &space, uint16_t reg )
-{
-	return space.read_word(0x03000000 + reg);
-}
-
-void crystal_state::SetVidReg( address_space &space, uint16_t reg, uint16_t val )
-{
-	space.write_word(0x03000000 + reg, val);
-}
-
-
 uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((m_crtcregs[0] & 0x0200) == 0x0200) // Blank Screen
@@ -1277,18 +1341,18 @@ uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		return 0;
 	}
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int DoFlip;
+	uint16_t head = m_queue_rear;
+	uint16_t tail = m_queue_front;
 
-	uint32_t B0 = 0x0;
-	uint32_t B1 = (GetVidReg(space, 0x90) & 0x8000) ? 0x400000 : 0x100000;
+	uint32_t B0 = 0x000000;
+	uint32_t B1 = m_bank1_select == true ? 0x400000 : 0x100000;
 	uint16_t *Front, *Back;
 	uint16_t *Visible, *DrawDest;
 	uint16_t *srcline;
-	uint16_t head, tail;
 	uint32_t width = cliprect.width();
 
-	if (GetVidReg(space, 0x8e) & 1)
+	if (m_display_bank & 1)
 	{
 		Front = (uint16_t*) (m_frameram + B1 / 4);
 		Back  = (uint16_t*) (m_frameram + B0 / 4);
@@ -1301,34 +1365,32 @@ uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	Visible  = (uint16_t*) Front;
 	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-	DrawDest = reinterpret_cast<uint16_t *>(m_frameram.target());
+	//DrawDest = reinterpret_cast<uint16_t *>(m_frameram.target());
 
-
-	if (GetVidReg(space, 0x8c) & 0x80)
-		DrawDest = Front;
-	else
-		DrawDest = Back;
-
-//  DrawDest = Visible;
-
-	srcline = (uint16_t *) DrawDest;
+	DrawDest = ((m_draw_select == true) ? Front : Back);
 
 	DoFlip = 0;
-	head = GetVidReg(space, 0x82);
-	tail = GetVidReg(space, 0x80);
-	while ((head & 0x7ff) != (tail & 0x7ff))
-	{
-		// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-		DoFlip = m_vr0vid->vrender0_ProcessPacket(0x03800000 + head * 64, DrawDest, reinterpret_cast<uint8_t*>(m_textureram.target()));
-		head++;
-		head &= 0x7ff;
-		if (DoFlip)
-			break;
-	}
 
-	// TODO: !!! remove this from rendering loop !!! >.>
-	if (DoFlip)
-		SetVidReg(space, 0x8e, GetVidReg(space, 0x8e) ^ 1);
+	// In general this should be inside the VRender0 video chip,
+	// in ideal world with async processing via a timer
+	// but then performance ...?
+	if (m_render_start == true)
+	{
+		while ((head & 0x7ff) != (tail & 0x7ff))
+		{
+			// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+			// TODO: this is WRITING to frame buffer area in screen_update 
+			DoFlip = m_vr0vid->vrender0_ProcessPacket(0x03800000 + head * 64, DrawDest, reinterpret_cast<uint8_t*>(m_textureram.target()));
+			head++;
+			head &= 0x7ff;
+			if (DoFlip)
+				break;
+		}
+
+		// TODO: !!! remove this from rendering loop !!! >.>
+		if (DoFlip)
+			m_display_bank ^= 1;
+	}
 
 	srcline = (uint16_t *) Visible;
 	uint32_t const dx = cliprect.left();
@@ -1343,32 +1405,33 @@ WRITE_LINE_MEMBER(crystal_state::screen_vblank)
 	// rising edge
 	if (state)
 	{
+		// TODO: this is actually not activated by games, they checks for vblank via flip bit, 
+		// needs a custom signal hooked to the renderer for the stuff below this
+		if (crt_active_vblank_irq() == true)
+			IntReq(24);      //VRender0 VBlank
+		
+		if (m_render_start == false)
+			return;
+		
 		address_space &space = m_maincpu->space(AS_PROGRAM);
-		uint16_t head, tail;
 		int DoFlip = 0;
 
-		head = GetVidReg(space, 0x82);
-		tail = GetVidReg(space, 0x80);
-		while ((head & 0x7ff) != (tail & 0x7ff))
+		while ((m_queue_rear & 0x7ff) != (m_queue_front & 0x7ff))
 		{
-			uint16_t Packet0 = space.read_word(0x03800000 + head * 64);
+			uint16_t Packet0 = space.read_word(0x03800000 + m_queue_rear * 64);
 			if (Packet0 & 0x81)
 				DoFlip = 1;
-			head++;
-			head &= 0x7ff;
+			m_queue_rear ++;
+			m_queue_rear &= 0x7ff;
 			if (DoFlip)
 				break;
 		}
-		SetVidReg(space, 0x82, head);
+
 		if (DoFlip)
 		{
 			if (m_FlipCount)
 				m_FlipCount--;
-
 		}
-		
-		if (crt_active_vblank_irq() == true)
-			IntReq(24);      //VRender0 VBlank
 	}
 }
 
