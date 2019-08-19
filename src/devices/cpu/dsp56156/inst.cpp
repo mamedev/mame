@@ -4,7 +4,7 @@
 #include "inst.h"
 #include "emu.h"
 
-namespace DSP56K
+namespace DSP_56156
 {
 // Factory
 std::unique_ptr<Instruction> Instruction::decodeInstruction(const Opcode* opc,

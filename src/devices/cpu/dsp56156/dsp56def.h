@@ -7,9 +7,9 @@
 #ifndef __DSP56_DEF_H__
 #define __DSP56_DEF_H__
 
-#include "dsp56k.h"
+#include "dsp56156.h"
 
-namespace DSP56K
+namespace DSP_56156
 {
 /***************************************************************************
     ALU
@@ -51,6 +51,6 @@ namespace DSP56K
 
 #define TEMP    cpustate->AGU.temp
 
-} // namespace DSP56K
+} // namespace DSP_56156
 
 #endif

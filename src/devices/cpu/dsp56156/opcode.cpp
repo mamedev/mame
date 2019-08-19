@@ -5,7 +5,7 @@
 
 #include "opcode.h"
 
-namespace DSP56K
+namespace DSP_56156
 {
 Opcode::Opcode(uint16_t w0, uint16_t w1) : m_word0(w0)/*, m_word1(w1)*/
 {
@@ -41,7 +41,7 @@ std::string Opcode::disassemble() const
 }
 
 
-void Opcode::evaluate(dsp56k_core* cpustate) const
+void Opcode::evaluate(dsp56156_core* cpustate) const
 {
 	if (m_instruction) m_instruction->evaluate(cpustate);
 	if (m_parallelMove) m_parallelMove->evaluate();

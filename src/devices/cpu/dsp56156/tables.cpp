@@ -8,7 +8,7 @@
 #include "tables.h"
 #include "dsp56def.h"
 
-namespace DSP56K
+namespace DSP_56156
 {
 /******************/
 /* Table decoding */
@@ -655,7 +655,7 @@ int8_t get_6_bit_signed_value(uint16_t bits)
 /* HELPER FUNCTIONS */
 /********************/
 
-uint16_t dsp56k_op_maskn(uint16_t cur, uint16_t mask)
+uint16_t dsp56156_op_maskn(uint16_t cur, uint16_t mask)
 {
 	int i;
 
@@ -695,7 +695,7 @@ bool registerOverlap(const reg_id& r0, const size_t bmd, const reg_id& r1)
 	return false;
 }
 
-uint16_t regValue16(dsp56k_core* cpustate, const reg_id& reg)
+uint16_t regValue16(dsp56156_core* cpustate, const reg_id& reg)
 {
 	if (reg == iX0) return X0;
 	if (reg == iX1) return X1;
@@ -726,7 +726,7 @@ uint16_t regValue16(dsp56k_core* cpustate, const reg_id& reg)
 	return 0xdead;
 }
 
-void setReg16(dsp56k_core* cpustate, const uint16_t& value, const reg_id& reg)
+void setReg16(dsp56156_core* cpustate, const uint16_t& value, const reg_id& reg)
 {
 	if (reg == iX0) X0 = value;
 	if (reg == iX1) X1 = value;

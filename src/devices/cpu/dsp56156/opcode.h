@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef __DSP56K_OPCODE_H__
-#define __DSP56K_OPCODE_H__
+#ifndef DSP56156_OPCODE_H
+#define DSP56156_OPCODE_H
 
 #include "inst.h"
 #include "pmove.h"
 
-#include "dsp56k.h"
+#include "dsp56156.h"
 
 //
 // An Opcode contains an instruction and a parallel move operation.
 //
-namespace DSP56K
+namespace DSP_56156
 {
 class Instruction;
 class ParallelMove;
@@ -23,7 +23,7 @@ public:
 	virtual ~Opcode();
 
 	std::string disassemble() const;
-	void evaluate(dsp56k_core* cpustate) const;
+	void evaluate(dsp56156_core* cpustate) const;
 	size_t size() const;
 	size_t evalSize() const;
 

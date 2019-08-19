@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef __DSP56K_PARALLEL_MOVE_H__
-#define __DSP56K_PARALLEL_MOVE_H__
+#ifndef DSP56156_PMOVE_H
+#define DSP56156_PMOVE_H
 
 #include "opcode.h"
 #include "tables.h"
@@ -9,7 +9,7 @@
 //
 // A ParallelMove Object is what all parallel move classes inherit from.
 //
-namespace DSP56K
+namespace DSP_56156
 {
 class Opcode;
 

@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef __DSP56K_OPS_H__
-#define __DSP56K_OPS_H__
+#ifndef DSP56156_TABLES_H
+#define DSP56156_TABLES_H
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "dsp56k.h"
+#include "dsp56156.h"
 
-namespace DSP56K
+namespace DSP_56156
 {
-#define BITSn(CUR,MASK) (dsp56k_op_maskn(CUR,MASK))
+#define BITSn(CUR,MASK) (dsp56156_op_maskn(CUR,MASK))
 
 enum bitsModified {BM_NONE = 0x0, BM_LOW = 0x1, BM_MIDDLE = 0x2, BM_HIGH = 0x4};
 
@@ -76,12 +76,12 @@ void assemble_address_from_IO_short_address(uint16_t pp, std::string& ea);
 int8_t get_6_bit_signed_value(uint16_t bits);
 
 // Helpers
-uint16_t dsp56k_op_maskn(uint16_t cur, uint16_t mask);
+uint16_t dsp56156_op_maskn(uint16_t cur, uint16_t mask);
 
 bool registerOverlap(const reg_id& r0, const size_t bmd, const reg_id& r1);
 
-uint16_t regValue16(dsp56k_core* cpustate, const reg_id& reg);
-void setReg16(dsp56k_core* cpustate, const uint16_t& value, const reg_id& reg);
+uint16_t regValue16(dsp56156_core* cpustate, const reg_id& reg);
+void setReg16(dsp56156_core* cpustate, const uint16_t& value, const reg_id& reg);
 
 std::string regIdAsString(const reg_id& regId);
 std::string opMnemonicAsString(const op_mnem& mnem);

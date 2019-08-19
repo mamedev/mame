@@ -16,7 +16,7 @@
 **********************************************************************/
 
 #include "emu.h"
-//#include "cpu/dsp56k/dsp56k.h"
+//#include "cpu/dsp56156/dsp56156.h"
 #include "cpu/mips/mips1.h"
 #include "cpu/mips/mips3.h"
 #include "machine/eepromser.h"

@@ -2,15 +2,15 @@
 // copyright-holders:Andrew Gardner
 /***************************************************************************
 
-    dsp56k.h
-    Interface file for the portable Motorola/Freescale DSP56k emulator.
+    dsp56156.h
+    Interface file for the portable Motorola/Freescale DSP56156 emulator.
     Written by Andrew Gardner
 
 ***************************************************************************/
 
 
-#ifndef MAME_CPU_DSP56K_DSP56K_H
-#define MAME_CPU_DSP56K_DSP56K_H
+#ifndef MAME_CPU_DSP56156_DSP56156_H
+#define MAME_CPU_DSP56156_DSP56156_H
 
 #pragma once
 
@@ -18,21 +18,21 @@
 
 // IRQ Lines
 // MODA and MODB are also known as IRQA and IRQB
-#define DSP56K_IRQ_MODA  0
-#define DSP56K_IRQ_MODB  1
-#define DSP56K_IRQ_MODC  2
-#define DSP56K_IRQ_RESET 3  /* Is this needed? */
+#define DSP56156_IRQ_MODA  0
+#define DSP56156_IRQ_MODB  1
+#define DSP56156_IRQ_MODC  2
+#define DSP56156_IRQ_RESET 3  /* Is this needed? */
 
 
-namespace DSP56K {
+namespace DSP_56156 {
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 // 5-4 Host Interface
-struct dsp56k_host_interface
+struct dsp56156_host_interface
 {
-	// **** Dsp56k side **** //
+	// **** DSP56156 side **** //
 	// Host Control Register
 	uint16_t* hcr;
 
@@ -65,7 +65,7 @@ struct dsp56k_host_interface
 };
 
 // 1-9 ALU
-struct dsp56k_data_alu
+struct dsp56156_data_alu
 {
 	// Four 16-bit input registers (can be accessed as 2 32-bit registers)
 	PAIR x;
@@ -82,7 +82,7 @@ struct dsp56k_data_alu
 };
 
 // 1-10 Address Generation Unit (AGU)
-struct dsp56k_agu
+struct dsp56156_agu
 {
 	// Four address registers
 	uint16_t r0;
@@ -112,7 +112,7 @@ struct dsp56k_agu
 };
 
 // 1-11 Program Control Unit (PCU)
-struct dsp56k_pcu
+struct dsp56156_pcu
 {
 	// Program Counter
 	uint16_t pc;
@@ -138,7 +138,7 @@ struct dsp56k_pcu
 	// Controls IRQ processing
 	void (*service_interrupts)(void);
 
-	// A list of pending interrupts (indices into dsp56k_interrupt_sources array)
+	// A list of pending interrupts (indices into dsp56156_interrupt_sources array)
 	int8_t pending_interrupts[32];
 
 	// Basics
@@ -149,26 +149,26 @@ struct dsp56k_pcu
 };
 
 // 1-8 The dsp56156 CORE
-struct dsp56k_core
+struct dsp56156_core
 {
 	// PROGRAM CONTROLLER
-	dsp56k_pcu PCU;
+	dsp56156_pcu PCU;
 
 	// ADR ALU (AGU)
-	dsp56k_agu AGU;
+	dsp56156_agu AGU;
 
 	// CLOCK GEN
-	//static emu_timer *dsp56k_timer;   // 1-5, 1-8 - Clock gen
+	//static emu_timer *dsp56156_timer;   // 1-5, 1-8 - Clock gen
 
 	// DATA ALU
-	dsp56k_data_alu ALU;
+	dsp56156_data_alu ALU;
 
 	// OnCE
 
 	// IBS and BITFIELD UNIT
 
 	// Host Interface
-	dsp56k_host_interface HI;
+	dsp56156_host_interface HI;
 
 	// IRQ line states
 	bool modA_state;
@@ -200,10 +200,10 @@ struct dsp56k_core
 };
 
 
-class dsp56k_device : public cpu_device
+class dsp56156_device : public cpu_device
 {
 public:
-	dsp56k_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	dsp56156_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	DECLARE_READ16_MEMBER( peripheral_register_r );
 	DECLARE_WRITE16_MEMBER( peripheral_register_w );
@@ -226,7 +226,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 8; }
 	virtual uint32_t execute_input_lines() const override { return 4; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == DSP56K_IRQ_RESET; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == DSP56156_IRQ_RESET; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -244,16 +244,16 @@ private:
 	address_space_config m_data_config;
 	required_shared_ptr<uint16_t> m_program_ram;
 
-	dsp56k_core m_dsp56k_core;
+	dsp56156_core m_core;
 
 	void agu_init();
 	void alu_init();
 };
 
-} // namespace DSP56K
+} // namespace DSP_56156
 
 
-DECLARE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device)
-using DSP56K::dsp56k_device;
+DECLARE_DEVICE_TYPE_NS(DSP56156, DSP_56156, dsp56156_device)
+using DSP_56156::dsp56156_device;
 
-#endif // MAME_CPU_DSP56K_DSP56K_H
+#endif // MAME_CPU_DSP56156_DSP56156_H

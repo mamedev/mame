@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "pmove.h"
 
-namespace DSP56K
+namespace DSP_56156
 {
 const reg_id& ParallelMove::opSource() const { return m_oco->instSource(); }
 const reg_id& ParallelMove::opDestination() const { return m_oco->instDestination(); }
