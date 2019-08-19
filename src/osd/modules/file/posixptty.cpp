@@ -29,6 +29,10 @@
 #include <pty.h>
 #elif defined(__HAIKU__)
 #include <bsd/pty.h>
+#elif defined(__sun)
+#include <sys/types.h>
+#include <stropts.h>
+#include <sys/conf.h>
 #endif
 
 
@@ -112,7 +116,7 @@ osd_file::error posix_open_ptty(std::uint32_t openflags, osd_file::ptr &file, st
 	else if (openflags & OPEN_FLAG_READ)
 		access |= O_RDONLY;
 	else
-		return error::INVALID_ACCESS;
+		return osd_file::error::INVALID_ACCESS;
 
 	int const masterfd = ::posix_openpt(access);
 	if (masterfd < 0)

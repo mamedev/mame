@@ -15,7 +15,8 @@
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_RPI
+	|| BX_PLATFORM_RPI     \
+	|| __sun
 #	include <pthread.h>
 #	if defined(__FreeBSD__)
 #		include <pthread_np.h>
@@ -55,7 +56,7 @@ namespace bx
 		static DWORD WINAPI threadFunc(LPVOID _arg);
 		HANDLE m_handle;
 		DWORD  m_threadId;
-#elif BX_PLATFORM_POSIX
+#elif BX_PLATFORM_POSIX || __sun
 		static void* threadFunc(void* _arg);
 		pthread_t m_handle;
 #endif // BX_PLATFORM_
@@ -154,7 +155,7 @@ namespace bx
 			);
 
 		ThreadPool::RunAsync(workItemHandler, WorkItemPriority::Normal, WorkItemOptions::TimeSliced);
-#elif BX_PLATFORM_POSIX
+#elif BX_PLATFORM_POSIX || __sun
 		int result;
 		BX_UNUSED(result);
 

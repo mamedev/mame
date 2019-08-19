@@ -8,7 +8,7 @@
 #include "font_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_SOLARIS) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID)
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID)
 
 #include "corestr.h"
 #include "corealloc.h"

@@ -3,6 +3,10 @@
 
 /* commands */
 
+#ifdef __sun
+#undef SEC
+#endif
+
 #define SEC_REQUEST_STATUS     (0x20)
 #define SEC_REQUEST_MARKET     (0x21)
 #define SEC_REQEUST_LAST_ERROR (0x22)

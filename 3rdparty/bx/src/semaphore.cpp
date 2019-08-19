@@ -12,7 +12,7 @@
 #elif  BX_PLATFORM_OSX \
 	|| BX_PLATFORM_IOS
 #	include <dispatch/dispatch.h>
-#elif BX_PLATFORM_POSIX
+#elif BX_PLATFORM_POSIX || __sun
 #	include <errno.h>
 #	include <pthread.h>
 #	include <semaphore.h>
@@ -36,7 +36,7 @@ namespace bx
 #elif  BX_PLATFORM_OSX \
 	|| BX_PLATFORM_IOS
 		dispatch_semaphore_t m_handle;
-#elif BX_PLATFORM_POSIX
+#elif BX_PLATFORM_POSIX || __sun
 		pthread_mutex_t m_mutex;
 		pthread_cond_t m_cond;
 		int32_t m_count;
@@ -106,7 +106,7 @@ namespace bx
 		return !dispatch_semaphore_wait(si->m_handle, dt);
 	}
 
-#elif BX_PLATFORM_POSIX
+#elif BX_PLATFORM_POSIX || __sun
 
 	uint64_t toNs(const timespec& _ts)
 	{
