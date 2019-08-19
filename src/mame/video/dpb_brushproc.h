@@ -59,8 +59,13 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void update_prom_signals();
+	void update_pal_signals();
 	void update_k_product();
 	void update_ext_product();
+	void update_final_product();
+	void update_brush_value();
+	void update_compare_b_value();
+	uint8_t update_brush_alu_result();
 
 	void set_oe1(int state);
 	void set_oe2(int state);
@@ -71,7 +76,10 @@ protected:
 	void set_proc_sel_h(int state);
 	void set_k_eq_il(int state);
 
+	uint8_t get_compare_b();
+
 	uint8_t m_store_in[2];
+	uint8_t m_store_out[2];
 	uint8_t m_ext_in;
 	uint8_t m_brush_in;
 	uint8_t m_cbus_in;
@@ -80,11 +88,19 @@ protected:
 	bool m_k_enable;
 	bool m_k_zero;
 	bool m_k_invert;
-	uint8_t m_k_product;
 
+	uint8_t m_k_product;
 	uint8_t m_ext_product;
+	uint16_t m_final_product;
+	uint16_t m_final_result;
+
+	uint8_t m_brush_value;
+	uint8_t m_final_brush_value;
+	uint8_t m_compare_b_value;
 
 	uint8_t m_func;
+
+	bool m_subtract_result;
 
 	bool m_sel_luma[2];
 	bool m_sel_eh;
@@ -108,7 +124,9 @@ protected:
 
 	uint16_t m_pal_in;
 	uint8_t *m_pal_base;
-	uint16_t m_pal_out;
+	uint16_t m_pal_data_out;
+	bool m_pal_bpinv_out;
+	bool m_pal_sel_out;
 
 	devcb_write8 m_store1;
 	devcb_write8 m_store2;
