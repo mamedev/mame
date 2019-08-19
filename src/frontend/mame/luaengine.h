@@ -51,6 +51,7 @@ public:
 	void on_frame_done();
 	void on_periodic();
 	bool on_missing_mandatory_image(const std::string &instance_name);
+	void on_machine_before_load_settings();
 
 	template<typename T, typename U>
 	bool call_plugin(const std::string &name, const T in, U &out)

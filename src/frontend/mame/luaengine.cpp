@@ -691,6 +691,11 @@ void lua_engine::on_machine_stop()
 	execute_function("LUA_ON_STOP");
 }
 
+void lua_engine::on_machine_before_load_settings()
+{
+	execute_function("LUA_ON_BEFORE_LOAD_SETTINGS");
+}
+
 void lua_engine::on_machine_pause()
 {
 	execute_function("LUA_ON_PAUSE");
@@ -784,6 +789,7 @@ void lua_engine::initialize()
  * emu.register_callback(callback, name) - register callback to be used by MAME via lua_engine::call_plugin()
  * emu.register_menu(event_callback, populate_callback, name) - register callbacks for plugin menu
  * emu.register_mandatory_file_manager_override(callback) - register callback invoked to override mandatory file manager
+ * emu.register_before_load_settings(callback) - register callback to be run before settings are loaded
  * emu.show_menu(menu_name) - show menu by name and pause the machine
  *
  * emu.print_verbose(str) - output to stderr at verbose level
@@ -824,6 +830,7 @@ void lua_engine::initialize()
 	emu["register_frame_done"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME_DONE"); };
 	emu["register_periodic"] = [this](sol::function func){ register_function(func, "LUA_ON_PERIODIC"); };
 	emu["register_mandatory_file_manager_override"] = [this](sol::function func) { register_function(func, "LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE"); };
+	emu["register_before_load_settings"] = [this](sol::function func) { register_function(func, "LUA_ON_BEFORE_LOAD_SETTINGS"); };
 	emu["register_menu"] = [this](sol::function cb, sol::function pop, const std::string &name) {
 			std::string cbfield = "menu_cb_" + name;
 			std::string popfield = "menu_pop_" + name;
@@ -1786,10 +1793,12 @@ void lua_engine::initialize()
  * field:set_value(value)
  * field:set_input_seq(seq_type, seq)
  * field:input_seq(seq_type)
+ * field:set_default_input_seq(seq_type, seq)
+ * field:default_input_seq(seq_type)
  *
  * field.device - get associated device_t
+ * field.port - get associated ioport_port
  * field.live - get ioport_field_live
-
  * field.name
  * field.default_name
  * field.player
@@ -1829,7 +1838,16 @@ void lua_engine::initialize()
 				input_seq_type seq_type = parse_seq_type(seq_type_string);
 				return sol::make_user(f.seq(seq_type));
 			},
+			"set_default_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				f.set_defseq(seq_type, seq);
+			},
+			"default_input_seq", [](ioport_field &f, const std::string &seq_type_string) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				return sol::make_user(f.defseq(seq_type));
+			},
 			"device", sol::property(&ioport_field::device),
+			"port", sol::property(&ioport_field::port),
 			"name", sol::property(&ioport_field::name),
 			"default_name", sol::property([](ioport_field &f) {
 					return f.specific_name() ? f.specific_name() : f.manager().type_name(f.type(), f.player());
