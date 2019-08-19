@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "axc51-core_dasm.h"
 
+// SOME of these might be AX208 specific, we do not currently hvae enough information to split it into AXC51 / AX208 however
 const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[] = {
 
 	// SFR Registers
@@ -199,7 +200,7 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 
 // based on extracted symbol table, note 0x8000 - 0x8ca3 is likely boot code, interrupt code, kernel etc.
 // this should be the same for all ax208 CPUs as they are thought to all use the same internal ROM
-const axc51core_disassembler::ax208_bios_info axc51core_disassembler::bios_call_names[] = {
+const ax208_disassembler::ax208_bios_info ax208_disassembler::bios_call_names[] = {
 	{ 0x8000, "entry point" },
 
 	{ 0x8006, "unknown, used" },
@@ -959,7 +960,29 @@ offs_t axc51core_disassembler::disassemble_extended_a5(std::ostream& stream, uns
 	return (PC - pc) | flags | SUPPORTED;
 }
 
-void axc51core_disassembler::disassemble_op_ljmp(std::ostream& stream, unsigned &PC, const data_buffer& params)
+
+offs_t axc51core_disassembler::disassemble_op(std::ostream& stream, unsigned PC, offs_t pc, const data_buffer& opcodes, const data_buffer& params, uint8_t op)
+{
+	uint32_t flags = 0;
+
+	switch (op)
+	{
+	case 0xa5:
+		return disassemble_extended_a5(stream, PC, pc, opcodes, params);
+
+	default:
+		return mcs51_disassembler::disassemble_op(stream, PC, pc, opcodes, params, op);
+	}
+
+	return (PC - pc) | flags | SUPPORTED;
+}
+
+
+ax208_disassembler::ax208_disassembler() : axc51core_disassembler(axc51core_names)
+{
+}
+
+void ax208_disassembler::disassemble_op_ljmp(std::ostream& stream, unsigned &PC, const data_buffer& params)
 {
 	uint16_t addr = (params.r8(PC++) << 8) & 0xff00;
 	addr |= params.r8(PC++);
@@ -987,7 +1010,7 @@ void axc51core_disassembler::disassemble_op_ljmp(std::ostream& stream, unsigned 
 	}
 }
 
-void axc51core_disassembler::disassemble_op_lcall(std::ostream& stream, unsigned &PC, const data_buffer& params)
+void ax208_disassembler::disassemble_op_lcall(std::ostream& stream, unsigned &PC, const data_buffer& params)
 {
 	uint16_t addr = (params.r8(PC++)<<8) & 0xff00;
 	addr|= params.r8(PC++);
@@ -1014,22 +1037,3 @@ void axc51core_disassembler::disassemble_op_lcall(std::ostream& stream, unsigned
 		util::stream_format(stream, "lcall $%04X", addr);
 	}
 }
-
-
-offs_t axc51core_disassembler::disassemble_op(std::ostream& stream, unsigned PC, offs_t pc, const data_buffer& opcodes, const data_buffer& params, uint8_t op)
-{
-	uint32_t flags = 0;
-
-	switch (op)
-	{
-	case 0xa5:
-		return disassemble_extended_a5(stream, PC, pc, opcodes, params);
-
-	default:
-		return mcs51_disassembler::disassemble_op(stream, PC, pc, opcodes, params, op);
-	}
-
-	return (PC - pc) | flags | SUPPORTED;
-}
-
-
