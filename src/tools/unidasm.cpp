@@ -329,6 +329,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "asap",            le,  0, []() -> util::disasm_interface * { return new asap_disassembler; } },
 	{ "avr8",            le,  0, []() -> util::disasm_interface * { return new avr8_disassembler; } },
 	{ "axc51core",       le,  0, []() -> util::disasm_interface * { return new axc51core_disassembler; } },
+	{ "axc208",          le,  0, []() -> util::disasm_interface * { return new ax208_disassembler; } },
 	{ "capricorn",       le,  0, []() -> util::disasm_interface * { return new capricorn_disassembler; } },
 	{ "ccpu",            le,  0, []() -> util::disasm_interface * { return new ccpu_disassembler; } },
 	{ "cdp1801",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1801); } },
