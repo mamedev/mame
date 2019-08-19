@@ -34973,4 +34973,30 @@
 		</part>
 	</software>
 
+	<software name="msnastrd">
+		<description>Mission: Asteroid (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2019-08-18"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mission asteroid (4am and san inc crack).dsk" size="143360" crc="a9c9e1ab" sha1="006865ece389e8daa676de7365eed76ece64726a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="charlweb">
+		<description>A Newbery Adventure: Charlotte's Web (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-08-18"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="a newbery adventure - charlotte's web (4am crack).dsk" size="143360" crc="158943a0" sha1="afc5c41c8249ce3a2764115e5379e2b561914285" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
