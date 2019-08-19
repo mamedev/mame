@@ -364,7 +364,7 @@ private:
 	template<int Which> DECLARE_WRITE32_MEMBER(dmasa_w);
 	template<int Which> DECLARE_READ32_MEMBER(dmada_r);
 	template<int Which> DECLARE_WRITE32_MEMBER(dmada_w);
-
+	inline int dma_setup_hold(uint8_t setting, uint8_t bitmask);
 	struct {
 		uint32_t src;
 		uint32_t dst;
@@ -583,6 +583,21 @@ WRITE16_MEMBER(crystal_state::tmcnt_w)
 	COMBINE_DATA(&m_timer_count[Which]);
 }
 
+/*
+ *
+ * DMA Controller
+ *
+ */
+
+// helper
+// bit 5 and bit 3 of the DMA control don't increment source/destination addresses if enabled.
+// At the time of writing P's Attack is the only SW that uses this feature, 
+// in a work RAM to area $4500000 transfer, probably to extend something ...
+inline int crystal_state::dma_setup_hold(uint8_t setting, uint8_t bitmask)
+{
+	return setting & bitmask ? 0 : (setting & 2) ? 4 : (1 << (setting & 1));
+}
+
 template<int Which> READ32_MEMBER(crystal_state::dmasa_r) { return m_dma[Which].src; }
 template<int Which> WRITE32_MEMBER(crystal_state::dmasa_w) { COMBINE_DATA(&m_dma[Which].src); }
 template<int Which> READ32_MEMBER(crystal_state::dmada_r) { return m_dma[Which].dst; }
@@ -599,8 +614,8 @@ WRITE32_MEMBER(crystal_state::dmac_w)
 		uint32_t const SRC = m_dma[Which].src;
 		uint32_t const DST = m_dma[Which].dst;
 		uint32_t const CNT = m_dma[Which].size;
-		int src_inc = CTR & 0x20 ? 0 : (CTR & 2) ? 4 : (1 << (CTR & 1));
-		int dst_inc = CTR & 0x08 ? 0 : (CTR & 2) ? 4 : (1 << (CTR & 1));
+		const int src_inc = dma_setup_hold(CTR, 0x20);
+		const int dst_inc = dma_setup_hold(CTR, 0x08);
 
 		if ((CTR & 0xd4) != 0)
 			popmessage("DMA%d with unhandled mode %02x, contact MAMEdev",Which,CTR);
