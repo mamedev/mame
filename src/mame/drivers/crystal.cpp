@@ -274,6 +274,7 @@ public:
 	void crystal(machine_config &config);
 	void crzyddz2(machine_config &config);
 	void trivrus(machine_config &config);
+	void psattack(machine_config &config);
 
 private:
 	/* memory pointers */
@@ -323,6 +324,7 @@ private:
 	void crzyddz2_mem(address_map &map);
 	void internal_map(address_map &map);
 	void trivrus_mem(address_map &map);
+	void psattack_mem(address_map &map);
 
 	// To move into SoC own device
 	// INTC
@@ -422,6 +424,23 @@ private:
  *
  */
 
+READ32_MEMBER(crystal_state::intvec_r)
+{
+	return (m_IntHigh & 7) << 8;
+}
+
+WRITE32_MEMBER(crystal_state::intvec_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_intst &= ~(1 << (data & 0x1f));
+		if (!m_intst)
+			m_maincpu->set_input_line(SE3208_INT, CLEAR_LINE);
+	}
+	if (ACCESSING_BITS_8_15)
+		m_IntHigh = (data >> 8) & 7;
+}
+
 READ32_MEMBER( crystal_state::inten_r )
 {
 	return m_inten;
@@ -430,7 +449,10 @@ READ32_MEMBER( crystal_state::inten_r )
 WRITE32_MEMBER( crystal_state::inten_w )
 {
 	COMBINE_DATA(&m_inten);
-	// ...
+	// P'S Attack has a timer 0 irq service with no call to intvec_w but just this
+	m_intst &= m_inten;
+	if (!m_intst)
+		m_maincpu->set_input_line(SE3208_INT, CLEAR_LINE);
 }
 
 READ32_MEMBER( crystal_state::intst_r )
@@ -477,23 +499,6 @@ WRITE16_MEMBER(crystal_state::flip_count_w)
 		else if (fc == 0)
 			m_FlipCount = 0;
 	}
-}
-
-READ32_MEMBER(crystal_state::intvec_r)
-{
-	return (m_IntHigh & 7) << 8;
-}
-
-WRITE32_MEMBER(crystal_state::intvec_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_intst &= ~(1 << (data & 0x1f));
-		if (!m_intst)
-			m_maincpu->set_input_line(SE3208_INT, CLEAR_LINE);
-	}
-	if (ACCESSING_BITS_8_15)
-		m_IntHigh = (data >> 8) & 7;
 }
 
 IRQ_CALLBACK_MEMBER(crystal_state::icallback)
@@ -594,32 +599,34 @@ WRITE32_MEMBER(crystal_state::dmac_w)
 		uint32_t const SRC = m_dma[Which].src;
 		uint32_t const DST = m_dma[Which].dst;
 		uint32_t const CNT = m_dma[Which].size;
+		int src_inc = CTR & 0x20 ? 0 : (CTR & 2) ? 4 : (1 << (CTR & 1));
+		int dst_inc = CTR & 0x08 ? 0 : (CTR & 2) ? 4 : (1 << (CTR & 1));
 
-		if ((CTR & 0xfc) != 0)
+		if ((CTR & 0xd4) != 0)
 			popmessage("DMA%d with unhandled mode %02x, contact MAMEdev",Which,CTR);
 
 		if (CTR & 0x2)  //32 bits
 		{
 			for (int i = 0; i < CNT; ++i)
 			{
-				uint32_t v = space.read_dword(SRC + i * 4);
-				space.write_dword(DST + i * 4, v);
+				uint32_t v = space.read_dword(SRC + i * src_inc);
+				space.write_dword(DST + i * dst_inc, v);
 			}
 		}
 		else if (CTR & 0x1) //16 bits
 		{
 			for (int i = 0; i < CNT; ++i)
 			{
-				uint16_t v = space.read_word(SRC + i * 2);
-				space.write_word(DST + i * 2, v);
+				uint16_t v = space.read_word(SRC + i * src_inc);
+				space.write_word(DST + i * dst_inc, v);
 			}
 		}
 		else    //8 bits
 		{
 			for (int i = 0; i < CNT; ++i)
 			{
-				uint8_t v = space.read_byte(SRC + i);
-				space.write_byte(DST + i, v);
+				uint8_t v = space.read_byte(SRC + i * src_inc);
+				space.write_byte(DST + i * dst_inc, v);
 			}
 		}
 		data &= ~(1 << 10);
@@ -1117,6 +1124,40 @@ void crystal_state::crospuzl_mem(address_map &map)
 	map(0x01511000, 0x01511003).portr("IN1");
 	map(0x01512000, 0x01512003).portr("IN2");
 	map(0x01513000, 0x01513003).portr("IN3");
+}
+
+void crystal_state::psattack_mem(address_map &map)
+{
+	map.unmap_value_high();
+	internal_map(map);
+	map(0x00000000, 0x001fffff).rom().nopw();
+
+	//   0x1400c00, 0x1400c01 read cfcard memory (auto increment?)
+	//   0x1402800, 0x1402807 read/write regs?
+	//   0x1802410, 0x1802413 peripheral chip select for above
+
+	map(0x02000000, 0x027fffff).ram().share("workram");
+
+	map(0x03800000, 0x03ffffff).ram().share("textureram");
+	map(0x04000000, 0x047fffff).ram().share("frameram");
+	
+	// placeholders, needs to be nuked (and this HW doesn't belong here lalala)
+	map(0x01500000, 0x01500003).portr("P1_P2");
+	map(0x01500004, 0x01500007).portr("P3_P4");
+	map(0x01500008, 0x0150000b).r(FUNC(crystal_state::system_input_r));
+	// 0x0150000c writes prolly eeprom
+
+	map(0x01000000, 0x0100ffff).ram().share("nvram"); // placeholder
+
+	map(0x01280000, 0x01280003).w(FUNC(crystal_state::Banksw_w)); 
+
+	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIOldat_r), FUNC(crystal_state::PIOldat_w));
+	map(0x01802008, 0x0180200b).r(FUNC(crystal_state::PIOedat_r));
+
+	map(0x05000000, 0x05ffffff).bankr("mainbank");
+	map(0x05000000, 0x05000003).rw(FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
+
+//	map(0x44414F4C, 0x44414F7F).ram().share("reset_patch");
 }
 
 // Crazy Dou Di Zhu II
@@ -1887,6 +1928,13 @@ void crystal_state::trivrus(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::trivrus_mem);
 }
 
+void crystal_state::psattack(machine_config &config)
+{
+	crystal(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::psattack_mem);
+}
+
+
 void crystal_state::crospuzl(machine_config &config)
 {
 	crystal(config);
@@ -2291,14 +2339,19 @@ GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye
 GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // timing is slightly too fast, player 2 inputs if they exists, lamps, not extensively tested
 GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
-GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Meng Hong Lou", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Crazy Dou Di Zhu II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, empty_init,    ROT0, "AGT",                 "Trivia R Us (v1.07)", 0 )
-GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, empty_init,    ROT0, "<unknown>",           "Cross Puzzle", MACHINE_NOT_WORKING )
 GAME( 200?, wulybuly, crysbios, crystal,  crystal,  crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // hangs during POST, with no PIC protection so ...?
 GAME( 200?, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "<unknown>",           "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) 
 
-GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, init_psattack, ROT0, "Uniana",              "P's Attack", MACHINE_IS_SKELETON ) // has a CF card instead of flash roms
+// not crystal system games, to be removed from here
+GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Meng Hong Lou", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Crazy Dou Di Zhu II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+
+GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, empty_init,    ROT0, "AGT",                 "Trivia R Us (v1.07)", 0 )
+
+GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, empty_init,    ROT0, "<unknown>",           "Cross Puzzle", MACHINE_NOT_WORKING )
+
+GAME( 2004, psattack, 0,        psattack, crystal,  crystal_state, init_psattack, ROT0, "Uniana",              "P's Attack", MACHINE_IS_SKELETON ) // has a CF card instead of flash roms
+
 // looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
 GAME( 200?, ddz,      0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "IGS?",                "Dou Di Zhu", MACHINE_IS_SKELETON )
 GAME( 200?, crzclass, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "TJF",                 "Zhaoji Fengdou", MACHINE_IS_SKELETON ) // 'Crazy Class'
