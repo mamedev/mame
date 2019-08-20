@@ -1072,10 +1072,10 @@ void mcpx_ide_device::ide_io(address_map &map)
 
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_IDE, tag, owner, clock),
-	m_pri_interrupt_handler(*this),
-	m_sec_interrupt_handler(*this),
 	m_pri(*this, "ide1"),
-	m_sec(*this, "ide2")
+	m_sec(*this, "ide2"),
+	m_pri_interrupt_handler(*this),
+	m_sec_interrupt_handler(*this)
 {
 	set_ids(0x10de01bc, 0, 0x01018a, 0);
 }
