@@ -35012,4 +35012,17 @@
 		</part>
 	</software>
 
+	<software name="chipwits">
+		<description>Chipwits</description>
+		<year>1985</year>
+		<publisher>Brainpower, Inc.</publisher>
+		<info name="release" value="2019-08-15"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="chipwits (logo crack).dsk" size="143360" crc="a79830de" sha1="c172fad40f566ba671829a18bfba790ce06f3fbd" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
