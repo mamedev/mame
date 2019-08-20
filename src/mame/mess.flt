@@ -706,6 +706,7 @@ saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
 saitek_risc2500.cpp
+saitek_ssystem3.cpp
 saitek_stratos.cpp
 saitek_superstar.cpp
 samcoupe.cpp
@@ -759,7 +760,6 @@ spectrum.cpp
 spg110.cpp
 squale.cpp
 ssem.cpp
-ssystem3.cpp
 st17xx.cpp
 storio.cpp
 studio2.cpp

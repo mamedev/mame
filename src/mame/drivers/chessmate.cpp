@@ -13,7 +13,8 @@ Microchess, originally made for the KIM-1. Jennings went on to co-found Personal
 Jennings also licensed Chessmate to Novag, and they released it as the MK II. The hardware
 is almost identical and the software is the same(identical ROM labels). Two designs were made,
 one jukebox shape, and one brick shape. The one in MAME came from the jukebox, but both
-models have the same ROMs.
+models have the same ROMs. Note that like MK I, although it is a Winkler/Auge production,
+it doesn't involve SciSys company. SciSys was founded by Winkler after MK II.
 
 TODO:
 - is there an older version of chmate? chips on pcb photos are dated 1979, but

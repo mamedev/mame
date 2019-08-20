@@ -3,7 +3,7 @@
 /*
 
 The ChessMachine EC by Tasc
-External module with ARM2 CPU, also sold under the Mephisto brand by H&G
+External module with ARM2 CPU, also sold under the Mephisto brand by H+G
 
 see chessmachine_device for technical notes
 

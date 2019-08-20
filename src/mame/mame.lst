@@ -34201,6 +34201,9 @@ ccdelta1                        //
 risc2500                        //
 montreux                        //
 
+@source:saitek_ssystem3.cpp
+ssystem3                        // Chess Champion Super System III / MK III
+
 @source:saitek_stratos.cpp
 stratos
 stratosa
@@ -36488,9 +36491,6 @@ ultraxg                         // review build
 vasara                          // (c) 2000 Visco
 vasara2                         // (c) 2001 Visco
 vasara2a                        // (c) 2001 Visco
-
-@source:ssystem3.cpp
-ssystem3                        // Chess Champion Super System III / MK III
 
 @source:st_mp100.cpp
 dracula                         //
