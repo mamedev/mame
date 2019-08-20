@@ -307,7 +307,39 @@ ROM_START(smartfp)
 ROM_END
 
 
+/*
+Wireless Air 60
+(info provided with dump)
+
+System: Wireless Air 60
+ROM: Toshiba TC58NVG0S3ETA00
+RAM: ESMT M12L128168A
+
+This is a raw NAND flash dump
+
+Interesting Strings:
+
+GPnandnand; (GP is General Plus, which is Sunplus by another name)
+GLB_GP-F_5B_USBD_1.0.0
+SP_ToneMaker
+GLB_GP-FS1_0405L_SPU_1.0.2.3
+SPF2ALP
+
+"GPnandnand" as a required signature appears to be referenced right here, in page 19 of a GeneralPlus document;
+http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_code_reference-20147131205102.pdf
+
+*/
+
+ROM_START( wlsair60 )
+	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
+ROM_END
+
+
 CONS(2011, wrlshunt, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
+
+// NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)
+CONS(2010, wlsair60, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
