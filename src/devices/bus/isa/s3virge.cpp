@@ -248,6 +248,7 @@ uint8_t s3virge_vga_device::s3_crtc_reg_read(uint8_t index)
 				switch(s3virge.linear_address_size & 0x03)
 				{
 					case 0:  // 64kB
+					default:
 						res = (s3virge.linear_address & 0x00ff0000) >> 16;
 						break;
 					case 1:  // 1MB
