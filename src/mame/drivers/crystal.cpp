@@ -275,6 +275,7 @@ public:
 	void crzyddz2(machine_config &config);
 	void trivrus(machine_config &config);
 	void psattack(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
 	/* memory pointers */
@@ -297,7 +298,7 @@ private:
 
 #ifdef IDLE_LOOP_SPEEDUP
 	uint8_t     m_FlipCntRead;
-	DECLARE_READ16_MEMBER(flip_count_speedup_r);
+	DECLARE_WRITE_LINE_MEMBER(idle_skip_speedup_w);
 #endif
 
 	uint32_t    m_Bank;
@@ -309,6 +310,7 @@ private:
 	DECLARE_WRITE32_MEMBER(Banksw_w);
 	DECLARE_READ32_MEMBER(FlashCmd_r);
 	DECLARE_WRITE32_MEMBER(FlashCmd_w);
+	DECLARE_WRITE32_MEMBER(coin_counters_w);
 
 	DECLARE_READ8_MEMBER(trivrus_input_r);
 	DECLARE_WRITE8_MEMBER(trivrus_input_w);
@@ -394,6 +396,30 @@ private:
 	DECLARE_READ32_MEMBER( cfgr_r );
 };
 
+uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if ((m_crtcregs[0] & 0x0200) == 0x0200) // Blank Screen
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
+
+	m_vr0vid->screen_update(screen, bitmap, cliprect);
+	return 0;
+}
+
+WRITE_LINE_MEMBER(crystal_state::screen_vblank)
+{
+	// rising edge
+	if (state)
+	{
+		if (crt_active_vblank_irq() == true)
+			IntReq(24);      //VRender0 VBlank
+
+		m_vr0vid->execute_drawing();
+	}
+}
+
 /*
  *
  * INT Controller
@@ -455,16 +481,15 @@ void crystal_state::IntReq( int num )
 #endif
 }
 
-READ16_MEMBER(crystal_state::flip_count_speedup_r)
-{
-	uint16_t res = m_vr0vid->flip_count_r(space, offset, mem_mask);
 #ifdef IDLE_LOOP_SPEEDUP
+WRITE_LINE_MEMBER(crystal_state::idle_skip_speedup_w)
+{
 	m_FlipCntRead++;
-	if (m_FlipCntRead >= 16 && !m_intst && res != 0)
+	if (m_FlipCntRead >= 16 && !m_intst && state == ASSERT_LINE)
 		m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
-#endif
-	return res;
 }
+#endif
+
 
 IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 {
@@ -880,9 +905,6 @@ void crystal_state::internal_map(address_map &map)
 
 //	map(0x03000000, 0x0300ffff)								// Video Registers
 	map(0x03000000, 0x0300ffff).m(m_vr0vid, FUNC(vr0video_device::regs_map));
-#ifdef IDLE_LOOP_SPEEDUP
-	map(0x030000a4, 0x300000a7).r(FUNC(crystal_state::flip_count_speedup_r)).w(m_vr0vid, FUNC(vr0video_device::flip_count_w)).umask32(0xffff0000);
-#endif
 
 //  map(0x03800000, 0x03ffffff).ram().share("textureram"); // Texture Buffer Memory (Max.8MB)
 //  map(0x04000000, 0x047fffff).ram().share("frameram");   // Frame Buffer Memory (Max.8MB)
@@ -894,14 +916,7 @@ void crystal_state::internal_map(address_map &map)
 
 READ32_MEMBER(crystal_state::system_input_r)
 {
-	// TODO: move this in i/o system
-	uint8_t Port4 = ioport("SYSTEM")->read();
-	if (!(Port4 & 0x10) && ((m_OldPort4 ^ Port4) & 0x10))   //coin buttons trigger IRQs
-		IntReq(12);
-	if (!(Port4 & 0x20) && ((m_OldPort4 ^ Port4) & 0x20))
-		IntReq(19);
-	m_OldPort4 = Port4;
-	return /*dips*/ioport("DSW")->read() | (Port4 << 16);
+	return ( ioport("SYSTEM")->read() << 16) | (ioport("DSW")->read()) | 0xff00ff00;
 }
 
 WRITE32_MEMBER(crystal_state::Banksw_w)
@@ -962,12 +977,23 @@ WRITE32_MEMBER(crystal_state::FlashCmd_w)
 	m_FlashCmd = data;
 }
 
+WRITE32_MEMBER(crystal_state::coin_counters_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		// Both signals are sent when setting is "1 shooter"
+		// Only evosocc and crysking allow the user to change this setting.
+		machine().bookkeeping().coin_counter_w(0, data & 1);
+		machine().bookkeeping().coin_counter_w(1, data & 2);
+	}
+}
+
 void crystal_state::crystal_mem(address_map &map)
 {
 	internal_map(map);
 	map(0x00000000, 0x0001ffff).rom().nopw();
 
-	map(0x01200000, 0x01200003).portr("P1_P2");
+	map(0x01200000, 0x01200003).portr("P1_P2").w(FUNC(crystal_state::coin_counters_w));
 	map(0x01200004, 0x01200007).portr("P3_P4");
 	map(0x01200008, 0x0120000b).r(FUNC(crystal_state::system_input_r));
 
@@ -977,7 +1003,8 @@ void crystal_state::crystal_mem(address_map &map)
 	map(0x01802004, 0x01802007).rw(FUNC(crystal_state::PIOldat_r), FUNC(crystal_state::PIOldat_w));
 	map(0x01802008, 0x0180200b).r(FUNC(crystal_state::PIOedat_r));
 
-	map(0x02000000, 0x027fffff).ram().share("workram");
+	// mirror is accessed by donghaer on later levels
+	map(0x02000000, 0x027fffff).mirror(0x00800000).ram().share("workram");
 
 	map(0x03800000, 0x03ffffff).ram().share("textureram");
 	map(0x04000000, 0x047fffff).ram().share("frameram");
@@ -1302,32 +1329,16 @@ void crystal_state::machine_reset()
 	m_crzyddz2_prot = 0x00;
 }
 
-uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+INPUT_CHANGED_MEMBER(crystal_state::coin_inserted)
 {
-	if ((m_crtcregs[0] & 0x0200) == 0x0200) // Blank Screen
+	if (oldval)
 	{
-		bitmap.fill(0, cliprect);
-		return 0;
-	}
-
-	m_vr0vid->screen_update(screen, bitmap, cliprect);
-	return 0;
-}
-
-WRITE_LINE_MEMBER(crystal_state::screen_vblank)
-{
-	// rising edge
-	if (state)
-	{
-		// TODO: this is actually not activated by games, they checks for vblank via flip bit, 
-		// needs a custom signal hooked to the renderer for the stuff below this
-		if (crt_active_vblank_irq() == true)
-			IntReq(24);      //VRender0 VBlank
-		m_vr0vid->execute_drawing();
+		uint8_t coin_chute = (uint8_t)(uintptr_t)param & 1;
+		IntReq(coin_chute ? 19 : 12);
 	}
 }
 
-static INPUT_PORTS_START(crystal)
+static INPUT_PORTS_START( crystal )
 	PORT_START("P1_P2")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -1375,8 +1386,8 @@ static INPUT_PORTS_START(crystal)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, crystal_state, coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, crystal_state, coin_inserted, 1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1406,6 +1417,25 @@ static INPUT_PORTS_START(crystal)
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( topbladv )
+	PORT_INCLUDE( crystal )
+
+	PORT_MODIFY("P1_P2")
+	PORT_BIT( 0x000000f0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P3_P4")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// TODO: coin 2 insertion is fuzzy, may be BTANB
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, crystal_state, coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, crystal_state, coin_inserted, 1)
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( urachamu )
 	PORT_INCLUDE( crystal )
@@ -1703,6 +1733,9 @@ void crystal_state::crystal(machine_config &config)
 	m_screen->set_palette("palette");
 
 	VIDEO_VRENDER0(config, m_vr0vid, 14318180, m_maincpu);
+	#ifdef IDLE_LOOP_SPEEDUP
+	m_vr0vid->idleskip_cb().set(FUNC(crystal_state::idle_skip_speedup_w));
+	#endif
 
 	PALETTE(config, "palette", palette_device::RGB_565);
 
@@ -2131,11 +2164,11 @@ GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,  
 GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer", 0 )
 GAME( 2001, officeye, 0,        crystal,  urachamu, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
-GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // timing is slightly too fast, player 2 inputs if they exists, lamps, not extensively tested
-GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
-GAME( 200?, wulybuly, crysbios, crystal,  crystal,  crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // hangs during POST, with no PIC protection so ...?
-GAME( 200?, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "<unknown>",           "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) 
+GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues
+GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // player 2 inputs if they exists, lamps, not extensively tested
+GAME( 2003, topbladv, crysbios, crystal,  topbladv, crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
+GAME( 200?, wulybuly, crysbios, crystal,  crystal,  crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // hangs during POST with no PIC protection so ...?
+GAME( 200?, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "<unknown>",           "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // PIC hookup
 
 // not crystal system games, to be removed from here
 GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, empty_init,    ROT0, "Sealy",               "Meng Hong Lou", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

@@ -29,6 +29,8 @@ vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, VIDEO_VRENDER0, tag, owner, clock)
     , device_video_interface(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_idleskip_cb(*this)
+
 {
 }
 
@@ -97,6 +99,7 @@ WRITE16_MEMBER(vr0video_device::bank1_select_w)
 
 READ16_MEMBER(vr0video_device::flip_count_r)
 {
+	m_idleskip_cb(m_flip_count != 0);
 	return m_flip_count;
 }
 
@@ -118,6 +121,8 @@ WRITE16_MEMBER(vr0video_device::flip_count_w)
 
 void vr0video_device::device_start()
 {
+	m_idleskip_cb.resolve_safe();
+	
 	save_item(NAME(m_InternalPalette));
 	save_item(NAME(m_LastPalUpdate));
 
