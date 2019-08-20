@@ -416,7 +416,7 @@ void tv990_state::tv990(machine_config &config)
 	rs232b.cts_handler().set(m_uart[1], FUNC(ns16450_device::cts_w));
 
 	KBDC8042(config, m_kbdc);
-	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->input_buffer_full_callback().set_inputline("maincpu", M68K_IRQ_2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
