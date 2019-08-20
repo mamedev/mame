@@ -7033,4 +7033,23 @@
 		</part>
 	</software>
 
+	<software name="midmagic">
+		<description>David's Midnight Magic</description>
+		<year>1982</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-08-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- This re-release was part of the "Double-Pack Classics" collection that
+		included Choplifter on the other side of the disk; both games were updated
+		to fix model-specific compatibility issues caused by the copy protection of
+		earlier releases. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241481">
+				<rom name="david's midnight magic.woz" size="241481" crc="fa2f209f" sha1="a19f1c50796f2f842c87d25c27decb3b12983d20" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
