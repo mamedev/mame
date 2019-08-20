@@ -11760,14 +11760,13 @@ ROM_END
 
 
 /*
-  New Lucky 8 Lines Super Turbo.
-  (Hack).
+  New Lucky 8 Lines Super Turbo (Hack).
 
   Sticker of Impera Austria in the PCB.
 
   It takes 15 seconds for the nag, and extra 30 seconds to boot the game.
 
-  Needs proper DSW and lamps fix.
+  This set needs proper DIP switches and lamps.
 
 */
 ROM_START( lucky8h )
@@ -11848,19 +11847,31 @@ ROM_END
 
 
 /*
-   New Lucky 8 Lines Crown Turbo (hack)
+  New Lucky 8 Lines Crown Turbo (hack)
 
-   It takes 15 seconds for the nag, and extra 30 seconds to boot the game.
+  It takes 15 seconds for the nag, and extra 30 seconds to boot the game.
+
+  The program has a nasty protection that checks a value mirrored
+  from $1249 to $D249. If this fails, just reset the machine.
+  This routine is used when BET, and other critical things.
+
+  3831: ld   a,($D249)
+  3834: cp   $4F
+  3836: jp   nz,$0000
+
+  This set needs proper DIP switches and lamps.
 
 */
 ROM_START( lucky8j )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pr.b14",  0x0000, 0x8000, CRC(245ab833) SHA1(0e73c7a4cd387ae71752b422c537f9b7e5dbb770) )
+	ROM_RELOAD(          0xc000, 0x2000)
+	ROM_IGNORE(                  0x6000)
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "5.h7",  0x00000, 0x8000, BAD_DUMP CRC(994a9894) SHA1(4063c2c5e111f24a85df1665fd3f9fbb20fda4da) )  // the original one is missing the first 0x4000
+	ROM_REGION( 0x18000, "gfx1", 0 )  // the original devices 5 & 7 are half the size, and have only the second half of the required data.
+	ROM_LOAD( "5.h7",  0x00000, 0x8000, BAD_DUMP CRC(994a9894) SHA1(4063c2c5e111f24a85df1665fd3f9fbb20fda4da) )  // from a gfx match set
 	ROM_LOAD( "6.h8",  0x08000, 0x8000, CRC(80888d64) SHA1(91ec96709df77c534d381e391839984a88aeb1e0) )
-	ROM_LOAD( "7.h10", 0x10000, 0x8000, BAD_DUMP CRC(255d5860) SHA1(f171fde3d542594132b38b44300f750d45fb67a2) )  // the original one is missing the first 0x4000
+	ROM_LOAD( "7.h10", 0x10000, 0x8000, BAD_DUMP CRC(255d5860) SHA1(f171fde3d542594132b38b44300f750d45fb67a2) )  // from a gfx match set
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "1.h1",  0x0000, 0x2000, CRC(275265ee) SHA1(7075dbe2d59b8cae4f355bcecfbbb9853fe9ca75) )
