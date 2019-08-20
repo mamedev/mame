@@ -137,6 +137,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cpuregion(*this, "maincpu")
 		, m_nvram(*this, "nvram")
+		, m_sec(*this, "sec")
+		, m_in(*this, "IN-%u", 0U)
+		, m_in_coin(*this, "IN-COIN")
 		, m_reel(*this, "reel%u", 1U)
 		, m_io_ports(*this, "IN-%u", 0)
 	{
@@ -148,6 +151,9 @@ public:
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;
+	required_device<sec_device> m_sec;
+	optional_ioport_array<21> m_in;
+	required_ioport m_in_coin;
 	optional_device_array<stepper_device, 6> m_reel;
 
 	int m_reel12_latch;
@@ -156,7 +162,6 @@ public:
 	int m_reel56_latch;
 	int m_optic_pattern;
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-	SEC sec;
 
 	int m_meterstatus;
 

@@ -343,14 +343,14 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 			end2 = base2 + 0x10000 / 2;
 
 
-			if ((offset>=base) && (offset<end))
+			if ((offset >= base) && (offset < end))
 			{
-				offset-=base;
-				return(m_mainram[offset]);
+				offset -= base;
+				return m_mainram[offset];
 			}
-			else if ((offset>=base2) && (offset<end2))
+			else if ((offset >= base2) && (offset < end2))
 			{
-				offset-=base2;
+				offset -= base2;
 				logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
 				int addr = (offset<<1);
 
@@ -375,10 +375,10 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 						case 0x0240:
 							retvalue = 0x00ff;
 
-							if (mem_mask&0xff00)
+							if (ACCESSING_BITS_8_15)
 							{
-								retvalue |= (sec.read_data_line() << (6+8));
-								retvalue |= ioport("IN-COIN")->read() << 8; // coin?
+								retvalue |= (m_sec->data_r() << 14);
+								retvalue |= m_in_coin->read() << 8; // coin?
 								//printf("%08x maincpu read access offset %08x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, mem_mask, cs);
 							}
 							return retvalue;
@@ -387,19 +387,19 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 							return 0x0080; // status of something?
 
 						case 0x1000:
-							return ioport("IN-16")->read();
+							return m_in[16]->read();
 
 						case 0x1010:
-							return ioport("IN-17")->read();
+							return m_in[17]->read();
 
 						case 0x1020:
-							return ioport("IN-18")->read();
+							return m_in[18]->read();
 
 						case 0x1030:
-							return ioport("IN-19")->read();
+							return m_in[19]->read();
 
 						case 0x1040: // door switch, test switch etc.
-							return ioport("IN-20")->read();
+							return m_in[20]->read();
 
 						case 0x1244:
 							return m_ymz->read(0);
@@ -559,7 +559,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 						case 0x0330:
 							logerror("%08x meter write %04x\n",pc, data);
 							//m_meterstatus = (m_meterstatus&0xc0) | (data & 0x3f);
-							sec.write_clock_line(~data&0x20);
+							m_sec->clk_w(~data&0x20);
 							break;
 
 						case 0x1248:
@@ -573,7 +573,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 						case 0x1330:
 							bfm_sc4_reel4_w(space,0,data&0xf);
 							//m_meterstatus = (m_meterstatus&0x3f) | ((data & 0x30) << 2);
-							sec.write_data_line(~data&0x10);
+							m_sec->data_w(~data&0x10);
 							break;
 
 						default:
@@ -811,8 +811,6 @@ void sc4_state::machine_reset()
 	bfm_sc45_state::machine_reset();
 
 	m_dochk41 = true;
-
-	sec.reset();
 }
 
 
@@ -921,6 +919,8 @@ void sc4_state::sc4_common(machine_config &config)
 
 	YMZ280B(config, m_ymz, 16000000); // ?? Mhz
 	m_ymz->add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	SEC(config, m_sec);
 }
 
 //Standard 6 reels all connected
