@@ -106,6 +106,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq11);
 	DECLARE_WRITE_LINE_MEMBER(irq10);
 	DECLARE_WRITE_LINE_MEMBER(irq14);
+	DECLARE_WRITE_LINE_MEMBER(irq15);
 
 protected:
 	virtual void device_start() override;
@@ -358,6 +359,10 @@ public:
 	virtual void config_map(address_map &map) override;
 
 	DECLARE_WRITE32_MEMBER(class_rev_w);
+	DECLARE_READ8_MEMBER(pri_read_cs1_r);
+	DECLARE_WRITE8_MEMBER(pri_write_cs1_w);
+	DECLARE_READ8_MEMBER(sec_read_cs1_r);
+	DECLARE_WRITE8_MEMBER(sec_write_cs1_w);
 
 protected:
 	virtual void device_start() override;
@@ -367,6 +372,8 @@ protected:
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 private:
+	required_device<bus_master_ide_controller_device> m_pri;
+	required_device<bus_master_ide_controller_device> m_sec;
 	devcb_write_line m_pri_interrupt_handler;
 	devcb_write_line m_sec_interrupt_handler;
 	void ide_pri_command(address_map &map);
@@ -394,6 +401,11 @@ public:
 	}
 	nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void config_map(address_map& map) override;
+
+	DECLARE_READ32_MEMBER(unknown_r);
+	DECLARE_WRITE32_MEMBER(unknown_w);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -405,7 +417,7 @@ DECLARE_DEVICE_TYPE(NV2A_AGP, nv2a_agp_device)
  * NV2A 3D Accelerator
  */
 
-class nv2a_gpu_device : public pci_device {
+class nv2a_gpu_device : public agp_device {
 public:
 	template <typename T>
 	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)

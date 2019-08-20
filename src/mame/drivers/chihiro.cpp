@@ -429,6 +429,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 #include "machine/pci.h"
+#include "machine/idectrl.h"
 #include "includes/xbox_pci.h"
 #include "includes/xbox.h"
 
