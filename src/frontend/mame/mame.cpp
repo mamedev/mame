@@ -323,6 +323,11 @@ void mame_machine_manager::ui_initialize(running_machine& machine)
 	m_ui->display_startup_screens(m_firstrun);
 }
 
+void mame_machine_manager::before_load_settings(running_machine& machine)
+{
+	m_lua->on_machine_before_load_settings();
+}
+
 void mame_machine_manager::create_custom(running_machine& machine)
 {
 	// start the inifile manager
