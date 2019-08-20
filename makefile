@@ -983,9 +983,7 @@ GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(OVERRIDE_CC)) -dumpversion 
 else
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
 endif
-ifneq ($(OS),solaris)
 CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | grep -e '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | tail -n 1)
-endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 GIT_AVAILABLE := $(shell git --version > /dev/null 2>&1 && echo git)
 endif
@@ -1367,11 +1365,10 @@ xcode4-ios: generate
 #-------------------------------------------------
 # gmake-solaris
 #-------------------------------------------------
-
-
+ifndef CLANG_VERSION
 $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=solaris --gcc_version=$(GCC_VERSION) $(MAKETYPE)
-
+endif
 .PHONY: solaris_x64
 solaris_x64: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64 precompile
@@ -1382,6 +1379,26 @@ solaris: solaris_x86
 
 .PHONY: solaris_x86
 solaris_x86: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32
+
+#-------------------------------------------------
+# gmake-solaris-clang
+#-------------------------------------------------
+ifdef CLANG_VERSION
+$(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=solaris --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
+endif
+.PHONY: solaris_x64_clang
+solaris_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64
+
+.PHONY: solaris_clang
+solaris_clang: solaris_x86_clang
+
+.PHONY: solaris_x86_clang
+solaris_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32
 

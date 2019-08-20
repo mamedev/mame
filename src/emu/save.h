@@ -267,7 +267,11 @@ public:
 // template specializations to enumerate the fundamental atomic types you are allowed to save
 ALLOW_SAVE_TYPE_AND_ARRAY(char)
 ALLOW_SAVE_TYPE          (bool); // std::vector<bool> may be packed internally
+#ifdef __sun
+ALLOW_SAVE_TYPE_AND_ARRAY(signed char)
+#else
 ALLOW_SAVE_TYPE_AND_ARRAY(s8)
+#endif
 ALLOW_SAVE_TYPE_AND_ARRAY(u8)
 ALLOW_SAVE_TYPE_AND_ARRAY(s16)
 ALLOW_SAVE_TYPE_AND_ARRAY(u16)
