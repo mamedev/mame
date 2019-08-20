@@ -26,6 +26,7 @@ public:
 	void regs_map(address_map &map);
 	void execute_drawing();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	auto idleskip_cb() { return m_idleskip_cb.bind(); }
 
 	DECLARE_READ16_MEMBER(flip_count_r);
 	DECLARE_WRITE16_MEMBER(flip_count_w);
@@ -37,6 +38,9 @@ protected:
 
 private:
 	int vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest);
+
+	required_device<cpu_device> m_cpu;
+	devcb_write_line  m_idleskip_cb;
 
 	struct RenderStateInfo
 	{
@@ -62,8 +66,6 @@ private:
 		uint32_t Height;
 	};
 
-	// internal state
-	required_device<cpu_device> m_cpu;
 
 	uint16_t m_InternalPalette[256];
 	uint32_t m_LastPalUpdate;
