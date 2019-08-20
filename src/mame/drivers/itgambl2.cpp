@@ -1171,7 +1171,7 @@ GAME( 200?, trstar2k, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, 
 GAME( 2001, laser2k1, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Laser 2001 (Ver 1.2)",                  MACHINE_IS_SKELETON )
 GAME( 2001, mdrink,   0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Magic Drink (Ver 1.2)",                 MACHINE_IS_SKELETON )
 GAME( 2001, te0144,   0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Puzzle Bobble (Italian Gambling Game)", MACHINE_IS_SKELETON )
-GAME( 1999, btorneo,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Bubble Torneo",                         MACHINE_IS_SKELETON )
+GAME( 200?, btorneo,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Bubble Torneo",                         MACHINE_IS_SKELETON )
 GAME( 200?, cmagica,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Carta Magica (Ver 1.8)",                MACHINE_IS_SKELETON )
 GAME( 200?, mcard_h8, cmagica,  itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Magic Card (H8, English)",              MACHINE_IS_SKELETON )
 GAME( 200?, millsun,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Millennium Sun",                        MACHINE_IS_SKELETON )
