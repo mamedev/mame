@@ -128,9 +128,9 @@ void alto2_cpu_device::iomem_map(address_map &map)
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	cpu_device(mconfig, ALTO2, tag, owner, clock),
 	m_kb_read_callback(*this),
-	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
-	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
-	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
+	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2, address_map_constructor(FUNC(alto2_cpu_device::ucode_map), this)),
+	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1, address_map_constructor(FUNC(alto2_cpu_device::const_map), this)),
+	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1, address_map_constructor(FUNC(alto2_cpu_device::iomem_map), this)),
 	m_cram_config(2),
 	m_ucode_rom_pages(1),
 	m_ucode_ram_pages(2),

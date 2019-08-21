@@ -28,9 +28,6 @@ public:
 	DECLARE_MACHINE_RESET(alto2);
 
 	void alto2(machine_config &config);
-	void alto2_const_map(address_map &map);
-	void alto2_iomem_map(address_map &map);
-	void alto2_ucode_map(address_map &map);
 
 protected:
 	u16 kb_r(offs_t offset);
@@ -259,30 +256,12 @@ ROM_END
 //  ADDRESS MAPS
 //**************************************************************************
 
-void alto2_state::alto2_ucode_map(address_map &map)
-{
-	map(0, 4*ALTO2_UCODE_PAGE_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::ucode_map));
-}
-
-void alto2_state::alto2_const_map(address_map &map)
-{
-	map(0, ALTO2_CONST_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::const_map));
-}
-
-void alto2_state::alto2_iomem_map(address_map &map)
-{
-	map(0, 2*ALTO2_RAM_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::iomem_map));
-}
-
 void alto2_state::alto2(machine_config &config)
 {
 	// Basic machine hardware
 	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto
 	ALTO2(config, m_maincpu, XTAL(29'491'200)/5);
-	m_maincpu->set_addrmap(AS_PROGRAM, &alto2_state::alto2_ucode_map);
-	m_maincpu->set_addrmap(AS_DATA, &alto2_state::alto2_const_map);
-	m_maincpu->set_addrmap(AS_IO, &alto2_state::alto2_iomem_map);
 	m_maincpu->kb_read_callback().set(FUNC(alto2_state::kb_r));
 
 	// Video hardware
