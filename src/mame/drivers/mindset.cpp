@@ -8,6 +8,7 @@
 #include "machine/upd765.h"
 #include "formats/pc_dsk.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -45,7 +46,7 @@ protected:
 	u32 m_palette[16];
 	bool m_genlock[16];
 	u16 m_dispctrl, m_screenpos, m_intpos, m_intaddr, m_fdc_dma_count;
-	u8 m_kbd_p1, m_kbd_p2, m_borderidx;
+	u8 m_kbd_p1, m_kbd_p2, m_borderidx, m_snd_p1, m_snd_p2;
 	u8 m_mouse_last_read[2], m_mouse_counter[2];
 	bool m_fdc_intext, m_fdc_int, m_fdc_drq, m_trap_int, m_trap_drq;
 
@@ -108,6 +109,7 @@ protected:
 	template<int floppy> void floppy_led_cb(floppy_image_device *, int state);
 
 	u16 keyscan();
+	void update_dac();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -185,6 +187,8 @@ void mindset_state::machine_start()
 	save_item(NAME(m_borderidx));
 	save_item(NAME(m_mouse_last_read));
 	save_item(NAME(m_mouse_counter));
+	save_item(NAME(m_snd_p1));
+	save_item(NAME(m_snd_p2));
 }
 
 void mindset_state::machine_reset()
@@ -198,6 +202,9 @@ void mindset_state::machine_reset()
 	m_kbd_p1 = m_kbd_p2 = m_borderidx = 0;
 	memset(m_mouse_last_read, 0, sizeof(m_mouse_last_read));
 	memset(m_mouse_counter, 0, sizeof(m_mouse_counter));
+	m_snd_p1 = 0x80;
+	m_snd_p2 = 0;
+	m_dac->write(0x80);
 }
 
 int mindset_state::sys_t0_r()
@@ -262,16 +269,22 @@ int mindset_state::kbd_t1_r()
 	return keyscan() & 0x100;
 }
 
+void mindset_state::update_dac()
+{
+	// The p1 dac has the waveform (idle at 0x80), while the p2 one is used for the global volume (mute at 0x00, max at 0xff)
+	m_dac->write((s8(m_snd_p1-0x80)*m_snd_p2/255 + 0x80) & 0xff);
+}
+
 void mindset_state::snd_p1_w(u8 data)
 {
-	m_dac->write(data);
-	if(data != 0x80)
-		logerror("%02x\n", data);
+	m_snd_p1 = data;
+	update_dac();
 }
 
 void mindset_state::snd_p2_w(u8 data)
 {
-	//  logerror("snd p2 %02x\n", data);
+	m_snd_p2 = data;
+	update_dac();
 }
 
 u16 mindset_state::keyscan()
@@ -1031,7 +1044,10 @@ void mindset_state::mindset(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_fdco[1], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
 
 	SPEAKER(config, "lspeaker").front_left();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1);
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, m_dac,  1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 }
 
 static INPUT_PORTS_START(mindset)
