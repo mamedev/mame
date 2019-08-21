@@ -34999,4 +34999,30 @@
 		</part>
 	</software>
 
+	<software name="poetryex">
+		<description>Poetry Express (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Learning Well</publisher>
+		<info name="release" value="2019-08-20"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="poetry express (4am crack).dsk" size="143360" crc="f250b9c8" sha1="cf080f71a9559bc005258a139f408912d8b4f3fc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chipwits">
+		<description>Chipwits</description>
+		<year>1985</year>
+		<publisher>Brainpower, Inc.</publisher>
+		<info name="release" value="2019-08-15"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="chipwits (logo crack).dsk" size="143360" crc="a79830de" sha1="c172fad40f566ba671829a18bfba790ce06f3fbd" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

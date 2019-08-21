@@ -6974,4 +6974,82 @@
 		</part>
 	</software>
 
+	<software name="aawarsea">
+		<description>The Ancient Art of War at Sea</description>
+		<year>1988</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-08-20"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235525">
+				<rom name="the ancient art of war at sea side a.woz" size="235525" crc="d2181caa" sha1="ffb7ccf58782e8427df325715c34fe24d91a0370" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235525">
+				<rom name="the ancient art of war at sea side b.woz" size="235525" crc="b75132a1" sha1="23ded0c791a7387535d2dd1aa296e76f4f2353dd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sokoban">
+		<description>Soko-Ban</description>
+		<year>1984</year>
+		<publisher>Spectrum HoloByte</publisher>
+		<info name="release" value="2019-08-20"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235526">
+				<rom name="soko-ban side a.woz" size="235526" crc="29156703" sha1="a70fc93979a892005cf8c447332ee4ac499e40c5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235526">
+				<rom name="soko-ban side b.woz" size="235526" crc="ef322495" sha1="d94ae0d9d47d38cd1032e7804d36b6e068f982f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crnsmanr">
+		<description>Cranston Manor</description>
+		<year>1981</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2019-08-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="cranston manor.woz" size="234780" crc="2ec631b9" sha1="029ec6088d47359df246b1cc994966b1106883e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midmagic">
+		<description>David's Midnight Magic</description>
+		<year>1982</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-08-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- This re-release was part of the "Double-Pack Classics" collection that
+		included Choplifter on the other side of the disk; both games were updated
+		to fix model-specific compatibility issues caused by the copy protection of
+		earlier releases. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241481">
+				<rom name="david's midnight magic.woz" size="241481" crc="fa2f209f" sha1="a19f1c50796f2f842c87d25c27decb3b12983d20" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
