@@ -127,6 +127,7 @@ void alto2_cpu_device::iomem_map(address_map &map)
 
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	cpu_device(mconfig, ALTO2, tag, owner, clock),
+	m_kb_read_callback(*this),
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
 	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
@@ -813,6 +814,8 @@ device_memory_interface::space_config_vector alto2_cpu_device::memory_space_conf
 
 void alto2_cpu_device::device_start()
 {
+	m_kb_read_callback.resolve_safe(0177777);
+
 	// get a pointer to the IO address space
 	m_iomem = &space(2);
 

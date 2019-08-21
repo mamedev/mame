@@ -185,6 +185,8 @@ public:
 	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~alto2_cpu_device();
 
+	auto kb_read_callback() { return m_kb_read_callback.bind(); }
+
 	//! driver interface to set diablo_hd_device
 	void set_diablo(int unit, diablo_hd_device* ptr);
 
@@ -243,6 +245,8 @@ protected:
 private:
 
 	void fatal(int level, const char *format, ...);
+
+	devcb_read16 m_kb_read_callback;
 
 	address_space_config m_ucode_config;
 	address_space_config m_const_config;

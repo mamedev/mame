@@ -20,14 +20,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_io_row0(*this, "ROW0"),
-		m_io_row1(*this, "ROW1"),
-		m_io_row2(*this, "ROW2"),
-		m_io_row3(*this, "ROW3"),
-		m_io_row4(*this, "ROW4"),
-		m_io_row5(*this, "ROW5"),
-		m_io_row6(*this, "ROW6"),
-		m_io_row7(*this, "ROW7"),
+		m_io_row(*this, "ROW%u", 0U),
 		m_io_config(*this, "CONFIG")
 	{ }
 
@@ -38,17 +31,13 @@ public:
 	void alto2_const_map(address_map &map);
 	void alto2_iomem_map(address_map &map);
 	void alto2_ucode_map(address_map &map);
+
 protected:
+	u16 kb_r(offs_t offset);
+
 	required_device<alto2_cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_ioport m_io_row0;
-	required_ioport m_io_row1;
-	required_ioport m_io_row2;
-	required_ioport m_io_row3;
-	required_ioport m_io_row4;
-	required_ioport m_io_row5;
-	required_ioport m_io_row6;
-	required_ioport m_io_row7;
+	required_ioport_array<8> m_io_row;
 	optional_ioport m_io_config;
 	static const device_timer_id TIMER_VBLANK = 0;
 	emu_timer* m_vblank_timer;
@@ -254,6 +243,11 @@ static INPUT_PORTS_START( alto2 )
 	PORT_DIPSETTING( 0374, "ID 374")   PORT_DIPSETTING( 0375, "ID 375")
 INPUT_PORTS_END
 
+u16 alto2_state::kb_r(offs_t offset)
+{
+	return m_io_row[offset]->read();
+}
+
 /* ROM */
 ROM_START( alto2 )
 	// dummy region for the maincpu - this is not used in any way
@@ -289,6 +283,7 @@ void alto2_state::alto2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &alto2_state::alto2_ucode_map);
 	m_maincpu->set_addrmap(AS_DATA, &alto2_state::alto2_const_map);
 	m_maincpu->set_addrmap(AS_IO, &alto2_state::alto2_iomem_map);
+	m_maincpu->kb_read_callback().set(FUNC(alto2_state::kb_r));
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
