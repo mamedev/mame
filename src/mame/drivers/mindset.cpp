@@ -426,6 +426,8 @@ void mindset_state::dispreg_w(u16 data)
 	}
 }
 
+u16 vram2[0x8000];
+
 u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// Temporary gross hack
@@ -437,6 +439,13 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	int pixels_per_byte_order = (m_dispctrl & 0x0600) >> 9;
 	bool large_pixels = m_dispctrl & 0x0100;
 
+	if (machine().input().code_pressed(KEYCODE_O)) {
+		for(int i=0; i<0x8000; i++)
+			vram2[i] = m_maincpu->space(AS_PROGRAM).read_word(0x26470+2*i);
+		bank = vram2;
+	}
+
+	
 	bitmap.fill(m_palette[m_borderidx]);
 
 	int dx = ((m_screenpos >>  8) & 15) * (751 - 640) / 15;
@@ -801,25 +810,25 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 					u16 tmask;
 					switch((mode >> 11) & 3) {
 					case 0:
-						tmask = dst;
+						tmask = src;
 						break;
 					case 1:
-						tmask = (dst >> 1) | dst;
+						tmask = (src >> 1) | src;
 						tmask = (tmask & 0x5555) * 0x3;
 						break;
 					case 2:
-						tmask = (dst >> 2) | dst;
-						tmask = (dst >> 1) | dst;
+						tmask = (src >> 2) | src;
+						tmask = (tmask >> 1) | tmask;
 						tmask = (tmask & 0x1111) * 0xf;
 						break;
 					case 3:
-						tmask = (dst >> 4) | dst;
-						tmask = (dst >> 2) | dst;
-						tmask = (dst >> 1) | dst;
+						tmask = (src >> 4) | src;
+						tmask = (tmask >> 2) | tmask;
+						tmask = (tmask >> 1) | tmask;
 						tmask = (tmask & 0x0101) * 0xff;
 						break;
 					}
-					cmask &= ~tmask;
+					cmask &= tmask;
 				}
 
 				res = (dst & ~cmask) | (res & cmask);
