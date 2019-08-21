@@ -15,6 +15,164 @@
 
 #include "mindset.lh"
 
+
+class mindset_module_interface: public device_t {
+public:
+	virtual void map(address_map &map) = 0;
+
+protected:
+	mindset_module_interface(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
+mindset_module_interface::mindset_module_interface(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock)
+{
+}
+
+class mindset_module: public device_t,
+					  public device_slot_interface
+{
+public:
+	template <typename T>
+	mindset_module(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false)
+		: mindset_module(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
+	mindset_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	virtual ~mindset_module() = default;
+
+	void map(address_space &space, offs_t base);
+
+protected:
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+};
+
+DEFINE_DEVICE_TYPE(MINDSET_MODULE, mindset_module,  "mindset_module", "MINDSET module")
+
+mindset_module::mindset_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MINDSET_MODULE, tag, owner, clock),
+	device_slot_interface(mconfig, *this)
+{
+}
+
+void mindset_module::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<mindset_module_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement mindset_module_interface\n", carddev->tag(), carddev->name());
+}
+
+void mindset_module::device_start()
+{
+}
+
+void mindset_module::map(address_space &space, offs_t base)
+{
+	mindset_module_interface *module = dynamic_cast<mindset_module_interface *>(get_card_device());
+	if(module)
+		space.install_device(base, base+0x3f, *module, &mindset_module_interface::map);
+}
+
+
+class mindset_sound_module: public mindset_module_interface {
+public:
+	mindset_sound_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	virtual ~mindset_sound_module() = default;
+
+	virtual void map(address_map &map) override;
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	u8 m_p1, m_p2;
+
+	required_device<i8042_device> m_soundcpu;
+	required_device<dac_byte_interface> m_dac;
+
+	void p1_w(u8 data);
+	void p2_w(u8 data);
+	void update_dac();
+};
+
+DEFINE_DEVICE_TYPE(MINDSET_SOUND_MODULE, mindset_sound_module,  "mindset_sound_module", "MINDSET stereo sound module")
+
+mindset_sound_module::mindset_sound_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mindset_module_interface(mconfig, MINDSET_SOUND_MODULE, tag, owner, clock),
+	m_soundcpu(*this, "soundcpu"),
+	m_dac(*this, "dac")
+{
+}
+
+void mindset_sound_module::device_start()
+{
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p2));
+}
+
+void mindset_sound_module::device_reset()
+{
+	m_p1 = 0x80;
+	m_p2 = 0;
+	m_dac->write(0x80);
+}
+
+void mindset_sound_module::update_dac()
+{
+	// The p1 dac has the waveform (idle at 0x80), while the p2 one is used for the global volume (mute at 0x00, max at 0xff)
+	m_dac->write((s8(m_p1-0x80)*m_p2/255 + 0x80) & 0xff);
+}
+
+void mindset_sound_module::p1_w(u8 data)
+{
+	m_p1 = data;
+	update_dac();
+}
+
+void mindset_sound_module::p2_w(u8 data)
+{
+	m_p2 = data;
+	update_dac();
+}
+
+void mindset_sound_module::map(address_map &map)
+{
+	map(0x00, 0x03).rw(m_soundcpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
+	map(0x00, 0x00).lr8("id", []() -> u8 { return 0x13; });
+}
+
+ROM_START(mindset_sound_module)
+	ROM_REGION(0x0800, "soundcpu", 0)
+	ROM_LOAD("253006-001.u16", 0, 0x800, CRC(7bea5edd) SHA1(30cdc0dedaa5246f4952df452a99ca22e3cd0636))
+ROM_END
+
+const tiny_rom_entry *mindset_sound_module::device_rom_region() const
+{
+	return ROM_NAME(mindset_sound_module);
+}
+
+void mindset_sound_module::device_add_mconfig(machine_config &config)
+{
+	I8042(config, m_soundcpu, 12_MHz_XTAL/2);
+	m_soundcpu->p1_out_cb().set(FUNC(mindset_sound_module::p1_w));
+	m_soundcpu->p2_out_cb().set(FUNC(mindset_sound_module::p2_w));
+
+	SPEAKER(config, "rspeaker").front_right();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, m_dac,  1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
+}
+
+
 class mindset_state: public driver_device
 {
 public:
@@ -39,6 +197,7 @@ protected:
 	output_finder<> m_yellow_led;
 	output_finder<> m_green_led;
 	required_device<dac_byte_interface> m_dac;
+	required_device_array<mindset_module, 6> m_modules;
 
 	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_gcps;
 
@@ -142,7 +301,8 @@ mindset_state::mindset_state(const machine_config &mconfig, device_type type, co
 	m_red_led(*this, "red_led"),
 	m_yellow_led(*this, "yellow_led"),
 	m_green_led(*this, "green_led"),
-	m_dac(*this, "dac")
+	m_dac(*this, "dac"),
+	m_modules(*this, "m%d", 0U)
 {
 }
 
@@ -193,6 +353,11 @@ void mindset_state::machine_start()
 
 void mindset_state::machine_reset()
 {
+	auto &space = m_maincpu->space(AS_IO);
+	space.unmap_readwrite(0x8080, 0x81ff);
+	for(int i=0; i<6; i++)
+		m_modules[i]->map(space, 0x8080 + 0x40*i);
+
 	m_fdc_intext = m_fdc_int = m_trap_int = m_fdc_drq = m_trap_drq = false;
 	m_trap_pos = m_trap_len = 0;
 	memset(m_trap_data, 0, sizeof(m_trap_data));
@@ -967,7 +1132,7 @@ u16 mindset_state::trap_dma_r(offs_t, u16 mem_mask)
 
 void mindset_state::maincpu_mem(address_map &map)
 {
-	map(0x00000, 0x7ffff).ram();
+	map(0x00000, 0x3ffff).ram();
 	map(0xb8000, 0xbffff).ram().share("vram");
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
@@ -1003,6 +1168,11 @@ void mindset_state::maincpu_io(address_map &map)
 static void pc_dd_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
+}
+
+static void mindset_modules(device_slot_interface &device)
+{
+	device.option_add("stereo", MINDSET_SOUND_MODULE);
 }
 
 void mindset_state::mindset(machine_config &config)
@@ -1057,6 +1227,13 @@ void mindset_state::mindset(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, m_dac,  1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
+
+	MINDSET_MODULE(config, "m0", mindset_modules, "stereo", false);
+	MINDSET_MODULE(config, "m1", mindset_modules, nullptr, false);
+	MINDSET_MODULE(config, "m2", mindset_modules, nullptr, false);
+	MINDSET_MODULE(config, "m3", mindset_modules, nullptr, false);
+	MINDSET_MODULE(config, "m4", mindset_modules, nullptr, false);
+	MINDSET_MODULE(config, "m5", mindset_modules, nullptr, false);
 }
 
 static INPUT_PORTS_START(mindset)
