@@ -591,8 +591,6 @@ void mindset_state::dispreg_w(u16 data)
 	}
 }
 
-u16 vram2[0x8000];
-
 u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// Temporary gross hack
@@ -604,13 +602,6 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	int pixels_per_byte_order = (m_dispctrl & 0x0600) >> 9;
 	bool large_pixels = m_dispctrl & 0x0100;
 
-	if (machine().input().code_pressed(KEYCODE_O)) {
-		for(int i=0; i<0x8000; i++)
-			vram2[i] = m_maincpu->space(AS_PROGRAM).read_word(0x26470+2*i);
-		bank = vram2;
-	}
-
-	
 	bitmap.fill(m_palette[m_borderidx]);
 
 	int dx = ((m_screenpos >>  8) & 15) * (751 - 640) / 15;
