@@ -12,6 +12,7 @@
 
 #include "sound/ay8910.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class bogeyman_state : public driver_device
 {

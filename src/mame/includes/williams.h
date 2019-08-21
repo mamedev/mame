@@ -22,6 +22,7 @@
 #include "sound/hc55516.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class williams_state : public driver_device
 {

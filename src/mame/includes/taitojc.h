@@ -10,6 +10,7 @@
 #include "machine/taitoio.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class taitojc_state : public driver_device
 {

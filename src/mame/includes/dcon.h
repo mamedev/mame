@@ -7,6 +7,7 @@
 
 #include "audio/seibu.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class dcon_state : public driver_device, public seibu_sound_common
 {

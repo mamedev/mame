@@ -13,6 +13,8 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

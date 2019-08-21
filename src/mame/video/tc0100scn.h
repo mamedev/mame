@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 enum {
 	TC0100SCN_LAYOUT_DEFAULT = 0,

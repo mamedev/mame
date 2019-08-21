@@ -14,6 +14,7 @@
 #include "video/atarimo.h"
 #include "video/atarivad.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class offtwall_state : public driver_device
 {

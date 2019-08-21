@@ -16,6 +16,7 @@
 #include "video/bufsprite.h"
 
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class tigeroad_state : public driver_device

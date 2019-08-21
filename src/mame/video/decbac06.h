@@ -6,6 +6,7 @@
 #pragma once
 
 #include "screen.h"
+#include "tilemap.h"
 #include <memory>
 
 class deco_bac06_device : public device_t

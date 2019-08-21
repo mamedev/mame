@@ -14,6 +14,7 @@
 #include "machine/74123.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define IREMM10_MASTER_CLOCK        (12500000)
 

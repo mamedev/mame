@@ -16,6 +16,7 @@
 #include "video/toaplan_scu.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class twincobr_state : public driver_device
 {

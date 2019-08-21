@@ -7,6 +7,7 @@
 
 #include "machine/watchdog.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class ampoker2_state : public driver_device
 {

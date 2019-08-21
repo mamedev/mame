@@ -5,6 +5,7 @@
 #include "video/jalblend.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class argus_state : public driver_device
 {

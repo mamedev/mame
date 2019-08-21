@@ -22,6 +22,7 @@
 #include "sound/x1_010.h"
 #include "video/seta001.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class seta_state : public driver_device

@@ -18,6 +18,7 @@
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];

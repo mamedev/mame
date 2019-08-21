@@ -209,6 +209,7 @@ A Note about Best Bet Products.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "peplus.lh"
 #include "pe_schip.lh"

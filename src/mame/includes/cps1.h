@@ -18,6 +18,7 @@
 #include "cpu/m68000/m68000.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 // Video raw params
 // measured clocks:

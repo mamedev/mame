@@ -49,6 +49,7 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class cb2001_state : public driver_device

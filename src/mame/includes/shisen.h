@@ -7,6 +7,7 @@
 
 #include "audio/m72.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class shisen_state : public driver_device
 {

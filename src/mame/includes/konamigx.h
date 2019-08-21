@@ -19,6 +19,7 @@
 #include "video/k055555.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class konamigx_state : public driver_device
 {

@@ -10,6 +10,7 @@
 #include "sound/sn76496.h"
 #include "sound/2203intf.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class homedata_state : public driver_device
 {

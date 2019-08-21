@@ -12,6 +12,7 @@
 
 #include "machine/gen_latch.h"
 #include "cpu/z80/z80.h"
+#include "tilemap.h"
 
 class zerozone_state : public driver_device
 {

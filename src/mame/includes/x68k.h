@@ -31,6 +31,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define GFX16     0
 #define GFX256    1

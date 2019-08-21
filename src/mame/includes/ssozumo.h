@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class ssozumo_state : public driver_device
 {

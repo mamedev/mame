@@ -12,6 +12,7 @@
 
 #include "sound/vlm5030.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK        XTAL(18'432'000)
 #define VOICE_CLOCK         XTAL(3'579'545)

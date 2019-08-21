@@ -13,6 +13,7 @@
 #include "machine/atarigen.h"
 #include "video/atarimo.h"
 #include "video/atarivad.h"
+#include "tilemap.h"
 
 class shuuz_state : public atarigen_state
 {

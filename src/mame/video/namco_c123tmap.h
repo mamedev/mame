@@ -7,6 +7,7 @@
 #pragma once
 
 #include "screen.h"
+#include "tilemap.h"
 
 class namco_c123tmap_device : public device_t, public device_gfx_interface
 {

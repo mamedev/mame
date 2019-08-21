@@ -78,6 +78,7 @@
 #include "machine/nvram.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK    XTAL(8'000'000)   /* guess */
 

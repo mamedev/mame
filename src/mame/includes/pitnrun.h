@@ -7,6 +7,7 @@
 
 #include "cpu/m6805/m68705.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class pitnrun_state : public driver_device
 {

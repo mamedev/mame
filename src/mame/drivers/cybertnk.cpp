@@ -178,6 +178,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class cybertnk_state : public driver_device

@@ -15,6 +15,7 @@
 #include "machine/gen_latch.h"
 #include "sound/discrete.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 #define MADALIEN_MAIN_CLOCK     XTAL(10'595'000)

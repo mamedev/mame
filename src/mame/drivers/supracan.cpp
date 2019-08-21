@@ -83,6 +83,7 @@ DEBUG TRICKS:
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
+#include "tilemap.h"
 
 #define SOUNDCPU_BOOT_HACK      (1)
 

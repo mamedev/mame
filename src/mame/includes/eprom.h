@@ -15,6 +15,7 @@
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class eprom_state : public atarigen_state
 {

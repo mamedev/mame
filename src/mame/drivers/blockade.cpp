@@ -19,6 +19,7 @@
 
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "blockade.lh"
 

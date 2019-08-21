@@ -27,6 +27,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define I8080_TAG   "maincpu"
 

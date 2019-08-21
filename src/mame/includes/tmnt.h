@@ -18,6 +18,7 @@
 #include "video/k054000.h"
 #include "video/konami_helper.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tmnt_state : public driver_device
 {

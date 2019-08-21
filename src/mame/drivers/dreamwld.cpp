@@ -103,6 +103,7 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include <algorithm>
 

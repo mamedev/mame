@@ -300,10 +300,6 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_TILEMAP_H
 #define MAME_EMU_TILEMAP_H
 

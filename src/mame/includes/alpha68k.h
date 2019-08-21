@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class alpha68k_state : public driver_device
 {

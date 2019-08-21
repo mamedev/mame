@@ -20,6 +20,7 @@
 #include "video/poly.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 enum
 {

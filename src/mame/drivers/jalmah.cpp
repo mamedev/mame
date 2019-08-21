@@ -116,6 +116,7 @@ OSC:    12.000MHz
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class jalmah_state : public driver_device

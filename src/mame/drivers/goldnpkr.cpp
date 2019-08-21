@@ -1289,6 +1289,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "pmpoker.lh"
 #include "goldnpkr.lh"

@@ -280,6 +280,7 @@ MH86171 Color Palette RAMDAC
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "pirpok2.lh"
 

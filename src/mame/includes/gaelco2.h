@@ -6,6 +6,7 @@
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class gaelco2_state : public driver_device
 {

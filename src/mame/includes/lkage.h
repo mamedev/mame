@@ -9,6 +9,7 @@
 #include "machine/input_merger.h"
 #include "machine/taito68705interface.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class lkage_state : public driver_device
 {

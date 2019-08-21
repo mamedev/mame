@@ -31,6 +31,7 @@ All clock timing comes from crystal 1
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class supduck_state : public driver_device
 {

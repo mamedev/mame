@@ -14,6 +14,7 @@
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class vindictr_state : public atarigen_state
 {

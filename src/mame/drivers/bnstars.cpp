@@ -98,6 +98,7 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 
 #include "rendlay.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class bnstars_state : public ms32_state

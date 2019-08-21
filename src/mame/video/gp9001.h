@@ -7,6 +7,7 @@
 #pragma once
 
 #include "video/bufsprite.h"
+#include "tilemap.h"
 
 class gp9001vdp_device : public device_t,
 							public device_gfx_interface,

@@ -61,6 +61,7 @@ $7004 writes, related to $7000 reads
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class olibochu_state : public driver_device
 {

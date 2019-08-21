@@ -15,6 +15,7 @@
 #include "video/toaplan_scu.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class toaplan1_state : public driver_device
 {

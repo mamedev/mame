@@ -13,6 +13,7 @@
 #include "emupal.h"
 #include "machine/timer.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class gcpinbal_state : public driver_device
 {

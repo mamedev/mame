@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "sound/sp0256.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class sauro_state : public driver_device
 {

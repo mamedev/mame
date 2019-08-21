@@ -13,6 +13,7 @@
 #include "machine/ldpr8210.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 #define GOTTLIEB_VIDEO_HCOUNT   318

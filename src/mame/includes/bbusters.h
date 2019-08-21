@@ -8,6 +8,7 @@
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class bbusters_state_base : public driver_device
 {

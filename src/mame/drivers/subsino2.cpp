@@ -55,6 +55,7 @@ To do:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 enum tilesize_t

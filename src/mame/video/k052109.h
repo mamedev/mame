@@ -6,6 +6,7 @@
 #pragma once
 
 #include "screen.h"
+#include "tilemap.h"
 
 typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)> k052109_cb_delegate;
 #define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)

@@ -13,6 +13,7 @@
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
 

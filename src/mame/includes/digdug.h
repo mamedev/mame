@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/er2055.h"
+#include "tilemap.h"
 
 class digdug_state : public galaga_state
 {

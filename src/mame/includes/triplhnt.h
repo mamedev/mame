@@ -16,6 +16,7 @@
 #include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 /* Discrete Sound Input Nodes */

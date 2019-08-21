@@ -12,6 +12,7 @@
 
 #include "machine/timer.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class fantasy_sound_device;
 

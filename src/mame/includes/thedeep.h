@@ -11,6 +11,7 @@
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class thedeep_state : public driver_device

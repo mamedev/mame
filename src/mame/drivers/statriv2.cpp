@@ -78,6 +78,7 @@ Issues:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class statriv2_state : public driver_device

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "video/bufsprite.h"
+#include "tilemap.h"
 
 DECLARE_DEVICE_TYPE(DOOYONG_ROM_TILEMAP, dooyong_rom_tilemap_device)
 DECLARE_DEVICE_TYPE(RSHARK_ROM_TILEMAP,  rshark_rom_tilemap_device)

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 
 typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags)> k007342_delegate;
 

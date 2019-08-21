@@ -44,6 +44,7 @@ Tomasz Slanina 20050225
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class vroulet_state : public driver_device

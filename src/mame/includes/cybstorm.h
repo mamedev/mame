@@ -14,6 +14,7 @@
 #include "machine/bankdev.h"
 #include "video/atarivad.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class cybstorm_state : public driver_device

@@ -73,6 +73,7 @@ FIX: PK Tetris have an input named AMUSE which I couldn't map.  Maybe it is
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "igspoker.lh"
 

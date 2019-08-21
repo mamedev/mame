@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 typedef device_delegate<void (int, uint16_t*, uint16_t*, uint16_t*, uint16_t*)> segaic16_video_pagelatch_delegate;
 
 

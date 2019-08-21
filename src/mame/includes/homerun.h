@@ -10,6 +10,7 @@
 #include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class homerun_state : public driver_device
 {

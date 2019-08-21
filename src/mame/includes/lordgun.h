@@ -10,6 +10,7 @@
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 struct lordgun_gun_data
 {

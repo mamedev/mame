@@ -7,6 +7,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class gomoku_state : public driver_device
 {

@@ -14,6 +14,7 @@
 #include "sound/tc8830f.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class timeplt_state : public driver_device
 {

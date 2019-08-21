@@ -7,6 +7,7 @@
 
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class sidearms_state : public driver_device
 {

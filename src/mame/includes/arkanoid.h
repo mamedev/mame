@@ -7,6 +7,7 @@
 
 #include "machine/taito68705interface.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {

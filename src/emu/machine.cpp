@@ -83,6 +83,7 @@
 #include "image.h"
 #include "network.h"
 #include "romload.h"
+#include "tilemap.h"
 #include "ui/uimain.h"
 #include <time.h>
 #include <rapidjson/writer.h>

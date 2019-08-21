@@ -43,6 +43,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "machine/x2212.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class firefox_state : public driver_device

@@ -38,6 +38,7 @@ voice.rom - VOICE ROM
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class good_state : public driver_device

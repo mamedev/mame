@@ -10,6 +10,7 @@
 #include "video/k053936.h"
 #include "cpu/dsp56156/dsp56156.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 static const uint16_t dsp56156_bank00_size = 0x1000;

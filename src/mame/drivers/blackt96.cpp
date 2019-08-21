@@ -85,6 +85,7 @@ Bugs (all of these looks BTANBs):
 #include "video/snk68_spr.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class blackt96_state : public driver_device

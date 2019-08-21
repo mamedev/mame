@@ -9,6 +9,7 @@
 #include "machine/i8255.h"
 #include "machine/ticket.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class goldstar_state : public driver_device

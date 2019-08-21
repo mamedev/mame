@@ -43,6 +43,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 #include "sbrkout.lh"
 
 class sbrkout_state : public driver_device

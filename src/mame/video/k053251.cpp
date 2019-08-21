@@ -120,6 +120,7 @@ actually used, since the priority is taken from the external ports.
 #include "emu.h"
 #include "k053251.h"
 #include "konami_helper.h"
+#include "tilemap.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

@@ -8,6 +8,7 @@
 #include "machine/74259.h"
 #include "machine/taito68705interface.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class retofinv_state : public driver_device
 {

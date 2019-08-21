@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 
 void K053936_0_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,uint32_t priority, int glfgreat_hack);

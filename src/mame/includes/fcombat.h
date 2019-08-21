@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 
 // this is copied from Exerion, but it should be correct

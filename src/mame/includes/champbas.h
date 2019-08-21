@@ -15,6 +15,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class champbas_state : public driver_device

@@ -16,6 +16,7 @@
 #include "sound/msm5205.h"
 #include "sound/dac.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class kchamp_state : public driver_device
 {

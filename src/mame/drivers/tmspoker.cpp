@@ -212,6 +212,7 @@
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(6'000'000)   /* confirmed */

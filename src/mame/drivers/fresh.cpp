@@ -28,6 +28,7 @@ rom 5 and 6 are prg roms
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 

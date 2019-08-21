@@ -235,6 +235,7 @@ To Do:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "victor5.lh"
 #include "victor21.lh"

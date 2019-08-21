@@ -9,6 +9,7 @@
 #include "machine/eepromser.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class unico_state : public driver_device
 {

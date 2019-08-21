@@ -9,6 +9,7 @@
 #include "machine/rp5h01.h"
 #include "video/ppu2c0x.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class playch10_state : public driver_device
 {

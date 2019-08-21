@@ -5,6 +5,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class powerins_state : public driver_device
 {

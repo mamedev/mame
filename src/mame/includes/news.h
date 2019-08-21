@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 class news_state : public driver_device
 {
 public:

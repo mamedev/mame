@@ -15,6 +15,7 @@
 #include "render.h"
 #include "rendfont.h"
 #include "rendutil.h"
+#include "tilemap.h"
 #include "ui/viewgfx.h"
 
 

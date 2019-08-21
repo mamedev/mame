@@ -11,6 +11,7 @@
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {

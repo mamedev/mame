@@ -86,6 +86,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class rabbit_state : public driver_device

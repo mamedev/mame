@@ -15,6 +15,7 @@
 #include "video/decmxc06.h"
 #include "video/decrmc3.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class dec8_state : public driver_device
 {

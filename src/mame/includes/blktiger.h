@@ -13,6 +13,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class blktiger_state : public driver_device
 {
