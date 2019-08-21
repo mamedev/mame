@@ -512,6 +512,7 @@ void eag_state::eag2100(machine_config &config)
 	eag(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_clock(6_MHz_XTAL);
 	m_mainmap->set_addrmap(AS_PROGRAM, &eag_state::eag2100_map);
 }
 

@@ -15,6 +15,7 @@ TODO:
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/md4330b.h"
 #include "video/pwm.h"
 
 #include "screen.h"
@@ -32,6 +33,7 @@ public:
 	ssystem3_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
@@ -46,8 +48,9 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<md4332b_device> m_lcd;
 	required_device<pwm_display_device> m_display;
-	optional_device<dac_bit_interface> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
 
 	// address maps
@@ -129,6 +132,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
+	MD4332B(config, m_lcd);
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	//config.set_default_layout(layout_saitek_ssystem3);
 
