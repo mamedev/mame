@@ -1225,6 +1225,8 @@ void mindset_state::mindset(machine_config &config)
 	MINDSET_MODULE(config, "m3", mindset_modules, nullptr, false);
 	MINDSET_MODULE(config, "m4", mindset_modules, nullptr, false);
 	MINDSET_MODULE(config, "m5", mindset_modules, nullptr, false);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mindset_flop");
 }
 
 static INPUT_PORTS_START(mindset)
