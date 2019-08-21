@@ -13,7 +13,7 @@
 		</part>
 		<!-- the scp image isn't currently used but might be preferable at a later date -->
 		<part name="flop1scp" interface="unused">
-			<dataarea name="cass" size="6524462">
+			<dataarea name="flop" size="6524462">
 				<rom name="vyper.scp" size="6524462" crc="e625f90f" sha1="bd69f346a49926742e37b98d3946020ab814d53c"/>
 			</dataarea>
 		</part>
