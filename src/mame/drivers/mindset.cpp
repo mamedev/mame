@@ -9,6 +9,8 @@
 #include "formats/pc_dsk.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "machine/ins8250.h"
+#include "bus/rs232/rs232.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -19,14 +21,46 @@
 class mindset_module_interface: public device_t {
 public:
 	virtual void map(address_map &map) = 0;
+	virtual void idmap(address_map &map) = 0;
+
+	auto irq_cb() { return m_irq_cb.bind(); }
+	bool irq_r() const;
 
 protected:
+	bool m_irq_state;
+
+	void irq_w(int state);
+
 	mindset_module_interface(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	devcb_write_line m_irq_cb;
 };
 
-mindset_module_interface::mindset_module_interface(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock)
+void mindset_module_interface::device_start()
 {
+	m_irq_cb.resolve_safe();
+	save_item(NAME(m_irq_state));
+}
+
+void mindset_module_interface::device_reset()
+{
+	m_irq_state = false;
+	m_irq_cb(m_irq_state);
+}
+
+mindset_module_interface::mindset_module_interface(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_irq_cb(*this)
+{
+}
+
+void mindset_module_interface::irq_w(int state)
+{
+	m_irq_state = state;
+	m_irq_cb(m_irq_state);
 }
 
 class mindset_module: public device_t,
@@ -45,7 +79,7 @@ public:
 	mindset_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~mindset_module() = default;
 
-	void map(address_space &space, offs_t base);
+	void map(address_space &space, offs_t base, bool id);
 
 protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -71,11 +105,11 @@ void mindset_module::device_start()
 {
 }
 
-void mindset_module::map(address_space &space, offs_t base)
+void mindset_module::map(address_space &space, offs_t base, bool id)
 {
 	mindset_module_interface *module = dynamic_cast<mindset_module_interface *>(get_card_device());
 	if(module)
-		space.install_device(base, base+0x3f, *module, &mindset_module_interface::map);
+		space.install_device(base, base+0x3f, *module, id ? &mindset_module_interface::idmap : &mindset_module_interface::map);
 }
 
 
@@ -85,6 +119,7 @@ public:
 	virtual ~mindset_sound_module() = default;
 
 	virtual void map(address_map &map) override;
+	virtual void idmap(address_map &map) override;
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -114,12 +149,14 @@ mindset_sound_module::mindset_sound_module(const machine_config &mconfig, const 
 
 void mindset_sound_module::device_start()
 {
+	mindset_module_interface::device_start();
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
 }
 
 void mindset_sound_module::device_reset()
 {
+	mindset_module_interface::device_reset();
 	m_p1 = 0x80;
 	m_p2 = 0;
 	m_dac->write(0x80);
@@ -145,8 +182,12 @@ void mindset_sound_module::p2_w(u8 data)
 
 void mindset_sound_module::map(address_map &map)
 {
-	map(0x00, 0x03).rw(m_soundcpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
-	map(0x00, 0x00).lr8("id", []() -> u8 { return 0x13; });
+	map(0x00, 0x03).rw(m_soundcpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff).mirror(0x3c);
+}
+
+void mindset_sound_module::idmap(address_map &map)
+{
+	map(0x00, 0x3f).lr8("id", []() -> u8 { return 0x13; }).umask16(0x00ff);
 }
 
 ROM_START(mindset_sound_module)
@@ -171,6 +212,54 @@ void mindset_sound_module::device_add_mconfig(machine_config &config)
 	vref.add_route(0, m_dac,  1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 }
+
+
+class mindset_rs232_module: public mindset_module_interface {
+public:
+	mindset_rs232_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	virtual ~mindset_rs232_module() = default;
+
+	virtual void map(address_map &map) override;
+	virtual void idmap(address_map &map) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<ins8250_device> m_ins8250;
+	required_device<rs232_port_device> m_rs232;
+};
+
+DEFINE_DEVICE_TYPE(MINDSET_RS232_MODULE, mindset_rs232_module,  "mindset_rs232_module", "MINDSET RS232 module")
+
+mindset_rs232_module::mindset_rs232_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mindset_module_interface(mconfig, MINDSET_RS232_MODULE, tag, owner, clock),
+	m_ins8250(*this, "ins8250"),
+	m_rs232(*this, "rs232")
+{
+}
+
+void mindset_rs232_module::map(address_map &map)
+{
+	map(0x00, 0x0f).rw(m_ins8250, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)).umask16(0x00ff).mirror(0x30);
+}
+
+void mindset_rs232_module::idmap(address_map &map)
+{
+	map(0x00, 0x3f).lr8("id", [this]() -> u8 { return 0x73 | (m_irq_state ? 0x80 : 0x00); }).umask16(0x00ff);
+}
+
+void mindset_rs232_module::device_add_mconfig(machine_config &config)
+{
+	INS8250(config, m_ins8250, 12_MHz_XTAL/2/4); // Weird since there's no divider in the module
+	m_ins8250->out_tx_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_ins8250->out_int_callback().set(FUNC(mindset_rs232_module::irq_w));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_ins8250, FUNC(ins8250_device::rx_w));
+	m_rs232->dsr_handler().set(m_ins8250, FUNC(ins8250_device::dsr_w));
+}
+
 
 
 class mindset_state: public driver_device
@@ -205,7 +294,7 @@ protected:
 	u32 m_palette[16];
 	bool m_genlock[16];
 	u16 m_dispctrl, m_screenpos, m_intpos, m_intaddr, m_fdc_dma_count;
-	u8 m_kbd_p1, m_kbd_p2, m_borderidx, m_snd_p1, m_snd_p2;
+	u8 m_kbd_p1, m_kbd_p2, m_borderidx, m_snd_p1, m_snd_p2, m_sys_p2;
 	u8 m_mouse_last_read[2], m_mouse_counter[2];
 	bool m_fdc_intext, m_fdc_int, m_fdc_drq, m_trap_int, m_trap_drq;
 
@@ -269,6 +358,7 @@ protected:
 
 	u16 keyscan();
 	void update_dac();
+	void map_modules();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -349,15 +439,22 @@ void mindset_state::machine_start()
 	save_item(NAME(m_mouse_counter));
 	save_item(NAME(m_snd_p1));
 	save_item(NAME(m_snd_p2));
+	save_item(NAME(m_sys_p2));
+}
+
+void mindset_state::map_modules()
+{
+	auto &space = m_maincpu->space(AS_IO);
+	bool id = !(m_sys_p2 & 0x40);
+	space.unmap_readwrite(0x8080, 0x81ff);
+	for(int i=0; i<6; i++)
+		m_modules[i]->map(space, 0x8080 + 0x40*i, id);
 }
 
 void mindset_state::machine_reset()
 {
-	auto &space = m_maincpu->space(AS_IO);
-	space.unmap_readwrite(0x8080, 0x81ff);
-	for(int i=0; i<6; i++)
-		m_modules[i]->map(space, 0x8080 + 0x40*i);
-
+	m_sys_p2 = 0;
+	map_modules();
 	m_fdc_intext = m_fdc_int = m_trap_int = m_fdc_drq = m_trap_drq = false;
 	m_trap_pos = m_trap_len = 0;
 	memset(m_trap_data, 0, sizeof(m_trap_data));
@@ -404,12 +501,15 @@ void mindset_state::sys_p1_w(u8 data)
 
 void mindset_state::sys_p2_w(u8 data)
 {
-	m_maincpu->int3_w(!(data & 0x80));
-	m_red_led = !BIT(data, 2);
+	u8 old = m_sys_p2;
+	m_sys_p2 = data;
 	m_yellow_led = !BIT(data, 0);
 	m_green_led = !BIT(data, 1);
-	//  logerror("power %s\n", data & 0x40 ?
-	logerror("SYS: write p2 %02x\n", data);
+	m_red_led = !BIT(data, 2);
+	if((m_sys_p2 ^ old) & 0x40)
+		map_modules();
+	m_maincpu->int3_w(!(data & 0x80));
+	//	logerror("SYS: write p2 %02x\n", data);
 }
 
 void mindset_state::kbd_p1_w(u8 data)
@@ -884,7 +984,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 	// x = go right to left (unimplemented)
 	// m = blending mode
 
-	if(1)
+	if(0)
 	logerror("GCP: p src %04x:%04x.%x dst %04x:%04x.%x sz %xx%x step %x:%x mask %04x:%04x k %x:%x mode %c%d%c%c%c%c%c%c%d\n", src_seg, src_adr, src_sft, dst_seg, dst_adr, dst_sft, width, height, sy, dy, rmask, wmask, (kmask >> 8) & 15, kmask & 15,
 			 mode & 0x4000 ? 'f' : '-',
 			 (mode >> 11) & 3,
@@ -1164,6 +1264,7 @@ static void pc_dd_floppies(device_slot_interface &device)
 static void mindset_modules(device_slot_interface &device)
 {
 	device.option_add("stereo", MINDSET_SOUND_MODULE);
+	device.option_add("rs232", MINDSET_RS232_MODULE);
 }
 
 void mindset_state::mindset(machine_config &config)
@@ -1171,7 +1272,7 @@ void mindset_state::mindset(machine_config &config)
 	config.m_perfect_cpu_quantum = ":syscpu";
 	config.set_default_layout(layout_mindset);
 
-	I80186(config, m_maincpu, 12_MHz_XTAL/2);
+	I80186(config, m_maincpu, 12_MHz_XTAL); // Divides internally by 2 to produce a clkout of 6MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &mindset_state::maincpu_mem);
 	m_maincpu->set_addrmap(AS_IO,      &mindset_state::maincpu_io);
 
@@ -1220,7 +1321,7 @@ void mindset_state::mindset(machine_config &config)
 	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	MINDSET_MODULE(config, "m0", mindset_modules, "stereo", false);
-	MINDSET_MODULE(config, "m1", mindset_modules, nullptr, false);
+	MINDSET_MODULE(config, "m1", mindset_modules, "rs232", false);
 	MINDSET_MODULE(config, "m2", mindset_modules, nullptr, false);
 	MINDSET_MODULE(config, "m3", mindset_modules, nullptr, false);
 	MINDSET_MODULE(config, "m4", mindset_modules, nullptr, false);
