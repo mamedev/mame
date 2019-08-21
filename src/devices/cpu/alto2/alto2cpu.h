@@ -188,7 +188,7 @@ public:
 	auto utilout_callback() { return m_utilout_callback.bind(); }
 
 	//! driver interface to set diablo_hd_device
-	void set_diablo(int unit, diablo_hd_device* ptr);
+	template <typename T> void set_diablo(int unit, T &&tag) { m_drive[unit].set_tag(std::forward<T>(tag)); }
 
 	//! call in for the next sector callback
 	void next_sector(int unit);

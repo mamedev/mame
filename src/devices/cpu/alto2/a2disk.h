@@ -11,7 +11,7 @@
 #ifndef _A2DISK_H_
 #define _A2DISK_H_
 
-diablo_hd_device* m_drive[2];       //!< two diablo_hd_device drives
+required_device_array<diablo_hd_device, 2> m_drive;       //!< two diablo_hd_device drives
 
 //! disk controller context
 struct {

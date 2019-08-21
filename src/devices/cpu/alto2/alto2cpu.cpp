@@ -181,6 +181,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_ether_id(0),
 	m_hw(),
 	m_mouse(),
+	m_drive(*this, { finder_base::DUMMY_TAG, finder_base::DUMMY_TAG }),
 	m_dsk(),
 	m_dsp(),
 	m_disp_a38(nullptr),
@@ -203,7 +204,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	memset(m_s_reg_bank, 0x00, sizeof(m_s_reg_bank));
 	memset(m_bank_reg, 0x00, sizeof(m_bank_reg));
 	memset(m_ram_related, 0x00, sizeof(m_ram_related));
-	memset(m_drive, 0x00, sizeof(m_drive));
 	memset(m_sysclka0, 0x00, sizeof(m_sysclka0));
 	memset(m_sysclka1, 0x00, sizeof(m_sysclka1));
 	memset(m_sysclkb0, 0x00, sizeof(m_sysclkb0));
@@ -229,16 +229,6 @@ alto2_cpu_device::~alto2_cpu_device()
 	exit_disp();
 	exit_disk();
 	exit_memory();
-}
-
-//-------------------------------------------------
-// driver interface to set diablo_hd_device
-//-------------------------------------------------
-
-void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
-{
-	logerror("%s: unit=%d diablo_hd_device=%p\n", __FUNCTION__, unit, (void *) ptr);
-	m_drive[unit] = ptr;
 }
 
 //-------------------------------------------------

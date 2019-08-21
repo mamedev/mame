@@ -273,6 +273,8 @@ void alto2_state::alto2(machine_config &config)
 	ALTO2(config, m_maincpu, XTAL(29'491'200)/5);
 	m_maincpu->kb_read_callback().set(FUNC(alto2_state::kb_r));
 	m_maincpu->utilout_callback().set(FUNC(alto2_state::utilout_w));
+	m_maincpu->set_diablo(0, DIABLO_HD_0);
+	m_maincpu->set_diablo(1, DIABLO_HD_1);
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -291,17 +293,12 @@ void alto2_state::alto2(machine_config &config)
 
 	DIABLO_HD(config, DIABLO_HD_0, 3333333);
 	DIABLO_HD(config, DIABLO_HD_1, 3333333);
-	}
+}
 
 /* Driver Init */
 
 void alto2_state::init_alto2()
 {
-	// Make the diablo drives known to the CPU core
-	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
-	cpu->set_diablo(0, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_0)));
-	cpu->set_diablo(1, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_1)));
-
 	// Create a timer which fires twice per frame, once for each field
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
 	m_vblank_timer->adjust(attotime::from_hz(2*30),0,attotime::from_hz(30*2));
