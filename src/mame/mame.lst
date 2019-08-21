@@ -10054,6 +10054,9 @@ clshroadd                       // (c) 1986 Wood Place Inc. (Data East license)
 clshroads                       // (c) 1986 Wood Place Inc. (Status Games license)
 firebatl                        // (c) 1984 Taito
 
+@source:clxvme186.cpp
+clxvme186                       //
+
 @source:cm1800.cpp
 cm1800                          //
 
