@@ -2027,6 +2027,7 @@ void lua_engine::initialize()
  * input:seq_pressed(seq) - get pressed state for input_seq
  * input:seq_to_tokens(seq) - get KEYCODE_* string tokens for seq
  * input:seq_name(seq) - get seq friendly name
+ * input:seq_clean(seq) - clean the seq and remove invalid elements
  * input:seq_poll_start(class, [opt] start_seq) - start polling for input_item_class passed as string
  *                                                (switch/abs[olute]/rel[ative]/max[imum])
  * input:seq_poll() - poll once, returns true if input was fetched
@@ -2043,6 +2044,7 @@ void lua_engine::initialize()
 			"seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); },
 			"seq_to_tokens", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_to_tokens(seq); },
 			"seq_name", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_name(seq); },
+			"seq_clean", [](input_manager &input, sol::user<input_seq> seq) { input_seq cleaned_seq = input.seq_clean(seq); return sol::make_user(cleaned_seq); },
 			"seq_poll_start", [](input_manager &input, const char *cls_string, sol::object seq) {
 				input_item_class cls;
 				if (!strcmp(cls_string, "switch"))
