@@ -128,6 +128,7 @@ void alto2_cpu_device::iomem_map(address_map &map)
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	cpu_device(mconfig, ALTO2, tag, owner, clock),
 	m_kb_read_callback(*this),
+	m_utilout_callback(*this),
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2, address_map_constructor(FUNC(alto2_cpu_device::ucode_map), this)),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1, address_map_constructor(FUNC(alto2_cpu_device::const_map), this)),
 	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1, address_map_constructor(FUNC(alto2_cpu_device::iomem_map), this)),
@@ -207,7 +208,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	memset(m_sysclka1, 0x00, sizeof(m_sysclka1));
 	memset(m_sysclkb0, 0x00, sizeof(m_sysclkb0));
 	memset(m_sysclkb1, 0x00, sizeof(m_sysclkb1));
-	m_speaker = 0;
 }
 
 alto2_cpu_device::~alto2_cpu_device()
@@ -239,16 +239,6 @@ void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
 {
 	logerror("%s: unit=%d diablo_hd_device=%p\n", __FUNCTION__, unit, (void *) ptr);
 	m_drive[unit] = ptr;
-}
-
-//-------------------------------------------------
-// driver interface to set speaker_sound_device
-//-------------------------------------------------
-
-void alto2_cpu_device::set_speaker(speaker_sound_device* speaker)
-{
-	logerror("%s: speaker_sound_device=%p\n", __FUNCTION__, speaker);
-	m_speaker = speaker;
 }
 
 //-------------------------------------------------
@@ -815,6 +805,7 @@ device_memory_interface::space_config_vector alto2_cpu_device::memory_space_conf
 void alto2_cpu_device::device_start()
 {
 	m_kb_read_callback.resolve_safe(0177777);
+	m_utilout_callback.resolve_safe();
 
 	// get a pointer to the IO address space
 	m_iomem = &space(2);

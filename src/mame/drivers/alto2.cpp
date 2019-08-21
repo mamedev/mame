@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "cpu/alto2/alto2cpu.h"
 #include "machine/diablo_hd.h"
+#include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
 #include "rendlay.h"
@@ -31,6 +32,7 @@ public:
 
 protected:
 	u16 kb_r(offs_t offset);
+	void utilout_w(u16 data);
 
 	required_device<alto2_cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -245,6 +247,13 @@ u16 alto2_state::kb_r(offs_t offset)
 	return m_io_row[offset]->read();
 }
 
+void alto2_state::utilout_w(u16 data)
+{
+	// FIXME: write printer data
+	// printer_write();
+	m_speaker->level_w(data ^ 0177777 ? 1 : 0);
+}
+
 /* ROM */
 ROM_START( alto2 )
 	// dummy region for the maincpu - this is not used in any way
@@ -263,6 +272,7 @@ void alto2_state::alto2(machine_config &config)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto
 	ALTO2(config, m_maincpu, XTAL(29'491'200)/5);
 	m_maincpu->kb_read_callback().set(FUNC(alto2_state::kb_r));
+	m_maincpu->utilout_callback().set(FUNC(alto2_state::utilout_w));
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -291,7 +301,7 @@ void alto2_state::init_alto2()
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
 	cpu->set_diablo(0, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_0)));
 	cpu->set_diablo(1, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_1)));
-	cpu->set_speaker(m_speaker);
+
 	// Create a timer which fires twice per frame, once for each field
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
 	m_vblank_timer->adjust(attotime::from_hz(2*30),0,attotime::from_hz(30*2));
