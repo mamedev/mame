@@ -828,32 +828,32 @@ uint8_t z180_device::z180_readcontrol(offs_t port)
 
 	case 0x38:
 		data = m_mmu_cbr;
-		LOG("Z180 CBR    rd $%02x ($%02x)\n", data);
+		LOG("Z180 CBR    rd $%02x\n", data);
 		break;
 
 	case 0x39:
 		data = m_mmu_bbr;
-		LOG("Z180 BBR    rd $%02x ($%02x)\n", data);
+		LOG("Z180 BBR    rd $%02x\n", data);
 		break;
 
 	case 0x3a:
 		data = m_mmu_cbar;
-		LOG("Z180 CBAR   rd $%02x ($%02x)\n", data);
+		LOG("Z180 CBAR   rd $%02x\n", data);
 		break;
 
 	case 0x3b:
 		data = 0xff;
-		LOG("Z180 IO3B   rd $%02x ($%02x)\n", data);
+		LOG("Z180 IO3B   rd $%02x\n", data);
 		break;
 
 	case 0x3c:
 		data = 0xff;
-		LOG("Z180 IO3C   rd $%02x ($%02x)\n", data);
+		LOG("Z180 IO3C   rd $%02x\n", data);
 		break;
 
 	case 0x3d:
 		data = 0xff;
-		LOG("Z180 IO3D   rd $%02x ($%02x)\n", data);
+		LOG("Z180 IO3D   rd $%02x\n", data);
 		break;
 
 	case 0x3e:
