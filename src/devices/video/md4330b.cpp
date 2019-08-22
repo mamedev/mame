@@ -75,7 +75,7 @@ void md4330b_device::update_q()
 	u32 out = m_shift;
 	if (m_tc)
 		out = ~out;
-	out &= (1 << m_qmax) - 1;
+	out &= (u64(1) << m_qmax) - 1;
 
 	m_write_q(0, out);
 }
