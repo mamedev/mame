@@ -1530,5 +1530,5 @@ ROM_START(mindset)
 	ROM_LOAD("kbd_v3.0.bin", 0, 0x800, CRC(1c6aa433) SHA1(1d01dbda4730f26125ba2564a608c2f8ddfc05b3))
 ROM_END
 
-COMP( 1984, mindset, 0, 0, mindset, mindset, mindset_state, empty_init, "Mindset Corporation", "Mindset Video Production System", MACHINE_SUPPORTS_SAVE)
+COMP( 1984, mindset, 0, 0, mindset, mindset, mindset_state, empty_init, "Mindset Corporation", "Mindset Personal Computer", MACHINE_SUPPORTS_SAVE)
 
