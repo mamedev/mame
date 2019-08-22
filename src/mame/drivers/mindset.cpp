@@ -57,6 +57,9 @@
 // - Digitizing tablet
 //   * no osd support, and a relatively rare device in the real world which is also hard to simulate on something else
 
+// - Power control
+//   * the system mcu controls the power to the system (some bit of p2 is seems), rocker switch on the keyboard resets the keyboard mcu for "on" and pretends sending a byte for "off".  Can be annoying UI-wise, and pretty much requires autosave.
+
 class mindset_module_interface: public device_t {
 public:
 	virtual void map(address_map &map) = 0;
