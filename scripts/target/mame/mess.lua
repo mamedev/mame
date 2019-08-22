@@ -1134,6 +1134,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"homebrew",
 		"homelab",
 		"hp",
+		"husky",
 		"ibm6580",
 		"ie15",
 		"imp",
@@ -2393,6 +2394,14 @@ files {
 createMESSProjects(_target, _subtarget, "heurikon")
 files {
 	MAME_DIR .. "src/mame/drivers/hk68v10.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "husky")
+files {
+	MAME_DIR .. "src/mame/drivers/hawk.cpp",
+	MAME_DIR .. "src/mame/drivers/hunter2.cpp",
+	MAME_DIR .. "src/mame/drivers/hunter16.cpp",
+	MAME_DIR .. "src/mame/drivers/husky.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ibm6580")
@@ -3972,8 +3981,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/hprot1.cpp",
 	MAME_DIR .. "src/mame/drivers/hpz80unk.cpp",
 	MAME_DIR .. "src/mame/drivers/ht68k.cpp",
-	MAME_DIR .. "src/mame/drivers/hunter2.cpp",
-	MAME_DIR .. "src/mame/drivers/hunter16.cpp",
 	MAME_DIR .. "src/mame/drivers/i7000.cpp",
 	MAME_DIR .. "src/mame/drivers/ibm3153.cpp",
 	MAME_DIR .. "src/mame/drivers/icatel.cpp",

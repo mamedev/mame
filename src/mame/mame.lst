@@ -15166,6 +15166,9 @@ stunrunp                        // (proto)          (c) 1989
 @source:harriet.cpp
 harriet                         // 1990
 
+@source:hawk.cpp
+hawk                            // Husky Hawk
+
 @source:hazelgr.cpp
 hg_frd                          // Fruit Deuce
 
@@ -15746,11 +15749,14 @@ ht68k                           //
 amu880                          //
 
 @source:hunter2.cpp
-hunter2                         //
+hunter2                         // Husky Hunter 2
 
 @source:hunter16.cpp
-hunter16                        //
-hunter1680                      //
+hunter16                        // Husky Hunter 16
+hunter1680                      // Husky Hunter 16/80
+
+@source:husky.cpp
+husky                           // DVW Husky
 
 @source:hvyunit.cpp
 hvyunit                         // (c) 1988 Kaneko
