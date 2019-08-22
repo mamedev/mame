@@ -15753,6 +15753,7 @@ hunter2                         // Husky Hunter 2
 
 @source:hunter16.cpp
 hunter16                        // Husky Hunter 16
+hunter216                       // Husky Hunter 2/16
 hunter1680                      // Husky Hunter 16/80
 
 @source:husky.cpp
