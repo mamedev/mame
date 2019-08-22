@@ -17,6 +17,45 @@
 
 #include "mindset.lh"
 
+// Missing:
+// - Correct video timings
+//   * screen_device does not handle interlaced screens yet
+
+// - Correct timing of the specific-video-position interrupt
+//   * see previous (so that partial screen update is correct) plus there's no "interrupt at a (x, y) position" interface
+
+// - Interrupt from modules
+//   * no use example, serial maybe?  And may be going through the system mcu
+
+// - HD support module
+//   * can't find the software that uses it.  Hand-drawn schematic at http://bitsavers.org/pdf/mindset/video_input/video_input_module_schematic.jpg (it's the same)
+
+// - Modem modules
+//   * no information on them, probably no software to use them either
+
+// - Cartridges
+//   * no dump of the rom ones, no users for the nvram ones.  gwbasic could use the nvram ones maybe?
+
+// - Graphics CoProcessor timings
+//   * need to count the accesses and estimate the mean access duration
+
+// - GCP right-to-left blitting
+//   * need to find a user, otherwise no way to know if the implementation is correct
+
+// - GCP collision detection
+//   * need to find a user, or at least a way to distinguish between the mask and the comparison value
+
+// - GCP interrupt
+//   * need to find a user, especially since it interacts with the system mcu
+
+// - Genlock
+//   * no osd support for video input
+
+// - Capture card
+//   * no osd support for video input.  Could try with the picture image device maybe?
+
+// - Digitizing tablet
+//   * no osd support, and a relatively rare device in the real world which is also hard to simulate on something else
 
 class mindset_module_interface: public device_t {
 public:
@@ -1488,5 +1527,5 @@ ROM_START(mindset)
 	ROM_LOAD("kbd_v3.0.bin", 0, 0x800, CRC(1c6aa433) SHA1(1d01dbda4730f26125ba2564a608c2f8ddfc05b3))
 ROM_END
 
-COMP( 1984, mindset, 0, 0, mindset, mindset, mindset_state, empty_init, "Mindset Corporation", "Mindset Video Production System", MACHINE_NOT_WORKING)
+COMP( 1984, mindset, 0, 0, mindset, mindset, mindset_state, empty_init, "Mindset Corporation", "Mindset Video Production System", MACHINE_SUPPORTS_SAVE)
 
