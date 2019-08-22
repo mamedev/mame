@@ -25,11 +25,13 @@ D     Disassembler
 G     Go
 H     Help
 I     Inport
+L     Load memory from tape
 M     Print/Modify memory (A=ascii, B=bit, H=hex)
 N     Turn on tracer & step to next instruction
 O     Outport
 P     Display memory contents in various formats
 R     Set initial register contents
+S     Save memory to tape
 T     Trace interval
 
 Pressing enter will change the prompt from KMD > to KMD+> and pressing
@@ -38,9 +40,11 @@ space will change it back.
 mfabfz85 -bios 0 and 3 work; others produce rubbish.
 
 Cassette:
-- Unable to locate handbook 4.4.a which deals with the CMT.
-- It is known to use a 8251 UART at ports FE/FF.
-- So, added a 1200 baud Kansas City interface, which works.
+- Like many early designs, the interface is grossly over-complicated, using 12 chips.
+- Similar to Kansas City, except that 1 = 3600Hz, 0 = 2400Hz
+- The higher frequencies, only 50% apart, cause the interface to be less reliable
+- Baud rates of 150, 300, 600, 1200 selected by a jumper. We emulate 1200 only,
+  as the current code would be too unreliable with the lower rates.
 
 ****************************************************************************/
 
@@ -73,8 +77,8 @@ private:
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kansas_r);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
-	u8 m_cass_data[4];
-	bool m_cassoutbit, m_cassold;
+	u8 m_cass_data[5];
+	bool m_cassoutbit, m_cassbit, m_cassold;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<i8251_device> m_uart;
@@ -107,24 +111,42 @@ void mfabfz_state::mfabfz85_io(address_map &map)
 static INPUT_PORTS_START( mfabfz )
 INPUT_PORTS_END
 
-
+// Note: if the other baud rates are to be supported, then this function
+//       will need to be redesigned.
 WRITE_LINE_MEMBER( mfabfz_state::kansas_w )
 {
 	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
 	{
-		// incoming @76923Hz
-		u8 twobit = m_cass_data[3] & 63;
-
 		if (state)
 		{
+			// incoming @76923Hz (1200), 38461.5 (600), 19231.77 (300), 9615.38 (150)
+			u8 twobit = m_cass_data[3] & 63;
+			static u8 cycles[3] = { 11, 10, 11 }; // 1200 baud
+
 			if (twobit == 0)
+			{
 				m_cassold = m_cassoutbit;
+				m_cass_data[2] = 0;
+				m_cass_data[4] = 0;
+			}
 
-			if (m_cassold)
-				m_cass->output(BIT(m_cass_data[3], 4) ? -1.0 : +1.0); // 2400Hz
-			else
-				m_cass->output(BIT(m_cass_data[3], 5) ? -1.0 : +1.0); // 1200Hz
+			if (m_cass_data[2] == 0)
+			{
+				m_cassbit ^= 1;
+				m_cass->output(m_cassbit ? -1.0 : +1.0);
 
+				if (m_cassold)
+				{
+					m_cass_data[4]++;
+					if (m_cass_data[4] > 2)
+						m_cass_data[4] = 0;
+					m_cass_data[2] = cycles[m_cass_data[4]]; // 3600 Hz
+				}
+				else
+					m_cass_data[2] = 16; // 2400 Hz
+			}
+
+			m_cass_data[2]--;
 			m_cass_data[3]++;
 		}
 	}
@@ -135,34 +157,37 @@ WRITE_LINE_MEMBER( mfabfz_state::kansas_w )
 WRITE_LINE_MEMBER(mfabfz_state::kansas_r)
 {
 	// incoming @76923Hz
-	// no tape - set to idle
-	m_cass_data[1]++;
-	if (m_cass_data[1] > 192)
+	if (state)
 	{
-		m_cass_data[1] = 192;
-		m_uart->write_rxd(1);
+		// no tape - set to idle
+		m_cass_data[1]++;
+		if (m_cass_data[1] > 32)
+		{
+			m_cass_data[1] = 32;
+			m_uart->write_rxd(1);
+		}
+
+		if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY)
+			return;
+
+		/* cassette - turn 2400/3600Hz to a bit */
+		uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+		if (cass_ws != m_cass_data[0])
+		{
+			m_cass_data[0] = cass_ws;
+			m_uart->write_rxd((m_cass_data[1] < 14) ? 1 : 0);
+			m_cass_data[1] = 0;
+		}
 	}
 
-	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY)
-		return;
-
-	/* cassette - turn 1200/2400Hz to a bit */
-	m_cass_data[1]++;
-	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
-
-	if (cass_ws != m_cass_data[0])
-	{
-		m_cass_data[0] = cass_ws;
-		m_uart->write_rxd((m_cass_data[1] < 96) ? 1 : 0);
-		m_cass_data[1] = 0;
-	}
 	m_uart->write_rxc(state);
 }
 
 void mfabfz_state::machine_reset()
 {
-	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
-	m_cassoutbit = m_cassold = 1;
+	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = m_cass_data[4] = 0;
+	m_cassoutbit = m_cassold = m_cassbit = 1;
 	m_uart->write_rxd(1);
 	m_uart->write_cts(0);
 }
