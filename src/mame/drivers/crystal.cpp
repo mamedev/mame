@@ -133,6 +133,8 @@ Notes:
 #include <algorithm>
 
 #define IDLE_LOOP_SPEEDUP
+// strip this define once we have actual credits from Smitdogg
+//#define ROGUE_CARTS
 
 class crystal_state : public driver_device
 {
@@ -159,7 +161,9 @@ public:
 	void init_crysking();
 	void init_evosocc();
 	void init_donghaer();
+#ifdef ROGUE_CARTS
 	void init_maldaiza();
+#endif
 
 	void crystal(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -676,6 +680,30 @@ ROM_START( topbladv )
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
 ROM_END
 
+ROM_START( officeye )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // bios (not the standard one)
+	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
+
+	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this
+	ROM_LOAD("office_yeo_in_cheon_ha_pic16f84a.bin",  0x000000, 0x4280, CRC(7561cdf5) SHA1(eade592823a110019b4af81a7dc56d01f7d6589f) )
+
+	ROM_REGION32_LE( 0x2000000, "flash", 0 ) // Flash
+	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )
+	ROM_LOAD("flash.u2",  0x1000000, 0x1000000, CRC(e4f85d0a) SHA1(2ddfa6b3a30e69754aa9d96434ff3d37784bfa57) )
+ROM_END
+
+ROM_START( donghaer )
+	CRYSBIOS
+
+	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this (or the dump in this case)
+	ROM_LOAD("donghaer_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION32_LE( 0x2000000, "flash", 0 ) // Flash
+	ROM_LOAD( "u1",           0x0000000, 0x1000000, CRC(61217ad7) SHA1(2593f1356aa850f4f9aa5d00bec822aa59c59224) )
+	ROM_LOAD( "u2",           0x1000000, 0x1000000, CRC(6d82f1a5) SHA1(036bd45f0daac1ffeaa5ad9774fc1b56e3c75ff9) )
+ROM_END
+
+#ifdef ROGUE_CARTS
 ROM_START( wulybuly )
 	CRYSBIOS
 	
@@ -711,30 +739,16 @@ ROM_START( maldaiza )
 	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(f484d12b) SHA1(29641cda9138b5bf02c2ece34f8289385fd2ba29) )
 	ROM_LOAD( "u2",           0x1000000, 0x1000000,  CRC(86175ebf) SHA1(c1800f7339dafd3ec6c0302eebc8406582a46b04) ) // $ff filled
 ROM_END
+#endif
 
-ROM_START( officeye )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // bios (not the standard one)
-	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
+/* note on PIC protection from ElSemi (for actually emulating it instead of patching)
 
-	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this
-	ROM_LOAD("office_yeo_in_cheon_ha_pic16f84a.bin",  0x000000, 0x4280, CRC(7561cdf5) SHA1(eade592823a110019b4af81a7dc56d01f7d6589f) )
+The PIC uses a software UART bit banged on a single output pin of the main CPU:
+the data port is bit 0x20000000 on the PIO register, the same register where the EEPROM control lines are. The serial data is transmitted at 8 data bits, even parity, 1 stop bit. It's probably
+tricky to get it working properly because it doesn't rely on a clock signal, and so, the pic and main cpu must run in parallel, and the bit lengths must match. The pic bit delay routine is just a loop.
+also it seems that bit 0x40000000 is the PIC reset.
 
-	ROM_REGION32_LE( 0x2000000, "flash", 0 ) // Flash
-	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )
-	ROM_LOAD("flash.u2",  0x1000000, 0x1000000, CRC(e4f85d0a) SHA1(2ddfa6b3a30e69754aa9d96434ff3d37784bfa57) )
-ROM_END
-
-ROM_START( donghaer )
-	CRYSBIOS
-
-	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this (or the dump in this case)
-	ROM_LOAD("donghaer_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
-
-	ROM_REGION32_LE( 0x2000000, "flash", 0 ) // Flash
-	ROM_LOAD( "u1",           0x0000000, 0x1000000, CRC(61217ad7) SHA1(2593f1356aa850f4f9aa5d00bec822aa59c59224) )
-	ROM_LOAD( "u2",           0x1000000, 0x1000000, CRC(6d82f1a5) SHA1(036bd45f0daac1ffeaa5ad9774fc1b56e3c75ff9) )
-ROM_END
-
+*/
 
 void crystal_state::init_crysking()
 {
@@ -772,15 +786,6 @@ void crystal_state::init_evosocc()
 	Rom[WORD_XOR_LE(0x974ED0/2)] = 0x90FC;  //PUSH R7-R6-R5-R4-R3-R2
 	Rom[WORD_XOR_LE(0x974ED2/2)] = 0x9001;  //PUSH R0
 }
-
-/* note on PIC protection from ElSemi (for actually emulating it instead of patching)
-
-The PIC uses a software UART bit banged on a single output pin of the main CPU:
-the data port is bit 0x20000000 on the PIO register, the same register where the EEPROM control lines are. The serial data is transmitted at 8 data bits, even parity, 1 stop bit. It's probably
-tricky to get it working properly because it doesn't rely on a clock signal, and so, the pic and main cpu must run in parallel, and the bit lengths must match. The pic bit delay routine is just a loop.
-also it seems that bit 0x40000000 is the PIC reset.
-
-*/
 
 void crystal_state::init_topbladv()
 {
@@ -853,19 +858,22 @@ void crystal_state::init_donghaer()
 	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001; // PUSH %R0
 }
 
+#ifdef ROGUE_CARTS
 void crystal_state::init_maldaiza()
 {
 	//uint16_t *Rom = (uint16_t*)memregion("flash")->base();
 	// ...
 }
-
+#endif
 
 GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer", 0 )
 GAME( 2001, officeye, 0,        crystal,  urachamu, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
 GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues
-GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // player 2 inputs if they exists, lamps, not extensively tested
 GAME( 2003, topbladv, crysbios, crystal,  topbladv, crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
-GAME( 200?, wulybuly, crysbios, crystal,  crystal,  crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // hangs during POST with no PIC protection so ...?
+#ifdef ROGUE_CARTS
+GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", MACHINE_NOT_WORKING ) // lamps, not extensively tested
+GAME( 200?, wulybuly, crysbios, crystal,  crystal,  crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // no actual graphics except offset text, confirmed to have no PIC protection so failing elsewhere
 GAME( 200?, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "<unknown>",           "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // PIC hookup
+#endif
