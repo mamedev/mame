@@ -40,7 +40,6 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void hunter16_lcdc(address_map &map);
 	void mem_map(address_map &map);
 	void io_16_map(address_map &map);
 	void io_1680_map(address_map &map);
@@ -63,11 +62,6 @@ private:
 	uint8_t pt_r();
 };
 
-
-void hunter16_state::hunter16_lcdc(address_map &map)
-{
-	map(0x0000, 0x7fff).ram().share("videoram");
-}
 
 void hunter16_state::mem_map(address_map &map)
 {
@@ -231,7 +225,6 @@ void hunter16_state::hunter16(machine_config &config)
 	PALETTE(config, m_palette, FUNC(hunter16_state::palette_init_hunter16), 2);
 
 	HD61830(config, m_lcdc, 16_MHz_XTAL / 16);  // unknown divider
-	m_lcdc->set_addrmap(0, &hunter16_state::hunter16_lcdc);
 	m_lcdc->set_screen("screen");
 }
 
