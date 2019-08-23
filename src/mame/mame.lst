@@ -15749,6 +15749,7 @@ ht68k                           //
 amu880                          //
 
 @source:hunter2.cpp
+hunter                          // Husky Hunter
 hunter2                         // Husky Hunter 2
 
 @source:hunter16.cpp
