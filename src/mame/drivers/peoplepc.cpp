@@ -277,7 +277,7 @@ void peoplepc_state::olypeopl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	h46505_device &crtc(H46505(config, "h46505", XTAL(22'000'000)/8));
+	mc6845_device &crtc(MC6845(config, "h46505", XTAL(22'000'000)/8)); // unknown variant
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

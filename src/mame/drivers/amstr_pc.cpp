@@ -35,6 +35,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_joy/pc_joy.h"
+#include "bus/rs232/rs232.h"
 
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
@@ -487,9 +488,8 @@ INPUT_PORTS_END
 
 void amstrad_pc_state::cfg_com(device_t *device)
 {
-	/* has it's own mouse */
-	device = device->subdevice("serport0");
-	MCFG_SLOT_DEFAULT_OPTION(nullptr)
+	/* has its own mouse */
+	device->subdevice<rs232_port_device>("serport0")->set_default_option(nullptr);
 }
 
 void amstrad_pc_state::cfg_fdc(device_t *device)

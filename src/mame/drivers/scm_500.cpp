@@ -11,23 +11,33 @@ http://www.standardchange.com/frequently-asked-questions
 */
 
 #include "emu.h"
+#include "cpu/mcs51/mcs51.h"
 
 class scm_500_state : public driver_device
 {
 public:
 	scm_500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      ,m_maincpu(*this, "maincpu")
-		{ }
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
 	void scm_500(machine_config &config);
 
 private:
+	void prog_map(address_map &map);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-//  required_device<cpu_device> m_maincpu;
+
+	required_device<mcs51_cpu_device> m_maincpu;
 };
 
+
+void scm_500_state::prog_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( scm_500 )
 INPUT_PORTS_END
@@ -42,7 +52,8 @@ void scm_500_state::machine_reset()
 
 void scm_500_state::scm_500(machine_config &config)
 {
-	// unknown CPU
+	I80C51GB(config, m_maincpu, 12'000'000); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &scm_500_state::prog_map);
 }
 
 /*

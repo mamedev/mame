@@ -9,6 +9,7 @@
 #include "machine/74157.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class yunsung8_state : public driver_device
 {

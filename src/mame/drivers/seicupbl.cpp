@@ -30,6 +30,7 @@ Measured clocks:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class seicupbl_state : public driver_device

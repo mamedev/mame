@@ -8,6 +8,7 @@
 #include "machine/74259.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class targeth_state : public driver_device
 {

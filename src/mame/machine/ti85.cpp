@@ -1216,7 +1216,7 @@ void ti85_state::ti86_setup_snapshot (uint8_t * data)
 	m_interrupt_speed = 0x03;
 }
 
-SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
+SNAPSHOT_LOAD_MEMBER(ti85_state::snapshot_cb)
 {
 	int expected_snapshot_size = 0;
 	std::vector<uint8_t> ti8x_snapshot_data;

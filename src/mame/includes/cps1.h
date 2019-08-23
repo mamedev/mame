@@ -18,6 +18,7 @@
 #include "cpu/m68000/m68000.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 // Video raw params
 // measured clocks:
@@ -167,6 +168,7 @@ public:
 	void init_sf2thndr();
 	void init_dinohunt();
 	void init_sf2hack();
+	void init_sf2rk();
 	void init_slammast();
 	void init_pang3b();
 	void init_pang3();

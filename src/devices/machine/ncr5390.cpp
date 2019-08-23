@@ -124,6 +124,7 @@ void ncr53c94_device::write(offs_t offset, uint8_t data)
 
 ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_device(mconfig, type, tag, owner, clock)
+	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0)
 	, select_timeout(0), seq(0), tcount(0), tcounter(0), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false), test_mode(false)
 	, m_irq_handler(*this)
@@ -471,6 +472,7 @@ void ncr5390_device::step(bool timeout)
 		break;
 
 	case DISC_SEL_ATN_SEND_BYTE:
+		command_length--;
 		if(c == CD_SELECT_ATN_STOP) {
 			seq = 1;
 			function_bus_complete();

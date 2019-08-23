@@ -844,6 +844,7 @@ sound_manager::sound_manager(running_machine &machine)
 		m_finalmix(machine.sample_rate()),
 		m_leftmix(machine.sample_rate()),
 		m_rightmix(machine.sample_rate()),
+		m_samples_this_update(0),
 		m_muted(0),
 		m_attenuation(0),
 		m_nosound_mode(machine.osd().no_sound()),
@@ -1089,16 +1090,16 @@ void sound_manager::update(void *ptr, int param)
 	g_profiler.start(PROFILER_SOUND);
 
 	// force all the speaker streams to generate the proper number of samples
-	int samples_this_update = 0;
+	m_samples_this_update = 0;
 	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
-		speaker.mix(&m_leftmix[0], &m_rightmix[0], samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
+		speaker.mix(&m_leftmix[0], &m_rightmix[0], m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// now downmix the final result
 	u32 finalmix_step = machine().video().speed_factor();
 	u32 finalmix_offset = 0;
 	s16 *finalmix = &m_finalmix[0];
 	int sample;
-	for (sample = m_finalmix_leftover; sample < samples_this_update * 1000; sample += finalmix_step)
+	for (sample = m_finalmix_leftover; sample < m_samples_this_update * 1000; sample += finalmix_step)
 	{
 		int sampindex = sample / 1000;
 
@@ -1118,7 +1119,7 @@ void sound_manager::update(void *ptr, int param)
 			samp = 32767;
 		finalmix[finalmix_offset++] = samp;
 	}
-	m_finalmix_leftover = sample - samples_this_update * 1000;
+	m_finalmix_leftover = sample - m_samples_this_update * 1000;
 
 	// play the result
 	if (finalmix_offset > 0)
@@ -1152,4 +1153,19 @@ void sound_manager::update(void *ptr, int param)
 		stream->apply_sample_rate_changes();
 
 	g_profiler.stop();
+}
+
+
+//-------------------------------------------------
+//  samples - fills the specified buffer with
+//  16-bit stereo audio samples generated during
+//  the current frame
+//-------------------------------------------------
+
+void sound_manager::samples(s16 *buffer)
+{
+	for (int sample = 0; sample < m_samples_this_update * 2; sample++)
+	{
+		*buffer++ = m_finalmix[sample];
+	}
 }

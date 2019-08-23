@@ -10,6 +10,7 @@
 #include "machine/taitoio.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class taitojc_state : public driver_device
 {
@@ -33,7 +34,6 @@ public:
 		m_lamps(*this, "lamp%u", 0U),
 		m_counters(*this, "counter%u", 0U)
 	{
-		m_mcu_output = 0;
 		m_speed_meter = 0;
 		m_brake_meter = 0;
 	}
@@ -85,7 +85,6 @@ private:
 	uint8_t m_mcu_comm_hc11;
 	uint8_t m_mcu_data_main;
 	uint8_t m_mcu_data_hc11;
-	uint8_t m_mcu_output;
 
 	uint8_t m_has_dsp_hack;
 
@@ -107,9 +106,8 @@ private:
 	DECLARE_WRITE8_MEMBER(hc11_comm_w);
 	DECLARE_WRITE8_MEMBER(hc11_output_w);
 	DECLARE_READ8_MEMBER(hc11_data_r);
-	DECLARE_READ8_MEMBER(hc11_output_r);
 	DECLARE_WRITE8_MEMBER(hc11_data_w);
-	DECLARE_READ8_MEMBER(hc11_analog_r);
+	template <int Ch> uint8_t hc11_analog_r();
 
 	DECLARE_READ16_MEMBER(dsp_shared_r);
 	DECLARE_WRITE16_MEMBER(dsp_shared_w);
@@ -149,7 +147,6 @@ private:
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
 
 	void dendego_map(address_map &map);
-	void hc11_io_map(address_map &map);
 	void hc11_pgm_map(address_map &map);
 	void taitojc_map(address_map &map);
 	void tms_data_map(address_map &map);

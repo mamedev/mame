@@ -52,7 +52,7 @@ public:
 	void myvision(machine_config &config);
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	DECLARE_READ8_MEMBER( ay_port_a_r );
 	DECLARE_READ8_MEMBER( ay_port_b_r );
 	DECLARE_WRITE8_MEMBER( ay_port_a_w );
@@ -152,7 +152,7 @@ void myvision_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
+DEVICE_IMAGE_LOAD_MEMBER( myvision_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -214,7 +214,8 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 	m_column = data;
 }
 
-MACHINE_CONFIG_START(myvision_state::myvision)
+void myvision_state::myvision(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &myvision_state::myvision_mem);
@@ -237,13 +238,13 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "myvision_cart")
-	MCFG_GENERIC_LOAD(myvision_state, cart)
-	//MCFG_GENERIC_MANDATORY
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "myvision_cart"));
+	cartslot.set_device_load(FUNC(myvision_state::cart_load), this);
+	//cartslot.set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("myvision");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( myvision )

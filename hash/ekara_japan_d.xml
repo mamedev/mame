@@ -36,7 +36,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
-				<rom name="dc0001-bht.u1" size="0x100000" crc="bd0c4044" sha1="496f9270c0285480ad513c2628260a5ed629dfd6" offset="0" />
+				<rom name="dc0001-bht.u1" size="0x100000" crc="bd0c4044" sha1="496f9270c0285480ad513c2628260a5ed629dfd6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48,7 +48,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
-				<rom name="dc0002-bat.u1" size="0x100000" crc="bb4e13a7" sha1="f9d3a669de1b7ad3080eb428575905ee2170458c" offset="0" />
+				<rom name="dc0002-bat.u1" size="0x100000" crc="bb4e13a7" sha1="f9d3a669de1b7ad3080eb428575905ee2170458c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -60,7 +60,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
-				<rom name="dc0003-bht.u1" size="0x100000" crc="fd15d60f" sha1="c017d3fa1e10ad13cc130b92bd149a347d5c996c" offset="0" />
+				<rom name="dc0003-bht.u1" size="0x100000" crc="fd15d60f" sha1="c017d3fa1e10ad13cc130b92bd149a347d5c996c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -72,7 +72,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
-				<rom name="dc0005-tpj.u1" size="0x100000" crc="515c125f" sha1="a7c7bf758b1afecb8fb55eb5766343325c1acc89" offset="0" />
+				<rom name="dc0005-tpj.u1" size="0x100000" crc="515c125f" sha1="a7c7bf758b1afecb8fb55eb5766343325c1acc89"/>
 			</dataarea>
 		</part>
 	</software>

@@ -8,6 +8,7 @@
 #include "cpu/m6800/m6801.h"
 #include "sound/namco.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class skykid_state : public driver_device
 {

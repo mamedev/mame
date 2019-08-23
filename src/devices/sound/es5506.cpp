@@ -1049,7 +1049,7 @@ void es5506_device::generate_samples(int32_t **outputs, int offset, int samples)
 		/* generate from the appropriate source */
 		if (!base)
 		{
-			logerror("es5506: nullptr region base %d\n",voice->control >> 14);
+			LOG("es5506: nullptr region base %d\n",voice->control >> 14);
 			generate_dummy(voice, base, left, right, samples);
 		}
 		else if (voice->control & 0x2000)
@@ -1060,7 +1060,7 @@ void es5506_device::generate_samples(int32_t **outputs, int offset, int samples)
 		/* does this voice have it's IRQ bit raised? */
 		if (voice->control&CONTROL_IRQ)
 		{
-			logerror("es5506: IRQ raised on voice %d!!\n",v);
+			LOG("es5506: IRQ raised on voice %d!!\n",v);
 
 			/* only update voice vector if existing IRQ is acked by host */
 			if (m_irqv&0x80)
@@ -1118,7 +1118,7 @@ void es5505_device::generate_samples(int32_t **outputs, int offset, int samples)
 		/* generate from the appropriate source */
 		if (!base)
 		{
-			logerror("es5506: nullptr region base %d\n",voice->control >> 14);
+			LOG("es5506: nullptr region base %d\n",voice->control >> 14);
 			generate_dummy(voice, base, left, right, samples);
 		}
 		else if (voice->control & 0x2000)
@@ -1129,7 +1129,7 @@ void es5505_device::generate_samples(int32_t **outputs, int offset, int samples)
 		/* does this voice have it's IRQ bit raised? */
 		if (voice->control&CONTROL_IRQ)
 		{
-			logerror("es5506: IRQ raised on voice %d!!\n",v);
+			LOG("es5506: IRQ raised on voice %d!!\n",v);
 
 			/* only update voice vector if existing IRQ is acked by host */
 			if (m_irqv&0x80)

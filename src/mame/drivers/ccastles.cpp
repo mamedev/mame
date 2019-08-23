@@ -306,8 +306,8 @@ void ccastles_state::main_map(address_map &map)
 	map(0x0000, 0x7fff).ram().w(FUNC(ccastles_state::ccastles_videoram_w)).share("videoram");
 	map(0x0000, 0x0001).w(FUNC(ccastles_state::ccastles_bitmode_addr_w));
 	map(0x0002, 0x0002).rw(FUNC(ccastles_state::ccastles_bitmode_r), FUNC(ccastles_state::ccastles_bitmode_w));
-	map(0x8000, 0x8fff).ram();
-	map(0x8e00, 0x8fff).share("spriteram");
+	map(0x8000, 0x8dff).ram();
+	map(0x8e00, 0x8fff).ram().share("spriteram");
 	map(0x9000, 0x90ff).mirror(0x0300).rw(FUNC(ccastles_state::nvram_r), FUNC(ccastles_state::nvram_w));
 	map(0x9400, 0x9403).mirror(0x01fc).r(FUNC(ccastles_state::leta_r));
 	map(0x9600, 0x97ff).portr("IN0");

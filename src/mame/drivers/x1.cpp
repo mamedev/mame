@@ -1510,7 +1510,7 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	m_hres_320 = data & 0x40;
 
 	/* set up the pixel clock according to the above divider */
-	m_crtc->set_clock(VDP_CLOCK/((m_hres_320) ? 48 : 24));
+	m_crtc->set_unscaled_clock(VDP_CLOCK/((m_hres_320) ? 48 : 24));
 
 	if(!BIT(data, 5) && BIT(m_io_switch, 5))
 		m_iobank->set_bank(1);
@@ -2228,7 +2228,7 @@ void x1_state::x1(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(x1_state::screen_update_x1));
 
-	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	HD6845S(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
@@ -2263,11 +2263,11 @@ void x1_state::x1(machine_config &config)
 	ay.add_route(0, "rspeaker", 0.25);
 	ay.add_route(1, "lspeaker", 0.5);
 	ay.add_route(2, "rspeaker", 0.5);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 	m_cassette->set_interface("x1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");

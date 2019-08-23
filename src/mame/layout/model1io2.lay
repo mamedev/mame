@@ -18,9 +18,9 @@
 	</element>
 
 	<view name="Default">
-		<screen tag="ioboard:screen">
-			<bounds left="0" top="0" right="1" bottom="1" />
-		</screen>
+		<!-- workaround for MAME selecting a 3-screen view by default -->
+		<screen tag="ioboard:screen"><bounds left="0" top="0" right="1" bottom="1" /></screen>
+
 		<screen tag="screen">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>

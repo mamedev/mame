@@ -7,6 +7,7 @@
 #pragma once
 
 #include "machine/timer.h"
+#include "tilemap.h"
 
 class xevious_state : public galaga_state
 {

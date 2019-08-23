@@ -14,6 +14,7 @@
 #include "sound/sn76496.h"
 #include "sound/discrete.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class circusc_state : public driver_device
 {

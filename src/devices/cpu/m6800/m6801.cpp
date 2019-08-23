@@ -668,11 +668,10 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 		break;
 
 	case M6801_TIN_LINE:
-		m_irq_state[M6801_TIN_LINE] = state;
-
 		if (state != m_irq_state[M6801_TIN_LINE])
 		{
-			//eddge = (state == CLEAR_LINE ) ? 2 : 0;
+			m_irq_state[M6801_TIN_LINE] = state;
+			//edge = (state == CLEAR_LINE ) ? 2 : 0;
 			if( ((m_tcsr&TCSR_IEDG) ^ (state==CLEAR_LINE ? TCSR_IEDG : 0))==0 )
 				return;
 			/* active edge in */

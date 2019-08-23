@@ -9,6 +9,7 @@
 #include "video/tecmo_spr.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class tecmo_state : public driver_device
 {

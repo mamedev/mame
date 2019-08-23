@@ -187,6 +187,8 @@ private:
 	emu_timer   *m_interrupt_timer;
 	emu_timer   *m_maze_tone_timer;
 
+	attotime m_interrupt_time;
+
 	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
 	DECLARE_READ8_MEMBER(mw8080bw_reversable_shift_result_r);
 	DECLARE_WRITE8_MEMBER(mw8080bw_reversable_shift_count_w);

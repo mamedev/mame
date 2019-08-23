@@ -521,13 +521,14 @@ void trs80_state::trs80(machine_config &config)       // the original model I, l
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
-MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
+void trs80_state::model1(machine_config &config)      // model I, level II
+{
 	trs80(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::m1_mem);
@@ -538,7 +539,7 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 
-	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", attotime::from_seconds(1))
+	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80_state::quickload_cb), this);
 
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
@@ -569,7 +570,7 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
 	m_uart->set_auto_rdav(true);
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
-MACHINE_CONFIG_END
+}
 
 void trs80_state::sys80(machine_config &config)
 {

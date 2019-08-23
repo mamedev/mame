@@ -1815,7 +1815,7 @@ void namcos12_boothack_state::golgo13(machine_config &config)
 void namcos12_state::jvsmap(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("iocpu", 0);
-	map(0xc000, 0xffff).ram();
+	map(0xc000, 0xfb7f).ram();
 }
 
 void namcos12_state::jvsiomap(address_map &map)
@@ -1866,7 +1866,7 @@ void namcos12_state::tdjvsmap(address_map &map)
 	map(0x0000, 0x3fff).rom().region("iocpu", 0);
 	map(0x6000, 0x6001).portr("IN01");
 	map(0x6002, 0x6003).portr("IN23");
-	map(0xc000, 0xffff).ram();
+	map(0xc000, 0xfb7f).ram();
 }
 
 void namcos12_state::tdjvsiomap(address_map &map)
@@ -1883,7 +1883,7 @@ void namcos12_state::plarailjvsmap(address_map &map)
 	map(0x0000, 0x3fff).rom().region("iocpu", 0);
 	map(0x6000, 0x6001).portr("IN01");
 	map(0x6002, 0x6003).portr("IN23");
-	map(0xc000, 0xffff).ram();
+	map(0xc000, 0xfb7f).ram();
 }
 
 void namcos12_state::plarailjvsiomap(address_map &map)

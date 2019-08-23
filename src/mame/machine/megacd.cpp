@@ -303,6 +303,8 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_lc89510_temp, 0); // cd controller
 	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA), this); // hack
+	m_lc89510_temp->set_cdrom_tag("^cdrom");
+	m_lc89510_temp->set_68k_tag(m_scdcpu);
 
 	TIMER(config, m_stopwatch_timer).configure_generic(timer_device::expired_delegate()); //stopwatch timer
 	TIMER(config, m_stamp_timer).configure_generic(FUNC(sega_segacd_device::stamp_timer_callback));
@@ -325,6 +327,7 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfx_segacd)
+	, device_video_interface(mconfig, *this, false)
 	, m_scdcpu(*this, "segacd_68k")
 	, m_hostcpu(*this, finder_base::DUMMY_TAG)
 	, m_rfsnd(*this, "rfsnd")
@@ -1841,7 +1844,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::dma_timer_callback )
 	// timed reset of flags
 	scd_mode_dmna_ret_flags |= 0x0021;
 
-	m_dma_timer->adjust(attotime::from_hz(m_framerate) / m_total_scanlines);
+	m_dma_timer->adjust(attotime::from_hz(get_framerate()) / double(m_total_scanlines));
 
 }
 

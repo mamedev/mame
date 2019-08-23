@@ -218,10 +218,8 @@ void concept_state::concept(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);            /* 50 or 60, jumper-selectable */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(720, 560);
-	screen.set_visarea(0, 720-1, 0, 560-1);
+	screen.set_raw(16.364_MHz_XTAL * 2, 944, 0, 720, 578, 0, 560);
+	// Horizontal sync is 34.669 kHz; refresh rate is ~50 or ~60 Hz, jumper-selectable
 	screen.set_screen_update(FUNC(concept_state::screen_update));
 	screen.set_palette("palette");
 

@@ -17,6 +17,7 @@
 #include "video/bufsprite.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class ddragon3_state : public driver_device

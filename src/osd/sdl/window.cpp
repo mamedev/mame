@@ -356,7 +356,7 @@ void sdl_window_info::modify_prescale(int dir)
 
 void sdl_window_info::update_cursor_state()
 {
-#if (USE_XINPUT)
+#if (USE_XINPUT && USE_XINPUT_WII_LIGHTGUN_HACK)
 	// Hack for wii-lightguns:
 	// they stop working with a grabbed mouse;
 	// even a ShowCursor(SDL_DISABLE) already does this.
@@ -1157,4 +1157,14 @@ sdl_window_info::sdl_window_info(
 sdl_window_info::~sdl_window_info()
 {
 	global_free(m_original_mode);
+}
+
+
+//============================================================
+//  osd_set_aggressive_input_focus
+//============================================================
+
+void osd_set_aggressive_input_focus(bool aggressive_focus)
+{
+	// dummy implementation for now
 }

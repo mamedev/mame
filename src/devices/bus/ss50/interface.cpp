@@ -42,36 +42,36 @@
 ***********************************************************************
 
                         +-+
-                        |o| RS2 (originally UD3)
-                        |o| RS3 (originally UD4)
-                        |o| -16V (originally -12V)
-                        |o| +16V (originally +12V)
-                        |o| GND
-                        |o| GND
-                        |o| INDEX
-                        |o| /FIRQ (6800: /NMI)
-                        |o| /IRQ
-                        |o| RS0
-                        |o| RS1
-                        |o| D0
-                        |o| D1
-                        |o| D2
-                        |o| D3
-                        |o| D4
-                        |o| D5
-                        |o| D6
-                        |o| D7
-                        |o| E (6800: ϕ2)
-                        |o| R/W
-                        |o| +8V (unregulated)
-                        |o| +8V (unregulated)
-                        |o| 600b/1200b (originally 1200b)
-                        |o| 4800b (originally 600b)
-                        |o| 300b
-                        |o| 150b/9600b (originally 150b)
-                        |o| 110b
-                        |o| /RESET
-                        |o| I/O #
+                     30 |o| RS2 (originally UD3)
+                     29 |o| RS3 (originally UD4)
+                     28 |o| -16V (originally -12V)
+                     27 |o| +16V (originally +12V)
+                     26 |o| GND
+                     25 |o| GND
+                     24 |o| INDEX
+                     23 |o| /FIRQ (6800: /NMI)
+                     22 |o| /IRQ
+                     21 |o| RS0
+                     20 |o| RS1
+                     19 |o| D0
+                     18 |o| D1
+                     17 |o| D2
+                     16 |o| D3
+                     15 |o| D4
+                     14 |o| D5
+                     13 |o| D6
+                     12 |o| D7
+                     11 |o| E (6800: ϕ2)
+                     10 |o| R/W
+                      9 |o| +8V (unregulated)
+                      8 |o| +8V (unregulated)
+                      7 |o| 600b/1200b (originally 1200b)
+                      6 |o| 4800b (originally 600b)
+                      5 |o| 300b
+                      4 |o| 150b/9600b (originally 150b)
+                      3 |o| 110b
+                      2 |o| /RESET
+                      1 |o| I/O #
                         +-+
 
 **********************************************************************/
@@ -79,11 +79,14 @@
 #include "emu.h"
 #include "bus/ss50/interface.h"
 
+#include "bus/ss50/dc5.h"
 #include "bus/ss50/mpc.h"
 //#include "bus/ss50/mpl.h"
 //#include "bus/ss50/mpr.h"
 #include "bus/ss50/mps.h"
-//#include "bus/ss50/mpt.h"
+#include "bus/ss50/mps2.h"
+#include "bus/ss50/mpt.h"
+#include "bus/ss50/piaide.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -218,9 +221,12 @@ ss50_card_interface::ss50_card_interface(const machine_config &mconfig, device_t
 
 void ss50_default_2rs_devices(device_slot_interface &device)
 {
+	device.option_add("dc5", SS50_DC5);
 	device.option_add("mpc", SS50_MPC);
 	//device.option_add("mpl", SS50_MPL);
 	//device.option_add("mpn", SS50_MPN);
 	device.option_add("mps", SS50_MPS);
-	//device.option_add("mpt", SS50_MPT);
+	device.option_add("mps2", SS50_MPS2);
+	device.option_add("mpt", SS50_MPT);
+	device.option_add("piaide", SS50_PIAIDE);
 }

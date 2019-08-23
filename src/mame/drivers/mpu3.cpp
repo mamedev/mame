@@ -604,7 +604,7 @@ READ8_MEMBER(mpu3_state::pia_ic6_portb_r)
 WRITE8_MEMBER(mpu3_state::pia_ic6_porta_w)
 {
 	LOG(("%s: IC6 PIA Port A Set to %2x (Alpha)\n", machine().describe_context(),data));
-	m_vfd->por(!(data&0x08));
+	m_vfd->por((data & 0x08));
 	m_vfd->data((data & 0x20) >> 5);
 	m_vfd->sclk((data & 0x10) >>4);
 }

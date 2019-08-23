@@ -111,7 +111,7 @@ void v1050_state::video_start()
 
 void v1050_state::v1050_video(machine_config &config)
 {
-	H46505(config, m_crtc, 15.36_MHz_XTAL/8);
+	HD6845S(config, m_crtc, 15.36_MHz_XTAL/8); // HD6845SP according to Programmer's Technical Document
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
@@ -119,7 +119,7 @@ void v1050_state::v1050_video(machine_config &config)
 	m_crtc->out_vsync_callback().set(FUNC(v1050_state::crtc_vs_w));
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_screen_update(H46505_TAG, FUNC(h46505_device::screen_update));
+	screen.set_screen_update(H46505_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(640, 400);

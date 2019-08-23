@@ -9,6 +9,7 @@
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class calomega_state : public driver_device
 {
@@ -70,7 +71,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(update_aciabaud_scale);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	uint32_t screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void calomega_palette(palette_device &palette) const;
 
 	void s903mod_map(address_map &map);

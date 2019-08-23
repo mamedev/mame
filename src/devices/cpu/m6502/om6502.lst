@@ -1218,7 +1218,7 @@ tya_imp
 
 #   exceptions
 reset
-	PC = read_arg(0xfffc);
+	P |= F_I; PC = read_arg(0xfffc);
 	PC = set_h(PC, read_arg(0xfffd));
 	prefetch();
 	inst_state = -1;

@@ -298,8 +298,6 @@ void v50_device::install_peripheral_io()
 
 void v50_device::internal_port_map(address_map &map)
 {
-	v33_internal_port_map(map);
-
 	map(0xfff0, 0xfff0).w(FUNC(v50_device::TCKS_w));
 
 	map(0xfff2, 0xfff2).w(FUNC(v50_device::RFC_w));

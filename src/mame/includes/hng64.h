@@ -15,6 +15,7 @@
 #include "machine/mb8421.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 enum hng64trans_t
 {

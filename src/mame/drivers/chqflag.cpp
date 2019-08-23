@@ -38,9 +38,9 @@ template<int Chip>
 READ8_MEMBER(chqflag_state::k051316_ramrom_r)
 {
 	if (m_k051316_readroms)
-		return m_k051316[Chip]->rom_r(space, offset);
+		return m_k051316[Chip]->rom_r(offset);
 	else
-		return m_k051316[Chip]->read(space, offset);
+		return m_k051316[Chip]->read(offset);
 }
 
 WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)

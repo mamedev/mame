@@ -12,6 +12,7 @@
 
 #include "sound/discrete.h"
 #include "screen.h"
+#include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
 #define HITME_DOWNCOUNT_VAL      NODE_01

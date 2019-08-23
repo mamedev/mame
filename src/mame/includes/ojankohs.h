@@ -13,6 +13,7 @@
 #include "sound/msm5205.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class ojankohs_state : public driver_device
 {

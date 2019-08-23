@@ -424,10 +424,27 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			if (tr.number_of_sector == 0)
 				continue;
 
+			int protection = 0;
+			int first_sector_code = -1;
+			for(int j=0;j<tr.number_of_sector;j++) {
+				sector_header sector;
+				io_generic_read(io, &sector,track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j),sizeof(sector));
+
+				if (j == 0)
+					first_sector_code = sector.sector_size_code;
+
+				if ((j > 0) && (sector.sector_size_code == 2) && (first_sector_code == 6))
+					protection = 1;  //  first: 6144 rest: 512
+
+				if ((j > 0) && (sector.sector_size_code == j) && (first_sector_code == 0))
+					protection = 2;  // first: 128 rest: N*128
+			}
+
 			desc_pc_sector sects[256];
 			uint8_t sect_data[65536];
 			int sdatapos = 0;
 			int pos = track_offsets[(track<<1)+side] + 0x100;
+
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
 				io_generic_read(io, &sector,track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j),sizeof(sector));
@@ -437,7 +454,14 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				sects[j].sector      = sector.sector_id;
 				sects[j].size        = sector.sector_size_code;
 				if(extendformat)
-					sects[j].actual_size = sector.data_length;
+				{
+					if (protection == 1)
+						sects[j].actual_size = 512;
+					else if (protection == 2)
+						sects[j].actual_size = 128;
+					else
+						sects[j].actual_size = sector.data_length;
+				}
 				else
 					sects[j].actual_size = 128 << tr.sector_size_code;
 

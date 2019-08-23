@@ -412,22 +412,22 @@ INPUT_PORTS_END
 
 READ16_MEMBER(cubeqst_state::read_rotram)
 {
-	return m_rotatecpu->rotram_r(space, offset, mem_mask);
+	return m_rotatecpu->rotram_r(offset);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_rotram)
 {
-	m_rotatecpu->rotram_w(space, offset, data, mem_mask);
+	m_rotatecpu->rotram_w(offset, data, mem_mask);
 }
 
 READ16_MEMBER(cubeqst_state::read_sndram)
 {
-	return m_soundcpu->sndram_r(space, offset, mem_mask);
+	return m_soundcpu->sndram_r(offset);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_sndram)
 {
-	m_soundcpu->sndram_w(space, offset, data, mem_mask);
+	m_soundcpu->sndram_w(offset, data, mem_mask);
 }
 
 void cubeqst_state::m68k_program_map(address_map &map)

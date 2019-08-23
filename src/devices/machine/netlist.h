@@ -31,52 +31,6 @@ namespace netlist {
 
 // MAME specific configuration
 
-#define MCFG_NETLIST_SETUP(_setup)                                                  \
-	downcast<netlist_mame_device &>(*device).set_setup_func(NETLIST_NAME(_setup));
-
-#if 0
-#define MCFG_NETLIST_SETUP_MEMBER(_obj, _setup)                                \
-	downcast<netlist_mame_device &>(*device).set_constructor(_obj, _setup);
-
-#define MCFG_NETLIST_ANALOG_INPUT(_basetag, _tag, _name)                            \
-	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ANALOG_INPUT, 0)                     \
-	downcast<netlist_mame_analog_input_device &>(*device).set_name(_name);
-
-#define MCFG_NETLIST_ANALOG_MULT_OFFSET(_mult, _offset)                             \
-	dynamic_cast<netlist_mame_sub_interface &>(*device).set_mult_offset(_mult, _offset);
-
-#define MCFG_NETLIST_ANALOG_OUTPUT(_basetag, _tag, _IN, _class, _member, _class_tag) \
-	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ANALOG_OUTPUT, 0)                    \
-	downcast<netlist_mame_analog_output_device &>(*device).set_params(_IN,              \
-		FUNC(_class :: _member), _class_tag);
-
-#define MCFG_NETLIST_LOGIC_OUTPUT(_basetag, _tag, _IN, _class, _member, _class_tag) \
-	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_OUTPUT, 0)                    \
-	downcast<netlist_mame_logic_output_device &>(*device).set_params(_IN,              \
-				netlist_mame_logic_output_device::output_delegate(& _class :: _member, \
-						# _class "::" # _member, _class_tag, (_class *)nullptr)   );
-
-#define MCFG_NETLIST_LOGIC_INPUT(_basetag, _tag, _name, _shift)             \
-	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_INPUT, 0)              \
-	downcast<netlist_mame_logic_input_device &>(*device).set_params(_name, _shift);
-
-#define MCFG_NETLIST_INT_INPUT(_basetag, _tag, _name, _shift, _mask)        \
-	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_INT_INPUT, 0)                \
-	downcast<netlist_mame_int_input_device &>(*device).set_params(_name, _mask, _shift);
-
-#define MCFG_NETLIST_RAM_POINTER(_basetag, _tag, _name) \
-	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_RAM_POINTER, 0) \
-	downcast<netlist_mame_ram_pointer_device &>(*device).set_params(_name);
-
-#define MCFG_NETLIST_STREAM_INPUT(_basetag, _chan, _name)                           \
-	MCFG_DEVICE_ADD(_basetag ":cin" # _chan, NETLIST_STREAM_INPUT, 0)               \
-	downcast<netlist_mame_stream_input_device &>(*device).set_params(_chan, _name);
-
-#define MCFG_NETLIST_STREAM_OUTPUT(_basetag, _chan, _name)                          \
-	MCFG_DEVICE_ADD(_basetag ":cout" # _chan, NETLIST_STREAM_OUTPUT, 0)             \
-	downcast<netlist_mame_stream_output_device &>(*device).set_params(_chan, _name);
-#endif
-
 #define NETLIST_LOGIC_PORT_CHANGED(_base, _tag)                                     \
 	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_device, input_changed, 0)
 

@@ -5093,4 +5093,30 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="highwaye">
+		<!-- Unreleased official port. -->
+		<description>Highway Encounter (unreleased)</description>
+		<year>1990</year>
+		<publisher>Vortex Software</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="highway.st" size="737280" crc="3a83b6b2" sha1="d6db24f519690e2481926fc5fb89b1e6b7b24601" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toiacidg">
+		<!-- Unreleased official port. Hidden message reveals a build date of February 1990. -->
+		<description>Toi Acid Game (unreleased)</description>
+		<year>1990</year>
+		<publisher>Iber Software</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "420014">
+				<rom name="toiacidgame.msa" size="420014" crc="aaff7c21" sha1="99694f3d78bce3aa985a14753fbc69425025dc5c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

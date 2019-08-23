@@ -656,6 +656,8 @@ void arm7_cpu_device::device_start()
 	state_add( ARM7_R13,   "R13",  m_r[13]).formatstr("%08X");
 	state_add( ARM7_R14,   "R14",  m_r[14]).formatstr("%08X");
 	state_add( ARM7_R15,   "R15",  m_r[15]).formatstr("%08X");
+	/* Current Status Program Register */
+	state_add( ARM7_CPSR,  "CPSR", m_r[eCPSR]).formatstr("%08X");
 	/* FIRQ Mode Shadowed Registers */
 	state_add( ARM7_FR8,   "FR8",  m_r[eR8_FIQ]  ).formatstr("%08X");
 	state_add( ARM7_FR9,   "FR9",  m_r[eR9_FIQ]  ).formatstr("%08X");

@@ -9,6 +9,7 @@
 #include "machine/i2cmem.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "tilemap.h"
 
 class funworld_state : public driver_device
 {
@@ -52,7 +53,7 @@ protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 	void funworld_palette(palette_device &palette) const;
-	uint32_t screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_funworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	void magicrd2_map(address_map &map);

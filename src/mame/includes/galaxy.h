@@ -46,7 +46,7 @@ private:
 	IRQ_CALLBACK_MEMBER(galaxy_irq_callback);
 	void galaxy_set_timer();
 	void galaxy_setup_snapshot (const uint8_t * data, uint32_t size);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( galaxy );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	void galaxy_mem(address_map &map);
 	void galaxyp_io(address_map &map);
 	void galaxyp_mem(address_map &map);

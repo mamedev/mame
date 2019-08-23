@@ -166,3 +166,5 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/widgets.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/widgets.h",
 }
+
+pchsource(MAME_DIR .. "src/frontend/mame/audit.cpp")

@@ -41,7 +41,7 @@ protected:
 private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	required_device<hd6845_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_memory_region m_gfx;
 

@@ -15,6 +15,7 @@
 #include "video/atarimo.h"
 #include "video/atarivad.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class relief_state : public driver_device
 {

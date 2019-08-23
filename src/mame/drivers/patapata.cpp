@@ -27,6 +27,7 @@ maybe close to jalmah.cpp?
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class patapata_state : public driver_device

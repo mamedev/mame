@@ -248,7 +248,7 @@ void unichamp_state::unichamp(machine_config &config)
 	/* basic machine hardware */
 
 	//The CPU is really clocked this way:
-	//MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
+	//CP1610(config, m_maincpu, XTAL(3'579'545)/4);
 	//But since it is only running 7752/29868 th's of the time...
 	//TODO find a more accurate method? (the emulation will be the same though)
 	CP1610(config, m_maincpu, (7752.0/29868.0)*XTAL(3'579'545)/4);

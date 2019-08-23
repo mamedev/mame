@@ -762,14 +762,10 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					}
 
 					/* Display a scanline of a character */
-					*p++ = BIT(gfx, 7) ? fg : bg;
-					*p++ = BIT(gfx, 6) ? fg : bg;
-					*p++ = BIT(gfx, 5) ? fg : bg;
-					*p++ = BIT(gfx, 4) ? fg : bg;
-					*p++ = BIT(gfx, 3) ? fg : bg;
-					*p++ = BIT(gfx, 2) ? fg : bg;
-					*p++ = BIT(gfx, 1) ? fg : bg;
-					*p++ = BIT(gfx, 0) ? fg : bg;
+					for (int i = 7; i >= 0; i--)
+					{
+						*p++ = BIT(gfx, i) ? fg : bg;
+					}
 				}
 			} else {
 			// text mode
@@ -814,14 +810,10 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						fg = 1;
 
 					/* Display a scanline of a character */
-					*p++ = BIT(gfx, 7) ? fg : bg;
-					*p++ = BIT(gfx, 6) ? fg : bg;
-					*p++ = BIT(gfx, 5) ? fg : bg;
-					*p++ = BIT(gfx, 4) ? fg : bg;
-					*p++ = BIT(gfx, 3) ? fg : bg;
-					*p++ = BIT(gfx, 2) ? fg : bg;
-					*p++ = BIT(gfx, 1) ? fg : bg;
-					*p++ = BIT(gfx, 0) ? fg : bg;
+					for (int i = 7; i >= 0; i--)
+					{
+						*p++ = BIT(gfx, i) ? fg : bg;
+					}
 				}
 			}
 		}

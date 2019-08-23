@@ -17,6 +17,7 @@
 
  TODO:
      Really understand ASIC chip
+     Remove device_post_load once outputs support savestates
 
 ***********************************/
 
@@ -51,6 +52,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void device_post_load() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -78,6 +80,7 @@ private:
 
 	uint8_t m_video;
 	uint8_t m_hsync_q;
+	uint8_t m_lamps_cache[8];
 
 	required_device<i80c32_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -91,12 +94,19 @@ void cardline_state::machine_start()
 	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
+	memset(m_lamps_cache, 0, sizeof(m_lamps_cache));
 	for (int i = 0; i < 0x2000; i++)
 		m_maincpu.target()->space(AS_IO).write_byte(i, 0x73);
 	save_item(NAME(m_video));
 	save_item(NAME(m_hsync_q));
+	save_item(NAME(m_lamps_cache));
 }
 
+void cardline_state::device_post_load()
+{
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = m_lamps_cache[i];
+}
 
 MC6845_BEGIN_UPDATE( cardline_state::crtc_begin_update )
 {
@@ -105,16 +115,14 @@ MC6845_BEGIN_UPDATE( cardline_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 {
-	uint8_t *gfx;
 	uint16_t x = 0;
-	int gfx_ofs;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-	gfx_ofs = 0;
+	int gfx_ofs = 0;
 
 	// bits 0 and 1 seem to be chip select lines. None of those selected
 	// most likely would put the output lines into a floating (threestate)
-	// state. The next statement doesn't add functioality but documents
+	// state. The next statement doesn't add functionality but documents
 	// how this works.
 
 	if(m_video & 1)
@@ -123,7 +131,7 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 	if(m_video & 2)
 		gfx_ofs = 0x1000;
 
-	gfx = memregion("gfx1")->base();
+	uint8_t *gfx = memregion("gfx1")->base();
 
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
@@ -163,7 +171,7 @@ WRITE_LINE_MEMBER(cardline_state::vsync_changed)
 
 WRITE8_MEMBER(cardline_state::a3003_w)
 {
-	/* seems a generate a signal when address is written to */
+	/* seems to generate a signal when address is written to */
 }
 
 WRITE8_MEMBER(cardline_state::vram_w)
@@ -209,14 +217,14 @@ READ8_MEMBER(cardline_state::hsync_r)
 WRITE8_MEMBER(cardline_state::lamps_w)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
-	m_lamps[5] = BIT(data, 0);
-	m_lamps[0] = BIT(data, 1);
-	m_lamps[1] = BIT(data, 2);
-	m_lamps[2] = BIT(data, 3);
-	m_lamps[3] = BIT(data, 4);
-	m_lamps[4] = BIT(data, 5);
-	m_lamps[6] = BIT(data, 6);
-	m_lamps[7] = BIT(data, 7);
+	m_lamps_cache[5] = m_lamps[5] = BIT(data, 0);
+	m_lamps_cache[0] = m_lamps[0] = BIT(data, 1);
+	m_lamps_cache[1] = m_lamps[1] = BIT(data, 2);
+	m_lamps_cache[2] = m_lamps[2] = BIT(data, 3);
+	m_lamps_cache[3] = m_lamps[3] = BIT(data, 4);
+	m_lamps_cache[4] = m_lamps[4] = BIT(data, 5);
+	m_lamps_cache[6] = m_lamps[6] = BIT(data, 6);
+	m_lamps_cache[7] = m_lamps[7] = BIT(data, 7);
 }
 
 void cardline_state::mem_prg(address_map &map)
@@ -232,13 +240,13 @@ void cardline_state::mem_io(address_map &map)
 	map(0x2006, 0x2006).portr("DSW");
 	map(0x2007, 0x2007).w(FUNC(cardline_state::lamps_w));
 	map(0x2008, 0x2008).noprw(); // set to 1 during coin input
-	//AM_RANGE(0x2080, 0x213f) AM_NOP // ????
+	//map(0x2080, 0x213f).noprw(); // ????
 	map(0x2100, 0x213f).rw(FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
 	map(0x2400, 0x2400).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).w("crtc", FUNC(mc6845_device::register_w));
-	//AM_RANGE(0x2840, 0x2840) AM_NOP // ???
-	//AM_RANGE(0x2880, 0x2880) AM_NOP // ???
+	//map(0x2840, 0x2840).noprw(); // ???
+	//map(0x2880, 0x2880).noprw(); // ???
 	map(0x3003, 0x3003).w(FUNC(cardline_state::a3003_w));
 	map(0xc000, 0xdfff).w(FUNC(cardline_state::vram_w)).share("videoram");
 	map(0xe000, 0xffff).w(FUNC(cardline_state::attr_w)).share("colorram");

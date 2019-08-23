@@ -6,6 +6,7 @@
 #pragma once
 
 #include "screen.h"
+#include "tilemap.h"
 
 typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)> k052109_cb_delegate;
 #define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)
@@ -42,12 +43,10 @@ public:
 	chip so it must not be set by the callback.
 	*/
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
-	DECLARE_READ16_MEMBER( lsb_r );
-	DECLARE_WRITE16_MEMBER( lsb_w );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u16 word_r(offs_t offset);
+	void word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void set_rmrd_line(int state);
 	int get_rmrd_line();

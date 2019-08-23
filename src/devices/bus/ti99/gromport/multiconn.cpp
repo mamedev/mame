@@ -311,7 +311,7 @@ void ti99_multi_cart_conn_device::device_add_mconfig(machine_config &config)
 
 INPUT_CHANGED_MEMBER( ti99_multi_cart_conn_device::switch_changed )
 {
-	LOGMASKED(LOG_CHANGE, "Slot changed %d - %d\n", (int)((uint64_t)param & 0x07), newval);
+	LOGMASKED(LOG_CHANGE, "Slot changed %d - %d\n", (int)(param & 0x07), newval);
 	m_active_slot = m_fixed_slot = newval - 1;
 }
 

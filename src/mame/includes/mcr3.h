@@ -15,6 +15,7 @@
 #include "machine/74259.h"
 #include "machine/adc0844.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class mcr3_state : public mcr_state
 {

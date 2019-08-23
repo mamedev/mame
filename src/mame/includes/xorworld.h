@@ -7,6 +7,7 @@
 
 #include "machine/eepromser.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class xorworld_state : public driver_device
 {

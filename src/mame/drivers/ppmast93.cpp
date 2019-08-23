@@ -140,6 +140,7 @@ Dip locations added based on the notes above.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class ppmast93_state : public driver_device

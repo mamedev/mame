@@ -4,6 +4,29 @@
 
     Motorola MC6845 and compatible CRT controller emulation
 
+***********************************************************************
+                            ____    ____
+                   GND   1 |*   \__/    | 40  VS
+                _RESET   2 |            | 39  HS
+                 LPSTB   3 |            | 38  RA0
+                   MA0   4 |            | 37  RA1
+                   MA1   5 |            | 36  RA2
+                   MA2   6 |            | 35  RA3
+                   MA3   7 |            | 34  RA4
+                   MA4   8 |            | 33  D0
+                   MA5   9 |            | 32  D1
+                   MA6  10 |            | 31  D2
+                   MA7  11 |   MC6845   | 30  D3
+                   MA8  12 |            | 29  D4
+                   MA9  13 |            | 28  D5
+                  MA10  14 |            | 27  D6
+                  MA11  15 |            | 26  D7
+                  MA12  16 |            | 25  _CS
+                  MA13  17 |            | 24  RS
+                    DE  18 |            | 23  E
+                CURSOR  19 |            | 22  R/_W
+                   Vcc  20 |____________| 21  CLK
+
 **********************************************************************/
 
 #ifndef MAME_VIDEO_MC6845_H
@@ -93,10 +116,6 @@ public:
 	/* simulates the LO->HI clocking of the light pen pin (pin 3) */
 	void assert_light_pen_input();
 
-	/* set the clock (pin 21) of the chip */
-	void set_clock(int clock);
-	void set_clock(const XTAL &xtal) { set_clock(int(xtal.value())); }
-
 	/* set number of pixels per video memory address */
 	void set_hpixels_per_column(int hpixels_per_column);
 
@@ -114,6 +133,9 @@ protected:
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	attotime cclks_to_attotime(uint64_t clocks) const { return clocks_to_attotime(clocks * m_clk_scale); }
+	uint64_t attotime_to_cclks(const attotime &duration) const { return attotime_to_clocks(duration) / m_clk_scale; }
 
 	bool m_supports_disp_start_addr_r;
 	bool m_supports_vert_sync_width;
@@ -225,6 +247,8 @@ protected:
 	int m_noninterlace_adjust;      /* adjust max ras in non-interlace mode */
 	int m_interlace_adjust;         /* adjust max ras in interlace mode */
 
+	uint32_t m_clk_scale;
+
 	/* visible screen area adjustment */
 	int m_visarea_adjust_min_x;
 	int m_visarea_adjust_max_x;
@@ -298,20 +322,10 @@ protected:
 	virtual void device_reset() override;
 };
 
-class h46505_device : public mc6845_device
+class hd6845s_device : public mc6845_device
 {
 public:
-	h46505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
-class hd6845_device : public mc6845_device
-{
-public:
-	hd6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -458,8 +472,7 @@ DECLARE_DEVICE_TYPE(MC6845,   mc6845_device)
 DECLARE_DEVICE_TYPE(MC6845_1, mc6845_1_device)
 DECLARE_DEVICE_TYPE(R6545_1,  r6545_1_device)
 DECLARE_DEVICE_TYPE(C6545_1,  c6545_1_device)
-DECLARE_DEVICE_TYPE(H46505,   h46505_device)
-DECLARE_DEVICE_TYPE(HD6845,   hd6845_device)
+DECLARE_DEVICE_TYPE(HD6845S,  hd6845s_device)
 DECLARE_DEVICE_TYPE(SY6545_1, sy6545_1_device)
 DECLARE_DEVICE_TYPE(SY6845E,  sy6845e_device)
 DECLARE_DEVICE_TYPE(HD6345,   hd6345_device)

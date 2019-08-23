@@ -136,6 +136,7 @@ void pp01_state::machine_reset()
 		m_memory_block[i] = 0xff;
 		pp01_set_memory(i, 0xff);
 	}
+	m_uart->write_cts(0);
 }
 
 WRITE8_MEMBER(pp01_state::pp01_mem_block_w)
@@ -154,12 +155,16 @@ void pp01_state::machine_start()
 }
 
 
-WRITE_LINE_MEMBER(pp01_state::pp01_pit_out0)
+WRITE_LINE_MEMBER(pp01_state::z2_w)
 {
-}
+	if (state)
+	{
+		bool cassbit = (m_cass->input() < -0.04) ? 0 : 1;
+		m_uart->write_rxd(cassbit);
+	}
 
-WRITE_LINE_MEMBER(pp01_state::pp01_pit_out1)
-{
+	m_uart->write_rxc(state);
+	m_uart->write_txc(state);
 }
 
 READ8_MEMBER(pp01_state::pp01_8255_porta_r)

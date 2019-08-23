@@ -45,7 +45,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom12" />
 			<dataarea name="rom" size="12288">
-				<rom name="air battle (europe).bin" size="12288" crc="d94d4109" sha1="66837bbd0b9df12c89215f533a1ec8b5a42d5610" offset="0"/>
+				<rom name="air battle (europe).bin" size="12288" crc="d94d4109" sha1="66837bbd0b9df12c89215f533a1ec8b5a42d5610"/>
 			</dataarea>
 		</part>
 	</software>
@@ -59,7 +59,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="backgammon (europe).bin" size="8192" crc="9d2c45dc" sha1="bcb420dc1cc6fa5cf13dc46c546145953fb11643" offset="0"/>
+				<rom name="backgammon (europe).bin" size="8192" crc="9d2c45dc" sha1="bcb420dc1cc6fa5cf13dc46c546145953fb11643"/>
 			</dataarea>
 		</part>
 	</software>
@@ -73,7 +73,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="billiard americain (france).bin" size="8192" crc="4cec1404" sha1="004ea921b691db6b310f5b51c495df9b86be3aa8" offset="0"/>
+				<rom name="billiard americain (france).bin" size="8192" crc="4cec1404" sha1="004ea921b691db6b310f5b51c495df9b86be3aa8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +86,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="billiard (europe).bin" size="8192" crc="3c949a57" sha1="4c7f1dc569e9abe829e36dbe42d91d39419bfd60" offset="0"/>
+				<rom name="billiard (europe).bin" size="8192" crc="3c949a57" sha1="4c7f1dc569e9abe829e36dbe42d91d39419bfd60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="billard electrique (france).bin" size="8192" crc="ac5c74e6" sha1="215439c1044b93888b71bd6a210ebfda93d97c22" offset="0"/>
+				<rom name="billard electrique (france).bin" size="8192" crc="ac5c74e6" sha1="215439c1044b93888b71bd6a210ebfda93d97c22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +110,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="flipper (europe).bin" size="8192" crc="2fce9245" sha1="6510b54e3e9bf9bc7ae558d1d16fa73294701ddb" offset="0"/>
+				<rom name="flipper (europe).bin" size="8192" crc="2fce9245" sha1="6510b54e3e9bf9bc7ae558d1d16fa73294701ddb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="clay pigeon (europe).bin" size="8192" crc="6fabcb7e" sha1="3f6dbef6bf13427a52f4f7324d9c33cfce52adb0" offset="0"/>
+				<rom name="clay pigeon (europe).bin" size="8192" crc="6fabcb7e" sha1="3f6dbef6bf13427a52f4f7324d9c33cfce52adb0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -134,7 +134,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="cosmic conflict (europe).bin" size="8192" crc="a8dbed92" sha1="99932be5496a0daa7dffc70c7a3ab85bfa726043" offset="0"/>
+				<rom name="cosmic conflict (europe).bin" size="8192" crc="a8dbed92" sha1="99932be5496a0daa7dffc70c7a3ab85bfa726043"/>
 			</dataarea>
 		</part>
 	</software>
@@ -146,7 +146,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="course de voitures - autodrome - cryptogramme (france).bin" size="8192" crc="9bc04ebb" sha1="e69e524eba10976310333787eafef1d18da6d568" offset="0"/>
+				<rom name="course de voitures - autodrome - cryptogramme (france).bin" size="8192" crc="9bc04ebb" sha1="e69e524eba10976310333787eafef1d18da6d568"/>
 			</dataarea>
 		</part>
 	</software>
@@ -158,7 +158,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="demon attack (france).bin" size="8192" crc="50af9d45" sha1="cfd1337c8d5a40f2f4e1ab49158a8963764919da" offset="0"/>
+				<rom name="demon attack (france).bin" size="8192" crc="50af9d45" sha1="cfd1337c8d5a40f2f4e1ab49158a8963764919da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -170,7 +170,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="exojet (france).bin" size="8192" crc="cfca6f39" sha1="8aafcd055a2ef45c3d85804c8a3ea04d9a9732ab" offset="0"/>
+				<rom name="exojet (france).bin" size="8192" crc="cfca6f39" sha1="8aafcd055a2ef45c3d85804c8a3ea04d9a9732ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -183,7 +183,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="flashpoint (usa)(proto)(pal conversion).bin" size="8192" crc="06861a9c" sha1="6810ccc1508244216860271417a866618a731ae2" offset="0"/>
+				<rom name="flashpoint (usa)(proto)(pal conversion).bin" size="8192" crc="06861a9c" sha1="6810ccc1508244216860271417a866618a731ae2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="freedom fighters (europe).bin" size="8192" crc="1931f5c5" sha1="3f8d6cd5bed5244b400c69640065c77ec103a6cd" offset="0"/>
+				<rom name="freedom fighters (europe).bin" size="8192" crc="1931f5c5" sha1="3f8d6cd5bed5244b400c69640065c77ec103a6cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="guerre de l'espace (france).bin" size="8192" crc="105231f8" sha1="9220dc32d3bb9225292f3e709d1320b9b1052140" offset="0"/>
+				<rom name="guerre de l'espace (france).bin" size="8192" crc="105231f8" sha1="9220dc32d3bb9225292f3e709d1320b9b1052140"/>
 			</dataarea>
 		</part>
 	</software>
@@ -220,7 +220,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom16" />
 			<dataarea name="rom" size="16384">
-				<rom name="helicopter rescue (europe).bin" size="16384" crc="c4134df8" sha1="7369a2d3fb81ddc4c8086bbcd245c11ea7aaa331" offset="0"/>
+				<rom name="helicopter rescue (europe).bin" size="16384" crc="c4134df8" sha1="7369a2d3fb81ddc4c8086bbcd245c11ea7aaa331"/>
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +232,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="basket - bowling + (france).bin" size="8192" crc="b5fb1416" sha1="c341ed24346546b75de2ab24af1a9223ca2d1aac" offset="0"/>
+				<rom name="basket - bowling + (france).bin" size="8192" crc="b5fb1416" sha1="c341ed24346546b75de2ab24af1a9223ca2d1aac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -243,7 +243,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="tenpin bowling - basketball (europe).bin" size="8192" crc="e5fb4260" sha1="29d5c9b252e65d257f1472e343039ed8c47eeb05" offset="0"/>
+				<rom name="tenpin bowling - basketball (europe).bin" size="8192" crc="e5fb4260" sha1="29d5c9b252e65d257f1472e343039ed8c47eeb05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="killer bees (europe).bin" size="8192" crc="dee70b33" sha1="9253586337917bda0b7c43dbb251999b6c974f30" offset="0"/>
+				<rom name="killer bees (europe).bin" size="8192" crc="dee70b33" sha1="9253586337917bda0b7c43dbb251999b6c974f30"/>
 			</dataarea>
 		</part>
 	</software>
@@ -268,7 +268,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="loony balloon (europe).bin" size="8192" crc="b932d584" sha1="8dd1cba7ce6622aaf5e1b432ab8d47e395d211f2" offset="0"/>
+				<rom name="loony balloon (europe).bin" size="8192" crc="b932d584" sha1="8dd1cba7ce6622aaf5e1b432ab8d47e395d211f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -280,7 +280,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="moto-crash (france).bin" size="8192" crc="68560dc7" sha1="f6de2f95e5cf4849a4d7071b1a470c3ef0634e5f" offset="0"/>
+				<rom name="moto-crash (france).bin" size="8192" crc="68560dc7" sha1="f6de2f95e5cf4849a4d7071b1a470c3ef0634e5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -293,7 +293,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom12" />
 			<dataarea name="rom" size="12288">
-				<rom name="neutron star (europe).bin" size="12288" crc="be11157c" sha1="fde3e0791b9cbef91a8462764ebf09a457ffe038" offset="0"/>
+				<rom name="neutron star (europe).bin" size="12288" crc="be11157c" sha1="fde3e0791b9cbef91a8462764ebf09a457ffe038"/>
 			</dataarea>
 		</part>
 	</software>
@@ -306,7 +306,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="nightmare (europe).bin" size="8192" crc="26b0ff5b" sha1="c8988f13c2af7632de6ef326ed617279bf6c8221" offset="0"/>
+				<rom name="nightmare (europe).bin" size="8192" crc="26b0ff5b" sha1="c8988f13c2af7632de6ef326ed617279bf6c8221"/>
 			</dataarea>
 		</part>
 	</software>
@@ -320,7 +320,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="norseman (europe).bin" size="8192" crc="a75c42f8" sha1="8e8fe23225631eef673517f3e2970eade15b7a5c" offset="0"/>
+				<rom name="norseman (europe).bin" size="8192" crc="a75c42f8" sha1="8e8fe23225631eef673517f3e2970eade15b7a5c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -332,7 +332,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="pickaxe pete (europe).bin" size="8192" crc="b2ffb353" sha1="182829b4cd5184ab3705d26f75e3d8c497b5abf6" offset="0"/>
+				<rom name="pickaxe pete (europe).bin" size="8192" crc="b2ffb353" sha1="182829b4cd5184ab3705d26f75e3d8c497b5abf6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +344,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="race - spin-out - cryptogram (europe).bin" size="8192" crc="ee3ee642" sha1="69a73208c0c0a6d1b879e62d0ccf3a5a534510bd" offset="0"/>
+				<rom name="race - spin-out - cryptogram (europe).bin" size="8192" crc="ee3ee642" sha1="69a73208c0c0a6d1b879e62d0ccf3a5a534510bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -356,7 +356,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="la ruche infernale (france).bin" size="8192" crc="20e2f7be" sha1="34f91468bf42b26eb237af342164043c16d173ca" offset="0"/>
+				<rom name="la ruche infernale (france).bin" size="8192" crc="20e2f7be" sha1="34f91468bf42b26eb237af342164043c16d173ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -368,7 +368,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="satellite attack (europe).bin" size="8192" crc="b4735e6b" sha1="8bec213886d026040ed2037f01e8e9f81fa395b9" offset="0"/>
+				<rom name="satellite attack (europe).bin" size="8192" crc="b4735e6b" sha1="8bec213886d026040ed2037f01e8e9f81fa395b9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -380,7 +380,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="stone sling (europe).bin" size="8192" crc="2391c2fb" sha1="d358fcc6a0fa6469d7063114aa0dc143af14e3e9" offset="0"/>
+				<rom name="stone sling (europe).bin" size="8192" crc="2391c2fb" sha1="d358fcc6a0fa6469d7063114aa0dc143af14e3e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -392,7 +392,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="terrahawks (europe).bin" size="8192" crc="764894a1" sha1="0c01df9799b6d0235fef3c86fec1beac5b0b2d74" offset="0"/>
+				<rom name="terrahawks (europe).bin" size="8192" crc="764894a1" sha1="0c01df9799b6d0235fef3c86fec1beac5b0b2d74"/>
 			</dataarea>
 		</part>
 	</software>
@@ -404,7 +404,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom16" />
 			<dataarea name="rom" size="16384">
-				<rom name="trans american rally (europe).bin" size="16384" crc="0d2d721d" sha1="be8a9f2aa66acb4f5e288d1a77afada9565b530a" offset="0"/>
+				<rom name="trans american rally (europe).bin" size="16384" crc="0d2d721d" sha1="be8a9f2aa66acb4f5e288d1a77afada9565b530a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -416,7 +416,7 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
-				<rom name="le tresor englouti (france).bin" size="8192" crc="b2f0f0b4" sha1="c0fcaef6a18026e0acc04c3d48443d768043cb03" offset="0"/>
+				<rom name="le tresor englouti (france).bin" size="8192" crc="b2f0f0b4" sha1="c0fcaef6a18026e0acc04c3d48443d768043cb03"/>
 			</dataarea>
 		</part>
 	</software>

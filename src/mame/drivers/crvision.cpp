@@ -746,8 +746,15 @@ void crvision_state::creativision(machine_config &config)
 	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
 	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::write));
 
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SN76489A(config, m_psg, XTAL(2'000'000));
+	m_psg->ready_cb().set(m_pia, FUNC(pia6821_device::cb1_w));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
+
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit7));
@@ -758,14 +765,6 @@ void crvision_state::creativision(machine_config &config)
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	OUTPUT_LATCH(config, "cent_ctrl_out").bit_handler<4>().set(m_centronics, FUNC(centronics_device::write_strobe));
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	SN76489A(config, m_psg, XTAL(2'000'000));
-	m_psg->ready_cb().set(m_pia, FUNC(pia6821_device::cb1_w));
-	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	WAVE(config, "wave", m_cassette).add_route(1, "mono", 0.25);
 
 	// cartridge
 	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);
@@ -829,8 +828,15 @@ void laser2001_state::lasr2001(machine_config &config)
 	m_pia->ca2_handler().set(FUNC(laser2001_state::pia_ca2_w));
 	m_pia->cb2_handler().set(FUNC(laser2001_state::pia_cb2_w));
 
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SN76489A(config, m_psg, XTAL(17'734'470)/9);
+	m_psg->ready_cb().set(FUNC(laser2001_state::write_psg_ready));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
+
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(laser2001_state::write_centronics_busy));
@@ -844,14 +850,6 @@ void laser2001_state::lasr2001(machine_config &config)
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	SN76489A(config, m_psg, XTAL(17'734'470)/9);
-	m_psg->ready_cb().set(FUNC(laser2001_state::write_psg_ready));
-	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	WAVE(config, "wave", m_cassette).add_route(1, "mono", 0.25);
 
 	// cartridge
 	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);

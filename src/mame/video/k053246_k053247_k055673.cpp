@@ -38,6 +38,8 @@ The sprite RAM format is very similar to the 053245.
 #include "k053246_k053247_k055673.h"
 #include "konami_helper.h"
 
+#include <algorithm>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -52,58 +54,55 @@ void k053247_device::clear_all()
 	m_ram = nullptr;
 	m_gfx = nullptr;
 
-	for (auto & elem : m_kx46_regs)
-		elem = 0;
-
-	for (auto & elem : m_kx47_regs)
-		elem = 0;
+	std::fill(std::begin(m_kx46_regs), std::end(m_kx46_regs), 0);
+	std::fill(std::begin(m_kx47_regs), std::end(m_kx47_regs), 0);
 
 	m_objcha_line = 0;
 	m_z_rejection = 0;
 }
 
-void k053247_device::k053247_get_ram( uint16_t **ram )
+void k053247_device::k053247_get_ram(u16 **ram)
 {
 	*ram = m_ram.get();
 }
 
-int k053247_device::k053247_get_dx( void )
+int k053247_device::k053247_get_dx(void)
 {
 	return m_dx;
 }
 
-int k053247_device::k053247_get_dy( void )
+int k053247_device::k053247_get_dy(void)
 {
 	return m_dy;
 }
 
-int k053247_device::k053246_read_register( int regnum )
+u8 k053247_device::k053246_read_register(offs_t offset)
 {
-	return(m_kx46_regs[regnum]);
+	return m_kx46_regs[offset];
 }
 
-int k053247_device::k053247_read_register( int regnum )
+u16 k053247_device::k053247_read_register(offs_t offset)
 {
-	return(m_kx47_regs[regnum]);
+	return m_kx47_regs[offset];
 }
 
 
-WRITE16_MEMBER( k053247_device::k055673_reg_word_w ) // write-only OBJSET2 registers (see p.43 table 6.1)
+void k053247_device::k055673_reg_word_w(offs_t offset, u16 data, u16 mem_mask) // write-only OBJSET2 registers (see p.43 table 6.1)
 {
 	COMBINE_DATA(m_kx47_regs + offset);
 }
 
-READ16_MEMBER( k053247_device::k053247_word_r )
+u16 k053247_device::k053247_word_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( k053247_device::k053247_word_w )
+void k053247_device::k053247_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(m_ram.get() + offset);
 }
 
-READ8_MEMBER( k053247_device::k053247_r )
+u8 k053247_device::k053247_r(offs_t offset)
 {
 	int offs = offset >> 1;
 
@@ -113,7 +112,7 @@ READ8_MEMBER( k053247_device::k053247_r )
 		return(m_ram[offs] >> 8);
 }
 
-WRITE8_MEMBER( k053247_device::k053247_w )
+void k053247_device::k053247_w(offs_t offset, u8 data)
 {
 	int offs = offset >> 1;
 
@@ -129,10 +128,10 @@ WRITE8_MEMBER( k053247_device::k053247_w )
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
 
 // FIXME: rearrange ROM loading so this can be merged with the 4/6/8bpp version
-READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
+u16 k053247_device::k055673_5bpp_rom_word_r(offs_t offset) // 5bpp
 {
-	uint8_t *ROM8 = (uint8_t *)&m_gfxrom[0];
-	uint16_t *ROM = (uint16_t *)&m_gfxrom[0];
+	u8 *ROM8 = (u8 *)&m_gfxrom[0];
+	u16 *ROM = (u16 *)&m_gfxrom[0];
 	int size4 = (m_gfxrom.length() / (1024 * 1024)) / 5;
 	int romofs;
 
@@ -167,12 +166,12 @@ READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
 	return 0;
 }
 
-READ16_MEMBER( k053247_device::k055673_rom_word_r )
+u16 k053247_device::k055673_rom_word_r(offs_t offset)
 {
 	if (m_bpp == 5)
-		return k055673_5bpp_rom_word_r(space, offset, mem_mask);
+		return k055673_5bpp_rom_word_r(offset);
 
-	uint16_t *ROM = (uint16_t *)&m_gfxrom[0];
+	u16 *ROM = (u16 *)&m_gfxrom[0];
 	int romofs;
 
 	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
@@ -184,9 +183,9 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 	return ROM[romofs + (offset & 0x3)];
 }
 
-READ16_MEMBER( k053247_device::k055673_ps_rom_word_r )
+u16 k053247_device::k055673_ps_rom_word_r(offs_t offset)
 {
-	uint8_t *ROM = (uint8_t *)&m_gfxrom[0];
+	u8 *ROM = (u8 *)&m_gfxrom[0];
 	int romofs;
 	int magic = (offset & 1);
 
@@ -198,7 +197,7 @@ READ16_MEMBER( k053247_device::k055673_ps_rom_word_r )
 	return ROM[finoffs+2] | (ROM[finoffs]<<8);
 }
 
-READ8_MEMBER( k053247_device::k053246_r )
+u8 k053247_device::k053246_r(offs_t offset)
 {
 	if (m_objcha_line == ASSERT_LINE)
 	{
@@ -214,31 +213,17 @@ READ8_MEMBER( k053247_device::k053246_r )
 	}
 }
 
-WRITE8_MEMBER( k053247_device::k053246_w )
+void k053247_device::k053246_w(offs_t offset, u8 data)
 {
 	m_kx46_regs[offset] = data;
 }
 
-READ16_MEMBER( k053247_device::k053246_word_r )
-{
-	offset <<= 1;
-	return k053246_r( space, offset + 1) | (k053246_r( space, offset) << 8);
-}
-
-WRITE16_MEMBER( k053247_device::k053246_word_w )
-{
-	if (ACCESSING_BITS_8_15)
-		k053246_w( space, offset << 1,(data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7)
-		k053246_w( space, (offset << 1) + 1,data & 0xff);
-}
-
-void k053247_device::k053246_set_objcha_line( int state )
+void k053247_device::k053246_set_objcha_line(int state)
 {
 	m_objcha_line = state;
 }
 
-int k053247_device::k053246_is_irq_enabled( void )
+int k053247_device::k053246_is_irq_enabled(void)
 {
 	// This bit enables obj DMA rather than obj IRQ even though the two functions usually coincide.
 	return m_kx46_regs[5] & 0x10;
@@ -274,22 +259,17 @@ int k053247_device::k053246_is_irq_enabled( void )
  */
 
 template<class _BitmapClass>
-void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect )
+void k053247_device::k053247_sprites_draw_common(_BitmapClass &bitmap, const rectangle &cliprect)
 {
 #define NUM_SPRITES 256
-
 
 	int code, color, x, y, shadow, shdmask, count, temp, primask;
 
 	int sortedlist[NUM_SPRITES];
 	int offs,zcode;
 
-
-
-
-	uint8_t drawmode_table[256];
-	uint8_t shadowmode_table[256];
-
+	u8 drawmode_table[256];
+	u8 shadowmode_table[256];
 
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
@@ -408,7 +388,7 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 
 		m_k053247_cb(&code, &color, &primask);
 
-		k053247_draw_single_sprite_gxcore( bitmap, cliprect,
+		k053247_draw_single_sprite_gxcore(bitmap, cliprect,
 				nullptr, nullptr,
 				code, m_ram.get(), offs,
 				color,
@@ -424,12 +404,11 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 #undef NUM_SPRITES
 }
 
-void k053247_device::k053247_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
-{ k053247_sprites_draw_common( bitmap, cliprect); }
+void k053247_device::k053247_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{ k053247_sprites_draw_common(bitmap, cliprect); }
 
-void k053247_device::k053247_sprites_draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
-{ k053247_sprites_draw_common( bitmap, cliprect); }
-
+void k053247_device::k053247_sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{ k053247_sprites_draw_common(bitmap, cliprect); }
 
 
 /*
@@ -450,8 +429,8 @@ void k053247_device::k053247_sprites_draw( bitmap_rgb32 &bitmap, const rectangle
 
 void k053247_device::zdrawgfxzoom32GP(
 		bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, uint8_t* gx_objzbuf, uint8_t* gx_shdzbuf)
+		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
+		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf)
 {
 #define FP     19
 #define FPONE  (1<<FP)
@@ -459,21 +438,21 @@ void k053247_device::zdrawgfxzoom32GP(
 #define FPENT  0
 
 	// inner loop
-	const uint8_t  *src_ptr;
+	const u8  *src_ptr;
 	int src_x;
 	int eax, ecx;
 	int src_fx, src_fdx;
 	int shdpen;
-	uint8_t  z8 = 0, p8 = 0;
-	uint8_t  *ozbuf_ptr;
-	uint8_t  *szbuf_ptr;
+	u8  z8 = 0, p8 = 0;
+	u8  *ozbuf_ptr;
+	u8  *szbuf_ptr;
 	const pen_t *pal_base;
 	const pen_t *shd_base;
-	uint32_t *dst_ptr;
+	u32 *dst_ptr;
 
 	// outter loop
 	int src_fby, src_fdy, src_fbx;
-	const uint8_t *src_base;
+	const u8 *src_base;
 	int dst_w, dst_h;
 
 	// one-time
@@ -574,8 +553,8 @@ void k053247_device::zdrawgfxzoom32GP(
 
 	// adjust insertion points and pre-entry constants
 	eax = (dst_y - dst_miny) * GX_ZBUFW + (dst_x - dst_minx) + dst_w;
-	z8 = (uint8_t)zcode;
-	p8 = (uint8_t)pri;
+	z8 = (u8)zcode;
+	p8 = (u8)pri;
 	ozbuf_ptr += eax;
 	szbuf_ptr += eax << 1;
 	dst_ptr += dst_y * dst_pitch + dst_x + dst_w;
@@ -735,7 +714,7 @@ void k053247_device::zdrawgfxzoom32GP(
 
 							// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
 							dst_ptr[ecx] = shd_base[pix.as_rgb15()];
-							//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32( eax, 0x00000000, 128);
+							//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32(eax, 0x00000000, 128);
 						}
 						while (++ecx);
 
@@ -892,11 +871,10 @@ void k053247_device::zdrawgfxzoom32GP(
 }
 
 
-
 void k053247_device::zdrawgfxzoom32GP(
 		bitmap_ind16 &bitmap, const rectangle &cliprect,
-		uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, uint8_t* gx_objzbuf, uint8_t* gx_shdzbuf)
+		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
+		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf)
 {
 	fatalerror("no zdrawgfxzoom32GP for bitmap_ind16\n");
 }
@@ -907,11 +885,9 @@ void k053247_device::zdrawgfxzoom32GP(
 *****************************************************************************/
 
 
-
-
 DEFINE_DEVICE_TYPE(K055673, k055673_device, "k055673", "K055673 Sprite Generator")
 
-k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: k053247_device(mconfig, K055673, tag, owner, clock)
 {
 }
@@ -927,7 +903,7 @@ void k055673_device::device_start()
 		throw device_missing_dependencies();
 
 	int gfx_index = 0;
-	uint32_t total;
+	u32 total;
 
 	static const gfx_layout spritelayout =  /* System GX sprite layout */
 	{
@@ -982,12 +958,12 @@ void k055673_device::device_start()
 		{ 0, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960 },
 		16*16*4
 	};
-	uint8_t *s1, *s2, *d;
+	u8 *s1, *s2, *d;
 	long i;
-	uint16_t *alt_k055673_rom;
+	u16 *alt_k055673_rom;
 	int size4;
 
-	alt_k055673_rom = (uint16_t *)&m_gfxrom[0];
+	alt_k055673_rom = (u16 *)&m_gfxrom[0];
 
 	/* decode the graphics */
 	switch (m_bpp)
@@ -996,10 +972,10 @@ void k055673_device::device_start()
 			size4 = (m_gfxrom.length()/(1024*1024))/5;
 			size4 *= 4*1024*1024;
 			/* set the # of tiles based on the 4bpp section */
-			alt_k055673_rom = auto_alloc_array(machine(), uint16_t, size4 * 5 / 2);
-			d = (uint8_t *)alt_k055673_rom;
+			alt_k055673_rom = auto_alloc_array(machine(), u16, size4 * 5 / 2);
+			d = (u8 *)alt_k055673_rom;
 			// now combine the graphics together to form 5bpp
-			s1 = (uint8_t *)&m_gfxrom[0]; // 4bpp area
+			s1 = (u8 *)&m_gfxrom[0]; // 4bpp area
 			s2 = s1 + (size4);   // 1bpp area
 			for (i = 0; i < size4; i+= 4)
 			{
@@ -1011,27 +987,27 @@ void k055673_device::device_start()
 			}
 
 			total = size4 / 128;
-			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout, 5);
+			konami_decode_gfx(*this, gfx_index, (u8 *)alt_k055673_rom, total, &spritelayout, 5);
 			break;
 
 		case K055673_LAYOUT_RNG:
 			total = m_gfxrom.length() / (16*16/2);
-			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout2, 4);
+			konami_decode_gfx(*this, gfx_index, (u8 *)alt_k055673_rom, total, &spritelayout2, 4);
 			break;
 
 		case K055673_LAYOUT_PS:
 			total = m_gfxrom.length() / (16*16/2);
-			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout5, 4);
+			konami_decode_gfx(*this, gfx_index, (u8 *)alt_k055673_rom, total, &spritelayout5, 4);
 			break;
 
 		case K055673_LAYOUT_LE2:
 			total = m_gfxrom.length() / (16*16);
-			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout3, 8);
+			konami_decode_gfx(*this, gfx_index, (u8 *)alt_k055673_rom, total, &spritelayout3, 8);
 			break;
 
 		case K055673_LAYOUT_GX6:
 			total = m_gfxrom.length() / (16*16*6/8);
-			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout4, 6);
+			konami_decode_gfx(*this, gfx_index, (u8 *)alt_k055673_rom, total, &spritelayout4, 6);
 			break;
 
 		default:
@@ -1044,11 +1020,11 @@ void k055673_device::device_start()
 	m_z_rejection = -1;
 	m_gfx = gfx(gfx_index);
 	m_objcha_line = CLEAR_LINE;
-	m_ram = std::make_unique<uint16_t[]>(0x1000/2);
+	m_ram = std::make_unique<u16[]>(0x1000/2);
 
 	memset(m_ram.get(),  0, 0x1000);
-	memset(m_kx46_regs, 0, 8);
-	memset(m_kx47_regs, 0, 32);
+	std::fill(std::begin(m_kx46_regs), std::end(m_kx46_regs), 0);
+	std::fill(std::begin(m_kx47_regs), std::end(m_kx47_regs), 0);
 
 	save_pointer(NAME(m_ram), 0x800);
 	save_item(NAME(m_kx46_regs));
@@ -1061,20 +1037,19 @@ void k055673_device::device_start()
 //-------------------------------------------------
 
 
-
 DEFINE_DEVICE_TYPE(K053247, k053247_device, "k053247", "K053246/K053247 Sprite Generator")
 decltype(K053247) K053246 = K053247;
 
-k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: k053247_device(mconfig, K053247, tag, owner, clock)
 {
 }
 
-k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		device_gfx_interface(mconfig, *this, nullptr),
-		m_gfxrom(*this, finder_base::DUMMY_TAG),
+		m_gfxrom(*this, DEVICE_SELF),
 		m_gfx_num(0)
 {
 	clear_all();
@@ -1089,7 +1064,7 @@ void k053247_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
-	uint32_t total;
+	u32 total;
 	static const gfx_layout spritelayout =
 	{
 		16,16,
@@ -1108,7 +1083,7 @@ void k053247_device::device_start()
 	{
 	case NORMAL_PLANE_ORDER:
 		total = m_gfxrom.length() / 128;
-		konami_decode_gfx(*this, m_gfx_num, (uint8_t *)&m_gfxrom[0], total, &spritelayout, 4);
+		konami_decode_gfx(*this, m_gfx_num, (u8 *)&m_gfxrom[0], total, &spritelayout, 4);
 		break;
 
 	default:
@@ -1131,7 +1106,7 @@ void k053247_device::device_start()
 
 	m_gfx = gfx(m_gfx_num);
 
-	m_ram = make_unique_clear<uint16_t[]>(0x1000 / 2);
+	m_ram = make_unique_clear<u16[]>(0x1000 / 2);
 
 	save_pointer(NAME(m_ram), 0x1000 / 2);
 	save_item(NAME(m_kx46_regs));
@@ -1149,8 +1124,8 @@ void k053247_device::device_reset()
 	m_z_rejection = -1;
 	m_objcha_line = CLEAR_LINE;
 
-	memset(m_kx46_regs, 0, 8);
-	memset(m_kx47_regs, 0, 32);
+	std::fill(std::begin(m_kx46_regs), std::end(m_kx46_regs), 0);
+	std::fill(std::begin(m_kx47_regs), std::end(m_kx47_regs), 0);
 }
 
 
@@ -1171,13 +1146,7 @@ void k053247_device::device_reset()
         0x00-0xff = zcode to ignore
 */
 
-void k053247_device::k053247_set_z_rejection( int zcode )
+void k053247_device::k053247_set_z_rejection(int zcode)
 {
 	m_z_rejection = zcode;
 }
-
-
-READ16_MEMBER( k053247_device::k053246_reg_word_r )
-{
-	return(m_kx46_regs[offset * 2] << 8 | m_kx46_regs[offset * 2 + 1]);
-}   // OBJSET1

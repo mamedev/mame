@@ -207,13 +207,11 @@ void mips1core_device_base::device_reset()
 	m_cop0[COP0_Status] = SR_BEV | SR_TS;
 
 	m_data_spacenum = 0;
+	m_bus_error = false;
 }
 
 void mips1core_device_base::execute_run()
 {
-	// check for interrupts
-	check_irqs();
-
 	// core execution loop
 	while (m_icount-- > 0)
 	{
@@ -238,10 +236,17 @@ void mips1core_device_base::execute_run()
 			}
 		}
 
-		// fetch and execute instruction
+		// fetch instruction
 		fetch(m_pc, [this](u32 const op)
 		{
-			// parse the instruction
+			// check for interrupts
+			if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
+			{
+				generate_exception(EXCEPTION_INTERRUPT);
+				return;
+			}
+
+			// decode and execute instruction
 			switch (op >> 26)
 			{
 			case 0x00: // SPECIAL
@@ -558,31 +563,31 @@ void mips1core_device_base::execute_run()
 				break;
 			}
 
-			// update pc and branch state
-			switch (m_branch_state)
-			{
-			case NONE:
-				m_pc += 4;
-				break;
-
-			case DELAY:
-				m_branch_state = NONE;
-				m_pc = m_branch_target;
-				break;
-
-			case BRANCH:
-				m_branch_state = DELAY;
-				m_pc += 4;
-				break;
-
-			case EXCEPTION:
-				m_branch_state = NONE;
-				break;
-			}
-
 			// clear register 0
 			m_r[0] = 0;
 		});
+
+		// update pc and branch state
+		switch (m_branch_state)
+		{
+		case NONE:
+			m_pc += 4;
+			break;
+
+		case DELAY:
+			m_branch_state = NONE;
+			m_pc = m_branch_target;
+			break;
+
+		case BRANCH:
+			m_branch_state = DELAY;
+			m_pc += 4;
+			break;
+
+		case EXCEPTION:
+			m_branch_state = NONE;
+			break;
+		}
 	}
 }
 
@@ -598,8 +603,6 @@ void mips1core_device_base::execute_set_input(int irqline, int state)
 	}
 	else
 		CAUSE &= ~(CAUSE_IPEX0 << irqline);
-
-	check_irqs();
 }
 
 device_memory_interface::space_config_vector mips1core_device_base::memory_space_config() const
@@ -845,12 +848,6 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 		debugger_privilege_hook();
 }
 
-void mips1core_device_base::check_irqs()
-{
-	if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
-		generate_exception(EXCEPTION_INTERRUPT);
-}
-
 void mips1core_device_base::handle_cop0(u32 const op)
 {
 	switch (RSREG)
@@ -887,7 +884,7 @@ void mips1core_device_base::handle_cop0(u32 const op)
 		switch (op & 31)
 		{
 			case 0x10: // RFE
-				SR = (SR & ~SR_KUIEpc) | ((SR >> 2) & SR_KUIEpc);
+				SR = (SR & ~SR_KUIE) | ((SR >> 2) & SR_KUIEpc);
 				if (bool(SR & SR_KUc) ^ bool(SR & SR_KUp))
 					debugger_privilege_hook();
 				break;
@@ -911,32 +908,24 @@ void mips1core_device_base::set_cop0_reg(unsigned const reg, u32 const data)
 {
 	switch (reg)
 	{
-	case COP0_Context:
-		m_cop0[COP0_Context] = (m_cop0[COP0_Context] & ~PTE_BASE) | (data & PTE_BASE);
-		break;
 	case COP0_Status:
-	{
-		u32 const delta = SR ^ data;
+		{
+			u32 const delta = SR ^ data;
 
-		m_cop0[COP0_Status] = data;
+			m_cop0[COP0_Status] = data;
 
-		// handle cache isolation and swap
-		m_data_spacenum = (data & SR_IsC) ? ((data & SR_SwC) ? 1 : 2) : 0;
+			// handle cache isolation and swap
+			m_data_spacenum = (data & SR_IsC) ? ((data & SR_SwC) ? 1 : 2) : 0;
 
-		// update interrupts
-		if (delta & (SR_IEc | SR_IM))
-			check_irqs();
+			if ((delta & SR_KUc) && (m_branch_state != EXCEPTION))
+				debugger_privilege_hook();
+		}
+		break;
 
-		if ((delta & SR_KUc) && (m_branch_state != EXCEPTION))
-			debugger_privilege_hook();
-	}
-	break;
 	case COP0_Cause:
 		CAUSE = (CAUSE & CAUSE_IPEX) | (data & ~CAUSE_IPEX);
-
-		// update interrupts -- software ints can occur this way
-		check_irqs();
 		break;
+
 	case COP0_PRId:
 		// read-only register
 		break;
@@ -1069,12 +1058,18 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::f
 {
 	if (memory_translate(m_data_spacenum, TRANSLATE_READ, address))
 	{
-		switch (sizeof(T))
+		T const data
+			= (sizeof(T) == 1) ? space(m_data_spacenum).read_byte(address)
+			: (sizeof(T) == 2) ? space(m_data_spacenum).read_word(address)
+			: space(m_data_spacenum).read_dword(address);
+
+		if (m_bus_error)
 		{
-		case 1: apply(T(space(m_data_spacenum).read_byte(address))); break;
-		case 2: apply(T(space(m_data_spacenum).read_word(address))); break;
-		case 4: apply(T(space(m_data_spacenum).read_dword(address))); break;
+			m_bus_error = false;
+			generate_exception(EXCEPTION_BUSDATA);
 		}
+		else
+			apply(data);
 	}
 }
 
@@ -1095,8 +1090,17 @@ bool mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
 {
 	if (memory_translate(0, TRANSLATE_FETCH, address))
 	{
-		apply(space(0).read_dword(address));
+		u32 const data = space(0).read_dword(address);
 
+		if (m_bus_error)
+		{
+			m_bus_error = false;
+			generate_exception(EXCEPTION_BUSINST);
+
+			return false;
+		}
+
+		apply(data);
 		return true;
 	}
 	else
@@ -1177,7 +1181,7 @@ void mips1_device_base::device_start()
 	{
 		state_add(MIPS1_FCR31, "FCSR", m_fcr31);
 		for (unsigned i = 0; i < ARRAY_LENGTH(m_f); i++)
-			state_add(MIPS1_F0 + i, util::string_format("F%d", i).c_str(), m_f[i]);
+			state_add(MIPS1_F0 + i, util::string_format("F%d", i * 2).c_str(), m_f[i]);
 	}
 
 	save_item(NAME(m_reset_time));
@@ -1226,8 +1230,8 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[index][0] = m_cop0[COP0_EntryHi];
 			m_tlb[index][1] = m_cop0[COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlb write index %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
-				index, (m_cop0[COP0_EntryHi] & EH_ASID) >> 6, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
+			LOGMASKED(LOG_TLB, "asid %2d tlb write index %2d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+				(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, index, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
 				m_cop0[COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cop0[COP0_EntryLo] & EL_D ? 'D' : '-',
 				m_cop0[COP0_EntryLo] & EL_V ? 'V' : '-',
@@ -1243,8 +1247,8 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[random][0] = m_cop0[COP0_EntryHi];
 			m_tlb[random][1] = m_cop0[COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlb write random %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
-				random, (m_cop0[COP0_EntryHi] & EH_ASID) >> 6, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
+			LOGMASKED(LOG_TLB, "asid %2d tlb write random %2d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+				(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, random, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
 				m_cop0[COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cop0[COP0_EntryLo] & EL_D ? 'D' : '-',
 				m_cop0[COP0_EntryLo] & EL_V ? 'V' : '-',
@@ -1261,15 +1265,15 @@ void mips1_device_base::handle_cop0(u32 const op)
 			u32 const mask = (m_tlb[index][1] & EL_G) ? EH_VPN : EH_VPN | EH_ASID;
 			if ((m_tlb[index][0] & mask) == (m_cop0[COP0_EntryHi] & mask))
 			{
-				LOGMASKED(LOG_TLB, "tlb probe hit vpn 0x%08x index %d (%s)\n",
-					m_cop0[COP0_EntryHi] & mask, index, machine().describe_context());
+				LOGMASKED(LOG_TLB, "asid %2d tlb probe index %2d vpn 0x%08x (%s)\n",
+					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, index, m_cop0[COP0_EntryHi] & mask, machine().describe_context());
 
 				m_cop0[COP0_Index] = index << 8;
 				break;
 			}
 		}
 		if ((VERBOSE & LOG_TLB) && BIT(m_cop0[COP0_Index], 31))
-			LOGMASKED(LOG_TLB, "tlb probe miss asid %d vpn 0x%08x(%s)\n",
+			LOGMASKED(LOG_TLB, "asid %2d tlb probe miss vpn 0x%08x(%s)\n",
 				(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, m_cop0[COP0_EntryHi] & EH_VPN, machine().describe_context());
 		break;
 
@@ -1287,6 +1291,28 @@ u32 mips1_device_base::get_cop0_reg(unsigned const reg)
 	return m_cop0[reg];
 }
 
+void mips1_device_base::set_cop0_reg(unsigned const reg, u32 const data)
+{
+	switch (reg)
+	{
+	case COP0_EntryHi:
+		m_cop0[COP0_EntryHi] = data & EH_WM;
+		break;
+
+	case COP0_EntryLo:
+		m_cop0[COP0_EntryLo] = data & EL_WM;
+		break;
+
+	case COP0_Context:
+		m_cop0[COP0_Context] = (m_cop0[COP0_Context] & ~PTE_BASE) | (data & PTE_BASE);
+		break;
+
+	default:
+		mips1core_device_base::set_cop0_reg(reg, data);
+		break;
+	}
+}
+
 void mips1_device_base::handle_cop1(u32 const op)
 {
 	if (!(SR & SR_COP1))
@@ -1297,6 +1323,8 @@ void mips1_device_base::handle_cop1(u32 const op)
 
 	if (!m_fcr0)
 		return;
+
+	softfloat_exceptionFlags = 0;
 
 	switch (op >> 26)
 	{
@@ -1355,8 +1383,10 @@ void mips1_device_base::handle_cop1(u32 const op)
 				}
 
 				// exception check
-				if ((m_fcr31 & FCR31_CE) || ((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM))
-					execute_set_input(m_fpu_irq, ASSERT_LINE);
+				{
+					bool const exception = (m_fcr31 & FCR31_CE) || (((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM));
+					execute_set_input(m_fpu_irq, exception ? ASSERT_LINE : CLEAR_LINE);
+				}
 				break;
 
 			default:
@@ -1831,15 +1861,15 @@ template <typename T> void mips1_device_base::set_cop1_reg(unsigned const reg, T
 		if (softfloat_exceptionFlags & softfloat_flag_invalid)
 			m_fcr31 |= FCR31_CV;
 
-		// check if exception is enabled
-		if (((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM))
-		{
-			execute_set_input(m_fpu_irq, ASSERT_LINE);
-			return;
-		}
-
 		// set flags
 		m_fcr31 |= ((m_fcr31 & FCR31_CM) >> 10);
+
+		// update exception state
+		bool const exception = (m_fcr31 & FCR31_CE) || ((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM);
+		execute_set_input(m_fpu_irq, exception ? ASSERT_LINE : CLEAR_LINE);
+
+		if (exception)
+			return;
 	}
 
 	if (sizeof(T) == 4)
@@ -1930,11 +1960,11 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 		if (VERBOSE & LOG_TLB)
 		{
 			if (modify)
-				LOGMASKED(LOG_TLB, "tlb modify asid %d address 0x%08x (%s)\n",
+				LOGMASKED(LOG_TLB, "asid %2d tlb modify address 0x%08x (%s)\n",
 					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
 			else
-				LOGMASKED(LOG_TLB, "tlb miss %c asid %d address 0x%08x (%s)\n",
-					(intention & TRANSLATE_WRITE) ? 'w' : 'r', (m_cop0[COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
+				LOGMASKED(LOG_TLB, "asid %2d tlb miss %c address 0x%08x (%s)\n",
+					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, (intention & TRANSLATE_WRITE) ? 'w' : 'r', address, machine().describe_context());
 		}
 
 		// load tlb exception registers

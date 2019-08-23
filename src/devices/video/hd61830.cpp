@@ -248,6 +248,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 
 	case INSTRUCTION_NUMBER_OF_CHARACTERS:
 		m_hn = (data & 0x7f) + 1;
+		m_hn = (m_hn % 2 == 0) ? m_hn : (m_hn + 1);
 
 		LOG("HD61830 Number of Characters: %u\n", m_hn);
 		break;
@@ -259,7 +260,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 		break;
 
 	case INSTRUCTION_CURSOR_POSITION:
-		m_cp = (data & 0x7f) + 1;
+		m_cp = (data & 0x0f) + 1;
 
 		LOG("HD61830 Cursor Position: %u\n", m_cp);
 		break;

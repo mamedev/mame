@@ -280,9 +280,8 @@ void queen_state::machine_reset()
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0x20000);
 }
 
-
-
-MACHINE_CONFIG_START(queen_state::queen)
+void queen_state::queen(machine_config &config)
+{
 	PENTIUM3(config, m_maincpu, 533000000/16); // Celeron or Pentium 3, 533 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &queen_state::queen_map);
 	m_maincpu->set_addrmap(AS_IO, &queen_state::queen_io);
@@ -290,9 +289,11 @@ MACHINE_CONFIG_START(queen_state::queen)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, queen_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, queen_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (0, FUNC(queen_state::intel82439tx_pci_r), this);
+	pcibus.set_device_write(0, FUNC(queen_state::intel82439tx_pci_w), this);
+	pcibus.set_device_read (7, FUNC(queen_state::intel82371ab_pci_r), this);
+	pcibus.set_device_write(7, FUNC(queen_state::intel82371ab_pci_w), this);
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -302,9 +303,7 @@ MACHINE_CONFIG_START(queen_state::queen)
 
 	/* video hardware */
 	pcvideo_vga(config);
-MACHINE_CONFIG_END
-
-
+}
 
 
 ROM_START( queen )

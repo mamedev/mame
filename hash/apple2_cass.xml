@@ -17,7 +17,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="3D Art Graphics" />
 			<dataarea name="cass" size="5387342">
-				<rom name="3d art graphics (1978)(kazumasa miyazawa).wav" size="5387342" crc="5a7b4b43" sha1="34ba56678d8cd30ec4fff14949f60cadb4cf608a" offset="0" />
+				<rom name="3d art graphics (1978)(kazumasa miyazawa).wav" size="5387342" crc="5a7b4b43" sha1="34ba56678d8cd30ec4fff14949f60cadb4cf608a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="3D-Docking" />
 			<dataarea name="cass" size="4876844">
-				<rom name="3d-docking (1978)(programma international, inc.).wav" size="4876844" crc="eb124a5d" sha1="8d6c6d971611caf5fc4c3bb0e64e24768cb1785c" offset="0" />
+				<rom name="3d-docking (1978)(programma international, inc.).wav" size="4876844" crc="eb124a5d" sha1="8d6c6d971611caf5fc4c3bb0e64e24768cb1785c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,7 +44,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="3D Star Fire" />
 			<dataarea name="cass" size="8052074">
-				<rom name="3-d star fire! (1980)(tukumo original software).wav" size="8052074" crc="6ab161f2" sha1="504cdfbd49686afa542e03db7315803b40699877" offset="0" />
+				<rom name="3-d star fire! (1980)(tukumo original software).wav" size="8052074" crc="6ab161f2" sha1="504cdfbd49686afa542e03db7315803b40699877"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Ack-Ack" />
 			<dataarea name="cass" size="5661708">
-				<rom name="ack-ack (1978)(programm international, inc.).wav" size="5661708" crc="ce6d5ecf" sha1="6b1d1c937ae4c18ab31291bcbe345c3b67cc1c18" offset="0" />
+				<rom name="ack-ack (1978)(programm international, inc.).wav" size="5661708" crc="ce6d5ecf" sha1="6b1d1c937ae4c18ab31291bcbe345c3b67cc1c18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -71,7 +71,7 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Computer Acquire" />
 			<dataarea name="cass" size="8344952">
-				<rom name="computer acquire (1982)(microcomputer games).wav" size="8344952" crc="0af5925b" sha1="4833e742bd0f5bf14693124f3f97ded820d0db63" offset="0" />
+				<rom name="computer acquire (1982)(microcomputer games).wav" size="8344952" crc="0af5925b" sha1="4833e742bd0f5bf14693124f3f97ded820d0db63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Computer Acquire" />
 			<dataarea name="cass" size="4781660">
-				<rom name="computer acquire (1980)(microcomputer games).wav" size="4781660" crc="aa0c4b02" sha1="2017a51d1e520fcf8d5ff8dc82b1e990683b3ba6" offset="0" />
+				<rom name="computer acquire (1980)(microcomputer games).wav" size="4781660" crc="aa0c4b02" sha1="2017a51d1e520fcf8d5ff8dc82b1e990683b3ba6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Adventure Sampler" />
 			<dataarea name="cass" size="2646052">
-				<rom name="adventure 0 special sampler (1979)(adventure international).wav" size="2646052" crc="d5ed0215" sha1="84c5f472a9d709fb916959f5274f9a612db5d414" offset="0" />
+				<rom name="adventure 0 special sampler (1979)(adventure international).wav" size="2646052" crc="d5ed0215" sha1="84c5f472a9d709fb916959f5274f9a612db5d414"/>
 			</dataarea>
 		</part>
 	</software>
@@ -111,7 +111,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Adventure Land" />
 			<dataarea name="cass" size="5705366">
-				<rom name="adventure 1 adventure land (1979)(adventure international).wav" size="5705366" crc="c4c443a8" sha1="9e925312e1c07e5d2de223f3f5d8dee1b5bc00b6" offset="0" />
+				<rom name="adventure 1 adventure land (1979)(adventure international).wav" size="5705366" crc="c4c443a8" sha1="9e925312e1c07e5d2de223f3f5d8dee1b5bc00b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +124,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Mission Impossible" />
 			<dataarea name="cass" size="11143724">
-				<rom name="adventure 3 mission impossible (1979) (adventure international).wav" size="11143724" crc="8e0dbbcb" sha1="044b08fd97b770de99c552a1a720425b6a903bbb" offset="0" />
+				<rom name="adventure 3 mission impossible (1979) (adventure international).wav" size="11143724" crc="8e0dbbcb" sha1="044b08fd97b770de99c552a1a720425b6a903bbb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -137,7 +137,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Voodoo Castle" />
 			<dataarea name="cass" size="2693420">
-				<rom name="adventure 4 voodoo castle (1979) (adventure international).wav" size="2693420" crc="f77bf0ee" sha1="b1c486031af0a9f59e55c924e448bf945c600998" offset="0" />
+				<rom name="adventure 4 voodoo castle (1979) (adventure international).wav" size="2693420" crc="f77bf0ee" sha1="b1c486031af0a9f59e55c924e448bf945c600998"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,13 +151,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Alignment Test Tone" />
 			<dataarea name="cass" size="5677100">
-				<rom name="alignment test tone (1979)(apple computer).wav" size="5677100" crc="4c8a1d5a" sha1="1907a04173c83c536a06699659142621f20558ab" offset="0" />
+				<rom name="alignment test tone (1979)(apple computer).wav" size="5677100" crc="4c8a1d5a" sha1="1907a04173c83c536a06699659142621f20558ab"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Renumber/Append" />
 			<dataarea name="cass" size="2207020">
-				<rom name="renumber - append (1979)(apple computer).wav" size="2207020" crc="0f49d611" sha1="65042e4ebfcfdf1692cbf05619f0746d685029d0" offset="0" />
+				<rom name="renumber - append (1979)(apple computer).wav" size="2207020" crc="0f49d611" sha1="65042e4ebfcfdf1692cbf05619f0746d685029d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -171,13 +171,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Alignment Test Tone" />
 			<dataarea name="cass" size="5677100">
-				<rom name="alignment test tone (1979)(apple computer).wav" size="5677100" crc="4c8a1d5a" sha1="1907a04173c83c536a06699659142621f20558ab" offset="0" />
+				<rom name="alignment test tone (1979)(apple computer).wav" size="5677100" crc="4c8a1d5a" sha1="1907a04173c83c536a06699659142621f20558ab"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Sampler" />
 			<dataarea name="cass" size="3583788">
-				<rom name="sampler (1979)(apple computer).wav" size="3583788" crc="82a535c8" sha1="87c4bfd2adcccc872138f94dec29b9e688192faf" offset="0" />
+				<rom name="sampler (1979)(apple computer).wav" size="3583788" crc="82a535c8" sha1="87c4bfd2adcccc872138f94dec29b9e688192faf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -191,7 +191,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Andromeda Conquest" />
 			<dataarea name="cass" size="3811372">
-				<rom name="andromeda conquest (1982)(microcomputer games).wav" size="3811372" crc="908e87b3" sha1="89f70e2aadddc4ef760e1eaa55469771521520a8" offset="0" />
+				<rom name="andromeda conquest (1982)(microcomputer games).wav" size="3811372" crc="908e87b3" sha1="89f70e2aadddc4ef760e1eaa55469771521520a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -204,7 +204,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple-2 Trek" />
 			<dataarea name="cass" size="8449462">
-				<rom name="apple-2 trek (1977)(apple computer).wav" size="8449462" crc="3edd69cf" sha1="5b260523993893fa6cce5520d955cab425a9ecc4" offset="0" />
+				<rom name="apple-2 trek (1977)(apple computer).wav" size="8449462" crc="3edd69cf" sha1="5b260523993893fa6cce5520d955cab425a9ecc4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -218,13 +218,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Apple Bowl 16K" />
 			<dataarea name="cass" size="3903776">
-				<rom name="apple bowl 16k (1979)(apple computer).wav" size="3903776" crc="4d56f9ac" sha1="0a6ebe430c3819f09fd982b24cc4ccf3d384afe1" offset="0" />
+				<rom name="apple bowl 16k (1979)(apple computer).wav" size="3903776" crc="4d56f9ac" sha1="0a6ebe430c3819f09fd982b24cc4ccf3d384afe1"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Apple Bowl 32K" />
 			<dataarea name="cass" size="6263596">
-				<rom name="apple bowl 32k (1979)(apple computer).wav" size="6263596" crc="d5e8bee7" sha1="9c2c6cf2357b292c05de657b8862496733ee0db5" offset="0" />
+				<rom name="apple bowl 32k (1979)(apple computer).wav" size="6263596" crc="d5e8bee7" sha1="9c2c6cf2357b292c05de657b8862496733ee0db5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -238,7 +238,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple Casino" />
 			<dataarea name="cass" size="5349420">
-				<rom name="apple casino (1978)(powersoft, inc.).wav" size="5349420" crc="b0a90ce2" sha1="48a95b1014a438a070d936ec408f7342156fcf0f" offset="0" />
+				<rom name="apple casino (1978)(powersoft, inc.).wav" size="5349420" crc="b0a90ce2" sha1="48a95b1014a438a070d936ec408f7342156fcf0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -252,7 +252,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple Derby" />
 			<dataarea name="cass" size="8189852">
-				<rom name="apple derby (1978)(powersoft, inc.).wav" size="8189852" crc="d96bd0cf" sha1="cb7c97774376c3d8fb7e3f798f165ed9d45b5aad" offset="0" />
+				<rom name="apple derby (1978)(powersoft, inc.).wav" size="8189852" crc="d96bd0cf" sha1="cb7c97774376c3d8fb7e3f798f165ed9d45b5aad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -266,7 +266,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple ][ Organ" />
 			<dataarea name="cass" size="4191276">
-				<rom name="apple ][ organ (1978)(powersoft, inc.).wav" size="4191276" crc="339ca26f" sha1="ab781cccd8285ea860d8b02d2e7bd335f98bef0d" offset="0" />
+				<rom name="apple ][ organ (1978)(powersoft, inc.).wav" size="4191276" crc="339ca26f" sha1="ab781cccd8285ea860d8b02d2e7bd335f98bef0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -279,7 +279,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft IIa" />
 			<dataarea name="cass" size="9322474">
-				<rom name="applesoft (1977)(apple computer).wav" size="9322474" crc="eddd44f1" sha1="308bae54e399eca2ceab134198d217cf5b895135" offset="0" />
+				<rom name="applesoft (1977)(apple computer).wav" size="9322474" crc="eddd44f1" sha1="308bae54e399eca2ceab134198d217cf5b895135"/>
 			</dataarea>
 		</part>
 	</software>
@@ -293,7 +293,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple Stock Quote Reporter" />
 			<dataarea name="cass" size="6640828">
-				<rom name="apple stock quote reporter (1978)(apple computer).wav" size="6640828" crc="d8079d0b" sha1="f70d91cc12dd3ff3a045255c84a61f0c14ee3167" offset="0" />
+				<rom name="apple stock quote reporter (1978)(apple computer).wav" size="6640828" crc="d8079d0b" sha1="f70d91cc12dd3ff3a045255c84a61f0c14ee3167"/>
 			</dataarea>
 		</part>
 	</software>
@@ -307,7 +307,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple Trek" />
 			<dataarea name="cass" size="3996802">
-				<rom name="applesoft (1977)(apple computer).wav" size="3996802" crc="3e8e5ada" sha1="61d67a606c63bfe3d5e8090af5ef710aeceb4c6c" offset="0" />
+				<rom name="applesoft (1977)(apple computer).wav" size="3996802" crc="3e8e5ada" sha1="61d67a606c63bfe3d5e8090af5ef710aeceb4c6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -321,13 +321,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Applevision" />
 			<dataarea name="cass" size="2063394">
-				<rom name="apple-vision (1979)(apple computer).wav" size="2063394" crc="09a87b3d" sha1="5f8924a88220a7a1c93ddd358d50a8b85f6b1f51" offset="0" />
+				<rom name="apple-vision (1979)(apple computer).wav" size="2063394" crc="09a87b3d" sha1="5f8924a88220a7a1c93ddd358d50a8b85f6b1f51"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Biorhythm" />
 			<dataarea name="cass" size="6070316">
-				<rom name="biorhythms (1979)(apple computer).wav" size="6070316" crc="fb1acbfa" sha1="d080c895bd6bd942dc089bfdef3253518824cdb9" offset="0" />
+				<rom name="biorhythms (1979)(apple computer).wav" size="6070316" crc="fb1acbfa" sha1="d080c895bd6bd942dc089bfdef3253518824cdb9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -342,13 +342,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft ][ floating point BASIC" />
 			<dataarea name="cass" size="3260004">
-				<rom name="applesoft ][ floating point basic (1978)(apple computer).wav" size="3260004" crc="9e4fa8e5" sha1="cedcd667a787567add8814d6aa76e5b78c621d92" offset="0" />
+				<rom name="applesoft ][ floating point basic (1978)(apple computer).wav" size="3260004" crc="9e4fa8e5" sha1="cedcd667a787567add8814d6aa76e5b78c621d92"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Floating Point BASIC Demo" />
 			<dataarea name="cass" size="1984556">
-				<rom name="floating point basic demo (1978)(apple computer).wav" size="1984556" crc="7c93a437" sha1="847d87c9f7471f76adf10be348a69f143390df78" offset="0" />
+				<rom name="floating point basic demo (1978)(apple computer).wav" size="1984556" crc="7c93a437" sha1="847d87c9f7471f76adf10be348a69f143390df78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -362,7 +362,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Assembler" />
 			<dataarea name="cass" size="5953068">
-				<rom name="assembler (1978)(powersoft, inc.).wav" size="5953068" crc="a010c5eb" sha1="435f945236957843979983c4ed745b372af2786a" offset="0" />
+				<rom name="assembler (1978)(powersoft, inc.).wav" size="5953068" crc="a010c5eb" sha1="435f945236957843979983c4ed745b372af2786a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -376,7 +376,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft Utilities" />
 			<dataarea name="cass" size="1634092">
-				<rom name="applesoft utility programs (1979)(hayden book company).wav" size="1634092" crc="87c6abe2" sha1="df4b59110be453299a27551d49de138d124166d3" offset="0" />
+				<rom name="applesoft utility programs (1979)(hayden book company).wav" size="1634092" crc="87c6abe2" sha1="df4b59110be453299a27551d49de138d124166d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -390,7 +390,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Air Traffic Controller" />
 			<dataarea name="cass" size="1483820">
-				<rom name="air traffic controller (1980)(creative computing).wav" size="1483820" crc="036daec2" sha1="71c1a8e375632cfe201fd5e87b8795102a614f80" offset="0" />
+				<rom name="air traffic controller (1980)(creative computing).wav" size="1483820" crc="036daec2" sha1="71c1a8e375632cfe201fd5e87b8795102a614f80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -404,7 +404,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="B-1 Nuclear Bomber" />
 			<dataarea name="cass" size="3018500">
-				<rom name="b1nuclear bomber (1980)(microcomputer games).wav" size="3018500" crc="d84da9d6" sha1="56daa8c24a6e48b347b6edbca2370df9a5c7fcaa" offset="0" />
+				<rom name="b1nuclear bomber (1980)(microcomputer games).wav" size="3018500" crc="d84da9d6" sha1="56daa8c24a6e48b347b6edbca2370df9a5c7fcaa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -417,13 +417,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Beneath Apple Manor load 1" />
 			<dataarea name="cass" size="8260652">
-				<rom name="beneath apple manor (1978)(software factory) side A.wav" size="8260652" crc="21685790" sha1="21a7000cc0d8e751602bf7e57b9094281f42695e" offset="0" />
+				<rom name="beneath apple manor (1978)(software factory) side A.wav" size="8260652" crc="21685790" sha1="21a7000cc0d8e751602bf7e57b9094281f42695e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Beneath Apple Manor load 2" />
 			<dataarea name="cass" size="15841288">
-				<rom name="beneath apple manor (1978)(software factory) side B.wav" size="15841288" crc="0388b520" sha1="dffb5e885a4c77f3d95cd29ef1573feea8d6f85f" offset="0" />
+				<rom name="beneath apple manor (1978)(software factory) side B.wav" size="15841288" crc="0388b520" sha1="dffb5e885a4c77f3d95cd29ef1573feea8d6f85f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -437,7 +437,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Baseball" />
 			<dataarea name="cass" size="10511916">
-				<rom name="baseball (1979)(programma international, inc.).wav" size="10511916" crc="60efcc58" sha1="cee748ecce19e6bc8da10bb71fab5bf3c9806794" offset="0" />
+				<rom name="baseball (1979)(programma international, inc.).wav" size="10511916" crc="60efcc58" sha1="cee748ecce19e6bc8da10bb71fab5bf3c9806794"/>
 			</dataarea>
 		</part>
 	</software>
@@ -452,7 +452,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Battlestar I" />
 			<dataarea name="cass" size="9069612">
-				<rom name="battlestar i (1979)(programma international, inc.).wav" size="9069612" crc="6f0d0135" sha1="aa1ecee8ebc0a05518617c7b6814ffc9ff824205" offset="0" />
+				<rom name="battlestar i (1979)(programma international, inc.).wav" size="9069612" crc="6f0d0135" sha1="aa1ecee8ebc0a05518617c7b6814ffc9ff824205"/>
 			</dataarea>
 		</part>
 	</software>
@@ -466,13 +466,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Black Jack" />
 			<dataarea name="cass" size="9268268">
-				<rom name="black jack (1978)(apple computer).wav" size="9268268" crc="6b622d43" sha1="c59888774efd4d32f96de8c83302257cacaefaf4" offset="0" />
+				<rom name="black jack (1978)(apple computer).wav" size="9268268" crc="6b622d43" sha1="c59888774efd4d32f96de8c83302257cacaefaf4"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Slot Machine" />
 			<dataarea name="cass" size="9270316">
-				<rom name="slot machine (1978)(apple computer).wav" size="9270316" crc="ab1d0a5f" sha1="30cba23d317fabd3fb45b07cbc1424223a2522fc" offset="0" />
+				<rom name="slot machine (1978)(apple computer).wav" size="9270316" crc="ab1d0a5f" sha1="30cba23d317fabd3fb45b07cbc1424223a2522fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -485,7 +485,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Bomber" />
 			<dataarea name="cass" size="27578412">
-				<rom name="bomber (1980)(astar international, inc.).wav" size="27578412" crc="2ad88fdf" sha1="da0fa5cd4f485a15c8320c6137d664e05c9b4e65" offset="0" />
+				<rom name="bomber (1980)(astar international, inc.).wav" size="27578412" crc="2ad88fdf" sha1="da0fa5cd4f485a15c8320c6137d664e05c9b4e65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -498,7 +498,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Bomber" />
 			<dataarea name="cass" size="2072620">
-				<rom name="bomber (1978)(softape).wav" size="2072620" crc="29afeebf" sha1="3d34fc025da7c7e8c91224b098c305ac03fbd1fe" offset="0" />
+				<rom name="bomber (1978)(softape).wav" size="2072620" crc="29afeebf" sha1="3d34fc025da7c7e8c91224b098c305ac03fbd1fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -512,13 +512,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Bowling" />
 			<dataarea name="cass" size="8120876">
-				<rom name="bowling (1979)(instant software).wav" size="8120876" crc="98f1a8f5" sha1="4b45badbc712d9ebefd0f1fb03f5e077af82123e" offset="0" />
+				<rom name="bowling (1979)(instant software).wav" size="8120876" crc="98f1a8f5" sha1="4b45badbc712d9ebefd0f1fb03f5e077af82123e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Trilogy" />
 			<dataarea name="cass" size="13566128">
-				<rom name="trilogy (1979)(instant software).wav" size="13566128" crc="24e01f0f" sha1="7200180beb402d089f7dbc13a4d921cdcb269aa0" offset="0" />
+				<rom name="trilogy (1979)(instant software).wav" size="13566128" crc="24e01f0f" sha1="7200180beb402d089f7dbc13a4d921cdcb269aa0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -532,13 +532,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Brian's Theme" />
 			<dataarea name="cass" size="1075026">
-				<rom name="brian's theme (1979)(apple computer).wav" size="1075026" crc="27e117bc" sha1="077bd439a3773145ac1538054c1454fb019fc933" offset="0" />
+				<rom name="brian's theme (1979)(apple computer).wav" size="1075026" crc="27e117bc" sha1="077bd439a3773145ac1538054c1454fb019fc933"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Phone List" />
 			<dataarea name="cass" size="6736940">
-				<rom name="phone list (1979)(apple computer).wav" size="6736940" crc="3c2205e6" sha1="9ca9be28f29f5b60fac17d98285f8b0f66d24e97" offset="0" />
+				<rom name="phone list (1979)(apple computer).wav" size="6736940" crc="3c2205e6" sha1="9ca9be28f29f5b60fac17d98285f8b0f66d24e97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -552,13 +552,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Brick Out" />
 			<dataarea name="cass" size="4003116">
-				<rom name="brick out (1978)(apple computer).wav" size="4003116" crc="d976632e" sha1="98af4863cbfb26c2dd5c4eeaa7aec7a0caa23d63" offset="0" />
+				<rom name="brick out (1978)(apple computer).wav" size="4003116" crc="d976632e" sha1="98af4863cbfb26c2dd5c4eeaa7aec7a0caa23d63"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Color Demo" />
 			<dataarea name="cass" size="1192748">
-				<rom name="color demo (1978)(apple computer).wav" size="1192748" crc="2a4993cd" sha1="4e614be8bcffec53b122792ee1de873f235a7e6d" offset="0" />
+				<rom name="color demo (1978)(apple computer).wav" size="1192748" crc="2a4993cd" sha1="4e614be8bcffec53b122792ee1de873f235a7e6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -571,7 +571,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Bridge Challenger" />
 			<dataarea name="cass" size="2265644">
-				<rom name="bridge challenger (1978)(personal software).wav" size="2265644" crc="a33f6f18" sha1="659b5d7f39b90da8bf1322cba6e7ff291663c283" offset="0" />
+				<rom name="bridge challenger (1978)(personal software).wav" size="2265644" crc="a33f6f18" sha1="659b5d7f39b90da8bf1322cba6e7ff291663c283"/>
 			</dataarea>
 		</part>
 	</software>
@@ -584,13 +584,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Breakout" />
 			<dataarea name="cass" size="1409068">
-				<rom name="breakout (1977)(apple computer).wav" size="1409068" crc="f71de074" sha1="53b200528b26173104e453cc392605d1e12eb25e" offset="0" />
+				<rom name="breakout (1977)(apple computer).wav" size="1409068" crc="f71de074" sha1="53b200528b26173104e453cc392605d1e12eb25e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Color Graphics" />
 			<dataarea name="cass" size="1333036">
-				<rom name="4k color demos (1977)(apple computer).wav" size="1333036" crc="e03d6568" sha1="00654b4370bc6317241c1f20ae5e8a57d998df26" offset="0" />
+				<rom name="4k color demos (1977)(apple computer).wav" size="1333036" crc="e03d6568" sha1="00654b4370bc6317241c1f20ae5e8a57d998df26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -604,13 +604,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Breakout" />
 			<dataarea name="cass" size="1127548">
-				<rom name="color graphics (1978)(apple computer).wav" size="1127548" crc="f829f060" sha1="e1b5b432ad2bf1974c934ac57d08a625181e6b9c" offset="0" />
+				<rom name="color graphics (1978)(apple computer).wav" size="1127548" crc="f829f060" sha1="e1b5b432ad2bf1974c934ac57d08a625181e6b9c"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Color Graphics" />
 			<dataarea name="cass" size="1544236">
-				<rom name="breakout (1978)(apple computer).wav" size="1544236" crc="64441f07" sha1="37da93d0a057a718031395f6c83c57c9a8d3daf0" offset="0" />
+				<rom name="breakout (1978)(apple computer).wav" size="1544236" crc="64441f07" sha1="37da93d0a057a718031395f6c83c57c9a8d3daf0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -624,7 +624,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Canter Downs" />
 			<dataarea name="cass" size="4652588">
-				<rom name="canter downs (1979)(programma international, inc.).wav" size="4652588" crc="10faecb1" sha1="75fe9d7a9d16a3fd07433f59721edf064aba39a1" offset="0" />
+				<rom name="canter downs (1979)(programma international, inc.).wav" size="4652588" crc="10faecb1" sha1="75fe9d7a9d16a3fd07433f59721edf064aba39a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -637,7 +637,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Checkbook 1" />
 			<dataarea name="cass" size="3815212">
-				<rom name="checkbook (1978)(apple computer).wav" size="3815212" crc="bd524dca" sha1="5ea924cffdb112ac3ef84f97560821936c63ab95" offset="0" />
+				<rom name="checkbook (1978)(apple computer).wav" size="3815212" crc="bd524dca" sha1="5ea924cffdb112ac3ef84f97560821936c63ab95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -651,13 +651,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Color Demosoft" />
 			<dataarea name="cass" size="1391234">
-				<rom name="color demosoft (1979)(apple computer).wav" size="1391234" crc="2ba255a5" sha1="3b3340d96435a8e377e897ecbfa36aa0d901188d" offset="0" />
+				<rom name="color demosoft (1979)(apple computer).wav" size="1391234" crc="2ba255a5" sha1="3b3340d96435a8e377e897ecbfa36aa0d901188d"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Little Brickout" />
 			<dataarea name="cass" size="3092524">
-				<rom name="little brickout (1979)(apple computer).wav" size="3092524" crc="8aa1ca88" sha1="a19b143204faeb88d61001f4f57ba4d4ca8939fd" offset="0" />
+				<rom name="little brickout (1979)(apple computer).wav" size="3092524" crc="8aa1ca88" sha1="a19b143204faeb88d61001f4f57ba4d4ca8939fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -671,13 +671,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Colorsketch" />
 			<dataarea name="cass" size="4058668">
-				<rom name="color sketch (1979)(apple computer).wav" size="4058668" crc="af861101" sha1="49862c931d8abdf6590c15208128c56d89158c93" offset="0" />
+				<rom name="color sketch (1979)(apple computer).wav" size="4058668" crc="af861101" sha1="49862c931d8abdf6590c15208128c56d89158c93"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Supermath" />
 			<dataarea name="cass" size="4156716">
-				<rom name="supermath (1979)(apple computer).wav" size="4156716" crc="d49f1024" sha1="e951066dd8e3130cf2a6d466d7f05b2fb76a35ee" offset="0" />
+				<rom name="supermath (1979)(apple computer).wav" size="4156716" crc="d49f1024" sha1="e951066dd8e3130cf2a6d466d7f05b2fb76a35ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -691,7 +691,7 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Complex Mathematics" />
 			<dataarea name="cass" size="1499948">
-				<rom name="complex mathematics (1979)(hayden book company).wav" size="1499948" crc="a9219357" sha1="98db4682726d3945c5d9fccbfc6af3be02975a15" offset="0" />
+				<rom name="complex mathematics (1979)(hayden book company).wav" size="1499948" crc="a9219357" sha1="98db4682726d3945c5d9fccbfc6af3be02975a15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -705,7 +705,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Conflict 2500" />
 			<dataarea name="cass" size="4012332">
-				<rom name="conflict 2500 (1981)(microcomputer games).wav" size="4012332" crc="76931c59" sha1="9e227794c34604b5dae45f05bdf89a10cad1a426" offset="0" />
+				<rom name="conflict 2500 (1981)(microcomputer games).wav" size="4012332" crc="76931c59" sha1="9e227794c34604b5dae45f05bdf89a10cad1a426"/>
 			</dataarea>
 		</part>
 	</software>
@@ -718,13 +718,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Craps" />
 			<dataarea name="cass" size="3705900">
-				<rom name="craps (1979)(softape) side 1.wav" size="3705900" crc="1453953e" sha1="53f560ddffeabb16ff55b3c3145a33af53693422" offset="0" />
+				<rom name="craps (1979)(softape) side 1.wav" size="3705900" crc="1453953e" sha1="53f560ddffeabb16ff55b3c3145a33af53693422"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Bright Pen Craps" />
 			<dataarea name="cass" size="3719724">
-				<rom name="craps (1979)(softape) side 2.wav" size="3719724" crc="f9906e12" sha1="2a9b4f3f922f91417d610973e55e5099e8544c97" offset="0" />
+				<rom name="craps (1979)(softape) side 2.wav" size="3719724" crc="f9906e12" sha1="2a9b4f3f922f91417d610973e55e5099e8544c97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -737,7 +737,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Crazy Climber" />
 			<dataarea name="cass" size="17004588">
-				<rom name="crazy climber (19xx)(imagesoft).wav" size="17004588" crc="821add2b" sha1="e8d9265a7ae73e0171ce1995745f50e0d4cda294" offset="0" />
+				<rom name="crazy climber (19xx)(imagesoft).wav" size="17004588" crc="821add2b" sha1="e8d9265a7ae73e0171ce1995745f50e0d4cda294"/>
 			</dataarea>
 		</part>
 	</software>
@@ -750,7 +750,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Crazy Eights" />
 			<dataarea name="cass" size="3120684">
-				<rom name="crazy eights (1979)(softape).wav" size="3120684" crc="8e1e31b5" sha1="b81fbe4bbb50e465fc8801f7fcbffd5272078b7b" offset="0" />
+				<rom name="crazy eights (1979)(softape).wav" size="3120684" crc="8e1e31b5" sha1="b81fbe4bbb50e465fc8801f7fcbffd5272078b7b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -764,7 +764,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Cubik" />
 			<dataarea name="cass" size="4861228">
-				<rom name="cubik (1978)(powersoft, inc.).wav" size="4861228" crc="f2dea8fb" sha1="6a42d75220f3842e42d313705f9095f80b3b7d3b" offset="0" />
+				<rom name="cubik (1978)(powersoft, inc.).wav" size="4861228" crc="f2dea8fb" sha1="6a42d75220f3842e42d313705f9095f80b3b7d3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -777,7 +777,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Datestones of Ryn" />
 			<dataarea name="cass" size="3578924">
-				<rom name="datestones of ryn (1979)(automated simulations).wav" size="3578924" crc="6cc0785c" sha1="2b1db918c2a4fee1cb97e3ab888521fcacab13d2" offset="0" />
+				<rom name="datestones of ryn (1979)(automated simulations).wav" size="3578924" crc="6cc0785c" sha1="2b1db918c2a4fee1cb97e3ab888521fcacab13d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -791,13 +791,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Datamover" />
 			<dataarea name="cass" size="456748">
-				<rom name="datamover (1978)(apple computer).wav" size="456748" crc="2facd401" sha1="897d7b9e596067b3b9e2716e5bf7b46345d34822" offset="0" />
+				<rom name="datamover (1978)(apple computer).wav" size="456748" crc="2facd401" sha1="897d7b9e596067b3b9e2716e5bf7b46345d34822"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Telepong" />
 			<dataarea name="cass" size="1844268">
-				<rom name="telepong (1978)(apple computer).wav" size="1844268" crc="26f60636" sha1="b25301a352dc939fbe71c629ca56650e7da141d6" offset="0" />
+				<rom name="telepong (1978)(apple computer).wav" size="1844268" crc="26f60636" sha1="b25301a352dc939fbe71c629ca56650e7da141d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -811,7 +811,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Depth Charge" />
 			<dataarea name="cass" size="8130604">
-				<rom name="depth charge (1978)(programma international, inc.).wav" size="8130604" crc="a89b164c" sha1="4a8c8c183782c0a5730bd86b2a6f0b5eeb4be67d" offset="0" />
+				<rom name="depth charge (1978)(programma international, inc.).wav" size="8130604" crc="a89b164c" sha1="4a8c8c183782c0a5730bd86b2a6f0b5eeb4be67d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -824,7 +824,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Disk-O-Tape" />
 			<dataarea name="cass" size="3544108">
-				<rom name="disk-o-tape (1980)(dann mccreary).wav" size="3544108" crc="9e2db91a" sha1="00dc079bf5c3672d365ddfa3bd835db38246a1b1" offset="0" />
+				<rom name="disk-o-tape (1980)(dann mccreary).wav" size="3544108" crc="9e2db91a" sha1="00dc079bf5c3672d365ddfa3bd835db38246a1b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -838,7 +838,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Dnieper River Line" />
 			<dataarea name="cass" size="2866988">
-				<rom name="dnieper river line (1982)(microcomputer games).wav" size="2866988" crc="9d4619d4" sha1="c1df14711bc2bc623c1218f2bf09ac76c6c21fc2" offset="0" />
+				<rom name="dnieper river line (1982)(microcomputer games).wav" size="2866988" crc="9d4619d4" sha1="c1df14711bc2bc623c1218f2bf09ac76c6c21fc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -851,7 +851,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Don't Fall" />
 			<dataarea name="cass" size="4988972">
-				<rom name="don't fall (1980)(innerglo).wav" size="4988972" crc="ea4ec7e7" sha1="b46f78e4b143b1c17ed8828561140298115abba9" offset="0" />
+				<rom name="don't fall (1980)(innerglo).wav" size="4988972" crc="ea4ec7e7" sha1="b46f78e4b143b1c17ed8828561140298115abba9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -865,7 +865,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Echo" />
 			<dataarea name="cass" size="3164460">
-				<rom name="echo (1979)(programma international, inc.).wav" size="3164460" crc="390469d8" sha1="43de6482576a01d35acdcfce41e0034252f097eb" offset="0" />
+				<rom name="echo (1979)(programma international, inc.).wav" size="3164460" crc="390469d8" sha1="43de6482576a01d35acdcfce41e0034252f097eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -878,7 +878,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Electronic Index-Card File" />
 			<dataarea name="cass" size="1962284">
-				<rom name="electronic index-card file (1978)(softape).wav" size="1962284" crc="c01b1e82" sha1="d3d9278d4c95391213015a507c47b58d48f34331" offset="0" />
+				<rom name="electronic index-card file (1978)(softape).wav" size="1962284" crc="c01b1e82" sha1="d3d9278d4c95391213015a507c47b58d48f34331"/>
 			</dataarea>
 		</part>
 	</software>
@@ -891,7 +891,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Enchanted Island" />
 			<dataarea name="cass" size="7966252">
-				<rom name="enchanted island (1980)(mad hatter software).wav" size="7966252" crc="2b3f5363" sha1="df56727cad2e47c47af4e0bf767f55b3dda7c54e" offset="0" />
+				<rom name="enchanted island (1980)(mad hatter software).wav" size="7966252" crc="2b3f5363" sha1="df56727cad2e47c47af4e0bf767f55b3dda7c54e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -905,7 +905,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Engineering Mathematics 1" />
 			<dataarea name="cass" size="1662508">
-				<rom name="engineering mathematics 1 (1979)(hayden book company).wav" size="1662508" crc="602189da" sha1="93bd7fa7bcbdafd983029f3f9f7b58cfcf1d07cf" offset="0" />
+				<rom name="engineering mathematics 1 (1979)(hayden book company).wav" size="1662508" crc="602189da" sha1="93bd7fa7bcbdafd983029f3f9f7b58cfcf1d07cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -918,7 +918,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Escape" />
 			<dataarea name="cass" size="1820204">
-				<rom name="escape (1978)(muse).wav" size="1820204" crc="32d0793c" sha1="808250d5bee4b166d9cedf05ccb9aa97f2b958a4" offset="0" />
+				<rom name="escape (1978)(muse).wav" size="1820204" crc="32d0793c" sha1="808250d5bee4b166d9cedf05ccb9aa97f2b958a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -932,7 +932,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Fastgammon" />
 			<dataarea name="cass" size="5762680">
-				<rom name="fastgammon (1979)(quality software).wav" size="5762680" crc="1d8904fd" sha1="fe581fcb92c6619962bc07352000e2ca8406b214" offset="0" />
+				<rom name="fastgammon (1979)(quality software).wav" size="5762680" crc="1d8904fd" sha1="fe581fcb92c6619962bc07352000e2ca8406b214"/>
 			</dataarea>
 		</part>
 	</software>
@@ -946,7 +946,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Financial Wizard 2" />
 			<dataarea name="cass" size="3562540">
-				<rom name="financial wizard 2 (1978)(powersoft, inc.).wav" size="3562540" crc="9d7e8081" sha1="07c722bebc743e450cace67457184d137739dd94" offset="0" />
+				<rom name="financial wizard 2 (1978)(powersoft, inc.).wav" size="3562540" crc="9d7e8081" sha1="07c722bebc743e450cace67457184d137739dd94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -960,7 +960,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Financial Wizard 3" />
 			<dataarea name="cass" size="2872364">
-				<rom name="financial wizard 3 (1978)(powersoft, inc.).wav" size="2872364" crc="fe8ef8db" sha1="131cc20746206fba3f56f7bc176c017a79a81b63" offset="0" />
+				<rom name="financial wizard 3 (1978)(powersoft, inc.).wav" size="2872364" crc="fe8ef8db" sha1="131cc20746206fba3f56f7bc176c017a79a81b63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -974,7 +974,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Financial Wizard 4" />
 			<dataarea name="cass" size="2769964">
-				<rom name="financial wizard 4 (1978)(powersoft, inc.).wav" size="2769964" crc="e4e8ca2c" sha1="6b59f03fc57dc3786b1da0da32d228fc063fb153" offset="0" />
+				<rom name="financial wizard 4 (1978)(powersoft, inc.).wav" size="2769964" crc="e4e8ca2c" sha1="6b59f03fc57dc3786b1da0da32d228fc063fb153"/>
 			</dataarea>
 		</part>
 	</software>
@@ -988,13 +988,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Finance I" />
 			<dataarea name="cass" size="2721326">
-				<rom name="finance (1979)(apple computer).wav" size="2721326" crc="75bc99b2" sha1="ac6294eca74b899c9cc8ac105df1b1a38253ecbb" offset="0" />
+				<rom name="finance (1979)(apple computer).wav" size="2721326" crc="75bc99b2" sha1="ac6294eca74b899c9cc8ac105df1b1a38253ecbb"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Penny Arcade" />
 			<dataarea name="cass" size="3288108">
-				<rom name="penny arcade (1979)(apple computer).wav" size="3288108" crc="e2caf89c" sha1="f5d1e377bb84b37e05db6a9887a705e4aaf30cab" offset="0" />
+				<rom name="penny arcade (1979)(apple computer).wav" size="3288108" crc="e2caf89c" sha1="f5d1e377bb84b37e05db6a9887a705e4aaf30cab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1008,7 +1008,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Football Predictions" />
 			<dataarea name="cass" size="8885164">
-				<rom name="football predictions (1979)(programma international, inc.).wav" size="8885164" crc="3d6e1e46" sha1="34f2c1201133fefd8f786d706464c075c2b86023" offset="0" />
+				<rom name="football predictions (1979)(programma international, inc.).wav" size="8885164" crc="3d6e1e46" sha1="34f2c1201133fefd8f786d706464c075c2b86023"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1022,13 +1022,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Forte" />
 			<dataarea name="cass" size="2882604">
-				<rom name="forte (1979)(softape).wav" size="2882604" crc="8a397319" sha1="ca4d838645d0d3af8817bd375ebe4ecf0829a6c2" offset="0" />
+				<rom name="forte (1979)(softape).wav" size="2882604" crc="8a397319" sha1="ca4d838645d0d3af8817bd375ebe4ecf0829a6c2"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Forte Music" />
 			<dataarea name="cass" size="2872364">
-				<rom name="forte music (1979)(softape).wav" size="2872364" crc="50aaa2a6" sha1="f2ef9dd28676d424b7140044217d67ee3cc3b023" offset="0" />
+				<rom name="forte music (1979)(softape).wav" size="2872364" crc="50aaa2a6" sha1="f2ef9dd28676d424b7140044217d67ee3cc3b023"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1041,7 +1041,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Funpak I" />
 			<dataarea name="cass" size="7131802">
-				<rom name="funpak i (1978)(systems design lab).wav" size="7131802" crc="f99e45b4" sha1="ce355cd6f9306ccd25fb360689e2560d88a420b2" offset="0" />
+				<rom name="funpak i (1978)(systems design lab).wav" size="7131802" crc="f99e45b4" sha1="ce355cd6f9306ccd25fb360689e2560d88a420b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1054,7 +1054,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Galaxian" />
 			<dataarea name="cass" size="3840366">
-				<rom name="galaxian (19xx).wav" size="3840366" crc="71baf623" sha1="246e076f410ecad419ce84d92409f7fed76f2b17" offset="0" />
+				<rom name="galaxian (19xx).wav" size="3840366" crc="71baf623" sha1="246e076f410ecad419ce84d92409f7fed76f2b17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1068,7 +1068,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Galaxy" />
 			<dataarea name="cass" size="2049644">
-				<rom name="galaxy (1982)(microcomputer games).wav" size="2049644" crc="7a0b14b4" sha1="7241850c8d231079ca84ccda3bf3b5c71bc5560b" offset="0" />
+				<rom name="galaxy (1982)(microcomputer games).wav" size="2049644" crc="7a0b14b4" sha1="7241850c8d231079ca84ccda3bf3b5c71bc5560b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1081,7 +1081,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Galaxy Travel" />
 			<dataarea name="cass" size="3086124">
-				<rom name="galaxy travel (1980)(tsukumo original soft).wav" size="3086124" crc="3ed3e3d4" sha1="8dd4151f055234ac039e74219f1fb2fe9829afef" offset="0" />
+				<rom name="galaxy travel (1980)(tsukumo original soft).wav" size="3086124" crc="3ed3e3d4" sha1="8dd4151f055234ac039e74219f1fb2fe9829afef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1095,7 +1095,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Beginner's Guide 2" />
 			<dataarea name="cass" size="1500972">
-				<rom name="game playing with basic (tape 2)(1977)(hayden book company).wav" size="1500972" crc="761dd313" sha1="b380b03833f72887e8707ddcceaebc52b7c796c2" offset="0" />
+				<rom name="game playing with basic (tape 2)(1977)(hayden book company).wav" size="1500972" crc="761dd313" sha1="b380b03833f72887e8707ddcceaebc52b7c796c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1109,7 +1109,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Beginner's Guide 3" />
 			<dataarea name="cass" size="1954604">
-				<rom name="game playing with basic (tape 3)(1977)(hayden book company).wav" size="1954604" crc="457f9fa3" sha1="535fbf1e9b22170ee1502265a01453ebcadb432d" offset="0" />
+				<rom name="game playing with basic (tape 3)(1977)(hayden book company).wav" size="1954604" crc="457f9fa3" sha1="535fbf1e9b22170ee1502265a01453ebcadb432d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1123,7 +1123,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Gammon Gambler" />
 			<dataarea name="cass" size="6233132">
-				<rom name="gammon gambler 16k (1979)(personal software).wav" size="6233132" crc="92950545" sha1="841d6edbffc5babd2ce1e88a2f8d85a60f832dd0" offset="0" />
+				<rom name="gammon gambler 16k (1979)(personal software).wav" size="6233132" crc="92950545" sha1="841d6edbffc5babd2ce1e88a2f8d85a60f832dd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1136,7 +1136,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Global War" />
 			<dataarea name="cass" size="8757292">
-				<rom name="global war (1979)(muse).wav" size="8757292" crc="47305f47" sha1="5e64bff4aea29910c64d88fd6bbf28d4d440a7fd" offset="0" />
+				<rom name="global war (1979)(muse).wav" size="8757292" crc="47305f47" sha1="5e64bff4aea29910c64d88fd6bbf28d4d440a7fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1150,7 +1150,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Guns of Fort Defiance" />
 			<dataarea name="cass" size="4169460">
-				<rom name="guns of fort defiance (1981)(microcomputer games).wav" size="4169460" crc="d7da3839" sha1="677aa8eacdbfc69c6779e7cd844471aab424beb6" offset="0" />
+				<rom name="guns of fort defiance (1981)(microcomputer games).wav" size="4169460" crc="d7da3839" sha1="677aa8eacdbfc69c6779e7cd844471aab424beb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1164,7 +1164,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Haunted House" />
 			<dataarea name="cass" size="2004524">
-				<rom name="haunted house (1978)(creative computing).wav" size="2004524" crc="2d656631" sha1="24507a28ecbc059728f6d9f774d09c6cfff78fe7" offset="0" />
+				<rom name="haunted house (1978)(creative computing).wav" size="2004524" crc="2d656631" sha1="24507a28ecbc059728f6d9f774d09c6cfff78fe7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1178,7 +1178,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Hires Boxing" />
 			<dataarea name="cass" size="13711404">
-				<rom name="hires boxing (1979)(programma international, inc.).wav" size="13711404" crc="a565edf0" sha1="e7b2ea76b7cd1c8b6876bc5ef9b0f68a9109e735" offset="0" />
+				<rom name="hires boxing (1979)(programma international, inc.).wav" size="13711404" crc="a565edf0" sha1="e7b2ea76b7cd1c8b6876bc5ef9b0f68a9109e735"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1192,7 +1192,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="High Resolution Graphics" />
 			<dataarea name="cass" size="2788396">
-				<rom name="hi resolution graphics (1978)(apple computer).wav" size="2788396" crc="0f2afcb9" sha1="aa8fc667ee0ec4bd97c91f11486f9f1292d43d7e" offset="0" />
+				<rom name="hi resolution graphics (1978)(apple computer).wav" size="2788396" crc="0f2afcb9" sha1="aa8fc667ee0ec4bd97c91f11486f9f1292d43d7e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1205,7 +1205,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Highres Graphic Printer" />
 			<dataarea name="cass" size="2644780">
-				<rom name="hires graphic printer (1979)(systems design lab).wav" size="2644780" crc="59f0f006" sha1="1f1d1ca6389fcb797756adfcd5b4b6d9979f4e60" offset="0" />
+				<rom name="hires graphic printer (1979)(systems design lab).wav" size="2644780" crc="59f0f006" sha1="1f1d1ca6389fcb797756adfcd5b4b6d9979f4e60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1218,7 +1218,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Highres Playground" />
 			<dataarea name="cass" size="2646572">
-				<rom name="hires playground (1979)(systems design lab).wav" size="2646572" crc="272178d3" sha1="6f56e644c9d093dac663735aa35bbd94df1aeb52" offset="0" />
+				<rom name="hires playground (1979)(systems design lab).wav" size="2646572" crc="272178d3" sha1="6f56e644c9d093dac663735aa35bbd94df1aeb52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1232,13 +1232,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Hangman" />
 			<dataarea name="cass" size="1365000">
-				<rom name="hangman (1978)(apple computer).wav" size="1365000" crc="7cb17ef7" sha1="0f9f5c19ad9b29f660cafadbd07182e820dc0480" offset="0" />
+				<rom name="hangman (1978)(apple computer).wav" size="1365000" crc="7cb17ef7" sha1="0f9f5c19ad9b29f660cafadbd07182e820dc0480"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Color Math" />
 			<dataarea name="cass" size="1874220">
-				<rom name="color math (1978)(apple computer).wav" size="1874220" crc="8e6e9d4a" sha1="24a6f70ec9e79cc509fe16d97faba8e20ddac9ba" offset="0" />
+				<rom name="color math (1978)(apple computer).wav" size="1874220" crc="8e6e9d4a" sha1="24a6f70ec9e79cc509fe16d97faba8e20ddac9ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1252,13 +1252,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Hopalong Cassidy" />
 			<dataarea name="cass" size="4846636">
-				<rom name="hopalong cassidy (1979)(apple computer).wav" size="4846636" crc="f51cefd7" sha1="04241ab8698bf0cfc49fda9867b410ad784ab4a0" offset="0" />
+				<rom name="hopalong cassidy (1979)(apple computer).wav" size="4846636" crc="f51cefd7" sha1="04241ab8698bf0cfc49fda9867b410ad784ab4a0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Lemonade Stand" />
 			<dataarea name="cass" size="3955722">
-				<rom name="lemonade (1979)(apple computer).wav" size="3955722" crc="0e4ef59c" sha1="fb6c1dfd3293235583a29a770e7a2af50438d0cd" offset="0" />
+				<rom name="lemonade (1979)(apple computer).wav" size="3955722" crc="0e4ef59c" sha1="fb6c1dfd3293235583a29a770e7a2af50438d0cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1271,13 +1271,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="House of Seven Gables" />
 			<dataarea name="cass" size="11567148">
-				<rom name="house of seven gables (19xx)(compu-things).wav" size="11567148" crc="787ef3e3" sha1="09cb89e0801ac508d067831b1de6bbd26e1114d9" offset="0" />
+				<rom name="house of seven gables (19xx)(compu-things).wav" size="11567148" crc="787ef3e3" sha1="09cb89e0801ac508d067831b1de6bbd26e1114d9"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Journey to the Center of the Earth" />
 			<dataarea name="cass" size="9901100">
-				<rom name="journey to the center of the earth (19xx)(compu-things).wav" size="9901100" crc="35547dc7" sha1="084d1587c8dca12470b3c39e5a9d4f9cc1a7c32c" offset="0" />
+				<rom name="journey to the center of the earth (19xx)(compu-things).wav" size="9901100" crc="35547dc7" sha1="084d1587c8dca12470b3c39e5a9d4f9cc1a7c32c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1290,7 +1290,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="I Got Mine" />
 			<dataarea name="cass" size="1796652">
-				<rom name="i got mine (1978)(softape).wav" size="1796652" crc="77c458af" sha1="25e255bea9040f4b119825b03ac139fbc8b2f8e3" offset="0" />
+				<rom name="i got mine (1978)(softape).wav" size="1796652" crc="77c458af" sha1="25e255bea9040f4b119825b03ac139fbc8b2f8e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1303,7 +1303,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Journey to Atlantis" />
 			<dataarea name="cass" size="7323180">
-				<rom name="journey to atlantis (1979)(mad hatter software).wav" size="7323180" crc="dab7fd46" sha1="5782daccbb5f444485066777e57b8d75ca0622ab" offset="0" />
+				<rom name="journey to atlantis (1979)(mad hatter software).wav" size="7323180" crc="dab7fd46" sha1="5782daccbb5f444485066777e57b8d75ca0622ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1316,7 +1316,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Jupiter Express" />
 			<dataarea name="cass" size="1765164">
-				<rom name="jupiter express (1979)(softape).wav" size="1765164" crc="dfe28025" sha1="b9d95d9375dbb4ef33bdeb694313ab0fd36102dc" offset="0" />
+				<rom name="jupiter express (1979)(softape).wav" size="1765164" crc="dfe28025" sha1="b9d95d9375dbb4ef33bdeb694313ab0fd36102dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1331,7 +1331,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Kaleidoscope" />
 			<dataarea name="cass" size="4940844">
-				<rom name="kaleidoscope (1978)(programma international, inc.).wav" size="4940844" crc="b2378720" sha1="50d9abf67893f33272a7d1463f70bfd68454da5a" offset="0" />
+				<rom name="kaleidoscope (1978)(programma international, inc.).wav" size="4940844" crc="b2378720" sha1="50d9abf67893f33272a7d1463f70bfd68454da5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1345,7 +1345,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Lords of Karma" />
 			<dataarea name="cass" size="8095936">
-				<rom name="lords of karma (1980)(microcomputer games).wav" size="8095936" crc="295520d8" sha1="ddaf810d7c610da485620738a506fb0436319303" offset="0" />
+				<rom name="lords of karma (1980)(microcomputer games).wav" size="8095936" crc="295520d8" sha1="ddaf810d7c610da485620738a506fb0436319303"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1358,7 +1358,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Kidstuff" />
 			<dataarea name="cass" size="4413484">
-				<rom name="kidstuff (1978)(speakeasy software, ltd.).wav" size="4413484" crc="31e0ce94" sha1="78e160c894659d55ec99b8fb5c64df2b0614275d" offset="0" />
+				<rom name="kidstuff (1978)(speakeasy software, ltd.).wav" size="4413484" crc="31e0ce94" sha1="78e160c894659d55ec99b8fb5c64df2b0614275d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1372,7 +1372,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Laserblast" />
 			<dataarea name="cass" size="2503468">
-				<rom name="laserblast (1979)(programma international, inc.).wav" size="2503468" crc="71a0ef4e" sha1="50ae1828b05d695546c129d624e740ec17e3363b" offset="0" />
+				<rom name="laserblast (1979)(programma international, inc.).wav" size="2503468" crc="71a0ef4e" sha1="50ae1828b05d695546c129d624e740ec17e3363b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1385,13 +1385,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Learning BASIC part 1" />
 			<dataarea name="cass" size="9259564">
-				<rom name="learning basic pt. 1 (1980)(innerglo).wav" size="9259564" crc="fcb643ed" sha1="5c17d8f02659687e8063d520a47f77c94a83aa44" offset="0" />
+				<rom name="learning basic pt. 1 (1980)(innerglo).wav" size="9259564" crc="fcb643ed" sha1="5c17d8f02659687e8063d520a47f77c94a83aa44"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Learning BASIC part 2" />
 			<dataarea name="cass" size="8397868">
-				<rom name="learning basic pt. 2 (1980)(innerglo).wav" size="8397868" crc="9dff2410" sha1="0a7b2f32fc52c20f5ab7d904d2d9aaa8c8266681" offset="0" />
+				<rom name="learning basic pt. 2 (1980)(innerglo).wav" size="8397868" crc="9dff2410" sha1="0a7b2f32fc52c20f5ab7d904d2d9aaa8c8266681"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1404,7 +1404,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Learning BASIC part 3" />
 			<dataarea name="cass" size="9042988">
-				<rom name="learning basic pt. 3 (1980)(innerglo).wav" size="9042988" crc="8a9c9dbd" sha1="79651c8dd049dcb28f4d754c3dcc406a72282018" offset="0" />
+				<rom name="learning basic pt. 3 (1980)(innerglo).wav" size="9042988" crc="8a9c9dbd" sha1="79651c8dd049dcb28f4d754c3dcc406a72282018"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1418,13 +1418,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Leases" />
 			<dataarea name="cass" size="1874784">
-				<rom name="leases (1978)(apple computer).wav" size="1874784" crc="3dda6da2" sha1="042d146c5d1981ae8d7d7a0b010f53cd804137f3" offset="0" />
+				<rom name="leases (1978)(apple computer).wav" size="1874784" crc="3dda6da2" sha1="042d146c5d1981ae8d7d7a0b010f53cd804137f3"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Loans" />
 			<dataarea name="cass" size="2752556">
-				<rom name="loans (1978)(apple computer).wav" size="2752556" crc="1e771ac1" sha1="4c8c278c540128f34f442523fda1ad5f044ebf07" offset="0" />
+				<rom name="loans (1978)(apple computer).wav" size="2752556" crc="1e771ac1" sha1="4c8c278c540128f34f442523fda1ad5f044ebf07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1438,7 +1438,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Lunar Lander" />
 			<dataarea name="cass" size="4652332">
-				<rom name="lunar lander (1979)(programma international, inc.).wav" size="4652332" crc="7a6d6001" sha1="0191cb44d649d3fe6f122e14c9f84f13f13863d6" offset="0" />
+				<rom name="lunar lander (1979)(programma international, inc.).wav" size="4652332" crc="7a6d6001" sha1="0191cb44d649d3fe6f122e14c9f84f13f13863d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1451,7 +1451,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Lunar Lander" />
 			<dataarea name="cass" size="2448940">
-				<rom name="lunar lander ii (19xx)(sensible software).wav" size="2448940" crc="1088fc3e" sha1="e6b74783b1bb21086e13fd39f60ccb3711bce1f3" offset="0" />
+				<rom name="lunar lander ii (19xx)(sensible software).wav" size="2448940" crc="1088fc3e" sha1="e6b74783b1bb21086e13fd39f60ccb3711bce1f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1465,7 +1465,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Magic Squares" />
 			<dataarea name="cass" size="6194220">
-				<rom name="magic squares (1979)(programma international, inc.).wav" size="6194220" crc="9f9445ab" sha1="5c5e4108ea71fa013c511f487d41170fb52152a0" offset="0" />
+				<rom name="magic squares (1979)(programma international, inc.).wav" size="6194220" crc="9f9445ab" sha1="5c5e4108ea71fa013c511f487d41170fb52152a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1479,7 +1479,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Match Wits" />
 			<dataarea name="cass" size="4586540">
-				<rom name="match wits (1978)(programma international, inc.).wav" size="4586540" crc="fc57ef8f" sha1="545d34ed634d87326198e728b10cf72ae4744b88" offset="0" />
+				<rom name="match wits (1978)(programma international, inc.).wav" size="4586540" crc="fc57ef8f" sha1="545d34ed634d87326198e728b10cf72ae4744b88"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1492,7 +1492,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Maze Game" />
 			<dataarea name="cass" size="9117740">
-				<rom name="maze game (1978)(muse).wav" size="9117740" crc="613b7dc2" sha1="a838651a6f5b26d7715b7755a20542afe4459534" offset="0" />
+				<rom name="maze game (1978)(muse).wav" size="9117740" crc="613b7dc2" sha1="a838651a6f5b26d7715b7755a20542afe4459534"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1505,13 +1505,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Memory Builder 1 &amp; 2" />
 			<dataarea name="cass" size="4521260">
-				<rom name="memory builder (1978)(program design) side a.wav" size="4521260" crc="15211b88" sha1="49ffd89eea719bd99bb1ffa8221b511aefd5e973" offset="0" />
+				<rom name="memory builder (1978)(program design) side a.wav" size="4521260" crc="15211b88" sha1="49ffd89eea719bd99bb1ffa8221b511aefd5e973"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Memory Builder 3 &amp; 4" />
 			<dataarea name="cass" size="4507180">
-				<rom name="memory builder (1978)(program design) side b.wav" size="4507180" crc="9b994c4e" sha1="e564271c02fe61dfbf4cf7d55e0525acbc827de9" offset="0" />
+				<rom name="memory builder (1978)(program design) side b.wav" size="4507180" crc="9b994c4e" sha1="e564271c02fe61dfbf4cf7d55e0525acbc827de9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1524,7 +1524,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Memory Check" />
 			<dataarea name="cass" size="1313324">
-				<rom name="memory check (19xx)(tsukumo original soft).wav" size="1313324" crc="a65255a3" sha1="8532eaf984ad0677c288fc6e73f2eb75b7eb7a21" offset="0" />
+				<rom name="memory check (19xx)(tsukumo original soft).wav" size="1313324" crc="a65255a3" sha1="8532eaf984ad0677c288fc6e73f2eb75b7eb7a21"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1537,7 +1537,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Microchess 2.0" />
 			<dataarea name="cass" size="4349366">
-				<rom name="microchess 2.0 (1978)(personal software).wav" size="4349366" crc="3ae45b7c" sha1="d4431d88b8a81741076ded6e8f799c55e8cbcb40" offset="0" />
+				<rom name="microchess 2.0 (1978)(personal software).wav" size="4349366" crc="3ae45b7c" sha1="d4431d88b8a81741076ded6e8f799c55e8cbcb40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1550,7 +1550,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Microgammon 1.0" />
 			<dataarea name="cass" size="4144428">
-				<rom name="microgammon 1.0 (1979)(softape).wav" size="4144428" crc="1ec25dda" sha1="03ed6fdaaaf3f5d446ca8abf4cc843438b47eecd" offset="0" />
+				<rom name="microgammon 1.0 (1979)(softape).wav" size="4144428" crc="1ec25dda" sha1="03ed6fdaaaf3f5d446ca8abf4cc843438b47eecd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1564,7 +1564,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Micro Invaders" />
 			<dataarea name="cass" size="8362028">
-				<rom name="micro invaders (1979)(programma international, inc.).wav" size="8362028" crc="c3249f40" sha1="9d2e10fc677397513ac47a8a1c575f00a9c3aae5" offset="0" />
+				<rom name="micro invaders (1979)(programma international, inc.).wav" size="8362028" crc="c3249f40" sha1="9d2e10fc677397513ac47a8a1c575f00a9c3aae5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1577,7 +1577,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Microtrivia" />
 			<dataarea name="cass" size="3970604">
-				<rom name="microtrivia (1978)(speakeasy software, ltd.).wav" size="3970604" crc="fc99350f" sha1="519c23664ca1579523087af6d2a8df5fa63cf46e" offset="0" />
+				<rom name="microtrivia (1978)(speakeasy software, ltd.).wav" size="3970604" crc="fc99350f" sha1="519c23664ca1579523087af6d2a8df5fa63cf46e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1591,7 +1591,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Midway Campaign" />
 			<dataarea name="cass" size="4139402">
-				<rom name="midway campaign (1980)(microcomputer games).wav" size="4139402" crc="c7e71401" sha1="546e6d74dbcaaa16bda0f0cd59e7777abccb61b9" offset="0" />
+				<rom name="midway campaign (1980)(microcomputer games).wav" size="4139402" crc="c7e71401" sha1="546e6d74dbcaaa16bda0f0cd59e7777abccb61b9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1604,7 +1604,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Missile Command" />
 			<dataarea name="cass" size="16926764">
-				<rom name="missile command v1.2 (1981)(urban e. soft).wav" size="16926764" crc="beeb8d8e" sha1="d9db80ff2f68084791528fcb32de3c2971856971" offset="0" />
+				<rom name="missile command v1.2 (1981)(urban e. soft).wav" size="16926764" crc="beeb8d8e" sha1="d9db80ff2f68084791528fcb32de3c2971856971"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1617,25 +1617,25 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Don't Fall Instructions" />
 			<dataarea name="cass" size="9620780">
-				<rom name="don't fall (1978)(magnemedia) side 1.wav" size="9620780" crc="1b0df616" sha1="5aa84d7836646f2f1390ab2656a8e9574225f17e" offset="0" />
+				<rom name="don't fall (1978)(magnemedia) side 1.wav" size="9620780" crc="1b0df616" sha1="5aa84d7836646f2f1390ab2656a8e9574225f17e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Don't Fall" />
 			<dataarea name="cass" size="9638180">
-				<rom name="don't fall (1978)(magnemedia) side 2.wav" size="9638180" crc="58184e28" sha1="eaa3c20b87964fb12e02a380c4aea5f4690eb38f" offset="0" />
+				<rom name="don't fall (1978)(magnemedia) side 2.wav" size="9638180" crc="58184e28" sha1="eaa3c20b87964fb12e02a380c4aea5f4690eb38f"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="apple2_cass">
 			<feature name="part_id" value="Memory Aide Instructions" />
 			<dataarea name="cass" size="10155052">
-				<rom name="memory aide (1978)(magnemedia) side 1.wav" size="10155052" crc="e7508dc3" sha1="2ae7c390530a11d72b888a8db7ac7fcf6912a1f2" offset="0" />
+				<rom name="memory aide (1978)(magnemedia) side 1.wav" size="10155052" crc="e7508dc3" sha1="2ae7c390530a11d72b888a8db7ac7fcf6912a1f2"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="apple2_cass">
 			<feature name="part_id" value="Memory Aide" />
 			<dataarea name="cass" size="3049004">
-				<rom name="memory aide (1978)(magnemedia) side 2.wav" size="3049004" crc="187f3206" sha1="8ca43c5c014d8a11d1fc2818b83ec543adc5e62e" offset="0" />
+				<rom name="memory aide (1978)(magnemedia) side 2.wav" size="3049004" crc="187f3206" sha1="8ca43c5c014d8a11d1fc2818b83ec543adc5e62e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1648,25 +1648,25 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Grading Routine Instructions" />
 			<dataarea name="cass" size="9923116">
-				<rom name="grading routine (1978)(magnemedia) side 1.wav" size="9923116" crc="ea479acd" sha1="e0bc18700997ff7931866cd852d9b0884bb58a69" offset="0" />
+				<rom name="grading routine (1978)(magnemedia) side 1.wav" size="9923116" crc="ea479acd" sha1="e0bc18700997ff7931866cd852d9b0884bb58a69"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Grading Routine" />
 			<dataarea name="cass" size="8345428">
-				<rom name="grading routine (1978)(magnemedia) side 2.wav" size="8345428" crc="ac09bd7b" sha1="370105e2aa5c366f867da6d6db6441cdcf2ce8d9" offset="0" />
+				<rom name="grading routine (1978)(magnemedia) side 2.wav" size="8345428" crc="ac09bd7b" sha1="370105e2aa5c366f867da6d6db6441cdcf2ce8d9"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="apple2_cass">
 			<feature name="part_id" value="Drawing Instructions" />
 			<dataarea name="cass" size="11952172">
-				<rom name="drawing (1978)(magnemedia) side 1.wav" size="11952172" crc="ea3895cd" sha1="e7a10b85ace4c996afb2d6dc5a7c400e21b16d6e" offset="0" />
+				<rom name="drawing (1978)(magnemedia) side 1.wav" size="11952172" crc="ea3895cd" sha1="e7a10b85ace4c996afb2d6dc5a7c400e21b16d6e"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="apple2_cass">
 			<feature name="part_id" value="Drawing" />
 			<dataarea name="cass" size="2829356">
-				<rom name="drawing (1978)(magnemedia) side 2.wav" size="2829356" crc="ae916c6f" sha1="85c75d0db93129b03a66b59a187e0195b77ac37d" offset="0" />
+				<rom name="drawing (1978)(magnemedia) side 2.wav" size="2829356" crc="ae916c6f" sha1="85c75d0db93129b03a66b59a187e0195b77ac37d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1679,25 +1679,25 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Study Aide Instructions" />
 			<dataarea name="cass" size="15785516">
-				<rom name="study aide (1978)(magnemedia) side 1.wav" size="15785516" crc="3f48adfb" sha1="28c8adf67c9e11ba8c0dbd3cff113f468b9c1e46" offset="0" />
+				<rom name="study aide (1978)(magnemedia) side 1.wav" size="15785516" crc="3f48adfb" sha1="28c8adf67c9e11ba8c0dbd3cff113f468b9c1e46"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Study Aide" />
 			<dataarea name="cass" size="3820588">
-				<rom name="study aide (1978)(magnemedia) side 2.wav" size="3820588" crc="82713ffa" sha1="0018527632c0b25f313d63843148982aff3c6fa8" offset="0" />
+				<rom name="study aide (1978)(magnemedia) side 2.wav" size="3820588" crc="82713ffa" sha1="0018527632c0b25f313d63843148982aff3c6fa8"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="apple2_cass">
 			<feature name="part_id" value="Keyboard Organ Instructions" />
 			<dataarea name="cass" size="6019116">
-				<rom name="keyboard organ (1978)(magnemedia) side 1.wav" size="6019116" crc="7748c493" sha1="66fc048f6771abb6e4eb5f2f8485d1f382f40d07" offset="0" />
+				<rom name="keyboard organ (1978)(magnemedia) side 1.wav" size="6019116" crc="7748c493" sha1="66fc048f6771abb6e4eb5f2f8485d1f382f40d07"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="apple2_cass">
 			<feature name="part_id" value="Keyboard Organ" />
 			<dataarea name="cass" size="2855468">
-				<rom name="keyboard organ (1978)(magnemedia) side 2.wav" size="2855468" crc="a5efdaec" sha1="0e2de76e78a905ee7ed8afa5e8aa754881b1fba7" offset="0" />
+				<rom name="keyboard organ (1978)(magnemedia) side 2.wav" size="2855468" crc="a5efdaec" sha1="0e2de76e78a905ee7ed8afa5e8aa754881b1fba7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1710,25 +1710,25 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Supermath Instructions" />
 			<dataarea name="cass" size="10584108">
-				<rom name="supermath (1978)(magnemedia) side 1.wav" size="10584108" crc="22b7d1ab" sha1="2e40eb251e6b0dc36cb6e9b0f27fc6264d05221f" offset="0" />
+				<rom name="supermath (1978)(magnemedia) side 1.wav" size="10584108" crc="22b7d1ab" sha1="2e40eb251e6b0dc36cb6e9b0f27fc6264d05221f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Supermath" />
 			<dataarea name="cass" size="9308138">
-				<rom name="supermath (1978)(magnemedia) side 2.wav" size="9308138" crc="133d912d" sha1="edf76a0b723a3a98e8b42f053f29e4af2cfceb6b" offset="0" />
+				<rom name="supermath (1978)(magnemedia) side 2.wav" size="9308138" crc="133d912d" sha1="edf76a0b723a3a98e8b42f053f29e4af2cfceb6b"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="apple2_cass">
 			<feature name="part_id" value="True/False Quiz Instructions" />
 			<dataarea name="cass" size="6613036">
-				<rom name="true-false quiz (1978)(magnemedia) side 1.wav" size="6613036" crc="3d666eb5" sha1="aa7bd6c33d59f2b26378d8c7277e199c6fed9b8e" offset="0" />
+				<rom name="true-false quiz (1978)(magnemedia) side 1.wav" size="6613036" crc="3d666eb5" sha1="aa7bd6c33d59f2b26378d8c7277e199c6fed9b8e"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="apple2_cass">
 			<feature name="part_id" value="True/False Quiz" />
 			<dataarea name="cass" size="2866124">
-				<rom name="true-false quiz (1978)(magnemedia) side 2.wav" size="2866124" crc="8bed6234" sha1="935b0233c16c4bcfabb557abe144eb9620f4e3a5" offset="0" />
+				<rom name="true-false quiz (1978)(magnemedia) side 2.wav" size="2866124" crc="8bed6234" sha1="935b0233c16c4bcfabb557abe144eb9620f4e3a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1741,25 +1741,25 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Variable Message Instructions" />
 			<dataarea name="cass" size="19404332">
-				<rom name="variable message (1978)(magnemedia) side 1.wav" size="19404332" crc="59111af2" sha1="3a004ff39facb382433dd839b38ca000b792c561" offset="0" />
+				<rom name="variable message (1978)(magnemedia) side 1.wav" size="19404332" crc="59111af2" sha1="3a004ff39facb382433dd839b38ca000b792c561"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Variable Message" />
 			<dataarea name="cass" size="4535852">
-				<rom name="variable message (1978)(magnemedia) side 2.wav" size="4535852" crc="b67d01e3" sha1="06c65c4871b5800e4004d51f300383d4d1915044" offset="0" />
+				<rom name="variable message (1978)(magnemedia) side 2.wav" size="4535852" crc="b67d01e3" sha1="06c65c4871b5800e4004d51f300383d4d1915044"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="apple2_cass">
 			<feature name="part_id" value="Matching Quiz Instructions" />
 			<dataarea name="cass" size="17906220">
-				<rom name="matching quiz (1978)(magnemedia) side 1.wav" size="17906220" crc="17d0c259" sha1="727a893fd7c86fa26bbb908a3198559e3c79ff3d" offset="0" />
+				<rom name="matching quiz (1978)(magnemedia) side 1.wav" size="17906220" crc="17d0c259" sha1="727a893fd7c86fa26bbb908a3198559e3c79ff3d"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="apple2_cass">
 			<feature name="part_id" value="Matching Quiz" />
 			<dataarea name="cass" size="3326508">
-				<rom name="matching quiz (1978)(magnemedia) side 2.wav" size="3326508" crc="bc37814d" sha1="9c30bcb0d90d52aca3d53df4a6069dad2a6bd8f2" offset="0" />
+				<rom name="matching quiz (1978)(magnemedia) side 2.wav" size="3326508" crc="bc37814d" sha1="9c30bcb0d90d52aca3d53df4a6069dad2a6bd8f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1773,7 +1773,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 1: Advanced Dragon Maze, Digital Derby, Saucer War" />
 			<dataarea name="cass" size="4961324">
-				<rom name="module1 (1978)(softape).wav" size="4961324" crc="3098a7ba" sha1="12782e405ebbbeb3dd5a433155ff3315afe160fe" offset="0" />
+				<rom name="module1 (1978)(softape).wav" size="4961324" crc="3098a7ba" sha1="12782e405ebbbeb3dd5a433155ff3315afe160fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1787,7 +1787,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 2: 3-D plot, Etch-A-Sketch, Star" />
 			<dataarea name="cass" size="4898860">
-				<rom name="module1 (1978)(softape).wav" size="4898860" crc="9819fa9e" sha1="a53acf794a5ed198598a9fb602ba0d84f5c724c7" offset="0" />
+				<rom name="module1 (1978)(softape).wav" size="4898860" crc="9819fa9e" sha1="a53acf794a5ed198598a9fb602ba0d84f5c724c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1800,7 +1800,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 3: Othello, Mastermind, Seven" />
 			<dataarea name="cass" size="5348396">
-				<rom name="module3 (1978)(softape).wav" size="5348396" crc="219292cd" sha1="4b16db0e495e442a935a9dc7022f6f548d2c1930" offset="0" />
+				<rom name="module3 (1978)(softape).wav" size="5348396" crc="219292cd" sha1="4b16db0e495e442a935a9dc7022f6f548d2c1930"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1815,7 +1815,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 4: The Appelodian" />
 			<dataarea name="cass" size="5538860">
-				<rom name="module4 (1978)(softape).wav" size="5538860" crc="c4b0ea9e" sha1="d827ea9099b73d35db348601dac297399e751ea5" offset="0" />
+				<rom name="module4 (1978)(softape).wav" size="5538860" crc="c4b0ea9e" sha1="d827ea9099b73d35db348601dac297399e751ea5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1828,7 +1828,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 5: Awari, Towers of Hanoi, Hex-Pawn" />
 			<dataarea name="cass" size="5303340">
-				<rom name="module5 (1978)(softape).wav" size="5303340" crc="a54601f6" sha1="3b0d14c80aab86957af2afd4cf7d006aaaae65e0" offset="0" />
+				<rom name="module5 (1978)(softape).wav" size="5303340" crc="a54601f6" sha1="3b0d14c80aab86957af2afd4cf7d006aaaae65e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1841,7 +1841,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 6: Apple '21'" />
 			<dataarea name="cass" size="5631020">
-				<rom name="module6 (1978)(softape).wav" size="5631020" crc="58d9f0cc" sha1="ebf5d802bccd42543ca6805a4f2b8c23a62ab24e" offset="0" />
+				<rom name="module6 (1978)(softape).wav" size="5631020" crc="58d9f0cc" sha1="ebf5d802bccd42543ca6805a4f2b8c23a62ab24e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1854,7 +1854,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 7: Hyper-Life, 8 Color Demos" />
 			<dataarea name="cass" size="5633068">
-				<rom name="module7 (1978)(softape).wav" size="5633068" crc="c7eb8831" sha1="215b139b8262f69386c3cad3e35a21f1f1619951" offset="0" />
+				<rom name="module7 (1978)(softape).wav" size="5633068" crc="c7eb8831" sha1="215b139b8262f69386c3cad3e35a21f1f1619951"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1868,7 +1868,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 8: UFO, Clean Sweep/Pong Practice, Star Wars, Luner Lander" />
 			<dataarea name="cass" size="5624620">
-				<rom name="module8 (1978)(softape).wav" size="5624620" crc="532d4df6" sha1="988fb3b4ca3add0bac8018bc8223603c6b4dfc70" offset="0" />
+				<rom name="module8 (1978)(softape).wav" size="5624620" crc="532d4df6" sha1="988fb3b4ca3add0bac8018bc8223603c6b4dfc70"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1881,7 +1881,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Dunjonquest Morloc's Tower" />
 			<dataarea name="cass" size="8045612">
-				<rom name="morloc's tower (1979)(automated simulations).wav" size="8045612" crc="8d6b11f5" sha1="3f25d51e2416cf27aa98d5cca51d0b6b41e7393c" offset="0" />
+				<rom name="morloc's tower (1979)(automated simulations).wav" size="8045612" crc="8d6b11f5" sha1="3f25d51e2416cf27aa98d5cca51d0b6b41e7393c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1896,7 +1896,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Moto-Cross" />
 			<dataarea name="cass" size="2646828">
-				<rom name="moto-cross (1979)(programma international, inc.).wav" size="2646828" crc="2271e2d8" sha1="a12d1c9516f926e4f1ba10b8695ef25f301dfb87" offset="0" />
+				<rom name="moto-cross (1979)(programma international, inc.).wav" size="2646828" crc="2271e2d8" sha1="a12d1c9516f926e4f1ba10b8695ef25f301dfb87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1909,7 +1909,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Music Box" />
 			<dataarea name="cass" size="2036268">
-				<rom name="music box and kaleidoscope (1978)(muse).wav" size="2036268" crc="24e9b452" sha1="b16a9cbcf76bf179ff1edcac4c87babdb26345fd" offset="0" />
+				<rom name="music box and kaleidoscope (1978)(muse).wav" size="2036268" crc="24e9b452" sha1="b16a9cbcf76bf179ff1edcac4c87babdb26345fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1922,13 +1922,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Music Kaleidoscope" />
 			<dataarea name="cass" size="2955820">
-				<rom name="music kaleidoscope (1979)(softape) side 1.wav" size="2955820" crc="9ef30815" sha1="d4fe23e351110d4dd7930dfab0b10851357344dc" offset="0" />
+				<rom name="music kaleidoscope (1979)(softape) side 1.wav" size="2955820" crc="9ef30815" sha1="d4fe23e351110d4dd7930dfab0b10851357344dc"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Music Kaleidoscope" />
 			<dataarea name="cass" size="7469612">
-				<rom name="music kaleidoscope (1979)(softape) side 2.wav" size="7469612" crc="a5d03e48" sha1="81fb90cd5b30cd7fa8c6f169e6d234dd96b90656" offset="0" />
+				<rom name="music kaleidoscope (1979)(softape) side 2.wav" size="7469612" crc="a5d03e48" sha1="81fb90cd5b30cd7fa8c6f169e6d234dd96b90656"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1942,7 +1942,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="North Atlantic Convoy Raider" />
 			<dataarea name="cass" size="2596010">
-				<rom name="north atlantic convoy raider (1980)(microcomputer games).wav" size="2596010" crc="a6656a4b" sha1="51d69eba69fe9a22ad9d3e7c8ad4932b68320d96" offset="0" />
+				<rom name="north atlantic convoy raider (1980)(microcomputer games).wav" size="2596010" crc="a6656a4b" sha1="51d69eba69fe9a22ad9d3e7c8ad4932b68320d96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1956,7 +1956,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Oil Tycoon" />
 			<dataarea name="cass" size="6613036">
-				<rom name="oil tycoon (1980)(instant software).wav" size="6613036" crc="4b857dff" sha1="c07bc0489462f7c64fb6b81eb044be2b89509bde" offset="0" />
+				<rom name="oil tycoon (1980)(instant software).wav" size="6613036" crc="4b857dff" sha1="c07bc0489462f7c64fb6b81eb044be2b89509bde"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1969,7 +1969,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Othello" />
 			<dataarea name="cass" size="9419396">
-				<rom name="othello for apple v2.1 (1982)(hiroshi ohnishi).wav" size="9419396" crc="e0f75405" sha1="68d48f89cac396a96f12472aac47513657fe5a9a" offset="0" />
+				<rom name="othello for apple v2.1 (1982)(hiroshi ohnishi).wav" size="9419396" crc="e0f75405" sha1="68d48f89cac396a96f12472aac47513657fe5a9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1982,13 +1982,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Othello" />
 			<dataarea name="cass" size="4076588">
-				<rom name="othello (1979)(softape) side 1.wav" size="4076588" crc="55e45fe2" sha1="ffa69cefa9b0cbe3e3e583301b75f0eb5f0317e5" offset="0" />
+				<rom name="othello (1979)(softape) side 1.wav" size="4076588" crc="55e45fe2" sha1="ffa69cefa9b0cbe3e3e583301b75f0eb5f0317e5"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Othello" />
 			<dataarea name="cass" size="4403756">
-				<rom name="othello (1979)(softape) side 2.wav" size="4403756" crc="6b81866b" sha1="430b5c4ec8f93f9e21a5dd964f62abf3a525cb8c" offset="0" />
+				<rom name="othello (1979)(softape) side 2.wav" size="4403756" crc="6b81866b" sha1="430b5c4ec8f93f9e21a5dd964f62abf3a525cb8c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2001,7 +2001,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Patient Professor" />
 			<dataarea name="cass" size="9436716">
-				<rom name="patient professor 16k (1980)(innerglo).wav" size="9436716" crc="e526c7ee" sha1="73c81ad74e87cfa6abe047015046f6735b8d7c6a" offset="0" />
+				<rom name="patient professor 16k (1980)(innerglo).wav" size="9436716" crc="e526c7ee" sha1="73c81ad74e87cfa6abe047015046f6735b8d7c6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2014,7 +2014,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Patient Professor" />
 			<dataarea name="cass" size="13443116">
-				<rom name="patient professor 24k (1980)(innerglo).wav" size="13443116" crc="de69a3d6" sha1="3a2c58d144f62a6822fe5577f7326b6bc62681be" offset="0" />
+				<rom name="patient professor 24k (1980)(innerglo).wav" size="13443116" crc="de69a3d6" sha1="3a2c58d144f62a6822fe5577f7326b6bc62681be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2027,7 +2027,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Peg Jump" />
 			<dataarea name="cass" size="4906388">
-				<rom name="peg jump (1979)(programma international, inc.).wav" size="4906388" crc="340ace7f" sha1="f6486a5c9e7afa3aa68ea61943dd6f1e17ab222b" offset="0" />
+				<rom name="peg jump (1979)(programma international, inc.).wav" size="4906388" crc="340ace7f" sha1="f6486a5c9e7afa3aa68ea61943dd6f1e17ab222b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2041,7 +2041,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Phasor Zap" />
 			<dataarea name="cass" size="5661020">
-				<rom name="phasor zap (1978)(programma international, inc.).wav" size="5661020" crc="9dba7708" sha1="fb50074fd2670a8e72da8538c0b8fcf171062d66" offset="0" />
+				<rom name="phasor zap (1978)(programma international, inc.).wav" size="5661020" crc="9dba7708" sha1="fb50074fd2670a8e72da8538c0b8fcf171062d66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2055,13 +2055,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Pinball" />
 			<dataarea name="cass" size="5128556">
-				<rom name="pinball (1978)(apple computer).wav" size="5128556" crc="a6200da2" sha1="b7f0f5b3ada398a5f51fed60f1e0bf310a6aff1d" offset="0" />
+				<rom name="pinball (1978)(apple computer).wav" size="5128556" crc="a6200da2" sha1="b7f0f5b3ada398a5f51fed60f1e0bf310a6aff1d"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Infinite Number of Monkeys" />
 			<dataarea name="cass" size="8309954">
-				<rom name="infinite number of monkeys (1978)(apple computer).wav" size="8309954" crc="dcf0b9a5" sha1="e8f24ea5fb685ddac963eabc001c77b11f1f2e68" offset="0" />
+				<rom name="infinite number of monkeys (1978)(apple computer).wav" size="8309954" crc="dcf0b9a5" sha1="e8f24ea5fb685ddac963eabc001c77b11f1f2e68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2075,7 +2075,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Pirates!" />
 			<dataarea name="cass" size="5294124">
-				<rom name="pirates (1978)(programma international, inc.).wav" size="5294124" crc="400133d2" sha1="f8b3269b4995bfc113bdcef8d2a18683f6349e03" offset="0" />
+				<rom name="pirates (1978)(programma international, inc.).wav" size="5294124" crc="400133d2" sha1="f8b3269b4995bfc113bdcef8d2a18683f6349e03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2089,7 +2089,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Planet Miners" />
 			<dataarea name="cass" size="4165402">
-				<rom name="planet miners (1981)(microcomputer games).wav" size="4165402" crc="77e2ae4a" sha1="9949c63313b972c35e4147bd338bb8f3ab4cd006" offset="0" />
+				<rom name="planet miners (1981)(microcomputer games).wav" size="4165402" crc="77e2ae4a" sha1="9949c63313b972c35e4147bd338bb8f3ab4cd006"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2102,7 +2102,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Planetoids" />
 			<dataarea name="cass" size="4227450">
-				<rom name="planetoids (1981)(adventure international).wav" size="4227450" crc="48847252" sha1="d2ab268963de5cf4874d9a019d15df29b277d39c" offset="0" />
+				<rom name="planetoids (1981)(adventure international).wav" size="4227450" crc="48847252" sha1="d2ab268963de5cf4874d9a019d15df29b277d39c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2115,13 +2115,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Same and Different" />
 			<dataarea name="cass" size="6924332">
-				<rom name="preschool iq builder (1978)(program design, inc.) side 1.wav" size="6924332" crc="e29302ae" sha1="e99e8452651dee538fad6bf18bcba9a347c4c1a9" offset="0" />
+				<rom name="preschool iq builder (1978)(program design, inc.) side 1.wav" size="6924332" crc="e29302ae" sha1="e99e8452651dee538fad6bf18bcba9a347c4c1a9"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Letter Builder" />
 			<dataarea name="cass" size="720172">
-				<rom name="preschool iq builder (1978)(program design, inc.) side 2.wav" size="720172" crc="d1fe773c" sha1="896a0ea693c2753ea1180b27aaa8de47edf51ca1" offset="0" />
+				<rom name="preschool iq builder (1978)(program design, inc.) side 2.wav" size="720172" crc="d1fe773c" sha1="896a0ea693c2753ea1180b27aaa8de47edf51ca1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2134,7 +2134,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Quiz Baseball" />
 			<dataarea name="cass" size="8737324">
-				<rom name="quiz baseball (1980)(innerglo).wav" size="8737324" crc="79ef9506" sha1="88015870fa49e37ca9e49b8ef1f3d1ac8c0ed9d3" offset="0" />
+				<rom name="quiz baseball (1980)(innerglo).wav" size="8737324" crc="79ef9506" sha1="88015870fa49e37ca9e49b8ef1f3d1ac8c0ed9d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2147,13 +2147,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Racer" />
 			<dataarea name="cass" size="1743916">
-				<rom name="racer (1979)(softape) side 1.wav" size="1743916" crc="9fa3e14d" sha1="5a6239e82e28caf066b493807f7fbc45cd258ff1" offset="0" />
+				<rom name="racer (1979)(softape) side 1.wav" size="1743916" crc="9fa3e14d" sha1="5a6239e82e28caf066b493807f7fbc45cd258ff1"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Racer" />
 			<dataarea name="cass" size="2028076">
-				<rom name="racer (1979)(softape) side 2.wav" size="2028076" crc="6759ee32" sha1="19c9745ad458d7aed5007c3d008e84559b4d9a4c" offset="0" />
+				<rom name="racer (1979)(softape) side 2.wav" size="2028076" crc="6759ee32" sha1="19c9745ad458d7aed5007c3d008e84559b4d9a4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2167,7 +2167,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Radar Interceptor" />
 			<dataarea name="cass" size="10623600">
-				<rom name="radar interceptor (1979)(powersoft, inc.).wav" size="10623600" crc="d8fda7da" sha1="59b4a5c9cf2197c76214eed25e95504950517e96" offset="0" />
+				<rom name="radar interceptor (1979)(powersoft, inc.).wav" size="10623600" crc="d8fda7da" sha1="59b4a5c9cf2197c76214eed25e95504950517e96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2182,7 +2182,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="RAM Test" />
 			<dataarea name="cass" size="1430664">
-				<rom name="ramtest (1978)(apple computer).wav" size="1430664" crc="7360c3dc" sha1="129ab08814fba4c0c72bfcabf44ad0003932a70b" offset="0" />
+				<rom name="ramtest (1978)(apple computer).wav" size="1430664" crc="7360c3dc" sha1="129ab08814fba4c0c72bfcabf44ad0003932a70b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2195,7 +2195,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Raster Blaster" />
 			<dataarea name="cass" size="19201162">
-				<rom name="raster blaster (1981)(budgco).wav" size="19201162" crc="bddfb059" sha1="038c9152366b5c60b96344dcf765b01224ffe30c" offset="0" />
+				<rom name="raster blaster (1981)(budgco).wav" size="19201162" crc="bddfb059" sha1="038c9152366b5c60b96344dcf765b01224ffe30c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2208,7 +2208,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Renju" />
 			<dataarea name="cass" size="12820542">
-				<rom name="renju (1980)(tsukumo electronics).wav" size="12820542" crc="8b5596ab" sha1="99bb666d4f50f518c32ee60cef28dff93ce81beb" offset="0" />
+				<rom name="renju (1980)(tsukumo electronics).wav" size="12820542" crc="8b5596ab" sha1="99bb666d4f50f518c32ee60cef28dff93ce81beb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2221,7 +2221,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Retreat" />
 			<dataarea name="cass" size="5260494">
-				<rom name="retreat (1978)(programma international, inc.).wav" size="5260494" crc="9ecd8a40" sha1="807937205c3438e132269e78fbd68f32a4835df1" offset="0" />
+				<rom name="retreat (1978)(programma international, inc.).wav" size="5260494" crc="9ecd8a40" sha1="807937205c3438e132269e78fbd68f32a4835df1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2235,7 +2235,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Revive" />
 			<dataarea name="cass" size="944428">
-				<rom name="revive (1979)(hayden book company).wav" size="944428" crc="ccb029bc" sha1="c2e8a21d136af796c89a06b5a79cde1c0bce59d1" offset="0" />
+				<rom name="revive (1979)(hayden book company).wav" size="944428" crc="ccb029bc" sha1="c2e8a21d136af796c89a06b5a79cde1c0bce59d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2249,7 +2249,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Rocket Pilot" />
 			<dataarea name="cass" size="7916076">
-				<rom name="rocket pilot (1978)(powersoft, inc.).wav" size="7916076" crc="7e9cf6f3" sha1="ca9eb01983e78fbc9089577b0eb6a8dc5222c79f" offset="0" />
+				<rom name="rocket pilot (1978)(powersoft, inc.).wav" size="7916076" crc="7e9cf6f3" sha1="ca9eb01983e78fbc9089577b0eb6a8dc5222c79f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2262,13 +2262,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Road Race" />
 			<dataarea name="cass" size="6708268">
-				<rom name="roadrace (19xx)(wise owl workshop).wav" size="6708268" crc="b82630dc" sha1="5b638787cf33a0ba2e7125a3b587d3e5b21230e3" offset="0" />
+				<rom name="roadrace (19xx)(wise owl workshop).wav" size="6708268" crc="b82630dc" sha1="5b638787cf33a0ba2e7125a3b587d3e5b21230e3"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Saucer War" />
 			<dataarea name="cass" size="3786284">
-				<rom name="space war (19xx)(wise owl workshop).wav" size="3786284" crc="d4b079f7" sha1="e2b1922419e8b8f32c44b3e7a9093093f00b8ffc" offset="0" />
+				<rom name="space war (19xx)(wise owl workshop).wav" size="3786284" crc="d4b079f7" sha1="e2b1922419e8b8f32c44b3e7a9093093f00b8ffc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2281,7 +2281,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Roulette" />
 			<dataarea name="cass" size="3073068">
-				<rom name="roulette (1979)(softape).wav" size="3073068" crc="c48e3b35" sha1="a769e8ac5f7231a1873b97da8a00cc0da191fa3a" offset="0" />
+				<rom name="roulette (1979)(softape).wav" size="3073068" crc="c48e3b35" sha1="a769e8ac5f7231a1873b97da8a00cc0da191fa3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2295,13 +2295,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Sahara Warriors Commando" />
 			<dataarea name="cass" size="3418412">
-				<rom name="sahara warriors commando (1979)(instant software).wav" size="3418412" crc="fd14ef3c" sha1="19a62def42265359484a1801f4e7d8936901a16d" offset="0" />
+				<rom name="sahara warriors commando (1979)(instant software).wav" size="3418412" crc="fd14ef3c" sha1="19a62def42265359484a1801f4e7d8936901a16d"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="French Foreign Legion" />
 			<dataarea name="cass" size="3308076">
-				<rom name="sahara warriors french foreign legion (1979)(instant software).wav" size="3308076" crc="ff2965e8" sha1="a3424c0c1146b5b01f7d7d16652f8d887d08da8f" offset="0" />
+				<rom name="sahara warriors french foreign legion (1979)(instant software).wav" size="3308076" crc="ff2965e8" sha1="a3424c0c1146b5b01f7d7d16652f8d887d08da8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2315,7 +2315,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Sargon I" />
 			<dataarea name="cass" size="3535916">
-				<rom name="sargon i (1979)(hayden books company).wav" size="3535916" crc="d4a436b8" sha1="e9efdc3a3c6e0387257e7af89226b4be109b2be2" offset="0" />
+				<rom name="sargon i (1979)(hayden books company).wav" size="3535916" crc="d4a436b8" sha1="e9efdc3a3c6e0387257e7af89226b4be109b2be2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2329,7 +2329,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Sargon II" />
 			<dataarea name="cass" size="3978796">
-				<rom name="sargon ii (1979)(hayden books company).wav" size="3978796" crc="07779706" sha1="05d6b81337287d5141951ca4ee244fac64d57a16" offset="0" />
+				<rom name="sargon ii (1979)(hayden books company).wav" size="3978796" crc="07779706" sha1="05d6b81337287d5141951ca4ee244fac64d57a16"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2343,7 +2343,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Saucer Invasion" />
 			<dataarea name="cass" size="7673900">
-				<rom name="saucer invasion (1978)(powersoft, inc.).wav" size="7673900" crc="313aeed8" sha1="712f784f3ffa085bcf4633d5ae35469a68c5ed80" offset="0" />
+				<rom name="saucer invasion (1978)(powersoft, inc.).wav" size="7673900" crc="313aeed8" sha1="712f784f3ffa085bcf4633d5ae35469a68c5ed80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2357,13 +2357,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Savings" />
 			<dataarea name="cass" size="3288108">
-				<rom name="savings (1978)(apple computer).wav" size="3288108" crc="84f9d02a" sha1="350c0efa6abec4aac01d79933fae7cadaa978ebe" offset="0" />
+				<rom name="savings (1978)(apple computer).wav" size="3288108" crc="84f9d02a" sha1="350c0efa6abec4aac01d79933fae7cadaa978ebe"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Finance" />
 			<dataarea name="cass" size="3279916">
-				<rom name="finance (1978)(apple computer).wav" size="3279916" crc="37360e3d" sha1="d9eaec167a3ad69e449d4607c1a206effaea9fbf" offset="0" />
+				<rom name="finance (1978)(apple computer).wav" size="3279916" crc="37360e3d" sha1="d9eaec167a3ad69e449d4607c1a206effaea9fbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2376,7 +2376,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide Mar 1981" />
 			<dataarea name="cass" size="9112502">
-				<rom name="softside mar 1981 (1981)(softside).wav" size="9112502" crc="e6b9e964" sha1="4006ee029c1f52b4826a374bd7a97d390adb0648" offset="0" />
+				<rom name="softside mar 1981 (1981)(softside).wav" size="9112502" crc="e6b9e964" sha1="4006ee029c1f52b4826a374bd7a97d390adb0648"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2389,7 +2389,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide May 1981" />
 			<dataarea name="cass" size="5401388">
-				<rom name="softside may 1981 (1981)(softside).wav" size="5401388" crc="2f094a6f" sha1="56e82ec918add2cdd41e85670e43fd8bdd5bffbb" offset="0" />
+				<rom name="softside may 1981 (1981)(softside).wav" size="5401388" crc="2f094a6f" sha1="56e82ec918add2cdd41e85670e43fd8bdd5bffbb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2402,7 +2402,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide June 1981" />
 			<dataarea name="cass" size="4574764">
-				<rom name="softside june 1981 (1981)(softside).wav" size="4574764" crc="9eece719" sha1="ba935c3783bbb038856a7afd6dfacb6d5fa0f2dc" offset="0" />
+				<rom name="softside june 1981 (1981)(softside).wav" size="4574764" crc="9eece719" sha1="ba935c3783bbb038856a7afd6dfacb6d5fa0f2dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2415,7 +2415,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide July 1981" />
 			<dataarea name="cass" size="6104364">
-				<rom name="softside jul 1981 (1981)(softside).wav" size="6104364" crc="b2487dc2" sha1="b756b3b6740af14bbb798312ee4fcb5ccf2ae81f" offset="0" />
+				<rom name="softside jul 1981 (1981)(softside).wav" size="6104364" crc="b2487dc2" sha1="b756b3b6740af14bbb798312ee4fcb5ccf2ae81f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2428,7 +2428,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide August 1981" />
 			<dataarea name="cass" size="7275564">
-				<rom name="softside aug 1981 (1981)(softside).wav" size="7275564" crc="f3b26e1a" sha1="c8c1e18c2eedb12916ea960550bc89f1a28d6a6a" offset="0" />
+				<rom name="softside aug 1981 (1981)(softside).wav" size="7275564" crc="f3b26e1a" sha1="c8c1e18c2eedb12916ea960550bc89f1a28d6a6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2441,7 +2441,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide September 1981" />
 			<dataarea name="cass" size="5331244">
-				<rom name="softside sep 1981 (1981)(softside).wav" size="5331244" crc="c9d327dc" sha1="e9e06b885612dc051798f55c0268a3ceaae3357a" offset="0" />
+				<rom name="softside sep 1981 (1981)(softside).wav" size="5331244" crc="c9d327dc" sha1="e9e06b885612dc051798f55c0268a3ceaae3357a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2454,7 +2454,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide October 1981" />
 			<dataarea name="cass" size="2868780">
-				<rom name="softside oct 1981 (1981)(softside).wav" size="2868780" crc="9c2f08f0" sha1="bc22110a5c500fffaada03b88a6a00dddbf0798d" offset="0" />
+				<rom name="softside oct 1981 (1981)(softside).wav" size="2868780" crc="9c2f08f0" sha1="bc22110a5c500fffaada03b88a6a00dddbf0798d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2467,7 +2467,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide December 1981" />
 			<dataarea name="cass" size="4618284">
-				<rom name="softside dec 1981 (1981)(softside).wav" size="4618284" crc="956dcc21" sha1="a671cc9977683b6fb3b4602b34d82e96d6467d36" offset="0" />
+				<rom name="softside dec 1981 (1981)(softside).wav" size="4618284" crc="956dcc21" sha1="a671cc9977683b6fb3b4602b34d82e96d6467d36"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2480,7 +2480,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide January 1982" />
 			<dataarea name="cass" size="13446432">
-				<rom name="softside jan 1982 (1982)(softside).wav" size="13446432" crc="75591998" sha1="d75c7b20fb7c2636e0e09706b68c70a7e9a64c08" offset="0" />
+				<rom name="softside jan 1982 (1982)(softside).wav" size="13446432" crc="75591998" sha1="d75c7b20fb7c2636e0e09706b68c70a7e9a64c08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2493,7 +2493,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide May 1982" />
 			<dataarea name="cass" size="5369900">
-				<rom name="softside may 1982 (1982)(softside).wav" size="5369900" crc="fecbafe4" sha1="d22ddcf09fb9d2793c9227f7abcdcfab46031f93" offset="0" />
+				<rom name="softside may 1982 (1982)(softside).wav" size="5369900" crc="fecbafe4" sha1="d22ddcf09fb9d2793c9227f7abcdcfab46031f93"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2506,7 +2506,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide July 1982" />
 			<dataarea name="cass" size="5479212">
-				<rom name="softside jul 1982 (1982)(softside).wav" size="5479212" crc="4c4363e4" sha1="f3cd6557ed709c13555b0cc67091fdbf40026104" offset="0" />
+				<rom name="softside jul 1982 (1982)(softside).wav" size="5479212" crc="4c4363e4" sha1="f3cd6557ed709c13555b0cc67091fdbf40026104"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2519,7 +2519,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide July 1982 Computers in Education" />
 			<dataarea name="cass" size="3550764">
-				<rom name="softside jul 1982 computers in education (1982)(softside).wav" size="3550764" crc="6ae8be1c" sha1="b712888c96329b2c3c9a0c50b2bac98d4b784e5e" offset="0" />
+				<rom name="softside jul 1982 computers in education (1982)(softside).wav" size="3550764" crc="6ae8be1c" sha1="b712888c96329b2c3c9a0c50b2bac98d4b784e5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2533,7 +2533,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Songs in the Key of Apple" />
 			<dataarea name="cass" size="1653036">
-				<rom name="songs in the key of apple (1979)(hayden books company).wav" size="1653036" crc="8de54bc5" sha1="5a0d4843368fb7e1f4165125f43cec4c2b7910b4" offset="0" />
+				<rom name="songs in the key of apple (1979)(hayden books company).wav" size="1653036" crc="8de54bc5" sha1="5a0d4843368fb7e1f4165125f43cec4c2b7910b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2547,7 +2547,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Space Maze" />
 			<dataarea name="cass" size="7637548">
-				<rom name="space maze (1978)(powersoft, inc.).wav" size="7637548" crc="6c98e163" sha1="18105e7a3c06bcf6cac3baababb24cb8a8204e45" offset="0" />
+				<rom name="space maze (1978)(powersoft, inc.).wav" size="7637548" crc="6c98e163" sha1="18105e7a3c06bcf6cac3baababb24cb8a8204e45"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2561,7 +2561,7 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Space War" />
 			<dataarea name="cass" size="1437740">
-				<rom name="space wars (1979)(instant software).wav" size="1437740" crc="3bc0f44c" sha1="bdaffda302bde3c6cc97f9ff4e030164868220c8" offset="0" />
+				<rom name="space wars (1979)(instant software).wav" size="1437740" crc="3bc0f44c" sha1="bdaffda302bde3c6cc97f9ff4e030164868220c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2575,7 +2575,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Speedway" />
 			<dataarea name="cass" size="2460716">
-				<rom name="speedway (1979)(programma international, inc.).wav" size="2460716" crc="93e89693" sha1="5542418c1d0b6cf4ee33facf4df2c3f7ea24c5aa" offset="0" />
+				<rom name="speedway (1979)(programma international, inc.).wav" size="2460716" crc="93e89693" sha1="5542418c1d0b6cf4ee33facf4df2c3f7ea24c5aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2590,7 +2590,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Spider Tag" />
 			<dataarea name="cass" size="2875180">
-				<rom name="speedway (1979)(programma international, inc.).wav" size="2875180" crc="fd3828e6" sha1="6de7d0cec32fe7178b2bd1366945fbf74387fee3" offset="0" />
+				<rom name="speedway (1979)(programma international, inc.).wav" size="2875180" crc="fd3828e6" sha1="6de7d0cec32fe7178b2bd1366945fbf74387fee3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2603,7 +2603,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Star Blazer" />
 			<dataarea name="cass" size="3793196">
-				<rom name="star blazer (1982)(star craft).wav" size="3793196" crc="461b47f4" sha1="5dd90b8b88c2ec2e45ff182a6b5a672fa124d16e" offset="0" />
+				<rom name="star blazer (1982)(star craft).wav" size="3793196" crc="461b47f4" sha1="5dd90b8b88c2ec2e45ff182a6b5a672fa124d16e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2616,7 +2616,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Star Quest Rescue at Rigel" />
 			<dataarea name="cass" size="25599020">
-				<rom name="starquest - rescue at rigel (1980)(automated simulations).wav" size="25599020" crc="28e393bf" sha1="6a04bb7bb46b497e18aff7da90c10d281fe9920d" offset="0" />
+				<rom name="starquest - rescue at rigel (1980)(automated simulations).wav" size="25599020" crc="28e393bf" sha1="6a04bb7bb46b497e18aff7da90c10d281fe9920d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2630,7 +2630,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Star Wars" />
 			<dataarea name="cass" size="4311084">
-				<rom name="star war (1978)(powersoft, inc.).wav" size="4311084" crc="96b8e8e8" sha1="866042ecf0758372716964e2af61ece1466910f9" offset="0" />
+				<rom name="star war (1978)(powersoft, inc.).wav" size="4311084" crc="96b8e8e8" sha1="866042ecf0758372716964e2af61ece1466910f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2644,7 +2644,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Statistics" />
 			<dataarea name="cass" size="4048940">
-				<rom name="statistics (1979)(programma international, inc.).wav" size="4048940" crc="0c596cd3" sha1="5b4318bf6e1a817d1ba5a0dd3f14888a862696ca" offset="0" />
+				<rom name="statistics (1979)(programma international, inc.).wav" size="4048940" crc="0c596cd3" sha1="5b4318bf6e1a817d1ba5a0dd3f14888a862696ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2658,7 +2658,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Stocks &amp; Bonds" />
 			<dataarea name="cass" size="3417644">
-				<rom name="stocks &amp; bonds (1982)(microcomputer games).wav" size="3417644" crc="6d5ba93a" sha1="a423846a9a89456a363046e342e3205fbb676ce3" offset="0" />
+				<rom name="stocks &amp; bonds (1982)(microcomputer games).wav" size="3417644" crc="6d5ba93a" sha1="a423846a9a89456a363046e342e3205fbb676ce3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2671,13 +2671,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Story Builder" />
 			<dataarea name="cass" size="2804268">
-				<rom name="story builder (1978)(program design, inc.).wav" size="2804268" crc="0f426918" sha1="5e71e374f35f222c981daebf801f1069ace1b728" offset="0" />
+				<rom name="story builder (1978)(program design, inc.).wav" size="2804268" crc="0f426918" sha1="5e71e374f35f222c981daebf801f1069ace1b728"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Word Master" />
 			<dataarea name="cass" size="804140">
-				<rom name="word master (1978)(program design, inc.).wav" size="804140" crc="36b3c41c" sha1="e8880e7541d143ae18876cba2e9f3278e211ebe9" offset="0" />
+				<rom name="word master (1978)(program design, inc.).wav" size="804140" crc="36b3c41c" sha1="e8880e7541d143ae18876cba2e9f3278e211ebe9"/>
 			</dataarea>
 		</part>
 
@@ -2692,13 +2692,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Startrek" />
 			<dataarea name="cass" size="4134574">
-				<rom name="startrek (1978)(apple computer).wav" size="4134574" crc="7112bff5" sha1="279545abc5bf9b57dc79e7ea322df59b733803b0" offset="0" />
+				<rom name="startrek (1978)(apple computer).wav" size="4134574" crc="7112bff5" sha1="279545abc5bf9b57dc79e7ea322df59b733803b0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Starwars" />
 			<dataarea name="cass" size="2590032">
-				<rom name="starwars (1978)(apple computer).wav" size="2590032" crc="d2ea22a1" sha1="823ac3669a4b98fb7ca41f90db0d562c624d4904" offset="0" />
+				<rom name="starwars (1978)(apple computer).wav" size="2590032" crc="d2ea22a1" sha1="823ac3669a4b98fb7ca41f90db0d562c624d4904"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2711,13 +2711,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Study Aide Instructions" />
 			<dataarea name="cass" size="8520748">
-				<rom name="study aide audio instructions (1980)(innerglo).wav" size="8520748" crc="b8eceae1" sha1="a995249d2b62e7c23db4d165865715b609d01d73" offset="0" />
+				<rom name="study aide audio instructions (1980)(innerglo).wav" size="8520748" crc="b8eceae1" sha1="a995249d2b62e7c23db4d165865715b609d01d73"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Study Aide" />
 			<dataarea name="cass" size="4495404">
-				<rom name="study aide (1980)(innerglo).wav" size="4495404" crc="55430adf" sha1="ce138ee50b05741812f31f1e5a7965c9abb57145" offset="0" />
+				<rom name="study aide (1980)(innerglo).wav" size="4495404" crc="55430adf" sha1="ce138ee50b05741812f31f1e5a7965c9abb57145"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2730,7 +2730,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Super Arithmetica" />
 			<dataarea name="cass" size="9414188">
-				<rom name="super arithmetica 16k (1980)(innerglo).wav" size="9414188" crc="369dd377" sha1="e67edbd48e3480cb0d909a89eaf5a5dd98eb9da1" offset="0" />
+				<rom name="super arithmetica 16k (1980)(innerglo).wav" size="9414188" crc="369dd377" sha1="e67edbd48e3480cb0d909a89eaf5a5dd98eb9da1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2743,7 +2743,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Super Invader" />
 			<dataarea name="cass" size="15345708">
-				<rom name="super invader (1979)(tsukumo electronics).wav" size="15345708" crc="0a15c912" sha1="5d06f533fc5923232b7711cbbf954c26461ea340" offset="0" />
+				<rom name="super invader (1979)(tsukumo electronics).wav" size="15345708" crc="0a15c912" sha1="5d06f533fc5923232b7711cbbf954c26461ea340"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2758,7 +2758,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Super Othello" />
 			<dataarea name="cass" size="3218476">
-				<rom name="super othello (1979)(programma international, inc.).wav" size="3218476" crc="0542c3ca" sha1="6451dab37064e8568d9fa8f85730ff5346dd6d44" offset="0" />
+				<rom name="super othello (1979)(programma international, inc.).wav" size="3218476" crc="0542c3ca" sha1="6451dab37064e8568d9fa8f85730ff5346dd6d44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2773,7 +2773,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Super Starwars" />
 			<dataarea name="cass" size="7945260">
-				<rom name="super starwars (1978)(programma international, inc.).wav" size="7945260" crc="b4509301" sha1="bdb991e89f0fcbb415c0d800dbbd97a0dc2238b2" offset="0" />
+				<rom name="super starwars (1978)(programma international, inc.).wav" size="7945260" crc="b4509301" sha1="bdb991e89f0fcbb415c0d800dbbd97a0dc2238b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2786,7 +2786,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SuperMath" />
 			<dataarea name="cass" size="8937516">
-				<rom name="supermath 16k (1980)(innerglo).wav" size="8937516" crc="685a5fd5" sha1="7b2e058e5f9f09c28e3460e2ba4859c7624d7ef3" offset="0" />
+				<rom name="supermath 16k (1980)(innerglo).wav" size="8937516" crc="685a5fd5" sha1="7b2e058e5f9f09c28e3460e2ba4859c7624d7ef3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2799,7 +2799,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Sweet Talker" />
 			<dataarea name="cass" size="6821932">
-				<rom name="sweet talker (1981xx) (the micromint, inc.).wav" size="6821932" crc="eef50548" sha1="39aa445a40306113171e435557b6ba0dd24321cb" offset="0" />
+				<rom name="sweet talker (1981xx) (the micromint, inc.).wav" size="6821932" crc="eef50548" sha1="39aa445a40306113171e435557b6ba0dd24321cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2812,7 +2812,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Talking Calculator" />
 			<dataarea name="cass" size="4154412">
-				<rom name="bomber (1978)(softape).wav" size="4154412" crc="1225ffda" sha1="45e718c156d0765edf864a81e58d79ed9be6c5b8" offset="0" />
+				<rom name="bomber (1978)(softape).wav" size="4154412" crc="1225ffda" sha1="45e718c156d0765edf864a81e58d79ed9be6c5b8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2826,7 +2826,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Tanktics" />
 			<dataarea name="cass" size="3308844">
-				<rom name="tanktics (1981)(microcomputer games).wav" size="3308844" crc="ef614277" sha1="b7093cb9cdce008ec994657fd8f301757fee7330" offset="0" />
+				<rom name="tanktics (1981)(microcomputer games).wav" size="3308844" crc="ef614277" sha1="b7093cb9cdce008ec994657fd8f301757fee7330"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2839,7 +2839,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Tank War" />
 			<dataarea name="cass" size="3493676">
-				<rom name="tank war (1978)(muse).wav" size="3493676" crc="87b60d5a" sha1="17914f7d51b8f1489c98486235fbc0d43bbde669" offset="0" />
+				<rom name="tank war (1978)(muse).wav" size="3493676" crc="87b60d5a" sha1="17914f7d51b8f1489c98486235fbc0d43bbde669"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2853,13 +2853,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Tape Measure" />
 			<dataarea name="cass" size="5863468">
-				<rom name="tape measure (1979)(apple computer).wav" size="5863468" crc="195b6bb8" sha1="054eeddfd41176e0d9a1e33a1593202ec828c46f" offset="0" />
+				<rom name="tape measure (1979)(apple computer).wav" size="5863468" crc="195b6bb8" sha1="054eeddfd41176e0d9a1e33a1593202ec828c46f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Alignment Test Tone" />
 			<dataarea name="cass" size="5677100">
-				<rom name="alignment test tone (1979)(apple computer).wav" size="5677100" crc="4c8a1d5a" sha1="1907a04173c83c536a06699659142621f20558ab" offset="0" />
+				<rom name="alignment test tone (1979)(apple computer).wav" size="5677100" crc="4c8a1d5a" sha1="1907a04173c83c536a06699659142621f20558ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2872,13 +2872,13 @@
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Tic-Tac-Talker" />
 			<dataarea name="cass" size="5725228">
-				<rom name="tic-tac-talker (1978)(softape).wav" size="5725228" crc="47ff1faa" sha1="77baa051d6dfdc8b3287c41f2907e3aa0756d37f" offset="0" />
+				<rom name="tic-tac-talker (1978)(softape).wav" size="5725228" crc="47ff1faa" sha1="77baa051d6dfdc8b3287c41f2907e3aa0756d37f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
 			<feature name="part_id" value="Spectrum Analysis" />
 			<dataarea name="cass" size="1769516">
-				<rom name="spectrum analysis (1978)(softape).wav" size="1769516" crc="f728971a" sha1="281b8ee1096fc1017efbc1572fbb187f5a3082e0" offset="0" />
+				<rom name="spectrum analysis (1978)(softape).wav" size="1769516" crc="f728971a" sha1="281b8ee1096fc1017efbc1572fbb187f5a3082e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2892,7 +2892,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Time Clock" />
 			<dataarea name="cass" size="5442092">
-				<rom name="time clock (1978)(programma international, inc.).wav" size="5442092" crc="3c0aff4e" sha1="b01c36bf8b7b2527ea50cb18236f894bc3e7a1dd" offset="0" />
+				<rom name="time clock (1978)(programma international, inc.).wav" size="5442092" crc="3c0aff4e" sha1="b01c36bf8b7b2527ea50cb18236f894bc3e7a1dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2906,7 +2906,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Typing Tutor" />
 			<dataarea name="cass" size="1951788">
-				<rom name="typing tutor (1979)(microsoft).wav" size="1951788" crc="a7ab0476" sha1="94198c2b231ab1d2a5dd1039832a5ad96eb39997" offset="0" />
+				<rom name="typing tutor (1979)(microsoft).wav" size="1951788" crc="a7ab0476" sha1="94198c2b231ab1d2a5dd1039832a5ad96eb39997"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2919,7 +2919,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="U-Draw" />
 			<dataarea name="cass" size="5832876">
-				<rom name="udraw (1978)(muse).wav" size="5832876" crc="2e0fe9d2" sha1="ac1395a185445b51b34916215f43aa7fa64b868a" offset="0" />
+				<rom name="udraw (1978)(muse).wav" size="5832876" crc="2e0fe9d2" sha1="ac1395a185445b51b34916215f43aa7fa64b868a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2933,7 +2933,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Voyager I" />
 			<dataarea name="cass" size="2204716">
-				<rom name="voyager i (1982)(microcomputer games).wav" size="2204716" crc="522ee148" sha1="eb0ed351a7479db800915f6eec6253b8acfcf129" offset="0" />
+				<rom name="voyager i (1982)(microcomputer games).wav" size="2204716" crc="522ee148" sha1="eb0ed351a7479db800915f6eec6253b8acfcf129"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2946,7 +2946,7 @@
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Warlords" />
 			<dataarea name="cass" size="3660844">
-				<rom name="warlords (1978)(speakeasy software, ltd.).wav" size="3660844" crc="f83b589f" sha1="8e15d938c62383d64f443f1ea64a77dbe2272818" offset="0" />
+				<rom name="warlords (1978)(speakeasy software, ltd.).wav" size="3660844" crc="f83b589f" sha1="8e15d938c62383d64f443f1ea64a77dbe2272818"/>
 			</dataarea>
 		</part>
 	</software>

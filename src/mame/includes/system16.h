@@ -11,6 +11,7 @@
 #include "machine/segaic16.h"
 #include "sound/msm5205.h"
 #include "sound/upd7759.h"
+#include "tilemap.h"
 
 class segas1x_bootleg_state : public sega_16bit_common_base
 {
@@ -57,6 +58,7 @@ public:
 	void astormb2(machine_config &config);
 	void passsht4b(machine_config &config);
 	void wb3bb(machine_config &config);
+	void wb3bble(machine_config &config);
 	void shdancbl(machine_config &config);
 	void shinobi_datsu(machine_config &config);
 	void bayrouteb1(machine_config &config);
@@ -70,6 +72,7 @@ public:
 
 	void init_passsht();
 	void init_wb3bbl();
+	void init_wb3bble();
 	void init_fpointbl();
 	void init_eswatbl();
 	void init_astormbl();
@@ -120,6 +123,7 @@ private:
 	DECLARE_WRITE16_MEMBER(eswat_tilebank0_w);
 	DECLARE_WRITE16_MEMBER(altbeastbl_gfx_w);
 	DECLARE_READ16_MEMBER(beautyb_unkx_r);
+	DECLARE_WRITE16_MEMBER(wb3bble_refreshenable_w);
 	DECLARE_WRITE16_MEMBER(sys18_refreshenable_w);
 	DECLARE_WRITE16_MEMBER(sys18_tilebank_w);
 	DECLARE_READ8_MEMBER(system18_bank_r);
@@ -204,6 +208,8 @@ private:
 	void tturfbl_sound_io_map(address_map &map);
 	void tturfbl_sound_map(address_map &map);
 	void wb3bbl_map(address_map &map);
+	void wb3bble_map(address_map &map);
+	void wb3bble_decrypted_opcodes_map(address_map &map);
 
 	virtual void machine_start() override { m_leds.resolve(); }
 

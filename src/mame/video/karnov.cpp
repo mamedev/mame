@@ -22,7 +22,7 @@ uint32_t karnov_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_bg_tilemap->set_scrollx(m_scroll[0]);
 	m_bg_tilemap->set_scrolly(m_scroll[1]);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x800, 0);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spriteram->buffer(), 0x800);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

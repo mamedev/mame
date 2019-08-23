@@ -65,8 +65,8 @@
 #include "machine/z80scc.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "machine/dec_lk201.h"
 #include "machine/am79c90.h"
 #include "machine/dc7085.h"
@@ -531,9 +531,7 @@ void decstation_state::threemin_map(address_map &map)
 
 void decstation_state::ncr5394(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
+	downcast<ncr53c94_device *>(device)->set_clock(10000000);
 }
 
 static void dec_scsi_devices(device_slot_interface &device)

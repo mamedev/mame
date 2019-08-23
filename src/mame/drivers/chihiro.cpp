@@ -65,7 +65,7 @@ GD build date
 |*| 20070217 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  | 317-0457-JPN |
 |*| 20070525 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  | 317-0457-JPN |
 | | 200?     | Sega Network Taisen Mahjong MJ 3 Evo Test Ver      | Sega                     | GDROM  | GDX-0022   |              |
-| | 200?     | Firmware Update For MJ 3 Evo                       | Sega                     | GDROM  | GDX-0023   |              |
+|*| 20061222 | Mahjong MJ 3 Evolution Firmware Update             | Sega                     | GDROM  | GDX-0023   | 317-0457-JPN |
 | | 2009     | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
 |*| 20090331 | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
 |*| 20030226 | Chihiro Change Region GD USA                       | Sega                     | GDROM  | 611-0028A  | 317-0351-EXP |
@@ -76,7 +76,7 @@ GD build date
 |*| 2005     | Sangokushi Taisen                                  | Sega                     | DVDROM | CDV-10022  |              |
 |*| 2006     | Sangokushi Taisen 2 Firmware Update                | Sega                     | DVDROM | CDV-10023  |              |
 |*| 2006     | Mobile Suit Gundam 0079 Card Builder Ver.2.02      | Banpresto                | DVDROM | CDV-10024B | 317-0415-JPN |
-|*| 2006     | Sangokushi Taisen 2                                | Sega                     | DVDROM | CDV-10029  |              |
+|*| 2006     | Sangokushi Taisen 2 Ver.2.100                      | Sega                     | DVDROM | CDV-10029  |              |
 |*| 2007     | Mobile Suit Gundam 0083 Card Builder               | Banpresto                | DVDROM | CDV-10030  | 317-0484-JPN |
 |*| 2008     | Sangokushi Taisen 3                                | Sega                     | DVDROM | CDV-10036  |              |
 |*| 2008     | Sangokushi Taisen 3 Ver.J                          | Sega                     | DVDROM | CDV-10036J |              |
@@ -86,31 +86,78 @@ GD build date
 +-+----------+----------------------------------------------------+--------------------------+--------+------------+--------------+
 * denotes these games are archived.
 
-   Year   Game (Unknown media)                                Manufacturer
-+-+-----------------------------------------------------------+------------+
-| | 2004 | Quest Of D                                         | Sega       |
-| | 2004 | Quest Of D (Ver.1.02)                              | Sega       |
-| | 2004 | Quest Of D (Ver.1.10)                              | Sega       |
-| | 2004 | Quest Of D (Ver.1.10a)                             | Sega       |
-| | 2005 | Quest Of D (Ver.1.20)                              | Sega       |
-| | 2005 | Quest Of D (Ver.1.20a)                             | Sega       |
-| | 2005 | Quest Of D (Ver.1.21)                              | Sega       |
-| | 2005 | Quest Of D: Gofu no Keisyousya (Ver.2.00)          | Sega       |
-| | 2005 | Quest Of D: Gofu no Keisyousya (Ver.2.01)          | Sega       |
-| | 2006 | Quest Of D: Gofu no Keisyousya (Ver.2.02b)         | Sega       |
-| | 2006 | Quest Of D: Oukoku no Syugosya (Ver.3.00)          | Sega       |
-| | 2006 | Quest Of D: Oukoku no Syugosya (Ver.3.01)          | Sega       |
-| | 2007 | Quest Of D: The Battle Kingdom (Ver.4.00)          | Sega       |
-| | 2008 | Quest Of D: The Battle Kingdom (Ver.4.00b)         | Sega       |
-| | 2008 | Quest Of D: The Battle Kingdom (Ver.4.00c)         | Sega       |
-| | 2008 | Quest Of D: The Battle Kingdom (Ver.4.01)          | Sega       |
-| | 2005 | Sangokushi Taisen (Ver.1.03)                       | Sega       |
-| | 2005 | Sangokushi Taisen (Ver.1.10)                       | Sega       |
-| | 2005 | Sangokushi Taisen (Ver.1.11)                       | Sega       |
-| | 2006 | Sangokushi Taisen (Ver.1.12)                       | Sega       |
-| | 2006 | Sangokushi Taisen 2 (Ver.2.01)                     | Sega       |
-| | 2005 | Sega Golf Club Network Pro Tour 2005               | Sega       |
-+-+------+----------------------------------------------------+------------+
+
+  Year   Game (Unknown media)                                  Manufacturer   Number
++-+-----------------------------------------------------------+------------+------------+
+| | 2004 | Quest Of D                                         | Sega       | CDV-10005  |
+| | 2004 | Quest Of D                                         | Sega       | CDV-10005A |
+| | 2004 | Quest Of D                                         | Sega       | CDV-10005B |
+| | 2004 | Quest Of D 1.01D                                   | Sega       | CDV-10005D |
+| | 2004 | Quest Of D 1.02                                    | Sega       | CDV-10005E |
+| | 2004 | Quest Of D Senko Habai                             | Sega       | CDV-10005P |
+| | 2004 | Quest Of D 1.10                                    | Sega       | CDV-10006  |
+| | 2004 | Quest Of D 1.10A                                   | Sega       | CDV-10006A |
+| | 200? | Sangokushi Taisen                                  | Sega       | CDV-10009  |
+| | 200? | Sangokushi Taisen 0.94                             | Sega       | CDV-10009A |
+| | 200? | Sangokushi Taisen 1.00                             | Sega       | CDV-10009B |
+| | 200? | Sangokushi Taisen 1.001                            | Sega       | CDV-10009C |
+| | 200? | Sangokushi Taisen 1.002                            | Sega       | CDV-10009E |
+| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009F |
+| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009G |
+| | 200? | Sangokushi Taisen 1.100                            | Sega       | CDV-10009H |
+| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009J |
+| | 200? | Sangokushi Taisen 1.100                            | Sega       | CDV-10009K |
+| | 200? | Sangokushi Taisen 1.110                            | Sega       | CDV-10009L |
+| | 200? | Sangokushi Taisen 1.120                            | Sega       | CDV-10009M |
+| | 200? | Sangokushi Taisen 1.120                            | Sega       | CDV-10009N |
+| | 200? | Sangokushi Taisen 1.100 (kakinhenkou)              | Sega       | CDV-10009P |
+| | 200? | Sangokushi Taisen 1.121                            | Sega       | CDV-10009Q |
+| | 200? | Sangokushi Taisen 1.122                            | Sega       | CDV-10009R |
+| | 200? | Mobile Suit Gundam 0079 Card Builder               | Banpresto  | CDV-10010A |
+| | 200? | Quest Of D 1.20                                    | Sega       | CDV-10012  |
+| | 200? | Quest Of D 1.20A                                   | Sega       | CDV-10012A |
+| | 200? | Sangokushi Taisen 1.00 (Asia)                      | Sega       | CDV-10014  |
+| | 200? | Sangokushi Taisen (Asia)                           | Sega       | CDV-10014B |
+| | 200? | Sangokushi Taisen (Asia)                           | Sega       | CDV-10014C |
+| | 200? | Quest Of D 1.21                                    | Sega       | CDV-10016  |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.00                | Sega       | CDV-10017  |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.01                | Sega       | CDV-10017A |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.02                | Sega       | CDV-10017B |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.02B               | Sega       | CDV-10017C |
+| | 200? | Quest Of D: Gofu no Keisyousya 2.02C               | Sega       | CDV-10017D |
+| | 200? | Sangokushi Taisen 2                                | Sega       | CDV-10019  |
+| | 200? | Sangokushi Taisen 2 2.010                          | Sega       | CDV-10019B |
+| | 200? | Mobile Suit Gundam 0079 Card Builder 2.00          | Banpresto  | CDV-10024  |
+| | 200? | Mobile Suit Gundam 0079 Card Builder 2.00          | Banpresto  | CDV-10024A |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.00                | Sega       | CDV-10026  |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.01                | Sega       | CDV-10026A |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.01A               | Sega       | CDV-10026B |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.01B               | Sega       | CDV-10026C |
+| | 200? | Quest Of D: Oukoku no Syugosya 3.02                | Sega       | CDV-10026D |
+| | 200? | Sangokushi Taisen 2                                | Sega       | CDV-10029A |
+| | 200? | Mobile Suit Gundam 0083 Card Builder               | Banpresto  | CDV-10030A |
+| | 200? | Sangokushi Taisen 2 (Asia)                         | Sega       | CDV-10032  |
+| | 200? | Sangokushi Taisen 2 (Asia)                         | Sega       | CDV-10032A |
+| | 200? | Sangokushi Taisen 2 (Asia) Check disc              | Sega       | CDV-10033  |
+| | 200? | Sangokushi Taisen 2 (Asia) Firmware update         | Sega       | CDV-10034  |
+| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035  |
+| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035A |
+| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035C |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036A |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036B |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036D |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036G |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036H |
+| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036K |
+| | 200? | Mobile Suit Gundam 0083 Card Builder 2.00          | Banpresto  | CDV-10037  |
+| | 200? | Mobile Suit Gundam 0083 Card Builder 2.02          | Banpresto  | CDV-10037A |
+| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038  |
+| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038A |
+| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038B |
+| | 200? | Sega Golf Club Network Pro Tour 2005 (DVD NMC TJP) | Sega       | CDV-10039  |
+| | 200? | Sangokushi Taisen 3 (Export)                       | Sega       | CDV-10040  |
+| | 200? | Sangokushi Taisen 3 (Export)                       | Sega       | CDV-10040A |
++-+------+----------------------------------------------------+------------+------------+
 
 A Chihiro system consists of several boards.
 The system is in 2 separate metal boxes that fit together to form one box.
@@ -382,6 +429,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 #include "machine/pci.h"
+#include "machine/idectrl.h"
 #include "includes/xbox_pci.h"
 #include "includes/xbox.h"
 
@@ -575,7 +623,7 @@ class chihiro_state : public xbox_base_state
 public:
 	chihiro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xbox_base_state(mconfig, type, tag)
-		, m_ide(*this, "ide")
+		, m_ide(*this, "ide1")
 		, m_dimmboard(*this, "rom_board")
 		, m_hack_index(-1)
 		, m_hack_counter(0)
@@ -1716,13 +1764,11 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 
 void chihiro_state::chihiro_map(address_map &map)
 {
-	xbox_base_map(map);
 	map(0xff000000, 0xff07ffff).rom().region("bios", 0).mirror(0x00f80000);
 }
 
 void chihiro_state::chihiro_map_io(address_map &map)
 {
-	xbox_base_map_io(map);
 	map(0x4000, 0x40ff).rw(FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
 }
 
@@ -1868,7 +1914,7 @@ void chihiro_state::chihiro_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chihiro_state::chihiro_map);
 	m_maincpu->set_addrmap(AS_IO, &chihiro_state::chihiro_map_io);
 
-	subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(ide_baseboard, nullptr, "bb", true);
+	subdevice<ide_controller_32_device>(":pci:09.0:ide1")->options(ide_baseboard, nullptr, "bb", true);
 
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
@@ -2306,6 +2352,16 @@ ROM_START( mj3evo )
 	ROM_LOAD( "317-0457-jpn.pic", 0x000000, 0x004000, CRC(650fcc94) SHA1(c88488900460fb3deecb3cf376fc043b10c020ef) )
 ROM_END
 
+ROM_START( mj3evoup )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0023", 0, SHA1(fd88b7abff4f0932ac650d103e52ac598e82e5fb) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0457-jpn.pic", 0x000000, 0x004000, CRC(650fcc94) SHA1(c88488900460fb3deecb3cf376fc043b10c020ef) )
+ROM_END
+
 /*
 Title             BOX GDROM CF-BOX FIRM
 Media ID          EB08
@@ -2553,7 +2609,7 @@ ROM_END
 /* 0021A */ GAME( 2007, mj3evoa,  mj3evo,    chihirogd,   chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) (GDX-0021A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0021B */ GAME( 2007, mj3evo,   chihiro,   chihirogd,   chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) (GDX-0021B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0022  Taisen Mahjong MJ 3 Evolution Test Version
-// 0023  Firmware Update For MJ 3 Evolution
+/* 0023  */ GAME( 2006, mj3evoup, chihiro,   chihirogd,   chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution Firmware Update (GDX-0023)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, chihiro_state, empty_init, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (4.01) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 

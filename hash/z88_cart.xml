@@ -14,7 +14,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="bounder.epr" size="32768" crc="41dd1410" sha1="b07e3aa43f0ccb2020a0de5ca1118a1c779ded8f" offset="0"/>
+				<rom name="bounder.epr" size="32768" crc="41dd1410" sha1="b07e3aa43f0ccb2020a0de5ca1118a1c779ded8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27,7 +27,33 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="camel.epr" size="32768" crc="376b8fb4" sha1="110389322f1e32db128001eee8e4a832a37370a2" offset="0"/>
+				<rom name="camel.epr" size="32768" crc="376b8fb4" sha1="110389322f1e32db128001eee8e4a832a37370a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="codecnt">
+		<description>Code Count</description>
+		<year>1990</year>
+		<publisher>Ranger Computers</publisher>
+		<info name="author" value="David Hampson"/>
+		<info name="usage" value="Requires 128K RAM internal or slot 1"/>
+		<part name="cart1" interface="z88_cart">
+			<feature name="slot" value="32krom"/>
+			<dataarea name="rom" size="32768">
+				<rom name="codecount.epr" size="32768" crc="ea80713d" sha1="51c8e4e5160fb1b1e8b1c6c35e52c92a50835617"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dataorg">
+		<description>Z88 Data Organiser</description>
+		<year>1989</year>
+		<publisher>Harvester Information Systems</publisher>
+		<part name="cart1" interface="z88_cart">
+			<feature name="slot" value="32krom"/>
+			<dataarea name="rom" size="32768">
+				<rom name="dataorg.epr" size="32768" crc="476d85ec" sha1="529fbcea89bac0f1fd2acda28506c7d40f6d8a12"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40,7 +66,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="demo.epr" size="32768" crc="1dbcbc08" sha1="91ca8ce56c09a8904caec6a60379a14323456b94" offset="0"/>
+				<rom name="demo.epr" size="32768" crc="1dbcbc08" sha1="91ca8ce56c09a8904caec6a60379a14323456b94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +80,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="dstar.epr" size="32768" crc="75ba018b" sha1="44459531af6307dbb13dd409e25d889f8e97293f" offset="0"/>
+				<rom name="dstar.epr" size="32768" crc="75ba018b" sha1="44459531af6307dbb13dd409e25d889f8e97293f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -66,13 +92,39 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="eazylink.epr" size="32768" crc="9a6a5136" sha1="e122c24d517dc6193075046d7051d7f6d14abafe" offset="0"/>
+				<rom name="eazylink.epr" size="32768" crc="9a6a5136" sha1="e122c24d517dc6193075046d7051d7f6d14abafe"/>
 			</dataarea>
 
 			<!-- Documentation in PipeDream format, should be copied into ram -->
 
 			<dataarea name="ram01" size="66536">
-				<rom name="eazylink.pdd" size="66536" crc="fb9364e8" sha1="00f531513ad0252b2a6a055556614b6a6e571042" offset="0"/>
+				<rom name="eazylink.pdd" size="66536" crc="fb9364e8" sha1="00f531513ad0252b2a6a055556614b6a6e571042"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epcopy">
+		<description>EP-Copy</description>
+		<year>1990</year>
+		<publisher>Ranger Computers</publisher>
+		<info name="author" value="David Hampson"/>
+		<part name="cart1" interface="z88_cart">
+			<feature name="slot" value="32krom"/>
+			<dataarea name="rom" size="32768">
+				<rom name="epcopy.epr" size="32768" crc="d4aa343f" sha1="5b26eb229f13e102db0e422ce16403c574ebd3b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eventcs">
+		<description>Event Control System</description>
+		<year>1989</year>
+		<publisher>Front Line Computers</publisher>
+		<info name="author" value="Thomas Nunns"/>
+		<part name="cart1" interface="z88_cart">
+			<feature name="slot" value="32krom"/>
+			<dataarea name="rom" size="32768">
+				<rom name="eventcs.epr" size="32768" crc="0be032c7" sha1="13661628fd85c45db57da118124c923992c511a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -80,11 +132,11 @@
 	<software name="examples">
 		<description>Examples</description>
 		<year>1988</year>
-		<publisher>Cambridge Computers</publisher>
+		<publisher>Cambridge Computer</publisher>
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="examples.epr" size="32768" crc="b48989a0" sha1="d8f6d7c7062bfc5ff9e5621b754a9ce0a0186a53" offset="0"/>
+				<rom name="examples.epr" size="32768" crc="b48989a0" sha1="d8f6d7c7062bfc5ff9e5621b754a9ce0a0186a53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,13 +148,13 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="flashstore.epr" size="32768" crc="0ea821c6" sha1="506e86435edcb97a1330715a8b4259f0250dc9bd" offset="0"/>
+				<rom name="flashstore.epr" size="32768" crc="0ea821c6" sha1="506e86435edcb97a1330715a8b4259f0250dc9bd"/>
 			</dataarea>
 
 			<!-- Documentation in PipeDream format, should be copied into ram -->
 
 			<dataarea name="ram01" size="7414">
-				<rom name="flash.pdd" size="7414" crc="25d438d8" sha1="bdcb7e9d9873defb452fa0fe5acb14b159e77dda" offset="0"/>
+				<rom name="flash.pdd" size="7414" crc="25d438d8" sha1="bdcb7e9d9873defb452fa0fe5acb14b159e77dda"/>
 			</dataarea>
 		</part>
 	</software>
@@ -114,7 +166,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="forever-201.epr" size="32768" crc="4357529d" sha1="c1a92c635fb3aa5d0a637116845355ab2111bdd7" offset="0"/>
+				<rom name="forever-201.epr" size="32768" crc="4357529d" sha1="c1a92c635fb3aa5d0a637116845355ab2111bdd7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -126,7 +178,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="forever-202.epr" size="32768" crc="49229fc3" sha1="3daf1a55f5a8a826110c8a677b641a8b21987040" offset="0"/>
+				<rom name="forever-202.epr" size="32768" crc="49229fc3" sha1="3daf1a55f5a8a826110c8a677b641a8b21987040"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,7 +192,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="jsw.epr" size="32768" crc="59af56f9" sha1="c63655406663324d08276262a5555c082e3a18a0" offset="0"/>
+				<rom name="jsw.epr" size="32768" crc="59af56f9" sha1="c63655406663324d08276262a5555c082e3a18a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -154,7 +206,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="lancelot.epr" size="32768" crc="65f70ea8" sha1="ec0d8a27f500583c02834f1c734f0fe4cc99c281" offset="0"/>
+				<rom name="lancelot.epr" size="32768" crc="65f70ea8" sha1="ec0d8a27f500583c02834f1c734f0fe4cc99c281"/>
 			</dataarea>
 		</part>
 	</software>
@@ -168,191 +220,191 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="lemmings.epr" size="32768" crc="06771b9c" sha1="21a082e253afe2d21986c51b9b19350ac0fd64a2" offset="0"/>
+				<rom name="lemmings.epr" size="32768" crc="06771b9c" sha1="21a082e253afe2d21986c51b9b19350ac0fd64a2"/>
 			</dataarea>
 
 			<!-- The following are the levels and should be stored in z88 memory on the default device/directory, you don't
 			        have to keep all 60 of them on the z88 just the ones you want to play and drag over more when required. -->
 
 			<dataarea name="ram01" size="2695">
-				<rom name="lemlevel.01" size="2695" crc="b3ddde7d" sha1="ac2a1d6cd5b121bc33d516bed0d9d4e37c74ece0" offset="0"/>
+				<rom name="lemlevel.01" size="2695" crc="b3ddde7d" sha1="ac2a1d6cd5b121bc33d516bed0d9d4e37c74ece0"/>
 			</dataarea>
 			<dataarea name="ram02" size="1264">
-				<rom name="lemlevel.02" size="1264" crc="9acb0d61" sha1="07f1565e14556c7ad4f3a710ec4ad74bcb6b1d6e" offset="0"/>
+				<rom name="lemlevel.02" size="1264" crc="9acb0d61" sha1="07f1565e14556c7ad4f3a710ec4ad74bcb6b1d6e"/>
 			</dataarea>
 			<dataarea name="ram03" size="949">
-				<rom name="lemlevel.03" size="949" crc="97c5f197" sha1="a88d5d97e97128f0191c2dfaddebc54807c79995" offset="0"/>
+				<rom name="lemlevel.03" size="949" crc="97c5f197" sha1="a88d5d97e97128f0191c2dfaddebc54807c79995"/>
 			</dataarea>
 			<dataarea name="ram04" size="1300">
-				<rom name="lemlevel.04" size="1300" crc="a6ef0651" sha1="493fd3459c9da346a544a7e5269b4141fbf8e273" offset="0"/>
+				<rom name="lemlevel.04" size="1300" crc="a6ef0651" sha1="493fd3459c9da346a544a7e5269b4141fbf8e273"/>
 			</dataarea>
 			<dataarea name="ram05" size="3360">
-				<rom name="lemlevel.05" size="3360" crc="ef2c7bd0" sha1="4257c7034b4196d5d9c256af5792a245e702cb59" offset="0"/>
+				<rom name="lemlevel.05" size="3360" crc="ef2c7bd0" sha1="4257c7034b4196d5d9c256af5792a245e702cb59"/>
 			</dataarea>
 			<dataarea name="ram06" size="1137">
-				<rom name="lemlevel.06" size="1137" crc="9ecc1501" sha1="80c153dbf80e376a7355fea9e8a491c44c294a78" offset="0"/>
+				<rom name="lemlevel.06" size="1137" crc="9ecc1501" sha1="80c153dbf80e376a7355fea9e8a491c44c294a78"/>
 			</dataarea>
 			<dataarea name="ram07" size="547">
-				<rom name="lemlevel.07" size="547" crc="de791a3a" sha1="7b4d35113c6f5cb1c36e83ba370c531aad136178" offset="0"/>
+				<rom name="lemlevel.07" size="547" crc="de791a3a" sha1="7b4d35113c6f5cb1c36e83ba370c531aad136178"/>
 			</dataarea>
 			<dataarea name="ram08" size="786">
-				<rom name="lemlevel.08" size="786" crc="ca7f11f3" sha1="febae65afcee09afaa656bc08cb72ea661c85655" offset="0"/>
+				<rom name="lemlevel.08" size="786" crc="ca7f11f3" sha1="febae65afcee09afaa656bc08cb72ea661c85655"/>
 			</dataarea>
 			<dataarea name="ram09" size="1344">
-				<rom name="lemlevel.09" size="1344" crc="2d5e3ae2" sha1="bed750c2df15972e6357ddcb780fce58054d132b" offset="0"/>
+				<rom name="lemlevel.09" size="1344" crc="2d5e3ae2" sha1="bed750c2df15972e6357ddcb780fce58054d132b"/>
 			</dataarea>
 			<dataarea name="ram10" size="2143">
-				<rom name="lemlevel.10" size="2143" crc="1cc1242b" sha1="54e06bd8883f4e6f4d024059ef0cc5d0d6dea0c6" offset="0"/>
+				<rom name="lemlevel.10" size="2143" crc="1cc1242b" sha1="54e06bd8883f4e6f4d024059ef0cc5d0d6dea0c6"/>
 			</dataarea>
 			<dataarea name="ram11" size="1574">
-				<rom name="lemlevel.11" size="1574" crc="a360bec6" sha1="c04a1cd8d9ca54a6b538990b58ea735cc1f3e75d" offset="0"/>
+				<rom name="lemlevel.11" size="1574" crc="a360bec6" sha1="c04a1cd8d9ca54a6b538990b58ea735cc1f3e75d"/>
 			</dataarea>
 			<dataarea name="ram12" size="756">
-				<rom name="lemlevel.12" size="756" crc="d61456bf" sha1="52f14b00cc6b41f6402bc6a8a5b6e29bd232cb81" offset="0"/>
+				<rom name="lemlevel.12" size="756" crc="d61456bf" sha1="52f14b00cc6b41f6402bc6a8a5b6e29bd232cb81"/>
 			</dataarea>
 			<dataarea name="ram13" size="1486">
-				<rom name="lemlevel.13" size="1486" crc="64e146c2" sha1="2f2f5ecf302a3d171625da00c7219ef44605ddec" offset="0"/>
+				<rom name="lemlevel.13" size="1486" crc="64e146c2" sha1="2f2f5ecf302a3d171625da00c7219ef44605ddec"/>
 			</dataarea>
 			<dataarea name="ram14" size="1211">
-				<rom name="lemlevel.14" size="1211" crc="dfb744f3" sha1="c24086d9f45a8513c082c2e2983b478d241d783a" offset="0"/>
+				<rom name="lemlevel.14" size="1211" crc="dfb744f3" sha1="c24086d9f45a8513c082c2e2983b478d241d783a"/>
 			</dataarea>
 			<dataarea name="ram15" size="670">
-				<rom name="lemlevel.15" size="670" crc="932ea5db" sha1="4a3fb9286aa45fb6d817ebca0dba3ddb7fa485e0" offset="0"/>
+				<rom name="lemlevel.15" size="670" crc="932ea5db" sha1="4a3fb9286aa45fb6d817ebca0dba3ddb7fa485e0"/>
 			</dataarea>
 			<dataarea name="ram16" size="1648">
-				<rom name="lemlevel.16" size="1648" crc="12504649" sha1="c0398faa968c7ed1b0d02fe04bd7a7dc6b5cf9b0" offset="0"/>
+				<rom name="lemlevel.16" size="1648" crc="12504649" sha1="c0398faa968c7ed1b0d02fe04bd7a7dc6b5cf9b0"/>
 			</dataarea>
 			<dataarea name="ram17" size="386">
-				<rom name="lemlevel.17" size="386" crc="135d006d" sha1="6caca1ea5dba6eaa4ec39e6df7c5f2649d535812" offset="0"/>
+				<rom name="lemlevel.17" size="386" crc="135d006d" sha1="6caca1ea5dba6eaa4ec39e6df7c5f2649d535812"/>
 			</dataarea>
 			<dataarea name="ram18" size="3031">
-				<rom name="lemlevel.18" size="3031" crc="a87ba9f1" sha1="9085f2328d0b24c55de79cf71de2c4edc41ab63e" offset="0"/>
+				<rom name="lemlevel.18" size="3031" crc="a87ba9f1" sha1="9085f2328d0b24c55de79cf71de2c4edc41ab63e"/>
 			</dataarea>
 			<dataarea name="ram19" size="2143">
-				<rom name="lemlevel.19" size="2143" crc="81487e05" sha1="fe7313e8d62dec3f975a6707737beab94b8a67d3" offset="0"/>
+				<rom name="lemlevel.19" size="2143" crc="81487e05" sha1="fe7313e8d62dec3f975a6707737beab94b8a67d3"/>
 			</dataarea>
 			<dataarea name="ram20" size="782">
-				<rom name="lemlevel.20" size="782" crc="60f1745e" sha1="95589e127baaade5e0ac550cd7061fde6b6a59ce" offset="0"/>
+				<rom name="lemlevel.20" size="782" crc="60f1745e" sha1="95589e127baaade5e0ac550cd7061fde6b6a59ce"/>
 			</dataarea>
 			<dataarea name="ram21" size="1124">
-				<rom name="lemlevel.21" size="1124" crc="ec9f8bec" sha1="30b0d9fd0cc92cfa426b547eb09eefca69627679" offset="0"/>
+				<rom name="lemlevel.21" size="1124" crc="ec9f8bec" sha1="30b0d9fd0cc92cfa426b547eb09eefca69627679"/>
 			</dataarea>
 			<dataarea name="ram22" size="1133">
-				<rom name="lemlevel.22" size="1133" crc="39e2663f" sha1="1789a5a136a3152729e3a15664d8ec2baf2f2c60" offset="0"/>
+				<rom name="lemlevel.22" size="1133" crc="39e2663f" sha1="1789a5a136a3152729e3a15664d8ec2baf2f2c60"/>
 			</dataarea>
 			<dataarea name="ram23" size="1647">
-				<rom name="lemlevel.23" size="1647" crc="691e3bcf" sha1="e96336bb39fde144368057b59598cba6603a509b" offset="0"/>
+				<rom name="lemlevel.23" size="1647" crc="691e3bcf" sha1="e96336bb39fde144368057b59598cba6603a509b"/>
 			</dataarea>
 			<dataarea name="ram24" size="2713">
-				<rom name="lemlevel.24" size="2713" crc="cf205e87" sha1="e16be38fc433ee1d6315f52235bef212fb475172" offset="0"/>
+				<rom name="lemlevel.24" size="2713" crc="cf205e87" sha1="e16be38fc433ee1d6315f52235bef212fb475172"/>
 			</dataarea>
 			<dataarea name="ram25" size="949">
-				<rom name="lemlevel.25" size="949" crc="680f9dd3" sha1="99ae5fec14e134c3d7793a7098048ec7227a3356" offset="0"/>
+				<rom name="lemlevel.25" size="949" crc="680f9dd3" sha1="99ae5fec14e134c3d7793a7098048ec7227a3356"/>
 			</dataarea>
 			<dataarea name="ram26" size="1152">
-				<rom name="lemlevel.26" size="1152" crc="ed862cdb" sha1="a7f43ca8e488f305855741e0c8658176abb58a60" offset="0"/>
+				<rom name="lemlevel.26" size="1152" crc="ed862cdb" sha1="a7f43ca8e488f305855741e0c8658176abb58a60"/>
 			</dataarea>
 			<dataarea name="ram27" size="551">
-				<rom name="lemlevel.27" size="551" crc="246dcf03" sha1="16f98a94d4c22d7aa6b0640add48dee497d0c0cc" offset="0"/>
+				<rom name="lemlevel.27" size="551" crc="246dcf03" sha1="16f98a94d4c22d7aa6b0640add48dee497d0c0cc"/>
 			</dataarea>
 			<dataarea name="ram28" size="3343">
-				<rom name="lemlevel.28" size="3343" crc="22b25807" sha1="dbe625d029d773c4ee663564086de518ba780f87" offset="0"/>
+				<rom name="lemlevel.28" size="3343" crc="22b25807" sha1="dbe625d029d773c4ee663564086de518ba780f87"/>
 			</dataarea>
 			<dataarea name="ram29" size="316">
-				<rom name="lemlevel.29" size="316" crc="3c15cb06" sha1="177f08de0f576426ffeccd1ec8510c039c64e1e2" offset="0"/>
+				<rom name="lemlevel.29" size="316" crc="3c15cb06" sha1="177f08de0f576426ffeccd1ec8510c039c64e1e2"/>
 			</dataarea>
 			<dataarea name="ram30" size="678">
-				<rom name="lemlevel.30" size="678" crc="c03cf107" sha1="ecd43cf2313dca99798dcf4d018303830298292c" offset="0"/>
+				<rom name="lemlevel.30" size="678" crc="c03cf107" sha1="ecd43cf2313dca99798dcf4d018303830298292c"/>
 			</dataarea>
 			<dataarea name="ram31" size="1364">
-				<rom name="lemlevel.31" size="1364" crc="782a956b" sha1="8d4575bfe27004be23cd0f97ff2e045e510ee3c1" offset="0"/>
+				<rom name="lemlevel.31" size="1364" crc="782a956b" sha1="8d4575bfe27004be23cd0f97ff2e045e510ee3c1"/>
 			</dataarea>
 			<dataarea name="ram32" size="1492">
-				<rom name="lemlevel.32" size="1492" crc="066b925a" sha1="b946f0d3dcdaf9f6df932ce0405fb317afbdd350" offset="0"/>
+				<rom name="lemlevel.32" size="1492" crc="066b925a" sha1="b946f0d3dcdaf9f6df932ce0405fb317afbdd350"/>
 			</dataarea>
 			<dataarea name="ram33" size="1011">
-				<rom name="lemlevel.33" size="1011" crc="1a1e2c85" sha1="b6bc9d5062ba45931d537e5de5ea3f4755ec1976" offset="0"/>
+				<rom name="lemlevel.33" size="1011" crc="1a1e2c85" sha1="b6bc9d5062ba45931d537e5de5ea3f4755ec1976"/>
 			</dataarea>
 			<dataarea name="ram34" size="79">
-				<rom name="lemlevel.34" size="79" crc="8222a1a9" sha1="84753cf72523c5c14e2d4ba51def7df6a49e4396" offset="0"/>
+				<rom name="lemlevel.34" size="79" crc="8222a1a9" sha1="84753cf72523c5c14e2d4ba51def7df6a49e4396"/>
 			</dataarea>
 			<dataarea name="ram35" size="771">
-				<rom name="lemlevel.35" size="771" crc="f17b1cf2" sha1="cbc4a1a0bbaead321c499702d8d409ea17078210" offset="0"/>
+				<rom name="lemlevel.35" size="771" crc="f17b1cf2" sha1="cbc4a1a0bbaead321c499702d8d409ea17078210"/>
 			</dataarea>
 			<dataarea name="ram36" size="761">
-				<rom name="lemlevel.36" size="761" crc="66e8bf56" sha1="b76055303c32fe4875d76bfcc3531cacb614897b" offset="0"/>
+				<rom name="lemlevel.36" size="761" crc="66e8bf56" sha1="b76055303c32fe4875d76bfcc3531cacb614897b"/>
 			</dataarea>
 			<dataarea name="ram37" size="939">
-				<rom name="lemlevel.37" size="939" crc="e419b2ab" sha1="37eff7eef1ffdba1f1c56af2c4bf0fe150131f3f" offset="0"/>
+				<rom name="lemlevel.37" size="939" crc="e419b2ab" sha1="37eff7eef1ffdba1f1c56af2c4bf0fe150131f3f"/>
 			</dataarea>
 			<dataarea name="ram38" size="304">
-				<rom name="lemlevel.38" size="304" crc="d3b22e83" sha1="b3908d77dea6f21cb029002e72df0583af9b9785" offset="0"/>
+				<rom name="lemlevel.38" size="304" crc="d3b22e83" sha1="b3908d77dea6f21cb029002e72df0583af9b9785"/>
 			</dataarea>
 			<dataarea name="ram39" size="781">
-				<rom name="lemlevel.39" size="781" crc="a1e273c1" sha1="93967790f166863c4c50d805ffce5c1c6967410e" offset="0"/>
+				<rom name="lemlevel.39" size="781" crc="a1e273c1" sha1="93967790f166863c4c50d805ffce5c1c6967410e"/>
 			</dataarea>
 			<dataarea name="ram40" size="528">
-				<rom name="lemlevel.40" size="528" crc="a6fba8e2" sha1="2c620c48691239228ea642a3acd42faf7b5df2fe" offset="0"/>
+				<rom name="lemlevel.40" size="528" crc="a6fba8e2" sha1="2c620c48691239228ea642a3acd42faf7b5df2fe"/>
 			</dataarea>
 			<dataarea name="ram41" size="810">
-				<rom name="lemlevel.41" size="810" crc="f3d9a278" sha1="d1f1c0f2ce1d02f77466b3f6231e65e6b5113e69" offset="0"/>
+				<rom name="lemlevel.41" size="810" crc="f3d9a278" sha1="d1f1c0f2ce1d02f77466b3f6231e65e6b5113e69"/>
 			</dataarea>
 			<dataarea name="ram42" size="1215">
-				<rom name="lemlevel.42" size="1215" crc="504e258a" sha1="70d141970993a9ef46ec7e3372d84cc0bc7d10ac" offset="0"/>
+				<rom name="lemlevel.42" size="1215" crc="504e258a" sha1="70d141970993a9ef46ec7e3372d84cc0bc7d10ac"/>
 			</dataarea>
 			<dataarea name="ram43" size="1519">
-				<rom name="lemlevel.43" size="1519" crc="cc9ec4e6" sha1="08ad46617ed72cd47b8eeb274cb24fcd1f2bda7b" offset="0"/>
+				<rom name="lemlevel.43" size="1519" crc="cc9ec4e6" sha1="08ad46617ed72cd47b8eeb274cb24fcd1f2bda7b"/>
 			</dataarea>
 			<dataarea name="ram44" size="385">
-				<rom name="lemlevel.44" size="385" crc="2396b11f" sha1="d44aa8027587b9031fc869af2613cc0c6194cca3" offset="0"/>
+				<rom name="lemlevel.44" size="385" crc="2396b11f" sha1="d44aa8027587b9031fc869af2613cc0c6194cca3"/>
 			</dataarea>
 			<dataarea name="ram45" size="1141">
-				<rom name="lemlevel.45" size="1141" crc="01a42d40" sha1="b0740f679d0882c8028899f7ce6e277b713a876f" offset="0"/>
+				<rom name="lemlevel.45" size="1141" crc="01a42d40" sha1="b0740f679d0882c8028899f7ce6e277b713a876f"/>
 			</dataarea>
 			<dataarea name="ram46" size="848">
-				<rom name="lemlevel.46" size="848" crc="2cd3c689" sha1="06dcf3fa202057df3a451b663cf92f6d7b3a65e9" offset="0"/>
+				<rom name="lemlevel.46" size="848" crc="2cd3c689" sha1="06dcf3fa202057df3a451b663cf92f6d7b3a65e9"/>
 			</dataarea>
 			<dataarea name="ram47" size="2178">
-				<rom name="lemlevel.47" size="2178" crc="3520dacd" sha1="783ef3270466d90693740c5f42a910578654a5d8" offset="0"/>
+				<rom name="lemlevel.47" size="2178" crc="3520dacd" sha1="783ef3270466d90693740c5f42a910578654a5d8"/>
 			</dataarea>
 			<dataarea name="ram48" size="1141">
-				<rom name="lemlevel.48" size="1141" crc="b20277f7" sha1="4ee2b45e5dfc4cb9ee03d9d664b718a5be5596c6" offset="0"/>
+				<rom name="lemlevel.48" size="1141" crc="b20277f7" sha1="4ee2b45e5dfc4cb9ee03d9d664b718a5be5596c6"/>
 			</dataarea>
 			<dataarea name="ram49" size="1376">
-				<rom name="lemlevel.49" size="1376" crc="bdfa540e" sha1="7ed1ceb6b86fba48f3b0cf2924c538a21898acd4" offset="0"/>
+				<rom name="lemlevel.49" size="1376" crc="bdfa540e" sha1="7ed1ceb6b86fba48f3b0cf2924c538a21898acd4"/>
 			</dataarea>
 			<dataarea name="ram50" size="725">
-				<rom name="lemlevel.50" size="725" crc="ce91c2a3" sha1="cb5dbef47d7797299e3d3eb6c2120a5c09664036" offset="0"/>
+				<rom name="lemlevel.50" size="725" crc="ce91c2a3" sha1="cb5dbef47d7797299e3d3eb6c2120a5c09664036"/>
 			</dataarea>
 			<dataarea name="ram51" size="502">
-				<rom name="lemlevel.51" size="502" crc="f4963e29" sha1="859655cf6f19bb53346c2dc2d0aff570c36f45af" offset="0"/>
+				<rom name="lemlevel.51" size="502" crc="f4963e29" sha1="859655cf6f19bb53346c2dc2d0aff570c36f45af"/>
 			</dataarea>
 			<dataarea name="ram52" size="678">
-				<rom name="lemlevel.52" size="678" crc="8511dd20" sha1="ba4a921c014814c7f55cde9a632a79c911369d4d" offset="0"/>
+				<rom name="lemlevel.52" size="678" crc="8511dd20" sha1="ba4a921c014814c7f55cde9a632a79c911369d4d"/>
 			</dataarea>
 			<dataarea name="ram53" size="940">
-				<rom name="lemlevel.53" size="940" crc="074d8749" sha1="bf555f0f886ed8cd0e76bb84c254a431604a1ddf" offset="0"/>
+				<rom name="lemlevel.53" size="940" crc="074d8749" sha1="bf555f0f886ed8cd0e76bb84c254a431604a1ddf"/>
 			</dataarea>
 			<dataarea name="ram54" size="1504">
-				<rom name="lemlevel.54" size="1504" crc="b151a7c8" sha1="6607ca0dd1620d41e7f9648004cc748f6e49156c" offset="0"/>
+				<rom name="lemlevel.54" size="1504" crc="b151a7c8" sha1="6607ca0dd1620d41e7f9648004cc748f6e49156c"/>
 			</dataarea>
 			<dataarea name="ram55" size="1173">
-				<rom name="lemlevel.55" size="1173" crc="08411240" sha1="43e339ad570ef522faebceabb4468ddf2a14b867" offset="0"/>
+				<rom name="lemlevel.55" size="1173" crc="08411240" sha1="43e339ad570ef522faebceabb4468ddf2a14b867"/>
 			</dataarea>
 			<dataarea name="ram56" size="572">
-				<rom name="lemlevel.56" size="572" crc="e6483b61" sha1="8baf006abcb365063f822538a399daf30cca6d70" offset="0"/>
+				<rom name="lemlevel.56" size="572" crc="e6483b61" sha1="8baf006abcb365063f822538a399daf30cca6d70"/>
 			</dataarea>
 			<dataarea name="ram57" size="482">
-				<rom name="lemlevel.57" size="482" crc="e7d9dc4b" sha1="c831d8e84912f38e95ca36e2d5d173f9d363d9a8" offset="0"/>
+				<rom name="lemlevel.57" size="482" crc="e7d9dc4b" sha1="c831d8e84912f38e95ca36e2d5d173f9d363d9a8"/>
 			</dataarea>
 			<dataarea name="ram58" size="1259">
-				<rom name="lemlevel.58" size="1259" crc="0c523ecc" sha1="f5d5c845e50c494b79795b0f453807550d679c24" offset="0"/>
+				<rom name="lemlevel.58" size="1259" crc="0c523ecc" sha1="f5d5c845e50c494b79795b0f453807550d679c24"/>
 			</dataarea>
 			<dataarea name="ram59" size="1036">
-				<rom name="lemlevel.59" size="1036" crc="7562ff75" sha1="9ce1bcfdbd46f105f382eae8482ba558069af4e0" offset="0"/>
+				<rom name="lemlevel.59" size="1036" crc="7562ff75" sha1="9ce1bcfdbd46f105f382eae8482ba558069af4e0"/>
 			</dataarea>
 			<dataarea name="ram60" size="1685">
-				<rom name="lemlevel.60" size="1685" crc="33cd99d4" sha1="a1f9cd1d90eaea3df2c171871bd0a91e44227d8a" offset="0"/>
+				<rom name="lemlevel.60" size="1685" crc="33cd99d4" sha1="a1f9cd1d90eaea3df2c171871bd0a91e44227d8a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -366,7 +418,19 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="mmz88.epr" size="32768" crc="ae50ad80" sha1="8f0cd8c63fe5a792f882e54a8fc4472a184c5f71" offset="0"/>
+				<rom name="mmz88.epr" size="32768" crc="ae50ad80" sha1="8f0cd8c63fe5a792f882e54a8fc4472a184c5f71"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pclink2">
+		<description>PC-Link II</description>
+		<year>1988</year>
+		<publisher>Cambridge Computer</publisher>
+		<part name="cart1" interface="z88_cart">
+			<feature name="slot" value="32krom"/>
+			<dataarea name="rom" size="16384">
+				<rom name="pclink2.epr" size="16384" crc="2a60c112" sha1="93eab6131dce9ff1a2d4e1292c46b620ff7efa3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -379,13 +443,13 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="pdrom.epr" size="32768" crc="1c05f986" sha1="42d58a25defc85ce494ecb0a4f6532c0a42c5bb7" offset="0"/>
+				<rom name="pdrom.epr" size="32768" crc="1c05f986" sha1="42d58a25defc85ce494ecb0a4f6532c0a42c5bb7"/>
 			</dataarea>
 
 			<!-- Demo image for use with Graphics application, should be copied into ram -->
 
 			<dataarea name="ram01" size="4102">
-				<rom name="demo.img" size="4102" crc="597001a1" sha1="62bc4967b1454d3e32bb157cf7a5bfff4b209bd5" offset="0"/>
+				<rom name="demo.img" size="4102" crc="597001a1" sha1="62bc4967b1454d3e32bb157cf7a5bfff4b209bd5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -398,7 +462,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="pyramid-std.epr" size="32768" crc="9441ea18" sha1="01785eceee7e24f2a82feb39f1ad8c05d6698060" offset="0"/>
+				<rom name="pyramid-std.epr" size="32768" crc="9441ea18" sha1="01785eceee7e24f2a82feb39f1ad8c05d6698060"/>
 			</dataarea>
 		</part>
 	</software>
@@ -410,7 +474,34 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="128krom"/>
 			<dataarea name="rom" size="131072">
-				<rom name="spellmaster.epr" size="131072" crc="ad0c407d" sha1="1e9d302989e8e98e963f99ce1ea5a634ed1c466e" offset="0"/>
+				<rom name="spellmaster.epr" size="131072" crc="ad0c407d" sha1="1e9d302989e8e98e963f99ce1ea5a634ed1c466e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stopwtch">
+		<description>Stop Watch</description>
+		<year>1989</year>
+		<publisher>Front Line Computers</publisher>
+		<info name="author" value="Thomas Nunns"/>
+		<part name="cart1" interface="z88_cart">
+			<feature name="slot" value="32krom"/>
+			<dataarea name="rom" size="32768">
+				<rom name="stopwatch.epr" size="32768" crc="e829cb38" sha1="7fca0e95027e3784cba02f03cd18082848814599"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tolltrak">
+		<description>Toll Tracker v2.0 (Demo)</description>
+		<year>1990</year>
+		<publisher>Fieldstar Marketing</publisher>
+		<info name="author" value="Dean McGaveston"/>
+		<info name="usage" value="Requires 128K RAM internal or slot 1"/>
+		<part name="cart1" interface="z88_cart">
+			<feature name="slot" value="32krom"/>
+			<dataarea name="rom" size="32768">
+				<rom name="tolltracker.epr" size="32768" crc="ec4da584" sha1="e82762383e4e7f36dfb52e2bd34ee891ff6e3a6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -422,7 +513,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="ugrom.epr" size="32768" crc="e5afab2d" sha1="ef3569d392d6f2d3a5d65855277a48caf8be911f" offset="0"/>
+				<rom name="ugrom.epr" size="32768" crc="e5afab2d" sha1="ef3569d392d6f2d3a5d65855277a48caf8be911f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +526,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="uutools.epr" size="32768" crc="1be795e5" sha1="e2822f6cdcaf1b12fe18c6f9005a5aeca14755c4" offset="0"/>
+				<rom name="uutools.epr" size="32768" crc="1be795e5" sha1="e2822f6cdcaf1b12fe18c6f9005a5aeca14755c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -448,7 +539,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="wn-std.epr" size="32768" crc="b6cc2ddc" sha1="ff86d271a62f1b4deb20f189bc5468a6bf94f12b" offset="0"/>
+				<rom name="wn-std.epr" size="32768" crc="b6cc2ddc" sha1="ff86d271a62f1b4deb20f189bc5468a6bf94f12b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -460,7 +551,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="128krom"/>
 			<dataarea name="rom" size="131072">
-				<rom name="wb.epr" size="131072" crc="0fdfbc10" sha1="a3c5071ef5bca492540acad2799fd8012b986737" offset="0"/>
+				<rom name="wb.epr" size="131072" crc="0fdfbc10" sha1="a3c5071ef5bca492540acad2799fd8012b986737"/>
 			</dataarea>
 		</part>
 	</software>
@@ -473,7 +564,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="zchess.epr" size="32768" crc="ecdc1600" sha1="b73dc7079c002672ff0bfa1f635d6a290fb65076" offset="0"/>
+				<rom name="zchess.epr" size="32768" crc="ecdc1600" sha1="b73dc7079c002672ff0bfa1f635d6a290fb65076"/>
 			</dataarea>
 		</part>
 	</software>
@@ -486,7 +577,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="zetriz.epr" size="32768" crc="98e9cfa0" sha1="bbcd5544ad077fee20a811c8372c1fb1a92358ff" offset="0"/>
+				<rom name="zetriz.epr" size="32768" crc="98e9cfa0" sha1="bbcd5544ad077fee20a811c8372c1fb1a92358ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -499,7 +590,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="ziputils.epr" size="32768" crc="9a6900f5" sha1="8229a1d5ce4ea5adcd2326f2bae4b64745f0427a" offset="0"/>
+				<rom name="ziputils.epr" size="32768" crc="9a6900f5" sha1="8229a1d5ce4ea5adcd2326f2bae4b64745f0427a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -512,7 +603,7 @@
 		<part name="cart1" interface="z88_cart">
 			<feature name="slot" value="32krom"/>
 			<dataarea name="rom" size="32768">
-				<rom name="zlab.epr" size="32768" crc="da0daf3c" sha1="f23ec71f49222f1285bd8a5c88457c22190c9928" offset="0"/>
+				<rom name="zlab.epr" size="32768" crc="da0daf3c" sha1="f23ec71f49222f1285bd8a5c88457c22190c9928"/>
 			</dataarea>
 		</part>
 	</software>

@@ -10,6 +10,7 @@
 #include "video/tecmo_mix.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class spbactn_state : public driver_device
 {

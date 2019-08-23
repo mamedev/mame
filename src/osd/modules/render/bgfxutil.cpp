@@ -31,9 +31,6 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(uint32_t f
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
 				copy_util::copyline_palette16(dst_line, src_line16, width, palette);
 				break;
-			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTEA16):
-				copy_util::copyline_palettea16(dst_line, src_line16, width, palette);
-				break;
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
 				copy_util::copyline_yuy16_to_argb(dst_line, src_line16, width, palette, 1);
 				break;

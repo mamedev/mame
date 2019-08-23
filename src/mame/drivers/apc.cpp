@@ -526,7 +526,7 @@ INPUT_CHANGED_MEMBER(apc_state::key_stroke)
 {
 	if(newval && !oldval)
 	{
-		m_keyb.data = (uint8_t)(uintptr_t)(param) & 0xff;
+		m_keyb.data = uint8_t(param & 0xff);
 		//m_keyb.status &= ~1;
 		m_i8259_m->ir4_w(1);
 	}

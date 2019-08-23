@@ -14,6 +14,7 @@
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class system1_state : public driver_device
 {
@@ -104,7 +105,6 @@ public:
 	void init_tokisens();
 	void init_bootsys2();
 	void init_bootsys2d();
-	void init_choplift();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);

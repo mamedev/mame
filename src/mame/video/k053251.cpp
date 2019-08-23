@@ -120,6 +120,7 @@ actually used, since the priority is taken from the external ports.
 #include "emu.h"
 #include "k053251.h"
 #include "konami_helper.h"
+#include "tilemap.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -179,7 +180,7 @@ void k053251_device::device_post_load()
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE8_MEMBER( k053251_device::write )
+void k053251_device::write(offs_t offset, u8 data)
 {
 	int i, newind;
 
@@ -223,18 +224,6 @@ WRITE8_MEMBER( k053251_device::write )
 	}
 }
 
-WRITE16_MEMBER( k053251_device::lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		write(space, offset, data & 0xff);
-}
-
-WRITE16_MEMBER( k053251_device::msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		write(space, offset, (data >> 8) & 0xff);
-}
-
 int k053251_device::get_priority( int ci )
 {
 	return m_ram[ci];
@@ -268,12 +257,7 @@ void k053251_device::reset_indexes()
 
 // debug handlers
 
-READ16_MEMBER( k053251_device::lsb_r )
+u8 k053251_device::read(offs_t offset)
 {
-	return(m_ram[offset]);
-}       // PCU1
-
-READ16_MEMBER( k053251_device::msb_r )
-{
-	return(m_ram[offset] << 8);
+	return m_ram[offset];
 }       // PCU1

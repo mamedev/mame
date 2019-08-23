@@ -234,7 +234,7 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 
 	// 80/40 character mode
 	m_80_40_char_en = BIT(data, 4);
-	m_crtc->set_clock(12.48_MHz_XTAL / (m_80_40_char_en ? 16 : 8));
+	m_crtc->set_unscaled_clock(12.48_MHz_XTAL / (m_80_40_char_en ? 16 : 8));
 
 	// RTC interrupt enable
 	m_enable_rtc_int = BIT(data, 5);

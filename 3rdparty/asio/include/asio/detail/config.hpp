@@ -709,7 +709,7 @@
 #  if defined(__clang__)
 #   if (__cplusplus >= 201103)
 #    ifdef _LIBCPP_VERSION
-#     if _LIBCPP_VERSION >= 9000
+#     if _LIBCPP_VERSION >= 8000
 #      define ASIO_HAS_STD_STRING_VIEW 1
 #     endif
 #    endif

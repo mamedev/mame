@@ -443,7 +443,7 @@ void svision_state::init_svisions()
 	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
+DEVICE_IMAGE_LOAD_MEMBER( svision_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -494,7 +494,8 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 	m_tvlink.palette[3] = MAKE24_RGB32(svisionp_pens[3].r(), svisionp_pens[3].g(), svisionp_pens[3].b());
 }
 
-MACHINE_CONFIG_START(svision_state::svision_base)
+void svision_state::svision_base(machine_config &config)
+{
 	config.set_default_layout(layout_svision);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -504,13 +505,12 @@ MACHINE_CONFIG_START(svision_state::svision_base)
 	m_sound->add_route(1, "rspeaker", 0.50);
 	m_sound->irq_cb().set(FUNC(svision_state::sound_irq_w));
 
-	MCFG_GENERIC_CARTSLOT_ADD(m_cart, generic_plain_slot, "svision_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,ws,sv")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(svision_state, svision_cart)
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "svision_cart", "bin,ws,sv");
+	m_cart->set_must_be_loaded(true);
+	m_cart->set_device_load(FUNC(svision_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("svision");
-MACHINE_CONFIG_END
+}
 
 void svision_state::svision(machine_config &config)
 {

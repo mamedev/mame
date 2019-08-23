@@ -255,7 +255,8 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 	m_maincpu->set_input_line(sm8500_cpu_device::LCDC_INT, ASSERT_LINE );
 }
 
-MACHINE_CONFIG_START(gamecom_state::gamecom)
+void gamecom_state::gamecom(machine_config &config)
+{
 	/* basic machine hardware */
 	SM8500(config, m_maincpu, XTAL(11'059'200)/2);   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gamecom_state::gamecom_mem_map);
@@ -291,16 +292,10 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_linear_slot, "gamecom_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,tgc")
-	MCFG_GENERIC_LOAD(gamecom_state, gamecom_cart1)
-
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_linear_slot, "gamecom_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,tgc")
-	MCFG_GENERIC_LOAD(gamecom_state, gamecom_cart2)
-
+	GENERIC_CARTSLOT(config, "cartslot1", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart1_load), this);
+	GENERIC_CARTSLOT(config, "cartslot2", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart2_load), this);
 	SOFTWARE_LIST(config, "cart_list").set_original("gamecom");
-MACHINE_CONFIG_END
+}
 
 ROM_START( gamecom )
 	ROM_REGION( 0x2000, "maincpu", 0 )
@@ -311,4 +306,4 @@ ROM_START( gamecom )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY  FULLNAME    FLAGS
-CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_IMPERFECT_SOUND)
+CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, init_gamecom, "Tiger", "Game.com", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)

@@ -54,7 +54,6 @@ Ports:
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -130,7 +129,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pio_bc_w);
 	DECLARE_READ8_MEMBER(sby_r);
 	DECLARE_WRITE8_MEMBER(ald_w);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void ace_io(address_map &map);
 	void ace_mem(address_map &map);
@@ -169,7 +168,7 @@ private:
  Snapshot Handling
 ******************************************************************************/
 
-SNAPSHOT_LOAD_MEMBER( ace_state, ace )
+SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 {
 	cpu_device *cpu = m_maincpu;
 	uint8_t *RAM = memregion(cpu->tag())->base();
@@ -754,7 +753,8 @@ void ace_state::machine_start()
 //  machine_config( ace )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ace_state::ace)
+void ace_state::ace(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(6'500'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ace_state::ace_mem);
@@ -776,7 +776,6 @@ MACHINE_CONFIG_START(ace_state::ace)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	AY8910(config, AY8910_TAG, XTAL(6'500'000) / 2).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -788,9 +787,10 @@ MACHINE_CONFIG_START(ace_state::ace)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(ace_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("jupace_cass");
 
-	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", attotime::from_seconds(1))
+	SNAPSHOT(config, "snapshot", "ace", attotime::from_seconds(1)).set_load_callback(FUNC(ace_state::snapshot_cb), this);
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));
@@ -811,7 +811,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("16K,32K,48K");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("jupace_cass");
-MACHINE_CONFIG_END
+}
 
 
 

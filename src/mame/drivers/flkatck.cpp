@@ -218,7 +218,7 @@ void flkatck_state::machine_reset()
 void flkatck_state::flkatck(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); /* HD63C09EP, 3MHz (24MHz/8)*/
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); /* HD63C09EP, 3MHz (24MHz/8) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &flkatck_state::flkatck_map);
 	m_maincpu->set_vblank_int("screen", FUNC(flkatck_state::flkatck_interrupt));
 

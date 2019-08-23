@@ -679,12 +679,6 @@ void p1_state::poisk1(machine_config &config)
 	ISA8_SLOT(config, "isa3", 0, m_isabus, p1_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa4", 0, m_isabus, p1_isa8_cards, nullptr, false);
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-
-	SOFTWARE_LIST(config, "flop_list").set_original("poisk1_flop");
-//  SOFTWARE_LIST(config, "cass_list").set_original("poisk1_cass");
-
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
@@ -694,6 +688,13 @@ void p1_state::poisk1(machine_config &config)
 
 	/* XXX verify palette */
 	PALETTE(config, m_palette, FUNC(p1_state::p1_palette), CGA_PALETTE_SETS * 16);
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("poisk1_flop");
+//  SOFTWARE_LIST(config, "cass_list").set_original("poisk1_cass");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K");

@@ -26,6 +26,7 @@ protected:
 
 	virtual void device_start() override;
 
+	u8 latch_status_r();
 	void int0_ack_w(u8 data);
 	u8 status_r();
 	void misc_w(u8 data);
@@ -33,12 +34,13 @@ protected:
 	void mask_w(u8 data);
 	void eeprom_w(u8 data);
 
-	void mpu_map(address_map &map);
+	void common_map(address_map &map);
 	void scsic_config(device_t *device);
 	void scsi_add(machine_config &config);
 
 	required_device<cpu_device> m_mpu;
 	required_device<generic_latch_8_device> m_cmdlatch;
+	required_device<generic_latch_8_device> m_hostlatch;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<upd765_family_device> m_fdc;
 	required_region_ptr<u8> m_bios;
@@ -55,7 +57,7 @@ protected:
 
 private:
 	void eeprom_w(u8 data);
-	u8 eeprom_r();
+	u8 latch_status_r();
 	u8 status_r();
 
 	void mpu_map(address_map &map);
@@ -69,6 +71,9 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void mpu_map(address_map &map);
 };
 
 class tekram_dc820_device : public tekram_eisa_scsi_device
@@ -94,6 +99,9 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void mpu_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(TEKRAM_DC320B, tekram_dc320b_device)

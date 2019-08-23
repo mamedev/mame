@@ -10,6 +10,7 @@
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tnx1_state : public driver_device
 {

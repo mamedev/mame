@@ -375,6 +375,16 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 
 		uint8_t realy = (int)y;
 
+		// update the screen if necessary
+		if (!m_ppu1->screen().vblank())
+		{
+			int vpos = m_ppu1->screen().vpos();
+			int hpos = m_ppu1->screen().hpos();
+
+			if (vpos > realy || (vpos == realy && hpos >= x))
+				m_ppu1->screen().update_now();
+		}
+
 		/* get the pixel at the gun position */
 		rgb_t col = m_ppu1->screen().pixel(x, realy);
 		uint8_t bright = col.brightness();

@@ -83,12 +83,13 @@
 #include "image.h"
 #include "network.h"
 #include "romload.h"
+#include "tilemap.h"
 #include "ui/uimain.h"
 #include <time.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
-#if defined(EMSCRIPTEN)
+#if defined(__EMSCRIPTEN__)
 #include <emscripten.h>
 #endif
 
@@ -308,6 +309,7 @@ int running_machine::run(bool quiet)
 		start();
 
 		// load the configuration settings
+		manager().before_load_settings(*this);
 		m_configuration->load_settings();
 
 		// disallow save state registrations starting here.
@@ -340,7 +342,7 @@ int running_machine::run(bool quiet)
 
 		m_hard_reset_pending = false;
 
-#if defined(EMSCRIPTEN)
+#if defined(__EMSCRIPTEN__)
 		// break out to our async javascript loop and halt
 		emscripten_set_running_machine(this);
 #endif
@@ -912,7 +914,7 @@ void running_machine::handle_saveload()
 			u32 const openflags = (m_saveload_schedule == saveload_schedule::LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 			// open the file
-			emu_file file(m_saveload_searchpath, openflags);
+			emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
 			auto const filerr = file.open(m_saveload_pending_file);
 			if (filerr == osd_file::error::NONE)
 			{
@@ -1354,7 +1356,7 @@ device_memory_interface::space_config_vector dummy_space_device::memory_space_co
 //  JAVASCRIPT PORT-SPECIFIC
 //**************************************************************************
 
-#if defined(EMSCRIPTEN)
+#if defined(__EMSCRIPTEN__)
 
 running_machine * running_machine::emscripten_running_machine;
 
@@ -1439,4 +1441,4 @@ void running_machine::emscripten_load(const char *name) {
 	emscripten_running_machine->schedule_load(name);
 }
 
-#endif /* defined(EMSCRIPTEN) */
+#endif /* defined(__EMSCRIPTEN__) */

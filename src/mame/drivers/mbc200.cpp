@@ -319,11 +319,11 @@ void mbc200_state::mbc200(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 400);
 	screen.set_visarea(0, 640-1, 0, 400-1);
-	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mbc200);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	H46505(config, m_crtc, 8_MHz_XTAL / 4); // HD46505SP
+	HD6845S(config, m_crtc, 8_MHz_XTAL / 4); // HD46505SP
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

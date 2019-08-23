@@ -78,6 +78,21 @@ do                                                                              
 	(DEST) = SOURCE;                                                                \
 }                                                                                   \
 while (0)
+#define PIXEL_OP_COPY_OPAQUE_PRIORITY(DEST, PRIORITY, SOURCE)                       \
+do                                                                                  \
+{                                                                                   \
+	if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                                  \
+		(DEST) = SOURCE;                                                            \
+	(PRIORITY) = 31;                                                                \
+}                                                                                   \
+while (0)
+#define PIXEL_OP_COPY_OPAQUE_PRIMASK(DEST, PRIORITY, SOURCE)                        \
+do                                                                                  \
+{                                                                                   \
+	(DEST) = SOURCE;                                                                \
+	(PRIORITY) = ((PRIORITY) & pmask) | pcode;                                      \
+}                                                                                   \
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_COPY_TRANSPEN - render all pixels
@@ -93,6 +108,29 @@ do                                                                              
 		(DEST) = SOURCE;                                                            \
 }                                                                                   \
 while (0)
+#define PIXEL_OP_COPY_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE)                     \
+do                                                                                  \
+{                                                                                   \
+	u32 srcdata = (SOURCE);                                                         \
+	if (srcdata != trans_pen)                                                       \
+	{                                                                               \
+		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
+			(DEST) = SOURCE;                                                        \
+		(PRIORITY) = 31;                                                            \
+	}                                                                               \
+}                                                                                   \
+while (0)
+#define PIXEL_OP_COPY_TRANSPEN_PRIMASK(DEST, PRIORITY, SOURCE)                      \
+do                                                                                  \
+{                                                                                   \
+	u32 srcdata = (SOURCE);                                                         \
+	if (srcdata != trans_pen)                                                       \
+	{                                                                               \
+		(DEST) = SOURCE;                                                            \
+		(PRIORITY) = ((PRIORITY) & pmask) | pcode;                                  \
+	}                                                                               \
+}                                                                                   \
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_COPY_TRANSALPHA - render all pixels
@@ -100,12 +138,35 @@ while (0)
     directly
 -------------------------------------------------*/
 
-#define PIXEL_OP_COPY_TRANSALPHA(DEST, PRIORITY, SOURCE)                              \
+#define PIXEL_OP_COPY_TRANSALPHA(DEST, PRIORITY, SOURCE)                            \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
-	if ((srcdata & 0xff000000) != 0)                                            \
+	if ((srcdata & 0xff000000) != 0)                                                \
 		(DEST) = SOURCE;                                                            \
+}                                                                                   \
+while (0)
+#define PIXEL_OP_COPY_TRANSALPHA_PRIORITY(DEST, PRIORITY, SOURCE)                   \
+do                                                                                  \
+{                                                                                   \
+	u32 srcdata = (SOURCE);                                                         \
+	if ((srcdata & 0xff000000) != 0)                                                \
+	{                                                                               \
+		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
+			(DEST) = SOURCE;                                                        \
+		(PRIORITY) = 31;                                                            \
+	}                                                                               \
+}                                                                                   \
+while (0)
+#define PIXEL_OP_COPY_TRANSALPHA_PRIMASK(DEST, PRIORITY, SOURCE)                    \
+do                                                                                  \
+{                                                                                   \
+	u32 srcdata = (SOURCE);                                                         \
+	if ((srcdata & 0xff000000) != 0)                                                \
+	{                                                                               \
+		(DEST) = SOURCE;                                                            \
+		(PRIORITY) = ((PRIORITY) & pmask) | pcode;                                  \
+	}                                                                               \
 }                                                                                   \
 while (0)
 
@@ -127,6 +188,13 @@ do                                                                              
 	if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                                  \
 		(DEST) = paldata[SOURCE];                                                   \
 	(PRIORITY) = 31;                                                                \
+}                                                                                   \
+while (0)
+#define PIXEL_OP_REMAP_OPAQUE_PRIMASK(DEST, PRIORITY, SOURCE)                       \
+do                                                                                  \
+{                                                                                   \
+	(DEST) = paldata[SOURCE];                                                       \
+	(PRIORITY) = ((PRIORITY) & pmask) | pcode;                                      \
 }                                                                                   \
 while (0)
 

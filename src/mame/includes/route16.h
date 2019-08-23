@@ -33,6 +33,8 @@ public:
 	void route16(machine_config &config);
 
 	void init_route16();
+	void init_route16a();
+	void init_route16c();
 
 private:
 	DECLARE_WRITE8_MEMBER(out0_w);

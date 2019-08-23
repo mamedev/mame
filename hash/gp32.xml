@@ -27,7 +27,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="34604032">
-				<rom name="astonishia story r (korea).smc" size="34604032" crc="49e57a20" sha1="c894b0dd8b934c77580187d7972490f5e59f2372" offset="0" />
+				<rom name="astonishia story r (korea).smc" size="34604032" crc="49e57a20" sha1="c894b0dd8b934c77580187d7972490f5e59f2372"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39,7 +39,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="blue angelo - angels from the shrine (europe) (en,fr,de,es,it,pt).smc" size="17302528" crc="54ff5945" sha1="369f96bb41378ab4108d0dc8866148b328cbd75e" offset="0" />
+				<rom name="blue angelo - angels from the shrine (europe) (en,fr,de,es,it,pt).smc" size="17302528" crc="54ff5945" sha1="369f96bb41378ab4108d0dc8866148b328cbd75e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="dooly soccer 2002 (korea).smc" size="17302528" crc="cc95d224" sha1="0347cd106cba22b0d2e1170d44ec1d302e982a5e" offset="0" />
+				<rom name="dooly soccer 2002 (korea).smc" size="17302528" crc="cc95d224" sha1="0347cd106cba22b0d2e1170d44ec1d302e982a5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="dungeon &amp; guarder - dragon gore (korea).smc" size="17302528" crc="0e3bf8ce" sha1="93c358177ae221f33e0aef793f83cc027ede0cfc" offset="0" />
+				<rom name="dungeon &amp; guarder - dragon gore (korea).smc" size="17302528" crc="0e3bf8ce" sha1="93c358177ae221f33e0aef793f83cc027ede0cfc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +79,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="dungeon &amp; guarder - dragon gore (europe).smc" size="17302528" crc="e76d34a6" sha1="433da4a0cdbf3c797f62bf01bfa86608434b04f2" offset="0" />
+				<rom name="dungeon &amp; guarder - dragon gore (europe).smc" size="17302528" crc="e76d34a6" sha1="433da4a0cdbf3c797f62bf01bfa86608434b04f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -92,7 +92,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="dyhard - with infinite stairs (korea).smc" size="17302528" crc="a82d4e88" sha1="091c0f41954c03b9979683dd957a9dbbc4e28405" offset="0" />
+				<rom name="dyhard - with infinite stairs (korea).smc" size="17302528" crc="a82d4e88" sha1="091c0f41954c03b9979683dd957a9dbbc4e28405"/>
 			</dataarea>
 		</part>
 	</software>
@@ -104,7 +104,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="dyhard - with infinite stairs (europe).smc" size="17302528" crc="c16523fb" sha1="b684b443b1450f98a43953393352b0724a9171cb" offset="0" />
+				<rom name="dyhard - with infinite stairs (europe).smc" size="17302528" crc="c16523fb" sha1="b684b443b1450f98a43953393352b0724a9171cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="gp fight (korea).smc" size="17302528" crc="d7551f7f" sha1="3bb0dfba690eb8b3885e48f4c0a981b8c96cda9b" offset="0" />
+				<rom name="gp fight (korea).smc" size="17302528" crc="d7551f7f" sha1="3bb0dfba690eb8b3885e48f4c0a981b8c96cda9b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="hany party game (korea).smc" size="17302528" crc="b7a78b6f" sha1="d7cf21ba51c7fea4257a7309eb31f96e635c783b" offset="0" />
+				<rom name="hany party game (korea).smc" size="17302528" crc="b7a78b6f" sha1="d7cf21ba51c7fea4257a7309eb31f96e635c783b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +142,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="her knights - all for princess - deadline (korea).smc" size="17302528" crc="e61a93b2" sha1="4ced58d61f831cbfc0d0a369e559ad364cb71541" offset="0" />
+				<rom name="her knights - all for princess - deadline (korea).smc" size="17302528" crc="e61a93b2" sha1="4ced58d61f831cbfc0d0a369e559ad364cb71541"/>
 			</dataarea>
 		</part>
 	</software>
@@ -154,7 +154,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="her knights - all for the princess (europe).smc" size="17302528" crc="1e0150ea" sha1="d137f8ed7e2a092037d64d8cf65bace68e2d6ebb" offset="0" />
+				<rom name="her knights - all for the princess (europe).smc" size="17302528" crc="1e0150ea" sha1="d137f8ed7e2a092037d64d8cf65bace68e2d6ebb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -167,7 +167,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="kimchiman gp32 (korea).smc" size="17302528" crc="6b7d6985" sha1="593ff3500abb654e297f2f66cae92ec893db6906" offset="0" />
+				<rom name="kimchiman gp32 (korea).smc" size="17302528" crc="6b7d6985" sha1="593ff3500abb654e297f2f66cae92ec893db6906"/>
 			</dataarea>
 		</part>
 	</software>
@@ -180,7 +180,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="little girl mill of a gingko, the (korea).smc" size="17302528" crc="44868758" sha1="1ce508583d7bdd176209c2ef3a606e7686590b87" offset="0" />
+				<rom name="little girl mill of a gingko, the (korea).smc" size="17302528" crc="44868758" sha1="1ce508583d7bdd176209c2ef3a606e7686590b87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -193,7 +193,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="little wizard (korea).smc" size="17302528" crc="0107b043" sha1="27387e388dabb3bf78ab2d4cac1b8a0104f62e49" offset="0" />
+				<rom name="little wizard (korea).smc" size="17302528" crc="0107b043" sha1="27387e388dabb3bf78ab2d4cac1b8a0104f62e49"/>
 			</dataarea>
 		</part>
 	</software>
@@ -205,7 +205,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="little wizard (europe).smc" size="17302528" crc="47d66121" sha1="ef1cae9d810ee55aeefb86410843241503df30f1" offset="0" />
+				<rom name="little wizard (europe).smc" size="17302528" crc="47d66121" sha1="ef1cae9d810ee55aeefb86410843241503df30f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -218,7 +218,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="oneshot voca (korea).smc" size="17302528" crc="4cedef98" sha1="69f1f554077397cccc17cc66c3e0f520005fa439" offset="0" />
+				<rom name="oneshot voca (korea).smc" size="17302528" crc="4cedef98" sha1="69f1f554077397cccc17cc66c3e0f520005fa439"/>
 			</dataarea>
 		</part>
 	</software>
@@ -231,7 +231,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="princess maker 2 (korea).smc" size="17302528" crc="3c50aad0" sha1="2a55ffc4b69ac6515903b11d5c1a67559ed42891" offset="0" />
+				<rom name="princess maker 2 (korea).smc" size="17302528" crc="3c50aad0" sha1="2a55ffc4b69ac6515903b11d5c1a67559ed42891"/>
 			</dataarea>
 		</part>
 	</software>
@@ -244,7 +244,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="rally pop (korea).smc" size="17302528" crc="ce07aaa6" sha1="f7e8c59c88adcce506cb6b8a86fd2ad9b307468f" offset="0" />
+				<rom name="rally pop (korea).smc" size="17302528" crc="ce07aaa6" sha1="f7e8c59c88adcce506cb6b8a86fd2ad9b307468f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -256,7 +256,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="raphael (korea).smc" size="17302528" crc="d8f55b72" sha1="9d4e4dd297dd33ecfa22a90826c0efccb47be323" offset="0" />
+				<rom name="raphael (korea).smc" size="17302528" crc="d8f55b72" sha1="9d4e4dd297dd33ecfa22a90826c0efccb47be323"/>
 			</dataarea>
 		</part>
 	</software>
@@ -268,7 +268,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="tanggle's magic square (korea).smc" size="17302528" crc="f1555016" sha1="3dccead2a6e1fa11ec5d66f248eeacf9f25106d5" offset="0" />
+				<rom name="tanggle's magic square (korea).smc" size="17302528" crc="f1555016" sha1="3dccead2a6e1fa11ec5d66f248eeacf9f25106d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -281,7 +281,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="therapy (korea).smc" size="17302528" crc="6ff45a35" sha1="7ded192d9dce09c92dc5a83ccb0b477219f33b11" offset="0" />
+				<rom name="therapy (korea).smc" size="17302528" crc="6ff45a35" sha1="7ded192d9dce09c92dc5a83ccb0b477219f33b11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -294,7 +294,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="tomak - save the earth, again (korea).smc" size="17302528" crc="f8c9f4ce" sha1="87b196f94bb5361563d7b35ba732b56e214be08e" offset="0" />
+				<rom name="tomak - save the earth, again (korea).smc" size="17302528" crc="f8c9f4ce" sha1="87b196f94bb5361563d7b35ba732b56e214be08e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -306,7 +306,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="tomak - save the earth, again (europe) (v1.0).smc" size="17302528" crc="eea98281" sha1="0767d37cd7dd29bb572a82cc05d766e8e7321dd9" offset="0" />
+				<rom name="tomak - save the earth, again (europe) (v1.0).smc" size="17302528" crc="eea98281" sha1="0767d37cd7dd29bb572a82cc05d766e8e7321dd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -318,7 +318,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="tomak - save the earth, again (europe) (v2.0).smc" size="17302528" crc="eec1c3db" sha1="9c0e29cfa7be8a6644c63499b7065d4e5f40208e" offset="0" />
+				<rom name="tomak - save the earth, again (europe) (v2.0).smc" size="17302528" crc="eec1c3db" sha1="9c0e29cfa7be8a6644c63499b7065d4e5f40208e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -331,7 +331,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="woody &amp; kunta - treasure island (korea).smc" size="17302528" crc="de2142bc" sha1="9e768faa8300cd5b3102f433aae53a6f4d3d7f1f" offset="0" />
+				<rom name="woody &amp; kunta - treasure island (korea).smc" size="17302528" crc="de2142bc" sha1="9e768faa8300cd5b3102f433aae53a6f4d3d7f1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +344,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="woody &amp; kunta - treasure island (europe).smc" size="17302528" crc="ab479052" sha1="cd1df6228293dc8193e779bdba562f3040e21b4a" offset="0" />
+				<rom name="woody &amp; kunta - treasure island (europe).smc" size="17302528" crc="ab479052" sha1="cd1df6228293dc8193e779bdba562f3040e21b4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -357,7 +357,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="w.b.w. - wanna be wizard! (korea).smc" size="17302528" crc="25386f14" sha1="cb19613a9377aef5be77bb00138fd8d0b201737e" offset="0" />
+				<rom name="w.b.w. - wanna be wizard! (korea).smc" size="17302528" crc="25386f14" sha1="cb19613a9377aef5be77bb00138fd8d0b201737e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -369,7 +369,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="wizard slayer (korea).smc" size="17302528" crc="d7f6d3cf" sha1="a6801cee5cdc2f76d318df1880d8441bf9405de3" offset="0" />
+				<rom name="wizard slayer (korea).smc" size="17302528" crc="d7f6d3cf" sha1="a6801cee5cdc2f76d318df1880d8441bf9405de3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -381,7 +381,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="34604032">
-				<rom name="funny soccer 2002.smc" size="34604032" crc="a5152676" sha1="70b12322b3e5245132e167b0d1633556a048b257" offset="0" />
+				<rom name="funny soccer 2002.smc" size="34604032" crc="a5152676" sha1="70b12322b3e5245132e167b0d1633556a048b257"/>
 			</dataarea>
 		</part>
 	</software>
@@ -393,7 +393,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="gloop deluxe.smc" size="17302528" crc="4d992443" sha1="a2440b563e6ad36f9718a5a9db17ed6d219e0e9e" offset="0" />
+				<rom name="gloop deluxe.smc" size="17302528" crc="4d992443" sha1="a2440b563e6ad36f9718a5a9db17ed6d219e0e9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -405,7 +405,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="holeman battle race 2002.smc" size="17302528" crc="e91b207b" sha1="8e7c3a36d230afbdf465ba62fb3785f1376c9373" offset="0" />
+				<rom name="holeman battle race 2002.smc" size="17302528" crc="e91b207b" sha1="8e7c3a36d230afbdf465ba62fb3785f1376c9373"/>
 			</dataarea>
 		</part>
 	</software>
@@ -417,7 +417,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="pinball dreams.smc" size="17302528" crc="f9a48ef2" sha1="19eefbfd765913067a5a622ae6c40222118e6e5d" offset="0" />
+				<rom name="pinball dreams.smc" size="17302528" crc="f9a48ef2" sha1="19eefbfd765913067a5a622ae6c40222118e6e5d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -429,7 +429,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="69207040">
-				<rom name="story of bug eyed monster.smc" size="69207040" crc="5534905b" sha1="3e70e746f9a1819e629ffc4b9082ac4a8d1d022e" offset="0" />
+				<rom name="story of bug eyed monster.smc" size="69207040" crc="5534905b" sha1="3e70e746f9a1819e629ffc4b9082ac4a8d1d022e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -441,7 +441,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="69207040">
-				<rom name="winter is.smc" size="69207040" crc="62c4a3fb" sha1="cf072fae0825164ff8c7393ab513058b78c46061" offset="0" />
+				<rom name="winter is.smc" size="69207040" crc="62c4a3fb" sha1="cf072fae0825164ff8c7393ab513058b78c46061"/>
 			</dataarea>
 		</part>
 	</software>
@@ -453,7 +453,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="super plusha.smc" size="17302528" crc="65da87fc" sha1="1e2e984014f184759a35df93160f0fb4d11c7742" offset="0" />
+				<rom name="super plusha.smc" size="17302528" crc="65da87fc" sha1="1e2e984014f184759a35df93160f0fb4d11c7742"/>
 			</dataarea>
 		</part>
 	</software>
@@ -465,7 +465,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="tales of windy land.smc" size="17302528" crc="83b9c315" sha1="51679a8197f721fc601ea0cd8c91a3bbabed9585" offset="0" />
+				<rom name="tales of windy land.smc" size="17302528" crc="83b9c315" sha1="51679a8197f721fc601ea0cd8c91a3bbabed9585"/>
 			</dataarea>
 		</part>
 	</software>
@@ -477,7 +477,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="topy topy gogo.smc" size="17302528" crc="9a5faa26" sha1="46e1f08ec260a633e8e4c44b3b46b5135e6c76a6" offset="0" />
+				<rom name="topy topy gogo.smc" size="17302528" crc="9a5faa26" sha1="46e1f08ec260a633e8e4c44b3b46b5135e6c76a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -489,7 +489,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="tears - another story.smc" size="17302528" crc="7c46d80a" sha1="682f123d3f827544cc876e624ccacd61cd8283a3" offset="0" />
+				<rom name="tears - another story.smc" size="17302528" crc="7c46d80a" sha1="682f123d3f827544cc876e624ccacd61cd8283a3"/>
 			</dataarea>
 		</part>
 	</software>

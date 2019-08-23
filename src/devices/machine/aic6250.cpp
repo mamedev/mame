@@ -49,6 +49,7 @@ static char const *const aic6250_phase[] = { "DATA OUT", "*", "DATA IN", "*", "C
 
 aic6250_device::aic6250_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_device(mconfig, type, tag, owner, clock)
+	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_int_cb(*this)
 	, m_breq_cb(*this)
 	, m_port_a_r_cb(*this)
@@ -407,14 +408,14 @@ void aic6250_device::control_reg_0_w(u8 data)
 		data & R07W_EN_PORT_A_INP_OR_OUT ? "output" : "input",
 		data & R07W_TARGET_MODE ? "target" : "initiator");
 
+	m_control_reg_0 = data;
+
 	if (data & R07W_P_MEM_CYCLE_REQ)
 	{
 		LOGMASKED(LOG_DMA, "processor memory %s request initiated\n", data & R07W_P_MEM_RW ? "write" : "read");
 		m_status_reg_1 &= ~R08R_MEM_CYCLE_CMPL;
 		m_breq_cb(1);
 	}
-
-	m_control_reg_0 = data;
 }
 
 u8 aic6250_device::status_reg_1_r()

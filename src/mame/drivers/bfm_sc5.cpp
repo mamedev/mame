@@ -8,6 +8,130 @@
 
     This system is not emulated.
 
+ SCORPION 5 PCB
+ _________________________________________________________________________
+ | ______________________  _____________  _____________  _________    __  |
+ | |____PLUG_J_LAMPS_____| |___PLUG_K___| |___PLUG_L___| |_PLUG_M_|   |P| |
+ |                                                                    |L| |
+ | D20NF D20NF D20NF D20NF D20NF D20NF D20NF                          |N| |
+ | D20NF D20NF D20NF D20NF D20NF D20NF D20NF                          __  |
+ | __          D20NF  D20NF                    MM74HCT                |P| |
+ | |P|                                                                |L| |
+ | |L| ______  ______ ______  ______  ULN28030AG  CS4341AKSZ          |P| |
+ | |U| ULN28030AG x 2 UDN2982LWT x 2                                  __  |
+ | |G|               ____ ____ ____   ULN28030AG                      |P| |
+ | | |               HC14 HC14 HC14  _________  __________  ___       |L| |
+ | |F|               ______  ______  |AMI S   | |YAMAHA   | |P |      |Q| |
+ | |_|               UDN2982LWT x 2  |0728DC0 | |YMZ280B-F| |L |      __  |
+ | __   _____  _____                 |BFG206ML| |_________| |U | IC20 |P| |
+ | |P|  |    | |    |                 62215-001      XTL1   |G |      |L| |
+ | |L|  |DB9 | |DB9 |                                       |  | IC19 |R| |
+ | |E|  |MALE| |FEMALE                 ______   ___________ |Z |      |_| |
+ | |_|  |____| |____| 74HCT00          |NXP  |  |COLDFIRE  ||  |  __  __  |
+ | __            ___      XTL3  SCC68681C1A44|  |MCF5206EAB40  |  |P| |P| |
+ | |P|           |SW|  o <- LED        |_____|  |          ||  |  |L| |L| |
+ | |L|           | 4| __                        |          ||  |  |U| |U| |
+ | |U|           |__| |_| SW RESET              |__________||  |  |G| |G| |
+ | |G|           |SW| |_| SW TEST      ____  ______  ______ |  |  | | | | |
+ | | |           | 1|                  |GAL| IS62C256AL x 2 |__|  |U| |S| |
+ | |D|           |__|                  |___|                          __  |
+ | |_|                 o o o o o o o <- LEDS                     XTL2 |P| |
+ |  _______ _______ ____________________                   _______    |L| |
+ | |PLUG C||PLUG B| |______PLUG A_______|    BATTERY 3.6V  |PLUG V|   |T| |
+ |________________________________________________________________________|
+
+SW1 = 8 dipswitches
+SW4 = 8 dipswitches
+
+IC20 = MC1489DG
+IC19 = SN75188
+
+XTL1 = 16.9344 MHz
+XTL2 = 40.0000 MHz
+XTL3 = 3.6864 MHz
+
+PLUG A = POWER IN
+PLUG B = CAB SWITCHES
+PLUG C = REEL INPUTS
+PLUG D = REEL OUTPUTS
+PLE = PLUG E = GAME SWITCHES
+PLUG F = L.E.D.S
+PLUG J = LAMPS
+PLUG K = REEL LAMPS
+PLUG L = GENERAL I/O
+PLUG M = AUDIO OUTPUT
+PLN = PLUG N = ALPHA
+PLP = PLUG P = SEC METER
+PLQ = PLUG Q = CCTalk I/F
+PLR = PLUG R = RS232 PORT 2
+PLUG S = RS232 PORT 1 (DB25 female)
+PLT = PLUG T = I2C I/F
+PLUG U = BDM I/F
+PLUG V = I2C I/F
+PLUG Z = GAME CARD / VIDEO CARD
+
+
+ISS 3 ADDER 5 VIDEO CARD
+
+       COMPONENT SIDE                           SOLDER SIDE
+  ___________________________            ___________________________
+ | _______  _______ _______ |            |                          |
+ ||      | |__CN2_||__CN1_| |            |                          |
+ || IC3  |     MAX202 MAX202|            |                          |
+ ||______|  XTL3            |            |                          |
+ |  _________________       |___      ___|                          |
+ | |                | ___   |__|      |__|                          |
+ | | ROM 2 IC7      | |IC8  |__|      |__|                          |
+ | |________________|       |__| PLG1 |__|                          |
+ |  _________________       |__|      |__|                          |
+ | |                |       |__|      |__|                          |
+ | | ROM 1 IC6      | XTL2  |__|      |__|                          |
+ | |________________|       |__|      |__|                          |
+ | _______________________  |__|      |__|  ____                    |
+ ||_|_|_|_|__PLG3__|_|_|_|  |__|      |__|  |IC | ____________      |
+ |    ____                  |__|      |__|  |11 | |     ______|     |
+ |   |IC5|                  |__|      |__|  |___| |    |__          |
+ |   |___|              XTL1|__|      |__|  ____  |    |__          |
+ |  __________________      |__|      |__|  |IC | |    |__          |
+ |  |                 |     |__|      |__|  | 9 | |PL1 |__          |
+ |  | IC1             |     |__|      |__|  |___| |    |__          |
+ |  | YAMAHA          |     |__|      |__|  ____  |    |__          |
+ |  | YGV619-V        |     |__|      |__|  |IC | |    |__          |
+ |  |                 |     |__|      |__|  |10 | |    |__          |
+ |  |                 |     |            |  |___| |    |______      |
+ |  |_________________|     |            |        |___________|     |
+ | _____    _____       ____|            |____                      |
+ | |    |   |    |     |                      |                     |
+ | | IC2|   | IC4|     |                      |                     |
+ | |    |   |    |     |                      |                     |
+ | |____|   |____|     |                      |                     |
+ |             ______  |                      |  ______             |
+ |_____________|     |_|                      |_|     |_____________|
+              | PLG2  |                        |       |
+              |_______|                        |_______|
+
+XTL1 = 20.00 MHz
+XTL2 = 20.00 MHz
+XTL3 = 3.686 MHz
+
+IC2 = Samsung K4S641632H-UC75
+IC3 = Philips / NXP SCC6861C1A44
+IC4 = Samsung K4S641632H-UC75
+IC5 = GAL16V8D
+IC8 = PIC (for external Serial EEPROM)
+IC9 = LCX245
+IC10 = LCX245
+IC11 = 74HCT2730
+
+PLG1 = To mother board
+PLG2 = VGA OUT (HD15)
+PLG3 = Flash (for pluging flash ROMs)
+
+CN1 = RS232 Port 3
+CN2 = RS232 Port 4
+
+PL1 = Compact Flash Slot
+
 */
 
 

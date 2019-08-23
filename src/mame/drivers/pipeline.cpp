@@ -79,6 +79,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class pipeline_state : public driver_device

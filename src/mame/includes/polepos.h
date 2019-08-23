@@ -16,6 +16,7 @@
 #include "sound/namco.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class polepos_state : public driver_device

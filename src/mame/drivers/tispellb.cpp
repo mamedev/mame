@@ -91,8 +91,8 @@ private:
 	u16 m_sub_r;
 
 	virtual void power_off() override;
-	void prepare_display();
-	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
+	void power_subcpu();
+	void update_display();
 
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
@@ -109,7 +109,6 @@ private:
 
 	virtual void machine_start() override;
 };
-
 
 void tispellb_state::machine_start()
 {
@@ -136,27 +135,30 @@ void tispellb_state::machine_start()
 
 // common
 
+void tispellb_state::power_subcpu()
+{
+	if (m_subcpu)
+		m_subcpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
+}
+
 void tispellb_state::power_off()
 {
 	hh_tms1k_state::power_off();
-
-	if (m_subcpu)
-		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	power_subcpu();
 }
 
-void tispellb_state::prepare_display()
+void tispellb_state::update_display()
 {
 	// almost same as snspell
-	u16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
-	set_display_segmask(0xff, 0x3fff);
-	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
+	u16 gridmask = m_display->row_on(15) ? 0xffff : 0x8000;
+	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_o)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15, same as snspell
 	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_r)
@@ -171,13 +173,13 @@ WRITE16_MEMBER(tispellb_state::main_write_r)
 	m_r = data;
 	m_inp_mux = data & 0x7f;
 	m_grid = data & 0x80ff;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(tispellb_state::main_read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[7]->read() | read_inputs(7);
+	return m_inputs[7]->read() | read_inputs(7);
 }
 
 
@@ -250,18 +252,8 @@ WRITE16_MEMBER(tispellb_state::rev2_write_r)
 
 INPUT_CHANGED_MEMBER(tispellb_state::power_button)
 {
-	int on = (int)(uintptr_t)param;
-
-	if (on && !m_power_on)
-	{
-		m_power_on = true;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-
-		if (m_subcpu)
-			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
-	else if (!on && m_power_on)
-		power_off();
+	hh_tms1k_state::power_button(field, param, oldval, newval);
+	power_subcpu();
 }
 
 static INPUT_PORTS_START( spellb )
@@ -363,7 +355,9 @@ void tispellb_state::rev1(machine_config &config)
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 16);
+	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_spellb);
 
 	/* no sound! */
@@ -383,7 +377,9 @@ void tispellb_state::rev2(machine_config &config)
 	TMS6100(config, m_tms6100, 350000);
 	m_tms6100->enable_4bit_mode(true);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 16);
+	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_spellb);
 
 	/* sound hardware */

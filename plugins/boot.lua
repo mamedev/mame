@@ -22,31 +22,24 @@ function lfs.env_replace(str)
 end
 
 _G._ = emu.lang_translate
-local dir = lfs.env_replace(manager:options().entries.pluginspath:value())
 
-package.path = dir .. "/?.lua;" .. dir .. "/?/init.lua"
+-- substitute environment variables in the plugins path from options
+local dirs = lfs.env_replace(manager:options().entries.pluginspath:value())
 
-local json = require('json')
-local function readAll(file)
-	local f = io.open(file, "rb")
-	local content = f:read("*all")
-	f:close()
-	return content
+-- and split the paths apart and make them suitable for package.path
+package.path = ""
+for dir in string.gmatch(dirs, "([^;]+)") do
+	if (package.path ~= "") then
+		package.path = package.path .. ";"
+	end
+	package.path = package.path .. dir .. "/?.lua;" .. dir .. "/?/init.lua"
 end
 
-for file in lfs.dir(dir) do
-	if (file~="." and file~=".." and lfs.attributes(dir .. "/" .. file,"mode")=="directory") then
-		local filename = dir .. "/" .. file .. "/plugin.json"
-		local meta = json.parse(readAll(filename))
-		if (meta["plugin"]["type"]=="plugin") and (mame_manager:plugins().entries[meta["plugin"]["name"]]~=nil) then
-			local entry = mame_manager:plugins().entries[meta["plugin"]["name"]]
-			if (entry:value()==true) then
-				emu.print_verbose("Starting plugin " .. meta["plugin"]["name"] .. "...")
-				plugin = require(meta["plugin"]["name"])
-				if plugin.set_folder~=nil then plugin.set_folder(dir .. "/" .. file) end
-				plugin.startplugin();
-			end
-		end
+for _,entry in pairs(manager:plugins()) do
+	if (entry.type == "plugin" and entry.start) then
+		emu.print_verbose("Starting plugin " .. entry.name .. "...")
+		plugin = require(entry.name)
+		if plugin.set_folder~=nil then plugin.set_folder(entry.directory) end
+		plugin.startplugin();
 	end
 end
-

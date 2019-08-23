@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="306361">
-				<rom name="attache_boot_2.2.5.imd" size="306361" crc="e34241ad" sha1="b35261c8644b285902eda4a102630d0aab67d211" offset="0" />
+				<rom name="attache_boot_2.2.5.imd" size="306361" crc="e34241ad" sha1="b35261c8644b285902eda4a102630d0aab67d211"/>
 			</dataarea>
 		</part>
 	</software>

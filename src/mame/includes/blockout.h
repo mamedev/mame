@@ -17,9 +17,8 @@ class blockout_state : public driver_device
 public:
 	blockout_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
+		m_videoram(*this, "videoram", 16),
 		m_frontvideoram(*this, "frontvideoram"),
-		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
@@ -27,13 +26,12 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint16_t> m_frontvideoram;
-	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u16> m_frontvideoram;
 
 	/* video-related */
 	bitmap_ind16 m_tmpbitmap;
-	uint16_t   m_color;
+	u16   m_color;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -45,17 +43,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 	DECLARE_WRITE16_MEMBER(blockout_irq6_ack_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq5_ack_w);
-	DECLARE_WRITE16_MEMBER(blockout_paletteram_w);
-	DECLARE_WRITE16_MEMBER(blockout_frontcolor_w);
-	DECLARE_WRITE16_MEMBER(blockout_videoram_w);
+	void frontcolor_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, u8 data);
 	void init_agress();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_blockout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(blockout_scanline);
-	void setcolor( int color, int rgb );
-	void update_pixels( int x, int y );
+	static rgb_t blockout_xBGR_444(u32 raw);
 	void blockout(machine_config &config);
 	void agress(machine_config &config);
 	void agress_map(address_map &map);

@@ -84,6 +84,11 @@ void x68k_scsiext_device::irq_w(int state)
 	m_slot->irq2_w(state);  // correct?  Or perhaps selectable?
 }
 
+uint8_t x68k_scsiext_device::iack2()
+{
+	return 0xf6;
+}
+
 void x68k_scsiext_device::drq_w(int state)
 {
 	// TODO

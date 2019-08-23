@@ -231,7 +231,7 @@ private:
 	void ti8x_snapshot_setup_registers(uint8_t *data);
 	void ti85_setup_snapshot(uint8_t *data);
 	void ti86_setup_snapshot(uint8_t *data);
-	DECLARE_SNAPSHOT_LOAD_MEMBER(ti8x);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	ti83pse_timer m_ctimer[3];
 

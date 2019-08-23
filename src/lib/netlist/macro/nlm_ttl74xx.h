@@ -240,6 +240,21 @@
 #define TTL_7486_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7486_DIP, name)
 
+#if (USE_TRUTHTABLE_74107)
+#define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                   \
+		NET_REGISTER_DEV(TTL_74107, name)                                      \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, CLK, cCLK)                                           \
+		NET_CONNECT(name, J, cJ)                                               \
+		NET_CONNECT(name, K, cK)                                               \
+		NET_CONNECT(name, CLRQ, cCLRQ)
+
+#define TTL_74107_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74107_DIP, name)
+
+#endif
+
 #define TTL_74155_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74155_DIP, name)
 

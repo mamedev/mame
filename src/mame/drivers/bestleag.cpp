@@ -26,6 +26,7 @@ Dip Locations added according to Service Mode
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class bestleag_state : public driver_device

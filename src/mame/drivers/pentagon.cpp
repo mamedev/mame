@@ -305,6 +305,7 @@ void pentagon_state::pentagon(machine_config &config)
 	config.device_remove("exp");
 
 	SOFTWARE_LIST(config, "cass_list_pen").set_original("pentagon_cass");
+	SOFTWARE_LIST(config, "betadisc_list").set_original("spectrum_betadisc_flop");
 }
 
 void pentagon_state::pent1024(machine_config &config)

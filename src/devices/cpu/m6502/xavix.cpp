@@ -18,9 +18,12 @@
     0x0000-0x7fff seems to be a 'low bus' area, it is always the same regardless
                   of banking
     0x8000-0xffff is a banked area with individual code and data banks
-                  0x00ff contains the DATA bank, set manually in code
-                  0x00fe appears to be the current CODE bank, set with either the
-                         custom opcodes, or manually (if running from lowbus only?)
+
+    Zero Page notes:
+
+    0x00ff contains the DATA bank, set manually in code
+    0x00fe appears to be the current CODE bank, set with either the
+            custom opcodes, or manually (if running from lowbus only?)
 
 ***************************************************************************/
 
@@ -93,40 +96,54 @@ void xavix_device::device_start()
 	m_lowbus_space = &space(5);
 	m_extbus_space = &space(6);
 
-	state_add(XAVIX_DATABANK, "DATBNK", m_databank).callimport().formatstr("%2s");;
+	state_add(XAVIX_DATABANK, "DATBNK", m_databank).callimport().formatstr("%2s");
 	state_add(XAVIX_CODEBANK, "CODBNK", m_codebank).callimport().formatstr("%2s");
+
+	save_item(NAME(m_special_stack));
+	save_item(NAME(m_special_stackpos));
 }
 
 void xavix_device::device_reset()
 {
+	m_special_stackpos = 0xff;
+	for (int i = 0; i < 0x100; i++)
+		m_special_stack[i] = 0x00;
+
 	set_codebank(0);
 	set_databank(0);
 	m6502_device::device_reset();
 }
 
-// used by the xalda_idy  ( lda ($**), y )opcodes where databank value is used for high address bits
-inline uint8_t xavix_device::read_special(uint16_t adr)
-{
-	return read_full_data_sp(m_databank, adr);
-}
 
-// used by DMA and video operations (and custom new opcodes) where full address is specified
-uint8_t xavix_device::read_full_data_sp(uint32_t adr)
-{
-	return read_full_data_sp((adr&0xff0000)>>16, adr&0xffff);
-}
-
-void xavix_device::write_full_data_sp(uint32_t adr, uint8_t val)
-{
-	write_full_data_sp((adr&0xff0000)>>16, adr&0xffff, val);
-}
 
 xavix_device::mi_xavix_normal::mi_xavix_normal(xavix_device *_base)
 {
 	base = _base;
 }
 
-inline uint8_t xavix_device::read_full_data(uint32_t addr)
+void xavix_device::write_special_stack(uint8_t data)
+{
+	m_special_stack[m_special_stackpos&0xff] = data;
+}
+
+void xavix_device::dec_special_stack()
+{
+	m_special_stackpos--;
+}
+
+void xavix_device::inc_special_stack()
+{
+	m_special_stackpos++;
+}
+
+uint8_t xavix_device::read_special_stack()
+{
+	return m_special_stack[m_special_stackpos&0xff];
+}
+
+
+
+uint8_t xavix_device::read_full_data(uint32_t addr)
 {
 	return read_full_data((addr & 0xff0000)>>16, addr & 0xffff);
 }
@@ -143,58 +160,8 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 			}
 			else if (adr == 0xff)
 			{
-				return databank;
+				return m_databank;
 			}
-
-			return m_lowbus_space->read_byte(adr);
-		}
-		else
-		{
-			return m_extbus_space->read_byte((databank << 16) | adr);
-		}
-	}
-	else
-	{
-		if (adr < 0x8000)
-		{
-			if (adr == 0xfe)
-			{
-				//logerror("%02x%04x returning codebank\n", m_codebank, PC);
-				return m_codebank;
-			}
-			else if (adr == 0xff)
-			{
-				//logerror("%02x%04x returning databank\n", m_codebank, PC);
-				return databank;
-			}
-
-			if ((adr & 0x7fff) >= 0x200)
-			{
-				return m_extbus_space->read_byte((databank << 16) | adr);
-			}
-			else
-			{
-				//logerror("%02x%04x returning lowbus %04x\n", m_codebank, PC, adr); // useful for debugging opcodes which must ignore lowbus (all indirect ones?)
-				return m_lowbus_space->read_byte(adr);
-			}
-		}
-		else
-		{
-			return m_extbus_space->read_byte((databank << 16) | adr);
-		}
-	}
-}
-
-inline uint8_t xavix_device::read_full_data_sp(uint8_t databank, uint16_t adr)
-{
-	if (databank < 0x80)
-	{
-		if (adr < 0x8000)
-		{
-			if (adr == 0xfe)
-				return m_codebank;
-			else if (adr == 0xff)
-				return databank;
 
 			return m_lowbus_space->read_byte(adr);
 		}
@@ -208,7 +175,6 @@ inline uint8_t xavix_device::read_full_data_sp(uint8_t databank, uint16_t adr)
 		return m_extbus_space->read_byte((databank << 16) | adr);
 	}
 }
-
 
 // data reads
 inline uint8_t xavix_device::mi_xavix_normal::read(uint16_t adr)
@@ -235,6 +201,55 @@ void xavix_device::write_full_data(uint32_t addr, uint8_t val)
 	write_full_data((addr & 0xff0000)>>16, addr & 0xffff, val);
 }
 
+uint8_t xavix_device::read_stack(uint32_t addr)
+{
+	// address is always 0x100-0x1ff
+	return m_lowbus_space->read_byte((addr & 0xff)+0x100);
+}
+
+void xavix_device::write_stack(uint32_t addr, uint8_t val)
+{
+	// address is always 0x100-0x1ff
+	m_lowbus_space->write_byte((addr & 0xff)+0x100, val);
+}
+
+uint8_t xavix_device::read_zeropage(uint32_t addr)
+{
+	// address is always 0x00-0xff
+	addr &= 0xff;
+
+	if (addr == 0xfe)
+	{
+		return m_codebank;
+	}
+	else if (addr == 0xff)
+	{
+		return m_databank;
+	}
+
+	return m_lowbus_space->read_byte(addr);
+}
+
+void xavix_device::write_zeropage(uint32_t addr, uint8_t val)
+{
+	// address is always 0x00-0xff
+	addr &= 0xff;
+
+	if (addr == 0xfe)
+	{
+		m_codebank = val;
+		return;
+	}
+	else if (addr == 0xff)
+	{
+		m_databank = val;
+		return;
+	}
+
+	m_lowbus_space->write_byte(addr, val);
+}
+
+
 // data writes
 inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_t val)
 {
@@ -253,50 +268,6 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 				return;
 			}
 
-			m_lowbus_space->write_byte(adr, val);
-		}
-		else
-		{
-			m_extbus_space->write_byte((databank << 16) | adr, val);
-		}
-	}
-	else
-	{
-		if (adr < 0x8000)
-		{
-			if (adr == 0xfe)
-			{
-				m_codebank = val;
-				return;
-			}
-			else if (adr == 0xff)
-			{
-				m_databank = val;
-				return;
-			}
-
-			if ((adr & 0x7fff) >= 0x200)
-			{
-				m_extbus_space->write_byte((databank << 16) | adr, val);
-			}
-			else
-			{
-				m_lowbus_space->write_byte(adr, val);
-			}
-		}
-		else
-		{
-			m_extbus_space->write_byte((databank << 16) | adr, val);
-		}
-	}
-}
-
-inline void xavix_device::write_full_data_sp(uint8_t databank, uint16_t adr, uint8_t val)
-{
-	if (databank < 0x80)
-	{
-		if (adr < 0x8000)
-		{
 			m_lowbus_space->write_byte(adr, val);
 		}
 		else

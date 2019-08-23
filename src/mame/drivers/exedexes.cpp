@@ -22,14 +22,14 @@
 #include "speaker.h"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::exedexes_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240) // vblank-out irq
+	if (scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
 
-	if(scanline == 0) // unknown irq event
+	if (scanline == 0) // unknown irq event
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
 }
 
@@ -43,18 +43,17 @@ void exedexes_state::exedexes_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW0");
 	map(0xc004, 0xc004).portr("DSW1");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(exedexes_state::exedexes_c804_w));                              /* coin counters + text layer enable */
+	map(0xc804, 0xc804).w(FUNC(exedexes_state::c804_w));                              /* coin counters + text layer enable */
 	map(0xc806, 0xc806).nopw();                                            /* Watchdog ?? */
-	map(0xd000, 0xd3ff).ram().w(FUNC(exedexes_state::exedexes_videoram_w)).share("videoram"); /* Video RAM */
-	map(0xd400, 0xd7ff).ram().w(FUNC(exedexes_state::exedexes_colorram_w)).share("colorram"); /* Color RAM */
+	map(0xd000, 0xd3ff).ram().w(FUNC(exedexes_state::videoram_w)).share("videoram"); /* Video RAM */
+	map(0xd400, 0xd7ff).ram().w(FUNC(exedexes_state::colorram_w)).share("colorram"); /* Color RAM */
 	map(0xd800, 0xd801).writeonly().share("nbg_yscroll");
 	map(0xd802, 0xd803).writeonly().share("nbg_xscroll");
 	map(0xd804, 0xd805).writeonly().share("bg_scroll");
-	map(0xd807, 0xd807).w(FUNC(exedexes_state::exedexes_gfxctrl_w));                           /* layer enables */
+	map(0xd807, 0xd807).w(FUNC(exedexes_state::gfxctrl_w));                           /* layer enables */
 	map(0xe000, 0xefff).ram();                                                 /* Work RAM */
 	map(0xf000, 0xffff).ram().share("spriteram");   /* Sprite RAM */
 }
-
 
 
 void exedexes_state::sound_map(address_map &map)
@@ -66,7 +65,6 @@ void exedexes_state::sound_map(address_map &map)
 	map(0x8002, 0x8002).w("sn1", FUNC(sn76489_device::write));
 	map(0x8003, 0x8003).w("sn2", FUNC(sn76489_device::write));
 }
-
 
 
 static INPUT_PORTS_START( exedexes )
@@ -150,49 +148,39 @@ static INPUT_PORTS_START( exedexes )
 INPUT_PORTS_END
 
 
-
-
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
+	RGN_FRAC(1,1),    /* 512 characters */
 	2,  /* 2 bits per pixel */
 	{ 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
 	16*8    /* every char takes 16 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
 	16,16,  /* 16*16 sprites */
-		256,    /* 256 sprites */
-		4,      /* 4 bits per pixel */
-		{ 0x4000*8+4, 0x4000*8+0, 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
-			32*8+0, 32*8+1, 32*8+2, 32*8+3, 33*8+0, 33*8+1, 33*8+2, 33*8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	RGN_FRAC(1,2),    /* 256 sprites */
+	4,      /* 4 bits per pixel */
+	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
+	{ STEP4(0,1), STEP4(4*2,1), STEP4(4*2*2*16,1), STEP4(4*2*2*16+4*2,1) },
+	{ STEP16(0,4*2*2) },
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
 	32,32,  /* 32*32 tiles */
-	64,    /* 64 tiles */
+	RGN_FRAC(1,1),    /* 64 tiles */
 	2,      /* 2 bits per pixel */
 	{ 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
-			64*8+0, 64*8+1, 64*8+2, 64*8+3, 65*8+0, 65*8+1, 65*8+2, 65*8+3,
-			128*8+0, 128*8+1, 128*8+2, 128*8+3, 129*8+0, 129*8+1, 129*8+2, 129*8+3,
-			192*8+0, 192*8+1, 192*8+2, 192*8+3, 193*8+0, 193*8+1, 193*8+2, 193*8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16,
-			16*16, 17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16,
-			24*16, 25*16, 26*16, 27*16, 28*16, 29*16, 30*16, 31*16 },
+	{ STEP4(0,1), STEP4(4*2,1), STEP4(4*2*2*32,1), STEP4(4*2*2*32+4*2,1),
+		STEP4(4*2*2*64,1), STEP4(4*2*2*64+4*2,1), STEP4(4*2*2*96,1), STEP4(4*2*2*96+4*2,1) },
+	{ STEP32(0,4*2*2) },
 	256*8   /* every tile takes 256 consecutive bytes */
 };
-
 
 
 static GFXDECODE_START( gfx_exedexes )
@@ -224,12 +212,11 @@ void exedexes_state::exedexes(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4000000);   /* 4 MHz (?) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &exedexes_state::exedexes_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(exedexes_state::exedexes_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(exedexes_state::scanline), "screen", 0, 1);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));  /* 3 MHz ??? */
 	audiocpu.set_addrmap(AS_PROGRAM, &exedexes_state::sound_map);
 	audiocpu.set_periodic_int(FUNC(exedexes_state::irq0_line_hold), attotime::from_hz(4*60));
-
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -239,7 +226,7 @@ void exedexes_state::exedexes(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(exedexes_state::screen_update_exedexes));
+	screen.set_screen_update(FUNC(exedexes_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
@@ -258,7 +245,6 @@ void exedexes_state::exedexes(machine_config &config)
 
 	SN76489(config, "sn2", 3000000).add_route(ALL_OUTPUTS, "mono", 0.36);
 }
-
 
 
 ROM_START( exedexes )
@@ -284,7 +270,7 @@ ROM_START( exedexes )
 	ROM_LOAD( "j11_ee10.bin", 0x00000, 0x4000, CRC(bc83e265) SHA1(ac9b4cce9e539c560414abf2fc239910f2bfbb2d) ) /* Sprites planes 0-1 */
 	ROM_LOAD( "j12_ee11.bin", 0x04000, 0x4000, CRC(0e0f300d) SHA1(2f973748e459b16673115abf7de8615219e39fa4) ) /* Sprites planes 2-3 */
 
-	ROM_REGION( 0x6000, "gfx5", 0 ) /* background tilemaps */
+	ROM_REGION( 0x6000, "tilerom", 0 ) /* background tilemaps */
 	ROM_LOAD( "c01_ee07.bin", 0x0000, 0x4000, CRC(3625a68d) SHA1(83010ca356385b713bafe03a502c566f6a9a8365) )    /* Front Tile Map */
 	ROM_LOAD( "h04_ee09.bin", 0x4000, 0x2000, CRC(6057c907) SHA1(886790641b84b8cd659d2eb5fd1adbabdd7dad3d) )    /* Back Tile map */
 
@@ -326,7 +312,7 @@ ROM_START( savgbees )
 	ROM_LOAD( "j11_ee10.bin", 0x00000, 0x4000, CRC(bc83e265) SHA1(ac9b4cce9e539c560414abf2fc239910f2bfbb2d) ) /* Sprites planes 0-1 */
 	ROM_LOAD( "j12_ee11.bin", 0x04000, 0x4000, CRC(0e0f300d) SHA1(2f973748e459b16673115abf7de8615219e39fa4) ) /* Sprites planes 2-3 */
 
-	ROM_REGION( 0x6000, "gfx5", 0 ) /* background tilemaps */
+	ROM_REGION( 0x6000, "tilerom", 0 ) /* background tilemaps */
 	ROM_LOAD( "c01_ee07.bin", 0x0000, 0x4000, CRC(3625a68d) SHA1(83010ca356385b713bafe03a502c566f6a9a8365) )    /* Front Tile Map */
 	ROM_LOAD( "h04_ee09.bin", 0x4000, 0x2000, CRC(6057c907) SHA1(886790641b84b8cd659d2eb5fd1adbabdd7dad3d) )    /* Back Tile map */
 
@@ -344,7 +330,6 @@ ROM_START( savgbees )
 	ROM_LOAD( "l03_e-09.bin", 0x0a00, 0x0100, CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) )    /* unknown (all 0) */
 	ROM_LOAD( "03e_e-01.bin", 0x0b00, 0x0020, CRC(1acee376) SHA1(367094d924f8e0ec36d8310fada4d8143358f697) )    /* unknown (priority?) */
 ROM_END
-
 
 
 GAME( 1985, exedexes, 0,        exedexes, exedexes, exedexes_state, empty_init, ROT270, "Capcom", "Exed Exes", MACHINE_SUPPORTS_SAVE )

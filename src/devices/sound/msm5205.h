@@ -28,8 +28,6 @@ public:
 		m_s2 = BIT(select, 0);
 		m_bitwidth = (select & 4) ? 4 : 3;
 	}
-	template <class Object> devcb_base &set_vck_callback(Object &&cb) { return m_vck_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vck_legacy_callback(Object &&cb) { return m_vck_legacy_cb.set_callback(std::forward<Object>(cb)); }
 	auto vck_callback() { return m_vck_cb.bind(); }
 	auto vck_legacy_callback() { return m_vck_legacy_cb.bind(); }
 

@@ -179,7 +179,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_restore );
 	DECLARE_INPUT_CHANGED_MEMBER( caps_lock );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c128);
 
 	DECLARE_READ8_MEMBER( cia2_pb_r );
 	DECLARE_WRITE8_MEMBER( cia2_pb_w );
@@ -279,7 +279,7 @@ enum
 };
 
 
-QUICKLOAD_LOAD_MEMBER( c128_state, cbm_c64 )
+QUICKLOAD_LOAD_MEMBER(c128_state::quickload_c128)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
@@ -319,8 +319,8 @@ int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, i
 	int vicfix = 1;
 	int sphi2 = m_vic->phi0_r();
 
-	m_game = m_exp->game_r(ca, sphi2, ba, rw, m_hiram);
-	m_exrom = m_exp->exrom_r(ca, sphi2, ba, rw, m_hiram);
+	m_game = m_exp->game_r(ca, sphi2, ba, rw, m_loram, m_hiram);
+	m_exrom = m_exp->exrom_r(ca, sphi2, ba, rw, m_loram, m_hiram);
 
 	uint32_t input = sphi2 << 26 | m_va14 << 25 | m_charen << 24 |
 		m_hiram << 23 | m_loram << 22 | ba << 21 | VMA5 << 20 | VMA4 << 19 | ms0 << 18 | ms1 << 17 | ms2 << 16 |
@@ -1755,8 +1755,7 @@ void c128_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128), this);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
@@ -1950,8 +1949,7 @@ void c128_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(c128_state, cbm_c64), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128), this);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");

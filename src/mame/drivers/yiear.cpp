@@ -151,10 +151,11 @@ void yiear_state::main_map(address_map &map)
 	map(0x4e02, 0x4e02).portr("P2");
 	map(0x4e03, 0x4e03).portr("DSW1");
 	map(0x4f00, 0x4f00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x5000, 0x5fff).ram();
 	map(0x5000, 0x502f).ram().share("spriteram");
+	map(0x5030, 0x53ff).ram();
 	map(0x5400, 0x542f).ram().share("spriteram2");
-	map(0x5800, 0x5fff).w(FUNC(yiear_state::yiear_videoram_w)).share("videoram");
+	map(0x5430, 0x57ff).ram();
+	map(0x5800, 0x5fff).ram().w(FUNC(yiear_state::yiear_videoram_w)).share("videoram");
 	map(0x8000, 0xffff).rom();
 }
 

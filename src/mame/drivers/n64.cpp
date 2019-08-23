@@ -37,12 +37,12 @@ private:
 	DECLARE_READ32_MEMBER(dd_null_r);
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void mempak_format(uint8_t* pak);
 	image_init_result disk_load(device_image_interface &image);
 	void disk_unload(device_image_interface &image);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( n64dd );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_n64dd);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_n64dd);
 	void n64_map(address_map &map);
 	void n64dd_map(address_map &map);
 	void rsp_map(address_map &map);
@@ -306,7 +306,7 @@ void n64_mess_state::mempak_format(uint8_t* pak)
 	memcpy(pak+512, pak_inode_table, 256); // Mirror
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
+DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::cart_load)
 {
 	int i, length;
 	uint8_t *cart = memregion("user2")->base();
@@ -399,12 +399,12 @@ MACHINE_START_MEMBER(n64_mess_state,n64dd)
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64dd)
+DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::load_n64dd)
 {
 	return disk_load(image);
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER(n64_mess_state,n64dd)
+DEVICE_IMAGE_UNLOAD_MEMBER(n64_mess_state::unload_n64dd)
 {
 	disk_unload(image);
 }
@@ -469,7 +469,7 @@ void n64_mess_state::n64(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart", "v64,z64,rom,n64,bin"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(device_image_load_delegate(&n64_mess_state::device_image_load_n64_cart, this));
+	cartslot.set_device_load(FUNC(n64_mess_state::cart_load), this);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("n64");
@@ -484,11 +484,11 @@ void n64_mess_state::n64dd(machine_config &config)
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "n64_cart"));
 	cartslot.set_extensions("v64,z64,rom,n64,bin");
-	cartslot.set_device_load(device_image_load_delegate(&n64_mess_state::device_image_load_n64_cart, this));
+	cartslot.set_device_load(FUNC(n64_mess_state::cart_load), this);
 
 	harddisk_image_device &hdd(HARDDISK(config, "n64disk"));
-	hdd.set_device_load(device_image_load_delegate(&n64_mess_state::device_image_load_n64dd, this));
-	hdd.set_device_unload(device_image_func_delegate(&n64_mess_state::device_image_unload_n64dd, this));
+	hdd.set_device_load(FUNC(n64_mess_state::load_n64dd), this);
+	hdd.set_device_unload(FUNC(n64_mess_state::unload_n64dd), this);
 	hdd.set_interface("n64dd_disk");
 
 	SOFTWARE_LIST(config, "dd_list").set_original("n64dd");

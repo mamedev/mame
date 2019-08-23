@@ -85,13 +85,13 @@ void k054000_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE8_MEMBER( k054000_device::write )
+void k054000_device::write(offs_t offset, u8 data)
 {
 	//logerror("%s: write %02x to 054000 address %02x\n",m_maincpu->pc(),data,offset);
 	m_regs[offset] = data;
 }
 
-READ8_MEMBER( k054000_device::read )
+u8 k054000_device::read(offs_t offset)
 {
 	int Acx, Acy, Aax, Aay;
 	int Bcx, Bcy, Bax, Bay;
@@ -131,15 +131,4 @@ READ8_MEMBER( k054000_device::read )
 		return 1;
 
 	return 0;
-}
-
-READ16_MEMBER( k054000_device::lsb_r )
-{
-	return read(space, offset);
-}
-
-WRITE16_MEMBER( k054000_device::lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		write(space, offset, data & 0xff);
 }

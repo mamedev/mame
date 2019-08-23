@@ -90,6 +90,7 @@ public:
 	void init_zerogun();
 	void init_sgt24h();
 	void init_srallyc();
+	void init_powsledm();
 
 protected:
 	virtual void machine_start() override;
@@ -495,6 +496,7 @@ public:
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
 	void indy500(machine_config &config);
+	void powsled(machine_config &config);
 	void rchase2(machine_config &config);
 	void gunblade(machine_config &config);
 	void dynabb(machine_config &config);

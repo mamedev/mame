@@ -58,14 +58,14 @@ Ghouls & Ghosts            171-5869A   -                 610-0239-23         MPR
 Super Hang On              171-5782    837-6963-24       610-0239-24         MPR-12640      (234000)      EPR-12368-24   (27256)   n/a
 Forgotten Worlds           171-5782    837-6963-26       610-0239-26         MPR-12672-H    (Mask)        EPR-12368-26   (27256)   n/a
 The Revenge Of Shinobi     171-5782    837-6963-28       610-0239-28         MPR-12675 S44  (uPD23C4000)  EPR-12368-28   (27C256)  n/a
-Arnold Palmer Tour Golf    171-5782    837-6963-31       610-0239-31         MPR-12645F     (23C4000)     EPR-12368-31   (27256)   n/a
+Arnold Palmer Tour Golf    171-5782    837-6963-31       610-0239-31         MPR-12645F     (834200A)     EPR-12368-31   (27256)   n/a
 Super Real Basket Ball     171-5782    837-6963-32       610-0239-32         MPR-12904F     (838200A)     EPR-12368-32   (27256)   n/a
 Tommy Lasorda Baseball     171-5782    837-6963-35       610-0239-35         MPR-12706F     (834200A)     EPR-12368-35   (27256)   n/a
 ESWAT                      171-5782    837-6963-38       610-0239-38         MPR-13192-H    (uPD23C4000)  EPR-12368-38   (27256)   n/a
 Moonwalker                 171-5782    837-6963-40       610-0239-40         MPR-13285A S61 (uPD23C4000)  EPR-12368-40   (27256)   n/a
 Shadow Dancer              171-5782    837-6963-43       610-0239-43         MPR-13571-S    (uPD23C4000)  EPR-12368-43   (27256)   n/a
-Wrestle War                171-5782    837-6963-48       610-0239-48         MPR-14025-F    (23C4000)     EPR-12368-48   (27256)   n/a
-Bonanza Bros.              171-5782    837-6963-49       610-0239-49         MPR-13905A-F   (23C4000)     EPR-12368-49   (27256)   n/a
+Wrestle War                171-5782    837-6963-48       610-0239-48         MPR-14025-F    (834200A)     EPR-12368-48   (27256)   n/a
+Bonanza Bros.              171-5782    837-6963-49       610-0239-49         MPR-13905A-F   (834200A)     EPR-12368-49   (27256)   n/a
 Streets of Rage            171-5782    837-6963-51       610-0239-51         MPR-14125-SM   (uPD23C4000)  EPR-12368-51   (27C256)  n/a
 Sonic The Hedgehog         171-5782    837-6963-52       610-0239-52         MPR-13913-F    (834200A)     EPR-12368-52   (27C256)  n/a
 Spider-Man                 171-5782    837-6963-54       610-0239-54         MPR-14027-SM   (uPD23C4000)  EPR-12368-54   (27C256)  n/a
@@ -715,7 +715,7 @@ void mtech_state::megatech(machine_config &config)
 	screen.set_screen_update(FUNC(mtech_state::screen_update_main));
 	screen.screen_vblank().set(FUNC(mtech_state::screen_vblank_main));
 
-	m_vdp->irq().set_inputline(m_z80snd, 0);
+	m_vdp->n_int().set_inputline(m_z80snd, 0);
 
 	screen_device &menu(SCREEN(config, "menu", SCREEN_TYPE_RASTER));
 	// check frq
@@ -727,7 +727,7 @@ void mtech_state::megatech(machine_config &config)
 	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
 	m_vdp1->set_screen("menu");
 	m_vdp1->set_is_pal(false);
-	m_vdp1->irq().set_inputline(m_bioscpu, 0);
+	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
 	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }
@@ -767,34 +767,36 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 	return image_init_result::PASS;
 }
 
-#define MCFG_MEGATECH_CARTSLOT_ADD(_tag, _load) \
-	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "megatech_cart") \
-	MCFG_GENERIC_LOAD(mtech_state, _load)
+#define MEGATECH_CARTSLOT(_tag, _load) \
+	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "megatech_cart").set_device_load(FUNC(mtech_state::_load), this)
 
-MACHINE_CONFIG_START(mtech_state::megatech_multislot)
+void mtech_state::megatech_multislot(machine_config &config)
+{
 	megatech(config);
 
 	// add cart slots
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot2", mt_cart2)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot3", mt_cart3)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot4", mt_cart4)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot5", mt_cart5)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot6", mt_cart6)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot7", mt_cart7)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot8", mt_cart8)
+	MEGATECH_CARTSLOT("mt_slot1", mt_cart1);
+	MEGATECH_CARTSLOT("mt_slot2", mt_cart2);
+	MEGATECH_CARTSLOT("mt_slot3", mt_cart3);
+	MEGATECH_CARTSLOT("mt_slot4", mt_cart4);
+	MEGATECH_CARTSLOT("mt_slot5", mt_cart5);
+	MEGATECH_CARTSLOT("mt_slot6", mt_cart6);
+	MEGATECH_CARTSLOT("mt_slot7", mt_cart7);
+	MEGATECH_CARTSLOT("mt_slot8", mt_cart8);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("megatech");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(mtech_state::megatech_fixedslot)
+void mtech_state::megatech_fixedslot(machine_config &config)
+{
 	megatech(config);
 
 	// add cart slots
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
-	MCFG_SET_IMAGE_LOADABLE(false)
-MACHINE_CONFIG_END
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "mt_slot1", generic_plain_slot, "megatech_cart"));
+	cartslot.set_device_load(FUNC(mtech_state::mt_cart1), this);
+	cartslot.set_user_loadable(false);
+}
 
 
 /* MegaTech Games - Genesis & sms! Games with a timer */
@@ -1102,12 +1104,12 @@ ROM_START( mt_parlg ) /* Parlour Games */
 ROM_END
 
 
-/* Game 31 - Arnold Palmer Tournament Gold */
+/* Game 31 - Arnold Palmer Tournament Golf */
 ROM_START( mt_tgolf ) /* Arnold Palmer Tournament Golf */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "mp12645f.ic1", 0x000000, 0x080000, CRC(c07ef8d2) SHA1(9d111fdc7bb92d52bfa048cd134aa488b4f475ef) )
+	ROM_LOAD16_WORD_SWAP( "mpr-12645f.ic1", 0x000000, 0x080000, CRC(c07ef8d2) SHA1(9d111fdc7bb92d52bfa048cd134aa488b4f475ef) )
 	ROM_LOAD16_BYTE( "epr-12368-31.ic2", 0x300001, 0x08000, CRC(30af7e4a) SHA1(baf91d527393dc90aba9371abcb1e690bcc83c7e) )
 
 	ROM_REGION( 0x01, "sms_pin", ROMREGION_ERASE00 )
@@ -1248,11 +1250,13 @@ ROM_END
 
 
 /* Game 49 - Bonanza Bros. */
+// original dump of mpr-13905a.ic1 had a size of 0x100000, which is a double dump of the correct size 0x080000
+// the IC is a Fujitsu MB834200A MaskROM by 4Mb (512KB) in a DIP40-600mil package
 ROM_START( mt_bbros ) /* Bonanza Bros. */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "mp13905a.ic1", 0x000000, 0x100000, CRC(68a88d60) SHA1(2f56e8a2b0999de4fa0d14a1527f4e1df0f9c7a2) )
+	ROM_LOAD16_WORD_SWAP( "mpr-13905a.ic1", 0x000000, 0x080000, CRC(6d617940) SHA1(11d5ff1c2db79632f6dea2edf97f56af2149cea4) )
 	ROM_LOAD16_BYTE( "epr-12368-49.ic2", 0x300001, 0x08000, CRC(c5101da2) SHA1(636f30043e2e9291e193ef9a2ead2e97a0bf7380) )
 
 	ROM_REGION( 0x01, "sms_pin", ROMREGION_ERASE00 )
@@ -1384,14 +1388,14 @@ ROM_END
 
 
 /* Game 61 - Turbo Outrun */
-// original dump of epr-14674.ic1 had CRC(c2b9a802) SHA1(108cc844c944125f9d271a2f2db094301294e8c2)
+// original dump of mpr-14674.ic1 had CRC(c2b9a802) SHA1(108cc844c944125f9d271a2f2db094301294e8c2)
 // with the byte at offset 3 being F6 instead of Fe, this seems like a bad dump when compared to the Genesis rom which
 // has been verified on multiple carts, chances are the ROM had developed a fault.
 ROM_START( mt_tout ) /* Turbo Outrun */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "epr-14674.ic1", 0x000000, 0x080000, CRC(453712a2) SHA1(5d2c8430a9a14aac7f19c22617539b0503ab92cd) )
+	ROM_LOAD16_WORD_SWAP( "mpr-14674.ic1", 0x000000, 0x080000, CRC(453712a2) SHA1(5d2c8430a9a14aac7f19c22617539b0503ab92cd) )
 	ROM_LOAD16_BYTE( "epr-12368-61.ic2", 0x300001, 0x08000, CRC(4aa0b2a2) SHA1(bce03f88d6cfd02683d51c28058f6229fda13b49) )
 
 	ROM_REGION( 0x01, "sms_pin", ROMREGION_ERASE00 )

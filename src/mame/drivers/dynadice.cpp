@@ -42,6 +42,7 @@ dy_6.bin (near Z80)
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class dynadice_state : public driver_device

@@ -36,12 +36,12 @@ public:
 		set_ipt_convert_callback(ipt_convert_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
 	}
 
-	DECLARE_WRITE8_MEMBER( di_w );
-	DECLARE_WRITE8_MEMBER( cs_w );
-	DECLARE_WRITE8_MEMBER( sclk_w );
-	DECLARE_WRITE8_MEMBER( conv_w );
-	DECLARE_READ8_MEMBER( do_r );
-	DECLARE_READ8_MEMBER( eoc_r );
+	void di_w(u8 data);
+	void cs_w(u8 data);
+	void sclk_w(u8 data);
+	void conv_w(u8 data = 0);
+	u8 do_r();
+	u8 eoc_r();
 
 protected:
 	adc12138_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

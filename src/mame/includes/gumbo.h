@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 class gumbo_state : public driver_device
 {
 public:

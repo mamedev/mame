@@ -11,6 +11,7 @@
 #include "machine/timer.h"
 #include "video/kan_pand.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #define PROT_OUTPUT_BUFFER_SIZE 8
 

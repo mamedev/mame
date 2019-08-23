@@ -55,7 +55,15 @@ DEFINE_DEVICE_TYPE(SGI_MACE, mace_device, "sgimace", "SGI MACE")
 mace_device::mace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SGI_MACE, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_rtc_read_callback(*this)
+	, m_rtc_write_callback(*this)
 {
+}
+
+void mace_device::device_resolve_objects()
+{
+	m_rtc_read_callback.resolve_safe(0);
+	m_rtc_write_callback.resolve_safe();
 }
 
 void mace_device::device_start()
@@ -82,15 +90,12 @@ void mace_device::device_start()
 	m_timer_msc = timer_alloc(TIMER_MSC);
 	m_timer_ust->adjust(attotime::never);
 	m_timer_msc->adjust(attotime::never);
-
-	save_item(NAME(m_rtc.m_unknown));
 }
 
 void mace_device::device_reset()
 {
 	memset(&m_isa, 0, sizeof(isa_t));
 	memset(&m_ust_msc, 0, sizeof(ust_msc_t));
-	memset(&m_rtc, 0, sizeof(rtc_t));
 
 	m_timer_ust->adjust(attotime::from_nsec(960), 0, attotime::from_nsec(960));
 	m_timer_msc->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
@@ -117,7 +122,7 @@ void mace_device::map(address_map &map)
 	map(0x00330000, 0x0033ffff).rw(FUNC(mace_device::i2c_r), FUNC(mace_device::i2c_w));
 	map(0x00340000, 0x0034ffff).rw(FUNC(mace_device::ust_msc_r), FUNC(mace_device::ust_msc_w));
 	map(0x00380000, 0x0039ffff).rw(FUNC(mace_device::isa_ext_r), FUNC(mace_device::isa_ext_w));
-	map(0x003a0000, 0x003a3fff).rw(FUNC(mace_device::rtc_r), FUNC(mace_device::rtc_w));
+	map(0x003a0000, 0x003a7fff).rw(FUNC(mace_device::rtc_r), FUNC(mace_device::rtc_w));
 }
 
 //**************************************************************************
@@ -415,36 +420,20 @@ WRITE64_MEMBER(mace_device::isa_ext_w)
 
 READ64_MEMBER(mace_device::rtc_r)
 {
-	uint64_t ret = 0ULL;
-	switch (offset)
-	{
-	case 0x3f00/8:
-		ret = m_rtc.m_unknown;
-		LOGMASKED(LOG_READ_RTC, "%s: MACE: RTC: Unknown Read: %08x = %08x%08x & %08x%08x\n", machine().describe_context(), 0x1f3a0000 + offset*8
-			, (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-		break;
-	default:
-		LOGMASKED(LOG_READ_RTC, "%s: MACE: RTC: Unknown Read: %08x = %08x%08x & %08x%08x\n", machine().describe_context()
-			, 0x1f3a0000 + offset*8, (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-		break;
-	}
+	uint64_t ret = m_rtc_read_callback(offset >> 5);
+
+	LOGMASKED(LOG_READ_RTC, "%s: MACE: RTC Read: %08x (register %02x) = %08x%08x & %08x%08x\n", machine().describe_context()
+		, 0x1f3a0000 + offset*8, offset >> 5, (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+
 	return ret;
 }
 
 WRITE64_MEMBER(mace_device::rtc_w)
 {
-	switch (offset)
-	{
-	case 0x3f00/8:
-		LOGMASKED(LOG_WRITE_RTC, "%s: MACE: RTC: Unknown Write: %08x = %08x%08x & %08x%08x\n", machine().describe_context(), 0x1f3a0000 + offset*8
-			, (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-		m_rtc.m_unknown = data;
-		break;
-	default:
-		LOGMASKED(LOG_WRITE_RTC, "%s: MACE: RTC: Unknown Write: %08x = %08x%08x & %08x%08x\n", machine().describe_context(), 0x1f3a0000 + offset*8
-			, (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
-		return;
-	}
+	LOGMASKED(LOG_WRITE_RTC, "%s: MACE: RTC Write: %08x (register %02x) = %08x%08x & %08x%08x\n", machine().describe_context(), 0x1f3a0000 + offset*8
+			, offset >> 5, (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+
+	m_rtc_write_callback(offset >> 5, data & 0xff);
 }
 
 //**************************************************************************

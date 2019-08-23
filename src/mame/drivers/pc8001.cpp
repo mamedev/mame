@@ -523,7 +523,8 @@ void pc8001_state::pc8001(machine_config &config)
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
 }
@@ -570,7 +571,8 @@ void pc8001mk2_state::pc8001mk2(machine_config &config)
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 }

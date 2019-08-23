@@ -438,7 +438,7 @@ void tms7000_device::timer_run(int tmr)
 	// run automatic timer if source is internal
 	if ((m_timer_control[tmr] & 0xe0) == 0x80)
 	{
-		attotime period = attotime::from_hz(clock()) * 8 * (m_timer_prescaler[tmr] + 1); // fOSC/16 - fOSC is freq _before_ internal clockdivider
+		attotime period = attotime::from_hz(clock()) * 16 * (m_timer_prescaler[tmr] + 1); // fOSC/16 - fOSC is freq _before_ internal clockdivider
 		m_timer_handle[tmr]->adjust(period, tmr);
 	}
 }

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 
+<!-- NOTE: no chesspieces simulation here, ACI GGM is a multiple boardgame console, not just chess -->
+
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.16" green="0.16" blue="0.16" /></rect></element>
@@ -36,14 +38,8 @@
 	</element>
 
 	<element name="hl" defstate="0">
-		<text string=" ">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-		<rect state="1">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
+		<text string=" "/>
+		<rect state="1"><color red="0" green="0" blue="0" /></rect>
 	</element>
 
 	<element name="text_r1"><text string="MEM"><color red="0.3" green="0.3" blue="0.3" /></text></element>

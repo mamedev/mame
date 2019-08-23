@@ -20,7 +20,6 @@
 #include "machine/buffer.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 #include "formats/trs_cas.h"
@@ -95,7 +94,7 @@ private:
 	INTERRUPT_GEN_MEMBER(fdc_interrupt);
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( trs80_cmd );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	DECLARE_MACHINE_RESET(lnw80);
 	void lnw80_palette(palette_device &palette) const;
 	uint32_t screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

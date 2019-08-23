@@ -242,8 +242,9 @@ WRITE8_MEMBER(liberate_state::prosport_charram_w)
 
 void liberate_state::prosport_map(address_map &map)
 {
-	map(0x0000, 0x03ff).mirror(0x2000).ram();
-	map(0x0200, 0x021f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x0000, 0x01ff).mirror(0x2000).ram();
+	map(0x0200, 0x021f).mirror(0x2000).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x0220, 0x03ff).mirror(0x2000).ram();
 	map(0x0400, 0x07ff).ram().w(FUNC(liberate_state::prosport_bg_vram_w)).share("bg_vram");
 	map(0x0800, 0x1fff).rw(FUNC(liberate_state::prosport_charram_r), FUNC(liberate_state::prosport_charram_w)); //0x1e00-0x1fff isn't charram!
 	map(0x2400, 0x2fff).ram();

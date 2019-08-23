@@ -89,6 +89,7 @@ Bprom dump by f205v
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class stuntair_state : public driver_device

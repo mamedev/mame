@@ -13,16 +13,18 @@ NOTES:
 A couple of things unaccounted for:
 
 No backgrounds ROMs from the original board...
-- This may be related to the SubCPU. I don't think it's contributing
-  much right now, but I could be wrong. And it would explain that vast
-  expanse of bankswitch ROM on a slave CPU....
-- Just had a look at the sprites, and they seem like kosher sprites all
-  the way up.... So it must be hidden in the sub-cpu somewhere?
+- TOSHIBA TRJ-100 installed at the second board should contain the image
+  as U.S. Championship V'Ball has a TRJ-101 that contains it. A custom made
+  adapter is needed to dump it.
 - Got two bootleg sets with background gfx roms. Using those on the
   original games for now.
 
 OBVIOUS SPEED PROBLEMS...
 - Timers are too fast and/or too slow, and the whole thing's moving too fast
+- TRJ-100 is accessed at about 3MHz speed, but seems to generate 5MHz clock
+  internally. This clock is exposed at the pin 22, and used as a clock at least
+  for some shifter ICs, such as IC110, 111, 112, and 113. Timers might be based
+  on this 5MHz clock, too?
 
 Port 0x2800 on the Sub CPU.
 - All those I/O looking ports on the main CPU (0x3exx and 0x3fxx)
@@ -733,7 +735,7 @@ ROM_START( chinagat )
 
 	ROM_REGION(0x40000, "gfx3", 0 ) /* Background */
 	ROM_LOAD( "chinagat_a-13", 0x00000, 0x10000, BAD_DUMP CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) ) // not dumped yet, these were taken from the bootleg set instead
-	ROM_LOAD( "chinagat_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // Where are these on the real board?
+	ROM_LOAD( "chinagat_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // TRJ-100 should contain it, but not dumped yet.
 	ROM_LOAD( "chinagat_a-15", 0x20000, 0x10000, BAD_DUMP CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
 	ROM_LOAD( "chinagat_a-14", 0x30000, 0x10000, BAD_DUMP CRC(aef814c8) SHA1(f6b9229ca7beb9a0e47d1f6a1083c6102fdd20c8) )
 
@@ -770,7 +772,7 @@ ROM_START( saiyugou )
 
 	ROM_REGION(0x40000, "gfx3", 0 ) /* Background */
 	ROM_LOAD( "saiyugou_a-13", 0x00000, 0x10000, BAD_DUMP CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) ) // not dumped yet, these were taken from the bootleg set instead
-	ROM_LOAD( "saiyugou_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // Where are these on the real board?
+	ROM_LOAD( "saiyugou_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // TRJ-100 should contain it, but not dumped yet.
 	ROM_LOAD( "saiyugou_a-15", 0x20000, 0x10000, BAD_DUMP CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
 	ROM_LOAD( "saiyugou_a-14", 0x30000, 0x10000, BAD_DUMP CRC(aef814c8) SHA1(f6b9229ca7beb9a0e47d1f6a1083c6102fdd20c8) )
 

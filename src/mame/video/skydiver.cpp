@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(skydiver_state::lamp_r_w)
 WRITE8_MEMBER(skydiver_state::latch3_watchdog_w)
 {
 	m_watchdog->watchdog_reset();
-	m_latch3->write_a0(space, offset, 0);
+	m_latch3->write_a0(offset);
 }
 
 

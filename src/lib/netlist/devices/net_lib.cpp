@@ -93,8 +93,10 @@ namespace devices
 		LIB_ENTRY(7493_dip)
 		LIB_ENTRY(7497)
 		LIB_ENTRY(7497_dip)
+#if (!USE_TRUTHTABLE_74107)
 		LIB_ENTRY(74107)
 		LIB_ENTRY(74107_dip)
+#endif
 		LIB_ENTRY(74107A)    // FIXME: implement missing DIP
 		LIB_ENTRY(74123)
 		LIB_ENTRY(74123_dip)

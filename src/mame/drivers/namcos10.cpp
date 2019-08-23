@@ -42,12 +42,12 @@ Seishun Quiz Colorful High School (CHS1 Ver.A)     (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)            (C) Namco, 2004
 Shamisen Brothers                                  (C) Kato/Konami, 2003
 Star Trigon (STT1 Ver.A)                           (C) Namco, 2002
-*Taiko No Tatsujin                                 (C) Namco, 2001
-Taiko No Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001
-Taiko No Tatsujin 3 (TK31 Ver.A)                   (C) Namco, 2002
-Taiko No Tatsujin 4 (TK41 Ver.A)                   (C) Namco, 2003
-Taiko No Tatsujin 5 (TK51 Ver.A)                   (C) Namco, 2003
-Taiko No Tatsujin 6 (TK61 Ver.A)                   (C) Namco, 2004
+*Taiko no Tatsujin                                 (C) Namco, 2001
+Taiko no Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001
+Taiko no Tatsujin 3 (TK31 Ver.A)                   (C) Namco, 2002
+Taiko no Tatsujin 4 (TK41 Ver.A)                   (C) Namco, 2003
+Taiko no Tatsujin 5 (TK51 Ver.A)                   (C) Namco, 2003
+Taiko no Tatsujin 6 (TK61 Ver.A)                   (C) Namco, 2004
 Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)    (C) Namco/Metro, 2002
 Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A) (C) Namco, 2002
 
@@ -273,11 +273,11 @@ Panicuru Panekuru                     PPA1  Ver.A   KC017A   8E, 8D, 7E         
 Point Blank 3                         GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
 Sekai Kaseki Hakken                   SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Star Trigon                           STT1  Ver.A   KC019A   8E, 8D               N/A
-Taiko No Tatsujin 2                   TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
-Taiko No Tatsujin 3                   TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
-Taiko No Tatsujin 4                   TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
-Taiko No Tatsujin 5                   TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
-Taiko No Tatsujin 6                   TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
+Taiko no Tatsujin 2                   TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
+Taiko no Tatsujin 3                   TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
+Taiko no Tatsujin 4                   TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
+Taiko no Tatsujin 5                   TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
+Taiko no Tatsujin 6                   TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
 Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
 
       Notes:
@@ -1240,6 +1240,18 @@ ROM_START( sekaikh )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
 ROM_END
 
+ROM_START( taiko6 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x3180000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "k9f2808u0c.8e",         0x0000000, 0x1080000, CRC(a87352c9) SHA1(1816fabecfaa140da2cd46334701c3e2fb93258e) )
+	ROM_LOAD( "k9f2808u0c.8d",         0x1080000, 0x1080000, CRC(e89aa7a3) SHA1(c34d693f4715ce930dbd105eda1ffc8379991c22) )
+	ROM_LOAD( "k9f2808u0c.7e",         0x2100000, 0x1080000, CRC(098920ef) SHA1(06a689d8abb8454ed62dda92d93a8f5d756a6166) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk-6", 0, SHA1(ca8b8dfccc2022094c428b5e0b6391a77ec351f4) )
+ROM_END
 
 GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
@@ -1258,3 +1270,4 @@ GAME( 2002, gamsharaj, gamshara, ns10_gamshara, namcos10, namcos10_state, init_g
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, init_nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2004, taiko6,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

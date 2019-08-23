@@ -10,6 +10,7 @@
 #include "sound/n63701x.h"
 #include "sound/namco.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class namcos86_state : public driver_device
 {

@@ -503,6 +503,7 @@ public:
 	void debug_grab_texture(int type, const char *filename);
 	void debug_grab_vertex_program_slot(int slot, uint32_t *instruction);
 	void start(address_space *cpu_space);
+	void set_ram_base(void *base);
 	void savestate_items();
 	void compute_supersample_factors(float &horizontal, float &vertical);
 	void compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel);

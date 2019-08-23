@@ -123,11 +123,11 @@ void i82357_device::map(address_map &map)
 
 	// NMI Enable Register (0x70, 72, 74, 76)
 	map(0x070, 0x077).lw8("nmi_rtc",
-		[this](address_space &space, offs_t offset, u8 data)
+		[this](offs_t offset, u8 data)
 		{
 			m_nmi_enabled = !BIT(data, 7);
 
-			m_out_rtc(space, 0, data & 0x7f);
+			m_out_rtc(0, data & 0x7f);
 
 			m_nmi_check->adjust(attotime::zero);
 		}).umask64(0xff);

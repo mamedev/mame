@@ -37,6 +37,7 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+#include "speaker.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -578,6 +579,7 @@ void e100_state::e100(machine_config &config)
 	/* Serial port support */
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
+	SPEAKER(config, "mono").front_center();
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
 	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active
 	 * Once running enable/disable internal UI by pressing Scroll Lock in case it interferes with target keys
@@ -587,7 +589,8 @@ void e100_state::e100(machine_config &config)
 	 * E100 supports cassette through the 'LOAD' and 'SAVE' commands with no arguments
 	 */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

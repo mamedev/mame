@@ -8,7 +8,6 @@
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "machine/ram.h"
 #include "bus/centronics/ctronics.h"
 #include "video/mc6847.h"

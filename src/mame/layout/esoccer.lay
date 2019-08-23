@@ -18,7 +18,8 @@
 
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.2" green="0.04" blue="0.046" /></disk>
-		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
+		<disk state="1"><color red="0.6" green="0.11" blue="0.12" /></disk>
+		<disk state="2"><color red="1.0" green="0.2" blue="0.23" /></disk>
 	</element>
 
 

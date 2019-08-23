@@ -97,7 +97,7 @@ vbl_zpg
 
 #   exceptions
 reset_16
-	PC = read_arg(0xfff1);
+	P |= F_I; PC = read_arg(0xfff1);
 	PC = set_h(PC, read_arg(0xfff0));
 	prefetch();
 	inst_state = -1;

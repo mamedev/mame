@@ -17,4 +17,4 @@ cpy_imm     cmp_ce_idx  cpz_imm     dew_zpg     cpy_ce_zpg  cmp_ce_zpg  dec_ce_z
 bne_ce_rel  cmp_ce_idy  cmp_idz     bne_rw2     cpz_zpg     cmp_ce_zpx  dec_ce_zpx  smb_ce_bzp  cld_ce_imp  cmp_ce_aby  phx_ce_imp  phz_imp     cpz_aba     cmp_ce_abx  dec_ce_abx  bbs_ce_zpb
 cpx_imm     sbc_ce_idx  lda_isy     inw_zpg     cpx_ce_zpg  sbc_ce_zpg  inc_ce_zpg  smb_ce_bzp  inx_ce_imp  sbc_ce_imm  nop_c_imp   row_aba     cpx_aba     sbc_ce_aba  inc_ce_aba  bbs_ce_zpb
 beq_ce_rel  sbc_ce_idy  sbc_idz     beq_rw2     phw_iw2     sbc_ce_zpx  inc_ce_zpx  smb_ce_bzp  sed_ce_imp  sbc_ce_aby  plx_ce_imp  plz_imp     phw_aba     sbc_ce_abx  inc_ce_abx  bbs_ce_zpb
-reset
+reset_c

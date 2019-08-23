@@ -23,6 +23,7 @@ TODO:
 #include "machine/74259.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
@@ -286,7 +287,7 @@ WRITE8_MEMBER(flyball_state::pitcher_horz_w)
 WRITE8_MEMBER(flyball_state::misc_w)
 {
 	// address and data lines passed through inverting buffers
-	m_outlatch->write_d0(space, ~offset, ~data);
+	m_outlatch->write_d0(~offset, ~data);
 }
 
 WRITE_LINE_MEMBER(flyball_state::lamp_w)

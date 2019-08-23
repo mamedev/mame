@@ -168,8 +168,6 @@ void ob68k1a_state::machine_reset()
 	uint8_t *rom = memregion(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);
-
-	m_maincpu->reset();
 }
 
 

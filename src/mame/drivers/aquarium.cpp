@@ -59,16 +59,16 @@ Notes:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(aquarium_state::aquarium_watchdog_w)
+void aquarium_state::watchdog_w(u8 data)
 {
 	m_watchdog->write_line_ck(BIT(data, 7));
 	// bits 0 & 1 also used
 }
 
-WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
+void aquarium_state::z80_bank_w(u8 data)
 {
 	// uses bits ---x --xx
-	data = bitswap<8>(data, 7, 6, 5, 2, 3,      1, 4, 0);
+	data = bitswap<8>(data, 7, 6, 5, 2, 3, 1, 4, 0);
 
 	//printf("aquarium bank %04x %04x\n", data, mem_mask);
 	// aquarium bank 0003 00ff - correct (title)   011
@@ -76,35 +76,32 @@ WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 	// aquarium bank 0005 00ff - level 1 (correct)
 	// (all music seems correct w/regards the reference video)
 
-
-	membank("bank1")->set_entry(data & 0x7);
+	m_audiobank->set_entry(data & 0x7);
 }
 
-uint8_t aquarium_state::aquarium_snd_bitswap( uint8_t scrambled_data )
+u8 aquarium_state::snd_bitswap(u8 scrambled_data)
 {
 	return bitswap<8>(scrambled_data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
-READ8_MEMBER(aquarium_state::aquarium_oki_r)
+u8 aquarium_state::oki_r()
 {
-	return aquarium_snd_bitswap(m_oki->read());
+	return snd_bitswap(m_oki->read());
 }
 
-WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
+void aquarium_state::oki_w(u8 data)
 {
-	logerror("%s:Writing %04x to the OKI M6295\n", machine().describe_context(), aquarium_snd_bitswap(data));
-	m_oki->write(aquarium_snd_bitswap(data));
+	logerror("%s:Writing %04x to the OKI M6295\n", machine().describe_context(), snd_bitswap(data));
+	m_oki->write(snd_bitswap(data));
 }
-
-
 
 
 void aquarium_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0xc00000, 0xc00fff).ram().w(FUNC(aquarium_state::aquarium_mid_videoram_w)).share("mid_videoram");
-	map(0xc01000, 0xc01fff).ram().w(FUNC(aquarium_state::aquarium_bak_videoram_w)).share("bak_videoram");
-	map(0xc02000, 0xc03fff).ram().w(FUNC(aquarium_state::aquarium_txt_videoram_w)).share("txt_videoram");
+	map(0xc00000, 0xc00fff).ram().w(FUNC(aquarium_state::mid_videoram_w)).share("mid_videoram");
+	map(0xc01000, 0xc01fff).ram().w(FUNC(aquarium_state::bak_videoram_w)).share("bak_videoram");
+	map(0xc02000, 0xc03fff).ram().w(FUNC(aquarium_state::txt_videoram_w)).share("txt_videoram");
 	map(0xc80000, 0xc81fff).rw(m_sprgen, FUNC(excellent_spr_device::read), FUNC(excellent_spr_device::write)).umask16(0x00ff);
 	map(0xd00000, 0xd00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80014, 0xd8001f).writeonly().share("scroll");
@@ -113,7 +110,7 @@ void aquarium_state::main_map(address_map &map)
 	map(0xd80082, 0xd80083).nopr(); /* stored but not read back ? check code at 0x01f440 */
 	map(0xd80084, 0xd80085).portr("INPUTS");
 	map(0xd80086, 0xd80087).portr("SYSTEM");
-	map(0xd80088, 0xd80088).w(FUNC(aquarium_state::aquarium_watchdog_w));
+	map(0xd80088, 0xd80088).w(FUNC(aquarium_state::watchdog_w));
 	map(0xd8008b, 0xd8008b).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xff0000, 0xffffff).ram();
 }
@@ -129,10 +126,10 @@ void aquarium_state::snd_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x02, 0x02).rw(FUNC(aquarium_state::aquarium_oki_r), FUNC(aquarium_state::aquarium_oki_w));
+	map(0x02, 0x02).rw(FUNC(aquarium_state::oki_r), FUNC(aquarium_state::oki_w));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x06, 0x06).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w)); // only written with 0 for some reason
-	map(0x08, 0x08).w(FUNC(aquarium_state::aquarium_z80_bank_w));
+	map(0x08, 0x08).w(FUNC(aquarium_state::z80_bank_w));
 }
 
 static INPUT_PORTS_START( aquarium )
@@ -203,88 +200,23 @@ static INPUT_PORTS_START( aquarium )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
 INPUT_PORTS_END
 
-static const gfx_layout char5bpplayout =
+static const gfx_layout layout_5bpp_hi =
 {
-	16,16,  /* 16*16 characters */
-	RGN_FRAC(1,2),
-	5,  /* 4 bits per pixel */
-	{  RGN_FRAC(1,2), 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4, 2*4+32, 3*4+32, 0*4+32, 1*4+32, 6*4+32, 7*4+32, 4*4+32, 5*4+32 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
-};
-
-static const gfx_layout char_8x8_layout =
-{
-	8,8,    /* 8*8 characters */
+	16, 16,
 	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	1,
+	{ 0 },
+	{ STEP16(0, 1) },
+	{ STEP16(0, 16) },
+	16*16
 };
-
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ 48, 16, 32, 0 },
-	{ 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
-};
-
-void aquarium_state::init_aquarium()
-{
-	uint8_t *Z80 = memregion("audiocpu")->base();
-
-	/* The BG tiles are 5bpp, this rearranges the data from
-	   the roms containing the 1bpp data so we can decode it
-	   correctly */
-	uint8_t *DAT2 = memregion("gfx1")->base() + 0x080000;
-	uint8_t *DAT = memregion("user1")->base();
-	int len = 0x0200000;
-
-	for (len = 0; len < 0x020000; len++)
-	{
-		DAT2[len * 4 + 1] =  (DAT[len] & 0x80) << 0;
-		DAT2[len * 4 + 1] |= (DAT[len] & 0x40) >> 3;
-		DAT2[len * 4 + 0] =  (DAT[len] & 0x20) << 2;
-		DAT2[len * 4 + 0] |= (DAT[len] & 0x10) >> 1;
-		DAT2[len * 4 + 3] =  (DAT[len] & 0x08) << 4;
-		DAT2[len * 4 + 3] |= (DAT[len] & 0x04) << 1;
-		DAT2[len * 4 + 2] =  (DAT[len] & 0x02) << 6;
-		DAT2[len * 4 + 2] |= (DAT[len] & 0x01) << 3;
-	}
-
-	DAT2 = memregion("gfx4")->base() + 0x080000;
-	DAT = memregion("user2")->base();
-
-	for (len = 0; len < 0x020000; len++)
-	{
-		DAT2[len * 4 + 1] =  (DAT[len] & 0x80) << 0;
-		DAT2[len * 4 + 1] |= (DAT[len] & 0x40) >> 3;
-		DAT2[len * 4 + 0] =  (DAT[len] & 0x20) << 2;
-		DAT2[len * 4 + 0] |= (DAT[len] & 0x10) >> 1;
-		DAT2[len * 4 + 3] =  (DAT[len] & 0x08) << 4;
-		DAT2[len * 4 + 3] |= (DAT[len] & 0x04) << 1;
-		DAT2[len * 4 + 2] =  (DAT[len] & 0x02) << 6;
-		DAT2[len * 4 + 2] |= (DAT[len] & 0x01) << 3;
-	}
-
-	/* configure and set up the sound bank */
-	membank("bank1")->configure_entries(0, 0x8, &Z80[0x00000], 0x8000);
-	membank("bank1")->set_entry(0x00);
-}
-
 
 static GFXDECODE_START( gfx_aquarium )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,       0x300, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, char5bpplayout,   0x400, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, char_8x8_layout,  0x200, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0, char5bpplayout,   0x400, 32 )
+	GFXDECODE_ENTRY( "txt",    0, gfx_8x8x4_packed_msb,   0x200, 16 )
+	GFXDECODE_ENTRY( "mid",    0, gfx_16x16x4_packed_msb, 0x400, 32 ) // low 4bpp of 5bpp data
+	GFXDECODE_ENTRY( "bak",    0, gfx_16x16x4_packed_msb, 0x400, 32 ) // low 4bpp of 5bpp data
+	GFXDECODE_ENTRY( "bak_hi", 0, layout_5bpp_hi,         0x400, 32 ) // hi 1bpp of 5bpp data
+	GFXDECODE_ENTRY( "mid_hi", 0, layout_5bpp_hi,         0x400, 32 ) // hi 1bpp of 5bpp data
 GFXDECODE_END
 
 void aquarium_state::aquarium(machine_config &config)
@@ -307,13 +239,16 @@ void aquarium_state::aquarium(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 64*8);
 	m_screen->set_visarea(2*8, 42*8-1, 2*8, 34*8-1);
-	m_screen->set_screen_update(FUNC(aquarium_state::screen_update_aquarium));
+	m_screen->set_screen_update(FUNC(aquarium_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarium);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000/2);
 
 	EXCELLENT_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_palette(m_palette);
+	m_sprgen->set_color_base(0x300);
+	m_sprgen->set_colpri_callback(FUNC(aquarium_state::aquarium_colpri_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -340,23 +275,23 @@ ROM_START( aquarium )
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 (sound) code */
 	ROM_LOAD( "excellent_5.10c",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
-	ROM_LOAD( "excellent_1.15b", 0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
-	/* data is expanded here from USER1 */
-	ROM_REGION( 0x100000, "user1", 0 ) /* BG Tiles */
+	ROM_REGION( 0x080000, "mid", 0 ) /* BG Tiles */
+	ROM_LOAD16_WORD_SWAP( "excellent_1.15b", 0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
+	/* data is expanded here from mid_hi */
+	ROM_REGION( 0x020000, "mid_hi", 0 ) /* BG Tiles */
 	ROM_LOAD( "excellent_6.15d", 0x000000, 0x020000, CRC(9065b146) SHA1(befc218bbcd63453ea7eb8f976796d36f2b2d552) ) // 1bpp
 
-	ROM_REGION( 0x100000, "gfx4", 0 ) /* BG Tiles */
-	ROM_LOAD( "excellent_8.14g", 0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
-	/* data is expanded here from USER2 */
-	ROM_REGION( 0x100000, "user2", 0 ) /* BG Tiles */
+	ROM_REGION( 0x080000, "bak", 0 ) /* BG Tiles */
+	ROM_LOAD16_WORD_SWAP( "excellent_8.14g", 0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
+	/* data is expanded here from bak_hi */
+	ROM_REGION( 0x020000, "bak_hi", 0 ) /* BG Tiles */
 	ROM_LOAD( "excellent_7.17g", 0x000000, 0x020000, CRC(b96b2b82) SHA1(2b719d0c185d1eca4cd9ea66bed7842b74062288) ) // 1bpp
 
-	ROM_REGION( 0x060000, "gfx2", 0 ) /* FG Tiles */
-	ROM_LOAD( "excellent_2.17e", 0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
+	ROM_REGION( 0x060000, "txt", 0 ) /* FG Tiles */
+	ROM_LOAD16_WORD_SWAP( "excellent_2.17e", 0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* Sprites? */
-	ROM_LOAD( "d23c8000.1f",   0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) ) // PCB denotes 23C16000 but a 23C8000 MASK is used
+	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites? */
+	ROM_LOAD16_WORD_SWAP( "d23c8000.1f",   0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) ) // PCB denotes 23C16000 but a 23C8000 MASK is used
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "excellent_4.7d",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
@@ -369,27 +304,78 @@ ROM_START( aquariumj )
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 (sound) code */
 	ROM_LOAD( "excellent_5.10c",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
-	ROM_LOAD( "excellent_1.15b", 0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
-	/* data is expanded here from USER1 */
-	ROM_REGION( 0x100000, "user1", 0 ) /* BG Tiles */
+	ROM_REGION( 0x080000, "mid", 0 ) /* BG Tiles */
+	ROM_LOAD16_WORD_SWAP( "excellent_1.15b", 0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
+	/* data is expanded here from mid_hi */
+	ROM_REGION( 0x020000, "mid_hi", 0 ) /* BG Tiles */
 	ROM_LOAD( "excellent_6.15d", 0x000000, 0x020000, CRC(9065b146) SHA1(befc218bbcd63453ea7eb8f976796d36f2b2d552) ) // 1bpp
 
-	ROM_REGION( 0x100000, "gfx4", 0 ) /* BG Tiles */
-	ROM_LOAD( "excellent_8.14g", 0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
-	/* data is expanded here from USER2 */
-	ROM_REGION( 0x100000, "user2", 0 ) /* BG Tiles */
+	ROM_REGION( 0x080000, "bak", 0 ) /* BG Tiles */
+	ROM_LOAD16_WORD_SWAP( "excellent_8.14g", 0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
+	/* data is expanded here from bak_hi */
+	ROM_REGION( 0x020000, "bak_hi", 0 ) /* BG Tiles */
 	ROM_LOAD( "excellent_7.17g", 0x000000, 0x020000, CRC(b96b2b82) SHA1(2b719d0c185d1eca4cd9ea66bed7842b74062288) ) // 1bpp
 
-	ROM_REGION( 0x060000, "gfx2", 0 ) /* FG Tiles */
-	ROM_LOAD( "excellent_2.17e", 0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
+	ROM_REGION( 0x060000, "txt", 0 ) /* FG Tiles */
+	ROM_LOAD16_WORD_SWAP( "excellent_2.17e", 0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* Sprites? */
-	ROM_LOAD( "d23c8000.1f",   0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) ) // PCB denotes 23C16000 but a 23C8000 MASK is used
+	ROM_REGION( 0x200000, "spritegen", 0 ) /* Sprites? */
+	ROM_LOAD16_WORD_SWAP( "d23c8000.1f",   0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) ) // PCB denotes 23C16000 but a 23C8000 MASK is used
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "excellent_4.7d",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
+
+void aquarium_state::expand_gfx(int low, int hi)
+{
+	/* The BG tiles are 5bpp, this rearranges the data from
+	   the roms containing the 1bpp data so we can decode it
+	   correctly */
+	gfx_element *gfx_l = m_gfxdecode->gfx(low);
+	gfx_element *gfx_h = m_gfxdecode->gfx(hi);
+
+	// allocate memory for the assembled data
+	u8 *srcdata = auto_alloc_array(machine(), u8, gfx_l->elements() * gfx_l->width() * gfx_l->height());
+
+	// loop over elements
+	u8 *dest = srcdata;
+	for (int c = 0; c < gfx_l->elements(); c++)
+	{
+		const u8 *c0base = gfx_l->get_data(c);
+		const u8 *c1base = gfx_h->get_data(c);
+
+		// loop over height
+		for (int y = 0; y < gfx_l->height(); y++)
+		{
+			const u8 *c0 = c0base;
+			const u8 *c1 = c1base;
+
+			for (int x = 0; x < gfx_l->width(); x++)
+			{
+				u8 hi_data = *c1++;
+				*dest++ = (*c0++ & 0xf) | ((hi_data << 4) & 0x10);
+			}
+			c0base += gfx_l->rowbytes();
+			c1base += gfx_h->rowbytes();
+		}
+	}
+
+	gfx_l->set_raw_layout(srcdata, gfx_l->width(), gfx_l->height(), gfx_l->elements(), 8 * gfx_l->width(), 8 * gfx_l->width() * gfx_l->height());
+	gfx_l->set_granularity(32);
+	m_gfxdecode->set_gfx(hi, nullptr);
+}
+
+void aquarium_state::init_aquarium()
+{
+	expand_gfx(1, 4);
+	expand_gfx(2, 3);
+
+	u8 *Z80 = memregion("audiocpu")->base();
+
+	/* configure and set up the sound bank */
+	m_audiobank->configure_entries(0, 0x8, &Z80[0x00000], 0x8000);
+	m_audiobank->set_entry(0x00);
+}
 
 GAME( 1996, aquarium,  0,        aquarium, aquarium, aquarium_state, init_aquarium, ROT0, "Excellent System", "Aquarium (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1996, aquariumj, aquarium, aquarium, aquarium, aquarium_state, init_aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

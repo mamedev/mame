@@ -8,6 +8,7 @@
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tiamc1_state : public driver_device
 {

@@ -38,6 +38,7 @@ the sound board should be fully discrete.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "seabattl.lh"
 

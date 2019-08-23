@@ -1061,8 +1061,14 @@ cheat_manager::cheat_manager(running_machine &machine)
 	if (!machine.options().cheat())
 		return;
 
-	m_output.resize(UI_TARGET_FONT_ROWS * 2);
-	m_justify.resize(UI_TARGET_FONT_ROWS * 2);
+	// in its current form, cheat_manager is tightly coupled to mame_ui_manager; therefore we
+	// expect this call to succeed
+	mame_ui_manager *ui = dynamic_cast<mame_ui_manager *>(&machine.ui());
+	assert(ui);
+
+	int target_font_rows = ui->options().font_rows();
+	m_output.resize(target_font_rows * 2);
+	m_justify.resize(target_font_rows * 2);
 
 	// request a callback
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&cheat_manager::frame_update, this));

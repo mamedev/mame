@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    atarigen.c
+    atarigen.cpp
 
     General functions for Atari games.
 
@@ -54,16 +54,16 @@ DEFINE_DEVICE_TYPE(ATARI_SOUND_COMM, atari_sound_comm_device, "atarscom", "Atari
 //  atari_sound_comm_device - constructor
 //-------------------------------------------------
 
-atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ATARI_SOUND_COMM, tag, owner, clock),
-		m_main_int_cb(*this),
-		m_sound_cpu(*this, finder_base::DUMMY_TAG),
-		m_main_to_sound_ready(false),
-		m_sound_to_main_ready(false),
-		m_main_to_sound_data(0),
-		m_sound_to_main_data(0),
-		m_timed_int(0),
-		m_ym2151_int(0)
+atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, ATARI_SOUND_COMM, tag, owner, clock)
+	, m_main_int_cb(*this)
+	, m_sound_cpu(*this, finder_base::DUMMY_TAG)
+	, m_main_to_sound_ready(false)
+	, m_sound_to_main_ready(false)
+	, m_main_to_sound_data(0)
+	, m_sound_to_main_data(0)
+	, m_timed_int(0)
+	, m_ym2151_int(0)
 {
 }
 
@@ -149,14 +149,17 @@ void atari_sound_comm_device::sound_irq()
 //  can be used.
 //-------------------------------------------------
 
-READ8_MEMBER(atari_sound_comm_device::sound_irq_ack_r)
+u8 atari_sound_comm_device::sound_irq_ack_r()
 {
-	m_timed_int = 0;
-	update_sound_irq();
+	if (!machine().side_effects_disabled())
+	{
+		m_timed_int = 0;
+		update_sound_irq();
+	}
 	return 0;
 }
 
-WRITE8_MEMBER(atari_sound_comm_device::sound_irq_ack_w)
+void atari_sound_comm_device::sound_irq_ack_w(u8 data)
 {
 	m_timed_int = 0;
 	update_sound_irq();
@@ -180,7 +183,7 @@ WRITE_LINE_MEMBER(atari_sound_comm_device::ym2151_irq_gen)
 //  sound CPU in response.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atari_sound_comm_device::sound_reset_w)
+void atari_sound_comm_device::sound_reset_w(u16 data)
 {
 	synchronize(TID_SOUND_RESET);
 }
@@ -193,7 +196,7 @@ WRITE16_MEMBER(atari_sound_comm_device::sound_reset_w)
 //  the upper 8 bits.
 //-------------------------------------------------
 
-WRITE8_MEMBER(atari_sound_comm_device::main_command_w)
+void atari_sound_comm_device::main_command_w(u8 data)
 {
 	synchronize(TID_SOUND_WRITE, data);
 }
@@ -206,10 +209,13 @@ WRITE8_MEMBER(atari_sound_comm_device::main_command_w)
 //  byte in the upper 8 bits.
 //-------------------------------------------------
 
-READ8_MEMBER(atari_sound_comm_device::main_response_r)
+u8 atari_sound_comm_device::main_response_r()
 {
-	m_sound_to_main_ready = false;
-	m_main_int_cb(CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_sound_to_main_ready = false;
+		m_main_int_cb(CLEAR_LINE);
+	}
 	return m_sound_to_main_data;
 }
 
@@ -219,7 +225,7 @@ READ8_MEMBER(atari_sound_comm_device::main_response_r)
 //  sound CPU to the main CPU.
 //-------------------------------------------------
 
-WRITE8_MEMBER(atari_sound_comm_device::sound_response_w)
+void atari_sound_comm_device::sound_response_w(u8 data)
 {
 	synchronize(TID_6502_WRITE, data);
 }
@@ -231,10 +237,13 @@ WRITE8_MEMBER(atari_sound_comm_device::sound_response_w)
 //  CPU.
 //-------------------------------------------------
 
-READ8_MEMBER(atari_sound_comm_device::sound_command_r)
+u8 atari_sound_comm_device::sound_command_r()
 {
-	m_main_to_sound_ready = false;
-	m_sound_cpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_main_to_sound_ready = false;
+		m_sound_cpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
 	return m_main_to_sound_data;
 }
 
@@ -289,7 +298,7 @@ void atari_sound_comm_device::delayed_sound_write(int data)
 {
 	// warn if we missed something
 	if (m_main_to_sound_ready)
-		logerror("Missed command from 68010\n");
+		logerror("Missed command from 680x0\n");
 
 	// set up the states and signal an NMI to the sound CPU
 	m_main_to_sound_data = data;
@@ -326,23 +335,23 @@ void atari_sound_comm_device::delayed_6502_write(int data)
 ***************************************************************************/
 
 atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_scanline_int_state(0),
-		m_video_int_state(0),
-		m_xscroll(*this, "xscroll"),
-		m_yscroll(*this, "yscroll"),
-		m_slapstic_num(0),
-		m_slapstic(nullptr),
-		m_slapstic_bank(0),
-		m_slapstic_last_pc(0),
-		m_slapstic_last_address(0),
-		m_slapstic_base(0),
-		m_slapstic_mirror(0),
-		m_scanlines_per_callback(0),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_slapstic_device(*this, ":slapstic")
+	: driver_device(mconfig, type, tag)
+	, m_scanline_int_state(0)
+	, m_video_int_state(0)
+	, m_xscroll(*this, "xscroll")
+	, m_yscroll(*this, "yscroll")
+	, m_slapstic_num(0)
+	, m_slapstic(nullptr)
+	, m_slapstic_bank(0)
+	, m_slapstic_last_pc(0)
+	, m_slapstic_last_address(0)
+	, m_slapstic_base(0)
+	, m_slapstic_mirror(0)
+	, m_scanlines_per_callback(0)
+	, m_maincpu(*this, "maincpu")
+	, m_gfxdecode(*this, "gfxdecode")
+	, m_screen(*this, "screen")
+	, m_slapstic_device(*this, ":slapstic")
 {
 }
 
@@ -449,7 +458,7 @@ WRITE_LINE_MEMBER(atarigen_state::scanline_int_write_line)
 //  scanline interrupt.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::scanline_int_ack_w)
+void atarigen_state::scanline_int_ack_w(u16 data)
 {
 	m_scanline_int_state = 0;
 	update_interrupts();
@@ -476,7 +485,7 @@ WRITE_LINE_MEMBER(atarigen_state::video_int_write_line)
 //  interrupt.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::video_int_ack_w)
+void atarigen_state::video_int_ack_w(u16 data)
 {
 	m_video_int_state = 0;
 	update_interrupts();
@@ -522,7 +531,7 @@ void atarigen_state::device_post_load()
 //  slapstic and sets the chip number.
 //-------------------------------------------------
 
-void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, uint8_t *mem)
+void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem)
 {
 	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing\n");
@@ -534,7 +543,7 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 	// install the memory handlers
 	address_space &program = device.space(AS_PROGRAM);
 	program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, 0, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
-	m_slapstic = (uint16_t *)mem;
+	m_slapstic = (u16 *)mem;
 
 	// allocate memory for a copy of bank 0
 	m_slapstic_bank0.resize(0x2000);
@@ -577,8 +586,11 @@ READ16_MEMBER(atarigen_state::slapstic_r)
 	// fetch the result from the current bank first
 	int result = m_slapstic[offset & 0xfff];
 
-	// then determine the new one
-	slapstic_update_bank(m_slapstic_device->slapstic_tweak(space, offset));
+	if (!machine().side_effects_disabled())
+	{
+		// then determine the new one
+		slapstic_update_bank(m_slapstic_device->slapstic_tweak(space, offset));
+	}
 	return result;
 }
 
@@ -663,26 +675,24 @@ void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 {
 	gfx_element *gx0 = m_gfxdecode->gfx(gfx0);
 	gfx_element *gx1 = m_gfxdecode->gfx(gfx1);
-	uint8_t *srcdata, *dest;
-	int c, x, y;
 
 	// allocate memory for the assembled data
-	srcdata = auto_alloc_array(machine(), uint8_t, gx0->elements() * gx0->width() * gx0->height());
+	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
-	dest = srcdata;
-	for (c = 0; c < gx0->elements(); c++)
+	u8 *dest = srcdata;
+	for (int c = 0; c < gx0->elements(); c++)
 	{
-		const uint8_t *c0base = gx0->get_data(c);
-		const uint8_t *c1base = gx1->get_data(c);
+		const u8 *c0base = gx0->get_data(c);
+		const u8 *c1base = gx1->get_data(c);
 
 		// loop over height
-		for (y = 0; y < gx0->height(); y++)
+		for (int y = 0; y < gx0->height(); y++)
 		{
-			const uint8_t *c0 = c0base;
-			const uint8_t *c1 = c1base;
+			const u8 *c0 = c0base;
+			const u8 *c1 = c1base;
 
-			for (x = 0; x < gx0->width(); x++)
+			for (int x = 0; x < gx0->width(); x++)
 				*dest++ = (*c0++ & mask0) | (*c1++ & mask1);
 			c0base += gx0->rowbytes();
 			c1base += gx1->rowbytes();

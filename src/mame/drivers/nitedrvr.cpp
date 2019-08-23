@@ -51,14 +51,14 @@
 void nitedrvr_state::nitedrvr_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram().mirror(0x100); // SCRAM
-	map(0x0200, 0x027f).nopr().w(FUNC(nitedrvr_state::nitedrvr_videoram_w)).mirror(0x180).share("videoram"); // PFW
+	map(0x0200, 0x027f).nopr().ram().mirror(0x180).share("videoram"); // PFW
 	map(0x0400, 0x042f).nopr().writeonly().mirror(0x1c0).share("hvc"); // POSH, POSV, CHAR
 	map(0x0430, 0x043f).w("watchdog", FUNC(watchdog_timer_device::reset_w)).mirror(0x1c0);
 	map(0x0600, 0x07ff).r(FUNC(nitedrvr_state::nitedrvr_in0_r));
 	map(0x0800, 0x09ff).r(FUNC(nitedrvr_state::nitedrvr_in1_r));
 	map(0x0a00, 0x0bff).w(FUNC(nitedrvr_state::nitedrvr_out0_w));
 	map(0x0c00, 0x0dff).w(FUNC(nitedrvr_state::nitedrvr_out1_w));
-	map(0x8000, 0x807f).readonly().mirror(0x380).share("videoram"); // PFR
+	map(0x8000, 0x807f).nopw().ram().mirror(0x380).share("videoram"); // PFR
 	map(0x8400, 0x87ff).rw(FUNC(nitedrvr_state::nitedrvr_steering_reset_r), FUNC(nitedrvr_state::nitedrvr_steering_reset_w));
 	map(0x9000, 0x9fff).rom(); // ROM1-ROM2
 	map(0xfff0, 0xffff).rom(); // ROM2 for 6502 vectors
@@ -153,7 +153,7 @@ void nitedrvr_state::nitedrvr(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 278, 0, 256); // ~57 Hz
+	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240);
 	// PROM derives VRESET, VBLANK, VSYNC, IRQ from vertical scan count and last VBLANK
 	screen.set_screen_update(FUNC(nitedrvr_state::screen_update_nitedrvr));
 	screen.set_palette(m_palette);

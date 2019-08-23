@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "mmboard.h"
+#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -24,173 +25,28 @@ DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODUL, mephisto_display_modul_device, "mdisp
 //    IMPLEMENTATION
 //***************************************************************************
 
-static INPUT_PORTS_START( mephisto_sensors_board )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_START("IN.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_START("IN.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_START("IN.4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_START("IN.5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_START("IN.6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_START("IN.7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)   PORT_TOGGLE
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( mephisto_buttons_board )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_START("IN.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_START("IN.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_START("IN.4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_START("IN.5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_START("IN.6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_START("IN.7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER)
-INPUT_PORTS_END
-
-
 //-------------------------------------------------
-//  input_ports - device-specific input ports
+//  device_add_mconfig - add device-specific
+//  machine configuration
 //-------------------------------------------------
 
-ioport_constructor mephisto_sensors_board_device::device_input_ports() const
+void mephisto_sensors_board_device::device_add_mconfig(machine_config &config)
 {
-	return INPUT_PORTS_NAME( mephisto_sensors_board );
+	SENSORBOARD(config, m_board);
+	m_board->set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 }
 
 //-------------------------------------------------
-//  input_ports - device-specific input ports
+//  device_add_mconfig - add device-specific
+//  machine configuration
 //-------------------------------------------------
 
-ioport_constructor mephisto_buttons_board_device::device_input_ports() const
+void mephisto_buttons_board_device::device_add_mconfig(machine_config &config)
 {
-	return INPUT_PORTS_NAME( mephisto_buttons_board );
+	SENSORBOARD(config, m_board);
+	m_board->set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 }
 
 //**************************************************************************
@@ -203,7 +59,8 @@ ioport_constructor mephisto_buttons_board_device::device_input_ports() const
 
 mephisto_board_device::mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_sensors(*this, "IN.%u", 0)
+	, m_board(*this, "board")
+	, m_sensordelay(attotime::from_msec(150))
 	, m_led(*this, "led%u", 0U)
 	, m_disable_leds(false)
 {
@@ -241,6 +98,8 @@ void mephisto_board_device::device_start()
 	save_item(NAME(m_mux));
 	save_item(NAME(m_leds));
 	save_item(NAME(m_leds_state));
+
+	m_board->set_delay(m_sensordelay);
 }
 
 //-------------------------------------------------
@@ -283,7 +142,7 @@ READ8_MEMBER( mephisto_board_device::input_r )
 
 	for (int i=0; i<8; i++)
 		if (!BIT(m_mux, i))
-			data &= m_sensors[i]->read();
+			data &= ~m_board->read_rank(i);
 
 	return data;
 }
@@ -312,7 +171,7 @@ WRITE8_MEMBER( mephisto_board_device::led_w )
 mephisto_display_modul_device::mephisto_display_modul_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MEPHISTO_DISPLAY_MODUL, tag, owner, clock)
 	, m_lcdc(*this, "hd44780")
-	, m_beeper(*this, "beeper")
+	, m_dac(*this, "dac")
 {
 }
 
@@ -335,8 +194,11 @@ void mephisto_display_modul_device::device_add_mconfig(machine_config &config)
 	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SPEAKER(config, "speaker").front_center();
+	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -376,7 +238,7 @@ WRITE8_MEMBER(mephisto_display_modul_device::io_w)
 	if (BIT(data, 1) && !BIT(m_ctrl, 1))
 		m_lcdc->write(BIT(data, 0), m_latch);
 
-	m_beeper->set_state(BIT(data, 2) | BIT(data, 3));
+	m_dac->write(data >> 2 & 3);
 
 	m_ctrl = data;
 }

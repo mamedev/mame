@@ -18,14 +18,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LASERDISC_PR8210_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PIONEER_PR8210, 0)
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -46,7 +38,7 @@ class pioneer_pr8210_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// input and output
 	void control_w(uint8_t data);

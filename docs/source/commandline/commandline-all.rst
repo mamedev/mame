@@ -1504,46 +1504,6 @@ Core Artwork Options
 
     The default is OFF **-noartwork_crop**.
 
-.. _mame-commandline-nousebackdrops:
-
-**-[no]use_backdrops** / **-[no]backdrop**
-
-    Enables/disables the display of backdrops.
-
-    The default is ON (**-use_backdrops**).
-
-.. _mame-commandline-nouseoverlays:
-
-**-[no]use_overlays** / **-[no]overlay**
-
-    Enables/disables the display of overlays.
-
-    The default is ON (**-use_overlays**).
-
-.. _mame-commandline-nousebezels:
-
-**-[no]use_bezels** / **-[no]bezels**
-
-    Enables/disables the display of bezels.
-
-    The default is ON (**-use_bezels**).
-
-.. _mame-commandline-nousecpanels:
-
-**-[no]use_cpanels** / **-[no]cpanels**
-
-    Enables/disables the display of control panels.
-
-    The default is ON (**-use_cpanels**).
-
-.. _mame-commandline-nousemarquees:
-
-**-[no]use_marquees** / **-[no]marquees**
-
-    Enables/disables the display of marquees.
-
-    The default is ON (**-use_marquees**).
-
 .. _mame-commandline-fallbackartwork:
 
 **-fallback_artwork**

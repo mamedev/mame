@@ -24,7 +24,7 @@
 #include "emupal.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK_NTSC 53693175
+#define OSC1_CLOCK 53693175 // same as NTSC genesis / mega drive master clock
 
 class calcune_state : public driver_device
 {
@@ -111,17 +111,17 @@ WRITE16_MEMBER(calcune_state::cal_770000_w)
 READ16_MEMBER(calcune_state::cal_vdp_r)
 {
 	if (!vdp_state)
-		return m_vdp->vdp_r(space, offset, mem_mask);
+		return m_vdp->vdp_r(offset, mem_mask);
 	else
-		return m_vdp2->vdp_r(space, offset, mem_mask);
+		return m_vdp2->vdp_r(offset, mem_mask);
 }
 
 WRITE16_MEMBER(calcune_state::cal_vdp_w)
 {
 	if (!vdp_state)
-		m_vdp->vdp_w(space, offset, data, mem_mask);
+		m_vdp->vdp_w(offset, data, mem_mask);
 	else
-		m_vdp2->vdp_w(space, offset, data, mem_mask);
+		m_vdp2->vdp_w(offset, data, mem_mask);
 }
 
 void calcune_state::calcune_map(address_map &map)
@@ -251,23 +251,24 @@ MACHINE_START_MEMBER(calcune_state,calcune)
 
 void calcune_state::calcune(machine_config &config)
 {
-	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); /* 7.67 MHz */
+	M68000(config, m_maincpu, OSC1_CLOCK / 7); /* 7.67 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &calcune_state::calcune_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(calcune_state::genesis_int_callback));
 
-	Z80(config, "z80", MASTER_CLOCK_NTSC / 15).set_disable(); /* 3.58 MHz, no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
+	Z80(config, "z80", OSC1_CLOCK / 15).set_disable(); /* 3.58 MHz, no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
 
 	MCFG_MACHINE_START_OVERRIDE(calcune_state,calcune)
 	MCFG_MACHINE_RESET_OVERRIDE(calcune_state,calcune)
 
 	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(double(OSC1_CLOCK) / 10.0 / 262.0 / 342.0); // same as SMS?
+//  screen.set_refresh_hz(double(OSC1_CLOCK) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
 	screen.set_size(64*8, 620);
 	screen.set_visarea(0, 40*8-1, 0, 28*8-1);
 	screen.set_screen_update(FUNC(calcune_state::screen_update_calcune));
 
-	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
+	SEGA315_5313(config, m_vdp, OSC1_CLOCK, m_maincpu);
 	m_vdp->set_is_pal(false);
 	m_vdp->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
 	m_vdp->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
@@ -278,7 +279,7 @@ void calcune_state::calcune(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	SEGA315_5313(config, m_vdp2, MASTER_CLOCK_NTSC, m_maincpu);
+	SEGA315_5313(config, m_vdp2, OSC1_CLOCK, m_maincpu);
 	m_vdp2->set_is_pal(false);
 //  are these not hooked up or should they OR with the other lines?
 //  m_vdp2->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));

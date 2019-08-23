@@ -214,7 +214,7 @@ void icebox_state::io_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( icebox )
 	PORT_START("BAUD")
-	PORT_DIPNAME( 0x0f, 0x0e, "Baud Rate for Terminal")
+	PORT_DIPNAME( 0x0f, 0x0e, "Baud Rate for Terminal") PORT_DIPLOCATION("SW:5,6,7,8")
 	PORT_DIPSETTING(    0x00, "50")
 	PORT_DIPSETTING(    0x01, "75")
 	PORT_DIPSETTING(    0x02, "110")
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( icebox )
 	PORT_DIPSETTING(    0x0c, "4800")
 	PORT_DIPSETTING(    0x0e, "9600")
 	PORT_DIPSETTING(    0x0f, "19200")
-	PORT_DIPNAME( 0xf0, 0x70, "Baud Rate for Printer")
+	PORT_DIPNAME( 0xf0, 0x70, "Baud Rate for Printer") PORT_DIPLOCATION("SW:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "50")
 	PORT_DIPSETTING(    0x10, "75")
 	PORT_DIPSETTING(    0x20, "110")
@@ -335,7 +335,7 @@ void icebox_state::icebox(machine_config &config)
 	rs232b.dsr_handler().set(m_uart1, FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set(m_uart1, FUNC(i8251_device::write_cts));
 
-	COM5016_5(config, m_brg, 4.9152_MHz_XTAL);   // BR1941L
+	COM5016_5(config, m_brg, 4.9152_MHz_XTAL);   // BR1941L-05
 	m_brg->fr_handler().set(m_uart0, FUNC(i8251_device::write_txc));
 	m_brg->fr_handler().append(m_uart0, FUNC(i8251_device::write_rxc));
 	m_brg->ft_handler().set(m_uart1, FUNC(i8251_device::write_txc));

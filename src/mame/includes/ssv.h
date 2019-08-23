@@ -14,6 +14,7 @@
 #include "sound/es5506.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class ssv_state : public driver_device
 {

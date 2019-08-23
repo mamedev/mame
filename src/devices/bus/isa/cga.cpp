@@ -875,7 +875,7 @@ void isa8_cga_device::mode_control_w(uint8_t data)
 
 	// The lowest bit of the mode register selects, among others, the
 	// input clock to the 6845.
-	m_crtc->set_clock( ( m_mode_control & 1 ) ? CGA_HCLK : CGA_LCLK );
+	m_crtc->set_unscaled_clock( ( m_mode_control & 1 ) ? CGA_HCLK : CGA_LCLK );
 
 	set_palette_luts();
 }

@@ -11,6 +11,7 @@
 #include "video/vsystem_spr.h"
 #include "video/k053936.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class crshrace_state : public driver_device
 {

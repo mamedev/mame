@@ -453,7 +453,7 @@ private:
 	virtual void video_start() override;
 	void aristmk4_palette(palette_device &palette) const;
 	void lions_palette(palette_device &palette) const;
-	uint32_t screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aristmk4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(note_input_reset);
 	TIMER_CALLBACK_MEMBER(coin_input_reset);
 	TIMER_CALLBACK_MEMBER(hopper_reset);
@@ -509,7 +509,7 @@ void aristmk4_state::uBackgroundColour()
 	}
 }
 
-uint32_t aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x,y;
@@ -1043,7 +1043,7 @@ void aristmk4_state::slots_mem(address_map &map)
 	map(0x500d, 0x500d).portr("500d");
 	map(0x500e, 0x500e).portr("500e");
 	map(0x500f, 0x500f).portr("500f");
-	map(0x5010, 0x501f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x5010, 0x501f).m("via6522_0", FUNC(via6522_device::map));
 	map(0x5200, 0x5200).r(FUNC(aristmk4_state::cashcade_r));
 	map(0x5201, 0x5201).portr("5201");
 	map(0x52c0, 0x52c0).r(FUNC(aristmk4_state::bv_p0));
@@ -1087,7 +1087,7 @@ void aristmk4_state::poker_mem(address_map &map)
 	map(0x500d, 0x500d).portr("500d");
 	map(0x500e, 0x500e).portr("500e");
 	map(0x500f, 0x500f).portr("500f");
-	map(0x5010, 0x501f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x5010, 0x501f).m("via6522_0", FUNC(via6522_device::map));
 	map(0x5200, 0x5200).r(FUNC(aristmk4_state::cashcade_r));
 	map(0x5201, 0x5201).portr("5201");
 	map(0x52c0, 0x52c0).r(FUNC(aristmk4_state::bv_p0));
@@ -1798,7 +1798,6 @@ void aristmk4_state::aristmk4(machine_config &config)
 	screen.set_visarea(0, 304-1, 0, 216-1);    /* from the crtc registers... updated by crtc */
 	screen.set_screen_update(FUNC(aristmk4_state::screen_update_aristmk4));
 	screen.screen_vblank().set_inputline(m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
-	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aristmk4);
 	PALETTE(config, m_palette, FUNC(aristmk4_state::aristmk4_palette), 512);

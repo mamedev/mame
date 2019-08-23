@@ -6,8 +6,6 @@
 #pragma once
 
 
-#define YMF278B_STD_CLOCK (33868800)            /* standard clock for OPL4 */
-
 class ymf278b_device : public device_t, public device_sound_interface, public device_rom_interface
 {
 public:

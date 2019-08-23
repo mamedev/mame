@@ -10,6 +10,7 @@
 #include "video/bufsprite.h"
 #include "video/deckarn.h"
 #include "video/decrmc3.h"
+#include "tilemap.h"
 
 class karnov_state : public driver_device
 {

@@ -77,6 +77,7 @@ enum
 };
 
 #define M37710_INTERRUPT_MAX (M37710_LINE_RESET + 1)
+#define M37710_MASKABLE_INTERRUPTS (M37710_INTERRUPT_MAX - 5)
 
 
 /* Registers - used by m37710_set_reg() and m37710_get_reg() */
@@ -127,8 +128,59 @@ public:
 	auto an7_cb() { return m_analog_cb[7].bind(); }
 
 protected:
-	DECLARE_READ8_MEMBER( m37710_internal_r );
-	DECLARE_WRITE8_MEMBER( m37710_internal_w );
+	// internal registers
+	uint8_t port_r(offs_t offset);
+	void port_w(offs_t offset, uint8_t data);
+	void da_reg_w(offs_t offset, uint8_t data);
+	void pulse_output_w(offs_t offset, uint8_t data);
+	uint8_t ad_control_r();
+	void ad_control_w(uint8_t data);
+	uint8_t ad_sweep_r();
+	void ad_sweep_w(uint8_t data);
+	uint16_t ad_result_r(offs_t offset);
+	uint8_t uart0_mode_r();
+	void uart0_mode_w(uint8_t data);
+	uint8_t uart1_mode_r();
+	void uart1_mode_w(uint8_t data);
+	void uart0_baud_w(uint8_t data);
+	void uart1_baud_w(uint8_t data);
+	void uart0_tbuf_w(uint16_t data);
+	void uart1_tbuf_w(uint16_t data);
+	uint8_t uart0_ctrl_reg0_r();
+	void uart0_ctrl_reg0_w(uint8_t data);
+	uint8_t uart1_ctrl_reg0_r();
+	void uart1_ctrl_reg0_w(uint8_t data);
+	uint8_t uart0_ctrl_reg1_r();
+	void uart0_ctrl_reg1_w(uint8_t data);
+	uint8_t uart1_ctrl_reg1_r();
+	void uart1_ctrl_reg1_w(uint8_t data);
+	uint16_t uart0_rbuf_r();
+	uint16_t uart1_rbuf_r();
+	uint8_t count_start_r();
+	void count_start_w(uint8_t data);
+	void one_shot_start_w(uint8_t data);
+	uint8_t up_down_r();
+	void up_down_w(uint8_t data);
+	uint16_t timer_reg_r(offs_t offset, uint16_t mem_mask);
+	void timer_reg_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint8_t timer_mode_r(offs_t offset);
+	void timer_mode_w(offs_t offset, uint8_t data);
+	uint8_t proc_mode_r(offs_t offset);
+	void proc_mode_w(uint8_t data);
+	void watchdog_timer_w(uint8_t data);
+	uint8_t watchdog_freq_r();
+	void watchdog_freq_w(uint8_t data);
+	uint8_t waveform_mode_r();
+	void waveform_mode_w(uint8_t data);
+	uint8_t rto_control_r();
+	void rto_control_w(uint8_t data);
+	uint8_t dram_control_r();
+	void dram_control_w(uint8_t data);
+	void refresh_timer_w(uint8_t data);
+	uint16_t dmac_control_r(offs_t offset, uint16_t mem_mask);
+	void dmac_control_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint8_t int_control_r(offs_t offset);
+	void int_control_w(offs_t offset, uint8_t data);
 
 	// construction/destruction
 	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
@@ -138,6 +190,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 20; /* rough guess */ }
 	virtual uint32_t execute_input_lines() const override { return M37710_LINE_MAX; }
@@ -199,7 +253,6 @@ private:
 	uint32_t m_im3;       /* Immediate load target */
 	uint32_t m_im4;       /* Immediate load target */
 	uint32_t m_irq_delay;     /* delay 1 instruction before checking irq */
-	uint32_t m_irq_level;     /* irq level */
 	int m_ICount;     /* cycle count */
 	uint32_t m_source;        /* temp register */
 	uint32_t m_destination;   /* temp register */
@@ -207,15 +260,45 @@ private:
 	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
 	uint32_t m_stopped;       /* Sets how the CPU is stopped */
 
-	// on-board peripheral stuff
-	uint8_t m_m37710_regs[128];
+	// ports
+	uint8_t m_port_regs[11];
+	uint8_t m_port_dir[11];
+
+	// A/D
+	uint8_t m_ad_control;
+	uint8_t m_ad_sweep;
+
+	// UARTs
+	uint8_t m_uart_mode[2];
+	uint8_t m_uart_baud[2];
+	uint8_t m_uart_ctrl_reg0[2];
+	uint8_t m_uart_ctrl_reg1[2];
+
+	// timers
+	uint8_t m_count_start;
+	uint8_t m_one_shot_start;
+	uint8_t m_up_down_reg;
+	uint16_t m_timer_reg[8];
+	uint8_t m_timer_mode[8];
 	attotime m_reload[8];
 	emu_timer *m_timers[8];
 	int m_timer_out[8];
+
+	// misc. internal registers
+	uint8_t m_proc_mode;
+	uint8_t m_watchdog_freq;
+	uint8_t m_rto_control;
+	uint8_t m_dram_control;
+	uint16_t m_dmac_control;
+
+	// DMA
 	uint32_t m_dma0_src, m_dma0_dst, m_dma0_cnt, m_dma0_mode;
 	uint32_t m_dma1_src, m_dma1_dst, m_dma1_cnt, m_dma1_mode;
 	uint32_t m_dma2_src, m_dma2_dst, m_dma2_cnt, m_dma2_mode;
 	uint32_t m_dma3_src, m_dma3_dst, m_dma3_cnt, m_dma3_mode;
+
+	// interrupt controller
+	uint8_t m_int_control[M37710_MASKABLE_INTERRUPTS];
 
 	// for debugger
 	uint32_t m_debugger_pc;
@@ -229,19 +312,17 @@ private:
 	typedef void (m37710_cpu_device::*opcode_func)();
 	typedef uint32_t (m37710_cpu_device::*get_reg_func)(int regnum);
 	typedef void (m37710_cpu_device::*set_reg_func)(int regnum, uint32_t val);
-	typedef void (m37710_cpu_device::*set_line_func)(int line, int state);
 	typedef int  (m37710_cpu_device::*execute_func)(int cycles);
 
-	static const int m37710_irq_levels[M37710_INTERRUPT_MAX];
+	static const int m37710_int_reg_map[M37710_MASKABLE_INTERRUPTS];
 	static const int m37710_irq_vectors[M37710_INTERRUPT_MAX];
-	static const char *const m37710_rnames[128];
 	static const char *const m37710_tnames[8];
+	static const char *const m37710_intnames[M37710_INTERRUPT_MAX];
 	static const opcode_func *const m37710i_opcodes[4];
 	static const opcode_func *const m37710i_opcodes2[4];
 	static const opcode_func *const m37710i_opcodes3[4];
 	static const get_reg_func m37710i_get_reg[4];
 	static const set_reg_func m37710i_set_reg[4];
-	static const set_line_func m37710i_set_line[4];
 	static const execute_func m37710i_execute[4];
 	static const opcode_func m37710i_opcodes_M0X0[];
 	static const opcode_func m37710i_opcodes_M0X1[];
@@ -261,7 +342,6 @@ private:
 	const opcode_func *m_opcodes89;  /* opcodes with 0x89 prefix */
 	get_reg_func m_get_reg;
 	set_reg_func m_set_reg;
-	set_line_func m_set_line;
 	execute_func m_execute;
 
 	// Implementation
@@ -277,10 +357,6 @@ private:
 	void m37710i_set_reg_M0X1(int regnum, uint32_t val);
 	void m37710i_set_reg_M1X0(int regnum, uint32_t val);
 	void m37710i_set_reg_M1X1(int regnum, uint32_t val);
-	void m37710i_set_line_M0X0(int line, int state);
-	void m37710i_set_line_M0X1(int line, int state);
-	void m37710i_set_line_M1X0(int line, int state);
-	void m37710i_set_line_M1X1(int line, int state);
 	int m37710i_execute_M0X0(int cycles);
 	int m37710i_execute_M0X1(int cycles);
 	int m37710i_execute_M1X0(int cycles);

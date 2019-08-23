@@ -294,7 +294,7 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
 
 INPUT_CHANGED_MEMBER( genmod_mapper_device::setgm_changed )
 {
-	int number = (int)((uint64_t)param&0x03);
+	int number = int(param&0x03);
 	int value = newval;
 
 	switch (number)

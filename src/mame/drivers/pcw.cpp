@@ -949,7 +949,7 @@ void pcw_state::pcw_io(address_map &map)
 	map(0x0f6, 0x0f6).w(FUNC(pcw_state::pcw_pointer_table_top_scan_w));
 	map(0x0f7, 0x0f7).w(FUNC(pcw_state::pcw_vdu_video_control_register_w));
 	map(0x0f8, 0x0f8).rw(FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
-	map(0x0fc, 0x0fd).rw(m_printer_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x0fc, 0x0fd).rw(m_printer_mcu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 }
 
 
@@ -1249,7 +1249,7 @@ void pcw_state::pcw(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcw_state::pcw_map);
 	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw_io);
 
-	I8041(config, m_printer_mcu, 11000000);  // 11MHz
+	I8041AH(config, m_printer_mcu, 11000000);  // 11MHz
 	m_printer_mcu->p2_in_cb().set(FUNC(pcw_state::mcu_printer_p2_r));
 	m_printer_mcu->p2_out_cb().set(FUNC(pcw_state::mcu_printer_p2_w));
 	m_printer_mcu->p1_in_cb().set(FUNC(pcw_state::mcu_printer_p1_r));

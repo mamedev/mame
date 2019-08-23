@@ -163,17 +163,16 @@ private:
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(decold_sound_cmd_w);
 	virtual void machine_start() override;
-	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
 	void rblaster_map(address_map &map);
 	void rblaster_sound_map(address_map &map);
 };
 
-void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
+void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	int i,spr_offs,x,y,col,fx,fy;
 
 	/*
 	[+0] ---- -x-- flip X
@@ -184,68 +183,67 @@ void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	[+3] x coord
 	*/
 
-	for(i=0;i<0x20;i+=4)
+	for (int i = 0; i < 0x20; i += 4)
 	{
-		if(~spriteram[i+0] & 1)
+		if (~spriteram[i] & 1)
 			continue;
 
-		spr_offs = spriteram[i+1]|tile_bank;
-		x = spriteram[i+3];
-		y = spriteram[i+2];
-		col = 6; /* TODO */
-		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
-		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
+		int spr_offs = spriteram[i + 1] | tile_bank;
+		int x = spriteram[i + 3];
+		int y = spriteram[i + 2];
+		int col = 6; /* TODO */
+		int fx = (spriteram[i] & 0x04) ? 1 : 0;
+		int fy = (spriteram[i] & 0x02) ? 1 : 0;
 
-		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		gfx->transpen(bitmap, cliprect, spr_offs, col, fx, fy, x, y, 0);
 	}
 
-	for(i=0x3e0;i<0x400;i+=4)
+	for (int i = 0x3e0; i < 0x400; i += 4)
 	{
-		if(~spriteram[i+0] & 1)
+		if (~spriteram[i] & 1)
 			continue;
 
-		spr_offs = spriteram[i+1]|tile_bank;
-		x = spriteram[i+3];
-		y = spriteram[i+2];
-		col = 6; /* TODO */
-		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
-		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
+		int spr_offs = spriteram[i + 1] | tile_bank;
+		int x = spriteram[i + 3];
+		int y = spriteram[i + 2];
+		int col = 6; /* TODO */
+		int fx = (spriteram[i] & 0x04) ? 1 : 0;
+		int fy = (spriteram[i] & 0x02) ? 1 : 0;
 
-		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		gfx->transpen(bitmap, cliprect, spr_offs, col, fx, fy, x, y, 0);
 	}
 }
 
-uint32_t deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int y,x;
 
 	bitmap.fill(0, cliprect);
 
-	draw_sprites(bitmap,cliprect,m_vram1,0x000);
-	draw_sprites(bitmap,cliprect,m_vram0,0x100);
+	draw_sprites(bitmap, cliprect, m_vram1, 0x000);
+	draw_sprites(bitmap, cliprect, m_vram0, 0x100);
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<32;x++)
+		for (int x = 0; x < 32; x++)
 		{
-			int attr = m_attr0[x+y*32];
-			int tile = m_vram0[x+y*32] | ((attr & 3) << 8);
+			int attr = m_attr0[x + y * 32];
+			int tile = m_vram0[x + y * 32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
-			gfx->transpen(bitmap,cliprect,tile|0x400,colour,0,0,x*8,y*8,0);
+			gfx->transpen(bitmap, cliprect, tile | 0x400, colour, 0, 0, x * 8, y * 8, 0);
 		}
 	}
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<32;x++)
+		for (int x = 0; x < 32; x++)
 		{
-			int attr = m_attr1[x+y*32];
-			int tile = m_vram1[x+y*32] | ((attr & 3) << 8);
+			int attr = m_attr1[x + y * 32];
+			int tile = m_vram1[x + y * 32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
-			gfx->transpen(bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
+			gfx->transpen(bitmap, cliprect, tile, colour, 0, 0, x * 8, y * 8, 0);
 		}
 	}
 
@@ -462,8 +460,8 @@ void deco_ld_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(deco_ld_state::rblaster)
-
+void deco_ld_state::rblaster(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 8000000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_ld_state::rblaster_map);
@@ -478,12 +476,11 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	SONY_LDP1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update_rblaster));
 	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rblaster);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
 
@@ -502,7 +499,7 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

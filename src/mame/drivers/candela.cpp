@@ -47,6 +47,7 @@
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -137,14 +138,15 @@
 public:
 	can09t_state(const machine_config &mconfig, device_type type, const char * tag)
 		: driver_device(mconfig, type, tag)
-		,m_maincpu(*this, "maincpu")
-		,m_syspia(*this, SYSPIA_TAG)
-		,m_usrpia(*this, USRPIA_TAG)
-		,m_pia3(*this, PIA3_TAG)
-		,m_pia4(*this, PIA4_TAG)
-		,m_ptm(*this, "ptm")
-		,m_acia(*this, "acia")
-		,m_banksel(1)
+		, m_maincpu(*this, "maincpu")
+		, m_syspia(*this, SYSPIA_TAG)
+		, m_usrpia(*this, USRPIA_TAG)
+		, m_pia3(*this, PIA3_TAG)
+		, m_pia4(*this, PIA4_TAG)
+		, m_ptm(*this, "ptm")
+		, m_acia(*this, "acia")
+		, m_cass(*this, "cassette")
+		, m_banksel(1)
 	{ }
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_start() override;
@@ -165,6 +167,7 @@ protected:
 	required_device<pia6821_device> m_pia4;
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;
+	required_device<cassette_image_device> m_cass;
 
 	uint8_t m_banksel;
 	uint8_t *m_plap;
@@ -426,7 +429,8 @@ READ8_MEMBER( can09t_state::syspia_A_r )
 READ8_MEMBER( can09t_state::syspia_B_r )
 {
 	LOG("%s()\n", FUNCNAME);
-	return 0;
+	u8 data = (m_cass->input() > 0.04) ? 0x80 : 0;
+	return data;
 }
 
 WRITE8_MEMBER( can09t_state::syspia_B_w )
@@ -435,6 +439,7 @@ WRITE8_MEMBER( can09t_state::syspia_B_w )
 
 	m_banksel = (data & 0x20) ? 0x10 : 0;
 	LOGBANK("Bank select: %d", (m_banksel >> 4) & 1);
+	m_cass->output(BIT(data, 6) ? 1.0 : -1.0);
 }
 
 WRITE_LINE_MEMBER(can09t_state::syspia_cb2_w)
@@ -487,6 +492,7 @@ INPUT_PORTS_END
  * - Map PIA:S
  * - ROM/RAM paging by using the PIAs and the myriad of 74138s on the board
  * - Vram and screen for the 6845 CRTC
+ * - Check actual clock source for CRTC. An 8MHz UKI crystal is also nearby
  * - Keyboard
  * - Serial port
  * - Floppy controller
@@ -521,7 +527,7 @@ protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_bank1;
-	required_device<h46505_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 };
 
 void can09_state::machine_reset()
@@ -640,8 +646,8 @@ void can09_state::can09_map(address_map &map)
 //  AM_RANGE(0x0000, 0x7fff) AM_RAM
 	map(0x0000, 0x7fff).ram().bankrw("bank1");
 	map(0xe000, 0xffff).rom().region("roms", 0);
-	map(0xe020, 0xe020).w(m_crtc, FUNC(h46505_device::address_w));
-	map(0xe021, 0xe021).w(m_crtc, FUNC(h46505_device::register_w));
+	map(0xe020, 0xe020).w(m_crtc, FUNC(hd6845s_device::address_w));
+	map(0xe021, 0xe021).w(m_crtc, FUNC(hd6845s_device::register_w));
 	map(0xe034, 0xe037).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 
 #if 0
@@ -710,6 +716,11 @@ void can09t_state::can09t(machine_config &config)
 	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
 	CLOCK(config, "acia_clock", CAN09T_ACIA_CLOCK).signal_handler().set(FUNC(can09t_state::write_acia_clock));
+
+	SPEAKER(config, "mono").front_center();
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 #define CAN09_X1_CLOCK 22.1184_MHz_XTAL        /* UKI 22118.40 Khz */
@@ -722,8 +733,8 @@ void can09_state::can09(machine_config &config)
 	/* RAM banks */
 	RAM(config, RAM_TAG).set_default_size("768K");
 
-	// CRTC  init
-	h46505_device &crtc(H46505(config, "crtc", CAN09_CPU_CLOCK)); // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby
+	// CRTC init
+	hd6845s_device &crtc(HD6845S(config, "crtc", CAN09_CPU_CLOCK)); // HD46505SP-1 (HD68A45SP)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

@@ -61,7 +61,6 @@
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -278,12 +277,12 @@ void pcm_state::pcm(machine_config &config)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	Z80PIO(config, m_pio_u, XTAL(10'000'000)/4);
 	m_pio_u->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

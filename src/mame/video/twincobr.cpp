@@ -364,7 +364,7 @@ void twincobr_state::log_vram()
 }
 
 
-u32 twincobr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 twincobr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	log_vram();
 
@@ -383,7 +383,7 @@ u32 twincobr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	if (!m_display_on)
 	{
-		bitmap.fill(0, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 	else
 	{

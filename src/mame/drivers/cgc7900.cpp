@@ -444,8 +444,6 @@ void cgc7900_state::machine_reset()
 
 	memcpy((uint8_t *)m_chrom_ram.target(), user1, 8); // not really what happens but...
 
-	m_maincpu->reset();
-
 	kbd_mods = 0x300; // forces cold boot -- initializes SRAM contents
 	kbd_data = 0;
 	kbd_ready = false;

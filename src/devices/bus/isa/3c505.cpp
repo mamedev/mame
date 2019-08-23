@@ -157,10 +157,10 @@ static INPUT_PORTS_START(3c505)
 
 	PORT_DIPNAME(0xfe, 0x00, "ROM Base")
 	// Apollo host ROM addresses
-	PORT_DIPSETTING(   0x00, "00000h")
-	PORT_DIPSETTING(   0x02, "02000h")
-	PORT_DIPSETTING(   0x04, "04000h")
-	PORT_DIPSETTING(   0x06, "06000h")
+	PORT_DIPSETTING(   0x00, "80000h")
+	PORT_DIPSETTING(   0x02, "82000h")
+	PORT_DIPSETTING(   0x04, "84000h")
+	PORT_DIPSETTING(   0x06, "86000h")
 
 	// conventional PC option ROM addresses
 	PORT_DIPSETTING(   0xc8, "C8000h")
@@ -402,11 +402,7 @@ void isa16_3c505_device::acr_w(u8 data)
 	if ((data ^ m_acr) & ACR_LED2)
 		m_led[1] = !!(data & ACR_LED2);
 
-	if (!(m_acr & ACR_R586) && (data & ACR_R586))
-	{
-		LOGMASKED(LOG_REG, "i82586 reset\n");
-		m_net->reset();
-	}
+	m_net->reset_w((data & ACR_R586) ? 1 : 0);
 
 	if ((data ^ m_acr) & ACR_FLSH)
 	{

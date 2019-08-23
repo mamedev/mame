@@ -65,7 +65,7 @@ void hp98032_io_card_device::device_add_mconfig(machine_config &config)
 }
 
 static INPUT_PORTS_START(hp98032_port)
-	MCFG_HP9845_IO_SC(2)
+	PORT_HP9845_IO_SC(2)
 INPUT_PORTS_END
 
 ioport_constructor hp98032_io_card_device::device_input_ports() const

@@ -865,10 +865,10 @@ void isa8_aga_device::pc_aga_set_mode( AGA_MODE mode)
 
 	switch (m_mode) {
 	case AGA_COLOR:
-		m_mc6845->set_clock( XTAL(14'318'181)/8 );
+		m_mc6845->set_unscaled_clock( XTAL(14'318'181)/8 );
 		break;
 	case AGA_MONO:
-		m_mc6845->set_clock( 16257000/9 );
+		m_mc6845->set_unscaled_clock( 16257000/9 );
 		break;
 	case AGA_OFF:
 		break;

@@ -235,6 +235,11 @@ WRITE32_MEMBER(policetr_state::speedup_w)
  *
  *************************************/
 
+void policetr_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x2ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
+}
+
 void policetr_state::mem(address_map &map)
 {
 	map.global_mask(0x3fffffff);
@@ -246,8 +251,8 @@ void policetr_state::mem(address_map &map)
 	map(0x00600002, 0x00600002).r(FUNC(policetr_state::bsmt2000_data_r));
 	map(0x00700000, 0x00700003).w(FUNC(policetr_state::bsmt2000_reg_w));
 	map(0x00800000, 0x00800003).w(FUNC(policetr_state::bsmt2000_data_w));
-	map(0x00900001, 0x00900001).w(FUNC(policetr_state::palette_offset_w));
-	map(0x00920001, 0x00920001).w(FUNC(policetr_state::palette_data_w));
+	map(0x00900001, 0x00900001).w(m_ramdac, FUNC(ramdac_device::index_w));
+	map(0x00920001, 0x00920001).w(m_ramdac, FUNC(ramdac_device::pal_w));
 	map(0x00a00000, 0x00a00003).w(FUNC(policetr_state::control_w));
 	map(0x00a00000, 0x00a00003).portr("IN0");
 	map(0x00a20000, 0x00a20003).portr("IN1");
@@ -263,8 +268,8 @@ void sshooter_state::mem(address_map &map)
 
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
 	map(0x00200000, 0x00200003).w(FUNC(sshooter_state::bsmt2000_data_w));
-	map(0x00300001, 0x00300001).w(FUNC(sshooter_state::palette_offset_w));
-	map(0x00320001, 0x00320001).w(FUNC(sshooter_state::palette_data_w));
+	map(0x00300001, 0x00300001).w(m_ramdac, FUNC(ramdac_device::index_w));
+	map(0x00320001, 0x00320001).w(m_ramdac, FUNC(ramdac_device::pal_w));
 	map(0x00400000, 0x00400003).r(FUNC(sshooter_state::video_r));
 	map(0x00500000, 0x00500003).nopw();        // copies ROM here at startup, plus checksum
 	map(0x00600002, 0x00600002).r(FUNC(sshooter_state::bsmt2000_data_r));
@@ -426,6 +431,9 @@ void policetr_state::policetr(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(policetr_state::vblank));
 
 	PALETTE(config, m_palette).set_entries(256);
+	
+	RAMDAC(config, m_ramdac, 0, m_palette);  // BT481A Palette RAMDAC
+	m_ramdac->set_addrmap(0, &policetr_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, m_lspeaker).front_left();

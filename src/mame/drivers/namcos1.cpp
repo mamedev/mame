@@ -1466,6 +1466,7 @@ ROM_START( quester )
 	ROM_LOAD( "qs1_o1.bin",         0x20000, 0x10000, CRC(e4aab0ca) SHA1(e4765dd369b02492dbb9955cc082f24665a01635) )
 ROM_END
 
+/* Quester Special */
 ROM_START( questers )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "qs1_s0.bin",         0x00000, 0x10000, CRC(c2ef3af9) SHA1(aa0766aad450660e216d817e41e030141e8d1f48) )
@@ -1498,6 +1499,7 @@ ROM_START( questers )
 	ROM_LOAD( "qs1_o0.bin",         0x00000, 0x10000, CRC(e24f0bf1) SHA1(31f37f853fe27c24cfeaa059f8959dfea37911cb) )
 	ROM_LOAD( "qs1_o1.bin",         0x20000, 0x10000, CRC(e4aab0ca) SHA1(e4765dd369b02492dbb9955cc082f24665a01635) )
 ROM_END
+
 /* Pac-Mania */
 ROM_START( pacmania )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
@@ -1742,7 +1744,6 @@ ROM_START( galaga88a )
 	ROM_LOAD( "g8_obj-5.bin",       0xa0000, 0x20000, CRC(b0645169) SHA1(e55dc9bd532b6bd821b7bf6994c35175600c317c) ) // 12-11-87
 ROM_END
 
-
 /* World Stadium */
 ROM_START( ws )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
@@ -1784,7 +1785,7 @@ ROM_START( ws )
 	ROM_LOAD_HS( "ws1_obj3.bin",    0x60000, 0x10000, CRC(f2ed5309) SHA1(b7d9c0a617660ecceaf7db3fd53bc0377ed1b6c1) )
 ROM_END
 
-/* Beraboh Man */
+/* Beraboh Man (revision C) */
 ROM_START( berabohm )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bm1_s0.bin",         0x00000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
@@ -1797,7 +1798,7 @@ ROM_START( berabohm )
 	ROM_LOAD_1024( "bm1_p4.bin",      0x200000, CRC(f6cfcb8c) SHA1(22c78c9afbe71a66d2022778309463dbe28419aa) )
 	/* 280000-2fffff empty */
 	ROM_LOAD_512 ( "bm1-p6.bin",      0x300000, CRC(a51b69a5) SHA1(d04a52feb95f8b65978af88bd4b338883228fd93) )
-	ROM_LOAD_1024( "bm1_p7c.bin",     0x380000, CRC(9694d7b2) SHA1(2953a7029457a8afb2767560f05c064aade28bca) )
+	ROM_LOAD_1024( "bm1_p7c.bin",     0x380000, CRC(9694d7b2) SHA1(2953a7029457a8afb2767560f05c064aade28bca) ) /* rev C */
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
@@ -1829,6 +1830,7 @@ ROM_START( berabohm )
 	ROM_LOAD( "bm_obj-7.bin",       0xe0000, 0x20000, CRC(377c81ed) SHA1(85f4682c6079863793f5575d261a33309c221ba7) )
 ROM_END
 
+/* Beraboh Man (revision B) */
 ROM_START( berabohmb )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bm1_s0.bin",         0x00000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
@@ -1841,7 +1843,7 @@ ROM_START( berabohmb )
 	ROM_LOAD_1024( "bm1_p4.bin",      0x200000, CRC(f6cfcb8c) SHA1(22c78c9afbe71a66d2022778309463dbe28419aa) )
 	/* 280000-2fffff empty */
 	ROM_LOAD_512 ( "bm1-p6.bin",      0x300000, CRC(a51b69a5) SHA1(d04a52feb95f8b65978af88bd4b338883228fd93) )
-	ROM_LOAD_1024( "bm1_p7b.bin",     0x380000, CRC(e0c36ddd) SHA1(e949da36524add3ab70d5dd5dcc7c6f42e3799e7) )
+	ROM_LOAD_1024( "bm1_p7b.bin",     0x380000, CRC(e0c36ddd) SHA1(e949da36524add3ab70d5dd5dcc7c6f42e3799e7) ) /* rev B */
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
@@ -2630,8 +2632,42 @@ ROM_START( pistoldm )
 	ROM_LOAD( "pd_obj-7.bin",       0xe0000, 0x20000, CRC(00d4a8f0) SHA1(2312bea93272974b944ea5566b5cd2631761dfef) )
 ROM_END
 
-/* Souko Ban Deluxe */
+/* Boxy Boy */
 ROM_START( boxyboy )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "sb1_snd0.bin",       0x00000, 0x10000, CRC(bf46a106) SHA1(cbc95759902c45869346973860cf27792860f781) )
+
+	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_LOAD_1024( "sb1_prg0.bin",    0x000000, CRC(8af8cb73) SHA1(7c89ca0383e601a48d2f83449b2faf7b66a7a94d) )
+	ROM_LOAD_1024( "sb1_prg1.bin",    0x080000, CRC(5d1fdd94) SHA1(df1f1f33df3041c7eb46dc9287427785c7264c2a) )
+	/* 100000-17ffff empty */
+	/* 180000-1fffff empty */
+	/* 200000-27ffff empty */
+	/* 280000-2fffff empty */
+	/* 300000-37ffff empty */
+	ROM_LOAD_512 ( "sb2_prg7.bin",    0x380000, CRC(f570301b) SHA1(87dae1bbd4d5a0e2f2ecc502ef874a99de26d8df) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "sb1_voi0.bin",    0x00000, 0x10000, CRC(63d9cedf) SHA1(117767c6b25325bf3005756d74196da56008498c) )
+
+	ROM_REGION( 0x20000, "c123tmap:mask", 0 )  /* character mask */
+	ROM_LOAD( "sb1_chr8.bin",       0x00000, 0x10000, CRC(5692b297) SHA1(ed20a0f4ce80674d01cd2a30571ffeff9f9066fd) )
+
+	ROM_REGION( 0x100000, "c123tmap", 0 ) /* characters */
+	ROM_LOAD( "sb1_chr0.bin",       0x00000, 0x20000, CRC(267f1331) SHA1(46a41ee3553cc7c73a47a339365e27b814067674) )
+	ROM_LOAD( "sb1_chr1.bin",       0x20000, 0x20000, CRC(e5ff61ad) SHA1(30aff224dd5c5a85b057aa648677747b1b0e14a8) )
+	ROM_LOAD( "sb1_chr2.bin",       0x40000, 0x20000, CRC(099b746b) SHA1(11125ee9cb988b23e9192dc37444fb59b60ab3ce) )
+	ROM_LOAD( "sb1_chr3.bin",       0x60000, 0x20000, CRC(1551bb7c) SHA1(eaebc333e0bb8fddd6f48ab157eb492631e5e959) )
+
+	ROM_REGION( 0x100000, "sprite", 0 ) /* sprites */
+	ROM_LOAD( "sb1_obj0.bin",       0x00000, 0x10000, CRC(ed810da4) SHA1(b3172b50b15d0e2fd40d38d32abf4de22b6f7a85) )
+ROM_END
+
+/* Boxy Boy */
+ROM_START( boxyboya )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "sb1_snd0.bin",       0x00000, 0x10000, CRC(bf46a106) SHA1(cbc95759902c45869346973860cf27792860f781) )
 
@@ -2664,6 +2700,7 @@ ROM_START( boxyboy )
 	ROM_LOAD( "sb1_obj0.bin",       0x00000, 0x10000, CRC(ed810da4) SHA1(b3172b50b15d0e2fd40d38d32abf4de22b6f7a85) )
 ROM_END
 
+/* Souko Ban Deluxe (Japan) */
 ROM_START( soukobdx )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "sb1_snd0.bin",       0x00000, 0x10000, CRC(bf46a106) SHA1(cbc95759902c45869346973860cf27792860f781) )
@@ -2697,6 +2734,7 @@ ROM_START( soukobdx )
 	ROM_LOAD( "sb1_obj0.bin",       0x00000, 0x10000, CRC(ed810da4) SHA1(b3172b50b15d0e2fd40d38d32abf4de22b6f7a85) )
 ROM_END
 
+/* Puzzle Club */
 ROM_START( puzlclub )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "pc1_s0.bin",         0x00000, 0x10000, CRC(44737c02) SHA1(bcacfed1c3522d6ecddd3ac79ded620e5334df35) )
@@ -2884,7 +2922,8 @@ GAME( 1989, ws89,      ws,       ns1,     ws89,     namcos1_state, init_ws89,   
 GAME( 1989, dangseed,  0,        ns1,     dangseed, namcos1_state, init_dangseed, ROT90,  "Namco", "Dangerous Seed (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ws90,      ws,       ns1,     ws90,     namcos1_state, init_ws90,     ROT180, "Namco", "World Stadium '90 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, pistoldm,  0,        ns1,     ns1,      namcos1_state, init_pistoldm, ROT0,   "Namco", "Pistol Daimyo no Bouken (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, boxyboy,   0,        ns1,     boxyboy,  namcos1_state, init_soukobdx, ROT0,   "Namco", "Boxy Boy (SB?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, boxyboy,   0,        ns1,     boxyboy,  namcos1_state, init_soukobdx, ROT0,   "Namco", "Boxy Boy (World, SB2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, boxyboya,  boxyboy,  ns1,     boxyboy,  namcos1_state, init_soukobdx, ROT0,   "Namco", "Boxy Boy (SB?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, soukobdx,  boxyboy,  ns1,     boxyboy,  namcos1_state, init_soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan, SB1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, puzlclub,  0,        ns1,     puzlclub, namcos1_state, init_puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tankfrce,  0,        ns1,     ns1,      namcos1_state, init_tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Players)", MACHINE_SUPPORTS_SAVE )

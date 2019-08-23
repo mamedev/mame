@@ -81,10 +81,10 @@ WRITE_LINE_MEMBER(wiping_state::sound_irq_mask_w)
 void wiping_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0x83ff).share("videoram");
-	map(0x8400, 0x87ff).share("colorram");
-	map(0x8800, 0x88ff).share("spriteram");
-	map(0x8000, 0x8bff).ram();
+	map(0x8000, 0x83ff).ram().share("videoram");
+	map(0x8400, 0x87ff).ram().share("colorram");
+	map(0x8800, 0x88ff).ram().share("spriteram");
+	map(0x8900, 0x8bff).ram();
 	map(0x9000, 0x93ff).ram().share("share1");
 	map(0x9800, 0x9bff).ram().share("share2");
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));

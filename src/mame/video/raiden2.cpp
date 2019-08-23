@@ -40,7 +40,6 @@ WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 
 void raiden2_state::draw_sprites(const rectangle &cliprect)
 {
-	u16 *source = m_spriteram + (0x1000/2)-4;
 	m_sprite_bitmap.fill(0xf, cliprect);
 
 	gfx_element *gfx = m_gfxdecode->gfx(2);
@@ -52,8 +51,9 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 	  06 yyyy yyyy yyyy yyyy   y = ypos
 	 */
 
-	while (source >= m_spriteram)
+	for (int srcindex = (m_spriteram->bytes()/2)-4; srcindex >= 0; srcindex -= 4)
 	{
+		u16 *source = &m_spriteram->buffer()[srcindex];
 		int tile_number = source[1];
 		int sx = source[2];
 		int sy = source[3];
@@ -144,8 +144,6 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 				tile_number++;
 			}
 		}
-
-		source -= 4;
 	}
 
 }

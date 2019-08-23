@@ -37,6 +37,7 @@ Year  Game                         Manufacturer    Notes
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class igs009_state : public driver_device

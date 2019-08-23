@@ -65,9 +65,9 @@ void gameplan_state::cpu_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram"); // cmos ram
 	map(0x2000, 0x27ff).ram(); // main ram
-	map(0x3800, 0x380f).rw(m_via_1, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x3810, 0x381f).rw(m_via_2, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x3820, 0x382f).rw(m_via_0, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x3800, 0x380f).m(m_via_1, FUNC(via6522_device::map));
+	map(0x3810, 0x381f).m(m_via_2, FUNC(via6522_device::map));
+	map(0x3820, 0x382f).m(m_via_0, FUNC(via6522_device::map));
 	map(0x3830, 0x3831).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x3840, 0x3841).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x3850, 0x3850).nopr(); //watchdog_reset_r ?

@@ -38,7 +38,7 @@
 
 			// convert source to clr
 			pen_to_clr(pen, &s_clr.trgb);
-			//s_clr.u32 = (pen >> 3); // using the union is actually significantly slower than our pen_to_clr to function!
+			//s_clr.data = (pen >> 3); // using the union is actually significantly slower than our pen_to_clr to function!
 			// source * intesity and clamp
 
 #if TINT == 1
@@ -49,10 +49,9 @@
 
 				// convert destination to clr
 				pen_to_clr(*bmp, &d_clr.trgb);
-				//d_clr.u32 = *bmp >> 3; // using the union is actually significantly slower than our pen_to_clr to function!
+				//d_clr.data = *bmp >> 3; // using the union is actually significantly slower than our pen_to_clr to function!
 				#if _SMODE == 0
 				//g_profiler.start(PROFILER_USER7);
-
 
 					#if _DMODE == 0
 					//g_profiler.start(PROFILER_USER1);
@@ -180,12 +179,11 @@
 #endif
 #endif
 
-
 			#endif
 
 			// write result
-			*bmp = s_clr.trgb.to_pen()|(pen&0x20000000);
-			//*bmp = (s_clr.u32<<3)|(pen&0x20000000); // using the union is actually significantly slower than our to_pen function!
+			*bmp = s_clr.trgb.to_pen() | (pen & 0x20000000);
+			//*bmp = (s_clr.data << 3) | (pen & 0x20000000); // using the union is actually significantly slower than our to_pen function!
 
 #endif // END NOT REALLY SIMPLE
 

@@ -81,18 +81,6 @@ enum
 class hmcs40_cpu_device : public cpu_device
 {
 public:
-	enum
-	{
-		PORT_R0X = 0,
-		PORT_R1X,
-		PORT_R2X,
-		PORT_R3X,
-		PORT_R4X,
-		PORT_R5X,
-		PORT_R6X,
-		PORT_R7X
-	};
-
 	// max 8 4-bit R ports
 	template <std::size_t Bit> auto read_r() { return m_read_r[Bit].bind(); }
 	template <std::size_t Bit> auto write_r() { return m_write_r[Bit].bind(); }

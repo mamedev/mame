@@ -25,9 +25,13 @@ public:
 
 	mace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto rtc_read_callback() { return m_rtc_read_callback.bind(); }
+	auto rtc_write_callback() { return m_rtc_write_callback.bind(); }
+
 	void map(address_map &map);
 
 protected:
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -67,6 +71,9 @@ protected:
 
 	required_device<mips3_device> m_maincpu;
 
+	devcb_read8 m_rtc_read_callback;
+	devcb_write8 m_rtc_write_callback;
+
 	enum
 	{
 		ISA_INT_COMPARE1    = 0x2000,
@@ -98,19 +105,11 @@ protected:
 		uint64_t m_vout_msc_ust;
 	};
 
-	// DS17287 RTC; proper hookup is unknown
-	struct rtc_t
-	{
-		uint64_t m_unknown;
-	};
-
 	isa_t m_isa;
 
 	ust_msc_t m_ust_msc;
 	emu_timer *m_timer_ust;
 	emu_timer *m_timer_msc;
-
-	rtc_t m_rtc;
 };
 
 DECLARE_DEVICE_TYPE(SGI_MACE, mace_device)

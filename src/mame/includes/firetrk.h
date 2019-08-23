@@ -15,6 +15,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define FIRETRUCK_MOTOR_DATA    NODE_01
 #define FIRETRUCK_HORN_EN       NODE_02

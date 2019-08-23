@@ -29,7 +29,7 @@
  *
  * TODO
  *   - refactor to separate devices with registers
- *   - implement blinking and overlay
+ *   - implement blinking and rgb device overlay
  *   - unsure about address masking when accessing overlay colors
  */
 

@@ -13,6 +13,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class nemesis_state : public driver_device
@@ -33,7 +34,7 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_gx400_shared_ram(*this, "gx400_shared"),
 		m_bubsys_shared_ram(*this, "bubsys_shared"),
-		m_bubsys_control_ram(*this, "bubsys_control"),	
+		m_bubsys_control_ram(*this, "bubsys_control"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_filter1(*this, "filter1"),
@@ -96,6 +97,7 @@ private:
 	uint16_t    m_selected_ip; /* Copied from WEC Le Mans 24 driver, explicity needed for Hyper Crash */
 	int       m_gx400_irq1_cnt;
 	uint8_t     m_frame_counter;
+	uint16_t    m_scanline_counter;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -148,14 +150,17 @@ private:
 	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(nemesis_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(bubsys_vblank_irq);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(blkpnthr_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(bubsys_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(hcrash_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
 	void create_palette_lookups();
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	void set_screen_raw_params(machine_config &config);
 
 	void blkpnthr_map(address_map &map);
 	void blkpnthr_sound_map(address_map &map);

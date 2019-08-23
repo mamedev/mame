@@ -113,11 +113,6 @@ const options_entry emu_options::s_option_entries[] =
 	// artwork options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE ARTWORK OPTIONS" },
 	{ OPTION_ARTWORK_CROP ";artcrop",                    "0",         OPTION_BOOLEAN,    "crop artwork so emulated screen image fills output screen/window in one axis" },
-	{ OPTION_USE_BACKDROPS ";backdrop",                  "1",         OPTION_BOOLEAN,    "enable backdrops if artwork is enabled and available" },
-	{ OPTION_USE_OVERLAYS ";overlay",                    "1",         OPTION_BOOLEAN,    "enable overlays if artwork is enabled and available" },
-	{ OPTION_USE_BEZELS ";bezel",                        "1",         OPTION_BOOLEAN,    "enable bezels if artwork is enabled and available" },
-	{ OPTION_USE_CPANELS ";cpanel",                      "1",         OPTION_BOOLEAN,    "enable cpanels if artwork is enabled and available" },
-	{ OPTION_USE_MARQUEES ";marquee",                    "1",         OPTION_BOOLEAN,    "enable marquees if artwork is enabled and available" },
 	{ OPTION_FALLBACK_ARTWORK,                           nullptr,     OPTION_STRING,     "fallback artwork if no external artwork or internal driver layout defined" },
 	{ OPTION_OVERRIDE_ARTWORK,                           nullptr,     OPTION_STRING,     "override artwork for external artwork and internal driver layout" },
 
@@ -389,9 +384,9 @@ namespace
 		if (!same_name)
 			result.push_back(image.brief_instance_name());
 
-		if (image.instance_name() != image.cannonical_instance_name())
+		if (image.instance_name() != image.canonical_instance_name())
 		{
-			result.push_back(image.cannonical_instance_name());
+			result.push_back(image.canonical_instance_name());
 			if (!same_name)
 				result.push_back(image.brief_instance_name() + "1");
 		}
@@ -569,7 +564,7 @@ bool emu_options::add_and_remove_slot_options()
 
 		for (const device_slot_interface &slot : slot_interface_iterator(config.root_device()))
 		{
-			// come up with the cannonical name of the slot
+			// come up with the canonical name of the slot
 			const char *slot_option_name = slot.slot_name();
 
 			// erase this option from existing (so we don't purge it later)
@@ -635,7 +630,7 @@ bool emu_options::add_and_remove_image_options()
 	// "cartridge" starting out, but become "cartridge1" when another cartridge device is added.
 	//
 	// To get around this behavior, our internal data structures work in terms of what is
-	// returned by cannonical_instance_name(), which will be something like "cartridge1" both
+	// returned by canonical_instance_name(), which will be something like "cartridge1" both
 	// for a singular cartridge device and the first cartridge in a multi cartridge system.
 	//
 	// The need for this behavior was identified by Tafoid when the following command line
@@ -651,9 +646,9 @@ bool emu_options::add_and_remove_image_options()
 	// first, create a list of existing image options; this is so we can purge
 	// any stray slot options that are no longer pertinent when we're done; we
 	// have to do this for both "flavors" of name
-	existing_option_tracker<::image_option> existing(m_image_options_cannonical);
+	existing_option_tracker<::image_option> existing(m_image_options_canonical);
 
-	// wipe the non-cannonical image options; we're going to rebuild it
+	// wipe the non-canonical image options; we're going to rebuild it
 	m_image_options.clear();
 
 	// it is perfectly legal for this to be called without a system; we
@@ -666,19 +661,19 @@ bool emu_options::add_and_remove_image_options()
 		// iterate through all image devices
 		for (device_image_interface &image : image_interface_iterator(config.root_device()))
 		{
-			const std::string &cannonical_name(image.cannonical_instance_name());
+			const std::string &canonical_name(image.canonical_instance_name());
 
 			// erase this option from existing (so we don't purge it later)
-			existing.remove(cannonical_name);
+			existing.remove(canonical_name);
 
 			// do we need to add this option?
-			auto iter = m_image_options_cannonical.find(cannonical_name);
-			::image_option *this_option = iter != m_image_options_cannonical.end() ? &iter->second : nullptr;
+			auto iter = m_image_options_canonical.find(canonical_name);
+			::image_option *this_option = iter != m_image_options_canonical.end() ? &iter->second : nullptr;
 			if (!this_option)
 			{
-				// we do - add it to both m_image_options_cannonical and m_image_options
-				auto pair = std::make_pair(cannonical_name, ::image_option(*this, image.cannonical_instance_name()));
-				this_option = &m_image_options_cannonical.emplace(std::move(pair)).first->second;
+				// we do - add it to both m_image_options_canonical and m_image_options
+				auto pair = std::make_pair(canonical_name, ::image_option(*this, image.canonical_instance_name()));
+				this_option = &m_image_options_canonical.emplace(std::move(pair)).first->second;
 				changed = true;
 
 				// if this image is user loadable, we have to surface it in the core_options
@@ -708,15 +703,15 @@ bool emu_options::add_and_remove_image_options()
 	// at this point we need to purge stray image options that may no longer be pertinent
 	for (auto &opt_name : existing)
 	{
-		auto iter = m_image_options_cannonical.find(*opt_name);
-		assert(iter != m_image_options_cannonical.end());
+		auto iter = m_image_options_canonical.find(*opt_name);
+		assert(iter != m_image_options_canonical.end());
 
 		// if this is represented in core_options, remove it
 		if (iter->second.option_entry())
 			remove_entry(*iter->second.option_entry());
 
 		// remove this option
-		m_image_options_cannonical.erase(iter);
+		m_image_options_canonical.erase(iter);
 		changed = true;
 	}
 
@@ -1237,9 +1232,9 @@ core_options::entry::shared_ptr slot_option::setup_option_entry(const char *name
 //  image_option ctor
 //-------------------------------------------------
 
-image_option::image_option(emu_options &host, const std::string &cannonical_instance_name)
+image_option::image_option(emu_options &host, const std::string &canonical_instance_name)
 	: m_host(host)
-	, m_canonical_instance_name(cannonical_instance_name)
+	, m_canonical_instance_name(canonical_instance_name)
 {
 }
 

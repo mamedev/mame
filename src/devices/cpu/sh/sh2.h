@@ -81,9 +81,140 @@ public:
 	}
 
 
-	DECLARE_WRITE32_MEMBER( sh7604_w );
-	DECLARE_READ32_MEMBER( sh7604_r );
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
+
+	// SCI
+	DECLARE_READ8_MEMBER( smr_r );
+	DECLARE_WRITE8_MEMBER( smr_w );
+	DECLARE_READ8_MEMBER( brr_r );
+	DECLARE_WRITE8_MEMBER( brr_w );
+	DECLARE_READ8_MEMBER( scr_r );
+	DECLARE_WRITE8_MEMBER( scr_w );
+	DECLARE_READ8_MEMBER( tdr_r );
+	DECLARE_WRITE8_MEMBER( tdr_w );
+	DECLARE_READ8_MEMBER( ssr_r );
+	DECLARE_WRITE8_MEMBER( ssr_w );
+	DECLARE_READ8_MEMBER( rdr_r );
+
+	// FRT / FRC
+	DECLARE_READ8_MEMBER( tier_r );
+	DECLARE_WRITE8_MEMBER( tier_w );
+	DECLARE_READ16_MEMBER( frc_r );
+	DECLARE_WRITE16_MEMBER( frc_w );
+	DECLARE_READ8_MEMBER( ftcsr_r );
+	DECLARE_WRITE8_MEMBER( ftcsr_w );
+	DECLARE_READ16_MEMBER( ocra_b_r );
+	DECLARE_WRITE16_MEMBER( ocra_b_w );
+	DECLARE_READ8_MEMBER( frc_tcr_r );
+	DECLARE_WRITE8_MEMBER( frc_tcr_w );
+	DECLARE_READ8_MEMBER( tocr_r );
+	DECLARE_WRITE8_MEMBER( tocr_w );
+	DECLARE_READ16_MEMBER( frc_icr_r );
+
+	// INTC
+	DECLARE_READ16_MEMBER( ipra_r );
+	DECLARE_WRITE16_MEMBER( ipra_w );
+	DECLARE_READ16_MEMBER( iprb_r );
+	DECLARE_WRITE16_MEMBER( iprb_w );
+	DECLARE_READ16_MEMBER( vcra_r );
+	DECLARE_WRITE16_MEMBER( vcra_w );
+	DECLARE_READ16_MEMBER( vcrb_r );
+	DECLARE_WRITE16_MEMBER( vcrb_w );
+	DECLARE_READ16_MEMBER( vcrc_r );
+	DECLARE_WRITE16_MEMBER( vcrc_w );
+	DECLARE_READ16_MEMBER( vcrd_r );
+	DECLARE_WRITE16_MEMBER( vcrd_w );
+	DECLARE_READ16_MEMBER( vcrwdt_r );
+	DECLARE_WRITE16_MEMBER( vcrwdt_w );
+	DECLARE_READ32_MEMBER( vcrdiv_r );
+	DECLARE_WRITE32_MEMBER( vcrdiv_w );
+	DECLARE_READ16_MEMBER( intc_icr_r );
+	DECLARE_WRITE16_MEMBER( intc_icr_w );
+
+	// DIVU
+	DECLARE_READ32_MEMBER( dvsr_r );
+	DECLARE_WRITE32_MEMBER( dvsr_w );
+	DECLARE_READ32_MEMBER( dvdnt_r );
+	DECLARE_WRITE32_MEMBER( dvdnt_w );
+	DECLARE_READ32_MEMBER( dvdnth_r );
+	DECLARE_WRITE32_MEMBER( dvdnth_w );
+	DECLARE_READ32_MEMBER( dvdntl_r );
+	DECLARE_WRITE32_MEMBER( dvdntl_w );
+
+	DECLARE_READ32_MEMBER( dvcr_r );
+	DECLARE_WRITE32_MEMBER( dvcr_w );
+
+	// DMAC
+	template <int Channel> READ32_MEMBER(vcrdma_r)
+	{
+		return m_vcrdma[Channel] & 0x7f;
+	}
+
+	template <int Channel> WRITE32_MEMBER(vcrdma_w)
+	{
+		COMBINE_DATA(&m_vcrdma[Channel]);
+		m_irq_vector.dmac[Channel] = m_vcrdma[Channel] & 0x7f;
+		sh2_recalc_irq();
+	}
+
+	template <int Channel> READ8_MEMBER(drcr_r) { return m_dmac[Channel].drcr & 3; }
+	template <int Channel> WRITE8_MEMBER(drcr_w) { m_dmac[Channel].drcr = data & 3; sh2_recalc_irq(); }
+	template <int Channel> READ32_MEMBER(sar_r) { return m_dmac[Channel].sar; }
+	template <int Channel> WRITE32_MEMBER(sar_w) { COMBINE_DATA(&m_dmac[Channel].sar); }
+	template <int Channel> READ32_MEMBER(dar_r) { return m_dmac[Channel].dar; }
+	template <int Channel> WRITE32_MEMBER(dar_w) { COMBINE_DATA(&m_dmac[Channel].dar); }
+	template <int Channel> READ32_MEMBER(dmac_tcr_r) { return m_dmac[Channel].tcr; }
+	template <int Channel> WRITE32_MEMBER(dmac_tcr_w) { COMBINE_DATA(&m_dmac[Channel].tcr); m_dmac[Channel].tcr &= 0xffffff; }
+	template <int Channel> READ32_MEMBER(chcr_r) { return m_dmac[Channel].chcr; }
+	template <int Channel> WRITE32_MEMBER(chcr_w)
+	{
+		uint32_t old;
+		old = m_dmac[Channel].chcr;
+		COMBINE_DATA(&m_dmac[Channel].chcr);
+		m_dmac[Channel].chcr = (data & ~2) | (old & m_dmac[Channel].chcr & 2);
+		sh2_dmac_check(Channel);
+	}
+	READ32_MEMBER( dmaor_r ) { return m_dmaor & 0xf; }
+	WRITE32_MEMBER( dmaor_w )
+	{
+		if(ACCESSING_BITS_0_7)
+		{
+			uint8_t old;
+			old = m_dmaor & 0xf;
+			m_dmaor = (data & ~6) | (old & m_dmaor & 6);
+			sh2_dmac_check(0);
+			sh2_dmac_check(1);
+		}
+	}
+
+	// WTC
+	DECLARE_READ16_MEMBER( wtcnt_r );
+	DECLARE_WRITE16_MEMBER( wtcnt_w );
+	DECLARE_READ16_MEMBER( rstcsr_r );
+	DECLARE_WRITE16_MEMBER( rstcsr_w );
+
+	// misc
+	DECLARE_READ8_MEMBER( sbycr_r );
+	DECLARE_WRITE8_MEMBER( sbycr_w );
+	DECLARE_READ8_MEMBER( ccr_r );
+	DECLARE_WRITE8_MEMBER( ccr_w );
+
+	// BSC
+	DECLARE_READ32_MEMBER( bcr1_r );
+	DECLARE_WRITE32_MEMBER( bcr1_w );
+	DECLARE_READ32_MEMBER( bcr2_r );
+	DECLARE_WRITE32_MEMBER( bcr2_w );
+	DECLARE_READ32_MEMBER( wcr_r );
+	DECLARE_WRITE32_MEMBER( wcr_w );
+	DECLARE_READ32_MEMBER( mcr_r );
+	DECLARE_WRITE32_MEMBER( mcr_w );
+	DECLARE_READ32_MEMBER( rtcsr_r );
+	DECLARE_WRITE32_MEMBER( rtcsr_w );
+	DECLARE_READ32_MEMBER( rtcor_r );
+	DECLARE_WRITE32_MEMBER( rtcor_w );
+	DECLARE_READ32_MEMBER( rtcnt_r );
+	DECLARE_WRITE32_MEMBER( rtcnt_w );
+
 
 	virtual void set_frt_input(int state) override;
 	void sh2_notify_dma_data_available();
@@ -128,11 +259,58 @@ private:
 	int8_t    m_irq_line_state[17];
 
 	address_space *m_internal;
-	uint32_t m_m[0x200/4];
+	// SCI
+	uint8_t m_smr, m_brr, m_scr, m_tdr, m_ssr;
+	// FRT / FRC
+	uint8_t m_tier, m_ftcsr, m_frc_tcr, m_tocr;
+	uint16_t m_frc;
+	uint16_t m_ocra, m_ocrb, m_frc_icr;
+	// INTC
+	struct {
+		uint8_t frc;
+		uint8_t sci;
+		uint8_t divu;
+		uint8_t dmac;
+		uint8_t wdt;
+	} m_irq_level;
+	struct {
+		uint8_t fic;
+		uint8_t foc;
+		uint8_t fov;
+		uint8_t divu;
+		uint8_t dmac[2];
+	} m_irq_vector;
+	uint16_t m_ipra, m_iprb;
+	uint16_t m_vcra, m_vcrb, m_vcrc, m_vcrd, m_vcrwdt, m_vcrdiv, m_intc_icr, m_vcrdma[2];
+	bool m_vecmd, m_nmie;
+
+	// DIVU
+	bool m_divu_ovf, m_divu_ovfie;
+	uint32_t m_dvsr, m_dvdntl, m_dvdnth;
+
+	// WTC
+	uint8_t m_wtcnt, m_wtcsr;
+	uint8_t m_rstcsr;
+	uint16_t m_wtcw[2];
+
+	// DMAC
+	struct {
+		uint8_t drcr;
+		uint32_t sar;
+		uint32_t dar;
+		uint32_t tcr;
+		uint32_t chcr;
+	} m_dmac[2];
+	uint8_t m_dmaor;
+
+	// misc
+	uint8_t m_sbycr, m_ccr;
+
+	// BSC
+	uint32_t m_bcr1, m_bcr2, m_wcr, m_mcr, m_rtcsr, m_rtcor, m_rtcnt;
+
 	int8_t  m_nmi_line_state;
 
-	uint16_t  m_frc;
-	uint16_t  m_ocra, m_ocrb, m_icr;
 	uint64_t  m_frc_base;
 
 	int     m_frt_input;
@@ -150,8 +328,6 @@ private:
 	uint32_t m_active_dma_src[2];
 	uint32_t m_active_dma_dst[2];
 	uint32_t m_active_dma_count[2];
-	uint16_t m_wtcnt;
-	uint8_t m_wtcsr;
 
 	int     m_is_slave;
 	dma_kludge_delegate              m_dma_kludge_cb;
@@ -181,7 +357,7 @@ private:
 	TIMER_CALLBACK_MEMBER( sh2_dma_current_active_callback );
 	void sh2_timer_resync();
 	void sh2_timer_activate();
-	void sh2_do_dma(int dma);
+	void sh2_do_dma(int dmach);
 	virtual void sh2_exception(const char *message, int irqline) override;
 	void sh2_dmac_check(int dma);
 	void sh2_recalc_irq();

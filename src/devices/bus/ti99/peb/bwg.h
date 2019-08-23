@@ -125,8 +125,8 @@ private:
 	required_device<mm58274c_device> m_clock;
 
 	// Latched CRU outputs
-	required_device<ls259_device> m_crulatch0_7;
-	required_device<ls259_device> m_crulatch8_15;
+	required_device<hc259_device> m_crulatch0_7;
+	required_device<hc259_device> m_crulatch8_15;
 
 	// Motor monoflop
 	required_device<ttl74123_device> m_motormf;

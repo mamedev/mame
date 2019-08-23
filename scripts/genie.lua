@@ -77,6 +77,16 @@ function precompiledheaders()
 	end
 end
 
+function precompiledheaders_novs()
+	precompiledheaders()
+	if string.sub(_ACTION,1,4) == "vs20" then
+		--print("Disabling pch for Visual Studio")
+		flags {
+			"NoPCH"
+		}
+	end
+end
+
 function addprojectflags()
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
@@ -486,7 +496,6 @@ configuration { "vs20*" }
 		"/bigobj",
 	}
 	flags {
-		"NoPCH",
 		"ExtraWarnings",
 	}
 	if not _OPTIONS["NOWERROR"] then
@@ -1174,6 +1183,7 @@ configuration { "asmjs" }
 	}
 	linkoptions {
 		"-Wl,--start-group",
+		"-s ERROR_ON_MISSING_LIBRARIES=0"
 	}
 	archivesplit_size "20"
 
@@ -1303,6 +1313,9 @@ configuration { "vsllvm" }
 		"_CRT_SECURE_NO_DEPRECATE",
 		"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
 	}
+	includedirs {
+		MAME_DIR .. "3rdparty/dxsdk/Include"
+	}
 
 configuration { "vs20*" }
 		defines {
@@ -1313,7 +1326,7 @@ configuration { "vs20*" }
 			"_CRT_SECURE_NO_DEPRECATE",
 			"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
 		}
-		
+
 -- Windows Store/Phone projects already link against the available libraries.
 if _OPTIONS["vs"]==nil or not (string.startswith(_OPTIONS["vs"], "winstore8") or string.startswith(_OPTIONS["vs"], "winphone8")) then
 		links {
@@ -1481,6 +1494,7 @@ configuration { "vsllvm" }
 			"-Wno-tautological-undefined-compare",
 			"-Wno-deprecated-declarations",
 			"-Wno-macro-redefined",
+			"-Wno-narrowing",
 		}
 
 

@@ -998,9 +998,6 @@ void lisa_state::machine_reset()
 			sony_set_enable_lines(m_fdc, 1);   /* on lisa2, drive unit 1 is always selected (?) */
 		}
 	}
-
-	/* reset 68k to pick up proper vectors from MMU */
-	m_maincpu->reset();
 }
 
 INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)

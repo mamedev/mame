@@ -319,7 +319,7 @@ menu_select_game::~menu_select_game()
 void menu_select_game::handle()
 {
 	if (!m_prev_selected)
-		m_prev_selected = item[0].ref;
+		m_prev_selected = item(0).ref;
 
 	// if I have to load datfile, perform a hard reset
 	if (ui_globals::reset)
@@ -616,17 +616,17 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		skip_main_items = 0;
 
 	// configure the custom rendering
-	customtop = 3.0f * ui().get_line_height() + 5.0f * UI_BOX_TB_BORDER;
-	custombottom = 5.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = 3.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
+	custombottom = 5.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 
 	// reselect prior game launched, if any
 	if (old_item_selected != -1)
 	{
-		selected = old_item_selected;
+		set_selected_index(old_item_selected);
 		if (ui_globals::visible_main_lines == 0)
-			top_line = (selected != 0) ? selected - 1 : 0;
+			top_line = (selected_index() != 0) ? selected_index() - 1 : 0;
 		else
-			top_line = selected - (ui_globals::visible_main_lines / 2);
+			top_line = selected_index() - (ui_globals::visible_main_lines / 2);
 
 		if (reselect_last::software().empty())
 			reselect_last::reset();
