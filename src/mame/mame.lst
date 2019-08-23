@@ -11433,7 +11433,7 @@ debutm
 @source:dec0.cpp
 automat                         // bootleg
 baddudes                        // EI (c) 1988 Data East USA (US)
-birdtry                         // (c) 1988 Data East Corporation (Japan)
+birdtry                         // EK (c) 1988 Data East Corporation (Japan)
 bouldash                        // (c) 1990 Data East Corporation (World)
 bouldashj                       // (c) 1990 Data East Corporation (Japan)
 drgninja                        // EG (c) 1988 Data East Corporation (Japan)
@@ -11444,8 +11444,8 @@ ffantasyj                       // EV (c) 1989 Data East Corporation (Japan)
 ffantasya                       // EV (c) 1989 Data East Corporation (Japan)
 ffantasyb                       // EX (c) 1989 Data East Corporation (World)
 ffantasybl                      // bootleg
-hbarrel                         // (c) 1987 Data East USA (US)
-hbarrelw                        // (c) 1987 Data East Corporation (World)
+hbarrel                         // EC (c) 1987 Data East Corporation (World)
+hbarrelu                        // (c) 1987 Data East USA (US)
 bandit                          // (c) 1989 Data East USA (US)
 hippodrm                        // EW (c) 1989 Data East USA (US)
 midres                          // (c) 1989 Data East Corporation (World)
@@ -11460,11 +11460,11 @@ robocopu                        // (c) 1988 Data East USA (US)
 robocopu0                       // (c) 1988 Data East USA (US)
 robocopw                        // EP? (c) 1988 Data East Corporation (World)
 secretab                        // bootleg
-secretag                        // (c) 1989 Data East Corporation (World)
-secretagj                       // (c) 1989 Data East Corporation (Japan)
-slyspy                          // (c) 1989 Data East USA (US)
-slyspy2                         // (c) 1989 Data East USA (US)
-slyspy3                         // (c) 1989 Data East USA (US)
+secretag                        // FB (c) 1989 Data East Corporation (World)
+secretagj                       // FC (c) 1989 Data East Corporation (Japan)
+slyspy                          // FA (c) 1989 Data East USA (US)
+slyspy2                         // FA (c) 1989 Data East USA (US)
+slyspy3                         // FA (c) 1989 Data East USA (US)
 
 @source:dec8.cpp
 breywood                        // (c) 1986 Data East Corporation (Japan)
