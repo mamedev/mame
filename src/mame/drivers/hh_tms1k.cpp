@@ -7514,7 +7514,7 @@ void mbdtower_state::update_display()
 	else
 	{
 		// display items turned off
-		m_display->matrix(0, 0);
+		m_display->clear();
 	}
 }
 

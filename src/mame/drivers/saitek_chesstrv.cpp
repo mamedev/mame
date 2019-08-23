@@ -14,8 +14,8 @@ It was also redistributed by Acetronic as "Chess Traveller"(British spelling the
 and by Prinztronic as well, another British brand
 
 SciSys/Novag's "Chess Champion: Pocket Chess" is assumed to be the same game,
-with the exception that they added battery low voltage detection to it (rightmost
-digit DP lights up).
+it has the same MCU serial (SL90387). They added battery low voltage detection
+to it (rightmost digit DP lights up).
 
 ******************************************************************************/
 

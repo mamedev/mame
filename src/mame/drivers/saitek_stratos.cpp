@@ -218,7 +218,7 @@ void saitek_stratos_state::power_off()
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// clear display
-	m_display->matrix(0, 0);
+	m_display->clear();
 	clear_lcd();
 	update_lcd();
 }

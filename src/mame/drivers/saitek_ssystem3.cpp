@@ -14,7 +14,7 @@ with support from David Levy.
 
 Hardware notes: (main unit)
 - Synertek 6502A @ 2MHz (4MHz XTAL)
-- Synertek 6522
+- Synertek 6522 VIA
 - 8KB ROM (2*Synertek 2332)
 - 1KB RAM (2*HM472114P-3)
 - MD4332BE + a bunch of TTL for the LCD
@@ -31,14 +31,13 @@ Chess Unit:
 Printer Unit:
 - unknown hardware, assume own CPU like the chess unit
 
-PSU ("permanent storage unit"?) is probably just a 256x4 battery-backed RAM
+PSU ("permanent storage unit"?) is just a battery-backed 256x4 RAM (TC5501P)
 module, not sure why it was so expensive (~180DM).
 A chess clock accessory was also announced but unreleased.
 
 SciSys Super System IV is on similar hardware.
 
 TODO:
-- WIP
 - 6522 ACR register is initialized with 0xe3. Meaning: PA and PB inputs are set
   to latch mode, but the program then never clocks the latch, it functions as if
   it meant to write 0xe0. Maybe 6522 CA1 pin emulation is wrong? Documentation
@@ -49,7 +48,11 @@ TODO:
 - 2nd 7474 /2 clock divider on each 4000-7fff access, this also applies to 6522 clock
   (doesn't affect chess calculation speed, only I/O access, eg. beeper pitch).
   Should be doable to add, but 6522 device doesn't support live clock changes.
-- add chessboard lcd and printer
+- LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
+  probably to keep refreshing the LCD when inactive, there is no need to emulate it
+- add chessboard lcd and printer unit
+- add memory unit
+- internal artwork
 
 ******************************************************************************/
 
@@ -57,7 +60,6 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
-#include "machine/clock.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/md4330b.h"
@@ -104,8 +106,7 @@ private:
 	void main_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE_LINE_MEMBER(update_lcd);
-	DECLARE_WRITE32_MEMBER(lcd_q_w);
+	DECLARE_WRITE32_MEMBER(lcd_q_w) { m_lcd_q = data; }
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -137,29 +138,6 @@ void ssystem3_state::machine_start()
 /******************************************************************************
     I/O
 ******************************************************************************/
-
-// MD4332B LCD
-
-WRITE_LINE_MEMBER(ssystem3_state::update_lcd)
-{
-	// update on falling edge
-	if (!state)
-	{
-		// temporary
-		output().set_value("digit0", m_lcd_q >> 0 & 0xff);
-		output().set_value("digit1", m_lcd_q >> 8 & 0xff);
-		output().set_value("digit2", m_lcd_q >> 16 & 0xff);
-		output().set_value("digit3", m_lcd_q >> 24 & 0xff);
-	}
-}
-
-WRITE32_MEMBER(ssystem3_state::lcd_q_w)
-{
-	m_lcd_q = data;
-}
-
-
-// 6522 VIA
 
 WRITE8_MEMBER(ssystem3_state::input_w)
 {
@@ -198,7 +176,16 @@ WRITE8_MEMBER(ssystem3_state::control_w)
 	// PB2 also clocks a 4015B
 	// DA: LCD DO, DB: Q3A
 	if (data & ~m_control & 4)
+	{
 		m_shift = m_shift << 1 | m_lcd->do_r();
+		u64 out2 = m_shift | 0x100;
+
+		// weird TTL maze, I assume it's a hw kludge to fix a bug after the maskroms were already manufactured
+		if (BIT(m_shift, 3) & ~(BIT(m_shift, 1) ^ BIT(m_shift, 4)) & ~(BIT(m_lcd_q, 7) & BIT(m_lcd_q, 23)))
+			out2 ^= 0x12;
+
+		m_display->matrix(1, out2 << 32 | m_lcd_q);
+	}
 
 	// PB3: device serial out
 
@@ -254,12 +241,12 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A) PORT_NAME("A 1 / White")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Time") // not a toggle switch
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_TOGGLE PORT_NAME("Time")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H 8 / Black")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C) PORT_NAME("C 3 / Queen / #50")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("B 2 / King / FP")
 
-	PORT_START("IN.4")
+	PORT_START("IN.4") // switches
 	PORT_CONFNAME( 0x01, 0x01, "Sound" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
@@ -289,11 +276,13 @@ void ssystem3_state::ssystem3(machine_config &config)
 	MD4332B(config, m_lcd);
 	m_lcd->write_q().set(FUNC(ssystem3_state::lcd_q_w));
 
-	clock_device &tc_clock(CLOCK(config, "tc_clock", 50)); // from power supply
-	tc_clock.signal_handler().set(m_lcd, FUNC(md4332b_device::tc_w));
-	tc_clock.signal_handler().append(FUNC(ssystem3_state::update_lcd));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 729);
+	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(4, 4);
+	PWM_DISPLAY(config, m_display).set_size(1, 32+8+1);
+	m_display->set_bri_levels(0.25);
 	//config.set_default_layout(layout_saitek_ssystem3);
 
 	/* sound hardware */
@@ -315,6 +304,9 @@ ROM_START( ssystem3 )
 
 	// HACK! 6522 ACR register setup
 	ROM_FILL(0x946d, 1, 0xe0) // was 0xe3
+
+	ROM_REGION( 53511, "screen", 0)
+	ROM_LOAD( "ssystem3.svg", 0, 53511, CRC(a2820cc8) SHA1(2e922bb2d4a244931c1e7dafa84910dee5ab2623) )
 ROM_END
 
 } // anonymous namespace
