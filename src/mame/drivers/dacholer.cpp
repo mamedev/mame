@@ -724,31 +724,31 @@ void dacholer_state::itaten(machine_config &config)
 
 ROM_START( dacholer )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dacholer8.rom",  0x0000, 0x2000, CRC(8b73a441) SHA1(6de9e4845b9063af8df42aa82ad536737190582c) )
-	ROM_LOAD( "dacholer9.rom",  0x2000, 0x2000, CRC(9499289f) SHA1(bcfe554eb1f8e686d193050c18278b6bf93f179f) )
-	ROM_LOAD( "dacholer10.rom", 0x4000, 0x2000, CRC(39d37281) SHA1(daaf84079dd18dd854946e066e2dcde994bcbba4) )
-	ROM_LOAD( "dacholer11.rom", 0x6000, 0x2000, CRC(bb781ea4) SHA1(170966c4bcd0246968850d908a69f81ea1e136d5) )
+	ROM_LOAD( "dc1.5k",  0x0000, 0x2000, CRC(8b73a441) SHA1(6de9e4845b9063af8df42aa82ad536737190582c) )
+	ROM_LOAD( "dc2.5l",  0x2000, 0x2000, CRC(9499289f) SHA1(bcfe554eb1f8e686d193050c18278b6bf93f179f) )
+	ROM_LOAD( "dc3.5m", 0x4000, 0x2000, CRC(39d37281) SHA1(daaf84079dd18dd854946e066e2dcde994bcbba4) )
+	ROM_LOAD( "dc4.5n", 0x6000, 0x2000, CRC(bb781ea4) SHA1(170966c4bcd0246968850d908a69f81ea1e136d5) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dacholer12.rom", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) )
-	ROM_LOAD( "dacholer13.rom", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
-	ROM_LOAD( "dacholer14.rom", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
+	ROM_LOAD( "dc1.6g", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) )
+	ROM_LOAD( "dc2.6h", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
+	ROM_LOAD( "dc3.6j", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "dacholer7.rom", 0x0000, 0x2000, CRC(fd649d36) SHA1(77d78eef44f348b635dbc0711e662a5236c00d51) )
+	ROM_LOAD( "dc7.12j", 0x0000, 0x2000, CRC(fd649d36) SHA1(77d78eef44f348b635dbc0711e662a5236c00d51) )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "dacholer1.rom", 0x0000, 0x2000, CRC(9cca0fd2) SHA1(3ca1b4cca9611232df1195ae6ac172a79c8368c3) )
-	ROM_LOAD( "dacholer2.rom", 0x2000, 0x2000, CRC(c1322b27) SHA1(8022f59b8ae10a7a911563b01bffc2d5646108a5) )
-	ROM_LOAD( "dacholer3.rom", 0x4000, 0x2000, CRC(9e1e7198) SHA1(7a75da1ae09f6cf095976b48f462ede42625b244) )
+	ROM_LOAD( "dc3.13a", 0x0000, 0x2000, CRC(9cca0fd2) SHA1(3ca1b4cca9611232df1195ae6ac172a79c8368c3) )
+	ROM_LOAD( "dc2.12a", 0x2000, 0x2000, CRC(c1322b27) SHA1(8022f59b8ae10a7a911563b01bffc2d5646108a5) )
+	ROM_LOAD( "dc1.11a", 0x4000, 0x2000, CRC(9e1e7198) SHA1(7a75da1ae09f6cf095976b48f462ede42625b244) )
 
 	ROM_REGION( 0x6000, "gfx3", 0 )
-	ROM_LOAD( "dacholer5.rom", 0x0000, 0x2000, CRC(dd4818f0) SHA1(718236932248512f8779f640e0367b5d92e6497e) )
-	ROM_LOAD( "dacholer4.rom", 0x2000, 0x2000, CRC(7f338ae0) SHA1(9206ed044feb44c55990803cdf608dd899e976ff) )
-	ROM_LOAD( "dacholer6.rom", 0x4000, 0x2000, CRC(0a6d4ec4) SHA1(419ea1f6ead3afb2de98432d9f8ead7447842a1e) )
+	ROM_LOAD( "dc5.2d", 0x0000, 0x2000, CRC(dd4818f0) SHA1(718236932248512f8779f640e0367b5d92e6497e) )
+	ROM_LOAD( "dc4.1d", 0x2000, 0x2000, CRC(7f338ae0) SHA1(9206ed044feb44c55990803cdf608dd899e976ff) )
+	ROM_LOAD( "dc6.3d", 0x4000, 0x2000, CRC(0a6d4ec4) SHA1(419ea1f6ead3afb2de98432d9f8ead7447842a1e) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "k.13d", 0x0000, 0x0020, BAD_DUMP CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) ) //taken from Kick Boy
+	ROM_LOAD( "dc.13d", 0x0000, 0x0020, CRC(d273abe5) SHA1(219bcba7f3e961f6b2cfbf48ac6ae6b6d80b974c) )
 ROM_END
 
 ROM_START( kickboy )
@@ -859,6 +859,6 @@ ROM_START( itaten )
 ROM_END
 
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, empty_init, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, empty_init, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_SUPPORTS_SAVE )
 GAME( 1983, kickboy,  0, dacholer, kickboy,  dacholer_state, empty_init, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, itaten,   0, itaten,   itaten,   dacholer_state, empty_init, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )
