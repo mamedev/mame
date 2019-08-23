@@ -22114,7 +22114,8 @@ mod8                            //
 
 @source:model1.cpp
 netmerc                         // ?? Info available in time ??
-swa                             // 1994.04 Star Wars Arcade
+swa                             // 1994.04 Star Wars Arcade (US)
+swaj                            // 1994.04 Star Wars Arcade (Japan)
 vf                              // 1993.12 Virtua Fighter
 vformula                        // 1993.?? Virtua Formula
 vr                              // 1992.08 Virtua Racing

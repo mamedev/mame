@@ -1764,6 +1764,7 @@ void model1_state::machine_start()
 	} else {
 		bool is_swa =
 			!strcmp(machine().system().name, "swa") ||
+			!strcmp(machine().system().name, "swaj") ||
 			!strcmp(machine().system().name, "wingwar") ||
 			!strcmp(machine().system().name, "wingwaru") ||
 			!strcmp(machine().system().name, "wingwarj") ||
