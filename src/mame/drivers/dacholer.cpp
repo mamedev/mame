@@ -721,30 +721,30 @@ void dacholer_state::itaten(machine_config &config)
 	config.device_remove("msm");
 }
 
-ROM_START( dacholer )
+ROM_START( dacholer ) /* AM-1-A & AM-1-B two board stack */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dc_1.5k", 0x0000, 0x2000, CRC(8b73a441) SHA1(6de9e4845b9063af8df42aa82ad536737190582c) ) /* these 4 ROMs located on top board */
-	ROM_LOAD( "dc_2.5l", 0x2000, 0x2000, CRC(9499289f) SHA1(bcfe554eb1f8e686d193050c18278b6bf93f179f) )
-	ROM_LOAD( "dc_3.5m", 0x4000, 0x2000, CRC(39d37281) SHA1(daaf84079dd18dd854946e066e2dcde994bcbba4) )
-	ROM_LOAD( "dc_4.5n", 0x6000, 0x2000, CRC(bb781ea4) SHA1(170966c4bcd0246968850d908a69f81ea1e136d5) )
+	ROM_LOAD( "dp_1.5k", 0x0000, 0x2000, CRC(8b73a441) SHA1(6de9e4845b9063af8df42aa82ad536737190582c) ) /* these 4 ROMs located on the AM-1-A top board */
+	ROM_LOAD( "dp_2.5l", 0x2000, 0x2000, CRC(9499289f) SHA1(bcfe554eb1f8e686d193050c18278b6bf93f179f) )
+	ROM_LOAD( "dp_3.5m", 0x4000, 0x2000, CRC(39d37281) SHA1(daaf84079dd18dd854946e066e2dcde994bcbba4) )
+	ROM_LOAD( "dp_4.5n", 0x6000, 0x2000, CRC(bb781ea4) SHA1(170966c4bcd0246968850d908a69f81ea1e136d5) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dc_1.6g", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) ) /* these 3 ROMs located on top board */
-	ROM_LOAD( "dc_2.6h", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
-	ROM_LOAD( "dc_3.6j", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
+	ROM_LOAD( "ds_1.6g", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) ) /* these 4 ROMs located on the AM-1-A top board */
+	ROM_LOAD( "ds_2.6h", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
+	ROM_LOAD( "ds_3.6j", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
 	/* 6K not populated */
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "dc_7.12j", 0x0000, 0x2000, CRC(fd649d36) SHA1(77d78eef44f348b635dbc0711e662a5236c00d51) ) /* this ROM located on bottom board */
+	ROM_LOAD( "dc_7.12j", 0x0000, 0x2000, CRC(fd649d36) SHA1(77d78eef44f348b635dbc0711e662a5236c00d51) ) /* this ROM located on the AM-1-B bottom board */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "dc_3.13a", 0x0000, 0x2000, CRC(9cca0fd2) SHA1(3ca1b4cca9611232df1195ae6ac172a79c8368c3) ) /* these 3 ROMs located on bottom board */
+	ROM_LOAD( "dc_3.13a", 0x0000, 0x2000, CRC(9cca0fd2) SHA1(3ca1b4cca9611232df1195ae6ac172a79c8368c3) ) /* these 3 ROMs located on the AM-1-B bottom board */
 	ROM_LOAD( "dc_2.12a", 0x2000, 0x2000, CRC(c1322b27) SHA1(8022f59b8ae10a7a911563b01bffc2d5646108a5) )
 	ROM_LOAD( "dc_1.11a", 0x4000, 0x2000, CRC(9e1e7198) SHA1(7a75da1ae09f6cf095976b48f462ede42625b244) )
 	/* 10A not populated */
 
 	ROM_REGION( 0x6000, "gfx3", 0 )
-	ROM_LOAD( "dc_5.2d", 0x0000, 0x2000, CRC(dd4818f0) SHA1(718236932248512f8779f640e0367b5d92e6497e) ) /* these 3 ROMs located on bottom board */
+	ROM_LOAD( "dc_5.2d", 0x0000, 0x2000, CRC(dd4818f0) SHA1(718236932248512f8779f640e0367b5d92e6497e) ) /* these 3 ROMs located on the AM-1-B bottom board */
 	ROM_LOAD( "dc_4.1d", 0x2000, 0x2000, CRC(7f338ae0) SHA1(9206ed044feb44c55990803cdf608dd899e976ff) )
 	ROM_LOAD( "dc_6.3d", 0x4000, 0x2000, CRC(0a6d4ec4) SHA1(419ea1f6ead3afb2de98432d9f8ead7447842a1e) )
 	/* 4D not populated */
