@@ -243,13 +243,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( mmd1_state::kansas_r )
 		return;
 
 	/* cassette - turn 1200/2400Hz to a bit */
-	m_cass_data[1]++;
 	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_cassinbit = (m_cass_data[1] < 24) ? 1 : 0;
+		m_cassinbit = (m_cass_data[1] < 12) ? 1 : 0;
 		m_cass_data[1] = 0;
 	}
 }
