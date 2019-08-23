@@ -896,6 +896,7 @@ u8 tilemap_t::tile_apply_bitmask(const u8 *maskdata, u32 x0, u32 y0, u8 category
 void tilemap_t::configure_blit_parameters(blit_parameters &blit, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask)
 {
 	// set the target bitmap
+	assert(priority_bitmap.cliprect().contains(cliprect));
 	blit.priority = &priority_bitmap;
 	blit.cliprect = cliprect;
 
