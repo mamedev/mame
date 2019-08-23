@@ -2412,7 +2412,7 @@ ROM_START( lastmisn )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) )
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verfied to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2448,7 +2448,7 @@ ROM_START( lastmisnu6 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) )
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verfied to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2484,7 +2484,7 @@ ROM_START( lastmisnu5 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) )
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verfied to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2520,7 +2520,7 @@ ROM_START( lastmisnj )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    // created from dump of the US version
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, BAD_DUMP CRC(0d58c3a1) SHA1(184e75324b7ab2de8e6441f0c954046db80b2640) )
+	ROM_LOAD( "last_mission_japan.18a", 0x0000, 0x1000, BAD_DUMP CRC(0d58c3a1) SHA1(184e75324b7ab2de8e6441f0c954046db80b2640) ) /* correct ROM label when real MCU is dumped */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
