@@ -10894,6 +10894,9 @@ crospang                        // (c) 1998 F2 System
 heuksun                         // (c) 1998 Oksan / F2 System
 pitapat
 
+@source:crospuzl.cpp
+crospuzl                        //
+
 @source:crshrace.cpp
 crshrace                        // (c) 1993 Video System Co.
 crshrace2                       // (c) 1993 Video System Co.
@@ -10911,19 +10914,12 @@ wizzard                         //
 
 @source:crystal.cpp
 crysbios                        //
-crospuzl                        //
 crysking                        // 2001 Brezzasoft. Crystal of the kings
-crzclass                        // 200? TJF
-crzyddz2                        // 2006 Sealy
-ddz                             // 200?
 donghaer                        //
 evosocc                         // 2001 Evoga. Evolution Soccer
 maldaiza						//
 officeye                        //
-menghong                        // 2004? Sealy
-psattack                        // 2004 Uniana
 topbladv                        // 2002 Sonokong. Top Blade V
-trivrus                         // 2009 AGT. Trivia R Us
 urachamu						// 2002 GamToU
 wulybuly						//
 
@@ -11296,6 +11292,10 @@ wwfwfestub                      // bootleg
 @source:ddribble.cpp
 ddribble                        // GX690 (c) 1986
 ddribblep                       // GX690 (c) 1986
+
+@source:ddz.cpp
+crzclass                        // 200? TJF
+ddz                             // 200?
 
 @source:de_2.cpp
 bttf_a20                        //
@@ -21439,6 +21439,10 @@ meijinsn                        // (c) 1986 SNK
 
 @source:mekd2.cpp
 mekd2                           // 1977 Motorola Evaluation Kit
+
+@source:menghong.cpp
+crzyddz2                        // 2006 Sealy
+menghong                        // 2004? Sealy
 
 @source:mephisto_brikett.cpp
 mephisto
@@ -33314,6 +33318,9 @@ i8580111                        // IBM PS/2 8580-111 (Model 80)
 @source:ps2sony.cpp
 ps2                             // Sony Playstation 2
 
+@source:psattack.cpp
+psattack                        // 2004 Uniana
+
 @source:pse.cpp
 bazooka                         // (c) 1976 PSE
 bazookabr                       // (c) 1977 Taito do Brasil
@@ -38568,6 +38575,9 @@ vs4jc                           // 2004.09 Virtua Striker 4 (Japan) (Rev C)
 
 @source:triplhnt.cpp
 triplhnt                        // 008422-008791    1977/04 [6800]
+
+@source:trivrus.cpp
+trivrus                         // 2009 AGT. Trivia R Us
 
 @source:trkfldch.cpp
 trkfldch                        // (c) 2007 Konami
