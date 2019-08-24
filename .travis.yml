@@ -12,6 +12,7 @@ compiler:
 os:
   - linux
   - osx
+dist: trusty
 matrix:
   exclude:
     - os: osx
