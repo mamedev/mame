@@ -51,13 +51,15 @@ TODO:
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
 - dump/add chessboard lcd and printer unit
-- dump/add 1980 program revision
+- dump/add 1980 program revision, were the BTANB fixed?
 - add memory unit
 
 BTANB:
 - If the TIME switch is held up, it will sometimes recognize the wrong input when
   another button is pressed. I assume they noticed this bug too late and tried to
   lessen the chance by adding a spring to the switch.
+- Similar to the TIME switch bug, pressing 2 buttons simultaneously can cause it
+  to malfunction, eg. press A+CE or C+CE and an "8" appears in the display.
 
 ******************************************************************************/
 
