@@ -25,7 +25,7 @@ TODO:
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
   verification is wanted for: gnw_bfight, gnw_bjack, gnw_bsweep, gnw_climber,
-  gnw_dkjrp, gnw_gcliff, gnw_sbuster, gnw_zelda
+  gnw_dkjrp, gnw_gcliff, gnw_mbaway, gnw_sbuster, gnw_zelda
 
 ****************************************************************************
 
@@ -83,7 +83,7 @@ PG-74*    tt   SM511?  Popeye
 SM-91*    p    SM511?  Snoopy (assume same ROM & LCD as tabletop version)
 PG-92*    p    SM511?  Popeye          "
 CJ-93     p    SM511   Donkey Kong Jr. "
-PB-94*    p    SM511?  Mario's Bombs Away
+TB-94     p    SM511   Mario's Bombs Away
 DC-95*    p    SM511?  Mickey Mouse
 MK-96*    p    SM511?  Donkey Kong Circus (same ROM as DC-95? LCD is different)
 DJ-101    nws  SM510   Donkey Kong Jr.
@@ -3647,6 +3647,94 @@ ROM_START( gnw_dkjrp )
 
 	ROM_REGION( 340751, "screen", 0)
 	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Mario's Bombs Away (model TB-94)
+  * PCB labels: TB-94 M (main board), SM-91C (controller board)
+  * Sharp SM511 label TB-94 537C (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_mbaway_state : public hh_sm510_state
+{
+public:
+	gnw_mbaway_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mbaway(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_mbaway )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Up/Down
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_mbaway_state::gnw_mbaway(machine_config &config)
+{
+	/* basic machine hardware */
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 1031);
+	screen.set_visarea_full();
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_mbaway )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tb-94.program", 0x0000, 0x1000, CRC(11d18a48) SHA1(afccfa19dace7c4fcc15a84ecfcfb9d7ae3861e4) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "tb-94.melody", 0x000, 0x100, BAD_DUMP CRC(6179e627) SHA1(e0bc8a7b2a1044f1437b0e06391102e403c11e1f) )
+
+	ROM_REGION( 514643, "screen", 0)
+	ROM_LOAD( "gnw_mbaway.svg", 0, 514643, CRC(2ec2f18b) SHA1(8e2fd20615d867aac97e443fb977513ff98138b4) )
 ROM_END
 
 
@@ -9697,6 +9785,7 @@ CONS( 1988, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_sta
 
 // Nintendo G&W: table top / panorama screen
 CONS( 1983, gnw_dkjrp,   0,          0, gnw_dkjrp,   gnw_dkjrp,   gnw_dkjrp_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (panorama screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_mbaway,  0,          0, gnw_mbaway,  gnw_mbaway,  gnw_mbaway_state,  empty_init, "Nintendo", "Game & Watch: Mario's Bombs Away", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: micro vs. system (actually, no official Game & Watch logo anywhere)
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE )
