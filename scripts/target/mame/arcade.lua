@@ -682,6 +682,7 @@ MACHINES["PS2INTC"] = true
 --MACHINES["IOPTIMER"] = true
 MACHINES["AIC565"] = true
 MACHINES["AIC6250"] = true
+MACHINES["VRENDER0"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -4650,6 +4651,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/corona.cpp",
 	MAME_DIR .. "src/mame/drivers/cwheel.cpp",
 	MAME_DIR .. "src/mame/drivers/crystal.cpp",
+	MAME_DIR .. "src/mame/drivers/ddz.cpp",
 	MAME_DIR .. "src/mame/drivers/menghong.cpp",
 	MAME_DIR .. "src/mame/drivers/trivrus.cpp",
 	MAME_DIR .. "src/mame/drivers/crospuzl.cpp",
