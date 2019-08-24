@@ -742,19 +742,18 @@ void nforcepc_state::nforcepc(machine_config &config)
 	AS99127F(config, ":pci:01.1:12d", 0);
 	AS99127F_SENSOR2(config, ":pci:01.1:148", 0);
 	AS99127F_SENSOR3(config, ":pci:01.1:149", 0);
-	MCPX_OHCI(config, ":pci:02.0", 0); // 10de:01c2 NVIDIA Corporation nForce USB Controller
-	// .interrupt_handler().set(FUNC(nforcepc_state::ohci_usb_interrupt_changed));
+	mcpx_ohci_device &ohci(MCPX_OHCI(config, ":pci:02.0", 0)); // 10de:01c2 NVIDIA Corporation nForce USB Controller
+	ohci.interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq1));
 	MCPX_OHCI(config, ":pci:03.0", 0); // 10de:01c2 NVIDIA Corporation nForce USB Controller
 	MCPX_ETH(config, ":pci:04.0", 0); // 10de:01c3 NVIDIA Corporation nForce Ethernet Controller
 	MCPX_APU(config, ":pci:05.0", 0, m_maincpu); // 10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
 	MCPX_AC97_AUDIO(config, ":pci:06.0", 0); // 10de:01b1 NVIDIA Corporation nForce AC'97 Audio Controller
 	PCI_BRIDGE(config, ":pci:08.0", 0, 0x10de01b8, 0); // 10de:01b8 NVIDIA Corporation nForce PCI-to-PCI bridge
 	// 10ec:8139 Realtek Semiconductor Co., Ltd. RTL-8139/8139C/8139C+ (behind bridge)
-	MCPX_IDE(config, ":pci:09.0", 0); // 10de:01bc NVIDIA Corporation nForce IDE
-	/*  subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(nforcepc_ata_devices, "hdd", "cdrom", true);
-	    .interrupt_handler().set(FUNC(nforcepc_state::ide_interrupt_changed));
-	    ide.irq_pri().set(":pci:01.0", FUNC(mcpx_isalpc_device::pc_irq14_w));
-	    ide.irq_sec().set(":pci:01.0", FUNC(mcpx_isalpc_device::pc_irq15_w));*/
+	mcpx_ide_device &ide(MCPX_IDE(config, ":pci:09.0", 0)); // 10de:01bc NVIDIA Corporation nForce IDE
+	ide.pri_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq14));
+	ide.sec_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq15));
+		/*subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(nforcepc_ata_devices, "hdd", "cdrom", true);*/
 	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
 	SST_49LF020(config, "bios", 0);
 }
