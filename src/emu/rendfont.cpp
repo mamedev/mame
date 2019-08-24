@@ -374,7 +374,7 @@ private:
 
 void convert_command_glyph(std::string &str)
 {
-	str.c_str(); // force NUL-termination - we depend on it later
+	(void)str.c_str(); // force NUL-termination - we depend on it later
 	std::size_t const len(str.length());
 	std::vector<char> buf(2 * (len + 1));
 	std::size_t j(0);
