@@ -56,6 +56,12 @@ IC2 = Hitachi HD74HC373P
 IC2 = Hitachi HD74HC373P
 IC10 = Hitachi HD74HC244P
 
+**************************************************************************
+
+The "Sagitario" darts machine from CIC Play S.L. uses the same PCB with a different program ROM (from CIC Play).
+The chip at IC1 on the CIC Play PCB is silkscreened as "REF 0034 9115S", and the other at IC17 has
+its surface scratched out.
+
 */
 
 #include "emu.h"
