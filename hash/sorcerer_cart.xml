@@ -79,8 +79,9 @@ Four cartridges were made for this computer one of which was a hardware device, 
 	<software name="basicb">
 		<description>Basic (Rev. B)</description>
 		<!-- Unofficial Hack Release -->
-		<year>19??</year>
+		<year>1980</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="B.T.F. (Billy) Tan and R.J.V. (Bob) Stafford"/>
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="basic rev.b.rom" size="8192" crc="792ce8ad" sha1="ebf00fdcf028ce9131ca62d81b8fd80a9055d114"/>
