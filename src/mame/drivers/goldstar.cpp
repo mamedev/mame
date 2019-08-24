@@ -13012,7 +13012,7 @@ ROM_END
 */
 ROM_START( ladylinr )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "ladybrd.bin",    0x0000, 0x8000, CRC(44d2aed0) SHA1(1afe6178d1bf4ad0b623f33be879ed5180ad2db1) )
+	ROM_LOAD( "ladybrd.bin",  0x0000, 0x8000, CRC(44d2aed0) SHA1(1afe6178d1bf4ad0b623f33be879ed5180ad2db1) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "ll73.bin",   0x00000, 0x8000, CRC(afa4a705) SHA1(779340713df7029553cfc1c57997dfdd96a0f0cc) )
@@ -13041,7 +13041,7 @@ ROM_END
 
 ROM_START( ladylinra )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "6895a.bin",    0x0000, 0x8000, CRC(edf477ed) SHA1(abb54a7d5dcb9b32871272274a4fb850c0c5f633) )
+	ROM_LOAD( "6895a.bin",  0x0000, 0x8000, CRC(edf477ed) SHA1(abb54a7d5dcb9b32871272274a4fb850c0c5f633) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(b9a018de) SHA1(fea5a428c6b970c9ad054cbc0ac9727491300d5f) )
@@ -13066,6 +13066,136 @@ ROM_START( ladylinra )
 
 	ROM_REGION( 0x40, "unkprom2", 0 )
 	ROM_LOAD( "63s081.73",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+/*
+  Lady Liner (encrypted)
+
+  These have a custom module with an encapsulated Z80
+  "CSP Z80" by SPL, Swiss made.
+
+  Encryption seems close to custom Sega/NEC 315-xxx CPUs
+  Data, address and M1 line (opcodes/data) are involved.
+
+  Each set has different encryption, and seems that the
+  encryption range is 0000-3b77. Beyond the offset, all
+  seems to be unencrypted.
+
+*/
+ROM_START( ladylinrb )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "5067a.bin",  0x0000, 0x8000, CRC(41fc18a9) SHA1(2825a3f6b556993a16c2ea3f0a14c73bebb74d9c) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(b9a018de) SHA1(fea5a428c6b970c9ad054cbc0ac9727491300d5f) )
+	ROM_LOAD( "72.bin",   0x08000, 0x8000, CRC(819498e0) SHA1(8e68400419bada80f8bbaf6e9d19bf8eeadddd2a) )
+	ROM_LOAD( "71.bin",   0x10000, 0x8000, CRC(36ccd3f8) SHA1(fd1b4e24d9bbadc4f82810fa5fd18ca0bbd968de) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "63s141.38",   0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "63s141.37",   0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "63s081.39",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "63s141.96",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "63s081.73",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+ROM_START( ladylinrc )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "4012a.bin",  0x0000, 0x8000, CRC(a741cd75) SHA1(84f9ae2421fe60548925cf262b4d3ebee2d30e9c) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(afa4a705) SHA1(779340713df7029553cfc1c57997dfdd96a0f0cc) )
+	ROM_LOAD( "72.bin",   0x08000, 0x8000, CRC(bd1d8a39) SHA1(01e37704c753352024e79b0b83b040f8288b9aed) )
+	ROM_LOAD( "71.bin",   0x10000, 0x8000, CRC(1c417efa) SHA1(491579a76d80c4f488ef94393d12a190571ae285) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.38",   0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "82s129.37",   0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "82s123.39",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.96",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "82s123.73",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+ROM_START( ladylinrd )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "6092a.bin",  0x0000, 0x8000, CRC(fdf3d899) SHA1(40cb78d808ed153ff0232bc043e3d404face8cab) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(b9a018de) SHA1(fea5a428c6b970c9ad054cbc0ac9727491300d5f) )
+	ROM_LOAD( "72.bin",   0x08000, 0x8000, CRC(819498e0) SHA1(8e68400419bada80f8bbaf6e9d19bf8eeadddd2a) )
+	ROM_LOAD( "71.bin",   0x10000, 0x8000, CRC(36ccd3f8) SHA1(fd1b4e24d9bbadc4f82810fa5fd18ca0bbd968de) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom_38.bin",   0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "prom_37.bin",   0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "prom_39.bin",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "prom_96.bin",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "prom_73.bin",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+ROM_START( ladylinre )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "6095a.bin",  0x0000, 0x8000, CRC(7c3a3697) SHA1(5f348407ec26ce6d92edf54157652f7cbde86b91) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(b9a018de) SHA1(fea5a428c6b970c9ad054cbc0ac9727491300d5f) )
+	ROM_LOAD( "72.bin",   0x08000, 0x8000, CRC(819498e0) SHA1(8e68400419bada80f8bbaf6e9d19bf8eeadddd2a) )
+	ROM_LOAD( "71.bin",   0x10000, 0x8000, CRC(36ccd3f8) SHA1(fd1b4e24d9bbadc4f82810fa5fd18ca0bbd968de) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom_38.bin",   0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "prom_37.bin",   0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "prom_39.bin",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "prom_96.bin",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "prom_73.bin",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
 ROM_END
 
 
@@ -17349,8 +17479,12 @@ GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init
 GAMEL( 198?, super972,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8 )    // ???
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
-GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (Set 1)",                                       0 )
-GAME(  198?, ladylinra, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (Set 2)",                                       0 )
+GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (set 1)",                                       0 )
+GAME(  198?, ladylinra, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (set 2)",                                       0 )
+GAME(  198?, ladylinrb, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 1)",                            MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
+GAME(  198?, ladylinrc, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
+GAME(  198?, ladylinrd, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
+GAME(  198?, ladylinre, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   empty_init,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
 
 GAME(  1985, luckylad,  0,        lucky8,   luckylad, wingco_state,   init_luckylad,  ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
