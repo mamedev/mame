@@ -751,8 +751,8 @@ ROM_START( dacholer ) /* AM-1-A & AM-1-B two board stack */
 
 	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "dc.13d",  0x0000, 0x0020, CRC(d273abe5) SHA1(219bcba7f3e961f6b2cfbf48ac6ae6b6d80b974c) ) /* this MB7051 (or compatible 82S123) BPROM located on bottom board */
-	ROM_LOAD( "af-2.1h", 0x0020, 0x0020, CRC(e1cac297) SHA1(f15326d04d006d9d029a6565aebf9daf3657bc2a) ) /* this PBROM located on bottom board */
-	ROM_LOAD( "af-1.3n", 0x0040, 0x0020, CRC(5638e485) SHA1(5d892111936a8eb7646c03a17300069be9a2b442) ) /* this PBROM located on top board */
+	ROM_LOAD( "af-2.1h", 0x0020, 0x0020, CRC(e1cac297) SHA1(f15326d04d006d9d029a6565aebf9daf3657bc2a) ) /* this PBROM located on the AM-1-B bottom board */
+	ROM_LOAD( "af-1.3n", 0x0040, 0x0020, CRC(5638e485) SHA1(5d892111936a8eb7646c03a17300069be9a2b442) ) /* this PBROM located on the AM-1-A top board */
 ROM_END
 
 ROM_START( kickboy )

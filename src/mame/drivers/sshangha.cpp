@@ -605,5 +605,5 @@ void sshangha_state::init_sshangha()
 
 GAME( 1992, sshangha,  0,        sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd.",                 "Super Shanghai Dragon's Eye (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sshanghaj, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd.",                 "Super Shanghai Dragon's Eye (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sshanghak, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd. (Taito License)", "Super Shanghai Dragon's Eye (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghak, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd. (Taito license)", "Super Shanghai Dragon's Eye (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sshanghab, sshangha, sshanghab, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg",                         "Super Shanghai Dragon's Eye (World, bootleg)", MACHINE_SUPPORTS_SAVE )

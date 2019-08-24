@@ -1640,6 +1640,9 @@ ROM_END
     Alien Storm, Sega System 18
     CPU: FD1094 (317-0146)
     ROM Board: 171-5873B
+        main pcb: 837-7381
+    Game numbers: 833-7379 ALIENSTORM
+         ROM pcb: 834-7380
 */
 ROM_START( astormj )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // 68000 code
