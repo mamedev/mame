@@ -164,23 +164,29 @@ READ8_MEMBER(pentagon_state::beta_neutral_r)
 
 READ8_MEMBER(pentagon_state::beta_enable_r)
 {
-	if(m_ROMSelection == 1) {
-		m_ROMSelection = 3;
-		if (m_beta->started()) {
-			m_beta->enable();
-			m_bank1->set_base(memregion("beta:beta")->base());
+	if (!(machine().side_effects_disabled())) {
+		if (m_ROMSelection == 1) {
+			m_ROMSelection = 3;
+			if (m_beta->started()) {
+				m_beta->enable();
+				m_bank1->set_base(memregion("beta:beta")->base());
+			}
 		}
 	}
+
 	return m_program->read_byte(offset + 0x3d00);
 }
 
 READ8_MEMBER(pentagon_state::beta_disable_r)
 {
-	if (m_beta->started() && m_beta->is_active()) {
-		m_ROMSelection = BIT(m_port_7ffd_data, 4);
-		m_beta->disable();
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+	if (!(machine().side_effects_disabled())) {
+		if (m_beta->started() && m_beta->is_active()) {
+			m_ROMSelection = BIT(m_port_7ffd_data, 4);
+			m_beta->disable();
+			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection << 14)]);
+		}
 	}
+
 	return m_program->read_byte(offset + 0x4000);
 }
 
