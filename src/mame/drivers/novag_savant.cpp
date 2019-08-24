@@ -89,6 +89,7 @@ private:
 	void mcu_io(address_map &map);
 
 	// I/O handlers
+	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_READ8_MEMBER(stall_r);
 	DECLARE_WRITE8_MEMBER(stall_w);
@@ -136,9 +137,14 @@ void savant_state::machine_start()
 
 // Z80 side
 
-READ8_MEMBER(savant_state::nvram_r)
+WRITE8_MEMBER(savant_state::nvram_w)
 {
 	// nvram is only d0-d3
+	m_nvram[offset] = data & 0xf;
+}
+
+READ8_MEMBER(savant_state::nvram_r)
+{
 	return m_nvram[offset] & 0xf;
 }
 
@@ -273,7 +279,7 @@ void savant_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd0ff).mirror(0x0300).ram().r(FUNC(savant_state::nvram_r)).share("nvram");
+	map(0xd000, 0xd0ff).mirror(0x0300).ram().rw(FUNC(savant_state::nvram_r), FUNC(savant_state::nvram_w)).share("nvram");
 }
 
 void savant_state::main_io(address_map &map)

@@ -52,7 +52,6 @@ TODO:
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
 - dump/add chessboard lcd and printer unit
 - dump/add 1980 program revision, were the BTANB fixed?
-- add memory unit
 
 BTANB:
 - If the TIME switch is held up, it will sometimes recognize the wrong input when
@@ -91,6 +90,7 @@ public:
 		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
+		m_nvram(*this, "nvram"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -107,13 +107,16 @@ private:
 	required_device<md4332b_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	required_ioport_array<4+1> m_inputs;
+	required_shared_ptr<u8> m_nvram;
+	required_ioport_array<4+2> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers
 	DECLARE_WRITE32_MEMBER(lcd_q_w) { m_lcd_q = data; }
+	DECLARE_WRITE8_MEMBER(nvram_w);
+	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -145,6 +148,18 @@ void ssystem3_state::machine_start()
 /******************************************************************************
     I/O
 ******************************************************************************/
+
+WRITE8_MEMBER(ssystem3_state::nvram_w)
+{
+	// nvram is only d0-d3
+	if (m_inputs[5]->read() & 1)
+		m_nvram[offset] = data & 0x0f;
+}
+
+READ8_MEMBER(ssystem3_state::nvram_r)
+{
+	return (m_inputs[5]->read() & 1) ? (m_nvram[offset] & 0x0f) : 0;
+}
 
 WRITE8_MEMBER(ssystem3_state::input_w)
 {
@@ -218,6 +233,7 @@ READ8_MEMBER(ssystem3_state::control_r)
 void ssystem3_state::main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x3c00).ram();
+	map(0x4000, 0x40ff).mirror(0x1f00).ram().rw(FUNC(ssystem3_state::nvram_r), FUNC(ssystem3_state::nvram_w)).share("nvram");
 	map(0x6000, 0x600f).mirror(0x1ff0).m(m_via, FUNC(via6522_device::map));
 	map(0x8000, 0x9fff).mirror(0x6000).rom();
 }
@@ -260,6 +276,11 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_CONFNAME( 0x02, 0x02, "Light" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+
+	PORT_START("IN.5") // accessories
+	PORT_CONFNAME( 0x01, 0x01, "Memory Unit" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -280,7 +301,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 	m_via->writepb_handler().set(FUNC(ssystem3_state::control_w));
 	m_via->readpb_handler().set(FUNC(ssystem3_state::control_r));
 
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MD4332B(config, m_lcd);
@@ -314,6 +335,9 @@ ROM_START( ssystem3 )
 
 	// HACK! 6522 ACR register setup
 	ROM_FILL(0x946d, 1, 0xe0) // was 0xe3
+
+	ROM_REGION( 0x100, "nvram", 0 ) // default settings
+	ROM_LOAD( "nvram", 0, 0x100, CRC(b5dddc7b) SHA1(3be9ec8359cc9ef16a04f28dfd24f9ffe1a2fca9) )
 
 	ROM_REGION( 53511, "screen", 0)
 	ROM_LOAD( "ssystem3.svg", 0, 53511, CRC(a2820cc8) SHA1(2e922bb2d4a244931c1e7dafa84910dee5ab2623) )
