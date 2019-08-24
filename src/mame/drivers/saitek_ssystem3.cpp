@@ -50,9 +50,9 @@ TODO:
   Should be doable to add, but 6522 device doesn't support live clock changes.
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
-- add chessboard lcd and printer unit
+- dump/add chessboard lcd and printer unit
+- dump/add 1980 program revision
 - add memory unit
-- internal artwork
 
 ******************************************************************************/
 
@@ -69,7 +69,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "saitek_ssystem3.lh" // clickable
+#include "saitek_ssystem3.lh" // clickable
 
 
 namespace {
@@ -250,6 +250,12 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_CONFNAME( 0x01, 0x01, "Sound" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x02, "Light" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+
+	PORT_START("DUMMY")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -278,12 +284,12 @@ void ssystem3_state::ssystem3(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920, 729);
+	screen.set_size(1920/2, 729/2);
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(1, 32+8+1);
 	m_display->set_bri_levels(0.25);
-	//config.set_default_layout(layout_saitek_ssystem3);
+	config.set_default_layout(layout_saitek_ssystem3);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -318,4 +324,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ssystem3, 0,      0, ssystem3, ssystem3, ssystem3_state, empty_init, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, ssystem3, 0,      0, ssystem3, ssystem3, ssystem3_state, empty_init, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
