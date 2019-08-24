@@ -3560,7 +3560,7 @@ ROM_END
   Nintendo Game & Watch: Donkey Kong Jr. (model CJ-93)
   * PCB labels: CJ-93 M (main board), CJ-93C (controller board)
   * Sharp SM511 label CJ-93 539D (no decap)
-  * lcd screen with custom segments, 1-bit sound
+  * inverted lcd screen with custom segments, 1-bit sound
 
   This is the panorama version. There's also a tabletop version which is
   assumed to use the same ROM/LCD, and a new wide screen version which is
@@ -3643,7 +3643,7 @@ ROM_START( gnw_dkjrp )
 	ROM_LOAD( "cj-93.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) )
+	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) ) // decap needed for verification
 
 	ROM_REGION( 340751, "screen", 0)
 	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
@@ -3658,7 +3658,7 @@ ROM_END
   Nintendo Game & Watch: Mario's Bombs Away (model TB-94)
   * PCB labels: TB-94 M (main board), SM-91C (controller board)
   * Sharp SM511 label TB-94 537C (no decap)
-  * lcd screen with custom segments, 1-bit sound
+  * inverted lcd screen with custom segments, 1-bit sound
 
 ***************************************************************************/
 
@@ -3731,7 +3731,7 @@ ROM_START( gnw_mbaway )
 	ROM_LOAD( "tb-94.program", 0x0000, 0x1000, CRC(11d18a48) SHA1(afccfa19dace7c4fcc15a84ecfcfb9d7ae3861e4) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "tb-94.melody", 0x000, 0x100, BAD_DUMP CRC(6179e627) SHA1(e0bc8a7b2a1044f1437b0e06391102e403c11e1f) )
+	ROM_LOAD( "tb-94.melody", 0x000, 0x100, BAD_DUMP CRC(6179e627) SHA1(e0bc8a7b2a1044f1437b0e06391102e403c11e1f) ) // decap needed for verification
 
 	ROM_REGION( 514643, "screen", 0)
 	ROM_LOAD( "gnw_mbaway.svg", 0, 514643, CRC(2ec2f18b) SHA1(8e2fd20615d867aac97e443fb977513ff98138b4) )

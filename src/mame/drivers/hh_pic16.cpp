@@ -763,9 +763,6 @@ static INPUT_PORTS_START( matchme )
 	PORT_CONFNAME( 0x02, 0x02, "Music" )
 	PORT_CONFSETTING(    0x02, "Manual" )
 	PORT_CONFSETTING(    0x00, "Auto" )
-
-	PORT_START("DUMMY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 void matchme_state::matchme(machine_config &config)

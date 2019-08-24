@@ -6992,9 +6992,6 @@ static INPUT_PORTS_START( simon )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<0>, 0x07)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f)
-
-	PORT_START("DUMMY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 void simon_state::simon(machine_config &config)
@@ -7162,9 +7159,6 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<4>, 0x0f)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<6>, 0x03)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<6>, 0x03)
-
-	PORT_START("DUMMY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 void ssimon_state::ssimon(machine_config &config)
@@ -8729,9 +8723,6 @@ static INPUT_PORTS_START( alphie )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<2>, 0x1f) PORT_NAME("Answer Arm Down")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f) PORT_NAME("Activity Selector Left")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f) PORT_NAME("Activity Selector Right")
-
-	PORT_START("DUMMY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 // output PLA is guessed
@@ -11300,9 +11291,6 @@ static INPUT_PORTS_START( copycat )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Play")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Replay")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("DUMMY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 void copycat_state::copycat(machine_config &config)
