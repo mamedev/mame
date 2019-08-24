@@ -4124,3 +4124,15 @@ if (MACHINES["WTL3132"]~=null) then
 		MAME_DIR .. "src/devices/machine/wtl3132.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/vrender0.h,MACHINES["VRENDER0"] = true
+---------------------------------------------------
+
+if (MACHINES["VRENDER0"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/vrender0.cpp",
+		MAME_DIR .. "src/devices/machine/vrender0.h",
+	}
+end
