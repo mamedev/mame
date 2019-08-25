@@ -11,7 +11,7 @@
  ***************************************************************************/
 
 class vr0video_device : public device_t,
-                        public device_video_interface
+						public device_video_interface
 {
 public:
 	template <typename T> vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
@@ -71,23 +71,23 @@ private:
 	uint32_t m_LastPalUpdate;
 
 	RenderStateInfo m_RenderState;
-	
+
 	uint8_t *m_textureram;
 	uint16_t *m_frameram;
-	
+
 	DECLARE_READ16_MEMBER( cmd_queue_front_r );
 	DECLARE_WRITE16_MEMBER( cmd_queue_front_w );
 
 	DECLARE_READ16_MEMBER( cmd_queue_rear_r );
 	uint16_t m_queue_rear, m_queue_front;
-	
+
 	DECLARE_READ16_MEMBER( bank1_select_r );
 	DECLARE_WRITE16_MEMBER( bank1_select_w );
 	bool m_bank1_select;
-	
+
 	DECLARE_READ16_MEMBER( display_bank_r );
 	uint8_t m_display_bank;
-	
+
 	DECLARE_READ16_MEMBER( render_control_r );
 	DECLARE_WRITE16_MEMBER( render_control_w );
 	bool m_draw_select;

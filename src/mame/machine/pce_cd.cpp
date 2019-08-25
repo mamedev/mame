@@ -84,7 +84,7 @@ void pce_cd_device::regs_map(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(pce_cd_device::cdc_status_r), FUNC(pce_cd_device::cdc_status_w));
 	map(0x01, 0x01).rw(FUNC(pce_cd_device::cdc_data_r), FUNC(pce_cd_device::cdc_data_w));
-	map(0x02, 0x02).rw(FUNC(pce_cd_device::irq_mask_r), FUNC(pce_cd_device::irq_mask_w)); 
+	map(0x02, 0x02).rw(FUNC(pce_cd_device::irq_mask_r), FUNC(pce_cd_device::irq_mask_w));
 	map(0x03, 0x03).r(FUNC(pce_cd_device::irq_status_r));
 	map(0x04, 0x04).rw(FUNC(pce_cd_device::cdc_reset_r), FUNC(pce_cd_device::cdc_reset_w));
 	map(0x05, 0x06).r(FUNC(pce_cd_device::cdda_data_r));
@@ -101,7 +101,7 @@ void pce_cd_device::regs_map(address_map &map)
 
 pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PCE_CD, tag, owner, clock)
-    , device_memory_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
 	, m_space_config("io", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(pce_cd_device::regs_map), this))
 	, m_maincpu(*this, ":maincpu")
 	, m_msm(*this, "msm5205")
@@ -216,7 +216,7 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_end_mark));
 	save_item(NAME(m_cdda_volume));
 	save_item(NAME(m_adpcm_volume));
-	
+
 	// internal regs
 	save_item(NAME(m_reset_reg));
 	save_item(NAME(m_irq_mask));
@@ -1111,7 +1111,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
 }
 
 /*
- * 
+ *
  * Register section
  *
  */
@@ -1212,7 +1212,7 @@ WRITE8_MEMBER(pce_cd_device::cdc_reset_w)
 READ8_MEMBER(pce_cd_device::cdda_data_r)
 {
 	uint8_t port_shift = offset ? 0 : 8;
-	
+
 	return ((m_cdda->get_channel_volume(m_irq_status & 2) ? 0 : 1) >> port_shift) & 0xff;
 }
 
@@ -1292,7 +1292,7 @@ READ8_MEMBER(pce_cd_device::adpcm_status_r)
 // ---x ---- ADPCM set length
 // ---- x--- ADPCM set read address
 // ---- --xx ADPCM set write address
-// TODO: some games reads bit 5 and wants it to be low otherwise they hangs, 
+// TODO: some games reads bit 5 and wants it to be low otherwise they hangs,
 //       how that can cope with "repeat"?
 READ8_MEMBER(pce_cd_device::adpcm_address_control_r)
 {
@@ -1493,7 +1493,7 @@ uint8_t pce_cd_device::get_adpcm_ram_byte()
  * I/O accessors
  *
  */
-// TODO: more stuff actually belongs to the whole CD interface, 
+// TODO: more stuff actually belongs to the whole CD interface,
 //       cfr. pce_cd_intf_r/w in drivers/pce.cpp
 READ8_MEMBER(pce_cd_device::intf_r)
 {

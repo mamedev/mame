@@ -2,16 +2,16 @@
 // copyright-holders:Angelo Salese, ElSemi
 /***************************************************************************
 
-	MagicEyes VRender0 SoC peripherals
-	
-	Device by Angelo Salese
-	Based off original crystal.cpp by ElSemi
+    MagicEyes VRender0 SoC peripherals
 
-	TODO:
-	- Improve encapsulation, still needs a few trampolines from host driver;
-	- Proper PIO emulation;
-	- Output CRTC border color;
-	- Add VCLK select;
+    Device by Angelo Salese
+    Based off original crystal.cpp by ElSemi
+
+    TODO:
+    - Improve encapsulation, still needs a few trampolines from host driver;
+    - Proper PIO emulation;
+    - Output CRTC border color;
+    - Add VCLK select;
 
 ***************************************************************************/
 
@@ -76,7 +76,7 @@ void vrender0soc_device::regs_map(address_map &map)
 	map(0x01414, 0x01417).rw(FUNC(vrender0soc_device::tmcnt_r<2>), FUNC(vrender0soc_device::tmcnt_w<2>)).umask32(0x0000ffff);
 	map(0x01418, 0x0141b).rw(FUNC(vrender0soc_device::tmcon_r<3>), FUNC(vrender0soc_device::tmcon_w<3>));
 	map(0x0141c, 0x0141f).rw(FUNC(vrender0soc_device::tmcnt_r<3>), FUNC(vrender0soc_device::tmcnt_w<3>)).umask32(0x0000ffff);
-	
+
 //  map(0x01800, 0x01bff)                            // Pulse Width Modulation
 //  map(0x02000, 0x023ff)                            // PIO (Port)
 //  map(0x02004, 0x02007).rw(FUNC(vrender0soc_device::PIO_r), FUNC(vrender0soc_device::PIO_w)); // PIOLDAT
@@ -207,7 +207,7 @@ WRITE32_MEMBER( vrender0soc_device::intst_w )
 }
 
 void vrender0soc_device::IntReq( int num )
-{	
+{
 	if (m_inten & (1 << num))
 	{
 		m_intst |= (1 << num);
@@ -308,7 +308,7 @@ WRITE16_MEMBER(vrender0soc_device::tmcnt_w)
 
 // helper
 // bit 5 and bit 3 of the DMA control don't increment source/destination addresses if enabled.
-// At the time of writing P's Attack is the only SW that uses this feature, 
+// At the time of writing P's Attack is the only SW that uses this feature,
 // in a work RAM to area $4500000 transfer, probably to extend something ...
 inline int vrender0soc_device::dma_setup_hold(uint8_t setting, uint8_t bitmask)
 {
@@ -479,7 +479,7 @@ bool vrender0soc_device::crt_active_vblank_irq()
 {
 	if (crt_is_interlaced() == false)
 		return true;
-	
+
 	// bit 3 of CRTC reg -> select display start
 	return (m_host_screen->frame_number() & 1) ^ ((m_crtcregs[0] & 8) >> 3);
 }
@@ -490,16 +490,16 @@ void vrender0soc_device::crtc_update()
 	uint32_t vdisp = m_crtcregs[0x1c / 4];
 	if (hdisp == 0 || vdisp == 0)
 		return;
-	
+
 	bool interlace_mode = crt_is_interlaced();
-	
+
 	if (interlace_mode)
 		vdisp <<= 1;
 
 	uint32_t htot = (m_crtcregs[0x20 / 4] & 0x3ff) + 1;
-	uint32_t vtot = (m_crtcregs[0x24 / 4] & 0x7ff);	
-	
-	// adjust htotal in case it's not setup by the game 
+	uint32_t vtot = (m_crtcregs[0x24 / 4] & 0x7ff);
+
+	// adjust htotal in case it's not setup by the game
 	// (datasheet mentions that it can be done automatically shrug):
 	// - the two Sealy games do that
 	// - Cross Puzzle sets up an HTotal of 400 with 640x480 display
@@ -512,22 +512,22 @@ void vrender0soc_device::crtc_update()
 		uint32_t hsfp = m_crtcregs[0x10 / 4] & 0xff;
 		if (hbp == 0 && hsw == 0 && hsfp == 0)
 			return;
-		
+
 		htot = hdisp + (hbp+1) + (hsw+1) + (hsfp+1);
 		m_crtcregs[0x20 / 4] = ((htot & 0x3ff) - 1);
 	}
-	
+
 	// urachamu
 	if (vtot == 0)
 	{
 		uint32_t vbp = (m_crtcregs[0x08 / 4] & 0xff);
 		if (vbp == 0)
 			return;
-		
+
 		vtot = vdisp + (vbp + 1);
 		m_crtcregs[0x24 / 4] = ((vtot & 0x7ff) - 1);
 	}
-	
+
 	// TODO: the two Sealy games doesn't set this, eventually need to parametrize this one up
 	uint32_t pixel_clock = (BIT(m_crtcregs[0x04 / 4], 3)) ? 14318180 : 14318180*2;
 	if (BIT(m_crtcregs[0x04 / 4], 7))
@@ -546,7 +546,7 @@ void vrender0soc_device::crtc_update()
 		vtot += 1;
 	}
 	//else
-	//	pixel_clock >>= 1; 
+	//  pixel_clock >>= 1;
 
 
 	vtot += 9;

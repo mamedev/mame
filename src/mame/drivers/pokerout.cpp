@@ -64,7 +64,7 @@
   |   '---------'                                                                                     2  ====|
   |                                                                                                   2  ====|
   |   .---------.                                                                                        ====|
-  |   | SN7407N |     .-------------.       .------------.       .-----------.                        E  ====| 
+  |   | SN7407N |     .-------------.       .------------.       .-----------.                        E  ====|
   |   '---------'     |TMS27128JL-20|       |TMS4416-15NL|       | EP-310 DC |       .------------.   D  ====|
   |                   | "BRK 01"    |       '------------'       '-++++++++--'       | T74LS244B1 |   G  ====|
   |   .---------.     '-------------'                            .-++++++++-----.    '------------'   E  ====|
@@ -101,7 +101,7 @@
   CTC connection...
 
     .-----v-----.
-    |  CLK/TRG0 |--------. 
+    |  CLK/TRG0 |--------.
     |    ZC/TO0 |--(NC)  |
     |           |        |
     |  CLK/TRG1 |--------+---(74LS74,CLK/2)---> CLK AY8910.
@@ -112,7 +112,7 @@
     |           |            |
     |  CLK/TRG3 |------------+------> Z80 /NMI.
     |           |
-    |       IEI |--------(1K RES)---> Z80 /BUSRQ. 
+    |       IEI |--------(1K RES)---> Z80 /BUSRQ.
     |       IEO |--(NC)
     |      /INT |-------------------> Z80 /INT.
     '-----------'
@@ -153,10 +153,10 @@
 
   The double-up feature will allow you to choose one between BIG/SMALL, on the
   next card to draw. Use LEFT for BIG or RIGHT for SMALL, then press START 1 to
-  draw the card.  
+  draw the card.
 
   DIP switches could set the coinage and maximum bet.
-  
+
   As soon as you get out of credits or payout, the game will go to breakout mode.
   You can payout only amounts of credits multiples of 10.
 
@@ -168,10 +168,10 @@
   TEST 1 (key 9) will show you a sort of percentage screen, and using RIGHT, you
   can see the bookkeeping and statistics. Press payout (key W) to exit.
   Using LEFT you're entering in the TEST MODE (also TEST 2 key does the same).
-  
+
   TEST 2 (key 0) will enter the TEST MODE, where you can test the game buttons
   and DIP switches. There are some inputs used by the code for unknown purposes
-  that are not present in this mode. Press START 2 (key 2) + UP to exit the mode.  
+  that are not present in this mode. Press START 2 (key 2) + UP to exit the mode.
 
 ********************************************************************************
 
@@ -267,8 +267,8 @@ other writes found...
 static INPUT_PORTS_START(pokerout)
 
 	PORT_START("IN0")  // 80h
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_NAME("Right / Small") 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY  PORT_NAME("Down / Hold / Take") 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_NAME("Right / Small")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY  PORT_NAME("Down / Hold / Take")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Spare C / Poker Credits")  PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Reserved") PORT_CODE(KEYCODE_R)
@@ -281,13 +281,13 @@ static INPUT_PORTS_START(pokerout)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN1-02") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN1-04") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN1-08") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY    PORT_NAME("Up / Cancel / Double-Up") 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY  PORT_NAME("Left / Big") 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY    PORT_NAME("Up / Cancel / Double-Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY  PORT_NAME("Left / Big")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )  PORT_NAME("Start 2 / Bet")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test 1") PORT_CODE(KEYCODE_9)
 
 	PORT_START("IN2")  // A0h
-//	Program does complex operations with this pull-up/down mask to boot the game.
+//  Program does complex operations with this pull-up/down mask to boot the game.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -367,7 +367,7 @@ void pokerout_state::pokerout(machine_config &config)
 	tms9129_device &vdp(TMS9129(config, "vdp", VDP_CLOCK));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(VDP_MEM);
-//	int line no connected, so no callback.
+//  int line no connected, so no callback.
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */

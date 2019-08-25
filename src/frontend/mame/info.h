@@ -39,7 +39,7 @@ public:
 private:
 	// internal state
 	emu_options     m_lookup_options;
-	bool			m_dtd;
+	bool            m_dtd;
 };
 
 #endif // MAME_FRONTEND_MAME_INFO_H

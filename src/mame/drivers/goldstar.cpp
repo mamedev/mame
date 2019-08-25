@@ -11830,7 +11830,7 @@ ROM_START( lucky8i )
 	ROM_LOAD( "4.h6",   0x6000, 0x2000, CRC(9e939979) SHA1(c6e93df6465c076557ff5dccf650aff3a9064e0d) )
 	ROM_IGNORE(                 0x6000)  // identical quarters.... discarding three.
 
-    // neeed proper bipolar proms dumps...
+	// neeed proper bipolar proms dumps...
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "n82s129an.g13", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
 	ROM_LOAD( "n82s129an.g14", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
@@ -11903,7 +11903,7 @@ ROM_END
 
   The custom CPU performs XOR masks and bitswaps relative to addressing
   and involves M1 line for different encryption betweeen opcodes and data.
-  
+
 */
 ROM_START( lucky8k )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -11921,7 +11921,7 @@ ROM_START( lucky8k )
 	ROM_LOAD( "3.h4",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
 	ROM_LOAD( "4.h5",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
 
-    // neeed proper bipolar proms dumps...
+	// neeed proper bipolar proms dumps...
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "tbp24s10n.g13",  0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
 	ROM_LOAD( "tbp24s10n.g14",  0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )

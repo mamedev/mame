@@ -4,20 +4,20 @@
 
     SNES bootlegs controlled by an MCS-51 core
 
-	Skeleton driver
+    Skeleton driver
 
-	Currently there are dumps for a Mortal Kombat 3 board and a board with
-	4 slots that supports various games directly and also has a generic
-	timer based mode.
+    Currently there are dumps for a Mortal Kombat 3 board and a board with
+    4 slots that supports various games directly and also has a generic
+    timer based mode.
 
-	Hardware (for the 4 slot switcher):
-	- MCS-51 based CPU 44-pin (markings removed)
-	- WD1016D-PL (?)
-	- TC5565PL-15 (8k SRAM)
-	- 12 MHz XTAL
-	- 4 Position Dipswitch
+    Hardware (for the 4 slot switcher):
+    - MCS-51 based CPU 44-pin (markings removed)
+    - WD1016D-PL (?)
+    - TC5565PL-15 (8k SRAM)
+    - 12 MHz XTAL
+    - 4 Position Dipswitch
 
-	Connector pinout:
+    Connector pinout:
 
                  JAMMA                      P1 (from SNES)
     GND          A | 1           GND         1 - GND
@@ -96,17 +96,17 @@ void snesb51_state::mem_map(address_map &map)
 
 void snesb51_state::io_map(address_map &map)
 {
-//	map(0x8000, 0x8000).r
-//	map(0x8200, 0x8200).r
-//	map(0x8401, 0x8401).w
+//  map(0x8000, 0x8000).r
+//  map(0x8200, 0x8200).r
+//  map(0x8401, 0x8401).w
 	map(0x8c00, 0x8c00).w(FUNC(snesb51_state::ram_address_high_w));
 	map(0x8e00, 0x8e00).w(FUNC(snesb51_state::ram_address_low_w));
-//	map(0x9000, 0xafff).ram();
+//  map(0x9000, 0xafff).ram();
 	map(0xa000, 0xa000).w(FUNC(snesb51_state::ram_w));
-//	map(0xb000, 0xb000).w
-//	map(0xd000, 0xd000).w
-//	map(0xd400, 0xd400).w
-//	map(0xd800, 0xd800).r
+//  map(0xb000, 0xb000).w
+//  map(0xd000, 0xd000).w
+//  map(0xd400, 0xd400).w
+//  map(0xd800, 0xd800).r
 }
 
 static INPUT_PORTS_START( mk3snes )

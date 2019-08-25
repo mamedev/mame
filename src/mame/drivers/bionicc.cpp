@@ -45,37 +45,37 @@
     using an Agilent DSO9404A scope and two N2873A 500MHz probes
 
     BTANB [MT00209] (verified on real PCB):
-	- misplaced sprites (see beginning of level 1 or 2 for example)
-	- sprite / sprite priority (see level 2 the reflectors)
-	- sprite / background priority (see level 1: birds walk through
-	  branches of different trees)
-	- see the beginning of level 3: background screwed
-	- gray tiles around the title in Top Secret
+    - misplaced sprites (see beginning of level 1 or 2 for example)
+    - sprite / sprite priority (see level 2 the reflectors)
+    - sprite / background priority (see level 1: birds walk through
+      branches of different trees)
+    - see the beginning of level 3: background screwed
+    - gray tiles around the title in Top Secret
 
     Notes:
-	- Protection MCU is labelled "TS" without a number and without a coloured.
-	  Maybe its code is not region dependant.
-	- The MCU rom contains the string
-	  "<for dealer-location test & USA show. 87/03/10 >"
-	  which indicates it could be from an earlier version, especially with it
-	  coming from a 'Top Secret' bootleg with identical program but unprotected
-	  MCU, however f1dream has a similar string, and is verified as being from
-	  a production board.
-	- Euro rom labels (IE: "TSE") had a blue stripe, while those labeled
-	  as USA (TSU) had an red stripe on the sticker. The intermixing
-	  of TSE and TSU roms in the parent set is correct and verified.
-	- Euro set simply states the game cannot be operated in Japan.
-	- IRQ 4 is control related. On each interrupt, it reads 0xFE4000
-	  (coin/start), shift the bits around and move the resulting byte into a
-	  dword RAM location. The dword RAM location is rotated by 8 bits each time
-	  this happens. This is probably done to be pedantic about coin insertions
-	  (might be protection related).
+    - Protection MCU is labelled "TS" without a number and without a coloured.
+      Maybe its code is not region dependant.
+    - The MCU rom contains the string
+      "<for dealer-location test & USA show. 87/03/10 >"
+      which indicates it could be from an earlier version, especially with it
+      coming from a 'Top Secret' bootleg with identical program but unprotected
+      MCU, however f1dream has a similar string, and is verified as being from
+      a production board.
+    - Euro rom labels (IE: "TSE") had a blue stripe, while those labeled
+      as USA (TSU) had an red stripe on the sticker. The intermixing
+      of TSE and TSU roms in the parent set is correct and verified.
+    - Euro set simply states the game cannot be operated in Japan.
+    - IRQ 4 is control related. On each interrupt, it reads 0xFE4000
+      (coin/start), shift the bits around and move the resulting byte into a
+      dword RAM location. The dword RAM location is rotated by 8 bits each time
+      this happens. This is probably done to be pedantic about coin insertions
+      (might be protection related).
 
-	TODO:
-	- Firing IRQ4 at line 16 causes the game to often miss coin inserts. Set
-	  to 128 currently to compensate.
-	- The game doesn't set the coin lockout in service mode, so the coin inputs
-	  can't be tested there if you uncomment and enable it.
+    TODO:
+    - Firing IRQ4 at line 16 causes the game to often miss coin inserts. Set
+      to 128 currently to compensate.
+    - The game doesn't set the coin lockout in service mode, so the coin inputs
+      can't be tested there if you uncomment and enable it.
 
 ***************************************************************************/
 
@@ -315,24 +315,24 @@ rgb_t bionicc_state::RRRRGGGGBBBBIIII(uint32_t raw)
 
 /*
 
-	This board handles tile/tile and tile/sprite priority with a PROM. Its
-	working is complicated and hardcoded in the driver.
+    This board handles tile/tile and tile/sprite priority with a PROM. Its
+    working is complicated and hardcoded in the driver.
 
-	The PROM is a 256x4 chip, with address inputs wired as follows:
+    The PROM is a 256x4 chip, with address inputs wired as follows:
 
-	A0 bg opaque
-	A1 \
-	A2 |  fg pen
-	A3 |
-	A4 /
-	A5 fg has priority over sprites (bit 5 of tile attribute)
-	A6 fg has not priority over bg (bits 6 & 7 of tile attribute both set)
-	A7 sprite opaque
+    A0 bg opaque
+    A1 \
+    A2 |  fg pen
+    A3 |
+    A4 /
+    A5 fg has priority over sprites (bit 5 of tile attribute)
+    A6 fg has not priority over bg (bits 6 & 7 of tile attribute both set)
+    A7 sprite opaque
 
-	The output selects the active layer, it can be:
-	0  bg
-	1  fg
-	2  sprite
+    The output selects the active layer, it can be:
+    0  bg
+    1  fg
+    2  sprite
 
 */
 
@@ -588,8 +588,8 @@ void bionicc_state::output_w(u8 data)
 	flip_screen_set(BIT(data, 0));
 
 	// commented out, else you can't test the coin inputs in service mode
-//	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 4));
-//	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 5));
+//  machine().bookkeeping().coin_lockout_w(1, BIT(~data, 4));
+//  machine().bookkeeping().coin_lockout_w(0, BIT(~data, 5));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 6));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }

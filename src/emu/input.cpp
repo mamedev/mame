@@ -1465,7 +1465,7 @@ bool input_manager::seq_poll()
 
 //-------------------------------------------------
 //  seq_clean - clean the sequence, removing
-//	any invalid bits
+//  any invalid bits
 //-------------------------------------------------
 
 input_seq input_manager::seq_clean(const input_seq &seq) const

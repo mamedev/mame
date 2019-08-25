@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, ElSemi
 /***************************************************************************
 
-	MagicEyes VRender0 SoC
+    MagicEyes VRender0 SoC
 
 ***************************************************************************/
 
@@ -48,7 +48,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	required_device <se3208_device> m_host_cpu;
 	required_device <screen_device> m_host_screen;
@@ -64,12 +64,12 @@ private:
 
 	DECLARE_READ32_MEMBER(intvec_r);
 	DECLARE_WRITE32_MEMBER(intvec_w);
-	
+
 	uint8_t m_IntHigh;
 	uint32_t m_intst;
 	DECLARE_READ32_MEMBER(intst_r);
 	DECLARE_WRITE32_MEMBER(intst_w);
-	
+
 	// Timer
 	template<int Which> DECLARE_WRITE32_MEMBER(tmcon_w);
 	template<int Which> DECLARE_READ32_MEMBER(tmcon_r);
@@ -81,7 +81,7 @@ private:
 	uint16_t m_timer_count[4];
 	emu_timer  *m_Timer[4];
 	void TimerStart(int which);
-	
+
 	// DMAC
 	template<int Which> DECLARE_READ32_MEMBER(dmac_r);
 	template<int Which> DECLARE_WRITE32_MEMBER(dmac_w);
@@ -98,13 +98,13 @@ private:
 		uint32_t size;
 		uint32_t ctrl;
 	}m_dma[2];
-	
+
 	// CRTC
 	DECLARE_READ32_MEMBER(crtc_r);
 	DECLARE_WRITE32_MEMBER(crtc_w);
 	void crtc_update();
 	inline bool crt_is_interlaced();
-	
+
 	// Misc
 	DECLARE_READ32_MEMBER( sysid_r );
 	DECLARE_READ32_MEMBER( cfgr_r );

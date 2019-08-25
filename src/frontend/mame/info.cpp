@@ -264,7 +264,7 @@ info_xml_creator::info_xml_creator(emu_options const &options, bool dtd)
 
 //-------------------------------------------------
 //  output - print the XML information for all
-//	known machines matching a pattern
+//  known machines matching a pattern
 //-------------------------------------------------
 
 void info_xml_creator::output(std::ostream &out, const std::vector<std::string> &patterns)
@@ -323,15 +323,15 @@ void info_xml_creator::output(std::ostream &out, const std::vector<std::string> 
 
 //-------------------------------------------------
 //  output - print the XML information for all
-//	known (and filtered) machines
+//  known (and filtered) machines
 //-------------------------------------------------
 
 void info_xml_creator::output(std::ostream &out, const std::function<bool(const char *shortname, bool &done)> &filter, bool include_devices)
 {
 	struct prepared_info
 	{
-		std::string		m_xml_snippet;
-		device_type_set	m_dev_set;
+		std::string     m_xml_snippet;
+		device_type_set m_dev_set;
 	};
 
 	// prepare a driver enumerator and the queue
@@ -395,7 +395,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 			// emit the XML
 			output_header_if_necessary(out);
 			out << pi.m_xml_snippet;
-			
+
 			// merge devices into devfilter, if appropriate
 			if (devfilter)
 			{

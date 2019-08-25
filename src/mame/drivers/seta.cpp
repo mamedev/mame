@@ -3823,14 +3823,14 @@ INPUT_PORTS_END
                                 Athena no Hatena?
 ***************************************************************************/
 /*
-		Athena no Hatena is a quiz game that uses only four buttons for inputs.
-		However, the hidden "Test Program" menu makes use of the standard
-		stick/3-button input layout. With the default input mapping, the menus
-		are unusable as the three SHOT buttons are unmapped. So we have two
-		input configurations to allow the debug menu to be usable.
+        Athena no Hatena is a quiz game that uses only four buttons for inputs.
+        However, the hidden "Test Program" menu makes use of the standard
+        stick/3-button input layout. With the default input mapping, the menus
+        are unusable as the three SHOT buttons are unmapped. So we have two
+        input configurations to allow the debug menu to be usable.
 
-		More information about the Test Program menu:
-		http://sudden-desu.net/entry/athena-no-hatena-debug-menu-and-functions
+        More information about the Test Program menu:
+        http://sudden-desu.net/entry/athena-no-hatena-debug-menu-and-functions
 */
 
 static INPUT_PORTS_START( atehate )

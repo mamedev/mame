@@ -30,13 +30,13 @@ public:
 		LAW_2MB,
 		LAW_4MB
 	};
-	
+
 	virge_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virge_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	void lfb_map(address_map &map);
 	void mmio_map(address_map& map);
-	
+
 	DECLARE_READ32_MEMBER(vga_3b0_r);
 	DECLARE_WRITE32_MEMBER(vga_3b0_w);
 	DECLARE_READ32_MEMBER(vga_3c0_r);
@@ -52,20 +52,20 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	
+
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	virtual void config_map(address_map &map) override;
-	
+
 	void postload(void);
-	
+
 	required_device<s3virge_vga_device> m_vga;
 	required_memory_region m_bios;
 	optional_device<screen_device> m_screen;
 
 private:
 	void refresh_linear_window();
-	
+
 	uint8_t m_current_crtc_reg;
 };
 
@@ -85,9 +85,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-//	required_device<s3virge_vga_device> m_vga;
-//	required_memory_region m_bios;
-//	optional_device<screen_device> m_screen;
+//  required_device<s3virge_vga_device> m_vga;
+//  required_memory_region m_bios;
+//  optional_device<screen_device> m_screen;
 };
 
 DECLARE_DEVICE_TYPE(VIRGE_PCI, virge_pci_device)

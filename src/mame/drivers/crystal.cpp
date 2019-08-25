@@ -210,7 +210,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void PatchReset();
 	void crystal_mem(address_map &map);
-	
+
 	// PIO
 	DECLARE_READ32_MEMBER(PIOldat_r);
 	DECLARE_WRITE32_MEMBER(PIOldat_w);
@@ -359,7 +359,7 @@ void crystal_state::crystal_mem(address_map &map)
 	map(0x03800000, 0x03ffffff).ram().share("textureram");
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 	map(0x04800000, 0x04800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
-	
+
 	map(0x05000000, 0x05ffffff).bankr("mainbank");
 	map(0x05000000, 0x05000003).rw(FUNC(crystal_state::FlashCmd_r), FUNC(crystal_state::FlashCmd_w));
 
@@ -568,7 +568,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( urachamu )
 	PORT_INCLUDE( crystal )
-	
+
 	// TODO: player 2 start doesn't work ingame, it only skip attract mode items,
 	// or be valid in test mode when prompted to press start
 	// lamps test also gives only p1 and p3, and after crediting up only p1 and p3 starts are lighted on ($01320000 address writes)
@@ -706,33 +706,33 @@ ROM_END
 #ifdef ROGUE_CARTS
 ROM_START( wulybuly )
 	CRYSBIOS
-	
+
 	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF ) // empty socket
-	
+
 	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
 	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(7406f5db) SHA1(dd53afb08d0567241d08d2422c672d429ef9b78f) )
 ROM_END
 
 ROM_START( urachamu )
 	CRYSBIOS
-	
+
 	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF ) // empty socket
-	
+
 	ROM_REGION32_LE( 0x4000000, "flash", 0 ) // Flash
 	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(f341d6fc) SHA1(23ecd9f3e5e20fc2a293cc735c8c4d60d01b68c0) )
 	ROM_LOAD( "u2",           0x1000000, 0x1000000,  CRC(ad81d61f) SHA1(5872c1d96e25d1b2a1b8a35c8ff163d67cfdabe4) )
 	ROM_LOAD( "u3",           0x2000000, 0x1000000,  CRC(3c7e32a4) SHA1(8a26e745eccc00a2c622062c8ad027781dfc1969) )
 	ROM_LOAD( "u4",           0x3000000, 0x1000000,  CRC(c5505627) SHA1(5229f435b4cf218d50ae4a4ae65a6ae13d7b7080) )
-	
-	// without this game defaults in free play mode, with no demo sound and 0 lives count. 
+
+	// without this game defaults in free play mode, with no demo sound and 0 lives count.
 	ROM_REGION( 0x10000, "nvram", 0 )
 	ROM_LOAD( "nvram",        0x00000, 0x10000, CRC(66df826d) SHA1(09260b76cb17082c841e7e37b89cb076e54ffb8d) )
 ROM_END
 
 ROM_START( maldaiza )
 	CRYSBIOS
-	
-	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF ) 
+
+	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF )
 	ROM_LOAD("maldaliza_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
 
 	ROM_REGION32_LE( 0x4000000, "flash", 0 ) // Flash

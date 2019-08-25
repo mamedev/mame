@@ -62,7 +62,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void nexus3d_map(address_map &map);
-	
+
 	uint32_t m_intpend, m_intmask, m_intlevel;
 	DECLARE_READ32_MEMBER(int_pending_r);
 	DECLARE_WRITE32_MEMBER(int_ack_w);
@@ -70,12 +70,12 @@ private:
 	DECLARE_READ32_MEMBER(int_mask_r);
 	DECLARE_WRITE32_MEMBER(int_mask_w);
 	void IntReq(int level);
-	
+
 	DECLARE_READ32_MEMBER(vrender3d_status_r);
 	DECLARE_WRITE32_MEMBER(rop_data_w);
 	DECLARE_WRITE16_MEMBER(rop_register_w);
 	DECLARE_READ16_MEMBER(rop_status_r);
-	
+
 	DECLARE_READ32_MEMBER(timer_status_r);
 	DECLARE_WRITE32_MEMBER(timer_status_w);
 	DECLARE_READ32_MEMBER(timer_count_r);
@@ -122,7 +122,7 @@ void nexus3d_state::IntReq(int level)
 		m_intpend |= 1 << level;
 	}
 	uint32_t inten = m_intmask ^ 0xffffffff;
-	
+
 	if (m_intpend & inten)
 		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	else
@@ -181,10 +181,10 @@ WRITE32_MEMBER(nexus3d_state::timer_status_w)
 {
 	COMBINE_DATA(&m_timer_status);
 	//printf("%08x %08x\n",m_timer_status, m_timer_count);
-	
+
 	if (m_timer_status & 0x20)
 		m_timer_irq = false;
-	
+
 	if (m_timer_status & 8)
 	{
 		m_timer_result = false;
@@ -221,8 +221,8 @@ TIMER_CALLBACK_MEMBER(nexus3d_state::timercb)
 
 READ32_MEMBER(nexus3d_state::crtc_vblank_r)
 {
-	uint16_t res = (m_screen->vblank()<<1) | (m_screen->hblank()<<0); 
-	
+	uint16_t res = (m_screen->vblank()<<1) | (m_screen->hblank()<<0);
+
 	return (res<<16);
 }
 
@@ -230,12 +230,12 @@ void nexus3d_state::nexus3d_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("mainram");
 	map(0x02000000, 0x023fffff).ram().share("fbram"); // boundary tbd
-	
+
 	map(0x03720000, 0x0373ffff).ram(); // 3d fifo, boundary tbd
 	map(0x046c0000, 0x046fffff).ram(); // """
-	
+
 	map(0x60000000, 0x67ffffff).ram(); // color tables?
-	
+
 	// actually USB hubs (prints "USB STRAGE" if 0)
 	map(0x8c000000, 0x8c000003).portr("IN0");
 	map(0x8c800000, 0x8c800003).portr("IN1");
@@ -266,14 +266,14 @@ void nexus3d_state::nexus3d_map(address_map &map)
 
 	map(0xc0001844, 0xc0001847).r(FUNC(nexus3d_state::crtc_vblank_r));
 
-//	map(0xc0000f40, 0xc0000f4f).ram();
+//  map(0xc0000f40, 0xc0000f4f).ram();
 //  map(0xC0000F44, 0xC0000F47) (nexus3d_unk2_r, nexus3d_unk2_w ) // often, status for something.
 	map(0xc0000f4c, 0xc0000f4f).r(FUNC(nexus3d_state::rop_status_r)).umask32(0xffff0000);
-	
+
 	map(0xe0000014, 0xe0000017).r(FUNC(nexus3d_state::vrender3d_status_r));
 
-//	map(0xe0000000, 0xe00000ff) General / Control registers
-//	map(0xe0000300, 0xe00003ff) GTE constant vector registers
+//  map(0xe0000000, 0xe00000ff) General / Control registers
+//  map(0xe0000300, 0xe00003ff) GTE constant vector registers
 
 }
 

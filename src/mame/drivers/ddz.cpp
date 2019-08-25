@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /****************************************************************************
-	
-	招级疯斗 - "Zhaoji Fengdou" - "Crazy Class" HW
-	
-	driver by Angelo Salese, based off original ddz.cpp by ElSemi
 
-	TODO:
-	- Decryption;
-	
+    招级疯斗 - "Zhaoji Fengdou" - "Crazy Class" HW
+
+    driver by Angelo Salese, based off original ddz.cpp by ElSemi
+
+    TODO:
+    - Decryption;
+
 =============================================================================
 
 Haze's notes:
@@ -35,7 +35,7 @@ Offset      0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F
 if you reverse the letters you get 'bug in vfprintf : bad base'
 
 so I suspect the data is in reverse order and maybe some blocks scrambled about.
-	
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -73,7 +73,7 @@ public:
 
 	void init_ddz();
 	void ddz(machine_config &config);
-	
+
 private:
 
 	/* memory pointers */
@@ -154,10 +154,10 @@ void ddz_state::ddz_mem(address_map &map)
 {
 	map(0x00000000, 0x00ffffff).rom().nopw().region("ipl", 0);
 
-//	map(0x01500000, 0x01500003).portr("IN0");
-//	map(0x01500004, 0x01500007).portr("IN1");
-//	map(0x01500008, 0x0150000b).portr("IN2");
-	
+//  map(0x01500000, 0x01500003).portr("IN0");
+//  map(0x01500004, 0x01500007).portr("IN1");
+//  map(0x01500008, 0x0150000b).portr("IN2");
+
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
@@ -250,13 +250,13 @@ ROM_START( crzclass ) // PCB marked MAH-JONG
 ROM_END
 
 void ddz_state::init_ddz()
-{	
+{
 	for(uint32_t x=0;x<m_encdata.bytes();x+=16)
 	{
 		// TBD
 		for(int y=0;y<16;y++)
 			m_ipl[x+(y)] = m_encdata[x+y];
-//			m_ipl[x+(15-y)] = m_encdata[x+y];
+//          m_ipl[x+(15-y)] = m_encdata[x+y];
 	}
 }
 

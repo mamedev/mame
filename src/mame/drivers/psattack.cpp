@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /****************************************************************************
-	
-	P's Attack (c) 2004 Uniana
-	
-	driver by Angelo Salese, based off original crystal.cpp by ElSemi
 
-	TODO:
-	- Compact Flash hookup;
-	- Enables wavetable IRQ;
-	
+    P's Attack (c) 2004 Uniana
+
+    driver by Angelo Salese, based off original crystal.cpp by ElSemi
+
+    TODO:
+    - Compact Flash hookup;
+    - Enables wavetable IRQ;
+
 =============================================================================
-	
+
 P's Attack (c) 2004 Uniana Co., Ltd
 
 +----------54321---654321--654321---------------------------+
@@ -119,7 +119,7 @@ GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
   4| +5V
   5| Switch (Trigger)
   6| GND
-	
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -155,7 +155,7 @@ public:
 
 	void init_psattack();
 	void psattack(machine_config &config);
-	
+
 private:
 
 	/* memory pointers */
@@ -241,7 +241,7 @@ void psattack_state::psattack_mem(address_map &map)
 	map(0x01500004, 0x01500007).portr("IN1");
 	map(0x01500008, 0x0150000b).portr("IN2");
 	//0x0150000c is prolly eeprom
-	
+
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
 
 	map(0x02000000, 0x027fffff).ram().share("workram");

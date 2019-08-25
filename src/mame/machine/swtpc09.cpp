@@ -116,8 +116,8 @@ TIMER_CALLBACK_MEMBER(swtpc09_state::floppy_motor_callback)
 void swtpc09_state::validate_floppy_side(uint8_t cmd)
 {
 	if ((cmd & 0xe1) == 0x80 || (cmd & 0xe0) == 0xa0 ||
-	    (cmd & 0xf9) == 0xc0 || (cmd & 0xf9) == 0xe0 ||
-	    (cmd & 0xf9) == 0xf0)
+		(cmd & 0xf9) == 0xc0 || (cmd & 0xf9) == 0xe0 ||
+		(cmd & 0xf9) == 0xf0)
 	{
 		uint32_t expected_sectors = m_floppy_expected_sectors->read();
 		uint32_t track_zero_expected_sectors = m_floppy_track_zero_expected_sectors->read();
@@ -760,8 +760,8 @@ void swtpc09_state::machine_reset()
 	m_maincpu->set_clock(maincpu_clock * 4);
 
 	if (m_system_type == FLEX_DMAF2 ||
-	    m_system_type == UNIFLEX_DMAF2 ||
-	    m_system_type == UNIFLEX_DMAF3)
+		m_system_type == UNIFLEX_DMAF2 ||
+		m_system_type == UNIFLEX_DMAF3)
 	{
 		uint32_t fdc_clock = m_fdc_clock->read();
 		m_fdc->set_unscaled_clock(fdc_clock);
@@ -778,8 +778,8 @@ void swtpc09_state::machine_reset()
 	// Note UNIBUG has a smarter boot loader in ROM and will toggle the
 	// density on failure so this is not necessary for UniFLEX.
 	if ((m_system_type == FLEX_DMAF2 ||
-	     m_system_type == FLEX_DC5_PIAIDE) &&
-	    m_sbug_double_density->read())
+		 m_system_type == FLEX_DC5_PIAIDE) &&
+		m_sbug_double_density->read())
 	{
 		// Patch the boot ROM to load the boot sector in double density.
 		uint8_t* sbug = memregion("bankdev")->base();
@@ -789,7 +789,7 @@ void swtpc09_state::machine_reset()
 	}
 
 	if (m_system_type == FLEX_DC5_PIAIDE &&
-	    m_piaide_flex_boot_cd00->read())
+		m_piaide_flex_boot_cd00->read())
 	{
 		// Patch the PIA-IDE boot rom to use IO1
 		uint8_t* rom = memregion("bankdev")->base();

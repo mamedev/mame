@@ -1546,7 +1546,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
   In test mode, the DIP switches status are assigned with code 00,
   so you can't see them since they are black on black background.
 
-*/  
+*/
 }
 
 void goldnpkr_state::video_start()
@@ -6431,7 +6431,7 @@ ROM_END
   Joker Card (witch game)
   PCB with daugtherboard c/6502 and rom.
 
-  Program tries to show jokers in the attract, 
+  Program tries to show jokers in the attract,
   but these aren't in the graphics set.
 
   Maybe the PCB was filled with different eproms
@@ -6451,7 +6451,7 @@ ROM_START( jokercar )
 	ROM_LOAD( "7.4a",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // cards deck gfx, bitplane 1
 	ROM_LOAD( "6.6a",  0x1000, 0x1000, CRC(712f7fbc) SHA1(dcb73c45f58117b4206bc259d9386c4e16650325) )    // cards deck gfx, bitplane 2
 	ROM_LOAD( "5.7a",  0x2000, 0x1000, CRC(7351706a) SHA1(cde3fefe721ac5d3a725afc53fa609b5cc0c01da) )    // cards deck gfx, bitplane 3
-	
+
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END

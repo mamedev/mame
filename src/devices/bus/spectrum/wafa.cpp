@@ -4,19 +4,19 @@
 
     Rotronics Wafadrive
 
-	Provides 2 built-in 'infinite loop' tape based drives that act like
-	discs (similar to Microdrive), a Centronics port, a RS232 port, and
-	the standard pass-thru connector.
+    Provides 2 built-in 'infinite loop' tape based drives that act like
+    discs (similar to Microdrive), a Centronics port, a RS232 port, and
+    the standard pass-thru connector.
 
-	Tapes could hold 128k, 64k or 16k (approximate sizes) with longer
-	seek times on the higher capacity media.  Loading was significantly
-	slower than the Microdrive (but faster than cassette)
+    Tapes could hold 128k, 64k or 16k (approximate sizes) with longer
+    seek times on the higher capacity media.  Loading was significantly
+    slower than the Microdrive (but faster than cassette)
 
-	Media was highly unreliable and prone to snapping.
+    Media was highly unreliable and prone to snapping.
 
-	use
-	NEW *
-	to initialize
+    use
+    NEW *
+    to initialize
 
 **********************************************************************/
 

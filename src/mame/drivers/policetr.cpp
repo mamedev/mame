@@ -431,7 +431,7 @@ void policetr_state::policetr(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(policetr_state::vblank));
 
 	PALETTE(config, m_palette).set_entries(256);
-	
+
 	RAMDAC(config, m_ramdac, 0, m_palette);  // BT481A Palette RAMDAC
 	m_ramdac->set_addrmap(0, &policetr_state::ramdac_map);
 

@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device, "vr0video", "MagicEyes VRend
 
 vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIDEO_VRENDER0, tag, owner, clock)
-    , device_video_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_idleskip_cb(*this)
 
@@ -74,7 +74,7 @@ WRITE16_MEMBER(vr0video_device::render_control_w)
 		m_render_reset = BIT(data, 3);
 		m_render_start = BIT(data, 2);
 		m_dither_mode = data & 3;
-		
+
 		// initialize pipeline
 		// TODO: what happens if reset and start are both 1? Datasheet advises against it.
 		if (m_render_reset == true)
@@ -122,7 +122,7 @@ WRITE16_MEMBER(vr0video_device::flip_count_w)
 void vr0video_device::device_start()
 {
 	m_idleskip_cb.resolve_safe();
-	
+
 	save_item(NAME(m_InternalPalette));
 	save_item(NAME(m_LastPalUpdate));
 
@@ -146,7 +146,7 @@ void vr0video_device::device_start()
 	save_item(NAME(m_RenderState.PixelFormat));
 	save_item(NAME(m_RenderState.Width));
 	save_item(NAME(m_RenderState.Height));
-	
+
 	save_item(NAME(m_flip_count));
 	save_item(NAME(m_queue_rear));
 	save_item(NAME(m_queue_front));
@@ -504,7 +504,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 	// TODO: this need to be removed
 	address_space &space = m_cpu->space(AS_PROGRAM);
 	uint8_t *TEXTURE = m_textureram;
-	
+
 	uint32_t Dx = Packet(1) & 0x3ff;
 	uint32_t Dy = Packet(2) & 0x1ff;
 	uint32_t Endx = Packet(3) & 0x3ff;
@@ -662,7 +662,7 @@ void vr0video_device::execute_drawing()
 {
 	if (m_render_start == false)
 		return;
-	
+
 	uint32_t B0 = 0x000000;
 	uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
 	uint16_t *DrawDest;
@@ -679,7 +679,7 @@ void vr0video_device::execute_drawing()
 		Front = (m_frameram + B0);
 		Back  = (m_frameram + B1);
 	}
-	
+
 	DrawDest = ((m_draw_select == true) ? Front : Back);
 
 	while ((m_queue_rear & 0x7ff) != (m_queue_front & 0x7ff))
@@ -690,7 +690,7 @@ void vr0video_device::execute_drawing()
 		if (DoFlip)
 			break;
 	}
-	
+
 	if (DoFlip)
 	{
 		if (m_flip_count)
@@ -708,15 +708,15 @@ uint32_t vr0video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 	uint32_t B0 = 0x000000;
 	uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
-	
+
 	if (m_display_bank & 1)
 		Visible = (m_frameram + B1);
 	else
 		Visible = (m_frameram + B0);
-	
+
 	uint32_t const dx = cliprect.left();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		std::copy_n(&Visible[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
-	
+
 	return 0;
 }

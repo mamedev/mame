@@ -551,7 +551,7 @@ void mindset_state::sys_p2_w(u8 data)
 	if((m_sys_p2 ^ old) & 0x40)
 		map_modules();
 	m_maincpu->int3_w(!(data & 0x80));
-	//	logerror("SYS: write p2 %02x\n", data);
+	//  logerror("SYS: write p2 %02x\n", data);
 }
 
 void mindset_state::kbd_p1_w(u8 data)

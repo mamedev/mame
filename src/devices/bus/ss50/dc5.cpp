@@ -76,7 +76,7 @@ private:
 	emu_timer *m_floppy_motor_timer;
 	floppy_image_device *m_fdc_selected_floppy; // Current selected floppy.
 	uint8_t m_fdc_side;                // Current floppy side.
-	uint32_t m_fdc_clock;		   // Current clock frequency.
+	uint32_t m_fdc_clock;          // Current clock frequency.
 
 	TIMER_CALLBACK_MEMBER(floppy_motor_callback);
 
@@ -295,8 +295,8 @@ TIMER_CALLBACK_MEMBER(ss50_dc5_device::floppy_motor_callback)
 void ss50_dc5_device::validate_floppy_side(uint8_t cmd)
 {
 	if ((cmd & 0xe1) == 0x80 || (cmd & 0xe0) == 0xa0 ||
-	    (cmd & 0xf9) == 0xc0 || (cmd & 0xf9) == 0xe0 ||
-	    (cmd & 0xf9) == 0xf0)
+		(cmd & 0xf9) == 0xc0 || (cmd & 0xf9) == 0xe0 ||
+		(cmd & 0xf9) == 0xf0)
 	{
 		uint32_t expected_sectors = m_expected_sectors->read();
 		uint32_t track_zero_expected_sectors = m_track_zero_expected_sectors->read();
@@ -393,10 +393,10 @@ uint8_t ss50_dc5_device::validate_fdc_sso(uint8_t cmd)
 
 	// The SSO is only loaded for type II and III commands.
 	if ((cmd & 0xe1) == 0x80 ||
-	    (cmd & 0xe0) == 0xa0 ||
-	    (cmd & 0xf9) == 0xc0 ||
-	    (cmd & 0xf9) == 0xe0 ||
-	    (cmd & 0xf9) == 0xf0)
+		(cmd & 0xe0) == 0xa0 ||
+		(cmd & 0xf9) == 0xc0 ||
+		(cmd & 0xf9) == 0xe0 ||
+		(cmd & 0xf9) == 0xf0)
 	{
 		// The SSO output is inverted and input to DDEN.
 		uint8_t dden = !BIT(cmd, 1);

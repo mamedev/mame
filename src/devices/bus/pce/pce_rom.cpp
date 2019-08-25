@@ -84,13 +84,13 @@ void pce_tennokoe_device::device_reset()
 }
 
 // Tennokoe Bank is a special HuCard containing x4 Backup RAM banks,
-// the software can transfer 
+// the software can transfer
 void pce_tennokoe_device::nvram_default()
 {
 	memset(m_bram, 0xff, m_bram_size);
 	// easter egg: load copy of a BRAM (debug leftover?) inside bank 4.
 	// Contains 14 save blocks, mostly at the end of the various games.
-	// Not entirely correct but not incorrect as well to just unlock these saves for public use, 
+	// Not entirely correct but not incorrect as well to just unlock these saves for public use,
 	// for testing reasons and for a slim chance of actually be supposed as default data in the bank(s)
 	// File list:
 	// 001 NEUTOPIA1
@@ -197,7 +197,7 @@ READ8_MEMBER(pce_tennokoe_device::read_cart)
 			else
 				return m_bram[offset & (m_bram_size-1)];
 	}
-	
+
 	logerror("tennokoe: ROM reading at %06x\n",offset);
 	return 0xff;
 }

@@ -260,7 +260,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sdip_9_w);
 	DECLARE_WRITE8_MEMBER(sdip_a_w);
 	DECLARE_WRITE8_MEMBER(sdip_b_w);
-	
+
 	DECLARE_READ8_MEMBER(as_unkdev_data_r);
 	DECLARE_WRITE8_MEMBER(as_unkdev_data_w);
 	DECLARE_WRITE8_MEMBER(as_unkdev_addr_w);

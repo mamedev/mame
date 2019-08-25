@@ -3629,7 +3629,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 
 	<!-- *********** V.Smile Smartbook games *********** -->
-        <!-- Will need to emulate and add the Smartbook touch tablet as a bus/controller on MAME and then add it as a shared feature on the XML -->
+		<!-- Will need to emulate and add the Smartbook touch tablet as a bus/controller on MAME and then add it as a shared feature on the XML -->
 
 	<software name="scoobynsb" supported="no">
 		<description>Scooby-Doo! - A Night Of Fright Is No Delight (Smartbook) (USA)</description>

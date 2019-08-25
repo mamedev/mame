@@ -2925,7 +2925,7 @@ void subsino_state::mtrainnv(machine_config &config)
   with CPU brick.
 
   Dumped by Team Europe.
-  
+
 ***************************************************************************/
 
 ROM_START( victor5 )

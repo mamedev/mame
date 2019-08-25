@@ -15,7 +15,7 @@
 
  see parts list with IC Money description below
 
- some of these fill up the log with 
+ some of these fill up the log with
  'BLMOVE with unaligned src and aligned dst' from the 34020
  which softlocks MAME as the PC no longer advances, see "void tms340x0_device::blmove(uint16_t op)" in 34010ops.hxx
  this appears to be valid code, just unsupported in the 34020 core
@@ -24,7 +24,7 @@
 
 
 /*---------------------------------------------------------------------------------------------------------------------------------------
-	I C Money
+    I C Money
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 -- CPU board ---
@@ -95,11 +95,11 @@ Dumpable stuff:
 * U2: Altera EPM7032S ; U2-A ; cannot dump, connected J2 10pin header? :(
 * U3: Altera EPM7032S ; U3-A ; cannot dump, connected J3 10pin header? :(
 
-U8: M27C801 ; I.C.Money \n IM5_A-03-B ; cannot dump 
+U8: M27C801 ; I.C.Money \n IM5_A-03-B ; cannot dump
 U9: M27C801 ; 65998223 GB U09 8M MX27C8000PC-10 \n I.C.MONEY \n IM5_-A-03-B \n A391 4U3F ; ok
 U10: M27C801 ; I.C.Money \n IM5_A-03-B \n GB-U10 (2FC4) ; ok
-U11: M27C801 ; 65998223 GB U11 8M MX27C8000PC-10 \n I.C.MONEY \n IM5_-A-03-B \n D12D 3795 ; ok 
-U12: M27C801 ; 65998223 GB U12 8M MX27C8000PC-10 \n I.C.MONEY \n IM5_-A-03-B \n 377D 3453 ; ok 
+U11: M27C801 ; 65998223 GB U11 8M MX27C8000PC-10 \n I.C.MONEY \n IM5_-A-03-B \n D12D 3795 ; ok
+U12: M27C801 ; 65998223 GB U12 8M MX27C8000PC-10 \n I.C.MONEY \n IM5_-A-03-B \n 377D 3453 ; ok
 U13: M27C801 ; I.C.Money \n IM5_A-03-B \n GB-U13 (F044) ; ok
 U14: M27C801 ; 65998223 GB U14 8M MX27C8000PC-10 \n I.C.MONEY \n IM5_-A-03-B \n 2F4B CP9U ; ok
 U15: M27C801 ; 65998223 GB U15 8M MX27C8000PC-10 \n I.C.MONEY \n IM5_-A-03-B \n 4A50 2076 ; ok
@@ -113,14 +113,14 @@ U5: AHCT574
 U6: TL16C550CFN
 U7: Bt481AKPJ110  (palette RAMDAC)
 .
-U16: TMS55160DGH-60 
+U16: TMS55160DGH-60
 U17: TMS55160DGH-60
 U18: 74HCT04D
 U19: DS1488M
 U20: DS1489M
 U21: unpopulated
-U22: MC74F373N 
-U23: MC74F373N 
+U22: MC74F373N
+U23: MC74F373N
 U24: SN74F374N
 U25: SN74F374N
 U26: 74F244PC
@@ -140,13 +140,13 @@ Markings bottom: 6 470.5020 00.21
 
 
 /*---------------------------------------------------------------------------------------------------------------------------------------
-	Wild Thing 
+    Wild Thing
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 -- CPU board --
 
-U2: MB-U2 ; M27C4001@DIP32 ; Wild Thing (EE) \n 200€ / 1000S \n POKE-E-A-WV (EE) \n MB-U2 (5694)
-U6: MB-U6 ; M27C1001@DIP32 ; Wild Thing (EE) \n 200€ / 1000S \n WILD-A-A3-D (EE) \n MB-U6 (19CA)
+U2: MB-U2 ; M27C4001@DIP32 ; Wild Thing (EE) \n 200â‚¬ / 1000S \n POKE-E-A-WV (EE) \n MB-U2 (5694)
+U6: MB-U6 ; M27C1001@DIP32 ; Wild Thing (EE) \n 200â‚¬ / 1000S \n WILD-A-A3-D (EE) \n MB-U6 (19CA)
 U22: MB-U22D ; GAL16V8D ; ??
 U32: MB-U32I ; GAL22V10D ; ??
 U35: POKE-S6368 ; GAL22V10D ; ??
@@ -155,8 +155,8 @@ Red PCB / Mainboard
 
 -- alt CPU board ---
 
-U2: M27C4001@DIP32 ; Wild Thing (EE) \n 200€ / 1000S \n POKE-E-A-WV (EE) \n MB-U2 (5694)
-U6: M27C1001@DIP32 ; Wild Thing (EE) \n 200€ / 1000S \n WILD-A-A3-D (EE) \n MB-U6 (19CA)
+U2: M27C4001@DIP32 ; Wild Thing (EE) \n 200â‚¬ / 1000S \n POKE-E-A-WV (EE) \n MB-U2 (5694)
+U6: M27C1001@DIP32 ; Wild Thing (EE) \n 200â‚¬ / 1000S \n WILD-A-A3-D (EE) \n MB-U6 (19CA)
 U22: GAL16V8B ; [no markings] ; ?? cannot dump yet
 U32: GAL16V8B ; [no markings] ; ?? cannot dump yet
 U35: PALCE22V10H; POKE-S-6598 ; ?? cannot dump yet
@@ -165,8 +165,8 @@ PCB markings bottom: 6 470.5028 00.01
 
 -- another alt CPU board ---
 
-U2: M27C4001@DIP32 ; Wild Thing (EE) \n 200€ / 1000S \n POKE-E-A-WV (EE) \n MB-U2 (5694) ; (same as mb-1 ; mb-2)
-U6: M27C1001@DIP32 ; Wild Thing (EE) \n 200€ / 1000S \n WILD-A-A3-D (EE) \n MB-U6 (19CA) ; (didn't dump anymore)
+U2: M27C4001@DIP32 ; Wild Thing (EE) \n 200â‚¬ / 1000S \n POKE-E-A-WV (EE) \n MB-U2 (5694) ; (same as mb-1 ; mb-2)
+U6: M27C1001@DIP32 ; Wild Thing (EE) \n 200â‚¬ / 1000S \n WILD-A-A3-D (EE) \n MB-U6 (19CA) ; (didn't dump anymore)
 U22: GAL16V8D ; MB-U22-D
 U32: GAL16V8D ; MB-U32-B
 U35: PALCE22V10H; POKE-S-7266 ; ?? cannot dump yet
@@ -201,15 +201,15 @@ Markings bottom: 6 470.5020 00.05
 */
 
 /*---------------------------------------------------------------------------------------------------------------------------------------
-	Bonus Poker 
+    Bonus Poker
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 
 -- CPU Board ---
 
 Chips with data:
-* U2: M27C4001@DIP32 ; Bonus Poker (EE) \n 200€ / 1000S \n POKE-I-B-WJ (EE) \n MB-U2 (6A73) ; dumped
-* U6: M27C4001@DIP32 ; Bonus Poker (EE) \n 200€ / 1000S \n BOPO-B-A1-C (EE) \n MB-U6 (EAA2) ; dumped
+* U2: M27C4001@DIP32 ; Bonus Poker (EE) \n 200â‚¬ / 1000S \n POKE-I-B-WJ (EE) \n MB-U2 (6A73) ; dumped
+* U6: M27C4001@DIP32 ; Bonus Poker (EE) \n 200â‚¬ / 1000S \n BOPO-B-A1-C (EE) \n MB-U6 (EAA2) ; dumped
 * U22: GAL16V8D ; MB-U22D ; dumped
 * U32: GAL22V10D ; MB-U32I ; dumped
 * U35: GAL22V10D ; POKE-S6366 ; dumped
@@ -289,7 +289,7 @@ General chips:
 
 * U1: TMS34020AGBL-32
 
-* U16: TMS55160DGH-60 
+* U16: TMS55160DGH-60
 * U17: TMS55160DGH-60
 * U24: 74F374N
 * U25: 74F374N
@@ -439,7 +439,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(atronic_state::scanline_update)
 void atronic_state::video_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("vidram");
-	
+
 	map(0xa0000010, 0xa000001f).w(m_ramdac, FUNC(ramdac_device::index_w)).umask16(0x00ff);
 	map(0xa0000020, 0xa000002f).w(m_ramdac, FUNC(ramdac_device::pal_w)).umask16(0x00ff);
 	map(0xa0000030, 0xa000003f).w(m_ramdac, FUNC(ramdac_device::mask_w)).umask16(0x00ff);
@@ -851,7 +851,7 @@ ROM_START( beetleup )
 	ROM_LOAD32_BYTE( "u09_7b88.bin", 0x000000, 0x100000, CRC(8443972b) SHA1(5f2eea84ba18a83502f36eeaa52cff49a1631668) )
 	ROM_LOAD32_BYTE( "u11_1957.bin", 0x000001, 0x100000, CRC(36c7e5c5) SHA1(2bad0bb6b363af6a37f5b11c7ca8b3b674df4072) )
 	ROM_LOAD32_BYTE( "u13_b661.bin", 0x000002, 0x100000, CRC(0e74726c) SHA1(3103d801a622315877fc09d9c99290b54b266885) )
-	ROM_LOAD32_BYTE( "u15_fd57.bin", 0x000003, 0x100000, CRC(9eabc514) SHA1(ed89b068b381ad4e007352bddf3aebe10ebebf4a) )	
+	ROM_LOAD32_BYTE( "u15_fd57.bin", 0x000003, 0x100000, CRC(9eabc514) SHA1(ed89b068b381ad4e007352bddf3aebe10ebebf4a) )
 	ROM_LOAD32_BYTE( "u08_5804.bin", 0x400000, 0x100000, CRC(65a020e3) SHA1(2bb781905338e2d444222095d8430137632fae3d) )
 	ROM_LOAD32_BYTE( "u10_647c.bin", 0x400001, 0x100000, CRC(c46c064d) SHA1(6181cf0e1d53f0a79c266b4f87d3b0c32313c593) )
 	ROM_LOAD32_BYTE( "u12_07f3.bin", 0x400002, 0x100000, CRC(cefdfdad) SHA1(2032e0942f52d025f8da225c31ca7f7121c7b7f8) )
@@ -1008,7 +1008,7 @@ ROM_START( jumpjkpt )
 	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u09.bin", 0x000000, 0x100000, CRC(7d3cb293) SHA1(e9f102620f01309327678e115e206fd29dcffde6) )
 	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u11.bin", 0x000001, 0x100000, CRC(d92c0c7e) SHA1(680032b81e76c74539ff56f8c5fc7d4d16fd4793) )
 	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u13.bin", 0x000002, 0x100000, CRC(555ced70) SHA1(1ec115a2e2a1c171070775913a3eb831efc81dab) )
-	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u15.bin", 0x000003, 0x100000, CRC(78d603e5) SHA1(eee3953acedcfedb0118328c37d8a13c72a222f3) )		
+	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u15.bin", 0x000003, 0x100000, CRC(78d603e5) SHA1(eee3953acedcfedb0118328c37d8a13c72a222f3) )
 	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u08.bin", 0x400000, 0x100000, CRC(3c96ccd3) SHA1(b3a05b5cd1200b177f2f9e5f0d0a4870efb9ce29) )
 	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u10.bin", 0x400001, 0x100000, CRC(ae8f94ea) SHA1(bf747b63847bd60c3a387e723b4253e546d1eb80) )
 	ROM_LOAD32_BYTE( "jujp01-a_-b-std_-5_u12.bin", 0x400002, 0x100000, CRC(cbc70102) SHA1(6079afafeea35a5d2b3a1b32076ebcd0c2ad4625) )
@@ -1106,7 +1106,7 @@ ROM_START( tajmah )
 
 	// sound (missing or not needed here? there is an OKI M6585 on the mainboard)
 	/*
-	ROM_REGION( 0x400000, "u18u21", 0 ) 
+	ROM_REGION( 0x400000, "u18u21", 0 )
 	ROM_LOAD( "u18", 0x0000, 0x100000, NO_DUMP )
 	ROM_LOAD( "u19", 0x0000, 0x100000, NO_DUMP )
 	ROM_LOAD( "u20", 0x0000, 0x100000, NO_DUMP )
@@ -1130,7 +1130,7 @@ ROM_START( 3wishrd )
 	ROM_REGION16_LE( 0x800000, "user1", 0 ) /* TMS34020APCM-40 code (34020) */
 	ROM_LOAD32_BYTE( "tw5b01a.8u9", 0x000000, 0x100000, CRC(2410659a) SHA1(2bcd2539c0e3e7389c27c21e58d9199b9c7c742e) )
 	ROM_LOAD32_BYTE( "tw5b01a.u11", 0x000001, 0x100000, CRC(44ca9ce1) SHA1(b1c6d83f749202c072c6ce99c0470a31cfab8986) )
-	ROM_LOAD32_BYTE( "tw5b01a.u13", 0x000002, 0x100000, CRC(6c60097b) SHA1(f5ddb86b481b7b95d6ec151b37d662b583817813) )	
+	ROM_LOAD32_BYTE( "tw5b01a.u13", 0x000002, 0x100000, CRC(6c60097b) SHA1(f5ddb86b481b7b95d6ec151b37d662b583817813) )
 	ROM_LOAD32_BYTE( "tw5b01a.u15", 0x000003, 0x100000, CRC(07f813c3) SHA1(02447ae735aa34451538abd6625061cea91672e9) )
 	ROM_LOAD32_BYTE( "tw5b01a.8u8", 0x400000, 0x100000, CRC(0c58220a) SHA1(840e411b6baee6518df23920448ecde76102a9dd) )
 	ROM_LOAD32_BYTE( "tw5b01a.u10", 0x400001, 0x100000, CRC(c4d871cc) SHA1(0a89f19401e3b14473db42d995e0879b9ffc973c) )
@@ -1181,7 +1181,7 @@ ROM_START( atricmon )
 	ROM_LOAD32_BYTE( "gb-u9.bin",  0x000000, 0x100000, CRC(eff83f95) SHA1(743f2fb0dd84a83387919db70175aa62f5f6f858) )
 	ROM_LOAD32_BYTE( "gb-u11.bin", 0x000001, 0x100000, CRC(3fc27ae9) SHA1(896da175c11b48fb28dbb0678849b8f167cf5f6e) )
 	ROM_LOAD32_BYTE( "gb-u13.bin", 0x000002, 0x100000, CRC(6ad50f67) SHA1(b32781f06acc3e9929467d6d1212cf0dc757e5b3) )
-	ROM_LOAD32_BYTE( "gb-u15.bin", 0x000003, 0x100000, CRC(6ae46bb3) SHA1(edc51f9a885c483283edb9b0873b980727205a91) )		
+	ROM_LOAD32_BYTE( "gb-u15.bin", 0x000003, 0x100000, CRC(6ae46bb3) SHA1(edc51f9a885c483283edb9b0873b980727205a91) )
 	ROM_LOAD32_BYTE( "gb-u8.bin",  0x400000, 0x100000, CRC(7dee3392) SHA1(718333ad5552351702e95a76cc2b61f7c3bf14ac) )
 	ROM_LOAD32_BYTE( "gb-u10.bin", 0x400001, 0x100000, CRC(db88f900) SHA1(83638b46fd7b6e4229fa5295479c9763c2f690c0) )
 	ROM_LOAD32_BYTE( "gb-u12.bin", 0x400002, 0x100000, CRC(fcbada90) SHA1(3206409c9a689e196694831ff5e6ba0fd32d676a) )
@@ -1214,7 +1214,7 @@ ROM_START( atrbonpk )
 	ROM_LOAD32_BYTE( "u9.bin",  0x400000, 0x080000, CRC(5b8450f1) SHA1(27fc771c3fb824cdb845237324984778fcd0a737) )
 	ROM_LOAD32_BYTE( "u11.bin", 0x400001, 0x080000, CRC(c8c52bd1) SHA1(081b8b4c46f18d030329bf519a8ed50385f7c062) )
 	ROM_LOAD32_BYTE( "u13.bin", 0x400002, 0x080000, CRC(23164a85) SHA1(e6de6aac28f1dac9ea908aaab9760b56ded1bb91) )
-	ROM_LOAD32_BYTE( "u15.bin", 0x400003, 0x080000, CRC(aabbb4ff) SHA1(4a13475929141a4824b15347873cf330f7f7b0d0) )		
+	ROM_LOAD32_BYTE( "u15.bin", 0x400003, 0x080000, CRC(aabbb4ff) SHA1(4a13475929141a4824b15347873cf330f7f7b0d0) )
 	ROM_LOAD32_BYTE( "u8.bin",  0x600000, 0x080000, CRC(d6dfde87) SHA1(f3221adecb67ee593d52a1bbbdcee78dde497dbd) )
 	ROM_LOAD32_BYTE( "u10.bin", 0x600001, 0x080000, CRC(d81a1f77) SHA1(c3ec3a06dacc3f528c9bcfa7a18e25e0126b1d85) )
 	ROM_LOAD32_BYTE( "u12.bin", 0x600002, 0x080000, CRC(4b24dc03) SHA1(f875f09c6d44821b169e111cb1ea3d9716746d5f) )
@@ -1314,7 +1314,7 @@ ROM_START( santam )
 	ROM_LOAD( "gb_u09_8m_m27c801-100f1_9df6h.bin", 0x000000, 0x100000, CRC(470ccae5) SHA1(0521af7830cc59102edcc658df4d21a3d669d6db) )
 	ROM_LOAD( "gb_u11_8m_m27c801-100f1_7621h.bin", 0x100000, 0x100000, CRC(8f9a1031) SHA1(1aca654b62e73f3005e627625bea2b4198c04a99) )
 	ROM_LOAD( "gb_u13_8m_m27c801-100f1_be61h.bin", 0x200000, 0x100000, CRC(8b65f945) SHA1(40077a7d7ab13945df96f2483cb4f11ad8ae525c) )
-	ROM_LOAD( "gb_u15_8m_m27c801-100f1_2857h.bin", 0x300000, 0x100000, CRC(8b688a66) SHA1(a343d8039b1c1c8edc717f3bf8a101a8d3069d23) )	
+	ROM_LOAD( "gb_u15_8m_m27c801-100f1_2857h.bin", 0x300000, 0x100000, CRC(8b688a66) SHA1(a343d8039b1c1c8edc717f3bf8a101a8d3069d23) )
 	ROM_LOAD( "gb_u08_8m_m27c801-100f1_ac13h.bin", 0x400000, 0x100000, CRC(84a6f213) SHA1(296b8b8d97b0bc543b9e747c751a6e9f4a6dc26f) )
 	ROM_LOAD( "gb_u10_8m_m27c801-100f1_03abh.bin", 0x500000, 0x100000, CRC(736acaa0) SHA1(1b2a4da15deba54dab76bf1fe88f0f4986217a31) )
 	ROM_LOAD( "gb_u12_8m_m27c801-100f1_5953h.bin", 0x600000, 0x100000, CRC(cc0b9bce) SHA1(30e0594c6890deddb665b6169c47e640508c6b7f) )

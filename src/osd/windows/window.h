@@ -44,9 +44,9 @@
 
 enum class win_window_focus
 {
-	NONE,		// neither this window nor this thread have focus
-	THREAD,		// a window in this thread has focus
-	WINDOW		// this window has focus directly
+	NONE,       // neither this window nor this thread have focus
+	THREAD,     // a window in this thread has focus
+	WINDOW      // this window has focus directly
 };
 
 
@@ -154,7 +154,7 @@ private:
 #endif
 
 	running_machine &   m_machine;
-	bool				m_attached_mode;
+	bool                m_attached_mode;
 };
 
 struct osd_draw_callbacks

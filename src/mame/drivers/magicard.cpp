@@ -943,7 +943,7 @@ ROM_START( magicarde )
 ROM_END
 
 /*
-  Magic Export. 
+  Magic Export.
   Ver 211A.
 
   1x Philips SCC66470CAB.

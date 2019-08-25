@@ -288,7 +288,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 VIDEO_START_MEMBER(legionna_state,cupsoc)
 {
 	common_video_start(false, false, false);
-	
+
 	m_sprite_pri_mask[0] = 0xfff0; // title screen "Seibu Cup Soccer" elements
 	m_sprite_pri_mask[1] = 0xfffc; // ?
 	m_sprite_pri_mask[2] = 0xfffe; // ?
@@ -299,7 +299,7 @@ VIDEO_START_MEMBER(legionna_state,grainbow)
 {
 	common_video_start(false, false, true);
 	m_sprite_xoffs = m_sprite_yoffs = 16;
-	m_sprite_pri_mask[0] = 0xfff0; // 
+	m_sprite_pri_mask[0] = 0xfff0; //
 	m_sprite_pri_mask[1] = 0xfffc; // level 2 and 3
 	m_sprite_pri_mask[2] = 0xfffe; // swamp monster mask effect
 	m_sprite_pri_mask[3] = 0x0000; // Insert coin

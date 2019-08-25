@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /****************************************************************************
-	
-	Trivia R Us (c) 2009 AGT
-	
-	driver by Angelo Salese, based off original crystal.cpp by ElSemi
 
-	TODO:
-	- touch panel;
- 	- RTC;
-	
+    Trivia R Us (c) 2009 AGT
+
+    driver by Angelo Salese, based off original crystal.cpp by ElSemi
+
+    TODO:
+    - touch panel;
+    - RTC;
+
 =============================================================================
-	
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -89,13 +89,13 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void trivrus_mem(address_map &map);
-	
+
 	// PIO
 	DECLARE_READ32_MEMBER(PIOldat_r);
 	uint32_t m_PIO;
 	DECLARE_WRITE32_MEMBER(PIOldat_w);
 	DECLARE_READ32_MEMBER(PIOedat_r);
-	
+
 	DECLARE_READ8_MEMBER(trivrus_input_r);
 	DECLARE_WRITE8_MEMBER(trivrus_input_w);
 	uint8_t m_trivrus_input;
@@ -214,7 +214,7 @@ void trivrus_state::trivrus_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().nopw();
 
-//	map(0x01280000, 0x01280003).w(FUNC(trivrus_state::Banksw_w));
+//  map(0x01280000, 0x01280003).w(FUNC(trivrus_state::Banksw_w));
 
 //  0x01280000 & 0x0000ffff (written at boot)
 	map(0x01500000, 0x01500000).rw(FUNC(trivrus_state::trivrus_input_r), FUNC(trivrus_state::trivrus_input_w));
@@ -236,7 +236,7 @@ void trivrus_state::trivrus_mem(address_map &map)
 	map(0x03800000, 0x03ffffff).ram().share("textureram");
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 	map(0x04800000, 0x04800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
-	
+
 	map(0x05000000, 0x05ffffff).bankr("mainbank");
 	map(0x05000000, 0x05000003).rw(FUNC(trivrus_state::FlashCmd_r), FUNC(trivrus_state::FlashCmd_w));
 }

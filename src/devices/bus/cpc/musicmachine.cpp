@@ -27,8 +27,8 @@ void cpc_musicmachine_device::device_add_mconfig(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
-	acia_clock.signal_handler().set(FUNC(cpc_musicmachine_device::write_acia_clock));	
-	
+	acia_clock.signal_handler().set(FUNC(cpc_musicmachine_device::write_acia_clock));
+
 	SPEAKER(config, "speaker").front_center();
 	ZN429E(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.2);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
@@ -60,7 +60,7 @@ void cpc_musicmachine_device::device_start()
 {
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
-	
+
 	space.install_write_handler(0xf8e8,0xf8e8,write8_delegate(FUNC(cpc_musicmachine_device::irqsel_w),this));
 	space.install_readwrite_handler(0xf8ec,0xf8ef,read8_delegate(FUNC(cpc_musicmachine_device::acia_r), this),write8_delegate(FUNC(cpc_musicmachine_device::acia_w),this));
 	space.install_write_handler(0xf8f0,0xf8f0,write8_delegate(FUNC(cpc_musicmachine_device::dac_w),this));
@@ -85,7 +85,7 @@ WRITE8_MEMBER(cpc_musicmachine_device::dac_w)
 READ8_MEMBER(cpc_musicmachine_device::acia_r)
 {
 	uint8_t ret = 0;
-	
+
 	switch(offset)
 	{
 		case 2:
@@ -95,7 +95,7 @@ READ8_MEMBER(cpc_musicmachine_device::acia_r)
 			ret = m_acia->data_r();
 			break;
 	}
-	
+
 	return ret;
 }
 

@@ -220,10 +220,10 @@ void virge_pci_device::device_start()
 {
 	set_ids(0x53335631, 0x00, 0x030000, 0x000000);
 	pci_device::device_start();
-	
+
 	add_rom(m_bios->base(),0x8000);
 	expansion_rom_base = 0xc0000;
-	
+
 	add_map(32 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
 	set_map_address(0, 0x70000000);
 	set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
@@ -236,10 +236,10 @@ void virgedx_pci_device::device_start()
 {
 	set_ids(0x53338a01, 0x00, 0x030000, 0x000000);
 	pci_device::device_start();
-	
+
 	add_rom(m_bios->base(),0x8000);
 	expansion_rom_base = 0xc0000;
-	
+
 	add_map(4 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
 	set_map_address(0, 0x70000000);
 	set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
@@ -253,9 +253,9 @@ void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 {
 	memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8_delegate(FUNC(virge_pci_device::vram_r),this), write8_delegate(FUNC(virge_pci_device::vram_w),this));
 
-	io_space->install_readwrite_handler(0x3b0, 0x3bf, read32_delegate(FUNC(virge_pci_device::vga_3b0_r), this), write32_delegate(FUNC(virge_pci_device::vga_3b0_w), this));	
-	io_space->install_readwrite_handler(0x3c0, 0x3cf, read32_delegate(FUNC(virge_pci_device::vga_3c0_r), this), write32_delegate(FUNC(virge_pci_device::vga_3c0_w), this));	
-	io_space->install_readwrite_handler(0x3d0, 0x3df, read32_delegate(FUNC(virge_pci_device::vga_3d0_r), this), write32_delegate(FUNC(virge_pci_device::vga_3d0_w), this));	
+	io_space->install_readwrite_handler(0x3b0, 0x3bf, read32_delegate(FUNC(virge_pci_device::vga_3b0_r), this), write32_delegate(FUNC(virge_pci_device::vga_3b0_w), this));
+	io_space->install_readwrite_handler(0x3c0, 0x3cf, read32_delegate(FUNC(virge_pci_device::vga_3c0_r), this), write32_delegate(FUNC(virge_pci_device::vga_3c0_w), this));
+	io_space->install_readwrite_handler(0x3d0, 0x3df, read32_delegate(FUNC(virge_pci_device::vga_3d0_r), this), write32_delegate(FUNC(virge_pci_device::vga_3d0_w), this));
 }
 
 void virge_pci_device::device_add_mconfig(machine_config &config)

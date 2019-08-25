@@ -1,21 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /****************************************************************************
-	
-	Cross Puzzle
-	
-	driver by Angelo Salese, based off original crystal.cpp by ElSemi
 
-	TODO:
-	- Dies at POST with a SPU error and no Flash memory available;
-	- RTC isn't DS1302
+    Cross Puzzle
 
-	
+    driver by Angelo Salese, based off original crystal.cpp by ElSemi
+
+    TODO:
+    - Dies at POST with a SPU error and no Flash memory available;
+    - RTC isn't DS1302
+
+
 =============================================================================
 
- This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been see 
+ This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been see
  with a standard VRenderZERO+ MagicEyes EISC chip
-	
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -79,7 +79,7 @@ private:
 	uint32_t    m_FlashCmd;
 	uint32_t    m_crospuzl_addr;
 
-//	DECLARE_WRITE32_MEMBER(Banksw_w);
+//  DECLARE_WRITE32_MEMBER(Banksw_w);
 	DECLARE_READ8_MEMBER(FlashCmd_r);
 	DECLARE_WRITE32_MEMBER(FlashCmd_w);
 	DECLARE_WRITE32_MEMBER(flash_addr_w);
@@ -91,7 +91,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void crospuzl_mem(address_map &map);
-	
+
 	// PIO
 	DECLARE_READ32_MEMBER(PIOldat_r);
 	uint32_t m_PIO;
@@ -215,8 +215,8 @@ void crospuzl_state::crospuzl_mem(address_map &map)
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 	map(0x04800000, 0x04800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
 
-//	map(0x05000000, 0x05ffffff).bankr("mainbank");
-//	map(0x05000000, 0x05000003).rw(FUNC(crospuzl_state::FlashCmd_r), FUNC(crospuzl_state::FlashCmd_w));
+//  map(0x05000000, 0x05ffffff).bankr("mainbank");
+//  map(0x05000000, 0x05000003).rw(FUNC(crospuzl_state::FlashCmd_r), FUNC(crospuzl_state::FlashCmd_w));
 }
 
 #ifdef IDLE_LOOP_SPEEDUP
@@ -245,7 +245,7 @@ void crospuzl_state::machine_start()
 	save_item(NAME(m_FlipCntRead));
 #endif
 
-//	save_item(NAME(m_Bank));
+//  save_item(NAME(m_Bank));
 	save_item(NAME(m_FlashCmd));
 	save_item(NAME(m_PIO));
 }
@@ -428,7 +428,7 @@ void crospuzl_state::crospuzl(machine_config &config)
 	m_vr0snd->add_route(1, "rspeaker", 1.0);
 }
 
-ROM_START( crospuzl ) 
+ROM_START( crospuzl )
 	ROM_REGION( 0x80010, "maincpu", 0 )
 	ROM_LOAD("en29lv040a.u5",  0x000000, 0x80010, CRC(d50e8500) SHA1(d681cd18cd0e48854c24291d417d2d6d28fe35c1) )
 

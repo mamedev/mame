@@ -348,7 +348,7 @@ class icanpian_state : public icanguit_state
 public:
 	icanpian_state(const machine_config &mconfig, device_type type, const char *tag)
 		: icanguit_state(mconfig, type, tag)
-	//	, m_eeprom(*this, "eeprom")
+	//  , m_eeprom(*this, "eeprom")
 	{ }
 
 	void icanpian(machine_config &config);
@@ -1749,10 +1749,10 @@ WRITE16_MEMBER(icanpian_state::porta_w)
 READ16_MEMBER(icanpian_state::portb_r)
 {
 /*
-	uint16_t ret = 0x0000;
-	logerror("%s: portbxx_r\n", machine().describe_context());
-	ret |= m_eeprom->do_read() ? 0xffff : 0x0000;
-	return ret;
+    uint16_t ret = 0x0000;
+    logerror("%s: portbxx_r\n", machine().describe_context());
+    ret |= m_eeprom->do_read() ? 0xffff : 0x0000;
+    return ret;
 */
 	return 0x0000;
 }
@@ -1760,10 +1760,10 @@ READ16_MEMBER(icanpian_state::portb_r)
 WRITE16_MEMBER(icanpian_state::portb_w)
 {
 /*
-	logerror("%s: portbxx_w (%04x)\n", machine().describe_context(), data);
-	m_eeprom->di_write(BIT(data, 2));
-	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+    logerror("%s: portbxx_w (%04x)\n", machine().describe_context(), data);
+    m_eeprom->di_write(BIT(data, 2));
+    m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+    m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 */
 }
 
@@ -2029,9 +2029,9 @@ void icanpian_state::icanpian(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(icanpian_state::portc_r));
 	m_maincpu->portc_out().set(FUNC(icanpian_state::portc_w));
 
-//	EEPROM_93C66_16BIT(config, m_eeprom); // unknown part
-//	m_eeprom->erase_time(attotime::from_usec(1));
-//	m_eeprom->write_time(attotime::from_usec(1));
+//  EEPROM_93C66_16BIT(config, m_eeprom); // unknown part
+//  m_eeprom->erase_time(attotime::from_usec(1));
+//  m_eeprom->write_time(attotime::from_usec(1));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanpian_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);

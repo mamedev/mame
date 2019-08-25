@@ -63,10 +63,10 @@
 		<text state="0" string=":"> <color red="0.49412" green="0.51765" blue="0.51765" /></text>
 		<text state="1" string=":"> <color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
-	<element name="sym_left"> 
+	<element name="sym_left">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
-		<text state="0" string="&#x2190;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text> 
-		<text state="1" string="&#x2190;">  <color red="0.2" green="0.16" blue="0.16" /></text> 
+		<text state="0" string="&#x2190;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="&#x2190;">  <color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="sym_right">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>

@@ -2,12 +2,12 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-	Microdrive 'cartridges'
-	These are infinite tape loop based devices that act like discs
+    Microdrive 'cartridges'
+    These are infinite tape loop based devices that act like discs
 -->
 <softwarelist name="spectrum_microdrive" description="Sinclair ZX Microdrive tapes/cartridges">
 
-	<software name="outl001" supported="no"> 
+	<software name="outl001" supported="no">
 		<description>Outlet (Issue 001)</description>
 		<year>1987</year>
 		<publisher>Outlet</publisher>

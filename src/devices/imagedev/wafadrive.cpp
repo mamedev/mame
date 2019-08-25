@@ -5,7 +5,7 @@
     wafadrive.cpp
 
     Emulation of an individual drive within the Wafadrive unit
-	(preliminary, no actual emulation yet)
+    (preliminary, no actual emulation yet)
 
 *********************************************************************/
 

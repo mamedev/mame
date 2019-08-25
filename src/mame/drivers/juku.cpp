@@ -2,28 +2,28 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-	Juku E5101
+    Juku E5101
 
-	Hardware:
-	- КР580ВМ80A
-	- КР580ИР82
-	- КР580ВА86
-	- КР580ВА87
-	- КР580ВИ53 x3
-	- КР580ВК38
-	- КР580ВН59
-	- КР580ВВ51A x2
-	- КР580ВВ55A x2
+    Hardware:
+    - КР580ВМ80A
+    - КР580ИР82
+    - КР580ВА86
+    - КР580ВА87
+    - КР580ВИ53 x3
+    - КР580ВК38
+    - КР580ВН59
+    - КР580ВВ51A x2
+    - КР580ВВ55A x2
 
-	Note:
-	- In the monitor, enter A to start BASIC and T to boot from disk/network
+    Note:
+    - In the monitor, enter A to start BASIC and T to boot from disk/network
 
-	TODO:
-	- Display mode 384x200
-	- Work out how the floppy interface really works
-	- Sound
-	- Tape?
-	- Network?
+    TODO:
+    - Display mode 384x200
+    - Work out how the floppy interface really works
+    - Sound
+    - Tape?
+    - Network?
 
 ***************************************************************************/
 
@@ -141,7 +141,7 @@ void juku_state::io_map(address_map &map)
 	map(0x1c, 0x1f).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x1c, 0x1c).w(FUNC(juku_state::fdc_cmd_w));
 	map(0x1f, 0x1f).rw(FUNC(juku_state::fdc_data_r), FUNC(juku_state::fdc_data_w));
-//	map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+//  map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 
@@ -375,7 +375,7 @@ void juku_state::pio0_porta_w(uint8_t data)
 
 	m_key_encoder->update();
 
-//	logerror("porta_w %02x\n", data);
+//  logerror("porta_w %02x\n", data);
 }
 
 uint8_t juku_state::pio0_portb_r()
@@ -416,7 +416,7 @@ void juku_state::pio0_portc_w(uint8_t data)
 	// the motor is always running for now
 	floppy->mon_w(0);
 
-//	m_floppy[0]->get_device()->ss_w(BIT(data, 6));
+//  m_floppy[0]->get_device()->ss_w(BIT(data, 6));
 
 	m_bank->set_bank(data & 0x03);
 
@@ -517,7 +517,7 @@ void juku_state::juku(machine_config &config)
 	TTL74148(config, m_key_encoder, 0);
 
 	KR1818VG93(config, m_fdc, 1000000);
-//	m_fdc->intrq_wr_callback().set(FUNC(juku_state::fdc_intrq_w));
+//  m_fdc->intrq_wr_callback().set(FUNC(juku_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(juku_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", juku_floppies, "525qd", juku_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", juku_floppies, "525qd", juku_state::floppy_formats);

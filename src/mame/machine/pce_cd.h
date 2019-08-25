@@ -41,7 +41,7 @@ enum {
 // ======================> pce_cd_device
 
 class pce_cd_device : public device_t,
-           			  public device_memory_interface
+					  public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -67,7 +67,7 @@ protected:
 
 private:
 	const address_space_config m_space_config;
-	
+
 	DECLARE_READ8_MEMBER(cdc_status_r);
 	DECLARE_WRITE8_MEMBER(cdc_status_w);
 	DECLARE_READ8_MEMBER(cdc_reset_r);
@@ -92,7 +92,7 @@ private:
 	DECLARE_WRITE8_MEMBER(adpcm_address_control_w);
 	DECLARE_WRITE8_MEMBER(adpcm_playback_rate_w);
 	DECLARE_WRITE8_MEMBER(fade_register_w);
-	
+
 	uint8_t m_reset_reg;
 	uint8_t m_irq_mask;
 	uint8_t m_irq_status;

@@ -10,14 +10,14 @@
 
     Notes:
 
-	AXC51CORE:
-	somes sources indicate that the extended opcode encoding may change
-	on some CPU models despite all being 'AXC51CORE' however we lack solid
-	information on this at present.
+    AXC51CORE:
+    somes sources indicate that the extended opcode encoding may change
+    on some CPU models despite all being 'AXC51CORE' however we lack solid
+    information on this at present.
 
     AX208:
     The CPU has 0x2000 bytes of internal ROM mapped at 0x8000-0x9fff providing
-	bootcode, operating kernel and many standard library functions
+    bootcode, operating kernel and many standard library functions
 
  *****************************************************************************/
 

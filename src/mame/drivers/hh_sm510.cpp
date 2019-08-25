@@ -1837,7 +1837,7 @@ ROM_END
   * lcd screen with custom segments, 1-bit sound
 
   This is the wide screen version, there's also a silver version.
-  
+
   In 1989 Elektronika(USSR) release a clone: Space Bridge. This game shares
   the same ROM, though the graphics are slightly different.
 

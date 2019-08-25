@@ -4,7 +4,7 @@
 
     Digitek Micrologic 20
 
-	Access control device with dot-matrix display
+    Access control device with dot-matrix display
 
   ML20/232
   ____________________________________________________

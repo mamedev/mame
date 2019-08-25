@@ -460,7 +460,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_phoenix_ver40_rev6_w)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-//	printf("[%02X]",data);
+//  printf("[%02X]",data);
 }
 
 
@@ -586,8 +586,8 @@ ROM_START(pcipc)
 	ROMX_LOAD("crisis.rom", 0x00000, 0x40000, CRC(38a1458a) SHA1(8881ac336392cca79a772b4168f63efc31f953dd), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "5hx29", "5hx29")
 	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(3) )
-//	ROM_REGION(0x8000,"ibm_vga", 0)
-//	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
+//  ROM_REGION(0x8000,"ibm_vga", 0)
+//  ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
 ROM_START(pcipctx)

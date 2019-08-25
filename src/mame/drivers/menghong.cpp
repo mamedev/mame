@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /****************************************************************************
-	
-	Sealy HW running on VRender0+ SoC
-	
-	driver by Angelo Salese, based off original crystal.cpp by ElSemi
-	
-	TODO:
-	- HY04 protection (controls tile RNG at very least)
-	- 8bpp colors are washed, data from flash ROMs is XORed with contents 
+
+    Sealy HW running on VRender0+ SoC
+
+    driver by Angelo Salese, based off original crystal.cpp by ElSemi
+
+    TODO:
+    - HY04 protection (controls tile RNG at very least)
+    - 8bpp colors are washed, data from flash ROMs is XORed with contents
       of NVRAM area 0x14000700-80f, might be shared with HY04 as well.
-	- EEPROM hookup;
-	- extract password code when entering test mode in-game;
-	
+    - EEPROM hookup;
+    - extract password code when entering test mode in-game;
+
 =============================================================================
 
 Crazy Dou Di Zhu II
@@ -62,7 +62,7 @@ Meng Hong Lou (Dream of the Red Chamber)
 Sealy, 2004?
 
 Red PCB, very similar to crzyddz2
-	
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -143,7 +143,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void crzyddz2_mem(address_map &map);
-	
+
 	// PIO
 	DECLARE_READ32_MEMBER(PIOldat_r);
 	DECLARE_WRITE32_MEMBER(PIOldat_w);
@@ -235,9 +235,9 @@ WRITE32_MEMBER(menghong_state::crzyddz2_PIOldat_w)
 	//uint32_t CLK = data & 0x02000000;
 	//uint32_t DAT = data & 0x10000000;
 
-//	m_eeprom->cs_write(RST ? 1 : 0);
-//	m_eeprom->di_write(DAT ? 1 : 0);
-//	m_eeprom->clk_write(CLK ? 1 : 0);
+//  m_eeprom->cs_write(RST ? 1 : 0);
+//  m_eeprom->di_write(DAT ? 1 : 0);
+//  m_eeprom->clk_write(CLK ? 1 : 0);
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -424,7 +424,7 @@ static INPUT_PORTS_START(crzyddz2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG       ) // big
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL     ) // small + D
-INPUT_PORTS_END 
+INPUT_PORTS_END
 
 void menghong_state::crzyddz2(machine_config &config)
 {

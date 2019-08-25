@@ -3,7 +3,7 @@
 /*
  * The Music Machine - MIDI and sampling expansion
  * by Ram Electronics
- * 
+ *
  * Contains a 6850 AICA, Ferranti ZN429E8 DAC and ZN449 ADC
  */
 
@@ -28,7 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER(acia_w);
 	DECLARE_WRITE8_MEMBER(irqsel_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	
+
 	void write_acia_clock(u8 data) { m_acia->write_txc(data); m_acia->write_rxc(data); }
 
 protected:
@@ -44,7 +44,7 @@ private:
 
 	required_device<acia6850_device> m_acia;
 	required_device<dac_byte_interface> m_dac;
-	
+
 	bool m_irq_select;
 };
 

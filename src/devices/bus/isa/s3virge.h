@@ -38,14 +38,14 @@ public:
 
 	DECLARE_READ32_MEMBER(s3d_register_r);
 	DECLARE_WRITE32_MEMBER(s3d_register_w);
-	
+
 	uint16_t get_crtc_port() { return (vga.miscellaneous_output&1)?0x3d0:0x3b0; }
 	uint32_t get_linear_address() { return s3virge.linear_address; }
 	void set_linear_address(uint32_t addr) { s3virge.linear_address = addr; }
 	uint8_t get_linear_address_size() { return s3virge.linear_address_size; }
 	bool is_linear_address_active() { return s3virge.linear_address_enable; }
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
-	
+
 	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existant 8514/A device\n"); return nullptr; }
 
 protected:
@@ -54,7 +54,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 	enum
 	{
 		LAW_64K = 0,
@@ -62,7 +62,7 @@ protected:
 		LAW_2MB,
 		LAW_4MB
 	};
-	
+
 	enum
 	{
 		OP_BITBLT = 0,

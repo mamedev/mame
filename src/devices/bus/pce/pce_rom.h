@@ -98,7 +98,7 @@ protected:
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
-	
+
 private:
 	const uint32_t m_bram_size = 0x800*4;
 	uint8_t m_bram[0x800*4];

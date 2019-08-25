@@ -1924,7 +1924,7 @@ WRITE8_MEMBER(segas16b_state::dfjail_dac_data_w)
 	#if 0
 	switch(offset)
 	{
-		case 0: 
+		case 0:
 			m_dfjail_dac_data = (data & 0xf) << 0;
 			break;
 		case 1:
@@ -3838,18 +3838,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dfjail )
 	PORT_INCLUDE( lockonph )
-	
+
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	
+
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	
+
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x01, DEF_STR( 8C_1C ) )
@@ -3878,7 +3878,7 @@ static INPUT_PORTS_START( dfjail )
 	PORT_DIPSETTING(    0x10, "7" )
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_SERVICE_DIPLOC( 0x80, 0x80, "SW1:8" )
-	
+
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -4203,7 +4203,7 @@ void segas16b_state::dfjail(machine_config &config)
 	M68000(config.replace(), m_maincpu, XTAL(16'000'000)/2); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::dfjail_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
-	
+
 	Z80(config.replace(), m_soundcpu, XTAL(16'000'000)/4); // ?
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::bootleg_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::dfjail_sound_iomap);
@@ -4212,7 +4212,7 @@ void segas16b_state::dfjail(machine_config &config)
 
 	//config.device_remove("ym2151");
 	config.device_remove("upd");
-	
+
 	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
@@ -5085,11 +5085,11 @@ ROM_START( dfjail )
 	ROM_LOAD16_BYTE( "13.g14", 0x080001, 0x020000, CRC(f125b5b0) SHA1(52497e27b4cd8d7fd52f1f786d1f394a8e4c4e55) )
 	ROM_LOAD16_BYTE( "22.h15", 0x0c0000, 0x020000, CRC(7329f038) SHA1(794cc571a3efba7f0f87cf8b552a8e6fc1f3e669) )
 	ROM_LOAD16_BYTE( "14.g15", 0x0c0001, 0x020000, CRC(ca831a54) SHA1(ce4926a7713bfcf6191dafeb7684da21d0ee8f73) )
-    ROM_LOAD16_BYTE( "23.h16", 0x100000, 0x020000, CRC(94ca23e8) SHA1(16b98ec952ea89cc52d798bab715efb1d5dcb5dc) )
-    ROM_LOAD16_BYTE( "15.g16", 0x100001, 0x020000, CRC(db426709) SHA1(48c01388fc1c6c5fd2b2a1d6fc67bd6e79272053) )
+	ROM_LOAD16_BYTE( "23.h16", 0x100000, 0x020000, CRC(94ca23e8) SHA1(16b98ec952ea89cc52d798bab715efb1d5dcb5dc) )
+	ROM_LOAD16_BYTE( "15.g16", 0x100001, 0x020000, CRC(db426709) SHA1(48c01388fc1c6c5fd2b2a1d6fc67bd6e79272053) )
 	ROM_LOAD16_BYTE( "24.h17", 0x140000, 0x020000, CRC(6628becc) SHA1(499b77cfaed861cdb2ec94160143cbb0baa7d5ad) )
 	ROM_LOAD16_BYTE( "16.g17", 0x140001, 0x020000, CRC(f7b2aad6) SHA1(595f5db13ca6e6bb7b000b8cf13654f92bff3d01) )
-    ROM_LOAD16_BYTE( "25.h19", 0x180000, 0x020000, CRC(26ca591f) SHA1(2dfc9be451df633e114b86961b304b0d9eaffec3) )
+	ROM_LOAD16_BYTE( "25.h19", 0x180000, 0x020000, CRC(26ca591f) SHA1(2dfc9be451df633e114b86961b304b0d9eaffec3) )
 	ROM_LOAD16_BYTE( "17.g19", 0x180001, 0x020000, CRC(9302cfc3) SHA1(6a63df5e4dbc11404b46a0a7ea90298adba56c14) )
 	ROM_LOAD16_BYTE( "26.h20", 0x1c0000, 0x020000, CRC(5828e0af) SHA1(41d3118eae0c43ad25ef96d1c526a52dc46703d8) )
 	ROM_LOAD16_BYTE( "18.g20", 0x1c0001, 0x020000, CRC(fc8aced0) SHA1(12ffd552228893f2093c2d5617fc00cae262e2ed) )

@@ -23,7 +23,7 @@ public:
 	axc51core_disassembler();
 
 	axc51core_disassembler(const mem_info* names) : mcs51_disassembler(names) {};
-	
+
 	virtual ~axc51core_disassembler() = default;
 
 	static const mem_info axc51core_names[];

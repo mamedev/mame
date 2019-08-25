@@ -3,11 +3,11 @@
 
 <!-- ZX Spectrum Beta Disc / TR-DOS disk images
     (currently only hooked up to Pentagon machine, but interfaces available for older systems too)
-	
-	some original release TR-DOS images seem to be in SCL format, which does not appear to properly
-	define a disk but instead a list of files that are on the disk? (not currently added)
-	
-	TODO: move Pentagon specific images to a different list?
+
+    some original release TR-DOS images seem to be in SCL format, which does not appear to properly
+    define a disk but instead a list of files that are on the disk? (not currently added)
+
+    TODO: move Pentagon specific images to a different list?
 -->
 
 <softwarelist name="spectrum_betadisc_flop" description="ZX Spectrum Beta Disc / TR-DOS disk images">
@@ -44,7 +44,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mightyffh" cloneof="mightyff">
 		<description>Mighty Final Fight (v1.2, Wally music hack)</description>
 		<year>2018</year>
@@ -56,7 +56,7 @@
 		</part>
 	</software>
 
-	<software name="lcdizzy"> 
+	<software name="lcdizzy">
 		<description>Log Cabin Dizzy (v1.04, English)</description>
 		<year>2018</year>
 		<publisher>Verm-V</publisher>
@@ -67,7 +67,7 @@
 		</part>
 	</software>
 
-	<software name="lcdizzya" cloneof="lcdizzy"> 
+	<software name="lcdizzya" cloneof="lcdizzy">
 		<description>Log Cabin Dizzy (v1.04, Russian)</description>
 		<year>2018</year>
 		<publisher>Verm-V</publisher>
@@ -78,7 +78,7 @@
 		</part>
 	</software>
 
-	<software name="dwpentag"> 
+	<software name="dwpentag">
 		<description>DreamWalker: Alter Ego 2 (Pentagon)</description>
 		<year>2014</year>
 		<publisher>RetroSouls</publisher>
@@ -89,7 +89,7 @@
 		</part>
 	</software>
 
-	<software name="gravibot"> 
+	<software name="gravibot">
 		<description>Gravibots</description>
 		<year>2014</year>
 		<publisher>RetroSouls</publisher>
@@ -100,7 +100,7 @@
 		</part>
 	</software>
 
-	<software name="lirus"> 
+	<software name="lirus">
 		<description>Lirus</description>
 		<year>2016</year>
 		<publisher>RetroSouls</publisher>
@@ -111,7 +111,7 @@
 		</part>
 	</software>
 
-	<software name="multidud"> 
+	<software name="multidud">
 		<description>MultiDude (Pengaton)</description>
 		<year>2014</year>
 		<publisher>RetroSouls</publisher>
@@ -122,7 +122,7 @@
 		</part>
 	</software>
 
-	<software name="sectorin"> 
+	<software name="sectorin">
 		<description>Sector: Invasion</description>
 		<year>2014</year>
 		<publisher>RetroSouls</publisher>
@@ -133,7 +133,7 @@
 		</part>
 	</software>
 
-	<software name="twinligh"> 
+	<software name="twinligh">
 		<description>Twinlight</description>
 		<year>2017</year>
 		<publisher>RetroSouls</publisher>
@@ -143,8 +143,8 @@
 			</dataarea>
 		</part>
 	</software>
-	
-	<software name="bobcarot" supported="no"> <!-- won't load file? --> 
+
+	<software name="bobcarot" supported="no"> <!-- won't load file? -->
 		<description>Bobby Carrot</description>
 		<year>2018</year>
 		<publisher>Aleksey Golubtsov</publisher>
@@ -154,7 +154,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="neoplasm">
 		<description>Aliens Neoplasma (set 1, v1.2, English)</description>
 		<year>2019</year>
@@ -164,9 +164,9 @@
 				<rom name="aliens_neoplasma_1_2_en_trd_v1_2.trd" size="655360" crc="c054ca8b" sha1="d82efc709fc42f39fe92e77c9cdd7575855cae74"/>
 			</dataarea>
 		</part>
-	</software>	
-	
-	<software name="neoplasma" cloneof="neoplasm" supported="partial"> 
+	</software>
+
+	<software name="neoplasma" cloneof="neoplasm" supported="partial">
 		<description>Aliens Neoplasma (set 2, v1.2, English, Turbo Sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
@@ -177,7 +177,7 @@
 		</part>
 	</software>
 
-	<software name="neoplasms" cloneof="neoplasm"> 
+	<software name="neoplasms" cloneof="neoplasm">
 		<description>Aliens Neoplasma (set 3, v1.2, Spanish)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
@@ -188,7 +188,7 @@
 		</part>
 	</software>
 
-	<software name="neoplasmsa" cloneof="neoplasm" supported="partial"> 
+	<software name="neoplasmsa" cloneof="neoplasm" supported="partial">
 		<description>Aliens Neoplasma (set 4, v1.2, Spanish, Turbo Sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
@@ -199,7 +199,7 @@
 		</part>
 	</software>
 
-	<software name="neoplasmr" cloneof="neoplasm"> 
+	<software name="neoplasmr" cloneof="neoplasm">
 		<description>Aliens Neoplasma (set 5, v1.2, Russian)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
@@ -208,9 +208,9 @@
 				<rom name="aliens_neoplasma_1_2_ru_trd_v1_2.trd" size="655360" crc="5975dcd9" sha1="c0820e5735afb2423642bee69458c0d3ff395b69"/>
 			</dataarea>
 		</part>
-	</software>	
-	
-	<software name="neoplasmra" cloneof="neoplasm" supported="partial"> 
+	</software>
+
+	<software name="neoplasmra" cloneof="neoplasm" supported="partial">
 		<description>Aliens Neoplasma (set 6, v1.2, Russian, Turbo Sound)</description>
 		<year>2019</year>
 		<publisher>Sanchez crew</publisher>
@@ -219,9 +219,9 @@
 				<rom name="aliens_neoplasma_1_2_ru_trd_ts_v1_2.trd" size="655360" crc="8316b07d" sha1="0ba959d936d501d457d5ac36b593aced7b8f8a07"/>
 			</dataarea>
 		</part>
-	</software>	
-	
-	<software name="redshftt"> 
+	</software>
+
+	<software name="redshftt">
 		<description>Redshift</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -231,5 +231,5 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>
