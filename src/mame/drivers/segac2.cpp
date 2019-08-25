@@ -1541,7 +1541,12 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-
+/*
+	sound output balance (tfrceac)
+	reference : https://youtu.be/AOmeWp9qe5E
+	reference 2 : https://youtu.be/Tq8VkJYmij8
+	reference 3: https://youtu.be/VId_HWdNuyA
+*/
 void segac2_state::segac(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1572,7 +1577,7 @@ void segac2_state::segac(machine_config &config)
 	m_vdp->lv4_irq().set(FUNC(segac2_state::vdp_lv4irqline_callback_c2));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_screen("megadriv");
-	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
