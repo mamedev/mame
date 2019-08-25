@@ -480,7 +480,7 @@ bool vrender0soc_device::crt_active_vblank_irq()
 	if (crt_is_interlaced() == false)
 		return true;
 
-	// bit 3 of CRTC reg -> select display start
+	// bit 3 of CRTC reg -> select display start even/odd fields
 	return (m_host_screen->frame_number() & 1) ^ ((m_crtcregs[0] & 8) >> 3);
 }
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:ElSemi
+// copyright-holders:ElSemi, Angelo Salese
 /*
     CRYSTAL SYSTEM by Brezzasoft (2001)
     using VRender0 System on a Chip
@@ -21,6 +21,23 @@
     program with the correct data
 
     MAME driver by ElSemi
+	Additional work and refactoring by Angelo Salese
+	
+	TODO:
+	- provide NVRAM defaults where applicable;
+	- add an actual reset button (helps with inp record/playback);
+	- donghaer: needs "raster effect" for 2 players mode split screen, but no 
+	  interrupt is actually provided for the task so apparently not a timer 
+	  related effect;
+	- wulybuly: strips off main RAM to texture transfers except for text after 
+	  the first couple of frames;
+	- maldaiza: PIC protection.
+	- urachamu: some animation timings seems off, like bat hit animation before starting a given game.
+	  They were actually too fast before adding 30 Hz vblank for interlace mode, even if the game don't
+	  really read crtc blanking reg or use any other interrupt but the coin ones;
+	- urachamu: investigate what CDMA in test mode really do, assuming it's not a dud;
+
+========================================================================================================
 
 The Crystal of Kings
 Brezza Soft Corporation (Japan), 2001
@@ -133,8 +150,6 @@ Notes:
 #include <algorithm>
 
 #define IDLE_LOOP_SPEEDUP
-// strip this define once we have actual credits from Smitdogg
-//#define ROGUE_CARTS
 
 class crystal_state : public driver_device
 {
@@ -161,9 +176,7 @@ public:
 	void init_crysking();
 	void init_evosocc();
 	void init_donghaer();
-#ifdef ROGUE_CARTS
 	void init_maldaiza();
-#endif
 
 	void crystal(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -566,7 +579,7 @@ static INPUT_PORTS_START( topbladv )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( urachamu )
+static INPUT_PORTS_START( officeye )
 	PORT_INCLUDE( crystal )
 
 	// TODO: player 2 start doesn't work ingame, it only skip attract mode items,
@@ -600,6 +613,20 @@ static INPUT_PORTS_START( urachamu )
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( urachamu )
+	PORT_INCLUDE( officeye )
+
+	// oddily they reversed red and blue
+	PORT_MODIFY("P1_P2")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Blue")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Red")
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Blue")
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Blue")
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Red")
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Red")
+INPUT_PORTS_END
+
 
 void crystal_state::crystal(machine_config &config)
 {
@@ -703,7 +730,6 @@ ROM_START( donghaer )
 	ROM_LOAD( "u2",           0x1000000, 0x1000000, CRC(6d82f1a5) SHA1(036bd45f0daac1ffeaa5ad9774fc1b56e3c75ff9) )
 ROM_END
 
-#ifdef ROGUE_CARTS
 ROM_START( wulybuly )
 	CRYSBIOS
 
@@ -739,7 +765,6 @@ ROM_START( maldaiza )
 	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(f484d12b) SHA1(29641cda9138b5bf02c2ece34f8289385fd2ba29) )
 	ROM_LOAD( "u2",           0x1000000, 0x1000000,  CRC(86175ebf) SHA1(c1800f7339dafd3ec6c0302eebc8406582a46b04) ) // $ff filled
 ROM_END
-#endif
 
 /* note on PIC protection from ElSemi (for actually emulating it instead of patching)
 
@@ -858,22 +883,18 @@ void crystal_state::init_donghaer()
 	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001; // PUSH %R0
 }
 
-#ifdef ROGUE_CARTS
 void crystal_state::init_maldaiza()
 {
 	//uint16_t *Rom = (uint16_t*)memregion("flash")->base();
 	// ...
 }
-#endif
 
 GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga",               "Evolution Soccer", 0 )
-GAME( 2001, officeye, 0,        crystal,  urachamu, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
-GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues
+GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
+GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues, seldomly hangs
+GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", 0 ) // lamps, verify game timings
 GAME( 2003, topbladv, crysbios, crystal,  topbladv, crystal_state, init_topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
-#ifdef ROGUE_CARTS
-GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", MACHINE_NOT_WORKING ) // lamps, not extensively tested
 GAME( 200?, wulybuly, crysbios, crystal,  crystal,  crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING ) // no actual graphics except offset text, confirmed to have no PIC protection so failing elsewhere
 GAME( 200?, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "<unknown>",           "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // PIC hookup
-#endif

@@ -1,21 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /****************************************************************************
+	
+	Cross Puzzle
+	
+	driver by Angelo Salese, based off original crystal.cpp by ElSemi
 
-    Cross Puzzle
-
-    driver by Angelo Salese, based off original crystal.cpp by ElSemi
-
-    TODO:
-    - Dies at POST with a SPU error and no Flash memory available;
-    - RTC isn't DS1302
-
-
+	TODO:
+	- Dies at POST with a SPU error;
+	- Hooking up serflash_device instead of the custom implementation here
+	  makes the game to print having all memory available and no game 
+	  detected, fun
+	- RTC isn't DS1302
+	
+	Notes:
+	- Game enables UART1 receive irq, if that irq is enable it just prints 
+	  "___sysUART1_ISR<LF>___sysUART1_ISR_END<LF>"
+	
 =============================================================================
 
- This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been see
- with a standard VRenderZERO+ MagicEyes EISC chip
-
+ This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been 
+ seen with a standard VRenderZERO+ MagicEyes EISC chip
+	
 ****************************************************************************/
 
 #include "emu.h"
@@ -76,13 +82,15 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(idle_skip_speedup_w);
 #endif
 
-	uint32_t    m_FlashCmd;
-	uint32_t    m_crospuzl_addr;
+	uint8_t    m_FlashCmd;
+	uint8_t    m_FlashPrevCommand;
+	uint32_t   m_FlashAddr;
+	uint8_t    m_FlashShift;
 
-//  DECLARE_WRITE32_MEMBER(Banksw_w);
+//	DECLARE_WRITE32_MEMBER(Banksw_w);
 	DECLARE_READ8_MEMBER(FlashCmd_r);
-	DECLARE_WRITE32_MEMBER(FlashCmd_w);
-	DECLARE_WRITE32_MEMBER(flash_addr_w);
+	DECLARE_WRITE8_MEMBER(FlashCmd_w);
+	DECLARE_WRITE8_MEMBER(FlashAddr_w);
 
 	IRQ_CALLBACK_MEMBER(icallback);
 
@@ -91,7 +99,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void crospuzl_mem(address_map &map);
-
+	
 	// PIO
 	DECLARE_READ32_MEMBER(PIOldat_r);
 	uint32_t m_PIO;
@@ -129,22 +137,10 @@ IRQ_CALLBACK_MEMBER(crospuzl_state::icallback)
 	return m_vr0soc->irq_callback();
 }
 
-WRITE32_MEMBER(crospuzl_state::FlashCmd_w)
-{
-	m_FlashCmd = data;
-}
-
 READ32_MEMBER(crospuzl_state::PIOedat_r)
 {
+	// TODO: this doesn't work with regular serflash_device
 	return machine().rand() & 0x04000000; // serial ready line
-}
-
-WRITE32_MEMBER(crospuzl_state::flash_addr_w)
-{
-	if (m_FlashCmd == 0x90)
-		m_crospuzl_addr = 0;
-	if (data)
-		m_crospuzl_addr = (data << 16);
 }
 
 READ8_MEMBER(crospuzl_state::FlashCmd_r)
@@ -155,19 +151,42 @@ READ8_MEMBER(crospuzl_state::FlashCmd_r)
 	}
 	if ((m_FlashCmd & 0xff) == 0x90)
 	{
-		const uint8_t id[5] = { 0xee, 0x81, 0x00, 0x00, 0x00 };
-		uint8_t res = id[m_crospuzl_addr];
-		m_crospuzl_addr ++;
-		m_crospuzl_addr %= 4;
+		// Service Mode has the first two bytes of the ID printed, 
+		// in format ****/ee81
+		// ee81 has no correspondence in the JEDEC flash vendor ID list, 
+		// and the standard claims that the ID is 7 + 1 parity bit.
+		// TODO: Retrieve ID from actual HW service mode screen.
+//		const uint8_t id[5] = { 0xee, 0x81, 0x00, 0x15, 0x00 };
+		const uint8_t id[5] = { 0xec, 0xf1, 0x00, 0x15, 0x00 };
+		uint8_t res = id[m_FlashAddr];
+		m_FlashAddr ++;
+		m_FlashAddr %= 5;
 		return res;
 	}
 	if ((m_FlashCmd & 0xff) == 0x30)
 	{
-		uint8_t res = m_flash[m_crospuzl_addr];
-		m_crospuzl_addr++;
+		uint8_t res = m_flash[m_FlashAddr];
+		m_FlashAddr++;
 		return res;
 	}
 	return 0;
+}
+
+WRITE8_MEMBER(crospuzl_state::FlashCmd_w)
+{ 
+	m_FlashPrevCommand = m_FlashCmd;
+	m_FlashCmd = data;
+	m_FlashShift = 0;
+	m_FlashAddr = 0;
+	logerror("%08x %08x CMD\n",m_FlashPrevCommand, m_FlashCmd);
+}
+
+WRITE8_MEMBER(crospuzl_state::FlashAddr_w)
+{
+	m_FlashAddr |= data << (m_FlashShift*8);
+	m_FlashShift ++;
+	if (m_FlashShift == 4)
+		logerror("%08x %02x ADDR\n",m_FlashAddr,m_FlashShift);
 }
 
 READ32_MEMBER(crospuzl_state::PIOldat_r)
@@ -195,8 +214,8 @@ void crospuzl_state::crospuzl_mem(address_map &map)
 	map(0x00000000, 0x0007ffff).rom().nopw();
 
 	map(0x01500000, 0x01500000).r(FUNC(crospuzl_state::FlashCmd_r));
-	map(0x01500100, 0x01500103).w(FUNC(crospuzl_state::FlashCmd_w));
-	map(0x01500200, 0x01500203).w(FUNC(crospuzl_state::flash_addr_w));
+	map(0x01500100, 0x01500100).w(FUNC(crospuzl_state::FlashCmd_w));
+	map(0x01500200, 0x01500200).w(FUNC(crospuzl_state::FlashAddr_w));
 	map(0x01510000, 0x01510003).portr("IN0");
 	map(0x01511000, 0x01511003).portr("IN1");
 	map(0x01512000, 0x01512003).portr("IN2");
@@ -215,8 +234,8 @@ void crospuzl_state::crospuzl_mem(address_map &map)
 	map(0x04000000, 0x047fffff).ram().share("frameram");
 	map(0x04800000, 0x04800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
 
-//  map(0x05000000, 0x05ffffff).bankr("mainbank");
-//  map(0x05000000, 0x05000003).rw(FUNC(crospuzl_state::FlashCmd_r), FUNC(crospuzl_state::FlashCmd_w));
+//	map(0x05000000, 0x05ffffff).bankr("mainbank");
+//	map(0x05000000, 0x05000003).rw(FUNC(crospuzl_state::FlashCmd_r), FUNC(crospuzl_state::FlashCmd_w));
 }
 
 #ifdef IDLE_LOOP_SPEEDUP
@@ -245,7 +264,7 @@ void crospuzl_state::machine_start()
 	save_item(NAME(m_FlipCntRead));
 #endif
 
-//  save_item(NAME(m_Bank));
+//	save_item(NAME(m_Bank));
 	save_item(NAME(m_FlashCmd));
 	save_item(NAME(m_PIO));
 }
@@ -253,7 +272,9 @@ void crospuzl_state::machine_start()
 void crospuzl_state::machine_reset()
 {
 	m_FlashCmd = 0xff;
-	m_crospuzl_addr = 0;
+	m_FlashAddr = 0;
+	m_FlashShift = 0;
+	m_FlashPrevCommand = 0xff;
 #ifdef IDLE_LOOP_SPEEDUP
 	m_FlipCntRead = 0;
 #endif
@@ -428,7 +449,7 @@ void crospuzl_state::crospuzl(machine_config &config)
 	m_vr0snd->add_route(1, "rspeaker", 1.0);
 }
 
-ROM_START( crospuzl )
+ROM_START( crospuzl ) 
 	ROM_REGION( 0x80010, "maincpu", 0 )
 	ROM_LOAD("en29lv040a.u5",  0x000000, 0x80010, CRC(d50e8500) SHA1(d681cd18cd0e48854c24291d417d2d6d28fe35c1) )
 
