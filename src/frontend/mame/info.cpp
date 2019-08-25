@@ -1855,21 +1855,22 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 
 			if (loadable)
 			{
-				const char *name = imagedev.instance_name().c_str();
-				const char *shortname = imagedev.brief_instance_name().c_str();
+				char const *const name = imagedev.instance_name().c_str();
+				char const *const shortname = imagedev.brief_instance_name().c_str();
 
 				out << "\t\t\t<instance";
 				out << util::string_format(" name=\"%s\"", normalize_string(name));
 				out << util::string_format(" briefname=\"%s\"", normalize_string(shortname));
 				out << "/>\n";
 
-				std::string extensions(imagedev.file_extensions());
-
-				char *ext = strtok((char *)extensions.c_str(), ",");
-				while (ext != nullptr)
+				char const *extensions(imagedev.file_extensions());
+				while (extensions)
 				{
-					out << util::string_format("\t\t\t<extension name=\"%s\"/>\n", normalize_string(ext));
-					ext = strtok(nullptr, ",");
+					char const *end(extensions);
+					while (*end && (',' != *end))
+						++end;
+					out << util::string_format("\t\t\t<extension name=\"%s\"/>\n", normalize_string(std::string(extensions, end).c_str()));
+					extensions = *end ? (end + 1) : nullptr;
 				}
 			}
 			out << "\t\t</device>\n";
