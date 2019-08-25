@@ -16,10 +16,10 @@
 | 80-          | Schreibmaschinenkurs        | 27-6431-00 |   LH5V1RN5    |
 |              | Superspeicher               |            |GM76V8128CLFW70| (RAM Module)
 
-the LH5V1RN6 flash-rom is pin compatible to an LH531V00 which is compatible to an D27C010 eprom!
-VTECH burned two games on one flash-rom, with setting the highest adressline HIGH or LOW, they choosed the game,
+The LH5V1RN6 Flash ROM is pin compatible to an LH531V00 which is compatible to an D27C010 EPROM!
+VTECH burned two games on one Flash ROM, with setting the highest address line HIGH or LOW, they choosed the game,
 but if you wanted to play both games, you had to buy both cartridges!
-On one was the highest adressline set to HIGH, on the other one this adressline was set to LOW.
+On one was the highest address line set to HIGH, on the other one this address line was set to LOW.
 
 -->
 
@@ -89,7 +89,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 	</software>
 
 	<software name="update" supported="no">
-		<description>Update Programm-Zusatzkasette (Ger)</description>
+		<description>Update Programm-Zusatzkassette (Ger)</description>
 		<year>200?</year>
 		<publisher>Video Technology</publisher>
 		<info name="serial" value="" />
