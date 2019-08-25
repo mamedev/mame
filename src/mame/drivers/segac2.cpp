@@ -1572,7 +1572,7 @@ void segac2_state::segac(machine_config &config)
 	m_vdp->lv4_irq().set(FUNC(segac2_state::vdp_lv4irqline_callback_c2));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_screen("megadriv");
-	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
@@ -1593,7 +1593,7 @@ void segac2_state::segac(machine_config &config)
 
 	ym3438_device &ymsnd(YM3438(config, "ymsnd", XL2_CLOCK/7));
 	ymsnd.irq_handler().set(FUNC(segac2_state::segac2_irq2_interrupt));
-	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(0, "mono", 1.00);
 	/* right channel not connected */
 }
 
