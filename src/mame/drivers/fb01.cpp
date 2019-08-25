@@ -89,8 +89,7 @@ void fb01_state::fb01_io(address_map &map)
 	map(0x20, 0x20).portr("PANEL");
 
 	// 30-31  HD44780A
-	map(0x30, 0x30).rw("hd44780", FUNC(hd44780_device::control_read), FUNC(hd44780_device::control_write));
-	map(0x31, 0x31).rw("hd44780", FUNC(hd44780_device::data_read), FUNC(hd44780_device::data_write));
+	map(0x30, 0x31).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 }
 
 

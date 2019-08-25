@@ -252,8 +252,7 @@ void psion1_state::psion1_mem(address_map &map)
 {
 	map(0x0000, 0x001f).rw(FUNC(psion1_state::hd63701_int_reg_r), FUNC(psion1_state::hd63701_int_reg_w));
 	map(0x0040, 0x00ff).ram().share("sys_register");
-	map(0x2000, 0x2000).mirror(0x07fe).rw(m_lcdc, FUNC(hd44780_device::control_read), FUNC(hd44780_device::control_write));
-	map(0x2001, 0x2001).mirror(0x07fe).rw(m_lcdc, FUNC(hd44780_device::data_read), FUNC(hd44780_device::data_write));
+	map(0x2000, 0x2001).mirror(0x07fe).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x2800, 0x2800).r(FUNC(psion1_state::reset_kb_counter_r));
 	map(0x2e00, 0x2e00).r(FUNC(psion1_state::switchoff_r));
 	map(0x3000, 0x3000).r(FUNC(psion1_state::inc_kb_counter_r));

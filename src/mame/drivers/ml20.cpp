@@ -112,8 +112,8 @@ void ml20_state::mem_map(address_map &map)
 void ml20_state::io_map(address_map &map)
 {
 	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x10, 0x10).rw(m_lcdc, FUNC(hd44780_device::data_read), FUNC(hd44780_device::data_write));
-	map(0x14, 0x14).rw(m_lcdc, FUNC(hd44780_device::control_read), FUNC(hd44780_device::control_write));
+	map(0x10, 0x10).rw(m_lcdc, FUNC(hd44780_device::data_r), FUNC(hd44780_device::data_w));
+	map(0x14, 0x14).rw(m_lcdc, FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w));
 }
 
 static INPUT_PORTS_START( ml20 )
