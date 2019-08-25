@@ -7572,10 +7572,12 @@
 		</part>
 	</software>
 
-	<software name="tms320c5x">
-		<description>TMS320C5x DSK - Applications Guide/Application Software</description>
+	<!-- Bundled with "TMS320C5x DSK - Applications Guide" by Texas Instruments. TI ID: BPRA063 -->
+	<software name="tms320c5x" supported="yes">
+		<description>TMS320C5x DSK - Applications Guide - Application Software</description>
 		<year>1997</year>
 		<publisher>Texas Instruments</publisher>
+		<info name="usage" value="Install from DOS with: INSTALL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="tms320c5x dsk - applications guide application software.img" size="1474560" crc="3ca3e247" sha1="e8d4e2bb9093ffac1c4034fb7ef023d9f0b2efb2"/>
@@ -10735,6 +10737,7 @@
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Dynamix" />
 		<info name="version" value="1.0" />
+		<info name="usage" value="Start from DOS with: TIM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="incredible machine.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e"/>
@@ -12488,6 +12491,98 @@
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="swtiefgtd5.img" size="1474560" crc="7751ed1f" sha1="4fc14b87a62ab1db717227ef3ad9343ce3aa7193"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strkcomm" supported="no">
+		<description>Strike Commander</description>
+		<year>1992</year>
+		<publisher>Origin</publisher>
+		<info name="version" value="F1.4" />
+		<info name="usage" value="Install from DOS with: INSTALL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 1.img" size="1474560" crc="9a1c4ab7" sha1="91abf66c7082e0161da01ff22273d31eda514fac" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 2.img" size="1474560" crc="92019646" sha1="ee1bf5c13752c6a6bba3b203ed3f21ffd4c57a1a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 3.img" size="1474560" crc="05ff13dc" sha1="e532d66ddebfacd7efd241ed23c5bbbfe3c5d725" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 4.img" size="1474560" crc="89bfed90" sha1="47e364bfb946c547d8146d6601d45c3424a8a604" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 5.img" size="1474560" crc="af24628a" sha1="d6c67860a1ff8f77bcbe3d9db3465532ba2d8f1c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 6.img" size="1474560" crc="69a93bb1" sha1="9ebff1daeaeea017e983dfcebeb9a89780d46204" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 7.img" size="1474560" crc="a00f4589" sha1="27c0fc8b4d44fccd3194ada3b496151674dc6bbd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 8.img" size="1474560" crc="937ccb56" sha1="05d3eb7f471c60c8aba27898438ad461bf586824" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speechpk" supported="no">
+		<description>Strike Commander: Speech Pack</description>
+		<year>1993</year>
+		<publisher>Origin</publisher>
+		<info name="usage" value="Install from DOS with: SPEECH"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander speech pack disk 1.img" size="1474560" crc="330a2acc" sha1="566b363c02bbc819adb7bff03786caddabf409fe" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander speech pack disk 2.img" size="1474560" crc="851cd0ee" sha1="36c408510468fda350cec8a8f5c7cc6c70f8e235" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander speech pack disk 3.img" size="1474560" crc="5e0325e6" sha1="bb0bafd104b24c35a8205190b22a51e876853732" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tactops" supported="no">
+		<description>Strike Commander: Tactical Operations</description>
+		<year>1993</year>
+		<publisher>Origin</publisher>
+		<info name="usage" value="Install from DOS with: INSTALL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander tactical operations disk 1.img" size="1474560" crc="0bdc6fcd" sha1="3944b61ca4f734211f6dbc51a2b6706cef183364" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander tactical operations disk 2.img" size="1474560" crc="65f4dd43" sha1="498f36a093442032c6d01158a4315503afebaa88" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander tactical operations disk 3.img" size="1474560" crc="8b2304c2" sha1="5942808d9d3d1409d6330dfa6a908f7751370f46" offset="0" />
 			</dataarea>
 		</part>
 	</software>
