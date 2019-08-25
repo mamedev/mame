@@ -95,13 +95,14 @@ WRITE8_MEMBER(piggypas_state::led_strobe_w)
 
 READ8_MEMBER(piggypas_state::lcd_latch_r)
 {
-	return m_lcd_latch;
+	return m_hd44780->db_r();
 }
 
 WRITE8_MEMBER(piggypas_state::lcd_latch_w)
 {
 	// P1.7 might also be used to reset DS1232 watchdog
 	m_lcd_latch = data;
+	m_hd44780->db_w(data);
 }
 
 WRITE8_MEMBER(piggypas_state::lcd_control_w)
@@ -109,13 +110,9 @@ WRITE8_MEMBER(piggypas_state::lcd_control_w)
 	// RXD (P3.0) = chip select
 	// TXD (P3.1) = register select
 	// INT0 (P3.2) = R/W
-	if (BIT(data, 0))
-	{
-		if (BIT(data, 2))
-			m_lcd_latch = m_hd44780->read(BIT(data, 1));
-		else
-			m_hd44780->write(BIT(data, 1), m_lcd_latch);
-	}
+	m_hd44780->e_w(BIT(data, 0));
+	m_hd44780->rs_w(BIT(data, 1));
+	m_hd44780->rw_w(BIT(data, 2));
 
 	// T0 (P3.4) = output shift clock (serial data present at P1.0)
 	// T1 (P3.5) = output latch enable

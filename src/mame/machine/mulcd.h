@@ -19,10 +19,10 @@ public:
 
 	void set_contrast(float contrast) { m_contrast = contrast; }
 	void set_leds(u8 leds) { m_leds = leds; }
-	u8 data_read() { return m_lcd->data_read(); }
-	u8 control_read() { return m_lcd->control_read(); }
-	void data_write(u8 data) { m_lcd->data_write(data); }
-	void control_write(u8 data) { m_lcd->control_write(data); }
+	u8 data_read() { return m_lcd->data_r(); }
+	u8 control_read() { return m_lcd->control_r(); }
+	void data_write(u8 data) { m_lcd->data_w(data); }
+	void control_write(u8 data) { m_lcd->control_w(data); }
 
 
 protected:

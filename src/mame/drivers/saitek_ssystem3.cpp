@@ -200,13 +200,17 @@ WRITE8_MEMBER(ssystem3_state::control_w)
 	if (data & ~m_control & 4)
 	{
 		m_shift = m_shift << 1 | m_lcd->do_r();
-		u64 out2 = m_shift | 0x100;
+		u8 out2 = m_shift;
 
 		// weird TTL maze, I assume it's a hw kludge to fix a bug after the maskroms were already manufactured
 		if (BIT(m_shift, 3) & ~(BIT(m_shift, 1) ^ BIT(m_shift, 4)) & ~(BIT(m_lcd_q, 7) & BIT(m_lcd_q, 23)))
 			out2 ^= 0x12;
 
-		m_display->matrix(1, out2 << 32 | m_lcd_q);
+		// update display
+		for (int i = 0; i < 4; i++)
+			m_display->write_row(i, m_lcd_q >> (8*i) & 0xff);
+		m_display->write_row(4, out2 | 0x100);
+		m_display->update();
 	}
 
 	// PB3: device serial out
@@ -312,8 +316,10 @@ void ssystem3_state::ssystem3(machine_config &config)
 	screen.set_size(1920/2, 729/2);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(1, 32+8+1);
+	PWM_DISPLAY(config, m_display).set_size(5, 9);
+	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_bri_levels(0.25);
+
 	config.set_default_layout(layout_saitek_ssystem3);
 
 	/* sound hardware */
@@ -339,8 +345,8 @@ ROM_START( ssystem3 )
 	ROM_REGION( 0x100, "nvram", 0 ) // default settings
 	ROM_LOAD( "nvram", 0, 0x100, CRC(b5dddc7b) SHA1(3be9ec8359cc9ef16a04f28dfd24f9ffe1a2fca9) )
 
-	ROM_REGION( 53511, "screen", 0)
-	ROM_LOAD( "ssystem3.svg", 0, 53511, CRC(a2820cc8) SHA1(2e922bb2d4a244931c1e7dafa84910dee5ab2623) )
+	ROM_REGION( 53469, "screen", 0)
+	ROM_LOAD( "ssystem3.svg", 0, 53469, CRC(0479eac3) SHA1(6f26c8dfab2c8456cf576ea4ca6ab7a8445bf5e5) )
 ROM_END
 
 } // anonymous namespace
