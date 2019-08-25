@@ -146,7 +146,8 @@ u8 ss50_interface_port_device::read(offs_t offset)
 {
 	if (m_card == nullptr)
 	{
-		logerror("%s: Read from unspecified interface (RS = %X)\n", machine().describe_context(), offset);
+		if (!machine().side_effects_disabled())
+			logerror("%s: Read from unspecified interface (RS = %X)\n", machine().describe_context(), offset);
 		return 0xff;
 	}
 
