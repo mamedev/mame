@@ -46,6 +46,7 @@ TMP47C241MG = TCLS-47 series 4-bit CPU with 2048x8 internal ROM
 #include "emu.h"
 #include "cpu/cr16b/cr16b.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 class glcx_state : public driver_device
 {
@@ -91,6 +92,8 @@ void glcx_state::glcx(machine_config &config)
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
 	screen.set_screen_update(FUNC(glcx_state::screen_update));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("glcx");
 }
 
 ROM_START( gl6600cx )
