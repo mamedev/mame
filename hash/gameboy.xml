@@ -5801,14 +5801,20 @@
 	</software>
 
 	<software name="elevator">
-		<description>Elevator Action (Euro, USA)</description>
+		<description>Elevator Action (Euro, USA, Chn)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
-		<info name="serial" value="DMG-EA-USA, DMG-EA-NOE"/>
+		<info name="serial" value="DMG-EA-USA, DMG-EA-NOE, DMG-117 CHN"/>
+		<info name="alt_title" value="ELEVATOR Action 电梯大盗"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
+			<!-- Chinese cart
+			<feature name="pcb" value="DMG-BEAN-M13" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
+			-->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-eae-0.u1" size="65536" crc="b749a927" sha1="c0c9de672a31f314e98392160fc343cf46ee98b9"/>
@@ -5836,9 +5842,12 @@
 		<info name="alt_title" value="Exodus - Journey to the Promised Land (Box)"/>
 		<info name="serial" value="EGB-1"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="" /> <!-- Unnamed Color Dreams PCB -->
+			<feature name="rom" value="[9524GJN]" />
+			<feature name="flipflop" value="[SN74LS377N]" />
 			<feature name="slot" value="rom_wisdom" />
 			<dataarea name="rom" size="131072">
-				<rom name="exodus - journey to the promised land (usa) (unl).bin" size="131072" crc="2e5497ef" sha1="685d5a47a1fc386d7b451c8b2733e654b7779b71"/>
+				<rom name="exodus gameboy ver 1.0.rom" size="131072" crc="2e5497ef" sha1="685d5a47a1fc386d7b451c8b2733e654b7779b71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5858,10 +5867,10 @@
 
 	<software name="f1race" supported="partial">
 		<!-- Notes: Also released by NP in 2000-03 -->
-		<description>F-1 Race (World, Rev. A)</description>
+		<description>F-1 Race (World, Rev. 1)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-F1A, DMG-F1-USA, DMG-F1-(NOE/EUR)"/>
+		<info name="serial" value="DMG-F1A, DMG-F1-USA, DMG-F1-NOE, DMG-F1-EUR"/>
 		<info name="release" value="19901109 (JPN)"/>
 		<info name="alt_title" value="F1レース"/>
 		<part name="cart" interface="gameboy_cart">
@@ -6111,7 +6120,7 @@
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="famista 3 (japan).bin" size="262144" crc="bdc4ccc3" sha1="ac4b03e11e2ba135d0427c8b1da7de57c006b4a6"/>
+				<rom name="dmg-n3j-0.u1" size="262144" crc="bdc4ccc3" sha1="ac4b03e11e2ba135d0427c8b1da7de57c006b4a6"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6171,7 +6180,7 @@
 		<description>Ferrari Grand Prix Challenge (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-XP-USA, DMG-XP-(NOE/ESP)"/>
+		<info name="serial" value="DMG-XP-USA, DMG-XP-NOE, DMG-XP-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -6247,11 +6256,14 @@
 		<description>FIFA Road to the World Cup '98 (Euro)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="DMG-A8SP-EUU"/>
+		<info name="serial" value="DMG-A8SP-EUU, DMG-A8SP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="fifa road to the world cup '98 (europe).bin" size="524288" crc="cdf6a5ac" sha1="5ef615a919ea967e749febb046f9d097d91fab0d"/>
+				<rom name="dmg-a8sp-0.u1" size="524288" crc="cdf6a5ac" sha1="5ef615a919ea967e749febb046f9d097d91fab0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6290,9 +6302,12 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-HR-USA, DMG-HR-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="fighting simulator 2 in 1 (usa, europe).bin" size="131072" crc="52678ae8" sha1="9073276d8adf1e59829ae48073b42ae19c9770ce"/>
+				<rom name="dmg-hre-0.u1" size="131072" crc="52678ae8" sha1="9073276d8adf1e59829ae48073b42ae19c9770ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6301,7 +6316,7 @@
 		<description>Final Fantasy Adventure (USA)</description>
 		<year>1991</year>
 		<publisher>Square</publisher>
-		<info name="serial" value="DMG-FF-USA"/>
+		<info name="serial" value="DMG-FF-USA, DMG-FF-USA-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
@@ -6316,7 +6331,7 @@
 		<description>Final Fantasy Legend II (USA)</description>
 		<year>1991</year>
 		<publisher>Square</publisher>
-		<info name="serial" value="DMG-S2-USA"/>
+		<info name="serial" value="DMG-S2-USA, DMG-S2-USA-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -6331,7 +6346,7 @@
 		<description>Final Fantasy Legend III (USA)</description>
 		<year>1993</year>
 		<publisher>Squaresoft</publisher>
-		<info name="serial" value="DMG-OS-USA"/>
+		<info name="serial" value="DMG-OS-USA, DMG-OS-USA-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -6346,7 +6361,7 @@
 		<description>The Final Fantasy Legend (USA)</description>
 		<year>1990</year>
 		<publisher>Square</publisher>
-		<info name="serial" value="DMG-SA-USA"/>
+		<info name="serial" value="DMG-SA-USA, DMG-SA-USA-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-GDAN-03" />
 			<feature name="u1" value="U1 PRG" />
@@ -6396,9 +6411,12 @@
 		<publisher>Sofel</publisher>
 		<info name="serial" value="DMG-US-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="fish dude (usa).bin" size="65536" crc="4b929719" sha1="72d11ae07b6701efe109d20dad6107ff6f603ea5"/>
+				<rom name="dmg-use-0.u1" size="65536" crc="4b929719" sha1="72d11ae07b6701efe109d20dad6107ff6f603ea5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6583,9 +6601,12 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AFKE-USA, DMG-AFKP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="frank thomas big hurt baseball (usa, europe).bin" size="524288" crc="9a494ae6" sha1="ccea5b85ed334a2bf7bd4449f07bbf3a86841dfd"/>
+				<rom name="dmg-afkp-0.u1" size="524288" crc="9a494ae6" sha1="ccea5b85ed334a2bf7bd4449f07bbf3a86841dfd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6713,9 +6734,15 @@
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="不思議のダンジョン 風来のシレンGB 月影村の怪物"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DEDN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="fushigi no dungeon - fuurai no shiren gb - tsukikage mura no kaibutsu (japan).bin" size="524288" crc="2962afb4" sha1="920ef94c05ac741047a266cb1668c881eab2937c"/>
+				<rom name="dmg-afdj-0.u1" size="524288" crc="2962afb4" sha1="920ef94c05ac741047a266cb1668c881eab2937c"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
