@@ -56,7 +56,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
 	DECLARE_READ8_MEMBER(champbja_protection_r);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	DECLARE_WRITE8_MEMBER(tilemap_w);
 	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
