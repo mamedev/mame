@@ -172,17 +172,10 @@ MACHINE_RESET_MEMBER(gameplan_state,trvquest)
 	m_video_data = 0;
 }
 
-INTERRUPT_GEN_MEMBER(gameplan_state::trvquest_interrupt)
-{
-	m_via_2->write_ca1(1);
-	m_via_2->write_ca1(0);
-}
-
 void gameplan_state::trvquest(machine_config &config)
 {
 	M6809(config, m_maincpu, XTAL(6'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gameplan_state::cpu_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gameplan_state::trvquest_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
