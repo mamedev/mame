@@ -14,17 +14,16 @@ A couple of things unaccounted for:
 
 No backgrounds ROMs from the original board...
 - TOSHIBA TRJ-100 installed at the second board should contain the image
-  as U.S. Championship V'Ball has a TRJ-101 that contains it. A custom made
-  adapter is needed to dump it.
+  as U.S. Championship V'Ball has a TRJ-101 that contains it. It also contains
+  related logic to generate 16-bits address and to decode pixels at 6MHz pixel
+  clock, based on given attributes in multicycles, screen flip flag, and clocks.
+  It seems almost equivalent to Double Dragon's  IC38, 39, 40, 53, 54, and all
+  logic in the page 9 of the schematics for the second board.
 - Got two bootleg sets with background gfx roms. Using those on the
   original games for now.
 
 OBVIOUS SPEED PROBLEMS...
 - Timers are too fast and/or too slow, and the whole thing's moving too fast
-- TRJ-100 is accessed at about 3MHz speed, but seems to generate 5MHz clock
-  internally. This clock is exposed at the pin 22, and used as a clock at least
-  for some shifter ICs, such as IC110, 111, 112, and 113. Timers might be based
-  on this 5MHz clock, too?
 
 Port 0x2800 on the Sub CPU.
 - All those I/O looking ports on the main CPU (0x3exx and 0x3fxx)
@@ -69,6 +68,114 @@ Input is unique but has a few similarities to DD2 (the coin inputs)
 
 2008-07
 Dip locations and factory settings verified with China Gate US manual.
+
+
+PCB Layout
+----------
+
+TA-0023-P2-03 (Video Board)
+|-----------------------------------------------------|
+|        |      J2      |     |      J1      |        |
+|        ----------------     ----------------        |
+|                                                     |
+|                                                     |
+|        23JB-0                   IC7                 |
+|                                                     |
+|                                                     |
+| X1                                                  |
+|                                                     |
+|                                                     |
+|                                           IC40      |
+|                                                     |
+|                                        |------------|
+|      IC70                              |1           |
+|                                        |            |
+|                                        |            |
+|                         IC78   IC75    |  TRJ-100   |
+|                                        |            |
+|                                        |            |
+|                                        |32          |
+|                                        |------------|
+|                                                     |
+|   IC106     23J7-0  23J8-0  23J9-0  23JA-0          |
+|                                                     |
+|                                                     |
+|                                                     |
+|-----------------------------------------------------|
+
+Clock
+    X1    - 12MHz
+
+PROM
+    23JB-0  - user1 (82S131)
+
+ROMs
+    23J7-0  - gfx2 mask ROM
+    23J8-0  - gfx2 mask ROM
+    23J9-0  - gfx2 mask ROM
+    23JA-0  - gfx2 mask ROM
+    TJR-100 - gfx3 custom ROM (undump)
+
+SRAMs (2KBx8bits) Motorola MCM2016HN55, SANYO LC3517?
+    IC7   - ?
+    IC40  - bgvideoram
+    IC70  - ?
+    IC75  - ?
+    IC78  - ?
+    IC106 - ?
+
+Connectors
+    J1, J2 - 50pins, almost same assignments with ones for Double Dragon.
+             At this moment, 17pin is known to be used for TRJ-100.
+
+
+TRJ-100 pin assigns
+-------------------
+Following assignments are estimated based on the circuit around the TRJ-100 in
+comparison with one for Double Dragon.
+/M2H2 clock is special for this PCB, and M2H is used in Double Dragon instead.
+This signal is created by NAND with M2H (1.5MHz) and MH (3MHz).
+
+Following pictures show each clock timing. '%' is the timing to latch AT[7:0]
+by these clocks.
+        _    ________
+/M2H2 - _\__/%  _____\  duty 1:3, 1.5MHz
+/M2H  -  \_____/%    \  duty 1:1, 1.5MHz, inverted
+          _____
+M2H   -  /%    \_____/  duty 1:1, 1.5MHz
+
+ 1 - VCC
+ 2 I /M2H  - inverted 1.5MHz, used to latch AT[7:0] for A[13:6]
+ 3 I AT0   - connected with bgvideoram d0, used as A6 and A14
+ 4 I AT1   - connected with bgvideoram d1, used as A7 and A15
+ 5 I AT2   - connected with bgvideoram d2, used as A8 and A16
+ 6 I AT3   - connected with bgvideoram d3, used as A9 and BPL0
+ 7 I AT4   - connected with bgvideoram d4, used as A10 and BPL1
+ 8 I AT5   - connected with bgvideoram d5, used as A11 and BPL2
+ 9 I AT6   - connected with bgvideoram d6, used as A12 and BINV
+10 I AT7   - connected with bgvideoram d7, used as A13 and BPA
+11 I /M2H2 - /(M2H & MH), used to latch AT[7:0] for A[16:14], BPL, BIN, and BPA
+12 O BPAL0 - connected with J2 26pin
+13 O BPAL1 - connected with J2 24pin
+14 O BPAL2 - connected with J2 22pin
+15 O BPRT  - connected with J2 20pin
+16 I /CE?  - connected with J1 17pin, always LOW as far as it's observed
+17 I BHP3  - back horizontal (y) position 0, used to select output
+18 I /1P   - screen flip
+19 I BHP0  - back horizontal (y) position 1, used to select output
+20 I BHP1  - back horizontal (y) position 2, used as A5
+21 I BHP2  - back horizontal (y) position 3, used as A6
+22 I /HCLK - inverted 6MHZ clock, used as a pixel clock to shift output
+23 I BVP0  - back vertical (x) position 0, used as A0
+24 I BVP1  - back vertical (x) position 1, used as A1
+25 I BVP2  - back vertical (x) position 2, used as A2
+26 I BVP3  - back vertical (x) position 3, used as A3
+27 O BCOL0 - connected with J2 34pin
+28 O BCOL1 - connected with J2 32pin
+29 O BCOL2 - connected with J2 30pin
+30 O BCOL3 - connected with J2 28pin
+31 GND
+32 GND
 */
 
 #include "emu.h"
