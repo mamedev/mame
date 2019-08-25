@@ -6441,21 +6441,20 @@ ROM_END
 */
 ROM_START( jokercar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1-5.sub", 0x4000, 0x4000, CRC(0000ac96) SHA1(000009b31f3dfa09be321c14fbf0e95d492ad2f2) )
+	ROM_LOAD( "1-5.sub", 0x4000, 0x4000, CRC(fa99f263) SHA1(209c8801a253de562bac091e37b091c8176c0943) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(                  0x0000, 0x2000, 0x0000 )  // filling the R-G bitplanes
-	ROM_LOAD( "4u.8a", 0x2000, 0x1000, CRC(4e520c7a) SHA1(1de3ac4a150160c15f453b0d3f9d3cd3178bfedd) )    // chars gfx
+	ROM_LOAD( "4u.8a", 0x2000, 0x1000, CRC(85044094) SHA1(06db79dd47a47886480bd7a6546a2252cd48b3e3) )    // chars gfx
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.4a",  0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    // cards deck gfx, bitplane 1
-	ROM_LOAD( "6.6a",  0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    // cards deck gfx, bitplane 2
-	ROM_LOAD( "5.7a",  0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    // cards deck gfx, bitplane 3
+	ROM_LOAD( "7.4a",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // cards deck gfx, bitplane 1
+	ROM_LOAD( "6.6a",  0x1000, 0x1000, CRC(712f7fbc) SHA1(dcb73c45f58117b4206bc259d9386c4e16650325) )    // cards deck gfx, bitplane 2
+	ROM_LOAD( "5.7a",  0x2000, 0x1000, CRC(7351706a) SHA1(cde3fefe721ac5d3a725afc53fa609b5cc0c01da) )    // cards deck gfx, bitplane 3
 	
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
-
 
 
 /************************************
