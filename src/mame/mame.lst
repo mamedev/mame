@@ -14253,6 +14253,7 @@ gjmovie                         // Genius Junior Movie (Germany)
 gjrstar                         // Genius Junior Redstar (Germany)
 gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
+gln                             // Genius Leader Notebook
 pitagjr                         // Pitagorin Junior
 
 @source:genpc.cpp
@@ -31630,7 +31631,6 @@ gl4000                          // Genius Leader 4000 Quadro (Germany)
 gl4004                          // Genius Leader 4004 Quadro L (Germany)
 gl5000                          // Genius Leader 5000 (Germany)
 gl5005x                         // Genius Leader 5005X (Germany)
-gln                             // 199? Genius Leader Notebook
 glpn                            // Genius Leader Power Notebook (Germany)
 gmtt                            // 1998 Genius Master Table Top (Germany)
 lexipcm                         // LexiPC Mega 2000 (Germany)

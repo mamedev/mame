@@ -1063,11 +1063,6 @@ ROM_START( gbs5505x )
 	ROM_LOAD( "27-7006-00.u5", 0x000000, 0x200000, CRC(28af3ca7) SHA1(5df7063c7327263c23d5ac2aac3aa66f7e0821c5) )
 ROM_END
 
-ROM_START( gln ) // not Z80 code
-	ROM_REGION( 0x80000, "bios", 0 )
-	ROM_LOAD( "27-5308-00_9524_d.bin", 0x000000, 0x080000, CRC(d1b994ee) SHA1(b5cf0810df0676712e4f30e279cc46c19b4277dd))
-ROM_END
-
 ROM_START( pc1000 )
 	ROM_REGION( 0x20000, "bios", 0 )
 	ROM_LOAD( "27-00780-002-002.u4", 0x000000, 0x020000, CRC(705170ae) SHA1(825ce0ff2c7d0a7b1e2577d1465a37f7e8da383b))
@@ -1107,5 +1102,4 @@ COMP( 1997, gl5005x,  0,      0,      pc2000,   pc2000,  pc2000_state, empty_ini
 COMP( 1997, glpn,     0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998, gmtt ,    0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Master Table Top (Germany)",      MACHINE_IS_SKELETON )
 COMP( 2001, gbs5505x, 0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius BrainStation 5505X (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1993, gln,      0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader Notebook",                 MACHINE_IS_SKELETON )
 COMP( 1999, lexipcm,  0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Lexibook",                "LexiPC Mega 2000 (Germany)",             MACHINE_IS_SKELETON )
