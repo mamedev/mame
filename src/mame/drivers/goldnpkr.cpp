@@ -12108,7 +12108,7 @@ GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init
 GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
 GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
 
-GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    MACHINE_IMPERFECT_GRAPHICS, )
+GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    MACHINE_IMPERFECT_GRAPHICS )
 
 GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, init_vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",     0,                   layout_goldnpkr )
 
