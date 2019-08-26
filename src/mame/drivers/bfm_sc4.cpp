@@ -33886,15 +33886,15 @@ INPUT_PORTS_END
 
 // PR3039 AWP ANT N DECS JIGGY BANK S4         PR3009 JIGGY BANK SOUNDS11        JIGGY BANK  S.SITE
 GAMEL( 200?, sc4adjb,  0,       sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjba, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbb, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbc, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbd, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbe, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbf, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbg, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbh, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4adjbi, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjba, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbb, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbc, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbd, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbe, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbf, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbg, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbh, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4adjbi, sc4adjb, sc4_5reel_alt, sc4adjb, sc4_state, init_sc4adjb, ROT0, "BFM", "Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
 void sc4_state::init_sc4adwta()
