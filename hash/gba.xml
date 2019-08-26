@@ -4154,7 +4154,7 @@
 		<info name="release" value="20151106"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
-			<dataarea name="rom" size="8409344">
+			<dataarea name="rom" size="16777216">
 				<rom name="broken circle (europe) (en,it) (unl).bin" size="16777216" crc="3212c09b" sha1="e04a71dbe7b640cc53e81f447856e60666e64aa3"/>
 			</dataarea>
 		</part>
