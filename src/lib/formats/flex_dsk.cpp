@@ -91,8 +91,8 @@ int flex_format::find_size(io_generic *io, uint32_t form_factor)
 	}
 	if (info.disk_ext[0] || info.disk_ext[1] || info.disk_ext[2]) {
 	  LOG_FORMATS(".");
-	  for (int i = 0; i < sizeof(info.disk_name); i++) {
-		uint8_t ch = info.disk_name[i];
+	  for (int i = 0; i < sizeof(info.disk_ext); i++) {
+		uint8_t ch = info.disk_ext[i];
 		if (ch < 0x20 || ch > 0x7f) {
 		  LOG_FORMATS("[%02x]", ch);
 		} else {
