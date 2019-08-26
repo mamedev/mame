@@ -73,6 +73,71 @@ Dip locations and factory settings verified with China Gate US manual.
 PCB Layout
 ----------
 
+TA-0023-P1-03 (Main Board)
+|-----------------------------------------------------|
+|        |      J1      |     |      J2      |        |
+|        ----------------     ----------------        |
+| X1                                                  |
+|                                                     |
+|                                                     |
+|    LH0080A                                          |
+|                                                     |
+|                                                     |
+|                HD68B09EP    HD68B09EP               |
+|     23J0-0      (main)        (sub)         23J6-0  |
+|                                                     |
+|  YM2151                              23J5-0         |
+|       23J1 23J2  23J3-0      23J4-0                 |
+|        -0   -0                                      |
+|                                                     |
+|                                                     |
+|   YM3012  M6295                                     |
+|                                                     |
+|                                                     |
+|            X2                                       |
+|                                                     |
+|                                             SW2 SW1 |
+|                                                     |
+|                                                     |
+|  VR1           |-------------------|                |
+|                |   ||  JAMMA       |                |
+|----------------|---||--------------|----------------|
+
+Clock
+    X1        - 3.579545MHz
+    X2        - 1.056MHz
+
+CPUs
+    HD68B09EP - HITACHI 6809E for main
+    HD68B09EP - HITACHI 6809E for sub
+    LH0080A   - SHARP Z80 for sound
+
+Sound
+    YM2151    - YAMAHA FM sound
+    YM3012    - YAMAHA DAC for YM2151
+    M6295     - OKI ADPCM
+
+PROM
+    23J5-0    - user1 (82S129)
+
+ROMs
+    23J0-0    - soundcpu EPROM
+    23J1-0    - oki mask ROM
+    23J2-0    - oki mask ROM
+    23J3-0    - maincpu EPROM
+    23J4-0    - sub EPROM
+    23J6-0    - gfx1 mask ROM
+
+SRAMs
+    not listed yet
+
+Others
+    VR1       - Speaker volume
+    SW1       - DIPSW1
+    SW2       - DIPSW2
+    JAMMA     - Standard JAMMA connector
+
+
 TA-0023-P2-03 (Video Board)
 |-----------------------------------------------------|
 |        |      J2      |     |      J1      |        |
@@ -104,29 +169,29 @@ TA-0023-P2-03 (Video Board)
 |-----------------------------------------------------|
 
 Clock
-    X1    - 12MHz
+    X1        - 12MHz
 
 PROM
-    23JB-0  - user1 (82S131)
+    23JB-0    - user1 (82S131)
 
 ROMs
-    23J7-0  - gfx2 mask ROM
-    23J8-0  - gfx2 mask ROM
-    23J9-0  - gfx2 mask ROM
-    23JA-0  - gfx2 mask ROM
-    TJR-100 - gfx3 custom ROM (undump)
+    23J7-0    - gfx2 mask ROM
+    23J8-0    - gfx2 mask ROM
+    23J9-0    - gfx2 mask ROM
+    23JA-0    - gfx2 mask ROM
+    TJR-100   - gfx3 custom ROM (undump)
 
 SRAMs (2KBx8bits) Motorola MCM2016HN55, SANYO LC3517?
-    IC7   - ?
-    IC40  - bgvideoram
-    IC70  - ?
-    IC75  - ?
-    IC78  - ?
-    IC106 - ?
+    IC7       - ?
+    IC40      - bgvideoram
+    IC70      - ?
+    IC75      - ?
+    IC78      - ?
+    IC106     - ?
 
 Connectors
-    J1, J2 - 50pins, almost same assignments with ones for Double Dragon.
-             At this moment, 17pin is known to be used for TRJ-100.
+    J1, J2    - 50pins, almost same assignments with ones for Double Dragon.
+                At this moment, 17pin is known to be used for TRJ-100.
 
 
 TRJ-100 pin assigns
