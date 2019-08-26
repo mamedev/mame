@@ -13,12 +13,16 @@
 
 #include "cpu/se3208/se3208.h"
 #include "screen.h"
+#include "video/vrender0.h"
+#include "sound/vrender0.h"
+#include "emupal.h"
+#include "speaker.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-
+#define IDLE_LOOP_SPEEDUP
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -33,14 +37,14 @@ public:
 	vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void regs_map(address_map &map);
+	void audiovideo_map(address_map &map);
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
-	template<class T> void set_host_screen_tag(T &&tag) { m_host_screen.set_tag(std::forward<T>(tag)); }
+	void set_external_vclk(uint32_t vclk) { m_ext_vclk = vclk; } 
 	bool crt_is_blanked() { return ((m_crtcregs[0] & 0x0200) == 0x0200); }
 	bool crt_active_vblank_irq();
 	void IntReq( int num );
 	int irq_callback();
-	auto idleskip_cb() { return m_idleskip_cb.bind(); }
-	bool irq_pending() { return m_intst & m_inten; }
+	bool irq_pending() { return m_intst; }
 
 protected:
 	// device-level overrides
@@ -51,12 +55,19 @@ protected:
 
 private:
 	required_device <se3208_device> m_host_cpu;
-	required_device <screen_device> m_host_screen;
+	required_device <screen_device> m_screen;
+	required_device <palette_device> m_palette;
+	required_device <vr0video_device> m_vr0vid;
+	required_device <vr0sound_device> m_vr0snd;
+	required_device <speaker_device> m_lspeaker;
+	required_device <speaker_device> m_rspeaker;
 	required_shared_ptr <uint32_t> m_crtcregs;
-	devcb_write_line  m_idleskip_cb;
-
+	required_shared_ptr <uint32_t> m_textureram;
+	required_shared_ptr <uint32_t> m_frameram;
+	
 	address_space *m_host_space;
-	// To move into SoC own device
+	uint32_t m_ext_vclk;
+
 	// INTC
 	uint32_t m_inten;
 	DECLARE_READ32_MEMBER(inten_r);
@@ -108,6 +119,16 @@ private:
 	// Misc
 	DECLARE_READ32_MEMBER( sysid_r );
 	DECLARE_READ32_MEMBER( cfgr_r );
+	
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	
+	// Hacks
+#ifdef IDLE_LOOP_SPEEDUP
+	uint8_t     m_FlipCntRead;
+	DECLARE_WRITE_LINE_MEMBER(idle_skip_resume_w);
+	DECLARE_WRITE_LINE_MEMBER(idle_skip_speedup_w);
+#endif
 };
 
 

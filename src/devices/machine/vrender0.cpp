@@ -19,7 +19,6 @@
 #include "vrender0.h"
 
 
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -39,9 +38,15 @@ DEFINE_DEVICE_TYPE(VRENDER0_SOC, vrender0soc_device, "vrender0", "MagicEyes VRen
 vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VRENDER0_SOC, tag, owner, clock),
 	m_host_cpu(*this, finder_base::DUMMY_TAG),
-	m_host_screen(*this, finder_base::DUMMY_TAG),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette"),
+	m_vr0vid(*this, "vr0vid"),
+	m_vr0snd(*this, "vr0snd"),
+	m_lspeaker(*this, "lspeaker"),
+	m_rspeaker(*this, "rspeaker"),
 	m_crtcregs(*this, "crtcregs"),
-	m_idleskip_cb(*this)
+	m_textureram(*this, "textureram"),
+	m_frameram(*this, "frameram")
 {
 }
 
@@ -88,6 +93,13 @@ void vrender0soc_device::regs_map(address_map &map)
 //  map(0x04000, 0x043ff)                            // RAMDAC & PLL
 }
 
+void vrender0soc_device::audiovideo_map(address_map &map)
+{
+	map(0x00000000, 0x0000ffff).m(m_vr0vid, FUNC(vr0video_device::regs_map));
+	map(0x00800000, 0x00ffffff).ram().share("textureram");
+	map(0x01000000, 0x017fffff).ram().share("frameram");
+	map(0x01800000, 0x01800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - device-specific machine
@@ -96,8 +108,26 @@ void vrender0soc_device::regs_map(address_map &map)
 
 void vrender0soc_device::device_add_mconfig(machine_config &config)
 {
-	// ...
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+    // evolution soccer defaults
+	m_screen->set_raw((XTAL(14'318'180)*2)/4, 455, 0, 320, 262, 0, 240);
+    m_screen->set_screen_update(FUNC(vrender0soc_device::screen_update));
+    m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
+    m_screen->set_palette(m_palette);
+	
+	VIDEO_VRENDER0(config, m_vr0vid, 14318180);
+	#ifdef IDLE_LOOP_SPEEDUP
+	m_vr0vid->idleskip_cb().set(FUNC(vrender0soc_device::idle_skip_speedup_w));
+	#endif
 
+	PALETTE(config, m_palette, palette_device::RGB_565);
+
+	SPEAKER(config, m_lspeaker).front_left();
+	SPEAKER(config, m_rspeaker).front_right();
+
+	SOUND_VRENDER0(config, m_vr0snd, 0);
+	m_vr0snd->add_route(0, m_lspeaker, 1.0);
+	m_vr0snd->add_route(1, m_rspeaker, 1.0);
 }
 
 
@@ -107,8 +137,12 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 
 void vrender0soc_device::device_start()
 {
+	m_vr0vid->set_areas(reinterpret_cast<uint8_t*>(m_textureram.target()), reinterpret_cast<uint16_t*>(m_frameram.target()));
+	m_vr0snd->set_areas(m_textureram, m_frameram);
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
-	m_idleskip_cb.resolve_safe();
+
+	if (this->clock() == 0)
+		fatalerror("%s: bus clock not setup properly",this->tag());
 
 	for (int i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb),this), (void*)(uintptr_t)i);
@@ -128,6 +162,10 @@ void vrender0soc_device::device_start()
 	save_item(NAME(m_dma[1].src));
 	save_item(NAME(m_dma[1].dst));
 	save_item(NAME(m_dma[1].size));
+	
+#ifdef IDLE_LOOP_SPEEDUP
+	save_item(NAME(m_FlipCntRead));
+#endif
 }
 
 
@@ -138,7 +176,7 @@ void vrender0soc_device::device_start()
 void vrender0soc_device::device_reset()
 {
 	// TODO: improve CRT defaults
-	m_crtcregs[1] = 0x00000022;
+	m_crtcregs[1] = 0x0000002a;
 
 	//m_FlipCount = 0;
 	m_IntHigh = 0;
@@ -151,6 +189,10 @@ void vrender0soc_device::device_reset()
 		m_timer_control[i] = 0xff << 8;
 		m_Timer[i]->adjust(attotime::never);
 	}
+
+#ifdef IDLE_LOOP_SPEEDUP
+	m_FlipCntRead = 0;
+#endif
 }
 
 
@@ -214,7 +256,9 @@ void vrender0soc_device::IntReq( int num )
 		m_host_cpu->set_input_line(SE3208_INT, ASSERT_LINE);
 	}
 
-	m_idleskip_cb(ASSERT_LINE);
+#ifdef IDLE_LOOP_SPEEDUP
+	idle_skip_resume_w(ASSERT_LINE);
+#endif
 }
 
 
@@ -242,7 +286,8 @@ void vrender0soc_device::TimerStart(int which)
 {
 	int PD = (m_timer_control[which] >> 8) & 0xff;
 	int TCV = m_timer_count[which] & 0xffff;
-	attotime period = attotime::from_hz(14318180 * 3) * ((PD + 1) * (TCV + 1)); // TODO : related to CPU clock
+	// TODO: documentation claims this is bus clock, may be slower than the CPU itself
+	attotime period = attotime::from_hz(this->clock()) * ((PD + 1) * (TCV + 1));
 	m_Timer[which]->adjust(period);
 
 //  printf("timer %d start, PD = %x TCV = %x period = %s\n", which, PD, TCV, period.as_string());
@@ -369,6 +414,12 @@ WRITE32_MEMBER(vrender0soc_device::dmac_w)
 	COMBINE_DATA(&m_dma[Which].ctrl);
 }
 
+/*
+ *
+ * CRT Controller
+ *
+ */
+
 READ32_MEMBER(vrender0soc_device::crtc_r)
 {
 	uint32_t res = m_crtcregs[offset];
@@ -380,10 +431,10 @@ READ32_MEMBER(vrender0soc_device::crtc_r)
 			if (crt_is_interlaced()) // Interlace
 				vdisp <<= 1;
 
-			if (m_host_screen->vpos() <= vdisp) // Vertical display enable status
+			if (m_screen->vpos() <= vdisp) // Vertical display enable status
 				res |=  0x4000;
 
-			if (m_host_screen->hpos() > hdisp) // horizontal & vertical blank period
+			if (m_screen->hpos() > hdisp) // horizontal & vertical blank period
 				res &= ~0x2000;
 			else
 				res |=  0x2000;
@@ -481,7 +532,7 @@ bool vrender0soc_device::crt_active_vblank_irq()
 		return true;
 
 	// bit 3 of CRTC reg -> select display start even/odd fields
-	return (m_host_screen->frame_number() & 1) ^ ((m_crtcregs[0] & 8) >> 3);
+	return (m_screen->frame_number() & 1) ^ ((m_crtcregs[0] & 8) >> 3);
 }
 
 void vrender0soc_device::crtc_update()
@@ -528,8 +579,11 @@ void vrender0soc_device::crtc_update()
 		m_crtcregs[0x24 / 4] = ((vtot & 0x7ff) - 1);
 	}
 
-	// TODO: the two Sealy games doesn't set this, eventually need to parametrize this one up
-	uint32_t pixel_clock = (BIT(m_crtcregs[0x04 / 4], 3)) ? 14318180 : 14318180*2;
+	// ext vclk set up by Sealy games in menghong.cpp
+	uint32_t pixel_clock = (BIT(m_crtcregs[0x04 / 4], 3)) ? 14318180 : m_ext_vclk;
+	if (pixel_clock == 0)
+		fatalerror("%s: Accessing external vclk in CRTC parameters, please set it up via setter in config\n",this->tag());
+	
 	if (BIT(m_crtcregs[0x04 / 4], 7))
 		pixel_clock *= 2;
 	// TODO: divider setting = 0 is reserved, guess it just desyncs the signal?
@@ -554,7 +608,7 @@ void vrender0soc_device::crtc_update()
 	//printf("%dX%d %dX%d %d\n",htot, vtot, hdisp, vdisp, pixel_clock);
 
 	rectangle const visarea(0, hdisp - 1, 0, vdisp - 1);
-	m_host_screen->configure(htot, vtot, visarea, HZ_TO_ATTOSECONDS(pixel_clock) * vtot * htot);
+	m_screen->configure(htot, vtot, visarea, HZ_TO_ATTOSECONDS(pixel_clock) * vtot * htot);
 }
 
 // accessed by cross puzzle
@@ -562,15 +616,70 @@ READ32_MEMBER(vrender0soc_device::sysid_r)
 {
 	// Device ID: VRender0+ -> 0x0a
 	// Revision Number -> 0x00
+	logerror("%s: read SYSID\n",this->tag());
 	return 0x00000a00;
 }
 
 READ32_MEMBER(vrender0soc_device::cfgr_r)
 {
-	// TODO: this truly needs real HW verification
+	// TODO: this truly needs real HW verification, 
+	//       only Cross Puzzle reads this so far so leaving a logerror
 	// -x-- ---- Main Clock select (0 -> External Clock)
 	// --xx x--- Reserved for Chip Test Mode
 	// ---- -xx- Local ROM Data Bus Width (01 -> 16 bit)
 	// ---- ---x Local Memory Bus Width (0 -> 16 bit)
-	return 0x00000002;
+	logerror("%s: read CFGR\n",this->tag());
+	return 0x00000041;
 }
+
+/*
+ *
+ * Video configuration
+ *
+ */
+
+uint32_t vrender0soc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (crt_is_blanked()) // Blank Screen
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
+
+	// TODO: chip can do superimposing, cfr. TCOL register in CRTC
+	m_vr0vid->screen_update(screen, bitmap, cliprect);
+	return 0;
+}
+
+WRITE_LINE_MEMBER(vrender0soc_device::screen_vblank)
+{
+	// rising edge
+	if (state)
+	{
+		if (crt_active_vblank_irq() == true)
+			IntReq(24);      //VRender0 VBlank
+
+		m_vr0vid->execute_drawing();
+	}
+}
+
+/*
+ *
+ * Hacks
+ *
+ */
+
+#ifdef IDLE_LOOP_SPEEDUP
+WRITE_LINE_MEMBER(vrender0soc_device::idle_skip_resume_w)
+{
+	m_FlipCntRead = 0;
+	m_host_cpu->resume(SUSPEND_REASON_SPIN);
+}
+
+WRITE_LINE_MEMBER(vrender0soc_device::idle_skip_speedup_w)
+{
+	m_FlipCntRead++;
+	if (m_FlipCntRead >= 16 && irq_pending() == false && state == ASSERT_LINE)
+		m_host_cpu->suspend(SUSPEND_REASON_SPIN, 1);
+}
+#endif
