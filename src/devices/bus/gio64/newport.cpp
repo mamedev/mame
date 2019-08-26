@@ -47,7 +47,7 @@
 #define LOG_REJECTS     (1 << 9)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP | LOG_XMAP | LOG_REX3 | LOG_RAMDAC | LOG_COMMANDS | LOG_REJECTS)
 
-#define VERBOSE         (LOG_REX3 | LOG_CMAP | LOG_XMAP | LOG_COMMANDS)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(XMAP9,      xmap9_device,      "xmap9",      "SGI XMAP9")
@@ -2925,9 +2925,10 @@ uint32_t newport_base_device::do_pixel_read()
 	}
 	LOGMASKED(LOG_COMMANDS, "Read %08x from %04x, %04x\n", ret, src_x, src_y);
 	m_rex3.m_x_start_i++;
+	int16_t dy = (m_rex3.m_y_end_i < m_rex3.m_y_start_i) ? -1 : 1;
 	if (m_rex3.m_x_start_i > m_rex3.m_x_end_i)
 	{
-		m_rex3.m_y_start_i++;
+		m_rex3.m_y_start_i += dy;
 		m_rex3.m_x_start_i = m_rex3.m_x_save;
 	}
 
