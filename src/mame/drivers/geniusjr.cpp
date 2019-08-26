@@ -172,8 +172,9 @@ public:
 	{
 	}
 
-	void gln(machine_config &config);
 	void gj4000(machine_config &config);
+	void gln(machine_config &config);
+	void gls(machine_config &config);
 	void gj5000(machine_config &config);
 	void gjrstar(machine_config &config);
 	void gjmovie(machine_config &config);
@@ -237,6 +238,13 @@ void geniusjr_state::gln(machine_config &config)
 	subdevice<software_list_device>("cart_list")->set_original("gln");
 }
 
+void geniusjr_state::gls(machine_config &config)
+{
+	gj4000(config);
+
+	subdevice<software_list_device>("cart_list")->set_original("gls");
+}
+
 void geniusjr_state::gj5000(machine_config &config)
 {
 	M68HC05L9(config, m_maincpu, 8'000'000); // unknown clock (type also uncertain)
@@ -289,6 +297,14 @@ ROM_START( gjmovie )
 	ROM_LOAD( "lh532hlk.bin", 0x000000, 0x40000, CRC(2e64c296) SHA1(604034f902e20851cb9af60964031a508ceef83e))
 ROM_END
 
+ROM_START( pitagjr )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "extrom", 0 )
+	ROM_LOAD( "lh532hjt_9811d.u3", 0x00000, 0x40000, CRC(23878b45) SHA1(8f3c41c10cfde9d76763c3a8701ec6616db4ab40) )
+ROM_END
+
 ROM_START( gjrstar )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
@@ -321,12 +337,12 @@ ROM_START( gln )
 	ROM_LOAD( "27-5308-00_9524_d.bin", 0x000000, 0x080000, CRC(d1b994ee) SHA1(b5cf0810df0676712e4f30e279cc46c19b4277dd))
 ROM_END
 
-ROM_START( pitagjr )
+ROM_START( gls )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "extrom", 0 )
-	ROM_LOAD( "lh532hjt_9811d.u3", 0x00000, 0x40000, CRC(23878b45) SHA1(8f3c41c10cfde9d76763c3a8701ec6616db4ab40) )
+	ROM_REGION( 0x80000, "extrom", 0 )
+	ROM_LOAD( "gls.bin", 0x000000, 0x080000, NO_DUMP )
 ROM_END
 
 
@@ -339,3 +355,4 @@ COMP( 1996, gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty
 COMP( 1998, gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998, gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
 COMP( 1993, gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Notebook",            MACHINE_IS_SKELETON )
+COMP( 199?, gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Select",              MACHINE_IS_SKELETON ) // placeholder driver to attach cartridge dumps to

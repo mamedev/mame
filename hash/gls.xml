@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="gls" description="VTech Genius Leader Select cartridges">
+
+	<software name="srs">
+		<description>Spielend Richtig Schreiben</description>
+		<year>199?</year>
+		<publisher>Video Technology</publisher>
+		<info name="serial" value="80-2463" />
+
+		<part name="rom" interface="genius_rom">
+			<dataarea name="rom" size="0x40000">
+				<rom name="27-05763-000.u2" size="0x40000" crc="5c6ada02" sha1="ee948b077a20fd3f4b4cdfcabeb09b17f9cc99c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
