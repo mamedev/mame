@@ -56,6 +56,14 @@ a2bus_computereyes2_device::a2bus_computereyes2_device(const machine_config &mco
 
 void a2bus_computereyes2_device::device_start()
 {
+	save_item(NAME(m_x));
+	save_item(NAME(m_y));
+	save_item(NAME(m_cer0));
+	save_item(NAME(m_cer1));
+	save_item(NAME(m_cer2));
+	save_item(NAME(m_threshold));
+	save_item(NAME(m_bActive));
+	save_item(NAME(m_a2_bitmap));
 }
 
 void a2bus_computereyes2_device::device_reset()
