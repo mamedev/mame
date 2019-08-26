@@ -6772,9 +6772,15 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="game &amp; watch gallery (europe).bin" size="262144" crc="96ecc1e0" sha1="31186cff6bb548ecd0c91c07f16dc98de9c19ea2"/>
+				<rom name="dmg-agap-0.u1" size="262144" crc="96ecc1e0" sha1="31186cff6bb548ecd0c91c07f16dc98de9c19ea2"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6826,14 +6832,17 @@
 
 	<software name="gbgall">
 		<!-- Notes: SGB enhanced -->
-		<description>Game Boy Gallery (Euro)</description>
+		<description>Game Boy Gallery (Euro, Aus)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-AGGA-(EUR/AUS/UKV)"/>
+		<info name="serial" value="DMG-AGGA-EUR, DMG-AGGA-AUS, DMG-AGGA-UKV, DMG-AGGA-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="game boy gallery (europe).bin" size="131072" crc="263fd152" sha1="07b6174a413858f84bfc480169945c7fd1a372b9"/>
+				<rom name="dmg-agga-0.u1" size="131072" crc="263fd152" sha1="07b6174a413858f84bfc480169945c7fd1a372b9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6917,9 +6926,15 @@
 		<info name="release" value="19910521"/>
 		<info name="alt_title" value="ゲームボーイウォーズ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="game boy wars (japan).bin" size="262144" crc="f5d364db" sha1="9f725d3cbbeb5e27b7ee36304f077f78d9ad074e"/>
+				<rom name="dmg-gwj-0.u1" size="262144" crc="f5d364db" sha1="9f725d3cbbeb5e27b7ee36304f077f78d9ad074e"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6967,7 +6982,7 @@
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ゲームで発見!!たまごっち"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />
+			<feature name="pcb" value="DMG-DECN-10" /> <!-- Also with DMG-DECN(K)-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM [LH5268ANF-10PLL]" />
@@ -7096,16 +7111,19 @@
 	</software>
 
 	<software name="yanchamr">
-		<description>Ganso!! Yancha Maru (Jpn)</description>
+		<description>Ganso!! Yancha Maru (Jpn, Chn)</description>
 		<year>1991</year>
 		<publisher>Irem</publisher>
-		<info name="serial" value="DMG-YMJ (IG-05)"/>
+		<info name="serial" value="DMG-YMJ (IG-05), DMG-107 CHN"/>
 		<info name="release" value="19910711"/>
-		<info name="alt_title" value="元祖!!ヤンチャ丸"/>
+		<info name="alt_title" value="元祖!!ヤンチャ丸 (Japan), 元相!! ヤンチャ丸 元柤快杰·元租快傑 (China)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-M11" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="ganso!! yancha maru (japan).bin" size="65536" crc="004443e6" sha1="76be351eac00749553c942b6f8002e65d8a35986"/>
+				<rom name="u2" size="65536" crc="004443e6" sha1="76be351eac00749553c942b6f8002e65d8a35986"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7116,9 +7134,12 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-L4-UKV, DMG-L4-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="garfield labyrinth (europe).bin" size="131072" crc="51b8626d" sha1="87913e557dfb98c5f2a0f42ea074c36eca57a4f7"/>
+				<rom name="dmg-l4x-0.u1" size="131072" crc="51b8626d" sha1="87913e557dfb98c5f2a0f42ea074c36eca57a4f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7144,7 +7165,7 @@
 		<description>Gauntlet II (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
-		<info name="serial" value="DMG-G2-USA, DMG-G2-(UKV/ESP)"/>
+		<info name="serial" value="DMG-G2-USA, DMG-G2-UKV, DMG-G2-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-01" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -7175,32 +7196,38 @@
 	</software>
 
 	<software name="gbgenjin" cloneof="bckid">
-		<description>GB Genjin (Jpn)</description>
+		<description>GB Genjin (Jpn, Chn)</description>
 		<year>1992</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="DMG-GKJ"/>
+		<info name="serial" value="DMG-GKJ, DMG-204 CHN"/>
 		<info name="release" value="19921127"/>
-		<info name="alt_title" value="GB原人"/>
+		<info name="alt_title" value="GB原人 (Japan), GB原人 BONK'S ADVENTURE (China)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-M11" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="gb genjin (japan).bin" size="262144" crc="690227f6" sha1="c2e98c76e49155e7b9815e0c33ae6cf71daaee2c"/>
+				<rom name="u2" size="262144" crc="690227f6" sha1="c2e98c76e49155e7b9815e0c33ae6cf71daaee2c"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gbgenjn2" cloneof="bckid2">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
-		<description>GB Genjin 2 (Jpn)</description>
+		<description>GB Genjin 2 (Jpn, Chn)</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="DMG-RJJ"/>
+		<info name="serial" value="DMG-RJJ, DMG-218 CHN"/>
 		<info name="release" value="19941021"/>
-		<info name="alt_title" value="GB原人2"/>
+		<info name="alt_title" value="GB原人2 (Japan), GB原人2 BONK'S REVENGE (China)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-M14" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="gb genjin 2 (japan).bin" size="262144" crc="6f7ad5d9" sha1="82c1e3dd8b425fb49a1d1c25813002b23963a84a"/>
+				<rom name="u2" size="262144" crc="6f7ad5d9" sha1="82c1e3dd8b425fb49a1d1c25813002b23963a84a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7267,7 +7294,7 @@
 		<description>Gear Works (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
-		<info name="serial" value="DMG-G8-USA, DMG-G8-(FAH/NOE)"/>
+		<info name="serial" value="DMG-G8-USA, DMG-G8-FAH, DMG-G8-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -7288,12 +7315,14 @@
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="ゲゲゲの鬼太郎 妖怪創造主現る!"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="pcb" value="DMG-GDAN-03" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
+			<feature name="u3" value="U3 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
-				<rom name="gegege no kitarou - youkai souzoushu arawaru! (japan).bin" size="262144" crc="28e507b0" sha1="fa52c8f0bb31e25be829c7d4f52a7f4db1d5ef5b"/>
+				<rom name="dmg-aktj-0.u1" size="262144" crc="28e507b0" sha1="fa52c8f0bb31e25be829c7d4f52a7f4db1d5ef5b"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -7350,9 +7379,12 @@
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="原人コレクション GB原人, GB原人2, GB原人ランド"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-M-BFAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1" />
 			<feature name="slot" value="rom_mbc1col" />
 			<dataarea name="rom" size="1048576">
-				<rom name="genjin collection (japan).bin" size="1048576" crc="b2eedd36" sha1="a9f953e2a3680078e51cb42fac44edf81991737b"/>
+				<rom name="dmg-ag3j-0.u1" size="1048576" crc="b2eedd36" sha1="a9f953e2a3680078e51cb42fac44edf81991737b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7434,7 +7466,7 @@
 		<description>Ghostbusters II (Euro, USA)</description>
 		<year>1990</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="DMG-GB-USA, DMG-GB-(NOE/SCN)"/>
+		<info name="serial" value="DMG-GB-USA, DMG-GB-NOE, DMG-GB-SCN"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -7491,11 +7523,14 @@
 		<description>Glücksrad (Ger)</description>
 		<year>1990</year>
 		<publisher>GameTek</publisher>
-		<info name="serial" value="DMG-WF-NOE"/>
+		<info name="serial" value="DMG-WF-NOE, DMG-WF-NOE-1"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN(K)-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="gluecksrad (germany).bin" size="131072" crc="e8b26577" sha1="638cd5087b53b7fe7c6ece99fd973f98c0c09ebe"/>
+				<rom name="dmg-wfd-0.u1" size="131072" crc="e8b26577" sha1="638cd5087b53b7fe7c6ece99fd973f98c0c09ebe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7649,11 +7684,14 @@
 		<description>Godzilla (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Toho</publisher>
-		<info name="serial" value="DMG-GZ-USA (TBG-3), DMG-GZ-(NOE-1/ESP)"/>
+		<info name="serial" value="DMG-GZ-USA (TBG-3), DMG-GZ-NOE-1, DMG-GZ-ESP"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="godzilla (usa, europe).bin" size="131072" crc="fe4f80b7" sha1="c0fa19386aa1e325af42e8dd2caf8e66112b9578"/>
+				<rom name="dmg-gze-0.u1" size="131072" crc="fe4f80b7" sha1="c0fa19386aa1e325af42e8dd2caf8e66112b9578"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7681,18 +7719,18 @@
 		<description>Golf (World)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-GOA, DMG-GO-USA, DMG-GO-(EUR/ESP/NOE/UKV)"/>
+		<info name="serial" value="DMG-GOA, DMG-GO-USA, DMG-GO-EUR, DMG-GO-ESP, DMG-GO-NOE, DMG-GO-UKV, DMG-GO-ESP-1"/>
 		<info name="release" value="19891128 (JPN)"/>
 		<info name="alt_title" value="ゴルフ"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-GDAN-02" />
+			<feature name="pcb" value="DMG-GDAN-02" /> <!-- Also with DMG-GDAN-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2-A]" />
 			<feature name="u3" value="U3 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
-				<rom name="golf (world).bin" size="131072" crc="6ed10383" sha1="2acee1a14ba611e73b0b7d6bce170107213fcc0c"/>
+				<rom name="dmg-goa-0.u1" size="131072" crc="6ed10383" sha1="2acee1a14ba611e73b0b7d6bce170107213fcc0c"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -7744,9 +7782,15 @@
 		<info name="release" value="200203xx"/>
 		<info name="alt_title" value="ゴールド シカクいアタマをマルくする。 合格ボーイGOLD ■いアタマを●くする。 国語 算数 理科 社会 常識の書 スペシャルエディション"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A06-01" />
+			<feature name="u1" value="U1 2M/4M/8M-MROM" />
+			<feature name="u2" value="U2 MBC-5" />
+			<feature name="u3" value="U3 64K-SRAM" /> 
+			<feature name="u4" value="U4 MM1134A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="goukaku boy series - shikakui atama o marukusuru - joushiki no sho (japan).bin" size="1048576" crc="5d43a385" sha1="d367f2dab5eacb10e785a13a2550ca7cc3e54177"/>
+				<rom name="dmg-bs4j-0.u1" size="1048576" crc="5d43a385" sha1="d367f2dab5eacb10e785a13a2550ca7cc3e54177"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -7763,7 +7807,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
-			<feature name="u2" value="U2 MBC-5" />
+			<feature name="u2" value="U2 MBC-5 [MBC5 P-2]" />
 			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" /> <!-- Winbond RAM -->
 			<feature name="u4" value="U4 MM1134A [6735]" />
 			<feature name="batt" value="Batt CR1616" />
@@ -7786,7 +7830,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
-			<feature name="u2" value="U2 MBC-5" />
+			<feature name="u2" value="U2 MBC-5 [MBC5 P-2]" />
 			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" /> <!-- Winbond RAM -->
 			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
@@ -7919,7 +7963,7 @@
 	</software>
 
 	<software name="gbsyoji">
-		<description>Goukaku Boy Series - Gakken - Yojijukugo 288 (Jpn, Rev. A)</description>
+		<description>Goukaku Boy Series - Gakken - Yojijukugo 288 (Jpn, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AY3J-JPN"/>
@@ -8061,9 +8105,12 @@
 		<info name="release" value="19970124"/>
 		<info name="alt_title" value="合格ボーイシリーズ セットで覚える 日本史ターゲット201"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="goukaku boy series - nihonshi target 201 (japan).bin" size="262144" crc="cf133379" sha1="d6178851d778bf794a0fce14a831f6e2cd991f22"/>
+				<rom name="dmg-an3j-0.u1" size="262144" crc="cf133379" sha1="d6178851d778bf794a0fce14a831f6e2cd991f22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8252,7 +8299,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
-			<feature name="u2" value="U2 MBC-5" />
+			<feature name="u2" value="U2 MBC-5 [MBC5 P-1]" />
 			<feature name="u3" value="U3 64K-SRAM [LH5164AN-10L]" />    <!-- Sharp RAM -->
 			<feature name="u4" value="U4 MM1134A [6735]" />
 			<feature name="batt" value="Batt CR1616" />
