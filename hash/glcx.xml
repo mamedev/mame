@@ -25,7 +25,7 @@ On one was the highest address line set to HIGH, on the other one this address l
 
 	<software name="englisha" supported="no">
 		<description>Englisch für Anfänger</description>
-		<year>200?</year>
+		<year>1999</year>
 		<publisher>Video Technology</publisher>
 		<info name="serial" value="80-28071" />
 
@@ -38,7 +38,7 @@ On one was the highest address line set to HIGH, on the other one this address l
 
 	<software name="lmu" supported="no">
 		<description>Länder-Menschen-Umwelt</description>
-		<year>200?</year>
+		<year>1999</year>
 		<publisher>Video Technology</publisher>
 		<info name="serial" value="80-28072" />
 
@@ -51,7 +51,7 @@ On one was the highest address line set to HIGH, on the other one this address l
 
 	<software name="swg" supported="no">
 		<description>Sport-Wissen-Geschichte (8008 CX)</description>
-		<year>200?</year>
+		<year>1999</year>
 		<publisher>Video Technology</publisher>
 		<info name="serial" value="80-28073" />
 
@@ -64,7 +64,7 @@ On one was the highest address line set to HIGH, on the other one this address l
 
 	<software name="allgewis" supported="no">
 		<description>Allgemeinwissen (8008 CX)</description>
-		<year>200?</year>
+		<year>1999</year>
 		<publisher>Video Technology</publisher>
 		<info name="serial" value="80-28074" />
 
