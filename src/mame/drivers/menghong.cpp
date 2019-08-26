@@ -71,15 +71,9 @@ Red PCB, very similar to crzyddz2
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/vrender0.h"
-#include "sound/vrender0.h"
-#include "video/vrender0.h"
 #include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
 
 #include <algorithm>
-
-#define IDLE_LOOP_SPEEDUP
 
 class menghong_state : public driver_device
 {
@@ -87,16 +81,11 @@ public:
 	menghong_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
-		m_textureram(*this, "textureram"),
-		m_frameram(*this, "frameram"),
 		m_flash(*this, "flash"),
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc"),
-		m_vr0vid(*this, "vr0vid"),
-		m_vr0snd(*this, "vr0snd"),
 		m_ds1302(*this, "rtc"),
-		m_screen(*this, "screen"),
 		m_eeprom(*this, "eeprom")
 	{ }
 
@@ -106,25 +95,14 @@ public:
 private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_workram;
-	required_shared_ptr<uint32_t> m_textureram;
-	required_shared_ptr<uint32_t> m_frameram;
 	optional_region_ptr<uint32_t> m_flash;
 	optional_memory_bank m_mainbank;
 
 	/* devices */
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
-	required_device<vr0video_device> m_vr0vid;
-	required_device<vr0sound_device> m_vr0snd;
 	required_device<ds1302_device> m_ds1302;
-	required_device<screen_device> m_screen;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-
-#ifdef IDLE_LOOP_SPEEDUP
-	uint8_t     m_FlipCntRead;
-	DECLARE_WRITE_LINE_MEMBER(idle_skip_resume_w);
-	DECLARE_WRITE_LINE_MEMBER(idle_skip_speedup_w);
-#endif
 
 	uint32_t    m_Bank;
 	uint32_t    m_maxbank;
@@ -140,45 +118,15 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void crzyddz2_mem(address_map &map);
 
 	// PIO
 	DECLARE_READ32_MEMBER(PIOldat_r);
-	DECLARE_WRITE32_MEMBER(PIOldat_w);
-	DECLARE_READ32_MEMBER(PIOedat_r);
 	uint32_t m_PIO;
 	DECLARE_WRITE32_MEMBER(crzyddz2_PIOldat_w);
 	DECLARE_READ32_MEMBER(crzyddz2_PIOedat_r);
 	uint8_t m_crzyddz2_prot;
 };
-
-
-
-uint32_t menghong_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if (m_vr0soc->crt_is_blanked()) // Blank Screen
-	{
-		bitmap.fill(0, cliprect);
-		return 0;
-	}
-
-	m_vr0vid->screen_update(screen, bitmap, cliprect);
-	return 0;
-}
-
-WRITE_LINE_MEMBER(menghong_state::screen_vblank)
-{
-	// rising edge
-	if (state)
-	{
-		if (m_vr0soc->crt_active_vblank_irq() == true)
-			m_vr0soc->IntReq(24);      //VRender0 VBlank
-
-		m_vr0vid->execute_drawing();
-	}
-}
 
 IRQ_CALLBACK_MEMBER(menghong_state::icallback)
 {
@@ -294,36 +242,14 @@ void menghong_state::crzyddz2_mem(address_map &map)
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
 
-	map(0x03000000, 0x0300ffff).m(m_vr0vid, FUNC(vr0video_device::regs_map));
-	map(0x03800000, 0x03ffffff).ram().share("textureram");
-	map(0x04000000, 0x047fffff).ram().share("frameram");
-	map(0x04800000, 0x04800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
+	map(0x03000000, 0x04ffffff).m(m_vr0soc, FUNC(vrender0soc_device::audiovideo_map));
 
 	map(0x05000000, 0x05ffffff).bankr("mainbank");
 	map(0x05000000, 0x05000003).rw(FUNC(menghong_state::FlashCmd_r), FUNC(menghong_state::FlashCmd_w));
 }
 
-#ifdef IDLE_LOOP_SPEEDUP
-
-WRITE_LINE_MEMBER(menghong_state::idle_skip_resume_w)
-{
-	m_FlipCntRead = 0;
-	m_maincpu->resume(SUSPEND_REASON_SPIN);
-}
-
-WRITE_LINE_MEMBER(menghong_state::idle_skip_speedup_w)
-{
-	m_FlipCntRead++;
-	if (m_FlipCntRead >= 16 && m_vr0soc->irq_pending() == false && state == ASSERT_LINE)
-		m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
-}
-#endif
-
 void menghong_state::machine_start()
 {
-	m_vr0vid->set_areas(reinterpret_cast<uint8_t*>(m_textureram.target()), reinterpret_cast<uint16_t*>(m_frameram.target()));
-	m_vr0snd->set_areas(m_textureram, m_frameram);
-
 	if (m_mainbank)
 	{
 		m_maxbank = (m_flash) ? m_flash.bytes() / 0x1000000 : 0;
@@ -339,11 +265,6 @@ void menghong_state::machine_start()
 		}
 	}
 
-#ifdef IDLE_LOOP_SPEEDUP
-	save_item(NAME(m_FlipCntRead));
-
-#endif
-
 	save_item(NAME(m_Bank));
 	save_item(NAME(m_FlashCmd));
 	save_item(NAME(m_PIO));
@@ -354,10 +275,6 @@ void menghong_state::machine_reset()
 	m_Bank = 0;
 	m_mainbank->set_entry(m_Bank);
 	m_FlashCmd = 0xff;
-
-#ifdef IDLE_LOOP_SPEEDUP
-	m_FlipCntRead = 0;
-#endif
 
 	m_crzyddz2_prot = 0x00;
 }
@@ -432,36 +349,16 @@ void menghong_state::crzyddz2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &menghong_state::crzyddz2_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(menghong_state::icallback));
 
+	// HY04 running at 8 MHz
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// evolution soccer defaults
-	m_screen->set_raw((XTAL(14'318'180)*2)/4, 455, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(menghong_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(menghong_state::screen_vblank));
-	m_screen->set_palette("palette");
-
-	VRENDER0_SOC(config, m_vr0soc, 0);
+	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
-	m_vr0soc->set_host_screen_tag(m_screen);
-
-	VIDEO_VRENDER0(config, m_vr0vid, 14318180, m_maincpu);
-	#ifdef IDLE_LOOP_SPEEDUP
-	m_vr0soc->idleskip_cb().set(FUNC(menghong_state::idle_skip_resume_w));
-	m_vr0vid->idleskip_cb().set(FUNC(menghong_state::idle_skip_speedup_w));
-	#endif
-
-	PALETTE(config, "palette", palette_device::RGB_565);
+	m_vr0soc->set_external_vclk(28636360); // Assumed from the only available XTal on PCB
 
 	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
 	EEPROM_93C46_16BIT(config, "eeprom");
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	SOUND_VRENDER0(config, m_vr0snd, 0);
-	m_vr0snd->add_route(0, "lspeaker", 1.0);
-	m_vr0snd->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START( crzyddz2 )
