@@ -26,13 +26,6 @@
 #define IDLE_LOOP_SPEEDUP
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -194,7 +187,6 @@ private:
 	DECLARE_READ16_MEMBER( frameram_r );
 	DECLARE_WRITE16_MEMBER( frameram_w );
 
-	
 	// Hacks
 #ifdef IDLE_LOOP_SPEEDUP
 	uint8_t     m_FlipCntRead;

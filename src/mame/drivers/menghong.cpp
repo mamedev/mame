@@ -144,7 +144,6 @@ private:
 };
 
 
-
 IRQ_CALLBACK_MEMBER(menghong_state::icallback)
 {
 	return m_vr0soc->irq_callback();
