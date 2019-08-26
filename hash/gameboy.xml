@@ -8610,9 +8610,12 @@
 		<publisher>Activision</publisher>
 		<info name="serial" value="DMG-BX-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="heavyweight championship boxing (usa).bin" size="65536" crc="1526a96b" sha1="1d6f1afed7ce7a90a07219449d4d3b679afeda6b"/>
+				<rom name="dmg-bxe-0.u1" size="65536" crc="1526a96b" sha1="1d6f1afed7ce7a90a07219449d4d3b679afeda6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8690,7 +8693,7 @@
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
-				<rom name="hercules no eikou - ugokidashita kamigami (japan).bin" size="262144" crc="4f8a61bf" sha1="c12c60b0c0a2ee1aaded61020fa72b5b467459e1"/>
+				<rom name="dmg-hej-0.u1" size="262144" crc="4f8a61bf" sha1="c12c60b0c0a2ee1aaded61020fa72b5b467459e1"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -8795,9 +8798,12 @@
 		<info name="release" value="19891222"/>
 		<info name="alt_title" value="北斗の拳 凄絶十番勝負"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BCA-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="hokuto no ken - seizetsu juuban shoubu (japan).bin" size="131072" crc="e4b4febc" sha1="4f8e8d2d079a0e3b76a67411d919297808f3849b"/>
+				<rom name="dmg-hkj-0.u1" size="131072" crc="e4b4febc" sha1="4f8e8d2d079a0e3b76a67411d919297808f3849b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9052,9 +9058,12 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-AGOP-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" /> 
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="hugo (europe).bin" size="131072" crc="74aa5e0f" sha1="d314dffcf5fb441d5d6d6419e01dc825e90cf0fc"/>
+				<rom name="dmg-agop-0.u1" size="131072" crc="74aa5e0f" sha1="d314dffcf5fb441d5d6d6419e01dc825e90cf0fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9106,7 +9115,7 @@
 		<description>Disney's The Hunchback of Notre Dame - Topsy Turvy Games (Euro, USA)</description>
 		<year>1997</year>
 		<publisher>T*HQ</publisher>
-		<info name="serial" value="DMG-ANDE-USA, DMG-ANDP-(NOE/UKV)"/>
+		<info name="serial" value="DMG-ANDE-USA, DMG-ANDP-NOE, DMG-ANDP-UKV"/>
 		<info name="alt_title" value="Disney's The Hunchback of Notre Dame - 5 Foolishly Fun Topsy Turvy Games (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- UKV cart -->
@@ -9123,7 +9132,7 @@
 		<description>The Hunt for Red October (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Hi Tech Expressions</publisher>
-		<info name="serial" value="DMG-HF-USA, DMG-HF-(ESP/UKV)"/>
+		<info name="serial" value="DMG-HF-USA, DMG-HF-ESP, DMG-HF-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- ESP cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -9174,15 +9183,18 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-DW-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="hyper dunk (europe).bin" size="131072" crc="02d09ce3" sha1="6aca47dd2d9c57999a566903292af2601c832c9c"/>
+				<rom name="dmg-dwx-0.u1" size="131072" crc="02d09ce3" sha1="6aca47dd2d9c57999a566903292af2601c832c9c"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="hyperlod">
-		<description>Hyper Lode Runner (World, Rev. A)</description>
+		<description>Hyper Lode Runner (World, Rev. 1)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-HLA, DMG-HL-USA, DMG-HL-UKV"/>
