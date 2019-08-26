@@ -28,7 +28,6 @@ DEFINE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device, "vr0video", "MagicEyes VRend
 vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIDEO_VRENDER0, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_idleskip_cb(*this)
 
 {
@@ -161,6 +160,7 @@ void vr0video_device::device_start()
 void vr0video_device::set_areas(uint8_t *textureram, uint16_t *frameram)
 {
 	m_textureram = textureram;
+	m_packetram = (uint16_t*)textureram;
 	m_frameram = frameram;
 }
 
@@ -495,22 +495,21 @@ static const _DrawTemplate DrawTile[]=
 	TILENAME(16,1,2),
 };
 
-#define Packet(i) space.read_word(PacketPtr + 2 * i)
-
 //Returns true if the operation was a flip (sync or async)
 // TODO: async loading actually doesn't stop rendering but just flips the render bank
 int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 {
-	// TODO: this need to be removed
-	address_space &space = m_cpu->space(AS_PROGRAM);
+	uint16_t *Packet = m_packetram;
 	uint8_t *TEXTURE = m_textureram;
 
-	uint32_t Dx = Packet(1) & 0x3ff;
-	uint32_t Dy = Packet(2) & 0x1ff;
-	uint32_t Endx = Packet(3) & 0x3ff;
-	uint32_t Endy = Packet(4) & 0x1ff;
+	Packet += PacketPtr;
+
+	uint32_t Dx = Packet[1] & 0x3ff;
+	uint32_t Dy = Packet[2] & 0x1ff;
+	uint32_t Endx = Packet[3] & 0x3ff;
+	uint32_t Endy = Packet[4] & 0x1ff;
 	uint32_t Mode = 0;
-	uint16_t Packet0 = Packet(0);
+	uint16_t Packet0 = Packet[0];
 
 	if (Packet0 & 0x81) //Sync or ASync flip
 	{
@@ -520,8 +519,8 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 
 	if (Packet0 & 0x200)
 	{
-		m_RenderState.Tx = Packet(5) | ((Packet(6) & 0x1f) << 16);
-		m_RenderState.Ty = Packet(7) | ((Packet(8) & 0x1f) << 16);
+		m_RenderState.Tx = Packet[5] | ((Packet[6] & 0x1f) << 16);
+		m_RenderState.Ty = Packet[7] | ((Packet[8] & 0x1f) << 16);
 	}
 	else
 	{
@@ -530,10 +529,10 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 	}
 	if (Packet0 & 0x400)
 	{
-		m_RenderState.Txdx = Packet(9)  | ((Packet(10) & 0x1f) << 16);
-		m_RenderState.Tydx = Packet(11) | ((Packet(12) & 0x1f) << 16);
-		m_RenderState.Txdy = Packet(13) | ((Packet(14) & 0x1f) << 16);
-		m_RenderState.Tydy = Packet(15) | ((Packet(16) & 0x1f) << 16);
+		m_RenderState.Txdx = Packet[9]  | ((Packet[10] & 0x1f) << 16);
+		m_RenderState.Tydx = Packet[11] | ((Packet[12] & 0x1f) << 16);
+		m_RenderState.Txdy = Packet[13] | ((Packet[14] & 0x1f) << 16);
+		m_RenderState.Tydy = Packet[15] | ((Packet[16] & 0x1f) << 16);
 	}
 	else
 	{
@@ -544,25 +543,25 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 	}
 	if (Packet0 & 0x800)
 	{
-		m_RenderState.SrcAlphaColor = Packet(17) | ((Packet(18) & 0xff) << 16);
-		m_RenderState.SrcBlend = (Packet(18) >> 8) & 0x3f;
-		m_RenderState.DstAlphaColor = Packet(19) | ((Packet(20) & 0xff) << 16);
-		m_RenderState.DstBlend = (Packet(20) >> 8) & 0x3f;
+		m_RenderState.SrcAlphaColor = Packet[17] | ((Packet[18] & 0xff) << 16);
+		m_RenderState.SrcBlend = (Packet[18] >> 8)	& 0x3f;
+		m_RenderState.DstAlphaColor = Packet[19] | ((Packet[20] & 0xff) << 16);
+		m_RenderState.DstBlend = (Packet[20] >> 8) & 0x3f;
 	}
 	if (Packet0 & 0x1000)
-		m_RenderState.ShadeColor = Packet(21) | ((Packet(22) & 0xff) << 16);
+		m_RenderState.ShadeColor = Packet[21] | ((Packet[22] & 0xff) << 16);
 	if (Packet0 & 0x2000)
-		m_RenderState.TransColor = Packet(23) | ((Packet(24) & 0xff) << 16);
+		m_RenderState.TransColor = Packet[23] | ((Packet[24] & 0xff) << 16);
 	if (Packet0 & 0x4000)
 	{
-		m_RenderState.TileOffset = Packet(25);
-		m_RenderState.FontOffset = Packet(26);
-		m_RenderState.PalOffset = Packet(27) >> 3;
-		m_RenderState.PaletteBank = (Packet(28) >> 8) & 0xf;
-		m_RenderState.TextureMode = Packet(28) & 0x1000;
-		m_RenderState.PixelFormat = (Packet(28) >> 6) & 3;
-		m_RenderState.Width  = 8 << ((Packet(28) >> 0) & 0x7);
-		m_RenderState.Height = 8 << ((Packet(28) >> 3) & 0x7);
+		m_RenderState.TileOffset = Packet[25];
+		m_RenderState.FontOffset = Packet[26];
+		m_RenderState.PalOffset = Packet[27] >> 3;
+		m_RenderState.PaletteBank = (Packet[28] >> 8) & 0xf;
+		m_RenderState.TextureMode = Packet[28] & 0x1000;
+		m_RenderState.PixelFormat = (Packet[28] >> 6) & 3;
+		m_RenderState.Width  = 8 << ((Packet[28] >> 0) & 0x7);
+		m_RenderState.Height = 8 << ((Packet[28] >> 3) & 0x7);
 	}
 
 	if (Packet0 & 0x40 && m_RenderState.PalOffset != m_LastPalUpdate)
@@ -684,7 +683,7 @@ void vr0video_device::execute_drawing()
 
 	while ((m_queue_rear & 0x7ff) != (m_queue_front & 0x7ff))
 	{
-		DoFlip = vrender0_ProcessPacket(0x03800000 + m_queue_rear * 64, DrawDest);
+		DoFlip = vrender0_ProcessPacket(m_queue_rear * 32, DrawDest);
 		m_queue_rear ++;
 		m_queue_rear &= 0x7ff;
 		if (DoFlip)
