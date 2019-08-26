@@ -1,11 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="genius" description="VTech Genius cartridges">
-
-<!-- this software list contains miscellaneous VTech Genius family cartridges, needs to be split to respective systems later -->
-
-
-<!-- Compatible with: Genius Leader series (actual compatible models as listed on the box are documented below) -->
+<softwarelist name="gln" description="VTech Genius Leader Notebook cartridges">
 
 <!-- According to the boxart, this is compatible with: Leader Notebook -->
 	<software name="franzosis">
@@ -21,9 +16,10 @@
 		</part>
 	</software>
 
-<!-- According to the boxart, this is compatible with: Leader Notebook/Notebook Plus/Power Notebook -->
-	<software name="swga" cloneof="swg">
-		<description>Sport-Wissen-Geschichte (Genius Leader Notebook)</description>
+<!-- According to the boxart, this is compatible with: Leader Notebook
+     A (later) sticker says compatibility extends to Notebook Plus/Power Notebook -->
+	<software name="swg">
+		<description>Sport-Wissen-Geschichte</description>
 		<year>200?</year>
 		<publisher>Video Technology</publisher>
 		<info name="serial" value="80-2455" />

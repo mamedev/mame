@@ -220,19 +220,21 @@ void geniusjr_state::machine_start()
 	m_rombank->set_entry(0);
 }
 
-void geniusjr_state::gln(machine_config &config)
+void geniusjr_state::gj4000(machine_config &config)
 {
 	M68HC05L9(config, m_maincpu, 8'000'000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &geniusjr_state::gj4000_map);
 
 	m_bank_size = 0x8000;
-}
-
-void geniusjr_state::gj4000(machine_config &config)
-{
-	gln(config);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gj4000");
+}
+
+void geniusjr_state::gln(machine_config &config)
+{
+	gj4000(config);
+
+	subdevice<software_list_device>("cart_list")->set_original("gln");
 }
 
 void geniusjr_state::gj5000(machine_config &config)

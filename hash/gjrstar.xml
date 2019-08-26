@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="gjrstar" description="VTech Genius Junior Redstar cartridges">
 
-<!-- According to the boxart, this is compatible with: Junior Redstar/Redstar 2 -->
+<!-- According to the boxart, this is compatible with: Junior Redstar/Redstar 2/Redstar 3 -->
 	<software name="wortspie">
 		<description>Wortspiele</description>
 		<year>200?</year>
