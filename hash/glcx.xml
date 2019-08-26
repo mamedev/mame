@@ -3,11 +3,14 @@
 <softwarelist name="glcx" description="VTech Genius Leader CX cartridges">
 
 <!-- Compatible with: Notebook Fun, e-Power X, 5005 X, 6600 CX, 8008 CX, Black Magic CX
+     A (later) sticker on 80-28071 says compatibility extends to Brainstation, Crosshanger XL, 9009 CXL
+     Diktate (undumped) claims compatibility only with Notebook Fun and e-Power X
 
 +- - - - - - - +- - - - - - - - - - - - - - -+- - - - - - +- - - - - - - - -
 | CARTRIDGE ID |          GAME NAME          |  EPROM-ID  |  EPROM-TYPE   |
 +- - - - - - - +- - - - - - - - - - - - - - -+- - - - - - +- - - - - - - - -
 |              |                             |            |               |
+| 80-27471     | Diktate                     |            |               |
 | 80-28071     | Englisch für Anfänger       | 27-6386-00 |   LH5V1RN5    |
 | 80-28072     | Länder-Menschen-Umwelt      | 27-6386-00 |   LH5V1RN5    |
 | 80-28073     | Sport-Wissen-Geschichte     | 27-6388-00 |   LH5V1RN5    |
@@ -83,6 +86,7 @@ On one was the highest address line set to HIGH, on the other one this address l
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x20000">
+				<!-- contains Z80 code -->
 				<rom name="27-6431-00" size="0x20000" crc="db628338" sha1="86d88f6a6f399e38cf332516407a0efdde36d4c2"/>
 			</dataarea>
 		</part>
@@ -96,6 +100,7 @@ On one was the highest address line set to HIGH, on the other one this address l
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x20000">
+				<!-- contains CR16B code -->
 				<rom name="54-6531-00-0.u4" size="0x20000" crc="bfb01f0a" sha1="c8d8b9e0a3e8299332383b3009c82c8d1994bbf9" offset="0" />
 			</dataarea>
 		</part>
