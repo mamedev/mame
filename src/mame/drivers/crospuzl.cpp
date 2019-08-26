@@ -60,7 +60,6 @@ private:
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<pcf8583_device> m_rtc;
-	required_device<screen_device> m_screen;
 
 	uint8_t    m_FlashCmd;
 	uint8_t    m_FlashPrevCommand;
@@ -366,19 +365,7 @@ void crospuzl_state::crospuzl(machine_config &config)
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 
-<<<<<<< HEAD
 	PCF8583(config, m_rtc, 32.768_kHz_XTAL);
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	SOUND_VRENDER0(config, m_vr0snd, 0);
-	m_vr0snd->add_route(0, "lspeaker", 1.0);
-	m_vr0snd->add_route(1, "rspeaker", 1.0);
-=======
-	// TODO: presumably not on this HW
-	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
->>>>>>> Internalize vrender0 video/audio components
 }
 
 ROM_START( crospuzl ) 
