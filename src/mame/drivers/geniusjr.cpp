@@ -6,6 +6,13 @@ VTech Genius Junior series
 
 CPU is 68HC05 derived?
 
+Other known international versions:
+- Pitagorín (Spanish version of Genius Leader Notebook)
+- Talking Whiz-Kid Animated (English version of Genius Junior Redstar)
+- Talking Whiz-Kid Genius (English version of Genius Junior Movie)
+- Talking Whiz-Kid Notebook (English version of Genius Leader Notebook)
+- Talking Whiz-Kid Power Mouse (English version of Genius Leader Select)
+
 */
 
 /***************************************************************************************
