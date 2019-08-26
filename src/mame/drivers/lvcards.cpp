@@ -647,22 +647,22 @@ void lvcards_state::init_lvcardsa()
 
 		switch (i & 0x1111)
 		{
-			case 0x0000: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
-			case 0x0001: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x0010: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0000: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x0001: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0010: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
 			case 0x0011: x = bitswap<8>(x ^ 0xa8, 7, 6, 5, 4, 3, 2, 1, 0); break; // xor ok, no swap?
-			case 0x0100: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor ok, 5-7 unverified
-			case 0x0101: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x0111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor ok, 3-5 unverified
-			case 0x1000: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
-			case 0x1001: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor ok, 3-5 unverified
-			case 0x1010: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x1011: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor ok, 3-5 unverified
-			case 0x1100: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor ok, 3-5 unverified
-			case 0x1101: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor ok, 5-7 unverified
-			case 0x1110: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor ok, 3-5 unverified
-			case 0x1111: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0100: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0101: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x0111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1000: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1001: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1010: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1011: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1100: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1101: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1110: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1111: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
 		}
 
 		m_decrypted_opcodes[i] = x;
@@ -674,22 +674,22 @@ void lvcards_state::init_lvcardsa()
 
 		switch(A & 0x1111)
 		{
-			case 0x0000: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x0001: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x0010: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0000: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0001: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0010: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
 			case 0x0011: x = bitswap<8>(x ^ 0xa8, 7, 6, 5, 4, 3, 2, 1, 0); break; // xor ok, no swap?
-			case 0x0100: x = bitswap<8>(x ^ 0xa8, 3, 6, 7, 4, 5, 2, 1, 0); break; // xor and swap ok
-			case 0x0101: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x0111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
-			case 0x1000: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x1001: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor and swap ok
-			case 0x1010: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor and swap ok
-			case 0x1011: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x1100: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
-			case 0x1101: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor and swap ok
-			case 0x1110: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
-			case 0x1111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
+			case 0x0100: x = bitswap<8>(x ^ 0xa8, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x0101: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x0111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1000: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1001: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1010: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1011: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1100: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1101: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1110: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
 		}
 
 		ROM[A] = x;
