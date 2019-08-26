@@ -232,7 +232,7 @@ ROM_START( rhunting )
 ROM_END
 
 
-GAME( 1977, attckexd,  0,        attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (Set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, attckexd2, attckexd, attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (Set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, attckexd,  0,        attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 1) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, attckexd2, attckexd, attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 2) [TTL]", MACHINE_IS_SKELETON )
 GAME( 1976, deathrac,  0,        deathrac, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Death Race [TTL]",     MACHINE_IS_SKELETON )
 GAME( 1976, rhunting,  deathrac, deathrac, 0, exidyttl_state, empty_init, ROT0, "bootleg", "Robot Hunting (bootleg of Death Race) [TTL]",MACHINE_IS_SKELETON )
