@@ -14,12 +14,6 @@ class vr0video_device : public device_t,
 						public device_video_interface
 {
 public:
-	template <typename T> vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: vr0video_device(mconfig, tag, owner, clock)
-	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-	}
-
 	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_areas(uint8_t *textureram, uint16_t *frameram);
@@ -39,7 +33,6 @@ protected:
 private:
 	int vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest);
 
-	required_device<cpu_device> m_cpu;
 	devcb_write_line  m_idleskip_cb;
 
 	struct RenderStateInfo
@@ -73,6 +66,7 @@ private:
 	RenderStateInfo m_RenderState;
 
 	uint8_t *m_textureram;
+	uint16_t *m_packetram;
 	uint16_t *m_frameram;
 
 	DECLARE_READ16_MEMBER( cmd_queue_front_r );
