@@ -69,7 +69,7 @@ TODO:
 
 - What do the control ports do? Payout?
 - Input ports need to be cleaned up
-- NVRAM does not work for lvcards?
+- NVRAM does not work for lvcards? In lvcardsa it works
 
 ***************************************************************************/
 
@@ -180,6 +180,12 @@ void lvcards_state::lvcards_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
+
+void lvcards_state::lvcardsa_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().share("decrypted_opcodes");
+	map(0xc000, 0xdfff).rom().region("maincpu", 0xc000);
 }
 
 void lvpoker_state::lvpoker_map(address_map &map)
@@ -488,6 +494,14 @@ void lvcards_state::lvcards(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void lvcards_state::lvcardsa(machine_config &config)
+{
+	lvcards(config);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	m_maincpu->set_addrmap(AS_OPCODES, &lvpoker_state::lvcardsa_decrypted_opcodes_map);
+}
+
 void lvpoker_state::lvpoker(machine_config &config)
 {
 	lvcards(config);
@@ -623,7 +637,66 @@ ROM_START( ponttehk )
 	ROM_LOAD( "pon24s10.001", 0x0200, 0x0100, CRC(c64ecee8) SHA1(80c9ec21e135235f7f2d41ce7900cf3904123823) )  /* blue component */
 ROM_END
 
-GAME( 1985, lvcards,  0,       lvcards,  lvcards,  lvcards_state, empty_init, ROT0, "Tehkan", "Lovely Cards",             0 )
-GAME( 1985, lvcardsa, lvcards, lvcards,  lvcards,  lvcards_state, empty_init, ROT0, "Tehkan", "Lovely Cards (encrypted)", MACHINE_NOT_WORKING )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvpoker_state, empty_init, ROT0, "Tehkan", "Lovely Poker [BET]",       0 )
-GAME( 1985, ponttehk, 0,       ponttehk, ponttehk, lvpoker_state, empty_init, ROT0, "Tehkan", "Pontoon (Tehkan)",         0 )
+void lvcards_state::init_lvcardsa()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x6000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		switch (i & 0x1111)
+		{
+			case 0x0000: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
+			case 0x0001: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0010: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0011: x = bitswap<8>(x ^ 0xa8, 7, 6, 5, 4, 3, 2, 1, 0); break; // xor ok, no swap?
+			case 0x0100: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor ok, 5-7 unverified
+			case 0x0101: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor ok, 3-5 unverified
+			case 0x1000: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
+			case 0x1001: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor ok, 3-5 unverified
+			case 0x1010: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x1011: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor ok, 3-5 unverified
+			case 0x1100: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor ok, 3-5 unverified
+			case 0x1101: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor ok, 5-7 unverified
+			case 0x1110: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor ok, 3-5 unverified
+			case 0x1111: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int A = 0; A < 0x6000; A++)
+	{
+		uint8_t x = ROM[A];
+
+		switch(A & 0x1111)
+		{
+			case 0x0000: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0001: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0010: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0011: x = bitswap<8>(x ^ 0xa8, 7, 6, 5, 4, 3, 2, 1, 0); break; // xor ok, no swap?
+			case 0x0100: x = bitswap<8>(x ^ 0xa8, 3, 6, 7, 4, 5, 2, 1, 0); break; // xor and swap ok
+			case 0x0101: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x0111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
+			case 0x1000: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x1001: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor and swap ok
+			case 0x1010: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor and swap ok
+			case 0x1011: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x1100: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
+			case 0x1101: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break; // xor and swap ok
+			case 0x1110: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break; // xor and swap ok
+			case 0x1111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break; // xor and swap ok
+		}
+
+		ROM[A] = x;
+	}
+}
+
+GAME( 1985, lvcards,  0,       lvcards,  lvcards,  lvcards_state, empty_init,    ROT0, "Tehkan", "Lovely Cards",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, lvcardsa, lvcards, lvcardsa, lvcards,  lvcards_state, init_lvcardsa, ROT0, "Tehkan", "Lovely Cards (encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvpoker_state, empty_init,    ROT0, "Tehkan", "Lovely Poker [BET]",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ponttehk, 0,       ponttehk, ponttehk, lvpoker_state, empty_init,    ROT0, "Tehkan", "Pontoon (Tehkan)",         MACHINE_SUPPORTS_SAVE )
