@@ -6434,9 +6434,20 @@ ROM_END
   Program tries to show jokers in the attract,
   but these aren't in the graphics set.
 
-  Maybe the PCB was filled with different eproms
-  just to play the game, since jokers seems that
-  don't appear in the game. Just in the attract.
+  The GFX roms for cards, have identical halves,
+  and the jokers extended GFX should be placed
+  in the second half.
+
+  Fortunatelly we have an identical GFX set from
+  another game (that match 100% the first half),
+  so for now could assume we can use it instead
+  till the original devices appear...
+
+  The game apparently uses jokers and has 3's
+  and 7's bonus.
+
+  Depending of the bet, you can have one or two
+  witches as bonus if you win a hand.
 
 */
 ROM_START( jokercar )
@@ -6447,10 +6458,10 @@ ROM_START( jokercar )
 	ROM_FILL(                  0x0000, 0x2000, 0x0000 )  // filling the R-G bitplanes
 	ROM_LOAD( "4u.8a", 0x2000, 0x1000, CRC(85044094) SHA1(06db79dd47a47886480bd7a6546a2252cd48b3e3) )    // chars gfx
 
-	ROM_REGION( 0x3000, "gfx2", 0 )
-	ROM_LOAD( "7.4a",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // cards deck gfx, bitplane 1
-	ROM_LOAD( "6.6a",  0x1000, 0x1000, CRC(712f7fbc) SHA1(dcb73c45f58117b4206bc259d9386c4e16650325) )    // cards deck gfx, bitplane 2
-	ROM_LOAD( "5.7a",  0x2000, 0x1000, CRC(7351706a) SHA1(cde3fefe721ac5d3a725afc53fa609b5cc0c01da) )    // cards deck gfx, bitplane 3
+	ROM_REGION( 0x3000, "gfx2", 0 )  // these are from another set that match 100% the first half of the original devices, that have identical halves...
+	ROM_LOAD( "7.4a",  0x0000, 0x1000, BAD_DUMP CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    // cards deck gfx, bitplane 1
+	ROM_LOAD( "6.6a",  0x1000, 0x1000, BAD_DUMP CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    // cards deck gfx, bitplane 2
+	ROM_LOAD( "5.7a",  0x2000, 0x1000, BAD_DUMP CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    // cards deck gfx, bitplane 3
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
@@ -12107,7 +12118,7 @@ GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init
 GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
 GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
 
-GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    0 )
 
 GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, init_vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",     0,                   layout_goldnpkr )
 
