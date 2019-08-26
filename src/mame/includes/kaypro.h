@@ -79,11 +79,9 @@ public:
 	void kaypro_map(address_map &map);
 	void kayproii_io(address_map &map);
 private:
-	void mc6845_cursor_configure();
 	void mc6845_screen_configure();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	uint8_t m_mc6845_cursor[16];
 	uint8_t m_mc6845_reg[32];
 	uint8_t m_mc6845_ind;
 	uint8_t m_framecnt;
