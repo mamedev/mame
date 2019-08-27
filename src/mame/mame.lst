@@ -33115,7 +33115,8 @@ powerinsa                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsb                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsc                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsj                       // (c) 1993 Atlus (Japan)
-powerinsp                       // prototype
+powerinspj                      // prototype (USA)
+powerinspu                      // prototype (Japan)
 
 @source:powerstack.cpp
 powerstk                        // Motorola Powerstack II
