@@ -3469,6 +3469,8 @@ if (BUSES["SPECTRUM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/spectrum/exp.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/exp.h",
+		MAME_DIR .. "src/devices/bus/spectrum/beta.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/beta.h",
 		MAME_DIR .. "src/devices/bus/spectrum/beta128.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/beta128.h",
 		MAME_DIR .. "src/devices/bus/spectrum/intf1.cpp",
