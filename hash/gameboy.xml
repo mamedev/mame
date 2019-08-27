@@ -11407,7 +11407,7 @@
 		<description>Lamborghini - American Challenge (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Titus</publisher>
-		<info name="serial" value="DMG-L7-USA, DMG-L7-(FRG/UKV)"/>
+		<info name="serial" value="DMG-L7-USA, DMG-L7-FRG, DMG-L7-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- FRG cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -11468,9 +11468,14 @@
 		<info name="release" value="19910531"/>
 		<info name="alt_title" value="レジェンド -明日への翼- ~ Legend - Ashita e no Tsubasa (Box)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-GDAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
+			<feature name="u3" value="U3 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
-				<rom name="legend - asu e no tsubasa (japan).bin" size="131072" crc="fc20ebf0" sha1="7447b3faa1d15e80815cdace3c6c0691bc28aa90"/>
+				<rom name="dmg-lgj-0.u1" size="131072" crc="fc20ebf0" sha1="7447b3faa1d15e80815cdace3c6c0691bc28aa90"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11523,7 +11528,7 @@
 	</software>
 
 	<software name="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Euro, USA, Rev. B)</description>
+		<description>The Legend of Zelda - Link's Awakening (Euro, USA, Rev. 2)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-USA-1, DMG-ZL-EUR"/>
@@ -11538,10 +11543,10 @@
 	</software>
 
 	<software name="zeldalnka" cloneof="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Euro, USA, Rev. A)</description>
+		<description>The Legend of Zelda - Link's Awakening (Euro, USA, Can, Rev. 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-ZL-(UKV/ESP-1)"/>
+		<info name="serial" value="DMG-ZL-UKV, DMG-ZL-ESP-1, DMG-ZL-CAN"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -11553,10 +11558,10 @@
 	</software>
 
 	<software name="zeldalnkb" cloneof="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Euro, USA)</description>
+		<description>The Legend of Zelda - Link's Awakening (Euro, USA, Can)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-ZL-USA, DMG-ZL-UKV"/>
+		<info name="serial" value="DMG-ZL-USA, DMG-ZL-UKV, DMG-ZL-CAN"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />  <!-- USA cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -11573,6 +11578,7 @@
 		</part>
 	</software>
 
+	<!-- Bad dump? -->
 	<software name="zeldalnkc" cloneof="zeldalnk">
 		<description>The Legend of Zelda - Link's Awakening (Can)</description>
 		<year>1993</year>
@@ -11602,9 +11608,9 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B1]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B1]" /> <!-- Also with [MBC1B] -->
 			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />    <!-- Hyundai RAM -->
-			<feature name="u4" value="U4 26A [6129 3809]" />
+			<feature name="u4" value="U4 26A [6129]" /> <!-- Also with [26A] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -11623,9 +11629,9 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" />
-			<feature name="u3" value="U3 RAM [LH5168NFB-10TL]" />
-			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" /> <!-- Also with [MBC1-B] -->
+			<feature name="u3" value="U3 RAM [LH5168NFB-10TL]" /> <!-- Also with [HY6264ALLJ-10] -->
+			<feature name="u4" value="U4 26A [26A]" /> <!-- Also with [6129] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -11711,6 +11717,7 @@
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-LT-USA, DMG-LT-FAH"/>
+		<info name="alt_title" value="Lethal Weapon - L'Arme Fatale (French Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FAH cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -11742,7 +11749,7 @@
 		<description>The Lion King (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
-		<info name="serial" value="DMG-ALNP-EUR, DMG-ALNP-NOE, DMG-ALNP-EUR"/>
+		<info name="serial" value="DMG-ALNP-EUR, DMG-ALNP-NOE"/>
 		<info name="alt_title" value="Disney's The Lion King (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
@@ -11826,9 +11833,12 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-LD-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="little mermaid, the (europe).bin" size="131072" crc="00def37a" sha1="62a5beea93d48445a0f16f5582fc4fc61ba9fc1b"/>
+				<rom name="dmg-ldx-0.u1" size="131072" crc="00def37a" sha1="62a5beea93d48445a0f16f5582fc4fc61ba9fc1b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11850,13 +11860,18 @@
 		<description>Lock'n Chase (World)</description>
 		<year>1990</year>
 		<publisher>Data East</publisher>
-		<info name="serial" value="DMG-LCA, DMG-LC-USA, DMG-LC-UKV"/>
+		<info name="serial" value="DMG-LCA, DMG-LC-USA, DMG-LC-UKV, DMG-128 CHN"/>
 		<info name="release" value="19900511 (JPN)"/>
-		<info name="alt_title" value="ロックンチェイス ~ Lock 'n' Chase (Jpn Box), Lock n' Chase (Western Box)"/>
+		<info name="alt_title" value="ロックンチェイス ~ Lock 'n' Chase (Jpn Box), Lock n' Chase (Western Box), LOCK'N'CHASE 銀行大盗·银行大盗 (Chinese)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart, also found with DMG-BBA-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<!-- Chinese cart
+			<feature name="pcb" value="DMG-BEAN-M13" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
+			-->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-lca-0.u1" size="65536" crc="dab91c7a" sha1="643cbd566d35ce8dbe0f24627e4862c09805a04c"/>
@@ -11883,7 +11898,7 @@
 		<description>Looney Tunes (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-LN-USA, DMG-LN-NOE"/>
+		<info name="serial" value="DMG-LN-USA, DMG-LN-UKV, DMG-LN-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
