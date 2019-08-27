@@ -9515,8 +9515,10 @@
 		<info name="release" value="19900802"/>
 		<info name="alt_title" value="石道 The Way of Stones"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-AAA-03" />
+			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
-				<rom name="ishido - the way of stones (japan).bin" size="32768" crc="ab367915" sha1="75768fa6c719b96e6642bca5439a78cd3696761f"/>
+				<rom name="dmg-stj-0.u1" size="32768" crc="ab367915" sha1="75768fa6c719b96e6642bca5439a78cd3696761f"/>
 			</dataarea>
 		</part>
 	</software>
