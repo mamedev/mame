@@ -143,6 +143,8 @@ private:
 	uint8_t *m_sharedram;
 };
 
+
+
 IRQ_CALLBACK_MEMBER(menghong_state::icallback)
 {
 	return m_vr0soc->irq_callback();
@@ -516,6 +518,7 @@ ROM_START( crzyddz2 )
 	
 	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
 ROM_END
+
 
 GAME( 2004?,menghong, 0,        menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Crazy Dou Di Zhu II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
