@@ -11,8 +11,9 @@
 	- Hooking up serflash_device instead of the custom implementation here
 	  makes the game to print having all memory available and no game 
 	  detected, fun
-	- RTC isn't DS1302
-	
+	- I2C RTC interface should be correct but still doesn't work, sending
+          unrecognized slave address 0x30 (device type might be wrong as well)
+
 	Notes:
 	- Game enables UART1 receive irq, if that irq is enable it just prints 
 	  "___sysUART1_ISR<LF>___sysUART1_ISR_END<LF>"
@@ -26,9 +27,8 @@
 
 #include "emu.h"
 #include "cpu/se3208/se3208.h"
-#include "machine/ds1302.h"
+#include "machine/pcf8583.h"
 #include "machine/nvram.h"
-#include "machine/eepromser.h"
 #include "machine/vrender0.h"
 #include "sound/vrender0.h"
 #include "video/vrender0.h"
@@ -53,7 +53,7 @@ public:
 		m_vr0soc(*this, "vr0soc"),
 		m_vr0vid(*this, "vr0vid"),
 		m_vr0snd(*this, "vr0snd"),
-		m_ds1302(*this, "rtc"),
+		m_rtc(*this, "rtc"),
 		m_screen(*this, "screen")
 	{ }
 
@@ -73,7 +73,7 @@ private:
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<vr0video_device> m_vr0vid;
 	required_device<vr0sound_device> m_vr0snd;
-	required_device<ds1302_device> m_ds1302;
+	required_device<pcf8583_device> m_rtc;
 	required_device<screen_device> m_screen;
 
 #ifdef IDLE_LOOP_SPEEDUP
@@ -101,8 +101,11 @@ private:
 	void crospuzl_mem(address_map &map);
 	
 	// PIO
-	DECLARE_READ32_MEMBER(PIOldat_r);
 	uint32_t m_PIO;
+	uint32_t m_ddr;
+	DECLARE_READ32_MEMBER(PIOlddr_r);
+	DECLARE_WRITE32_MEMBER(PIOlddr_w);
+	DECLARE_READ32_MEMBER(PIOldat_r);
 	DECLARE_WRITE32_MEMBER(PIOldat_w);
 	DECLARE_READ32_MEMBER(PIOedat_r);
 };
@@ -140,7 +143,8 @@ IRQ_CALLBACK_MEMBER(crospuzl_state::icallback)
 READ32_MEMBER(crospuzl_state::PIOedat_r)
 {
 	// TODO: this doesn't work with regular serflash_device
-	return machine().rand() & 0x04000000; // serial ready line
+	return (m_rtc->sda_r() << 19)
+		| (machine().rand() & 0x04000000); // serial ready line
 }
 
 READ8_MEMBER(crospuzl_state::FlashCmd_r)
@@ -189,6 +193,20 @@ WRITE8_MEMBER(crospuzl_state::FlashAddr_w)
 		logerror("%08x %02x ADDR\n",m_FlashAddr,m_FlashShift);
 }
 
+READ32_MEMBER(crospuzl_state::PIOlddr_r)
+{
+	return m_ddr;
+}
+
+WRITE32_MEMBER(crospuzl_state::PIOlddr_w)
+{
+	if (BIT(m_ddr, 19) != BIT(data, 19))
+		m_rtc->sda_w(BIT(data, 19) ? 1 : BIT(m_PIO, 19));
+	if (BIT(m_ddr, 20) != BIT(data, 20))
+		m_rtc->scl_w(BIT(data, 20) ? 1 : BIT(m_PIO, 20));
+	COMBINE_DATA(&m_ddr);
+}
+
 READ32_MEMBER(crospuzl_state::PIOldat_r)
 {
 	return m_PIO;
@@ -198,13 +216,10 @@ READ32_MEMBER(crospuzl_state::PIOldat_r)
 // TODO: change me
 WRITE32_MEMBER(crospuzl_state::PIOldat_w)
 {
-	uint32_t RST = data & 0x01000000;
-	uint32_t CLK = data & 0x02000000;
-	uint32_t DAT = data & 0x10000000;
-
-	m_ds1302->ce_w(RST ? 1 : 0);
-	m_ds1302->io_w(DAT ? 1 : 0);
-	m_ds1302->sclk_w(CLK ? 1 : 0);
+	if (!BIT(m_ddr, 19))
+		m_rtc->sda_w(BIT(data, 19));
+	if (!BIT(m_ddr, 20))
+		m_rtc->scl_w(BIT(data, 20));
 
 	COMBINE_DATA(&m_PIO);
 }
@@ -224,6 +239,8 @@ void crospuzl_state::crospuzl_mem(address_map &map)
 	map(0x01600000, 0x01607fff).ram().share("nvram");
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
+	map(0x0180001c, 0x0180001f).noprw();
+	map(0x01802000, 0x01802003).rw(FUNC(crospuzl_state::PIOlddr_r), FUNC(crospuzl_state::PIOlddr_w));
 	map(0x01802004, 0x01802007).rw(FUNC(crospuzl_state::PIOldat_r), FUNC(crospuzl_state::PIOldat_w));
 	map(0x01802008, 0x0180200b).r(FUNC(crospuzl_state::PIOedat_r));
 
@@ -267,6 +284,7 @@ void crospuzl_state::machine_start()
 //	save_item(NAME(m_Bank));
 	save_item(NAME(m_FlashCmd));
 	save_item(NAME(m_PIO));
+	save_item(NAME(m_ddr));
 }
 
 void crospuzl_state::machine_reset()
@@ -278,6 +296,7 @@ void crospuzl_state::machine_reset()
 #ifdef IDLE_LOOP_SPEEDUP
 	m_FlipCntRead = 0;
 #endif
+	m_ddr = 0xffffffff;
 }
 
 static INPUT_PORTS_START(crospuzl)
@@ -439,7 +458,7 @@ void crospuzl_state::crospuzl(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_565);
 
-	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
+	PCF8583(config, m_rtc, 32.768_kHz_XTAL);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
