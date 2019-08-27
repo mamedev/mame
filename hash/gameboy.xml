@@ -10391,9 +10391,15 @@
 		<info name="release" value="19980717"/>
 		<info name="alt_title" value="化石創世リボーン"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="kaseki sousei reborn (japan).bin" size="524288" crc="42e8ba89" sha1="c61050451f8731e35b1b983c610041cb59509ed2"/>
+				<rom name="dmg-akrj-0.u1" size="524288" crc="42e8ba89" sha1="c61050451f8731e35b1b983c610041cb59509ed2"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -10433,7 +10439,7 @@
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="kattobi road (japan).bin" size="131072" crc="efbc23fc" sha1="7ac064a877ecc8247dfb7213722dbd0f4be665f0"/>
+				<rom name="dmg-k5j-0.u1" size="131072" crc="efbc23fc" sha1="7ac064a877ecc8247dfb7213722dbd0f4be665f0"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -10490,7 +10496,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10" />  <!-- AUS cart -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1B/1B1 [MBC1B1]" />
+			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
 			<feature name="u3" value="U3 RAM [BR6265BF-10SL]" />
 			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
@@ -10547,10 +10553,10 @@
 	</software>
 
 	<software name="kidicar">
-		<description>Kid Icarus - Of Myths and Monsters (Euro, USA)</description>
+		<description>Kid Icarus - Of Myths and Monsters (Euro, USA, Can)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-KA-USA, DMG-KA-UKV"/>
+		<info name="serial" value="DMG-KA-USA, DMG-KA-UKV, DMG-KA-CAN"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-GDAN-03" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -10601,7 +10607,7 @@
 		<description>Killer Instinct (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-AKLE-USA, DMG-AKLP-(EUR/UKV)"/>
+		<info name="serial" value="DMG-AKLE-USA, DMG-AKLP-EUR, DMG-AKLP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -10620,9 +10626,12 @@
 		<info name="alt_title" value="King James Bible (Box)"/>
 		<info name="serial" value="EBGB"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="" /> <!-- Unnamed Color Dreams PCB -->
+			<feature name="rom" value="[EBGB1.00]" />
+			<feature name="flipflop" value="[T74LS377B1]" />
 			<feature name="slot" value="rom_wisdom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="king james bible (usa) (unl).bin" size="1048576" crc="23679231" sha1="6362fde9dcb08242a64f2fbea33de93d1776a6e0"/>
+				<rom name="ebgb1.00.rom" size="1048576" crc="23679231" sha1="6362fde9dcb08242a64f2fbea33de93d1776a6e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10862,14 +10871,14 @@
 	</software>
 
 	<software name="kirby">
-		<description>Kirby's Dream Land (Euro, USA)</description>
+		<description>Kirby's Dream Land (Euro, USA, Can)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-KY-USA, DMG-KY-(NOE/ESP-1/EUR/UKV)"/>
+		<info name="serial" value="DMG-KY-USA, DMG-KY-CAN, DMG-KY-NOE, DMG-KY-ESP-1, DMG-KY-EUR, DMG-KY-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- Euro carts, also found on DMG-BEAN-10 pcbs -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" /> <!-- Also with [DMG MBC1B1] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-kye-0.u1" size="262144" crc="40f25740" sha1="90979baa1d0e24b41b5c304c5ddaf77450692d5a"/>
@@ -10903,7 +10912,7 @@
 		<description>Kirby's Pinball Land (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-K9-USA, DMG-K9-(NOE/UKV)"/>
+		<info name="serial" value="DMG-K9-USA, DMG-K9-NOE, DMG-K9-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-GDAN-03" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -10924,7 +10933,7 @@
 		<description>Kirby's Star Stacker (Euro, Aus, USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-AKCE-USA, DMG-AKCP-(AUS/EUR)"/>
+		<info name="serial" value="DMG-AKCE-USA, DMG-AKCP-AUS, DMG-AKCP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -11036,9 +11045,12 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-FW-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="knight quest (usa).bin" size="131072" crc="df50f477" sha1="99eb275df25baa6d1b53f5518e93c5f5913a2b6a"/>
+				<rom name="dmg-fwe-0.u1" size="131072" crc="df50f477" sha1="99eb275df25baa6d1b53f5518e93c5f5913a2b6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11366,7 +11378,7 @@
 		<description>Kwirk (Euro, USA)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-AP-USA, DMG-AP-UKV"/>
+		<info name="serial" value="DMG-AP-USA, DMG-AP-UKV, DMG-AP-NOE"/>
 		<info name="alt_title" value="Kwirk - He's A-maze-ing! (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-AAA-03" />   <!-- UKV cart -->
