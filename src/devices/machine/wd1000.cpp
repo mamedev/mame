@@ -603,7 +603,7 @@ void wd1000_device::cmd_format_sector()
 
 	for (int i = 0; i < m_sector_count; i++)
 	{
-		bzero(buffer, sizeof(buffer));
+		std::fill(std::begin(buffer), std::end(buffer), 0);
 		hard_disk_write(file, get_lbasector(), buffer);
 	}
 
