@@ -714,11 +714,6 @@ bool mc6845_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 
 	if (cursor_start_ras <= m_cursor_end_ras)
 	{
-		if (m_cursor_end_ras > m_max_ras_addr)
-		{
-			// Full cursor.
-			return true;
-		}
 		// Cursor from start to end inclusive.
 		return (ra >= cursor_start_ras) && (ra <= m_cursor_end_ras);
 	}
