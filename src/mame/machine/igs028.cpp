@@ -158,12 +158,14 @@ void igs028_device::IGS028_handle()
 	{
 		case 0x12:
 		{
+/* fix olds100a
 			uint16_t mode = m_sharedprotram[0x303e / 2];  // ?
 			uint16_t src  = m_sharedprotram[0x306a / 2] >> 1; // ?
 			uint16_t dst  = m_sharedprotram[0x3084 / 2] & 0x1fff;
 			uint16_t size = m_sharedprotram[0x30a2 / 2] & 0x1fff;
 
 			IGS028_do_dma(src, dst, size, mode);
+*/
 		}
 		break;
 
