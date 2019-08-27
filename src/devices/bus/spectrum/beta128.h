@@ -5,8 +5,8 @@
     Technology Research Beta 128 Disk interface
 
 *********************************************************************/
-#ifndef MAME_BUS_SPECTRUM_BETA_H
-#define MAME_BUS_SPECTRUM_BETA_H
+#ifndef MAME_BUS_SPECTRUM_BETA128_H
+#define MAME_BUS_SPECTRUM_BETA128_H
 
 #include "exp.h"
 #include "softlist.h"
@@ -61,4 +61,4 @@ protected:
 DECLARE_DEVICE_TYPE(SPECTRUM_BETA128, spectrum_beta128_device)
 
 
-#endif // MAME_BUS_SPECTRUM_BETA_H
+#endif // MAME_BUS_SPECTRUM_BETA128_H
