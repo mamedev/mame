@@ -7,12 +7,14 @@
 	driver by Angelo Salese, based off original crystal.cpp by ElSemi
 
 	TODO:
-	- Dies at POST with a SPU error;
+	- Dies at POST with a SPU error, 
+	  supposedly it should print a "running system." instead of "Ok" at the 
+	  end of the POST routine;
 	- Hooking up serflash_device instead of the custom implementation here
 	  makes the game to print having all memory available and no game 
 	  detected, fun
 	- I2C RTC interface should be correct but still doesn't work, sending
-          unrecognized slave address 0x30 (device type might be wrong as well)
+      unrecognized slave address 0x30 (device type might be wrong as well)
 
 	Notes:
 	- Game enables UART1 receive irq, if that irq is enable it just prints 
@@ -95,7 +97,8 @@ IRQ_CALLBACK_MEMBER(crospuzl_state::icallback)
 
 READ32_MEMBER(crospuzl_state::PIOedat_r)
 {
-	// TODO: this doesn't work with regular serflash_device
+	// TODO: this needs fixing in serflash_device 
+	// (has a laconic constant for the ready line)
 	return (m_rtc->sda_r() << 19)
 		| (machine().rand() & 0x04000000); // serial ready line
 }
@@ -356,14 +359,15 @@ INPUT_PORTS_END
 
 void crospuzl_state::crospuzl(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
+	SE3208(config, m_maincpu, 14318180 * 3); // FIXME: 72 MHz-ish
 	m_maincpu->set_addrmap(AS_PROGRAM, &crospuzl_state::crospuzl_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(crospuzl_state::icallback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
+	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3); // FIXME: 72 MHz-ish
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
+	m_vr0soc->set_external_vclk(14318180 * 2); // Unknown clock, should output ~70 Hz?
 
 	PCF8583(config, m_rtc, 32.768_kHz_XTAL);
 }
