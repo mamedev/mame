@@ -49,11 +49,7 @@ public:
 		m_flash(*this, "flash"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc"),
-<<<<<<< HEAD
 		m_rtc(*this, "rtc")
-=======
-		m_ds1302(*this, "rtc")
->>>>>>> Internalize vrender0 video/audio components
 	{ }
 
 
@@ -68,15 +64,7 @@ private:
 	/* devices */
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
-<<<<<<< HEAD
 	required_device<pcf8583_device> m_rtc;
-<<<<<<< HEAD
-=======
-	required_device<screen_device> m_screen;
->>>>>>> Internalize vrender0 video/audio components
-=======
-	required_device<ds1302_device> m_ds1302;
->>>>>>> Internalize vrender0 video/audio components
 
 	uint8_t    m_FlashCmd;
 	uint8_t    m_FlashPrevCommand;
@@ -237,10 +225,7 @@ void crospuzl_state::machine_reset()
 	m_FlashAddr = 0;
 	m_FlashShift = 0;
 	m_FlashPrevCommand = 0xff;
-<<<<<<< HEAD
 	m_ddr = 0xffffffff;
-=======
->>>>>>> Internalize vrender0 video/audio components
 }
 
 static INPUT_PORTS_START(crospuzl)
@@ -383,8 +368,6 @@ void crospuzl_state::crospuzl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3); // FIXME: 72 MHz-ish
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 	m_vr0soc->set_external_vclk(14318180 * 2); // Unknown clock, should output ~70 Hz?
@@ -393,34 +376,8 @@ void crospuzl_state::crospuzl(machine_config &config)
 //  TODO: use this device, in machine/smartmed.h (has issues with is_busy() emulation)
 //	NAND(config, m_nand, 0);
 //	m_nand->set_nand_type(nand_device::chip::K9F1G08U0B); // TODO: exact flavor
-=======
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
-	m_vr0soc->set_host_cpu_tag(m_maincpu);
->>>>>>> Internalize vrender0 video/audio components
 
-<<<<<<< HEAD
 	PCF8583(config, m_rtc, 32.768_kHz_XTAL);
-<<<<<<< HEAD
-=======
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	SOUND_VRENDER0(config, m_vr0snd, 0);
-	m_vr0snd->add_route(0, "lspeaker", 1.0);
-	m_vr0snd->add_route(1, "rspeaker", 1.0);
-=======
-	// TODO: presumably not on this HW
-	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
->>>>>>> Internalize vrender0 video/audio components
->>>>>>> Internalize vrender0 video/audio components
-=======
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
-	m_vr0soc->set_host_cpu_tag(m_maincpu);
-
-	// TODO: presumably not on this HW
-	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
->>>>>>> Internalize vrender0 video/audio components
 }
 
 ROM_START( crospuzl ) 
