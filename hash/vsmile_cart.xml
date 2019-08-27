@@ -56,7 +56,7 @@ Addons (w/ yellow Smartridges)
 |        | 80-091320(US)     | V.Smile Jamming Gym Class                                                  |
 |        | 80-091322(NL)     | V.Smile Muziek en Leer Mat                                                 |
 |        | 80-091323(UK)     | V.Smile Dance'n'Learn                                                      |
-|        | 80-091324(GE)     | V.Smile Lern- und Tanzmatte                                                |
+|   XX   | 80-091324(GE)     | V.Smile Tanz Mit Center (cart labeled as "Lern- und Tanzmatte")            |
 |        | 80-091325(FR)     | V.Smile Defi Gym                                                           |
 |        | 80-091325(FR)     | V.Smile Tapis Multisport (box serial)                                      |
 |   XX   | 80-091327(SP)     | V.Smile Gimnasio Interactivo                                               |
@@ -1681,9 +1681,27 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- No inputs, uses a dance mat controller -->
+	<software name="jamgymg" supported="no"> <!-- Will be clone of "jamgym" once found and dumped. -->
+		<description>V.Smile Tanz Mit Center (Germany)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091324(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" />
+			</dataarea>
+		</part>
+	</software>
 
-	<!-- No inputs -->
-	<software name="gyms" supported="no">
+	<!-- No inputs, uses a dance mat controller -->
+	<software name="jamgyms" cloneof="jamgymg" supported="no">
 		<description>Gimnasio Interactivo V.Smile (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1698,23 +1716,6 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 				<rom name="52-91327 - V.Smile Gimnasio Interactivo (Spain).bin" size="0x800000" crc="a203eaf7" sha1="bb7c7ecf6b208cd8b81daba58748345d3109268a" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jamgymg" supported="yes"> <!-- Will be clone of "jamgym" once found and dumped. -->
-		<description>V.Smile - Lern- und Tanzmatte (Germany)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-091324(GE)" />
-		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_rom" />
-			<feature name="pcb" value="707180" />
-			<feature name="pcb_model" value="707180-2" />
-			<feature name="cart_type" value="yellow" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" />
 			</dataarea>
 		</part>
 	</software>
@@ -2212,7 +2213,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs -->
+	<!-- No inputs, uses keyboard and mouse -->
 	<software name="pcpalisr3" supported="no">
 		<description>V.Smile PC Pal Island (USA, Rev. 3?)</description>
 		<year>200?</year>
@@ -2228,6 +2229,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<!-- No inputs, uses keyboard and mouse -->
 	<software name="pcpalisg" cloneof="pcpalisr3" supported="yes">
 		<description>V.Smile Mein erster Mausklick (Germany)</description>
 		<year>200?</year>
@@ -3452,6 +3454,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<!-- No inputs, uses a keyboard controller -->
 	<software name="smartkbg" supported="no"> <!-- Will be clone of "smartkb" once found and dumped. -->
 		<description>V.Smile Schreibspaß (Germany)</description>
 		<year>200?</year>
