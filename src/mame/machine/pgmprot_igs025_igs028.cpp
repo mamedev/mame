@@ -159,6 +159,24 @@ void pgm_028_025_state::machine_reset()
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = 0x00900000 | region;
 
+//fix olds100a
+	uint16_t *mem16 = (uint16_t *)(memregion(":user2")->base());
+	int i;
+
+	/* populate shared protection ram with data read from pcb .. */
+	for (i = 0; i < 0x4000 / 2; i++)
+	{
+		m_sharedprotram[i] = mem16[i];
+	}
+
+	//ROM:004008B4                 .word 0xFBA5
+	for(i = 0; i < 0x4000 / 2; i++)
+	{
+		if (m_sharedprotram[i] == (0xffff - i))
+			m_sharedprotram[i] = 0x4e75;
+	} 
+//fix olds100a	
+
 	pgm_state::machine_reset();
 }
 
