@@ -67,7 +67,7 @@ private:
 
 	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmpea, m_tmp16aux;
 	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8, m_prefix;
-	u32 m_acc, m_temp, m_tmp32;
+	u32 m_acc, m_temp, m_tmp32, m_tmp32aux;
 	s32 m_icount;
 	u64 m_tmp64;
 	bool m_prefix_valid;
@@ -279,6 +279,21 @@ private:
 		return rv;
 	}
 
+	inline u16 peek_stack_16()
+	{
+		u16 rv = 0;
+		if (m_ps & F_S)
+		{
+			rv = read_16((m_ssb << 16) | m_ssp);
+		}
+		else
+		{
+			rv = read_16((m_usb << 16) | m_usp);
+		}
+
+		return rv;
+	}
+
 	inline u16 pull_16_ssp()
 	{
 		u16 rv = read_16((m_ssb << 16) | m_ssp);
@@ -394,6 +409,22 @@ private:
 		}
 
 		return m_tmp64 & 0xffffffff;
+	}
+	inline u8 doADD_8(u8 lhs, u8 rhs)
+	{
+		m_tmp16 = lhs + rhs;
+		m_ps &= ~(F_C|F_V);
+		if ((m_tmp16 ^ lhs) & (m_tmp16 ^ rhs) & 0x80)
+		{
+			m_ps |= F_V;
+		}
+		if (m_tmp16 > 0xff)
+		{
+			m_ps |= F_C;
+		}
+		setNZ_8(m_tmp16 & 0xff);
+
+		return m_tmp16 & 0xff;
 	}
 	inline u16 doADD_16(u16 lhs, u16 rhs)
 	{
