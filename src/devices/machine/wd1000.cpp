@@ -470,10 +470,7 @@ WRITE8_MEMBER( wd1000_device::write )
 		//   bit 6,5  : sector size (0: 256, 1: 512, 3: 128)
 		//   bit 4,3  : drive select (0,1,2,3)
 		//   bit 2,1,0: head select (0-7)
-		uint8_t ecc = BIT(data, 7);
-		uint8_t sec_size = (data & 0x60) >> 5;
 		uint8_t drive = (data & 0x18) >> 3;
-		uint8_t head = data & 0x7;
 		m_sdh = data;
 
 		// Update the drive ready flag in the status register which
@@ -564,7 +561,6 @@ void wd1000_device::cmd_restore()
 void wd1000_device::cmd_read_sector()
 {
 	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
-	hard_disk_info *info = hard_disk_get_info(file);
 	uint8_t dma = BIT(m_command, 3);
 
 	hard_disk_read(file, get_lbasector(), m_buffer);

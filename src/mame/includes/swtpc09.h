@@ -18,7 +18,9 @@
 #include "machine/6840ptm.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
+#include "machine/input_merger.h"
 #include "imagedev/harddriv.h"
+#include "machine/wd1000.h"
 #include "machine/bankdev.h"
 #include "machine/mc14411.h"
 
@@ -37,7 +39,9 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_floppy2(*this, "fdc:2")
 		, m_floppy3(*this, "fdc:3")
+		, m_hdc(*this, "hdc")
 		, m_via(*this, "via")
+		, m_via_cb2(*this, "via_cb2")
 		, m_dat(*this, "dat")
 		, m_bankdev(*this, "bankdev")
 		, m_maincpu_clock(*this, "maincpu_clock")
@@ -82,6 +86,7 @@ private:
 	DECLARE_READ8_MEMBER( dmaf3_via_read_porta );
 	DECLARE_READ8_MEMBER( dmaf3_via_read_portb );
 	DECLARE_WRITE8_MEMBER( dmaf3_via_write_porta );
+	DECLARE_WRITE8_MEMBER( dmaf3_via_write_portb );
 	DECLARE_WRITE_LINE_MEMBER( dmaf3_via_irq );
 
 	TIMER_CALLBACK_MEMBER(floppy_motor_callback);
@@ -100,8 +105,16 @@ private:
 	DECLARE_READ8_MEMBER ( dmaf3_control_reg_r );
 	DECLARE_WRITE8_MEMBER ( dmaf3_control_reg_w );
 
-	DECLARE_READ8_MEMBER( dmaf3_wd_r );
-	DECLARE_WRITE8_MEMBER( dmaf3_wd_w );
+	DECLARE_WRITE_LINE_MEMBER(dmaf3_hdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER( dmaf3_hdc_drq_w );
+	DECLARE_READ8_MEMBER( dmaf3_hdc_control_r );
+	DECLARE_WRITE8_MEMBER( dmaf3_hdc_control_w );
+	DECLARE_READ8_MEMBER( dmaf3_hdc_reset_r );
+	DECLARE_WRITE8_MEMBER( dmaf3_hdc_reset_w );
+	DECLARE_READ8_MEMBER( dmaf3_archive_reset_r );
+	DECLARE_WRITE8_MEMBER( dmaf3_archive_reset_w );
+	DECLARE_READ8_MEMBER( dmaf3_archive_clear_r );
+	DECLARE_WRITE8_MEMBER( dmaf3_archive_clear_w );
 
 	DECLARE_WRITE8_MEMBER(dat_w);
 	DECLARE_READ8_MEMBER(main_r);
@@ -122,7 +135,6 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void swtpc09_fdc_dma_transfer();
 	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
 
 	void floppy_motor_trigger();
@@ -144,7 +156,10 @@ private:
 	optional_device<floppy_connector> m_floppy2;
 	optional_device<floppy_connector> m_floppy3;
 
+	optional_device<wd1000_device> m_hdc;
+
 	optional_device<via6522_device> m_via;
+	optional_device<input_merger_device> m_via_cb2;
 	required_shared_ptr<uint8_t> m_dat;
 	required_device<address_map_bank_device> m_bankdev;
 	required_ioport m_maincpu_clock;
@@ -158,15 +173,17 @@ private:
 
 	uint8_t m_pia_counter;             // this is the counter on pia porta
 
-	uint8_t m_fdc_dma_address_reg;     // dmaf2 or dmaf3 dma extended address reg
+	uint8_t m_dmaf_high_address[4];    // dmaf2 or dmaf3 dma extended address reg
+	uint8_t m_dmaf2_interrupt_enable;
+
 	uint8_t m_system_type;             // flag to indicate hw and rom combination
 	uint8_t m_fdc_status;              // for floppy controller
 	int m_floppy_motor_on;
 	emu_timer *m_floppy_motor_timer;
 	floppy_image_device *m_fdc_floppy; // Current selected floppy.
 	uint8_t m_fdc_side;                // Current floppy side.
-	uint8_t m_via_ca1_input;           // dmaf3 fdc interrupt is connected here
 	uint8_t m_dmaf3_via_porta;
+	uint8_t m_dmaf3_via_portb;
 	uint8_t m_active_interrupt;
 	uint8_t m_interrupt;
 
@@ -180,6 +197,20 @@ private:
 		int active;
 		int address;
 		int counter;
+		// Channel control register.
+		//  bit 0: Read / Write mode
+		//  bit 1: Mode control B
+		//  bit 2: Mode control A
+		//  bit 3: Address up (0) / down (1).
+		//  bit 4: Not used
+		//  bit 5: Not used
+		//  bit 6: Busy / Ready. Read only. Set when request
+		//         made. Cleared when transfer completed.
+		//  bit 7: DMA end flag. Read only? Set when transfer
+		//         completed. Cleared when control register
+		//          read. Sets IRQ.
+		// Mode control A,B: 0,0 Mode2; 0,1 Mode 3; 1,0 Mode 0;
+		//                   1,1 Undefined.
 		uint8_t control;
 		int start_address;
 		int start_counter;
@@ -188,8 +219,17 @@ private:
 	/* 6844 description */
 	m6844_channel_data m_m6844_channel[4];
 	uint8_t m_m6844_priority;
+	// Interrupt control register.
+	// Bit 0-3: channel interrupt enable, 1 enabled, 0 masked.
+	// Bit 4-6: unused
+	// Bit 7: Read only. Set to 1 when IRQ asserted. Clear when the
+	// control register associated with the channel that caused the
+	// interrut is read.
 	uint8_t m_m6844_interrupt;
 	uint8_t m_m6844_chain;
+	void m6844_update_interrupt();
+	void m6844_fdc_dma_transfer(uint8_t channel);
+	void m6844_hdc_dma_transfer(uint8_t channel);
 };
 
 #endif // MAME_INCLUDES_SWTPC09_H
