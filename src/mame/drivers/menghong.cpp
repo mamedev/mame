@@ -9,7 +9,7 @@
     TODO:
     - HY04 protection (controls tile RNG at very least)
     - 8bpp colors are washed, data from flash ROMs is XORed with contents
-      of NVRAM area 0x14000700-80f, might be shared with HY04 as well.
+      of NVRAM area 0x1400070b-80f, might be shared with HY04 as well.
     - EEPROM hookup;
     - extract password code when entering test mode in-game;
 
@@ -71,6 +71,7 @@ Red PCB, very similar to crzyddz2
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/vrender0.h"
+#include "machine/timer.h"
 #include "emupal.h"
 
 #include <algorithm>
@@ -85,12 +86,14 @@ public:
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc"),
+//		m_nvram(*this, "nvram"),
 		m_ds1302(*this, "rtc"),
 		m_eeprom(*this, "eeprom")
 	{ }
 
 
 	void crzyddz2(machine_config &config);
+	void menghong(machine_config &config);
 
 private:
 	/* memory pointers */
@@ -101,6 +104,7 @@ private:
 	/* devices */
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
+//	required_device<nvram_device> m_nvram;
 	required_device<ds1302_device> m_ds1302;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
@@ -118,6 +122,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void menghong_mem(address_map &map);
 	void crzyddz2_mem(address_map &map);
 
 	// PIO
@@ -126,7 +131,15 @@ private:
 	DECLARE_WRITE32_MEMBER(crzyddz2_PIOldat_w);
 	DECLARE_READ32_MEMBER(crzyddz2_PIOedat_r);
 	uint8_t m_crzyddz2_prot;
+	
+	DECLARE_READ8_MEMBER(menghong_shared_r);
+	DECLARE_WRITE8_MEMBER(menghong_shared_w);
+	DECLARE_READ8_MEMBER(crzyddz2_shared_r);
+	DECLARE_WRITE8_MEMBER(crzyddz2_shared_w);
+	uint8_t *m_sharedram;
 };
+
+
 
 IRQ_CALLBACK_MEMBER(menghong_state::icallback)
 {
@@ -170,6 +183,57 @@ WRITE32_MEMBER(menghong_state::FlashCmd_w)
 
 // Crazy Dou Di Zhu II
 // To do: HY04 (pic?) protection, 93C46 hookup
+
+READ8_MEMBER(menghong_state::menghong_shared_r)
+{	
+	if (offset >= 0x0c && offset < 0x10c)
+	{
+		// initial Sealy Logo, assuming that it should be transparent color ...
+		// 0x8e -> 0xac, should be 0x8c
+		// 0x8f -> 0xe3, should be 0x10
+		// 0x90 -> 0x50, should be 0xac
+	}
+
+	return m_sharedram[offset];
+}
+
+WRITE8_MEMBER(menghong_state::menghong_shared_w)
+{
+	m_sharedram[offset] = data;
+}
+
+READ8_MEMBER(menghong_state::crzyddz2_shared_r)
+{
+	return m_sharedram[offset];
+}
+
+WRITE8_MEMBER(menghong_state::crzyddz2_shared_w)
+{
+	m_sharedram[offset] = data;
+	
+	// State machine is unconfirmed
+	if (offset == 0x7e3)
+	{
+		switch(data)
+		{
+			case 0x00:
+				m_sharedram[0x650] = 0x00; // prints 93c46 error otherwise
+				m_sharedram[0x651] = 0x03; // PC=2012188
+				break;
+			case 0xbb:
+				// this actually affects color again, game checksums the NVRAM contents
+				// at PC=0x2011f9a, expecting a value of 0x7ebe otherwise locks up 
+				// after Sealy logo. Every single value is added to the routine and left 
+				// shifted by 1 (including the two values above)
+				for(int i=0;i<0x3f;i++)
+					m_sharedram[i+0x652] = 0xff;
+				m_sharedram[0x691] = 0x9b;
+				break;
+			// additional locking protection is also applied with RNG feature
+			// PC=0x2036756 tight loops if R1=0
+		}
+	}
+}
 
 READ32_MEMBER(menghong_state::PIOldat_r)
 {
@@ -227,14 +291,16 @@ crzyddz2    in      out
 	return 0xffffff00 | data | m_crzyddz2_prot;
 }
 
-void menghong_state::crzyddz2_mem(address_map &map)
+void menghong_state::menghong_mem(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom().nopw();
 
 	map(0x01280000, 0x01280003).w(FUNC(menghong_state::Banksw_w));
-	map(0x01400000, 0x0140ffff).ram().share("nvram");
+//	map(0x01400000, 0x0140ffff).ram().share("nvram");
+	map(0x01400000, 0x0140ffff).rw(FUNC(menghong_state::menghong_shared_r), FUNC(menghong_state::menghong_shared_w));
 	map(0x01500000, 0x01500003).portr("P1_P2");
 	map(0x01500004, 0x01500007).r(FUNC(menghong_state::crzyddz2_key_r));
+	map(0x01500008, 0x0150000b).portr("SYSTEM");
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
 	map(0x01802004, 0x01802007).rw(FUNC(menghong_state::PIOldat_r), FUNC(menghong_state::crzyddz2_PIOldat_w));
@@ -248,8 +314,16 @@ void menghong_state::crzyddz2_mem(address_map &map)
 	map(0x05000000, 0x05000003).rw(FUNC(menghong_state::FlashCmd_r), FUNC(menghong_state::FlashCmd_w));
 }
 
+void menghong_state::crzyddz2_mem(address_map &map)
+{
+	menghong_mem(map);
+	map(0x01400000, 0x0140ffff).rw(FUNC(menghong_state::crzyddz2_shared_r), FUNC(menghong_state::crzyddz2_shared_w));
+}
+
 void menghong_state::machine_start()
 {
+	m_sharedram = auto_alloc_array_clear(machine(), uint8_t, 0x10000);
+	
 	if (m_mainbank)
 	{
 		m_maxbank = (m_flash) ? m_flash.bytes() / 0x1000000 : 0;
@@ -301,6 +375,35 @@ static INPUT_PORTS_START(crzyddz2)
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x010000, 0x010000, "DSWA" )
+	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+
 	// 1500004 (multiplexed by 1802005)
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A         )
@@ -343,15 +446,15 @@ static INPUT_PORTS_START(crzyddz2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL     ) // small + D
 INPUT_PORTS_END
 
-void menghong_state::crzyddz2(machine_config &config)
+void menghong_state::menghong(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
-	m_maincpu->set_addrmap(AS_PROGRAM, &menghong_state::crzyddz2_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &menghong_state::menghong_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(menghong_state::icallback));
 
 	// HY04 running at 8 MHz
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
@@ -361,24 +464,17 @@ void menghong_state::crzyddz2(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 }
 
-ROM_START( crzyddz2 )
-	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
-	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(0f3a1987) SHA1(6cad943846c79db31226676c7391f32216cfff79) )
-
-	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF )
-	//ROM_COPY( "flash",      0x000000, 0x000000, 0x1000000 ) // copy flash here
-	ROM_LOAD( "27c322.u49", 0x000000, 0x0400000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) ) // 1ST AND 2ND HALF IDENTICAL
-
-	ROM_REGION( 0x4280, "pic", 0 ) // hy04
-	ROM_LOAD("hy04", 0x000000, 0x4280, NO_DUMP )
-ROM_END
+void menghong_state::crzyddz2(machine_config &config)
+{
+	menghong(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &menghong_state::crzyddz2_mem);
+}
 
 ROM_START( menghong )
 	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
 	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
 
 	ROM_REGION( 0x0400000, "maincpu", 0 )
-	//ROM_COPY( "flash",      0x000000, 0x000000, 0x1000000 ) // copy flash here
 	ROM_LOAD( "060511_08-01-18.u49",  0x0000000, 0x0200000, CRC(b0c12107) SHA1(b1753757bbdb7d996df563ac6abdc6b46676704b) ) // 27C160
 	ROM_RELOAD(                       0x0200000, 0x0200000 )
 
@@ -386,5 +482,16 @@ ROM_START( menghong )
 	ROM_LOAD("menghong_hy04", 0x000000, 0x4280, NO_DUMP )
 ROM_END
 
-GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+ROM_START( crzyddz2 )
+	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
+	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(0f3a1987) SHA1(6cad943846c79db31226676c7391f32216cfff79) )
+
+	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "27c322.u49", 0x000000, 0x0400000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x4280, "pic", 0 ) // hy04
+	ROM_LOAD("hy04", 0x000000, 0x4280, NO_DUMP )
+ROM_END
+
+GAME( 2004?,menghong, 0,        menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Crazy Dou Di Zhu II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
