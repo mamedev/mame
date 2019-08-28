@@ -501,10 +501,6 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 {
 	uint16_t *Packet = m_packetram;
 	uint8_t *TEXTURE = m_textureram;
-	static int test = 0;
-
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		test^=1;
 
 	Packet += PacketPtr;
 
@@ -650,12 +646,6 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 				Quad.Pal = m_InternalPalette + (m_RenderState.PaletteBank * 16);
 			else
 				Quad.Pal = m_InternalPalette;
-			
-			if (m_RenderState.PixelFormat < 2 && test)
-			{
-				printf("RAW %08x %08x\n",m_RenderState.PalOffset,m_RenderState.PaletteBank);
-				printf("CALC %08x\n",0x3800000 + ((1024 * m_RenderState.PalOffset) + (m_RenderState.PaletteBank * 16)*4) );
-			}
 				
 			if (m_RenderState.TextureMode)   //Tiled
 				DrawTile[m_RenderState.PixelFormat + 4 * Mode](&Quad);
