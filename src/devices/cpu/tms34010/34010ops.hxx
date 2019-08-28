@@ -2395,7 +2395,36 @@ void tms340x0_device::rpix_b(uint16_t op)
 void tms340x0_device::setcdp(uint16_t op)
 {
 	if (!m_is_34020) { unimpl(op); return; }
-	logerror("020:setcdp\n");
+	off_t dptch = DPTCH();
+
+	// Check whether we're dealing with an even number
+	if ((dptch & 1) == 0)
+	{
+		switch(population_count_32(dptch))
+		{
+			// .. only single bit set, pitch is power of two!
+			case 1:
+			{
+				m_convdp = 32 - count_leading_zeros(dptch);
+				COUNT_CYCLES(4);
+				return;
+			}
+			// .. two bits, we can decompose it to sum of two power of two numbers
+			case 2:
+			{
+				uint8_t first_one = count_leading_zeros(dptch);
+				uint8_t v1 = 32 - first_one;
+				uint8_t v2 = 32 - count_leading_zeros(dptch & ~(1 << (first_one - 1)));
+
+				m_convdp = v2 | (v1 << 8);
+				COUNT_CYCLES(6);
+				return;
+			}
+		}
+	}
+	// Default to arbitrary number, setting pitch to 0
+	m_convdp = 0;
+	COUNT_CYCLES(3);
 }
 
 void tms340x0_device::setcmp(uint16_t op)
