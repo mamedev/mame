@@ -169,6 +169,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 
 // slot devices
 #include "beta.h"
+#include "beta128.h"
 //#include "disciple.h"
 #include "intf1.h"
 #include "intf2.h"
@@ -189,6 +190,9 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 
 void spectrum_expansion_devices(device_slot_interface &device)
 {
+	device.option_add("betav2", SPECTRUM_BETAV2);
+	device.option_add("betav3", SPECTRUM_BETAV3);
+	device.option_add("betaplus", SPECTRUM_BETAPLUS);
 	device.option_add("beta128", SPECTRUM_BETA128);
 	//device.option_add("disciple", SPECTRUM_DISCIPLE);
 	device.option_add("intf1", SPECTRUM_INTF1);
