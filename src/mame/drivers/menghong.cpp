@@ -9,7 +9,8 @@
     TODO:
     - HY04 protection (controls tile RNG at very least)
     - 8bpp colors are washed, data from flash ROMs is XORed with contents
-      of NVRAM area 0x1400070b-80f, might be shared with HY04 as well.
+      of NVRAM area 0x1400070b-80f in menghong, might be shared with 
+	  HY04 as well.
     - EEPROM hookup;
     - extract password code when entering test mode in-game;
 
@@ -186,20 +187,176 @@ WRITE32_MEMBER(menghong_state::FlashCmd_w)
 
 READ8_MEMBER(menghong_state::menghong_shared_r)
 {	
-	if (offset >= 0x0c && offset < 0x10c)
-	{
-		// initial Sealy Logo, assuming that it should be transparent color ...
-		// 0x8e -> 0xac, should be 0x8c
-		// 0x8f -> 0xe3, should be 0x10
-		// 0x90 -> 0x50, should be 0xac
-	}
-
 	return m_sharedram[offset];
 }
 
 WRITE8_MEMBER(menghong_state::menghong_shared_w)
 {
 	m_sharedram[offset] = data;
+	
+	if (offset == 0x2a0)
+	{
+		if (data == 0x09)
+		{
+			// enables game settings by pressing start on password screen
+			m_sharedram[0x485] = 0x02;
+			
+			// start at 0x140071b, up to 0x806, rolls back at 0x70c
+			// since we don't have any reference at the moment a plaintext attack is possible with:
+			// 1. NOP the XOR opcode at 0x207f544 
+			// 2. take whatever is the original value of the supposedly transparent color on a 
+			//    given texture palette bank
+			// 3. look back in the stack area for where the value is originally loaded
+			// 4. soft reset the machine and checkout the address where this value should belong
+			//    in this area
+			// 5. finally check back if everything is right by injecting the given triplet in this
+			//    area, being careful about the inverted Blue and Red from stack to this
+			// Note: In the end this big table will be nuked in favour of an hand crafted ROM
+			
+			// operator mode big text
+			m_sharedram[0x70e] = 0x2c;
+			m_sharedram[0x70f] = 0xe6;
+			m_sharedram[0x710] = 0x05;
+			
+			// title screen (overlaps with insert coin)
+			m_sharedram[0x720] = 0xc0;
+			// insert coin
+			m_sharedram[0x721] = 0x3a; 
+			m_sharedram[0x722] = 0xfb; 
+			m_sharedram[0x723] = 0x19;
+
+			// transparency on "coin" outline / blinking on "insert"
+			m_sharedram[0x727] = 0x85;
+			m_sharedram[0x728] = 0x0d;
+			m_sharedram[0x729] = 0xfd;
+
+			m_sharedram[0x72c] = 0xc0;
+			m_sharedram[0x72d] = 0xb4;
+			m_sharedram[0x72e] = 0xdc;
+
+			m_sharedram[0x731] = 0xb3;
+			m_sharedram[0x732] = 0x2e;
+			m_sharedram[0x733] = 0xa7;
+
+			// 3rd girl (yellow dress)
+			m_sharedram[0x760] = 0x8d;
+			m_sharedram[0x761] = 0x61;
+			m_sharedram[0x762] = 0xe0;
+			
+			// 3rd girl shading
+			m_sharedram[0x76c] = 0x47 ^ 0xff;
+			m_sharedram[0x76d] = 0x75 ^ 0xff;
+			m_sharedram[0x76e] = 0xdb ^ 0xff;
+
+			// 1st girl (yellow necklace, violet dress)
+			m_sharedram[0x770] = 0x31;
+			m_sharedram[0x771] = 0x7f;
+			m_sharedram[0x772] = 0x65;
+
+			// 1st girl shading
+			m_sharedram[0x77c] = 0xb5 ^ 0xff;
+			m_sharedram[0x77d] = 0xd3 ^ 0xff;
+			m_sharedram[0x77e] = 0xc7 ^ 0xff;
+			// power up girl shading, shared with one above
+			m_sharedram[0x77f] = 0x13 ^ 0xff;
+			m_sharedram[0x780] = 0x85 ^ 0xff;
+			// power up girl transparency, shared with one below
+			m_sharedram[0x781] = 0x40;
+			m_sharedram[0x782] = 0x50;
+			// attract mode gals, shading
+			m_sharedram[0x783] = 0x15 ^ 0xff;
+			m_sharedram[0x784] = 0x14 ^ 0xff;
+			m_sharedram[0x785] = 0x16 ^ 0xff;
+			
+			// attract mode gals, transparency
+			m_sharedram[0x786] = 0x9e;
+			m_sharedram[0x787] = 0x69;
+			m_sharedram[0x788] = 0x77;
+
+			// Sealy Logo
+			m_sharedram[0x78e] = 0x8c;
+			m_sharedram[0x78f] = 0x10;
+			m_sharedram[0x790] = 0xac;
+
+			// power-up on draw
+			m_sharedram[0x791] = 0xd6;
+			m_sharedram[0x792] = 0x0d; 
+			m_sharedram[0x793] = 0x39;
+
+			// gameplay credit/bet count (3rd value matches following)
+			m_sharedram[0x794] = 0x70;
+			m_sharedram[0x795] = 0x0b;
+			// gals on title screen, shading
+			m_sharedram[0x796] = 0xd5 ^ 0xff;
+			m_sharedram[0x797] = 0x11 ^ 0xff;
+			m_sharedram[0x798] = 0x94 ^ 0xff;
+			
+			// gals on title screen, transparency
+			m_sharedram[0x799] = 0x03;
+			m_sharedram[0x79a] = 0xc2;
+			m_sharedram[0x79b] = 0xe3;
+			
+			// pre-title screen attract mode text
+			m_sharedram[0x79e] = 0xbf;
+			m_sharedram[0x79f] = 0xa9;
+			m_sharedram[0x7a0] = 0x4c;
+
+			// test mode
+			m_sharedram[0x7a1] = 0xb1;
+			m_sharedram[0x7a2] = 0x49;
+			m_sharedram[0x7a3] = 0x19;
+
+			// operator mode 4th item header kanji
+			m_sharedram[0x7a4] = 0x0e;
+			m_sharedram[0x7a5] = 0x71;
+			m_sharedram[0x7a6] = 0x3a;
+
+			// big/small kanji
+			m_sharedram[0x7b9] = 0xa3;
+			m_sharedram[0x7ba] = 0x1e;
+			m_sharedram[0x7bb] = 0x19;
+
+			// gameplay: Kanji for discard tile
+			m_sharedram[0x7be] = 0x72;
+			m_sharedram[0x7bf] = 0x22;
+			m_sharedram[0x7c0] = 0x2a;
+
+			// "WIN" text on big/small
+			m_sharedram[0x7ce] = 0x6d;
+			m_sharedram[0x7cf] = 0x93;
+			m_sharedram[0x7d0] = 0xb2;
+
+			// 2nd girl (with pearl necklace)
+			// 3d99800
+			m_sharedram[0x7d3] = 0xa3;
+			m_sharedram[0x7d4] = 0x11;
+			m_sharedram[0x7d5] = 0x83;
+			
+			// operator mode numbers
+			m_sharedram[0x7dc] = 0x6a;
+			m_sharedram[0x7dd] = 0xa5;
+			m_sharedram[0x7de] = 0x39;
+			// 2nd girl shading
+			m_sharedram[0x7df] = 0x61 ^ 0xff;
+			m_sharedram[0x7e0] = 0xc2 ^ 0xff;
+			m_sharedram[0x7e1] = 0x95 ^ 0xff;
+
+			// hand text descriptions
+			m_sharedram[0x7e8] = 0x16;
+			m_sharedram[0x7e9] = 0xb2;
+			m_sharedram[0x7ea] = 0xa3;
+			
+			// tile drawing hand
+			m_sharedram[0x7f1] = 0x00;
+			m_sharedram[0x7f2] = 0x12;
+			m_sharedram[0x7f3] = 0x9a;
+			
+			// input letters, gameplay
+			m_sharedram[0x7fc] = 0x3f;
+			m_sharedram[0x7fd] = 0x46;
+			m_sharedram[0x7fe] = 0xfd;
+		}
+	}
 }
 
 READ8_MEMBER(menghong_state::crzyddz2_shared_r)
@@ -368,7 +525,7 @@ static INPUT_PORTS_START(crzyddz2)
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1         ) // start (secret code screen)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SERVICE2       ) // .. 2  (next secret code / stats)
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE        ) // .. 1  (secret code screen / service mode)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE1       ) // .. 3  (inc secret code / credit)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE3       ) // .. 4  (exit secret screen / clear credits)
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE4       ) //       (reset and clear ram?)
