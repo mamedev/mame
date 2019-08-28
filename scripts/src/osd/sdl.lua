@@ -38,7 +38,7 @@ function maintargetosdoptions(_target,_subtarget)
 		}
 	end
 
-	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" then
+	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" and _OPTIONS["targetos"]~="asmjs" then
 		links {
 			"SDL2_ttf",
 		}
