@@ -887,16 +887,29 @@ WRITE16_MEMBER( sh2_device::rstcsr_w )
 	}
 }
 
-READ8_MEMBER( sh2_device::sbycr_r )
+READ16_MEMBER( sh2_device::fmr_sbycr_r )
 {
 	return m_sbycr;
 }
 
-WRITE8_MEMBER( sh2_device::sbycr_w )
+WRITE16_MEMBER( sh2_device::fmr_sbycr_w )
 {
-	m_sbycr = data;
-	if (data & 0x1f)
-		logerror("SH2 module stop selected %02x\n",data);
+	switch (mem_mask)
+	{
+	case 0xff00: // FMR 8bit
+		logerror("SH2 set clock multiplier x%d\n", 1 << ((data >> 8) & 3));
+		break;
+	case 0xffff: // FMR 16bit
+		// SH7604 docs says FMR register must be set using 8-bit write, however at practice 16-bit works too.
+		// has been verified for CPS3 custom SH2, SH7604 and SH7095 (clock multiplier feature is not officially documented for SH7095).
+		logerror("SH2 set clock multiplier x%d\n", 1 << (data & 3));
+		break;
+	case 0x00ff: // SBYCR
+		m_sbycr = data;
+		if (data & 0x1f)
+			logerror("SH2 module stop selected %02x\n", data);
+		break;
+	}
 }
 
 READ8_MEMBER( sh2_device::ccr_r )

@@ -194,8 +194,8 @@ public:
 	DECLARE_WRITE16_MEMBER( rstcsr_w );
 
 	// misc
-	DECLARE_READ8_MEMBER( sbycr_r );
-	DECLARE_WRITE8_MEMBER( sbycr_w );
+	DECLARE_READ16_MEMBER( fmr_sbycr_r );
+	DECLARE_WRITE16_MEMBER( fmr_sbycr_w );
 	DECLARE_READ8_MEMBER( ccr_r );
 	DECLARE_WRITE8_MEMBER( ccr_w );
 
