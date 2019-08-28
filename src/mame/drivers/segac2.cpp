@@ -40,7 +40,7 @@
     1994  Ichidant-R (World)         Sega              ?                C2
     1994  Ichidant-R (Korea)         Sega              ?                C2
     1994  Puyo Puyo 2                Compile           317-0228         C2
-    1994  Zunzunkyou no Yabou        Sega              ?                C2
+    1994  Zunzunkyou no Yabou        Sega              317-0221         C2
 
     1995  Print Club (Vol.1)         Atlus             ?                C2
     1995  Print Club (Vol.2)         Atlus             ?                C2
@@ -2035,7 +2035,7 @@ ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega - 834-10778 (EMP5032 labeled 31
 ROM_END
 
 
-ROM_START( zunkyou ) /* Zunzunkyou no Yabou  (c)1994 Sega */
+ROM_START( zunkyou ) /* Zunzunkyou no Yabou  (c)1994 Sega - 834-9029 (EMP5032 labeled 317-0221)  */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16812.ic32", 0x000000, 0x080000, CRC(eb088fb0) SHA1(69089a3516ad50f35e81971ef3c33eb3f5d52374) )
 	ROM_LOAD16_BYTE( "epr-16811.ic31", 0x000001, 0x080000, CRC(9ac7035b) SHA1(1803ffbadc1213e04646d483e27da1591e22cd06) )
