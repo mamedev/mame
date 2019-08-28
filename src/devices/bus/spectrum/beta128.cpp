@@ -10,6 +10,26 @@
 	due to changes in the 128k ROM structure etc. (enable address
 	is moved from 3cxx to 3dxx for example)
 
+	Issues:
+
+	Using the FD1793 device a 'CAT' operation in the 'spectrum' driver
+	will always report 'No Disk' but using the Soviet clone KR1818VG93
+	it properly gives the disk catalogue.  Despite this files can still
+	be loaded from disk.
+
+	The 128k Spectrum drivers have a similar issues, although even if
+	you replace the controller doing a 'CAT' operation seems to have
+	an adverse effect on the system memory setup as things become
+	corrupt (LOADing or MERGEing a program afterwards can cause a reset)
+
+	Neither of these issues occur in other Spectrum emulators using
+	the same ROMs and floppy images.
+
+	TODO:
+
+	there were many unofficial ROMs available for this, make them
+	available for use.
+
 *********************************************************************/
 
 #include "emu.h"
@@ -28,8 +48,8 @@ DEFINE_DEVICE_TYPE(SPECTRUM_BETA128, spectrum_beta128_device, "spectrum_beta128"
 //-------------------------------------------------
 
 INPUT_PORTS_START(beta128)
-	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Magic Button") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_beta128_device, magic_button, 0)
+	PORT_START("BUTTON") // don't use F12, it clashes with the 'exit from debugger' button
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Magic Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_beta128_device, magic_button, 0)
 
 	PORT_START("SWITCH")
 	PORT_CONFNAME(0x03, 0x01, "System Switch") //PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_beta128_device, switch_changed, 0)
@@ -86,6 +106,8 @@ ROM_END
 void spectrum_beta128_device::device_add_mconfig(machine_config &config)
 {
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
+	//KR1818VG93(config, m_fdc, 4_MHz_XTAL / 4);
+
 	FLOPPY_CONNECTOR(config, "fdc:0", beta_floppies, "525qd", spectrum_beta128_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", beta_floppies, "525qd", spectrum_beta128_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", beta_floppies, nullptr, spectrum_beta128_device::floppy_formats).enable_sound(true);

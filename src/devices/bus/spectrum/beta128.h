@@ -48,7 +48,7 @@ protected:
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
 	required_memory_region m_rom;
-	required_device<fd1793_device> m_fdc;
+	required_device<wd_fdc_device_base> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<spectrum_expansion_slot_device> m_exp;
 	required_ioport m_switch;

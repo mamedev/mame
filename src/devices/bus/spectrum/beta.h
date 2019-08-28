@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Nigel Barnes
+// copyright-holders:Nigel Barnes, David Haywood
 /*********************************************************************
 
     Technology Research Beta Disk interface
 
 *********************************************************************/
-#ifndef MAME_BUS_SPECTRUM_BETA_H
-#define MAME_BUS_SPECTRUM_BETA_H
+#ifndef MAME_BUS_SPECTRUM_BETAV2_H
+#define MAME_BUS_SPECTRUM_BETAV2_H
 
 #include "exp.h"
 #include "softlist.h"
@@ -18,15 +18,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class spectrum_beta_device :
+class spectrum_betav2_device :
 	public device_t,
 	public device_spectrum_expansion_interface
 
 {
 public:
 	// construction/destruction
-	spectrum_beta_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	spectrum_beta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betav2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betav2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -36,6 +36,7 @@ protected:
 	virtual void device_reset() override;
 
 	// optional information overrides
+	void device_add_mconfig_base(machine_config& config);
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -47,15 +48,47 @@ protected:
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
 	required_memory_region m_rom;
-	required_device<fd1793_device> m_fdc;
+	required_device<wd_fdc_device_base> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<spectrum_expansion_slot_device> m_exp;
 
 	int m_romcs;
 };
 
+class spectrum_betav3_device :
+	public spectrum_betav2_device
+{
+public:
+	// construction/destruction
+	spectrum_betav3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betav3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+};
+
+class spectrum_betaplus_device :
+	public spectrum_betav3_device
+{
+public:
+	// construction/destruction
+	spectrum_betaplus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betaplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_INPUT_CHANGED_MEMBER(magic_button);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
+};
+
 // device type definition
-DECLARE_DEVICE_TYPE(SPECTRUM_BETA, spectrum_beta_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_BETAV2, spectrum_betav2_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_BETAV3, spectrum_betav3_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_BETAPLUS, spectrum_betaplus_device)
 
 
-#endif // MAME_BUS_SPECTRUM_BETA_H
+#endif // MAME_BUS_SPECTRUM_BETAV2_H
