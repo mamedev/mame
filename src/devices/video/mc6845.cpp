@@ -705,8 +705,9 @@ bool mc6845_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 	}
 
 	uint16_t cursor_start_ras = m_cursor_start_ras & 0x1f;
+	uint16_t max_ras_addr = m_max_ras_addr  + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust);
 
-	if (cursor_start_ras > m_max_ras_addr)
+	if (cursor_start_ras > max_ras_addr)
 	{
 		// No cursor possible.
 		return false;
@@ -714,6 +715,11 @@ bool mc6845_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 
 	if (cursor_start_ras <= m_cursor_end_ras)
 	{
+		if (m_cursor_end_ras > max_ras_addr)
+		{
+			// Full cursor.
+			return true;
+		}
 		// Cursor from start to end inclusive.
 		return (ra >= cursor_start_ras) && (ra <= m_cursor_end_ras);
 	}
