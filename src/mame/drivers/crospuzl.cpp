@@ -9,8 +9,11 @@
 	TODO:
 	- Dies at POST with a SPU error, 
 	  supposedly it should print a "running system." instead of "Ok" at the 
-	  end of the POST routine;
-	- Hooking up serflash_device instead of the custom implementation here
+	  end of the POST routine.
+	  Update: it tries to load a "sdata.bin" file, which is nowhere to be found in the dump.
+	  Considering also that first $20000 block is empty and loading the flash linearly gives 
+	  the reference memory size but then game isn't detected at all.
+	- Hooking up nand_device instead of the custom implementation here
 	  makes the game to print having all memory available and no game 
 	  detected, fun
 	- I2C RTC interface should be correct but still doesn't work, sending
@@ -117,7 +120,7 @@ READ8_MEMBER(crospuzl_state::FlashCmd_r)
 		// and the standard claims that the ID is 7 + 1 parity bit.
 		// TODO: Retrieve ID from actual HW service mode screen.
 //		const uint8_t id[5] = { 0xee, 0x81, 0x00, 0x15, 0x00 };
-		const uint8_t id[5] = { 0xec, 0xf1, 0x00, 0x15, 0x00 };
+		const uint8_t id[5] = { 0xec, 0xf1, 0x00, 0x95, 0x40 };
 		uint8_t res = id[m_FlashAddr];
 		m_FlashAddr ++;
 		m_FlashAddr %= 5;
@@ -369,6 +372,11 @@ void crospuzl_state::crospuzl(machine_config &config)
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 	m_vr0soc->set_external_vclk(14318180 * 2); // Unknown clock, should output ~70 Hz?
 
+//  ROM strings have references to a K9FXX08 device
+//  TODO: use this device, in machine/smartmed.h (has issues with is_busy() emulation)
+//	NAND(config, m_nand, 0);
+//	m_nand->set_nand_type(nand_device::chip::K9F1G08U0B); // TODO: exact flavor
+
 	PCF8583(config, m_rtc, 32.768_kHz_XTAL);
 }
 
@@ -376,10 +384,9 @@ ROM_START( crospuzl )
 	ROM_REGION( 0x80010, "maincpu", 0 )
 	ROM_LOAD("en29lv040a.u5",  0x000000, 0x80010, CRC(d50e8500) SHA1(d681cd18cd0e48854c24291d417d2d6d28fe35c1) )
 
-	ROM_REGION( 0x8400010, "flash", ROMREGION_ERASEFF ) // NAND Flash
-	// mostly empty, but still looks good
-	ROM_LOAD("k9f1g08u0a.riser",  0x000000, 0x0020000, CRC(7f3c88c3) SHA1(db3169a7b4caab754e9d911998a2ece13c65ce5b) )
-	ROM_CONTINUE(                 0x000000, 0x8400010-0x0020000 )
+	ROM_REGION( 0x8400010, "flash", ROMREGION_ERASE00 ) // NAND Flash
+	ROM_LOAD("k9f1g08u0a.riser",  0x00000, 0x8400010, BAD_DUMP CRC(7f3c88c3) SHA1(db3169a7b4caab754e9d911998a2ece13c65ce5b) )
+	ROM_COPY( "flash",            0x20000, 0x00000, 0x20000 )
 ROM_END
 
 GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crospuzl_state, empty_init,    ROT0, "<unknown>",           "Cross Puzzle", MACHINE_NOT_WORKING )
