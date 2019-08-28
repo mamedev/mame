@@ -12218,7 +12218,7 @@
 	</software>
 
 	<software name="saga" cloneof="ffantleg">
-		<description>Makai Toushi Sa-Ga (Jpn, Rev. A)</description>
+		<description>Makai Toushi Sa-Ga (Jpn, Rev. 1)</description>
 		<year>1989</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="DMG-SAJ"/>
@@ -12373,7 +12373,7 @@
 		<description>Mario &amp; Yoshi (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-YO-(EUR/ITA)"/>
+		<info name="serial" value="DMG-YO-EUR, DMG-YO-ITA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- ITA cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -12418,7 +12418,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="u3" value="U3 RAM [LH5268ANF-10YLL]" />
 			<feature name="u4" value="U4 26A [6129A]" />
 			<feature name="batt" value="Batt CR1616" />
@@ -12440,9 +12440,12 @@
 		<info name="release" value="19950127"/>
 		<info name="alt_title" value="ママレード・ボーイ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="marmalade boy (japan).bin" size="262144" crc="0f3ff7da" sha1="60125690b7a354ff8e72f497c8a88ecd691e7e4b"/>
+				<rom name="dmg-amaj-0.u1" size="262144" crc="0f3ff7da" sha1="60125690b7a354ff8e72f497c8a88ecd691e7e4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12548,9 +12551,12 @@
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-ADMP-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="maus, die (europe) (en,fr,de,es).bin" size="262144" crc="478f573c" sha1="bf2b9d7a54ff0b80c2710f747f5457578caa0cd0"/>
+				<rom name="dmg-admp-0.u1" size="262144" crc="478f573c" sha1="bf2b9d7a54ff0b80c2710f747f5457578caa0cd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12589,16 +12595,22 @@
 
 	<software name="medakabu">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
-		<description>Medarot - Kabuto Version (Jpn, Rev. A)</description>
+		<description>Medarot - Kabuto Version (Jpn, Rev. 1)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AMXJ-JPN"/>
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="メダロット カブトバージョン"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DEDN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="medarot - kabuto version (japan) (rev a).bin" size="524288" crc="12a3982d" sha1="1cbc7ab5941dc27bc50699a00ef2b1beb930449d"/>
+				<rom name="dmg-amxj-1.u1" size="524288" crc="12a3982d" sha1="1cbc7ab5941dc27bc50699a00ef2b1beb930449d"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -12614,9 +12626,15 @@
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="メダロット カブトバージョン"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DEDN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="medarot - kabuto version (japan).bin" size="524288" crc="1bab9900" sha1="ae26b9310ab41d94a73b807ef5f30e2d0e34d667"/>
+				<rom name="dmg-amxj-0.u1" size="524288" crc="1bab9900" sha1="ae26b9310ab41d94a73b807ef5f30e2d0e34d667"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -12625,16 +12643,22 @@
 
 	<software name="medakuwa">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
-		<description>Medarot - Kuwagata Version (Jpn, Rev. A)</description>
+		<description>Medarot - Kuwagata Version (Jpn, Rev. 1)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AMYJ-JPN"/>
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="メダロット クワガタバージョン"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DEDN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
+			<feature name="u3" value="U3 RAM [LH52256CN-10LL]" />
+			<feature name="u4" value="U4 26A [6129A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="medarot - kuwagata version (japan) (rev a).bin" size="524288" crc="5e77e82e" sha1="2262f69a89abe0f66dc1554c1ee470fd536130a3"/>
+				<rom name="dmg-amyj-1.u1" size="524288" crc="5e77e82e" sha1="2262f69a89abe0f66dc1554c1ee470fd536130a3"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -12743,7 +12767,7 @@
 		<description>Mega Man - Dr. Wily's Revenge (USA)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
-		<info name="serial" value="DMG-RW-USA"/>
+		<info name="serial" value="DMG-RW-USA, DMG-RW-USA-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -12775,11 +12799,14 @@
 		<description>Mega Man II (USA)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
-		<info name="serial" value="DMG-W2-USA"/>
+		<info name="serial" value="DMG-W2-USA, DMG-W2-USA-1"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="megaman ii (usa).bin" size="262144" crc="e496f686" sha1="334f1a93346d55e1be2967f0af952e37aa52fca7"/>
+				<rom name="dmg-w2e-0.u1" size="262144" crc="e496f686" sha1="334f1a93346d55e1be2967f0af952e37aa52fca7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12788,7 +12815,7 @@
 		<description>Mega Man III (Euro)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-W3-(NOE/FAH)"/>
+		<info name="serial" value="DMG-W3-NOE, DMG-W3-FAH"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -12972,13 +12999,19 @@
 		<description>Metroid II - Return of Samus (World)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-MEA, DMG-ME-USA, DMG-ME-(ESP-1/UKV)"/>
+		<info name="serial" value="DMG-MEA, DMG-ME-USA, DMG-ME-ESP-1, DMG-ME-UKV, DMG-ME-NOE, DMG-ME-CAN, DMG-ME-SCN, DMG-206 CHN"/>
 		<info name="release" value="19920121 (JPN)"/>
-		<info name="alt_title" value="メトロイド2 リターン・オブ・サムス"/>
+		<info name="alt_title" value="メトロイド2 リターン・オブ・サムス (Japan), METROID II - RETRUN OF SAMUS 银河战士II·銀河戰士II (China)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-M11" />
+			<feature name="u1" value="U1 512K-4M ROM [epoxy]" />
+			<feature name="u2" value="U2 MBC1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 BA6129" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="metroid ii - return of samus (world).bin" size="262144" crc="dee05370" sha1="74a2fad86b9a4c013149b1e214bc4600efb1066d"/>
+				<rom name="u1" size="262144" crc="dee05370" sha1="74a2fad86b9a4c013149b1e214bc4600efb1066d"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13018,10 +13051,14 @@
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-I5-USA, DMG-I5-NOE"/>
+		<info name="alt_title" value="Mickey Mouse V - Zauberstäbe (German Box)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN(K)-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="mickey mouse - magic wand (usa, europe).bin" size="131072" crc="f0482567" sha1="90a181ee7d42941bce3b425077d6570da0e2fb2c"/>
+				<rom name="dmg-i5x-0.u1" size="131072" crc="f0482567" sha1="90a181ee7d42941bce3b425077d6570da0e2fb2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13049,9 +13086,12 @@
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="ミッキーマウスIV 魔法のラビリンス ~ Mickey Mouse IV - Mahou no Labyrinth (Box)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="mickey mouse iv (japan).bin" size="131072" crc="0d30b3a1" sha1="d091d67890103ca97caf2c46d6bf4e2a85c92383"/>
+				<rom name="dmg-l4a-0.u1" size="131072" crc="0d30b3a1" sha1="d091d67890103ca97caf2c46d6bf4e2a85c92383"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13107,9 +13147,12 @@
 		<info name="serial" value="DMG-MC-USA"/>
 		<info name="alt_title" value="Mickey's Dangerous Chase (Box)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="mickey's chase (usa).bin" size="131072" crc="7b822d8f" sha1="37d0737be3773ad62664645d34505a136f0be99b"/>
+				<rom name="dmg-mce-0.u1" size="131072" crc="7b822d8f" sha1="37d0737be3773ad62664645d34505a136f0be99b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13168,9 +13211,12 @@
 		<info name="release" value="19961221"/>
 		<info name="alt_title" value="みどりのマキバオー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="midori no makibaou (japan).bin" size="262144" crc="1dd93d95" sha1="4de380b202e375761f9fe7fb13349f5b02e2dac2"/>
+				<rom name="dmg-anaj-0.u1" size="262144" crc="1dd93d95" sha1="4de380b202e375761f9fe7fb13349f5b02e2dac2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13236,16 +13282,19 @@
 	</software>
 
 	<software name="milonj" cloneof="milon">
-		<description>Milon no Meikyuu Kumikyoku (Jpn)</description>
+		<description>Milon no Meikyuu Kumikyoku (Jpn, Chn)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="DMG-M8J"/>
+		<info name="serial" value="DMG-M8J, DMG-111 CHN"/>
 		<info name="release" value="19930326"/>
-		<info name="alt_title" value="ミロンの迷宮組曲"/>
+		<info name="alt_title" value="ミロンの迷宮組曲 (Japan), 迷宮組曲 MILON'S SECRET CASTLE 美拢迷宫组曲·美攏迷宮組曲 (China)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-M11" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="milon no meikyuu kumikyoku (japan).bin" size="131072" crc="f188c94c" sha1="95e6473824b7671140c738e0d3bfdbe2b1f39480"/>
+				<rom name="u2" size="131072" crc="f188c94c" sha1="95e6473824b7671140c738e0d3bfdbe2b1f39480"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13321,9 +13370,15 @@
 		<info name="release" value="19970926"/>
 		<info name="alt_title" value="ミニ4ボーイII ファイナルエボリューション"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
+			<feature name="u3" value="U3 RAM [BR6265BF-10SL]" />
+			<feature name="u4" value="U4 26A [6129A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="mini 4 boy ii - final evolution (japan).bin" size="524288" crc="d6962241" sha1="eebcf67ab1455501f1b758ab71a8dc22808b34f1"/>
+				<rom name="dmg-aj2j-0.u1" size="524288" crc="d6962241" sha1="eebcf67ab1455501f1b758ab71a8dc22808b34f1"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13354,9 +13409,15 @@
 		<info name="release" value="19970523"/>
 		<info name="alt_title" value="ミニ四駆GB レッツ&amp;ゴー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DEDN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="miniyonku gb let's &amp; go!! (japan).bin" size="524288" crc="fc0c180b" sha1="a51dc3ea1961297a3056e0326c8a153f496dae8a"/>
+				<rom name="dmg-am4j-0.u1" size="524288" crc="fc0c180b" sha1="a51dc3ea1961297a3056e0326c8a153f496dae8a"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -13382,16 +13443,21 @@
 	</software>
 
 	<software name="miracle">
-		<description>Miracle Adventure of Esparks - Ushinawareta Seiseki Perivron (Jpn)</description>
+		<description>Miracle Adventure of Esparks - Ushinawareta Seiseki Perivron (Jpn, Chn)</description>
 		<year>1992</year>
 		<publisher>Tomy</publisher>
-		<info name="serial" value="DMG-ESJ"/>
+		<info name="serial" value="DMG-ESJ, DMG-124 CHN"/>
 		<info name="release" value="19921211"/>
-		<info name="alt_title" value="ミラクルアドベンチャー エスパークス 失われた聖石ペリヴァロン"/>
+		<info name="alt_title" value="ミラクルアドベンチャー エスパークス 失われた聖石ペリヴァロン (Japan), MIRACLE ADVENTURE OF ESPARKS 魔法神剑·魔法神劍 (China)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
+			<!-- Chinese cart
+			<feature name="pcb" value="DMG-BEAN-M13" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
+			-->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-esj-0.u1" size="131072" crc="b3ad9b76" sha1="27b272aff632f7e8ca72e87627ce37336666c952"/>
@@ -13405,8 +13471,10 @@
 		<publisher>Accolade</publisher>
 		<info name="serial" value="DMG-MW-USA, DMG-MW-ESP"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-AAA-03" />
+			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
-				<rom name="missile command (usa, europe).bin" size="32768" crc="3a6cd4d8" sha1="ed529062ae3d1feb4defbf54c2cc759211e3aeaa"/>
+				<rom name="dmg-mwe-0.u1" size="32768" crc="3a6cd4d8" sha1="ed529062ae3d1feb4defbf54c2cc759211e3aeaa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13476,12 +13544,13 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR & USA carts -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" />
-			<feature name="u3" value="U3 RAM [XLJ6265BF-10SL]" />
+			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" /> <!-- Also with [DMG MBC1B1] -->
+			<feature name="u3" value="U3 RAM [XLJ6265BF-10SL]" /> <!-- Also with [HY6264ALLJ-10] -->
 			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
+				<!-- USA cart has label DMG-AMOE-0 -->
 				<rom name="dmg-amop-0.u1" size="524288" crc="2c36c74c" sha1="37085973519d61e17797693b23016493da56a462"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
@@ -13498,9 +13567,15 @@
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="桃太郎コレクション"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-MC-DFCN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" />
+			<feature name="u3" value="U3 RAM [LH5268ANF-10PLL]" />
+			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1col" />
 			<dataarea name="rom" size="1048576">
-				<rom name="momotarou collection (japan).bin" size="1048576" crc="ad376905" sha1="cd7088d13f5b80f32c0fae95a57969f6f33a9a02"/>
+				<rom name="dmg-amdj-0.u1" size="1048576" crc="ad376905" sha1="cd7088d13f5b80f32c0fae95a57969f6f33a9a02"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13650,9 +13725,12 @@
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="DMG-LY-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="monopoly (usa).bin" size="131072" crc="fd90f0d6" sha1="ff54ef03cb4dda14890ae0394dd7ba5e00130d08"/>
+				<rom name="dmg-lye-0.u1" size="131072" crc="fd90f0d6" sha1="ff54ef03cb4dda14890ae0394dd7ba5e00130d08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13744,9 +13822,15 @@
 		<info name="release" value="19930319"/>
 		<info name="alt_title" value="モンスターメーカー2 ウルの秘剣"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="monster maker 2 - uru no hiken (japan).bin" size="262144" crc="66e708fc" sha1="ffac4e116cfe1c2d545c746640cc55e7df59101b"/>
+				<rom name="dmg-m6j-0.u1" size="262144" crc="66e708fc" sha1="ffac4e116cfe1c2d545c746640cc55e7df59101b"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13775,9 +13859,15 @@
 		<info name="release" value="19980306"/>
 		<info name="alt_title" value="もんすたあ★レース"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DEDN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="monster race (japan).bin" size="524288" crc="c191bd66" sha1="bb305ec61ec272a7a2fada1c03ba6784c5168f86"/>
+				<rom name="dmg-amrj-0.u1" size="524288" crc="c191bd66" sha1="bb305ec61ec272a7a2fada1c03ba6784c5168f86"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -13793,9 +13883,15 @@
 		<info name="release" value="19981002"/>
 		<info name="alt_title" value="もんすたあ★レース おかわり"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DEDN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="monster race okawari (japan).bin" size="524288" crc="bd3039e5" sha1="a566012977dbcede8066c06e445b6a346d158e53"/>
+				<rom name="dmg-amfj-0.u1" size="524288" crc="bd3039e5" sha1="a566012977dbcede8066c06e445b6a346d158e53"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -13865,7 +13961,7 @@
 		<description>Mortal Kombat (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-C9-USA, DMG-C9-(NOE-1/UKV)"/>
+		<info name="serial" value="DMG-C9-USA, DMG-C9-NOE-1, DMG-C9-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV & NOE-1 carts -->
 			<feature name="u1" value="U1 PRG" />
@@ -13885,7 +13981,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- Also found on DMG-BEAN(K)-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" /> <!-- Also with [DMG MBC1-B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-a3mp-0.u1" size="524288" crc="40c9d0f2" sha1="73d10c377eab9bf73b1824ac1fe4a1855dee7303"/>
@@ -13899,9 +13995,12 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-A3ME-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="mortal kombat 3 (usa).bin" size="524288" crc="bf9c65fb" sha1="b43626e2f20fa865783892ab8a012aa86e1dcee2"/>
+				<rom name="dmg-a3me-0.u1" size="524288" crc="bf9c65fb" sha1="b43626e2f20fa865783892ab8a012aa86e1dcee2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14063,11 +14162,14 @@
 		<description>Mr. Do! (Euro)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="DMG-M4-NOE"/>
+		<info name="serial" value="DMG-M4-NOE, DMG-M4-UKV"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="mr. do! (europe).bin" size="65536" crc="cf84ac77" sha1="83663a2d49cfe41e6d9a6aad6157d7d8f024e969"/>
+				<rom name="dmg-m4x-0.u1" size="65536" crc="cf84ac77" sha1="83663a2d49cfe41e6d9a6aad6157d7d8f024e969"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14106,7 +14208,7 @@
 		<description>Ms. Pac-Man (Euro, Aus)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-N4-(UKV/AUS)"/>
+		<info name="serial" value="DMG-N4-UKV, DMG-N4-AUS"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -14150,7 +14252,7 @@
 		<description>Disney's Mulan (Euro, USA)</description>
 		<year>1998</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="DMG-AMLE-USA, DMG-AMLP-EUR-1"/>
+		<info name="serial" value="DMG-AMLE-USA, DMG-AMLP-EUR, DMG-AMLP-EUR-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -14183,9 +14285,12 @@
 		<publisher>Asmik</publisher>
 		<info name="serial" value="DMG-MY-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="mysterium (usa).bin" size="131072" crc="eb225e96" sha1="382c346af83e3cb9f95192378843d4e15ef93716"/>
+				<rom name="dmg-mye-0.u1" size="131072" crc="eb225e96" sha1="382c346af83e3cb9f95192378843d4e15ef93716"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14194,7 +14299,7 @@
 		<description>Mystic Quest (Euro)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-FF-(ESP-1/UKV)"/>
+		<info name="serial" value="DMG-FF-ESP-1, DMG-FF-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
@@ -14223,10 +14328,16 @@
 		<description>Mystic Quest (Ger)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
+		<info name="serial" value="DMG-FF-NOE, DMG-FF-FRG"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-GDAN-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC2A" />
+			<feature name="u3" value="U3 26A" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
-				<rom name="mystic quest (germany).bin" size="262144" crc="0351b9a6" sha1="7cb65cb314e3f26b92549ddc7f4fc275186c6170"/>
+				<rom name="dmg-ffd-0.u1" size="262144" crc="0351b9a6" sha1="7cb65cb314e3f26b92549ddc7f4fc275186c6170"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
