@@ -499,10 +499,6 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 {
 	uint16_t *Packet = m_packetram;
 	uint8_t *TEXTURE = m_textureram;
-	static int test = 0;
-
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		test^=1;
 
 	Packet += PacketPtr;
 
