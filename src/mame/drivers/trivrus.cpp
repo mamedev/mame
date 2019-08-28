@@ -7,8 +7,10 @@
     driver by Angelo Salese, based off original crystal.cpp by ElSemi
 
     TODO:
-    - touch panel;
-    - RTC;
+    - touch panel, according to service mode can be generic, atouch or 3M 
+	  (microtouch?). It interfaces thru UART0 port;
+    - RTC (unknown type);
+	- Split romset or add a slot option supporting debug terminal mode;
 
 =============================================================================
 
@@ -16,19 +18,13 @@
 
 #include "emu.h"
 #include "cpu/se3208/se3208.h"
-#include "machine/ds1302.h"
 #include "machine/nvram.h"
-#include "machine/eepromser.h"
 #include "machine/vrender0.h"
-#include "sound/vrender0.h"
-#include "video/vrender0.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include <algorithm>
-
-#define IDLE_LOOP_SPEEDUP
 
 class trivrus_state : public driver_device
 {
@@ -39,8 +35,7 @@ public:
 		m_flash(*this, "flash"),
 		m_maincpu(*this, "maincpu"),
 		m_mainbank(*this, "mainbank"),
-		m_vr0soc(*this, "vr0soc"),
-		m_ds1302(*this, "rtc")
+		m_vr0soc(*this, "vr0soc")
 	{ }
 
 
@@ -56,7 +51,6 @@ private:
 	required_device<se3208_device> m_maincpu;
 	optional_memory_bank m_mainbank;
 	required_device<vrender0soc_device> m_vr0soc;
-	required_device<ds1302_device> m_ds1302;
 
 	uint32_t    m_FlashCmd;
 	uint32_t    m_Bank;
@@ -95,26 +89,19 @@ WRITE32_MEMBER(trivrus_state::FlashCmd_w)
 
 READ32_MEMBER(trivrus_state::PIOedat_r)
 {
-	return m_ds1302->io_r() << 28;
+	return 0;
 }
 
 READ32_MEMBER(trivrus_state::PIOldat_r)
 {
+	// ...
 	return m_PIO;
 }
 
 // PIO Latched output DATa Register
-// TODO: change me
 WRITE32_MEMBER(trivrus_state::PIOldat_w)
 {
-	uint32_t RST = data & 0x01000000;
-	uint32_t CLK = data & 0x02000000;
-	uint32_t DAT = data & 0x10000000;
-
-	m_ds1302->ce_w(RST ? 1 : 0);
-	m_ds1302->io_w(DAT ? 1 : 0);
-	m_ds1302->sclk_w(CLK ? 1 : 0);
-
+	// ...
 	COMBINE_DATA(&m_PIO);
 }
 
@@ -171,7 +158,8 @@ void trivrus_state::trivrus_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().nopw();
 
-//  0x01280000 & 0x0000ffff (written at boot)
+	map(0x01280000, 0x01280003).w(FUNC(trivrus_state::Banksw_w));
+
 	map(0x01500000, 0x01500000).rw(FUNC(trivrus_state::trivrus_input_r), FUNC(trivrus_state::trivrus_input_w));
 //  0x01500010 & 0x000000ff = sec
 //  0x01500010 & 0x00ff0000 = min
@@ -179,6 +167,7 @@ void trivrus_state::trivrus_mem(address_map &map)
 //  0x01500014 & 0x00ff0000 = day
 //  0x01500018 & 0x000000ff = month
 //  0x0150001c & 0x000000ff = year - 2000
+	// another device is actually accessed on odd address, unless it's still RTC above
 	map(0x01600000, 0x01607fff).ram().share("nvram");
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
@@ -268,12 +257,12 @@ static INPUT_PORTS_START(trivrus)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Interlace?" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Serial?" )
+	PORT_DIPNAME( 0x01, 0x01, "Monitor Type" )
+	PORT_DIPSETTING(    0x01, "VGA" )
+	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_DIPNAME( 0x02, 0x02, "UART Monitor Mode" ) // communicates via UART0 port to an unknown device (presumably a terminal, unemulated)
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )       // hangs at boot
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -296,7 +285,7 @@ INPUT_PORTS_END
 
 void trivrus_state::trivrus(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
+	SE3208(config, m_maincpu, 14318180 * 3); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &trivrus_state::trivrus_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(trivrus_state::icallback));
 
@@ -304,8 +293,7 @@ void trivrus_state::trivrus(machine_config &config)
 
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
-
-	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
+	m_vr0soc->set_external_vclk(28636360);
 }
 
 ROM_START( trivrus )
