@@ -428,15 +428,15 @@
 	</software>
 
 	<software name="aladdin">
-		<!-- Notes: SGB enhanced -->
-		<description>Disney's Aladdin (Euro)</description>
+		<description>Disney's Aladdin (Australia, Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
-		<info name="serial" value="DMG-ALAP-EUR, DMG-ALAP-EUR-1"/>
+		<info name="serial" value="DMG-ALAP-AUS, DMG-ALAP-EUR, DMG-ALAP-EUR-1"/>
+		<sharedfeat name="compatibility" value="GB,SGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN-10 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" /> <!-- Also found with [DMG MBC1-B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-alap-0.u1" size="262144" crc="283c58b7" sha1="a40694a808c5a0d3eeb386f81ad5b0c11163238f"/>
@@ -459,10 +459,11 @@
 	</software>
 
 	<software name="alfred">
-		<description>Alfred Chicken (Euro)</description>
+		<description>Alfred Chicken (Europe)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="DMG-C3-FAH, DMG-C3-UKV"/>
+		<sharedfeat name="compatibility" value="GB" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -504,14 +505,15 @@
 	</software>
 
 	<software name="alien3">
-		<description>Alien³ (Euro, USA)</description>
+		<description>Alien³ (Australia, Europe, USA)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
-		<info name="serial" value="DMG-L3-USA, DMG-L3-NOE"/>
+		<info name="serial" value="DMG-L3-AUS, DMG-L3-NOE, DMG-L3-USA"/>
+		<sharedfeat name="compatibility" value="GB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-l3e-0.u1" size="131072" crc="effb960b" sha1="ab4d11eee7faea42c637505469e0671c9d4a83f8"/>
@@ -595,7 +597,7 @@
 		<description>Alleyway (World)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-AWA, DMG-AW-USA, DMG-AW-(UKV/ESP-1)"/>
+		<info name="serial" value="DMG-AWA, DMG-AW-USA, DMG-AW-UKV, DMG-AW-ESP-1"/>
 		<info name="release" value="19890421 (JPN)"/>
 		<info name="alt_title" value="アレイウェイ"/>
 		<part name="cart" interface="gameboy_cart">
@@ -14426,9 +14428,12 @@
 		<info name="release" value="19911227"/>
 		<info name="alt_title" value="中嶋 悟 監修 F-1ヒーローGB ワールドチャンピオンシップ'91"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="nakajima satoru f-1 hero gb - world championship '91 (japan).bin" size="131072" crc="e00ebc44" sha1="e07448143b82704fc142e7cce5ddb73866ef1d78"/>
+				<rom name="dmg-f3j-0.u1" size="131072" crc="e00ebc44" sha1="e07448143b82704fc142e7cce5ddb73866ef1d78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14456,9 +14461,12 @@
 		<info name="release" value="19911203"/>
 		<info name="alt_title" value="ナムコクラシック"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="namco classic (japan).bin" size="131072" crc="ec3257b3" sha1="65b91cc77b1971f8229d4caaf4feb89c64856c8b"/>
+				<rom name="dmg-nhj-0.u1" size="131072" crc="ec3257b3" sha1="65b91cc77b1971f8229d4caaf4feb89c64856c8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14832,9 +14840,12 @@
 		<publisher>Ultra</publisher>
 		<info name="serial" value="DMG-NM-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="nemesis (usa).bin" size="131072" crc="5110e971" sha1="0ad4a8f156bc6899e2337417cedf9e279f8abc08"/>
+				<rom name="dmg-nme-0.u1" size="131072" crc="5110e971" sha1="0ad4a8f156bc6899e2337417cedf9e279f8abc08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14886,16 +14897,24 @@
 
 	<software name="samspir">
 		<!-- Notes: SGB enhanced -->
-		<description>Nettou Samurai Spirits (Jpn, Rev. A)</description>
+		<description>Nettou Samurai Spirits (Jpn, Chn, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
-		<info name="serial" value="DMG-X4J"/>
+		<info name="serial" value="DMG-X4J, DMG-406 CHN"/>
 		<info name="release" value="19940630"/>
-		<info name="alt_title" value="熱闘サムライスピリッツ"/>
+		<info name="alt_title" value="熱闘サムライスピリッツ (Japan), 熱闘サムライスピリッツ DEAD HEAT FIGHTERS SAMURAI SPIRITS 热斗侍魂·熱鬥侍魂 (China)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
+			<!-- Chinese cart
+			<feature name="pcb" value="DMG-BEAN-M12" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
+			-->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="nettou samurai spirits (japan) (rev a).bin" size="524288" crc="c94850cc" sha1="05bfa0c00e29fb8d69ef683eddec52e1de57a9ff"/>
+				<rom name="dmg-x4j-1.u1" size="524288" crc="c94850cc" sha1="05bfa0c00e29fb8d69ef683eddec52e1de57a9ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14925,9 +14944,12 @@
 		<info name="release" value="19960823"/>
 		<info name="alt_title" value="熱闘 サムライスピリッツ 斬紅郎無双剣"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BFAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="1048576">
-				<rom name="nettou samurai spirits - zankurou musouken (japan).bin" size="1048576" crc="995d0838" sha1="0ba93965808f7a96c92a85289678e16b41cb09ec"/>
+				<rom name="dmg-aszj-0.u1" size="1048576" crc="995d0838" sha1="0ba93965808f7a96c92a85289678e16b41cb09ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15008,9 +15030,12 @@
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="熱闘ワールドヒーローズ2JET"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="nettou world heroes 2 jet (japan).bin" size="524288" crc="0a12f53c" sha1="0dd04ca0ac61b449d3040587918b63d649fbbcc2"/>
+				<rom name="dmg-awjj-0.u1" size="524288" crc="0a12f53c" sha1="0dd04ca0ac61b449d3040587918b63d649fbbcc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15184,9 +15209,12 @@
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-WC-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN(K)-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="nigel mansell's world championship (usa).bin" size="131072" crc="03e84d7d" sha1="beebc29ef505916a525fb9a5ab0d6d11bcbbfb47"/>
+				<rom name="DMG-WCE-0.u1" size="131072" crc="03e84d7d" sha1="beebc29ef505916a525fb9a5ab0d6d11bcbbfb47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15247,10 +15275,16 @@
 		<info name="release" value="19980626"/>
 		<info name="alt_title" value="日刊べるとも倶楽部"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-KECN-SP" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC3" />
+			<feature name="u3" value="U3 RAM" />
+			<feature name="u4" value="U4" />
+			<feature name="battery" value="BATT CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="nikkan berutomo club (japan).bin" size="524288" crc="ad3f851d" sha1="4403ddbc2faa6b540893814a7ecaafb218849ee9"/>
+				<rom name="dmg-antj-0.u1" size="524288" crc="ad3f851d" sha1="4403ddbc2faa6b540893814a7ecaafb218849ee9"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -15352,9 +15386,12 @@
 		<info name="release" value="19950714"/>
 		<info name="alt_title" value="−忍空−"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="ninku (japan).bin" size="524288" crc="b50119eb" sha1="44b35ae3aa21d42d67b04a8581a0c83dc96521ce"/>
+				<rom name="dmg-ankj-0.u1" size="524288" crc="b50119eb" sha1="44b35ae3aa21d42d67b04a8581a0c83dc96521ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15384,9 +15421,12 @@
 		<info name="release" value="19951227"/>
 		<info name="alt_title" value="忍たま乱太郎GB ~ Nintama Rantarou GB"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN(K)-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="nintama rantarou - ninjutsu gakuen ni nyuugaku shiyou no dan (japan).bin" size="262144" crc="bd223184" sha1="4110bd38bde1d9a9a20c2a0c73a3e9f799a72847"/>
+				<rom name="dmg-agnj-0.u1" size="262144" crc="bd223184" sha1="4110bd38bde1d9a9a20c2a0c73a3e9f799a72847"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15411,7 +15451,7 @@
 		<description>Nintendo World Cup (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-NC-USA, DMG-NC-(NOE/ESP-1/UKV)"/>
+		<info name="serial" value="DMG-NC-USA, DMG-NC-NOE, DMG-NC-ESP-1, DMG-NC-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -15430,9 +15470,12 @@
 		<info name="alt_title" value="NIV Bible &amp; the 20 Lost Levels of Joshua (Box)"/>
 		<info name="serial" value="NVGB"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="" /> <!-- Unnamed Color Dreams PCB -->
+			<feature name="rom" value="" />
+			<feature name="flipflop" value="[SN74LS377N]" />
 			<feature name="slot" value="rom_wisdom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="niv bible &amp; the 20 lost levels of joshua (usa) (unl).bin" size="2097152" crc="e7a26b31" sha1="136cf97a8c3560ec9db3d8f354d91b7de27e0743"/>
+				<rom name="NIV100.rom" size="2097152" crc="e7a26b31" sha1="136cf97a8c3560ec9db3d8f354d91b7de27e0743"/>
 			</dataarea>
 		</part>
 	</software>
