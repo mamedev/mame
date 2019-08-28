@@ -218,7 +218,6 @@ WRITE8_MEMBER(menghong_state::menghong_shared_w)
 			// 0x14005f9 available tiles
 			// 0x14005a5 cpu tiles
 			// 0x14005b4 cpu discard pond
-			
 		}
 	}
 }
