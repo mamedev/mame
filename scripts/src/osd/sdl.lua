@@ -328,7 +328,7 @@ if BASE_TARGETOS=="unix" then
 					"socket",
 					"nsl",
 				}
-			else
+			elseif _OPTIONS["targetos"]~="asmjs" then
 				links {
 					"util",
 				}

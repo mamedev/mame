@@ -1183,7 +1183,6 @@ configuration { "asmjs" }
 	}
 	linkoptions {
 		"-Wl,--start-group",
-		"-s ERROR_ON_MISSING_LIBRARIES=0"
 	}
 	archivesplit_size "20"
 
