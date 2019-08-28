@@ -86,7 +86,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
-#include "cpu/mcs51/mcs51.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -96,6 +95,69 @@ Stephh's notes (based on the games M68000 code and some tests) :
  *  Microcontroller emulation
  *
  *************************************/
+
+// i8031 bootleg emulation
+
+void karnov_state::chelnovjbl_mcu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
+
+void karnov_state::chelnovjbl_mcu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(FUNC(karnov_state::mcu_data_l_r), FUNC(karnov_state::mcu_data_l_w));
+	map(0x01, 0x01).rw(FUNC(karnov_state::mcu_data_h_r), FUNC(karnov_state::mcu_data_h_w));
+}
+
+void karnov_state::chelnovjbl_mcu_ack_w(uint16_t data)
+{
+	m_maincpu->set_input_line(6, CLEAR_LINE);
+}
+
+uint16_t karnov_state::chelnovjbl_mcu_r()
+{
+	return m_mcu_to_maincpu;
+}
+
+void karnov_state::chelnovjbl_mcu_w(uint16_t data)
+{
+	m_maincpu_to_mcu = data;
+	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+}
+
+uint8_t karnov_state::mcu_data_l_r()
+{
+	return m_maincpu_to_mcu >> 0;
+}
+
+void karnov_state::mcu_data_l_w(uint8_t data)
+{
+	m_mcu_to_maincpu = (m_mcu_to_maincpu & 0xff00) | (data << 0);
+}
+
+uint8_t karnov_state::mcu_data_h_r()
+{
+	return m_maincpu_to_mcu >> 8;
+}
+
+void karnov_state::mcu_data_h_w(uint8_t data)
+{
+	m_mcu_to_maincpu = (m_mcu_to_maincpu & 0x00ff) | (data << 8);
+}
+
+void karnov_state::mcu_p1_w(uint8_t data)
+{
+	if (BIT(m_mcu_p1, 0) == 1 && BIT(data, 0) == 0)
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+
+	if (BIT(m_mcu_p1, 1) == 1 && BIT(data, 1) == 0)
+		m_maincpu->set_input_line(6, ASSERT_LINE);
+
+	m_mcu_p1 = data;
+}
+
+// end of i8031 emulation
 
 /* Emulation of the protected microcontroller - for coins & general protection */
 void karnov_state::karnov_i8751_w( int data )
@@ -416,6 +478,14 @@ void karnov_state::karnov_map(address_map &map)
 	map(0x0c000e, 0x0c000f).w(FUNC(karnov_state::vint_ack_w));
 }
 
+void karnov_state::chelnovjbl_map(address_map &map)
+{
+	karnov_map(map);
+	map(0x0c0000, 0x0c0001).portr("P1_P2").w(FUNC(karnov_state::chelnovjbl_mcu_ack_w));
+	map(0x0c0006, 0x0c0007).rw(FUNC(karnov_state::chelnovjbl_mcu_r), FUNC(karnov_state::chelnovjbl_mcu_w));
+	map(0x0c000c, 0x0c000d).unmaprw();
+	map(0x0c000e, 0x0c000f).nopr();
+}
 
 void karnov_state::base_sound_map(address_map &map)
 {
@@ -480,7 +550,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( karnov )
 	PORT_INCLUDE( common )
 
-	PORT_START("FAKE")  /* Dummy input for i8751 */
+	PORT_START("COIN")  /* Dummy input for i8751 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -537,7 +607,7 @@ static INPUT_PORTS_START( wndrplnt )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_COCKTAIL */
 
-	PORT_START("FAKE")  /* Dummy input for i8751 */
+	PORT_START("COIN")  /* Dummy input for i8751 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -587,7 +657,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( chelnov )
 	PORT_INCLUDE( common )
 
-	PORT_START("FAKE")  /* Dummy input for i8751 */
+	PORT_START("COIN")  /* Dummy input for i8751 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -707,7 +777,7 @@ WRITE_LINE_MEMBER(karnov_state::vbint_w)
 	if (!state)
 		return;
 
-	uint8_t port = ioport("FAKE")->read();
+	uint8_t port = ioport("COIN")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
 	if (port == m_coin_mask)
@@ -733,6 +803,12 @@ WRITE_LINE_MEMBER(karnov_state::vbint_w)
 	m_maincpu->set_input_line(7, ASSERT_LINE);
 }
 
+void karnov_state::chelnovjbl_vbint_w(int state)
+{
+	m_maincpu->set_input_line(7, ASSERT_LINE);
+}
+
+
 /*************************************
  *
  *  Machine driver
@@ -747,7 +823,9 @@ void karnov_state::machine_start()
 	save_item(NAME(m_i8751_command_queue));
 	save_item(NAME(m_i8751_level));
 	save_item(NAME(m_latch));
-
+	save_item(NAME(m_mcu_p1));
+	save_item(NAME(m_mcu_to_maincpu));
+	save_item(NAME(m_maincpu_to_mcu));
 }
 
 void karnov_state::machine_reset()
@@ -778,14 +856,14 @@ void karnov_state::karnov(machine_config &config)
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(karnov_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(karnov_state::vbint_w));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(karnov_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(karnov_state::vbint_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
@@ -824,21 +902,18 @@ void karnov_state::karnovjbl(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void karnov_state::chelnovjbl_mcu_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rom();
-}
-
-
 void karnov_state::chelnovjbl(machine_config &config)
 {
 	karnov(config);
-	i8031_device &mcu(I8031(config, "mcu", 2000000)); // ??mhz
-	mcu.set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
-//  mcu.port_in_cb<1>().set(FUNC(karnov_state::p1_r));
-//  mcu.port_out_cb<1>().set(FUNC(karnov_state::p1_w));
-//  mcu.port_in_cb<3>().set(FUNC(karnov_state::p3_r));
-//  mcu.port_out_cb<3>().set(FUNC(karnov_state::p3_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_map);
+
+	I8031(config, m_mcu, 8_MHz_XTAL); // unknown clock
+	m_mcu->set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
+	m_mcu->set_addrmap(AS_IO, &karnov_state::chelnovjbl_mcu_io_map);
+	m_mcu->port_out_cb<1>().set(FUNC(karnov_state::mcu_p1_w));
+	m_mcu->port_in_cb<3>().set_ioport("COIN");
+
+	m_screen->screen_vblank().set(FUNC(karnov_state::chelnovjbl_vbint_w));
 }
 
 void karnov_state::wndrplnt(machine_config &config)
@@ -1214,7 +1289,7 @@ ROM_START( chelnovjbl ) // code is the same as the regular chelnovj set
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )    /* SCM8031HCCN40  */ // unique to the bootlegs (rewritten, or an exact copy of original Data East internal rom?)
+	ROM_REGION( 0x2000, "mcu", 0 )    /* SCM8031HCCN40  */ // unique to the bootlegs (rewritten or adjusted to be 8031 compatible)
 	ROM_LOAD( "17o.bin", 0x0000, 0x2000, CRC(9af64150) SHA1(0f478d9f79baebd2ad90615c98c6bc2d73c0056a) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1359,5 +1434,5 @@ GAME( 1987, wndrplnt,    0,       wndrplnt,   wndrplnt, karnov_state, init_wndrp
 GAME( 1988, chelnov,     0,       karnov,     chelnov,  karnov_state, init_chelnov,  ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (World)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1988, chelnovu,    chelnov, karnov,     chelnovu, karnov_state, init_chelnovu, ROT0,   "Data East USA",               "Chelnov - Atomic Runner (US)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1988, chelnovj,    chelnov, karnov,     chelnovj, karnov_state, init_chelnovj, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (Japan)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovj, karnov_state, init_chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE ) // todo: hook up MCU instead of using simulation code
-GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovj, karnov_state, init_chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovj, karnov_state, empty_init,    ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovj, karnov_state, empty_init,    ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE )
