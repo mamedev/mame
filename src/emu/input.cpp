@@ -865,6 +865,11 @@ bool input_manager::code_check_axis(input_device_item &item, input_code code)
 		(curval == INPUT_ABSOLUTE_MAX || curval == INPUT_ABSOLUTE_MIN))
 		return false;
 
+	// if either curval is zero, then we're probably comparing against a case
+	// where we lost acquisition of the device, so this check doesn't count
+	if (curval == 0)
+		return false;
+
 	// compute the diff against memory
 	s32 diff = curval - item.memory();
 	if (diff < 0)
