@@ -98,7 +98,7 @@ void s100_am310_device::device_reset()
 
 u8 s100_am310_device::s100_sinp_r(offs_t offset)
 {
-	if ((offset & 0x00fe) == (m_adr->read() << 1))
+	if ((offset & 0x00fe) == (m_adr->read() << 2)) // AB1 must be 0
 	{
 		if (BIT(offset, 0))
 			return m_statlatch->read();
@@ -115,7 +115,7 @@ u8 s100_am310_device::s100_sinp_r(offs_t offset)
 
 void s100_am310_device::s100_sout_w(offs_t offset, u8 data)
 {
-	if ((offset & 0x00fe) == (m_adr->read() << 1))
+	if ((offset & 0x00fe) == (m_adr->read() << 2)) // AB1 must be 0
 	{
 		if (BIT(offset, 0))
 			m_cmdlatch->write(data);
