@@ -456,14 +456,7 @@ void debug_gdbstub::exit(void)
 //-------------------------------------------------------------------------
 void debug_gdbstub::init_debugger(running_machine &machine)
 {
-	std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
-	osd_file::error filerr = m_socket.open(socket_name.c_str());
-	if ( filerr != osd_file::error::NONE )
-		return;
-
 	m_machine = &machine;
-
-	osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
 }
 
 //-------------------------------------------------------------------------
@@ -592,6 +585,12 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		for ( const auto &reg: m_gdb_registers )
 			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name.c_str());
 #endif
+
+		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
+		osd_file::error filerr = m_socket.open(socket_name.c_str());
+		if ( filerr != osd_file::error::NONE )
+			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
+		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
 
 		m_initialized = true;
 	}
