@@ -383,7 +383,18 @@ void mips1core_device_base::execute_run()
 				}
 				break;
 			case 0x01: // REGIMM
-				switch (RTREG)
+				/*
+				 * Hardware testing has established that MIPS-1 processors do
+				 * not decode bit 17 of REGIMM format instructions. This bit is
+				 * used to add the "branch likely" instructions for MIPS-2 and
+				 * later architectures.
+				 *
+				 * IRIX 5.3 inst(1M) uses this behaviour to distinguish MIPS-1
+				 * from MIPS-2 processors; the latter nullify the delay slot
+				 * instruction if the branch is not taken, whereas the former
+				 * execute the delay slot instruction regardless.
+				 */
+				switch (RTREG & 0x1d)
 				{
 				case 0x00: // BLTZ
 					if (s32(m_r[RSREG]) < 0)
