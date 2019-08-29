@@ -395,6 +395,7 @@ VIDEOS["MB88303"] = true
 VIDEOS["PS2GS"] = true
 VIDEOS["PS2GIF"] = true
 VIDEOS["DECSFB"] = true
+VIDEOS["BT431"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -719,6 +720,7 @@ MACHINES["DC7085"] = true
 MACHINES["I82357"] = true
 MACHINES["XC1700E"] = true
 MACHINES["EDLC"] = true
+MACHINES["WTL3132"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -3193,6 +3195,12 @@ files {
 	MAME_DIR .. "src/mame/video/light.h",
 	MAME_DIR .. "src/mame/video/crime.cpp",
 	MAME_DIR .. "src/mame/video/crime.h",
+	MAME_DIR .. "src/mame/video/sgi_gr1.cpp",
+	MAME_DIR .. "src/mame/video/sgi_gr1.h",
+	MAME_DIR .. "src/mame/video/sgi_ge5.cpp",
+	MAME_DIR .. "src/mame/video/sgi_ge5.h",
+	MAME_DIR .. "src/mame/video/sgi_re2.cpp",
+	MAME_DIR .. "src/mame/video/sgi_re2.h",
 }
 
 createMESSProjects(_target, _subtarget, "sharp")

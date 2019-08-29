@@ -66,7 +66,7 @@
 #include "bus/rs232/hlemouse.h"
 
 // video and audio
-#include "screen.h"
+#include "video/sgi_gr1.h"
 
 #define LOG_GENERAL (1U << 0)
 
@@ -87,6 +87,7 @@ public:
 		, m_enet(*this, "enet")
 		, m_duart(*this, "duart%u", 0U)
 		, m_serial(*this, "serial%u", 1U)
+		, m_gfx(*this, "gfx")
 		, m_leds(*this, "led%u", 0U)
 	{
 	}
@@ -107,6 +108,7 @@ private:
 	required_device<am7990_device> m_enet;
 	required_device_array<scn2681_device, 2> m_duart;
 	required_device_array<rs232_port_device, 2> m_serial;
+	required_device<sgi_gr1_device> m_gfx;
 
 	enum leds : unsigned
 	{
@@ -241,6 +243,7 @@ void pi4d2x_state::map(address_map &map)
 	//map(0x1e000000, 0x1effffff); // vme a24 modifier 0x39 non-privileged
 
 	//map(0x1f000000, 0x1fbfffff); // local I/O (duarts, timers, etc.)
+	map(0x1f000000, 0x1f003fff).m(m_gfx, FUNC(sgi_gr1_device::map));
 
 	map(0x1f800000, 0x1f800003).lrw8("memcfg", [this]() { return m_memcfg; }, [this](u8 data) { m_memcfg = data; }).umask32(0xff000000);
 	map(0x1f800000, 0x1f800003).r(FUNC(pi4d2x_state::sysid_r)).umask32(0x00ff0000);
@@ -291,7 +294,7 @@ void pi4d2x_state::map(address_map &map)
 			m_eeprom->cs_write(BIT(data, 5));
 			m_eeprom->clk_write(BIT(data, 6));
 
-			//BIT(data, 7); // gfx_reset: reset graphics subsystem
+			m_gfx->reset_w(BIT(data, 7));
 
 			m_cpuauxctl = data;
 		}).umask32(0xff000000);
@@ -592,6 +595,21 @@ void pi4d2x_state::common(machine_config &config)
 	m_serial[1]->rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_b_w));
 	m_serial[1]->cts_handler().set(m_duart[1], FUNC(scn2681_device::ip1_w));
 	m_serial[1]->dcd_handler().set(m_duart[1], FUNC(scn2681_device::ip2_w));
+
+	// graphics
+	SGI_GR12(config, m_gfx, 0);
+	m_gfx->out_vblank().set(
+		[this](int state)
+		{
+			if (state)
+				m_lio_isr |= LIO_VRSTAT;
+			else
+				m_lio_isr &= ~LIO_VRSTAT;
+
+			lio_interrupt(LIO_VR, state);
+		});
+	m_gfx->out_int_ge().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_GE>)).invert();
+	m_gfx->out_int_fifo().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_FIFO>)).invert();
 
 	// TODO: vme slot, cpu interrupt 0
 }
