@@ -93,8 +93,10 @@ uint32_t tomy_princ_state::screen_update_tomy_princ(screen_device &screen, bitma
 	return 0;
 }
 
+// fe2d25
 void tomy_princ_state::princ_map(address_map &map)
 {
+	map(0x000008, 0x000008).lr8("free1", []() -> u8 { return 0x20; });	// else init function fails and princ goes into an infinite loop
 	map(0x68ff44, 0x68ff44).lr8("free0", [this]() -> u8 { return m_screen->vblank() ? 0x11 : 0x10; });
 	map(0xe00000, 0xe07fff).ram();  // stacks are placed here
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0x00000);

@@ -93,6 +93,28 @@ void f2mc16_device::device_start()
 	state_add(F2MC16_R5, "R5", m_temp).callimport().callexport().formatstr("%02X");
 	state_add(F2MC16_R6, "R6", m_temp).callimport().callexport().formatstr("%02X");
 	state_add(F2MC16_R7, "R7", m_temp).callimport().callexport().formatstr("%02X");
+
+	save_item(NAME(m_pc));
+	save_item(NAME(m_usp));
+	save_item(NAME(m_ssp));
+	save_item(NAME(m_ps));
+	save_item(NAME(m_tmp16));
+	save_item(NAME(m_tmpea));
+	save_item(NAME(m_tmp16aux));
+	save_item(NAME(m_pcb));
+	save_item(NAME(m_dtb));
+	save_item(NAME(m_usb));
+	save_item(NAME(m_ssb));
+	save_item(NAME(m_adb));
+	save_item(NAME(m_dpr));
+	save_item(NAME(m_tmp8));
+	save_item(NAME(m_prefix));
+	save_item(NAME(m_acc));
+	save_item(NAME(m_temp));
+	save_item(NAME(m_tmp32));
+	save_item(NAME(m_tmp32aux));
+	save_item(NAME(m_tmp64));
+	save_item(NAME(m_prefix_valid));
 }
 
 void f2mc16_device::device_reset()
@@ -1617,7 +1639,7 @@ void f2mc16_device::opcodes_bo6c(u8 operand)
 			m_tmp32 = read_8((m_pcb<<16) | (m_pc+2));
 			m_tmp32 |= (m_dpr<<8) | (m_dtb<<8);
 			m_tmp8 = read_8(m_tmp32);
-			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 4));
+			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 3));
 			m_ps &= ~F_Z;
 			m_pc += 4;
 			if (!(read_8(m_tmp32) & (1 << (operand & 7))))
