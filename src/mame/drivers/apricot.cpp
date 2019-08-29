@@ -289,7 +289,7 @@ MC6845_UPDATE_ROW( apricot_state::crtc_update_row )
 		{
 			int fill = 0;
 
-			// no hardware cursor (apparently)
+			if (i == cursor_x) fill = 1; // cursor?
 			if (BIT(code, 12) && BIT(data, 14)) fill = 1; // strike-through?
 			if (BIT(code, 13) && BIT(data, 15)) fill = 1; // underline?
 
