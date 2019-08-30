@@ -484,13 +484,15 @@ void dogfightp_state::dogfightp(machine_config &config)
 	common(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &dogfightp_state::dogfightp_main_map);
-	m_maincpu->set_vblank_int("videopcb:screen", FUNC(vastar_common_state::vblank_irq));
+	m_maincpu->set_vblank_int("screen", FUNC(vastar_common_state::vblank_irq));
 
 	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
 	mainlatch.q_out_cb<1>().set("videopcb", FUNC(orca_ovg_40c_device::flipscreen_w));
 
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
 	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb", 0));
-	videopcb.set_palette("videopcb:palette");
+	videopcb.set_screen("screen");
 	videopcb.set_percuss_hardware(true);
 }
 
