@@ -12715,6 +12715,29 @@
 		</part>
 	</software>
 
+	<software name="veildark" supported="yes">
+		<description>Veil of Darkness</description>
+		<year>1993</year>
+		<publisher>Strategic Simulations, Inc.</publisher>
+		<info name="version" value="1.0" />
+		<info name="usage" value="Install from DOS with: INSTALL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="veil of darkness disk 1.img" size="1474560" crc="9b9b0525" sha1="0a8d58c2c06c51c2e3e4aa580212e8b7cae47658"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="veil of darkness disk 2.img" size="1474560" crc="09ea1968" sha1="6e425fc719b62dd3314d2e7192ddbe93f4fa39d9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="veil of darkness disk 3.img" size="1474560" crc="848ccdbf" sha1="731ef4102cbd302a0442a8d40c095c56e9c10b8e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="warcraft">
 		<!-- Dumped via Kryoflux from original disks, all tracks show as modified -->
 		<description>WarCraft - Orcs &amp; Humans</description>
