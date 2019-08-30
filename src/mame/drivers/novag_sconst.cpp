@@ -213,7 +213,7 @@ void sconst_state::sconst(machine_config &config)
 
 	const attotime irq_period = attotime::from_hz(8_MHz_XTAL/4 / 0x1000); // through 4020 IC, ~488Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(sconst_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1020)); // active for 10.2us
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(10200)); // active for 10.2us
 	TIMER(config, "irq_off").configure_periodic(FUNC(sconst_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);

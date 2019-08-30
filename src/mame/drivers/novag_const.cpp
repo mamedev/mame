@@ -5,22 +5,25 @@
 
 Novag Constellation (model 831)
 
-Hardware notes:
+Hardware notes (1st version):
 - MOS MPS6502A @ 2MHz
-- 2KB RAM (daughterboard with 4*2114) battery-backed, 2*8KB ROM
+- 2KB RAM (daughterboard with 4*2114), 2*8KB ROM
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
 
+3.6MHz version:
+- G65SC02P-3 @ 3.6MHz (7.2MHz XTAL)
+- 2KB RAM (TC5516AP), 16KB ROM (custom label, assumed TMM23128)
+- PCB supports "Memory Save", but components aren't installed
+
 TODO:
-- add 3.6MHz version: 7.2MHz XTAL, 65SC02 CPU, 1 maskrom(NOVAG-831A 6133-8316) 16KB?
-  1 RAM chip(TC5516AP) instead of silly daughterboard
 - add Quattro version, another small update, this time 4MHz
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65sc02.h"
 #include "machine/sensorboard.h"
-#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
@@ -46,7 +49,8 @@ public:
 	{ }
 
 	// machine drivers
-	void constellation(machine_config &config);
+	void nconst(machine_config &config);
+	void nconst36(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -61,7 +65,8 @@ private:
 	required_ioport_array<8> m_inputs;
 
 	// address maps
-	void main_map(address_map &map);
+	void const_map(address_map &map);
+	void const36_map(address_map &map);
 
 	// periodic interrupts
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
@@ -87,6 +92,10 @@ void const_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
+
+	// game relies on RAM filled with FF at power-on
+	for (int i = 0; i < 0x800; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i, 0xff);
 }
 
 
@@ -151,15 +160,21 @@ READ8_MEMBER(const_state::input2_r)
     Address Maps
 ******************************************************************************/
 
-void const_state::main_map(address_map &map)
+void const_state::const36_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0000, 0x07ff).ram();
 	map(0x6000, 0x6000).rw(FUNC(const_state::input2_r), FUNC(const_state::mux_w));
 	map(0x8000, 0x8000).rw(FUNC(const_state::input1_r), FUNC(const_state::control_w));
+	map(0xc000, 0xffff).rom();
+}
+
+void const_state::const_map(address_map &map)
+{
+	const36_map(map);
+
 	map(0xa000, 0xbfff).rom();
-	map(0xc000, 0xdfff).unmapr(); // checks for bookrom but doesn't have any
-	map(0xe000, 0xffff).rom();
+	map(0xc000, 0xdfff).unmapr(); // checks for bookrom? but doesn't have any
 }
 
 
@@ -168,7 +183,7 @@ void const_state::main_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( constellation )
+static INPUT_PORTS_START( nconst )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Multi Move / Player/Player / King")
@@ -208,18 +223,16 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void const_state::constellation(machine_config &config)
+void const_state::nconst(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 2_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
 	const attotime irq_period = attotime::from_hz(2_MHz_XTAL / 0x2000); // through 4020 IC, ~244Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1020)); // active for ?us (assume same as supercon)
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17100)); // assume same as const36
 	TIMER(config, "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -235,6 +248,25 @@ void const_state::constellation(machine_config &config)
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void const_state::nconst36(machine_config &config)
+{
+	nconst(config);
+
+	/* basic machine hardware */
+	M65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const36_map);
+
+	const attotime irq_period = attotime::from_hz(7.2_MHz_XTAL/2 / 0x2000); // through 4020 IC, ~439Hz
+	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17100)); // active for ~17.1us
+	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
+
+	m_board->set_delay(attotime::from_msec(200));
+
+	BEEP(config.replace(), m_beeper, 7.2_MHz_XTAL/2 / 0x800); // ~1758Hz
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
 
 
 /******************************************************************************
@@ -247,6 +279,11 @@ ROM_START( const )
 	ROM_LOAD("8314_orange", 0xe000, 0x2000, CRC(89395a86) SHA1(4807f196fec70abdaabff5bfc479a64d5cf2b0ad) ) // "
 ROM_END
 
+ROM_START( const36 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("novag-831a_6133-8316.u2",  0xc000, 0x4000, CRC(7da760f3) SHA1(6172e0fa03377e911141a86747849bf25f20613f) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -255,5 +292,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME   PARENT CMP MACHINE        INPUT          STATE        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, const, 0,      0, constellation, constellation, const_state, empty_init, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT CMP MACHINE   INPUT   STATE        INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1983, const,   0,      0, nconst,   nconst, const_state, empty_init, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, const36, const,  0, nconst36, nconst, const_state, empty_init, "Novag", "Constellation 3.6MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

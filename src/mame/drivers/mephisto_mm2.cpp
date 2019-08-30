@@ -20,6 +20,10 @@ IRQ Line is set to VSS
 1-74HC00AP Toshiba
 1-CD74HC259E
 
+LCD module:
+PCB label HGS 10 122 01
+1-CD4011
+4-CD4015
 
 $0000-$1fff   S-RAM
 $2000 LCD 4 Byte Shift Register writeonly right to left

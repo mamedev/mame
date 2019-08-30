@@ -200,16 +200,14 @@ WRITE8_MEMBER(ssystem3_state::control_w)
 	if (data & ~m_control & 4)
 	{
 		m_shift = m_shift << 1 | m_lcd->do_r();
-		u8 out2 = m_shift;
 
 		// weird TTL maze, I assume it's a hw kludge to fix a bug after the maskroms were already manufactured
-		if (BIT(m_shift, 3) & ~(BIT(m_shift, 1) ^ BIT(m_shift, 4)) & ~(BIT(m_lcd_q, 7) & BIT(m_lcd_q, 23)))
-			out2 ^= 0x12;
+		u8 xorval = (BIT(m_shift, 3) & ~(BIT(m_shift, 1) ^ BIT(m_shift, 4)) & ~(BIT(m_lcd_q, 7) & BIT(m_lcd_q, 23))) ? 0x12 : 0;
 
 		// update display
 		for (int i = 0; i < 4; i++)
 			m_display->write_row(i, m_lcd_q >> (8*i) & 0xff);
-		m_display->write_row(4, out2 | 0x100);
+		m_display->write_row(4, (m_shift ^ xorval) | 0x100);
 		m_display->update();
 	}
 
