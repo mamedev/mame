@@ -40,6 +40,7 @@ sgi_ge5_device::sgi_ge5_device(machine_config const &mconfig, char const *tag, d
 	, m_re_w(*this)
 	, m_icount(0)
 {
+	(void)m_dma_count;
 }
 
 void sgi_ge5_device::device_add_mconfig(machine_config &config)
