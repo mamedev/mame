@@ -316,9 +316,6 @@ INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
 		timer_set(attotime::from_usec(30), TIMER_DMAEND);
 	}
-
-	if (m_k052109->is_irq_enabled())
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 void simpsons_state::simpsons(machine_config &config)
@@ -352,7 +349,9 @@ void simpsons_state::simpsons(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(simpsons_state::tile_callback), this);
+	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K053246(config, m_k053246, 0);
 	m_k053246->set_sprite_callback(FUNC(simpsons_state::sprite_callback), this);

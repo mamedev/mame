@@ -344,7 +344,7 @@ void chqflag_state::chqflag(machine_config &config)
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback), this);
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);

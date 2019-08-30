@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Manuel Abadia
+
 #include "emu.h"
 #include "includes/thunderx.h"
+#include "screen.h"
 
 /***************************************************************************
 

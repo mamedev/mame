@@ -326,6 +326,7 @@ void xmen_state::xmen(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
 	K053246(config, m_k053246, 0);
@@ -388,6 +389,7 @@ void xmen_state::xmen6p(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
 	K053246(config, m_k053246, 0);

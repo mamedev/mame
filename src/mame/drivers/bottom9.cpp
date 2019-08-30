@@ -25,12 +25,6 @@
 #include "speaker.h"
 
 
-WRITE_LINE_MEMBER(bottom9_state::vblank_irq)
-{
-	if (state && m_k052109->is_irq_enabled())
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 READ8_MEMBER(bottom9_state::k052109_051960_r)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
@@ -319,7 +313,6 @@ void bottom9_state::bottom9(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(bottom9_state::screen_update_bottom9));
-	screen.screen_vblank().set(FUNC(bottom9_state::vblank_irq));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
@@ -327,11 +320,13 @@ void bottom9_state::bottom9(machine_config &config)
 
 	K052109(config, m_k052109, 0); // 051961 on schematics
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(bottom9_state::tile_callback), this);
+	m_k052109->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(bottom9_state::sprite_callback), this);
 
 	K051316(config, m_k051316, 0);

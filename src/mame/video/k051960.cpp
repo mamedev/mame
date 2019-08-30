@@ -61,6 +61,8 @@ memory map:
 #include "emu.h"
 #include "k051960.h"
 
+#include "screen.h"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -130,9 +132,9 @@ GFXDECODE_END
 k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K051960, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
+	, device_video_interface(mconfig, *this)
 	, m_ram(nullptr)
 	, m_sprite_rom(*this, DEVICE_SELF)
-	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_scanline_timer(nullptr)
 	, m_irq_handler(*this)
 	, m_firq_handler(*this)
@@ -173,14 +175,14 @@ void k051960_device::set_plane_order(int order)
 void k051960_device::device_start()
 {
 	// make sure our screen is started
-	if (!m_screen->started())
+	if (!screen().started())
 		throw device_missing_dependencies();
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
 	// allocate scanline timer and start at first scanline
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k051960_device::scanline_callback), this));
-	m_scanline_timer->adjust(m_screen->time_until_pos(0));
+	m_scanline_timer->adjust(screen().time_until_pos(0));
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
@@ -232,7 +234,7 @@ void k051960_device::device_reset()
 TIMER_CALLBACK_MEMBER( k051960_device::scanline_callback )
 {
 	// range 0..255
-	uint8_t y = m_screen->vpos();
+	uint8_t y = screen().vpos();
 
 	// 32v
 	if ((y % 32 == 0) && m_nmi_enabled)
@@ -243,7 +245,7 @@ TIMER_CALLBACK_MEMBER( k051960_device::scanline_callback )
 		m_irq_handler(ASSERT_LINE);
 
 	// wait for next line
-	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1));
+	m_scanline_timer->adjust(screen().time_until_pos(y + 1));
 }
 
 int k051960_device::k051960_fetchromdata( int byte )
@@ -290,7 +292,7 @@ u8 k051960_device::k051937_r(offs_t offset)
 	if (m_readroms && offset >= 4 && offset < 8)
 		return k051960_fetchromdata(offset & 3);
 	else if (offset == 0)
-		return m_screen->vblank() ? 1 : 0; // vblank?
+		return screen().vblank() ? 1 : 0; // vblank?
 
 	//logerror("%s: read unknown 051937 address %x\n", m_maincpu->pc(), offset);
 	return 0;

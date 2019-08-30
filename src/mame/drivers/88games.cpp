@@ -26,12 +26,6 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(_88games_state::vblank_irq)
-{
-	if (state && m_k052109->is_irq_enabled())
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 READ8_MEMBER(_88games_state::bankedram_r)
 {
 	if (m_videobank)
@@ -323,17 +317,18 @@ void _88games_state::_88games(machine_config &config)
 	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(_88games_state::screen_update_88games));
 	screen.set_palette("palette");
-	screen.screen_vblank().set(FUNC(_88games_state::vblank_irq));
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(_88games_state::tile_callback), this);
+	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(_88games_state::sprite_callback), this);
 
 	K051316(config, m_k051316, 0);

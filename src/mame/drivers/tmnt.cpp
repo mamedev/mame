@@ -1935,11 +1935,12 @@ void tmnt_state::cuebrick(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::cuebrick_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
 	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
@@ -1985,11 +1986,12 @@ void tmnt_state::mia(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::mia_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
 	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
@@ -2048,11 +2050,12 @@ void tmnt_state::tmnt(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::tmnt_sprite_callback), this);
 	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
@@ -2108,11 +2111,12 @@ void tmnt_state::punkshot(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::punkshot_sprite_callback), this);
 
 	K053251(config, m_k053251, 0);
@@ -2159,6 +2163,7 @@ void tmnt_state::lgtnfght(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2215,6 +2220,7 @@ void tmnt_state::blswhstl(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::blswhstl_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2289,6 +2295,7 @@ void tmnt_state::glfgreat(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2355,6 +2362,7 @@ void tmnt_state::prmrsocr(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2417,6 +2425,7 @@ void tmnt_state::tmnt2(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2472,6 +2481,7 @@ void tmnt_state::ssriders(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2519,6 +2529,7 @@ void tmnt_state::sunsetbl(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::ssbl_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2567,11 +2578,12 @@ void tmnt_state::thndrx2(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::thndrx2_sprite_callback), this);
 
 	K053251(config, m_k053251, 0);
