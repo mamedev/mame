@@ -3633,7 +3633,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="ranger1">
 		<description>Ranger 1 (Demo)</description>
-		<year>1991?</year>
+		<year>1991</year>
 		<publisher>Seetrax CAE</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -3649,8 +3649,8 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="368640">
-				<rom name="ranger 1 (demo, disk 3).img" size="368640" crc="351cf1f2" sha1="e1a49c5055a0405940aba2b4bb740d7f80b10792"/>
+			<dataarea name="flop" size="2670150">
+				<rom name="ranger 1 (demo, disk 3).mfm" size="2670150" crc="69b0c9ad" sha1="5bc30f9a76eae75eb53efd41fde6d1f946ecfbcb" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9929,12 +9929,13 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<!-- matches dump of 3.5" "International Version" -->
-	<software name="nova9a" cloneof="nova9">
+	<software name="nova9a" cloneof="nova9" supported="yes">
 		<description>Nova 9: The Return of Gir Draxon (version 1.0)</description>
 		<year>1991</year>
 		<publisher>Sierra</publisher>
 		<info name="developer" value="Dynamix" />
 		<info name="version" value="1.0" />
+		<info name="usage" value="Install from DOS with: INSTALL" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 1 of 6].img" size="737280" crc="a14599bc" sha1="f94be59a1426c00b2b0421c8b47433b1fda48b19"/>
