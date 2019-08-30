@@ -166,15 +166,13 @@ menu is not normally available but is likely accessed with a special key/button 
 Because the CPU in the cart is always powered by the battery, it has stealth capability that allows it to continually
 monitor the situation. If the custom CPU detects any tampering (generally things such as voltage fluctuation or voltage
 dropping or even removal of the cart with the power on), it immediately erases the SRAM (i.e. the decryption key)
-inside the CPU which effectively kills the security cart. This also suggests that the custom Capcom CPU contains some
-additional internal code to initiate the boot process because in order to re-program a cart using the hidden security
-menu the CPU must execute some working code. It is known (from decapping it) that the CPU in the security cart contains
-an amount of static RAM for data storage and a SH2 core based on the Hitachi SH7010-series (SH7014) SuperH RISC engine
-family of Microprocessors.
+inside the CPU which effectively kills the security cart. It is known (from decapping it) that the CPU in the security
+cart contains an amount of static RAM for data storage and a SH2 core based on the Hitachi SH7010-series (SH7014)
+SuperH RISC engine family of Microprocessors.
 
 It is thought that when a cartridge dies it will set the decryption keys identical to the ones of SFIII-2nd Impact, so
 removing the battery and changing the content of the flashROM (if it's not a 2nd Impact) will make it run as a normal
-SFIII-2nd Impact cartridge (is this verified on real hardware?)
+SFIII-2nd Impact cartridge (verified).
 
 The main board uses the familiar Capcom SIMM modules to hold the data from the CDROM so that the life of the CD drive
 is maximized. The SIMMs don't contain RAM, but instead TSOP48 surface mounted flashROMs that can be updated with
@@ -285,12 +283,12 @@ Notes:
       33C93      - AMD 33C93A-16 SCSI Controller (PLCC44)
       KM681002   - Samsung Electronics KM681002 128k x8 SRAM (SOJ32). This is the 'Color RAM' in the test mode memory
                    test
-      62256      - 8k x8 SRAM (SOJ28). This is the 'SS RAM' in the test mode memory test and is connected to the custom
+      62256      - 32k x8 SRAM (SOJ28). This is the 'SS RAM' in the test mode memory test and is connected to the custom
                    SSU chip.
-      HM514260(1)- Hitachi HM514260CJ7 1M x16 DRAM (SOJ40). This is the 'Work RAM' in the test mode memory test and is
+      HM514260(1)- Hitachi HM514260CJ7 256k x16 DRAM (SOJ40). This is the 'Work RAM' in the test mode memory test and is
                    connected to the custom CCU chip.
-      HM514260(2)- Hitachi HM514260CJ7 1M x16 DRAM (SOJ40). This is the 'Sprite RAM' in the test mode memory test
-      TC5118160  - Toshiba TC5118160BJ-60 or NEC 4218160-60 256k x16 DRAM (SOJ42). This is the 'Character RAM' in the
+      HM514260(2)- Hitachi HM514260CJ7 256k x16 DRAM (SOJ40). This is the 'Sprite RAM' in the test mode memory test
+      TC5118160  - Toshiba TC5118160BJ-60 or NEC 4218160-60 1M x16 DRAM (SOJ42). This is the 'Character RAM' in the
                    test mode memory test
       SW1        - Push-button Test Switch
       VOL        - Master Volume Potentiometer
@@ -326,7 +324,7 @@ Notes:
                                                              connected to it.
                            DL-2929 IOU SD08-1513  (QFP208) - I/O controller, next to 3.6864MHz XTAL.
                            DL-3329 SSU SD04-1536  (QFP144) - Sound chip, clocked at 21.47725MHz (42.9545/2). It has 32k
-                                                             SRAM connected to it.
+                                                             SRAM connected to it, probably also 'SS' foreground layer generator.
                            DL-3429 GLL1 SD06-1537 (QFP144) - DMA memory/bus controller.
                            DL-3529 GLL2 SD11-1755 (QFP80)  - ROM/SIMM bank selection chip (via 3x FCT162244 logic ICs).
 
@@ -448,7 +446,7 @@ Security cart resurrection info
 When the security cart dies the game no longer functions. The PCB can be brought back to life by doing the following
 hardware modification to the security cart.....
 
-1. Remove the custom QFP144 CPU and replace it with a standard Hitachi HD6417095 SH-2 CPU
+1. Remove the custom QFP144 CPU and replace it with a standard Hitachi HD6417604 or HD6417095 SH-2 CPU
 2. Remove the 29F400 TSOP48 flashROM and re-program it with the decrypted and modified main program ROM from set
    'cps3boot' in MAME. A 28F400 SOP44 flashROM can be used instead and mounted to the back side of the security cart
    PCB. Do not mount both SOP44 and TSOP48 flashROMs, use only one TSOP48 flashROM or one SOP44 flashROM.
@@ -456,6 +454,67 @@ hardware modification to the security cart.....
    from set 'cps3boot' in MAME.
 4. That is all. Enjoy your working PCB.
 
+
+Hardware register info
+----------------------
+
+		PPU CRTC registers (write only)
+		0x040C0060 - 0x040C0081
+
+		Offset:	Bits:				Desc:		Values: 384		495 "wide"
+		60		xxxx xxxx xxxx xxxx	H Sync				42		35
+		62		xxxx xxxx xxxx xxxx	H Start				111		118
+		64		xxxx xxxx xxxx xxxx	H Blank				495		613
+		66		xxxx xxxx xxxx xxxx	H Total*			454		454
+		68		---- --xx xxxx xxxx	H Zoom Master?		0		0		+128 if flip screen, might be not zoom-related but global H scroll
+		6A		xxxx xxxx xxxx xxxx	H Zoom Offset?		0		0
+		6C		---- --xx xxxx xxxx	H Zoom Size?		1023	1023
+		6E		xxxx xxxx xxxx xxxx	H Zoom Scale		64		64
+		70		xxxx xxxx xxxx xxxx	V Sync				3		3
+		72		xxxx xxxx xxxx xxxx	V Start				21		21
+		74		xxxx xxxx xxxx xxxx	V Blank				245		245
+		76		xxxx xxxx xxxx xxxx	V Total				262		262
+		78		---- --xx xxxx xxxx	V Zoom Master?		0		0		might be not zoom-related but global V scroll
+		7A		xxxx xxxx xxxx xxxx	V Zoom Offset?		0		0
+		7C		---- --xx xxxx xxxx	V Zoom Size?		1023	1023
+		7E		xxxx xxxx xxxx xxxx	V Zoom Scale		64		64
+		80		---- ---- ---- -210	Pixel clock			3		5		not clear how it works, which OSC is base clock, etc.
+				---- ---- ---4 3---	Flip screen X/Y (or Y/X)
+				---- ---- -65- ----	?? always 11, 00 in unused 24KHz mode (pixel clock divider?)
+				f--- ---- ---- ---- ?? always 0, but there is code which may set it (display disable?)
+
+	(*) H Total value is same for all 15KHz modes, probably uses fixed clock (not affected by pixel clock modifier),
+		perhaps 42.9545MHz/6 ? (/454 = 15768.9Hz /262 = 60.186Hz ?)
+		unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.9545MHz/6 /293 = 24433.7Hz /424 = 57.63Hz ?)
+
+
+		'SS' foreground tilemap layer generator (presumable located in 'SSU' chip) registers (write only?)
+		0x05050000 - 0x05050029 area, even bytes only.
+
+		Offset:	Bits:		Desc:	Values: 384		495 "wide"
+		00		xxxx xxxx	H Sync			42		35		same as PPU
+		01		xxxx xxxx	H Start L
+		02		xxxx xxxx	H Start H		62		64
+		03		xxxx xxxx	H Blank L
+		04		xxxx xxxx	H Blank H		534		671
+		05		xxxx xxxx	H Total L*
+		06		xxxx xxxx	H Total H*		454		454*	same as PPU
+		07		xxxx xxxx	H Scroll L
+		08		xxxx xxxx	H Scroll H		-101	-107	+128 if flip screen
+		09		xxxx xxxx	V Sync			3		3		same as PPU
+		0a		xxxx xxxx	V Start L
+		0b		xxxx xxxx	V Start H		21		21		same as PPU
+		0c		xxxx xxxx	V Blank L
+		0d		xxxx xxxx	V Blank H		247		247		PPU value +2
+		0e		xxxx xxxx	V Total L
+		0f		xxxx xxxx	V Total H		262		262		same as PPU
+		10		xxxx xxxx	V Scroll L
+		11		xxxx xxxx	V Scroll H		-24		-24		+288 if flip screen
+		12		xxxx xxxx	Palette base
+		13		---- -210	Pixel clock		3		5		not clear how it works
+		14		---- --10	Flip screen X/Y (or Y/X?)
+
+	(*) H Total value is same for all 15KHz modes, same as PPU.
 */
 
 #include "emu.h"
@@ -822,11 +881,10 @@ static const gfx_layout cps3_tiles8x8_layout =
 	8,8,
 	0x200,
 	4,
-	{ /*8,9,10,11,*/ 0,1,2,3 },
-	{ 20,16,4,0,52,48,36,32 },
-
-	{ STEP8(0,8*8) },
-	64*8
+	{ STEP4(0,1) },
+	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4 },
+	{ STEP8(0,8*4) },
+	64*4
 };
 
 static inline u8 get_fade(int c, int f)
@@ -873,17 +931,14 @@ void cps3_state::set_mame_colours(int colournum, u16 data, u32 fadeval)
 void cps3_state::video_start()
 {
 	m_char_ram = make_unique_clear<u32[]>(0x800000/4);
+	m_ss_ram = make_unique_clear<u8[]>(0x8000);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, (u8 *)(&m_ss_ram[0x8000/4]), 0, m_palette->entries() / 16, 0));
-
-	//decode_ssram();
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, &m_ss_ram[0x4000], 0, m_palette->entries() / 16, 0));
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, cps3_tiles16x16_layout, (u8 *)m_char_ram.get(), 0, m_palette->entries() / 64, 0));
 	m_gfxdecode->gfx(1)->set_granularity(64);
-
-	//decode_charram();
 
 	m_mame_colours = make_unique_clear<u32[]>(0x80000/2);
 
@@ -897,12 +952,14 @@ void cps3_state::video_start()
 
 	m_renderbuffer_bitmap.fill(0x3f, m_renderbuffer_clip);
 
+	save_item(NAME(m_ppu_gscroll));
+	save_item(NAME(m_ss_hscroll));
+	save_item(NAME(m_ss_vscroll));
 	save_item(NAME(m_ss_pal_base));
-	save_item(NAME(m_unk_vidregs));
-	save_item(NAME(m_ss_bank_base));
 
 	save_pointer(NAME(m_char_ram), 0x800000/4);
 	save_pointer(NAME(m_mame_colours), 0x80000/2);
+	save_pointer(NAME(m_ss_ram), 0x8000);
 }
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
@@ -975,9 +1032,7 @@ void cps3_state::draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &
 // fg layer (TODO: this could be handled with an actual tilemap)
 void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// bank select? (sfiii2 intro) (could also be a scroll bit if the tilemap is just double height)
-	int bank = 0x800;
-	if (m_ss_bank_base & 0x01000000) bank = 0x000;
+	int scrolly = (-m_ss_vscroll) & 0x100; // TODO properly handle scroll value 
 
 	for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 	{
@@ -985,24 +1040,24 @@ void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		clip.min_y = clip.max_y = line;
 
 		int y = line / 8;
-		int count = (y * 64) + bank;
+		int offset = ((line + scrolly) / 8 * 128) & 0x1fff;
 
 		// 'combo meter' in JoJo games uses rowscroll
-		int rowscroll = m_ss_ram[((line - 1) & 0x1ff) + 0x4000 / 4] >> 16;
+		int rowscroll = m_ss_ram[((line + scrolly - 1) & 0x1ff)*2 + 0x2000];
 
 		for (int x = 0; x < 64; x++)
 		{
-			u32 data = m_ss_ram[count]; // +0x800 = 2nd bank, used on sfiii2 intro..
-			u32 tile = (data >> 16) & 0x1ff;
-			int pal = (data & 0x003f) >> 1;
-			int flipx = (data & 0x0080) >> 7;
-			int flipy = (data & 0x0040) >> 6;
+			u16 data = m_ss_ram[offset] | (m_ss_ram[offset + 1] << 8) ;
+			u32 tile =  (data & 0x01ff) >> 0;
+			int pal =   (data & 0x3e00) >> 9;
+			int flipy = (data & 0x4000) >> 14; // 
+			int flipx = (data & 0x8000) >> 15; // is this right or should be vice versa ?
 			pal += m_ss_pal_base << 5;
 
 			cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000);
 			cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, 512 + (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000);
 
-			count++;
+			offset += 2;
 		}
 	}
 }
@@ -1014,33 +1069,20 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	int bg_drawn[4] = { 0, 0, 0, 0 };
 
-	// decode_ssram();
-	// decode_charram();
-
 	/* registers are normally 002a006f 01ef01c6
 	        widescreen mode = 00230076 026501c6
 	    only SFIII2 uses widescreen, I don't know exactly which register controls it */
-	if (((m_fullscreenzoom[1] & 0xffff0000) >> 16) == 0x0265)
+	int width = ((m_ppu_crtc_zoom[1] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[0] & 0xffff);
+	if (width > 0 && m_screenwidth != width)
 	{
-		if (m_screenwidth != 496)
-		{
-			m_screenwidth = 496;
-			visarea.set(0, 496 - 1, 0, 224 - 1);
-			screen.configure(496, 224, visarea, period);
-		}
-	}
-	else
-	{
-		if (m_screenwidth != 384)
-		{
-			m_screenwidth = 384;
-			visarea.set(0, 384 - 1, 0, 224 - 1);
-			screen.configure(384, 224, visarea, period);
-		}
+		int height = ((m_ppu_crtc_zoom[5] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[4] & 0xffff);
+		visarea.set(0, width - 1, 0, height - 1);
+		screen.configure(width, height, visarea, period);
+		m_screenwidth = width;
 	}
 
-	u32 fullscreenzoomx = m_fullscreenzoom[3] & 0x000000ff;
-	u32 fullscreenzoomy = m_fullscreenzoom[3] & 0x000000ff;
+	u32 fullscreenzoomx = m_ppu_crtc_zoom[3] & 0x000000ff;
+	u32 fullscreenzoomy = m_ppu_crtc_zoom[7] & 0x000000ff;
 	/* clamp at 0x80, I don't know if this is accurate */
 	if (fullscreenzoomx > 0x80) fullscreenzoomx = 0x80;
 	if (fullscreenzoomy > 0x80) fullscreenzoomy = 0x80;
@@ -1078,8 +1120,8 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		bool const global_bpp = (m_spriteram[i + 2] & 0x02000000) >> 25;
 		u32 const global_pal = (m_spriteram[i + 2] & 0x01ff0000) >> 16;
 
-		int const gscrollx = (m_unk_vidregs[gscroll] & 0x03ff0000) >> 16;
-		int const gscrolly = (m_unk_vidregs[gscroll] & 0x000003ff) >> 0;
+		int const gscrollx = (m_ppu_gscroll[gscroll] & 0x03ff0000) >> 16;
+		int const gscrolly = (m_ppu_gscroll[gscroll] & 0x000003ff) >> 0;
 		start = (start * 0x100) >> 2;
 
 		if ((m_spriteram[i + 0] & 0xf0000000) == 0x80000000)
@@ -1268,39 +1310,30 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 }
 
 /*
-    SSRAM 0x0000 - 0x1fff tilemap layout bank 0
-          0x2000 - 0x3fff tilemap layout bank 1
-          0x4000 - 0x7fff rowscroll (banked?)
+    SSRAM (only even bytes)
+          0x0000 - 0x3fff tilemap layout
+          0x4000 - 0x7fff rowscroll
           0x8000 - 0xffff tile character definitions
-
 */
 
-READ32_MEMBER(cps3_state::ssram_r)
+READ8_MEMBER(cps3_state::ssram_r)
 {
-	if (offset >= 0x8000/4)
-		return little_endianize_int32(m_ss_ram[offset]);
-	else
-		return m_ss_ram[offset];
+	return m_ss_ram[offset];
 }
 
-WRITE32_MEMBER(cps3_state::ssram_w)
+WRITE8_MEMBER(cps3_state::ssram_w)
 {
-	if (offset >= 0x8000/4)
-	{
-		// we only want to endian-flip the character data, the tilemap info is fine
-		data = little_endianize_int32(data);
-		mem_mask = little_endianize_int32(mem_mask);
-		m_gfxdecode->gfx(0)->mark_dirty((offset - (0x8000/4))/16);
-	}
+	if (offset >= 0x4000)
+		m_gfxdecode->gfx(0)->mark_dirty((offset - 0x4000)/32);
 
-	COMBINE_DATA(&m_ss_ram[offset]);
+	m_ss_ram[offset] = data;
 }
 
-WRITE32_MEMBER(cps3_state::_0xc0000000_ram_w)
+WRITE32_MEMBER(cps3_state::sh2cache_ram_w)
 {
-	COMBINE_DATA( &m_0xc0000000_ram[offset] );
+	COMBINE_DATA( &m_sh2cache_ram[offset] );
 	// store a decrypted copy
-	m_0xc0000000_ram_decrypted[offset] = m_0xc0000000_ram[offset]^cps3_mask(offset*4+0xc0000000, m_key1, m_key2);
+	m_sh2cache_ram_decrypted[offset] = m_sh2cache_ram[offset]^cps3_mask(offset*4+0xc0000000, m_key1, m_key2);
 }
 
 WRITE32_MEMBER(cps3_state::cram_bank_w)
@@ -1623,26 +1656,22 @@ WRITE32_MEMBER(cps3_state::cram_gfxflash_bank_w)
 	}
 }
 
-// this seems to be dma active flags, and maybe vblank... not if it is anything else
-READ32_MEMBER(cps3_state::vbl_r)
+READ16_MEMBER(cps3_state::gpu_status_r)
 {
-	return 0x00000000;
+	// 40c000c GPU DMA? status register
+	// -------- -----2-- Palette DMA? active   |
+	// -------- ------1- Character DMA? active | it seems only 1 of these might be active at the same time
+	// -------- -------0 Sprite DMA active ? games wait it to be 0 after 8/9/8/9/8/9 sequence write to 40C0082 register
+	// it is also possible these bits is not DMA-related but HBLANK/VBLANK/etc statuses.
+	return 0x0000;
 }
 
-READ32_MEMBER(cps3_state::unk_io_r)
+READ16_MEMBER(cps3_state::dev_dipsw_r)
 {
-	//  warzard will crash before booting if you return anything here
-	return 0xffffffff;
-}
-
-READ32_MEMBER(cps3_state::_40C0000_r)
-{
-	return 0x00000000;
-}
-
-READ32_MEMBER(cps3_state::_40C0004_r)
-{
-	return 0x00000000;
+	// not present on retail motherboards but games read this
+	// inverted words from 5000a00-5000a0f area ANDed with inverted words from 5000a10-5000a1f. perhaps one return DIPSW in 8 high bits, while other in 8 low bits.
+	//  warzard will crash before booting if some of bits is not 0
+	return 0xffff;
 }
 
 /* EEPROM access is a little odd, I think it accesses eeprom through some kind of
@@ -1698,28 +1727,40 @@ WRITE32_MEMBER(cps3_state::eeprom_w)
 
 }
 
-WRITE32_MEMBER(cps3_state::ss_bank_base_w)
+WRITE16_MEMBER(cps3_state::outport_w)
 {
-	// might be scroll registers or something else..
-	// used to display bank with 'insert coin' on during sfiii2 attract intro
-	COMBINE_DATA(&m_ss_bank_base);
-
-//  logerror("ss_bank_base_w %08x %08x\n", data, mem_mask);
+	if (ACCESSING_BITS_0_7)
+	{
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x10);
+		machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	}
+	// bits 14 and 15 some LEDs ?
 }
 
-WRITE32_MEMBER(cps3_state::ss_pal_base_w)
+WRITE8_MEMBER(cps3_state::ssregs_w)
 {
-		if (DEBUG_PRINTF) logerror ("ss_pal_base_w %08x %08x\n", data, mem_mask);
-
-	if (ACCESSING_BITS_24_31)
+	switch (offset)
 	{
-		m_ss_pal_base = (data & 0x00ff0000)>>16;
-
-		if (data & 0xff000000) logerror("ss_pal_base MSB32 upper bits used %04x \n", data);
-	}
-	else
-	{
-	//  logerror("ss_pal_base LSB32 used %04x \n", data);
+	case 0x07:
+		m_ss_hscroll = (m_ss_hscroll & 0xff00) | data;
+		break;
+	case 0x08:
+		m_ss_hscroll = (m_ss_hscroll & 0xff) | (data << 8);
+		break;
+	case 0x10:
+		m_ss_vscroll = (m_ss_vscroll & 0xff00) | data;
+		break;
+	case 0x11:
+		m_ss_vscroll = (m_ss_vscroll & 0xff) | (data << 8);
+		break;
+	case 0x12:
+		m_ss_pal_base = data;
+		break;
+	default:
+		logerror("SS regs write %02X data %02X\n", offset, data);
+		break;
 	}
 }
 
@@ -1757,7 +1798,8 @@ WRITE32_MEMBER(cps3_state::palettedma_w)
 				u16* src = (u16*)m_user5;
 			//  if (DEBUG_PRINTF) logerror("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", m_paldma_source, m_paldma_realsource, m_paldma_dest, m_paldma_fade, m_paldma_other2, m_paldma_length);
 
-				for (int i = 0; i<m_paldma_length; i ++)
+				u32 dmalen = m_paldma_length | ((data & 1) << 16);
+				for (u32 i = 0; i < dmalen; i++)
 				{
 					u16 coldata = src[BYTE_XOR_BE(((m_paldma_realsource>>1)+i))];
 
@@ -1765,15 +1807,10 @@ WRITE32_MEMBER(cps3_state::palettedma_w)
 
 					set_mame_colours((m_paldma_dest+i)^1, coldata, m_paldma_fade);
 				}
-
-
 				m_maincpu->set_input_line(10, ASSERT_LINE);
-
-
 			}
 		}
 	}
-
 }
 
 
@@ -1966,37 +2003,27 @@ void cps3_state::process_character_dma(u32 address)
 
 		//logerror("%08x %08x %08x real_source %08x (rom %d offset %08x) real_destination %08x, real_length %08x\n", dat1, dat2, dat3, real_source, real_source/0x800000, real_source%0x800000, real_destination, real_length);
 
-		if  ((dat1 & 0x00e00000) == 0x00800000)
+		switch ((dat1 >> 21) & 7)
 		{
-			/* Sets a table used by the decompression routines */
-			{
-				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
-				m_current_table_address = real_source;
-			}
-			m_maincpu->set_input_line(10, ASSERT_LINE);
-		}
-		else if  ((dat1 & 0x00e00000) == 0x00400000)
-		{
-			/* 6bpp DMA decompression
+		case 4:	/* Sets a table used by the decompression routines */
+			/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
+			m_current_table_address = real_source;
+			break;
+		case 2:	/* 6bpp DMA decompression
 			  - this is used for the majority of sprites and backgrounds */
-			do_char_dma(real_source, real_destination, real_length );
-			m_maincpu->set_input_line(10, ASSERT_LINE);
-
-		}
-		else if  ((dat1 & 0x00e00000) == 0x00600000)
-		{
-			/* 8bpp DMA decompression
+			do_char_dma(real_source, real_destination, real_length);
+			break;
+		case 3:	/* 8bpp DMA decompression
 			  - this is used on SFIII NG Sean's Stage ONLY */
 			do_alt_char_dma(real_source, real_destination, real_length);
-			m_maincpu->set_input_line(10, ASSERT_LINE);
-		}
-		else
-		{
+			break;
+		default:
 			// warzard uses command 0, uncompressed? but for what?
-			//logerror("Unknown DMA List Command Type\n");
+			logerror("Unknown DMA List Command Type %d\n", (dat1 >> 21) & 7);
+			break;
 		}
-
 	}
+	m_maincpu->set_input_line(10, ASSERT_LINE);
 }
 
 WRITE32_MEMBER(cps3_state::characterdma_w)
@@ -2044,19 +2071,9 @@ WRITE32_MEMBER(cps3_state::characterdma_w)
 	}
 }
 
-WRITE32_MEMBER(cps3_state::irq10_ack_w)
+WRITE32_MEMBER(cps3_state::ppu_gscroll_w)
 {
-	m_maincpu->set_input_line(10, CLEAR_LINE); return;
-}
-
-WRITE32_MEMBER(cps3_state::irq12_ack_w)
-{
-	m_maincpu->set_input_line(12, CLEAR_LINE); return;
-}
-
-WRITE32_MEMBER(cps3_state::unk_vidregs_w)
-{
-	COMBINE_DATA(&m_unk_vidregs[offset]);
+	COMBINE_DATA(&m_ppu_gscroll[offset]);
 }
 
 READ16_MEMBER(cps3_state::colourram_r)
@@ -2077,34 +2094,25 @@ void cps3_state::cps3_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // Bios ROM
 	map(0x02000000, 0x0207ffff).ram().share("mainram"); // Main RAM
+	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (SFIII memory test mode ONLY, and only odd bytes)
 
-	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (SFIII memory test mode ONLY)
+	map(0x04000000, 0x0407ffff).ram().share("spriteram"); // Sprite RAM
+	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w)).share("colourram");  // Colour RAM 0x20000 colours
+	// PPU registers
+	map(0x040c0000, 0x040c0007).nopr(); // ?? warzard reads this but not use values, dev/debug leftovers ?
+	map(0x040c000c, 0x040c000d).r(FUNC(cps3_state::gpu_status_r));
 
-//  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_SHARE("spriteram")//AM_WRITEONLY // Sprite RAM (jojoba tests this size)
-	map(0x04000000, 0x0407ffff).ram().share("spriteram");//AM_WRITEONLY // Sprite RAM
-
-	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w)).share("colourram");  // Colour RAM (jojoba tests this size) 0x20000 colours?!
-
-	// video registers of some kind probably
-	map(0x040C0000, 0x040C0003).r(FUNC(cps3_state::_40C0000_r));//?? every frame
-	map(0x040C0004, 0x040C0007).r(FUNC(cps3_state::_40C0004_r));//AM_READ(_40C0004_r) // warzard reads this!
-//  AM_RANGE(0x040C0008, 0x040C000b) AM_WRITENOP//??
-	map(0x040C000c, 0x040C000f).r(FUNC(cps3_state::vbl_r));// AM_WRITENOP/
-
-	map(0x040C0000, 0x040C001f).w(FUNC(cps3_state::unk_vidregs_w));
-	map(0x040C0020, 0x040C002b).writeonly().share("tmap20_regs");
-	map(0x040C0030, 0x040C003b).writeonly().share("tmap30_regs");
-	map(0x040C0040, 0x040C004b).writeonly().share("tmap40_regs");
-	map(0x040C0050, 0x040C005b).writeonly().share("tmap50_regs");
-
-	map(0x040C0060, 0x040C007f).ram().share("fullscreenzoom");
-
-	map(0x040C0094, 0x040C009b).w(FUNC(cps3_state::characterdma_w));
-
-	map(0x040C00a0, 0x040C00af).w(FUNC(cps3_state::palettedma_w));
-
-	map(0x040C0084, 0x040C0087).w(FUNC(cps3_state::cram_bank_w));
-	map(0x040C0088, 0x040C008b).w(FUNC(cps3_state::cram_gfxflash_bank_w));
+	map(0x040c0000, 0x040c001f).w(FUNC(cps3_state::ppu_gscroll_w));
+	map(0x040c0020, 0x040c002b).writeonly().share("tmap20_regs");
+	map(0x040c0030, 0x040c003b).writeonly().share("tmap30_regs");
+	map(0x040c0040, 0x040c004b).writeonly().share("tmap40_regs");
+	map(0x040c0050, 0x040c005b).writeonly().share("tmap50_regs");
+	map(0x040c0060, 0x040c007f).writeonly().share("ppu_crtc_zoom");
+	map(0x040c0080, 0x040c0083).nopw().umask32(0x0000ffff); // sprite-related, triggered after sprite list upload
+	map(0x040c0084, 0x040c0087).w(FUNC(cps3_state::cram_bank_w));
+	map(0x040c0088, 0x040c008b).w(FUNC(cps3_state::cram_gfxflash_bank_w));
+	map(0x040c0094, 0x040c009b).w(FUNC(cps3_state::characterdma_w));
+	map(0x040c00a0, 0x040c00af).w(FUNC(cps3_state::palettedma_w));
 
 	map(0x040e0000, 0x040e02ff).rw(m_cps3sound, FUNC(cps3_sound_device::cps3_sound_r), FUNC(cps3_sound_device::cps3_sound_w));
 
@@ -2113,35 +2121,33 @@ void cps3_state::cps3_map(address_map &map)
 
 	map(0x05000000, 0x05000003).portr("INPUTS");
 	map(0x05000004, 0x05000007).portr("EXTRA");
+	map(0x05000008, 0x05000009).w(FUNC(cps3_state::outport_w));
 
-	map(0x05000008, 0x0500000b).nopw(); // ?? every frame
-
-	map(0x05000a00, 0x05000a1f).r(FUNC(cps3_state::unk_io_r)); // ?? every frame
+	map(0x05000a00, 0x05000a1f).r(FUNC(cps3_state::dev_dipsw_r));
 
 	map(0x05001000, 0x05001203).rw(FUNC(cps3_state::eeprom_r), FUNC(cps3_state::eeprom_w));
 
-	map(0x05040000, 0x0504ffff).rw(FUNC(cps3_state::ssram_r), FUNC(cps3_state::ssram_w)).share("ss_ram"); // 'SS' RAM (Score Screen) (text tilemap + toles)
-	//0x25050020
-	map(0x05050020, 0x05050023).w(FUNC(cps3_state::ss_bank_base_w));
-	map(0x05050024, 0x05050027).w(FUNC(cps3_state::ss_pal_base_w));
+	map(0x05040000, 0x0504ffff).rw(FUNC(cps3_state::ssram_r), FUNC(cps3_state::ssram_w)).umask32(0x00ff00ff); // 'SS' RAM (Score Screen) (text tilemap + toles)
+	map(0x05050000, 0x0505002b).w(FUNC(cps3_state::ssregs_w)).umask32(0x00ff00ff);
 
-	map(0x05100000, 0x05100003).w(FUNC(cps3_state::irq12_ack_w));
-	map(0x05110000, 0x05110003).w(FUNC(cps3_state::irq10_ack_w));
-
+	map(0x05100000, 0x05100003).lw32("irq12_ack", [this](offs_t, u32) { m_maincpu->set_input_line(12, CLEAR_LINE); });
+	map(0x05110000, 0x05110003).lw32("irq10_ack", [this](offs_t, u32) { m_maincpu->set_input_line(10, CLEAR_LINE); });
+	map(0x05120000, 0x05120003).lw32("irq14_ack", [this](offs_t, u32) { m_maincpu->set_input_line(14, CLEAR_LINE); }); // ?? unused
+	map(0x05130000, 0x05130003).lw32("irq6_ack", [this](offs_t, u32) { m_maincpu->set_input_line(6, CLEAR_LINE); }); // ?? unused
 	map(0x05140000, 0x05140003).rw("scsi:7:wd33c93", FUNC(wd33c93_device::indir_r), FUNC(wd33c93_device::indir_w)).umask32(0x00ff00ff);
 
 	map(0x06000000, 0x067fffff).rw(FUNC(cps3_state::flash1_r), FUNC(cps3_state::flash1_w)); /* Flash ROMs simm 1 */
 	map(0x06800000, 0x06ffffff).rw(FUNC(cps3_state::flash2_r), FUNC(cps3_state::flash2_w)); /* Flash ROMs simm 2 */
 
 	map(0x07ff0048, 0x07ff004b).nopw(); // bit 0 toggles during programming
-	map(0xc0000000, 0xc00003ff).ram().w(FUNC(cps3_state::_0xc0000000_ram_w)).share("0xc0000000_ram"); /* Executes code from here */
+	map(0xc0000000, 0xc00003ff).ram().w(FUNC(cps3_state::sh2cache_ram_w)).share("sh2cache_ram"); /* Executes code from here */
 }
 
 void cps3_state::decrypted_opcodes_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // Bios ROM
 	map(0x06000000, 0x06ffffff).rom().share("decrypted_gamerom");
-	map(0xc0000000, 0xc00003ff).rom().share("0xc0000000_ram_decrypted");
+	map(0xc0000000, 0xc00003ff).rom().share("sh2cache_ram_decrypted");
 }
 
 static INPUT_PORTS_START( cps3 )
@@ -2203,27 +2209,28 @@ static INPUT_PORTS_START( cps3_jojo)
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Light") PORT_PLAYER(2)
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Medium") PORT_PLAYER(2)
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Strong") PORT_PLAYER(2)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("EXTRA")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Stand") PORT_PLAYER(1)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Stand") PORT_PLAYER(2)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(cps3_state::vbl_interrupt)
+WRITE_LINE_MEMBER(cps3_state::vbl_interrupt)
 {
-	device.execute().set_input_line(12, ASSERT_LINE);
+	if (state)
+		m_maincpu->set_input_line(12, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(cps3_state::other_interrupt)
+// this seems to need to be periodic (see the life bar portraits in sfiii2
+// but also triggered on certain dma events (or warzard locks up in attract)
+// what is the REAL source of IRQ10??
+INTERRUPT_GEN_MEMBER(cps3_state::irq10_periodic)
 {
-	// this seems to need to be periodic (see the life bar portraits in sfiii2
-	// but also triggered on certain dma events (or warzard locks up in attract)
-	// what is the REAL source of IRQ10??
-	device.execute().set_input_line(10, ASSERT_LINE);
+	m_maincpu->set_input_line(10, ASSERT_LINE);
 }
 
 
@@ -2375,18 +2382,11 @@ SH2_DMA_KLUDGE_CB(cps3_state::dma_callback)
 
 	if (src < 0x80000)
 	{
-		int offs = (src & 0x07ffff) >> 2;
-		data = data ^ cps3_mask(offs * 4, m_key1, m_key2);
+		data = data ^ cps3_mask(src & ~3, m_key1, m_key2);
 	}
-	else if (src >= 0x6000000 && src < 0x6800000)
+	else if (src >= 0x6000000 && src < 0x7000000)
 	{
-		int offs = (src & 0x07fffff) >> 2;
-		if (!m_altEncryption) data = data ^ cps3_mask(0x6000000 + offs * 4, m_key1, m_key2);
-	}
-	else if (src >= 0x6800000 && src < 0x7000000)
-	{
-		int offs = (src & 0x07fffff) >> 2;
-		if (!m_altEncryption) data = data ^ cps3_mask(0x6800000 + offs * 4, m_key1, m_key2);
+		if (!m_altEncryption) data = data ^ cps3_mask(src & ~3, m_key1, m_key2);
 	}
 	else
 	{
@@ -2454,8 +2454,7 @@ void cps3_state::cps3(machine_config &config)
 	SH2(config, m_maincpu, 6250000*4); // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps3_state::cps3_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps3_state::decrypted_opcodes_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cps3_state::vbl_interrupt));
-	m_maincpu->set_periodic_int(FUNC(cps3_state::other_interrupt), attotime::from_hz(80)); /* ?source? */
+	m_maincpu->set_periodic_int(FUNC(cps3_state::irq10_periodic), attotime::from_hz(80)); /* ?source? */
 	m_maincpu->set_dma_kludge_callback(FUNC(cps3_state::dma_callback));
 
 	NSCSI_BUS(config, "scsi");
@@ -2466,7 +2465,8 @@ void cps3_state::cps3(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(60'000'000)/8, 486, 0, 384, 259, 0, 224);
 	screen.set_screen_update(FUNC(cps3_state::screen_update));
-/*
+	screen.screen_vblank().set(FUNC(cps3_state::vbl_interrupt));
+	/*
     Measured clocks:
         V = 59.5992Hz
         H = 15.4335kHz
