@@ -1144,6 +1144,11 @@ void goldstar_state::ladylinr_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
+void goldstar_state::ladylinrb_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+}
+
 void goldstar_state::wcat3_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -9221,6 +9226,14 @@ void goldstar_state::ladylinr(machine_config &config)
 }
 
 
+void goldstar_state::ladylinrb(machine_config &config)
+{
+	ladylinr(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &goldstar_state::ladylinrb_decrypted_opcodes_map);
+}
+
+
 void wingco_state::wcat3(machine_config &config)
 {
 	/* basic machine hardware */
@@ -16482,6 +16495,81 @@ void goldstar_state::init_jkrmast()
 	}
 }
 
+void goldstar_state::init_ladylinrb()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	uint8_t unkn = 0x00;
+
+	static const uint8_t xor_table_00[0x08][0x08] =
+	{
+		{ 0x10, 0x01, unkn, 0x75, 0x01, 0x11, 0x41, 0x11 }, // 0x0x and 0x2x
+		{ 0x43, 0x53, 0x42, 0x12, unkn, 0x40, 0x50, 0x40 }, // 0x1x and 0x3x
+		{ 0x51, 0x52, 0x13, 0x51, 0x10, unkn, 0x51, 0x41 }, // 0x4x and 0x6x
+		{ 0x52, 0x03, 0x12, 0x50, 0x41, 0x51, 0x51, 0x01 }, // 0x5x and 0x7x
+		{ 0x50, 0x43, 0x43, 0x02, 0x02, 0x43, 0x50, 0x10 }, // 0x8x and 0xax
+		{ 0x42, 0x01, 0x43, unkn, 0x13, 0x03, unkn, 0x42 }, // 0x9x and 0xbx
+		{ 0x52, 0x42, 0x01, unkn, 0x13, 0x00, unkn, 0x03 }, // 0xcx and 0xex
+		{ 0x10, 0x53, 0x52, 0x42, unkn, 0x01, 0x43, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_01[0x08][0x08] =
+	{
+		{ 0x12, 0x11, 0x42, 0x51, 0x03, 0x52, 0x53, 0x41 }, // 0x0x and 0x2x
+		{ 0x53, 0x41, 0x11, 0x52, 0x01, 0x03, 0x13, 0x11 }, // 0x1x and 0x3x
+		{ 0x13, 0x41, 0x53, 0x01, unkn, unkn, 0x10, 0x50 }, // 0x4x and 0x6x
+		{ 0x51, 0x53, 0x41, 0x02, 0x40, 0x01, 0x52, 0x10 }, // 0x5x and 0x7x
+		{ 0x10, 0x50, unkn, 0x03, 0x03, unkn, unkn, 0x10 }, // 0x8x and 0xax
+		{ 0x01, 0x53, 0x13, 0x10, 0x42, 0x03, 0x52, unkn }, // 0x9x and 0xbx
+		{ 0x42, 0x53, 0x12, 0x03, 0x11, 0x00, 0x01, 0x01 }, // 0xcx and 0xex
+		{ 0x43, 0x10, unkn, 0x10, unkn, 0x02, 0x50, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_02[0x08][0x08] =
+	{
+		{ 0x13, 0x02, 0x40, 0x52, 0x03, 0x53, 0x51, unkn }, // 0x0x and 0x2x
+		{ 0x12, unkn, 0x12, 0x01, 0x02, 0x41, 0x50, 0x03 }, // 0x1x and 0x3x
+		{ 0x01, 0x11, 0x01, 0x03, 0x40, unkn, 0x02, unkn }, // 0x4x and 0x6x
+		{ 0x51, 0x03, 0x01, 0x43, 0x52, 0x50, 0x03, 0x42 }, // 0x5x and 0x7x
+		{ unkn, 0x40, 0x13, 0x13, unkn, unkn, 0x40, 0x01 }, // 0x8x and 0xax
+		{ 0x13, 0x41, 0x52, 0x12, unkn, 0x43, 0x41, unkn }, // 0x9x and 0xbx
+		{ 0x03, 0x13, unkn, unkn, unkn, 0x00, 0x02, unkn }, // 0xcx and 0xex
+		{ 0x01, 0x43, 0x52, 0x11, 0x42, unkn, 0x51, 0x40 }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_03[0x08][0x08] =
+	{
+		{ 0x50, 0x13, 0x41, 0x42, 0x11, 0x53, 0x10, 0x41 }, // 0x0x and 0x2x
+		{ 0x42, unkn, 0x41, 0x51, 0x12, 0x40, 0x51, 0x40 }, // 0x1x and 0x3x
+		{ 0x50, 0x52, 0x40, 0x12, 0x50, unkn, 0x02, 0x50 }, // 0x4x and 0x6x
+		{ 0x10, 0x51, 0x53, 0x50, 0x53, 0x01, 0x53, 0x53 }, // 0x5x and 0x7x
+		{ unkn, unkn, 0x01, 0x13, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, 0x10, 0x40, 0x52, 0x13, 0x43, 0x41, unkn }, // 0x9x and 0xbx
+		{ 0x03, 0x53, 0x13, 0x50, 0x42, 0x00, unkn, 0x50 }, // 0xcx and 0xex
+		{ unkn, 0x40, 0x12, 0x11, 0x10, 0x43, 0x03, 0x53 }, // 0xdx and 0xfx
+	};
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		uint8_t row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
+
+		uint8_t xor_v = x & 0x07;
+
+		switch(i & 0x03)
+		{
+			case 0x00: x ^= xor_table_00[row][xor_v]; break;
+			case 0x01: x ^= xor_table_01[row][xor_v]; break;
+			case 0x02: x ^= xor_table_02[row][xor_v]; break;
+			case 0x03: x ^= xor_table_03[row][xor_v]; break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+}
+
+
 //  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
 void cb3_state::do_blockswaps(uint8_t* ROM)
@@ -17481,10 +17569,10 @@ GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
 GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (set 1)",                                       0 )
 GAME(  198?, ladylinra, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (set 2)",                                       0 )
-GAME(  198?, ladylinrb, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 1)",                            MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
-GAME(  198?, ladylinrc, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
-GAME(  198?, ladylinrd, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
-GAME(  198?, ladylinre, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
+GAME(  198?, ladylinrb, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrb, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 1)",                            0 )
+GAME(  198?, ladylinrc, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            MACHINE_NOT_WORKING )  // same encryption as ladylinrb with different xor values
+GAME(  198?, ladylinrd, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            MACHINE_NOT_WORKING )  // same encryption as ladylinrb with different xor values
+GAME(  198?, ladylinre, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            MACHINE_NOT_WORKING )  // same encryption as ladylinrb with different xor values
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   empty_init,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
 
 GAME(  1985, luckylad,  0,        lucky8,   luckylad, wingco_state,   init_luckylad,  ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
