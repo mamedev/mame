@@ -2994,8 +2994,9 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="easypc">
 		<description>Easy-PC Demonstrator for Printed Circuit Boards and Schematics</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>Number One Systems</publisher>
+		<info name="usage" value="Start from DOS with: DEMO" />
 		<info name="version" value="Rev. I0123" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">

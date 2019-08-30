@@ -550,10 +550,12 @@
 		</part>
 	</software>
 
-	<software name="drafix">
+	<software name="drafix" supported="yes">
 		<description>Drafix Windows CAD (Demo)</description>
 		<year>1990</year>
 		<publisher>Fox Data</publisher>
+		<info name="usage" value="Start from DOS with: DEMO"/>
+		<info name="version" value="3.5" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="drafix windows cad (demo).img" size="1228800" crc="95f50d9f" sha1="bc9de150a22e58a8ad4a0948d66f203527d84f32"/>
@@ -6606,6 +6608,7 @@
 		<description>The Greatest Little PIC Book</description>
 		<year>1997?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires Windows 3.1 or later"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1474560">
@@ -9053,6 +9056,25 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 2).img" size="1474560" crc="20c4dc37" sha1="e39ac3f58f81813e515e8fa203dff7e9b9ebf9d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bundliga">
+		<description>Bundesliga Manager Professional</description>
+		<year>1991</year>
+		<publisher>Software 2000</publisher>
+		<info name="usage" value="Install from DOS with: INSTALL" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "2515456">
+				<rom name="bundesliga manager professional disk 1.hfe" size="2515456" crc="2cc75e28" sha1="7913ba2b4cf1424b103a4f3bde3bbca8c16ba0e3" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "4579328">
+				<rom name="bundesliga manager professional disk 2.hfe" size="4579328" crc="1507de08" sha1="75c0fd4f7777e7355134e7b9d4f3cdb32a483508" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
