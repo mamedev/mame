@@ -161,13 +161,16 @@ void trivrus_state::trivrus_mem(address_map &map)
 	map(0x01280000, 0x01280003).w(FUNC(trivrus_state::Banksw_w));
 
 	map(0x01500000, 0x01500000).rw(FUNC(trivrus_state::trivrus_input_r), FUNC(trivrus_state::trivrus_input_w));
-//  0x01500010 & 0x000000ff = sec
-//  0x01500010 & 0x00ff0000 = min
-//  0x01500014 & 0x000000ff = hour
-//  0x01500014 & 0x00ff0000 = day
-//  0x01500018 & 0x000000ff = month
-//  0x0150001c & 0x000000ff = year - 2000
-	// another device is actually accessed on odd address, unless it's still RTC above
+	// reads occurs by SELECTING the given register on successive ODD addresses then reading at 0x01500011
+	// bit 0 of 1500010 looks some kind of busy flag (tight loops if on)
+	// on write:
+//  0x01500010 = sec
+//  0x01500012 = min
+//  0x01500014 = hour
+//  0x01500016 = day
+//  0x01500018 = month
+//  0x0150001c = year - 2000
+	// all regs are in BCD format
 	map(0x01600000, 0x01607fff).ram().share("nvram");
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
@@ -180,6 +183,7 @@ void trivrus_state::trivrus_mem(address_map &map)
 
 	map(0x05000000, 0x05ffffff).bankr("mainbank");
 	map(0x05000000, 0x05000003).rw(FUNC(trivrus_state::FlashCmd_r), FUNC(trivrus_state::FlashCmd_w));
+//  0x06000000 accessed during POST during above check then discarded, probably a debug left-over
 }
 
 void trivrus_state::machine_start()
