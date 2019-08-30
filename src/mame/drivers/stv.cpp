@@ -51,6 +51,7 @@
 
 #include "coreutil.h"
 
+#include "segabill.lh"
 
 #define FIRST_SPEEDUP_SLOT  (2)         // in case we remove/alter the BIOS speedups later
 
@@ -146,6 +147,9 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 			machine().bookkeeping().coin_counter_w(1,~data & 0x02);
 			machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
 			machine().bookkeeping().coin_lockout_w(1,~data & 0x08);
+			break;
+		case 0x09:
+			m_billboard->write(data);
 			break;
 		case 0x0d:
 			// then bit 7==0 - reset counters, currently this is unhandled, instead counters reset after each read (PORT_RESET used)
@@ -1182,6 +1186,10 @@ void stv_state::stv(machine_config &config)
 	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
 	m_scsp->add_route(0, "lspeaker", 1.0);
 	m_scsp->add_route(1, "rspeaker", 1.0);
+
+	SEGA_BILLBOARD(config, m_billboard, 0);
+
+	config.set_default_layout(layout_segabill);
 }
 
 void stv_state::stv_5881(machine_config &config)
