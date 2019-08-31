@@ -110,8 +110,9 @@ protected:
 	{
 		dip_descriptor *    next;
 		const char *        name;
-		uint32_t              mask;
-		uint32_t              state;
+		device_t *          owner;
+		uint32_t            mask;
+		uint32_t            state;
 	};
 
 	dip_descriptor *    diplist;

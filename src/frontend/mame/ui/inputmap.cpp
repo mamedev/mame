@@ -592,7 +592,7 @@ void menu_settings::populate(float &customtop, float &custombottom)
 
 						/* find the matching switch name */
 						for (dip = diplist; dip != nullptr; dip = dip->next)
-							if (strcmp(dip->name, diploc.name()) == 0)
+							if (dip->owner == &field.device() && strcmp(dip->name, diploc.name()) == 0)
 								break;
 
 						/* allocate new if none */
@@ -601,6 +601,7 @@ void menu_settings::populate(float &customtop, float &custombottom)
 							dip = (dip_descriptor *)m_pool_alloc(sizeof(*dip));
 							dip->next = nullptr;
 							dip->name = diploc.name();
+							dip->owner = &field.device();
 							dip->mask = dip->state = 0;
 							*diplist_tailptr = dip;
 							diplist_tailptr = &dip->next;
@@ -659,7 +660,7 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 
 			if (field != nullptr && !field->diplocations().empty())
 				for (const ioport_diplocation &diploc : field->diplocations())
-					if (strcmp(dip->name, diploc.name()) == 0)
+					if (dip->owner == &field->device() && strcmp(dip->name, diploc.name()) == 0)
 						selectedmask |= 1 << (diploc.number() - 1);
 		}
 
