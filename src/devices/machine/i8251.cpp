@@ -17,9 +17,18 @@
 #include "emu.h"
 #include "i8251.h"
 
-//#define VERBOSE 1
+#define LOG_STAT    (1U << 1)
+#define LOG_COM     (1U << 2)
+#define LOG_MODE    (1U << 3)
+
+//#define VERBOSE (LOG_GENERAL | LOG_STAT | LOG_COM | LOG_MODE)
+//#define LOG_OUTPUT_STREAM std::cout
+
 #include "logmacro.h"
 
+#define LOGSTAT(...)  LOGMASKED(LOG_STAT,  __VA_ARGS__)
+#define LOGCOM(...)   LOGMASKED(LOG_COM,   __VA_ARGS__)
+#define LOGMODE(...)  LOGMASKED(LOG_MODE,  __VA_ARGS__)
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -310,6 +319,7 @@ void i8251_device::device_reset()
 	/* no character to read by cpu */
 	/* transmitter is ready and is empty */
 	m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
+	LOGSTAT("status is reset to %02x\n", m_status);
 	m_mode_byte = 0;
 	m_command = 0;
 	m_rx_data = 0;
@@ -334,67 +344,26 @@ void i8251_device::device_reset()
 void i8251_device::command_w(uint8_t data)
 {
 	/* command */
-	LOG("I8251: Command byte\n");
-
 	m_command = data;
 
-	LOG("Command byte: %02x\n", data);
-
-	if (BIT(data, 7))
-		LOG("hunt mode\n");
-
-	if (BIT(data, 5))
-		LOG("/rts set to 0\n");
-	else
-		LOG("/rts set to 1\n");
-
-	if (BIT(data, 2))
-		LOG("receive enable\n");
-	else
-		LOG("receive disable\n");
-
-	if (BIT(data, 1))
-		LOG("/dtr set to 0\n");
-	else
-		LOG("/dtr set to 1\n");
-
-	if (BIT(data, 0))
-		LOG("transmit enable\n");
-	else
-		LOG("transmit disable\n");
-
-
-	/*  bit 7:
-	        0 = normal operation
-	        1 = hunt mode
-	    bit 6:
-	        0 = normal operation
-	        1 = internal reset
-	    bit 5:
-	        0 = /RTS set to 1
-	        1 = /RTS set to 0
-	    bit 4:
-	        0 = normal operation
-	        1 = reset error flag
-	    bit 3:
-	        0 = normal operation
-	        1 = send break character
-	    bit 2:
-	        0 = receive disable
-	        1 = receive enable
-	    bit 1:
-	        0 = /DTR set to 1
-	        1 = /DTR set to 0
-	    bit 0:
-	        0 = transmit disable
-	        1 = transmit enable
-	*/
+	LOG("I8251: Command byte: %02x\n", data);
+	LOGCOM(" Tx enable: %d\n", data & 0x01 ? 1 : 0); // bit 0: 0 = transmit disable 1 = transmit enable
+	LOGCOM(" DTR      : %d\n", data & 0x02 ? 1 : 0); // bit 1: 0 = /DTR set to 1    1 = /DTR set to 0
+	LOGCOM(" Rx enable: %d\n", data & 0x04 ? 1 : 0); // bit 2: 0 = receive disable  1 = receive enable
+	LOGCOM(" Send BRK : %d\n", data & 0x08 ? 1 : 0); // bit 3: 0 = normal operation 1 = send break character
+	LOGCOM(" Err reset: %d\n", data & 0x10 ? 1 : 0); // bit 4: 0 = normal operation 1 = reset error flag
+	LOGCOM(" RTS      : %d\n", data & 0x20 ? 1 : 0); // bit 5: 0 = /RTS set to 1    1 = /RTS set to 0
+	LOGCOM(" Reset    : %d\n", data & 0x40 ? 1 : 0); // bit 6: 0 = normal operation 1 = internal reset
+	LOGCOM(" Hunt mode: %d\n", data & 0x80 ? 1 : 0); // bit 7: 0 = normal operation 1 = hunt mode
 
 	m_rts_handler(!BIT(data, 5));
 	m_dtr_handler(!BIT(data, 1));
 
 	if (BIT(data, 4))
+	{
+		LOGSTAT("status errors are reset\n");
 		m_status &= ~(I8251_STATUS_PARITY_ERROR | I8251_STATUS_OVERRUN_ERROR | I8251_STATUS_FRAMING_ERROR);
+	}
 
 	if (BIT(data, 6))
 	{
@@ -412,39 +381,22 @@ void i8251_device::command_w(uint8_t data)
 
 void i8251_device::mode_w(uint8_t data)
 {
-	LOG("I8251: Mode byte = %X\n", data);
+	LOG("I8251: Mode byte = %02x\n", data);
 
 	m_mode_byte = data;
 
 	/* Synchronous or Asynchronous? */
 	if ((data & 0x03) != 0)
 	{
-		/*  Asynchronous
-
-		    bit 7,6: stop bit length
-		    0 = inhibit
-		    1 = 1 bit
-		    2 = 1.5 bits
-		    3 = 2 bits
-		    bit 5: parity type
-		    0 = parity odd
-		    1 = parity even
-		    bit 4: parity test enable
-		    0 = disable
-		    1 = enable
-		    bit 3,2: character length
-		    0 = 5 bits
-		    1 = 6 bits
-		    2 = 7 bits
-		    3 = 8 bits
-		    bit 1,0: baud rate factor
-		    0 = defines command byte for synchronous or asynchronous
-		    1 = x1
-		    2 = x16
-		    3 = x64
-		    */
-
-		LOG("I8251: Asynchronous operation\n");
+		LOGMODE(" Asynchronous mode\n");
+		// bit 1,0: baud rate factor - 0x00 = defines mode byte for synchronous mode, 0x01 = x1, 0x02 = x16, 0x03 = x64
+		LOGMODE("  Baud div : %s\n", std::array<char const *, 4> {{"invalid", "x1", "x16", "x64"}}[(data & (0x02 | 0x01)) >> 0]);
+		// bit 3,2: character length - 0x00 = 5 bits, 0x01 = 6 bits, 0x02 = 7 bits, 0x03 = 8 bits
+		LOGMODE("  Char len : %s\n", std::array<char const *, 4> {{"5", "6", "7", "8"}}[(data & (0x08 | 0x04)) >> 2]);
+		LOGMODE("  Parity ck: %s\n", data & 0x10 ? "enable" : "disable"); // bit 4: parity test enable 0 = disable    1 = enable
+		LOGMODE("  Parity   : %s\n", data & 0x20 ? "even" : "odd");       // bit 5: parity type        0 = parity odd 1 = parity even
+		// bit 7,6: stop bit length - 0x00 = inhibit, 0x01 = 1 bit, 0x02 = 1.5 bits, 0x03 = 2 bits
+		LOGMODE("  Stop Bits: %s\n", std::array<char const *, 4> {{"inhibit", "1", "1.5", "2"}}[(data & (0x80 | 0x40)) >> 6]);
 
 		const int data_bits_count = ((data >> 2) & 0x03) + 5;
 		LOG("Character length: %d\n", data_bits_count);
@@ -454,18 +406,15 @@ void i8251_device::mode_w(uint8_t data)
 		{
 			if (BIT(data, 5))
 			{
-				LOG("enable parity checking (even parity)\n");
 				parity = PARITY_EVEN;
 			}
 			else
 			{
-				LOG("enable parity checking (odd parity)\n");
 				parity = PARITY_ODD;
 			}
 		}
 		else
 		{
-			LOG("parity check disabled\n");
 			parity = PARITY_NONE;
 		}
 
@@ -475,22 +424,18 @@ void i8251_device::mode_w(uint8_t data)
 		case 0:
 		default:
 			stop_bits = STOP_BITS_0;
-			LOG("stop bit: inhibit\n");
 			break;
 
 		case 1:
 			stop_bits = STOP_BITS_1;
-			LOG("stop bit: 1 bit\n");
 			break;
 
 		case 2:
 			stop_bits = STOP_BITS_1_5;
-			LOG("stop bit: 1.5 bits\n");
 			break;
 
 		case 3:
 			stop_bits = STOP_BITS_2;
-			LOG("stop bit: 2 bits\n");
 			break;
 		}
 
@@ -525,6 +470,7 @@ void i8251_device::mode_w(uint8_t data)
 #endif
 		/* not expecting mode byte now */
 		m_flags &= ~I8251_EXPECTING_MODE;
+		LOGSTAT("status WAS reset, but not anymore\n");
 		//              m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
 	}
 	else
@@ -583,6 +529,7 @@ void i8251_device::control_w(uint8_t data)
 				/* finished transfering sync bytes, now expecting command */
 				m_flags &= ~(I8251_EXPECTING_MODE | I8251_EXPECTING_SYNC_BYTE);
 				m_sync_byte_offset = 0;
+				LOGSTAT("status was reset but not anymore\n");
 			//  m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
 			}
 		}
@@ -607,7 +554,16 @@ uint8_t i8251_device::status_r()
 {
 	uint8_t status = (m_dsr << 7) | m_status;
 
-	LOG("status: %02x\n", status);
+	LOG("status read: %02x\n", status);
+	LOGSTAT(" TxRDY  : %d\n", status & 0x01 ? 1 : 0);
+	LOGSTAT(" RxRDY  : %d\n", status & 0x02 ? 1 : 0);
+	LOGSTAT(" TxEMPTY: %d\n", status & 0x04 ? 1 : 0);
+	LOGSTAT(" Parity : %d\n", status & 0x08 ? 1 : 0);
+	LOGSTAT(" Overrun: %d\n", status & 0x10 ? 1 : 0);
+	LOGSTAT(" Framing: %d\n", status & 0x20 ? 1 : 0);
+	LOGSTAT(" Syn/Brk: %d\n", status & 0x40 ? 1 : 0);
+	LOGSTAT(" DSR    : %d\n\n", status & 0x80 ? 1 : 0);
+
 	return status;
 }
 
@@ -621,20 +577,22 @@ void i8251_device::data_w(uint8_t data)
 {
 	m_tx_data = data;
 
-		LOG("data_w %02x\n" , data);
+	LOG("data_w %02x\n" , data);
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
+	LOGSTAT("status cleared TX_READY by data_w\n");
 	update_tx_ready();
 
-		// Store state of tx enable when writing to DB buffer
-		if (is_tx_enabled()) {
-				m_flags |= I8251_DELAYED_TX_EN;
-		} else {
-				m_flags &= ~I8251_DELAYED_TX_EN;
-		}
+	// Store state of tx enable when writing to DB buffer
+	if (is_tx_enabled())
+	{
+		m_flags |= I8251_DELAYED_TX_EN;
+	} else {
+		m_flags &= ~I8251_DELAYED_TX_EN;
+	}
 
-		check_for_tx_start();
+	check_for_tx_start();
 
 	/* if transmitter is active, then tx empty will be signalled */
 
@@ -655,11 +613,17 @@ void i8251_device::receive_character(uint8_t ch)
 
 	m_rx_data = ch;
 
+	LOGSTAT("status RX READY test %02x\n", m_status);
 	/* char has not been read and another has arrived! */
 	if (m_status & I8251_STATUS_RX_READY)
+	{
 		m_status |= I8251_STATUS_OVERRUN_ERROR;
+		LOGSTAT("status overrun set\n");
+	}
 
+	LOGSTAT("status pre RX READY set %02x\n", m_status);
 	m_status |= I8251_STATUS_RX_READY;
+	LOGSTAT("status post RX READY set %02x\n", m_status);
 
 	update_rx_ready();
 }
@@ -677,6 +641,7 @@ uint8_t i8251_device::data_r()
 	if (!machine().side_effects_disabled())
 	{
 		m_status &= ~I8251_STATUS_RX_READY;
+		LOGSTAT("status RX_READY cleared\n");
 		update_rx_ready();
 	}
 	return m_rx_data;
