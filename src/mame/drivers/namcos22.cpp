@@ -2736,8 +2736,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::mcu_irq)
 	/* TODO: real sources of these */
 	if (scanline == 480)
 		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
-	else if (scanline == 0)
-		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 	else if (scanline == 240)
 		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }

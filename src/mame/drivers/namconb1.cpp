@@ -337,11 +337,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_irq2_cb)
 	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_adc_cb)
-{
-	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-}
-
 /****************************************************************************/
 
 WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
@@ -984,7 +979,6 @@ void namconb1_state::namconb1(machine_config &config)
 	// has to be 60 hz or music will go crazy in nebulray, vshoot, gslugrs*
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namconb1_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namconb1_state::mcu_irq2_cb), attotime::from_hz(60));
-	TIMER(config, "mcu_adc").configure_periodic(FUNC(namconb1_state::mcu_adc_cb), attotime::from_hz(60));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/8, 384, 0, 288, 264, 0, 224);

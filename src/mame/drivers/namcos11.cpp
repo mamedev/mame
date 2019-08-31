@@ -356,7 +356,6 @@ private:
 	DECLARE_WRITE16_MEMBER(c76_speedup_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 
 	void c76_map(address_map &map);
 	void namcos11_map(address_map &map);
@@ -594,11 +593,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq2_cb)
 	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
-{
-	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-}
-
 void namcos11_state::coh110(machine_config &config)
 {
 	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
@@ -620,7 +614,6 @@ void namcos11_state::coh110(machine_config &config)
 	/* TODO: irq generation for these */
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcos11_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcos11_state::mcu_irq2_cb), attotime::from_hz(60));
-	TIMER(config, "mcu_adc").configure_periodic(FUNC(namcos11_state::mcu_adc_cb), attotime::from_hz(60));
 
 	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 

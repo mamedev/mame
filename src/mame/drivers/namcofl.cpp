@@ -477,11 +477,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_irq2_cb)
 	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_adc_cb)
-{
-	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-}
-
 
 MACHINE_START_MEMBER(namcofl_state,namcofl)
 {
@@ -532,7 +527,6 @@ void namcofl_state::namcofl(machine_config &config)
 	/* TODO: irq generation for these */
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcofl_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcofl_state::mcu_irq2_cb), attotime::from_hz(60));
-	TIMER(config, "mcu_adc").configure_periodic(FUNC(namcofl_state::mcu_adc_cb), attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(namcofl_state,namcofl)
 	MCFG_MACHINE_RESET_OVERRIDE(namcofl_state,namcofl)
