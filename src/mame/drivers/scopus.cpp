@@ -191,12 +191,12 @@ void sagitta180_state::sagitta180(machine_config &config)
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
 	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
 	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 19218)); // 19218 / 19222 ? guesses...
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
