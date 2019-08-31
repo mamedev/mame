@@ -54,6 +54,10 @@ protected:
 	required_device<spectrum_expansion_slot_device> m_exp;
 
 	int m_romcs;
+	int m_romlatch;
+//	int m_masterportdisable;
+
+	void fetch(offs_t offset);
 };
 
 class spectrum_betav3_device :

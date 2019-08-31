@@ -298,7 +298,7 @@ READ8_MEMBER(spectrum_state::opcode_fetch_r)
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->opcode_fetch(offset);
-	uint8_t retval = m_specmem->get_space()->read_byte(offset);
+	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
 	m_exp->opcode_fetch_post(offset);
 	return retval;
 }
@@ -306,14 +306,14 @@ READ8_MEMBER(spectrum_state::opcode_fetch_r)
 READ8_MEMBER(spectrum_state::spectrum_data_r)
 {
 	m_exp->data_fetch(offset);
-	uint8_t retval = m_specmem->get_space()->read_byte(offset);
+	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
 	m_exp->data_fetch_post(offset);
 	return retval;
 }
 
 WRITE8_MEMBER(spectrum_state::spectrum_data_w)
 {
-	m_specmem->get_space()->write_byte(offset,data);
+	m_specmem->space(AS_PROGRAM).write_byte(offset,data);
 }
 
 WRITE8_MEMBER(spectrum_state::spectrum_rom_w)
@@ -644,21 +644,13 @@ INPUT_PORTS_END
 
 void spectrum_state::init_spectrum()
 {
-	if (!m_specmem)
-		fatalerror("no memory\n");
-
 	switch (m_ram->size())
 	{
 		case 48*1024:
-			m_specmem->get_space()->install_ram(0x8000, 0xffff, nullptr); // Fall through
+			m_specmem->space(AS_PROGRAM).install_ram(0x8000, 0xffff, nullptr); // Fall through
 		case 16*1024:
-			m_specmem->get_space()->install_ram(0x5b00, 0x7fff, nullptr);
+			m_specmem->space(AS_PROGRAM).install_ram(0x5b00, 0x7fff, nullptr);
 	}
-}
-
-void spectrum_state::machine_start()
-{
-	printf("machine start\n");
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum)
@@ -716,9 +708,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
 
-	SPECTRUM_MEMORY(config, m_specmem);
-	m_specmem->set_map(&spectrum_state::spectrum_map);
-
+	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 

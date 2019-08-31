@@ -3269,7 +3269,6 @@ files {
 	MAME_DIR .. "src/mame/includes/zx.h",
 	MAME_DIR .. "src/mame/machine/zx.cpp",
 	MAME_DIR .. "src/mame/drivers/spectrum.cpp",
-	MAME_DIR .. "src/mame/machine/spectrum_mem.cpp",
 	MAME_DIR .. "src/mame/includes/spectrum.h",
 	MAME_DIR .. "src/mame/drivers/spec128.cpp",
 	MAME_DIR .. "src/mame/includes/spec128.h",

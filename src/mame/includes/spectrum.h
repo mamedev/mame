@@ -12,7 +12,7 @@
 #pragma once
 
 #include "machine/spec_snqk.h"
-#include "machine/spectrum_mem.h"
+#include "machine/bankdev.h"
 #include "bus/spectrum/exp.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -100,8 +100,6 @@ public:
 	void init_spectrum();
 
 protected:
-
-	virtual void machine_start() override;
 
 	enum
 	{
@@ -191,7 +189,7 @@ protected:
 
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
-	optional_device<spectrum_memory> m_specmem;
+	optional_device<address_map_bank_device> m_specmem;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<spectrum_expansion_slot_device> m_exp;
 
