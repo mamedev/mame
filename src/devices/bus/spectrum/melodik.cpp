@@ -69,9 +69,9 @@ READ_LINE_MEMBER(spectrum_melodik_device::romcs)
 	return m_exp->romcs();
 }
 
-void spectrum_melodik_device::opcode_fetch(offs_t offset)
+void spectrum_melodik_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch(offset);
+	m_exp->pre_opcode_fetch(offset);
 }
 
 uint8_t spectrum_melodik_device::mreq_r(offs_t offset)

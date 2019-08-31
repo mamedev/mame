@@ -296,15 +296,15 @@ void spectrum_betav2_device::fetch(offs_t offset)
 	}
 }
 
-void spectrum_betav2_device::opcode_fetch(offs_t offset)
+void spectrum_betav2_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch(offset);
+	m_exp->pre_opcode_fetch(offset);
 	fetch(offset);
 }
 
-void spectrum_betav2_device::data_fetch(offs_t offset)
+void spectrum_betav2_device::pre_data_fetch(offs_t offset)
 {
-	m_exp->data_fetch(offset);
+	m_exp->pre_data_fetch(offset);
 	fetch(offset);
 }
 

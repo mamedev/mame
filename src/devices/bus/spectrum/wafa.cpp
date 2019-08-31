@@ -106,9 +106,9 @@ READ_LINE_MEMBER(spectrum_wafa_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
-void spectrum_wafa_device::opcode_fetch(offs_t offset)
+void spectrum_wafa_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch(offset);
+	m_exp->pre_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{
@@ -124,9 +124,9 @@ void spectrum_wafa_device::opcode_fetch(offs_t offset)
 	}
 }
 
-void spectrum_wafa_device::opcode_fetch_post(offs_t offset)
+void spectrum_wafa_device::post_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch_post(offset);
+	m_exp->post_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{

@@ -101,28 +101,28 @@ READ_LINE_MEMBER(spectrum_expansion_slot_device::romcs)
 // fetch_r
 //-------------------------------------------------
 
-void spectrum_expansion_slot_device::opcode_fetch(offs_t offset)
+void spectrum_expansion_slot_device::pre_opcode_fetch(offs_t offset)
 {
 	if (m_card)
-		 m_card->opcode_fetch(offset);
+		 m_card->pre_opcode_fetch(offset);
 }
 
-void spectrum_expansion_slot_device::opcode_fetch_post(offs_t offset)
+void spectrum_expansion_slot_device::post_opcode_fetch(offs_t offset)
 {
 	if (m_card)
-		 m_card->opcode_fetch_post(offset);
+		 m_card->post_opcode_fetch(offset);
 }
 
-void spectrum_expansion_slot_device::data_fetch(offs_t offset)
+void spectrum_expansion_slot_device::pre_data_fetch(offs_t offset)
 {
 	if (m_card)
-		 m_card->data_fetch(offset);
+		 m_card->pre_data_fetch(offset);
 }
 
-void spectrum_expansion_slot_device::data_fetch_post(offs_t offset)
+void spectrum_expansion_slot_device::post_data_fetch(offs_t offset)
 {
 	if (m_card)
-		 m_card->data_fetch_post(offset);
+		 m_card->post_data_fetch(offset);
 }
 
 //-------------------------------------------------

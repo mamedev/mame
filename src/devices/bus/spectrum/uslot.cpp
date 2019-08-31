@@ -76,10 +76,10 @@ READ_LINE_MEMBER(spectrum_uslot_device::romcs)
 	return m_exp1->romcs() | m_exp2->romcs();
 }
 
-void spectrum_uslot_device::opcode_fetch(offs_t offset)
+void spectrum_uslot_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp1->opcode_fetch(offset);
-	m_exp2->opcode_fetch(offset);
+	m_exp1->pre_opcode_fetch(offset);
+	m_exp2->pre_opcode_fetch(offset);
 }
 
 uint8_t spectrum_uslot_device::mreq_r(offs_t offset)
