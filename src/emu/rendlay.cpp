@@ -205,7 +205,7 @@ private:
 					{
 						std::istringstream stream(m_text);
 						stream.imbue(f_portable_locale);
-						m_text.c_str();
+						(void)m_text.c_str();
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -242,7 +242,7 @@ private:
 					{
 						std::istringstream stream(m_text);
 						stream.imbue(f_portable_locale);
-						m_text.c_str();
+						(void)m_text.c_str();
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -302,7 +302,7 @@ private:
 					{
 						std::istringstream stream(m_text);
 						stream.imbue(f_portable_locale);
-						m_text.c_str();
+						(void)m_text.c_str();
 						if (m_text[0] == '$')
 						{
 							stream.get();
