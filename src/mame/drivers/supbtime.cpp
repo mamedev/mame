@@ -327,7 +327,7 @@ GFXDECODE_END
 
 void supbtime_state::supbtime(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(28'000'000) / 2);
+	M68000(config, m_maincpu, XTAL(21'477'272) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::supbtime_map);
 
 	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
