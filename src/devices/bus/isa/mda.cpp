@@ -472,17 +472,17 @@ WRITE8_MEMBER( isa8_mda_device::io_write)
 {
 	switch( offset )
 	{
-		case 0: case 2: case 4: case 6:
+		case 0x00: case 0x02: case 0x04: case 0x06:
 			m_crtc->address_w(data);
 			break;
-		case 1: case 3: case 5: case 7:
+		case 0x01: case 0x03: case 0x05: case 0x07:
 			m_crtc->register_w(data);
 			break;
-		case 8:
+		case 0x08:
 			mode_control_w(space, offset, data);
 			break;
-		case 12: case 13:  case 14:
-			m_lpt->write(space, offset - 12, data);
+		case 0x0c: case 0x0d:  case 0x0e:
+			m_lpt->write(space, offset - 0x0c, data);
 			break;
 	}
 }
@@ -492,18 +492,18 @@ READ8_MEMBER( isa8_mda_device::io_read)
 	int data = 0xff;
 	switch( offset )
 	{
-		case 0: case 2: case 4: case 6:
+		case 0x00: case 0x02: case 0x04: case 0x06:
 			/* return last written mc6845 address value here? */
 			break;
-		case 1: case 3: case 5: case 7:
+		case 0x01: case 0x03: case 0x05: case 0x07:
 			data = m_crtc->register_r();
 			break;
-		case 10:
+		case 0x0a:
 			data = status_r(space, offset);
 			break;
-		/* 12, 13, 14  are the LPT ports */
-		case 12: case 13:  case 14:
-			data = m_lpt->read(space, offset - 12);
+		/* LPT ports */
+		case 0x0c: case 0x0d:  case 0x0e:
+			data = m_lpt->read(space, offset - 0x0c);
 			break;
 	}
 	return data;
@@ -691,19 +691,19 @@ WRITE8_MEMBER( isa8_hercules_device::io_write )
 {
 	switch( offset )
 	{
-	case 0: case 2: case 4: case 6:
+	case 0x00: case 0x02: case 0x04: case 0x06:
 		m_crtc->address_w(data);
 		break;
-	case 1: case 3: case 5: case 7:
+	case 0x01: case 0x03: case 0x05: case 0x07:
 		m_crtc->register_w(data);
 		break;
-	case 8:
+	case 0x08:
 		mode_control_w(space, offset, data);
 		break;
-	case 12: case 13:  case 14:
+	case 0x0c: case 0x0d:  case 0x0e:
 		m_lpt->write(space, offset - 12, data);
 		break;
-	case 15:
+	case 0x0f:
 		m_configuration_switch = data;
 		break;
 	}
@@ -735,18 +735,18 @@ READ8_MEMBER( isa8_hercules_device::io_read )
 	int data = 0xff;
 	switch( offset )
 	{
-	case 0: case 2: case 4: case 6:
+	case 0x00: case 0x02: case 0x04: case 0x06:
 		/* return last written mc6845 address value here? */
 		break;
-	case 1: case 3: case 5: case 7:
+	case 0x01: case 0x03: case 0x05: case 0x07:
 		data = m_crtc->register_r();
 		break;
-	case 10:
+	case 0x0a:
 		data = status_r(space, offset);
 		break;
-	/* 12, 13, 14  are the LPT ports */
-	case 12: case 13:  case 14:
-		data = m_lpt->read(space, offset - 12);
+	/* LPT ports */
+	case 0xc: case 0xd:  case 0xe:
+		data = m_lpt->read(space, offset - 0x0c);
 		break;
 	}
 	return data;
@@ -1095,7 +1095,7 @@ void isa8_epc_mda_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(4);
 
-	MC6845(config, m_crtc, XTAL(19'170'000) / 16); // clock and divider are guesswork
+	HD6845S(config, m_crtc, XTAL(19'170'000) / 16); // clock and divider are guesswork
 	m_crtc->set_screen(EPC_MDA_SCREEN);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -1207,16 +1207,16 @@ void isa8_epc_mda_device::device_reset()
 WRITE8_MEMBER( isa8_epc_mda_device::io_write)
 {
 	LOG("%s: %04x <- %02x\n", FUNCNAME, offset, data);
-	mc6845_device *mc6845 = subdevice<mc6845_device>(MC6845_NAME);
+	hd6845s_device *hd6845s = subdevice<hd6845s_device>(MC6845_NAME);
 	switch( offset )
 	{
 		case 0x04:
-		  //LOGSETUP(" - 6845 address write\n");
-			mc6845->address_w( data );
+		  //LOGSETUP(" - HD6845S address write\n");
+			hd6845s->address_w( data );
 			break;
 		case 0x05:
-		  //LOGSETUP(" - 6845 register write\n");
-			mc6845->register_w( data );
+		  //LOGSETUP(" - HD6845S register write\n");
+			hd6845s->register_w( data );
 			break;
 		case 0x08: // Mode 1 reg
 			LOGMODE(" - Mode register 1 write: %02x\n", data);
@@ -1262,15 +1262,15 @@ READ8_MEMBER( isa8_epc_mda_device::io_read)
 {
 	LOG("%s: %04x <- ???\n", FUNCNAME, offset);
 	int data = 0xff;
-	mc6845_device *mc6845 = subdevice<mc6845_device>(MC6845_NAME);
+	hd6845s_device *hd6845s = subdevice<hd6845s_device>(MC6845_NAME);
 	switch( offset )
 	{
 		case 0x04:
-			LOGR(" - 6845 address read\n");
+			LOGR(" - hd6845s address read\n");
 			break;
 		case 0x05:
-			LOGR(" - 6845 register read\n");
-			data = mc6845->register_r();
+			LOGR(" - hd6845s register read\n");
+			data = hd6845s->register_r();
 			break;
 		case 0x08: // Mode 1 reg
 			data = m_mode_control;
