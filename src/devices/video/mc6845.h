@@ -219,6 +219,7 @@ protected:
 	uint16_t  m_vsync_on_pos;
 	uint16_t  m_vsync_off_pos;
 	bool    m_has_valid_parameters;
+	bool    m_display_disabled_msg_shown;
 
 	uint16_t   m_current_disp_addr;   /* the display address currently drawn (used only in mc6845_update) */
 

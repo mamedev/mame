@@ -49,7 +49,7 @@
 #define LOG_REGS    (1 << 2U)
 #define LOG_CONF    (1 << 3U)
 
-//#define VERBOSE (LOG_SETUP)
+//#define VERBOSE (LOG_SETUP|LOG_CONF|LOG_REGS)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -1032,6 +1032,12 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		assert(!m_update_row_cb.isnull());
 
+		if (m_display_disabled_msg_shown == true)
+		{
+			logerror("M6845: Valid screen parameters - display reenabled!!!\n");
+			m_display_disabled_msg_shown = false;
+		}
+
 		/* call the set up function if any */
 		if (!m_begin_update_cb.isnull())
 			m_begin_update_cb(bitmap, cliprect);
@@ -1054,7 +1060,11 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 	else
 	{
-		logerror("M6845: Invalid screen parameters - display disabled!!!\n");
+		if (m_display_disabled_msg_shown == false)
+		{
+			logerror("M6845: Invalid screen parameters - display disabled!!!\n");
+			m_display_disabled_msg_shown = true;
+		}
 	}
 
 	return 0;
@@ -1102,6 +1112,7 @@ void mc6845_device::device_start()
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
 	m_has_valid_parameters = false;
+	m_display_disabled_msg_shown = false;
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
 	m_raster_counter = 0;
@@ -1173,6 +1184,7 @@ void mc6845_device::device_start()
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_has_valid_parameters));
+	save_item(NAME(m_display_disabled_msg_shown));
 }
 
 
