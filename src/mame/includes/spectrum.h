@@ -12,7 +12,7 @@
 #pragma once
 
 #include "machine/spec_snqk.h"
-
+#include "machine/spectrum_mem.h"
 #include "bus/spectrum/exp.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -59,6 +59,8 @@ struct EVENT_LIST_ITEM
 };
 
 
+
+
 class spectrum_state : public driver_device
 {
 public:
@@ -69,6 +71,7 @@ public:
 		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
+		m_specmem(*this, "specmem"),
 		m_speaker(*this, "speaker"),
 		m_exp(*this, "exp"),
 		m_io_line0(*this, "LINE0"),
@@ -97,6 +100,9 @@ public:
 	void init_spectrum();
 
 protected:
+
+	virtual void machine_start() override;
+
 	enum
 	{
 		TIMER_IRQ_ON,
@@ -138,6 +144,9 @@ protected:
 	DECLARE_READ8_MEMBER(opcode_fetch_r);
 	DECLARE_WRITE8_MEMBER(spectrum_rom_w);
 	DECLARE_READ8_MEMBER(spectrum_rom_r);
+	DECLARE_READ8_MEMBER(spectrum_data_r);
+	DECLARE_WRITE8_MEMBER(spectrum_data_w);
+
 	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
 	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
@@ -177,10 +186,12 @@ protected:
 	void spectrum_128_fetch(address_map &map);
 	void spectrum_io(address_map &map);
 	void spectrum_mem(address_map &map);
+	void spectrum_map(address_map &map);
 	void spectrum_fetch(address_map &map);
 
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	optional_device<spectrum_memory> m_specmem;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<spectrum_expansion_slot_device> m_exp;
 

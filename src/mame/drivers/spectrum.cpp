@@ -298,9 +298,22 @@ READ8_MEMBER(spectrum_state::opcode_fetch_r)
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->opcode_fetch(offset);
-	uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	uint8_t retval = m_specmem->get_space()->read_byte(offset);
 	m_exp->opcode_fetch_post(offset);
 	return retval;
+}
+
+READ8_MEMBER(spectrum_state::spectrum_data_r)
+{
+	m_exp->data_fetch(offset);
+	uint8_t retval = m_specmem->get_space()->read_byte(offset);
+	m_exp->data_fetch_post(offset);
+	return retval;
+}
+
+WRITE8_MEMBER(spectrum_state::spectrum_data_w)
+{
+	m_specmem->get_space()->write_byte(offset,data);
 }
 
 WRITE8_MEMBER(spectrum_state::spectrum_rom_w)
@@ -444,8 +457,14 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 
 void spectrum_state::spectrum_mem(address_map &map)
 {
+	map(0x0000, 0xffff).rw(FUNC(spectrum_state::spectrum_data_r), FUNC(spectrum_state::spectrum_data_w));
+}
+
+void spectrum_state::spectrum_map(address_map &map)
+{
 	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
 	map(0x4000, 0x5aff).ram().share("video_ram");
+	// installed later depending on ramsize
 	//map(0x5b00, 0x7fff).ram();
 	//map(0x8000, 0xffff).ram();
 }
@@ -625,15 +644,21 @@ INPUT_PORTS_END
 
 void spectrum_state::init_spectrum()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	if (!m_specmem)
+		fatalerror("no memory\n");
 
 	switch (m_ram->size())
 	{
 		case 48*1024:
-			space.install_ram(0x8000, 0xffff, nullptr); // Fall through
+			m_specmem->get_space()->install_ram(0x8000, 0xffff, nullptr); // Fall through
 		case 16*1024:
-			space.install_ram(0x5b00, 0x7fff, nullptr);
+			m_specmem->get_space()->install_ram(0x5b00, 0x7fff, nullptr);
 	}
+}
+
+void spectrum_state::machine_start()
+{
+	printf("machine start\n");
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum)
@@ -690,6 +715,10 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+
+	SPECTRUM_MEMORY(config, m_specmem);
+	m_specmem->set_map(&spectrum_state::spectrum_map);
+
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 

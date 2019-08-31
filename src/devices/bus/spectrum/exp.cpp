@@ -107,14 +107,22 @@ void spectrum_expansion_slot_device::opcode_fetch(offs_t offset)
 		 m_card->opcode_fetch(offset);
 }
 
-//-------------------------------------------------
-// fetch_r
-//-------------------------------------------------
-
 void spectrum_expansion_slot_device::opcode_fetch_post(offs_t offset)
 {
 	if (m_card)
 		 m_card->opcode_fetch_post(offset);
+}
+
+void spectrum_expansion_slot_device::data_fetch(offs_t offset)
+{
+	if (m_card)
+		 m_card->data_fetch(offset);
+}
+
+void spectrum_expansion_slot_device::data_fetch_post(offs_t offset)
+{
+	if (m_card)
+		 m_card->data_fetch_post(offset);
 }
 
 //-------------------------------------------------

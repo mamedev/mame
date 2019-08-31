@@ -286,11 +286,26 @@ void spectrum_betav2_device::opcode_fetch(offs_t offset)
 	{
 		if ((offset & 0xff00) == 0x3c00)
 			m_romcs = 1;
+		else
+			m_romcs = 1;
 	
 		// how does the ROM get disabled on these older beta units
 		// there are no RETs that end up in RAM as with the 128
 		// so it looks like jumps to the 0xxx and 1xxx regions, but
 		// that doesn't work?
+	}
+}
+
+void spectrum_betav2_device::data_fetch(offs_t offset)
+{
+	m_exp->data_fetch(offset);
+
+	if (!machine().side_effects_disabled())
+	{
+		if ((offset & 0xff00) == 0x3c00)
+			m_romcs = 1;
+		else
+			m_romcs = 1;
 	}
 }
 
