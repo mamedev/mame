@@ -177,9 +177,9 @@ READ_LINE_MEMBER(spectrum_mface1_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
-void spectrum_mface1_device::opcode_fetch(offs_t offset)
+void spectrum_mface1_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch(offset);
+	m_exp->pre_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{

@@ -60,8 +60,23 @@
 	separate as the enable / disable mechanisms are different and
 	remaining mappings of devices unconfirmed
 
-	These devices are not currently working as the disable logic is
-	not understood.
+	---
+
+	Based on older BDI schematics, it seems the logic is like:
+
+	memory access 0x3CXX (any type of access: code or data, read or write) -> temporary use BDI ROM (NOT permanent latch/switch like in beta128)
+	memory access <0x4000 area and BDI ROM_latch==true -> use BDI ROM
+   
+	IO write to port 0bxxxxxx00 -> D7 master_latch, 0=enable, 1=disable
+
+	while master_latch is enabled access to regular Spectrum IO is blocked (output /IORQ forced to 1) but enabled BDI ports:
+
+	IO write to port 0b1xxxx111 -> D7 BDI ROM_latch (0=enable, 1=disble), D6 - FDC DDEN, D4 - SIDE, D3 - FDC HLT, D2 - FDC /MR (reset), D0-1 - floppy drive select.
+	IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
+	IO read/write ports 0b0YYxx111 - access FDC ports YY
+
+	So mostly the same as beta128, except for new BDI ROM_latch bit
+
 
 *********************************************************************/
 
@@ -266,6 +281,8 @@ void spectrum_betav2_device::device_reset()
 {
 	// always paged in on boot? (no mode switch like beta128)
 	m_romcs = 1;
+	m_romlatch = 0;
+//	m_masterportdisable = 1;
 }
 
 //**************************************************************************
@@ -277,30 +294,42 @@ READ_LINE_MEMBER(spectrum_betav2_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
-
-void spectrum_betav2_device::opcode_fetch(offs_t offset)
+void spectrum_betav2_device::fetch(offs_t offset)
 {
-	m_exp->opcode_fetch(offset);
-
 	if (!machine().side_effects_disabled())
 	{
 		if ((offset & 0xff00) == 0x3c00)
 			m_romcs = 1;
+		else
+			m_romcs = 0;
 	
-		// how does the ROM get disabled on these older beta units
-		// there are no RETs that end up in RAM as with the 128
-		// so it looks like jumps to the 0xxx and 1xxx regions, but
-		// that doesn't work?
+		if (!m_romlatch)
+		{
+			if (offset < 0x4000)
+				m_romcs = 1;
+		}
 	}
+}
+
+void spectrum_betav2_device::pre_opcode_fetch(offs_t offset)
+{
+	m_exp->pre_opcode_fetch(offset);
+	fetch(offset);
+}
+
+void spectrum_betav2_device::pre_data_fetch(offs_t offset)
+{
+	m_exp->pre_data_fetch(offset);
+	fetch(offset);
 }
 
 uint8_t spectrum_betav2_device::iorq_r(offs_t offset)
 {
 	uint8_t data = m_exp->iorq_r(offset);
 
-#if 0 // this is the Beta 128 logic, it may or may not be the same here
+//	if (!m_masterportdisable)
 	if (m_romcs)
-	{
+	{ 
 		switch (offset & 0xff)
 		{
 		case 0x1f: case 0x3f: case 0x5f: case 0x7f:
@@ -314,14 +343,18 @@ uint8_t spectrum_betav2_device::iorq_r(offs_t offset)
 			break;
 		}
 	}
-#endif
 
 	return data;
 }
 
 void spectrum_betav2_device::iorq_w(offs_t offset, uint8_t data)
 {
-#if 0 // this is the Beta 128 logic, it may or may not be the same here
+//	if ((offset & 0x03) == 0x00)
+//	{
+//		m_masterportdisable = data & 0x80;
+//	}
+
+//	if (!m_masterportdisable)
 	if (m_romcs)
 	{
 		switch (offset & 0xff)
@@ -331,6 +364,8 @@ void spectrum_betav2_device::iorq_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0xff:
+			m_romlatch = data & 0x80;
+
 			floppy_image_device* floppy = m_floppy[data & 3]->get_device();
 
 			m_fdc->set_floppy(floppy);
@@ -356,7 +391,7 @@ void spectrum_betav2_device::iorq_w(offs_t offset, uint8_t data)
 			break;
 		}
 	}
-#endif 
+
 	m_exp->iorq_w(offset, data);
 }
 
@@ -400,6 +435,7 @@ INPUT_CHANGED_MEMBER(spectrum_betaplus_device::magic_button)
 	{
 		m_slot->nmi_w(ASSERT_LINE);
 		m_romcs = 1;
+		m_romlatch = 0;
 	}
 	else
 	{

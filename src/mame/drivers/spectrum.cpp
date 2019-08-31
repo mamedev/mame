@@ -291,16 +291,29 @@ SamRam
 /****************************************************************************************************/
 /* Spectrum 48k functions */
 
-READ8_MEMBER(spectrum_state::opcode_fetch_r)
+READ8_MEMBER(spectrum_state::pre_opcode_fetch_r)
 {
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
-	m_exp->opcode_fetch(offset);
-	uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
-	m_exp->opcode_fetch_post(offset);
+	m_exp->pre_opcode_fetch(offset);
+	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
+	m_exp->post_opcode_fetch(offset);
 	return retval;
+}
+
+READ8_MEMBER(spectrum_state::spectrum_data_r)
+{
+	m_exp->pre_data_fetch(offset);
+	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
+	m_exp->post_data_fetch(offset);
+	return retval;
+}
+
+WRITE8_MEMBER(spectrum_state::spectrum_data_w)
+{
+	m_specmem->space(AS_PROGRAM).write_byte(offset,data);
 }
 
 WRITE8_MEMBER(spectrum_state::spectrum_rom_w)
@@ -442,17 +455,23 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 
 /* Memory Maps */
 
-void spectrum_state::spectrum_mem(address_map &map)
+void spectrum_state::spectrum_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
 	map(0x4000, 0x5aff).ram().share("video_ram");
+	// installed later depending on ramsize
 	//map(0x5b00, 0x7fff).ram();
 	//map(0x8000, 0xffff).ram();
 }
 
-void spectrum_state::spectrum_fetch(address_map &map)
+void spectrum_state::spectrum_opcodes(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(spectrum_state::opcode_fetch_r));
+	map(0x0000, 0xffff).rw(FUNC(spectrum_state::spectrum_data_r), FUNC(spectrum_state::spectrum_data_w));
+}
+
+void spectrum_state::spectrum_data(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(spectrum_state::pre_opcode_fetch_r));
 }
 
 /* ports are not decoded full.
@@ -625,14 +644,12 @@ INPUT_PORTS_END
 
 void spectrum_state::init_spectrum()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	switch (m_ram->size())
 	{
 		case 48*1024:
-			space.install_ram(0x8000, 0xffff, nullptr); // Fall through
+			m_specmem->space(AS_PROGRAM).install_ram(0x8000, 0xffff, nullptr); // Fall through
 		case 16*1024:
-			space.install_ram(0x5b00, 0x7fff, nullptr);
+			m_specmem->space(AS_PROGRAM).install_ram(0x5b00, 0x7fff, nullptr);
 	}
 }
 
@@ -686,10 +703,12 @@ void spectrum_state::spectrum_common(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, X1 / 4);        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
-	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_opcodes);
+	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_data);
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_io);
-	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+
+	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 
 	config.m_minimum_quantum = attotime::from_hz(60);
 
