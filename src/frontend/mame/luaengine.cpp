@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic,Luca Bruno
 /***************************************************************************
 
-    luaengine.c
+    luaengine.cpp
 
     Controls execution of the core MAME system.
 
@@ -1247,6 +1247,8 @@ void lua_engine::initialize()
  *
  * machine.paused - get paused state
  * machine.samplerate - get audio sample rate
+ * machine.exit_pending
+ * machine.hard_reset_pending
  *
  * machine.devices[] - get device table (k=tag, v=device_t)
  * machine.screens[] - get screens table (k=tag, v=screen_device)
@@ -1277,6 +1279,8 @@ void lua_engine::initialize()
 				},
 			"paused", sol::property(&running_machine::paused),
 			"samplerate", sol::property(&running_machine::sample_rate),
+			"exit_pending", sol::property(&running_machine::exit_pending),
+			"hard_reset_pending", sol::property(&running_machine::hard_reset_pending),
 			"devices", sol::property([this](running_machine &m) {
 					std::function<void(device_t &, sol::table)> tree;
 					sol::table table = sol().create_table();
