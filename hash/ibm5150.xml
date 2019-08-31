@@ -3024,8 +3024,8 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<year>1985</year>
 		<publisher>Simon &amp; Schuster</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="the great international paper airplane construction kit.img" size="368640" crc="a55cdfa9" sha1="bef12645b6851977805226ca1b44586b0a4a6cb8"/>
+			<dataarea name="flop" size="2862183">
+				<rom name="the great international paper airplane construction kit.mfm" size="2862183" crc="f47c4753" sha1="32e0fa0c51a65b432712d9910dbf48e61d613312" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3153,7 +3153,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="mitt forsta ordbehandlingsprogram (swe).img" size="368640" crc="e237d825" sha1="57fbdbfa0d91ee5ca8f2b5428a2e2257e523ebfe"/>
+				<rom name="n2-046-020059.img" size="368640" crc="e237d825" sha1="57fbdbfa0d91ee5ca8f2b5428a2e2257e523ebfe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8368,6 +8368,24 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="diskb.img" size="737280" crc="2b0662a2" sha1="5843c7bb6e4d6ad998042cfe53a6c6f07d3fd3e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fta1">
+		<description>The Faery Tale Adventure: Book I</description>
+		<year>1989</year>
+		<publisher>MicroIllusions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A &amp; B" />
+			<dataarea name="flop" size="737280">
+				<rom name="the faery tale adventure book i (disk a and b).img" size="737280" crc="86cfd792" sha1="b368702f2e958eabd7b87dc605158e7c55995239" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="737280">
+				<rom name="the faery tale adventure book i (disk c).img" size="737280" crc="3e78d895" sha1="de9519bef38d558bf108e188cc848f268081adb7" />
 			</dataarea>
 		</part>
 	</software>

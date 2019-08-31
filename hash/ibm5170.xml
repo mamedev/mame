@@ -6369,9 +6369,9 @@
 		</part>
 	</software>
 
-	<software name="5250emu">
+	<software name="5250emu" supported="yes">
 		<description>Enhanced 5250 Emulation Program</description>
-		<year>1986?</year>
+		<year>1986</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="2.12" />
 		<part name="flop1" interface="floppy_3_5">
@@ -6650,7 +6650,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 of 3 - Install Disk" />
 			<dataarea name="flop" size="1474560">
-				<rom name="hijaak pro 2.0 (disk 1).img" size="1474560" crc="2777a9bc" sha1="e518434bc7a4dcd4e377bb54729ab8a06a7f4753"/>
+				<rom name="hijaak pro 2.0 (disk 1).img" size="1474560" crc="56de8bb6" sha1="f3cdf765ed17f2560e60ce0369a8a21ce41ee2d7"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -6721,7 +6721,7 @@
 			<feature name="part_id" value="Disk 1 of 3" />
 			<feature name="disk_serial" value="IB10-DSK-1of3" />
 			<dataarea name="flop" size="1474560">
-				<rom name="ib10-dsk-1of3.img" size="1474560" crc="0b248ec8" sha1="5c6cf65435facb324f08809ffc340df4687f24a6"/>
+				<rom name="ib10-dsk-1of3.img" size="1474560" crc="9f307ff0" sha1="17cd05ebee49ec2e8ef467a97449290106f1f0bd"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -6745,8 +6745,8 @@
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="jack nicklaus screen savers.img" size="1474560" crc="680c9114" sha1="430e9d3827430aa4e795300005556a43fa652548"/>
+			<dataarea name="flop" size="4228062">
+				<rom name="jack nicklaus screen savers.mfm" size="4228062" crc="6fa0f8f9" sha1="5d1dd82b3e7993bc449b3583064b0aa3da391ef5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8064,8 +8064,8 @@
 		<publisher>WordFinder Software AB</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Registreringsdiskett" />
-			<dataarea name="flop" size="737280">
-				<rom name="registreringsdiskett.img" size="737280" crc="26700ec2" sha1="51d0deb495af37a09bc2a6facd73c372e776b670"/>
+			<dataarea name="flop" size="2235328">
+				<rom name="registreringsdiskett.mfm" size="2235328" crc="7744282c" sha1="26b6074aad47dce199872b13ba6cb8f908d67111"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -8076,20 +8076,20 @@
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Sv-En Verkst.tekn. lexikon - Lexikondiskett 2" />
-			<dataarea name="flop" size="737280">
-				<rom name="sv-en verkst tekn lexikon - lexikondiskett 2.img" size="737280" crc="8ba40420" sha1="39c5c520f7337f6dc2ecfda8cf637cb95f3c84b3"/>
+			<dataarea name="flop" size="2241641">
+				<rom name="sv-en verkst tekn lexikon - lexikondiskett 2.mfm" size="2241641" crc="c1ce7436" sha1="103bf7a190b3738f1b0debe2429aacea2188ce17"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Svenskt lexikon (SAOL) - Lexikondiskett 3" />
-			<dataarea name="flop" size="1474560">
-				<rom name="svenskt lexikon (saol) - lexikondiskett 3.img" size="1474560" crc="dee45b52" sha1="0a60c29e231514448751fd023fef1e2ae81f6483"/>
+			<dataarea name="flop" size="4224979">
+				<rom name="svenskt lexikon (saol) - lexikondiskett 3.mfm" size="4224979" crc="3e296c43" sha1="3e0c1dfdb1bb1e5be1fb85124078bc95880e56b2"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Svenskt lexikon (SAOL) - Lexikondiskett 4" />
-			<dataarea name="flop" size="1474560">
-				<rom name="svenskt lexikon (saol) - lexikondiskett 4.img" size="1474560" crc="56ef5cd6" sha1="a2084e8b00dde0a34a80690ccca709eafdaa4bd2"/>
+			<dataarea name="flop" size="4237395">
+				<rom name="svenskt lexikon (saol) - lexikondiskett 4.mfm" size="4237395" crc="5eee09ca" sha1="110375b861de44e90648b3800edead4d7bb470de"/>
 			</dataarea>
 		</part>
 	</software>
