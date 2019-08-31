@@ -1184,6 +1184,9 @@ wrldtour                        //
 wrldtour2                       //
 wrldtour3                       //
 
+@source:am1000.cpp
+am1000                          // (c) 1988 Alpha Micro
+
 @source:amaticmg.cpp
 am_mg24                         // (c) 2000 Amatic
 am_mg24a                        // (c) 2000 Amatic

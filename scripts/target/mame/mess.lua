@@ -3885,6 +3885,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/alcat7100.cpp",
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",
 	MAME_DIR .. "src/mame/drivers/alphasma.cpp",
+	MAME_DIR .. "src/mame/drivers/am1000.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex210.cpp",
 	MAME_DIR .. "src/mame/drivers/ampro.cpp",
