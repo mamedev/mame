@@ -38,8 +38,8 @@ Addons (w/ yellow Smartridges)
 |        | 80-03600(US)      | V.Smile PC Pal Island                                                      |
 +========+===================+============================================================================+
 |   XX   | 80-036800(US)     | V.Smile PC Pal Island (cart serial)                                        |
-|        | 80-036822(SP)     | V.Smile PC Pal Island (cart serial)                                        |
-|   XX   | 80-036804(GE)     | V.Smile Mein erster Mausklick (52-036804 on back label, blue sticker "P ○○○○")
+|  SOON  | 80-036822(SP)     | V.Smile PC (52-036822(SP) on back label)                                   |
+|   XX   | 80-036804(GE)     | V.Smile Mein erster Mausklick (52-036804(GE) on back label)                |
 +========+===================+============================================================================+
 |   XX   | 80-067000(US)     | V.Smile Art Studio                                                         |
 |        | 80-067003(UK)     | V.Smile Art Studio                                                         |
@@ -48,7 +48,7 @@ Addons (w/ yellow Smartridges)
 |        |          (DK)     | V.Smile Tegnestudie                                                        |
 |   XX   | 80-067021(SE)     | V.Smile Tecknarstudio                                                      |
 |        | 80-067022(SP)     | V.Smile Estudio de Arte (orange)                                           |
-|  SOON  | 80-067022(SP)     | V.Smile Estudio de Arte (yellow, green sticker "738 ○○○○")                 |
+|  SOON  | 80-067022(SP)     | V.Smile Estudio de Arte (yellow)                                           |
 |        | 80-067033(NO)     | V.Smile Tegnestudio                                                        |
 |        | 80-067057(SP)     | V.Smile Estudio de Arte (pink)                                             |
 |        |          (CN)     | 智乐学习通小画室                                                            |
@@ -95,7 +95,7 @@ Regular game cartridges
 |        | 80-090142(NL)     | Mijn Puppy!                                                                                    |
 |   XX   | 80-090144(GE)     | Mein erster Hund                                                                               |
 |        | 80-090145(FR)     | Mon Toutou Tout Fou!                                                                           |
-|        | 80-090147(SP)     | Dakota y su mascota (EAN 3417766901475)                                                        |
+|  SOON  | 80-090147(SP)     | Dakota y su mascota (EAN 3417766901475, 52-090147(SP) on back label)                           |
 |        |          (DK)     | Min hundehvalp                                                                                 |
 |   XX   | 80-090154(SE)     | Min hundvalp                                                                                   |
 |        |          (NO)     | Min valp                                                                                       |
@@ -105,7 +105,7 @@ Regular game cartridges
 |        | 80-090163(UK)     | Monsters vs. Aliens                                                                            |
 |   XX   | 80-090164(GE)     | Monsters vs. Aliens                                                                            |
 |        | 80-090165(FR)     | Monsters Contre Aliens                                                                         |
-|   XX   | 80-090167(SP)     | Monstruos contra Alienígenas  (52-090167(SP) on back label, green sticker: "P ○○○○")           |
+|   XX   | 80-090167(SP)     | Monstruos contra Alienígenas  (52-090167(SP) on back label)                                    |
 +========+===================+================================================================================================+
 |        | 80-090180(US)     | <Unknown>                                                                                      |
 |        | 80-090183(UK)     | Wonder Pets! - Save the Animals                                                                |
@@ -139,7 +139,7 @@ Regular game cartridges
 |   XX   | 80-092004(GE)     | Abenteuer im ABC Park (Rev. 3, translucent blue cart)                                          |
 |   XX   | 80-092005(FR)     | ABC Land Aventure                                                                              |
 |        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                                                |
-|   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB, green sticker: "449 ○○○○")
+|   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB)                          |
 |        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent blue cart, no # on label)                         |
 |        |          (KOR)    | Alphabet Park Adventure - 알파벳 공원 대탐험                                                     |
 |        |          (CN)     | 英语乐园                                                                                        |
@@ -166,8 +166,8 @@ Regular game cartridges
 |   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie                                                  |
 |   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (ALT)                                            |
 |        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)                                              |
-|   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB, green sticker: "449 ○○○○") |
-|   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (092067-1 on PCB, green sticker: "732 ○○○○")  |
+|   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB)                            |
+|   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (092067-1 on PCB)                             |
 |   XX   | 80-092073(DK)     | Peter Plys - Honningjagten                                                                     |
 |   XX   | 80-092074(SE)     | Nalle Puh - Honungsjakten                                                                      |
 |        |          (NO)     | Winnie the Pooh - Honningjakten                                                                |
@@ -183,7 +183,7 @@ Regular game cartridges
 |   XX   | 80-092084(GE)     | Micky - Mickys magisches Abenteuer                                                             |
 |        | 80-092085(FR)     | Mickey - Mickey a la recherche de Pluto                                                        |
 |        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)                         |
-|   XX   | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB, green sticker: "528 ○●○○") |
+|   XX   | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB)                            |
 |        |          (DK)     | Mickey                                                                                         |
 |   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                                            |
 |        |          (NO)     | Mickey                                                                                         |
@@ -213,7 +213,7 @@ Regular game cartridges
 |   XX   | 80-092124(GE)     | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer                                      |
 |   XX   | 80-092125(FR)     | La Petite Sirene - Ariel devient une princesse                                                 |
 |        | 80-092126(PT)     |                                                                                                |
-|   XX   | 80-092127(SP)     | La Sirenita - El Viaje Fantástico de Ariel (no # on label, green sticker: "451 ○●○○")          |
+|   XX   | 80-092127(SP)     | La Sirenita - El Viaje Fantástico de Ariel (no # on label)                                     |
 |   XX   | 80-092133(DK)     | Den Lille Havfrue - Ariels majestætiske rejse!                                                 |
 |   XX   | 80-092134(SE)     | Den Lilla Sjöjungfrun - Ariels majestätiska resa!                                              |
 |        |          (NO)     | Den Lille Havfruen - Ariels majestetiske reise!                                                |
@@ -232,7 +232,7 @@ Regular game cartridges
 |   XX   | 80-092145(FR)     | Spider-Man & ses amis - Missions Secrètes (white webs)                                         |
 |        | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (yellow webs)                                        |
 |        | 80-092146(PT)     | Spider-man & Amigos - Missoes Secretas                                                         |
-|   XX   | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs, 2005, green sticker: "518 ○○○○")          |
+|   XX   | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs, 2005)                                     |
 |        | 80-092147-122(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2007)                                    |
 |  SOON  | 80-092147-222(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2008)                                    |
 +========+===================+================================================================================================+
@@ -258,7 +258,7 @@ Regular game cartridges
 |        | 80-092183(UK)     | Care Bears - A Lesson in Caring                                                                |
 |        | 80-092184(GE)     | Gluecksbarchis  <- existance not proven                                                        |
 |        | 80-092185(FR)     | Les Bisounours - Le Monde Merveilleux des Bisounours                                           |
-|   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB, green sticker: "522 ○○○○")                  |
+|   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB)                                             |
 +========+===================+================================================================================================+
 |        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092201(IT)     | Aladdin - Il magico mondo di Aladdin                                                           |
@@ -266,7 +266,7 @@ Regular game cartridges
 |        | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                                             |
 |        | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                                                   |
-|   XX   | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label, green sticker: "534 ○○○○")
+|   XX   | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label)                         |
 |        | 80-092210(KOR)    | Aladdin - 알라딘의 신비한 모험 게임 (50-92210(KOR) on back label)                                 |
 +========+===================+================================================================================================+
 |   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody!                                                          |
@@ -276,7 +276,7 @@ Regular game cartridges
 |   XX   | 80-092224(GE)     | Toy Story 2 - Woodys Spannende Rettung                                                         |
 |        | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                                             |
 |        | 80-092226(PT)     | Toy Story 2 - O Resgate de Woody (92236 on cart)                                               |
-|   XX   | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label, green sticker: "528 ○○○○")      |
+|   XX   | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label)                                 |
 |        |          (DK)     | Toy Story 2 - Operation: Red Woody!                                                            |
 |   XX   | 80-092234(SE)     | Toy Story 2 - Operation: Rädda Woody!                                                          |
 |        |          (NO)     | Toy Story 2 - Operasjon: Redd Woody!                                                           |
@@ -292,14 +292,14 @@ Regular game cartridges
 |        | 80-092243-203(UK) | Cinderella - Cinderella's Magic Wishes (2008)                                                  |
 |   XX   | 80-092244(GE)     | Cinderella - Lernen im Märchenland (2005)                                                      |
 |   XX   | 80-092244-104(GE) | Cinderella - Lernen im Märchenland (2007)                                                      |
-|   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (2008) (52-092244-205(GER) on back label, white sticker: "827 ○○○○")
+|   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (2008) (52-092244-205(GER) on back label)                   |
 |   XX   | 80-092245(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
 |        | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
 |        | 80-092245-205(FR) | Cendrillon - Le reve enchante de Cendrillon                                                    |
 |        | 80-092246(PT)     | Cinderela - Os Sonhos Magicos da Cinderela (Cart#92256)                                        |
 |  SOON  | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
 |  SOON  | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (white/light pink cart label background)      |
-|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (no # on front label, 52-092247-222(SP) on back label, green sticker: "P ○○○○", non motion#, but V.Motion in spanish catalog)
+|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (no # on front label, 52-092247-222(SP) on back label, non motion#, but V.Motion in Spanish catalog)
 |   XX   | 80-092253(DK)     | Cinderella - Askepots magiske ønsker                                                           |
 |   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                      |
 |        | 80-092255(NO)     | Cinderella - Askepotts magiske ønsker                                                          |
@@ -322,7 +322,7 @@ Regular game cartridges
 |   XX   | 80-092285(FR)     | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                   |
 |        | 80-092285-1?5(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (NTSC French-Canadian)            |
 |        | 80-092286(PT)     | Dora - em busca das pecas perdidas (cart# 92296)                                               |
-|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label, green sticker: "P ○○○○")
+|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label)
 |        | 80-092287-122(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora                                         |
 +========+===================+================================================================================================+
 |   XX   | 80-092300(US)     | Bob the Builder - Bob's Busy Day                                                               |
@@ -366,7 +366,7 @@ Regular game cartridges
 |   XX   | 80-092363-103(UK) | Zayzoo: An Earth Adventure                                                                     |
 |   XX   | 80-092364(GE)     | Zayzoos Lernall                                                                                |
 |   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                                              |
-|   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label, green sticker: "531 ○○○○")          |
+|   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label)                                     |
 |        |          (CN)     | 我的外星人同学                                                                                   |
 +========+===================+================================================================================================+
 |        | 80-092380(US)     | Barney - The Land of Make Believe                                                              |
@@ -378,10 +378,10 @@ Regular game cartridges
 |   XX   | 80-092420(US)     | Finding Nemo - Nemo's Ocean Discoveries                                                        |
 |   XX   | 80-092422(NL)     | Finding Nemo - De wonderwereld van Nemo                                                        |
 |        | 80-092423(UK)     | Finding Nemo - Nemo's Ocean Discoveries                                                        |
-|   XX   | 50-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer (52-92424(GER) on back label, blue sticker: "P ○○○○", "VT8321" silscreened on the cart)
+|   XX   | 50-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer (52-92424(GER) on back label, "VT8321" silscreened on the cart)
 |        | 80-092425(FR)     | Le Monde de Nemo - Nemo à la découverte de l'océan                                             |
 |  SOON  | 80-092426(PT)     | A Procura de Nemo - À descoberta do Oceano  (Cart#92436, 52-092426(Port) on back label)        |
-|   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label, green sticker: "542 ○○○●")
+|   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label)                     |
 |        |          (CN)     | 海底总动员                                                                                      |
 +========+===================+================================================================================================+
 |   XX   | 80-092440(US)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
@@ -389,13 +389,13 @@ Regular game cartridges
 |        | 80-092443(UK)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
 |   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                                   |
 |        | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                            |
-|   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label, green sticker: "634 ○○○○")
+|   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label)                    |
 +========+===================+================================================================================================+
 |        | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                                         |
 |        | 80-092462(NL)     | Sesamstraat - Bert and Ernie's Fantasie Avontuur                                               |
 |   XX   | 80-092464(GE)     | Sesame Street - Ernie and Berts Fantastisches Abenteuer                                        |
 |        | 80-092465(FR)     | 5, Rue Sesame - Les Aventures Imaginaires d'Ernest et Bert                                     |
-|   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label, green sticker: "735 ○○○○")
+|   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label)
 +========+===================+================================================================================================+
 |        | 80-092480(US)     | The Batman - Gotham City Rescue                                                                |
 |        |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492??, GPZ06629)                             |
@@ -410,10 +410,10 @@ Regular game cartridges
 |        | 80-092502(NL)     | Truckie's Rekenrace                                                                            |
 |        | 80-092503(UK)     | Whiz Kid Wheels                                                                                |
 |        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (diff color)                                                      |
-|   XX   | 80-092504(GE)     | Flitzers Schlaue Staedtetour (purple, 52-092504(GER) on back label, blue sticker: "P ○○○○")    |
+|   XX   | 80-092504(GE)     | Flitzers Schlaue Staedtetour (purple, 52-092504(GER) on back label)                            |
 |        | 80-092505(FR)     | Mission Pilote                                                                                 |
 |        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                                               |
-|   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label, green sticker: "534 ○○○○")                   |
+|   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label)                                              |
 |        | 80-092510(KOR)    | Whiz Kid Wheels - 꼬마 자동차 트러클 (50-92510(KOR) on back label)                               |
 |        |          (CN)     | 数学快车                                                                                        |
 +========+===================+================================================================================================+
@@ -422,7 +422,7 @@ Regular game cartridges
 |        | 80-092523(UK)     | Spider-Man & Friends Doc Ock's Challenge                                                       |
 |   XX   | 80-092524(GE)     | Spider-Man & Freunde Wettkampf im Space Labor                                                  |
 |        | 80-092525(FR)     | Spider-Man & ses amis Le défi du docteur Ock                                                   |
-|   XX   | 80-092527(SP)     | Spider-Man y Amigos - La Aventura Del Doctor Octopus (52-92527(SP) on back label, green sticker: "624 ○○○○")
+|   XX   | 80-092527(SP)     | Spider-Man y Amigos - La Aventura Del Doctor Octopus (52-92527(SP) on back label)              |
 +========+===================+================================================================================================+
 |   XX   | 80-092540(US)     | Noddy - Detective for a Day                                                                    |
 |   XX   | 80-092543(UK)     | Noddy - Detective for a Day                                                                    |
@@ -493,7 +493,7 @@ Regular game cartridges
 |        | 80-092843(UK)     | Wall-E                                                                                         |
 |   XX   | 80-092844(GE)     | Wall-E                                                                                         |
 |        | 80-092845(FR)     | Wall-E                                                                                         |
-|   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label, green sticker: "P ○○○○")                                      |
+|   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label)                                                               |
 |        |          (DK)     | Wall-E                                                                                         |
 |   XX   | 80-092854(SE)     | Wall-E                                                                                         |
 |        |          (NO)     | Wall-E                                                                                         |
@@ -515,7 +515,7 @@ Regular game cartridges
 |   XX   | 80-092884(GE)     | Ratatouille - Remys neue Rezepte                                                               |
 |        | 80-092884-104(GE) | Ratatouille - Remys neue Rezepte (ALT)                                                         |
 |        | 80-092885(FR)     | Ratatouille - Les nouvelles recettes de Rémy                                                   |
-|   XX   | 80-092887(SP)     | Ratatouille - Las recetas del Remy (52-092887(SP) on back label, green sticker: "735 ○○○○")    |
+|   XX   | 80-092887(SP)     | Ratatouille - Las recetas del Remy (52-092887(SP) on back label)                               |
 +========+===================+================================================================================================+
 |   XX   | 80-092900(US)     | Go Diego Go! - Save the Animal Familes!                                                        |
 |        | 80-092902(NL)     | Go Diego Go! - Red de dierenfamilies!                                                          |
@@ -526,7 +526,7 @@ Regular game cartridges
 |        | 80-092922(UK)     | Cranium - Partyland Park                                                                       |
 |        | 80-092924(GE)     | Cranium - Freizeit Park                                                                        |
 |        | 80-092925(FR)     | Cranium - Le Parc D'attractions                                                                |
-|  SOON  | 80-092927(SP)     | Cranium - Parque de atracciones de Cranium (52-092927(SP) on back label, green sticker: "P ○○○○")
+|  SOON  | 80-092927(SP)     | Cranium - Parque de atracciones de Cranium (52-092927(SP) on back label)                       |
 +========+===================+================================================================================================+
 |        | 80-092940(US)     | <Unknown> (should be Mickey Mouse Clubhouse, 80-084180 exists in V.Link database)              |
 |        |          (IT)     | La Casa di Topolino                                                                            |
@@ -534,7 +534,7 @@ Regular game cartridges
 |        | 80-092943(UK)     | Mickey Mouse Clubhouse                                                                         |
 |   XX   | 80-092944(GE)     | Micky Maus Wunderhaus                                                                          |
 |        | 80-092945(FR)     | La Maison de Mickey                                                                            |
-|   XX   | 80-092947(SP)     | La Casa de Mickey Mouse (52-092947(SP) on back label, green sticker: "P ○○○○")                 |
+|   XX   | 80-092947(SP)     | La Casa de Mickey Mouse (52-092947(SP) on back label)                                          |
 |        |          (DK)     | Mickey Mouse Clubhouse                                                                         |
 |   XX   | 80-092954(SE)     | Mickey Mouse Clubhouse                                                                         |
 |        |          (NO)     | Mickey Mouse Clubhouse                                                                         |
@@ -545,7 +545,7 @@ Regular game cartridges
 |   XX   | 80-092963(UK)     | Kung Fu Panda - Path of the Panda                                                              |
 |   XX   | 80-092964(GE)     | Kung Fu Panda - Der Weg des Panda                                                              |
 |        | 80-092965(FR)     | Kung Fu Panda - La Mission de Po                                                               |
-|  SOON  | 80-092967(SP)     | Kung Fu Panda - Aventura en el Valle de la Paz (52-092967(SP) on back label, green sticker: "P ○○○○")
+|  SOON  | 80-092967(SP)     | Kung Fu Panda - Aventura en el Valle de la Paz (52-092967(SP) on back label)                   |
 +========+===================+================================================================================================+
 |   XX   | 80-092980(US)     | Disney's Little Einsteins: The Glass Slipper Ball                                              |
 |        | 80-092983(UK)     | Disney's Little Einsteins: The Glass Slipper Ball (purple cart on front of UK box, but V.Motion listed)
@@ -562,12 +562,12 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 +========+===================+================================================================================================+
 |        | 80-089000(US)     | Spider-Man &amp; Friends - Where is Hulk?                                                      |
 +========+===================+================================================================================================+
-|        | 80-089020(US)     | Toy Story 2                                                                                    |
+|  SOON  | 80-089020(US)     | Toy Story 2                                                                                    |
 +========+===================+================================================================================================+
-|        | 80-089040(US)     | Dora the Explorer - Dora's Got a Puppy                                                         |
+|  SOON  | 80-089040(US)     | Dora the Explorer - Dora's Got a Puppy                                                         |
 |        | 80-089045(FR)     | Dora's ??????                                                                                  |
 +========+===================+================================================================================================+
-|   XX   | 80-089060(US)     | Scooby-Doo! - A Night Of Fright Is No Delight (52-089060(US) on back label, white sticker: "P ○●○○")
+|   XX   | 80-089060(US)     | Scooby-Doo! - A Night Of Fright Is No Delight (52-089060(US) on back label)                    |
 +========+===================+================================================================================================+
 
 -->
