@@ -7,7 +7,9 @@
 //============================================================
 
 #include "emu.h"
+#include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/textbuf.h"
 #include "debug_module.h"
 #include "debugger.h"
 #include "modules/lib/osdobj_common.h"
@@ -42,6 +44,16 @@ struct gdb_register_map
 		const char *gdb_name;
 		bool stop_packet;
 		gdb_register_type gdb_type;
+		int override_bitsize;
+
+		gdb_register_description(const char *_state_name=nullptr, const char *_gdb_name=nullptr, bool _stop_packet=false, gdb_register_type _gdb_type=TYPE_INT, int _override_bitsize=-1)
+		: state_name(_state_name)
+		, gdb_name(_gdb_name)
+		, stop_packet(_stop_packet)
+		, gdb_type(_gdb_type)
+		, override_bitsize(_override_bitsize)
+		{
+		}
 	};
 	std::vector<gdb_register_description> registers;
 };
@@ -167,6 +179,77 @@ static const gdb_register_map gdb_register_map_ppc601 =
 };
 
 //-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_r4600 =
+{
+	"mips",
+	"org.gnu.gdb.mips.cpu",
+	{
+		{ "zero", "r0",   false, TYPE_INT, 32 },
+		{ "at",   "r1",   false, TYPE_INT, 32 },
+		{ "v0",   "r2",   false, TYPE_INT, 32 },
+		{ "v1",   "r3",   false, TYPE_INT, 32 },
+		{ "a0",   "r4",   false, TYPE_INT, 32 },
+		{ "a1",   "r5",   false, TYPE_INT, 32 },
+		{ "a2",   "r6",   false, TYPE_INT, 32 },
+		{ "a3",   "r7",   false, TYPE_INT, 32 },
+		{ "t0",   "r8",   false, TYPE_INT, 32 },
+		{ "t1",   "r9",   false, TYPE_INT, 32 },
+		{ "t2",   "r10",  false, TYPE_INT, 32 },
+		{ "t3",   "r11",  false, TYPE_INT, 32 },
+		{ "t4",   "r12",  false, TYPE_INT, 32 },
+		{ "t5",   "r13",  false, TYPE_INT, 32 },
+		{ "t6",   "r14",  false, TYPE_INT, 32 },
+		{ "t7",   "r15",  false, TYPE_INT, 32 },
+		{ "s0",   "r16",  false, TYPE_INT, 32 },
+		{ "s1",   "r17",  false, TYPE_INT, 32 },
+		{ "s2",   "r18",  false, TYPE_INT, 32 },
+		{ "s3",   "r19",  false, TYPE_INT, 32 },
+		{ "s4",   "r20",  false, TYPE_INT, 32 },
+		{ "s5",   "r21",  false, TYPE_INT, 32 },
+		{ "s6",   "r22",  false, TYPE_INT, 32 },
+		{ "s7",   "r23",  false, TYPE_INT, 32 },
+		{ "t8",   "r24",  false, TYPE_INT, 32 },
+		{ "t9",   "r25",  false, TYPE_INT, 32 },
+		{ "k0",   "r26",  false, TYPE_INT, 32 },
+		{ "k1",   "r27",  false, TYPE_INT, 32 },
+		{ "gp",   "r28",  false, TYPE_INT, 32 },
+		{ "sp",   "r29",  false, TYPE_INT, 32 },
+		{ "fp",   "r30",  false, TYPE_INT, 32 },
+		{ "ra",   "r31",  false, TYPE_INT, 32 },
+		{ "LO",   "lo",   false, TYPE_INT, 32 },
+		{ "HI",   "hi",   false, TYPE_INT, 32 },
+		{ "PC",   "pc",   true,  TYPE_CODE_POINTER, 32 },
+	}
+};
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_m68020pmmu =
+{
+	"m68k",
+	"org.gnu.gdb.m68k.core",
+	{
+		{ "D0", "d0", false, TYPE_INT },
+		{ "D1", "d1", false, TYPE_INT },
+		{ "D2", "d2", false, TYPE_INT },
+		{ "D3", "d3", false, TYPE_INT },
+		{ "D4", "d4", false, TYPE_INT },
+		{ "D5", "d5", false, TYPE_INT },
+		{ "D6", "d6", false, TYPE_INT },
+		{ "D7", "d7", false, TYPE_INT },
+		{ "A0", "a0", false, TYPE_INT },
+		{ "A1", "a1", false, TYPE_INT },
+		{ "A2", "a2", false, TYPE_INT },
+		{ "A3", "a3", false, TYPE_INT },
+		{ "A4", "a4", false, TYPE_INT },
+		{ "A5", "a5", false, TYPE_INT },
+		{ "A6", "fp", true,  TYPE_INT },
+		{ "A7", "sp", true,  TYPE_INT },
+		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
+		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+	}
+};
+
+//-------------------------------------------------------------------------
 static const gdb_register_map gdb_register_map_z80 =
 {
 	"z80",
@@ -204,11 +287,13 @@ static const gdb_register_map gdb_register_map_m6502 =
 
 //-------------------------------------------------------------------------
 static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
-	{ "i486",    gdb_register_map_i486 },
-	{ "arm7_le", gdb_register_map_arm7 },
-	{ "ppc601",  gdb_register_map_ppc601 },
-	{ "z80",     gdb_register_map_z80 },
-	{ "m6502",   gdb_register_map_m6502 },
+	{ "i486",       gdb_register_map_i486 },
+	{ "arm7_le",    gdb_register_map_arm7 },
+	{ "r4600",      gdb_register_map_r4600 },
+	{ "ppc601",     gdb_register_map_ppc601 },
+	{ "m68020pmmu", gdb_register_map_m68020pmmu },
+	{ "z80",        gdb_register_map_z80 },
+	{ "m6502",      gdb_register_map_m6502 },
 };
 
 //-------------------------------------------------------------------------
@@ -223,6 +308,7 @@ public:
 		m_memory(nullptr),
 		m_address_space(nullptr),
 		m_debugger_cpu(nullptr),
+		m_debugger_console(nullptr),
 		m_debugger_port(0),
 		m_socket(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE),
 		m_is_be(false),
@@ -315,6 +401,7 @@ private:
 	device_memory_interface *m_memory;
 	address_space *m_address_space;
 	debugger_cpu *m_debugger_cpu;
+	debugger_console *m_debugger_console;
 	int m_debugger_port;
 	emu_file m_socket;
 	bool m_is_be;
@@ -322,7 +409,7 @@ private:
 	bool m_dettached;
 	bool m_extended_mode;
 	bool m_send_stop_packet;
-	bool m_target_xml_sent;
+	bool m_target_xml_sent;     // the 'g', 'G', 'p', and 'P' commands only work once target.xml has been sent
 
 	struct gdb_register
 	{
@@ -369,14 +456,7 @@ void debug_gdbstub::exit(void)
 //-------------------------------------------------------------------------
 void debug_gdbstub::init_debugger(running_machine &machine)
 {
-	std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
-	osd_file::error filerr = m_socket.open(socket_name.c_str());
-	if ( filerr != osd_file::error::NONE )
-		return;
-
 	m_machine = &machine;
-
-	osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
 }
 
 //-------------------------------------------------------------------------
@@ -419,6 +499,8 @@ static std::string escape_packet(const std::string src)
 //-------------------------------------------------------------------------
 void debug_gdbstub::generate_target_xml(void)
 {
+	// Note: we do not attempt to replicate the regnum values from old
+	//       GDB clients that did not support target.xml.
 	std::string target_xml;
 	target_xml += "<?xml version=\"1.0\"?>\n";
 	target_xml += "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">\n";
@@ -426,8 +508,7 @@ void debug_gdbstub::generate_target_xml(void)
 	target_xml += string_format("<architecture>%s</architecture>\n", m_gdb_arch.c_str());
 	target_xml += string_format("  <feature name=\"%s\">\n", m_gdb_feature.c_str());
 	for ( const auto &reg: m_gdb_registers )
-		if ( !reg.gdb_name.empty() )
-			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name.c_str(), reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
+		target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name.c_str(), reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
 	target_xml += "  </feature>\n";
 	target_xml += "</target>\n";
 	m_target_xml = escape_packet(target_xml);
@@ -451,6 +532,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		m_memory = &m_maincpu->memory();
 		m_address_space = &m_memory->space(AS_PROGRAM);
 		m_debugger_cpu = &m_machine->debugger().cpu();
+		m_debugger_console = &m_machine->debugger().console();
 
 		m_is_be = m_address_space->endianness() == ENDIANNESS_BIG;
 
@@ -482,7 +564,10 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 					new_reg.gdb_name = reg.gdb_name;
 					new_reg.gdb_regnum = cur_gdb_regnum;
 					new_reg.gdb_type = reg.gdb_type;
-					new_reg.gdb_bitsize = entry->datasize() * 8;
+					if ( reg.override_bitsize != -1 )
+						new_reg.gdb_bitsize = reg.override_bitsize;
+					else
+						new_reg.gdb_bitsize = entry->datasize() * 8;
 					new_reg.state_index = entry->index();
 					m_gdb_registers.push_back(std::move(new_reg));
 					if ( reg.stop_packet )
@@ -498,9 +583,14 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 
 #if 0
 		for ( const auto &reg: m_gdb_registers )
-			if ( !reg.gdb_name.empty() )
-				osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name.c_str());
+			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name.c_str());
 #endif
+
+		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
+		osd_file::error filerr = m_socket.open(socket_name.c_str());
+		if ( filerr != osd_file::error::NONE )
+			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
+		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
 
 		m_initialized = true;
 	}
@@ -622,8 +712,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_g(const char *buf)
 		return REPLY_UNSUPPORTED;
 	std::string reply;
 	for ( const auto &reg: m_gdb_registers )
-		if ( !reg.gdb_name.empty() )
-			reply += get_register_string(reg.gdb_regnum);
+		reply += get_register_string(reg.gdb_regnum);
 	send_reply(reply.c_str());
 	return REPLY_NONE;
 }
@@ -698,6 +787,22 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 }
 
 //-------------------------------------------------------------------------
+static bool hex_decode(std::vector<uint8_t> *_data, const char *buf, size_t length)
+{
+	std::vector<uint8_t> &data = *_data;
+	data.resize(length);
+	for ( int i = 0; i < length; i++ )
+	{
+		if ( sscanf(buf, "%02hhx", &data[i]) != 1 )
+			return false;
+		buf += 2;
+	}
+	if ( *buf != '\0' )
+		return false;
+	return true;
+}
+
+//-------------------------------------------------------------------------
 // Write memory.
 debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 {
@@ -712,15 +817,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 		return REPLY_ENN;
 
 	std::vector<uint8_t> data;
-	data.reserve(length);
-	buf += buf_offset;
-	for ( int i = 0; i < length; i++ )
-	{
-		if ( sscanf(buf, "%02hhx", &data[i]) != 1 )
-			return REPLY_ENN;
-		buf += 2;
-	}
-	if ( *buf != '\0' )
+	if ( !hex_decode(&data, buf + buf_offset, length) )
 		return REPLY_ENN;
 
 	for ( int i = 0; i < length; i++ )
@@ -781,6 +878,33 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 	{
 		// Obtain thread information from RTOS.
 		return REPLY_UNSUPPORTED;
+	}
+
+	// Check packets that use qname,params convention.
+	if ( strncmp(buf, "Rcmd,", 5) == 0 )
+	{
+		buf += 5;
+		std::vector<uint8_t> data;
+		if ( !hex_decode(&data, buf, strlen(buf) / 2) )
+			return REPLY_ENN;
+		std::string command(data.begin(), data.end());
+		text_buffer *textbuf = m_debugger_console->get_console_textbuf();
+		text_buffer_clear(textbuf);
+		m_debugger_console->execute_command(command, false);
+		uint32_t nlines = text_buffer_num_lines(textbuf);
+		if ( nlines == 0 )
+			return REPLY_OK;
+		std::string reply;
+		for ( uint32_t i = 0; i < nlines; i++ )
+		{
+			const char *line = text_buffer_get_seqnum_line(textbuf, i);
+			reply.reserve(reply.length() + (strlen(line)+1)*2);
+			while ( *line != '\0' )
+				reply += string_format("%02x", *line++);
+			reply += "0A";
+		}
+		send_reply(reply.c_str());
+		return REPLY_NONE;
 	}
 
 	// Split name and parameters
@@ -1060,6 +1184,8 @@ std::string debug_gdbstub::get_register_string(int gdb_regnum)
 					: (reg.gdb_bitsize == 16) ? "%04"  PRIx64
 					:                           "%02"  PRIx64;
 	uint64_t value = m_state->state_int(reg.state_index);
+	if ( reg.gdb_bitsize < 64 )
+		value &= (1ULL << reg.gdb_bitsize) - 1;
 	if ( !m_is_be )
 	{
 		value = (reg.gdb_bitsize == 64) ? BYTESWAP_64(value)
