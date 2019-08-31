@@ -60,8 +60,23 @@
 	separate as the enable / disable mechanisms are different and
 	remaining mappings of devices unconfirmed
 
-	These devices are not currently working as the disable logic is
-	not understood.
+	---
+
+	Based on older BDI schematics, it seems the logic is like:
+
+	memory access 0x3CXX (any type of access: code or data, read or write) -> temporary use BDI ROM (NOT permanent latch/switch like in beta128)
+	memory access <0x4000 area and BDI ROM_latch==true -> use BDI ROM
+   
+	IO write to port 0bxxxxxx00 -> D7 master_latch, 0=enable, 1=disable
+
+	while master_latch is enabled access to regular Spectrum IO is blocked (output /IORQ forced to 1) but enabled BDI ports:
+
+	IO write to port 0b1xxxx111 -> D7 BDI ROM_latch (0=enable, 1=disble), D6 - FDC DDEN, D4 - SIDE, D3 - FDC HLT, D2 - FDC /MR (reset), D0-1 - floppy drive select.
+	IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
+	IO read/write ports 0b0YYxx111 - access FDC ports YY
+
+	So mostly the same as beta128, except for new BDI ROM_latch bit
+
 
 *********************************************************************/
 
