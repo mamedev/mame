@@ -2376,12 +2376,12 @@ ROM_START( baddudes ) /* DE-0297-1 main board, DE-0299-1 sub/rom board */
 	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) ) /* Also known to be labeled as A-2 */
 ROM_END
 
-ROM_START( drgninja )
+ROM_START( drgninja ) /* DE-0297-0 main board, DE-0299-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code, middle 0x20000 unused */
-	ROM_LOAD16_BYTE( "eg04.3c",  0x00000, 0x10000, CRC(41b8b3f8) SHA1(0ab143b9f7a5f857cfd2053c24fa5213ce7641e4) )
-	ROM_LOAD16_BYTE( "eg01.3a",  0x00001, 0x10000, CRC(e08e6885) SHA1(641eaf4ef6c8bfbc39611f5f81765f7915ae9d9f) )
-	ROM_LOAD16_BYTE( "eg06.6c",  0x40000, 0x10000, CRC(2b81faf7) SHA1(6d10c29f5ee06856843d83e77ba24c2b6e00a9cb) )
-	ROM_LOAD16_BYTE( "eg03.6a",  0x40001, 0x10000, CRC(c52c2e9d) SHA1(399f2b7df9d558c8f33bf1a7c8048c62e0f54cec) )
+	ROM_LOAD16_BYTE( "eg04-1.3c", 0x00000, 0x10000, CRC(41b8b3f8) SHA1(0ab143b9f7a5f857cfd2053c24fa5213ce7641e4) )
+	ROM_LOAD16_BYTE( "eg01-1.3a", 0x00001, 0x10000, CRC(e08e6885) SHA1(641eaf4ef6c8bfbc39611f5f81765f7915ae9d9f) )
+	ROM_LOAD16_BYTE( "eg06.6c",   0x40000, 0x10000, CRC(2b81faf7) SHA1(6d10c29f5ee06856843d83e77ba24c2b6e00a9cb) )
+	ROM_LOAD16_BYTE( "eg03.6a",   0x40001, 0x10000, CRC(c52c2e9d) SHA1(399f2b7df9d558c8f33bf1a7c8048c62e0f54cec) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "eg07.8a",   0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
@@ -2392,11 +2392,7 @@ ROM_START( drgninja )
 	/* various graphic and sound roms also differ when compared to baddudes */
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
-	//ROM_LOAD( "drgninja.25",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) )
-	// the rom below was found on a genuine 'dragonninja' pcb, compared to the other ROM it has the 'bad dudes' (unused) logo
-	// partially erased, and a bad pixel on the left arrow character.  Is the other rom a cleaned up hack, or from a bootleg,
-	// or did Data East actually clean it up on a later PCB?
-	ROM_LOAD( "eg25.15h",  0x00000, 0x08000, CRC(dd557b19) SHA1(ce1e76aeb7e147f373bb48dbc1becc1601953499) ) // different to baddudes
+	ROM_LOAD( "eg25.15h",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) ) // different to baddudes
 	ROM_LOAD( "eg26.16h",  0x08000, 0x08000, CRC(5d75fc8f) SHA1(92947dd78bfe8067fb5f645fa1ef212e48b69c70) ) // different to baddudes
 
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* tiles */
@@ -2445,11 +2441,11 @@ ROM_START( drgninjab )
 	/* various graphic and sound roms also differ when compared to baddudes */
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
-	//ROM_LOAD( "drgninja.25",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) )
-	// the rom below was found on a genuine 'dragonninja' pcb, compared to the other ROM it has the 'bad dudes' (unused) logo
-	// partially erased, and a bad pixel on the left arrow character.  Is the other rom a cleaned up hack, or from a bootleg,
-	// or did Data East actually clean it up on a later PCB?
-	ROM_LOAD( "eg25.15h",  0x00000, 0x08000, CRC(dd557b19) SHA1(ce1e76aeb7e147f373bb48dbc1becc1601953499) ) // different to baddudes
+	// ROM_LOAD( "eg25.15h",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) ) has been verfied
+	//  correct for the above drgninja set and dumped from an original DECO PCB with the original label intact.
+	// ROM_LOAD( "eg25.bin",  0x00000, 0x08000, CRC(dd557b19) SHA1(ce1e76aeb7e147f373bb48dbc1becc1601953499) ) has the unused
+	//  'Bad Dudes' logo partially erased, and a bad pixel on the left arrow character.
+	ROM_LOAD( "eg25.bin",  0x00000, 0x08000, CRC(dd557b19) SHA1(ce1e76aeb7e147f373bb48dbc1becc1601953499) ) // 99.996948%
 	ROM_LOAD( "eg26.16h",  0x08000, 0x08000, CRC(5d75fc8f) SHA1(92947dd78bfe8067fb5f645fa1ef212e48b69c70) ) // different to baddudes
 
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* tiles */
@@ -2535,7 +2531,7 @@ ROM_START( drgninjab2 )
 	ROM_LOAD( "68705r3.0m",     0x0000, 0x1000, CRC(34bc5e7f) SHA1(7231dd7eb9b5152a287e1bcceb3c3a0b35f441af) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "a22.9m",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) ) // 99.996948%
+	ROM_LOAD( "a22.9m",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) )
 	ROM_LOAD( "a23.9n",  0x08000, 0x08000, CRC(5d75fc8f) SHA1(92947dd78bfe8067fb5f645fa1ef212e48b69c70) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* tiles */ // identical but split into 4 roms
@@ -2551,14 +2547,14 @@ ROM_START( drgninjab2 )
 	ROM_LOAD( "a20.9j",    0x18000, 0x08000, CRC(e71c0793) SHA1(e42a8192c772da1d6c93f9f9e89c553d712e18f7) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 ) /* sprites */
-	ROM_LOAD( "a6.4g",  0x00000, 0x10000, CRC(5617d67f) SHA1(8f684de27ae79c4d35720706cdd2733af0e0a9cc) )
-	ROM_LOAD( "a2.4c",  0x10000, 0x08000, CRC(17e42633) SHA1(405f5296a741901677cca978a1b287d894eb1e54) )
-	ROM_LOAD( "a8.5g",  0x20000, 0x10000, CRC(ba83e8d8) SHA1(63092a5d0da0c9228a72a83b43a67a47b1388724) )
-	ROM_LOAD( "a4.5c",  0x30000, 0x08000, CRC(fea2a134) SHA1(525dd5f48993db1fe1e3c095442884178f75e8e0) )
-	ROM_LOAD( "a5.3g",  0x40000, 0x10000, CRC(fd91e08e) SHA1(8998f020791c8830e963096dc7b8fcb430d041d4) )
-	ROM_LOAD( "a1.3c",  0x50000, 0x08000, CRC(e83c760a) SHA1(d08db381658b8b3288c5eaa9048a906126e0f712) )
-	ROM_LOAD( "a7.4-5g",  0x60000, 0x10000, CRC(601b7b23) SHA1(c1c665614f1377bc47720382b25c965266a2593f) )
-	ROM_LOAD( "a3.4-5c",  0x70000, 0x08000, CRC(eeee8a1a) SHA1(2bf8378ff38f6a7c7cbd4cbd489de25cb1f0fe71) )
+	ROM_LOAD( "a6.4g",   0x00000, 0x10000, CRC(5617d67f) SHA1(8f684de27ae79c4d35720706cdd2733af0e0a9cc) )
+	ROM_LOAD( "a2.4c",   0x10000, 0x08000, CRC(17e42633) SHA1(405f5296a741901677cca978a1b287d894eb1e54) )
+	ROM_LOAD( "a8.5g",   0x20000, 0x10000, CRC(ba83e8d8) SHA1(63092a5d0da0c9228a72a83b43a67a47b1388724) )
+	ROM_LOAD( "a4.5c",   0x30000, 0x08000, CRC(fea2a134) SHA1(525dd5f48993db1fe1e3c095442884178f75e8e0) )
+	ROM_LOAD( "a5.3g",   0x40000, 0x10000, CRC(fd91e08e) SHA1(8998f020791c8830e963096dc7b8fcb430d041d4) )
+	ROM_LOAD( "a1.3c",   0x50000, 0x08000, CRC(e83c760a) SHA1(d08db381658b8b3288c5eaa9048a906126e0f712) )
+	ROM_LOAD( "a7.4-5g", 0x60000, 0x10000, CRC(601b7b23) SHA1(c1c665614f1377bc47720382b25c965266a2593f) )
+	ROM_LOAD( "a3.4-5c", 0x70000, 0x08000, CRC(eeee8a1a) SHA1(2bf8378ff38f6a7c7cbd4cbd489de25cb1f0fe71) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "a30.10b",   0x0000, 0x10000, CRC(f6806826) SHA1(e2c6a0682f34d30c63dab8715729151cc3657387) ) //  99.218750%
@@ -4019,8 +4015,8 @@ void dec0_state::init_ffantasybl()
 //    YEAR, NAME,       PARENT,   MACHINE,    INPUT,      STATE/DEVICE,   INIT,        MONITOR,COMPANY,                 FULLNAME,            FLAGS
 GAME( 1987, hbarrel,    0,        hbarrel,    hbarrel,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Heavy Barrel (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hbarrelu,   hbarrel,  hbarrel,    hbarrel,    dec0_state, init_hbarrel,    ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, baddudes,   0,        baddudes,   baddudes,   dec0_state, init_hbarrel,    ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, drgninja,   baddudes, baddudes,   drgninja,   dec0_state, init_hbarrel,    ROT0,   "Data East Corporation", "Dragonninja (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, baddudes,   0,        baddudes,   baddudes,   dec0_state, init_hbarrel,    ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninja,   baddudes, baddudes,   drgninja,   dec0_state, init_hbarrel,    ROT0,   "Data East Corporation", "Dragonninja (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, birdtry,    0,        birdtry,    birdtry,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocop,    0,        robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopw,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
