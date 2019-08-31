@@ -2722,12 +2722,13 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="2630fa">
 		<description>2630 Fourier Analyzer (Demo)</description>
-		<year>1987?</year>
+		<year>1987</year>
 		<publisher>Tektronix</publisher>
+		<info name="usage" value="Start from DOS with: IPD" />
 		<info name="version" value="1.70" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="2630 fourier analyzer 1.70 (demo).img" size="368640" crc="2a593b4a" sha1="bc8fb32634cc1e2beff1d518d9db77d272269d27"/>
+			<dataarea name="flop" size="2795439">
+				<rom name="2630 fourier analyzer 1.70 (demo).mfm" size="2795439" crc="6b878f2a" sha1="420223b960f51ca6d475832c078e698a6cdb1424" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6625,13 +6626,25 @@ has been replaced with an all-zero block. -->
 	<!-- DOS-based games -->
 
 	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM  -->
-		<description>2400 A.D.</description>
+		<description>2400 A.D. (set 1)</description>
 		<year>1987</year>
 		<publisher>Origin</publisher>
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="2400ad.img" size="368640" crc="bf246734" sha1="a9f0be5fa2a5077375dae572622926bb8aa9e28a"/>
+				<rom name="2400ad.img" size="368640" crc="bf246734" sha1="a9f0be5fa2a5077375dae572622926bb8aa9e28a" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Listed as clone of 2400ad because not sure if different version -->
+	<software name="2400ad1" cloneof="2400ad" supported="yes">
+		<description>2400 A.D. (set 2)</description>
+		<year>1987</year>
+		<publisher>Origin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2840406">
+				<rom name="2400ad.mfm" size="2840406" crc="5dd2e4aa" sha1="e7deec7be1abb1e1b95f72b5d64eb5f8953edee8"/>
 			</dataarea>
 		</part>
 	</software>
