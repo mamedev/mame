@@ -8,7 +8,10 @@
 
     TODO:
     - Compact Flash hookup;
-    - Enables wavetable IRQ;
+	- Requires timed based FIFO renderer, loops until both rear and front 
+	  are equal.
+    - Enables wavetable IRQ, even if so far no channel enables the submask;
+	- Unemulated 93C86 EEPROM device;
 
 =============================================================================
 
@@ -127,9 +130,9 @@ GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/vrender0.h"
+#include "machine/ataintf.h"
 #include "emupal.h"
 
-#include <algorithm>
 
 class psattack_state : public driver_device
 {
@@ -138,7 +141,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
-		m_vr0soc(*this, "vr0soc")
+		m_vr0soc(*this, "vr0soc"),
+		m_ata(*this, "ata")
 	{ }
 
 
@@ -153,17 +157,46 @@ private:
 	/* devices */
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
+	required_device<ata_interface_device> m_ata;
 
 	IRQ_CALLBACK_MEMBER(icallback);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void psattack_mem(address_map &map);
+	
+	DECLARE_READ16_MEMBER(cfcard_data_r);
+	DECLARE_READ8_MEMBER(cfcard_regs_r);
+	DECLARE_WRITE8_MEMBER(cfcard_regs_w);
+	DECLARE_WRITE32_MEMBER(output_w);
 };
 
 IRQ_CALLBACK_MEMBER(psattack_state::icallback)
 {
 	return m_vr0soc->irq_callback();
+}
+
+// TODO: wrong, likely PIC protected too
+READ8_MEMBER( psattack_state::cfcard_regs_r )
+{
+	return m_ata->read_cs0(offset & 7, 0x000000ff);
+}
+
+WRITE8_MEMBER( psattack_state::cfcard_regs_w )
+{
+	m_ata->write_cs0(offset & 7, 0x000000ff);
+}
+
+READ16_MEMBER( psattack_state::cfcard_data_r )
+{
+	return m_ata->read_cs0(0, 0x0000ffff);
+}
+
+WRITE32_MEMBER( psattack_state::output_w )
+{
+	// suppress logging for now
+	if (data)
+		logerror("output_w: %08x & %08x\n",data,mem_mask);
 }
 
 void psattack_state::psattack_mem(address_map &map)
@@ -172,13 +205,17 @@ void psattack_state::psattack_mem(address_map &map)
 
 	//   0x1400c00, 0x1400c01 read cfcard memory (auto increment?)
 	//   0x1402800, 0x1402807 read/write regs?
-	//   0x1802410, 0x1802413 peripheral chip select for above
-	map(0x01500000, 0x01500003).portr("IN0");
+	// cf card interface
+	map(0x01400c00, 0x01400c01).r(FUNC(psattack_state::cfcard_data_r));
+	map(0x01402800, 0x01402807).rw(FUNC(psattack_state::cfcard_regs_r), FUNC(psattack_state::cfcard_regs_w));
+
+	map(0x01500000, 0x01500003).portr("IN0").w(FUNC(psattack_state::output_w));
 	map(0x01500004, 0x01500007).portr("IN1");
 	map(0x01500008, 0x0150000b).portr("IN2");
-	//0x0150000c is prolly eeprom
+//	0x0150000c is prolly eeprom
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
+//  map(0x01802410, 0x01802413) peripheral chip select for cf?
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
 
@@ -212,8 +249,13 @@ void psattack_state::psattack(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &psattack_state::psattack_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(psattack_state::icallback));
 
+	// PIC16C711
+
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
+	m_vr0soc->set_external_vclk(XTAL(25'175'000)); // assumed from the only available XTal on PCB
+
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 }
 
 ROM_START( psattack )
@@ -224,8 +266,8 @@ ROM_START( psattack )
 	ROM_LOAD("16c711.pic",  0x0000, 0x137b, CRC(617d8292) SHA1(d32d6054ce9db2e31efaf41015afcc78ed32f6aa) ) // raw dump
 	ROM_LOAD("16c711.bin",  0x0000, 0x4010, CRC(b316693f) SHA1(eba1f75043bd415268eedfdb95c475e73c14ff86) ) // converted to binary
 
-	DISK_REGION( "cfcard" )
-	DISK_IMAGE_READONLY( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
 ROM_END
 
 void psattack_state::init_psattack()
