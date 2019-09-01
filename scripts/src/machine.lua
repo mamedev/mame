@@ -4145,6 +4145,8 @@ end
 if (MACHINES["VRENDER0"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/vrender0.cpp",
+		MAME_DIR .. "src/devices/machine/vr0uart.cpp",
 		MAME_DIR .. "src/devices/machine/vrender0.h",
 	}
 end
+

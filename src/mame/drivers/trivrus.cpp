@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:Luca Elia, Angelo Salese
 /****************************************************************************
 
     Trivia R Us (c) 2009 AGT
 
     driver by Angelo Salese, based off original crystal.cpp by ElSemi
+	original mods on this driver by Luca Elia
 
     TODO:
     - touch panel, according to service mode can be generic, atouch or 3M 
@@ -20,6 +21,7 @@
 #include "cpu/se3208/se3208.h"
 #include "machine/nvram.h"
 #include "machine/vrender0.h"
+#include "machine/microtch.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -35,7 +37,8 @@ public:
 		m_flash(*this, "flash"),
 		m_maincpu(*this, "maincpu"),
 		m_mainbank(*this, "mainbank"),
-		m_vr0soc(*this, "vr0soc")
+		m_vr0soc(*this, "vr0soc"),
+		m_microtouch(*this, "microtouch")
 	{ }
 
 
@@ -51,6 +54,7 @@ private:
 	required_device<se3208_device> m_maincpu;
 	optional_memory_bank m_mainbank;
 	required_device<vrender0soc_device> m_vr0soc;
+	required_device<microtouch_device> m_microtouch;
 
 	uint32_t    m_FlashCmd;
 	uint32_t    m_Bank;
@@ -162,7 +166,7 @@ void trivrus_state::trivrus_mem(address_map &map)
 
 	map(0x01500000, 0x01500000).rw(FUNC(trivrus_state::trivrus_input_r), FUNC(trivrus_state::trivrus_input_w));
 	// reads occurs by SELECTING the given register on successive ODD addresses then reading at 0x01500011
-	// bit 0 of 1500010 looks some kind of busy flag (tight loops if on)
+	// bit 0 of 1500010 looks some kind of busy flag (game tight loops if on)
 	// on write:
 //  0x01500010 = sec
 //  0x01500012 = min
@@ -234,7 +238,7 @@ static INPUT_PORTS_START( trivrus )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Right/False")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) // with 1 impulse it misses often
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
@@ -298,6 +302,11 @@ void trivrus_state::trivrus(machine_config &config)
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 	m_vr0soc->set_external_vclk(28636360);
+	m_vr0soc->tx_callback<0>().set(m_microtouch, FUNC(microtouch_device::rx));
+	
+	// TODO: 3M from service mode, most likely wrong?
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_vr0soc, FUNC(vrender0soc_device::rx_w<0>));
+
 }
 
 ROM_START( trivrus )

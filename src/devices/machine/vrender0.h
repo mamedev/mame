@@ -17,6 +17,7 @@
 #include "sound/vrender0.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "diserial.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -24,11 +25,69 @@
 
 #define IDLE_LOOP_SPEEDUP
 
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vrender0soc_device
+// ======================> vr0uart_device
+
+class vrender0soc_device;
+
+class vr0uart_device : public device_t,
+					   public device_serial_interface
+{
+public:
+	// construction/destruction
+	vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void regs_map(address_map &map);
+	void set_channel_num(int ch) { m_channel_num = ch; }
+	void set_parent(vrender0soc_device *parent) { m_parent = parent; }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	DECLARE_READ32_MEMBER( control_r );
+	DECLARE_WRITE32_MEMBER( control_w );
+	DECLARE_READ32_MEMBER( baud_rate_div_r );
+	DECLARE_WRITE32_MEMBER( baud_rate_div_w );
+	DECLARE_READ32_MEMBER( status_r ); 
+	DECLARE_WRITE32_MEMBER( transmit_buffer_w );
+	DECLARE_READ32_MEMBER( receive_buffer_r );
+	TIMER_CALLBACK_MEMBER( break_timer_cb );
+	
+	uint32_t m_ucon; // control
+	uint32_t m_ubdr; // baud rate
+	uint32_t m_ustat; // status
+	util::fifo<uint8_t, 16> m_urxb_fifo; // receive FIFO
+	
+	void update_serial_config();
+	inline uint32_t calculate_baud_rate();
+	
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_complete() override;
+
+	inline void tx_send_byte(uint8_t val);
+	int m_channel_num;	
+	vrender0soc_device *m_parent;
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(VRENDER0_UART, vr0uart_device)
+
 
 class vrender0soc_device : public device_t
 {
@@ -45,7 +104,10 @@ public:
 	void IntReq( int num );
 	int irq_callback();
 	bool irq_pending() { return m_intst; }
-
+	void write_line_tx(int port, uint8_t value);
+	template <int Port> auto tx_callback() { return write_tx[Port].bind(); }
+	template <int Port> DECLARE_WRITE_LINE_MEMBER(rx_w) { m_uart[Port]->rx_w((uint8_t)state); }
+	
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -61,12 +123,15 @@ private:
 	required_device <vr0sound_device> m_vr0snd;
 	required_device <speaker_device> m_lspeaker;
 	required_device <speaker_device> m_rspeaker;
+	required_device_array <vr0uart_device, 2> m_uart;
 	required_shared_ptr <uint32_t> m_crtcregs;
 	required_shared_ptr <uint32_t> m_textureram;
 	required_shared_ptr <uint32_t> m_frameram;
 	
 	address_space *m_host_space;
 	uint32_t m_ext_vclk;
+
+	devcb_write_line write_tx[2];
 
 	// INTC
 	uint32_t m_inten;
