@@ -34235,6 +34235,10 @@ cp2000                          //
 @source:saitek_delta1.cpp
 ccdelta1                        //
 
+@source:saitek_mark5.cpp
+ccmk5
+ccmk6
+
 @source:saitek_risc2500.cpp
 risc2500                        //
 montreux                        //
