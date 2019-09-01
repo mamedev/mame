@@ -231,9 +231,7 @@ void concept_state::concept(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* rtc */
-	MM58274C(config, m_mm58274, 32.768_kHz_XTAL);
-	m_mm58274->set_mode24(0); // 12 hour
-	m_mm58274->set_day1(1);   // monday
+	MM58174(config, m_mm58174, 32.768_kHz_XTAL);
 
 	/* via */
 	VIA6522(config, m_via0, 16.364_MHz_XTAL / 16);

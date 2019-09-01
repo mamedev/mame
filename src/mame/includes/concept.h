@@ -16,7 +16,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
-#include "machine/mm58274c.h"   /* mm58274 seems to be compatible with mm58174 */
+#include "machine/mm58174.h"
 #include "sound/spkrdev.h"
 #include "bus/a2bus/a2bus.h"
 
@@ -36,7 +36,7 @@ public:
 		m_via0(*this, VIA_0_TAG),
 		m_kbdacia(*this, KBD_ACIA_TAG),
 		m_speaker(*this, "spkr"),
-		m_mm58274(*this,"mm58274c"),
+		m_mm58174(*this, "mm58174"),
 		m_a2bus(*this, "a2bus"),
 		m_videoram(*this,"videoram")
 	{ }
@@ -50,7 +50,7 @@ private:
 	required_device<via6522_device> m_via0;
 	required_device<mos6551_device> m_kbdacia;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<mm58274c_device> m_mm58274;
+	required_device<mm58174_device> m_mm58174;
 	required_device<a2bus_device> m_a2bus;
 	required_shared_ptr<uint16_t> m_videoram;
 
