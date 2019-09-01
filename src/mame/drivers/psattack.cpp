@@ -133,6 +133,7 @@ GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
 #include "machine/ataintf.h"
 #include "emupal.h"
 
+
 class psattack_state : public driver_device
 {
 public:
