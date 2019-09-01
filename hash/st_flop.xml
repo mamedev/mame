@@ -1671,6 +1671,25 @@
 		</part>
 	</software>
 
+	<software name="ferrari" supported="no">
+		<description>Ferrari Formula One (Euro)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Disk" />
+			<dataarea name="flop" size="425552">
+				<rom name="e02431xl(1).stx" size="425552" crc="55d733c5" sha1="9c5581f80bc3c89c3bc97b907c80db99919eb4d4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="425040">
+				<rom name="e02431xl(2).stx" size="425040" crc="a0c353e9" sha1="f976beb1167ed203293969d8c1b3db35a4dd005d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="firefor2" supported="no">
 		<!-- SPS (CAPS) release 3130 -->
 		<description>Fire and Forget II - The Death Convoy (Euro)</description>
@@ -5089,7 +5108,7 @@
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="ca400607-012 rev b.img" size="737280" crc="87f39639" sha1="16de1678dd4f0fe1295f51ff4307fc0c09290249" offset="0" />
+				<rom name="ca400607-012 rev. b.img" size="737280" crc="87f39639" sha1="16de1678dd4f0fe1295f51ff4307fc0c09290249" offset="0" />
 			</dataarea>
 		</part>
 	</software>

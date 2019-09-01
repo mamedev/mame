@@ -44,13 +44,12 @@
 	</software>
 
 	<software name="a590_seagate" cloneof="a590">
-		<description>A590 Setup Disk (Seagate Harddisk)</description>
-		<year>1990</year>
+		<description>A590 Setup Disk 1.23 (Seagate Harddisk)</description>
+		<year>1988</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="A590 Setup Disk (Seagate Harddisk)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317734-04_a590_seagate.adf" size="901120" status="nodump"/>
+				<rom name="317734-04.adf" size="901120" crc="7f1623a7" sha1="1f3e20206eb83f60745e19538de3123089c8da24"/>
 			</dataarea>
 		</part>
 	</software>

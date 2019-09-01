@@ -550,10 +550,12 @@
 		</part>
 	</software>
 
-	<software name="drafix">
+	<software name="drafix" supported="yes">
 		<description>Drafix Windows CAD (Demo)</description>
 		<year>1990</year>
 		<publisher>Fox Data</publisher>
+		<info name="usage" value="Start from DOS with: DEMO"/>
+		<info name="version" value="3.5" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="drafix windows cad (demo).img" size="1228800" crc="95f50d9f" sha1="bc9de150a22e58a8ad4a0948d66f203527d84f32"/>
@@ -5216,7 +5218,7 @@
 
 	<software name="divaisdn">
 		<description>DIVA T/A ISDN Modem Setup Wizard for Windows 3.x</description>
-		<year>1997?</year>
+		<year>1997</year>
 		<publisher>Eicon Technology Corporation</publisher>
 		<info name="version" value="1 Release 4" />
 		<part name="flop1" interface="floppy_3_5">
@@ -5483,8 +5485,8 @@
 		<info name="version" value="6.0" />
 		<info name="release" value="19931125"/>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="mitsumi mouse driver 6.0.img" size="1474560" crc="591804ee" sha1="bb41f6447f631a4efe850431be3c720f9cadc4d1"/>
+			<dataarea name="flop" size="88372">
+				<rom name="mitsumi mouse driver 6.0.imd" size="88372" crc="0b009fd5" sha1="3cdad00105af7a69ba7bd941498f5816039a0596"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5548,8 +5550,8 @@
 		<publisher>Unex Technology Corporation</publisher>
 		<info name="version" value="3.02" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1492992">
-				<rom name="nexnic nd010 pci adapter (ethernet-fast ethernet) 3.02.img" size="1492992" crc="2324ce96" sha1="aae7140dfd7603ffcf48f8fd80c026744c584e8a"/>
+			<dataarea name="flop" size="4227910">
+				<rom name="nexnic nd010 pci adapter (ethernet-fast ethernet) 3.02.mfm" size="4227910" crc="6fee8a2f" sha1="3616f28d9874ba5805e53ccbe63284f1a7d7aea1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5581,15 +5583,15 @@
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<feature name="disk_serial" value="26-00195-02" />
-			<dataarea name="flop" size="1474560">
-				<rom name="26-00195-02.img" size="1474560" crc="f293e498" sha1="835144d594a7ee07cf8586c4b4b5f5609fa2cd2b"/>
+			<dataarea name="flop" size="4221025">
+				<rom name="26-00195-02.mfm" size="4221025" crc="b9be8f34" sha1="ea5beeff97be1a3ab3f0a0f3d6246d1416559688"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<feature name="disk_serial" value="26-00195-03" />
-			<dataarea name="flop" size="1474560">
-				<rom name="26-00195-03.img" size="1474560" crc="fe7b2947" sha1="e16288117726d21649492fd4bc7e1ad3f00bf572"/>
+			<dataarea name="flop" size="4221752">
+				<rom name="26-00195-03.mfm" size="4221752" crc="81d63864" sha1="a906b72067cc2278a241f8baddc90e79d7c2920d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5662,8 +5664,8 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="scroll 3d mouse setup disk for ps2 and serial 2.0.img" size="1474560" crc="97c2f7ad" sha1="1fcb7beb6926934bdbdbeb35bc18213a0fb22584"/>
+			<dataarea name="flop" size="4236544">
+				<rom name="scroll 3d mouse setup disk for ps2 and serial 2.0.mfm" size="4236544" crc="7e408ad4" sha1="7f88263de01478f42f2a937540fee0a70eae5dc5" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5843,20 +5845,20 @@
 		<info name="version" value="3.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #1" />
-			<dataarea name="flop" size="1474560">
-				<rom name="soundwave 32 series 3.0 (disk 1).img" size="1474560" crc="8420c21c" sha1="337f31df6ec72fb1c62a0d7409421b618282f16d"/>
+			<dataarea name="flop" size="4226759">
+				<rom name="soundwave 32 series 3.0 (disk 1).mfm" size="4226759" crc="8fc8426e" sha1="5dd2f3a0d84e46677afd61ea8d92da6c924f66ea"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #2" />
-			<dataarea name="flop" size="1474560">
-				<rom name="soundwave 32 series 3.0 (disk 2).img" size="1474560" crc="a4f80a83" sha1="50ac37c8fc7b3fcba3e6d1fb81e8288e643f622a"/>
+			<dataarea name="flop" size="4244689">
+				<rom name="soundwave 32 series 3.0 (disk 2).mfm" size="4244689" crc="91d2c027" sha1="1a5cc99508c7a5fa34880fa021f40425e6e3cd05"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #3" />
-			<dataarea name="flop" size="1474560">
-				<rom name="soundwave 32 series 3.0 (disk 3).img" size="1474560" crc="a26402fd" sha1="9386134e27286db48e076aaa98f7c86b86277c53"/>
+			<dataarea name="flop" size="4221234">
+				<rom name="soundwave 32 series 3.0 (disk 3).mfm" size="4221234" crc="e509fbc6" sha1="db1b571b7ca82fe1beed69ea5f7975e74ad8419f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6114,7 +6116,7 @@
 
 	<software name="autoconv">
 		<description>Auto Convert</description>
-		<year>1989?</year>
+		<year>1989</year>
 		<publisher>Generic Software</publisher>
 		<info name="version" value="4.0" />
 		<info name="serial" value="IAC-57008-I" />
@@ -6249,21 +6251,21 @@
 
 	<software name="cpavfw">
 		<description>Central Point Anti-Virus for Windows</description>
-		<year>1992?</year>
+		<year>1992</year>
 		<publisher>Central Point Software, Inc.</publisher>
 		<info name="usage" value="To start, type SETUP at A: and press ENTER." />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Setup Disk" />
 			<feature name="disk_serial" value="103347.001" />
-			<dataarea name="flop" size="737280">
-				<rom name="103347.001.img" size="737280" crc="8a5400ce" sha1="e30c347d9e64bdb4aa97a91880fcad487509b7e5" status="baddump"/>
+			<dataarea name="flop" size="2550386">
+				<rom name="103347.001.mfm" size="2550386" crc="414f1718" sha1="114de7a5b09659305cec8f9130ed9462ce0f0865" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<feature name="disk_serial" value="103348.001" />
-			<dataarea name="flop" size="737280">
-				<rom name="103348.001.img" size="737280" crc="2db0ec1b" sha1="757a26ca8ede74aa531b9d18497c8222547e7826" status="baddump"/>
+			<dataarea name="flop" size="2737329">
+				<rom name="103348.001.mfm" size="2737329" crc="8bbb6532" sha1="90d348477198b7fc119d49351d4379fcee4e0145" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6367,9 +6369,9 @@
 		</part>
 	</software>
 
-	<software name="5250emu">
+	<software name="5250emu" supported="yes">
 		<description>Enhanced 5250 Emulation Program</description>
-		<year>1986?</year>
+		<year>1986</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="2.12" />
 		<part name="flop1" interface="floppy_3_5">
@@ -6606,6 +6608,7 @@
 		<description>The Greatest Little PIC Book</description>
 		<year>1997?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires Windows 3.1 or later"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1474560">
@@ -6647,7 +6650,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 of 3 - Install Disk" />
 			<dataarea name="flop" size="1474560">
-				<rom name="hijaak pro 2.0 (disk 1).img" size="1474560" crc="2777a9bc" sha1="e518434bc7a4dcd4e377bb54729ab8a06a7f4753"/>
+				<rom name="hijaak pro 2.0 (disk 1).img" size="1474560" crc="56de8bb6" sha1="f3cdf765ed17f2560e60ce0369a8a21ce41ee2d7"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -6686,7 +6689,7 @@
 		</part>
 	</software>
 
-	<!-- Bundled with Integration i Microsoft Office 97: Step by Step by Susanne Freet et al. ISBN10: 91-644-0153-7 -->
+	<!-- Bundled with "Integration i Microsoft Office 97: Step by Step" by Susanne Freet et al. ISBN10: 91-644-0153-7 -->
 	<software name="iimso97">
 		<description>Integration i Microsoft Office 97: Step by Step (Swe)</description>
 		<year>1997</year>
@@ -6718,7 +6721,7 @@
 			<feature name="part_id" value="Disk 1 of 3" />
 			<feature name="disk_serial" value="IB10-DSK-1of3" />
 			<dataarea name="flop" size="1474560">
-				<rom name="ib10-dsk-1of3.img" size="1474560" crc="0b248ec8" sha1="5c6cf65435facb324f08809ffc340df4687f24a6"/>
+				<rom name="ib10-dsk-1of3.img" size="1474560" crc="9f307ff0" sha1="17cd05ebee49ec2e8ef467a97449290106f1f0bd"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -6742,8 +6745,8 @@
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="jack nicklaus screen savers.img" size="1474560" crc="680c9114" sha1="430e9d3827430aa4e795300005556a43fa652548"/>
+			<dataarea name="flop" size="4228062">
+				<rom name="jack nicklaus screen savers.mfm" size="4228062" crc="6fa0f8f9" sha1="5d1dd82b3e7993bc449b3583064b0aa3da391ef5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6870,8 +6873,8 @@
 		</part>
 	</software>
 
-	<!-- Bundled with Mastering Borland C++ 3.1 by Tom Swan. ISBN10: 0-672-30274-8 -->
-	<software name="brlndcpp">
+	<!-- Bundled with "Mastering Borland C++ 3.1" by Tom Swan. ISBN10: 0-672-30274-8 -->
+	<software name="brlndcpp" supported="yes">
 		<description>Mastering Borland C++ 3.1</description>
 		<year>1992</year>
 		<publisher>Sams Publishing</publisher>
@@ -6897,13 +6900,14 @@
 
 	<software name="microcp3">
 		<description>Micro-Cap III</description>
-		<year>1989?</year>
-		<publisher>Spectrum</publisher>
-		<info name="version" value="2.0" />
+		<year>1989</year>
+		<publisher>Spectrum Software</publisher>
+		<info name="version" value="2.04" />
+		<info name="usage" value="Run from DOS with: MC3" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette A - Main Program" />
-			<dataarea name="flop" size="737280">
-				<rom name="micro-cap iii 2.0 (disk a).img" size="737280" crc="b3cdeb35" sha1="2fa7acf79df636caf7cb9354400d2539764b369c"/>
+			<dataarea name="flop" size="2295223">
+				<rom name="micro-cap iii 2.0 (disk a).mfm" size="2295223" crc="00f887fe" sha1="74387f094f112422d31848723800cf276e1fa9d0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -8060,8 +8064,8 @@
 		<publisher>WordFinder Software AB</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Registreringsdiskett" />
-			<dataarea name="flop" size="737280">
-				<rom name="registreringsdiskett.img" size="737280" crc="26700ec2" sha1="51d0deb495af37a09bc2a6facd73c372e776b670"/>
+			<dataarea name="flop" size="2235328">
+				<rom name="registreringsdiskett.mfm" size="2235328" crc="7744282c" sha1="26b6074aad47dce199872b13ba6cb8f908d67111"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -8072,20 +8076,20 @@
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Sv-En Verkst.tekn. lexikon - Lexikondiskett 2" />
-			<dataarea name="flop" size="737280">
-				<rom name="sv-en verkst tekn lexikon - lexikondiskett 2.img" size="737280" crc="8ba40420" sha1="39c5c520f7337f6dc2ecfda8cf637cb95f3c84b3"/>
+			<dataarea name="flop" size="2241641">
+				<rom name="sv-en verkst tekn lexikon - lexikondiskett 2.mfm" size="2241641" crc="c1ce7436" sha1="103bf7a190b3738f1b0debe2429aacea2188ce17"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Svenskt lexikon (SAOL) - Lexikondiskett 3" />
-			<dataarea name="flop" size="1474560">
-				<rom name="svenskt lexikon (saol) - lexikondiskett 3.img" size="1474560" crc="dee45b52" sha1="0a60c29e231514448751fd023fef1e2ae81f6483"/>
+			<dataarea name="flop" size="4224979">
+				<rom name="svenskt lexikon (saol) - lexikondiskett 3.mfm" size="4224979" crc="3e296c43" sha1="3e0c1dfdb1bb1e5be1fb85124078bc95880e56b2"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Svenskt lexikon (SAOL) - Lexikondiskett 4" />
-			<dataarea name="flop" size="1474560">
-				<rom name="svenskt lexikon (saol) - lexikondiskett 4.img" size="1474560" crc="56ef5cd6" sha1="a2084e8b00dde0a34a80690ccca709eafdaa4bd2"/>
+			<dataarea name="flop" size="4237395">
+				<rom name="svenskt lexikon (saol) - lexikondiskett 4.mfm" size="4237395" crc="5eee09ca" sha1="110375b861de44e90648b3800edead4d7bb470de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9053,6 +9057,25 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 2).img" size="1474560" crc="20c4dc37" sha1="e39ac3f58f81813e515e8fa203dff7e9b9ebf9d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bundliga">
+		<description>Bundesliga Manager Professional</description>
+		<year>1991</year>
+		<publisher>Software 2000</publisher>
+		<info name="usage" value="Install from DOS with: INSTALL" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "2404046">
+				<rom name="bundesliga manager professional disk 1.mfm" size="2404046" crc="f0cb0b78" sha1="5251bd64d890106f14946157370691080bf122b5" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "3783439">
+				<rom name="bundesliga manager professional disk 2.mfm" size="3783439" crc="1542912f" sha1="059e6c54239e11ad5dcbd43fe2e4f574cd922475" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11676,11 +11699,12 @@
 		</part>
 	</software>
 
-	<software name="nova9_525">
+	<software name="nova9_525" supported="yes">
 		<description>Nova 9 (International Version, 5.25")</description>
 		<year>1991</year>
 		<publisher>Dynamix</publisher>
 		<info name="version" value="1.0" />
+		<info name="usage" value="Install from DOS with: INSTALL" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1228800">
@@ -12503,42 +12527,42 @@
 		<info name="usage" value="Install from DOS with: INSTALL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander disk 1.img" size="1474560" crc="9a1c4ab7" sha1="91abf66c7082e0161da01ff22273d31eda514fac" offset="0" />
+				<rom name="strike commander disk 1.img" size="1474560" crc="9a1c4ab7" sha1="91abf66c7082e0161da01ff22273d31eda514fac"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander disk 2.img" size="1474560" crc="92019646" sha1="ee1bf5c13752c6a6bba3b203ed3f21ffd4c57a1a" offset="0" />
+				<rom name="strike commander disk 2.img" size="1474560" crc="92019646" sha1="ee1bf5c13752c6a6bba3b203ed3f21ffd4c57a1a"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander disk 3.img" size="1474560" crc="05ff13dc" sha1="e532d66ddebfacd7efd241ed23c5bbbfe3c5d725" offset="0" />
+				<rom name="strike commander disk 3.img" size="1474560" crc="05ff13dc" sha1="e532d66ddebfacd7efd241ed23c5bbbfe3c5d725"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander disk 4.img" size="1474560" crc="89bfed90" sha1="47e364bfb946c547d8146d6601d45c3424a8a604" offset="0" />
+				<rom name="strike commander disk 4.img" size="1474560" crc="89bfed90" sha1="47e364bfb946c547d8146d6601d45c3424a8a604"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander disk 5.img" size="1474560" crc="af24628a" sha1="d6c67860a1ff8f77bcbe3d9db3465532ba2d8f1c" offset="0" />
+				<rom name="strike commander disk 5.img" size="1474560" crc="af24628a" sha1="d6c67860a1ff8f77bcbe3d9db3465532ba2d8f1c"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander disk 6.img" size="1474560" crc="69a93bb1" sha1="9ebff1daeaeea017e983dfcebeb9a89780d46204" offset="0" />
+				<rom name="strike commander disk 6.img" size="1474560" crc="69a93bb1" sha1="9ebff1daeaeea017e983dfcebeb9a89780d46204"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander disk 7.img" size="1474560" crc="a00f4589" sha1="27c0fc8b4d44fccd3194ada3b496151674dc6bbd" offset="0" />
+				<rom name="strike commander disk 7.img" size="1474560" crc="a00f4589" sha1="27c0fc8b4d44fccd3194ada3b496151674dc6bbd"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander disk 8.img" size="1474560" crc="937ccb56" sha1="05d3eb7f471c60c8aba27898438ad461bf586824" offset="0" />
+				<rom name="strike commander disk 8.img" size="1474560" crc="937ccb56" sha1="05d3eb7f471c60c8aba27898438ad461bf586824"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12550,17 +12574,17 @@
 		<info name="usage" value="Install from DOS with: SPEECH"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander speech pack disk 1.img" size="1474560" crc="330a2acc" sha1="566b363c02bbc819adb7bff03786caddabf409fe" offset="0" />
+				<rom name="strike commander speech pack disk 1.img" size="1474560" crc="330a2acc" sha1="566b363c02bbc819adb7bff03786caddabf409fe"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander speech pack disk 2.img" size="1474560" crc="851cd0ee" sha1="36c408510468fda350cec8a8f5c7cc6c70f8e235" offset="0" />
+				<rom name="strike commander speech pack disk 2.img" size="1474560" crc="851cd0ee" sha1="36c408510468fda350cec8a8f5c7cc6c70f8e235"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander speech pack disk 3.img" size="1474560" crc="5e0325e6" sha1="bb0bafd104b24c35a8205190b22a51e876853732" offset="0" />
+				<rom name="strike commander speech pack disk 3.img" size="1474560" crc="5e0325e6" sha1="bb0bafd104b24c35a8205190b22a51e876853732"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12572,17 +12596,17 @@
 		<info name="usage" value="Install from DOS with: INSTALL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander tactical operations disk 1.img" size="1474560" crc="0bdc6fcd" sha1="3944b61ca4f734211f6dbc51a2b6706cef183364" offset="0" />
+				<rom name="strike commander tactical operations disk 1.img" size="1474560" crc="0bdc6fcd" sha1="3944b61ca4f734211f6dbc51a2b6706cef183364"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander tactical operations disk 2.img" size="1474560" crc="65f4dd43" sha1="498f36a093442032c6d01158a4315503afebaa88" offset="0" />
+				<rom name="strike commander tactical operations disk 2.img" size="1474560" crc="65f4dd43" sha1="498f36a093442032c6d01158a4315503afebaa88"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="strike commander tactical operations disk 3.img" size="1474560" crc="8b2304c2" sha1="5942808d9d3d1409d6330dfa6a908f7751370f46" offset="0" />
+				<rom name="strike commander tactical operations disk 3.img" size="1474560" crc="8b2304c2" sha1="5942808d9d3d1409d6330dfa6a908f7751370f46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12599,8 +12623,8 @@
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size = "1474560">
-				<rom name="thunderhawk ah-73m disk 2.img" size="1474560" crc="aabeac50" sha1="af127a034efbd1b4fa815c3ec5255ab9597f5f88"/>
+			<dataarea name="flop" size = "4312032">
+				<rom name="thunderhawk ah-73m disk 2.mfm" size="4312032" crc="af736d24" sha1="9cd7a03fd44b908a654d13bdb7e41f15fa16d648" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12711,6 +12735,29 @@
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="disk 4.img" size="1228800" crc="caf1057e" sha1="bff9d7c21675da1197cbcf039823982e69d9c6c0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="veildark" supported="yes">
+		<description>Veil of Darkness</description>
+		<year>1993</year>
+		<publisher>Strategic Simulations, Inc.</publisher>
+		<info name="version" value="1.0" />
+		<info name="usage" value="Install from DOS with: INSTALL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="veil of darkness disk 1.img" size="1474560" crc="9b9b0525" sha1="0a8d58c2c06c51c2e3e4aa580212e8b7cae47658"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="veil of darkness disk 2.img" size="1474560" crc="09ea1968" sha1="6e425fc719b62dd3314d2e7192ddbe93f4fa39d9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="veil of darkness disk 3.img" size="1474560" crc="848ccdbf" sha1="731ef4102cbd302a0442a8d40c095c56e9c10b8e"/>
 			</dataarea>
 		</part>
 	</software>
