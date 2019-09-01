@@ -1145,11 +1145,6 @@ void goldstar_state::ladylinr_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
-void goldstar_state::ladylinrb_decrypted_opcodes_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
-}
-
 void goldstar_state::wcat3_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -9241,7 +9236,7 @@ void goldstar_state::ladylinrb(machine_config &config)
 {
 	ladylinr(config);
 
-	m_maincpu->set_addrmap(AS_OPCODES, &goldstar_state::ladylinrb_decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &goldstar_state::common_decrypted_opcodes_map);
 }
 
 
@@ -16631,31 +16626,15 @@ void goldstar_state::init_ladylinrc()
 
 		uint8_t xor_v = x & 0x07;
 
-		int mask = 0x3700;
-
 		switch(i & 0x03)
 		{
-			case 0x00: x ^= xor_table_00[row][xor_v]; if (x == ROM[i] && x != 0xcd && i >= mask && i < 0x3c80) logerror("0x00 addr: %04x, rom: %02x, xored: %02x\n", i, ROM[i], x); break;
-			case 0x01: x ^= xor_table_01[row][xor_v]; if (x == ROM[i] && x != 0xcd && i >= mask && i < 0x3c80) logerror("0x01 addr: %04x, rom: %02x, xored: %02x\n", i, ROM[i], x); break;
-			case 0x02: x ^= xor_table_02[row][xor_v]; if (x == ROM[i] && x != 0xcd && i >= mask && i < 0x3c80) logerror("0x02 addr: %04x, rom: %02x, xored: %02x\n", i, ROM[i], x); break;
-			case 0x03: x ^= xor_table_01[row][xor_v]; if (x == ROM[i] && x != 0xcd && i >= mask && i < 0x3c80) logerror("0x01 addr: %04x, rom: %02x, xored: %02x\n", i, ROM[i], x); break;
+			case 0x00: x ^= xor_table_00[row][xor_v]; break;
+			case 0x01: x ^= xor_table_01[row][xor_v]; break;
+			case 0x02: x ^= xor_table_02[row][xor_v]; break;
+			case 0x03: x ^= xor_table_01[row][xor_v]; break;
 		}
 
 		m_decrypted_opcodes[i] = x;
-	}
-
-	for (int i = 0x3c80; i < 0x8000; i++)
-		m_decrypted_opcodes[i] = ROM[i];
-
-	{
-		char filename[256];
-		sprintf(filename,"decrypted_opcodes_%s", machine().system().name);
-		FILE *fp = fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(m_decrypted_opcodes, 0x8000, 1, fp);
-			fclose(fp);
-		}
 	}
 }
 

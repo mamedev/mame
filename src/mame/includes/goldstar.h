@@ -85,7 +85,6 @@ public:
 	void goldstar_readport(address_map &map);
 	void kkotnoli_map(address_map &map);
 	void ladylinr_map(address_map &map);
-	void ladylinrb_decrypted_opcodes_map(address_map &map);
 	void lucky8_map(address_map &map);
 	void common_decrypted_opcodes_map(address_map &map);
 	void mbstar_map(address_map &map);

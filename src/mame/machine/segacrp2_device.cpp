@@ -85,7 +85,7 @@ static void decode(uint8_t *rom, uint8_t *decrypted,
 	}
 }
 
-DEFINE_DEVICE_TYPE(NEC_315_5136,  nec_315_5136_device,  "nec_315_5179",  "Nec 315-5136")
+DEFINE_DEVICE_TYPE(NEC_315_5136,  nec_315_5136_device,  "nec_315_5136",  "Nec 315-5136")
 DEFINE_DEVICE_TYPE(SEGA_315_5179, sega_315_5179_device, "sega_315_5179", "Sega 315-5179")
 DEFINE_DEVICE_TYPE(SEGA_315_5178, sega_315_5178_device, "sega_315_5178", "Sega 315-5178")
 DEFINE_DEVICE_TYPE(SEGA_315_5177, sega_315_5177_device, "sega_315_5177", "Sega 315-5177") // also seen as 317-5000
