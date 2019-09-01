@@ -44,9 +44,11 @@ vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char
 	m_vr0snd(*this, "vr0snd"),
 	m_lspeaker(*this, "lspeaker"),
 	m_rspeaker(*this, "rspeaker"),
+	m_uart(*this, "uart%u", 0),
 	m_crtcregs(*this, "crtcregs"),
 	m_textureram(*this, "textureram"),
-	m_frameram(*this, "frameram")
+	m_frameram(*this, "frameram"),
+	write_tx{ { *this }, { *this } }
 {
 }
 
@@ -72,6 +74,8 @@ void vrender0soc_device::regs_map(address_map &map)
 	map(0x00c08, 0x00c0b).rw(FUNC(vrender0soc_device::inten_r), FUNC(vrender0soc_device::inten_w));
 	map(0x00c0c, 0x00c0f).rw(FUNC(vrender0soc_device::intst_r), FUNC(vrender0soc_device::intst_w));
 //  map(0x01000, 0x013ff)                            // UART
+	map(0x01000, 0x0101f).m(m_uart[0], FUNC(vr0uart_device::regs_map));
+	map(0x01020, 0x0103f).m(m_uart[1], FUNC(vr0uart_device::regs_map));
 //  map(0x01400, 0x017ff)                            // Timer & Counter
 	map(0x01400, 0x01403).rw(FUNC(vrender0soc_device::tmcon_r<0>), FUNC(vrender0soc_device::tmcon_w<0>));
 	map(0x01404, 0x01407).rw(FUNC(vrender0soc_device::tmcnt_r<0>), FUNC(vrender0soc_device::tmcnt_w<0>)).umask32(0x0000ffff);
@@ -108,6 +112,9 @@ void vrender0soc_device::audiovideo_map(address_map &map)
 
 void vrender0soc_device::device_add_mconfig(machine_config &config)
 {
+	for (required_device<vr0uart_device> &uart : m_uart)
+		VRENDER0_UART(config, uart, 3579500);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
     // evolution soccer defaults
 	m_screen->set_raw((XTAL(14'318'180)*2)/4, 455, 0, 320, 262, 0, 240);
@@ -137,6 +144,8 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 
 void vrender0soc_device::device_start()
 {
+	int i;
+	
 	m_vr0vid->set_areas(reinterpret_cast<uint8_t*>(m_textureram.target()), reinterpret_cast<uint16_t*>(m_frameram.target()));
 	m_vr0snd->set_areas(m_textureram, m_frameram);
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
@@ -144,9 +153,18 @@ void vrender0soc_device::device_start()
 	if (this->clock() == 0)
 		fatalerror("%s: bus clock not setup properly",this->tag());
 
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb),this), (void*)(uintptr_t)i);
 
+	for (auto &cb : write_tx)
+		cb.resolve_safe();
+
+	for (i = 0; i < 2; i++)
+	{
+		m_uart[i]->set_channel_num(i);
+		m_uart[i]->set_parent(this);
+	}
+	
 	save_item(NAME(m_inten));
 	save_item(NAME(m_intst));
 	save_item(NAME(m_IntHigh));
@@ -167,6 +185,13 @@ void vrender0soc_device::device_start()
 	save_item(NAME(m_FlipCntRead));
 #endif
 }
+
+void vrender0soc_device::write_line_tx(int port, uint8_t value)
+{
+	//printf("callback %d %02x\n",port,value);
+	write_tx[port & 1](value);
+}
+
 
 
 //-------------------------------------------------
