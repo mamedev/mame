@@ -458,7 +458,7 @@ protected:
 
 	void iterate_shade();
 
-    uint32_t get_default_color(uint32_t src);
+	uint32_t get_default_color(uint32_t src);
 	uint32_t get_host_color();
 	uint32_t get_rgb_color(int16_t x, int16_t y);
 
