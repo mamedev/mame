@@ -1309,67 +1309,67 @@ ROM_END
 class gnw_vermin_state : public hh_sm510_state
 {
 public:
-        gnw_vermin_state(const machine_config &mconfig, device_type type, const char *tag) :
-                hh_sm510_state(mconfig, type, tag)
-        {
-                inp_fixed_last();
-        }
+	gnw_vermin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
 
-        void gnw_vermin(machine_config &config);
+	void gnw_vermin(machine_config &config);
 };
 
 // config
 
 static INPUT_PORTS_START( gnw_vermin )
-        PORT_START("IN.0")
-        PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
-        PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
-        PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-        PORT_CONFNAME( 0x08, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- disable after boot
-        PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-        PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_CONFNAME( 0x08, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
-        PORT_START("BA")
-        PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 
-        PORT_START("B")
-        PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 
-        PORT_START("ACL")
-        PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
 void gnw_vermin_state::gnw_vermin(machine_config &config)
 {
-        /* basic machine hardware */
-        SM5A(config, m_maincpu);
-        m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-        m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-        m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-        m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-        m_maincpu->read_ba().set_ioport("BA");
-        m_maincpu->read_b().set_ioport("B");
+	/* basic machine hardware */
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
-        /* video hardware */
-        screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-        screen.set_refresh_hz(60);
-        screen.set_size(1650, 1080);
-        screen.set_visarea_full();
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1650, 1080);
+	screen.set_visarea_full();
 
-        /* sound hardware */
-        SPEAKER(config, "mono").front_center();
-        SPEAKER_SOUND(config, m_speaker);
-        m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // roms
 
 ROM_START( gnw_vermin )
-        ROM_REGION( 0x1000, "maincpu", 0 )
-        ROM_LOAD( "mt-03", 0x0000, 0x0740, CRC(f8493177) SHA1(d629432ef8e9fbd7bbdc3fbeb45d9bd70d9d571b) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mt-03", 0x0000, 0x0740, CRC(f8493177) SHA1(d629432ef8e9fbd7bbdc3fbeb45d9bd70d9d571b) )
 
-        ROM_REGION( 105437, "screen", 0)
-        ROM_LOAD( "gnw_vermin.svg", 0, 105437, CRC(c0fc6c40) SHA1(fc64292185aa3d0c92ddfce9227722a17aa5d43f) )
+	ROM_REGION( 105437, "screen", 0)
+	ROM_LOAD( "gnw_vermin.svg", 0, 105437, CRC(c0fc6c40) SHA1(fc64292185aa3d0c92ddfce9227722a17aa5d43f) )
 ROM_END
 
 
@@ -1839,7 +1839,8 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
-  * Sharp SM5A label ?
+  * PCB label MC-25 EG-26 (yes, both listed)
+  * Sharp SM5A label MC-25 51YD / ?
   * lcd screen with custom segments, 1-bit sound
 
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
