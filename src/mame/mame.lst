@@ -21483,6 +21483,9 @@ meijinsn                        // (c) 1986 SNK
 @source:mekd2.cpp
 mekd2                           // 1977 Motorola Evaluation Kit
 
+@source:mekd4.cpp
+mekd4                           // 1980 Motorola Evaluation Kit
+
 @source:menghong.cpp
 crzyddz2                        // 2006 Sealy
 menghong                        // 2004? Sealy
