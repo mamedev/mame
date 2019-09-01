@@ -21,7 +21,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(VRENDER0_UART, vr0uart_device, "vr0uart", "Magic Eyes VRender0 UART")
+DEFINE_DEVICE_TYPE(VRENDER0_UART, vr0uart_device, "vr0uart", "MagicEyes VRender0 UART")
 
 
 //**************************************************************************

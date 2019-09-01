@@ -98,7 +98,8 @@ public:
 	void regs_map(address_map &map);
 	void audiovideo_map(address_map &map);
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
-	void set_external_vclk(uint32_t vclk) { m_ext_vclk = vclk; } 
+	void set_external_vclk(const uint32_t vclk) { m_ext_vclk = vclk; } 
+	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); } 
 	bool crt_is_blanked() { return ((m_crtcregs[0] & 0x0200) == 0x0200); }
 	bool crt_active_vblank_irq();
 	void IntReq( int num );
