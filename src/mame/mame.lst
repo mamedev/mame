@@ -31116,8 +31116,10 @@ cfortea                         //
 cforteb                         //
 
 @source:novag_const.cpp
-const                           //
+const
 const36
+ssensor4
+supercon
 
 @source:novag_diablo.cpp
 diablo68                        //
@@ -31130,9 +31132,6 @@ npresto                         //
 @source:novag_savant.cpp
 savant                          //
 savant2                         //
-
-@source:novag_sconst.cpp
-supercon                        //
 
 @source:novag_sexpert.cpp
 sexperta                        //
