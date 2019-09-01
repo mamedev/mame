@@ -30,9 +30,9 @@ Mephisto program module:
 - PCB label: DF 4003-B
 - 6*CDP1833CE (1KB ROM)
 
-Mephisto II program module:
+Mephisto II/ESB II program module:
 - PCB label: HG 4005 02 301 00
-- 3*TC5334P (4KB ROM)
+- 3*TC5334P (4KB ROM), 4*M2532A on ESB II
 - 2*TC5514P (1KBx4 RAM)
 - 2*CDP1859CE (4bit latch)
 
@@ -93,6 +93,7 @@ public:
 	// machine drivers
 	void mephisto(machine_config &config);
 	void mephisto2(machine_config &config);
+	void mephisto2e(machine_config &config);
 	void mephisto3(machine_config &config);
 
 protected:
@@ -112,6 +113,7 @@ private:
 	// address maps
 	void mephisto_map(address_map &map);
 	void mephisto2_map(address_map &map);
+	void mephisto2e_map(address_map &map);
 	void mephisto3_map(address_map &map);
 	void mephisto_io(address_map &map);
 
@@ -306,6 +308,12 @@ void brikett_state::mephisto2_map(address_map &map)
 	map(0xf000, 0xf3ff).ram();
 }
 
+void brikett_state::mephisto2e_map(address_map &map)
+{
+	mephisto2_map(map);
+	map(0x3000, 0x3fff).rom();
+}
+
 void brikett_state::mephisto3_map(address_map &map)
 {
 	mephisto_map(map);
@@ -362,8 +370,17 @@ static INPUT_PORTS_START( mephisto )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, reset_button, 0)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mephisto3 )
+static INPUT_PORTS_START( mephisto2e )
 	PORT_INCLUDE( mephisto )
+
+	PORT_START("IN.5") // optional
+	PORT_CONFNAME( 0x01, 0x01, "ESB 6000" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mephisto3 )
+	PORT_INCLUDE( mephisto2e )
 
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INFO")
@@ -375,11 +392,6 @@ static INPUT_PORTS_START( mephisto3 )
 	PORT_MODIFY("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right / White / 0")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("MEM")
-
-	PORT_START("IN.5") // optional
-	PORT_CONFNAME( 0x01, 0x01, "ESB 6000" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_MODIFY("IN.4")
 	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, brikett_state, switch_cpu_freq, 0)
@@ -435,13 +447,12 @@ void brikett_state::mephisto2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto2_map);
 }
 
-void brikett_state::mephisto3(machine_config &config)
+void brikett_state::mephisto2e(machine_config &config)
 {
 	mephisto2(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto3_map);
-	m_maincpu->q_cb().set(FUNC(brikett_state::q_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto2e_map);
 	m_maincpu->ef1_cb().set(FUNC(brikett_state::esb_r));
 	m_extport->do_cb().set(FUNC(brikett_state::esb_w));
 
@@ -451,6 +462,16 @@ void brikett_state::mephisto3(machine_config &config)
 
 	m_display->set_size(4+8, 8);
 	config.set_default_layout(layout_mephisto_3);
+}
+
+void brikett_state::mephisto3(machine_config &config)
+{
+	mephisto2e(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_clock(6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto3_map);
+	m_maincpu->q_cb().set(FUNC(brikett_state::q_w));
 }
 
 
@@ -477,11 +498,24 @@ ROM_START( mephisto2 )
 	ROM_LOAD("5621_03_353", 0x2000, 0x1000, CRC(430dac62) SHA1(a0e23fcb4cfa27778a9398bd4994a7792e4541d0) ) // "
 ROM_END
 
+ROM_START( mephisto2e )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("251-11", 0x0000, 0x1000, CRC(3c8e2631) SHA1(5960e47f0659b1e5f164107069738e730e3ff255) ) // M2532A
+	ROM_LOAD("252-10", 0x1000, 0x1000, CRC(832b053e) SHA1(b0dfe857c38f13a4b04ac67a8a46f37c962a8629) ) // "
+	ROM_LOAD("253-09", 0x2000, 0x1000, CRC(00788b63) SHA1(cf94dc19ef85b359989410e7824280c59433fca9) ) // "
+	ROM_LOAD("254-09", 0x3000, 0x1000, CRC(d6be47a6) SHA1(3d577036111c026292b6c445efcb126cf7a6a472) ) // "
+ROM_END
+
 
 ROM_START( mephisto3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101", 0x0000, 0x4000, CRC(923de04f) SHA1(ca7cb3e29aeb3432a815c9d58bb0ed45e7302581) ) // HN4827128G-45
 	ROM_LOAD("201", 0x4000, 0x4000, CRC(0c3cb8fa) SHA1(31449422142c19fc71474a057fc5d6af8a86be7d) ) // "
+ROM_END
+
+ROM_START( mephisto3b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("g81", 0x0000, 0x8000, CRC(7b49475d) SHA1(30193153f0c259294b47e95d3e33834e40a94821) ) // HN613256P
 ROM_END
 
 } // anonymous namespace
@@ -492,7 +526,11 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT CMP MACHINE    INPUT      STATE          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, mephisto,  0,      0, mephisto,  mephisto,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, mephisto2, 0,      0, mephisto2, mephisto,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, mephisto3, 0,      0, mephisto3, mephisto3, brikett_state, empty_init, "Hegener + Glaser", "Mephisto III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    CMP MACHINE     INPUT       STATE          INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1980, mephisto,   0,         0, mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, mephisto2e, mephisto2, 0, mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1983, mephisto3,  0,         0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mephisto3b, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
