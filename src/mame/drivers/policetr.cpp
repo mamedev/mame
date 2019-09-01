@@ -719,6 +719,6 @@ GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b_state, empty_ini
 GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
 
 GAME( 1998, sshooter,    0,        sshooter, policetr, sshooter_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
-GAME( 1998, sshooter17,  sshooter, sshooter, policetr, sshooter_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
+GAME( 1998, sshooter17,  sshooter, sshooter, policetr, sshoot17_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
 GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot12_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot11_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )

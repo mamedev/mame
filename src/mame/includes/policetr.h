@@ -119,7 +119,7 @@ class sshooter_state : public policetr_state
 {
 public:
 	sshooter_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sshooter_state(mconfig, type, tag, 0x1fc03470, 0x00018fd8)
+		: sshooter_state(mconfig, type, tag, 0x1fc03440, 0x00018fd8)
 	{ }
 
 	void sshooter(machine_config &config);
@@ -132,11 +132,27 @@ protected:
 	void mem(address_map &map);
 };
 
+class sshoot17_state : public sshooter_state
+{
+public:
+	sshoot17_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sshooter_state(mconfig, type, tag, 0x1fc03470, 0x00018fd8)
+	{ }
+};
+
 class sshoot12_state : public sshooter_state
 {
 public:
 	sshoot12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sshooter_state(mconfig, type, tag, 0x1fc033e0, 0x00018fd8)
+	{ }
+};
+
+class sshoot11_state : public sshooter_state
+{
+public:
+	sshoot11_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sshooter_state(mconfig, type, tag, 0x1fc032f8, 0x00018fd8)
 	{ }
 };
 
