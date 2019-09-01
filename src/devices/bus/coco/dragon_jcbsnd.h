@@ -32,6 +32,7 @@ protected:
 	virtual memory_region* get_cart_memregion() override;
 
 	virtual DECLARE_READ8_MEMBER(cts_read) override;
+	virtual DECLARE_WRITE8_MEMBER(cts_write) override;
 
 	// internal state
 	device_image_interface *m_cart;
