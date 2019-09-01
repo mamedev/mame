@@ -87,7 +87,7 @@ public:
 	void ladylinr_map(address_map &map);
 	void ladylinrb_decrypted_opcodes_map(address_map &map);
 	void lucky8_map(address_map &map);
-	void lucky8f_decrypted_opcodes_map(address_map &map);
+	void common_decrypted_opcodes_map(address_map &map);
 	void mbstar_map(address_map &map);
 	void megaline_portmap(address_map &map);
 	void ncb3_readwriteport(address_map &map);
@@ -252,6 +252,7 @@ public:
 	void flaming7(machine_config &config);
 	void lucky8(machine_config &config);
 	void lucky8f(machine_config &config);
+	void lucky8k(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);
 	void flam7_w4(machine_config &config);
