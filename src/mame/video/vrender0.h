@@ -16,7 +16,7 @@ class vr0video_device : public device_t,
 public:
 	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_areas(uint8_t *textureram, uint16_t *frameram);
+	void set_areas(uint16_t *textureram, uint16_t *frameram);
 	void regs_map(address_map &map);
 	void execute_drawing();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

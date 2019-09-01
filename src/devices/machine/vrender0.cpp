@@ -46,8 +46,6 @@ vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char
 	m_rspeaker(*this, "rspeaker"),
 	m_uart(*this, "uart%u", 0),
 	m_crtcregs(*this, "crtcregs"),
-	m_textureram(*this, "textureram"),
-	m_frameram(*this, "frameram"),
 	write_tx{ { *this }, { *this } }
 {
 }
@@ -100,8 +98,8 @@ void vrender0soc_device::regs_map(address_map &map)
 void vrender0soc_device::audiovideo_map(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).m(m_vr0vid, FUNC(vr0video_device::regs_map));
-	map(0x00800000, 0x00ffffff).ram().share("textureram");
-	map(0x01000000, 0x017fffff).ram().share("frameram");
+	map(0x00800000, 0x00ffffff).rw(FUNC(vrender0soc_device::textureram_r), FUNC(vrender0soc_device::textureram_w));
+	map(0x01000000, 0x017fffff).rw(FUNC(vrender0soc_device::frameram_r), FUNC(vrender0soc_device::frameram_w));
 	map(0x01800000, 0x01800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
 }
 
@@ -145,8 +143,10 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 void vrender0soc_device::device_start()
 {
 	int i;
+	m_textureram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
+	m_frameram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
 	
-	m_vr0vid->set_areas(reinterpret_cast<uint8_t*>(m_textureram.target()), reinterpret_cast<uint16_t*>(m_frameram.target()));
+	m_vr0vid->set_areas(m_textureram, m_frameram);
 	m_vr0snd->set_areas(m_textureram, m_frameram);
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
@@ -224,6 +224,32 @@ void vrender0soc_device::device_reset()
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
+
+/*
+ *
+ * Texture/FrameRAM 16-bit trampolines
+ *
+ */
+
+READ16_MEMBER(vrender0soc_device::textureram_r)
+{
+	return m_textureram[offset];
+}
+
+WRITE16_MEMBER(vrender0soc_device::textureram_w)
+{
+	COMBINE_DATA(&m_textureram[offset]);
+}
+
+READ16_MEMBER(vrender0soc_device::frameram_r)
+{
+	return m_frameram[offset];
+}
+
+WRITE16_MEMBER(vrender0soc_device::frameram_w)
+{
+	COMBINE_DATA(&m_frameram[offset]);
+}
 
 /*
  *
