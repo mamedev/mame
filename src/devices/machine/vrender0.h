@@ -126,8 +126,8 @@ private:
 	required_device <speaker_device> m_rspeaker;
 	required_device_array <vr0uart_device, 2> m_uart;
 	required_shared_ptr <uint32_t> m_crtcregs;
-	required_shared_ptr <uint32_t> m_textureram;
-	required_shared_ptr <uint32_t> m_frameram;
+	uint16_t *m_textureram;
+	uint16_t *m_frameram;
 	
 	address_space *m_host_space;
 	uint32_t m_ext_vclk;
@@ -188,6 +188,12 @@ private:
 	
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	
+	DECLARE_READ16_MEMBER( textureram_r );
+	DECLARE_WRITE16_MEMBER( textureram_w );
+	DECLARE_READ16_MEMBER( frameram_r );
+	DECLARE_WRITE16_MEMBER( frameram_w );
+
 	
 	// Hacks
 #ifdef IDLE_LOOP_SPEEDUP

@@ -1,10 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:ElSemi
-#include "emu.h"
-#include "vrender0.h"
-
-
-/***********************************
+/*****************************************************************************************
         VRENDER ZERO
         VIDEO EMULATION By ElSemi
 
@@ -16,8 +12,10 @@
     It supports alphablend with programmable factors per channel and for source and dest
     color.
 
-************************************/
+*****************************************************************************************/
 
+#include "emu.h"
+#include "vrender0.h"
 
 /*****************************************************************************
  DEVICE INTERFACE
@@ -157,10 +155,10 @@ void vr0video_device::device_start()
 	save_item(NAME(m_dither_mode));
 }
 
-void vr0video_device::set_areas(uint8_t *textureram, uint16_t *frameram)
+void vr0video_device::set_areas(uint16_t *textureram, uint16_t *frameram)
 {
-	m_textureram = textureram;
-	m_packetram = (uint16_t*)textureram;
+	m_textureram = (uint8_t *)textureram;
+	m_packetram = textureram;
 	m_frameram = frameram;
 }
 
