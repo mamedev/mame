@@ -217,6 +217,7 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/segacrp2_device.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
@@ -940,7 +941,7 @@ void goldstar_state::lucky8_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
-void goldstar_state::lucky8f_decrypted_opcodes_map(address_map &map)
+void goldstar_state::common_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
 }
@@ -8971,7 +8972,17 @@ void wingco_state::lucky8f(machine_config &config)
 {
 	lucky8(config);
 
-	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::lucky8f_decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
+}
+
+void wingco_state::lucky8k(machine_config &config)
+{
+	lucky8(config);
+
+	nec_315_5136_device &maincpu(NEC_315_5136(config.replace(), m_maincpu, CPU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
+	maincpu.set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
 }
 
 void wingco_state::bingowng(machine_config &config)
@@ -17638,7 +17649,7 @@ GAMEL( 1989, lucky8g,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init
 GAMEL( 1991, lucky8h,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Super Turbo (Hack)",                     0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8i,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Eagle/Wing",        "New Lucky 8 Lines (set 9, W-4, Eagle, licensed by Wing)",  0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 199?, lucky8j,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Crown Turbo (Hack)",                     MACHINE_NOT_WORKING,   layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8k,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", MACHINE_NOT_WORKING,   layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8k,   lucky8,   lucky8k,  lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
