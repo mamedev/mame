@@ -37,7 +37,7 @@ T     Trace interval
 Pressing enter will change the prompt from KMD > to KMD+> and pressing
 space will change it back.
 
-mfabfz85 -bios 0 and 3 work; others produce rubbish.
+mfabfz85 -bios 0, 3 and 4 work; others produce rubbish.
 
 Cassette:
 - Like many early designs, the interface is grossly over-complicated, using 12 chips.
@@ -290,7 +290,7 @@ ROM_START( mfabfz85 )
 	ROMX_LOAD( "mfa_mat85_0x2800-0x2fff.bin", 0x2800, 0x0800, CRC(9a6aafa9) SHA1(af897e91cc2ce5d6e49fa88c920ad85e1f0209bf), ROM_BIOS(2) )
 	ROMX_LOAD( "mfa_mat85_0x3000-0x37ff.bin", 0x3000, 0x0800, CRC(eae4e3d5) SHA1(f7112965874417bbfc4a32f31f84e1db83249ab7), ROM_BIOS(2) )
 	ROMX_LOAD( "mfa_mat85_0x3800-0x3fff.bin", 0x3800, 0x0800, CRC(536db0e3) SHA1(328ccc18455f710390c29c0fd0f4b0713a4a69ae), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 3, "16k_set2", "MAT85+ 16k set2" ) // 2400, 7O2, txd-invert
+	ROM_SYSTEM_BIOS( 3, "16k_set2", "MAT85+ 16k set2" ) // 2400, 7N2, txd-invert
 	ROMX_LOAD( "mat85_1_1of8.bin", 0x0000, 0x0800, CRC(73b588ea) SHA1(2b9570fe44c3c19d6aa7c7c11ecf390fa5d48998), ROM_BIOS(3) )
 	ROMX_LOAD( "mat85_2_2of8.bin", 0x0800, 0x0800, CRC(c97acc82) SHA1(eedb27c19a2d21b5ec5bca6cafeb25584e21e500), ROM_BIOS(3) )
 	ROMX_LOAD( "mat85_3_3of8.bin", 0x1000, 0x0800, CRC(c9b91bb4) SHA1(ef829964f507b1f6bbcf3c557c274fe728636efe), ROM_BIOS(3) )
@@ -299,7 +299,7 @@ ROM_START( mfabfz85 )
 	ROMX_LOAD( "soft_2_6of8.bin",  0x2800, 0x0800, CRC(81fc3b24) SHA1(186dbd389fd700c5af1ef7c37948e11701ec596e), ROM_BIOS(3) )
 	ROMX_LOAD( "soft_3_7of8.bin",  0x3000, 0x0800, CRC(eae4e3d5) SHA1(f7112965874417bbfc4a32f31f84e1db83249ab7), ROM_BIOS(3) )
 	ROMX_LOAD( "soft_4_8of8.bin",  0x3800, 0x0800, CRC(536db0e3) SHA1(328ccc18455f710390c29c0fd0f4b0713a4a69ae), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS (4, "32k_dtp", "MAT32K dtp" ) // not working
+	ROM_SYSTEM_BIOS (4, "32k_dtp", "MAT32K dtp" ) // 2400, 7N2, txd-invert
 	ROMX_LOAD( "mfa_mat85_sp1_ed_kpl_dtp_terminal.bin", 0x0000, 0x8000, CRC(ed432c19) SHA1(31cbc06d276dbb201d50967f4ddba26a42560753), ROM_BIOS(4) )
 ROM_END
 
