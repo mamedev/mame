@@ -17,18 +17,15 @@ To-Do/Issues:
 
 Street Fighter 3 2nd Impact uses flipped tilemaps during flashing, emulate this.
 
-Figure out proper IRQ10 generation:
-    If we generate on DMA operations only then Warzard is OK, otherwise it hangs during attract
-    HOWEVER, SFIII2 sometimes has messed up character profiles unless we also generate it periodically.
-    I think the corrupt background on some of the lighting effects may be related to this + the DMA
-    status flags.
+DMA ack IRQ10 generation:
+    Character and Palette DMAs speed is unknown, needs to be measured.
 
 Alpha Blending Effects
     These are actually palette manipulation effects, not true blending.  How the values are used is
     not currently 100% understood.  They are incorrect if you use player 2 in Warzard
 
 Linezoom
-    Is it used anywhere??
+    Is it used in games? May be enabled in jojo/jojoba dev.menu BG test (P2 btn4)
 
 Palette DMA effects
     Verify them, they might not be 100% accurate at the moment
@@ -455,44 +452,91 @@ hardware modification to the security cart.....
 4. That is all. Enjoy your working PCB.
 
 
-Hardware register info
+Hardware registers info
 ----------------------
 
-		PPU CRTC registers (write only)
-		0x040C0060 - 0x040C0081
+		PPU registers (read only)
+		0x040C0000 - 0x040C000D
 
-		Offset:	Bits:				Desc:		Values: 384		495 "wide"
-		60		xxxx xxxx xxxx xxxx	H Sync				42		35
-		62		xxxx xxxx xxxx xxxx	H Start				111		118
-		64		xxxx xxxx xxxx xxxx	H Blank				495		613
-		66		xxxx xxxx xxxx xxxx	H Total*			454		454
-		68		---- --xx xxxx xxxx	H Zoom Master?		0		0		+128 if flip screen, might be not zoom-related but global H scroll
-		6A		xxxx xxxx xxxx xxxx	H Zoom Offset?		0		0
-		6C		---- --xx xxxx xxxx	H Zoom Size?		1023	1023
+		Offset:	Bits:				Desc:
+		0C		---- ---- ---- -2--	Palette DMA active   |
+				---- ---- ---- --1-	Character DMA active | several parts of game code assume only 1 of these might be active at the same time
+				---- ---- ---- ---0	Sprite list DMA/copy active, see register 82 description
+
+		PPU registers (write only)
+		0x040C0000 - 0x040C00AF
+
+		Offset:	Bits:				Desc:
+		00		---- --xx xxxx xxxx Global Scroll 0 X
+		02		---- --xx xxxx xxxx Global Scroll 0 Y
+		04-1F					Global Scrolls 1-7
+		20		xxxx xxxx xxxx xxxx Tilemap 0 Scroll X
+		22		xxxx xxxx xxxx xxxx Tilemap 0 Scroll Y
+		24		xxxx xxxx xxxx xxxx Tilemap 0 ??
+		26		f--- ---- ---- ---- Tilemap 0 Enable
+				-e-- ---- ---- ---- Tilemap 0 Line Scroll Enable
+				--dc ---- ---- ---- Tilemap 0 Line Zoom Enable? (seems unused in games, but might be enabled in jojo dev.menu BG test)
+				---- b--- ---- ---- Tilemap 0 ? Flip X (Warzard demo fights during special moves)
+				---- -a-- ---- ---- Tilemap 0 Flip Y (not implemented, Capcom logos background during sfiii2 flashing)
+		28		-edc ba98 ---- ---- Tilemap 0 Line Scroll and Zoom Base address (1st word is scroll, 2nd word is zoom)
+				---- ---- -654 3210 Tilemap 0 Tiles Base address
+		2A		unused ? always 0
+		2C		unused ? always 0
+		2E		unused ? always 0
+		30-5F					Tilemaps 1-3
+												Values: 384		495 "wide"
+		60		xxxx xxxx xxxx xxxx	H Sync end*			42		35
+		62		xxxx xxxx xxxx xxxx	H Blank end			111		118
+		64		xxxx xxxx xxxx xxxx	H Screen end		495		613
+		66		xxxx xxxx xxxx xxxx	H Total end*		454		454
+		68		---- --xx xxxx xxxx	H ?? Zoom Master?	0		0		+128 if flip screen, might be not zoom-related but global H scroll
+		6A		xxxx xxxx xxxx xxxx	H ?? Zoom Offset?	0		0
+		6C		xxxx xxxx xxxx xxxx	H ?? Zoom Size?		1023	1023	(511 at BIOS init)
 		6E		xxxx xxxx xxxx xxxx	H Zoom Scale		64		64
-		70		xxxx xxxx xxxx xxxx	V Sync				3		3
-		72		xxxx xxxx xxxx xxxx	V Start				21		21
-		74		xxxx xxxx xxxx xxxx	V Blank				245		245
-		76		xxxx xxxx xxxx xxxx	V Total				262		262
-		78		---- --xx xxxx xxxx	V Zoom Master?		0		0		might be not zoom-related but global V scroll
-		7A		xxxx xxxx xxxx xxxx	V Zoom Offset?		0		0
-		7C		---- --xx xxxx xxxx	V Zoom Size?		1023	1023
+		70		xxxx xxxx xxxx xxxx	V Sync end			3		3
+		72		xxxx xxxx xxxx xxxx	V Blank end			21		21
+		74		xxxx xxxx xxxx xxxx	V Screen end		245		245
+		76		xxxx xxxx xxxx xxxx	V Total end			262		262
+		78		---- --xx xxxx xxxx	V ?? Zoom Master?	0		0		might be not zoom-related but global V scroll
+		7A		xxxx xxxx xxxx xxxx	V ?? Zoom Offset?	0		0
+		7C		xxxx xxxx xxxx xxxx	V ?? Zoom Size?		1023	1023	(261 at BIOS init)
 		7E		xxxx xxxx xxxx xxxx	V Zoom Scale		64		64
 		80		---- ---- ---- -210	Pixel clock			3		5		not clear how it works, which OSC is base clock, etc.
 				---- ---- ---4 3---	Flip screen X/Y (or Y/X)
-				---- ---- -65- ----	?? always 11, 00 in unused 24KHz mode (pixel clock divider?)
-				f--- ---- ---- ---- ?? always 0, but there is code which may set it (display disable?)
+				---- ---- --5- ----	?? always set to 1, 0 in unused 24KHz mode (pixel clock divider?)
+				---- ---- -6-- ----	?? set to 0 by BIOS init, then set to 1 after video mode selection, 0 in unused 24KHz mode (pixel clock divider?)
+				f--- ---- ---- ---- ?? always 0, but there is code which may set it
+		82		---- ---- ---- 3--0 Sprite list DMA/copy to onchip RAM ? after new list upload to sprite RAM games write here 8/9/8/9 pattern, then wait until register 0C bit 0 became 0, then write 0.
+		84		---- b--- ---- ---- ?? always set to 0x0800
+		86		---- ---- ---- 3210 Character RAM bank
+		88		---- ---- --54 3210 Gfx flash ROM bank
+		8A		---- ---- ---- ---- ?? set to 0 by BIOS init, never writen later
+		8E		---- ---- 7-5- ---- ?? set to 0x00A0 by BIOS init after Pal/Char DMA registers, never writen later (Char/Pal DMA IRQ enable ?)
+		96		xxxx xxxx xxxx xxxx Character DMA Source low bits
+		98		---- ---- --54 3210 Character DMA Source high bits
+				---- ---- -6-- ---- Character DMA Start
+		A0		---- -a98 7654 3210 Palette DMA Source high bits
+		A2		xxxx xxxx xxxx xxxx Palette DMA Source low bits
+		A4		---- ---- ---- ---0 Palette DMA Destination high bit
+		A6		xxxx xxxx xxxx xxxx Palette DMA Destination low bits
+		A8		-edc ba98 -654 3210 Palette DMA Fade low bits
+		AA		---- ---- -654 3210 Palette DMA Fade high bits
+		AC		xxxx xxxx xxxx xxxx Palette DMA Lenght low bits
+		AE		---- ---- ---- ---0 Palette DMA Lenght high bit
+				---- ---- ---- --1- Palette DMA Start
 
-	(*) H Total value is same for all 15KHz modes, probably uses fixed clock (not affected by pixel clock modifier),
-		perhaps 42.9545MHz/6 ? (/454 = 15768.9Hz /262 = 60.186Hz ?)
-		unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.9545MHz/6 /293 = 24433.7Hz /424 = 57.63Hz ?)
+		All CRTC-related values is last clock/line of given area, i.e. actual sizes is +1 to value.
+
+	(*) H Total value is same for all 15KHz modes, uses fixed clock (not affected by pixel clock modifier),
+		probably 42.954545MHz/6 (similar to SSV) /(454+1) = 15734.25Hz /(262+1) = 59.826Hz
+		unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.954545MHz/6 /(293+1) = 24350.62Hz /(424+1) = 57.29Hz)
 
 
 		'SS' foreground tilemap layer generator (presumable located in 'SSU' chip) registers (write only?)
 		0x05050000 - 0x05050029 area, even bytes only.
 
 		Offset:	Bits:		Desc:	Values: 384		495 "wide"
-		00		xxxx xxxx	H Sync			42		35		same as PPU
+		00		xxxx xxxx	H Sync*			42		35		same as PPU
 		01		xxxx xxxx	H Start L
 		02		xxxx xxxx	H Start H		62		64
 		03		xxxx xxxx	H Blank L
@@ -1656,14 +1700,9 @@ WRITE32_MEMBER(cps3_state::cram_gfxflash_bank_w)
 	}
 }
 
-READ16_MEMBER(cps3_state::gpu_status_r)
+READ16_MEMBER(cps3_state::dma_status_r)
 {
-	// 40c000c GPU DMA? status register
-	// -------- -----2-- Palette DMA? active   |
-	// -------- ------1- Character DMA? active | it seems only 1 of these might be active at the same time
-	// -------- -------0 Sprite DMA active ? games wait it to be 0 after 8/9/8/9/8/9 sequence write to 40C0082 register
-	// it is also possible these bits is not DMA-related but HBLANK/VBLANK/etc statuses.
-	return 0x0000;
+	return m_dma_status;
 }
 
 READ16_MEMBER(cps3_state::dev_dipsw_r)
@@ -1807,7 +1846,8 @@ WRITE32_MEMBER(cps3_state::palettedma_w)
 
 					set_mame_colours((m_paldma_dest+i)^1, coldata, m_paldma_fade);
 				}
-				m_maincpu->set_input_line(10, ASSERT_LINE);
+				m_dma_status |= 4;
+				m_dma_timer->adjust(attotime::from_usec(100)); // delay time is a hack, what is actual DMA speed?
 			}
 		}
 	}
@@ -2023,7 +2063,8 @@ void cps3_state::process_character_dma(u32 address)
 			break;
 		}
 	}
-	m_maincpu->set_input_line(10, ASSERT_LINE);
+	m_dma_status |= 2;
+	m_dma_timer->adjust(attotime::from_usec(100)); // delay time is a hack, what is actual DMA speed?
 }
 
 WRITE32_MEMBER(cps3_state::characterdma_w)
@@ -2094,13 +2135,13 @@ void cps3_state::cps3_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // Bios ROM
 	map(0x02000000, 0x0207ffff).ram().share("mainram"); // Main RAM
-	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (SFIII memory test mode ONLY, and only odd bytes)
+	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (sfiii and warzard memory test mode ONLY, and only odd bytes)
 
 	map(0x04000000, 0x0407ffff).ram().share("spriteram"); // Sprite RAM
 	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w)).share("colourram");  // Colour RAM 0x20000 colours
 	// PPU registers
 	map(0x040c0000, 0x040c0007).nopr(); // ?? warzard reads this but not use values, dev/debug leftovers ?
-	map(0x040c000c, 0x040c000d).r(FUNC(cps3_state::gpu_status_r));
+	map(0x040c000c, 0x040c000d).r(FUNC(cps3_state::dma_status_r));
 
 	map(0x040c0000, 0x040c001f).w(FUNC(cps3_state::ppu_gscroll_w));
 	map(0x040c0020, 0x040c002b).writeonly().share("tmap20_regs");
@@ -2225,11 +2266,10 @@ WRITE_LINE_MEMBER(cps3_state::vbl_interrupt)
 		m_maincpu->set_input_line(12, ASSERT_LINE);
 }
 
-// this seems to need to be periodic (see the life bar portraits in sfiii2
-// but also triggered on certain dma events (or warzard locks up in attract)
-// what is the REAL source of IRQ10??
-INTERRUPT_GEN_MEMBER(cps3_state::irq10_periodic)
+// Test cases: character portraits screen after character select in sfiii2, warzard attract title.
+TIMER_DEVICE_CALLBACK_MEMBER(cps3_state::dma_interrupt)
 {
+	m_dma_status &= ~6;
 	m_maincpu->set_input_line(10, ASSERT_LINE);
 }
 
@@ -2454,7 +2494,6 @@ void cps3_state::cps3(machine_config &config)
 	SH2(config, m_maincpu, 6250000*4); // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps3_state::cps3_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps3_state::decrypted_opcodes_map);
-	m_maincpu->set_periodic_int(FUNC(cps3_state::irq10_periodic), attotime::from_hz(80)); /* ?source? */
 	m_maincpu->set_dma_kludge_callback(FUNC(cps3_state::dma_callback));
 
 	NSCSI_BUS(config, "scsi");
@@ -2466,7 +2505,7 @@ void cps3_state::cps3(machine_config &config)
 	screen.set_raw(XTAL(60'000'000)/8, 486, 0, 384, 259, 0, 224);
 	screen.set_screen_update(FUNC(cps3_state::screen_update));
 	screen.screen_vblank().set(FUNC(cps3_state::vbl_interrupt));
-	/*
+/*
     Measured clocks:
         V = 59.5992Hz
         H = 15.4335kHz
@@ -2476,6 +2515,8 @@ void cps3_state::cps3(machine_config &config)
         60MHz       / 15.4335kHz = 3887.647 / 8 = 485.956 ~ 486 -> likely
          42.9545MHz / 15.4445kHz = 2781.217 / 6 = 463.536 -> unlikely
 */
+
+	TIMER(config, m_dma_timer).configure_generic(FUNC(cps3_state::dma_interrupt));
 
 	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
 	PALETTE(config, m_palette).set_entries(0x10000); // actually 0x20000 ...

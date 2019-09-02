@@ -14,6 +14,7 @@
 #include "machine/intelfsh.h"
 #include "cpu/sh/sh2.h"
 #include "audio/cps3.h"
+#include "machine/timer.h"
 #include "emupal.h"
 
 
@@ -26,6 +27,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_cps3sound(*this, "cps3sound")
+		, m_dma_timer(*this, "dma_timer")
 		, m_simm{{*this, "simm1.%u", 0U},
 				 {*this, "simm2.%u", 0U},
 				 {*this, "simm3.%u", 0U},
@@ -85,6 +87,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<cps3_sound_device> m_cps3sound;
+	required_device<timer_device> m_dma_timer;
 	optional_device_array<fujitsu_29f016a_device, 8> m_simm[7];
 
 	required_shared_ptr<u32> m_mainram;
@@ -119,6 +122,7 @@ private:
 	u32 m_key1;
 	u32 m_key2;
 	int m_altEncryption;
+	u16 m_dma_status;
 	u32 m_cram_bank;
 	u16 m_current_eeprom_read;
 	u32 m_paldma_source;
@@ -149,7 +153,7 @@ private:
 	DECLARE_WRITE32_MEMBER(flash1_w);
 	DECLARE_WRITE32_MEMBER(flash2_w);
 	DECLARE_WRITE32_MEMBER(cram_gfxflash_bank_w);
-	DECLARE_READ16_MEMBER(gpu_status_r);
+	DECLARE_READ16_MEMBER(dma_status_r);
 	DECLARE_READ16_MEMBER(dev_dipsw_r);
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
@@ -163,7 +167,7 @@ private:
 	void draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	WRITE_LINE_MEMBER(vbl_interrupt);
-	INTERRUPT_GEN_MEMBER(irq10_periodic);
+	TIMER_DEVICE_CALLBACK_MEMBER(dma_interrupt);
 	u16 rotate_left(u16 value, int n);
 	u16 rotxor(u16 val, u16 xorval);
 	u32 cps3_mask(u32 address, u32 key1, u32 key2);
