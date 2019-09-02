@@ -1,10 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:ElSemi
-#include "emu.h"
-#include "vrender0.h"
-
-
-/***********************************
+/*****************************************************************************************
         VRENDER ZERO
         VIDEO EMULATION By ElSemi
 
@@ -16,8 +12,17 @@
     It supports alphablend with programmable factors per channel and for source and dest
     color.
 
-************************************/
+	TODO:
+	- Dither Mode;
+	- Draw select to Front buffer is untested, speculatively gonna be used for raster 
+	  effects;
+	- screen_update doesn't honor CRT Display Start registers,
+	  so far only psattack changes it on-the-fly, for unknown reasons;
 
+*****************************************************************************************/
+
+#include "emu.h"
+#include "vrender0.h"
 
 /*****************************************************************************
  DEVICE INTERFACE
@@ -28,7 +33,6 @@ DEFINE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device, "vr0video", "MagicEyes VRend
 vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIDEO_VRENDER0, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_idleskip_cb(*this)
 
 {
@@ -158,9 +162,10 @@ void vr0video_device::device_start()
 	save_item(NAME(m_dither_mode));
 }
 
-void vr0video_device::set_areas(uint8_t *textureram, uint16_t *frameram)
+void vr0video_device::set_areas(uint16_t *textureram, uint16_t *frameram)
 {
-	m_textureram = textureram;
+	m_textureram = (uint8_t *)textureram;
+	m_packetram = textureram;
 	m_frameram = frameram;
 }
 
@@ -172,6 +177,8 @@ void vr0video_device::device_reset()
 {
 	memset(m_InternalPalette, 0, sizeof(m_InternalPalette));
 	m_LastPalUpdate = 0xffffffff;
+	
+	m_DisplayDest = m_DrawDest = m_frameram;
 }
 
 /*****************************************************************************
@@ -495,22 +502,21 @@ static const _DrawTemplate DrawTile[]=
 	TILENAME(16,1,2),
 };
 
-#define Packet(i) space.read_word(PacketPtr + 2 * i)
-
 //Returns true if the operation was a flip (sync or async)
 // TODO: async loading actually doesn't stop rendering but just flips the render bank
-int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
+int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 {
-	// TODO: this need to be removed
-	address_space &space = m_cpu->space(AS_PROGRAM);
+	uint16_t *Packet = m_packetram;
 	uint8_t *TEXTURE = m_textureram;
 
-	uint32_t Dx = Packet(1) & 0x3ff;
-	uint32_t Dy = Packet(2) & 0x1ff;
-	uint32_t Endx = Packet(3) & 0x3ff;
-	uint32_t Endy = Packet(4) & 0x1ff;
+	Packet += PacketPtr;
+
+	uint32_t Dx = Packet[1] & 0x3ff;
+	uint32_t Dy = Packet[2] & 0x1ff;
+	uint32_t Endx = Packet[3] & 0x3ff;
+	uint32_t Endy = Packet[4] & 0x1ff;
 	uint32_t Mode = 0;
-	uint16_t Packet0 = Packet(0);
+	uint16_t Packet0 = Packet[0];
 
 	if (Packet0 & 0x81) //Sync or ASync flip
 	{
@@ -520,8 +526,8 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 
 	if (Packet0 & 0x200)
 	{
-		m_RenderState.Tx = Packet(5) | ((Packet(6) & 0x1f) << 16);
-		m_RenderState.Ty = Packet(7) | ((Packet(8) & 0x1f) << 16);
+		m_RenderState.Tx = Packet[5] | ((Packet[6] & 0x1f) << 16);
+		m_RenderState.Ty = Packet[7] | ((Packet[8] & 0x1f) << 16);
 	}
 	else
 	{
@@ -530,10 +536,10 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 	}
 	if (Packet0 & 0x400)
 	{
-		m_RenderState.Txdx = Packet(9)  | ((Packet(10) & 0x1f) << 16);
-		m_RenderState.Tydx = Packet(11) | ((Packet(12) & 0x1f) << 16);
-		m_RenderState.Txdy = Packet(13) | ((Packet(14) & 0x1f) << 16);
-		m_RenderState.Tydy = Packet(15) | ((Packet(16) & 0x1f) << 16);
+		m_RenderState.Txdx = Packet[9]  | ((Packet[10] & 0x1f) << 16);
+		m_RenderState.Tydx = Packet[11] | ((Packet[12] & 0x1f) << 16);
+		m_RenderState.Txdy = Packet[13] | ((Packet[14] & 0x1f) << 16);
+		m_RenderState.Tydy = Packet[15] | ((Packet[16] & 0x1f) << 16);
 	}
 	else
 	{
@@ -544,25 +550,25 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 	}
 	if (Packet0 & 0x800)
 	{
-		m_RenderState.SrcAlphaColor = Packet(17) | ((Packet(18) & 0xff) << 16);
-		m_RenderState.SrcBlend = (Packet(18) >> 8) & 0x3f;
-		m_RenderState.DstAlphaColor = Packet(19) | ((Packet(20) & 0xff) << 16);
-		m_RenderState.DstBlend = (Packet(20) >> 8) & 0x3f;
+		m_RenderState.SrcAlphaColor = Packet[17] | ((Packet[18] & 0xff) << 16);
+		m_RenderState.SrcBlend = (Packet[18] >> 8)	& 0x3f;
+		m_RenderState.DstAlphaColor = Packet[19] | ((Packet[20] & 0xff) << 16);
+		m_RenderState.DstBlend = (Packet[20] >> 8) & 0x3f;
 	}
 	if (Packet0 & 0x1000)
-		m_RenderState.ShadeColor = Packet(21) | ((Packet(22) & 0xff) << 16);
+		m_RenderState.ShadeColor = Packet[21] | ((Packet[22] & 0xff) << 16);
 	if (Packet0 & 0x2000)
-		m_RenderState.TransColor = Packet(23) | ((Packet(24) & 0xff) << 16);
+		m_RenderState.TransColor = Packet[23] | ((Packet[24] & 0xff) << 16);
 	if (Packet0 & 0x4000)
 	{
-		m_RenderState.TileOffset = Packet(25);
-		m_RenderState.FontOffset = Packet(26);
-		m_RenderState.PalOffset = Packet(27) >> 3;
-		m_RenderState.PaletteBank = (Packet(28) >> 8) & 0xf;
-		m_RenderState.TextureMode = Packet(28) & 0x1000;
-		m_RenderState.PixelFormat = (Packet(28) >> 6) & 3;
-		m_RenderState.Width  = 8 << ((Packet(28) >> 0) & 0x7);
-		m_RenderState.Height = 8 << ((Packet(28) >> 3) & 0x7);
+		m_RenderState.TileOffset = Packet[25];
+		m_RenderState.FontOffset = Packet[26];
+		m_RenderState.PalOffset = Packet[27] >> 3;
+		m_RenderState.PaletteBank = (Packet[28] >> 8) & 0xf;
+		m_RenderState.TextureMode = Packet[28] & 0x1000;
+		m_RenderState.PixelFormat = (Packet[28] >> 6) & 3;
+		m_RenderState.Width  = 8 << ((Packet[28] >> 0) & 0x7);
+		m_RenderState.Height = 8 << ((Packet[28] >> 3) & 0x7);
 	}
 
 	if (Packet0 & 0x40 && m_RenderState.PalOffset != m_LastPalUpdate)
@@ -574,6 +580,8 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 		{
 			uint32_t p = Pal[i];
 			uint16_t v = RGB32TO16(p);
+			// TODO: this is most likely an artifact of not emulating the dither modes,
+			//       and it's wrong anyway: topbladv gameplay fighters sports a slighty visible square shadow block.
 			if ((v == Trans && p != m_RenderState.TransColor) || v == NOTRANSCOLOR)  //Error due to conversion. caused transparent
 			{
 				if ((v & 0x1f) != 0x1f)
@@ -608,7 +616,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 		Quad.w = 1 + Endx - Dx;
 		Quad.h = 1 + Endy - Dy;
 
-		Quad.Dest = (uint16_t*) Dest;
+		Quad.Dest = m_DrawDest;
 		Quad.Dest = Quad.Dest + Dx + (Dy * Quad.Pitch);
 
 		Quad.Tx = m_RenderState.Tx;
@@ -647,6 +655,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 				Quad.Pal = m_InternalPalette + (m_RenderState.PaletteBank * 16);
 			else
 				Quad.Pal = m_InternalPalette;
+				
 			if (m_RenderState.TextureMode)   //Tiled
 				DrawTile[m_RenderState.PixelFormat + 4 * Mode](&Quad);
 			else
@@ -658,14 +667,13 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 	return 0;
 }
 
-void vr0video_device::execute_drawing()
+void vr0video_device::execute_flipping()
 {
 	if (m_render_start == false)
 		return;
 
 	uint32_t B0 = 0x000000;
 	uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
-	uint16_t *DrawDest;
 	uint16_t *Front, *Back;
 	int DoFlip = 0;
 
@@ -680,11 +688,12 @@ void vr0video_device::execute_drawing()
 		Back  = (m_frameram + B1);
 	}
 
-	DrawDest = ((m_draw_select == true) ? Front : Back);
+	m_DrawDest = ((m_draw_select == true) ? Front : Back);
+	m_DisplayDest = Front;
 
 	while ((m_queue_rear & 0x7ff) != (m_queue_front & 0x7ff))
 	{
-		DoFlip = vrender0_ProcessPacket(0x03800000 + m_queue_rear * 64, DrawDest);
+		DoFlip = vrender0_ProcessPacket(m_queue_rear * 32);
 		m_queue_rear ++;
 		m_queue_rear &= 0x7ff;
 		if (DoFlip)
@@ -703,20 +712,11 @@ void vr0video_device::execute_drawing()
 
 uint32_t vr0video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *Visible;
 	const uint32_t width = cliprect.width();
-
-	uint32_t B0 = 0x000000;
-	uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
-
-	if (m_display_bank & 1)
-		Visible = (m_frameram + B1);
-	else
-		Visible = (m_frameram + B0);
 
 	uint32_t const dx = cliprect.left();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		std::copy_n(&Visible[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
+		std::copy_n(&m_DisplayDest[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
 
 	return 0;
 }

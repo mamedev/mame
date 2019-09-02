@@ -8,7 +8,10 @@
 
     TODO:
     - Compact Flash hookup;
-    - Enables wavetable IRQ;
+	- Requires timed based FIFO renderer, loops until both rear and front 
+	  are equal.
+    - Enables wavetable IRQ, even if so far no channel enables the submask;
+	- Unemulated 93C86 EEPROM device;
 
 =============================================================================
 
@@ -127,15 +130,9 @@ GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/vrender0.h"
-#include "sound/vrender0.h"
-#include "video/vrender0.h"
+#include "machine/ataintf.h"
 #include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
 
-#include <algorithm>
-
-#define IDLE_LOOP_SPEEDUP
 
 class psattack_state : public driver_device
 {
@@ -143,13 +140,9 @@ public:
 	psattack_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
-		m_textureram(*this, "textureram"),
-		m_frameram(*this, "frameram"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc"),
-		m_vr0vid(*this, "vr0vid"),
-		m_vr0snd(*this, "vr0snd"),
-		m_screen(*this, "screen")
+		m_ata(*this, "ata")
 	{ }
 
 
@@ -160,75 +153,51 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_workram;
-	required_shared_ptr<uint32_t> m_textureram;
-	required_shared_ptr<uint32_t> m_frameram;
 
 	/* devices */
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
-	required_device<vr0video_device> m_vr0vid;
-	required_device<vr0sound_device> m_vr0snd;
-	required_device<screen_device> m_screen;
-
-#ifdef IDLE_LOOP_SPEEDUP
-	uint8_t     m_FlipCntRead;
-	DECLARE_WRITE_LINE_MEMBER(idle_skip_resume_w);
-	DECLARE_WRITE_LINE_MEMBER(idle_skip_speedup_w);
-#endif
+	required_device<ata_interface_device> m_ata;
 
 	IRQ_CALLBACK_MEMBER(icallback);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void psattack_mem(address_map &map);
+	
+	DECLARE_READ16_MEMBER(cfcard_data_r);
+	DECLARE_READ8_MEMBER(cfcard_regs_r);
+	DECLARE_WRITE8_MEMBER(cfcard_regs_w);
+	DECLARE_WRITE32_MEMBER(output_w);
 };
-
-uint32_t psattack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if (m_vr0soc->crt_is_blanked()) // Blank Screen
-	{
-		bitmap.fill(0, cliprect);
-		return 0;
-	}
-
-	m_vr0vid->screen_update(screen, bitmap, cliprect);
-	return 0;
-}
-
-WRITE_LINE_MEMBER(psattack_state::screen_vblank)
-{
-	// rising edge
-	if (state)
-	{
-		if (m_vr0soc->crt_active_vblank_irq() == true)
-			m_vr0soc->IntReq(24);      //VRender0 VBlank
-
-		m_vr0vid->execute_drawing();
-	}
-}
 
 IRQ_CALLBACK_MEMBER(psattack_state::icallback)
 {
 	return m_vr0soc->irq_callback();
 }
 
-#ifdef IDLE_LOOP_SPEEDUP
-WRITE_LINE_MEMBER(psattack_state::idle_skip_resume_w)
+// TODO: wrong, likely PIC protected too
+READ8_MEMBER( psattack_state::cfcard_regs_r )
 {
-	m_FlipCntRead = 0;
-	m_maincpu->resume(SUSPEND_REASON_SPIN);
+	return m_ata->read_cs0(offset & 7, 0x000000ff);
 }
 
-WRITE_LINE_MEMBER(psattack_state::idle_skip_speedup_w)
+WRITE8_MEMBER( psattack_state::cfcard_regs_w )
 {
-	m_FlipCntRead++;
-	if (m_FlipCntRead >= 16 && m_vr0soc->irq_pending() == false && state == ASSERT_LINE)
-		m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
+	m_ata->write_cs0(offset & 7, 0x000000ff);
 }
-#endif
 
+READ16_MEMBER( psattack_state::cfcard_data_r )
+{
+	return m_ata->read_cs0(0, 0x0000ffff);
+}
+
+WRITE32_MEMBER( psattack_state::output_w )
+{
+	// suppress logging for now
+	if (data)
+		logerror("output_w: %08x & %08x\n",data,mem_mask);
+}
 
 void psattack_state::psattack_mem(address_map &map)
 {
@@ -236,20 +205,21 @@ void psattack_state::psattack_mem(address_map &map)
 
 	//   0x1400c00, 0x1400c01 read cfcard memory (auto increment?)
 	//   0x1402800, 0x1402807 read/write regs?
-	//   0x1802410, 0x1802413 peripheral chip select for above
-	map(0x01500000, 0x01500003).portr("IN0");
+	// cf card interface
+	map(0x01400c00, 0x01400c01).r(FUNC(psattack_state::cfcard_data_r));
+	map(0x01402800, 0x01402807).rw(FUNC(psattack_state::cfcard_regs_r), FUNC(psattack_state::cfcard_regs_w));
+
+	map(0x01500000, 0x01500003).portr("IN0").w(FUNC(psattack_state::output_w));
 	map(0x01500004, 0x01500007).portr("IN1");
 	map(0x01500008, 0x0150000b).portr("IN2");
-	//0x0150000c is prolly eeprom
+//	0x0150000c is prolly eeprom
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
+//  map(0x01802410, 0x01802413) peripheral chip select for cf?
 
 	map(0x02000000, 0x027fffff).ram().share("workram");
 
-	map(0x03000000, 0x0300ffff).m(m_vr0vid, FUNC(vr0video_device::regs_map));
-	map(0x03800000, 0x03ffffff).ram().share("textureram");
-	map(0x04000000, 0x047fffff).ram().share("frameram");
-	map(0x04800000, 0x04800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
+	map(0x03000000, 0x04ffffff).m(m_vr0soc, FUNC(vrender0soc_device::audiovideo_map));
 }
 
 static INPUT_PORTS_START( psattack )
@@ -265,19 +235,12 @@ INPUT_PORTS_END
 
 void psattack_state::machine_start()
 {
-	m_vr0vid->set_areas(reinterpret_cast<uint8_t*>(m_textureram.target()), reinterpret_cast<uint16_t*>(m_frameram.target()));
-	m_vr0snd->set_areas(m_textureram, m_frameram);
-
-#ifdef IDLE_LOOP_SPEEDUP
-	save_item(NAME(m_FlipCntRead));
-#endif
+	// ...
 }
 
 void psattack_state::machine_reset()
 {
-#ifdef IDLE_LOOP_SPEEDUP
-	m_FlipCntRead = 0;
-#endif
+	// ...
 }
 
 void psattack_state::psattack(machine_config &config)
@@ -286,31 +249,13 @@ void psattack_state::psattack(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &psattack_state::psattack_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(psattack_state::icallback));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// evolution soccer defaults
-	m_screen->set_raw((XTAL(14'318'180)*2)/4, 455, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(psattack_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(psattack_state::screen_vblank));
-	m_screen->set_palette("palette");
+	// PIC16C711
 
-	VRENDER0_SOC(config, m_vr0soc, 0);
+	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
-	m_vr0soc->set_host_screen_tag(m_screen);
+	m_vr0soc->set_external_vclk(XTAL(25'175'000)); // assumed from the only available XTal on PCB
 
-	VIDEO_VRENDER0(config, m_vr0vid, 14318180, m_maincpu);
-	#ifdef IDLE_LOOP_SPEEDUP
-	m_vr0soc->idleskip_cb().set(FUNC(psattack_state::idle_skip_resume_w));
-	m_vr0vid->idleskip_cb().set(FUNC(psattack_state::idle_skip_speedup_w));
-	#endif
-
-	PALETTE(config, "palette", palette_device::RGB_565);
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	SOUND_VRENDER0(config, m_vr0snd, 0);
-	m_vr0snd->add_route(0, "lspeaker", 1.0);
-	m_vr0snd->add_route(1, "rspeaker", 1.0);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 }
 
 ROM_START( psattack )
@@ -321,8 +266,8 @@ ROM_START( psattack )
 	ROM_LOAD("16c711.pic",  0x0000, 0x137b, CRC(617d8292) SHA1(d32d6054ce9db2e31efaf41015afcc78ed32f6aa) ) // raw dump
 	ROM_LOAD("16c711.bin",  0x0000, 0x4010, CRC(b316693f) SHA1(eba1f75043bd415268eedfdb95c475e73c14ff86) ) // converted to binary
 
-	DISK_REGION( "cfcard" )
-	DISK_IMAGE_READONLY( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
 ROM_END
 
 void psattack_state::init_psattack()

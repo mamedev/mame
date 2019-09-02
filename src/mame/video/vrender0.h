@@ -14,17 +14,11 @@ class vr0video_device : public device_t,
 						public device_video_interface
 {
 public:
-	template <typename T> vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: vr0video_device(mconfig, tag, owner, clock)
-	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-	}
-
 	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_areas(uint8_t *textureram, uint16_t *frameram);
+	void set_areas(uint16_t *textureram, uint16_t *frameram);
 	void regs_map(address_map &map);
-	void execute_drawing();
+	void execute_flipping();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	auto idleskip_cb() { return m_idleskip_cb.bind(); }
 
@@ -37,9 +31,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	int vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest);
+	int vrender0_ProcessPacket(uint32_t PacketPtr);
 
-	required_device<cpu_device> m_cpu;
 	devcb_write_line  m_idleskip_cb;
 
 	struct RenderStateInfo
@@ -73,6 +66,7 @@ private:
 	RenderStateInfo m_RenderState;
 
 	uint8_t *m_textureram;
+	uint16_t *m_packetram;
 	uint16_t *m_frameram;
 
 	DECLARE_READ16_MEMBER( cmd_queue_front_r );
@@ -83,18 +77,22 @@ private:
 
 	DECLARE_READ16_MEMBER( bank1_select_r );
 	DECLARE_WRITE16_MEMBER( bank1_select_w );
-	bool m_bank1_select;
+	bool m_bank1_select;		//!< Select framebuffer bank1 address
 
 	DECLARE_READ16_MEMBER( display_bank_r );
-	uint8_t m_display_bank;
+	uint8_t m_display_bank;		//!< Current display bank
 
 	DECLARE_READ16_MEMBER( render_control_r );
 	DECLARE_WRITE16_MEMBER( render_control_w );
-	bool m_draw_select;
-	bool m_render_reset;
-	bool m_render_start;
-	uint8_t m_dither_mode;
-	uint8_t m_flip_count;
+	bool m_draw_select;			//!< If true, device draws to Front buffer instead of Back
+	bool m_render_reset;		//!< Reset pipeline FIFO
+	bool m_render_start;		//!< Enable pipeline processing
+	uint8_t m_dither_mode;		//!< applied on RGB888 to RGB565 conversions (00: 2x2, 01:4x4, 1x disable)
+	uint8_t m_flip_count;		//!< number of framebuffer "syncs" loaded in the parameter RAM,
+								//!< a.k.a. how many full (vblank) buffers are ready for the device to parse.
+	
+	uint16_t *m_DrawDest;		//!< frameram pointer to draw buffer area
+	uint16_t *m_DisplayDest;	//!< frameram pointer to display buffer area
 };
 
 DECLARE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device)
