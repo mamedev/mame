@@ -12,6 +12,13 @@
     It supports alphablend with programmable factors per channel and for source and dest
     color.
 
+	TODO:
+	- Dither Mode;
+	- Draw select to Front buffer is untested, speculatively gonna be used for raster 
+	  effects;
+	- screen_update doesn't honor CRT Display Start registers,
+	  so far only psattack changes it on-the-fly, for unknown reasons
+
 *****************************************************************************************/
 
 #include "emu.h"
@@ -170,6 +177,8 @@ void vr0video_device::device_reset()
 {
 	memset(m_InternalPalette, 0, sizeof(m_InternalPalette));
 	m_LastPalUpdate = 0xffffffff;
+	
+	m_DisplayDest = m_DrawDest = m_frameram;
 }
 
 /*****************************************************************************
@@ -571,6 +580,8 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 		{
 			uint32_t p = Pal[i];
 			uint16_t v = RGB32TO16(p);
+			// TODO: this is most likely an artifact of not emulating the dither modes,
+			//       and it's wrong anyway: topbladv gameplay fighters sports a slighty visible square shadow block.
 			if ((v == Trans && p != m_RenderState.TransColor) || v == NOTRANSCOLOR)  //Error due to conversion. caused transparent
 			{
 				if ((v & 0x1f) != 0x1f)
@@ -663,7 +674,6 @@ void vr0video_device::execute_drawing()
 
 	uint32_t B0 = 0x000000;
 	uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
-	uint16_t *DrawDest;
 	uint16_t *Front, *Back;
 	int DoFlip = 0;
 
@@ -678,11 +688,12 @@ void vr0video_device::execute_drawing()
 		Back  = (m_frameram + B1);
 	}
 
-	DrawDest = ((m_draw_select == true) ? Front : Back);
+	m_DrawDest = ((m_draw_select == true) ? Front : Back);
+	m_DisplayDest = Front;
 
 	while ((m_queue_rear & 0x7ff) != (m_queue_front & 0x7ff))
 	{
-		DoFlip = vrender0_ProcessPacket(m_queue_rear * 32, DrawDest);
+		DoFlip = vrender0_ProcessPacket(m_queue_rear * 32, m_DrawDest);
 		m_queue_rear ++;
 		m_queue_rear &= 0x7ff;
 		if (DoFlip)
@@ -701,20 +712,11 @@ void vr0video_device::execute_drawing()
 
 uint32_t vr0video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *Visible;
 	const uint32_t width = cliprect.width();
-
-	uint32_t B0 = 0x000000;
-	uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
-
-	if (m_display_bank & 1)
-		Visible = (m_frameram + B1);
-	else
-		Visible = (m_frameram + B0);
 
 	uint32_t const dx = cliprect.left();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		std::copy_n(&Visible[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
+		std::copy_n(&m_DisplayDest[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
 
 	return 0;
 }
