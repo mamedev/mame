@@ -20,6 +20,11 @@ Note:   Police Trainer v1.3B runs on the same revision PCB as Sharpshooter - Rev
 Note:   Police Trainer v1.0 (Rev 0.2 PCB), the checksum results in MAME have been
         verified to be the same as an original PCB.
 
+Note:   All versions of Police Trainer "claim" to be version 1.5 both in an audio sample
+        and during the demo routine the screen shows: POLICE TRAINER   VERSION 1.5
+        The actual version can be verified by checking the labels or in the service mode.
+        To date, no version higher then v1.3B has been found and v1.2 has NEVER been seen.
+
 To ID the version of your SharpShooter, check the 2nd printed line on each type of ROM.
 
 Program Roms:  C121012 - Code version 1.2, Graphics v1.0 & Sound v1.2
@@ -458,85 +463,85 @@ void sshooter_state::sshooter(machine_config &config)
  *
  *************************************/
 
-ROM_START( policetr ) /* Rev 0.3 PCB , with all chips dated 04/01/97 */
+ROM_START( policetr ) /* Rev 0.3 PCB , with the program chips dated 04/01/97 */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
-	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
-	ROM_LOAD16_BYTE( "pt-u125.bin", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
-	ROM_LOAD16_BYTE( "pt-u124.bin", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
+	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) ) // mask ROM labeled: U125   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) ) // mask ROM labeled: U124   POLICE TRAINER   P&P MARKETING
 
 	ROM_REGION32_BE( 0x80000, "maincpu", 0 )
-	ROM_LOAD32_BYTE( "pt-u113.bin", 0x00000, 0x20000, CRC(7b34d366) SHA1(b86cfe155e0685992aebbcc7db705fdbadc42bf9) )
-	ROM_LOAD32_BYTE( "pt-u112.bin", 0x00001, 0x20000, CRC(57d059c8) SHA1(ed0c624fc0afbeb6616bba8a67ce5b18d7c119fc) )
-	ROM_LOAD32_BYTE( "pt-u111.bin", 0x00002, 0x20000, CRC(fb5ce933) SHA1(4a07ac3e2d86262061092f112cab89f8660dce3d) )
-	ROM_LOAD32_BYTE( "pt-u110.bin", 0x00003, 0x20000, CRC(40bd6f60) SHA1(156000d3c439eab45962f0a2681bd806a17f47ee) )
+	ROM_LOAD32_BYTE( "1.3_4-1-97_u113_a707.u113", 0x00000, 0x20000, CRC(7b34d366) SHA1(b86cfe155e0685992aebbcc7db705fdbadc42bf9) ) // labeled: 1.3  4/1/97   U113  A707, later versions are known to be labeled: Police Trainer v1.3   U113  A707
+	ROM_LOAD32_BYTE( "1.3_4-1-97_u112_381c.u112", 0x00001, 0x20000, CRC(57d059c8) SHA1(ed0c624fc0afbeb6616bba8a67ce5b18d7c119fc) ) // labeled: 1.3  4/1/97   U112  381C, later versions are known to be labeled: Police Trainer v1.3   U112  381C
+	ROM_LOAD32_BYTE( "1.3_4-1-97_u111_e96e.u111", 0x00002, 0x20000, CRC(fb5ce933) SHA1(4a07ac3e2d86262061092f112cab89f8660dce3d) ) // labeled: 1.3  4/1/97   U111  E96E, later versions are known to be labeled: Police Trainer v1.3   U111  E96E
+	ROM_LOAD32_BYTE( "1.3_4-1-97_u110_a2fd.u110", 0x00003, 0x20000, CRC(40bd6f60) SHA1(156000d3c439eab45962f0a2681bd806a17f47ee) ) // labeled: 1.3  4/1/97   U110  A2FD, later versions are known to be labeled: Police Trainer v1.3   U110  A2FD
 
 	ROM_REGION( 0x1000000, "bsmt", 0 )
-	ROM_LOAD( "pt-u160.bin", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) )
-	ROM_RELOAD(              0x3f8000, 0x100000 )
-	ROM_LOAD( "pt-u162.bin", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) )
-	ROM_RELOAD(              0x4f8000, 0x100000 )
+	ROM_LOAD( "u160_police_trainer_p-p_marketing.u160", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) ) // mask ROM labeled: U160   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x3f8000, 0x100000 )
+	ROM_LOAD( "u162_police_trainer_p-p_marketing.u162", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) ) // mask ROM labeled: U162   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x4f8000, 0x100000 )
 ROM_END
 
 
-ROM_START( policetr11 ) /* Rev 0.3 PCB with all chips dated 01/06/97 */
+ROM_START( policetr11 ) /* Rev 0.3 PCB with the program chips dated 01/06/97 */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
-	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
-	ROM_LOAD16_BYTE( "pt-u125.bin", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
-	ROM_LOAD16_BYTE( "pt-u124.bin", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
+	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) ) // mask ROM labeled: U125   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) ) // mask ROM labeled: U124   POLICE TRAINER   P&P MARKETING
 
 	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  /* 2MB for R3000 code */
-	ROM_LOAD32_BYTE( "pt-u113.v11", 0x00000, 0x20000, CRC(3d62f6d6) SHA1(342ffa38a6972bbb03c89b4dd603c2cc60609d3d) )
-	ROM_LOAD32_BYTE( "pt-u112.v11", 0x00001, 0x20000, CRC(942b280b) SHA1(c342ba3255203ce28ff59479da00f26f0bd026e0) )
-	ROM_LOAD32_BYTE( "pt-u111.v11", 0x00002, 0x20000, CRC(da6c45a7) SHA1(471bd372d2ad5bcb29af19dae09f3cfab4b010fd) )
-	ROM_LOAD32_BYTE( "pt-u110.v11", 0x00003, 0x20000, CRC(f1c8a8c0) SHA1(8a2d1ada002be6f2a3c2d21d193e7cde6531545a) )
+	ROM_LOAD32_BYTE( "1.1_1-6-97_u113_87a7.u113", 0x00000, 0x20000, CRC(3d62f6d6) SHA1(342ffa38a6972bbb03c89b4dd603c2cc60609d3d) ) // labeled: 1.1  1/6/97   U113 87A7
+	ROM_LOAD32_BYTE( "1.1_1-6-97_u112_9bdb.u112", 0x00001, 0x20000, CRC(942b280b) SHA1(c342ba3255203ce28ff59479da00f26f0bd026e0) ) // labeled: 1.1  1/6/97   U112 9BDB
+	ROM_LOAD32_BYTE( "1.1_1-6-97_u111_7aa2.u111", 0x00002, 0x20000, CRC(da6c45a7) SHA1(471bd372d2ad5bcb29af19dae09f3cfab4b010fd) ) // labeled: 1.1  1/6/97   U111 7AA2
+	ROM_LOAD32_BYTE( "1.1_1-6-97_u110_ac17.u110", 0x00003, 0x20000, CRC(f1c8a8c0) SHA1(8a2d1ada002be6f2a3c2d21d193e7cde6531545a) ) // labeled: 1.1  1/6/97   U110 AC17
 
 	ROM_REGION( 0x1000000, "bsmt", 0 )
-	ROM_LOAD( "pt-u160.bin", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) )
-	ROM_RELOAD(              0x3f8000, 0x100000 )
-	ROM_LOAD( "pt-u162.bin", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) )
-	ROM_RELOAD(              0x4f8000, 0x100000 )
+	ROM_LOAD( "u160_police_trainer_p-p_marketing.u160", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) ) // mask ROM labeled: U160   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x3f8000, 0x100000 )
+	ROM_LOAD( "u162_police_trainer_p-p_marketing.u162", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) ) // mask ROM labeled: U162   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x4f8000, 0x100000 )
 ROM_END
 
 
-ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96 */
+ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96, there is no mention of version on any chip */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
 	/* Same data as the other sets, but split in 4 meg roms */
-	ROM_LOAD16_BYTE( "pt-u121.v10", 0x000000, 0x080000, CRC(9d31e805) SHA1(482f38e07ddb758e1fb444af7b56a0ef6ea945c8) )
-	ROM_LOAD16_BYTE( "pt-u120.v10", 0x000001, 0x080000, CRC(b03b9d46) SHA1(2bb8fcb1df09aa762b98adf2e1edd186203746c0) )
-	ROM_LOAD16_BYTE( "pt-u123.v10", 0x100000, 0x080000, CRC(80557cf1) SHA1(ba96fd5b6673b382013e1810a36edb827caaff4b) )
-	ROM_LOAD16_BYTE( "pt-u122.v10", 0x100001, 0x080000, CRC(eca09f41) SHA1(bbb1466d39c09598899a3f50b3bb8f9d58b274ec) )
-	ROM_LOAD16_BYTE( "pt-u125.v10", 0x200000, 0x080000, CRC(24bddc51) SHA1(6d7c85dba47c675c65e1cb751d581af0d2c678ad) )
-	ROM_LOAD16_BYTE( "pt-u124.v10", 0x200001, 0x080000, CRC(f1a43dee) SHA1(2c0aa894e148315168239c7df391ef1f2b4d32a1) )
-	ROM_LOAD16_BYTE( "pt-u127.v10", 0x300000, 0x080000, CRC(5031ea1e) SHA1(c1f9272f9874150d510f22c44c186fad0ed3a7e4) )
-	ROM_LOAD16_BYTE( "pt-u126.v10", 0x300001, 0x080000, CRC(33bf2653) SHA1(357da2da7df417109adbf600f3455c224f6c076f) )
+	ROM_LOAD16_BYTE( "u121_10-7-96.u121", 0x000000, 0x080000, CRC(9d31e805) SHA1(482f38e07ddb758e1fb444af7b56a0ef6ea945c8) ) // labeled: U121   10/7/96
+	ROM_LOAD16_BYTE( "u120_10-7-96.u120", 0x000001, 0x080000, CRC(b03b9d46) SHA1(2bb8fcb1df09aa762b98adf2e1edd186203746c0) ) // labeled: U120   10/7/96
+	ROM_LOAD16_BYTE( "u123_10-7-96.u123", 0x100000, 0x080000, CRC(80557cf1) SHA1(ba96fd5b6673b382013e1810a36edb827caaff4b) ) // labeled: U123   10/7/96
+	ROM_LOAD16_BYTE( "u122_10-7-96.u122", 0x100001, 0x080000, CRC(eca09f41) SHA1(bbb1466d39c09598899a3f50b3bb8f9d58b274ec) ) // labeled: U122   10/7/96
+	ROM_LOAD16_BYTE( "u125_10-7-96.u125", 0x200000, 0x080000, CRC(24bddc51) SHA1(6d7c85dba47c675c65e1cb751d581af0d2c678ad) ) // labeled: U125   10/7/96
+	ROM_LOAD16_BYTE( "u124_10-7-96.u124", 0x200001, 0x080000, CRC(f1a43dee) SHA1(2c0aa894e148315168239c7df391ef1f2b4d32a1) ) // labeled: U124   10/7/96
+	ROM_LOAD16_BYTE( "u127_10-7-96.u127", 0x300000, 0x080000, CRC(5031ea1e) SHA1(c1f9272f9874150d510f22c44c186fad0ed3a7e4) ) // labeled: U127   10/7/96
+	ROM_LOAD16_BYTE( "u126_10-7-96.u126", 0x300001, 0x080000, CRC(33bf2653) SHA1(357da2da7df417109adbf600f3455c224f6c076f) ) // labeled: U126   10/7/96
 
 	ROM_REGION32_BE( 0x80000, "maincpu", 0 )  /* 2MB for R3000 code */
-	ROM_LOAD32_BYTE( "pt-u113.v10", 0x00000, 0x20000, CRC(3e27a0ce) SHA1(0d010da68f950a10a74eddc57941e4c0e2144071) )
-	ROM_LOAD32_BYTE( "pt-u112.v10", 0x00001, 0x20000, CRC(fcbcf4ca) SHA1(374291600043cfbbd87260b12961ac6d68caeda0) )
-	ROM_LOAD32_BYTE( "pt-u111.v10", 0x00002, 0x20000, CRC(61f79667) SHA1(25298cd8706b5c59f7c9e0f8d44db0df73c23403) )
-	ROM_LOAD32_BYTE( "pt-u110.v10", 0x00003, 0x20000, CRC(5c3c1548) SHA1(aab977274ecff7cb5fd540a3d0da7940e9707906) )
+	ROM_LOAD32_BYTE( "u113_10-7-96.u113", 0x00000, 0x20000, CRC(3e27a0ce) SHA1(0d010da68f950a10a74eddc57941e4c0e2144071) ) // labeled: U113   10/7/96
+	ROM_LOAD32_BYTE( "u112_10-7-96.u112", 0x00001, 0x20000, CRC(fcbcf4ca) SHA1(374291600043cfbbd87260b12961ac6d68caeda0) ) // labeled: U112   10/7/96
+	ROM_LOAD32_BYTE( "u111_10-7-96.u111", 0x00002, 0x20000, CRC(61f79667) SHA1(25298cd8706b5c59f7c9e0f8d44db0df73c23403) ) // labeled: U111   10/7/96
+	ROM_LOAD32_BYTE( "u110_10-7-96.u110", 0x00003, 0x20000, CRC(5c3c1548) SHA1(aab977274ecff7cb5fd540a3d0da7940e9707906) ) // labeled: U110   10/7/96
 
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	/* Same data as the other sets, but split in 4 meg roms */
-	ROM_LOAD( "pt-u160.v10", 0x000000, 0x080000, CRC(cd374405) SHA1(e53689d4344c78c3faac22747ada28bc3add8c56) )
-	ROM_RELOAD(              0x3f8000, 0x080000 )
-	ROM_LOAD( "pt-u161.v10", 0x080000, 0x080000, CRC(c33e3497) SHA1(a7d488f04bba3f1b884b0df210c3793f41967d73) )
-	ROM_RELOAD(              0x478000, 0x080000 )
-	ROM_LOAD( "pt-u162.v10", 0x100000, 0x080000, CRC(e7e02312) SHA1(ac92b8615b18528820a40dad025173e9f24072bf) )
-	ROM_RELOAD(              0x4f8000, 0x080000 )
-	ROM_LOAD( "pt-u163.v10", 0x180000, 0x080000, CRC(a45b3f85) SHA1(21965dcf89e04d5ee21e27eefd6baa34d6d4479a) )
-	ROM_RELOAD(              0x578000, 0x080000 )
+	ROM_LOAD( "u160_10-7-96.u160", 0x000000, 0x080000, CRC(cd374405) SHA1(e53689d4344c78c3faac22747ada28bc3add8c56) ) // labeled: U160   10/7/96
+	ROM_RELOAD(                    0x3f8000, 0x080000 )
+	ROM_LOAD( "u161_10-7-96.u161", 0x080000, 0x080000, CRC(c33e3497) SHA1(a7d488f04bba3f1b884b0df210c3793f41967d73) ) // labeled: U161   10/7/96
+	ROM_RELOAD(                    0x478000, 0x080000 )
+	ROM_LOAD( "u162_10-7-96.u162", 0x100000, 0x080000, CRC(e7e02312) SHA1(ac92b8615b18528820a40dad025173e9f24072bf) ) // labeled: U162   10/7/96
+	ROM_RELOAD(                    0x4f8000, 0x080000 )
+	ROM_LOAD( "u163_10-7-96.u163", 0x180000, 0x080000, CRC(a45b3f85) SHA1(21965dcf89e04d5ee21e27eefd6baa34d6d4479a) ) // labeled: U163   10/7/96
+	ROM_RELOAD(                    0x578000, 0x080000 )
 ROM_END
 
 
 ROM_START( policetr13a ) /* Rev 0.5B PCB , unknown program rom date. Actual version is V1.3B */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
-	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
-	ROM_LOAD16_BYTE( "pt-u125.bin", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
-	ROM_LOAD16_BYTE( "pt-u124.bin", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
+	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) ) // mask ROM labeled: U125   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) ) // mask ROM labeled: U124   POLICE TRAINER   P&P MARKETING
 
 	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) /* Program roms are type 27C020 */
 /*
@@ -549,25 +554,25 @@ Note: With this version, the program roms are twice the size of those found on a
 
       This set has also been found using mask roms for the program roms which would indicate it was the final version.
 */
-	ROM_LOAD32_BYTE( "pt-av13.u113", 0x00000, 0x40000, CRC(909c052d) SHA1(23bd4849261ee5cc2414a4043ee929ccf1bd6806) ) /* Checksum printed on label  FB46 */
-	ROM_LOAD32_BYTE( "pt-av13.u112", 0x00001, 0x40000, CRC(f9dc9ca8) SHA1(52de7bc8c9aa7834d953b9f9e2a65e06f8042f0a) ) /* Checksum printed on label  201D */
-	ROM_LOAD32_BYTE( "pt-av13.u111", 0x00002, 0x40000, CRC(8c4f3a64) SHA1(4953e6fc26bae7d6e7c7230f4ca76e3f5032af14) ) /* Checksum printed on label  F343 */
-	ROM_LOAD32_BYTE( "pt-av13.u110", 0x00003, 0x40000, CRC(738a8277) SHA1(423a9bcecb82959f38ae79a0728d72eb13ed93b3) ) /* Checksum printed on label  050C */
+	ROM_LOAD32_BYTE( "police_trainer_av1.3_u113_fb46.u113", 0x00000, 0x40000, CRC(909c052d) SHA1(23bd4849261ee5cc2414a4043ee929ccf1bd6806) ) // labeled: Police Trainer   Av1.3   U113  FB46
+	ROM_LOAD32_BYTE( "police_trainer_av1.3_u112_201d.u112", 0x00001, 0x40000, CRC(f9dc9ca8) SHA1(52de7bc8c9aa7834d953b9f9e2a65e06f8042f0a) ) // labeled: Police Trainer   Av1.3   U112  201D
+	ROM_LOAD32_BYTE( "police_trainer_av1.3_u111_f343.u111", 0x00002, 0x40000, CRC(8c4f3a64) SHA1(4953e6fc26bae7d6e7c7230f4ca76e3f5032af14) ) // labeled: Police Trainer   Av1.3   U111  F343
+	ROM_LOAD32_BYTE( "police_trainer_av1.3_u110_050c.u110", 0x00003, 0x40000, CRC(738a8277) SHA1(423a9bcecb82959f38ae79a0728d72eb13ed93b3) ) // labeled: Police Trainer   Av1.3   U110  050C
 
 	ROM_REGION( 0x1000000, "bsmt", 0 )
-	ROM_LOAD( "pt-u160.bin", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) )
-	ROM_RELOAD(              0x3f8000, 0x100000 )
-	ROM_LOAD( "pt-u162.bin", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) )
-	ROM_RELOAD(              0x4f8000, 0x100000 )
+	ROM_LOAD( "u160_police_trainer_p-p_marketing.u160", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) ) // mask ROM labeled: U160   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x3f8000, 0x100000 )
+	ROM_LOAD( "u162_police_trainer_p-p_marketing.u162", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) ) // mask ROM labeled: U162   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x4f8000, 0x100000 )
 ROM_END
 
 
 ROM_START( policetr13b ) /* Rev 0.5B PCB , unknown program rom date Actual version is V1.3B */
 	ROM_REGION( 0x400000, "gfx", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "pt-u121.bin", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) )
-	ROM_LOAD16_BYTE( "pt-u120.bin", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) )
-	ROM_LOAD16_BYTE( "pt-u125.bin", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) )
-	ROM_LOAD16_BYTE( "pt-u124.bin", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) )
+	ROM_LOAD16_BYTE( "u121_police_trainer_p-p_marketing.u121", 0x000000, 0x100000, CRC(56b0b00a) SHA1(4034fe373a61f756f4813f0c20b1cf05e4338059) ) // mask ROM labeled: U121   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u120_police_trainer_p-p_marketing.u120", 0x000001, 0x100000, CRC(ca664142) SHA1(2727ecb9287b4ed30088e017bb6b8763dfb75b2f) ) // mask ROM labeled: U120   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u125_police_trainer_p-p_marketing.u125", 0x200000, 0x100000, CRC(e9ccf3a0) SHA1(b3fd8c094f76ace4cf403c3d0f6bd6c5d8db7d6a) ) // mask ROM labeled: U125   POLICE TRAINER   P&P MARKETING
+	ROM_LOAD16_BYTE( "u124_police_trainer_p-p_marketing.u124", 0x200001, 0x100000, CRC(f4acf921) SHA1(5b244e9a51304318fa0c03eb7365b3c12627d19b) ) // mask ROM labeled: U124   POLICE TRAINER   P&P MARKETING
 
 	ROM_REGION32_BE( 0x100000, "maincpu", 0 ) /* Program roms are type 27C010 */
 /*
@@ -577,23 +582,23 @@ Note: If you set the dipswitch to service mode and reset the game within Mame. A
 
       The program rom checksum in the diagnostic screen is 17551773
 */
-	ROM_LOAD32_BYTE( "ptb-u113.v13", 0x00000, 0x20000, CRC(d636c00d) SHA1(ef989eb85b51a64ca640297c1286514c8d7f8f76) ) /* Checksum printed on label  CB73 */
-	ROM_LOAD32_BYTE( "ptb-u112.v13", 0x00001, 0x20000, CRC(86f0497e) SHA1(d177023f7cb2e01de60ef072212836dc94759c1a) ) /* Checksum printed on label  974C */
-	ROM_LOAD32_BYTE( "ptb-u111.v13", 0x00002, 0x20000, CRC(39e96d6a) SHA1(efe6ffe70432b94c98f3d7247408a6d2f6f9e33d) ) /* Checksum printed on label  E5F1 */
-	ROM_LOAD32_BYTE( "ptb-u110.v13", 0x00003, 0x20000, CRC(d7e6f4cb) SHA1(9dffe4937bc5cf47d870f06ae0dced362cd2dd66) ) /* Checksum printed on label  556D */
+	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u113_CB73.u113", 0x00000, 0x20000, CRC(d636c00d) SHA1(ef989eb85b51a64ca640297c1286514c8d7f8f76) ) // labeled: Police Trainer   v1.3B   U113  CB73
+	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u112_974c.u112", 0x00001, 0x20000, CRC(86f0497e) SHA1(d177023f7cb2e01de60ef072212836dc94759c1a) ) // labeled: Police Trainer   v1.3B   U113  974C
+	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u111_e5f1.u111", 0x00002, 0x20000, CRC(39e96d6a) SHA1(efe6ffe70432b94c98f3d7247408a6d2f6f9e33d) ) // labeled: Police Trainer   v1.3B   U113  E5F1
+	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u110_556d.u110", 0x00003, 0x20000, CRC(d7e6f4cb) SHA1(9dffe4937bc5cf47d870f06ae0dced362cd2dd66) ) // labeled: Police Trainer   v1.3B   U113  556D
 
 	ROM_REGION( 0x1000000, "bsmt", 0 )
-	ROM_LOAD( "ss-u160.bin", 0x000000, 0x100000, CRC(1c603d42) SHA1(880992871be52129684052d542946de0cc32ba9a) ) // U160 1:1  S12  030398 ECIE:4791  SharpShooter
-	ROM_RELOAD(              0x3f8000, 0x100000 )
-	ROM_LOAD( "ss-u162.bin", 0x100000, 0x100000, CRC(40ef448a) SHA1(c96f7b169be2576e9f3783af84c07259efefb812) ) // U162 2:1  S12  030398 ECIE:D722  SharpShooter
-	ROM_RELOAD(              0x4f8000, 0x100000 )
+	ROM_LOAD( "u160_police_trainer_p-p_marketing.u160", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) ) // mask ROM labeled: U160   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x3f8000, 0x100000 )
+	ROM_LOAD( "u162_police_trainer_p-p_marketing.u162", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) ) // mask ROM labeled: U162   POLICE TRAINER   P&P MARKETING
+	ROM_RELOAD(                                         0x4f8000, 0x100000 )
 ROM_END
 
 
 ROM_START( sshooter ) /* Rev 0.5B PCB , Added a "Welcome" start-up screen which shows "This is Version C191012" */
 	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
-	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 2:2   G10   021998 ECIE:3395   SharpShooter
+	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
 	ROM_LOAD16_BYTE( "u125_2-1_g10_021998_ecie-4584_sharpshooter.u125", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // U125 2:1   G10   021998 ECIE:4584   SharpShooter
 	ROM_LOAD16_BYTE( "u124_2-2_g10_021998_ecie-c816_sharpshooter.u124", 0x200001, 0x100000, CRC(8e805970) SHA1(bfc9940ed6425f136d768170275279c590da7003) ) // U124 2:2   G10   021998 ECIE:C816   SharpShooter
 	ROM_LOAD16_BYTE( "u123_3-1_g10_021998_ecie-4167_sharpshooter.u123", 0x400000, 0x100000, CRC(d045bb62) SHA1(839209ff6a8e5db63a51a3494a6c973e0068a3c6) ) // U123 3:1   G10   021998 ECIE:4167   SharpShooter
@@ -618,7 +623,7 @@ ROM_END
 ROM_START( sshooter17 ) /* Rev 0.5B PCB , unknown program rom date */
 	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
-	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 2:2   G10   021998 ECIE:3395   SharpShooter
+	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
 	ROM_LOAD16_BYTE( "u125_2-1_g10_021998_ecie-4584_sharpshooter.u125", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // U125 2:1   G10   021998 ECIE:4584   SharpShooter
 	ROM_LOAD16_BYTE( "u124_2-2_g10_021998_ecie-c816_sharpshooter.u124", 0x200001, 0x100000, CRC(8e805970) SHA1(bfc9940ed6425f136d768170275279c590da7003) ) // U124 2:2   G10   021998 ECIE:C816   SharpShooter
 	ROM_LOAD16_BYTE( "u123_3-1_g10_021998_ecie-4167_sharpshooter.u123", 0x400000, 0x100000, CRC(d045bb62) SHA1(839209ff6a8e5db63a51a3494a6c973e0068a3c6) ) // U123 3:1   G10   021998 ECIE:4167   SharpShooter
@@ -643,7 +648,7 @@ ROM_END
 ROM_START( sshooter12 ) /* Rev 0.5B PCB , program roms dated 04/17/98 */
 	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
-	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 2:2   G10   021998 ECIE:3395   SharpShooter
+	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
 	ROM_LOAD16_BYTE( "u125_2-1_g10_021998_ecie-4584_sharpshooter.u125", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // U125 2:1   G10   021998 ECIE:4584   SharpShooter
 	ROM_LOAD16_BYTE( "u124_2-2_g10_021998_ecie-c816_sharpshooter.u124", 0x200001, 0x100000, CRC(8e805970) SHA1(bfc9940ed6425f136d768170275279c590da7003) ) // U124 2:2   G10   021998 ECIE:C816   SharpShooter
 	ROM_LOAD16_BYTE( "u123_3-1_g10_021998_ecie-4167_sharpshooter.u123", 0x400000, 0x100000, CRC(d045bb62) SHA1(839209ff6a8e5db63a51a3494a6c973e0068a3c6) ) // U123 3:1   G10   021998 ECIE:4167   SharpShooter
@@ -668,7 +673,7 @@ ROM_END
 ROM_START( sshooter11 ) /* Rev 0.5B PCB , program roms dated 04/03/98 */
 	ROM_REGION( 0x800000, "gfx", ROMREGION_ERASE00 ) /* Graphics v1.0 */
 	ROM_LOAD16_BYTE( "u121_1-1_g10_021998_ecie-9418_sharpshooter.u121", 0x000000, 0x100000, CRC(22e27dd6) SHA1(cb9e8c450352bb116a9c0407cc8ce6d8ae9d9881) ) // U121 1:1   G10   021998 ECIE:9418   SharpShooter
-	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 2:2   G10   021998 ECIE:3395   SharpShooter
+	ROM_LOAD16_BYTE( "u120_1-2_g10_021998_ecie-3395_sharpshooter.u120", 0x000001, 0x100000, CRC(30173b1b) SHA1(366464444ce208391ca350f1639403f0c2217330) ) // U120 1:2   G10   021998 ECIE:3395   SharpShooter
 	ROM_LOAD16_BYTE( "u125_2-1_g10_021998_ecie-4584_sharpshooter.u125", 0x200000, 0x100000, CRC(79e8520a) SHA1(682e5c7954f96db65a137f05cde67c310b85b526) ) // U125 2:1   G10   021998 ECIE:4584   SharpShooter
 	ROM_LOAD16_BYTE( "u124_2-2_g10_021998_ecie-c816_sharpshooter.u124", 0x200001, 0x100000, CRC(8e805970) SHA1(bfc9940ed6425f136d768170275279c590da7003) ) // U124 2:2   G10   021998 ECIE:C816   SharpShooter
 	ROM_LOAD16_BYTE( "u123_3-1_g10_021998_ecie-4167_sharpshooter.u123", 0x400000, 0x100000, CRC(d045bb62) SHA1(839209ff6a8e5db63a51a3494a6c973e0068a3c6) ) // U123 3:1   G10   021998 ECIE:4167   SharpShooter
