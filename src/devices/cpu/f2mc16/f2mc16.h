@@ -478,6 +478,8 @@ private:
 	void opcodes_ea76(u8 operand);
 	void opcodes_ea77(u8 operand);
 	void opcodes_ea78(u8 operand);
+	void opcodes_rwi7a(u8 operand);
+	void opcodes_rwi7b(u8 operand);
 
 	void set_irq(int vector, int level);
 	void clear_irq(int vector);

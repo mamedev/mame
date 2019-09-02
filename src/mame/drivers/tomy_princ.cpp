@@ -75,17 +75,45 @@ private:
 	required_device<mb90611_device> m_maincpu;
 	required_device<timer_device> m_scantimer;
 
+	virtual void machine_reset() override;
+
 	TIMER_DEVICE_CALLBACK_MEMBER(scan_interrupt);
 
 	void princ_map(address_map &map);
 
+	u8 read_gpu_status();
+
 	uint32_t screen_update_tomy_princ(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	bool bFirstPort8Read;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(tomy_princ_state::scan_interrupt)
 {
-	m_maincpu->tin0_w(ASSERT_LINE);
-	m_maincpu->tin0_w(CLEAR_LINE);
+	for (int i = 0; i < 128; i++)
+	{
+		m_maincpu->tin0_w(ASSERT_LINE);
+		m_maincpu->tin0_w(CLEAR_LINE);
+	}
+
+	m_maincpu->tin1_w(ASSERT_LINE);
+	m_maincpu->tin1_w(CLEAR_LINE);
+}
+
+void tomy_princ_state::machine_reset()
+{
+	bFirstPort8Read = true;
+}
+
+u8 tomy_princ_state::read_gpu_status()
+{
+	if (bFirstPort8Read)
+	{
+		bFirstPort8Read = false;
+		return 0x20;
+	}
+
+	return 0x00;
 }
 
 uint32_t tomy_princ_state::screen_update_tomy_princ(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -96,7 +124,9 @@ uint32_t tomy_princ_state::screen_update_tomy_princ(screen_device &screen, bitma
 // fe2d25
 void tomy_princ_state::princ_map(address_map &map)
 {
-	map(0x000008, 0x000008).lr8("free1", []() -> u8 { return 0x20; });	// else init function fails and princ goes into an infinite loop
+	map(0x000001, 0x000001).lw8("free2", [](u8 data) { return 0xff; });
+	map(0x000008, 0x000008).r(FUNC(tomy_princ_state::read_gpu_status));
+	map(0x68ff00, 0x68ff00).lw8("free1", [this](u8 data) { bFirstPort8Read = true; });
 	map(0x68ff44, 0x68ff44).lr8("free0", [this]() -> u8 { return m_screen->vblank() ? 0x11 : 0x10; });
 	map(0xe00000, 0xe07fff).ram();  // stacks are placed here
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0x00000);

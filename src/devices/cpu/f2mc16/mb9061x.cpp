@@ -263,6 +263,7 @@ void mb9061x_device::tin_common(int timer, int base, int state)
 			{
 				u8 ctl = m_timer_regs[base];
 				m_timer_regs[base] |= TCTL_UF;
+				//printf("Timer %d exp, CL %02x\n", timer, m_timer_regs[base]);
 				if (ctl & TCTL_INTE)
 				{
 					//printf("timer %d IRQ\n", timer);
