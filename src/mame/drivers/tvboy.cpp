@@ -92,7 +92,6 @@ void tvboy_state::tvboyii(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31);
 	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
-	m_screen->set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
