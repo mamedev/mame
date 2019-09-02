@@ -710,7 +710,7 @@ WRITE_LINE_MEMBER(vrender0soc_device::screen_vblank)
 		if (crt_active_vblank_irq() == true)
 			IntReq(24);      //VRender0 VBlank
 
-		m_vr0vid->execute_drawing();
+		m_vr0vid->execute_flipping();
 	}
 }
 
