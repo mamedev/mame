@@ -2441,7 +2441,7 @@ ROM_START( drgninjab )
 	/* various graphic and sound roms also differ when compared to baddudes */
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
-	// ROM_LOAD( "eg25.15h",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) ) has been verfied
+	// ROM_LOAD( "eg25.15h",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) ) has been verified
 	//  correct for the above drgninja set and dumped from an original DECO PCB with the original label intact.
 	// ROM_LOAD( "eg25.bin",  0x00000, 0x08000, CRC(dd557b19) SHA1(ce1e76aeb7e147f373bb48dbc1becc1601953499) ) has the unused
 	//  'Bad Dudes' logo partially erased, and a bad pixel on the left arrow character.
