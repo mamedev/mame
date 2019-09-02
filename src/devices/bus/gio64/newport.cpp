@@ -913,34 +913,34 @@ void rb2_device::deserialize(FILE *file)
 
 uint32_t rb2_device::expand_to_all_lanes(uint32_t src)
 {
-    switch (m_draw_depth) {
-    case 0:
-        src |= src << 4;
-        src |= src << 8;
-        src |= src << 16;
-        break;
-    case 1:
-        src |= src << 8;
-        src |= src << 16;
-        break;
-    case 2:
-        src |= src << 12;
-        break;
-    case 3:
-        break;
-    }
-    switch (m_plane_enable)
-    {
-    case 1: // RGB/CI
-    case 2: // RGBA
-    case 6: // CID
-        return src;
-    case 4: // OLAY
-        return src << 8;
-    case 5: // PUP
-        return src << 2;
-    }
-    return src;
+	switch (m_draw_depth) {
+	case 0:
+		src |= src << 4;
+		src |= src << 8;
+		src |= src << 16;
+		break;
+	case 1:
+		src |= src << 8;
+		src |= src << 16;
+		break;
+	case 2:
+		src |= src << 12;
+		break;
+	case 3:
+		break;
+	}
+	switch (m_plane_enable)
+	{
+	case 1: // RGB/CI
+	case 2: // RGBA
+	case 6: // CID
+		return src;
+	case 4: // OLAY
+		return src << 8;
+	case 5: // PUP
+		return src << 2;
+	}
+	return src;
 }
 
 void rb2_device::set_write_mask(uint32_t data)
@@ -2372,10 +2372,10 @@ void newport_base_device::output_pixel(int16_t x, int16_t y, uint32_t color)
 
 	const uint32_t address = (uint32_t)(y * (1280 + 64) + x);
 	m_set_address(address);
-    if (BIT(m_rex3.m_draw_mode1, 18))
-        blend_pixel(color);
-    else
-	    m_write_pixel(color);
+	if (BIT(m_rex3.m_draw_mode1, 18))
+		blend_pixel(color);
+	else
+		m_write_pixel(color);
 }
 
 void newport_base_device::blend_pixel(uint32_t src)
@@ -3268,27 +3268,27 @@ uint32_t newport_base_device::get_default_color(uint32_t src)
 		case 0: // 4bpp
 			color &= 0xf;
 			color |= color << 4;
-            color |= color << 8;
-            color |= color << 16;
+			color |= color << 8;
+			color |= color << 16;
 			break;
 		case 1: // 8bpp
 			color &= 0xff;
-            color |= color << 8;
-            color |= color << 16;
+			color |= color << 8;
+			color |= color << 16;
 			break;
 		case 2: // 12bpp
 			if (BIT(m_rex3.m_draw_mode1, 15))
 				color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-            else
-                color &= 0x00000fff;
-            color |= color << 12;
+			else
+				color &= 0x00000fff;
+			color |= color << 12;
 			break;
 		case 3: // 24bpp
 			color = m_rex3.m_color_vram & 0xffffff;
 			break;
 	}
 
-    return color;
+	return color;
 }
 
 void newport_base_device::do_rex3_command()
