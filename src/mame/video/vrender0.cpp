@@ -17,7 +17,7 @@
 	- Draw select to Front buffer is untested, speculatively gonna be used for raster 
 	  effects;
 	- screen_update doesn't honor CRT Display Start registers,
-	  so far only psattack changes it on-the-fly, for unknown reasons
+	  so far only psattack changes it on-the-fly, for unknown reasons;
 
 *****************************************************************************************/
 
@@ -504,7 +504,7 @@ static const _DrawTemplate DrawTile[]=
 
 //Returns true if the operation was a flip (sync or async)
 // TODO: async loading actually doesn't stop rendering but just flips the render bank
-int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
+int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 {
 	uint16_t *Packet = m_packetram;
 	uint8_t *TEXTURE = m_textureram;
@@ -616,7 +616,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 		Quad.w = 1 + Endx - Dx;
 		Quad.h = 1 + Endy - Dy;
 
-		Quad.Dest = (uint16_t*) Dest;
+		Quad.Dest = m_DrawDest;
 		Quad.Dest = Quad.Dest + Dx + (Dy * Quad.Pitch);
 
 		Quad.Tx = m_RenderState.Tx;
@@ -667,7 +667,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest)
 	return 0;
 }
 
-void vr0video_device::execute_drawing()
+void vr0video_device::execute_flipping()
 {
 	if (m_render_start == false)
 		return;
@@ -693,7 +693,7 @@ void vr0video_device::execute_drawing()
 
 	while ((m_queue_rear & 0x7ff) != (m_queue_front & 0x7ff))
 	{
-		DoFlip = vrender0_ProcessPacket(m_queue_rear * 32, m_DrawDest);
+		DoFlip = vrender0_ProcessPacket(m_queue_rear * 32);
 		m_queue_rear ++;
 		m_queue_rear &= 0x7ff;
 		if (DoFlip)

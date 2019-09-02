@@ -18,7 +18,7 @@ public:
 
 	void set_areas(uint16_t *textureram, uint16_t *frameram);
 	void regs_map(address_map &map);
-	void execute_drawing();
+	void execute_flipping();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	auto idleskip_cb() { return m_idleskip_cb.bind(); }
 
@@ -31,7 +31,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	int vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest);
+	int vrender0_ProcessPacket(uint32_t PacketPtr);
 
 	devcb_write_line  m_idleskip_cb;
 
