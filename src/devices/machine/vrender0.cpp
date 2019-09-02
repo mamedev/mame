@@ -499,7 +499,7 @@ READ32_MEMBER(vrender0soc_device::crtc_r)
 
 WRITE32_MEMBER(vrender0soc_device::crtc_w)
 {
-	if (((m_crtcregs[0] & 0x0100) == 0x0100) && (offset > 0)) // Write protect
+	if (((m_crtcregs[0] & 0x0100) == 0x0100) && (offset > 0) && (offset < 0x28/4)) // Write protect
 		return;
 
 	uint32_t old = m_crtcregs[offset];
