@@ -34,14 +34,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-/* void genpc_state::pc8_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0xfc000, 0xfffff).rom().region("bios", 0);
-}
-
-*/
-
 void genpc_state::pc8_map(address_map &map)
 {
 	map.unmap_value_high();
