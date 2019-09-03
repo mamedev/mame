@@ -35104,4 +35104,24 @@
 		</part>
 	</software>
 
+	<software name="cb123q">
+		<description>Charlie Brown's 1, 2, 3's (1990 Queue re-release) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2019-09-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="charlie brown's 1, 2, 3's (1990 re-release)(4am crack) side a.dsk" size="143360" crc="62ff3f40" sha1="c7cd861c9000a6169cc8e14af661ba7cb02227a1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="charlie brown's 1, 2, 3's (1990 re-release)(4am crack) side b.dsk" size="143360" crc="4b8a2eb6" sha1="61fe7bb3f9e88c430a743c39ed6f378539eff31a" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
