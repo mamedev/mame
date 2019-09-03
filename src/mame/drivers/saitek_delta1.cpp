@@ -3,9 +3,8 @@
 // thanks-to:Berger
 /******************************************************************************
 
-SciSys Delta-1, the chess engine seems similar to Boris (see aci_boris.cpp)
-It was sold by both Novag and SciSys, ROM has "COPY RIGHT WINKLER HK 1979",
-Winkler was the founder of SciSys(later renamed to Saitek).
+SciSys Delta-1, it was sold by both Novag and SciSys, ROM has "COPY RIGHT WINKLER
+HK 1979", Winkler was the founder of SciSys(later renamed to Saitek).
 
 Hardware notes:
 - 3850PK CPU at ~2MHz, 3853PK memory interface
