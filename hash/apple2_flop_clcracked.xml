@@ -35025,4 +35025,83 @@
 		</part>
 	</software>
 
+	<software name="glschred">
+		<description>Professor Davensteev's Galaxy Search: Red Level (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Learning Well</publisher>
+		<info name="release" value="2019-08-24"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="galaxy search - red level (4am crack).dsk" size="143360" crc="d673e271" sha1="a8c1ca0c80c3560805aa501d10f08bbd321229a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glschblu">
+		<description>Professor Davensteev's Galaxy Search: Blue Level (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Learning Well</publisher>
+		<info name="release" value="2019-08-24"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="galaxy search - blue level (4am crack).dsk" size="143360" crc="b3d86651" sha1="fed5df3a9a3e57d829cd44c7491096f94b2b45b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metstbkm">
+		<description>MicroExam Test Bank for Computer Mathematics: Structured BASIC with Math Applications (Version 1.01) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>South-Western Publishing</publisher>
+		<info name="release" value="2019-08-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Master"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microexam test bank for computer mathematics- structured basic with math applications (4am crack) disk 1 - master.dsk" size="143360" crc="7e820ae0" sha1="f203ea7bbb46bd54d303c5fee72de17a0776651e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Chapters 1-10"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microexam test bank for computer mathematics- structured basic with math applications (4am crack) disk 2 - chapters 1-10.dsk" size="143360" crc="e87d74a1" sha1="e922fa2ae51ec1c59c9a9be4ab150821bbef7d0d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="djlb1on1">
+		<description>Julius Erving and Larry Bird Go One on One (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-08-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="one on one (4am and san inc crack).dsk" size="143360" crc="ab1717ad" sha1="0b9331f3a44b13ceefd8f201b01a41118d6ab4c0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quizcstl">
+		<description>Quiz Castle (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Didatech</publisher>
+		<info name="release" value="2019-09-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quiz castle (4am crack) side a.dsk" size="143360" crc="6806575a" sha1="a85a9fc2ed2238c79d4c4541e262172e736ce387" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quiz castle (4am crack) side b.dsk" size="143360" crc="294cba3b" sha1="8944bd8ed48858606f988a9439d90dfc6a81ee30" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
