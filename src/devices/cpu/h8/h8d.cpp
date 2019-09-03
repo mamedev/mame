@@ -12,11 +12,11 @@
 #include "h8d.h"
 #include "cpu/h8/h8d.hxx"
 
-h8_disassembler::h8_disassembler(const disasm_entry *_table) : table(_table)
+h8_disassembler::h8_disassembler(const disasm_entry *_table, bool _advanced) : table(_table), advanced(_advanced)
 {
 }
 
-h8_disassembler::h8_disassembler() : h8_disassembler(disasm_entries)
+h8_disassembler::h8_disassembler() : h8_disassembler(disasm_entries, false)
 {
 }
 
@@ -89,7 +89,7 @@ void h8_disassembler::disassemble_am(std::ostream &stream, int am, offs_t pc, co
 		break;
 
 	case DASM_r16d16h:
-		util::stream_format(stream, "@(%x, %s)", opcodes.r16(epc-2), r16_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@(h'%x, %s)", opcodes.r16(epc-2), r16_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r32ih:
@@ -113,11 +113,11 @@ void h8_disassembler::disassemble_am(std::ostream &stream, int am, offs_t pc, co
 		break;
 
 	case DASM_r32d16h:
-		util::stream_format(stream, "@(%x, %s)", opcodes.r16(epc-2), r32_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@(h'%x, %s)", opcodes.r16(epc-2), r32_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r32d32hh:
-		util::stream_format(stream, "@(%x, %s)", opcodes.r32(epc-4), r32_names[(opcode >> 20) & 7]);
+		util::stream_format(stream, "@(h'%x, %s)", opcodes.r32(epc-4), r32_names[(opcode >> 20) & 7]);
 		break;
 
 	case DASM_psp:
@@ -141,41 +141,60 @@ void h8_disassembler::disassemble_am(std::ostream &stream, int am, offs_t pc, co
 		break;
 
 	case DASM_abs8:
-		util::stream_format(stream, "@%08x", 0xffffff00 | opcodes.r8(pc+1));
+		if (advanced)
+			util::stream_format(stream, "@h'%06x", 0xffff00 | opcodes.r8(pc+1));
+		else
+			util::stream_format(stream, "@h'%04x", 0xff00 | opcodes.r8(pc+1));
 		break;
 
 	case DASM_abs16:
 		if(offset >= 6)
-			util::stream_format(stream, "@%08x", s16(opcodes.r16(epc-4)));
+		{
+			if (advanced)
+				util::stream_format(stream, "@h'%06x", s32(s16(opcodes.r16(epc-4))) & 0xffffff);
+			else
+				util::stream_format(stream, "@h'%04x", opcodes.r16(epc-4));
+		}
 		else
-			util::stream_format(stream, "@%08x", s16(opcodes.r16(epc-2)));
+		{
+			if (advanced)
+				util::stream_format(stream, "@h'%06x", s32(s16(opcodes.r16(epc-2))) & 0xffffff);
+			else
+				util::stream_format(stream, "@h'%04x", opcodes.r16(epc-2));
+		}
 		break;
 
 	case DASM_abs32:
 		if(slot == 3)
-			util::stream_format(stream, "@%08x", opcodes.r32(epc-6));
+			util::stream_format(stream, "@h'%06x", opcodes.r32(epc-6));
 		else
-			util::stream_format(stream, "@%08x", opcodes.r32(epc-4));
+			util::stream_format(stream, "@h'%06x", opcodes.r32(epc-4));
 		break;
 
 	case DASM_abs8i:
-		util::stream_format(stream, "@%02x", opcodes.r8(pc+1));
+		util::stream_format(stream, "@h'%02x", opcodes.r8(pc+1));
 		break;
 
 	case DASM_abs16e:
-		util::stream_format(stream, "%04x", opcodes.r16(pc+2));
+		util::stream_format(stream, "h'%04x", opcodes.r16(pc+2));
 		break;
 
 	case DASM_abs24e:
-		util::stream_format(stream, "%08x", opcodes.r32(pc) & 0xffffff);
+		util::stream_format(stream, "h'%06x", opcodes.r32(pc) & 0xffffff);
 		break;
 
 	case DASM_rel8:
-		util::stream_format(stream, "%08x", pc + 2 + s8(opcodes.r8(pc+1)));
+		if (advanced)
+			util::stream_format(stream, "h'%06x", (pc + 2 + s8(opcodes.r8(pc+1))) & 0xffffff);
+		else
+			util::stream_format(stream, "h'%04x", (pc + 2 + s8(opcodes.r8(pc+1))) & 0xffff);
 		break;
 
 	case DASM_rel16:
-		util::stream_format(stream, "%08x", pc + 4 + s16(opcodes.r16(pc+2)));
+		if (advanced)
+			util::stream_format(stream, "h'%06x", (pc + 4 + s16(opcodes.r16(pc+2))) & 0xffffff);
+		else
+			util::stream_format(stream, "h'%04x", (pc + 4 + s16(opcodes.r16(pc+2))) & 0xffff);
 		break;
 
 	case DASM_one:
@@ -199,15 +218,15 @@ void h8_disassembler::disassemble_am(std::ostream &stream, int am, offs_t pc, co
 		break;
 
 	case DASM_imm8:
-		util::stream_format(stream, "#%02x", opcodes.r8(pc+1));
+		util::stream_format(stream, "#h'%02x", opcodes.r8(pc+1));
 		break;
 
 	case DASM_imm16:
-		util::stream_format(stream, "#%04x", opcodes.r16(pc+2));
+		util::stream_format(stream, "#h'%04x", opcodes.r16(pc+2));
 		break;
 
 	case DASM_imm32:
-		util::stream_format(stream, "#%08x", opcodes.r32(pc+2));
+		util::stream_format(stream, "#h'%08x", opcodes.r32(pc+2));
 		break;
 
 	case DASM_ccr:
@@ -248,15 +267,15 @@ offs_t h8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			break;
 	}
 	const disasm_entry &e = table[inst];
-	stream << e.opcode;
-
-	if(e.am1 != DASM_none) {
-		stream << ' ';
+	if(e.am1 == DASM_none)
+		stream << e.opcode;
+	else {
+		util::stream_format(stream, "%-08s", e.opcode);
 		disassemble_am(stream, e.am1, pc, opcodes, slot[e.slot], e.slot, e.flags & LENGTHMASK);
-	}
-	if(e.am2 != DASM_none) {
-		stream << ", ";
-		disassemble_am(stream, e.am2, pc, opcodes, slot[e.slot], e.slot, e.flags & LENGTHMASK);
+		if(e.am2 != DASM_none) {
+			stream << ", ";
+			disassemble_am(stream, e.am2, pc, opcodes, slot[e.slot], e.slot, e.flags & LENGTHMASK);
+		}
 	}
 	return e.flags | SUPPORTED;
 }
