@@ -35124,4 +35124,18 @@
 		</part>
 	</software>
 
+	<software name="buckzoom">
+		<description>Buck Rogers - Planet of Zoom (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sega Enterprises</publisher>
+		<info name="release" value="2019-09-04"/>
+		<!-- Press open-apple during boot to read a message from the programmer. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="buck rogers - planet of zoom (logo crack).dsk" size="143360" crc="bdea01ca" sha1="864fc49ea8f3ab20603a2d03338db96f689d2020" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
