@@ -1557,6 +1557,9 @@ ROM_END
   * Sharp SM5A label OC-22 204A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
+  Also cloned in 1989 by Elektronika(USSR) as Тайны океана (Tayny okeana),
+  it is close to identical, graphics as well.
+
 ***************************************************************************/
 
 class gnw_octopus_state : public hh_sm510_state
@@ -1731,8 +1734,9 @@ ROM_END
   * Sharp SM5A label FP-24 51YB (die label CMS646, ROM ID 74)
   * lcd screen with custom segments, 1-bit sound
 
-  In 1989, Elektronika(USSR) released a clone: Merry Cook. This game shares
-  the same ROM, though the graphics are slightly different.
+  In 1989, Elektronika(USSR) released a clone: Весёлый повар (Vesolyy povar,
+  export version: Merry Cook). This game shares the same ROM, though the graphics
+  are slightly different.
 
 ***************************************************************************/
 
@@ -1846,11 +1850,11 @@ ROM_END
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
   regions where Nintendo wasn't able to license from Disney.
 
-  In 1984, Elektronika(USSR) released a clone: Nu, pogodi! This was followed
-  by several other titles that were the same under the hood, only differing
-  in graphics. They also made a slightly modified version, adding a new game
-  mode (by pressing A+B) where the player/CPU roles are reversed. This version
-  is known as Razvedciki kosmosa (export version: Explorers of Space).
+  In 1984, Elektronika(USSR) released a clone: Ну, погоди! (Nu, pogodi!). This was
+  followed by several other titles that were the same under the hood, only differing
+  in graphics. They also made a slightly modified version, adding a new game mode
+  (by pressing A+B) where the player/CPU roles are reversed. This version is known as
+  Разведчики космоса (Razvedchiki kosmosa, export version: Explorers of Space).
 
 ***************************************************************************/
 
@@ -2008,8 +2012,9 @@ ROM_END
 
   This is the wide screen version, there's also a silver version.
 
-  In 1989 Elektronika(USSR) release a clone: Kosmicheskiy most (export version:
-  Space Bridge). This game shares the same ROM, though the graphics are different.
+  In 1989 Elektronika(USSR) released a clone: Космический мост (Kosmicheskiy most,
+  export version: Space Bridge). This game shares the same ROM, though the
+  graphics are different.
 
 ***************************************************************************/
 
