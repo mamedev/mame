@@ -2008,8 +2008,8 @@ ROM_END
 
   This is the wide screen version, there's also a silver version.
 
-  In 1989 Elektronika(USSR) release a clone: Space Bridge. This game shares
-  the same ROM, though the graphics are slightly different.
+  In 1989 Elektronika(USSR) release a clone: Kosmicheskiy most (export version:
+  Space Bridge). This game shares the same ROM, though the graphics are different.
 
 ***************************************************************************/
 
