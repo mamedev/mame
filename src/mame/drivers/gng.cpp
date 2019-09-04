@@ -20,6 +20,14 @@ Notes:
 - Increased "gfx3" to address 0x400 sprites, to avoid Ghosts'n Goblins
   from drawing a bad sprite. (18/08/2005 Pierpaolo Prazzoli)
 
+ Notes by Jose Tejada (jotego)
+
+There is no watchdog in GnG, as previously stated in the MAME driver.
+Instead, there is a DMA circuit that copies object data from the CPU RAM to a buffer
+this also slows down the CPU as it is halted during that time.
+The DMA is triggered when a certain memory location is addressed. That location was
+thought to be a watchdog before.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -71,7 +79,7 @@ void gng_state::gng_map(address_map &map)
 	map(0x3a00, 0x3a00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3b08, 0x3b09).w(FUNC(gng_state::gng_bgscrollx_w));
 	map(0x3b0a, 0x3b0b).w(FUNC(gng_state::gng_bgscrolly_w));
-	map(0x3c00, 0x3c00).noprw(); /* watchdog? */
+	// 0x3c00 is the DMA trigger. Not emulated.
 	map(0x3d00, 0x3d07).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x3e00, 0x3e00).w(FUNC(gng_state::gng_bankswitch_w));
 	map(0x4000, 0x5fff).bankr("bank1");

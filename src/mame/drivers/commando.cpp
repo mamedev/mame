@@ -44,6 +44,16 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 ***************************************************************************/
 
+// Notes by Jose Tejada (jotego):
+// The main CPU frequency is 3 MHz, after a two-stage FF clock divider.
+// The CPU clock is gated by bus arbitrion logic. The CPU clock is halted until
+// video hardware has an opening in memory access, then the CPU is allowed to
+// access common memory. This slows down the CPU but doesn't alter its basic 3MHz frequency.
+//
+// There is also a DMA circuit that copies object data from the CPU RAM to a buffer
+// this also slows down the CPU as it is halted during that time.
+
+
 #include "emu.h"
 #include "includes/commando.h"
 
@@ -66,6 +76,7 @@ void commando_state::commando_map(address_map &map)
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc804, 0xc804).w(FUNC(commando_state::commando_c804_w));
+	// 0xc806 triggers the DMA (not emulated)
 	map(0xc808, 0xc809).w(FUNC(commando_state::commando_scrollx_w));
 	map(0xc80a, 0xc80b).w(FUNC(commando_state::commando_scrolly_w));
 	map(0xd000, 0xd3ff).ram().w(FUNC(commando_state::commando_videoram2_w)).share("videoram2");
@@ -225,7 +236,9 @@ GFXDECODE_END
 
 #define XTAL        12000000
 #define PHI_B       XTAL/2/2
-#define PHI_MAIN    4000000 // ??? too complicated to trace from schematics
+#define PHI_MAIN    XTAL/2/2 // As seen in the schematics:
+// the signal goes into a bus arbitrion logic that doesn't affect its frequency
+// although the CPU gets slowed down when accessing char/background memories
 
 /* Interrupt Generator */
 
@@ -255,7 +268,7 @@ void commando_state::machine_reset()
 void commando_state::commando(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, PHI_MAIN);  // ???
+	Z80(config, m_maincpu, PHI_MAIN);  // 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &commando_state::commando_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &commando_state::decrypted_opcodes_map);
 
