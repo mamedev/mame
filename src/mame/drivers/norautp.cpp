@@ -32,7 +32,7 @@
    * Kimble Double HI-LO (z80 version),   198?,  Kimble Ireland.
    * PMA Poker,                           198?,  PMA.
    * Poker / Black Jack (Model 7521),     198?,  M. Kramer Manufacturing.
-   * Draw Poker (Joker Poker ver.01),     1984,  Coinmaster.
+   * Draw Poker (Joker Poker V.01),       1984,  Coinmaster.
 
   -- 8080 based --
 
@@ -1449,6 +1449,15 @@ void norautp_state::cgidjp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::cgidjp_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &norautp_state::cgidjp_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
+
+void norautp_state::cdrawpkr(machine_config &config)
+{
+	noraut_base(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+	m_screen->set_visarea(5*8, 61*8-1, (0*16) + 8, 16*16-1);
 }
 
 /********** 8080 based **********/
@@ -3575,7 +3584,7 @@ ROM_END
 
   Draw Poker
   Coinmaster.
-  Based on Joker Poker.
+  Based on Joker Poker V.01.
 
   Noraut Z80 based HW.
 
@@ -3584,6 +3593,8 @@ ROM_END
      PPI #0:  offset 0x70-0x73  config = 0x90
      PPI #1:  offset 0xB0-0xB3  config = 0x92
      PPI #2:  offset 0xD0-0xD3  config = 0xC0
+
+  The game needs approx 20 seconds to boot the game.
 
 */
 
@@ -3758,7 +3769,7 @@ GAME(  198?, kimblz80, 0,       kimble,   norautp,  norautp_state, empty_init, R
 GAME(  1983, pma,      0,       nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                           MACHINE_NOT_WORKING )
 GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     MACHINE_NOT_WORKING, layout_noraut12 )
 GAME(  19??, newhilop, 0,       newhilop, norautp,  norautp_state, empty_init, ROT0, "Song Won?",                "New Hi-Low Poker",                    MACHINE_NOT_WORKING )
-GAMEL( 1984, cdrawpkr, 0,       norautp,  cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker ver.01)",     0,                   layout_noraut11 )
+GAMEL( 1984, cdrawpkr, 0,       cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",       0,                   layout_noraut11 )
 
 
 /************************************* 8080 sets **************************************/

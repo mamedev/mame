@@ -45,6 +45,7 @@ public:
 	void drhl(machine_config &config);
 	void norautxp(machine_config &config);
 	void cgidjp(machine_config &config);
+	void cdrawpkr(machine_config &config);
 
 	void init_ssa();
 	void init_enc();
