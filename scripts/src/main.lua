@@ -220,6 +220,9 @@ end
 		elseif _OPTIONS["targetos"]=="ios-arm" or _OPTIONS["LIBRETRO_IOS"]=="1" then
 			targetsuffix "_libretro_ios"
 			targetextension ".dylib"
+		elseif _OPTIONS["LIBRETRO_TVOS"]=="1" then
+			targetsuffix "_libretro_tvos"
+			targetextension ".dylib"
 		elseif _OPTIONS["targetos"]=="windows" then
 			targetextension ".dll"
 			flags {
