@@ -35,6 +35,7 @@ public:
 	void stv(machine_config &config);
 	void hopper(machine_config &config);
 	void batmanfr(machine_config &config);
+	void shienryu(machine_config &config);
 	void stv_5838(machine_config &config);
 	void stv_5881(machine_config &config);
 	void stvcd(machine_config &config);
