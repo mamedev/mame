@@ -472,17 +472,18 @@ Hardware registers info
 		04-1F					Global Scrolls 1-7
 		20		xxxx xxxx xxxx xxxx Tilemap 0 Scroll X
 		22		xxxx xxxx xxxx xxxx Tilemap 0 Scroll Y
-		24		xxxx xxxx xxxx xxxx Tilemap 0 ??
+		24		---- -a98 76-- ---- Tilemap 0 ?? always 0
+				---- ---- ---4 3210 Tilemap 0 Width (in tiles)
 		26		f--- ---- ---- ---- Tilemap 0 Enable
 				-e-- ---- ---- ---- Tilemap 0 Line Scroll Enable
-				--dc ---- ---- ---- Tilemap 0 Line Zoom Enable? (seems unused in games, but might be enabled in jojo dev.menu BG test)
-				---- b--- ---- ---- Tilemap 0 ? Flip X (Warzard demo fights during special moves)
+				--d- ---- ---- ---- Tilemap 0 Line Zoom Enable (seems unused in games, but might be enabled in jojo dev.menu BG test)
+				---c ---- ---- ---- Tilemap 0 ?? set together with Zoom
+				---- b--- ---- ---- Tilemap 0 Flip X (not implemented, Warzard demo fights during special moves)
 				---- -a-- ---- ---- Tilemap 0 Flip Y (not implemented, Capcom logos background during sfiii2 flashing)
+				---- --98 7654 3210	Tilemap 0 ?? always 0
 		28		-edc ba98 ---- ---- Tilemap 0 Line Scroll and Zoom Base address (1st word is scroll, 2nd word is zoom)
 				---- ---- -654 3210 Tilemap 0 Tiles Base address
-		2A		unused ? always 0
-		2C		unused ? always 0
-		2E		unused ? always 0
+		2A-2F	unused
 		30-5F					Tilemaps 1-3
 												Values: 384		495 "wide"
 		60		xxxx xxxx xxxx xxxx	H Sync end*			42		35
@@ -758,20 +759,17 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 								if (c != transparent_color)
 								{
 									/* blending isn't 100% understood */
+									// is it really ORed or bits should be replaced same as in Seta/SSV hardware ?
 									if (gfx->granularity() == 64)
 									{
 										// OK for sfiii2 spotlight
-										if (c & 0x01) dest[x] |= 0x2000;
-										if (c & 0x02) dest[x] |= 0x4000;
-										if (c & 0x04) dest[x] |= 0x8000;
-										if (c & 0x08) dest[x] |= 0x10000;
-										if (c & 0xf0) dest[x] |= machine().rand(); // ?? not used?
+										dest[x] |= (c & 0xf) << 13;
+										//if (c & 0xf0) dest[x] = machine().rand(); // ?? not used?
 									}
 									else
 									{
 										// OK for jojo intro, and warzard swords, and various shadows in sf games
-										if (c & 0x01) dest[x] |= 0x8000;
-										if (color & 0x100) dest[x] |= 0x10000;
+										dest[x] |= ((c & 1) << 15) | ((color & 1) << 16);
 									}
 								}
 								x_index += dx;
@@ -1060,9 +1058,9 @@ void cps3_state::draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &
 	for (int x = cliprect.left() / 16; x < (cliprect.right() / 16) + 2; x++)
 	{
 		u32 const dat = m_spriteram[mapbase + ((tileline & 63) * 64) + ((x + scrollx / 16) & 63)];
-		u32 const tileno = (dat & 0xffff0000) >> 17;
+		u32 const tileno = (dat & 0xfffe0000) >> 17;
 		u32 const colour = (dat & 0x000001ff) >> 0;
-		bool const bpp = (dat & 0x0000200) >> 9;
+		bool const bpp =   (dat & 0x00000200) >> 9;
 		bool const yflip = (dat & 0x00000800) >> 11;
 		bool const xflip = (dat & 0x00001000) >> 12;
 
@@ -1150,26 +1148,27 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	//logerror("Spritelist start:\n");
 	for (int i = 0x00000 / 4; i < 0x2000 / 4; i += 4)
 	{
-		int const xpos = (m_spriteram[i + 1] & 0x03ff0000) >> 16;
-		int const ypos = m_spriteram[i + 1] & 0x000003ff;
+		if (m_spriteram[i + 0] & 0x80000000)
+			break;
+
 		u8 const gscroll = (m_spriteram[i + 0] & 0x70000000) >> 28;
 		u32 const length = (m_spriteram[i + 0] & 0x01ff0000) >> 16; // how many entries in the sprite table
-		u32 start = (m_spriteram[i + 0] & 0x00007ff0) >> 4;
+		u32 start =        (m_spriteram[i + 0] & 0x00007ff0) >> 4;
+		
+		int const xpos =   (m_spriteram[i + 1] & 0x03ff0000) >> 16;
+		int const ypos =    m_spriteram[i + 1] & 0x000003ff;
 
-		bool const whichbpp = (m_spriteram[i + 2] & 0x40000000) >> 30; // not 100% sure if this is right, jojo title / characters
-		bool const whichpal = (m_spriteram[i + 2] & 0x20000000) >> 29;
-		u8 const global_xflip = (m_spriteram[i + 2] & 0x10000000) >> 28;
-		u8 const global_yflip = (m_spriteram[i + 2] & 0x08000000) >> 27;
+		bool const whichbpp =     (m_spriteram[i + 2] & 0x40000000) >> 30; // not 100% sure if this is right, jojo title / characters
+		bool const whichpal =     (m_spriteram[i + 2] & 0x20000000) >> 29;
+		u8 const global_xflip =   (m_spriteram[i + 2] & 0x10000000) >> 28;
+		u8 const global_yflip =   (m_spriteram[i + 2] & 0x08000000) >> 27;
 		bool const global_alpha = (m_spriteram[i + 2] & 0x04000000) >> 26; // alpha / shadow? set on sfiii2 shadows, and big black image in jojo intro
-		bool const global_bpp = (m_spriteram[i + 2] & 0x02000000) >> 25;
-		u32 const global_pal = (m_spriteram[i + 2] & 0x01ff0000) >> 16;
+		bool const global_bpp =   (m_spriteram[i + 2] & 0x02000000) >> 25;
+		u32 const global_pal =    (m_spriteram[i + 2] & 0x01ff0000) >> 16;
 
 		int const gscrollx = (m_ppu_gscroll[gscroll] & 0x03ff0000) >> 16;
 		int const gscrolly = (m_ppu_gscroll[gscroll] & 0x000003ff) >> 0;
 		start = (start * 0x100) >> 2;
-
-		if ((m_spriteram[i + 0] & 0xf0000000) == 0x80000000)
-			break;
 
 		for (int j = 0; j < (length) * 4; j += 4)
 		{
@@ -1177,26 +1176,24 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			u32 const value2 = (m_spriteram[start + j + 1]);
 			u32 const value3 = (m_spriteram[start + j + 2]);
 
-			//u8* srcdata = (u8*)m_char_ram;
-			//u32 sourceoffset = (value1 >>14) & 0x7fffff;
+			static const int tilestable[4] = { 8,1,2,4 };
 
 			u32 const tileno = (value1 & 0xfffe0000) >> 17;
+			u8 flipx =         (value1 & 0x00001000) >> 12;
+			u8 flipy =         (value1 & 0x00000800) >> 11;
+			bool const alpha = (value1 & 0x00000400) >> 10; //? this one is used for alpha effects on warzard
+			bool const bpp =   (value1 & 0x00000200) >> 9;
+			u32 const pal =    (value1 & 0x000001ff);
 
 			int xpos2 = (value2 & 0x03ff0000) >> 16;
 			int ypos2 = (value2 & 0x000003ff) >> 0;
-			u8 flipx = (value1 & 0x00001000) >> 12;
-			u8 flipy = (value1 & 0x00000800) >> 11;
-			bool const alpha = (value1 & 0x00000400) >> 10; //? this one is used for alpha effects on warzard
-			bool const bpp = (value1 & 0x00000200) >> 9;
-			u32 const pal = (value1 & 0x000001ff);
 
 			/* these are the sizes to actually draw */
 			u32 const ysizedraw2 = ((value3 & 0x7f000000) >> 24) + 1;
 			u32 const xsizedraw2 = ((value3 & 0x007f0000) >> 16) + 1;
-
-			static const int tilestable[4] = { 8,1,2,4 };
-			s8 ysize2 = ((value3 & 0x0000000c) >> 2);
-			s8 xsize2 = ((value3 & 0x00000003) >> 0);
+			//u8 unk =             ((value3 & 0x00000300) >> 8); // unknown, 3 - sprites, 0 - tilemaps
+			s8 ysize2 =            ((value3 & 0x0000000c) >> 2);
+			s8 xsize2 =            ((value3 & 0x00000003) >> 0);
 
 			if (ysize2 == 0)
 			{
@@ -1211,7 +1208,7 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 				/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
 				    which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
 
-				if (bg_drawn[tilemapnum] == 0)
+				if (bg_drawn[tilemapnum] == 0) // Hack, tilemaps rendered similar to sprites, but as a screen-wide rows
 				{
 					for (int uu = m_renderbuffer_clip.top(); uu <= m_renderbuffer_clip.bottom(); uu++)
 					{
@@ -1252,6 +1249,14 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 				if (flipy) ypos2 -= (ysize2 * yinc) >> 16;
 
+				/* use the palette value from the main list or the sublists? */
+				int actualpal = whichpal ? global_pal : pal;
+
+				/* use the bpp value from the main list or the sublists? */
+				m_gfxdecode->gfx(1)->set_granularity((whichbpp ? global_bpp : bpp) ? 64 : 256);
+
+				int trans = (global_alpha || alpha) ? CPS3_TRANSPARENCY_PEN_INDEX_BLEND : CPS3_TRANSPARENCY_PEN_INDEX;
+
 				int count = 0;
 				for (int xx = 0; xx < xsize2 + 1; xx++)
 				{
@@ -1268,7 +1273,6 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 					for (int yy = 0; yy < ysize2 + 1; yy++)
 					{
 						int current_ypos;
-						int actualpal;
 
 						if (flipy) current_ypos = (ypos + ypos2 + ((yy * yinc) >> 16));
 						else current_ypos = (ypos + ypos2 - ((yy * yinc) >> 16));
@@ -1282,32 +1286,7 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 						//if ( (whichbpp) && (m_screen->frame_number() & 1)) continue;
 
-						/* use the palette value from the main list or the sublists? */
-						if (whichpal)
-						{
-							actualpal = global_pal;
-						}
-						else
-						{
-							actualpal = pal;
-						}
-
-						/* use the bpp value from the main list or the sublists? */
-						if (whichbpp)
-						{
-							if (!global_bpp) m_gfxdecode->gfx(1)->set_granularity(256);
-							else m_gfxdecode->gfx(1)->set_granularity(64);
-						}
-						else
-						{
-							if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
-							else m_gfxdecode->gfx(1)->set_granularity(64);
-						}
-
-						int realtileno = tileno + count;
-						int trans = (global_alpha || alpha) ? CPS3_TRANSPARENCY_PEN_INDEX_BLEND : CPS3_TRANSPARENCY_PEN_INDEX;
-
-						cps3_drawgfxzoom(m_renderbuffer_bitmap, m_renderbuffer_clip, m_gfxdecode->gfx(1), realtileno, actualpal, 0 ^ flipx, 0 ^ flipy, current_xpos, current_ypos, trans, 0, xscale, yscale);
+						cps3_drawgfxzoom(m_renderbuffer_bitmap, m_renderbuffer_clip, m_gfxdecode->gfx(1), tileno + count, actualpal, 0 ^ flipx, 0 ^ flipy, current_xpos, current_ypos, trans, 0, xscale, yscale);
 						count++;
 					}
 				}
@@ -2291,6 +2270,7 @@ void cps3_state::machine_start()
 	save_item(NAME(m_chardma_source));
 	save_item(NAME(m_chardma_other));
 	save_item(NAME(m_current_table_address));
+	save_item(NAME(m_dma_status));
 
 	save_pointer(NAME(m_eeprom), 0x400/4);
 }
@@ -2299,6 +2279,7 @@ void cps3_state::machine_start()
 void cps3_state::machine_reset()
 {
 	m_current_table_address = -1;
+	m_dma_status = 0;
 
 	// copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
 	copy_from_nvram();
