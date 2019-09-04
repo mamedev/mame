@@ -454,7 +454,7 @@
 		<element ref="text_p4"><bounds x="99.5" y="48.3" width="3" height="3" /></element>
 		<element ref="text_p5"><bounds x="99.5" y="52.3" width="3" height="3" /></element>
 		<element ref="text_p6"><bounds x="99.5" y="56.3" width="3" height="3" /></element>
-		<bezel element="blue" blend="multiply"><bounds x="99.5" y="36" width="3" height="25" /></bezel>
+		<element ref="blue" blend="multiply"><bounds x="99.5" y="36" width="3" height="25" /></element>
 
 		<element ref="text_b1"><bounds x="97.1" y="65.2" width="5.2" height="1.5" /></element>
 		<element ref="text_b2"><bounds x="97.1" y="69.2" width="5.2" height="1.5" /></element>

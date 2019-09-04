@@ -31,7 +31,7 @@ Chess Unit:
 Printer Unit:
 - unknown hardware, assume own CPU like the chess unit
 
-PSU ("permanent storage unit"?) is just a battery-backed 256x4 RAM (TC5501P)
+PSU ("permanent storage unit"?) is just a 256x4 battery-backed RAM (TC5501P)
 module, not sure why it was so expensive (~180DM).
 A chess clock accessory was also announced but unreleased.
 
