@@ -583,9 +583,9 @@ Note: If you set the dipswitch to service mode and reset the game within Mame. A
       The program rom checksum in the diagnostic screen is 17551773
 */
 	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u113_cb73.u113", 0x00000, 0x20000, CRC(d636c00d) SHA1(ef989eb85b51a64ca640297c1286514c8d7f8f76) ) // labeled: Police Trainer   v1.3B   U113  CB73
-	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u112_974c.u112", 0x00001, 0x20000, CRC(86f0497e) SHA1(d177023f7cb2e01de60ef072212836dc94759c1a) ) // labeled: Police Trainer   v1.3B   U113  974C
-	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u111_e5f1.u111", 0x00002, 0x20000, CRC(39e96d6a) SHA1(efe6ffe70432b94c98f3d7247408a6d2f6f9e33d) ) // labeled: Police Trainer   v1.3B   U113  E5F1
-	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u110_556d.u110", 0x00003, 0x20000, CRC(d7e6f4cb) SHA1(9dffe4937bc5cf47d870f06ae0dced362cd2dd66) ) // labeled: Police Trainer   v1.3B   U113  556D
+	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u112_974c.u112", 0x00001, 0x20000, CRC(86f0497e) SHA1(d177023f7cb2e01de60ef072212836dc94759c1a) ) // labeled: Police Trainer   v1.3B   U112  974C
+	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u111_e5f1.u111", 0x00002, 0x20000, CRC(39e96d6a) SHA1(efe6ffe70432b94c98f3d7247408a6d2f6f9e33d) ) // labeled: Police Trainer   v1.3B   U111  E5F1
+	ROM_LOAD32_BYTE( "police_trainer_v1.3b_u110_556d.u110", 0x00003, 0x20000, CRC(d7e6f4cb) SHA1(9dffe4937bc5cf47d870f06ae0dced362cd2dd66) ) // labeled: Police Trainer   v1.3B   U110  556D
 
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD( "u160_police_trainer_p-p_marketing.u160", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) ) // mask ROM labeled: U160   POLICE TRAINER   P&P MARKETING
