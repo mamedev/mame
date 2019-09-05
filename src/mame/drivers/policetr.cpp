@@ -531,7 +531,7 @@ ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96, there is n
 	ROM_RELOAD(                    0x478000, 0x080000 )
 	ROM_LOAD( "u162_10-7-96.u162", 0x100000, 0x080000, CRC(e7e02312) SHA1(ac92b8615b18528820a40dad025173e9f24072bf) ) // labeled: U162   10/7/96
 	ROM_RELOAD(                    0x4f8000, 0x080000 )
-	ROM_LOAD( "u163_10-7-96.u163", 0x180000, 0x080000, CRC(a45b3f85) SHA1(21965dcf89e04d5ee21e27eefd6baa34d6d4479a) ) // labeled: U163   10/7/96
+	ROM_LOAD( "u163_10-7-96.u163", 0x180000, 0x080000, CRC(1053b94a) SHA1(b3ff6a269c1cc4a91a08bc277b896e3e6c4eceee) ) // labeled: U163   10/7/96
 	ROM_RELOAD(                    0x578000, 0x080000 )
 ROM_END
 
@@ -718,7 +718,7 @@ void policetr_state::driver_init()
 
 GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
 GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, polict10_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
 
 GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
 GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )

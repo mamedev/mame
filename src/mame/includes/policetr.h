@@ -163,3 +163,11 @@ public:
 		: sshooter_state(mconfig, type, tag, 0x1fc028bc, 0x00000fc8)
 	{ }
 };
+
+class polict10_state : public sshooter_state
+{
+public:
+	polict10_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sshooter_state(mconfig, type, tag, 0x1fc028b4, 0x00000fc8)
+	{ }
+};
