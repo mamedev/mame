@@ -7329,4 +7329,49 @@
 		</part>
 	</software>
 
+	<software name="snoggle">
+		<description>Snoggle</description>
+		<year>1981</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-09-05"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="68557">
+				<rom name="snoggle.woz" size="68557" crc="e65cf748" sha1="239aa3d0aec224a759e12085c732b11fa86d9a63" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tredoubt">
+		<description>Tawala's Last Redoubt</description>
+		<year>1981</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-09-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235494">
+				<rom name="tawala's last redoubt.woz" size="235494" crc="ade2db41" sha1="7c644a56c710fecd902f75d5a4e32dd3c7176825" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="successn">
+		<description>Succession</description>
+		<year>1982</year>
+		<publisher>Piccadilly Software</publisher>
+		<info name="release" value="2019-09-05"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="68556">
+				<rom name="succession.woz" size="68556" crc="7fd914be" sha1="3aefea6ab2f46eadafcb89e486adcf59b3790e4c" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
