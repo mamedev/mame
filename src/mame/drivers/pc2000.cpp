@@ -11,6 +11,15 @@
         - MisterX bankswitch
         - dump the chargen
 
+****************************************************************************
+
+Other known international versions:
+- Genio 2000 (Spanish version of Genius Leader 4000 Quadro)
+- PreComputer Power Pad (English version of Genius Leader 4000 Quadro)
+- PreComputer Power Pad Plus (English version of Genius Leader 5000)
+- Talking Whiz-Kid Einstein (English version of Genius Leader Power Notebook)
+- Talking Whiz-Kid Einstein Mouse (alternate English version of Genius Leader Power Notebook)
+
 ****************************************************************************/
 
 

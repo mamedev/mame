@@ -7,13 +7,33 @@ VTech Genius Junior series
 CPU is 68HC05 derived?
 
 Other known international versions:
+- Genius 4000 (French version of Genius Leader 4000)
+- Genius 5000 (French version of Genius Leader 5000)
+- Genius PRO (French version of Genius Leader Select)
+- Genius Progress (French version of Genius Leader Notebook)
 - Pitagorín (Spanish version of Genius Leader Notebook)
 - Pitagorín Plus (Spanish version of Genius Junior Redstar 3)
+- PreComputer Notebook (alternate English version of Genius Leader Notebook)
 - El Super-Ordenador Parlanchín (alternate Spanish version of Genius Junior Movie)
+- Smart Start Animated (alternate English version of Genius Junior Redstar)
+- Talande Smart Start Laptop (Swedish version of Genius Junior Movie)
 - Talking Whiz-Kid Animated (English version of Genius Junior Redstar)
 - Talking Whiz-Kid Genius (English version of Genius Junior Movie)
 - Talking Whiz-Kid Notebook (English version of Genius Leader Notebook)
 - Talking Whiz-Kid Power Mouse (English version of Genius Leader Select)
+- Talking Whiz-Kid Super Animated (English version of Genius Junior Redstar 3)
+
+Undumped VTech laptops possibly on similar hardware:
+- Genius Einstein (French version of Genius Leader Action)
+- Genius Prodige (French version of Genius Master Power Maus)
+- Genius Leader Action
+- Genius Leader Notebook Plus
+- Genius Master Notebook MM
+- Genius Master Power Maus
+- PreComputer Notebook II (English version of Genius Leader Notebook Plus)
+- Talking Einstein (English version of Genius Leader Action)
+- Talking Whiz-Kid Explorer (alternate English version of Genius Leader Action)
+- Talking Whiz-Kid Notebook 2000 (English version of Genius Master Notebook MM)
 
 */
 
