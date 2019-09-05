@@ -421,6 +421,11 @@ newoption {
 	description = "Specify iOS target when building using libretro"
 }
 
+newoption {
+	trigger = "LIBRETRO_TVOS",
+	description = "Specify tvOS target when building using libretro"
+}
+
 dofile ("extlib.lua")
 
 if _OPTIONS["SHLIB"]=="1" then
@@ -711,7 +716,7 @@ else
 		"LSB_FIRST",
 	}
 	-- For iOS in libretro, don't specify the arch since it's already specified in $(CC) and $(CXX)
-	if _OPTIONS["targetos"]=="macosx"  and _OPTIONS["LIBRETRO_IOS"] ~= "1" then
+	if _OPTIONS["targetos"]=="macosx"  and _OPTIONS["LIBRETRO_IOS"] ~= "1" and _OPTIONS["LIBRETRO_TVOS"] ~= "1" then
 		configuration { "x64" }
 			buildoptions {
 				"-arch x86_64",

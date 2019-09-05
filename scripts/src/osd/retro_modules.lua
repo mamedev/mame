@@ -149,7 +149,7 @@ function osdmodulestargetconf()
 			"oleaut32",
 		}
 	elseif _OPTIONS["targetos"]=="macosx" then
-		if _OPTIONS["LIBRETRO_IOS"]=="1" then
+		if _OPTIONS["LIBRETRO_IOS"]=="1" or _OPTIONS["LIBRETRO_TVOS"]=="1" then
 			links {
 				"AudioToolbox.framework",
 				"CoreAudio.framework",
@@ -247,6 +247,11 @@ newoption {
 newoption {
 	trigger = "LIBRETRO_IOS",
 	description = "Specify iOS target when building using libretro"
+}
+
+newoption {
+	trigger = "LIBRETRO_TVOS",
+	description = "Specify tvOS target when building using libretro"
 }
 
 
