@@ -15090,6 +15090,10 @@ gyrussb                         // bootleg or actual Taito NZ license?
 gyrussce                        // GX347 (c) 1983 + Centuri license
 venus                           // bootleg
 
+@source:h01x.cpp
+nf500a                          // NF500A - TRS-80 Level II BASIC
+h01jce                          // H-01 JCE - TRS-80 Level II BASIC
+
 @source:h19.cpp
 h19                             // Heath H19 (Zenith Z-19)
 super19                         // Super19 replacement ROMS for H19
