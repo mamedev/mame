@@ -206,11 +206,11 @@ ROM_START(pc)
 	ROM_SYSTEM_BIOS(44, "ecd", "ECD-Computer") // (c) E C D Computer GmbH 1985 - BIOS for ECD Professional Microcomputer - use pcherc
 	ROMX_LOAD( "ecd_computer.bin", 0xe000, 0x2000, CRC(caab05f5) SHA1(060aa6c17ff9405c256684cec8a5165227c7c522), ROM_BIOS(44))
 	ROM_SYSTEM_BIOS(45, "td20", "TD-20") // Triple D International TD-20, 8088/86 Modular BIOS Ver 3.1jk 06/19&/89 15:42
-	ROMX_LOAD( "bios.bin", 0xc000, 0x4000, CRC(dfce8cd5) SHA1(c4a9624f230ecdeeee606ee1d0bc685226938505), ROM_BIOS(45))
+	ROMX_LOAD( "td20bios.bin", 0xc000, 0x4000, CRC(dfce8cd5) SHA1(c4a9624f230ecdeeee606ee1d0bc685226938505), ROM_BIOS(45))
 	ROM_SYSTEM_BIOS(46, "b190b", "B-190-B") // B-190-B' P1.830 810.02, Chipset: Faraday FE2010A ICs: UM8272A, INS8250N-BT, MM58167AN-T
-	ROMX_LOAD( "bios.bin", 0xc000, 0x4000, CRC(4178d321) SHA1(a6b30c0805beabe3566b7d22984aa683fc62d7dc), ROM_BIOS(46)) // continuous beep but works
+	ROMX_LOAD( "b190bios.bin", 0xc000, 0x4000, CRC(4178d321) SHA1(a6b30c0805beabe3566b7d22984aa683fc62d7dc), ROM_BIOS(46)) // continuous beep but works
 	ROM_SYSTEM_BIOS(47, "kt10mb", "KT 10 M/B") // Award XT BIOS 2.05
-	ROMX_LOAD( "bios.bin", 0xe000, 0x2000, CRC(94e9836e) SHA1(793a9359ffd6f0964aa25edce31a3f37aa0dadc8), ROM_BIOS(47)) 
+	ROMX_LOAD( "kt10bios.bin", 0xe000, 0x2000, CRC(94e9836e) SHA1(793a9359ffd6f0964aa25edce31a3f37aa0dadc8), ROM_BIOS(47)) 
 ROM_END
 
 #define rom_pcmda    rom_pc
