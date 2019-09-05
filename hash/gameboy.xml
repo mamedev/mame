@@ -11616,13 +11616,13 @@
 		<description>Kirby's Pinball Land (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-K9-USA, DMG-K9-NOE, DMG-K9-UKV"/>
+		<info name="serial" value="DMG-K9-FAH, DMG-K9-NOE, DMG-K9-UKV, DMG-K9-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-GDAN-03" />  <!-- UKV cart -->
+			<feature name="pcb" value="DMG-GDAN-03" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC2A [DMG MBC2-A]" />
-			<feature name="u3" value="U3 26A [6129 3816]" />
+			<feature name="u2" value="U2 MBC2A [DMG MBC2-A]" /> <!-- Also found with [DMG MBC2A] -->
+			<feature name="u3" value="U3 26A [6129]" /> <!-- Also found with [26A] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
@@ -12111,11 +12111,11 @@
 		<description>Kwirk (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-AP-USA, DMG-AP-UKV, DMG-AP-NOE"/>
+		<info name="serial" value="DMG-AP-FAH, DMG-AP-NOE, DMG-AP-UKV, DMG-AP-USA"/>
 		<info name="alt_title" value="Kwirk - He's A-maze-ing! (Box)"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-03" />   <!-- UKV cart -->
+			<feature name="pcb" value="DMG-AAA-03" />
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-ape-0.u1" size="32768" crc="21c98af2" sha1="6ef48e912a47c774048456aa870c7e810fd45685"/>
@@ -12271,7 +12271,7 @@
 	</software>
 
 	<software name="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Euro, USA, Rev. 2)</description>
+		<description>The Legend of Zelda - Link's Awakening (Europe, USA, Rev. 2)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-USA-1, DMG-ZL-EUR"/>
@@ -12287,7 +12287,7 @@
 	</software>
 
 	<software name="zeldalnka" cloneof="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Euro, USA, Can, Rev. 1)</description>
+		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA, Rev. 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZL-UKV, DMG-ZL-ESP-1, DMG-ZL-CAN"/>
@@ -12303,17 +12303,17 @@
 	</software>
 
 	<software name="zeldalnkb" cloneof="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Euro, USA, Can)</description>
+		<description>The Legend of Zelda - Link's Awakening (Canada, Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-ZL-USA, DMG-ZL-UKV, DMG-ZL-CAN"/>
+		<info name="serial" value="DMG-ZL-CAN, DMG-ZL-UKV, DMG-ZL-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-02" />  <!-- USA cart -->
+			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [MBC1-B]" />
-			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />    <!-- Hyundai RAM -->
-			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B] -->
+			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
+			<feature name="u4" value="U4 26A [26A]" /> <!-- Also found with [6129] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -12326,7 +12326,7 @@
 
 	<!-- Bad dump? -->
 	<software name="zeldalnkc" cloneof="zeldalnk">
-		<description>The Legend of Zelda - Link's Awakening (Can)</description>
+		<description>The Legend of Zelda - Link's Awakening (Canada)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZC-CAN"/>
@@ -12609,12 +12609,15 @@
 		<description>Disney's The Little Mermaid (USA)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
-		<info name="serial" value="DMG-LD-USA"/>
+		<info name="serial" value="DMG-LD-USA, DMG-LD-USA-1"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="little mermaid, the (usa).bin" size="131072" crc="d7c517e5" sha1="9c7d7a82d0eeb4d7b4f4b7ae35e5ebd80c93d780"/>
+				<rom name="dmg-lde-0.u1" size="131072" crc="d7c517e5" sha1="9c7d7a82d0eeb4d7b4f4b7ae35e5ebd80c93d780"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13034,9 +13037,14 @@
 		<info name="alt_title" value="魔界塔士 サ・ガ"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-GDAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBCA2 [DMG MBC2A]" />
+			<feature name="u3" value="U3 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
-				<rom name="makai toushi sa-ga (japan).bin" size="131072" crc="131b09f2" sha1="7a8f770a34207fee324431c47836f1ab317863f9"/>
+				<rom name="dmg-saj-0.u1" size="131072" crc="131b09f2" sha1="7a8f770a34207fee324431c47836f1ab317863f9"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13165,13 +13173,13 @@
 	</software>
 
 	<software name="marioyos">
-		<description>Mario &amp; Yoshi (Europe)</description>
+		<description>Mario &amp; Yoshi (Australia, Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-YO-EUR, DMG-YO-ITA"/>
+		<info name="serial" value="DMG-YO-AUS, DMG-YO-EUR, DMG-YO-ITA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />  <!-- ITA cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -13182,24 +13190,24 @@
 	</software>
 
 	<software name="mariopicj" cloneof="mariopic">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Also released via the Nintendo Power service in 2000-03 -->
 		<description>Mario no Picross (Japan)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-APCJ-JPN"/>
+		<info name="serial" value="DMG-APCJ-JPN (G733249)"/>
 		<info name="release" value="19950314"/>
 		<info name="alt_title" value="マリオのピクロス"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
-			<feature name="u3" value="U3 RAM [VN4464-08LL]" />
-			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" /> <!-- Also found with [DMG MBC1B1] -->
+			<feature name="u3" value="U3 RAM [VN4464-08LL]" /> <!-- Also found with [HY6264ALLJ-10] -->
+			<feature name="u4" value="U4 26A [26A]" /> <!-- Also found with [6129A] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="mario no picross (japan).bin" size="262144" crc="17533700" sha1="6b72cbff3e224299eff6f79e0110a477b8f840c2"/>
+				<rom name="dmg-apcj-0.u1" size="262144" crc="17533700" sha1="6b72cbff3e224299eff6f79e0110a477b8f840c2"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -13207,18 +13215,17 @@
 	</software>
 
 	<software name="mariopic">
-		<!-- Notes: SGB enhanced -->
 		<description>Mario's Picross (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-APCE-USA, DMG-APCP-NOE"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<info name="serial" value="DMG-APCP-NOE, DMG-APCE-USA"/>
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-02" />  <!-- NOE cart -->
+			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
-			<feature name="u3" value="U3 RAM [LH5268ANF-10YLL]" />
-			<feature name="u4" value="U4 26A [6129A]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
+			<feature name="u3" value="U3 RAM [LH5268ANF-10YLL]" /> <!-- Also found with [HY6264ALLJ-10] and [VN4464S-08LL] -->
+			<feature name="u4" value="U4 26A [6129A]" /> <!-- Also found with [26A] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -13567,15 +13574,18 @@
 	</software>
 
 	<software name="megaman">
-		<description>Mega Man - Dr. Wily's Revenge (Europe)</description>
+		<description>Mega Man - Dr. Wily's Revenge (Australia, Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-RW-(NOE/EUR)"/>
+		<info name="serial" value="DMG-RW-AUS, DMG-RW-EUR, DMG-RW-NOE"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN(K)-02" /> <!-- Also found with DMG-BEAN-10 -->
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="megaman - dr. wily's revenge (europe).bin" size="262144" crc="2ea4b976" sha1="11255a24344e9fed53b8f1f6f894d21e161a0d5e"/>
+				<rom name="dmg-rwx-0.u1" size="262144" crc="2ea4b976" sha1="11255a24344e9fed53b8f1f6f894d21e161a0d5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13587,9 +13597,9 @@
 		<info name="serial" value="DMG-RW-USA, DMG-RW-USA-1"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />
+			<feature name="pcb" value="DMG-BEAN(K)-02" /> <!-- Also found with DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-rwe-0.u1" size="262144" crc="47e70e08" sha1="277edb3c844e812ba4b3eb9a96c9c30414541858"/>
@@ -13604,7 +13614,7 @@
 		<info name="serial" value="DMG-W2-EUR, DMG-W2-ESP-1"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="pcb" value="DMG-BEAN-10" /> <!-- Also found with DMG-BEAN-20 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -13635,12 +13645,12 @@
 		<description>Mega Man III (Europe)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-W3-NOE, DMG-W3-FAH"/>
+		<info name="serial" value="DMG-W3-FAH, DMG-W3-NOE, DMG-W3-SCN"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" /> <!-- Also found with [DMG MBC1B1] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-w3x-0.u1" size="262144" crc="03b0d4ec" sha1="ecadbc9e273e4d99ccd87f98bbbd912aec43c077"/>
@@ -13669,9 +13679,9 @@
 		<info name="serial" value="DMG-R4-EUR"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="pcb" value="DMG-BEAN-10" /> <!-- Also found with DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-r4x-0.u1" size="524288" crc="060b89e6" sha1="a15a05593bf9bdddb5826b148e25182e7b90f268"/>
@@ -13698,9 +13708,9 @@
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-WM-EUR"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN(K)-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -13711,12 +13721,11 @@
 	</software>
 
 	<software name="megaman5u" cloneof="megaman5">
-		<!-- Notes: SGB enhanced -->
 		<description>Mega Man V (USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-WM-USA"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -13831,20 +13840,28 @@
 		<description>Metroid II - Return of Samus (World)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-MEA, DMG-ME-USA, DMG-ME-ESP-1, DMG-ME-UKV, DMG-ME-NOE, DMG-ME-CAN, DMG-ME-SCN, DMG-206 CHN"/>
-		<info name="release" value="19920121 (JPN)"/>
+		<info name="serial" value="DMG-206 CHN, DMG-MEA, DMG-ME-CAN, DMG-ME-ESP-1, DMG-ME-NOE, DMG-ME-SCN, DMG-ME-UKV, DMG-ME-USA"/>
+		<info name="release" value="19920121"/>
 		<info name="alt_title" value="メトロイド2 リターン・オブ・サムス (Japan), METROID II - RETRUN OF SAMUS 银河战士II·銀河戰士II (China)"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" /> <!-- Also found with DMG-DECN-10 -->
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" /> <!-- Also found with [DMG MBC1-B] -->
+			<feature name="u3" value="U3 RAM [LH5168NFB-10L]" /> <!-- Also found with [LH5168N-10PL] -->
+			<feature name="u4" value="U4 26A [26A]" /> <!-- Also found with [6129A] -->
+			<feature name="batt" value="Batt CR1616" />
+		 	<!-- Chinese cart
 			<feature name="pcb" value="DMG-DECN-M11" />
 			<feature name="u1" value="U1 512K-4M ROM [epoxy]" />
 			<feature name="u2" value="U2 MBC1" />
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 BA6129" />
 			<feature name="batt" value="Batt CR1616" />
+			-->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="u1" size="262144" crc="dee05370" sha1="74a2fad86b9a4c013149b1e214bc4600efb1066d"/>
+				<rom name="dmg-mea-0.u1" size="262144" crc="dee05370" sha1="74a2fad86b9a4c013149b1e214bc4600efb1066d"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -14283,18 +14300,23 @@
 	</software>
 
 	<software name="miniyoas">
-		<!-- Notes: SGB enhanced -->
 		<description>Mini Yonku GB Let's &amp; Go!! - All-Star Battle Max (Japan)</description>
 		<year>1998</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="DMG-AAMJ-JPN"/>
 		<info name="release" value="19980619"/>
 		<info name="alt_title" value="ミニ四駆GB Let's &amp; Go!! オールスターバトルMAX"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-LFDN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC3 [MBC3]" />
+			<feature name="u3" value="U3 RAM [BR62256F-70LL]" />
+			<feature name="u4" value="U4 [6129A]" />
+			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<dataarea name="rom" size="1048576">
-				<rom name="miniyonku gb let's &amp; go!! - all-star battle max (japan).bin" size="1048576" crc="97ebd21d" sha1="ca662cb506b553f1730c29c088e597bace1e0052"/>
+				<rom name="dmg-aamj-0.u1" size="1048576" crc="97ebd21d" sha1="ca662cb506b553f1730c29c088e597bace1e0052"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -14400,18 +14422,17 @@
 	</software>
 
 	<software name="mole">
-		<!-- Notes: SGB enhanced -->
 		<description>Mole Mania (Europe, USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AMOE-USA, DMG-AMOP-EUR"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB.SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR & USA carts -->
+			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" /> <!-- Also with [DMG MBC1B1] -->
-			<feature name="u3" value="U3 RAM [XLJ6265BF-10SL]" /> <!-- Also with [HY6264ALLJ-10] -->
-			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
+			<feature name="u3" value="U3 RAM [XLJ6265BF-10SL]" /> <!-- Also found with [HY6264ALLJ-10] -->
+			<feature name="u4" value="U4 26A [26A]" /> <!-- Also found with [6129A] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -14449,18 +14470,17 @@
 	</software>
 
 	<software name="momocol2">
-		<!-- Notes: SGB enhanced -->
 		<description>Momotarou Collection 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AM3J-JPN"/>
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="桃太郎コレクション2"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-MC-SFCN-01" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MMM01 [MMM01 644 113]" />
+			<feature name="u2" value="U2 MMM01 [MMM01]" />
 			<feature name="u3" value="U3 RAM [XLJ6265BF-10SL]" />
 			<feature name="u4" value="U4 26A [26A]" />
 			<feature name="batt" value="Batt CR1616" />
@@ -14883,7 +14903,7 @@
 		<info name="serial" value="DMG-A3ME-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN(K)-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -15153,16 +15173,15 @@
 	</software>
 
 	<software name="mulan">
-		<!-- Notes: SGB enhanced -->
 		<description>Disney's Mulan (Europe, USA)</description>
 		<year>1998</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-AMLE-USA, DMG-AMLP-EUR, DMG-AMLP-EUR-1"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-amlp-0.u1" size="524288" crc="e285cf30" sha1="b039f13d7a4eac290ab2d0bf4a4a740cfc517959"/>
@@ -15556,12 +15575,15 @@
 		<description>NBA All Star Challenge 2 (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
-		<info name="serial" value="DMG-H2-USA, DMG-H2-(NOE-1/UKV)"/>
+		<info name="serial" value="DMG-H2-FAH, DMG-H2-NOE-1, DMG-H2-UKV, DMG-H2-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="nba all star challenge 2 (usa, europe).bin" size="131072" crc="c27c0289" sha1="a07672471909cace9e9765bce6a05a8ab74d55d4"/>
+				<rom name="dmg-h2e-0.u1" size="131072" crc="c27c0289" sha1="a07672471909cace9e9765bce6a05a8ab74d55d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15748,12 +15770,15 @@
 		<description>Nemesis (Europe)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
-		<info name="serial" value="DMG-NM-UKV"/>
+		<info name="serial" value="DMG-NM-NOE, DMG-NM-UKV"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="nemesis (europe).bin" size="131072" crc="19930ea5" sha1="e95e7a476a160bc0a685112d80239a5d669fd192"/>
+				<rom name="dmg-nmx-0.u1" size="131072" crc="19930ea5" sha1="e95e7a476a160bc0a685112d80239a5d669fd192"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15840,14 +15865,13 @@
 	</software>
 
 	<software name="samspir">
-		<!-- Notes: SGB enhanced -->
-		<description>Nettou Samurai Spirits (Jpn, Chn, Rev. 1)</description>
+		<description>Nettou Samurai Spirits (China, Japan, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
-		<info name="serial" value="DMG-X4J, DMG-406 CHN"/>
+		<info name="serial" value="DMG-406 CHN, DMG-X4J"/>
 		<info name="release" value="19940630"/>
 		<info name="alt_title" value="熱闘サムライスピリッツ (Japan), 熱闘サムライスピリッツ DEAD HEAT FIGHTERS SAMURAI SPIRITS 热斗侍魂·熱鬥侍魂 (China)"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -16074,12 +16098,15 @@
 		<description>NFL Quarterback Club (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
-		<info name="serial" value="DMG-Q6-USA, DMG-Q6-NOE"/>
+		<info name="serial" value="DMG-Q6-NOE, DMG-Q6-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="nfl quarterback club (usa, europe).bin" size="131072" crc="c7838830" sha1="cb5b7b05549e0eeddb820fa92cd46c3e3e28b760"/>
+				<rom name="dmg-q6e-0.u1" size="131072" crc="c7838830" sha1="cb5b7b05549e0eeddb820fa92cd46c3e3e28b760"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16429,15 +16456,15 @@
 		<description>Nintendo World Cup (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-NC-USA, DMG-NC-NOE, DMG-NC-ESP-1, DMG-NC-UKV"/>
+		<info name="serial" value="DMG-NC-ESP-1, DMG-NC-NOE, DMG-NC-UKV, DMG-NC-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN(K)-10 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" /> <!-- Also found with [DMG MBC1B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="nintendo world cup (usa, europe).bin" size="131072" crc="96c24e13" sha1="9308dadfeb1becb81fe35015397df6e8e8ead06e"/>
+				<rom name="dmg-nce-0.u1" size="131072" crc="96c24e13" sha1="9308dadfeb1becb81fe35015397df6e8e8ead06e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16519,24 +16546,29 @@
 		<info name="alt_title" value="ぬ〜ぼ〜"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="noobow (japan).bin" size="262144" crc="8bbcc8bb" sha1="b571d9051e3a9f1a55533b4f43941cae907aedff"/>
+				<rom name="dmg-nwj-0.u1" size="262144" crc="8bbcc8bb" sha1="b571d9051e3a9f1a55533b4f43941cae907aedff"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="oddworld">
-		<!-- Notes: SGB enhanced -->
 		<description>Oddworld Adventures (Europe, USA)</description>
 		<year>1998</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="DMG-AODE-USA, DMG-AODP-EUR"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="oddworld adventures (usa, europe).bin" size="524288" crc="6510c0e2" sha1="be3f69371b6959dab34014cb1d3672f4f3377c3a"/>
+				<rom name="dmg-aodp-0.u1" size="524288" crc="6510c0e2" sha1="be3f69371b6959dab34014cb1d3672f4f3377c3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16674,9 +16706,12 @@
 		<info name="serial" value="DMG-CN-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="operation c (usa).bin" size="131072" crc="2ebbc1ae" sha1="1dc3e1c62e62f77ac633408b544ac1d02b3761eb"/>
+				<rom name="dmg-cne-0.u1" size="131072" crc="2ebbc1ae" sha1="1dc3e1c62e62f77ac633408b544ac1d02b3761eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16701,11 +16736,13 @@
 		<description>Othello (Europe)</description>
 		<year>1990</year>
 		<publisher>Tsukuda Original?</publisher>
-		<info name="serial" value="DMG-OT-UKV"/>
+		<info name="serial" value="DMG-OT-FAH, DMG-OT-UKV"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-AAA-03" />
+			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
-				<rom name="othello (europe).bin" size="32768" crc="e6607e29" sha1="03848a74502f4571bec20b42adab86ded357af81"/>
+				<rom name="dmg-otx-0.u1" size="32768" crc="e6607e29" sha1="03848a74502f4571bec20b42adab86ded357af81"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16956,9 +16993,12 @@
 		<info name="serial" value="DMG-PC-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="pac-man (usa).bin" size="65536" crc="b681e243" sha1="a05f50d3571c0572eb0433474a99c966a67a2d1b"/>
+				<rom name="dmg-pce-0.u1" size="65536" crc="b681e243" sha1="a05f50d3571c0572eb0433474a99c966a67a2d1b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17277,16 +17317,18 @@
 	</software>
 
 	<software name="pagemstru" cloneof="pagemstr">
-		<!-- Notes: SGB enhanced -->
 		<description>The Pagemaster (USA)</description>
 		<year>1994</year>
 		<publisher>Fox Interactive</publisher>
 		<info name="serial" value="DMG-APME-USA"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="pagemaster, the (usa).bin" size="262144" crc="cdfa71e5" sha1="1d1dfdab693fdb1a3a1388cae34af017f79c41ab"/>
+				<rom name="dmg-apme-0.u1" size="262144" crc="cdfa71e5" sha1="1d1dfdab693fdb1a3a1388cae34af017f79c41ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17372,9 +17414,12 @@
 		<info name="serial" value="DMG-AG-NOE"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="pang (euro).bin" size="131072" crc="9ae199df" sha1="ae97143e51b6f031efb83b245b1b2558e6cb9026"/>
+				<rom name="dmg-agx-0.u1" size="131072" crc="9ae199df" sha1="ae97143e51b6f031efb83b245b1b2558e6cb9026"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17588,14 +17633,13 @@
 	</software>
 
 	<software name="pga96">
-		<!-- Notes: SGB enhanced -->
 		<description>PGA Tour '96 (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A3GE-USA, DMG-A3GP-EUR"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -17636,18 +17680,23 @@
 	</software>
 
 	<software name="picross2">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!--  Also released via the Nintendo Power service in 2000-03 -->
 		<description>Picross 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AP2J-JPN"/>
 		<info name="release" value="19961019"/>
 		<info name="alt_title" value="ピクロス2"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-DECN(K)-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> 
+			<feature name="u3" value="U3 RAM [LH5268ANF-10PLL]" /> 
+			<feature name="u4" value="U4 26A [26A]" /> 
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="picross 2 (japan).bin" size="524288" crc="f5aa5902" sha1="57788519111cbe9e20b43d1935e9f52ae165e858"/>
+				<rom name="dmg-ap2j-0.u1" size="524288" crc="f5aa5902" sha1="57788519111cbe9e20b43d1935e9f52ae165e858"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -17685,7 +17734,7 @@
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1A]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="pinball - 66hiki no wani daikoushin! (japan).bin" size="65536" crc="1b3a89c6" sha1="3671335514b388ee08322416abd873f11a5e0b66"/>
+				<rom name="dmg-pbj-0.u1" size="65536" crc="1b3a89c6" sha1="3671335514b388ee08322416abd873f11a5e0b66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17715,9 +17764,12 @@
 		<info name="serial" value="DMG-APDP-EUR"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN(K)-02 -->
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" /> <!-- Also found with [DMG MBC1-B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="pinball deluxe (europe).bin" size="262144" crc="02864c32" sha1="a99d8a9880ed79b40766b3a532f8a165171ca450"/>
+				<rom name="dmg-apdp-0.u1" size="262144" crc="02864c32" sha1="a99d8a9880ed79b40766b3a532f8a165171ca450"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17963,14 +18015,13 @@
 	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
 	-->
 	<software name="pockbmanj" cloneof="pockbman">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Bomberman (Japan)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-APOJ-JPN"/>
 		<info name="release" value="19971212"/>
 		<info name="alt_title" value="ポケットボンバーマン"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-TEDN-01" />
 			<feature name="u1" value="U1 PRG" />
@@ -18010,14 +18061,13 @@
 	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
 	-->
 	<software name="pockfam">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Family (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-HFAJ-JPN"/>
 		<info name="release" value="19980809"/>
 		<info name="alt_title" value="ポケットファミリーGB"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-UEDT-01" />
 			<feature name="u1" value="U1 PRG" />
@@ -18025,7 +18075,7 @@
 			<feature name="u3" value="U3 RAM [LH52256CT-10LL]" />
 			<feature name="u4" value="U4 [26A]" />
 			<feature name="u4" value="U5 [LVX04]" />
-			<feature name="batt" value="Batt CR2025" />
+			<feature name="batt" value="BATT CR2025" />
 			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="524288">
 				<rom name="dmg-hfaj-0.u1" size="524288" crc="48993d4f" sha1="162b0ab1fcfcf9b7ac888f137fedc41264219cf9"/>
@@ -18150,20 +18200,19 @@
 	</software>
 
 	<software name="pokepika">
-		<!-- Notes: SGB enhanced -->
-		<description>Pocket Monsters - Pikachu (Japan, Rev. 4)</description>
+		<description>Pocket Monsters - Pikachu (Japan, Rev. 3)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN"/>
 		<info name="release" value="19980912"/>
 		<info name="alt_title" value="ポケットモンスター ピカチュウ"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-KFDN-10" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC3A [MBC3 A]" />
-			<feature name="u3" value="U3 RAM [LH52256CN-10LL]" />
-			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="u2" value="U2 MBC3A [MBC3 A]" /> <!-- Also found with [MBC-3 B] -->
+			<feature name="u3" value="U3 RAM [LH52256CN-10LL]" /> <!-- Also found with [BS62LV256SC-70] -->
+			<feature name="u4" value="U4 MM1134A [134A]" /> <!-- Also found with [6735] -->
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<dataarea name="rom" size="1048576">
@@ -18175,20 +18224,19 @@
 	</software>
 
 	<software name="pokepikaa" cloneof="pokeyell">
-		<!-- Notes: SGB enhanced -->
-		<description>Pocket Monsters - Pikachu (Japan, Rev. 3)</description>
+		<description>Pocket Monsters - Pikachu (Japan, Rev. 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN"/>
 		<info name="release" value="19980912"/>
 		<info name="alt_title" value="ポケットモンスター ピカチュウ"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-KFDN-10" />
+			<feature name="pcb" value="DMG-KFDN-10" /> <!-- Also found with DMG-KFDN-01 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC3A [MBC3 A]" />
-			<feature name="u3" value="U3 RAM [GM76C256CLLFWJ0]" />
-			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="u2" value="U2 MBC3A [MBC3 A]" /> <!-- Also found with [MBC3 A P-2] -->
+			<feature name="u3" value="U3 RAM [GM76C256CLLFWJ0]" /> <!-- Also found with [BR62256F-70LL] -->
+			<feature name="u4" value="U4 MM1134A [134A]" /> <!-- Also found with [6129A] and [26A] -->
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<dataarea name="rom" size="1048576">
@@ -18200,19 +18248,18 @@
 	</software>
 
 	<software name="pokepikab" cloneof="pokeyell">
-		<!-- Notes: SGB enhanced -->
-		<description>Pocket Monsters - Pikachu (Japan, Rev. 2)</description>
+		<description>Pocket Monsters - Pikachu (Japan, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN"/>
 		<info name="release" value="19980912"/>
 		<info name="alt_title" value="ポケットモンスター ピカチュウ"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-KFDN-01" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC3A [MBC3 A]" />
-			<feature name="u3" value="U3 RAM" />
+			<feature name="u2" value="U2 MBC3A [MBC3 A P-2]" />
+			<feature name="u3" value="U3 RAM [GM76C256CLLFW70]" />
 			<feature name="u4" value="U4 [6129A]" />
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
@@ -18225,20 +18272,19 @@
 	</software>
 
 	<software name="pokepikac" cloneof="pokeyell">
-		<!-- Notes: SGB enhanced -->
-		<description>Pocket Monsters - Pikachu (Jpn, Rev. 0A)</description>
+		<description>Pocket Monsters - Pikachu (Japan)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSJ-JPN"/>
 		<info name="release" value="19980912"/>
 		<info name="alt_title" value="ポケットモンスター ピカチュウ"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-KFDN-01" />
+			<feature name="pcb" value="DMG-KFDN-01" /> <!-- Also found with DMG-LFDN-01 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC3A [MBC3 A]" />
-			<feature name="u3" value="U3 RAM [GM76C256CLLFW70]" />
-			<feature name="u4" value="U4 [6129A]" />
+			<feature name="u2" value="U2 MBC3A [MBC3 A]" /> <!-- Also found with [MBC3] -->
+			<feature name="u3" value="U3 RAM [GM76C256CLLFW70]" /> <!-- Also found with [LH52256CN-10LL] -->
+			<feature name="u4" value="U4 [6129A]" /> <!-- Also found with [26A] -->
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<dataarea name="rom" size="1048576">
@@ -18307,20 +18353,19 @@
 	</software>
 
 	<software name="pokemido">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Monsters Midori (Japan, Rev. 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-APBJ-JPN"/>
+		<info name="serial" value="DMG-APBJ-JPN (G743412)"/>
 		<info name="release" value="19960227"/>
 		<info name="alt_title" value="ポケットモンスター緑"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DEDN-01" />
+			<feature name="pcb" value="DMG-DEDN-01" /> <!-- Also found with DMG-DEDN-10 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1B [MBC1B1]" />
-			<feature name="u3" value="U3 RAM [LH52B256NZ-10PLL]" />
-			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="u2" value="U2 MBC1B [MBC1B1]" /> <!-- Also found with [DMG MBC1-B] -->
+			<feature name="u3" value="U3 RAM [LH52B256NZ-10PLL]" /> <!-- Also found with [LH52B256NA-10PLL] -->
+			<feature name="u4" value="U4 26A [26A]" /> <!-- Also found with [6129A] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -18401,21 +18446,21 @@
 	</software>
 
 	<software name="pokeblue">
-		<!-- Notes: SGB enhanced -->
-		<description>Pokémon - Blue Version (Euro, Aus, USA)</description>
+		<description>Pokémon - Blue Version (Australia, Europe, USA)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-APEE-USA, DMG-APEU-(EUR/AUS)"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<info name="serial" value="DMG-APEE-USA, DMG-APEU-AUS, DMG-APEU-EUR"/>
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-KFDN-10" />
+			<feature name="pcb" value="DMG-KFDN-10" /> <!-- Also found with DMG-KFDN-01 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC3A [MBC-3 A]" />
+			<feature name="u2" value="U2 MBC3A [MBC-3 A]" /> <!-- Also found with [MBC3 A P-2] -->
 			<feature name="u3" value="U3 RAM [LH52256CN-10LL]" />
-			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="u4" value="U4 MM1134A [134A]" /> <!-- Also found with [26A] -->
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<dataarea name="rom" size="1048576">
+				<!-- USA cart has label DMG-APEE-0 -->
 				<rom name="dmg-apeu-0.u1" size="1048576" crc="d6da8a1a" sha1="d7037c83e1ae5b39bde3c30787637ba1d4c48ce2"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
@@ -18441,17 +18486,16 @@
 	</software>
 
 	<software name="pokeblueg" cloneof="pokeblue">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Blaue Edition (Germany)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APED-NOE"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
-			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5 P-1]" />
+			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" /> <!-- Also found with [LH52256CN-10LL] -->
 			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
@@ -18504,22 +18548,21 @@
 	</software>
 
 	<software name="pokered">
-		<!-- Notes: SGB enhanced -->
-		<description>Pokémon - Red Version (Euro, Aus, USA)</description>
+		<description>Pokémon - Red Version (Australia, Europe, USA)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-APAE-USA, DMG-APAU-(EUR/AUS)"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<info name="serial" value="DMG-APAE-USA, DMG-APAU-AUS, DMG-APAU-EUR"/>
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
-			<feature name="pcb" value="DMG-KFDN-10" /> <!-- DMG-APAU-EUR -->
-			<feature name="u1" value="U1 PRG" /> <!-- DMG-APAU-EUR -->
-			<feature name="u2" value="U2 MBC3A [MBC3 B]" /> <!-- DMG-APAU-EUR -->
-			<feature name="u3" value="U3 RAM [W24257S-70LL]" /> <!-- DMG-APAU-EUR -->
-			<feature name="u4" value="U4 MM1134 [134A]" /> <!-- DMG-APAU-EUR -->
-			<feature name="batt" value="Batt CR2025" /> <!-- DMG-APAU-EUR -->
+			<feature name="pcb" value="DMG-KFDN-10" /> <!-- Also found with DMG-KFDN-01 -->
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC3A [MBC3 B]" /> <!-- Also found with [MBC3 A P-2] -->
+			<feature name="u3" value="U3 RAM [W24257S-70LL]" /> <!-- Also found with [LH52256CN-10LL] -->
+			<feature name="u4" value="U4 MM1134 [134A]" /> <!-- Also found with [6129A] -->
+			<feature name="batt" value="Batt CR2025" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - red version (usa, europe).bin" size="1048576" crc="9f7fdd53" sha1="ea9bcae617fdf159b045185467ae58b2e4a48b9a"/>
+				<rom name="dmg-apau-0.u1" size="1048576" crc="9f7fdd53" sha1="ea9bcae617fdf159b045185467ae58b2e4a48b9a"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -18527,16 +18570,21 @@
 	</software>
 
 	<software name="pokeredf" cloneof="pokered">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Version Rouge (France)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAF-FRA"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-A02-01" />
+			<feature name="u1" value="U1 2M/4M/8M-MROM" />
+			<feature name="u2" value="U2 MBC-5" />
+			<feature name="u3" value="U3 256K-SRAM" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - version rouge (france).bin" size="1048576" crc="337fce11" sha1="47a7622fa30e6402a3891fe65b3a930bf9bd7aec"/>
+				<rom name="dmg-apaf-0.u1" size="1048576" crc="337fce11" sha1="47a7622fa30e6402a3891fe65b3a930bf9bd7aec"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -18544,16 +18592,21 @@
 	</software>
 
 	<software name="pokeredg" cloneof="pokered">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Rote Edition (Germany)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAD-NOE"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-A02-01" />
+			<feature name="u1" value="U1 2M/4M/8M-MROM" />
+			<feature name="u2" value="U2 MBC-5 [MBC5 P-1]" />
+			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pokemon - rote edition (germany).bin" size="1048576" crc="89197825" sha1="87d523fe1a0c548db7c5477b451ddec1eb083c06"/>
+				<rom name="dmg-apad-0.u1" size="1048576" crc="89197825" sha1="87d523fe1a0c548db7c5477b451ddec1eb083c06"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -18617,21 +18670,21 @@
 	</software>
 
 	<software name="pokeyell">
-		<!-- Notes: SGB enhanced -->
-		<description>Pokémon - Yellow Version (Euro, Aus, USA)</description>
+		<description>Pokémon - Yellow Version (Australia, Europe, USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-APSE-USA, DMG-APSU-(EUR/AUS)"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<info name="serial" value="DMG-APSE-USA, DMG-APSE-USA-1, DMG-APSU-AUS, DMG-APSU-EUR"/>
+		<sharedfeat name="compatibility" value="GB,SGB,GBC" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
-			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" />
-			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="u2" value="U2 MBC-5 [MBC-5]" /> <!-- Also found with [MBC5 P-1] -->
+			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" /> <!-- Also found with [LH52256CN-10LL] -->
+			<feature name="u4" value="U4 MM1134A [134A]" /> <!-- Also found with [6735] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
+				<!-- USA cart has label DMG-APSE-0 -->
 				<rom name="dmg-apsu-0.u1" size="1048576" crc="7d527d62" sha1="cc7d03262ebfaf2f06772c1a480c7d9d5f4a38e1"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768">
@@ -18640,18 +18693,17 @@
 	</software>
 
 	<software name="pokeyellf" cloneof="pokeyell">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Version Jaune (France)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSF-FRA"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB,GBC" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
-			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 256K-SRAM [LH52256CN-10LL]" /> <!-- Sharp RAM -->
-			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
+			<feature name="u3" value="U3 256K-SRAM [LH52256CN-10LL]" /> <!-- Also found with [W24258S-70LE] -->
+			<feature name="u4" value="U4 MM1134A [6735]" /> <!-- Also found with [134A] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -18663,18 +18715,17 @@
 	</software>
 
 	<software name="pokeyellg" cloneof="pokeyell">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Gelbe Edition (Germany)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSD-NOE"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB,GBC" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
-			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 256K-SRAM" />
-			<feature name="u4" value="U4 MM1134A" />
+			<feature name="u2" value="U2 MBC-5 [MBC-5]" /> <!-- Also found with [MBC5 P-1] -->
+			<feature name="u3" value="U3 256K-SRAM [W24258S-70LE]" /> <!-- Also found with [LC35256DM-70W] -->
+			<feature name="u4" value="U4 MM1134A [6735]" /> <!-- Also found with [134A] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -18762,10 +18813,10 @@
 		<description>Pop Up (Europe)</description>
 		<year>1992</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="DMG-OP-NOE"/>
+		<info name="serial" value="DMG-OP-FAH, DMG-OP-NOE"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-03" />
+			<feature name="pcb" value="DMG-AAA-03" /> <!-- Also found with DMG-AAA-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-opx-0.u1" size="32768" crc="7f545b40" sha1="80094c524c8c9dd01d1402692837b4bc9701350f"/>
@@ -18903,14 +18954,17 @@
 		<description>Power Mission (Japan)</description>
 		<year>1990</year>
 		<publisher>Vap</publisher>
-		<info name="serial" value="DMG-XCA"/>
+		<info name="serial" value="DMG-XCA (9506)"/>
 		<info name="release" value="19900824"/>
 		<info name="alt_title" value="パワーミッション"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1A]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="power mission (japan).bin" size="131072" crc="0e2a1414" sha1="ef28356e7a3b82f64e62cb9a7b4c121aa626ff7c"/>
+				<rom name="dmg-xca-0.u1" size="131072" crc="0e2a1414" sha1="ef28356e7a3b82f64e62cb9a7b4c121aa626ff7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18999,12 +19053,15 @@
 		<description>Prehistorik Man (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Titus</publisher>
-		<info name="serial" value="DMG-UH-USA, DMG-UH-EUR"/>
+		<info name="serial" value="DMG-UH-EUR, DMG-UH-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="prehistorik man (usa, europe).bin" size="131072" crc="c5204156" sha1="1139d6b799b8585bbb7868bd3bca5ba9dea4eef5"/>
+				<rom name="dmg-uhe-0.u1" size="131072" crc="c5204156" sha1="1139d6b799b8585bbb7868bd3bca5ba9dea4eef5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19330,18 +19387,17 @@
 	</software>
 
 	<software name="puyopuyo">
-		<!-- Notes: SGB enhanced -->
 		<description>Puyo Puyo (Japan, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-QQJ"/>
 		<info name="release" value="19940731"/>
 		<info name="alt_title" value="ぷよぷよ"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN(K)-02" />
+			<feature name="pcb" value="DMG-BEAN(K)-02" /> <!-- Also found with DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-qqj-1.u1" size="262144" crc="20e48285" sha1="ef05ab17131030554e0d820dd0e602af82e1fe54"/>
@@ -19529,14 +19585,14 @@
 		<description>Qix (World)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-QXA, DMG-QX-USA, DMG-QX-UKV"/>
-		<info name="release" value="19900413 (JPN)"/>
+		<info name="serial" value="DMG-QXA, DMG-QX-SCN, DMG-QX-UKV, DMG-QX-USA"/>
+		<info name="release" value="19900413"/>
 		<info name="alt_title" value="クイックス"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart, JPN version on DMG-BBA-02 pcb -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- Also found with DMG-BBA-02 and DMG-BEAN-01 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" /> <!-- Also found with [DMG MBC1-B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-qxa-0.u1" size="65536" crc="9185e89e" sha1="fb9935ca821562966eafa8f60ec2f489ad33940a"/>
@@ -19632,9 +19688,12 @@
 		<info name="alt_title" value="アール・タイプ"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="r-type (japan).bin" size="131072" crc="e4988910" sha1="440573ce4ea3bab679e25315cd3f05c5530f6bd1"/>
+				<rom name="dmg-rea-0.u1" size="131072" crc="e4988910" sha1="440573ce4ea3bab679e25315cd3f05c5530f6bd1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19917,10 +19976,10 @@
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-01" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" /> <!-- Also found with [DMG MBC1A] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="red arremer - makaimura gaiden (japan).bin" size="131072" crc="ae0122aa" sha1="dd49a66372411da76023e993b3476190f76eeca8"/>
+				<rom name="dmg-raj-0.u1" size="131072" crc="ae0122aa" sha1="dd49a66372411da76023e993b3476190f76eeca8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21049,7 +21108,7 @@
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BBA-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1A]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-svj-0.u1" size="65536" crc="79afe59e" sha1="42ec788b74b03000164533c87cab0292b0d37995"/>
@@ -21680,12 +21739,13 @@
 		<description>The Smurfs Travel the World (Europe)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="DMG-AUFP-(EUR/NOE)"/>
+		<info name="serial" value="DMG-AUFP-EUR, DMG-AUFP-FAH, DMG-AUFP-NOE"/>
+		<info name="alt_title" value="Les Schtroumpfs autour du monde (French Box)"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN-10 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-aufp-0.u1" size="131072" crc="cb2c7198" sha1="e138c3ac1bc2e23091e71cc1aa90788770622458"/>
@@ -21830,15 +21890,15 @@
 	</software>
 
 	<software name="soccer">
-		<description>Soccer (Europe)</description>
+		<description>Soccer (Australia, Europe)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
-		<info name="serial" value="DMG-YK-(NOE-1/UKV-1/ESP-1/AUS/FAH/EUR)"/>
+		<info name="serial" value="DMG-YK-AUS, DMG-YK-ESP-1, DMG-YK-EUR, DMG-YK-FAH, DMG-YK-NOE-1, DMG-YK-UKV-1"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />  <!-- Also found on DMG-BEAN-10 pcb -->
+			<feature name="pcb" value="DMG-BEAN-02" />  <!-- Also found with DMG-BEAN-10 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-yky-0.u1" size="131072" crc="c36b199b" sha1="355fb7f220a0ba470011220282a59e707f168e1a"/>
@@ -22918,9 +22978,12 @@
 		<info name="serial" value="DMG-N6-EUR"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN(K)-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="super battletank (europe).bin" size="131072" crc="31a227ed" sha1="4931b578626abf8fd2e7b6e344234e7e688a1406"/>
+				<rom name="dmg-n6x-0.u1" size="131072" crc="31a227ed" sha1="4931b578626abf8fd2e7b6e344234e7e688a1406"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23060,16 +23123,15 @@
 	</software>
 
 	<software name="supchinf">
-		<!-- Notes: SGB enhanced -->
 		<description>Super Chinese Fighter GB (Japan)</description>
 		<year>1996</year>
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-AFFJ-JPN"/>
 		<info name="release" value="19961228"/>
 		<info name="alt_title" value="スーパーチャイニーズFIGHTER GB"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="pcb" value="DMG-BEAN-01" /> <!-- Also found with DMG-BFAN-01 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
@@ -23149,14 +23211,14 @@
 	</software>
 
 	<software name="sdkong" cloneof="dkland">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<!-- Also released via the Nintendo Power service in 2000-03 -->
 		<description>Super Donkey Kong GB (Japan)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-YTJ"/> <!-- DMG-YTJ-JPN G735376 -->
+		<info name="serial" value="DMG-YTJ-JPN (G735376)"/>
 		<info name="release" value="19950727"/>
 		<info name="alt_title" value="スーパードンキーコングGB"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
@@ -23247,17 +23309,17 @@
 
 	<software name="sml">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Super Mario Land (World, Rev. A)</description>
+		<description>Super Mario Land (World, Rev. 1)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-MLA, DMG-ML-USA, DMG-ML-NOE"/>
-		<info name="release" value="19890421 (JPN)"/>
+		<info name="serial" value="DMG-MLA, DMG-ML-ITA, DMG-ML-NOE, DMG-ML-UKV, DMG-ML-USA, DMG-ML-USA-1"/>
+		<info name="release" value="19890421"/>
 		<info name="alt_title" value="スーパーマリオランド"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BBA-02" />   <!-- JPN cart, also found on DMG-BBA-03 and DMG-BEAN-02 pcbs -->
+			<feature name="pcb" value="DMG-BBA-02" /> <!-- Also found with DMG-BBA-03, DMG-BEAN-01, DMG-BEAN-10 and DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" /> <!-- Also found with [DMG MBC1B1] and [DMG MBC1-B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-mla-1.u1" size="65536" crc="2c27ec70" sha1="418203621b887caa090215d97e3f509b79affd3e"/>
@@ -23283,15 +23345,21 @@
 	</software>
 
 	<software name="sml2">
-		<description>Super Mario Land 2 - 6 Golden Coins (Euro, Aus, USA, Rev. B)</description>
+		<description>Super Mario Land 2 - 6 Golden Coins (Australia, Europe, USA, Rev. 2)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-MQ-USA, DMG-MQ-(UKV/AUS/EUR)"/>
+		<info name="serial" value="DMG-MQ-AUS, DMG-MQ-EUR, DMG-MQ-UKV, DMG-MQ-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
+			<feature name="u4" value="U4 26A [6129]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="super mario land 2 - 6 golden coins (usa, europe) (rev b).bin" size="524288" crc="635a9112" sha1="d11d94fa3c36b9f72e925070b66bb4f16d31001e"/>
+				<rom name="dmg-mqe-2.u1" size="524288" crc="635a9112" sha1="d11d94fa3c36b9f72e925070b66bb4f16d31001e"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23324,12 +23392,18 @@
 		<description>Super Mario Land 2 - 6 Golden Coins (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-MQ-USA, DMG-MQ-(NOE/UKV)"/>
+		<info name="serial" value="DMG-MQ-NOE, DMG-MQ-UKV, DMG-MQ-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u3" value="U3 RAM [LH5168NFB-10TL]" />
+			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="super mario land 2 - 6 golden coins (usa, europe).bin" size="524288" crc="d5ec24e4" sha1="bba408539ecbf8d322324956d859bc86e2a9977b"/>
+				<rom name="dmg-mqe-0.u1" size="524288" crc="d5ec24e4" sha1="bba408539ecbf8d322324956d859bc86e2a9977b"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23346,9 +23420,15 @@
 		<info name="alt_title" value="スーパーマリオランド2 6つの金貨"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u3" value="U3 RAM [XLJ6265AF-10SL]" />
+			<feature name="u4" value="U4 26A [6129]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="super mario land 2 - 6-tsu no kinka (japan) (rev b).bin" size="524288" crc="29e0911a" sha1="aaadb040ee6d85418e12f9993beb4f2cb8dc9953"/>
+				<rom name="dmg-l6j-2.u1" size="524288" crc="29e0911a" sha1="aaadb040ee6d85418e12f9993beb4f2cb8dc9953"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -23804,9 +23884,12 @@
 		<info name="alt_title" value="タイトー チェイスH.Q."/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="taito chase h.q. (japan).bin" size="131072" crc="c58bb4f5" sha1="d448c5c63a0cca4f7c4ee806ff928c564d40d386"/>
+				<rom name="dmg-hqj-0.u1" size="131072" crc="c58bb4f5" sha1="d448c5c63a0cca4f7c4ee806ff928c564d40d386"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24397,15 +24480,15 @@
 
 	<software name="tetris">
 		<!-- Also released via the Nintendo Power service in 2000-09 -->
-		<description>Tetris (World, Rev. A)</description>
+		<description>Tetris (World, Rev. 1)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-TRA, DMG-TR-USA, DMG-TR-CAN, DMG-TR-NOE, DMG-TR-ESP, DMG-TR-ESP-1, DMG-TR-UKVAUS, DMG-TR-HKG, DMG-104 CHN"/>
-		<info name="release" value="19890614 (JPN)"/>
+		<info name="serial" value="DMG-104 CHN, DMG-TRA, DMG-TR-AUS, DMG-TR-CAN, DMG-TR-ESP, DMG-TR-ESP-1, DMG-TR-EUR, DMG-TR-HKG, DMG-TR-NOE, DMG-TR-SCN-1, DMG-TR-UKV, DMG-TR-USA"/>
+		<info name="release" value="19890614"/>
 		<info name="alt_title" value="テトリス"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-03" />
+			<feature name="pcb" value="DMG-AAA-03" /> <!-- Also found with AAAC S -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-tra-1.u1" size="32768" crc="46df91ad" sha1="74591cc9501af93873f9a5d3eb12da12c0723bbc"/>
@@ -24478,15 +24561,18 @@
 	</software>
 
 	<software name="tetrisat">
-		<description>Tetris Attack (Euro, USA, Rev. A)</description>
+		<description>Tetris Attack (Europe, USA, Rev. 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AYLE-USA, DMG-AYLP-EUR"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="tetris attack (usa, europe) (rev a).bin" size="524288" crc="5ee45a4d" sha1="85b4b0d5a5a0417e10fed853419fe65975a6071f"/>
+				<rom name="dmg-aylp-1.u1" size="524288" crc="5ee45a4d" sha1="85b4b0d5a5a0417e10fed853419fe65975a6071f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24910,7 +24996,7 @@
 			<feature name="pcb" value="DMG-GDAN-03" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
-			<feature name="u3" value="U3 26A [6129 3443]" />
+			<feature name="u3" value="U3 26A [6129]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
@@ -25813,12 +25899,15 @@
 		<description>V-Rally - Championship Edition (Europe)</description>
 		<year>1998</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="DMG-AVLP-NOE"/>
+		<info name="serial" value="DMG-AVLP-FAH, DMG-AVLP-NOE"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="v-rally - championship edition (europe) (en,fr,de).bin" size="262144" crc="d149652b" sha1="67d2a6e41b6a1d8372808535ac8c8222d7c53480"/>
+				<rom name="dmg-avlp-0.u1" size="262144" crc="d149652b" sha1="67d2a6e41b6a1d8372808535ac8c8222d7c53480"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25982,16 +26071,15 @@
 	</software>
 
 	<software name="warblast">
-		<!-- Notes: SGB enhanced -->
-		<description>Wario Blast Featuring Bomberman! (Europe, USA)</description>
+		<description>Wario Blast featuring Bomberman! (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-EE-USA, DMG-EE-NOE"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<info name="serial" value="DMG-EE-NOE, DMG-EE-UKV, DMG-EE-USA"/>
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-eee-0.u1" size="262144" crc="927b57a1" sha1="279fb0223e362db553b739b1b8f9c18b81d92413"/>
@@ -26004,16 +26092,16 @@
 		<description>Wario Land - Super Mario Land 3 (World)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-WJA, DMG-WJ-USA, DMG-WJ-NOE, DMG-WJ-EUR, DMG-WJ-ESP-1"/>
-		<info name="release" value="19940121 (JPN)"/>
+		<info name="serial" value="DMG-WJA, DMG-WJ-ESP-1, DMG-WJ-EUR, DMG-WJ-NOE, DMG-WJ-SCN, DMG-WJ-UKV, DMG-WJ-USA"/>
+		<info name="release" value="19940121"/>
 		<info name="alt_title" value="スーパーマリオランド3 ワリオランド"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR cart, JPN cart on DECN(K)-02 pcb -->
+			<feature name="pcb" value="DMG-DECN-10" />  <!-- Also found with DMG-DECN(K)-02 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
-			<feature name="u3" value="U3 RAM [LH5164AN-10L]" /> <!-- Sharp RAM -->
-			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" /> <!-- Also found with [DMG MBC1-B] -->
+			<feature name="u3" value="U3 RAM [LH5164AN-10L]" /> <!-- Also found with [HY6264ALLJ-10] and [XLJ6265BF-10SL] -->
+			<feature name="u4" value="U4 26A [26A]" /> <!-- Also found with [6129A] -->
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -26025,14 +26113,13 @@
 	</software>
 
 	<software name="wario2">
-		<!-- Notes: SGB enhanced-->
 		<description>Wario Land II (Europe, USA)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AW2E-USA, DMG-AW2P-EUR"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-LFDN-01" />  <!-- EUR cart -->
+			<feature name="pcb" value="DMG-LFDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3 [MBC3]" />
 			<feature name="u3" value="U3 RAM [BR82256P-70LL]" />
@@ -26311,9 +26398,9 @@
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DEDN-01" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1B [MBC1-B]" />
+			<feature name="u2" value="U2 MBC1B [DMG MBC1-B]" />
 			<feature name="u3" value="U3 RAM [LH52B256NA-10TLL]" />
-			<feature name="u4" value="U4 26A [6129 3C86]" />
+			<feature name="u4" value="U4 26A [6129]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
@@ -26325,16 +26412,16 @@
 	</software>
 
 	<software name="wizardwx">
-		<description>Wizards &amp; Warriors Chapter X - The Fortress of Fear (Europe, USA)</description>
+		<description>Wizards &amp; Warriors Chapter X - The Fortress of Fear (Australia, Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-WW-USA, DMG-WW-(NOE/ESP-1/UKV)"/>
+		<info name="serial" value="DMG-WW-AUS, DMG-WW-ESP-1, DMG-WW-NOE, DMG-WW-UKV, DMG-WW-USA"/>
 		<info name="alt_title" value="Wizards &amp; Warriors X - The Fortress of Fear (Box)"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-01" />  <!-- NOE & UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-01" /> <!-- Also found with DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-wwe-0.u1" size="65536" crc="104eb503" sha1="22a514056e58263dc08602778bc3bf2c0ca6e681"/>
@@ -26446,16 +26533,18 @@
 	</software>
 
 	<software name="wcup98">
-		<!-- Notes: SGB enhanced -->
 		<description>World Cup 98 (Europe, USA)</description>
 		<year>1998</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8WE-USA, DMG-A8WP-EUR"/>
-		<sharedfeat name="compatibility" value="GB" />
+		<sharedfeat name="compatibility" value="GB,SGB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="world cup 98 (usa, europe).bin" size="524288" crc="6a3272b1" sha1="f71a802596d2a56ee3e708ecac90735d42757e5b"/>
+				<rom name="dmg-a8wp-0.u1" size="524288" crc="6a3272b1" sha1="f71a802596d2a56ee3e708ecac90735d42757e5b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26645,12 +26734,12 @@
 		<description>WWF Superstars (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>LJN</publisher>
-		<info name="serial" value="DMG-LW-USA, DMG-LW-(FAH/NOE)"/>
+		<info name="serial" value="DMG-LW-FAH, DMG-LW-NOE, DMG-LW-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FAH & USA carts -->
+			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-lwe-0.u1" size="131072" crc="adbc4e0a" sha1="957a7d33a1569158f7b1882362262a6ab391ff5b"/>
@@ -26832,9 +26921,12 @@
 		<info name="serial" value="DMG-AYNP-FRA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="yannick noah tennis (france).bin" size="65536" crc="402d4d47" sha1="5bc39c44da587a89bef7478617c402855a1b5b24"/>
+				<rom name="dmg-aynp-0.u1" size="65536" crc="402d4d47" sha1="5bc39c44da587a89bef7478617c402855a1b5b24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26904,12 +26996,12 @@
 		<description>Yoshi's Cookie (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-CI-USA, DMG-CI-UKV"/>
+		<info name="serial" value="DMG-CI-EUR, DMG-CI-UKV, DMG-CI-USA"/>
 		<sharedfeat name="compatibility" value="GB" />
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN-10 -->
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-cie-0.u1" size="131072" crc="75336712" sha1="233dcc94d86951ddf167aaa82ec9b94b87b29e2d"/>
@@ -27470,7 +27562,7 @@
 	</software>
 
 	<software name="rockman8">
-		<description>Rockman 8 (Chi)</description>
+		<description>Rockman 8 (China)</description>
 		<year>1999</year>
 		<publisher>Yong Yong</publisher>
 		<sharedfeat name="compatibility" value="GB" />
@@ -27485,7 +27577,7 @@
 	</software>
 
 	<software name="sml4" cloneof="crayon4">
-		<description>Super Mario Land 4 (Chi)</description>
+		<description>Super Mario Land 4 (China)</description>
 		<year>1997?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="GB" />
@@ -27498,7 +27590,7 @@
 	</software>
 
 	<software name="sonic3d5">
-		<description>Sonic 3D Blast 5 (Chi)</description>
+		<description>Sonic 3D Blast 5 (China)</description>
 		<year>1998</year>
 		<publisher>Yong Yong</publisher>
 		<sharedfeat name="compatibility" value="GB" />
@@ -27524,7 +27616,7 @@
 	</software>
 
 	<software name="ffant4" cloneof="ffantlg3">
-		<description>Final Fantasy 4 (Chi)</description>
+		<description>Final Fantasy 4 (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="GB" />
@@ -27539,7 +27631,7 @@
 	</software>
 
 	<software name="mhzx">
-		<description>Meng Huan Zhi Xing (Chi)</description>
+		<description>Meng Huan Zhi Xing (China, set 1)</description>
 		<year>19??</year>
 		<publisher>SKOB</publisher>
 		<sharedfeat name="compatibility" value="GB" />
@@ -27554,7 +27646,7 @@
 	</software>
 
 	<software name="mhzxa" cloneof="mhzx">
-		<description>Meng Huan Zhi Xing (Chi, Alt)</description>
+		<description>Meng Huan Zhi Xing (China, set 2)</description>
 		<year>19??</year>
 		<publisher>SKOB</publisher>
 		<sharedfeat name="compatibility" value="GB" />
@@ -27608,7 +27700,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 -->
 
 	<software name="pipaball">
-		<description>Song of the Pipa / Magic Ball (Tw)</description>
+		<description>Song of the Pipa / Magic Ball (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<info name="serial" value="GS-01"/>
@@ -27622,7 +27714,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="firedrag">
-		<description>Fire Dragon (Tw)</description>
+		<description>Fire Dragon (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<info name="serial" value="GS-06"/>
@@ -27636,7 +27728,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="lasama">
-		<description>La Sa Ma Chuan Qi - Story of Lasama (Tw)</description>
+		<description>La Sa Ma Chuan Qi - Story of Lasama (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<info name="serial" value="GS-04"/>
@@ -27652,7 +27744,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="magicbal">
-		<description>Magic Ball (Tw)</description>
+		<description>Magic Ball (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<info name="serial" value="GS-02"/>
@@ -27666,7 +27758,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="mitudelu">
-		<description>Mi Tu De Lu (Tw)</description>
+		<description>Mi Tu De Lu (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<sharedfeat name="compatibility" value="GB" />
@@ -27679,7 +27771,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="yehrude">
-		<description>Prince YehRude (Tw)</description>
+		<description>Prince YehRude (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<info name="serial" value="GS-03"/>
@@ -27693,7 +27785,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="rainbwpr">
-		<description>Rainbow Prince (Tw)</description>
+		<description>Rainbow Prince (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<info name="serial" value="GS-05"/>
@@ -27707,7 +27799,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="tigerdrg">
-		<description>Tiger A Dragon (Tw)</description>
+		<description>Tiger A Dragon (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
 		<sharedfeat name="compatibility" value="GB" />
@@ -27723,7 +27815,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 
 
 	<software name="188in1" supported="partial">
-		<description>Color GameBoy 188 in 1 (HK)</description>
+		<description>Color GameBoy 188 in 1 (Hong Kong)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="GB" />
