@@ -58,6 +58,7 @@ public:
 	void init_ladylinrb();
 	void init_ladylinrc();
 	void init_ladylinrd();
+	void init_ladylinre();
 	DECLARE_VIDEO_START(goldstar);
 	void cm_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(cherrym);
