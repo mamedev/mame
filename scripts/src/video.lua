@@ -1269,7 +1269,7 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/bt431.h,VIDEOS["VRENDER0"] = true
+--@src/devices/video/vrender0.h,VIDEOS["VRENDER0"] = true
 --------------------------------------------------
 
 if (VIDEOS["VRENDER0"]~=null) then
