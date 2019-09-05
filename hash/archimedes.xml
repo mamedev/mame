@@ -189,7 +189,8 @@ Zalaga by ProAction (RiscPC & StrongARM)
 Zelanites: The Onslaught by Micro Power (RiscOS2)
 -->
 
-	<software name="2067bc">
+	<!-- Boot OK, !Control throws a "sprite doesn't exist" exception -->
+	<software name="2067bc" supported="partial">
 		<description>2067 BC</description>
 		<year>1992</year>
 		<publisher>Oregan Software</publisher>
@@ -211,7 +212,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="aggress">
+	<!-- jumps to lalaland, has trainer -->
+	<software name="aggress" supported="no">
 		<description>Aggressor</description>
 		<year>1992</year>
 		<publisher>Atomic Software</publisher>
@@ -222,7 +224,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="airsuprm">
+	<!-- boot OK -->
+	<software name="airsuprm" supported="yes">
 		<description>Air Supremacy</description>
 		<year>1991</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -233,7 +236,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="aldebaran">
+	<!-- no key seems to work on title screen -->
+	<software name="aldebaran" supported="no">
 		<description>Aldebaran</description>
 		<year>1991</year>
 		<publisher>Evolution Trading</publisher>
@@ -244,7 +248,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="alerion">
+	<!-- boot OK -->
+	<software name="alerion" supported="yes">
 		<description>Alerion</description>
 		<year>1994</year>
 		<publisher>Archimedes World</publisher>
@@ -255,7 +260,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="alienatt">
+	<!-- boot OK, has a vertical line gap on player ship when moving left/right -->
+	<software name="alienatt" supported="partial">
 		<description>Alien Attack</description>
 		<year>1992</year>
 		<publisher>Archimedes World</publisher>
@@ -521,7 +527,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="break147">
+	<!-- boot OK -->
+	<software name="break147" supported="yes">
 		<description>Break 147</description>
 		<year>1991</year>
 		<publisher>Fourth Dimension</publisher>
@@ -532,7 +539,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="bublfair">
+	<!-- No key works for "insert coin" -->
+	<software name="bublfair" supported="no">
 		<description>Bubble Fair</description>
 		<year>1991</year>
 		<publisher>Eterna</publisher>
@@ -631,7 +639,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="caverns">
+	<!-- Boot OK -->
+	<software name="caverns" supported="yes">
 		<description>Caverns</description>
 		<year>1991</year>
 		<publisher>Minerva</publisher>
@@ -2818,7 +2827,9 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="xenon2">
+	<!-- Requires multi-drive floppy -->
+	<!-- (swap disk prompt doesn't really appear on screen but it's there) -->
+	<software name="xenon2" supported="partial">
 		<description>Xenon 2: Megablast</description>
 		<year>1993</year>
 		<publisher>Eclipse</publisher>

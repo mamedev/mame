@@ -182,6 +182,10 @@ uint32_t archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		{
 			count = 0;
 			int cursor_h = m_vidc_regs[VIDC_VCER] - m_vidc_regs[VIDC_VCSR];
+			
+			if (cursor_h <= 0)
+				return 0;
+			
 			for(y=0; y<cursor_h; y++)
 			{
 				for(x=0;x<32;x+=4)

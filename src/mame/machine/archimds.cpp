@@ -121,7 +121,6 @@ void archimedes_state::vidc_video_tick()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	static uint8_t *vram = m_region_vram->base();
 	uint32_t size;
-	uint32_t m_vidc_ccur;
 	uint32_t offset_ptr;
 
 	size = (m_vidc_vidend - m_vidc_vidstart + 0x10) & 0x1fffff;
@@ -142,8 +141,10 @@ void archimedes_state::vidc_video_tick()
 
 	if(m_cursor_enabled == true)
 	{
-		for(m_vidc_ccur = 0;m_vidc_ccur < 0x200;m_vidc_ccur++)
-			m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
+		uint32_t ccur_size = (m_vidc_regs[VIDC_VCER] - m_vidc_regs[VIDC_VCSR]) * 32;
+		
+		for(uint32_t ccur = 0; ccur < ccur_size; ccur++)
+			m_cursor_vram[ccur] = (space.read_byte(m_vidc_cinit+ccur));
 	}
 
 	if(m_video_dma_on)
@@ -294,6 +295,9 @@ void archimedes_state::archimedes_reset()
 
 	m_vidc_vblank_time = 10000; // set a stupidly high time so it doesn't fire off
 	m_vbl_timer->adjust(attotime::never);
+	
+	m_cursor_enabled = false;
+	memset(m_cursor_vram, 0, sizeof(m_cursor_vram));
 }
 
 void archimedes_state::archimedes_init()
@@ -757,8 +761,8 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 							case 0x50: return 0; //fdc type, new model returns 5 here
 							case 0x70: return 0x0F;
 							case 0x74: return 0xFF; // unknown
-//                          case 0x78: /* joystick */
-//                          case 0x7c:
+							case 0x78: // joystick DB9 ports
+							case 0x7c: return m_joy[offset & 1].read_safe(0xff);
 						}
 					}
 
@@ -1042,7 +1046,6 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 		switch ((data >> 17) & 7)
 		{
 			case 0: /* video init */
-				m_cursor_enabled = false;
 				m_vidc_vidinit = 0x2000000 | ((data>>2)&0x7fff)*16;
 				//printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
 				break;
@@ -1092,6 +1095,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 					m_vidc_vidcur = 0;
 					m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time+1));
 				}
+				else
+					m_cursor_enabled = false;
 
 				if ((data>>11) & 1)
 				{
