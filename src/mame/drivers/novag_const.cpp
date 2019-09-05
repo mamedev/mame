@@ -26,6 +26,10 @@ Constellation 3.6MHz:
 - 2KB RAM (TC5516AP), 16KB ROM (custom label, assumed TMM23128)
 - PCB supports "Memory Save", but components aren't installed
 
+Constellation Quattro:
+- R65C02P3 @ 4MHz (8MHz XTAL)
+- 2KB RAM (D449C), 16KB ROM (custom label)
+
 Super Sensor IV:
 - MOS MPS6502A @ 2MHz
 - 1KB battery-backed RAM (2*TC5514AP-3)
@@ -43,13 +47,14 @@ Super Constellation:
 TODO:
 - ssensor4 nvram doesn't work, at boot it always starts a new game
 - is Dynamic S a program update of ssensor4 or identical?
-- add Constellation Quattro version, another small update, this time 4MHz
+- verify IRQ active time for ssensor4, const, constq
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/r65c02.h"
 #include "machine/sensorboard.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -59,6 +64,7 @@ TODO:
 
 // internal artwork
 #include "novag_const.lh" // clickable
+#include "novag_constq.lh" // clickable
 #include "novag_ssensor4.lh" // clickable
 #include "novag_supercon.lh" // clickable
 
@@ -81,6 +87,7 @@ public:
 	// machine drivers
 	void nconst(machine_config &config);
 	void nconst36(machine_config &config);
+	void nconstq(machine_config &config);
 	void ssensor4(machine_config &config);
 	void sconst(machine_config &config);
 
@@ -283,7 +290,7 @@ static INPUT_PORTS_START( ssensor4 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sconst )
+static INPUT_PORTS_START( nconstq )
 	PORT_INCLUDE( nconst )
 
 	PORT_MODIFY("IN.1")
@@ -291,6 +298,10 @@ static INPUT_PORTS_START( sconst )
 
 	PORT_MODIFY("IN.2")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Sound / Depth Search / Bishop")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sconst )
+	PORT_INCLUDE( nconstq )
 
 	PORT_MODIFY("IN.4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Print Moves")
@@ -382,6 +393,19 @@ void const_state::sconst(machine_config &config)
 	config.set_default_layout(layout_novag_supercon);
 }
 
+void const_state::nconstq(machine_config &config)
+{
+	sconst(config);
+
+	/* basic machine hardware */
+	R65C02(config.replace(), m_maincpu, 8_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
+
+	config.device_remove("nvram");
+
+	config.set_default_layout(layout_novag_constq);
+}
+
 
 
 /******************************************************************************
@@ -405,6 +429,11 @@ ROM_START( const36 )
 	ROM_LOAD("novag-831a_6133-8316.u2", 0xc000, 0x4000, CRC(7da760f3) SHA1(6172e0fa03377e911141a86747849bf25f20613f) )
 ROM_END
 
+ROM_START( constq )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("novag_854-501.u2", 0xc000, 0x4000, CRC(b083d5c4) SHA1(ecac8a599bd8ea8dd549c742ec45b94fb8b11af4) )
+ROM_END
+
 
 ROM_START( supercon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -425,5 +454,6 @@ CONS( 1981, ssensor4, 0,      0, ssensor4, ssensor4, const_state, empty_init, "N
 
 CONS( 1983, const,    0,      0, nconst,   nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1984, const36,  const,  0, nconst36, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, constq,   const,  0, nconstq,  nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1984, supercon, 0,      0, sconst,   sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

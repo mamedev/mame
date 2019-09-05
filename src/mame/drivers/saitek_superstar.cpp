@@ -14,7 +14,7 @@ Hardware notes (Superstar 28K):
 - TTL, buzzer, 28 LEDs, 8*8 chessboard buttons
 
 Turbostar 432:
-- PCB label: SUPERSTAR REV 3
+- PCB label: SUPERSTAR REV-3
 - R65C02P4 @ 4MHz
 - 4KB RAM (2*HM6116P-4)
 - 32KB ROM (custom label), extension ROM slot
