@@ -35133,7 +35133,7 @@
 
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="buck rogers - planet of zoom (logo crack).dsk" size="143360" crc="bdea01ca" sha1="864fc49ea8f3ab20603a2d03338db96f689d2020" />
+				<rom name="sega - buck rogers - planet of zoom (logo crack).dsk" size="143360" crc="49bc53af" sha1="a565aefbdaa2b94a4c5a18ec5ddd801abfe78827" />
 			</dataarea>
 		</part>
 	</software>
