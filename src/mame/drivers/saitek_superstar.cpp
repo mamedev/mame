@@ -20,7 +20,7 @@ Turbostar 432:
 - 32KB ROM (custom label), extension ROM slot
 
 There are 2 versions of Turbostar 432, the 2nd one has a lighter shade and
-the top-right is gray instead of red.
+the top-right is gray instead of red. It came with the KSO ROM included.
 
 I.C.D. (a reseller in USA, NY) also sold an overclocked version (first 5MHz,
 and later 5.53MHz), and named it Turbostar 540 Plus. The ROM is unmodified,

@@ -454,6 +454,6 @@ CONS( 1981, ssensor4, 0,      0, ssensor4, ssensor4, const_state, empty_init, "N
 
 CONS( 1983, const,    0,      0, nconst,   nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1984, const36,  const,  0, nconst36, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, constq,   const,  0, nconstq,  nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, constq,   const,  0, nconstq,  nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1984, supercon, 0,      0, sconst,   sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

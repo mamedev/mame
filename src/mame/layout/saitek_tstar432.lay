@@ -71,19 +71,6 @@
 	<element name="cblack"><rect><color red="0.41" green="0.4" blue="0.39" /></rect></element>
 	<element name="cwhite"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 
-	<element name="text_sqa">
-		<rect><color red="0.41" green="0.4" blue="0.39" /></rect>
-		<text string="CASUAL"><color red="0.81" green="0.8" blue="0.79" /></text>
-	</element>
-	<element name="text_sqb">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="TOURNAMENT"><color red="0.41" green="0.4" blue="0.39" /></text>
-	</element>
-	<element name="text_sqh">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="PROBLEM"><color red="0.41" green="0.4" blue="0.39" /></text>
-	</element>
-
 	<element name="hlbb" defstate="0">
 		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
 		<disk state="1">
@@ -198,10 +185,6 @@
 		<bezel element="cwhite"><bounds x="50" y="70" width="11" height="10" /></bezel>
 		<bezel element="cblack"><bounds x="60" y="70" width="11" height="10" /></bezel>
 		<bezel element="cwhite"><bounds x="70" y="70" width="10" height="10" /></bezel>
-
-		<bezel element="text_sqa"><bounds x="1" y="78.7" width="8" height="1.25" /></bezel>
-		<bezel element="text_sqb"><bounds x="11" y="78.7" width="8" height="1.25" /></bezel>
-		<bezel element="text_sqh"><bounds x="71" y="78.7" width="8" height="1.25" /></bezel>
 
 		<!-- sensors, pieces -->
 		<repeat count="8">

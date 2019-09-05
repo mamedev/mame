@@ -25,15 +25,16 @@ Hardware notes:
 - sensory board at left edge, only for MK VI
 
 Chess Champion Sensory Board:
+- PCB label: SciSys 502-00
 - 4KB ROM (NEC D2732), TTL
 - magnet sensors, 64 leds
 
-A piece-recognition chessboard was also announced but not released. Maybe
-it existed as prototype, see patent GB2103943A.
+The slots were designed to support anything, but the only released peripheral
+was the Chess Champion Sensory Board. A piece-recognition chessboard was also
+announced but not released. Maybe it existed as prototype, see patent GB2103943A.
 
 TODO:
 - WIP
-- add sensory board peripheral, need rom dump
 - /2 CPU divider when accessing 0x5000 (the nvram)
 - reading from 0x4400 will write to the LCD too, open bus? it wouldn't make
   sense to use it (and as expected, it never is used)
@@ -45,6 +46,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"
+#include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/hlcd0538.h"
@@ -55,6 +57,7 @@ TODO:
 
 // internal artwork
 //#include "saitek_mark5.lh" // clickable
+//#include "saitek_mark6.lh" // clickable
 
 
 namespace {
@@ -65,6 +68,8 @@ public:
 	mark5_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_cb_rom(*this, "chessboard"),
 		m_display(*this, "display%u", 0),
 		m_lcd(*this, "lcd%u", 0),
 		m_dac(*this, "dac"),
@@ -75,6 +80,9 @@ public:
 
 	// machine drivers
 	void mark5(machine_config &config);
+	void mark6(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(cb_enable) { if (!newval) m_display[3]->clear(); }
 
 protected:
 	virtual void machine_start() override;
@@ -83,7 +91,9 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device_array<pwm_display_device, 3> m_display;
+	optional_device<sensorboard_device> m_board;
+	optional_region_ptr<u8> m_cb_rom;
+	optional_device_array<pwm_display_device, 3+1> m_display;
 	required_device_array<hlcd0538_device, 3> m_lcd;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<u8> m_nvram;
@@ -91,7 +101,8 @@ private:
 	output_finder<3, 8, 34> m_out_x;
 
 	// address maps
-	void main_map(address_map &map);
+	void mark5_map(address_map &map);
+	void mark6_map(address_map &map);
 
 	// I/O handlers
 	DECLARE_WRITE8_MEMBER(nvram_w);
@@ -102,6 +113,9 @@ private:
 	DECLARE_WRITE8_MEMBER(reset_irq_w);
 	DECLARE_READ8_MEMBER(reset_irq_r);
 	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_READ8_MEMBER(cb_rom_r);
+	DECLARE_WRITE8_MEMBER(cb_w);
+	DECLARE_READ8_MEMBER(cb_r);
 
 	template<int N> DECLARE_WRITE8_MEMBER(pwm_output_w);
 	template<int N> DECLARE_WRITE64_MEMBER(lcd_output_w);
@@ -109,6 +123,7 @@ private:
 	u8 m_dac_data;
 	u8 m_lcd_lcd;
 	u8 m_lcd_rowsel;
+	u8 m_cb_mux;
 
 	emu_timer *m_irqtimer;
 	TIMER_CALLBACK_MEMBER(interrupt);
@@ -124,11 +139,13 @@ void mark5_state::machine_start()
 	m_dac_data = 0;
 	m_lcd_lcd = 0;
 	m_lcd_rowsel = 0;
+	m_cb_mux = 0;
 
 	// register for savestates
 	save_item(NAME(m_dac_data));
 	save_item(NAME(m_lcd_lcd));
 	save_item(NAME(m_lcd_rowsel));
+	save_item(NAME(m_cb_mux));
 }
 
 void mark5_state::machine_reset()
@@ -246,13 +263,39 @@ READ8_MEMBER(mark5_state::input_r)
 	return ~data;
 }
 
+WRITE8_MEMBER(mark5_state::cb_w)
+{
+	if (~m_inputs[6]->read() & 0x20)
+		return;
+
+	// d0-d2: chessboard led mux 1/input mux
+	// d3-d5: chessboard led mux 2
+	// d6: led state
+	m_display[3]->matrix(1 << (data & 7), 1 << (data >> 3 & 0xf));
+	m_cb_mux = data;
+}
+
+READ8_MEMBER(mark5_state::cb_r)
+{
+	if (~m_inputs[6]->read() & 0x20)
+		return 0xff;
+
+	// read chessboard sensors
+	return ~m_board->read_file(m_cb_mux & 7);
+}
+
+READ8_MEMBER(mark5_state::cb_rom_r)
+{
+	return (m_inputs[6]->read() & 0x20) ? m_cb_rom[offset] : 0xff;
+}
+
 
 
 /******************************************************************************
     Address Maps
 ******************************************************************************/
 
-void mark5_state::main_map(address_map &map)
+void mark5_state::mark5_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).ram();
@@ -262,6 +305,14 @@ void mark5_state::main_map(address_map &map)
 	map(0x4c00, 0x4c00).mirror(0x03ff).rw(FUNC(mark5_state::reset_irq_r), FUNC(mark5_state::reset_irq_w));
 	map(0x5000, 0x50ff).mirror(0x0f00).ram().rw(FUNC(mark5_state::nvram_r), FUNC(mark5_state::nvram_w)).share("nvram");
 	map(0x8000, 0xffff).rom();
+}
+
+void mark5_state::mark6_map(address_map &map)
+{
+	mark5_map(map);
+
+	map(0x7000, 0x77ff).r(FUNC(mark5_state::cb_rom_r));
+	map(0x7800, 0x7800).mirror(0x07ff).rw(FUNC(mark5_state::cb_r), FUNC(mark5_state::cb_w));
 }
 
 
@@ -338,6 +389,15 @@ static INPUT_PORTS_START( mark5 )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mark6 )
+	PORT_INCLUDE( mark5 )
+
+	PORT_MODIFY("IN.6")
+	PORT_CONFNAME( 0x20, 0x20, "Sensory Board" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mark5_state, cb_enable, 0)
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 
 /******************************************************************************
@@ -348,7 +408,7 @@ void mark5_state::mark5(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 19.6608_MHz_XTAL / 10);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mark5_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mark5_state::mark5_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -381,6 +441,22 @@ void mark5_state::mark5(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
+void mark5_state::mark6(machine_config &config)
+{
+	mark5(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mark5_state::mark6_map);
+
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(150));
+
+	PWM_DISPLAY(config, m_display[3]).set_size(8, 8);
+	m_display[3]->set_bri_levels(0.001);
+	//config.set_default_layout(layout_saitek_mark6);
+}
+
 
 
 /******************************************************************************
@@ -405,6 +481,9 @@ ROM_START( ccmk6 )
 	ROM_LOAD("y6_c0", 0xc000, 0x2000, CRC(705e5718) SHA1(513bba3e7344194efaaf022a7934d32d8cba3cb5) ) // "
 	ROM_LOAD("y6_e0", 0xe000, 0x2000, CRC(b92c3eb3) SHA1(99a20f5e971b8c4228e0eda0a4c05750d46b95f6) ) // "
 
+	ROM_REGION( 0x1000, "chessboard", 0 )
+	ROM_LOAD("d2732c-e.u1", 0x0000, 0x1000, CRC(93221b4c) SHA1(8561b52c80cab7c04d30eaa14f9520a362d7f822) ) // no label, identical halves
+
 	ROM_REGION( 1887311, "screen", 0)
 	ROM_LOAD( "ccmk5.svg", 0, 1887311, CRC(3261bcb2) SHA1(46b38a2877faa36ef1adea2b8f484a97b46ea529) )
 ROM_END
@@ -419,4 +498,4 @@ ROM_END
 
 //    YEAR  NAME   PARENT CMP MACHINE INPUT  STATE        INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1981, ccmk5, 0,      0, mark5,  mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark V", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1982, ccmk6, ccmk5,  0, mark5,  mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1982, ccmk6, ccmk5,  0, mark6,  mark6, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

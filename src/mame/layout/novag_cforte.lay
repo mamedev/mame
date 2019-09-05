@@ -491,11 +491,11 @@
 		<bezel name="digit12" element="digit"><bounds x="104.125" y="9" width="2" height="3" /></bezel>
 		<bezel name="digit13" element="digit"><bounds x="106.125" y="9" width="2" height="3" /></bezel>
 
-		<bezel element="text_l7"><bounds x="87" y="68.64" width="14" height="1.4" /></bezel>
-		<bezel element="text_l8"><bounds x="87" y="76.35" width="14" height="1.4" /></bezel>
+		<bezel element="text_l7"><bounds x="86" y="68.64" width="14" height="1.4" /></bezel>
+		<bezel element="text_l8"><bounds x="86" y="76.35" width="14" height="1.4" /></bezel>
 
-		<bezel name="0.6" element="ledg"><bounds x="87" y="71.29" width="1" height="2" /></bezel>
-		<bezel name="0.7" element="ledg"><bounds x="87" y="79.00" width="1" height="2" /></bezel>
+		<bezel name="0.6" element="ledg"><bounds x="86" y="71.29" width="1" height="2" /></bezel>
+		<bezel name="0.7" element="ledg"><bounds x="86" y="79.00" width="1" height="2" /></bezel>
 
 	<!-- right side buttons -->
 
