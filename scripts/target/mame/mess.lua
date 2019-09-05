@@ -396,6 +396,7 @@ VIDEOS["PS2GS"] = true
 VIDEOS["PS2GIF"] = true
 VIDEOS["DECSFB"] = true
 VIDEOS["BT431"] = true
+--VIDEOS["VRENDER0"] = true
 
 --------------------------------------------------
 -- specify available machine cores

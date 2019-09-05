@@ -1266,3 +1266,15 @@ if (VIDEOS["BT431"]~=null) then
 		MAME_DIR .. "src/devices/video/bt431.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/bt431.h,VIDEOS["VRENDER0"] = true
+--------------------------------------------------
+
+if (VIDEOS["VRENDER0"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/vrender0.cpp",
+		MAME_DIR .. "src/devices/video/vrender0.h",
+	}
+end
