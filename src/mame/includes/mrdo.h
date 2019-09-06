@@ -11,6 +11,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class mrdo_state : public driver_device
 {

@@ -232,7 +232,7 @@ void addressable_latch_device::update_bit()
 //  LSB of data (or CRUOUT on TMS99xx)
 //-------------------------------------------------
 
-WRITE8_MEMBER(addressable_latch_device::write_d0)
+void addressable_latch_device::write_d0(offs_t offset, u8 data)
 {
 	if (LOG_MYSTERY_BITS && data != 0x00 && data != 0x01 && data != 0xff)
 		logerror("Mystery bits written to Q%d:%s%s%s%s%s%s%s\n",
@@ -253,7 +253,7 @@ WRITE8_MEMBER(addressable_latch_device::write_d0)
 //  second-lowest data bit
 //-------------------------------------------------
 
-WRITE8_MEMBER(addressable_latch_device::write_d1)
+void addressable_latch_device::write_d1(offs_t offset, u8 data)
 {
 	if (LOG_MYSTERY_BITS && data != 0x00 && data != 0x02 && data != 0xff)
 		logerror("Mystery bits written to Q%d:%s%s%s%s%s%s%s\n",
@@ -274,7 +274,7 @@ WRITE8_MEMBER(addressable_latch_device::write_d1)
 //  MSB of (8-bit) data
 //-------------------------------------------------
 
-WRITE8_MEMBER(addressable_latch_device::write_d7)
+void addressable_latch_device::write_d7(offs_t offset, u8 data)
 {
 	if (LOG_MYSTERY_BITS && data != 0x00 && data != 0x80 && data != 0xff)
 		logerror("Mystery bits written to Q%d:%s%s%s%s%s%s%s\n",
@@ -296,7 +296,7 @@ WRITE8_MEMBER(addressable_latch_device::write_d7)
 //  ignored)
 //-------------------------------------------------
 
-WRITE8_MEMBER(addressable_latch_device::write_a0)
+void addressable_latch_device::write_a0(offs_t offset, u8 data)
 {
 	write_bit(offset >> 1, offset & 1);
 }
@@ -307,7 +307,7 @@ WRITE8_MEMBER(addressable_latch_device::write_a0)
 //  fourth lowest as data input
 //-------------------------------------------------
 
-WRITE8_MEMBER(addressable_latch_device::write_a3)
+void addressable_latch_device::write_a3(offs_t offset, u8 data)
 {
 	write_bit(offset & 7, (offset & 8) >> 3);
 }
@@ -318,7 +318,7 @@ WRITE8_MEMBER(addressable_latch_device::write_a3)
 //  (offset is ignored)
 //-------------------------------------------------
 
-WRITE8_MEMBER(addressable_latch_device::write_nibble_d0)
+void addressable_latch_device::write_nibble_d0(u8 data)
 {
 	write_bit((data & 0x0e) >> 1, data & 0x01);
 }
@@ -329,7 +329,7 @@ WRITE8_MEMBER(addressable_latch_device::write_nibble_d0)
 //  (offset is ignored)
 //-------------------------------------------------
 
-WRITE8_MEMBER(addressable_latch_device::write_nibble_d3)
+void addressable_latch_device::write_nibble_d3(u8 data)
 {
 	write_bit(data & 0x07, BIT(data, 3));
 }
@@ -338,7 +338,7 @@ WRITE8_MEMBER(addressable_latch_device::write_nibble_d3)
 //  clear - pulse clear line from bus write
 //-------------------------------------------------
 
-WRITE8_MEMBER(addressable_latch_device::clear)
+void addressable_latch_device::clear(u8 data)
 {
 	clear_outputs(m_enable ? u8(m_data) << m_address : 0);
 }

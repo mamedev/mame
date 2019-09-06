@@ -12,6 +12,7 @@
 
 #include "video/ladybug.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class ladybug_base_state : public driver_device

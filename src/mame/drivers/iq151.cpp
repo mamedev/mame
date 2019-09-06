@@ -423,6 +423,7 @@ void iq151_state::iq151(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("iq151_cass");
 
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(iq151_state::cassette_timer), attotime::from_hz(2000));

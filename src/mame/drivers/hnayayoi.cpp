@@ -119,8 +119,8 @@ void hnayayoi_state::hnayayoi_io_map(address_map &map)
 	map(0x02, 0x03).r("ymsnd", FUNC(ym2203_device::read));
 	map(0x04, 0x04).portr("DSW3");
 	map(0x06, 0x06).w(FUNC(hnayayoi_state::adpcm_data_w));
-	map(0x08, 0x08).w("crtc", FUNC(hd6845_device::address_w));
-	map(0x09, 0x09).w("crtc", FUNC(hd6845_device::register_w));
+	map(0x08, 0x08).w("crtc", FUNC(hd6845s_device::address_w));
+	map(0x09, 0x09).w("crtc", FUNC(hd6845s_device::register_w));
 	map(0x0a, 0x0a).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
 	map(0x0c, 0x0c).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
 	map(0x20, 0x27).w(m_mainlatch, FUNC(ls259_device::write_d0));
@@ -141,8 +141,8 @@ void hnayayoi_state::hnfubuki_map(address_map &map)
 	map(0xff02, 0xff03).r("ymsnd", FUNC(ym2203_device::read));
 	map(0xff04, 0xff04).portr("DSW3");
 	map(0xff06, 0xff06).w(FUNC(hnayayoi_state::adpcm_data_w));
-	map(0xff08, 0xff08).w("crtc", FUNC(hd6845_device::address_w));
-	map(0xff09, 0xff09).w("crtc", FUNC(hd6845_device::register_w));
+	map(0xff08, 0xff08).w("crtc", FUNC(hd6845s_device::address_w));
+	map(0xff09, 0xff09).w("crtc", FUNC(hd6845s_device::register_w));
 	map(0xff0a, 0xff0a).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
 	map(0xff0c, 0xff0c).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
 	map(0xff20, 0xff27).w(m_mainlatch, FUNC(ls259_device::write_d0));
@@ -166,7 +166,7 @@ void hnayayoi_state::untoucha_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x10).w("ymsnd", FUNC(ym2203_device::control_port_w));
 	map(0x11, 0x11).r("ymsnd", FUNC(ym2203_device::status_port_r));
-	map(0x12, 0x12).w("crtc", FUNC(hd6845_device::address_w));
+	map(0x12, 0x12).w("crtc", FUNC(hd6845s_device::address_w));
 	map(0x13, 0x13).w(FUNC(hnayayoi_state::adpcm_data_w));
 	map(0x14, 0x14).portr("COIN");
 	map(0x15, 0x15).r(FUNC(hnayayoi_state::keyboard_1_r));
@@ -179,7 +179,7 @@ void hnayayoi_state::untoucha_io_map(address_map &map)
 	map(0x30, 0x37).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x50, 0x50).w("ymsnd", FUNC(ym2203_device::write_port_w));
 	map(0x51, 0x51).r("ymsnd", FUNC(ym2203_device::read_port_r));
-	map(0x52, 0x52).w("crtc", FUNC(hd6845_device::register_w));
+	map(0x52, 0x52).w("crtc", FUNC(hd6845s_device::register_w));
 }
 
 static INPUT_PORTS_START( hf_keyboard )
@@ -562,11 +562,11 @@ void hnayayoi_state::hnayayoi(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(20_MHz_XTAL / 2, 632, 0, 512, 263, 0, 243);
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
-	hd6845_device &crtc(HD6845(config, "crtc", 20_MHz_XTAL / 8));
+	hd6845s_device &crtc(HD6845S(config, "crtc", 20_MHz_XTAL / 8));
 	crtc.set_screen("screen");
 	crtc.set_char_width(4);
 	crtc.set_show_border_area(false);
@@ -611,7 +611,7 @@ void hnayayoi_state::untoucha(machine_config &config)
 	m_mainlatch->q_out_cb<3>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
 	m_mainlatch->q_out_cb<4>().set_nop(); // ?
 
-	subdevice<hd6845_device>("crtc")->set_update_row_callback(FUNC(hnayayoi_state::untoucha_update_row), this);
+	subdevice<hd6845s_device>("crtc")->set_update_row_callback(FUNC(hnayayoi_state::untoucha_update_row), this);
 
 	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
 }

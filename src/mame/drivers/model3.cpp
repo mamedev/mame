@@ -1367,7 +1367,6 @@ void model3_state::model3_init(int step)
 
 	// copy the 68k vector table into RAM
 	memcpy(m_soundram, memregion("audiocpu")->base(), 16);
-	m_audiocpu->reset();
 
 	m_scan_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 1), m_screen->vpos() + 1);
 
@@ -3613,7 +3612,7 @@ ROM_START( vs2v991 )    /* Step 2.0 */
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
 
-ROM_START( vs299b ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2 */
+ROM_START( vs299b ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, 837-13690-COM security board */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21550b.17",  0x400006, 0x100000, CRC(c508e488) SHA1(3134d418beaee9f824a0bd0e5441a997b5911d16) )
@@ -3685,7 +3684,7 @@ ROM_START( vs299b ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-1
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
 
-ROM_START( vs299a ) /* Step 2.0 */
+ROM_START( vs299a ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, 837-13690-COM security board */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21535a.17",  0x400006, 0x100000, CRC(8e4ec341) SHA1(973c71e7a48e728cbcb2465b56e90669fee0ec53) )
@@ -6024,7 +6023,7 @@ void model3_state::add_cpu_166mhz(machine_config &config)
 
 void model3_state::add_base_devices(machine_config &config)
 {
-	M68000(config, m_audiocpu, 45158000/4); // SCSP Clock / 2
+	M68000(config, m_audiocpu, 45.1584_MHz_XTAL / 4); // SCSP Clock / 2
 	m_audiocpu->set_addrmap(AS_PROGRAM, &model3_state::model3_snd);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
@@ -6044,13 +6043,13 @@ void model3_state::add_base_devices(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SCSP(config, m_scsp1, 45158000/2); // 45.158 MHz XTAL
+	SCSP(config, m_scsp1, 45.1584_MHz_XTAL / 2); // 45.158 MHz XTAL
 	m_scsp1->set_addrmap(0, &model3_state::scsp1_map);
 	m_scsp1->irq_cb().set(FUNC(model3_state::scsp_irq));
 	m_scsp1->add_route(0, "lspeaker", 1.0);
 	m_scsp1->add_route(1, "rspeaker", 1.0);
 
-	scsp_device &scsp2(SCSP(config, "scsp2", 45158000/2));
+	scsp_device &scsp2(SCSP(config, "scsp2", 45.1584_MHz_XTAL / 2));
 	scsp2.set_addrmap(0, &model3_state::scsp2_map);
 	scsp2.add_route(0, "lspeaker", 1.0);
 	scsp2.add_route(1, "rspeaker", 1.0);

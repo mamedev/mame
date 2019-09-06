@@ -235,6 +235,19 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		</part>
 	</software>
 
+	<software name="yakyuuky" supported="no">
+		<description>Yakyuu-Kyou</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="ヤキュウキョウ" />
+		<!-- Crashes after displaying "ヤキュウキョウ" -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="70352">
+				<rom name="yakyuu-kyou (smc-777) [fd].d88" size="70352" crc="3d92559a" sha1="b1d326a8b8e6cd69723686e3a47474539741d9f8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- Homebrew Software-->
 

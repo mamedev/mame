@@ -83,7 +83,7 @@ WRITE_LINE_MEMBER(hlcd0538_device::lcd_w)
 	// transfer to latches on rising edge
 	if (state && !m_lcd)
 	{
-		m_write_cols(0, m_shift, ~u64(0));
+		m_write_cols(0, m_shift);
 		m_shift = 0;
 	}
 

@@ -121,7 +121,7 @@ double ptokenizer::get_number_double()
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	}
 	bool err;
-	auto ret = plib::pstonum_ne<double>(tok.str(), err);
+	auto ret = plib::pstonum_ne<double, true>(tok.str(), err);
 	if (err)
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	return ret;
@@ -135,7 +135,7 @@ long ptokenizer::get_number_long()
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	}
 	bool err;
-	auto ret = plib::pstonum_ne<long>(tok.str(), err);
+	auto ret = plib::pstonum_ne<long, true>(tok.str(), err);
 	if (err)
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	return ret;
@@ -357,7 +357,7 @@ int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, i
 		else
 		{
 			// FIXME: error handling
-			val = plib::pstonum<decltype(val)>(tok);
+			val = plib::pstonum<decltype(val), true>(tok);
 			start++;
 		}
 	}
@@ -516,7 +516,7 @@ pstring  ppreprocessor::process_line(pstring line)
 				else
 				{
 					pstring arg("");
-					for (int i=2; i<lti.size() - 1; i++)
+					for (std::size_t i=2; i<lti.size() - 1; i++)
 						arg += lti[i] + " ";
 					arg += lti[lti.size()-1];
 					m_defines.insert({lti[1], define_t(lti[1], arg)});

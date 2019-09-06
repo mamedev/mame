@@ -8,6 +8,7 @@
 #include "sound/flt_rc.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class tp84_state : public driver_device
 {

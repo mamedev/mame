@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="gln" description="VTech Genius Leader Notebook cartridges">
+
+<!-- According to the boxart, this is compatible with: Leader Notebook -->
+	<software name="franzosis">
+		<description>Französisch Total</description>
+		<year>200?</year>
+		<publisher>Video Technology</publisher>
+		<info name="serial" value="80-2013" />
+
+		<part name="rom" interface="genius_rom">
+			<dataarea name="rom" size="0x40000">
+				<rom name="27-5460-00" size="0x40000" crc="cbacea9d" sha1="d5659266ed25233080996c43ebf9ccb6156cd1cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- According to the boxart, this is compatible with: Leader Notebook
+     A (later) sticker says compatibility extends to Notebook Plus/Power Notebook -->
+	<software name="swg">
+		<description>Sport-Wissen-Geschichte</description>
+		<year>200?</year>
+		<publisher>Video Technology</publisher>
+		<info name="serial" value="80-2455" />
+
+		<part name="rom" interface="genius_rom">
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-5664-00" size="0x20000" crc="5afee6c1" sha1="578605d2649c1140f38dcaeae07a1d25f795a85e"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- According to the boxart, this is compatible with: Leader Power Notebook -->
+	<software name="diktate">
+		<description>Diktate</description>
+		<year>200?</year>
+		<publisher>Video Technology</publisher>
+		<info name="serial" value="80-13574" />
+
+		<part name="rom" interface="genius_rom">
+			<dataarea name="rom" size="0x40000">
+				<rom name="27-5777-00" size="0x40000" crc="d77e0d64" sha1="f368c6880475064b187e41b9802740f070cda7e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

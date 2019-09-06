@@ -130,6 +130,8 @@ Unresolved Issues:
 - Elaine's end-game graphics has wrong masking effect (known non-zoomed pdrawgfx issue)
 - intro screen at wrong alpha effect; it has K054157 flag-per-tile for alpha blending?
 - Tilemap scroll is wrong at cocktail mode
+- Music fadeout isn't working
+reference(xexexj) : https://www.youtube.com/watch?v=TegjBEvvGxI
 
 ***************************************************************************/
 
@@ -349,12 +351,12 @@ void xexex_state::main_map(address_map &map)
 	map(0x090000, 0x097fff).ram().share("spriteram");           // K053247 sprite RAM
 	map(0x098000, 0x09ffff).rw(FUNC(xexex_state::spriteram_mirror_r), FUNC(xexex_state::spriteram_mirror_w));   // K053247 sprite RAM mirror read
 	map(0x0c0000, 0x0c003f).w(m_k056832, FUNC(k056832_device::word_w));              // VACSET (K054157)
-	map(0x0c2000, 0x0c2007).w(m_k053246, FUNC(k053247_device::k053246_word_w));              // OBJSET1
-	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_word_r));               // Passthrough to sprite roms
+	map(0x0c2000, 0x0c2007).w(m_k053246, FUNC(k053247_device::k053246_w));              // OBJSET1
+	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_r));               // Passthrough to sprite roms
 	map(0x0c6000, 0x0c7fff).rw(m_k053250, FUNC(k053250_device::ram_r), FUNC(k053250_device::ram_w));    // K053250 "road" RAM
 	map(0x0c8000, 0x0c800f).rw(m_k053250, FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));              // CLTC
-	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::lsb_w));               // priority encoder
+	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);               // priority encoder
 //  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                // CCU
 	map(0x0d4000, 0x0d4001).w(FUNC(xexex_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
@@ -373,9 +375,9 @@ void xexex_state::main_map(address_map &map)
 
 #if XE_DEBUG
 	map(0x0c0000, 0x0c003f).r(m_k056832, FUNC(k056832_device::word_r));
-	map(0x0c2000, 0x0c2007).r(m_k053246, FUNC(k053247_device::k053246_reg_word_r));
-	map(0x0ca000, 0x0ca01f).r(m_k054338, FUNC(k054338_device::word_r));
-	map(0x0cc000, 0x0cc01f).r(m_k053251, FUNC(k053251_device::lsb_r));
+	map(0x0c2000, 0x0c2007).r(m_k053246, FUNC(k053247_device::k053246_read_register));
+	map(0x0ca000, 0x0ca01f).r(m_k054338, FUNC(k054338_device::register_r));
+	map(0x0cc000, 0x0cc01f).r(m_k053251, FUNC(k053251_device::read)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).r(m_k056832, FUNC(k056832_device::b_word_r));
 #endif
 
@@ -499,12 +501,12 @@ void xexex_state::xexex(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(xexex_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	K053246(config, m_k053246, 0);
 	m_k053246->set_sprite_callback(FUNC(xexex_state::sprite_callback), this);
-	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48, 32);
+	m_k053246->set_config(NORMAL_PLANE_ORDER, -48, 32);
 	m_k053246->set_palette(m_palette);
 
 	K053250(config, m_k053250, 0, m_palette, m_screen, -5, -16);
@@ -551,11 +553,11 @@ ROM_START( xexex ) /* Europe, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067eaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
 	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "k053246", 0 )
 	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
 	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
 	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
@@ -582,11 +584,11 @@ ROM_START( orius ) /* USA, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067uaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
 	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "k053246", 0 )
 	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
 	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
 	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
@@ -613,11 +615,11 @@ ROM_START( xexexa ) /* Asia, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067eaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
 	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "k053246", 0 )
 	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
 	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
 	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
@@ -644,11 +646,11 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067jaa05.4e", 0x000000, 0x020000, CRC(2f4dd0a8) SHA1(bfa76c9c968f1beba648a2911510e3d666a8fe3a) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
 	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "k053246", 0 )
 	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
 	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
 	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )

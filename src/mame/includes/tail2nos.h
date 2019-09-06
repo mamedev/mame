@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "video/k051316.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tail2nos_state : public driver_device
 {

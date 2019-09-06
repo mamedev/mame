@@ -77,7 +77,7 @@ protected:
 	void LE_invert();
 
 	template <typename T>
-	void LE_compute_x(T * x);
+	void LE_compute_x(T & x);
 
 
 	template <typename T1, typename T2>
@@ -101,15 +101,15 @@ private:
 	float_ext_type m_A[storage_N][m_pitch];
 	float_ext_type m_Ainv[storage_N][m_pitch];
 	float_ext_type m_W[storage_N][m_pitch];
-	float_ext_type m_RHS[storage_N]; // right hand side - contains currents
+	std::array<float_ext_type, storage_N> m_RHS; // right hand side - contains currents
 
 	float_ext_type m_lA[storage_N][m_pitch];
 
 	/* temporary */
 	float_type H[storage_N][m_pitch] ;
-	unsigned rows[storage_N];
+	std::array<unsigned, storage_N> rows;
 	unsigned cols[storage_N][m_pitch];
-	unsigned colcount[storage_N];
+	std::array<unsigned, storage_N> colcount;
 
 	unsigned m_cnt;
 
@@ -200,7 +200,7 @@ void matrix_solver_w_t<FT, SIZE>::LE_invert()
 template <typename FT, int SIZE>
 template <typename T>
 void matrix_solver_w_t<FT, SIZE>::LE_compute_x(
-		T * x)
+		T & x)
 {
 	const std::size_t kN = size();
 
@@ -222,7 +222,7 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 {
 	const auto iN = size();
 
-	float_type new_V[storage_N]; // = { 0.0 };
+	std::array<float_type, storage_N> new_V; // = { 0.0 };
 
 	if ((m_cnt % 50) == 0)
 	{
@@ -260,7 +260,7 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 			/* construct w = transform(V) * y
 			 * dim: rowcount x iN
 			 * */
-			float_type w[storage_N];
+			std::array<float_type, storage_N> w;
 			for (unsigned i = 0; i < rowcount; i++)
 			{
 				const unsigned r = rows[i];
@@ -310,7 +310,7 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 			}
 			/* Back substitution */
 			//inv(H) w = t     w = H t
-			float_type t[storage_N];  // FIXME: convert to member
+			std::array<float_type, storage_N> t;  // FIXME: convert to member
 			for (unsigned j = rowcount; j-- > 0; )
 			{
 				float_type tmp = 0;

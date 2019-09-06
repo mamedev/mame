@@ -7,12 +7,13 @@
     Format code for CBM .tap files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_CBM_TAP_H
+#define MAME_FORMATS_CBM_TAP_H
 
-#ifndef CBM_TAP_H
-#define CBM_TAP_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(cbm_cassette_formats);
 
-#endif /*  CBM_TAP_H */
+#endif // MAME_FORMATS_CBM_TAP_H

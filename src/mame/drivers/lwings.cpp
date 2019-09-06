@@ -103,16 +103,16 @@ WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
-INTERRUPT_GEN_MEMBER(lwings_state::lwings_interrupt)
+WRITE_LINE_MEMBER(lwings_state::lwings_interrupt)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
 }
 
-INTERRUPT_GEN_MEMBER(lwings_state::avengers_interrupt)
+WRITE_LINE_MEMBER(lwings_state::avengers_interrupt)
 {
-	if(m_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (state && m_nmi_mask)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -936,7 +936,6 @@ void lwings_state::lwings(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);     /* verified on PCB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::lwings_interrupt));
 
 	Z80(config, m_soundcpu, XTAL(12'000'000)/4);    /* verified on PCB */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_sound_map);
@@ -955,6 +954,7 @@ void lwings_state::lwings(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(lwings_state::screen_update_lwings));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.screen_vblank().append(FUNC(lwings_state::lwings_interrupt));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
@@ -983,7 +983,6 @@ void lwings_state::fball(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::avengers_interrupt));
 
 	Z80(config, m_soundcpu, XTAL(12'000'000)/4); // ?
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_sound_map);
@@ -1001,6 +1000,7 @@ void lwings_state::fball(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // the 16-pixel black border on left edge is correct, test mode actually uses that area
 	screen.set_screen_update(FUNC(lwings_state::screen_update_lwings));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.screen_vblank().append(FUNC(lwings_state::avengers_interrupt));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
@@ -1051,7 +1051,10 @@ void lwings_state::avengers(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
+
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.screen_vblank().append(FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
 
 	subdevice<cpu_device>("adpcm")->set_addrmap(AS_IO, &lwings_state::avengers_adpcm_io_map);
 

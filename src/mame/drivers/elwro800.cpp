@@ -21,12 +21,12 @@
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h" /* for floppy disc controller */
 #include "machine/i8255.h"
-#include "sound/wave.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 
 /* Devices */
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "formats/tzx_cas.h"
 #include "machine/bankdev.h"
 
@@ -42,6 +42,8 @@ public:
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
+		m_upd765(*this, "upd765"),
+		m_flop(*this, "upd765:%u", 0U),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_io_ports(*this, {"LINE7", "LINE6", "LINE5", "LINE4", "LINE3", "LINE2", "LINE1", "LINE0", "LINE8"}),
@@ -79,6 +81,8 @@ private:
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;
+	required_device<upd765a_device> m_upd765;
+	required_device_array<floppy_connector, 2> m_flop;
 	required_device<address_map_bank_device> m_bank1;
 	required_device<address_map_bank_device> m_bank2;
 	required_ioport_array<9> m_io_ports;
@@ -115,8 +119,9 @@ uint8_t elwro800_state::nmi_r()
 
 WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
 {
-	m_upd765_0->get_device()->mon_w(!BIT(data, 0));
-	m_upd765_1->get_device()->mon_w(!BIT(data, 1));
+	for (int i = 0; i < 2; i++)
+		if (m_flop[i]->get_device())
+			m_flop[i]->get_device()->mon_w(!BIT(data, i));
 
 	m_upd765->tc_w(data & 0x04);
 
@@ -260,7 +265,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 			/* cassette input from wav */
 			if (m_cassette->input() > 0.0038 )
 			{
-				data &= ~0x40;
+				data |= 0x40;
 			}
 		}
 		else
@@ -600,12 +605,12 @@ void elwro800_state::elwro800(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tzx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	FLOPPY_CONNECTOR(config, "upd765:0", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats);

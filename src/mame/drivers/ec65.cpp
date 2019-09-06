@@ -74,8 +74,8 @@ void ec65_state::ec65_mem(address_map &map)
 	map(0x0000, 0xdfff).ram();
 	map(0xe000, 0xe003).rw(PIA6821_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xe010, 0xe011).rw(ACIA6850_TAG, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xe100, 0xe10f).rw(m_via_0, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xe110, 0xe11f).rw(m_via_1, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe100, 0xe10f).m(m_via_0, FUNC(via6522_device::map));
+	map(0xe110, 0xe11f).m(m_via_1, FUNC(via6522_device::map));
 	map(0xe130, 0xe133).rw(ACIA6551_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xe140, 0xe140).w(MC6845_TAG, FUNC(mc6845_device::address_w));
 	map(0xe141, 0xe141).rw(MC6845_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -100,14 +100,7 @@ void ec65_state::kbd_put(u8 data)
 {
 	if (data)
 	{
-		m_via_0->write_pa0(BIT(data, 0));
-		m_via_0->write_pa1(BIT(data, 1));
-		m_via_0->write_pa2(BIT(data, 2));
-		m_via_0->write_pa3(BIT(data, 3));
-		m_via_0->write_pa4(BIT(data, 4));
-		m_via_0->write_pa5(BIT(data, 5));
-		m_via_0->write_pa6(BIT(data, 6));
-		m_via_0->write_pa7(BIT(data, 7));
+		m_via_0->write_pa(data);
 		m_via_0->write_ca1(1);
 		m_via_0->write_ca1(0);
 	}
@@ -115,14 +108,7 @@ void ec65_state::kbd_put(u8 data)
 
 void ec65_state::machine_reset()
 {
-	m_via_1->write_pb0(1);
-	m_via_1->write_pb1(1);
-	m_via_1->write_pb2(1);
-	m_via_1->write_pb3(1);
-	m_via_1->write_pb4(1);
-	m_via_1->write_pb5(1);
-	m_via_1->write_pb6(1);
-	m_via_1->write_pb7(1);
+	m_via_1->write_pb(0xff);
 }
 
 MC6845_UPDATE_ROW( ec65_state::crtc_update_row )

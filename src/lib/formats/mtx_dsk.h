@@ -7,11 +7,10 @@
     Disk image format
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_MTX_DSK_H
+#define MAME_FORMATS_MTX_DSK_H
 
 #pragma once
-
-#ifndef __MTX_DSK_H__
-#define __MTX_DSK_H__
 
 #include "wd177x_dsk.h"
 
@@ -30,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_MTX_FORMAT;
 
-#endif // __MTX_DSK_H__
+#endif // MAME_FORMATS_MTX_DSK_H

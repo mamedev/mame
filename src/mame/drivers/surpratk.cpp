@@ -19,12 +19,6 @@
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
-{
-	if (m_k052109->is_irq_enabled())
-		device.execute().set_input_line(0, HOLD_LINE);
-}
-
 WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 {
 	if (data & 0xf8)
@@ -172,7 +166,6 @@ void surpratk_state::surpratk(machine_config &config)
 	/* basic machine hardware */
 	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &surpratk_state::surpratk_map);
-	m_maincpu->set_vblank_int("screen", FUNC(surpratk_state::surpratk_interrupt));
 	m_maincpu->line().set(FUNC(surpratk_state::banking_callback));
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&surpratk_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
@@ -193,7 +186,9 @@ void surpratk_state::surpratk(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(surpratk_state::tile_callback), this);
+	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette(m_palette);

@@ -28,8 +28,8 @@
 #include "emu.h"
 #include "includes/next.h"
 
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "screen.h"
 #include "softlist.h"
 

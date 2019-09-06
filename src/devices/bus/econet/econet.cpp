@@ -57,7 +57,7 @@ device_econet_interface::device_econet_interface(const machine_config &mconfig, 
 econet_slot_device::econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ECONET_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_address(0), m_econet(nullptr)
+	m_address(0), m_econet(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -68,7 +68,6 @@ econet_slot_device::econet_slot_device(const machine_config &mconfig, const char
 
 void econet_slot_device::device_start()
 {
-	m_econet = machine().device<econet_device>(ECONET_TAG);
 	device_econet_interface *dev = dynamic_cast<device_econet_interface *>(get_card_device());
 	if (dev) m_econet->add_device(get_card_device(), m_address);
 }

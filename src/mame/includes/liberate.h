@@ -7,6 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class liberate_state : public driver_device
 {

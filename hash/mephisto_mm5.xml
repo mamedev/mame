@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- HG 550 module is exclusively used with MM V -->
+
+<softwarelist name="mephisto_mm5" description="Mephisto MM V Modules">
+	<software name="hg550">
+		<description>Mephisto HG 550 Opening Library</description>
+		<year>1990</year>
+		<publisher>Hegener + Glaser</publisher>
+		<part name="cart" interface="mephisto_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="hg_550" size="0x4000" crc="0359f13d" sha1="833cef8302ad8d283d3f95b1d325353c7e3b8614" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

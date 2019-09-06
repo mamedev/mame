@@ -403,7 +403,7 @@ INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 	/* coin insertion causes an IRQ */
 	if(newval)
 	{
-		m_coin_command_pending = (uint8_t)(uintptr_t)(param);
+		m_coin_command_pending = uint8_t(param);
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
 		    definitely doesn't expect them as it locks out the coin routine */
@@ -717,7 +717,7 @@ ROM_START( firetrap )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 64k for banked ROMs */
 	ROM_LOAD( "di-02.4a",     0x00000, 0x8000, CRC(3d1e4bf7) SHA1(ee903b469619f49edb1727fb545c9a6085f50746) )
 	ROM_LOAD( "di-01.3a",     0x10000, 0x8000, CRC(9bbae38b) SHA1(dc1d3ed5da71bfb104fd54fc70c56833f31d281f) )
-	ROM_LOAD( "di-00.2a",     0x18000, 0x8000, CRC(d0dad7de) SHA1(8783ebf6ddfef32f6036913d403f76c1545b813d) )
+	ROM_LOAD( "di-00-a.2a",   0x18000, 0x8000, CRC(f39e2cf4) SHA1(ce77a65089937906d8a41076a3f29ad6f45fda9d) ) // this rom has data at 3FD7 where it seems to be blanked out in firetrapa, as well as other changes
 
 	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the sound CPU + 32k for banked ROMs */
 	ROM_LOAD( "di-17.10j",    0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
@@ -781,7 +781,7 @@ ROM_START( firetrapa )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 64k for banked ROMs */
 	ROM_LOAD( "di-02.4a",     0x00000, 0x8000, CRC(3d1e4bf7) SHA1(ee903b469619f49edb1727fb545c9a6085f50746) )
 	ROM_LOAD( "di-01.3a",     0x10000, 0x8000, CRC(9bbae38b) SHA1(dc1d3ed5da71bfb104fd54fc70c56833f31d281f) )
-	ROM_LOAD( "di-00-a.2a.bin",     0x18000, 0x8000, CRC(f39e2cf4) SHA1(ce77a65089937906d8a41076a3f29ad6f45fda9d) ) // this rom has data at 3FD7 where it seems to be blanked out in firetrap, as well as other changes
+	ROM_LOAD( "di-00.2a",     0x18000, 0x8000, CRC(d0dad7de) SHA1(8783ebf6ddfef32f6036913d403f76c1545b813d) )
 
 	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the sound CPU + 32k for banked ROMs */
 	ROM_LOAD( "di-17.10j",    0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
@@ -969,7 +969,7 @@ ROM_END
 
 
 
-GAME( 1986, firetrap,   0,        firetrap,   firetrap,   firetrap_state, empty_init, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap,   firetrap_state, empty_init, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  firetrap_state, empty_init, ROT90, "Wood Place Inc.", "Fire Trap (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, firetrap_state, empty_init, ROT90, "bootleg", "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrap,   0,        firetrap,   firetrap,   firetrap_state, empty_init, ROT90, "Woodplace Inc. (Data East USA license)", "Fire Trap (US, rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap,   firetrap_state, empty_init, ROT90, "Woodplace Inc. (Data East USA license)", "Fire Trap (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  firetrap_state, empty_init, ROT90, "Woodplace Inc.",                         "Fire Trap (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, firetrap_state, empty_init, ROT90, "bootleg",                                "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )

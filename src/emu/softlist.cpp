@@ -694,10 +694,10 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		std::string &value = attrvalues[5];
 		const std::string &status = attrvalues[6];
 		const std::string &loadflag = attrvalues[7];
-		if (!sizestr.empty() && !offsetstr.empty())
+		if (!sizestr.empty())
 		{
 			u32 length = strtol(sizestr.c_str(), nullptr, 0);
-			u32 offset = strtol(offsetstr.c_str(), nullptr, 0);
+			u32 offset = offsetstr.empty() ? 0 : strtol(offsetstr.c_str(), nullptr, 0);
 
 			if (loadflag == "reload")
 				add_rom_entry("", "", offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS);
@@ -707,6 +707,8 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				add_rom_entry("", "", offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS);
 			else if (loadflag == "fill")
 				add_rom_entry("", std::move(value), offset, length, ROMENTRYTYPE_FILL);
+			else if (loadflag == "ignore")
+				add_rom_entry("", "", 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 			else if (!name.empty())
 			{
 				bool baddump = (status == "baddump");
@@ -744,11 +746,6 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			}
 			else
 				parse_error("Rom name missing");
-		}
-		else if (!sizestr.empty() && !loadflag.empty() && loadflag == "ignore")
-		{
-			u32 length = strtol(sizestr.c_str(), nullptr, 0);
-			add_rom_entry("", "", 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 		}
 		else
 			parse_error("Incomplete rom definition");

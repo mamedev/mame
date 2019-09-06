@@ -10,6 +10,7 @@
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tnx1_state : public driver_device
 {
@@ -103,9 +104,12 @@ protected:
 class popeyebl_state : public tpp1_state
 {
 	using tpp1_state::tpp1_state;
+public:
+	virtual void config(machine_config& config) override;
 protected:
 	virtual void decrypt_rom() override;
 	virtual void maincpu_program_map(address_map &map) override;
+	void decrypted_opcodes_map(address_map& map);
 
 	virtual bool bootleg_sprites() const override { return true; }
 };

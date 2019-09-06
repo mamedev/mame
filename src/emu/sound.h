@@ -198,6 +198,8 @@ public:
 	const std::vector<std::unique_ptr<sound_stream>> &streams() const { return m_stream_list; }
 	attotime last_update() const { return m_last_update; }
 	attoseconds_t update_attoseconds() const { return m_update_attoseconds; }
+	int sample_count() const { return m_samples_this_update; }
+	void samples(s16 *buffer);
 
 	// stream creation
 	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback = stream_update_delegate());
@@ -233,6 +235,7 @@ private:
 	std::vector<s16>    m_finalmix;
 	std::vector<s32>    m_leftmix;
 	std::vector<s32>    m_rightmix;
+	int                 m_samples_this_update;
 
 	u8                  m_muted;
 	int                 m_attenuation;

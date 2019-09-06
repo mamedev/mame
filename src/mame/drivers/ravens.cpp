@@ -7,8 +7,8 @@ Ravensburger Selbstbaucomputer
 This is a project described in "Ravensburger" magazine. You had to make
 the entire thing (including the circuit boards) yourself.
 
-http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
 
+https://web.archive.org/web/20160321001634/http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
         2013-04-23 Skeleton driver.
 
 
@@ -75,7 +75,6 @@ ToDo:
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/terminal.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "ravens.lh"
@@ -106,7 +105,7 @@ private:
 	DECLARE_MACHINE_RESET(ravens2);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void ravens2_io(address_map &map);
 	void ravens_io(address_map &map);
@@ -274,7 +273,7 @@ void ravens_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
+QUICKLOAD_LOAD_MEMBER(ravens_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -351,13 +350,13 @@ void ravens_state::ravens(machine_config &config)
 	config.set_default_layout(layout_ravens);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb), this);
+
+	SPEAKER(config, "mono").front_center();
 
 	/* cassette */
 	CASSETTE(config, m_cass);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void ravens_state::ravens2(machine_config &config)
@@ -376,13 +375,13 @@ void ravens_state::ravens2(machine_config &config)
 	m_terminal->set_keyboard_callback(FUNC(ravens_state::kbd_put));
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb), this);
+
+	SPEAKER(config, "mono").front_center();
 
 	/* cassette */
 	CASSETTE(config, m_cass);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

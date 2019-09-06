@@ -132,21 +132,21 @@
 			<feature name="part_id" value="C300 Rebuild Boot Floppy" />
 			<feature name="compatibility" value="2000,2020,6000,6040" />
 			<dataarea name="flop" size="1474560">
-				<rom name="clipper.img" size="1474560" offset="0" crc="f182eb64" sha1="0e104e4db9f666ccc0d618b402666d90f025a3b4" />
+				<rom name="clipper.img" size="1474560" crc="f182eb64" sha1="0e104e4db9f666ccc0d618b402666d90f025a3b4" />
 			</dataarea>
 		</part>
 		<part name="boot_c400e" interface="floppy_3_5">
 			<feature name="part_id" value="C400E Rebuild Boot Floppy" />
 			<feature name="compatibility" value="6600,6640,6680" />
 			<dataarea name="flop" size="1474560">
-				<rom name="c400e.img" size="1474560" offset="0" status="nodump" />
+				<rom name="c400e.img" size="1474560" crc="7285f377" sha1="9700aa90018c264d63010aefc26557ffa9035fdc" />
 			</dataarea>
 		</part>
 		<part name="boot_c400" interface="floppy_3_5">
 			<feature name="part_id" value="C400 Rebuild Boot Floppy" />
 			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
 			<dataarea name="flop" size="1474560">
-				<rom name="c400.img" size="1474560" offset="0" crc="7e739d42" sha1="ca3f2244d1167553482cd73c59cea74e181f37c7" />
+				<rom name="c400.img" size="1474560" crc="7e739d42" sha1="ca3f2244d1167553482cd73c59cea74e181f37c7" />
 			</dataarea>
 		</part>
 
@@ -155,21 +155,21 @@
 			<feature name="part_id" value="Rebuild Floppy #2/4" />
 			<feature name="compatibility" value="2000,2020"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="20x0_root2.img" size="1474560" offset="0" crc="66ee95eb" sha1="9b6e316f4c038ef471a84a82e396376b361c970a" />
+				<rom name="20x0_root2.img" size="1474560" crc="66ee95eb" sha1="9b6e316f4c038ef471a84a82e396376b361c970a" />
 			</dataarea>
 		</part>
 		<part name="20x0_root3" interface="floppy_3_5">
 			<feature name="part_id" value="Rebuild Floppy #3/4" />
 			<feature name="compatibility" value="2000,2020"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="20x0_root3.img" size="1474560" offset="0" crc="de490556" sha1="882c46e193a5467b66ffe2cd0ac8518df087d112" />
+				<rom name="20x0_root3.img" size="1474560" crc="de490556" sha1="882c46e193a5467b66ffe2cd0ac8518df087d112" />
 			</dataarea>
 		</part>
 		<part name="20x0_root4" interface="floppy_3_5">
 			<feature name="part_id" value="Rebuild Floppy #4/4" />
 			<feature name="compatibility" value="2000,2020"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="20x0_root4.img" size="1474560" offset="0" crc="2b0e3f01" sha1="e191057117aee120301143f25d5446f55789009c" />
+				<rom name="20x0_root4.img" size="1474560" crc="2b0e3f01" sha1="e191057117aee120301143f25d5446f55789009c" />
 			</dataarea>
 		</part>
 
@@ -178,21 +178,21 @@
 			<feature name="part_id" value="Rebuild Floppy #2/4" />
 			<feature name="compatibility" value="2400,2430"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="24x0_root2.img" size="1474560" offset="0" crc="f6a7ba45" sha1="c810cec284f61921ab1ffffe5e71b291d0a295a6" />
+				<rom name="24x0_root2.img" size="1474560" crc="f6a7ba45" sha1="c810cec284f61921ab1ffffe5e71b291d0a295a6" />
 			</dataarea>
 		</part>
 		<part name="24x0_root3" interface="floppy_3_5">
 			<feature name="part_id" value="Rebuild Floppy #3/4" />
 			<feature name="compatibility" value="2400,2430"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="24x0_root3.img" size="1474560" offset="0" crc="1659399b" sha1="9ad4b4492654e76f4d5284af15b0235553b63f46" />
+				<rom name="24x0_root3.img" size="1474560" crc="1659399b" sha1="9ad4b4492654e76f4d5284af15b0235553b63f46" />
 			</dataarea>
 		</part>
 		<part name="24x0_root4" interface="floppy_3_5">
 			<feature name="part_id" value="Rebuild Floppy #4/4" />
 			<feature name="compatibility" value="2400,2430"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="24x0_root4.img" size="1474560" offset="0" crc="594b2c9c" sha1="b69812399b7b32abbe81d00945b0d96a27b04c19" />
+				<rom name="24x0_root4.img" size="1474560" crc="594b2c9c" sha1="b69812399b7b32abbe81d00945b0d96a27b04c19" />
 			</dataarea>
 		</part>
 
@@ -201,21 +201,21 @@
 			<feature name="part_id" value="Rebuild Floppy #2/4" />
 			<feature name="compatibility" value="6000,6040"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="60x0_root2.img" size="1474560" offset="0" crc="7ca8534b" sha1="bffb0eda4a8cdbe2e910b94ec64629cd9dc95095" />
+				<rom name="60x0_root2.img" size="1474560" crc="7ca8534b" sha1="bffb0eda4a8cdbe2e910b94ec64629cd9dc95095" />
 			</dataarea>
 		</part>
 		<part name="60x0_root3" interface="floppy_3_5">
 			<feature name="part_id" value="Rebuild Floppy #3/4" />
 			<feature name="compatibility" value="6000,6040"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="60x0_root3.img" size="1474560" offset="0" crc="2723ee4d" sha1="80dd7c43e40fd3437cf897b4c15c0b9c644a0644" />
+				<rom name="60x0_root3.img" size="1474560" crc="2723ee4d" sha1="80dd7c43e40fd3437cf897b4c15c0b9c644a0644" />
 			</dataarea>
 		</part>
 		<part name="60x0_root4" interface="floppy_3_5">
 			<feature name="part_id" value="Rebuild Floppy #4/4" />
 			<feature name="compatibility" value="6000,6040"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="60x0_root4.img" size="1474560" offset="0" crc="27764477" sha1="be89a8ba99aebe99b0bddc914b62c0ac106b56cc" />
+				<rom name="60x0_root4.img" size="1474560" crc="27764477" sha1="be89a8ba99aebe99b0bddc914b62c0ac106b56cc" />
 			</dataarea>
 		</part>
 
@@ -224,21 +224,21 @@
 			<feature name="part_id" value="Rebuild Floppy #2/4" />
 			<feature name="compatibility" value="6400,6450"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="6450_root2.img" size="1474560" offset="0" crc="33bb336f" sha1="74a05fb7b7f615f0e2b3186da34bd32d7e3d0880" />
+				<rom name="6450_root2.img" size="1474560" crc="33bb336f" sha1="74a05fb7b7f615f0e2b3186da34bd32d7e3d0880" />
 			</dataarea>
 		</part>
 		<part name="6450_root3" interface="floppy_3_5">
 			<feature name="part_id" value="Rebuild Floppy #3/4" />
 			<feature name="compatibility" value="6400,6450"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="6450_root3.img" size="1474560" offset="0" crc="7a9d0379" sha1="fc1623163b6a18ba840c43cfba5ca41a72deeb80" />
+				<rom name="6450_root3.img" size="1474560" crc="7a9d0379" sha1="fc1623163b6a18ba840c43cfba5ca41a72deeb80" />
 			</dataarea>
 		</part>
 		<part name="6450_root4" interface="floppy_3_5">
 			<feature name="part_id" value="Rebuild Floppy #4/4" />
 			<feature name="compatibility" value="6400,6450"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="6450_root4.img" size="1474560" offset="0" crc="224cfb96" sha1="19edcc1a796eee9fdc4ec02e503ce46664c26a29" />
+				<rom name="6450_root4.img" size="1474560" crc="224cfb96" sha1="19edcc1a796eee9fdc4ec02e503ce46664c26a29" />
 			</dataarea>
 		</part>
 
@@ -280,21 +280,21 @@
 			  <feature name="part_id" value="Emerald Diagnostic Floppy #1/3" />
 			  <feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
 			  <dataarea name="flop" size="1474560">
-					<rom name="emerald1.img" size="1474560" offset="0" crc="2130e140" sha1="4cfcd2683bb05d04d13909e98e5bd67128534077" />
+					<rom name="emerald1.img" size="1474560" crc="2130e140" sha1="4cfcd2683bb05d04d13909e98e5bd67128534077" />
 			  </dataarea>
 		</part>
 		<part name="emerald2" interface="floppy_3_5">
 			  <feature name="part_id" value="Emerald Diagnostic Floppy #2/3" />
 			  <feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
 			  <dataarea name="flop" size="1474560">
-					<rom name="emerald2.img" size="1474560" offset="0" crc="971c761c" sha1="7c9b1eea5daf919ecde02cf8a1f394e383058708" />
+					<rom name="emerald2.img" size="1474560" crc="971c761c" sha1="7c9b1eea5daf919ecde02cf8a1f394e383058708" />
 			  </dataarea>
 		</part>
 		<part name="emerald3" interface="floppy_3_5">
 			  <feature name="part_id" value="Emerald Diagnostic Floppy #3/3" />
 			  <feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
 			  <dataarea name="flop" size="1474560">
-					<rom name="emerald3.img" size="1474560" offset="0" crc="1951566a" sha1="2aa1c7aed43901627f35df8c87785385a5fba701" />
+					<rom name="emerald3.img" size="1474560" crc="1951566a" sha1="2aa1c7aed43901627f35df8c87785385a5fba701" />
 			  </dataarea>
 		</part>
 
@@ -303,7 +303,7 @@
 			<feature name="part_id" value="Turqouise Diagnostic Floppy" />
 			<feature name="compatibility" value="2000,2020" />
 			<dataarea name="flop" size="1474560">
-				<rom name="turq.img" size="1474560" offset="0" crc="70e2980a" sha1="3fa2f0c54ef27e16e579563db9cd70b68e11e403" />
+				<rom name="turq.img" size="1474560" crc="70e2980a" sha1="3fa2f0c54ef27e16e579563db9cd70b68e11e403" />
 			</dataarea>
 		</part>
 
@@ -312,28 +312,28 @@
 			<feature name="part_id" value="Sapphire Flash ROM Floppy" />
 			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
 			<dataarea name="flop" size="1474560">
-				<rom name="sapphire.img" size="1474560" offset="0" crc="1721d7d1" sha1="fc25109c4c7b2d94d0fd55e7cebaa03e7177ad5e" />
+				<rom name="sapphire.img" size="1474560" crc="1721d7d1" sha1="fc25109c4c7b2d94d0fd55e7cebaa03e7177ad5e" />
 			</dataarea>
 		</part>
 		<part name="sapphire1" interface="floppy_3_5">
 			<feature name="part_id" value="Sapphire Diagnostic Floppy #1/3" />
 			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
 			<dataarea name="flop" size="1474560">
-				<rom name="sapphire1.img" size="1474560" offset="0" crc="e0db6354" sha1="75fb42ae87d78daaeac30390bef335419425da09" />
+				<rom name="sapphire1.img" size="1474560" crc="e0db6354" sha1="75fb42ae87d78daaeac30390bef335419425da09" />
 			</dataarea>
 		</part>
 		<part name="sapphire2" interface="floppy_3_5">
 			<feature name="part_id" value="Sapphire Diagnostic Floppy #2/3" />
 			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
 			<dataarea name="flop" size="1474560">
-				<rom name="sapphire2.img" size="1474560" offset="0" crc="955065d1" sha1="6df92a7986a83d31e91189c8097b9b4f8d02960f" />
+				<rom name="sapphire2.img" size="1474560" crc="955065d1" sha1="6df92a7986a83d31e91189c8097b9b4f8d02960f" />
 			</dataarea>
 		</part>
 		<part name="sapphire3" interface="floppy_3_5">
 			<feature name="part_id" value="Sapphire Diagnostic Floppy #3/3" />
 			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
 			<dataarea name="flop" size="1474560">
-				<rom name="sapphire3.img" size="1474560" offset="0" crc="2f14fcb2" sha1="2d33087273c14597fc065e13d05e1ce9d1841704" />
+				<rom name="sapphire3.img" size="1474560" crc="2f14fcb2" sha1="2d33087273c14597fc065e13d05e1ce9d1841704" />
 			</dataarea>
 		</part>
 	</software>

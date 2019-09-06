@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "image.h"
 #include "drivenum.h"
+#include "tilemap.h"
 
 
 //**************************************************************************

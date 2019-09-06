@@ -191,7 +191,7 @@ public:
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbmb );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cbmb);
 	// memory state
 	int m_dramon;
 	int m_busen1;
@@ -300,7 +300,7 @@ public:
 	DECLARE_READ8_MEMBER( tpi2_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi2_pc_w );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( p500 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_p500);
 	// video state
 	int m_statvid;
 	int m_vicdotsel;
@@ -339,12 +339,12 @@ static void cbmb_quick_sethiaddress(address_space &space, uint16_t hiaddress)
 	space.write_byte(0xf0047, hiaddress >> 8);
 }
 
-QUICKLOAD_LOAD_MEMBER( cbm2_state, cbmb )
+QUICKLOAD_LOAD_MEMBER(cbm2_state::quickload_cbmb)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0x10000, cbmb_quick_sethiaddress);
 }
 
-QUICKLOAD_LOAD_MEMBER( p500_state, p500 )
+QUICKLOAD_LOAD_MEMBER(p500_state::quickload_p500)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbmb_quick_sethiaddress);
 }
@@ -2361,8 +2361,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(p500_state, p500), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500), this);
 
 	// internal ram
 	_128k(config);
@@ -2495,8 +2494,7 @@ void p500_state::p500_pal(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(p500_state, p500), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500), this);
 
 	// internal ram
 	_128k(config);
@@ -2628,8 +2626,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cbm2_state, cbmb), this), "p00,prg,t64", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(cbm2_state::quickload_cbmb), this);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");

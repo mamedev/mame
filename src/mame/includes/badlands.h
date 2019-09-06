@@ -21,6 +21,7 @@
 #include "video/atarimo.h"
 
 #include "speaker.h"
+#include "tilemap.h"
 
 /*----------- defined in machine/badlands.cpp -----------*/
 

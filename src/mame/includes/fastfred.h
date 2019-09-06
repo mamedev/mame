@@ -13,6 +13,7 @@
 
 #include "machine/74259.h"
 #include "includes/galaxold.h"
+#include "tilemap.h"
 
 class fastfred_state : public galaxold_state
 {

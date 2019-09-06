@@ -68,7 +68,7 @@ bool parser_t::parse(const pstring &nlname)
 		{
 			require_token(m_tok_param_left);
 			if (!in_nl)
-				error (MF_0_UNEXPECTED_NETLIST_END);
+				error (MF_UNEXPECTED_NETLIST_END());
 			else
 			{
 				in_nl = false;
@@ -78,7 +78,7 @@ bool parser_t::parse(const pstring &nlname)
 		else if (token.is(m_tok_NETLIST_START))
 		{
 			if (in_nl)
-				error (MF_0_UNEXPECTED_NETLIST_START);
+				error (MF_UNEXPECTED_NETLIST_START());
 			require_token(m_tok_param_left);
 			token_t name = get_token();
 			require_token(m_tok_param_right);
@@ -359,16 +359,28 @@ void parser_t::device(const pstring &dev_type)
 
 	for (const pstring &tp : paramlist)
 	{
-		require_token(m_tok_comma);
 		if (plib::startsWith(tp, "+"))
 		{
+			require_token(m_tok_comma);
 			pstring output_name = get_identifier();
 			m_setup.log().debug("Link: {1} {2}\n", tp, output_name);
 
 			m_setup.register_link(devname + "." + tp.substr(1), output_name);
 		}
+		else if (plib::startsWith(tp, "@"))
+		{
+			pstring term = tp.substr(1);
+			m_setup.log().debug("Link: {1} {2}\n", tp, term);
+
+			//FIXME
+			if (term == "VCC")
+				m_setup.register_link(devname + "." + term, "V5");
+			else
+				m_setup.register_link(devname + "." + term, term);
+		}
 		else
 		{
+			require_token(m_tok_comma);
 			pstring paramfq = devname + "." + tp;
 
 			m_setup.log().debug("Defparam: {1}\n", paramfq);
@@ -414,7 +426,7 @@ nl_double parser_t::eval_param(const token_t &tok)
 	else
 	{
 		bool err;
-		ret = plib::pstonum_ne<nl_double>(tok.str(), err);
+		ret = plib::pstonum_ne<nl_double, true>(tok.str(), err);
 		if (err)
 			error(plib::pfmt("Parameter value <{1}> not double \n")(tok.str()));
 	}

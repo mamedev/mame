@@ -12,6 +12,7 @@
 #pragma once
 
 #include "machine/6522via.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timekpr.h"
@@ -39,6 +40,8 @@ public:
 		m_palette(*this, "palette"),
 		m_ticket(*this, "ticket"),
 		m_timekeeper(*this, "m48t02"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_main_ram(*this, "main_ram", 0),
 		m_nvram(*this, "nvram", 0),
 		m_video(*this, "video", 0),
@@ -83,6 +86,8 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_ticket;
 	optional_device<timekeeper_device> m_timekeeper;
+	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch2;
 
 	optional_shared_ptr<u16> m_main_ram;
 	optional_shared_ptr<u16> m_nvram;
@@ -99,9 +104,7 @@ protected:
 	u8 m_xint_state;
 	u8 m_qint_state;
 	u8 m_irq_base;
-	u8 m_sound_data;
 	u8 m_sound_return;
-	u8 m_sound_int_state;
 	offs_t m_itech020_prot_address;
 	int m_special_result;
 	int m_p1_effx;
@@ -148,9 +151,9 @@ protected:
 	void sound_bank_w(u8 data);
 	void sound_data_w(u8 data);
 	u8 sound_return_r();
-	u8 sound_data_r();
 	void sound_return_w(u8 data);
 	u8 sound_data_buffer_r();
+	void sound_control_w(u8 data);
 	void firq_clear_w(u8 data);
 	void timekill_colora_w(u8 data);
 	void timekill_colorbc_w(u8 data);
@@ -176,7 +179,6 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	WRITE_LINE_MEMBER(generate_int1);
-	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	inline offs_t compute_safe_address(int x, int y);
 	inline void disable_clipping();

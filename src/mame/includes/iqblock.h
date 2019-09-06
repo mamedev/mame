@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/timer.h"
+#include "tilemap.h"
 
 class iqblock_state : public driver_device
 {

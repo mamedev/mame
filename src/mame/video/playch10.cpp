@@ -111,7 +111,7 @@ uint32_t playch10_state::screen_update_playch10_single(screen_device &screen, bi
 
 	if (m_pc10_game_mode)
 		/* render the ppu */
-		m_ppu->render(bitmap, 0, 0, 0, 0);
+		m_ppu->render(bitmap, 0, 0, 0, 0, cliprect);
 	else
 	{
 		/* When the bios is accessing vram, the video circuitry can't access it */
@@ -127,9 +127,9 @@ uint32_t playch10_state::screen_update_playch10_top(screen_device &screen, bitma
 	if (m_pc10_bios != 1)
 		return screen_update_playch10_single(screen, bitmap, cliprect);
 
-	if (!m_pc10_dispmask)
-		/* render the ppu */
-		m_ppu->render(bitmap, 0, 0, 0, 0);
+	/* When the bios is accessing vram, the video circuitry can't access it */
+	if (!m_pc10_sdcs)
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
@@ -142,9 +142,9 @@ uint32_t playch10_state::screen_update_playch10_bottom(screen_device &screen, bi
 	if (m_pc10_bios != 1)
 		return screen_update_playch10_single(screen, bitmap, cliprect);
 
-	/* When the bios is accessing vram, the video circuitry can't access it */
-	if (!m_pc10_sdcs)
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (!m_pc10_dispmask)
+		/* render the ppu */
+		m_ppu->render(bitmap, 0, 0, 0, 0, cliprect);
 	else
 		bitmap.fill(0, cliprect);
 

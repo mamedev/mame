@@ -174,10 +174,10 @@ void raiden2cop_device::dma_zsorting(uint16_t data)
 	}
 	switch(cop_sort_param) {
 	case 2:
-		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key > b.sorting_key; });
+		std::stable_sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key > b.sorting_key; });
 		break;
 	case 1:
-		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key < b.sorting_key; });
+		std::stable_sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key < b.sorting_key; });
 		break;
 	}
 

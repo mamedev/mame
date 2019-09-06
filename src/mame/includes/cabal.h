@@ -8,6 +8,7 @@
 #include "audio/seibu.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class cabal_state : public driver_device
 {

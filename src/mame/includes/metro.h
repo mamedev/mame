@@ -19,6 +19,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class metro_state : public driver_device
 {
@@ -144,7 +145,7 @@ private:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);
 	DECLARE_VIDEO_START(blzntrnd);
 	DECLARE_VIDEO_START(gstrik2);
-	uint32_t screen_update_psac_vdp2_mix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_psac_vdp2_mix(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(periodic_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(bangball_scanline);
@@ -239,9 +240,6 @@ private:
 	void update_irq_state();
 	void metro_common();
 	void gakusai_oki_bank_set();
-
-	// blazing tornado
-	bitmap_ind16 m_vdp_bitmap;
 };
 
 #endif // MAME_INCLUDES_METRO_H

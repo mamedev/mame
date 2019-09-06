@@ -42,6 +42,8 @@ public:
 	static const mem_info default_names[];
 	static const mem_info i8052_names[];
 	static const mem_info i80c52_names[];
+	static const mem_info i8xc51fx_names[];
+	static const mem_info i8xc51gb_names[];
 	static const mem_info ds5002fp_names[];
 	static const mem_info i8xc751_names[];
 
@@ -64,6 +66,8 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 protected:
+	virtual void disassemble_op_ljmp(std::ostream& stream, unsigned& PC, const data_buffer& params);
+	virtual void disassemble_op_lcall(std::ostream& stream, unsigned& PC, const data_buffer& params);
 	virtual offs_t disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op);
 
 	std::string get_data_address( uint8_t arg ) const;
@@ -99,6 +103,20 @@ class i80c52_disassembler : public mcs51_disassembler
 public:
 	i80c52_disassembler();
 	virtual ~i80c52_disassembler() = default;
+};
+
+class i8xc51fx_disassembler : public mcs51_disassembler
+{
+public:
+	i8xc51fx_disassembler();
+	virtual ~i8xc51fx_disassembler() = default;
+};
+
+class i8xc51gb_disassembler : public mcs51_disassembler
+{
+public:
+	i8xc51gb_disassembler();
+	virtual ~i8xc51gb_disassembler() = default;
 };
 
 class ds5002fp_disassembler : public mcs51_disassembler

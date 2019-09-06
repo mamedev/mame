@@ -8,8 +8,7 @@
     Driver by Pierpaolo Prazzoli
 
     TODO:
-      - is the background color pen correct for both games? (Dacholer probably
-        just use a different color prom data)
+      - is the background color pen correct for all games?
 
     Mods by Tomasz Slanina (2008.06.12):
       - fixed sound cpu interrupts (mode 2 (two vectors)+ nmi)
@@ -41,6 +40,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class dacholer_state : public driver_device
 {
@@ -670,7 +670,7 @@ void dacholer_state::dacholer_palette(palette_device &palette) const
 void dacholer_state::dacholer(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000)/4);  /* ? */
+	Z80(config, m_maincpu, XTAL(16'000'000)/4);  /* Dacholer PCB has a 15.46848 MHz OSC here */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dacholer_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &dacholer_state::main_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dacholer_state::irq0_line_assert));
@@ -721,33 +721,38 @@ void dacholer_state::itaten(machine_config &config)
 	config.device_remove("msm");
 }
 
-ROM_START( dacholer )
+ROM_START( dacholer ) /* AM-1-A & AM-1-B two board stack */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dacholer8.rom",  0x0000, 0x2000, CRC(8b73a441) SHA1(6de9e4845b9063af8df42aa82ad536737190582c) )
-	ROM_LOAD( "dacholer9.rom",  0x2000, 0x2000, CRC(9499289f) SHA1(bcfe554eb1f8e686d193050c18278b6bf93f179f) )
-	ROM_LOAD( "dacholer10.rom", 0x4000, 0x2000, CRC(39d37281) SHA1(daaf84079dd18dd854946e066e2dcde994bcbba4) )
-	ROM_LOAD( "dacholer11.rom", 0x6000, 0x2000, CRC(bb781ea4) SHA1(170966c4bcd0246968850d908a69f81ea1e136d5) )
+	ROM_LOAD( "dp_1.5k", 0x0000, 0x2000, CRC(8b73a441) SHA1(6de9e4845b9063af8df42aa82ad536737190582c) ) /* these 4 ROMs located on the AM-1-A top board */
+	ROM_LOAD( "dp_2.5l", 0x2000, 0x2000, CRC(9499289f) SHA1(bcfe554eb1f8e686d193050c18278b6bf93f179f) )
+	ROM_LOAD( "dp_3.5m", 0x4000, 0x2000, CRC(39d37281) SHA1(daaf84079dd18dd854946e066e2dcde994bcbba4) )
+	ROM_LOAD( "dp_4.5n", 0x6000, 0x2000, CRC(bb781ea4) SHA1(170966c4bcd0246968850d908a69f81ea1e136d5) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dacholer12.rom", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) )
-	ROM_LOAD( "dacholer13.rom", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
-	ROM_LOAD( "dacholer14.rom", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
+	ROM_LOAD( "ds_1.6g", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) ) /* these 4 ROMs located on the AM-1-A top board */
+	ROM_LOAD( "ds_2.6h", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
+	ROM_LOAD( "ds_3.6j", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
+	/* 6K not populated */
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "dacholer7.rom", 0x0000, 0x2000, CRC(fd649d36) SHA1(77d78eef44f348b635dbc0711e662a5236c00d51) )
+	ROM_LOAD( "dc_7.12j", 0x0000, 0x2000, CRC(fd649d36) SHA1(77d78eef44f348b635dbc0711e662a5236c00d51) ) /* this ROM located on the AM-1-B bottom board */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "dacholer1.rom", 0x0000, 0x2000, CRC(9cca0fd2) SHA1(3ca1b4cca9611232df1195ae6ac172a79c8368c3) )
-	ROM_LOAD( "dacholer2.rom", 0x2000, 0x2000, CRC(c1322b27) SHA1(8022f59b8ae10a7a911563b01bffc2d5646108a5) )
-	ROM_LOAD( "dacholer3.rom", 0x4000, 0x2000, CRC(9e1e7198) SHA1(7a75da1ae09f6cf095976b48f462ede42625b244) )
+	ROM_LOAD( "dc_3.13a", 0x0000, 0x2000, CRC(9cca0fd2) SHA1(3ca1b4cca9611232df1195ae6ac172a79c8368c3) ) /* these 3 ROMs located on the AM-1-B bottom board */
+	ROM_LOAD( "dc_2.12a", 0x2000, 0x2000, CRC(c1322b27) SHA1(8022f59b8ae10a7a911563b01bffc2d5646108a5) )
+	ROM_LOAD( "dc_1.11a", 0x4000, 0x2000, CRC(9e1e7198) SHA1(7a75da1ae09f6cf095976b48f462ede42625b244) )
+	/* 10A not populated */
 
 	ROM_REGION( 0x6000, "gfx3", 0 )
-	ROM_LOAD( "dacholer5.rom", 0x0000, 0x2000, CRC(dd4818f0) SHA1(718236932248512f8779f640e0367b5d92e6497e) )
-	ROM_LOAD( "dacholer4.rom", 0x2000, 0x2000, CRC(7f338ae0) SHA1(9206ed044feb44c55990803cdf608dd899e976ff) )
-	ROM_LOAD( "dacholer6.rom", 0x4000, 0x2000, CRC(0a6d4ec4) SHA1(419ea1f6ead3afb2de98432d9f8ead7447842a1e) )
+	ROM_LOAD( "dc_5.2d", 0x0000, 0x2000, CRC(dd4818f0) SHA1(718236932248512f8779f640e0367b5d92e6497e) ) /* these 3 ROMs located on the AM-1-B bottom board */
+	ROM_LOAD( "dc_4.1d", 0x2000, 0x2000, CRC(7f338ae0) SHA1(9206ed044feb44c55990803cdf608dd899e976ff) )
+	ROM_LOAD( "dc_6.3d", 0x4000, 0x2000, CRC(0a6d4ec4) SHA1(419ea1f6ead3afb2de98432d9f8ead7447842a1e) )
+	/* 4D not populated */
 
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "k.13d", 0x0000, 0x0020, BAD_DUMP CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) ) //taken from Kick Boy
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "dc.13d",  0x0000, 0x0020, CRC(d273abe5) SHA1(219bcba7f3e961f6b2cfbf48ac6ae6b6d80b974c) ) /* this MB7051 (or compatible 82S123) BPROM located on bottom board */
+	ROM_LOAD( "af-2.1h", 0x0020, 0x0020, CRC(e1cac297) SHA1(f15326d04d006d9d029a6565aebf9daf3657bc2a) ) /* this PBROM located on the AM-1-B bottom board */
+	ROM_LOAD( "af-1.3n", 0x0040, 0x0020, CRC(5638e485) SHA1(5d892111936a8eb7646c03a17300069be9a2b442) ) /* this PBROM located on the AM-1-A top board */
 ROM_END
 
 ROM_START( kickboy )
@@ -766,16 +771,18 @@ ROM_START( kickboy )
 	ROM_LOAD( "k_7.12j", 0x0000, 0x2000, CRC(22be46e8) SHA1(d92b3913d8eba881c69acd1d85ca73ee58489fae) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "k_3.13a",  0x0000, 0x2000, CRC(7eac2a64) SHA1(b4a44770bbded59cd572ac5d0ae178affc8cdab8) )
-	ROM_LOAD( "k_2.12a",  0x2000, 0x2000, CRC(b8829572) SHA1(01009ec63449c809608923fd9dcecd82b29c5d6d) )
+	ROM_LOAD( "k_3.13a", 0x0000, 0x2000, CRC(7eac2a64) SHA1(b4a44770bbded59cd572ac5d0ae178affc8cdab8) )
+	ROM_LOAD( "k_2.12a", 0x2000, 0x2000, CRC(b8829572) SHA1(01009ec63449c809608923fd9dcecd82b29c5d6d) )
 
 	ROM_REGION( 0x6000, "gfx3", 0 )
 	ROM_LOAD( "k_5.2d", 0x0000, 0x2000, CRC(4b769a1c) SHA1(fde17dcd4b7cda9cc54572e81bc2f0e48c19277d) )
 	ROM_LOAD( "k_4.1d", 0x2000, 0x2000, CRC(45199750) SHA1(a04b4d6d0defa613d269625b089d28dc68d5b73a) )
 	ROM_LOAD( "k_6.3d", 0x4000, 0x2000, CRC(d1795506) SHA1(e0f7a64e301cf43c4739031461dba16aa44100a1) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "k.13d", 0x0000, 0x0020, CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) )
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "k.13d",   0x0000, 0x0020, CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) )
+	ROM_LOAD( "af-2.1h", 0x0020, 0x0020, CRC(e1cac297) SHA1(f15326d04d006d9d029a6565aebf9daf3657bc2a) )
+	ROM_LOAD( "af-1.3n", 0x0040, 0x0020, CRC(5638e485) SHA1(5d892111936a8eb7646c03a17300069be9a2b442) )
 ROM_END
 
 /*
@@ -804,7 +811,7 @@ ITA-EXP
 
 --------------------------------
 IT A-2
-OSC  :19.968 ?
+OSC  :19.968MHz
 --------------------------------
 8.10A        [c32b0859] 2764
 9.11A        [919cac5e]  |
@@ -858,6 +865,6 @@ ROM_START( itaten )
 ROM_END
 
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, empty_init, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, empty_init, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_SUPPORTS_SAVE )
 GAME( 1983, kickboy,  0, dacholer, kickboy,  dacholer_state, empty_init, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, itaten,   0, itaten,   itaten,   dacholer_state, empty_init, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="juku" description="Juku E5101 floppy disks">
+
+	<software name="cpm22">
+		<description>CP/M 2.2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="cpm22.juk" size="819200" crc="a66233aa" sha1="5bb58a70b87e9ee9ca78c9cc3d90e197d3b4663e" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -80,7 +80,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/microdrv.h"
+#include "imagedev/microdrv.h"
 #include "machine/qimi.h"
 #include "machine/ram.h"
 #include "machine/zx8302.h"
@@ -946,9 +946,9 @@ void ql_state::ql(machine_config &config)
 	m_zx8302->out_raw2_callback().set(FUNC(ql_state::zx8302_raw2_w));
 	m_zx8302->in_raw2_callback().set(FUNC(ql_state::zx8302_raw2_r));
 
-	MICRODRIVE(config, m_mdv1, 0);
+	MICRODRIVE(config, m_mdv1);
 	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w));
-	MICRODRIVE(config, m_mdv2, 0);
+	MICRODRIVE(config, m_mdv2);
 
 	RS232_PORT(config, m_ser1, default_rs232_devices, nullptr); // wired as DCE
 	RS232_PORT(config, m_ser2, default_rs232_devices, nullptr); // wired as DTE

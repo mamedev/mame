@@ -64,15 +64,6 @@ ROM_START( alcat258 ) // MSM80C154 (+ TS9347// 8k ram // b&w
 ROM_END
 
 
-ROM_START( itt9216 ) // MC68008P8, (+beeper, 701188-001, xtal 38.080)// 64k ram // colour
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "174054-007.u52", 0x0000, 0x2000, CRC(be1f85c8) SHA1(8c44ff6166c43b524f41133053fa82f5c48047d8) )
-
-	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "174055-004.u40", 0x0000, 0x2000, CRC(c8611425) SHA1(31fbdd6ff72a96c59277b6edac9a6360f6e1e49e) )
-ROM_END
-
-
 ROM_START( loewed ) // order unknown // i8031, i8051(xtal 11.000 next to it), ITT LOTTI // 64k ram + battery-backed nvram // b&w
 	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "mainboard_18764_100.bin", 0x00000, 0x020000, CRC(f9ec7591) SHA1(1df7bdf33b8086166f1addb686a911a0c52dde32) )
@@ -86,23 +77,6 @@ ROM_START( loewe715 ) // i8051, ITT LOTTI // 64k ram // colour
 ROM_END
 
 
-ROM_START( t3210 ) // order unknown // i8031, 8742 // 4+2k ram onboard; 24kb in battery-backed expansion // b&w
-	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "s22723_r115-c1-6_ct.d6",   0x00000, 0x8000, CRC(d09fea94) SHA1(52168060093dfe964c0316d9ff335cd59da01d48) )
-	ROM_LOAD( "s22723_r115-c2-6_ct.d7",   0x08000, 0x8000, CRC(6e1eaacd) SHA1(cfda25dbbeddc7c75379c4b0dc97addb602d79ef) )
-	ROM_LOAD( "s22723_r121-c2-2.d11",     0x10000, 0x0800, CRC(f0eda00e) SHA1(6b0d9f5e9d99644c3be16cbf0c0d3b1ea05aabee) )
-	ROM_LOAD( "d8742_s22723_r118-c1.d16", 0x10800, 0x0800, CRC(f334a2a3) SHA1(c1cd4d775c2984252e6869a4c8f99d56646b89e9) )
-	ROM_LOAD( "prom_s22723_r120-c1.bin",  0x11000, 0x0100, CRC(4460cd50) SHA1(fe36d758d64493cb5f8217fe51bbbe8203424fbe) )
-ROM_END
-
-
-ROM_START( feap90 ) // order unknown // i8031, i8742 (+SAA5351, 80C42C121) // 4+2k ram onboard; 24kb in battery-backed expansion // b&w
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "s22723-r116-c25-6 ex.d6", 0x00000, 0x10000, CRC(8362778d) SHA1(30fbe45eaedc1ed2e7b189f12e2ba7c23ab75de7) )
-	ROM_LOAD( "s22723-r116-c26-6 ex.d2", 0x10000, 0x08000, CRC(121622ba) SHA1(c447da13f88772ec7d26e55ca8822e2c2dc3ecef) )
-ROM_END
-
-
 ROM_START( 7951om ) // TTL (no cpu) // 1k x 6bits display ram 64-characters uppercase only, screen 40x12 // green
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prom1_rear.bin", 0x0000, 0x0100, CRC(ab231a4c) SHA1(1412d0e9163125f28a777717c4dd9d5fd54b5196) )
@@ -110,6 +84,16 @@ ROM_START( 7951om ) // TTL (no cpu) // 1k x 6bits display ram 64-characters uppe
 
 	ROM_REGION( 0x0800, "chargen", ROMREGION_INVERT )
 	ROM_LOAD( "7951om.bin",     0x0000, 0x0800, CRC(36fc61c6) SHA1(6b5e8701b185b32a1a2630ddfc5402345628ecba) )
+ROM_END
+
+
+ROM_START( swtpc8212 ) // MC6802P, 2xMC6821P, INS8250N, MCM66750, MC6845P, bank of 8 dips, crystals 17.0748 (video), 1.8432 (cpu/uart). On the back is a 25-pin RS-232 port, and a 25-pin printer port.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8224g_ver.1.1_6oct80.ic1", 0xf000, 0x0800, CRC(7d7f3c21) SHA1(f7e6e20b36a1c724a4e348bc784d0b7b5fb462a3) )
+	ROM_LOAD( "8224g_ver.1.1_6oct80.ic2", 0xf800, 0x0800, CRC(2b118c22) SHA1(5fa031c834c7c582d5715764941499fcef51f477) )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "grafix_8x12_22aug80.bin",  0x0000, 0x0800, CRC(a525ed65) SHA1(813d2e85ddb258c5b032b959e695ad33200cbcc4) )
 ROM_END
 
 
@@ -121,15 +105,12 @@ ROM_START( teleguide ) // order unknown // i8051, i8031 (layout very similar to 
 ROM_END
 
 
-
 /* Driver */
 
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY             FULLNAME                     FLAGS */
 COMP( 1991, alcat258,  0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminatel 258",         MACHINE_IS_SKELETON )
-COMP( 1986, itt9216,   0,      0,      terminal, terminal, terminal_state, empty_init, "ITT",                "Courier 9216-X",         MACHINE_IS_SKELETON )
 COMP( 1992, loewed,    0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multitel D",             MACHINE_IS_SKELETON )
 COMP( 1988, loewe715,  0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multicom 715L",          MACHINE_IS_SKELETON )
-COMP( 1986, t3210,     0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Bitel T3210",            MACHINE_IS_SKELETON )
-COMP( 1986, feap90,    0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Multitel Fe Ap 90-1.1",  MACHINE_IS_SKELETON )
 COMP( 1987, 7951om,    0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "7951om",                 MACHINE_IS_SKELETON )
+COMP( 1980, swtpc8212, 0,      0,      terminal, terminal, terminal_state, empty_init, "Southwest Technical Products Corporation", "SWTPC 8212", MACHINE_IS_SKELETON )
 COMP( 1992, teleguide, 0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe / Televerket", "Teleguide",              MACHINE_IS_SKELETON )

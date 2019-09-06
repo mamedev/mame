@@ -80,6 +80,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class goodejan_state : public driver_device, public seibu_sound_common

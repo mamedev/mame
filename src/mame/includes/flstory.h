@@ -12,6 +12,7 @@
 #include "sound/ta7630.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class flstory_state : public driver_device
 {

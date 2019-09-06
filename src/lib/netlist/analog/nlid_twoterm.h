@@ -36,8 +36,8 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "netlist/solver/nld_solver.h"
-#include "plib/pfunction.h"
 #include "nld_generic_models.h"
+#include "plib/pfunction.h"
 
 #include <cmath>
 
@@ -149,9 +149,18 @@ namespace analog
 
 	protected:
 
-		NETLIB_RESETI();
 		//NETLIB_UPDATEI() { }
-		NETLIB_UPDATE_PARAMI();
+		NETLIB_RESETI()
+		{
+			NETLIB_NAME(twoterm)::reset();
+			set_R(std::max(m_R(), exec().gmin()));
+		}
+
+		NETLIB_UPDATE_PARAMI()
+		{
+			solve_now();
+			set_R(std::max(m_R(), exec().gmin()));
+		}
 
 	private:
 		param_double_t m_R;
@@ -464,6 +473,14 @@ namespace analog
 			set_mat(0.0, 0.0, -m_I(),
 					0.0, 0.0,  m_I());
 		}
+
+		NETLIB_UPDATE_PARAMI()
+		{
+			solve_now();
+			set_mat(0.0, 0.0, -m_I(),
+					0.0, 0.0,  m_I());
+		}
+
 
 	private:
 		state_var<double> m_t;

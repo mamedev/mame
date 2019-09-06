@@ -91,7 +91,7 @@ READ16_MEMBER(atari_vad_device::control_read)
 
 WRITE16_MEMBER(atari_vad_device::alpha_w)
 {
-	m_alpha_tilemap->write16(space, offset, data, mem_mask);
+	m_alpha_tilemap->write16(offset, data, mem_mask);
 }
 
 
@@ -102,9 +102,9 @@ WRITE16_MEMBER(atari_vad_device::alpha_w)
 
 WRITE16_MEMBER(atari_vad_device::playfield_upper_w)
 {
-	m_playfield_tilemap->write16_ext(space, offset, data, mem_mask);
+	m_playfield_tilemap->write16_ext(offset, data, mem_mask);
 	if (m_playfield2_tilemap != nullptr)
-		m_playfield2_tilemap->write16_ext(space, offset, data, mem_mask);
+		m_playfield2_tilemap->write16_ext(offset, data, mem_mask);
 }
 
 
@@ -116,9 +116,9 @@ WRITE16_MEMBER(atari_vad_device::playfield_upper_w)
 
 WRITE16_MEMBER(atari_vad_device::playfield_latched_lsb_w)
 {
-	m_playfield_tilemap->write16(space, offset, data, mem_mask);
+	m_playfield_tilemap->write16(offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
-		m_playfield_tilemap->write16_ext(space, offset, m_control[0x1d], uint16_t(0x00ff));
+		m_playfield_tilemap->write16_ext(offset, m_control[0x1d], uint16_t(0x00ff));
 }
 
 
@@ -130,9 +130,9 @@ WRITE16_MEMBER(atari_vad_device::playfield_latched_lsb_w)
 
 WRITE16_MEMBER(atari_vad_device::playfield_latched_msb_w)
 {
-	m_playfield_tilemap->write16(space, offset, data, mem_mask);
+	m_playfield_tilemap->write16(offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
-		m_playfield_tilemap->write16_ext(space, offset, m_control[0x1c], uint16_t(0xff00));
+		m_playfield_tilemap->write16_ext(offset, m_control[0x1c], uint16_t(0xff00));
 }
 
 
@@ -144,9 +144,9 @@ WRITE16_MEMBER(atari_vad_device::playfield_latched_msb_w)
 
 WRITE16_MEMBER(atari_vad_device::playfield2_latched_msb_w)
 {
-	m_playfield2_tilemap->write16(space, offset, data, mem_mask);
+	m_playfield2_tilemap->write16(offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
-		m_playfield2_tilemap->write16_ext(space, offset, m_control[0x1c], uint16_t(0xff00));
+		m_playfield2_tilemap->write16_ext(offset, m_control[0x1c], uint16_t(0xff00));
 }
 
 

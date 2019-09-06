@@ -356,9 +356,9 @@ private:
 			char const *const text[] = { _("Select custom filters:") };
 			draw_text_box(
 					std::begin(text), std::end(text),
-					x, x2, y - top, y - UI_BOX_TB_BORDER,
+					x, x2, y - top, y - ui().box_tb_border(),
 					ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-					UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+					ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 		}
 
 	private:
@@ -506,7 +506,7 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(floa
 	{
 		item_append(util::string_format(_("Filter %1$u"), i + 1), m_parent.m_filters[i]->display_name(), get_arrow_flags(i), (void *)(FILTER_FIRST + i));
 		if (m_added)
-			selected = item.size() - 2;
+			set_selected_index(item_count() - 2);
 		if (m_parent.m_filters[i]->wants_adjuster())
 		{
 			std::string name("^!");
@@ -525,7 +525,7 @@ void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(floa
 	item_append(menu_item_type::SEPARATOR);
 
 	// leave space for heading
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 template <class Impl, class Base, typename Base::type Type>
@@ -966,9 +966,9 @@ private:
 			char const *const text[] = { _("Select category:") };
 			draw_text_box(
 					std::begin(text), std::end(text),
-					x, x2, y - top, y - UI_BOX_TB_BORDER,
+					x, x2, y - top, y - ui().box_tb_border(),
 					ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-					UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+					ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 		}
 
 	private:
@@ -1055,7 +1055,7 @@ void category_machine_filter::menu_configure::populate(float &customtop, float &
 		}
 	}
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 void category_machine_filter::menu_configure::handle()

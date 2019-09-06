@@ -436,7 +436,7 @@ static void aussiebyte_floppies(device_slot_interface &device)
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( aussiebyte_state, aussiebyte )
+QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -495,7 +495,8 @@ void aussiebyte_state::machine_reset()
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
+void aussiebyte_state::aussiebyte(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &aussiebyte_state::aussiebyte_map);
@@ -590,9 +591,8 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", aussiebyte_state, aussiebyte, "com,cpm", attotime::from_seconds(3))
-
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(aussiebyte_state::quickload_cb), this);
+}
 
 
 void aussiebyte_state::machine_start()

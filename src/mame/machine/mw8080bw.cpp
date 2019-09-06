@@ -52,6 +52,8 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::interrupt_trigger)
 
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 
+	m_interrupt_time = machine().time();
+
 	/* set up for next interrupt */
 	uint8_t next_counter;
 	int next_vblank;
@@ -74,6 +76,9 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::interrupt_trigger)
 IRQ_CALLBACK_MEMBER(mw8080bw_state::interrupt_vector)
 {
 	int vpos = m_screen->vpos();
+	// MAME scheduling quirks cause this to happen more often than you might think, in fact far too often
+	if (machine().time() < m_interrupt_time)
+		vpos++;
 	uint8_t counter = vpos_to_vysnc_chain_counter(vpos);
 	uint8_t vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
 
@@ -92,6 +97,8 @@ void mw8080bw_state::mw8080bw_start_interrupt_timer(  )
 {
 	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
 	m_interrupt_timer->adjust(m_screen->time_until_pos(vpos));
+
+	m_interrupt_time = attotime::zero;
 }
 
 

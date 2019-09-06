@@ -7,6 +7,7 @@
 
 #include "nld_9316.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -24,15 +25,13 @@ namespace netlist
 		, m_LOADQ(*this, "LOADQ")
 		, m_ENP(*this, "ENP")
 		, m_CLRQ(*this, "CLRQ")
-		, m_A(*this, "A", NETLIB_DELEGATE(9316, abcd))
-		, m_B(*this, "B", NETLIB_DELEGATE(9316, abcd))
-		, m_C(*this, "C", NETLIB_DELEGATE(9316, abcd))
-		, m_D(*this, "D", NETLIB_DELEGATE(9316, abcd))
+		, m_ABCD(*this, {{"A", "B", "C", "D"}}, NETLIB_DELEGATE(9316, abcd))
 		, m_Q(*this, {{ "QA", "QB", "QC", "QD" }})
 		, m_cnt(*this, "m_cnt", 0)
 		, m_abcd(*this, "m_abcd", 0)
 		, m_loadq(*this, "m_loadq", 0)
 		, m_ent(*this, "m_ent", 0)
+		, m_power_pins(*this)
 		{
 		}
 
@@ -59,8 +58,8 @@ namespace netlist
 				m_CLK.inactivate();
 				if (!CLRQ && (m_cnt>0))
 				{
+					update_outputs_all(0, NLTIME_FROM_NS(36));
 					m_cnt = 0;
-					update_outputs_all(m_cnt, NLTIME_FROM_NS(36));
 				}
 			}
 			m_RC.push(m_ent && (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
@@ -69,7 +68,7 @@ namespace netlist
 
 		NETLIB_HANDLERI(clk)
 		{
-			auto cnt = (m_loadq ? m_cnt + 1 : m_abcd) & MAXCNT;
+			auto cnt = (m_loadq ? (m_cnt + 1) & MAXCNT: m_abcd);
 			m_RC.push(m_ent && (cnt == MAXCNT), NLTIME_FROM_NS(27));
 			update_outputs_all(cnt, NLTIME_FROM_NS(20));
 			m_cnt = cnt;
@@ -77,7 +76,7 @@ namespace netlist
 
 		NETLIB_HANDLERI(abcd)
 		{
-			m_abcd = static_cast<uint8_t>((m_D() << 3) | (m_C() << 2) | (m_B() << 1) | (m_A() << 0));
+			m_abcd = static_cast<unsigned>((m_ABCD[0]() << 0) | (m_ABCD[1]() << 1) | (m_ABCD[2]() << 2) | (m_ABCD[3]() << 3));
 		}
 
 		logic_input_t m_CLK;
@@ -90,19 +89,16 @@ namespace netlist
 		logic_input_t m_ENP;
 		logic_input_t m_CLRQ;
 
-		logic_input_t m_A;
-		logic_input_t m_B;
-		logic_input_t m_C;
-		logic_input_t m_D;
-
+		object_array_t<logic_input_t, 4> m_ABCD;
 		object_array_t<logic_output_t, 4> m_Q;
 
 		/* counter state */
 		state_var<unsigned> m_cnt;
 		/* cached pins */
-		state_var_u8 m_abcd;
+		state_var<unsigned> m_abcd;
 		state_var_sig m_loadq;
 		state_var_sig m_ent;
+		nld_power_pins m_power_pins;
 
 		void update_outputs_all(unsigned cnt, netlist_time out_delay) noexcept
 		{
@@ -124,7 +120,7 @@ namespace netlist
 			register_subalias("5", "C");
 			register_subalias("6", "D");
 			register_subalias("7", "ENP");
-			// register_subalias("8", "); -. GND
+			register_subalias("8", "GND");
 
 			register_subalias("9", "LOADQ");
 			register_subalias("10", "ENT");
@@ -133,12 +129,12 @@ namespace netlist
 			register_subalias("13", "QB");
 			register_subalias("14", "QA");
 			register_subalias("15", "RC");
-			// register_subalias("16", ); -. VCC
+			register_subalias("16", "VCC");
 		}
 	};
 
 
-	NETLIB_DEVICE_IMPL(9316,     "TTL_9316",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D")
+	NETLIB_DEVICE_IMPL(9316,     "TTL_9316",     "+CLK,+ENP,+ENT,+CLRQ,+LOADQ,+A,+B,+C,+D,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(9316_dip, "TTL_9316_DIP", "")
 
 	} //namespace devices

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "pce_slot.h"
+#include "machine/nvram.h"
 
 
 // ======================> pce_rom_device
@@ -77,11 +78,41 @@ private:
 	uint8_t m_bank_base;
 };
 
+// ======================> pce_tennokoe_device
+
+class pce_tennokoe_device : public pce_rom_device,
+							public device_nvram_interface
+{
+public:
+	// construction/destruction
+	pce_tennokoe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
+
+private:
+	const uint32_t m_bram_size = 0x800*4;
+	uint8_t m_bram[0x800*4];
+
+	uint8_t m_bram_locked;
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(PCE_ROM_STD,      pce_rom_device)
 DECLARE_DEVICE_TYPE(PCE_ROM_CDSYS3,   pce_cdsys3_device)
 DECLARE_DEVICE_TYPE(PCE_ROM_POPULOUS, pce_populous_device)
 DECLARE_DEVICE_TYPE(PCE_ROM_SF2,      pce_sf2_device)
+DECLARE_DEVICE_TYPE(PCE_ROM_TENNOKOE, pce_tennokoe_device)
+
 
 #endif // MAME_BUS_PCE_PCE_ROM_H

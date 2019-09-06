@@ -120,12 +120,11 @@ void taxidriv_state::main_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("vram4");           /* radar bitmap */
 	map(0xc800, 0xcfff).writeonly().share("vram5"); /* "sprite1" bitmap */
 	map(0xd000, 0xd7ff).writeonly().share("vram6"); /* "sprite2" bitmap */
-	map(0xd800, 0xdfff).ram().share("vram7");           /* "sprite3" bitmap */
-	map(0xe000, 0xf3ff).readonly();
-	map(0xe000, 0xe3ff).writeonly().share("vram1"); /* car tilemap */
-	map(0xe400, 0xebff).writeonly().share("vram2"); /* bg1 tilemap */
-	map(0xec00, 0xefff).writeonly().share("vram0"); /* fg tilemap */
-	map(0xf000, 0xf3ff).writeonly().share("vram3"); /* bg2 tilemap */
+	map(0xd800, 0xdfff).ram().share("vram7"); /* "sprite3" bitmap */
+	map(0xe000, 0xe3ff).ram().share("vram1"); /* car tilemap */
+	map(0xe400, 0xebff).ram().share("vram2"); /* bg1 tilemap */
+	map(0xec00, 0xefff).ram().share("vram0"); /* fg tilemap */
+	map(0xf000, 0xf3ff).ram().share("vram3"); /* bg2 tilemap */
 	map(0xf400, 0xf403).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf480, 0xf483).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite1" placement */
 	map(0xf500, 0xf503).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite2" placement */

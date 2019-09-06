@@ -1,0 +1,10 @@
+{
+  "plugin": {
+	"name": "autofire",
+	"description": "Autofire plugin",
+	"version": "0.0.3",
+	"author": "Jack Li",
+	"type": "plugin",
+	"start": "false"
+  }
+}

@@ -438,7 +438,7 @@ WRITE_LINE_MEMBER(pacman_state::irq_mask_w)
 
 WRITE8_MEMBER(pacman_state::pacman_interrupt_vector_w)
 {
-	m_maincpu->set_input_line_vector(0, data);
+	m_maincpu->set_input_line_vector(0, data); // Z80
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -503,7 +503,7 @@ WRITE8_MEMBER(pacman_state::piranha_interrupt_vector_w)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
-	m_maincpu->set_input_line_vector(0, data );
+	m_maincpu->set_input_line_vector(0, data ); // Z80
 }
 
 
@@ -512,7 +512,7 @@ WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
 	if (data == 0xfc) data = 0xfc;
-	m_maincpu->set_input_line_vector(0, data );
+	m_maincpu->set_input_line_vector(0, data ); // Z80
 }
 
 
@@ -4210,6 +4210,32 @@ ROM_START( mspacmanbg2 )
 	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
 ROM_END
 
+ROM_START( mspacmanbi ) // very similar to mspacmanbg
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2.bin",  0x0000, 0x4000,  BAD_DUMP CRC(03905a76) SHA1(1780ef598c6150ffa44bf467479670f7ca50d512) )
+	ROM_CONTINUE(       0x8000, 0x4000) // blocks 5+6 are repeated twice in here, but for 0xac0d that differs from 0x8c0d
+	ROM_FILL( 0x18b5, 0x01, 0x4e ) // bad dump, has 0x04 instead of 0x4e. Causes Ms. Pacman not responding to controls / moving autonomously
+	ROM_FILL( 0x197d, 0x01, 0xda ) // bad dump, has 0x92 instead of 0xda. Causes Ms. Pacman misplacements / teleportations inside and outside of the maze
+	ROM_FILL( 0x1a61, 0x01, 0x21 ) // bad dump, has 0x00 instead of 0x21, resulting in illegal opcode
+	ROM_FILL( 0xac0d, 0x01, 0xeb ) // bad dump, has 0xea instead of 0xeb. No ill effect observed, but better safe than sorry
+	// other differences are due to copyright and year change
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "1.bin",    0x0000, 0x0800, CRC(8ee4a3b0) SHA1(01e3453c99f7a5d78ab083c49c650e898c0dd2ee) )
+	ROM_CONTINUE(0x1000,0x800)
+	ROM_CONTINUE(0x0800,0x800)
+	ROM_CONTINUE(0x1800,0x800)
+	ROM_IGNORE(0x2000)
+
+	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "82s123.h7",    0x0000, 0x0020, BAD_DUMP CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) )
+	ROM_LOAD( "82s129-3.d1",  0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs, not dumped for this set */
+	ROM_LOAD( "82s129-1.a9",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+ROM_END
+
 ROM_START( mspacmanbgd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27256.01",  0x0000, 0x4000, CRC(5bcc195e) SHA1(9a82536f3a33c406b8cc9e076ccf21c61a009305) )
@@ -4991,6 +5017,33 @@ ROM_START( pacmanfm )
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "pm1-3.1m", 0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // 82s126
 	ROM_LOAD( "pm1-2.3m", 0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // 82s126 - timing - not used
+ROM_END
+
+// PCB is marked "PUK" both on component side and on solder side. Code is identical to pacmanfm, only differences are in p9bfz.5e (adds U.G.) and in mmi63s141j.3m
+ROM_START( pacmanug )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1p.6e",  0x0000, 0x0800, CRC(f36e88ab) SHA1(813cecf44bf5464b1aed64b36f5047e4c79ba176) )
+	ROM_LOAD( "5p.6k",  0x0800, 0x0800, CRC(618bd9b3) SHA1(b9ca52b63a49ddece768378d331deebbe34fe177) )
+	ROM_LOAD( "2p.6f",  0x1000, 0x0800, CRC(7d177853) SHA1(9b5ddaaa8b564654f97af193dbcc29f81f230a25) )
+	ROM_LOAD( "6p.6m",  0x1800, 0x0800, CRC(d3e8914c) SHA1(c2f00e1773c6864435f29c8b7f44f2ef85d227d3) )
+	ROM_LOAD( "3p.6h",  0x2000, 0x0800, CRC(6bf4f625) SHA1(afe72fdfec66c145b53ed865f98734686b26e921) )
+	ROM_LOAD( "7p.6n",  0x2800, 0x0800, CRC(a948ce83) SHA1(08759833f7e0690b2ccae573c929e2a48e5bde7f) )
+	ROM_LOAD( "4p.6j",  0x3000, 0x0800, CRC(b6289b26) SHA1(d249fa9cdde774d5fee7258147cd25fa3f4dc2b3) )
+	ROM_LOAD( "8p.6p",  0x3800, 0x0800, CRC(17a88c13) SHA1(eb462de79f49b7aa8adb0cc6d31535b10550c0ce) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "p9bfz.5e", 0x0000, 0x0800, CRC(dc9f2a7b) SHA1(511a620abddaf40c8a578afaaddb2d832a74797b) )
+	ROM_LOAD( "11p.5h",   0x0800, 0x0800, CRC(3591b89d) SHA1(79bb456be6c39c1ccd7d077fbe181523131fb300) )
+	ROM_LOAD( "10p.5f",   0x1000, 0x0800, CRC(9e39323a) SHA1(be933e691df4dbe7d12123913c3b7b7b585b7a35) )
+	ROM_LOAD( "12p.5j",   0x1800, 0x0800, CRC(1b1d9096) SHA1(53771c573051db43e7185b1d188533056290a620) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "sig82s123.7f",  0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "mmi6301-1j.4a", 0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "mmi6301-1j.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "mmi63s141j.3m", 0x0100, 0x0100, CRC(deadc015) SHA1(751029630dcfef61dc834203eaffaf6afc7d83fc) )
 ROM_END
 
 ROM_START( piranha ) /* GDP-01 main PCB with GDP-02 auxiliary card */
@@ -7556,6 +7609,7 @@ GAME( 1981, abscam,   puckman,  piranha,  mspacman, pacman_state,  init_eyes,   
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, pacman_state,  empty_init,    ROT90,  "hack", "Piranha (hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, titanpac, puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "hack", "Titan (Pac-Man hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacmanfm, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (FAMARE S.A.)", "Pac Man (FAMARE S.A. bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, pacmanug, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (U.G.)", "Pac Man (U.G. bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, pacplus,  0,        pacman,   pacman,   pacman_state,  init_pacplus,  ROT90,  "Namco (Midway license)", "Pac-Man Plus", MACHINE_SUPPORTS_SAVE )
 
@@ -7585,6 +7639,7 @@ GAME( 1992, mspacmanblt,mspacman,woodpek, mspacman, pacman_state,  empty_init,  
 GAME( 1991, mspacmanbcc,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
 GAME( 1991, mspacmanbhe,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Herle SA)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Herle SA bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB
 GAME( 1992, mspacmanbco,mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Cocamatic)","Come-Cocos (Ms. Pac-Man) (Cocamatic bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // this PCB have swapped Blue and Green color lines (Ms.Pac-Man sprite should be pink), no "MADE IN GREECE" text at PCB
+GAME( 1993, mspacmanbi, mspacman,woodpek, mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Impeuropex)", "Ms. Pac-Man (Impeuropex bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, pacman_state,  empty_init,    ROT90,  "bootleg (Video Game SA)", "Puck Man (Spanish, 'Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
 

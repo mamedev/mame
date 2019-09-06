@@ -4,7 +4,7 @@
 
     a2videoterm.c
 
-    Implementation of the Videx VideoTerm 80-column card
+    Implementation of the Videx Videoterm 80-column card
 
     Notes (from Videoterm user's manual, which contains
            schematics and firmware source listings).
@@ -18,7 +18,6 @@
     CC00-CDFF: VRAM window
 
     TODO:
-    Cursor is probably not completely right.
     Add font ROM select.
 
 *********************************************************************/
@@ -36,11 +35,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_VIDEOTERM,      a2bus_videoterm_device, "a2vidtrm", "Videx VideoTerm")
+DEFINE_DEVICE_TYPE(A2BUS_VIDEOTERM,      a2bus_videoterm_device, "a2vidtrm", "Videx Videoterm 80 Column Display")
 DEFINE_DEVICE_TYPE(A2BUS_IBSAP16,        a2bus_ap16_device,      "a2ap16",   "IBS AP-16 80 column card")
 DEFINE_DEVICE_TYPE(A2BUS_IBSAP16ALT,     a2bus_ap16alt_device,   "a2ap16a",  "IBS AP-16 80 column card (alt. version)")
-DEFINE_DEVICE_TYPE(A2BUS_VTC1,           a2bus_vtc1_device,      "a2vtc1",   "unknown VideoTerm clone #1")
-DEFINE_DEVICE_TYPE(A2BUS_VTC2,           a2bus_vtc2_device,      "a2vtc2",   "unknown VideoTerm clone #2")
+DEFINE_DEVICE_TYPE(A2BUS_VTC1,           a2bus_vtc1_device,      "a2vtc1",   "unknown Videoterm clone")
 DEFINE_DEVICE_TYPE(A2BUS_AEVIEWMASTER80, a2bus_aevm80_device,    "a2aevm80", "Applied Engineering Viewmaster 80")
 
 #define VIDEOTERM_ROM_REGION  "vterm_rom"
@@ -48,14 +46,16 @@ DEFINE_DEVICE_TYPE(A2BUS_AEVIEWMASTER80, a2bus_aevm80_device,    "a2aevm80", "Ap
 #define VIDEOTERM_SCREEN_NAME "vterm_screen"
 #define VIDEOTERM_MC6845_NAME "mc6845_vterm"
 
-#define MDA_CLOCK   16257000
-
 ROM_START( a2videoterm )
-	ROM_REGION(0x400, VIDEOTERM_ROM_REGION, 0)
-	ROM_LOAD( "videx videoterm rom 2.4.bin", 0x000000, 0x000400, CRC(bbe3bb28) SHA1(bb653836e84850ce3197f461d4e19355f738cfbf) )
+	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, ROMREGION_ERASEFF)
+	ROM_SYSTEM_BIOS(0, "v24_60hz", "Firmware v2.4 (60 Hz)")
+	ROMX_LOAD( "6.ic6.bin", 0x000000, 0x000800, CRC(5776fa24) SHA1(19f69011ed7d2551c39d5c1cac1f5a2defc8f8fb), ROM_BIOS(0) ) // dumped from clone card
+	ROM_SYSTEM_BIOS(1, "v24_50hz", "Firmware v2.4 (50 Hz)")
+	ROMX_LOAD( "videx videoterm rom 2.4.bin", 0x000000, 0x000400, CRC(bbe3bb28) SHA1(bb653836e84850ce3197f461d4e19355f738cfbf), ROM_BIOS(1) )
 
-	ROM_REGION(0x5000, VIDEOTERM_GFX_REGION, 0)
+	ROM_REGION(0x5800, VIDEOTERM_GFX_REGION, 0)
 	ROM_LOAD( "videx videoterm character rom normal.bin", 0x000000, 0x000800, CRC(87f89f08) SHA1(410b54f33d13c82e3857f1be906d93a8c5b8d321) )
+	//ROM_LOAD( "5.ic5.bin", 0x000000, 0x000800, CRC(aafa7085) SHA1(54d7c358f1927ba8f3b61145215a806d8cb6b673) ) // dumped from clone card, identical to normal ROM except final byte is FF instead of 00
 	ROM_LOAD( "videx videoterm character rom normal uppercase.bin", 0x000800, 0x000800, CRC(3d94a7a4) SHA1(5518254f24bc945aab13bc71ecc9526d6dd8e033) )
 	ROM_LOAD( "videx videoterm character rom apl.bin", 0x001000, 0x000800, CRC(1adb704e) SHA1(a95df910eca33188cacee333b1325aa47edbcc25) )
 	ROM_LOAD( "videx videoterm character rom epson.bin", 0x001800, 0x000800, CRC(0c6ef8d0) SHA1(db72c0c120086f1aa4a87120c5d7993c4a9d3a18) )
@@ -65,6 +65,7 @@ ROM_START( a2videoterm )
 	ROM_LOAD( "videx videoterm character rom spanish.bin", 0x003800, 0x000800, CRC(439eac08) SHA1(d6f9f8eb7702440d9ae39129ea4f480b80fc4608) )
 	ROM_LOAD( "videx videoterm character rom super and subscript.bin", 0x004000, 0x000800, CRC(08b7c538) SHA1(7f4029d97be05680fe695debe07cea07666419e0) )
 	ROM_LOAD( "videx videoterm character rom symbol.bin", 0x004800, 0x000800, CRC(82bce582) SHA1(29dfa8c5257dbf25651c6bffa9cdb453482aa70e) )
+	ROM_LOAD( "4.ic4.bin", 0x005000, 0x000800, CRC(8a497a48) SHA1(50c3df528109c65491a001ec74e50351a652c1fd) ) // dumped from clone card, contains inverse character set
 ROM_END
 
 ROM_START( a2ap16 )
@@ -92,15 +93,6 @@ ROM_START( vtc1 )
 	ROM_LOAD( "8.ic8.bin",    0x000800, 0x000800, CRC(fbd98d77) SHA1(0d9b1c3917e23ca35d5fbd405f05ff6e87122b92) )
 ROM_END
 
-ROM_START( vtc2 )
-	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, 0)
-	ROM_LOAD( "6.ic6.bin",    0x000000, 0x000800, CRC(5776fa24) SHA1(19f69011ed7d2551c39d5c1cac1f5a2defc8f8fb) )
-
-	ROM_REGION(0x1000, VIDEOTERM_GFX_REGION, 0)
-	ROM_LOAD( "5.ic5.bin",    0x000000, 0x000800, CRC(aafa7085) SHA1(54d7c358f1927ba8f3b61145215a806d8cb6b673) )
-	ROM_LOAD( "4.ic4.bin",    0x000800, 0x000800, CRC(8a497a48) SHA1(50c3df528109c65491a001ec74e50351a652c1fd) )
-ROM_END
-
 ROM_START( a2aevm80 )
 	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, 0)
 	ROM_LOAD( "ae viewmaster 80 rom.bin", 0x000000, 0x000800, CRC(62a4b111) SHA1(159bf7c4add1435be215fddb648c0743fbcc49b5) )
@@ -119,16 +111,54 @@ ROM_END
 
 void a2bus_videx80_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME, SCREEN_TYPE_RASTER)); // 560x216?  (80x24 7x9 characters)
-	screen.set_raw(MDA_CLOCK, 882, 0, 720, 370, 0, 350);
+	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(17.43_MHz_XTAL, 1116, 0, 720, 260, 0, 216);
+	//screen.set_raw(17.43_MHz_XTAL, 1107, 0, 720, 315, 0, 216);
 	screen.set_screen_update(VIDEOTERM_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
-	MC6845(config, m_crtc, MDA_CLOCK/9);
+	HD6845S(config, m_crtc, 17.43_MHz_XTAL / 9);
 	m_crtc->set_screen(VIDEOTERM_SCREEN_NAME);
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(8);
+	m_crtc->set_char_width(9);
 	m_crtc->set_update_row_callback(FUNC(a2bus_videx80_device::crtc_update_row), this);
-	m_crtc->out_vsync_callback().set(FUNC(a2bus_videx80_device::vsync_changed));
+}
+
+void a2bus_ap16_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_videx80_device::device_add_mconfig(config);
+
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(16_MHz_XTAL, 1026, 0, 720, 313, 0, 216);
+
+	m_crtc->set_clock(16_MHz_XTAL / 9);
+}
+
+void a2bus_ap16alt_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_videx80_device::device_add_mconfig(config);
+
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(18_MHz_XTAL, 1152, 0, 720, 315, 0, 216);
+
+	m_crtc->set_clock(18_MHz_XTAL / 9);
+}
+
+void a2bus_vtc1_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_videx80_device::device_add_mconfig(config);
+
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(18_MHz_XTAL, 1155, 0, 880, 260, 0, 216);
+
+	m_crtc->set_clock(18_MHz_XTAL / 11);
+	m_crtc->set_char_width(11);
+}
+
+void a2bus_aevm80_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_videx80_device::device_add_mconfig(config);
+
+	subdevice<screen_device>(VIDEOTERM_SCREEN_NAME)->set_raw(18_MHz_XTAL, 1280, 0, 800, 234, 0, 216);
+
+	m_crtc->set_clock(18_MHz_XTAL / 10);
+	m_crtc->set_char_width(10);
 }
 
 //-------------------------------------------------
@@ -155,11 +185,6 @@ const tiny_rom_entry *a2bus_vtc1_device::device_rom_region() const
 	return ROM_NAME( vtc1 );
 }
 
-const tiny_rom_entry *a2bus_vtc2_device::device_rom_region() const
-{
-	return ROM_NAME( vtc2 );
-}
-
 const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 {
 	return ROM_NAME( a2aevm80 );
@@ -171,9 +196,10 @@ const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 
 a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr), m_framecnt(0),
-	m_crtc(*this, VIDEOTERM_MC6845_NAME), m_palette(*this, ":a2video"),
-	m_rambank(0)
+	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr),
+	m_crtc(*this, VIDEOTERM_MC6845_NAME),
+	m_rambank(0),
+	m_char_width(9)
 {
 }
 
@@ -195,16 +221,13 @@ a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const 
 a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VTC1, tag, owner, clock)
 {
-}
-
-a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx80_device(mconfig, A2BUS_VTC2, tag, owner, clock)
-{
+	m_char_width = 11;
 }
 
 a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_videx80_device(mconfig, A2BUS_AEVIEWMASTER80, tag, owner, clock)
 {
+	m_char_width = 10;
 }
 
 //-------------------------------------------------
@@ -220,14 +243,12 @@ void a2bus_videx80_device::device_start()
 	memset(m_ram, 0, 4*512);
 
 	save_item(NAME(m_ram));
-	save_item(NAME(m_framecnt));
 	save_item(NAME(m_rambank));
 }
 
 void a2bus_videx80_device::device_reset()
 {
 	m_rambank = 0;
-	m_framecnt = 0;
 }
 
 
@@ -326,42 +347,24 @@ void a2bus_videx80_device::write_c800(uint16_t offset, uint8_t data)
 
 MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint32_t  *p = &bitmap.pix32(y);
 	uint16_t  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
-	int i;
 
-	for ( i = 0; i < x_count; i++ )
+	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t offset = ( ma + i ) & 0x7ff;
 		uint8_t chr = m_ram[ offset ];
 		uint8_t data = m_chrrom[ chr_base + chr * 16 ];
-		uint8_t fg = 15;
-		uint8_t bg = 0;
+		rgb_t fg = rgb_t::white();
+		rgb_t bg = rgb_t::black();
 
 		if ( i == cursor_x )
+			std::swap(fg, bg);
+
+		for (int j = m_char_width; j > 0; j--)
 		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
+			*p++ = BIT(data, 7) ? fg : bg;
+			data <<= 1;
 		}
-
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-	}
-}
-
-WRITE_LINE_MEMBER( a2bus_videx80_device::vsync_changed )
-{
-	if ( state )
-	{
-		m_framecnt++;
 	}
 }

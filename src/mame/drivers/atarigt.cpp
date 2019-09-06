@@ -7,11 +7,12 @@
     driver by Aaron Giles
 
     Games supported:
-        * T-Mek (1994) [2 sets]
+        * T-Mek (1994) [5 sets]
         * Primal Rage (1994) [2 sets]
 
     Known bugs:
-        * protection devices unknown
+        * Protection not fully understood
+        * T-Mek's serial communications hardware is missing. The twin and single cabs seemingly use different link hardware but both link the same.
 
 ****************************************************************************
 
@@ -217,7 +218,7 @@ WRITE32_MEMBER(atarigt_state::latch_w)
 	if (ACCESSING_BITS_24_31)
 	{
 		/* bits 13-11 are the MO control bits */
-		m_rle->control_write(space, offset, (data >> 27) & 7);
+		m_rle->control_write((data >> 27) & 7);
 	}
 
 	if (ACCESSING_BITS_16_23)
@@ -233,7 +234,7 @@ WRITE32_MEMBER(atarigt_state::mo_command_w)
 {
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
-		m_rle->command_write(space, offset, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		m_rle->command_write(((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -616,11 +617,14 @@ void atarigt_state::main_map(address_map &map)
 	map(0xd00010, 0xd0001f).r(FUNC(atarigt_state::analog_port_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd4ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
-	map(0xd70000, 0xd7ffff).ram();
-	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
-	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd70000, 0xd71fff).ram();
+	map(0xd72000, 0xd75fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
+	map(0xd76000, 0xd76fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
+	map(0xd77000, 0xd77fff).ram();
 	map(0xd78000, 0xd78fff).ram().share("rle");
-	map(0xd7a200, 0xd7a203).w(FUNC(atarigt_state::mo_command_w)).share("mo_command");
+	map(0xd79000, 0xd7a1ff).ram();
+	map(0xd7a200, 0xd7a203).ram().w(FUNC(atarigt_state::mo_command_w)).share("mo_command");
+	map(0xd7a204, 0xd7ffff).ram();
 	map(0xd80000, 0xdfffff).rw(FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w)).share("colorram");
 	map(0xe04000, 0xe04003).w(FUNC(atarigt_state::led_w));
 	map(0xe08000, 0xe08003).w(FUNC(atarigt_state::latch_w));
@@ -803,8 +807,8 @@ static const atari_rle_objects_config modesc =
  *
  *************************************/
 
-MACHINE_CONFIG_START(atarigt_state::atarigt)
-
+void atarigt_state::atarigt(machine_config &config)
+{
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, ATARI_CLOCK_50MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarigt_state::main_map);
@@ -818,7 +822,9 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarigt);
 	PALETTE(config, m_palette).set_entries(MRAM_ENTRIES);
 
-	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8);
+	m_playfield_tilemap->set_layout(FUNC(atarigt_state::atarigt_playfield_scan), 128,64);
+	m_playfield_tilemap->set_info_callback(FUNC(atarigt_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(atarigt_state::get_alpha_tile_info));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -836,8 +842,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	/* sound hardware */
 	ATARI_CAGE(config, m_cage, 0);
 	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
-
-MACHINE_CONFIG_END
+}
 
 void atarigt_state::tmek(machine_config &config)
 {
@@ -1313,7 +1318,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	if (pc == 0x25834 || pc == 0x25860)
 		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", m_maincpu->pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)m_maincpu->state_int(M68K_A3) - 2);
 
-	m_playfield_tilemap->write32(space, offset, data, mem_mask);
+	m_playfield_tilemap->write32(offset, data, mem_mask);
 }
 
 void atarigt_state::init_tmek()
@@ -1347,10 +1352,10 @@ void atarigt_state::init_primrage()
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
+GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
 GAME( 1994, primrage,   0,        primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, primrage20, primrage, primrage20, primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )

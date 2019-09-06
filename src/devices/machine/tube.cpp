@@ -91,10 +91,13 @@ uint8_t tube_device::host_r(offs_t offset)
 
 	case 1: /* Register 1 */
 		data = m_ph1[0];
-		for (int i = 0; i < 23; i++) m_ph1[i] = m_ph1[i + 1];
-		m_ph1pos--;
-		m_pstat[0] |= 0x40;
-		if (!m_ph1pos) m_hstat[0] &= ~0x80;
+		if (!machine().side_effects_disabled())
+		{
+			for (int i = 0; i < 23; i++) m_ph1[i] = m_ph1[i + 1];
+			m_ph1pos--;
+			m_pstat[0] |= 0x40;
+			if (!m_ph1pos) m_hstat[0] &= ~0x80;
+		}
 		break;
 
 	case 2: /* Register 2 flags */
@@ -103,7 +106,7 @@ uint8_t tube_device::host_r(offs_t offset)
 
 	case 3: /* Register 2 */
 		data = m_ph2;
-		if (m_hstat[1] & 0x80)
+		if (BIT(m_hstat[1], 7) && !machine().side_effects_disabled())
 		{
 			m_hstat[1] &= ~0x80;
 			m_pstat[1] |= 0x40;
@@ -116,11 +119,11 @@ uint8_t tube_device::host_r(offs_t offset)
 
 	case 5: /* Register 3 */
 		data = m_ph3[0];
-		if (m_ph3pos > 0)
+		if ((m_ph3pos > 0) && !machine().side_effects_disabled())
 		{
 			m_ph3[0] = m_ph3[1];
 			m_ph3pos--;
-			m_pstat[2] |= 0x40;
+			m_pstat[2] |= 0xc0;
 			if (!m_ph3pos) m_hstat[2] &= ~0x80;
 		}
 		break;
@@ -131,7 +134,7 @@ uint8_t tube_device::host_r(offs_t offset)
 
 	case 7: /* Register 4 */
 		data = m_ph4;
-		if (m_hstat[3] & 0x80)
+		if (BIT(m_hstat[3], 7) && !machine().side_effects_disabled())
 		{
 			m_hstat[3] &= ~0x80;
 			m_pstat[3] |= 0x40;
@@ -148,7 +151,7 @@ void tube_device::host_w(offs_t offset, uint8_t data)
 	switch (offset & 0x07)
 	{
 	case 0: /* Status flags */
-		if (data & 0x80)
+		if (BIT(data, 7))
 			m_r1stat |= (data & 0x3f);
 		else
 			m_r1stat &= ~(data & 0x3f);
@@ -168,7 +171,7 @@ void tube_device::host_w(offs_t offset, uint8_t data)
 		break;
 
 	case 5: /* Register 3 */
-		if (m_r1stat & 0x10)
+		if (BIT(m_r1stat, 4))
 		{
 			if (m_hp3pos < 2)
 				m_hp3[m_hp3pos++] = data;
@@ -209,7 +212,7 @@ uint8_t tube_device::parasite_r(offs_t offset)
 
 	case 1: /* Register 1 */
 		data = m_hp1;
-		if (m_pstat[0] & 0x80)
+		if (BIT(m_pstat[0], 7) && !machine().side_effects_disabled())
 		{
 			m_pstat[0] &= ~0x80;
 			m_hstat[0] |= 0x40;
@@ -222,7 +225,7 @@ uint8_t tube_device::parasite_r(offs_t offset)
 
 	case 3: /* Register 2 */
 		data = m_hp2;
-		if (m_pstat[1] & 0x80)
+		if (BIT(m_pstat[1], 7) && !machine().side_effects_disabled())
 		{
 			m_pstat[1] &= ~0x80;
 			m_hstat[1] |= 0x40;
@@ -235,7 +238,7 @@ uint8_t tube_device::parasite_r(offs_t offset)
 
 	case 5: /* Register 3 */
 		data = m_hp3[0];
-		if (m_hp3pos > 0)
+		if ((m_hp3pos > 0) && !machine().side_effects_disabled())
 		{
 			m_hp3[0] = m_hp3[1];
 			m_hp3pos--;
@@ -253,7 +256,7 @@ uint8_t tube_device::parasite_r(offs_t offset)
 
 	case 7: /* Register 4 */
 		data = m_hp4;
-		if (m_pstat[3] & 0x80)
+		if (BIT(m_pstat[3], 7) && !machine().side_effects_disabled())
 		{
 			m_pstat[3] &= ~0x80;
 			m_hstat[3] |= 0x40;
@@ -286,7 +289,7 @@ void tube_device::parasite_w(offs_t offset, uint8_t data)
 		break;
 
 	case 5: /* Register 3 */
-		if (m_r1stat & 0x10)
+		if (BIT(m_r1stat, 4))
 		{
 			if (m_ph3pos < 2)
 				m_ph3[m_ph3pos++] = data;
@@ -301,7 +304,7 @@ void tube_device::parasite_w(offs_t offset, uint8_t data)
 			m_ph3[0] = data;
 			m_ph3pos = 1;
 			m_hstat[2] |= 0x80;
-			m_pstat[2] &= ~0x40;
+			m_pstat[2] &= ~0xc0;
 		}
 		break;
 

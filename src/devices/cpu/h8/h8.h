@@ -87,9 +87,10 @@ protected:
 		EXR_I  = 0x07
 	};
 
-	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_constructor map_delegate);
+	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -132,7 +133,7 @@ protected:
 	uint32_t  TMP1, TMP2;
 	uint32_t  TMPR;                   /* For debugger ER register import */
 
-	bool has_exr, has_trace, supports_advanced, mode_advanced, mac_saturating;
+	bool has_exr, has_trace, supports_advanced, mode_advanced, mode_a20, mac_saturating;
 
 	int inst_state, inst_substate, requested_state;
 	int icount, bcount, count_before_instruction_step;

@@ -65,9 +65,9 @@ protected:
 	chd_file        m_diffchd;              /* handle to the diff CHD */
 	hard_disk_file  *m_hard_disk_handle;
 
-	device_image_load_delegate      m_device_image_load;
-	device_image_func_delegate      m_device_image_unload;
-	const char *                    m_interface;
+	load_delegate   m_device_image_load;
+	unload_delegate m_device_image_unload;
+	const char *    m_interface;
 };
 
 // device type definition

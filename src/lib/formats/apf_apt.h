@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders: Original author, Robbbert
-#ifndef APFCAS_H
-#define APFCAS_H
+#ifndef MAME_FORMATS_APF_APT_H
+#define MAME_FORMATS_APF_APT_H
+
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(apf_cassette_formats);
 
-
-#endif /* APFCAS_H */
+#endif // MAME_FORMATS_APF_APT_H

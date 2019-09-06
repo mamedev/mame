@@ -13,6 +13,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class kingofb_state : public driver_device
 {

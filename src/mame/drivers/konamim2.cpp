@@ -688,7 +688,7 @@ void konamim2_state::machine_start()
 	m_ppc1->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_ppc2->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
-	// Breakpoints don't wortk with fast RAM
+	// Breakpoints don't work with fast RAM
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
 		m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
@@ -1423,7 +1423,7 @@ ROM_START( totlvica )
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "639aab01", 0, SHA1(bb99db2eeaecabfda8f20b7b06f714605bbd5b7c) )
+	DISK_IMAGE_READONLY( "639aab01", 0, SHA1(34f34b26399cc04ffb0207df69f52eba42892eb6) )
 ROM_END
 
 ROM_START( totlvicj )

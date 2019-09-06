@@ -13,10 +13,16 @@
     1fc00000 - 1fc7ffff      Boot ROM
     40000000 - 7fffffff      RAM
 
+NOTE: The default Sgi O2 Keyboard (Model No. RT6856T, Part No. 121472-101-B,
+      Sgi No. 062-0002-001) has a Zilog "RT101+228A" MCU, which is really a
+      Zilog Z8615 (a Z8-based PC keyboard controller) with 4K ROM (undumped).
+      It might have a custom ROM, since it had special marking.
+
 **********************************************************************/
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
+#include "machine/ds17x85.h"
 #include "machine/mace.h"
 #include "video/crime.h"
 
@@ -44,7 +50,6 @@ protected:
 void o2_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("bank1");
-	map(0x00000000, 0x00000fff).ram();
 	map(0x14000000, 0x15ffffff).m(m_crime, FUNC(crime_device::map));
 	map(0x1f000000, 0x1f3fffff).m(m_mace, FUNC(mace_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
@@ -74,8 +79,12 @@ void o2_state::o2(machine_config &config)
 	m_maincpu->set_force_no_drc(true);
 
 	SGI_MACE(config, m_mace, m_maincpu);
+	m_mace->rtc_read_callback().set("rtc", FUNC(ds17x85_device::read_direct));
+	m_mace->rtc_write_callback().set("rtc", FUNC(ds17x85_device::write_direct));
 
 	SGI_CRIME(config, m_crime, m_maincpu);
+
+	DS1687(config, "rtc", 32768);
 }
 
 ROM_START( o2 )

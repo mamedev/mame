@@ -376,8 +376,8 @@ void junofrst_state::machine_start()
 	save_item(NAME(m_last_irq));
 	save_item(NAME(m_irq_toggle));
 	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_flip_x));
-	save_item(NAME(m_flip_y));
+	save_item(NAME(m_flipscreen_x));
+	save_item(NAME(m_flipscreen_y));
 	save_item(NAME(m_blitterdata));
 }
 
@@ -428,16 +428,14 @@ void junofrst_state::junofrst(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 16);
-
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);  /* not sure about the visible area */
-	screen.set_screen_update(FUNC(junofrst_state::screen_update_tutankhm));
-	screen.screen_vblank().set(FUNC(junofrst_state::_30hz_irq));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
+	PALETTE(config, m_palette).set_format(1, tutankhm_state::raw_to_rgb_func, 16);
+
+	m_screen->set_screen_update(FUNC(junofrst_state::screen_update_tutankhm_scramble));
+	m_screen->screen_vblank().set(FUNC(junofrst_state::_30hz_irq));
+
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

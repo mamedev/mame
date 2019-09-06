@@ -43,12 +43,6 @@
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(thunderx_state::vblank_interrupt)
-{
-	if (m_k052109->is_irq_enabled())
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
-}
-
 void thunderx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -379,24 +373,24 @@ READ8_MEMBER(thunderx_state::k052109_051960_r)
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER(thunderx_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
 /***************************************************************************/
@@ -642,7 +636,6 @@ void thunderx_state::scontra(machine_config &config)
 	/* basic machine hardware */
 	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 052001 (verified on pcb) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &thunderx_state::scontra_map);
-	m_maincpu->set_vblank_int("screen", FUNC(thunderx_state::vblank_interrupt));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thunderx_state::scontra_sound_map);
@@ -663,13 +656,15 @@ void thunderx_state::scontra(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 0); // 051961 on Super Contra and Thunder Cross schematics
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(thunderx_state::tile_callback), this);
+	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(thunderx_state::sprite_callback), this);
 
 	/* sound hardware */
@@ -704,6 +699,8 @@ void thunderx_state::thunderx(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thunderx_state::thunderx_sound_map);
 
 	m_bank5800->set_map(&thunderx_state::thunderx_bank5800_map).set_addr_width(13);
+
+	m_k052109->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	config.device_remove("k007232");
 }

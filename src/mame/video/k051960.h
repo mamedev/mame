@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "screen.h"
-
 enum
 {
 	K051960_PLANEORDER_BASE = 0,
@@ -19,7 +17,7 @@ typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)
 #define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, int *shadow)
 
 
-class k051960_device : public device_t, public device_gfx_interface
+class k051960_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 	static const gfx_layout spritelayout;
 	static const gfx_layout spritelayout_reverse;
@@ -41,7 +39,6 @@ public:
 	// static configuration
 	template <typename... T> void set_sprite_callback(T &&... args) { m_k051960_cb = k051960_cb_delegate(std::forward<T>(args)...); }
 	void set_plane_order(int order);
-	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	/*
 	The callback is passed:
@@ -57,11 +54,11 @@ public:
 	  the game has special treatment (Aliens)
 	*/
 
-	DECLARE_READ8_MEMBER( k051960_r );
-	DECLARE_WRITE8_MEMBER( k051960_w );
+	u8 k051960_r(offs_t offset);
+	void k051960_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER( k051937_r );
-	DECLARE_WRITE8_MEMBER( k051937_w );
+	u8 k051937_r(offs_t offset);
+	void k051937_w(offs_t offset, u8 data);
 
 	void k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority);
 
@@ -78,7 +75,6 @@ private:
 
 	required_region_ptr<uint8_t> m_sprite_rom;
 
-	required_device<screen_device> m_screen;
 	emu_timer *m_scanline_timer;
 
 	k051960_cb_delegate m_k051960_cb;

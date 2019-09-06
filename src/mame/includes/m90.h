@@ -9,6 +9,7 @@
 #include "cpu/nec/v25.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class m90_state : public driver_device
 {

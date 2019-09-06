@@ -988,7 +988,7 @@ void abc806_state::machine_reset()
 //  bac quickload
 //-------------------------------------------------
 
-QUICKLOAD_LOAD_MEMBER( abc800_state, bac )
+QUICKLOAD_LOAD_MEMBER(abc800_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1052,7 +1052,8 @@ QUICKLOAD_LOAD_MEMBER( abc800_state, bac )
 //  machine_config( common )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc800_state::common)
+void abc800_state::common(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, ABC800_X01/2/2);
 	m_maincpu->set_daisy_config(abc800_daisy_chain);
@@ -1083,8 +1084,13 @@ MACHINE_CONFIG_START(abc800_state::common)
 	m_dart->out_txdb_callback().set(ABC_KEYBOARD_PORT_TAG, FUNC(abc_keyboard_port_device::txd_w));
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, abc800_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
+
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
@@ -1104,17 +1110,13 @@ MACHINE_CONFIG_START(abc800_state::common)
 
 	ABCBUS_SLOT(config, ABCBUS_TAG, ABC800_X01/2/2, abcbus_cards, nullptr);
 
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, abc800_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
-
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("abc800");
 	SOFTWARE_LIST(config, "hdd_list").set_original("abc800_hdd");
 
 	// quickload
-	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", attotime::from_seconds(2))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc800_state::quickload_cb), this);
+}
 
 
 //-------------------------------------------------

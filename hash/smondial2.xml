@@ -4,7 +4,7 @@
 	<software name="college">
 		<description>College Module</description>
 		<year>1989</year>
-		<publisher>Hegener &amp; Glaser</publisher>
+		<publisher>Hegener + Glaser</publisher>
 		<part name="cart" interface="smondial2_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="college_module.bin" size="0x4000" crc="02fbdf33" sha1="7d1c87b446ef00f4a533f5193f33b3e05af9ff33" offset="0" />

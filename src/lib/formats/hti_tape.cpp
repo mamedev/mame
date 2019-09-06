@@ -7,7 +7,9 @@
 *********************************************************************/
 
 #include "hti_tape.h"
+
 #include "imageutl.h"
+
 
 static constexpr uint32_t FILE_MAGIC =  0x5441434f;      // Magic value at start of image file: "TACO"
 

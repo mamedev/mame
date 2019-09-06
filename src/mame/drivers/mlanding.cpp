@@ -82,17 +82,18 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_mechacpu(*this, "mechacpu"),
 		m_yoke(*this, "yokectrl"),
-		m_msm1(*this, "msm1"),
-		m_msm2(*this, "msm2"),
+		m_msm(*this, "msm%u", 1U),
 		m_ctc(*this, "ctc"),
 		m_dma_bank(*this, "dma_ram"),
-		m_msm1_rom(*this, "adpcm1"),
-		m_msm2_rom(*this, "adpcm2"),
+		m_msm_rom(*this, "adpcm%u", 1U),
 		m_g_ram(*this, "g_ram"),
 		m_cha_ram(*this, "cha_ram"),
 		m_dot_ram(*this, "dot_ram"),
 		m_power_ram(*this, "power_ram"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_io_dswa(*this, "DSWA"),
+		m_io_dswb(*this, "DSWB"),
+		m_io_limit(*this, "LIMIT%u", 0U)
 	{ }
 
 	void mlanding(machine_config &config);
@@ -109,7 +110,7 @@ private:
 		TIMER_DMA_COMPLETE
 	};
 
-	static constexpr uint32_t c_dma_bank_words = 0x2000;
+	static constexpr u32 c_dma_bank_words = 0x2000;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -117,63 +118,65 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_mechacpu;
 	required_device<taitoio_yoke_device> m_yoke;
-	required_device<msm5205_device> m_msm1;
-	required_device<msm5205_device> m_msm2;
+	required_device_array<msm5205_device, 2> m_msm;
 	required_device<z80ctc_device> m_ctc;
 
 	required_memory_bank    m_dma_bank;
-	required_region_ptr<uint8_t> m_msm1_rom;
-	required_region_ptr<uint8_t> m_msm2_rom;
+	required_region_ptr_array<u8, 2> m_msm_rom;
 
-	required_shared_ptr<uint16_t> m_g_ram;
-	required_shared_ptr<uint16_t> m_cha_ram;
-	required_shared_ptr<uint16_t> m_dot_ram;
-	required_shared_ptr<uint8_t>  m_power_ram;
+	required_shared_ptr<u16> m_g_ram;
+	required_shared_ptr<u16> m_cha_ram;
+	required_shared_ptr<u16> m_dot_ram;
+	required_shared_ptr<u8>  m_power_ram;
 
 	required_device<palette_device> m_palette;
 
-	std::unique_ptr<uint16_t[]> m_dma_ram;
-	uint8_t   m_dma_cpu_bank;
-	uint8_t   m_dma_busy;
-	uint16_t  m_dsp_hold_signal;
+	required_ioport m_io_dswa;
+	required_ioport m_io_dswb;
+	required_ioport_array<2> m_io_limit;
 
-	uint32_t  m_msm_pos[2];
-	uint8_t   m_msm_reset[2];
-	uint8_t   m_msm_nibble[2];
-	uint8_t   m_msm2_vck;
-	uint8_t   m_msm2_vck2;
+	std::unique_ptr<u16[]> m_dma_ram;
+	u8   m_dma_cpu_bank;
+	u8   m_dma_busy;
+	u16  m_dsp_hold_signal;
 
-	DECLARE_WRITE16_MEMBER(dma_start_w);
-	DECLARE_WRITE16_MEMBER(dma_stop_w);
-	DECLARE_WRITE16_MEMBER(output_w);
-	DECLARE_READ16_MEMBER(input_r);
-	DECLARE_READ16_MEMBER(analog1_lsb_r);
-	DECLARE_READ16_MEMBER(analog2_lsb_r);
-	DECLARE_READ16_MEMBER(analog3_lsb_r);
-	DECLARE_READ16_MEMBER(analog1_msb_r);
-	DECLARE_READ16_MEMBER(analog2_msb_r);
-	DECLARE_READ16_MEMBER(analog3_msb_r);
-	DECLARE_READ16_MEMBER(power_ram_r);
-	DECLARE_WRITE16_MEMBER(power_ram_w);
+	u32  m_msm_pos[2];
+	u8   m_msm_reset[2];
+	u8   m_msm_nibble[2];
+	u8   m_msm2_vck;
+	u8   m_msm2_vck2;
 
-	DECLARE_WRITE16_MEMBER(dsp_control_w);
-	DECLARE_READ16_MEMBER(dsp_hold_signal_r);
+	void dma_start_w(u16 data = 0);
+	void dma_stop_w(u16 data = 0);
+	void output_w(u16 data);
+	u16 input_r();
+	u8 analog1_lsb_r();
+	u8 analog2_lsb_r();
+	u8 analog3_lsb_r();
+	u8 analog1_msb_r();
+	u8 analog2_msb_r();
+	u8 analog3_msb_r();
+	u8 power_ram_r(offs_t offset);
+	void power_ram_w(offs_t offset, u8 data);
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(msm5205_1_start_w);
-	DECLARE_WRITE8_MEMBER(msm5205_1_stop_w);
-	DECLARE_WRITE8_MEMBER(msm5205_1_addr_lo_w);
-	DECLARE_WRITE8_MEMBER(msm5205_1_addr_hi_w);
-	DECLARE_WRITE8_MEMBER(msm5205_2_start_w);
-	DECLARE_WRITE8_MEMBER(msm5205_2_stop_w);
+	void dsp_control_w(u16 data);
+	u16 dsp_hold_signal_r();
+
+	void sound_bankswitch_w(u8 data);
+	void msm5205_1_start_w(u8 data = 0);
+	void msm5205_1_stop_w(u8 data = 0);
+	void msm5205_1_addr_lo_w(u8 data);
+	void msm5205_1_addr_hi_w(u8 data);
+	void msm5205_2_start_w(u8 data);
+	void msm5205_2_stop_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_1_vck);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
 
-	DECLARE_READ8_MEMBER(motor_r);
+	u8 motor_r();
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t exec_dma();
-	void msm5205_update(int chip);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 exec_dma();
+	void msm5205_update(unsigned chip);
 
 	void audio_map_io(address_map &map);
 	void audio_map_prog(address_map &map);
@@ -195,7 +198,7 @@ private:
 void mlanding_state::machine_start()
 {
 	// Allocate two DMA RAM banks
-	m_dma_ram = std::make_unique<uint16_t[]>(c_dma_bank_words * 2);
+	m_dma_ram = std::make_unique<u16[]>(c_dma_bank_words * 2);
 	m_dma_bank->configure_entries(0, 2, m_dma_ram.get(), c_dma_bank_words * 2);
 
 	// Register state for saving
@@ -224,8 +227,8 @@ void mlanding_state::machine_reset()
 
 	m_msm_reset[0] = 0;
 	m_msm_reset[1] = 0;
-	m_msm1->reset_w(1);
-	m_msm2->reset_w(1);
+	m_msm[0]->reset_w(1);
+	m_msm[1]->reset_w(1);
 	m_msm2_vck = 0;
 	m_msm2_vck2 = 0;
 }
@@ -238,16 +241,16 @@ void mlanding_state::machine_reset()
  *
  *************************************/
 
-uint32_t mlanding_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 mlanding_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = m_palette->pens();
 
-	for (uint32_t y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (u32 y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint16_t *src = &m_g_ram[(112 + y) * 512 + cliprect.min_x];
-		uint16_t *dst = &bitmap.pix16(y, cliprect.min_x);
+		u16 *src = &m_g_ram[(112 + y) * 512 + cliprect.min_x];
+		u16 *dst = &bitmap.pix16(y, cliprect.min_x);
 
-		for (uint32_t x = cliprect.min_x; x <= cliprect.max_x; ++x)
+		for (u32 x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
 			*dst++ = pens[*src++ & 0x3fff];
 		}
@@ -264,12 +267,12 @@ uint32_t mlanding_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-WRITE16_MEMBER(mlanding_state::dma_start_w)
+void mlanding_state::dma_start_w(u16 data)
 {
 	m_dma_cpu_bank ^= 1;
 	m_dma_bank->set_entry(m_dma_cpu_bank);
 
-	uint32_t pixels = exec_dma();
+	const u32 pixels = exec_dma();
 
 	if (pixels)
 	{
@@ -281,7 +284,7 @@ WRITE16_MEMBER(mlanding_state::dma_start_w)
 }
 
 
-WRITE16_MEMBER(mlanding_state::dma_stop_w)
+void mlanding_state::dma_stop_w(u16 data)
 {
 	m_dma_busy = 0;
 	timer_set(attotime::never);
@@ -305,58 +308,58 @@ WRITE16_MEMBER(mlanding_state::dma_stop_w)
 
     3   ........ ....xxxx       Colour
 */
-uint32_t mlanding_state::exec_dma()
+u32 mlanding_state::exec_dma()
 {
-	uint32_t pixcnt = 0;
-	uint32_t gram_mask = m_g_ram.bytes() - 1;
-	uint16_t *dma_ram = &m_dma_ram[(m_dma_cpu_bank ^ 1) * c_dma_bank_words];
+	u32 pixcnt = 0;
+	const u32 gram_mask = m_g_ram.bytes() - 1;
+	const u16 *dma_ram = &m_dma_ram[(m_dma_cpu_bank ^ 1) * c_dma_bank_words];
 
 	// Process the entries in DMA RAM
-	for (uint32_t offs = 0; offs < c_dma_bank_words; offs += 4)
+	for (u32 offs = 0; offs < c_dma_bank_words; offs += 4)
 	{
-		uint16_t attr = dma_ram[offs];
+		const u16 attr = dma_ram[offs];
 
 		if (attr == 0)
 			continue;
 
-		uint16_t code = attr & 0x1fff;
+		u16 code = attr & 0x1fff;
 
-		uint16_t xword = dma_ram[offs + 1];
-		uint16_t yword = dma_ram[offs + 2];
+		const u16 xword = dma_ram[offs + 1];
+		const u16 yword = dma_ram[offs + 2];
 
-		uint16_t x = xword & 0x1ff;
-		uint16_t y = yword & 0x1ff;
-		uint16_t sx = ((xword >> 11) & 0x1f) + 1;
-		uint16_t sy = ((yword >> 11) & 0x1f) + 1;
+		const u16 x = xword & 0x1ff;
+		const u16 y = yword & 0x1ff;
+		const u16 sx = ((xword >> 11) & 0x1f) + 1;
+		const u16 sy = ((yword >> 11) & 0x1f) + 1;
 
-		uint8_t colour = dma_ram[offs + 3] & 0xff;
+		const u8 colour = dma_ram[offs + 3] & 0xff;
 
 		if ((attr & 0x2000) == 0)
 		{
 			// Normal draw mode
-			uint8_t basepix = colour << 4;
+			const u8 basepix = colour << 4;
 
-			for (uint32_t j = 0; j < sx; ++j)
+			for (u32 j = 0; j < sx; ++j)
 			{
-				for (uint32_t k = 0; k < sy; ++k)
+				for (u32 k = 0; k < sy; ++k)
 				{
 					// Draw an 8x8 tile
-					for (uint32_t y1 = 0; y1 < 8; ++y1)
+					for (u32 y1 = 0; y1 < 8; ++y1)
 					{
-						uint16_t *src = &m_cha_ram[(code * 2 * 8) + y1 * 2];
-						uint32_t byteaddr = ((y + k * 8 + y1) * 512 + (j * 8 + x)) * 2;
+						const u16 *src = &m_cha_ram[(code * 2 * 8) + y1 * 2];
+						u32 byteaddr = ((y + k * 8 + y1) * 512 + (j * 8 + x)) * 2;
 
-						uint8_t *pixdata = reinterpret_cast<uint8_t *>(m_g_ram.target()) + BYTE_XOR_BE(1);
+						u8 *pixdata = reinterpret_cast<u8 *>(m_g_ram.target()) + BYTE_XOR_BE(1);
 
-						uint8_t p2 = *src & 0xff;
-						uint8_t p1 = *src++ >> 8;
-						uint8_t p4 = *src;
-						uint8_t p3 = *src++ >> 8;
+						const u8 p2 = *src & 0xff;
+						const u8 p1 = *src++ >> 8;
+						const u8 p4 = *src;
+						const u8 p3 = *src++ >> 8;
 
 						// Draw 8 pixels
-						for (uint32_t x1 = 0; x1 < 8; ++x1)
+						for (u32 x1 = 0; x1 < 8; ++x1)
 						{
-							uint16_t pix = (BIT(p4, x1) << 3) | (BIT(p3, x1) << 2) | (BIT(p2, x1) << 1) | BIT(p1, x1);
+							const u16 pix = (BIT(p4, x1) << 3) | (BIT(p3, x1) << 2) | (BIT(p2, x1) << 1) | BIT(p1, x1);
 
 							if ((attr & 0x8000) == 0)
 							{
@@ -382,16 +385,16 @@ uint32_t mlanding_state::exec_dma()
 		else
 		{
 			// Set pixel or palette data
-			for (uint32_t y1 = 0; y1 < sy * 8; ++y1)
+			for (u32 y1 = 0; y1 < sy * 8; ++y1)
 			{
-				uint32_t byteaddr = (((y + y1) * 512) + x) * 2;
+				u32 byteaddr = (((y + y1) * 512) + x) * 2;
 
 				if ((attr & 0x4000) == 0)
 				{
 					// Clear pixel data
-					uint8_t *pixdata = reinterpret_cast<uint8_t *>(m_g_ram.target()) + BYTE_XOR_BE(1);
+					u8 *pixdata = reinterpret_cast<u8 *>(m_g_ram.target()) + BYTE_XOR_BE(1);
 
-					for (uint32_t x1 = 0; x1 < sx * 8; ++x1)
+					for (u32 x1 = 0; x1 < sx * 8; ++x1)
 					{
 						pixdata[byteaddr & gram_mask] = colour;
 						byteaddr += 2;
@@ -401,9 +404,9 @@ uint32_t mlanding_state::exec_dma()
 				else
 				{
 					// Clear palette data
-					uint8_t *paldata = reinterpret_cast<uint8_t *>(m_g_ram.target()) + BYTE_XOR_BE(0);
+					u8 *paldata = reinterpret_cast<u8 *>(m_g_ram.target()) + BYTE_XOR_BE(0);
 
-					for (uint32_t x1 = 0; x1 < sx * 8; ++x1)
+					for (u32 x1 = 0; x1 < sx * 8; ++x1)
 					{
 						paldata[byteaddr & gram_mask] = colour;
 						byteaddr += 2;
@@ -439,7 +442,7 @@ void mlanding_state::device_timer(emu_timer &timer, device_timer_id id, int para
  *
  *************************************/
 
-READ16_MEMBER(mlanding_state::input_r)
+u16 mlanding_state::input_r()
 {
 	/*
 	    FEDCBA98 76543210
@@ -448,13 +451,13 @@ READ16_MEMBER(mlanding_state::input_r)
 	    x....... ........   DMA busy
 	*/
 
-	uint8_t dswa = ioport("DSWA")->read();
-	uint8_t dswb = ioport("DSWB")->read() & 0x7f;
+	const u8 dswa = m_io_dswa->read();
+	const u8 dswb = m_io_dswb->read() & 0x7f;
 	return m_dma_busy << 15 | dswb << 8 | dswa;
 }
 
 
-WRITE16_MEMBER(mlanding_state::output_w)
+void mlanding_state::output_w(u16 data)
 {
 	/*
 	    76543210
@@ -481,25 +484,25 @@ WRITE16_MEMBER(mlanding_state::output_w)
  *
  *************************************/
 
-READ16_MEMBER(mlanding_state::analog1_msb_r)
+u8 mlanding_state::analog1_msb_r()
 {
-	return (m_yoke->throttle_r(space,0) >> 4) & 0xff;
+	return (m_yoke->throttle_r() >> 4) & 0xff;
 }
 
 
-READ16_MEMBER(mlanding_state::analog2_msb_r)
+u8 mlanding_state::analog2_msb_r()
 {
-	return (m_yoke->stickx_r(space,0) >> 4) & 0xff;
+	return (m_yoke->stickx_r() >> 4) & 0xff;
 }
 
 
-READ16_MEMBER(mlanding_state::analog3_msb_r)
+u8 mlanding_state::analog3_msb_r()
 {
-	return (m_yoke->sticky_r(space,0) >> 4) & 0xff;
+	return (m_yoke->sticky_r() >> 4) & 0xff;
 }
 
 
-READ16_MEMBER(mlanding_state::analog1_lsb_r)
+u8 mlanding_state::analog1_lsb_r()
 {
 	/*
 	    76543210
@@ -509,23 +512,23 @@ READ16_MEMBER(mlanding_state::analog1_lsb_r)
 	    .x......    Slot down
 	*/
 
-	uint8_t res = (ioport("LIMIT0")->read() & 0x70) | (m_yoke->throttle_r(space,0) & 0xf);
+	const u8 res = (m_io_limit[0]->read() & 0x70) | (m_yoke->throttle_r() & 0xf);
 
 	return res;
 }
 
 
-READ16_MEMBER(mlanding_state::analog2_lsb_r)
+u8 mlanding_state::analog2_lsb_r()
 {
 	/*
 	    76543210
 	    ....xxxx    Counter 2 bits 3-0
 	*/
-	return m_yoke->stickx_r(space,0) & 0x0f;
+	return m_yoke->stickx_r() & 0x0f;
 }
 
 
-READ16_MEMBER(mlanding_state::analog3_lsb_r)
+u8 mlanding_state::analog3_lsb_r()
 {
 	/*
 	    76543210
@@ -534,7 +537,7 @@ READ16_MEMBER(mlanding_state::analog3_lsb_r)
 	    ..x.....    Handle left
 	    .x......    Handle up
 	*/
-	uint8_t res = (ioport("LIMIT1")->read() & 0x70) | (m_yoke->sticky_r(space,0) & 0xf);
+	const u8 res = (m_io_limit[1]->read() & 0x70) | (m_yoke->sticky_r() & 0xf);
 
 	return res;
 }
@@ -546,13 +549,13 @@ READ16_MEMBER(mlanding_state::analog3_lsb_r)
  *
  *************************************/
 
-READ16_MEMBER(mlanding_state::dsp_hold_signal_r)
+u16 mlanding_state::dsp_hold_signal_r()
 {
 	return m_dsp_hold_signal;
 }
 
 
-WRITE16_MEMBER(mlanding_state::dsp_control_w)
+void mlanding_state::dsp_control_w(u16 data)
 {
 	/*
 	    1 after zeroing 'dot' RAM
@@ -569,22 +572,20 @@ WRITE16_MEMBER(mlanding_state::dsp_control_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mlanding_state::sound_bankswitch_w)
+void mlanding_state::sound_bankswitch_w(u8 data)
 {
 	// Unused?
 }
 
 
-void mlanding_state::msm5205_update(int chip)
+void mlanding_state::msm5205_update(unsigned chip)
 {
 	if (m_msm_reset[chip])
 		return;
 
-	const uint8_t *rom = chip ? m_msm2_rom : m_msm1_rom;
-	uint8_t data = rom[m_msm_pos[chip]];
-	msm5205_device *msm = chip ? m_msm2 : m_msm1;
+	const u8 data = m_msm_rom[chip][m_msm_pos[chip]];
 
-	msm->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	m_msm[chip]->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];
@@ -607,7 +608,7 @@ WRITE_LINE_MEMBER(mlanding_state::z80ctc_to0)
 		// CTC output is divided by 2
 		if (m_msm2_vck)
 		{
-			m_msm2->vclk_w(1);
+			m_msm[1]->vclk_w(1);
 		}
 		else
 		{
@@ -618,13 +619,13 @@ WRITE_LINE_MEMBER(mlanding_state::z80ctc_to0)
 			if (m_msm_pos[1] == 0x2000)
 			{
 				m_msm_pos[1] = 0;
-				m_msm2->reset_w(1);
-				m_msm2->vclk_w(0);
-				m_msm2->reset_w(0);
+				m_msm[1]->reset_w(1);
+				m_msm[1]->vclk_w(0);
+				m_msm[1]->reset_w(0);
 			}
 			else
 			{
-				m_msm2->vclk_w(0);
+				m_msm[1]->vclk_w(0);
 			}
 		}
 
@@ -634,48 +635,48 @@ WRITE_LINE_MEMBER(mlanding_state::z80ctc_to0)
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_1_start_w)
+void mlanding_state::msm5205_1_start_w(u8 data)
 {
 	m_msm_reset[0] = 0;
-	m_msm1->reset_w(0);
+	m_msm[0]->reset_w(0);
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_1_stop_w)
+void mlanding_state::msm5205_1_stop_w(u8 data)
 {
 	m_msm_reset[0] = 1;
 	m_msm_nibble[0] = 0;
 	m_msm_pos[0] &= ~0xff;
-	m_msm1->reset_w(1);
+	m_msm[0]->reset_w(1);
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_1_addr_lo_w)
+void mlanding_state::msm5205_1_addr_lo_w(u8 data)
 {
 	m_msm_pos[0] &= ~0x0ff00;
 	m_msm_pos[0] |= data << 8;
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_1_addr_hi_w)
+void mlanding_state::msm5205_1_addr_hi_w(u8 data)
 {
 	m_msm_pos[0] &= ~0x70000;
 	m_msm_pos[0] |= (data & 7) << 16;
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_2_start_w)
+void mlanding_state::msm5205_2_start_w(u8 data)
 {
 	m_msm_reset[1] = 0;
-	m_msm2->reset_w(0);
+	m_msm[1]->reset_w(0);
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_2_stop_w)
+void mlanding_state::msm5205_2_stop_w(u8 data)
 {
 	m_msm_reset[1] = 1;
 	m_msm_nibble[1] = 0;
-	m_msm2->reset_w(1);
+	m_msm[1]->reset_w(1);
 }
 
 
@@ -686,20 +687,19 @@ WRITE8_MEMBER(mlanding_state::msm5205_2_stop_w)
  *
  *************************************/
 
-READ16_MEMBER(mlanding_state::power_ram_r)
+u8 mlanding_state::power_ram_r(offs_t offset)
 {
 	return m_power_ram[offset];
 }
 
 
-WRITE16_MEMBER(mlanding_state::power_ram_w)
+void mlanding_state::power_ram_w(offs_t offset, u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-		m_power_ram[offset] = data & 0xff;
+	m_power_ram[offset] = data;
 }
 
 
-READ8_MEMBER(mlanding_state::motor_r)
+u8 mlanding_state::motor_r()
 {
 	/*
 	    9001: RIGHT MOTOR: 1F=UP, 00=STOP, 2F=DOWN
@@ -738,16 +738,16 @@ void mlanding_state::main_map(address_map &map)
 	map(0x200000, 0x20ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x240004, 0x240005).nopr(); // Watchdog
 	map(0x240006, 0x240007).r(FUNC(mlanding_state::input_r));
-	map(0x280000, 0x280fff).rw(FUNC(mlanding_state::power_ram_r), FUNC(mlanding_state::power_ram_w));
+	map(0x280000, 0x280fff).rw(FUNC(mlanding_state::power_ram_r), FUNC(mlanding_state::power_ram_w)).umask16(0x00ff);
 	map(0x290000, 0x290001).portr("IN1");
 	map(0x290002, 0x290003).portr("IN0");
 	map(0x2a0000, 0x2a0001).w(FUNC(mlanding_state::output_w));
-	map(0x2b0000, 0x2b0001).r(FUNC(mlanding_state::analog1_msb_r));
-	map(0x2b0002, 0x2b0003).r(FUNC(mlanding_state::analog1_lsb_r));
-	map(0x2b0004, 0x2b0005).r(FUNC(mlanding_state::analog2_msb_r));
-	map(0x2b0006, 0x2b0007).r(FUNC(mlanding_state::analog2_lsb_r));
-	map(0x2c0000, 0x2c0001).r(FUNC(mlanding_state::analog3_msb_r));
-	map(0x2c0002, 0x2c0003).r(FUNC(mlanding_state::analog3_lsb_r));
+	map(0x2b0001, 0x2b0001).r(FUNC(mlanding_state::analog1_msb_r));
+	map(0x2b0003, 0x2b0003).r(FUNC(mlanding_state::analog1_lsb_r));
+	map(0x2b0005, 0x2b0005).r(FUNC(mlanding_state::analog2_msb_r));
+	map(0x2b0007, 0x2b0007).r(FUNC(mlanding_state::analog2_lsb_r));
+	map(0x2c0001, 0x2c0001).r(FUNC(mlanding_state::analog3_msb_r));
+	map(0x2c0003, 0x2c0003).r(FUNC(mlanding_state::analog3_lsb_r));
 	map(0x2d0000, 0x2d0001).nopr();
 	map(0x2d0001, 0x2d0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x2d0003, 0x2d0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -992,14 +992,14 @@ void mlanding_state::mlanding(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	MSM5205(config, m_msm1, 384_kHz_XTAL);
-	m_msm1->vck_callback().set(FUNC(mlanding_state::msm5205_1_vck)); // VCK function
-	m_msm1->set_prescaler_selector(msm5205_device::S48_4B); // 8 kHz, 4-bit
-	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.80);
+	MSM5205(config, m_msm[0], 384_kHz_XTAL);
+	m_msm[0]->vck_callback().set(FUNC(mlanding_state::msm5205_1_vck)); // VCK function
+	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B); // 8 kHz, 4-bit
+	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MSM5205(config, m_msm2, 384_kHz_XTAL);
-	m_msm2->set_prescaler_selector(msm5205_device::SEX_4B); // Slave mode, 4-bit
-	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.10);
+	MSM5205(config, m_msm[1], 384_kHz_XTAL);
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B); // Slave mode, 4-bit
+	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
 

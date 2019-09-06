@@ -173,7 +173,7 @@ CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 
 INPUT_CHANGED_MEMBER(arcadia_amiga_state::coin_changed_callback)
 {
-	int coin = (uintptr_t)param;
+	int coin = param;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval && m_coin_counter[coin] < 3)

@@ -8,6 +8,9 @@
 
 #include "nld_7474.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
+
+#include <array>
 
 namespace netlist
 {
@@ -24,6 +27,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		, m_nextD(*this, "m_nextD", 0)
+		, m_power_pins(*this)
 		{
 		}
 
@@ -41,10 +45,12 @@ namespace netlist
 
 		state_var<netlist_sig_t> m_nextD;
 
+		nld_power_pins m_power_pins;
+
 		void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ)
 		{
 			// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
-			static constexpr const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+			static constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 			m_Q.push(stateQ, delay[stateQ]);
 			m_QQ.push(stateQQ, delay[stateQQ]);
 		}
@@ -53,31 +59,34 @@ namespace netlist
 	NETLIB_OBJECT(7474_dip)
 	{
 		NETLIB_CONSTRUCTOR(7474_dip)
-		, m_1(*this, "1")
-		, m_2(*this, "2")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
 		{
-			register_subalias("1", "1.CLRQ");
-			register_subalias("2", "1.D");
-			register_subalias("3", "1.CLK");
-			register_subalias("4", "1.PREQ");
-			register_subalias("5", "1.Q");
-			register_subalias("6", "1.QQ");
-			// register_subalias("7", ); ==> GND
+			register_subalias("1", "A.CLRQ");
+			register_subalias("2", "A.D");
+			register_subalias("3", "A.CLK");
+			register_subalias("4", "A.PREQ");
+			register_subalias("5", "A.Q");
+			register_subalias("6", "A.QQ");
+			register_subalias("7", "A.GND");
 
-			register_subalias("8", "2.QQ");
-			register_subalias("9", "2.Q");
-			register_subalias("10", "2.PREQ");
-			register_subalias("11", "2.CLK");
-			register_subalias("12", "2.D");
-			register_subalias("13", "2.CLRQ");
-			// register_subalias("14", ); ==> VCC
+			register_subalias("8", "B.QQ");
+			register_subalias("9", "B.Q");
+			register_subalias("10", "B.PREQ");
+			register_subalias("11", "B.CLK");
+			register_subalias("12", "B.D");
+			register_subalias("13", "B.CLRQ");
+			register_subalias("14", "A.VCC");
+
+			connect("A.GND", "B.GND");
+			connect("A.VCC", "B.VCC");
 		}
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 
 	private:
-		NETLIB_SUB(7474) m_1;
-		NETLIB_SUB(7474) m_2;
+		NETLIB_SUB(7474) m_A;
+		NETLIB_SUB(7474) m_B;
 	};
 
 	NETLIB_HANDLER(7474, clk)
@@ -119,7 +128,7 @@ namespace netlist
 	{
 	}
 
-	NETLIB_DEVICE_IMPL(7474, "TTL_7474", "+CLK,+D,+CLRQ,+PREQ")
+	NETLIB_DEVICE_IMPL(7474, "TTL_7474", "+CLK,+D,+CLRQ,+PREQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7474_dip, "TTL_7474_DIP", "")
 
 	} //namespace devices

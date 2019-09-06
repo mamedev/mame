@@ -130,10 +130,10 @@ Hardware:   PPIA 8255
 ***************************************************************************/
 
 /*-------------------------------------------------
-    QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
+    QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
+QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 {
 	/*
 
@@ -260,7 +260,7 @@ void atom_state::atom_mem(address_map &map)
 	map(0xb000, 0xb003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 //  map(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
 //  map(0xb404, 0xb404) AM_READ_PORT("ECONET")
-	map(0xb800, 0xb80f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xb800, 0xb80f).mirror(0x3f0).m(R6522_TAG, FUNC(via6522_device::map));
 	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
 }
 
@@ -285,7 +285,7 @@ void atom_state::atombb_mem(address_map &map)
 	map(0x0000, 0x3fff).ram();
 	map(0x4000, 0x57ff).ram().share("video_ram");
 	map(0x7000, 0x7003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7800, 0x780f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x7800, 0x780f).mirror(0x3f0).m(R6522_TAG, FUNC(via6522_device::map));
 	map(0x8000, 0xbfff).rom().region("basic", 0);
 	map(0xf000, 0xffff).rom().region(SY6502_TAG, 0);
 }
@@ -302,7 +302,7 @@ void atom_state::prophet_mem(address_map &map)
 	map(0x9800, 0x9fff).ram();
 	map(0xa000, 0xafff).rom().region("ic24", 0);
 	map(0xb000, 0xb003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xb800, 0xb80f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xb800, 0xb80f).mirror(0x3f0).m(R6522_TAG, FUNC(via6522_device::map));
 	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
 }
 
@@ -708,7 +708,8 @@ FLOPPY_FORMATS_END0
     MACHINE_DRIVER( atom )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(atom_state::atom)
+void atom_state::atom(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, X2/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atom_mem);
@@ -752,16 +753,15 @@ MACHINE_CONFIG_START(atom_state::atom)
 	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_formats(atom_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("atom_cass");
 
-	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm")
+	QUICKLOAD(config, "quickload", "atm").set_load_callback(FUNC(atom_state::quickload_cb), this);
 
 	/* utility rom slot */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "atom_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(atom_state, cart_load)
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "atom_cart", "bin,rom").set_device_load(FUNC(atom_state::cart_load), this);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("2K,4K,6K,8K,10K,12K").set_default_value(0x00);
@@ -770,44 +770,43 @@ MACHINE_CONFIG_START(atom_state::atom)
 	SOFTWARE_LIST(config, "rom_list").set_original("atom_rom");
 	SOFTWARE_LIST(config, "cass_list").set_original("atom_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("atom_flop");
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------
     MACHINE_DRIVER( atomeb )
 -------------------------------------------------*/
 
-#define MCFG_ATOM_ROM_ADD(_tag, _load) \
-	MCFG_GENERIC_SOCKET_ADD(_tag, generic_linear_slot, "atom_cart") \
-	MCFG_GENERIC_EXTENSIONS("bin,rom") \
-	MCFG_GENERIC_LOAD(atomeb_state, _load)
+#define ATOM_ROM(_tag, _load) \
+	GENERIC_SOCKET(config, _tag, generic_linear_slot, "atom_cart", "bin,rom").set_device_load(FUNC(atomeb_state::_load), this) \
 
-MACHINE_CONFIG_START(atomeb_state::atomeb)
+void atomeb_state::atomeb(machine_config &config)
+{
 	atom(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atomeb_state::atomeb_mem);
 
 	/* cartridges */
 	config.device_remove("cartslot");
 
-	MCFG_ATOM_ROM_ADD("rom_a0", ext_load<0x0>)
-	MCFG_ATOM_ROM_ADD("rom_a1", ext_load<0x1>)
-	MCFG_ATOM_ROM_ADD("rom_a2", ext_load<0x2>)
-	MCFG_ATOM_ROM_ADD("rom_a3", ext_load<0x3>)
-	MCFG_ATOM_ROM_ADD("rom_a4", ext_load<0x4>)
-	MCFG_ATOM_ROM_ADD("rom_a5", ext_load<0x5>)
-	MCFG_ATOM_ROM_ADD("rom_a6", ext_load<0x6>)
-	MCFG_ATOM_ROM_ADD("rom_a7", ext_load<0x7>)
-	MCFG_ATOM_ROM_ADD("rom_a8", ext_load<0x8>)
-	MCFG_ATOM_ROM_ADD("rom_a9", ext_load<0x9>)
-	MCFG_ATOM_ROM_ADD("rom_aa", ext_load<0xa>)
-	MCFG_ATOM_ROM_ADD("rom_ab", ext_load<0xb>)
-	MCFG_ATOM_ROM_ADD("rom_ac", ext_load<0xc>)
-	MCFG_ATOM_ROM_ADD("rom_ad", ext_load<0xd>)
-	MCFG_ATOM_ROM_ADD("rom_ae", ext_load<0xe>)
-	MCFG_ATOM_ROM_ADD("rom_af", ext_load<0xf>)
+	ATOM_ROM("rom_a0", ext_load<0x0>);
+	ATOM_ROM("rom_a1", ext_load<0x1>);
+	ATOM_ROM("rom_a2", ext_load<0x2>);
+	ATOM_ROM("rom_a3", ext_load<0x3>);
+	ATOM_ROM("rom_a4", ext_load<0x4>);
+	ATOM_ROM("rom_a5", ext_load<0x5>);
+	ATOM_ROM("rom_a6", ext_load<0x6>);
+	ATOM_ROM("rom_a7", ext_load<0x7>);
+	ATOM_ROM("rom_a8", ext_load<0x8>);
+	ATOM_ROM("rom_a9", ext_load<0x9>);
+	ATOM_ROM("rom_aa", ext_load<0xa>);
+	ATOM_ROM("rom_ab", ext_load<0xb>);
+	ATOM_ROM("rom_ac", ext_load<0xc>);
+	ATOM_ROM("rom_ad", ext_load<0xd>);
+	ATOM_ROM("rom_ae", ext_load<0xe>);
+	ATOM_ROM("rom_af", ext_load<0xf>);
 
-	MCFG_ATOM_ROM_ADD("rom_e0", e0_load)
-	MCFG_ATOM_ROM_ADD("rom_e1", e1_load)
-MACHINE_CONFIG_END
+	ATOM_ROM("rom_e0", e0_load);
+	ATOM_ROM("rom_e1", e1_load);
+}
 
 /*-------------------------------------------------
     MACHINE_DRIVER( atombb )
@@ -853,7 +852,7 @@ void atom_state::atombb(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(atom_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("atom_cass");
 
 	/* internal ram */

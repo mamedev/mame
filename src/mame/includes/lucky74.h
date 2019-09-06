@@ -7,6 +7,7 @@
 
 #include "sound/msm5205.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class lucky74_state : public driver_device
 {

@@ -9,8 +9,11 @@
 
     No info found as yet.
 
-    It takes about 8 seconds to start up.
     Type HE to get a list of commands.
+
+    If you hit a key as soon as it is started, the system will present a
+    prompt and work. Otherwise it runs into the weeds because the rom banking
+    isn't yet emulated.
 
 ****************************************************************************/
 

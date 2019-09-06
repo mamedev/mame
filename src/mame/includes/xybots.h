@@ -13,6 +13,7 @@
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
+#include "tilemap.h"
 
 class xybots_state : public atarigen_state
 {

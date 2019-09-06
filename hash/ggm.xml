@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="ggm" description="GGM Cartridges">
+
+<!-- Applied Concepts Great Game Machine (GGM) / Chafitz Modular Game System (MGS) game cartridges -->
+
+	<software name="boris25">
+		<description>Boris 2.5 / Sargon 2.5</description>
+		<year>1980</year>
+		<publisher>Applied Concepts</publisher>
+		<part name="cart" interface="ggm">
+			<dataarea name="rom" size="0x8000">
+				<rom name="007-7039-00" offset="0x4000" size="0x1000" crc="0db2e277" sha1="9f8823739d28b0a0e3857b7c672aa2514cd6816b" /> <!-- AMD AM9232CPC -->
+				<rom                    offset="0x6000" size="0x1000" loadflag="reload" />
+				<rom name="007040xxx"   offset="0x5000" size="0x1000" crc="980fa10f" sha1="5ec814bbaf583031acbe2c0199a6195c2849ef5e" /> <!-- Rockwell R3280-11 -->
+				<rom                    offset="0x7000" size="0x1000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

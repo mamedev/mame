@@ -162,9 +162,9 @@ READ_LINE_MEMBER(spectrum_opus_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
-void spectrum_opus_device::opcode_fetch(offs_t offset)
+void spectrum_opus_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch(offset);
+	m_exp->pre_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{
@@ -285,5 +285,5 @@ WRITE8_MEMBER(spectrum_opus_device::pia_out_b)
 
 WRITE_LINE_MEMBER(spectrum_opus_device::busy_w)
 {
-	m_pia->set_a_input(state << 6, 0xbf);
+	m_pia->set_a_input(state << 6);
 }

@@ -7,6 +7,7 @@
 
 #include "nld_7493.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -30,6 +31,7 @@ namespace netlist
 		, m_QB(*this, "QB")
 		, m_QC(*this, "QC")
 		, m_QD(*this, "QD")
+		, m_power_pins(*this)
 		{
 		}
 
@@ -87,6 +89,7 @@ namespace netlist
 		logic_output_t m_QB;
 		logic_output_t m_QC;
 		logic_output_t m_QD;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(7493_dip, 7493)
@@ -98,13 +101,13 @@ namespace netlist
 			register_subalias("3", "R2");
 
 			// register_subalias("4", ); --> NC
-			// register_subalias("5", ); --> VCC
+			register_subalias("5", "VCC");
 			// register_subalias("6", ); --> NC
 			// register_subalias("7", ); --> NC
 
 			register_subalias("8", "QC");
 			register_subalias("9", "QB");
-			// register_subalias("10", ); -. GND
+			register_subalias("10", "GND");
 			register_subalias("11", "QD");
 			register_subalias("12", "QA");
 			// register_subalias("13", ); -. NC
@@ -113,7 +116,7 @@ namespace netlist
 	};
 
 
-	NETLIB_DEVICE_IMPL(7493,        "TTL_7493", "+CLKA,+CLKB,+R1,+R2")
+	NETLIB_DEVICE_IMPL(7493,        "TTL_7493", "+CLKA,+CLKB,+R1,+R2,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7493_dip,    "TTL_7493_DIP", "")
 
 	} //namespace devices

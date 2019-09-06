@@ -38,9 +38,9 @@ template<int Chip>
 READ8_MEMBER(chqflag_state::k051316_ramrom_r)
 {
 	if (m_k051316_readroms)
-		return m_k051316[Chip]->rom_r(space, offset);
+		return m_k051316[Chip]->rom_r(offset);
 	else
-		return m_k051316[Chip]->read(space, offset);
+		return m_k051316[Chip]->read(offset);
 }
 
 WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
@@ -344,7 +344,7 @@ void chqflag_state::chqflag(machine_config &config)
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback), this);
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);

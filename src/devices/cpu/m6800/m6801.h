@@ -12,10 +12,7 @@
 enum
 {
 	M6801_IRQ_LINE = M6800_IRQ_LINE,
-	M6801_TIN_LINE,                 /* P20/Tin Input Capture line (eddge sense)     */
-									/* Active eddge is selecrable by internal reg.  */
-									/* raise eddge : CLEAR_LINE  -> ASSERT_LINE     */
-									/* fall  eddge : ASSERT_LINE -> CLEAR_LINE      */
+	M6801_TIN_LINE, // P20/Tin Input Capture line (edge sense). Active edge is selectable by internal reg.
 	M6801_SC1_LINE
 };
 

@@ -24,7 +24,6 @@
 #include "machine/kc_keyb.h"
 #include "machine/rescap.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -156,7 +155,7 @@ public:
 	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( kc );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void kc85_3(machine_config &config);
 	void kc85_3_io(address_map &map);
 	void kc85_3_mem(address_map &map);

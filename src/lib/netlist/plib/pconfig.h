@@ -13,7 +13,7 @@
  * RDTSCP.
  */
 #ifndef PHAS_RDTSCP
-#define PHAS_RDTSCP (1)
+#define PHAS_RDTSCP (0)
 #endif
 
 /*
@@ -31,6 +31,15 @@
 
 #ifndef PHAS_INT128
 #define PHAS_INT128 (0)
+#endif
+
+/*
+ * OpenMP adds about 10% to 20% performance for analog
+ * netlists like kidniki.
+ */
+
+#ifndef USE_OPENMP
+#define USE_OPENMP              (0)
 #endif
 
 /*
@@ -95,18 +104,22 @@
 #endif
 #endif
 
-#ifndef PHAS_INT128
-#define PHAS_INT128 (0)
-#endif
-
 #if (PHAS_INT128)
 typedef __uint128_t UINT128;
 typedef __int128_t INT128;
 #endif
 
 //============================================================
-//  Standard defines
+// Check for OpenMP
 //============================================================
+
+#if defined(OPENMP)
+#define HAS_OPENMP ( OPENMP >= 200805 )
+#elif defined(_OPENMP)
+#define HAS_OPENMP ( _OPENMP >= 200805 )
+#else
+#define HAS_OPENMP (0)
+#endif
 
 //============================================================
 //  Pointer to Member Function
@@ -128,7 +141,7 @@ typedef __int128_t INT128;
 		#define MEMBER_ABI _thiscall
 	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
 		#define PHAS_PMF_INTERNAL 0
-	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(EMSCRIPTEN)
+	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(__EMSCRIPTEN__)
 		#define PHAS_PMF_INTERNAL 2
 	#else
 		#define PHAS_PMF_INTERNAL 1
@@ -155,5 +168,16 @@ typedef __int128_t INT128;
 	#undef MEMBER_ABI
 	#define MEMBER_ABI
 #endif
+
+//============================================================
+//  WARNINGS
+//============================================================
+
+#if (USE_OPENMP)
+#if (!(HAS_OPENMP))
+#error To use openmp compile and link with "-fopenmp"
+#endif
+#endif
+
 
 #endif /* PCONFIG_H_ */

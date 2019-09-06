@@ -5,6 +5,7 @@
 
 Applied Concepts Boris (electronic chess computer)
 
+Hardware notes:
 - MK3850N-3 CPU @ 2 MHz from XTAL, MK3853N memory interface
 - 256 bytes RAM(2*2112), 2*AMI 2KB ROM (2nd ROM only half used)
 - 8-digit 16seg led panel
@@ -23,7 +24,7 @@ ROM labeled 007-7027-00.
 #include "emu.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "machine/timer.h"
+#include "video/pwm.h"
 
 // internal artwork
 #include "aci_boris.lh" // clickable
@@ -37,35 +38,33 @@ public:
 	boris_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_delay_display(*this, "delay_display_%u", 0),
-		m_out_digit(*this, "digit%u", 0U)
+		m_display(*this, "display"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void boris(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<4> m_inp_matrix;
-	required_device_array<timer_device, 8> m_delay_display;
-	output_finder<8> m_out_digit;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<4> m_inputs;
 
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
+	void update_reset(ioport_value state);
 
+	void update_display();
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
-
-	void update_4042();
 
 	u8 m_io[2]; // MK3850 I/O ports
 	u8 m_4042;  // 4042 latch output
@@ -73,9 +72,6 @@ private:
 
 void boris_state::machine_start()
 {
-	// resolve handlers
-	m_out_digit.resolve();
-
 	// zerofill
 	memset(m_io, 0, sizeof(m_io));
 	m_4042 = 0;
@@ -85,60 +81,47 @@ void boris_state::machine_start()
 	save_item(NAME(m_4042));
 }
 
-INPUT_CHANGED_MEMBER(boris_state::reset_switch)
+void boris_state::machine_reset()
+{
+	update_reset(ioport("RESET")->read());
+}
+
+void boris_state::update_reset(ioport_value state)
 {
 	// reset switch is tied to MK3850 RESET pin
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	// clear display
-	if (newval)
-	{
-		for (int i = 0; i < 8; i++)
-			m_delay_display[i]->adjust(attotime::zero, i);
-	}
+	if (state)
+		m_display->clear();
 }
 
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // MK3850 ports/TTL
 
-TIMER_DEVICE_CALLBACK_MEMBER(boris_state::delay_display)
-{
-	// 16 segments via port 1 and 4042 output (latched port 1)
-	u16 mask = (param & 8) ? 0xffff : 0;
-	m_out_digit[param & 7] = ~(m_4042 << 8 | m_io[1]) & mask;
-}
-
-void boris_state::update_4042()
+void boris_state::update_display()
 {
 	// port 1 is latched as long as 4042 clock is low
 	// (yes low, this is actually (~~m_io[0] & 8) since output ports are inverted)
 	if (m_io[0] & 8)
 		m_4042 = bitswap<8>(m_io[1],4,2,0,6,5,1,3,7);
+
+	// 16 segments via port 1 and 4042 output (latched port 1)
+	u16 seg_data = ~(m_4042 << 8 | m_io[1]);
+	m_display->matrix(1 << (~m_io[0] & 7), seg_data);
 }
 
 WRITE8_MEMBER(boris_state::mux_w)
 {
 	// IO00-IO02: 4028 A-C to digit/input mux (4028 D to GND)
-	u8 prev = ~m_io[0] & 7;
-	u8 sel = ~data & 7;
-	if (sel != prev)
-	{
-		// digits are strobed, so on falling edge, delay them going off to prevent flicker or stuck display
-		m_delay_display[prev]->adjust(attotime::from_msec(50), prev);
-
-		// need a short delay on rising edge too, while boris sets up digit segments
-		// (it writes port 1, increments digit, latches port 1, writes port 1 again)
-		m_delay_display[sel]->adjust(attotime::from_usec(50), sel | 8);
-	}
-
 	// IO03: clock 4042
 	m_io[0] = data;
-	update_4042();
+	update_display();
 }
 
 READ8_MEMBER(boris_state::input_r)
@@ -147,7 +130,7 @@ READ8_MEMBER(boris_state::input_r)
 	u8 data = m_io[0];
 	u8 sel = ~data & 7;
 	if (sel >= 4)
-		data |= m_inp_matrix[sel-4]->read() << 4;
+		data |= m_inputs[sel-4]->read() << 4;
 
 	return data;
 }
@@ -156,7 +139,7 @@ WRITE8_MEMBER(boris_state::digit_w)
 {
 	// IO10-IO17: digit segments
 	m_io[1] = data;
-	update_4042();
+	update_display();
 }
 
 
@@ -211,7 +194,7 @@ static INPUT_PORTS_START( boris )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, boris_state, reset_switch, nullptr) PORT_NAME("Reset Switch")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, boris_state, reset_switch, 0) PORT_NAME("Reset Switch")
 INPUT_PORTS_END
 
 
@@ -232,9 +215,9 @@ void boris_state::boris(machine_config &config)
 	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
-	for (int i = 0; i < 8; i++)
-		TIMER(config, m_delay_display[i]).configure_generic(FUNC(boris_state::delay_display));
-
+	PWM_DISPLAY(config, m_display).set_size(8, 16);
+	m_display->set_segmask(0xff, 0xffff);
+	m_display->set_bri_levels(0.05);
 	config.set_default_layout(layout_aci_boris);
 }
 
@@ -265,5 +248,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT CMP MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1978, boris,  0,      0, boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 01)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris awaits your move"
-COMP( 1978, borisa, boris,  0, boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 00)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris plays black"
+CONS( 1978, boris,  0,      0, boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 01)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris awaits your move"
+CONS( 1978, borisa, boris,  0, boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 00)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris plays black"

@@ -2736,8 +2736,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::mcu_irq)
 	/* TODO: real sources of these */
 	if (scanline == 480)
 		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
-	else if (scanline == 0)
-		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 	else if (scanline == 240)
 		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
@@ -2855,9 +2853,9 @@ READ8_MEMBER(namcos22s_state::mcu_port6_r)
 }
 
 template <int Channel>
-u16 namcos22s_state::mcu_adc_r(offs_t offset)
+u16 namcos22s_state::mcu_adc_r()
 {
-	return m_adc_ports[offset].read_safe(0);
+	return m_adc_ports[Channel].read_safe(0);
 }
 
 void namcos22s_state::mcu_program(address_map &map)

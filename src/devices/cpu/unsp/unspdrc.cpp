@@ -931,14 +931,14 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 
 					UML_TEST(block, I1, 0x00008000);
 					UML_JMPc(block, uml::COND_Z, mul_opb_nohi);
-					UML_SHL(block, I0, I0, 16);
-					UML_SUB(block, I2, I2, I0);
+					UML_SHL(block, I3, I0, 16);
+					UML_SUB(block, I2, I2, I3);
 
 					UML_LABEL(block, mul_opb_nohi);
 					UML_TEST(block, I0, 0x00008000);
 					UML_JMPc(block, uml::COND_Z, mul_opa_nohi);
-					UML_SHL(block, I1, I1, 16);
-					UML_SUB(block, I2, I2, I1);
+					UML_SHL(block, I3, I1, 16);
+					UML_SUB(block, I2, I2, I3);
 
 					UML_LABEL(block, mul_opa_nohi);
 					UML_SHR(block, mem(&m_core->m_r[REG_R4]), I2, 16);

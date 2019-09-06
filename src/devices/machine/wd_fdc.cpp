@@ -85,6 +85,8 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	drq_cb(*this),
 	hld_cb(*this),
 	enp_cb(*this),
+	sso_cb(*this),
+	ready_cb(*this), // actually output by the drive, not by the FDC
 	enmf_cb(*this)
 {
 	force_ready = false;
@@ -107,6 +109,8 @@ void wd_fdc_device_base::device_start()
 	drq_cb.resolve();
 	hld_cb.resolve();
 	enp_cb.resolve();
+	sso_cb.resolve();
+	ready_cb.resolve();
 	enmf_cb.resolve();
 
 	if (!has_enmf && !enmf_cb.isnull())
@@ -120,6 +124,7 @@ void wd_fdc_device_base::device_start()
 	enmf = false;
 	floppy = nullptr;
 	status = 0x00;
+	mr = true;
 
 	save_item(NAME(status));
 	save_item(NAME(command));
@@ -134,6 +139,9 @@ void wd_fdc_device_base::device_start()
 	save_item(NAME(counter));
 	save_item(NAME(status_type_1));
 	save_item(NAME(last_dir));
+	if (!disable_mfm)
+		save_item(NAME(dden));
+	save_item(NAME(mr));
 }
 
 void wd_fdc_device_base::device_reset()
@@ -143,40 +151,52 @@ void wd_fdc_device_base::device_reset()
 
 void wd_fdc_device_base::soft_reset()
 {
-	command = 0x00;
-	main_state = IDLE;
-	sub_state = IDLE;
-	cur_live.state = IDLE;
-	track = 0x00;
-	sector = 0x01;
-	status = 0x00;
-	data = 0x00;
-	cmd_buffer = track_buffer = sector_buffer = -1;
-	counter = 0;
-	status_type_1 = true;
-	last_dir = 1;
-
-	// gnd == enmf enabled, otherwise disabled (default)
-	if (!enmf_cb.isnull() && has_enmf)
-		enmf = enmf_cb() ? false : true;
-
-	intrq = false;
-	if (!intrq_cb.isnull())
-	{
-		intrq_cb(intrq);
+	if(mr) {
+		mr_w(0);
+		mr_w(1);
 	}
-	drq = false;
-	if (!drq_cb.isnull())
-	{
-		drq_cb(drq);
-	}
-	hld = false;
-	intrq_cond = 0;
-	live_abort();
+}
 
-	// trigger a restore after everything else is reset too, in particular the floppy device itself
-	sub_state = INITIAL_RESTORE;
-	t_gen->adjust(attotime::zero);
+WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
+{
+	if(mr && !state) {
+		command = 0x00;
+		main_state = IDLE;
+		sub_state = IDLE;
+		cur_live.state = IDLE;
+		track = 0x00;
+		sector = 0x01;
+		status = 0x00;
+		data = 0x00;
+		cmd_buffer = track_buffer = sector_buffer = -1;
+		counter = 0;
+		status_type_1 = true;
+		last_dir = 1;
+		mr = false;
+
+		// gnd == enmf enabled, otherwise disabled (default)
+		if (!enmf_cb.isnull() && has_enmf)
+			enmf = enmf_cb() ? false : true;
+
+		intrq = false;
+		if (!intrq_cb.isnull())
+		{
+			intrq_cb(intrq);
+		}
+		drq = false;
+		if (!drq_cb.isnull())
+		{
+			drq_cb(drq);
+		}
+		hld = false;
+		intrq_cond = 0;
+		live_abort();
+	} else if(state && !mr) {
+		// trigger a restore after everything else is reset too, in particular the floppy device itself
+		sub_state = INITIAL_RESTORE;
+		t_gen->adjust(attotime::zero);
+		mr = true;
+	}
 }
 
 void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
@@ -457,8 +477,8 @@ void wd_fdc_device_base::read_sector_start()
 	main_state = READ_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_sector_continue();
@@ -558,8 +578,8 @@ void wd_fdc_device_base::read_track_start()
 	main_state = READ_TRACK;
 	status &= ~(S_LOST|S_RNF);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_track_continue();
@@ -637,8 +657,8 @@ void wd_fdc_device_base::read_id_start()
 	main_state = READ_ID;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_id_continue();
@@ -714,8 +734,8 @@ void wd_fdc_device_base::write_track_start()
 	main_state = WRITE_TRACK;
 	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 
@@ -825,8 +845,8 @@ void wd_fdc_device_base::write_sector_start()
 	main_state = WRITE_SECTOR;
 	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
-	if(side_control && floppy)
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+	if(side_control)
+		update_sso();
 	sub_state = motor_control  ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	write_sector_continue();
@@ -1088,6 +1108,11 @@ void wd_fdc_device_base::do_cmd_w()
 void wd_fdc_device_base::cmd_w(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
+	if (!mr) {
+		logerror("Not initiating command %02x during master reset\n", val);
+		return;
+	}
+
 	LOGCOMP("Initiating command %02x\n", val);
 
 	if(intrq && !(intrq_cond & I_IMM)) {
@@ -1117,7 +1142,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 
 uint8_t wd_fdc_device_base::status_r()
 {
-	if(intrq && !(intrq_cond & I_IMM)) {
+	if(intrq && !(intrq_cond & I_IMM) && !machine().side_effects_disabled()) {
 		intrq = false;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
@@ -1169,7 +1194,7 @@ void wd_fdc_device_base::track_w(uint8_t val)
 	if (inverted_bus) val ^= 0xff;
 
 	// No more than one write in flight
-	if(track_buffer != -1)
+	if(track_buffer != -1 || !mr)
 		return;
 
 	track_buffer = val;
@@ -1192,6 +1217,8 @@ void wd_fdc_device_base::do_sector_w()
 
 void wd_fdc_device_base::sector_w(uint8_t val)
 {
+	if (!mr) return;
+
 	if (inverted_bus) val ^= 0xff;
 
 	// No more than one write in flight
@@ -1218,6 +1245,8 @@ uint8_t wd_fdc_device_base::sector_r()
 
 void wd_fdc_device_base::data_w(uint8_t val)
 {
+	if (!mr) return;
+
 	if (inverted_bus) val ^= 0xff;
 
 	data = val;
@@ -1226,7 +1255,8 @@ void wd_fdc_device_base::data_w(uint8_t val)
 
 uint8_t wd_fdc_device_base::data_r()
 {
-	drop_drq();
+	if (!machine().side_effects_disabled())
+		drop_drq();
 
 	uint8_t val = data;
 	if (inverted_bus) val ^= 0xff;
@@ -1277,6 +1307,9 @@ void wd_fdc_device_base::spinup()
 
 void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 {
+	if(!ready_cb.isnull())
+		ready_cb(state);
+
 	// why is this even possible?
 	if (!floppy)
 		return;
@@ -2172,6 +2205,31 @@ void wd_fdc_device_base::drop_drq()
 			if(!intrq_cb.isnull())
 				intrq_cb(intrq);
 		}
+	}
+}
+
+void wd_fdc_device_base::update_sso()
+{
+	// The 'side_control' flag is interpreted as meaning that the FDC has
+	// a SSO output feature, not that it necessarily controls the floppy.
+	if(!side_control)
+		return;
+
+	uint8_t side = (command & 0x02) ? 1 : 0;
+
+	// If a SSO callback is defined then it is assumed that this callback
+	// will update the floppy side if that is the connection. There are
+	// some machines that use the SSO output for other purposes.
+	if(!sso_cb.isnull()) {
+		sso_cb(side);
+		return;
+	}
+
+	// If a SSO callback is not defined then assume that the machine
+	// intended the driver to update the floppy side which appears to be
+	// the case in most cases.
+	if(floppy) {
+		floppy->ss_w((command & 0x02) ? 1 : 0);
 	}
 }
 

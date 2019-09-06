@@ -7,13 +7,18 @@
     Cassette tape image abstraction code
 
 *********************************************************************/
+#ifndef MAME_FORMATS_CASSIMG_H
+#define MAME_FORMATS_CASSIMG_H
 
-#ifndef CASSIMG_H
-#define CASSIMG_H
+#pragma once
+
+#include "ioprocs.h"
 
 #include "osdcore.h"
 #include "coretmpl.h"
-#include "ioprocs.h"
+
+#include <string>
+#include <vector>
 
 #ifndef LOG_FORMATS
 #define LOG_FORMATS if (0) printf
@@ -119,10 +124,10 @@ struct CassetteModulation
 {
 	int flags;
 	double zero_frequency_low;
-	double zero_frequency_cannonical;
+	double zero_frequency_canonical;
 	double zero_frequency_high;
 	double one_frequency_low;
-	double one_frequency_cannonical;
+	double one_frequency_canonical;
 	double one_frequency_high;
 };
 
@@ -224,4 +229,4 @@ cassette_image::error cassette_legacy_identify(cassette_image *cassette, struct 
 cassette_image::error cassette_legacy_construct(cassette_image *cassette,
 	const struct CassetteLegacyWaveFiller *legacy_args);
 
-#endif /* CASSIMG_H */
+#endif // MAME_FORMATS_CASSIMG_H

@@ -17,6 +17,9 @@
 DECLARE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device)
 DECLARE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device)
 DECLARE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device)
+DECLARE_DEVICE_TYPE(M68HC705J1A, m68hc705j1a_device)
+DECLARE_DEVICE_TYPE(M68HC05L9,   m68hc05l9_device)
+DECLARE_DEVICE_TYPE(M68HC05L11,  m68hc05l11_device)
 
 
 //**************************************************************************
@@ -77,6 +80,8 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
+			u32 addr_width,
+			u16 vector_mask,
 			address_map_constructor internal_map);
 
 	void set_port_bits(std::array<u8, PORT_COUNT> const &bits);
@@ -177,6 +182,7 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
+			u32 addr_width,
 			address_map_constructor internal_map);
 };
 
@@ -227,6 +233,55 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+
+// ======================> m68hc705j1a_device
+
+class m68hc705j1a_device : public m68hc705_device
+{
+public:
+	m68hc705j1a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	void j1a_map(address_map &map);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+
+// ======================> m68hc05l9_device
+
+class m68hc05l9_device : public m68hc05_device
+{
+public:
+	m68hc05l9_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	void l9_map(address_map &map);
+
+	virtual void device_start() override;
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+
+// ======================> m68hc05l11_device
+
+class m68hc05l11_device : public m68hc05_device
+{
+public:
+	m68hc05l11_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	void l11_map(address_map &map);
+
+	virtual void device_start() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };

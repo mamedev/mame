@@ -11,6 +11,7 @@
 #include "pcxt83.h"
 #include "pcat84.h"
 #include "pcat101.h"
+#include "hle_mouse.h"
 
 void pc_xt_keyboards(device_slot_interface &device)
 {
@@ -29,4 +30,9 @@ void pc_at_keyboards(device_slot_interface &device)
 	device.option_add(STR_KBD_IBM_PC_AT_84, PC_KBD_IBM_PC_AT_84);
 	device.option_add(STR_KBD_IBM_3270PC_122, PC_KBD_IBM_3270PC_122);
 	device.option_add(STR_KBD_IBM_PC_AT_101, PC_KBD_IBM_PC_AT_101);
+}
+
+void ps2_mice(device_slot_interface &device)
+{
+	device.option_add(STR_HLE_PS2_MOUSE, HLE_PS2_MOUSE);
 }

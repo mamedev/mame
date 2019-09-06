@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class mugsmash_state : public driver_device
 {

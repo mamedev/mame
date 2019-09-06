@@ -33,6 +33,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class silvmil_state : public driver_device

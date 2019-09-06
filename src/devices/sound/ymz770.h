@@ -122,6 +122,7 @@ protected:
 	virtual void sequencer() override;
 private:
 	int m_bank;
+	uint32_t volinc[256];
 };
 
 // device type definition

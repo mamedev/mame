@@ -24,6 +24,7 @@ public:
 		, m_raster_ctrl(*this, "raster_ctrl")
 		, m_spriteram(*this, "spriteram")
 		, m_sharedram(*this, "sharedram")
+		, m_sndbank(*this, "sndbank")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_subcpu(*this, "subcpu")
@@ -48,10 +49,11 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_shared_ptr<uint16_t> m_spritemap;
-	required_shared_ptr<uint16_t> m_raster_ctrl;
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_sharedram;
+	required_shared_ptr<u16> m_spritemap;
+	required_shared_ptr<u16> m_raster_ctrl;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_sharedram;
+	required_memory_bank m_sndbank;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -67,37 +69,37 @@ private:
 	required_ioport m_steer;
 
 	// Misc
-	uint16_t  m_cpua_ctrl;
-	int32_t   m_ioc220_port;
+	u16  m_cpua_ctrl;
+	s32  m_ioc220_port;
 
 	// ADPCM
-	required_region_ptr_array<uint8_t, 2> m_msm_rom;
-	uint16_t  m_msm_pos[2];
-	uint8_t   m_msm_reset[2];
-	uint8_t   m_msm_nibble[2];
-	uint8_t   m_msm2_vck;
-	uint8_t   m_msm2_vck2;
+	required_region_ptr_array<u8, 2> m_msm_rom;
+	u16  m_msm_pos[2];
+	u8   m_msm_reset[2];
+	u8   m_msm_nibble[2];
+	u8   m_msm2_vck;
+	u8   m_msm2_vck2;
 
 #ifdef MAME_DEBUG
-	uint8_t   m_dislayer[5];
+	u8   m_dislayer[5];
 #endif
 
 	void msm5205_update(int chip);
 
-	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
-	DECLARE_READ8_MEMBER(input_bypass_r);
-	DECLARE_READ16_MEMBER(motor_r);
-	DECLARE_WRITE16_MEMBER(motor_w);
-	DECLARE_WRITE8_MEMBER(coins_w);
+	void cpua_ctrl_w(u16 data);
+	u8 input_bypass_r();
+	u16 motor_r(offs_t offset);
+	void motor_w(offs_t offset, u16 data);
+	void coins_w(u8 data);
 
-	DECLARE_WRITE8_MEMBER(msm5205_command_w);
+	void msm5205_command_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_1_vck);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
-	DECLARE_WRITE8_MEMBER(volume_w);
+	void volume_w(offs_t offset, u8 data);
 
-	// video/topspeed.c
+	// video/topspeed.cpp
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_topspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cpua_map(address_map &map);
 	void cpub_map(address_map &map);

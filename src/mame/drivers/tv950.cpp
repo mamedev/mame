@@ -117,7 +117,7 @@ void tv950_state::tv950_mem(address_map &map)
 	map(0x9300, 0x9303).rw(m_uart[0], FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // CS0 = AB9
 	map(0x9500, 0x9503).rw(m_uart[2], FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // CS0 = AB10
 	map(0x9900, 0x9903).rw(m_uart[1], FUNC(mos6551_device::read), FUNC(mos6551_device::write)); // CS0 = AB11
-	map(0xb100, 0xb10f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xb100, 0xb10f).m(m_via, FUNC(via6522_device::map));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 

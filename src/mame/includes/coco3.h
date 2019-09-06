@@ -62,7 +62,7 @@ protected:
 	virtual bool irq_get_line(void) override;
 
 	// miscellaneous
-	virtual void update_keyboard_input(uint8_t value, uint8_t z) override;
+	virtual void update_keyboard_input(uint8_t value) override;
 	virtual void cart_w(bool line) override;
 
 private:

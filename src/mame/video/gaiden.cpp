@@ -303,7 +303,7 @@ uint32_t gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 
 	bitmap.fill(0, cliprect);
 
 	// non buffered?
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram->live(), m_sprite_sizey, flip_screen() ? -m_spr_offset_y : m_spr_offset_y, flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(3), cliprect, m_spriteram->live(), m_sprite_sizey, flip_screen() ? -m_spr_offset_y : m_spr_offset_y, flip_screen(), m_sprite_bitmap);
 	m_background->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 	m_text_layer->draw(screen, m_tile_bitmap_tx, cliprect, 0, 0);
@@ -328,7 +328,7 @@ uint32_t gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &
 
 	// raiga sprite has 2 frame lags
 	m_sprite_bitmap.fill(0, cliprect);
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram->buffer(), m_sprite_sizey, flip_screen() ? -m_spr_offset_y : m_spr_offset_y, flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(3), cliprect, m_spriteram->buffer(), m_sprite_sizey, flip_screen() ? -m_spr_offset_y : m_spr_offset_y, flip_screen(), m_sprite_bitmap);
 	return 0;
 }
 

@@ -14,13 +14,13 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12780-a - animal art studio (uk).bin" size="0x400000" crc="f1390fea" sha1="3ace0c1b1ffe883e2dda8976c24f47729df53191" offset="0" />
+				<rom name="500-12780-a - animal art studio (uk).bin" size="0x400000" crc="f1390fea" sha1="3ace0c1b1ffe883e2dda8976c24f47729df53191"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="aniarts" cloneof="aniart" supported="no">
-		<description>Estudio de Arte Animal (SP)</description>
+		<description>Estudio de Arte Animal (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -28,7 +28,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12887-a - estudio de arte animal (sp).bin" size="0x400000" crc="11920f3a" sha1="c6c1f153a6e17a31da1a079f2c8e0e57947d2ac9" offset="0" />
+				<rom name="500-12887-a - estudio de arte animal (sp).bin" size="0x400000" crc="11920f3a" sha1="c6c1f153a6e17a31da1a079f2c8e0e57947d2ac9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12892-a - the backyardingans (uk).bin" size="0x400000" crc="d33777fd" sha1="3245cd4f86cf7d1e59f9484eeb61078981fcf6e8" offset="0" />
+				<rom name="500-12892-a - the backyardingans (uk).bin" size="0x400000" crc="d33777fd" sha1="3245cd4f86cf7d1e59f9484eeb61078981fcf6e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +56,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13570-a - the world of cars (uk).bin" size="0x400000" crc="b021c6a7" sha1="2553877ff49062dce71beb4c717740c62db243cd" offset="0" />
+				<rom name="500-13570-a - the world of cars (uk).bin" size="0x400000" crc="b021c6a7" sha1="2553877ff49062dce71beb4c717740c62db243cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -70,7 +70,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13078-a - disney princess (uk).bin" size="0x400000" crc="fe96e198" sha1="106b24cf48ba393d0541db36a60c790df9d95f2a" offset="0" />
+				<rom name="500-13078-a - disney princess (uk).bin" size="0x400000" crc="fe96e198" sha1="106b24cf48ba393d0541db36a60c790df9d95f2a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -84,7 +84,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13089-a - go diego go learning expeditions (uk).bin" size="0x400000" crc="5e5d0617" sha1="83c644d2728125c26bd32af4e07fe278d6f588a0" offset="0" />
+				<rom name="500-13089-a - go diego go learning expeditions (uk).bin" size="0x400000" crc="5e5d0617" sha1="83c644d2728125c26bd32af4e07fe278d6f588a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12731-a - learning carnival (uk).bin" size="0x400000" crc="31633d96" sha1="9b0252fe0f3cd539ad47132c6adee358a0c1cba8" offset="0" />
+				<rom name="500-12731-a - learning carnival (uk).bin" size="0x400000" crc="31633d96" sha1="9b0252fe0f3cd539ad47132c6adee358a0c1cba8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12727-a - finding nemo (uk).bin" size="0x400000" crc="33e02256" sha1="caac98a66b714aa9addef42d31cd139fe138ea58" offset="0" />
+				<rom name="500-12727-a - finding nemo (uk).bin" size="0x400000" crc="33e02256" sha1="caac98a66b714aa9addef42d31cd139fe138ea58"/>
 			</dataarea>
 		</part>
 	</software>
@@ -126,7 +126,7 @@
 			<feature name="pcbtype" value="841-30125-A" />
 			<feature name="pcbdate" value="06242008" /> <!-- 20080624 -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13678-a - ni hao kai-lan (uk).bin" size="0x400000" crc="b9d6a774" sha1="9acd15a6b92d10e23e2364a251c71677efaae399" offset="0" />
+				<rom name="500-13678-a - ni hao kai-lan (uk).bin" size="0x400000" crc="b9d6a774" sha1="9acd15a6b92d10e23e2364a251c71677efaae399"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,7 +140,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13085-a - scouts puppy pals (uk).bin" size="0x400000" crc="f9cf74c7" sha1="6ba8f0c74a8c6075632db29b9034f72190809305" offset="0" />
+				<rom name="500-13085-a - scouts puppy pals (uk).bin" size="0x400000" crc="f9cf74c7" sha1="6ba8f0c74a8c6075632db29b9034f72190809305"/>
 			</dataarea>
 		</part>
 	</software>
@@ -154,13 +154,13 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12728-a - toy story (uk).bin" size="0x400000" crc="9021fa2e" sha1="841be50a7f0eb4f633469b04928d3085874866dc" offset="0" />
+				<rom name="500-12728-a - toy story (uk).bin" size="0x400000" crc="9021fa2e" sha1="841be50a7f0eb4f633469b04928d3085874866dc"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="toystors" cloneof="toystor" supported="no">
-		<description>Disney/Pixar Toy Story - ¡Al 100 y más allá! (SP)</description>
+		<description>Disney/Pixar Toy Story - ¡Al 100 y más allá! (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -168,7 +168,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12894-a - toy story (sp).bin" size="0x400000" crc="91a748f6" sha1="05da46b6ded3fee24bc1167395f8139647368b68" offset="0" />
+				<rom name="500-12894-a - toy story (sp).bin" size="0x400000" crc="91a748f6" sha1="05da46b6ded3fee24bc1167395f8139647368b68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -182,7 +182,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-13084-a - bob the builder (uk).bin" size="0x400000" crc="387920df" sha1="ac071987f5389604f368ea0a59962a0c28f73a80" offset="0" />
+				<rom name="500-13084-a - bob the builder (uk).bin" size="0x400000" crc="387920df" sha1="ac071987f5389604f368ea0a59962a0c28f73a80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -196,7 +196,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12781-a - thomas and friends (uk).bin" size="0x400000" crc="8485c99a" sha1="2a4899868f383b8a6e8cdc0e65dfed86222ff697" offset="0" />
+				<rom name="500-12781-a - thomas and friends (uk).bin" size="0x400000" crc="8485c99a" sha1="2a4899868f383b8a6e8cdc0e65dfed86222ff697"/>
 			</dataarea>
 		</part>
 	</software>
@@ -210,9 +210,8 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12729-a - dora the explorer (uk).bin" size="0x400000" crc="e93bd91a" sha1="e4c9649becd6370d555c6475cb491ba78c54ad17" offset="0" />
+				<rom name="500-12729-a - dora the explorer (uk).bin" size="0x400000" crc="e93bd91a" sha1="e4c9649becd6370d555c6475cb491ba78c54ad17"/>
 			</dataarea>
 		</part>
 	</software>
 </softwarelist>
-

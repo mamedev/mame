@@ -1644,7 +1644,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 				break;
 
 			default:
-				util::stream_format(stream, "Ext. OP $%X @ %X\n", extended_op, pc);
+				util::stream_format(stream, "Ext. OP $%X @ %X", extended_op, pc);
 				osd_printf_verbose("Illegal Extended Opcode: %X @ %X\n", extended_op, pc);
 				break;
 			}

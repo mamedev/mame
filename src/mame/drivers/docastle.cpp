@@ -610,7 +610,7 @@ void docastle_state::docastle(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	H46505(config, m_crtc, XTAL(9'828'000) / 16);
+	HD6845S(config, m_crtc, XTAL(9'828'000) / 16);
 	/*
 	The games program the CRTC for a width of 32 characters (256 pixels).
 	However, the DE output from the CRTC is first ANDed with the NAND of
@@ -628,7 +628,6 @@ void docastle_state::docastle(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0); // from CRTC
 	screen.set_screen_update(FUNC(docastle_state::screen_update_docastle));
-	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_docastle);
 	PALETTE(config, m_palette, FUNC(docastle_state::docastle_palette), 512);

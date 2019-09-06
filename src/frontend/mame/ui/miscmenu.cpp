@@ -25,6 +25,8 @@
 #include "ui/inifile.h"
 #include "ui/submenu.h"
 
+#include <fstream>
+
 namespace ui {
 /***************************************************************************
     MENU HANDLERS
@@ -585,20 +587,27 @@ void menu_export::handle()
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 				if (file.open(filename.c_str(), ".xml") == osd_file::error::NONE)
 				{
-					FILE *pfile;
 					std::string fullpath(file.fullpath());
 					file.close();
-					pfile = fopen(fullpath.c_str(), "w");
+					std::ofstream pfile(fullpath);
 
-					// create the XML and save to file
-					driver_enumerator drvlist(machine().options());
-					drvlist.exclude_all();
-					for (auto & elem : m_list)
-						drvlist.include(driver_list::find(*elem));
+					// prepare a filter for the drivers we want to show
+					std::unordered_set<const game_driver *> driver_list(m_list.begin(), m_list.end());
+					auto filter = [&driver_list](const char *shortname, bool &)
+					{
+						auto iter = std::find_if(
+							driver_list.begin(),
+							driver_list.end(),
+							[shortname](const game_driver *driver) { return !strcmp(shortname, driver->name); });
+						return iter != driver_list.end();
+					};
 
+					// do we want to show devices?
+					bool include_devices = uintptr_t(menu_event->itemref) == 1;
+
+					// and do the dirty work
 					info_xml_creator creator(machine().options());
-					creator.output(pfile, drvlist, (uintptr_t(menu_event->itemref) == 1) ? false : true);
-					fclose(pfile);
+					creator.output(pfile, filter, include_devices);
 					machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
 				}
 			}
@@ -790,7 +799,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Save machine configuration"), "", 0, (void *)(uintptr_t)SAVE);
 	item_append(menu_item_type::SEPARATOR);
-	customtop = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
@@ -802,9 +811,9 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 	char const *const text[] = { _("Configure machine:"), m_drv.type.fullname() };
 	draw_text_box(
 			std::begin(text), std::end(text),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 void menu_machine_configure::setup_bios()
@@ -880,9 +889,12 @@ void menu_plugins_configure::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 		{
-			int oldval = plugins.int_value((const char*)menu_event->itemref);
-			plugins.set_value((const char*)menu_event->itemref, oldval == 1 ? 0 : 1, OPTION_PRIORITY_CMDLINE);
-			changed = true;
+			plugin *p = plugins.find((const char*)menu_event->itemref);
+			if (p)
+			{
+				p->m_start = !p->m_start;
+				changed = true;
+			}
 		}
 	}
 	if (changed)
@@ -897,16 +909,13 @@ void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
 	plugin_options& plugins = mame_machine_manager::instance()->plugins();
 
-	for (auto &curentry : plugins.entries())
+	for (auto &curentry : plugins.plugins())
 	{
-		if (curentry->type() != OPTION_HEADER)
-		{
-			auto enabled = !strcmp(curentry->value(), "1");
-			item_append_on_off(curentry->description(), enabled, 0, (void *)(uintptr_t)curentry->name().c_str());
-		}
+		bool enabled = curentry.m_start;
+		item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
 	}
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
 
 //-------------------------------------------------
@@ -918,9 +927,9 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 	char const *const toptext[] = { _("Plugins") };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 } // namespace ui

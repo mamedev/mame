@@ -1508,6 +1508,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/sound/swp00.h,SOUNDS["SWP00"] = true
+---------------------------------------------------
+
+if (SOUNDS["SWP00"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/swp00.cpp",
+		MAME_DIR .. "src/devices/sound/swp00.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/swp20.h,SOUNDS["SWP20"] = true
+---------------------------------------------------
+
+if (SOUNDS["SWP20"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/swp20.cpp",
+		MAME_DIR .. "src/devices/sound/swp20.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/sound/swp30.h,SOUNDS["SWP30"] = true
 ---------------------------------------------------
 

@@ -58,11 +58,9 @@ public:
 	// Callbacks
 	auto extop_cb() { return m_external_operation.bind(); }
 	auto intlevel_cb() { return m_get_intlevel.bind(); }
-	auto iaq_cb() { return m_iaq_line.bind(); }
 	auto clkout_cb() { return m_clock_out_line.bind(); }
 	auto wait_cb() { return m_wait_line.bind(); }
 	auto holda_cb() { return m_holda_line.bind(); }
-	auto dbin_cb() { return m_dbin_line.bind(); }
 
 protected:
 	tms99xx_device(const machine_config &mconfig, device_type type,
@@ -160,6 +158,9 @@ protected:
 	// Used to display the number of consumed cycles in the log.
 	int     m_first_cycle;
 
+	// Indicates the instruction acquision phase
+	bool    m_iaq;
+
 	/************************************************************************/
 
 	// Clock output. This is not a pin of the TMS9900 because the TMS9900
@@ -173,14 +174,8 @@ protected:
 	// HOLD Acknowledge line. When asserted (high), the CPU is in HOLD state.
 	devcb_write_line   m_holda_line;
 
-	// Signal to the outside world that we are now getting an instruction
-	devcb_write_line   m_iaq_line;
-
 	// Get the value of the interrupt level lines
 	devcb_read8    m_get_intlevel;
-
-	// DBIN line. When asserted (high), the CPU has disabled the data bus output buffers.
-	devcb_write_line   m_dbin_line;
 
 	// Trigger external operation. This is achieved by putting a special value in
 	// the most significant three bits of the address bus (TMS9995: data bus) and

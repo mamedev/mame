@@ -12,6 +12,7 @@
 
 #include "cpu/mcs48/mcs48.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class pandoras_state : public driver_device
 {

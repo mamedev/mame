@@ -14,6 +14,7 @@
 #include "machine/i8255.h"
 #include "sound/samples.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class zaxxon_state : public driver_device
 {

@@ -128,7 +128,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void dleuro_palette(palette_device &palette) const;
-	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dleuro(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
 
 	void dleuro_io_map(address_map &map);
@@ -220,16 +220,18 @@ void dlair_state::dleuro_palette(palette_device &palette) const
  *
  *************************************/
 
-uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// redraw the overlay
 	for (int y = 0; y < 32; y++)
+	{
 		for (int x = 0; x < 32; x++)
 		{
 			uint8_t const *const base = &m_videoram[y * 64 + x * 2 + 1];
 			// TODO: opaque?
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
+			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
+	}
 
 	return 0;
 }
@@ -742,26 +744,28 @@ void dlair_state::dlair_base(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(dlair_state::dlair_pr7820)
+void dlair_state::dlair_pr7820(machine_config &config)
+{
 	dlair_base(config);
 	PIONEER_PR7820(config, m_pr7820, 0);
 	m_pr7820->add_route(0, "lspeaker", 1.0);
 	m_pr7820->add_route(1, "rspeaker", 1.0);
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_pr7820")
-MACHINE_CONFIG_END
+	m_pr7820->add_ntsc_screen(config, "screen");
+}
 
 
-MACHINE_CONFIG_START(dlair_state::dlair_ldv1000)
+void dlair_state::dlair_ldv1000(machine_config &config)
+{
 	dlair_base(config);
 	PIONEER_LDV1000(config, m_ldv1000, 0);
 	m_ldv1000->add_route(0, "lspeaker", 1.0);
 	m_ldv1000->add_route(1, "rspeaker", 1.0);
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_ldv1000")
-MACHINE_CONFIG_END
+	m_ldv1000->add_ntsc_screen(config, "screen");
+}
 
 
-MACHINE_CONFIG_START(dlair_state::dleuro)
-
+void dlair_state::dleuro(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK_EURO/4);
 	m_maincpu->set_daisy_config(dleuro_daisy_chain);
@@ -780,12 +784,11 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	PHILIPS_22VP932(config, m_22vp932, 0);
 	m_22vp932->set_overlay(256, 256, FUNC(dlair_state::screen_update_dleuro));
-	m_22vp932->set_overlay_palette(m_palette);
 	m_22vp932->add_route(0, "lspeaker", 1.0);
 	m_22vp932->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
+	m_22vp932->add_pal_screen(config, "screen");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dlair);
 	PALETTE(config, m_palette, FUNC(dlair_state::dleuro_palette), 16);
@@ -797,7 +800,7 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "lspeaker", 0.33);
 	m_speaker->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
-MACHINE_CONFIG_END
+}
 
 
 

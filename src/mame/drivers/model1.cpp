@@ -603,6 +603,16 @@ READ8_MEMBER( model1_state::dpram_r )
 	return m_dpram->right_r(offset);
 }
 
+WRITE8_MEMBER( model1_state::gen_outputs_w )
+{
+	// generic output lines, output to outx where x = bit
+	// eg. out0 = coin counter 1, see below for per-game descriptions
+	for (int i = 0; i < 8; i++)
+		m_outs[i] = BIT(data, i);
+
+	m_digits[1] = data;
+}
+
 WRITE8_MEMBER( model1_state::vf_outputs_w )
 {
 	// 7654----  unknown (not used?)
@@ -613,8 +623,6 @@ WRITE8_MEMBER( model1_state::vf_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::vr_outputs_w )
@@ -630,8 +638,6 @@ WRITE8_MEMBER( model1_state::vr_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::swa_outputs_w )
@@ -647,8 +653,6 @@ WRITE8_MEMBER( model1_state::swa_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::wingwar_outputs_w )
@@ -663,8 +667,6 @@ WRITE8_MEMBER( model1_state::wingwar_outputs_w )
 	// -------0  coin counter 1
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::wingwar360_outputs_w )
@@ -677,8 +679,6 @@ WRITE8_MEMBER( model1_state::wingwar360_outputs_w )
 
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	m_digits[1] = data;
 }
 
 WRITE8_MEMBER( model1_state::netmerc_outputs_w )
@@ -857,7 +857,8 @@ void model1_state::machine_reset()
 	irq_init();
 	copro_reset();
 
-	if (!strcmp(machine().system().name, "swa") )
+	if (!strcmp(machine().system().name, "swa") ||
+		!strcmp(machine().system().name, "swaj"))
 	{
 		m_sound_irq = 0;
 	}
@@ -1304,7 +1305,7 @@ ROM_START( vr )
 	ROM_LOAD32_WORD( "mpr-14894.30", 0x800000, 0x200000, CRC(830a71bc) SHA1(884378e8a5afeb819daf5285d0d205986d566340) )
 	ROM_LOAD32_WORD( "mpr-14895.31", 0x800002, 0x200000, CRC(af027ac5) SHA1(523f03d90358ddb7d0e96fd06b9a65cebfc09f24) )
 	ROM_LOAD32_WORD( "mpr-14896.32", 0xc00000, 0x200000, CRC(382091dc) SHA1(efa266f0f6bfe36ad1c365e588fff33b01e166dd) )
-	ROM_LOAD32_WORD( "mpr-14879.33", 0xc00002, 0x200000, CRC(74873195) SHA1(80705ec577d14570f9bba77cc26766f831c41f42) )
+	ROM_LOAD32_WORD( "mpr-14897.33", 0xc00002, 0x200000, CRC(74873195) SHA1(80705ec577d14570f9bba77cc26766f831c41f42) )
 
 	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
 	ROM_LOAD32_BYTE( "mpr-14898.39", 0x000000, 0x80000, CRC(61da2bb6) SHA1(7a12ba522d64a1aeec1ca6f5a87ee063692131f9) )
@@ -1355,7 +1356,7 @@ ROM_START( vformula )
 	ROM_LOAD32_WORD( "mpr-14894.30", 0x800000, 0x200000, CRC(830a71bc) SHA1(884378e8a5afeb819daf5285d0d205986d566340) )
 	ROM_LOAD32_WORD( "mpr-14895.31", 0x800002, 0x200000, CRC(af027ac5) SHA1(523f03d90358ddb7d0e96fd06b9a65cebfc09f24) )
 	ROM_LOAD32_WORD( "mpr-14896.32", 0xc00000, 0x200000, CRC(382091dc) SHA1(efa266f0f6bfe36ad1c365e588fff33b01e166dd) )
-	ROM_LOAD32_WORD( "mpr-14879.33", 0xc00002, 0x200000, CRC(74873195) SHA1(80705ec577d14570f9bba77cc26766f831c41f42) )
+	ROM_LOAD32_WORD( "mpr-14897.33", 0xc00002, 0x200000, CRC(74873195) SHA1(80705ec577d14570f9bba77cc26766f831c41f42) )
 
 	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
 	ROM_LOAD32_BYTE( "mpr-14898.39", 0x000000, 0x80000, CRC(61da2bb6) SHA1(7a12ba522d64a1aeec1ca6f5a87ee063692131f9) )
@@ -1372,6 +1373,54 @@ ROM_START( swa )
 	MODEL1_CPU_BOARD
 
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
+	ROM_LOAD16_BYTE( "epr-16669.14", 0x200000, 0x80000, CRC(52e5e7e4) SHA1(0eb584299d821a61ed2c27c615356eaeb18b41c6) )
+	ROM_LOAD16_BYTE( "epr-16670.15", 0x200001, 0x80000, CRC(1e7ecabd) SHA1(62e8dd5d3a053426a1f3d94d15b04621d36d6a2c) )
+
+	ROM_LOAD( "epr-16668.5", 0xf80000, 0x80000, CRC(9e112425) SHA1(fc7be83b33b586780444e3426164e1cb5125f794) )
+	ROM_RELOAD(          0x000000, 0x80000 )
+	ROM_RELOAD(          0x080000, 0x80000 )
+
+	ROM_REGION32_LE( 0x2000, "tgp_copro", 0)
+	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
+		ROM_LOAD16_WORD_SWAP( "epr-16470.7", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
+	ROM_RELOAD(0x80000, 0x20000)
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
+	ROM_LOAD( "mpr-16486.32", 0x000000, 0x200000, CRC(7df50533) SHA1(f2fb876738e37d70eb9005e5629a9ae89aa413a8) )
+	ROM_LOAD( "mpr-16487.33", 0x200000, 0x200000, CRC(31b28dfa) SHA1(bd1ac11bf2f9161f61f8af3b9ff4c2709b7ee700) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
+	ROM_LOAD( "mpr-16484.4", 0x000000, 0x200000, CRC(9d4c334d) SHA1(8b4d903f14559fed425d225bb23ccfe8da23cbd3) )
+	ROM_LOAD( "mpr-16485.5", 0x200000, 0x200000, CRC(95aadcad) SHA1(4276db655db9834692c3843eb96a3e3a89cb7252) )
+
+	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 DSB code */
+	ROM_LOAD( "epr-16471.2", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
+
+	ROM_REGION( 0x800000, "mpeg", 0 ) /* DSB MPEG data */
+	ROM_LOAD( "mpr-16514.57", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
+	ROM_LOAD( "mpr-16515.58", 0x200000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
+
+	ROM_REGION32_LE( 0xc00000, "polygons", 0 ) /* TGP model roms */
+	ROM_LOAD32_WORD( "mpr-16476.26", 0x000000, 0x200000, CRC(d48609ae) SHA1(8c8686a5c9ca4837447a7f70ed194e2f1882b66d) )
+	ROM_LOAD32_WORD( "mpr-16477.27", 0x000002, 0x200000, CRC(b979b082) SHA1(0c60d259093e987f3856730b57b43bde7e9562e3) )
+	ROM_LOAD32_WORD( "mpr-16478.28", 0x400000, 0x200000, CRC(80c780f7) SHA1(2f57c5373b02765d302bcd81e24f7b7bc4181387) )
+	ROM_LOAD32_WORD( "mpr-16479.29", 0x400002, 0x200000, CRC(e43183b3) SHA1(4e62c67cdf7a6fdac0ded86d5f9e81044b9dea8d) )
+	ROM_LOAD32_WORD( "mpr-16480.30", 0x800000, 0x200000, CRC(3185547a) SHA1(9871937372c2c755717802117a3ad39e1a11410e) )
+	ROM_LOAD32_WORD( "mpr-16481.31", 0x800002, 0x200000, CRC(ce8d76fe) SHA1(0406f0500d19d6707515627b4143f92a9a5db769) )
+
+	ROM_REGION32_LE( 0x200000, "copro_data", 0 ) /* TGP data roms */
+	ROM_LOAD32_BYTE( "mpr-16472.39", 0x000000, 0x80000, CRC(5a0d7553) SHA1(ba8e08e5a0c6b7fbc10084ad7ad3edf61efb0d70) )
+	ROM_LOAD32_BYTE( "mpr-16473.40", 0x000001, 0x80000, CRC(876c5399) SHA1(be7e40c77a385600941f11c24852cd73c71696f0) )
+	ROM_LOAD32_BYTE( "mpr-16474.41", 0x000002, 0x80000, CRC(5864a26f) SHA1(be0c22dfff37408f6b401b1970f7fcc6fc7fbcd2) )
+	ROM_LOAD32_BYTE( "mpr-16475.42", 0x000003, 0x80000, CRC(b9266be9) SHA1(cf195cd89c9d191b9eb8c5299f8cc154c2b4bd82) )
+ROM_END
+
+ROM_START( swaj )
+	MODEL1_CPU_BOARD
+
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16468.14", 0x200000, 0x80000, CRC(681d03c0) SHA1(4d21e26ce211466d429b84bca69a8147ff31ec6c) )
 	ROM_LOAD16_BYTE( "epr-16469.15", 0x200001, 0x80000, CRC(6f281f7c) SHA1(6a9179e48d14838bb2a1a3f63fdd3a68ed009e03) )
 
@@ -1383,30 +1432,27 @@ ROM_START( swa )
 	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
-		ROM_LOAD16_WORD_SWAP( "epr-16470.bin", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
+		ROM_LOAD16_WORD_SWAP( "epr-16470.7", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
 	ROM_RELOAD(0x80000, 0x20000)
 
 	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
-	ROM_LOAD( "mpr-16486.bin", 0x000000, 0x200000, CRC(7df50533) SHA1(f2fb876738e37d70eb9005e5629a9ae89aa413a8) )
-	ROM_LOAD( "mpr-16487.bin", 0x200000, 0x200000, CRC(31b28dfa) SHA1(bd1ac11bf2f9161f61f8af3b9ff4c2709b7ee700) )
+	ROM_LOAD( "mpr-16486.32", 0x000000, 0x200000, CRC(7df50533) SHA1(f2fb876738e37d70eb9005e5629a9ae89aa413a8) )
+	ROM_LOAD( "mpr-16487.33", 0x200000, 0x200000, CRC(31b28dfa) SHA1(bd1ac11bf2f9161f61f8af3b9ff4c2709b7ee700) )
 
 	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
-	ROM_LOAD( "mpr-16484.bin", 0x000000, 0x200000, CRC(9d4c334d) SHA1(8b4d903f14559fed425d225bb23ccfe8da23cbd3) )
-	ROM_LOAD( "mpr-16485.bin", 0x200000, 0x200000, CRC(95aadcad) SHA1(4276db655db9834692c3843eb96a3e3a89cb7252) )
+	ROM_LOAD( "mpr-16484.4", 0x000000, 0x200000, CRC(9d4c334d) SHA1(8b4d903f14559fed425d225bb23ccfe8da23cbd3) )
+	ROM_LOAD( "mpr-16485.5", 0x200000, 0x200000, CRC(95aadcad) SHA1(4276db655db9834692c3843eb96a3e3a89cb7252) )
 
 	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 DSB code */
-	ROM_LOAD( "epr-16471.bin", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
+	ROM_LOAD( "epr-16471.2", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
 
 	ROM_REGION( 0x400000, "mpeg", 0 ) /* DSB MPEG data */
-	ROM_LOAD( "mpr-16514.bin", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
-	ROM_LOAD( "mpr-16515.bin", 0x200000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
+	ROM_LOAD( "mpr-16514.57", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
+	ROM_LOAD( "mpr-16515.58", 0x200000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
 
 	ROM_REGION32_LE( 0xc00000, "polygons", 0 ) /* TGP model roms */
 	ROM_LOAD32_WORD( "mpr-16476.26", 0x000000, 0x200000, CRC(d48609ae) SHA1(8c8686a5c9ca4837447a7f70ed194e2f1882b66d) )
-// original dump (which one is right?)
-//  ROM_LOAD32_WORD( "mpr-16477.27", 0x000002, 0x200000, CRC(b979b082) SHA1(0c60d259093e987f3856730b57b43bde7e9562e3) )
-// new dump
-		ROM_LOAD32_WORD( "mpr16477.bin", 0x000002, 0x200000, CRC(971ff194) SHA1(9665ede3ca22885489f1f1b5865ccfac42364206) )
+	ROM_LOAD32_WORD( "mpr-16477.27", 0x000002, 0x200000, CRC(b979b082) SHA1(0c60d259093e987f3856730b57b43bde7e9562e3) )
 	ROM_LOAD32_WORD( "mpr-16478.28", 0x400000, 0x200000, CRC(80c780f7) SHA1(2f57c5373b02765d302bcd81e24f7b7bc4181387) )
 	ROM_LOAD32_WORD( "mpr-16479.29", 0x400002, 0x200000, CRC(e43183b3) SHA1(4e62c67cdf7a6fdac0ded86d5f9e81044b9dea8d) )
 	ROM_LOAD32_WORD( "mpr-16480.30", 0x800000, 0x200000, CRC(3185547a) SHA1(9871937372c2c755717802117a3ad39e1a11410e) )
@@ -1751,6 +1797,7 @@ void model1_state::vf(machine_config &config)
 	ioboard.set_default_bios_tag("epr14869b");
 	ioboard.in_callback<2>().set_ioport("IN.2");
 	ioboard.output_callback().set(FUNC(model1_state::vf_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 }
 
 void model1_state::vr(machine_config &config)
@@ -1765,6 +1812,7 @@ void model1_state::vr(machine_config &config)
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
 }
@@ -1781,6 +1829,7 @@ void model1_state::vformula(machine_config &config)
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
 }
@@ -1797,6 +1846,7 @@ void model1_state::swa(machine_config &config)
 	ioboard.an_callback<4>().set_ioport("STICK2X");
 	ioboard.an_callback<5>().set_ioport("STICK2Y");
 	ioboard.output_callback().set(FUNC(model1_state::swa_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	SPEAKER(config, "dleft").front_left();
 	SPEAKER(config, "dright").front_right();
@@ -1824,6 +1874,7 @@ void model1_state::wingwar(machine_config &config)
 	ioboard.an_callback<1>().set_ioport("STICKY");
 	ioboard.an_callback<2>().set_ioport("THROTTLE");
 	ioboard.output_callback().set(FUNC(model1_state::wingwar_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 
@@ -1839,6 +1890,7 @@ void model1_state::wingwar360(machine_config &config)
 	ioboard.drive_write_callback().set(FUNC(model1_state::r360_w));
 	ioboard.an_callback<2>().set_constant(0);
 	ioboard.output_callback().set(FUNC(model1_state::wingwar360_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 }
@@ -1865,6 +1917,7 @@ void model1_state::netmerc(machine_config &config)
 	ioboard.an_callback<0>().set_ioport("STICKX");
 	ioboard.an_callback<2>().set_ioport("STICKY");
 	ioboard.output_callback().set(FUNC(model1_state::netmerc_outputs_w));
+	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	config.set_default_layout(layout_model1io2);
 }
@@ -1875,12 +1928,13 @@ void model1_state::netmerc(machine_config &config)
 //**************************************************************************
 
 //    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS         INIT        ROTATION  COMPANY  FULLNAME              FLAGS
-GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",     MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",      0, layout_vr )
-GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",   MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",      MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",   MACHINE_NOT_WORKING )
-GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state, empty_init, ROT0,     "Sega",  "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       netmerc,    netmerc,    model1_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",       MACHINE_NOT_WORKING )
+GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
+GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",         MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         MACHINE_NOT_WORKING )
+GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state, empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,    netmerc,    model1_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )

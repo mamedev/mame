@@ -7,13 +7,15 @@
     x68k bare-bones formats
 
 *********************************************************************/
+#ifndef MAME_FORMATS_XDF_DSK_H
+#define MAME_FORMATS_XDF_DSK_H
 
-#ifndef XDF_DSK_H_
-#define XDF_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
-class xdf_format : public upd765_format {
+class xdf_format : public upd765_format
+{
 public:
 	xdf_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_XDF_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_XDF_DSK_H

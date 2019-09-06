@@ -25,9 +25,6 @@ void policetr_state::video_start()
 	/* the destination bitmap is not directly accessible to the CPU */
 	m_dstbitmap = std::make_unique<bitmap_ind8>(+DSTBITMAP_WIDTH, +DSTBITMAP_HEIGHT);
 
-	save_item(NAME(m_palette_offset));
-	save_item(NAME(m_palette_index));
-	save_item(NAME(m_palette_data));
 	save_item(NAME(m_src_xoffs));
 	save_item(NAME(m_src_yoffs));
 	save_item(NAME(m_dst_xoffs));
@@ -299,34 +296,6 @@ READ32_MEMBER(policetr_state::video_r)
 	logerror("%s: video_r with latch %02X\n", machine().describe_context(), m_video_latch);
 	return 0;
 }
-
-
-
-
-/*************************************
- *
- *  Palette access
- *
- *************************************/
-
-WRITE8_MEMBER(policetr_state::palette_offset_w)
-{
-	m_palette_offset = data;
-	m_palette_index = 0;
-}
-
-
-WRITE8_MEMBER(policetr_state::palette_data_w)
-{
-	m_palette_data[m_palette_index] = data;
-	if (++m_palette_index == 3)
-	{
-		m_palette->set_pen_color(m_palette_offset, rgb_t(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
-		m_palette_index = 0;
-	}
-}
-
-
 
 /*************************************
  *

@@ -17,7 +17,7 @@ Measured clocks:
  MC68000P12F - 14.99MHz
  Z0840006PSC -  3.996MHz
    OKI M6295 -  0.999MHz
- 
+
 ***************************************************************************/
 
 
@@ -30,6 +30,7 @@ Measured clocks:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class seicupbl_state : public driver_device

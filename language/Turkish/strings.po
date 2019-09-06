@@ -21,41 +21,41 @@ msgstr ""
 #: src/frontend/mame/ui/videoopt.cpp:56
 #, c-format
 msgid "Screen #%d"
-msgstr ""
+msgstr "#%d Ekran"
 
 #: src/frontend/mame/ui/videoopt.cpp:204 src/frontend/mame/ui/submenu.cpp:48
 msgid "Rotate"
-msgstr ""
+msgstr "Döndür"
 
 #: src/frontend/mame/ui/videoopt.cpp:208
 msgid "Backdrops"
-msgstr ""
+msgstr "Zeminler"
 
 #: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
 #: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
 #: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/ui.cpp:1255
 #: src/frontend/mame/ui/cheatopt.cpp:273
 msgid "Enabled"
-msgstr ""
+msgstr "Etkin"
 
 #: src/frontend/mame/ui/videoopt.cpp:208 src/frontend/mame/ui/videoopt.cpp:212
 #: src/frontend/mame/ui/videoopt.cpp:216 src/frontend/mame/ui/videoopt.cpp:220
 #: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/ui.cpp:1255
 #: src/frontend/mame/ui/cheatopt.cpp:273
 msgid "Disabled"
-msgstr ""
+msgstr "Etkin Değil"
 
 #: src/frontend/mame/ui/videoopt.cpp:212
 msgid "Overlays"
-msgstr ""
+msgstr "Kaplamalar"
 
 #: src/frontend/mame/ui/videoopt.cpp:216
 msgid "Bezels"
-msgstr ""
+msgstr "Çerçeveler"
 
 #: src/frontend/mame/ui/videoopt.cpp:220
 msgid "CPanels"
-msgstr ""
+msgstr "Kontrol Panelleri"
 
 #: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/dirmenu.cpp:51
 #: src/frontend/mame/ui/selmenu.cpp:86
@@ -64,15 +64,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/videoopt.cpp:228
 msgid "View"
-msgstr ""
+msgstr "Görünüm"
 
 #: src/frontend/mame/ui/videoopt.cpp:228
 msgid "Cropped"
-msgstr ""
+msgstr "Kırpılmış"
 
 #: src/frontend/mame/ui/videoopt.cpp:228
 msgid "Full"
-msgstr ""
+msgstr "Tam"
 
 #: src/frontend/mame/ui/dirmenu.cpp:35
 msgid "ROMs"
@@ -120,7 +120,7 @@ msgstr "Ekran Görüntüleri"
 
 #: src/frontend/mame/ui/dirmenu.cpp:46 src/frontend/mame/ui/selmenu.cpp:72
 msgid "Cabinets"
-msgstr ""
+msgstr "Kabinler"
 
 #: src/frontend/mame/ui/dirmenu.cpp:47 src/frontend/mame/ui/selmenu.cpp:75
 msgid "Flyers"
@@ -148,7 +148,7 @@ msgstr "Nişan"
 
 #: src/frontend/mame/ui/dirmenu.cpp:54
 msgid "Artworks"
-msgstr ""
+msgstr "Çizimler"
 
 #: src/frontend/mame/ui/dirmenu.cpp:55 src/frontend/mame/ui/selmenu.cpp:79
 msgid "Bosses"
@@ -156,7 +156,7 @@ msgstr "Patronlar"
 
 #: src/frontend/mame/ui/dirmenu.cpp:56
 msgid "Artworks Preview"
-msgstr ""
+msgstr "Çizim Önizleme"
 
 #: src/frontend/mame/ui/dirmenu.cpp:57 src/frontend/mame/ui/selmenu.cpp:85
 msgid "Select"
@@ -193,7 +193,7 @@ msgstr "Dizin Ayarı"
 #: src/frontend/mame/ui/dirmenu.cpp:167
 #, c-format
 msgid "Current %1$s Folders"
-msgstr ""
+msgstr "Şimdiki %1$s Dizinler"
 
 #: src/frontend/mame/ui/dirmenu.cpp:179
 msgid "Change Folder"
@@ -205,17 +205,17 @@ msgstr "Dizin Ekle"
 
 #: src/frontend/mame/ui/dirmenu.cpp:182
 msgid "Remove Folder"
-msgstr ""
+msgstr "Dizin Kaldır"
 
 #: src/frontend/mame/ui/dirmenu.cpp:418
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "%1$s Dizin Değiştir - Ara: %2$s_"
 
 #: src/frontend/mame/ui/dirmenu.cpp:418
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr ""
+msgstr "%1$s Dizin Ekle - Ara: %2$s_"
 
 #: src/frontend/mame/ui/dirmenu.cpp:429
 msgid "Press TAB to set"
@@ -224,65 +224,65 @@ msgstr "Ayarlamak için TAB'a basın"
 #: src/frontend/mame/ui/dirmenu.cpp:513
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr "%1$s dizini kaldır"
+msgstr "%1$s dizinini kaldır"
 
 #: src/frontend/mame/ui/selector.cpp:115
 msgid "Selection List - Search: "
-msgstr ""
+msgstr "Seçim Listesi - Ara: "
 
 #: src/frontend/mame/ui/selector.cpp:123
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr ""
+msgstr "Seçmek için çift tıkla veya %1$s'e bas"
 
 #: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
-msgstr ""
+msgstr "durdu"
 
 #: src/frontend/mame/ui/tapectrl.cpp:87
 msgid "playing"
-msgstr ""
+msgstr "oynatıyor"
 
 #: src/frontend/mame/ui/tapectrl.cpp:87
 msgid "(playing)"
-msgstr ""
+msgstr "(oynatıyor)"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "recording"
-msgstr ""
+msgstr "kaydediyor"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "(recording)"
-msgstr ""
+msgstr "(kaydediyor)"
 
 #: src/frontend/mame/ui/tapectrl.cpp:95
 msgid "Pause/Stop"
-msgstr ""
+msgstr "Ara Ver/Başlat"
 
 #: src/frontend/mame/ui/tapectrl.cpp:98
 msgid "Play"
-msgstr ""
+msgstr "Oynat"
 
 #: src/frontend/mame/ui/tapectrl.cpp:101
 msgid "Record"
-msgstr ""
+msgstr "Kaydet"
 
 #: src/frontend/mame/ui/tapectrl.cpp:104 src/frontend/mame/ui/submenu.cpp:66
 msgid "Rewind"
-msgstr ""
+msgstr "Geri Sar"
 
 #: src/frontend/mame/ui/tapectrl.cpp:107
 msgid "Fast Forward"
-msgstr ""
+msgstr "İleri sar"
 
 #: src/frontend/mame/ui/swlist.cpp:83 src/frontend/mame/ui/filesel.cpp:256
 #: src/frontend/mame/ui/slotopt.cpp:220
 msgid "[empty slot]"
-msgstr ""
+msgstr "[boş yuva]"
 
 #: src/frontend/mame/ui/swlist.cpp:88
 msgid "[file manager]"
-msgstr ""
+msgstr "[dosya yöneticisi]"
 
 #: src/frontend/mame/ui/swlist.cpp:94 src/frontend/mame/ui/filesel.cpp:264
 msgid "[software list]"
@@ -290,24 +290,24 @@ msgstr "[yazılım listesi]"
 
 #: src/frontend/mame/ui/swlist.cpp:228
 msgid "Switch Item Ordering"
-msgstr ""
+msgstr "Madde sıralamasını değiştir"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr ""
+msgstr "Sıralama değiştirildi: girdiler %s'e göre sıralandı"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 msgid "shortname"
-msgstr ""
+msgstr "kısa ad"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 msgid "description"
-msgstr ""
+msgstr "açıklama"
 
 #: src/frontend/mame/ui/swlist.cpp:389
 msgid "[compatible lists]"
-msgstr ""
+msgstr "[uyumlu listeler]"
 
 #: src/frontend/mame/ui/datmenu.cpp:80
 msgid "Software Usage"
@@ -315,27 +315,27 @@ msgstr "Yazılım Kullanımı"
 
 #: src/frontend/mame/ui/datmenu.cpp:362
 msgid "Revision: "
-msgstr ""
+msgstr "Gözden Geçirme: "
 
 #: src/frontend/mame/ui/filecreate.cpp:79
 msgid "File Already Exists - Override?"
-msgstr ""
+msgstr "Dosya Zaten Var - Üzerine yazılsın mı?"
 
 #: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1054
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 #: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1054
 msgid "Yes"
-msgstr ""
+msgstr "Evet"
 
 #: src/frontend/mame/ui/filecreate.cpp:171
 msgid "New Image Name:"
-msgstr ""
+msgstr "Yeni Görüntü Adı:"
 
 #: src/frontend/mame/ui/filecreate.cpp:177
 msgid "Image Format:"
-msgstr ""
+msgstr "Görüntü Formatı:"
 
 #: src/frontend/mame/ui/filecreate.cpp:183
 msgid "Create"
@@ -343,11 +343,11 @@ msgstr "Oluştur"
 
 #: src/frontend/mame/ui/filecreate.cpp:214
 msgid "Please enter a file extension too"
-msgstr ""
+msgstr "Lütfen bir dosya eklentiside girin"
 
 #: src/frontend/mame/ui/filecreate.cpp:266
 msgid "Select image format"
-msgstr ""
+msgstr "Görüntü formatı seçin"
 
 #: src/frontend/mame/ui/mainmenu.cpp:60
 msgid "Input (general)"
@@ -359,11 +359,11 @@ msgstr "Girdi (bu Makine)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:65
 msgid "Analog Controls"
-msgstr ""
+msgstr "Analog Kontroller"
 
 #: src/frontend/mame/ui/mainmenu.cpp:67
 msgid "Dip Switches"
-msgstr ""
+msgstr "Dip Anahtarlar"
 
 #: src/frontend/mame/ui/mainmenu.cpp:69
 msgid "Machine Configuration"
@@ -371,7 +371,7 @@ msgstr "Makine Yapılandırması"
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "Bookkeeping Info"
-msgstr ""
+msgstr "Kayıt Bilgisi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:73
 msgid "Machine Information"
@@ -387,7 +387,7 @@ msgstr "Dosya Yöneticisi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:88
 msgid "Tape Control"
-msgstr ""
+msgstr "Teyp Kontrolü"
 
 #: src/frontend/mame/ui/mainmenu.cpp:91 src/frontend/mame/ui/info_pty.cpp:30
 msgid "Pseudo terminals"
@@ -399,15 +399,15 @@ msgstr "BIOS Seçimi"
 
 #: src/frontend/mame/ui/mainmenu.cpp:97
 msgid "Slot Devices"
-msgstr ""
+msgstr "Yuva Cihazları"
 
 #: src/frontend/mame/ui/mainmenu.cpp:100
 msgid "Barcode Reader"
-msgstr ""
+msgstr "Barkod okuyucu"
 
 #: src/frontend/mame/ui/mainmenu.cpp:103
 msgid "Network Devices"
-msgstr ""
+msgstr "Ağ Cihazları"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Keyboard Mode"
@@ -415,7 +415,7 @@ msgstr "Klavye Modu"
 
 #: src/frontend/mame/ui/mainmenu.cpp:108
 msgid "Slider Controls"
-msgstr ""
+msgstr "Kaydırıcı Kontrolleri"
 
 #: src/frontend/mame/ui/mainmenu.cpp:110 src/frontend/mame/ui/submenu.cpp:101
 msgid "Video Options"
@@ -423,7 +423,7 @@ msgstr "Görüntü Seçenekleri"
 
 #: src/frontend/mame/ui/mainmenu.cpp:113
 msgid "Crosshair Options"
-msgstr ""
+msgstr "Nişanlayıcı Seçenekleri"
 
 #: src/frontend/mame/ui/mainmenu.cpp:116 plugins/cheat/init.lua:753
 msgid "Cheat"
@@ -431,11 +431,11 @@ msgstr "Hile"
 
 #: src/frontend/mame/ui/mainmenu.cpp:119
 msgid "Plugin Options"
-msgstr ""
+msgstr "Eklenti Seçenekleri"
 
 #: src/frontend/mame/ui/mainmenu.cpp:122
 msgid "External DAT View"
-msgstr ""
+msgstr "Harici DAT Görünümü"
 
 #: src/frontend/mame/ui/mainmenu.cpp:127 src/frontend/mame/ui/miscmenu.cpp:786
 msgid "Add To Favorites"
@@ -459,39 +459,39 @@ msgstr "Kod Girin"
 
 #: src/frontend/mame/ui/barcode.cpp:119
 msgid "Barcode length invalid!"
-msgstr ""
+msgstr "Barkod uzunluğu geçersiz!"
 
 #: src/frontend/mame/ui/info_pty.cpp:39
 msgid "[failed]"
-msgstr ""
+msgstr "[başarısız]"
 
 #: src/frontend/mame/ui/optsmenu.cpp:72 src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Sound Options"
-msgstr ""
+msgstr "Ses Seçenekleri"
 
 #: src/frontend/mame/ui/optsmenu.cpp:75
 msgid "General Inputs"
-msgstr ""
+msgstr "Genel Girişler"
 
 #: src/frontend/mame/ui/optsmenu.cpp:78
 msgid "Save Configuration"
-msgstr ""
+msgstr "Yapılandırmayı kaydet"
 
 #: src/frontend/mame/ui/optsmenu.cpp:141
 msgid "Settings"
-msgstr ""
+msgstr "Ayarlar"
 
 #: src/frontend/mame/ui/optsmenu.cpp:199
 msgid "Filter"
-msgstr ""
+msgstr "Filtre"
 
 #: src/frontend/mame/ui/optsmenu.cpp:212
 msgid "Customize UI"
-msgstr ""
+msgstr "UI'yi Özelleştir"
 
 #: src/frontend/mame/ui/optsmenu.cpp:213
 msgid "Configure Directories"
-msgstr ""
+msgstr "Dizinleri yapılandır"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:149
 msgid ""
@@ -500,6 +500,10 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Seçtiğiniz oyun için gerekli olan bir veya daha fazla ROM veya CHD görüntüsü eksik. Lütfen "
+"başka bir oyun seçin.\n"
+"\n"
+"Devam etmek için herhangi bir tuşa basın."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:247
 #, c-format
@@ -513,7 +517,7 @@ msgstr ""
 #: src/frontend/mame/ui/simpleselgame.cpp:277
 #: src/frontend/mame/ui/selgame.cpp:606
 msgid "Configure Options"
-msgstr ""
+msgstr "Seçenekleri Düzenle"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:298
 #, c-format

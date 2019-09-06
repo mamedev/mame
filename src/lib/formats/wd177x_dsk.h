@@ -7,9 +7,10 @@
     helper for simple wd177x-formatted disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_WD177X_DSK_H
+#define MAME_FORMATS_WD177X_DSK_H
 
-#ifndef WD177X_DSK_H
-#define WD177X_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -56,8 +57,8 @@ protected:
 
 	int compute_track_size(const format &f) const;
 	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const;
-	void check_compatibility(floppy_image *image, std::vector<int> &candidates);
+	virtual void check_compatibility(floppy_image *image, std::vector<int> &candidates);
 	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
 };
 
-#endif /* WD177X_DSK_H */
+#endif // MAME_FORMATS_WD177X_DSK_H

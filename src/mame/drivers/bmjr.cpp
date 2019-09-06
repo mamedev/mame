@@ -18,7 +18,6 @@
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -360,10 +359,10 @@ void bmjr_state::bmjr(machine_config &config)
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50); // guesswork
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

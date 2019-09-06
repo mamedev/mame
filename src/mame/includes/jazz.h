@@ -34,8 +34,8 @@
 
 // busses and connectors
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -59,9 +59,9 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_flash(*this, "flash")
 		, m_kbdc(*this, "kbdc")
-		, m_network(*this, "net")
+		, m_net(*this, "net")
 		, m_screen(*this, "screen")
-		, m_ramdac(*this, "g364")
+		, m_cvc(*this, "g364")
 		, m_ace(*this, "ace%u", 0)
 		, m_lpt(*this, "lpt")
 		, m_isp(*this, "isp")
@@ -101,9 +101,9 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_device<amd_28f020_device> m_flash;
 	required_device<ps2_keyboard_controller_device> m_kbdc;
-	required_device<dp83932c_device> m_network;
+	required_device<dp83932c_device> m_net;
 	required_device<screen_device> m_screen;
-	required_device<g364_device> m_ramdac;
+	required_device<g364_device> m_cvc;
 	required_device_array<ns16550_device, 2> m_ace;
 	required_device<pc_lpt_device> m_lpt;
 	required_device<i82357_device> m_isp;

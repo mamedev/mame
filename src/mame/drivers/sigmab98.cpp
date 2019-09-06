@@ -2925,7 +2925,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 	else if (scanline == 128)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector); // Z80
 	else if ((scanline % 8) == 0)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z*) - this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z80 - this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
 }
 
 void lufykzku_state::lufykzku(machine_config &config)

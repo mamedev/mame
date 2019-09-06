@@ -2,15 +2,12 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    Multitech Microkit09
+Multitech Microkit09
 
-    2013-12-08 Mostly working driver.
+2013-12-08 Mostly working driver.
 
-    The only documentation is in French, so the operation of the system
-    is a bit of a mystery.
 
 ToDo:
-    - Fix Cassette
     - Need software to test with
 
 Pasting:
@@ -26,7 +23,7 @@ Test Paste:
 
 
 
-    2015-10-02 Added alternate bios found on a forum. Memory map is different.
+2015-10-02 Added alternate bios found on a forum. Memory map is different.
                Still to fix keyboard and display. No documentation exists.
 
 ****************************************************************************/
@@ -35,7 +32,6 @@ Test Paste:
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "mkit09.lh"
@@ -50,6 +46,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_maincpu(*this, "maincpu")
 		, m_digits(*this, "digit%u", 0U)
+		, m_io_keyboard(*this, "X%u", 0)
 	{ }
 
 	void mkit09a(machine_config &config);
@@ -73,6 +70,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
 	output_finder<10> m_digits;
+	required_ioport_array<4> m_io_keyboard;
 };
 
 
@@ -160,11 +158,7 @@ void mkit09_state::machine_reset()
 READ8_MEMBER( mkit09_state::pa_r )
 {
 	if (m_keydata < 4)
-	{
-		char kbdrow[4];
-		sprintf(kbdrow,"X%d",m_keydata);
-		return ioport(kbdrow)->read();
-	}
+		return m_io_keyboard[m_keydata]->read();
 
 	return 0xff;
 }
@@ -209,7 +203,6 @@ void mkit09_state::mkit09(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	PIA6821(config, m_pia, 0);
@@ -221,6 +214,8 @@ void mkit09_state::mkit09(machine_config &config)
 	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void mkit09_state::mkit09a(machine_config &config)
@@ -234,7 +229,6 @@ void mkit09_state::mkit09a(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	PIA6821(config, m_pia, 0);
@@ -246,6 +240,7 @@ void mkit09_state::mkit09a(machine_config &config)
 	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

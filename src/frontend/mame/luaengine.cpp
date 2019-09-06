@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic,Luca Bruno
 /***************************************************************************
 
-    luaengine.c
+    luaengine.cpp
 
     Controls execution of the core MAME system.
 
@@ -25,6 +25,7 @@
 #include "uiinput.h"
 #include "pluginopts.h"
 #include "softlist.h"
+#include "inputdev.h"
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
@@ -144,33 +145,6 @@ namespace sol
 			}
 		};
 		template <>
-		struct checker<input_item_class>
-		{
-			template <typename Handler>
-			static bool check (lua_State* L, int index, Handler&& handler, record& tracking)
-			{
-				return stack::check<const std::string &>(L, index, handler);
-			}
-		};
-		template <>
-		struct getter<input_item_class>
-		{
-			static input_item_class get(lua_State* L, int index, record& tracking)
-			{
-				const std::string item_class =  stack::get<const std::string &>(L, index);
-				if(item_class == "switch")
-					return ITEM_CLASS_SWITCH;
-				else if(item_class == "absolute" || item_class == "abs")
-					return ITEM_CLASS_ABSOLUTE;
-				else if(item_class == "relative" || item_class == "rel")
-					return ITEM_CLASS_RELATIVE;
-				else if(item_class == "maximum" || item_class == "max")
-					return ITEM_CLASS_MAXIMUM;
-				else
-					return ITEM_CLASS_INVALID;
-			}
-		};
-		template <>
 		struct pusher<sol::buffer *>
 		{
 			static int push(lua_State* L, sol::buffer *buff)
@@ -228,6 +202,22 @@ namespace sol
 		};
 	}
 }
+
+
+//-------------------------------------------------
+// parse_seq_type - parses a string into an input_seq_type
+//-------------------------------------------------
+
+static input_seq_type parse_seq_type(const std::string &s)
+{
+	input_seq_type result = SEQ_TYPE_STANDARD;
+	if (s == "increment")
+		result = SEQ_TYPE_INCREMENT;
+	else if (s == "decrement")
+		result = SEQ_TYPE_DECREMENT;
+	return result;
+}
+
 
 //-------------------------------------------------
 //  mem_read - templated memory readers for <sign>,<size>
@@ -576,7 +566,7 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 	sol::object obj = sol().registry()[field];
 	if(obj.is<sol::protected_function>())
 	{
-		auto res = (obj.as<sol::protected_function>())(in);
+		auto res = invoke(obj.as<sol::protected_function>(), in);
 		if(!res.valid())
 		{
 			sol::error err = res;
@@ -594,7 +584,7 @@ void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<s
 	sol::object obj = sol().registry()[field];
 	if(obj.is<sol::protected_function>())
 	{
-		auto res = (obj.as<sol::protected_function>())();
+		auto res = invoke(obj.as<sol::protected_function>());
 		if(!res.valid())
 		{
 			sol::error err = res;
@@ -622,7 +612,7 @@ bool lua_engine::menu_callback(const std::string &menu, int index, const std::st
 	sol::object obj = sol().registry()[field];
 	if(obj.is<sol::protected_function>())
 	{
-		auto res = (obj.as<sol::protected_function>())(index, event);
+		auto res = invoke(obj.as<sol::protected_function>(), index, event);
 		if(!res.valid())
 		{
 			sol::error err = res;
@@ -634,17 +624,23 @@ bool lua_engine::menu_callback(const std::string &menu, int index, const std::st
 	return ret;
 }
 
-bool lua_engine::execute_function(const char *id)
+int lua_engine::enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback)
 {
+	int count = 0;
 	sol::object functable = sol().registry()[id];
-	if(functable.is<sol::table>())
+	if (functable.is<sol::table>())
 	{
-		for(auto &func : functable.as<sol::table>())
+		for (auto &func : functable.as<sol::table>())
 		{
-			if(func.second.is<sol::protected_function>())
+			if (func.second.is<sol::protected_function>())
 			{
-				auto ret = (func.second.as<sol::protected_function>())();
-				if(!ret.valid())
+				bool cont = callback(func.second.as<sol::protected_function>());
+				count++;
+				if (!cont)
+					break;
+
+				auto ret = invoke(func.second.as<sol::protected_function>());
+				if (!ret.valid())
 				{
 					sol::error err = ret;
 					osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
@@ -653,7 +649,22 @@ bool lua_engine::execute_function(const char *id)
 		}
 		return true;
 	}
-	return false;
+	return count;
+}
+
+bool lua_engine::execute_function(const char *id)
+{
+	int count = enumerate_functions(id, [this](const sol::protected_function &func)
+	{
+		auto ret = invoke(func);
+		if(!ret.valid())
+		{
+			sol::error err = ret;
+			osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
+		}
+		return true;
+	});
+	return count > 0;
 }
 
 void lua_engine::register_function(sol::function func, const char *id)
@@ -678,6 +689,11 @@ void lua_engine::on_machine_start()
 void lua_engine::on_machine_stop()
 {
 	execute_function("LUA_ON_STOP");
+}
+
+void lua_engine::on_machine_before_load_settings()
+{
+	execute_function("LUA_ON_BEFORE_LOAD_SETTINGS");
 }
 
 void lua_engine::on_machine_pause()
@@ -705,6 +721,27 @@ void lua_engine::on_periodic()
 	execute_function("LUA_ON_PERIODIC");
 }
 
+bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
+{
+	bool handled = false;
+	enumerate_functions("LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE", [this, &instance_name, &handled](const sol::protected_function &func)
+	{
+		auto ret = invoke(func, instance_name);
+
+		if(!ret.valid())
+		{
+			sol::error err = ret;
+			osd_printf_error("[LUA ERROR] in on_missing_mandatory_image: %s\n", err.what());
+		}
+		else if (ret.get<bool>())
+		{
+			handled = true;
+		}
+		return !handled;
+	});
+	return handled;
+}
+
 void lua_engine::attach_notifiers()
 {
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_prestart, this), true);
@@ -722,33 +759,45 @@ void lua_engine::attach_notifiers()
 void lua_engine::initialize()
 {
 
-/*
+/*  emu library
+ *
  * emu.app_name() - return application name
  * emu.app_version() - return application version
- * emu.gamename() - returns game full name
- * emu.softname() - returns softlist name
- * emu.keypost(keys) - post keys to natural keyboard
+ * emu.gamename() - return game full name
+ * emu.romname() - return game ROM name
+ * emu.softname() - return softlist name
  * emu.time() - return emulation time
- * emu.start(driver) - start given driver
+ * emu.pid() - return frontend process ID
+ *
+ * emu.driver_find(driver_name) - find and return game_driver for driver_name
+ * emu.start(driver_name) - start given driver_name
  * emu.pause() - pause emulation
  * emu.unpause() - unpause emulation
- * emu.register_prestart(callback) - callback before reset
- * emu.register_start(callback) - callback after reset
- * emu.register_stop(callback) - callback after stopping
- * emu.register_pause(callback) - callback at pause
- * emu.register_resume(callback) - callback at resume
- * emu.register_frame(callback) - callback at end of frame
- * emu.register_frame_done(callback) - callback after frame is drawn to screen (for overlays)
- * emu.register_periodic(callback) - periodic callback while program is running
- * emu.register_menu(event_callback, populate_callback, name) - callbacks for plugin menu
- * emu.print_verbose(str) -- output to stderr at verbose level
- * emu.print_error(str) -- output to stderr at error level
- * emu.print_info(str) -- output to stderr at info level
- * emu.print_debug(str) -- output to stderr at debug level
- * emu.driver_find(driver) -- find and return game_driver for driver
- * emu.wait(len) -- wait for len within coroutine
- * emu.lang_translate(str) -- get translation for str if available
+ * emu.step() - advance one frame
+ * emu.keypost(keys) - post keys to natural keyboard
+ * emu.wait(len) - wait for len within coroutine
+ * emu.lang_translate(str) - get translation for str if available
+ *
+ * emu.register_prestart(callback) - register callback before reset
+ * emu.register_start(callback) - register callback after reset
+ * emu.register_stop(callback) - register callback after stopping
+ * emu.register_pause(callback) - register callback at pause
+ * emu.register_resume(callback) - register callback at resume
+ * emu.register_frame(callback) - register callback at end of frame
+ * emu.register_frame_done(callback) - register callback after frame is drawn to screen (for overlays)
+ * emu.register_periodic(callback) - register periodic callback while program is running
+ * emu.register_callback(callback, name) - register callback to be used by MAME via lua_engine::call_plugin()
+ * emu.register_menu(event_callback, populate_callback, name) - register callbacks for plugin menu
+ * emu.register_mandatory_file_manager_override(callback) - register callback invoked to override mandatory file manager
+ * emu.register_before_load_settings(callback) - register callback to be run before settings are loaded
+ * emu.show_menu(menu_name) - show menu by name and pause the machine
+ *
+ * emu.print_verbose(str) - output to stderr at verbose level
+ * emu.print_error(str) - output to stderr at error level
+ * emu.print_info(str) - output to stderr at info level
+ * emu.print_debug(str) - output to stderr at debug level
  */
+
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
@@ -768,6 +817,10 @@ void lua_engine::initialize()
 		};
 	emu["pause"] = [this](){ return machine().pause(); };
 	emu["unpause"] = [this](){ return machine().resume(); };
+	emu["step"] = [this]() {
+			mame_machine_manager::instance()->ui().set_single_step(true);
+			machine().resume();
+		};
 	emu["register_prestart"] = [this](sol::function func){ register_function(func, "LUA_ON_PRESTART"); };
 	emu["register_start"] = [this](sol::function func){ register_function(func, "LUA_ON_START"); };
 	emu["register_stop"] = [this](sol::function func){ register_function(func, "LUA_ON_STOP"); };
@@ -776,6 +829,8 @@ void lua_engine::initialize()
 	emu["register_frame"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME"); };
 	emu["register_frame_done"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME_DONE"); };
 	emu["register_periodic"] = [this](sol::function func){ register_function(func, "LUA_ON_PERIODIC"); };
+	emu["register_mandatory_file_manager_override"] = [this](sol::function func) { register_function(func, "LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE"); };
+	emu["register_before_load_settings"] = [this](sol::function func) { register_function(func, "LUA_ON_BEFORE_LOAD_SETTINGS"); };
 	emu["register_menu"] = [this](sol::function cb, sol::function pop, const std::string &name) {
 			std::string cbfield = "menu_cb_" + name;
 			std::string popfield = "menu_pop_" + name;
@@ -815,16 +870,21 @@ void lua_engine::initialize()
 	emu["lang_translate"] = &lang_translate;
 	emu["pid"] = &osd_getpid;
 
-/*
- * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
- *                                     support zipped files on the searchpath
- * file:open(name) - open first file matching name in searchpath, supports read and write sockets as "socket.127.0.0.1:1234"
+
+/*  emu_file library
+ *
+ * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style
+ *                                     with 'rwc' with addtional c for create *and truncate*
+ *                                     (be careful) support zipped files on the searchpath
+ *
+ * file:open(name) - open first file matching name in searchpath. supports read
+ *                   and write sockets as "socket.127.0.0.1:1234"
  * file:open_next() - open next file matching name in searchpath
  * file:read(len) - only reads len bytes, doesn't do lua style formats
  * file:write(data) - write data to file
  * file:seek(offset, whence) - whence is as C "SEEK_*" int
  * file:seek([opt] whence, [opt] offset) - lua style "set"|"cur"|"end", returns cur offset
- * file:size() -
+ * file:size() - file size in bytes
  * file:filename() - name of current file, container name if file is in zip
  * file:fullpath() -
 */
@@ -918,11 +978,17 @@ void lua_engine::initialize()
 			"filename", &emu_file::filename,
 			"fullpath", &emu_file::fullpath);
 
-/*
+
+/*  thread library
+ *
  * emu.thread()
- * thread.start(scr) - run scr (string not function) in a seperate thread in a new empty (other then modules) lua context
- * thread.continue(val) - resume thread and pass val to it
- * thread.result() - get thread result as string
+ *
+ * thread:start(scr) - run scr (lua code as string) in a separate thread
+ *                     in a new empty (other than modules) lua context.
+ *                     thread runs until yield() and/or terminates on return.
+ * thread:continue(val) - resume thread that has yielded and pass val to it
+ *
+ * thread.result - get result of a terminated thread as string
  * thread.busy - check if thread is running
  * thread.yield - check if thread is yielded
  */
@@ -981,10 +1047,14 @@ void lua_engine::initialize()
 			"busy", sol::readonly(&context::busy),
 			"yield", sol::readonly(&context::yield));
 
-/*
+
+/*  save_item library
+ *
  * emu.item(item_index)
+ *
  * item.size - size of the raw data type
  * item.count - number of entries
+ *
  * item:read(offset) - read entry value by index
  * item:read_block(offset, count) - read a block of entry values as a string (byte addressing)
  * item:write(offset, value) - write entry value by index
@@ -1050,12 +1120,18 @@ void lua_engine::initialize()
 					}
 				});
 
-/* manager:options()
- * machine:options()
- * machine:ui():options()
+
+/*  core_options library
+ *
+ * manager:options()
+ * manager:machine():options()
+ * manager:ui():options()
+ * manager:plugins()
+ *
  * options:help() - get help for options
  * options:command(command) - return output for command
- * options.entries[] - get table of option entries
+ *
+ * options.entries[] - get table of option entries (k=name, v=core_options::entry)
  */
 
 	sol().registry().new_usertype<core_options>("core_options", "new", sol::no_constructor,
@@ -1082,14 +1158,18 @@ void lua_engine::initialize()
 				return table;
 			}));
 
-/* options.entries[entry_name]
- * entry.value() - get value of entry
- * entry.value(val) - set entry to val
- * entry.description() - get info about entry
- * entry.default_value() - get default for entry
- * entry.minimum() - get min value for entry
- * entry.maximum() - get max value for entry
- * entry.has_range() - are min and max valid for entry
+
+/*  core_options::entry library
+ *
+ * options.entries[entry_name]
+ *
+ * entry:value() - get value of entry
+ * entry:value(val) - set entry to val
+ * entry:description() - get info about entry
+ * entry:default_value() - get default for entry
+ * entry:minimum() - get min value for entry
+ * entry:maximum() - get max value for entry
+ * entry:has_range() - are min and max valid for entry
  */
 
 	sol().registry().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor,
@@ -1138,27 +1218,41 @@ void lua_engine::initialize()
 			"maximum", &core_options::entry::maximum,
 			"has_range", &core_options::entry::has_range);
 
-/* manager:machine()
+
+/*  running_machine library
+ *
+ * manager:machine()
+ *
  * machine:exit() - close program
  * machine:hard_reset() - hard reset emulation
  * machine:soft_reset() - soft reset emulation
  * machine:save(filename) - save state to filename
  * machine:load(filename) - load state from filename
+ * machine:popmessage(str) - print str as popup
+ * machine:popmessage() - clear displayed popup message
+ * machine:logerror(str) - print str to log
+ *
  * machine:system() - get game_driver for running driver
  * machine:video() - get video_manager
+ * machine:sound() - get sound_manager
  * machine:render() - get render_manager
  * machine:ioport() - get ioport_manager
  * machine:parameters() - get parameter_manager
+ * machine:memory() - get memory_manager
  * machine:options() - get machine core_options
- * machine:output() - get output_manager
+ * machine:outputs() - get output_manager
  * machine:input() - get input_manager
  * machine:uiinput() - get ui_input_manager
+ * machine:debugger() - get debugger_manager
+ *
  * machine.paused - get paused state
- * machine.devices[] - get device table
- * machine.screens[] - get screens table
- * machine.images[] - get available image devices
- * machine:popmessage(str) - print str as popup
- * machine:logerror(str) - print str to log
+ * machine.samplerate - get audio sample rate
+ * machine.exit_pending
+ * machine.hard_reset_pending
+ *
+ * machine.devices[] - get device table (k=tag, v=device_t)
+ * machine.screens[] - get screens table (k=tag, v=screen_device)
+ * machine.images[] - get available image devices table (k=type, v=device_image_interface)
  */
 
 	sol().registry().new_usertype<running_machine> ("machine", "new", sol::no_constructor,
@@ -1169,6 +1263,7 @@ void lua_engine::initialize()
 			"load", &running_machine::schedule_load,
 			"system", &running_machine::system,
 			"video", &running_machine::video,
+			"sound", &running_machine::sound,
 			"render", &running_machine::render,
 			"ioport", &running_machine::ioport,
 			"parameters", &running_machine::parameters,
@@ -1183,6 +1278,9 @@ void lua_engine::initialize()
 					return sol::make_object(sol(), &m.debugger());
 				},
 			"paused", sol::property(&running_machine::paused),
+			"samplerate", sol::property(&running_machine::sample_rate),
+			"exit_pending", sol::property(&running_machine::exit_pending),
+			"hard_reset_pending", sol::property(&running_machine::hard_reset_pending),
 			"devices", sol::property([this](running_machine &m) {
 					std::function<void(device_t &, sol::table)> tree;
 					sol::table table = sol().create_table();
@@ -1221,7 +1319,31 @@ void lua_engine::initialize()
 					[](running_machine &m) { m.popmessage(); }),
 			"logerror", [](running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); } );
 
-/* game_driver - this should be self explanatory
+
+/*  game_driver library
+ *
+ * emu.driver_find(driver_name)
+ *
+ * driver.source_file - relative path to the source file
+ * driver.parent
+ * driver.name
+ * driver.description
+ * driver.year
+ * driver.manufacturer
+ * driver.compatible_with
+ * driver.default_layout
+ * driver.orientation - screen rotation degree (rot0/90/180/270)
+ * driver.type - machine type (arcade/console/computer/other)
+ * driver.not_working - not considered working
+ * driver.supports_save - supports save states
+ * driver.no_cocktail - screen flip support is missing
+ * driver.is_bios_root - this driver entry is a BIOS root
+ * driver.requires_artwork - requires external artwork for key game elements
+ * driver.clickable_artwork - artwork is clickable and requires mouse cursor
+ * driver.unofficial - unofficial hardware modification
+ * driver.no_sound_hw - system has no sound output
+ * driver.mechanical - contains mechanical parts (pinball, redemption games, ...)
+ * driver.is_incomplete - official system with blatantly incomplete hardware/software
  */
 
 	sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
@@ -1232,14 +1354,72 @@ void lua_engine::initialize()
 			"year", sol::readonly(&game_driver::year),
 			"manufacturer", sol::readonly(&game_driver::manufacturer),
 			"compatible_with", sol::readonly(&game_driver::compatible_with),
-			"default_layout", sol::readonly(&game_driver::default_layout));
+			"default_layout", sol::readonly(&game_driver::default_layout),
+			"orientation", sol::property([](game_driver const &driver) {
+					std::string rot;
+					switch (driver.flags & machine_flags::MASK_ORIENTATION)
+					{
+					case machine_flags::ROT0:
+						rot = "rot0";
+						break;
+					case machine_flags::ROT90:
+						rot = "rot90";
+						break;
+					case machine_flags::ROT180:
+						rot = "rot180";
+						break;
+					case machine_flags::ROT270:
+						rot = "rot270";
+						break;
+					default:
+						rot = "undefined";
+						break;
+					}
+					return rot;
+				}),
+			"type", sol::property([](game_driver const &driver) {
+					std::string type;
+					switch (driver.flags & machine_flags::MASK_TYPE)
+					{
+					case machine_flags::TYPE_ARCADE:
+						type = "arcade";
+						break;
+					case machine_flags::TYPE_CONSOLE:
+						type = "console";
+						break;
+					case machine_flags::TYPE_COMPUTER:
+						type = "computer";
+						break;
+					default:
+						type = "other";
+						break;
+					}
+					return type;
+				}),
+			"not_working", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) > 0; }),
+			"supports_save", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) > 0; }),
+			"no_cocktail", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) > 0; }),
+			"is_bios_root", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) > 0; }),
+			"requires_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) > 0; }),
+			"clickable_artwork", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::CLICKABLE_ARTWORK) > 0; }),
+			"unofficial", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::UNOFFICIAL) > 0; }),
+			"no_sound_hw", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::NO_SOUND_HW) > 0; }),
+			"mechanical", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::MECHANICAL) > 0; }),
+			"is_incomplete", sol::property([](game_driver const &driver) { return (driver.flags & machine_flags::IS_INCOMPLETE) > 0; }
+		));
 
-/* machine:debugger()
- * debug:command(cmd) - run cmd in debugger console
- * debug.consolelog[] - get consolelog
- * debug.errorlog[] - get errorlog
- * debug.visible_cpu - accessor for debugger active cpu for commands, affects debug views
- * debug.execution_state - accessor for active cpu run state
+
+/*  debugger_manager library (requires debugger to be active)
+ *
+ * manager:machine():debugger()
+ *
+ * debugger:command(command_string) - run command_string in debugger console
+ *
+ * debugger.consolelog[] - get consolelog text buffer (wrap_textbuf)
+ * debugger.errorlog[] - get errorlog text buffer (wrap_textbuf)
+ *
+ * debugger.visible_cpu - accessor for debugger active cpu for commands, affects debug views
+ * debugger.execution_state - accessor for active cpu run state
  */
 
 	struct wrap_textbuf { wrap_textbuf(text_buffer *buf) { textbuf = buf; }; text_buffer *textbuf; };
@@ -1260,22 +1440,40 @@ void lua_engine::initialize()
 						debug.cpu().set_execution_running();
 				}));
 
+
+/*  wrap_textbuf library (requires debugger to be active)
+ *
+ * manager:machine():debugger().consolelog
+ * manager:machine():debugger().errorlog
+ *
+ * log[index] - get log entry
+ * #log - entry count
+ */
+
 	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
 			"__metatable", [](){},
 			"__newindex", [](){},
 			"__index", [](wrap_textbuf &buf, int index) { return text_buffer_get_seqnum_line(buf.textbuf, index - 1); },
 			"__len", [](wrap_textbuf &buf) { return text_buffer_num_lines(buf.textbuf) + text_buffer_line_index_to_seqnum(buf.textbuf, 0) - 1; });
 
-/* device:debug()
+
+/*  device_debug library (requires debugger to be active)
+ *
+ * manager:machine().devices[device_tag]:debug()
+ *
  * debug:step([opt] steps) - run cpu steps, default 1
  * debug:go() - run cpu
- * debug:bpset(addr, cond, act) - set break, cond and act are debugger expressions
+ * debug:bpset(addr, [opt] cond, [opt] act) - set breakpoint on addr, cond and act are debugger
+ *                                            expressions. returns breakpoint index
  * debug:bpclr(idx) - clear break
- * debug:bplist()[] - table of breakpoints
- * debug:wpset(space, type, addr, len, cond, act) - set watch, cond and act are debugger expressions
+ * debug:bplist()[] - table of breakpoints (k=index, v=device_debug::breakpoint)
+ * debug:wpset(space, type, addr, len, [opt] cond, [opt] act) - set watchpoint, cond and act
+ *                                                              are debugger expressions.
+ *                                                              returns watchpoint index
  * debug:wpclr(idx) - clear watch
- * debug:wplist(space)[] - table of watchpoints
+ * debug:wplist(space)[] - table of watchpoints (k=index, v=watchpoint)
  */
+
 	sol().registry().new_usertype<device_debug>("device_debug", "new", sol::no_constructor,
 			"step", [](device_debug &dev, sol::object num) {
 					int steps = 1;
@@ -1341,15 +1539,19 @@ void lua_engine::initialize()
 				});
 
 
-/* machine.devices[device_tag]
+/*  device_t library
+ *
+ * manager:machine().devices[device_tag]
+ *
  * device:name() - device long name
  * device:shortname() - device short name
  * device:tag() - device tree tag
  * device:owner() - device parent tag
  * device:debug() - debug interface, cpus only
- * device.spaces[] - device address spaces table
- * device.state[] - device state entries table
- * device.items[] - device save state items table (item name is key, item index is value)
+ *
+ * device.spaces[] - device address spaces table (k=name, v=addr_space)
+ * device.state[] - device state entries table (k=name, v=device_state_entry)
+ * device.items[] - device save state items table (k=name, v=index)
  */
 
 	sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor,
@@ -1406,6 +1608,28 @@ void lua_engine::initialize()
 					return table;
 				}));
 
+
+/*  addr_space library
+ *
+ * manager:machine().devices[device_tag].spaces[space]
+ *
+ * read/write by signedness u/i and bit-width 8/16/32/64:
+ * space:read_*(addr)
+ * space:write_*(addr, val)
+ * space:read_log_*(addr)
+ * space:write_log_*(addr, val)
+ * space:read_direct_*(addr)
+ * space:write_direct_*(addr, val)
+ *
+ * space.name - address space name
+ * space.shift - address bus shift, bitshift required for a bytewise address
+ *               to map onto this space's addess resolution (addressing granularity).
+ *               positive value means leftshift, negative means rightshift.
+ * space.index
+ *
+ * space.map[] - table of address map entries (k=index, v=address_map_entry)
+ */
+
 	sol().registry().new_usertype<addr_space>("addr_space", sol::call_constructor, sol::constructors<sol::types<address_space &, device_memory_interface &>>(),
 			"read_i8", &addr_space::mem_read<int8_t>,
 			"read_u8", &addr_space::mem_read<uint8_t>,
@@ -1458,6 +1682,16 @@ void lua_engine::initialize()
 			"name", sol::property([](addr_space &sp) { return sp.space.name(); }),
 			"shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }),
 			"index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }),
+
+/* address_map_entry library
+ *
+ * manager:machine().devices[device_tag].spaces[space].map[entry_index]
+ *
+ * mapentry.offset - address start
+ * mapentry.endoff - address end
+ * mapentry.readtype
+ * mapentry.writetype
+ */
 			"map", sol::property([this](addr_space &sp) {
 					address_space &space = sp.space;
 					sol::table map = sol().create_table();
@@ -1473,13 +1707,23 @@ void lua_engine::initialize()
 					return map;
 				}));
 
-/* machine:ioport()
+
+/*  ioport_manager library
+ *
+ * manager:machine():ioport()
+ *
  * ioport:count_players() - get count of player controllers
- * ioport.ports[] - ioports table
+ * ioport:type_group(type, player)
+ *
+ * ioport.ports[] - ioports table (k=tag, v=ioport_port)
  */
 
 	sol().registry().new_usertype<ioport_manager>("ioport", "new", sol::no_constructor,
 			"count_players", &ioport_manager::count_players,
+			"natkeyboard", &ioport_manager::natkeyboard,
+			"type_group", [](ioport_manager &im, ioport_type type, int player) {
+				return im.type_group(type, player);
+			},
 			"ports", sol::property([this](ioport_manager &im) {
 					sol::table port_table = sol().create_table();
 					for (auto &port : im.ports())
@@ -1487,14 +1731,38 @@ void lua_engine::initialize()
 					return port_table;
 				}));
 
-/* ioport.ports[port_tag]
+/*  natural_keyboard library
+ *
+ * manager:machine():ioport():natkeyboard()
+ *
+ * natkeyboard:paste() - paste clipboard data
+ * natkeyboard:post() - post data to natural keyboard
+ * natkeyboard:post_coded() - post data to natural keyboard
+ *
+ * natkeyboard.empty - is the natural keyboard buffer empty?
+ * natkeyboard.in_use - is the natural keyboard in use?
+ */
+
+	sol().registry().new_usertype<natural_keyboard>("natkeyboard", "new", sol::no_constructor,
+			"empty", sol::property(&natural_keyboard::empty),
+			"in_use", sol::property(&natural_keyboard::in_use, &natural_keyboard::set_in_use),
+			"paste", &natural_keyboard::paste,
+			"post", [](natural_keyboard &nat, const std::string &text)          { nat.post_utf8(text); },
+			"post_coded", [](natural_keyboard &nat, const std::string &text)    { nat.post_coded(text); });
+
+
+/*  ioport_port library
+ *
+ * manager:machine():ioport().ports[port_tag]
+ *
  * port:tag() - get port tag
  * port:active() - get port status
  * port:live() - get port ioport_port_live (TODO: not usable from lua as of now)
  * port:read() - get port value
  * port:write(val, mask) - set port to value & mask (output fields only, for other fields use field:set_value(val))
  * port:field(mask) - get ioport_field for port and mask
- * port.field[] - get ioport_field table
+ *
+ * port.fields[] - get ioport_field table (k=name, v=ioport_field)
  */
 
 	sol().registry().new_usertype<ioport_port>("ioport_port", "new", sol::no_constructor,
@@ -1525,12 +1793,78 @@ void lua_engine::initialize()
 					return f_table;
 				}));
 
-/* port.field[field_tag] - this should be self explanatory
+
+/*  ioport_field library
+ *
+ * manager:machine():ioport().ports[port_tag].fields[field_name]
+ *
+ * field:set_value(value)
+ * field:set_input_seq(seq_type, seq)
+ * field:input_seq(seq_type)
+ * field:set_default_input_seq(seq_type, seq)
+ * field:default_input_seq(seq_type)
+ * field:keyboard_codes(which)
+ *
+ * field.device - get associated device_t
+ * field.port - get associated ioport_port
+ * field.live - get ioport_field_live
+ * field.name
+ * field.default_name
+ * field.player
+ * field.mask
+ * field.defvalue
+ * field.sensitivity
+ * field.way - amount of available directions
+ * field.type_class
+ * field.is_analog
+ * field.is_digital_joystick
+ * field.enabled
+ * field.optional
+ * field.cocktail
+ * field.toggle - whether field is a toggle
+ * field.rotated
+ * field.analog_reverse
+ * field.analog_reset
+ * field.analog_wraps
+ * field.analog_invert
+ * field.impulse
+ * field.type
+ * field.crosshair_scale
+ * field.crosshair_offset
+ * field.user_value
  */
 
 	sol().registry().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
 			"set_value", &ioport_field::set_value,
+			"set_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				settings.seq[seq_type] = seq;
+				f.set_user_settings(settings);
+			},
+			"input_seq", [](ioport_field &f, const std::string &seq_type_string) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				return sol::make_user(f.seq(seq_type));
+			},
+			"set_default_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				f.set_defseq(seq_type, seq);
+			},
+			"default_input_seq", [](ioport_field &f, const std::string &seq_type_string) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				return sol::make_user(f.defseq(seq_type));
+			},
+			"keyboard_codes", [this](ioport_field &f, int which)
+			{
+				sol::table result = sol().create_table();
+				int index = 1;
+				for (char32_t code : f.keyboard_codes(which))
+					result[index++] = code;
+				return result;
+			},
 			"device", sol::property(&ioport_field::device),
+			"port", sol::property(&ioport_field::port),
 			"name", sol::property(&ioport_field::name),
 			"default_name", sol::property([](ioport_field &f) {
 					return f.specific_name() ? f.specific_name() : f.manager().type_name(f.type(), f.player());
@@ -1540,6 +1874,18 @@ void lua_engine::initialize()
 			"defvalue", sol::property(&ioport_field::defvalue),
 			"sensitivity", sol::property(&ioport_field::sensitivity),
 			"way", sol::property(&ioport_field::way),
+			"type_class", sol::property([](ioport_field &f) {
+					switch (f.type_class())
+					{
+					case INPUT_CLASS_KEYBOARD:      return "keyboard";
+					case INPUT_CLASS_CONTROLLER:    return "controller";
+					case INPUT_CLASS_CONFIG:        return "config";
+					case INPUT_CLASS_DIPSWITCH:     return "dipswitch";
+					case INPUT_CLASS_MISC:          return "misc";
+					default:                        break;
+					}
+					throw false;
+				}),
 			"is_analog", sol::property(&ioport_field::is_analog),
 			"is_digital_joystick", sol::property(&ioport_field::is_digital_joystick),
 			"enabled", sol::property(&ioport_field::enabled),
@@ -1555,31 +1901,58 @@ void lua_engine::initialize()
 			"type", sol::property(&ioport_field::type),
 			"live", sol::property(&ioport_field::live),
 			"crosshair_scale", sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale),
-			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset));
+			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset),
+			"user_value", sol::property([](ioport_field &f) {
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				return settings.value;
+			}, [](ioport_field &f, ioport_value val) {
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				settings.value = val;
+				f.set_user_settings(settings);
+			}));
 
-/* field.live
+
+/*  ioport_field_live library
+ *
+ * manager:machine():ioport().ports[port_tag].fields[field_name].live
+ *
+ * live.name
  */
 
 	sol().registry().new_usertype<ioport_field_live>("ioport_field_live", "new", sol::no_constructor,
 			"name", &ioport_field_live::name);
 
-/* machine:parameters()
- * parameter:add(tag, val) - add tag = val parameter
- * parameter:lookup(tag) - get val for tag
+
+/*  parameters_manager library
+ *
+ * manager:machine():parameters()
+ *
+ * parameters:add(tag, val) - add tag = val parameter
+ * parameters:lookup(tag) - get val for tag
  */
 
 	sol().registry().new_usertype<parameters_manager>("parameters", "new", sol::no_constructor,
 			"add", &parameters_manager::add,
 			"lookup", &parameters_manager::lookup);
 
-/* machine:video()
- * video:begin_recording([opt] filename) - start recording to filename if given or default
- * video:end_recording() - stop recording
- * video:snapshot() - save shot of all screens
+
+/*  video_manager library
+ *
+ * manager:machine():video()
+ *
+ * video:begin_recording([opt] filename) - start AVI recording to filename if given or default
+ * video:end_recording() - stop AVI recording
  * video:is_recording() - get recording status
+ * video:snapshot() - save shot of all screens
  * video:skip_this_frame() - is current frame going to be skipped
  * video:speed_factor() - get speed factor
  * video:speed_percent() - get percent from realtime
+ * video:frame_update() - render a frame
+ * video:size() - get width and height of snapshot bitmap in pixels
+ * video:pixels() - get binary bitmap of all screens as string
+ *
  * video.frameskip - current frameskip
  * video.throttled - throttle state
  * video.throttle_rate - throttle rate
@@ -1606,12 +1979,63 @@ void lua_engine::initialize()
 			"skip_this_frame", &video_manager::skip_this_frame,
 			"speed_factor", &video_manager::speed_factor,
 			"speed_percent", &video_manager::speed_percent,
+			"effective_frameskip", &video_manager::effective_frameskip,
 			"frame_update", &video_manager::frame_update,
+			"size", [](video_manager &vm) {
+					s32 width, height;
+					vm.compute_snapshot_size(width, height);
+					return std::tuple<s32, s32>(width, height);
+				},
+			"pixels", [](video_manager &vm, sol::this_state s) {
+					lua_State *L = s;
+					luaL_Buffer buff;
+					s32 width, height;
+					vm.compute_snapshot_size(width, height);
+					int size = width * height * 4;
+					u32 *ptr = (u32 *)luaL_buffinitsize(L, &buff, size);
+					vm.pixels(ptr);
+					luaL_pushresultsize(&buff, size);
+					return sol::make_reference(L, sol::stack_reference(L, -1));
+				},
 			"frameskip", sol::property(&video_manager::frameskip, &video_manager::set_frameskip),
 			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
 
-/* machine:input()
+/*  sound_manager library
+ *
+ * manager:machine():sound()
+ *
+ * sound:start_recording() - begin audio recording
+ * sound:stop_recording() - end audio recording
+ * sound:ui_mute(turn_off) - turns on/off UI sound
+ * sound:system_mute() - turns on/off system sound
+ * sound:samples() - get current frame's audio buffer contents in binary form as string
+ *
+ * sound.attenuation - sound attenuation
+ */
+
+	sol().registry().new_usertype<sound_manager>("sound", "new", sol::no_constructor,
+			"start_recording", &sound_manager::start_recording,
+			"stop_recording", &sound_manager::stop_recording,
+			"ui_mute", &sound_manager::ui_mute,
+			"debugger_mute", &sound_manager::debugger_mute,
+			"system_mute", &sound_manager::system_mute,
+			"samples", [](sound_manager &sm, sol::this_state s) {
+					lua_State *L = s;
+					luaL_Buffer buff;
+					s32 count = sm.sample_count() * 2 * 2; // 2 channels, 2 bytes per sample
+					s16 *ptr = (s16 *)luaL_buffinitsize(L, &buff, count);
+					sm.samples(ptr);
+					luaL_pushresultsize(&buff, count);
+					return sol::make_reference(L, sol::stack_reference(L, -1));
+				},
+			"attenuation", sol::property(&sound_manager::attenuation, &sound_manager::set_attenuation));
+
+
+/*  input_manager library
+ *
+ * manager:machine():input()
+ *
  * input:code_from_token(token) - get input_code for KEYCODE_* string token
  * input:code_pressed(code) - get pressed state for input_code
  * input:code_to_token(code) - get KEYCODE_* string token for code
@@ -1620,6 +2044,12 @@ void lua_engine::initialize()
  * input:seq_pressed(seq) - get pressed state for input_seq
  * input:seq_to_tokens(seq) - get KEYCODE_* string tokens for seq
  * input:seq_name(seq) - get seq friendly name
+ * input:seq_clean(seq) - clean the seq and remove invalid elements
+ * input:seq_poll_start(class, [opt] start_seq) - start polling for input_item_class passed as string
+ *                                                (switch/abs[olute]/rel[ative]/max[imum])
+ * input:seq_poll() - poll once, returns true if input was fetched
+ * input:seq_poll_final() - get final input_seq
+ * input.device_classes - returns device classes
  */
 
 	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,
@@ -1631,18 +2061,112 @@ void lua_engine::initialize()
 			"seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); },
 			"seq_to_tokens", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_to_tokens(seq); },
 			"seq_name", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_name(seq); },
-			"seq_poll_start", [](input_manager &input, input_item_class cls, sol::object seq) {
-					input_seq *start = nullptr;
-					if(seq.is<sol::user<input_seq>>())
-						start = &seq.as<sol::user<input_seq>>();
-					input.seq_poll_start(cls, start);
-				},
-			"seq_poll", &input_manager::seq_poll,
-			"seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); });
+			"seq_clean", [](input_manager &input, sol::user<input_seq> seq) { input_seq cleaned_seq = input.seq_clean(seq); return sol::make_user(cleaned_seq); },
+			"seq_poll_start", [](input_manager &input, const char *cls_string, sol::object seq) {
+				input_item_class cls;
+				if (!strcmp(cls_string, "switch"))
+					cls = ITEM_CLASS_SWITCH;
+				else if (!strcmp(cls_string, "absolute") || !strcmp(cls_string, "abs"))
+					cls = ITEM_CLASS_ABSOLUTE;
+				else if (!strcmp(cls_string, "relative") || !strcmp(cls_string, "rel"))
+					cls = ITEM_CLASS_RELATIVE;
+				else if (!strcmp(cls_string, "maximum") || !strcmp(cls_string, "max"))
+					cls = ITEM_CLASS_MAXIMUM;
+				else
+					cls = ITEM_CLASS_INVALID;
 
-/* machine:uiinput()
- * uiinput:find_mouse() - returns x, y, button state, ui render target
+				input_seq *start = nullptr;
+				if(seq.is<sol::user<input_seq>>())
+					start = &seq.as<sol::user<input_seq>>();
+				input.seq_poll_start(cls, start);
+			},
+			"seq_poll", &input_manager::seq_poll,
+			"seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); },
+			"device_classes", sol::property([this](input_manager &input)
+			{
+				sol::table result = sol().create_table();
+				for (input_device_class devclass_id = DEVICE_CLASS_FIRST_VALID; devclass_id <= DEVICE_CLASS_LAST_VALID; devclass_id++)
+				{
+					input_class &devclass = input.device_class(devclass_id);
+					result[devclass.name()] = &devclass;
+				}
+				return result;
+			}));
+
+/*  input_class library
+ *
+ * manager:machine():input().device_classes[devclass]
+ *
+ * devclass.name
+ * devclass.enabled
+ * devclass.multi
+ * devclass.devices[]
+ */
+	sol().registry().new_usertype<input_class>("input_class", "new", sol::no_constructor,
+		"name", sol::property(&input_class::name),
+		"enabled", sol::property(&input_class::enabled, &input_class::enable),
+		"multi", sol::property(&input_class::multi, &input_class::set_multi),
+		"devices", sol::property([this](input_class &devclass)
+			{
+				sol::table result = sol().create_table();
+				int index = 1;
+				for (int devindex = 0; devindex <= devclass.maxindex(); devindex++)
+				{
+					input_device *dev = devclass.device(devindex);
+					if (dev)
+						result[index++] = dev;
+				}
+				return result;
+			}));
+
+/*  input_device library
+ *
+ * manager:machine():input().device_classes[devclass].devices[index]
+ * device.name
+ * device.id
+ * device.devindex
+ * device.items[]
+ */
+
+	sol().registry().new_usertype<input_device>("input_device", "new", sol::no_constructor,
+		"name", sol::property(&input_device::name),
+		"id", sol::property(&input_device::id),
+		"devindex", sol::property(&input_device::devindex),
+		"items", sol::property([this](input_device &dev)
+		{
+			sol::table result = sol().create_table();
+			for (input_item_id id = ITEM_ID_FIRST_VALID; id < dev.maxitem(); id++)
+			{
+				input_device_item *item = dev.item(id);
+				if (item)
+					result[id] = dev.item(id);
+			}
+			return result;
+		}));
+
+/*  input_device_item library
+ *
+ * manager:machine():input().device_classes[devclass].devices[index].items[item_id]
+ * item.name
+ * item.token
+ * item:code()
+ */
+	sol().registry().new_usertype<input_device_item>("input_device_item", "new", sol::no_constructor,
+		"name", sol::property(&input_device_item::name),
+		"token", sol::property(&input_device_item::token),
+		"code", [](input_device_item &item)
+		{
+			input_code code(item.device().devclass(), item.device().devindex(), item.itemclass(), ITEM_MODIFIER_NONE, item.itemid());
+			return sol::make_user(code);
+		});
+
+/*  ui_input_manager library
+ *
+ * manager:machine():uiinput()
+ *
+ * uiinput:find_mouse() - return x, y, button state, ui render target
  * uiinput:pressed(key) - get pressed state for ui key
+ * uiinput.presses_enabled - enable/disable ui key presses
  */
 
 	sol().registry().new_usertype<ui_input_manager>("uiinput", "new", sol::no_constructor,
@@ -1652,10 +2176,15 @@ void lua_engine::initialize()
 					render_target *rt = ui.find_mouse(&x, &y, &button);
 					return std::tuple<int32_t, int32_t, bool, render_target *>(x, y, button, rt);
 				},
-			"pressed", &ui_input_manager::pressed);
+			"pressed", &ui_input_manager::pressed,
+			"presses_enabled", sol::property(&ui_input_manager::presses_enabled, &ui_input_manager::set_presses_enabled));
 
-/* render.targets[target_index]
- * render:ui_target()
+
+/*  render_target library
+ *
+ * manager:machine():render().targets[target_index]
+ * manager:machine():render():ui_target()
+ *
  * target:view_bounds() - get x0, x1, y0, y1 bounds for target
  * target:width() - get target width
  * target:height() - get target height
@@ -1663,13 +2192,11 @@ void lua_engine::initialize()
  * target:hidden() - is target hidden
  * target:is_ui_target() - is ui render target
  * target:index() - target index
- * target:view_name(index) - current target layout view name
+ * target:view_name([opt] index) - current target layout view name
+ *
  * target.max_update_rate -
  * target.view - current target layout view
  * target.orientation - current target orientation
- * target.backdrops - enable backdrops
- * target.bezels - enable bezels
- * target.marquees - enable marquees
  * target.screen_overlay - enable overlays
  * target.zoom - enable zoom
  */
@@ -1689,14 +2216,20 @@ void lua_engine::initialize()
 			"max_update_rate", sol::property(&render_target::max_update_rate, &render_target::set_max_update_rate),
 			"view", sol::property(&render_target::view, &render_target::set_view),
 			"orientation", sol::property(&render_target::orientation, &render_target::set_orientation),
-			"backdrops", sol::property(&render_target::backdrops_enabled, &render_target::set_backdrops_enabled),
-			"overlays", sol::property(&render_target::overlays_enabled, &render_target::set_overlays_enabled),
-			"bezels", sol::property(&render_target::bezels_enabled, &render_target::set_bezels_enabled),
-			"marquees", sol::property(&render_target::marquees_enabled, &render_target::set_marquees_enabled),
 			"screen_overlay", sol::property(&render_target::screen_overlay_enabled, &render_target::set_screen_overlay_enabled),
 			"zoom", sol::property(&render_target::zoom_to_screen, &render_target::set_zoom_to_screen));
 
-/* render:ui_container() - this should be self explanatory
+
+/*  render_container library
+ *
+ * manager:machine():render():ui_container()
+ *
+ * container:orientation()
+ * container:xscale()
+ * container:yscale()
+ * container:xoffset()
+ * container:yoffset()
+ * container:is_empty()
  */
 
 	sol().registry().new_usertype<render_container>("render_container", "new", sol::no_constructor,
@@ -1707,10 +2240,15 @@ void lua_engine::initialize()
 			"yoffset", &render_container::yoffset,
 			"is_empty", &render_container::is_empty);
 
-/* machine:render()
+
+/*  render_manager library
+ *
+ * manager:machine():render()
+ *
  * render:max_update_rate() -
- * render:ui_target() - target for ui drawing
- * render:ui_container() - container for ui drawing
+ * render:ui_target() - render_target for ui drawing
+ * render:ui_container() - render_container for ui drawing
+ *
  * render.targets[] - render_target table
  */
 
@@ -1726,15 +2264,22 @@ void lua_engine::initialize()
 					return target_table;
 				}));
 
-/* machine.screens[screen_tag]
- * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol, color is 32bit argb
+
+/*  screen_device library
+ *
+ * manager:machine().screens[screen_tag]
+ *
+ * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol
+ *                                                     filled with fillcol, color is 32bit argb
  * screen:draw_line(x1, y1, x2, y2, linecol) - draw line from (x1, y1)-(x2, y2) colored linecol
- * screen:draw_text(x || justify, y, message, [opt] fgcolor, [opt] bgcolor) - draw message at (x, y) or at line y with left, right, center justification
+ * screen:draw_text(x || justify, y, message, [opt] fgcolor, [opt] bgcolor) - draw message at (x, y) or at line y
+ *                                                                            with left/right/center justification
  * screen:height() - screen height
  * screen:width() - screen width
  * screen:orientation() - screen angle, flipx, flipy
- * screen:refresh() - screen refresh rate
- * screen:snapshot() - save snap shot
+ * screen:refresh() - screen refresh rate in Hz
+ * screen:refresh_attoseconds() - screen refresh rate in attoseconds
+ * screen:snapshot([opt] filename) - save snap shot
  * screen:type() - screen drawing type
  * screen:frame_number() - screen frame count
  * screen:name() - screen device full name
@@ -1743,8 +2288,8 @@ void lua_engine::initialize()
  * screen:xscale() - screen x scale factor
  * screen:yscale() - screen y scale factor
  * screen:pixel(x, y) - get pixel at (x, y) as packed RGB in a u32
- * screen:pixels() - get whole screen bitmap as string
-*/
+ * screen:pixels() - get whole screen binary bitmap as string
+ */
 
 	sol().registry().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
 			"draw_box", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
@@ -1788,7 +2333,7 @@ void lua_engine::initialize()
 						luaL_error(m_lua_state, "Error in param 1 to draw_text");
 						return;
 					}
-					rgb_t textcolor = UI_TEXT_COLOR;
+					rgb_t textcolor = mame_machine_manager::instance()->ui().colors().text_color();
 					rgb_t bgcolor = 0;
 					if(color.is<uint32_t>())
 						textcolor = rgb_t(color.as<uint32_t>());
@@ -1823,20 +2368,33 @@ void lua_engine::initialize()
 					return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
 				},
 			"refresh", [](screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); },
+			"refresh_attoseconds", [](screen_device &sdev) { return sdev.refresh_attoseconds(); },
 			"snapshot", [this](screen_device &sdev, sol::object filename) -> sol::object {
-					emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-					osd_file::error filerr;
-					if(filename.is<const char *>())
+					std::string snapstr;
+					bool is_absolute_path = false;
+					if (filename.is<const char *>())
 					{
-						std::string snapstr(filename.as<const char *>());
-						strreplace(snapstr, "/", PATH_SEPARATOR);
-						strreplace(snapstr, "%g", machine().basename());
-						filerr = file.open(snapstr.c_str());
+						// a filename was specified; if it isn't absolute postprocess it
+						snapstr = filename.as<const char *>();
+						is_absolute_path = osd_is_absolute_path(snapstr);
+						if (!is_absolute_path)
+						{
+							strreplace(snapstr, "/", PATH_SEPARATOR);
+							strreplace(snapstr, "%g", machine().basename());
+						}
 					}
+
+					// open the file
+					emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					osd_file::error filerr;
+					if (!snapstr.empty())
+						filerr = file.open(snapstr);
 					else
 						filerr = machine().video().open_next(file, "png");
-					if(filerr != osd_file::error::NONE)
+					if (filerr != osd_file::error::NONE)
 						return sol::make_object(sol(), filerr);
+
+					// and save the snapshot
 					machine().video().save_snapshot(&sdev, file);
 					return sol::make_object(sol(), sol::nil);
 				},
@@ -1872,14 +2430,21 @@ void lua_engine::initialize()
 				}
 			);
 
-/* mame_manager:ui()
+
+/*  mame_ui_manager library
+ *
+ * manager:ui()
+ *
  * ui:is_menu_active() - ui menu state
  * ui:options() - ui core_options
- * ui.show_fps - fps display enabled
- * ui.show_profiler - profiler display enabled
  * ui:get_line_height() - current ui font height
  * ui:get_string_width(str, scale) - get str width with ui font at scale factor of current font size
  * ui:get_char_width(char) - get width of utf8 glyph char with ui font
+ * ui:set_aggressive_input_focus(bool)
+ *
+ * ui.single_step
+ * ui.show_fps - fps display enabled
+ * ui.show_profiler - profiler display enabled
  */
 
 	sol().registry().new_usertype<mame_ui_manager>("ui", "new", sol::no_constructor,
@@ -1891,13 +2456,19 @@ void lua_engine::initialize()
 			"get_line_height", &mame_ui_manager::get_line_height,
 			"get_string_width", &mame_ui_manager::get_string_width,
 			// sol converts char32_t to a string
-			"get_char_width", [](mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); });
+			"get_char_width", [](mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); },
+			"set_aggressive_input_focus", [](mame_ui_manager &m, bool aggressive_focus) { osd_set_aggressive_input_focus(aggressive_focus); });
 
-/* device.state[]
+
+/*  device_state_entry library
+ *
+ * manager:machine().devices[device_tag].state[state_name]
+ *
  * state:name() - get device state name
- * state:value() - get device state value
  * state:is_visible() - is state visible in debugger
  * state:is_divider() - is state a divider
+ *
+ * state.value - get device state value
  */
 
 	sol().registry().new_usertype<device_state_entry>("dev_space", "new", sol::no_constructor,
@@ -1922,7 +2493,11 @@ void lua_engine::initialize()
 			"is_visible", &device_state_entry::visible,
 			"is_divider", &device_state_entry::divider);
 
-/* machine:memory()
+
+/*  memory_manager library
+ *
+ * manager:machine():memory()
+ *
  * memory.banks[] - table of memory banks
  * memory.regions[] - table of memory regions
  * memory.shares[] - table of memory shares
@@ -1948,6 +2523,16 @@ void lua_engine::initialize()
 					return table;
 				}));
 
+/*  memory_region library
+ *
+ * manager:machine():memory().regions[region_tag]
+ *
+ * read/write by signedness u/i and bit-width 8/16/32/64:
+ * region:read_*(addr)
+ * region:write_*(addr, val)
+ *
+ * region.size
+ */
 	sol().registry().new_usertype<memory_region>("region", "new", sol::no_constructor,
 			"read_i8", &region_read<int8_t>,
 			"read_u8", &region_read<uint8_t>,
@@ -1966,6 +2551,17 @@ void lua_engine::initialize()
 			"write_i64", &region_write<int64_t>,
 			"write_u64", &region_write<uint64_t>,
 			"size", sol::property(&memory_region::bytes));
+
+/*  memory_share library
+ *
+ * manager:machine():memory().shares[share_tag]
+ *
+ * read/write by signedness u/i and bit-width 8/16/32/64:
+ * share:read_*(addr)
+ * share:write_*(addr, val)
+ *
+ * region.size
+*/
 
 	sol().registry().new_usertype<memory_share>("share", "new", sol::no_constructor,
 			"read_i8", &share_read<int8_t>,
@@ -1986,13 +2582,17 @@ void lua_engine::initialize()
 			"write_u64", &share_write<uint64_t>,
 			"size", sol::property(&memory_share::bytes));
 
-/* machine:output()
- * output:set_value(name, val) - set output name to val
- * output:set_indexed_value(index, val) - set output index to val
- * output:get_value(name) - get output name value
- * output:get_indexed_value(index) - get output index value
- * output:name_to_id(name) - get index for name
- * output:id_to_name(index) - get name for index
+
+/*  output_manager library
+ *
+ * manager:machine():outputs()
+ *
+ * outputs:set_value(name, val) - set output name to val
+ * outputs:set_indexed_value(index, val) - set output index to val
+ * outputs:get_value(name) - get output name value
+ * outputs:get_indexed_value(index) - get output index value
+ * outputs:name_to_id(name) - get index for name
+ * outputs:id_to_name(index) - get name for index
  */
 
 	sol().registry().new_usertype<output_manager>("output", "new", sol::no_constructor,
@@ -2003,7 +2603,33 @@ void lua_engine::initialize()
 			"name_to_id", &output_manager::name_to_id,
 			"id_to_name", &output_manager::id_to_name);
 
-/* machine.images[] - images are floppy/cart/cdrom/tape/hdd etc, otherwise this should be self explanatory
+
+/*  device_image_interface library
+ *
+ * manager:machine().images[image_type]
+ *
+ * image:exists()
+ * image:filename() - full path to the image file
+ * image:longname()
+ * image:manufacturer()
+ * image:year()
+ * image:software_list_name()
+ * image:image_type_name() - floppy/cart/cdrom/tape/hdd etc
+ * image:load()
+ * image:unload()
+ * image:create()
+ * image:crc()
+ * image:display()
+ *
+ * image.device - get associated device_t
+ * image.instance_name
+ * image.brief_instance_name
+ * image.software_parent
+ * image.is_readable
+ * image.is_writeable
+ * image.is_creatable
+ * image.is_reset_on_load
+ * image.must_be_loaded
  */
 
 	sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor,
@@ -2017,17 +2643,48 @@ void lua_engine::initialize()
 			"image_type_name", &device_image_interface::image_type_name,
 			"load", &device_image_interface::load,
 			"unload", &device_image_interface::unload,
+			"create", [](device_image_interface &di, const std::string &filename) { return di.create(filename); },
 			"crc", &device_image_interface::crc,
+			"display", [](device_image_interface &di) { return di.call_display(); },
 			"device", sol::property(static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device)),
+			"instance_name", sol::property(&device_image_interface::instance_name),
+			"brief_instance_name", sol::property(&device_image_interface::brief_instance_name),
 			"is_readable", sol::property(&device_image_interface::is_readable),
 			"is_writeable", sol::property(&device_image_interface::is_writeable),
 			"is_creatable", sol::property(&device_image_interface::is_creatable),
-			"is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
+			"is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load),
+			"must_be_loaded", sol::property(&device_image_interface::must_be_loaded)
+		);
+
+
+/*  mame_machine_manager library
+ *
+ * manager
+ * mame_manager - alias of manager
+ *
+ * manager:machine() - running machine
+ * manager:options() - core options
+ * manager:plugins() - plugin options
+ * manager:ui() - mame ui manager
+ */
 
 	sol().registry().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
 			"machine", &machine_manager::machine,
 			"options", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.options()); },
-			"plugins", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.plugins()); },
+			"plugins", [this](mame_machine_manager &m) {
+				sol::table table = sol().create_table();
+				for (auto &curentry : m.plugins().plugins())
+				{
+					sol::table plugin_table = sol().create_table();
+					plugin_table["name"] = curentry.m_name;
+					plugin_table["description"] = curentry.m_description;
+					plugin_table["type"] = curentry.m_type;
+					plugin_table["directory"] = curentry.m_directory;
+					plugin_table["start"] = curentry.m_start;
+					table[curentry.m_name] = plugin_table;
+				}
+				return table;
+			},
 			"ui", &mame_machine_manager::ui);
 	sol()["manager"] = std::ref(*mame_machine_manager::instance());
 	sol()["mame_manager"] = std::ref(*mame_machine_manager::instance());
@@ -2074,7 +2731,7 @@ void lua_engine::run(sol::load_result res)
 {
 	if(res.valid())
 	{
-		auto ret = (res.get<sol::protected_function>())();
+		auto ret = invoke(res.get<sol::protected_function>());
 		if(!ret.valid())
 		{
 			sol::error err = ret;
@@ -2101,4 +2758,17 @@ void lua_engine::load_script(const char *filename)
 void lua_engine::load_string(const char *value)
 {
 	run(sol().load(value));
+}
+
+//-------------------------------------------------
+//  invoke - invokes a function, wrapping profiler
+//-------------------------------------------------
+
+template<typename TFunc, typename... TArgs>
+sol::protected_function_result lua_engine::invoke(TFunc &&func, TArgs&&... args)
+{
+	g_profiler.start(PROFILER_LUA);
+	sol::protected_function_result result = func(std::forward<TArgs>(args)...);
+	g_profiler.stop();
+	return result;
 }

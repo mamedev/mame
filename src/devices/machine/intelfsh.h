@@ -37,14 +37,16 @@ public:
 		FLASH_SANYO_LE26FV10N1TS,
 		FLASH_SST_28SF040,
 		FLASH_SST_39VF020,
+		FLASH_SST_49LF020,
 		FLASH_TMS_29F040,
 
 		// 16-bit variants
 		FLASH_SHARP_LH28F400 = 0x1000,
 		FLASH_INTEL_E28F400B,
 		FLASH_INTEL_TE28F160,
+		FLASH_SHARP_LH28F160S3,
 		FLASH_INTEL_TE28F320,
-		FLASH_SHARP_UNK128MBIT,
+		FLASH_SHARP_LH28F320BF,
 		FLASH_INTEL_28F320J3D,
 		FLASH_INTEL_28F320J5,
 		FLASH_SST_39VF400A,
@@ -261,6 +263,12 @@ public:
 	sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class sst_49lf020_device : public intelfsh8_device
+{
+public:
+	sst_49lf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class tms_29f040_device : public intelfsh8_device
 {
 public:
@@ -280,6 +288,12 @@ public:
 	intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class sharp_lh28f160s3_device : public intelfsh16_device
+{
+public:
+	sharp_lh28f160s3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class intel_te28f320_device : public intelfsh16_device
 {
 public:
@@ -292,10 +306,10 @@ public:
 	intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class sharp_unk128mbit_device : public intelfsh16_device
+class sharp_lh28f320bf_device : public intelfsh16_device
 {
 public:
-	sharp_unk128mbit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_lh28f320bf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class intel_28f320j3d_device : public intelfsh16_device
@@ -347,12 +361,14 @@ DECLARE_DEVICE_TYPE(PANASONIC_MN63F805MNP, panasonic_mn63f805mnp_device)
 DECLARE_DEVICE_TYPE(SANYO_LE26FV10N1TS,    sanyo_le26fv10n1ts_device)
 DECLARE_DEVICE_TYPE(SST_28SF040,           sst_28sf040_device)
 DECLARE_DEVICE_TYPE(SST_39VF020,           sst_39vf020_device)
+DECLARE_DEVICE_TYPE(SST_49LF020,           sst_49lf020_device)
 
 DECLARE_DEVICE_TYPE(SHARP_LH28F400,        sharp_lh28f400_device)
 DECLARE_DEVICE_TYPE(INTEL_E28F008SA,       intel_e28f008sa_device)
 DECLARE_DEVICE_TYPE(INTEL_TE28F160,        intel_te28f160_device)
+DECLARE_DEVICE_TYPE(SHARP_LH28F160S3,      sharp_lh28f160s3_device)
 DECLARE_DEVICE_TYPE(INTEL_TE28F320,        intel_te28f320_device)
-DECLARE_DEVICE_TYPE(SHARP_UNK128MBIT,      sharp_unk128mbit_device)
+DECLARE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device)
 DECLARE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device)

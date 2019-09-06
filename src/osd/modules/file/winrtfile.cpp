@@ -348,7 +348,7 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 	// convert the path to TCHARs
 	osd::text::tstring t_path = osd::text::to_tstring(path);
 
-	// cannonicalize the path
+	// canonicalize the path
 	TCHAR buffer[MAX_PATH];
 	if (!GetFullPathName(t_path.c_str(), ARRAY_LENGTH(buffer), buffer, nullptr))
 		return win_error_to_file_error(GetLastError());

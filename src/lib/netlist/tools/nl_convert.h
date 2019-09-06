@@ -164,7 +164,7 @@ protected:
 	void process_line(const pstring &line);
 
 private:
-
+	pstring m_subckt;
 };
 
 class nl_convert_eagle_t : public nl_convert_base_t

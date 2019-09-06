@@ -598,7 +598,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_impulse(0),
 		m_name(name),
 		m_read_param(nullptr),
-		m_write_param(nullptr),
+		m_write_param(0),
 		m_digital_value(false),
 		m_min(0),
 		m_max(maskbits),
@@ -1457,7 +1457,7 @@ ioport_field *ioport_port::field(ioport_value mask) const
 {
 	// if we got the port, look for the field
 	for (ioport_field &field : fields())
-		if ((field.mask() & mask) != 0)
+		if ((field.mask() & mask) != 0 && field.enabled())
 			return &field;
 	return nullptr;
 }

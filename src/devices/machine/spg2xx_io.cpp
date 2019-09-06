@@ -276,7 +276,7 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 		val = m_cpu->get_ds();
 		LOGMASKED(LOG_SEGMENT, "io_r: Data Segment = %04x\n", val);
 		break;
-	
+
 	default:
 		LOGMASKED(LOG_UNKNOWN_IO, "io_r: Unknown register %04x\n", 0x3d00 + offset);
 		break;
@@ -1221,7 +1221,7 @@ void spg2xx_io_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
 	{
-		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070), changed);		//m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
+		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070), changed);     //m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
 		m_ffreq_tmr1_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
 	}
 

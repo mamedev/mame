@@ -273,20 +273,35 @@ void v99x8_device::configure_pal_ntsc()
 
 
 /*
-    Driver-specific function: update the vdp mouse state
+    Colorbus inputs
+    vdp will process mouse deltas only if it is in mouse mode
+    Reg 8: MS LP x x x x x x
 */
-void v99x8_device::update_mouse_state(int mx_delta, int my_delta, int button_state)
+void v99x8_device::colorbus_x_input(int mx_delta)
 {
-	// save button state
-	m_button_state = (button_state << 6) & 0xc0;
-
 	if ((m_cont_reg[8] & 0xc0) == 0x80)
-	{   // vdp will process mouse deltas only if it is in mouse mode
+	{
 		m_mx_delta += mx_delta;
-		m_my_delta += my_delta;
+		if (m_mx_delta < -127) m_mx_delta = -127;
+		if (m_mx_delta > 127) m_mx_delta = 127;
 	}
 }
 
+void v99x8_device::colorbus_y_input(int my_delta)
+{
+	if ((m_cont_reg[8] & 0xc0) == 0x80)
+	{
+		m_my_delta += my_delta;
+		if (m_my_delta < -127) m_my_delta = -127;
+		if (m_my_delta > 127) m_my_delta = 127;
+	}
+}
+
+void v99x8_device::colorbus_button_input(bool switch1_pressed, bool switch2_pressed)
+{
+	// save button state
+	m_button_state = (switch2_pressed? 0x80 : 0x00) | (switch1_pressed? 0x40 : 0x00);
+}
 
 
 /***************************************************************************

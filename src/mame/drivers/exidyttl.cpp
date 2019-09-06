@@ -98,8 +98,7 @@ void exidyttl_state::video_start()
 void exidyttl_state::attack(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_attack);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_attack);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -114,8 +113,7 @@ void exidyttl_state::attack(machine_config &config)
 void exidyttl_state::deathrac(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_attack);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_attack);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -234,7 +232,7 @@ ROM_START( rhunting )
 ROM_END
 
 
-GAME( 1977, attckexd,  0,        attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (Set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, attckexd2, attckexd, attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (Set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, attckexd,  0,        attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 1) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, attckexd2, attckexd, attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (set 2) [TTL]", MACHINE_IS_SKELETON )
 GAME( 1976, deathrac,  0,        deathrac, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Death Race [TTL]",     MACHINE_IS_SKELETON )
 GAME( 1976, rhunting,  deathrac, deathrac, 0, exidyttl_state, empty_init, ROT0, "bootleg", "Robot Hunting (bootleg of Death Race) [TTL]",MACHINE_IS_SKELETON )

@@ -294,7 +294,7 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
 
 INPUT_CHANGED_MEMBER( genmod_mapper_device::setgm_changed )
 {
-	int number = (int)((uint64_t)param&0x03);
+	int number = int(param&0x03);
 	int value = newval;
 
 	switch (number)
@@ -907,11 +907,13 @@ void geneve_mapper_device::write_to_pfm(offs_t offset, uint8_t data)
     This decoding will later be used in the READ/WRITE member functions. Also,
     we initiate wait state creation here.
 */
-void geneve_mapper_device::setaddress(offs_t mode, uint16_t address)
+void geneve_mapper_device::setaddress(offs_t address, uint8_t busctrl)
 {
 	LOGMASKED(LOG_DETAIL, "setaddress = %04x\n", address);
 	m_debug_no_ws = false;
 	m_decoded.offset = address;
+
+	m_read_mode = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 
 	decode_logical(m_read_mode, &m_decoded);
 	if (m_decoded.function == MUNDEF)
@@ -993,15 +995,6 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 			m_ready_asserted = false;
 		}
 	}
-}
-
-/*
-    We need the DBIN line for the setaddress operation.
-*/
-WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
-{
-	m_read_mode = (state==ASSERT_LINE);
-	LOGMASKED(LOG_DETAIL, "dbin = %02x\n", m_read_mode? 1:0);
 }
 
 /*

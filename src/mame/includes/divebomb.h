@@ -17,6 +17,7 @@
 #include "sound/sn76496.h"
 #include "video/k051316.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #define XTAL1 XTAL(24'000'000)
 

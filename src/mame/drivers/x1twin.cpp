@@ -466,7 +466,7 @@ void x1twin_state::x1twin(machine_config &config)
 	pce_screen.set_raw(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242);
 	pce_screen.set_screen_update(FUNC(x1twin_state::screen_update_x1pce));
 
-	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	HD6845S(config, m_crtc, (VDP_CLOCK/48)); //unknown divider (TODO: verify chip type)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
@@ -506,11 +506,11 @@ void x1twin_state::x1twin(machine_config &config)
 	ay.add_route(0, "x1_r", 0.25);
 	ay.add_route(1, "x1_l", 0.5);
 	ay.add_route(2, "x1_r", 0.5);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 	m_cassette->set_interface("x1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");

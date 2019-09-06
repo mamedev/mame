@@ -701,7 +701,6 @@ void sidearms_state::whizz(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::whizz_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &sidearms_state::whizz_io_map);
-	m_audiocpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
 	config.m_minimum_quantum = attotime::from_hz(60000);
 
@@ -725,10 +724,9 @@ void sidearms_state::whizz(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
 }

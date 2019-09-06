@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-/***************************************************************************
+/***************************************************************************************
 
 Argo
 
@@ -19,12 +19,19 @@ Commands: same as UNIOR
 ToDo:
 - Add devices
 - There is no obvious evidence of sound.
-- Cassette UART on ports C1 and C3.
+- Cassette
+-- no info available but seems to be much the same as Unior, so code copied over
+-- clock not hooked up, don't know where it comes from
+-- unable to test as the i8251 device needs work to support syndet
 
-****************************************************************************/
+****************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8251.h"
+#include "imagedev/cassette.h"
+//#include "sound/spkrdev.h"
+#include "speaker.h"
 #include "screen.h"
 
 
@@ -36,6 +43,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_uart(*this, "uart")
+		, m_cass(*this, "cassette")
 	{ }
 
 	void argo(machine_config &config);
@@ -51,6 +60,7 @@ private:
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
 	DECLARE_READ8_MEMBER(argo_io_r);
 	DECLARE_WRITE8_MEMBER(argo_io_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
@@ -59,11 +69,14 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
+	required_device<i8251_device> m_uart;
+	required_device<cassette_image_device> m_cass;
 	uint8_t m_framecnt;
 	uint8_t m_cursor_pos[3];
 	uint8_t m_p_cursor_pos;
 	bool m_ram_ctrl;
 	uint8_t m_scroll_ctrl;
+	bool m_txd, m_txe;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -86,6 +99,12 @@ READ8_MEMBER(argo_state::argo_io_r)
 
 	switch (low_io)
 	{
+	case 0xC1: // uart data
+		return m_uart->data_r();
+
+	case 0xC3: // uart status
+		return m_uart->status_r();
+
 	case 0xA1: // keyboard
 		char kbdrow[6];
 		sprintf(kbdrow,"X%X",uint8_t(offset>>8));
@@ -106,6 +125,14 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 
 	switch (low_io)
 	{
+	case 0xC1: // uart data
+		m_uart->data_w(data);
+		break;
+
+	case 0xC3: // uart control
+		m_uart->control_w(data);
+		break;
+
 	case 0xA1: // prep scroll step 1
 		m_scroll_ctrl = (data == 0x61);
 		break;
@@ -145,6 +172,21 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 	}
 }
 
+// Untested. This needs to be driven by a 2400Hz clock.
+WRITE_LINE_MEMBER(argo_state::ctc_z1_w)
+{
+	// write
+	if (m_txe)
+		m_cass->output(1);
+	else
+		m_cass->output((m_txd ^ state) ? 1 : 0);
+
+	m_uart->write_txc(state);
+
+	// read - untested
+	m_uart->write_rxd((m_cass->input() > 0.04) ? 1 : 0);
+	m_uart->write_rxc(state);
+}
 
 
 void argo_state::mem_map(address_map &map)
@@ -364,6 +406,19 @@ void argo_state::argo(machine_config &config)
 	screen.set_screen_update(FUNC(argo_state::screen_update));
 	screen.set_size(640, 250);
 	screen.set_visarea_full();
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	//SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
+
+	/* Devices */
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
+	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
 }
 
 /* ROM definition */

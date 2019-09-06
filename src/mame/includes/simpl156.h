@@ -71,7 +71,7 @@ private:
 
 	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
 
 	void chainrec_map(address_map &map);
 	void joemacr_map(address_map &map);

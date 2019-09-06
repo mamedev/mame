@@ -15,7 +15,6 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -144,10 +143,10 @@ void ondra_state::ondra(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("ondra_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("ondra");

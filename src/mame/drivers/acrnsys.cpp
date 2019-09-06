@@ -131,7 +131,7 @@ void acrnsys_state::a6809_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x0900, 0x090f).mirror(0xf0).rw(m_via6522, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0900, 0x090f).mirror(0xf0).m(m_via6522, FUNC(via6522_device::map));
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -139,7 +139,7 @@ void acrnsys_state::a6502a_mem(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x0000, 0x07ff).ram();
-	map(0x0e00, 0x0e0f).mirror(0x1f0).rw(m_via6522, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0e00, 0x0e0f).mirror(0x1f0).m(m_via6522, FUNC(via6522_device::map));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 

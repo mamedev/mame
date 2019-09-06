@@ -921,7 +921,7 @@ inline uint8_t x07_state::get_char(uint16_t pos)
 INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 {
 	uint8_t data = 0;
-	uint8_t idx = (uint8_t)(uintptr_t)param;
+	uint8_t idx = (uint8_t)param;
 
 	if (m_kb_on && newval)
 	{
@@ -948,7 +948,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 	uint8_t modifier;
 	uint8_t a1 = ioport("A1")->read();
 	uint8_t bz = ioport("BZ")->read();
-	uint8_t keycode = (uint8_t)(uintptr_t)param;
+	uint8_t keycode = (uint8_t)param;
 
 	if (m_kb_on && !newval)
 	{
@@ -1052,7 +1052,7 @@ inline void x07_state::draw_udk()
 		}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
+DEVICE_IMAGE_LOAD_MEMBER( x07_state::card_load )
 {
 	uint32_t size = m_card->common_get_size("rom");
 
@@ -1479,8 +1479,8 @@ void x07_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, 0xc3c3);
 }
 
-MACHINE_CONFIG_START(x07_state::x07)
-
+void x07_state::x07(machine_config &config)
+{
 	/* basic machine hardware */
 	NSC800(config, m_maincpu, 15.36_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &x07_state::x07_mem);
@@ -1501,7 +1501,6 @@ MACHINE_CONFIG_START(x07_state::x07)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 0).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
 	PRINTER(config, m_printer, 0);
@@ -1520,20 +1519,19 @@ MACHINE_CONFIG_START(x07_state::x07)
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K,20K,24K");
 
 	/* Memory Card */
-	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "x07_card")
-	MCFG_GENERIC_EXTENSIONS("rom,bin")
-	MCFG_GENERIC_LOAD(x07_state, x07_card)
+	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "x07_card", "rom,bin").set_device_load(FUNC(x07_state::card_load), this);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x07_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("x07_cass");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "card_list").set_original("x07_card");
 	SOFTWARE_LIST(config, "cass_list").set_original("x07_cass");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( x07 )

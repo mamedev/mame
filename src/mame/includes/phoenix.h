@@ -7,6 +7,7 @@
 
 #include "audio/pleiads.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class phoenix_state : public driver_device
 {

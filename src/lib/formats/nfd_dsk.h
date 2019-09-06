@@ -7,9 +7,10 @@
     PC98 NFD disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_NFD_DSK_H
+#define MAME_FORMATS_NFD_DSK_H
 
-#ifndef NFD_DSK_H
-#define NFD_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -30,4 +31,4 @@ public:
 
 extern const floppy_format_type FLOPPY_NFD_FORMAT;
 
-#endif /* NFD_DSK_H */
+#endif // MAME_FORMATS_NFD_DSK_H

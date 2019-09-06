@@ -122,7 +122,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( write_kb6 ) { if (state) m_kb |= 64; else m_kb &= ~64; }
 	DECLARE_WRITE_LINE_MEMBER( write_kb7 ) { if (state) m_kb |= 128; else m_kb &= ~128; }
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c16 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c16);
 
 	enum
 	{
@@ -190,7 +190,7 @@ private:
 
 
 
-QUICKLOAD_LOAD_MEMBER( plus4_state, cbm_c16 )
+QUICKLOAD_LOAD_MEMBER(plus4_state::quickload_c16)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
@@ -930,8 +930,7 @@ void plus4_state::plus4(machine_config &config)
 	m_exp->cd_wr_callback().set(FUNC(plus4_state::write));
 	m_exp->aec_wr_callback().set_inputline(MOS7501_TAG, INPUT_LINE_HALT);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(plus4_state, cbm_c16), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(plus4_state::quickload_c16), this);
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");

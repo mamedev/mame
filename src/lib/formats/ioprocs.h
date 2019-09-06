@@ -7,10 +7,12 @@
     File IO abstraction layer
 
 *********************************************************************/
+#ifndef MAME_FORMATS_IOPROCS_H
+#define MAME_FORMATS_IOPROCS_H
 
-#ifndef IOPROCS_H
-#define IOPROCS_H
+#pragma once
 
+#include <stdint.h>
 #include <stdlib.h>
 
 
@@ -59,14 +61,10 @@ extern const struct io_procs corefile_ioprocs_noclose;
 
 ***************************************************************************/
 
-
-
 void io_generic_close(struct io_generic *genio);
 void io_generic_read(struct io_generic *genio, void *buffer, uint64_t offset, size_t length);
 void io_generic_write(struct io_generic *genio, const void *buffer, uint64_t offset, size_t length);
 void io_generic_write_filler(struct io_generic *genio, uint8_t filler, uint64_t offset, size_t length);
 uint64_t io_generic_size(struct io_generic *genio);
 
-
-
-#endif /* IOPROCS_H */
+#endif // MAME_FORMATS_IOPROCS_H

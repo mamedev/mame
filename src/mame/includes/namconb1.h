@@ -19,9 +19,6 @@
 #include "video/namco_c123tmap.h"
 #include "video/namco_c169roz.h"
 
-#define NAMCONB1_SPRITEGFX      0
-
-
 
 class namconb1_state : public driver_device
 {
@@ -145,7 +142,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scantimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 
 	int NB1objcode2tile(int code);
 	int NB2objcode2tile_machbrkr(int code);

@@ -15,8 +15,6 @@
 #define NAMCOFL_VTOTAL      (262)   /* needs to be checked */
 #define NAMCOFL_VBSTART (224)
 
-#define NAMCOFL_SPRITEGFX       0
-
 class namcofl_state : public driver_device
 {
 public:
@@ -93,7 +91,6 @@ private:
 	TIMER_CALLBACK_MEMBER(raster_interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 	void common_init();
 	int FLobjcode2tile(int code);
 	void TilemapCB(uint16_t code, int *tile, int *mask);

@@ -7,6 +7,7 @@
 
 #include "sound/tms5220.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class portrait_state : public driver_device
 {

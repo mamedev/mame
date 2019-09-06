@@ -60,6 +60,7 @@ TODO:
 
 #include "emu.h"
 #include "includes/kim1.h"
+#include "speaker.h"
 #include "kim1.lh"
 
 //**************************************************************************
@@ -125,8 +126,8 @@ static INPUT_PORTS_START( kim1 )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, nullptr)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, nullptr)
+	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0)
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, 0)
 	PORT_DIPNAME(0x10, 0x10, "sw3: SS")                       PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
 	PORT_DIPSETTING( 0x00, "single step")
 	PORT_DIPSETTING( 0x10, "run")
@@ -250,6 +251,8 @@ void kim1_state::kim1(machine_config &config)
 	// video hardware
 	config.set_default_layout(layout_kim1);
 
+	SPEAKER(config, "mono").front_center();
+
 	// devices
 	MOS6530(config, m_riot2, 1000000);
 	m_riot2->in_pa_callback().set(FUNC(kim1_state::kim1_u2_read_a));
@@ -262,6 +265,7 @@ void kim1_state::kim1(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(kim1_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cass->set_interface ("kim1_cass");
 
 	TIMER(config, "led_timer").configure_periodic(FUNC(kim1_state::kim1_update_leds), attotime::from_hz(60));

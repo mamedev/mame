@@ -76,7 +76,7 @@ READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	return m_k052109->word_r(space, offset, mem_mask);
+	return m_k052109->word_r(offset);
 }
 
 WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
@@ -84,7 +84,7 @@ WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	m_k052109->word_w(space, offset, data, mem_mask);
+	m_k052109->word_w(offset, data, mem_mask);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
@@ -92,9 +92,9 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_BITS_8_15)
-		m_k052109->write(space, offset, (data >> 8) & 0xff);
+		m_k052109->write(offset, (data >> 8) & 0xff);
 	else if (ACCESSING_BITS_0_7)
-		m_k052109->write(space, offset + 0x2000, data & 0xff);
+		m_k052109->write(offset + 0x2000, data & 0xff);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
@@ -116,7 +116,7 @@ READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		return m_k053245->k053245_word_r(space, offset, mem_mask);
+		return m_k053245->k053245_word_r(offset);
 	}
 }
 
@@ -127,7 +127,7 @@ WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 	if (!(offset & 0x0031))
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		m_k053245->k053245_word_w(space, offset, data, mem_mask);
+		m_k053245->k053245_word_w(offset, data, mem_mask);
 	}
 }
 
@@ -135,7 +135,7 @@ READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
 {
 	offset &= ~1;   /* handle mirror address */
 
-	return m_k053245->k053244_r(space, offset + 1) | (m_k053245->k053244_r(space, offset) << 8);
+	return m_k053245->k053244_r(offset + 1) | (m_k053245->k053244_r(offset) << 8);
 }
 
 WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
@@ -143,9 +143,9 @@ WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
 	offset &= ~1;   /* handle mirror address */
 
 	if (ACCESSING_BITS_8_15)
-		m_k053245->k053244_w(space, offset, (data >> 8) & 0xff);
+		m_k053245->k053244_w(offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		m_k053245->k053244_w(space, offset + 1, data & 0xff);
+		m_k053245->k053244_w(offset + 1, data & 0xff);
 }
 
 /* cuebrick, mia, tmnt */
@@ -171,7 +171,7 @@ INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 
 WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 {
-	m_k053260->main_write(space, offset, data);
+	m_k053260->main_write(offset, data);
 
 	if (offset)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
@@ -350,7 +350,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 			{
 				if ((space.read_word(0x180006 + 128 * i) >> 8) == logical_pri)
 				{
-					m_k053245->k053245_word_w(space, 8 * i, hardware_pri, 0x00ff);
+					m_k053245->k053245_word_w(8 * i, hardware_pri, 0x00ff);
 					hardware_pri++;
 				}
 			}
@@ -547,7 +547,7 @@ void tmnt_state::punkshot_main_map(address_map &map)
 	map(0x0a0006, 0x0a0007).portr("P1/P2");
 	map(0x0a0020, 0x0a0021).w(FUNC(tmnt_state::punkshot_0a0020_w));
 	map(0x0a0040, 0x0a0043).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x0a0060, 0x0a007f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x0a0060, 0x0a007f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x0a0080, 0x0a0081).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::punkshot_k052109_word_noA12_w));
 	map(0x110000, 0x110007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
@@ -571,7 +571,7 @@ void tmnt_state::lgtnfght_main_map(address_map &map)
 	map(0x0a0028, 0x0a0029).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0b0000, 0x0b3fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x0c0000, 0x0c001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
-	map(0x0e0000, 0x0e001f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x0e0000, 0x0e001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 }
 
@@ -588,7 +588,7 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x204000, 0x207fff).ram(); /* main RAM */
 	map(0x300000, 0x303fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
+	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
 	map(0x680000, 0x68001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x700000, 0x700001).portr("P1");
 	map(0x700002, 0x700003).portr("P2");
@@ -599,7 +599,7 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x700400, 0x700401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0x780600, 0x780603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x780604, 0x780605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
-	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 }
 
 WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
@@ -608,7 +608,7 @@ WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_k053251->write(space, offset, (data >> 8) & 0xff);
+		m_k053251->write(offset, (data >> 8) & 0xff);
 
 		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
 		and got marked as dirty in the write above... how was the original hardware working?!? */
@@ -631,9 +631,9 @@ void tmnt_state::glfgreat_main_map(address_map &map)
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));  /* 053936? */
 	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
-	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));    /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
+	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1/P2");
 	map(0x120002, 0x120003).portr("P3/P4");
 	map(0x120004, 0x120005).portr("COINS/DSW3");
@@ -654,9 +654,9 @@ void tmnt_state::prmrsocr_main_map(address_map &map)
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
 	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
-	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));    /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
+	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1/COINS");
 	map(0x120002, 0x120003).portr("P2/EEPROM");
 	map(0x121000, 0x12101f).m("k054321", FUNC(k054321_device::main_map)).umask16(0x00ff);
@@ -690,7 +690,7 @@ void tmnt_state::tmnt2_put_word( address_space &space, uint32_t addr, uint16_t d
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			m_k053245->k053245_word_w(space, offs, data, 0xffff);
+			m_k053245->k053245_word_w(offs, data, 0xffff);
 		}
 	}
 	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)
@@ -925,7 +925,7 @@ void tmnt_state::tmnt2_main_map(address_map &map)
 	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
-	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 }
 
@@ -950,7 +950,7 @@ void tmnt_state::ssriders_main_map(address_map &map)
 	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
-	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 }
 
@@ -959,7 +959,7 @@ void tmnt_state::sunsetbl_main_map(address_map &map)
 	map(0x000000, 0x0bffff).rom();
 	map(0x104000, 0x107fff).ram(); /* main RAM */
 	map(0x14c000, 0x14cfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x14e700, 0x14e71f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x14e700, 0x14e71f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x180000, 0x183fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x184000, 0x18ffff).ram();
 	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
@@ -986,9 +986,9 @@ void tmnt_state::thndrx2_main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram(); /* main RAM */
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x400000, 0x400003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
+	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
 	map(0x500100, 0x500101).w(FUNC(tmnt_state::thndrx2_eeprom_w));
 	map(0x500200, 0x500201).portr("P1/COINS");
 	map(0x500202, 0x500203).r(FUNC(tmnt_state::thndrx2_eeprom_r));
@@ -1935,11 +1935,12 @@ void tmnt_state::cuebrick(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::cuebrick_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
 	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
@@ -1985,11 +1986,12 @@ void tmnt_state::mia(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::mia_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
 	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
@@ -2048,11 +2050,12 @@ void tmnt_state::tmnt(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::tmnt_sprite_callback), this);
 	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
@@ -2108,11 +2111,12 @@ void tmnt_state::punkshot(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::punkshot_sprite_callback), this);
 
 	K053251(config, m_k053251, 0);
@@ -2159,6 +2163,7 @@ void tmnt_state::lgtnfght(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2215,6 +2220,7 @@ void tmnt_state::blswhstl(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::blswhstl_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2289,6 +2295,7 @@ void tmnt_state::glfgreat(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2355,6 +2362,7 @@ void tmnt_state::prmrsocr(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2417,6 +2425,7 @@ void tmnt_state::tmnt2(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2472,6 +2481,7 @@ void tmnt_state::ssriders(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2519,6 +2529,7 @@ void tmnt_state::sunsetbl(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::ssbl_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2567,11 +2578,12 @@ void tmnt_state::thndrx2(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::thndrx2_sprite_callback), this);
 
 	K053251(config, m_k053251, 0);
@@ -3147,6 +3159,26 @@ ROM_START( punkshot2 )
 	ROM_LOAD( "907d04.d3",    0x0000, 0x80000, CRC(090feb5e) SHA1(2394907b62ff0724c277642caf6375239249e2d7) )
 ROM_END
 
+ROM_START( punkshot2e )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
+	ROM_LOAD16_BYTE( "907_2.i7",    0x00000, 0x20000, CRC(aa55516c) SHA1(297202c3dc817b016b646341712e7e1805bc98a5) )
+	ROM_LOAD16_BYTE( "907_3.i10",   0x00001, 0x20000, CRC(0d3aa3d5) SHA1(39a9f4aac9463a88f1f57dc9aeb5718793aaa2c1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "907f01.e8",    0x0000, 0x8000, CRC(f040c484) SHA1(f76a739cacc0aba98a5bf85a48c81cef0d9bbfb4) )
+
+	ROM_REGION( 0x80000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "907d06.e23",   0x000000, 0x40000, CRC(f5cc38f4) SHA1(e6dc9994582a08740dc2fcb30a38771053627d5f) )
+	ROM_LOAD32_WORD( "907d05.e22",   0x000002, 0x40000, CRC(e25774c1) SHA1(74fda3b418b4b0064b5e660a93122b07f6d41416) )
+
+	ROM_REGION( 0x200000, "k051960", 0 )    /* sprites */
+	ROM_LOAD32_WORD( "907d07.k2",    0x000000, 0x100000, CRC(b0fe4543) SHA1(3be1caef29084063dd8754c1eecc34a2ec842415) )
+	ROM_LOAD32_WORD( "907d08.k7",    0x000002, 0x100000, CRC(d5ac8d9d) SHA1(cb330be1c5c016465ef7048b3b29c65a741ee45b) )
+
+	ROM_REGION( 0x80000, "k053260", 0 ) /* samples for the 053260 */
+	ROM_LOAD( "907d04.d3",    0x0000, 0x80000, CRC(090feb5e) SHA1(2394907b62ff0724c277642caf6375239249e2d7) )
+ROM_END
+
 ROM_START( punkshotj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "907z02.i7",    0x00000, 0x20000, CRC(7a3a5c89) SHA1(240967b911df8939b048bbcdfcac668455fc82e9) )
@@ -3472,6 +3504,34 @@ ROM_START( tmnt22pu )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with invisible error message
 	ROM_LOAD( "tmnt2_uda.nv", 0x0000, 0x080, CRC(44928d33) SHA1(44024927987f6bb8bdac3dbd1fdc81d7b55c0f5a) )
+ROM_END
+
+ROM_START( tmnt24pu )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 4*128k for 68000 code */
+	ROM_LOAD16_BYTE( "063uea02.8e",  0x000000, 0x20000, CRC(5eebc67f) SHA1(dbfbe0bdd40cfb01824d59e9785759ffdfdcba55) )
+	ROM_LOAD16_BYTE( "063uea03.8g",  0x000001, 0x20000, CRC(1b956869) SHA1(3cea77c8b6ca93899a044c28a45f5966937b7df7) )
+	ROM_LOAD16_BYTE( "063uea04.10e", 0x040000, 0x20000, CRC(e13d93a6) SHA1(7297a4c19d1e338fa41a3983bb9179a6c3cd6ea4) )
+	ROM_LOAD16_BYTE( "063uea05.10g", 0x040001, 0x20000, CRC(a3a1f5ea) SHA1(6d869a8ba457c40928ca0bcf3e5b7a436faa185c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "063b01.2f", 0x0000, 0x10000, CRC(364f548a) SHA1(e0636e27d4fc48b2ccb1417b63d2b68d9e272c06) )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "063b12.16k", 0x000000, 0x080000, CRC(d3283d19) SHA1(49e4daa9cbe4d99bf71fcee6237cb434a0d55312) )
+	ROM_LOAD32_WORD( "063b11.12k", 0x000002, 0x080000, CRC(6ebc0c15) SHA1(e6848405076937fbf8ec6d318293a0ff922725f4) )
+
+	ROM_REGION( 0x400000, "k053245", 0 )    /* sprites */
+	ROM_LOAD32_WORD( "063b09.7l", 0x000000, 0x100000, CRC(2d7a9d2a) SHA1(a26f9c1a07152bc8c7bcd797d4485bf848f5e2a0) )
+	ROM_LOAD32_WORD( "063b07.3l", 0x000002, 0x100000, CRC(d9bee7bf) SHA1(7bbb65138fbd216b80412783e6f0072742101440) )
+	ROM_LOAD32_WORD( "063b10.7k", 0x200000, 0x080000, CRC(f2dd296e) SHA1(a2aad10bfb0904dd73c2ee11049648c94de7f4d5) )
+	ROM_LOAD32_WORD( "063b08.3k", 0x200002, 0x080000, CRC(3b1ae36f) SHA1(9e69cae8b517497ac77c4d148f56f2bb6a23de89) )
+	/* second half empty */
+
+	ROM_REGION( 0x200000, "k053260", 0 )    /* samples for the 053260 */
+	ROM_LOAD( "063b06.1d",  0x0000, 0x200000, CRC(1e510aa5) SHA1(02b9bd6bb6b098026a620e4d671c40a31ad9e318) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with invisible error message
+	ROM_LOAD( "tmnt2_uea.nv", 0x0000, 0x080, CRC(4f086faa) SHA1(de5395737173a6b12ab0cab33f42c44151ceff89) )
 ROM_END
 
 ROM_START( tmht22pe )
@@ -4225,6 +4285,7 @@ GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,  
 
 GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot2e,  punkshot, punkshot, punksht2,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (World 2 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  tmnt_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (World)", MACHINE_SUPPORTS_SAVE )
@@ -4245,6 +4306,7 @@ GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init, 
 GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt24pu,    tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UEA)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt_state, empty_init,  ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA1 Type H)", MACHINE_SUPPORTS_SAVE )
 

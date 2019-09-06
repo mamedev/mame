@@ -8,9 +8,10 @@
     his CoCoSDC floppy disk emulator.
 
 *********************************************************************/
+#ifndef MAME_FORMATS_SDF_DSK_H
+#define MAME_FORMATS_SDF_DSK_H
 
-#ifndef SDF_DSK_H
-#define SDF_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -42,4 +43,4 @@ protected:
 
 extern const floppy_format_type FLOPPY_SDF_FORMAT;
 
-#endif /* SDF_DSK_H */
+#endif // MAME_FORMATS_SDF_DSK_H

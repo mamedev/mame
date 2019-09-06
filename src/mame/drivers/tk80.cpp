@@ -64,7 +64,6 @@ public:
 		, m_digit(*this, "digit%u", 0U)
 	{ }
 
-	void add_tk80_ppi(machine_config &config);
 	void ics8080(machine_config &config);
 	void tk80(machine_config &config);
 	void mikrolab(machine_config &config);
@@ -231,6 +230,38 @@ INPUT_PORTS_START( ics8080 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RUN") PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tk85 )
+	PORT_START("X0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 / AF") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 / BC") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 / DE") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 / HL") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 / SP") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 / BR.P") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 / BR.D") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+
+	PORT_START("X1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A / SAVE") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B / LOAD") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C / TM") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D / MOV") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E / OUT") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F / IN") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+
+	PORT_START("X2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RUN") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CONT") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ADRS SET") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("READ DEC") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("READ INC") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("WR / ENT") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
+INPUT_PORTS_END
+
 READ8_MEMBER( tk80_state::key_matrix_r )
 {
 	// PA0-7 keyscan in
@@ -286,18 +317,10 @@ WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
 	m_ppi_portc = data;
 }
 
-void tk80_state::add_tk80_ppi(machine_config &config)
-{
-	I8255(config, m_ppi);
-	m_ppi->in_pa_callback().set(FUNC(tk80_state::key_matrix_r));
-	m_ppi->in_pb_callback().set(FUNC(tk80_state::serial_r));
-	m_ppi->out_pc_callback().set(FUNC(tk80_state::serial_w));
-}
-
 void tk80_state::tk80(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(18'432'000) / 9);
+	I8080A(config, m_maincpu, 18.432_MHz_XTAL / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tk80_state::tk80_mem);
 	m_maincpu->set_addrmap(AS_IO, &tk80_state::tk80_io);
 
@@ -305,7 +328,10 @@ void tk80_state::tk80(machine_config &config)
 	config.set_default_layout(layout_tk80);
 
 	/* Devices */
-	add_tk80_ppi(config);
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(tk80_state::key_matrix_r));
+	m_ppi->in_pb_callback().set(FUNC(tk80_state::serial_r));
+	m_ppi->out_pc_callback().set(FUNC(tk80_state::serial_w));
 }
 
 void tk80_state::mikrolab(machine_config &config)
@@ -328,7 +354,7 @@ void tk80_state::nd80z(machine_config &config)
 	config.set_default_layout(layout_tk80);
 
 	/* Devices */
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(tk80_state::nd80z_key_r));
 	m_ppi->in_pb_callback().set(FUNC(tk80_state::serial_r));
 	m_ppi->out_pc_callback().set(FUNC(tk80_state::mikrolab_serial_w));
@@ -336,15 +362,18 @@ void tk80_state::nd80z(machine_config &config)
 
 void tk80_state::tk85(machine_config &config)
 {
-	I8085A(config, m_maincpu, XTAL(4'915'200));
+	I8085A(config, m_maincpu, 4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tk80_state::tk85_mem);
 	m_maincpu->set_addrmap(AS_IO, &tk80_state::tk80_io);
+	// TODO: SID and SOD = serial cassette interface
 
 	/* video hardware */
 	config.set_default_layout(layout_tk80);
 
 	/* Devices */
-	add_tk80_ppi(config);
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(tk80_state::key_matrix_r));
+	m_ppi->out_pc_callback().set(FUNC(tk80_state::serial_w));
 }
 
 void tk80_state::ics8080(machine_config &config)
@@ -392,7 +421,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT        COMPANY      FULLNAME              FLAGS
 COMP( 1976, tk80,     0,      0,      tk80,     tk80,     tk80_state, empty_init, "NEC",       "TK-80",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, nectk85,  tk80,   0,      tk85,     tk80,     tk80_state, empty_init, "NEC",       "TK-85",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, nectk85,  tk80,   0,      tk85,     tk85,     tk80_state, empty_init, "NEC",       "TK-85",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 19??, nd80z,    tk80,   0,      nd80z,    tk80,     tk80_state, empty_init, "Chunichi",  "ND-80Z",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 19??, mikrolab, tk80,   0,      mikrolab, mikrolab, tk80_state, empty_init, "<unknown>", "Mikrolab KR580IK80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 19??, ics8080,  tk80,   0,      ics8080,  ics8080,  tk80_state, empty_init, "<unknown>", "ICS8080",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

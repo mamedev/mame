@@ -10,7 +10,7 @@
 		<info name="author" value="C. Poetzsch, Jürgen Buchmüller" />
 		<part name="rom" interface="cgenie_flop_rom">
 			<dataarea name="rom" size="2772">
-				<rom name="newe000.bin" size="2772" crc="953491a7" sha1="8d6a739a9058b3834897a15bcda5348b94008f5a" offset="0" />
+				<rom name="newe000.bin" size="2772" crc="953491a7" sha1="8d6a739a9058b3834897a15bcda5348b94008f5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +22,7 @@
 		<info name="usage" value="Enter CALL E000 to start" />
 		<part name="rom" interface="cgenie_flop_rom">
 			<dataarea name="rom" size="0x1000">
-				<rom name="colour_monitor_2.bin" size="0x1000" crc="a6b08d4d" sha1="2398f8ea430468dbd29fb0fabe89b2c21c2404f7" offset="0" />
+				<rom name="colour_monitor_2.bin" size="0x1000" crc="a6b08d4d" sha1="2398f8ea430468dbd29fb0fabe89b2c21c2404f7"/>
 			</dataarea>
 		</part>
 	</software>

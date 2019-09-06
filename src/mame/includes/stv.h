@@ -9,6 +9,7 @@
 #include "audio/rax.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
+#include "machine/segabill.h"
 
 class stv_state : public saturn_state
 {
@@ -24,7 +25,8 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_cryptdevice(*this, "315_5881"),
 		m_5838crypt(*this, "315_5838"),
-		m_hopper(*this, "hopper")
+		m_hopper(*this, "hopper"),
+		m_billboard(*this, "billboard")
 	{
 	}
 
@@ -33,6 +35,7 @@ public:
 	void stv(machine_config &config);
 	void hopper(machine_config &config);
 	void batmanfr(machine_config &config);
+	void shienryu(machine_config &config);
 	void stv_5838(machine_config &config);
 	void stv_5881(machine_config &config);
 	void stvcd(machine_config &config);
@@ -153,6 +156,7 @@ private:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	optional_device<ticket_dispenser_device> m_hopper;
+	required_device<sega_billboard_device> m_billboard;
 	uint16_t crypt_read_callback(uint32_t addr);
 
 	DECLARE_READ8_MEMBER(pdr1_input_r);

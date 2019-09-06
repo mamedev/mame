@@ -54,7 +54,7 @@ ROM_END
 
 void a2bus_corvfdc02_device::device_add_mconfig(machine_config &config)
 {
-	UPD765A(config, m_fdc, 8'000'000, true, false);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, false); // clocked through FDC9229BT
 	m_fdc->intrq_wr_callback().set(FUNC(a2bus_corvfdc02_device::intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(a2bus_corvfdc02_device::drq_w));
 	FLOPPY_CONNECTOR(config, m_con1, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);

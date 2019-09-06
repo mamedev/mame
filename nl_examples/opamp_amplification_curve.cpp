@@ -18,7 +18,7 @@
 
 #include "netlist/devices/net_lib.h"
 
-#define OPAMP_TEST "MB3614(FPF=10 UGF=1000k)"
+#define OPAMP_TEST "MB3614(DAB=0.0015)"
 
 NETLIST_START(main)
 
@@ -33,26 +33,48 @@ NETLIST_START(main)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-7)
 
 	VS(vs, 0)
-	PARAM(vs.FUNC, "0.001 * sin(6.28 * pow(10, 1 + 10*T) * T)")
-	//PARAM(vs.FUNC, "0.001 * sin(6.28 * pow(10, trunc((1 + T * 4)*2)/2) * T)")
-	//PARAM(vs.FUNC, "1.001 * sin(6.28 * 100 * T)")
+	/*
+	 * Having f(t)=sin(g(t)*t) the derivative becomes
+	 *
+	 * f'(t) = d/dt(g(t)*t) * cos(g(t)*t)
+	 *
+	 * w(t) = d/dt(g(t)*t) = 2*pi*freq(t)  is the angular frequency at time t
+	 *
+	 * choosing freq(t) = pow(10, a+b*t) and integrating we get
+	 *
+	 * g(t)*t = 2 * pi /(b*ln(10)) * (pow(10, a+b*t)-pow(10,a))
+	 */
+
+	PARAM(vs.FUNC, "0.001 * sin(0.2728752708 * (pow(10, 1 + 10*T) - 10))")
+
+	/*
+	 * Stepwise ... same as above
+	 */
+	//PARAM(vs.FUNC, "0.001 * sin(6.28 * pow(10, trunc((1 + T * 10)*10)/10) * T)")
+
+	/*
+	 * Fixed Frequency:
+	 * PARAM(vs.FUNC, "1.001 * sin(6.28 * 100 * T)")
+	 */
 	PARAM(vs.R, 0.001)
 	ALIAS(clk, vs.1)
 	NET_C(vs.2, GND)
     ANALOG_INPUT(V12, 12)
     ANALOG_INPUT(VM12, -12)
 
-    OPAMP(op,OPAMP_TEST)
+    OPAMP(op, OPAMP_TEST)
 
     NET_C(op.GND, VM12)
     NET_C(op.VCC, V12)
 
     /* Opamp B wired as inverting amplifier connected to output of first opamp */
 
-    RES(R1,   0.1)
-    RES(R2, 10000)
+    RES(R1, 100)
+    RES(RP, 100)
+    RES(R2, 10000000)
 
-    NET_C(op.PLUS, GND)
+    NET_C(op.PLUS, RP.1)
+	NET_C(RP.2, GND)
     NET_C(op.MINUS, R2.2)
     NET_C(op.MINUS, R1.2)
 

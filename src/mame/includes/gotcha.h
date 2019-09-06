@@ -12,6 +12,7 @@
 
 #include "sound/okim6295.h"
 #include "video/decospr.h"
+#include "tilemap.h"
 
 class gotcha_state : public driver_device
 {

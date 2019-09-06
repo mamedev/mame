@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "winchester.h"
 #include "imagedev/harddriv.h"
+#include "machine/74259.h"
 
 //#define LOG_GENERAL (1U <<  0)
 #define LOG_REGS    (1U <<  1)
@@ -38,14 +39,8 @@ DEFINE_DEVICE_TYPE(APRICOT_WINCHESTER, apricot_winchester_device, "apricot_winch
 void apricot_winchester_device::regs(address_map &map)
 {
 	map(0x0e0, 0x0ef).rw(m_hdc, FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
-	map(0x1e0, 0x1e0).rw(FUNC(apricot_winchester_device::int_r), FUNC(apricot_winchester_device::head_w<0>)).umask16(0x00ff);
-	map(0x1e2, 0x1e2).w(FUNC(apricot_winchester_device::head_w<1>)).umask16(0x00ff);
-	map(0x1e4, 0x1e4).w(FUNC(apricot_winchester_device::head_w<2>)).umask16(0x00ff);
-	map(0x1e6, 0x1e6).w(FUNC(apricot_winchester_device::drive_w<0>)).umask16(0x00ff);
-	map(0x1e8, 0x1e8).w(FUNC(apricot_winchester_device::xferd_w)).umask16(0x00ff); // transferred
-	map(0x1ea, 0x1ea).w(FUNC(apricot_winchester_device::hbcr_w)).umask16(0x00ff); // host buffer clear register
-	map(0x1ec, 0x1ec).w(FUNC(apricot_winchester_device::clksel_w)).umask16(0x00ff); // buffer chip read/write clock select (host or wdc)
-	map(0x1ee, 0x1ee).w(FUNC(apricot_winchester_device::drive_w<1>)).umask16(0x00ff);
+	map(0x1e0, 0x1e0).r(FUNC(apricot_winchester_device::int_r));
+	map(0x1e0, 0x1ef).w("latch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x1f0, 0x1f0).rw(FUNC(apricot_winchester_device::data_r), FUNC(apricot_winchester_device::data_w)).umask16(0x00ff);
 }
 
@@ -59,6 +54,16 @@ void apricot_winchester_device::device_add_mconfig(machine_config &config)
 	m_hdc->out_intrq_callback().set(FUNC(apricot_winchester_device::hdc_intrq_w));
 	m_hdc->in_data_callback().set(FUNC(apricot_winchester_device::hdc_data_r));
 	m_hdc->out_data_callback().set(FUNC(apricot_winchester_device::hdc_data_w));
+
+	ls259_device &latch(LS259(config, "latch")); // IC6
+	latch.q_out_cb<0>().set(FUNC(apricot_winchester_device::head_w<0>));
+	latch.q_out_cb<1>().set(FUNC(apricot_winchester_device::head_w<1>));
+	latch.q_out_cb<2>().set(FUNC(apricot_winchester_device::head_w<2>));
+	latch.q_out_cb<3>().set(FUNC(apricot_winchester_device::drive_w<0>));
+	latch.q_out_cb<4>().set(FUNC(apricot_winchester_device::xferd_w)); // transferred
+	latch.q_out_cb<5>().set(FUNC(apricot_winchester_device::hbcr_w)); // host buffer clear register
+	latch.q_out_cb<6>().set(FUNC(apricot_winchester_device::clksel_w)); // buffer chip read/write clock select (host or wdc)
+	latch.q_out_cb<7>().set(FUNC(apricot_winchester_device::drive_w<1>));
 
 	HARDDISK(config, "hdc:0", 0);
 	HARDDISK(config, "hdc:1", 0);
@@ -127,7 +132,7 @@ WRITE_LINE_MEMBER( apricot_winchester_device::hdc_intrq_w )
 	m_bus->int2_w(state);
 }
 
-READ8_MEMBER( apricot_winchester_device::hdc_data_r )
+uint8_t apricot_winchester_device::hdc_data_r()
 {
 	uint8_t data = 0xff;
 
@@ -136,14 +141,14 @@ READ8_MEMBER( apricot_winchester_device::hdc_data_r )
 		LOGDATA("hdc_data_r[%04x]\n", m_ram_ptr);
 
 		data = m_ram[m_ram_ptr];
-		if (m_ram_ptr < 0x1fff)
+		if (!machine().side_effects_disabled() && (m_ram_ptr < 0x1fff))
 			m_ram_ptr++;
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER( apricot_winchester_device::hdc_data_w )
+void apricot_winchester_device::hdc_data_w(uint8_t data)
 {
 	if (m_clksel == 1)
 	{
@@ -155,22 +160,22 @@ WRITE8_MEMBER( apricot_winchester_device::hdc_data_w )
 	}
 }
 
-READ8_MEMBER( apricot_winchester_device::int_r )
+uint8_t apricot_winchester_device::int_r()
 {
 	return m_int;
 }
 
 template<int N>
-WRITE8_MEMBER( apricot_winchester_device::head_w )
+WRITE_LINE_MEMBER( apricot_winchester_device::head_w )
 {
-	m_head = (m_head & ~(1 << N)) | (BIT(data, 0) << N);
+	m_head = (m_head & ~(1 << N)) | (state << N);
 	LOGREGS("Select head: %d\n", m_head);
 }
 
 template<int N>
-WRITE8_MEMBER( apricot_winchester_device::drive_w )
+WRITE_LINE_MEMBER( apricot_winchester_device::drive_w )
 {
-	m_drive = (m_drive & ~(1 << N)) | (BIT(data, 0) << N);
+	m_drive = (m_drive & ~(1 << N)) | (state << N);
 	LOGREGS("Select drive: %d\n", m_drive);
 
 	// forward drive status to the hdc
@@ -196,32 +201,32 @@ WRITE8_MEMBER( apricot_winchester_device::drive_w )
 	m_hdc->drdy_w(drive != nullptr && drive->exists());
 }
 
-WRITE8_MEMBER( apricot_winchester_device::xferd_w )
+WRITE_LINE_MEMBER( apricot_winchester_device::xferd_w )
 {
-	LOGREGS("xferd_w: %02x\n", data);
+	LOGREGS("xferd_w: %02x\n", state);
 
-	m_hdc->brdy_w(BIT(data, 0));
+	m_hdc->brdy_w(state);
 }
 
-WRITE8_MEMBER( apricot_winchester_device::hbcr_w )
+WRITE_LINE_MEMBER( apricot_winchester_device::hbcr_w )
 {
-	LOGREGS("hbcr_w: %02x\n", data);
+	LOGREGS("hbcr_w: %02x\n", state);
 
 	// reset ram pointer on high->low transition
-	if (m_hbcr == 1 && data == 0)
+	if (m_hbcr == 1 && !state)
 		m_ram_ptr = 0;
 
-	m_hbcr = BIT(data, 0);
+	m_hbcr = state;
 }
 
-WRITE8_MEMBER( apricot_winchester_device::clksel_w )
+WRITE_LINE_MEMBER( apricot_winchester_device::clksel_w )
 {
-	LOGREGS("clksel_w: %02x\n", data);
+	LOGREGS("clksel_w: %02x\n", state);
 
-	m_clksel = BIT(data, 0);
+	m_clksel = state;
 }
 
-READ8_MEMBER( apricot_winchester_device::data_r )
+uint8_t apricot_winchester_device::data_r()
 {
 	uint8_t data = 0xff;
 
@@ -239,7 +244,7 @@ READ8_MEMBER( apricot_winchester_device::data_r )
 	return data;
 }
 
-WRITE8_MEMBER( apricot_winchester_device::data_w )
+void apricot_winchester_device::data_w(uint8_t data)
 {
 	if (m_clksel == 0)
 	{

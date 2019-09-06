@@ -3882,6 +3882,7 @@
 		<publisher>Hudson</publisher>
 		<info name="release" value="19910906"/>
 		<part name="cart" interface="pce_cart">
+			<feature name="slot" value="tennokoe" />
 			<dataarea name="rom" size="131072">
 				<rom name="tennokoe bank (japan).pce" size="131072" crc="3b3808bd" sha1="8ade1c698e0cb96ce3ed01986c7e5268aa5a1451" offset="000000" />
 			</dataarea>

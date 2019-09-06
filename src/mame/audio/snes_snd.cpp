@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Brad Martin
 /***************************************************************************
 
-  snes_snd.c
+  snes_snd.cpp
 
   File to handle the sound emulation of the Nintendo Super NES.
 
@@ -146,10 +146,9 @@ static const int ENVCNT[0x20]
 ALLOW_SAVE_TYPE(snes_sound_device::env_state_t32);
 
 
-
 DEFINE_DEVICE_TYPE(SNES_SOUND, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
 
-snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SNES_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
@@ -161,9 +160,9 @@ snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *
 
 void snes_sound_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 2, clock());
+	m_channel = machine().sound().stream_alloc(*this, 0, 2, clock() / 64);
 
-	m_ram = make_unique_clear<uint8_t[]>(SNES_SPCRAM_SIZE);
+	m_ram = make_unique_clear<u8[]>(SNES_SPCRAM_SIZE);
 
 	/* put IPL image at the top of RAM */
 	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
@@ -191,7 +190,7 @@ void snes_sound_device::device_reset()
 		m_port_out[i] = 0;
 	}
 
-	for(i=0; i<3; i++)
+	for (i = 0; i < 3; i++)
 	{
 		m_timer_enabled[i] = false;
 		m_TnDIV[i] = 256;
@@ -199,21 +198,33 @@ void snes_sound_device::device_reset()
 		m_subcounter[i] = 0;
 	}
 
-	attotime period = attotime::from_hz(64000);
+	attotime period = attotime::from_ticks(32, clock());
 	m_tick_timer->adjust(period, 0, period);
 
 	dsp_reset();
 }
 
-inline void snes_sound_device::update_timer_tick(uint8_t which)
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void snes_sound_device::device_clock_changed()
 {
-	if(m_timer_enabled[which] == false)
+	m_channel->set_sample_rate(clock() / 64);
+	attotime period = attotime::from_ticks(32, clock());
+	m_tick_timer->adjust(period, 0, period);
+}
+
+inline void snes_sound_device::update_timer_tick(u8 which)
+{
+	if (m_timer_enabled[which] == false)
 		return;
 
 	m_subcounter[which]++;
 
 	// if timer channel is 0 or 1 we update at 64000/8
-	if(m_subcounter[which] >= 8 || which == 2)
+	if (m_subcounter[which] >= 8 || which == 2)
 	{
 		m_subcounter[which] = 0;
 		m_counter[which]++;
@@ -228,13 +239,13 @@ inline void snes_sound_device::update_timer_tick(uint8_t which)
 
 void snes_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(id != TIMER_TICK_ID)
+	if (id != TIMER_TICK_ID)
 	{
 		assert_always(false, "Unknown id in snes_sound_device::device_timer");
 		return;
 	}
 
-	for(int ch=0;ch<3;ch++)
+	for (int ch = 0; ch < 3; ch++)
 		update_timer_tick(ch);
 }
 
@@ -287,21 +298,12 @@ void snes_sound_device::dsp_reset()
  to mix audio into
 -------------------------------------------------*/
 
-void snes_sound_device::dsp_update( short *sound_ptr )
+void snes_sound_device::dsp_update( s16 *sound_ptr )
 {
 	int V;
 
-#ifndef NO_ECHO
-	int echo_base;
-	int echol;
-	int echor;
-#endif
-
 	int envx;
 	int m;
-	int outl;
-	int outr;
-	signed long outx;       /* Smpl height (must be signed) */
 	src_dir_type * sd;
 	int v;
 	int vl;
@@ -329,7 +331,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 	/* Question: what is the expected behavior when pitch modulation is enabled on
 	voice 0?  Jurassic Park 2 does this.  For now, using outx of zero for first
 	voice. */
-	outx = 0;
+	s32 outx = 0;       /* Smpl height (must be signed) */
 
 	/* Same table for noise and envelope */
 	m_noise_cnt -= ENVCNT[m_dsp_regs[0x6c] & 0x1f];
@@ -339,12 +341,12 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 		m_noise_lev = (((m_noise_lev << 13) ^ (m_noise_lev << 14)) & 0x4000) | (m_noise_lev >> 1);
 	}
 
-	outl  = 0;
-	outr  = 0;
+	int outl  = 0;
+	int outr  = 0;
 
 #ifndef NO_ECHO
-	echol = 0;
-	echor = 0;
+	int echol = 0;
+	int echor = 0;
 #endif
 
 	for (v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1)
@@ -357,7 +359,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			m_keys       |= m;
 			m_keyed_on   |= m;
 			vl          = m_dsp_regs[(v << 4) + 4];
-			vp->samp_id = *( uint32_t * )&sd[vl];
+			vp->samp_id = *( u32 * )&sd[vl];
 			vp->mem_ptr = LEtoME16(sd[vl].vptr);
 
 #ifdef DBG_KEY
@@ -410,7 +412,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			continue;
 		}
 
-		vp->pitch = LEtoME16(*((uint16_t *)&m_dsp_regs[V + 2])) & 0x3fff;
+		vp->pitch = LEtoME16(*((u16 *)&m_dsp_regs[V + 2])) & 0x3fff;
 
 #ifndef NO_PMOD
 		/* Pitch mod uses OUTX from last voice for this one.  Luckily we haven't
@@ -473,7 +475,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 					}
 
 					vp->header_cnt = 8;
-					vl = (uint8_t)m_ram[vp->mem_ptr++];
+					vl = (u8)m_ram[vp->mem_ptr++];
 					vp->range  = vl >> 4;
 					vp->end    = vl & 3;
 					vp->filter = (vl & 12) >> 2;
@@ -486,13 +488,13 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 				if (vp->half == 0)
 				{
 					vp->half = 1;
-					outx     = ((signed char)m_ram[vp->mem_ptr]) >> 4;
+					outx     = ((s8)m_ram[vp->mem_ptr]) >> 4;
 				}
 				else
 				{
 					vp->half = 0;
 					/* Funkiness to get 4-bit signed to carry through */
-					outx   = (signed char)(m_ram[vp->mem_ptr++] << 4);
+					outx   = (s8)(m_ram[vp->mem_ptr++] << 4);
 					outx >>= 4;
 					vp->header_cnt--;
 				}
@@ -520,7 +522,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 				}
 
 #ifdef DBG_BRR
-				logerror("V%d: shifted delta=%04X\n", v, (uint16_t)outx);
+				logerror("V%d: shifted delta=%04X\n", v, (u16)outx);
 #endif
 
 				switch (vp->filter)
@@ -542,21 +544,21 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 					break;
 				}
 
-				if (outx < (signed short)0x8000)
+				if (outx < (s16)0x8000)
 				{
-					outx = (signed short)0x8000;
+					outx = (s16)0x8000;
 				}
-				else if (outx > (signed short)0x7fff)
+				else if (outx > (s16)0x7fff)
 				{
-					outx = (signed short)0x7fff;
+					outx = (s16)0x7fff;
 				}
 
 #ifdef DBG_BRR
-				logerror("V%d: filter + delta=%04X\n", v, (uint16_t)outx);
+				logerror("V%d: filter + delta=%04X\n", v, (u16)outx);
 #endif
 
-				vp->smp2 = (signed short)vp->smp1;
-				vp->smp1 = (signed short)(outx << 1);
+				vp->smp2 = (s16)vp->smp1;
+				vp->smp1 = (s16)(outx << 1);
 				vp->sampbuf[vp->sampptr] = vp->smp1;
 
 #ifdef DBG_BRR
@@ -571,7 +573,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 #ifdef DBG_PMOD
 				logerror("Noise enabled, voice %d\n", v);
 #endif
-				outx = (signed short)(m_noise_lev << 1);
+				outx = (s16)(m_noise_lev << 1);
 			}
 			else
 			{
@@ -589,7 +591,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			SNES, it appears clipping is done only if it is the fourth addition
 			that would cause a wrap.  If it has already wrapped before the
 			fourth addition, it is not clipped. */
-			vr  = (signed short)vr;
+			vr  = (s16)vr;
 			vr += ((G1[vl] * vp->sampbuf[(vp->sampptr + 3) & 3]) >> 11) & ~1;
 
 			if (vr > 32767)
@@ -597,7 +599,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			else if (vr < -32768)
 				vr = -32768;
 
-			outx = (signed short)vr;
+			outx = (s16)vr;
 
 #ifdef DBG_INTRP
 			logerror("V%d: mixfrac=%d: [%d]*%d + [%d]*%d + [%d]*%d + [%d]*%d = %d\n", v, vl,
@@ -619,8 +621,8 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 		outx = ((outx * envx) >> 11) & ~1;
 		m_dsp_regs[V + 9] = outx >> 8;
 
-		vl = (((int)(signed char)m_dsp_regs[V    ]) * outx) >> 7;
-		vr = (((int)(signed char)m_dsp_regs[V + 1]) * outx) >> 7;
+		vl = (((int)(s8)m_dsp_regs[V    ]) * outx) >> 7;
+		vr = (((int)(s8)m_dsp_regs[V + 1]) * outx) >> 7;
 		outl += vl;
 		outr += vr;
 
@@ -633,45 +635,45 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 		}
 	}
 
-	outl = (outl * (signed char)m_dsp_regs[0x0c]) >> 7;
-	outr = (outr * (signed char)m_dsp_regs[0x1c]) >> 7;
+	outl = (outl * (s8)m_dsp_regs[0x0c]) >> 7;
+	outr = (outr * (s8)m_dsp_regs[0x1c]) >> 7;
 
 #ifndef NO_ECHO
 	/* Perform echo.  First, read mem at current location, and put those samples
 	into the FIR filter queue. */
 #ifdef DBG_ECHO
 	logerror("Echo delay=%dms, feedback=%d%%\n", m_dsp_regs[0x7d] * 16,
-		((signed char)m_dsp_regs[0x0d] * 100) / 0x7f);
+		((s8)m_dsp_regs[0x0d] * 100) / 0x7f);
 #endif
 
-	echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
-	m_fir_lbuf[m_fir_ptr] = (signed short)LEtoME16(*(uint16_t *)&m_ram[echo_base]);
-	m_fir_rbuf[m_fir_ptr] = (signed short)LEtoME16(*(uint16_t *)&m_ram[echo_base + sizeof(short)]);
+	int echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
+	m_fir_lbuf[m_fir_ptr] = (s16)LEtoME16(*(u16 *)&m_ram[echo_base]);
+	m_fir_rbuf[m_fir_ptr] = (s16)LEtoME16(*(u16 *)&m_ram[echo_base + sizeof(s16)]);
 
 	/* Now, evaluate the FIR filter, and add the results into the final output. */
-	vl = m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x7f];
-	vr = m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x7f];
+	vl = m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x7f];
+	vr = m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x7f];
 	m_fir_ptr = (m_fir_ptr + 1) & 7;
-	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x6f];
-	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x6f];
+	vl += m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x6f];
+	vr += m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x6f];
 	m_fir_ptr = (m_fir_ptr + 1) & 7;
-	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x5f];
-	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x5f];
+	vl += m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x5f];
+	vr += m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x5f];
 	m_fir_ptr = (m_fir_ptr + 1) & 7;
-	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x4f];
-	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x4f];
+	vl += m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x4f];
+	vr += m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x4f];
 	m_fir_ptr = (m_fir_ptr + 1) & 7;
-	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x3f];
-	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x3f];
+	vl += m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x3f];
+	vr += m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x3f];
 	m_fir_ptr = (m_fir_ptr + 1) & 7;
-	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x2f];
-	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x2f];
+	vl += m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x2f];
+	vr += m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x2f];
 	m_fir_ptr = (m_fir_ptr + 1) & 7;
-	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x1f];
-	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x1f];
+	vl += m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x1f];
+	vr += m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x1f];
 	m_fir_ptr = (m_fir_ptr + 1) & 7;
-	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x0f];
-	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x0f];
+	vl += m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x0f];
+	vr += m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x0f];
 
 #ifdef DBG_ECHO
 	logerror("FIR Coefficients: %02X %02X %02X %02X %02X %02X %02X %02X\n",
@@ -686,20 +688,20 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 #endif
 
 	/* FIR_ptr is left in the position of the oldest sample, the one that will be replaced next update. */
-	outl += vl * (signed char)m_dsp_regs[0x2c] >> 14;
-	outr += vr * (signed char)m_dsp_regs[0x3c] >> 14;
+	outl += vl * (s8)m_dsp_regs[0x2c] >> 14;
+	outr += vr * (s8)m_dsp_regs[0x3c] >> 14;
 
 	if (!(m_dsp_regs[0x6c] & 0x20))
 	{
 		/* Add the echo feedback back into the original result, and save that into memory for use later. */
-		echol += vl * (signed char)m_dsp_regs[0x0d] >> 14;
+		echol += vl * (s8)m_dsp_regs[0x0d] >> 14;
 
 		if (echol > 32767)
 			echol = 32767;
 		else if (echol < -32768)
 			echol = -32768;
 
-		echor += vr * (signed char)m_dsp_regs[0x0D ] >> 14;
+		echor += vr * (s8)m_dsp_regs[0x0D ] >> 14;
 
 		if (echor > 32767)
 			echor = 32767;
@@ -707,14 +709,14 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			echor = -32768;
 
 #ifdef DBG_ECHO
-		logerror("Echo: Writing %04X,%04X at location %04X\n", (uint16_t)echol, (uint16_t)echor, echo_base);
+		logerror("Echo: Writing %04X,%04X at location %04X\n", (u16)echol, (u16)echor, echo_base);
 #endif
 
-		*(uint16_t *)&m_ram[echo_base]                 = MEtoLE16((uint16_t)echol);
-		*(uint16_t *)&m_ram[echo_base + sizeof(short)] = MEtoLE16((uint16_t)echor);
+		*(u16 *)&m_ram[echo_base]               = MEtoLE16((u16)echol);
+		*(u16 *)&m_ram[echo_base + sizeof(s16)] = MEtoLE16((u16)echor);
 	}
 
-	m_echo_ptr += 2 * sizeof(short);
+	m_echo_ptr += 2 * sizeof(s16);
 
 	if (m_echo_ptr >= ((m_dsp_regs[0x7d] & 0x0f) << 11))
 	{
@@ -769,12 +771,9 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 
 int snes_sound_device::advance_envelope( int v )
 {
-	int envx;
-	int cnt;
-	int adsr1;
 	int t;
 
-	envx = m_voice_state[v].envx;
+	int envx = m_voice_state[v].envx;
 
 	if (m_voice_state[v].envstate == env_state_t32::RELEASE)
 	{
@@ -802,8 +801,8 @@ int snes_sound_device::advance_envelope( int v )
 		return envx;
 	}
 
-	cnt = m_voice_state[v].envcnt;
-	adsr1 = m_dsp_regs[(v << 4) + 5];
+	int cnt = m_voice_state[v].envcnt;
+	int adsr1 = m_dsp_regs[(v << 4) + 5];
 
 	if (adsr1 & 0x80)
 	{
@@ -1029,7 +1028,7 @@ void snes_sound_device::set_volume(int volume)
          I/O for DSP
  ***************************/
 
-READ8_MEMBER( snes_sound_device::dsp_io_r )
+u8 snes_sound_device::dsp_io_r(offs_t offset)
 {
 	m_channel->update();
 
@@ -1042,7 +1041,7 @@ READ8_MEMBER( snes_sound_device::dsp_io_r )
 	return m_dsp_regs[offset & 0x7f];
 }
 
-WRITE8_MEMBER( snes_sound_device::dsp_io_w )
+void snes_sound_device::dsp_io_w(offs_t offset, u8 data)
 {
 	m_channel->update();
 
@@ -1062,7 +1061,7 @@ WRITE8_MEMBER( snes_sound_device::dsp_io_w )
        I/O for SPC700
  ***************************/
 
-READ8_MEMBER( snes_sound_device::spc_io_r )
+u8 snes_sound_device::spc_io_r(offs_t offset)
 {
 	switch (offset) /* Offset is from 0x00f0 */
 	{
@@ -1073,7 +1072,7 @@ READ8_MEMBER( snes_sound_device::spc_io_r )
 		case 0x2:       /* Register address */
 			return m_ram[0xf2];
 		case 0x3:       /* Register data */
-			return dsp_io_r(space, m_ram[0xf2]);
+			return dsp_io_r(m_ram[0xf2]);
 		case 0x4:       /* Port 0 */
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
@@ -1091,7 +1090,7 @@ READ8_MEMBER( snes_sound_device::spc_io_r )
 		case 0xe:       /* Counter 1 */
 		case 0xf:       /* Counter 2 */
 		{
-			uint8_t value = m_ram[0xf0 + offset] & 0x0f;
+			u8 value = m_ram[0xf0 + offset] & 0x0f;
 			m_ram[0xf0 + offset] = 0;
 			return value;
 		}
@@ -1100,12 +1099,12 @@ READ8_MEMBER( snes_sound_device::spc_io_r )
 	return 0;
 }
 
-WRITE8_MEMBER( snes_sound_device::spc_io_w )
+void snes_sound_device::spc_io_w(offs_t offset, u8 data)
 {
 	switch (offset) /* Offset is from 0x00f0 */
 	{
 		case 0x0:
-			printf("Warning: write to SOUND TEST register with data %02x!\n", data);
+			logerror("Warning: write to SOUND TEST register with data %02x!\n", data);
 			break;
 		case 0x1:       /* Control */
 			for (int i = 0; i < 3; i++)
@@ -1139,7 +1138,7 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 			break;
 		case 0x3:       /* Register data - 0x80-0xff is a read-only mirror of 0x00-0x7f */
 			if (!(m_ram[0xf2] & 0x80))
-				dsp_io_w(space, m_ram[0xf2] & 0x7f, data);
+				dsp_io_w(m_ram[0xf2] & 0x7f, data);
 			break;
 		case 0x4:       /* Port 0 */
 		case 0x5:       /* Port 1 */
@@ -1154,7 +1153,7 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 		case 0xb:       /* Timer 1 */
 		case 0xc:       /* Timer 2 */
 			// if 0 then TnDiv is divided by 256, otherwise it's divided by 1 to 255
-			if(data == 0)
+			if (data == 0)
 				m_TnDIV[offset - 0xa] = 256;
 			else
 				m_TnDIV[offset - 0xa] = data;
@@ -1168,7 +1167,7 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 	m_ram[0xf0 + offset] = data;
 }
 
-READ8_MEMBER( snes_sound_device::spc_ram_r )
+u8 snes_sound_device::spc_ram_r(offs_t offset)
 {
 	/* IPL ROM enabled */
 	if (offset >= 0xffc0 && m_ram[0xf1] & 0x80)
@@ -1177,20 +1176,20 @@ READ8_MEMBER( snes_sound_device::spc_ram_r )
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( snes_sound_device::spc_ram_w )
+void snes_sound_device::spc_ram_w(offs_t offset, u8 data)
 {
 	m_ram[offset] = data;
 }
 
 
-READ8_MEMBER( snes_sound_device::spc_port_out )
+u8 snes_sound_device::spc_port_out(offs_t offset)
 {
 	assert(offset < 4);
 
 	return m_port_out[offset];
 }
 
-WRITE8_MEMBER( snes_sound_device::spc_port_in )
+void snes_sound_device::spc_port_in(offs_t offset, u8 data)
 {
 	assert(offset < 4);
 
@@ -1226,6 +1225,8 @@ void snes_sound_device::state_register()
 	save_item(NAME(m_port_in));
 	save_item(NAME(m_port_out));
 
+	save_item(NAME(m_TnDIV));
+
 	for (int v = 0; v < 8; v++)
 	{
 		save_item(NAME(m_voice_state[v].mem_ptr), v);
@@ -1254,7 +1255,7 @@ void snes_sound_device::state_register()
 
 void snes_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	short mix[2];
+	s16 mix[2];
 
 	for (int i = 0; i < samples; i++)
 	{

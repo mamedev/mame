@@ -23,6 +23,18 @@
 		</part>
 	</software>
 
+	<software name="oldtwrp">
+		<description>Old Tower</description>
+		<year>2018</year>
+		<publisher>RetroSouls</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="101080">
+				<rom name="oldtowerpentagon.tap" size="101080" crc="a68f6ac1" sha1="7e397cd79d8444bc36e7dc27c7fc511ffc5236b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 </softwarelist>
 
 

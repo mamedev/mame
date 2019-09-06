@@ -199,11 +199,13 @@ void ajax_state::ajax(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(ajax_state::tile_callback), this);
+	m_k052109->irq_handler().set_inputline(m_subcpu, M6809_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(ajax_state::sprite_callback), this);
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 

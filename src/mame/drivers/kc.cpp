@@ -135,16 +135,15 @@ void kc_state::kc85_3(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(kc_state, kc), this), "kcc", attotime::from_seconds(2));
+	QUICKLOAD(config, "quickload", "kcc", attotime::from_seconds(2)).set_load_callback(FUNC(kc_state::quickload_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(kc_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("kc_cass");
 
 	/* cartridge slot */
@@ -214,16 +213,15 @@ void kc85_4_state::kc85_4(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(kc_state, kc), this), "kcc", attotime::from_seconds(2));
+	QUICKLOAD(config, "quickload", "kcc", attotime::from_seconds(2)).set_load_callback(FUNC(kc_state::quickload_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(kc_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("kc_cass");
 
 	/* cartridge slot */

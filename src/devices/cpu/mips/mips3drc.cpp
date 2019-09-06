@@ -73,6 +73,7 @@
 static void cfunc_printf_exception(void *param);
 static void cfunc_get_cycles(void *param);
 static void cfunc_printf_probe(void *param);
+static void cfunc_debug_break(void *param);
 
 
 /***************************************************************************
@@ -530,6 +531,20 @@ static void cfunc_printf_probe(void *param)
 }
 
 /*-------------------------------------------------
+    func_debug_break - debugger break
+-------------------------------------------------*/
+
+void mips3_device::func_debug_break()
+{
+	machine().debug_break();
+}
+
+static void cfunc_debug_break(void *param)
+{
+	((mips3_device *)param)->func_debug_break();
+}
+
+/*-------------------------------------------------
     cfunc_unimplemented - handler for
     unimplemented opcdes
 -------------------------------------------------*/
@@ -658,7 +673,10 @@ void mips3_device::static_generate_tlb_mismatch()
 	alloc_handle(*m_drcuml, m_tlb_mismatch, "tlb_mismatch");
 	UML_HANDLE(block, *m_tlb_mismatch);                                         // handle  tlb_mismatch
 	UML_RECOVER(block, I0, MAPVAR_PC);                                          // recover i0,PC
-	UML_MOV(block, mem(&m_core->pc), I0);                                       // mov     <pc>,i0
+	// Need the current PC address for the instruction to do the TLB lookup
+	// so need to adjust I0 so it points to the true PC address in case this is a delay slot
+	UML_ADD(block, I0, I0, 3);                                                  // add     i1,i0,3
+	UML_AND(block, I0, I0, ~3);                                                 // and     i0,i0,~3
 	UML_SHR(block, I1, I0, 12);                                                 // shr     i1,i0,12
 	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);        // load    i1,[vtlb_table],i1,dword
 	if (PRINTF_MMU)
@@ -678,9 +696,11 @@ void mips3_device::static_generate_tlb_mismatch()
 	save_fast_iregs(block);
 
 	// the saved PC may be set 1 instruction back with the low bit set to indicate
-	// a delay slot; in this path we want the original instruction address, so recover it
-	UML_ADD(block, I0, mem(&m_core->pc), 3);                             // add     i0,<pc>,3
-	UML_AND(block, mem(&m_core->pc), I0, ~3);                                // and     <pc>,i0,~3
+	// a delay slot; in this path we want the previous instruction address, so recover it
+	UML_RECOVER(block, I0, MAPVAR_PC);                                          // recover i0,PC
+	UML_AND(block, I0, I0, ~3);                                                 // and     i0,i0,~3
+	UML_MOV(block, mem(&m_core->pc), I0);                                       // mov     i0,[pc]
+
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                      // exit    EXECUTE_MISSING_CODE
 
 	block.end();
@@ -718,8 +738,7 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 	{
 		/* set BadVAddr to the fault address */
 		UML_GETEXP(block, I0);                                                  // getexp  i0
-		UML_TEST(block, CPR032(COP0_Status), SR_EXL);                           // test    [Status],SR_EXL
-		UML_MOVc(block, COND_Z, CPR032(COP0_BadVAddr), I0);                     // mov     [BadVAddr],i0,Z
+		UML_MOV(block, CPR032(COP0_BadVAddr), I0);                              // mov     [BadVAddr],i0
 	}
 
 	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
@@ -773,6 +792,7 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 		(PRINTF_MMU && (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)))
 	{
 		UML_CALLC(block, cfunc_printf_exception, this);                            // callc   cfunc_printf_exception,nullptr
+		//UML_CALLC(block, cfunc_debug_break, this);                            // callc   cfunc_debug_break,nullptr
 	}
 
 	/* choose our target PC */
@@ -1221,7 +1241,7 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 	{
 		if (PRINTF_MMU)
 		{
-			static const char text[] = "Compiler page fault @ %08X";
+			static const char text[] = "Compiler page fault @ %08X\n";
 			UML_MOV(block, mem(&m_core->format), (uintptr_t)text);          // mov     [format],text
 			UML_MOV(block, mem(&m_core->arg0), desc->pc);              // mov     [arg0],desc->pc
 			UML_CALLC(block, cfunc_printf_debug, this);                            // callc   printf_debug
@@ -1510,12 +1530,15 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 
 		case 0x30:  /* LL - MIPS II */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *m_read32[m_core->mode >> 1]); // callh   read32
+			UML_MOV(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // mov     [LLAddr],i0
+			UML_CALLH(block, *m_read32[m_core->mode >> 1]);                 // callh   read32
 			if (RTREG != 0)
-				UML_DSEXT(block, R64(RTREG), I0, SIZE_DWORD);                       // dsext   <rtreg>,i0
-			UML_MOV(block, mem(&m_core->llbit), 1);                              // mov     [llbit],1
+				UML_DSEXT(block, R64(RTREG), I0, SIZE_DWORD);               // dsext   <rtreg>,i0
+			UML_MOV(block, mem(&m_core->llbit), 1);                         // mov     [llbit],1
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			if LL_BREAK
+				UML_CALLC(block, cfunc_debug_break, this);                  // callc   cfunc_debug_break,nullptr
 			return true;
 
 		case 0x24:  /* LBU - MIPS I */
@@ -1556,12 +1579,15 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 
 		case 0x34:  /* LLD - MIPS III */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *m_read64[m_core->mode >> 1]); // callh   read64
+			UML_MOV(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // mov     [LLAddr],i0
+			UML_CALLH(block, *m_read64[m_core->mode >> 1]);                 // callh   read64
 			if (RTREG != 0)
-				UML_DMOV(block, R64(RTREG), I0);                                // dmov    <rtreg>,i0
-			UML_MOV(block, mem(&m_core->llbit), 1);                              // mov     [llbit],1
+				UML_DMOV(block, R64(RTREG), I0);                            // dmov    <rtreg>,i0
+			UML_MOV(block, mem(&m_core->llbit), 1);                         // mov     [llbit],1
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			if LL_BREAK
+				UML_CALLC(block, cfunc_debug_break, this);                  // callc   cfunc_debug_break,nullptr
 			return true;
 
 		case 0x22:  /* LWL - MIPS I */
@@ -1703,13 +1729,16 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 			return true;
 
 		case 0x38:  /* SC - MIPS II */
-			UML_CMP(block, mem(&m_core->llbit), 0);                              // cmp     [llbit],0
-			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                       // je      skip
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, I1, R32(RTREG));                                 // mov     i1,<rtreg>
-			UML_CALLH(block, *m_write32[m_core->mode >> 1]);    // callh   write32
-			UML_LABEL(block, skip);                                             // skip:
-			UML_DSEXT(block, R64(RTREG), mem(&m_core->llbit), SIZE_DWORD);               // dsext   <rtreg>,[llbit],dword
+			UML_MOV(block, R32(RTREG), 0);                                  // mov     <rtreg>, 0
+			UML_CMP(block, mem(&m_core->llbit), 0);                         // cmp     [llbit],0
+			UML_JMPc(block, COND_E, skip = compiler.labelnum++);            // je      skip
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_CMP(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // cmp [LLADDR], RSREG + SIMMVAL
+			UML_JMPc(block, COND_NE, skip);                                 // jne      skip
+			UML_CALLH(block, *m_write32[m_core->mode >> 1]);                // callh   write32
+			UML_MOV(block, R32(RTREG), 1);                                  // mov     <rtreg>, 0
+			UML_LABEL(block, skip);                                         // skip:
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
 			return true;
@@ -1723,13 +1752,16 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 			return true;
 
 		case 0x3c:  /* SCD - MIPS III */
-			UML_CMP(block, mem(&m_core->llbit), 0);                              // cmp     [llbit],0
-			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                       // je      skip
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_DMOV(block, I1, R64(RTREG));                                    // dmov    i1,<rtreg>
-			UML_CALLH(block, *m_write64[m_core->mode >> 1]);    // callh   write64
+			UML_DMOV(block, R64(RTREG), 0);                                     // dmov   <rtreg>,0
+			UML_CMP(block, mem(&m_core->llbit), 0);                             // cmp     [llbit],0
+			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                // je      skip
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                            // add     i0,<rsreg>,SIMMVAL
+			UML_CMP(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);              // cmp [LLADDR], RSREG + SIMMVAL
+			UML_JMPc(block, COND_NE, skip);                                     // jne      skip
+			UML_CALLH(block, *m_write64[m_core->mode >> 1]);                    // callh   write64
+			UML_DMOV(block, R64(RTREG), 1);                                     // dmov   <rtreg>,1
 			UML_LABEL(block, skip);                                             // skip:
-			UML_DSEXT(block, R64(RTREG), mem(&m_core->llbit), SIZE_DWORD);               // dsext   <rtreg>,[llbit],dword
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
 			return true;

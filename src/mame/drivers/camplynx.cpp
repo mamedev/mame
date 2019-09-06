@@ -165,7 +165,6 @@
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 
@@ -857,7 +856,6 @@ void camplynx_state::lynx_common(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.02);
 }
 
 void camplynx_state::lynx_disk(machine_config &config)
@@ -889,6 +887,7 @@ void camplynx_state::lynx48k(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(lynx48k_cassette_formats);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cass->set_interface("camplynx_cass");
 
 	/* devices */
@@ -937,6 +936,7 @@ void camplynx_state::lynx128k(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(lynx128k_cassette_formats);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cass->set_interface("camplynx_cass");
 
 	/* devices */

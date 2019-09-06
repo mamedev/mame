@@ -268,7 +268,7 @@ void micro3d_state::drmath_data(address_map &map)
 	map(0x01400000, 0x01400003).rw(FUNC(micro3d_state::micro3d_pipe_r), FUNC(micro3d_state::micro3d_fifo_w));
 	map(0x01600000, 0x01600003).w(FUNC(micro3d_state::drmath_intr2_ack));
 	map(0x01800000, 0x01800003).w(FUNC(micro3d_state::micro3d_alt_fifo_w));
-	map(0x03fffff0, 0x03ffffff).rw("scc", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
+	map(0x03fffff0, 0x03ffffff).rw("scc", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 }
 
 /*************************************

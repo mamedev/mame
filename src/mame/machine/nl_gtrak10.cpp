@@ -11,7 +11,7 @@
 
 //render a white square with the shape of the car window
 //instead of drawing the actual car sprite graphics
-#define CAR_WINDOW_HACK
+//#define CAR_WINDOW_HACK
 
 //generate a regular pattern of squares
 // instead of the race track
@@ -26,6 +26,7 @@ NETLIST_START(gtrak10)
 	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	ANALOG_INPUT(V5, 5)
+	ALIAS(VCC, V5)
 
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
@@ -369,6 +370,7 @@ NETLIST_START(gtrak10)
 	NET_C(RT, R66.1)
 	NET_C(SLICK_Q, R65.1)
 
+#if 0
 	CAP(C44, CAP_U(10))
 	NET_C(C44.1, R63.2)
 	NET_C(C44.1, R73.2)
@@ -377,5 +379,14 @@ NETLIST_START(gtrak10)
 	NET_C(C44.1, R66.2)
 	NET_C(C44.1, R65.2)
 	ALIAS(VIDEO_OUT, C44.2)
+#else
+	// A capacitor just kills performance completely
+	RES(RVID, RES_K(10))
+	NET_C(GND, RVID.2)
+
+	NET_C(RVID.1, R63.2, R73.2, R64.2, R74.2, R66.2, R65.2)
+
+	ALIAS(VIDEO_OUT, RVID.1)
+#endif
 
 NETLIST_END()

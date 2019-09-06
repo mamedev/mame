@@ -102,7 +102,7 @@ void dmv_k806_device::device_reset()
 
 void dmv_k806_device::device_add_mconfig(machine_config &config)
 {
-	I8741(config, m_mcu, XTAL(6'000'000));
+	I8741A(config, m_mcu, XTAL(6'000'000));
 	m_mcu->p1_in_cb().set(FUNC(dmv_k806_device::port1_r));
 	m_mcu->p2_out_cb().set(FUNC(dmv_k806_device::port2_w));
 	m_mcu->t1_in_cb().set(FUNC(dmv_k806_device::portt1_r));

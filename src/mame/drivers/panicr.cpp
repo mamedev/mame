@@ -69,6 +69,7 @@ D.9B         [f99cac4b] /
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class panicr_state : public driver_device

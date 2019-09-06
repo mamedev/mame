@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class battlex_state : public driver_device
 {

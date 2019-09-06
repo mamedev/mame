@@ -84,8 +84,8 @@ private:
 	required_device<pit8253_device> m_ioctimer;
 	required_device<i8271_device> m_iocfdc;
 	required_device<floppy_connector> m_flop0;
-	required_device<i8041_device> m_iocpio;
-	required_device<i8741_device> m_kbcpu;
+	required_device<i8041a_device> m_iocpio;
+	required_device<i8741a_device> m_kbcpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<centronics_device> m_centronics;

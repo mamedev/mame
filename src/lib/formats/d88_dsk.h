@@ -7,9 +7,10 @@
     D88 disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_D88_DSK_H
+#define MAME_FORMATS_D88_DSK_H
 
-#ifndef D88_DSK_H
-#define D88_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -31,4 +32,4 @@ public:
 
 extern const floppy_format_type FLOPPY_D88_FORMAT;
 
-#endif /* D88_DSK_H */
+#endif // MAME_FORMATS_D88_DSK_H

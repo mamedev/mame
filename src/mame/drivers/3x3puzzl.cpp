@@ -46,6 +46,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MAIN_CLOCK XTAL(10'000'000)
 

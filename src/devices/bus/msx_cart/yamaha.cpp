@@ -86,7 +86,10 @@ const tiny_rom_entry *msx_cart_sfg01_device::device_rom_region() const
 
 ROM_START( msx_sfg05 )
 	ROM_REGION(0x8000, "sfg", 0)
-	ROM_LOAD("sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
+	ROM_SYSTEM_BIOS( 0, "sfg05", "SFG05 (original)" )
+	ROMX_LOAD( "sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "sfg05a", "SFG05 (SFG01 upgrade)" ) // SFG01 PCB, Yamaha official upgrade, has YM2151 instead of YM2164
+	ROMX_LOAD( "sfg05a.rom", 0x0, 0x8000, CRC(5bc237f8) SHA1(930338f45c08228108c0831cc4a26014c2674718), ROM_BIOS(1) )
 ROM_END
 
 

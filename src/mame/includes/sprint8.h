@@ -10,6 +10,7 @@
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class sprint8_state : public driver_device
 {

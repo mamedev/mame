@@ -565,7 +565,6 @@ void galaxold_state::dkongjrmc_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
-	map(0x7000, 0x73ff).ram().w(FUNC(galaxold_state::galaxold_videoram_w));
 	map(0x7000, 0x70ff).ram().w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
 	map(0x7100, 0x71ff).ram().share("spriteram");
 	map(0x7400, 0x77ff).ram().w(FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
@@ -3054,7 +3053,7 @@ ROM_START( scramb3 )
 	ROM_LOAD( "6.1h",       0x0000, 0x0800, CRC(4708845b) SHA1(a8b1ad19a95a9d35050a2ab7194cc96fc5afcdc9) )
 	ROM_LOAD( "5.1k",       0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) // three proms on smaller top PCB not dumped yet. The one used is taken from scramble.
+	ROM_REGION( 0x0020, "proms", 0 ) // identical to scramble
 	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 

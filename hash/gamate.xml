@@ -27,7 +27,7 @@ C1066 - ??
 		<info name="serial" value="C1001" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="c1001_cubeup.bin" size="16384" crc="2a911e57" sha1="9d3b28887b6f375600bff29f8f233087b9152a60" offset="0x00000" />
+				<rom name="c1001_cubeup.bin" size="16384" crc="2a911e57" sha1="9d3b28887b6f375600bff29f8f233087b9152a60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39,7 +39,7 @@ C1066 - ??
 		<info name="serial" value="C1002" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1002_witty_apee.bin" size="32768" crc="f1190956" sha1="0c0579472260b1a0f5bfbda4cba8043b2a75aa54" offset="0" />
+				<rom name="c1002_witty_apee.bin" size="32768" crc="f1190956" sha1="0c0579472260b1a0f5bfbda4cba8043b2a75aa54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +51,7 @@ C1066 - ??
 		<info name="serial" value="C1003" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1003_box_forum.bin" size="32768" crc="82c6f1d5" sha1="a4c826d85b990b4c01d17e81b722cc54f7ae9e93" offset="0" />
+				<rom name="c1003_box_forum.bin" size="32768" crc="82c6f1d5" sha1="a4c826d85b990b4c01d17e81b722cc54f7ae9e93"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@ C1066 - ??
 		<info name="serial" value="C1004" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1004_mighty_tank.bin" size="32768" crc="f24379fd" sha1="ef3a555860b09431fbf1600238e7a4865d7af792" offset="0" />
+				<rom name="c1004_mighty_tank.bin" size="32768" crc="f24379fd" sha1="ef3a555860b09431fbf1600238e7a4865d7af792"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,7 +75,7 @@ C1066 - ??
 		<info name="serial" value="C1005" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1005_enchanted_bricks.bin" size="32768" crc="3dcdf55a" sha1="d722c5334a063c1f05e7bcd17fcc645cc3571127" offset="0" />
+				<rom name="c1005_enchanted_bricks.bin" size="32768" crc="3dcdf55a" sha1="d722c5334a063c1f05e7bcd17fcc645cc3571127"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@ C1066 - ??
 		<info name="serial" value="C1006" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1006_mini_golf.bin" size="32768" crc="59781e23" sha1="527d6cd2069086e76596bc365be5c807dfffcb64" offset="0" />
+				<rom name="c1006_mini_golf.bin" size="32768" crc="59781e23" sha1="527d6cd2069086e76596bc365be5c807dfffcb64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -99,7 +99,7 @@ C1066 - ??
 		<info name="serial" value="C1007" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1007_galaxy_invaders.bin" size="32768" crc="93afad9b" sha1="03f9c3d6cb3192f5bf91f2ac0e578bc65c8b1825" offset="0" />
+				<rom name="c1007_galaxy_invaders.bin" size="32768" crc="93afad9b" sha1="03f9c3d6cb3192f5bf91f2ac0e578bc65c8b1825"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
-				<rom name="c1-008.bin" size="65536" crc="a67ba296" sha1="d01988984e2950fde8096a0156808995a0e5c515" offset="0" />
+				<rom name="c1-008.bin" size="65536" crc="a67ba296" sha1="d01988984e2950fde8096a0156808995a0e5c515"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +124,7 @@ C1066 - ??
 		<info name="serial" value="C1009" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1009_tornado.bin" size="32768" crc="4cd6118e" sha1="671ea650ef462e7dcb4cb02b07ddbc300002707b" offset="0" />
+				<rom name="c1009_tornado.bin" size="32768" crc="4cd6118e" sha1="671ea650ef462e7dcb4cb02b07ddbc300002707b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -136,7 +136,7 @@ C1066 - ??
 		<info name="serial" value="C1011" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1011_money_maze.bin" size="32768" crc="4d9bfd91" sha1="814f4ff6fffb6a86c9936f74f50049b34bc0d362" offset="0" />
+				<rom name="c1011_money_maze.bin" size="32768" crc="4d9bfd91" sha1="814f4ff6fffb6a86c9936f74f50049b34bc0d362"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@ C1066 - ??
 		<info name="serial" value="C1012" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1012_pharaoh_revenger.bin" size="32768" crc="daac7932" sha1="a1b2846613341fe7d92e4ceb40e5525fce5c1cdd" offset="0" />
+				<rom name="c1012_pharaoh_revenger.bin" size="32768" crc="daac7932" sha1="a1b2846613341fe7d92e4ceb40e5525fce5c1cdd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +160,7 @@ C1066 - ??
 		<info name="serial" value="C1013" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1013_dino_bibo.bin" size="32768" crc="d6e1f1b7" sha1="7e7ba0b7b919e89e2d8a904de30f5ee34ffba822" offset="0" />
+				<rom name="c1013_dino_bibo.bin" size="32768" crc="d6e1f1b7" sha1="7e7ba0b7b919e89e2d8a904de30f5ee34ffba822"/>
 			</dataarea>
 		</part>
 	</software>
@@ -172,7 +172,7 @@ C1066 - ??
 		<info name="serial" value="C1014" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1014_time_warrior.bin" size="32768" crc="1502d7e3" sha1="8d15793fbea07cfda8d68d7eb96fe0eccc978317" offset="0" />
+				<rom name="c1014_time_warrior.bin" size="32768" crc="1502d7e3" sha1="8d15793fbea07cfda8d68d7eb96fe0eccc978317"/>
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +184,7 @@ C1066 - ??
 		<info name="serial" value="C1015" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1015_kill_shot.bin" size="32768" crc="69bc6a30" sha1="a4310f285f68c1837b4e92a2e127e22e7f0fd4f2" offset="0" />
+				<rom name="c1015_kill_shot.bin" size="32768" crc="69bc6a30" sha1="a4310f285f68c1837b4e92a2e127e22e7f0fd4f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="131072">
-				<rom name="c1-016.bin" size="131072" crc="1c2921df" sha1="958f4936f3aa8db5e76d315ee6acc6aee0e010b4" offset="0" />
+				<rom name="c1-016.bin" size="131072" crc="1c2921df" sha1="958f4936f3aa8db5e76d315ee6acc6aee0e010b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -209,7 +209,7 @@ C1066 - ??
 		<info name="serial" value="C1017" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1017_devilcastle.bin" size="32768" crc="2f4dfa71" sha1="175994971c157e51ff0b5dd0e46c9e8c92cf2a50" offset="0" />
+				<rom name="c1017_devilcastle.bin" size="32768" crc="2f4dfa71" sha1="175994971c157e51ff0b5dd0e46c9e8c92cf2a50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -221,7 +221,7 @@ C1066 - ??
 		<info name="serial" value="C1018" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1018_kung-fu_fighter.bin" size="32768" crc="4ba40206" sha1="7188b9265e43d4c51eab016462ced23a2fcb9972" offset="0" />
+				<rom name="c1018_kung-fu_fighter.bin" size="32768" crc="4ba40206" sha1="7188b9265e43d4c51eab016462ced23a2fcb9972"/>
 			</dataarea>
 		</part>
 	</software>
@@ -233,7 +233,7 @@ C1066 - ??
 		<info name="serial" value="C1019" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1019_dino_ball.bin" size="32768" crc="b609871f" sha1="b9c1817bca6e5a580dabd87a4fe8b757c973403f" offset="0" />
+				<rom name="c1019_dino_ball.bin" size="32768" crc="b609871f" sha1="b9c1817bca6e5a580dabd87a4fe8b757c973403f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -245,7 +245,7 @@ C1066 - ??
 		<info name="serial" value="C1021" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1021_mith_of_asamia.bin" size="32768" crc="3871a86c" sha1="70082452deb9d11c91ff3e1ad88ee8cbf24723ad" offset="0" />
+				<rom name="c1021_mith_of_asamia.bin" size="32768" crc="3871a86c" sha1="70082452deb9d11c91ff3e1ad88ee8cbf24723ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -257,7 +257,7 @@ C1066 - ??
 		<info name="serial" value="C1022" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1022_pipemania.bin" size="32768" crc="ae5978bd" sha1="a86fb7f4cc0f12b0c2d262a6618df76267c1513e" offset="0" />
+				<rom name="c1022_pipemania.bin" size="32768" crc="ae5978bd" sha1="a86fb7f4cc0f12b0c2d262a6618df76267c1513e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -269,7 +269,7 @@ C1066 - ??
 		<info name="serial" value="C1023" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1023_tennis.bin" size="32768" crc="93adefb1" sha1="ef5ae26d0f9a744c73eec364ac7bee2fd6eb1ed9" offset="0" />
+				<rom name="c1023_tennis.bin" size="32768" crc="93adefb1" sha1="ef5ae26d0f9a744c73eec364ac7bee2fd6eb1ed9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -281,7 +281,7 @@ C1066 - ??
 		<info name="serial" value="C1024" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1024_marauder.bin" size="32768" crc="c0a8607b" sha1="f41dab120bf7b3d7e2b21a408c8b89b4224bf825" offset="0" />
+				<rom name="c1024_marauder.bin" size="32768" crc="c0a8607b" sha1="f41dab120bf7b3d7e2b21a408c8b89b4224bf825"/>
 			</dataarea>
 		</part>
 	</software>
@@ -293,7 +293,7 @@ C1066 - ??
 		<info name="serial" value="C1026" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1026_flipuzzle.bin" size="32768" crc="f4bd2a05" sha1="3928cd356f23f595d8023e4d4a46a98308cf4662" offset="0" />
+				<rom name="c1026_flipuzzle.bin" size="32768" crc="f4bd2a05" sha1="3928cd356f23f595d8023e4d4a46a98308cf4662"/>
 			</dataarea>
 		</part>
 	</software>
@@ -305,7 +305,7 @@ C1066 - ??
 		<info name="serial" value="C1027" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1027_monster_pitfall.bin" size="32768" crc="be6eda47" sha1="bc35475cfea02de98d2f4646f6ae4a9f48e138f5" offset="0" />
+				<rom name="c1027_monster_pitfall.bin" size="32768" crc="be6eda47" sha1="bc35475cfea02de98d2f4646f6ae4a9f48e138f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -317,7 +317,7 @@ C1066 - ??
 		<info name="serial" value="C1028" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1028_vindicators.bin" size="32768" crc="7b99ee4c" sha1="b858479fc168572e684d3bb2330ae6826470f69f" offset="0" />
+				<rom name="c1028_vindicators.bin" size="32768" crc="7b99ee4c" sha1="b858479fc168572e684d3bb2330ae6826470f69f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -329,7 +329,7 @@ C1066 - ??
 		<info name="serial" value="C1029" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1029_brick_blaster.bin" size="32768" crc="76f5f2f1" sha1="a4e2d675ef6fd844b33d0aa40ce75ecaa6e65002" offset="0" />
+				<rom name="c1029_brick_blaster.bin" size="32768" crc="76f5f2f1" sha1="a4e2d675ef6fd844b33d0aa40ce75ecaa6e65002"/>
 			</dataarea>
 		</part>
 	</software>
@@ -341,7 +341,7 @@ C1066 - ??
 		<info name="serial" value="C1031" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1031_bomb_blast.bin" size="32768" crc="33fd30f4" sha1="069928d2577c05a17f42a96f4183a90773e58539" offset="0" />
+				<rom name="c1031_bomb_blast.bin" size="32768" crc="33fd30f4" sha1="069928d2577c05a17f42a96f4183a90773e58539"/>
 			</dataarea>
 		</part>
 	</software>
@@ -354,7 +354,7 @@ C1066 - ??
 		<info name="serial" value="C1031" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1031_bomb_blaster.bin" size="32768" crc="81ffb896" sha1="e79fa833714111a70b4700774dc2575d8cd84f3e" offset="0" />
+				<rom name="c1031_bomb_blaster.bin" size="32768" crc="81ffb896" sha1="e79fa833714111a70b4700774dc2575d8cd84f3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -366,7 +366,7 @@ C1066 - ??
 		<info name="serial" value="C1032" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1032_cosmic_fighter.bin" size="32768" crc="d24df424" sha1="df4ebdd1bfb63fa74b7fe83d0f3ce4b403bb5cde" offset="0" />
+				<rom name="c1032_cosmic_fighter.bin" size="32768" crc="d24df424" sha1="df4ebdd1bfb63fa74b7fe83d0f3ce4b403bb5cde"/>
 			</dataarea>
 		</part>
 	</software>
@@ -379,7 +379,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
-				<rom name="c1-033.bin" size="65536" crc="9002269d" sha1="899d1592f0da06f9684cb271ec34541c702f21ab" offset="0" />
+				<rom name="c1-033.bin" size="65536" crc="9002269d" sha1="899d1592f0da06f9684cb271ec34541c702f21ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -391,7 +391,7 @@ C1066 - ??
 		<info name="serial" value="C1035" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1035_treasure_hunter.bin" size="32768" crc="3bed5e9c" sha1="c724b40b97a7f97abfb33e31e5c315ae986b669a" offset="0" />
+				<rom name="c1035_treasure_hunter.bin" size="32768" crc="3bed5e9c" sha1="c724b40b97a7f97abfb33e31e5c315ae986b669a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -403,7 +403,7 @@ C1066 - ??
 		<info name="serial" value="C1036" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1-036.bin" size="32768" crc="5ba39d1c" sha1="23f4adad99f6c17fb556b512b6eca2645033aadd" offset="0" />
+				<rom name="c1-036.bin" size="32768" crc="5ba39d1c" sha1="23f4adad99f6c17fb556b512b6eca2645033aadd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -415,7 +415,7 @@ C1066 - ??
 		<info name="serial" value="C1037" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1037_nightmare_of_santa_claus.bin" size="32768" crc="ed243824" sha1="ff3ad53998dd5858f1176767786ec187ea8b059b" offset="0" />
+				<rom name="c1037_nightmare_of_santa_claus.bin" size="32768" crc="ed243824" sha1="ff3ad53998dd5858f1176767786ec187ea8b059b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -428,7 +428,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
-				<rom name="c1-038.bin" size="65536" crc="19bba397" sha1="01163f89447c68554cd2fe60b22dea7b578f1605" offset="0" />
+				<rom name="c1-038.bin" size="65536" crc="19bba397" sha1="01163f89447c68554cd2fe60b22dea7b578f1605"/>
 			</dataarea>
 		</part>
 	</software>
@@ -441,7 +441,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
-				<rom name="c1-042.bin" size="65536" crc="8363c32d" sha1="b07681e28b65af53fed23def3f6305ab929bb8f1" offset="0" />
+				<rom name="c1-042.bin" size="65536" crc="8363c32d" sha1="b07681e28b65af53fed23def3f6305ab929bb8f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -453,7 +453,7 @@ C1066 - ??
 		<info name="serial" value="C1043" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1043_boom.bin" size="32768" crc="20fda0f7" sha1="02f9a07b251bc29d0e5b3d6a4dfde0ab63bd65a3" offset="0" />
+				<rom name="c1043_boom.bin" size="32768" crc="20fda0f7" sha1="02f9a07b251bc29d0e5b3d6a4dfde0ab63bd65a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -465,7 +465,7 @@ C1066 - ??
 		<info name="serial" value="C1044" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1044_snowman_legend.bin" size="32768" crc="bfdf356f" sha1="19184793176d7aba7e353819aca57030254666ae" offset="0" />
+				<rom name="c1044_snowman_legend.bin" size="32768" crc="bfdf356f" sha1="19184793176d7aba7e353819aca57030254666ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -478,7 +478,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
-				<rom name="c1-045.bin" size="65536" crc="c165094f" sha1="148bd0e461d8f967b483136460a770820d2e7226" offset="0" />
+				<rom name="c1-045.bin" size="65536" crc="c165094f" sha1="148bd0e461d8f967b483136460a770820d2e7226"/>
 			</dataarea>
 		</part>
 	</software>
@@ -491,7 +491,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
-				<rom name="c1-046.bin" size="65536" crc="e492ef8e" sha1="fa2b9666c9c1090573c40cafa273c9ff5c1787be" offset="0" />
+				<rom name="c1-046.bin" size="65536" crc="e492ef8e" sha1="fa2b9666c9c1090573c40cafa273c9ff5c1787be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -504,7 +504,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="131072">
-				<rom name="c1-047.bin" size="131072" crc="39660803" sha1="8719418a6b30c2cc9d013d35d1baacde86016da3" offset="0" />
+				<rom name="c1-047.bin" size="131072" crc="39660803" sha1="8719418a6b30c2cc9d013d35d1baacde86016da3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -517,7 +517,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
-				<rom name="c1-048.bin" size="65536" crc="daf715c5" sha1="f10e180c4aac41e9c710ce38ca9a93ca6f331f57" offset="0" />
+				<rom name="c1-048.bin" size="65536" crc="daf715c5" sha1="f10e180c4aac41e9c710ce38ca9a93ca6f331f57"/>
 			</dataarea>
 		</part>
 	</software>
@@ -530,7 +530,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
-				<rom name="c1-049.bin" size="65536" crc="aa2e0d32" sha1="1b3082be0698c12c8fc978db6a0c63c8958c33f8" offset="0" />
+				<rom name="c1-049.bin" size="65536" crc="aa2e0d32" sha1="1b3082be0698c12c8fc978db6a0c63c8958c33f8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -542,7 +542,7 @@ C1066 - ??
 		<info name="serial" value="C1050" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="fortress.bin" size="32768" crc="c771e16b" sha1="aa971e546da8957de29837e5310452c129771967" offset="0" />
+				<rom name="fortress.bin" size="32768" crc="c771e16b" sha1="aa971e546da8957de29837e5310452c129771967"/>
 			</dataarea>
 		</part>
 	</software>
@@ -555,7 +555,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="65536">
-				<rom name="c1-052.bin" size="65536" crc="0fa48c23" sha1="ea422fe969b260296b99397cdeff6ae053ac4a86" offset="0" />
+				<rom name="c1-052.bin" size="65536" crc="0fa48c23" sha1="ea422fe969b260296b99397cdeff6ae053ac4a86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -568,7 +568,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="131072">
-				<rom name="c1-053.bin" size="131072" crc="727299c7" sha1="5515f7dc5a00fa38677c4ac5b73af232008f3e51" offset="0" />
+				<rom name="c1-053.bin" size="131072" crc="727299c7" sha1="5515f7dc5a00fa38677c4ac5b73af232008f3e51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -580,7 +580,7 @@ C1066 - ??
 		<info name="serial" value="C1054" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="c1054_magic_jigsaw.bin" size="32768" crc="1098bcd3" sha1="75004583a83225e8379fa3f34433e0a76222e1f7" offset="0" />
+				<rom name="c1054_magic_jigsaw.bin" size="32768" crc="1098bcd3" sha1="75004583a83225e8379fa3f34433e0a76222e1f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -593,7 +593,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="131072">
-				<rom name="c1-056.bin" size="131072" crc="447595e4" sha1="1b471f8ac8ffb107c62ec3b765c43e268d90b73a" offset="0" />
+				<rom name="c1-056.bin" size="131072" crc="447595e4" sha1="1b471f8ac8ffb107c62ec3b765c43e268d90b73a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -606,7 +606,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="131072">
-				<rom name="c1-057.bin" size="131072" crc="a542c61f" sha1="2eccf1fe8d400a54ffb2f026af8b9842442b6d9f" offset="0" />
+				<rom name="c1-057.bin" size="131072" crc="a542c61f" sha1="2eccf1fe8d400a54ffb2f026af8b9842442b6d9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -619,7 +619,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="262144">
-				<rom name="c1-058.bin" size="262144" crc="16a79cd8" sha1="7d638bf61286adfa612de974efff2d9b5b4b3331" offset="0" />
+				<rom name="c1-058.bin" size="262144" crc="16a79cd8" sha1="7d638bf61286adfa612de974efff2d9b5b4b3331"/>
 			</dataarea>
 		</part>
 	</software>
@@ -632,7 +632,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="524288">
-				<rom name="c1-060.bin" size="524288" crc="9aa13551" sha1="a1163f1da52e23bda0502f229488a5b4d04bbe8a" offset="0" />
+				<rom name="c1-060.bin" size="524288" crc="9aa13551" sha1="a1163f1da52e23bda0502f229488a5b4d04bbe8a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -645,7 +645,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="524288">
-				<rom name="c1-061.bin" size="524288" crc="00356983" sha1="e93c671ee1eb40bb4d7298671dc213a07afef9e0" offset="0" />
+				<rom name="c1-061.bin" size="524288" crc="00356983" sha1="e93c671ee1eb40bb4d7298671dc213a07afef9e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -658,7 +658,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="262144">
-				<rom name="c1-063.bin" size="262144" crc="93d5f365" sha1="91b9b9060b76d2012d5cbc6523839f67caa37aaf" offset="0" />
+				<rom name="c1-063.bin" size="262144" crc="93d5f365" sha1="91b9b9060b76d2012d5cbc6523839f67caa37aaf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -671,7 +671,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="524288">
-				<rom name="c1-064.bin" size="524288" crc="8574f0eb" sha1="ba42622b9ff4b2fa0cb70f322ee24b1d8c387222" offset="0" />
+				<rom name="c1-064.bin" size="524288" crc="8574f0eb" sha1="ba42622b9ff4b2fa0cb70f322ee24b1d8c387222"/>
 			</dataarea>
 		</part>
 	</software>
@@ -684,7 +684,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="524288">
-				<rom name="c1-065.bin" size="524288" crc="1ed9d0a3" sha1="568f87864c0ed6117fe34e3f79e56c01e911e482" offset="0" />
+				<rom name="c1-065.bin" size="524288" crc="1ed9d0a3" sha1="568f87864c0ed6117fe34e3f79e56c01e911e482"/>
 			</dataarea>
 		</part>
 	</software>
@@ -697,7 +697,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="524288">
-				<rom name="c1-067.bin" size="524288" crc="76e26b63" sha1="bfb2f4b5b771277333ffc1e27cf3a5608e9ea163" offset="0" />
+				<rom name="c1-067.bin" size="524288" crc="76e26b63" sha1="bfb2f4b5b771277333ffc1e27cf3a5608e9ea163"/>
 			</dataarea>
 		</part>
 	</software>
@@ -710,7 +710,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="524288">
-				<rom name="c1-068.bin" size="524288" crc="96386b08" sha1="69909b78598184760b3e261da897a9bc90af9dfb" offset="0" />
+				<rom name="c1-068.bin" size="524288" crc="96386b08" sha1="69909b78598184760b3e261da897a9bc90af9dfb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -723,7 +723,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="524288">
-				<rom name="c1-069.bin" size="524288" crc="3bceb859" sha1="32187903c10dc80d62e9bf794b912921542d6d38" offset="0" />
+				<rom name="c1-069.bin" size="524288" crc="3bceb859" sha1="32187903c10dc80d62e9bf794b912921542d6d38"/>
 			</dataarea>
 		</part>
 	</software>
@@ -736,7 +736,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="524288">
-				<rom name="c1-070.bin" size="524288" crc="7ba8af6d" sha1="6aa0364010272c82c7cc8c7afd60254de148fa72" offset="0" />
+				<rom name="c1-070.bin" size="524288" crc="7ba8af6d" sha1="6aa0364010272c82c7cc8c7afd60254de148fa72"/>
 			</dataarea>
 		</part>
 	</software>
@@ -749,7 +749,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="4in1" />
 			<dataarea name="rom" size="131072">
-				<rom name="c1-401.bin" size="131072" crc="10e81571" sha1="4dd20632eb31023e18241290eca7d5a5acb1fa84" offset="0" />
+				<rom name="c1-401.bin" size="131072" crc="10e81571" sha1="4dd20632eb31023e18241290eca7d5a5acb1fa84"/>
 			</dataarea>
 		</part>
 	</software>
@@ -762,7 +762,7 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<feature name="slot" value="banked" />
 			<dataarea name="rom" size="524288">
-				<rom name="k1-001.bin" size="524288" crc="ebb46efe" sha1="beae4f3365031f4e8ae192a5e6d27a28979ef84b" offset="0" />
+				<rom name="k1-001.bin" size="524288" crc="ebb46efe" sha1="beae4f3365031f4e8ae192a5e6d27a28979ef84b"/>
 			</dataarea>
 		</part>
 	</software>

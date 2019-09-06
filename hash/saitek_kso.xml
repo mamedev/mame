@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="saitek_kso" description="Saitek KSO ROM">
+
+<!-- Extension ROM, sold separately, placed in ROM socket through hatch on top-right -->
+<!-- Used in: Superstar 36K, Turbostar chess computers -->
+
+	<software name="kso">
+		<description>Kasparov Selected Openings</description>
+		<year>1985</year>
+		<publisher>SciSys</publisher>
+		<part name="extrom" interface="saitek_kso">
+			<dataarea name="rom" size="0x8000">
+				<rom name="y01d-kso" size="0x2000" crc="25fac442" sha1="b2886d497e09b3df3a6ece25ee0900c27d092c54" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

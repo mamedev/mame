@@ -5,6 +5,7 @@
 #include "sound/upd7759.h"
 #include "video/snk68_spr.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class snk68_state : public driver_device
 {

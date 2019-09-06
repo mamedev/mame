@@ -136,6 +136,9 @@
  *
  *  Protected RAM
  *
+ *  If not specified in the memory map,
+ *  then it's at the start of the nvram
+ *
  *************************************/
 
 WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
@@ -147,14 +150,14 @@ WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
 READ8_MEMBER(astrocde_state::protected_ram_r)
 {
 	m_ram_write_enable = false;
-	return m_protected_ram[offset];
+	return m_protected_ram ? m_protected_ram[offset] : m_nvram[offset];
 }
 
 
 WRITE8_MEMBER(astrocde_state::protected_ram_w)
 {
 	if (m_ram_write_enable)
-		m_protected_ram[offset] = data;
+		(m_protected_ram ? m_protected_ram : m_nvram)[offset] = data;
 	m_ram_write_enable = false;
 }
 
@@ -458,7 +461,7 @@ void astrocde_state::robby_map(address_map &map)
 	map(0x4000, 0x7fff).ram().share("videoram");
 	map(0x8000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
-	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
+	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w));
 	map(0xe800, 0xffff).ram();
 }
 
@@ -478,7 +481,7 @@ void astrocde_state::demndrgn_map(address_map &map)
 void astrocde_state::profpac_map(address_map &map)
 {
 	demndrgn_map(map);
-	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w)).share("protected_ram");
+	map(0xe000, 0xe1ff).rw(FUNC(astrocde_state::protected_ram_r), FUNC(astrocde_state::protected_ram_w));
 }
 
 

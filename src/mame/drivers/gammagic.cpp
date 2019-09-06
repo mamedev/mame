@@ -130,7 +130,8 @@ void gammagic_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(gammagic_state::gammagic)
+void gammagic_state::gammagic(machine_config &config)
+{
 	PENTIUM(config, m_maincpu, 133000000); // Intel Pentium 133
 	m_maincpu->set_addrmap(AS_PROGRAM, &gammagic_state::gammagic_map);
 	m_maincpu->set_addrmap(AS_IO, &gammagic_state::gammagic_io);
@@ -138,14 +139,15 @@ MACHINE_CONFIG_START(gammagic_state::gammagic)
 
 	pcat_common(config);
 
-//  I82371SB(config, "i82371sb", 0);
-//  MCFG_I82439TX_ADD("i82439tx", "maincpu", "user")
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-//  MCFG_PCI_BUS_LEGACY_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
-//  MCFG_PCI_BUS_LEGACY_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
+	PCI_BUS_LEGACY(config, "pcibus", 0, 0);
+//  pcibus.set_device_read (0, FUNC(gammagic_state::intel82439tx_pci_r), this);
+//  pcibus.set_device_write(0, FUNC(gammagic_state::intel82439tx_pci_w), this);
+//  pcibus.set_device_read (7, FUNC(gammagic_state::intel82371ab_pci_r), this);
+//  pcibus.set_device_write(7, FUNC(gammagic_state::intel82371ab_pci_w), this);
+
 	/* video hardware */
 	pcvideo_vga(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( gammagic )

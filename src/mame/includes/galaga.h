@@ -11,6 +11,7 @@
 #include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class galaga_state : public driver_device
 {
@@ -62,6 +63,8 @@ public:
 	void galaga_map(address_map &map);
 	void galaga_mem4(address_map &map);
 	void gatsbee_main_map(address_map &map);
+
+	void starfield_init();
 
 protected:
 	virtual void machine_start() override;

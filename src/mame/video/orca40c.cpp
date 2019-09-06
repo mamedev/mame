@@ -11,8 +11,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "screen.h"
 #include "video/orca40c.h"
+
+#include "emupal.h"
+#include "screen.h"
 
 #define PIXEL_CLOCK         (XTAL(18'432'000)/3)
 
@@ -28,13 +30,13 @@ DEFINE_DEVICE_TYPE(ORCA_OVG_40C, orca_ovg_40c_device, "orca_ovg_40c", "Orca OVG 
 
 orca_ovg_40c_device::orca_ovg_40c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ORCA_OVG_40C, tag, owner, clock),
-		device_gfx_interface(mconfig, *this),
+		device_gfx_interface(mconfig, *this, nullptr, "palette"),
+		device_video_interface(mconfig, *this),
 		m_videoram(*this, "videoram"),
 		m_videoram_2(*this,"videoram_2"),
 		m_attributeram(*this, "attributeram"),
 		m_spriteram(*this, "spriteram"),
 		m_bulletsram(*this, "bulletsram"),
-		m_palette(*this, "palette"),
 		m_percuss_hardware(false),
 		m_flip_screen(false)
 {
@@ -216,7 +218,7 @@ TILE_GET_INFO_MEMBER(orca_ovg_40c_device::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(3, code, color, 0);
 }
 
-void orca_ovg_40c_device::draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void orca_ovg_40c_device::draw_bullets( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	for (int offs = 0; offs < m_bulletsram.bytes(); offs += 4)
 	{
@@ -236,7 +238,7 @@ void orca_ovg_40c_device::draw_bullets( bitmap_ind16 &bitmap, const rectangle &c
 	}
 }
 
-void orca_ovg_40c_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void orca_ovg_40c_device::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
@@ -260,7 +262,7 @@ void orca_ovg_40c_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 	}
 }
 
-uint32_t orca_ovg_40c_device::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t orca_ovg_40c_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	for (int i = 0; i < 32; i++)
 		m_fg_tilemap->set_scrolly(i, m_attributeram[i * 2]);
@@ -272,13 +274,19 @@ uint32_t orca_ovg_40c_device::screen_update( screen_device &screen, bitmap_ind16
 	return 0;
 }
 
+void orca_ovg_40c_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+		screen().set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(orca_ovg_40c_device::screen_update), this));
+}
+
 void orca_ovg_40c_device::device_add_mconfig(machine_config &config)
 {
-	/* video hardware */
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(DEVICE_SELF, FUNC(orca_ovg_40c_device::screen_update));
-	screen.set_palette("palette");
-
-	PALETTE(config, m_palette, FUNC(orca_ovg_40c_device::palette_init), 4*8+2*8+2*1, 48+1);
+	PALETTE(config, "palette", FUNC(orca_ovg_40c_device::palette_init), 4*8+2*8+2*1, 48+1);
 }

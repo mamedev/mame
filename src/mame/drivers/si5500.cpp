@@ -72,20 +72,31 @@ void si5500_state::mainic_w(offs_t offset, u8 data)
 
 WRITE_LINE_MEMBER(si5500_state::gpib_int_w)
 {
-	m_mainpsi->set_single_int(4, state);
+	m_mainpsi->set_int_line(4, state);
 }
 
 WRITE_LINE_MEMBER(si5500_state::acc_int_w)
 {
-	m_mainpsi->set_single_int(5, state);
+	m_mainpsi->set_int_line(5, state);
 }
 
 u8 si5500_state::gpibpsi_input_r(offs_t offset)
 {
-	if (offset == tms9901_device::P0_P7)
-		return m_gpib_data;
-
-	return 0xff;
+	switch (offset)
+	{
+	case tms9901_device::P0:
+	case tms9901_device::P1:
+	case tms9901_device::P2:
+	case tms9901_device::P3:
+	case tms9901_device::P4:
+	case tms9901_device::P5:
+	case tms9901_device::P6:
+		return BIT(m_gpib_data, offset-tms9901_device::P0);
+	case tms9901_device::INT15_P7:
+		return BIT(m_gpib_data, 7);
+	default:
+		return 1;
+	}
 }
 
 WRITE_LINE_MEMBER(si5500_state::gpibc_we_w)
@@ -175,7 +186,7 @@ void si5500_state::si5500(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &si5500_state::cru_map);
 
 	TMS9901(config, m_mainpsi, 10_MHz_XTAL / 4);
-	m_mainpsi->intlevel_cb().set(FUNC(si5500_state::mainic_w));
+	m_mainpsi->intreq_cb().set(FUNC(si5500_state::mainic_w));
 
 	tms9902_device &acc(TMS9902(config, "acc", 10_MHz_XTAL / 4));
 	acc.int_cb().set(FUNC(si5500_state::acc_int_w));

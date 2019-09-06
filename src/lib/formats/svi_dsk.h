@@ -7,11 +7,10 @@
     Disk image format
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_SVI_DSK_H
+#define MAME_FORMATS_SVI_DSK_H
 
 #pragma once
-
-#ifndef __SVI_DSK_H__
-#define __SVI_DSK_H__
 
 #include "flopimg.h"
 
@@ -32,4 +31,4 @@ public:
 
 extern const floppy_format_type FLOPPY_SVI_FORMAT;
 
-#endif // __SVI_DSK_H__
+#endif // MAME_FORMATS_SVI_DSK_H

@@ -85,7 +85,6 @@ void scv_state::scv_mem(address_map &map)
 	map(0x3600, 0x3600).w(m_upd1771c, FUNC(upd1771c_device::write));
 
 	map(0x8000, 0xff7f).rw(m_cart, FUNC(scv_cart_slot_device::read_cart), FUNC(scv_cart_slot_device::write_cart)); // cartridge
-	map(0xff80, 0xffff).ram();   // upd7801 internal RAM
 }
 
 

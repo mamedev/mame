@@ -7,6 +7,7 @@
 
 #include "machine/74259.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class marineb_state : public driver_device
 {

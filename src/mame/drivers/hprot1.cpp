@@ -135,10 +135,10 @@ void hprot1_state::i80c31_io(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
 /*TODO: verify the mirror mask value for the HD44780 device */
-	map(0xc000, 0xc000).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::control_write));
-	map(0xc010, 0xc010).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::data_write));
-	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_read));
-	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_read));
+	map(0xc000, 0xc000).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::control_w));
+	map(0xc010, 0xc010).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::data_w));
+	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_r));
+	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_r));
 /*TODO: attach the watchdog/brownout reset device:
     map(0xe000,0xe0??).mirror(?).r("adm965an", FUNC(adm965an_device::data_read)); */
 }

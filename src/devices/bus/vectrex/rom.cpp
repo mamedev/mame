@@ -53,7 +53,10 @@ void vectrex_rom64k_device::device_start()
 
 void vectrex_rom64k_device::device_reset()
 {
-	m_bank = 0;
+	// Resetting to 1 instead of 0 fixes 64KiB cartridges that don't have a workaround
+	// for the fact that MAME does not currently emulate the pull-up resistor on the 6522's PB6 line.
+	// TODO: correctly emulate PB6 pull-up behavior (line should be high whenever PB6 set to input).
+	m_bank = 1;
 }
 
 

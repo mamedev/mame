@@ -125,7 +125,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 <softwarelist name="leapster" description="LeapFrog Leapster cartridges">
 
 	<software name="1stgrade" supported="no">
-		<description>1st Grade (US)</description>
+		<description>1st Grade (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11000" />
@@ -137,7 +137,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="adibou" supported="no">
-		<description>Adibou - A La Recherche De Robitoc (Fra)</description>
+		<description>Adibou - A La Recherche De Robitoc (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12475-A" />
@@ -149,7 +149,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="anigeni" supported="no">
-		<description>Animal Genius (US)</description>
+		<description>Animal Genius (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12293-A" />
@@ -185,7 +185,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="batmang" cloneof="batman" supported="no">
-		<description>Batman - Multipliziere, dividiere und regiere (Ger)</description>
+		<description>Batman - Multipliziere, dividiere und regiere (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11972-A" />
@@ -197,7 +197,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="batmans" cloneof="batman" supported="no">
-		<description>The Batman - El Poder De Los Números (Spa)</description>
+		<description>The Batman - El Poder De Los Números (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12830-A" />
@@ -221,7 +221,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="carsf" cloneof="cars" supported="no">
-		<description>Cars (Fra)</description>
+		<description>Cars (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12414-A" />
@@ -233,7 +233,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="carsg" cloneof="cars" supported="no">
-		<description>Cars (Ger)</description>
+		<description>Cars (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12171-A" />
@@ -245,7 +245,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="carss" cloneof="cars" supported="no">
-		<description>Cars (Spa)</description>
+		<description>Cars (Spain)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12223-A" />
@@ -257,7 +257,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="cars2" supported="no">
-		<description>Cars 2 (US)</description>
+		<description>Cars 2 (USA)</description>
 		<year>2011</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-14320-A" />
@@ -305,7 +305,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="createcr" supported="no">
-		<description>Creature Create (US)</description>
+		<description>Creature Create (USA)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12677-A" />
@@ -317,7 +317,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="demo" supported="no">
-		<description>Demo - Herbst 2004 II (Ger)</description>
+		<description>Demo - Herbst 2004 II (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11603-A" />
@@ -341,7 +341,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="kirikou" supported="no">
-		<description>Dis Pourquoi Kirikou (Fra)</description>
+		<description>Dis Pourquoi Kirikou (France)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13366-A" />
@@ -353,7 +353,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="fairiess" supported="no">
-		<description>Disney Fairies (Spa)</description>
+		<description>Disney Fairies (Spain)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13763-A" />
@@ -377,7 +377,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="princelg" supported="no">
-		<description>Disney Prinzessinnen - Zauberhaftes Lernen (Ger)</description>
+		<description>Disney Prinzessinnen - Zauberhaftes Lernen (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11496-A" />
@@ -389,7 +389,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="princelf" cloneof="princelg" supported="no">
-		<description>Disney Princesse - La Magie D'Apprendre (Fra)</description>
+		<description>Disney Princesse - La Magie D'Apprendre (France)</description>
 		<year>2004</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12411-A" />
@@ -401,7 +401,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="princels" cloneof="princelg" supported="no">
-		<description>Disney Princesa - La Magia De Aprender (Spa)</description>
+		<description>Disney Princesa - La Magia De Aprender (Spain)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12218-A" />
@@ -449,7 +449,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="dora" supported="no">
-		<description>Dora - Retter der Wildnis (Ger)</description>
+		<description>Dora - Retter der Wildnis (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12562-B" />
@@ -461,7 +461,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="doraf" cloneof="dora" supported="no">
-		<description>Dora L'Exploratrice - Au Secours Des Animaux (Fra)</description>
+		<description>Dora L'Exploratrice - Au Secours Des Animaux (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12339-A" />
@@ -473,7 +473,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="dorapont" supported="no">
-		<description>Dora L'Exploratrice - Le Pont Casse (Fra)</description>
+		<description>Dora L'Exploratrice - Le Pont Casse (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12392-A" />
@@ -497,7 +497,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="findnemog" cloneof="findnemo" supported="no">
-		<description>Findet Nemo (Ger)</description>
+		<description>Findet Nemo (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11495-A" />
@@ -509,7 +509,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="findnemos" cloneof="findnemo" supported="no">
-		<description>Buscando a Nemo - Leer Bajo el Mar (Spa)</description>
+		<description>Buscando a Nemo - Leer Bajo el Mar (Spain)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12227-A" />
@@ -557,7 +557,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="grund1" supported="no">
-		<description>Grundschule 1 (Ger)</description>
+		<description>Grundschule 1 (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10935-A" />
@@ -569,7 +569,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="grund2" supported="no">
-		<description>Grundschule 2 - Musik in Gefahr (Ger)</description>
+		<description>Grundschule 2 - Musik in Gefahr (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11494-A" />
@@ -593,7 +593,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="kinderga" supported="no">
-		<description>Kindergarten (US)</description>
+		<description>Kindergarten (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10999" />
@@ -605,7 +605,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="riviere" supported="no">
-		<description>La Rivière Des Lapins + L'Atelier De Peinture (Fra)</description>
+		<description>La Rivière Des Lapins + L'Atelier De Peinture (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12393-A" />
@@ -617,7 +617,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="rrabbitf" supported="no">
-		<description>Lapin Malin - Danse Avec Les Mots (Fra)</description>
+		<description>Lapin Malin - Danse Avec Les Mots (France)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12800-A" />
@@ -629,7 +629,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="lernleap" supported="no">
-		<description>Learning with Leap (US)</description>
+		<description>Learning with Leap (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10093" />
@@ -641,7 +641,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="lernleapg" cloneof="lernleap" supported="no">
-		<description>Lernen mit Leap (Ger)</description>
+		<description>Lernen mit Leap (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11078-A" />
@@ -653,7 +653,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="brunobls" supported="no">
-		<description>Lernst du Malen &amp; Schreiben - Mit Bruno Bleistift  (Ger)</description>
+		<description>Lernst du Malen &amp; Schreiben - Mit Bruno Bleistift  (Germany)</description>
 		<year>2004?</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11493-A" />
@@ -665,7 +665,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="letrpilr" supported="no">
-		<description>Letterpillar (US)</description>
+		<description>Letterpillar (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12350-A" />
@@ -689,7 +689,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="mrpencils" cloneof="mrpencil" supported="no">
-		<description>Don Lápiz - Aprender a Dibujar y Escribir (Spa)</description>
+		<description>Don Lápiz - Aprender a Dibujar y Escribir (Spain)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12206-A" />
@@ -713,7 +713,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="numraid" supported="no">
-		<description>Number Raiders - Arcade-Style Learning (US)</description>
+		<description>Number Raiders - Arcade-Style Learning (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11993-A" />
@@ -725,7 +725,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="numraidf" cloneof="numraid" supported="no">
-		<description>A La Conquête Des Nombres - Un Jeu D'Arcade Éducatif! (Fra)</description>
+		<description>A La Conquête Des Nombres - Un Jeu D'Arcade Éducatif! (France)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12413-A" />
@@ -737,7 +737,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="numraidg" cloneof="numraid" supported="no">
-		<description>Zahlenjäger - Lernen im Arcade-Stil! (Ger)</description>
+		<description>Zahlenjäger - Lernen im Arcade-Stil! (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12141-A" />
@@ -749,7 +749,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="numraids" cloneof="numraid" supported="no">
-		<description>La Conquista de los Números (Spa)</description>
+		<description>La Conquista de los Números (Spain)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12141-A" />
@@ -761,7 +761,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="noddyf" supported="no">
-		<description>Oui-Oui - Aventures Au Pays Des Jouets (Fra)</description>
+		<description>Oui-Oui - Aventures Au Pays Des Jouets (France)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12799-A" />
@@ -785,7 +785,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="petpalss" cloneof="petpals" supported="no">
-		<description>Perrito Club - ¡Adopta Un Nuevo Amiguito Y Aprende! (Spa)</description>
+		<description>Perrito Club - ¡Adopta Un Nuevo Amiguito Y Aprende! (Spain)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12824-A" />
@@ -797,7 +797,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="ratat" supported="no">
-		<description>Ratatouille (US)</description>
+		<description>Ratatouille (USA)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13445-A" />
@@ -809,7 +809,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="ratatf" cloneof="ratat" supported="no">
-		<description>Ratatouille (Fra)</description>
+		<description>Ratatouille (France)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12674-A" />
@@ -821,7 +821,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="ratatg" cloneof="ratat" supported="no">
-		<description>Ratatouille (Ger)</description>
+		<description>Ratatouille (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12738-A" />
@@ -845,7 +845,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="ispychl" supported="no">
-		<description>Scholastic I Spy - Challenger (US)</description>
+		<description>Scholastic I Spy - Challenger (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11929-A" />
@@ -857,7 +857,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="scoutwit" supported="no">
-		<description>Scholastic OutWit! (US)</description>
+		<description>Scholastic OutWit! (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13299-A" />
@@ -869,7 +869,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="scooby" supported="no">
-		<description>Scooby Doo! (US)</description>
+		<description>Scooby Doo! (USA)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-14005-A" />
@@ -881,7 +881,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="scoobsnk" supported="no">
-		<description>Scooby-Doo! - Spooky Snacks! (US)</description>
+		<description>Scooby-Doo! - Spooky Snacks! (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12160-A" />
@@ -893,7 +893,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="scoobsnkf" cloneof="scoobsnk" supported="no">
-		<description>Scooby-Doo! - Et Les Nombres Fous! (Fra)</description>
+		<description>Scooby-Doo! - Et Les Nombres Fous! (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12629-A" />
@@ -930,7 +930,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="spongebf" cloneof="spongeb" supported="no">
-		<description>Bob Leponge - Heros D'un Jour (Fra)</description>
+		<description>Bob Leponge - Heros D'un Jour (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12415-A" />
@@ -942,7 +942,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="spongebg" cloneof="spongeb" supported="no">
-		<description>Spongebob Schwammkopf Hat Alles im Griff (Ger)</description>
+		<description>Spongebob Schwammkopf Hat Alles im Griff (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10933-A" />
@@ -966,7 +966,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="spongewrmg" cloneof="spongewrm" supported="no">
-		<description>Spongebob Schwammkopf - Zeitreise durch das Wurmloch (Ger)</description>
+		<description>Spongebob Schwammkopf - Zeitreise durch das Wurmloch (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13273-A" />
@@ -990,7 +990,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="spidermnf" cloneof="spidermn" supported="no">
-		<description>Spider-Man - L'Affaire Des Mots Mystères (Fra)</description>
+		<description>Spider-Man - L'Affaire Des Mots Mystères (France)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12416-A" />
@@ -1002,7 +1002,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="spidermng" cloneof="spidermn" supported="no">
-		<description>Spider-Man - Schachmatt den Schildersaboteuren! (Ger)</description>
+		<description>Spider-Man - Schachmatt den Schildersaboteuren! (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11497-A" />
@@ -1014,7 +1014,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="spidermns" cloneof="spidermn" supported="no">
-		<description>Spider-Man - El Caso de Las Letras Revueltas (Spa)</description>
+		<description>Spider-Man - El Caso de Las Letras Revueltas (Spain)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12210-A" />
@@ -1038,7 +1038,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="jedimaths" cloneof="jedimath" supported="no">
-		<description>Star Wars - Matemáticas Jedi (Spa)</description>
+		<description>Star Wars - Matemáticas Jedi (Spain)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13417-A" />
@@ -1050,7 +1050,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="swjedir" supported="no">
-		<description>Star Wars - Jedi Reading (US)</description>
+		<description>Star Wars - Jedi Reading (USA)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13472-A" />
@@ -1062,7 +1062,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="talkingw" supported="no">
-		<description>Talking WORDS Factory (US)</description>
+		<description>Talking WORDS Factory (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11006" />
@@ -1074,7 +1074,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="tfcall" supported="no">
-		<description>Thomas and Friends - Calling all Engines! (US)</description>
+		<description>Thomas and Friends - Calling all Engines! (USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11204-A" />
@@ -1098,7 +1098,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="up" supported="no">
-		<description>Up (US)</description>
+		<description>Up (USA)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13563-A" />
@@ -1110,7 +1110,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="ups" cloneof="up" supported="no">
-		<description>Up (Spa)</description>
+		<description>Up (Spain)</description>
 		<year>2009</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13643-A" />
@@ -1122,7 +1122,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="vorschul" supported="no">
-		<description>Vorschule (Ger)</description>
+		<description>Vorschule (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10934-A" />
@@ -1134,7 +1134,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="walle" supported="no">
-		<description>Wall-E (US)</description>
+		<description>Wall-E (USA)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13272-A" />
@@ -1146,7 +1146,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="walleg" cloneof="walle" supported="no">
-		<description>Wall-E (Ger)</description>
+		<description>Wall-E (Germany)</description>
 		<year>2008?</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13441-A" />
@@ -1158,7 +1158,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="walles" cloneof="walle" supported="no">
-		<description>Wall-E (Spa)</description>
+		<description>Wall-E (Spain)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13414-A" />
@@ -1170,7 +1170,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="cosmicmtg" cloneof="cosmicmt" supported="no">
-		<description>Weltraum-Mathe - Lernen im Arcade-Stil! (Ger)</description>
+		<description>Weltraum-Mathe - Lernen im Arcade-Stil! (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12140-A" />
@@ -1195,7 +1195,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 
 	<!-- Word Chasers -->
 	<software name="wrdchsrsg" supported="no">
-		<description>Wörterjäger - Lernen im Arcade-Stil! (Ger)</description>
+		<description>Wörterjäger - Lernen im Arcade-Stil! (Germany)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12142-A" />
@@ -1207,7 +1207,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="wrdchsrss" cloneof="wrdchsrsg" supported="no"> <!-- By now, clone of "wrdchsrsg", until the English set is found -->
-		<description>El Laberinto de las Letras (Spa)</description>
+		<description>El Laberinto de las Letras (Spain)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12259-A" />

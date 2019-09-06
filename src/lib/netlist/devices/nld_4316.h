@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 /*
- * nld_4136.h
+ * nld_4316.h
  *
  *  CD4066: Quad Analog Switch with Level Translation
  *

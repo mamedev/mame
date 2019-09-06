@@ -51,10 +51,10 @@ INPUT_CHANGED_MEMBER(vsmileb_state::pad_button_changed)
 	}
 	else
 	{
-		value |= (uint16_t)(uintptr_t)param;
+		value |= (uint16_t)param;
 	}
-	m_spg->uart_rx((uint8_t)(value >> 8));
-	m_spg->uart_rx((uint8_t)value);
+	m_maincpu->uart_rx((uint8_t)(value >> 8));
+	m_maincpu->uart_rx((uint8_t)value);
 }
 
 template <uint16_t V> INPUT_CHANGED_MEMBER(vsmileb_state::sw_mode)
@@ -63,8 +63,8 @@ template <uint16_t V> INPUT_CHANGED_MEMBER(vsmileb_state::sw_mode)
 	{
 		m_mode = V;
 		const uint16_t value = m_mode | 0x0080;
-		m_spg->uart_rx((uint8_t)(value >> 8));
-		m_spg->uart_rx((uint8_t)value);
+		m_maincpu->uart_rx((uint8_t)(value >> 8));
+		m_maincpu->uart_rx((uint8_t)value);
 	}
 }
 
@@ -103,9 +103,9 @@ static INPUT_PORTS_START( vsmileb )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, pad_button_changed, vsmileb_state::BUTTON_EXIT)   PORT_NAME("Exit")
 
 	PORT_START("MODE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Play Time")       PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0400>, nullptr) // three-position function switch
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Watch & Learn")   PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0800>, nullptr)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Learn & Explore") PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0c00>, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Play Time")       PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0400>, 0) // three-position function switch
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Watch & Learn")   PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0800>, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Learn & Explore") PORT_CHANGED_MEMBER(DEVICE_SELF, vsmileb_state, sw_mode<0x0c00>, 0)
 
 	PORT_START("LOGO")
 	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
@@ -122,16 +122,18 @@ INPUT_PORTS_END
 
 void vsmileb_state::vsmileb(machine_config &config)
 {
+	SPG28X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsmileb_state::mem_map);
+	m_maincpu->set_force_no_drc(true);
+	m_maincpu->chip_select().set(FUNC(vsmileb_state::chip_sel_w));
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->porta_in().set(FUNC(vsmileb_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(vsmileb_state::portb_r));
+
 	vsmile_base(config);
 
 	m_bankdev->set_addrmap(AS_PROGRAM, &vsmileb_state::banked_map);
-
-	SPG28X(config.replace(), m_spg, XTAL(27'000'000), m_maincpu, m_screen);
-	m_spg->chip_select().set(FUNC(vsmileb_state::chip_sel_w));
-	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-	m_spg->porta_in().set(FUNC(vsmileb_state::porta_r));
-	m_spg->portb_in().set(FUNC(vsmileb_state::portb_r));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmileb_cart");
 }
@@ -139,7 +141,7 @@ void vsmileb_state::vsmileb(machine_config &config)
 void vsmileb_state::vsmilebp(machine_config &config)
 {
 	vsmileb(config);
-	m_spg->set_pal(true);
+	m_maincpu->set_pal(true);
 }
 
 /************************************

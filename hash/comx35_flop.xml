@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="dos.1.4+f&amp;m.disk.tools.img" size="143360" crc="40945c5c" sha1="eb725c09c669010433ef68bbaa3e2f1f3b399ed7" offset="0" />
+				<rom name="dos.1.4+f&amp;m.disk.tools.img" size="143360" crc="40945c5c" sha1="eb725c09c669010433ef68bbaa3e2f1f3b399ed7"/>
 			</dataarea>
 		</part>
 	</software>

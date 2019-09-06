@@ -101,7 +101,7 @@ ioport_constructor pcd_video_device::device_input_ports() const
 
 void pcd_video_device::device_add_mconfig(machine_config &config)
 {
-	i8741_device &mcu(I8741(config, "graphics", 16_MHz_XTAL / 2));
+	i8741a_device &mcu(I8741A(config, "graphics", 16_MHz_XTAL / 2)); // NEC D8741AD
 	mcu.p1_in_cb().set(FUNC(pcd_video_device::p1_r));
 	mcu.p2_out_cb().set(FUNC(pcd_video_device::p2_w));
 	mcu.t1_in_cb().set(FUNC(pcd_video_device::t1_r));
@@ -420,7 +420,7 @@ void pcd_video_device::map(address_map &map)
 	map(0x00, 0x0f).w(m_crtc, FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0x00, 0x0f).r(m_crtc, FUNC(scn2674_device::read)).umask16(0xff00);
 	map(0x20, 0x20).w(FUNC(pcd_video_device::vram_sw_w));
-	map(0x30, 0x33).rw("graphics", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w)).umask16(0x00ff);
+	map(0x30, 0x33).rw("graphics", FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w)).umask16(0x00ff);
 }
 
 void pcx_video_device::device_start()

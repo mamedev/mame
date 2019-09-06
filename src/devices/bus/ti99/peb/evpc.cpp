@@ -321,11 +321,13 @@ READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{
-		if ((offset & 0x00f0)==0) // offset 0 delivers bits 0-7 (address 00-0f)
+		switch ((offset>>1) & 7)
 		{
-			uint8_t p = ~(ioport("EVPC-SW1")->read() | (ioport("EVPC-SW3")->read()<<2)
-				| (ioport("EVPC-SW4")->read()<<3) | (ioport("EVPC-SW8")->read()<<7));
-			*value = BIT(p, (offset >> 1) & 7);
+		case 0: *value = ~(ioport("EVPC-SW1")->read()); break;
+		case 2: *value = ~(ioport("EVPC-SW3")->read()); break;
+		case 3: *value = ~(ioport("EVPC-SW4")->read()); break;
+		case 7: *value = ~(ioport("EVPC-SW8")->read()); break;
+		default: *value = ~0; break;
 		}
 	}
 }
@@ -438,8 +440,6 @@ WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
 		m_intlevel = state;
 		if (m_console_conn != nullptr) m_console_conn->vclock_line(state);
 		else m_slot->lcp_line(state);
-
-		if (state!=0) m_colorbus->poll();
 	}
 }
 
@@ -506,8 +506,8 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 	soundgen.ready_cb().set(FUNC(snug_enhanced_video_device::ready_line));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
-	// Mouse connected to the color bus of the v9938
-	TI99_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, "busmouse");
+	// Mouse connected to the color bus of the v9938; default: none
+	V9938_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, nullptr);
 }
 
 } } } // end namespace bus::ti99::peb

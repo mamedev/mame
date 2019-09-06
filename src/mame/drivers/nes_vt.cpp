@@ -1395,6 +1395,8 @@ void nes_vt_state::nes_vt(machine_config &config)
 
 	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
+	m_ctrl1->set_screen_tag(m_screen);
+	m_ctrl2->set_screen_tag(m_screen);
 }
 
 void nes_vt_state::nes_vt_ddr(machine_config &config)
@@ -1403,6 +1405,8 @@ void nes_vt_state::nes_vt_ddr(machine_config &config)
 
 	NES_CONTROL_PORT(config, m_ctrl1, majesco_control_port1_devices, "ddr");
 	NES_CONTROL_PORT(config, m_ctrl2, majesco_control_port2_devices, nullptr);
+	m_ctrl1->set_screen_tag(m_screen);
+	m_ctrl2->set_screen_tag(m_screen);
 }
 
 void nes_vt_state::nes_vt_hum(machine_config &config)
@@ -1524,6 +1528,26 @@ ROM_END
 ROM_START( vdogdemo )
 	ROM_REGION( 0x80000, "mainrom", 0 )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(054af705) SHA1(e730aeaa94b9cc28aa8b512a5bf411ec45226831) )
+ROM_END
+
+ROM_START( pinkjelly )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "seesaw.bin", 0x00000, 0x200000, CRC(67b5a079) SHA1(36ebfd64809af072b73acfa3a426b57017851bf4) )
+ROM_END
+
+ROM_START( vtpinball )
+	ROM_REGION( 0x80000, "mainrom", 0 )
+	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(62e52c23) SHA1(b83b82c928b9fe82abfaa915196322153787c8ce) )
+ROM_END
+
+ROM_START( vtsndtest )
+	ROM_REGION( 0x80000, "mainrom", 0 )
+	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(ddc2bc9c) SHA1(fb9209c62d1496ba7fe379e8a078cabd48cccd9b) )
+ROM_END
+
+ROM_START( vtboxing )
+	ROM_REGION( 0x80000, "mainrom", 0 )
+	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
 ROM_END
 
 ROM_START( mc_dgear )
@@ -1803,20 +1827,32 @@ CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT
 // this is glitchy even in other emulators, might just be entirely unfinished, it selects banks but they don't contain the required gfx?
 CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
 
+// Bundled as "VT03 Demo" on the V.R. Technology VT SDK
+CONS( 200?, pinkjelly, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / Simmer Technology Co., Ltd.", "VRT VT SDK 'Pink Jelly' (VT03 Demo)", MACHINE_IMPERFECT_GRAPHICS )
+
+// Bundled as "C-Compiler Demo Program 2" on the V.R. Technology VT SDK
+CONS( 200?, vtpinball, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / OJ-Jungle", "VRT VT SDK 'Pinball' (C-Compiler Demo Program 2)", MACHINE_NOT_WORKING )
+
+// Bundled as "Sound Generator FMDemo" on the V.R. Technology VT SDK
+CONS( 200?, vtsndtest, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'VT03 Sound Test' (Sound Generator FMDemo)", MACHINE_IMPERFECT_CONTROLS )
+
+// Bundled as "Demo for VT03 Pic32" on the V.R. Technology VT SDK
+CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
+
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
 CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
-CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,    nes_vt, nes_vt_state, empty_init, "<unknown> / Konami", "VG Pocket Tablet", MACHINE_NOT_WORKING )
+CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,    nes_vt, nes_vt_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING )
 // There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
 // and colors overall a bit off
 CONS( 2009, cybar120,  0,  0,  nes_vt_vg, nes_vt, nes_vt_state, empty_init, "Defender", "Defender M2500P 120-in-1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, vgpocket,  0,  0,  nes_vt_vg, nes_vt, nes_vt_state, empty_init, "<unknown>", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_state, empty_init, "<unknown>", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vgpocket,  0,  0,  nes_vt_vg, nes_vt, nes_vt_state, empty_init, "Performance Designed Products", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_state, empty_init, "Performance Designed Products", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
 // sport games, also no sound in menu or sport games due to missing PCM

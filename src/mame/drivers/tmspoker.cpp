@@ -212,6 +212,7 @@
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(6'000'000)   /* confirmed */
@@ -251,7 +252,7 @@ private:
 	uint8_t inputs_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void tmspoker_palette(palette_device &palette) const;
-	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
 
 	void tmspoker_cru_map(address_map &map);
@@ -288,7 +289,7 @@ void tmspoker_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -310,8 +311,14 @@ void tmspoker_state::tmspoker_palette(palette_device &palette) const
 
 INTERRUPT_GEN_MEMBER(tmspoker_state::tmspoker_interrupt)
 {
-	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE); //_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
-	m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);  // MZ: do we need this?
+	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE);
+	// MZ: The TMS9980A uses level-triggered interrupts, so this
+	// interrupt must somehow be cleared later. Clearing the line
+	// immediately is not effective, since the interrupt is not latched
+	// and will be lost.
+	// In addition, the TMS99xx processors do not offer an interrupt
+	// acknowledge output, so this is possibly done by using a CRU port.
+	// Needs further investigation of the ROM contents.
 }
 
 
@@ -340,6 +347,16 @@ void tmspoker_state::machine_reset()
 * Memory Map Information *
 *************************/
 //59a
+
+// MZ: The driver locks up in this loop until it gets an interrupt on level 2.
+//     This is obviously missing.
+//
+//     0982:     CLR  @>2040               04E0 2040
+//     0986:     MOV  @>2040,@>2040        C820 2040 2040
+//     098C:     JEQ  >0986                13FC
+//     098E:     RT                        045B
+//
+
 void tmspoker_state::tmspoker_map(address_map &map)
 {
 	map.global_mask(0x3fff);
@@ -576,7 +593,6 @@ void tmspoker_state::tmspoker(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(tmspoker_state::screen_update_tmspoker));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tmspoker);
 	PALETTE(config, "palette", FUNC(tmspoker_state::tmspoker_palette), 256);

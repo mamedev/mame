@@ -486,6 +486,13 @@ void natural_keyboard::post_utf8(const char *text, size_t length, const attotime
 }
 
 
+void natural_keyboard::post_utf8(const std::string &text, const attotime &rate)
+{
+	if (!text.empty())
+		post_utf8(text.c_str(), text.size(), rate);
+}
+
+
 //-------------------------------------------------
 //  post_coded - post a coded string
 //-------------------------------------------------
@@ -560,6 +567,34 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 		if (ch != 0)
 			post(ch);
 		curpos += increment;
+	}
+}
+
+
+void natural_keyboard::post_coded(const std::string &text, const attotime &rate)
+{
+	if (!text.empty())
+		post_coded(text.c_str(), text.size(), rate);
+}
+
+
+//-------------------------------------------------
+//  paste - does a paste from the keyboard
+//-------------------------------------------------
+
+void natural_keyboard::paste()
+{
+	// retrieve the clipboard text
+	char *text = osd_get_clipboard_text();
+
+	// was a result returned?
+	if (text != nullptr)
+	{
+		// post the text
+		post_utf8(text);
+
+		// free the string
+		free(text);
 	}
 }
 

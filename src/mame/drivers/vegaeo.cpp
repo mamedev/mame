@@ -297,4 +297,4 @@ void vegaeo_state::init_vegaeo()
 	init_speedup();
 }
 
-GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, init_vegaeo, ROT0, "Eolith", "Crazy War", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, init_vegaeo, ROT0, "Eolith", "Crazy War", MACHINE_SUPPORTS_SAVE )

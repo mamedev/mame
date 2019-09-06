@@ -9,7 +9,8 @@
     Notes:
     - keyboard connected to sio channel a
     - sio channel a clock output connected to ctc trigger 0
-    - rt1715w: SCP3 boot crashes in z80dma (Unknown base register XX)
+    - memory map not 100% clear
+    - rt1715w: SCP3 boot loops while executing PROFILE.SUB
 
     Docs:
     - http://www.robotrontechnik.de/html/computer/pc1715w.htm
@@ -88,6 +89,7 @@ private:
 	void rt1715w_io(address_map &map);
 	void rt1715_mem(address_map &map);
 	void rt1715w_mem(address_map &map);
+	void rt1715w_m1(address_map &map);
 	void rt1715w_banked_mem(address_map &map);
 
 	DECLARE_MACHINE_START(rt1715);
@@ -97,7 +99,7 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	optional_device_array<address_map_bank_device, 2> m_bankdev;
+	optional_device_array<address_map_bank_device, 3> m_bankdev;
 	required_device<z80sio_device> m_sio0;
 	required_device<z80ctc_device> m_ctc0;
 	optional_device<i8272a_device> m_fdc;
@@ -114,6 +116,7 @@ private:
 	int m_led2_val;
 	u8 m_krfd;
 	uint16_t m_dma_adr;
+	int m_r, m_w;
 };
 
 
@@ -226,12 +229,15 @@ MACHINE_START_MEMBER(rt1715_state, rt1715w)
 
 MACHINE_RESET_MEMBER(rt1715_state, rt1715w)
 {
-	m_bankdev[0]->set_bank(0);
-	m_bankdev[1]->set_bank(0);
-
 	m_dma->rdy_w(1);
 	m_krfd = 0;
 	m_dma_adr = 0;
+	m_r = 0;
+	m_w = 0;
+
+	m_bankdev[0]->set_bank(m_r);
+	m_bankdev[1]->set_bank(m_w);
+	m_bankdev[2]->set_bank(m_r);
 }
 
 /*
@@ -249,22 +255,53 @@ WRITE8_MEMBER(rt1715_state::rt1715w_set_bank)
 	int r = data >> 4;
 	int w = data & 15;
 
-	logerror("%s: rt1715w_set_bank target %x source %x%s\n", machine().describe_context(), r, w, r == w ? "" : " DIFF");
+	logerror("%s: rt1715w_set_bank target %x source %x%s\n", machine().describe_context(), w, r, r == w ? "" : " DIFF");
 
 	m_bankdev[0]->set_bank(r);
 	m_bankdev[1]->set_bank(w);
+	if (r < 2) m_bankdev[2]->set_bank(r);
+
+	m_r = r;
+	m_w = w;
 }
 
 READ8_MEMBER(rt1715_state::memory_read_byte)
 {
-	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
+	uint8_t data = 0;
+
+	switch (m_r)
+	{
+	case 0:
+		data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+		break;
+
+	case 1:
+		data = m_ram->pointer()[offset];
+		break;
+
+	case 2: case 3: case 4: case 5:
+		data = m_ram->pointer()[offset + (m_r - 2) * 0x10000];
+		break;
+	}
+	return data;
 }
 
 WRITE8_MEMBER(rt1715_state::memory_write_byte)
 {
-	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
-	prog_space.write_byte(offset, data);
+	switch (m_w)
+	{
+	case 0:
+		m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+		break;
+
+	case 1:
+		m_ram->pointer()[offset] = data;
+		break;
+
+	case 2: case 3: case 4: case 5:
+		m_ram->pointer()[offset + (m_w - 2) * 0x10000] = data;
+		break;
+	}
 }
 
 READ8_MEMBER(rt1715_state::io_read_byte)
@@ -282,7 +319,7 @@ WRITE8_MEMBER(rt1715_state::io_write_byte)
 WRITE_LINE_MEMBER(rt1715_state::busreq_w)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
@@ -387,13 +424,21 @@ void rt1715_state::rt1715w_mem(address_map &map)
 	map(0x0000, 0xffff).r(m_bankdev[0], FUNC(address_map_bank_device::read8)).w(m_bankdev[1], FUNC(address_map_bank_device::write8));
 }
 
+void rt1715_state::rt1715w_m1(address_map &map)
+{
+	map(0x0000, 0xffff).r(m_bankdev[2], FUNC(address_map_bank_device::read8)).w(m_bankdev[2], FUNC(address_map_bank_device::write8));
+}
+
 void rt1715_state::rt1715w_banked_mem(address_map &map)
 {
+	// map 0
 	map(0x00000, 0x007ff).rom().region("ipl", 0);
 	map(0x02000, 0x02fff).ram().region("gfx", 0);
 	map(0x03000, 0x03fff).ram().share("videoram");
 	map(0x04000, 0x0ffff).bankrw("bank2");
-	map(0x10000, 0x4ffff).bankrw("bank3");
+	// maps 1-5
+	map(0x10000, 0x1ffff).bankrw("bank3");
+	map(0x20000, 0x5ffff).bankrw("bank3");
 }
 
 // rt1715w -- decoders A13, A14, page C
@@ -436,9 +481,9 @@ void rt1715_state::k7658_io(address_map &map)
 
 static INPUT_PORTS_START( rt1715w )
 	PORT_START("S8")
-	PORT_DIPNAME( 0x01, 0x01, "UNK0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Floppy drive type" )
+	PORT_DIPSETTING(    0x01, "5.25\"-FD" )
+	PORT_DIPSETTING(    0x00, "8\"-FD" )
 	PORT_DIPNAME( 0x02, 0x02, "UNK1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -581,12 +626,13 @@ void rt1715_state::rt1715w(machine_config &config)
 	rt1715(config);
 
 	m_maincpu->set_clock(15.9744_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rt1715_state::rt1715w_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rt1715_state::rt1715w_m1);
 	m_maincpu->set_addrmap(AS_IO, &rt1715_state::rt1715w_io);
 	m_maincpu->set_daisy_config(rt1715w_daisy_chain);
 
 	ADDRESS_MAP_BANK(config, "bankdev0").set_map(&rt1715_state::rt1715w_banked_mem).set_options(ENDIANNESS_BIG, 8, 19, 0x10000);
 	ADDRESS_MAP_BANK(config, "bankdev1").set_map(&rt1715_state::rt1715w_banked_mem).set_options(ENDIANNESS_BIG, 8, 19, 0x10000);
+	ADDRESS_MAP_BANK(config, "bankdev2").set_map(&rt1715_state::rt1715w_banked_mem).set_options(ENDIANNESS_BIG, 8, 19, 0x10000);
 
 	MCFG_MACHINE_START_OVERRIDE(rt1715_state, rt1715w)
 	MCFG_MACHINE_RESET_OVERRIDE(rt1715_state, rt1715w)

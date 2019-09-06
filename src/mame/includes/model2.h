@@ -18,6 +18,7 @@
 #include "machine/gen_fifo.h"
 #include "machine/i8251.h"
 #include "machine/m2comm.h"
+#include "machine/segabill.h"
 #include "machine/timer.h"
 #include "sound/scsp.h"
 #include "video/segaic24.h"
@@ -90,6 +91,7 @@ public:
 	void init_zerogun();
 	void init_sgt24h();
 	void init_srallyc();
+	void init_powsledm();
 
 protected:
 	virtual void machine_start() override;
@@ -456,7 +458,8 @@ class model2a_state : public model2_tgp_state
 {
 public:
 	model2a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: model2_tgp_state(mconfig, type, tag)
+		: model2_tgp_state(mconfig, type, tag),
+		  m_billboard(*this, "billboard")
 	{}
 
 	void manxtt(machine_config &config);
@@ -475,6 +478,9 @@ protected:
 	void model2a_crx_mem(address_map &map);
 	void model2a_5881_mem(address_map &map);
 	void model2a_0229_mem(address_map &map);
+
+private:
+	required_device<sega_billboard_device> m_billboard;
 };
 
 /*****************************
@@ -488,13 +494,15 @@ class model2b_state : public model2_state
 public:
 	model2b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: model2_state(mconfig, type, tag),
-		  m_copro_adsp(*this, "copro_adsp")
+		  m_copro_adsp(*this, "copro_adsp"),
+		  m_billboard(*this, "billboard")
 	{}
 
 	void model2b(machine_config &config);
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
 	void indy500(machine_config &config);
+	void powsled(machine_config &config);
 	void rchase2(machine_config &config);
 	void gunblade(machine_config &config);
 	void dynabb(machine_config &config);
@@ -524,6 +532,9 @@ protected:
 
 	virtual void copro_halt() override;
 	virtual void copro_boot() override;
+
+private:
+	required_device<sega_billboard_device> m_billboard;
 };
 
 /*****************************

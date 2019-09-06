@@ -37,5 +37,5 @@ private:
 	u8 m_access_width;
 	u8 m_access_endian;
 
-	void generate(u8 ukey, uX umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count);
+	void generate(u8 ukey, uX gumask, uX umask, u32 cswidth, u32 bits_per_access, u8 base_shift, s8 shift, u32 active_count);
 };

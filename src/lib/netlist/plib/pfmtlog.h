@@ -17,8 +17,8 @@ namespace plib {
 
 P_ENUM(plog_level,
 	DEBUG,
-	INFO,
 	VERBOSE,
+	INFO,
 	WARNING,
 	ERROR,
 	FATAL)
@@ -190,6 +190,12 @@ public:
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		return format_element(ptype_traits<T *>::size_spec(), ptype_traits<T *>::fmt_spec(), ptype_traits<T *>::cast(x));
 	}
+
+	pfmt &operator ()()
+	{
+		return *this;
+	}
+
 
 	template<typename X, typename Y, typename... Args>
 	pfmt &operator()(X&& x, Y && y, Args&&... args)

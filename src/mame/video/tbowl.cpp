@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /* video/tbowl.c */
 
-/* see drivers/tbowl.c for more info */
+/* see drivers/tbowl.cpp for more info */
 
 #include "emu.h"
 #include "includes/tbowl.h"
@@ -138,7 +138,7 @@ uint32_t tbowl_state::screen_update_left(screen_device &screen, bitmap_ind16 &bi
 
 	bitmap.fill(0x100, cliprect); /* is there a register controlling the colour? looks odd when screen is blank */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_sprgen->tbowl_draw_sprites(bitmap,cliprect, m_gfxdecode, 0, m_spriteram);
+	m_sprgen->tbowl_draw_sprites(bitmap,cliprect, m_gfxdecode->gfx(3), 0, m_spriteram);
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
@@ -156,7 +156,7 @@ uint32_t tbowl_state::screen_update_right(screen_device &screen, bitmap_ind16 &b
 
 	bitmap.fill(0x100, cliprect); /* is there a register controlling the colour? looks odd when screen is blank */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_sprgen->tbowl_draw_sprites(bitmap,cliprect, m_gfxdecode, 32*8, m_spriteram);
+	m_sprgen->tbowl_draw_sprites(bitmap,cliprect, m_gfxdecode->gfx(3), 32*8, m_spriteram);
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 

@@ -321,12 +321,12 @@ void phc25_state::phc25(machine_config &config)
 	psg.port_a_read_callback().set_ioport("JOY0");
 	psg.port_b_read_callback().set_ioport("JOY1");
 	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	/* devices */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(phc25_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.15);
 	m_cassette->set_interface("phc25_cass");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

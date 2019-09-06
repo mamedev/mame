@@ -15,6 +15,7 @@
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class snk_state : public driver_device
 {

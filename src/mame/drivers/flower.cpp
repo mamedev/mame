@@ -85,6 +85,7 @@ CHIP #  POSITION   TYPE
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK XTAL(18'432'000)
 

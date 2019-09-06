@@ -59,6 +59,10 @@ WRITE8_MEMBER(x68k_midi_device::x68k_midi_reg_w)
 
 void x68k_midi_device::irq_w(int state)
 {
-	set_vector(MIDI_IRQ_VECTOR | (m_midi->vector() & 0x1f));
 	m_slot->irq4_w(state);  // selectable between IRQ2 and IRQ4
+}
+
+uint8_t x68k_midi_device::iack4()
+{
+	return MIDI_IRQ_VECTOR | (m_midi->vector() & 0x1f);
 }

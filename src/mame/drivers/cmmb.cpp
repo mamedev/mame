@@ -458,4 +458,14 @@ ROM_START( cmmb162 )
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( cmmb103 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "cmm103.u2",    0x10000, 0x40000, CRC(5e925b6b) SHA1(ac675d65bf5cdbd8b0456bb23e46bb00dcae916a) )
+	ROM_COPY( "maincpu",      0x18000, 0x08000, 0x08000 )
+	//ROM_FILL( 0x1c124, 2, 0xea ) // temporary patch to avoid waiting on IRQs
+
+	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
+ROM_END
+
+GAME( 2001, cmmb103, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command (rev 1.03)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 GAME( 2002, cmmb162, 0, cmmb, cmmb, cmmb_state, empty_init, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

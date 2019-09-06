@@ -7,6 +7,7 @@
 
 #include "sound/okim6295.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class oneshot_state : public driver_device
 {

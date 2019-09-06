@@ -231,4 +231,4 @@ GAME( 199?, gl_uyrp,    gl_uyr,   globalfr, globalfr, globalfr_state, empty_init
 GAME( 199?, gl_hbh,     0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel (Global) (v1.0) (Stealth)",               MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, gl_hbhcl,   0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (v1.9) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, gl_hbhclp,  gl_hbhcl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (v1.9 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_hbhcla,  gl_hbhcl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (Set 2) (Stealth)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_hbhcla,  gl_hbhcl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (set 2) (Stealth)",         MACHINE_IS_SKELETON_MECHANICAL )

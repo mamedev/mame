@@ -33,6 +33,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class quickpick5_state : public driver_device
 {
@@ -65,10 +66,10 @@ private:
 	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	// A0 is inverted to match the Z80's endianness.  Typical Konami.
-	READ8_MEMBER(k244_r) { return m_k053245->k053244_r(space, offset^1);  }
-	WRITE8_MEMBER(k244_w) { m_k053245->k053244_w(space, offset^1, data); }
-	READ8_MEMBER(k245_r) { return m_k053245->k053245_r(space, offset^1);  }
-	WRITE8_MEMBER(k245_w) { m_k053245->k053245_w(space, offset^1, data); }
+	READ8_MEMBER(k244_r) { return m_k053245->k053244_r(offset^1);  }
+	WRITE8_MEMBER(k244_w) { m_k053245->k053244_w(offset^1, data); }
+	READ8_MEMBER(k245_r) { return m_k053245->k053245_r(offset^1);  }
+	WRITE8_MEMBER(k245_w) { m_k053245->k053245_w(offset^1, data); }
 
 	WRITE8_MEMBER(control_w)
 	{

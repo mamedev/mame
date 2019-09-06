@@ -61,7 +61,6 @@ public:
 	void init_hippodrm();
 	void init_hbarrel();
 	void init_slyspy();
-	void init_birdtry();
 	void init_drgninja();
 	void init_midresb();
 	void init_ffantasybl();
@@ -87,13 +86,14 @@ protected:
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
 	DECLARE_WRITE16_MEMBER(priority_w);
 
+	void robocop_colpri_cb(u32 &colour, u32 &pri_mask);
+
 	void set_screen_raw_params_data_east(machine_config &config);
 
 private:
 	enum class mcu_type {
 		EMULATED,
-		BADDUDES_SIM,
-		BIRDTRY_SIM
+		BADDUDES_SIM
 	};
 
 	optional_device<h6280_device> m_subcpu;
@@ -149,8 +149,11 @@ private:
 	uint32_t screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void hbarrel_colpri_cb(u32 &colour, u32 &pri_mask);
+	void bandit_colpri_cb(u32 &colour, u32 &pri_mask);
+	void midres_colpri_cb(u32 &colour, u32 &pri_mask);
+
 	void baddudes_i8751_write(int data);
-	void birdtry_i8751_write(int data);
 	void dec0_i8751_write(int data);
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);

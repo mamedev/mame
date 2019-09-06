@@ -78,7 +78,6 @@
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "sound/wave.h"      /* for K7 sound*/
 
 #include "screen.h"
 #include "speaker.h"

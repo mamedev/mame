@@ -181,6 +181,7 @@ static const pce_slot slot_list[] =
 	{ PCE_CDSYS3J, "cdsys3j" },
 	{ PCE_POPULOUS, "populous" },
 	{ PCE_SF2, "sf2" },
+	{ PCE_TENNOKOE, "tennokoe" },
 };
 
 static int pce_get_pcb_id(const char *slot)
@@ -306,6 +307,8 @@ int pce_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 		if (!memcmp(ROM + 0x29d1, "VER. 3.", 7))         { type = PCE_CDSYS3J; } // JP version
 		else if (!memcmp(ROM + 0x29c4, "VER. 3.", 7 ))   { type = PCE_CDSYS3U; } // US version
 	}
+
+	// TODO: type for TENNOKOE, "Kei's" string at bottom?
 
 	return type;
 }

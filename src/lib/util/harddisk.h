@@ -29,6 +29,7 @@ struct hard_disk_info
 	uint32_t          heads;
 	uint32_t          sectors;
 	uint32_t          sectorbytes;
+	uint32_t          fileoffset;       // offset in the file where the HDD image starts.  not valid for CHDs.
 };
 
 
@@ -38,6 +39,8 @@ struct hard_disk_info
 ***************************************************************************/
 
 hard_disk_file *hard_disk_open(chd_file *chd);
+hard_disk_file *hard_disk_open(util::core_file &corefile, uint32_t skipoffs);
+
 void hard_disk_close(hard_disk_file *file);
 
 chd_file *hard_disk_get_chd(hard_disk_file *file);

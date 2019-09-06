@@ -45,17 +45,15 @@ private:
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
 	DECLARE_WRITE8_MEMBER( colorram_w );
-	DECLARE_READ_LINE_MEMBER( rdata_r );
-	DECLARE_READ_LINE_MEMBER( bdata_r );
-	DECLARE_READ_LINE_MEMBER( gdata_r );
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_WRITE_LINE_MEMBER( ca2_w );
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( eti660 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	required_shared_ptr<uint8_t> m_p_videoram;
 
 	void io_map(address_map &map);

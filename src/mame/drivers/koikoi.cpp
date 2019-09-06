@@ -45,6 +45,7 @@ to prevent disabling inputs.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define KOIKOI_CRYSTAL 15468000
 

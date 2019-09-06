@@ -33,11 +33,11 @@ void electron_plus2_device::device_add_mconfig(machine_config &config)
 {
 	/* rom sockets */
 	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 13
-	m_rom[0]->set_device_load(device_image_load_delegate(&electron_plus2_device::device_image_load_rom1_load, this));
+	m_rom[0]->set_device_load(FUNC(electron_plus2_device::rom1_load), this);
 	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 14
-	m_rom[1]->set_device_load(device_image_load_delegate(&electron_plus2_device::device_image_load_rom2_load, this));
+	m_rom[1]->set_device_load(FUNC(electron_plus2_device::rom2_load), this);
 	GENERIC_SOCKET(config, m_rom[2], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 15
-	m_rom[2]->set_device_load(device_image_load_delegate(&electron_plus2_device::device_image_load_rom3_load, this));
+	m_rom[2]->set_device_load(FUNC(electron_plus2_device::rom3_load), this);
 
 	/* cartridges */
 	ELECTRON_CARTSLOT(config, m_cart[0], DERIVED_CLOCK(1, 1), electron_cart, nullptr);

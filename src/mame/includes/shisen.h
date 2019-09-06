@@ -7,6 +7,7 @@
 
 #include "audio/m72.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class shisen_state : public driver_device
 {
@@ -35,7 +36,6 @@ private:
 	int m_gfxbank;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_READ8_MEMBER(dsw1_r);
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);

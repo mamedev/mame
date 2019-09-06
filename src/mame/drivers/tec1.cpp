@@ -36,7 +36,7 @@ GO (execute program at current address) is the X key.
 SHIFT - later monitor versions utilised an extra shift button. Hold
         it down and press another key (use Left Shift).
 
-Whenever a program listing mentions RESET, do a Soft Reset.
+Whenever a program listing mentions RESET, press Left-Alt key.
 
 Each key causes a beep to be heard. You may need to press more than once
 to get it to register.
@@ -77,7 +77,6 @@ JMON ToDo:
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "tec1.lh"
@@ -91,7 +90,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
-		, m_wave(*this, "wave")
 		, m_key_pressed(0)
 		, m_io_line0(*this, "LINE0")
 		, m_io_line1(*this, "LINE1")
@@ -104,11 +102,12 @@ public:
 	void tec1(machine_config &config);
 	void tecjmon(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cass;
-	optional_device<wave_device> m_wave;
 	bool m_key_pressed;
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
@@ -411,7 +410,15 @@ static INPUT_PORTS_START( tec1 )
 	PORT_BIT(0x1f, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, tec1_state, reset_button, 0)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(tec1_state::reset_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 
 /***************************************************************************
@@ -448,10 +455,10 @@ void tec1_state::tecjmon(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 }
 
 

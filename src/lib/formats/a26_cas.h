@@ -5,12 +5,13 @@
 
     Format code for a2600 SuperCharger cassette files
 */
+#ifndef MAME_FORMATS_A26_CAS_H
+#define MAME_FORMATS_A26_CAS_H
 
-#ifndef A26_CAS_H
-#define A26_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(a26_cassette_formats);
 
-#endif /* A26_CAS_H */
+#endif // MAME_FORMATS_A26_CAS_H

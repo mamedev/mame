@@ -688,7 +688,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
+void cliffhgr_state::cliffhgr(machine_config &config)
+{
 	Z80(config, m_maincpu, 4000000);       /* 4MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cliffhgr_state::mainmem);
 	m_maincpu->set_addrmap(AS_IO, &cliffhgr_state::mainport);
@@ -708,14 +709,14 @@ MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
 	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* override video rendering and raw screen info */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
 	DISCRETE(config, m_discrete, cliffhgr_discrete).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

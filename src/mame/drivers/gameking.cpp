@@ -67,7 +67,7 @@ private:
 	TIMER_CALLBACK_MEMBER(gameking_timer2);
 
 	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameking_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	struct Gkio {
 		uint8_t input, input2;
@@ -239,7 +239,7 @@ TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
 	timer1->reset(m_maincpu->cycles_to_attotime(io->timer * 300/*?*/));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
+DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -286,7 +286,8 @@ INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bi
 }
 
 
-MACHINE_CONFIG_START(gameking_state::gameking)
+void gameking_state::gameking(machine_config &config)
+{
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 6000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gameking_state::gameking_mem);
@@ -303,10 +304,8 @@ MACHINE_CONFIG_START(gameking_state::gameking)
 	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gameking_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(gameking_state, gameking_cart)
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gameking_cart", "bin").set_device_load(FUNC(gameking_state::cart_load), this);
+}
 
 void gameking_state::gameking1(machine_config &config)
 {

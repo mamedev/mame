@@ -7,13 +7,15 @@
     Tandy 2000 disk format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_TANDY2K_DSK_H
+#define MAME_FORMATS_TANDY2K_DSK_H
 
-#ifndef BW2_DSK_H_
-#define BW2_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
-class tandy2k_format : public upd765_format {
+class tandy2k_format : public upd765_format
+{
 public:
 	tandy2k_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_TANDY_2000_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_TANDY2K_DSK_H

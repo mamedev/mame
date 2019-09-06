@@ -109,7 +109,7 @@ void debug_view_disasm::enumerate_sources()
 
 void debug_view_disasm::view_notify(debug_view_notification type)
 {
-	if(type == VIEW_NOTIFY_CURSOR_CHANGED)
+	if((type == VIEW_NOTIFY_CURSOR_CHANGED) && (m_cursor_visible == true))
 		adjust_visible_y_for_cursor();
 
 	else if(type == VIEW_NOTIFY_SOURCE_CHANGED)

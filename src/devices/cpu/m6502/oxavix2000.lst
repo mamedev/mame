@@ -4,29 +4,29 @@
 
 phy_imp
 	read_pc_noinc();
-	write(SP, Y);
+	write_stack(SP, Y);
 	dec_SP();
 	prefetch();
 
 phx_imp
 	read_pc_noinc();
-	write(SP, X);
+	write_stack(SP, X);
 	dec_SP();
 	prefetch();
 
 plx_imp
 	read_pc_noinc();
-	read(SP);
+	read_stack(SP);
 	inc_SP();
-	X = read(SP);
+	X = read_stack(SP);
 	set_nz(X);
 	prefetch();
 
 ply_imp
 	read_pc_noinc();
-	read(SP);
+	read_stack(SP);
 	inc_SP();
-	Y = read(SP);
+	Y = read_stack(SP);
 	set_nz(Y);
 	prefetch();
 
@@ -342,15 +342,15 @@ eorpa_imp
 	prefetch();
 
 adcpa_imp
-	do_adc(read_full_data_sp(m_pa));
+	do_adc(read_full_data(m_pa));
 	prefetch();
 
 stapa_imp
-	write_full_data_sp(m_pa, A);
+	write_full_data(m_pa, A);
 	prefetch();
 
 ldapa_imp
-	A = read_full_data_sp(m_pa);
+	A = read_full_data(m_pa);
 	set_nz(A);
 	prefetch();
 
@@ -360,7 +360,7 @@ cmppa_imp
 	prefetch();
 
 sbcpa_imp
-	do_sbc(read_full_data_sp(m_pa));
+	do_sbc(read_full_data(m_pa));
 	prefetch();
 
 orapb_imp
@@ -379,15 +379,15 @@ eorpb_imp
 	prefetch();
 
 adcpb_imp
-	do_adc(read_full_data_sp(m_pb));
+	do_adc(read_full_data(m_pb));
 	prefetch();
 
 stapb_imp
-	write_full_data_sp(m_pb, A);
+	write_full_data(m_pb, A);
 	prefetch();
 
 ldapb_imp
-	A = read_full_data_sp(m_pb);
+	A = read_full_data(m_pb);
 	set_nz(A);
 	prefetch();
 
@@ -397,7 +397,7 @@ cmppb_imp
 	prefetch();
 
 sbcpb_imp
-	do_sbc(read_full_data_sp(m_pb));
+	do_sbc(read_full_data(m_pb));
 	prefetch();
 
 stx_aby
@@ -412,9 +412,9 @@ sty_abx
 	write(TMP+X, Y);
 	prefetch();
 
-stz_zpg
+stz_xav_zpg
 	TMP = read_pc();
-	write(TMP, 0x00);
+	write_zeropage(TMP, 0x00);
 	prefetch();
 
 stz_aba
@@ -423,7 +423,7 @@ stz_aba
 	write(TMP, 0x00);
 	prefetch();
 
-bit_zpx
+bit_xav_zpx
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	prefetch();
@@ -441,9 +441,9 @@ bit_imm
 		P |= F_Z;
 	prefetch();
 
-asr_zpg
+asr_xav_zpg
 	TMP = read_pc(); // TODO: verify this, should it write back or set A?
-	TMP = read(TMP);
+	TMP = read_zeropage(TMP);
 	do_asr(TMP);
 	prefetch();
 
@@ -456,7 +456,7 @@ asr_aba
 	write(TMP, TMP2);
 	prefetch();
 
-asr_zpx
+asr_xav_zpx
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
 	prefetch();

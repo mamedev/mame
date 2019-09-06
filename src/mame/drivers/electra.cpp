@@ -66,7 +66,7 @@ private:
 
 
 static NETLIST_START(electra)
-	SOLVER(Solve, 48000)
+	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
@@ -95,8 +95,7 @@ void electra_state::video_start()
 void electra_state::electra(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK);
-	m_maincpu->set_constructor(netlist_electra);
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_electra);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

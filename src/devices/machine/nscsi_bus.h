@@ -23,7 +23,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override;
+	virtual void device_resolve_objects() override;
 
 private:
 	struct dev_t {
@@ -60,10 +60,22 @@ public:
 	nscsi_device *get_device();
 
 protected:
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 };
 
-class nscsi_device : public device_t, public device_slot_card_interface
+class nscsi_slot_card_interface : public device_slot_card_interface
+{
+	friend class nscsi_connector;
+
+public:
+	nscsi_slot_card_interface(const machine_config &mconfig, device_t &device, const char *nscsi_tag);
+
+private:
+	required_device<nscsi_device> m_nscsi;
+};
+
+class nscsi_device : public device_t
 {
 public:
 	// Here because the biggest users are the devices, not the bus
@@ -128,7 +140,7 @@ protected:
 	nscsi_bus_device *scsi_bus;
 };
 
-class nscsi_full_device : public nscsi_device
+class nscsi_full_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	virtual void scsi_ctrl_changed() override;
@@ -300,7 +312,7 @@ protected:
 		SBUF_SENSE
 	};
 
-	using nscsi_device::nscsi_device;
+	nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

@@ -177,7 +177,11 @@ render_primitive_list *renderer_d3d9::get_primitives()
 	if (win == nullptr)
 		return nullptr;
 
-	GetClientRectExceptMenu(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client, win->fullscreen());
+	HWND hWnd = std::static_pointer_cast<win_window_info>(win)->platform_window();
+	if (IsIconic(hWnd))
+		return nullptr;
+
+	GetClientRectExceptMenu(hWnd, &client, win->fullscreen());
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
 		win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());
@@ -2007,7 +2011,7 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 		{
 			format = m_texture_manager->get_yuv_format();
 		}
-		else if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_ARGB32 || PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_PALETTEA16)
+		else if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_ARGB32)
 		{
 			format = D3DFMT_A8R8G8B8;
 		}
@@ -2226,21 +2230,6 @@ inline void texture_info::copyline_palette16(uint32_t *dst, const uint16_t *src,
 
 
 //============================================================
-//  copyline_palettea16
-//============================================================
-
-inline void texture_info::copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
-{
-	if (xborderpix)
-		*dst++ = palette[*src];
-	for (int x = 0; x < width; x++)
-		*dst++ = palette[*src++];
-	if (xborderpix)
-		*dst++ = palette[*--src];
-}
-
-
-//============================================================
 //  copyline_rgb32
 //============================================================
 
@@ -2451,10 +2440,6 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 			{
 				case TEXFORMAT_PALETTE16:
 					copyline_palette16((uint32_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
-					break;
-
-				case TEXFORMAT_PALETTEA16:
-					copyline_palettea16((uint32_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 					break;
 
 				case TEXFORMAT_RGB32:

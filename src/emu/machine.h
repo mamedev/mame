@@ -193,6 +193,7 @@ public:
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
+	bool hard_reset_pending() const { return m_hard_reset_pending; }
 	bool ui_active() const { return m_ui_active; }
 	const char *basename() const { return m_basename.c_str(); }
 	int sample_rate() const { return m_sample_rate; }
@@ -396,7 +397,7 @@ private:
 	// configuration state
 	dummy_space_device m_dummy_space;
 
-#if defined(EMSCRIPTEN)
+#if defined(__EMSCRIPTEN__)
 private:
 	static running_machine *emscripten_running_machine;
 	static void emscripten_main_loop();

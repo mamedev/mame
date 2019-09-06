@@ -11,6 +11,7 @@
 #include "sound/okim6295.h"
 #include "sound/upd7759.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class aerofgt_state : public driver_device
 {

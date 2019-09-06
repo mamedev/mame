@@ -178,7 +178,7 @@ void gimix_state::gimix_mem(address_map &map)
 
 static INPUT_PORTS_START( gimix )
 	PORT_START("dma_s2")
-	PORT_DIPNAME(0x00000100,0x00000000,"5.25\" / 8\" floppy drive 0") PORT_DIPLOCATION("S2:9") PORT_CHANGED_MEMBER(DEVICE_SELF,gimix_state,drive_size_cb,nullptr)
+	PORT_DIPNAME(0x00000100,0x00000000,"5.25\" / 8\" floppy drive 0") PORT_DIPLOCATION("S2:9") PORT_CHANGED_MEMBER(DEVICE_SELF,gimix_state,drive_size_cb,0)
 	PORT_DIPSETTING(0x00000000,"5.25\"")
 	PORT_DIPSETTING(0x00000100,"8\"")
 

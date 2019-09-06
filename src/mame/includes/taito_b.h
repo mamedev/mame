@@ -17,7 +17,6 @@ class taitob_state : public driver_device
 public:
 	taitob_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_pixelram(*this, "pixelram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ym(*this, "ymsnd"),
@@ -37,7 +36,6 @@ public:
 
 	void spacedx(machine_config &config);
 	void rambo3(machine_config &config);
-	void hitice(machine_config &config);
 	void ashura(machine_config &config);
 	void silentd(machine_config &config);
 	void tetrista(machine_config &config);
@@ -71,16 +69,11 @@ protected:
 	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
 	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
 	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
-	DECLARE_WRITE16_MEMBER(hitice_pixelram_w);
-	DECLARE_WRITE16_MEMBER(hitice_pixel_scroll_w);
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
-	DECLARE_VIDEO_START(hitice);
-	DECLARE_VIDEO_RESET(hitice);
-	DECLARE_VIDEO_START(taitob_core);
+	virtual void video_start() override;
 	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void crimec_map(address_map &map);
-	void hitice_map(address_map &map);
 	void masterw_map(address_map &map);
 	void masterw_sound_map(address_map &map);
 	void pbobble_map(address_map &map);
@@ -100,9 +93,6 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	/* memory pointers */
-	optional_shared_ptr<uint16_t> m_pixelram;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
@@ -132,8 +122,6 @@ protected:
 	optional_ioport m_eepromout_io;
 	optional_ioport_array<2> m_trackx_io;
 	optional_ioport_array<2> m_tracky_io;
-
-	void hitice_clear_pixel_bitmap();
 };
 
 class taitob_c_state : public taitob_state
@@ -152,12 +140,37 @@ protected:
 	void realpunc_map(address_map &map);
 	void realpunc_hd63484_map(address_map &map);
 
-	DECLARE_VIDEO_START(realpunc);
+	virtual void video_start() override;
 	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
 	uint16_t        m_realpunc_video_ctrl;
+};
+
+class hitice_state : public taitob_state
+{
+public:
+	hitice_state(const machine_config &mconfig, device_type type, const char *tag) :
+		taitob_state(mconfig, type, tag),
+		m_pixelram(*this, "pixelram")
+	{ }
+
+	void hitice(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+	virtual void video_reset() override;
+
+private:
+	DECLARE_WRITE16_MEMBER(pixelram_w);
+	DECLARE_WRITE16_MEMBER(pixel_scroll_w);
+
+	void hitice_map(address_map &map);
+
+	void clear_pixel_bitmap();
+
+	required_shared_ptr<uint16_t> m_pixelram;
 };
 
 #endif // MAME_INCLUDES_TAITO_B_H

@@ -7,6 +7,7 @@
 
 #include "machine/watchdog.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class mcatadv_state : public driver_device
 {

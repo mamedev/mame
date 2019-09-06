@@ -1430,8 +1430,7 @@ void a4000_state::a400030_mem(address_map &map)
 {
 	map.unmap_value_high();
 	a4000_mem(map);
-	map(0x07000000, 0x07dfffff).noprw(); // motherboard ram
-	map(0x07e00000, 0x07ffffff).ram(); // motherboard ram (up to 16mb), grows downward
+	map(0x07000000, 0x07dfffff).noprw(); // Drop the first 2Mb
 }
 
 // 2MB chip RAM and CD-ROM
@@ -1983,7 +1982,6 @@ void a1200_state::a1200(machine_config &config)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
 
 	config.device_remove("palette");
 
@@ -2020,7 +2018,6 @@ void a1200_state::a1200n(machine_config &config)
 	config.device_remove("screen");
 	ntsc_video(config);
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
@@ -2044,7 +2041,6 @@ void a4000_state::a4000(machine_config &config)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
 
 	config.device_remove("palette");
 
@@ -2071,7 +2067,6 @@ void a4000_state::a4000n(machine_config &config)
 	config.device_remove("screen");
 	ntsc_video(config);
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
@@ -2095,7 +2090,6 @@ void a4000_state::a400030n(machine_config &config)
 	config.device_remove("screen");
 	ntsc_video(config);
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
@@ -2124,7 +2118,6 @@ void cd32_state::cd32(machine_config &config)
 	akiko.sda_w_callback().set("i2cmem", FUNC(i2cmem_device::write_sda));
 
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
 
 	config.device_remove("palette");
 
@@ -2149,7 +2142,6 @@ void cd32_state::cd32n(machine_config &config)
 	config.device_remove("screen");
 	ntsc_video(config);
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);
@@ -2174,7 +2166,6 @@ void a4000_state::a4000tn(machine_config &config)
 	config.device_remove("screen");
 	ntsc_video(config);
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
 	m_paula->set_clock(amiga_state::CLK_C1_NTSC);
 	m_cia_0->set_clock(amiga_state::CLK_E_NTSC);
 	m_cia_1->set_clock(amiga_state::CLK_E_NTSC);

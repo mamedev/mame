@@ -13,6 +13,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/timer.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class finalizr_state : public driver_device
 {

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 
 class st0020_device : public device_t, public device_gfx_interface
 {

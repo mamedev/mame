@@ -107,6 +107,7 @@ Notes:
 #include "includes/retofinv.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "screen.h"
@@ -128,12 +129,6 @@ WRITE8_MEMBER(retofinv_state::cpu2_m6000_w)
 READ8_MEMBER(retofinv_state::cpu0_mf800_r)
 {
 	return m_cpu2_m6000;
-}
-
-WRITE8_MEMBER(retofinv_state::soundcommand_w)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE_LINE_MEMBER(retofinv_state::irq0_ack_w)
@@ -193,7 +188,7 @@ void retofinv_state::bootleg_map(address_map &map)
 	map(0xc007, 0xc007).portr("DSW3");
 	map(0xc800, 0xc807).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xd000, 0xd000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xd800, 0xd800).w(FUNC(retofinv_state::soundcommand_w));
+	map(0xd800, 0xd800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf800, 0xf800).r(FUNC(retofinv_state::cpu0_mf800_r));
 }
 
@@ -218,7 +213,7 @@ void retofinv_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x27ff).ram(); /* 6116 sram at IC28 */
-	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x4000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x6000, 0x6000).w(FUNC(retofinv_state::cpu2_m6000_w));
 	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::write));
 	map(0xa000, 0xa000).w("sn2", FUNC(sn76489a_device::write));
@@ -456,7 +451,8 @@ void retofinv_state::retofinv(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
 	SN76489A(config, "sn1", XTAL(18'432'000)/6).add_route(ALL_OUTPUTS, "mono", 0.80);   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 

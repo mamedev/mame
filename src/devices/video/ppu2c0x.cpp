@@ -676,6 +676,9 @@ void ppu2c0x_device::draw_background(uint8_t *line_priority)
 
 		index1 = tile_index + x;
 
+		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
+		page2 = readbyte(index1);
+
 		// this is attribute table stuff! (actually read 2 in PPUspeak)!
 		/* Figure out which byte in the color table to use */
 		pos = ((index1 & 0x380) >> 4) | ((index1 & 0x1f) >> 2);
@@ -685,10 +688,6 @@ void ppu2c0x_device::draw_background(uint8_t *line_priority)
 
 		/* figure out which bits in the color table to use */
 		color_bits = ((index1 & 0x40) >> 4) + (index1 & 0x02);
-
-		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
-		address = index1 & 0x3ff;
-		page2 = readbyte(index1);
 
 		// 27/12/2002
 		if (!m_latch.isnull())
@@ -980,10 +979,13 @@ void ppu2c0x_device::update_scanline()
 		/* Render this scanline if appropriate */
 		if (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES))
 		{
-			/* If background or sprites are enabled, copy the ppu address latch */
-			/* Copy only the scroll x-coarse and the x-overflow bit */
-			m_refresh_data &= ~0x041f;
-			m_refresh_data |= (m_refresh_latch & 0x041f);
+			if (m_scanline_timer->remaining() == attotime::zero)
+			{
+				/* If background or sprites are enabled, copy the ppu address latch */
+				/* Copy only the scroll x-coarse and the x-overflow bit */
+				m_refresh_data &= ~0x041f;
+				m_refresh_data |= (m_refresh_latch & 0x041f);
+			}
 
 //          logerror("updating refresh_data: %04x (scanline: %d)\n", m_refresh_data, m_scanline);
 			render_scanline();
@@ -1015,23 +1017,26 @@ void ppu2c0x_device::update_scanline()
 				bitmap.pix32(m_scanline, i) = back_pen;
 		}
 
-		/* increment the fine y-scroll */
-		m_refresh_data += 0x1000;
-
-		/* if it's rolled, increment the coarse y-scroll */
-		if (m_refresh_data & 0x8000)
+		if (m_scanline_timer->remaining() == attotime::zero)
 		{
-			uint16_t tmp;
-			tmp = (m_refresh_data & 0x03e0) + 0x20;
-			m_refresh_data &= 0x7c1f;
+			/* increment the fine y-scroll */
+			m_refresh_data += 0x1000;
 
-			/* handle bizarro scrolling rollover at the 30th (not 32nd) vertical tile */
-			if (tmp == 0x03c0)
-				m_refresh_data ^= 0x0800;
-			else
-				m_refresh_data |= (tmp & 0x03e0);
+			/* if it's rolled, increment the coarse y-scroll */
+			if (m_refresh_data & 0x8000)
+			{
+				uint16_t tmp;
+				tmp = (m_refresh_data & 0x03e0) + 0x20;
+				m_refresh_data &= 0x7c1f;
 
-//          logerror("updating refresh_data: %04x\n", m_refresh_data);
+				/* handle bizarro scrolling rollover at the 30th (not 32nd) vertical tile */
+				if (tmp == 0x03c0)
+					m_refresh_data ^= 0x0800;
+				else
+					m_refresh_data |= (tmp & 0x03e0);
+
+				//logerror("updating refresh_data: %04x\n", m_refresh_data);
+			}
 		}
 	}
 
@@ -1332,13 +1337,18 @@ void ppu2c0x_device::spriteram_dma( address_space &space, const uint8_t page )
  *
  *************************************/
 
-void ppu2c0x_device::render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, int sy)
+void ppu2c0x_device::render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, int sy, const rectangle &cliprect)
 {
-	copybitmap(bitmap, *m_bitmap, flipx, flipy, sx, sy, bitmap.cliprect());
+	if (m_scanline_timer->remaining() != attotime::zero)
+	{
+		// Partial line update, need to render first (especially for light gun emulation).
+		update_scanline();
+	}
+	copybitmap(bitmap, *m_bitmap, flipx, flipy, sx, sy, cliprect);
 }
 
 uint32_t ppu2c0x_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	render(bitmap, 0, 0, 0, 0);
+	render(bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 class mosaic_state : public driver_device
 {
 public:

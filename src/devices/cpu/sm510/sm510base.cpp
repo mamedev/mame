@@ -61,6 +61,7 @@ void sm510_base_device::device_start()
 	m_acc = 0;
 	m_bl = 0;
 	m_bm = 0;
+	m_sbl = false;
 	m_sbm = false;
 	m_c = 0;
 	m_skip = false;
@@ -73,7 +74,7 @@ void sm510_base_device::device_start()
 	m_l = 0;
 	m_x = 0;
 	m_y = 0;
-	m_bp = false;
+	m_bp = 0;
 	m_bc = false;
 	m_halt = false;
 	m_melody_rd = 0;
@@ -93,6 +94,7 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_acc));
 	save_item(NAME(m_bl));
 	save_item(NAME(m_bm));
+	save_item(NAME(m_sbl));
 	save_item(NAME(m_sbm));
 	save_item(NAME(m_c));
 	save_item(NAME(m_skip));
@@ -147,13 +149,14 @@ void sm510_base_device::device_reset()
 	// ACL
 	m_skip = false;
 	m_halt = false;
+	m_sbl = false;
 	m_sbm = false;
 	m_op = m_prev_op = 0;
 	reset_vector();
 	m_prev_pc = m_pc;
 
 	// lcd is on (Bp on, BC off, bs(y) off)
-	m_bp = true;
+	m_bp = 1;
 	m_bc = false;
 	m_y = 0;
 

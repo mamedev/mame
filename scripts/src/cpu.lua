@@ -113,14 +113,6 @@ if (CPUS["ARCOMPACT"]~=null) then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.h",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp",
 	}
-	dependency {
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact.cpp",       GEN_DIR .. "emu/cpu/arcompact/arcompact.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp", GEN_DIR .. "emu/cpu/arcompact/arcompact.hxx" },
-	}
-
-	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact_make.py" , GEN_DIR .. "emu/cpu/arcompact/arcompact.hxx",   { MAME_DIR .. "src/devices/cpu/arcompact/arcompact_make.py" }, {"@echo Generating ARCOMPACT source files...", PYTHON .. " $(1)  $(@)" }},
-	}
 end
 
 if (CPUS["ARCOMPACT"]~=null or _OPTIONS["with-tools"]) then
@@ -1087,6 +1079,8 @@ if (CPUS["I386"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/i386/i386.cpp",
 		MAME_DIR .. "src/devices/cpu/i386/i386.h",
+		MAME_DIR .. "src/devices/cpu/i386/athlon.cpp",
+		MAME_DIR .. "src/devices/cpu/i386/athlon.h",
 		MAME_DIR .. "src/devices/cpu/i386/cache.h",
 		MAME_DIR .. "src/devices/cpu/i386/cycles.h",
 		MAME_DIR .. "src/devices/cpu/i386/i386op16.hxx",
@@ -1094,6 +1088,7 @@ if (CPUS["I386"]~=null) then
 		MAME_DIR .. "src/devices/cpu/i386/i386ops.h",
 		MAME_DIR .. "src/devices/cpu/i386/i386ops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/i386priv.h",
+		MAME_DIR .. "src/devices/cpu/i386/i386segs.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/i486ops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/pentops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87ops.hxx",
@@ -1670,9 +1665,7 @@ if (CPUS["M680X0"]~=null) then
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kfpu.hxx",
-		--MAME_DIR .. "src/devices/cpu/m68000/m68kmake.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kmmu.h",
-		--MAME_DIR .. "src/devices/cpu/m68000/m68k_in.cpp",
 	}
 end
 
@@ -1682,34 +1675,34 @@ if (CPUS["M680X0"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Motorola/Freescale dsp56k
---@src/devices/cpu/dsp56k/dsp56k.h,CPUS["DSP56156"] = true
+-- Motorola/Freescale DSP56156
+--@src/devices/cpu/dsp56156/dsp56156.h,CPUS["DSP56156"] = true
 --------------------------------------------------
 
 if (CPUS["DSP56156"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56k.cpp",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56k.h",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56mem.cpp",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56mem.h",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56pcu.cpp",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56pcu.h",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56def.h",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56ops.hxx",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56156.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56156.h",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56mem.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56mem.h",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56pcu.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56pcu.h",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56def.h",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56ops.hxx",
 	}
 end
 
 if (CPUS["DSP56156"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/dsp56dsm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/dsp56dsm.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/opcode.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/opcode.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/inst.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/inst.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/pmove.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/pmove.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/tables.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/tables.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/dsp56dsm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/dsp56dsm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/opcode.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/opcode.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/inst.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/inst.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/pmove.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/pmove.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/tables.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/tables.h")
 end
 
 --------------------------------------------------
@@ -2161,6 +2154,11 @@ if (CPUS["UNSP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/unsp/unsp.cpp",
 		MAME_DIR .. "src/devices/cpu/unsp/unsp.h",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_extended.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_jumps.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_exxx.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_fxxx.cpp",
+		MAME_DIR .. "src/devices/cpu/unsp/unsp_other.cpp",
 		MAME_DIR .. "src/devices/cpu/unsp/unspdefs.h",
 		MAME_DIR .. "src/devices/cpu/unsp/unspdrc.cpp",
 		MAME_DIR .. "src/devices/cpu/unsp/unspfe.cpp",
@@ -2171,6 +2169,11 @@ end
 if (CPUS["UNSP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_extended.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_jumps.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_exxx.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_fxxx.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/unsp/unspdasm_other.cpp")
 end
 
 --------------------------------------------------
@@ -2837,6 +2840,23 @@ if (CPUS["MEG"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Yamaha DSPV
+--@src/devices/sound/dspv.h,CPUS["DSPV"] = true
+--------------------------------------------------
+
+if (CPUS["DSPV"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/dspv.cpp",
+		MAME_DIR .. "src/devices/sound/dspv.h",
+	}
+end
+
+if (CPUS["DSPV"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/dspvd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/dspvd.h")
+end
+
+--------------------------------------------------
 --  National Semiconductor NS32000 series
 --@src/devices/cpu/ns32000/ns32000.h,CPUS["NS32000"] = true
 --------------------------------------------------
@@ -2851,4 +2871,74 @@ end
 if (CPUS["NS32000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.h")
+end
+
+--------------------------------------------------
+-- Elan RISC II series
+--@src/devices/cpu/rii/riscii.h,CPUS["RII"] = true
+--------------------------------------------------
+
+if (CPUS["RII"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/rii/riscii.cpp",
+		MAME_DIR .. "src/devices/cpu/rii/riscii.h",
+	}
+end
+
+if (CPUS["RII"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rii/riidasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rii/riidasm.h")
+end
+
+--------------------------------------------------
+-- National Semiconductor BCP
+--@src/devices/cpu/bcp/dp8344.h,CPUS["BCP"] = true
+--------------------------------------------------
+
+if (CPUS["BCP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/bcp/dp8344.cpp",
+		MAME_DIR .. "src/devices/cpu/bcp/dp8344.h",
+	}
+end
+
+if (CPUS["BCP"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/bcp/bcpdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/bcp/bcpdasm.h")
+end
+
+--------------------------------------------------
+-- Fujitsu F2MC-16 series
+--@src/devices/cpu/f2mc16/f2mc16.h,CPUS["F2MC16"] = true
+--------------------------------------------------
+
+if (CPUS["F2MC16"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.h",
+	}
+end
+
+if (CPUS["F2MC16"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.h")
+end
+
+--------------------------------------------------
+-- National Semiconductor CR16B
+--@src/devices/cpu/cr16b/cr16bdasm.h,CPUS["CR16B"] = true
+--------------------------------------------------
+
+if (CPUS["CR16B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/cr16b/cr16b.cpp",
+		MAME_DIR .. "src/devices/cpu/cr16b/cr16b.h",
+	}
+end
+
+if (CPUS["CR16B"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.h")
 end

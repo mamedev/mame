@@ -1186,7 +1186,10 @@ ROM_END
 
 /****************************************
 
-  Royal Card (amusement).
+  Royal Card.
+  Amusement.
+  1985-01-01
+
   PCB silkscreened "FD-510"
 
   1x Z80 @ 2.5 MHz. (measured)
@@ -1211,6 +1214,30 @@ ROM_START( roylcrdn )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mb7051.3h",  0x0000, 0x0020, CRC(cb6f1aec) SHA1(84136393f9cf8bd836123a31483e9a746ca00cdc) )
+ROM_END
+
+/*
+  Royal Card (Part Two)
+  Miki Corp
+  Ver. 1.02
+  1982-04-10
+
+  PCB silkscreened (c) MIKI CORP
+
+*/
+ROM_START( roylcrdna )
+	ROM_REGION( 0x10000, "cpu0", 0 )
+	ROM_LOAD( "rc4.ic11",     0x0000, 0x1000, CRC(4a7d9479) SHA1(0c695128b0a66c077013991d062c28a3f00857d1) )
+	ROM_LOAD( "rc5.ic12",     0x1000, 0x1000, CRC(577ca478) SHA1(ab138673f74a618f6842f8a6bdf840ef661f27b8) )
+	ROM_LOAD( "rc6.ic13",     0x2000, 0x1000, CRC(42507bb5) SHA1(458b5580d9d20687972cccb12490bd58d9b09175) )
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	ROM_LOAD( "rc1.k5", 0x0000, 0x1000, CRC(935d0e1c) SHA1(0d5b067f6931585c8138b211cf73e5f585af8101) )
+	ROM_LOAD( "rc2.l5", 0x1000, 0x1000, CRC(4429362e) SHA1(0bbb6dedf919e0453be2db6343827c5787d139f3) )
+	ROM_LOAD( "rc3.n5", 0x2000, 0x1000, CRC(50562072) SHA1(7f2ef4f4237d55198af307f6b81af6306c07ce95) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051.h3",  0x0000, 0x0020, CRC(cb6f1aec) SHA1(84136393f9cf8bd836123a31483e9a746ca00cdc) )
 ROM_END
 
 
@@ -1294,16 +1321,17 @@ void jangou_state::init_luckygrl()
  *
  *************************************/
 
-GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,  empty_init,    ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  jngolady,  0,        jngolady, jngolady, jangou_state,  init_jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrla, cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,  empty_init,    ROT0, "Nichibutsu",   "Jangou [BET] (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,  empty_init,    ROT0, "Logitec",      "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  jngolady,  0,        jngolady, jngolady, jangou_state,  init_jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Royal Denshi", "Country Girl (Japan set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrla, cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",   "Country Girl (Japan set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",   "Fruits & Bunny (World?)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Amusement",    "Royal Card (Nichibutsu HW)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1982,  roylcrdna, roylcrdn, roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Miki Corp.",   "Royal Card Part-Two (Nichibutsu HW, Ver. 1.02)",  MACHINE_SUPPORTS_SAVE )
 
 /* The following might not run there... */
-GAME( 1985,  luckygrl,  0,        cntrygrl, cntrygrl, jangou_state,  init_luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  luckygrl,  0,        cntrygrl, cntrygrl, jangou_state,  init_luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /*
 Some other games that might run on this HW:

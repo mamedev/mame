@@ -7,9 +7,10 @@
     PC98DIP disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_DIP_DSK_H
+#define MAME_FORMATS_DIP_DSK_H
 
-#ifndef DIP_DSK_H
-#define DIP_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -30,4 +31,4 @@ public:
 
 extern const floppy_format_type FLOPPY_DIP_FORMAT;
 
-#endif /* DIP_DSK_H */
+#endif // MAME_FORMATS_DIP_DSK_H

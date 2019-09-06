@@ -106,9 +106,11 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+#include "video/st0020.h"
 #include "emupal.h"
 #include "speaker.h"
-#include "video/st0020.h"
+#include "tilemap.h"
+
 #include "jclub2o.lh"
 #include "jclub2.lh"
 

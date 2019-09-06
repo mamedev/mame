@@ -16,7 +16,7 @@
 #include "machine/nscsi_bus.h"
 
 
-class ncr53c7xx_device : public nscsi_device, public device_execute_interface
+class ncr53c7xx_device : public nscsi_device, public nscsi_slot_card_interface, public device_execute_interface
 {
 public:
 	// construction/destruction

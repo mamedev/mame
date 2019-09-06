@@ -20,14 +20,14 @@ class cquestsnd_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	auto dac_w() { return m_dac_w.bind(); }
 	void set_sound_region(const char *tag) { m_sound_region_tag = tag; }
 
-	DECLARE_WRITE16_MEMBER(sndram_w);
-	DECLARE_READ16_MEMBER(sndram_r);
+	void sndram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 sndram_r(offs_t offset);
 
 protected:
 	enum
@@ -60,9 +60,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 1; }
+	virtual u32 execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -75,35 +75,35 @@ private:
 	address_space_config m_program_config;
 
 	/* AM2901 internals */
-	uint16_t  m_ram[16];
-	uint16_t  m_q;
-	uint16_t  m_f;
-	uint16_t  m_y;
-	uint32_t  m_cflag;
-	uint32_t  m_vflag;
+	u16  m_ram[16];
+	u16  m_q;
+	u16  m_f;
+	u16  m_y;
+	u32  m_cflag;
+	u32  m_vflag;
 
-	uint8_t   m_pc;         /* 2 x LS161 @ 6E, 6F */
-	uint16_t  m_platch;
-	uint8_t   m_rtnlatch;   /* LS374 @ 5F */
-	uint8_t   m_adrcntr;    /* 2 x LS161 */
-	uint16_t  m_adrlatch;
-	uint16_t  m_dinlatch;
-	uint16_t  m_ramwlatch;
+	u8   m_pc;         /* 2 x LS161 @ 6E, 6F */
+	u16  m_platch;
+	u8   m_rtnlatch;   /* LS374 @ 5F */
+	u8   m_adrcntr;    /* 2 x LS161 */
+	u16  m_adrlatch;
+	u16  m_dinlatch;
+	u16  m_ramwlatch;
 
-	uint16_t m_sram[4096/2];
+	u16 m_sram[4096/2];
 
-	int m_prev_ipram;
-	int m_prev_ipwrt;
+	bool m_prev_ipram;
+	bool m_prev_ipwrt;
 
 	devcb_write16 m_dac_w;
 	const char *m_sound_region_tag;
-	uint16_t *m_sound_data;
+	u16 *m_sound_data;
 
 	address_space *m_program;
 	memory_access_cache<3, -3, ENDIANNESS_BIG> *m_cache;
 	int m_icount;
 
-	int do_sndjmp(int jmp);
+	bool do_sndjmp(u8 jmp);
 };
 
 
@@ -111,14 +111,14 @@ class cquestrot_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	auto linedata_w() { return m_linedata_w.bind(); }
 
-	DECLARE_READ16_MEMBER(linedata_r);
-	DECLARE_WRITE16_MEMBER(rotram_w);
-	DECLARE_READ16_MEMBER(rotram_r);
+	u16 linedata_r();
+	void rotram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 rotram_r(offs_t offset);
 
 protected:
 	enum
@@ -158,9 +158,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 1; }
+	virtual u32 execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -177,45 +177,45 @@ private:
 	devcb_write16 m_linedata_w;
 
 	/* AM2901 internals */
-	uint16_t  m_ram[16];
-	uint16_t  m_q;
-	uint16_t  m_f;
-	uint16_t  m_y;
-	uint32_t  m_cflag;
-	uint32_t  m_vflag;
+	u16  m_ram[16];
+	u16  m_q;
+	u16  m_f;
+	u16  m_y;
+	u32  m_cflag;
+	u32  m_vflag;
 
-	uint16_t  m_pc;         /* 12-bit, but only 9 used */
-	uint8_t   m_seqcnt;     /* 4-bit counter */
+	u16  m_pc;         /* 12-bit, but only 9 used */
+	u8   m_seqcnt;     /* 4-bit counter */
 
-	uint8_t   m_dsrclatch;
-	uint8_t   m_rsrclatch;
-	uint16_t  m_dynaddr;    /* LS374 at 2D, 8D  */
-	uint16_t  m_dyndata;    /* LS374 at 10B, 9B */
-	uint16_t  m_yrlatch;    /* LS374 at 9D, 10D */
-	uint16_t  m_ydlatch;    /* LS374 at 9C, 10C */
-	uint16_t  m_dinlatch;
-	uint8_t   m_divreg;     /* LS74 at ? */
+	u8   m_dsrclatch;
+	u8   m_rsrclatch;
+	u16  m_dynaddr;    /* LS374 at 2D, 8D  */
+	u16  m_dyndata;    /* LS374 at 10B, 9B */
+	u16  m_yrlatch;    /* LS374 at 9D, 10D */
+	u16  m_ydlatch;    /* LS374 at 9C, 10C */
+	u16  m_dinlatch;
+	u8   m_divreg;     /* LS74 at ? */
 
-	uint16_t  m_linedata;
-	uint16_t  m_lineaddr;
+	u16  m_linedata;
+	u16  m_lineaddr;
 
-	uint16_t m_dram[16384]; /* Shared with 68000 */
-	uint16_t m_sram[2048];  /* Private */
+	u16 m_dram[16384]; /* Shared with 68000 */
+	u16 m_sram[2048];  /* Private */
 
-	uint8_t m_prev_dred;
-	uint8_t m_prev_dwrt;
-	uint8_t m_wc;
-	uint8_t m_rc;
-	uint8_t m_clkcnt;
+	u8 m_prev_dred;
+	u8 m_prev_dwrt;
+	u8 m_wc;
+	u8 m_rc;
+	u8 m_clkcnt;
 
 	address_space *m_program;
 	memory_access_cache<3, -3, ENDIANNESS_BIG> *m_cache;
 	int m_icount;
 
 	// For the debugger
-	uint8_t m_flags;
+	u8 m_flags;
 
-	int do_rotjmp(int jmp);
+	int do_rotjmp(u8 jmp);
 };
 
 
@@ -223,16 +223,16 @@ class cquestlin_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	auto linedata_r() { return m_linedata_r.bind(); }
 
-	DECLARE_WRITE16_MEMBER( linedata_w );
+	void linedata_w(offs_t offset, u16 data);
 	void cubeqcpu_swap_line_banks();
 	void cubeqcpu_clear_stack();
-	uint8_t cubeqcpu_get_ptr_ram_val(int i);
-	uint32_t* cubeqcpu_get_stack_ram();
+	u8 cubeqcpu_get_ptr_ram_val(int i);
+	u32* cubeqcpu_get_stack_ram();
 
 protected:
 	enum
@@ -270,9 +270,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 1; }
+	virtual u32 execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -289,51 +289,51 @@ private:
 	devcb_read16 m_linedata_r;
 
 	/* 12-bit AM2901 internals */
-	uint16_t  m_ram[16];
-	uint16_t  m_q;
-	uint16_t  m_f;
-	uint16_t  m_y;
-	uint32_t  m_cflag;
-	uint32_t  m_vflag;
+	u16  m_ram[16];
+	u16  m_q;
+	u16  m_f;
+	u16  m_y;
+	u32  m_cflag;
+	u32  m_vflag;
 
-	uint8_t   m_pc[2];      /* Two program counters; one for FG, other for BG */
+	u8   m_pc[2];      /* Two program counters; one for FG, other for BG */
 
-	uint16_t  m_seqcnt;     /* 12-bit */
-	uint16_t  m_clatch;     /* LS374 at 9E and 1-bit FF */
-	uint8_t   m_zlatch;     /* LS374 at 4H */
+	u16  m_seqcnt;     /* 12-bit */
+	u16  m_clatch;     /* LS374 at 9E and 1-bit FF */
+	u8   m_zlatch;     /* LS374 at 4H */
 
-	uint16_t  m_xcnt;
-	uint16_t  m_ycnt;
-	uint8_t   m_sreg;
+	u16  m_xcnt;
+	u16  m_ycnt;
+	u8   m_sreg;
 
-	uint16_t  m_fadlatch;
-	uint16_t  m_badlatch;
+	u16  m_fadlatch;
+	u16  m_badlatch;
 
-	uint16_t  m_sramdlatch;
+	u16  m_sramdlatch;
 
-	uint8_t   m_fglatch;
-	uint8_t   m_bglatch;
-	uint8_t   m_gt0reg;
-	uint8_t   m_fdxreg;
-	uint32_t  m_field;
+	u8   m_fglatch;
+	u8   m_bglatch;
+	u8   m_gt0reg;
+	u8   m_fdxreg;
+	u32  m_field;
 
-	uint32_t  m_clkcnt;
+	u32  m_clkcnt;
 
 	/* RAM */
-	uint16_t  m_sram[4096];       /* Shared with rotate CPU */
-	uint8_t   m_ptr_ram[1024];    /* Pointer RAM */
-	uint32_t  m_e_stack[32768];   /* Stack DRAM: 32kx20 */
-	uint32_t  m_o_stack[32768];   /* Stack DRAM: 32kx20 */
+	u16  m_sram[4096];       /* Shared with rotate CPU */
+	u8   m_ptr_ram[1024];    /* Pointer RAM */
+	u32  m_e_stack[32768];   /* Stack DRAM: 32kx20 */
+	u32  m_o_stack[32768];   /* Stack DRAM: 32kx20 */
 
 	address_space *m_program;
 	memory_access_cache<3, -3, ENDIANNESS_BIG> *m_cache;
 	int m_icount;
 
 	// For the debugger
-	uint8_t m_flags;
-	uint16_t m_curpc;
+	u8 m_flags;
+	u16 m_curpc;
 
-	int do_linjmp(int jmp);
+	int do_linjmp(u8 jmp);
 };
 
 

@@ -22,6 +22,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class aquarius_state : public driver_device

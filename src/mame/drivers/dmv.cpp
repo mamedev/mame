@@ -125,7 +125,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(irq7a_w)      { update_irqs(7, state); }
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	DECLARE_QUICKLOAD_LOAD_MEMBER(dmv);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	uint8_t program_read(int cas, offs_t offset);
 	void program_write(int cas, offs_t offset, uint8_t data);
@@ -393,7 +393,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( dmv_state, dmv )
+QUICKLOAD_LOAD_MEMBER(dmv_state::quickload_cb)
 {
 	/* Avoid loading a program if CP/M-80 is not in memory */
 	if ((m_ram->base()[0] != 0xc3) || (m_ram->base()[5] != 0xc3))
@@ -780,7 +780,7 @@ void dmv_state::dmv(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dmv_state::dmv_mem);
 	m_maincpu->set_addrmap(AS_IO, &dmv_state::dmv_io);
 
-	i8741_device &kbmcu(I8741(config, "kb_ctrl_mcu", XTAL(6'000'000)));
+	i8741a_device &kbmcu(I8741A(config, "kb_ctrl_mcu", XTAL(6'000'000)));
 	kbmcu.p1_in_cb().set(FUNC(dmv_state::kb_mcu_port1_r)); // bit 0 data from kb
 	kbmcu.p1_out_cb().set(FUNC(dmv_state::kb_mcu_port1_w)); // bit 1 data to kb
 	kbmcu.p2_out_cb().set(FUNC(dmv_state::kb_mcu_port2_w));
@@ -878,8 +878,7 @@ void dmv_state::dmv(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("dmv");
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(dmv_state, dmv), this), "com,cpm", attotime::from_seconds(3));
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(dmv_state::quickload_cb), this);
 }
 
 /* ROM definition */

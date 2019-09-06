@@ -67,10 +67,10 @@ inline int atari_rle_objects_device::round_to_powerof2(int value)
 //  atari_rle_objects_device: Constructor
 //-------------------------------------------------
 
-atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ATARI_RLE_OBJECTS, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		m_rombase(*this, DEVICE_SELF)
+atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, ATARI_RLE_OBJECTS, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_rombase(*this, DEVICE_SELF)
 {
 }
 
@@ -80,7 +80,7 @@ atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig
 //  bits.
 //-------------------------------------------------
 
-WRITE8_MEMBER(atari_rle_objects_device::control_write)
+void atari_rle_objects_device::control_write(u8 data)
 {
 //logerror("atarirle_control_w(%d)\n", bits);
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER(atari_rle_objects_device::control_write)
 //  bits.
 //-------------------------------------------------
 
-WRITE8_MEMBER(atari_rle_objects_device::command_write)
+void atari_rle_objects_device::command_write(u8 data)
 {
 	m_command = data;
 }
@@ -217,7 +217,7 @@ void atari_rle_objects_device::device_start()
 	memset(m_checksums, 0, sizeof(m_checksums));
 	for (int sumchunk = 0; sumchunk < m_rombase.bytes() / 0x20000; sumchunk++)
 	{
-		const uint16_t *csbase = &m_rombase[0x10000 * sumchunk];
+		const u16 *csbase = &m_rombase[0x10000 * sumchunk];
 		int cursum = 0;
 		for (int word = 0; word < 0x10000; word++)
 			cursum += *csbase++;
@@ -352,19 +352,19 @@ void atari_rle_objects_device::prescan_rle(int which)
 	object_info &info = m_info[which];
 
 	// look up the offset
-	uint16_t *base = (uint16_t *)&m_rombase[which * 4];
-	const uint16_t *end = &m_rombase[0] + m_rombase.length();
-	info.xoffs = (int16_t)base[0];
-	info.yoffs = (int16_t)base[1];
+	u16 *base = (u16 *)&m_rombase[which * 4];
+	const u16 *end = &m_rombase[0] + m_rombase.length();
+	info.xoffs = (s16)base[0];
+	info.yoffs = (s16)base[1];
 
 	// determine the depth and table
 	int flags = base[2];
 	info.bpp = m_rle_bpp[(flags >> 8) & 7];
-	const uint16_t *table = info.table = m_rle_table[(flags >> 8) & 7];
+	const u16 *table = info.table = m_rle_table[(flags >> 8) & 7];
 
 	// determine the starting offset
 	int offset = ((base[2] & 0xff) << 16) | base[3];
-	info.data = base = (uint16_t *)&m_rombase[offset];
+	info.data = base = (u16 *)&m_rombase[offset];
 
 	// make sure it's valid
 	if (offset < which * 4 || offset >= m_rombase.length())
@@ -492,9 +492,9 @@ if (count++ == atarirle_hilite_index)
 	hilite = current->entry;
 
 				if (x & ((m_xposmask.mask() + 1) >> 1))
-					x = (int16_t)(x | ~m_xposmask.mask());
+					x = (s16)(x | ~m_xposmask.mask());
 				if (y & ((m_yposmask.mask() + 1) >> 1))
-					y = (int16_t)(y | ~m_yposmask.mask());
+					y = (s16)(y | ~m_yposmask.mask());
 				x += m_cliprect.left();
 
 				// merge priority and color
@@ -542,7 +542,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 	y -= scaled_yoffs;
 
 	// draw it with appropriate flipping
-	uint32_t palettebase = m_palettebase + color;
+	u32 palettebase = m_palettebase + color;
 	if (!hflip)
 		draw_rle_zoom(bitmap, clip, info, palettebase, x, y, xscale << 4, yscale << 4);
 	else
@@ -556,7 +556,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 //  a 16-bit bitmap.
 //-------------------------------------------------
 
-void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectangle &clip, const object_info &info, uint32_t palette, int sx, int sy, int scalex, int scaley)
+void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectangle &clip, const object_info &info, u32 palette, int sx, int sy, int scalex, int scaley)
 {
 	// determine scaled size; make sure we didn't end up with 0
 	int scaled_width = (scalex * info.width + 0x7fff) >> 16;
@@ -601,12 +601,12 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 		return;
 
 	// loop top to bottom
-	const uint16_t *row_start = info.data;
-	const uint16_t *table = info.table;
+	const u16 *row_start = info.data;
+	const u16 *table = info.table;
 	int current_row = 0;
 	for (int y = sy; y <= ey; y++, sourcey += dy)
 	{
-		uint16_t *dest = &bitmap.pix16(y, sx);
+		u16 *dest = &bitmap.pix16(y, sx);
 		int  sourcex = dx / 2, rle_end = 0;
 
 		// loop until we hit the row we're on
@@ -614,7 +614,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 			row_start += 1 + *row_start;
 
 		// grab our starting parameters from this row
-		const uint16_t *base = row_start;
+		const u16 *base = row_start;
 		int entry_count = *base++;
 
 		// non-clipped case
@@ -665,7 +665,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 		// clipped case
 		else
 		{
-			const uint16_t *end = &bitmap.pix16(y, ex);
+			const u16 *end = &bitmap.pix16(y, ex);
 			int to_be_skipped = pixels_to_skip;
 
 			// decode the pixels
@@ -735,7 +735,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 //  flip.
 //-------------------------------------------------
 
-void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const rectangle &clip, const object_info &info, uint32_t palette, int sx, int sy, int scalex, int scaley)
+void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const rectangle &clip, const object_info &info, u32 palette, int sx, int sy, int scalex, int scaley)
 {
 	// determine scaled size; make sure we didn't end up with 0
 	int scaled_width = (scalex * info.width + 0x7fff) >> 16;
@@ -780,12 +780,12 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 		return;
 
 	// loop top to bottom
-	const uint16_t *row_start = info.data;
-	const uint16_t *table = info.table;
+	const u16 *row_start = info.data;
+	const u16 *table = info.table;
 	int current_row = 0;
 	for (int y = sy; y <= ey; y++, sourcey += dy)
 	{
-		uint16_t *dest = &bitmap.pix16(y, ex);
+		u16 *dest = &bitmap.pix16(y, ex);
 		int sourcex = dx / 2, rle_end = 0;
 
 		// loop until we hit the row we're on
@@ -793,7 +793,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 			row_start += 1 + *row_start;
 
 		// grab our starting parameters from this row
-		const uint16_t *base = row_start;
+		const u16 *base = row_start;
 		int entry_count = *base++;
 
 		// non-clipped case
@@ -844,7 +844,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 		// clipped case
 		else
 		{
-			const uint16_t *start = &bitmap.pix16(y, sx);
+			const u16 *start = &bitmap.pix16(y, sx);
 			int to_be_skipped = pixels_to_skip;
 
 			// decode the pixels
@@ -928,9 +928,9 @@ void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
 		int y = m_yposmask.extract(m_ram, hilite);
 
 		if (x & ((m_xposmask.mask() + 1) >> 1))
-			x = int16_t(x | ~m_xposmask.mask());
+			x = s16(x | ~m_xposmask.mask());
 		if (y & ((m_yposmask.mask() + 1) >> 1))
-			y = int16_t(y | ~m_yposmask.mask());
+			y = s16(y | ~m_yposmask.mask());
 		x += m_cliprect.left();
 
 		// merge priority and color
@@ -1027,7 +1027,7 @@ atari_rle_objects_device::sprite_parameter::sprite_parameter()
 //  set: Sets the mask via an input 4-word mask.
 //-------------------------------------------------
 
-bool atari_rle_objects_device::sprite_parameter::set(const uint16_t input[8])
+bool atari_rle_objects_device::sprite_parameter::set(const u16 input[8])
 {
 	// determine the word and make sure it's only 1
 	m_word = 0xffff;
@@ -1049,7 +1049,7 @@ bool atari_rle_objects_device::sprite_parameter::set(const uint16_t input[8])
 
 	// determine the shift and final mask
 	m_shift = 0;
-	uint16_t temp = input[m_word];
+	u16 temp = input[m_word];
 	while (!(temp & 1))
 	{
 		m_shift++;

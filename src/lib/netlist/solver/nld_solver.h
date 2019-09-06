@@ -60,7 +60,6 @@ namespace devices
 		, m_use_gabs(*this, "USE_GABS", true)
 		, m_use_linear_prediction(*this, "USE_LINEAR_PREDICTION", false) // // savings are eaten up by effort
 
-		, m_log_stats(*this, "LOG_STATS", true)   // log statistics on shutdown
 		, m_params()
 		{
 			// internal staff
@@ -99,8 +98,6 @@ namespace devices
 
 		param_logic_t m_use_gabs;
 		param_logic_t m_use_linear_prediction;
-
-		param_logic_t  m_log_stats;
 
 		std::vector<pool_owned_ptr<matrix_solver_t>> m_mat_solvers;
 		std::vector<matrix_solver_t *> m_mat_solvers_all;

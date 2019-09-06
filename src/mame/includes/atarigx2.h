@@ -15,6 +15,7 @@
 #include "machine/atarigen.h"
 #include "machine/atarixga.h"
 #include "video/atarirle.h"
+#include "tilemap.h"
 
 
 class atarigx2_state : public atarigen_state

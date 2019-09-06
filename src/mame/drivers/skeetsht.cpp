@@ -53,7 +53,6 @@ private:
 	DECLARE_WRITE16_MEMBER(ramdac_w);
 	DECLARE_WRITE8_MEMBER(tms_w);
 	DECLARE_READ8_MEMBER(tms_r);
-	DECLARE_READ8_MEMBER(hc11_porta_r);
 	DECLARE_WRITE8_MEMBER(hc11_porta_w);
 	DECLARE_WRITE8_MEMBER(ay8910_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
@@ -63,7 +62,6 @@ private:
 	required_device<mc68hc11_cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
 	required_device<tms34010_device> m_tms;
-	void hc11_io_map(address_map &map);
 	void hc11_pgm_map(address_map &map);
 	void tms_program_map(address_map &map);
 };
@@ -162,11 +160,6 @@ READ8_MEMBER(skeetsht_state::tms_r)
  *
  *************************************/
 
-READ8_MEMBER(skeetsht_state::hc11_porta_r)
-{
-	return m_porta_latch;
-}
-
 WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 {
 	if (!(data & 0x8) && (m_porta_latch & 8))
@@ -196,11 +189,6 @@ void skeetsht_state::hc11_pgm_map(address_map &map)
 	map(0x1800, 0x1800).w(FUNC(skeetsht_state::ay8910_w));
 	map(0x2800, 0x2807).rw(FUNC(skeetsht_state::tms_r), FUNC(skeetsht_state::tms_w));
 	map(0xb600, 0xbdff).ram(); //internal EEPROM
-}
-
-void skeetsht_state::hc11_io_map(address_map &map)
-{
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(FUNC(skeetsht_state::hc11_porta_r), FUNC(skeetsht_state::hc11_porta_w));
 }
 
 
@@ -237,10 +225,9 @@ INPUT_PORTS_END
 
 void skeetsht_state::skeetsht(machine_config &config)
 {
-	MC68HC11(config, m_68hc11, 4000000); // ?
+	MC68HC11A1(config, m_68hc11, 4000000); // ?
 	m_68hc11->set_addrmap(AS_PROGRAM, &skeetsht_state::hc11_pgm_map);
-	m_68hc11->set_addrmap(AS_IO, &skeetsht_state::hc11_io_map);
-	m_68hc11->set_config(0, 0x100, 0x01);  // And 512 bytes EEPROM? (68HC11A1)
+	m_68hc11->out_pa_callback().set(FUNC(skeetsht_state::hc11_porta_w));
 
 	TMS34010(config, m_tms, 48000000);
 	m_tms->set_addrmap(AS_PROGRAM, &skeetsht_state::tms_program_map);

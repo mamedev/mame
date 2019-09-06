@@ -194,6 +194,7 @@ void v25_common_device::device_reset()
 	m_ParityVal = 1;
 	m_pending_irq = 0;
 	m_unmasked_irq = INT_IRQ | NMI_IRQ;
+	m_macro_service = 0;
 	m_bankswitch_irq = 0;
 	m_priority_inttu = 7;
 	m_priority_intd = 7;
@@ -205,9 +206,7 @@ void v25_common_device::device_reset()
 	m_irq_state = 0;
 	m_poll_state = 1;
 	m_mode_state = m_MF = (m_v25v35_decryptiontable) ? 0 : 1;
-	m_intp_state[0] = 0;
-	m_intp_state[1] = 0;
-	m_intp_state[2] = 0;
+	m_intm = 0;
 	m_halted = 0;
 
 	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
@@ -295,24 +294,12 @@ void v25_common_device::nec_trap()
 	nec_interrupt(NEC_TRAP_VECTOR, BRK);
 }
 
-#define INTERRUPT(source, vector, priority) \
-	if(pending & (source)) {                \
-		m_IRQS = vector;               \
-		m_ISPR |= (1 << (priority));   \
-		m_pending_irq &= ~(source);    \
-		if(m_bankswitch_irq & (source))    \
-			nec_bankswitch(priority);    \
-		else                                    \
-			nec_interrupt(vector, source);   \
-		break;  /* break out of loop */ \
-	}
-
-/* interrupt sources subject to priority control */
-#define SOURCES (INTTU0 | INTTU1 | INTTU2 | INTD0 | INTD1 | INTP0 | INTP1 | INTP2 \
-				| INTSER0 | INTSR0 | INTST0 | INTSER1 | INTSR1 | INTST1 | INTTB)
-
 void v25_common_device::external_int()
 {
+	// interrupt sources subject to priority control
+	constexpr uint32_t SOURCES = INTTU0 | INTTU1 | INTTU2 | INTD0 | INTD1 | INTP0 | INTP1 | INTP2
+				| INTSER0 | INTSR0 | INTST0 | INTSER1 | INTSR1 | INTST1 | INTTB;
+
 	int pending = m_pending_irq & m_unmasked_irq;
 
 	if (pending & NMI_IRQ)
@@ -322,46 +309,149 @@ void v25_common_device::external_int()
 	}
 	else if (pending & SOURCES)
 	{
-		for(int i = 0; i < 8; i++)
+		int i = -1;
+		uint32_t source = 0;
+		uint8_t vector = 0;
+		uint8_t ms = 0;
+		while (++i < 8)
 		{
 			if (m_ISPR & (1 << i)) break;
 
 			if (m_priority_inttu == i)
 			{
-				INTERRUPT(INTTU0, NEC_INTTU0_VECTOR, i)
-				INTERRUPT(INTTU1, NEC_INTTU1_VECTOR, i)
-				INTERRUPT(INTTU2, NEC_INTTU2_VECTOR, i)
+				if (pending & INTTU0)
+				{
+					source = INTTU0;
+					vector = NEC_INTTU0_VECTOR;
+					ms = m_tmms[0];
+					break;
+				}
+				if (pending & INTTU1)
+				{
+					source = INTTU1;
+					vector = NEC_INTTU1_VECTOR;
+					ms = m_tmms[1];
+					break;
+				}
+				if (pending & INTTU2)
+				{
+					source = INTTU2;
+					vector = NEC_INTTU2_VECTOR;
+					ms = m_tmms[2];
+					break;
+				}
 			}
 
 			if (m_priority_intd == i)
 			{
-				INTERRUPT(INTD0, NEC_INTD0_VECTOR, i)
-				INTERRUPT(INTD1, NEC_INTD1_VECTOR, i)
+				if (pending & INTD0)
+				{
+					source = INTD0;
+					vector = NEC_INTD0_VECTOR;
+					break;
+				}
+				if (pending & INTD1)
+				{
+					source = INTD1;
+					vector = NEC_INTD1_VECTOR;
+					break;
+				}
 			}
 
 			if (m_priority_intp == i)
 			{
-				INTERRUPT(INTP0, NEC_INTP0_VECTOR, i)
-				INTERRUPT(INTP1, NEC_INTP1_VECTOR, i)
-				INTERRUPT(INTP2, NEC_INTP2_VECTOR, i)
+				if (pending & INTP0)
+				{
+					source = INTP0;
+					vector = NEC_INTP0_VECTOR;
+					break;
+				}
+				if (pending & INTP1)
+				{
+					source = INTP1;
+					vector = NEC_INTP1_VECTOR;
+					break;
+				}
+				if (pending & INTP2)
+				{
+					source = INTP2;
+					vector = NEC_INTP2_VECTOR;
+					break;
+				}
 			}
 
 			if (m_priority_ints0 == i)
 			{
-				INTERRUPT(INTSER0, NEC_INTSER0_VECTOR, i)
-				INTERRUPT(INTSR0, NEC_INTSR0_VECTOR, i)
-				INTERRUPT(INTST0, NEC_INTST0_VECTOR, i)
+				if (pending & INTSER0)
+				{
+					source = INTSER0;
+					vector = NEC_INTSER0_VECTOR;
+					break;
+				}
+				if (pending & INTSR0)
+				{
+					source = INTSR0;
+					vector = NEC_INTSR0_VECTOR;
+					ms = m_srms[0];
+					break;
+				}
+				if (pending & INTST0)
+				{
+					source = INTST0;
+					vector = NEC_INTST0_VECTOR;
+					ms = m_stms[0];
+					break;
+				}
 			}
 
 			if (m_priority_ints1 == i)
 			{
-				INTERRUPT(INTSER1, NEC_INTSER1_VECTOR, i)
-				INTERRUPT(INTSR1, NEC_INTSR1_VECTOR, i)
-				INTERRUPT(INTST1, NEC_INTST1_VECTOR, i)
+				if (pending & INTSER1)
+				{
+					source = INTSER1;
+					vector = NEC_INTSER1_VECTOR;
+					break;
+				}
+				if (pending & INTSR1)
+				{
+					source = INTSR1;
+					vector = NEC_INTSR1_VECTOR;
+					ms = m_srms[1];
+					break;
+				}
+				if (pending & INTST1)
+				{
+					source = INTST1;
+					vector = NEC_INTST1_VECTOR;
+					ms = m_stms[1];
+					break;
+				}
 			}
 
-			if (i == 7)
-				INTERRUPT(INTTB, NEC_INTTB_VECTOR, 7)
+			if (i == 7 && (pending & INTTB))
+			{
+				source = INTTB;
+				vector = NEC_INTTB_VECTOR;
+				break;
+			}
+		}
+
+		if (source != 0)
+		{
+			m_pending_irq &= ~source;
+			if (m_macro_service & source)
+			{
+				logerror("Unhandled macro service %02x\n", ms);
+			}
+			else
+			{
+				m_IRQS = vector;
+				m_ISPR |= (1 << i);
+				if (m_bankswitch_irq & source)
+					nec_bankswitch(i);
+				else
+					nec_interrupt(vector, source);
+			}
 		}
 	}
 	else if (pending & INT_IRQ)
@@ -464,6 +554,12 @@ void v25_common_device::device_start()
 	for (i = 0; i < 4; i++)
 		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v25_common_device::v25_timer_callback),this));
 
+	std::fill_n(&m_intp_state[0], 3, 0);
+	std::fill_n(&m_ems[0], 3, 0);
+	std::fill_n(&m_srms[0], 2, 0);
+	std::fill_n(&m_stms[0], 2, 0);
+	std::fill_n(&m_tmms[0], 3, 0);
+
 	save_item(NAME(m_intp_state));
 
 	save_item(NAME(m_ip));
@@ -484,12 +580,17 @@ void v25_common_device::device_start()
 	save_item(NAME(m_ParityVal));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_unmasked_irq));
+	save_item(NAME(m_macro_service));
 	save_item(NAME(m_bankswitch_irq));
 	save_item(NAME(m_priority_inttu));
 	save_item(NAME(m_priority_intd));
 	save_item(NAME(m_priority_intp));
 	save_item(NAME(m_priority_ints0));
 	save_item(NAME(m_priority_ints1));
+	save_item(NAME(m_ems));
+	save_item(NAME(m_srms));
+	save_item(NAME(m_stms));
+	save_item(NAME(m_tmms));
 	save_item(NAME(m_IRQS));
 	save_item(NAME(m_ISPR));
 	save_item(NAME(m_nmi_state));
@@ -497,6 +598,7 @@ void v25_common_device::device_start()
 	save_item(NAME(m_poll_state));
 	save_item(NAME(m_mode_state));
 	save_item(NAME(m_no_interrupt));
+	save_item(NAME(m_intm));
 	save_item(NAME(m_halted));
 	save_item(NAME(m_TM0));
 	save_item(NAME(m_MD0));

@@ -305,7 +305,7 @@ void debug_view_memory::view_update()
 
 				if (m_data_format <= 8) {
 					u64 chunkdata;
-					bool ismapped = read(m_bytes_per_chunk, address + chunknum * m_steps_per_chunk, chunkdata);
+					bool ismapped = read_chunk(address, chunknum, chunkdata);
 					dest = destrow + m_section[1].m_pos + 1 + chunkindex * spacing;
 					for (int ch = 0; ch < posdata.m_spacing; ch++, dest++)
 						if (dest >= destmin && dest < destmax)
@@ -830,6 +830,31 @@ bool debug_view_memory::read(u8 size, offs_t offs, floatx80 &data)
 	}
 
 	return mappedhi && mappedlo;
+}
+
+
+//-------------------------------------------------
+//  read_chunk - memory view data reader helper
+//-------------------------------------------------
+
+bool debug_view_memory::read_chunk(offs_t address, int chunknum, u64 &chunkdata)
+{
+	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
+	if (source.m_space) {
+		address += source.m_space->byte_to_address(chunknum * m_bytes_per_chunk);
+		if (!source.m_space->byte_to_address(m_bytes_per_chunk)) {
+			// if chunks are too small to be addressable, read a minimal chunk and split it up
+			u8 minbytes = 1 << -source.m_space->addr_shift();
+			bool ismapped = read(minbytes, address, chunkdata);
+			u8 suboffset = (chunknum * m_bytes_per_chunk) & (minbytes - 1);
+			chunkdata >>= 8 * (source.m_space->endianness() == ENDIANNESS_LITTLE ? suboffset : minbytes - m_bytes_per_chunk - suboffset);
+			chunkdata &= ~u64(0) >> (64 - 8 * m_bytes_per_chunk);
+			return ismapped;
+		}
+	}
+	else
+		address += chunknum * m_bytes_per_chunk;
+	return read(m_bytes_per_chunk, address, chunkdata);
 }
 
 

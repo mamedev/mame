@@ -11,14 +11,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 0"/>
 			<dataarea name="flop" size="81920">
-				<rom name="cpmdisk_myab37_side0.img" size="81920" crc="7065fa91" sha1="f0ca7c2785bd92ed7ede46aaba8b8e2a2d826e47" offset="0" />
+				<rom name="cpmdisk_myab37_side0.img" size="81920" crc="7065fa91" sha1="f0ca7c2785bd92ed7ede46aaba8b8e2a2d826e47"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="81920">
-				<rom name="cpmdisk_myab37_side1.img" size="81920" crc="062e88c7" sha1="2d3baa1f225129474839972b9735444120965e08" offset="0" />
+				<rom name="cpmdisk_myab37_side1.img" size="81920" crc="062e88c7" sha1="2d3baa1f225129474839972b9735444120965e08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="82895">
-				<rom name="demo.td0" size="82895" crc="f581ce62" sha1="2e79e7371d767cb689d1e490f8e1c869dc390a03" offset="0" />
+				<rom name="demo.td0" size="82895" crc="f581ce62" sha1="2e79e7371d767cb689d1e490f8e1c869dc390a03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="47013">
-				<rom name="system10.td0" size="47013" crc="be80a5ca" sha1="64bea62668e9b2604732810c0704f52f6c8c3f99" offset="0" />
+				<rom name="system10.td0" size="47013" crc="be80a5ca" sha1="64bea62668e9b2604732810c0704f52f6c8c3f99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="10734">
-				<rom name="fd2_dgen.imd" size="10734" crc="4c6ba75f" sha1="bb009d560089bdc0db2ab86634b4226956a96ac2" offset="0" />
+				<rom name="fd2_dgen.imd" size="10734" crc="4c6ba75f" sha1="bb009d560089bdc0db2ab86634b4226956a96ac2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="79143">
-				<rom name="fd2_bifak.imd" size="79143" crc="a741ad5d" sha1="a0cb8cc31a30fcbea258dd5249845819930e60c2" offset="0" />
+				<rom name="fd2_bifak.imd" size="79143" crc="a741ad5d" sha1="a0cb8cc31a30fcbea258dd5249845819930e60c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -80,7 +80,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="genesisproject_abcdemo.dsk" size="163840" crc="29059d3c" sha1="55b38436a2d3cfe1caf8e35e44775402a1511eec" offset="0" />
+				<rom name="genesisproject_abcdemo.dsk" size="163840" crc="29059d3c" sha1="55b38436a2d3cfe1caf8e35e44775402a1511eec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -94,7 +94,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="hiresinv.dsk" size="163840" crc="b811b980" sha1="805b4369085120662769f5a3d11b0e66ffbbfb76" offset="0" />
+				<rom name="hiresinv.dsk" size="163840" crc="b811b980" sha1="805b4369085120662769f5a3d11b0e66ffbbfb76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +107,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="abcstacker.dsk" size="163840" crc="97854140" sha1="7ec7f5b0368608165f0bee5e22bccbef7d3c845d" offset="0" />
+				<rom name="abcstacker.dsk" size="163840" crc="97854140" sha1="7ec7f5b0368608165f0bee5e22bccbef7d3c845d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="abcdatastorm.dsk" size="163840" crc="7aa13813" sha1="b0c13aa5928772485d8edb8d41e8e97b3028ac5d" offset="0" />
+				<rom name="abcdatastorm.dsk" size="163840" crc="7aa13813" sha1="b0c13aa5928772485d8edb8d41e8e97b3028ac5d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -138,7 +138,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="abcbook.dsk" size="163840" crc="ff881fbf" sha1="3a91c40464614f19c208101f90877ec3ec7dec89" offset="0" />
+				<rom name="abcbook.dsk" size="163840" crc="ff881fbf" sha1="3a91c40464614f19c208101f90877ec3ec7dec89"/>
 			</dataarea>
 		</part>
 	</software>

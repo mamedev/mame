@@ -33620,6 +33620,41 @@
 		</part>
 	</software>
 
+	<software name="simcity">
+		<description>SimCity (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="exrom" />
+			<feature name="pcb" value="NES-ETEPROM" />
+			<feature name="pcb_model" value="NES-ETEPROM-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 MMC5" />
+			<feature name="u4" value="U4 W-RAM-0" />
+			<feature name="u5" value="U5 W-RAM-1" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="battery" value="+Batt CR2032" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="simcity prg.u1" size="131072" crc="ad8bfb35" sha1="88fef47ebeec6bad9b7aef07b40f4ecf00846ca0" offset="0"/>
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="simcity chr.u2" size="131072" crc="3fbc73b9" sha1="5697a2040fa80f9eb8052aabe507bd8451eefcc3" offset="0"/>
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
+			<dataarea name="mapper_ram" size="1024">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bartvssmua" cloneof="bartvssm">
 		<description>The Simpsons - Bart vs. The Space Mutants (USA)</description>
 		<year>1991</year>

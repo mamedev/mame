@@ -242,12 +242,7 @@ void vme_fcscsi1_card_device::update_irq_to_maincpu() {
 void vme_fcscsi1_card_device::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff4, 0xfffff5).lr16("dmac irq", [this]() -> u16 {
-									 dmac_irq_state = 0;
-									 u16 vector = B41 ? dmac_irq_vector : 0x18+2;
-									 update_irq_to_maincpu();
-									 return vector;
-								 });
+	map(0xfffff5, 0xfffff5).r(FUNC(vme_fcscsi1_card_device::dma_iack));
 }
 
 FLOPPY_FORMATS_MEMBER( vme_fcscsi1_card_device::floppy_formats )
@@ -301,8 +296,7 @@ void vme_fcscsi1_card_device::device_add_mconfig(machine_config &config)
 	HD63450(config, m_dmac, CPU_CRYSTAL / 2, "maincpu");   // MC68450 compatible
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
-	m_dmac->dma_end().set(FUNC(vme_fcscsi1_card_device::dma_end));
-	m_dmac->dma_error().set(FUNC(vme_fcscsi1_card_device::dma_error));
+	m_dmac->irq_callback().set(FUNC(vme_fcscsi1_card_device::dma_irq));
 	//m_dmac->dma_read<0>().set(FUNC(vme_fcscsi1_card_device::scsi_read_byte));  // ch 0 = SCSI
 	//m_dmac->dma_write<0>().set(FUNC(vme_fcscsi1_card_device::scsi_write_byte));
 	m_dmac->dma_read<1>().set(FUNC(vme_fcscsi1_card_device::fdc_read_byte));  // ch 1 = fdc
@@ -420,12 +414,12 @@ WRITE8_MEMBER (vme_fcscsi1_card_device::led_w){
 	return;
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::dma_end)
+WRITE_LINE_MEMBER(vme_fcscsi1_card_device::dma_irq)
 {
-	if (data != 0)
+	if(state != CLEAR_LINE)
 	{
+		logerror("DMAC IRQ, vector = %x\n", m_dmac->iack());
 		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
 	}
 	else
 	{
@@ -435,25 +429,17 @@ WRITE8_MEMBER(vme_fcscsi1_card_device::dma_end)
 	update_irq_to_maincpu();
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::dma_error)
+uint8_t vme_fcscsi1_card_device::dma_iack()
 {
-	if(data != 0)
-	{
-		logerror("DMAC error, vector = %x\n", m_dmac->get_error_vector(offset));
-		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
-	}
+	if (B41)
+		return m_dmac->iack();
 	else
-	{
-		dmac_irq_state = 0;
-	}
-
-	update_irq_to_maincpu();
+		return m68000_base_device::autovector(2);
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_irq)
+WRITE_LINE_MEMBER(vme_fcscsi1_card_device::fdc_irq)
 {
-	if (data != 0)
+	if (state != 0)
 	{
 		fdc_irq_state = 1;
 	}

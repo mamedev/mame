@@ -580,6 +580,7 @@ void mc1000_state::mc1000(machine_config &config)
 	/* devices */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mc1000_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mc1000_cass");

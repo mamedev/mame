@@ -18,7 +18,6 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 class b2m_state : public driver_device

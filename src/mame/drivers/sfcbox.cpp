@@ -95,7 +95,7 @@ Static RAM: 256 Kibit
 
 PSS-62  - SUPER FAMICOM BOX Commercial Optional Cart
 GameData ROM: GROM2-1, 256Kibit
-Lower ROM: New Super 3D Golf Simulation - Waialae No Kiseki (Waialae Golf) (T&E SOFT), SHVC-GC-0, 4Mibit
+Lower ROM: New Super 3D Golf Simulation - Waialae no Kiseki (Waialae Golf) (T&E SOFT), SHVC-GC-0, 4Mibit
 Lower ROM: Super Mahjong 2 (I'MAX), SHVC-2A-1, 8Mibit
 
 PSS-63  - SUPER FAMICOM BOX Commercial Optional Cart
@@ -178,12 +178,12 @@ void sfcbox_state::snes_map(address_map &map)
 
 READ8_MEMBER(sfcbox_state::spc_ram_100_r)
 {
-	return m_spc700->spc_ram_r(space, offset + 0x100);
+	return m_spc700->spc_ram_r(offset + 0x100);
 }
 
 WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
 {
-	m_spc700->spc_ram_w(space, offset + 0x100, data);
+	m_spc700->spc_ram_w(offset + 0x100, data);
 }
 
 void sfcbox_state::spc_mem(address_map &map)
@@ -479,7 +479,7 @@ void sfcbox_state::sfcbox(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SNES_SOUND(config, m_spc700);
+	SNES_SOUND(config, m_spc700, XTAL(24'576'000) / 12);
 	m_spc700->add_route(0, "lspeaker", 1.00);
 	m_spc700->add_route(1, "rspeaker", 1.00);
 
@@ -589,6 +589,6 @@ ROM_END
 
 GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
 GAME( 1994, pss61,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae no Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
 GAME( 1994, pss63,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / BPS",         "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
 GAME( 199?, pss64,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )

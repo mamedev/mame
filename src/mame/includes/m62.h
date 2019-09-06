@@ -7,6 +7,7 @@
 
 #include "audio/irem.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class m62_state : public driver_device
 {

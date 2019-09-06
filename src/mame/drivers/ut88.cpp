@@ -215,8 +215,6 @@ void ut88_state::ut88(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
-
 	/* Devices */
 	I8255A(config, m_ppi);
 	m_ppi->out_pa_callback().set(FUNC(ut88_state::ut88_8255_porta_w));
@@ -226,6 +224,7 @@ void ut88_state::ut88(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rku_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("ut88_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("ut88");
@@ -245,11 +244,11 @@ void ut88_state::ut88mini(machine_config &config)
 
 	/* Cassette */
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rku_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("ut88_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("ut88");

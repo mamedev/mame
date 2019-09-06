@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/taito_b.h"
 
-WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
+WRITE16_MEMBER(hitice_state::pixelram_w)
 {
 	int sy = offset >> 9;
 	int sx = offset & 0x1ff;
@@ -18,18 +18,18 @@ WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
 	}
 }
 
-WRITE16_MEMBER(taitob_state::hitice_pixel_scroll_w)
+WRITE16_MEMBER(hitice_state::pixel_scroll_w)
 {
 	COMBINE_DATA(&m_pixel_scroll[offset]);
 }
 
-void taitob_state::hitice_clear_pixel_bitmap(  )
+void hitice_state::clear_pixel_bitmap()
 {
 	int i;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	for (i = 0; i < 0x40000; i++)
-		hitice_pixelram_w(space, i, 0, 0xffff);
+		pixelram_w(space, i, 0, 0xffff);
 }
 
 WRITE16_MEMBER(taitob_c_state::realpunc_video_ctrl_w)
@@ -37,16 +37,16 @@ WRITE16_MEMBER(taitob_c_state::realpunc_video_ctrl_w)
 	COMBINE_DATA(&m_realpunc_video_ctrl);
 }
 
-VIDEO_START_MEMBER(taitob_state,taitob_core)
+void taitob_state::video_start()
 {
 	m_pixel_bitmap = nullptr;  /* only hitice needs this */
 
 	save_item(NAME(m_pixel_scroll));
 }
 
-VIDEO_START_MEMBER(taitob_state,hitice)
+void hitice_state::video_start()
 {
-	VIDEO_START_CALL_MEMBER(taitob_core);
+	taitob_state::video_start();
 
 	m_b_fg_color_base = 0x80;       /* hitice also uses this for the pixel_bitmap */
 
@@ -55,18 +55,18 @@ VIDEO_START_MEMBER(taitob_state,hitice)
 	save_item(NAME(*m_pixel_bitmap));
 }
 
-VIDEO_RESET_MEMBER(taitob_state,hitice)
+void hitice_state::video_reset()
 {
 	/* kludge: clear the bitmap on startup */
-	hitice_clear_pixel_bitmap();
+	clear_pixel_bitmap();
 }
 
 
-VIDEO_START_MEMBER(taitob_c_state,realpunc)
+void taitob_c_state::video_start()
 {
 	m_realpunc_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
-	VIDEO_START_CALL_MEMBER(taitob_core);
+	taitob_state::video_start();
 }
 
 

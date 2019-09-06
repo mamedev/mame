@@ -11,6 +11,7 @@
 #include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tatsumi_state : public driver_device
 {

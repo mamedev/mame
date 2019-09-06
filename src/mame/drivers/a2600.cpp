@@ -126,7 +126,7 @@ WRITE8_MEMBER(a2600_base_state::switch_A_w)
 //  switch( ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
 //  {
 //  case 0x0a:  /* KidVid voice module */
-//      m_cassette->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
+//      m_cassette->change_state(( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : (CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), CASSETTE_MOTOR_DISABLED );
 //      break;
 //  }
 }
@@ -521,7 +521,6 @@ void a2600_state::a2600(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31);
 	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
-	m_screen->set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -568,7 +567,6 @@ void a2600_state::a2600p(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31);
 	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
-	m_screen->set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

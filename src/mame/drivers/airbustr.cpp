@@ -578,7 +578,6 @@ void airbustr_state::airbustr(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(12'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &airbustr_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &airbustr_state::sound_io_map);
-	m_audiocpu->set_vblank_int("screen", FUNC(airbustr_state::irq0_line_hold));       // nmi are caused by sub cpu writing a sound command
 
 	config.m_minimum_quantum = attotime::from_hz(6000);  // Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
@@ -613,6 +612,7 @@ void airbustr_state::airbustr(machine_config &config)
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4));   /* verified on pcb */
 	ymsnd.port_a_read_callback().set_ioport("DSW1");       // DSW-1 connected to port A
 	ymsnd.port_b_read_callback().set_ioport("DSW2");       // DSW-2 connected to port B
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 0.25);
 	ymsnd.add_route(2, "mono", 0.25);

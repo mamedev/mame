@@ -7,6 +7,7 @@
 
 #include "nld_82S123.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -19,6 +20,7 @@ namespace netlist
 		, m_CEQ(*this, "CEQ")
 		, m_O(*this, {{"O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8"}})
 		, m_ROM(*this, "ROM")
+		, m_power_pins(*this)
 		{
 		}
 
@@ -30,6 +32,7 @@ namespace netlist
 		object_array_t<logic_output_t, 8> m_O;
 
 		param_rom_t<uint8_t, 5, 8> m_ROM; // 256 bits, 32x8
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(82S123_dip, 82S123)
@@ -43,15 +46,16 @@ namespace netlist
 			register_subalias("5",     m_O[4]);
 			register_subalias("6",     m_O[5]);
 			register_subalias("7",     m_O[6]);
-			register_subalias("8",     m_O[7]);
+			register_subalias("8",     "GND");
 
-			register_subalias("15",    m_CEQ);
-
+			register_subalias("9",     m_O[7]);
 			register_subalias("10",    m_A[0]);
 			register_subalias("11",    m_A[1]);
 			register_subalias("12",    m_A[2]);
 			register_subalias("13",    m_A[3]);
 			register_subalias("14",    m_A[4]);
+			register_subalias("15",    m_CEQ);
+			register_subalias("16",    "VCC");
 		}
 	};
 
@@ -77,7 +81,7 @@ namespace netlist
 			m_O[i].push((o >> i) & 1, delay);
 	}
 
-	NETLIB_DEVICE_IMPL(82S123,     "PROM_82S123",     "+CEQ,+A0,+A1,+A2,+A3,+A4")
+	NETLIB_DEVICE_IMPL(82S123,     "PROM_82S123",     "+CEQ,+A0,+A1,+A2,+A3,+A4,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(82S123_dip, "PROM_82S123_DIP", "")
 
 	} //namespace devices

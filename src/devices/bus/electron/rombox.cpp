@@ -55,21 +55,21 @@ void electron_rombox_device::device_add_mconfig(machine_config &config)
 {
 	/* rom sockets */
 	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[0]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom1_load, this));
+	m_rom[0]->set_device_load(FUNC(electron_rombox_device::rom1_load), this);
 	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[1]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom2_load, this));
+	m_rom[1]->set_device_load(FUNC(electron_rombox_device::rom2_load), this);
 	GENERIC_SOCKET(config, m_rom[2], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[2]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom3_load, this));
+	m_rom[2]->set_device_load(FUNC(electron_rombox_device::rom3_load), this);
 	GENERIC_SOCKET(config, m_rom[3], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[3]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom4_load, this));
+	m_rom[3]->set_device_load(FUNC(electron_rombox_device::rom4_load), this);
 	GENERIC_SOCKET(config, m_rom[4], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[4]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom5_load, this));
+	m_rom[4]->set_device_load(FUNC(electron_rombox_device::rom5_load), this);
 	GENERIC_SOCKET(config, m_rom[5], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[5]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom6_load, this));
+	m_rom[5]->set_device_load(FUNC(electron_rombox_device::rom6_load), this);
 	GENERIC_SOCKET(config, m_rom[6], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[6]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom7_load, this));
+	m_rom[6]->set_device_load(FUNC(electron_rombox_device::rom7_load), this);
 	GENERIC_SOCKET(config, m_rom[7], generic_plain_slot, "electron_rom", "bin,rom");
-	m_rom[7]->set_device_load(device_image_load_delegate(&electron_rombox_device::device_image_load_rom8_load, this));
+	m_rom[7]->set_device_load(FUNC(electron_rombox_device::rom8_load), this);
 
 	/* pass-through */
 	ELECTRON_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), electron_expansion_devices, nullptr);

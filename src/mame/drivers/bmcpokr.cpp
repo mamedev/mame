@@ -26,6 +26,7 @@ Other:  BMC B816140 (CPLD)
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class bmcpokr_state : public driver_device
 {

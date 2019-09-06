@@ -21,25 +21,24 @@
  */
 
 static NETLIST_START(MC14584B_DIP)
-	MC14584B_GATE(s1)
-	MC14584B_GATE(s2)
-	MC14584B_GATE(s3)
-	MC14584B_GATE(s4)
-	MC14584B_GATE(s5)
-	MC14584B_GATE(s6)
+	MC14584B_GATE(A)
+	MC14584B_GATE(B)
+	MC14584B_GATE(C)
+	MC14584B_GATE(D)
+	MC14584B_GATE(E)
+	MC14584B_GATE(F)
 
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
-
-	DIPPINS(   /*       +--------------+      */
-		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
-		s1.Q,  /*    Y1 |2           13| A6   */ s6.A,
-		s2.A,  /*    A2 |3           12| Y6   */ s6.Q,
-		s2.Q,  /*    Y2 |4  MC14584B 11| A5   */ s5.A,
-		s3.A,  /*    A3 |5           10| Y5   */ s5.Q,
-		s3.Q,  /*    Y3 |6            9| A4   */ s4.A,
-		GND.I, /*   GND |7            8| Y4   */ s4.Q
-				/*       +--------------+      */
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
+	DIPPINS(  /*       +--------------+      */
+		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
+		A.Q,  /*    Y1 |2           13| A6   */ F.A,
+		B.A,  /*    A2 |3           12| Y6   */ F.Q,
+		B.Q,  /*    Y2 |4  MC14584B 11| A5   */ E.A,
+		C.A,  /*    A3 |5           10| Y5   */ E.Q,
+		C.Q,  /*    Y3 |6            9| A4   */ D.A,
+		A.GND,/*   GND |7            8| Y4   */ D.Q
+			  /*       +--------------+      */
 	)
 NETLIST_END()
 

@@ -44,7 +44,6 @@ protected:
 	uint16_t m_timer_counter;
 	uint32_t m_tin;
 	uint32_t m_tgate;
-	uint32_t m_tout;
 	emu_timer *m_timer;
 
 	devcb_write_line    m_tout_out_cb;
@@ -52,6 +51,8 @@ protected:
 	devcb_write_line    m_tgate_in_cb;
 	void do_timer_irq();
 	void do_timer_tick();
+	void tout_set();
+	void tout_clear();
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 

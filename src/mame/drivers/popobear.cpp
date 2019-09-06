@@ -85,6 +85,7 @@ Component Side   A   B   Solder Side
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class popobear_state : public driver_device
 {

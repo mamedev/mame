@@ -50,7 +50,7 @@ f3853_device::f3853_device(const machine_config &mconfig, device_type type, cons
 	m_int_vector(0),
 	m_prescaler(31),
 	m_priority_line(false),
-	m_external_interrupt_line(true)
+	m_external_interrupt_line(false)
 { }
 
 f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -210,7 +210,7 @@ TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
 
 WRITE_LINE_MEMBER(f3853_device::ext_int_w)
 {
-	if (m_external_interrupt_line && !state && m_external_int_enable)
+	if (!m_external_interrupt_line && state && m_external_int_enable)
 	{
 		m_request_flipflop = true;
 	}
@@ -386,6 +386,20 @@ WRITE8_MEMBER(f3856_device::write)
 //-------------------------------------------------
 //  f38t56_device-specific handlers
 //-------------------------------------------------
+
+READ8_MEMBER(f38t56_device::read)
+{
+	switch (offset & 3)
+	{
+	// interrupt: sense ext int pin
+	case 2:
+		return (m_external_interrupt_line) ? 0 : 0x80;
+
+	// other: same as 3856
+	default:
+		return f3856_device::read(space, offset);
+	}
+}
 
 WRITE8_MEMBER(f38t56_device::write)
 {

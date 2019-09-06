@@ -2,7 +2,7 @@
 // copyright-holders:Zsolt Vasvari, Curt Coder
 /***************************************************************************
 
-  video.c
+  video/lvcards.cpp
 
   Functions to emulate the video hardware of the machine.
 

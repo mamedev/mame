@@ -912,7 +912,7 @@ void systeme_state::systeme(machine_config &config)
 
 	SEGA315_5124(config, m_vdp2, XTAL(10'738'635));
 	m_vdp2->set_is_pal(false);
-	m_vdp2->irq().set_inputline(m_maincpu, 0);
+	m_vdp2->n_int().set_inputline(m_maincpu, 0);
 	m_vdp2->set_addrmap(0, &systeme_state::vdp2_map);
 	m_vdp2->add_route(ALL_OUTPUTS, "mono", 0.50);
 }

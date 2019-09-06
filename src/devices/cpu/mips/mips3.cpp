@@ -19,7 +19,6 @@
 #define ENABLE_OVERFLOWS            (0)
 #define ENABLE_EE_ELF_LOADER        (0)
 #define ENABLE_EE_DECI2             (0)
-#define DELAY_SLOT_EXCEPTION_HACK   (0)
 
 /***************************************************************************
     HELPER MACROS
@@ -147,8 +146,6 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_delayslot(false)
 	, m_op(0)
 	, m_interrupt_cycles(0)
-	, m_ll_value(0)
-	, m_lld_value(0)
 	, m_badcop_value(0)
 	, m_lwl(endianness == ENDIANNESS_BIG ? &mips3_device::lwl_be : &mips3_device::lwl_le)
 	, m_lwr(endianness == ENDIANNESS_BIG ? &mips3_device::lwr_be : &mips3_device::lwr_le)
@@ -317,12 +314,8 @@ void mips3_device::generate_exception(int exception, int backup)
 	/* check if exception within another exception */
 	if (!(SR & SR_EXL))
 	{
-		/* if we were in a branch delay slot, adjust */
-#if DELAY_SLOT_EXCEPTION_HACK
-		if (((m_nextpc != ~0) || (m_delayslot)) && (m_ppc == m_core->pc - 4))
-#else
-		if ((m_nextpc != ~0) || (m_delayslot))
-#endif
+		/* if we were in a branch delay slot and we are backing up, adjust */
+		if (((m_nextpc != ~0) || (m_delayslot)) && backup)
 		{
 			m_delayslot = false;
 			m_nextpc = ~0;
@@ -541,9 +534,14 @@ void mips3_device::device_start()
 		save_item(NAME(m_tlb[tlbindex].entry_hi), tlbindex);
 		save_item(NAME(m_tlb[tlbindex].entry_lo), tlbindex);
 	}
+	save_item(NAME(m_tlb_seed));
 
 	// Register state with debugger
 	state_add( MIPS3_PC,           "PC", m_core->pc).formatstr("%08X");
+	state_add( MIPS3_SR,           "SR", m_core->cpr[0][COP0_Status]).formatstr("%08X");
+	state_add( MIPS3_EPC,          "EPC", m_core->cpr[0][COP0_EPC]).formatstr("%08X");
+	state_add( MIPS3_CAUSE,        "Cause", m_core->cpr[0][COP0_Cause]).formatstr("%08X");
+	state_add( MIPS3_BADVADDR,     "BadVAddr", m_core->cpr[0][COP0_BadVAddr]).formatstr("%08X");
 
 #if USE_ABI_REG_NAMES
 	state_add( MIPS3_R0,           "zero", m_core->r[0]).callimport().formatstr("%016X");   // Can't change R0
@@ -714,9 +712,9 @@ void mips3_device::device_start()
 	state_add( MIPS3_FPS31,        "FPS31", m_core->cpr[1][31]).formatstr("%17s");
 	state_add( MIPS3_FPD31,        "FPD31", m_core->cpr[1][31]).formatstr("%17s");
 
-	state_add( MIPS3_SR,           "SR", m_core->cpr[0][COP0_Status]).formatstr("%08X");
-	state_add( MIPS3_EPC,          "EPC", m_core->cpr[0][COP0_EPC]).formatstr("%08X");
-	state_add( MIPS3_CAUSE,        "Cause", m_core->cpr[0][COP0_Cause]).formatstr("%08X");
+	//state_add( MIPS3_SR,           "SR", m_core->cpr[0][COP0_Status]).formatstr("%08X");
+	//state_add( MIPS3_EPC,          "EPC", m_core->cpr[0][COP0_EPC]).formatstr("%08X");
+	//state_add( MIPS3_CAUSE,        "Cause", m_core->cpr[0][COP0_Cause]).formatstr("%08X");
 	state_add( MIPS3_COUNT,        "Count", m_debugger_temp).callexport().formatstr("%08X");
 	state_add( MIPS3_COMPARE,      "Compare", m_core->cpr[0][COP0_Compare]).formatstr("%08X");
 	state_add( MIPS3_INDEX,        "Index", m_core->cpr[0][COP0_Index]).formatstr("%08X");
@@ -726,7 +724,8 @@ void mips3_device::device_start()
 	state_add( MIPS3_ENTRYLO1,     "EntryLo1", m_core->cpr[0][COP0_EntryLo1]).formatstr("%016X");
 	state_add( MIPS3_PAGEMASK,     "PageMask", m_core->cpr[0][COP0_PageMask]).formatstr("%016X");
 	state_add( MIPS3_WIRED,        "Wired", m_core->cpr[0][COP0_Wired]).formatstr("%08X");
-	state_add( MIPS3_BADVADDR,     "BadVAddr", m_core->cpr[0][COP0_BadVAddr]).formatstr("%08X");
+	//state_add( MIPS3_BADVADDR,     "BadVAddr", m_core->cpr[0][COP0_BadVAddr]).formatstr("%08X");
+	state_add( MIPS3_LLADDR,       "LLAddr", m_core->cpr[0][COP0_LLAddr]).formatstr("%08X");
 
 	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 	state_add( STATE_GENSP, "CURSP", m_core->r[31]).noshow();
@@ -1099,6 +1098,8 @@ void mips3_device::device_reset()
 	m_core->cpr[0][COP0_Count] = 0;
 	m_core->cpr[0][COP0_Config] = compute_config_register();
 	m_core->cpr[0][COP0_PRId] = compute_prid_register();
+	m_core->cpr[0][COP0_LLAddr] = 0;
+	m_core->llbit = 0;
 	m_core->count_zero_time = total_cycles();
 
 	/* initialize the TLB state */
@@ -1121,6 +1122,7 @@ void mips3_device::device_reset()
 	// TX4925 on-board peripherals pass-through
 	if (m_flavor == MIPS3_TYPE_TX4925)
 		vtlb_load(2 * m_tlbentries + 2, (0xff200000 - 0xff1f0000) >> MIPS3_MIN_PAGE_SHIFT, 0xff1f0000, 0xff1f0000 | VTLB_READ_ALLOWED | VTLB_WRITE_ALLOWED | VTLB_FETCH_ALLOWED | VTLB_FLAG_VALID);
+	m_tlb_seed = 0;
 
 	m_core->mode = (MODE_KERNEL << 1) | 0;
 	m_drc_cache_dirty = true;
@@ -1846,8 +1848,7 @@ void mips3_device::handle_cop0(uint32_t op)
 					m_core->pc = m_core->cpr[0][COP0_EPC];
 					SR &= ~SR_EXL;
 					check_irqs();
-					m_lld_value ^= 0xffffffff;
-					m_ll_value ^= 0xffffffff;
+					m_core->llbit = 0;
 					break;
 				case 0x20:  /* WAIT */                                                      break;
 				default:    handle_extra_cop0(op);                                          break;
@@ -1982,7 +1983,7 @@ void mips3_device::handle_cop1_fr0(uint32_t op)
 					if (IS_SINGLE(op)) { /* DIV.S */
 						if (FTVALW_FR0 == 0 && (COP1_FCR31 & (1 << (FCR31_ENABLE + FPE_DIV0)))) {
 							COP1_FCR31 |= (1 << (FCR31_FLAGS + FPE_DIV0));  // Set flag
-							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));	// Set cause
+							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));  // Set cause
 							generate_exception(EXCEPTION_FPE, 1);
 							//machine().debug_break();
 						}
@@ -1993,7 +1994,7 @@ void mips3_device::handle_cop1_fr0(uint32_t op)
 					else {               /* DIV.D */
 						if (FTVALL_FR0 == 0ull && (COP1_FCR31 & (1 << (FCR31_ENABLE + FPE_DIV0)))) {
 							COP1_FCR31 |= (1 << (FCR31_FLAGS + FPE_DIV0));  // Set flag
-							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));	// Set cause
+							COP1_FCR31 |= (1 << (FCR31_CAUSE + FPE_DIV0));  // Set cause
 							generate_exception(EXCEPTION_FPE, 1);
 							//machine().debug_break();
 						}
@@ -5194,7 +5195,17 @@ void mips3_device::execute_run()
 			case 0x2d:  /* SDR */       (this->*m_sdr)(op);                                                       break;
 			case 0x2e:  /* SWR */       (this->*m_swr)(op);                                                       break;
 			case 0x2f:  /* CACHE */     handle_cache(op);                                                         break;
-			case 0x30:  /* LL */        if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (uint32_t)temp; m_ll_value = RTVAL32;       break;
+			case 0x30:  /* LL */
+				if (RWORD(SIMMVAL + RSVAL32, &temp) && RTREG)
+				{
+					// Should actually use physical address
+					m_core->cpr[0][COP0_LLAddr] = SIMMVAL + RSVAL32;
+					RTVAL64 = temp;
+					m_core->llbit = 1;
+					if LL_BREAK
+						machine().debug_break();
+					break;
+				}
 			case 0x31:  /* LWC1 */
 				if (!(SR & SR_COP1))
 				{
@@ -5207,7 +5218,16 @@ void mips3_device::execute_run()
 				break;
 			case 0x32:  /* LWC2 */      if (RWORD(SIMMVAL+RSVAL32, &temp)) set_cop2_reg(RTREG, temp);           break;
 			case 0x33:  /* PREF */      /* effective no-op */                                                   break;
-			case 0x34:  /* LLD */       if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64; m_lld_value = temp64;     break;
+			case 0x34:  /* LLD */
+				if (RDOUBLE(SIMMVAL + RSVAL32, &temp64) && RTREG)
+				{
+					m_core->cpr[0][COP0_LLAddr] = SIMMVAL + RSVAL32;
+					RTVAL64 = temp64;
+					m_core->llbit = 1;
+					if LL_BREAK
+						machine().debug_break();
+					break;
+				}
 			case 0x35:  /* LDC1 */
 			if (!(SR & SR_COP1))
 			{
@@ -5220,19 +5240,15 @@ void mips3_device::execute_run()
 			break;
 			case 0x36:  handle_ldc2(op); break;
 			case 0x37:  /* LD */        if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64;       break;
-			case 0x38:  /* SC */        if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG)
-			{
-				if (temp == m_ll_value)
+			case 0x38:  /* SC */
+				if (RWORD(SIMMVAL + RSVAL32, &temp) && RTREG && m_core->llbit && m_core->cpr[0][COP0_LLAddr] == SIMMVAL + RSVAL32)
 				{
-					WWORD(SIMMVAL+RSVAL32, RTVAL32);
+					WWORD(SIMMVAL + RSVAL32, RTVAL32);
 					RTVAL64 = (uint32_t)1;
 				}
 				else
-				{
 					RTVAL64 = (uint32_t)0;
-				}
-			}
-			break;
+				break;
 			case 0x39:  /* SWC1 */
 				if (!(SR & SR_COP1))
 				{
@@ -5244,19 +5260,15 @@ void mips3_device::execute_run()
 				break;
 			case 0x3a:  /* SWC2 */      WWORD(SIMMVAL+RSVAL32, get_cop2_reg(RTREG));                            break;
 			case 0x3b:  /* SWC3 */      invalid_instruction(op);                                                break;
-			case 0x3c:  /* SCD */       if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG)
-			{
-				if (temp64 == m_lld_value)
+			case 0x3c:  /* SCD */
+				if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG && m_core->llbit && m_core->cpr[0][COP0_LLAddr] == SIMMVAL + RSVAL32)
 				{
-					WDOUBLE(SIMMVAL+RSVAL32, RTVAL64);
+					WDOUBLE(SIMMVAL + RSVAL32, RTVAL64);
 					RTVAL64 = 1;
 				}
 				else
-				{
 					RTVAL64 = 0;
-				}
-			}
-			break;
+				break;
 			case 0x3d:  /* SDC1 */
 				if (!(SR & SR_COP1))
 				{

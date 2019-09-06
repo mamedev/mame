@@ -316,8 +316,8 @@ offs_t mips1_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			}
 			break;
 
-		case 0x02:  util::stream_format(stream, "j      $%08x", (pc & 0xf0000000) | ((op & 0x0fffffff) << 2));  break;
-		case 0x03:  util::stream_format(stream, "jal    $%08x", (pc & 0xf0000000) | ((op & 0x0fffffff) << 2)); flags = STEP_OVER | step_over_extra(1); break;
+		case 0x02:  util::stream_format(stream, "j      $%08x", (pc & 0xf0000000) | ((op & 0x03ffffff) << 2));  break;
+		case 0x03:  util::stream_format(stream, "jal    $%08x", (pc & 0xf0000000) | ((op & 0x03ffffff) << 2)); flags = STEP_OVER | step_over_extra(1); break;
 		case 0x04:  if (rs == 0 && rt == 0)
 					util::stream_format(stream, "b      $%08x", pc + 4 + ((int16_t)op << 2));
 					else

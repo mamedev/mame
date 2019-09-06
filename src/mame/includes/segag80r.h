@@ -18,6 +18,7 @@
 #include "sound/sn76496.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class sega005_sound_device;

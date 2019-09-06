@@ -12,6 +12,7 @@
 
 #include "video/ladybug.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 // redclash/zerohour

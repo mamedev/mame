@@ -13,6 +13,7 @@
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 /* Discrete Sound Input Nodes */

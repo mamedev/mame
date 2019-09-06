@@ -27,17 +27,6 @@
 #define V30_GND_ADDR    ((m_ctrl_reg & 0x3) << 16)
 #define V30_OBJ_ADDR    ((m_ctrl_reg & 0x18) << 13)
 
-
-/*************************************
- *
- *  Holy Space for The 5 Wise Enters
- *
- *************************************/
-
-
-
-
-
 /*************************************
  *
  *  Machine functions

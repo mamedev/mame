@@ -9,6 +9,7 @@
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class fromanc2_state : public driver_device
 {

@@ -13,6 +13,7 @@
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
+#include "tilemap.h"
 
 class esd16_state : public driver_device
 {

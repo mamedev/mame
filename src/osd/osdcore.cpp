@@ -200,7 +200,12 @@ osd_ticks_t osd_ticks_per_second(void)
 
 void osd_sleep(osd_ticks_t duration)
 {
+#ifdef WIN32
+// sleep_for appears to oversleep on Windows with gcc 8
+	Sleep(duration / (osd_ticks_per_second() / 1000));
+#else
 	std::this_thread::sleep_for(std::chrono::high_resolution_clock::duration(duration));
+#endif
 }
 
 

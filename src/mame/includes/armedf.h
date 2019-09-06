@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class armedf_state : public driver_device
 {
@@ -124,6 +125,7 @@ protected:
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 						uint32_t code,uint32_t color, uint32_t clut,int flipx,int flipy,int offsx,int offsy,
 						int transparent_color);
+	void common_map(address_map &map);
 	void armedf_map(address_map &map);
 	void cclimbr2_map(address_map &map);
 	void cclimbr2_soundmap(address_map &map);

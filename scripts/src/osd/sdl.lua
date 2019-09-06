@@ -38,7 +38,7 @@ function maintargetosdoptions(_target,_subtarget)
 		}
 	end
 
-	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" then
+	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" and _OPTIONS["targetos"]~="asmjs" then
 		links {
 			"SDL2_ttf",
 		}
@@ -170,7 +170,24 @@ newoption {
 }
 
 if not _OPTIONS["NO_USE_XINPUT"] then
-	_OPTIONS["NO_USE_XINPUT"] = "1"
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" then
+		_OPTIONS["NO_USE_XINPUT"] = "1"
+	else
+		_OPTIONS["NO_USE_XINPUT"] = "0"
+	end
+end
+
+newoption {
+	trigger = "NO_USE_XINPUT_WII_LIGHTGUN_HACK",
+	description = "Disable use of Xinput Wii Lightgun Hack",
+	allowed = {
+		{ "0",  "Enable Xinput Wii Lightgun Hack"  },
+		{ "1",  "Disable Xinput Wii Lightgun Hack" },
+	},
+}
+
+if not _OPTIONS["NO_USE_XINPUT_WII_LIGHTGUN_HACK"] then
+	_OPTIONS["NO_USE_XINPUT_WII_LIGHTGUN_HACK"] = "1"
 end
 
 newoption {
@@ -311,7 +328,7 @@ if BASE_TARGETOS=="unix" then
 					"socket",
 					"nsl",
 				}
-			else
+			elseif _OPTIONS["targetos"]~="asmjs" then
 				links {
 					"util",
 				}
