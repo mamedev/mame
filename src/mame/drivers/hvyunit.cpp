@@ -635,7 +635,6 @@ void hvyunit_state::hvyunit(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sound_memory);
 	m_soundcpu->set_addrmap(AS_IO, &hvyunit_state::sound_io);
-	m_soundcpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
 
 	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_mermaid->port_in_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_r));
@@ -675,7 +674,9 @@ void hvyunit_state::hvyunit(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	YM2203(config, "ymsnd", XTAL(12'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80); /* 3MHz verified on PCB */
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); // 3MHz verified on PCB
+	ymsnd.irq_handler().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 
