@@ -1004,6 +1004,11 @@ void cps3_state::video_start()
 	save_pointer(NAME(m_ss_ram), 0x8000);
 }
 
+static inline int to_s10(int data)
+{
+	return (data & 0x1ff) - (data & 0x200);
+}
+
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
 void cps3_state::draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1059,10 +1064,10 @@ void cps3_state::draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &
 	{
 		u32 const dat = m_spriteram[mapbase + ((tileline & 63) * 64) + ((x + scrollx / 16) & 63)];
 		u32 const tileno = (dat & 0xfffe0000) >> 17;
-		u32 const colour = (dat & 0x000001ff) >> 0;
-		bool const bpp =   (dat & 0x00000200) >> 9;
-		bool const yflip = (dat & 0x00000800) >> 11;
 		bool const xflip = (dat & 0x00001000) >> 12;
+		bool const yflip = (dat & 0x00000800) >> 11;
+		bool const bpp =   (dat & 0x00000200) >> 9;
+		u32 const colour = (dat & 0x000001ff) >> 0;
 
 		if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
 		else m_gfxdecode->gfx(1)->set_granularity(64);
@@ -1106,17 +1111,12 @@ void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	attoseconds_t period = screen.frame_period().attoseconds();
-	rectangle visarea = screen.visible_area();
-
-	int bg_drawn[4] = { 0, 0, 0, 0 };
-
-	/* registers are normally 002a006f 01ef01c6
-	        widescreen mode = 00230076 026501c6
-	    only SFIII2 uses widescreen, I don't know exactly which register controls it */
 	int width = ((m_ppu_crtc_zoom[1] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[0] & 0xffff);
 	if (width > 0 && m_screenwidth != width)
 	{
+		attoseconds_t period = screen.frame_period().attoseconds();
+		rectangle visarea = screen.visible_area();
+
 		int height = ((m_ppu_crtc_zoom[5] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[4] & 0xffff);
 		visarea.set(0, width - 1, 0, height - 1);
 		screen.configure(width, height, visarea, period);
@@ -1208,14 +1208,13 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 				/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
 				    which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
 
-				if (bg_drawn[tilemapnum] == 0) // Hack, tilemaps rendered similar to sprites, but as a screen-wide rows
+				for (int yy = 0; yy <= ysizedraw2; yy++)
 				{
-					for (int uu = m_renderbuffer_clip.top(); uu <= m_renderbuffer_clip.bottom(); uu++)
-					{
-						draw_tilemapsprite_line(tilemapnum, uu, m_renderbuffer_bitmap, m_renderbuffer_clip);
-					}
+					int cury_pos = to_s10(yy - (to_s10(ypos2) + to_s10(gscrolly))); // OK for sfiii Alex's stage, but not sure if hardware realy works this way
+
+					if (cury_pos >= m_renderbuffer_clip.top() && cury_pos <= m_renderbuffer_clip.bottom())
+						draw_tilemapsprite_line(tilemapnum, cury_pos, m_renderbuffer_bitmap, m_renderbuffer_clip);
 				}
-				bg_drawn[tilemapnum] = 1;
 			}
 			else
 			{
