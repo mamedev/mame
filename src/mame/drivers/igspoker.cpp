@@ -2936,7 +2936,7 @@ GAMEL( 1993, cpokerx,     cpoker, igspoker, cpokerx,  igspoker_state, init_cpoke
 GAMEL( 1993, cpoker101,   cpoker, igspoker, cpokerx,  igspoker_state, init_cpokert,     ROT0, "IGS",                  "Champion Poker (v101)",                        MACHINE_NOT_WORKING, layout_igspoker ) // need to verify protection handling and inputs/outputs
 GAMEL( 1993, cpoker201f,  cpoker, igspoker, cpokerx,  igspoker_state, init_cpokert,     ROT0, "IGS",                  "Champion Poker (v201F)",                       MACHINE_NOT_WORKING, layout_igspoker ) //                   "
 GAMEL( 1993, cpoker210ks, cpoker, igspoker, cpokerx,  igspoker_state, init_cpokert,     ROT0, "IGS",                  "Champion Poker (v210KS)",                      MACHINE_NOT_WORKING, layout_igspoker ) //                   "
-GAMEL( 1993, cpoker300us, cpoker, igspoker, cpokerx,  igspoker_state, init_cpoker300us, ROT0, "IGS",                  "Champion Poker (v300US)",                      MACHINE_NOT_WORKING, layout_igspoker ) //                   "
+GAMEL( 1993, cpoker300us, cpoker, igspoker, cpoker,   igspoker_state, init_cpoker300us, ROT0, "IGS",                  "Champion Poker (v300US)",                      MACHINE_NOT_WORKING, layout_igspoker ) //                   "
 
 GAMEL( 2000, chleague,    0,        igspoker, chleague, igspoker_state, init_chleague,  ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
 GAMEL( 2000, chleagul,    chleague, igspoker, chleague, igspoker_state, init_chleague,  ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )
