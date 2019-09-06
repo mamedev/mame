@@ -297,8 +297,8 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Template is missing a <!--CONTENT--> marker\n");
 		return 1;
 	}
-	tempfooter.assign(tempheader).substr(result + 14, -1);
-	tempheader.substr(0, result);
+	tempfooter.assign(tempheader).erase(0, result + 14);
+	tempheader.erase(result);
 
 	// recurse over subdirectories
 	return recurse_dir(srcdir.length(), dstdir.length(), srcdir, dstdir, tempheader, tempfooter);
@@ -849,7 +849,7 @@ static bool find_include_file(std::string &srcincpath, int srcrootlen, int dstro
 			{
 				sepindex = srcincpath.find_last_of(PATH_SEPARATOR[0]);
 				if (sepindex != -1)
-					srcincpath.substr(0, sepindex);
+					srcincpath.erase(sepindex);
 			}
 
 			// otherwise, append a path separator and the pathpart
@@ -892,7 +892,7 @@ static bool find_include_file(std::string &srcincpath, int srcrootlen, int dstro
 			// for each directory left in the filename, we need to prepend a "../"
 			while ((sepindex = tempfile.find_first_of(PATH_SEPARATOR[0])) != -1)
 			{
-				tempfile.substr(sepindex + 1, -1);
+				tempfile.erase(0, sepindex + 1);
 				srcincpath.insert(0, "../");
 			}
 			srcincpath.append(".html");
