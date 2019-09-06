@@ -2,7 +2,8 @@
 // copyright-holders:Miodrag Milanovic
 /*****************************************************************************************
 
-PP-01 driver by Miodrag Milanovic
+PP-01 driver by Miodrag Milanovic.
+Also for PP-02/03/04/05/06, if the roms ever appear.
 
 2008-09-08 Preliminary driver.
 
@@ -14,7 +15,6 @@ S - ?
 Z - ?
 
 ToDo:
-- Cassette (coded but unable to test as the i8251 device needs work to support syndet)
 - Interrupt controller
 
 *****************************************************************************************/
@@ -27,7 +27,7 @@ ToDo:
 
 
 /* Address maps */
-void pp01_state::pp01_mem(address_map &map)
+void pp01_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x0fff).bankrw("bank1");
 	map(0x1000, 0x1fff).bankrw("bank2");
@@ -47,14 +47,16 @@ void pp01_state::pp01_mem(address_map &map)
 	map(0xf000, 0xffff).bankrw("bank16");
 }
 
-void pp01_state::pp01_io(address_map &map)
+void pp01_state::io_map(address_map &map)
 {
 	map(0xc0, 0xc3).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
-	//map(0xc4, 0xc7).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // user
+	map(0xc4, 0xc7).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // user
 	map(0xc8, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0xcc, 0xcf).w(FUNC(pp01_state::pp01_video_write_mode_w));
+	map(0xcc, 0xcf).w(FUNC(pp01_state::video_write_mode_w));
 	map(0xd0, 0xd3).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe0, 0xef).mirror(0x10).rw(FUNC(pp01_state::pp01_mem_block_r), FUNC(pp01_state::pp01_mem_block_w));
+	//map(0xd4, 0xd7). MH3214 interrupt controller
+	//map(0xd8, 0xdb). MH102 multiply 2 8-bit signed or unsigned numbers, get back 16-bit result.
+	map(0xe0, 0xef).mirror(0x10).rw(FUNC(pp01_state::mem_block_r), FUNC(pp01_state::mem_block_w));
 }
 
 /* Input ports */
@@ -214,8 +216,8 @@ void pp01_state::pp01(machine_config &config)
 {
 	/* basic machine hardware */
 	I8080(config, m_maincpu, 2000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pp01_state::pp01_mem);
-	m_maincpu->set_addrmap(AS_IO, &pp01_state::pp01_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pp01_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pp01_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -234,20 +236,23 @@ void pp01_state::pp01(machine_config &config)
 
 	/* Devices */
 	I8251(config, m_uart, 2000000);
-	m_uart->txd_handler().set([this] (bool state) { m_cass->output(state ? 1.0 : -1.0); });
-	// when rts and dtr are both high, the uart is being used for cassette operations
+	m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
+	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
+	m_uart->rts_handler().set([this] (bool state) { m_rts = state; });
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<2>(2000000);
 	m_pit->out_handler<2>().set(FUNC(pp01_state::z2_w));
 
-	i8255_device &ppi1(I8255A(config, "ppi1"));
-	ppi1.in_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_r));
-	ppi1.out_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_w));
-	ppi1.in_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_r));
-	ppi1.out_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_w));
-	ppi1.in_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_r));
-	ppi1.out_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_w));
+	I8255A(config, m_ppi1);
+	m_ppi1->in_pa_callback().set(FUNC(pp01_state::ppi1_porta_r));
+	m_ppi1->out_pa_callback().set(FUNC(pp01_state::ppi1_porta_w));
+	m_ppi1->in_pb_callback().set(FUNC(pp01_state::ppi1_portb_r));
+	m_ppi1->out_pb_callback().set(FUNC(pp01_state::ppi1_portb_w));
+	m_ppi1->in_pc_callback().set(FUNC(pp01_state::ppi1_portc_r));
+	m_ppi1->out_pc_callback().set(FUNC(pp01_state::ppi1_portc_w));
+
+	I8255A(config, m_ppi2);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
@@ -255,6 +260,7 @@ void pp01_state::pp01(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(pp01_state::kansas_r), attotime::from_hz(19200));
 }
 
 /* ROM definition */
