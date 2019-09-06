@@ -19707,13 +19707,13 @@
 	</software>
 
 	<software name="rtype">
-		<description>R-Type (Euro, Aus, USA)</description>
+		<description>R-Type (Australia, Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Irem</publisher>
-		<info name="serial" value="DMG-RE-USA, DMG-RE-(NOE/AUS)"/>
+		<info name="serial" value="DMG-RE-AUS, DMG-RE-NOE, DMG-RE-USA"/>
 		<sharedfeat name="compatibility" value="GB"/>
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02"/>  <!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]"/>
 			<feature name="slot" value="rom_mbc1"/>
@@ -19756,36 +19756,25 @@
 	</software>
 
 	<software name="rtype2j" cloneof="rtype2">
-		<description>R-Type II (Japan)</description>
+		<description>R-Type II (China, Japan)</description>
 		<year>1992</year>
 		<publisher>Irem</publisher>
-		<info name="serial" value="DMG-RZA (IG-10)"/>
+		<info name="serial" value="DMG-110 CHN, DMG-RZA (IG-10)"/>
 		<info name="release" value="19921211"/>
-		<info name="alt_title" value="アール・タイプ 2"/>
+		<info name="alt_title" value="アール・タイプ 2 (Japan), R-TYPE II Ｒ战机II·Ｒ戰機II (China)"/>
 		<sharedfeat name="compatibility" value="GB"/>
  		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-M11"/>
+			<feature name="u1" value="U1 MBC1"/>
+			<feature name="u2" value="U2 PRG-ROM [epoxy]"/>
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
-				<rom name="r-type ii (japan).bin" size="131072" crc="6002e291" sha1="28e13db505cbb5c178002acf02e5c0bfcfc6b08f"/>
+				<rom name="u2" size="131072" crc="6002e291" sha1="28e13db505cbb5c178002acf02e5c0bfcfc6b08f"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="racedays">
-		<description>Race Days (Europe)</description>
-		<year>1994</year>
-		<publisher>GameTek</publisher>
-		<info name="serial" value="DMG-ARDP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
- 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1"/>
-			<dataarea name="rom" size="262144">
-				<rom name="race days (europe).bin" size="262144" crc="442420b3" sha1="750143b2057b604123972a978a51a14a7e8621bf"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="racedaysu" cloneof="racedays">
 		<description>Race Days (USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
@@ -19794,7 +19783,24 @@
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
-				<rom name="race days (usa).bin" size="262144" crc="b9ab5319" sha1="eee5feb39af996804177f4a269d2a41f692120f9"/>
+				<rom name="race days (usa).bin" size="262144" crc="442420b3" sha1="750143b2057b604123972a978a51a14a7e8621bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racedayse" cloneof="racedays">
+		<description>Race Days (Europe)</description>
+		<year>1994</year>
+		<publisher>GameTek</publisher>
+		<info name="serial" value="DMG-ARDP-EUR"/>
+		<sharedfeat name="compatibility" value="GB"/>
+ 		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02"/>
+			<feature name="u1" value="U1 PRG"/>
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]"/>
+			<feature name="slot" value="rom_mbc1"/>
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-ardp-0.u1" size="262144" crc="b9ab5319" sha1="eee5feb39af996804177f4a269d2a41f692120f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19803,10 +19809,10 @@
 		<description>Race Drivin' (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>T*HQ</publisher>
-		<info name="serial" value="DMG-RV-USA, DMG-RV-UKV"/>
+		<info name="serial" value="DMG-RV-UKV, DMG-RV-USA"/>
 		<sharedfeat name="compatibility" value="GB"/>
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02"/>  <!-- UKV cart -->
+			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]"/>
 			<feature name="slot" value="rom_mbc1"/>
@@ -19870,15 +19876,15 @@
 		<description>Raging Fighter (Europe, USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="DMG-OB-USA, DMG-OB-NOE"/>
+		<info name="serial" value="DMG-OB-NOE, DMG-OB-USA"/>
 		<sharedfeat name="compatibility" value="GB"/>
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02"/>  <!-- NOE cart -->
+			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]"/>
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
-				<rom name="dmg-dbe-0.u1" size="262144" crc="1ef3bedb" sha1="3e9ae5693208b8c377792c0fb67d682c6158b14d"/>
+				<rom name="dmg-obe-0.u1" size="262144" crc="1ef3bedb" sha1="3e9ae5693208b8c377792c0fb67d682c6158b14d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19978,18 +19984,20 @@
 	</software>
 
 	<software name="realbout">
-		<!-- Notes: SGB enhanced -->
 		<description>Real Bout Special (Japan)</description>
 		<year>1998</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-ARBJ-JPN"/>
 		<info name="release" value="19980327"/>
 		<info name="alt_title" value="熱闘 リアルバウト餓狼伝説SPECIAL ~ Nettou Real Bout Garou Densetsu Special (Box)"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-10"/>
+			<feature name="u1" value="U1 PRG"/>
+			<feature name="u2" value="U2 MBC1/1B/1B1"/>
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
-				<rom name="real bout special (japan).bin" size="524288" crc="f4031d4c" sha1="d67a26af79becdf957cca82bc472b188f5754cd2"/>
+				<rom name="dmg-arbj-0.u1" size="524288" crc="f4031d4c" sha1="d67a26af79becdf957cca82bc472b188f5754cd2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20051,9 +20059,12 @@
 		<info name="serial" value="DMG-RX-USA"/>
 		<sharedfeat name="compatibility" value="GB"/>
  		<part name="cart" interface="gameboy_cart">
+		 	<feature name="pcb" value="DMG-BEAN-02"/>
+			<feature name="u1" value="U1 PRG"/>
+			<feature name="u2" value="U2 MBC1/1A/1B"/>
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
-				<rom name="ren &amp; stimpy show, the - space cadet adventures (usa).bin" size="262144" crc="2085aad9" sha1="da7634aa8e34be43d7dc89a572be2126795989af"/>
+				<rom name="dmg-rxe-0.u1" size="262144" crc="2085aad9" sha1="da7634aa8e34be43d7dc89a572be2126795989af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20304,10 +20315,10 @@
 	</software>
 
 	<software name="robocop">
-		<description>RoboCop (Euro, USA, Rev. A)</description>
+		<description>RoboCop (Europe, USA, Rev. 1)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="DMG-CP-USA, DMG-CP-(FAH/NOE)"/>
+		<info name="serial" value="DMG-CP-FAH, DMG-CP-NOE, DMG-CP-USA"/>
 		<sharedfeat name="compatibility" value="GB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>
