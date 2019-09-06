@@ -2733,7 +2733,7 @@ static void do_add_metadata(parameters_t &params)
 	{
 		text = *text_str->second;
 		if (text[0] == '"' && text[text.length() - 1] == '"')
-			text.substr(1, text.length() - 2);
+			*text_str->second = text.substr(1, text.length() - 2);
 	}
 
 	// process file input
