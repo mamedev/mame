@@ -234,6 +234,7 @@ void i8251_device::sync2_rxc()
 		return;
 
 	// remainder yet to be written
+	(void)m_sync2;
 }
 
 /*-------------------------------------------------
