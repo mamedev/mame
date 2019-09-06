@@ -205,7 +205,6 @@ private:
 					{
 						std::istringstream stream(m_text);
 						stream.imbue(f_portable_locale);
-						(void)m_text.c_str();
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -242,7 +241,6 @@ private:
 					{
 						std::istringstream stream(m_text);
 						stream.imbue(f_portable_locale);
-						(void)m_text.c_str();
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -302,7 +300,6 @@ private:
 					{
 						std::istringstream stream(m_text);
 						stream.imbue(f_portable_locale);
-						(void)m_text.c_str();
 						if (m_text[0] == '$')
 						{
 							stream.get();
@@ -2470,8 +2467,7 @@ private:
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
-
-					const char *origs =m_stopnames[fruit].c_str();
+					const char *origs = m_stopnames[fruit].c_str();
 					const char *ends = origs + strlen(origs);
 					const char *s = origs;
 					char32_t schar;
