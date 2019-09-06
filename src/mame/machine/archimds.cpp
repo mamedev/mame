@@ -37,6 +37,7 @@ static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 static const uint32_t pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
 
 #define IOC_LOG 0
+#define CRTC_LOG 0
 
 /* TODO: fix pending irqs */
 void archimedes_state::archimedes_request_irq_a(int mask)
@@ -743,7 +744,20 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 						return 0;
 					}
 				case 2:
-					logerror("IOC: Econet Read %08x\n",ioc_addr);
+					// RTFM joystick interface routes here
+					switch(ioc_addr)
+					{
+						case 0x3a0000:
+							return 0xed; // ID? Status?
+						case 0x3a0004:
+							return m_joy[0].read_safe(0xff);
+						case 0x3a0008: 
+							// Top Banana reads there and do various checks,
+							// disallowing player 1 joy use if they fails (?)
+							return m_joy[1].read_safe(0xff);
+					}
+					
+					logerror("IOC: Econet Read %08x at PC=%08x\n",ioc_addr, m_maincpu->pc());
 					return 0xffff;
 				case 3:
 					logerror("IOC: Serial Read\n");
@@ -759,10 +773,13 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 							case 0x18: return 0xff; // FDC latch B
 							case 0x40: return 0xff; // FDC latch A
 							case 0x50: return 0; //fdc type, new model returns 5 here
-							case 0x70: return 0x0F;
-							case 0x74: return 0xFF; // unknown
-							case 0x78: // joystick DB9 ports
-							case 0x7c: return m_joy[offset & 1].read_safe(0xff);
+							case 0x70: return 0x0f;
+							case 0x74: return 0xff; // unknown
+							case 0x78: // serial joystick?
+							case 0x7c:
+								logerror("FDC: reading Joystick port %04x at PC=%08x\n",ioc_addr, m_maincpu->pc());
+								return 0xff;
+							
 						}
 					}
 
@@ -910,7 +927,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 {
 	uint32_t reg = data>>24;
 	uint32_t val = data & 0xffffff;
-	//#ifdef MAME_DEBUG
+	#if CRTC_LOG
 	static const char *const vrnames[] =
 	{
 		"horizontal total",
@@ -930,7 +947,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		"vertical cursor start",
 		"vertical cursor end",
 	};
-	//#endif
+	#endif
 
 
 	// 0x00 - 0x3c Video Palette Logical Colors (16 colors)
@@ -999,10 +1016,10 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		}
 
 
-		//#ifdef MAME_DEBUG
+		#if CRTC_LOG
 		if(reg != VIDC_VCSR && reg != VIDC_VCER && reg != VIDC_HCSR)
 		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], m_vidc_regs[reg]);
-		//#endif
+		#endif
 
 		vidc_dynamic_res_change();
 	}

@@ -294,7 +294,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="aliped">
+	<!-- jumps to lalaland -->
+	<software name="aliped" supported="no">
 		<description>Aliped</description>
 		<year>1990</year>
 		<publisher>Archimedes World</publisher>
@@ -305,7 +306,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="alipeda" cloneof="aliped">
+	<!-- jumps to lalaland -->
+	<software name="alipeda" cloneof="aliped" supported="no">
 		<description>Aliped (Alt)</description>
 		<year>1990</year>
 		<publisher>Archimedes World</publisher>
@@ -458,7 +460,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="axis">
+	<!-- boot OK -->
+	<software name="axis" supported="yes">
 		<description>Axis</description>
 		<year>1993</year>
 		<publisher>TBA Software</publisher>
@@ -475,8 +478,9 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="bigbang">
+	
+	<!-- boot OK -->
+	<software name="bigbang" supported="yes">
 		<description>Big Bang</description>
 		<year>1996</year>
 		<publisher>Psycore</publisher>
@@ -673,7 +677,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="chokaway">
+	<!-- Entering into mission causes "sprite doesn't exist" error, has trainer -->
+	<software name="chokaway" supported="partial">
 		<description>Chocks Away</description>
 		<year>1990</year>
 		<publisher>Fourth Dimension</publisher>
@@ -691,7 +696,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="chokawaya" cloneof="chokaway">
+	<!-- "Attempt to use badly nested error handler" when launching main game -->
+	<software name="chokawaya" cloneof="chokaway" supported="no">
 		<description>Chocks Away (Alt)</description>
 		<year>1990</year>
 		<publisher>Fourth Dimension</publisher>
@@ -739,7 +745,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="chuckrck">
+	<!-- boot OK -->
+	<software name="chuckrck" supported="yes">
 		<description>Chuck Rock</description>
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
@@ -769,13 +776,14 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="corrupt">
-		<description>Corruption (Bad Dump?)</description>
+	<!-- OS locks up when trying to load "Game" file -->
+	<software name="corrupt" supported="no">
+		<description>Corruption</description>
 		<year>1993</year>
 		<publisher>Magnetic Scrolls</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="814080">
-				<rom name="corruption (19xx)(Magnetic Scrolls)[b].adf" size="814080" crc="2f8ba19c" sha1="7deebf17db394b5ae964324136d91d002a6c4634" />
+				<rom name="corruption (19xx)(Magnetic Scrolls)[b].adf" size="814080" crc="2f8ba19c" sha1="7deebf17db394b5ae964324136d91d002a6c4634" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -791,13 +799,14 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="crysmaze">
-		<description>The Crystal Maze (Demo) (Bad Dump?)</description>
+	<!-- black screen -->
+	<software name="crysmaze" supported="no">
+		<description>The Crystal Maze (Demo)</description>
 		<year>1993</year>
 		<publisher>Sherston Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="crystal maze, the (demo) (19xx)(sherston)[b].adf" size="819200" crc="ff81bc79" sha1="dc4b2f3543ea3ecf95f9713f27c671d5c83f9c04" />
+				<rom name="crystal maze, the (demo) (19xx)(sherston)[b].adf" size="819200" crc="ff81bc79" sha1="dc4b2f3543ea3ecf95f9713f27c671d5c83f9c04" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1091,13 +1100,14 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="fervour">
-		<description>Fervour (Bad Dump?)</description>
+	<!-- OS locks up with garbage line when trying to load any file -->
+	<software name="fervour" supported="no">
+		<description>Fervour</description>
 		<year>1992</year>
 		<publisher>Clares Micro Supplies</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="fervour (19xx)(-)[b].adf" size="819200" crc="318c6e2a" sha1="ff307f7dcd6c65be64931be211d8e1e2541012c8" />
+				<rom name="fervour (19xx)(-)[b].adf" size="819200" crc="318c6e2a" sha1="ff307f7dcd6c65be64931be211d8e1e2541012c8" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2287,8 +2297,9 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="sensoccr">
-		<description>Sensible Soccer</description>
+	<!-- Black screen after title screen -->
+	<software name="sensoccr" supported="no">
+		<description>Sensible Soccer (v1.1)</description>
 		<year>1993</year>
 		<publisher>Renegade</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2305,7 +2316,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="serpents">
+	<!-- boot OK -->
+	<software name="serpents" supported="yes">
 		<description>Serpents</description>
 		<year>1993</year>
 		<publisher>CIS</publisher>
@@ -2316,7 +2328,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="simcity">
+	<!-- Crashes when creating a new city with "fatal internal error (type=3)", throws three unimplemented COPRO opcodes, wants cache? -->
+	<software name="simcity" supported="no">
 		<description>Sim City</description>
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
@@ -2393,7 +2406,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="small">
+	<!-- boot OK, initial speech pitch sounds very low but it's likely a btanb -->
+	<software name="small" supported="yes">
 		<description>Small</description>
 		<year>1993</year>
 		<publisher>Virgo Software</publisher>
@@ -2404,7 +2418,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="speech">
+	<!-- none of the files listed launch anything, possible bad dump -->
+	<software name="speech" supported="no">
 		<description>Speech!</description>
 		<year>1991</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -2459,7 +2474,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="spheresc">
+	<!-- boot OK -->
+	<software name="spheresc" supported="yes">
 		<description>Spheres of Chaos</description>
 		<year>1993</year>
 		<publisher>Matt Black</publisher>
@@ -2499,7 +2515,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="starch">
+	<!-- Returns to Desktop when launched with !Boot, possible bad dump -->
+	<software name="starch" supported="no">
 		<description>Starch</description>
 		<year>1990</year>
 		<publisher>Archimedes World</publisher>
@@ -2521,7 +2538,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="stuntr2k">
+	<!-- "bad sound parameter" during intro -->
+	<software name="stuntr2k" supported="no">
 		<description>Stunt Racer 2000</description>
 		<year>1993</year>
 		<publisher>Fourth Dimension</publisher>
@@ -2649,7 +2667,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="topbanan">
+	<!-- boot OK -->
+	<software name="topbanan" supported="yes">
 		<description>Top Banana</description>
 		<year>1988</year>
 		<publisher>Hex</publisher>
@@ -2660,7 +2679,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="topbanana" cloneof="topbanan">
+	<!-- boot OK -->
+	<software name="topbanana" cloneof="topbanan" supported="yes">
 		<description>Top Banana (Alt)</description>
 		<year>1988</year>
 		<publisher>Hex</publisher>
@@ -2671,10 +2691,12 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="towbabel">
+	<!-- boot OK -->
+	<software name="towbabel" supported="yes">
 		<description>Tower of Babel</description>
 		<year>1991</year>
 		<publisher>Cygnus</publisher>
+		<info name="usage" value="Requires 4MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="814080">
 				<rom name="tower of babel (1991)(cygnus).adf" size="814080" crc="1b918df1" sha1="9e656be2f1f09d2859cf68200d8f2794fa795e49" />
@@ -2715,18 +2737,20 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="warlocks">
-		<description>Warlocks (Demo, Bad Dump?)</description>
+	<!-- Underdumped -->
+	<software name="warlocks" supported="no">
+		<description>Warlocks (Demo)</description>
 		<year>1993</year>
 		<publisher>Network 23</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="499604">
-				<rom name="warlocks (demo) (1993)(network xxiii)[b].adf" size="499604" crc="980c95d8" sha1="af5d9ed5829057c4f6bedc8075df5bf091d0298b" />
+				<rom name="warlocks (demo) (1993)(network xxiii)[b].adf" size="499604" crc="980c95d8" sha1="af5d9ed5829057c4f6bedc8075df5bf091d0298b" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="whitemag">
+	<!-- Loading with !boot causes "File FXS0 not found", picking the "four arrows" item makes the game to hang -->
+	<software name="whitemag" supported="no">
 		<description>White Magic</description>
 		<year>1989</year>
 		<publisher>Fourth Dimension</publisher>
@@ -2737,7 +2761,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="whitema2">
+	<!-- "Not enough memory in module area" when launched with !Boot, jumps to lalaland after some gameplay time -->
+	<software name="whitema2" supported="no">
 		<description>White Magic 2</description>
 		<year>1989</year>
 		<publisher>Fourth Dimension</publisher>
@@ -2770,7 +2795,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="wolf3d">
+	<!-- boot OK -->
+	<software name="wolf3d" supported="yes">
 		<description>Wolfenstein 3D</description>
 		<year>1994</year>
 		<publisher>Powerslave Software</publisher>
@@ -2827,12 +2853,12 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Requires multi-drive floppy -->
-	<!-- (swap disk prompt doesn't really appear on screen but it's there) -->
+	<!-- boot OK, seems too slow during gameplay, keyboard inputs sometimes gets stuck -->
 	<software name="xenon2" supported="partial">
 		<description>Xenon 2: Megablast</description>
 		<year>1993</year>
 		<publisher>Eclipse</publisher>
+		<info name="usage" value="Requires a second floppy drive"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disc 1"/>
 			<dataarea name="flop" size="819200">
@@ -2931,14 +2957,15 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="arcomini">
-		<description>ArcOmnibus (Bad Dump?)</description>
+	<!-- !Moric crashes after about 3 seconds in gameplay, making the OS unstable too -->
+	<software name="arcomini" supported="partial">
+		<description>ArcOmnibus</description>
 		<year>1990</year>
 		<publisher>RISC Developments</publisher>
 		<info name="author" value="Fairbrother" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="arcomini (1990)(fairbrother)[b].adf" size="819200" crc="b3028298" sha1="f1f70ad7c124ab863ba9deaca797e09b7c51bb40" />
+				<rom name="arcomini (1990)(fairbrother)[b].adf" size="819200" crc="b3028298" sha1="f1f70ad7c124ab863ba9deaca797e09b7c51bb40" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3048,14 +3075,15 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="crytond">
-		<description>Cryton Demo (Bad Dump?)</description>
+	<!-- Underdumped -->
+	<software name="crytond" supported="no">
+		<description>Cryton Demo</description>
 		<year>1989</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="author" value="Cryton" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305528">
-				<rom name="cryton demo (1989)(cryton)[b].adf" size="305528" crc="0aed18d4" sha1="b2804c0fd268def07fae6ab7644694d6134fcceb" />
+				<rom name="cryton demo (1989)(cryton)[b].adf" size="305528" crc="0aed18d4" sha1="b2804c0fd268def07fae6ab7644694d6134fcceb" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4583,13 +4611,14 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="startwri">
+	<!-- "System resources cannot be found" by attempting to load any file even with 16MB RAM -->
+	<software name="startwri" supported="no">
 		<description>StartWrite</description>
 		<year>1992</year>
 		<publisher>Icon Technology</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="814080">
-				<rom name="startwrite (1992)(icon technology)[b].adf" size="814080" crc="d915e78c" sha1="8ca4289ac423d4878129cb17d6177123b321108f" />
+				<rom name="startwrite (1992)(icon technology)[b].adf" size="814080" crc="d915e78c" sha1="8ca4289ac423d4878129cb17d6177123b321108f" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
