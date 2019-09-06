@@ -335,7 +335,7 @@ void mas3507d_device::fill_buffer()
 		mp3data[mp3_count++] = v;
 	}
 
-	int scount = mp3dec_decode_frame(&mp3_dec, mp3data.begin(), mp3_count, samples.begin(), &mp3_info);
+	int scount = mp3dec_decode_frame(&mp3_dec, static_cast<const uint8_t *>(&mp3data[0]), mp3_count, static_cast<mp3d_sample_t *>(&samples[0]), &mp3_info);
 
 	if(!scount) {
 		int to_drop = mp3_info.frame_bytes;
