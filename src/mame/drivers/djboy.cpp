@@ -493,7 +493,6 @@ void djboy_state::djboy(machine_config &config)
 	Z80(config, m_soundcpu, 12_MHz_XTAL / 2); // 6.000MHz, verified
 	m_soundcpu->set_addrmap(AS_PROGRAM, &djboy_state::soundcpu_am);
 	m_soundcpu->set_addrmap(AS_IO, &djboy_state::soundcpu_port_am);
-	m_soundcpu->set_vblank_int("screen", FUNC(djboy_state::irq0_line_hold));
 
 	I80C51(config, m_beast, 12_MHz_XTAL / 2); // 6.000MHz, verified
 	m_beast->port_in_cb<0>().set(FUNC(djboy_state::beast_p0_r));
@@ -535,6 +534,7 @@ void djboy_state::djboy(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL / 4)); // 3.000MHz, verified
+	ymsnd.irq_handler().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
 	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 
