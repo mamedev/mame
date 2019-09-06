@@ -638,13 +638,6 @@ int lua_engine::enumerate_functions(const char *id, std::function<bool(const sol
 				count++;
 				if (!cont)
 					break;
-
-				auto ret = invoke(func.second.as<sol::protected_function>());
-				if (!ret.valid())
-				{
-					sol::error err = ret;
-					osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
-				}
 			}
 		}
 		return true;
