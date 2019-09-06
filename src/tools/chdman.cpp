@@ -1971,7 +1971,6 @@ static void do_create_cd(parameters_t &params)
 	}
 
 	// print some info
-	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
