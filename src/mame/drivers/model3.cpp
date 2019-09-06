@@ -742,6 +742,7 @@ JP4/5/6/7 - Jumpers to configure ROMs
 #include "machine/m3comm.h"
 #include "speaker.h"
 
+#include "segabill.lh"
 
 void model3_state::update_irq_state()
 {
@@ -5921,6 +5922,7 @@ void model3_state::add_base_devices(machine_config &config)
 	m_io->in_pb_callback().set(FUNC(model3_state::input_r));
 	m_io->in_pc_callback().set_ioport("IN2");
 	m_io->in_pd_callback().set_ioport("IN3");
+	m_io->out_pe_callback().set([this] (uint8_t data) { m_billboard->write(data); });
 	m_io->in_pg_callback().set_ioport("DSW");
 	m_io->an_port_callback<0>().set_ioport("AN0");
 	m_io->an_port_callback<1>().set_ioport("AN1");
@@ -5954,6 +5956,10 @@ void model3_state::add_base_devices(machine_config &config)
 	scsp2.set_addrmap(0, &model3_state::scsp2_map);
 	scsp2.add_route(0, "lspeaker", 1.0);
 	scsp2.add_route(1, "rspeaker", 1.0);
+
+	SEGA_BILLBOARD(config, m_billboard, 0);
+
+	config.set_default_layout(layout_segabill);
 }
 
 void model3_state::add_scsi_devices(machine_config &config)

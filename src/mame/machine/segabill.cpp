@@ -4,6 +4,9 @@
 
     Sega Billboard
 
+	TODO: Timing, vs298 needs a higher interrupt frequency, but then
+	the animations seem to fast?
+
 ***************************************************************************/
 
 #include "emu.h"

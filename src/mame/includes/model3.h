@@ -15,6 +15,7 @@
 #include "sound/scsp.h"
 #include "machine/315_5649.h"
 #include "machine/315-5881_crypt.h"
+#include "machine/segabill.h"
 #include "machine/msm6242.h"
 #include "machine/timer.h"
 #include "emupal.h"
@@ -81,7 +82,8 @@ public:
 		m_soundram(*this, "soundram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_cryptdevice(*this, "315_5881")
+		m_cryptdevice(*this, "315_5881"),
+		m_billboard(*this, "billboard")
 	{
 		m_step15_with_mpc106 = false;
 		m_step20_with_old_real3d = false;
@@ -158,6 +160,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
+
+	required_device<sega_billboard_device> m_billboard;
 
 	tilemap_t *m_layer4[4];
 	tilemap_t *m_layer8[4];
