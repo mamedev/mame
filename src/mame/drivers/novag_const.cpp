@@ -22,9 +22,14 @@ Constellation:
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
 
 Constellation 3.6MHz:
-- G65SC02P-3 @ 3.6MHz (7.2MHz XTAL)
+- PCB label: NOVAG CONSTELLATION Rev E 100037
+- G65SC02P-3 or R65C02P3 @ 3.6MHz (7.2MHz XTAL)
 - 2KB RAM (TC5516AP), 16KB ROM (custom label, assumed TMM23128)
 - PCB supports "Memory Save", but components aren't installed
+
+Constellation 3.6MHz manufactured in 1986 was fitted with the same ROM as
+the Quattro, but PCB remains the same (Quatto PCB is very different).
+Button labels are the same as the older version.
 
 Constellation Quattro:
 - R65C02P3 @ 4MHz (8MHz XTAL)
@@ -36,8 +41,8 @@ Super Sensor IV:
 - 8KB ROM (TMM2364P)
 - 2 ROM sockets unpopulated
 
-Sensor Dynamic's ROM is identical to Super Sensor IV, the hardware is basically
-a low-budget version of it with peripheral ports removed.
+Sensor Dynamic's ROM is identical to Super Sensor IV "1I", the hardware is
+basically a low-budget version of it with peripheral ports removed.
 
 Super Constellation:
 - UMC UM6502C @ 4 MHz (8MHz XTAL)
@@ -53,7 +58,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65sc02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/sensorboard.h"
 #include "machine/nvram.h"
@@ -359,7 +363,7 @@ void const_state::nconst36(machine_config &config)
 	nconst(config);
 
 	/* basic machine hardware */
-	M65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
+	R65C02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
 	const attotime irq_period = attotime::from_hz(7.2_MHz_XTAL/2 / 0x2000); // through 4020 IC, ~439Hz
@@ -429,6 +433,11 @@ ROM_START( const36 )
 	ROM_LOAD("novag-831a_6133-8316.u2", 0xc000, 0x4000, CRC(7da760f3) SHA1(6172e0fa03377e911141a86747849bf25f20613f) )
 ROM_END
 
+ROM_START( const36a )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("novag_854-501.u2", 0xc000, 0x4000, CRC(b083d5c4) SHA1(ecac8a599bd8ea8dd549c742ec45b94fb8b11af4) )
+ROM_END
+
 ROM_START( constq )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("novag_854-501.u2", 0xc000, 0x4000, CRC(b083d5c4) SHA1(ecac8a599bd8ea8dd549c742ec45b94fb8b11af4) )
@@ -453,7 +462,8 @@ ROM_END
 CONS( 1981, ssensor4, 0,      0, ssensor4, ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1983, const,    0,      0, nconst,   nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, const36,  const,  0, nconst36, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, const36,  const,  0, nconst36, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, const36a, const,  0, nconst36, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, constq,   const,  0, nconstq,  nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1984, supercon, 0,      0, sconst,   sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
