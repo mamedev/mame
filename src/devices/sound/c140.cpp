@@ -444,22 +444,29 @@ void c140_device::c140_w(offs_t offset, u8 data)
 			}
 		}
 	}
-	else if (offset == 0x1f8 || offset == 0x1fe)
+	else if (offset == 0x1fa)
 	{
+		m_int1_callback(CLEAR_LINE);
+
 		// timing not verified
 		unsigned div = m_REG[0x1f8] != 0 ? m_REG[0x1f8] : 256;
 		attotime interval = attotime::from_ticks(div * 2, m_baserate);
 		if (BIT(m_REG[0x1fe], 0))
-			m_int1_timer->adjust(interval, 0, interval);
+			m_int1_timer->adjust(interval);
+	}
+	else if (offset == 0x1fe)
+	{
+		if (BIT(data, 0))
+		{
+			// kyukaidk and marvlandj want the first interrupt to happen immediately
+			if (!m_int1_timer->enabled())
+				m_int1_callback(ASSERT_LINE);
+		}
 		else
 		{
 			m_int1_callback(CLEAR_LINE);
-			m_int1_timer->adjust(attotime::never);
+			m_int1_timer->enable(false);
 		}
-	}
-	else if (offset == 0x1fa)
-	{
-		m_int1_callback(CLEAR_LINE);
 	}
 }
 
