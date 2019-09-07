@@ -192,7 +192,9 @@ READ8_MEMBER(const_state::input2_r)
 {
 	u8 data = 0;
 
-	// d0-d5: ?
+	// d3: timing related? seems unused (always high)
+	// other: ?
+
 	// d6,d7: multiplexed inputs (side panel)
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_inp_mux, i))
