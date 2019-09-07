@@ -2460,6 +2460,9 @@ ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
 ftsserv                         // 1991 Apricot FTs (Scorpion)
+pccm321							// PC-Chips M321 motherboard (386)
+pccm326							// PC-Chips M326 motherboard (386)
+pccm919							// PC-Chips M919 motherboard (486)
 hot409                          // Shuttle HOT-409
 ht286                           //
 ibm5162                         // 1986 IBM XT 5162 (XT w/80286)

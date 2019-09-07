@@ -1897,7 +1897,7 @@ ROM_START( at386sx )
 	ROMX_LOAD( "ncr_386sx_u46-17_7.3.bin", 0x10000, 0x8000, CRC(73ad83a2) SHA1(bf6704fb4a0da37251f192cea3af2bc8cc2e9cdb), ROM_SKIP(1) | ROM_BIOS(2))
 	// ROM_LOAD( "ncr_386sx_card_150-0004508_u1_v1.1.bin", 0x0000, 0x800, CRC(dd591ac1) SHA1(5bc40ca7340fa57aaf5d707be45a288f14085807))
 	// 3: BIOS-String: 30-0501-D81105-00101111-070791-ACER1217-0 - 386SX NPM/33,40-A0(2) 05/12/1993
-	ROM_SYSTEM_BIOS(3, "m919a00", "PC-Chips M919")
+	ROM_SYSTEM_BIOS(3, "m919a00", "386SX NPM/33,40-A0")
 	ROMX_LOAD( "m919a00_npm-40.bin", 0x10000, 0x10000, CRC(4f330d82) SHA1(08224c7bcfb2a859b682bf44ac1ac7fd9f2ade78),ROM_BIOS(3))
 ROM_END
 
@@ -1922,55 +1922,73 @@ ROM_START( at386 )
 	// 2: BIOS-String: 30-0101-429999-00101111-050591-D90-0 / AMI TD60C BIOS VERSION 2.42B
 	ROM_SYSTEM_BIOS(2, "amicg", "AMI CG")
 	ROMX_LOAD( "amicg.1",        0x10000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(2))
-	// 3: Award Modular BIOS 4.50
-	ROM_SYSTEM_BIOS(3, "pccm326", "PCChips M326 V5.2") //  BIOS reports a 66MHz 386DX original board has a TI TX486DLC/E-40PCE and IIT 4C87DLC-40 CPU/FPU combo
-	ROMX_LOAD( "m326_v5.2_m601-326.bin", 0x10000, 0x10000, CRC(cca6a443) SHA1(096c8bfa000c682d6c801da27c7fd14243ebb63b), ROM_BIOS(3) )
-	// 4: BIOS-String: 40-0100-001437-001001111-080893-4386-0 / Release 10/01/93.
-	ROM_SYSTEM_BIOS(4, "m326r53", "PC-Chips M326 Rev. 5.3")
-	ROMX_LOAD( "m326_rev.5.3.bin", 0x10000, 0x10000, CRC(6c156064) SHA1(362ce5a2333641083706a878b807ab87537ca1e6), ROM_BIOS(4) )
-	// 5:
-	ROM_SYSTEM_BIOS(5, "msi386", "MSI 386") // MSI 386 mainboard, initializes graphics card, then hangs
-	ROMX_LOAD( "ami_386_msi_02297_even.bin", 0x10000, 0x8000, CRC(768590a0) SHA1(90c5203d78591a093fd4f54ceb8d9827f1e64f39), ROM_SKIP(1) | ROM_BIOS(5) )
-	ROMX_LOAD( "ami_386_msi_02297_odd.bin", 0x10001, 0x8000, CRC(7b1360dc) SHA1(552ccda9f90826621e88d9abdc47306b9c2b2b15), ROM_SKIP(1) | ROM_BIOS(5) )
-	// 6: BIOS-String: 20-0200-DF1121-00101111-102591-SYM_386B-0 / 386DX/SX (S1A.P)
-	ROM_SYSTEM_BIOS(6, "386sc2c", "386-SC-2C")
-	ROMX_LOAD("386-sc-2c_ami_za492668.bin", 0x10000, 0x10000, CRC(b408eeb7) SHA1(cf1974492119e1aae623fa366d5760343e827e52), ROM_BIOS(6) )
-	// 7: BIOS-String: EC&T-1332-040990-K0
-	ROM_SYSTEM_BIOS(7, "cs8230", "CS8230")
-	ROMX_LOAD( "ami_386_cs8230_chipset.bin", 0x10000, 0x10000, CRC(1ee766d0) SHA1(75dba3c9817dfe6caca46f5f4f2f1d76ba88d3c7), ROM_BIOS(7) )
-	// 8
-	ROM_SYSTEM_BIOS(8, "ami2939", "AMI2939") // no display
-	ROMX_LOAD( "ami2939e.rom", 0x10000, 0x8000, CRC(65cbbd32) SHA1(d7d26b496f8e86f01722ad9f171a68f9fcdc477c), ROM_SKIP(1) | ROM_BIOS(8) )
-	ROMX_LOAD( "ami2939o.rom", 0x10001, 0x8000, CRC(8db6e739) SHA1(cdd47709d6036fad4be40c15bff41752d831d4b8), ROM_SKIP(1) | ROM_BIOS(8) )
-	// 9: BIOS-String: 30-0201-ZZ1347-00101111-050591-M320-0
-	ROM_SYSTEM_BIOS(9, "m321_23", "PCChips M321 Rev.2.3")
-	ROMX_LOAD( "pcchips_m321_rev2.3.bin", 0x10000, 0x10000, CRC(ca0542e4) SHA1(8af9f88e022f8115708178c6c0b313ea0423a2b5), ROM_BIOS(9) )
-	// 10: BIOS-String: 30-0200-DH1102-00101111-070791-ETEQ386-0 / REV C3
-	ROM_SYSTEM_BIOS(10, "sy19i", "Soyo SY-19I")
-	ROMX_LOAD( "ami_soyo_sy-19i.bin", 0x10000, 0x10000, CRC(369a040f) SHA1(3dbcbcb8b8a50717cae3b17f44ca1b7c394b75fc), ROM_BIOS(10) )
-	// 11: NCR 386 slot CPU - Upgrade card for e.g. NCR PC-8 - set graphics card to CGA to see a "Timer One Error" message
-	ROM_SYSTEM_BIOS(11, "ncr386", "NCR 386 CPU card")
-	ROMX_LOAD( "ncr_386_card_04152_u44_ver5.0.bin", 0x10000, 0x10000, CRC(80e44318) SHA1(54e1d4d646a577c53c65b2292b383ed6d91b65b2), ROM_BIOS(11))
+	// 3:
+	ROM_SYSTEM_BIOS(3, "msi386", "MSI 386") // MSI 386 mainboard, initializes graphics card, then hangs
+	ROMX_LOAD( "ami_386_msi_02297_even.bin", 0x10000, 0x8000, CRC(768590a0) SHA1(90c5203d78591a093fd4f54ceb8d9827f1e64f39), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "ami_386_msi_02297_odd.bin", 0x10001, 0x8000, CRC(7b1360dc) SHA1(552ccda9f90826621e88d9abdc47306b9c2b2b15), ROM_SKIP(1) | ROM_BIOS(3) )
+	// 4: BIOS-String: 20-0200-DF1121-00101111-102591-SYM_386B-0 / 386DX/SX (S1A.P)
+	ROM_SYSTEM_BIOS(4, "386sc2c", "386-SC-2C")
+	ROMX_LOAD("386-sc-2c_ami_za492668.bin", 0x10000, 0x10000, CRC(b408eeb7) SHA1(cf1974492119e1aae623fa366d5760343e827e52), ROM_BIOS(4) )
+	// 5: BIOS-String: EC&T-1332-040990-K0
+	ROM_SYSTEM_BIOS(5, "cs8230", "CS8230")
+	ROMX_LOAD( "ami_386_cs8230_chipset.bin", 0x10000, 0x10000, CRC(1ee766d0) SHA1(75dba3c9817dfe6caca46f5f4f2f1d76ba88d3c7), ROM_BIOS(5) )
+	// 6
+	ROM_SYSTEM_BIOS(6, "ami2939", "AMI2939") // no display
+	ROMX_LOAD( "ami2939e.rom", 0x10000, 0x8000, CRC(65cbbd32) SHA1(d7d26b496f8e86f01722ad9f171a68f9fcdc477c), ROM_SKIP(1) | ROM_BIOS(6) )
+	ROMX_LOAD( "ami2939o.rom", 0x10001, 0x8000, CRC(8db6e739) SHA1(cdd47709d6036fad4be40c15bff41752d831d4b8), ROM_SKIP(1) | ROM_BIOS(6) )
+	// 8: BIOS-String: 30-0200-DH1102-00101111-070791-ETEQ386-0 / REV C3
+	ROM_SYSTEM_BIOS(7, "sy19i", "Soyo SY-19I")
+	ROMX_LOAD( "ami_soyo_sy-19i.bin", 0x10000, 0x10000, CRC(369a040f) SHA1(3dbcbcb8b8a50717cae3b17f44ca1b7c394b75fc), ROM_BIOS(7) )
+	// 9: NCR 386 slot CPU - Upgrade card for e.g. NCR PC-8 - set graphics card to CGA to see a "Timer One Error" message
+	ROM_SYSTEM_BIOS(8, "ncr386", "NCR 386 CPU card")
+	ROMX_LOAD( "ncr_386_card_04152_u44_ver5.0.bin", 0x10000, 0x10000, CRC(80e44318) SHA1(54e1d4d646a577c53c65b2292b383ed6d91b65b2), ROM_BIOS(8))
 	// ROM_LOAD ("ncr_386_card_keyboard_04181_u27_ver5.6.bin", 0x0000, 0x800, CRC(6c9004e7) SHA1(0fe77f47ff77333d1ff9bfcf8d6d92193ab1f208))
-	// 12: BIOS-String: Phoenix 80386 ROM BIOS PLUS Version 1.10 22
-	ROM_SYSTEM_BIOS(12, "cbm386", "Commodore 386")
-	ROMX_LOAD( "cbm-386-bios-lo-v1.022e-8100.bin", 0x10000, 0x8000, CRC(a054a1b8) SHA1(d952b02cc10534325c1c5aaa8b6dfb77bc20a179), ROM_SKIP(1) | ROM_BIOS(12))
-	ROMX_LOAD( "cbm-386-bios-hi-v1.022e-d100.bin", 0x10001, 0x8000, CRC(b9541f3d) SHA1(e37c704521e85b07369d21b0521f4d1871c318dd), ROM_SKIP(1) | ROM_BIOS(12))
-	// 13: flashing "K/B controller incorrect"
-	ROM_SYSTEM_BIOS(13, "gmb386sat", "GMB-386SAT_V1.0")
-	ROMX_LOAD( "gmb-386sat_v1.0.bin", 0x10000, 0x10000, CRC(59ecc773) SHA1(f2007fce76b3a91f51bfb5f43c1539d5ae06d35f), ROM_BIOS(13))
-	// 14: BIOS-String: X0-0100-000000-00101111-060692-RC2018A-0 / Ver 1.4b / Texas Instruments 486 DLC [S3Q]
-	ROM_SYSTEM_BIOS(14, "ti486dlc", "TI 486DLC") // board is equipped with a TI486DLC
-	ROMX_LOAD( "ti_486dlc_rev.s3q.bin", 0x10000, 0x10000, CRC(39b150ed) SHA1(5fc96c6232dd3a066349d8e707e938af55893297), ROM_BIOS(14))
-	// 15: BIOS-String: 40-0400-001107-00101111-111192-U4800VLX-0 / UNICHIP BIOS VER 2.0A 09/27/1993
-	ROM_SYSTEM_BIOS(15, "386bw367", "386BW367 Rev. 1.0")
-	ROMX_LOAD( "unichip_386bw_367_rev_1.0.bin", 0x10000, 0x10000, CRC(7922a8f9) SHA1(785008e10edfd393dc39e921a12d1a07a14bac25), ROM_BIOS(15))
+	// 10: BIOS-String: Phoenix 80386 ROM BIOS PLUS Version 1.10 22
+	ROM_SYSTEM_BIOS(9, "cbm386", "Commodore 386")
+	ROMX_LOAD( "cbm-386-bios-lo-v1.022e-8100.bin", 0x10000, 0x8000, CRC(a054a1b8) SHA1(d952b02cc10534325c1c5aaa8b6dfb77bc20a179), ROM_SKIP(1) | ROM_BIOS(9))
+	ROMX_LOAD( "cbm-386-bios-hi-v1.022e-d100.bin", 0x10001, 0x8000, CRC(b9541f3d) SHA1(e37c704521e85b07369d21b0521f4d1871c318dd), ROM_SKIP(1) | ROM_BIOS(9))
+	// 11: flashing "K/B controller incorrect"
+	ROM_SYSTEM_BIOS(10, "gmb386sat", "GMB-386SAT_V1.0")
+	ROMX_LOAD( "gmb-386sat_v1.0.bin", 0x10000, 0x10000, CRC(59ecc773) SHA1(f2007fce76b3a91f51bfb5f43c1539d5ae06d35f), ROM_BIOS(10))
+	// 12: BIOS-String: X0-0100-000000-00101111-060692-RC2018A-0 / Ver 1.4b / Texas Instruments 486 DLC [S3Q]
+	ROM_SYSTEM_BIOS(11, "ti486dlc", "TI 486DLC") // board is equipped with a TI486DLC
+	ROMX_LOAD( "ti_486dlc_rev.s3q.bin", 0x10000, 0x10000, CRC(39b150ed) SHA1(5fc96c6232dd3a066349d8e707e938af55893297), ROM_BIOS(11))
+	// 13: BIOS-String: 40-0400-001107-00101111-111192-U4800VLX-0 / UNICHIP BIOS VER 2.0A 09/27/1993
+	ROM_SYSTEM_BIOS(12, "386bw367", "386BW367 Rev. 1.0")
+	ROMX_LOAD( "unichip_386bw_367_rev_1.0.bin", 0x10000, 0x10000, CRC(7922a8f9) SHA1(785008e10edfd393dc39e921a12d1a07a14bac25), ROM_BIOS(12))
 ROM_END
 
 
 //**************************************************************************
 //  80386 SX and DX motherboard
 //**************************************************************************
+
+// PC-Chips M321
+// Chipset: PCChips C206/306, CHIP6/4L04F1666, CHIP5/4L04F1282 (rev. 2.3 and 2.7 boards)
+ROM_START( pccm321 )
+	ROM_REGION(0x20000,"bios", 0)
+	// BIOS-String: 30-0201-ZZ1347-00101111-050591-M320-0
+	ROM_SYSTEM_BIOS(0, "m321_23", "PCChips M321 Rev.2.3")
+	ROMX_LOAD( "pcchips_m321_rev2.3.bin", 0x10000, 0x10000, CRC(ca0542e4) SHA1(8af9f88e022f8115708178c6c0b313ea0423a2b5), ROM_BIOS(0) )
+	// BIOS-String: 30-0100-001437-00101111-060692-PC CHIP-0
+	ROM_SYSTEM_BIOS(1, "m321_27_1", "PCChips M321 Rev.2.7 #1")
+	ROMX_LOAD( "3pcm002.bin", 0x10000, 0x10000, CRC(0525220a) SHA1(5565daea1db67fb2e6f5e7f5ddf5333569e74ab3), ROM_BIOS(1) )
+	// BIOS-String: 30-0100-001437-00101111-060692-PC CHIP-0 - TRANS-AMERITECH ENTERPRISES, Inc.
+	ROM_SYSTEM_BIOS(2, "m321_27_2", "PCChips M321 Rev.2.7 #2")
+	ROMX_LOAD( "3pcm004.bin", 0x10000, 0x10000, CRC(d7957833) SHA1(b512d9fc404c4282fb964444aa70a9760edad7db), ROM_BIOS(2) )
+ROM_END
+
+// PC-Chips M326
+// Chipset: SARC RC4018A4/9324 and SARC RC6206A4/9408-AHS or SARC RC4018A4/9324 and RC4919A4-9323 (v5.5 board) or SARC RC2016A4-9320 and RC4019A4-9324 (v5.3)
+ROM_START( pccm326  )
+	ROM_REGION(0x20000,"bios", 0)
+	// 0: Award Modular BIOS 4.50
+	ROM_SYSTEM_BIOS(0, "pccm326", "PCChips M326 V5.2") //  BIOS reports a 66MHz 386DX original board has a TI TX486DLC/E-40PCE and IIT 4C87DLC-40 CPU/FPU combo
+	ROMX_LOAD( "m326_v5.2_m601-326.bin", 0x10000, 0x10000, CRC(cca6a443) SHA1(096c8bfa000c682d6c801da27c7fd14243ebb63b), ROM_BIOS(0) )
+	// 1: BIOS-String: 40-0100-001437-001001111-080893-4386-0 / Release 10/01/93.
+	ROM_SYSTEM_BIOS(1, "m326r53", "PC-Chips M326 Rev. 5.3")
+	ROMX_LOAD( "m326_rev.5.3.bin", 0x10000, 0x10000, CRC(6c156064) SHA1(362ce5a2333641083706a878b807ab87537ca1e6), ROM_BIOS(1) )
+ROM_END
 
 // CX Technology, Inc. Model SXD (4x SIMM, 4x 16-bit ISA)
 // SARC RC2016A5; HM6818P; CX109; LT38C41 © Lance Corp. (keyboard controller?)
@@ -2038,6 +2056,9 @@ ROM_START( pcd3nsx )
 ROM_END
 
 // Toshiba T2000SX
+// 1MB RAM on board, up to 9MB with 2MB, 4MB or 8MB expansion cards - 16 level grayscale VGA 640x480 display, PVGA1F display controller, 256KB VRAM
+// Super integration (SI), components: DMAC 82C37Ax2, PIC 82C59Ax2, PIT 82C54, FDC TC8565, SIO TC8570 - 80C42 and 80C50 for keyboard - RTC 146818AF
+// 128KB ROM, 32KB Backup RAM - GA-SYS CNT System control gate array - GA-IO CNT I/O gate array
 ROM_START( t2000sx )
 	ROM_REGION( 0x20000, "bios", 0 )
 	ROM_LOAD( "014d.ic9", 0x00000, 0x20000, CRC(e9010b02) SHA1(75688fc8e222640fa22bcc90343c6966fe0da87f))
@@ -2074,7 +2095,7 @@ ROM_END
 
 ROM_START( at486 )
 	ROM_REGION(0x20000, "bios", 0)
-	// 0: BIOS-String: 30-0500-ZZ1130-00101111-070791-1219-0
+	// 0: BIOS-String: 30-0500-ZZ1130-00101111-070791-1219-0 /PAI JUNG ELECTRONIC IND. CO., LTD.
 	ROM_SYSTEM_BIOS(0, "at486", "PC/AT 486")
 	ROMX_LOAD( "at486.bin",   0x10000, 0x10000, CRC(31214616) SHA1(51b41fa44d92151025fc9ad06e518e906935e689), ROM_BIOS(0))
 	// 1: BIOS-String: 40-0100-009999-11101111-070791-UMC480A-0 / United Microelectronics Corporation (UMC) MG-48602
@@ -2154,6 +2175,17 @@ ROM_END
 //  80486 motherboard
 //**************************************************************************
 
+// PC-Chips M919 - this motherboard showcased the issues that gave PC-Chips its bad name, it was available with fake cache, a proprietary cache socket or with fully operational cache
+// Chipset: UMC UM8881F/9714-EYS and UM8886BF/9652-FXS (V3.4B/F), UMC UM8886BF/9618-FXS and UM8881F/9622-EYS (Rev. 1.5)
+// http://th2chips.freeservers.com/m919/ this mentions that the BIOS requires a flashable chip
+ROM_START( pccm919 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "m919v1", "PC-Chips M919 v1")
+	ROMX_LOAD( "9190914s.rom", 0x00000, 0x20000, CRC(bb18ff2d) SHA1(530d13df21f2d483ec0dddda44fb4fe7e29ec040), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "m919v2", "PC-Chips M919 v2")
+	ROMX_LOAD( "9191016s.rom", 0x00000, 0x20000, CRC(2a2125a6) SHA1(753061ae6f80c0ca42d1af91aada657910feae18), ROM_BIOS(1))
+ROM_END
+
 // J-Bond A433C-C/A450C-C (8 SIMM, 2 8-bit ISA, 6 16-bit ISA)
 // ETEQ ET82C491 + ET82C493; CHIPS P82C206; AMI KB-BIOS-VER-F P8042AHP
 ROM_START( a433cc )
@@ -2205,7 +2237,7 @@ ROM_START( a486sp3g )
 ROM_END
 
 // ASUS PCI/I-A486S (4 SIMM, 1 EISA)
-// SiS chipset; SMC I/O; AMIKEY-2
+// SiS 85C496/85C497 chipset; SMC 37C665 I/O; AMIKEY-2, S3 Trio 64 on board VGA, the manual also mentions Trio 32
 ROM_START( aa486s )
 	ROM_REGION(0x20000, "bios", 0)
 	// 0: BIOS-String: 05/22/95/SiS-496-497B-PCI-A486-0-00 / #401A0-0203
@@ -2306,6 +2338,7 @@ ROM_START( pcd4x )
 	ROM_SYSTEM_BIOS(0, "d756v320r316", "D756 BIOS V3.20 R3.16")
 	ROMX_LOAD( "fts_biosupdated756noflashbiosepromv320_320316_149.bin", 0x00000, 0x20000, CRC(2ab60725) SHA1(333b64424c08ecbbaf47110c99ad0335da211489), ROM_BIOS(0) )
 	// D674, was used in PCD-4M, PCD-4Msx, PCD-4RSXA/4RA
+	// LSI HT342-B-07 or Headland HT342-BUIB and another LSI chip
 	ROM_SYSTEM_BIOS(1, "d674v320r316", "D674 BIOS V3.20 R3.16")
 	ROMX_LOAD( "fts_biosupdated674noflashbiosepromv320_320316_144.bin", 0x00000, 0x20000, CRC(1293d27c) SHA1(22f36c4a5a0912011ed54ff917244f412208ffc0), ROM_BIOS(1) )
 	// D802, was used in PCD-4HVL
@@ -2328,6 +2361,8 @@ ROM_START( pcd4nl )
 ROM_END
 
 // Siemens-Nixdorf PCD-4ND 486 notebook - display remains blank
+// Graphics chip: WDC WD90C24A-ZZ on VESA Local Bus, 4MB on mainboard, 4MB/8MB/16MB on CF card like RAM modules
+// CPU: Intel 486 SX, 486DX2, 486DX4-75 or -100,  128KB Flash-Eprom for system and video BIOS, ESS688 soundchip
 ROM_START( pcd4nd )
 	ROM_REGION( 0x20000, "bios", 0 )
 	ROM_SYSTEM_BIOS(0, "pcd4ndno1", "pcd4ndno1")
@@ -2420,6 +2455,9 @@ COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_at
 COMP( 1994, ficvipio,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO", MACHINE_NOT_WORKING )
 COMP( 199?, ficvipio2, ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO2", MACHINE_NOT_WORKING )
 COMP( 199?, hot409,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-409", MACHINE_NOT_WORKING )
+COMP( 199?, pccm321,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "PC-Chips", "M321", MACHINE_NOT_WORKING )
+COMP( 199?, pccm326,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "PC-Chips", "M326", MACHINE_NOT_WORKING )
+COMP( 199?, pccm919,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "PC-Chips", "M919", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
 COMP( 1992, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING ) // Complains about missing mouse hardware
