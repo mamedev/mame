@@ -40,6 +40,14 @@ void cps3_sound_device::device_start()
 {
 	/* Allocate the stream */
 	m_stream = stream_alloc(0, 2, clock() / 384);
+
+	save_item(NAME(m_key));
+	for (int i = 0; i < 16; i++)
+	{
+		save_item(NAME(m_voice[i].regs), i);
+		save_item(NAME(m_voice[i].pos), i);
+		save_item(NAME(m_voice[i].frac), i);
+	}
 }
 
 
