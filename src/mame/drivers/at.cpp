@@ -1740,7 +1740,10 @@ ROM_START( mbc28 )
 	ROM_LOAD16_BYTE( "mbc-28_sl-dt_ver.1620_high_din_checksum,45ae00,27c256-15.bin", 0x10001, 0x8000, CRC(557b7346) SHA1(c0dca88627f8451211172441fefb4020839fb87f) )
 ROM_END
 
-// Siemens PCD-2
+// Siemens PCD-2 - Harddisk: NEC D5126
+// CPU card W26361-D458-Z4-06-05, Piggyback MFM controller with WDC WD42C22A-JU PROTO chip W26361-D477-Z2-04-05
+// Chips: Intel N82230-2, Intel N82231-2, WDC WD37C65BJM, VLSI 8831AM/X12012/VL16C452-QC
+// VGA card: S26361-D463 GS3 using a Video Seven 458-0023
 	// ROM_LOAD( "vga_nmc27c256q_435-0029-04_1988_video7_arrow.bin", 0x8000, 0x0800, CRC(0d8d7dff) SHA(cb5b2ab78d480ec3164d16c9c75f1449fa81a0e7) ) // Video7 VGA card
 	// ROM_LOAD( "vga_nmc27c256q_435-0030-04_1988_video7_arrow.bin", 0x8000, 0x0800, CRC(0935c003) SHA(35ac571818f616b856da8bbf6a7a9172f68b3ab6) )
 ROM_START( pcd2 )
@@ -1752,7 +1755,9 @@ ROM_START( pcd2 )
 	ROM_LOAD( "kbd_8742_award_upi_1.61_rev_1.01.bin", 0x000, 0x800, CRC(bb8a1979) SHA1(43d35ecf76e5e8d5ddf6c32b0f6f628a7542d6e4) ) // 8742 keyboard controller
 ROM_END
 
-// Compaq SLT/286 - complains about "102 - System board failure"
+// Compaq SLT/286 - complains about "102 - System board failure" - CPU: Harris CS80C286-12
+// Chips: Dallas DS1287, Compaq 109778-001/4758, Bt478KPJ35, S8852C4/DP8473V, Fujitsu 8904 Q16/109445-001, Fujitsu 8850 W00/109444-002, Compaq 19034/8846KK/10452-002
+// NS16C450V, Fujitsu 8850 W73/110110-001
 ROM_START( comslt286 )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "compaq_slt286-bios-revision_j.2-even.bin", 0x10000, 0x8000, CRC(77e894e0) SHA1(e935e62e203ec67eaab198c15a36cc0078fd35b0))
@@ -1948,32 +1953,40 @@ ROM_START( at386 )
 	ROM_SYSTEM_BIOS(6, "ami2939", "AMI2939") // no display
 	ROMX_LOAD( "ami2939e.rom", 0x10000, 0x8000, CRC(65cbbd32) SHA1(d7d26b496f8e86f01722ad9f171a68f9fcdc477c), ROM_SKIP(1) | ROM_BIOS(6) )
 	ROMX_LOAD( "ami2939o.rom", 0x10001, 0x8000, CRC(8db6e739) SHA1(cdd47709d6036fad4be40c15bff41752d831d4b8), ROM_SKIP(1) | ROM_BIOS(6) )
-	// 8: BIOS-String: 30-0200-DH1102-00101111-070791-ETEQ386-0 / REV C3
-	ROM_SYSTEM_BIOS(7, "sy19i", "Soyo SY-19I")
-	ROMX_LOAD( "ami_soyo_sy-19i.bin", 0x10000, 0x10000, CRC(369a040f) SHA1(3dbcbcb8b8a50717cae3b17f44ca1b7c394b75fc), ROM_BIOS(7) )
-	// 9: NCR 386 slot CPU - Upgrade card for e.g. NCR PC-8 - set graphics card to CGA to see a "Timer One Error" message
-	ROM_SYSTEM_BIOS(8, "ncr386", "NCR 386 CPU card")
-	ROMX_LOAD( "ncr_386_card_04152_u44_ver5.0.bin", 0x10000, 0x10000, CRC(80e44318) SHA1(54e1d4d646a577c53c65b2292b383ed6d91b65b2), ROM_BIOS(8))
+	// 7: NCR 386 slot CPU - Upgrade card for e.g. NCR PC-8 - set graphics card to CGA to see a "Timer One Error" message
+	ROM_SYSTEM_BIOS(7, "ncr386", "NCR 386 CPU card")
+	ROMX_LOAD( "ncr_386_card_04152_u44_ver5.0.bin", 0x10000, 0x10000, CRC(80e44318) SHA1(54e1d4d646a577c53c65b2292b383ed6d91b65b2), ROM_BIOS(7))
 	// ROM_LOAD ("ncr_386_card_keyboard_04181_u27_ver5.6.bin", 0x0000, 0x800, CRC(6c9004e7) SHA1(0fe77f47ff77333d1ff9bfcf8d6d92193ab1f208))
-	// 10: BIOS-String: Phoenix 80386 ROM BIOS PLUS Version 1.10 22
-	ROM_SYSTEM_BIOS(9, "cbm386", "Commodore 386")
-	ROMX_LOAD( "cbm-386-bios-lo-v1.022e-8100.bin", 0x10000, 0x8000, CRC(a054a1b8) SHA1(d952b02cc10534325c1c5aaa8b6dfb77bc20a179), ROM_SKIP(1) | ROM_BIOS(9))
-	ROMX_LOAD( "cbm-386-bios-hi-v1.022e-d100.bin", 0x10001, 0x8000, CRC(b9541f3d) SHA1(e37c704521e85b07369d21b0521f4d1871c318dd), ROM_SKIP(1) | ROM_BIOS(9))
-	// 11: flashing "K/B controller incorrect"
-	ROM_SYSTEM_BIOS(10, "gmb386sat", "GMB-386SAT_V1.0")
-	ROMX_LOAD( "gmb-386sat_v1.0.bin", 0x10000, 0x10000, CRC(59ecc773) SHA1(f2007fce76b3a91f51bfb5f43c1539d5ae06d35f), ROM_BIOS(10))
-	// 12: BIOS-String: X0-0100-000000-00101111-060692-RC2018A-0 / Ver 1.4b / Texas Instruments 486 DLC [S3Q]
-	ROM_SYSTEM_BIOS(11, "ti486dlc", "TI 486DLC") // board is equipped with a TI486DLC
-	ROMX_LOAD( "ti_486dlc_rev.s3q.bin", 0x10000, 0x10000, CRC(39b150ed) SHA1(5fc96c6232dd3a066349d8e707e938af55893297), ROM_BIOS(11))
-	// 13: BIOS-String: 40-0400-001107-00101111-111192-U4800VLX-0 / UNICHIP BIOS VER 2.0A 09/27/1993
-	ROM_SYSTEM_BIOS(12, "386bw367", "386BW367 Rev. 1.0")
-	ROMX_LOAD( "unichip_386bw_367_rev_1.0.bin", 0x10000, 0x10000, CRC(7922a8f9) SHA1(785008e10edfd393dc39e921a12d1a07a14bac25), ROM_BIOS(12))
+	// 8: BIOS-String: Phoenix 80386 ROM BIOS PLUS Version 1.10 22
+	ROM_SYSTEM_BIOS(8, "cbm386", "Commodore 386")
+	ROMX_LOAD( "cbm-386-bios-lo-v1.022e-8100.bin", 0x10000, 0x8000, CRC(a054a1b8) SHA1(d952b02cc10534325c1c5aaa8b6dfb77bc20a179), ROM_SKIP(1) | ROM_BIOS(8))
+	ROMX_LOAD( "cbm-386-bios-hi-v1.022e-d100.bin", 0x10001, 0x8000, CRC(b9541f3d) SHA1(e37c704521e85b07369d21b0521f4d1871c318dd), ROM_SKIP(1) | ROM_BIOS(8))
+	// 9: flashing "K/B controller incorrect"
+	ROM_SYSTEM_BIOS(9, "gmb386sat", "GMB-386SAT_V1.0")
+	ROMX_LOAD( "gmb-386sat_v1.0.bin", 0x10000, 0x10000, CRC(59ecc773) SHA1(f2007fce76b3a91f51bfb5f43c1539d5ae06d35f), ROM_BIOS(9))
+	// 10: BIOS-String: X0-0100-000000-00101111-060692-RC2018A-0 / Ver 1.4b / Texas Instruments 486 DLC [S3Q]
+	ROM_SYSTEM_BIOS(10, "ti486dlc", "TI 486DLC") // board is equipped with a TI486DLC
+	ROMX_LOAD( "ti_486dlc_rev.s3q.bin", 0x10000, 0x10000, CRC(39b150ed) SHA1(5fc96c6232dd3a066349d8e707e938af55893297), ROM_BIOS(10))
+	// 11: BIOS-String: 40-0400-001107-00101111-111192-U4800VLX-0 / UNICHIP BIOS VER 2.0A 09/27/1993
+	ROM_SYSTEM_BIOS(11, "386bw367", "386BW367 Rev. 1.0")
+	ROMX_LOAD( "unichip_386bw_367_rev_1.0.bin", 0x10000, 0x10000, CRC(7922a8f9) SHA1(785008e10edfd393dc39e921a12d1a07a14bac25), ROM_BIOS(11))
+	// 12: BIOS-String:
+	// Chipset: Ali M1429 A1 and M1431 A2, doesn't boot
+	ROM_SYSTEM_BIOS(12, "386ali", "386 board with Ali chipset")
+	ROMX_LOAD( "386_ali_ami_511767.bin", 0x10000, 0x10000, CRC(3c218db4) SHA1(785ea7c36e8be5e7410524e90170d4985cbc9c24), ROM_BIOS(12))
 ROM_END
 
 
 //**************************************************************************
 //  80386 SX and DX motherboard
 //**************************************************************************
+
+// Soyo SY-019H and SY-019I BIOS-String: 30-0200-DH1102-00101111-070791-ETEQ386-0 / REV C3
+// Chipset: SIS 85C206, ETEQ ET82C493, ET82C491
+ROM_START ( sy019hi )
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_LOAD( "ami_soyo_sy-19i.bin", 0x10000, 0x10000, CRC(369a040f) SHA1(3dbcbcb8b8a50717cae3b17f44ca1b7c394b75fc))
+ROM_END
 
 // PC-Chips M321
 // Chipset: PCChips C206/306, CHIP6/4L04F1666, CHIP5/4L04F1282 (rev. 2.3 and 2.7 boards)
@@ -2470,6 +2483,7 @@ COMP( 199?, hot409,    ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, pccm321,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "PC-Chips", "M321", MACHINE_NOT_WORKING )
 COMP( 199?, pccm326,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "PC-Chips", "M326", MACHINE_NOT_WORKING )
 COMP( 199?, pccm919,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "PC-Chips", "M919", MACHINE_NOT_WORKING )
+COMP( 199?, sy019hi,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Soyo", "SY-019H and SY-019I", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
 COMP( 1992, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING ) // Complains about missing mouse hardware
