@@ -973,7 +973,7 @@ static const uint8_t a2_key_remap[0x32][4] =
 	{ 0x55,0x55,0x15,0x15 },    /* u U     10     */
 	{ 0x49,0x49,0x09,0x09 },    /* i I     11     */
 	{ 0x4f,0x4f,0x0f,0x0f },    /* o O     12     */
-	{ 0x50,0x40,0x10,0x40 },    /* p P     13     */
+	{ 0x50,0x40,0x10,0x00 },    /* p P     13     */
 	{ 0x44,0x44,0x04,0x04 },    /* d D     14     */
 	{ 0x46,0x46,0x06,0x06 },    /* f F     15     */
 	{ 0x47,0x47,0x07,0x07 },    /* g G     16     */
@@ -1017,12 +1017,8 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
 		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
 
 		m_transchar = a2_key_remap[m_lastchar&0x3f][mod];
-
-		if (m_transchar != 0)
-		{
-			m_strobe = 0x80;
-//          printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
-		}
+		m_strobe = 0x80;
+//      printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
 	}
 }
 
