@@ -84,6 +84,7 @@ const double XTAL::known_xtals[] = {
 	  3'000'000, /* 3_MHz_XTAL             Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
 	  3'072'000, /* 3.072_MHz_XTAL         INS 8520 input clock rate */
 	  3'120'000, /* 3.12_MHz_XTAL          SP0250 clock on Gottlieb games */
+	  3'276'800, /* 3.2768_MHz_XTAL        SP0256 clock in Speech Synthesis for Dragon 32 */
 	  3'521'280, /* 3.52128_MHz_XTAL       RCA COSMAC VIP */
 	  3'570'000, /* 3.57_MHz_XTAL          Telmac TMC-600 */
 	  3'578'640, /* 3.57864_MHz_XTAL       Atari Portfolio PCD3311T */

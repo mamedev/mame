@@ -23,6 +23,7 @@
 #include "bus/coco/dragon_amtor.h"
 #include "bus/coco/dragon_fdc.h"
 #include "bus/coco/dragon_jcbsnd.h"
+#include "bus/coco/dragon_jcbspch.h"
 #include "bus/coco/dragon_sprites.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_ssc.h"
@@ -172,6 +173,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("premier_fdc", PREMIER_FDC);
 	device.option_add("sdtandy_fdc", SDTANDY_FDC);
 	device.option_add("jcbsnd", DRAGON_JCBSND);
+	device.option_add("jcbspch", DRAGON_JCBSPCH);
 	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("orch90", COCO_ORCH90);
@@ -240,6 +242,7 @@ void dragon_state::dragon_base(machine_config &config)
 
 	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
 	m_sam->res_rd_callback().set(FUNC(dragon_state::sam_read));
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);

@@ -3093,6 +3093,8 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.h",
+		MAME_DIR .. "src/devices/bus/coco/dragon_jcbspch.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_jcbspch.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_sprites.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_sprites.h",
 	}
