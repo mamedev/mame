@@ -4651,7 +4651,9 @@ ROM_END
 //  Altered Beast, Sega System 16B
 //  CPU: 68000 + i8751 (317-0076)
 //  ROM Board type: 171-5521
-//  Sega ID# for ROM board: 834-6661-08
+//  Sega game ID: 833-6660-08 ALTERED BEAST
+//    Main board: 837-6662-06
+//     ROM board: 834-6661-08
 //
 ROM_START( altbeast6 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -7030,7 +7032,8 @@ ROM_END
 //  Golden Axe (Japan), Sega System 16B
 //  CPU: 68000 + i8751 (317-0112)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-7002-02
+//  Sega game ID: 833-7001-02 GOLDEN AXE
+//     ROM board: 834-7002-02
 //
 ROM_START( goldnaxe2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -8466,7 +8469,9 @@ ROM_END
 //  Tetris, Sega System 16B
 //  CPU: FD1094 (317-0092)
 //  ROM Board type: 171-5704
-//       ROM board: 834-6891-02
+//  Main board: 837-6892-01
+// Game Number: 833-6890-02 TETRIS
+//   ROM board: 834-6891-02
 //
 ROM_START( tetris2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
