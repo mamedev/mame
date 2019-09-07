@@ -1824,6 +1824,8 @@ ROM_END
 //**************************************************************************
 
 // Compaq Portable II
+// Chips: Intel D8742, SN76LS612N, 2x NEC D8237AC-5, 2xIntel P8259A-2, MC146818AP, Intel P8254
+// Enhanced Color Graphics board: Chips P82C431, P82C434A
 ROM_START( comportii )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0,"105620-001", "Ver. D (105620/105622)")
@@ -1838,6 +1840,8 @@ ROM_START( comportii )
 ROM_END
 
 // Compaq Portable III
+// Chipset: Fujitsu MB672318, MB672316U, 2x Intel P8237A-5, Compaq 8731KX 104111-002, Intel 8272A, 2xAMD P8259A, Graphics: M77H010
+// MC146818P, Intel D8742, Fujitsu MB672322
 ROM_START( comportiii )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "106779-002", "106779-002")
@@ -1850,6 +1854,7 @@ ROM_START( comportiii )
 ROM_END
 
 // Nixdorf 8810 M15 Laptop - PC07 - boot from harddisk doesn't work
+// Chipset: Faraday FE3020, FE3000A, FE3010EB, FE3030, NEC D65013GF280, Toshiba TC8566AF, MC146818A, NEC D65013GF328, D65013GF371, D65013GF356, NS16C450V, Yamaha V6366C-F, MEI DA7116AFPBW
 ROM_START( n8810m15 )
 	// ROM_LOAD("charagene_v1.1_daft2c2.bin", 0x00000, 0x4000, CRC(dd324efd) SHA1(67fd91277733596bfad8506dc92d9f776e563dda)) // CGA chargen
 
@@ -1859,6 +1864,7 @@ ROM_START( n8810m15 )
 ROM_END
 
 // Nixdorf 8810 M16 Laptop - PC17 - CGA version - boot from harddisk doesn't work
+// Chipset: Chips P82xxxx, Chips P82C211-12, P82C215, P82C212B-12, MX9007G/MX1 16C4522QC, WD37C65BJM, Yamaha V6366C-F
 ROM_START( n8810m16c )
 	// ROM_LOAD("201cg rev 1.0.u78", 0x00000, 0x4000, CRC(3e31143b) SHA1(489da357e0ab8a469a3fb81cce160637486c87bc)) // CGA chargen
 	ROM_REGION(0x20000, "bios", 0 )
@@ -1869,6 +1875,7 @@ ROM_START( n8810m16c )
 ROM_END
 
 // Nixdorf 8810 M16 Laptop - PC17 - VGA version - boot from harddisk doesn't work
+// Chipset: MX8945G/MX16C4520C, Chps P82C212B-12, P82C215, P82C206, WD37C65BJM, P82C211-12, Chips F82C455, 
 ROM_START( n8810m16v )
 	// ROM_LOAD("8810m16vga_27c256_221vb_123g1.bin", 0x00000, 0x4000, CRC(3bc80739) SHA1(3d6d7fb01681eccbc0b560818654d5aa1e3c5230)) // C&T VGA BIOS for 82C455
 	ROM_REGION(0x20000, "bios", 0 )
