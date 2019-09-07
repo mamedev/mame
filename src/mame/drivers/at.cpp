@@ -1775,6 +1775,7 @@ ROM_START( ncrpc8 )
 	ROM_SYSTEM_BIOS(0, "pc8main", "NCR PC-8 mainboard") // large full size AT mainboard - Setup Version 2.3
 	ROMX_LOAD( "ncr_35117_u127_vers.4-2.bin", 0x10000, 0x8000, CRC(f4338669) SHA1(c1d6e714591c8d7ab966acfdbc3b463e06fbd073), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "ncr_35116_u113_vers.4-2.bin", 0x10001, 0x8000, CRC(b1b6a2e2) SHA1(5b2c0a2be59e064076ed757d84f61bf955ceca08), ROM_SKIP(1) | ROM_BIOS(0))
+	// Chips: NCR 006-3500404, NCR 006-3500447D, NCR 006-3500402PT, M5L8042-235P, SN76LS612N
 	ROM_SYSTEM_BIOS(1, "pc8card", "NCR PC-8 CPU card") // passive backplane and CPU card - Setup Version 2.1
 	ROMX_LOAD( "ncr_u127-30_v.4.bin", 0x10000, 0x8000, CRC(33121525) SHA1(11f8d8af4dad432f558c646d7d0ff23eb642a815), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "ncr_u113-27_v.4.bin", 0x10001, 0x8000, CRC(87424492) SHA1(5b7aba5678fe55c81fee2e07730b8ae03a23160f), ROM_SKIP(1) | ROM_BIOS(1))
@@ -1783,19 +1784,23 @@ ROM_START( ncrpc8 )
 ROM_END
 
 // Nixdorf 8810 M30
+// Chipset: Chips P82C211-12 P82C215, P82C212B-12, Zilog Z0853006VSC, L5A0757/NC-LSI56A-SCC1, Chips P82C604A, P82C206 H1
 ROM_START( n8810m30 )
 	ROM_REGION(0x20000, "bios", 0 )
 	ROM_LOAD( "at286bios_53889.00.0.17jr.bin", 0x00000, 0x20000, CRC(74870212) SHA1(adb3f379c9aeee6a5beb946d23af6eea706aca1d) )
 ROM_END
 
-// Nixdorf 8810 M55
+// Nixdorf 8810 M55 - Paradise PEGA 1A383048 piggybacked onto MFM/Floppy controller card
+// Chips: M5L8042-235P, NCR 006-3500402PT, 2xAMD AM9517A-5JC, NCR 006-3500447 D, NCR 006-3500404
 ROM_START( n8810m55 )
 	ROM_REGION(0x20000, "bios", 0 )
 	ROM_LOAD16_BYTE( "150-3872_u113_27_4.5.1.bin", 0x10001, 0x8000, CRC(35ff4fba) SHA1(557f0f98c27af76f6fa6990592e7150f5fc1fc02))
 	ROM_LOAD16_BYTE( "150-3873_u127_30_4.5.1.bin", 0x10000, 0x8000, CRC(5a7e6643) SHA1(f3890919a772eead7232bd227b2c8677377f6e24))
 ROM_END
 
-// Olivetti M290 - has an Olivetti branded Paradise VGA - locks up with "Error 2" and a key symbol
+// Olivetti M290 - has an Olivetti branded Paradise PVGA1A-JK VGA card - locks up with "Error 2" and a key symbol
+// Chipset: Olivetti GA099-B/28927F74AT, Olivetti GA098-B 28909F74AS, TI TACT82206FN, Olivetti 8920K5
+// Floppy/IDE card: WD37C65BJM, NS16C450V
 ROM_START( m290 )
 	ROM_REGION( 0x20000, "bios", 0 )
 	ROM_LOAD( "m290_pep3_1.25.bin", 0x10000, 0x10000, CRC(cb57d677) SHA1(4bdf5c52567c129b413c866c63b5fb3562fccd23))
