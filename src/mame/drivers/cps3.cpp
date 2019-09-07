@@ -23,6 +23,8 @@ Sprite-list caching (presumable)
     Warzard 2p mode, at next screen after characters select,
     if holding player's button to speed up sequence - player's sprites will be distorted.
 
+Whole screen flip not emulated
+
 Miscellaneous TO-DOs:
 
 DMA ack IRQ10 generation:
@@ -30,7 +32,7 @@ DMA ack IRQ10 generation:
 
 Alpha Blending Effects
     These are actually palette manipulation effects, not true blending.
-	Verify them, current emulation might not be 100% accurate.
+    Verify them, current emulation might not be 100% accurate.
 
 Tilemap Linezoom
     Seems unused in games. May be enabled in jojo/jojoba dev.menu BG test (P2 btn4)
