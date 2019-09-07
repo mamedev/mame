@@ -76,23 +76,23 @@ void apple2_joyport_device::device_start()
 
 READ_LINE_MEMBER(apple2_joyport_device::sw0_r)
 {
-	u8 port_read = m_an1 ? m_player2->read() : m_player1->read();
+	u8 port_read = m_an0 ? m_player2->read() : m_player1->read();
 
 	return BIT(port_read, 4);
 }
 
 READ_LINE_MEMBER(apple2_joyport_device::sw1_r)
 {
-	u8 port_read = m_an1 ? m_player2->read() : m_player1->read();
+	u8 port_read = m_an0 ? m_player2->read() : m_player1->read();
 
-	return m_an0 ? BIT(port_read, 0) : BIT(port_read, 3);
+	return m_an1 ? BIT(port_read, 0) : BIT(port_read, 3);
 }
 
 READ_LINE_MEMBER(apple2_joyport_device::sw2_r)
 {
-	u8 port_read = m_an1 ? m_player2->read() : m_player1->read();
+	u8 port_read = m_an0 ? m_player2->read() : m_player1->read();
 
-	return m_an0 ? BIT(port_read, 2) : BIT(port_read, 1);
+	return m_an1 ? BIT(port_read, 2) : BIT(port_read, 1);
 }
 
 WRITE_LINE_MEMBER(apple2_joyport_device::an0_w)
