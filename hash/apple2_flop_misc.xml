@@ -6603,4 +6603,25 @@
 		</part>
 	</software>
 
+	<software name="olemerld">
+		<description>Olin in Emerald</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-09-06"/>
+		<!-- Disk has no protection. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="olin in emerald side a.dsk" size="143360" crc="1e07e946" sha1="783946988a3fac037c341f93e98c117a40a444b8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="olin in emerald side b.dsk" size="143360" crc="6ac6e17b" sha1="5c627639573653632ce47b6c9a6bde213eb62470" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

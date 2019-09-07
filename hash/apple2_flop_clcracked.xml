@@ -35235,4 +35235,24 @@
 		</part>
 	</software>
 
+	<software name="istarflt1">
+		<description>Star Fleet 1: The War Begins (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Interstel</publisher>
+		<info name="release" value="2019-09-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star fleet i side a (san inc crack).dsk" size="143360" crc="c2befd2f" sha1="5f1bcbf6d20da209e356d2bcf9114bde9611673f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star fleet i side b (san inc crack).dsk" size="143360" crc="e570fc3b" sha1="9f884be8b09b08e2afab66d92f619f6718de2c10" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
