@@ -233,8 +233,57 @@ void i8251_device::sync2_rxc()
 	if (m_syndet_pin && !m_ext_syn_set)
 		return;
 
-	// remainder yet to be written
-	(void)m_sync2;
+	u8 need_parity = BIT(m_mode_byte, 4);
+
+	// see about parity
+	if (need_parity && (m_rxd_bits == m_data_bits_count))
+	{
+		if (calc_parity(m_sync1) != m_rxd)
+			m_status |= I8251_STATUS_PARITY_ERROR;
+		// and then continue on as if everything was ok
+	}
+	else
+	{
+		// add bit to byte
+		m_sync1 = (m_sync1 >> 1) | (m_rxd << (m_data_bits_count-1));
+		m_sync2 = (m_sync2 >> 1) | (m_rxd << (m_data_bits_count*2-1));
+	}
+
+	// if we are in hunt mode, the byte loaded has to
+	// be the sync byte. If not, go around again.
+	// if we leave hunt mode now, the sync byte must not go to the receive buffer
+	bool was_in_hunt_mode = false;
+	if (m_hunt_on)
+	{
+		if (m_sync2 == m_sync16)
+		{
+			m_rxd_bits = m_data_bits_count;
+			m_hunt_on = false;
+			was_in_hunt_mode = true;
+		}
+		else
+			return;
+	}
+
+	// is byte complete? if not, quit
+	m_rxd_bits++;
+	if (m_rxd_bits < (m_data_bits_count + need_parity))
+		return;
+
+	// now we have a synchronised byte, and parity has been dealt with
+
+	// copy byte to rx buffer
+	if (!was_in_hunt_mode)
+		receive_character(m_sync1);
+
+	// Is it a sync byte? syndet gets indicated whenever
+	// a sync byte passes by, regardless of hunt_mode status.
+	if (m_sync2 == m_sync16)
+		update_syndet(true);
+
+	m_rxd_bits = 0;
+	m_sync1 = 0;
+	m_sync2 = 0;
 }
 
 /*-------------------------------------------------
