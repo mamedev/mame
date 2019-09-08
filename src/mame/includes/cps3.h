@@ -110,6 +110,7 @@ private:
 	std::unique_ptr<u32[]> m_char_ram;
 	std::unique_ptr<u32[]> m_eeprom;
 	std::unique_ptr<u8[]>  m_ss_ram;
+	std::unique_ptr<u32[]> m_spritelist;
 	u32 m_ppu_gscroll[0x20/4];
 	s16 m_ss_hscroll;
 	s16 m_ss_vscroll;
@@ -123,6 +124,7 @@ private:
 	u32 m_key2;
 	int m_altEncryption;
 	u16 m_dma_status;
+	u16 m_spritelist_dma;
 	u32 m_cram_bank;
 	u16 m_current_eeprom_read;
 	u32 m_paldma_source;
@@ -163,6 +165,7 @@ private:
 	DECLARE_READ16_MEMBER(colourram_r);
 	DECLARE_WRITE16_MEMBER(colourram_w);
 	DECLARE_WRITE16_MEMBER(outport_w);
+	DECLARE_WRITE16_MEMBER(spritedma_w);
 	SH2_DMA_KLUDGE_CB(dma_callback);
 	void draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
