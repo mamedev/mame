@@ -74,7 +74,7 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 void sgi_mc_device::device_resolve_objects()
 {
 	m_int_dma_done_cb.resolve_safe();
-	m_eisa_present.resolve_safe();
+	m_eisa_present.resolve_safe(true);
 }
 
 //-------------------------------------------------

@@ -70,7 +70,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	devcb_write_line m_int_dma_done_cb;
-	devcb_write_line m_eisa_present;
+	devcb_read_line m_eisa_present;
 
 	address_space *m_space;
 
