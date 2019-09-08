@@ -3644,10 +3644,10 @@ void hp9845_base_state::ppu_io_map(address_map &map)
 	map(HP_MAKE_IOADDR(GVIDEO_PA, 0), HP_MAKE_IOADDR(GVIDEO_PA, 3)).rw(FUNC(hp9845_base_state::graphic_r), FUNC(hp9845_base_state::graphic_w));
 	// PA = 14, IC = 0..3
 	// Left-hand side tape drive (T14)
-	map(HP_MAKE_IOADDR(T14_PA, 0), HP_MAKE_IOADDR(T14_PA, 3)).rw(m_t14, FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
+	map(HP_MAKE_IOADDR(T14_PA, 0), HP_MAKE_IOADDR(T14_PA, 3)).rw(m_t14, FUNC(hp_new_taco_device::reg_r), FUNC(hp_new_taco_device::reg_w));
 	// PA = 15, IC = 0..3
 	// Right-hand side tape drive (T15)
-	map(HP_MAKE_IOADDR(T15_PA, 0), HP_MAKE_IOADDR(T15_PA, 3)).rw(m_t15, FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
+	map(HP_MAKE_IOADDR(T15_PA, 0), HP_MAKE_IOADDR(T15_PA, 3)).rw(m_t15, FUNC(hp_new_taco_device::reg_r), FUNC(hp_new_taco_device::reg_w));
 }
 
 void hp9845_base_state::hp9845_base(machine_config &config)
@@ -3688,11 +3688,11 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	TIMER(config, m_beep_timer).configure_generic(FUNC(hp9845_base_state::beeper_off));
 
 	// Tape drives
-	HP_TACO(config , m_t15 , 4000000);
+	HP_NEW_TACO(config , m_t15 , 4000000);
 	m_t15->irq().set([this](int state) { m_io_sys->set_irq(T15_PA , state); });
 	m_t15->flg().set([this](int state) { m_io_sys->set_flg(T15_PA , state); });
 	m_t15->sts().set([this](int state) { m_io_sys->set_sts(T15_PA , state); });
-	HP_TACO(config , m_t14 , 4000000);
+	HP_NEW_TACO(config , m_t14 , 4000000);
 	m_t14->irq().set([this](int state) { m_io_sys->set_irq(T14_PA , state); });
 	m_t14->flg().set([this](int state) { m_io_sys->set_flg(T14_PA , state); });
 	m_t14->sts().set([this](int state) { m_io_sys->set_sts(T14_PA , state); });

@@ -11,7 +11,8 @@
 #include "imageutl.h"
 
 
-static constexpr uint32_t FILE_MAGIC =  0x5441434f;      // Magic value at start of image file: "TACO"
+static constexpr uint32_t OLD_FILE_MAGIC = 0x5441434f;  // Magic value at start of old-format image file: "TACO"
+static constexpr uint32_t FILE_MAGIC = 0x48544930;  // Magic value at start of image file: "HTI0"
 
 // *** Position of tape holes ***
 // At beginning of tape:
@@ -40,6 +41,7 @@ static const hti_format_t::tape_pos_t tape_holes[] = {
 };
 
 hti_format_t::hti_format_t()
+	: m_bits_per_word(16)
 {
 	clear_tape();
 }
@@ -49,14 +51,15 @@ bool hti_format_t::load_tape(io_generic *io)
 	uint8_t tmp[ 4 ];
 
 	io_generic_read(io, tmp, 0, 4);
-	if (pick_integer_be(tmp , 0 , 4) != FILE_MAGIC) {
+	auto magic = pick_integer_be(tmp , 0 , 4);
+	if (magic != FILE_MAGIC && magic != OLD_FILE_MAGIC) {
 		return false;
 	}
 
 	uint64_t offset = 4;
 
 	for (tape_track_t& track : m_tracks) {
-		if (!load_track(io , offset , track)) {
+		if (!load_track(io , offset , track , magic == OLD_FILE_MAGIC)) {
 			clear_tape();
 			return false;
 		}
@@ -114,7 +117,7 @@ hti_format_t::tape_pos_t hti_format_t::word_length(tape_word_t w)
 
 	zeros = 16 - ones;
 
-	return zeros * ZERO_BIT_LEN + (ones + 1) * ONE_BIT_LEN;
+	return zeros * ZERO_BIT_LEN + ones * ONE_BIT_LEN;
 }
 
 hti_format_t::tape_pos_t hti_format_t::farthest_end(const track_iterator_t& it , bool forward)
@@ -187,7 +190,7 @@ void hti_format_t::write_word(unsigned track_no , tape_pos_t start , tape_word_t
 	// as the record expands & contracts when re-written with different content.
 	// Without this fix, a gap could form in the slack big enough to cause
 	// false gap detections.
-	if (forward && it_high != track.end() && (it_high->first - end_pos) >= (ZERO_BIT_LEN * 16 + ONE_BIT_LEN)) {
+	if (forward && it_high != track.end() && (it_high->first - end_pos) >= (ZERO_BIT_LEN * 16)) {
 		track.insert(it_high, std::make_pair(end_pos, 0));
 		it_high--;
 	}
@@ -264,6 +267,50 @@ hti_format_t::adv_res_t hti_format_t::adv_it(unsigned track_no , bool forward , 
 	}
 }
 
+bool hti_format_t::sync_with_record(unsigned track_no , track_iterator_t& it , unsigned& bit_idx)
+{
+	while ((it->second & (1U << bit_idx)) == 0) {
+		if (bit_idx) {
+			bit_idx--;
+		} else {
+			bit_idx = 15;
+			auto res = adv_it(track_no, true, it);
+			if (res != ADV_CONT_DATA) {
+				return false;
+			}
+		}
+	}
+	if (bit_idx) {
+		bit_idx--;
+	} else {
+		bit_idx = 15;
+	}
+	return true;
+}
+
+hti_format_t::adv_res_t hti_format_t::next_word(unsigned track_no , track_iterator_t& it , unsigned& bit_idx , tape_word_t& word)
+{
+	if (bit_idx == 15) {
+		auto res = adv_it(track_no, true, it);
+		if (res == ADV_NO_MORE_DATA) {
+			return res;
+		}
+		word = it->second;
+		return res;
+	} else {
+		word = it->second << (15 - bit_idx);
+		auto res = adv_it(track_no, true, it);
+		if (res == ADV_DISCONT_DATA) {
+			bit_idx = 15;
+			it--;
+		} else if (res == ADV_CONT_DATA) {
+			word |= (it->second >> (bit_idx + 1));
+		}
+
+		return res;
+	}
+}
+
 bool hti_format_t::next_gap(unsigned track_no , tape_pos_t& pos , bool forward , tape_pos_t min_gap)
 {
 	tape_track_t::iterator it;
@@ -323,10 +370,12 @@ bool hti_format_t::next_gap(unsigned track_no , tape_pos_t& pos , bool forward ,
 	return n_gaps == 0;
 }
 
-bool hti_format_t::load_track(io_generic *io , uint64_t& offset , tape_track_t& track)
+bool hti_format_t::load_track(io_generic *io , uint64_t& offset , tape_track_t& track , bool old_format)
 {
 	uint8_t tmp[ 4 ];
 	uint32_t tmp32;
+	tape_pos_t delta_pos = 0;
+	tape_pos_t last_word_end = 0;
 
 	track.clear();
 
@@ -350,7 +399,10 @@ bool hti_format_t::load_track(io_generic *io , uint64_t& offset , tape_track_t& 
 
 		tmp32 = pick_integer_le(tmp, 0, 4);
 
-		tape_pos_t pos = (tape_pos_t)tmp32;
+		tape_pos_t pos = (tape_pos_t)tmp32 + delta_pos;
+
+		tape_word_t word_accum = 0;
+		unsigned bits_in_accum = 0;
 
 		for (unsigned i = 0; i < n_words; i++) {
 			uint16_t tmp16;
@@ -359,8 +411,56 @@ bool hti_format_t::load_track(io_generic *io , uint64_t& offset , tape_track_t& 
 			offset += 2;
 			tmp16 = pick_integer_le(tmp, 0, 2);
 
-			track.insert(std::make_pair(pos , tmp16));
-			pos += word_length(tmp16);
+			if (!old_format) {
+				track.insert(std::make_pair(pos , tmp16));
+				pos += word_length(tmp16);
+			} else if (m_bits_per_word == 16) {
+				// Convert HP9845 & HP85 old format
+				// Basically, in old format each word had 17 bits (an implicit 1
+				// was added at the end). In new format we just keep the 16 bits
+				// and don't add the 17th bit.
+				if (i == 0 && tmp16 == 0 && (pos - last_word_end) > 16384) {
+					// This mysterious heuristic is meant to turn the first
+					// word of a record into a proper preamble word (from 0 to 1)
+					// provided this is actually at the beginning of a new record
+					// (enough distance from end of last record)
+					tmp16 = 1;
+				}
+				track.insert(std::make_pair(pos, tmp16));
+				pos += word_length(tmp16);
+				last_word_end = pos;
+				delta_pos -= ONE_BIT_LEN;
+			} else {
+				// Convert HP9825 old format
+				// In moving from old to new format we make the 17th bit at the
+				// end of each word explicit
+				word_accum |= (tmp16 >> bits_in_accum);
+				// Avoid storing overlapping words
+				if (pos >= last_word_end) {
+					track.insert(std::make_pair(pos, word_accum));
+				}
+				pos += word_length(word_accum);
+				last_word_end = pos;
+				if (bits_in_accum == 0) {
+					word_accum = 0;
+				} else {
+					word_accum = tmp16 << (16 - bits_in_accum);
+				}
+				word_accum |= (1U << (15 - bits_in_accum));
+				if (++bits_in_accum >= 16) {
+					track.insert(std::make_pair(pos, word_accum));
+					pos += word_length(word_accum);
+					last_word_end = pos;
+					word_accum = 0;
+					bits_in_accum = 0;
+				}
+			}
+		}
+		if (bits_in_accum) {
+			track.insert(std::make_pair(pos, word_accum));
+			tape_pos_t shift = (tape_pos_t)(16 - bits_in_accum) * ZERO_BIT_LEN;
+			delta_pos += shift;
+			last_word_end = pos + word_length(word_accum);
 		}
 	}
 }
