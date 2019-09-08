@@ -709,23 +709,17 @@ bool mc6845_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 
 	if (cursor_start_ras > max_ras_addr)
 	{
-		// No cursor possible.
+		// No cursor.
 		return false;
 	}
 
-	// See the 'apricot' boot screen, it probably expects no cursor.
 	// TODO explore the edge cases in the 'interlace and video' mode.
-	if (MODE_INTERLACE_AND_VIDEO && cursor_start_ras >= max_ras_addr)
-	{
-		// No cursor possible.
-		return false;
-	}
 
 	if (cursor_start_ras <= m_cursor_end_ras)
 	{
 		if (m_cursor_end_ras > max_ras_addr)
 		{
-			// Full cursor.
+			// Wraps to produce a full cursor.
 			return true;
 		}
 		// Cursor from start to end inclusive.
@@ -734,6 +728,32 @@ bool mc6845_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 
 	// Otherwise cursor_start_ras > m_cursor_end_ras giving a split cursor.
 	return (ra <= m_cursor_end_ras) || (ra >= cursor_start_ras);
+}
+
+// The HD6845 cursor does not wrap as it does for the MC6845.
+bool hd6845s_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
+{
+	if (!m_cursor_state)
+		return false;
+
+	if ((m_cursor_addr < line_addr) ||
+	    (m_cursor_addr >= (line_addr + m_horiz_disp)))
+	{
+		// Not a cursor character line.
+		return false;
+	}
+
+	uint16_t cursor_start_ras = m_cursor_start_ras & 0x1f;
+	uint16_t max_ras_addr = m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1;
+
+	if (cursor_start_ras > max_ras_addr || cursor_start_ras > m_cursor_end_ras)
+	{
+		// No cursor.
+		return false;
+	}
+
+	// Cursor from start to end inclusive.
+	return (ra >= cursor_start_ras) && (ra <= m_cursor_end_ras);
 }
 
 
