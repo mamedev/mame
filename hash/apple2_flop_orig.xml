@@ -7396,4 +7396,49 @@
 		</part>
 	</software>
 
+	<software name="smbprtwd">
+		<description>Super Mario Bros. Print World</description>
+		<year>1991</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="release" value="2019-09-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- The disk image is tagged as 64K ][+, but the box says 128K IIe/c/GS -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235451">
+				<rom name="super mario bros. print world side a.woz" size="235451" crc="03275984" sha1="24e3bc40e0ae968ce2f506d8ba339bf9a920d2c2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235451">
+				<rom name="super mario bros. print world side b.woz" size="235451" crc="be95255b" sha1="18fe07406b29be9c51a6fe7b6233f47938263cde" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olemerld">
+		<description>Olin in Emerald</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-09-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235529">
+				<rom name="olin in emerald side a.woz" size="235529" crc="4c7e5d67" sha1="54f67c52d62736eb7b9b46de1ce692de7349e1ed" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235529">
+				<rom name="olin in emerald side b.woz" size="235529" crc="6a3673d7" sha1="3785eeff9cd0c43f5a31961c869994160e016420" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
