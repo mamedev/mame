@@ -1534,7 +1534,7 @@ ROM_START( gnw_fires )
 	ROM_LOAD( "rc-04", 0x0000, 0x0740, CRC(154ef27d) SHA1(fb65826dfd405ad05fe0f5f947c213214bbd61c0) )
 
 	ROM_REGION( 102509, "screen", 0)
-	ROM_LOAD( "gnw_fires.svg", 0, 102509, CRC(6052df76) SHA1(15bd9694f6a23d4b399b9d3ab3d2d46f0e30d5dd) )
+	ROM_LOAD( "gnw_fires.svg", 0, 102509, CRC(314152ca) SHA1(bb6cd7dfba54d8cd5698c0cf2f381a1489cd8286) )
 ROM_END
 
 
