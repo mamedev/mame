@@ -100,6 +100,10 @@
         Not verified : Can sprites effect 8bpp and alpha blending simultaneously?
         Not verified what palette highest bits actually doing
 
+    Video reference:
+        ddream95 : https://www.youtube.com/watch?v=xshrAVTiGSQ
+	skullfngj : https://www.youtube.com/watch?v=eCwAVt0GbhQ
+
     Driver by Bryan McPhail, bmcphail@tendril.co.uk, thank you to Avedis and The Guru.
 
 ***************************************************************************/
