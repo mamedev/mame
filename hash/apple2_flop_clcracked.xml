@@ -35255,4 +35255,42 @@
 		</part>
 	</software>
 
+	<software name="univ2v10">
+		<description>Universe II (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Omnitrend Software</publisher>
+		<info name="release" value="2019-09-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk a.dsk" size="143360" crc="9def255e" sha1="dcb5adef707bf11ad664ab159aa45b4ef0c9527d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk b.dsk" size="143360" crc="c731084d" sha1="0219209822ccae52b408857c186636a405cb8e12" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk c.dsk" size="143360" crc="fff0a9c5" sha1="52ecefe3e7a69cbd2546c50c7856f639ae3520e5" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk d.dsk" size="143360" crc="1a85db1c" sha1="0c51842a2c8c861ae9f5e3240383e89cdea07885" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk e.dsk" size="143360" crc="ec4ca89a" sha1="9093ad172abc7ba7895bc8d105a5b1be64e8144f" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
