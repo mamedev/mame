@@ -56,7 +56,7 @@ protected:
 		CACHE_256K = 6,
 		CACHE_512K = 7,
 	};
-	r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, cache_size_t icache_size, cache_size_t dcache_size);
+	r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size_t icache_size, cache_size_t dcache_size);
 
 	enum cp0_reg : int
 	{
@@ -441,7 +441,7 @@ class r4000_device : public r4000_base_device
 public:
 	// NOTE: R4000 chips prior to 3.0 have an xtlb bug
 	r4000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, CACHE_8K, CACHE_8K)
+		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, 0x0500, CACHE_8K, CACHE_8K)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
@@ -452,7 +452,7 @@ class r4400_device : public r4000_base_device
 {
 public:
 	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, CACHE_16K, CACHE_16K)
+		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
@@ -463,7 +463,7 @@ class r4600_device : public r4000_base_device
 {
 public:
 	r4600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2000, CACHE_16K, CACHE_16K)
+		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2020, 0x2020, CACHE_16K, CACHE_16K)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;

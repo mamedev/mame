@@ -78,8 +78,8 @@ uint16_t hal2_device::read(offs_t offset)
 		LOGMASKED(LOG_READS, "%s: HAL2 Status Read: %08x\n", machine().describe_context(), m_isr);
 		return m_isr;
 	case REVISION_REG:
-		LOGMASKED(LOG_READS, "%s: HAL2 Revision Read: 0x4011\n", machine().describe_context());
-		return 0x4011;
+		LOGMASKED(LOG_READS, "%s: HAL2 Revision Read: 0x4010\n", machine().describe_context());
+		return 0x4010;
 
 	case INDIRECT_DATA0_REG:
 		LOGMASKED(LOG_WRITES, "%s: HAL2 Indirect Data Register 0 Read: %04x\n", machine().describe_context(), m_idr[0]);

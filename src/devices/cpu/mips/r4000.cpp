@@ -85,11 +85,11 @@ DEFINE_DEVICE_TYPE(R4000, r4000_device, "r4000", "MIPS R4000")
 DEFINE_DEVICE_TYPE(R4400, r4400_device, "r4400", "MIPS R4400")
 DEFINE_DEVICE_TYPE(R4600, r4600_device, "r4600", "QED R4600")
 
-r4000_base_device::r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, cache_size_t icache_size, cache_size_t dcache_size)
+r4000_base_device::r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size_t icache_size, cache_size_t dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
 	, m_program_config_be("program", ENDIANNESS_BIG, 64, 32)
-	, m_fcr0(0x00000500U)
+	, m_fcr0(fcr)
 {
 	m_cp0[CP0_PRId] = prid;
 
