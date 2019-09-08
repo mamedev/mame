@@ -1471,21 +1471,21 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_fireman_state : public hh_sm510_state
+class gnw_fires_state : public hh_sm510_state
 {
 public:
-	gnw_fireman_state(const machine_config &mconfig, device_type type, const char *tag) :
+	gnw_fires_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
 	{
 		inp_fixed_last();
 	}
 
-	void gnw_fireman(machine_config &config);
+	void gnw_fires(machine_config &config);
 };
 
 // config
 
-static INPUT_PORTS_START( gnw_fireman )
+static INPUT_PORTS_START( gnw_fires )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
@@ -1504,7 +1504,7 @@ static INPUT_PORTS_START( gnw_fireman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-void gnw_fireman_state::gnw_fireman(machine_config &config)
+void gnw_fires_state::gnw_fires(machine_config &config)
 {
 	/* basic machine hardware */
 	SM5A(config, m_maincpu);
@@ -1529,12 +1529,12 @@ void gnw_fireman_state::gnw_fireman(machine_config &config)
 
 // roms
 
-ROM_START( gnw_fireman )
+ROM_START( gnw_fires )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "rc-04", 0x0000, 0x0740, CRC(154ef27d) SHA1(fb65826dfd405ad05fe0f5f947c213214bbd61c0) )
 
-	ROM_REGION( 102511, "screen", 0)
-	ROM_LOAD( "gnw_fireman.svg", 0, 102511, CRC(6052df76) SHA1(15bd9694f6a23d4b399b9d3ab3d2d46f0e30d5dd) )
+	ROM_REGION( 102509, "screen", 0)
+	ROM_LOAD( "gnw_fires.svg", 0, 102509, CRC(6052df76) SHA1(15bd9694f6a23d4b399b9d3ab3d2d46f0e30d5dd) )
 ROM_END
 
 
@@ -10082,7 +10082,7 @@ CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,
 CONS( 1980, gnw_ball,    0,          0, gnw_ball,    gnw_ball,    gnw_ball_state,    empty_init, "Nintendo", "Game & Watch: Ball", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_flagman, 0,          0, gnw_flagman, gnw_flagman, gnw_flagman_state, empty_init, "Nintendo", "Game & Watch: Flagman", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_vermin,  0,          0, gnw_vermin,  gnw_vermin,  gnw_vermin_state,  empty_init, "Nintendo", "Game & Watch: Vermin", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_fireman, 0,          0, gnw_fireman, gnw_fireman, gnw_fireman_state, empty_init, "Nintendo", "Game & Watch: Fire (silver)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gnw_fires,   0,          0, gnw_fires,   gnw_fires,   gnw_fires_state,   empty_init, "Nintendo", "Game & Watch: Fire (silver)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_helmet,  0,          0, gnw_helmet,  gnw_helmet,  gnw_helmet_state,  empty_init, "Nintendo", "Game & Watch: Helmet", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: wide screen
