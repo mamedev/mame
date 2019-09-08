@@ -6,12 +6,6 @@
 AVE Micro Systems ARB chess computer driver, in some regions redistributed
 by Chafitz, and in Germany by Sandy Electronic.
 
-TODO:
-- verify gms40 module memory layout
-- need to add checkers pieces and custom initial position when Avelan gets dumped
-
-*******************************************************************************
-
 Auto Response Board (ARB) overview:
 - R6502P CPU @ 2MHz(4MHz XTAL), R6522P VIA
 - 2KB RAM(4*2114), cartridge port
@@ -37,6 +31,10 @@ Around 2012, Steve Braid(aka Trilobyte/Steve UK) started manufacturing ARB V2 bo
 without a module slot. CPU and VIA were replaced with new WDC 14MHz-rated chips,
 running at 16MHz.
 
+TODO:
+- verify gms40 module memory layout
+- need to add checkers pieces and custom initial position when Avelan gets dumped
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -48,9 +46,10 @@ running at 16MHz.
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
 #include "softlist.h"
 
 // internal artwork

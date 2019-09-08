@@ -169,9 +169,9 @@
 			<param name="dot_x" start="3.5" increment="11" />
 
 			<bezel name="digit~i~" element="digit"><bounds x="~digit_x~" y="0" width="10" height="15" /></bezel>
-			<bezel name="~i~.14" element="seg_disk"><bounds x="~dp_x~" y="13.5" width="1.5" height="1.5" /></bezel>
-			<bezel name="~i~.15" element="seg_disk"><bounds x="~ap1_x~" y="0" width="1" height="1.6" /></bezel>
-			<bezel name="~i~.15" element="seg_rect"><bounds x="~ap2_x~" y="0" width="0.7" height="3.5" /></bezel>
+			<bezel name="~i~.15" element="seg_disk"><bounds x="~dp_x~" y="13.5" width="1.5" height="1.5" /></bezel>
+			<bezel name="~i~.14" element="seg_disk"><bounds x="~ap1_x~" y="0" width="1" height="1.6" /></bezel>
+			<bezel name="~i~.14" element="seg_rect"><bounds x="~ap2_x~" y="0" width="0.7" height="3.5" /></bezel>
 			<bezel element="disk_white"><bounds x="~dot_x~" y="17.1" width="1.9" height="1.9" /></bezel>
 		</repeat>
 	</group>

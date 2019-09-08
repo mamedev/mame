@@ -6,18 +6,6 @@
 Applied Concepts Great Game Machine (GGM), electronic board game computer.
 2nd source distribution: Modular Game System (MGS), by Chafitz.
 
-TODO:
-- what's VIA PB0 for? game toggles it once per irq
-- identify XTAL (2MHz CPU/VIA is correct, compared to video reference)
-- add display DP segment (unused in boris25), and what about AP segment?
-- verify cartridge pinout, right now assume A0-A14 (max known cart size is 24KB).
-  Boris/Sargon cartridge is A0-A11 and 2 CS lines.
-- auto-switch keypad overlays? no need for it yet
-- (probably won't) add chesspieces to artwork? this machine supports more board
-  games than just chess: checkers, reversi, and even a blackjack game
-
-*******************************************************************************
-
 Hardware notes:
 - 6502A 2MHz (unknown XTAL, label "5-80"), SYP6522 VIA
 - 2KB RAM(4*HM472114AP-2), no ROM on main PCB
@@ -31,9 +19,10 @@ There were also some standalone machines, eg. Morphy Encore, Odin Encore.
 Known chess cartridges (*denotes not dumped):
 - Chess/Boris 2.5 (aka Sargon 2.5)
 - *Gruenfeld Edition - Master Chess Openings
-- *Morphy Edition - Master Chess (aka Sandy Edition?)
+- *Morphy Edition - Master Chess
 - *Capablanca Edition - Master Chess Endgame
-- *Steinitz Edition-4 - Master Chess
+- Sandy Edition - Master Chess (German language version of Morphy)
+- Steinitz Edition-4 - Master Chess
 - *Monitor Edition - Master Kriegspiel
 
 The opening/endgame cartridges are meant to be ejected/inserted while
@@ -46,6 +35,16 @@ Other games:
 - *Wits End (unreleased?)
 - *Lunar Lander (unreleased?)
 
+TODO:
+- what's VIA PB0 for? game toggles it once per irq
+- identify XTAL (2MHz CPU/VIA is correct, compared to video reference)
+- add display AP segment, is it used anywhere?
+- verify cartridge pinout, right now assume A0-A15 (max known cart size is 24KB).
+  Boris/Sargon cartridge is A0-A11 and 2 CS lines, Steinitz uses the whole range.
+- add option to auto-switch keypad overlays
+- (probably won't) add chesspieces to artwork? this machine supports more board
+  games than just chess: checkers, reversi, and even a blackjack game
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -56,9 +55,10 @@ Other games:
 #include "video/pwm.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
 #include "softlist.h"
 
 // internal artwork
@@ -172,10 +172,14 @@ void ggm_state::update_reset(ioport_value state)
 DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
 {
 	u32 size = m_cart->common_get_size("rom");
-	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0x7fff;
+	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0xffff;
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	// extra ram (optional)
+	if (image.get_feature("ram"))
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, nullptr);
 
 	return image_init_result::PASS;
 }
@@ -250,7 +254,7 @@ READ8_MEMBER(ggm_state::input_r)
 void ggm_state::main_map(address_map &map)
 {
 	// external slot has potential bus conflict with RAM/VIA
-	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(ggm_state::cartridge_r));
+	map(0x0000, 0xffff).r(FUNC(ggm_state::cartridge_r));
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x8000, 0x800f).m(m_via, FUNC(via6522_device::map));
 }
