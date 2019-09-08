@@ -2493,18 +2493,15 @@ void cps3_state::cps3(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(60'000'000)/8, 486, 0, 384, 259, 0, 224);
+	screen.set_raw(XTAL(42'954'545)/5, (454+1)*6/5, 0, 384, 262+1, 0, 224); // H Total counter uses XTAL/6 clock
 	screen.set_screen_update(FUNC(cps3_state::screen_update));
 	screen.screen_vblank().set(FUNC(cps3_state::vbl_interrupt));
 /*
     Measured clocks:
-        V = 59.5992Hz
-        H = 15.4335kHz
-        H/V = 258.955 ~ 259 lines
-
-    Possible video clocks:
-        60MHz       / 15.4335kHz = 3887.647 / 8 = 485.956 ~ 486 -> likely
-         42.9545MHz / 15.4445kHz = 2781.217 / 6 = 463.536 -> unlikely
+        Video DAC = 8.602MHz (384 wide mode) ~ 42.9545MHz / 5
+        H = 15.73315kHz
+        V = 59.8Hz
+        H/V ~ 263 lines
 */
 
 	TIMER(config, m_dma_timer).configure_generic(FUNC(cps3_state::dma_interrupt));
