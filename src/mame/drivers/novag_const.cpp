@@ -23,12 +23,12 @@ Constellation:
 
 Constellation 3.6MHz:
 - PCB label: NOVAG CONSTELLATION Rev E 100037
-- G65SC02P-3 or R65C02P3 @ 3.6MHz (7.2MHz XTAL)
+- G65SC02P-3 or R65C02P3(newer version) @ 3.6MHz (7.2MHz XTAL)
 - 2KB RAM (TC5516AP), 16KB ROM (custom label, assumed TMM23128)
 - PCB supports "Memory Save", but components aren't installed
 
 Constellation 3.6MHz manufactured in 1986 was fitted with the same ROM as
-the Quattro, but PCB remains the same (Quatto PCB is very different).
+the Quattro, but PCB remains almost the same (Quatto PCB is very different).
 Button labels are the same as the older version.
 
 Constellation Quattro:
@@ -52,12 +52,13 @@ Super Constellation:
 TODO:
 - ssensor4 nvram doesn't work, at boot it always starts a new game
 - is Dynamic S a program update of ssensor4 or identical?
-- verify IRQ active time for ssensor4, const, constq
+- verify IRQ active time for ssensor4
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65sc02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/sensorboard.h"
 #include "machine/nvram.h"
@@ -91,6 +92,7 @@ public:
 	// machine drivers
 	void nconst(machine_config &config);
 	void nconst36(machine_config &config);
+	void nconst36a(machine_config &config);
 	void nconstq(machine_config &config);
 	void ssensor4(machine_config &config);
 	void sconst(machine_config &config);
@@ -332,7 +334,7 @@ void const_state::nconst(machine_config &config)
 
 	const attotime irq_period = attotime::from_hz(2_MHz_XTAL / 0x2000); // through 4020 IC, ~244Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17100)); // assume same as const36
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17200)); // active for ~17.2us
 	TIMER(config, "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -355,6 +357,7 @@ void const_state::ssensor4(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::ssensor4_map);
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	config.set_default_layout(layout_novag_ssensor4);
@@ -365,12 +368,12 @@ void const_state::nconst36(machine_config &config)
 	nconst(config);
 
 	/* basic machine hardware */
-	R65C02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
+	M65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
 	const attotime irq_period = attotime::from_hz(7.2_MHz_XTAL/2 / 0x2000); // through 4020 IC, ~439Hz
 	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17100)); // active for ~17.1us
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17200)); // same as nconst
 	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	m_board->set_delay(attotime::from_msec(200));
@@ -380,36 +383,54 @@ void const_state::nconst36(machine_config &config)
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void const_state::sconst(machine_config &config)
+void const_state::nconst36a(machine_config &config)
 {
-	nconst(config);
+	nconst36(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(8_MHz_XTAL/2); // UM6502C
-	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::sconst_map);
+	R65C02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
-	const attotime irq_period = attotime::from_hz(8_MHz_XTAL/4 / 0x1000); // through 4020 IC, ~488Hz
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(10200)); // active for 10.2us
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	// 4020 CLK is 7.2_MHz_XTAL/4, but with IRQ on Q11 instead of Q12, result
+	// frequency and duty cycle are identical to nconst36
 
-	m_board->set_delay(attotime::from_msec(200));
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	config.set_default_layout(layout_novag_supercon);
+	/* sound hardware */
+	BEEP(config.replace(), m_beeper, 7.2_MHz_XTAL/4 / 0x800); // ~879Hz
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void const_state::nconstq(machine_config &config)
 {
-	sconst(config);
+	nconst36a(config);
 
 	/* basic machine hardware */
-	R65C02(config.replace(), m_maincpu, 8_MHz_XTAL/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
+	m_maincpu->set_clock(8_MHz_XTAL/2);
 
-	config.device_remove("nvram");
+	const attotime irq_period = attotime::from_hz(8_MHz_XTAL/4 / 0x1000); // through 4020 IC, ~488Hz
+	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(17200)); // same as nconst
+	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	config.set_default_layout(layout_novag_constq);
+
+	/* sound hardware */
+	BEEP(config.replace(), m_beeper, 8_MHz_XTAL/4 / 0x800); // ~976Hz
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void const_state::sconst(machine_config &config)
+{
+	nconstq(config);
+
+	/* basic machine hardware */
+	M6502(config.replace(), m_maincpu, 8_MHz_XTAL/2); // UM6502C
+	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::sconst_map);
+
+	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_nsec(10200)); // irq active for 10.2us
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	config.set_default_layout(layout_novag_supercon);
 }
 
 
@@ -460,12 +481,12 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, ssensor4, 0,      0, ssensor4, ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT CMP MACHINE    INPUT     STATE        INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1981, ssensor4, 0,      0, ssensor4,  ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, const,    0,      0, nconst,   nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, const36,  const,  0, nconst36, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, const36a, const,  0, nconst36, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, constq,   const,  0, nconstq,  nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, const,    0,      0, nconst,    nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, const36,  const,  0, nconst36,  nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, const36a, const,  0, nconst36a, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, constq,   const,  0, nconstq,   nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1984, supercon, 0,      0, sconst,   sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, supercon, 0,      0, sconst,    sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

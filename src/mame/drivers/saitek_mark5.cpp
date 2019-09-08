@@ -13,6 +13,9 @@ by Nick Toop. These credits are in the ROM data.
 Mark VI/Philidor was released a year later, it was a plug-in module for the Mark V.
 It's not much stronger than Mark V(retroactively called Mark V/Travemunde).
 
+When using the MAME sensorboard interface with MK VI, reset the board by pressing
+CLEAR before RESET, needed on 1st power-on or when starting a new game. 
+
 Hardware notes:
 - SY6502A @ ~2MHz (19.6608MHz XTAL, bunch of 74113 dividers)
 - 16KB RAM (8*HM4716AP-4N)
