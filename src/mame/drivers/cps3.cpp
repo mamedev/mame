@@ -1213,9 +1213,9 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 				/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
 				    which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
 
-				for (int yy = 0; yy <= ysizedraw2; yy++)
+				for (int yy = 0; yy < ysizedraw2; yy++)
 				{
-					int cury_pos = to_s10(yy - (to_s10(ypos2) + to_s10(gscrolly))); // OK for sfiii Alex's stage, but not sure if hardware realy works this way
+					int cury_pos = to_s10(yy - (to_s10(ypos2) + to_s10(gscrolly)) - 19); // OK for sfiii Alex's stage, but not sure if hardware realy works this way
 
 					if (cury_pos >= m_renderbuffer_clip.top() && cury_pos <= m_renderbuffer_clip.bottom())
 						draw_tilemapsprite_line(tilemapnum, cury_pos, m_renderbuffer_bitmap, m_renderbuffer_clip);
