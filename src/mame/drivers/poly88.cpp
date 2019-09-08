@@ -14,7 +14,6 @@ BASIC. PolyMorphic's "System 16" package shipped with 16K of RAM (as did
 the 8813), though their earlier systems had only 8K or less.
 
 ToDo:
-- Polyphase format not working because 8251 device doesn't support bisync.
 - More accurate interrupt emulation.
 - Single-step control.
 - .CAS file format support (http://deramp.com/polymorphic-computers/emu88.html).

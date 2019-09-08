@@ -82,7 +82,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( poly88_state::kansas_r )
 		if (m_dtr)
 		{
 			m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
-			m_casspol = 1;
+			m_casspol = 0;
 			return;
 		}
 
