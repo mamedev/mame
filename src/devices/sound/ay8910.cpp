@@ -106,7 +106,7 @@
  *
  *  and this can be used to re-Thenevin to 5V
  *
- *  RVequiv = RD * (5V / VO - 1)
+ *  RVequiv = RD * ( 5V / VO - 1)
  *
  *  The RV and Kn parameter are derived using least squares to match
  *  calculation results with measurements.
