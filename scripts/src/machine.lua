@@ -1192,6 +1192,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/hp_dc100_tape.h,MACHINES["HP_DC100_TAPE"] = true
+---------------------------------------------------
+
+if (MACHINES["HP_DC100_TAPE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/hp_dc100_tape.cpp",
+		MAME_DIR .. "src/devices/machine/hp_dc100_tape.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/hp_taco.h,MACHINES["HP_TACO"] = true
 ---------------------------------------------------
 
