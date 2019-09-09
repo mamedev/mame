@@ -2457,25 +2457,39 @@ cxsxd                           //
 ec1842                          //
 ec1849                          //
 ev1806                          // Everex EV-1806
+ev1815							// Everex EV-1815
 ews286                          // 1986 Ericsson WS286
 ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
 ftsserv                         // 1991 Apricot FTs (Scorpion)
+aubam12s2						// AUVA COMPUTER, INC. BAM/12-S2 motherboard (286)
+suntac5							// 286 motherboards using the 5-chip SUNTAC chipset
+ht12a                           // 286 motherboards using the Headland HT12/A chipset
+vlsi5							// 286 motherboards using the 5-chip VLSI chipset
+u3911v3							// Uniron U3911-V3 motherboard (286)
+mkp286							// Morse KP-286 motherboard (286)
+mba009							// HLB-286 MBA-009 motherboard (286)
+pccm205							// PC-Chips M205 motherboard (286)
 pccm321							// PC-Chips M321 motherboard (386)
 pccm326							// PC-Chips M326 motherboard (386)
 pccm919							// PC-Chips M919 motherboard (486)
+snomi286						// Snobol Mini 286 motherboard (286)
+sy019hi							// Soyo SY-019H and SY-019I motherboards (386)
+sm38640f						// SM 386-40F motherboard (386)
+4nd04a							// 386-4N-D04A motherboard (386)
 hot409                          // Shuttle HOT-409
-ht286                           //
 ibm5162                         // 1986 IBM XT 5162 (XT w/80286)
 ibm5170                         // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a                        // 1985 IBM PC/AT 5170, enhanced 8 MHz model
 ibmps1es                        // IBM PS/1 (Spanish)
 k286i                           // 1985 Kaypro 286i
+elanht286						// Leanord Elan High Tech 286
 kt216wb5                        // KT216WB5-HI Rev.2
 lm103s                          //
 m290                            // Olivetti M290
 magb233                         // Magitronic B233
+magb236                         // Magitronic B236
 mat286                          //
 megapc                          // 1992 Amstrad plc
 megapcpl                        //
