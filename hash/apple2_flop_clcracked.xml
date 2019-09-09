@@ -35104,4 +35104,193 @@
 		</part>
 	</software>
 
+	<software name="cb123q">
+		<description>Charlie Brown's 1, 2, 3's (1990 Queue re-release) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2019-09-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="charlie brown's 1, 2, 3's (1990 re-release)(4am crack) side a.dsk" size="143360" crc="62ff3f40" sha1="c7cd861c9000a6169cc8e14af661ba7cb02227a1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="charlie brown's 1, 2, 3's (1990 re-release)(4am crack) side b.dsk" size="143360" crc="4b8a2eb6" sha1="61fe7bb3f9e88c430a743c39ed6f378539eff31a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buckzoom">
+		<description>Buck Rogers - Planet of Zoom (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sega Enterprises</publisher>
+		<info name="release" value="2019-09-04"/>
+		<!-- Press open-apple during boot to read a message from the programmer. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sega - buck rogers - planet of zoom (logo crack).dsk" size="143360" crc="49bc53af" sha1="a565aefbdaa2b94a4c5a18ec5ddd801abfe78827" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="millv21">
+		<description>Millionaire (Version 2.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Blue Chip Software</publisher>
+		<info name="release" value="2019-09-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="millionaire v2.1 (4am crack).dsk" size="143360" crc="80f60f65" sha1="fa63ed4f174a7f40e35e5e0df5ba7d2377d667c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saleedge">
+		<description>The Sales Edge (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Human Edge Software</publisher>
+		<info name="release" value="2019-09-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the sales edge (4am crack) disk 1 - program.dsk" size="143360" crc="85039152" sha1="9607cd12259cf7e803d98a9cfd2cedf7bc3002b5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Output 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the sales edge (4am crack) disk 2 - output 1.dsk" size="143360" crc="d2102e6b" sha1="aefac69d88ce5f4e1e6014c0e963f6648b74a805" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Output 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the sales edge (4am crack) disk 3 - output 2.dsk" size="143360" crc="003b69bd" sha1="5793d7b5164836c8d94a8ba8e19bf9f8effc1de4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpsat11a">
+		<description>Computer Preparation for the SAT (Version 1.1A) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Harcourt Brace Jovanovich</publisher>
+		<info name="release" value="2019-09-05"/>
+		<!--"Computer Preparation for the SAT" is a 1986 educational program distributed by Harcourt Brace Jovanovich. This is version 1.1A. It is preserved here for the first time.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Mathematics"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (4am crack) disk 1 - mathematics.dsk" size="143360" crc="3fd1ba92" sha1="4d5c88056164044a42035fd8b135fabbfefc5f04" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Vocabulary"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (4am crack) disk 2 - vocabulary.dsk" size="143360" crc="44cf4f2a" sha1="dde57f4bba46dd3218123828907da63abb1a98e4" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Verbal item banks"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (4am crack) disk 3 - verbal item banks.dsk" size="143360" crc="6e22a81e" sha1="5095b94df65225ebe9b28a4e5de94ea1cd30ac65" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Practice tests"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (4am crack) disk 4 - practice tests.dsk" size="143360" crc="8ad412c8" sha1="68417e227245307801fc79bf6b89cb72e801fcac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crchoru4">
+		<description>Creature Chorus (Version 4.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2019-09-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="creature chorus v4.0 (4am crack).dsk" size="143360" crc="86db4bac" sha1="4f511f09dc1f94079fed1eba0902abfce26da333" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chivalr2">
+		<description>Chivalry (Revision 2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2019-09-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="chivalry rev. 2 (4am and san inc crack).dsk" size="143360" crc="ba08b7bb" sha1="af10167662e98448dbeacd64ce2782d268162097" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="istarflt1">
+		<description>Star Fleet 1: The War Begins (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Interstel</publisher>
+		<info name="release" value="2019-09-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star fleet i side a (san inc crack).dsk" size="143360" crc="c2befd2f" sha1="5f1bcbf6d20da209e356d2bcf9114bde9611673f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star fleet i side b (san inc crack).dsk" size="143360" crc="e570fc3b" sha1="9f884be8b09b08e2afab66d92f619f6718de2c10" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="univ2v10">
+		<description>Universe II (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Omnitrend Software</publisher>
+		<info name="release" value="2019-09-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk a.dsk" size="143360" crc="9def255e" sha1="dcb5adef707bf11ad664ab159aa45b4ef0c9527d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk b.dsk" size="143360" crc="c731084d" sha1="0219209822ccae52b408857c186636a405cb8e12" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk c.dsk" size="143360" crc="fff0a9c5" sha1="52ecefe3e7a69cbd2546c50c7856f639ae3520e5" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk d.dsk" size="143360" crc="1a85db1c" sha1="0c51842a2c8c861ae9f5e3240383e89cdea07885" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk e.dsk" size="143360" crc="ec4ca89a" sha1="9093ad172abc7ba7895bc8d105a5b1be64e8144f" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

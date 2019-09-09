@@ -7239,4 +7239,206 @@
 		</part>
 	</software>
 
+	<software name="drgkeep">
+		<description>Dragon's Keep</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2019-09-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="dragon's keep.woz" size="234773" crc="a892ffa5" sha1="1e8ca3764c89be6d61dcc0dd5259d10878bb958a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inthocky">
+		<description>International Hockey</description>
+		<year>1987</year>
+		<publisher>Artworx</publisher>
+		<info name="release" value="2019-09-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228095">
+				<rom name="international hockey.woz" size="228095" crc="c9c4e6f4" sha1="539b9dcb39c8a3e762dff56fd93c54a826bc6675" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racter">
+		<description>Racter</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-09-03"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235434">
+				<rom name="racter - disk 1, side a.woz" size="235434" crc="941fb21b" sha1="e0547effa5dd71c1ac27bab5414ce6ce429032b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phmpegas">
+		<description>PHM Pegasus</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-09-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="228119">
+				<rom name="phm pegasus side a.woz" size="228119" crc="acbbe3ee" sha1="41eefd1df1a6f9dfb2f50973bded138e8390dbeb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234775">
+				<rom name="phm pegasus side b.woz" size="234775" crc="b7df1300" sha1="6ed6881d6679e60b15c3d4d51648c05e258bb231" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crossbow">
+		<description>Crossbow</description>
+		<year>1988</year>
+		<publisher>Absolute Entertainment</publisher>
+		<info name="release" value="2019-09-03"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234737">
+				<rom name="crossbow side a.woz" size="234737" crc="d031baa8" sha1="3d9a8c99467701446e57b7ffefabac17cea387c9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234737">
+				<rom name="crossbow side b.woz" size="234737" crc="22c5b94a" sha1="1bf16464b10726c7adeceb58fe2cc767c18942c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snoggle">
+		<description>Snoggle</description>
+		<year>1981</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-09-05"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="68557">
+				<rom name="snoggle.woz" size="68557" crc="e65cf748" sha1="239aa3d0aec224a759e12085c732b11fa86d9a63" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tredoubt">
+		<description>Tawala's Last Redoubt</description>
+		<year>1981</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-09-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235494">
+				<rom name="tawala's last redoubt.woz" size="235494" crc="ade2db41" sha1="7c644a56c710fecd902f75d5a4e32dd3c7176825" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="successn">
+		<description>Succession</description>
+		<year>1982</year>
+		<publisher>Piccadilly Software</publisher>
+		<info name="release" value="2019-09-05"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="68556">
+				<rom name="succession.woz" size="68556" crc="7fd914be" sha1="3aefea6ab2f46eadafcb89e486adcf59b3790e4c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="istrflt1">
+		<description>Star Fleet 1: The War Begins</description>
+		<year>1984</year>
+		<publisher>Interstel</publisher>
+		<info name="release" value="2019-09-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="242156">
+				<rom name="star fleet i v2.1 side a.woz" size="242156" crc="739c7fc1" sha1="676c712a3b0316032eda6ada07688f4e754d05dd" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="242156">
+				<rom name="star fleet i v2.1 side b.woz" size="242156" crc="977bd1ad" sha1="6e5eed76f4d72750e0d41de4cf99df1ec509253b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbprtwd">
+		<description>Super Mario Bros. Print World</description>
+		<year>1991</year>
+		<publisher>Hi-Tech Expressions</publisher>
+		<info name="release" value="2019-09-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+		<!-- The disk image is tagged as 64K ][+, but the box says 128K IIe/c/GS -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235451">
+				<rom name="super mario bros. print world side a.woz" size="235451" crc="03275984" sha1="24e3bc40e0ae968ce2f506d8ba339bf9a920d2c2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235451">
+				<rom name="super mario bros. print world side b.woz" size="235451" crc="be95255b" sha1="18fe07406b29be9c51a6fe7b6233f47938263cde" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="olemerld">
+		<description>Olin in Emerald</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-09-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235529">
+				<rom name="olin in emerald side a.woz" size="235529" crc="4c7e5d67" sha1="54f67c52d62736eb7b9b46de1ce692de7349e1ed" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235529">
+				<rom name="olin in emerald side b.woz" size="235529" crc="6a3673d7" sha1="3785eeff9cd0c43f5a31961c869994160e016420" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
