@@ -21,6 +21,10 @@ public:
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
 
+	auto i2c_data_out() { return m_i2c_data_out.bind(); }
+	auto i2c_data_in() { return m_i2c_data_in.bind(); }
+	auto i2c_stop() { return m_i2c_stop.bind(); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -155,6 +159,10 @@ private:
 	uint32_t m_i2c_ctrl;
 	uint32_t m_i2c_data;
 	channel_t m_channels[2];
+
+	devcb_write8 m_i2c_data_out;
+	devcb_read8 m_i2c_data_in;
+	devcb_write_line m_i2c_stop;
 };
 
 DECLARE_DEVICE_TYPE(VINO, vino_device)

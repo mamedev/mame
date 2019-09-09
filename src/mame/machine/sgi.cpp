@@ -84,7 +84,7 @@ void sgi_mc_device::device_resolve_objects()
 void sgi_mc_device::device_start()
 {
 	m_sys_id = 0x03; // rev. C MC
-	m_sys_id = m_eisa_present() << 4;
+	m_sys_id |= m_eisa_present() << 4;
 
 	m_rpss_timer = timer_alloc(TIMER_RPSS);
 	m_rpss_timer->adjust(attotime::never);

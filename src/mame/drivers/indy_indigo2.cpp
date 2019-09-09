@@ -5,8 +5,9 @@
 *   SGI IP22/IP24 Indigo2/Indy workstation
 *
 *  Known Issues:
-*  - The proper hookup for the MAC address is unknown, requiring
-*    a fake MAC to be set up before any IRIX installers will proceed.
+*  - The MAC address is supplied by the NVRAM, requiring the user to
+*    use "setenv -f eaddr 08:00:69:xx:yy:zz" from the Indy boot PROM
+*    before any IRIX installers will proceed.
 *  - The Gentoo Linux live CD hangs on starting the kernel.
 *
 *  Memory map:
@@ -68,6 +69,7 @@
 #include "bus/nscsi/hd.h"
 #include "machine/sgi.h"
 #include "machine/vino.h"
+#include "machine/saa7191.h"
 #include "machine/wd33c9x.h"
 
 #include "sound/cdda.h"
@@ -93,6 +95,7 @@ public:
 		, m_ioc2(*this, "ioc2")
 		, m_rtc(*this, "rtc")
 		, m_vino(*this, "vino")
+		, m_dmsd(*this, "dmsd")
 		, m_gio64(*this, "gio64")
 		, m_gio64_gfx(*this, "gio64_gfx")
 		, m_gio64_exp0(*this, "gio64_exp0")
@@ -141,6 +144,7 @@ protected:
 	required_device<ioc2_device> m_ioc2;
 	required_device<ds1386_device> m_rtc;
 	optional_device<vino_device> m_vino;
+	optional_device<saa7191_device> m_dmsd;
 	optional_device<gio64_device> m_gio64;
 	optional_device<gio64_slot_device> m_gio64_gfx;
 	optional_device<gio64_slot_device> m_gio64_exp0;
@@ -393,7 +397,13 @@ void ip24_state::ip24(machine_config &config)
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip24_state::pio6_map);
 
 	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
+
+	SAA7191(config, m_dmsd);
 	VINO(config, m_vino);
+	m_vino->i2c_data_out().set(m_dmsd, FUNC(saa7191_device::i2c_data_w));
+	m_vino->i2c_data_in().set(m_dmsd, FUNC(saa7191_device::i2c_data_r));
+	m_vino->i2c_stop().set(m_dmsd, FUNC(saa7191_device::i2c_stop_w));
+
 	DS1386_8K(config, m_rtc, 32768);
 }
 
