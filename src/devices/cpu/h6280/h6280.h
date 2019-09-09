@@ -41,6 +41,9 @@ public:
 	auto port_in_cb() { return m_port_in_cb.bind(); } // K0-7 at Pinout
 	auto port_out_cb() { return m_port_out_cb.bind(); } // O0-7 at Pinout
 
+	// hack to fix music speed in some Data East games (core bug, external strapping, DE 45 customization or ???)
+	void set_timer_scale(int scale) { m_timer_scale = scale; }
+
 	/* functions for use by the PSG and joypad port only! */
 	uint8_t io_get_buffer();
 	void io_set_buffer(uint8_t);
@@ -373,6 +376,8 @@ protected:
 
 	// other internal states
 	int m_icount;
+
+	uint8_t m_timer_scale;
 
 	// address spaces
 	address_space *m_program;

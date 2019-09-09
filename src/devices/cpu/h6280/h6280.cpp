@@ -176,6 +176,7 @@ h6280_device::h6280_device(const machine_config &mconfig, const char *tag, devic
 	, m_port_in_cb(*this)
 	, m_port_out_cb(*this)
 	, m_psg(*this, "psg")
+	, m_timer_scale(1)
 {
 	// build the opcode table
 	for (int op = 0; op < 256; op++)
@@ -344,7 +345,7 @@ void h6280_device::device_reset()
 
 	/* timer off by default */
 	m_timer_status = 0;
-	m_timer_load = 128 * 1024;
+	m_timer_load = 128 * 1024 * m_timer_scale;
 
 	m_irq_pending = 0;
 }
@@ -2571,9 +2572,8 @@ WRITE8_MEMBER( h6280_device::timer_w )
 	switch (offset & 1)
 	{
 		case 0: /* Counter preload */
-			//m_timer_load = m_timer_value = ((data & 127) + 1) * 1024;
 			// matches HW behaviour, value is latched only with 0->1 counter enable transition
-			m_timer_load = ((data & 127) + 1) * 1024;
+			m_timer_load = ((data & 127) + 1) * 1024 * m_timer_scale;
 			return;
 
 		case 1: /* Counter enable */
