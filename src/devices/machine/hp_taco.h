@@ -2,25 +2,25 @@
 // copyright-holders:F. Ulivi
 /*********************************************************************
 
-    hp_new_taco.h
+    hp_taco.h
 
     HP TApe COntroller (5006-3012)
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP_NEW_TACO_H
-#define MAME_MACHINE_HP_NEW_TACO_H
+#ifndef MAME_MACHINE_HP_TACO_H
+#define MAME_MACHINE_HP_TACO_H
 
 #pragma once
 
 #include "formats/hti_tape.h"
 #include "machine/hp_dc100_tape.h"
 
-class hp_new_taco_device : public device_t
+class hp_taco_device : public device_t
 {
 public:
 	// construction/destruction
-	hp_new_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
 	auto irq() { return m_irq_handler.bind(); }
@@ -43,7 +43,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(wr_bit_r);
 
 protected:
-	hp_new_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hp_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -118,6 +118,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(HP_NEW_TACO, hp_new_taco_device)
+DECLARE_DEVICE_TYPE(HP_TACO, hp_taco_device)
 
-#endif // MAME_MACHINE_HP_NEW_TACO_H
+#endif // MAME_MACHINE_HP_TACO_H

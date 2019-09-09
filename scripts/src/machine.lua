@@ -1209,8 +1209,8 @@ end
 
 if (MACHINES["HP_TACO"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/hp_new_taco.cpp",
-		MAME_DIR .. "src/devices/machine/hp_new_taco.h",
+		MAME_DIR .. "src/devices/machine/hp_taco.cpp",
+		MAME_DIR .. "src/devices/machine/hp_taco.h",
 	}
 end
 

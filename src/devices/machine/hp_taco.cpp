@@ -2,7 +2,7 @@
 // copyright-holders:F. Ulivi
 /*********************************************************************
 
-    hp_new_taco.cpp
+    hp_taco.cpp
 
     HP TApe COntroller (5006-3012)
 
@@ -138,7 +138,7 @@
 // Dyke Shaffer for publishing the HP-internal TACO document.
 //
 #include "emu.h"
-#include "hp_new_taco.h"
+#include "hp_taco.h"
 
 // Debugging
 #include "logmacro.h"
@@ -276,10 +276,10 @@ enum cmd_t : uint8_t {
 };
 
 // Device type definition
-DEFINE_DEVICE_TYPE(HP_NEW_TACO, hp_new_taco_device, "hp_taco", "HP TACO")
+DEFINE_DEVICE_TYPE(HP_TACO, hp_taco_device, "hp_taco", "HP TACO")
 
 // Constructors
-hp_new_taco_device::hp_new_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_tape(*this , "drive")
 	, m_irq_handler(*this)
@@ -288,12 +288,12 @@ hp_new_taco_device::hp_new_taco_device(const machine_config &mconfig, device_typ
 {
 }
 
-hp_new_taco_device::hp_new_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp_new_taco_device(mconfig, HP_NEW_TACO, tag, owner, clock)
+hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hp_taco_device(mconfig, HP_TACO, tag, owner, clock)
 {
 }
 
-WRITE16_MEMBER(hp_new_taco_device::reg_w)
+WRITE16_MEMBER(hp_taco_device::reg_w)
 {
 	LOG_REG("wr R%u = %04x\n", 4 + offset , data);
 
@@ -323,7 +323,7 @@ WRITE16_MEMBER(hp_new_taco_device::reg_w)
 	}
 }
 
-READ16_MEMBER(hp_new_taco_device::reg_r)
+READ16_MEMBER(hp_taco_device::reg_r)
 {
 	uint16_t res = 0;
 
@@ -363,17 +363,17 @@ READ16_MEMBER(hp_new_taco_device::reg_r)
 	return res;
 }
 
-READ_LINE_MEMBER(hp_new_taco_device::flg_r)
+READ_LINE_MEMBER(hp_taco_device::flg_r)
 {
 	return m_flg;
 }
 
-READ_LINE_MEMBER(hp_new_taco_device::sts_r)
+READ_LINE_MEMBER(hp_taco_device::sts_r)
 {
 	return m_sts;
 }
 
-WRITE_LINE_MEMBER(hp_new_taco_device::cart_out_w)
+WRITE_LINE_MEMBER(hp_taco_device::cart_out_w)
 {
 	LOG_DBG("cart_out_w %d\n" , state);
 	set_tape_present(!state);
@@ -383,7 +383,7 @@ WRITE_LINE_MEMBER(hp_new_taco_device::cart_out_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp_new_taco_device::hole_w)
+WRITE_LINE_MEMBER(hp_taco_device::hole_w)
 {
 	if (state) {
 		LOG_DBG("hole_w\n");
@@ -395,7 +395,7 @@ WRITE_LINE_MEMBER(hp_new_taco_device::hole_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp_new_taco_device::tacho_tick_w)
+WRITE_LINE_MEMBER(hp_taco_device::tacho_tick_w)
 {
 	if (state) {
 		LOG_DBG("tacho_tick_w\n");
@@ -451,14 +451,14 @@ WRITE_LINE_MEMBER(hp_new_taco_device::tacho_tick_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hp_new_taco_device::motion_w)
+WRITE_LINE_MEMBER(hp_taco_device::motion_w)
 {
 	if (state) {
 		cmd_fsm();
 	}
 }
 
-WRITE_LINE_MEMBER(hp_new_taco_device::rd_bit_w)
+WRITE_LINE_MEMBER(hp_taco_device::rd_bit_w)
 {
 	LOG_RW("RD bit %d (st=%d,w=%04x,i=%u)\n" , state , m_cmd_state , m_working_reg , m_bit_idx);
 	if (m_cmd_state != CMD_IDLE) {
@@ -510,7 +510,7 @@ WRITE_LINE_MEMBER(hp_new_taco_device::rd_bit_w)
 	}
 }
 
-READ_LINE_MEMBER(hp_new_taco_device::wr_bit_r)
+READ_LINE_MEMBER(hp_taco_device::wr_bit_r)
 {
 	bool bit = false;
 	if (is_cmd_wr(m_cmd_reg) && m_cmd_state == CMD_PH2) {
@@ -532,7 +532,7 @@ READ_LINE_MEMBER(hp_new_taco_device::wr_bit_r)
 	return bit;
 }
 
-void hp_new_taco_device::device_add_mconfig(machine_config &config)
+void hp_taco_device::device_add_mconfig(machine_config &config)
 {
 	HP_DC100_TAPE(config , m_tape , 0);
 	m_tape->set_acceleration(ACCELERATION);
@@ -540,15 +540,15 @@ void hp_new_taco_device::device_add_mconfig(machine_config &config)
 	m_tape->set_tick_size(TACH_TICK_LEN);
 	m_tape->set_bits_per_word(16);
 	m_tape->set_go_threshold(MOVING_THRESHOLD);
-	m_tape->cart_out().set(FUNC(hp_new_taco_device::cart_out_w));
-	m_tape->hole().set(FUNC(hp_new_taco_device::hole_w));
-	m_tape->tacho_tick().set(FUNC(hp_new_taco_device::tacho_tick_w));
-	m_tape->motion_event().set(FUNC(hp_new_taco_device::motion_w));
-	m_tape->rd_bit().set(FUNC(hp_new_taco_device::rd_bit_w));
-	m_tape->wr_bit().set(FUNC(hp_new_taco_device::wr_bit_r));
+	m_tape->cart_out().set(FUNC(hp_taco_device::cart_out_w));
+	m_tape->hole().set(FUNC(hp_taco_device::hole_w));
+	m_tape->tacho_tick().set(FUNC(hp_taco_device::tacho_tick_w));
+	m_tape->motion_event().set(FUNC(hp_taco_device::motion_w));
+	m_tape->rd_bit().set(FUNC(hp_taco_device::rd_bit_w));
+	m_tape->wr_bit().set(FUNC(hp_taco_device::wr_bit_r));
 }
 
-void hp_new_taco_device::device_start()
+void hp_taco_device::device_start()
 {
 	LOG("device_start\n");
 	m_irq_handler.resolve_safe();
@@ -574,7 +574,7 @@ void hp_new_taco_device::device_start()
 	m_error_timer = timer_alloc(ERROR_TMR_ID);
 }
 
-void hp_new_taco_device::device_reset()
+void hp_taco_device::device_reset()
 {
 	LOG("device_reset\n");
 	clear_state();
@@ -593,7 +593,7 @@ void hp_new_taco_device::device_reset()
 	m_error_timer->reset();
 }
 
-void hp_new_taco_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id) {
 	case GAP_TMR_ID:
@@ -654,7 +654,7 @@ void hp_new_taco_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	}
 }
 
-void hp_new_taco_device::clear_state()
+void hp_taco_device::clear_state()
 {
 	m_data_reg = 0;
 	m_cmd_reg = 0;
@@ -670,7 +670,7 @@ void hp_new_taco_device::clear_state()
 	set_tape_present(!m_tape->cart_out_r());
 }
 
-void hp_new_taco_device::irq_w(bool state)
+void hp_taco_device::irq_w(bool state)
 {
 	if (state != m_irq) {
 		m_irq = state;
@@ -679,7 +679,7 @@ void hp_new_taco_device::irq_w(bool state)
 	}
 }
 
-void hp_new_taco_device::sts_w(bool state)
+void hp_taco_device::sts_w(bool state)
 {
 	if (state != m_sts) {
 		m_sts = state;
@@ -688,7 +688,7 @@ void hp_new_taco_device::sts_w(bool state)
 	}
 }
 
-void hp_new_taco_device::set_error(bool error , bool gap_in_read)
+void hp_taco_device::set_error(bool error , bool gap_in_read)
 {
 	LOG_DBG("Error %d %d\n" , error , gap_in_read);
 
@@ -711,22 +711,22 @@ void hp_new_taco_device::set_error(bool error , bool gap_in_read)
 	}
 }
 
-hti_format_t::tape_pos_t hp_new_taco_device::min_gap_size() const
+hti_format_t::tape_pos_t hp_taco_device::min_gap_size() const
 {
 	return BIT(m_cmd_reg , CMD_ST_FGAP) ? LONG_GAP_LENGTH : SHORT_GAP_LENGTH;
 }
 
-void hp_new_taco_device::set_gap_timer()
+void hp_taco_device::set_gap_timer()
 {
 	m_tape->time_to_next_gap(min_gap_size() , true , m_gap_timer);
 }
 
-void hp_new_taco_device::set_evd_timer()
+void hp_taco_device::set_evd_timer()
 {
 	m_tape->time_to_next_gap(EVD_GAP_LENGTH , false , m_evd_timer);
 }
 
-void hp_new_taco_device::set_tape_present(bool present)
+void hp_taco_device::set_tape_present(bool present)
 {
 	if (present) {
 		if (m_tape->wpr_r()) {
@@ -741,7 +741,7 @@ void hp_new_taco_device::set_tape_present(bool present)
 	}
 }
 
-void hp_new_taco_device::send_go()
+void hp_taco_device::send_go()
 {
 	hp_dc100_tape_device::tape_speed_t speed;
 
@@ -753,7 +753,7 @@ void hp_new_taco_device::send_go()
 	m_tape->set_speed_setpoint(speed , BIT(m_cmd_reg , CMD_ST_FWD));
 }
 
-void hp_new_taco_device::send_stop()
+void hp_taco_device::send_stop()
 {
 	m_tape->set_op(hp_dc100_tape_device::OP_IDLE);
 	if (m_tape->set_speed_setpoint(hp_dc100_tape_device::SP_STOP , false)) {
@@ -761,25 +761,25 @@ void hp_new_taco_device::send_stop()
 	}
 }
 
-void hp_new_taco_device::end_cmd()
+void hp_taco_device::end_cmd()
 {
 	m_gap_timer->reset();
 	m_evd_timer->reset();
 }
 
-void hp_new_taco_device::irq_and_end()
+void hp_taco_device::irq_and_end()
 {
 	irq_w(true);
 	end_cmd();
 	m_cmd_state = CMD_IDLE;
 }
 
-bool hp_new_taco_device::is_at_slow_speed() const
+bool hp_taco_device::is_at_slow_speed() const
 {
 	return !m_tape->is_accelerating() && fabs(m_tape->get_speed()) == SLOW_SPEED;
 }
 
-void hp_new_taco_device::start_rd()
+void hp_taco_device::start_rd()
 {
 	if (m_tape->get_op() != hp_dc100_tape_device::OP_READ) {
 		m_tape->set_op(hp_dc100_tape_device::OP_READ);
@@ -789,20 +789,20 @@ void hp_new_taco_device::start_rd()
 	}
 }
 
-void hp_new_taco_device::start_wr()
+void hp_taco_device::start_wr()
 {
 	m_tape->set_op(hp_dc100_tape_device::OP_WRITE);
 	m_gap_timer->reset();
 	m_evd_timer->reset();
 }
 
-void hp_new_taco_device::update_checksum(uint16_t data)
+void hp_taco_device::update_checksum(uint16_t data)
 {
 	// Update checksum with data
 	m_checksum_reg += data;
 }
 
-void hp_new_taco_device::cmd_fsm()
+void hp_taco_device::cmd_fsm()
 {
 	auto prev_state = m_cmd_state;
 	if (m_cmd_state == CMD_STOPPING) {
@@ -915,34 +915,34 @@ void hp_new_taco_device::cmd_fsm()
 	}
 }
 
-uint8_t hp_new_taco_device::get_cmd(uint16_t cmd_reg)
+uint8_t hp_taco_device::get_cmd(uint16_t cmd_reg)
 {
 	return uint8_t((cmd_reg & (BIT_MASK<uint16_t>(CMD_ST_G5) | BIT_MASK<uint16_t>(CMD_ST_G4) |
 							   BIT_MASK<uint16_t>(CMD_ST_G3) | BIT_MASK<uint16_t>(CMD_ST_G2) |
 							   BIT_MASK<uint16_t>(CMD_ST_G1) | BIT_MASK<uint16_t>(CMD_ST_G0))) >> CMD_ST_G0);
 }
 
-bool hp_new_taco_device::is_cmd_rd_wr(uint16_t cmd_reg)
+bool hp_taco_device::is_cmd_rd_wr(uint16_t cmd_reg)
 {
 	return BIT(cmd_reg , CMD_ST_G1);
 }
 
-bool hp_new_taco_device::is_cmd_rd(uint16_t cmd_reg)
+bool hp_taco_device::is_cmd_rd(uint16_t cmd_reg)
 {
 	return is_cmd_rd_wr(cmd_reg) && BIT(cmd_reg , CMD_ST_G3);
 }
 
-bool hp_new_taco_device::is_cmd_wr(uint16_t cmd_reg)
+bool hp_taco_device::is_cmd_wr(uint16_t cmd_reg)
 {
 	return is_cmd_rd_wr(cmd_reg) && !BIT(cmd_reg , CMD_ST_G3);
 }
 
-bool hp_new_taco_device::is_double_hole_cmd(uint16_t cmd_reg)
+bool hp_taco_device::is_double_hole_cmd(uint16_t cmd_reg)
 {
 	return is_cmd_rd_wr(cmd_reg) || get_cmd(cmd_reg) == CMD_ERASE || get_cmd(cmd_reg) == CMD_WR_GAP_N_TACH;
 }
 
-void hp_new_taco_device::start_cmd_exec(uint16_t new_cmd_reg)
+void hp_taco_device::start_cmd_exec(uint16_t new_cmd_reg)
 {
 	LOG_DBG("New cmd %02x D=%d S=%d @ %g cmd %02x st %d\n" , get_cmd(new_cmd_reg) , BIT(new_cmd_reg , CMD_ST_FWD) , BIT(new_cmd_reg , CMD_ST_FST) , machine().time().as_double() , get_cmd(m_cmd_reg) , m_cmd_state);
 

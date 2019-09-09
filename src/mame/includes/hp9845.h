@@ -9,7 +9,7 @@
 #pragma once
 
 #include "cpu/hphybrid/hphybrid.h"
-#include "machine/hp_new_taco.h"
+#include "machine/hp_taco.h"
 #include "sound/beep.h"
 #include "bus/hp9845_io/hp9845_io.h"
 #include "emupal.h"
@@ -56,8 +56,8 @@ protected:
 	required_device<timer_device> m_gv_timer;
 	required_ioport_array<4> m_io_key;
 	required_ioport m_io_shiftlock;
-	required_device<hp_new_taco_device> m_t14;
-	required_device<hp_new_taco_device> m_t15;
+	required_device<hp_taco_device> m_t14;
+	required_device<hp_taco_device> m_t15;
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
 	required_device_array<hp9845_io_slot_device, 4> m_io_slot;
