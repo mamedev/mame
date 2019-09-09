@@ -269,6 +269,7 @@ void cbuster_state::twocrude(machine_config &config)
 	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45, 6MHz Verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cbuster_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	m_audiocpu->set_timer_scale(2);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(58);

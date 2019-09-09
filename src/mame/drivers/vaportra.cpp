@@ -217,6 +217,7 @@ void vaportra_state::vaportra(machine_config &config)
 	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &vaportra_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	m_audiocpu->set_timer_scale(2);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);

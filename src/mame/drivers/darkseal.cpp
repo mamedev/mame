@@ -211,6 +211,7 @@ void darkseal_state::darkseal(machine_config &config)
 	H6280(config, m_audiocpu, XTAL(32'220'000)/4); /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &darkseal_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	m_audiocpu->set_timer_scale(2);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
