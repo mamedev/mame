@@ -119,6 +119,7 @@ void osd_break_into_debugger(const char *message)
 std::string osd_get_clipboard_text(void)
 {
 	std::string result;
+	bool has_result = false;
 	OSStatus err;
 
 	PasteboardRef pasteboard_ref;
@@ -131,8 +132,7 @@ std::string osd_get_clipboard_text(void)
 	ItemCount item_count;
 	err = PasteboardGetItemCount(pasteboard_ref, &item_count);
 
-	char *result = nullptr; // core expects a malloced C string of uft8 data
-	for (UInt32 item_index = 1; (item_index <= item_count) && !result; item_index++)
+	for (UInt32 item_index = 1; (item_index <= item_count) && !has_result; item_index++)
 	{
 		PasteboardItemID item_id;
 		err = PasteboardGetItemIdentifier(pasteboard_ref, item_index, &item_id);
@@ -145,7 +145,7 @@ std::string osd_get_clipboard_text(void)
 			continue;
 
 		CFIndex const flavor_count = CFArrayGetCount(flavor_type_array);
-		for (CFIndex flavor_index = 0; (flavor_index < flavor_count) && !result; flavor_index++)
+		for (CFIndex flavor_index = 0; (flavor_index < flavor_count) && !has_result; flavor_index++)
 		{
 			CFStringRef const flavor_type = (CFStringRef)CFArrayGetValueAtIndex(flavor_type_array, flavor_index);
 
@@ -173,11 +173,8 @@ std::string osd_get_clipboard_text(void)
 				CFRange const range = CFRangeMake(0, length);
 
 				result.resize(length);
-				if (result)
-				{
-					CFDataGetBytes(data_ref, range, reinterpret_cast<unsigned char *>(&result[0]));
-					result[length] = 0;
-				}
+				CFDataGetBytes(data_ref, range, reinterpret_cast<unsigned char *>(&result[0]));
+				has_result = true;
 
 				CFRelease(data_ref);
 			}
