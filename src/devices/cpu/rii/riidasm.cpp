@@ -321,6 +321,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 	case 0x2700:
 		util::stream_format(stream, "%-8s", "RPT");
 		format_register(stream, opcode & 0x00ff);
+		words |= STEP_OVER | step_over_extra(1);
 		break;
 
 	case 0x2b00:
