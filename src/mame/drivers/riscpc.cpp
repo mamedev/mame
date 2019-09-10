@@ -5,7 +5,7 @@
     Acorn Archimedes 7000/7000+
 
     very preliminary driver by Angelo Salese,
-    based on work by Tomasz Slanina and Tom Walker
+    based on work by Tomasz Slanina and Sarah Walker
 
     TODO:
     - Move device implementations into specific files;

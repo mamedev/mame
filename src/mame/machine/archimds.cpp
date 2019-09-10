@@ -612,6 +612,8 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			---- --x- I2C clock
 			---- ---x I2C data
 			*/
+			
+			//m_ioc_regs[CONTROL] = data & 0x38;
 			//if(data & 0x40)
 			//  popmessage("Muting sound, contact MAME/MESSdev");
 			break;
@@ -839,6 +841,38 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 					{
 						switch(ioc_addr & 0xfffc)
 						{
+							// serial joy port (!JS application)
+							case 0x10:
+							{
+								// compared to RTFM they reversed bits 0-3 (or viceversa, dunno what came out first)
+								// for pragmatic convenience we bitswap here, but this should really be a slot option at some point.
+								// TODO: understand how player 2 inputs routes, related somehow to CONTROL bit 6 (cfr. blitz in SW list)
+								// TODO: paradr2k polls here with bit 7 and fails detection (Vertical Twist)
+								uint8_t cur_joy_in = bitswap<8>(m_joy[0].read_safe(0xff),7,6,5,4,0,1,2,3);
+								
+								m_joy_serial_data = (data & 0xff) ^ 0xff;
+								bool serial_on = false;
+								
+								if (m_joy_serial_data == 0x20)
+									serial_on = true;
+								else if (m_joy_serial_data & cur_joy_in)
+									serial_on = true;
+								
+								
+								// wants printer irq for some reason (connected on parallel?)
+								if (serial_on == true)
+								{
+									archimedes_request_irq_a(ARCHIMEDES_IRQA_PRINTER_BUSY);
+									//m_ioc_regs[CONTROL] |= 0x40;
+								}
+								else
+								{
+									archimedes_clear_irq_a(ARCHIMEDES_IRQA_PRINTER_BUSY);
+									//m_ioc_regs[CONTROL] &= ~0x40;
+								}
+								
+								return;
+							}
 							case 0x18: // latch B
 								/*
 								---- x--- floppy controller reset
@@ -962,8 +996,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		g = (val & 0x00f0) >> 4;
 		r = (val & 0x000f) >> 0;
 
-		if(reg == 0x40 && val & 0xfff)
-			logerror("WARNING: border color write here (PC=%08x)!\n",m_maincpu->pc());
+		//if(reg == 0x40 && val & 0xfff)
+		//	logerror("WARNING: border color write here (PC=%08x)!\n",m_maincpu->pc());
 
 		m_palette->set_pen_color(reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
 

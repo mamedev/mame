@@ -146,6 +146,7 @@ private:
 	emu_timer *m_vbl_timer;
 	uint8_t m_floppy_select;
 	bool check_floppy_ready();
+	uint8_t m_joy_serial_data;
 };
 
 /* IOC registers */

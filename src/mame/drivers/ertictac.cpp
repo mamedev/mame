@@ -9,7 +9,7 @@
 
     original driver by Tomasz Slanina, Steve Ellenoff, Nicola Salmoria
     rewrite to use AA functions by R. Belmont & Angelo Salese
-    special thanks to Tom Walker (author of the Acorn Archimedes Arculator emulator)
+    special thanks to Sarah Walker (author of the Acorn Archimedes Arculator emulator)
 
     TODO (specific issues only):
     - Sound is currently ugly in both games, recognizable but still nowhere near perfection
