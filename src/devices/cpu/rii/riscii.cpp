@@ -6,7 +6,9 @@
 
     Architecture is very similar to the GI/Microchip PIC series, with
     16-bit opcodes and a banked 8-bit register file with special registers
-    for indirect access. (It has no relation to Berkeley RISC II.)
+    for indirect access. (It has no relation to Berkeley RISC II. Elan's
+    first generation of PIC-like microcontrollers, the EM78 series, has
+    13-bit opcodes.)
 
     Currently this device is just a stub with no actual execution core.
 
