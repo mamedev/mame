@@ -57,6 +57,7 @@ SOUNDS["SPEAKER"] = true
 --------------------------------------------------
 
 VIDEOS["FIXFREQ"] = true
+VIDEOS["PWM_DISPLAY"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -88,6 +89,7 @@ MACHINES["EEPROMDEV"] = true
 --MACHINES["68681"] = true
 --MACHINES["BANKDEV"] = true
 MACHINES["F3853"] = true
+MACHINES["SENSORBOARD"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -196,6 +198,8 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_tp1983.h",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.h",
+
+  MAME_DIR .. "src/mame/drivers/aci_prodigy.cpp",
 
 	-- Skeletons ...
 	MAME_DIR .. "src/mame/drivers/a1supply.cpp",

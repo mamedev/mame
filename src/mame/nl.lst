@@ -66,7 +66,7 @@ popeyeu                         // (c) 1982
 popeyef                         // (c) 1982
 popeyebl                        // bootleg
 
-@source:prodigy.cpp
+@source:aci_prodigy.cpp
 prodigy                        // ACI Destiny Prodigy, 1981
 
 @source:testpat.cpp
