@@ -752,13 +752,8 @@ void osd_break_into_debugger(const char *message);
 
 /*-----------------------------------------------------------------------------
     osd_get_clipboard_text: retrieves text from the clipboard
-
-    Return value:
-
-        the returned string needs to be osd_free()-ed!
-
 -----------------------------------------------------------------------------*/
-char *osd_get_clipboard_text(void);
+std::string osd_get_clipboard_text(void);
 
 
 /***************************************************************************

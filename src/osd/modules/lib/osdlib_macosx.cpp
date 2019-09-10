@@ -116,14 +116,15 @@ void osd_break_into_debugger(const char *message)
 //  osd_get_clipboard_text
 //============================================================
 
-char *osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text(void)
 {
+	std::string result;
 	OSStatus err;
 
 	PasteboardRef pasteboard_ref;
 	err = PasteboardCreate(kPasteboardClipboard, &pasteboard_ref);
 	if (err)
-		return nullptr;
+		return result;
 
 	PasteboardSynchronize(pasteboard_ref);
 
@@ -171,10 +172,10 @@ char *osd_get_clipboard_text(void)
 				CFIndex const length = CFDataGetLength(data_ref);
 				CFRange const range = CFRangeMake(0, length);
 
-				result = reinterpret_cast<char *>(malloc(length + 1));
+				result.resize(length);
 				if (result)
 				{
-					CFDataGetBytes(data_ref, range, reinterpret_cast<unsigned char *>(result));
+					CFDataGetBytes(data_ref, range, reinterpret_cast<unsigned char *>(&result[0]));
 					result[length] = 0;
 				}
 

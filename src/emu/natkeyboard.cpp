@@ -585,17 +585,10 @@ void natural_keyboard::post_coded(const std::string &text, const attotime &rate)
 void natural_keyboard::paste()
 {
 	// retrieve the clipboard text
-	char *text = osd_get_clipboard_text();
+	std::string text = osd_get_clipboard_text();
 
-	// was a result returned?
-	if (text != nullptr)
-	{
-		// post the text
-		post_utf8(text);
-
-		// free the string
-		free(text);
-	}
+	// post the text
+	post_utf8(text);
 }
 
 
