@@ -903,7 +903,7 @@ u16 ay8910_device::mix_3D()
 			u32 env_mask = (1 << (chan + 15));
 			if (m_feature & PSG_HAS_EXPANDED_MODE)
 			{
-				if (!is_expnaded_mode())
+				if (!is_expanded_mode())
 				{
 					env_volume >>= 1;
 					env_mask = 0;
@@ -920,7 +920,7 @@ u16 ay8910_device::mix_3D()
 		}
 		else
 		{
-			const u32 tone_mask = is_expnaded_mode() ? (1 << (chan + 15)) : 0;
+			const u32 tone_mask = is_expanded_mode() ? (1 << (chan + 15)) : 0;
 			indx |= tone_mask | (m_vol_enabled[chan] ? tone_volume(tone) << (chan*5) : 0);
 		}
 	}
@@ -946,17 +946,17 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 	{
 		case AY_AFINE:
 		case AY_ACOARSE:
-			coarse = m_regs[AY_ACOARSE] & (is_expnaded_mode() ? 0xff : 0xf);
+			coarse = m_regs[AY_ACOARSE] & (is_expanded_mode() ? 0xff : 0xf);
 			m_tone[0].set_period(m_regs[AY_AFINE], coarse);
 			break;
 		case AY_BFINE:
 		case AY_BCOARSE:
-			coarse = m_regs[AY_BCOARSE] & (is_expnaded_mode() ? 0xff : 0xf);
+			coarse = m_regs[AY_BCOARSE] & (is_expanded_mode() ? 0xff : 0xf);
 			m_tone[1].set_period(m_regs[AY_BFINE], coarse);
 			break;
 		case AY_CFINE:
 		case AY_CCOARSE:
-			coarse = m_regs[AY_CCOARSE] & (is_expnaded_mode() ? 0xff : 0xf);
+			coarse = m_regs[AY_CCOARSE] & (is_expanded_mode() ? 0xff : 0xf);
 			m_tone[2].set_period(m_regs[AY_CFINE], coarse);
 			break;
 		case AY_NOISEPER:
@@ -1208,7 +1208,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					u32 env_volume = envelope->volume;
 					if (m_feature & PSG_HAS_EXPANDED_MODE)
 					{
-						if (!is_expnaded_mode())
+						if (!is_expanded_mode())
 						{
 							env_volume >>= 1;
 							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
@@ -1234,7 +1234,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 				else
 				{
-					if (is_expnaded_mode())
+					if (is_expanded_mode())
 						*(buf[chan]++) = m_env_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0];
 					else
 						*(buf[chan]++) = m_vol_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0];
