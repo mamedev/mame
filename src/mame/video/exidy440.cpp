@@ -462,7 +462,7 @@ uint32_t topsecex_state::screen_update_topsecex(screen_device &screen, bitmap_in
 
 void exidy440_state::exidy440_video(machine_config &config)
 {
-	PALETTE(config, m_palette). set_entries(256);
+	PALETTE(config, m_palette).set_entries(512);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
