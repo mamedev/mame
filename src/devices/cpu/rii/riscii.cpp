@@ -614,7 +614,8 @@ void riscii_series_device::execute_jump(u32 addr)
 void riscii_series_device::execute_call(u32 addr)
 {
 	m_stkptr -= 2;
-	m_regs->write_word((BIT(m_stkptr, 7) ? m_maxbank : m_maxbank - 1) << 8 | 0x80 | (m_stkptr & 0x7e), m_pc & 0xffff);
+	u16 stkaddr = u16(m_maxbank - (BIT(m_stkptr, 7) ? 0 : 1)) << 8 | 0x80 | (m_stkptr & 0x7e);
+	m_regs->write_word(stkaddr, swapendian_int16(m_pc & 0xffff));
 	execute_jump(addr);
 }
 
@@ -746,7 +747,8 @@ void riscii_series_device::execute_rpt(u8 reg)
 
 void riscii_series_device::execute_ret(bool inte)
 {
-	execute_jump((m_pc & 0xf0000) | m_regs->read_word((BIT(m_stkptr, 7) ? m_maxbank : m_maxbank - 1) << 8 | 0x80 | (m_stkptr & 0x7e)));
+	u16 stkaddr = u16(m_maxbank - (BIT(m_stkptr, 7) ? 0 : 1)) << 8 | 0x80 | (m_stkptr & 0x7e);
+	execute_jump((m_pc & 0xf0000) | swapendian_int16(m_regs->read_word(stkaddr)));
 	m_stkptr += 2;
 	if (inte)
 		m_cpucon |= 0x08;
@@ -1056,7 +1058,10 @@ void riscii_series_device::execute_tbrd(u32 ptr)
 		m_regs->write_byte(addr, data >> 8);
 	else
 		m_regs->write_byte(addr, data);
-	m_exec_state = EXEC_CYCLE1;
+	if (m_repeat != 0)
+		--m_repeat;
+	else
+		m_exec_state = EXEC_CYCLE1;
 }
 
 void riscii_series_device::execute_run()
@@ -1070,8 +1075,12 @@ void riscii_series_device::execute_run()
 			debugger_instruction_hook(m_pc);
 			if (m_repeat != 0)
 			{
-				--m_repeat;
-				execute_cycle1(m_cache->read_word(m_pc));
+				execute_cycle1(m_cache->read_word(m_pc++));
+				if (m_exec_state == EXEC_CYCLE1)
+				{
+					--m_repeat;
+					m_pc = m_ppc;
+				}
 			}
 			else
 				execute_cycle1(m_cache->read_word(m_pc++));
