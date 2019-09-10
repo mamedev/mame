@@ -15,7 +15,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <locale>
+#include <clocale>
 
 namespace plib {
 
@@ -26,6 +26,10 @@ pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 	std::array<char, 2048> buf = {0};
 	std::size_t sl;
 	bool found_abs = false;
+	pstring old_locale(std::setlocale(LC_ALL, nullptr));
+
+	if (old_locale != "C")
+		std::setlocale(LC_ALL, "C");
 
 	m_arg++;
 
@@ -97,6 +101,8 @@ pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 			m_str = m_str.substr(0, p) + pstring(buf.data()) + m_str.substr(p + sl);
 		va_end(ap);
 	} while (found_abs);
+	if (old_locale != "C")
+		std::setlocale(LC_ALL, old_locale.c_str());
 	return *this;
 }
 
