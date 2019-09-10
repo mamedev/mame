@@ -111,8 +111,8 @@ void riscii_series_device::device_start()
 	set_icountptr(m_icount);
 
 	state_add(RII_PC, "PC", m_pc).mask((1 << m_prgbits) - 1);
-	state_add(STATE_GENPC, "GENPC", m_pc).callimport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_ppc).callimport().noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).mask((1 << m_prgbits) - 1).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_ppc).mask((1 << m_prgbits) - 1).noshow();
 	state_add(RII_REPEAT, "REPEAT", m_repeat);
 	state_add(RII_ACC, "ACC", m_acc);
 	state_add(RII_BSR, "BSR", m_bsr[0]).mask(m_bankmask);
@@ -123,6 +123,7 @@ void riscii_series_device::device_start()
 	state_add(RII_STKPTR, "STKPTR", m_stkptr);
 	state_add(RII_CPUCON, "CPUCON", m_cpucon).mask(0x9f);
 	state_add(RII_STATUS, "STATUS", m_status);
+	state_add(STATE_GENFLAGS, "CURFLAGS", m_status).noshow().formatstr("%8s");
 	state_add(RII_PROD, "PROD", m_prod);
 	state_add(RII_POST_ID, "POST_ID", m_post_id);
 
@@ -1121,4 +1122,22 @@ void riscii_series_device::execute_run()
 void riscii_series_device::execute_set_input(int inputnum, int state)
 {
 	// TODO
+}
+
+void riscii_series_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+	case STATE_GENFLAGS:
+		str = string_format("%c%c%c%c%c%c%c%c",
+			BIT(m_status, 7) ? 'T' : '.', // /TO
+			BIT(m_status, 6) ? 'P' : '.', // /PD
+			BIT(m_status, 5) ? 'G' : '.', // SGE
+			BIT(m_status, 4) ? 'L' : '.', // SLE
+			BIT(m_status, 3) ? 'V' : '.', // OV
+			BIT(m_status, 2) ? 'Z' : '.',
+			BIT(m_status, 1) ? 'D' : '.', // auxiliary carry
+			BIT(m_status, 0) ? 'C' : '.');
+		break;
+	}
 }
