@@ -45,11 +45,11 @@
         * Trivial Pursuit (Volumen III, Spanish, Maibesa license)
         * Trivial Pursuit (Volumen II, Spanish, Maibesa license)
         * Trivial Pursuit (Volumen IV, Spanish, Maibesa hardware)
+        * Trivial Pursuit (Volumen V, Spanish, Maibesa hardware)
 
     Looking for ROMs for these:
         * Euro Stocker
         * Trivial Pursuit (Volumen I, Spanish, Maibesa)
-        * Trivial Pursuit (Volumen V, Spanish, Maibesa) [probably running on Maibesa hardware]
 
     Known bugs:
         * CEM3394 emulation is not perfect
