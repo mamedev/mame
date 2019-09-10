@@ -903,7 +903,7 @@ u16 ay8910_device::mix_3D()
 			u32 env_mask = (1 << (chan + 15));
 			if (m_feature & PSG_HAS_EXPANDED_MODE)
 			{
-				if (!is_expnaded_mode())
+				if (!is_expanded_mode())
 				{
 					env_volume >>= 1;
 					env_mask = 0;
@@ -920,7 +920,7 @@ u16 ay8910_device::mix_3D()
 		}
 		else
 		{
-			const u32 tone_mask = is_expnaded_mode() ? (1 << (chan + 15)) : 0;
+			const u32 tone_mask = is_expanded_mode() ? (1 << (chan + 15)) : 0;
 			indx |= tone_mask | (m_vol_enabled[chan] ? tone_volume(tone) << (chan*5) : 0);
 		}
 	}
@@ -946,17 +946,17 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 	{
 		case AY_AFINE:
 		case AY_ACOARSE:
-			coarse = m_regs[AY_ACOARSE] & (is_expnaded_mode() ? 0xff : 0xf);
+			coarse = m_regs[AY_ACOARSE] & (is_expanded_mode() ? 0xff : 0xf);
 			m_tone[0].set_period(m_regs[AY_AFINE], coarse);
 			break;
 		case AY_BFINE:
 		case AY_BCOARSE:
-			coarse = m_regs[AY_BCOARSE] & (is_expnaded_mode() ? 0xff : 0xf);
+			coarse = m_regs[AY_BCOARSE] & (is_expanded_mode() ? 0xff : 0xf);
 			m_tone[1].set_period(m_regs[AY_BFINE], coarse);
 			break;
 		case AY_CFINE:
 		case AY_CCOARSE:
-			coarse = m_regs[AY_CCOARSE] & (is_expnaded_mode() ? 0xff : 0xf);
+			coarse = m_regs[AY_CCOARSE] & (is_expanded_mode() ? 0xff : 0xf);
 			m_tone[2].set_period(m_regs[AY_CFINE], coarse);
 			break;
 		case AY_NOISEPER:
@@ -1208,7 +1208,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					u32 env_volume = envelope->volume;
 					if (m_feature & PSG_HAS_EXPANDED_MODE)
 					{
-						if (!is_expnaded_mode())
+						if (!is_expanded_mode())
 						{
 							env_volume >>= 1;
 							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
@@ -1234,7 +1234,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 				else
 				{
-					if (is_expnaded_mode())
+					if (is_expanded_mode())
 						*(buf[chan]++) = m_env_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0];
 					else
 						*(buf[chan]++) = m_vol_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0];
@@ -1618,7 +1618,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 }
 
 ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
-								psg_type_t psg_type, int streams, int ioports, int config)
+								psg_type_t psg_type, int streams, int ioports, int feature)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_type(psg_type),
@@ -1633,13 +1633,13 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_count_noise(0),
 		m_rng(0),
 		m_mode(0),
-		m_env_step_mask((!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 0x0f : 0x1f),
-		m_step(         (!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 32 : 16),
-		m_zero_is_off(  (!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 1 : 0),
-		m_par(          (!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param),
-		m_par_env(      (!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param_env),
+		m_env_step_mask((!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 0x0f : 0x1f),
+		m_step(         (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 32 : 16),
+		m_zero_is_off(  (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 1 : 0),
+		m_par(          (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param),
+		m_par_env(      (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param_env),
 		m_flags(AY8910_LEGACY_OUTPUT),
-		m_feature(config),
+		m_feature(feature),
 		m_port_a_read_cb(*this),
 		m_port_b_read_cb(*this),
 		m_port_a_write_cb(*this),

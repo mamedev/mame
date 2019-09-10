@@ -126,7 +126,7 @@ public:
 
 protected:
 	ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner,
-					u32 clock, psg_type_t psg_type, int streams, int ioports, int config = PSG_DEFAULT);
+					u32 clock, psg_type_t psg_type, int streams, int ioports, int feature = PSG_DEFAULT);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -261,17 +261,17 @@ private:
 
 	// inlines
 	inline bool tone_enable(int chan) { return BIT(m_regs[AY_ENABLE], chan); }
-	inline u8 tone_volume(tone_t *tone) { return tone->volume & (is_expnaded_mode() ? 0x1f : 0x0f); }
-	inline u8 tone_envelope(tone_t *tone) { return (tone->volume >> (is_expnaded_mode() ? 5 : 4)) & ((m_feature & PSG_EXTENDED_ENVELOPE) ? 3 : 1); }
-	inline u8 tone_duty(tone_t *tone) { return is_expnaded_mode() ? (tone->duty & 0x8 ? 0x8 : tone->duty) : 0x4; }
-	inline u8 get_envelope_chan(int chan) { return is_expnaded_mode() ? chan : 0; }
+	inline u8 tone_volume(tone_t *tone) { return tone->volume & (is_expanded_mode() ? 0x1f : 0x0f); }
+	inline u8 tone_envelope(tone_t *tone) { return (tone->volume >> (is_expanded_mode() ? 5 : 4)) & ((m_feature & PSG_EXTENDED_ENVELOPE) ? 3 : 1); }
+	inline u8 tone_duty(tone_t *tone) { return is_expanded_mode() ? (tone->duty & 0x8 ? 0x8 : tone->duty) : 0x4; }
+	inline u8 get_envelope_chan(int chan) { return is_expanded_mode() ? chan : 0; }
 
 	inline bool noise_enable(int chan) { return BIT(m_regs[AY_ENABLE], 3 + chan); }
-	inline u8 noise_period() { return is_expnaded_mode() ? m_regs[AY_NOISEPER] & 0xff : (m_regs[AY_NOISEPER] & 0x1f) << 1; }
+	inline u8 noise_period() { return is_expanded_mode() ? m_regs[AY_NOISEPER] & 0xff : (m_regs[AY_NOISEPER] & 0x1f) << 1; }
 	inline u8 noise_output() { return m_rng & 1; }
 
-	inline bool is_expnaded_mode() { return ((m_feature & PSG_HAS_EXPANDED_MODE) && ((m_mode & 0xe) == 0xa)); }
-	inline u8 get_register_bank() { return is_expnaded_mode() ? (m_mode & 0x1) << 4 : 0; }
+	inline bool is_expanded_mode() { return ((m_feature & PSG_HAS_EXPANDED_MODE) && ((m_mode & 0xe) == 0xa)); }
+	inline u8 get_register_bank() { return is_expanded_mode() ? (m_mode & 0x1) << 4 : 0; }
 
 	// internal helpers
 	void set_type(psg_type_t psg_type);
