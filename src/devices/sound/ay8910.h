@@ -126,7 +126,7 @@ public:
 
 protected:
 	ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner,
-					u32 clock, psg_type_t psg_type, int streams, int ioports, int config = PSG_DEFAULT);
+					u32 clock, psg_type_t psg_type, int streams, int ioports, int feature = PSG_DEFAULT);
 
 	// device-level overrides
 	virtual void device_start() override;

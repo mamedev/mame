@@ -1618,7 +1618,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 }
 
 ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
-								psg_type_t psg_type, int streams, int ioports, int config)
+								psg_type_t psg_type, int streams, int ioports, int feature)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_type(psg_type),
@@ -1633,13 +1633,13 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_count_noise(0),
 		m_rng(0),
 		m_mode(0),
-		m_env_step_mask((!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 0x0f : 0x1f),
-		m_step(         (!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 32 : 16),
-		m_zero_is_off(  (!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 1 : 0),
-		m_par(          (!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param),
-		m_par_env(      (!(config & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param_env),
+		m_env_step_mask((!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 0x0f : 0x1f),
+		m_step(         (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 32 : 16),
+		m_zero_is_off(  (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 1 : 0),
+		m_par(          (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param),
+		m_par_env(      (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param_env),
 		m_flags(AY8910_LEGACY_OUTPUT),
-		m_feature(config),
+		m_feature(feature),
 		m_port_a_read_cb(*this),
 		m_port_b_read_cb(*this),
 		m_port_a_write_cb(*this),
