@@ -263,7 +263,7 @@ private:
 	inline bool tone_enable(int chan) { return BIT(m_regs[AY_ENABLE], chan); }
 	inline u8 tone_volume(tone_t *tone) { return tone->volume & (is_expanded_mode() ? 0x1f : 0x0f); }
 	inline u8 tone_envelope(tone_t *tone) { return (tone->volume >> (is_expanded_mode() ? 5 : 4)) & ((m_feature & PSG_EXTENDED_ENVELOPE) ? 3 : 1); }
-	inline u8 tone_duty(tone_t *tone) { return is_expanded_mode() ? (tone->duty & 0x8 ? 0x8 : tone->duty) : 0x4; }
+	inline u8 tone_duty(tone_t *tone) { return is_expanded_mode() ? (tone->duty & 0x8 ? 0x8 : (tone->duty & 0xf)) : 0x4; }
 	inline u8 get_envelope_chan(int chan) { return is_expanded_mode() ? chan : 0; }
 
 	inline bool noise_enable(int chan) { return BIT(m_regs[AY_ENABLE], 3 + chan); }
