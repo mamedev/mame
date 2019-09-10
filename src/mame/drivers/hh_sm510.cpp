@@ -4071,7 +4071,7 @@ ROM_START( gnw_mbaway )
 	ROM_LOAD( "tb-94.program", 0x0000, 0x1000, CRC(11d18a48) SHA1(afccfa19dace7c4fcc15a84ecfcfb9d7ae3861e4) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "tb-94.melody", 0x000, 0x100, BAD_DUMP CRC(883931c2) SHA1(9ad22bde42a67c42d117f3ffa81a23c3c9044e66) ) // decap needed for verification
+	ROM_LOAD( "tb-94.melody", 0x000, 0x100, BAD_DUMP CRC(60d98353) SHA1(8789d7cd39111fe01848a89748ab91731de5caef) ) // decap needed for verification
 
 	ROM_REGION( 514643, "screen", 0)
 	ROM_LOAD( "gnw_mbaway.svg", 0, 514643, CRC(2ec2f18b) SHA1(8e2fd20615d867aac97e443fb977513ff98138b4) )
