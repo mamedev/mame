@@ -49,7 +49,7 @@ private:
 
 	// internal state
 	bool (*m_sortType)(const device_debug::breakpoint *, const device_debug::breakpoint *);
-	std::vector<device_debug::breakpoint *> m_buffer;
+	std::vector<const device_debug::breakpoint *> m_buffer;
 };
 
 #endif // MAME_EMU_DEBUG_DVBPOINTS_H

@@ -1400,18 +1400,18 @@ void debugger_commands::execute_bplist(int ref, const std::vector<std::string> &
 
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
-		if (device.debug()->breakpoint_first() != nullptr)
+		if (!device.debug()->breakpoint_list().empty())
 		{
 			m_console.printf("Device '%s' breakpoints:\n", device.tag());
 
 			/* loop over the breakpoints */
-			for (device_debug::breakpoint *bp = device.debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
+			for (const device_debug::breakpoint &bp : device.debug()->breakpoint_list())
 			{
-				buffer = string_format("%c%4X @ %0*X", bp->enabled() ? ' ' : 'D', bp->index(), device.debug()->logaddrchars(), bp->address());
-				if (std::string(bp->condition()).compare("1") != 0)
-					buffer.append(string_format(" if %s", bp->condition()));
-				if (std::string(bp->action()).compare("") != 0)
-					buffer.append(string_format(" do %s", bp->action()));
+				buffer = string_format("%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
+				if (std::string(bp.condition()).compare("1") != 0)
+					buffer.append(string_format(" if %s", bp.condition()));
+				if (std::string(bp.action()).compare("") != 0)
+					buffer.append(string_format(" do %s", bp.action()));
 				m_console.printf("%s\n", buffer.c_str());
 				printed++;
 			}
@@ -1700,16 +1700,16 @@ void debugger_commands::execute_rplist(int ref, const std::vector<std::string> &
 
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
-		if (device.debug()->registerpoint_first() != nullptr)
+		if (!device.debug()->registerpoint_list().empty())
 		{
 			m_console.printf("Device '%s' registerpoints:\n", device.tag());
 
 			/* loop over the breakpoints */
-			for (device_debug::registerpoint *rp = device.debug()->registerpoint_first(); rp != nullptr; rp = rp->next())
+			for (const device_debug::registerpoint &rp : device.debug()->registerpoint_list())
 			{
-				buffer = string_format("%c%4X if %s", rp->enabled() ? ' ' : 'D', rp->index(), rp->condition());
-				if (rp->action() != nullptr)
-					buffer.append(string_format(" do %s", rp->action()));
+				buffer = string_format("%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
+				if (rp.action() != nullptr)
+					buffer.append(string_format(" do %s", rp.action()));
 				m_console.printf("%s\n", buffer.c_str());
 				printed++;
 			}

@@ -19,6 +19,7 @@
 #define __EMU_H__
 
 #include <list>
+#include <forward_list>
 #include <vector>
 #include <memory>
 #include <map>
