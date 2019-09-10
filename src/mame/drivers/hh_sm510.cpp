@@ -21,6 +21,7 @@ TODO:
 - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
   confident that it's same)
 - confirm gnw_climbcs rom (assumed to be the same as gnw_climber)
+- dump/add CN-07 version of gnw_helmet
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
@@ -1550,6 +1551,8 @@ ROM_END
 
   In the UK, it was distributed as Headache by CGL.
 
+  MCU label CN-07 is the first version, CN-17 is a bugfix release.
+
 ***************************************************************************/
 
 class gnw_helmet_state : public hh_sm510_state
@@ -1619,7 +1622,7 @@ void gnw_helmet_state::gnw_helmet(machine_config &config)
 
 ROM_START( gnw_helmet )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "cn-07", 0x0000, 0x0740, CRC(6d251e2e) SHA1(c61f591514de36fb2270038a6505945564c9f90e) )
+	ROM_LOAD( "cn-17", 0x0000, 0x0740, CRC(6d251e2e) SHA1(c61f591514de36fb2270038a6505945564c9f90e) )
 
 	ROM_REGION( 109241, "screen", 0)
 	ROM_LOAD( "gnw_helmet.svg", 0, 109241, CRC(fa8294a3) SHA1(05b734ac0126d3bffe160a23753a0a7e6f82996e) )
