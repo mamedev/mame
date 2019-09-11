@@ -176,7 +176,7 @@ WRITE32_MEMBER(deco_mlc_state::eeprom_w)
 	{
 		const u8 ebyte = (data >> 8) & 0xff;
 //      if (ebyte & 0x80)
-//		{
+//      {
 			m_eeprom->clk_write((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 			m_eeprom->di_write(ebyte & 0x1);
 			m_eeprom->cs_write((ebyte & 0x4) ? ASSERT_LINE : CLEAR_LINE);
@@ -232,11 +232,11 @@ WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 		m_maincpu->set_input_line(m_irqLevel, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
-		if(m_irq_ram[0x14/4] == -1) // TODO: likely to be anything that doesn't fit into the screen v-pos range.
+		if(m_irq_ram[0x14 / 4] == -1) // TODO: likely to be anything that doesn't fit into the screen v-pos range.
 			m_raster_irq_timer->adjust(attotime::never);
 		else
-			m_raster_irq_timer->adjust(m_screen->time_until_pos(m_irq_ram[0x14/4]));
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", m_irq_ram[0x14/4], m_screen->vpos());
+			m_raster_irq_timer->adjust(m_screen->time_until_pos(m_irq_ram[0x14 / 4]));
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", m_irq_ram[0x14 / 4], m_screen->vpos());
 		return;
 
 	default:
@@ -922,12 +922,13 @@ void deco_mlc_state::descramble_sound(  )
 
 	for (u32 x = 0; x < length; x++)
 	{
-		u32 addr = bitswap<24> (x,23,22,21,0, 20,
-								19,18,17,16,
-								15,14,13,12,
-								11,10,9, 8,
-								7, 6, 5, 4,
-								3, 2, 1 );
+		const u32 addr = bitswap<24>(x,
+		23,22,21,0, 20,
+		19,18,17,16,
+		15,14,13,12,
+		11,10,9, 8,
+		7, 6, 5, 4,
+		3, 2, 1 );
 
 		buf[addr] = rom[x];
 	}
@@ -937,8 +938,8 @@ void deco_mlc_state::descramble_sound(  )
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
-	u32 a = m_mainram[0x89a0/4];
-	u32 p = m_maincpu->pc();
+	const u32 a = m_mainram[0x89a0 / 4];
+	const u32 p = m_maincpu->pc();
 
 	if ((p == 0x3234 || p == 0x32dc) && (a & 1)) m_maincpu->spin_until_interrupt();
 
@@ -955,7 +956,7 @@ void deco_mlc_state::init_avengrgs()
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x32dc);
 
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0100000, 0x01088ff, 0, &m_mainram[0]);
-	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mainram[0x8a00/4]);
+	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0108a00, 0x011ffff, 0, &m_mainram[0x8a00 / 4]);
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0200080, 0x02000ff, 0, &m_clip_ram[0]);
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
 
