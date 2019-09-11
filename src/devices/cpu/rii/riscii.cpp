@@ -153,6 +153,7 @@ void riscii_series_device::device_reset()
 	m_tabptr = 0x000000;
 	m_stkptr = 0x00;
 	m_cpucon &= 0x01;
+	m_status |= 0xc0;
 	m_post_id = 0xf0;
 	m_exec_state = EXEC_CYCLE1;
 	m_repeat = 0x00;
@@ -261,7 +262,7 @@ u8 riscii_series_device::tabptrh_r()
 
 void riscii_series_device::tabptrh_w(u8 data)
 {
-	m_tabptr = (m_tabptr & 0x00ffff) | u32(data & (0x80 | ((1 << (m_prgbits - 16)) - 1))) << 16;
+	m_tabptr = (m_tabptr & 0x00ffff) | u32(data & (0x80 | ((1 << (m_prgbits - 15)) - 1))) << 16;
 }
 
 u8 riscii_series_device::acc_r()
@@ -301,7 +302,7 @@ u8 riscii_series_device::status_r()
 
 void riscii_series_device::status_w(u8 data)
 {
-	m_status = data;
+	m_status = (m_status & 0xc0) | (data & 0x3f);
 }
 
 u8 riscii_series_device::prodl_r()
@@ -751,7 +752,7 @@ void riscii_series_device::execute_ret(bool inte)
 	execute_jump((m_pc & 0xf0000) | swapendian_int16(m_regs->read_word(stkaddr)));
 	m_stkptr += 2;
 	if (inte)
-		m_cpucon |= 0x08;
+		m_cpucon |= 0x04;
 }
 
 void riscii_series_device::execute_wdtc()
@@ -1139,8 +1140,8 @@ void riscii_series_device::state_string_export(const device_state_entry &entry, 
 	{
 	case STATE_GENFLAGS:
 		str = string_format("%c%c%c%c%c%c%c%c",
-			BIT(m_status, 7) ? 'T' : '.', // /TO
-			BIT(m_status, 6) ? 'P' : '.', // /PD
+			BIT(m_status, 7) ? '.' : 'T', // /TO
+			BIT(m_status, 6) ? '.' : 'P', // /PD
 			BIT(m_status, 5) ? 'G' : '.', // SGE
 			BIT(m_status, 4) ? 'L' : '.', // SLE
 			BIT(m_status, 3) ? 'V' : '.', // OV
