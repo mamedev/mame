@@ -29,13 +29,13 @@ void deco_mlc_state::video_start()
 	}
 
 //  temp_bitmap = std::make_unique<bitmap_rgb32>(512, 512);
-	m_buffered_spriteram = std::make_unique<u16[]>(0x3000/4);
-	m_spriteram_spare = std::make_unique<u16[]>(0x3000/4);
-	m_spriteram = std::make_unique<u16[]>(0x3000/4);
+	m_buffered_spriteram = std::make_unique<u16[]>(0x3000 / 4);
+	m_spriteram_spare = std::make_unique<u16[]>(0x3000 / 4);
+	m_spriteram = std::make_unique<u16[]>(0x3000 / 4);
 
-	save_pointer(NAME(m_spriteram), 0x3000/4);
-	save_pointer(NAME(m_spriteram_spare), 0x3000/4);
-	save_pointer(NAME(m_buffered_spriteram), 0x3000/4);
+	save_pointer(NAME(m_spriteram), 0x3000 / 4);
+	save_pointer(NAME(m_spriteram_spare), 0x3000 / 4);
+	save_pointer(NAME(m_buffered_spriteram), 0x3000 / 4);
 }
 
 
@@ -45,7 +45,7 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 		int scalex, int srcline, int shadowMode )
 {
 	if (!scalex) return;
-	const u32 alphaMode = m_irq_ram[0x04/4] & 0xc0;
+	const u32 alphaMode = m_irq_ram[0x04 / 4] & 0xc0;
 
 	/*
 	scalex and scaley are 16.16 fixed point numbers
@@ -80,9 +80,9 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 
 		if (sx < clip.left())
 		{ /* clip left */
-			int pixels = clip.left()-sx;
+			int pixels = clip.left() - sx;
 			sx += pixels;
-			x_index_base += pixels*dx;
+			x_index_base += pixels * dx;
 		}
 		/* NS 980211 - fixed incorrect clipping */
 		if (ex > clip.right() + 1)
@@ -98,107 +98,42 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 			const u8 *code_base2 = gfx->get_data(code2 % gfx->elements());
 			const u8 *source1 = code_base1 + (srcline) * gfx->rowbytes();
 			const u8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
-			/* no alpha */
-			if (!shadowMode)
-			{
-				if (alphaMode & 0xc0)
+			// alphaMode & 0xc0 = 0xc0 : Shadow, 0 : Alpha or Pre-shadowed, Other bits unknown
+			if (shadowMode && (alphaMode & 0xc0))
+			{	/* TODO : 8bpp and shadow can use simultaneously? */
+				int x, x_index = x_index_base;
+				for (x = sx; x < ex; x++)
 				{
-					int x, x_index = x_index_base;
-					for (x = sx; x < ex; x++)
+					if (!(pri[x] & 0x80))
 					{
-						if (!(pri[x] & 0x80))
-						{
-							int c = source1[x_index >> 16];
-							if (use8bpp)
-								c = (c << 4) | source2[x_index >> 16];
+						int c = source1[x_index >> 16];
+						if (use8bpp)
+							c = (c << 4) | source2[x_index >> 16];
 
-							if (c != transparent_color)
-							{
-								u32 col = pal[c];
-								if ((pri[x] & 0x3) && ((pri[x] & 0x3) != 0x3))
-								{
-									const u8 a = (col >> 24) & 0xff;
-									const u8 r = (col >> 16) & 0xff;
-									const u8 g = (col >> 8) & 0xff;
-									const u8 b = (col >> 0) & 0xff;
-									if (pri[x] & 1) // shadow
-									{
-										col = rgb_t(a, r >> 1, g >> 1, b >> 1);
-									}
-									else if (pri[x] & 2) // hilight
-									{
-										col = rgb_t(a, 0x80 | (r >> 1), 0x80 | (g >> 1), 0x80 | (b >> 1));
-									}
-								}
-								dest[x] = col;
-								pri[x] |= 0x80; // Mark it drawn
-							}
-						}
-
-						x_index += dx;
+						if (c != transparent_color)
+							pri[x] |= shadowMode; // Mark it shadow / hilighted
 					}
-				}
-				else
-				{
-					int x, x_index = x_index_base;
-					for (x = sx; x < ex; x++)
-					{
-						if (!(pri[x] & 0x80))
-						{
-							int c = source1[x_index >> 16];
-							if (use8bpp)
-								c = (c << 4) | source2[x_index >> 16];
-
-							if (c != transparent_color)
-							{
-								dest[x] = pal[c];
-								pri[x] |= 0x80; // Mark it drawn
-							}
-						}
-
-						x_index += dx;
-					}
+					x_index += dx;
 				}
 			}
-			// alphaMode & 0xc0 = 0xc0 : Shadow, 0 : Alpha or Pre-shadowed, Other bits unknown
 			else
 			{
-				if (alphaMode & 0xc0)
-				{ /* TODO : 8bpp and shadow can use simultaneously? */
-					int x, x_index = x_index_base;
-					for (x = sx; x < ex; x++)
-					{
-						if (!(pri[x] & 0x80))
-						{
-							int c = source1[x_index >> 16];
-							if (use8bpp)
-								c = (c << 4) | source2[x_index >> 16];
-
-							if (c != transparent_color)
-								pri[x] |= shadowMode; // Mark it shadow / hilighted
-						}
-						x_index += dx;
-					}
-				}
-				else
+				int x, x_index = x_index_base;
+				for (x = sx; x < ex; x++)
 				{
-					int x, x_index = x_index_base;
-					for (x = sx; x < ex; x++)
+					if (!(pri[x] & 0x80))
 					{
-						if (!(pri[x] & 0x80))
-						{
-							int c = source1[x_index >> 16];
-							if (use8bpp)
-								c = (c << 4) | source2[x_index >> 16];
+						int c = source1[x_index >> 16];
+						if (use8bpp)
+							c = (c << 4) | source2[x_index >> 16];
 
-							if (c != transparent_color)
-							{
-								dest[x] = (shadowMode == 3) ? pal[c] : alpha_blend_r32(pal[c], shadowMode & 2 ? ~0 : 0, 0x80);
-								pri[x] |= 0x80; // Mark it drawn
-							}
+						if (c != transparent_color)
+						{
+							dest[x] = pal[c];
+							pri[x] |= 0x80 | shadowMode; // Mark it drawn
 						}
-						x_index += dx;
 					}
+					x_index += dx;
 				}
 			}
 		}
@@ -224,7 +159,7 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 
 	//printf("%d - (%08x %08x %08x) (%08x %08x %08x) (%08x %08x %08x)\n", scanline, m_irq_ram[6], m_irq_ram[7], m_irq_ram[8], m_irq_ram[9], m_irq_ram[10], m_irq_ram[11] , m_irq_ram[12] , m_irq_ram[13] , m_irq_ram[14]);
 
-	for (int offs = 0; offs < (0x3000/4); offs += 8)
+	for (int offs = 0; offs < (0x3000 / 4); offs += 8)
 	{
 		if ((spriteram[offs + 0] & 0x8000) == 0)
 			continue;
@@ -601,7 +536,7 @@ WRITE_LINE_MEMBER(deco_mlc_state::screen_vblank_mlc)
 		lookup table.  Without buffering incorrect one frame glitches are seen
 		in several places, especially in Hoops.
 		*/
-		std::copy(&m_spriteram[0], &m_spriteram[0x3000/4], &m_buffered_spriteram[0]);
+		std::copy(&m_spriteram[0], &m_spriteram[0x3000 / 4], &m_buffered_spriteram[0]);
 	}
 }
 
@@ -625,6 +560,20 @@ u32 deco_mlc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		printf("\n");
 		*/
 		draw_sprites(cliprect, i, dest, pri);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			u32 col = dest[x];
+			const u8 shadow_flag = pri[x] & 3;
+			if ((shadow_flag & 3) && (shadow_flag != 3))
+			{
+				if (shadow_flag & 1) // shadow
+					col = (col & 0xff000000) | ((col & 0xfefefe) >> 1);
+				else if (shadow_flag & 2) // hilight
+					col = (col & 0xff000000) | ((col & 0xfefefe) >> 1) | 0x808080;
+
+				dest[x] = col;
+			}
+		}
 	}
 	return 0;
 }
