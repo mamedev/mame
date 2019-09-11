@@ -10,6 +10,7 @@
 		<year>1980</year>
 		<publisher>Applied Concepts</publisher>
 		<part name="cart" interface="ggm">
+			<feature name="overlay" value="0x01" />
 			<dataarea name="rom" size="0x8000">
 				<rom name="007-7039-00" offset="0x4000" size="0x1000" crc="0db2e277" sha1="9f8823739d28b0a0e3857b7c672aa2514cd6816b" /> <!-- AMD AM9232CPC -->
 				<rom                    offset="0x6000" size="0x1000" loadflag="reload" />
@@ -24,6 +25,7 @@
 		<year>1981</year>
 		<publisher>Applied Concepts / Sandy Electronic</publisher>
 		<part name="cart" interface="ggm">
+			<feature name="overlay" value="0x02" />
 			<dataarea name="rom" size="0x8000">
 				<rom name="7087-00" offset="0x4000" size="0x1000" crc="7a2482b5" sha1="935a7c460d6b4f97c6ba7044ca064cfe467be737" /> <!-- MBM2732-35 -->
 				<rom                offset="0x6000" size="0x1000" loadflag="reload" />
@@ -38,6 +40,7 @@
 		<year>1982</year>
 		<publisher>Applied Concept</publisher>
 		<part name="cart" interface="ggm">
+			<feature name="overlay" value="0x03" />
 			<feature name="ram" value="1" /> <!-- HM6116LP-3 @ 0x800-0xfff -->
 			<dataarea name="rom" size="0x10000">
 				<rom name="7115" offset="0x4000" size="0x2000" crc="53830fac" sha1="3afb75ead1a807dc932a63d137e3fe746ba4c740" /> <!-- NEC D2764D -->
