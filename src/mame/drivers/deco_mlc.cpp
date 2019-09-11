@@ -226,7 +226,7 @@ WRITE32_MEMBER(deco_mlc_state::irq_ram_w)
 	Word 3 : Unknown(Always 0)
 	*/
 
-	switch (offset*4)
+	switch (offset * 4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
 		m_maincpu->set_input_line(m_irqLevel, CLEAR_LINE);
