@@ -71,12 +71,12 @@ TIMER_CALLBACK_MEMBER(zeus2_device::int_timer_callback)
 void zeus2_device::device_start()
 {
 	/* allocate memory for "wave" RAM */
-	waveram = auto_alloc_array(machine(), uint32_t, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
+	m_waveram = std::make_unique<uint32_t[]>(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
 	m_frameColor = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 	m_frameDepth = std::make_unique<int32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 
 	/* initialize polygon engine */
-	poly = auto_alloc(machine(), zeus2_renderer(this));
+	poly = std::make_unique<zeus2_renderer>(this);
 
 	m_vblank.resolve_safe();
 	m_irq.resolve_safe();
@@ -116,7 +116,7 @@ void zeus2_device::device_start()
 	save_item(NAME(zeus_texbase));
 	save_item(NAME(zeus_quad_size));
 	save_item(NAME(m_useZOffset));
-	save_pointer(NAME(waveram), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / 4);
+	save_pointer(NAME(m_waveram), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / 4);
 	save_pointer(NAME(m_frameColor), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 	save_pointer(NAME(m_frameDepth), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 	save_item(NAME(m_pal_table));
@@ -171,7 +171,7 @@ void zeus2_device::device_stop()
 	myfile.open(fileName.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 
 	if (myfile.is_open())
-		myfile.write((char *)waveram, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 2 * sizeof(uint32_t));
+		myfile.write((char *)m_waveram.get(), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 2 * sizeof(uint32_t));
 	myfile.close();
 #endif
 
@@ -1107,7 +1107,7 @@ if (subregdata_count[which] < 256)
 			{
 				//int blockNum = ((m_renderRegs[0x9] >> 16) * 1024 + (m_renderRegs[0x9] & 0xffff));
 				int blockNum = m_renderRegs[0x9];
-				void *dataPtr = (void *)(&waveram[blockNum * 2]);
+				void *dataPtr = (void *)(&m_waveram[blockNum * 2]);
 				if (logit)
 					logerror("\t(R%02X) = %06x PAL Control Load Table Byte Addr = %08X", which, value, blockNum * 8);
 				m_curPalTableSrc = m_renderRegs[0x9];
