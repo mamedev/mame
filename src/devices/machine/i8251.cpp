@@ -92,6 +92,11 @@ void i8251_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_command));
 	save_item(NAME(m_mode_byte));
+	save_item(NAME(m_delayed_tx_en));
+	save_item(NAME(m_sync1));
+	save_item(NAME(m_sync2));
+	save_item(NAME(m_sync8));
+	save_item(NAME(m_sync16));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dsr));
 	save_item(NAME(m_rxd));
@@ -102,6 +107,11 @@ void i8251_device::device_start()
 	save_item(NAME(m_br_factor));
 	save_item(NAME(m_rx_data));
 	save_item(NAME(m_tx_data));
+	save_item(NAME(m_syndet_pin));
+	save_item(NAME(m_hunt_on));
+	save_item(NAME(m_ext_syn_set));
+	save_item(NAME(m_rxd_bits));
+	save_item(NAME(m_data_bits_count));
 }
 
 
