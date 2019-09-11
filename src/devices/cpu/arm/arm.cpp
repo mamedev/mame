@@ -326,6 +326,10 @@ void arm_cpu_device::device_reset()
 	{
 		elem = 0;
 	}
+	for (auto & elem : m_coproControl)
+	{
+		elem = 0;
+	}
 	m_pendingIrq = 0;
 	m_pendingFiq = 0;
 
@@ -507,6 +511,7 @@ void arm_cpu_device::device_start()
 
 	save_item(NAME(m_sArmRegister));
 	save_item(NAME(m_coproRegister));
+	save_item(NAME(m_coproControl));
 	save_item(NAME(m_pendingIrq));
 	save_item(NAME(m_pendingFiq));
 
@@ -538,6 +543,17 @@ void arm_cpu_device::device_start()
 	state_add( ARM32_IR14, "IR14", m_sArmRegister[eR14_IRQ] ).formatstr("%08X");
 	state_add( ARM32_SR13, "SR13", m_sArmRegister[eR13_SVC] ).formatstr("%08X");
 	state_add( ARM32_SR14, "SR14", m_sArmRegister[eR14_SVC] ).formatstr("%08X");
+	if (m_copro_type == copro_type::VL86C020)
+	{
+		state_add( COPRO_F0,   "F0",   m_coproRegister[0] ).formatstr("%08X");
+		state_add( COPRO_F1,   "F1",   m_coproRegister[1] ).formatstr("%08X");
+		state_add( COPRO_F2,   "F2",   m_coproRegister[2] ).formatstr("%08X");
+		state_add( COPRO_F3,   "F3",   m_coproRegister[3] ).formatstr("%08X");
+		state_add( COPRO_F4,   "F4",   m_coproRegister[4] ).formatstr("%08X");
+		state_add( COPRO_F5,   "F5",   m_coproRegister[5] ).formatstr("%08X");
+		state_add( COPRO_F6,   "F6",   m_coproRegister[6] ).formatstr("%08X");
+		state_add( COPRO_F7,   "F7",   m_coproRegister[7] ).formatstr("%08X");
+	}
 
 	state_add(STATE_GENPC, "GENPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
@@ -1419,15 +1435,165 @@ uint32_t arm_cpu_device::DecimalToBCD(uint32_t value)
 	return accumulator;
 }
 
+inline float32_t arm_cpu_device::ReadCoProRegOrConst32(const uint32_t idx)
+{
+	if (idx & 8)
+	{
+		float32_t table[8] = { 0x00000000, 0x3f800000, 0x40000000, 0x40400000, 0x40800000, 0x40a00000, 0x3f000000, 0x41200000 };
+		return table[idx & 7];
+	}
+	
+	return ui32_to_f32(m_coproRegister[idx]);
+}
+
+inline float64_t arm_cpu_device::ReadCoProRegOrConst64(const uint32_t idx)
+{
+	if (idx & 8)
+	{
+		float64_t table[8] = { 0x0000000000000000, 0x3ff0000000000000, 0x4000000000000000, 0x4008000000000000, 
+							   0x4010000000000000, 0x4014000000000000, 0x3fe0000000000000, 0x4024000000000000 };
+		return table[idx & 7];
+	}
+	
+	return ui32_to_f64(m_coproRegister[idx]);
+}
+
+
 void arm_cpu_device::HandleCoProVL86C020( uint32_t insn )
 {
-	uint32_t rn=(insn>>12)&0xf;
-	uint32_t crn=(insn>>16)&0xf;
+	uint32_t rn = (insn>>12)&0xf;
+	uint32_t crn = (insn>>16)&0x7;
+	uint32_t crn2 = insn & 0xf;
+	// nearest, Plus infinity, Minus infinity, Zero
+	const uint_fast8_t arm_to_sf_rounding[4] = {
+		softfloat_round_near_even,
+		softfloat_round_max,
+		softfloat_round_min,
+		softfloat_round_near_maxMag
+	};
+	uint8_t round_mode = arm_to_sf_rounding[(insn>>5)&0x3];
+	// Single, Double, double Extended, Packed decimal
+	uint8_t precision_mode = (BIT(insn,20)<<1)|(BIT(insn,7));
 
 	m_icount -= S_CYCLE;
 
+	if (precision_mode >= 2)
+	{
+		//printf("%08x:  Unimplemented VL86C020 copro precision mode %08x %d %d\n", R15 & 0x3ffffff, insn,rn,crn);
+		return;
+	}
+
+	// FLT - integer to floating point reg
+	if((insn & 0x0ff00f1f) == 0x0e000110)
+	{
+		m_coproRegister[crn] = GetRegister(rn);
+	}
+	// FIX - floating point to integer reg
+	else if ((insn & 0x0fff0f98) == 0x0e100110)
+	{
+		uint32_t result;
+		switch(precision_mode)
+		{
+			case 0:
+			{
+				float32_t src = ui32_to_f32(m_coproRegister[crn]);
+				result = f32_to_ui32(src, round_mode, true);
+				break;
+			}
+			case 1:
+			{
+				float64_t src = ui32_to_f64(m_coproRegister[crn]);
+				result = f64_to_ui32(src, round_mode, true);
+				break;				
+			}
+		}
+
+		SetRegister(rn, result);
+	}
+	// ADF - Addition between floating point regs
+	else if ((insn&0x0ff08f10)==0x0e000100 )
+	{
+		uint32_t result;
+		rn &= 7;
+		switch(precision_mode)
+		{
+			case 0:
+			{
+				float32_t op1 = ui32_to_f32(m_coproRegister[crn]);
+				float32_t op2 = ReadCoProRegOrConst32(crn2);
+				float32_t fres = f32_add(op1, op2);
+				result = f32_to_ui32(fres, round_mode, true);
+				break;
+			}
+			case 1:
+			{
+				float64_t op1 = ui32_to_f64(m_coproRegister[crn]);
+				float64_t op2 = ReadCoProRegOrConst64(crn2);
+				float64_t fres = f64_add(op1, op2);
+				result = f64_to_ui32(fres, round_mode, true);
+				break;
+			}
+		}
+		
+		m_coproRegister[rn] = result;
+	}
+	// MVF - Move
+	else if ( (insn&0x0ff08f10)==0x0e008100 )
+	{
+		uint32_t result;
+
+		switch(precision_mode)
+		{
+			case 0:
+			{
+				float32_t fres = ReadCoProRegOrConst32(crn2);
+				result = f32_to_ui32(fres, round_mode, true);
+				break;
+			}
+			case 1:
+			{
+				float64_t fres = ReadCoProRegOrConst64(crn2);
+				result = f64_to_ui32(fres, round_mode, true);
+				break;
+			}
+		}
+		
+		m_coproRegister[crn] = result;
+	}
+	// CMFS - compare
+	else if ( (insn&0x0ff8fff0) == 0x0e90f110)
+	{
+		bool result;
+		
+		// TODO: according to "The Hacker" on AA, op2 ignores constants here, needs to be counterchecked.
+		switch(precision_mode)
+		{
+			case 0:
+			{
+				float32_t op1 = ui32_to_f32(m_coproRegister[crn]);
+				float32_t op2 = ui32_to_f32(m_coproRegister[crn2 & 7]);
+				result = f32_eq(op1, op2);
+				break;
+			}
+			case 1:
+			{
+				float64_t op1 = ui32_to_f64(m_coproRegister[crn]);
+				float64_t op2 = ui32_to_f64(m_coproRegister[crn2 & 7]);
+				result = f64_eq(op1, op2);
+				break;
+			}
+		}
+		
+		if (result == true)
+			R15 |= (Z_MASK);
+		else
+			R15 &= ~(Z_MASK);
+
+		// TODO: V flag
+		R15 &= ~(V_MASK);
+	}
 	/* MRC - transfer copro register to main register */
-	if( (insn&0x0f100010)==0x0e100010 )
+	else if( (insn&0x0f100010)==0x0e100010 )
 	{
 		if(crn == 0) // ID, read only
 		{
@@ -1440,16 +1606,17 @@ void arm_cpu_device::HandleCoProVL86C020( uint32_t insn )
 			SetRegister(rn, 0x41560300);
 			//machine().debug_break();
 		}
-		else
-			SetRegister(rn, m_coproRegister[crn]);
+		else if (crn >= 2 && crn < 6)
+			SetRegister(rn, m_coproControl[crn]);
 
 	}
 	/* MCR - transfer main register to copro register */
 	else if( (insn&0x0f100010)==0x0e000010 )
 	{
-		if(crn != 0)
-			m_coproRegister[crn]=GetRegister(rn);
+		if(crn >= 2 && crn < 6)
+			m_coproControl[crn]=GetRegister(rn);
 
+		// TODO: cache, trap if accessed in user mode, undefined instruction trap if any illegal access occurs (probably)
 		//printf("%08x:  VL86C020 copro instruction write %08x %d %d\n", R15 & 0x3ffffff, insn,rn,crn);
 	}
 	else
