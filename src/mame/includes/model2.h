@@ -71,7 +71,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_colorxlat;
 	std::unique_ptr<uint16_t[]> m_lumaram;
 	uint8_t m_gamma_table[256];
-	model2_renderer *m_poly;
+	std::unique_ptr<model2_renderer> m_poly;
 
 	/* Public for access by the ioports */
 	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
@@ -139,8 +139,8 @@ protected:
 
 	uint32_t m_geo_read_start_address;
 	uint32_t m_geo_write_start_address;
-	raster_state *m_raster;
-	geo_state *m_geo;
+	std::unique_ptr<raster_state> m_raster;
+	std::unique_ptr<geo_state> m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
 //  uint32_t m_soundack;
 	void model2_check_irq_state();
@@ -758,6 +758,61 @@ struct quad_m2
 	uint16_t              z;
 	uint16_t              texheader[4];
 	uint8_t               luma;
+};
+
+/*******************************************
+ *
+ *  Hardware 3D Rasterizer Internal State
+ *
+ *******************************************/
+
+#define MAX_TRIANGLES       32768
+
+struct raster_state
+{
+//  uint32_t mode;                      /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
+	uint16_t *texture_rom;              /* Texture ROM pointer */
+	uint32_t texture_rom_mask;          /* Texture ROM mask */
+	int16_t viewport[4];                /* View port (startx,starty,endx,endy) */
+	int16_t center[4][2];               /* Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y]) */
+	uint16_t center_sel;                /* Selected center */
+	uint32_t reverse;                   /* Left/Right Reverse */
+	float z_adjust;                     /* ZSort Mode */
+	float triangle_z;                   /* Current Triangle z value */
+	uint8_t master_z_clip;              /* Master Z-Clip value */
+	uint32_t cur_command;               /* Current command */
+	uint32_t command_buffer[32];        /* Command buffer */
+	uint32_t command_index;             /* Command buffer index */
+	triangle tri_list[MAX_TRIANGLES];   /* Triangle list */
+	uint32_t tri_list_index;            /* Triangle list index */
+	triangle *tri_sorted_list[0x10000]; /* Sorted Triangle list */
+	uint16_t min_z;                     /* Minimum sortable Z value */
+	uint16_t max_z;                     /* Maximum sortable Z value */
+	uint16_t texture_ram[0x10000];      /* Texture RAM pointer */
+	uint8_t log_ram[0x40000];           /* Log RAM pointer */
+};
+
+/*******************************************
+ *
+ *  Geometry Engine Internal State
+ *
+ *******************************************/
+
+struct geo_state
+{
+	raster_state *          raster;
+	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
+	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
+	uint32_t            polygon_rom_mask;       /* Polygon ROM mask */
+	float               matrix[12];             /* Current Transformation Matrix */
+	poly_vertex         focus;                  /* Focus (x,y) */
+	poly_vertex         light;                  /* Light Vector */
+	float               lod;                    /* LOD */
+	float               coef_table[32];         /* Distane Coefficient table */
+	texture_parameter   texture_parameters[32]; /* Texture parameters */
+	uint32_t          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
+	uint32_t          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
+	model2_state    *state;
 };
 
 #endif // MAME_INCLUDES_MODEL2_H
