@@ -230,7 +230,7 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 		}
 		else
 		{
-			command = string_format("bpclear 0x%X", bp.index());
+			command = string_format("bpclear 0x%X", bp->index());
 		}
 		m_machine->debugger().console().execute_command(command.c_str(), true);
 	}
@@ -252,8 +252,8 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 
 		if (bp != nullptr)
 		{
-			int32_t const bpindex = bp.index();
-			std::string command = string_format(bp.enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
+			int32_t const bpindex = bp->index();
+			std::string command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
 			m_machine->debugger().console().execute_command(command.c_str(), true);
 		}
 	}
