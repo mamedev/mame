@@ -917,15 +917,8 @@ void mame_ui_manager::decrease_frameskip()
 
 bool mame_ui_manager::can_paste()
 {
-	// retrieve the clipboard text
-	char *text = osd_get_clipboard_text();
-
-	// free the string if allocated
-	if (text != nullptr)
-		free(text);
-
-	// did we have text?
-	return text != nullptr;
+	// check to see if the clipboard is not empty
+	return !osd_get_clipboard_text().empty();
 }
 
 
