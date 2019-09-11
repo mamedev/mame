@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:smf
+// copyright-holders:smf, Robbbert
 /*********************************************************************
 
-    i8251.c
+    i8251.cpp
 
     Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
     NEC uPD71051 is a clone
@@ -10,6 +10,12 @@
     The V53/V53A use a customized version with only the Asynchronous mode
     and a split command / mode register
 
+To Do:
+- BRKDET: if, in Async mode, 16 low RxD bits in succession are clocked in,
+          the SYNDET pin & status must go high. It will go low upon a
+          status read, same as what happens with sync.
+
+- SYNC/BISYNC with PARITY is not tested, and therefore possibly buggy.
 
 
 *********************************************************************/
@@ -684,8 +690,6 @@ void i8251_device::mode_w(uint8_t data)
 
 	receive_register_reset();
 	m_txc_count = 0;
-
-	//              m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
 }
 
 void i8251_device::sync1_w(uint8_t data)
