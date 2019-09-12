@@ -161,6 +161,11 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 
 	for (int offs = 0; offs < (0x3000 / 4); offs += 8)
 	{
+		/* If this bit is set, combine this block with the next one */
+		use8bppMode = (offs + 8 < (0x3000 / 4)) && (spriteram[offs + 8 + 1] & 0x1000);
+		if (use8bppMode)
+			offs += 8;
+
 		if ((spriteram[offs + 0] & 0x8000) == 0)
 			continue;
 		if ((spriteram[offs + 1] & 0x2000) && (m_screen->frame_number() & 1))
@@ -259,19 +264,12 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 
 		color &= m_colour_mask;
 
-		/* If this bit is set, combine this block with the next one */
-		if (spriteram[offs + 1] & 0x1000)
+		/* In 8bpp the palette base is stored in the next block */
+		if (use8bppMode)
 		{
-			use8bppMode = 1;
-			/* In 8bpp the palette base is stored in the next block */
-			if (offs - 8 >= 0)
-			{
-				color = (spriteram[offs + 1 - 8] & 0x7f);
-				indx2 = spriteram[offs + 0 - 8] & 0x3fff;
-			}
+			color = (spriteram[offs + 1 - 8] & 0x7f);
+			indx2 = spriteram[offs + 0 - 8] & 0x3fff;
 		}
-		else
-			use8bppMode = 0;
 
 		/* Lookup tiles / size in sprite index ram OR in the lookup rom */
 		if (spriteram[offs + 0] & 0x4000)
@@ -520,9 +518,6 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 							shadowMode);
 
 		}
-
-		if (use8bppMode)
-			offs-=8;
 	}
 }
 
