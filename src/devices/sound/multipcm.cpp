@@ -259,8 +259,8 @@ void multipcm_device::lfo_init()
 		}
 	}
 
-	m_pitch_scale_tables = make_unique_clear<std::unique_ptr<int32_t[]>[]>(8);
-	m_amplitude_scale_tables = make_unique_clear<std::unique_ptr<int32_t[]>[]>(8);
+	m_pitch_scale_tables = std::make_unique<std::unique_ptr<int32_t[]>[]>(8);
+	m_amplitude_scale_tables = std::make_unique<std::unique_ptr<int32_t[]>[]>(8);
 	for (int32_t table = 0; table < 8; ++table)
 	{
 		float limit = PHASE_SCALE_LIMIT[table];
