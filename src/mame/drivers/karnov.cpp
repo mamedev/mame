@@ -9,6 +9,8 @@
     Chelnov (USA version)                  (c) 1988 Data East USA
     Chelnov (Japanese version)             (c) 1987 Data East Corporation
 
+    Main board:  DE-0248-1 (all games)
+    Video board: DE-0249-0 (all games)
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
@@ -967,7 +969,7 @@ void karnov_state::wndrplnt(machine_config &config)
  *
  *************************************/
 
-ROM_START( karnov ) /* DE-0248-1 main board + unknown video board */
+ROM_START( karnov )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "dn08-6.j15", 0x00000, 0x10000, CRC(4c60837f) SHA1(6886e6ee1d1563c3011b8fea79e7435f983a3ee0) )
 	ROM_LOAD16_BYTE( "dn11-6.j12", 0x00001, 0x10000, CRC(cd4abb99) SHA1(b4482175f5d90941ad3aec6c2269a50f57a465ed) )
@@ -1006,7 +1008,7 @@ ROM_START( karnov ) /* DE-0248-1 main board + unknown video board */
 	ROM_LOAD( "karnprom_20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) )
 ROM_END
 
-ROM_START( karnova ) /* DE-0248-1 main board + unknown video board */
+ROM_START( karnova )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "dn08-5.j15", 0x00000, 0x10000, CRC(db92c264) SHA1(bd4bcd984a3455eedd2b78dc2090c9d625025671) )
 	ROM_LOAD16_BYTE( "dn11-5.j20", 0x00001, 0x10000, CRC(05669b4b) SHA1(c78d0da5afc66750dd9841a7d4f8f244d878c081) )
@@ -1045,7 +1047,7 @@ ROM_START( karnova ) /* DE-0248-1 main board + unknown video board */
 	ROM_LOAD( "karnprom_20.l6", 0x0400, 0x0400, CRC(02f78ffb) SHA1(cb4dd8b0ce3c404195321b17e10f51352f506958) )
 ROM_END
 
-ROM_START( karnovj ) /* DE-0248-1 main board + unknown video board */
+ROM_START( karnovj )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "kar8.j15",  0x00000, 0x10000, CRC(3e17e268) SHA1(3a63928bb0148175519540f9d891b03590094dfb) )
 	ROM_LOAD16_BYTE( "kar11.j20", 0x00001, 0x10000, CRC(417c936d) SHA1(d31f9291f18c3d5e3c4430768396e1ac10fd9ea3) )
@@ -1168,7 +1170,7 @@ ROM_START( wndrplnt )
 	ROM_LOAD( "ea20.prm",      0x0400, 0x0400, CRC(619f9d1e) SHA1(17fe49b6c9ce17be4a03e3400229e3ef4998a46f) )
 ROM_END
 
-ROM_START( chelnov ) /* DE-0248-1 main board + unknown video board */
+ROM_START( chelnov )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ee08-e.j16",   0x00000, 0x10000, CRC(8275cc3a) SHA1(961166226b68744eef15fed6a306010757b83556) )
 	ROM_LOAD16_BYTE( "ee11-e.j19",   0x00001, 0x10000, CRC(889e40a0) SHA1(e927f32d9bc448a331fb7b3478b2d07154f5013b) )
@@ -1203,7 +1205,7 @@ ROM_START( chelnov ) /* DE-0248-1 main board + unknown video board */
 	ROM_LOAD( "ee-16.l6",      0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) )
 ROM_END
 
-ROM_START( chelnovu ) /* DE-0248-1 main board + unknown video board */
+ROM_START( chelnovu )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ee08-a.j15",   0x00000, 0x10000, CRC(2f2fb37b) SHA1(f89b424099097a95cf184d20a15b876c5b639552) )
 	ROM_LOAD16_BYTE( "ee11-a.j20",   0x00001, 0x10000, CRC(f306d05f) SHA1(e523ffd17fb0104fe28eac288b6ebf7fc0ea2908) )
@@ -1238,7 +1240,7 @@ ROM_START( chelnovu ) /* DE-0248-1 main board + unknown video board */
 	ROM_LOAD( "ee-16.l6",      0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) )
 ROM_END
 
-ROM_START( chelnovj ) /* DE-0248-1 main board + unknown video board - at least 1 PCB found with all labels as 'EPR-EExx' like Sega labels */
+ROM_START( chelnovj ) /* at least 1 PCB found with all labels as 'EPR-EExx' like Sega labels */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ee08.j15",    0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) ) /* PCBs known to have revision 1 ROM here - need to verify */
 	ROM_LOAD16_BYTE( "ee11.j20",    0x00001, 0x10000, CRC(e0ed3d99) SHA1(f47aaec5c72ecc308c32cdcf117ef4965ac5ea61) ) /* PCBs known to have revision 1 ROM here - need to verify */
