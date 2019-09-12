@@ -207,6 +207,11 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_space68k(nullptr)
 	, m_cpu68k(*this, finder_base::DUMMY_TAG)
 	, m_ext_palette(*this, finder_base::DUMMY_TAG)
+#ifdef DEBUG_315_5313_GFXVIEWER
+	, m_debug_palette(*this, "debug_palette")
+	, m_debug_gfxdecode(*this, "debug_gfxdecode")
+	, m_debug_palette_is_external(false)
+#endif
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base =  - 1;
@@ -222,6 +227,11 @@ void sega315_5313_device::device_add_mconfig(machine_config &config)
 	sega315_5313_mode4_device::device_add_mconfig(config);
 
 	SEGAPSG(config.replace(), m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+
+#ifdef DEBUG_315_5313_GFXVIEWER
+	PALETTE(config, "debug_palette", palette_device::BLACK).set_entries(64 * 313 * 3);
+	GFXDECODE(config, m_debug_gfxdecode, "debug_palette", gfxdecode_device::empty);
+#endif
 }
 
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
@@ -234,6 +244,39 @@ TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq4_on_timer_callback)
 {
 	m_lv4irqline_callback(true);
+}
+
+#ifdef DEBUG_315_5313_GFXVIEWER
+static const gfx_layout md_debug_8x8_layout =
+{
+	8,8,
+	0x10000 / ((8*8*4) / 8),
+	4,
+	{ STEP4(0,1) },
+	{ 2*4,3*4,0*4,1*4,6*4,7*4,4*4,5*4 },
+	{ STEP8(0,4*8) },
+	8*8*4
+};
+
+static const gfx_layout md_debug_8x16_layout =
+{
+	8,16,
+	0x10000 / ((8*16*4) / 8),
+	4,
+	{ STEP4(0,1) },
+	{ 2*4,3*4,0*4,1*4,6*4,7*4,4*4,5*4 },
+	{ STEP16(0,4*8) },
+	8*16*4
+};
+#endif
+
+void sega315_5313_device::device_post_load()
+{
+	sega315_5313_mode4_device::device_post_load();
+#ifdef DEBUG_315_5313_GFXVIEWER
+	m_debug_gfxdecode->gfx(0)->mark_all_dirty();
+	m_debug_gfxdecode->gfx(1)->mark_all_dirty();
+#endif
 }
 
 void sega315_5313_device::device_start()
@@ -316,6 +359,11 @@ void sega315_5313_device::device_start()
 	m_space68k = &m_cpu68k->space();
 
 	sega315_5313_mode4_device::device_start();
+
+#ifdef DEBUG_315_5313_GFXVIEWER
+	m_debug_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_debug_palette, md_debug_8x8_layout, (u8 *)m_vram.get(), 0, m_debug_palette->entries() / 16, 0));
+	m_debug_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_debug_palette, md_debug_8x16_layout, (u8 *)m_vram.get(), 0, m_debug_palette->entries() / 16, 0));
+#endif
 }
 
 void sega315_5313_device::device_reset()
@@ -368,7 +416,7 @@ void sega315_5313_device::vdp_vram_write(u16 data)
 		data = ((data & 0x00ff) << 8) | ((data & 0xff00) >> 8);
 	}
 
-	MEGADRIV_VDP_VRAM(m_vdp_address >> 1) = data;
+	vram_w(m_vdp_address >> 1, data);
 
 	/* The VDP stores an Internal copy of any data written to the Sprite Attribute Table.
 	   This data is _NOT_ invalidated when the Sprite Base Address changes, thus allowing
@@ -440,22 +488,22 @@ void sega315_5313_device::data_port_w(int data)
 
 		if (m_vdp_address & 1)
 		{
-			MEGADRIV_VDP_VRAM((m_vdp_address >> 1))   = (MEGADRIV_VDP_VRAM((m_vdp_address >> 1)) & 0xff00) | (data & 0x00ff);
+			vram_w(m_vdp_address >> 1, data & 0x00ff, 0x00ff);
 		}
 		else
 		{
-			MEGADRIV_VDP_VRAM((m_vdp_address >> 1))   = (MEGADRIV_VDP_VRAM((m_vdp_address >> 1)) & 0x00ff) | ((data & 0x00ff) << 8);
+			vram_w(m_vdp_address >> 1, (data & 0x00ff) << 8, 0x00ff << 8);
 		}
 
 		for (int count = 0; count <= m_vram_fill_length; count++) // <= for james pond 3
 		{
 			if (m_vdp_address & 1)
 			{
-				MEGADRIV_VDP_VRAM((m_vdp_address >> 1))   = (MEGADRIV_VDP_VRAM((m_vdp_address >> 1)) & 0x00ff) | (data & 0xff00);
+				vram_w(m_vdp_address >> 1, data & 0xff00, 0xff00);
 			}
 			else
 			{
-				MEGADRIV_VDP_VRAM((m_vdp_address >> 1))   = (MEGADRIV_VDP_VRAM((m_vdp_address >> 1)) & 0xff00) | ((data & 0xff00) >> 8);
+				vram_w(m_vdp_address >> 1, (data & 0xff00) >> 8, 0xff00 >> 8);
 			}
 
 			vdp_address_inc();
@@ -623,11 +671,11 @@ void sega315_5313_device::insta_vram_copy(u32 source, u16 length)
 
 		if (m_vdp_address & 1)
 		{
-			MEGADRIV_VDP_VRAM((m_vdp_address & 0xffff) >> 1) = (MEGADRIV_VDP_VRAM((m_vdp_address & 0xffff) >> 1) & 0xff00) | source_byte;
+			vram_w((m_vdp_address & 0xffff) >> 1, source_byte, 0x00ff);
 		}
 		else
 		{
-			MEGADRIV_VDP_VRAM((m_vdp_address & 0xffff) >> 1) = (MEGADRIV_VDP_VRAM((m_vdp_address & 0xffff) >> 1) & 0x00ff) | (source_byte << 8);
+			vram_w((m_vdp_address & 0xffff) >> 1, (source_byte << 8), 0x00ff << 8);
 		}
 
 		source++;
@@ -2066,12 +2114,28 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 	else
 		lineptr = m_render_line.get();
 
+#ifdef DEBUG_315_5313_GFXVIEWER
+	if (!m_debug_palette_is_external)
+	{
+		for (int p = 0; p < 64; p++)
+		{
+			u16 clut = m_palette_lookup[p];
+			if (!MEGADRIVE_REG0_SPECIAL_PAL) // 3 bit color mode, correct?
+				clut &= 0x49; // (1 << 6) | (1 << 3) | (1 << 0);
+
+			m_debug_palette->set_pen_color((64 * 313 * 0) + p + (scanline * 64), m_palette->pen(clut));
+			m_debug_palette->set_pen_color((64 * 313 * 1) + p + (scanline * 64), m_palette->pen(0x200 | clut));
+			m_debug_palette->set_pen_color((64 * 313 * 2) + p + (scanline * 64), m_palette->pen(0x400 | clut));
+		}
+	}
+#endif
+
 	for (int x = 0; x < 320; x++)
 	{
 		const u32 dat = m_video_renderline[x];
 		u16 clut = m_palette_lookup[(dat & 0x3f)];
 		if (!MEGADRIVE_REG0_SPECIAL_PAL) // 3 bit color mode, correct?
-			clut &= 0x111;
+			clut &= 0x49; // (1 << 6) | (1 << 3) | (1 << 0);
 
 		if (!(dat & 0x20000))
 			m_render_line_raw[x] = 0x100;

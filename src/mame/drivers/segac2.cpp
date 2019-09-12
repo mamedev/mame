@@ -1578,6 +1578,9 @@ void segac2_state::segac(machine_config &config)
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_screen("megadriv");
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.50);
+#ifdef DEBUG_315_5313_GFXVIEWER
+	m_vdp->set_debug_palette(m_palette);
+#endif
 
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 

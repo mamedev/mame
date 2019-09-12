@@ -10,6 +10,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 
+#define DEBUG_315_5313_GFXVIEWER 0 // Debug gfx / palette viewer (default off)
 
 class sega315_5313_device : public sega315_5313_mode4_device
 {
@@ -35,6 +36,10 @@ public:
 	void set_pal_write_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
 	template <typename T> void set_palette(T &&tag) { m_ext_palette.set_tag(std::forward<T>(tag)); }
 
+#ifdef DEBUG_315_5313_GFXVIEWER
+	template <typename T> void set_debug_palette(T &&tag) { m_debug_palette.set_tag(std::forward<T>(tag)); m_debug_palette_is_external = true; }
+#endif
+
 	// Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
 	template <typename... T> void set_md_32x_scanline(T &&... args) { m_32x_scanline_func = md_32x_scanline_delegate(std::forward<T>(args)...); }
 	template <typename... T> void set_md_32x_interrupt(T &&... args) { m_32x_interrupt_func = md_32x_interrupt_delegate(std::forward<T>(args)...); }
@@ -46,6 +51,16 @@ public:
 
 	u16 vdp_r(offs_t offset, u16 mem_mask = ~0);
 	void vdp_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0)
+	{
+		offset &= 0x7fff;
+		COMBINE_DATA(&m_vram[offset]);
+#ifdef DEBUG_315_5313_GFXVIEWER
+		m_debug_gfxdecode->gfx(0)->mark_dirty(offset / ((8*8*4) / 16));
+		m_debug_gfxdecode->gfx(1)->mark_dirty(offset / ((8*16*4) / 16));
+#endif
+	}
 
 	int get_scanline_counter();
 
@@ -85,6 +100,7 @@ public:
 	inline u16 vdp_get_word_from_68k_mem(u32 source);
 
 protected:
+	virtual void device_post_load() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -208,6 +224,13 @@ private:
 	address_space *m_space68k;
 	required_device<m68000_base_device> m_cpu68k;
 	optional_device<palette_device> m_ext_palette;
+
+#ifdef DEBUG_315_5313_GFXVIEWER
+	// debug functions
+	required_device<palette_device> m_debug_palette;
+	required_device<gfxdecode_device> m_debug_gfxdecode;
+	bool m_debug_palette_is_external;
+#endif
 };
 
 
