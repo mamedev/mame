@@ -243,7 +243,7 @@ void pi4d2x_state::map(address_map &map)
 	//map(0x1e000000, 0x1effffff); // vme a24 modifier 0x39 non-privileged
 
 	//map(0x1f000000, 0x1fbfffff); // local I/O (duarts, timers, etc.)
-	map(0x1f000000, 0x1f00ffff).m(m_gfx, FUNC(sgi_gr1_device::map)).mirror(0x8000);
+	map(0x1f000000, 0x1f007fff).m(m_gfx, FUNC(sgi_gr1_device::map)).mirror(0x8000);
 
 	map(0x1f800000, 0x1f800003).lrw8("memcfg", [this]() { return m_memcfg; }, [this](u8 data) { m_memcfg = data; }).umask32(0xff000000);
 	map(0x1f800000, 0x1f800003).r(FUNC(pi4d2x_state::sysid_r)).umask32(0x00ff0000);
