@@ -15,22 +15,26 @@ _esc = _escaper
 
 --
 -- Prepare to capture the output from all subsequent calls to io.printf(), 
--- used for automated testing of the generators.
+-- used for automated testing of the generators. Returns the previously
+-- captured text.
 --
 
 	function io.capture()
+		local prev = io.captured
 		io.captured = ''
+		return prev
 	end
 	
 	
 	
 --
--- Returns the captured text and stops capturing.
+-- Returns the captured text and stops capturing, optionally restoring a
+-- previous capture.
 --
 
-	function io.endcapture()
+	function io.endcapture(restore)
 		local captured = io.captured
-		io.captured = nil
+		io.captured = restore
 		return captured
 	end
 	

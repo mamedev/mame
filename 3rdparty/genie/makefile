@@ -39,8 +39,8 @@ clean:
 
 projgen:
 	$(SILENT) $(GENIE) --to=../build/gmake.windows --os=windows gmake
-	$(SILENT) $(GENIE) --to=../build/gmake.linux --os=linux gmake
-	$(SILENT) $(GENIE) --to=../build/gmake.darwin --os=macosx --platform=universal32 gmake
+	$(SILENT) $(GENIE) --to=../build/gmake.linux   --os=linux gmake
+	$(SILENT) $(GENIE) --to=../build/gmake.darwin  --os=macosx --platform=universal32 gmake
 	$(SILENT) $(GENIE) --to=../build/gmake.freebsd --os=bsd gmake
 
 rebuild:
@@ -55,7 +55,7 @@ release-linux: $(GENIE)
 	$(SILENT) $(GENIE) release
 	$(SILENT) $(MAKE) -C build/gmake.darwin  clean all CC=x86_64-apple-darwin15-clang
 	$(SILENT) $(MAKE) -C build/gmake.linux   clean all
-	$(SILENT) $(MAKE) -C build/gmake.windows clean all CC=i686-w64-mingw32-gcc
+	$(SILENT) $(MAKE) -C build/gmake.windows clean all CC=x86_64-w64-mingw32-gcc
 	$(SILENT) git checkout src/host/version.h
 
 release: release-$(OS)
