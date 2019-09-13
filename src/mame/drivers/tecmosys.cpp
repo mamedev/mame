@@ -413,9 +413,9 @@ INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_tecmosys )
 	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb,               0x4400, 0x40 )
-	GFXDECODE_ENTRY( "layer1", 0, gfx_16x16x4_grouped_row_packed_msb, 0x4000, 0x40 )
-	GFXDECODE_ENTRY( "layer2", 0, gfx_16x16x4_grouped_row_packed_msb, 0x4000, 0x40 )
-	GFXDECODE_ENTRY( "layer3", 0, gfx_16x16x4_grouped_row_packed_msb, 0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
 GFXDECODE_END
 
 

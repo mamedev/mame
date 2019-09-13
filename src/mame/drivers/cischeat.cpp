@@ -1859,7 +1859,7 @@ static GFXDECODE_START( gfx_scudhamm )
 	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               0x1e00/2, 16  )   // Scroll 0
 	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               0x0000/2, 16  )   // UNUSED
 	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,               0x4e00/2, 16  )   // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_msb, 0x3000/2, 128 )   // [0] sprites
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x3000/2, 128 )   // [0] sprites
 	// No Road Layers
 GFXDECODE_END
 

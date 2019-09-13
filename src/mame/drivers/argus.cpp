@@ -456,22 +456,22 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_argus )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_grouped_col_packed_msb,  0*16,  8 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_grouped_col_packed_msb,  8*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_grouped_col_packed_msb, 24*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb,  0*16,  8 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb,  8*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 24*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb,               40*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_valtric )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_grouped_col_packed_msb,  0*16, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_grouped_col_packed_msb, 16*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb,  0*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb,               32*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_butasan )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_grouped_col_packed_msb,  0*16, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_grouped_col_packed_msb, 16*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_grouped_col_packed_msb, 12*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb,  0*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 16*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 12*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb,               32*16, 16 )
 GFXDECODE_END
 

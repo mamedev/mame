@@ -573,8 +573,8 @@ INPUT_PORTS_END
  *************************************/
 
 static GFXDECODE_START( gfx_hvyunit )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_grouped_row_packed_msb, 0x100, 16 ) /* sprite bank */
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_grouped_row_packed_msb, 0x000, 16 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16 ) /* sprite bank */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
 
 

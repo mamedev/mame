@@ -1116,9 +1116,9 @@ void jalmah_state::jalmah(machine_config &config)
 }
 
 static GFXDECODE_START( gfx_urashima )
-	GFXDECODE_ENTRY( "scroll0", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 )
-	GFXDECODE_ENTRY( "scroll1", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 )
-	GFXDECODE_ENTRY( "scroll2", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
+	GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 )
 	GFXDECODE_ENTRY( "scroll3", 0, gfx_8x8x4_packed_msb,               0x000, 16 )
 GFXDECODE_END
 

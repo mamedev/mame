@@ -484,8 +484,8 @@ INPUT_PORTS_END
 /* Graphics Decode Information */
 
 static GFXDECODE_START( gfx_airbustr )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_grouped_row_packed_lsb,   0, 32 ) // tiles
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_grouped_row_packed_msb, 512, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_lsb,   0, 32 ) // tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 512, 16 ) // sprites
 GFXDECODE_END
 
 

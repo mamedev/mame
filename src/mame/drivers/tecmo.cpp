@@ -657,8 +657,8 @@ INPUT_PORTS_END
 static GFXDECODE_START( gfx_tecmo )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               256, 16 )   /* colors 256 - 511 */
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,                 0, 16 )   /* colors   0 - 255 */
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_grouped_row_packed_msb, 512, 16 )   /* colors 512 - 767 */
-	GFXDECODE_ENTRY( "gfx4", 0, gfx_16x16x4_grouped_row_packed_msb, 768, 16 )   /* colors 768 - 1023 */
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 512, 16 )   /* colors 512 - 767 */
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_row_2x2_group_packed_msb, 768, 16 )   /* colors 768 - 1023 */
 GFXDECODE_END
 
 

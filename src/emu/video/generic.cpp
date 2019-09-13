@@ -93,6 +93,7 @@ const gfx_layout gfx_16x16x4_planar =
 	16*16
 };
 
+// packed gfxs; msb and lsb is start nibble of packed pixel byte
 const gfx_layout gfx_8x8x4_packed_msb =
 {
 	8,8,
@@ -146,7 +147,7 @@ GFXLAYOUT_RAW(gfx_16x16x8_raw, 16, 16, 16*8, 16*16*8);
 	0 1
 	2 3
 */
-const gfx_layout gfx_16x16x4_grouped_row_packed_msb =
+const gfx_layout gfx_8x8x4_row_2x2_group_packed_msb =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -157,7 +158,7 @@ const gfx_layout gfx_16x16x4_grouped_row_packed_msb =
 	16*16*4
 };
 
-const gfx_layout gfx_16x16x4_grouped_row_packed_lsb =
+const gfx_layout gfx_8x8x4_row_2x2_group_packed_lsb =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -176,7 +177,7 @@ const gfx_layout gfx_16x16x4_grouped_row_packed_lsb =
 	0 2
 	1 3
 */
-const gfx_layout gfx_16x16x4_grouped_col_packed_msb =
+const gfx_layout gfx_8x8x4_col_2x2_group_packed_msb =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -187,7 +188,7 @@ const gfx_layout gfx_16x16x4_grouped_col_packed_msb =
 	16*16*4
 };
 
-const gfx_layout gfx_16x16x4_grouped_col_packed_lsb =
+const gfx_layout gfx_8x8x4_col_2x2_group_packed_lsb =
 {
 	16,16,
 	RGN_FRAC(1,1),

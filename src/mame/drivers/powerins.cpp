@@ -244,15 +244,15 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_powerins )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_grouped_col_packed_msb, 0x000, 0x20 ) // [0] Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 0x20 ) // [0] Tiles
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,               0x200, 0x10 ) // [1] Tiles
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_grouped_col_packed_msb, 0x400, 0x40 ) // [2] Sprites
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x400, 0x40 ) // [2] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_powerinsc )
-	GFXDECODE_ENTRY( "gfx1", 0,        gfx_16x16x4_grouped_col_packed_msb, 0x000, 0x20 ) // [0] Tiles
+	GFXDECODE_ENTRY( "gfx1", 0,        gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 0x20 ) // [0] Tiles
 	GFXDECODE_ENTRY( "gfx1", 0x280000, gfx_8x8x4_packed_msb,               0x200, 0x10 ) // [1] Tiles
-	GFXDECODE_ENTRY( "gfx3", 0,        gfx_16x16x4_grouped_col_packed_msb, 0x400, 0x40 ) // [2] Sprites
+	GFXDECODE_ENTRY( "gfx3", 0,        gfx_8x8x4_col_2x2_group_packed_msb, 0x400, 0x40 ) // [2] Sprites
 GFXDECODE_END
 
 /***************************************************************************

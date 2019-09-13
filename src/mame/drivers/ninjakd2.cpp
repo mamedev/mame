@@ -883,16 +883,16 @@ INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_ninjakd2 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x200, 16)    // fg
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_grouped_row_packed_msb, 0x100, 16)    // sprites
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_grouped_row_packed_msb, 0x000, 16)    // bg
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16)    // sprites
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16)    // bg
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_robokid )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x300, 16) // fg
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_grouped_col_packed_msb, 0x200, 16) // sprites
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_16x16x4_grouped_col_packed_msb, 0x000, 16) // bg0
-	GFXDECODE_ENTRY( "gfx4", 0, gfx_16x16x4_grouped_col_packed_msb, 0x000, 16) // bg1
-	GFXDECODE_ENTRY( "gfx5", 0, gfx_16x16x4_grouped_col_packed_msb, 0x000, 16) // bg2
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16) // sprites
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg0
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg1
+	GFXDECODE_ENTRY( "gfx5", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg2
 GFXDECODE_END
 
 

@@ -177,8 +177,8 @@ static INPUT_PORTS_START( quizpani )
 INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_quizpani )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 ) /* Background */
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_grouped_col_packed_msb, 0x000, 16 ) /* Text */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) /* Background */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) /* Text */
 GFXDECODE_END
 
 

@@ -408,8 +408,8 @@ INPUT_PORTS_END
 /*** GFX Decode ***/
 
 static GFXDECODE_START( gfx_mcatadv )
-	GFXDECODE_ENTRY( "bg0", 0, gfx_16x16x4_grouped_row_packed_msb, 0, 0x200 )
-	GFXDECODE_ENTRY( "bg1", 0, gfx_16x16x4_grouped_row_packed_msb, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg0", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x200 )
 GFXDECODE_END
 
 
