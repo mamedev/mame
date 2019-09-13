@@ -745,7 +745,7 @@ void md_cons_state::genesis_scd(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
@@ -764,7 +764,7 @@ void md_cons_state::md_scd(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
@@ -783,7 +783,7 @@ void md_cons_state::mdj_scd(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
@@ -799,7 +799,7 @@ void md_cons_state::genesis_32x_scd(machine_config &config)
 	genesis_32x(config);
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
@@ -819,7 +819,7 @@ void md_cons_state::md_32x_scd(machine_config &config)
 	md_32x(config);
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
@@ -839,7 +839,7 @@ void md_cons_state::mdj_32x_scd(machine_config &config)
 	mdj_32x(config);
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
