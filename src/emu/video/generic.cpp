@@ -140,3 +140,85 @@ const gfx_layout gfx_16x16x4_packed_lsb =
 };
 
 GFXLAYOUT_RAW(gfx_16x16x8_raw, 16, 16, 16*8, 16*16*8);
+
+/*
+	16x16; grouped of 4 8x8 tiles (row align)
+	0 1
+	2 3
+*/
+const gfx_layout gfx_16x16x4_grouped_row_packed_msb =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*8,4) }, // x order : hi nibble first, low nibble second
+	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
+	16*16*4
+};
+
+const gfx_layout gfx_16x16x4_grouped_row_packed_lsb =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ // x order : low nibble first, hi nibble second
+		1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
+		4*8*8+1*4, 4*8*8+0*4, 4*8*8+3*4, 4*8*8+2*4, 4*8*8+5*4, 4*8*8+4*4, 4*8*8+7*4, 4*8*8+6*4
+	},
+	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
+	16*16*4
+};
+
+const gfx_layout gfx_16x16x8_grouped_row_raw =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP4(0,1) },
+	{ STEP8(0,8), STEP8(8*8*8,8) },
+	{ STEP8(0,8*8), STEP8(8*8*8*2,8*8) },
+	16*16*8
+};
+
+/*
+	16x16; grouped of 4 8x8 tiles (col align)
+	0 2
+	1 3
+*/
+const gfx_layout gfx_16x16x4_grouped_col_packed_msb =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) }, // x order : hi nibble first, low nibble second
+	{ STEP16(0,4*8) },
+	16*16*4
+};
+
+const gfx_layout gfx_16x16x4_grouped_col_packed_lsb =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ // x order : low nibble first, hi nibble second
+		1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
+		4*8*16+1*4, 4*8*16+0*4, 4*8*16+3*4, 4*8*16+2*4, 4*8*16+5*4, 4*8*16+4*4, 4*8*16+7*4, 4*8*16+6*4
+	},
+	{ STEP16(0,4*8) },
+	16*16*4
+};
+
+const gfx_layout gfx_16x16x8_grouped_col_raw =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP4(0,1) },
+	{ STEP8(0,8), STEP8(8*8*16,8) },
+	{ STEP16(0,8*8) },
+	16*16*8
+};

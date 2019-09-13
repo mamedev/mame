@@ -481,39 +481,11 @@ static INPUT_PORTS_START( airbustrj )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
-/* Graphics Layout */
-
-static const gfx_layout tile_gfxlayout =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{  1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-		1*4+32*8, 0*4+32*8, 3*4+32*8, 2*4+32*8, 5*4+32*8, 4*4+32*8, 7*4+32*8, 6*4+32*8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
-	16*16*4
-};
-
-static const gfx_layout sprite_gfxlayout =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-		0*4+32*8, 1*4+32*8, 2*4+32*8, 3*4+32*8, 4*4+32*8, 5*4+32*8, 6*4+32*8, 7*4+32*8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
-	16*16*4
-};
-
 /* Graphics Decode Information */
 
 static GFXDECODE_START( gfx_airbustr )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_gfxlayout,   0, 32 ) // tiles
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_gfxlayout, 512, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_grouped_row_packed_lsb,   0, 32 ) // tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_grouped_row_packed_msb, 512, 16 ) // sprites
 GFXDECODE_END
 
 

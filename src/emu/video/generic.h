@@ -36,4 +36,12 @@ extern const gfx_layout gfx_16x16x4_packed_msb;
 extern const gfx_layout gfx_16x16x4_packed_lsb;
 extern const gfx_layout gfx_16x16x8_raw;
 
+extern const gfx_layout gfx_16x16x4_grouped_row_packed_msb;
+extern const gfx_layout gfx_16x16x4_grouped_row_packed_lsb;
+extern const gfx_layout gfx_16x16x8_grouped_row_raw;
+
+extern const gfx_layout gfx_16x16x4_grouped_col_packed_msb;
+extern const gfx_layout gfx_16x16x4_grouped_col_packed_lsb;
+extern const gfx_layout gfx_16x16x8_grouped_col_raw;
+
 #endif  /* MAME_EMU_VIDEO_GENERIC_H */

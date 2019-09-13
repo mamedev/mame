@@ -3990,53 +3990,42 @@ static INPUT_PORTS_START( dolmen )
 INPUT_PORTS_END
 
 
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*16,4) },
-	{ STEP16(0,4*8) },
-	32*32
-};
-
 static GFXDECODE_START( gfx_tharrier )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_16x16x4_grouped_col_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_macross )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x200, 16 ) /* color 0x200-0x2ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 16 ) /* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_16x16x4_grouped_col_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_macross2 )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x300, 16 ) /* color 0x300-0x3ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 32 ) /* color 0x100-0x2ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x300, 16 ) /* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_16x16x4_grouped_col_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 32 ) /* color 0x100-0x2ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bjtwin )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bioship )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x300, 16 ) /* color 0x300-0x3ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x200, 16 ) /* color 0x200-0x2ff */
-	GFXDECODE_ENTRY( "gfx4",    0, tilelayout,           0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x300, 16 ) /* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_msb, 0x200, 16 ) /* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( "gfx4",    0, gfx_16x16x4_grouped_col_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_strahl )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x300, 16 ) /* color 0x300-0x3ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
-	GFXDECODE_ENTRY( "gfx4",    0, tilelayout,           0x200, 16 ) /* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_16x16x4_grouped_col_packed_msb, 0x300, 16 ) /* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "gfx4",    0, gfx_16x16x4_grouped_col_packed_msb, 0x200, 16 ) /* color 0x200-0x2ff */
 GFXDECODE_END
 
 
@@ -5371,27 +5360,16 @@ static const gfx_layout tilelayout_8bpp =
 };
 
 
-static const gfx_layout tilelayout_swapnibble =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4,0,12,8,20,16,28,24, 512+4,512+0,512+12,512+8,512+20,512+16,512+28,512+24 },
-	{ STEP16(0,4*8) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_grdnstrm )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x200, 16 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout_8bpp,      0x000,  1 ) // [1] Layer 0
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "bgtile",  0, tilelayout_8bpp,                    0x000,  1 ) // [1] Layer 0
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_msb, 0x100, 16 ) // [0] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_redhawkb )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,  0x200, 16 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout_swapnibble, 0x000, 16 ) // [1] Layer 0
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout_swapnibble, 0x100, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_16x16x4_grouped_col_packed_lsb, 0x000, 16 ) // [1] Layer 0
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_lsb, 0x100, 16 ) // [0] Sprites
 GFXDECODE_END
 
 

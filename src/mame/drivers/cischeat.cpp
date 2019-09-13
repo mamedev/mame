@@ -1792,44 +1792,6 @@ INPUT_PORTS_END
 
 **************************************************************************/
 
-#ifdef UNUSED_VARIABLE
-/* 8x8x4, straightforward layout */
-static const gfx_layout tiles_8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-#endif
-
-/* 16x16x4, straightforward layout */
-static const gfx_layout tiles_16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP16(0,4) },
-	{ STEP16(0,4*16) },
-	16*16*4
-};
-
-/* 16x16x4, made of four 8x8 tiles */
-static const gfx_layout tiles_16x16_quad =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(8*8*4*0,4), STEP8(8*8*4*2,4) },
-	{ STEP16(0,4*8) },
-	16*16*4
-};
-
 static const uint32_t road_layout_xoffset[64] =
 {
 	STEP16(16*4*0,4),STEP16(16*4*1,4),
@@ -1855,10 +1817,10 @@ static const gfx_layout road_layout =
 **************************************************************************/
 
 static GFXDECODE_START( gfx_bigrun )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x0e00/2 , 16 ) // Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x1600/2 , 16 ) // Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x3600/2 , 16 ) // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x2800/2 , 64 ) // [0] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,   0x0e00/2 , 16 ) // Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,   0x1600/2 , 16 ) // Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,   0x3600/2 , 16 ) // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x2800/2 , 64 ) // [0] Sprites
 	GFXDECODE_ENTRY( "road0", 0, road_layout,0x2000/2 , 64 ) // [1] Road 0
 	GFXDECODE_ENTRY( "road1", 0, road_layout,0x1800/2 , 64 ) // [2] Road 1
 GFXDECODE_END
@@ -1868,10 +1830,10 @@ GFXDECODE_END
 **************************************************************************/
 
 static GFXDECODE_START( gfx_cischeat )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1c00/2, 32  ) // Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2c00/2, 32  ) // Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6c00/2, 32  ) // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x5000/2, 128 ) // [0] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,   0x1c00/2, 32  ) // Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,   0x2c00/2, 32  ) // Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,   0x6c00/2, 32  ) // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x5000/2, 128 ) // [0] Sprites
 	GFXDECODE_ENTRY( "road0", 0, road_layout,0x3800/2, 64  ) // [1] Road 0
 	GFXDECODE_ENTRY( "road1", 0, road_layout,0x4800/2, 64  ) // [2] Road 1
 GFXDECODE_END
@@ -1881,10 +1843,10 @@ GFXDECODE_END
 **************************************************************************/
 
 static GFXDECODE_START( gfx_f1gpstar )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1e00/2, 16  ) // Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2e00/2, 16  ) // Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6e00/2, 16  ) // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16,0x5000/2, 128 ) // [0] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,   0x1e00/2, 16  ) // Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,   0x2e00/2, 16  ) // Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,   0x6e00/2, 16  ) // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0x5000/2, 128 ) // [0] Sprites
 	GFXDECODE_ENTRY( "road0", 0, road_layout,0x3800/2, 64  ) // [1] Road 0
 	GFXDECODE_ENTRY( "road1", 0, road_layout,0x4800/2, 64  ) // [2] Road 1
 GFXDECODE_END
@@ -1894,10 +1856,10 @@ GFXDECODE_END
 **************************************************************************/
 
 static GFXDECODE_START( gfx_scudhamm )
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x1e00/2, 16  )   // Scroll 0
-	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x0000/2, 16  )   // UNUSED
-	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,          0x4e00/2, 16  )   // Scroll 2
-	GFXDECODE_ENTRY( "sprites", 0, tiles_16x16_quad,   0x3000/2, 128 )   // [0] sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               0x1e00/2, 16  )   // Scroll 0
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               0x0000/2, 16  )   // UNUSED
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,               0x4e00/2, 16  )   // Scroll 2
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_grouped_col_packed_msb, 0x3000/2, 128 )   // [0] sprites
 	// No Road Layers
 GFXDECODE_END
 
