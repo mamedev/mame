@@ -95,6 +95,7 @@ private:
 
 	// memory helpers
 	u16 get_banked_address(u8 reg);
+	u32 tabptr_offset(int offset) const;
 
 	// execution
 	void execute_move(u8 dstreg, u8 srcreg);

@@ -384,6 +384,11 @@ u16 riscii_series_device::get_banked_address(u8 reg)
 		return reg;
 }
 
+u32 riscii_series_device::tabptr_offset(int offset) const
+{
+	return (m_tabptr & 0x800000) | ((m_tabptr + offset) & ((1 << (m_prgbits + 1)) - 1));
+}
+
 
 //**************************************************************************
 //  EXECUTION CORE
@@ -1053,6 +1058,7 @@ void riscii_series_device::execute_cycle1(u16 opcode)
 
 void riscii_series_device::execute_tbrd(u32 ptr)
 {
+	// TODO: "Bit 23 is used to select the internal/external memory"
 	u16 addr = get_banked_address(m_curreg);
 	u16 data = m_program->read_word(ptr >> 1);
 	if (BIT(ptr, 0))
@@ -1092,15 +1098,15 @@ void riscii_series_device::execute_run()
 			break;
 
 		case EXEC_TBRD1:
-			execute_tbrd(m_tabptr++);
+			execute_tbrd(std::exchange(m_tabptr, tabptr_offset(1)));
 			break;
 
 		case EXEC_TBRD2:
-			execute_tbrd(m_tabptr--);
+			execute_tbrd(std::exchange(m_tabptr, tabptr_offset(-1)));
 			break;
 
 		case EXEC_TBRDA:
-			execute_tbrd(m_tabptr + m_acc);
+			execute_tbrd(tabptr_offset(m_acc));
 			break;
 
 		case EXEC_L0JMP: case EXEC_L1JMP: case EXEC_L2JMP: case EXEC_L3JMP:
