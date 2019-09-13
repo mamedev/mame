@@ -1995,8 +1995,9 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK, cannot take off, trips unemulated COPRO opcode, to be rechecked -->
-	<software name="mig29">
+	<!-- boot OK, trips various unemulated COPRO opcode -->
+	<!-- Has internal joystick calibration -->
+	<software name="mig29" supported="partial">
 		<description>Mig 29 Fulcrum</description>
 		<year>1991</year>
 		<publisher>Krisalis</publisher>

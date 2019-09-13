@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "softfloat3/source/include/softfloat.h"
-
 /****************************************************************************************************
  *  INTERRUPT CONSTANTS
  ***************************************************************************************************/
@@ -40,8 +38,7 @@ protected:
 		ARM32_R0, ARM32_R1, ARM32_R2, ARM32_R3, ARM32_R4, ARM32_R5, ARM32_R6, ARM32_R7,
 		ARM32_R8, ARM32_R9, ARM32_R10, ARM32_R11, ARM32_R12, ARM32_R13, ARM32_R14, ARM32_R15,
 		ARM32_FR8, ARM32_FR9, ARM32_FR10, ARM32_FR11, ARM32_FR12, ARM32_FR13, ARM32_FR14,
-		ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14,
-		COPRO_F0, COPRO_F1, COPRO_F2, COPRO_F3, COPRO_F4, COPRO_F5, COPRO_F6, COPRO_F7
+		ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14
 	};
 
 	arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
@@ -70,8 +67,9 @@ protected:
 
 	int m_icount;
 	uint32_t m_sArmRegister[27];
-	u32 m_coproRegister[16];
 	uint32_t m_coproControl[16];
+	uint32_t m_coproFPsr, m_coproFPcr;
+	uint32_t m_coproRegister[16];
 	uint8_t m_pendingIrq;
 	uint8_t m_pendingFiq;
 	address_space *m_program;
@@ -93,7 +91,8 @@ protected:
 	void HandleMemSingle(uint32_t insn);
 	void HandleMemBlock(uint32_t insn);
 	void HandleCoPro(uint32_t insn);
-	void HandleCoProVL86C020(uint32_t insn);
+	bool HandleCoProVL86C020(uint32_t insn);
+	inline void HandleTrap(uint8_t vector);
 	uint32_t decodeShift(uint32_t insn, uint32_t *pCarry);
 	void arm_check_irq_state();
 	int loadInc(uint32_t pat, uint32_t rbv, uint32_t s);
@@ -102,8 +101,6 @@ protected:
 	int storeDec(uint32_t pat, uint32_t rbv);
 	static uint32_t BCDToDecimal(uint32_t value);
 	static uint32_t DecimalToBCD(uint32_t value);
-	inline float32_t ReadCoProRegOrConst32(uint32_t idx);
-	inline float64_t ReadCoProRegOrConst64(uint32_t idx);
 };
 
 
