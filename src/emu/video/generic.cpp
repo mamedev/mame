@@ -171,17 +171,6 @@ const gfx_layout gfx_16x16x4_grouped_row_packed_lsb =
 	16*16*4
 };
 
-const gfx_layout gfx_16x16x8_grouped_row_raw =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP4(0,1) },
-	{ STEP8(0,8), STEP8(8*8*8,8) },
-	{ STEP8(0,8*8), STEP8(8*8*8*2,8*8) },
-	16*16*8
-};
-
 /*
 	16x16; grouped of 4 8x8 tiles (col align)
 	0 2
@@ -210,15 +199,4 @@ const gfx_layout gfx_16x16x4_grouped_col_packed_lsb =
 	},
 	{ STEP16(0,4*8) },
 	16*16*4
-};
-
-const gfx_layout gfx_16x16x8_grouped_col_raw =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP4(0,1) },
-	{ STEP8(0,8), STEP8(8*8*16,8) },
-	{ STEP16(0,8*8) },
-	16*16*8
 };
