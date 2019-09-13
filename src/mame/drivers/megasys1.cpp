@@ -1634,41 +1634,17 @@ WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
  *
  *************************************/
 
-#ifdef UNUSED_VARIABLE
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1)   },
-	{ STEP8(0,4)   },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-#endif
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1)   },
-	{ STEP8(8*8*4*0,4), STEP8(8*8*4*2,4) },
-	{ STEP16(0,4*8) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_z )
-	//GFXDECODE_ENTRY( "scroll0", 0, tilelayout,   256*0, 16 )   // [0] Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tilelayout,   256*2, 16 )   // [1] Scroll 1
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 256*1, 16 )   // [2] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               256*0, 16 )   // [0] Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,               256*2, 16 )   // [1] Scroll 1
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 256*1, 16 )   // [2] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_abc )
-	//GFXDECODE_ENTRY( "scroll0", 0, tilelayout,   256*0, 16 )   // [0] Scroll 0
-	//GFXDECODE_ENTRY( "scroll1", 0, tilelayout,   256*1, 16 )   // [1] Scroll 1
-	//GFXDECODE_ENTRY( "scroll2", 0, tilelayout,   256*2, 16 )   // [2] Scroll 2 (unused in system D)
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 256*3, 16 )   // [3] Sprites
+	//GFXDECODE_ENTRY( "scroll0", 0, gfx_8x8x4_packed_msb,               256*0, 16 )   // [0] Scroll 0
+	//GFXDECODE_ENTRY( "scroll1", 0, gfx_8x8x4_packed_msb,               256*1, 16 )   // [1] Scroll 1
+	//GFXDECODE_ENTRY( "scroll2", 0, gfx_8x8x4_packed_msb,               256*2, 16 )   // [2] Scroll 2 (unused in system D)
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 256*3, 16 )   // [3] Sprites
 GFXDECODE_END
 
 /*************************************

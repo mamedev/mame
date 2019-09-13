@@ -415,20 +415,8 @@ static INPUT_PORTS_START( sandscrp )
 INPUT_PORTS_END
 
 
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(8*8*4*0,4),   STEP8(8*8*4*1,4)   },
-	{ STEP8(8*8*4*0,8*4), STEP8(8*8*4*2,8*4) },
-	16*16*4
-};
-
-
 static GFXDECODE_START( gfx_sandscrp )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0x000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 0x10 ) // [0] Sprites
 GFXDECODE_END
 
 

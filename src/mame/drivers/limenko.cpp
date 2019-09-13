@@ -676,19 +676,8 @@ INPUT_PORTS_END
 *****************************************************************************************************/
 
 
-static const gfx_layout tile_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8,
-};
-
 static GFXDECODE_START(gfx_limenko)
-	GFXDECODE_ENTRY("gfx", 0, tile_layout, 0, 16) /* tiles */
+	GFXDECODE_ENTRY("gfx", 0, gfx_8x8x8_raw, 0, 16) /* tiles */
 GFXDECODE_END
 
 
