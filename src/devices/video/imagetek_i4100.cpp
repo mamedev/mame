@@ -1014,7 +1014,7 @@ void imagetek_i4100_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bi
 		int x = src[0];
 		int const curr_pri = (x & 0xf800) >> 11;
 
-		if ((curr_pri == 0x1f))
+		if (curr_pri == 0x1f)
 			continue;
 
 		int y          = src[1];
@@ -1045,7 +1045,7 @@ void imagetek_i4100_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bi
 
 		while (sprite_ptr != m_sprite_end)
 		{
-			if ((sprite_ptr->curr_pri == i))
+			if (sprite_ptr->curr_pri == i)
 			{
 				u8 pri = global_pri;
 
