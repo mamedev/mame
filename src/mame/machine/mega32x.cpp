@@ -225,6 +225,7 @@ DEFINE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device,  "sega_32x_pal",  "Sega 3
 sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
+	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this, false)
 	, m_sh2_shared(*this, "sh2_shared")
 	, m_main_cpu(*this, finder_base::DUMMY_TAG)
@@ -233,6 +234,7 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
 	, m_scan_timer(*this, finder_base::DUMMY_TAG)
+	, m_stream(nullptr)
 {
 }
 
@@ -827,6 +829,7 @@ TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
 {
 	if (m_lch_size > 0)
 	{
+		m_stream->update();
 		switch(m_pwm_ctrl & 3)
 		{
 			case 0: /*Speaker OFF*/ break;
@@ -842,6 +845,7 @@ TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
 
 	if (m_rch_size > 0)
 	{
+		m_stream->update();
 		switch((m_pwm_ctrl & 0xc) >> 2)
 		{
 			case 0: /*Speaker OFF*/ break;
@@ -933,6 +937,15 @@ WRITE16_MEMBER( sega_32x_device::m68k_pwm_w )
 		pwm_w(space,offset,(data & 0x7f) | (m_pwm_ctrl & 0xff80),mem_mask);
 	else
 		pwm_w(space,offset,data,mem_mask);
+}
+
+void sega_32x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	for (int s = 0; s < samples; s++)
+	{
+		outputs[0][s] = inputs[0][s];
+		outputs[1][s] = inputs[1][s];
+	}
 }
 
 /**********************************************************************************************/
@@ -1706,8 +1719,8 @@ void sega_32x_ntsc_device::device_add_mconfig(machine_config &config)
 	m_master_cpu->set_addrmap(AS_PROGRAM, &sega_32x_ntsc_device::sh2_main_map);
 	m_slave_cpu->set_addrmap(AS_PROGRAM, &sega_32x_ntsc_device::sh2_slave_map);
 
-	DAC_12BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, ":lspeaker", 0.4); // unknown DAC
-	DAC_12BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, ":rspeaker", 0.4); // unknown DAC
+	DAC_12BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 0); // unknown DAC
+	DAC_12BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 1); // unknown DAC
 }
 
 void sega_32x_pal_device::device_add_mconfig(machine_config &config)
@@ -1717,8 +1730,8 @@ void sega_32x_pal_device::device_add_mconfig(machine_config &config)
 	m_master_cpu->set_addrmap(AS_PROGRAM, &sega_32x_pal_device::sh2_main_map);
 	m_slave_cpu->set_addrmap(AS_PROGRAM, &sega_32x_pal_device::sh2_slave_map);
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, ":lspeaker", 0.4); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, ":rspeaker", 0.4); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 0); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 1); // unknown DAC
 }
 
 
@@ -1733,6 +1746,7 @@ void sega_32x_device::device_start()
 		set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 
+	m_stream = stream_alloc(2, 2, 48000 * 4);
 	m_32x_pwm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_32x_device::handle_pwm_callback), this));
 
 	m_32x_dram0 = std::make_unique<uint16_t[]>(0x40000/2);
