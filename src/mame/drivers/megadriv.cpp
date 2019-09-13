@@ -614,6 +614,8 @@ void md_cons_state::genesis_32x(machine_config &config)
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_screen("megadriv");
+	m_32x->add_route(0, "lspeaker", 1.00);
+	m_32x->add_route(1, "rspeaker", 1.00);
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -647,6 +649,8 @@ void md_cons_state::mdj_32x(machine_config &config)
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_screen("megadriv");
+	m_32x->add_route(0, "lspeaker", 1.00);
+	m_32x->add_route(1, "rspeaker", 1.00);
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -680,6 +684,8 @@ void md_cons_state::md_32x(machine_config &config)
 
 	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_screen("megadriv");
+	m_32x->add_route(0, "lspeaker", 1.00);
+	m_32x->add_route(1, "rspeaker", 1.00);
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
