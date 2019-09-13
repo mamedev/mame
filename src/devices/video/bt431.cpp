@@ -118,7 +118,7 @@ void bt431_device::reg_w(u8 data)
 	switch (m_address & 0xf)
 	{
 	case REG_COMMAND:
-		m_command = data;
+		m_command = data & CR_WM;
 		LOG("64x64 cursor %s, cross hair cursor %s, cursor format %s, cross hair thickness %d\n",
 			(data & CR_D6) ? "enable" : "disable",
 			(data & CR_D5) ? "enable" : "disable",
