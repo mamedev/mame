@@ -4888,7 +4888,7 @@ void nmk16_state::macross2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000); /* Z84008PS 4 MHz ? */
+	Z80(config, m_audiocpu, 4000000); /* Z8400B PS 4 MHz ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::macross2_sound_io_map);
 
