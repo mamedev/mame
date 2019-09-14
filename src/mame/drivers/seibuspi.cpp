@@ -4102,9 +4102,9 @@ GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state, init_rdf
 GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftja,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earliest)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftu,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftua,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftauge,   rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Evaluation Software For Show, Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 // this is one revision - SXX2C ROM SUB4 cart
+GAME( 1996, rdftua,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftjb,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftau,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Australia)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, rdftam,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
