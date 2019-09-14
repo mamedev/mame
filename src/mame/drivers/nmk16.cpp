@@ -4787,7 +4787,7 @@ void nmk16_state::tdragon3h(machine_config &config)
 void nmk16_state::raphero(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(14'000'000)); /* MC68HC000P12 or P16 14 MHz */
+	M68000(config, m_maincpu, XTAL(14'000'000)); /* MC68HC000P12 or MC68000P12F or TMP68HC000P-16 14 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::raphero_map);
 	set_hacky_interrupt_timing(config);
 
