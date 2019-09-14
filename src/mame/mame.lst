@@ -2453,7 +2453,7 @@ pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops
 pcd4nl                          // 1995 Siemens-Nixdorf PCD-4NL 486 subnotebook
 pcd4nd                          // 1993 Siemens-Nixdorf 486 notebook
 ct386sx                         //
-wyse286							// WYSEpc
+wy220001						// WYSEpc
 cxsxd                           //
 ec1842                          //
 ec1849                          //
@@ -2474,7 +2474,7 @@ headg2							// 286 motherboards with Headland G2 chipset
 mb1212c							// Biostar MB-1212C motherboard (286)
 bam16a0							// VIP-M21502A BAM16-A0 motherboard (286)
 cmpa286							// CMP enterprise CO.LTD. motherboard (286)
-chips0							// 286 motherboards with the original Chips chipset
+chips8220							// 286 motherboards with the original Chips chipset
 suntac5							// 286 motherboards using the 5-chip SUNTAC chipset
 ht12a                           // 286 motherboards using the Headland HT12/A chipset
 vlsi5							// 286 motherboards using the 5-chip VLSI chipset

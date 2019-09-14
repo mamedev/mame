@@ -1577,10 +1577,10 @@ ROM_START( neat )
 	ROMX_LOAD( "286-neat_neat012-l-verify.bin", 0x10000, 0x8000, CRC(591d226c) SHA1(7f42797ead8213022192bb2bbbe2de7f6796ac6f), ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "286-neat_neat012-h-verify.bin", 0x10001, 0x8000, CRC(0198e2e4) SHA1(10ced383b6dc00c2e98b7bed0782f59a9c266625), ROM_SKIP(1) | ROM_BIOS(4) )
 	// 5: AUVA VIP BAM/16-11 - BIOS-String: Phoenix 80286 ROM BIOS PLUS Version 3.10 20 - ISA8:1, ISA16: 5, Memory Slot: 1
-	ROM_SYSTEM_BIOS(5, "bam1611", "VIP BAM/16-11")
+	ROM_SYSTEM_BIOS(5, "bam1611", "VIP BAM/16-11") // OSC: 18.432 - 14.318 - 32.000MHz
 	ROMX_LOAD( "286-vip bam-6-11 m215100-lo_32k.bin", 0x10000, 0x8000, CRC(b51b8bc1) SHA1(a7ebbced98aca32a7f0cdf80d1b832dfeb92d5e7), ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "286-vip bam-6-11 m215100-hi_32k.bin", 0x10001, 0x8000, CRC(46ddd5a6) SHA1(fd4267af298c7f70e062a7c4e023caf852bbf082), ROM_SKIP(1) | ROM_BIOS(5) )
-	// 6: CP-805 - BIOS-String: ENET-1138-030390-K0
+	// 6: CP-805 - BIOS-String: ENET-1138-030390-K0 
 	ROM_SYSTEM_BIOS(6, "cp805", "CP-805")
 	ROMX_LOAD( "286-chips ami78384 even.bin", 0x10000, 0x8000, CRC(5280fee0) SHA1(25051ad6bbccddc0738861b614dbafbca5c3bff5), ROM_SKIP(1) | ROM_BIOS(6) )
 	ROMX_LOAD( "286-chips ami78384 odd.bin", 0x10001, 0x8000, CRC(24526bf3) SHA1(8f8b46fe2e708fa53d0eeb44a16924cd878bdd33), ROM_SKIP(1) | ROM_BIOS(6) )
@@ -1729,24 +1729,23 @@ ROM_END
 
 // ***** Motherboards using the original Chips chipset: P82C202, P82C201, P82A203, P82A204, P82A205
 
-ROM_START( chips0 )
+ROM_START( chips8220 )
 	ROM_REGION(0x20000, "bios", 0)
 	// 0: AL-6410 (found online, no markings on the board itself), Chipset: Chips P82A204, P82A203, P82A205, P82C201, P82C202
 	ROM_SYSTEM_BIOS(0, "al6410", "AL-6410") /* (BIOS-String: D286-1103-110387-K0) (BIOS release date:: 03-11-1987) (ISA8: 2, ISA16: 6) */
 	ROMX_LOAD( "al-6410_ami_bios_low.bin", 0x10000, 0x8000, CRC(50c4e121) SHA1(5f9c27aabdc6bb810e90bced2053b7c21c4994dd), ROM_SKIP(1) |  ROM_BIOS(0) )
 	ROMX_LOAD( "al-6410_ami_bios_high.bin", 0x10001, 0x8000, CRC(a44be083) SHA1(99f73d7ceb315eb3770c94d90228f8859cadc610), ROM_SKIP(1) | ROM_BIOS(0) )
 	// 1: AT SYSTEM 6M/8M/10M - Chipset: Chips P82A205; P82C201; P82A203; P82A204 - ISA8:2, ISA16: 6
-	ROM_SYSTEM_BIOS(1, "at6m8m10m", "AT SYSTEM 6M/8M/10M") /* (BIOS release date:: 04-02-1987) */
+	ROM_SYSTEM_BIOS(1, "at6m8m10m", "AT SYSTEM 6M/8M/10M") // (BIOS release date:: 04-02-1987) - OSC: 20.000000MHz - MQ-14.3 - 12.000
 	ROMX_LOAD( "286-at system 6m8m10m-l_32k.bin", 0x10000, 0x8000, CRC(37e0e1c1) SHA1(f5cd17658554a73bb86c5c8e630dac3e34b38e51), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "286-at system 6m8m10m-r_32k.bin", 0x10001, 0x8000, CRC(c672efff) SHA1(7224bb6b4d25ef34bc0aa9d7c450baf9b47fd917), ROM_SKIP(1) | ROM_BIOS(1) )
 	// 2: CDTEK - BIOS-String: DSUN-1202-042088-K0 286-BIOS AMI for CDTEK - ISA8:2, ISA16:6 - Chipset ICs plus SN76LS612N, RTC MC146818P
-	ROM_SYSTEM_BIOS(2, "cdtekchips", "CDTEK 286") // ISA8: 
+	ROM_SYSTEM_BIOS(2, "cdtekchips", "CDTEK 286") // ISA8:2, ISA16: 6 - OSC: 12.000, 14.31818, 16000.00KHz
 	ROMX_LOAD( "286-cdtek2-even_32k.bin", 0x10000, 0x8000, CRC(94867e8d) SHA1(12e61cc8b875b57324c93276c9f6093f2bd0e277), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROMX_LOAD( "286-cdtek2-odd_32k.bin", 0x10001, 0x8000, CRC(153ed3bd) SHA1(10b711e0f0d79e0b6d181f24fe66544d2d72a310), ROM_SKIP(1) | ROM_BIOS(2) )	
 	// 3: This board looks identical to #2 but has different chips fitted: SN76LS612N = Zymos HCT612, Chips P82A204 = TACT80204FN, P82A203 = STK-5134, P82A205 = STK-5135, 
-	// P82C201 = STK-5132, P82C202 = STK-5133
-	// BIOS-String: Phoenix 80286 ROM BIOS Version 3.06
-	ROM_SYSTEM_BIOS(3, "286tact", "286 TACT")
+	// P82C201 = STK-5132, P82C202 = STK-5133 - BIOS-String: Phoenix 80286 ROM BIOS Version 3.06
+	ROM_SYSTEM_BIOS(3, "286tact", "286 TACT") // OSC: 20.0000MHz, 14.31818 - 24.000MHz
 	ROMX_LOAD( "286-tact-320548-1_32k.bin", 0x10000, 0x8000, CRC(0b528d19) SHA1(15f5a94d89461655c0f74681bbae5745db009ac2), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "286-tact-320548-2_32k.bin", 0x10001, 0x8000, CRC(418aa2d0) SHA1(b6af0b8aa595d8f8de6c0fc851bf1c226dcc7ca7), ROM_SKIP(1) | ROM_BIOS(3) )		
 ROM_END	
@@ -2722,7 +2721,7 @@ COMP( 198?, snomi286,  ibm5170, 0,       atvga,     0,     at_state,     init_at
 COMP( 198?, cmpa286,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "CMP enterprise CO.LTD.", "286 motherboard", MACHINE_NOT_WORKING )
 COMP( 198?, bam16a0,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "AUVA", "VIP-M21502A BAM16-A0", MACHINE_NOT_WORKING )
 COMP( 199?, olim203,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Olivetti", "M203 motherboard", MACHINE_NOT_WORKING )
-COMP( 198?, chips0,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>", "286 motherboards with the original Chips chipset", MACHINE_NOT_WORKING )
+COMP( 198?, chips8220, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>", "286 motherboards with the original Chips chipset", MACHINE_NOT_WORKING )
 COMP( 199?, cdtekg2,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "CDTEK", "286 motherboard with Headland G2 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, octekg2,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Octek", "286 mainboard with Headland G2 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, headg2,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>", "286 motherboards with Headland G2 chipset", MACHINE_NOT_WORKING )
