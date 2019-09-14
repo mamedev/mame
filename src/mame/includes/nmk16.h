@@ -61,13 +61,17 @@ public:
 	void acrobatm(machine_config &config);
 	void strahl(machine_config &config);
 	void tdragon3h(machine_config &config);
-	void atombjt(machine_config &config);
 	void hachamf_prot(machine_config &config);
 	void macross(machine_config &config);
 	void mustangb(machine_config &config);
 	void mustang(machine_config &config);
 	void twinactn(machine_config &config);
 	void vandykeb(machine_config &config);
+
+	void powerins(machine_config &config);
+	void powerinsa(machine_config &config);
+	void powerinsb(machine_config &config);
+	void powerinsc(machine_config &config);
 
 	void init_nmk();
 	void init_tharrier();
@@ -79,8 +83,9 @@ public:
 	void init_tdragon_prot();
 	void init_banked_audiocpu();
 	void init_gunnailb();
+	void init_powerinsa();
+	void init_powerinsc();
 	void init_bjtwin();
-	void init_atombjt();
 
 	DECLARE_VIDEO_START(gunnail);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
@@ -162,6 +167,7 @@ protected:
 
 	void set_hacky_interrupt_timing(machine_config &config);
 	void set_hacky_screen_lowres(machine_config &config);
+	void set_hacky_screen_midres(machine_config &config);
 	void set_hacky_screen_hires(machine_config &config);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
@@ -169,14 +175,17 @@ protected:
 	TILE_GET_INFO_MEMBER(common_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bioship_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(powerins_get_bg_tile_info);
 	DECLARE_VIDEO_START(macross);
 	DECLARE_VIDEO_START(bioship);
 	DECLARE_VIDEO_START(strahl);
 	DECLARE_VIDEO_START(macross2);
+	DECLARE_VIDEO_START(powerins);
 	DECLARE_VIDEO_START(bjtwin);
 	u32 screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_powerins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(tdragon_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(hachamf_mcu_sim);
@@ -184,8 +193,10 @@ protected:
 	void video_init();
 	inline void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *spr);
 	inline void draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *spr);
+	inline void draw_sprite_powerins(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *spr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites_powerins(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bg_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer = 0);
 	void tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mcu_run(u8 dsw_setting);
@@ -198,7 +209,6 @@ protected:
 	void decode_ssmissin();
 
 	void acrobatm_map(address_map &map);
-	void atombjt_map(address_map &map);
 	void bioship_map(address_map &map);
 	void bjtwin_map(address_map &map);
 	void gunnail_map(address_map &map);
@@ -215,6 +225,11 @@ protected:
 	void mustangb_map(address_map &map);
 	void oki1_map(address_map &map);
 	void oki2_map(address_map &map);
+	void powerins_map(address_map &map);
+	void powerins_sound_map(address_map &map);
+	void powerinsa_map(address_map &map);
+	void powerinsa_oki_map(address_map &map);
+	void powerinsb_sound_io_map(address_map &map);
 	void raphero_map(address_map &map);
 	void raphero_sound_mem_map(address_map &map);
 	void ssmissin_map(address_map &map);

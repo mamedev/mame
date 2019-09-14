@@ -65,6 +65,13 @@ TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
 			0);
 }
 
+// 11 bit tile code, 5 bit color code
+TILE_GET_INFO_MEMBER(nmk16_state::powerins_get_bg_tile_info)
+{
+	const u16 code = m_bgvideoram[0][(m_tilerambank << 13) | tile_index];
+	SET_TILE_INFO_MEMBER(1, (code & 0x7ff) | (m_bgbank << 11), (code >> 12) | ((code & 0x800) >> 7), 0);
+}
+
 
 /***************************************************************************
 
@@ -146,6 +153,19 @@ VIDEO_START_MEMBER(nmk16_state,gunnail)
 {
 	VIDEO_START_CALL_MEMBER(macross2);
 	m_bg_tilemap[0]->set_scroll_rows(512);
+}
+
+VIDEO_START_MEMBER(nmk16_state,powerins)
+{
+	m_sprlimit = 448 * 263; // not verified
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::powerins_get_bg_tile_info), this), tilemap_mapper_delegate(FUNC(nmk16_state::tilemap_scan_pages), this), 16, 16, 256, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::common_get_tx_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+
+	m_tx_tilemap->set_transparent_pen(15);
+
+	video_init();
+	m_videoshift = 32;  /* 320x224 screen, leftmost 32 pixels have to be retrieved */
+						/* from the other side of the tilemap (!) */
 }
 
 VIDEO_START_MEMBER(nmk16_state, bjtwin)
@@ -361,6 +381,57 @@ inline void nmk16_state::draw_sprite_flipsupported(bitmap_ind16 &bitmap, const r
 	} while (--yy >= 0);
 }
 
+inline void nmk16_state::draw_sprite_powerins(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *spr)
+{
+	if (!(spr[0] & 0x0001))
+		return;
+
+	int sx          = (spr[4] & 0x1ff) + m_videoshift;
+	int sy          =  spr[6] & 0x1ff;
+	int code        =  spr[3] & 0x7fff;
+	const u16 color =  spr[7];
+	const int w     =  spr[1] & 0x000f;
+	const int h     = (spr[1] & 0x00f0) >> 4;
+	int flipx       = (spr[1] & 0x1000) >> 12;
+	int flipy       =  0;  // ??
+	code           |= (spr[1] & 0x100) << 7;
+
+	int delta = 16;
+
+	flipx ^= flip_screen();
+	flipy ^= flip_screen();
+
+	if (flip_screen())
+	{
+		sx = 368 - sx;
+		sy = 240 - sy;
+		delta = -16;
+	}
+
+	int yy = h;
+	sy += flipy ? (delta * h) : 0;
+	do
+	{
+		int x = sx + (flipx ? (delta * w) : 0);
+		int xx = w;
+		do
+		{
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+			code,
+			color,
+			flipx, flipy,
+			((x + 16) & 0x1ff) - 16,sy & 0x1ff, 15);
+		m_sprclk += 128; // 128 clock per each 16x16 tile
+		if (m_sprclk >= m_sprlimit)
+			return;
+
+		code++;
+		x += delta * (flipx ? -1 : 1);
+		} while (--xx >= 0);
+		sy += delta * (flipy ? -1 : 1);
+	} while (--yy >= 0);
+}
+
 void nmk16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sprclk = 0;
@@ -386,6 +457,20 @@ void nmk16_state::draw_sprites_flipsupported(bitmap_ind16 &bitmap, const rectang
 			return;
 
 		draw_sprite_flipsupported(bitmap, cliprect, m_spriteram_old2.get() + offs);
+	}
+}
+
+void nmk16_state::draw_sprites_powerins(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_sprclk = 0;
+
+	for (int offs = 0; offs < 0x1000/2; offs += 8)
+	{
+		m_sprclk += 16; // 16 clock per each reading
+		if (m_sprclk >= m_sprlimit)
+			return;
+
+		draw_sprite_powerins(bitmap, cliprect, m_spriteram_old2.get() + offs);
 	}
 }
 
@@ -456,6 +541,14 @@ u32 nmk16_state::screen_update_manybloc(screen_device &screen, bitmap_ind16 &bit
 {
 	bg_update(screen, bitmap, cliprect, 0);
 	draw_sprites_flipsupported(bitmap, cliprect);
+	tx_update(screen, bitmap, cliprect);
+	return 0;
+}
+
+u32 nmk16_state::screen_update_powerins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bg_update(screen, bitmap, cliprect, 0);
+	draw_sprites_powerins(bitmap, cliprect);
 	tx_update(screen, bitmap, cliprect);
 	return 0;
 }

@@ -1356,9 +1356,6 @@ files {
 	MAME_DIR .. "src/mame/includes/ohmygod.h",
 	MAME_DIR .. "src/mame/video/ohmygod.cpp",
 	MAME_DIR .. "src/mame/drivers/patapata.cpp",
-	MAME_DIR .. "src/mame/drivers/powerins.cpp",
-	MAME_DIR .. "src/mame/includes/powerins.h",
-	MAME_DIR .. "src/mame/video/powerins.cpp",
 	MAME_DIR .. "src/mame/drivers/bowltry.cpp",
 }
 
