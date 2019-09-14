@@ -238,6 +238,7 @@ public:
 		m_bp(*this, "BP"),
 		m_touch_x(*this, "TOUCH_X"),
 		m_touch_y(*this, "TOUCH_Y"),
+		m_inp_bank(*this, "IN_BANK%u", 1U),
 		m_cmos_ram(*this, "cmos"),
 		m_program_ram(*this, "prograram"),
 		m_s3000_ram(*this, "s3000_ram"),
@@ -261,7 +262,7 @@ public:
 	void init_pepluss64();
 	void init_peplussbw();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(input_r);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(input_r);
 
 protected:
 	virtual void machine_start() override;
@@ -283,6 +284,7 @@ private:
 	optional_ioport m_bp;
 	optional_ioport m_touch_x;
 	optional_ioport m_touch_y;
+	optional_ioport_array<2> m_inp_bank;
 
 	required_shared_ptr<uint8_t> m_cmos_ram;
 	required_shared_ptr<uint8_t> m_program_ram;
@@ -1088,10 +1090,11 @@ void peplus_state::main_iomap(address_map &map)
 *      Input ports       *
 *************************/
 
+template <int N>
 CUSTOM_INPUT_MEMBER(peplus_state::input_r)
 {
 	uint8_t inp_ret = 0x00;
-	uint8_t inp_read = ioport((const char *)param)->read();
+	uint8_t inp_read = m_inp_bank[N]->read();
 
 	if (inp_read & 0x01) inp_ret = 0x01;
 	if (inp_read & 0x02) inp_ret = 0x02;
@@ -1165,9 +1168,9 @@ static INPUT_PORTS_START( peplus_schip )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1193,9 +1196,9 @@ static INPUT_PORTS_START( nonplus_poker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 
 	PORT_MODIFY("SW1")
@@ -1243,9 +1246,9 @@ static INPUT_PORTS_START( peplus_poker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1271,9 +1274,9 @@ static INPUT_PORTS_START( peplus_bjack )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1304,9 +1307,9 @@ static INPUT_PORTS_START( peplus_keno )
 	PORT_BIT( 0xffff, 0x200, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 1024) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1332,9 +1335,9 @@ static INPUT_PORTS_START( peplus_slots )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state, input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 

@@ -125,7 +125,7 @@ static INPUT_PORTS_START( flicker )
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Door Slam")     PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, 0)
 	PORT_BIT(0x001c, IP_ACTIVE_HIGH, IPT_UNKNOWN)  // called "two coins", "three coins", "four coins" in patent, purpose unknown
-	PORT_BIT(0x07e0, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(DEVICE_SELF, flicker_state, coins_in, nullptr)
+	PORT_BIT(0x07e0, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(flicker_state, coins_in)
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_TILT)
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_START)    PORT_NAME("Credit Button")                         PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, 0)
 	PORT_BIT(0x6000, IP_ACTIVE_HIGH, IPT_UNUSED)

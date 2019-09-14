@@ -58,7 +58,7 @@ public:
 	void init_spacecr();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(input_port_4_f0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
+	template <int Player> DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
 
 private:
 	required_shared_ptr<uint8_t> m_videoram_1;

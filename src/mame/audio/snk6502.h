@@ -19,7 +19,7 @@ class snk6502_sound_device : public device_t, public device_sound_interface
 public:
 	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(music0_playing);
+	DECLARE_READ_LINE_MEMBER(music0_playing);
 
 	void set_music_freq(int freq);
 	void set_music_clock(double clock_time);

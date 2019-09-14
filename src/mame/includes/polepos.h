@@ -40,7 +40,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(auto_start_r);
+	DECLARE_READ_LINE_MEMBER(auto_start_r);
 
 	void init_polepos2();
 

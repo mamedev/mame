@@ -322,7 +322,7 @@ public:
 
 	void init_nss();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
+	DECLARE_READ_LINE_MEMBER(game_over_flag_r);
 
 private:
 	required_device<cpu_device> m_bioscpu;
@@ -652,7 +652,7 @@ void nss_state::machine_start()
 }
 
 
-CUSTOM_INPUT_MEMBER(nss_state::game_over_flag_r)
+READ_LINE_MEMBER(nss_state::game_over_flag_r)
 {
 	return m_game_over_flag;
 }
@@ -665,7 +665,7 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("FP")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nss_state,game_over_flag_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nss_state, game_over_flag_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Restart Button")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Page Up Button")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Page Down Button")

@@ -149,7 +149,7 @@ public:
 
 	void wrally2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(wrally2_analog_bit_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(wrally2_analog_bit_r);
 
 private:
 	required_ioport m_analog0;

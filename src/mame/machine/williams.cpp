@@ -467,13 +467,6 @@ MACHINE_START_MEMBER(tshoot_state,tshoot)
 }
 
 
-CUSTOM_INPUT_MEMBER(tshoot_state::gun_r)
-{
-	int data = m_gun[(uintptr_t)param]->read();
-	return (data & 0x3f) ^ ((data & 0x3f) >> 1);
-}
-
-
 WRITE_LINE_MEMBER(tshoot_state::maxvol_w)
 {
 	/* something to do with the sound volume */

@@ -332,7 +332,7 @@ WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(ddragon_state::subcpu_bus_free)
+READ_LINE_MEMBER(ddragon_state::subcpu_bus_free_r)
 {
 	// Corresponds to BA (Bus Available) on the HD63701
 	if (m_subcpu)
@@ -680,7 +680,7 @@ static INPUT_PORTS_START( ddragon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state, subcpu_bus_free, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddragon_state, subcpu_bus_free_r)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 

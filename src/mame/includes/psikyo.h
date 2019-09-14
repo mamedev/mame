@@ -59,8 +59,8 @@ public:
 	void init_tengai();
 	void init_gunbird();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(z80_nmi_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	DECLARE_READ_LINE_MEMBER(z80_nmi_r);
+	DECLARE_READ_LINE_MEMBER(mcu_status_r);
 
 private:
 	/* memory pointers */

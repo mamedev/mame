@@ -362,7 +362,7 @@ protected:
 };
 
 
-CUSTOM_INPUT_MEMBER(tnx1_state::dsw1_read)
+READ_LINE_MEMBER(tnx1_state::dsw1_read)
 {
 	return ioport("DSW1")->read() >> m_dswbit;
 }
@@ -418,7 +418,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPSETTING(    0x08, "A 1/6 B 1/1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tnx1_state, dsw1_read, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tnx1_state, dsw1_read)
 
 	PORT_START("DSW1")  /* DSW1 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
@@ -444,7 +444,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER( tnx1_state::pop_field_r )
+READ_LINE_MEMBER( tnx1_state::pop_field_r )
 {
 	return m_field ^ 1;
 }
@@ -475,7 +475,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tnx1_state,pop_field_r, nullptr) /* inverted init e/o signal (even odd) */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tnx1_state, pop_field_r) // inverted init e/o signal (even odd)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -497,7 +497,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_CONFSETTING(    0x20, "Nintendo Co.,Ltd" )
 	PORT_CONFSETTING(    0x60, "Nintendo of America" )
 //  PORT_CONFSETTING(    0x00, "Nintendo of America" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tnx1_state, dsw1_read, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tnx1_state, dsw1_read)
 
 	PORT_START("DSW1")  /* DSW1 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW2:1,2")

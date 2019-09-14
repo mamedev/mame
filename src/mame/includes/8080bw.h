@@ -80,10 +80,10 @@ public:
 	void init_attackfc();
 	void init_invrvnge();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
+	DECLARE_READ_LINE_MEMBER(sflush_80_r);
 	uint8_t sflush_in0_r();
 	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
-	DECLARE_CUSTOM_INPUT_MEMBER(claybust_gun_on_r);
+	DECLARE_READ_LINE_MEMBER(claybust_gun_on_r);
 
 private:
 	/* devices/memory pointers */

@@ -169,7 +169,7 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
+	DECLARE_READ_LINE_MEMBER(hopper_status_r);
 
 	void jankenmn(machine_config &config);
 
@@ -251,7 +251,7 @@ WRITE8_MEMBER(jankenmn_state::lamps3_w)
 		logerror("payout: %02X\n", (data & 0x04));
 }
 
-CUSTOM_INPUT_MEMBER(jankenmn_state::hopper_status_r)
+READ_LINE_MEMBER(jankenmn_state::hopper_status_r)
 {
 	// temp workaround, needs hopper
 	return machine().rand();
@@ -336,7 +336,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state, hopper_status_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jankenmn_state, hopper_status_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 

@@ -663,7 +663,7 @@ void toaplan2_state::shared_ram_w(offs_t offset, u8 data)
 }
 
 
-CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
+READ_LINE_MEMBER(toaplan2_state::c2map_r)
 {
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
@@ -1632,7 +1632,7 @@ static INPUT_PORTS_START( tekipaki )
 //  PORT_CONFSETTING(        0x000d, DEF_STR( Japan ) )
 //  PORT_CONFSETTING(        0x000e, DEF_STR( Japan ) )
 	PORT_CONFSETTING(       0x000f, "Japan (Distributed by Tecmo)" )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, nullptr)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(toaplan2_state, c2map_r)
 INPUT_PORTS_END
 
 
@@ -2045,7 +2045,7 @@ static INPUT_PORTS_START( whoopee )
 	PORT_INCLUDE( pipibibs )
 
 	PORT_MODIFY("JMPR")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, nullptr)   // bit 0x10 sound ready
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(toaplan2_state, c2map_r)   // bit 0x10 sound ready
 INPUT_PORTS_END
 
 

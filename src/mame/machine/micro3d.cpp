@@ -370,7 +370,7 @@ READ8_MEMBER( micro3d_state::adc_volume_r )
 	return (uint8_t)((255.0/100.0) * m_volume->read() + 0.5);
 }
 
-CUSTOM_INPUT_MEMBER(micro3d_state::botss_hwchk_r)
+READ_LINE_MEMBER(micro3d_state::botss_hwchk_r)
 {
 	return m_botss_latch;
 }

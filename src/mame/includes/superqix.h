@@ -93,8 +93,8 @@ public:
 	void sqix_8031(machine_config &config);
 	void sqix_nomcu(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(fromz80_semaphore_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(frommcu_semaphore_input_r);
+	DECLARE_READ_LINE_MEMBER(fromz80_semaphore_input_r);
+	DECLARE_READ_LINE_MEMBER(frommcu_semaphore_input_r);
 
 protected:
 	virtual void machine_start() override;

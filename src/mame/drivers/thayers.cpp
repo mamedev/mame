@@ -52,8 +52,8 @@ public:
 
 	void thayers(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_enter_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_ready_r);
 
 private:
 	enum
@@ -651,14 +651,14 @@ void thayers_state::thayers_io_map(address_map &map)
 
 /* Input Ports */
 
-CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_enter_r)
+READ_LINE_MEMBER(thayers_state::laserdisc_enter_r)
 {
 	if (m_pr7820 != nullptr) return m_pr7820_enter;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_ready_r)
+READ_LINE_MEMBER(thayers_state::laserdisc_ready_r)
 {
 	if (m_pr7820 != nullptr) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
@@ -702,8 +702,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_START("COIN")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(thayers_state, laserdisc_enter_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(thayers_state, laserdisc_ready_r)
 
 	PORT_START("ROW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 YES") PORT_CODE(KEYCODE_1)

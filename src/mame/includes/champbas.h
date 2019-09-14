@@ -36,7 +36,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(watchdog_bit2);
+	DECLARE_READ_LINE_MEMBER(watchdog_bit2);
 
 	void init_champbas();
 

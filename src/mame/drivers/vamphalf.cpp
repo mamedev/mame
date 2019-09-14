@@ -1050,7 +1050,7 @@ static INPUT_PORTS_START( boonggab )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 3
-	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vamphalf_state,boonggab_photo_sensors_r, nullptr) // photo sensors 1, 2 and 3
+	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(vamphalf_state, boonggab_photo_sensors_r) // photo sensors 1, 2 and 3
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 

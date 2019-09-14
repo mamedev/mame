@@ -643,8 +643,6 @@ public:
 		hackaddress2 = 0x8524;
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
-
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
@@ -701,7 +699,7 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
+	DECLARE_READ_LINE_MEMBER(camera_r);
 
 protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -714,7 +712,7 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
+	DECLARE_READ_LINE_MEMBER(camera_r);
 };
 
 
@@ -730,7 +728,7 @@ public:
 	void xavix_mtrk(machine_config &config);
 	void xavix_mtrkp(machine_config &config);
 
-	CUSTOM_INPUT_MEMBER( mtrk_wheel_r );
+	DECLARE_READ_LINE_MEMBER( mtrk_wheel_r );
 
 protected:
 	required_device<xavix_mtrk_wheel_device> m_wheel;
@@ -939,8 +937,6 @@ public:
 	void xavix_i2c_taiko(machine_config &config);
 	void xavix_i2c_jpopira(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
-
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
@@ -957,7 +953,7 @@ public:
 
 	void xavix_cart_popira2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+	DECLARE_READ_LINE_MEMBER(i2c_r);
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -981,8 +977,8 @@ public:
 		m_extraiowrite(0)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi1_r);
+	DECLARE_READ_LINE_MEMBER(ekara_multi0_r);
+	DECLARE_READ_LINE_MEMBER(ekara_multi1_r);
 
 //  void xavix_ekara(machine_config &config);
 

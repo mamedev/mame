@@ -107,7 +107,7 @@ public:
 	void init_coh1000w();
 	void init_primrag2();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
+	DECLARE_READ_LINE_MEMBER(jdredd_gun_mux_r);
 
 private:
 	template<int Chip> DECLARE_WRITE_LINE_MEMBER(cat702_dataout) { m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
@@ -2037,7 +2037,7 @@ Notes:
       *         - Unpopulated DIP42 socket
 */
 
-CUSTOM_INPUT_MEMBER(zn_state::jdredd_gun_mux_read)
+READ_LINE_MEMBER(zn_state::jdredd_gun_mux_r)
 {
 	return m_jdredd_gun_mux;
 }
@@ -2892,7 +2892,7 @@ static INPUT_PORTS_START( jdredd )
 	PORT_BIT( 0x6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zn_state,jdredd_gun_mux_read, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zn_state, jdredd_gun_mux_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 

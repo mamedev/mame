@@ -69,7 +69,7 @@ public:
 	void init_qbert();
 	void init_qbertqub();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(track_delta_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
 
 private:

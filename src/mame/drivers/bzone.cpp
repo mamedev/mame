@@ -267,7 +267,7 @@ INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
+READ_LINE_MEMBER(bzone_state::clock_r)
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
@@ -394,9 +394,9 @@ void redbaron_state::redbaron_map(address_map &map)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step") \
 	/* bit 6 is the VG HALT bit. We set it to "low" */\
 	/* per default (busy vector processor). */\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, nullptr)\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_bzone_device, done_r)\
 	/* bit 7 is tied to a 3kHz clock */\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bzone_state, clock_r)
 
 
 #define BZONEDSW0\

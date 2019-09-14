@@ -1392,11 +1392,16 @@ void taitoz_state::spacegun_eeprom_w(u8 data)
                        GAME INPUTS
 **********************************************************/
 
-CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
+CUSTOM_INPUT_MEMBER(taitoz_state::gas_pedal_r)
 {
 	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	ioport_port *port = ioport((const char *)param);
-	return retval[port != nullptr ? port->read() & 7 : 0];
+	return retval[m_gas.read_safe(0) & 7];
+}
+
+CUSTOM_INPUT_MEMBER(taitoz_state::brake_pedal_r)
+{
+	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	return retval[m_brake.read_safe(0) & 7];
 }
 
 
@@ -2210,7 +2215,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, gas_pedal_r) PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00)
 
 	PORT_START("IN1")
@@ -2219,7 +2224,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, brake_pedal_r) PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00) // no function?
 
 	PORT_START("IN2")   /* unused */
@@ -2292,7 +2297,7 @@ static INPUT_PORTS_START( chasehq ) // IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, brake_pedal_r) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN1")
@@ -2301,7 +2306,7 @@ static INPUT_PORTS_START( chasehq ) // IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Calibrate") // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitoz_state, gas_pedal_r) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN2")   /* unused */

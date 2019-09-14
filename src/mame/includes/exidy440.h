@@ -31,8 +31,8 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(firq_beam_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(firq_vblank_r);
+	DECLARE_READ_LINE_MEMBER(firq_beam_r);
+	DECLARE_READ_LINE_MEMBER(firq_vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_showdown();

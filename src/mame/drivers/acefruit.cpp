@@ -43,9 +43,9 @@ public:
 
 	void init_sidewndr();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(sidewndr_payout_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(starspnr_coinage_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(starspnr_payout_r);
 
 protected:
 	enum
@@ -229,56 +229,53 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
+template <int Mask>
+READ_LINE_MEMBER(acefruit_state::sidewndr_payout_r)
 {
-	int bit_mask = (uintptr_t)param;
-
-	switch (bit_mask)
+	switch (Mask)
 	{
 		case 0x01:
-			return ((m_port_payout->read() & bit_mask) >> 0);
+			return ((m_port_payout->read() & Mask) >> 0);
 		case 0x02:
-			return ((m_port_payout->read() & bit_mask) >> 1);
+			return ((m_port_payout->read() & Mask) >> 1);
 		default:
-			logerror("sidewndr_payout_r : invalid %02X bit_mask\n",bit_mask);
+			logerror("sidewndr_payout_r : invalid %02X bit_mask\n",Mask);
 			return 0;
 	}
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
+template <int Mask>
+READ_LINE_MEMBER(acefruit_state::starspnr_coinage_r)
 {
-	int bit_mask = (uintptr_t)param;
-
-	switch (bit_mask)
+	switch (Mask)
 	{
 		case 0x01:
-			return ((m_port_coinage->read() & bit_mask) >> 0);
+			return ((m_port_coinage->read() & Mask) >> 0);
 		case 0x02:
-			return ((m_port_coinage->read() & bit_mask) >> 1);
+			return ((m_port_coinage->read() & Mask) >> 1);
 		case 0x04:
-			return ((m_port_coinage->read() & bit_mask) >> 2);
+			return ((m_port_coinage->read() & Mask) >> 2);
 		case 0x08:
-			return ((m_port_coinage->read() & bit_mask) >> 3);
+			return ((m_port_coinage->read() & Mask) >> 3);
 		default:
-			logerror("starspnr_coinage_r : invalid %02X bit_mask\n",bit_mask);
+			logerror("starspnr_coinage_r : invalid %02X bit_mask\n",Mask);
 			return 0;
 	}
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
+template <int Mask>
+READ_LINE_MEMBER(acefruit_state::starspnr_payout_r)
 {
-	int bit_mask = (uintptr_t)param;
-
-	switch (bit_mask)
+	switch (Mask)
 	{
 		case 0x01:
-			return ((m_port_payout->read() & bit_mask) >> 0);
+			return ((m_port_payout->read() & Mask) >> 0);
 		case 0x02:
-			return ((m_port_payout->read() & bit_mask) >> 1);
+			return ((m_port_payout->read() & Mask) >> 1);
 		case 0x04:
-			return ((m_port_payout->read() & bit_mask) >> 2);
+			return ((m_port_payout->read() & Mask) >> 2);
 		default:
-			logerror("starspnr_payout_r : invalid %02X bit_mask\n",bit_mask);
+			logerror("starspnr_payout_r : invalid %02X bit_mask\n",Mask);
 			return 0;
 	}
 }
@@ -383,14 +380,14 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Cancel/Clear" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Refill" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )              /* "Token in" - also "Refill" when "Refill" mode ON */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,sidewndr_payout_r, (void *)0x01)
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, sidewndr_payout_r<0x01>)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")   // 3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Hold/Nudge 1" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME( "Accountancy System" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )              /* "50P in" */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,sidewndr_payout_r, (void *)0x02)
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, sidewndr_payout_r<0x02>)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN4")   // 4
@@ -497,7 +494,7 @@ static INPUT_PORTS_START( starspnr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect/Cancel" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x08) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x08>) /* to be confirmed */
 
 	PORT_START("IN2")   // 2
 	/* tested at 0xe83c */
@@ -507,7 +504,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xef82 after IN5 bit 1 and after IN1 bit 3 - after coins are tested - table at 0xefa8 (3 bytes) */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeeba with IN3 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x02) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x02>) /* to be confirmed */
 	/* tested at 0x1b0f */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -516,7 +513,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xe8ea and 0xecbe */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeeba with IN2 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x01) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x01>) /* to be confirmed */
 	/* tested at 0x0178 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -527,7 +524,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xed86 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_coinage_r, (void *)0x04) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x04>) /* to be confirmed */
 
 	PORT_START("IN5")   // 5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME( "Hold 3" )
@@ -536,7 +533,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xec6f */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN6 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x01) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_payout_r<0x01>) /* to be confirmed */
 	/* tested at 0xe312 and 0xe377 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -545,7 +542,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xee42, 0xee5e and 0xeff5 before IN1 bit 0 - invalid code after 0xf000 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN5 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x02) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_payout_r<0x02>) /* to be confirmed */
 	/* tested at 0xe8dd and 0xec1c */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -557,7 +554,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xedcb */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN5 bit 3 and IN6 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, acefruit_state,starspnr_payout_r, (void *)0x04) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_payout_r<0x04>) /* to be confirmed */
 	/* tested at 0xec2a */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 

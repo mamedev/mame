@@ -43,12 +43,15 @@ public:
 		m_tc0140syt(*this, "tc0140syt"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_filter(*this, {"2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l"}),
+		m_gas(*this, "GAS"),
+		m_brake(*this, "BRAKE"),
 		m_steer(*this, "STEER"),
 		m_io_eepromout(*this, "EEPROMOUT"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
 
 	void bshark_base(machine_config &config);
 	void sci(machine_config &config);
@@ -108,6 +111,8 @@ private:
 	optional_device<tc0140syt_device> m_tc0140syt;  // bshark & spacegun miss the CPUs which shall use TC0140
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device_array<filter_volume_device, 4> m_filter;
+	optional_ioport m_gas;
+	optional_ioport m_brake;
 	optional_ioport m_steer;
 	optional_ioport m_io_eepromout;
 	output_finder<2> m_lamps;

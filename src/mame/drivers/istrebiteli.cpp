@@ -144,7 +144,7 @@ public:
 	void istreb(machine_config &config);
 	void motogonki(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
+	template <int ID> DECLARE_READ_LINE_MEMBER(collision_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
@@ -449,23 +449,23 @@ void istrebiteli_state::moto_io_map(address_map &map)
 	map(0x40, 0x4f).w(FUNC(istrebiteli_state::moto_tileram_w));
 }
 
-CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
+template <int ID>
+READ_LINE_MEMBER(istrebiteli_state::collision_r)
 {
 	// piece of HACK
 	// real hardware does per-pixel sprite collision detection
-	int id = *(int*)&param;
 
-	if ((m_spr_ctrl[id] & 0x80) == 0)
+	if ((m_spr_ctrl[ID] & 0x80) == 0)
 	{
-		int sx = m_spr_xy[0 + id * 2];
-		int sy = m_spr_xy[1 + id * 2];
-		int px = m_spr_xy[6 - id * 2] + 3;
-		int py = m_spr_xy[7 - id * 2] + 3;
+		int sx = m_spr_xy[0 + ID * 2];
+		int sy = m_spr_xy[1 + ID * 2];
+		int px = m_spr_xy[6 - ID * 2] + 3;
+		int py = m_spr_xy[7 - ID * 2] + 3;
 
 		if (sx > 56 && px >= sx && px < (sx + 8) && py >= sy && py < (sy + 8))
-			m_spr_collision[id] |= 1;
+			m_spr_collision[ID] |= 1;
 	}
-	return m_spr_collision[id];
+	return m_spr_collision[ID];
 }
 
 CUSTOM_INPUT_MEMBER(istrebiteli_state::coin_r)
@@ -486,7 +486,7 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(istrebiteli_state, collision_r<1>)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -496,14 +496,14 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(istrebiteli_state, collision_r<0>)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2)
-	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, coin_r, nullptr)
+	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(istrebiteli_state, coin_r)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 

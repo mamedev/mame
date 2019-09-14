@@ -379,27 +379,17 @@ WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 /* Per Game IO port callbacks */
 
 
-CUSTOM_INPUT_MEMBER(xavix_i2c_state::i2c_r)
-{
-	return m_i2cmem->read_sda();
-}
-
-CUSTOM_INPUT_MEMBER(xavix_i2c_cart_state::i2c_r)
-{
-	return m_i2cmem->read_sda();
-}
-
-CUSTOM_INPUT_MEMBER(xavix_i2c_lotr_state::camera_r) // seems to be some kind of camera status bits
+READ_LINE_MEMBER(xavix_i2c_lotr_state::camera_r) // seems to be some kind of camera status bits
 {
 	return machine().rand();
 }
 
-CUSTOM_INPUT_MEMBER(xavix_i2c_bowl_state::camera_r) // seems to be some kind of camera status bits
+READ_LINE_MEMBER(xavix_i2c_bowl_state::camera_r) // seems to be some kind of camera status bits
 {
 	return machine().rand();
 }
 
-CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi0_r)
+READ_LINE_MEMBER(xavix_ekara_state::ekara_multi0_r)
 {
 	switch (m_extraioselect & 0x7f)
 	{
@@ -417,7 +407,7 @@ CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi0_r)
 	return 0x00;
 }
 
-CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi1_r)
+READ_LINE_MEMBER(xavix_ekara_state::ekara_multi1_r)
 {
 	switch (m_extraioselect & 0x7f)
 	{
@@ -566,7 +556,7 @@ WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io2)
 
 // the cart pins Popira 2 uses for IO with cart gc0010 are not controllable by the CPU on other ekara systems
 
-CUSTOM_INPUT_MEMBER(xavix_popira2_cart_state::i2c_r)
+READ_LINE_MEMBER(xavix_popira2_cart_state::i2c_r)
 {
 	if (m_cartslot->has_cart())
 		return m_cartslot->read_sda();

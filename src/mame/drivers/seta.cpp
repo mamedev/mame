@@ -4471,7 +4471,7 @@ static INPUT_PORTS_START( setaroul )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Attendant Pay") // att.pay (clears error)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3    ) PORT_NAME("Note")          // note    (same as 100 coins)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_NAME("Coupon")        // cupon   (same as  10 coins)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, setaroul_state, coin_sensors_r, nullptr)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(setaroul_state, coin_sensors_r)
 
 	PORT_START("COIN1") // start the coin drop sequence (see coin_sensors_r)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, setaroul_state, coin_drop_start, 0)
@@ -6567,10 +6567,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( usclssic )
 	PORT_START("TRACKX")
-	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, usclssic_state, trackball_x_r, nullptr)
+	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(usclssic_state, trackball_x_r)
 
 	PORT_START("TRACKY")
-	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, usclssic_state, trackball_y_r, nullptr)
+	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(usclssic_state, trackball_y_r)
 
 	PORT_START("TRACK1_X")     /* muxed port 0 */
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
