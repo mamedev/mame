@@ -1687,11 +1687,12 @@ ROM_END
 
 
 // WYSEpc 286 - motherboard: WY-2200-01 - continuous ticks from the speaker
-ROM_START( wyse286 )
+ROM_START( wy220001 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROMX_LOAD( "wyse_tech_rev.a_250325-02_27128-15.bin", 0x18000, 0x4000, CRC(010f1c4d) SHA1(712d6ca4e4bdbc6b105c8691d612407edcfd9cf7), ROM_SKIP(1))
 	ROMX_LOAD( "wyse_tech_rev.a_250326-02_27128-15.bin", 0x18001, 0x4000, CRC(37fcd62b) SHA1(ada0e232387c8ba7067168f50f8b7a89eb824c44), ROM_SKIP(1))
 ROM_END
+
 
 // ***** Motherboards using the Acer (ALi) M1207 chipset
 
@@ -2711,7 +2712,7 @@ COMP( 1994, ficvipio,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, ficvipio2, ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO2", MACHINE_NOT_WORKING )
 COMP( 199?, hot409,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-409", MACHINE_NOT_WORKING )
 COMP( 198?, aubam12s2, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "AUVA COMPUTER, INC.", "BAM/12-S2", MACHINE_NOT_WORKING )
-COMP( 198?, wyse286,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Wyse", "WYSEpc", MACHINE_NOT_WORKING )
+COMP( 198?, wy220001,  ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Wyse", "WYSEpc 286", MACHINE_NOT_WORKING )
 COMP( 198?, mkp286,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Morse", "KP-286", MACHINE_NOT_WORKING )
 COMP( 198?, pccm205,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "PC-Chips", "M205", MACHINE_NOT_WORKING )
 COMP( 199?, pccm321,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "PC-Chips", "M321", MACHINE_NOT_WORKING )
