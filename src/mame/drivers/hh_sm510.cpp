@@ -21,6 +21,7 @@ TODO:
 - confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
   confident that it's same)
 - confirm gnw_climbcs rom (assumed to be the same as gnw_climber)
+- dump/add purple version of gnw_judge
 - dump/add CN-07 version of gnw_helmet
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
@@ -48,7 +49,7 @@ AC-01     s    SM5A    Ball (aka Toss-Up)
 FL-02     s    SM5A    Flagman (aka Flag Man)
 MT-03     s    SM5A    Vermin (aka The Exterminator)
 RC-04     s    SM5A    Fire (aka Fireman Fireman)
-IP-05*    s    SM5A?   Judge
+IP-05     s    SM5A    Judge
 MN-06*    g    SM5A?   Manhole
 CN-07     g    SM5A    Helmet (aka Headache)
 LN-08*    g    SM5A?   Lion
@@ -664,6 +665,90 @@ ROM_START( gnw_fires )
 
 	ROM_REGION( 102509, "screen", 0)
 	ROM_LOAD( "gnw_fires.svg", 0, 102509, CRC(314152ca) SHA1(bb6cd7dfba54d8cd5698c0cf2f381a1489cd8286) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Judge (model IP-05)
+  * PCB label IP-05
+  * Sharp SM5A label IP-05 5010 (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the first (green) issue of the game which contains a bug where the
+  players are scored differently when wrongly dodging a win. This issue is
+  fixed in the second (purple) issue.
+
+***************************************************************************/
+
+class gnw_judge_state : public hh_sm510_state
+{
+public:
+	gnw_judge_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_judge(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_judge )
+    PORT_START("IN.0") // R2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P2 Dodge")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P2 Hit")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P1 Dodge")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P1 Hit")
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_judge_state::gnw_judge(machine_config &config)
+{
+	/* basic machine hardware */
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1647, 1080);
+	screen.set_visarea_full();
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_judge )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ip-05", 0x0000, 0x0740, CRC(1b28a834) SHA1(cb8dbbf678ba22c4484d18cc1a6b99c1d34d1951) )
+
+	ROM_REGION( 104950, "screen", 0)
+	ROM_LOAD( "gnw_judge.svg", 0, 104950, CRC(fb51e31b) SHA1(c78e6d80aa5b59de1955ba5f83cc138b83bf714c) )
 ROM_END
 
 
@@ -10077,6 +10162,7 @@ CONS( 1980, gnw_ball,    0,          0, gnw_ball,    gnw_ball,    gnw_ball_state
 CONS( 1980, gnw_flagman, 0,          0, gnw_flagman, gnw_flagman, gnw_flagman_state, empty_init, "Nintendo", "Game & Watch: Flagman", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_vermin,  0,          0, gnw_vermin,  gnw_vermin,  gnw_vermin_state,  empty_init, "Nintendo", "Game & Watch: Vermin", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_fires,   0,          0, gnw_fires,   gnw_fires,   gnw_fires_state,   empty_init, "Nintendo", "Game & Watch: Fire (silver)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gnw_judge,   0,          0, gnw_judge,   gnw_judge,   gnw_judge_state,   empty_init, "Nintendo", "Game & Watch: Judge", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_helmet,  0,          0, gnw_helmet,  gnw_helmet,  gnw_helmet_state,  empty_init, "Nintendo", "Game & Watch: Helmet", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: wide screen
