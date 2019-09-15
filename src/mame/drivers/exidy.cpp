@@ -1795,7 +1795,7 @@ GAME( 1981, mtrapb2,   mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,   
 GAME( 1981, venture,   0,       venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture2,  venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture4,  venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, venture2b, venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 2, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture2b, venture, venture,  venture,   exidy_state, init_venture,  ROT0, "bootleg", "Venture (version 5 set 2, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, teetert,   0,       teetert,  teetert,   exidy_state, init_teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
 
