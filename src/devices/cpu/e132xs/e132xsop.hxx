@@ -2069,7 +2069,7 @@ void hyperstone_device::hyperstone_shli()
 		SR |= (val & (0x80000000 >> (n - 1))) ? 1 : 0;
 	}
 
-	uint64_t mask = ((1U << (32 - n)) - 1) ^ 0xffffffff;
+	uint64_t mask = ((1ULL << (32 - n)) - 1) ^ 0xffffffff;
 	uint32_t val2 = val << n;
 
 	if (((val & mask) && (!(val2 & 0x80000000))) || (((val & mask) ^ mask) && (val2 & 0x80000000)))

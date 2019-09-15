@@ -458,7 +458,7 @@ void hyperstone_device::adjust_timer_interrupt()
 	uint64_t cycles_until_next_clock = cycles_since_base - (clocks_since_base << m_core->clck_scale);
 
 	if (cycles_until_next_clock == 0)
-		cycles_until_next_clock = (uint64_t)(1 << m_core->clck_scale);
+		cycles_until_next_clock = (uint64_t)(1ULL << m_core->clck_scale);
 
 	/* special case: if we have a change pending, set a timer to fire then */
 	if (TPR & 0x80000000)
