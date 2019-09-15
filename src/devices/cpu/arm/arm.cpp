@@ -1361,9 +1361,9 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		}
 
 	case 3:                     /* ROR and RRX */
+		while (k >= 32) k -= 32;
 		if (k)
 		{
-			while (k > 32) k -= 32;
 			if (pCarry) *pCarry = rm & (1 << (k - 1));
 			return ROR(rm, k);
 		}
