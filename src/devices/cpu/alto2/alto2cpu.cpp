@@ -1353,7 +1353,7 @@ static const char* memory_range_name(offs_t offset)
 	offset += ALTO2_IO_PAGE_BASE;
 
 	/* binary search in table of memory ranges */
-	while (_max >= _min)
+	while (_max > _min)
 	{
 		_mid = (_min + _max) / 2;
 		if (memory_range_name_table[_mid].last < offset)
