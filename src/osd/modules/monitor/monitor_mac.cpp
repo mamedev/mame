@@ -12,11 +12,10 @@
 #include "modules/osdmodule.h"
 #include "monitor_module.h"
 
+#if defined(OSD_MAC)
+
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
-
-#define OSD_MAC 1
-#if defined(OSD_MAC)
 
 #include <algorithm>
 
