@@ -7955,6 +7955,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="colossus4">
+		<description>Colossus Bridge 4</description>
+		<year>1988</year>
+		<publisher>CDS Software</publisher>
+		<info name="usage" value="Turn power on load system Insert COLOSSUS disk type BRIDGE or TUTOR" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="colossus 4 bridge.img" size="737280" crc="e8d92247" sha1="fa6ff45a9314a66e6eadc57f0a242f2e35edf391"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="keen123">
 		<description>Commander Keen in Invasion of the Vorticons (v1.31, 5.25")</description>
 		<year>1991</year>
