@@ -1479,16 +1479,14 @@ void lua_engine::initialize()
 			"bpclr", &device_debug::breakpoint_clear,
 			"bplist", [this](device_debug &dev) {
 					sol::table table = sol().create_table();
-					device_debug::breakpoint *list = dev.breakpoint_first();
-					while(list)
+					for(const device_debug::breakpoint &bpt : dev.breakpoint_list())
 					{
 						sol::table bp = sol().create_table();
-						bp["enabled"] = list->enabled();
-						bp["address"] = list->address();
-						bp["condition"] = list->condition();
-						bp["action"] = list->action();
-						table[list->index()] = bp;
-						list = list->next();
+						bp["enabled"] = bpt.enabled();
+						bp["address"] = bpt.address();
+						bp["condition"] = bpt.condition();
+						bp["action"] = bpt.action();
+						table[bpt.index()] = bp;
 					}
 					return table;
 				},

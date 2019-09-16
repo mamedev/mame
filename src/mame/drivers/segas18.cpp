@@ -1343,7 +1343,7 @@ void segas18_state::system18(machine_config &config)
 	m_vdp->lv4_irq().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_pal_write_base(0x1000);
-	m_vdp->set_palette(m_palette);
+	m_vdp->set_ext_palette(m_palette);
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.0);
 
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "screen", 0, 1);

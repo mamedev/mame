@@ -28,8 +28,8 @@ public:
 		m_color_prom_spr(*this, "sprpal")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dsw1_read);
-	DECLARE_CUSTOM_INPUT_MEMBER(pop_field_r);
+	DECLARE_READ_LINE_MEMBER(dsw1_read);
+	DECLARE_READ_LINE_MEMBER(pop_field_r);
 
 	virtual void config(machine_config &config);
 

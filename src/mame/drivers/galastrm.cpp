@@ -70,7 +70,7 @@ void galastrm_state::tc0610_w(offs_t offset, u16 data)
 }
 
 
-CUSTOM_INPUT_MEMBER(galastrm_state::frame_counter_r)
+READ_LINE_MEMBER(galastrm_state::frame_counter_r)
 {
 	return m_frame_counter;
 }
@@ -113,7 +113,7 @@ void galastrm_state::main_map(address_map &map)
 static INPUT_PORTS_START( galastrm )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state, frame_counter_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galastrm_state, frame_counter_r)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )

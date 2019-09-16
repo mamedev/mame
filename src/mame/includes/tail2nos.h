@@ -30,12 +30,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_acia(*this, "acia")
+		m_acia(*this, "acia"),
+		m_analog(*this, "AN%u", 0U)
 	{ }
 
 	void tail2nos(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
 
 protected:
 	virtual void machine_start() override;
@@ -63,6 +64,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<acia6850_device> m_acia;
+	required_ioport_array<2> m_analog;
 
 	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_zoomdata_w);

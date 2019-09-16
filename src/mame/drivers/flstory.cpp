@@ -506,7 +506,7 @@ static INPUT_PORTS_START( victnine )
 	/* bits 0,1 are MCU related:
 	    - bit 0: mcu is ready to receive data from main cpu
 	    - bit 1: mcu has sent data to the main cpu       */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, flstory_state,victnine_mcu_status_bit01_r, nullptr)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(flstory_state, victnine_mcu_status_bit01_r)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )

@@ -10,7 +10,7 @@ void slapshot_state::video_start()
 {
 	m_spriteram_delayed = std::make_unique<u16[]>(m_spriteram.bytes() / 2);
 	m_spriteram_buffered = std::make_unique<u16[]>(m_spriteram.bytes() / 2);
-	m_spritelist = auto_alloc_array(machine(), struct slapshot_tempsprite, 0x400);
+	m_spritelist = std::make_unique<slapshot_tempsprite[]>(0x400);
 
 	m_sprites_disabled = true;
 	m_sprites_active_area = 0;
@@ -91,7 +91,7 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct slapshot_tempsprite *sprite_ptr = m_spritelist;
+	slapshot_tempsprite *sprite_ptr = &m_spritelist[0];
 
 	/* must remember enable status from last frame because driftout fails to
 	   reactivate them from a certain point onwards. */
@@ -341,7 +341,7 @@ void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 
 	/* this happens only if primsks != nullptr */
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != &m_spritelist[0])
 	{
 		sprite_ptr--;
 

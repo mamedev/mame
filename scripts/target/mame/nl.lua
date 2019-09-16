@@ -57,6 +57,7 @@ SOUNDS["SPEAKER"] = true
 --------------------------------------------------
 
 VIDEOS["FIXFREQ"] = true
+VIDEOS["PWM_DISPLAY"] = true
 
 --------------------------------------------------
 -- specify available machine cores

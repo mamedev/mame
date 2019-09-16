@@ -159,7 +159,7 @@ public:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(votrax_speech_w);
-	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
+	DECLARE_READ_LINE_MEMBER( votrax_speech_status_r );
 
 	void astrocade_base(machine_config &config);
 	void astrocade_16color_base(machine_config &config);

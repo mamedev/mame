@@ -353,8 +353,8 @@ void debug_view_disasm::complete_information(const debug_view_disasm_source &sou
 		dasm.m_is_pc = adr == pc;
 
 		dasm.m_is_bp = false;
-		for(device_debug::breakpoint *bp = source.device()->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
-			if(adr ==(bp->address() & source.m_space.logaddrmask())) {
+		for(const device_debug::breakpoint &bp : source.device()->debug()->breakpoint_list())
+			if(adr == (bp.address() & source.m_space.logaddrmask())) {
 				dasm.m_is_bp = true;
 				break;
 			}

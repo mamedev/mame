@@ -6,12 +6,6 @@
 
     MOS Technology 6502, original NMOS variant
 
-TODO:
-- device_start SP = 0x01bd; can't be right. At power-on, SP = 0(0x100)
-  and at RESET, it is decremented 3 times without writing to the stack
-  see: https://www.pagetable.com/?p=410
-  In other words, the first couple of cycles of STATE_RESET aren't emulated
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -99,7 +93,7 @@ void m6502_device::init()
 	X = 0x80;
 	Y = 0x00;
 	P = 0x36;
-	SP = 0x01bd;
+	SP = 0x0100;
 	TMP = 0x0000;
 	TMP2 = 0x00;
 	IR = 0x00;

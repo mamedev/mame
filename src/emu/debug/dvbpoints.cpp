@@ -167,7 +167,7 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 			return;
 
 		// Enable / disable
-		m_buffer[bpIndex]->setEnabled(!m_buffer[bpIndex]->enabled());
+		const_cast<device_debug::breakpoint &>(*m_buffer[bpIndex]).setEnabled(!m_buffer[bpIndex]->enabled());
 
 		machine().debug_view().update_all(DVT_DISASSEMBLY);
 	}
@@ -193,8 +193,8 @@ void debug_view_breakpoints::gather_breakpoints()
 	{
 		// Collect
 		device_debug &debugInterface = *source.device()->debug();
-		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != nullptr; bp = bp->next())
-			m_buffer.push_back(bp);
+		for (const device_debug::breakpoint &bp : debugInterface.breakpoint_list())
+			m_buffer.push_back(&bp);
 	}
 
 	// And now for the sort
@@ -268,7 +268,7 @@ void debug_view_breakpoints::view_update()
 		int bpi = row + m_topleft.y - 1;
 		if ((bpi < m_buffer.size()) && (bpi >= 0))
 		{
-			device_debug::breakpoint *const bp = m_buffer[bpi];
+			const device_debug::breakpoint *const bp = m_buffer[bpi];
 
 			linebuf.clear();
 			linebuf.rdbuf()->clear();

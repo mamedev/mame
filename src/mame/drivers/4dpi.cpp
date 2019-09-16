@@ -243,7 +243,7 @@ void pi4d2x_state::map(address_map &map)
 	//map(0x1e000000, 0x1effffff); // vme a24 modifier 0x39 non-privileged
 
 	//map(0x1f000000, 0x1fbfffff); // local I/O (duarts, timers, etc.)
-	map(0x1f000000, 0x1f003fff).m(m_gfx, FUNC(sgi_gr1_device::map));
+	map(0x1f000000, 0x1f007fff).m(m_gfx, FUNC(sgi_gr1_device::map)).mirror(0x8000);
 
 	map(0x1f800000, 0x1f800003).lrw8("memcfg", [this]() { return m_memcfg; }, [this](u8 data) { m_memcfg = data; }).umask32(0xff000000);
 	map(0x1f800000, 0x1f800003).r(FUNC(pi4d2x_state::sysid_r)).umask32(0x00ff0000);
@@ -569,7 +569,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	// duart 1 (serial ports)
 	SCN2681(config, m_duart[1], 3.6864_MHz_XTAL); // SCN2681AC1N40
-	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
 
 	// duart 1 outputs
@@ -602,11 +602,11 @@ void pi4d2x_state::common(machine_config &config)
 		[this](int state)
 		{
 			if (state)
-				m_lio_isr |= LIO_VRSTAT;
+				m_lio_isr |= (1U << LIO_VRSTAT);
 			else
-				m_lio_isr &= ~LIO_VRSTAT;
+				m_lio_isr &= ~(1U << LIO_VRSTAT);
 
-			lio_interrupt(LIO_VR, state);
+			lio_interrupt<LIO_VR>(!state);
 		});
 	m_gfx->out_int_ge().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_GE>)).invert();
 	m_gfx->out_int_fifo().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_FIFO>)).invert();

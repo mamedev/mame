@@ -837,19 +837,18 @@ void galaxold_state::bullsdrtg_data_map(address_map &map)
 }
 
 /* Lives Dips are spread across two input ports */
-CUSTOM_INPUT_MEMBER(galaxold_state::vpool_lives_r)
+template <int Mask>
+READ_LINE_MEMBER(galaxold_state::vpool_lives_r)
 {
-	int bit_mask = (uintptr_t)param;
-
-	switch (bit_mask)
+	switch (Mask)
 	{
 		case 0x40:  /* vpool : IN1 (0xa800) bit 6 */
-			return ((ioport("LIVES")->read() & bit_mask) >> 6);
+			return ((ioport("LIVES")->read() & Mask) >> 6);
 		case 0x01:  /* vpool : DSW (0xb000) bit 0 */
-			return ((ioport("LIVES")->read() & bit_mask) >> 0);
+			return ((ioport("LIVES")->read() & Mask) >> 0);
 
 		default:
-			logerror("vpool_lives_r : invalid %02X bit_mask\n",bit_mask);
+			logerror("vpool_lives_r : invalid %02X bit_mask\n",Mask);
 			return 0;
 	}
 }
@@ -873,11 +872,11 @@ static INPUT_PORTS_START( vpool )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,vpool_lives_r, (void *)0x40)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxold_state, vpool_lives_r<0x40>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,vpool_lives_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxold_state, vpool_lives_r<0x01>)
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -1080,24 +1079,23 @@ INPUT_PORTS_END
 
 
 /* Coinage Dips are spread across two input ports */
+template <int Mask>
 CUSTOM_INPUT_MEMBER(galaxold_state::ckongg_coinage_r)
 {
-	int bit_mask = (uintptr_t)param;
-
-	switch (bit_mask)
+	switch (Mask)
 	{
 		case 0x0c:  /* ckongg  : DSW (0xc800) bits 2 and 3 */
-			return ((ioport("COINAGE")->read() & bit_mask) >> 2);
+			return ((ioport("COINAGE")->read() & Mask) >> 2);
 		case 0x40:  /* ckongg  : IN1 (0xc400) bit 6 */
-			return ((ioport("COINAGE")->read() & bit_mask) >> 6);
+			return ((ioport("COINAGE")->read() & Mask) >> 6);
 
 		case 0xc0:  /* ckongmc : IN1 (0xa800) bits 6 and 7 */
-			return ((ioport("COINAGE")->read() & bit_mask) >> 6);
+			return ((ioport("COINAGE")->read() & Mask) >> 6);
 		case 0x01:  /* ckongmc : DSW (0xb000) bit 0 */
-			return ((ioport("COINAGE")->read() & bit_mask) >> 0);
+			return ((ioport("COINAGE")->read() & Mask) >> 0);
 
 		default:
-			logerror("ckongg_coinage_r : invalid %02X bit_mask\n",bit_mask);
+			logerror("ckongg_coinage_r : invalid %02X bit_mask\n",Mask);
 			return 0;
 	}
 }
@@ -1121,7 +1119,7 @@ static INPUT_PORTS_START( ckongg )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0x40)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxold_state, ckongg_coinage_r<0x40>)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -1132,7 +1130,7 @@ static INPUT_PORTS_START( ckongg )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0x0c)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxold_state, ckongg_coinage_r<0x0c>)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COINAGE")
@@ -1166,10 +1164,10 @@ static INPUT_PORTS_START( ckongmc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxold_state, ckongg_coinage_r<0xc0>)
 
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxold_state, ckongg_coinage_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -1417,6 +1415,14 @@ static INPUT_PORTS_START( scrambler )
 INPUT_PORTS_END
 
 
+template <int Mask>
+READ_LINE_MEMBER(galaxold_state::_4in1_fake_port_r)
+{
+	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
+
+	return (ioport(portnames[m__4in1_bank])->read() & Mask) ? 1 : 0;
+}
+
 static INPUT_PORTS_START( 4in1 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -1437,18 +1443,18 @@ static INPUT_PORTS_START( 4in1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x40)   // See fake ports
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x80)   // See fake ports
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxold_state, _4in1_fake_port_r<0x40>)   // See fake ports
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxold_state, _4in1_fake_port_r<0x80>)   // See fake ports
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x01)   // See fake ports
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x02)   // See fake ports
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxold_state, _4in1_fake_port_r<0x01>)   // See fake ports
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxold_state, _4in1_fake_port_r<0x02>)   // See fake ports
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )         // 2 when continue (Scramble PT2)
 	PORT_DIPSETTING(    0x04, "5" )         // 2 when continue (Scramble PT2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x08)   // See fake ports
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x10)   // See fake ports
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x20)   // See fake ports
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxold_state, _4in1_fake_port_r<0x08>)   // See fake ports
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxold_state, _4in1_fake_port_r<0x10>)   // See fake ports
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxold_state, _4in1_fake_port_r<0x20>)   // fake ports
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("FAKE1")      /* The Ghost Muncher PT3 - FAKE DSW0 (bits 0 to 5) and IN1 (bits 6 and 7) */
@@ -1592,19 +1598,18 @@ INPUT_PORTS_END
 
 
 /* Coinage Dips are spread across two input ports */
+template <int Mask>
 CUSTOM_INPUT_MEMBER(galaxold_state::dkongjrm_coinage_r)
 {
-	int bit_mask = (uintptr_t)param;
-
-	switch (bit_mask)
+	switch (Mask)
 	{
 		case 0xc0:  /* dkongjrm : IN1 (0xa8??) bits 6 and 7 */
-			return ((ioport("COINAGE")->read() & bit_mask) >> 6);
+			return ((ioport("COINAGE")->read() & Mask) >> 6);
 		case 0x01:  /* dkongjrm : DSW (0xb0??) bit 0 */
-			return ((ioport("COINAGE")->read() & bit_mask) >> 0);
+			return ((ioport("COINAGE")->read() & Mask) >> 0);
 
 		default:
-			logerror("dkongjrm_coinage_r : invalid %02X bit_mask\n",bit_mask);
+			logerror("dkongjrm_coinage_r : invalid %02X bit_mask\n",Mask);
 			return 0;
 	}
 }
@@ -1628,10 +1633,10 @@ static INPUT_PORTS_START( dkongjrm )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,dkongjrm_coinage_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxold_state, dkongjrm_coinage_r<0xc0>)
 
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,dkongjrm_coinage_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxold_state, dkongjrm_coinage_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "4" )

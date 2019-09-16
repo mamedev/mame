@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(prot_address_w);
 	DECLARE_WRITE8_MEMBER(prot_data_w);
 	DECLARE_READ8_MEMBER(prot_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mightguy_area_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(mightguy_area_r);
 	void init_mightguy();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

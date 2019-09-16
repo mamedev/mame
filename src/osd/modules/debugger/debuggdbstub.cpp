@@ -977,13 +977,9 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_s(const char *buf)
 //-------------------------------------------------------------------------
 static bool remove_breakpoint(device_debug *debug, uint64_t address, int /*kind*/)
 {
-	device_debug::breakpoint *bp = debug->breakpoint_first();
-	while ( bp != nullptr )
-	{
-		if ( bp->address() == address )
-			return debug->breakpoint_clear(bp->index());
-		bp = bp->next();
-	}
+	const device_debug::breakpoint *bp = debug->breakpoint_find(address);
+	if (bp != nullptr)
+		return debug->breakpoint_clear(bp->index());
 	return false;
 }
 

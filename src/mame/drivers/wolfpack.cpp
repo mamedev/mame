@@ -53,10 +53,10 @@ void wolfpack_state::machine_reset()
 }
 
 
-CUSTOM_INPUT_MEMBER(wolfpack_state::dial_r)
+template <int Bit>
+READ_LINE_MEMBER(wolfpack_state::dial_r)
 {
-	int bit = (uintptr_t)param;
-	return ((ioport("DIAL")->read() + bit) / 2) & 0x01;
+	return ((ioport("DIAL")->read() + Bit) / 2) & 0x01;
 }
 
 
@@ -171,8 +171,8 @@ void wolfpack_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state, dial_r, (void *)0)    /* dial connects here */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state, dial_r, (void *)1)    /* dial connects here */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wolfpack_state, dial_r<0>)    // dial connects here
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wolfpack_state, dial_r<1>)    // dial connects here
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )

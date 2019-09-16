@@ -14,7 +14,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-class sega_32x_device : public device_t, public device_palette_interface, public device_video_interface
+class sega_32x_device : public device_t, public device_palette_interface, public device_sound_interface, public device_video_interface
 {
 public:
 	void pause_cpu();
@@ -109,6 +109,9 @@ protected:
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const override { return 32*32*32/**2*/; }
 
+	// device_sound_interface overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
 	/* our main vblank handler resets this */
@@ -125,6 +128,7 @@ protected:
 	int m_32x_240mode;
 	uint16_t m_32x_a1518a_reg;
 
+	sound_stream *m_stream;
 	TIMER_CALLBACK_MEMBER(handle_pwm_callback);
 	void calculate_pwm_timer();
 	uint16_t m_pwm_ctrl, m_pwm_cycle, m_pwm_tm_reg;

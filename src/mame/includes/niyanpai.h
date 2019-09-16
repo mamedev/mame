@@ -25,7 +25,7 @@ public:
 
 	void init_niyanpai();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
+	DECLARE_READ_LINE_MEMBER(musobana_outcoin_flag_r);
 
 private:
 	enum

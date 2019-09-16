@@ -112,7 +112,7 @@ public:
 		m_mcu->pa_w(machine().dummy_space(), 0, m_meta->read());
 	}
 
-	CUSTOM_INPUT_MEMBER(kdat_r)
+	READ_LINE_MEMBER(kdat_r)
 	{
 		return m_kdat_in ^ 0x01U;
 	}
@@ -128,7 +128,7 @@ public:
 		return (result >> 2) ^ 0x3fU;
 	}
 
-	CUSTOM_INPUT_MEMBER(reset_r)
+	READ_LINE_MEMBER(reset_r)
 	{
 		return m_ctrl_a_a;
 	}
@@ -414,17 +414,17 @@ protected:
 
 INPUT_PORTS_START(fullsize_cols)
 	PORT_START("COLS")
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, cols_r, nullptr)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(mitsumi_keyboard_base, cols_r)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, kdat_r, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(mitsumi_keyboard_base, kdat_r)
 INPUT_PORTS_END
 
 INPUT_PORTS_START(compact_cols)
 	PORT_START("COLS")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, reset_r, nullptr)
-	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, cols_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(mitsumi_keyboard_base, reset_r)
+	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(mitsumi_keyboard_base, cols_r)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, mitsumi_keyboard_base, kdat_r, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(mitsumi_keyboard_base, kdat_r)
 INPUT_PORTS_END
 
 INPUT_PORTS_START(mitsumi_meta)

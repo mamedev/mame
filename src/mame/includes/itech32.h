@@ -75,7 +75,7 @@ public:
 	void init_gt3d();
 	void init_gt3dl();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(special_port_r);
+	DECLARE_READ_LINE_MEMBER(special_port_r);
 
 protected:
 	required_device<cpu_device> m_maincpu;

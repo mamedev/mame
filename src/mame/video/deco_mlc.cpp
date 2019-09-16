@@ -20,27 +20,32 @@
 void deco_mlc_state::video_start()
 {
 	int max_color = (0x800 / m_gfxdecode->gfx(0)->granularity());
-	m_colour_mask=max_color - 1;
-	m_shadow_mask=max_color << 1;
+	m_colour_mask = max_color - 1;
+	m_shadow_mask = max_color | (max_color << 1);
+	for (int s = 0; s <= 8; s++)
+	{
+		if (BIT(m_gfxdecode->gfx(0)->granularity(), s))
+		m_shadow_shift = 11 - s;
+	}
 
-//  temp_bitmap = std::make_unique<bitmap_rgb32>(512, 512 );
-	m_buffered_spriteram = std::make_unique<uint16_t[]>(0x3000/4);
-	m_spriteram_spare = std::make_unique<uint16_t[]>(0x3000/4);
-	m_spriteram = std::make_unique<uint16_t[]>(0x3000/4);
+//  temp_bitmap = std::make_unique<bitmap_rgb32>(512, 512);
+	m_buffered_spriteram = std::make_unique<u16[]>(0x3000 / 4);
+	m_spriteram_spare = std::make_unique<u16[]>(0x3000 / 4);
+	m_spriteram = std::make_unique<u16[]>(0x3000 / 4);
 
-	save_pointer(NAME(m_spriteram), 0x3000/4);
-	save_pointer(NAME(m_spriteram_spare), 0x3000/4);
-	save_pointer(NAME(m_buffered_spriteram), 0x3000/4);
+	save_pointer(NAME(m_spriteram), 0x3000 / 4);
+	save_pointer(NAME(m_spriteram_spare), 0x3000 / 4);
+	save_pointer(NAME(m_buffered_spriteram), 0x3000 / 4);
 }
 
 
-void deco_mlc_state::drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_element *gfx,
-		uint32_t code1,uint32_t code2, uint32_t color,int flipx,int sx,
+void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gfx_element *gfx,
+		u32 code1,u32 code2, u32 color,int flipx,int sx,
 		int transparent_color,int use8bpp,
-		int scalex, int alpha, int srcline, int shadowMode, int alphaMode  )
+		int scalex, int srcline, int shadowMode )
 {
 	if (!scalex) return;
-	uint32_t shadowval = shadowMode ? 0xffffffff : 0;
+	const u32 alphaMode = m_irq_ram[0x04 / 4] & 0xc0;
 
 	/*
 	scalex and scaley are 16.16 fixed point numbers
@@ -51,22 +56,21 @@ void deco_mlc_state::drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_el
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 
+	const int sprite_screen_width = (scalex * 16 + (sx & 0xffff)) >> 16;
 
-	int sprite_screen_width = (scalex*16+(sx&0xffff))>>16;
-
-	sx>>=16;
+	sx >>= 16;
 	if (sprite_screen_width)
 	{
 		/* compute sprite increment per screen pixel */
-		int dx = (16<<16)/sprite_screen_width;
+		int dx = (16 << 16) / sprite_screen_width;
 
-		int ex = sx+sprite_screen_width;
+		int ex = sx + sprite_screen_width;
 
 		int x_index_base;
 
-		if( flipx )
+		if (flipx)
 		{
-			x_index_base = (sprite_screen_width-1)*dx;
+			x_index_base = (sprite_screen_width - 1) * dx;
 			dx = -dx;
 		}
 		else
@@ -74,53 +78,61 @@ void deco_mlc_state::drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_el
 			x_index_base = 0;
 		}
 
-		if( sx < clip.left())
+		if (sx < clip.left())
 		{ /* clip left */
-			int pixels = clip.left()-sx;
+			int pixels = clip.left() - sx;
 			sx += pixels;
-			x_index_base += pixels*dx;
+			x_index_base += pixels * dx;
 		}
 		/* NS 980211 - fixed incorrect clipping */
-		if( ex > clip.right()+1 )
+		if (ex > clip.right() + 1)
 		{ /* clip right */
-			int pixels = ex-clip.right()-1;
+			int pixels = ex-clip.right() - 1;
 			ex -= pixels;
 		}
 
-		if( ex>sx )
+		if (ex>sx)
 		{ /* skip if inner loop doesn't draw anything */
 			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-			const uint8_t *code_base1 = gfx->get_data(code1 % gfx->elements());
-			const uint8_t *code_base2 = gfx->get_data(code2 % gfx->elements());
-			const uint8_t *source1 = code_base1 + (srcline) * gfx->rowbytes();
-			const uint8_t *source2 = code_base2 + (srcline) * gfx->rowbytes();
-			/* no alpha */
-			if ((alpha == 0xff) && (!shadowMode))
-			{
+			const u8 *code_base1 = gfx->get_data(code1 % gfx->elements());
+			const u8 *code_base2 = gfx->get_data(code2 % gfx->elements());
+			const u8 *source1 = code_base1 + (srcline) * gfx->rowbytes();
+			const u8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
+			// alphaMode & 0xc0 = 0xc0 : Shadow, 0 : Alpha or Pre-shadowed, Other bits unknown
+			if (shadowMode && (alphaMode & 0xc0))
+			{	/* TODO : 8bpp and shadow can use simultaneously? */
 				int x, x_index = x_index_base;
-
-				for( x=sx; x<ex; x++ )
+				for (x = sx; x < ex; x++)
 				{
-					int c = source1[x_index>>16];
-					if (use8bpp)
-						c=(c<<4)|source2[x_index>>16];
+					if (!(pri[x] & 0x80))
+					{
+						int c = source1[x_index >> 16];
+						if (use8bpp)
+							c = (c << 4) | source2[x_index >> 16];
 
-					if( c != transparent_color ) dest[x] = pal[c];
-
+						if (c != transparent_color)
+							pri[x] |= shadowMode; // Mark it shadow / hilighted
+					}
 					x_index += dx;
 				}
 			}
 			else
-			{ /* TODO : 8bpp and alpha can use simultaneously? */
+			{
 				int x, x_index = x_index_base;
-				for( x=sx; x<ex; x++ )
+				for (x = sx; x < ex; x++)
 				{
-					int c = source1[x_index>>16];
-					if (use8bpp)
-						c=(c<<4)|source2[x_index>>16];
+					if (!(pri[x] & 0x80))
+					{
+						int c = source1[x_index >> 16];
+						if (use8bpp)
+							c = (c << 4) | source2[x_index >> 16];
 
-					 // alphaMode & 0xc0 = 0xc0 : Shadow, 0 : Alpha, Other bits unknown
-					if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], (alphaMode & 0xc0) ? shadowval : pal[c], shadowMode ? 0x80 : alpha);
+						if (c != transparent_color)
+						{
+							dest[x] = pal[c];
+							pri[x] |= 0x80 | shadowMode; // Mark it drawn
+						}
+					}
 					x_index += dx;
 				}
 			}
@@ -129,34 +141,34 @@ void deco_mlc_state::drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_el
 }
 
 
-void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest)
+void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* dest, u8* pri)
 {
-	uint32_t *index_ptr=nullptr;
-	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
+	u32 *index_ptr = nullptr;
+	int sprite,h,w,fx1,fy1;
 	int xoffs,yoffs;
-	uint8_t *rom = m_gfx2 + 0x20000, *index_ptr8;
-	uint8_t *rawrom = m_gfx2;
-	int blockIsTilemapIndex=0;
-	int sprite2=0,indx2=0,use8bppMode=0;
-	int yscale,xscale;
-	int alpha;
-	int useIndicesInRom=0;
-	int hibits=0;
-	int tileFormat=0;
-	int rasterMode=0;
-	int shadowMode=0;
+	const u8 *rom = m_gfx2 + 0x20000, *index_ptr8;
+	const u8 *rawrom = m_gfx2;
+	int blockIsTilemapIndex = 0;
+	int sprite2 = 0,indx2 = 0,use8bppMode = 0;
+	int useIndicesInRom = 0;
+	int hibits = 0;
+	int tileFormat = 0;
 
-	int clipper=0;
 	rectangle user_clip;
-	uint16_t* spriteram=m_buffered_spriteram.get();
+	const u16* spriteram = m_buffered_spriteram.get();
 
 	//printf("%d - (%08x %08x %08x) (%08x %08x %08x) (%08x %08x %08x)\n", scanline, m_irq_ram[6], m_irq_ram[7], m_irq_ram[8], m_irq_ram[9], m_irq_ram[10], m_irq_ram[11] , m_irq_ram[12] , m_irq_ram[13] , m_irq_ram[14]);
 
-	for (offs = (0x3000/4)-8; offs>=0; offs-=8)
+	for (int offs = 0; offs < (0x3000 / 4); offs += 8)
 	{
-		if ((spriteram[offs+0]&0x8000)==0)
+		/* If this bit is set, combine this block with the next one */
+		use8bppMode = (offs + 8 < (0x3000 / 4)) && (spriteram[offs + 8 + 1] & 0x1000);
+		if (use8bppMode)
+			offs += 8;
+
+		if ((spriteram[offs + 0] & 0x8000) == 0)
 			continue;
-		if ((spriteram[offs+1]&0x2000) && (m_screen->frame_number() & 1))
+		if ((spriteram[offs + 1] & 0x2000) && (m_screen->frame_number() & 1))
 			continue;
 
 		/*
@@ -198,18 +210,17 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		    Word 3: 0xffff - Low-bits of tile index
 		*/
 
-		y = spriteram[offs+2]&0x7ff;
-		x = spriteram[offs+3]&0x7ff;
+		int y = spriteram[offs + 2] & 0x7ff;
+		int x = spriteram[offs + 3] & 0x7ff;
 
-		if (x&0x400) x=-(0x400-(x&0x3ff));
-		if (y&0x400) y=-(0x400-(y&0x3ff));
+		if (x & 0x400) x = -(0x400 - (x & 0x3ff));
+		if (y & 0x400) y = -(0x400 - (y & 0x3ff));
 
-		fx = spriteram[offs+1]&0x8000;
-		fy = spriteram[offs+1]&0x4000;
-		color = spriteram[offs+1]&0xff;
+		int fx = spriteram[offs + 1] & 0x8000;
+		int fy = spriteram[offs + 1] & 0x4000;
+		int color = spriteram[offs + 1] & 0xff;
 
-		int raster_select = (spriteram[offs+1]&0x0180)>>7;
-
+		const int raster_select = (spriteram[offs + 1] & 0x0180)>>7;
 
 		// there are 3 different sets of raster values, must be a way to selects
 		// between them? furthermore avengrgs doesn't even enable this
@@ -220,124 +231,116 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		// have the scroll effect applied to them.  all clip windows are the same
 		// so there is no reason to select a clip window other than to be using it
 		// to select a set of raster-set scroll regs?
-		rasterMode = (spriteram[offs+1]>>10)&0x1;
+		int rasterMode = (spriteram[offs + 1] >> 10) & 0x1;
 
+		int clipper = (spriteram[offs + 1] >> 8) & 0x3;
 
-		clipper = (spriteram[offs+1]>>8)&0x3;
-
-		indx = spriteram[offs+0]&0x3fff;
-		yscale = spriteram[offs+4]&0x3ff;
-		xscale = spriteram[offs+5]&0x3ff;
-		colorOffset = 0;
+		int indx = spriteram[offs + 0] & 0x3fff;
+		int yscale = spriteram[offs + 4] & 0x3ff;
+		int xscale = spriteram[offs + 5] & 0x3ff;
+		int colorOffset = 0;
 
 		/* Clip windows - this mapping seems odd, but is correct for Skull Fang and StadHr96,
 		however there are space for 8 clipping windows, where is the high bit? (Or is it ~0x400?) */
-		clipper=((clipper&2)>>1)|((clipper&1)<<1); // Swap low two bits
+		clipper = ((clipper & 2) >> 1) | ((clipper & 1) << 1); // Swap low two bits
 
-
-		int upperclip = (spriteram[offs+1]>>10)&0x2;
+		int upperclip = (spriteram[offs + 1] >> 10) & 0x2;
 		// this is used on some ingame gfx in stadhr96
 		// to clip the images of your guys on the bases
 		if (upperclip)
 			clipper |= 0x4;
 
+		int min_y = m_clip_ram[(clipper * 4) + 0];
+		int max_y = m_clip_ram[(clipper * 4) + 1];
 
-		int min_y = m_clip_ram[(clipper*4)+0];
-		int max_y = m_clip_ram[(clipper*4)+1];
-
-		if ((scanline<min_y) || (scanline>max_y))
+		if ((scanline < min_y) || (scanline > max_y))
 			continue;
 
-
-		user_clip.setx(m_clip_ram[(clipper*4)+2], m_clip_ram[(clipper*4)+3]);
+		user_clip.setx(m_clip_ram[(clipper * 4) + 2], m_clip_ram[(clipper * 4) + 3]);
 		user_clip &= cliprect;
 
 		/* Any colours out of range (for the bpp value) trigger 'shadow' mode */
-		shadowMode = (color & (m_shadow_mask)) ? 1 : 0; // shadow mode (OK for skullfng)
-		if ((color & (m_colour_mask+1)) || (shadowMode))
-			alpha=0x80;
-		else
-			alpha=0xff;
+		int shadowMode = (color & m_shadow_mask) >> m_shadow_shift; // shadow mode (OK for skullfng)
 
-		color&=m_colour_mask;
+		color &= m_colour_mask;
 
-		/* If this bit is set, combine this block with the next one */
-		if (spriteram[offs+1]&0x1000) {
-			use8bppMode=1;
-			/* In 8bpp the palette base is stored in the next block */
-			if (offs-8>=0) {
-				color = (spriteram[offs+1-8]&0x7f);
-				indx2 = spriteram[offs+0-8]&0x3fff;
-			}
-		} else
-			use8bppMode=0;
-
-		/* Lookup tiles/size in sprite index ram OR in the lookup rom */
-		if (spriteram[offs+0]&0x4000) {
-			index_ptr8=rom + indx*8; /* Byte ptr */
-			h=(index_ptr8[1]>>0)&0xf;
-			w=(index_ptr8[3]>>0)&0xf;
-
-			if (!h) h=16;
-			if (!w) w=16;
-
-			sprite = (index_ptr8[7]<<8)|index_ptr8[6];
-			sprite |= (index_ptr8[4]&3)<<16;
-
-			if (use8bppMode) {
-				uint8_t* index_ptr28=rom + indx2*8;
-				sprite2=(index_ptr28[7]<<8)|index_ptr28[6];
-			}
-			//unused byte 5
-			yoffs=index_ptr8[0]&0xff;
-			xoffs=index_ptr8[2]&0xff;
-
-			fy1=(index_ptr8[1]&0x10)>>4;
-			fx1=(index_ptr8[3]&0x10)>>4;
-
-			tileFormat=index_ptr8[4]&0x80;
-
-			if (index_ptr8[4]&0xc0)
-				blockIsTilemapIndex=1;
-			else
-				blockIsTilemapIndex=0;
-
-			useIndicesInRom=0;
-
-		} else {
-			indx&=0x1fff;
-			index_ptr=m_vram + indx*4;
-			h=(index_ptr[0]>>8)&0xf;
-			w=(index_ptr[1]>>8)&0xf;
-
-			if (!h) h=16;
-			if (!w) w=16;
-
-			if (use8bppMode) {
-				uint32_t* index_ptr2=m_vram + ((indx2*4)&0x7fff);
-				sprite2=((index_ptr2[2]&0x3)<<16) | (index_ptr2[3]&0xffff);
-			}
-
-			sprite = ((index_ptr[2]&0x3)<<16) | (index_ptr[3]&0xffff);
-			if (index_ptr[2]&0xc0)
-				blockIsTilemapIndex=1;
-			else
-				blockIsTilemapIndex=0;
-
-			tileFormat=index_ptr[2]&0x80;
-
-			hibits=(index_ptr[2]&0x3c)<<10;
-			useIndicesInRom=index_ptr[2]&3;
-
-			yoffs=index_ptr[0]&0xff;
-			xoffs=index_ptr[1]&0xff;
-
-			fy1=(index_ptr[0]&0x1000)>>12;
-			fx1=(index_ptr[1]&0x1000)>>12;
+		/* In 8bpp the palette base is stored in the next block */
+		if (use8bppMode)
+		{
+			color = (spriteram[offs + 1 - 8] & 0x7f);
+			indx2 = spriteram[offs + 0 - 8] & 0x3fff;
 		}
 
-		if(fx1) fx^=0x8000;
-		if(fy1) fy^=0x4000;
+		/* Lookup tiles / size in sprite index ram OR in the lookup rom */
+		if (spriteram[offs + 0] & 0x4000)
+		{
+			index_ptr8 = rom + indx * 8; /* Byte ptr */
+			h = (index_ptr8[1] >> 0) & 0xf;
+			w = (index_ptr8[3] >> 0) & 0xf;
+
+			if (!h) h = 16;
+			if (!w) w = 16;
+
+			sprite = (index_ptr8[7] << 8) | index_ptr8[6];
+			sprite |= (index_ptr8[4] & 3) << 16;
+
+			if (use8bppMode)
+			{
+				const u8* index_ptr28 = rom + indx2 * 8;
+				sprite2 = (index_ptr28[7] << 8) | index_ptr28[6];
+			}
+			//unused byte 5
+			yoffs = index_ptr8[0] & 0xff;
+			xoffs = index_ptr8[2] & 0xff;
+
+			fy1 = (index_ptr8[1] & 0x10) >> 4;
+			fx1 = (index_ptr8[3] & 0x10) >> 4;
+
+			tileFormat = index_ptr8[4] & 0x80;
+
+			if (index_ptr8[4] & 0xc0)
+				blockIsTilemapIndex = 1;
+			else
+				blockIsTilemapIndex = 0;
+
+			useIndicesInRom = 0;
+		}
+		else
+		{
+			indx &= 0x1fff;
+			index_ptr = m_vram + indx * 4;
+			h = (index_ptr[0] >> 8) & 0xf;
+			w = (index_ptr[1] >> 8) & 0xf;
+
+			if (!h) h = 16;
+			if (!w) w = 16;
+
+			if (use8bppMode)
+			{
+				u32* index_ptr2 = m_vram + ((indx2 * 4) & 0x7fff);
+				sprite2 = ((index_ptr2[2] & 0x3) << 16) | (index_ptr2[3] & 0xffff);
+			}
+
+			sprite = ((index_ptr[2] & 0x3) << 16) | (index_ptr[3] & 0xffff);
+			if (index_ptr[2] & 0xc0)
+				blockIsTilemapIndex = 1;
+			else
+				blockIsTilemapIndex = 0;
+
+			tileFormat = index_ptr[2] & 0x80;
+
+			hibits = (index_ptr[2] & 0x3c) << 10;
+			useIndicesInRom = index_ptr[2] & 3;
+
+			yoffs = index_ptr[0] & 0xff;
+			xoffs = index_ptr[1] & 0xff;
+
+			fy1 = (index_ptr[0] & 0x1000) >> 12;
+			fx1 = (index_ptr[1] & 0x1000) >> 12;
+		}
+
+		if (fx1) fx ^= 0x8000;
+		if (fy1) fy ^= 0x4000;
 
 		int extra_x_scale = 0x100;
 
@@ -358,169 +361,163 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 				// YYY = duplicate bits of yyy?
 				// ZZZ = (sometimes) duplicate bits of zzz
 
-			if (raster_select==1 || raster_select==2 || raster_select==3)
+			if (raster_select == 1 || raster_select == 2 || raster_select == 3)
 			{
-				shadowMode = 0; // TODO : Raster enable and shadow mode can't use simultaneously?
+				//shadowMode = 0; // TODO : Raster enable and shadow mode can use simultaneously?
 				int irq_base_reg; /* 6, 9, 12  are possible */
-				if (raster_select== 1) irq_base_reg = 6;    // OK upper screen.. left?
-				else if (raster_select== 2) irq_base_reg = 9; // OK upper screen.. main / center
+				if (raster_select == 1) irq_base_reg = 6;    // OK upper screen.. left?
+				else if (raster_select == 2) irq_base_reg = 9; // OK upper screen.. main / center
 				else irq_base_reg = 12;
 
-				int extra_y_off = m_irq_ram[irq_base_reg+0] & 0x7ff;
-				int extra_x_off = m_irq_ram[irq_base_reg+1] & 0x7ff;
-				extra_x_scale = (m_irq_ram[irq_base_reg+2]>>0) & 0x3ff;
+				int extra_y_off = m_irq_ram[irq_base_reg + 0] & 0x7ff;
+				int extra_x_off = m_irq_ram[irq_base_reg + 1] & 0x7ff;
+				extra_x_scale = (m_irq_ram[irq_base_reg + 2] >> 0) & 0x3ff;
 
 				if (extra_x_off & 0x400) { extra_x_off -= 0x800; }
 				if (extra_y_off & 0x400) { extra_y_off -= 0x800; }
 
-
 				x += extra_x_off;
 				y += extra_y_off;
 			}
-			else if (raster_select==0x0)
+			else if (raster_select == 0x0)
 			{
 				// possibly disabled?
 			}
 		}
 
+		const int yscale_frac = (yscale << 8);
+		const int real_h = h * 16;
+
 		xscale *= extra_x_scale;
 
-		int ybase=y<<16;
-		int yinc=(yscale<<8)*16;
+		int ybase = y << 16;
+		const int yinc = yscale_frac * 16;
 
 		if (fy)
-			ybase+=(yoffs-15) * (yscale<<8) - ((h-1)*yinc);
+			ybase += (yoffs - 15) * yscale_frac - ((h - 1) * yinc);
 		else
-			ybase-=yoffs * (yscale<<8);
+			ybase -= yoffs * yscale_frac;
 
-		int xbase=x<<16;
-		int xinc=(xscale)*16;
+		int xbase = x << 16;
+		const int xinc = xscale * 16;
 
 		if (fx)
-			xbase+=(xoffs-15) * (xscale) - ((w-1)*xinc);
+			xbase += (xoffs - 15) * xscale - ((w - 1) * xinc);
 		else
-			xbase-=xoffs * (xscale);
+			xbase -= xoffs * xscale;
 
-
-		int full_realybase = ybase;
-		int full_sprite_screen_height = ((yscale<<8)*(h*16)+(0));
-		int full_sprite_screen_height_unscaled = ((1)*(h*16)+(0));
-
-
+		const int full_realybase = ybase;
+		const int full_sprite_screen_height = (yscale_frac * real_h + 0);
+		const int full_sprite_screen_height_unscaled = (1 * real_h + 0);
 
 		if (!full_sprite_screen_height_unscaled)
 			continue;
 
-
-		int ratio = full_sprite_screen_height / full_sprite_screen_height_unscaled;
+		const int ratio = full_sprite_screen_height / full_sprite_screen_height_unscaled;
 
 		if (!ratio)
 			continue;
 
-		int bby = scanline - (full_realybase>>16);
+		const int bby = scanline - (full_realybase >> 16);
 
 		if (bby < 0)
 			continue;
 
-		if (bby >= full_sprite_screen_height>>16)
+		if (bby >= full_sprite_screen_height >> 16)
 			continue;
-
-
 
 //      color = machine().rand();
 
-		int srcline = ((bby<<16) / ratio);
+		int srcline = ((bby << 16) / ratio);
 
-		by = srcline >> 4;
+		const int by = srcline >> 4;
 
-
-		srcline &=0xf;
-		if( fy )
+		srcline &= 0xf;
+		if (fy)
 		{
 			srcline = 15 - srcline;
 		}
 
-
-		for (bx=0; bx<w; bx++) {
-			int realxbase = xbase + bx * xinc;
+		for (int bx = 0; bx < w; bx++)
+		{
+			const int realxbase = xbase + bx * xinc;
 			int count = 0;
 			if (fx)
 			{
 				if (fy)
-					count = (h-1-by) * w + (w-1-bx);
+					count = (h - 1 - by) * w + (w - 1 - bx);
 				else
-					count = by * w + (w-1-bx);
+					count = by * w + (w - 1 - bx);
 			}
 			else
 			{
 				if (fy)
-					count = (h-1-by) * w + bx;
+					count = (h - 1 - by) * w + bx;
 				else
 					count = by * w + bx;
 			}
 
-			int tile=sprite + count;
-			int tile2=sprite2 + count;
+			int tile = sprite + count;
+			int tile2 = sprite2 + count;
 
-			if (blockIsTilemapIndex) {
+			if (blockIsTilemapIndex)
+			{
 				if (useIndicesInRom)
 				{
-					const uint8_t* ptr=rawrom+(tile*2);
-					tile=(*ptr) + ((*(ptr+1))<<8);
+					const u8* ptr = rawrom + (tile * 2);
+					tile = (*ptr) + ((*(ptr + 1)) << 8);
 
-					if (use8bppMode) {
-						const uint8_t* ptr2=rawrom+(tile2*2);
-						tile2=(*ptr2) + ((*(ptr2+1))<<8);
+					if (use8bppMode)
+					{
+						const u8* ptr2 = rawrom + (tile2 * 2);
+						tile2 = (*ptr2) + ((*(ptr2 + 1)) << 8);
 					}
 					else
 					{
-						tile2=0;
+						tile2 = 0;
 					}
 
 					if (tileFormat)
 					{
-						colorOffset=(tile&0xf000)>>12;
-						tile=(tile&0x0fff)|hibits;
-						tile2=(tile2&0x0fff)|hibits;
+						colorOffset = (tile & 0xf000) >> 12;
+						tile = (tile & 0x0fff) | hibits;
+						tile2 = (tile2 & 0x0fff) | hibits;
 					}
 					else
 					{
-						colorOffset=0;
-						tile=(tile&0xffff)|(hibits<<2);
-						tile2=(tile2&0xffff)|(hibits<<2);
+						colorOffset = 0;
+						tile = (tile & 0xffff) | (hibits << 2);
+						tile2 = (tile2 & 0xffff) | (hibits << 2);
 					}
 				}
 				else
 				{
-					const uint32_t* ptr=m_vram + ((tile)&0x7fff);
-					tile=(*ptr)&0xffff;
+					const u32* ptr = m_vram + (tile & 0x7fff);
+					tile = (*ptr) & 0xffff;
 
 					if (tileFormat)
 					{
-						colorOffset=(tile&0xf000)>>12;
-						tile=(tile&0x0fff)|hibits;
+						colorOffset = (tile & 0xf000) >> 12;
+						tile = (tile & 0x0fff) | hibits;
 					}
 					else
 					{
-						colorOffset=0;
-						tile=(tile&0xffff)|(hibits<<2);
+						colorOffset = 0;
+						tile = (tile & 0xffff) | (hibits << 2);
 					}
 
-					tile2=0;
+					tile2 = 0;
 				}
 			}
 
-			drawgfxzoomline(dest,user_clip,m_gfxdecode->gfx(0),
+			drawgfxzoomline(dest,pri,user_clip,m_gfxdecode->gfx(0),
 							tile,tile2,
 							color + colorOffset,fx,realxbase,
 							0,
-							use8bppMode,(xscale),alpha, srcline,
-							shadowMode, m_irq_ram[0x04/4]);
+							use8bppMode,xscale, srcline,
+							shadowMode);
 
 		}
-
-		if (use8bppMode)
-			offs-=8;
 	}
 }
 
@@ -534,28 +531,44 @@ WRITE_LINE_MEMBER(deco_mlc_state::screen_vblank_mlc)
 		lookup table.  Without buffering incorrect one frame glitches are seen
 		in several places, especially in Hoops.
 		*/
-		std::copy(&m_spriteram[0], &m_spriteram[0x3000/4], &m_buffered_spriteram[0]);
+		std::copy(&m_spriteram[0], &m_spriteram[0x3000 / 4], &m_buffered_spriteram[0]);
 	}
 }
 
-uint32_t deco_mlc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 deco_mlc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 //  temp_bitmap->fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 
-	for (int i=cliprect.top();i<=cliprect.bottom();i++)
+	for (int i = cliprect.top(); i <= cliprect.bottom(); i++)
 	{
-		uint32_t *dest = &bitmap.pix32(i);
+		u32 *dest = &bitmap.pix32(i);
+		u8 *pri = &screen.priority().pix8(i);
 
 		/*
 		printf("%d -", i);
-		for (int j=0;j<0x20;j++)
+		for (int j = 0; j < 0x20; j++)
 		{
 		    printf("%08x, ",m_irq_ram[j]);
 		}
 		printf("\n");
 		*/
-		draw_sprites(cliprect, i, dest);
+		draw_sprites(cliprect, i, dest, pri);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			u32 col = dest[x];
+			const u8 shadow_flag = pri[x] & 3;
+			if ((shadow_flag & 3) && (shadow_flag != 3))
+			{
+				if (shadow_flag & 1) // shadow
+					col = (col & 0xff000000) | ((col & 0xfefefe) >> 1);
+				else if (shadow_flag & 2) // hilight
+					col = (col & 0xff000000) | ((col & 0xfefefe) >> 1) | 0x808080;
+
+				dest[x] = col;
+			}
+		}
 	}
 	return 0;
 }

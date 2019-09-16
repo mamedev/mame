@@ -142,14 +142,6 @@ WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
 	membank("bank1")->set_entry(m__4in1_bank);
 }
 
-CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
-{
-	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
-	int bit_mask = (uintptr_t)param;
-
-	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
-}
-
 void galaxold_state::init_4in1()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);

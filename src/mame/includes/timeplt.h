@@ -38,7 +38,7 @@ public:
 	void psurge(machine_config &config);
 	void bikkuric(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(chkun_hopper_status_r);
+	DECLARE_READ_LINE_MEMBER(chkun_hopper_status_r);
 
 private:
 	required_device<cpu_device> m_maincpu;

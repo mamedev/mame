@@ -21,10 +21,8 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_READ_LINE_MEMBER(host_semaphore_r) { return m_host_flag ? ASSERT_LINE : CLEAR_LINE; }
-	DECLARE_READ_LINE_MEMBER(mcu_semaphore_r) { return m_mcu_flag ? ASSERT_LINE : CLEAR_LINE; }
-	DECLARE_CUSTOM_INPUT_MEMBER(host_semaphore_r) { return m_host_flag ? 1 : 0; }
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_semaphore_r) { return m_mcu_flag ? 1 : 0; }
+	DECLARE_READ_LINE_MEMBER(host_semaphore_r) { return m_host_flag ? 1 : 0; }
+	DECLARE_READ_LINE_MEMBER(mcu_semaphore_r) { return m_mcu_flag ? 1 : 0; }
 
 protected:
 	taito68705_mcu_device_base(

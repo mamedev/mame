@@ -10,10 +10,11 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 
-
-class sega315_5313_device : public sega315_5313_mode4_device
+class sega315_5313_device : public sega315_5313_mode4_device, public device_gfx_interface
 {
 public:
+	static constexpr unsigned PALETTE_PER_FRAME = 64 * 313 * 2; // 313 total scanlines for PAL systems, *2 for interlaced
+
 	template <typename T>
 	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
 		: sega315_5313_device(mconfig, tag, owner, clock)
@@ -33,7 +34,7 @@ public:
 
 	void set_alt_timing(int use_alt_timing) { m_use_alt_timing = use_alt_timing; }
 	void set_pal_write_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
-	template <typename T> void set_palette(T &&tag) { m_ext_palette.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_ext_palette(T &&tag) { m_ext_palette.set_tag(std::forward<T>(tag)); }
 
 	// Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
 	template <typename... T> void set_md_32x_scanline(T &&... args) { m_32x_scanline_func = md_32x_scanline_delegate(std::forward<T>(args)...); }
@@ -46,6 +47,22 @@ public:
 
 	u16 vdp_r(offs_t offset, u16 mem_mask = ~0);
 	void vdp_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0)
+	{
+		offset &= 0x7fff;
+		COMBINE_DATA(&m_vram[offset]);
+		gfx(0)->mark_dirty(offset / ((8*8*4) / 16));
+		gfx(1)->mark_dirty(offset / ((8*16*4) / 16));
+		gfx(2)->mark_dirty(offset / ((8*8*4) / 16));
+		gfx(3)->mark_dirty(offset / ((8*16*4) / 16));
+		gfx(4)->mark_dirty(offset / ((8*8*4) / 16));
+		gfx(5)->mark_dirty(offset / ((8*16*4) / 16));
+	}
+
+	device_palette_interface *gfx_palette() { return m_gfx_palette; }
+	device_palette_interface *gfx_palette_shadow() { return m_gfx_palette_shadow; }
+	device_palette_interface *gfx_palette_hilight() { return m_gfx_palette_hilight; }
 
 	int get_scanline_counter();
 
@@ -85,6 +102,7 @@ public:
 	inline u16 vdp_get_word_from_68k_mem(u32 source);
 
 protected:
+	virtual void device_post_load() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -112,7 +130,8 @@ private:
 
 	// nametable
 	struct nametable_t {
-		u16 addr;
+		gfx_element *gfx;
+		const u8* addr;
 		bool xflip;
 		bool yflip;
 		u16 colour;
@@ -120,7 +139,7 @@ private:
 	};
 	void get_window_tilebase(int &tile_base, u16 base, int vcolumn, int window_hsize, int hcolumn);
 	void get_vcolumn_tilebase(int &vcolumn, int &tile_base, u16 base, int vscroll, int scanline, int vsize, int hsize, int hcolumn);
-	void get_nametable(u16 tile_base, nametable_t &tile, int vcolumn);
+	void get_nametable(gfx_element *tile_gfx, u16 tile_base, nametable_t &tile, int vcolumn);
 	inline void draw_tile(nametable_t tile, int start, int end, int &dpos, bool is_fg);
 
 	int m_command_pending; // 2nd half of command pending..
@@ -208,6 +227,11 @@ private:
 	address_space *m_space68k;
 	required_device<m68000_base_device> m_cpu68k;
 	optional_device<palette_device> m_ext_palette;
+
+	// debug functions
+	required_device<palette_device> m_gfx_palette;
+	required_device<palette_device> m_gfx_palette_shadow;
+	required_device<palette_device> m_gfx_palette_hilight;
 };
 
 

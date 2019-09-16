@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:smf
+// copyright-holders:smf, Robbbert
 /*********************************************************************
 
-    i8251.c
+    i8251.cpp
 
     Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
     NEC uPD71051 is a clone
@@ -10,6 +10,12 @@
     The V53/V53A use a customized version with only the Asynchronous mode
     and a split command / mode register
 
+To Do:
+- BRKDET: if, in Async mode, 16 low RxD bits in succession are clocked in,
+          the SYNDET pin & status must go high. It will go low upon a
+          status read, same as what happens with sync.
+
+- SYNC/BISYNC with PARITY is not tested, and therefore possibly buggy.
 
 
 *********************************************************************/
@@ -86,6 +92,11 @@ void i8251_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_command));
 	save_item(NAME(m_mode_byte));
+	save_item(NAME(m_delayed_tx_en));
+	save_item(NAME(m_sync1));
+	save_item(NAME(m_sync2));
+	save_item(NAME(m_sync8));
+	save_item(NAME(m_sync16));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dsr));
 	save_item(NAME(m_rxd));
@@ -96,6 +107,11 @@ void i8251_device::device_start()
 	save_item(NAME(m_br_factor));
 	save_item(NAME(m_rx_data));
 	save_item(NAME(m_tx_data));
+	save_item(NAME(m_syndet_pin));
+	save_item(NAME(m_hunt_on));
+	save_item(NAME(m_ext_syn_set));
+	save_item(NAME(m_rxd_bits));
+	save_item(NAME(m_data_bits_count));
 }
 
 
@@ -684,8 +700,6 @@ void i8251_device::mode_w(uint8_t data)
 
 	receive_register_reset();
 	m_txc_count = 0;
-
-	//              m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
 }
 
 void i8251_device::sync1_w(uint8_t data)

@@ -16,7 +16,7 @@ class avgdvg_device : public device_t
 public:
 	template <typename T> void set_vector_tag(T &&tag) { m_vector.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
+	DECLARE_READ_LINE_MEMBER(done_r);
 	void go_w(u8 data = 0);
 	void reset_w(u8 data = 0);
 

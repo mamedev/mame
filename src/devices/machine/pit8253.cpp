@@ -297,7 +297,7 @@ void pit_counter_device::set_output(int output)
 
 /* This emulates timer "timer" for "elapsed_cycles" cycles and assumes no
    callbacks occur during that time. */
-void pit_counter_device::simulate2(int64_t elapsed_cycles)
+void pit_counter_device::simulate(int64_t elapsed_cycles)
 {
 	uint32_t adjusted_value;
 	int bcd = CTRL_BCD(m_control);
@@ -305,7 +305,7 @@ void pit_counter_device::simulate2(int64_t elapsed_cycles)
 	static const uint32_t CYCLES_NEVER = (0xffffffff);
 	uint32_t cycles_to_output = 0;
 
-	LOG2(("simulate2(): simulating %d cycles in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
+	LOG2(("simulate(): simulating %d cycles in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
 			(int)elapsed_cycles, mode, bcd, m_phase, m_gate, m_output, m_value));
 
 	switch (mode)
@@ -688,21 +688,9 @@ void pit_counter_device::simulate2(int64_t elapsed_cycles)
 		m_updatetimer->adjust(next_fire_time - machine().time());
 	}
 
-	LOG2(("simulate2(): simulating %d cycles in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
+	LOG2(("simulate(): simulating %d cycles in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
 			(int)elapsed_cycles, mode, bcd, m_phase, m_gate, m_output, m_value, cycles_to_output));
 }
-
-
-/* This emulates timer "timer" for "elapsed_cycles" cycles, broken down into
-   sections punctuated by callbacks. */
-void pit_counter_device::simulate(int64_t elapsed_cycles)
-{
-	if (elapsed_cycles > 0)
-		simulate2(elapsed_cycles);
-	else if (m_clockin)
-		m_updatetimer->adjust(attotime::from_hz(m_clockin));
-}
-
 
 /* This brings timer "timer" up to date */
 void pit_counter_device::update()
@@ -720,7 +708,12 @@ void pit_counter_device::update()
 	else
 		m_last_updated = now;
 
-	simulate(elapsed_cycles);
+	/* This emulates timer "timer" for "elapsed_cycles" cycles, broken down into
+	   sections punctuated by callbacks. */
+	if (elapsed_cycles > 0)
+		simulate(elapsed_cycles);
+	else if (m_clockin)
+		m_updatetimer->adjust(attotime::from_hz(m_clockin));
 }
 
 
@@ -976,7 +969,7 @@ void pit_counter_device::count_w(uint8_t data)
 			m_last_updated += attotime::from_hz(m_clockin);
 
 		load_count(data);
-		simulate2(0);
+		simulate(0);
 
 		if (CTRL_MODE(m_control) == 0)
 			set_output(0);
@@ -990,7 +983,7 @@ void pit_counter_device::count_w(uint8_t data)
 			m_last_updated += attotime::from_hz(m_clockin);
 
 		load_count(data << 8);
-		simulate2(0);
+		simulate(0);
 
 		if (CTRL_MODE(m_control) == 0)
 			set_output(0);
@@ -1005,7 +998,7 @@ void pit_counter_device::count_w(uint8_t data)
 				m_last_updated += attotime::from_hz(m_clockin);
 
 			load_count(m_lowcount | (data << 8));
-			simulate2(0);
+			simulate(0);
 		}
 		else
 		{
@@ -1082,7 +1075,7 @@ void pit_counter_device::set_clock_signal(int state)
 	if (!m_clock_signal && state)
 	{
 		/* Advance a cycle */
-		simulate2(1);
+		simulate(1);
 	}
 	m_clock_signal = state;
 }

@@ -97,7 +97,7 @@ public:
 
 	void init_wmg();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
 private:
 	u8 wmg_nvram_r(offs_t offset);
@@ -179,10 +179,10 @@ void wmg_state::wmg_banked_map(address_map &map)
  ***************************************************************/
 static INPUT_PORTS_START( wmg )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wmg_state, wmg_mux_r, "0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wmg_state, wmg_mux_r<0>)
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wmg_state, wmg_mux_r, "1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wmg_state, wmg_mux_r<1>)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
@@ -465,11 +465,10 @@ WRITE_LINE_MEMBER( wmg_state::wmg_port_select_w )
 	m_wmg_port_select = state | (m_wmg_c400 << 1);
 }
 
+template <int N>
 CUSTOM_INPUT_MEMBER(wmg_state::wmg_mux_r)
 {
-	const char *port = (const char *)param;
-
-	if (port[0] == '0')
+	if (N == 0)
 	{
 		uint8_t ports[17] = { 0,0,2,2,5,4,7,7,9,9,11,11,14,13,9,9 };
 		return m_keyboard[ports[m_wmg_port_select]]->read();

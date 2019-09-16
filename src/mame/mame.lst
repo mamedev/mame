@@ -12833,6 +12833,7 @@ targc                           // (c) 1980
 teetert                         // (c) 1981
 venture                         // (c) 1981
 venture2                        // (c) 1981
+venture2b                       // bootleg
 venture4                        // (c) 1981
 
 @source:exidy440.cpp
@@ -15341,6 +15342,7 @@ gnw_flagman                     // Nintendo
 gnw_gcliff                      // Nintendo
 gnw_ghouse                      // Nintendo
 gnw_helmet                      // Nintendo
+gnw_judge                       // Nintendo
 gnw_lboat                       // Nintendo
 gnw_manhole                     // Nintendo
 gnw_mario                       // Nintendo
@@ -35334,6 +35336,7 @@ rdftam                          // (c) 1996 Seibu Kaihatsu (Metrotainment licens
 rdftau                          // (c) 1996 Seibu Kaihatsu
 rdftauge                        // (c) 1996 Seibu Kaihatsu (Tuning license and text display, but Australia region code)
 rdftgb                          // (c) 1996 Seibu Kaihatsu
+rdftgr                          // (c) 1996 Seibu Kaihatsu
 rdftit                          // (c) 1996 Seibu Kaihatsu
 rdftj                           // (c) 1996 Seibu Kaihatsu
 rdftja                          // (c) 1996 Seibu Kaihatsu

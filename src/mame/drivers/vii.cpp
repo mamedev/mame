@@ -177,8 +177,6 @@ public:
 	void init_zeus();
 	void init_zone40();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -251,7 +249,7 @@ public:
 	void jakks_gkr_mv_i2c(machine_config &config);
 	void jakks_gkr_wp(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(i2c_gkr_r);
+	DECLARE_READ_LINE_MEMBER(i2c_gkr_r);
 
 private:
 	virtual void machine_start() override;
@@ -479,12 +477,7 @@ WRITE16_MEMBER(vii_state::vii_portb_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(spg2xx_game_state::i2c_r)
-{
-	return m_i2cmem->read_sda();
-}
-
-CUSTOM_INPUT_MEMBER(jakks_gkr_state::i2c_gkr_r)
+READ_LINE_MEMBER(jakks_gkr_state::i2c_gkr_r)
 {
 	if (m_cart && m_cart->exists())
 	{
@@ -650,7 +643,7 @@ static INPUT_PORTS_START( walle )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 INPUT_PORTS_END
@@ -663,7 +656,7 @@ static INPUT_PORTS_START( jak_sith_i2c )
 	PORT_BIT( 0xf3df, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -702,7 +695,7 @@ static INPUT_PORTS_START( jak_nm_i2c )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
@@ -727,7 +720,7 @@ static INPUT_PORTS_START( jak_wf_i2c )
 	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
 
@@ -818,7 +811,7 @@ static INPUT_PORTS_START( jak_sdoo_i2c ) // GameKeyReady units had 2 main button
 	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr) // is this correct? doesn't seem to work
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r) // is this correct? doesn't seem to work
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -869,7 +862,7 @@ static INPUT_PORTS_START( jak_gkr_i2c )
 	PORT_INCLUDE(jak_gkr)
 
 	PORT_MODIFY("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_disp_i2c )
@@ -887,7 +880,7 @@ static INPUT_PORTS_START( jak_disp_i2c )
 	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jakks_gkr_state,i2c_gkr_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jakks_gkr_state, i2c_gkr_r)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 	PORT_BIT( 0xfff6, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END

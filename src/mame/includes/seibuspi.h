@@ -52,7 +52,7 @@ public:
 	void init_ejanhs();
 	void init_sys386f();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
 
 	IRQ_CALLBACK_MEMBER(spi_irq_callback);
 	INTERRUPT_GEN_MEMBER(spi_interrupt);

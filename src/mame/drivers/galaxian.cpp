@@ -929,8 +929,8 @@ READ8_MEMBER(galaxian_state::theend_protection_r)
 	return m_protection_result;
 }
 
-
-CUSTOM_INPUT_MEMBER(galaxian_state::theend_protection_alt_r)
+template <int N>
+READ_LINE_MEMBER(galaxian_state::theend_protection_alt_r)
 {
 	/*
 	    Handled by a custom IC. Holds two bits derived from the upper bit of
@@ -1231,16 +1231,16 @@ WRITE8_MEMBER(galaxian_state::scorpion_digitalker_control_w)
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
+INPUT_CHANGED_MEMBER(gmgalax_state::game_changed)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* new value is the selected game */
-	m_gmgalax_selected_game = newval;
+	m_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
-	membank("bank1")->set_entry(m_gmgalax_selected_game);
-	galaxian_gfxbank_w(space, 0, m_gmgalax_selected_game);
+	membank("bank1")->set_entry(m_selected_game);
+	galaxian_gfxbank_w(space, 0, m_selected_game);
 
 	/* reset the stars */
 	galaxian_stars_enable_w(space, 0, 0);
@@ -1250,12 +1250,10 @@ INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
 }
 
 
-CUSTOM_INPUT_MEMBER(galaxian_state::gmgalax_port_r)
+template <int N>
+CUSTOM_INPUT_MEMBER(gmgalax_state::port_r)
 {
-	const char *portname = (const char *)param;
-	if (m_gmgalax_selected_game != 0)
-		portname += strlen(portname) + 1;
-	return ioport(portname)->read();
+	return (m_selected_game != 0 ? m_glin : m_gmin)[N]->read();
 }
 
 
@@ -1305,9 +1303,10 @@ WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(galaxian_state::azurian_port_r)
+template <int N>
+READ_LINE_MEMBER(galaxian_state::azurian_port_r)
 {
-	return (ioport("FAKE")->read() >> (uintptr_t)param) & 1;
+	return (ioport("FAKE")->read() >> N) & 1;
 }
 
 
@@ -1318,14 +1317,14 @@ CUSTOM_INPUT_MEMBER(galaxian_state::azurian_port_r)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(galaxian_state::kingball_muxbit_r)
+READ_LINE_MEMBER(galaxian_state::kingball_muxbit_r)
 {
 	/* multiplex the service mode switch with a speech DIP switch */
 	return (ioport("FAKE")->read() >> m_kingball_speech_dip) & 1;
 }
 
 
-CUSTOM_INPUT_MEMBER(galaxian_state::kingball_noise_r)
+READ_LINE_MEMBER(galaxian_state::kingball_noise_r)
 {
 	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
 	   that it's working, doesn't actually use return value, so we can just use
@@ -2867,7 +2866,7 @@ static INPUT_PORTS_START( azurian )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, azurian_port_r, (void *)0) /* "linked" with bit 2 of IN2 */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, azurian_port_r<0>) /* "linked" with bit 2 of IN2 */
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -2879,7 +2878,7 @@ static INPUT_PORTS_START( azurian )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x02, "7000" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, azurian_port_r, (void *)1) /* "linked" with bit 6 of IN1 */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, azurian_port_r<1>) /* "linked" with bit 6 of IN1 */
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
@@ -3491,13 +3490,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gmgalax )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_port_r, "GMIN0\0GLIN0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(gmgalax_state, port_r<0>)
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_port_r, "GMIN1\0GLIN1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(gmgalax_state, port_r<1>)
 
 	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_port_r, "GMIN2\0GLIN2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(gmgalax_state, port_r<2>)
 
 	PORT_START("GMIN0")      /* Ghost Muncher - IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )                                  PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
@@ -3575,7 +3574,7 @@ static INPUT_PORTS_START( gmgalax )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("GAMESEL")      /* fake - game select */
-	PORT_DIPNAME( 0x01, 0x00, "Game Select") PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_game_changed, 0)
+	PORT_DIPNAME( 0x01, 0x00, "Game Select") PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, gmgalax_state, game_changed, 0)
 	PORT_DIPSETTING( 0x00, "Ghost Muncher" )
 	PORT_DIPSETTING( 0x01, "Galaxian" )
 INPUT_PORTS_END
@@ -4328,14 +4327,14 @@ static INPUT_PORTS_START( kingball )
 	PORT_INCLUDE(galaxian)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, kingball_muxbit_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, kingball_muxbit_r)
 	/* Relating to above port:Hack? - possibly multiplexed via writes to $b003 */
 	//PORT_DIPNAME( 0x40, 0x40, "Speech" )
 	//PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	//PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, kingball_noise_r, nullptr)   /* NOISE line */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, kingball_noise_r)   /* NOISE line */
 	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
@@ -4826,9 +4825,9 @@ static INPUT_PORTS_START( theend )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)0) /* protection bit */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, theend_protection_alt_r<0>) /* protection bit */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)1) /* protection bit */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, theend_protection_alt_r<1>) /* protection bit */
 
 	PORT_START("IN3")   /* need for some PPI accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
@@ -4870,9 +4869,9 @@ static INPUT_PORTS_START( scramble )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)0)  /* protection bit */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, theend_protection_alt_r<0>)  /* protection bit */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)1)  /* protection bit */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, theend_protection_alt_r<1>)  /* protection bit */
 
 	PORT_START("IN3")   /* need for some PPI accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
@@ -5348,7 +5347,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::moonwar_dial_r)
 /* verified from Z80 code */
 static INPUT_PORTS_START( moonwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, moonwar_dial_r, nullptr)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxian_state, moonwar_dial_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // cocktail: p2 shield
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -6183,14 +6182,14 @@ void galaxian_state::zigzag(machine_config &config)
 }
 
 
-void galaxian_state::gmgalax(machine_config &config)
+void gmgalax_state::gmgalax(machine_config &config)
 {
 	galaxian(config);
 
 	/* banked video hardware */
 	m_gfxdecode->set_info(gfx_gmgalax);
 	m_palette->set_entries(64);
-	m_palette->set_init(FUNC(galaxian_state::galaxian_palette));
+	m_palette->set_init(FUNC(gmgalax_state::galaxian_palette));
 }
 
 
@@ -7073,20 +7072,20 @@ void galaxian_state::init_azurian()
 }
 
 
-void galaxian_state::init_gmgalax()
+void gmgalax_state::init_gmgalax()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
-	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::gmgalax_extend_tile_info, &galaxian_state::gmgalax_extend_sprite_info);
+	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &gmgalax_state::gmgalax_extend_tile_info, &gmgalax_state::gmgalax_extend_sprite_info);
 
 	/* ROM is banked */
 	space.install_read_bank(0x0000, 0x3fff, "bank1");
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	gmgalax_game_changed(*machine().ioport().ports().begin()->second->fields().first(), 0, 0, 0);
-	save_item(NAME(m_gmgalax_selected_game));
+	game_changed(*machine().ioport().ports().begin()->second->fields().first(), 0, 0, 0);
+	save_item(NAME(m_selected_game));
 }
 
 
@@ -12777,7 +12776,7 @@ GAME( 1982, zigzagb,     0,        zigzag,     zigzag,     galaxian_state, init_
 GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     galaxian_state, init_zigzag,     ROT90,  "bootleg (LAX)", "Zig Zag (Dig Dug conversion on Galaxian hardware, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* multi-game select via external switch */
-GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    galaxian_state, init_gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    gmgalax_state,  init_gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Multigames
 GAME( 2002, fourplay,    0,        fourplay,   galaxian,   galaxian_state, init_fourplay,   ROT90, "Macro", "Four Play", MACHINE_SUPPORTS_SAVE )

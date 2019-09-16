@@ -69,8 +69,8 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_status_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_command_r);
 	void init_fixed();
 	void init_variable();
 
@@ -106,7 +106,7 @@ private:
 		return CLEAR_LINE;
 	}
 
-	uint8_t laserdisc_status_r()
+	uint8_t laserdisc_status_strobe_r()
 	{
 		if (m_ldv1000 != nullptr) return m_ldv1000->status_strobe_r();
 		return CLEAR_LINE;
@@ -343,13 +343,13 @@ WRITE8_MEMBER(dlair_state::led_den2_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_status_r)
+READ_LINE_MEMBER(dlair_state::laserdisc_status_r)
 {
-	return laserdisc_status_r();
+	return laserdisc_status_strobe_r();
 }
 
 
-CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_command_r)
+READ_LINE_MEMBER(dlair_state::laserdisc_command_r)
 {
 	return (laserdisc_ready_r() == ASSERT_LINE) ? 0 : 1;
 }
@@ -563,8 +563,8 @@ static INPUT_PORTS_START( dlair )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, nullptr)     /* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, nullptr)    /* command strobe */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dlair_state, laserdisc_status_r)     /* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dlair_state, laserdisc_command_r)    /* command strobe */
 INPUT_PORTS_END
 
 
@@ -595,8 +595,8 @@ static INPUT_PORTS_START( dleuro )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, nullptr)     /* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, nullptr)    /* command strobe */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dlair_state, laserdisc_status_r)     /* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dlair_state, laserdisc_command_r)    /* command strobe */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:1")

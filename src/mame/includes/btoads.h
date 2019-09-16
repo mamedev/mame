@@ -34,8 +34,8 @@ public:
 		m_tlc34076(*this, "tlc34076"),
 		m_screen(*this, "screen") { }
 
-	DECLARE_CUSTOM_INPUT_MEMBER( main_to_sound_r );
-	DECLARE_CUSTOM_INPUT_MEMBER( sound_to_main_r );
+	DECLARE_READ_LINE_MEMBER( main_to_sound_r );
+	DECLARE_READ_LINE_MEMBER( sound_to_main_r );
 
 	void btoads(machine_config &config);
 

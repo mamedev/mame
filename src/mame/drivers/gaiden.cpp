@@ -662,33 +662,11 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout tilelayout =
-{
-	8,8,    /* tile size */
-	RGN_FRAC(1,1),  /* number of tiles */
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	4*8*8    /* offset to next tile */
-};
-
-static const gfx_layout tile2layout =
-{
-	16,16,  /* tile size */
-	RGN_FRAC(1,1),  /* number of tiles */
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
-	{ STEP8(0,4), STEP8(4*8*8,4) },
-	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
-	4*8*8*2*2   /* offset to next tile */
-};
-
 static GFXDECODE_START( gfx_gaiden )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0x100,    16 ) /* tiles 8x8  */
-	GFXDECODE_ENTRY( "gfx2", 0, tile2layout, 0x000, 0x100 ) /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile2layout, 0x000, 0x100 ) /* tiles 16x16 (only colors 0x00-0x0f and 0x80-0x8f are used) */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,  0x000, 0x100 ) /* sprites 8x8 (only colors 0x00-0x0f and 0x80-0x8f are used) */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x100,    16 ) /* tiles 8x8  */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 0x100 ) /* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 0x100 ) /* tiles 16x16 (only colors 0x00-0x0f and 0x80-0x8f are used) */
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb,               0x000, 0x100 ) /* sprites 8x8 (only colors 0x00-0x0f and 0x80-0x8f are used) */
 GFXDECODE_END
 
 static const gfx_layout mastninj_tile2layout =
@@ -714,10 +692,10 @@ static const gfx_layout mastninj_spritelayout =
 };
 
 static GFXDECODE_START( gfx_mastninj )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x000, 16 )  /* tiles 8x8  */
-	GFXDECODE_ENTRY( "gfx2", 0, mastninj_tile2layout,       0x300, 16 ) /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, mastninj_tile2layout,       0x200, 16 ) /* tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, mastninj_spritelayout,      0x100, 16 ) /* sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,  0x000, 16 )  /* tiles 8x8  */
+	GFXDECODE_ENTRY( "gfx2", 0, mastninj_tile2layout,  0x300, 16 ) /* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, mastninj_tile2layout,  0x200, 16 ) /* tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, mastninj_spritelayout, 0x100, 16 ) /* sprites 16x16 */
 GFXDECODE_END
 
 static const gfx_layout drgnbowl_tile2layout =
@@ -743,7 +721,7 @@ static const gfx_layout drgnbowl_spritelayout =
 };
 
 static GFXDECODE_START( gfx_drgnbowl )
-	GFXDECODE_ENTRY( "gfx1", 0,       tilelayout,                0, 16 )    /* tiles 8x8  */
+	GFXDECODE_ENTRY( "gfx1", 0,       gfx_8x8x4_packed_msb,      0, 16 )    /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, drgnbowl_tile2layout,  0x300, 16 )    /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0x20000, drgnbowl_tile2layout,  0x200, 16 )    /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0,       drgnbowl_spritelayout, 0x100, 16 )    /* sprites 16x16 */

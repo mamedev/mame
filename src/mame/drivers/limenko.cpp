@@ -66,7 +66,7 @@ public:
 	void init_legendoh();
 	void init_spotty();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
+	DECLARE_READ_LINE_MEMBER(spriteram_bit_r);
 
 protected:
 	virtual void video_start() override;
@@ -164,7 +164,7 @@ void limenko_state::fg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-CUSTOM_INPUT_MEMBER(limenko_state::spriteram_bit_r)
+READ_LINE_MEMBER(limenko_state::spriteram_bit_r)
 {
 	return m_spriteram_bit;
 }
@@ -572,7 +572,7 @@ static INPUT_PORTS_START(legendoh)
 	PORT_DIPNAME(0x20000000, 0x00000000, "Sound Enable")
 	PORT_DIPSETTING(         0x20000000, DEF_STR(Off))
 	PORT_DIPSETTING(         0x00000000, DEF_STR(On))
-	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(limenko_state, spriteram_bit_r) //changes spriteram location
 	PORT_BIT(0x4000ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("EEPROMOUT")
@@ -616,7 +616,7 @@ static INPUT_PORTS_START(sb2003)
 	PORT_DIPNAME(0x20000000, 0x00000000, "Sound Enable")
 	PORT_DIPSETTING(         0x20000000, DEF_STR(Off))
 	PORT_DIPSETTING(         0x00000000, DEF_STR(On))
-	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(limenko_state, spriteram_bit_r) //changes spriteram location
 	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1) // checked in dynabomb I/O test, but doesn't work in game
 	PORT_BIT(0x5f00ffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -654,7 +654,7 @@ static INPUT_PORTS_START(spotty)
 	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x00020000, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(limenko_state, spriteram_bit_r) //changes spriteram location
 	PORT_SERVICE_NO_TOGGLE(0x00200000, IP_ACTIVE_LOW)
 	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM) //security bit
 	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
@@ -676,19 +676,8 @@ INPUT_PORTS_END
 *****************************************************************************************************/
 
 
-static const gfx_layout tile_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8,
-};
-
 static GFXDECODE_START(gfx_limenko)
-	GFXDECODE_ENTRY("gfx", 0, tile_layout, 0, 16) /* tiles */
+	GFXDECODE_ENTRY("gfx", 0, gfx_8x8x8_raw, 0, 16) /* tiles */
 GFXDECODE_END
 
 

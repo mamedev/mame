@@ -62,7 +62,7 @@ WRITE_LINE_MEMBER(stactics_state::motor_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
+READ_LINE_MEMBER(stactics_state::motor_not_ready_r)
 {
 	// if the motor is self-centering, but not centered yet
 	return (!m_motor_on && (m_horiz_pos != 0 || m_vert_pos != 0));
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( stactics )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_motor_not_ready, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, motor_not_ready_r)
 
 	PORT_START("IN1")   /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
@@ -251,8 +251,8 @@ static INPUT_PORTS_START( stactics )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")   /* IN2 */
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_rng, nullptr)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_frame_count_d3, nullptr)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(stactics_state, get_rng)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, frame_count_d3_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
@@ -262,7 +262,7 @@ static INPUT_PORTS_START( stactics )
 
 	PORT_START("IN3")   /* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_shot_standby, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, shot_standby_r)
 	PORT_DIPNAME( 0x04, 0x04, "Number of Barriers" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x00, "6" )
@@ -274,7 +274,7 @@ static INPUT_PORTS_START( stactics )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_not_shot_arrive, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, not_shot_arrive_r)
 
 	PORT_START("FAKE")  /* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY

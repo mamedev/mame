@@ -156,10 +156,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
 	DECLARE_READ8_MEMBER(rescueb_a002_r) { return 0xfc; }
-	DECLARE_CUSTOM_INPUT_MEMBER(_4in1_fake_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(_4in1_fake_port_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(vpool_lives_r);
+	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
+	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 
 	void init_bullsdrtg();
 	void init_ladybugg();

@@ -86,7 +86,7 @@ public:
 	void init_batrider();
 	void init_enmadaio();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
+	DECLARE_READ_LINE_MEMBER(c2map_r);
 
 protected:
 	virtual void device_post_load() override;

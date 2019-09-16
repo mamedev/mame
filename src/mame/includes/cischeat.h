@@ -39,17 +39,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
-		, m_captflag_hopper(*this, "hopper")
-		, m_captflag_motor_left(*this, "motor_left")
-		, m_captflag_motor_right(*this, "motor_right")
-		, m_oki1_bank(*this, "oki1_bank")
-		, m_oki2_bank(*this, "oki2_bank")
 		, m_leds(*this, "led%u", 0U)
-	{
-		for (int side = 0; side < 2; ++side)
-			m_captflag_motor_command[side] = m_captflag_motor_pos[side] = 0;
-		m_captflag_leds = 0;
-	}
+	{}
 
 	DECLARE_WRITE16_MEMBER(scudhamm_motor_command_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_leds_w);
@@ -105,32 +96,17 @@ public:
 	void bigrun_draw_sprites(bitmap_ind16 &bitmap , const rectangle &cliprect, int priority1, int priority2);
 	void cischeat_untangle_sprites(const char *region);
 
-	DECLARE_WRITE16_MEMBER(captflag_motor_command_right_w);
-	DECLARE_WRITE16_MEMBER(captflag_motor_command_left_w);
-	void captflag_motor_move(int side, uint16_t data);
-	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_pos_r);
-	DECLARE_WRITE16_MEMBER(captflag_oki_bank_w);
-
-	DECLARE_WRITE16_MEMBER(captflag_leds_w);
-
-	void init_captflag();
-	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
 	void scudhamm(machine_config &config);
 	void armchmp2(machine_config &config);
 	void cischeat(machine_config &config);
 	void f1gpstr2(machine_config &config);
 	void f1gpstar(machine_config &config);
-	void captflag(machine_config &config);
 	void bigrun(machine_config &config);
 	void armchmp2_map(address_map &map);
 	void bigrun_map(address_map &map);
 	void bigrun_map2(address_map &map);
 	void bigrun_map3(address_map &map);
 	void bigrun_sound_map(address_map &map);
-	void captflag_map(address_map &map);
-	void captflag_oki1_map(address_map &map);
-	void captflag_oki2_map(address_map &map);
 	void cischeat_map(address_map &map);
 	void cischeat_map2(address_map &map);
 	void cischeat_map3(address_map &map);
@@ -184,18 +160,6 @@ protected:
 	optional_device<generic_latch_16_device> m_soundlatch;
 	optional_device<generic_latch_16_device> m_soundlatch2;
 
-	// captflag
-	optional_device<ticket_dispenser_device> m_captflag_hopper;
-
-	optional_device<timer_device> m_captflag_motor_left;
-	optional_device<timer_device> m_captflag_motor_right;
-	uint16_t m_captflag_motor_command[2];
-	uint16_t m_captflag_motor_pos[2];
-
-	optional_memory_bank m_oki1_bank;
-	optional_memory_bank m_oki2_bank;
-
-	uint16_t m_captflag_leds;
 	output_finder<5> m_leds;
 };
 
@@ -216,6 +180,54 @@ protected:
 
 private:
 	uint16_t m_sprite_dma_reg;
+};
+
+class captflag_state : public cischeat_state
+{
+public:
+	captflag_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cischeat_state(mconfig, type, tag)
+		, m_hopper(*this, "hopper")
+		, m_motor_left(*this, "motor_left")
+		, m_motor_right(*this, "motor_right")
+		, m_oki1_bank(*this, "oki1_bank")
+		, m_oki2_bank(*this, "oki2_bank")
+	{
+		for (int side = 0; side < 2; ++side)
+			m_motor_command[side] = m_motor_pos[side] = 0;
+		m_captflag_leds = 0;
+	}
+
+	void captflag(machine_config &config);
+	template <int N> DECLARE_READ_LINE_MEMBER(motor_busy_r);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(motor_pos_r);
+	void init_captflag();
+
+private:
+	DECLARE_WRITE16_MEMBER(motor_command_right_w);
+	DECLARE_WRITE16_MEMBER(motor_command_left_w);
+	void motor_move(int side, uint16_t data);
+	DECLARE_WRITE16_MEMBER(oki_bank_w);
+
+	DECLARE_WRITE16_MEMBER(leds_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
+
+	void captflag_map(address_map &map);
+	void oki1_map(address_map &map);
+	void oki2_map(address_map &map);
+
+	required_device<ticket_dispenser_device> m_hopper;
+
+	required_device<timer_device> m_motor_left;
+	required_device<timer_device> m_motor_right;
+
+	required_memory_bank m_oki1_bank;
+	required_memory_bank m_oki2_bank;
+
+	uint16_t m_captflag_leds;
+	uint16_t m_motor_command[2];
+	uint16_t m_motor_pos[2];
 };
 
 #endif

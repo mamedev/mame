@@ -881,51 +881,18 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout layout8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
-
-static const gfx_layout layout16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(32*8,4) },
-	{ STEP8(0,32), STEP8(64*8,32) },
-	128*8
-};
-
-static const gfx_layout robokid_layout16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(64*8,4) },
-	{ STEP16(0,32) },
-	128*8
-};
-
 static GFXDECODE_START( gfx_ninjakd2 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,    0x200, 16)    // fg
-	GFXDECODE_ENTRY( "gfx2", 0, layout16x16,  0x100, 16)    // sprites
-	GFXDECODE_ENTRY( "gfx3", 0, layout16x16,  0x000, 16)    // bg
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x200, 16)    // fg
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16)    // sprites
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16)    // bg
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_robokid )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,           0x300, 16) // fg
-	GFXDECODE_ENTRY( "gfx2", 0, robokid_layout16x16, 0x200, 16) // sprites
-	GFXDECODE_ENTRY( "gfx3", 0, robokid_layout16x16, 0x000, 16) // bg0
-	GFXDECODE_ENTRY( "gfx4", 0, robokid_layout16x16, 0x000, 16) // bg1
-	GFXDECODE_ENTRY( "gfx5", 0, robokid_layout16x16, 0x000, 16) // bg2
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,               0x300, 16) // fg
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16) // sprites
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg0
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg1
+	GFXDECODE_ENTRY( "gfx5", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16) // bg2
 GFXDECODE_END
 
 

@@ -109,12 +109,9 @@ private:
 
 	/* flags controlling how i8251_control_w operates */
 	uint8_t m_flags;
-	/* offset into sync_bytes used during sync byte transfer */
-	//uint8_t m_sync_byte_offset;
-	/* number of sync bytes written so far */
+	/* number of sync bytes programmed for sync mode (1 or 2) ; 0 = async mode */
 	uint8_t m_sync_byte_count;
 	/* the sync bytes written */
-	//uint8_t m_sync_bytes[2];
 	u8 m_sync1;
 	u16 m_sync2;
 	/* status of i8251 */

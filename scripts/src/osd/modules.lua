@@ -104,6 +104,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
 		MAME_DIR .. "src/osd/modules/input/input_winhybrid.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_uwp.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_mac.cpp",
 		MAME_DIR .. "src/osd/modules/output/output_module.h",
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/console.cpp",
@@ -115,6 +116,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/monitor/monitor_win32.cpp",
 		MAME_DIR .. "src/osd/modules/monitor/monitor_dxgi.cpp",
 		MAME_DIR .. "src/osd/modules/monitor/monitor_sdl.cpp",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_mac.cpp",
 	}
 	includedirs {
 		ext_includedir("asio"),

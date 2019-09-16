@@ -322,9 +322,9 @@ READ8_MEMBER(metro_state::soundstatus_r)
 	return (m_busy_sndcpu ? 0x00 : 0x01);
 }
 
-CUSTOM_INPUT_MEMBER(metro_state::custom_soundstatus_r)
+READ_LINE_MEMBER(metro_state::custom_soundstatus_r)
 {
-	return (m_busy_sndcpu ? 0x01 : 0x00);
+	return (m_busy_sndcpu ? 1 : 0);
 }
 
 WRITE8_MEMBER(metro_state::soundstatus_w)
@@ -1373,7 +1373,7 @@ void metro_state::vmetal_map(address_map &map)
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW,  IPT_START1   ) \
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW,  IPT_START2   ) \
 	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN  ) \
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(DEVICE_SELF, metro_state,custom_soundstatus_r, nullptr)   /* From Sound CPU */
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(metro_state, custom_soundstatus_r)   /* From Sound CPU */
 
 
 #define COINAGE_SERVICE_LOC(DIPBANK) \

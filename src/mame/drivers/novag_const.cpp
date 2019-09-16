@@ -6,6 +6,8 @@
 Novag Super Sensor IV (model 812)
 Novag Constellation (model 831)
 Novag Super Constellation (model 844)
+Novag Constellation 3.6MHz (model 845)
+Novag Constellation Quattro (model 862)
 
 The chess engine is by David Kittinger, Super Sensor IV is his first one
 working under Novag. The Constellation engine is completely different.

@@ -13,6 +13,8 @@
 #include "screen.h"
 #include "tilemap.h"
 
+struct F3config;
+
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {
 	/* Early F3 class games, these are not cartridge games and system features may be different */
@@ -130,8 +132,8 @@ public:
 	void init_scfinals();
 	void init_pbobbl2x();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
+	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
+	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
 
 protected:
@@ -276,11 +278,11 @@ protected:
 	u8 *m_tsrc_s[5];
 	u32 m_x_count[5];
 	u32 m_x_zoom[5];
-	struct tempsprite *m_spritelist;
-	const struct tempsprite *m_sprite_end;
-	struct f3_playfield_line_inf *m_pf_line_inf;
-	struct f3_spritealpha_line_inf *m_sa_line_inf;
-	const struct F3config *m_game_config;
+	std::unique_ptr<tempsprite[]> m_spritelist;
+	const tempsprite *m_sprite_end;
+	std::unique_ptr<f3_playfield_line_inf[]> m_pf_line_inf;
+	std::unique_ptr<f3_spritealpha_line_inf[]> m_sa_line_inf;
+	const F3config *m_game_config;
 	int (taito_f3_state::*m_dpix_n[8][16])(u32 s_pix);
 	int (taito_f3_state::**m_dpix_lp[5])(u32 s_pix);
 	int (taito_f3_state::**m_dpix_sp[9])(u32 s_pix);
@@ -371,8 +373,8 @@ protected:
 	inline void dpix_1_sprite(u32 s_pix);
 	inline void dpix_bg(u32 bgcolor);
 	void init_alpha_blend_func();
-	inline void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const struct f3_playfield_line_inf **line_t, const int *sprite, u32 orient, int skip_layer_num);
-	void visible_tile_check(struct f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, u16 *pf_data_n);
+	inline void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const f3_playfield_line_inf **line_t, const int *sprite, u32 orient, int skip_layer_num);
+	void visible_tile_check(f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, u16 *pf_data_n);
 	void calculate_clip(int y, u16 pri, u32* clip0, u32* clip1, int *line_enable);
 	void get_spritealphaclip_info();
 	void get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, u16 *pf_data_n);

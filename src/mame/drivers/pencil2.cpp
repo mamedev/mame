@@ -107,8 +107,8 @@ public:
 
 	void pencil2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
+	DECLARE_READ_LINE_MEMBER(printer_ready_r);
+	DECLARE_READ_LINE_MEMBER(printer_ack_r);
 
 private:
 	DECLARE_WRITE8_MEMBER(port10_w);
@@ -192,7 +192,7 @@ WRITE_LINE_MEMBER( pencil2_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-CUSTOM_INPUT_MEMBER( pencil2_state::printer_ready_r )
+READ_LINE_MEMBER( pencil2_state::printer_ready_r )
 {
 	return m_centronics_busy;
 }
@@ -202,7 +202,7 @@ WRITE_LINE_MEMBER( pencil2_state::write_centronics_ack )
 	m_centronics_ack = state;
 }
 
-CUSTOM_INPUT_MEMBER( pencil2_state::printer_ack_r )
+READ_LINE_MEMBER( pencil2_state::printer_ack_r )
 {
 	return m_centronics_ack;
 }
@@ -216,10 +216,10 @@ static INPUT_PORTS_START( pencil2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ready_r, " ")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(pencil2_state, printer_ready_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ack_r, " ")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(pencil2_state, printer_ack_r)
 
 	PORT_START("E1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j') PORT_CHAR('@')

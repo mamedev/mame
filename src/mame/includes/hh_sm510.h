@@ -24,7 +24,7 @@ public:
 		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_inp_lines(0),
 		m_inp_fixed(-1),
-		m_display_wait(33)
+		m_display_wait(16)
 	{ }
 
 	// devices
@@ -48,7 +48,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(acl_button);
 	virtual DECLARE_WRITE16_MEMBER(sm510_lcd_segment_w);
-	virtual DECLARE_WRITE8_MEMBER(sm500_lcd_segment_w);
+	virtual DECLARE_WRITE16_MEMBER(sm500_lcd_segment_w);
 	virtual DECLARE_READ8_MEMBER(input_r);
 	virtual DECLARE_WRITE8_MEMBER(input_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
@@ -58,7 +58,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(piezo2bit_input_w);
 
 	// display common
-	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 33ms)
+	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 16ms)
 	u8 m_display_x_len;             // lcd number of groups
 	u8 m_display_y_len;             // lcd number of segments
 	u8 m_display_z_len;             // lcd number of commons

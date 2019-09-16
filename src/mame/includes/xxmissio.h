@@ -24,7 +24,7 @@ public:
 
 	void xxmissio(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(status_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(status_r);
 
 protected:
 	virtual void machine_start() override;

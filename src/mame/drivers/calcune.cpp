@@ -31,12 +31,19 @@ class calcune_state : public driver_device
 public:
 	calcune_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		vdp_state(0),
 		m_maincpu(*this, "maincpu"),
-		m_vdp(*this, "gen_vdp"),
-		m_vdp2(*this, "gen_vdp2"),
-		m_palette(*this, "palette")
+		m_vdp(*this, "gen_vdp%u", 1U)
 	{ }
+
+	void init_calcune();
+
+	void calcune(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device_array<sega315_5313_device, 2> m_vdp;
+
+	int m_vdp_state;
 
 	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
 	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
@@ -47,23 +54,13 @@ public:
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
-	void init_calcune();
-
 	DECLARE_READ16_MEMBER(cal_700000_r);
 	DECLARE_WRITE16_MEMBER(cal_770000_w);
 	DECLARE_READ16_MEMBER(cal_vdp_r);
 	DECLARE_WRITE16_MEMBER(cal_vdp_w);
 
 	uint32_t screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void calcune(machine_config &config);
 	void calcune_map(address_map &map);
-private:
-	int vdp_state;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<sega315_5313_device> m_vdp;
-	required_device<sega315_5313_device> m_vdp2;
-	required_device<palette_device> m_palette;
 };
 
 
@@ -99,29 +96,23 @@ INPUT_PORTS_END
 
 READ16_MEMBER(calcune_state::cal_700000_r)
 {
-	vdp_state = 0;
+	m_vdp_state = 0;
 	return 0;
 }
 
 WRITE16_MEMBER(calcune_state::cal_770000_w)
 {
-	vdp_state = data;
+	m_vdp_state = data;
 }
 
 READ16_MEMBER(calcune_state::cal_vdp_r)
 {
-	if (!vdp_state)
-		return m_vdp->vdp_r(offset, mem_mask);
-	else
-		return m_vdp2->vdp_r(offset, mem_mask);
+	return m_vdp[m_vdp_state ? 1 : 0]->vdp_r(offset, mem_mask);
 }
 
 WRITE16_MEMBER(calcune_state::cal_vdp_w)
 {
-	if (!vdp_state)
-		m_vdp->vdp_w(offset, data, mem_mask);
-	else
-		m_vdp2->vdp_w(offset, data, mem_mask);
+	m_vdp[m_vdp_state ? 1 : 0]->vdp_w(offset, data, mem_mask);
 }
 
 void calcune_state::calcune_map(address_map &map)
@@ -147,48 +138,55 @@ void calcune_state::calcune_map(address_map &map)
 
 uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *paldata = m_palette->pens();
+	const pen_t *paldata = m_vdp[0]->gfx_palette()->pens();
+	const pen_t *paldata_s = m_vdp[0]->gfx_palette_shadow()->pens();
+	const pen_t *paldata_h = m_vdp[0]->gfx_palette_hilight()->pens();
+	const pen_t *paldata2 = m_vdp[1]->gfx_palette()->pens();
+	const pen_t *paldata2_s = m_vdp[1]->gfx_palette_shadow()->pens();
+	const pen_t *paldata2_h = m_vdp[1]->gfx_palette_hilight()->pens();
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		const unsigned palette_per_scanline = 64 * y;
+
 		uint32_t *dst = &bitmap.pix32(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int pix;
 
-			pix = m_vdp2->m_render_line_raw[x] & 0x3f;
+			pix = m_vdp[1]->m_render_line_raw[x] & 0x3f;
 
 			switch (pix & 0xc0)
 			{
 			case 0x00:
-				dst[x] = paldata[pix + 0x0000 + 0xc0];
+				dst[x] = paldata2[pix + palette_per_scanline];
 				break;
 			case 0x40:
 			case 0x80:
-				dst[x] = paldata[pix + 0x0040 + 0xc0];
+				dst[x] = paldata2_s[pix + palette_per_scanline];
 				break;
 			case 0xc0:
-				dst[x] = paldata[pix + 0x0080 + 0xc0];
+				dst[x] = paldata2_h[pix + palette_per_scanline];
 				break;
 
 			}
 
-			if (m_vdp->m_render_line_raw[x] & 0x100)
+			if (m_vdp[0]->m_render_line_raw[x] & 0x100)
 			{
-				pix = m_vdp->m_render_line_raw[x] & 0x3f;
+				pix = m_vdp[0]->m_render_line_raw[x] & 0x3f;
 				if (pix & 0xf)
 				{
 					switch (pix & 0xc0)
 					{
 					case 0x00:
-						dst[x] = paldata[pix + 0x0000];
+						dst[x] = paldata[pix + palette_per_scanline];
 						break;
 					case 0x40:
 					case 0x80:
-						dst[x] = paldata[pix + 0x0040];
+						dst[x] = paldata_s[pix + palette_per_scanline];
 						break;
 					case 0xc0:
-						dst[x] = paldata[pix + 0x0080];
+						dst[x] = paldata_h[pix + palette_per_scanline];
 						break;
 					}
 				}
@@ -201,8 +199,8 @@ uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb3
 
 MACHINE_RESET_MEMBER(calcune_state,calcune)
 {
-	m_vdp->device_reset_old();
-	m_vdp2->device_reset_old();
+	m_vdp[0]->device_reset_old();
+	m_vdp[1]->device_reset_old();
 }
 
 
@@ -210,12 +208,12 @@ IRQ_CALLBACK_MEMBER(calcune_state::genesis_int_callback)
 {
 	if (irqline==4)
 	{
-		m_vdp->vdp_clear_irq4_pending();
+		m_vdp[0]->vdp_clear_irq4_pending();
 	}
 
 	if (irqline==6)
 	{
-		m_vdp->vdp_clear_irq6_pending();
+		m_vdp[0]->vdp_clear_irq6_pending();
 	}
 
 	return (0x60+irqline*4)/4; // vector address
@@ -245,8 +243,10 @@ WRITE_LINE_MEMBER(calcune_state::vdp_lv4irqline_callback_genesis_68k)
 
 MACHINE_START_MEMBER(calcune_state,calcune)
 {
-	m_vdp->stop_timers();
-	m_vdp2->stop_timers();
+	m_vdp[0]->stop_timers();
+	m_vdp[1]->stop_timers();
+	m_vdp_state = 0;
+	save_item(NAME(m_vdp_state));
 }
 
 void calcune_state::calcune(machine_config &config)
@@ -268,33 +268,27 @@ void calcune_state::calcune(machine_config &config)
 	screen.set_visarea(0, 40*8-1, 0, 28*8-1);
 	screen.set_screen_update(FUNC(calcune_state::screen_update_calcune));
 
-	SEGA315_5313(config, m_vdp, OSC1_CLOCK, m_maincpu);
-	m_vdp->set_is_pal(false);
-	m_vdp->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
-	m_vdp->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
-	m_vdp->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
-	m_vdp->set_alt_timing(1);
-	m_vdp->set_pal_write_base(0x0000);
-	m_vdp->set_palette(m_palette);
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	SEGA315_5313(config, m_vdp[0], OSC1_CLOCK, m_maincpu);
+	m_vdp[0]->set_is_pal(false);
+	m_vdp[0]->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp[0]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
+	m_vdp[0]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp[0]->set_alt_timing(1);
+	m_vdp[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	SEGA315_5313(config, m_vdp2, OSC1_CLOCK, m_maincpu);
-	m_vdp2->set_is_pal(false);
+	SEGA315_5313(config, m_vdp[1], OSC1_CLOCK, m_maincpu);
+	m_vdp[1]->set_is_pal(false);
 //  are these not hooked up or should they OR with the other lines?
-//  m_vdp2->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
-//  m_vdp2->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
-//  m_vdp2->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
-	m_vdp2->set_alt_timing(1);
-	m_vdp2->set_pal_write_base(0x0c0);
-	m_vdp2->set_palette(m_palette);
-	m_vdp2->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+//  m_vdp[1]->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
+//  m_vdp[1]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
+//  m_vdp[1]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp[1]->set_alt_timing(1);
+	m_vdp[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
+	TIMER(config, "scantimer").configure_scanline("gen_vdp1", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 	TIMER(config, "scantimer2").configure_scanline("gen_vdp2", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
-
-	PALETTE(config, m_palette).set_entries(0xc0*2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -309,15 +303,15 @@ void calcune_state::calcune(machine_config &config)
 
 void calcune_state::init_calcune()
 {
-	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(false);
-	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(262);
+	m_vdp[0]->set_use_cram(1);
+	m_vdp[0]->set_vdp_pal(false);
+	m_vdp[0]->set_framerate(60);
+	m_vdp[0]->set_total_scanlines(262);
 
-	m_vdp2->set_use_cram(1);
-	m_vdp2->set_vdp_pal(false);
-	m_vdp2->set_framerate(60);
-	m_vdp2->set_total_scanlines(262);
+	m_vdp[1]->set_use_cram(1);
+	m_vdp[1]->set_vdp_pal(false);
+	m_vdp[1]->set_framerate(60);
+	m_vdp[1]->set_total_scanlines(262);
 }
 
 ROM_START( calcune )

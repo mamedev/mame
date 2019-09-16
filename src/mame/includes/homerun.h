@@ -32,9 +32,9 @@ public:
 	void dynashot(machine_config &config);
 	void homerun(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sprite0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(homerun_d7756_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_d7756_busy_r);
+	DECLARE_READ_LINE_MEMBER(sprite0_r);
+	DECLARE_READ_LINE_MEMBER(homerun_d7756_busy_r);
+	DECLARE_READ_LINE_MEMBER(ganjaja_d7756_busy_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
 
 protected:

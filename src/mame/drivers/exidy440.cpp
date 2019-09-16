@@ -271,13 +271,13 @@ INPUT_CHANGED_MEMBER(exidy440_state::coin_inserted)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(exidy440_state::firq_beam_r)
+READ_LINE_MEMBER(exidy440_state::firq_beam_r)
 {
 	return m_firq_beam;
 }
 
 
-CUSTOM_INPUT_MEMBER(exidy440_state::firq_vblank_r)
+READ_LINE_MEMBER(exidy440_state::firq_vblank_r)
 {
 	return m_firq_vblank;
 }
@@ -530,8 +530,8 @@ static INPUT_PORTS_START( crossbow )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -571,8 +571,8 @@ static INPUT_PORTS_START( cheyenne )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -612,8 +612,8 @@ static INPUT_PORTS_START( combat )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -653,8 +653,8 @@ static INPUT_PORTS_START( catch22 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -696,8 +696,8 @@ static INPUT_PORTS_START( cracksht )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -734,8 +734,8 @@ static INPUT_PORTS_START( claypign )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -776,8 +776,8 @@ static INPUT_PORTS_START( chiller )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -815,8 +815,8 @@ static INPUT_PORTS_START( topsecex )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -852,7 +852,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hitnmiss )
 	PORT_START("IN0")       /* player inputs and logic board dips */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,hitnmiss_button1_r, nullptr)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exidy440_state, hitnmiss_button1_r)
 	PORT_DIPNAME( 0x0c, 0x00, "Seconds" )
 	PORT_DIPSETTING(    0x04, "20" )
 	PORT_DIPSETTING(    0x00, "30" )
@@ -863,8 +863,8 @@ static INPUT_PORTS_START( hitnmiss )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -896,7 +896,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( whodunit )
 	PORT_START("IN0")       /* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "2" )
@@ -908,8 +908,8 @@ static INPUT_PORTS_START( whodunit )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE
@@ -947,8 +947,8 @@ static INPUT_PORTS_START( showdown )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_beam_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy440_state,firq_vblank_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_beam_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(exidy440_state, firq_vblank_r)
 
 	PORT_START("IN1")       /* audio board dips */
 	COINAGE

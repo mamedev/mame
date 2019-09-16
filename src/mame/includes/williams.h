@@ -287,7 +287,7 @@ public:
 
 	void tshoot(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
