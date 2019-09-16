@@ -16,7 +16,7 @@
 const options_entry osd_options::s_option_entries[] =
 {
 	{ nullptr,                               nullptr,           OPTION_HEADER,    "OSD KEYBOARD MAPPING OPTIONS" },
-#if defined(SDLMAME_MACOSX) || defined(OSD_SDL)
+#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
 	{ OSDOPTION_UIMODEKEY,                   "DEL",             OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #else
 	{ OSDOPTION_UIMODEKEY,                   "SCRLOCK",         OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
