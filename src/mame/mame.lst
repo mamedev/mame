@@ -2474,7 +2474,6 @@ headg2							// 286 motherboards with Headland G2 chipset
 mb1212c							// Biostar MB-1212C motherboard (286)
 bam16a0							// VIP-M21502A BAM16-A0 motherboard (286)
 cmpa286							// CMP enterprise CO.LTD. motherboard (286)
-chips8220							// 286 motherboards with the original Chips chipset
 suntac5							// 286 motherboards using the 5-chip SUNTAC chipset
 ht12a                           // 286 motherboards using the Headland HT12/A chipset
 vlsi5							// 286 motherboards using the 5-chip VLSI chipset
@@ -31654,6 +31653,10 @@ sicpc1605                       // Siemens Sicomp PC16-05
 ssam88s                         //
 sx16                            // Sanyo SX-16
 zdsupers                        //
+ledgmodm						// Leading Edge Model M
+eaglepc2						// Eagle PC-2
+mpx16							// Ciarcia's Circuit Cellar Micromint MPX-16
+hstrtpls						// Vendex HeadStart Plus
 
 @source:pc100.cpp
 pc100                           //
