@@ -322,6 +322,10 @@ void archimedes_state::archimedes_init()
 	m_snd_timer->adjust(attotime::never);
 }
 
+// TODO: access level permissions against current ARM mode
+// 1x SVC can r/w, OS read only, punt if user mode
+// 01 SVC and OS can r/w, user read only, punt otherwise
+// 00 free for all
 READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
 {
 	uint32_t page, poffs;
@@ -350,6 +354,8 @@ READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
 		else
 		{
 			//printf("ARCHIMEDES_MEMC: Reading unmapped page %02x\n",page);
+			if (!machine().side_effects_disabled())
+				m_maincpu->data_abort_w(ASSERT_LINE);
 			return 0xdeadbeef;
 		}
 	}
@@ -367,6 +373,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_logical_w)
 	// if the boot ROM is mapped, ignore writes
 	if (m_memc_latchrom)
 	{
+		// TODO: verify if this causes data abort or not
 		return;
 	}
 	else
@@ -383,6 +390,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_logical_w)
 		}
 		else
 		{
+			if (!machine().side_effects_disabled())
+				m_maincpu->data_abort_w(ASSERT_LINE);
 			//printf("ARCHIMEDES_MEMC: Writing unmapped page %02x, what do we do?\n",page);
 		}
 	}
@@ -423,6 +432,7 @@ READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
 			In this state, DRAM memory space is disabled.
 
 			****************************************************************************************/
+			// TODO: make this an override of above
 			if(!(m_memc_pages[page] & 0x10)  && (offset <= 0x3ff))
 				return 0xEAD0000A;
 			return m_archimedes_memc_physmem[((m_memc_pages[page] * page_sizes[m_memc_pagesize]) + poffs)>>2];
@@ -430,6 +440,8 @@ READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
 		else
 		{
 			//printf("ARCHIMEDES_MEMC: Reading unmapped page %02x\n",page);
+			if (!machine().side_effects_disabled())
+				m_maincpu->data_abort_w(ASSERT_LINE);
 			return 0xdeadbeef;
 		}
 	}

@@ -451,8 +451,8 @@ void arm_cpu_device::execute_run()
 
 void arm_cpu_device::HandleTrap(uint8_t vector)
 {
-	if (vector == 0x04)
-		printf("%08x\n",R15&0x3fffffc);
+//	if (vector == 0x04)
+//		printf("%08x\n",R15&0x3fffffc);
 	
 	uint32_t pc = R15+4;
 	R15 = eARM_MODE_SVC;    /* Set SVC mode so PC is saved to correct R14 bank */
@@ -460,6 +460,18 @@ void arm_cpu_device::HandleTrap(uint8_t vector)
 	R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|(vector)|eARM_MODE_SVC|I_MASK|(pc&MODE_MASK);
 
 	m_icount -= 2 * S_CYCLE + N_CYCLE;
+}
+
+WRITE_LINE_MEMBER( arm_cpu_device::data_abort_w )
+{
+	if (state)
+	{
+		//printf("%08x\n",R15 & 0x3fffffc);
+		R15 -= 4;
+		// TODO: it's really vector 0x10
+		HandleTrap(0x10-4);
+		//machine().debug_break();
+	}
 }
 
 void arm_cpu_device::arm_check_irq_state()
@@ -1522,7 +1534,7 @@ bool arm_cpu_device::HandleCoProVL86C020( uint32_t insn )
 		// TODO: check for user mode, throw access violation
 		m_coproFPcr = GetRegister(rn);
 		// TODO: check what it tries to do
-		printf("%08x:  WFC write %08x\n", R15 & 0x3fffffc, m_coproFPcr);
+		//printf("%08x:  WFC write %08x\n", R15 & 0x3fffffc, m_coproFPcr);
 	}
 	// RFC - Read Floating Point Control
 	else if ( (insn&0x0fff0fff) == 0x0e500110)
@@ -1532,10 +1544,10 @@ bool arm_cpu_device::HandleCoProVL86C020( uint32_t insn )
 	}
 	else
 	{
-		printf("%08x OPCODE\n",insn);
+		//printf("%08x OPCODE\n",insn);
 		HandleTrap(0x04);
-		if ((insn & 0x0e000000) == 0x0e000000)
-			machine().debug_break();
+		//if ((insn & 0x0e000000) == 0x0e000000)
+		//	machine().debug_break();
 		// HandleFPU(insn);
 		//printf("%08x:  Unimplemented VL86C020 copro instruction %08x %d %d\n", R15 & 0x3ffffff, insn,rn,crn);
 		

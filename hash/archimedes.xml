@@ -218,7 +218,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- jumps to lalaland, has trainer -->
+	<!-- Black screen, trips unimplemented opcode, has trainer -->
+	<!-- (pressing any key returns to RiscOS with an Atomic logo quickly destroyed) -->
 	<software name="aggress" supported="no">
 		<description>Aggressor</description>
 		<year>1992</year>
@@ -302,8 +303,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- jumps to lalaland -->
-	<software name="aliped" supported="no">
+	<!-- boot OK, has RMW bugs during scroll, cannot pickup items? (key on top of stairs) -->
+	<software name="aliped" supported="partial">
 		<description>Aliped</description>
 		<year>1990</year>
 		<publisher>Archimedes World</publisher>
@@ -314,7 +315,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- jumps to lalaland -->
+	<!-- boot OK, has RMW bugs during scroll, cannot pickup items? (key on top of stairs) -->
 	<software name="alipeda" cloneof="aliped" supported="no">
 		<description>Aliped (Alt)</description>
 		<year>1990</year>
@@ -1076,11 +1077,12 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- jumps to lalaland -->
+	<!-- Throws "Internal error: abort on data transfer at &01D04E50" exception -->
 	<software name="elite" supported="no">
 		<description>Elite</description>
 		<year>1991</year>
 		<publisher>Hybrid Technology</publisher>
+		<info name="usage" value="Requires 1MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="814080">
 				<rom name="elite (1991)(hybrid technology).adf" size="814080" crc="c4c32b35" sha1="fde0f540e0d5732646c1eebb54629a162f40db91" />
@@ -1088,11 +1090,12 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- jumps to lalaland -->
+	<!-- Throws "Internal error: abort on data transfer at &01D04E50" exception -->
 	<software name="elitea" cloneof="elite" supported="no">
 		<description>Elite (Alt)</description>
 		<year>1991</year>
 		<publisher>Hybrid Technology</publisher>
+		<info name="usage" value="Requires 1MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="archimedes elite (1991)(hybrid technology).adf" size="819200" crc="156d7bd6" sha1="49c495bc8001141fecce35469c3de976aae8b32b" />
@@ -1315,7 +1318,9 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Most executables either jump to lalaland or exceptions with "unrecoverable error" -->
+	<!-- !Flight throws "No stack for trap handler" exception -->
+	<!-- !Shape and !World have a "fatal internal error (type=3)" -->
+	<!-- !View loads but cannot be put into view? -->
 	<software name="flsimtkit" supported="no">
 		<description>Flight Sim Toolkit</description>
 		<year>1991</year>
@@ -1776,8 +1781,10 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Attempting to change inputs causes a jump to lalaland, fire key not recognized by the game, using joystick actually routes to mouse (with wrong inputs) -->
-	<software name="losttmpl" supported="no">
+	<!-- Changing inputs causes a "Sprite doesn't exist" if space key is pressed and a system hang -->
+	<!-- using "joystick 1" actually routes to mouse, need to select joystick 2 for actual joystick routing -->
+	<!-- mouse inputs are quite erratic -->
+	<software name="losttmpl" supported="partial">
 		<description>Legend of the Lost Temple</description>
 		<year>1992</year>
 		<publisher>Eterna</publisher>
@@ -2650,7 +2657,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- "Internal error: branch through zero" exception, after tripping an unemulated COPRO opcode -->
+	<!-- "Internal error: undefined instruction at &181F190" exception with RiscOS reset. -->
 	<software name="starf3k" supported="no">
 		<description>Star Fighter 3000</description>
 		<year>1994</year>
@@ -2669,8 +2676,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- jumps to lalaland when starting a game -->
-	<software name="starf3kd" supported="no">
+	<!-- boot OK, requires that the BGM fully plays on "WFE" boot screen -->
+	<software name="starf3kd" supported="yes">
 		<description>Star Fighter 3000 (Demo)</description>
 		<year>1994</year>
 		<publisher>Fednet</publisher>
@@ -2943,7 +2950,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- "Not enough memory in module area" when launched with !Boot, jumps to lalaland after some gameplay time -->
+	<!-- "Not enough memory in module area" when launched with !Boot -->
+	<!-- "No memory in system sprite area" when launched with Loader or Game -->
 	<software name="whitema2" supported="no">
 		<description>White Magic 2</description>
 		<year>1989</year>
@@ -3496,12 +3504,14 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Jumps to lalaland -->
+	<!-- "trap while in trap handler" at "TIME ZONE is loading" screen -->
+	<!-- Using alt method !Run2 with described steps causes "No stack for trap handler" -->
 	<software name="timezone" supported="no">
 		<description>Time Zone</description>
 		<year>19??</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="author" value="Cobra" />
+		<info name="usage" value="Requires 2MB RAM, 1MB requires trick described in ZoneHelp file"/>	
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="time zone (19xx)(cobra).adf" size="819200" crc="a21f92e4" sha1="371b30787a782cb1fe6cb6ad2217a832a06e1e96" />
