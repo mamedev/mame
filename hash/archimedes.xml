@@ -218,7 +218,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Black screen, trips unimplemented opcode, has trainer -->
+	<!-- Black screen, trips COPRO unimplemented opcode, has trainer -->
 	<!-- (pressing any key returns to RiscOS with an Atomic logo quickly destroyed) -->
 	<software name="aggress" supported="no">
 		<description>Aggressor</description>
