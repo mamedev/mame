@@ -73,7 +73,6 @@ protected:
 	uint32_t m_coproRegister[16];
 	uint8_t m_pendingIrq;
 	uint8_t m_pendingFiq;
-	uint8_t m_pendingDataAbort;
 	address_space *m_program;
 	std::function<u32 (offs_t)> m_pr32;
 	endianness_t m_endian;

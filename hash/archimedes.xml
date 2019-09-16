@@ -316,7 +316,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- boot OK, has RMW bugs during scroll, cannot pickup items? (key on top of stairs) -->
-	<software name="alipeda" cloneof="aliped" supported="no">
+	<software name="alipeda" cloneof="aliped" supported="partial">
 		<description>Aliped (Alt)</description>
 		<year>1990</year>
 		<publisher>Archimedes World</publisher>
