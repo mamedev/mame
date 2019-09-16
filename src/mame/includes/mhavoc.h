@@ -85,8 +85,8 @@ private:
 	optional_device_array<pokey_device, 4> m_pokey;
 	optional_device<tms5220_device> m_tms;
 	output_finder<2> m_lamps;
-	required_ioport m_coin;
-	required_ioport m_service;
+	optional_ioport m_coin;
+	optional_ioport m_service;
 
 	uint8_t m_alpha_data;
 	uint8_t m_alpha_rcvd;
