@@ -344,22 +344,6 @@ void primask_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 len
 
 
 
-// ----- scanline extraction -----
-
-// copy pixels from a single scanline of a bitmap to an 8bpp buffer
-void extract_scanline8(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u8 *destptr);
-void extract_scanline8(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u8 *destptr);
-
-// copy pixels from a single scanline of a bitmap to a 16bpp buffer
-void extract_scanline16(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u16 *destptr);
-void extract_scanline16(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u16 *destptr);
-
-// copy pixels from a single scanline of a bitmap to a 32bpp buffer
-void extract_scanline32(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u32 *destptr);
-void extract_scanline32(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u32 *destptr);
-
-
-
 // ----- bitmap copying -----
 
 // copy from one bitmap to another, copying all unclipped pixels

@@ -1975,59 +1975,6 @@ void primask_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 len
 
 
 /***************************************************************************
-    EXTRACT_SCANLINE IMPLEMENTATIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    extract_scanline8 - copy pixels from a single
-    scanline of a bitmap to an 8bpp buffer
--------------------------------------------------*/
-
-void extract_scanline8(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u8 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u16);
-}
-
-void extract_scanline8(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u8 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u32);
-}
-
-
-/*-------------------------------------------------
-    extract_scanline16 - copy pixels from a single
-    scanline of a bitmap to a 16bpp buffer
--------------------------------------------------*/
-
-void extract_scanline16(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u16 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u16);
-}
-
-void extract_scanline16(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u16 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u32);
-}
-
-
-/*-------------------------------------------------
-    extract_scanline32 - copy pixels from a single
-    scanline of a bitmap to a 32bpp buffer
--------------------------------------------------*/
-
-void extract_scanline32(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u32 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u16);
-}
-
-void extract_scanline32(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u32 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u32);
-}
-
-
-
-/***************************************************************************
     COPYBITMAP IMPLEMENTATIONS
 ***************************************************************************/
 

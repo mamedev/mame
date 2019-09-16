@@ -68,6 +68,8 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 #include "drawgfxm.h"
 #include "includes/psikyosh.h"
 
+#include <algorithm>
+
 static constexpr u32 BG_TRANSPEN = 0x00ff00ff; // used for representing transparency in temporary bitmaps
 
 //#define DEBUG_KEYS
@@ -340,7 +342,7 @@ void psikyosh_state::draw_bglayerscroll(u8 const layer, bitmap_rgb32 &bitmap, co
 
 			if ((tilebank >= 0x0a) && (tilebank <= 0x1f)) /* 20 banks of 0x800 bytes. filter garbage. */
 			{
-				s16 const tilemap_scanline = (scanline - scrolly + 0x400) & (height - 1);
+				u16 const tilemap_scanline = (scanline - scrolly + 0x400) & (height - 1);
 
 				// render reelvant tiles to temp bitmap, assume bank changes infrequently/never. render alpha as per-pen
 				cache_bitmap(tilemap_scanline, gfx, size, tilebank, alpha, last_bank);
@@ -349,7 +351,7 @@ void psikyosh_state::draw_bglayerscroll(u8 const layer, bitmap_rgb32 &bitmap, co
 				g_profiler.start(PROFILER_USER2);
 				u32 tilemap_line[32 * 16];
 				u32 scr_line[64 * 8];
-				extract_scanline32(m_bg_bitmap, 0, tilemap_scanline, 0x200, tilemap_line);
+				std::copy_n(&m_bg_bitmap.pix32(tilemap_scanline, 0), 0x200, tilemap_line);
 				g_profiler.stop();
 
 				/* slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
