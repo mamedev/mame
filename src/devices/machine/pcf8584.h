@@ -20,7 +20,7 @@
 **********************************************************************/
 
 #ifndef MAME_MACHINE_PCF8584_H
-#define MAME_MACHINE_PCF8584_H 1
+#define MAME_MACHINE_PCF8584_H
 
 #pragma once
 

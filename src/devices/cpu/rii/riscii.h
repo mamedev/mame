@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #ifndef MAME_CPU_RII_RISCII_H
-#define MAME_CPU_RII_RISCII_H 1
+#define MAME_CPU_RII_RISCII_H
 
 #pragma once
 
