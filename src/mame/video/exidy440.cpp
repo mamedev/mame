@@ -260,10 +260,10 @@ TIMER_CALLBACK_MEMBER(exidy440_state::beam_firq_callback)
 	}
 
 	/* round the x value to the nearest byte */
-	param = (param + 1) / 2;
+	uint8_t rounded_x = (param + 1) / 2;
 
 	/* latch the x value; this convolution comes from the read routine */
-	m_latched_x = (param + 3) ^ 2;
+	m_latched_x = (rounded_x + 3) ^ 2;
 
 	if (m_beam_firq_count++ < 12)
 		m_beam_firq_timer->adjust(m_screen->scan_period(), param);
