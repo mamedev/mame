@@ -98,7 +98,9 @@ private:
 	uint8_t m_firq_select;
 	uint8_t m_palettebank_io;
 	uint8_t m_palettebank_vis;
+	emu_timer *m_beam_firq_timer;
 	emu_timer *m_collide_firq_timer;
+	uint8_t m_beam_firq_count;
 };
 
 
