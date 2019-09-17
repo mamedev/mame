@@ -190,10 +190,16 @@
 #include "sound/sn76496.h"
 
 #include "bus/ti99/internal/genboard.h"
+#include "bus/ti99/internal/genkbd.h"
 
 #include "bus/ti99/colorbus/colorbus.h"
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/peb/peribox.h"
+
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/pcxt83.h"
+#include "bus/pc_kbd/keytro.h"
 
 #include "speaker.h"
 
@@ -201,11 +207,20 @@
 #define LOG_READY   (1U<<2)
 #define LOG_LINES   (1U<<3)
 #define LOG_CRU     (1U<<4)
+#define LOG_CRUKEY  (1U<<5)
 
 // Minimum log should be settings and warnings
 #define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
+
+
+void geneve_xt_keyboards(device_slot_interface &device)
+{
+	device.option_add(STR_KBD_KEYTRONIC_PC3270, PC_KBD_KEYTRONIC_PC3270);
+	device.option_add(STR_KBD_IBM_PC_XT_83, PC_KBD_IBM_PC_XT_83);
+	device.option_add(STR_KBD_GENEVE_XT_101_HLE, KBD_GENEVE_XT_101_HLE);
+}
 
 class geneve_state : public driver_device
 {
@@ -214,11 +229,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
 		m_tms9901(*this, TI_TMS9901_TAG),
-		m_keyboard(*this, GENEVE_KEYBOARD_TAG),
-		m_mapper(*this, GENEVE_MAPPER_TAG),
+		m_gatearray(*this, GENEVE_GATE_ARRAY_TAG),
 		m_peribox(*this, TI_PERIBOX_TAG),
 		m_joyport(*this, TI_JOYPORT_TAG),
 		m_colorbus(*this, COLORBUS_TAG),
+		m_kbdconn(*this, GENEVE_KEYBOARD_CONN_TAG),
 		m_left_button(0)
 	{
 	}
@@ -240,8 +255,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(VDP_reset);
 	DECLARE_WRITE_LINE_MEMBER(joystick_select);
 	DECLARE_WRITE_LINE_MEMBER(extbus_wait_states);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_reset);
 	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
 	DECLARE_WRITE_LINE_MEMBER(left_mouse_button);
+
+	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_line);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_data_line);
 
 	DECLARE_WRITE_LINE_MEMBER(clock_out);
 
@@ -253,16 +272,17 @@ private:
 
 	required_device<tms9995_device>         m_cpu;
 	required_device<tms9901_device>         m_tms9901;
-	required_device<bus::ti99::internal::geneve_keyboard_device> m_keyboard;
-	required_device<bus::ti99::internal::geneve_mapper_device>   m_mapper;
-	required_device<bus::ti99::peb::peribox_device>         m_peribox;
-	required_device<bus::ti99::joyport::joyport_device>    m_joyport;
+	required_device<bus::ti99::internal::geneve_gate_array_device>    m_gatearray;
+	required_device<bus::ti99::peb::peribox_device>               m_peribox;
+	required_device<bus::ti99::joyport::joyport_device>           m_joyport;
 	required_device<bus::ti99::colorbus::v9938_colorbus_device>   m_colorbus;
+	required_device<pc_kbdc_device>   m_kbdconn;
 
 	DECLARE_WRITE_LINE_MEMBER( inta );
 	DECLARE_WRITE_LINE_MEMBER( intb );
 	DECLARE_WRITE_LINE_MEMBER( ext_ready );
 	DECLARE_WRITE_LINE_MEMBER( mapper_ready );
+	DECLARE_WRITE_LINE_MEMBER( keyboard_int );
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -291,12 +311,12 @@ private:
 
 void geneve_state::memmap(address_map &map)
 {
-	map(0x0000, 0xffff).rw(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::readm), FUNC(bus::ti99::internal::geneve_mapper_device::writem));
+	map(0x0000, 0xffff).rw(GENEVE_GATE_ARRAY_TAG, FUNC(bus::ti99::internal::geneve_gate_array_device::readm), FUNC(bus::ti99::internal::geneve_gate_array_device::writem));
 }
 
 void geneve_state::memmap_setaddress(address_map &map)
 {
-	map(0x0000, 0xffff).w(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::setaddress));
+	map(0x0000, 0xffff).w(GENEVE_GATE_ARRAY_TAG, FUNC(bus::ti99::internal::geneve_gate_array_device::setaddress));
 }
 
 /*
@@ -316,7 +336,7 @@ void geneve_state::crumap(address_map &map)
 static INPUT_PORTS_START(geneve_common)
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x03, GENEVE_EPROM, "Boot from" ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 3)
+	PORT_CONFNAME( 0x03, GENEVE_EPROM, "Boot from" ) PORT_CHANGED_MEMBER(GENEVE_GATE_ARRAY_TAG, bus::ti99::internal::geneve_gate_array_device, settings_changed, 3)
 		PORT_CONFSETTING( GENEVE_EPROM, "EPROM" )
 		PORT_CONFSETTING( GENEVE_PFM512, "PFM 512" )
 		PORT_CONFSETTING( GENEVE_PFM512A, "PFM 512A" )
@@ -343,10 +363,10 @@ static INPUT_PORTS_START(genmod)
 	PORT_INCLUDE(geneve_common)
 
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GENEVE_GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::genmod_mapper_device, setgm_changed, 1)
+	PORT_DIPNAME( GENEVE_GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CHANGED_MEMBER(GENEVE_GATE_ARRAY_TAG, bus::ti99::internal::genmod_gate_array_device, setgm_changed, 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GENEVE_GM_TIM, GENEVE_GM_TIM, "Genmod TI mode") PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::genmod_mapper_device, setgm_changed, 2)
+	PORT_DIPNAME( GENEVE_GM_TIM, GENEVE_GM_TIM, "Genmod TI mode") PORT_CHANGED_MEMBER(GENEVE_GATE_ARRAY_TAG, bus::ti99::internal::genmod_gate_array_device, setgm_changed, 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TIM, DEF_STR( On ))
 
@@ -389,36 +409,36 @@ void geneve_state::cruwrite(offs_t offset, uint8_t data)
 			LOGMASKED(LOG_CRU, "Set capslock flag = %02x\n", data);
 			break;
 		case 8:
-			LOGMASKED(LOG_CRU, "Set keyboard clock flag = %02x\n", data);
-			m_keyboard->clock_control((data!=0)? ASSERT_LINE : CLEAR_LINE);
+			LOGMASKED(LOG_CRUKEY, "Set keyboard clock = %02x\n", data);
+			m_gatearray->set_keyboard_clock(data);
 			break;
 		case 9:
-			LOGMASKED(LOG_CRU, "Set keyboard scan flag = %02x\n", data);
-			m_keyboard->send_scancodes((data!=0)? ASSERT_LINE : CLEAR_LINE);
+			LOGMASKED(LOG_CRUKEY, "Enable keyboard shift reg = %02x\n", data);
+			m_gatearray->enable_shift_register(data);
 			break;
 		case 10:
 			LOGMASKED(LOG_CRU, "Geneve mode = %02x\n", data);
-			m_mapper->set_geneve_mode(data!=0);
+			m_gatearray->set_geneve_mode(data!=0);
 			break;
 		case 11:
 			LOGMASKED(LOG_CRU, "Direct mode = %02x\n", data);
-			m_mapper->set_direct_mode(data!=0);
+			m_gatearray->set_direct_mode(data!=0);
 			break;
 		case 12:
 			LOGMASKED(LOG_CRU, "Cartridge size 8K = %02x\n", data);
-			m_mapper->set_cartridge_size((data!=0)? 0x2000 : 0x4000);
+			m_gatearray->set_cartridge_size((data!=0)? 0x2000 : 0x4000);
 			break;
 		case 13:
 			LOGMASKED(LOG_CRU, "Cartridge writable 6000 = %02x\n", data);
-			m_mapper->set_cartridge_writable(0x6000, (data!=0));
+			m_gatearray->set_cartridge_writable(0x6000, (data!=0));
 			break;
 		case 14:
 			LOGMASKED(LOG_CRU, "Cartridge writable 7000 = %02x\n", data);
-			m_mapper->set_cartridge_writable(0x7000, (data!=0));
+			m_gatearray->set_cartridge_writable(0x7000, (data!=0));
 			break;
 		case 15:
 			LOGMASKED(LOG_CRU, "Extra wait states = %02x\n", data==0);
-			m_mapper->set_extra_waitstates(data==0);  // let's use the inverse semantics
+			m_gatearray->set_extra_waitstates(data==0);  // let's use the inverse semantics
 			break;
 		default:
 			LOGMASKED(LOG_WARN, "set CRU address %04x=%02x ignored\n", addroff, data);
@@ -531,6 +551,7 @@ WRITE_LINE_MEMBER( geneve_state::joystick_select )
 	m_joyport->write_port((state==ASSERT_LINE)? 1:2);
 }
 
+
 /*
     Write external mem cycles (0=long, 1=short)
 */
@@ -546,8 +567,16 @@ WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
 WRITE_LINE_MEMBER( geneve_state::video_wait_states )
 {
 	LOGMASKED(LOG_LINES, "Video wait states set to %d\n", state);
-	m_mapper->set_video_waitstates(state==ASSERT_LINE);
+	m_gatearray->set_video_waitstates(state==ASSERT_LINE);
 	m_video_wait = (state!=0)? ASSERT_LINE : CLEAR_LINE;
+}
+
+/*
+   Keyboard reset (active low).
+*/
+WRITE_LINE_MEMBER( geneve_state::keyboard_reset )
+{
+	LOGMASKED(LOG_CRUKEY, "Keyboard reset %d\n", state);
 }
 
 /*
@@ -635,7 +664,7 @@ void geneve_state::external_operation(offs_t offset, uint8_t data)
 WRITE_LINE_MEMBER( geneve_state::clock_out )
 {
 	m_tms9901->phi_line(state);
-	m_mapper->clock_in(state);
+	m_gatearray->clock_in(state);
 }
 
 void geneve_state::init_geneve()
@@ -679,9 +708,10 @@ void geneve_state::geneve(machine_config &config)
 {
 	geneve_common(config);
 
-	// Mapper
-	GENEVE_MAPPER(config, m_mapper, 0);
-	m_mapper->ready_cb().set(FUNC(geneve_state::mapper_ready));
+	// Gate array
+	GENEVE_GATE_ARRAY(config, m_gatearray, 0);
+	m_gatearray->ready_cb().set(FUNC(geneve_state::mapper_ready));
+	m_gatearray->kbdint_cb().set(FUNC(geneve_state::keyboard_interrupt));
 
 	// Peripheral expansion box (Geneve composition)
 	TI99_PERIBOX_GEN(config, m_peribox, 0);
@@ -695,8 +725,9 @@ void geneve_state::genmod(machine_config &config)
 	geneve_common(config);
 
 	// Mapper
-	GENMOD_MAPPER(config, m_mapper, 0);
-	m_mapper->ready_cb().set(FUNC(geneve_state::mapper_ready));
+	GENMOD_GATE_ARRAY(config, m_gatearray, 0);
+	m_gatearray->ready_cb().set(FUNC(geneve_state::mapper_ready));
+	m_gatearray->kbdint_cb().set(FUNC(geneve_state::keyboard_interrupt));
 
 	// Peripheral expansion box (Geneve composition with Genmod and plugged-in Memex)
 	TI99_PERIBOX_GENMOD(config, m_peribox, 0);
@@ -737,12 +768,12 @@ void geneve_state::geneve_common(machine_config &config)
 	m_tms9901->p_out_cb(0).set(FUNC(geneve_state::peripheral_bus_reset));
 	m_tms9901->p_out_cb(1).set(FUNC(geneve_state::VDP_reset));
 	m_tms9901->p_out_cb(2).set(FUNC(geneve_state::joystick_select));
-	m_tms9901->p_out_cb(4).set(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::pfm_select_lsb));
-	m_tms9901->p_out_cb(5).set(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::pfm_output_enable));
-	m_tms9901->p_out_cb(6).set(GENEVE_KEYBOARD_TAG, FUNC(bus::ti99::internal::geneve_keyboard_device::reset_line));
+	m_tms9901->p_out_cb(4).set(GENEVE_GATE_ARRAY_TAG, FUNC(bus::ti99::internal::geneve_gate_array_device::pfm_select_lsb));
+	m_tms9901->p_out_cb(5).set(GENEVE_GATE_ARRAY_TAG, FUNC(bus::ti99::internal::geneve_gate_array_device::pfm_output_enable));
+	m_tms9901->p_out_cb(6).set(FUNC(geneve_state::keyboard_reset));
 	m_tms9901->p_out_cb(7).set(FUNC(geneve_state::extbus_wait_states));
 	m_tms9901->p_out_cb(9).set(FUNC(geneve_state::video_wait_states));
-	m_tms9901->p_out_cb(13).set(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::pfm_select_msb));
+	m_tms9901->p_out_cb(13).set(GENEVE_GATE_ARRAY_TAG, FUNC(bus::ti99::internal::geneve_gate_array_device::pfm_select_msb));
 	m_tms9901->intreq_cb().set(FUNC(geneve_state::tms9901_interrupt));
 
 	// Clock
@@ -754,8 +785,12 @@ void geneve_state::geneve_common(machine_config &config)
 	soundgen.ready_cb().set(FUNC(geneve_state::ext_ready));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
-	// User interface devices
-	GENEVE_KEYBOARD(config, m_keyboard, 0).int_cb().set(FUNC(geneve_state::keyboard_interrupt));
+	// User interface devices: PC-style keyboard, joystick port, mouse connector
+	PC_KBDC(config, m_kbdconn, 0);
+	PC_KBDC_SLOT(config, "kbd", geneve_xt_keyboards, STR_KBD_GENEVE_XT_101_HLE).set_pc_kbdc_slot(m_kbdconn);
+	m_kbdconn->out_clock_cb().set(GENEVE_GATE_ARRAY_TAG, FUNC(bus::ti99::internal::geneve_gate_array_device::kbdclk));
+	m_kbdconn->out_data_cb().set(GENEVE_GATE_ARRAY_TAG, FUNC(bus::ti99::internal::geneve_gate_array_device::kbddata));
+
 	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
 	V9938_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, nullptr);
 	m_colorbus->extra_button_cb().set(FUNC(geneve_state::left_mouse_button));
