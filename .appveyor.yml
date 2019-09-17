@@ -8,6 +8,20 @@ image:
 shallow_clone: true
 clone_depth: 1
 
+environment:
+  matrix:
+    - BUILD: GCC
+    - BUILD: MSVC
+
+matrix:
+  exclude:
+    - image: Visual Studio 2017 Preview
+      BUILD: GCC
+    - image: Visual Studio 2019 Preview
+      BUILD: GCC
+    - image: Previous Visual Studio 2017
+      BUILD: GCC
+
 install:
   - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
   - set MSYSTEM=MINGW64
@@ -16,6 +30,14 @@ install:
 build_script:
   - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=0 vs2017 -j4"
   - msbuild "build\projects\windows\mametiny\vs2017\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+for:
+  -
+    matrix:
+      only:
+        - BUILD: GCC
+    build_script:
+      - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 OPTIMIZE=0 DEBUG=1 ARCHOPTS=-Wa,-mbig-obj -j4"
 
 test_script:
   - \projects\mame\mametiny64d.exe -validate
