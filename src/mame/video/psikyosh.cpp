@@ -65,7 +65,7 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 */
 
 #include "emu.h"
-#include "drawgfxm.h"
+#include "drawgfxt.ipp"
 #include "includes/psikyosh.h"
 
 #include <algorithm>
@@ -76,7 +76,7 @@ static constexpr u32 BG_TRANSPEN = 0x00ff00ff; // used for representing transpar
 //#define DEBUG_MESSAGE
 
 // take ARGB pixel with stored alpha and blend in to RGB32 bitmap
-#define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, PRIORITY, SOURCE)                             \
+#define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, SOURCE)                             \
 do                                                                                                  \
 {                                                                                                   \
 	const rgb_t srcdata = (SOURCE);                                                                      \
@@ -85,7 +85,7 @@ do                                                                              
 }                                                                                                   \
 while (0)
 // take RGB pixel with separate alpha and blend in to RGB32 bitmap
-#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, PRIORITY, SOURCE)                                \
+#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, SOURCE)                                \
 do                                                                                                  \
 {                                                                                                   \
 	const u32 srcdata = (SOURCE);                                                                      \
@@ -94,7 +94,7 @@ do                                                                              
 }                                                                                                   \
 while (0)
 // take ARGB pixel with stored alpha and copy in to RGB32 bitmap, scipping BG_TRANSPEN
-#define PIXEL_OP_COPY_TRANSPEN_RENDER32(DEST, PRIORITY, SOURCE)                             \
+#define PIXEL_OP_COPY_TRANSPEN_RENDER32(DEST, SOURCE)                             \
 do                                                                                                  \
 {                                                                                                   \
 	const u32 srcdata = (SOURCE);                                                                      \
@@ -171,10 +171,7 @@ static inline void pixop_transparent_alphatable(u8 source, u32 *dest, const pen_
 -------------------------------------------------*/
 void psikyosh_state::draw_scanline32_alpha(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, int alpha)
 {
-	DECLARE_NO_PRIORITY;
-	u32 const transpen = BG_TRANSPEN;
-
-	DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32, NO_PRIORITY);
+	drawscanline_core(bitmap, destx, desty, length, srcptr, [alpha, transpen = BG_TRANSPEN](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(destp, srcp); });
 }
 
 /*-------------------------------------------------
@@ -183,10 +180,7 @@ void psikyosh_state::draw_scanline32_alpha(bitmap_rgb32 &bitmap, s32 destx, s32 
 -------------------------------------------------*/
 void psikyosh_state::draw_scanline32_argb(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr)
 {
-	DECLARE_NO_PRIORITY;
-	u32 const transpen = BG_TRANSPEN;
-
-	DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32, NO_PRIORITY);
+	drawscanline_core(bitmap, destx, desty, length, srcptr, [transpen = BG_TRANSPEN](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(destp, srcp); });
 }
 
 /*-------------------------------------------------
@@ -195,10 +189,7 @@ void psikyosh_state::draw_scanline32_argb(bitmap_rgb32 &bitmap, s32 destx, s32 d
 -------------------------------------------------*/
 void psikyosh_state::draw_scanline32_transpen(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr)
 {
-	DECLARE_NO_PRIORITY;
-	u32 const transpen = BG_TRANSPEN;
-
-	DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_TRANSPEN_RENDER32, NO_PRIORITY);
+	drawscanline_core(bitmap, destx, desty, length, srcptr, [transpen = BG_TRANSPEN](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_RENDER32(destp, srcp); });
 }
 
 

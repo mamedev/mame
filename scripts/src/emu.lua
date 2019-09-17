@@ -105,7 +105,7 @@ files {
 	MAME_DIR .. "src/emu/divtlb.h",
 	MAME_DIR .. "src/emu/drawgfx.cpp",
 	MAME_DIR .. "src/emu/drawgfx.h",
-	MAME_DIR .. "src/emu/drawgfxm.h",
+	MAME_DIR .. "src/emu/drawgfxt.ipp",
 	MAME_DIR .. "src/emu/driver.cpp",
 	MAME_DIR .. "src/emu/driver.h",
 	MAME_DIR .. "src/emu/drivenum.cpp",
