@@ -1625,7 +1625,7 @@ void gfx_element::alphastore(bitmap_rgb32 &dest, const rectangle &cliprect,
 		return;
 
 	if (fixedalpha >= 0)
-		drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [paldata, alpha = fixedalpha, alphatable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANS0_ALPHASTORE32(destp, srcp); });
+		drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [paldata, alpha = fixedalpha](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANS0_ALPHASTORE32(destp, srcp); });
 	else
 		drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [paldata, alphatable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32(destp, srcp); });
 }
@@ -1660,7 +1660,7 @@ void gfx_element::alphatable(bitmap_rgb32 &dest, const rectangle &cliprect,
 	if (has_pen_usage() && (pen_usage(code) & ~(1 << 0)) == 0)
 		return;
 
-	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [paldata, fixedalpha, alphatable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(destp, srcp); });
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [paldata, alphatable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(destp, srcp); });
 }
 
 
