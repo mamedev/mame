@@ -1218,6 +1218,8 @@ tya_imp
 
 #   exceptions
 reset
+	prefetch_noirq();
+	prefetch_noirq();
 	read(SP); dec_SP();
 	read(SP); dec_SP();
 	read(SP); dec_SP();
