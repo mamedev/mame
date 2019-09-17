@@ -1218,6 +1218,8 @@ tya_imp
 
 #   exceptions
 reset
+	read_pc_noinc();
+	read_pc_noinc();
 	read(SP); dec_SP();
 	read(SP); dec_SP();
 	read(SP); dec_SP();
