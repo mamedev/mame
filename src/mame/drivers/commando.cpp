@@ -44,6 +44,16 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 ***************************************************************************/
 
+// Notes by Jose Tejada (jotego):
+// The main CPU frequency is 3 MHz, after a two-stage FF clock divider.
+// The CPU clock is gated by bus arbitrion logic. The CPU clock is halted until
+// video hardware has an opening in memory access, then the CPU is allowed to
+// access common memory. This slows down the CPU but doesn't alter its basic 3MHz frequency.
+//
+// There is also a DMA circuit that copies object data from the CPU RAM to a buffer
+// this also slows down the CPU as it is halted during that time.
+
+
 #include "emu.h"
 #include "includes/commando.h"
 
@@ -66,6 +76,7 @@ void commando_state::commando_map(address_map &map)
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc804, 0xc804).w(FUNC(commando_state::commando_c804_w));
+	// 0xc806 triggers the DMA (not emulated)
 	map(0xc808, 0xc809).w(FUNC(commando_state::commando_scrollx_w));
 	map(0xc80a, 0xc80b).w(FUNC(commando_state::commando_scrolly_w));
 	map(0xd000, 0xd3ff).ram().w(FUNC(commando_state::commando_videoram2_w)).share("videoram2");
@@ -225,7 +236,9 @@ GFXDECODE_END
 
 #define XTAL        12000000
 #define PHI_B       XTAL/2/2
-#define PHI_MAIN    4000000 // ??? too complicated to trace from schematics
+#define PHI_MAIN    XTAL/2/2 // As seen in the schematics:
+// the signal goes into a bus arbitrion logic that doesn't affect its frequency
+// although the CPU gets slowed down when accessing char/background memories
 
 /* Interrupt Generator */
 
@@ -255,7 +268,7 @@ void commando_state::machine_reset()
 void commando_state::commando(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, PHI_MAIN);  // ???
+	Z80(config, m_maincpu, PHI_MAIN);  // 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &commando_state::commando_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &commando_state::decrypted_opcodes_map);
 
@@ -518,6 +531,44 @@ ROM_START( commandob2 )
 	ROM_LOAD( "commandob2_pal16l8.bin", 0x000000, 0x000104, CRC(bdbcaf02) SHA1(148591f95a343c8ffa2eaa02764c91557aa523d3) )
 ROM_END
 
+// mix of ROMs from Mercenario and other commando bootlegs, only the first maincpu ROM is unique
+ROM_START( commandob3 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_LOAD( "b5.10n",  0x0000, 0x4000, CRC(df8f4e9a) SHA1(72f08dc70a72c183c3f071ed47b1d060516e545a) ) // like mercenario but for byte 0x00 changed to the encrypted one
+	ROM_LOAD( "b4.9n",   0x4000, 0x4000, CRC(aca99905) SHA1(609cf3d180ceb0c67e2deff9db16fa56c8948a97) ) // like mercenario
+	ROM_LOAD( "b3.8n",   0x8000, 0x4000, CRC(35486542) SHA1(531a85c9e03970ce037be84f2240c2df6f6e3ec1) ) // like commandob
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b2.9f",   0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )    // 2c.9f
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "b1.5d",   0x0000, 0x4000, CRC(505726e0) SHA1(2435c87c9c9d78a6e703cf0e1f6a0288207fcd4c) )    // characters
+
+	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_LOAD( "b12.5a",  0x00000, 0x4000, CRC(7b2e1b48) SHA1(5d49e1d8146e4ef744445b68f35677302e875a85) )   // 11c.5a
+	ROM_LOAD( "b13.6a",  0x04000, 0x4000, CRC(81b417d3) SHA1(5ec7e3f0c8069384a5f6eb39232c228b9d7b8c0c) )   // 12c.6a
+	ROM_LOAD( "b14.7a",  0x08000, 0x4000, CRC(5612dbd2) SHA1(9e4e1a22b6cbf60607b9a81dae34482ae55f7c47) )   // 13c.7a
+	ROM_LOAD( "b15.8a",  0x0c000, 0x4000, CRC(2b2dee36) SHA1(8792278464fa3da47176582025f6673a15a581e2) )   // 14c.8a
+	ROM_LOAD( "b16.9a",  0x10000, 0x4000, CRC(de70babf) SHA1(6717e23baf55f84d3143fb432140a7c3e102ac26) )   // 15c.9a
+	ROM_LOAD( "b17.10a", 0x14000, 0x4000, CRC(14178237) SHA1(f896e71c7004349c9a46155edfd9f0aaa186065d) )   // 16c.10a
+
+	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_LOAD( "b6.7e",   0x00000, 0x4000, CRC(79f16e3d) SHA1(04e1f03a4d6b4cc2b81bce3a290bbb95de900d35) )   // 5c.7e
+	ROM_LOAD( "b7.8e",   0x04000, 0x4000, CRC(26fee521) SHA1(2fbfc73ee860f72a20229a01d4da9f5cc2e858d3) )   // 6c.8e
+	ROM_LOAD( "b8.9e",   0x08000, 0x4000, CRC(ca88bdfd) SHA1(548b05460bc7983cc81f15c70e87f47d10db2812) )   // 7c.9e
+	ROM_LOAD( "b9.7h",   0x0c000, 0x4000, CRC(2019c883) SHA1(883c0156ceab99f4849fe36972c4162b4ac8c216) )   // 8c.7h
+	ROM_LOAD( "b10.8h",  0x10000, 0x4000, CRC(98703982) SHA1(ba9a9b0dcadd4f52502828408c4a19b0bd518351) )   // 9c.8h
+	ROM_LOAD( "b11.9h",  0x14000, 0x4000, CRC(f069d2f8) SHA1(2c92300a9407470b34965021de882f1f7a84730c) )   // 10c.9h
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "vtb1.1d", 0x0000, 0x0100, CRC(3aba15a1) SHA1(8b057f6e26155dd9e48bde182e680fce4519f600) )    /* red */
+	ROM_LOAD( "vtb2.2d", 0x0100, 0x0100, CRC(88865754) SHA1(ca6dddca98baf00a65b2fb70b69cf4704ef8c831) )    /* green */
+	ROM_LOAD( "vtb3.3d", 0x0200, 0x0100, CRC(4c14c3f6) SHA1(644ac17c7413f094ec9a15cba87bbd421b26321f) )    /* blue */
+	ROM_LOAD( "vtb4.1h", 0x0300, 0x0100, CRC(b388c246) SHA1(038f9851699331ad887b6281a9df053dca3db8fd) )    /* palette selector (not used) */
+	ROM_LOAD( "vtb5.6l", 0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
+	ROM_LOAD( "vtb6.6e", 0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
+ROM_END
+
 ROM_START( commandou2 )
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "uc4.9m",   0x0000, 0x8000, CRC(89ee8e17) SHA1(68db271af8b0f400ca95df5672983bfb87f3f84a) )
@@ -630,7 +681,7 @@ ROM_START( mercenario )
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "4ac.bin",  0x0000, 0x4000, CRC(59ebf408) SHA1(ce2c06580a9fc902b1f6409249f25eba8216af8a) )
 	ROM_LOAD( "4bc.bin",  0x4000, 0x4000, CRC(aca99905) SHA1(609cf3d180ceb0c67e2deff9db16fa56c8948a97) )
-	ROM_LOAD( "3c.8m",    0x8000, 0x4000, CRC(f998d08a) SHA1(05d86daeaaffbf5f67c77b630b91064c9ae7b6d4) )
+	ROM_LOAD( "b3.8n",    0x8000, 0x4000, CRC(f998d08a) SHA1(05d86daeaaffbf5f67c77b630b91064c9ae7b6d4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cm02.9f",  0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )    // 2c.9f
@@ -699,6 +750,7 @@ GAME( 1985, commandou2, commando, commando, commando, commando_state, init_comma
 GAME( 1985, commandoj,  commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Senjou no Ookami", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, commandob,  commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Commando (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, commandob2, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg", "Commando (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob3, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg", "Commando (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sinvasn,    commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Space Invasion (Europe)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sinvasnb,   commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, mercenario, commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Mercenario (Commando bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -16,10 +16,10 @@
 #include "pstring.h"
 #include "putil.h"
 
-#include <cwchar>
 #include <memory>
 
 #ifdef _WIN32
+#include <cwchar>
 #define PMAIN(appclass) \
 extern "C" int wmain(int argc, wchar_t *argv[]) { return plib::app::mainrun<appclass, wchar_t>(argc, argv); }
 #else

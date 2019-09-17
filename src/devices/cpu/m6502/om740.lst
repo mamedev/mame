@@ -114,7 +114,7 @@ jmp_zpi
 	prefetch();
 
 reset740
-	PC = read_arg(0xfffe);
+	P |= F_I; PC = read_arg(0xfffe);
 	PC = set_h(PC, read_arg(0xffff));
 	prefetch();
 	inst_state = -1;

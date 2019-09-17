@@ -46,11 +46,12 @@ enum iodevice_t
 	IO_QUICKLOAD,   /* 12 - Allow to load program/data into memory, without matching any actual device */
 	IO_MEMCARD,     /* 13 - Memory card */
 	IO_CDROM,       /* 14 - optical CD-ROM disc */
-	IO_MAGTAPE,     /* 15 - Magentic tape */
+	IO_MAGTAPE,     /* 15 - Magnetic tape */
 	IO_ROM,         /* 16 - Individual ROM image - the Amstrad CPC has a few applications that were sold on 16kB ROMs */
 	IO_MIDIIN,      /* 17 - MIDI In port */
 	IO_MIDIOUT,     /* 18 - MIDI Out port */
-	IO_COUNT        /* 19 - Total Number of IO_devices for searching */
+	IO_PICTURE,     /* 19 - A single-frame image */
+	IO_COUNT        /* 20 - Total Number of IO_devices for searching */
 };
 
 enum image_error_t
@@ -203,7 +204,7 @@ public:
 
 	const std::string &instance_name() const { return m_instance_name; }
 	const std::string &brief_instance_name() const { return m_brief_instance_name; }
-	const std::string &cannonical_instance_name() const { return m_canonical_instance_name; }
+	const std::string &canonical_instance_name() const { return m_canonical_instance_name; }
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 

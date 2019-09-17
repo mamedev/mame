@@ -10,7 +10,7 @@
 #include "includes/sorcerer.h"
 #include "machine/z80bin.h"
 
-
+// ************ TIMERS **************
 /* timer for sorcerer serial chip transmit and receive */
 
 TIMER_CALLBACK_MEMBER(sorcerer_state::serial_tc)
@@ -144,9 +144,9 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_reset)
 	membank("boot")->set_entry(0);
 }
 
-
+// ************ EXIDY VIDEO UNIT FDC **************
 // The floppy sector has been read. Enable CPU.
-WRITE_LINE_MEMBER(sorcerer_state::intrq_w)
+WRITE_LINE_MEMBER(sorcerer_state::intrq2_w)
 {
 	m_intrq_off = state ? false : true;
 	if (state)
@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER(sorcerer_state::intrq_w)
 }
 
 // The next byte from floppy is available. Enable CPU so it can get the byte.
-WRITE_LINE_MEMBER(sorcerer_state::drq_w)
+WRITE_LINE_MEMBER(sorcerer_state::drq2_w)
 {
 	m_drq_off = state ? false : true;
 	if (state)
@@ -183,7 +183,7 @@ WRITE_LINE_MEMBER(sorcerer_state::drq_w)
 // Signals are unknown so guess
 // It outputs 24 or 25 when booting, so suppose that
 // bit 0 = enable wait generator, bit 2 = drive 0 select, bit 5 = ??
-WRITE8_MEMBER(sorcerer_state::port_2c_w)
+WRITE8_MEMBER(sorcerer_state::port2c_w)
 {
 	m_2c = data;
 
@@ -212,6 +212,105 @@ WRITE8_MEMBER(sorcerer_state::port_2c_w)
 	m_fdc2->dden_w(0);   // assume double density ? //!BIT(data, 0));
 }
 
+// ************ DREAMDISK FDC **************
+// Dreamdisk interrupts
+WRITE_LINE_MEMBER(sorcerer_state::intrq4_w)
+{
+	if (state && m_halt)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+READ8_MEMBER(sorcerer_state::port48_r)
+{
+	return m_port48;
+}
+
+WRITE8_MEMBER(sorcerer_state::port48_w)
+{
+	m_port48 = data;
+	data ^= 0x1f;
+	floppy_image_device *floppy = nullptr;
+
+	if (BIT(data, 0)) floppy = m_floppy40->get_device();
+	if (BIT(data, 1)) floppy = m_floppy41->get_device();
+
+	m_fdc4->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 4));
+	}
+
+	m_fdc4->dden_w(BIT(data, 5));
+	m_fdc4->enmf_w(BIT(data, 6));  // also connected to unsupported 5/8 pin.
+}
+
+// ************ DIGITRIO FDC **************
+READ8_MEMBER(sorcerer_state::port34_r)
+{
+	u8 data = m_port34;
+	data |= m_fdc3->intrq_r() ? 0x80 : 0;
+	//data |= m_floppy->twosid_r() ? 0 : 0x20; // for 20cm disks only, 0=indicates the disk has 2 sides (drive has 2 heads?)
+	return data;
+}
+
+WRITE8_MEMBER(sorcerer_state::port34_w)
+{
+	m_port34 = data & 0x5f;
+	floppy_image_device *floppy = nullptr;
+
+	if (BIT(data, 0)) floppy = m_floppy30->get_device();
+	if (BIT(data, 1)) floppy = m_floppy31->get_device();
+
+	m_fdc3->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 5));
+	}
+
+	m_fdc3->dden_w(BIT(data, 6));
+	m_fdc3->set_unscaled_clock (BIT(data, 4) ? 2'000'000 : 1'000'000);
+}
+
+// ************ DIGITRIO DMA **************
+WRITE_LINE_MEMBER( sorcerer_state::busreq_w )
+{
+// since our Z80 has no support for BUSACK, we assume it is granted immediately
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this? - yes
+	m_dma->bai_w(state); // tell dma that bus has been granted
+}
+
+READ8_MEMBER(sorcerer_state::memory_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(sorcerer_state::memory_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	prog_space.write_byte(offset, data);
+}
+
+READ8_MEMBER(sorcerer_state::io_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(sorcerer_state::io_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	prog_space.write_byte(offset, data);
+}
+
+// ************ INBUILT PORTS **************
 WRITE8_MEMBER(sorcerer_state::port_fd_w)
 {
 	/* Translate data to control signals */
@@ -340,6 +439,64 @@ READ8_MEMBER(sorcerer_state::port_fe_r)
 	return data;
 }
 
+// ************ MACHINE **************
+void sorcerer_state::machine_start_common(u16 endmem)
+{
+	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
+	m_serial_timer = timer_alloc(TIMER_SERIAL);
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	/* configure RAM */
+	switch (m_ram->size())
+	{
+	case 8*1024:
+		space.unmap_readwrite(0x2000, endmem);
+		break;
+
+	case 16*1024:
+		space.unmap_readwrite(0x4000, endmem);
+		break;
+
+	case 32*1024:
+		space.unmap_readwrite(0x8000, endmem);
+		break;
+	}
+
+	if (m_cart && m_cart->exists())
+		space.install_read_handler(0xc000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+}
+
+void sorcerer_state::machine_start()
+{
+	machine_start_common(0xbfff);
+}
+
+MACHINE_START_MEMBER(sorcerer_state,sorcererd)
+{
+	machine_start_common(0xbbff);
+}
+
+void sorcerer_state::machine_reset()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	/* Initialize cassette interface */
+	m_cass_data.output.length = 0;
+	m_cass_data.output.level = 1;
+	m_cass_data.input.length = 0;
+	m_cass_data.input.bit = 1;
+
+	m_drq_off = true;
+	m_intrq_off = true;
+	m_wait = false;
+	m_fe = 0xff;
+	m_2c = 0;
+	port_fe_w(space, 0, 0, 0xff);
+
+	membank("boot")->set_entry(1);
+	timer_set(attotime::from_usec(10), TIMER_RESET);
+}
+
 /******************************************************************************
  Snapshot Handling
 ******************************************************************************/
@@ -390,83 +547,6 @@ SNAPSHOT_LOAD_MEMBER(sorcerer_state::snapshot_cb)
 	m_maincpu->set_pc(header[26] | (header[27] << 8));
 
 	return image_init_result::PASS;
-}
-
-void sorcerer_state::machine_start()
-{
-	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
-	m_serial_timer = timer_alloc(TIMER_SERIAL);
-
-	uint16_t endmem = 0xbfff;
-
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	/* configure RAM */
-	switch (m_ram->size())
-	{
-	case 8*1024:
-		space.unmap_readwrite(0x2000, endmem);
-		break;
-
-	case 16*1024:
-		space.unmap_readwrite(0x4000, endmem);
-		break;
-
-	case 32*1024:
-		space.unmap_readwrite(0x8000, endmem);
-		break;
-	}
-
-	if (m_cart->exists())
-		space.install_read_handler(0xc000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
-}
-
-MACHINE_START_MEMBER(sorcerer_state,sorcererd)
-{
-	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
-	m_serial_timer = timer_alloc(TIMER_SERIAL);
-
-	uint16_t endmem = 0xbbff;
-
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	/* configure RAM */
-	switch (m_ram->size())
-	{
-	case 8*1024:
-		space.unmap_readwrite(0x2000, endmem);
-		break;
-
-	case 16*1024:
-		space.unmap_readwrite(0x4000, endmem);
-		break;
-
-	case 32*1024:
-		space.unmap_readwrite(0x8000, endmem);
-		break;
-	}
-
-	if (m_cart->exists())
-		space.install_read_handler(0xc000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
-}
-
-void sorcerer_state::machine_reset()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* Initialize cassette interface */
-	m_cass_data.output.length = 0;
-	m_cass_data.output.level = 1;
-	m_cass_data.input.length = 0;
-	m_cass_data.input.bit = 1;
-
-	m_drq_off = true;
-	m_intrq_off = true;
-	m_wait = false;
-	m_fe = 0xff;
-	m_2c = 0;
-	port_fe_w(space, 0, 0, 0xff);
-
-	membank("boot")->set_entry(1);
-	timer_set(attotime::from_usec(10), TIMER_RESET);
 }
 
 

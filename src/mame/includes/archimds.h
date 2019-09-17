@@ -60,6 +60,7 @@ public:
 		m_region_vram(*this, "vram"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_joy(*this, "joy_p%u",1),
 		m_dac(*this, { "dac0", "dac1", "dac2", "dac3", "dac4", "dac5", "dac6", "dac7" })
 		{ }
 
@@ -91,7 +92,7 @@ public:
 	uint8_t m_i2c_clk;
 	int16_t m_memc_pages[0x2000]; // the logical RAM area is 32 megs, and the smallest page size is 4k
 	uint32_t m_vidc_regs[256];
-	uint8_t m_cursor_vram[0x200];
+	uint8_t m_cursor_vram[0x8000]; // size -> max(VCER) - min(VCSR) * 32 = 0x7fe0
 	uint8_t m_ioc_regs[0x80/4];
 	uint8_t m_vidc_bpp_mode;
 	uint8_t m_vidc_interlace;
@@ -110,6 +111,7 @@ protected:
 	required_memory_region m_region_vram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_ioport_array<2> m_joy;
 	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
 
 private:
@@ -144,6 +146,7 @@ private:
 	emu_timer *m_vbl_timer;
 	uint8_t m_floppy_select;
 	bool check_floppy_ready();
+	uint8_t m_joy_serial_data;
 };
 
 /* IOC registers */

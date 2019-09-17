@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_dsr );
 	DECLARE_WRITE_LINE_MEMBER( write_txc );
 	DECLARE_WRITE_LINE_MEMBER( write_rxc );
+	DECLARE_WRITE_LINE_MEMBER( write_syn );
 
 	DECLARE_READ_LINE_MEMBER(txrdy_r);
 
@@ -86,9 +87,10 @@ protected:
 
 	enum
 	{
-		I8251_EXPECTING_MODE = 0x01,
-		I8251_EXPECTING_SYNC_BYTE = 0x02,
-				I8251_DELAYED_TX_EN = 0x04
+		I8251_NEXT_COMMAND = 0,
+		I8251_NEXT_MODE,
+		I8251_NEXT_SYNC1,
+		I8251_NEXT_SYNC2,
 	};
 
 private:
@@ -100,25 +102,30 @@ private:
 	devcb_write_line m_txempty_handler;
 	devcb_write_line m_syndet_handler;
 
+	void sync1_rxc();
+	void sync2_rxc();
+	void update_syndet(bool voltage);
+	bool calc_parity(u8 ch);
+
 	/* flags controlling how i8251_control_w operates */
 	uint8_t m_flags;
-	/* offset into sync_bytes used during sync byte transfer */
-	uint8_t m_sync_byte_offset;
-	/* number of sync bytes written so far */
+	/* number of sync bytes programmed for sync mode (1 or 2) ; 0 = async mode */
 	uint8_t m_sync_byte_count;
 	/* the sync bytes written */
-	uint8_t m_sync_bytes[2];
+	u8 m_sync1;
+	u16 m_sync2;
 	/* status of i8251 */
 	uint8_t m_status;
 	uint8_t m_command;
 	/* mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous */
 	uint8_t m_mode_byte;
+	bool m_delayed_tx_en;
 
-	int m_cts;
-	int m_dsr;
-	int m_rxd;
-	int m_rxc;
-	int m_txc;
+	bool m_cts;
+	bool m_dsr;
+	bool m_rxd;
+	bool m_rxc;
+	bool m_txc;
 	int m_rxc_count;
 	int m_txc_count;
 	int m_br_factor;
@@ -127,6 +134,18 @@ private:
 	uint8_t m_rx_data;
 		/* tx buffer */
 	uint8_t m_tx_data;
+	void sync1_w(uint8_t data);
+	void sync2_w(uint8_t data);
+	uint8_t m_sync8;
+	uint16_t m_sync16;
+	// 1 = ext sync enabled via command
+	bool m_syndet_pin;
+	bool m_hunt_on;
+	// 1 = ext syndet pin has been set high; 0 = hunt mode activated
+	bool m_ext_syn_set;
+	// count of rxd bits
+	u8 m_rxd_bits;
+	u8 m_data_bits_count;
 };
 
 class v5x_scu_device :  public i8251_device

@@ -204,7 +204,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 READ32_MEMBER(hpc1_device::read)
 {
 	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
-		return m_rtc->read(space, offset - 0xe00/4);
+		return m_rtc->read(offset - 0xe00/4);
 
 	switch (offset)
 	{
@@ -331,7 +331,7 @@ WRITE32_MEMBER(hpc1_device::write)
 {
 	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
 	{
-		m_rtc->write(space, offset - 0xe00/4, (uint8_t)data);
+		m_rtc->write(offset - 0xe00/4, (uint8_t)data);
 		return;
 	}
 

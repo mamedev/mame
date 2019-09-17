@@ -28,6 +28,7 @@ TODO:
 #include "cpu/mb88xx/mb88xx.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class cswat_state : public driver_device

@@ -1400,18 +1400,18 @@ void debugger_commands::execute_bplist(int ref, const std::vector<std::string> &
 
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
-		if (device.debug()->breakpoint_first() != nullptr)
+		if (!device.debug()->breakpoint_list().empty())
 		{
 			m_console.printf("Device '%s' breakpoints:\n", device.tag());
 
 			/* loop over the breakpoints */
-			for (device_debug::breakpoint *bp = device.debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
+			for (const device_debug::breakpoint &bp : device.debug()->breakpoint_list())
 			{
-				buffer = string_format("%c%4X @ %0*X", bp->enabled() ? ' ' : 'D', bp->index(), device.debug()->logaddrchars(), bp->address());
-				if (std::string(bp->condition()).compare("1") != 0)
-					buffer.append(string_format(" if %s", bp->condition()));
-				if (std::string(bp->action()).compare("") != 0)
-					buffer.append(string_format(" do %s", bp->action()));
+				buffer = string_format("%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
+				if (std::string(bp.condition()).compare("1") != 0)
+					buffer.append(string_format(" if %s", bp.condition()));
+				if (std::string(bp.action()).compare("") != 0)
+					buffer.append(string_format(" do %s", bp.action()));
 				m_console.printf("%s\n", buffer.c_str());
 				printed++;
 			}
@@ -1700,16 +1700,16 @@ void debugger_commands::execute_rplist(int ref, const std::vector<std::string> &
 
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
-		if (device.debug()->registerpoint_first() != nullptr)
+		if (!device.debug()->registerpoint_list().empty())
 		{
 			m_console.printf("Device '%s' registerpoints:\n", device.tag());
 
 			/* loop over the breakpoints */
-			for (device_debug::registerpoint *rp = device.debug()->registerpoint_first(); rp != nullptr; rp = rp->next())
+			for (const device_debug::registerpoint &rp : device.debug()->registerpoint_list())
 			{
-				buffer = string_format("%c%4X if %s", rp->enabled() ? ' ' : 'D', rp->index(), rp->condition());
-				if (rp->action() != nullptr)
-					buffer.append(string_format(" do %s", rp->action()));
+				buffer = string_format("%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
+				if (rp.action() != nullptr)
+					buffer.append(string_format(" do %s", rp.action()));
 				m_console.printf("%s\n", buffer.c_str());
 				printed++;
 			}
@@ -1849,7 +1849,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	switch (space->addr_shift())
 	{
 	case -3:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u64 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1858,7 +1858,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		}
 		break;
 	case -2:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u32 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1867,7 +1867,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		}
 		break;
 	case -1:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1876,7 +1876,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		}
 		break;
 	case  0:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u8 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1887,7 +1887,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	case  3:
 		offset &= ~15;
 		endoffset &= ~15;
-		for (offs_t i = offset; i != endoffset; i+=16)
+		for (u64 i = offset; i != endoffset; i+=16)
 		{
 			offs_t curaddr = i;
 			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1944,7 +1944,7 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 	// determine the addresses to read
 	endoffset = (offset + length - 1) & space->addrmask();
 	offset = offset & space->addrmask();
-	offs_t i = 0;
+	u64 i = 0;
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
 	switch (space->addr_shift())
 	{
@@ -2089,7 +2089,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	auto dis = space->device().machine().disable_side_effects();
 	bool be = space->endianness() == ENDIANNESS_BIG;
 
-	for (offs_t i = offset; i <= endoffset; i += rowsize)
+	for (u64 i = offset; i <= endoffset; i += rowsize)
 	{
 		output.clear();
 		output.rdbuf()->clear();

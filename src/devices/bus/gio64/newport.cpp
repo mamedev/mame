@@ -47,7 +47,7 @@
 #define LOG_REJECTS     (1 << 9)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP | LOG_XMAP | LOG_REX3 | LOG_RAMDAC | LOG_COMMANDS | LOG_REJECTS)
 
-#define VERBOSE         (LOG_REX3 | LOG_CMAP | LOG_XMAP | LOG_COMMANDS)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(XMAP9,      xmap9_device,      "xmap9",      "SGI XMAP9")
@@ -87,6 +87,28 @@ void xmap9_device::device_reset()
 	m_popup_cmap = 0;
 	m_mode_table_idx = 0;
 	memset(m_mode_table, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_mode_table));
+}
+
+void xmap9_device::serialize(FILE *file)
+{
+	fwrite(&m_config, sizeof(uint32_t), 1, file);
+	fwrite(&m_revision, sizeof(uint32_t), 1, file);
+	fwrite(&m_fifo_available, sizeof(uint32_t), 1, file);
+	fwrite(&m_cursor_cmap, sizeof(uint32_t), 1, file);
+	fwrite(&m_popup_cmap, sizeof(uint32_t), 1, file);
+	fwrite(&m_mode_table_idx, sizeof(uint32_t), 1, file);
+	fwrite(m_mode_table, sizeof(uint32_t), 0x20, file);
+}
+
+void xmap9_device::deserialize(FILE *file)
+{
+	fread(&m_config, sizeof(uint32_t), 1, file);
+	fread(&m_revision, sizeof(uint32_t), 1, file);
+	fread(&m_fifo_available, sizeof(uint32_t), 1, file);
+	fread(&m_cursor_cmap, sizeof(uint32_t), 1, file);
+	fread(&m_popup_cmap, sizeof(uint32_t), 1, file);
+	fread(&m_mode_table_idx, sizeof(uint32_t), 1, file);
+	fread(&m_mode_table, sizeof(uint32_t), 0x20, file);
 }
 
 uint32_t xmap9_device::read(uint32_t offset)
@@ -214,6 +236,22 @@ void cmap_device::device_reset()
 	memset(m_palette, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_palette));
 }
 
+void cmap_device::serialize(FILE *file)
+{
+	fwrite(&m_status, sizeof(uint32_t), 1, file);
+	fwrite(&m_revision, sizeof(uint32_t), 1, file);
+	fwrite(&m_palette_idx, sizeof(uint16_t), 1, file);
+	fwrite(m_palette, sizeof(uint32_t), 0x10000, file);
+}
+
+void cmap_device::deserialize(FILE *file)
+{
+	fread(&m_status, sizeof(uint32_t), 1, file);
+	fread(&m_revision, sizeof(uint32_t), 1, file);
+	fread(&m_palette_idx, sizeof(uint16_t), 1, file);
+	fread(m_palette, sizeof(uint32_t), 0x10000, file);
+}
+
 void cmap_device::write(uint32_t offset, uint32_t data)
 {
 	switch (offset)
@@ -338,6 +376,66 @@ void vc2_device::device_reset()
 	m_readout_y1 = 0;
 
 	m_enable_cursor = false;
+}
+
+void vc2_device::serialize(FILE *file)
+{
+	fwrite(&m_vid_entry, sizeof(uint16_t), 1, file);
+	fwrite(&m_cursor_entry, sizeof(uint16_t), 1, file);
+	fwrite(&m_cursor_x, sizeof(uint16_t), 1, file);
+	fwrite(&m_cursor_y, sizeof(uint16_t), 1, file);
+	fwrite(&m_cur_cursor_x, sizeof(uint16_t), 1, file);
+	fwrite(&m_did_entry, sizeof(uint16_t), 1, file);
+	fwrite(&m_scanline_len, sizeof(uint16_t), 1, file);
+	fwrite(&m_ram_addr, sizeof(uint16_t), 1, file);
+	fwrite(&m_vt_frame_ptr, sizeof(uint16_t), 1, file);
+	fwrite(&m_vt_line_ptr, sizeof(uint16_t), 1, file);
+	fwrite(&m_vt_line_run, sizeof(uint16_t), 1, file);
+	fwrite(&m_vt_line_count, sizeof(uint16_t), 1, file);
+	fwrite(&m_cursor_table_ptr, sizeof(uint16_t), 1, file);
+	fwrite(&m_work_cursor_y, sizeof(uint16_t), 1, file);
+	fwrite(&m_did_frame_ptr, sizeof(uint16_t), 1, file);
+	fwrite(&m_did_line_ptr, sizeof(uint16_t), 1, file);
+	fwrite(&m_display_ctrl, sizeof(uint16_t), 1, file);
+	fwrite(&m_config, sizeof(uint16_t), 1, file);
+	fwrite(&m_reg_idx, sizeof(uint8_t), 1, file);
+	fwrite(&m_ram[0], sizeof(uint16_t), RAM_SIZE, file);
+	fwrite(&m_vt_table[0], sizeof(uint32_t), 2048 * 2048, file);
+	fwrite(&m_readout_x0, sizeof(int), 1, file);
+	fwrite(&m_readout_y0, sizeof(int), 1, file);
+	fwrite(&m_readout_x1, sizeof(int), 1, file);
+	fwrite(&m_readout_y1, sizeof(int), 1, file);
+	fwrite(&m_enable_cursor, sizeof(bool), 1, file);
+}
+
+void vc2_device::deserialize(FILE *file)
+{
+	fread(&m_vid_entry, sizeof(uint16_t), 1, file);
+	fread(&m_cursor_entry, sizeof(uint16_t), 1, file);
+	fread(&m_cursor_x, sizeof(uint16_t), 1, file);
+	fread(&m_cursor_y, sizeof(uint16_t), 1, file);
+	fread(&m_cur_cursor_x, sizeof(uint16_t), 1, file);
+	fread(&m_did_entry, sizeof(uint16_t), 1, file);
+	fread(&m_scanline_len, sizeof(uint16_t), 1, file);
+	fread(&m_ram_addr, sizeof(uint16_t), 1, file);
+	fread(&m_vt_frame_ptr, sizeof(uint16_t), 1, file);
+	fread(&m_vt_line_ptr, sizeof(uint16_t), 1, file);
+	fread(&m_vt_line_run, sizeof(uint16_t), 1, file);
+	fread(&m_vt_line_count, sizeof(uint16_t), 1, file);
+	fread(&m_cursor_table_ptr, sizeof(uint16_t), 1, file);
+	fread(&m_work_cursor_y, sizeof(uint16_t), 1, file);
+	fread(&m_did_frame_ptr, sizeof(uint16_t), 1, file);
+	fread(&m_did_line_ptr, sizeof(uint16_t), 1, file);
+	fread(&m_display_ctrl, sizeof(uint16_t), 1, file);
+	fread(&m_config, sizeof(uint16_t), 1, file);
+	fread(&m_reg_idx, sizeof(uint8_t), 1, file);
+	fread(&m_ram[0], sizeof(uint16_t), RAM_SIZE, file);
+	fread(&m_vt_table[0], sizeof(uint32_t), 2048 * 2048, file);
+	fread(&m_readout_x0, sizeof(int), 1, file);
+	fread(&m_readout_y0, sizeof(int), 1, file);
+	fread(&m_readout_x1, sizeof(int), 1, file);
+	fread(&m_readout_y1, sizeof(int), 1, file);
+	fread(&m_enable_cursor, sizeof(bool), 1, file);
 }
 
 void vc2_device::write(uint32_t offset, uint32_t data, uint32_t mem_mask)
@@ -756,8 +854,10 @@ void rb2_device::device_start()
 	save_item(NAME(m_dblsrc));
 	save_item(NAME(m_plane_enable));
 	save_item(NAME(m_draw_depth));
+	save_item(NAME(m_draw_bpp));
 	save_item(NAME(m_logicop));
-	save_item(NAME(m_store_shift));
+	save_item(NAME(m_src_shift));
+	save_item(NAME(m_dst_shift));
 
 	save_pointer(NAME(&m_rgbci[0]), BUFFER_SIZE);
 	save_pointer(NAME(&m_cidaux[0]), BUFFER_SIZE);
@@ -772,11 +872,75 @@ void rb2_device::device_reset()
 	m_dblsrc = false;
 	m_plane_enable = 0;
 	m_draw_depth = 0;
+	m_draw_bpp = 8;
 	m_logicop = 0;
-	m_store_shift = 0;
+	m_src_shift = 0;
+	m_dst_shift = 0;
 
 	m_dest_buf = &m_rgbci[0];
 	m_buf_ptr = &m_rgbci[0];
+}
+
+void rb2_device::serialize(FILE *file)
+{
+	fwrite(&m_global_mask, sizeof(uint32_t), 1, file);
+	fwrite(&m_write_mask, sizeof(uint32_t), 1, file);
+	fwrite(&m_blend, sizeof(bool), 1, file);
+	fwrite(&m_fast_clear, sizeof(bool), 1, file);
+	fwrite(&m_rgbmode, sizeof(bool), 1, file);
+	fwrite(&m_dblsrc, sizeof(bool), 1, file);
+	fwrite(&m_plane_enable, sizeof(uint8_t), 1, file);
+	fwrite(&m_draw_depth, sizeof(uint8_t), 1, file);
+	fwrite(&m_logicop, sizeof(uint8_t), 1, file);
+	fwrite(&m_src_shift, sizeof(uint8_t), 1, file);
+	fwrite(&m_dst_shift, sizeof(uint8_t), 1, file);
+}
+
+void rb2_device::deserialize(FILE *file)
+{
+	fread(&m_global_mask, sizeof(uint32_t), 1, file);
+	fread(&m_write_mask, sizeof(uint32_t), 1, file);
+	fread(&m_blend, sizeof(bool), 1, file);
+	fread(&m_fast_clear, sizeof(bool), 1, file);
+	fread(&m_rgbmode, sizeof(bool), 1, file);
+	fread(&m_dblsrc, sizeof(bool), 1, file);
+	fread(&m_plane_enable, sizeof(uint8_t), 1, file);
+	fread(&m_draw_depth, sizeof(uint8_t), 1, file);
+	fread(&m_logicop, sizeof(uint8_t), 1, file);
+	fread(&m_src_shift, sizeof(uint8_t), 1, file);
+	fread(&m_dst_shift, sizeof(uint8_t), 1, file);
+}
+
+uint32_t rb2_device::expand_to_all_lanes(uint32_t src)
+{
+	switch (m_draw_depth) {
+	case 0:
+		src |= src << 4;
+		src |= src << 8;
+		src |= src << 16;
+		break;
+	case 1:
+		src |= src << 8;
+		src |= src << 16;
+		break;
+	case 2:
+		src |= src << 12;
+		break;
+	case 3:
+		break;
+	}
+	switch (m_plane_enable)
+	{
+	case 1: // RGB/CI
+	case 2: // RGBA
+	case 6: // CID
+		return src;
+	case 4: // OLAY
+		return src << 8;
+	case 5: // PUP
+		return src << 2;
+	}
+	return src;
 }
 
 void rb2_device::set_write_mask(uint32_t data)
@@ -794,6 +958,7 @@ void rb2_device::set_flags(uint16_t data)
 	m_draw_depth = (data & 0x30) >> 4;
 	m_logicop = data & 0xf;
 
+	static const uint32_t s_draw_bpp[4] = { 4, 8, 12, 24 };
 	static const uint32_t s_store_shift[8][4][2] = {
 		{   { 0,  0 }, // None, 4bpp, Buffer 0/1
 			{ 0,  0 }, // None, 8bpp, Buffer 0/1
@@ -837,7 +1002,8 @@ void rb2_device::set_flags(uint16_t data)
 		},
 	};
 
-	m_store_shift = s_store_shift[m_plane_enable][m_draw_depth][m_dblsrc];
+	m_src_shift = s_store_shift[m_plane_enable][m_draw_depth][m_dblsrc];
+	m_draw_bpp = s_draw_bpp[m_draw_depth];
 
 	switch (m_plane_enable)
 	{
@@ -860,12 +1026,13 @@ void rb2_device::set_address(uint32_t address)
 
 uint32_t rb2_device::read_pixel()
 {
-	return *m_buf_ptr >> m_store_shift;
+	return *m_buf_ptr >> m_src_shift;
 }
 
 void rb2_device::write_pixel(uint32_t data)
 {
-	if (m_blend)
+	data = expand_to_all_lanes(data);
+	if (m_blend || m_fast_clear)
 		store_pixel(data);
 	else
 		logic_pixel(data);
@@ -900,7 +1067,7 @@ void rb2_device::store_pixel(uint32_t value)
 {
 	const uint32_t write_mask = m_write_mask & m_global_mask;
 	*m_buf_ptr &= ~write_mask;
-	*m_buf_ptr |= (value << m_store_shift) & write_mask;
+	*m_buf_ptr |= value & write_mask;
 }
 
 
@@ -1087,15 +1254,24 @@ void newport_base_device::start_logging()
 
 	popmessage("Recording Newport to %s", log_name_buf);
 
-	// TODO
-	//fwrite(&m_vc2, sizeof(vc2_t), 1, m_newview_log);
-	//fwrite(&m_xmap0, sizeof(xmap_t), 1, m_newview_log);
-	//fwrite(&m_xmap1, sizeof(xmap_t), 1, m_newview_log);
+	m_vc2->serialize(m_newview_log);
+	printf("vc2: %08x\n", (uint32_t)ftell(m_newview_log));
+	m_xmap[0]->serialize(m_newview_log);
+	printf("xmap0: %08x\n", (uint32_t)ftell(m_newview_log));
+	m_xmap[1]->serialize(m_newview_log);
+	printf("xmap1: %08x\n", (uint32_t)ftell(m_newview_log));
 	fwrite(&m_rex3, sizeof(rex3_t), 1, m_newview_log);
-	// TODO
-	//fwrite(&m_cmap0, sizeof(cmap_t), 1, m_newview_log);
-	//fwrite(&m_rgbci[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
-	//fwrite(&m_cidaux[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
+	printf("rex3: %08x\n", (uint32_t)ftell(m_newview_log));
+	m_cmap[0]->serialize(m_newview_log);
+	printf("cmap0: %08x\n", (uint32_t)ftell(m_newview_log));
+	m_cmap[1]->serialize(m_newview_log);
+	printf("cmap1: %08x\n", (uint32_t)ftell(m_newview_log));
+	m_rb2->serialize(m_newview_log);
+	printf("rb2: %08x\n", (uint32_t)ftell(m_newview_log));
+	fwrite(m_rb2->rgbci(0), sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
+	printf("rgbci: %08x\n", (uint32_t)ftell(m_newview_log));
+	fwrite(m_rb2->cidaux(0), sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
+	printf("cidaux: %08x\n", (uint32_t)ftell(m_newview_log));
 }
 
 void newport_base_device::stop_logging()
@@ -1237,7 +1413,7 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 							break;
 						case 2: // 8-Bit Overlay
 						{
-							const uint32_t pix_in = ((*src_cidaux >> 8) & 0xf) | ((*src_cidaux >> 12) & 0xf0);
+							const uint32_t pix_in = ((*src_cidaux >> 8) & 0xf) | ((*src_cidaux >> 16) & 0xf0);
 							if (pix_in)
 							{
 								*dest++ = palette[aux_msb | pix_in];
@@ -2003,6 +2179,23 @@ READ64_MEMBER(newport_base_device::rex3_r)
 		do_rex3_command();
 	}
 
+#if ENABLE_NEWVIEW_LOG
+	if (m_newview_log != nullptr)
+	{
+		uint32_t offset_lo = (uint32_t)offset | 0x40000000;
+		uint32_t data_hi = (uint32_t)(ret >> 32);
+		uint32_t data_lo = (uint32_t)ret;
+		uint32_t mem_mask_hi = (uint32_t)(mem_mask >> 32);
+		uint32_t mem_mask_lo = (uint32_t)mem_mask;
+
+		fwrite(&offset_lo, sizeof(uint32_t), 1, m_newview_log);
+		fwrite(&data_hi, sizeof(uint32_t), 1, m_newview_log);
+		fwrite(&data_lo, sizeof(uint32_t), 1, m_newview_log);
+		fwrite(&mem_mask_hi, sizeof(uint32_t), 1, m_newview_log);
+		fwrite(&mem_mask_lo, sizeof(uint32_t), 1, m_newview_log);
+	}
+#endif
+
 	return ret;
 }
 
@@ -2179,7 +2372,10 @@ void newport_base_device::output_pixel(int16_t x, int16_t y, uint32_t color)
 
 	const uint32_t address = (uint32_t)(y * (1280 + 64) + x);
 	m_set_address(address);
-	m_write_pixel(color);
+	if (BIT(m_rex3.m_draw_mode1, 18))
+		blend_pixel(color);
+	else
+		m_write_pixel(color);
 }
 
 void newport_base_device::blend_pixel(uint32_t src)
@@ -2413,18 +2609,7 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 
 	if (!BIT(m_rex3.m_draw_mode1, 15)) // RGB
 	{
-		switch (m_rex3.m_plane_depth)
-		{
-		case 0: // 4bpp
-			return (m_rex3.m_curr_color_red >> 11) & 0x0000000f;
-		case 1: // 8bpp
-			return (m_rex3.m_curr_color_red >> 11) & 0x000000ff;
-		case 2: // 12bpp
-			return (m_rex3.m_curr_color_red >> 9) & 0x00000fff;
-		case 3: // 24bpp
-			// Not supported
-			return 0;
-		}
+		return get_default_color(m_rex3.m_curr_color_red);
 	}
 
 	if (BIT(m_rex3.m_draw_mode1, 16)) // Dithering
@@ -2925,9 +3110,10 @@ uint32_t newport_base_device::do_pixel_read()
 	}
 	LOGMASKED(LOG_COMMANDS, "Read %08x from %04x, %04x\n", ret, src_x, src_y);
 	m_rex3.m_x_start_i++;
+	int16_t dy = (m_rex3.m_y_end_i < m_rex3.m_y_start_i) ? -1 : 1;
 	if (m_rex3.m_x_start_i > m_rex3.m_x_end_i)
 	{
-		m_rex3.m_y_start_i++;
+		m_rex3.m_y_start_i += dy;
 		m_rex3.m_x_start_i = m_rex3.m_x_save;
 	}
 
@@ -3074,6 +3260,37 @@ void newport_base_device::iterate_shade()
 	}
 }
 
+uint32_t newport_base_device::get_default_color(uint32_t src)
+{
+	uint32_t color = BIT(m_rex3.m_draw_mode1, 17) ? m_rex3.m_color_vram : src;
+	switch (m_rex3.m_plane_depth)
+	{
+		case 0: // 4bpp
+			color &= 0xf;
+			color |= color << 4;
+			color |= color << 8;
+			color |= color << 16;
+			break;
+		case 1: // 8bpp
+			color &= 0xff;
+			color |= color << 8;
+			color |= color << 16;
+			break;
+		case 2: // 12bpp
+			if (BIT(m_rex3.m_draw_mode1, 15))
+				color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
+			else
+				color &= 0x00000fff;
+			color |= color << 12;
+			break;
+		case 3: // 24bpp
+			color = m_rex3.m_color_vram & 0xffffff;
+			break;
+	}
+
+	return color;
+}
+
 void newport_base_device::do_rex3_command()
 {
 	static const char* const s_opcode_str[4] = { "Noop", "Read", "Draw", "Scr2Scr" };
@@ -3134,35 +3351,7 @@ void newport_base_device::do_rex3_command()
 
 					LOGMASKED(LOG_COMMANDS, "%04x, %04x to %04x, %04x = %08x\n", start_x, start_y, end_x, end_y, pattern);
 
-					uint32_t color = m_rex3.m_color_i;
-					if (fastclear)
-					{
-						if (rgbmode)
-						{
-							switch (m_rex3.m_plane_depth)
-							{
-								case 0: // 4bpp
-									color = m_rex3.m_color_vram & 0xf;
-									color |= color << 4;
-									break;
-								case 1: // 8bpp
-									color = m_rex3.m_color_vram & 0xff;
-									break;
-								case 2: // 12bpp
-									color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-									color |= color << 12;
-									break;
-								case 3: // 24bpp
-									color = m_rex3.m_color_vram & 0xffffff;
-									break;
-							}
-						}
-						else
-						{
-							color = m_rex3.m_color_vram;
-						}
-					}
-
+					uint32_t color = get_default_color(m_rex3.m_color_i);
 					const bool lr_abort = BIT(mode0, 19) && dx < 0;
 
 					uint32_t bit = 31;
@@ -3232,35 +3421,7 @@ void newport_base_device::do_rex3_command()
 					const bool fastclear = BIT(mode1, 17);
 					const uint32_t pattern = BIT(mode0, 12) ? m_rex3.m_z_pattern : (BIT(mode0, 13) ? m_rex3.m_ls_pattern : 0xffffffff);
 
-					uint32_t color = m_rex3.m_color_i;
-					if (fastclear)
-					{
-						if (rgbmode)
-						{
-							switch (m_rex3.m_plane_depth)
-							{
-								case 0: // 4bpp
-									color = m_rex3.m_color_vram & 0xf;
-									color |= color << 4;
-									break;
-								case 1: // 8bpp
-									color = m_rex3.m_color_vram & 0xff;
-									break;
-								case 2: // 12bpp
-									color = ((m_rex3.m_color_vram & 0xf00000) >> 12) | ((m_rex3.m_color_vram & 0xf000) >> 8) | ((m_rex3.m_color_vram & 0xf0) >> 4);
-									color |= color << 12;
-									break;
-								case 3: // 24bpp
-									color = m_rex3.m_color_vram & 0xffffff;
-									break;
-							}
-						}
-						else
-						{
-							color = m_rex3.m_color_vram;
-						}
-					}
-
+					uint32_t color = get_default_color(m_rex3.m_color_i);
 					const bool lr_abort = BIT(mode0, 19) && dx < 0;
 
 					do
@@ -3309,15 +3470,15 @@ void newport_base_device::do_rex3_command()
 				}
 
 				case 2: // I_Line
-					do_iline(m_rex3.m_color_i);
+					do_iline(get_default_color(m_rex3.m_color_i));
 					break;
 
 				case 3: // F_Line
-					do_fline(m_rex3.m_color_i);
+					do_fline(get_default_color(m_rex3.m_color_i));
 					break;
 
 				case 4: // A_Line
-					do_iline(m_rex3.m_color_i); // FIXME
+					do_iline(get_default_color(m_rex3.m_color_i)); // FIXME
 					break;
 
 				default: // Invalid

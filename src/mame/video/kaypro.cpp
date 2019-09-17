@@ -145,7 +145,7 @@ MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 	for (x = 0; x < x_count; x++)               // for each character
 	{
 		uint8_t inv=0;
-		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
+		if (x == cursor_x) inv=0xff;
 		uint16_t mem = (ma + x) & 0x7ff;
 		uint8_t chr = m_p_videoram[mem];
 		uint8_t attr = m_p_videoram[mem | 0x800];
@@ -177,10 +177,6 @@ MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 		if ( (BIT(attr, 2)) & (BIT(m_framecnt, 3)) )
 			fg = bg;
 
-		/* process cursor */
-		if (x == cursor_x)
-			inv ^= m_mc6845_cursor[ra];
-
 		/* get pattern of pixels for that character scanline */
 		if ( (ra == 15) & (BIT(attr, 3)) )  /* underline */
 			gfx = 0xff;
@@ -200,41 +196,6 @@ MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 }
 
 /************************************* MC6845 SUPPORT ROUTINES ***************************************/
-
-/* The 6845 can produce a variety of cursor shapes - all are emulated here - remove when mame fixed */
-void kaypro_state::mc6845_cursor_configure()
-{
-	uint8_t i,curs_type=0,r9,r10,r11;
-
-	/* curs_type holds the general cursor shape to be created
-	    0 = no cursor
-	    1 = partial cursor (only shows on a block of scan lines)
-	    2 = full cursor
-	    3 = two-part cursor (has a part at the top and bottom with the middle blank) */
-
-	for ( i = 0; i < ARRAY_LENGTH(m_mc6845_cursor); i++) m_mc6845_cursor[i] = 0;        // prepare cursor by erasing old one
-
-	r9  = m_mc6845_reg[9];                  // number of scan lines - 1
-	r10 = m_mc6845_reg[10] & 0x1f;              // cursor start line = last 5 bits
-	r11 = m_mc6845_reg[11]+1;                   // cursor end line incremented to suit for-loops below
-
-	/* decide the curs_type by examining the registers */
-	if (r10 < r11) curs_type=1;             // start less than end, show start to end
-	else
-	if (r10 == r11) curs_type=2;                // if equal, show full cursor
-	else curs_type=3;                   // if start greater than end, it's a two-part cursor
-
-	if ((r11 - 1) > r9) curs_type=2;            // if end greater than scan-lines, show full cursor
-	if (r10 > r9) curs_type=0;              // if start greater than scan-lines, then no cursor
-	if (r11 > 16) r11=16;                   // truncate 5-bit register to fit our 4-bit hardware
-
-	/* create the new cursor */
-	if (curs_type > 1) for (i = 0;i < ARRAY_LENGTH(m_mc6845_cursor);i++) m_mc6845_cursor[i]=0xff; // turn on full cursor
-
-	if (curs_type == 1) for (i = r10;i < r11;i++) m_mc6845_cursor[i]=0xff; // for each line that should show, turn on that scan line
-
-	if (curs_type == 3) for (i = r11; i < r10;i++) m_mc6845_cursor[i]=0; // now take a bite out of the middle
-}
 
 /* Resize the screen within the limits of the hardware. Expand the image to fill the screen area.
     Standard screen is 640 x 400 = 0x7d0 bytes. */
@@ -279,9 +240,6 @@ WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
 
 	if ((m_mc6845_ind == 1) || (m_mc6845_ind == 6) || (m_mc6845_ind == 9))
 		mc6845_screen_configure();          /* adjust screen size */
-
-	if ((m_mc6845_ind > 8) && (m_mc6845_ind < 12))
-		mc6845_cursor_configure();      /* adjust cursor shape - remove when mame fixed */
 
 	if ((m_mc6845_ind > 17) && (m_mc6845_ind < 20))
 		m_mc6845_video_address = m_mc6845_reg[19] | ((m_mc6845_reg[18] & 0x3f) << 8);   /* internal ULA address */

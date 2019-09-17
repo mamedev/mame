@@ -32,7 +32,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+	DECLARE_READ_LINE_MEMBER(vblank_r);
 	void ccastles(machine_config &config);
 
 protected:

@@ -51,14 +51,20 @@ files {
 	MAME_DIR .. "src/devices/imagedev/harddriv.h",
 	MAME_DIR .. "src/devices/imagedev/mfmhd.cpp",
 	MAME_DIR .. "src/devices/imagedev/mfmhd.h",
+	MAME_DIR .. "src/devices/imagedev/microdrv.cpp",
+	MAME_DIR .. "src/devices/imagedev/microdrv.h",
 	MAME_DIR .. "src/devices/imagedev/midiin.cpp",
 	MAME_DIR .. "src/devices/imagedev/midiin.h",
 	MAME_DIR .. "src/devices/imagedev/midiout.cpp",
 	MAME_DIR .. "src/devices/imagedev/midiout.h",
+	MAME_DIR .. "src/devices/imagedev/picture.cpp",
+	MAME_DIR .. "src/devices/imagedev/picture.h",
 	MAME_DIR .. "src/devices/imagedev/printer.cpp",
 	MAME_DIR .. "src/devices/imagedev/printer.h",
 	MAME_DIR .. "src/devices/imagedev/snapquik.cpp",
 	MAME_DIR .. "src/devices/imagedev/snapquik.h",
+	MAME_DIR .. "src/devices/imagedev/wafadrive.cpp",
+	MAME_DIR .. "src/devices/imagedev/wafadrive.h",
 }
 
 
@@ -988,6 +994,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds17x85.h,MACHINES["DS17X85"] = true
+---------------------------------------------------
+
+if (MACHINES["DS17X85"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds17x85.cpp",
+		MAME_DIR .. "src/devices/machine/ds17x85.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds1994.h,MACHINES["DS1994"] = true
 ---------------------------------------------------
 
@@ -1169,6 +1187,18 @@ if (MACHINES["HD64610"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/hd64610.cpp",
 		MAME_DIR .. "src/devices/machine/hd64610.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/hp_dc100_tape.h,MACHINES["HP_DC100_TAPE"] = true
+---------------------------------------------------
+
+if (MACHINES["HP_DC100_TAPE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/hp_dc100_tape.cpp",
+		MAME_DIR .. "src/devices/machine/hp_dc100_tape.h",
 	}
 end
 
@@ -2249,6 +2279,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pcf8584.h,MACHINES["PCF8584"] = true
+---------------------------------------------------
+
+if (MACHINES["PCF8584"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pcf8584.cpp",
+		MAME_DIR .. "src/devices/machine/pcf8584.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pcf8593.h,MACHINES["PCF8593"] = true
 ---------------------------------------------------
 
@@ -3074,6 +3116,18 @@ if (MACHINES["WD_FDC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/wd_fdc.cpp",
 		MAME_DIR .. "src/devices/machine/wd_fdc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/wd1000.h,MACHINES["WD1000"] = true
+---------------------------------------------------
+
+if (MACHINES["WD1000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/wd1000.cpp",
+		MAME_DIR .. "src/devices/machine/wd1000.h",
 	}
 end
 
@@ -4094,3 +4148,17 @@ if (MACHINES["WTL3132"]~=null) then
 		MAME_DIR .. "src/devices/machine/wtl3132.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/vrender0.h,MACHINES["VRENDER0"] = true
+---------------------------------------------------
+
+if (MACHINES["VRENDER0"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/vrender0.cpp",
+		MAME_DIR .. "src/devices/machine/vr0uart.cpp",
+		MAME_DIR .. "src/devices/machine/vrender0.h",
+	}
+end
+

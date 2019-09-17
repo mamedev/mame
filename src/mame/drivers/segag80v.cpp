@@ -302,7 +302,7 @@ READ8_MEMBER(segag80v_state::spinner_input_r)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(segag80v_state::elim4_joint_coin_r)
+READ_LINE_MEMBER(segag80v_state::elim4_joint_coin_r)
 {
 	return (ioport("COINS")->read() & 0xf) != 0xf;
 }
@@ -577,7 +577,7 @@ static INPUT_PORTS_START( elim4 )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segag80v_state,elim4_joint_coin_r, nullptr)   /* combination of all four coin inputs */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(segag80v_state, elim4_joint_coin_r)   // combination of all four coin inputs
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 

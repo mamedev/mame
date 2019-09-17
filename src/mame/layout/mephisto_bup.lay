@@ -5,7 +5,7 @@
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
+		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
 	</element>
 
 	<element name="led" defstate="0">
@@ -393,35 +393,35 @@
 <!-- buttons -->
 
 	<element name="gray"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
-	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="white"><rect><color red="0.95" green="0.95" blue="0.95" /></rect></element>
 
 	<element name="keys" defstate="0">
 		<rect state="1"><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
 
-	<element name="text_cl">   <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="CL">  <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_pos">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="POS"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_mem">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="MEM"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_info"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="INFO"><color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_lev">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="LEV"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_ent">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="ENT"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_res">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="RES"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_best"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="BEST"><color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_mon">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="MON"> <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_cl">   <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="CL">  <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_pos">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="POS"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_mem">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="MEM"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_info"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="INFO"><color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_lev">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="LEV"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_ent">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="ENT"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_res">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="RES"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_best"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="BEST"><color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_mon">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="MON"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
 
-	<element name="text_b1"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="1"><color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b2"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="2"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b3"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="3"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b4"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="4"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b5"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="5"> <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_b6"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="6"> <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_b1"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="1"><color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_b2"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="2"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_b3"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="3"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_b4"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="4"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_b5"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="5"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_b6"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="6"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
 
-	<element name="text_p1"><image file="chess/wk.png"/></element>
-	<element name="text_p2"><image file="chess/wq.png"/></element>
-	<element name="text_p3"><image file="chess/wr.png"/></element>
-	<element name="text_p4"><image file="chess/wb.png"/></element>
-	<element name="text_p5"><image file="chess/wn.png"/></element>
-	<element name="text_p6"><image file="chess/wp.png"/></element>
+	<element name="text_p1"><image file="chess/wk.png"><color alpha="0.95" /></image></element>
+	<element name="text_p2"><image file="chess/wq.png"><color alpha="0.95" /></image></element>
+	<element name="text_p3"><image file="chess/wr.png"><color alpha="0.95" /></image></element>
+	<element name="text_p4"><image file="chess/wb.png"><color alpha="0.95" /></image></element>
+	<element name="text_p5"><image file="chess/wn.png"><color alpha="0.95" /></image></element>
+	<element name="text_p6"><image file="chess/wp.png"><color alpha="0.95" /></image></element>
 
 	<group name="buttons">
 		<bounds x="69" y="93" width="29" height="14" />
@@ -472,7 +472,8 @@
 		<bezel element="text_res"><bounds  x="74.3" y="104" width="3.67" height="2.2" /></bezel>
 		<bezel element="text_best"><bounds x="79.3" y="104" width="3.67" height="2.2" /></bezel>
 		<bezel element="text_mon"><bounds  x="84.3" y="104" width="3.67" height="2.2" /></bezel>
-		<bezel element="black"><bounds x="90.35" y="104.5" width="1.3" height="1.3" /></bezel>
+		<bezel element="white"><bounds x="90.35" y="104.5" width="1.3" height="1.3" /></bezel>
+		<bezel element="gray"><bounds x="90.55" y="104.7" width="0.9" height="0.9" /></bezel>
 		<bezel element="white"><bounds x="95.35" y="104.5" width="1.3" height="1.3" /></bezel>
 
 		<bezel element="keys" inputtag="KEY1_0" inputmask="0x80">   <!-- 1 -->
@@ -513,6 +514,12 @@
 			<bounds x="94"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
 
+		<bezel element="keys" inputtag="RESET" inputmask="0x01">   <!-- RES -->
+			<bounds x="69"  y="103" width="4" height="4" /><color alpha="0.25" />
+		</bezel>
+		<bezel element="keys" inputtag="RESET" inputmask="0x02">   <!-- RES -->
+			<bounds x="74"  y="103" width="4" height="4" /><color alpha="0.25" />
+		</bezel>
 		<bezel element="keys" inputtag="KEY2_2" inputmask="0x80">   <!-- BEST -->
 			<bounds x="79"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</bezel>

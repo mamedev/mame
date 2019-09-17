@@ -45,6 +45,7 @@ altos2.cpp
 altos5.cpp
 altos486.cpp
 altos8600.cpp
+am1000.cpp
 amico2k.cpp
 amiga.cpp
 ampex.cpp
@@ -148,6 +149,7 @@ cit220.cpp
 cking_master.cpp
 clcd.cpp
 clickstart.cpp
+clxvme186.cpp
 cm1800.cpp
 cmi.cpp
 cms.cpp
@@ -309,10 +311,12 @@ h19.cpp
 h8.cpp
 h89.cpp
 harriet.cpp
+hawk.cpp
 hazeltin.cpp
 hazl1420.cpp
 hec2hrp.cpp
 hektor.cpp
+h01x.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
 hh_hmcs40.cpp
@@ -349,6 +353,7 @@ ht68k.cpp
 huebler.cpp
 hunter2.cpp
 hunter16.cpp
+husky.cpp
 hx20.cpp
 hyperscan.cpp
 i7000.cpp
@@ -397,6 +402,7 @@ jr100.cpp
 jr200.cpp
 jtc.cpp
 juicebox.cpp
+juku.cpp
 junior.cpp
 jupace.cpp
 jupiter.cpp
@@ -457,10 +463,15 @@ mdisk.cpp
 megadriv.cpp
 megadriv_rad.cpp
 mekd2.cpp
+mekd4.cpp
+mekd5.cpp
+mephisto_brikett.cpp
 mephisto_glasgow.cpp
+mephisto_mm1.cpp
 mephisto_mm2.cpp
 mephisto_modena.cpp
 mephisto_modular.cpp
+mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
 meritum.cpp
@@ -495,7 +506,9 @@ mk14.cpp
 mk85.cpp
 mk90.cpp
 mkit09.cpp
+ml20.cpp
 mmd1.cpp
+mmd2.cpp
 mod8.cpp
 modellot.cpp
 molecular.cpp
@@ -553,7 +566,6 @@ novag_const.cpp
 novag_diablo.cpp
 novag_presto.cpp
 novag_savant.cpp
-novag_sconst.cpp
 novag_sexpert.cpp
 o2.cpp
 ob68k1a.cpp
@@ -699,8 +711,11 @@ saitek_chesstrv.cpp
 saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
+saitek_mark5.cpp
 saitek_risc2500.cpp
+saitek_ssystem3.cpp
 saitek_stratos.cpp
+saitek_superstar.cpp
 samcoupe.cpp
 sansa_fuze.cpp
 sapi1.cpp
@@ -752,7 +767,6 @@ spectrum.cpp
 spg110.cpp
 squale.cpp
 ssem.cpp
-ssystem3.cpp
 st17xx.cpp
 storio.cpp
 studio2.cpp

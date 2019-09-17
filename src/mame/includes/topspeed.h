@@ -36,13 +36,16 @@ public:
 		, m_filter2(*this, "filter2")
 		, m_filter3(*this, "filter3")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_gas(*this, "GAS")
+		, m_brake(*this, "BRAKE")
 		, m_steer(*this, "STEER")
 		, m_msm_rom(*this, "adpcm_%u", 0U)
 	{ }
 
 	void topspeed(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pedal_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
 
 protected:
 	virtual void machine_start() override;
@@ -66,6 +69,8 @@ private:
 	required_device<filter_volume_device> m_filter2;
 	required_device<filter_volume_device> m_filter3;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_ioport m_gas;
+	required_ioport m_brake;
 	required_ioport m_steer;
 
 	// Misc

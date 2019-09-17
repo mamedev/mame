@@ -17,6 +17,7 @@ public:
 	auto out_fpcn() { return m_fpcn_cb.bind(); }
 	auto out_fpex() { return m_fpex_cb.bind(); }
 	auto out_zero() { return m_zero_cb.bind(); }
+	auto out_port_x() { return m_port_x_cb.bind(); }
 
 	// code and data ports
 	void c_port_w(u64 data) { m_c_port = data; }
@@ -35,6 +36,17 @@ public:
 	static std::string mbin(u64 const code);
 	static std::string abin(u64 const code);
 	static std::string adst(u64 const code);
+
+	void state_add(device_state_interface &parent, unsigned base = 0)
+	{
+		parent.state_add(base + 0, "MODE", m_mode).formatstr("%04X");
+		parent.state_add(base + 1, "T1", m_t1.v).formatstr("%08X");
+		parent.state_add(base + 2, "T2", m_t2.v).formatstr("%08X");
+		parent.state_add(base + 3, "T3", m_t3.v).formatstr("%08X");
+
+		for (unsigned i = 0; i < 32; i++)
+			parent.state_add(base + i + 4, util::string_format("F%d", i).c_str(), m_f[i].v).formatstr("%08X");
+	}
 
 	enum code_mask : u64
 	{
@@ -119,6 +131,7 @@ private:
 	devcb_write_line m_fpcn_cb;
 	devcb_write_line m_fpex_cb;
 	devcb_write_line m_zero_cb;
+	devcb_write32 m_port_x_cb;
 
 	// output line state
 	bool m_fpcn_state;

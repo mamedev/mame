@@ -23,6 +23,7 @@ Magic Sticks:
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class powerbal_state : public playmark_state

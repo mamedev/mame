@@ -1729,6 +1729,25 @@ void segas16b_state::system16b_bootleg_map(address_map &map)
 	map(0xffc000, 0xffffff).ram().share("workram");
 }
 
+void segas16b_state::dfjail_map(address_map &map)
+{
+	system16b_bootleg_map(map);
+	map(0x000000, 0x07ffff).rom();
+	map(0x840000, 0x840fff).ram().w(FUNC(segas16b_state::philko_paletteram_w)).share("paletteram");
+
+	map(0xc40000, 0xc43fff).unmaprw();
+
+	map(0xc40000, 0xc40001).nopw(); // coin counter
+	map(0xc41000, 0xc41001).portr("P1");
+	map(0xc41002, 0xc41003).portr("P2");
+	map(0xc41004, 0xc41005).portr("SERVICE");
+
+	map(0xc42000, 0xc42001).portr("DSW1");
+	map(0xc42002, 0xc42003).portr("DSW2");
+	map(0xc43000, 0xc43001).nopw();
+
+}
+
 void segas16b_state::map_fpointbla(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
@@ -1879,6 +1898,59 @@ void segas16b_state::bootleg_sound_portmap(address_map &map)
 	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
+WRITE8_MEMBER(segas16b_state::dfjail_sound_control_w)
+{
+	int size = memregion("soundcpu")->bytes() - 0x10000;
+
+	// NMI and presumably DAC output clear
+	// TODO: identify which is which
+	m_dfjail_nmi_enable = ((data & 0xc0) == 0);
+	if (m_dfjail_nmi_enable == false)
+		m_dac->write(0);
+	//m_upd7759->start_w(BIT(data, 7));
+	//m_upd7759->reset_w(BIT(data, 6));
+
+	int bankoffs = 0;
+	bankoffs = ((data & 0x08) >> 3) * 0x20000;
+	bankoffs += (data & 0x07) * 0x4000;
+
+	// set the final bank
+	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000 + (bankoffs % size));
+}
+
+WRITE8_MEMBER(segas16b_state::dfjail_dac_data_w)
+{
+	// TODO: understand how this is hooked up
+	#if 0
+	switch(offset)
+	{
+		case 0:
+			m_dfjail_dac_data = (data & 0xf) << 0;
+			break;
+		case 1:
+			m_dfjail_dac_data |= (data & 0xf) << 4;
+			break;
+		case 2:
+			m_dfjail_dac_data |= (data & 0xf) << 8;
+			break;
+		case 3:
+			m_dfjail_dac_data |= (data & 0xf) << 12;
+			m_dac->write(m_dfjail_dac_data);
+			break;
+	}
+	#endif
+}
+
+void segas16b_state::dfjail_sound_iomap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).w(FUNC(segas16b_state::dfjail_sound_control_w));
+	map(0x80, 0x83).w(FUNC(segas16b_state::dfjail_dac_data_w));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
+
 // similar to whizz / other philko games in sidearms.cpp, but with the m6295
 void segas16b_state::lockonph_sound_map(address_map &map)
 {
@@ -1895,7 +1967,6 @@ void segas16b_state::lockonph_sound_iomap(address_map &map)
 	map(0x80, 0x80).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
-
 
 //**************************************************************************
 //  I8751 MCU ADDRESS MAPS
@@ -2200,7 +2271,7 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_INCLUDE( afighter )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16b_analog_state, afighter_accel_r, nullptr)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(afighter_16b_analog_state, afighter_accel_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // SHOT
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // WEAPON1
@@ -2208,10 +2279,10 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) // WEAPON3
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16b_analog_state, afighter_handl_left_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(afighter_16b_analog_state, afighter_handl_left_r)
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16b_analog_state, afighter_handl_right_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(afighter_16b_analog_state, afighter_handl_right_r)
 
 	PORT_START("STEER")  // steering
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
@@ -3709,7 +3780,6 @@ static INPUT_PORTS_START( lockonph )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-
 	PORT_START("DSW1")    // DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW0:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -3764,6 +3834,76 @@ static INPUT_PORTS_START( lockonph )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dfjail )
+	PORT_INCLUDE( lockonph )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x01, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x70, 0x50, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPSETTING(    0x70, "1" )
+	PORT_DIPSETTING(    0x60, "2" )
+	PORT_DIPSETTING(    0x50, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x30, "5" )
+	PORT_DIPSETTING(    0x20, "6" )
+	PORT_DIPSETTING(    0x10, "7" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_SERVICE_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3") // it's actually BGM in attract mode
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -4047,6 +4187,36 @@ void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
 	m_ym2413->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	config.device_remove("upd");
+}
+
+INTERRUPT_GEN_MEMBER(segas16b_state::dfjail_soundirq_cb)
+{
+	if (m_dfjail_nmi_enable == true)
+	{
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
+}
+
+void segas16b_state::dfjail(machine_config &config)
+{
+	system16b_split(config);
+	M68000(config.replace(), m_maincpu, XTAL(16'000'000)/2); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::dfjail_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
+
+	Z80(config.replace(), m_soundcpu, XTAL(16'000'000)/4); // ?
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::bootleg_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::dfjail_sound_iomap);
+	// connected to a 74ls74 clock source
+	m_soundcpu->set_periodic_int(FUNC(segas16b_state::dfjail_soundirq_cb), attotime::from_hz(4*60)); // TODO: timing
+
+	//config.device_remove("ym2151");
+	config.device_remove("upd");
+
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -4481,6 +4651,9 @@ ROM_END
 //  Altered Beast, Sega System 16B
 //  CPU: 68000 + i8751 (317-0076)
 //  ROM Board type: 171-5521
+//  Sega game ID: 833-6660-08 ALTERED BEAST
+//    Main board: 837-6662-06
+//     ROM board: 834-6661-08
 //
 ROM_START( altbeast6 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -4524,7 +4697,7 @@ ROM_END
 //  Altered Beast, Sega System 16B
 //  CPU: FD1094 (317-0069)
 //  ROM Board type: 171-5521
-//  Sega game ID: 833-6660-07
+//  Sega game ID: 833-6660-07 ALTERED BEAST
 //    Main board: 837-6662-05
 //     ROM board: 834-6661-07
 //
@@ -4605,7 +4778,9 @@ ROM_END
 //  Altered Beast, Sega System 16B
 //  CPU: 68000 + MC-8123B 317-0066
 //  ROM Board type: 171-5521
-//  Sega ID# for ROM board: 834-6661-06
+//  Sega game ID: 833-6660-06 ALTERED BEAST
+//    Main board: 837-6662-01
+//     ROM board: 834-6661-06
 //
 ROM_START( altbeast4 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -4875,6 +5050,53 @@ ROM_START( lockonph )
 	ROM_LOAD16_BYTE( "b11", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
 	ROM_LOAD16_BYTE( "b13", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
 ROM_END
+
+//*************************************************************************************************************************
+//*************************************************************************************************************************
+//*************************************************************************************************************************
+//  The Destroyer From Jail
+//  CPU: 68000
+//  Custom Korean Board
+//
+ROM_START( dfjail )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "1.b15", 0x000001, 0x020000, CRC(ee235fa5) SHA1(6f6e68628a3fbab83a3168419e921c10a9872367) )
+	ROM_LOAD16_BYTE( "3.c15", 0x000000, 0x020000, CRC(dc763979) SHA1(03d97790cd66961ecd1bae94bf6c6d1d1d756109) )
+	ROM_LOAD16_BYTE( "2.b16", 0x040001, 0x020000, CRC(49ff074d) SHA1(a44dfe46204976579265ba24fd99de75510f34ab) )
+	ROM_LOAD16_BYTE( "4.c16", 0x040000, 0x020000, CRC(cdcbf6b1) SHA1(a3491600e40de4ceb7e72d9ef4bf12fe5f15e30a) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // z80
+	ROM_LOAD( "29.f3",        0x000000, 0x008000, CRC(7f3ebb6a) SHA1(f265c6215ef457202686b31c9b503a0a371a1139) )
+	ROM_LOAD( "28.g3",        0x010000, 0x020000, CRC(ed96d6b9) SHA1(3ad096e466150d0ca36fec8dd649554e7fb9f654) )
+	ROM_LOAD( "27.g1",        0x030000, 0x020000, CRC(7a88e1c1) SHA1(b238b451522819a5a8c1a9e82058b86d33ac2272) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "9.f16",        0x000000, 0x020000, CRC(b2a49d12) SHA1(052b96109abc18c562c09042664738bac68f66b4) )
+	ROM_LOAD( "10.f17",       0x020000, 0x020000, CRC(7d9e8397) SHA1(7cb44cd3584ff9ee8fe1cd4fbbde1448ca27202c) )
+	ROM_LOAD( "7.f14",        0x040000, 0x020000, CRC(549af682) SHA1(cc130a265e01b1fd416f237caebdb1955dbfb30b) )
+	ROM_LOAD( "8.f15",        0x060000, 0x020000, CRC(625c118d) SHA1(d7554e4ec7a2ffc8a2081e0f2c7725a5a2c3ba1a) )
+	ROM_LOAD( "5.f12",        0x080000, 0x020000, CRC(9d00656d) SHA1(91aa96a4fce7f9df557fa8a1e776f82a1f0d57bd) )
+	ROM_LOAD( "6.f13",        0x0a0000, 0x020000, CRC(37b7bf90) SHA1(da184f5213269a68fbb36f3740cc7e32234d0fd2) )
+
+	ROM_REGION16_BE( 0x200000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "19.h12", 0x000000, 0x020000, CRC(f84f472b) SHA1(0c513c53e41234a6c290387ef4fc27a9f9550cb4) )
+	ROM_LOAD16_BYTE( "11.g12", 0x000001, 0x020000, CRC(019662e6) SHA1(1106d3268a29c4ba001383cee5e69bdc963b8347) )
+	ROM_LOAD16_BYTE( "20.h13", 0x040000, 0x020000, CRC(f28bdf76) SHA1(51bf2383909e713aed143064d1e72681209f58e3) )
+	ROM_LOAD16_BYTE( "12.g13", 0x040001, 0x020000, CRC(d222e52b) SHA1(0319fe8387377bced4e6ae77745d88d64418d35b) )
+	ROM_LOAD16_BYTE( "21.h14", 0x080000, 0x020000, CRC(0508cb29) SHA1(ba71cca7da1f5fc6a8e346aee220be72cbd824a0) )
+	ROM_LOAD16_BYTE( "13.g14", 0x080001, 0x020000, CRC(f125b5b0) SHA1(52497e27b4cd8d7fd52f1f786d1f394a8e4c4e55) )
+	ROM_LOAD16_BYTE( "22.h15", 0x0c0000, 0x020000, CRC(7329f038) SHA1(794cc571a3efba7f0f87cf8b552a8e6fc1f3e669) )
+	ROM_LOAD16_BYTE( "14.g15", 0x0c0001, 0x020000, CRC(ca831a54) SHA1(ce4926a7713bfcf6191dafeb7684da21d0ee8f73) )
+	ROM_LOAD16_BYTE( "23.h16", 0x100000, 0x020000, CRC(94ca23e8) SHA1(16b98ec952ea89cc52d798bab715efb1d5dcb5dc) )
+	ROM_LOAD16_BYTE( "15.g16", 0x100001, 0x020000, CRC(db426709) SHA1(48c01388fc1c6c5fd2b2a1d6fc67bd6e79272053) )
+	ROM_LOAD16_BYTE( "24.h17", 0x140000, 0x020000, CRC(6628becc) SHA1(499b77cfaed861cdb2ec94160143cbb0baa7d5ad) )
+	ROM_LOAD16_BYTE( "16.g17", 0x140001, 0x020000, CRC(f7b2aad6) SHA1(595f5db13ca6e6bb7b000b8cf13654f92bff3d01) )
+	ROM_LOAD16_BYTE( "25.h19", 0x180000, 0x020000, CRC(26ca591f) SHA1(2dfc9be451df633e114b86961b304b0d9eaffec3) )
+	ROM_LOAD16_BYTE( "17.g19", 0x180001, 0x020000, CRC(9302cfc3) SHA1(6a63df5e4dbc11404b46a0a7ea90298adba56c14) )
+	ROM_LOAD16_BYTE( "26.h20", 0x1c0000, 0x020000, CRC(5828e0af) SHA1(41d3118eae0c43ad25ef96d1c526a52dc46703d8) )
+	ROM_LOAD16_BYTE( "18.g20", 0x1c0001, 0x020000, CRC(fc8aced0) SHA1(12ffd552228893f2093c2d5617fc00cae262e2ed) )
+ROM_END
+
 
 
 //*************************************************************************************************************************
@@ -6661,7 +6883,9 @@ ROM_END
 //  Golden Axe (Japan), Sega System 16B
 //  CPU: FD1094 (317-0121)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-7002-04
+//  Sega game ID: 833-7001-04 GOLDEN AXE
+//    Main board: 837-7003-04
+//     ROM board: 834-7002-04
 //
 // NOTE: ROM board 834-7002-04EP has EPROMs for EPR-12383, EPR-12378, EPR-12379 & EPR-12384 instead of MPR mask ROMs
 //
@@ -6808,7 +7032,8 @@ ROM_END
 //  Golden Axe (Japan), Sega System 16B
 //  CPU: 68000 + i8751 (317-0112)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-7002-02
+//  Sega game ID: 833-7001-02 GOLDEN AXE
+//     ROM board: 834-7002-02
 //
 ROM_START( goldnaxe2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -8244,7 +8469,9 @@ ROM_END
 //  Tetris, Sega System 16B
 //  CPU: FD1094 (317-0092)
 //  ROM Board type: 171-5704
-//       ROM board: 834-6891-02
+//  Main board: 837-6892-01
+// Game Number: 833-6890-02 TETRIS
+//   ROM board: 834-6891-02
 //
 ROM_START( tetris2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -8501,25 +8728,25 @@ ROM_END
 //
 ROM_START( tturfu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "epr-12266.a1",  0x00000, 0x10000, CRC(f549def8) SHA1(9e913509d46274bd192455321904ec9884b5f629) )
-	ROM_LOAD16_BYTE( "epr-12264.a4",  0x00001, 0x10000, CRC(f7cdb289) SHA1(9c386cf33a96a977c623c2f243db38fda2c41ba4) )
-	ROM_LOAD16_BYTE( "epr-12267.a2",  0x20000, 0x10000, CRC(3c3ce191) SHA1(036ece2be585a85e05c047fe4a1ab3b6814c3490) )
-	ROM_LOAD16_BYTE( "epr-12265.a5",  0x20001, 0x10000, CRC(8cdadd9a) SHA1(a17852f0eb8f63a82ff44cbeb100da72fe5890e0) )
+	ROM_LOAD16_BYTE( "epr-12266.a4",  0x00000, 0x10000, CRC(f549def8) SHA1(9e913509d46274bd192455321904ec9884b5f629) )
+	ROM_LOAD16_BYTE( "epr-12264.a1",  0x00001, 0x10000, CRC(f7cdb289) SHA1(9c386cf33a96a977c623c2f243db38fda2c41ba4) )
+	ROM_LOAD16_BYTE( "epr-12267.a5",  0x20000, 0x10000, CRC(3c3ce191) SHA1(036ece2be585a85e05c047fe4a1ab3b6814c3490) )
+	ROM_LOAD16_BYTE( "epr-12265.a2",  0x20001, 0x10000, CRC(8cdadd9a) SHA1(a17852f0eb8f63a82ff44cbeb100da72fe5890e0) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-12268.a14", 0x00000, 0x10000, CRC(e0dac07f) SHA1(c7f6de42eb93a8f34afdc300628735b5f40a34c2) )
-	ROM_LOAD( "epr-12269.a15", 0x10000, 0x10000, CRC(457a8790) SHA1(b701e1a1745cefb31083c8a3daa3b23181f89576) )
-	ROM_LOAD( "epr-12270.a16", 0x20000, 0x10000, CRC(69fc025b) SHA1(20be1242de27f1b997d43890051cc5d5ac8a127a) )
+	ROM_LOAD( "epr-12268.b9",  0x00000, 0x10000, CRC(e0dac07f) SHA1(c7f6de42eb93a8f34afdc300628735b5f40a34c2) )
+	ROM_LOAD( "epr-12269.b10", 0x10000, 0x10000, CRC(457a8790) SHA1(b701e1a1745cefb31083c8a3daa3b23181f89576) )
+	ROM_LOAD( "epr-12270.b11", 0x20000, 0x10000, CRC(69fc025b) SHA1(20be1242de27f1b997d43890051cc5d5ac8a127a) )
 
 	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-12276.b4", 0x00001, 0x10000, CRC(838bd71f) SHA1(82d9d127438f5e1906b1cf40bf3b4727f2ee5685) )
-	ROM_LOAD16_BYTE( "epr-12280.b8", 0x00000, 0x10000, CRC(639a57cb) SHA1(84fd8b96758d38f9e1ba1a3c2cf8099ec0452784) )
-	ROM_LOAD16_BYTE( "epr-12277.b3", 0x20001, 0x10000, CRC(f16b6ba2) SHA1(00cc04c7b5aad82d51d2d252e1e57bcdc5e2c9e3) )
-	ROM_LOAD16_BYTE( "epr-12281.b7", 0x20000, 0x10000, CRC(1ef1077f) SHA1(8ce6fd7d32a20b93b3f91aaa43fe22720da7236f) )
-	ROM_LOAD16_BYTE( "epr-12278.b2", 0x40001, 0x10000, CRC(961d06b7) SHA1(b1a9dea63785bfa2c0e7b931387b91dfcd27d79b) )
-	ROM_LOAD16_BYTE( "epr-12282.b6", 0x40000, 0x10000, CRC(e8671ee1) SHA1(a3732938c370f1936d867aae9c3d1e9bbfb57ede) )
-	ROM_LOAD16_BYTE( "epr-12279.b1", 0x60001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )
-	ROM_LOAD16_BYTE( "epr-12283.b5", 0x60000, 0x10000, CRC(ae0fa085) SHA1(ae9af92d4dd0c8a0f064d24e647522b588fbd7f7) )
+	ROM_LOAD16_BYTE( "epr-12276.b1", 0x00001, 0x10000, CRC(838bd71f) SHA1(82d9d127438f5e1906b1cf40bf3b4727f2ee5685) )
+	ROM_LOAD16_BYTE( "epr-12280.b5", 0x00000, 0x10000, CRC(639a57cb) SHA1(84fd8b96758d38f9e1ba1a3c2cf8099ec0452784) )
+	ROM_LOAD16_BYTE( "epr-12277.b2", 0x20001, 0x10000, CRC(f16b6ba2) SHA1(00cc04c7b5aad82d51d2d252e1e57bcdc5e2c9e3) )
+	ROM_LOAD16_BYTE( "epr-12281.b6", 0x20000, 0x10000, CRC(1ef1077f) SHA1(8ce6fd7d32a20b93b3f91aaa43fe22720da7236f) )
+	ROM_LOAD16_BYTE( "epr-12278.b3", 0x40001, 0x10000, CRC(961d06b7) SHA1(b1a9dea63785bfa2c0e7b931387b91dfcd27d79b) )
+	ROM_LOAD16_BYTE( "epr-12282.b7", 0x40000, 0x10000, CRC(e8671ee1) SHA1(a3732938c370f1936d867aae9c3d1e9bbfb57ede) )
+	ROM_LOAD16_BYTE( "epr-12279.b4", 0x60001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )
+	ROM_LOAD16_BYTE( "epr-12283.b8", 0x60000, 0x10000, CRC(ae0fa085) SHA1(ae9af92d4dd0c8a0f064d24e647522b588fbd7f7) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12271.a7",  0x00000, 0x8000, CRC(99671e52) SHA1(ab21b7e7a449c8081b5db1fdb579071e31b6852c) )
@@ -9419,6 +9646,7 @@ GAME( 1990, atomicp,    0,        atomicp,               atomicp,  segas16b_stat
 GAME( 1990, snapper,    0,        atomicp,               snapper,  segas16b_state, init_snapper,             ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
 GAME( 1991, lockonph,   0,        lockonph,              lockonph, segas16b_state, init_lockonph,            ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
+GAME( 199?, dfjail,   0,          dfjail,                dfjail,   segas16b_state, init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // dips, check sound, not extensively tested
 
 // decrypted bootleg / 'suicide repair' sets
 

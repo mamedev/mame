@@ -16,6 +16,17 @@
 		</part>
 	</software>
 
+	<software name="appetisv" cloneof="appetide">
+		<description>Amiga Appetizer (Sv)</description>
+		<year>1989</year>
+		<publisher>Gold Disk</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="amiga appetizer (sv).adf" size="901120" crc="8be0554b" sha1="0bba0914ea63c8e1c69e55ae502df6add2244d22"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dast11de">
 		<!-- Part of the Amiga Magic Pack -->
 		<description>Datastore 1.1 (De)</description>
@@ -26,6 +37,18 @@
 			<feature name="part_id" value="Datastore 1.1 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="datastore11_de.adf" size="901120" crc="8fc8bb62" sha1="05cc8175f2218532ad35b8fbb6c724b4bd0d9c3d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deskbudg">
+		<description>Desktop Budget (Sv)</description>
+		<year>1989</year>
+		<publisher>Gold Disk</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Desktop Budget (Sv)" />
+			<dataarea name="flop" size="901120">
+				<rom name="desktop budget (swe).adf" size="901120" crc="d9c1fab6" sha1="013b152b9aa7eff0263d54b85bb107f77b4c4245"/>
 			</dataarea>
 		</part>
 	</software>
@@ -86,6 +109,17 @@
 			<feature name="part_id" value="Simplex Tools 2 - RAP!TOP!COP! (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="simplex_tools_2.adf" size="901120" crc="9d211a17" sha1="a1021a34f6f95adc38021a24aed59300d6a211e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name ="suprdupr">
+		<description>SuperDuper 2.02</description>
+		<year>19??</year>
+		<publisher>Amitech Denmark</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="901120">
+				<rom name="superduper 2.02.adf" size="901120" crc="fba10303" sha1="281945a469e0e791ab63c7c4cb5b8ffbb1663095" />
 			</dataarea>
 		</part>
 	</software>

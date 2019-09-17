@@ -404,9 +404,9 @@ bool hp_hybrid_cpu_device::execute_one_bpc(uint16_t opcode , uint16_t& next_pc)
 	case 0x4000:
 		// JSM
 		m_icount -= 5;
+		next_pc = remove_mae(get_ea(opcode));
 		m_reg_R = (m_reg_R + 1) & m_addr_mask_low16;
 		WM(AEC_CASE_C , m_reg_R , m_reg_P);
-		next_pc = remove_mae(get_ea(opcode));
 		return true;
 
 	case 0x4800:

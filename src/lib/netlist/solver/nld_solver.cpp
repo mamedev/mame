@@ -386,7 +386,7 @@ namespace devices
 			ms->setup(grp);
 
 			log().verbose("Solver {1}", ms->name());
-			log().verbose("       ==> {2} nets", grp.size());
+			log().verbose("       ==> {1} nets", grp.size());
 			log().verbose("       has {1} elements", ms->has_dynamic_devices() ? "dynamic" : "no dynamic");
 			log().verbose("       has {1} elements", ms->has_timestep_devices() ? "timestep" : "no timestep");
 			for (auto &n : grp)

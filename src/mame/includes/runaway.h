@@ -8,6 +8,7 @@
 #include "machine/er2055.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class runaway_state : public driver_device
 {

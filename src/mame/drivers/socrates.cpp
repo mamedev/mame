@@ -985,7 +985,7 @@ WRITE8_MEMBER( iqunlimz_state::colors_w )
 
 INPUT_CHANGED_MEMBER( iqunlimz_state::send_input )
 {
-	uint8_t data = (uint8_t)(uintptr_t)param;
+	uint8_t data = (uint8_t)param;
 
 	if (newval)
 	{

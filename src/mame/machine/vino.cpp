@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /*********************************************************************
 
-    vino.c
+    vino.cpp
 
     Silicon Graphics VINO (Video-In, No Out) controller emulation
 
@@ -23,6 +23,9 @@ DEFINE_DEVICE_TYPE(VINO, vino_device, "vino", "SGI VINO Controller")
 
 vino_device::vino_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VINO, tag, owner, clock)
+	, m_i2c_data_out(*this)
+	, m_i2c_data_in(*this)
+	, m_i2c_stop(*this)
 {
 }
 
@@ -58,6 +61,10 @@ void vino_device::device_start()
 		save_item(NAME(m_channels[i].m_fifo_gio_ptr), i);
 		save_item(NAME(m_channels[i].m_fifo_video_ptr), i);
 	}
+
+	m_i2c_data_out.resolve_safe();
+	m_i2c_data_in.resolve_safe(0x00);
+	m_i2c_stop.resolve_safe();
 }
 
 void vino_device::device_reset()

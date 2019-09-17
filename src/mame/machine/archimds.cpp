@@ -37,6 +37,7 @@ static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 static const uint32_t pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
 
 #define IOC_LOG 0
+#define CRTC_LOG 0
 
 /* TODO: fix pending irqs */
 void archimedes_state::archimedes_request_irq_a(int mask)
@@ -121,7 +122,6 @@ void archimedes_state::vidc_video_tick()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	static uint8_t *vram = m_region_vram->base();
 	uint32_t size;
-	uint32_t m_vidc_ccur;
 	uint32_t offset_ptr;
 
 	size = (m_vidc_vidend - m_vidc_vidstart + 0x10) & 0x1fffff;
@@ -142,8 +142,10 @@ void archimedes_state::vidc_video_tick()
 
 	if(m_cursor_enabled == true)
 	{
-		for(m_vidc_ccur = 0;m_vidc_ccur < 0x200;m_vidc_ccur++)
-			m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
+		uint32_t ccur_size = (m_vidc_regs[VIDC_VCER] - m_vidc_regs[VIDC_VCSR]) * 32;
+		
+		for(uint32_t ccur = 0; ccur < ccur_size; ccur++)
+			m_cursor_vram[ccur] = (space.read_byte(m_vidc_cinit+ccur));
 	}
 
 	if(m_video_dma_on)
@@ -294,6 +296,9 @@ void archimedes_state::archimedes_reset()
 
 	m_vidc_vblank_time = 10000; // set a stupidly high time so it doesn't fire off
 	m_vbl_timer->adjust(attotime::never);
+	
+	m_cursor_enabled = false;
+	memset(m_cursor_vram, 0, sizeof(m_cursor_vram));
 }
 
 void archimedes_state::archimedes_init()
@@ -607,6 +612,8 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			---- --x- I2C clock
 			---- ---x I2C data
 			*/
+			
+			//m_ioc_regs[CONTROL] = data & 0x38;
 			//if(data & 0x40)
 			//  popmessage("Muting sound, contact MAME/MESSdev");
 			break;
@@ -739,7 +746,20 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 						return 0;
 					}
 				case 2:
-					logerror("IOC: Econet Read %08x\n",ioc_addr);
+					// RTFM joystick interface routes here
+					switch(ioc_addr)
+					{
+						case 0x3a0000:
+							return 0xed; // ID? Status?
+						case 0x3a0004:
+							return m_joy[0].read_safe(0xff);
+						case 0x3a0008: 
+							// Top Banana reads there and do various checks,
+							// disallowing player 1 joy use if they fails (?)
+							return m_joy[1].read_safe(0xff);
+					}
+					
+					logerror("IOC: Econet Read %08x at PC=%08x\n",ioc_addr, m_maincpu->pc());
 					return 0xffff;
 				case 3:
 					logerror("IOC: Serial Read\n");
@@ -755,10 +775,13 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 							case 0x18: return 0xff; // FDC latch B
 							case 0x40: return 0xff; // FDC latch A
 							case 0x50: return 0; //fdc type, new model returns 5 here
-							case 0x70: return 0x0F;
-							case 0x74: return 0xFF; // unknown
-//                          case 0x78: /* joystick */
-//                          case 0x7c:
+							case 0x70: return 0x0f;
+							case 0x74: return 0xff; // unknown
+							case 0x78: // serial joystick?
+							case 0x7c:
+								logerror("FDC: reading Joystick port %04x at PC=%08x\n",ioc_addr, m_maincpu->pc());
+								return 0xff;
+							
 						}
 					}
 
@@ -818,6 +841,38 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 					{
 						switch(ioc_addr & 0xfffc)
 						{
+							// serial joy port (!JS application)
+							case 0x10:
+							{
+								// compared to RTFM they reversed bits 0-3 (or viceversa, dunno what came out first)
+								// for pragmatic convenience we bitswap here, but this should really be a slot option at some point.
+								// TODO: understand how player 2 inputs routes, related somehow to CONTROL bit 6 (cfr. blitz in SW list)
+								// TODO: paradr2k polls here with bit 7 and fails detection (Vertical Twist)
+								uint8_t cur_joy_in = bitswap<8>(m_joy[0].read_safe(0xff),7,6,5,4,0,1,2,3);
+								
+								m_joy_serial_data = (data & 0xff) ^ 0xff;
+								bool serial_on = false;
+								
+								if (m_joy_serial_data == 0x20)
+									serial_on = true;
+								else if (m_joy_serial_data & cur_joy_in)
+									serial_on = true;
+								
+								
+								// wants printer irq for some reason (connected on parallel?)
+								if (serial_on == true)
+								{
+									archimedes_request_irq_a(ARCHIMEDES_IRQA_PRINTER_BUSY);
+									//m_ioc_regs[CONTROL] |= 0x40;
+								}
+								else
+								{
+									archimedes_clear_irq_a(ARCHIMEDES_IRQA_PRINTER_BUSY);
+									//m_ioc_regs[CONTROL] &= ~0x40;
+								}
+								
+								return;
+							}
 							case 0x18: // latch B
 								/*
 								---- x--- floppy controller reset
@@ -906,7 +961,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 {
 	uint32_t reg = data>>24;
 	uint32_t val = data & 0xffffff;
-	//#ifdef MAME_DEBUG
+	#if CRTC_LOG
 	static const char *const vrnames[] =
 	{
 		"horizontal total",
@@ -926,7 +981,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		"vertical cursor start",
 		"vertical cursor end",
 	};
-	//#endif
+	#endif
 
 
 	// 0x00 - 0x3c Video Palette Logical Colors (16 colors)
@@ -941,8 +996,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		g = (val & 0x00f0) >> 4;
 		r = (val & 0x000f) >> 0;
 
-		if(reg == 0x40 && val & 0xfff)
-			logerror("WARNING: border color write here (PC=%08x)!\n",m_maincpu->pc());
+		//if(reg == 0x40 && val & 0xfff)
+		//	logerror("WARNING: border color write here (PC=%08x)!\n",m_maincpu->pc());
 
 		m_palette->set_pen_color(reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
 
@@ -995,10 +1050,10 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		}
 
 
-		//#ifdef MAME_DEBUG
+		#if CRTC_LOG
 		if(reg != VIDC_VCSR && reg != VIDC_VCER && reg != VIDC_HCSR)
 		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], m_vidc_regs[reg]);
-		//#endif
+		#endif
 
 		vidc_dynamic_res_change();
 	}
@@ -1042,7 +1097,6 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 		switch ((data >> 17) & 7)
 		{
 			case 0: /* video init */
-				m_cursor_enabled = false;
 				m_vidc_vidinit = 0x2000000 | ((data>>2)&0x7fff)*16;
 				//printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
 				break;
@@ -1092,6 +1146,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 					m_vidc_vidcur = 0;
 					m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time+1));
 				}
+				else
+					m_cursor_enabled = false;
 
 				if ((data>>11) & 1)
 				{

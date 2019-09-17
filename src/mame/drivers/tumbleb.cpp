@@ -20,6 +20,7 @@
   WonderLeague '96      (c) 1996 SemiCom (Korea Only)
   SD Fighters           (c) 1996 SemiCom (Korea Only)
   Carket Ball           (c) 1996
+  Magic Purple          (c) 1996 Unico
   B.C. Story            (c) 1997 SemiCom
   MuHanSeungBu          (c) 1997 SemiCom (Korea Only)
   Date Quiz Go Go       (c) 1998 SemiCom (Korea Only)
@@ -2710,25 +2711,67 @@ ROM_START( fncywld )
 	ROM_LOAD( "00_fw01.bin", 0x000000, 0x040000, CRC(b395fe01) SHA1(ac7f2e21413658f8d2a1abf3a76b7817a4e050c9) )
 ROM_END
 
+/*
+
+Magic Purple, (c) 1996 Unico
+
++---------------------------------------------+
+|        unico_1     6116          unico_4    |
+|             M6295  6116                     |
+| YM3012     YM2151  6116          unico_5    |
+|         4.000MHz   6116                     |
+| 28.6363MHz         +--------+ GAL-D         |
+|                    | Actel  |               |
+|J                   | A1020B | GAL-E   GAL-G |
+|A                   +--------+         GAL-H |
+|M                        2018          GAL-I |
+|M                        2018                |
+|A          76C28         +--------+          |
+|           76C28         | Actel  | GAL-F    |
+|        62256 62256      | A1020B |          |
+| DSWA unico_2 unico_3    +--------+          |
+| DSWB   MC68000P12          6264    unico_6  |
+|    GAL-A GAL-B             6264    unico_7  |
+|          GAL-C 12.00MHz                     |
++---------------------------------------------+
+
+  CPU: MC68000P12
+Sound: YM2151+YM3012 & OKI M6295 (bagded as KA51+BS902 & AD-65)
+  OSC: 28.6363MHz, 12.000MHz, 4.000MHz
+Other: Actel A1020B PL84C
+       8-position dipswitch x 2
+RAM: HY62256A LP-70 x 2 - 32K x 8 SRAM
+     HY6264ALP-10 x 2 - 8K x 8 SRAM
+     SYC6116L-45P x 4 - 2K x 8 RAM
+     MCM2018N45 x 2 - 2K x 8 SRAM
+     GM76C28K-10 x 2 - 2K x 8 SRAM
+GAL-A through GAL-I misc undumped GALs
+
+Although not currently measured, clocks "should" be:
+ MC68000P12 - 12.00MHz
+     YM2151 - 4.00MHz
+  OKI M6295 - 1.000MHz  (4.000MHz OSC / 4)
+
+*/
 ROM_START( magipur )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "2-27c040.bin", 0x000000, 0x080000, CRC(135c5de7) SHA1(95c75e9e69793f67df9378391ae45915ef9bbb89) )
-	ROM_LOAD16_BYTE( "3-27c040.bin", 0x000001, 0x080000, CRC(ee4b16da) SHA1(82391ed4d21d3944ca482be00ab7c0838cf190ff) )
+	ROM_LOAD16_BYTE( "unico_2-27c040.bin", 0x000000, 0x080000, CRC(135c5de7) SHA1(95c75e9e69793f67df9378391ae45915ef9bbb89) )
+	ROM_LOAD16_BYTE( "unico_3-27c040.bin", 0x000001, 0x080000, CRC(ee4b16da) SHA1(82391ed4d21d3944ca482be00ab7c0838cf190ff) )
 
 	ROM_REGION( 0x100000, "sprgfx", 0  )
-	ROM_LOAD16_BYTE( "4-27c040.bin",  0x80000, 0x40000, CRC(e460a77d) SHA1(bde15705750e002bd576098700161b0944984401) )
+	ROM_LOAD16_BYTE( "unico_4-27c040.bin",  0x80000, 0x40000, CRC(e460a77d) SHA1(bde15705750e002bd576098700161b0944984401) )
 	ROM_CONTINUE(0x80001, 0x40000)
-	ROM_LOAD16_BYTE( "5-27c040.bin",  0x00000, 0x40000, CRC(79c53627) SHA1(9e2673b3becf0508f630f3bd8ff5fc30520b120b) )
+	ROM_LOAD16_BYTE( "unico_5-27c040.bin",  0x00000, 0x40000, CRC(79c53627) SHA1(9e2673b3becf0508f630f3bd8ff5fc30520b120b) )
 	ROM_CONTINUE(0x00001, 0x40000)
 
 	ROM_REGION( 0x100000, "tilegfx", 0 )
-	ROM_LOAD16_BYTE( "6-27c040.bin", 0x00001, 0x40000, CRC(b25b5872) SHA1(88a6a110073060c3b7b2987cc41d23c4ca412b43) )
+	ROM_LOAD16_BYTE( "unico_6-27c040.bin", 0x00001, 0x40000, CRC(b25b5872) SHA1(88a6a110073060c3b7b2987cc41d23c4ca412b43) )
 	ROM_CONTINUE(0x00000, 0x40000)
-	ROM_LOAD16_BYTE( "7-27c040.bin", 0x80001, 0x40000, CRC(d3c3a672) SHA1(5bbd67a953e1d47d05006a4ef4aa7a23e807f11b) )
+	ROM_LOAD16_BYTE( "unico_7-27c040.bin", 0x80001, 0x40000, CRC(d3c3a672) SHA1(5bbd67a953e1d47d05006a4ef4aa7a23e807f11b) )
 	ROM_CONTINUE(0x80000, 0x40000)
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "1-27c020.bin", 0x000000, 0x040000, CRC(84dcf771) SHA1(f8a693a11b14608a582a90b7fd7d3be92e46a0e1) )
+	ROM_LOAD( "unico_1-27c020.bin", 0x000000, 0x040000, CRC(84dcf771) SHA1(f8a693a11b14608a582a90b7fd7d3be92e46a0e1) )
 ROM_END
 
 ROM_START( suprtrio )

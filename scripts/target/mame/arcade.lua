@@ -284,6 +284,7 @@ SOUNDS["LC7535"] = true
 
 VIDEOS["SEGA315_5124"] = true
 VIDEOS["SEGA315_5313"] = true
+--VIDEOS["AM8052"] = true
 VIDEOS["BUFSPRITE"] = true
 --VIDEOS["CDP1861"] = true
 --VIDEOS["CDP1862"] = true
@@ -327,6 +328,7 @@ VIDEOS["MB90082"] = true
 VIDEOS["MB_VCU"] = true
 VIDEOS["MC6845"] = true
 --VIDEOS["MC6847"] = true
+--VIDEOS["MD4330B"] = true
 --VIDEOS["MM5445"] = true
 --VIDEOS["MSM6222B"] = true
 --VIDEOS["MSM6255"] = true
@@ -363,6 +365,7 @@ VIDEOS["ZEUS2"] = true
 VIDEOS["PPU2C0X"] = true
 VIDEOS["PS2GS"] = true
 VIDEOS["PS2GIF"] = true
+VIDEOS["VRENDER0"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -445,7 +448,8 @@ MACHINES["DS1204"] = true
 MACHINES["DS1205"] = true
 MACHINES["DS1302"] = true
 --MACHINES["DS1315"] = true
---MACHINES["DS1386"] = true
+MACHINES["DS1386"] = true
+MACHINES["DS17X85"] = true
 MACHINES["DS1994"] = true
 MACHINES["DS2401"] = true
 MACHINES["DS2404"] = true
@@ -556,6 +560,8 @@ MACHINES["OUTPUT_LATCH"] = true
 MACHINES["PC_FDC"] = true
 MACHINES["PC_LPT"] = true
 --MACHINES["PCCARD"] = true
+MACHINES["PCF8583"] = true
+MACHINES["PCF8584"] = true
 MACHINES["PCF8593"] = true
 MACHINES["PCI"] = true
 MACHINES["PCKEYBRD"] = true
@@ -677,6 +683,7 @@ MACHINES["PS2INTC"] = true
 --MACHINES["IOPTIMER"] = true
 MACHINES["AIC565"] = true
 MACHINES["AIC6250"] = true
+MACHINES["VRENDER0"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -912,7 +919,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
 	addprojectflags()
-	precompiledheaders()
+	precompiledheaders_novs()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -929,6 +936,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 		ext_includedir("flac"),
 		ext_includedir("glm"),
 		ext_includedir("jpeg"),
+		ext_includedir("rapidjson"),
 	}
 
 end
@@ -1430,8 +1438,6 @@ files {
 	MAME_DIR .. "src/mame/video/1943.cpp",
 	MAME_DIR .. "src/mame/drivers/alien.cpp",
 	MAME_DIR .. "src/mame/drivers/bionicc.cpp",
-	MAME_DIR .. "src/mame/includes/bionicc.h",
-	MAME_DIR .. "src/mame/video/bionicc.cpp",
 	MAME_DIR .. "src/mame/drivers/supduck.cpp",
 	MAME_DIR .. "src/mame/video/tigeroad_spr.cpp",
 	MAME_DIR .. "src/mame/video/tigeroad_spr.h",
@@ -3068,6 +3074,7 @@ files {
 	MAME_DIR .. "src/mame/video/punchout.cpp",
 	MAME_DIR .. "src/mame/drivers/famibox.cpp",
 	MAME_DIR .. "src/mame/drivers/sfcbox.cpp",
+	MAME_DIR .. "src/mame/drivers/snesb51.cpp",
 	MAME_DIR .. "src/mame/drivers/snesb.cpp",
 	MAME_DIR .. "src/mame/drivers/spacefb.cpp",
 	MAME_DIR .. "src/mame/includes/spacefb.h",
@@ -3505,6 +3512,8 @@ files {
 	MAME_DIR .. "src/mame/machine/mc8123.h",
 	MAME_DIR .. "src/mame/machine/segaic16.cpp",
 	MAME_DIR .. "src/mame/machine/segaic16.h",
+	MAME_DIR .. "src/mame/machine/segabill.cpp",
+	MAME_DIR .. "src/mame/machine/segabill.h",
 	MAME_DIR .. "src/mame/audio/segasnd.cpp",
 	MAME_DIR .. "src/mame/audio/segasnd.h",
 	MAME_DIR .. "src/mame/video/segaic16.cpp",
@@ -4645,8 +4654,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/corona.cpp",
 	MAME_DIR .. "src/mame/drivers/cwheel.cpp",
 	MAME_DIR .. "src/mame/drivers/crystal.cpp",
-	MAME_DIR .. "src/mame/video/vrender0.cpp",
-	MAME_DIR .. "src/mame/video/vrender0.h",
+	MAME_DIR .. "src/mame/drivers/ddz.cpp",
+	MAME_DIR .. "src/mame/drivers/menghong.cpp",
+	MAME_DIR .. "src/mame/drivers/trivrus.cpp",
+	MAME_DIR .. "src/mame/drivers/crospuzl.cpp",
+	MAME_DIR .. "src/mame/drivers/psattack.cpp",
 	MAME_DIR .. "src/mame/drivers/cubeqst.cpp",
 	MAME_DIR .. "src/mame/drivers/cybertnk.cpp",
 	MAME_DIR .. "src/mame/drivers/daryde.cpp",
@@ -4785,6 +4797,7 @@ files {
 	MAME_DIR .. "src/mame/video/micro3d.cpp",
 	MAME_DIR .. "src/mame/audio/micro3d.cpp",
 	MAME_DIR .. "src/mame/audio/micro3d.h",
+	MAME_DIR .. "src/mame/drivers/microdar.cpp",
 	MAME_DIR .. "src/mame/drivers/midas.cpp",
 	MAME_DIR .. "src/mame/drivers/mil4000.cpp",
 	MAME_DIR .. "src/mame/drivers/miniboy7.cpp",
@@ -4842,6 +4855,7 @@ files {
 	MAME_DIR .. "src/mame/audio/polyplay.cpp",
 	MAME_DIR .. "src/mame/video/polyplay.cpp",
 	MAME_DIR .. "src/mame/drivers/poker72.cpp",
+	MAME_DIR .. "src/mame/drivers/pokerout.cpp",
 	MAME_DIR .. "src/mame/drivers/potgoldu.cpp",
 	MAME_DIR .. "src/mame/drivers/proconn.cpp",
 	MAME_DIR .. "src/mame/drivers/pse.cpp",

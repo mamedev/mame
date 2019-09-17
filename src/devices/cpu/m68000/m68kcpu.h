@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <limits.h>
-
 #if defined(__sun__) && defined(__svr4__)
 #undef REG_SP
 #undef REG_PC
+#else
+#include <limits.h>
 #endif
 
 /* ======================================================================== */

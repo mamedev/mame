@@ -81,7 +81,7 @@ void splash_state::splash_map(address_map &map)
 	map(0x840002, 0x840003).portr("DSW2");
 	map(0x840004, 0x840005).portr("P1");
 	map(0x840006, 0x840007).portr("P2");
-	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 3, data); });
+	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
 	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
@@ -161,7 +161,7 @@ void splash_state::roldfrog_map(address_map &map)
 	map(0x840002, 0x840003).portr("DSW2");
 	map(0x840004, 0x840005).portr("P1");
 	map(0x840006, 0x840007).portr("P2");
-	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 3, data); });
+	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
 	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */

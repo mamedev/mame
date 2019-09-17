@@ -43,10 +43,10 @@ public:
 
 	void stactics(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_frame_count_d3);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_shot_standby);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_not_shot_arrive);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_motor_not_ready);
+	DECLARE_READ_LINE_MEMBER(frame_count_d3_r);
+	DECLARE_READ_LINE_MEMBER(shot_standby_r);
+	DECLARE_READ_LINE_MEMBER(not_shot_arrive_r);
+	DECLARE_READ_LINE_MEMBER(motor_not_ready_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
 
 private:

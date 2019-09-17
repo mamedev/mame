@@ -16,7 +16,7 @@
 const options_entry osd_options::s_option_entries[] =
 {
 	{ nullptr,                               nullptr,           OPTION_HEADER,    "OSD KEYBOARD MAPPING OPTIONS" },
-#ifdef SDLMAME_MACOSX
+#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
 	{ OSDOPTION_UIMODEKEY,                   "DEL",             OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #else
 	{ OSDOPTION_UIMODEKEY,                   "SCRLOCK",         OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
@@ -40,6 +40,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD DEBUGGING OPTIONS" },
 	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,   OPTION_STRING,    "debugger used: " },
+	{ OSDOPTION_DEBUGGER_PORT,                "23946",          OPTION_INTEGER,   "port to use for gdbstub debugger" },
 	{ OSDOPTION_DEBUGGER_FONT ";dfont",       OSDOPTVAL_AUTO,   OPTION_STRING,    "font to use for debugger views" },
 	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",           OPTION_FLOAT,     "font size to use for debugger views" },
 	{ OSDOPTION_WATCHDOG ";wdog",             "0",              OPTION_INTEGER,   "force the program to terminate if no updates within specified number of seconds" },
@@ -227,6 +228,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MONITOR_SDL);
 	REGISTER_MODULE(m_mod_man, MONITOR_WIN32);
 	REGISTER_MODULE(m_mod_man, MONITOR_DXGI);
+	REGISTER_MODULE(m_mod_man, MONITOR_MAC);
 
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
@@ -235,6 +237,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, DEBUG_WINDOWS);
 	REGISTER_MODULE(m_mod_man, DEBUG_QT);
 	REGISTER_MODULE(m_mod_man, DEBUG_IMGUI);
+	REGISTER_MODULE(m_mod_man, DEBUG_GDBSTUB);
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
 #endif
 

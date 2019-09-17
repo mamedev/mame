@@ -742,6 +742,7 @@ JP4/5/6/7 - Jumpers to configure ROMs
 #include "machine/m3comm.h"
 #include "speaker.h"
 
+#include "segabill.lh"
 
 void model3_state::update_irq_state()
 {
@@ -1408,175 +1409,70 @@ MACHINE_RESET_MEMBER(model3_state,model3_20){ model3_init(0x20); }
 MACHINE_RESET_MEMBER(model3_state,model3_21){ model3_init(0x21); }
 
 
-READ64_MEMBER(model3_state::model3_ctrl_r)
+//**************************************************************************
+//  INPUT HANDLING
+//**************************************************************************
+
+WRITE8_MEMBER( model3_state::eeprom_w )
 {
-	switch( offset )
-	{
-		case 0:
-			if (ACCESSING_BITS_56_63)
-			{
-				return (uint64_t)m_controls_bank << 56;
-			}
-			else if (ACCESSING_BITS_24_31)
-			{
-				if(m_controls_bank & 0x1)
-				{
-					return (ioport("IN1")->read()) << 24;
-				}
-				else
-				{
-					return (ioport("IN0")->read()) << 24;
-				}
-			}
-			break;
+	m_controls_bank = BIT(data, 0);
 
-		case 1:
-			if (ACCESSING_BITS_56_63)
-			{
-				return (uint64_t)ioport("IN2")->read() << 56;
-			}
-			else if (ACCESSING_BITS_24_31)
-			{
-				return ioport("IN3")->read() << 24;
-			}
-			break;
-
-		case 2:
-			return 0xffffffffffffffffU;
-
-		case 3:
-			return 0xffffffffffffffffU;     /* Dip switches */
-
-		case 4:
-			return 0xffffffffffffffffU;
-
-		case 5:
-			if (ACCESSING_BITS_24_31)                   /* Serial comm RX FIFO 1 */
-			{
-				return (uint64_t)m_serial_fifo1 << 24;
-			}
-			break;
-
-		case 6:
-			if (ACCESSING_BITS_56_63)       /* Serial comm RX FIFO 2 */
-			{
-				return (uint64_t)m_serial_fifo2 << 56;
-			}
-			else if (ACCESSING_BITS_24_31)              /* Serial comm full/empty flags */
-			{
-				return 0x0c << 24;
-			}
-			break;
-
-		case 7:
-			if (ACCESSING_BITS_24_31)       /* ADC Data read */
-			{
-				const uint8_t adc_data = m_adc_ports[m_adc_channel].read_safe(0);
-				m_adc_channel++;
-				m_adc_channel &= 0x7;
-				return (uint64_t)adc_data << 24;
-			}
-			break;
-	}
-
-	logerror("ctrl_r: %02X, %08X%08X", offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
-	return 0;
+	m_eeprom->di_write(BIT(data, 5));
+	m_eeprom->clk_write(BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE64_MEMBER(model3_state::model3_ctrl_w)
+READ8_MEMBER( model3_state::input_r )
 {
-	switch(offset)
+	if (m_controls_bank == 1)
+		return (ioport("IN1")->read());
+	else
+		return (ioport("IN0")->read());
+}
+
+WRITE8_MEMBER( model3_state::lostwsga_ser1_w )
+{
+	switch (data)
 	{
-		case 0:
-			if (ACCESSING_BITS_56_63)
+		case 0x00:
+			m_lightgun_reg_sel = m_serial_fifo2;
+			break;
+
+		case 0x87:
+			switch (m_lightgun_reg_sel)
 			{
-				int reg = (data >> 56) & 0xff;
-				m_eeprom->di_write((reg & 0x20) ? 1 : 0);
-				m_eeprom->clk_write((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->cs_write((reg & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-				m_controls_bank = reg & 0xff;
-			}
-			return;
+				// lightgun position
+				case 0: m_serial_fifo2 = (ioport("LIGHT0_Y")->read() >> 0) & 0xff; break;
+				case 1: m_serial_fifo2 = (ioport("LIGHT0_Y")->read() >> 8) & 0x03; break;
+				case 2: m_serial_fifo2 = (ioport("LIGHT0_X")->read() >> 0) & 0xff; break;
+				case 3: m_serial_fifo2 = (ioport("LIGHT0_X")->read() >> 8) & 0x03; break;
+				case 4: m_serial_fifo2 = (ioport("LIGHT1_Y")->read() >> 0) & 0xff; break;
+				case 5: m_serial_fifo2 = (ioport("LIGHT1_Y")->read() >> 8) & 0x03; break;
+				case 6: m_serial_fifo2 = (ioport("LIGHT1_X")->read() >> 0) & 0xff; break;
+				case 7: m_serial_fifo2 = (ioport("LIGHT1_X")->read() >> 8) & 0x03; break;
 
-		case 2:
-			COMBINE_DATA(&m_controls_2);
-			return;
-
-		case 3:
-			COMBINE_DATA(&m_controls_3);
-			return;
-
-		case 4:
-			if (ACCESSING_BITS_56_63)   /* Port 4 direction */
-			{
-			}
-			if (ACCESSING_BITS_24_31)               /* Serial comm TX FIFO 1 */
-			{                                           /* Used for reading the light gun in Lost World */
-				switch(data >> 24)
-				{
-					case 0x00:
-						m_lightgun_reg_sel = m_serial_fifo2;
-						break;
-					case 0x87:
-						m_serial_fifo1 = 0;
-						switch(m_lightgun_reg_sel)      /* read lightrun register */
-						{
-							case 0:     /* player 1 gun X-position, lower 8-bits */
-								m_serial_fifo2 = ioport("LIGHT0_Y")->read() & 0xff;
-								break;
-							case 1:     /* player 1 gun X-position, upper 2-bits */
-								m_serial_fifo2 = (ioport("LIGHT0_Y")->read() >> 8) & 0x3;
-								break;
-							case 2:     /* player 1 gun Y-position, lower 8-bits */
-								m_serial_fifo2 = ioport("LIGHT0_X")->read() & 0xff;
-								break;
-							case 3:     /* player 1 gun Y-position, upper 2-bits */
-								m_serial_fifo2 = (ioport("LIGHT0_X")->read() >> 8) & 0x3;
-								break;
-							case 4:     /* player 2 gun X-position, lower 8-bits */
-								m_serial_fifo2 = ioport("LIGHT1_Y")->read() & 0xff;
-								break;
-							case 5:     /* player 2 gun X-position, upper 2-bits */
-								m_serial_fifo2 = (ioport("LIGHT1_Y")->read() >> 8) & 0x3;
-								break;
-							case 6:     /* player 2 gun Y-position, lower 8-bits */
-								m_serial_fifo2 = ioport("LIGHT1_X")->read() & 0xff;
-								break;
-							case 7:     /* player 2 gun Y-position, upper 2-bits */
-								m_serial_fifo2 = (ioport("LIGHT1_X")->read() >> 8) & 0x3;
-								break;
-							case 8:     /* gun offscreen (bit set = gun offscreen, bit clear = gun on screen) */
-								m_serial_fifo2 = 0; /* bit 0 = player 1, bit 1 = player 2 */
-								if(ioport("OFFSCREEN")->read() & 0x1) {
-									m_serial_fifo2 |= 0x01;
-								}
-								break;
-						}
-						break;
-					default:
-						//osd_printf_debug("%s Lightgun: Unknown command %02X\n", machine().describe_context().c_str(), (uint32_t)(data >> 24));
-						break;
-				}
-			}
-			return;
-
-		case 5:
-			if (ACCESSING_BITS_56_63)   /* Serial comm TX FIFO 2 */
-			{
-				m_serial_fifo2 = data >> 56;
-				return;
+				// off-screen detect
+				case 8:
+					m_serial_fifo2 = 0;
+					if(ioport("OFFSCREEN")->read() & 0x01)
+						m_serial_fifo2 |= 0x01;
+					break;
 			}
 			break;
 
-		case 7:
-			if (ACCESSING_BITS_24_31)   /* ADC Channel selection */
-			{
-				m_adc_channel = (data >> 24) & 0xf;
-			}
-			return;
+		default:
+			logerror("lostwsga_ser1_w: Unknown command %02x\n", data);
 	}
+}
 
-	logerror("ctrl_w: %02X, %08X%08X, %08X%08X", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
+READ8_MEMBER( model3_state::lostwsga_ser2_r )
+{
+	return m_serial_fifo2;
+}
+
+WRITE8_MEMBER( model3_state::lostwsga_ser2_w )
+{
+	m_serial_fifo2 = data;
 }
 
 READ64_MEMBER(model3_state::model3_sys_r)
@@ -1806,7 +1702,7 @@ void model3_state::model3_10_mem(address_map &map)
 	map(0x8e000000, 0x8e0fffff).w(FUNC(model3_state::real3d_display_list_w));
 	map(0x98000000, 0x980fffff).w(FUNC(model3_state::real3d_polygon_ram_w));
 
-	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_ctrl_r), FUNC(model3_state::model3_ctrl_w));
+	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask64(0xff000000ff000000);
 	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).rw(FUNC(model3_state::model3_sound_r), FUNC(model3_state::model3_sound_w));
 	map(0xf00c0000, 0xf00dffff).mirror(0x0e000000).ram().share("backup");    /* backup SRAM */
 	map(0xf0100000, 0xf010003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_sys_r), FUNC(model3_state::model3_sys_w));
@@ -1833,7 +1729,7 @@ void model3_state::model3_5881_mem(address_map &map)
 	map(0xf01a0000, 0xf01a003f).mirror(0x0e000000).m(m_cryptdevice, FUNC(sega_315_5881_crypt_device::iomap_64be));
 }
 
-static INPUT_PORTS_START( common )
+static INPUT_PORTS_START( model3 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1848,40 +1744,59 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( model3 )
-	PORT_INCLUDE( common )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
 
 	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( von2 )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Lever Shot Trigger")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Left Lever Turbo Button")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1891,7 +1806,7 @@ static INPUT_PORTS_START( von2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right Lever Shot Trigger")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Right Lever Turbo Button")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1900,24 +1815,17 @@ static INPUT_PORTS_START( von2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
-
-	// TODO: not here
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lostwsga )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
 
 	PORT_START("LIGHT0_X")  // lightgun X-axis
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1936,9 +1844,9 @@ static INPUT_PORTS_START( lostwsga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scud )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* View Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* View Button 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* View Button 3 */
@@ -1948,88 +1856,79 @@ static INPUT_PORTS_START( scud )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )    /* Shift 3 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 )    /* Shift 4 */
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // steering
+	PORT_MODIFY("AN0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_MODIFY("AN1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // brake
+	PORT_MODIFY("AN2")   // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bass )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)     /* Cast */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)     /* Select */
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")       /* Rod Y */
+	PORT_MODIFY("AN0")       /* Rod Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")       /* Rod X */
+	PORT_MODIFY("AN1")       /* Rod X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")
+	PORT_MODIFY("AN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN3")       /* Reel */
+	PORT_MODIFY("AN3")       /* Reel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN4")       /* Stick Y */
+	PORT_MODIFY("AN4")       /* Stick Y */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN5")       /* Stick X */
+	PORT_MODIFY("AN5")       /* Stick X */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( harley )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* View Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* View Button 2 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* Shift down */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )    /* Shift up */
 	PORT_BIT( 0xcc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // steering
+	PORT_MODIFY("AN0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_MODIFY("AN1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // front brake
+	PORT_MODIFY("AN2")   // front brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN3")   // back brake
+	PORT_MODIFY("AN3")   // back brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daytona2 )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* View Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* View Button 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* View Button 3 */
@@ -2039,71 +1938,63 @@ static INPUT_PORTS_START( daytona2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )    /* Shift 3 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 )    /* Shift 4 */
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // steering
+	PORT_MODIFY("AN0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_MODIFY("AN1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // brake
+	PORT_MODIFY("AN2")   // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swtrilgy )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xde, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")       /* Analog Stick Y */
+	PORT_MODIFY("AN0")       /* Analog Stick Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
-	PORT_START("AN1")       /* Analog Stick X */
+	PORT_MODIFY("AN1")       /* Analog Stick X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eca )
-	PORT_INCLUDE( common )
+	PORT_INCLUDE( model3 )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* View Change */
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* Shift Up */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* Shift Down */
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // steering
+	PORT_MODIFY("AN0")   // steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // accelerator
+	PORT_MODIFY("AN1")   // accelerator
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN2")   // brake
+	PORT_MODIFY("AN2")   // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skichamp )
-	PORT_START("IN0")
+	PORT_INCLUDE( model3 )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) /* Test Button A */
@@ -2113,28 +2004,24 @@ static INPUT_PORTS_START( skichamp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )     /* Select 1 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )     /* Select 2 */
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* Pole Right */
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Foot sensor */
 
-	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     /* Dip switches */
-
-	PORT_START("AN0")   // inclining
+	PORT_MODIFY("AN0")   // inclining
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("AN1")   // swing
+	PORT_MODIFY("AN1")   // swing
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
 INPUT_PORTS_END
 
 
@@ -6030,6 +5917,22 @@ void model3_state::add_base_devices(machine_config &config)
 	NVRAM(config, "backup", nvram_device::DEFAULT_ALL_1);
 	RTC72421(config, m_rtc, XTAL(32'768)); // internal oscillator
 
+	SEGA_315_5649(config, m_io, 0);
+	m_io->out_pa_callback().set(FUNC(model3_state::eeprom_w));
+	m_io->in_pb_callback().set(FUNC(model3_state::input_r));
+	m_io->in_pc_callback().set_ioport("IN2");
+	m_io->in_pd_callback().set_ioport("IN3");
+	m_io->out_pe_callback().set([this] (uint8_t data) { m_billboard->write(data); });
+	m_io->in_pg_callback().set_ioport("DSW");
+	m_io->an_port_callback<0>().set_ioport("AN0");
+	m_io->an_port_callback<1>().set_ioport("AN1");
+	m_io->an_port_callback<2>().set_ioport("AN2");
+	m_io->an_port_callback<3>().set_ioport("AN3");
+	m_io->an_port_callback<4>().set_ioport("AN4");
+	m_io->an_port_callback<5>().set_ioport("AN5");
+	m_io->an_port_callback<6>().set_ioport("AN6");
+	m_io->an_port_callback<7>().set_ioport("AN7");
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_visarea(0, 495, 0, 383);
@@ -6053,6 +5956,10 @@ void model3_state::add_base_devices(machine_config &config)
 	scsp2.set_addrmap(0, &model3_state::scsp2_map);
 	scsp2.add_route(0, "lspeaker", 1.0);
 	scsp2.add_route(1, "rspeaker", 1.0);
+
+	SEGA_BILLBOARD(config, m_billboard, 0);
+
+	config.set_default_layout(layout_segabill);
 }
 
 void model3_state::add_scsi_devices(machine_config &config)
@@ -6114,6 +6021,16 @@ void model3_state::scud(machine_config &config)
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 }
 
+void model3_state::lostwsga(machine_config &config)
+{
+	model3_15(config);
+
+	// lightgun
+	m_io->serial_ch1_wr_callback().set(FUNC(model3_state::lostwsga_ser1_w));
+	m_io->serial_ch2_rd_callback().set(FUNC(model3_state::lostwsga_ser2_r));
+	m_io->serial_ch2_wr_callback().set(FUNC(model3_state::lostwsga_ser2_w));
+}
+
 void model3_state::model3_20(machine_config &config)
 {
 	add_cpu_166mhz(config);
@@ -6123,20 +6040,6 @@ void model3_state::model3_20(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_20)
 
 	M3COMM(config, "comm_board", 0);
-}
-
-uint16_t model3_state::crypt_read_callback(uint32_t addr)
-{
-	uint16_t dat = 0;
-	if (addr < 0x8000)
-	{
-		dat = m_maincpu->space().read_word((0xf0180000 + 4 * addr)); // every other word is unused in this RAM, probably 32-bit ram on 64-bit bus?
-	}
-
-//  dat = ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
-//  printf("reading %04x\n", dat);
-
-	return dat;
 }
 
 void model3_state::model3_20_5881(machine_config &config)
@@ -6160,6 +6063,20 @@ void model3_state::model3_21_5881(machine_config &config)
 {
 	model3_21(config);
 	add_crypt_devices(config);
+}
+
+uint16_t model3_state::crypt_read_callback(uint32_t addr)
+{
+	uint16_t dat = 0;
+	if (addr < 0x8000)
+	{
+		dat = m_maincpu->space().read_word((0xf0180000 + 4 * addr)); // every other word is unused in this RAM, probably 32-bit ram on 64-bit bus?
+	}
+
+//  dat = ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
+//  printf("reading %04x\n", dat);
+
+	return dat;
 }
 
 void model3_state::interleave_vroms()
@@ -6544,8 +6461,8 @@ GAME( 1996, scudj,       scud,      scud, scud,     model3_state,     init_scud,
 GAME( 1996, scuda,       scud,      scud, scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race Twin (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplus,    scud,      scud, scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplusa,   scud,      scud, scud,     model3_state,init_scudplusa, ROT0, "Sega", "Scud Race Plus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, lostwsga,       0, model3_15, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, lostwsgp,lostwsga, model3_15, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, lostwsga,       0,  lostwsga, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, lostwsgp,lostwsga,  lostwsga, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, vs215,        vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, vs215o,       vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lemans24,       0, model3_15, scud,     model3_state, init_lemans24, ROT0, "Sega", "Le Mans 24 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

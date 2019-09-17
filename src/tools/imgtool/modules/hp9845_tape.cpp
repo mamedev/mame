@@ -148,10 +148,10 @@
 #define BYTES_AVAILABLE_MASK    0xff00  // Mask of "bytes available" field
 #define BYTES_USED          0x00ff  // "bytes used" field = 256
 #define BYTES_USED_MASK     0x00ff  // Mask of "bytes used" field
-#define FORMAT_SECT_SIZE    ((tape_pos_t)(2.85 * hti_format_t::ONE_INCH_POS)) // Size of sectors including padding: 2.85"
-#define PREAMBLE_WORD       0   // Value of preamble word
+#define FORMAT_SECT_SIZE    ((tape_pos_t)(2.67 * hti_format_t::ONE_INCH_POS)) // Size of sectors including padding: 2.67"
+#define PREAMBLE_WORD       0x0001  // Value of preamble word
 #define WORDS_PER_HEADER_N_SECTOR   (WORDS_PER_SECTOR + 5)
-#define MIN_IRG_SIZE        ((tape_pos_t)(0.066 * hti_format_t::ONE_INCH_POS))    // Minimum size of IRG gaps: 0.066"
+#define MIN_IRG_SIZE        ((tape_pos_t)(16 * 1024))   // Minimum size of IRG gaps: 0.017"
 
 // File types
 #define BKUP_FILETYPE       0
@@ -324,6 +324,7 @@ static const struct io_procs my_stream_procs = {
 imgtoolerr_t tape_image_t::load_from_file(imgtool::stream *stream)
 {
 	hti_format_t inp_image;
+	inp_image.set_bits_per_word(16);
 
 	io_generic io;
 	io.file = (void *)stream;
@@ -357,16 +358,19 @@ imgtoolerr_t tape_image_t::load_from_file(imgtool::stream *stream)
 					}
 					if (state == 1) {
 						// Extract record data
-						if (it->second != PREAMBLE_WORD) {
+
+						// The top 8 bits are ignored by TACO when aligning with preamble
+						unsigned bit_idx = 7;
+						if (!inp_image.sync_with_record(track , it , bit_idx)) {
+							// Couldn't align
 							return IMGTOOLERR_CORRUPTIMAGE;
 						}
 						tape_word_t buffer[ WORDS_PER_HEADER_N_SECTOR ];
 						for (unsigned i = 0; i < WORDS_PER_HEADER_N_SECTOR; i++) {
-							auto res = inp_image.adv_it(track , true , it);
+							auto res = inp_image.next_word(track , it , bit_idx , buffer[ i ]);
 							if (res != hti_format_t::ADV_CONT_DATA) {
 								return IMGTOOLERR_CORRUPTIMAGE;
 							}
-							buffer[ i ] = it->second;
 						}
 						if (buffer[ 3 ] != checksum(&buffer[ 0 ], 3) ||
 							buffer[ 4 + WORDS_PER_SECTOR ] != checksum(&buffer[ 4 ], WORDS_PER_SECTOR)) {

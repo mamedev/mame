@@ -142,7 +142,7 @@ void kbdc8042_device::at_8042_check_keyboard()
 
 void kbdc8042_device::at_8042_check_mouse()
 {
-	if (!m_keyboard.received && !m_mouse.received)
+	if ((m_keybtype == KBDC8042_PS2) && PS2_MOUSE_ON && !m_keyboard.received && !m_mouse.received)
 	{
 		if (m_mouse.to_transmit == 0)
 		{
@@ -415,7 +415,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 			m_mouse.on = 1;
 			break;
 		case 0xa9:  /* test mouse */
-			at_8042_receive(PS2_MOUSE_ON ? 0x00 : 0xff);
+			at_8042_receive(((m_keybtype == KBDC8042_PS2) && PS2_MOUSE_ON) ? 0x00 : 0xff);
 			break;
 		case 0xaa:  /* selftest */
 			at_8042_receive(0x55);
@@ -530,5 +530,5 @@ INPUT_PORTS_END
 
 ioport_constructor kbdc8042_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(kbdc8042_mouse);
+	return ((m_keybtype == KBDC8042_PS2) && PS2_MOUSE_ON) ? INPUT_PORTS_NAME(kbdc8042_mouse) : nullptr;
 }

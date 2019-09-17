@@ -15,8 +15,6 @@
 
 #include "softlist_dev.h"
 
-typedef delegate<image_init_result (device_image_interface &,const char *, int)> snapquick_load_delegate;
-
 // ======================> snapshot_image_device
 class snapshot_image_device :   public device_t,
 								public device_image_interface

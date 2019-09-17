@@ -12,6 +12,7 @@
 #pragma once
 
 #include "machine/bankdev.h"
+#include "tilemap.h"
 
 class tc0091lvc_device : public device_t, public device_gfx_interface
 {

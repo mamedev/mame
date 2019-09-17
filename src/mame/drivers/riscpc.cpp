@@ -5,16 +5,16 @@
     Acorn Archimedes 7000/7000+
 
     very preliminary driver by Angelo Salese,
-    based on work by Tomasz Slanina and Tom Walker
+    based on work by Tomasz Slanina and Sarah Walker
 
     TODO:
-	- Move device implementations into specific files;
-	- PS/2 keyboard doesn't work properly;
-	- i2c device should actually be a pcf8583 RTC with i2c as slave 
-	  (and indeed CMOS settings doesn't work);
-	- Fix pendingUnd fatalerror from ARM7 core
-	- Fix per-machine configurations;
-	
+    - Move device implementations into specific files;
+    - PS/2 keyboard doesn't work properly;
+    - i2c device should actually be a pcf8583 RTC with i2c as slave
+      (and indeed CMOS settings doesn't work);
+    - Fix pendingUnd fatalerror from ARM7 core
+    - Fix per-machine configurations;
+
     ???
     bp (0382827C) (second trigger)
     do R13 = SR13
@@ -711,14 +711,14 @@ READ32_MEMBER( riscpc_state::a7000_iomd_r )
 		case IOMD_KBDCR:    return m_kbdc->status_r();
 
 		/*
-			1--- ---- always high (force)
-			-x-- ---- Timer 1
-			--x- ---- Timer 0
-			---x ---- Power On Reset
-			---- x--- Flyback
-			---- -x-- nINT1
-			---- --0- always low
-			---- ---x INT2
+		    1--- ---- always high (force)
+		    -x-- ---- Timer 1
+		    --x- ---- Timer 0
+		    ---x ---- Power On Reset
+		    ---- x--- Flyback
+		    ---- -x-- nINT1
+		    ---- --0- always low
+		    ---- ---x INT2
 		*/
 		case IOMD_IRQSTA:   return (m_IRQ_status_A & 0x7d) | 0x80;
 		case IOMD_IRQRQA:   return (m_IRQ_status_A & m_IRQ_mask_A);
@@ -755,7 +755,7 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 
 	switch(offset)
 	{
-		case IOMD_IOCR: 
+		case IOMD_IOCR:
 			m_IOMD_IO_ctrl = data & 0x7c;
 			m_i2cmem->write_sda(data & 0x01);
 			m_i2c_clk = (data & 2) >> 1;
@@ -763,20 +763,20 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 			break;
 
 		case IOMD_KBDDAT: m_kbdc->data_w(data); break;
-		case IOMD_KBDCR:  m_kbdc->command_w(data); 
+		case IOMD_KBDCR:  m_kbdc->command_w(data);
 			//m_IRQ_status_B |= 0x40;
 			//machine().debug_break();
 			//update_irq();
 			break;
 
-		case IOMD_IRQRQA:   
+		case IOMD_IRQRQA:
 			m_IRQ_status_A &= ~data;
 			m_IRQ_status_A |= 0x80;
 			update_irq();
 			break;
-			
-		case IOMD_IRQMSKA:  
-			m_IRQ_mask_A = data; 
+
+		case IOMD_IRQMSKA:
+			m_IRQ_mask_A = data;
 			update_irq();
 			break;
 
@@ -784,9 +784,9 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 			m_IRQ_status_B &= ~data;
 			update_irq();
 			break;
-			
-		case IOMD_IRQMSKB:  
-			m_IRQ_mask_B = data; 
+
+		case IOMD_IRQMSKB:
+			m_IRQ_mask_B = data;
 			update_irq();
 			break;
 
@@ -847,8 +847,8 @@ void riscpc_state::a7000_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
 //  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
-	// 
-//	map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM, not installed on A7000 models
+	//
+//  map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM, not installed on A7000 models
 //  I/O 03000000 - 033fffff
 //  AM_RANGE(0x03010000, 0x03011fff) //Super IO
 //  AM_RANGE(0x03012000, 0x03029fff) //FDC
@@ -875,7 +875,7 @@ void riscpc_state::riscpc_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( a7000 )
-//	PORT_INCLUDE( at_keyboard )
+//  PORT_INCLUDE( at_keyboard )
 
 	PORT_START("MOUSE")
 	// for debugging we leave video and sound HWs as options, eventually slotify them
@@ -929,8 +929,8 @@ WRITE_LINE_MEMBER(riscpc_state::keyboard_interrupt)
 	printf("IRQ %d\n",state);
 	if (!state)
 		return;
-	
-//	machine().debug_break();
+
+//  machine().debug_break();
 	m_IRQ_status_B|=0x80;
 	update_irq();
 }
@@ -949,22 +949,22 @@ void riscpc_state::base_config(machine_config &config)
 	kbd.set_pc_kbdc_slot(&kbd_con);
 
 	// auxiliary connector
-//	pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
-//	aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
-//	aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
+//  pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
+//  aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
+//  aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
 
 	// auxiliary port
-//	pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
-//	aux.set_pc_kbdc_slot(&aux_con);
+//  pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
+//  aux.set_pc_kbdc_slot(&aux_con);
 
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	m_kbdc->hot_res().set(FUNC(riscpc_state::keyboard_reset));
 	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->kbd_irq().set(FUNC(riscpc_state::keyboard_interrupt));
-//	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-//	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
-//	m_kbdc->aux_irq().set(FUNC(riscpc_state::keyboard_interrupt));
+//  m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+//  m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
+//  m_kbdc->aux_irq().set(FUNC(riscpc_state::keyboard_interrupt));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

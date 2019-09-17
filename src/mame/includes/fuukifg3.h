@@ -8,6 +8,7 @@
 #include "video/fuukifg.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 /* Define clocks based on actual OSC on the PCB */
 

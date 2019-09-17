@@ -9,7 +9,7 @@
 #include "palloc.h"
 #include "putil.h"
 
-#include <cstdarg>
+//#include <cstdarg>
 
 namespace plib {
 // ----------------------------------------------------------------------------------------
@@ -296,14 +296,14 @@ void ppreprocessor::error(const pstring &err)
 	throw pexception("PREPRO ERROR: " + err);
 }
 
-pstream::size_type ppreprocessor::vread(value_type *buf, const pstream::size_type n)
+pstream::size_type ppreprocessor::vread(char_type *buf, const pstream::size_type n)
 {
 	size_type bytes = std::min(m_buf.size() - m_pos, n);
 
 	if (bytes==0)
 		return 0;
 
-	std::memcpy(buf, m_buf.c_str() + m_pos, bytes);
+	std::copy(m_buf.c_str() + m_pos, m_buf.c_str() + m_pos + bytes, buf);
 	m_pos += bytes;
 	return bytes;
 }
@@ -357,7 +357,7 @@ int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, i
 		else
 		{
 			// FIXME: error handling
-			val = plib::pstonum<decltype(val), true>(tok);
+			val = plib::pstonum<decltype(val)>(tok);
 			start++;
 		}
 	}

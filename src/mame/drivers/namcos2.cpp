@@ -1756,7 +1756,6 @@ void namcos2_state::base_noio(machine_config &config)
 	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	config.m_minimum_quantum = attotime::from_hz(12000); /* CPU slices per frame */
 
@@ -1790,6 +1789,7 @@ void namcos2_state::base_noio(machine_config &config)
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -1848,7 +1848,6 @@ void namcos2_state::gollygho(machine_config &config)
 	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c65_standard(config);
 
@@ -1884,6 +1883,7 @@ void namcos2_state::gollygho(machine_config &config)
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -1903,7 +1903,6 @@ void namcos2_state::finallap_noio(machine_config &config)
 	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
 
@@ -1935,6 +1934,7 @@ void namcos2_state::finallap_noio(machine_config &config)
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -1982,7 +1982,6 @@ void namcos2_state::sgunner(machine_config &config)
 	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c65_standard(config);
 
@@ -2017,6 +2016,7 @@ void namcos2_state::sgunner(machine_config &config)
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -2035,7 +2035,6 @@ void namcos2_state::sgunner2(machine_config &config)
 	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c68_standard(config);
 
@@ -2070,6 +2069,7 @@ void namcos2_state::sgunner2(machine_config &config)
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -2088,7 +2088,6 @@ void namcos2_state::suzuka8h(machine_config &config)
 	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c68_standard(config);
 
@@ -2126,6 +2125,7 @@ void namcos2_state::suzuka8h(machine_config &config)
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -2160,7 +2160,6 @@ void namcos2_state::metlhawk(machine_config &config)
 	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c65_standard(config);
 
@@ -2200,6 +2199,7 @@ void namcos2_state::metlhawk(machine_config &config)
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 1.0);
 	m_c140->add_route(1, "rspeaker", 1.0);
 

@@ -38,8 +38,8 @@ public:
 	void init_landbrka();
 	void init_landbrkb();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(eolith_speedup_getvblank);
-	DECLARE_CUSTOM_INPUT_MEMBER(stealsee_speedup_getvblank);
+	DECLARE_READ_LINE_MEMBER(speedup_vblank_r);
+	DECLARE_READ_LINE_MEMBER(stealsee_speedup_vblank_r);
 
 	void speedup_read();
 	void init_speedup();

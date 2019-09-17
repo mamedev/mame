@@ -19,6 +19,7 @@
 #include "sound/ym2151.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class cyberbal_base_state : public atarigen_state
 {

@@ -19,6 +19,7 @@
 
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "blockade.lh"
 
@@ -44,7 +45,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
+	DECLARE_READ_LINE_MEMBER(coin_r);
 	DECLARE_WRITE8_MEMBER(coin_latch_w);
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -106,7 +107,7 @@ void blockade_state::main_io_map(address_map &map)
 
 static INPUT_PORTS_START( blockade )
 	PORT_START("coin")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, blockade_state, coin_inserted, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, blockade_state, coin_inserted, 0)
 
 	// These are not dip switches, they are mapped to connectors on the board.  Different games
 	// had different harnesses which plugged in here, and some pins were unused.
@@ -122,7 +123,7 @@ static INPUT_PORTS_START( blockade )
 	PORT_CONFSETTING(   0x50, "4" )
 	PORT_CONFSETTING(   0x30, "5" )
 	PORT_CONFSETTING(   0x70, "6" )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
@@ -153,7 +154,7 @@ static INPUT_PORTS_START( comotion )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -192,7 +193,7 @@ static INPUT_PORTS_START( blasto )
 	PORT_CONFSETTING(   0x00, "70 Secs") // though service manual says 60
 	PORT_CONFSETTING(   0x08, "90 Secs")
 	PORT_BIT(0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
@@ -227,7 +228,7 @@ static INPUT_PORTS_START( hustle )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START2)
 	PORT_BIT(0x60, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
@@ -264,7 +265,7 @@ static INPUT_PORTS_START( mineswpr )
 	PORT_CONFSETTING(   0x50, "4")
 	PORT_CONFSETTING(   0x30, "5")
 	PORT_CONFSETTING(   0x70, "6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -295,7 +296,7 @@ static INPUT_PORTS_START( mineswpr4 )
 	PORT_CONFSETTING(   0x50, "4")
 	PORT_CONFSETTING(   0x30, "5")
 	PORT_CONFSETTING(   0x70, "6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -331,7 +332,7 @@ INPUT_CHANGED_MEMBER( blockade_state::coin_inserted )
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-CUSTOM_INPUT_MEMBER( blockade_state::coin_r )
+READ_LINE_MEMBER( blockade_state::coin_r )
 {
 	return m_coin_latch;
 }

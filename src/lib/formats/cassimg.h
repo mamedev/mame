@@ -124,10 +124,10 @@ struct CassetteModulation
 {
 	int flags;
 	double zero_frequency_low;
-	double zero_frequency_cannonical;
+	double zero_frequency_canonical;
 	double zero_frequency_high;
 	double one_frequency_low;
-	double one_frequency_cannonical;
+	double one_frequency_canonical;
 	double one_frequency_high;
 };
 

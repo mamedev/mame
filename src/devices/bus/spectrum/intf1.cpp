@@ -45,14 +45,16 @@ void spectrum_intf1_device::device_add_mconfig(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	/* microdrive */
-	MICRODRIVE(config, m_mdv1, 0);
+	MICRODRIVE(config, m_mdv1);
 	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w));
-	MICRODRIVE(config, m_mdv2, 0);
+	MICRODRIVE(config, m_mdv2);
 
 	/* passthru */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+
+	SOFTWARE_LIST(config, "microdrive_list").set_original("spectrum_microdrive");
 }
 
 const tiny_rom_entry *spectrum_intf1_device::device_rom_region() const
@@ -109,9 +111,9 @@ READ_LINE_MEMBER(spectrum_intf1_device::romcs)
 // the Interface 1 looks for specific bus conditions to enable / disable the expansion overlay ROM
 
 // the enable must occur BEFORE the opcode is fetched, as the opcode must be fetched from the expansion ROM
-void spectrum_intf1_device::opcode_fetch(offs_t offset)
+void spectrum_intf1_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch(offset);
+	m_exp->pre_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{
@@ -125,9 +127,9 @@ void spectrum_intf1_device::opcode_fetch(offs_t offset)
 }
 
 // the disable must occur AFTER the opcode fetch, or the incorrect opcode is fetched for 0x0700
-void spectrum_intf1_device::opcode_fetch_post(offs_t offset)
+void spectrum_intf1_device::post_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch_post(offset);
+	m_exp->post_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{
@@ -162,10 +164,45 @@ void spectrum_intf1_device::mreq_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_intf1_device::iorq_r(offs_t offset)
 {
-	return m_exp->iorq_r(offset);
+	uint8_t data = 0xff;
+
+	if ((offset & 0x18) != 0x18)
+	{
+		switch (offset & 0x18)
+		{
+		case 0x00:
+			logerror("%s: iorq_r (microdrive) %04x\n", machine().describe_context(), offset);
+			break;
+		case 0x08:
+			logerror("%s: iorq_r (control) %04x\n", machine().describe_context(), offset);
+			break;
+		case 0x10:
+			logerror("%s: iorq_r (network) %04x\n", machine().describe_context(), offset);
+			break;
+		}
+	}
+
+	data &= m_exp->iorq_r(offset);
+	return data;
 }
 
 void spectrum_intf1_device::iorq_w(offs_t offset, uint8_t data)
 {
+	if ((offset & 0x18) != 0x18)
+	{
+		switch (offset & 0x18)
+		{
+		case 0x00:
+			logerror("%s: iorq_w (microdrive) %04x: %02x\n", machine().describe_context(), offset, data);
+			break;
+		case 0x08:
+			logerror("%s: iorq_w (control) %04x: %02x\n", machine().describe_context(), offset, data);
+			break;
+		case 0x10:
+			logerror("%s: iorq_w (network) %04x: %02x\n", machine().describe_context(), offset, data);
+			break;
+		}
+	}
+
 	m_exp->iorq_w(offset, data);
 }

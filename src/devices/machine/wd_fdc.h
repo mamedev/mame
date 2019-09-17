@@ -53,6 +53,7 @@ public:
 	auto drq_wr_callback() { return drq_cb.bind(); }
 	auto hld_wr_callback() { return hld_cb.bind(); }
 	auto enp_wr_callback() { return enp_cb.bind(); }
+	auto sso_wr_callback() { return sso_cb.bind(); }
 	auto ready_wr_callback() { return ready_cb.bind(); }
 	auto enmf_rd_callback() { return enmf_cb.bind(); }
 
@@ -291,7 +292,7 @@ private:
 
 	live_info cur_live, checkpoint_live;
 
-	devcb_write_line intrq_cb, drq_cb, hld_cb, enp_cb, ready_cb;
+	devcb_write_line intrq_cb, drq_cb, hld_cb, enp_cb, sso_cb, ready_cb;
 	devcb_read_line enmf_cb;
 
 	uint8_t format_last_byte;
@@ -355,6 +356,8 @@ private:
 
 	void drop_drq();
 	void set_drq();
+
+	void update_sso();
 };
 
 class wd_fdc_analog_device_base : public wd_fdc_device_base {

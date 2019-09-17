@@ -566,7 +566,7 @@ void nbmj8891_state::taiwanmb_io_map(address_map &map)
  * However, a few games (lovehous, maiko, mmaiko, hanaoji and the ones using inputport3_r below)
  * read nb1413m3_outcoin_flag also at inputport3! Is this the correct behaviour for these games
  * or should they only check the flag at inputport3? */
-CUSTOM_INPUT_MEMBER( nbmj8891_state::nb1413m3_outcoin_flag_r )
+READ_LINE_MEMBER( nbmj8891_state::nb1413m3_outcoin_flag_r )
 {
 	return m_nb1413m3->m_outcoin_flag & 0x01;
 }
@@ -1649,7 +1649,7 @@ static INPUT_PORTS_START( lovehous )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8891_state, nb1413m3_outcoin_flag_r, nullptr)    // OUT COIN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nbmj8891_state, nb1413m3_outcoin_flag_r)    // OUT COIN
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1810,7 +1810,7 @@ static INPUT_PORTS_START( maiko )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         //
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8891_state, nb1413m3_outcoin_flag_r, nullptr)    // OUT COIN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nbmj8891_state, nb1413m3_outcoin_flag_r)    // OUT COIN
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )         //
@@ -1886,7 +1886,7 @@ static INPUT_PORTS_START( mmaiko )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8891_state, nb1413m3_outcoin_flag_r, nullptr)    // OUT COIN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nbmj8891_state, nb1413m3_outcoin_flag_r)    // OUT COIN
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1962,7 +1962,7 @@ static INPUT_PORTS_START( hanaoji )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         //
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8891_state, nb1413m3_outcoin_flag_r, nullptr)    // OUT COIN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nbmj8891_state, nb1413m3_outcoin_flag_r)    // OUT COIN
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )         //

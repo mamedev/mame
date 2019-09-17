@@ -21,7 +21,7 @@
 #define LOG_IO      (1U << 2)
 #define LOG_BYPASS  (1U << 3)
 
-#define VERBOSE (LOG_GENERAL|LOG_REGS|LOG_IO|LOG_BYPASS)
+//#define VERBOSE (LOG_GENERAL|LOG_REGS|LOG_IO|LOG_BYPASS)
 #include "logmacro.h"
 
 ALLOW_SAVE_TYPE(float32_t);
@@ -36,6 +36,7 @@ wtl3132_device::wtl3132_device(machine_config const &mconfig, char const *tag, d
 	, m_fpcn_cb(*this)
 	, m_fpex_cb(*this)
 	, m_zero_cb(*this)
+	, m_port_x_cb(*this)
 {
 }
 
@@ -44,6 +45,7 @@ void wtl3132_device::device_start()
 	m_fpcn_cb.resolve_safe();
 	m_fpex_cb.resolve_safe();
 	m_zero_cb.resolve_safe();
+	m_port_x_cb.resolve_safe();
 
 	save_item(NAME(m_fpcn_state));
 	save_item(NAME(m_fpex_state));
@@ -286,7 +288,10 @@ void wtl3132_device::stage2(unsigned const index)
 	// complete fstore
 	if (OPF(code, IOCT) == 2)
 	{
-		m_x_port = m_x_out;
+		// FIXME: work out what should happen when the X port is being
+		// read/written in the same cycle
+		//m_x_port = m_x_out;
+		m_port_x_cb(m_x_out.v);
 		LOGMASKED(LOG_IO, "slot %d stage 2 fstore %f\n", index, u2f(m_x_out.v));
 	}
 }

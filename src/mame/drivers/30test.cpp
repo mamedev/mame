@@ -86,7 +86,6 @@ private:
 	DECLARE_READ8_MEMBER(hc11_okibank_r);
 	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
 
-	void namco_30test_io(address_map &map);
 	void namco_30test_map(address_map &map);
 };
 
@@ -174,13 +173,6 @@ void namco_30test_state::namco_30test_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void namco_30test_state::namco_30test_io(address_map &map)
-{
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).r(FUNC(namco_30test_state::namco_30test_mux_r));
-//  AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
-	map(MC68HC11_IO_PORTE, MC68HC11_IO_PORTE).portr("SYSTEM");
-}
-
 
 static INPUT_PORTS_START( 30test )
 	PORT_START("IN0")
@@ -256,10 +248,11 @@ void namco_30test_state::machine_start()
 void namco_30test_state::_30test(machine_config &config)
 {
 	/* basic machine hardware */
-	MC68HC11(config, m_maincpu, MAIN_CLOCK/4);
+	MC68HC11K1(config, m_maincpu, MAIN_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namco_30test_state::namco_30test_map);
-	m_maincpu->set_addrmap(AS_IO, &namco_30test_state::namco_30test_io);
-	m_maincpu->set_config(0, 768, 0x00);
+	m_maincpu->in_pa_callback().set(FUNC(namco_30test_state::namco_30test_mux_r));
+	//m_maincpu->in_pd_callback().set_ram();
+	m_maincpu->in_pe_callback().set_ioport("SYSTEM");
 
 	/* no video hardware */
 

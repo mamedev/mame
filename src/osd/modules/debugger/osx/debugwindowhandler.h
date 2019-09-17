@@ -45,8 +45,6 @@ enum
 + (void)addCommonActionItems:(NSMenu *)menu;
 + (NSPopUpButton *)newActionButtonWithFrame:(NSRect)frame;
 
-+ (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address forDevice:(device_t &)device;
-
 - (id)initWithMachine:(running_machine &)m title:(NSString *)t;
 
 - (void)activate;

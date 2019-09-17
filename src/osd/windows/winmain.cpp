@@ -165,6 +165,7 @@ const options_entry windows_options::s_option_entries[] =
 	// video options
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
 	{ WINOPTION_MENU,                                 "0",        OPTION_BOOLEAN,    "enables menu bar if available by UI implementation" },
+	{ WINOPTION_ATTACH_WINDOW,                        "",         OPTION_STRING,     "attach to arbitrary window" },
 
 	// post-processing options
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "DIRECT3D POST-PROCESSING OPTIONS" },

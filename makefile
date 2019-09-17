@@ -983,9 +983,7 @@ GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(OVERRIDE_CC)) -dumpversion 
 else
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
 endif
-ifneq ($(OS),solaris)
 CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | grep -e '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | tail -n 1)
-endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 GIT_AVAILABLE := $(shell git --version > /dev/null 2>&1 && echo git)
 endif
@@ -1367,11 +1365,10 @@ xcode4-ios: generate
 #-------------------------------------------------
 # gmake-solaris
 #-------------------------------------------------
-
-
+ifndef CLANG_VERSION
 $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=solaris --gcc_version=$(GCC_VERSION) $(MAKETYPE)
-
+endif
 .PHONY: solaris_x64
 solaris_x64: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64 precompile
@@ -1382,6 +1379,26 @@ solaris: solaris_x86
 
 .PHONY: solaris_x86
 solaris_x86: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32
+
+#-------------------------------------------------
+# gmake-solaris-clang
+#-------------------------------------------------
+ifdef CLANG_VERSION
+$(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=solaris --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
+endif
+.PHONY: solaris_x64_clang
+solaris_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64
+
+.PHONY: solaris_clang
+solaris_clang: solaris_x86_clang
+
+.PHONY: solaris_x86_clang
+solaris_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32
 
@@ -1628,14 +1645,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.211"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.213"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.211" > $@
+	@echo #define BARE_BUILD_VERSION "0.213" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1674,24 +1691,39 @@ tests: $(REGTESTS)
 
 .PHONY: cleansrc
 
+# FIXME: make this work with SEPARATE_BIN
 cleansrc:
 	@echo Cleaning up tabs/spaces/end of lines....
 ifeq ($(OS),windows)
 	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.cpp) do srcclean %%i >&2 )
 	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.hpp) do srcclean %%i >&2 )
 	$(shell for /r src %%i in (*.hxx) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.ipp) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mm) do srcclean %%i >&2 )
+	$(shell for /r hash %%i in (*.hsi) do srcclean %%i >&2 )
 	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
+	$(shell for /r plugins %%i in (*.lua) do srcclean %%i >&2 )
+	$(shell for /r scripts %%i in (*.lua) do srcclean %%i >&2 )
 else
-	$(shell find src/ -name *.c -exec ./srcclean {} >&2 ;)
-	$(shell find src/ -name *.h -exec ./srcclean {}  >&2 ;)
-	$(shell find src/ -name *.mak -exec ./srcclean {} >&2 ;)
-	$(shell find src/ -name *.lst -exec ./srcclean {} >&2 ;)
-	$(shell find src/ -name *.lay -exec ./srcclean {} >&2 ;)
-	$(shell find src/ -name *.hxx -exec ./srcclean {} >&2 ;)
-	$(shell find hash/ -name *.xml -exec ./srcclean {} >&2 ;)
+	$(SILENT) find src -name \*.c -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.cpp -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.h -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.hpp -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.hxx -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.ipp -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.lay -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.lst -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.mak -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.mm -exec ./srcclean {} \; >&2
+	$(SILENT) find hash -name \*.hsi -exec ./srcclean {} \; >&2
+	$(SILENT) find hash -name \*.xml -exec ./srcclean {} \; >&2
+	$(SILENT) find plugins -name \*.lua -exec ./srcclean {} \; >&2
+	$(SILENT) find scripts -name \*.lua -exec ./srcclean {} \; >&2
 endif
 
 #-------------------------------------------------

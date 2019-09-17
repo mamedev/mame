@@ -174,6 +174,7 @@
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
+#include "machine/i8255.h"
 #include "video/v9938.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -189,7 +190,7 @@
 #define RAM_PSW 0xf078
 
 #define BALLIN  (m_ballin >= 2)
-#define MOTORON (m_p32 != 0xf0)
+#define MOTORON ((m_p32 & 0x0f) != 0x00)
 #define LEDNOTNUM (m_led != m_num)
 
 
@@ -212,13 +213,9 @@ public:
 	void rulechan_init();
 
 private:
-
-	DECLARE_READ8_MEMBER(port0_r);
 	DECLARE_WRITE8_MEMBER(port0_w);
 	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(port3_r);
 	DECLARE_READ8_MEMBER(port30_r);
-	DECLARE_READ8_MEMBER(port31_r);
 	DECLARE_WRITE8_MEMBER(port31_w);
 	DECLARE_WRITE8_MEMBER(port32_w);
 	DECLARE_READ8_MEMBER(psg_portA_r);
@@ -300,17 +297,12 @@ void rulechan_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x00, 0x00).rw(FUNC(rulechan_state::port0_r),FUNC(rulechan_state::port0_w));   // Matrix scan line selector - Must be 0xf0 at power-up.
-	map(0x01, 0x01).portw("EEPROMOUT");                                                // EEPROM ok.
-	map(0x02, 0x02).r(FUNC(rulechan_state::port2_r));                                  // Matrix button read.
-	map(0x03, 0x03).r(FUNC(rulechan_state::port3_r));
+	map(0x00, 0x03).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x11).w("ay8910", FUNC(ay8910_device::address_data_w));                  // sound ok.
 	map(0x12, 0x12).r("ay8910", FUNC(ay8910_device::data_r));                          // ports ok.
 	map(0x20, 0x23).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));  // video ok.
-	map(0x30, 0x30).r(FUNC(rulechan_state::port30_r));                                 // wheel control.
-	map(0x31, 0x31).rw(FUNC(rulechan_state::port31_r),FUNC(rulechan_state::port31_w)); // wheel control - read: Must be 0x00 at power-up.
-	map(0x32, 0x32).w(FUNC(rulechan_state::port32_w));                                 // wheel control.
-	map(0x40, 0x43).nopr().nopw();
+	map(0x30, 0x33).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));   // wheel control.
+	map(0x40, 0x43).nopr().nopw();                                                     // serial communications?
 	map(0x60, 0x60).nopw();                                                            // Watchdog.
 }
 
@@ -319,19 +311,9 @@ void rulechan_state::main_io(address_map &map)
 *      Read Handlers      *
 **************************/
 
-READ8_MEMBER(rulechan_state::port0_r)
-{
-	return 0xf0;
-}
-
 READ8_MEMBER(rulechan_state::port2_r)
 {
 	return m_keymx[m_sline]->read();
-}
-
-READ8_MEMBER(rulechan_state::port3_r)
-{
-	return 0xff;
 }
 
 /******************************
@@ -345,11 +327,6 @@ READ8_MEMBER(rulechan_state::port3_r)
 READ8_MEMBER(rulechan_state::port30_r)
 {
 	return m_p30;
-}
-
-READ8_MEMBER(rulechan_state::port31_r)
-{
-	return 0x00;
 }
 
 READ8_MEMBER(rulechan_state::psg_portA_r)
@@ -744,6 +721,17 @@ void rulechan_state::rulechan(machine_config &config)
 	TIMER(config, "ball_speed").configure_periodic(FUNC(rulechan_state::ball_speed), attotime::from_hz(60));
 	TIMER(config, "wheel_speed").configure_periodic(FUNC(rulechan_state::wheel_speed), attotime::from_hz(60));
 
+	i8255_device &ppi0(I8255(config, "ppi0"));
+	ppi0.out_pa_callback().set(FUNC(rulechan_state::port0_w));   // Matrix scan line selector - Must read back as 0xf0 at power-up.
+	ppi0.out_pb_callback().set_ioport("EEPROMOUT");              // EEPROM ok.
+	ppi0.in_pc_callback().set(FUNC(rulechan_state::port2_r));    // Matrix button read.
+
+	i8255_device &ppi1(I8255(config, "ppi1"));
+	ppi1.in_pa_callback().set(FUNC(rulechan_state::port30_r));
+	ppi1.out_pb_callback().set(FUNC(rulechan_state::port31_w));  // Must read back as 0x00 at power-up.
+	ppi1.out_pc_callback().set(FUNC(rulechan_state::port32_w));
+	ppi1.tri_pc_callback().set_constant(0xf0);                   // Motor off at startup
+
 	/* video hardware */
 	v9938_device &v9938(V9938(config, "v9938", VID_CLOCK));
 	v9938.set_screen_ntsc("screen");
@@ -788,7 +776,6 @@ ROM_END
 void rulechan_state::rulechan_init()
 {
 	m_p30 = 0x3c;
-	m_p32 = 0xf0;  // Motor off at startup
 	m_step = 0;
 	m_updn2 = 0;
 	m_updn3 = 0;

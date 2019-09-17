@@ -28,11 +28,12 @@ public:
 	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto int_dma_done_cb() { return m_int_dma_done_cb.bind(); }
+	auto eisa_present() { return m_eisa_present.bind(); }
 
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
 
-	void set_cpu_buserr(uint32_t address);
+	void set_cpu_buserr(uint32_t address, uint64_t mem_mask);
 	uint32_t get_mem_config(int channel) const { return m_mem_config[channel]; }
 
 protected:
@@ -69,6 +70,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	devcb_write_line m_int_dma_done_cb;
+	devcb_read_line m_eisa_present;
 
 	address_space *m_space;
 

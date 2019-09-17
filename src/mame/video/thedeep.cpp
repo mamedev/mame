@@ -40,41 +40,20 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(thedeep_state::tilemap_scan_rows_back)
+TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info)
 {
-	return (col & 0x0f) + ((col & 0x10) << 5) + (row << 4);
-}
-
-TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_0)
-{
-	uint8_t code  =   m_vram_0[ tile_index * 2 + 0 ];
-	uint8_t color =   m_vram_0[ tile_index * 2 + 1 ];
-	SET_TILE_INFO_MEMBER(1,
-			code + (color << 8),
-			(color & 0xf0) >> 4,
-			TILE_FLIPX  );  // why?
-}
-
-TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_1)
-{
-	uint8_t code  =   m_vram_1[ tile_index * 2 + 0 ];
-	uint8_t color =   m_vram_1[ tile_index * 2 + 1 ];
+	uint8_t code  =   m_textram[ tile_index * 2 + 0 ];
+	uint8_t color =   m_textram[ tile_index * 2 + 1 ];
 	SET_TILE_INFO_MEMBER(2,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
 			0);
 }
 
-WRITE8_MEMBER(thedeep_state::vram_0_w)
+WRITE8_MEMBER(thedeep_state::textram_w)
 {
-	m_vram_0[offset] = data;
-	m_tilemap_0->mark_tile_dirty(offset / 2);
-}
-
-WRITE8_MEMBER(thedeep_state::vram_1_w)
-{
-	m_vram_1[offset] = data;
-	m_tilemap_1->mark_tile_dirty(offset / 2);
+	m_textram[offset] = data;
+	m_text_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -99,13 +78,9 @@ void thedeep_state::thedeep_palette(palette_device &palette) const
 
 void thedeep_state::video_start()
 {
-	m_tilemap_0  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(thedeep_state::tilemap_scan_rows_back),this),16,16,0x20,0x20);
-	m_tilemap_1  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,0x20,0x20);
+	m_text_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
 
-	m_tilemap_0->set_transparent_pen(0 );
-	m_tilemap_1->set_transparent_pen(0 );
-
-	m_tilemap_0->set_scroll_cols(0x20); // column scroll for the background
+	m_text_tilemap->set_transparent_pen(0);
 }
 
 /***************************************************************************
@@ -116,22 +91,10 @@ void thedeep_state::video_start()
 
 uint32_t thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int scrollx = m_scroll[0] + (m_scroll[1]<<8);
-	int scrolly = m_scroll[2] + (m_scroll[3]<<8);
-	int x;
-
-	m_tilemap_0->set_scrollx(0, scrollx);
-
-	for (x = 0; x < 0x20; x++)
-	{
-		int y = m_scroll2[x*2+0] + (m_scroll2[x*2+1]<<8);
-		m_tilemap_0->set_scrolly(x, y + scrolly);
-	}
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
+	m_tilegen->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
 	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(0), reinterpret_cast<uint16_t *>(m_spriteram.target()), 0x400/2);
-	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
+	m_text_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

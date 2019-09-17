@@ -139,7 +139,7 @@ static FLOPPY_IDENTIFY(apple2_dsk_identify)
 	size = floppy_image_size(floppy);
 	expected_size = APPLE2_TRACK_COUNT * APPLE2_SECTOR_COUNT * APPLE2_SECTOR_SIZE;
 
-	if (size == expected_size)
+	if ((size == expected_size) || (size == 35 * APPLE2_SECTOR_COUNT * APPLE2_SECTOR_SIZE))
 		*vote = 100;
 	else if ((size > expected_size) && ((size - expected_size) < 8))
 		*vote = 90;     /* tolerate images with up to eight fewer/extra bytes (bug #638) */
@@ -671,6 +671,10 @@ bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 				m_prodos_order = true;
 			}   // check for subnodule disk
 			else if (!memcmp(subnod_block1, &sector_data[0x100], 8))
+			{
+				m_prodos_order = true;
+			}   // check for ProDOS 2.5's new boot block
+			else if (!memcmp("PRODOS", &sector_data[0x3a], 6))
 			{
 				m_prodos_order = true;
 			}

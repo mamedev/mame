@@ -12,9 +12,58 @@
 #include "emupal.h"
 #include "screen.h"
 #include "machine/midwayic.h"
+#include "video/poly.h"
+
+/*************************************
+ *
+ *  Type definitions
+ *
+ *************************************/
+
+struct mz_poly_extra_data
+{
+	const void *    palbase;
+	const void *    texbase;
+	uint16_t          solidcolor;
+	uint16_t          voffset;
+	int16_t           zoffset;
+	uint16_t          transcolor;
+	uint16_t          texwidth;
+	uint16_t          color;
+	uint32_t          alpha;
+	uint32_t          ctrl_word;
+	bool            blend_enable;
+	bool            depth_test_enable;
+	bool            depth_write_enable;
+	uint32_t          blend;
+	uint8_t           (*get_texel)(const void *, int, int, int);
+};
+
+
+class midzeus_state;
+
+class midzeus_renderer : public poly_manager<float, mz_poly_extra_data, 4, 10000>
+{
+public:
+	midzeus_renderer(midzeus_state &state);
+
+	void render_poly(int32_t scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid);
+	void render_poly_solid_fixedz(int32_t scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid);
+
+	void zeus_draw_quad(int long_fmt, const uint32_t *databuffer, uint32_t texdata, bool logit);
+	void zeus_draw_debug_quad(const rectangle& rect, const vertex_t* vert);
+
+private:
+	midzeus_state& m_state;
+};
+
+typedef midzeus_renderer::vertex_t poly_vertex;
+
 
 class midzeus_state : public driver_device
 {
+	friend class midzeus_renderer;
+
 public:
 	midzeus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -127,4 +176,33 @@ private:
 	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void log_waveram(uint32_t length_and_base);
 	void update_gun_irq();
+
+	void *waveram0_ptr_from_block_addr(uint32_t addr);
+	void *waveram0_ptr_from_expanded_addr(uint32_t addr);
+	void *waveram1_ptr_from_expanded_addr(uint32_t addr);
+	void *waveram0_ptr_from_texture_addr(uint32_t addr, int width);
+	void waveram_plot_depth(int y, int x, uint16_t color, uint16_t depth);
+	void waveram_plot(int y, int x, uint16_t color);
+	void waveram_plot_check_depth(int y, int x, uint16_t color, uint16_t depth);
+	void waveram_plot_check_depth_nowrite(int y, int x, uint16_t color, uint16_t depth);
+
+	std::unique_ptr<midzeus_renderer> m_poly;
+	uint8_t m_log_fifo;
+
+	uint32_t m_zeus_fifo[20];
+	uint8_t m_zeus_fifo_words;
+	int16_t m_zeus_matrix[3][3];
+	int32_t m_zeus_point[3];
+	int16_t m_zeus_light[3];
+	void *m_zeus_renderbase;
+	uint32_t m_zeus_palbase;
+	uint32_t m_zeus_unkbase;
+	int m_zeus_enable_logging;
+	uint32_t m_zeus_objdata;
+	rectangle m_zeus_cliprect;
+
+	std::unique_ptr<uint32_t[]> m_waveram[2];
+	int m_yoffs;
+	int m_texel_width;
+	int m_is_mk4b;
 };

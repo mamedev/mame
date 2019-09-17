@@ -110,7 +110,7 @@ READ8_MEMBER(fgoal_state::analog_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(fgoal_state::_80_r)
+READ_LINE_MEMBER(fgoal_state::_80_r)
 {
 	uint8_t ret = (m_screen->vpos() & 0x80) ? 1 : 0;
 
@@ -263,7 +263,7 @@ static INPUT_PORTS_START( fgoal )
 	/* extra credit score changes depending on player's performance */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fgoal_state, _80_r, nullptr) /* 128V */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fgoal_state, _80_r) /* 128V */
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))

@@ -835,6 +835,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/uniflex_dsk.h,FORMATS["UNIFLEX_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["UNIFLEX_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/uniflex_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/uniflex_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/fm7_cas.h,FORMATS["FM7_CAS"] = true
 --------------------------------------------------
 
@@ -1010,6 +1022,18 @@ if (FORMATS["ITT3030_DSK"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/itt3030_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/itt3030_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/juku_dsk.h,FORMATS["JUKU_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["JUKU_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/juku_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/juku_dsk.h",
 	}
 end
 

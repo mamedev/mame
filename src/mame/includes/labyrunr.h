@@ -14,6 +14,7 @@
 #include "video/k051733.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class labyrunr_state : public driver_device
 {

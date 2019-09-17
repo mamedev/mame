@@ -13,6 +13,7 @@ Crazy Ballooon
 #include "sound/discrete.h"
 #include "sound/sn76477.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #define CRBALOON_MASTER_XTAL    (XTAL(9'987'000))
 

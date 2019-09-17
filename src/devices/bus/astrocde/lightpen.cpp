@@ -71,7 +71,7 @@ INPUT_CHANGED_MEMBER( astrocade_lightpen_device::trigger )
 
 static INPUT_PORTS_START( astrocade_lightpen )
 	PORT_START("TRIGGER")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrocade_lightpen_device, trigger, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrocade_lightpen_device, trigger, 0)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("LIGHTX")

@@ -23,6 +23,7 @@ TODO:
 #include "machine/74259.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;

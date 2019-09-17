@@ -6,8 +6,9 @@
 #pragma once
 
 #include "machine/74259.h"
-#include "emupal.h"
 #include "video/gaelco_wrally_sprites.h"
+#include "emupal.h"
+#include "tilemap.h"
 
 class wrally_state : public driver_device
 {

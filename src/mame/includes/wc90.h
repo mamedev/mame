@@ -8,6 +8,7 @@
 #include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class wc90_state : public driver_device
 {

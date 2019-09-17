@@ -309,10 +309,7 @@ WRITE16_MEMBER( alto2_cpu_device::utilout_w )
 		LOG((this,LOG_HW,2," UTILOUT wr %#o (%#o)\n", offset, data));
 	}
 	m_hw.utilout = data ^ 0177777;
-
-	// FIXME: write printer data
-	// printer_write();
-	m_speaker->level_w(data ? 1 : 0);
+	m_utilout_callback(m_hw.utilout);
 }
 
 /**

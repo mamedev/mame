@@ -219,6 +219,7 @@
 #include "machine/nvram.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #include "mgames.lh"
 

@@ -7,6 +7,7 @@
 
 #include "cpu/z80/z80.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class nova2001_state : public driver_device
 {

@@ -7,6 +7,7 @@ V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
 V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
 V.Smile Baby                  80-099***  (Smartridges are yellow, incompatible with TV based V.Smile consoles)
+V.Baby                        80-22****  (Smartridges are orange, incompatible with other V.Smile consoles, including V.Smile Baby)
 
 Language:
 ********0 = US                (White labels on back)
@@ -26,9 +27,9 @@ Language:
 |   XX   | 80-084000(US)     | Action Mania (Rev, 4?)                                                                    |
 |   XX   | 80-084000(US)     | Action Mania (Rev, 6?)                                                                    |
 |        |          (IT)     | ?????                                                                                     |
-|   XX   | 80-084002(NL)     | Sports Games (pink sticker: "P ○○○○")                                                     |
+|   XX   | 80-084002(NL)     | Sports Games                                                                              |
 |        | 80-084003(UK)     | Action Mania                                                                              |
-|   XX   | 80-084004(GE)     | Sportskanone (blue sticker: "P ○○○○")                                                     |
+|   XX   | 80-084004(GE)     | Sportskanone                                                                              |
 |        | 80-084005(FR)     | Sporti Folies                                                                             |
 |        | 80-084006(PT)     | Action Mania (84016 on cart)                                                              |
 |   XX   | 80-084007(SP)     | Action Manía                                                                              |
@@ -47,20 +48,20 @@ Language:
 |        | 80-084043(UK)     | Scooby-Doo! - Funland Frenzy                                                              |
 |        | 80-084044(GE)     | Scooby-Doo! - Im Lernpark                                                                 |
 |        | 80-084045(FR)     | Scooby-Doo - Panique A Funland                                                            |
-|        | 80-084047(SP)     | Scooby-Doo - Misterio en el Parque                                                        |
+|   XX   | 80-084047(SP)     | ¡¡Scooby-Doo!! - Misterio en el Parque                                                    |
 +========+===================+===========================================================================================+
 |        | 80-084060(US)     | Thomas and Friends - Engines Working Together                                             |
 |        | 80-084063(UK)     | Thomas and Friends - Engines Working Together                                             |
 |   XX   | 80-084064(GE)     | Thomas - Freunde halten zusammen                                                          |
 +========+===================+===========================================================================================+
-|        | 80-084080(US)     | Wall-E                                                                                    |
+|   XX   | 80-084080(US)     | Wall-E                                                                                    |
 |        | 80-084083(UK)     | Wall-E                                                                                    |
-|        | 80-084084(GE)     | Wall-E                                                                                    |
+|   XX   | 80-084084(GE)     | Wall-E                                                                                    |
 |        | 80-084085(FR)     | Wall-E                                                                                    |
-|        | 80-084087(SP)     | Wall-E                                                                                    |
+|   XX   | 80-084087(SP)     | Wall-E                                                                                    |
 +========+===================+===========================================================================================+
 |        | 80-084100(US)     | Wonder Pets - Save the Animals!                                                           |
-|        | 80-084103(UK)     | Wonder Pets - Save the Animals!                                                           |
+|   XX   | 80-084103(UK)     | Wonder Pets - Save the Animals!                                                           |
 +========+===================+===========================================================================================+
 |        | 80-084120(US)     | Kung Fu Panda - Path of the Panda                                                         |
 |        | 80-084123(UK)     | Kung Fu Panda - Path of the Panda                                                         |
@@ -71,7 +72,7 @@ Language:
 |        | 80-084143(UK)     | Spider-Man & Friends - Secret Missions                                                    |
 |   XX   | 80-084144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                  |
 |        | 80-084145(FR)     | Spider-Man and ses amis - Missions Secretes                                               |
-|        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas  (no # on label)                                   |
+|        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas (no # on label)                                    |
 +========+===================+===========================================================================================+
 |   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (Rev. 2?)                               |
 |   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (Rev. 5?)                               |
@@ -83,10 +84,10 @@ Language:
 |   XX   | 80-084180(US)     | Mickey Mouse Clubhouse                                                                    |
 |        | 80-084182(NL)     | Mickey Mouse Clubhouse                                                                    |
 |        | 80-084183(UK)     | Mickey Mouse Clubhouse                                                                    |
-|   XX   | 80-084184(GE)     | Micky Maus Wunderhaus (blue sticker: "P ○○○○")                                            |
+|   XX   | 80-084184(GE)     | Micky Maus Wunderhaus                                                                     |
 |        | 80-084185(FR)     | La Maison de Mickey                                                                       |
 |        | 80-084186(PT)     | A Casa do Mickey Mouse (84196 on cart)                                                    |
-|  SOON  | 80-084187(SP)     | La Casa de Mickey Mouse                                                                   |
+|   XX   | 80-084187(SP)     | La Casa de Mickey Mouse                                                                   |
 +========+===================+===========================================================================================+
 |   XX   | 80-084200(US)     | Nascar Academy - Race Car Superstar                                                       |
 +========+===================+===========================================================================================+
@@ -114,7 +115,7 @@ Language:
 +========+===================+===========================================================================================+
 |        | 80-084300(US)     | Soccer Challenge                                                                          |
 |        | 80-084303(UK)     | Football Challenge                                                                        |
-|   XX   | 80-084304(GE)     | Fussball Meisterschaft (blue sticker: "P ○○○○")                                           |
+|   XX   | 80-084304(GE)     | Fussball Meisterschaft                                                                    |
 |        | 80-084305(FR)     | Football Challenge                                                                        |
 |        | 80-084306(PT)     | Football Challenge  (cart#??)                                                             |
 |        | 80-084307(SP)     | Campeonato de Fútbol                                                                      |
@@ -132,7 +133,7 @@ Language:
 |        | 80-084342(NL)     | Up!                                                                                       |
 |        | 80-084344(GE)     | Oben                                                                                      |
 |        | 80-084345(FR)     | La-Haut                                                                                   |
-|  SOON  | 80-084347(SP)     | Up!                                                                                       |
+|   XX   | 80-084347(SP)     | Up!                                                                                       |
 |        | 80-084347-022(SP) | Up!  (-022 is odd for SP)                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084360(US)     | Handy Manny                                                                               |
@@ -149,7 +150,7 @@ Language:
 |   XX   | 80-084384(GE)     | Winnie Puuh - Die Honigjagd                                                               |
 |        | 80-084385(FR)     | Winnie Rourson - La Chasse au miel de Winnie                                              |
 |        | 80-084386(PT)     | Winnie - Em Busca do Mel (84396 on cart)                                                  |
-|        | 80-084387(SP)     | Winnie the Pooh - En Busca de la Miel                                                     |
+|   XX   | 80-084387(SP)     | Winnie the Pooh - En Busca de la Miel                                                     |
 +========+===================+===========================================================================================+
 |        | 80-084400(US)     | Cars: Rev It Up in Radiator Springs                                                       |
 |        | 80-084402(NL)     | Cars: Spektakel in Radiator Springs                                                       |
@@ -157,7 +158,7 @@ Language:
 |   XX   | 80-084404(GE)     | Cars: Vollgas in Radiator Springs                                                         |
 |        | 80-084405(FR)     | Cars: Quatre Roues                                                                        |
 |        | 80-084406(PT)     | Cars: Aventura Em Radiator Springs (84416 on cart)                                        |
-|        | 80-084407(SP)     | Cars: Acelera el Motor en Radiador Springs                                                |
+|   XX   | 80-084407(SP)     | Cars: Acelera el Motor en Radiador Springs                                                |
 +========+===================+===========================================================================================+
 |        | 80-084420(US)     | Toy Story 3                                                                               |
 |        | 80-084421(US)     | Toy Story 3 (pocket version)                                                              |
@@ -166,14 +167,14 @@ Language:
 |        | 80-084423(UK)     | Toy Story 3                                                                               |
 |   XX   | 80-084424(GE)     | Toy Story 3                                                                               |
 |        | 80-084425(FR)     | Toy Story 3                                                                               |
-|        | 80-084427(SP)     | Toy Story 3                                                                               |
+|   XX   | 80-084427(SP)     | Toy Story 3                                                                               |
 +========+===================+===========================================================================================+
 |   XX   | 80-084440(US)     | Monsters vs. Aliens                                                                       |
 |        | 80-084442(NL)     | Monsters vs. Aliens                                                                       |
 |        | 80-084443(UK)     | Monsters vs. Aliens                                                                       |
-|        | 80-084444(GE)     | Monsters vs. Aliens                                                                       |
+|   XX   | 80-084444(GE)     | Monsters vs. Aliens                                                                       |
 |        | 80-084445(FR)     | Monsters vs. Aliens                                                                       |
-|  SOON  | 80-084447(SP)     | Monstruos contra Alienígenas                                                              |
+|   XX   | 80-084447(SP)     | Monstruos contra Alienígenas                                                              |
 +========+===================+===========================================================================================+
 |        | 80-084460(US)     | Noddy - Detective for a Day (unreleased in USA??) see 80-092540                           |
 |        | 80-084463(UK)     | Noddy - Detective for a Day                                                               |
@@ -183,7 +184,7 @@ Language:
 |        | 80-084480(US)     | The Princess and the Frog  (motion version)                                               |
 |        | 80-084481(US)     | The Princess and the Frog  (pocket version)                                               |
 |        | 80-084482(NL)     | Prinses en de Kikker (label in english)                                                   |
-|        | 80-084483(UK)     | The Princess and the Frog                                                                 |
+|   XX   | 80-084483(UK)     | The Princess and the Frog                                                                 |
 |   XX   | 80-084484(GE)     | Kuess den Frosch                                                                          |
 |        | 80-084485(FR)     | La Princesse Et La Grenouille                                                             |
 |        | 80-084487(SP)     | Tiana y el Sapo - El gran sueño de Tiana                                                  |
@@ -224,19 +225,6 @@ Language:
 |   XX   | 80-084644(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                              |
 |        | 80-084647(SP)     | Bob Esponja - Un día en la vida de una esponja                                            |
 +========+===================+===========================================================================================+
-
-V.Smile Smartbooks
-Smartbooks currently have no dumps available, hence they are temporarily listed here.
-+========+===================+============================================================================+
-|        | 80-089000(US)     | Spider-Man &amp; Friends Where is Hulk?                                    |
-+========+===================+============================================================================+
-|        | 80-089020(US)     | Toy Story 2                                                                |
-+========+===================+============================================================================+
-|        | 80-089040(US)     | Dora the Explorer - Dora's Got a Puppy                                     |
-|        | 80-089045(FR)     | Dora's ??????                                                              |
-+========+===================+============================================================================+
-|        | 80-089060(US)     | Scooby-Doo! - A Night of Fright is no Delight                              |
-+========+===================+============================================================================+
 
 -->
 
@@ -326,6 +314,21 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="A84404(2).u1" size="8388608" crc="beaa1b6a" sha1="c6e68da7935642035e13cc7922b0193cc6e5272c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsms" cloneof="carsmg" supported="no">
+		<description>Disney/Pixar Cars - Acelera el Motor en Radiador Springs (Spain)</description>
+		<year>20??</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084407(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084407 - Cars - Acelera el Motor en Radiador Springs (SP) (Motion).bin" size="8388608" crc="0adff74e" sha1="7110d97905c955467d2c1529b91b83633f963086" />
 			</dataarea>
 		</part>
 	</software>
@@ -535,6 +538,21 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
+	<software name="mickeychms" cloneof="mickeychm" supported="no">
+		<description>Disney La Casa de Mickey Mouse (Spain)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084187(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084187 - La Casa de Mickey Mouse (SP) (Motion).bin" size="8388608" crc="d0acb307" sha1="ff777127884649e62413aac03228a60b073f23c4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monvsalienm" supported="no">
 		<description>DreamWorks Monsters vs. Aliens (USA, Rev. 3?)</description>
 		<year>2009</year>
@@ -544,6 +562,36 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile84440-3.bin" size="8388608" crc="81f7affb" sha1="3208b5f2d6616396b2bd3a5446bd4e3ee277dc9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monvsalienmg" supported="no" cloneof="monvsalienm">
+		<description>DreamWorks Monsters vs. Aliens (Germany)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084444(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-6" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084444 - Monsters vs Aliens (GER) (Motion).bin" size="8388608" crc="25760320" sha1="6cddb7a2b733b366609e33e1ebec3385e10a834e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monvsalienms" supported="no" cloneof="monvsalienm">
+		<description>DreamWorks Monstruos contra Alienígenas (Spain)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084447(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084447 - Monstruos contra Alienigenas (SP) (Motion).bin" size="8388608" crc="f82735b3" sha1="86e1b7fea38ecce40f526163d3f7557c15604484" />
 			</dataarea>
 		</part>
 	</software>
@@ -619,7 +667,37 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="prinfrogmg" supported="no">
+	<software name="poohms" cloneof="poohmg" supported="no">
+		<description>Disney Winnie the Pooh - En busca de la miel (Spain)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084387(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084387 - Winnie the Pooh - En busca de la miel (SP) (Motion).bin" size="8388608" crc="4e6da62d" sha1="be1021edc2106dc3db1c783258a414b387196ce1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prinfrogm" supported="no">
+		<description>Disney Princess - The Princess and the Frog - Tiana's Big Dream (UK)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084483(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084483 - Disney Princess - The Princess and the Frog (UK) (Motion).bin" size="8388608" crc="b4405317" sha1="9d016ece3cb62b2ca6c5fd7d2e3717fddf0d7034" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prinfrogmg" cloneof="prinfrogm" supported="no">
 		<description>Küss den Frosch - Tianas großer Traum (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -627,6 +705,21 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="C84484.bin" size="8388608" crc="8abc088c" sha1="3637de0af0371a4bb473ae28b35141b10bbb047f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobyffms" supported="no">
+		<description>¡¡Scooby-Doo!! - Misterio en el parque (Spain)</description>
+		<year>2009</year> <!-- (s09) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084047(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084047 - Scooby-Doo - Misterio en el parque (SP) (Motion).bin" size="8388608" crc="154c4c55" sha1="8826480a9771c432671d849f920fb009dd733519" />
 			</dataarea>
 		</part>
 	</software>
@@ -755,12 +848,45 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084424(GE)" />
 		<part name="cart" interface="vsmile_cart">
-			<feature name="pcb" value="710654-2" />
+			<feature name="pcb" value="710654" />
+			<feature name="pcb_model" value="710654" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x1000000">
 				<rom name="vsmile84424.blob1.bin" size="0x0800000" crc="845bbb46" sha1="1b11bb1a119715073560b40d65b77894043dd67a" offset="0x0000000" />
 				<rom name="vsmile84424.blob2.bin" size="0x0800000" crc="c006e9b6" sha1="2f4b32ba578117caa53bb0bf9db717d8d9dd8a13" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor3ms" cloneof="toystor3mg" supported="no">
+		<description>Disney/Pixar Toy Story 3 (Spain)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084427(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="710654" />
+			<feature name="pcb_model" value="710654-1" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-084427 - Toy Story 3 (SP) (Motion).u1" size="0x0800000" crc="a26c152a" sha1="ba5d3557787ed77cd1cae491d64201a2e7f52952" offset="0x0000000" />
+				<rom name="80-084427 - Toy Story 3 (SP) (Motion).u2" size="0x0800000" crc="8ab8e24b" sha1="eaa28b3e7f36c3e85abd7dceeeda382d70047742" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="upms" supported="no">
+		<description>Disney/Pixar UP (Spain)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084347(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-6" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="80-084347 - UP (SP) (Motion).bin" size="0x0800000" crc="781b9e60" sha1="b16b7ffbb7828313fdbdbe1b60f016e1572cb79e" />
 			</dataarea>
 		</part>
 	</software>
@@ -775,7 +901,37 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x0800000">
-				<rom name="vsmile84080-2.bin" size="0x0800000" crc="63b0ae95" sha1="0ae362c743e690175d07b61822f897fc16094eb9" offset="0x0000000" />
+				<rom name="vsmile84080-2.bin" size="0x0800000" crc="63b0ae95" sha1="0ae362c743e690175d07b61822f897fc16094eb9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallemg" cloneof="wallem" supported="no">
+		<description>Disney/Pixar Wall-E (Germany)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084084(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="80-084084 - Wall-E (Ger) (Motion).bin" size="0x0800000" crc="038dd57c" sha1="698bbe384d9019217b58efefe927262e40d34e1b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallems" cloneof="wallem" supported="no">
+		<description>Disney/Pixar Wall-E (Spain)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084087(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="80-084087 - Wall-E (SP) (Motion).bin" size="0x0800000" crc="f2782e64" sha1="09ccd0f5184b47ae730f1803c3a4373bca571b85" />
 			</dataarea>
 		</part>
 	</software>
@@ -788,6 +944,21 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="80-84224.bin" size="8388608" crc="76e0952f" sha1="fd4bed2303a0e98af85645a477edb34281a5d17d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wonderpetm" supported="no">
+		<description>Nickelodeon Wonder Pets! - Save the Animals! (UK)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084103(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="80-084103 - Wonder Pets - Save the Animals (UK) (Motion).bin" size="0x0800000" crc="29650608" sha1="66ec3ce1316265dec08f91dcca5709b57ee554cc" />
 			</dataarea>
 		</part>
 	</software>

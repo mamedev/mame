@@ -25,6 +25,7 @@
 #include "machine/i82439tx.h"
 #include "machine/i82371sb.h"
 #include "video/mga2064w.h"
+#include "video/virge_pci.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
@@ -459,7 +460,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_phoenix_ver40_rev6_w)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-	printf("[%02X]",data);
+//  printf("[%02X]",data);
 }
 
 
@@ -537,15 +538,16 @@ void pcipc_state::pcipc(machine_config &config)
 	ide.irq_pri().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq15_w));
 //  MGA2064W(config, ":pci:12.0", 0);
+	VIRGEDX_PCI(config, ":pci:12.0", 0);   // use VIRGEDX_PCI for its VESA 2.0 BIOS
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
 	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));
@@ -584,8 +586,8 @@ ROM_START(pcipc)
 	ROMX_LOAD("crisis.rom", 0x00000, 0x40000, CRC(38a1458a) SHA1(8881ac336392cca79a772b4168f63efc31f953dd), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "5hx29", "5hx29")
 	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(3) )
-	ROM_REGION(0x8000,"ibm_vga", 0)
-	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
+//  ROM_REGION(0x8000,"ibm_vga", 0)
+//  ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
 ROM_START(pcipctx)

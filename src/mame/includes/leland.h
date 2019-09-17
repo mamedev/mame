@@ -15,6 +15,7 @@
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define LELAND_BATTERY_RAM_SIZE 0x4000
 #define ATAXX_EXTRA_TRAM_SIZE 0x800

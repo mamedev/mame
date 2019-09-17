@@ -148,9 +148,9 @@ public:
 	// construction/destruction
 	core_options();
 	core_options(const core_options &) = delete;
-	core_options(core_options &&) = delete;
+	core_options(core_options &&) = default;
 	core_options& operator=(const core_options &) = delete;
-	core_options& operator=(core_options &&) = delete;
+	core_options& operator=(core_options &&) = default;
 	virtual ~core_options();
 
 	// getters
@@ -248,7 +248,7 @@ private:
 	void throw_options_exception_if_appropriate(condition_type condition, std::ostringstream &error_stream);
 
 	// internal state
-	std::vector<entry::shared_ptr>                      m_entries;              // cannonical list of entries
+	std::vector<entry::shared_ptr>                      m_entries;              // canonical list of entries
 	std::unordered_map<std::string, entry::weak_ptr>    m_entrymap;             // map for fast lookup
 	std::string                                         m_command;              // command found
 	std::vector<std::string>                            m_command_arguments;    // command arguments

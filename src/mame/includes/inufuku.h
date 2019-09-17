@@ -6,6 +6,7 @@
 #include "video/vsystem_spr.h"
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class inufuku_state : public driver_device
 {
@@ -27,7 +28,7 @@ public:
 	void inufuku(machine_config &config);
 	void _3on3dunk(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
+	DECLARE_READ_LINE_MEMBER(soundflag_r);
 
 private:
 	/* memory pointers */

@@ -597,8 +597,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_flags(0),
 		m_impulse(0),
 		m_name(name),
-		m_read_param(nullptr),
-		m_write_param(nullptr),
+		m_write_param(0),
 		m_digital_value(false),
 		m_min(0),
 		m_max(maskbits),
@@ -1210,7 +1209,7 @@ void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty
 
 	// apply custom mapping if necessary
 	if (!m_crosshair_mapper.isnull())
-		value = m_crosshair_mapper(*this, value);
+		value = m_crosshair_mapper(value);
 
 	// handle X axis
 	if (m_crosshair_axis == CROSSHAIR_AXIS_X)
@@ -3189,7 +3188,7 @@ void dynamic_field::read(ioport_value &result)
 		return;
 
 	// call the callback to read a new value
-	ioport_value newval = m_field.m_read(m_field, m_field.m_read_param);
+	ioport_value newval = m_field.m_read();
 	m_oldval = newval;
 
 	// merge in the bits (don't invert yet, as all digitals are inverted together)

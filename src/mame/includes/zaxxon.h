@@ -14,6 +14,7 @@
 #include "machine/i8255.h"
 #include "sound/samples.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class zaxxon_state : public driver_device
 {
@@ -47,8 +48,8 @@ public:
 	void init_razmataz();
 	void init_zaxxonj();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
+	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
+	template <int Num> DECLARE_READ_LINE_MEMBER(zaxxon_coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
 

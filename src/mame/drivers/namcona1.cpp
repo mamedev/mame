@@ -927,10 +927,6 @@ void namcona1_state::scanline_interrupt(int scanline)
 {
 	const u16 enabled = m_mEnableInterrupts ? ~m_vreg[0x1a / 2] : 0;
 
-	// adc (timing guessed, when does this trigger?)
-	if (scanline == 0)
-		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-
 	// vblank
 	if (scanline == 224)
 	{

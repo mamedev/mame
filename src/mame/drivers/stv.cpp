@@ -51,6 +51,8 @@
 
 #include "coreutil.h"
 
+#include "segabill.lh"
+#include "segabillv.lh"
 
 #define FIRST_SPEEDUP_SLOT  (2)         // in case we remove/alter the BIOS speedups later
 
@@ -146,6 +148,9 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 			machine().bookkeeping().coin_counter_w(1,~data & 0x02);
 			machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
 			machine().bookkeeping().coin_lockout_w(1,~data & 0x08);
+			break;
+		case 0x09:
+			m_billboard->write(data);
 			break;
 		case 0x0d:
 			// then bit 7==0 - reset counters, currently this is unhandled, instead counters reset after each read (PORT_RESET used)
@@ -1182,6 +1187,10 @@ void stv_state::stv(machine_config &config)
 	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
 	m_scsp->add_route(0, "lspeaker", 1.0);
 	m_scsp->add_route(1, "rspeaker", 1.0);
+
+	SEGA_BILLBOARD(config, m_billboard, 0);
+
+	config.set_default_layout(layout_segabill);
 }
 
 void stv_state::stv_5881(machine_config &config)
@@ -1237,6 +1246,12 @@ void stv_state::batmanfr(machine_config &config)
 {
 	stv(config);
 	ACCLAIM_RAX(config, "rax", 0);
+}
+
+void stv_state::shienryu(machine_config &config)
+{
+	stv(config);
+	config.set_default_layout(layout_segabillv);
 }
 
 #define STV_CARTSLOT_ADD(_tag, _load) \
@@ -3731,7 +3746,7 @@ GAME( 1998, sasissu,   stvbios, stv,      stv,      stv_state,   init_sasissu,  
 GAME( 1999, sanjeon,   sasissu, stv,      stv,      stv_state,   init_sanjeon,    ROT0,   "Sega / Deniam",                "DaeJeon! SanJeon SuJeon (AJTUE 990412 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, seabass,   stvbios, stv,      stv,      stv_state,   init_seabass,    ROT0,   "A wave inc. (Able license)",   "Sea Bass Fishing (JUET 971110 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, shanhigw,  stvbios, stv,      stv,      stv_state,   init_shanhigw,   ROT0,   "Sunsoft / Activision",         "Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, shienryu,  stvbios, stv,      stv,      stv_state,   init_shienryu,   ROT270, "Warashi",                      "Shienryu (JUET 961226 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, shienryu,  stvbios, shienryu, stv,      stv_state,   init_shienryu,   ROT270, "Warashi",                      "Shienryu (JUET 961226 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sss,       stvbios, stv_5881, stv,      stv_state,   init_sss,        ROT0,   "Capcom / Cave / Victor Interactive Software",       "Steep Slope Sliders (JUET 981110 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Also credited as Pack In Soft in ending screen
 GAME( 1995, sandor,    stvbios, stv,      stv,      stv_state,   init_sandor,     ROT0,   "Sega",                         "Puzzle & Action: Sando-R (J 951114 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, thunt,     sandor,  stv,      stv,      stv_state,   init_thunt,      ROT0,   "Sega",                         "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -43,6 +43,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/am8052.h,VIDEOS["AM8052"] = true
+--------------------------------------------------
+
+if (VIDEOS["AM8052"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/am8052.cpp",
+		MAME_DIR .. "src/devices/video/am8052.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/bufsprite.h,VIDEOS["BUFSPRITE"] = true
 --------------------------------------------------
 
@@ -605,6 +617,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/md4330b.h,VIDEOS["MD4330B"] = true
+--------------------------------------------------
+
+if (VIDEOS["MD4330B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/md4330b.cpp",
+		MAME_DIR .. "src/devices/video/md4330b.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/mm5445.h,VIDEOS["MM5445"] = true
 --------------------------------------------------
 
@@ -670,6 +694,18 @@ if (VIDEOS["PC_VGA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/trident.h",
 		MAME_DIR .. "src/devices/video/clgd542x.cpp",
 		MAME_DIR .. "src/devices/video/clgd542x.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/virge_pci.h,VIDEOS["VIRGE_PCI"] = true
+--------------------------------------------------
+
+if (VIDEOS["VIRGE_PCI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/virge_pci.cpp",
+		MAME_DIR .. "src/devices/video/virge_pci.h",
 	}
 end
 
@@ -1228,5 +1264,17 @@ if (VIDEOS["BT431"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/bt431.cpp",
 		MAME_DIR .. "src/devices/video/bt431.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/vrender0.h,VIDEOS["VRENDER0"] = true
+--------------------------------------------------
+
+if (VIDEOS["VRENDER0"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/vrender0.cpp",
+		MAME_DIR .. "src/devices/video/vrender0.h",
 	}
 end

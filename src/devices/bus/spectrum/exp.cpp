@@ -101,20 +101,28 @@ READ_LINE_MEMBER(spectrum_expansion_slot_device::romcs)
 // fetch_r
 //-------------------------------------------------
 
-void spectrum_expansion_slot_device::opcode_fetch(offs_t offset)
+void spectrum_expansion_slot_device::pre_opcode_fetch(offs_t offset)
 {
 	if (m_card)
-		 m_card->opcode_fetch(offset);
+		 m_card->pre_opcode_fetch(offset);
 }
 
-//-------------------------------------------------
-// fetch_r
-//-------------------------------------------------
-
-void spectrum_expansion_slot_device::opcode_fetch_post(offs_t offset)
+void spectrum_expansion_slot_device::post_opcode_fetch(offs_t offset)
 {
 	if (m_card)
-		 m_card->opcode_fetch_post(offset);
+		 m_card->post_opcode_fetch(offset);
+}
+
+void spectrum_expansion_slot_device::pre_data_fetch(offs_t offset)
+{
+	if (m_card)
+		 m_card->pre_data_fetch(offset);
+}
+
+void spectrum_expansion_slot_device::post_data_fetch(offs_t offset)
+{
+	if (m_card)
+		 m_card->post_data_fetch(offset);
 }
 
 //-------------------------------------------------
@@ -169,6 +177,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 
 // slot devices
 #include "beta.h"
+#include "beta128.h"
 //#include "disciple.h"
 #include "intf1.h"
 #include "intf2.h"
@@ -185,10 +194,13 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 #include "uslot.h"
 #include "usource.h"
 #include "uspeech.h"
-
+#include "wafa.h"
 
 void spectrum_expansion_devices(device_slot_interface &device)
 {
+	device.option_add("betav2", SPECTRUM_BETAV2);
+	device.option_add("betav3", SPECTRUM_BETAV3);
+	device.option_add("betaplus", SPECTRUM_BETAPLUS);
 	device.option_add("beta128", SPECTRUM_BETA128);
 	//device.option_add("disciple", SPECTRUM_DISCIPLE);
 	device.option_add("intf1", SPECTRUM_INTF1);
@@ -207,6 +219,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("uslot", SPECTRUM_USLOT);
 	device.option_add("usource", SPECTRUM_USOURCE);
 	device.option_add("uspeech", SPECTRUM_USPEECH);
+	device.option_add("wafadrive", SPECTRUM_WAFA);
 }
 
 void spec128_expansion_devices(device_slot_interface &device)
@@ -223,6 +236,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);
+	device.option_add("wafadrive", SPECTRUM_WAFA);
 }
 
 void specpls3_expansion_devices(device_slot_interface &device)

@@ -704,7 +704,7 @@ public:
 	INPUT_CHANGED_MEMBER(coin_start);
 	CUSTOM_INPUT_MEMBER(coin_r);
 	CUSTOM_INPUT_MEMBER(coin_usa_r);
-	CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 private:
 	DECLARE_WRITE32_MEMBER(Ns5w48);
@@ -1213,7 +1213,7 @@ void aristmk5_state::aristmk5_drame_map(address_map &map)
 }
 
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::hopper_r)
+READ_LINE_MEMBER(aristmk5_state::hopper_r)
 {
 	return (m_hopper_test && m_hopper->line_r()) ? 0 : 1;
 }
@@ -1388,7 +1388,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
 
 	PORT_START("P4")
-	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_usa_r, nullptr)
+	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(aristmk5_state, coin_usa_r)
 
 	PORT_START("P5")
 	PORT_BIT(0x00000008, IP_ACTIVE_LOW,  IPT_OTHER)   // Meters
@@ -1398,7 +1398,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 
 	PORT_START("EXTRA")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_TOGGLE PORT_CODE(KEYCODE_L)   PORT_NAME("Logic door")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, nullptr)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aristmk5 )
@@ -1442,14 +1442,14 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_BIT(0x00c00000, IP_ACTIVE_HIGH, IPT_UNUSED)  // Unused mechanical security switch
 
 PORT_START("P3")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, hopper_r, nullptr)
-	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_READ_LINE_MEMBER(aristmk5_state, hopper_r)
+	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(aristmk5_state, coin_r)
 
 	PORT_START("P6")
 	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_OTHER)    // Battery
 
 	PORT_START("EXTRA")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, nullptr)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, 0)
 INPUT_PORTS_END
 
 /********** Game-specific button labels **********/

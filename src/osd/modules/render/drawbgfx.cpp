@@ -15,7 +15,11 @@
 #include <SDL2/SDL_syswm.h>
 #endif
 #else
+#if defined(OSD_MAC)
+extern void *GetOSWindow(void *wincontroller);
+#else
 #include <SDL2/SDL_syswm.h>
+#endif
 #endif
 
 // MAMEOS headers
@@ -143,6 +147,17 @@ inline void winSetHwnd(::HWND _window)
 	pd.backBufferDS = NULL;
 	bgfx::setPlatformData(pd);
 }
+#elif defined(OSD_MAC)
+inline void macSetWindow(void *_window)
+{
+	bgfx::PlatformData pd;
+	pd.ndt          = NULL;
+	pd.nwh          = GetOSWindow(_window);
+	pd.context      = NULL;
+	pd.backBuffer   = NULL;
+	pd.backBufferDS = NULL;
+	bgfx::setPlatformData(pd);
+}
 #elif defined(OSD_SDL)
 static void* sdlNativeWindowHandle(SDL_Window* _window)
 {
@@ -240,6 +255,8 @@ int renderer_bgfx::create()
 #elif defined(OSD_UWP)
 
 		winrtSetWindow(AsInspectable(std::static_pointer_cast<uwp_window_info>(win)->platform_window()));
+#elif defined(OSD_MAC)
+		macSetWindow(std::static_pointer_cast<mac_window_info>(win)->platform_window());
 #else
 		sdlSetWindow(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window());
 #endif
@@ -296,6 +313,8 @@ int renderer_bgfx::create()
 		m_framebuffer = m_targets->create_backbuffer(std::static_pointer_cast<win_window_info>(win)->platform_window(), m_width[win->m_index], m_height[win->m_index]);
 #elif defined(OSD_UWP)
 		m_framebuffer = m_targets->create_backbuffer(AsInspectable(std::static_pointer_cast<uwp_window_info>(win)->platform_window()), m_width[win->m_index], m_height[win->m_index]);
+#elif defined(OSD_MAC)
+		m_framebuffer = m_targets->create_backbuffer(GetOSWindow(std::static_pointer_cast<mac_window_info>(win)->platform_window()), m_width[win->m_index], m_height[win->m_index]);
 #else
 		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window()), m_width[win->m_index], m_height[win->m_index]);
 #endif
@@ -949,6 +968,8 @@ bool renderer_bgfx::update_dimensions()
 			m_framebuffer = m_targets->create_backbuffer(std::static_pointer_cast<win_window_info>(win)->platform_window(), width, height);
 #elif defined(OSD_UWP)
 			m_framebuffer = m_targets->create_backbuffer(AsInspectable(std::static_pointer_cast<uwp_window_info>(win)->platform_window()), width, height);
+#elif defined(OSD_MAC)
+			m_framebuffer = m_targets->create_backbuffer(GetOSWindow(std::static_pointer_cast<mac_window_info>(win)->platform_window()), width, height);
 #else
 			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window()), width, height);
 #endif

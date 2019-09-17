@@ -42,6 +42,10 @@ void mb9061x_device::device_start()
 
 	m_tbtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb9061x_device::tbtc_tick), this));
 	m_tbtc_timer->adjust(attotime::never);
+	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb9061x_device::timer0_tick), this));
+	m_timer[0]->adjust(attotime::never);
+	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb9061x_device::timer1_tick), this));
+	m_timer[1]->adjust(attotime::never);
 }
 
 
@@ -59,6 +63,10 @@ device_memory_interface::space_config_vector mb9061x_device::memory_space_config
 void mb9061x_device::device_reset()
 {
 	f2mc16_device::device_reset();
+	m_tbtc = 0;
+	memset(m_timer_regs, 0, sizeof(m_timer_regs));
+	memset(m_event_count, 0, sizeof(m_event_count));
+	m_event_state[0] = m_event_state[1] = CLEAR_LINE;
 }
 
 void mb9061x_device::execute_set_input(int inputnum, int state)
@@ -83,6 +91,221 @@ mb90610_device::mb90610_device(const machine_config &mconfig, device_type type, 
 {
 }
 
+/* 16-bit preload timers with event count function */
+enum
+{
+		TCTH_CSL1 = 0x08,       // clock source select bit 1
+		TCTH_CSL0 = 0x04,       // clock source select bit 0
+		TCTH_MOD2 = 0x02,       // mode bit 2
+		TCTH_MOD1 = 0x01,       // mode bit 1
+
+		TCTL_MOD0 = 0x80,   // mode bit 0
+		TCTL_OUTE = 0x40,   // output enable
+		TCTL_OUTL = 0x20,   // output level
+		TCTL_RELD = 0x10,   // reload
+		TCTL_INTE = 0x08,   // IRQ enable
+		TCTL_UF   = 0x04,   // expire flag
+		TCTL_CNTE = 0x02,   // enable counting
+		TCTL_TRG  = 0x01    // force a reload and start counting
+};
+
+TIMER_CALLBACK_MEMBER(mb9061x_device::timer0_tick)
+{
+	u8 ctl = m_timer_regs[0];
+	m_timer_regs[0] |= TCTL_UF;
+	if (ctl & TCTL_INTE)
+	{
+//      printf("timer 0 IRQ\n");
+		intc_trigger_irq(9, 0x1d);
+	}
+
+	if (ctl & TCTL_RELD)
+	{
+		recalc_timer(0);
+		m_timer[0]->adjust(attotime::from_hz(m_timer_hz[0]));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(mb9061x_device::timer1_tick)
+{
+	u8 ctl = m_timer_regs[4];
+	m_timer_regs[4] |= TCTL_UF;
+	if (ctl & TCTL_INTE)
+	{
+ //       printf("timer 1 IRQ\n");
+		intc_trigger_irq(9, 0x1e);
+	}
+
+	if (ctl & TCTL_RELD)
+	{
+		recalc_timer(0);
+		m_timer[1]->adjust(attotime::from_hz(m_timer_hz[1]));
+	}
+}
+
+READ8_MEMBER(mb9061x_device::timer_r)
+{
+	//printf("timer_r: offset %d = %02x\n", offset, m_timer_regs[offset]);
+	return m_timer_regs[offset];
+}
+
+WRITE8_MEMBER(mb9061x_device::timer_w)
+{
+	int timer = offset / 4;
+	int reg = offset % 4;
+
+	//printf("timer_w: %x to %d\n", data, offset);
+#if 0
+	switch (reg)
+	{
+		case 0: // control/status, lower
+			printf("%02x to timer %d lower control\n", data, timer);
+			break;
+
+		case 1: // control/status, upper
+			printf("%02x to timer %d upper control\n", data, timer);
+			break;
+
+		case 2: // timer/reload, lower
+			printf("%02x to timer %d lower reload\n", data, timer);
+			break;
+
+		case 3: //  timer/reload, upper
+			printf("%02x to timer %d upper reload\n", data, timer);
+			break;
+	}
+#endif
+	if (reg == 0)
+	{
+		m_timer_regs[offset] &= (TCTL_TRG|TCTL_UF);
+		m_timer_regs[offset] |= data;
+	}
+	else
+	{
+		m_timer_regs[offset] = data;
+	}
+
+	int rbase = timer << 2;
+	u8 csl = (m_timer_regs[rbase+1] >> 2) & 3;
+	if (reg == 0)
+	{
+		if (data & TCTL_TRG)
+		{
+			//printf("Got TRG\n");
+			recalc_timer(timer);
+			if ((m_timer_regs[rbase] & TCTL_CNTE) && (csl != 3))
+			{
+				m_timer[timer]->adjust(attotime::from_hz(m_timer_hz[timer]));
+			}
+		}
+
+		if ((data & TCTL_CNTE) && (csl != 3))
+		{
+			//printf("CNTE set, starting timer at %d Hz\n", m_timer_hz[timer]);
+			m_timer[timer]->adjust(attotime::from_hz(m_timer_hz[timer]));
+		}
+
+		if ((data & TCTL_CNTE) && (csl == 3))
+		{
+			m_event_count[timer] = m_timer_regs[2] | (m_timer_regs[3]<<8);
+			//printf("CNTE set in event counter mode, reseeding count to %04x\n", m_event_count[timer]);
+		}
+
+		if (!(data & TCTL_UF))
+		{
+			intc_clear_irq(9, 0x1d + timer);
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(mb9061x_device::tin0_w)
+{
+	tin_common(0, 0, state);
+}
+
+WRITE_LINE_MEMBER(mb9061x_device::tin1_w)
+{
+	tin_common(1, 4, state);
+}
+
+void mb9061x_device::tin_common(int timer, int base, int state)
+{
+	// emsure event counter mode
+	if ((m_timer_regs[base + 1] & (TCTH_CSL0|TCTH_CSL1)) == (TCTH_CSL0|TCTH_CSL1) &&
+		(m_timer_regs[base] & TCTL_CNTE))
+	{
+		bool bTickIt = false;
+
+		// rising edge
+		if ((state && !m_event_state[base/4]) && (m_timer_regs[base] & TCTL_MOD0) && !(m_timer_regs[base+1] & TCTH_MOD1))
+		{
+			bTickIt = true;
+		}
+
+		// falling edge
+		if ((!state && m_event_state[base/4]) && !(m_timer_regs[base] & TCTL_MOD0) && (m_timer_regs[base+1] & TCTH_MOD1))
+		{
+			bTickIt = true;
+		}
+
+		// any edge
+		if ((state != m_event_state[base/4]) && !(m_timer_regs[base] & TCTL_MOD0) && (m_timer_regs[base+1] & TCTH_MOD1))
+		{
+			bTickIt = true;
+		}
+
+		if (bTickIt)
+		{
+			m_event_count[timer]--;
+			//printf("Tick timer %d, new value %04x\n", timer, m_event_count[timer]);
+
+			if (m_event_count[timer] == 0xffff)
+			{
+				u8 ctl = m_timer_regs[base];
+				m_timer_regs[base] |= TCTL_UF;
+				//printf("Timer %d exp, CL %02x\n", timer, m_timer_regs[base]);
+				if (ctl & TCTL_INTE)
+				{
+					//printf("timer %d IRQ\n", timer);
+					intc_trigger_irq(9, 0x1d + timer);
+				}
+
+				if (m_timer_regs[timer * 4] & TCTL_RELD)
+				{
+					m_event_count[timer] = m_timer_regs[2] | (m_timer_regs[3]<<8);
+					//printf("timer %d reload to %04x\n", timer, m_event_count[timer]);
+				}
+			}
+		}
+
+		m_event_state[timer] = state;
+	}
+}
+
+void mb9061x_device::recalc_timer(int tnum)
+{
+	int rbase = tnum << 2;
+	u32 divider = 1;
+	u8 csl = (m_timer_regs[rbase+1] >> 2) & 3;
+
+	// check clock select
+	switch (csl)
+	{
+		case 0: divider = 2; break;
+		case 1: divider = 16; break;
+		case 2: divider = 64; break;
+
+		case 3: // event counter mode
+			return;
+	}
+
+	u32 tclk = clock() / divider;
+	u32 tval = m_timer_regs[rbase+2] | (m_timer_regs[rbase+3]<<8);
+	//printf("CSL %d, tclk %d, tval %d\n", csl, tclk, tval);
+	//printf("Timer is %d Hz\n", tclk / tval);
+	m_timer_hz[tnum] = tclk / tval;
+}
+
 /* TBTC: timebase counter */
 enum
 {
@@ -104,7 +327,7 @@ WRITE8_MEMBER(mb9061x_device::tbtc_w)
 	static const float periods[4] = { 1.024, 4.096, 16.384, 131.072 };
 
 	//printf("%02x to TBTC\n", data);
-	if ((!(data & TBTC_TBR)) || ((data & (TBTC_TBC1|TBTC_TBC0)) != (m_tbtc & (TBTC_TBC1|TBTC_TBC0))))
+//  if ((!(data & TBTC_TBR)) || ((data & (TBTC_TBC1|TBTC_TBC0)) != (m_tbtc & (TBTC_TBC1|TBTC_TBC0))))
 	{
 		m_tbtc_timer->adjust(attotime(0, ATTOSECONDS_IN_MSEC(periods[data & (TBTC_TBC1|TBTC_TBC0)])));
 
@@ -182,6 +405,7 @@ void mb9061x_device::intc_clear_irq(int icr, int vector)
 /* MB90611 - Production version of this series */
 void mb90611_device::mb90611_map(address_map &map)
 {
+	map(0x0038, 0x003f).rw(FUNC(mb9061x_device::timer_r), FUNC(mb9061x_device::timer_w));
 	map(0x00a9, 0x00a9).rw(FUNC(mb9061x_device::tbtc_r), FUNC(mb9061x_device::tbtc_w));
 	map(0x00b0, 0x00bf).rw(FUNC(mb9061x_device::intc_r), FUNC(mb9061x_device::intc_w));
 	map(0x0100, 0x04ff).ram();  // 1K of internal RAM from 0x100 to 0x500

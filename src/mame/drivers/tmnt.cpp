@@ -1935,11 +1935,12 @@ void tmnt_state::cuebrick(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::cuebrick_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
 	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
@@ -1985,11 +1986,12 @@ void tmnt_state::mia(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::mia_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
 	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
@@ -2048,11 +2050,12 @@ void tmnt_state::tmnt(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::tmnt_sprite_callback), this);
 	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
@@ -2108,11 +2111,12 @@ void tmnt_state::punkshot(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::punkshot_sprite_callback), this);
 
 	K053251(config, m_k053251, 0);
@@ -2159,6 +2163,7 @@ void tmnt_state::lgtnfght(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2215,6 +2220,7 @@ void tmnt_state::blswhstl(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::blswhstl_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2289,6 +2295,7 @@ void tmnt_state::glfgreat(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2355,6 +2362,7 @@ void tmnt_state::prmrsocr(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2417,6 +2425,7 @@ void tmnt_state::tmnt2(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2472,6 +2481,7 @@ void tmnt_state::ssriders(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2519,6 +2529,7 @@ void tmnt_state::sunsetbl(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::ssbl_tile_callback), this);
 
 	K053245(config, m_k053245, 0);
@@ -2567,11 +2578,12 @@ void tmnt_state::thndrx2(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::thndrx2_sprite_callback), this);
 
 	K053251(config, m_k053251, 0);
@@ -3131,6 +3143,26 @@ ROM_START( punkshot2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "907m02.i7",    0x00000, 0x20000, CRC(59e14575) SHA1(249fc98a2d5fa3e4779438c37d22c0256be8d3fa) )
 	ROM_LOAD16_BYTE( "907m03.i10",   0x00001, 0x20000, CRC(adb14b1e) SHA1(c5db1c3b70ab3e53cd6a600b82bdccda4db05f90) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "907f01.e8",    0x0000, 0x8000, CRC(f040c484) SHA1(f76a739cacc0aba98a5bf85a48c81cef0d9bbfb4) )
+
+	ROM_REGION( 0x80000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "907d06.e23",   0x000000, 0x40000, CRC(f5cc38f4) SHA1(e6dc9994582a08740dc2fcb30a38771053627d5f) )
+	ROM_LOAD32_WORD( "907d05.e22",   0x000002, 0x40000, CRC(e25774c1) SHA1(74fda3b418b4b0064b5e660a93122b07f6d41416) )
+
+	ROM_REGION( 0x200000, "k051960", 0 )    /* sprites */
+	ROM_LOAD32_WORD( "907d07.k2",    0x000000, 0x100000, CRC(b0fe4543) SHA1(3be1caef29084063dd8754c1eecc34a2ec842415) )
+	ROM_LOAD32_WORD( "907d08.k7",    0x000002, 0x100000, CRC(d5ac8d9d) SHA1(cb330be1c5c016465ef7048b3b29c65a741ee45b) )
+
+	ROM_REGION( 0x80000, "k053260", 0 ) /* samples for the 053260 */
+	ROM_LOAD( "907d04.d3",    0x0000, 0x80000, CRC(090feb5e) SHA1(2394907b62ff0724c277642caf6375239249e2d7) )
+ROM_END
+
+ROM_START( punkshot2e )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
+	ROM_LOAD16_BYTE( "907_2.i7",    0x00000, 0x20000, CRC(aa55516c) SHA1(297202c3dc817b016b646341712e7e1805bc98a5) )
+	ROM_LOAD16_BYTE( "907_3.i10",   0x00001, 0x20000, CRC(0d3aa3d5) SHA1(39a9f4aac9463a88f1f57dc9aeb5718793aaa2c1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "907f01.e8",    0x0000, 0x8000, CRC(f040c484) SHA1(f76a739cacc0aba98a5bf85a48c81cef0d9bbfb4) )
@@ -4253,6 +4285,7 @@ GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, init_tmnt,  
 
 GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot2e,  punkshot, punkshot, punksht2,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (World 2 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  tmnt_state, empty_init,  ROT0,   "Konami",  "Punk Shot (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  tmnt_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (World)", MACHINE_SUPPORTS_SAVE )
@@ -4273,7 +4306,7 @@ GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init, 
 GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt24pu,    tmnt2,    tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UEA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt24pu,    tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UEA)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt_state, empty_init,  ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA1 Type H)", MACHINE_SUPPORTS_SAVE )
 

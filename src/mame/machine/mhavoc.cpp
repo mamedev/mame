@@ -204,37 +204,30 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_rom_banksel_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::tms5220_r)
+CUSTOM_INPUT_MEMBER(mhavoc_state::coin_service_r)
 {
-	return m_tms->readyq_r() ? 1 : 0;
+	return (m_player_1 ? m_service : m_coin)->read() & 0x03;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::mhavoc_bit67_r)
-{
-	const char *tag1 = (const char *)param;
-	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return ioport(m_player_1 ? tag2 : tag1)->read() & 0x03;
-}
-
-CUSTOM_INPUT_MEMBER(mhavoc_state::gamma_rcvd_r)
+READ_LINE_MEMBER(mhavoc_state::gamma_rcvd_r)
 {
 	/* Gamma rcvd flag */
 	return m_gamma_rcvd;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::gamma_xmtd_r)
+READ_LINE_MEMBER(mhavoc_state::gamma_xmtd_r)
 {
 	/* Gamma xmtd flag */
 	return m_gamma_xmtd;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::alpha_rcvd_r)
+READ_LINE_MEMBER(mhavoc_state::alpha_rcvd_r)
 {
 	/* Alpha rcvd flag */
 	return (m_has_gamma_cpu && m_alpha_rcvd);
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::alpha_xmtd_r)
+READ_LINE_MEMBER(mhavoc_state::alpha_xmtd_r)
 {
 	/* Alpha xmtd flag */
 	return (m_has_gamma_cpu && m_alpha_xmtd);

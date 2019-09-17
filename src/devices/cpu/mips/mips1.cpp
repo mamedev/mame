@@ -212,9 +212,6 @@ void mips1core_device_base::device_reset()
 
 void mips1core_device_base::execute_run()
 {
-	// check for interrupts
-	check_irqs();
-
 	// core execution loop
 	while (m_icount-- > 0)
 	{
@@ -239,10 +236,17 @@ void mips1core_device_base::execute_run()
 			}
 		}
 
-		// fetch and execute instruction
+		// fetch instruction
 		fetch(m_pc, [this](u32 const op)
 		{
-			// parse the instruction
+			// check for interrupts
+			if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
+			{
+				generate_exception(EXCEPTION_INTERRUPT);
+				return;
+			}
+
+			// decode and execute instruction
 			switch (op >> 26)
 			{
 			case 0x00: // SPECIAL
@@ -379,7 +383,18 @@ void mips1core_device_base::execute_run()
 				}
 				break;
 			case 0x01: // REGIMM
-				switch (RTREG)
+				/*
+				 * Hardware testing has established that MIPS-1 processors do
+				 * not decode bit 17 of REGIMM format instructions. This bit is
+				 * used to add the "branch likely" instructions for MIPS-2 and
+				 * later architectures.
+				 *
+				 * IRIX 5.3 inst(1M) uses this behaviour to distinguish MIPS-1
+				 * from MIPS-2 processors; the latter nullify the delay slot
+				 * instruction if the branch is not taken, whereas the former
+				 * execute the delay slot instruction regardless.
+				 */
+				switch (RTREG & 0x1d)
 				{
 				case 0x00: // BLTZ
 					if (s32(m_r[RSREG]) < 0)
@@ -559,31 +574,31 @@ void mips1core_device_base::execute_run()
 				break;
 			}
 
-			// update pc and branch state
-			switch (m_branch_state)
-			{
-			case NONE:
-				m_pc += 4;
-				break;
-
-			case DELAY:
-				m_branch_state = NONE;
-				m_pc = m_branch_target;
-				break;
-
-			case BRANCH:
-				m_branch_state = DELAY;
-				m_pc += 4;
-				break;
-
-			case EXCEPTION:
-				m_branch_state = NONE;
-				break;
-			}
-
 			// clear register 0
 			m_r[0] = 0;
 		});
+
+		// update pc and branch state
+		switch (m_branch_state)
+		{
+		case NONE:
+			m_pc += 4;
+			break;
+
+		case DELAY:
+			m_branch_state = NONE;
+			m_pc = m_branch_target;
+			break;
+
+		case BRANCH:
+			m_branch_state = DELAY;
+			m_pc += 4;
+			break;
+
+		case EXCEPTION:
+			m_branch_state = NONE;
+			break;
+		}
 	}
 }
 
@@ -599,8 +614,6 @@ void mips1core_device_base::execute_set_input(int irqline, int state)
 	}
 	else
 		CAUSE &= ~(CAUSE_IPEX0 << irqline);
-
-	check_irqs();
 }
 
 device_memory_interface::space_config_vector mips1core_device_base::memory_space_config() const
@@ -846,12 +859,6 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 		debugger_privilege_hook();
 }
 
-void mips1core_device_base::check_irqs()
-{
-	if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
-		generate_exception(EXCEPTION_INTERRUPT);
-}
-
 void mips1core_device_base::handle_cop0(u32 const op)
 {
 	switch (RSREG)
@@ -888,7 +895,7 @@ void mips1core_device_base::handle_cop0(u32 const op)
 		switch (op & 31)
 		{
 			case 0x10: // RFE
-				SR = (SR & ~SR_KUIEpc) | ((SR >> 2) & SR_KUIEpc);
+				SR = (SR & ~SR_KUIE) | ((SR >> 2) & SR_KUIEpc);
 				if (bool(SR & SR_KUc) ^ bool(SR & SR_KUp))
 					debugger_privilege_hook();
 				break;
@@ -921,10 +928,6 @@ void mips1core_device_base::set_cop0_reg(unsigned const reg, u32 const data)
 			// handle cache isolation and swap
 			m_data_spacenum = (data & SR_IsC) ? ((data & SR_SwC) ? 1 : 2) : 0;
 
-			// update interrupts
-			if (delta & (SR_IEc | SR_IM))
-				check_irqs();
-
 			if ((delta & SR_KUc) && (m_branch_state != EXCEPTION))
 				debugger_privilege_hook();
 		}
@@ -932,9 +935,6 @@ void mips1core_device_base::set_cop0_reg(unsigned const reg, u32 const data)
 
 	case COP0_Cause:
 		CAUSE = (CAUSE & CAUSE_IPEX) | (data & ~CAUSE_IPEX);
-
-		// update interrupts -- software ints can occur this way
-		check_irqs();
 		break;
 
 	case COP0_PRId:
@@ -1241,8 +1241,8 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[index][0] = m_cop0[COP0_EntryHi];
 			m_tlb[index][1] = m_cop0[COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlb write index %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
-				index, (m_cop0[COP0_EntryHi] & EH_ASID) >> 6, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
+			LOGMASKED(LOG_TLB, "asid %2d tlb write index %2d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+				(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, index, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
 				m_cop0[COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cop0[COP0_EntryLo] & EL_D ? 'D' : '-',
 				m_cop0[COP0_EntryLo] & EL_V ? 'V' : '-',
@@ -1258,8 +1258,8 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[random][0] = m_cop0[COP0_EntryHi];
 			m_tlb[random][1] = m_cop0[COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlb write random %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
-				random, (m_cop0[COP0_EntryHi] & EH_ASID) >> 6, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
+			LOGMASKED(LOG_TLB, "asid %2d tlb write random %2d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+				(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, random, m_cop0[COP0_EntryHi] & EH_VPN, m_cop0[COP0_EntryLo] & EL_PFN,
 				m_cop0[COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cop0[COP0_EntryLo] & EL_D ? 'D' : '-',
 				m_cop0[COP0_EntryLo] & EL_V ? 'V' : '-',
@@ -1276,15 +1276,15 @@ void mips1_device_base::handle_cop0(u32 const op)
 			u32 const mask = (m_tlb[index][1] & EL_G) ? EH_VPN : EH_VPN | EH_ASID;
 			if ((m_tlb[index][0] & mask) == (m_cop0[COP0_EntryHi] & mask))
 			{
-				LOGMASKED(LOG_TLB, "tlb probe hit vpn 0x%08x index %d (%s)\n",
-					m_cop0[COP0_EntryHi] & mask, index, machine().describe_context());
+				LOGMASKED(LOG_TLB, "asid %2d tlb probe index %2d vpn 0x%08x (%s)\n",
+					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, index, m_cop0[COP0_EntryHi] & mask, machine().describe_context());
 
 				m_cop0[COP0_Index] = index << 8;
 				break;
 			}
 		}
 		if ((VERBOSE & LOG_TLB) && BIT(m_cop0[COP0_Index], 31))
-			LOGMASKED(LOG_TLB, "tlb probe miss asid %d vpn 0x%08x(%s)\n",
+			LOGMASKED(LOG_TLB, "asid %2d tlb probe miss vpn 0x%08x(%s)\n",
 				(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, m_cop0[COP0_EntryHi] & EH_VPN, machine().describe_context());
 		break;
 
@@ -1334,6 +1334,8 @@ void mips1_device_base::handle_cop1(u32 const op)
 
 	if (!m_fcr0)
 		return;
+
+	softfloat_exceptionFlags = 0;
 
 	switch (op >> 26)
 	{
@@ -1969,11 +1971,11 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 		if (VERBOSE & LOG_TLB)
 		{
 			if (modify)
-				LOGMASKED(LOG_TLB, "tlb modify asid %d address 0x%08x (%s)\n",
+				LOGMASKED(LOG_TLB, "asid %2d tlb modify address 0x%08x (%s)\n",
 					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
 			else
-				LOGMASKED(LOG_TLB, "tlb miss %c asid %d address 0x%08x (%s)\n",
-					(intention & TRANSLATE_WRITE) ? 'w' : 'r', (m_cop0[COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
+				LOGMASKED(LOG_TLB, "asid %2d tlb miss %c address 0x%08x (%s)\n",
+					(m_cop0[COP0_EntryHi] & EH_ASID) >> 6, (intention & TRANSLATE_WRITE) ? 'w' : 'r', address, machine().describe_context());
 		}
 
 		// load tlb exception registers

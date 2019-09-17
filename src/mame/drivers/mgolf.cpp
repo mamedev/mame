@@ -10,6 +10,7 @@
 #include "cpu/m6502/m6502.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class mgolf_state : public driver_device
 {

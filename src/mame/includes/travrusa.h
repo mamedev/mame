@@ -7,6 +7,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class travrusa_state : public driver_device
 {

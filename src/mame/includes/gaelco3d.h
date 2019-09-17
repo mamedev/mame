@@ -56,8 +56,8 @@ public:
 	void gaelco3d2(machine_config &config);
 	void gaelco3d(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(fp_analog_bit_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(analog_bit_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(fp_analog_bit_r);
 
 private:
 	virtual void machine_start() override;

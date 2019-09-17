@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #ifndef MAME_CPU_F2MC16_F2MC16_H
-#define MAME_CPU_F2MC16_F2MC16_H 1
+#define MAME_CPU_F2MC16_F2MC16_H
 
 #pragma once
 
@@ -65,9 +65,9 @@ private:
 	address_space_config m_program_config;
 	address_space *m_program;
 
-	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmpea;
+	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmpea, m_tmp16aux;
 	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8, m_prefix;
-	u32 m_acc, m_temp, m_tmp32;
+	u32 m_acc, m_temp, m_tmp32, m_tmp32aux;
 	s32 m_icount;
 	u64 m_tmp64;
 	bool m_prefix_valid;
@@ -279,6 +279,21 @@ private:
 		return rv;
 	}
 
+	inline u16 peek_stack_16()
+	{
+		u16 rv = 0;
+		if (m_ps & F_S)
+		{
+			rv = read_16((m_ssb << 16) | m_ssp);
+		}
+		else
+		{
+			rv = read_16((m_usb << 16) | m_usp);
+		}
+
+		return rv;
+	}
+
 	inline u16 pull_16_ssp()
 	{
 		u16 rv = read_16((m_ssb << 16) | m_ssp);
@@ -306,42 +321,42 @@ private:
 
 	inline void doCMP_8(u8 lhs, u8 rhs)
 	{
-		m_tmp16 = lhs - rhs;
-		setNZ_16(m_tmp16 & 0xff);
+		u16 tmp16 = lhs - rhs;
+		setNZ_16(tmp16 & 0xff);
 		m_ps &= ~(F_C|F_V);
-		if (m_tmp16 & 0x100)
+		if (tmp16 & 0x100)
 		{
 			m_ps |= F_C;
 		}
-		if ((lhs ^ rhs) & (lhs ^ (m_tmp16 & 0xff)) & 0x80)
+		if ((lhs ^ rhs) & (lhs ^ (tmp16 & 0xff)) & 0x80)
 		{
 			m_ps |= F_V;
 		}
 	}
 	inline void doCMP_16(u16 lhs, u16 rhs)
 	{
-		m_tmp32 = lhs - rhs;
-		setNZ_16(m_tmp32 & 0xffff);
+		u32 tmp32 = lhs - rhs;
+		setNZ_16(tmp32 & 0xffff);
 		m_ps &= ~(F_C|F_V);
-		if (m_tmp32 & 0x10000)
+		if (tmp32 & 0x10000)
 		{
 			m_ps |= F_C;
 		}
-		if ((lhs ^ rhs) & (lhs ^ (m_tmp32 & 0xffff)) & 0x8000)
+		if ((lhs ^ rhs) & (lhs ^ (tmp32 & 0xffff)) & 0x8000)
 		{
 			m_ps |= F_V;
 		}
 	}
 	inline void doCMP_32(u32 lhs, u32 rhs)
 	{
-		m_tmp64 = lhs - rhs;
-		setNZ_32(m_tmp64 & 0xffffffff);
+		u64 tmp64 = lhs - rhs;
+		setNZ_32(tmp64 & 0xffffffff);
 		m_ps &= ~(F_C|F_V);
-		if (m_tmp64 & 0x100000000)
+		if (tmp64 & 0x100000000)
 		{
 			m_ps |= F_C;
 		}
-		if ((lhs ^ rhs) & (lhs ^ (m_tmp64 & 0xffffffff)) & 0x80000000)
+		if ((lhs ^ rhs) & (lhs ^ (tmp64 & 0xffffffff)) & 0x80000000)
 		{
 			m_ps |= F_V;
 		}
@@ -349,14 +364,14 @@ private:
 
 	inline u8 doSUB_8(u8 lhs, u8 rhs)
 	{
-		m_tmp16 = lhs - rhs;
-		setNZ_16(m_tmp16 & 0xff);
+		u16 tmp16 = lhs - rhs;
+		setNZ_16(tmp16 & 0xff);
 		m_ps &= ~(F_C|F_V);
-		if (m_tmp16 & 0x100)
+		if (tmp16 & 0x100)
 		{
 			m_ps |= F_C;
 		}
-		if ((lhs ^ rhs) & (lhs ^ (m_tmp16 & 0xff)) & 0x80)
+		if ((lhs ^ rhs) & (lhs ^ (tmp16 & 0xff)) & 0x80)
 		{
 			m_ps |= F_V;
 		}
@@ -365,73 +380,89 @@ private:
 	}
 	inline u16 doSUB_16(u16 lhs, u16 rhs)
 	{
-		m_tmp32 = lhs - rhs;
-		setNZ_16(m_tmp32 & 0xffff);
+		u32 tmp32 = lhs - rhs;
+		setNZ_16(tmp32 & 0xffff);
 		m_ps &= ~(F_C|F_V);
-		if (m_tmp32 & 0x10000)
+		if (tmp32 & 0x10000)
 		{
 			m_ps |= F_C;
 		}
-		if ((lhs ^ rhs) & (lhs ^ (m_tmp32 & 0xffff)) & 0x8000)
+		if ((lhs ^ rhs) & (lhs ^ (tmp32 & 0xffff)) & 0x8000)
 		{
 			m_ps |= F_V;
 		}
 
-		return m_tmp32 & 0xffff;
+		return tmp32 & 0xffff;
 	}
 	inline u32 doSUB_32(u32 lhs, u32 rhs)
 	{
-		m_tmp64 = lhs - rhs;
-		setNZ_32(m_tmp64 & 0xffffffff);
+		u64 tmp64 = lhs - rhs;
+		setNZ_32(tmp64 & 0xffffffff);
 		m_ps &= ~(F_C|F_V);
-		if (m_tmp64 & 0x100000000)
+		if (tmp64 & 0x100000000)
 		{
 			m_ps |= F_C;
 		}
-		if ((lhs ^ rhs) & (lhs ^ (m_tmp64 & 0xffffffff)) & 0x8000000)
+		if ((lhs ^ rhs) & (lhs ^ (tmp64 & 0xffffffff)) & 0x8000000)
 		{
 			m_ps |= F_V;
 		}
 
-		return m_tmp64 & 0xffffffff;
+		return tmp64 & 0xffffffff;
+	}
+	inline u8 doADD_8(u8 lhs, u8 rhs)
+	{
+		u16 tmp16 = lhs + rhs;
+		m_ps &= ~(F_C|F_V);
+		if ((tmp16 ^ lhs) & (tmp16 ^ rhs) & 0x80)
+		{
+			m_ps |= F_V;
+		}
+		if (tmp16 > 0xff)
+		{
+			m_ps |= F_C;
+		}
+		setNZ_8(tmp16 & 0xff);
+
+		return tmp16 & 0xff;
 	}
 	inline u16 doADD_16(u16 lhs, u16 rhs)
 	{
-		m_tmp32 = lhs + rhs;
+		u32 tmp32 = lhs + rhs;
 		m_ps &= ~(F_C|F_V);
-		if ((m_tmp32 ^ lhs) & (m_tmp32 ^ rhs) & 0x8000)
+		if ((tmp32 ^ lhs) & (tmp32 ^ rhs) & 0x8000)
 		{
 			m_ps |= F_V;
 		}
-		if (m_tmp32 > 0xffff)
+		if (tmp32 > 0xffff)
 		{
 			m_ps |= F_C;
 		}
-		setNZ_16(m_tmp32 & 0xffff);
+		setNZ_16(tmp32 & 0xffff);
 
-		return m_tmp32 & 0xffff;
+		return tmp32 & 0xffff;
 	}
 	inline u32 doADD_32(u32 lhs, u32 rhs)
 	{
-		m_tmp64 = lhs + rhs;
+		u64 tmp64 = lhs + rhs;
 		m_ps &= ~(F_C|F_V);
-		if ((m_tmp64 ^ lhs) & (m_tmp64 ^ rhs) & 0x80000000)
+		if ((tmp64 ^ lhs) & (tmp64 ^ rhs) & 0x80000000)
 		{
 			m_ps |= F_V;
 		}
-		if (m_tmp64 > 0xffffffff)
+		if (tmp64 > 0xffffffff)
 		{
 			m_ps |= F_C;
 		}
-		setNZ_32(m_tmp64 & 0xffffffff);
+		setNZ_32(tmp64 & 0xffffffff);
 
-		return m_tmp64 & 0xffffffff;
+		return tmp64 & 0xffffffff;
 	}
 
 	inline void take_branch()
 	{
-		m_tmp8 = read_8((m_pcb << 16) | (m_pc+1));
-		m_pc = m_pc + 2 + (s8)m_tmp8;
+		u8 tmp8 = read_8((m_pcb << 16) | (m_pc+1));
+		m_pc = m_pc + 2 + (s8)tmp8;
 		m_icount -= 4;
 	}
 
@@ -447,6 +478,8 @@ private:
 	void opcodes_ea76(u8 operand);
 	void opcodes_ea77(u8 operand);
 	void opcodes_ea78(u8 operand);
+	void opcodes_rwi7a(u8 operand);
+	void opcodes_rwi7b(u8 operand);
 
 	void set_irq(int vector, int level);
 	void clear_irq(int vector);

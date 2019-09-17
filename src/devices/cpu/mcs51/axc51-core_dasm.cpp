@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "axc51-core_dasm.h"
 
+// SOME of these might be AX208 specific, we do not currently hvae enough information to split it into AXC51 / AX208 however
 const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[] = {
 
 	// SFR Registers
@@ -194,6 +195,151 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 	{ 0x3071, "DACCNT" }, // DAC DMA Counter
 
 	{ -1 }
+};
+
+
+// based on extracted symbol table, note 0x8000 - 0x8ca3 is likely boot code, interrupt code, kernel etc.
+// this should be the same for all ax208 CPUs as they are thought to all use the same internal ROM
+const ax208_disassembler::ax208_bios_info ax208_disassembler::bios_call_names[] = {
+	{ 0x8000, "entry point" },
+
+	{ 0x8006, "unknown, used" },
+	{ 0x8009, "unknown, used" },
+
+	{ 0x8ca4, "_STRCHR" },
+	{ 0x8dd6, "_STRLEN" },
+	{ 0x8eb7, "_tolower" },
+	{ 0x8ec8, "_toupper" },
+	{ 0x900f, "_isalpha" },
+	{ 0x902a, "_iscntrl" },
+	{ 0x9038, "_isdigit" },
+	{ 0x9047, "_isalnum" },
+	{ 0x906d, "_isgraph" },
+	{ 0x907c, "_isprint" },
+	{ 0x908b, "_ispunct" },
+	{ 0x90bb, "_islower" },
+	{ 0x90ca, "_isupper" },
+	{ 0x90d9, "_isspace" },
+	{ 0x90ec, "_isxdigit" },
+	{ 0x91e2, "COPY" },
+	{ 0x9208, "SCDIV" },
+	{ 0x922a, "CLDPTR" },
+	{ 0x9243, "CLDIPTR" },
+	{ 0x9267, "CLDOPTR" },
+	{ 0x9294, "CLDIOPTR" },
+	{ 0x92cb, "CILDPTR" },
+	{ 0x92ed, "CILDOPTR" },
+	{ 0x9320, "CSTPTR" },
+	{ 0x9332, "CSTOPTR" },
+	{ 0x9354, "UIDIV" },
+	{ 0x93a9, "SIDIV" },
+	{ 0x93df, "IILDX" },
+	{ 0x93f5, "ILDIX" },
+	{ 0x940b, "ILDPTR" },
+	{ 0x9436, "ILDIPTR" },
+	{ 0x946b, "ILDOPTR" },
+	{ 0x94a3, "ILDIOPTR" },
+	{ 0x94ef, "IILDPTR" },
+	{ 0x9527, "IILDOPTR" },
+	{ 0x9574, "ISTPTR" },
+	{ 0x9593, "ISTOPTR" },
+	{ 0x95c0, "LADD" },
+	{ 0x95cd, "LSUB" },
+	{ 0x95db, "LMUL" },
+	{ 0x9666, "ULDIV" },
+	{ 0x96f8, "LAND" },
+	{ 0x9705, "LOR" },
+	{ 0x9712, "LXOR" },
+	{ 0x971f, "LNOT" },
+	{ 0x972c, "LNEG" },
+	{ 0x973a, "SLCMP" },
+	{ 0x9750, "ULCMP" },
+	{ 0x9761, "ULSHR" },
+	{ 0x9774, "SLSHR" },
+	{ 0x9788, "LSHL" },
+	{ 0x979b, "LLDPTR" },
+	{ 0x97bb, "LLDOPTR" },
+	{ 0x97eb, "LSTPTR" },
+	{ 0x9805, "LSTOPTR" },
+	{ 0x9829, "LILDPTR" },
+	{ 0x9849, "LILDOPTR" },
+	{ 0x9879, "LLDIPTR" },
+	{ 0x9899, "LLDIOPTR" },
+	{ 0x98c9, "LLDIDATA" },
+	{ 0x98d5, "LLDXDATA" },
+	{ 0x98e1, "LLDPDATA" },
+	{ 0x98ed, "LLDCODE" },
+	{ 0x98fd, "LLDIDATA0" },
+	{ 0x990a, "LLDXDATA0" },
+	{ 0x9916, "LLDPDATA0" },
+	{ 0x9923, "LLDCODE0" },
+	{ 0x9933, "LLDPTR0" },
+	{ 0x9953, "LLDOPTR0" },
+	{ 0x9983, "LLDIIDATA1" },
+	{ 0x9985, "LLDIIDATA8" },
+	{ 0x998c, "LLDIIDATA" },
+	{ 0x99a3, "LLDIXDATA1" },
+	{ 0x99a5, "LLDIXDATA8" },
+	{ 0x99ac, "LLDIXDATA" },
+	{ 0x99d8, "LLDIPDATA1" },
+	{ 0x99da, "LLDIPDATA8" },
+	{ 0x99e1, "LLDIPDATA" },
+	{ 0x99f8, "LILDIDATA1" },
+	{ 0x99fa, "LILDIDATA8" },
+	{ 0x9a01, "LILDIDATA" },
+	{ 0x9a18, "LILDXDATA1" },
+	{ 0x9a1a, "LILDXDATA8" },
+	{ 0x9a21, "LILDXDATA" },
+	{ 0x9a4d, "LILDPDATA1" },
+	{ 0x9a4f, "LILDPDATA8" },
+	{ 0x9a56, "LILDPDATA" },
+	{ 0x9a6d, "LSTIDATA" },
+	{ 0x9a79, "LSTXDATA" },
+	{ 0x9a85, "LSTPDATA" },
+	{ 0x9a91, "LSTKIDATA" },
+	{ 0x9aaa, "LSTKXDATA" },
+	{ 0x9adb, "LSTKPDATA" },
+	{ 0x9af4, "LSTKPTR" },
+	{ 0x9b0e, "LSTKOPTR" },
+	{ 0x9b32, "BCAST_L" },
+	{ 0x9b3b, "OFFX256" },
+	{ 0x9b4c, "OFFXADD" },
+	{ 0x9b58, "OFFXADD1" },
+	{ 0x9b61, "PLDIDATA" },
+	{ 0x9b6a, "PLDIIDATA" },
+	{ 0x9b7a, "PILDIDATA" },
+	{ 0x9b8a, "PSTIDATA" },
+	{ 0x9b93, "PLDXDATA" },
+	{ 0x9b9c, "PLDIXDATA" },
+	{ 0x9bb3, "PILDXDATA" },
+	{ 0x9bca, "PSTXDATA" },
+	{ 0x9bd3, "PLDPDATA" },
+	{ 0x9bdc, "PLDIPDATA" },
+	{ 0x9bec, "PILDPDATA" },
+	{ 0x9bfc, "PSTPDATA" },
+	{ 0x9c05, "PLDCODE" },
+	{ 0x9c11, "PLDPTR" },
+	{ 0x9c31, "PLDIPTR" },
+	{ 0x9c53, "PILDPTR" },
+	{ 0x9c75, "PSTPTR" },
+	{ 0x9cc4, "PSTPTRR" },
+	{ 0x9cf4, "PLDOPTR" },
+	{ 0x9d24, "PLDIOPTR" },
+	{ 0x9d56, "PILDOPTR" },
+	{ 0x9d88, "PSTOPTR" },
+	{ 0x9de1, "CCASE" },
+	{ 0x9e07, "ICASE" },
+	{ 0x9e34, "LCASE" },
+	{ 0x9e6e, "ICALL" },
+	{ 0x9e72, "ICALL2" },
+	{ 0x9e74, "MEMSET" },
+	{ 0x9ea0, "LROL" },
+	{ 0x9eb4, "LROR" },
+	{ 0x9ec8, "SLDIV" },
+	{ 0x9f47, "SPI_ENCRYPT_ON3" },
+	{ 0x9f5c, "_lshift9" },
+	{ 0x9fdc, "SPI_ENCRYPT_CLOSE" },
+	{ -1, "unknown" }
 };
 
 axc51core_disassembler::axc51core_disassembler() : mcs51_disassembler(axc51core_names)
@@ -814,6 +960,7 @@ offs_t axc51core_disassembler::disassemble_extended_a5(std::ostream& stream, uns
 	return (PC - pc) | flags | SUPPORTED;
 }
 
+
 offs_t axc51core_disassembler::disassemble_op(std::ostream& stream, unsigned PC, offs_t pc, const data_buffer& opcodes, const data_buffer& params, uint8_t op)
 {
 	uint32_t flags = 0;
@@ -831,3 +978,62 @@ offs_t axc51core_disassembler::disassemble_op(std::ostream& stream, unsigned PC,
 }
 
 
+ax208_disassembler::ax208_disassembler() : axc51core_disassembler(axc51core_names)
+{
+}
+
+void ax208_disassembler::disassemble_op_ljmp(std::ostream& stream, unsigned &PC, const data_buffer& params)
+{
+	uint16_t addr = (params.r8(PC++) << 8) & 0xff00;
+	addr |= params.r8(PC++);
+	if ((addr >= 0x8000) && (addr < 0xa000))
+	{
+		int i = 0;
+		int lookaddr = -1;
+		const char* lookname;
+		do
+		{
+			lookaddr = bios_call_names[i].addr;
+			lookname = bios_call_names[i].name;
+
+			if (lookaddr == addr)
+				break;
+
+			i++;
+		} while (lookaddr != -1);
+
+		util::stream_format(stream, "ljmp  $%04X (%s)", addr, lookname);
+	}
+	else
+	{
+		util::stream_format(stream, "ljmp  $%04X", addr);
+	}
+}
+
+void ax208_disassembler::disassemble_op_lcall(std::ostream& stream, unsigned &PC, const data_buffer& params)
+{
+	uint16_t addr = (params.r8(PC++)<<8) & 0xff00;
+	addr|= params.r8(PC++);
+	if ((addr >= 0x8000) && (addr < 0xa000))
+	{
+		int i = 0;
+		int lookaddr = -1;
+		const char* lookname;
+		do
+		{
+			lookaddr = bios_call_names[i].addr;
+			lookname = bios_call_names[i].name;
+
+			if (lookaddr == addr)
+				break;
+
+			i++;
+		} while (lookaddr != -1);
+
+		util::stream_format(stream, "lcall $%04X (%s)", addr, lookname);
+	}
+	else
+	{
+		util::stream_format(stream, "lcall $%04X", addr);
+	}
+}

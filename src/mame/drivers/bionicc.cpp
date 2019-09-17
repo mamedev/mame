@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Stroffolino, Paul Leaman
+// copyright-holders:Phil Stroffolino, Paul Leaman, Dirk Best
 // thanks-to: Steven Frew (the author of Slutte)
-/******************************************************************************************
+/***************************************************************************
 
     Bionic Commando
 
+    © 1987 Capcom
 
-    PCB is a 3 board stack:
+    Hardware:
+
         Main CPU board: 86612-A-2
     Graphics ROM board: 86612-B-2
      Program ROM board: 86612-C-2
@@ -18,6 +20,8 @@
            OSC: 24.000 MHz (on the 86612-B-2 PCB)
         Custom: CAPCOM DL-010D-103 (on the 86612-B-2 PCB)
 
+    Video timings:
+
     Horizontal scan rate: 15.606kHz
     Vertical scan rate: 60.024Hz
 
@@ -26,7 +30,7 @@
     htotal:             64.076us, 386 pixels
     hsync:               5.312us,  32 pixels
     back porch + sync:  15.106us,  91 pixels
-    active video:       42.662us, 257 pixels (it looks like the first pixel is repeated)
+    active video:       42.662us, 257 pixels (first pixel is repeated?)
     front porch:         6.308us,  38 pixels
 
     vtotal:             16.660ms, 260 lines
@@ -40,48 +44,461 @@
     Timings verified at SYNC pin and BLUE pin (jamma edge),
     using an Agilent DSO9404A scope and two N2873A 500MHz probes
 
-    Note: Protection MCU is labelled "TS" without a number and without a coloured
-          stripe. Maybe its code is not region dependant.
-    Note: Euro rom labels (IE: "TSE") had a blue stripe, while those labeled
-          as USA (TSU) had an red stripe on the sticker.  The intermixing
-          of TSE and TSU roms in the parent set is correct and verified.
-    Note: Euro set simply states the game cannot be operated in Japan....
-    Note: These issues have been verified on a real PCB and are not emulation bugs:
-          - misplaced sprites ( see beginning of level 1 or 2 for example )
-          - sprite / sprite priority ( see level 2 the reflectors )
-          - sprite / background priority ( see level 1: birds walk through
-            branches of different trees )
-          - see the beginning of level 3: background screwed
-          - gray tiles around the title in Top Secret
+    BTANB [MT00209] (verified on real PCB):
+    - misplaced sprites (see beginning of level 1 or 2 for example)
+    - sprite / sprite priority (see level 2 the reflectors)
+    - sprite / background priority (see level 1: birds walk through
+      branches of different trees)
+    - see the beginning of level 3: background screwed
+    - gray tiles around the title in Top Secret
 
-    Note: The MCU rom contains the string
-          "<for dealer-location test & USA show. 87/03/10 >"
-          which indicates it could be from an earlier version, especially with it
-          coming from a 'Top Secret' bootleg with identical program but unprotected
-          MCU, however f1dream has a similar string, and is verified as being from
-          a production board.
+    Notes:
+    - Protection MCU is labelled "TS" without a number and without a coloured.
+      Maybe its code is not region dependant.
+    - The MCU rom contains the string
+      "<for dealer-location test & USA show. 87/03/10 >"
+      which indicates it could be from an earlier version, especially with it
+      coming from a 'Top Secret' bootleg with identical program but unprotected
+      MCU, however f1dream has a similar string, and is verified as being from
+      a production board.
+    - Euro rom labels (IE: "TSE") had a blue stripe, while those labeled
+      as USA (TSU) had an red stripe on the sticker. The intermixing
+      of TSE and TSU roms in the parent set is correct and verified.
+    - Euro set simply states the game cannot be operated in Japan.
+    - IRQ 4 is control related. On each interrupt, it reads 0xFE4000
+      (coin/start), shift the bits around and move the resulting byte into a
+      dword RAM location. The dword RAM location is rotated by 8 bits each time
+      this happens. This is probably done to be pedantic about coin insertions
+      (might be protection related).
 
-    ToDo:
-    - Proper IRQ2 (should be LVBL) and IRQ4 (V256) hookup
+    TODO:
+    - Firing IRQ4 at line 16 causes the game to often miss coin inserts. Set
+      to 128 currently to compensate.
+    - The game doesn't set the coin lockout in service mode, so the coin inputs
+      can't be tested there if you uncomment and enable it.
 
-    About IRQ:
-        IRQ4 seems to be control related.
-        On each interrupt, it reads 0xFE4000 (coin/start), shift the bits around
-        and move the resulting byte into a dword RAM location. The dword RAM location
-        is rotated by 8 bits each time this happens.
-        This is probably done to be pedantic about coin insertions (might be protection
-        related).
-
-******************************************************************************************/
+***************************************************************************/
 
 #include "emu.h"
-#include "includes/bionicc.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
+#include "cpu/z80/z80.h"
+#include "machine/timer.h"
+#include "video/bufsprite.h"
+#include "video/tigeroad_spr.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class bionicc_state : public driver_device
+{
+public:
+	bionicc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_spritegen(*this, "spritegen"),
+		m_spriteram(*this, "spriteram") ,
+		m_txvideoram(*this, "txvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_mcu_p3(0xff)
+	{ }
+
+	void bionicc(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<i8751_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<tigeroad_spr_device> m_spritegen;
+	required_device<buffered_spriteram16_device> m_spriteram;
+
+	required_shared_ptr<uint16_t> m_txvideoram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_bgvideoram;
+
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void mcu_io(address_map &map);
+
+	void output_w(u8 data);
+
+	// video
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+
+	DECLARE_WRITE16_MEMBER(bgvideoram_w);
+	DECLARE_WRITE16_MEMBER(fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(txvideoram_w);
+	DECLARE_WRITE16_MEMBER(scroll_w);
+
+	tilemap_t   *m_tx_tilemap;
+	tilemap_t   *m_bg_tilemap;
+	tilemap_t   *m_fg_tilemap;
+	uint16_t    m_scroll[4];
+
+	// audio
+	void audiocpu_nmi_w(u8 data);
+
+	// protection mcu
+	u8 m_audiocpu_to_mcu; // ls374 at 4a
+	u8 m_mcu_to_audiocpu; // ls374 at 5a
+	u8 m_mcu_p1;
+	u8 m_mcu_p3;
+
+	void dmaon_w(u16 data);
+	u8 mcu_dma_r(offs_t offset);
+	void mcu_dma_w(offs_t offset, u8 data);
+	void mcu_p3_w(u8 data);
+};
+
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
+
+void bionicc_state::main_map(address_map &map)
+{
+	map.global_mask(0xfffff);
+	map(0x00000, 0x3ffff).rom();
+	map(0xe0000, 0xe07ff).ram(); /* RAM? */
+	map(0xe0800, 0xe0cff).ram().share("spriteram");
+	map(0xe0d00, 0xe3fff).ram();              /* RAM? */
+	map(0xe4000, 0xe4000).mirror(0x3ffc).w(FUNC(bionicc_state::output_w));
+	map(0xe4000, 0xe4001).mirror(0x3ffc).portr("INPUTS");
+	map(0xe4002, 0xe4002).mirror(0x3ffc).w(FUNC(bionicc_state::audiocpu_nmi_w));
+	map(0xe4002, 0xe4003).mirror(0x3ffc).portr("DSW");
+	map(0xe8010, 0xe8017).w(FUNC(bionicc_state::scroll_w));
+	map(0xe8018, 0xe8019).nopw(); // vblank irq ack?
+	map(0xe801a, 0xe801b).w(FUNC(bionicc_state::dmaon_w));
+	map(0xec000, 0xecfff).mirror(0x3000).ram().w(FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
+	map(0xf0000, 0xf3fff).ram().w(FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
+	map(0xf4000, 0xf7fff).ram().w(FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
+	map(0xf8000, 0xf87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfc000, 0xfffff).ram(); // WRAM
+}
+
+void bionicc_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xa000, 0xa000).lrw8("mcu", [this]() { return m_mcu_to_audiocpu; }, [this](u8 data) { m_audiocpu_to_mcu = data; });
+	map(0xc000, 0xc7ff).ram();
+}
+
+void bionicc_state::mcu_io(address_map &map)
+{
+	map.global_mask(0x7ff);
+	map(0x000, 0x7ff).rw(FUNC(bionicc_state::mcu_dma_r), FUNC(bionicc_state::mcu_dma_w));
+}
+
+
+//**************************************************************************
+//  INPUT PORT DEFINITIONS
+//**************************************************************************
+
+static INPUT_PORTS_START( bionicc )
+	PORT_START("INPUTS")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_COCKTAIL
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_COCKTAIL
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_COCKTAIL PORT_8WAY
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_COCKTAIL PORT_8WAY
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_COCKTAIL PORT_8WAY
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_COCKTAIL PORT_8WAY
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON2)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_COIN1)
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SWB:1,2,3")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SWB:4,5,6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
+	PORT_SERVICE_DIPLOC(  0x0040, IP_ACTIVE_LOW, "SWB:7" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWA:1,2")
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0200, "4" )
+	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPSETTING(      0x0000, "7" )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SWA:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Upright ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SWA:4,5")   /* table at 0x00483a */
+	PORT_DIPSETTING(      0x1800, "20k 40k 100k 60k+" )
+	PORT_DIPSETTING(      0x1000, "30k 50k 120k 70k+" )
+	PORT_DIPSETTING(      0x0800, "20k 60k")
+	PORT_DIPSETTING(      0x0000, "30k 70k" )
+	PORT_DIPNAME( 0x6000, 0x4000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SWA:6,7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Freeze" )                PORT_DIPLOCATION("SWA:8")     /* Listed as "Unused" */
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+//**************************************************************************
+//  PALETTE
+//**************************************************************************
+
+rgb_t bionicc_state::RRRRGGGGBBBBIIII(uint32_t raw)
+{
+	uint8_t bright = (raw & 0x0f);
+
+	uint8_t r = ((raw >> 12) & 0x0f) * 0x11;
+	uint8_t g = ((raw >>  8) & 0x0f) * 0x11;
+	uint8_t b = ((raw >>  4) & 0x0f) * 0x11;
+
+	if ((bright & 0x08) == 0)
+	{
+		r = r * (0x07 + bright) / 0x0e;
+		g = g * (0x07 + bright) / 0x0e;
+		b = b * (0x07 + bright) / 0x0e;
+	}
+
+	return rgb_t(r, g, b);
+}
+
+
+//**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
+
+/*
+
+    This board handles tile/tile and tile/sprite priority with a PROM. Its
+    working is complicated and hardcoded in the driver.
+
+    The PROM is a 256x4 chip, with address inputs wired as follows:
+
+    A0 bg opaque
+    A1 \
+    A2 |  fg pen
+    A3 |
+    A4 /
+    A5 fg has priority over sprites (bit 5 of tile attribute)
+    A6 fg has not priority over bg (bits 6 & 7 of tile attribute both set)
+    A7 sprite opaque
+
+    The output selects the active layer, it can be:
+    0  bg
+    1  fg
+    2  sprite
+
+*/
+
+WRITE16_MEMBER(bionicc_state::bgvideoram_w)
+{
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+WRITE16_MEMBER(bionicc_state::fgvideoram_w)
+{
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+WRITE16_MEMBER(bionicc_state::txvideoram_w)
+{
+	COMBINE_DATA(&m_txvideoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+WRITE16_MEMBER(bionicc_state::scroll_w)
+{
+	data = COMBINE_DATA(&m_scroll[offset]);
+
+	switch (offset)
+	{
+		case 0:
+			m_fg_tilemap->set_scrollx(0, data);
+			break;
+		case 1:
+			m_fg_tilemap->set_scrolly(0, data);
+			break;
+		case 2:
+			m_bg_tilemap->set_scrollx(0, data);
+			break;
+		case 3:
+			m_bg_tilemap->set_scrolly(0, data);
+			break;
+	}
+}
+
+u32 bionicc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);   /* nothing in FRONT */
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), false);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
+
+	// text layer last
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+void bionicc_state::video_start()
+{
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+
+	m_tx_tilemap->set_transparent_pen(3);
+	m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */
+	m_fg_tilemap->set_transmask(1, 0xffc1, 0x803e); /* split type 1 has pens 1-5 opaque in front half */
+	m_bg_tilemap->set_transparent_pen(15);
+}
+
+
+//**************************************************************************
+//  DRAWGFX LAYOUTS
+//**************************************************************************
+
+static const gfx_layout vramlayout=
+{
+	8,8,    /* 8*8 characters */
+	RGN_FRAC(1,1),   /* 1024 character */
+	2,      /* 2 bitplanes */
+	{ 4,0 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
+	128   /* every character takes 128 consecutive bytes */
+};
+
+static const gfx_layout scroll2layout=
+{
+	8,8,    /* 8*8 tiles */
+	RGN_FRAC(1,2),   /* 2048 tiles */
+	4,      /* 4 bits per pixel */
+	{ RGN_FRAC(1,2)+4,RGN_FRAC(1,2),4,0 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
+	128   /* every tile takes 128 consecutive bytes */
+};
+
+static const gfx_layout scroll1layout=
+{
+	16,16,  /* 16*16 tiles */
+	RGN_FRAC(1,2),   /* 2048 tiles */
+	4,      /* 4 bits per pixel */
+	{ RGN_FRAC(1,2)+4,RGN_FRAC(1,2),4,0 },
+	{ STEP4(0,1), STEP4(4*2,1), STEP4(4*2*2*16,1), STEP4(4*2*2*16+4*2,1) },
+	{ STEP16(0,4*2*2) },
+	512   /* each tile takes 512 consecutive bytes */
+};
+
+static GFXDECODE_START( gfx_bionicc )
+	GFXDECODE_ENTRY( "gfx1", 0, vramlayout,    768, 64 )    /* colors 768-1023 */
+	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout,   0,  8 )    /* colors   0- 127 */
+	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout, 256,  4 )    /* colors 256- 319 */
+GFXDECODE_END
+
+TILE_GET_INFO_MEMBER(bionicc_state::get_tx_tile_info)
+{
+	// 76------  tile code high bits
+	// --543210  color
+
+	int attr = m_txvideoram[tile_index + 0x400];
+	int code = m_txvideoram[tile_index] & 0xff;
+
+	SET_TILE_INFO_MEMBER(0, ((attr & 0xc0) << 2) | code, attr & 0x3f, 0);
+}
+
+TILE_GET_INFO_MEMBER(bionicc_state::get_fg_tile_info)
+{
+	// 7-------  tile flip x
+	// -6------  tile flip y
+	// --5-----  layer
+	// ---43---  color
+	// -----210  tile code high bits
+
+	int attr = m_fgvideoram[2 * tile_index + 1];
+	int code = m_fgvideoram[2 * tile_index] & 0xff;
+	int flag = 0;
+
+	if ((attr & 0xc0) == 0xc0)
+	{
+		// drawn to the background if both flip bits are set
+		tileinfo.category = 1;
+		tileinfo.group = 0;
+	}
+	else
+	{
+		tileinfo.category = 0;
+		tileinfo.group = (attr & 0x20) >> 5;
+		flag = TILE_FLIPXY((attr & 0xc0) >> 6);
+	}
+
+	SET_TILE_INFO_MEMBER(2, ((attr & 0x07) << 8) | code, (attr & 0x18) >> 3, flag);
+}
+
+TILE_GET_INFO_MEMBER(bionicc_state::get_bg_tile_info)
+{
+	// 7-------  tile flip x
+	// -6------  tile flip y
+	// --543---  color
+	// -----210  tile code high bits
+
+	int attr = m_bgvideoram[2 * tile_index + 1];
+	int code = m_bgvideoram[2 * tile_index] & 0xff;
+	int flag = TILE_FLIPXY((attr & 0xc0) >> 6);
+
+	SET_TILE_INFO_MEMBER(1, ((attr & 0x07) << 8) | code, (attr & 0x38) >> 3, flag);
+}
 
 
 //**************************************************************************
@@ -151,197 +568,43 @@ void bionicc_state::dmaon_w(u16 data)
 
 void bionicc_state::audiocpu_nmi_w(u8 data)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-/********************************************************************
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
 
-  Interrupt
+void bionicc_state::output_w(u8 data)
+{
+	// 7-------  coin counter 1
+	// -6------  coin counter 2
+	// --5-----  coin lockout 1
+	// ---4----  coin lockout 2
+	// ----321-  unused
+	// -------0  flip screen
 
-  The game runs on 2 interrupts.
+	flip_screen_set(BIT(data, 0));
 
-  IRQ 2 drives the game
-  IRQ 4 processes the input ports
-
-********************************************************************/
+	// commented out, else you can't test the coin inputs in service mode
+//  machine().bookkeeping().coin_lockout_w(1, BIT(~data, 4));
+//  machine().bookkeeping().coin_lockout_w(0, BIT(~data, 5));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::scanline)
 {
-	int scanline = param;
-
-	if(scanline == 240) // vblank-out irq
+	// vblank-out irq - drives the game (V256)
+	if (param == 256)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 128) // vblank-in irq (can't happen when the CPU is suspended)
+	// vblank-in irq - processes inputs (!LVBL)
+	// should be 16? but then often loses coin inserts
+	if (param == 128)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
-
-/*************************************
- *
- *  Address maps
- *
- *************************************/
-
-void bionicc_state::main_map(address_map &map)
-{
-	map.global_mask(0xfffff);
-	map(0x00000, 0x3ffff).rom();
-	map(0xe0000, 0xe07ff).ram(); /* RAM? */
-	map(0xe0800, 0xe0cff).ram().share("spriteram");
-	map(0xe0d00, 0xe3fff).ram();              /* RAM? */
-	map(0xe4000, 0xe4001).mirror(0x3ffc).portr("INPUTS");
-	map(0xe4000, 0xe4001).mirror(0x3ffc).w(FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
-	map(0xe4002, 0xe4003).mirror(0x3ffc).portr("DSW").w(FUNC(bionicc_state::audiocpu_nmi_w));
-	map(0xe8010, 0xe8017).w(FUNC(bionicc_state::scroll_w));
-	map(0xe8018, 0xe8019).nopw(); // vblank irq ack?
-	map(0xe801a, 0xe801b).w(FUNC(bionicc_state::dmaon_w));
-	map(0xec000, 0xecfff).mirror(0x3000).ram().w(FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
-	map(0xf0000, 0xf3fff).ram().w(FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
-	map(0xf4000, 0xf7fff).ram().w(FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
-	map(0xf8000, 0xf87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xfc000, 0xfffff).ram(); // WRAM
-}
-
-void bionicc_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xa000, 0xa000).lrw8("mcu", [this]() { return m_mcu_to_audiocpu; }, [this](u8 data) { m_audiocpu_to_mcu = data; });
-	map(0xc000, 0xc7ff).ram();
-}
-
-void bionicc_state::mcu_io(address_map &map)
-{
-	map.global_mask(0x7ff);
-	map(0x000, 0x7ff).rw(FUNC(bionicc_state::mcu_dma_r), FUNC(bionicc_state::mcu_dma_w));
-}
-
-
-/*************************************
- *
- *  Input ports
- *
- *************************************/
-
-static INPUT_PORTS_START( bionicc )
-	PORT_START("INPUTS")
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_COCKTAIL
-	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_COCKTAIL
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_COCKTAIL PORT_8WAY
-	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_COCKTAIL PORT_8WAY
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_COCKTAIL PORT_8WAY
-	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_COCKTAIL PORT_8WAY
-	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON2)
-	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON1)
-	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
-	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY
-	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_START2)
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_COIN1)
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SWB:1,2,3")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SWB:4,5,6")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
-	PORT_SERVICE_DIPLOC(  0x0040, IP_ACTIVE_LOW, "SWB:7" )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SWB:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWA:1,2")
-	PORT_DIPSETTING(      0x0300, "3" )
-	PORT_DIPSETTING(      0x0200, "4" )
-	PORT_DIPSETTING(      0x0100, "5" )
-	PORT_DIPSETTING(      0x0000, "7" )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SWA:3")
-	PORT_DIPSETTING(      0x0400, DEF_STR( Upright ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SWA:4,5")   /* table at 0x00483a */
-	PORT_DIPSETTING(      0x1800, "20k 40k 100k 60k+" )
-	PORT_DIPSETTING(      0x1000, "30k 50k 120k 70k+" )
-	PORT_DIPSETTING(      0x0800, "20k 60k")
-	PORT_DIPSETTING(      0x0000, "30k 70k" )
-	PORT_DIPNAME( 0x6000, 0x4000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SWA:6,7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x6000, DEF_STR( Medium ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Freeze" )                PORT_DIPLOCATION("SWA:8")     /* Listed as "Unused" */
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
-/*************************************
- *
- *  Graphics definitions
- *
- *************************************/
-
-static const gfx_layout vramlayout=
-{
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),   /* 1024 character */
-	2,      /* 2 bitplanes */
-	{ 4,0 },
-	{ STEP4(0,1), STEP4(4*2,1) },
-	{ STEP8(0,4*2*2) },
-	128   /* every character takes 128 consecutive bytes */
-};
-
-static const gfx_layout scroll2layout=
-{
-	8,8,    /* 8*8 tiles */
-	RGN_FRAC(1,2),   /* 2048 tiles */
-	4,      /* 4 bits per pixel */
-	{ RGN_FRAC(1,2)+4,RGN_FRAC(1,2),4,0 },
-	{ STEP4(0,1), STEP4(4*2,1) },
-	{ STEP8(0,4*2*2) },
-	128   /* every tile takes 128 consecutive bytes */
-};
-
-static const gfx_layout scroll1layout=
-{
-	16,16,  /* 16*16 tiles */
-	RGN_FRAC(1,2),   /* 2048 tiles */
-	4,      /* 4 bits per pixel */
-	{ RGN_FRAC(1,2)+4,RGN_FRAC(1,2),4,0 },
-	{ STEP4(0,1), STEP4(4*2,1), STEP4(4*2*2*16,1), STEP4(4*2*2*16+4*2,1) },
-	{ STEP16(0,4*2*2) },
-	512   /* each tile takes 512 consecutive bytes */
-};
-
-static GFXDECODE_START( gfx_bionicc )
-	GFXDECODE_ENTRY( "gfx1", 0, vramlayout,    768, 64 )    /* colors 768-1023 */
-	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout,   0,  4 )    /* colors   0-  63 */
-	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout, 256,  4 )    /* colors 256- 319 */
-GFXDECODE_END
-
-
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
 
 void bionicc_state::machine_start()
 {
@@ -360,25 +623,31 @@ void bionicc_state::machine_reset()
 	m_scroll[3] = 0;
 }
 
+
+//**************************************************************************
+//  MACHINE DEFINITIONS
+//**************************************************************************
+
 void bionicc_state::bionicc(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 24_MHz_XTAL / 2); /* 12 MHz - verified in schematics */
+	// Main CPU 68000CP10 @ 12 MHz
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bionicc_state::main_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(bionicc_state::scanline), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4));   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
-	audiocpu.set_addrmap(AS_PROGRAM, &bionicc_state::sound_map);
+	// Audio CPU Z80 @ 3.579545 MHz (EXO3 C,B=GND, A=5V ==> Divisor 2^2)
+	Z80(config, m_audiocpu, 14.318181_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bionicc_state::sound_map);
 
-	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
+	// Protection MCU Intel C8751H-88 @ 6 MHz
 	I8751(config, m_mcu, 24_MHz_XTAL / 4);
 	m_mcu->set_addrmap(AS_IO, &bionicc_state::mcu_io);
 	m_mcu->port_in_cb<1>().set([this](){ return m_audiocpu_to_mcu; });
 	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
 	m_mcu->port_out_cb<3>().set(FUNC(bionicc_state::mcu_p3_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	/* FIXME: should be 257 visible horizontal pixels, first visible pixel should be repeated, back porch/front porch should be separated */
 	screen.set_raw(24_MHz_XTAL / 4, 386, 0, 256, 260, 16, 240);
@@ -402,12 +671,9 @@ void bionicc_state::bionicc(machine_config &config)
 }
 
 
-
-/*************************************
- *
- *  ROM definition(s)
- *
- *************************************/
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
 ROM_START( bionicc ) /* "Not for use in Japan" */
 	ROM_REGION( 0x40000, "maincpu", 0 )      /* 68000 code */
@@ -714,12 +980,11 @@ ROM_START( bioniccbl2 ) // only the 4 maincpu ROMs differ, they came from an ori
 ROM_END
 
 
-/*************************************
- *
- *  Game driver(s)
- *
- *************************************/
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
 
+//    YEAR  NAME        PARENT   MACHINE  INPUT    CLASS          INIT        ROT   COMPANY    FULLNAME                             FLAGS
 GAME( 1987, bionicc,    0,       bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (Euro)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bionicc1,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bionicc2,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 2)",        MACHINE_SUPPORTS_SAVE )

@@ -454,7 +454,7 @@ void gime_device::reset_timer(void)
 	/* value is from 0-4095 */
 	m_timer_value = ((m_gime_registers[0x04] & 0x0F) * 0x100) | m_gime_registers[0x05];
 
-	/* depending on the GIME type, cannonicalize the value */
+	/* depending on the GIME type, canonicalize the value */
 	if (m_timer_value > 0)
 	{
 		if (GIME_TYPE_1987)

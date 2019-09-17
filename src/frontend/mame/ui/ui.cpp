@@ -274,6 +274,26 @@ void mame_ui_manager::set_handler(ui_callback_type callback_type, const std::fun
 
 
 //-------------------------------------------------
+//  output_joined_collection
+//-------------------------------------------------
+
+template<typename TColl, typename TEmitMemberFunc, typename TEmitDelimFunc>
+static void output_joined_collection(const TColl &collection, TEmitMemberFunc emit_member, TEmitDelimFunc emit_delim)
+{
+	bool is_first = true;
+
+	for (const auto &member : collection)
+	{
+		if (is_first)
+			is_first = false;
+		else
+			emit_delim();
+		emit_member(member);
+	}
+}
+
+
+//-------------------------------------------------
 //  display_startup_screens - display the
 //  various startup screens
 //-------------------------------------------------
@@ -283,15 +303,15 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	const int maxstate = 3;
 	int str = machine().options().seconds_to_run();
 	bool show_gameinfo = !machine().options().skip_gameinfo();
-	bool show_warnings = true, show_mandatory_fileman = !machine().options().skip_mandatory_fileman();
-	bool video_none = strcmp(downcast<osd_options &>(machine().options()).video(), "none") == 0;
+	bool show_warnings = true, show_mandatory_fileman = true;
+	bool video_none = strcmp(downcast<osd_options &>(machine().options()).video(), OSDOPTVAL_NONE) == 0;
 
 	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
 	// or if we are debugging, or if there's no mame window to send inputs to
 	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 || video_none)
 		show_gameinfo = show_warnings = show_mandatory_fileman = false;
 
-#if defined(EMSCRIPTEN)
+#if defined(__EMSCRIPTEN__)
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
 	show_gameinfo = show_warnings = false;
 #endif
@@ -326,12 +346,17 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			break;
 
 		case 2:
-			if (show_mandatory_fileman)
-				messagebox_text = machine_info().mandatory_images();
-			if (!messagebox_text.empty())
+			std::vector<std::reference_wrapper<const std::string>> mandatory_images = mame_machine_manager::instance()->missing_mandatory_images();
+			if (!mandatory_images.empty() && show_mandatory_fileman)
 			{
-				std::string warning = std::string(_("This driver requires images to be loaded in the following device(s): ")) + messagebox_text;
-				ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.c_str());
+				std::ostringstream warning;
+				warning << _("This driver requires images to be loaded in the following device(s): ");
+
+				output_joined_collection(mandatory_images,
+					[&warning](const std::reference_wrapper<const std::string> &img)    { warning << "\"" << img.get() << "\""; },
+					[&warning]()                                                        { warning << ","; });
+
+				ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.str().c_str());
 			}
 			break;
 		}
@@ -892,15 +917,8 @@ void mame_ui_manager::decrease_frameskip()
 
 bool mame_ui_manager::can_paste()
 {
-	// retrieve the clipboard text
-	char *text = osd_get_clipboard_text();
-
-	// free the string if allocated
-	if (text != nullptr)
-		free(text);
-
-	// did we have text?
-	return text != nullptr;
+	// check to see if the clipboard is not empty
+	return !osd_get_clipboard_text().empty();
 }
 
 

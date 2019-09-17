@@ -15,6 +15,9 @@ This is a cost-reduced design from CC10, no special I/O chips.
 Backgammon Challenger (BKC) is the same PCB, with the speaker connection going
 to the display panel instead.
 
+CC7 (BCC) was also bootlegged around 1981 by Splice Industria Brasileira,
+as "Byte XD-300". Mostek MK3880N-4 @ 4MHz, ROM contents is same as BCC REVB.
+
 RE information from netlist by Berger (a BCC model)
 
 Memory map:

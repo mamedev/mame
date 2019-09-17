@@ -9,8 +9,6 @@ Released in 1994 in Russian Federation by ЭНЕРГОПРИБОР (Energopribor
 It's running the Mirage chess engine by Vladimir Rybinkin, originally made for MS-DOS.
 
 TODO:
-- where is lcd segments common active state? (see m_lcd_data), current implementation
-  is wrong, it will occasionally display wrong (inverted) digits
 - where does the interrupt come from?
 - Debut-M is an updated version? Or is it the same program as Debut with a redesigned case?
 
@@ -19,7 +17,7 @@ TODO:
 Hardware notes:
 - КР1810ВМ86 (i8086 clone), 16200K XTAL
 - КР1810ГФ84 (i8284 clock divider /3)
-- 2*КР537РУ10 (2KB*8 RAM), 2*8KB ROM
+- 2*КР537РУ10 (2KB*8 RAM), 2*КС573РФ4А or similar (8KB ROM)
 - lcd panel (4 7seg digits), 64 chessboard buttons, 16 leds
 
 A bit more detailed, list of other Soviet standard TTL chips used and their equivalents:
@@ -83,7 +81,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<i8086_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -97,12 +95,12 @@ private:
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
 	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_WRITE_LINE_MEMBER(lcd_update_w);
 
-	u8 m_select;
+	u8 m_latch[5];
 	u8 m_dac_data;
-	u8 m_lcd_data;
-	u8 m_digit_data[4];
+	u8 m_lcd_update;
 };
 
 void debut_state::machine_start()
@@ -111,16 +109,14 @@ void debut_state::machine_start()
 	m_out_digit.resolve();
 
 	// zerofill
-	m_select = 0;
+	memset(m_latch, 0, sizeof(m_latch));
 	m_dac_data = 0;
-	m_lcd_data = 0;
-	memset(m_digit_data, 0, sizeof(m_digit_data));
+	m_lcd_update = 0;
 
 	// register for savestates
-	save_item(NAME(m_select));
+	save_item(NAME(m_latch));
 	save_item(NAME(m_dac_data));
-	save_item(NAME(m_lcd_data));
-	save_item(NAME(m_digit_data));
+	save_item(NAME(m_lcd_update));
 }
 
 
@@ -137,7 +133,7 @@ INTERRUPT_GEN_MEMBER(debut_state::interrupt)
 READ8_MEMBER(debut_state::input_r)
 {
 	u8 data = 0;
-	u8 sel = m_select & 0xf;
+	u8 sel = m_latch[0] & 0xf;
 
 	// a1-a3,d0: multiplexed inputs
 	// read keypad
@@ -151,38 +147,40 @@ READ8_MEMBER(debut_state::input_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(debut_state::control_w)
+WRITE8_MEMBER(debut_state::latch_w)
 {
 	u8 mask = 1 << offset;
-	u8 prev = m_select;
+	u8 prev = m_latch[0];
 
 	// a1-a3,d0: 74259
-	m_select = (m_select & ~mask) | ((data & 1) ? mask : 0);
+	// a1-a3,d1-d4: lcd panel 7seg data
+	for (int i = 0; i < 5; i++)
+		m_latch[i] = (m_latch[i] & ~mask) | (BIT(data, i) ? mask : 0);
 
 	// 74259 q0-q3: input mux/led select
 	// 74259 q4,q5: led data
-	m_display->matrix(~m_select >> 4 & 3, 1 << (m_select & 0xf));
+	m_display->matrix(~m_latch[0] >> 4 & 3, 1 << (m_latch[0] & 0xf));
 
 	// 74259 q7: toggle speaker
-	if (~m_select & prev & 0x80)
+	if (~m_latch[0] & prev & 0x80)
 	{
 		m_dac_data ^= 1;
 		m_dac->write(m_dac_data);
 	}
+}
 
-	// a1-a3,d1-d4 go to lcd panel
-	// clock lcd digit segments
-	for (int i = 0; i < 4; i++)
+WRITE_LINE_MEMBER(debut_state::lcd_update_w)
+{
+	// 8086 S5 also goes to the lcd panel
+	if (!state && m_lcd_update)
 	{
-		if (BIT(~data, i + 1))
-			m_digit_data[i] = (m_digit_data[i] & ~mask) | (m_lcd_data << offset);
+		u8 xorval = (m_latch[4] & 1) ? 0xff : 0;
 
-		m_out_digit[i] = bitswap<8>(m_digit_data[i],0,7,4,3,2,1,6,5);
+		for (int i = 0; i < 4; i++)
+			m_out_digit[i] = bitswap<8>(m_latch[i+1] ^ xorval,0,7,4,3,2,1,6,5);
 	}
 
-	// where is lcd common state?
-	if (offset == 0)
-		m_lcd_data = BIT(~data, 4);
+	m_lcd_update = state;
 }
 
 
@@ -200,7 +198,7 @@ void debut_state::main_map(address_map &map)
 
 void debut_state::main_io(address_map &map)
 {
-	map(0x00, 0x0f).rw(FUNC(debut_state::input_r), FUNC(debut_state::control_w)).umask16(0x00ff);
+	map(0x00, 0x0f).rw(FUNC(debut_state::input_r), FUNC(debut_state::latch_w)).umask16(0x00ff);
 }
 
 
@@ -221,7 +219,7 @@ static INPUT_PORTS_START( debutm )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("ВВ (Enter Position)")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, debut_state, reset_button, nullptr) PORT_NAME("СБ (Reset)")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, debut_state, reset_button, 0) PORT_NAME("СБ (Reset)")
 INPUT_PORTS_END
 
 
@@ -237,6 +235,7 @@ void debut_state::debutm(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(debut_state::interrupt), attotime::from_hz(380));
 	m_maincpu->set_addrmap(AS_PROGRAM, &debut_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &debut_state::main_io);
+	m_maincpu->if_handler().set(FUNC(debut_state::lcd_update_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -274,4 +273,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT CMP MACHINE INPUT   CLASS        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1994, debutm, 0,      0, debutm, debutm, debut_state, empty_init, "Energopribor", "Debut-M", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1994, debutm, 0,      0, debutm, debutm, debut_state, empty_init, "Energopribor", "Debut-M", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

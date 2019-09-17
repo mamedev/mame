@@ -7,6 +7,7 @@
 
 #include "sound/samples.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class gotya_state : public driver_device
 {

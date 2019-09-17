@@ -14,6 +14,11 @@
 
 #include "emu.h"
 
+#ifdef __sun
+#define ASIO_DISABLE_DEV_POLL
+#define ASIO_HAS_EPOLL
+#endif
+
 #include <thread>
 #include <set>
 #include "asio.h"

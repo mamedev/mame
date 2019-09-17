@@ -6,7 +6,7 @@
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
+		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
 	</element>
 
 

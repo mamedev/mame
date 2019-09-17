@@ -31,8 +31,7 @@ L - list registers
 M - ?
 
 ToDo:
-- Cassette (coded but unable to test as the i8251 device needs work to support syndet)
-- Colour
+- Colour - created by PROM D9 (type K555PT4) - we need a proper dump of it.
 
 **********************************************************************************************/
 
@@ -45,6 +44,7 @@ ToDo:
 #include "video/i8275.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
+#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -83,13 +83,15 @@ private:
 	void unior_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	uint8_t m_4c;
 	uint8_t m_4e;
-	bool m_txe, m_txd;
+	bool m_txe, m_txd, m_rts, m_casspol;
+	u8 m_cass_data[4];
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -188,7 +190,7 @@ static INPUT_PORTS_START( unior )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(0xA4)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') // I then hangs
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) // Russian A
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
@@ -308,19 +310,46 @@ void unior_state::unior_palette(palette_device &palette) const
     i8255
 
 *************************************************/
+TIMER_DEVICE_CALLBACK_MEMBER( unior_state::kansas_r )
+{
+	if (m_rts)
+	{
+		m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
+		m_casspol = 1;
+		return;
+	}
+
+	m_cass_data[1]++;
+	m_cass_data[2]++;
+
+	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		if (m_cass_data[1] > 13)
+			m_casspol ^= 1;
+		m_cass_data[1] = 0;
+		m_cass_data[2] = 0;
+		m_uart->write_rxd(m_casspol);
+	}
+	if ((m_cass_data[2] & 7)==2)
+	{
+		m_cass_data[3]++;
+		m_uart->write_rxc(BIT(m_cass_data[3], 0));
+	}
+}
+
 WRITE_LINE_MEMBER(unior_state::ctc_z1_w)
 {
-	// write
-	if (m_txe)
-		m_cass->output(1);
-	else
-		m_cass->output((m_txd ^ state) ? 1 : 0);
-
+	// write - incoming 2400Hz
 	m_uart->write_txc(state);
+	if (!m_txe)
+	{
+		m_cass->output((m_txd ^ state) ? -1.0 : 1.0);
+	}
 
-	// read - untested
-	m_uart->write_rxd((m_cass->input() > 0.04) ? 1 : 0);
-	m_uart->write_rxc(state);
+	// read - incoming 3202Hz
 }
 
 
@@ -329,6 +358,7 @@ READ8_MEMBER( unior_state::ppi0_b_r )
 	return 0;
 }
 
+// Bit 4 - cassette relay?
 WRITE8_MEMBER( unior_state::ppi0_b_w )
 {
 }
@@ -401,6 +431,9 @@ void unior_state::machine_reset()
 {
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xF800);
 	m_uart->write_cts(0);
+	m_uart->write_dsr(0);
+	m_casspol = 0;
+	m_cass_data[0] = m_cass_data[1] = 0;
 }
 
 void unior_state::unior(machine_config &config)
@@ -426,17 +459,19 @@ void unior_state::unior(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(unior_state::kansas_r), attotime::from_hz(38400));
 
 	/* Devices */
 	I8251(config, m_uart, 20_MHz_XTAL / 9);
 	m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
 	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
+	m_uart->rts_handler().set([this] (bool state) { m_rts = state; });
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(20_MHz_XTAL / 12);
 	m_pit->set_clk<1>(20_MHz_XTAL / 9);
 	m_pit->out_handler<1>().set(FUNC(unior_state::ctc_z1_w));
-	m_pit->set_clk<2>(16_MHz_XTAL / 9 / 64); // unknown frequency
+	m_pit->set_clk<2>(20_MHz_XTAL / 9 / 64); // unknown frequency
 	m_pit->out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	i8255_device &ppi0(I8255(config, "ppi0"));
@@ -468,12 +503,12 @@ void unior_state::unior(machine_config &config)
 /* ROM definition */
 ROM_START( unior )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "unior.rom", 0xf800, 0x0800, CRC(23a347e8) SHA1(2ef3134e2f4a696c3b52a145fa5a2d4c3487194b))
+	ROM_LOAD( "unior.rom.d30", 0xf800, 0x0800, CRC(23a347e8) SHA1(2ef3134e2f4a696c3b52a145fa5a2d4c3487194b))
 
 	ROM_REGION( 0x0840, "chargen", ROMREGION_ERASEFF )
-	ROM_LOAD( "unior.fnt",   0x0000, 0x0800, CRC(4f654828) SHA1(8c0ac11ea9679a439587952e4908940b67c4105e))
+	ROM_LOAD( "unior.fnt.d5",   0x0000, 0x0800, CRC(4f654828) SHA1(8c0ac11ea9679a439587952e4908940b67c4105e))
 	// according to schematic this should be 256 bytes
-	ROM_LOAD( "palette.rom", 0x0800, 0x0040, CRC(b4574ceb) SHA1(f7a82c61ab137de8f6a99b0c5acf3ac79291f26a))
+	ROM_LOAD( "palette.rom.d9", 0x0800, 0x0040, BAD_DUMP CRC(b4574ceb) SHA1(f7a82c61ab137de8f6a99b0c5acf3ac79291f26a))
 
 	ROM_REGION( 0x0800, "vram", ROMREGION_ERASEFF )
 ROM_END
@@ -481,4 +516,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS */
-COMP( 19??, unior, radio86, 0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_NOT_WORKING )
+COMP( 19??, unior, 0,       0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_WRONG_COLORS )

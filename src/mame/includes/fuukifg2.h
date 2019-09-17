@@ -10,6 +10,7 @@
 #include "video/fuukifg.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class fuuki16_state : public driver_device
 {

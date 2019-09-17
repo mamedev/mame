@@ -12,7 +12,7 @@
 
 /**************************************************************************/
 
-CUSTOM_INPUT_MEMBER(homerun_state::sprite0_r)
+READ_LINE_MEMBER(homerun_state::sprite0_r)
 {
 	// sprite-0 vs background collision status, similar to NES
 	return (m_screen->vpos() > (m_spriteram[0] - 16 + 1)) ? 1 : 0;

@@ -161,9 +161,9 @@ public:
 	void init_gstream();
 	void init_x2222();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
+	DECLARE_READ_LINE_MEMBER(mirror_service_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
+	DECLARE_READ_LINE_MEMBER(x2222_toggle_r);
 
 private:
 	/* devices */
@@ -212,14 +212,14 @@ private:
 	void x2222_io(address_map &map);
 };
 
-CUSTOM_INPUT_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
+READ_LINE_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
 {
 	m_toggle ^= 0xffff;
 	return m_toggle;
 }
 
 
-CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
+READ_LINE_MEMBER(gstream_state::mirror_service_r)
 {
 	int result;
 
@@ -427,10 +427,10 @@ static INPUT_PORTS_START( gstream )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_service_r, nullptr)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gstream_state, mirror_service_r)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_r, nullptr)
+	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gstream_state, gstream_mirror_r)
 	PORT_BIT( 0xffb0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -522,7 +522,7 @@ static INPUT_PORTS_START( x2222 )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,x2222_toggle_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gstream_state, x2222_toggle_r)
 INPUT_PORTS_END
 
 

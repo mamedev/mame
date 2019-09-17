@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
+#include "tilemap.h"
 
 class stadhero_state : public driver_device
 {

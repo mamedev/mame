@@ -174,75 +174,6 @@ WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 *
 ********************************/
 
-WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
-{
-	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
-	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
-	int lcred1[2][4] = {{1, 2, 3, 1}, {1, 2, 3, 5}};   /* slot 1 : credits awarded */
-	int lneed2[2][4] = {{1, 1, 1, 2}, {1, 2, 3, 4}};   /* slot 2 : coins needed */
-	int lcred2[2][4] = {{1, 2, 3, 1}, {1, 1, 1, 1}};   /* slot 2 : credits awarded */
-
-	m_i8751_return = 0;
-
-	switch (offset)
-	{
-	case 0: /* High byte */
-		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); /* Signal main cpu */
-		break;
-	case 1: /* Low byte */
-		m_i8751_value = (m_i8751_value & 0xff00) | data;
-		break;
-	}
-
-	/* Coins are controlled by the i8751 */
-	if ((ioport("IN2")->read() & 3) == 3) m_latch = 1;
-	if ((ioport("IN2")->read() & 1) != 1 && m_latch)
-	{
-		m_coin1++;
-		m_latch = 0;
-		m_snd = 0x400;
-		m_i8751_return = 0x400;
-		if (m_coin1>=m_need1)
-		{
-			m_coin1-=m_need1;
-			m_credits+=m_cred1;
-		}
-	}
-	if ((ioport("IN2")->read() & 2) != 2 && m_latch)
-	{
-		m_coin2++;
-		m_latch = 0;
-		m_snd = 0x400;
-		m_i8751_return = 0x400;
-		if (m_coin2>=m_need2)
-		{
-			m_coin2-=m_need2;
-			m_credits+=m_cred2;
-		}
-	}
-	if (m_credits>99) m_credits=99; /* not handled by main CPU */
-
-	if (m_i8751_value == 0x0401) m_i8751_return = 0;    /* ??? */
-
-	if (m_i8751_value == 0x007a) { m_i8751_return = 0x85; m_coinage_id = 0; }  /* Japanese version ID */
-	if (m_i8751_value == 0x007b) { m_i8751_return = 0x84; m_coinage_id = 0; }  /* US version ID */
-
-	if (offset == 0)
-	{
-		if ((m_i8751_value >> 8) == 0x01) /* Coinage settings */
-		{
-			m_i8751_return = m_i8751_value;
-			m_need1 = lneed1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
-			m_need2 = lneed2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
-			m_cred1 = lcred1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
-			m_cred2 = lcred2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
-		}
-		if ((m_i8751_value >> 8) == 0x02) { m_i8751_return = m_snd | ((m_credits / 10) << 4) | (m_credits % 10); m_snd = 0; }   /* Credits request */
-		if ((m_i8751_value >> 8) == 0x03 && m_credits) { m_i8751_return = 0; m_credits--; } /* Credits clear */
-	}
-}
-
 WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 {
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
@@ -447,7 +378,7 @@ void dec8_state::lastmisn_map(address_map &map)
 	map(0x180b, 0x180b).w(FUNC(dec8_state::lastmisn_scrolly_w)); /* Scroll LSB */
 	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
 	map(0x180d, 0x180d).w(FUNC(dec8_state::lastmisn_control_w)); /* Bank switch + Scroll MSB */
-	map(0x180e, 0x180f).w(FUNC(dec8_state::lastmisn_i8751_w));
+	map(0x180e, 0x180f).w(FUNC(dec8_state::dec8_i8751_w));
 	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
@@ -467,8 +398,10 @@ void dec8_state::lastmisn_sub_map(address_map &map)
 	map(0x1803, 0x1803).portr("DSW0").w(FUNC(dec8_state::main_irq_on_w));
 	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x1807, 0x1807).w(FUNC(dec8_state::flip_screen_w));
+	map(0x1806, 0x1806).r(FUNC(dec8_state::i8751_h_r));
+	map(0x1807, 0x1807).rw(FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
 	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
+	map(0x180e, 0x180f).w(FUNC(dec8_state::dec8_i8751_w));
 	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w));
 	map(0x2800, 0x2fff).writeonly().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
@@ -834,7 +767,12 @@ WRITE8_MEMBER(dec8_state::shackled_mcu_to_main_w)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data&0x10)==0)
+	{
 		m_i8751_port0 = m_i8751_value>>8;
+
+		// mcu sets p0 to 0x00
+		m_mcu->set_port_forced_input(0, m_i8751_port0);
+	}
 	if ((data&0x20)==0)
 		m_i8751_port1 = m_i8751_value&0xff;
 	if ((data&0x40)==0)
@@ -898,7 +836,7 @@ WRITE8_MEMBER(dec8_state::srdarwin_mcu_to_main_w)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 
 
-/* verified from M6809 code - coinage needs further checking when the MCU is available */
+/* verified from M6809 code */
 static INPUT_PORTS_START( lastmisn )
 	PORT_START("IN0")
 	PLAYER1_JOYSTICK
@@ -915,26 +853,32 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // coins read through MCU
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) // coins read through MCU
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
+	PORT_START("I8751")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -969,7 +913,7 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-/* verified from M6809 code - coinage needs further checking when the MCU is available */
+/* verified from M6809 code */
 static INPUT_PORTS_START( lastmisnj )
 	PORT_INCLUDE(lastmisn)
 
@@ -1952,7 +1896,17 @@ void dec8_state::lastmisn(machine_config &config)
 	M6502(config, m_audiocpu, 1500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::ym3526_s_map); /* NMIs are caused by the main CPU */
 
+	I8751(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::shackled_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
+
 	config.m_minimum_quantum = attotime::from_hz(12000);
+
+	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::shackled_coin_irq));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2458,7 +2412,7 @@ ROM_START( lastmisn )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) BAD_DUMP ) /* not verified to be the same data as the "A" MCU dump */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2494,7 +2448,7 @@ ROM_START( lastmisnu6 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2530,7 +2484,7 @@ ROM_START( lastmisnu5 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2565,8 +2519,8 @@ ROM_START( lastmisnj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )    // created from dump of the US version
+	ROM_LOAD( "last_mission_japan.18a", 0x0000, 0x1000, BAD_DUMP CRC(0d58c3a1) SHA1(184e75324b7ab2de8e6441f0c954046db80b2640) ) /* correct ROM label when real MCU is dumped */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )

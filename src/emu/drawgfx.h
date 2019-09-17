@@ -202,6 +202,9 @@ public:
 
 	// ----- core graphics drawing -----
 
+	// core drawgfx implementation
+	template <typename BitmapType, typename FunctionClass> void drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, FunctionClass pixel_op);
+
 	// specific drawgfx implementations for each transparency type
 	void opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty);
 	void opaque(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty);
@@ -216,6 +219,9 @@ public:
 	void alpha(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 transpen, u8 alpha);
 
 	// ----- zoomed graphics drawing -----
+
+	// core zoom implementation
+	template <typename BitmapType, typename FunctionClass> void drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, FunctionClass pixel_op);
 
 	// specific zoom implementations for each transparency type
 	void zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley);
@@ -232,6 +238,9 @@ public:
 
 	// ----- priority masked graphics drawing -----
 
+	// core prio implementation
+	template <typename BitmapType, typename PriorityType, typename FunctionClass> void drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, PriorityType &priority, FunctionClass pixel_op);
+
 	// specific prio implementations for each transparency type
 	void prio_opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, bitmap_ind8 &priority, u32 pmask);
 	void prio_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, bitmap_ind8 &priority, u32 pmask);
@@ -246,6 +255,9 @@ public:
 	void prio_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, bitmap_ind8 &priority, u32 pmask, u32 transpen, u8 alpha);
 
 	// ----- priority masked zoomed graphics drawing -----
+
+	// core prio_zoom implementation
+	template <typename BitmapType, typename PriorityType, typename FunctionClass> void drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, PriorityType &priority, FunctionClass pixel_op);
 
 	// specific prio_zoom implementations for each transparency type
 	void prio_zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask);
@@ -265,6 +277,7 @@ public:
 	void prio_zoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 trans_pen);
 	void alphastore(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, int fixedalpha, u8 *alphatable);
 	void alphatable(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, int fixedalpha, u8 *alphatable);
+
 private:
 	// internal helpers
 	void decode(u32 code);
@@ -341,22 +354,6 @@ void prio_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length
 
 void primask_draw_scanline32(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
 void primask_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
-
-
-
-// ----- scanline extraction -----
-
-// copy pixels from a single scanline of a bitmap to an 8bpp buffer
-void extract_scanline8(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u8 *destptr);
-void extract_scanline8(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u8 *destptr);
-
-// copy pixels from a single scanline of a bitmap to a 16bpp buffer
-void extract_scanline16(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u16 *destptr);
-void extract_scanline16(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u16 *destptr);
-
-// copy pixels from a single scanline of a bitmap to a 32bpp buffer
-void extract_scanline32(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u32 *destptr);
-void extract_scanline32(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u32 *destptr);
 
 
 
@@ -450,24 +447,24 @@ void primask_copyscrollbitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src,
 */
 
 // copy from one bitmap to another, with zoom and rotation, copying all unclipped pixels
-void copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound);
-void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound);
+void copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound);
+void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound);
 
-void prio_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask);
-void prio_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask);
+void prio_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask);
+void prio_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask);
 
-void primask_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
-void primask_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
+void primask_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
+void primask_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
 
 // copy from one bitmap to another, with zoom and rotation, copying all unclipped pixels whose values do not match transpen
-void copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 transparent_color);
-void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 transparent_color);
+void copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 transparent_color);
+void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 transparent_color);
 
-void prio_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask, u32 transparent_color);
-void prio_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask, u32 transparent_color);
+void prio_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask, u32 transparent_color);
+void prio_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask, u32 transparent_color);
 
-void primask_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 transparent_color, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
-void primask_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 transparent_color, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
+void primask_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 transparent_color, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
+void primask_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 transparent_color, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff);
 
 
 

@@ -60,8 +60,8 @@ public:
 	void set_power(bool state);
 
 	void switch_change(int sel, u32 mask, bool next);
-	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_next) { if (newval) switch_change(Sel, (u32)(uintptr_t)param, true); }
-	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, (u32)(uintptr_t)param, false); }
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_next) { if (newval) switch_change(Sel, param, true); }
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, param, false); }
 
 protected:
 	virtual void machine_start() override;

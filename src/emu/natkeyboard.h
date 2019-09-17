@@ -72,8 +72,8 @@ private:
 	// internal keyboard code information
 	struct keycode_map_entry
 	{
-		ioport_field *  field[SHIFT_COUNT + 1];
-		unsigned        shift;
+		std::array<ioport_field *, SHIFT_COUNT + 1>	field;
+		unsigned									shift;
 	};
 	typedef std::unordered_map<char32_t, keycode_map_entry> keycode_map;
 

@@ -2057,7 +2057,27 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		return false;
 
 	// read the file
-	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, nullptr));
+	util::xml::parse_options parseopt;
+	util::xml::parse_error parseerr;
+	parseopt.error = &parseerr;
+	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, &parseopt));
+	if (!rootnode)
+	{
+		if (parseerr.error_message)
+		{
+			osd_printf_warning(
+					"Error parsing XML file '%s' at line %d column %d: %s, ignoring\n",
+					filename,
+					parseerr.error_line,
+					parseerr.error_column,
+					parseerr.error_message);
+		}
+		else
+		{
+			osd_printf_warning("Error parsing XML file '%s', ignorning\n", filename);
+		}
+		return false;
+	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
 	if (!load_layout_file(m_manager.machine().root_device(), dirname, *rootnode))

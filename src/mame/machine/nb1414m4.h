@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 class nb1414m4_device : public device_t, public device_video_interface
 {
 public:

@@ -27,6 +27,7 @@
     company in 1981 and changed its name to IGT.
 
 ***********************************************************************************/
+
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
@@ -34,6 +35,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class drw80pkr_state : public driver_device

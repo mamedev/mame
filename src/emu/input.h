@@ -484,6 +484,7 @@ public:
 	const input_seq &seq_poll_final() const { return m_poll_seq; }
 
 	// input sequence helpers
+	input_seq seq_clean(const input_seq &seq) const;
 	std::string seq_name(const input_seq &seq) const;
 	std::string seq_to_tokens(const input_seq &seq) const;
 	void seq_from_tokens(input_seq &seq, const char *_token);

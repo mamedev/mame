@@ -290,13 +290,13 @@ inline void tatsumi_state::roundupt_drawgfxzoomrotate( _BitmapClass &dest_bmp, c
 }
 
 static void mycopyrozbitmap_core(bitmap_ind8 &bitmap,bitmap_rgb32 &srcbitmap,
-		int dstx,int dsty, int srcwidth, int srcheight,int incxx,int incxy,int incyx,int incyy,
-		const rectangle &clip,int transparent_color)
+		int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
+		const rectangle &clip, int transparent_color)
 { }
 
 static void mycopyrozbitmap_core(bitmap_rgb32 &bitmap,bitmap_rgb32 &srcbitmap,
-		int dstx,int dsty, int srcwidth, int srcheight,int incxx,int incxy,int incyx,int incyy,
-		const rectangle &clip,int transparent_color)
+		int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
+		const rectangle &clip, int transparent_color)
 {
 	uint32_t cx;
 	uint32_t cy;

@@ -127,6 +127,7 @@ Dip locations verified for:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class m63_state : public driver_device
 {

@@ -4,6 +4,8 @@
 #define MAME_VIDEO_K037122_H
 #pragma once
 
+#include "tilemap.h"
+
 class k037122_device : public device_t,
 						public device_video_interface,
 						public device_gfx_interface

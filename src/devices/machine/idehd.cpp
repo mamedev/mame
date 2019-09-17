@@ -838,7 +838,7 @@ void ide_hdd_device::device_reset()
 
 		// build the features page
 		uint32_t metalength;
-		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, &m_buffer[0], 512, metalength) == CHDERR_NONE)
+		if (m_handle && m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, &m_buffer[0], 512, metalength) == CHDERR_NONE)
 		{
 			for( int w = 0; w < 256; w++ )
 			{

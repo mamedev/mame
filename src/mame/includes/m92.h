@@ -17,6 +17,7 @@
 #include "video/bufsprite.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 struct M92_pf_layer_info
 {
@@ -71,7 +72,7 @@ public:
 
 	void init_bank();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(m92_sprite_busy_r);
+	DECLARE_READ_LINE_MEMBER(sprite_busy_r);
 
 private:
 	required_device<buffered_spriteram16_device> m_spriteram;

@@ -19,6 +19,7 @@
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define M81_B_B_JUMPER_J3_S \
 	PORT_START("JumperJ3") \

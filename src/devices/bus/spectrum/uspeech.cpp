@@ -99,7 +99,7 @@ READ_LINE_MEMBER(spectrum_uspeech_device::romcs)
 	return m_romcs;
 }
 
-void spectrum_uspeech_device::opcode_fetch(offs_t offset)
+void spectrum_uspeech_device::pre_opcode_fetch(offs_t offset)
 {
 	if (!machine().side_effects_disabled() && (offset == 0x0038))
 	{

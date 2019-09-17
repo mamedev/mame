@@ -619,7 +619,7 @@ static INPUT_PORTS_START( unkeinv )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, unkeinv_state, position_changed, nullptr)
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, unkeinv_state, position_changed, 0)
 INPUT_PORTS_END
 
 void unkeinv_state::unkeinv(machine_config &config)
@@ -678,7 +678,7 @@ public:
 
 	u8 m_motor_pos;
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
-	DECLARE_CUSTOM_INPUT_MEMBER(motor_switch);
+	DECLARE_READ_LINE_MEMBER(motor_switch_r);
 
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -703,7 +703,7 @@ void lchicken_state::machine_start()
 
 // handlers
 
-CUSTOM_INPUT_MEMBER(lchicken_state::motor_switch)
+READ_LINE_MEMBER(lchicken_state::motor_switch_r)
 {
 	return m_motor_pos > 0xe8; // approximation
 }
@@ -782,7 +782,7 @@ static INPUT_PORTS_START( lchicken )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lchicken_state, motor_switch, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(lchicken_state, motor_switch_r)
 INPUT_PORTS_END
 
 void lchicken_state::lchicken(machine_config &config)
@@ -1006,7 +1006,7 @@ static INPUT_PORTS_START( funrlgl )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, reset_button, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, reset_button, 0)
 INPUT_PORTS_END
 
 void funrlgl_state::funrlgl(machine_config &config)

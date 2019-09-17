@@ -34,6 +34,8 @@ public:
 		m_an(*this, { { "AN_C", "AN_D", "AN_E", "AN_F" } }),
 		m_fakex(*this, "FAKEX"),
 		m_fakey(*this, "FAKEY"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
 		m_visarea(0, 0, 0, 0),
 		m_bankxor(0)
 	{}
@@ -58,7 +60,7 @@ public:
 	void init_arligntn();
 	void init_hstennis();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
+	DECLARE_READ_LINE_MEMBER(special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
 
 protected:
@@ -89,6 +91,8 @@ protected:
 	optional_ioport_array<4> m_an;
 	optional_ioport m_fakex;
 	optional_ioport m_fakey;
+	optional_ioport m_p1;
+	optional_ioport m_p2;
 
 	rectangle m_visarea;
 

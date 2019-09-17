@@ -100,8 +100,8 @@ undoukai:
 
 ;@s:8080bw.cpp
 
-supinvsion:
 searthie:
+supinvsion:
 @:maincpu,program,20f4,02,00,50
 
 
@@ -8659,11 +8659,12 @@ peekaboou:
 
 
 ;(legend of makai (world)) and clones (by GeoMan)
+;names don't seems to save correctly even without the plugin
 lomakai:
 makaiden:
-@:maincpu,program,ff000,2,00,03
-@:maincpu,program,ff002,7e,00,00
-@:maincpu,program,fe060,4,00,00
+@:maincpu,:ram/share,f000,2,00,03
+@:maincpu,:ram/share,f002,7e,00,00
+@:maincpu,:ram/share,e060,4,00,00
 
 
 ;(takeda shingen (japan))

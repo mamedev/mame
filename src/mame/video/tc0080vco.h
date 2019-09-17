@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include "tilemap.h"
+
+
 class tc0080vco_device : public device_t, public device_gfx_interface
 {
 public:

@@ -713,11 +713,6 @@ WRITE8_MEMBER(taitojc_state::hc11_data_w)
 	m_mcu_data_main = data;
 }
 
-READ8_MEMBER(taitojc_state::hc11_output_r)
-{
-	return m_mcu_output;
-}
-
 WRITE8_MEMBER(taitojc_state::hc11_output_w)
 {
 /*
@@ -741,13 +736,12 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
 */
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
-
-	m_mcu_output = data;
 }
 
-READ8_MEMBER(taitojc_state::hc11_analog_r)
+template <int Ch>
+uint8_t taitojc_state::hc11_analog_r()
 {
-	return m_analog_ports[offset].read_safe(0);
+	return m_analog_ports[Ch].read_safe(0);
 }
 
 
@@ -755,15 +749,6 @@ void taitojc_state::hc11_pgm_map(address_map &map)
 {
 	map(0x4000, 0x5fff).ram();
 	map(0x8000, 0xffff).rom();
-}
-
-void taitojc_state::hc11_io_map(address_map &map)
-{
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).nopr(); // ?
-	map(MC68HC11_IO_PORTG, MC68HC11_IO_PORTG).rw(FUNC(taitojc_state::hc11_comm_r), FUNC(taitojc_state::hc11_comm_w));
-	map(MC68HC11_IO_PORTH, MC68HC11_IO_PORTH).rw(FUNC(taitojc_state::hc11_output_r), FUNC(taitojc_state::hc11_output_w));
-	map(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA).rw(FUNC(taitojc_state::hc11_data_r), FUNC(taitojc_state::hc11_data_w));
-	map(MC68HC11_IO_AD0, MC68HC11_IO_AD7).r(FUNC(taitojc_state::hc11_analog_r));
 }
 
 
@@ -1073,7 +1058,6 @@ void taitojc_state::machine_start()
 	save_item(NAME(m_mcu_comm_hc11));
 	save_item(NAME(m_mcu_data_main));
 	save_item(NAME(m_mcu_data_hc11));
-	save_item(NAME(m_mcu_output));
 
 	save_item(NAME(m_speed_meter));
 	save_item(NAME(m_brake_meter));
@@ -1091,10 +1075,22 @@ void taitojc_state::taitojc(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(taitojc_state::taitojc_vblank));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &taitojc_state::cpu_space_map);
 
-	mc68hc11_cpu_device &sub(MC68HC11(config, "sub", XTAL(16'000'000)/2)); // 8MHz, MC68HC11M0
+	mc68hc11_cpu_device &sub(MC68HC11M0(config, "sub", XTAL(16'000'000)/2)); // 8MHz, MC68HC11M0
 	sub.set_addrmap(AS_PROGRAM, &taitojc_state::hc11_pgm_map);
-	sub.set_addrmap(AS_IO, &taitojc_state::hc11_io_map);
-	sub.set_config(1, 1280, 0x00);
+	sub.in_pa_callback().set_constant(0); // ?
+	sub.in_pg_callback().set(FUNC(taitojc_state::hc11_comm_r));
+	sub.out_pg_callback().set(FUNC(taitojc_state::hc11_comm_w));
+	sub.out_ph_callback().set(FUNC(taitojc_state::hc11_output_w));
+	sub.in_spi2_data_callback().set(FUNC(taitojc_state::hc11_data_r));
+	sub.out_spi2_data_callback().set(FUNC(taitojc_state::hc11_data_w));
+	sub.in_an0_callback().set(FUNC(taitojc_state::hc11_analog_r<0>));
+	sub.in_an1_callback().set(FUNC(taitojc_state::hc11_analog_r<1>));
+	sub.in_an2_callback().set(FUNC(taitojc_state::hc11_analog_r<2>));
+	sub.in_an3_callback().set(FUNC(taitojc_state::hc11_analog_r<3>));
+	sub.in_an4_callback().set(FUNC(taitojc_state::hc11_analog_r<4>));
+	sub.in_an5_callback().set(FUNC(taitojc_state::hc11_analog_r<5>));
+	sub.in_an6_callback().set(FUNC(taitojc_state::hc11_analog_r<6>));
+	sub.in_an7_callback().set(FUNC(taitojc_state::hc11_analog_r<7>));
 
 	TMS32051(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
 	m_dsp->set_addrmap(AS_PROGRAM, &taitojc_state::tms_program_map);

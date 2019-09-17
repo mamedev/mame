@@ -1676,6 +1676,8 @@ if (BUSES["S100"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/s100/s100.cpp",
 		MAME_DIR .. "src/devices/bus/s100/s100.h",
+		MAME_DIR .. "src/devices/bus/s100/am310.cpp",
+		MAME_DIR .. "src/devices/bus/s100/am310.h",
 		MAME_DIR .. "src/devices/bus/s100/dg640.cpp",
 		MAME_DIR .. "src/devices/bus/s100/dg640.h",
 		MAME_DIR .. "src/devices/bus/s100/dj2db.cpp",
@@ -1728,10 +1730,18 @@ if (BUSES["SS50"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/ss50/interface.cpp",
 		MAME_DIR .. "src/devices/bus/ss50/interface.h",
+		MAME_DIR .. "src/devices/bus/ss50/dc5.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/dc5.h",
 		MAME_DIR .. "src/devices/bus/ss50/mpc.cpp",
 		MAME_DIR .. "src/devices/bus/ss50/mpc.h",
 		MAME_DIR .. "src/devices/bus/ss50/mps.cpp",
 		MAME_DIR .. "src/devices/bus/ss50/mps.h",
+		MAME_DIR .. "src/devices/bus/ss50/mps2.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/mps2.h",
+		MAME_DIR .. "src/devices/bus/ss50/mpt.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/mpt.h",
+		MAME_DIR .. "src/devices/bus/ss50/piaide.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/piaide.h",
 	}
 end
 
@@ -2125,12 +2135,18 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/agat840k_hle.h",
 		MAME_DIR .. "src/devices/bus/a2bus/agat_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/agat_fdc.h",
+		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.h",
 		MAME_DIR .. "src/devices/bus/a2bus/transwarp.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/transwarp.h",
+		MAME_DIR .. "src/devices/bus/a2bus/4play.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/4play.h",
+		MAME_DIR .. "src/devices/bus/a2bus/computereyes2.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/computereyes2.h",
 	}
 end
 
@@ -2141,6 +2157,8 @@ end
 
 if (BUSES["A2GAMEIO"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/a2gameio/computereyes.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/computereyes.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/gameio.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/gameio.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/joystick.cpp",
@@ -2923,6 +2941,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/internal/evpcconn.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/genkbd.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/genkbd.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.h",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/busmouse.cpp",
@@ -3075,6 +3095,8 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.h",
+		MAME_DIR .. "src/devices/bus/coco/dragon_jcbspch.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_jcbspch.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_sprites.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_sprites.h",
 	}
@@ -3118,6 +3140,8 @@ if (BUSES["CPC"]~=null) then
 		MAME_DIR .. "src/devices/bus/cpc/doubler.h",
 		MAME_DIR .. "src/devices/bus/cpc/transtape.cpp",
 		MAME_DIR .. "src/devices/bus/cpc/transtape.h",
+		MAME_DIR .. "src/devices/bus/cpc/musicmachine.cpp",
+		MAME_DIR .. "src/devices/bus/cpc/musicmachine.h",
 	}
 end
 
@@ -3453,6 +3477,8 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/exp.h",
 		MAME_DIR .. "src/devices/bus/spectrum/beta.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/beta.h",
+		MAME_DIR .. "src/devices/bus/spectrum/beta128.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/beta128.h",
 		MAME_DIR .. "src/devices/bus/spectrum/intf1.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/intf1.h",
 		MAME_DIR .. "src/devices/bus/spectrum/intf2.cpp",
@@ -3481,6 +3507,8 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/usource.h",
 		MAME_DIR .. "src/devices/bus/spectrum/uspeech.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/uspeech.h",
+		MAME_DIR .. "src/devices/bus/spectrum/wafa.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/wafa.h",
 	}
 end
 

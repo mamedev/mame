@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "machine/megacd.h"
 #include "machine/nvram.h"
+#include "video/315_5313.h"
 #include "megacd.lh"
 
 
@@ -273,22 +274,22 @@ _32x32_START
 _32x32_END
 
 static GFXDECODE_START( gfx_segacd )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f1_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
 GFXDECODE_END
 
 
@@ -327,6 +328,7 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfx_segacd)
+	, device_video_interface(mconfig, *this, false)
 	, m_scdcpu(*this, "segacd_68k")
 	, m_hostcpu(*this, finder_base::DUMMY_TAG)
 	, m_rfsnd(*this, "rfsnd")
@@ -1843,7 +1845,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::dma_timer_callback )
 	// timed reset of flags
 	scd_mode_dmna_ret_flags |= 0x0021;
 
-	m_dma_timer->adjust(attotime::from_hz(m_framerate) / m_total_scanlines);
+	m_dma_timer->adjust(attotime::from_hz(get_framerate()) / double(m_total_scanlines));
 
 }
 

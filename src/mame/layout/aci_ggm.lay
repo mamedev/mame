@@ -5,9 +5,16 @@
 
 <!-- define elements -->
 
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="black"><rect><color red="0.16" green="0.16" blue="0.16" /></rect></element>
 	<element name="disk_white"><disk><color red="0.73" green="0.73" blue="0.73" /></disk></element>
 	<element name="brown"><rect><color red="0.25" green="0.1" blue="0.05" /></rect></element>
+	<element name="yellow"><rect><color red="0.8" green="0.7" blue="0.4" /></rect></element>
+
+	<element name="red_s3" defstate="0"><rect state="3"><color red="0.8" green="0.1" blue="0.15" /></rect></element>
+	<element name="green_s3" defstate="0"><rect state="3"><color red="0.3" green="0.8" blue="0.2" /></rect></element>
+	<element name="brown_s3" defstate="0"><rect state="3"><color red="0.25" green="0.1" blue="0.05" /></rect></element>
+	<element name="brown_nb" defstate="0xf"><rect state="0"><color red="0.25" green="0.1" blue="0.05" /></rect></element>
 
 	<element name="digit" defstate="0">
 		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>
@@ -42,118 +49,99 @@
 		<rect state="1"><color red="0" green="0" blue="0" /></rect>
 	</element>
 
+	<element name="nothing" defstate="0"><text string=" "/></element>
+
 	<element name="text_r1"><text string="MEM"><color red="0.3" green="0.3" blue="0.3" /></text></element>
 	<element name="text_r2"><text string="ON"><color red="0.3" green="0.3" blue="0.3" /></text></element>
 
-	<element name="text_boris01">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="RESTORE"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris02">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="G.7"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris03">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="H.8"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris04">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="9"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris05">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="CE"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris06a">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="HALT /" align="1"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris06b">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="HINT" align="1"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris07">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="D.4"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris08">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="E.5"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris09">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="F.6"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris10">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="TIME"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris11">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string=".BEST"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris12">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="A.1"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris13">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="B.2"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris14">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="C.3"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris15">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="RANK"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris16">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="LEVEL"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris17">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="0"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris18">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="-"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris19">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="B/W"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
-	<element name="text_boris20">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="ENTER"><color red="0.8" green="0.7" blue="0.4" /></text>
-	</element>
+	<element name="text_boris01" defstate="0"><text state="1" string="RESTORE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris02" defstate="0"><text state="1" string="G.7"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris03" defstate="0"><text state="1" string="H.8"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris04" defstate="0"><text state="1" string="9"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris05" defstate="0"><text state="1" string="CE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris06a" defstate="0"><text state="1" string="HALT /" align="1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris06b" defstate="0"><text state="1" string="HINT" align="1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris07" defstate="0"><text state="1" string="D.4"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris08" defstate="0"><text state="1" string="E.5"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris09" defstate="0"><text state="1" string="F.6"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris10" defstate="0"><text state="1" string="TIME"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris11" defstate="0"><text state="1" string=".BEST"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris12" defstate="0"><text state="1" string="A.1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris13" defstate="0"><text state="1" string="B.2"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris14" defstate="0"><text state="1" string="C.3"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris15" defstate="0"><text state="1" string="RANK"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris16" defstate="0"><text state="1" string="LEVEL"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris17" defstate="0"><text state="1" string="0"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris18" defstate="0"><text state="1" string="-"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris19" defstate="0"><text state="1" string="B/W"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris20" defstate="0"><text state="1" string="ENTER"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 
-	<element name="text_borisp">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="[P]"><color red="0.8" green="0.1" blue="0.15" /></text>
-	</element>
-	<element name="text_borisn">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="[N]"><color red="0.8" green="0.1" blue="0.15" /></text>
-	</element>
-	<element name="text_borisb">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="[B]"><color red="0.8" green="0.1" blue="0.15" /></text>
-	</element>
-	<element name="text_borisr">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="[R]"><color red="0.8" green="0.1" blue="0.15" /></text>
-	</element>
-	<element name="text_borisq">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="[Q]"><color red="0.8" green="0.1" blue="0.15" /></text>
-	</element>
-	<element name="text_borisk">
-		<rect><color red="0.25" green="0.1" blue="0.05" /></rect>
-		<text string="[K]"><color red="0.8" green="0.1" blue="0.15" /></text>
-	</element>
+	<element name="text_morphy01" defstate="0"><text state="2" string="RESTORE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy02" defstate="0"><text state="2" string="G.7"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy03" defstate="0"><text state="2" string="H.8"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy04" defstate="0"><text state="2" string="AUDIO"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy05" defstate="0"><text state="2" string="CE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy06a" defstate="0"><text state="2" string="HALT /" align="1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy06b" defstate="0"><text state="2" string="HINT" align="1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy07" defstate="0"><text state="2" string="D.4"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy08" defstate="0"><text state="2" string="E.5"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy09" defstate="0"><text state="2" string="F.6"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy10" defstate="0"><text state="2" string="TIME"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy11" defstate="0"><text state="2" string=".BEST"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy12" defstate="0"><text state="2" string="A.1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy13" defstate="0"><text state="2" string="B.2"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy14" defstate="0"><text state="2" string="C.3"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy15" defstate="0"><text state="2" string="RANK"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy16" defstate="0"><text state="2" string="LEVEL"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy17" defstate="0"><text state="2" string="0"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy18" defstate="0"><text state="2" string="-"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy19" defstate="0"><text state="2" string="B/W"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy20" defstate="0"><text state="2" string="ENTER"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+
+	<element name="text_steinitz01a" defstate="0"><text state="3" string="RESTORE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz01b" defstate="0"><text state="3" string="TIMING"><color red="0.05" green="0.7" blue="0.15" /></text></element>
+	<element name="text_steinitz02" defstate="0"><text state="3" string="G.7"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz03" defstate="0"><text state="3" string="H.8"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz04a" defstate="0"><text state="3" string="AUDIO"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz04b" defstate="0"><text state="3" string="9"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz05" defstate="0"><text state="3" string="CE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz06a" defstate="0"><text state="3" string="HALT /" align="1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz06b" defstate="0"><text state="3" string="HINT" align="1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz06c" defstate="0"><text state="3" string="LOOK"><color red="0.05" green="0.7" blue="0.15" /></text></element>
+	<element name="text_steinitz07" defstate="0"><text state="3" string="D.4"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz08" defstate="0"><text state="3" string="E.5"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz09" defstate="0"><text state="3" string="F.6"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz10a" defstate="0"><text state="3" string="TIME"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz10b" defstate="0"><text state="3" string="CHANGE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz11a" defstate="0"><text state="3" string="BEST"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz11b" defstate="0"><text state="3" string="SCORE"><color red="0.05" green="0.7" blue="0.15" /></text></element>
+	<element name="text_steinitz12" defstate="0"><text state="3" string="A.1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz13" defstate="0"><text state="3" string="B.2"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz14" defstate="0"><text state="3" string="C.3"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz15" defstate="0"><text state="3" string="RANK"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz16" defstate="0"><text state="3" string="LEVEL"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz17a" defstate="0"><text state="3" string="DISPLAY"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz17b" defstate="0"><text state="3" string="0"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz18a" defstate="0"><text state="3" string="&#x2190;"><color red="0.05" green="0.7" blue="0.15" /></text></element>
+	<element name="text_steinitz18b" defstate="0"><text state="3" string="&#x2192;"><color red="0.55" green="0.0" blue="0.1" /></text></element>
+	<element name="text_steinitz18c" defstate="0"><text state="3" string="REVIEW"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz19" defstate="0"><text state="3" string="B/W"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz20" defstate="0"><text state="3" string="ENTER"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+
+	<element name="digitp" defstate="9224"><led14seg><color red="0.75" green="0.1" blue="0.15" /></led14seg></element>
+	<element name="digitn" defstate="3244"><led14seg><color red="0.75" green="0.1" blue="0.15" /></led14seg></element>
+	<element name="digitb" defstate="14398"><led14seg><color red="0.75" green="0.1" blue="0.15" /></led14seg></element>
+	<element name="digitr" defstate="510"><led14seg><color red="0.75" green="0.1" blue="0.15" /></led14seg></element>
+	<element name="digitq" defstate="7132"><led14seg><color red="0.75" green="0.1" blue="0.15" /></led14seg></element>
+	<element name="digitk" defstate="7166"><led14seg><color red="0.75" green="0.1" blue="0.15" /></led14seg></element>
+
+	<element name="digitpi" defstate="7159"><led14seg><color red="0" green="0" blue="0.0" /></led14seg></element>
+	<element name="digitni" defstate="13139"><led14seg><color red="0" green="0" blue="0.0" /></led14seg></element>
+	<element name="digitbi" defstate="1985"><led14seg><color red="0" green="0" blue="0.0" /></led14seg></element>
+	<element name="digitri" defstate="15873"><led14seg><color red="0" green="0" blue="0.0" /></led14seg></element>
+	<element name="digitqi" defstate="9251"><led14seg><color red="0" green="0" blue="0.0" /></led14seg></element>
+	<element name="digitki" defstate="9217"><led14seg><color red="0" green="0" blue="0.0" /></led14seg></element>
+
 
 <!-- groups -->
 
@@ -169,87 +157,211 @@
 			<param name="dot_x" start="3.5" increment="11" />
 
 			<bezel name="digit~i~" element="digit"><bounds x="~digit_x~" y="0" width="10" height="15" /></bezel>
-			<bezel name="~i~.14" element="seg_disk"><bounds x="~dp_x~" y="13.5" width="1.5" height="1.5" /></bezel>
-			<bezel name="~i~.15" element="seg_disk"><bounds x="~ap1_x~" y="0" width="1" height="1.6" /></bezel>
-			<bezel name="~i~.15" element="seg_rect"><bounds x="~ap2_x~" y="0" width="0.7" height="3.5" /></bezel>
+			<bezel name="~i~.15" element="seg_disk"><bounds x="~dp_x~" y="13.5" width="1.5" height="1.5" /></bezel>
+			<bezel name="~i~.14" element="seg_disk"><bounds x="~ap1_x~" y="0" width="1" height="1.6" /></bezel>
+			<bezel name="~i~.14" element="seg_rect"><bounds x="~ap2_x~" y="0" width="0.7" height="3.5" /></bezel>
 			<bezel element="disk_white"><bounds x="~dot_x~" y="17.1" width="1.9" height="1.9" /></bezel>
 		</repeat>
 	</group>
 
-	<group name="buttons_base">
+
+	<group name="buttons">
 		<bounds x="0" y="0" width="19.5" height="13.5" />
 
+		<!-- input listeners -->
+		<element ref="nothing" inputtag="IN.3" inputmask="0x08"><bounds x="0"  y="0" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x04"><bounds x="4"  y="0" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x08"><bounds x="8"  y="0" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x10"><bounds x="12" y="0" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x10"><bounds x="16" y="0" width="3.5" height="3" /></element>
+
+		<element ref="nothing" inputtag="IN.3" inputmask="0x02"><bounds x="0"  y="3.5" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x10"><bounds x="4"  y="3.5" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x01"><bounds x="8"  y="3.5" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.1" inputmask="0x02"><bounds x="12" y="3.5" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x08"><bounds x="16" y="3.5" width="3.5" height="3" /></element>
+
+		<element ref="nothing" inputtag="IN.3" inputmask="0x04"><bounds x="0"  y="7" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x02"><bounds x="4"  y="7" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x04"><bounds x="8"  y="7" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x08"><bounds x="12" y="7" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x04"><bounds x="16" y="7" width="3.5" height="3" /></element>
+
+		<element ref="nothing" inputtag="IN.3" inputmask="0x01"><bounds x="0"  y="10.5" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x01"><bounds x="4"  y="10.5" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x01"><bounds x="8"  y="10.5" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x02"><bounds x="12" y="10.5" width="3.5" height="3" /></element>
+		<element ref="nothing" inputtag="IN.3" inputmask="0x10"><bounds x="16" y="10.5" width="3.5" height="3" /></element>
+
+		<!-- buttons base -->
 		<repeat count="4">
 			<param name="y" start="0" increment="3.5" />
 			<repeat count="5">
 				<param name="x" start="0" increment="4" />
-				<bezel element="~basecolor~"><bounds x="~x~" y="~y~" width="3.5" height="3" /></bezel>
+				<element ref="yellow"><bounds x="~x~" y="~y~" width="3.5" height="3" /></element>
 			</repeat>
 		</repeat>
-	</group>
 
-	<group name="buttons_boris">
-		<bounds x="0" y="0" width="19.5" height="13.5" />
+		<repeat count="4">
+			<param name="y" start="0.15" increment="3.5" />
+			<repeat count="5">
+				<param name="x" start="0.15" increment="4" />
+				<element ref="brown"><bounds x="~x~" y="~y~" width="3.2" height="2.7" /></element>
+			</repeat>
+		</repeat>
 
-		<bezel element="text_boris01"><bounds x="0.1" y="0.9" width="3.3" height="1" /></bezel>
-		<bezel element="text_boris02"><bounds x="4.1" y="0.01" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_boris03"><bounds x="8.1" y="0.01" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_boris04"><bounds x="12.1" y="0.4" width="3.3" height="1.9" /></bezel>
-		<bezel element="text_boris05"><bounds x="16.1" y="0.6" width="3.3" height="1.5" /></bezel>
+		<!-- chess symbols -->
+		<element ref="blackb"><bounds x="5.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="blackb"><bounds x="9.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="blackb"><bounds x="13.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="blackb"><bounds x="5.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="blackb"><bounds x="9.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="blackb"><bounds x="13.25" y="8.35" width="1" height="1.3" /></element>
 
-		<bezel element="text_boris06a"><bounds x="0.6" y="4.0" width="2.8" height="1" /></bezel>
-		<bezel element="text_boris06b"><bounds x="0.6" y="5.0" width="2.8" height="1" /></bezel>
-		<bezel element="text_boris07"><bounds x="4.1" y="3.51" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_boris08"><bounds x="8.1" y="3.51" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_boris09"><bounds x="12.1" y="3.51" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_boris10"><bounds x="16.1" y="4.4" width="3.3" height="1" /></bezel>
+		<element name="digitr" ref="digitr"><bounds x="5.25" y="4.85" width="1" height="1.3" /></element>
+		<element name="digitq" ref="digitq"><bounds x="9.25" y="4.85" width="1" height="1.3" /></element>
+		<element name="digitk" ref="digitk"><bounds x="13.25" y="4.85" width="1" height="1.3" /></element>
+		<element name="digitp" ref="digitp"><bounds x="5.25" y="8.35" width="1" height="1.3" /></element>
+		<element name="digitn" ref="digitn"><bounds x="9.25" y="8.35" width="1" height="1.3" /></element>
+		<element name="digitb" ref="digitb"><bounds x="13.25" y="8.35" width="1" height="1.3" /></element>
 
-		<bezel element="text_boris11"><bounds x="0.1" y="7.9" width="3.3" height="1" /></bezel>
-		<bezel element="text_boris12"><bounds x="4.1" y="7.01" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_boris13"><bounds x="8.1" y="7.01" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_boris14"><bounds x="12.1" y="7.01" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_boris15"><bounds x="16.1" y="7.9" width="3.3" height="1" /></bezel>
+		<element name="digitri" ref="digitri"><bounds x="5.25" y="4.85" width="1" height="1.3" /></element>
+		<element name="digitqi" ref="digitqi"><bounds x="9.25" y="4.85" width="1" height="1.3" /></element>
+		<element name="digitki" ref="digitki"><bounds x="13.25" y="4.85" width="1" height="1.3" /></element>
+		<element name="digitpi" ref="digitpi"><bounds x="5.25" y="8.35" width="1" height="1.3" /></element>
+		<element name="digitni" ref="digitni"><bounds x="9.25" y="8.35" width="1" height="1.3" /></element>
+		<element name="digitbi" ref="digitbi"><bounds x="13.25" y="8.35" width="1" height="1.3" /></element>
 
-		<bezel element="text_boris16"><bounds x="0.1" y="11.4" width="3.3" height="1" /></bezel>
-		<bezel element="text_boris17"><bounds x="4.1" y="10.9" width="3.3" height="1.9" /></bezel>
-		<bezel element="text_boris18"><bounds x="8.1" y="10.9" width="3.3" height="1.9" /></bezel>
-		<bezel element="text_boris19"><bounds x="12.1" y="11.1" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_boris20"><bounds x="16.1" y="11.4" width="3.3" height="1" /></bezel>
+		<element ref="brown" blend="add"><bounds x="5.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown" blend="add"><bounds x="9.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown" blend="add"><bounds x="13.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown" blend="add"><bounds x="5.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="brown" blend="add"><bounds x="9.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="brown" blend="add"><bounds x="13.25" y="8.35" width="1" height="1.3" /></element>
 
-		<bezel element="text_borisp"><bounds x="4.1" y="8.3" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_borisn"><bounds x="8.1" y="8.3" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_borisb"><bounds x="12.1" y="8.3" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_borisr"><bounds x="4.1" y="4.8" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_borisq"><bounds x="8.1" y="4.8" width="3.3" height="1.5" /></bezel>
-		<bezel element="text_borisk"><bounds x="12.1" y="4.8" width="3.3" height="1.5" /></bezel>
-	</group>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="5.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="9.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="13.25" y="4.85" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="5.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="9.25" y="8.35" width="1" height="1.3" /></element>
+		<element ref="brown_nb" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="13.25" y="8.35" width="1" height="1.3" /></element>
 
-	<group name="buttons_click">
-		<bounds x="0" y="0" width="19.5" height="13.5" />
+		<!-- boris overlay -->
+		<element ref="text_boris01" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="1.0" width="3.3" height="0.8" /></element>
+		<element ref="text_boris02" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris03" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris04" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="0.5" width="3.3" height="1.7" /></element>
+		<element ref="text_boris05" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
 
-		<bezel element="hl" inputtag="IN.3" inputmask="0x08"><bounds x="0"  y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x04"><bounds x="4"  y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x08"><bounds x="8"  y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x10"><bounds x="12" y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x10"><bounds x="16" y="0" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<element ref="text_boris06a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.25" width="2.8" height="0.8" /></element>
+		<element ref="text_boris06b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.95" width="2.8" height="0.8" /></element>
+		<element ref="text_boris07" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_boris08" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_boris09" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_boris10" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="4.5" width="3.3" height="0.8" /></element>
 
-		<bezel element="hl" inputtag="IN.3" inputmask="0x02"><bounds x="0"  y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x10"><bounds x="4"  y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x01"><bounds x="8"  y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x02"><bounds x="12" y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x08"><bounds x="16" y="3.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<element ref="text_boris11" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="8.0" width="3.3" height="0.8" /></element>
+		<element ref="text_boris12" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris13" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris14" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_boris15" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
 
-		<bezel element="hl" inputtag="IN.3" inputmask="0x04"><bounds x="0"  y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x02"><bounds x="4"  y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x04"><bounds x="8"  y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x08"><bounds x="12" y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x04"><bounds x="16" y="7" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<element ref="text_boris16" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="11.5" width="3.3" height="0.8" /></element>
+		<element ref="text_boris17" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="1.7" /></element>
+		<element ref="text_boris18" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="11.0" width="3.3" height="1.7" /></element>
+		<element ref="text_boris19" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
+		<element ref="text_boris20" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
 
-		<bezel element="hl" inputtag="IN.3" inputmask="0x01"><bounds x="0"  y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x01"><bounds x="4"  y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x01"><bounds x="8"  y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.2" inputmask="0x02"><bounds x="12" y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
-		<bezel element="hl" inputtag="IN.3" inputmask="0x10"><bounds x="16" y="10.5" width="3.5" height="3" /><color alpha="0.22" /></bezel>
+		<!-- morphy overlay -->
+		<element ref="text_morphy01" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="1.0" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy02" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy03" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy04" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="1.0" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy05" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
+
+		<element ref="text_morphy06a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.25" width="2.8" height="0.8" /></element>
+		<element ref="text_morphy06b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.95" width="2.8" height="0.8" /></element>
+		<element ref="text_morphy07" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy08" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy09" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy10" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="4.5" width="3.3" height="0.8" /></element>
+
+		<element ref="text_morphy11" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="8.0" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy12" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy13" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy14" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy15" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
+
+		<element ref="text_morphy16" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="11.5" width="3.3" height="0.8" /></element>
+		<element ref="text_morphy17" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="1.7" /></element>
+		<element ref="text_morphy18" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="11.0" width="3.3" height="1.7" /></element>
+		<element ref="text_morphy19" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
+		<element ref="text_morphy20" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
+
+		<!-- steinitz overlay -->
+		<element ref="red_s3" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="16.15" y="7.15" width="3.2" height="2.7" /></element>
+		<element ref="brown_s3" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="16.3" y="7.3" width="2.9" height="2.4" /></element>
+
+		<element ref="green_s3" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="0.15" y="10.65" width="3.2" height="2.7" /></element>
+		<element ref="brown_s3" inputtag="IN.6" inputmask="0x0f" inputraw="1"><bounds x="0.3" y="10.8" width="2.9" height="2.4" /></element>
+
+		<element ref="text_steinitz01a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="0.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz01b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="1.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz02" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz03" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="0.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz04a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="0.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz04b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="1.5" width="3.3" height="1.1" /></element>
+		<element ref="text_steinitz05" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="0.7" width="3.3" height="1.3" /></element>
+
+		<element ref="text_steinitz06a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="3.75" width="2.8" height="0.8" /></element>
+		<element ref="text_steinitz06b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.9" y="4.45" width="2.8" height="0.8" /></element>
+		<element ref="text_steinitz06c" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="5.4" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz07" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz08" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz09" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="3.6" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz10a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="4.0" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz10b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="5.0" width="3.3" height="0.8" /></element>
+
+		<element ref="text_steinitz11a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="7.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz11b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="8.5" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz12" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz13" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz14" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="7.1" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz15" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="8.0" width="3.3" height="0.8" /></element>
+
+		<element ref="text_steinitz16" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="0.1" y="11.0" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz17a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz17b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="4.1" y="12.0" width="3.3" height="1.1" /></element>
+		<element ref="text_steinitz18a" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="10.25" width="3.3" height="1.5" /></element>
+		<element ref="text_steinitz18b" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="10.8" width="3.3" height="1.5" /></element>
+		<element ref="text_steinitz18c" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="8.1" y="12.2" width="3.3" height="0.8" /></element>
+		<element ref="text_steinitz19" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="12.1" y="11.2" width="3.3" height="1.3" /></element>
+		<element ref="text_steinitz20" inputtag="IN.6" inputmask="0x0f" inputraw="1" blend="add"><bounds x="16.1" y="11.5" width="3.3" height="0.8" /></element>
+
+		<!-- input highlights -->
+		<element ref="hl" inputtag="IN.3" inputmask="0x08"><bounds x="0"  y="0" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x04"><bounds x="4"  y="0" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x08"><bounds x="8"  y="0" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x10"><bounds x="12" y="0" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x10"><bounds x="16" y="0" width="3.5" height="3" /><color alpha="0.22" /></element>
+
+		<element ref="hl" inputtag="IN.3" inputmask="0x02"><bounds x="0"  y="3.5" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x10"><bounds x="4"  y="3.5" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x01"><bounds x="8"  y="3.5" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.1" inputmask="0x02"><bounds x="12" y="3.5" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x08"><bounds x="16" y="3.5" width="3.5" height="3" /><color alpha="0.22" /></element>
+
+		<element ref="hl" inputtag="IN.3" inputmask="0x04"><bounds x="0"  y="7" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x02"><bounds x="4"  y="7" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x04"><bounds x="8"  y="7" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x08"><bounds x="12" y="7" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x04"><bounds x="16" y="7" width="3.5" height="3" /><color alpha="0.22" /></element>
+
+		<element ref="hl" inputtag="IN.3" inputmask="0x01"><bounds x="0"  y="10.5" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.0" inputmask="0x01"><bounds x="4"  y="10.5" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x01"><bounds x="8"  y="10.5" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.2" inputmask="0x02"><bounds x="12" y="10.5" width="3.5" height="3" /><color alpha="0.22" /></element>
+		<element ref="hl" inputtag="IN.3" inputmask="0x10"><bounds x="16" y="10.5" width="3.5" height="3" /><color alpha="0.22" /></element>
 	</group>
 
 	<group name="mem_switch">
@@ -264,26 +376,12 @@
 
 <!-- build screen -->
 
-	<view name="Internal Layout, Boris 2.5">
+	<view name="Internal Layout">
 		<bounds left="-5" right="104" top="-2" bottom="93" />
 		<group ref="display"><bounds x="0" y="0" width="88" height="19" /></group>
 		<bezel element="black"><bounds x="-6" y="23" width="111" height="1.5" /></bezel>
 
-		<param name="basecolor" value="brown" />
-		<group ref="buttons_base"><bounds x="0" y="30" width="88" height="60.92" /></group>
-		<group ref="buttons_boris"><bounds x="0" y="30" width="88" height="60.92" /></group>
-		<group ref="buttons_click"><bounds x="0" y="30" width="88" height="60.92" /></group>
-		<group ref="mem_switch"><bounds x="87" y="28" width="18" height="19.2" /></group>
-	</view>
-
-	<view name="Internal Layout, No Overlay">
-		<bounds left="-5" right="104" top="-2" bottom="93" />
-		<group ref="display"><bounds x="0" y="0" width="88" height="19" /></group>
-		<bezel element="black"><bounds x="-6" y="23" width="111" height="1.5" /></bezel>
-
-		<param name="basecolor" value="brown" />
-		<group ref="buttons_base"><bounds x="0" y="30" width="88" height="60.92" /></group>
-		<group ref="buttons_click"><bounds x="0" y="30" width="88" height="60.92" /></group>
+		<group ref="buttons"><bounds x="0" y="30" width="88" height="60.92" /></group>
 		<group ref="mem_switch"><bounds x="87" y="28" width="18" height="19.2" /></group>
 	</view>
 

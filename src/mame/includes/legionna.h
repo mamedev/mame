@@ -11,6 +11,7 @@
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #include <algorithm>
 

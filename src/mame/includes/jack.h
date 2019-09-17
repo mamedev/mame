@@ -13,6 +13,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class jack_state : public driver_device
 {

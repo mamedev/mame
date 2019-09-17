@@ -9,7 +9,6 @@
 
 #include "ptypes.h"
 
-#include <cstring>
 #include <exception>
 #include <iterator>
 #include <limits>
@@ -126,9 +125,10 @@ public:
 	pstring_t &operator=(const pstring_t &string) = default;
 	pstring_t &operator=(pstring_t &&string) noexcept = default;
 
-	explicit pstring_t(code_t code)
+	explicit pstring_t(size_type n, code_t code)
 	{
-		*this += code;
+		while (n--)
+			*this += code;
 	}
 
 	template <typename T,
@@ -198,13 +198,12 @@ public:
 
 	const_reference at(const size_type pos) const { return *reinterpret_cast<const ref_value_type *>(F::nthcode(m_str.c_str(),pos)); }
 
+	static constexpr const size_type npos = static_cast<size_type>(-1);
+
 	/* the following are extensions to <string> */
 
+	// FIXME: remove those
 	size_type mem_t_size() const { return m_str.size(); }
-
-	const string_type &cpp_string() const { return m_str; }
-
-	static constexpr const size_type npos = static_cast<size_type>(-1);
 
 private:
 	string_type m_str;
@@ -477,8 +476,10 @@ extern template struct pstring_t<pwchar_traits>;
 
 #if (PSTRING_USE_STD_STRING)
 typedef std::string pstring;
+static inline pstring::size_type pstring_mem_t_size(const pstring &s) { return s.size(); }
 #else
 using pstring = pstring_t<putf8_traits>;
+static inline pstring::size_type pstring_mem_t_size(const pstring &s) { return s.mem_t_size(); }
 #endif
 using putf8string = pstring_t<putf8_traits>;
 using pu16string = pstring_t<putf16_traits>;
@@ -602,13 +603,22 @@ namespace plib
 	template<typename T>
 	bool startsWith(const T &str, const char *arg)
 	{
-		return (left(str, std::strlen(arg)) == arg);
+		return startsWith(str, static_cast<pstring>(arg));
 	}
 
 	template<typename T>
 	bool endsWith(const T &str, const char *arg)
 	{
-		return (right(str, std::strlen(arg)) == arg);
+		return endsWith(str, static_cast<pstring>(arg));
+	}
+
+	template<typename T>
+	std::size_t strlen(const T *str)
+	{
+		const T *p = str;
+		while (*p)
+			p++;
+		return p - str;
 	}
 
 	template<typename T>
@@ -670,7 +680,7 @@ namespace std
 	{
 		using argument_type = pstring_t<T>;
 		using result_type = std::size_t;
-		result_type operator()(argument_type const& s) const
+		result_type operator()(const argument_type & s) const
 		{
 			const typename argument_type::mem_t *string = s.c_str();
 			result_type result = 5381;

@@ -586,7 +586,7 @@ void segas24_sprite_device::device_start()
 
       Clip?
     0   01---nnn    nnnnnnnn    next sprite
-    1   hVH-----    --------    hide/vflip/hflip
+    1   hHV-----    --------    hide/hflip/vflip (inverts clipping logic, typical Sega)
     2   -------y    yyyyyyyy    Clip top
     2   -------x    xxxxxxxx    Clip left
     2   -------y    yyyyyyyy    Clip bottom
@@ -655,6 +655,7 @@ void segas24_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 		//      int dump;
 		int xmod, ymod;
 		int min_x, min_y, max_x, max_y;
+		int clip_reverse_y;
 
 		uint32_t addoffset;
 		uint32_t newoffset;
@@ -664,11 +665,15 @@ void segas24_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 		cclip = clip[countspr];
 
 		if(cclip) {
+			// Crackdown uses this on pre-title screen intro 
+			// for masking both avatars and the Sega logo itself.
+			clip_reverse_y = (cclip[1] & 0x2000) >> 13;
 			min_y = (cclip[2] & 511);
 			min_x = (cclip[3] & 511) - 8;
 			max_y = (cclip[4] & 511);
 			max_x = (cclip[5] & 511) - 8;
 		} else {
+			clip_reverse_y = 0;
 			min_x = 0;
 			max_x = 495;
 			min_y = 0;
@@ -748,7 +753,7 @@ void segas24_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 				for(zy=0; zy<8; zy++) {
 					ymod1 += zoomy;
 					while(ymod1 >= 0x40) {
-						if(ypos1 >= min_y && ypos1 <= max_y) {
+						if((ypos1 >= min_y && ypos1 <= max_y) ^ clip_reverse_y) {
 							int zx;
 							xmod2 = xmod1;
 							xpos2 = xpos1;

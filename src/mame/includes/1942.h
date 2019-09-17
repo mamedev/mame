@@ -13,6 +13,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class _1942_state : public driver_device
 {

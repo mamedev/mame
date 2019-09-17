@@ -83,6 +83,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "kingdrby.lh"
 

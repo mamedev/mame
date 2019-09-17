@@ -186,7 +186,7 @@ u8 gaelco2_state::shareram_r(offs_t offset)
 
 void gaelco2_state::wrally2_latch_w(offs_t offset, u16 data)
 {
-	m_mainlatch->write_bit(offset >> 2, BIT(data, 0));
+	m_mainlatch->write_bit(offset >> 3, BIT(data, 0));
 }
 
 WRITE_LINE_MEMBER(gaelco2_state::coin1_counter_w)
@@ -248,51 +248,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
 
 	if ((scanline % 64) == 0 && m_clr_gun_int)
 		m_maincpu->set_input_line(4, HOLD_LINE);
-}
-
-/***************************************************************************
-
-    World Rally 2 analog controls
-    - added by Mirko Mattioli <els@fastwebnet.it>
-    ---------------------------------------------------------------
-    WR2 pcb has two ADC, one for each player. The ADCs have in common
-    the clock signal line (adc_clk) and the chip enable signal line
-    (adc_cs) and, of course,  two different data out signal lines.
-    When "Pot Wheel" option is selected via dip-switch, then the gear
-    is enabled (low/high shifter); the gear is disabled in joy mode by
-    the CPU program code. No brakes are present in this game.
-    Analog controls routines come from modified code wrote by Aaron
-    Giles for gaelco3d driver.
-
-***************************************************************************/
-
-
-CUSTOM_INPUT_MEMBER(wrally2_state::wrally2_analog_bit_r)
-{
-	int which = (uintptr_t)param;
-	return (m_analog_ports[which] >> 7) & 0x01;
-}
-
-
-WRITE_LINE_MEMBER(wrally2_state::wrally2_adc_clk)
-{
-	/* a zero/one combo is written here to clock the next analog port bit */
-	if (!state)
-	{
-		m_analog_ports[0] <<= 1;
-		m_analog_ports[1] <<= 1;
-	}
-}
-
-
-WRITE_LINE_MEMBER(wrally2_state::wrally2_adc_cs)
-{
-	/* a zero is written here to read the analog ports, and a one is written when finished */
-	if (!state)
-	{
-		m_analog_ports[0] = m_analog0->read();
-		m_analog_ports[1] = m_analog1->read();
-	}
 }
 
 /***************************************************************************

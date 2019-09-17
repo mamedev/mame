@@ -20,7 +20,7 @@
 #include "nl_errstr.h"
 
 #include <cmath>
-#include <cstring>
+//#include <cstring>
 #include <limits>
 
 namespace netlist

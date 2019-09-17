@@ -162,7 +162,6 @@
 #define OPTION_BIOS                 "bios"
 #define OPTION_CHEAT                "cheat"
 #define OPTION_SKIP_GAMEINFO        "skip_gameinfo"
-#define OPTION_SKIP_MANDATORY_FILEMAN   "skip_mandatory_fileman"
 #define OPTION_UI_FONT              "uifont"
 #define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
@@ -438,7 +437,6 @@ public:
 	const char *bios() const { return value(OPTION_BIOS); }
 	bool cheat() const { return bool_value(OPTION_CHEAT); }
 	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }
-	bool skip_mandatory_fileman() const { return bool_value(OPTION_SKIP_MANDATORY_FILEMAN); }
 	const char *ui_font() const { return value(OPTION_UI_FONT); }
 	ui_option ui() const { return m_ui; }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
@@ -511,7 +509,7 @@ private:
 
 	// slots and devices
 	std::unordered_map<std::string, ::slot_option>      m_slot_options;
-	std::unordered_map<std::string, ::image_option>     m_image_options_cannonical;
+	std::unordered_map<std::string, ::image_option>     m_image_options_canonical;
 	std::unordered_map<std::string, ::image_option *>   m_image_options;
 
 	// cached options, for scenarios where parsing core_options is too slow

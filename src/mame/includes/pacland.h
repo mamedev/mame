@@ -9,6 +9,7 @@
 #include "sound/namco.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class pacland_state : public driver_device
 {

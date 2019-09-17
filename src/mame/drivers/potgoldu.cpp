@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
+#include "cpu/m6805/m68hc05.h"
 #include "screen.h"
 
 
@@ -33,6 +34,7 @@ public:
 	{ }
 
 	void potgold(machine_config &config);
+	void potgold580(machine_config &config);
 
 private:
 	virtual void machine_reset() override;
@@ -44,14 +46,6 @@ private:
 
 	required_device<tms34010_device> m_maincpu;
 };
-
-
-#define CPU_CLOCK           XTAL(40'000'000)
-#define VIDEO_CLOCK         (22118400) // ?
-#define SOUND_CLOCK         (3579645)
-
-
-
 
 
 void potgold_state::video_start()
@@ -81,19 +75,28 @@ INPUT_PORTS_END
 void potgold_state::potgold(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	TMS34010(config, m_maincpu, 40_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &potgold_state::potgold_map);
 	m_maincpu->set_halt_on_reset(false);
-	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixel_clock(22.1184_MHz_XTAL / 22);
 	m_maincpu->set_pixels_per_clock(1);
 	m_maincpu->set_scanline_rgb32_callback(FUNC(potgold_state::scanline_update));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200);
+	screen.set_raw(22.1184_MHz_XTAL / 2, 444, 0, 320, 233, 0, 200);
 	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
-	/* YM2413 */
+	//YM2413(config, "ymsnd", 3.579545_MHz_XTAL);
+}
+
+void potgold_state::potgold580(machine_config &config)
+{
+	potgold(config);
+
+	//YMF721S(config.replace(), "ymsnd", 33.8688_MHz_XTAL);
+
+	M68HC705J1A(config, "mcu", 4_MHz_XTAL);
 }
 
 ROM_START( potgoldu )
@@ -110,6 +113,8 @@ ROM_START( potgoldu )
 	// these two are definitely a pair
 	ROM_LOAD16_BYTE( "400x.u3",  0x1c0000, 0x20000, BAD_DUMP CRC(c0894db0) SHA1(d68321949250bfe0f14bd5ef8d115ba4b3786b8b) )
 	ROM_LOAD16_BYTE( "400x.u7",  0x1c0001, 0x20000, BAD_DUMP CRC(0953ecf7) SHA1(91cbe5d9aff171902dc3eb43a308a7a833c8fb71) )
+
+	// no MCU for this hardware revision
 ROM_END
 
 ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAMDAC + SC28L198A1A UART + EPM7192SQC160-10 CPLD
@@ -121,10 +126,10 @@ ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAM
 	ROM_LOAD16_BYTE( "pog_580f.u5", 0x280000, 0x80000, CRC(64c3b488) SHA1(30564feee544f7b4d1d48c68dbfcd6ae0ae1b220) )
 	ROM_LOAD16_BYTE( "pog_580f.u8", 0x280001, 0x80000, CRC(cca108a4) SHA1(edd46df79bd8835ca61b5d48277de4a70a83e2a0) )
 
-	// Dumper's note: Not included is the "Security" chip needed to run the game. However from what I can tell the chip only collates the bins, dumps them to ram, and keeps settings.
-	ROM_REGION( 0x2000, "mcu", 0 )  /* 68H705 (68hc705??) microcontroller */
-	ROM_LOAD( "mc68h705",     0x0000, 0x2000, NO_DUMP ) // not sure which type of mcu this is, size is a guess
+	// Dumper's note: "Security" chip needed to run the game. However from what I can tell the chip only collates the bins, dumps them to ram, and keeps settings.
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "potgoldu_mc68hc705j1acp.bin", 0x000, 0x800, CRC(4130e596) SHA1(cd7e80a371abd4208a64c537fc84f1525be9203c) ) // 'Ver 1.00a' (assumed to be for this set)
 ROM_END
 
-GAME( 200?, potgoldu,    0,        potgold,   potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
-GAME( 200?, potgoldu580, potgoldu, potgold,   potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )
+GAME( 200?, potgoldu,    0,        potgold,    potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
+GAME( 200?, potgoldu580, potgoldu, potgold580, potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )

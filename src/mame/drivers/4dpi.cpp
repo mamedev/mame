@@ -22,6 +22,7 @@
 ****************************************************************************/
 /*
  * Sources:
+ *   - http://bitsavers.org/pdf/sgi/personal_iris/VME-Eclipse_CPU_VIP10_Specification.pdf
  *   - http://www.bitsavers.org/pdf/sgi/personal_iris/SGI_IP-6_Schematic.pdf
  *   - http://www.futuretech.blinkenlights.nl/pitechrep.html
  *   - https://hardware.majix.org/computers/sgi.pi/index.shtml
@@ -30,13 +31,16 @@
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/sgimips/
  *
  * TODO:
- *   - IOC1 and CTL1
- *   - graphics, audio
+ *   - graphics, audio, printer
+ *   - devicify ioc1 and ctl1
  *
  * Status:
  *   - parity and cache diagnostics fail
- *   - boots monitor and fx/sash from cdrom or network
- *   - hangs after booting irix from miniroot
+ *   - irix 4.0.5 working
+ *   - ide test failures
+ *     - lca2 (unimplemented fpga program/readback)
+ *     - nvram4 (security mode?)
+ *     - fpu (cvt.?.? invalid operation exceptions)
  */
 
 #include "emu.h"
@@ -62,7 +66,7 @@
 #include "bus/rs232/hlemouse.h"
 
 // video and audio
-#include "screen.h"
+#include "video/sgi_gr1.h"
 
 #define LOG_GENERAL (1U << 0)
 
@@ -83,6 +87,7 @@ public:
 		, m_enet(*this, "enet")
 		, m_duart(*this, "duart%u", 0U)
 		, m_serial(*this, "serial%u", 1U)
+		, m_gfx(*this, "gfx")
 		, m_leds(*this, "led%u", 0U)
 	{
 	}
@@ -99,10 +104,11 @@ private:
 
 	required_device<dp8573_device> m_rtc;
 	required_device<pit8254_device> m_pit;
-	required_device<wd33c93_device> m_scsi;
+	required_device<wd33c9x_base_device> m_scsi;
 	required_device<am7990_device> m_enet;
 	required_device_array<scn2681_device, 2> m_duart;
 	required_device_array<rs232_port_device, 2> m_serial;
+	required_device<sgi_gr1_device> m_gfx;
 
 	enum leds : unsigned
 	{
@@ -110,8 +116,9 @@ private:
 		LED_CPU = 1, // cpu activity
 		LED_GFX = 2, // graphics
 		LED_FPU = 3, // fpu present
+		LED_CON = 4, // console
 	};
-	output_finder<4> m_leds;
+	output_finder<5> m_leds;
 
 	void common(machine_config &config);
 	void map(address_map &map);
@@ -120,18 +127,29 @@ private:
 	void lio_interrupt(unsigned number, int state);
 	void scsi_drq(int state);
 
-	u8 ctl_sid_r();
+	u8 sysid_r();
 
-	enum ctl_sid_mask : u8
+	u32 buserror_r(offs_t offset)
 	{
-		SID_SERDATA = 0x01, // serial memory data output state
-		SID_FPPRES  = 0x02, // floating point processor present
-		SID_SERCLK  = 0x04, // serial memory clock
-		SID_GDMAERR = 0x08, // error in graphics dma
-		SID_GDMAEN  = 0x10, // graphics dma busy
-		SID_GDMARDY = 0x20, // asserted at end of graphics dma
-		SID_GDMARST = 0x40, // asserted in reset of graphics dma
-		SID_VMERMW  = 0x80, // asserted in vme read-modify-write
+		m_cpu->berr_w(1);
+		return 0;
+	}
+	void buserror_w(offs_t offset, u32 data, u32 mem_mask)
+	{
+		m_cpu->set_input_line(INPUT_LINE_IRQ5, 1);
+	}
+
+	enum sysid_mask : u8
+	{
+		SYSID_SERDATA = 0x01, // serial memory data output state
+		SYSID_FPPRES  = 0x02, // floating point processor present (active low)
+		SYSID_SERCLK  = 0x04, // serial memory clock
+		SYSID_VMEFBT  = 0x04, // vme fast bus timeout
+		SYSID_GDMAERR = 0x08, // error in graphics dma
+		SYSID_GDMAEN  = 0x10, // graphics dma busy
+		SYSID_GDMARDY = 0x20, // asserted at end of graphics dma
+		SYSID_GDMARST = 0x40, // asserted in reset of graphics dma
+		SYSID_VMERMW  = 0x80, // asserted in vme read-modify-write
 	};
 
 	enum lio_int_number : unsigned
@@ -148,153 +166,278 @@ private:
 		LIO_VRSTAT = 9, // vert retrace status: no interrupt
 	};
 
-	enum mem_cfg_mask : u8
+	enum memcfg_mask : u8
 	{
-		MCF_4MRAM    = 0x10,
-		MCF_MEMSIZE  = 0x1f,
-		MCF_TIMERDIS = 0x20, // reduce peripheral r/w strobe
-		MCF_FMEM     = 0x40, // reduce cas pulse on reads
-		MCF_REFDIS   = 0x80, // disable memory refresh
+		MEMCFG_MEMSIZE  = 0x0f, // (n+1)/16 memory populated
+		MEMCFG_4MRAM    = 0x10, // 4M DRAMs
+		MEMCFG_TIMERDIS = 0x20, // disable timer (active low)
+		MEMCFG_FMEM     = 0x40, // reduce cas pulse on reads
+		MEMCFG_REFDIS   = 0x80, // disable memory refresh (active low)
 	};
 
-	enum aux_ctl_mask : u8
+	enum cpuctrl_mask : u16
 	{
-		AUX_LED = 0x0f, // diagnostic leds
-		AUX_PE  = 0x10, // console led/eeprom program enable
-		AUX_CS  = 0x20, // eeprom chip select
-		AUX_CLK = 0x40, // serial clock
-		AUX_GR  = 0x80, // graphics reset
+		CPUCTRL_SERDATA = 0x0100, // serial memory data out
+		CPUCTRL_SIN     = 0x0200, // system init (reset)
+		CPUCTRL_RPAR    = 0x0400, // enable parity checking
+		CPUCTRL_SLA     = 0x0800, // enable slave accesses
+		CPUCTRL_ARB     = 0x1000, // enable vme arbiter
+		CPUCTRL_BAD     = 0x2000, // write bad parity
+		CPUCTRL_DOG     = 0x4000, // enable watchdog timer
+		CPUCTRL_FPER    = 0x8000, // fast peripheral cycle
 	};
 
-	u8 m_mem_cfg;
-	u8 m_ctl_sid;
+	enum cpuauxctl_mask : u8
+	{
+		CPUAUXCTRL_LED = 0x0f, // diagnostic leds (active low)
+		CPUAUXCTRL_PE  = 0x10, // console led (active low)
+		CPUAUXCTRL_CS  = 0x20, // eeprom chip select
+		CPUAUXCTRL_CLK = 0x40, // serial clock
+		CPUAUXCTRL_GR  = 0x80, // graphics reset (active low)
+	};
+
+	u8 m_memcfg;
+	u8 m_sysid;
 	u8 m_vme_isr;
 	u8 m_vme_imr;
-	u8 m_aux_ctl;
-	u16 m_ctl_cpuctrl;
+	u16 m_cpuctrl;
+	u8 m_cpuauxctl;
+	u32 m_erradr;
+	u32 m_refadr;
 	attotime m_refresh_timer;
+
+	enum parerr_mask : u8
+	{
+		PARERR_GDMA  = 0x01,
+		PARERR_DMA   = 0x02,
+		PARERR_CPU   = 0x04,
+		PARERR_VME   = 0x08,
+		PARERR_BYTE  = 0xf0,
+	};
+	u8 m_parerr;
 
 	u16 m_lio_isr;
 	u8 m_lio_imr;
 	bool m_lio_int;
 
-	u16 m_scsi_dmalo;
-	unsigned m_scsi_dmapage;
-	std::unique_ptr<u16 []> m_dma_map;
+	u16 m_dmalo;
+	u8 m_mapindex;
+	std::unique_ptr<u16 []> m_dmahi;
+	offs_t m_dmaaddr;
 };
 
 void pi4d2x_state::map(address_map &map)
 {
+	// silence local memory
+	map(0x00000000, 0x0fffffff).noprw();
+
+	// vme address space produces bus errors by default
+	map(0x10000000, 0x1effffff).rw(FUNC(pi4d2x_state::buserror_r), FUNC(pi4d2x_state::buserror_w));
+
+	// TODO: 1 32-bit 6U VME slot
 	//map(0x10000000, 0x1bffffff); // vme a32 modifier 0x09 non-privileged
 	//map(0x1c000000, 0x1cffffff); // vme a24 modifier 0x3d privileged
+	//map(0x1d000000, 0x1d0fffff); // vme a16 modifier 0x2d privileged
+	//map(0x1d100000, 0x1d1fffff); // vme a16 modifier 0x29 non-privileged
+	//map(0x1df00000, 0x1dffffff).umask32(0x0000ff00); // VME_IACK: vme interrupt acknowledge
 	//map(0x1e000000, 0x1effffff); // vme a24 modifier 0x39 non-privileged
-	//map(0x1d000000, 0x1d00ffff); // vme a16 modifier 0x2d privileged
-	//map(0x1d100000, 0x1d10ffff); // vme a16 modifier 0x29 non-privileged
 
-	//map(0x1df00000, 0x1df00003).umask32(0x0000ff00); // VME_IACK: vme interrupt acknowledge
+	//map(0x1f000000, 0x1fbfffff); // local I/O (duarts, timers, etc.)
+	map(0x1f000000, 0x1f007fff).m(m_gfx, FUNC(sgi_gr1_device::map)).mirror(0x8000);
 
-	map(0x1f800000, 0x1f800003).lw8("mem_cfg", [this](u8 data) { m_mem_cfg = data; }).umask32(0xff000000);
-	map(0x1f800000, 0x1f800003).r(FUNC(pi4d2x_state::ctl_sid_r)).umask32(0x00ff0000);
+	map(0x1f800000, 0x1f800003).lrw8("memcfg", [this]() { return m_memcfg; }, [this](u8 data) { m_memcfg = data; }).umask32(0xff000000);
+	map(0x1f800000, 0x1f800003).r(FUNC(pi4d2x_state::sysid_r)).umask32(0x00ff0000);
 
 	map(0x1f840000, 0x1f840003).lrw8("vme_isr", [this]() { return m_vme_isr; }, [this](u8 data) { m_vme_isr = data; }).umask32(0x000000ff);
 	map(0x1f840008, 0x1f84000b).lrw8("vme_imr", [this]() { return m_vme_imr; }, [this](u8 data) { m_vme_imr = data; }).umask32(0x000000ff);
 
-	map(0x1f880000, 0x1f880003).lrw16("ctl_cpuctrl",
+	map(0x1f880000, 0x1f880003).lrw16("cpuctrl",
 		[this]()
 		{
-			return m_ctl_cpuctrl;
+			return m_cpuctrl;
 		},
 		[this](u16 data)
 		{
 			m_eeprom->di_write(BIT(data, 8));
 
-			//BIT(data, 9); // reset system
+			// reset system
+			if (BIT(data, 9))
+				machine().schedule_soft_reset();
+
 			//BIT(data, 10); // enable parity checking
 			//BIT(data, 11); // enable slave accesses
 			//BIT(data, 12); // enable vme arbiter
 			//BIT(data, 13); // write bad parity
-			//BIT(data, 14); // watchdog enable
-			//BIT(data, 15); // unused/fast peripheral cycle?
+			//BIT(data, 14); // enable watchdog timer
+			//BIT(data, 15); // fast peripheral cycle
 
-			m_ctl_cpuctrl = data;
+			m_cpuctrl = data;
 		}).umask32(0x0000ffff);
 	//map(0x1f8c0000, 0x1f8c0003); // lca readback trigger (b)
-	map(0x1f8e0000, 0x1f8e0003).lrw8("aux_ctl",
+	map(0x1f8e0000, 0x1f8e0003).lrw8("cpuauxctrl",
 		[this]()
 		{
-			return m_aux_ctl;
+			return m_cpuauxctl;
 		},
 		[this](u8 data)
 		{
 			// cpu leds
-			m_leds[LED_HBT] = BIT(data, 0);
-			m_leds[LED_CPU] = BIT(data, 1);
-			m_leds[LED_GFX] = BIT(data, 2);
-			m_leds[LED_FPU] = BIT(data, 3);
+			m_leds[LED_HBT] = !BIT(data, 0);
+			m_leds[LED_CPU] = !BIT(data, 1);
+			m_leds[LED_GFX] = !BIT(data, 2);
+			m_leds[LED_FPU] = !BIT(data, 3);
 
-			//BIT(data, 4); // console led(?) & eeprom program enable
+			// console led
+			m_leds[LED_CON] = !BIT(data, 4);
+
+			// serial eeprom chip select and clock out
 			m_eeprom->cs_write(BIT(data, 5));
 			m_eeprom->clk_write(BIT(data, 6));
-			//BIT(data, 7); // gfx_reset: reset graphics subsystem
 
-			m_aux_ctl = data;
+			m_gfx->reset_w(BIT(data, 7));
+
+			m_cpuauxctl = data;
 		}).umask32(0xff000000);
 
-		map(0x1f900000, 0x1f900003).lrw16("scsi_dmalo_addr", [this]() { return m_scsi_dmalo; }, [this](u16 data) { m_scsi_dmalo = data; m_scsi_dmapage = 0; }).umask32(0x0000ffff);
+	map(0x1f900000, 0x1f900003).lrw16("dmalo",
+		[this]()
+		{
+			return m_dmalo;
+		},
+		[this](u16 data)
+		{
+			m_dmalo = data;
+			m_mapindex = 0;
+
+			m_dmaaddr = (u32(m_dmahi[m_mapindex]) << 12) | (m_dmalo & 0x0ffc);
+		}).umask32(0x0000ffff);
+
+	map(0x1f910000, 0x1f910003).lrw8("mapindex",
+		[this]()
+		{
+			return m_mapindex;
+		},
+		[this](u8 data)
+		{
+			m_mapindex = data;
+		}).umask32(0x000000ff);
 
 	/*
 	 * DMA address mapping table is a pair of CY7C128-35PC 2048x8 SRAMs which
 	 * read/write to data bus D27-12. A10 is tied high, giving 1024 entries.
 	 */
-	map(0x1f920000, 0x1f920fff).lrw16("dma_map",
+	map(0x1f920000, 0x1f920fff).lrw16("dmahi",
 		[this](offs_t offset)
 		{
-			return m_dma_map[offset];
+			return m_dmahi[offset];
 		},
 		[this](offs_t offset, u16 data, u16 mem_mask)
 		{
-			mem_mask &= 0x0fff;
-			COMBINE_DATA(&m_dma_map[offset]);
+			COMBINE_DATA(&m_dmahi[offset]);
 		}).umask32(0x0000ffff);
 
-	//map(0x1f940000, 0x1f940003).umask32(?); // scsi_flush_addr
+	// emulation can ignore dma flush
+	map(0x1f940000, 0x1f940003).nopw();
 
 	map(0x1f950000, 0x1f9501ff).rw(m_enet, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff0000);
-	map(0x1f960000, 0x1f960007).lr8("enet_reset", [this](offs_t offset) { m_enet->reset_w(!offset); return 0; }).umask32(0xff000000);
+	map(0x1f960000, 0x1f960003).lr8("etherrdy", [this]() { m_enet->reset_w(1); return 0; }).umask32(0xff000000);
+	map(0x1f960004, 0x1f960007).lr8("etherrst", [this]() { m_enet->reset_w(0); return 0; }).umask32(0xff000000);
+	//map(0x1f960008, 0x1f96000b).rw().umask32(0xff000000); // etherwait: wait state control
 
 	map(0x1f980000, 0x1f980003).lr16("lio_isr", [this]() { return m_lio_isr; }).umask32(0x0000ffff);
-	map(0x1f980008, 0x1f98000b).lrw8("lio_imr", [this]() { return m_lio_imr; }, [this](u8 data) { m_lio_imr = data; }).umask32(0x000000ff);
+	map(0x1f980008, 0x1f98000b).lrw8("lio_imr",
+		[this]()
+		{
+			return m_lio_imr;
+		},
+		[this](u8 data)
+		{
+			m_lio_imr = data;
+
+			// update interrupt line
+			bool const lio_int = ~m_lio_isr & m_lio_imr;
+			if (m_lio_imr ^ lio_int)
+			{
+				m_lio_int = lio_int;
+				m_cpu->set_input_line(INPUT_LINE_IRQ1, m_lio_int);
+			}
+		}).umask32(0x000000ff);
+
+	// 1 0 a7 a6 a5 a4 a3 a2 a1 a0 1 0  lance dmahi
+	// 0 0 a7 a6 a5 a4 a3 a2 a1 a0 1 0  scsi dmahi
+	// 0 1 a7 a6 a5 a4 a3 a2 a1 a0 1 0  printer/audio dmahi
+
+	// TODO: printer/audio
+	//map(0x1f970000, 0x1f970003).r().umask32(0x00ff0000); // pbstat - printer byte status
+	//map(0x1f9c0000, 0x1f9c0003).rw().umask32(0x0000ffff); // prdmact - dma byte count
+	//map(0x1f9c0004, 0x1f9c0007).w().umask32(0x00ff0000); // aogndac - audio output gain
+	//map(0x1f9c0104, 0x1f9c0107).w().umask32(0x00ff0000);
+	//map(0x1f9c0204, 0x1f9c0207).r().umask32(0x00ff0000); // prdmast - dma status
+	//map(0x1f9c0304, 0x1f9c0307).r().umask32(0x00ff0000); // a/dreg - a/d i/o
+	//map(0x1f9d0000, 0x1f9d0003).w().umask32(?); // pchrld - reload registers
+	//map(0x1f9d0004, 0x1f9d0007).rw().umask32(0x0000ffff); // prdmalo - dma low addr reg
+	//map(0x1f9e0000, 0x1f9e0003).rw().umask32(0x000000ff); // mapindex - printer map index (5-bit)
+	//map(0x1f9e0004, 0x1f9e0007).w().umask32(0xff000000); // dmastop
+	//map(0x1f9e0008, 0x1f9e000b).w().umask32(?); // prswack - soft ack
+	//map(0x1f9e000c, 0x1f9e000f).w().umask32(0xff000000); // dmastart
+	//map(0x1f9f0000, 0x1f9f0003).r().umask32(0xff000000); // prdy - turn off reset
+	//map(0x1f9f0004, 0x1f9f0007).r().umask32(0xff000000); // prst - turn on reset
+	//map(0x1f9f0008, 0x1f9f000b).rw().umask32(0x0000ffff); // prdmacn - dma control
+	//map(0x1f9f000c, 0x1f9f000f).rw().umask32(0xffffffff); // prdmadr - dma data reg
+
+	// HACK: pass diagnostic iom3: ioc multiplexer registers test
+	map(0x1f9c0000, 0x1f9c0003).ram().umask32(0x0000ffff);
+	map(0x1f9d0004, 0x1f9d0007).ram().umask32(0x0000ffff);
+	map(0x1f9e0000, 0x1f9e0003).ram().umask32(0x000000ff);
+	map(0x1f9f000c, 0x1f9f000f).ram().umask32(0xffffffff);
 
 	map(0x1fa00000, 0x1fa00003).lr8("timer1_ack", [this]() { m_cpu->set_input_line(INPUT_LINE_IRQ4, 0); return 0; }).umask32(0xff000000);
 	map(0x1fa20000, 0x1fa20003).lr8("timer0_ack", [this]() { m_cpu->set_input_line(INPUT_LINE_IRQ2, 0); return 0; }).umask32(0xff000000);
 
-	//map(0x1fa40000, 0x1fa40000); // system bus error address
-	map(0x1fa40004, 0x1fa40007).lrw32("refresh_timer",
+	map(0x1fa40000, 0x1fa40003).lr32("erradr", [this]() { m_cpu->set_input_line(INPUT_LINE_IRQ5, 0); m_cpu->berr_w(0); return m_erradr; });
+
+	map(0x1fa40004, 0x1fa40007).lrw32("refadr",
 		[this]()
 		{
-			return u32((machine().time() - m_refresh_timer).as_attoseconds() / ATTOSECONDS_PER_NANOSECOND);
+			if (m_memcfg & MEMCFG_TIMERDIS)
+			{
+				// refresh cycle is generated every 64μs
+				u64 const refreshes = (machine().time() - m_refresh_timer).as_ticks(15.625_kHz_XTAL);
+
+				// each refresh cycle generates 4 sequential accesses
+				// TODO: should the other factor be 1024 for 1M DRAM?
+				return u32(m_refadr + refreshes * 4096 * 4);
+			}
+			else
+				return m_refadr;
 		},
 		[this](u32 data)
 		{
-			m_refresh_timer = machine().time() - attotime::from_nsec(data);
+			m_refadr = data;
+			m_refresh_timer = machine().time();
 		});
 
 	//map(0x1fa40008, 0x1fa4000b); // GDMA_DABR_PHYS descriptor array base register
 	//map(0x1fa4000c, 0x1fa4000f); // GDMA_BUFADR_PHYS buffer address register
-	//map(0x1fa40010, 0x1fa400013).umask32(0xffff0000); // GDMA_BURST_PHYS burst/delay register
-	//map(0x1fa40010, 0x1fa400013).umask32(0x0000ffff); // GDMA_BUFLEN_PHYS buffer length register
+	map(0x1fa40010, 0x1fa40013).nopw().umask32(0xffff0000); // GDMA_BURST_PHYS burst/delay register (FIXME: silenced)
+	//map(0x1fa40010, 0x1fa40013).umask32(0x0000ffff); // GDMA_BUFLEN_PHYS buffer length register
 
-	//map(0x1fa60000, 0x1fa600003); // VMA_RMW_ADDR
+	map(0x1fa60000, 0x1fa60003).lrw8("vmermw", [this]() { m_sysid |= SYSID_VMERMW; return 0; }, [this](u8 data) { m_sysid |= SYSID_VMERMW; }).umask32(0xff000000);
+	//map(0x1fa60004, 0x1fa60007).rw("actpup").umask32(0xff000000); // turn on active bus pullup
+	map(0x1fa60018, 0x1fa6001b).lrw8("vmefbon", [this]() { m_sysid |= SYSID_VMEFBT; return 0; }, [this](u8 data) { m_sysid |= SYSID_VMEFBT; }).umask32(0xff000000);
+	map(0x1fa6001c, 0x1fa6001f).lrw8("vmefbof", [this]() { m_sysid &= ~SYSID_VMEFBT; return 0; }, [this](u8 data) { m_sysid &= ~SYSID_VMEFBT; }).umask32(0xff000000);
+	map(0x1fa60020, 0x1fa60023).nopr(); // reload gfx dma burst/delay reg (FIXME: silenced)
+	//map(0x1fa60024, 0x1fa60027).rw("enraso").umask32(0xff000000); // enable ctl ras decoder
 
-	map(0x1fa80000, 0x1fa80007).lr32("scsi_reset", [this](offs_t offset) { m_scsi->reset_w(!!offset); return 0; });
+	map(0x1fa80000, 0x1fa80003).lr8("scsirdy", [this]() { m_scsi->reset_w(0); return 0; }).umask32(0xff000000);
+	map(0x1fa80004, 0x1fa80007).lr8("scsirst", [this]() { m_scsi->reset_w(1); return 0; }).umask32(0xff000000);
+	map(0x1fa80008, 0x1fa8000b).lr8("scsibstat", []() { return 0; }).umask32(0x00ff0000);
 
-	//map(0x1fa80008, 0x1fa8000b); // IOC2 configuration register, bus error on IOC1
+	// TODO: IOC2 configuration register, bus error on IOC1
+	//map(0x1fa80008, 0x1fa8000b).rw(FUNC(pi4d2x_state::buserror_r), FUNC(pi4d2x_state::buserror_w));
 
-	//map(0x1faa0000, 0x1faa0003).umask32(0xff000000); // clear lan access bit
-	//map(0x1faa0000, 0x1faa0003).umask32(0x00ff0000); // clear dma access bit
-	//map(0x1faa0000, 0x1faa0003).umask32(0x0000ff00); // clear cpu access bit
-	//map(0x1faa0000, 0x1faa0003).umask32(0x000000ff); // clear vme access bit
-	//map(0x1faa0004, 0x1faa0007).umask32(0x00ff0000); // parity error register
+	map(0x1faa0000, 0x1faa0003).lrw8("clrerr", [this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); return 0; }, [this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); });
+	map(0x1faa0004, 0x1faa0007).lr8("parerr", [this]() { return m_parerr; }).umask32(0x00ff0000);
 
 	map(0x1fb00000, 0x1fb00003).rw(m_scsi, FUNC(wd33c93_device::indir_addr_r), FUNC(wd33c93_device::indir_addr_w)).umask32(0x00ff0000);
 	map(0x1fb00100, 0x1fb00103).rw(m_scsi, FUNC(wd33c93_device::indir_reg_r), FUNC(wd33c93_device::indir_reg_w)).umask32(0x00ff0000);
@@ -314,6 +457,9 @@ void pi4d2x_state::map(address_map &map)
 	map(0x1fbc0000, 0x1fbc007f).rw(m_rtc, FUNC(dp8573_device::read), FUNC(dp8573_device::write)).umask32(0xff000000);
 
 	map(0x1fc00000, 0x1fc3ffff).rom().region("boot", 0);
+
+	// unused memory address space produces bus errors
+	map(0x40000000, 0xffffffff).rw(FUNC(pi4d2x_state::buserror_r), FUNC(pi4d2x_state::buserror_w));
 }
 
 static void scsi_devices(device_slot_interface &device)
@@ -328,8 +474,8 @@ static void scsi_devices(device_slot_interface &device)
 
 void pi4d2x_state::pi4d20(machine_config &config)
 {
-	R2000A(config, m_cpu, 25_MHz_XTAL / 2, 16384, 8192);
-	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
+	R3000(config, m_cpu, 25_MHz_XTAL / 2, 16384, 8192);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010);
 
 	common(config);
 }
@@ -348,7 +494,7 @@ void pi4d2x_state::common(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &pi4d2x_state::map);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
-	// 16 SIMM slots with 1, 2 or 4MB SIMMs installed in sets of 4
+	// 16 SIMM slots with 1, 2? or 4MB SIMMs installed in sets of 4
 	RAM(config, m_ram);
 	m_ram->set_default_size("16M");
 	m_ram->set_extra_options("4M,8M,12M,32M,48M,64M");
@@ -360,8 +506,8 @@ void pi4d2x_state::common(machine_config &config)
 
 	PIT8254(config, m_pit);
 	m_pit->set_clk<2>(3.6864_MHz_XTAL);
-	m_pit->out_handler<0>().set_inputline(m_cpu, INPUT_LINE_IRQ2);
-	m_pit->out_handler<1>().set_inputline(m_cpu, INPUT_LINE_IRQ4);
+	m_pit->out_handler<0>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ2, 1); });
+	m_pit->out_handler<1>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ4, 1); });
 	m_pit->out_handler<2>().set(m_pit, FUNC(pit8254_device::write_clk0));
 	m_pit->out_handler<2>().append(m_pit, FUNC(pit8254_device::write_clk1));
 
@@ -369,7 +515,7 @@ void pi4d2x_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0").option_set("wd33c93", WD33C93).machine_config(
 		[this](device_t *device)
 		{
-			wd33c93_device &wd33c93(downcast<wd33c93_device &>(*device));
+			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
 
 			wd33c93.set_clock(10000000);
 			wd33c93.irq_cb().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_SCSI>)).invert();
@@ -388,16 +534,16 @@ void pi4d2x_state::common(machine_config &config)
 	m_enet->dma_in().set(
 		[this](offs_t offset)
 		{
-			unsigned const page = 0x200 + (offset >> 12);
-			u32 const address = (u32(m_dma_map[page]) << 12) | (offset & 0xfff);
+			unsigned const page = 0x200 + ((offset >> 12) & 0xff);
+			u32 const address = (u32(m_dmahi[page]) << 12) | (offset & 0xfff);
 
 			return m_cpu->space(0).read_word(address);
 		});
 	m_enet->dma_out().set(
 		[this](offs_t offset, u16 data, u16 mem_mask)
 		{
-			unsigned const page = 0x200 + (offset >> 12);
-			u32 const address = (u32(m_dma_map[page]) << 12) | (offset & 0xfff);
+			unsigned const page = 0x200 + ((offset >> 12) & 0xff);
+			u32 const address = (u32(m_dmahi[page]) << 12) | (offset & 0xfff);
 
 			m_cpu->space(0).write_word(address, data, mem_mask);
 		});
@@ -423,7 +569,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	// duart 1 (serial ports)
 	SCN2681(config, m_duart[1], 3.6864_MHz_XTAL); // SCN2681AC1N40
-	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
 
 	// duart 1 outputs
@@ -449,6 +595,23 @@ void pi4d2x_state::common(machine_config &config)
 	m_serial[1]->rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_b_w));
 	m_serial[1]->cts_handler().set(m_duart[1], FUNC(scn2681_device::ip1_w));
 	m_serial[1]->dcd_handler().set(m_duart[1], FUNC(scn2681_device::ip2_w));
+
+	// graphics
+	SGI_GR12(config, m_gfx, 0);
+	m_gfx->out_vblank().set(
+		[this](int state)
+		{
+			if (state)
+				m_lio_isr |= (1U << LIO_VRSTAT);
+			else
+				m_lio_isr &= ~(1U << LIO_VRSTAT);
+
+			lio_interrupt<LIO_VR>(!state);
+		});
+	m_gfx->out_int_ge().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_GE>)).invert();
+	m_gfx->out_int_fifo().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_FIFO>)).invert();
+
+	// TODO: vme slot, cpu interrupt 0
 }
 
 void pi4d2x_state::initialize()
@@ -456,7 +619,8 @@ void pi4d2x_state::initialize()
 	// map the configured ram
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
 
-	m_ctl_sid = SID_FPPRES;
+	m_memcfg = 0;
+	m_sysid = 0;
 
 	m_lio_isr = 0x3ff;
 	m_lio_imr = 0;
@@ -464,7 +628,7 @@ void pi4d2x_state::initialize()
 
 	m_refresh_timer = machine().time();
 
-	m_dma_map = make_unique_clear<u16 []>(2048);
+	m_dmahi = make_unique_clear<u16 []>(2048);
 
 	m_leds.resolve();
 }
@@ -492,28 +656,22 @@ void pi4d2x_state::scsi_drq(int state)
 {
 	if (state)
 	{
-		u32 const address = (u32(m_dma_map[m_scsi_dmapage]) << 12) | (m_scsi_dmalo & 0x0fff);
-
-		if (m_scsi_dmalo & 0x8000)
-			m_cpu->space(0).write_byte(address, m_scsi->dma_r());
+		if (m_dmalo & 0x8000)
+			m_cpu->space(0).write_byte(m_dmaaddr++, m_scsi->dma_r());
 		else
-			m_scsi->dma_w(m_cpu->space(0).read_byte(address));
+			m_scsi->dma_w(m_cpu->space(0).read_byte(m_dmaaddr++));
 
-		m_scsi_dmalo = (m_scsi_dmalo & 0xf000) | ((m_scsi_dmalo + 1) & 0x0fff);
-		if (!(m_scsi_dmalo & 0x0fff))
-			m_scsi_dmapage++;
+		if (!(m_dmaaddr & 0xfff))
+			m_dmaaddr = u32(m_dmahi[++m_mapindex]) << 12;
 	}
 }
 
-u8 pi4d2x_state::ctl_sid_r()
+u8 pi4d2x_state::sysid_r()
 {
-	u8 data = m_ctl_sid;
+	u8 data = m_sysid;
 
 	if (m_eeprom->do_read())
-		data |= SID_SERDATA;
-
-	if (m_aux_ctl & AUX_CLK)
-		data |= SID_SERCLK;
+		data |= SYSID_SERDATA;
 
 	return data;
 }

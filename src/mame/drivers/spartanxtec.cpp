@@ -28,6 +28,7 @@ probably an original bug?
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class spartanxtec_state : public driver_device

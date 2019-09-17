@@ -63,8 +63,8 @@ struct zeus2_poly_extra_data
 *  Macros
 *************************************/
 
-#define WAVERAM_BLOCK0(blocknum)                ((void *)((uint8_t *)waveram + 8 * (blocknum)))
-#define WAVERAM_BLOCK0_EXT(blocknum)                ((void *)((uint8_t *)m_state->waveram + 8 * (blocknum)))
+#define WAVERAM_BLOCK0(blocknum)                ((void *)((uint8_t *)m_waveram.get() + 8 * (blocknum)))
+#define WAVERAM_BLOCK0_EXT(blocknum)            ((void *)((uint8_t *)m_state->m_waveram.get() + 8 * (blocknum)))
 
 #define WAVERAM_PTR8(base, bytenum)             ((uint8_t *)(base) + BYTE4_XOR_LE(bytenum))
 #define WAVERAM_READ8(base, bytenum)            (*WAVERAM_PTR8(base, bytenum))
@@ -124,7 +124,7 @@ public:
 	uint32_t m_zeusbase[0x80];
 	uint32_t m_renderRegs[0x50];
 
-	zeus2_renderer* poly;
+	std::unique_ptr<zeus2_renderer> poly;
 
 	rectangle zeus_cliprect;
 
@@ -136,7 +136,7 @@ public:
 	int zeus_quad_size;
 	bool m_useZOffset;
 
-	uint32_t *waveram;
+	std::unique_ptr<uint32_t[]> m_waveram;
 	std::unique_ptr<uint32_t[]> m_frameColor;
 	std::unique_ptr<int32_t[]> m_frameDepth;
 	uint32_t m_pal_table[0x100];

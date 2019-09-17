@@ -184,7 +184,7 @@ namespace devices
 			{
 				// FIXME: use pstonum_ne
 				//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
-				pati[i] = plib::pstonum<std::int64_t, true>(pat[i]);
+				pati[i] = plib::pstonum<std::int64_t>(pat[i]);
 				total += pati[i];
 			}
 			netlist_time ttotal = netlist_time::zero();

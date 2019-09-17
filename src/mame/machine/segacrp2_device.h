@@ -27,6 +27,14 @@ protected:
 
 
 // actual encrypted CPUs
+class nec_315_5136_device : public segacrp2_z80_device
+{
+public:
+	nec_315_5136_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+protected:
+	virtual void decrypt() override;
+};
+
 class sega_315_5179_device : public segacrp2_z80_device
 {
 public:
@@ -103,6 +111,7 @@ protected:
 };
 
 
+DECLARE_DEVICE_TYPE(NEC_315_5136,  nec_315_5136_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5179, sega_315_5179_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5178, sega_315_5178_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5177, sega_315_5177_device)

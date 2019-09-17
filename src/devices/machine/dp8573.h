@@ -21,16 +21,16 @@ public:
 
 	dp8573_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
+	void pfail_w(int state) {}
 
-	auto irq() { return m_irq.bind(); }
-	auto power_fail() { return m_pfail.bind(); }
+	auto intr() { return m_intr_cb.bind(); }
+	auto mfo() { return m_mfo_cb.bind(); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_nvram_interface overrides
@@ -38,6 +38,7 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
+	void sync_time();
 	void save_registers();
 	void set_interrupt(uint8_t mask);
 	void clear_interrupt(uint8_t mask);
@@ -51,7 +52,7 @@ protected:
 		REG_OMR             = 0x02, // Not Applicable / Output Mode Register
 		REG_PFR_ICR0        = 0x03, // Periodic Flag Register / Interrupt Control Register 0
 		REG_TSCR_ICR1       = 0x04, // Time Save Control Register / Interrupt Control Register 1
-		REG_HUNDREDTH       = 0x05, // Hundredths and Teneths of a Second (0-99)
+		REG_HUNDREDTH       = 0x05, // Hundredths and Tenths of a Second (0-99)
 		REG_SECOND          = 0x06, // Seconds (0-59)
 		REG_MINUTE          = 0x07, // Minutes (0-59)
 		REG_HOUR            = 0x08, // Hours (1-12, 0-23)
@@ -139,8 +140,8 @@ protected:
 
 	emu_timer *m_timer;
 
-	devcb_write_line m_irq;
-	devcb_write_line m_pfail;
+	devcb_write_line m_intr_cb;
+	devcb_write_line m_mfo_cb;
 };
 
 DECLARE_DEVICE_TYPE(DP8573, dp8573_device)

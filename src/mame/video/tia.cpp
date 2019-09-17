@@ -22,24 +22,23 @@ static const int nusiz[8][3] =
 	{ 1, 4, 0 }
 };
 
-static void extend_palette(palette_device &palette) {
-	int i,j;
-
-	for( i = 0; i < 128; i ++ )
+void tia_video_device::extend_palette()
+{
+	for (int i = 0; i < 128; i++)
 	{
-		rgb_t   new_rgb = palette.pen_color( i );
+		rgb_t   new_rgb = pen_color( i );
 		uint8_t   new_r =  new_rgb .r();
 		uint8_t   new_g =  new_rgb .g();
 		uint8_t   new_b =  new_rgb .b();
 
-		for ( j = 0; j < 128; j++ )
+		for (int j = 0; j < 128; j++)
 		{
-			rgb_t   old_rgb = palette.pen_color( j );
+			rgb_t   old_rgb = pen_color( j );
 			uint8_t   old_r =  old_rgb .r();
 			uint8_t   old_g =  old_rgb .g();
 			uint8_t   old_b =  old_rgb .b();
 
-			palette.set_pen_color(( ( i + 1 ) << 7 ) | j,
+			set_pen_color(( ( i + 1 ) << 7 ) | j,
 				( new_r + old_r ) / 2,
 				( new_g + old_g ) / 2,
 				( new_b + old_b ) / 2 );
@@ -47,7 +46,7 @@ static void extend_palette(palette_device &palette) {
 	}
 }
 
-void tia_ntsc_video_device::tia_ntsc_palette(palette_device &palette) const
+void tia_ntsc_video_device::init_palette()
 {
 	/********************************************************************
 	Atari 2600 NTSC Palette Notes:
@@ -282,18 +281,18 @@ void tia_ntsc_video_device::tia_ntsc_palette(palette_device &palette) const
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette.set_pen_color(
+			set_pen_color(
 					8 * i + j,
 					uint8_t(255 * R + 0.5),
 					uint8_t(255 * G + 0.5),
 					uint8_t(255 * B + 0.5));
 		}
 	}
-	extend_palette(palette);
+	extend_palette();
 }
 
 
-void tia_pal_video_device::tia_pal_palette(palette_device &palette) const
+void tia_pal_video_device::init_palette()
 {
 	static constexpr double color[16][2] =
 	{
@@ -340,19 +339,20 @@ void tia_pal_video_device::tia_pal_palette(palette_device &palette) const
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette.set_pen_color(
+			set_pen_color(
 					8 * i + j,
 					uint8_t(255 * R + 0.5),
 					uint8_t(255 * G + 0.5),
 					uint8_t(255 * B + 0.5));
 		}
 	}
-	extend_palette(palette);
+	extend_palette();
 }
 
 tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
 	, m_read_input_port_cb(*this)
 	, m_databus_contents_cb(*this)
 	, m_vsync_cb(*this)
@@ -373,15 +373,6 @@ tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const 
 {
 }
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void tia_pal_video_device::device_add_mconfig(machine_config &config)
-{
-	PALETTE(config, "palette", FUNC(tia_pal_video_device::tia_pal_palette), TIA_PALETTE_LENGTH);
-}
-
 // device type definition
 DEFINE_DEVICE_TYPE(TIA_NTSC_VIDEO, tia_ntsc_video_device, "tia_ntsc_video", "TIA Video (NTSC)")
 
@@ -395,15 +386,6 @@ tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, cons
 }
 
 //-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void tia_ntsc_video_device::device_add_mconfig(machine_config &config)
-{
-	PALETTE(config, "palette", FUNC(tia_ntsc_video_device::tia_ntsc_palette), TIA_PALETTE_LENGTH);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -414,13 +396,14 @@ void tia_video_device::device_start()
 	m_databus_contents_cb.resolve();
 	m_vsync_cb.resolve();
 
+	init_palette();
 
 	int cx = screen().width();
 
 	screen_height = screen().height();
-	helper[0] = std::make_unique<bitmap_ind16>(cx, TIA_MAX_SCREEN_HEIGHT);
-	helper[1] = std::make_unique<bitmap_ind16>(cx, TIA_MAX_SCREEN_HEIGHT);
-	helper[2] = std::make_unique<bitmap_ind16>(cx, TIA_MAX_SCREEN_HEIGHT);
+	helper[0].allocate(cx, TIA_MAX_SCREEN_HEIGHT);
+	helper[1].allocate(cx, TIA_MAX_SCREEN_HEIGHT);
+	buffer.allocate(cx, TIA_MAX_SCREEN_HEIGHT);
 
 	register_save_state();
 }
@@ -430,10 +413,10 @@ void tia_video_device::device_start()
 //  screen_update -
 //-------------------------------------------------
 
-uint32_t tia_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tia_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen_height = screen.height();
-	copybitmap(bitmap, *helper[2], 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, buffer, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -969,7 +952,7 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 		if (collision_check(lineM0, lineM1, colx1, x2))
 			CXPPMM |= 0x40;
 
-		p = &helper[current_bitmap]->pix16(y % screen_height, 34);
+		p = &helper[current_bitmap].pix16(y % screen_height, 34);
 
 		for (x = x1; x < x2; x++)
 		{
@@ -978,17 +961,17 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 
 		if ( x2 == 160 && y % screen_height == (screen_height - 1) ) {
 			int t_y;
-			for ( t_y = 0; t_y < helper[2]->height(); t_y++ ) {
-				uint16_t* l0 = &helper[current_bitmap]->pix16(t_y);
-				uint16_t* l1 = &helper[1 - current_bitmap]->pix16(t_y);
-				uint16_t* l2 = &helper[2]->pix16(t_y);
+			for ( t_y = 0; t_y < buffer.height(); t_y++ ) {
+				uint16_t* l0 = &helper[current_bitmap].pix16(t_y);
+				uint16_t* l1 = &helper[1 - current_bitmap].pix16(t_y);
+				uint32_t* l2 = &buffer.pix32(t_y);
 				int t_x;
-				for( t_x = 0; t_x < helper[2]->width(); t_x++ ) {
+				for( t_x = 0; t_x < buffer.width(); t_x++ ) {
 					if ( l0[t_x] != l1[t_x] ) {
 						/* Combine both entries */
-						l2[t_x] = ( ( l0[t_x] + 1 ) << 7 ) | l1[t_x];
+						l2[t_x] = pen(( ( l0[t_x] + 1 ) << 7 ) | l1[t_x]);
 					} else {
-						l2[t_x] = l0[t_x];
+						l2[t_x] = pen(l0[t_x]);
 					}
 				}
 			}
@@ -1338,7 +1321,7 @@ WRITE8_MEMBER( tia_video_device::HMOVE_w )
 		}
 		if (curr_y < screen_height)
 		{
-			memset(&helper[current_bitmap]->pix16(curr_y, 34), 0, 16);
+			memset(&helper[current_bitmap].pix16(curr_y, 34), 0, 16);
 		}
 
 		prev_x = 8;
@@ -2256,4 +2239,7 @@ void tia_video_device::register_save_state()
 	save_item(NAME(HMBL_latch));
 	save_item(NAME(REFLECT));
 	save_item(NAME(NUSIZx_changed));
+	save_item(NAME(helper[0]));
+	save_item(NAME(helper[1]));
+	save_item(NAME(buffer));
 }

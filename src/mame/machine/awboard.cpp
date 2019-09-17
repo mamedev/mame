@@ -25,9 +25,10 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 
   Both low and high words of 32-bit offset from start of EPR-ROM area. Used for
   reading header and program code data, cannot be used for reading MPR-ROMs data.
-  During program code DMA transfer Romeo MCU perform data checksuming (decrypted data, in 8bit units),
-  result must match some CPLD / encryption key-specific value, otherwise MPR-ROM access
-  described below will not work correctly.
+  During program code DMA transfer Romeo ASIC perform data checksum - 8bit sum of
+  decrypted data bytes with swapped 4bit nibbles. Result must be equal to 8bit
+  decryption key provided by cartridge CPLD, otherwise MPR-ROM access described
+  below will not work.
   Game header (first 256 bytes of ROM) is not checksum protected.
 
  AW_MPR_RECORD_INDEX                                     Register addres: 0x5f700c
@@ -173,46 +174,38 @@ void aw_rom_board::submap(address_map &map)
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_g1_device(mconfig, AW_ROM_BOARD, tag, owner, clock)
 	, m_region(*this, DEVICE_SELF)
-	, m_keyregion(*this, finder_base::DUMMY_TAG)
 {
 }
 
 /*
-We are using 20 bits keys with the following subfields' structure:
-bits 0-15 is a 16-bits XOR
-bits 17-16 is a index to the sboxes table
-bits 19-18 is a index to the permutation table
+We are using 8 bits keys with the following subfields' structure:
+bits 0-3 is a index of 16-bits XOR (only 11 was used in known games)
+bits 4-5 is a index to the sboxes table
+bits 6-7 is a index to the permutation table
 
 These subfields could be differing from the "real" ones in the following ways:
+- Current keys equal to decrypted game code binary 8-bit sum (of each byte's swapped 4-bit nibbles)
 - Every one of the index subfields could be suffering an arbitrary bitswap and XOR
 - The 16-bits-XOR subfield could suffer an arbitrary XOR which could depend on the 4 index bits (that is: a different XOR per every index combination)
 - Of course, the way in which we are mixing 3 subfields in one only key is arbitrary too.
-
-The keys are stored as 32-bits big-endian values in a file.
 */
 
 
 const int aw_rom_board::permutation_table[4][16] =
 {
+	{14,1,11,15,7,3,8,13,0,4,2,12,6,10,5,9},
 	{8,10,1,3,7,4,11,2,5,15,6,0,12,13,9,14},
 	{4,5,9,6,1,13,7,11,10,0,14,12,8,15,2,3},
-	{12,7,11,2,0,5,15,6,1,8,14,4,9,13,3,10},
-	{14,1,11,15,7,3,8,13,0,4,2,12,6,10,5,9}
+	{12,7,11,2,0,5,15,6,1,8,14,4,9,13,3,10}
 };
 
 const aw_rom_board::sbox_set aw_rom_board::sboxes_table[4] =
 {
 	{
-		{4,12,8,14,16,30,31,0,23,29,24,21,11,22,27,5,3,20,18,26,10,7,17,1,28,6,15,13,2,9,25,19},
-		{13,1,0,9,5,12,4,14,3,15,2,10,11,6,8,7},
-		{7,13,4,6,5,9,3,2,0,15,12,10,8,11,1,14},
-		{4,0,1,2,5,7,3,6}
-	},
-	{
-		{3,0,14,17,10,15,31,20,13,2,29,28,9,18,25,27,6,19,30,22,7,12,1,16,23,11,24,4,8,26,21,5},
-		{2,10,6,9,11,13,4,5,3,15,7,14,12,1,0,8},
+		{11,8,6,25,2,7,23,28,5,10,21,20,1,26,17,19,14,27,22,30,15,4,9,24,31,3,16,12,0,18,29,13},
+		{13,5,9,6,4,2,11,10,12,0,8,1,3,14,15,7},
 		{1,13,11,3,8,7,9,10,12,15,4,14,0,5,6,2},
-		{6,5,0,3,7,1,4,2}
+		{3,0,5,6,2,4,1,7}
 	},
 	{
 		{9,15,28,7,13,24,2,23,21,1,22,16,18,8,17,31,27,6,30,12,4,20,5,19,0,25,3,29,10,14,11,26},
@@ -221,19 +214,30 @@ const aw_rom_board::sbox_set aw_rom_board::sboxes_table[4] =
 		{1,5,6,2,4,7,3,0}
 	},
 	{
-		{17,3,31,2,28,10,9,29,6,25,24,8,13,1,19,15,22,0,14,20,16,7,21,4,18,26,27,5,12,23,11,30},
-		{4,8,11,15,3,14,7,12,1,0,9,5,6,13,2,10},
-		{14,0,9,11,4,1,7,5,13,6,8,12,2,3,10,15},
-		{2,1,0,5,4,6,7,3}
+		{17,25,29,27,5,11,10,21,2,8,13,0,30,3,14,16,22,1,7,15,31,18,4,20,9,19,26,24,23,28,12,6},
+		{15,3,2,11,7,14,6,12,1,13,0,8,9,4,10,5},
+		{6,12,5,7,4,8,2,3,1,14,13,11,9,10,0,15},
+		{5,1,0,3,4,6,2,7}
 	},
+	{
+		{7,21,9,20,10,28,31,11,16,15,14,30,27,23,5,25,0,22,24,2,6,17,3,18,4,12,13,19,26,1,29,8},
+		{10,6,5,1,13,0,9,2,15,14,7,11,8,3,12,4},
+		{8,6,15,13,2,7,1,3,11,0,14,10,4,5,12,9},
+		{6,5,4,1,0,2,3,7}
+	}
 };
 
-uint16_t aw_rom_board::decrypt(uint16_t cipherText, uint32_t address, const uint32_t key)
+const int aw_rom_board::xor_table[16] =  // -1 = unknown/unused
+{
+	0x0000, -1, 0x97CF, 0x4BE3, 0x2255, 0x8DD6, -1, 0xC6A2, 0xA1E8, 0xB3BF, 0x3B1A, 0x547A, -1, 0x935F, -1, -1
+};
+
+uint16_t aw_rom_board::decrypt(uint16_t cipherText, uint32_t address, const uint8_t key)
 {
 	uint8_t b0,b1,b2,b3;
 	uint16_t aux;
-	const int* pbox = permutation_table[key>>18];
-	const sbox_set* ss = &sboxes_table[(key>>16)&3];
+	const int* pbox = permutation_table[key>>6];
+	const sbox_set* ss = &sboxes_table[(key>>4)&3];
 
 	aux = bitswap<16>(cipherText,
 					pbox[15],pbox[14],pbox[13],pbox[12],pbox[11],pbox[10],pbox[9],pbox[8],
@@ -250,25 +254,21 @@ uint16_t aw_rom_board::decrypt(uint16_t cipherText, uint32_t address, const uint
 	b2 = ss->S2[b2];
 	b3 = ss->S3[b3];
 
-	return ((b3<<13)|(b2<<9)|(b1<<5)|b0)^(key&0xffff);
-}
-
-void aw_rom_board::set_key()
-{
-	if (!m_keyregion.found())
-		return;
-
-	if (m_keyregion->bytes() != 4)
-		throw emu_fatalerror("AW-ROM-BOARD: key region %s has incorrect size (%d, expected 4)\n", m_keyregion.finder_tag(), m_keyregion->bytes());
-
-	const uint8_t *krp = m_keyregion->base();
-	rombd_key = (krp[0] << 24) | (krp[1] << 16) | (krp[2] << 8) | krp[3];
+	return ((b3<<13)|(b2<<9)|(b1<<5)|b0)^xor_table[key&0xf];
 }
 
 void aw_rom_board::device_start()
 {
 	naomi_g1_device::device_start();
-	set_key();
+
+	std::string skey = parameter("key");
+	if (!skey.empty())
+		rombd_key = strtoll(skey.c_str(), nullptr, 16);
+	else
+	{
+		logerror("%s: Warning: key not provided\n", tag());
+		rombd_key = 0;
+	}
 
 	mpr_offset = decrypt16(0x58/2) | (decrypt16(0x5a/2) << 16);
 

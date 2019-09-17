@@ -258,7 +258,7 @@ static INPUT_PORTS_START( corona )
 	PORT_INCLUDE( saitek_stratos )
 
 	PORT_MODIFY("IN.5")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CODE(KEYCODE_G) PORT_NAME("LCD Scroll")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("LCD Scroll")
 INPUT_PORTS_END
 
 
@@ -325,5 +325,5 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1990, corona,   0,       0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D+)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
-CONS( 1988, coronaa,  corona,  0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, corona,   0,       0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
+CONS( 1988, coronaa,  corona,  0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

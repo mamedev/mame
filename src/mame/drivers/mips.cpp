@@ -179,6 +179,23 @@
  *
  * Keyboard controller output port
  *  4: select 1M/4M SIMMs?
+ *
+ * PON failures
+ *   kseg0/kseg1 cache
+ *   instruction cache functionality (skipped)
+ *   instruction cache mats+ (skipped)
+ *   data cache block refill
+ *   instruction cache block refill (skipped)
+ *   scc - requires z80scc zero count interrupt
+ *   tod - loop <1 second real time?
+ *   color frame buffer (skipped)
+ *   dma controller chip
+ *   scsi controller chip
+ *   tlb (skipped) - all pass except tlb_n (requires cpu data cache)
+ *   exception (skipped)
+ *   parity
+ *   dma parity (skipped)
+ *   at serial board (skipped)
  */
 
 #include "emu.h"
@@ -670,6 +687,9 @@ void rx3230_state::rx3230_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).noprw(); // silence ram
 
+	//map(0x10000000, 0x13ffffff); // restricted AT I/O space
+	//map(0x14000000, 0x17ffffff); // restricted AT memory space
+
 	map(0x16080004, 0x16080007).nopr(); // silence graphics register
 
 	map(0x18000000, 0x1800003f).m(m_scsi, FUNC(ncr53c94_device::map)).umask32(0xff);
@@ -686,9 +706,7 @@ void rx3230_state::rx3230_map(address_map &map)
 	//map(0x1e800000, 0x1e800003).umask32(0xff); // fdc tc
 
 	map(0x1fc00000, 0x1fc3ffff).rom().region("rx3230", 0);
-
-	map(0x1ff00000, 0x1ff00003).lr8("boardtype", []() { return 0xa; }).umask32(0xff); // r? idprom boardtype?
-	//map(0x1ff00018, 0x1ff0001b).umask32(0x0000ff00); // r? idprom?
+	map(0x1ff00000, 0x1ff3ffff).rom().region("rx3230", 0); // mirror
 }
 
 void rx3230_state::rs3230_map(address_map &map)

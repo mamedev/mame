@@ -25,6 +25,7 @@ private:
 	// internal helpers
 	void format_register(std::ostream &stream, u8 reg) const;
 	void format_immediate(std::ostream &stream, u8 data) const;
+	void format_address(std::ostream &stream, u32 dst) const;
 
 	// register names
 	const char *const *m_regs;

@@ -15,6 +15,7 @@
 #include "machine/rp5h01.h"
 #include "sound/vlm5030.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class punchout_state : public driver_device
 {

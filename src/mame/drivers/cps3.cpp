@@ -13,31 +13,35 @@ Sound emulation by Philip Bennett
 
 SCSI code by ElSemi
 
-To-Do/Issues:
+Known Issues:
 
-Street Fighter 3 2nd Impact uses flipped tilemaps during flashing, emulate this.
+Tilemap Global X/Y flip not emulated
+    Street Fighter 3 2nd Impact uses Y-flipped tilemaps during flashing.
+    Warzard uses X-flipped tilemaps during special effects.
 
-Figure out proper IRQ10 generation:
-    If we generate on DMA operations only then Warzard is OK, otherwise it hangs during attract
-    HOWEVER, SFIII2 sometimes has messed up character profiles unless we also generate it periodically.
-    I think the corrupt background on some of the lighting effects may be related to this + the DMA
-    status flags.
+Whole screen flip not emulated
+
+Miscellaneous TO-DOs:
+
+DMA ack IRQ10 generation:
+    Character and Palette DMAs speed is unknown, needs to be measured.
 
 Alpha Blending Effects
-    These are actually palette manipulation effects, not true blending.  How the values are used is
-    not currently 100% understood.  They are incorrect if you use player 2 in Warzard
+    These are actually palette manipulation effects, not true blending.
+    Verify them, current emulation might not be 100% accurate.
 
-Linezoom
-    Is it used anywhere??
+Tilemap Linezoom
+    Seems unused in games. May be enabled in jojo/jojoba dev.menu BG test (P2 btn4)
 
 Palette DMA effects
     Verify them, they might not be 100% accurate at the moment
 
 Verify Full Screen Zoom on real hardware
-    Which is which, x & y registers, how far can it zoom etc.
+    How far can it zoom etc.
 
 Verify CRT registers
-    Only SFIII2 changes them, for widescreen mode.  What other modes are possible?
+    Actual Pixel clock for H Start and H Blank registers is unknown. It is not known which is base pixel clock
+    and how it affected by register 40C0080 bits.
 
 Sprite positioning glitches
     Some sprites are still in the wrong places, seems the placement of zooming sprites is imperfect
@@ -45,8 +49,7 @@ Sprite positioning glitches
     the same occurs in the sf games.  doesn't look like the origin is correct when zooming in all cases.
 
 Gaps in Sprite Zooming
-    probably caused by use of drawgfx instead of processing as a single large sprite, but could also be due to the
-    positioning of each part of the sprite.  Warzard is confirmed to have gaps during some cut-scenes on real hardware.
+    Warzard is confirmed to have gaps during some cut-scenes on real hardware.
 
 ---
 
@@ -166,15 +169,13 @@ menu is not normally available but is likely accessed with a special key/button 
 Because the CPU in the cart is always powered by the battery, it has stealth capability that allows it to continually
 monitor the situation. If the custom CPU detects any tampering (generally things such as voltage fluctuation or voltage
 dropping or even removal of the cart with the power on), it immediately erases the SRAM (i.e. the decryption key)
-inside the CPU which effectively kills the security cart. This also suggests that the custom Capcom CPU contains some
-additional internal code to initiate the boot process because in order to re-program a cart using the hidden security
-menu the CPU must execute some working code. It is known (from decapping it) that the CPU in the security cart contains
-an amount of static RAM for data storage and a SH2 core based on the Hitachi SH7010-series (SH7014) SuperH RISC engine
-family of Microprocessors.
+inside the CPU which effectively kills the security cart. It is known (from decapping it) that the CPU in the security
+cart contains an amount of static RAM for data storage and a SH2 core based on the Hitachi SH7010-series (SH7014)
+SuperH RISC engine family of Microprocessors.
 
 It is thought that when a cartridge dies it will set the decryption keys identical to the ones of SFIII-2nd Impact, so
 removing the battery and changing the content of the flashROM (if it's not a 2nd Impact) will make it run as a normal
-SFIII-2nd Impact cartridge (is this verified on real hardware?)
+SFIII-2nd Impact cartridge (verified).
 
 The main board uses the familiar Capcom SIMM modules to hold the data from the CDROM so that the life of the CD drive
 is maximized. The SIMMs don't contain RAM, but instead TSOP48 surface mounted flashROMs that can be updated with
@@ -285,12 +286,12 @@ Notes:
       33C93      - AMD 33C93A-16 SCSI Controller (PLCC44)
       KM681002   - Samsung Electronics KM681002 128k x8 SRAM (SOJ32). This is the 'Color RAM' in the test mode memory
                    test
-      62256      - 8k x8 SRAM (SOJ28). This is the 'SS RAM' in the test mode memory test and is connected to the custom
+      62256      - 32k x8 SRAM (SOJ28). This is the 'SS RAM' in the test mode memory test and is connected to the custom
                    SSU chip.
-      HM514260(1)- Hitachi HM514260CJ7 1M x16 DRAM (SOJ40). This is the 'Work RAM' in the test mode memory test and is
+      HM514260(1)- Hitachi HM514260CJ7 256k x16 DRAM (SOJ40). This is the 'Work RAM' in the test mode memory test and is
                    connected to the custom CCU chip.
-      HM514260(2)- Hitachi HM514260CJ7 1M x16 DRAM (SOJ40). This is the 'Sprite RAM' in the test mode memory test
-      TC5118160  - Toshiba TC5118160BJ-60 or NEC 4218160-60 256k x16 DRAM (SOJ42). This is the 'Character RAM' in the
+      HM514260(2)- Hitachi HM514260CJ7 256k x16 DRAM (SOJ40). This is the 'Sprite RAM' in the test mode memory test
+      TC5118160  - Toshiba TC5118160BJ-60 or NEC 4218160-60 1M x16 DRAM (SOJ42). This is the 'Character RAM' in the
                    test mode memory test
       SW1        - Push-button Test Switch
       VOL        - Master Volume Potentiometer
@@ -326,7 +327,7 @@ Notes:
                                                              connected to it.
                            DL-2929 IOU SD08-1513  (QFP208) - I/O controller, next to 3.6864MHz XTAL.
                            DL-3329 SSU SD04-1536  (QFP144) - Sound chip, clocked at 21.47725MHz (42.9545/2). It has 32k
-                                                             SRAM connected to it.
+                                                             SRAM connected to it, probably also 'SS' foreground layer generator.
                            DL-3429 GLL1 SD06-1537 (QFP144) - DMA memory/bus controller.
                            DL-3529 GLL2 SD11-1755 (QFP80)  - ROM/SIMM bank selection chip (via 3x FCT162244 logic ICs).
 
@@ -448,7 +449,7 @@ Security cart resurrection info
 When the security cart dies the game no longer functions. The PCB can be brought back to life by doing the following
 hardware modification to the security cart.....
 
-1. Remove the custom QFP144 CPU and replace it with a standard Hitachi HD6417095 SH-2 CPU
+1. Remove the custom QFP144 CPU and replace it with a standard Hitachi HD6417604 or HD6417095 SH-2 CPU
 2. Remove the 29F400 TSOP48 flashROM and re-program it with the decrypted and modified main program ROM from set
    'cps3boot' in MAME. A 28F400 SOP44 flashROM can be used instead and mounted to the back side of the security cart
    PCB. Do not mount both SOP44 and TSOP48 flashROMs, use only one TSOP48 flashROM or one SOP44 flashROM.
@@ -456,6 +457,115 @@ hardware modification to the security cart.....
    from set 'cps3boot' in MAME.
 4. That is all. Enjoy your working PCB.
 
+
+Hardware registers info
+----------------------
+
+		PPU registers (read only)
+		0x040C0000 - 0x040C000D
+
+		Offset:	Bits:				Desc:
+		0C		---- ---- ---- -2--	Palette DMA active   |
+				---- ---- ---- --1-	Character DMA active | several parts of game code assume only 1 of these might be active at the same time
+				---- ---- ---- ---0	Sprite list DMA/copy active, see register 82 description
+
+		PPU registers (write only)
+		0x040C0000 - 0x040C00AF
+
+		Offset:	Bits:				Desc:
+		00		---- --xx xxxx xxxx Global Scroll 0 X
+		02		---- --xx xxxx xxxx Global Scroll 0 Y
+		04-1F					Global Scrolls 1-7
+		20		xxxx xxxx xxxx xxxx Tilemap 0 Scroll X
+		22		xxxx xxxx xxxx xxxx Tilemap 0 Scroll Y
+		24		---- -a98 76-- ---- Tilemap 0 ?? always 0
+				---- ---- ---4 3210 Tilemap 0 Width (in tiles)
+		26		f--- ---- ---- ---- Tilemap 0 Enable
+				-e-- ---- ---- ---- Tilemap 0 Line Scroll Enable
+				--d- ---- ---- ---- Tilemap 0 Line Zoom Enable (seems unused in games, but might be enabled in jojo dev.menu BG test)
+				---c ---- ---- ---- Tilemap 0 ?? set together with Zoom
+				---- b--- ---- ---- Tilemap 0 Flip X (not implemented, Warzard demo fights during special moves)
+				---- -a-- ---- ---- Tilemap 0 Flip Y (not implemented, Capcom logos background during sfiii2 flashing)
+				---- --98 7654 3210	Tilemap 0 ?? always 0
+		28		-edc ba98 ---- ---- Tilemap 0 Line Scroll and Zoom Base address (1st word is scroll, 2nd word is zoom)
+				---- ---- -654 3210 Tilemap 0 Tiles Base address
+		2A-2F	unused
+		30-5F					Tilemaps 1-3
+												Values: 384		495 "wide"
+		60		xxxx xxxx xxxx xxxx	H Sync end*			42		35
+		62		xxxx xxxx xxxx xxxx	H Blank end			111		118
+		64		xxxx xxxx xxxx xxxx	H Screen end		495		613
+		66		xxxx xxxx xxxx xxxx	H Total end*		454		454
+		68		---- --xx xxxx xxxx	H ?? Zoom Master?	0		0		+128 if flip screen, might be not zoom-related but global H scroll
+		6A		xxxx xxxx xxxx xxxx	H ?? Zoom Offset?	0		0
+		6C		xxxx xxxx xxxx xxxx	H ?? Zoom Size?		1023	1023	(511 at BIOS init)
+		6E		xxxx xxxx xxxx xxxx	H Zoom Scale		64		64
+		70		xxxx xxxx xxxx xxxx	V Sync end			3		3
+		72		xxxx xxxx xxxx xxxx	V Blank end			21		21
+		74		xxxx xxxx xxxx xxxx	V Screen end		245		245
+		76		xxxx xxxx xxxx xxxx	V Total end			262		262
+		78		---- --xx xxxx xxxx	V ?? Zoom Master?	0		0		might be not zoom-related but global V scroll
+		7A		xxxx xxxx xxxx xxxx	V ?? Zoom Offset?	0		0
+		7C		xxxx xxxx xxxx xxxx	V ?? Zoom Size?		1023	1023	(261 at BIOS init)
+		7E		xxxx xxxx xxxx xxxx	V Zoom Scale		64		64
+		80		---- ---- ---- -210	Pixel clock			3		5		base clock is 42.954545MHz, 3 = /5 divider, 5 = /4 divider.
+				---- ---- ---4 3---	Flip screen X/Y (or Y/X)
+				---- ---- --5- ----	?? always set to 1, 0 in unused 24KHz mode (pixel clock divider?)
+				---- ---- -6-- ----	?? set to 0 by BIOS init, then set to 1 after video mode selection, 0 in unused 24KHz mode (pixel clock divider?)
+				f--- ---- ---- ---- ?? always 0, but there is code which may set it
+		82		---- ---- ---- 3--0 Sprite list DMA/copy to onchip RAM ? after new list upload to sprite RAM games write here 8/9/8/9 pattern, then wait until register 0C bit 0 became 0, then write 0.
+		84		---- b--- ---- ---- ?? always set to 0x0800
+		86		---- ---- ---- 3210 Character RAM bank
+		88		---- ---- --54 3210 Gfx flash ROM bank
+		8A		---- ---- ---- ---- ?? set to 0 by BIOS init, never writen later
+		8E		---- ---- 7-5- ---- ?? set to 0x00A0 by BIOS init after Pal/Char DMA registers, never writen later (Char/Pal DMA IRQ enable ?)
+		96		xxxx xxxx xxxx xxxx Character DMA Source low bits
+		98		---- ---- --54 3210 Character DMA Source high bits
+				---- ---- -6-- ---- Character DMA Start
+		A0		---- -a98 7654 3210 Palette DMA Source high bits
+		A2		xxxx xxxx xxxx xxxx Palette DMA Source low bits
+		A4		---- ---- ---- ---0 Palette DMA Destination high bit
+		A6		xxxx xxxx xxxx xxxx Palette DMA Destination low bits
+		A8		-edc ba98 -654 3210 Palette DMA Fade low bits
+		AA		---- ---- -654 3210 Palette DMA Fade high bits
+		AC		xxxx xxxx xxxx xxxx Palette DMA Lenght low bits
+		AE		---- ---- ---- ---0 Palette DMA Lenght high bit
+				---- ---- ---- --1- Palette DMA Start
+
+		All CRTC-related values is last clock/line of given area, i.e. actual sizes is +1 to value.
+
+	(*) H Total value is same for all 15KHz modes, uses fixed clock (not affected by pixel clock modifier) -
+		42.954545MHz/6 (similar to SSV) /(454+1) = 15734.25Hz /(262+1) = 59.826Hz
+		unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.954545MHz/6 /(293+1) = 24350.62Hz /(424+1) = 57.29Hz)
+
+
+		'SS' foreground tilemap layer generator (presumable located in 'SSU' chip) registers (write only?)
+		0x05050000 - 0x05050029 area, even bytes only.
+
+		Offset:	Bits:		Desc:	Values: 384		495 "wide"
+		00		xxxx xxxx	H Sync*			42		35		same as PPU
+		01		xxxx xxxx	H Start L
+		02		xxxx xxxx	H Start H		62		64
+		03		xxxx xxxx	H Blank L
+		04		xxxx xxxx	H Blank H		534		671
+		05		xxxx xxxx	H Total L*
+		06		xxxx xxxx	H Total H*		454		454*	same as PPU
+		07		xxxx xxxx	H Scroll L
+		08		xxxx xxxx	H Scroll H		-101	-107	+128 if flip screen
+		09		xxxx xxxx	V Sync			3		3		same as PPU
+		0a		xxxx xxxx	V Start L
+		0b		xxxx xxxx	V Start H		21		21		same as PPU
+		0c		xxxx xxxx	V Blank L
+		0d		xxxx xxxx	V Blank H		247		247		PPU value +2
+		0e		xxxx xxxx	V Total L
+		0f		xxxx xxxx	V Total H		262		262		same as PPU
+		10		xxxx xxxx	V Scroll L
+		11		xxxx xxxx	V Scroll H		-24		-24		+288 if flip screen
+		12		xxxx xxxx	Palette base
+		13		---- -210	Pixel clock		3		5		not clear how it works
+		14		---- --10	Flip screen X/Y (or Y/X?)
+
+	(*) H Total value is same for all 15KHz modes, same as PPU.
 */
 
 #include "emu.h"
@@ -655,20 +765,17 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 								if (c != transparent_color)
 								{
 									/* blending isn't 100% understood */
+									// is it really ORed or bits should be replaced same as in Seta/SSV hardware ?
 									if (gfx->granularity() == 64)
 									{
 										// OK for sfiii2 spotlight
-										if (c & 0x01) dest[x] |= 0x2000;
-										if (c & 0x02) dest[x] |= 0x4000;
-										if (c & 0x04) dest[x] |= 0x8000;
-										if (c & 0x08) dest[x] |= 0x10000;
-										if (c & 0xf0) dest[x] |= machine().rand(); // ?? not used?
+										dest[x] |= (c & 0xf) << 13;
+										//if (c & 0xf0) dest[x] = machine().rand(); // ?? not used?
 									}
 									else
 									{
 										// OK for jojo intro, and warzard swords, and various shadows in sf games
-										if (c & 0x01) dest[x] |= 0x8000;
-										if (color & 0x100) dest[x] |= 0x10000;
+										dest[x] |= ((c & 1) << 15) | ((color & 1) << 16);
 									}
 								}
 								x_index += dx;
@@ -822,11 +929,10 @@ static const gfx_layout cps3_tiles8x8_layout =
 	8,8,
 	0x200,
 	4,
-	{ /*8,9,10,11,*/ 0,1,2,3 },
-	{ 20,16,4,0,52,48,36,32 },
-
-	{ STEP8(0,8*8) },
-	64*8
+	{ STEP4(0,1) },
+	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4 },
+	{ STEP8(0,8*4) },
+	64*4
 };
 
 static inline u8 get_fade(int c, int f)
@@ -862,9 +968,10 @@ void cps3_state::set_mame_colours(int colournum, u16 data, u32 fadeval)
 		data = (data & 0x8000) | (r << 0) | (g << 5) | (b << 10);
 	}
 
+	colournum &= 0x1ffff;
 	m_colourram[colournum] = data;
 
-	m_mame_colours[colournum] = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+	m_mame_colours[colournum] = rgb_t(r << 3, g << 3, b << 3); // no color extension, VideoDAC's RGB bits 0-2 connected to GND
 
 	if (colournum < 0x10000) m_palette->set_pen_color(colournum,m_mame_colours[colournum]/* rgb_t(r<<3,g<<3,b<<3)*/);//m_mame_colours[colournum]);
 }
@@ -873,19 +980,18 @@ void cps3_state::set_mame_colours(int colournum, u16 data, u32 fadeval)
 void cps3_state::video_start()
 {
 	m_char_ram = make_unique_clear<u32[]>(0x800000/4);
+	m_mame_colours = make_unique_clear<u32[]>(0x20000);
+	m_ss_ram = make_unique_clear<u8[]>(0x8000);
+	m_spritelist = make_unique_clear<u32[]>(0x80000/4);
+
+	m_spritelist[0] = 0x80000000;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, (u8 *)(&m_ss_ram[0x8000/4]), 0, m_palette->entries() / 16, 0));
-
-	//decode_ssram();
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, &m_ss_ram[0x4000], 0, m_palette->entries() / 16, 0));
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, cps3_tiles16x16_layout, (u8 *)m_char_ram.get(), 0, m_palette->entries() / 64, 0));
 	m_gfxdecode->gfx(1)->set_granularity(64);
-
-	//decode_charram();
-
-	m_mame_colours = make_unique_clear<u32[]>(0x80000/2);
 
 	m_screenwidth = 384;
 
@@ -897,12 +1003,15 @@ void cps3_state::video_start()
 
 	m_renderbuffer_bitmap.fill(0x3f, m_renderbuffer_clip);
 
-	save_item(NAME(m_ss_pal_base));
-	save_item(NAME(m_unk_vidregs));
-	save_item(NAME(m_ss_bank_base));
-
 	save_pointer(NAME(m_char_ram), 0x800000/4);
-	save_pointer(NAME(m_mame_colours), 0x80000/2);
+	save_pointer(NAME(m_mame_colours), 0x20000);
+	save_pointer(NAME(m_ss_ram), 0x8000);
+	save_pointer(NAME(m_spritelist), 0x80000/4);
+}
+
+static inline int to_s10(int data)
+{
+	return (data & 0x1ff) - (data & 0x200);
 }
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
@@ -959,11 +1068,11 @@ void cps3_state::draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &
 	for (int x = cliprect.left() / 16; x < (cliprect.right() / 16) + 2; x++)
 	{
 		u32 const dat = m_spriteram[mapbase + ((tileline & 63) * 64) + ((x + scrollx / 16) & 63)];
-		u32 const tileno = (dat & 0xffff0000) >> 17;
-		u32 const colour = (dat & 0x000001ff) >> 0;
-		bool const bpp = (dat & 0x0000200) >> 9;
-		bool const yflip = (dat & 0x00000800) >> 11;
+		u32 const tileno = (dat & 0xfffe0000) >> 17;
 		bool const xflip = (dat & 0x00001000) >> 12;
+		bool const yflip = (dat & 0x00000800) >> 11;
+		bool const bpp =   (dat & 0x00000200) >> 9;
+		u32 const colour = (dat & 0x000001ff) >> 0;
 
 		if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
 		else m_gfxdecode->gfx(1)->set_granularity(64);
@@ -975,9 +1084,7 @@ void cps3_state::draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &
 // fg layer (TODO: this could be handled with an actual tilemap)
 void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// bank select? (sfiii2 intro) (could also be a scroll bit if the tilemap is just double height)
-	int bank = 0x800;
-	if (m_ss_bank_base & 0x01000000) bank = 0x000;
+	int scrolly = (-m_ss_vscroll) & 0x100; // TODO properly handle scroll value 
 
 	for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 	{
@@ -985,62 +1092,44 @@ void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		clip.min_y = clip.max_y = line;
 
 		int y = line / 8;
-		int count = (y * 64) + bank;
+		int offset = ((line + scrolly) / 8 * 128) & 0x1fff;
 
 		// 'combo meter' in JoJo games uses rowscroll
-		int rowscroll = m_ss_ram[((line - 1) & 0x1ff) + 0x4000 / 4] >> 16;
+		int rowscroll = m_ss_ram[((line + scrolly - 1) & 0x1ff)*2 + 0x2000];
 
 		for (int x = 0; x < 64; x++)
 		{
-			u32 data = m_ss_ram[count]; // +0x800 = 2nd bank, used on sfiii2 intro..
-			u32 tile = (data >> 16) & 0x1ff;
-			int pal = (data & 0x003f) >> 1;
-			int flipx = (data & 0x0080) >> 7;
-			int flipy = (data & 0x0040) >> 6;
+			u16 data = m_ss_ram[offset] | (m_ss_ram[offset + 1] << 8) ;
+			u32 tile =  (data & 0x01ff) >> 0;
+			int pal =   (data & 0x3e00) >> 9;
+			int flipy = (data & 0x4000) >> 14; // 
+			int flipx = (data & 0x8000) >> 15; // is this right or should be vice versa ?
 			pal += m_ss_pal_base << 5;
 
 			cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000);
 			cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, 512 + (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000);
 
-			count++;
+			offset += 2;
 		}
 	}
 }
 
 u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	attoseconds_t period = screen.frame_period().attoseconds();
-	rectangle visarea = screen.visible_area();
-
-	int bg_drawn[4] = { 0, 0, 0, 0 };
-
-	// decode_ssram();
-	// decode_charram();
-
-	/* registers are normally 002a006f 01ef01c6
-	        widescreen mode = 00230076 026501c6
-	    only SFIII2 uses widescreen, I don't know exactly which register controls it */
-	if (((m_fullscreenzoom[1] & 0xffff0000) >> 16) == 0x0265)
+	int width = ((m_ppu_crtc_zoom[1] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[0] & 0xffff);
+	if (width > 0 && m_screenwidth != width)
 	{
-		if (m_screenwidth != 496)
-		{
-			m_screenwidth = 496;
-			visarea.set(0, 496 - 1, 0, 224 - 1);
-			screen.configure(496, 224, visarea, period);
-		}
-	}
-	else
-	{
-		if (m_screenwidth != 384)
-		{
-			m_screenwidth = 384;
-			visarea.set(0, 384 - 1, 0, 224 - 1);
-			screen.configure(384, 224, visarea, period);
-		}
+		attoseconds_t period = screen.frame_period().attoseconds();
+		rectangle visarea = screen.visible_area();
+
+		int height = ((m_ppu_crtc_zoom[5] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[4] & 0xffff);
+		visarea.set(0, width - 1, 0, height - 1);
+		screen.configure(width, height, visarea, period);
+		m_screenwidth = width;
 	}
 
-	u32 fullscreenzoomx = m_fullscreenzoom[3] & 0x000000ff;
-	u32 fullscreenzoomy = m_fullscreenzoom[3] & 0x000000ff;
+	u32 fullscreenzoomx = m_ppu_crtc_zoom[3] & 0x000000ff;
+	u32 fullscreenzoomy = m_ppu_crtc_zoom[7] & 0x000000ff;
 	/* clamp at 0x80, I don't know if this is accurate */
 	if (fullscreenzoomx > 0x80) fullscreenzoomx = 0x80;
 	if (fullscreenzoomy > 0x80) fullscreenzoomy = 0x80;
@@ -1064,53 +1153,53 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	//logerror("Spritelist start:\n");
 	for (int i = 0x00000 / 4; i < 0x2000 / 4; i += 4)
 	{
-		int const xpos = (m_spriteram[i + 1] & 0x03ff0000) >> 16;
-		int const ypos = m_spriteram[i + 1] & 0x000003ff;
-		u8 const gscroll = (m_spriteram[i + 0] & 0x70000000) >> 28;
-		u32 const length = (m_spriteram[i + 0] & 0x01ff0000) >> 16; // how many entries in the sprite table
-		u32 start = (m_spriteram[i + 0] & 0x00007ff0) >> 4;
-
-		bool const whichbpp = (m_spriteram[i + 2] & 0x40000000) >> 30; // not 100% sure if this is right, jojo title / characters
-		bool const whichpal = (m_spriteram[i + 2] & 0x20000000) >> 29;
-		u8 const global_xflip = (m_spriteram[i + 2] & 0x10000000) >> 28;
-		u8 const global_yflip = (m_spriteram[i + 2] & 0x08000000) >> 27;
-		bool const global_alpha = (m_spriteram[i + 2] & 0x04000000) >> 26; // alpha / shadow? set on sfiii2 shadows, and big black image in jojo intro
-		bool const global_bpp = (m_spriteram[i + 2] & 0x02000000) >> 25;
-		u32 const global_pal = (m_spriteram[i + 2] & 0x01ff0000) >> 16;
-
-		int const gscrollx = (m_unk_vidregs[gscroll] & 0x03ff0000) >> 16;
-		int const gscrolly = (m_unk_vidregs[gscroll] & 0x000003ff) >> 0;
-		start = (start * 0x100) >> 2;
-
-		if ((m_spriteram[i + 0] & 0xf0000000) == 0x80000000)
+		if (m_spritelist[i + 0] & 0x80000000)
 			break;
+
+		u8 const gscroll = (m_spritelist[i + 0] & 0x70000000) >> 28;
+		u32 const length = (m_spritelist[i + 0] & 0x01ff0000) >> 16; // how many entries in the sprite table
+		u32 start =        (m_spritelist[i + 0] & 0x00007ff0) >> 4;
+		
+		int const xpos =   (m_spritelist[i + 1] & 0x03ff0000) >> 16;
+		int const ypos =    m_spritelist[i + 1] & 0x000003ff;
+
+		bool const whichbpp =     (m_spritelist[i + 2] & 0x40000000) >> 30; // not 100% sure if this is right, jojo title / characters
+		bool const whichpal =     (m_spritelist[i + 2] & 0x20000000) >> 29;
+		u8 const global_xflip =   (m_spritelist[i + 2] & 0x10000000) >> 28;
+		u8 const global_yflip =   (m_spritelist[i + 2] & 0x08000000) >> 27;
+		bool const global_alpha = (m_spritelist[i + 2] & 0x04000000) >> 26; // alpha / shadow? set on sfiii2 shadows, and big black image in jojo intro
+		bool const global_bpp =   (m_spritelist[i + 2] & 0x02000000) >> 25;
+		u32 const global_pal =    (m_spritelist[i + 2] & 0x01ff0000) >> 16;
+		//int const tilemapnum =  (m_spritelist[i + 2] & 0x00000030) >> 4; // jojo and jojoba only
+
+		int const gscrollx = (m_ppu_gscroll[gscroll] & 0x03ff0000) >> 16;
+		int const gscrolly = (m_ppu_gscroll[gscroll] & 0x000003ff) >> 0;
+		start = (start * 0x100) >> 2;
 
 		for (int j = 0; j < (length) * 4; j += 4)
 		{
-			u32 const value1 = (m_spriteram[start + j + 0]);
-			u32 const value2 = (m_spriteram[start + j + 1]);
-			u32 const value3 = (m_spriteram[start + j + 2]);
+			u32 const value1 = (m_spritelist[start + j + 0]);
+			u32 const value2 = (m_spritelist[start + j + 1]);
+			u32 const value3 = (m_spritelist[start + j + 2]);
 
-			//u8* srcdata = (u8*)m_char_ram;
-			//u32 sourceoffset = (value1 >>14) & 0x7fffff;
+			static const int tilestable[4] = { 8,1,2,4 };
 
 			u32 const tileno = (value1 & 0xfffe0000) >> 17;
+			u8 flipx =         (value1 & 0x00001000) >> 12;
+			u8 flipy =         (value1 & 0x00000800) >> 11;
+			bool const alpha = (value1 & 0x00000400) >> 10; //? this one is used for alpha effects on warzard
+			bool const bpp =   (value1 & 0x00000200) >> 9;
+			u32 const pal =    (value1 & 0x000001ff);
 
 			int xpos2 = (value2 & 0x03ff0000) >> 16;
 			int ypos2 = (value2 & 0x000003ff) >> 0;
-			u8 flipx = (value1 & 0x00001000) >> 12;
-			u8 flipy = (value1 & 0x00000800) >> 11;
-			bool const alpha = (value1 & 0x00000400) >> 10; //? this one is used for alpha effects on warzard
-			bool const bpp = (value1 & 0x00000200) >> 9;
-			u32 const pal = (value1 & 0x000001ff);
 
 			/* these are the sizes to actually draw */
 			u32 const ysizedraw2 = ((value3 & 0x7f000000) >> 24) + 1;
 			u32 const xsizedraw2 = ((value3 & 0x007f0000) >> 16) + 1;
-
-			static const int tilestable[4] = { 8,1,2,4 };
-			s8 ysize2 = ((value3 & 0x0000000c) >> 2);
-			s8 xsize2 = ((value3 & 0x00000003) >> 0);
+			//u8 unk =             ((value3 & 0x00000300) >> 8); // 3 - sprites, 0 - tilemaps, enable X/Y zooms ?
+			s8 ysize2 =            ((value3 & 0x0000000c) >> 2);
+			s8 xsize2 =            ((value3 & 0x00000003) >> 0);
 
 			if (ysize2 == 0)
 			{
@@ -1125,14 +1214,13 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 				/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
 				    which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
 
-				if (bg_drawn[tilemapnum] == 0)
+				for (int yy = 0; yy < ysizedraw2; yy++)
 				{
-					for (int uu = m_renderbuffer_clip.top(); uu <= m_renderbuffer_clip.bottom(); uu++)
-					{
-						draw_tilemapsprite_line(tilemapnum, uu, m_renderbuffer_bitmap, m_renderbuffer_clip);
-					}
+					int cury_pos = to_s10(yy - (to_s10(ypos2) + to_s10(gscrolly)) - 19); // OK for sfiii Alex's stage, but not sure if hardware realy works this way
+
+					if (cury_pos >= m_renderbuffer_clip.top() && cury_pos <= m_renderbuffer_clip.bottom())
+						draw_tilemapsprite_line(tilemapnum, cury_pos, m_renderbuffer_bitmap, m_renderbuffer_clip);
 				}
-				bg_drawn[tilemapnum] = 1;
 			}
 			else
 			{
@@ -1166,6 +1254,14 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 				if (flipy) ypos2 -= (ysize2 * yinc) >> 16;
 
+				/* use the palette value from the main list or the sublists? */
+				int actualpal = whichpal ? global_pal : pal;
+
+				/* use the bpp value from the main list or the sublists? */
+				m_gfxdecode->gfx(1)->set_granularity((whichbpp ? global_bpp : bpp) ? 64 : 256);
+
+				int trans = (global_alpha || alpha) ? CPS3_TRANSPARENCY_PEN_INDEX_BLEND : CPS3_TRANSPARENCY_PEN_INDEX;
+
 				int count = 0;
 				for (int xx = 0; xx < xsize2 + 1; xx++)
 				{
@@ -1182,7 +1278,6 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 					for (int yy = 0; yy < ysize2 + 1; yy++)
 					{
 						int current_ypos;
-						int actualpal;
 
 						if (flipy) current_ypos = (ypos + ypos2 + ((yy * yinc) >> 16));
 						else current_ypos = (ypos + ypos2 - ((yy * yinc) >> 16));
@@ -1196,32 +1291,7 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 						//if ( (whichbpp) && (m_screen->frame_number() & 1)) continue;
 
-						/* use the palette value from the main list or the sublists? */
-						if (whichpal)
-						{
-							actualpal = global_pal;
-						}
-						else
-						{
-							actualpal = pal;
-						}
-
-						/* use the bpp value from the main list or the sublists? */
-						if (whichbpp)
-						{
-							if (!global_bpp) m_gfxdecode->gfx(1)->set_granularity(256);
-							else m_gfxdecode->gfx(1)->set_granularity(64);
-						}
-						else
-						{
-							if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
-							else m_gfxdecode->gfx(1)->set_granularity(64);
-						}
-
-						int realtileno = tileno + count;
-						int trans = (global_alpha || alpha) ? CPS3_TRANSPARENCY_PEN_INDEX_BLEND : CPS3_TRANSPARENCY_PEN_INDEX;
-
-						cps3_drawgfxzoom(m_renderbuffer_bitmap, m_renderbuffer_clip, m_gfxdecode->gfx(1), realtileno, actualpal, 0 ^ flipx, 0 ^ flipy, current_xpos, current_ypos, trans, 0, xscale, yscale);
+						cps3_drawgfxzoom(m_renderbuffer_bitmap, m_renderbuffer_clip, m_gfxdecode->gfx(1), tileno + count, actualpal, 0 ^ flipx, 0 ^ flipy, current_xpos, current_ypos, trans, 0, xscale, yscale);
 						count++;
 					}
 				}
@@ -1268,39 +1338,30 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 }
 
 /*
-    SSRAM 0x0000 - 0x1fff tilemap layout bank 0
-          0x2000 - 0x3fff tilemap layout bank 1
-          0x4000 - 0x7fff rowscroll (banked?)
+    SSRAM (only even bytes)
+          0x0000 - 0x3fff tilemap layout
+          0x4000 - 0x7fff rowscroll
           0x8000 - 0xffff tile character definitions
-
 */
 
-READ32_MEMBER(cps3_state::ssram_r)
+READ8_MEMBER(cps3_state::ssram_r)
 {
-	if (offset >= 0x8000/4)
-		return little_endianize_int32(m_ss_ram[offset]);
-	else
-		return m_ss_ram[offset];
+	return m_ss_ram[offset];
 }
 
-WRITE32_MEMBER(cps3_state::ssram_w)
+WRITE8_MEMBER(cps3_state::ssram_w)
 {
-	if (offset >= 0x8000/4)
-	{
-		// we only want to endian-flip the character data, the tilemap info is fine
-		data = little_endianize_int32(data);
-		mem_mask = little_endianize_int32(mem_mask);
-		m_gfxdecode->gfx(0)->mark_dirty((offset - (0x8000/4))/16);
-	}
+	if (offset >= 0x4000)
+		m_gfxdecode->gfx(0)->mark_dirty((offset - 0x4000)/32);
 
-	COMBINE_DATA(&m_ss_ram[offset]);
+	m_ss_ram[offset] = data;
 }
 
-WRITE32_MEMBER(cps3_state::_0xc0000000_ram_w)
+WRITE32_MEMBER(cps3_state::sh2cache_ram_w)
 {
-	COMBINE_DATA( &m_0xc0000000_ram[offset] );
+	COMBINE_DATA( &m_sh2cache_ram[offset] );
 	// store a decrypted copy
-	m_0xc0000000_ram_decrypted[offset] = m_0xc0000000_ram[offset]^cps3_mask(offset*4+0xc0000000, m_key1, m_key2);
+	m_sh2cache_ram_decrypted[offset] = m_sh2cache_ram[offset]^cps3_mask(offset*4+0xc0000000, m_key1, m_key2);
 }
 
 WRITE32_MEMBER(cps3_state::cram_bank_w)
@@ -1346,6 +1407,27 @@ WRITE32_MEMBER(cps3_state::cram_data_w)
 	data = little_endianize_int32(data);
 	COMBINE_DATA(&m_char_ram[fulloffset]);
 	m_gfxdecode->gfx(1)->mark_dirty(fulloffset/0x40);
+}
+
+WRITE16_MEMBER(cps3_state::spritedma_w)
+{
+	u16 prev = m_spritelist_dma;
+	COMBINE_DATA(&m_spritelist_dma);
+
+	// display list caching (into PPU on-chip RAM ?)
+	if ((m_spritelist_dma & 8) && !(prev & 8)) // 0->1
+	{
+		for (int i = 0; i < 0x2000/4; i += 4)
+		{
+			std::copy(&m_spriteram[i], &m_spriteram[i + 4], &m_spritelist[i]); // copy main list record
+			u32 dat = m_spriteram[i];
+			if (dat & 0x80000000)
+				break;
+			u32 offs =   (dat & 0x00007fff) << 2;
+			u32 length = (dat & 0x01ff0000) >> 16;
+			std::copy(&m_spriteram[offs], &m_spriteram[offs + length*4], &m_spritelist[offs]); // copy sublist
+		}
+	}
 }
 
 /* FLASH ROM ACCESS */
@@ -1623,26 +1705,17 @@ WRITE32_MEMBER(cps3_state::cram_gfxflash_bank_w)
 	}
 }
 
-// this seems to be dma active flags, and maybe vblank... not if it is anything else
-READ32_MEMBER(cps3_state::vbl_r)
+READ16_MEMBER(cps3_state::dma_status_r)
 {
-	return 0x00000000;
+	return m_dma_status;
 }
 
-READ32_MEMBER(cps3_state::unk_io_r)
+READ16_MEMBER(cps3_state::dev_dipsw_r)
 {
-	//  warzard will crash before booting if you return anything here
-	return 0xffffffff;
-}
-
-READ32_MEMBER(cps3_state::_40C0000_r)
-{
-	return 0x00000000;
-}
-
-READ32_MEMBER(cps3_state::_40C0004_r)
-{
-	return 0x00000000;
+	// not present on retail motherboards but games read this
+	// inverted words from 5000a00-5000a0f area ANDed with inverted words from 5000a10-5000a1f. perhaps one return DIPSW in 8 high bits, while other in 8 low bits.
+	//  warzard will crash before booting if some of bits is not 0
+	return 0xffff;
 }
 
 /* EEPROM access is a little odd, I think it accesses eeprom through some kind of
@@ -1698,28 +1771,42 @@ WRITE32_MEMBER(cps3_state::eeprom_w)
 
 }
 
-WRITE32_MEMBER(cps3_state::ss_bank_base_w)
+WRITE16_MEMBER(cps3_state::outport_w)
 {
-	// might be scroll registers or something else..
-	// used to display bank with 'insert coin' on during sfiii2 attract intro
-	COMBINE_DATA(&m_ss_bank_base);
-
-//  logerror("ss_bank_base_w %08x %08x\n", data, mem_mask);
+	if (ACCESSING_BITS_0_7)
+	{
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x10);
+		machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	}
+	// bits 14 and 15 some LEDs ?
 }
 
-WRITE32_MEMBER(cps3_state::ss_pal_base_w)
+WRITE8_MEMBER(cps3_state::ssregs_w)
 {
-		if (DEBUG_PRINTF) logerror ("ss_pal_base_w %08x %08x\n", data, mem_mask);
-
-	if (ACCESSING_BITS_24_31)
+	switch (offset)
 	{
-		m_ss_pal_base = (data & 0x00ff0000)>>16;
-
-		if (data & 0xff000000) logerror("ss_pal_base MSB32 upper bits used %04x \n", data);
-	}
-	else
-	{
-	//  logerror("ss_pal_base LSB32 used %04x \n", data);
+	case 0x07:
+		m_ss_hscroll = (m_ss_hscroll & 0xff00) | data;
+		break;
+	case 0x08:
+		m_ss_hscroll = (m_ss_hscroll & 0xff) | (data << 8);
+		break;
+	case 0x10:
+		m_ss_vscroll = (m_ss_vscroll & 0xff00) | data;
+		break;
+	case 0x11:
+		m_ss_vscroll = (m_ss_vscroll & 0xff) | (data << 8);
+		break;
+	case 0x12:
+		m_ss_pal_base = data;
+		break;
+	case 0x14:
+		break;
+	default:
+		logerror("SS regs write %02X data %02X\n", offset, data);
+		break;
 	}
 }
 
@@ -1757,7 +1844,8 @@ WRITE32_MEMBER(cps3_state::palettedma_w)
 				u16* src = (u16*)m_user5;
 			//  if (DEBUG_PRINTF) logerror("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", m_paldma_source, m_paldma_realsource, m_paldma_dest, m_paldma_fade, m_paldma_other2, m_paldma_length);
 
-				for (int i = 0; i<m_paldma_length; i ++)
+				u32 dmalen = m_paldma_length | ((data & 1) << 16);
+				for (u32 i = 0; i < dmalen; i++)
 				{
 					u16 coldata = src[BYTE_XOR_BE(((m_paldma_realsource>>1)+i))];
 
@@ -1765,15 +1853,11 @@ WRITE32_MEMBER(cps3_state::palettedma_w)
 
 					set_mame_colours((m_paldma_dest+i)^1, coldata, m_paldma_fade);
 				}
-
-
-				m_maincpu->set_input_line(10, ASSERT_LINE);
-
-
+				m_dma_status |= 4;
+				m_dma_timer->adjust(attotime::from_usec(100)); // delay time is a hack, what is actual DMA speed?
 			}
 		}
 	}
-
 }
 
 
@@ -1966,37 +2050,28 @@ void cps3_state::process_character_dma(u32 address)
 
 		//logerror("%08x %08x %08x real_source %08x (rom %d offset %08x) real_destination %08x, real_length %08x\n", dat1, dat2, dat3, real_source, real_source/0x800000, real_source%0x800000, real_destination, real_length);
 
-		if  ((dat1 & 0x00e00000) == 0x00800000)
+		switch ((dat1 >> 21) & 7)
 		{
-			/* Sets a table used by the decompression routines */
-			{
-				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
-				m_current_table_address = real_source;
-			}
-			m_maincpu->set_input_line(10, ASSERT_LINE);
-		}
-		else if  ((dat1 & 0x00e00000) == 0x00400000)
-		{
-			/* 6bpp DMA decompression
+		case 4:	/* Sets a table used by the decompression routines */
+			/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
+			m_current_table_address = real_source;
+			break;
+		case 2:	/* 6bpp DMA decompression
 			  - this is used for the majority of sprites and backgrounds */
-			do_char_dma(real_source, real_destination, real_length );
-			m_maincpu->set_input_line(10, ASSERT_LINE);
-
-		}
-		else if  ((dat1 & 0x00e00000) == 0x00600000)
-		{
-			/* 8bpp DMA decompression
+			do_char_dma(real_source, real_destination, real_length);
+			break;
+		case 3:	/* 8bpp DMA decompression
 			  - this is used on SFIII NG Sean's Stage ONLY */
 			do_alt_char_dma(real_source, real_destination, real_length);
-			m_maincpu->set_input_line(10, ASSERT_LINE);
-		}
-		else
-		{
+			break;
+		default:
 			// warzard uses command 0, uncompressed? but for what?
-			//logerror("Unknown DMA List Command Type\n");
+			logerror("Unknown DMA List Command Type %d\n", (dat1 >> 21) & 7);
+			break;
 		}
-
 	}
+	m_dma_status |= 2;
+	m_dma_timer->adjust(attotime::from_usec(100)); // delay time is a hack, what is actual DMA speed?
 }
 
 WRITE32_MEMBER(cps3_state::characterdma_w)
@@ -2044,19 +2119,9 @@ WRITE32_MEMBER(cps3_state::characterdma_w)
 	}
 }
 
-WRITE32_MEMBER(cps3_state::irq10_ack_w)
+WRITE32_MEMBER(cps3_state::ppu_gscroll_w)
 {
-	m_maincpu->set_input_line(10, CLEAR_LINE); return;
-}
-
-WRITE32_MEMBER(cps3_state::irq12_ack_w)
-{
-	m_maincpu->set_input_line(12, CLEAR_LINE); return;
-}
-
-WRITE32_MEMBER(cps3_state::unk_vidregs_w)
-{
-	COMBINE_DATA(&m_unk_vidregs[offset]);
+	COMBINE_DATA(&m_ppu_gscroll[offset]);
 }
 
 READ16_MEMBER(cps3_state::colourram_r)
@@ -2077,34 +2142,25 @@ void cps3_state::cps3_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // Bios ROM
 	map(0x02000000, 0x0207ffff).ram().share("mainram"); // Main RAM
+	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (sfiii and warzard memory test mode ONLY, and only odd bytes)
 
-	map(0x03000000, 0x030003ff).ram(); // 'FRAM' (SFIII memory test mode ONLY)
+	map(0x04000000, 0x0407ffff).ram().share("spriteram"); // Sprite RAM
+	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w)).share("colourram");  // Colour RAM 0x20000 colours
+	// PPU registers
+	map(0x040c0000, 0x040c0007).nopr(); // ?? warzard reads this but not use values, dev/debug leftovers ?
+	map(0x040c000c, 0x040c000d).r(FUNC(cps3_state::dma_status_r));
 
-//  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_SHARE("spriteram")//AM_WRITEONLY // Sprite RAM (jojoba tests this size)
-	map(0x04000000, 0x0407ffff).ram().share("spriteram");//AM_WRITEONLY // Sprite RAM
-
-	map(0x04080000, 0x040bffff).rw(FUNC(cps3_state::colourram_r), FUNC(cps3_state::colourram_w)).share("colourram");  // Colour RAM (jojoba tests this size) 0x20000 colours?!
-
-	// video registers of some kind probably
-	map(0x040C0000, 0x040C0003).r(FUNC(cps3_state::_40C0000_r));//?? every frame
-	map(0x040C0004, 0x040C0007).r(FUNC(cps3_state::_40C0004_r));//AM_READ(_40C0004_r) // warzard reads this!
-//  AM_RANGE(0x040C0008, 0x040C000b) AM_WRITENOP//??
-	map(0x040C000c, 0x040C000f).r(FUNC(cps3_state::vbl_r));// AM_WRITENOP/
-
-	map(0x040C0000, 0x040C001f).w(FUNC(cps3_state::unk_vidregs_w));
-	map(0x040C0020, 0x040C002b).writeonly().share("tmap20_regs");
-	map(0x040C0030, 0x040C003b).writeonly().share("tmap30_regs");
-	map(0x040C0040, 0x040C004b).writeonly().share("tmap40_regs");
-	map(0x040C0050, 0x040C005b).writeonly().share("tmap50_regs");
-
-	map(0x040C0060, 0x040C007f).ram().share("fullscreenzoom");
-
-	map(0x040C0094, 0x040C009b).w(FUNC(cps3_state::characterdma_w));
-
-	map(0x040C00a0, 0x040C00af).w(FUNC(cps3_state::palettedma_w));
-
-	map(0x040C0084, 0x040C0087).w(FUNC(cps3_state::cram_bank_w));
-	map(0x040C0088, 0x040C008b).w(FUNC(cps3_state::cram_gfxflash_bank_w));
+	map(0x040c0000, 0x040c001f).w(FUNC(cps3_state::ppu_gscroll_w));
+	map(0x040c0020, 0x040c002b).writeonly().share("tmap20_regs");
+	map(0x040c0030, 0x040c003b).writeonly().share("tmap30_regs");
+	map(0x040c0040, 0x040c004b).writeonly().share("tmap40_regs");
+	map(0x040c0050, 0x040c005b).writeonly().share("tmap50_regs");
+	map(0x040c0060, 0x040c007f).writeonly().share("ppu_crtc_zoom");
+	map(0x040c0080, 0x040c0083).w(FUNC(cps3_state::spritedma_w)).umask32(0x0000ffff);
+	map(0x040c0084, 0x040c0087).w(FUNC(cps3_state::cram_bank_w));
+	map(0x040c0088, 0x040c008b).w(FUNC(cps3_state::cram_gfxflash_bank_w));
+	map(0x040c0094, 0x040c009b).w(FUNC(cps3_state::characterdma_w));
+	map(0x040c00a0, 0x040c00af).w(FUNC(cps3_state::palettedma_w));
 
 	map(0x040e0000, 0x040e02ff).rw(m_cps3sound, FUNC(cps3_sound_device::cps3_sound_r), FUNC(cps3_sound_device::cps3_sound_w));
 
@@ -2113,35 +2169,33 @@ void cps3_state::cps3_map(address_map &map)
 
 	map(0x05000000, 0x05000003).portr("INPUTS");
 	map(0x05000004, 0x05000007).portr("EXTRA");
+	map(0x05000008, 0x05000009).w(FUNC(cps3_state::outport_w));
 
-	map(0x05000008, 0x0500000b).nopw(); // ?? every frame
-
-	map(0x05000a00, 0x05000a1f).r(FUNC(cps3_state::unk_io_r)); // ?? every frame
+	map(0x05000a00, 0x05000a1f).r(FUNC(cps3_state::dev_dipsw_r));
 
 	map(0x05001000, 0x05001203).rw(FUNC(cps3_state::eeprom_r), FUNC(cps3_state::eeprom_w));
 
-	map(0x05040000, 0x0504ffff).rw(FUNC(cps3_state::ssram_r), FUNC(cps3_state::ssram_w)).share("ss_ram"); // 'SS' RAM (Score Screen) (text tilemap + toles)
-	//0x25050020
-	map(0x05050020, 0x05050023).w(FUNC(cps3_state::ss_bank_base_w));
-	map(0x05050024, 0x05050027).w(FUNC(cps3_state::ss_pal_base_w));
+	map(0x05040000, 0x0504ffff).rw(FUNC(cps3_state::ssram_r), FUNC(cps3_state::ssram_w)).umask32(0x00ff00ff); // 'SS' RAM (Score Screen) (text tilemap + toles)
+	map(0x05050000, 0x0505002b).w(FUNC(cps3_state::ssregs_w)).umask32(0x00ff00ff);
 
-	map(0x05100000, 0x05100003).w(FUNC(cps3_state::irq12_ack_w));
-	map(0x05110000, 0x05110003).w(FUNC(cps3_state::irq10_ack_w));
-
+	map(0x05100000, 0x05100003).lw32("irq12_ack", [this](offs_t, u32) { m_maincpu->set_input_line(12, CLEAR_LINE); });
+	map(0x05110000, 0x05110003).lw32("irq10_ack", [this](offs_t, u32) { m_maincpu->set_input_line(10, CLEAR_LINE); });
+	map(0x05120000, 0x05120003).lw32("irq14_ack", [this](offs_t, u32) { m_maincpu->set_input_line(14, CLEAR_LINE); }); // ?? unused
+	map(0x05130000, 0x05130003).lw32("irq6_ack", [this](offs_t, u32) { m_maincpu->set_input_line(6, CLEAR_LINE); }); // ?? unused
 	map(0x05140000, 0x05140003).rw("scsi:7:wd33c93", FUNC(wd33c93_device::indir_r), FUNC(wd33c93_device::indir_w)).umask32(0x00ff00ff);
 
 	map(0x06000000, 0x067fffff).rw(FUNC(cps3_state::flash1_r), FUNC(cps3_state::flash1_w)); /* Flash ROMs simm 1 */
 	map(0x06800000, 0x06ffffff).rw(FUNC(cps3_state::flash2_r), FUNC(cps3_state::flash2_w)); /* Flash ROMs simm 2 */
 
 	map(0x07ff0048, 0x07ff004b).nopw(); // bit 0 toggles during programming
-	map(0xc0000000, 0xc00003ff).ram().w(FUNC(cps3_state::_0xc0000000_ram_w)).share("0xc0000000_ram"); /* Executes code from here */
+	map(0xc0000000, 0xc00003ff).ram().w(FUNC(cps3_state::sh2cache_ram_w)).share("sh2cache_ram"); /* Executes code from here */
 }
 
 void cps3_state::decrypted_opcodes_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().region("bios", 0); // Bios ROM
 	map(0x06000000, 0x06ffffff).rom().share("decrypted_gamerom");
-	map(0xc0000000, 0xc00003ff).rom().share("0xc0000000_ram_decrypted");
+	map(0xc0000000, 0xc00003ff).rom().share("sh2cache_ram_decrypted");
 }
 
 static INPUT_PORTS_START( cps3 )
@@ -2203,34 +2257,34 @@ static INPUT_PORTS_START( cps3_jojo)
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Light") PORT_PLAYER(2)
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Medium") PORT_PLAYER(2)
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Strong") PORT_PLAYER(2)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("EXTRA")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Stand") PORT_PLAYER(1)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Stand") PORT_PLAYER(2)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(cps3_state::vbl_interrupt)
+WRITE_LINE_MEMBER(cps3_state::vbl_interrupt)
 {
-	device.execute().set_input_line(12, ASSERT_LINE);
+	if (state)
+		m_maincpu->set_input_line(12, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(cps3_state::other_interrupt)
+// Test cases: character portraits screen after character select in sfiii2, warzard attract title.
+TIMER_DEVICE_CALLBACK_MEMBER(cps3_state::dma_interrupt)
 {
-	// this seems to need to be periodic (see the life bar portraits in sfiii2
-	// but also triggered on certain dma events (or warzard locks up in attract)
-	// what is the REAL source of IRQ10??
-	device.execute().set_input_line(10, ASSERT_LINE);
+	m_dma_status &= ~6;
+	m_maincpu->set_input_line(10, ASSERT_LINE);
 }
 
 
 void cps3_state::machine_start()
 {
-	m_eeprom = std::make_unique<u32[]>(0x400/4);
-	subdevice<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
+	m_eeprom = std::make_unique<u32[]>(0x80/4);
+	subdevice<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x80);
 
 	save_item(NAME(m_cram_gfxflash_bank));
 	save_item(NAME(m_cram_bank));
@@ -2244,14 +2298,22 @@ void cps3_state::machine_start()
 	save_item(NAME(m_chardma_source));
 	save_item(NAME(m_chardma_other));
 	save_item(NAME(m_current_table_address));
+	save_item(NAME(m_dma_status));
+	save_item(NAME(m_ppu_gscroll));
+	save_item(NAME(m_ss_hscroll));
+	save_item(NAME(m_ss_vscroll));
+	save_item(NAME(m_ss_pal_base));
+	save_item(NAME(m_spritelist_dma));
 
-	save_pointer(NAME(m_eeprom), 0x400/4);
+	save_pointer(NAME(m_eeprom), 0x80/4);
 }
 
 
 void cps3_state::machine_reset()
 {
 	m_current_table_address = -1;
+	m_dma_status = 0;
+	m_spritelist_dma = 0;
 
 	// copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
 	copy_from_nvram();
@@ -2262,6 +2324,8 @@ void cps3_state::device_post_load()
 {
 	// copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
 	copy_from_nvram();
+	m_gfxdecode->gfx(0)->mark_all_dirty();
+	m_gfxdecode->gfx(1)->mark_all_dirty();
 }
 
 
@@ -2375,18 +2439,11 @@ SH2_DMA_KLUDGE_CB(cps3_state::dma_callback)
 
 	if (src < 0x80000)
 	{
-		int offs = (src & 0x07ffff) >> 2;
-		data = data ^ cps3_mask(offs * 4, m_key1, m_key2);
+		data = data ^ cps3_mask(src & ~3, m_key1, m_key2);
 	}
-	else if (src >= 0x6000000 && src < 0x6800000)
+	else if (src >= 0x6000000 && src < 0x7000000)
 	{
-		int offs = (src & 0x07fffff) >> 2;
-		if (!m_altEncryption) data = data ^ cps3_mask(0x6000000 + offs * 4, m_key1, m_key2);
-	}
-	else if (src >= 0x6800000 && src < 0x7000000)
-	{
-		int offs = (src & 0x07fffff) >> 2;
-		if (!m_altEncryption) data = data ^ cps3_mask(0x6800000 + offs * 4, m_key1, m_key2);
+		if (!m_altEncryption) data = data ^ cps3_mask(src & ~3, m_key1, m_key2);
 	}
 	else
 	{
@@ -2454,8 +2511,6 @@ void cps3_state::cps3(machine_config &config)
 	SH2(config, m_maincpu, 6250000*4); // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps3_state::cps3_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps3_state::decrypted_opcodes_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cps3_state::vbl_interrupt));
-	m_maincpu->set_periodic_int(FUNC(cps3_state::other_interrupt), attotime::from_hz(80)); /* ?source? */
 	m_maincpu->set_dma_kludge_callback(FUNC(cps3_state::dma_callback));
 
 	NSCSI_BUS(config, "scsi");
@@ -2464,18 +2519,19 @@ void cps3_state::cps3(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(60'000'000)/8, 486, 0, 384, 259, 0, 224);
+	screen.set_raw(XTAL(42'954'545)/5, (454+1)*6/5, 0, 384, 262+1, 0, 224); // H Total counter uses XTAL/6 clock
 	screen.set_screen_update(FUNC(cps3_state::screen_update));
+	screen.screen_vblank().set(FUNC(cps3_state::vbl_interrupt));
 /*
     Measured clocks:
-        V = 59.5992Hz
-        H = 15.4335kHz
-        H/V = 258.955 ~ 259 lines
-
-    Possible video clocks:
-        60MHz       / 15.4335kHz = 3887.647 / 8 = 485.956 ~ 486 -> likely
-         42.9545MHz / 15.4445kHz = 2781.217 / 6 = 463.536 -> unlikely
+        Video DAC = 8.602MHz (384 wide mode) ~ 42.9545MHz / 5
+                    10.73MHZ (496 wide mode) ~ 42.9545MHz / 4
+        H = 15.73315kHz
+        V = 59.8Hz
+        H/V ~ 263 lines
 */
+
+	TIMER(config, m_dma_timer).configure_generic(FUNC(cps3_state::dma_interrupt));
 
 	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
 	PALETTE(config, m_palette).set_entries(0x10000); // actually 0x20000 ...
@@ -2560,7 +2616,7 @@ ROM_START( redearth )
 	ROM_LOAD( "redearth_euro.29f400.u2", 0x000000, 0x080000, CRC(02e0f336) SHA1(acc37e830dfeb9674f5a0fb24f4cc23217ae4ff5) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-wzd-5", 0, BAD_DUMP SHA1(e5676752b08283dc4a98c3d7b759e8aa6dcd0679) )
+	DISK_IMAGE_READONLY( "cap-wzd-5", 0, SHA1(034c375c3f2f68723eef530b40da909a7be7b556) )
 ROM_END
 
 ROM_START( redearthr1 )
@@ -2576,7 +2632,7 @@ ROM_START( warzard )
 	ROM_LOAD( "warzard_japan.29f400.u2", 0x000000, 0x080000, CRC(f8e2f0c6) SHA1(93d6a986f44c211fff014e55681eca4d2a2774d6) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-wzd-5", 0, BAD_DUMP SHA1(e5676752b08283dc4a98c3d7b759e8aa6dcd0679) )
+	DISK_IMAGE_READONLY( "cap-wzd-5", 0, SHA1(034c375c3f2f68723eef530b40da909a7be7b556) )
 ROM_END
 
 ROM_START( warzardr1 )
@@ -2593,7 +2649,7 @@ ROM_START( sfiii )
 	ROM_LOAD( "sfiii_euro.29f400.u2", 0x000000, 0x080000, CRC(27699ddc) SHA1(d8b525cd27e584560b129598df31fd2c5b2a682a) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) )
+	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
 ROM_START( sfiiiu )
@@ -2601,7 +2657,7 @@ ROM_START( sfiiiu )
 	ROM_LOAD( "sfiii_usa_region_b1.29f400.u2", 0x000000, 0x080000, CRC(fb172a8e) SHA1(48ebf59910f246835f7dc0c588da30f7a908072f) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) )
+	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
 ROM_START( sfiiia )
@@ -2609,7 +2665,7 @@ ROM_START( sfiiia )
 	ROM_LOAD( "sfiii_asia_region_bd.29f400.u2", 0x000000, 0x080000,  CRC(cbd28de7) SHA1(9c15ecb73b9587d20850e62e8683930a45caa01b) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) )
+	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
 ROM_START( sfiiij )
@@ -2617,7 +2673,7 @@ ROM_START( sfiiij )
 	ROM_LOAD( "sfiii_japan.29f400.u2", 0x000000, 0x080000, CRC(74205250) SHA1(c3e83ace7121d32da729162662ec6b5285a31211) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) )
+	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
 ROM_START( sfiiih )
@@ -2625,7 +2681,7 @@ ROM_START( sfiiih )
 	ROM_LOAD( "sfiii_hispanic.29f400.u2", 0x000000, 0x080000, CRC(d2b3cd48) SHA1(00ebb270c24a66515c97e35331de54ff5358000e) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) )
+	DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(20aa46f8ffeb235205dc95cfd8fba42c7d102355) )
 ROM_END
 
 
@@ -2634,7 +2690,7 @@ ROM_START( sfiii2 )
 	ROM_LOAD( "sfiii2_usa.29f400.u2", 0x000000, 0x080000, CRC(75dd72e0) SHA1(5a12d6ea6734df5de00ecee6f9ef470749d2f242) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-3ga000", 0, BAD_DUMP SHA1(4e162885b0b3265a56e0265037bcf247e820f027) )
+	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
 ROM_END
 
 ROM_START( sfiii2j )
@@ -2642,7 +2698,7 @@ ROM_START( sfiii2j )
 	ROM_LOAD( "sfiii2_japan.29f400.u2", 0x000000, 0x080000, CRC(faea0a3e) SHA1(a03cd63bcf52e4d57f7a598c8bc8e243694624ec) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-3ga000", 0, BAD_DUMP SHA1(4e162885b0b3265a56e0265037bcf247e820f027) )
+	DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(a0c11a5c3057dc1ad3962aa38adf95acb3430bec) )
 ROM_END
 
 
@@ -2659,7 +2715,7 @@ ROM_START( jojor1 )
 	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-jjk-2", 0, BAD_DUMP SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) )
+	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
 ROM_END
 
 ROM_START( jojor2 )
@@ -2667,7 +2723,7 @@ ROM_START( jojor2 )
 	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-jjk000", 0, BAD_DUMP SHA1(09869f6d8c032b527e02d815749dc8fab1289e86) )
+	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
 ROM_END
 
 ROM_START( jojoj )
@@ -2683,7 +2739,7 @@ ROM_START( jojojr1 )
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-jjk-2", 0, BAD_DUMP SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) )
+	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
 ROM_END
 
 ROM_START( jojojr2 )
@@ -2691,7 +2747,7 @@ ROM_START( jojojr2 )
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-jjk000", 0, BAD_DUMP SHA1(09869f6d8c032b527e02d815749dc8fab1289e86) )
+	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
 ROM_END
 
 
@@ -2700,7 +2756,7 @@ ROM_START( sfiii3 )
 	ROM_LOAD( "sfiii3_euro.29f400.u2", 0x000000, 0x080000, CRC(30bbf293) SHA1(f094c2eeaf4f6709060197aca371a4532346bf78) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-33s-2", 0, BAD_DUMP SHA1(41b0e246db91cbfc3f8f0f62d981734feb4b4ab5) )
+	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(5a090956fc6d68e496ac42854199059898f2fe16) )
 ROM_END
 
 ROM_START( sfiii3r1 )
@@ -2708,7 +2764,7 @@ ROM_START( sfiii3r1 )
 	ROM_LOAD( "sfiii3_euro.29f400.u2", 0x000000, 0x080000, CRC(30bbf293) SHA1(f094c2eeaf4f6709060197aca371a4532346bf78) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) )
+	DISK_IMAGE_READONLY( "cap-33s-1", 0, SHA1(92e146fea751404077919da91f4c5112742627ed) )
 ROM_END
 
 ROM_START( sfiii3u )
@@ -2716,7 +2772,7 @@ ROM_START( sfiii3u )
 	ROM_LOAD( "sfiii3_usa.29f400.u2", 0x000000, 0x080000, CRC(ecc545c1) SHA1(e39083820aae914fd8b80c9765129bedb745ceba) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-33s-2", 0, BAD_DUMP SHA1(41b0e246db91cbfc3f8f0f62d981734feb4b4ab5) )
+	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(5a090956fc6d68e496ac42854199059898f2fe16) )
 ROM_END
 
 ROM_START( sfiii3ur1 )
@@ -2724,7 +2780,7 @@ ROM_START( sfiii3ur1 )
 	ROM_LOAD( "sfiii3_usa.29f400.u2", 0x000000, 0x080000, CRC(ecc545c1) SHA1(e39083820aae914fd8b80c9765129bedb745ceba) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) )
+	DISK_IMAGE_READONLY( "cap-33s-1", 0, SHA1(92e146fea751404077919da91f4c5112742627ed) )
 ROM_END
 
 ROM_START( sfiii3j )
@@ -2732,7 +2788,7 @@ ROM_START( sfiii3j )
 	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-33s-2", 0, BAD_DUMP SHA1(41b0e246db91cbfc3f8f0f62d981734feb4b4ab5) )
+	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(5a090956fc6d68e496ac42854199059898f2fe16) )
 ROM_END
 
 ROM_START( sfiii3jr1 )
@@ -2740,7 +2796,7 @@ ROM_START( sfiii3jr1 )
 	ROM_LOAD( "sfiii3_japan.29f400.u2", 0x000000, 0x080000, CRC(63f23d1f) SHA1(58559403c325454f8c8d3eb0f569a531aa22db26) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) )
+	DISK_IMAGE_READONLY( "cap-33s-1", 0, SHA1(92e146fea751404077919da91f4c5112742627ed) )
 ROM_END
 
 
@@ -3818,15 +3874,17 @@ ROM_END
 
 *****************************************************************************************/
 
+#define GAME_FLAGS (MACHINE_SUPPORTS_SAVE)
+
 /* Red Earth / Warzard */
 
 // 961121
-GAME( 1996, redearth,    0,        redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, warzard,     redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961121)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, redearth,    0,        redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", GAME_FLAGS )
+GAME( 1996, warzard,     redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961121)", GAME_FLAGS )
 
 // 961023
-GAME( 1996, redearthr1,  redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961023)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, redearthr1,  redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", GAME_FLAGS )
+GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961023)", GAME_FLAGS )
 
 /* Street Fighter III: New Generation */
 
@@ -3837,13 +3895,13 @@ GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redeart
 // not dumped
 
 // 970204
-GAME( 1997, sfiii,       0,        sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Euro 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiiu,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiia,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiij,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiih,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiin,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 2)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii,       0,        sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Euro 970204)", GAME_FLAGS )
+GAME( 1997, sfiiiu,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", GAME_FLAGS )
+GAME( 1997, sfiiia,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", GAME_FLAGS )
+GAME( 1997, sfiiij,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", GAME_FLAGS )
+GAME( 1997, sfiiih,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", GAME_FLAGS )
+GAME( 1997, sfiiin,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", GAME_FLAGS )
+GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 2)", GAME_FLAGS )
 
 /* Street Fighter III 2nd Impact: Giant Attack */
 
@@ -3851,65 +3909,65 @@ GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii, 
 // not dumped
 
 // 970930
-GAMEL(1997, sfiii2,      0,        sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", MACHINE_IMPERFECT_GRAPHICS, layout_sfiii2 ) // layout is for widescreen support
-GAMEL(1997, sfiii2j,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", MACHINE_IMPERFECT_GRAPHICS, layout_sfiii2 )
-GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", MACHINE_IMPERFECT_GRAPHICS, layout_sfiii2 )
+GAMEL(1997, sfiii2,      0,        sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", GAME_FLAGS, layout_sfiii2 ) // layout is for widescreen support
+GAMEL(1997, sfiii2j,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", GAME_FLAGS, layout_sfiii2 )
+GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", GAME_FLAGS, layout_sfiii2 )
 
 /* JoJo's Venture / JoJo no Kimyou na Bouken */
 
 // 990128
-GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoj,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojon,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", GAME_FLAGS )
+GAME( 1998, jojoj,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", GAME_FLAGS )
+GAME( 1998, jojon,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", GAME_FLAGS )
 
 // 990108
-GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojojr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojonr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_FLAGS )
+GAME( 1998, jojojr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", GAME_FLAGS )
+GAME( 1998, jojonr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", GAME_FLAGS )
 
 // 981202
-GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojojr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, jojonr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", GAME_FLAGS )
+GAME( 1998, jojojr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", GAME_FLAGS )
+GAME( 1998, jojonr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", GAME_FLAGS )
 
 /* Street Fighter III 3rd Strike: Fight for the Future */
 
 // 990608
-GAME( 1999, sfiii3,      0,        sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990608)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3u,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3j,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3n,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3,      0,        sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990608)", GAME_FLAGS )
+GAME( 1999, sfiii3u,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", GAME_FLAGS )
+GAME( 1999, sfiii3j,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608)", GAME_FLAGS )
+GAME( 1999, sfiii3n,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", GAME_FLAGS )
 
 // 990512
-GAME( 1999, sfiii3r1,    sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990512)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3ur1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3jr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3nr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3r1,    sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990512)", GAME_FLAGS )
+GAME( 1999, sfiii3ur1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", GAME_FLAGS )
+GAME( 1999, sfiii3jr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512)", GAME_FLAGS )
+GAME( 1999, sfiii3nr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", GAME_FLAGS )
 
 /* JoJo's Bizarre Adventure / JoJo no Kimyou na Bouken: Mirai e no Isan */
 
 // 990927
-GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobane,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", GAME_FLAGS )
+GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", GAME_FLAGS )
+GAME( 1999, jojobane,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", GAME_FLAGS )
 
 // 990913
-GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", GAME_FLAGS )
+GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", GAME_FLAGS )
+GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_FLAGS )
 
 // bootlegs, hold START1 during bootup to change games
 
 // newest revision, fixes some issues with Warzard decryption.
-GAME( 1999, cps3boot,    0,        sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3boota,   cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3boot,    0,        sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", GAME_FLAGS )
+GAME( 1999, cps3boota,   cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", GAME_FLAGS )
 
-GAME( 1999, cps3booto,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3bootao,  cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3booto,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", GAME_FLAGS )
+GAME( 1999, cps3bootao,  cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", GAME_FLAGS )
 // this doesn't play 2nd Impact despite it being listed.  2nd Impact uses separate data/code encryption and can't be decrypted cleanly for a standard SH2.  Selecting it just flashes in a copy of 3rd Strike with the 2nd Impact loading screen
-GAME( 1999, cps3booto2,  cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3booto2,  cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", GAME_FLAGS )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
-GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", GAME_FLAGS )
 // these are test bootleg CDs for running 2nd Impact on a standard SH2
-GAME( 1999, cps3bs32,    cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3bs32a,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_IMPERFECT_GRAPHICS ) // older / buggier hack
+GAME( 1999, cps3bs32,    cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", GAME_FLAGS )
+GAME( 1999, cps3bs32a,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", GAME_FLAGS ) // older / buggier hack

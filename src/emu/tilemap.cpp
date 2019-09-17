@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 //**************************************************************************
@@ -895,6 +896,7 @@ u8 tilemap_t::tile_apply_bitmask(const u8 *maskdata, u32 x0, u32 y0, u8 category
 void tilemap_t::configure_blit_parameters(blit_parameters &blit, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask)
 {
 	// set the target bitmap
+	assert(priority_bitmap.cliprect().contains(cliprect));
 	blit.priority = &priority_bitmap;
 	blit.cliprect = cliprect;
 
@@ -952,20 +954,16 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 	realize_all_dirty_tiles();
 
 	// flip the tilemap around the center of the visible area
-	rectangle visarea = screen.visible_area();
-	// TODO: is this correct or are drivers relying on a bug here?
-	// These are not the width and height, rather 2 * left + width,
-	// and 2 * top + height, and these are inputs to the
-	// effective_*scroll functions used in the case of a flip.
-	u32 width = visarea.right() + visarea.left() + 1;
-	u32 height = visarea.bottom() + visarea.top() + 1;
+	rectangle const visarea = screen.visible_area();
+	u32 const xextent = visarea.right() + visarea.left() + 1; // x0 + x1 + 1 for calculating horizontal centre as (x0 + x1 + 1) >> 1
+	u32 const yextent = visarea.bottom() + visarea.top() + 1; // y0 + y1 + 1 for calculating vertical centre as (y0 + y1 + 1) >> 1
 
 	// XY scrolling playfield
 	if (m_scrollrows == 1 && m_scrollcols == 1)
 	{
 		// iterate to handle wraparound
-		int scrollx = effective_rowscroll(0, width);
-		int scrolly = effective_colscroll(0, height);
+		int scrollx = effective_rowscroll(0, xextent);
+		int scrolly = effective_colscroll(0, yextent);
 		for (int ypos = scrolly - m_height; ypos <= blit.cliprect.bottom(); ypos += m_height)
 			for (int xpos = scrollx - m_width; xpos <= blit.cliprect.right(); xpos += m_width)
 				draw_instance(screen, dest, blit, xpos, ypos);
@@ -978,7 +976,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 		// iterate over Y to handle wraparound
 		int rowheight = m_height / m_scrollrows;
-		int scrolly = effective_colscroll(0, height);
+		int scrolly = effective_colscroll(0, yextent);
 		for (int ypos = scrolly - m_height; ypos <= original_cliprect.bottom(); ypos += m_height)
 		{
 			int const firstrow = std::max((original_cliprect.top() - ypos) / rowheight, 0);
@@ -989,9 +987,9 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 			for (int currow = firstrow; currow <= lastrow; currow = nextrow)
 			{
 				// scan forward until we find a non-matching row
-				int scrollx = effective_rowscroll(currow, width);
+				int scrollx = effective_rowscroll(currow, xextent);
 				for (nextrow = currow + 1; nextrow <= lastrow; nextrow++)
-					if (effective_rowscroll(nextrow, width) != scrollx)
+					if (effective_rowscroll(nextrow, xextent) != scrollx)
 						break;
 
 				// skip if disabled
@@ -1015,15 +1013,15 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 		const rectangle original_cliprect = blit.cliprect;
 
 		// iterate over columns in the tilemap
-		int scrollx = effective_rowscroll(0, width);
+		int scrollx = effective_rowscroll(0, xextent);
 		int colwidth = m_width / m_scrollcols;
 		int nextcol;
 		for (int curcol = 0; curcol < m_scrollcols; curcol = nextcol)
 		{
 			// scan forward until we find a non-matching column
-			int scrolly = effective_colscroll(curcol, height);
+			int scrolly = effective_colscroll(curcol, yextent);
 			for (nextcol = curcol + 1; nextcol < m_scrollcols; nextcol++)
-				if (effective_colscroll(nextcol, height) != scrolly)
+				if (effective_colscroll(nextcol, yextent) != scrolly)
 					break;
 
 			// skip if disabled

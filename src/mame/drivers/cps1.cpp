@@ -7801,6 +7801,45 @@ ROM_START( sf2stt )
 	ROM_LOAD( "1.stt", 0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
 ROM_END
 
+ROM_START( sf2re ) // combines sf2m8 program ROMs with sf2cems6a ROMs for most GFX and common ROMs for sound
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "4.u222", 0x000000, 0x80000, CRC(db567b66) SHA1(315bfbf2786ef67a95afb87de836ab348523dbbe) )
+	ROM_LOAD16_BYTE( "3.u196", 0x000001, 0x80000, CRC(95ea597e) SHA1(5eb82feaa1de5611a96888e4670744bbb7d90393) )
+	ROM_LOAD16_BYTE( "2.u221", 0x100000, 0x20000, CRC(1073b7b6) SHA1(81ca1eab65ceac69520584bb23a684ccb9d92f89) )
+	ROM_LOAD16_BYTE( "1.u195", 0x100001, 0x20000, CRC(924c6ce2) SHA1(676a912652bd75da5087f0c7eae047b7681a993c) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROM_LOAD64_WORD( "1mre125.u70",   0x000000, 0x80000, CRC(baa0f81f) SHA1(5e55a5c4ad64be17089670a3d73c1c0d9082351b) )
+	ROM_CONTINUE(                     0x000004, 0x80000)
+	ROM_LOAD64_WORD( "3mre121.u68",   0x000002, 0x80000, CRC(8edff95a) SHA1(8db35c5940dcc1f09f11be26051b2f98445d10e7) )
+	ROM_CONTINUE(                     0x000006, 0x80000)
+	ROM_LOAD64_WORD( "5mre148.u69",   0x200000, 0x80000, CRC(468962b1) SHA1(fdfd2a7cbbcafaa37e972da425446d471e1e1dae) )
+	ROM_CONTINUE(                     0x200004, 0x80000)
+	ROM_LOAD64_WORD( "7mrd413.u64",   0x200002, 0x80000, CRC(8165f536) SHA1(8178fe2240c73c7283592aa31dd24aec5bf9429b) )
+	ROM_CONTINUE(                     0x200006, 0x80000)
+	ROM_LOAD64_WORD( "sfiire143.u19", 0x400000, 0x80000, CRC(39d763d3) SHA1(a2a0bddecaca6046785ccddfd20b8356a6ec36f0) )
+	ROM_CONTINUE(                     0x400004, 0x80000)
+	ROM_LOAD64_WORD( "sfiire073.u18", 0x400002, 0x80000, CRC(93ec42ae) SHA1(7c8b481d61a4e9977cac35236835f4aa5badf992) )
+	ROM_CONTINUE(                     0x400006, 0x80000)
+	/* extra gfx layer roms loaded over the former ones to remove the capcom copyright logo */
+	ROM_LOAD64_BYTE( "27c010.u31",    0x400004, 0x10000, CRC(6de44671) SHA1(dc6abba639e0c27033e391c7438d88dc89a93351) )
+	ROM_CONTINUE(                     0x400000, 0x10000 )
+	ROM_LOAD64_BYTE( "27c010.u30",    0x400005, 0x10000, CRC(bf0cd819) SHA1(f04a098fce07949277268327871c5e5520e3bb3c) )
+	ROM_CONTINUE(                     0x400001, 0x10000 )
+	ROM_LOAD64_BYTE( "27c010.u29",    0x400006, 0x10000, CRC(e8f14362) SHA1(a20eb75e322011e2a8d8bf2acebe713bef3d3941) )
+	ROM_CONTINUE(                     0x400002, 0x10000 )
+	ROM_LOAD64_BYTE( "27c010.u28",    0x400007, 0x10000, CRC(76f9f91f) SHA1(58a34062d2c8378558a7f1629140330279af9a43) )
+	ROM_CONTINUE(                     0x400003, 0x10000 )
+	/* end of extra gfx layer roms */
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "csicat27c512.u191", 0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )
+	ROM_CONTINUE(                  0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "27c020.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+ROM_END
+
 ROM_START( sf2rk )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "w6.u222",          0x000000, 0x80000, CRC(49422b6f) SHA1(69fe9147c7ee3f6fa29077df16f4ef1224495be3) )
@@ -13048,7 +13087,6 @@ void cps_state::init_sf2rk()
 	}
 }
 
-
 READ16_MEMBER(cps_state::sf2dongb_prot_r)
 {
 	switch (offset)
@@ -13395,6 +13433,7 @@ GAME( 1992, sf2ceupl,    sf2ce,    sf2m10,     sf2hack,  cps_state, init_cps1,  
 GAME( 1992, sf2cems6a,   sf2ce,    sf2cems6,   sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 1)", MACHINE_SUPPORTS_SAVE ) // 920313 USA
 GAME( 1992, sf2cems6b,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // 920322 USA
 GAME( 1992, sf2cems6c,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 3)", MACHINE_SUPPORTS_SAVE ) // 920322 USA
+GAME( 1992, sf2re,       sf2,      sf2m3,      sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (RE, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )    // 920313 - based on USA version, glitch on title screen confirmed not to happen on PCB so MIG
 GAME( 1992, cworld2j,    0,        cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, cworld2ja,   cworld2j, cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 90629B-3, no battery)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, cworld2jb,   cworld2j, cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 91634B-2)", MACHINE_SUPPORTS_SAVE )

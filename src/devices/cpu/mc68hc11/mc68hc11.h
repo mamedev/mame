@@ -6,51 +6,52 @@
 #pragma once
 
 
-#define MC68HC11_IO_PORTA           0x00
-#define MC68HC11_IO_PORTB           0x01
-#define MC68HC11_IO_PORTC           0x02
-#define MC68HC11_IO_PORTD           0x03
-#define MC68HC11_IO_PORTE           0x04
-#define MC68HC11_IO_PORTF           0x05
-#define MC68HC11_IO_PORTG           0x06
-#define MC68HC11_IO_PORTH           0x07
-#define MC68HC11_IO_SPI1_DATA       0x08
-#define MC68HC11_IO_SPI2_DATA       0x09
-#define MC68HC11_IO_AD0             0x10
-#define MC68HC11_IO_AD1             0x11
-#define MC68HC11_IO_AD2             0x12
-#define MC68HC11_IO_AD3             0x13
-#define MC68HC11_IO_AD4             0x14
-#define MC68HC11_IO_AD5             0x15
-#define MC68HC11_IO_AD6             0x16
-#define MC68HC11_IO_AD7             0x17
+enum {
+	MC68HC11_IRQ_LINE           = 0,
+	MC68HC11_TOC1_LINE          = 1
+};
 
-#define MC68HC11_IRQ_LINE           0
-#define MC68HC11_TOC1_LINE          1
-
-DECLARE_DEVICE_TYPE(MC68HC11, mc68hc11_cpu_device)
+DECLARE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device)
+DECLARE_DEVICE_TYPE(MC68HC11D0, mc68hc11d0_device)
+DECLARE_DEVICE_TYPE(MC68HC11K1, mc68hc11k1_device)
+DECLARE_DEVICE_TYPE(MC68HC11M0, mc68hc11m0_device)
 
 class mc68hc11_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void set_config(int has_extended_io, int internal_ram_size, int init_value)
-	{
-		set_has_extended_io(has_extended_io);
-		set_internal_ram_size(internal_ram_size);
-		set_init_value(init_value);
-	}
-
-	// I/O enable flag
-	void set_has_extended_io(int has_extended_io) { m_has_extended_io = has_extended_io; }
-	void set_internal_ram_size(int internal_ram_size) { m_internal_ram_size = internal_ram_size; }
-	// default value for INIT register
-	void set_init_value(int init_value) { m_init_value = init_value; }
+	// port configuration
+	auto in_pa_callback() { return m_port_input_cb[0].bind(); }
+	auto in_pb_callback() { return m_port_input_cb[1].bind(); }
+	auto in_pc_callback() { return m_port_input_cb[2].bind(); }
+	auto in_pd_callback() { return m_port_input_cb[3].bind(); }
+	auto in_pe_callback() { return m_port_input_cb[4].bind(); }
+	auto in_pf_callback() { return m_port_input_cb[5].bind(); }
+	auto in_pg_callback() { return m_port_input_cb[6].bind(); }
+	auto in_ph_callback() { return m_port_input_cb[7].bind(); }
+	auto out_pa_callback() { return m_port_output_cb[0].bind(); }
+	auto out_pb_callback() { return m_port_output_cb[1].bind(); }
+	auto out_pc_callback() { return m_port_output_cb[2].bind(); }
+	auto out_pd_callback() { return m_port_output_cb[3].bind(); }
+	auto out_pe_callback() { return m_port_output_cb[4].bind(); }
+	auto out_pf_callback() { return m_port_output_cb[5].bind(); }
+	auto out_pg_callback() { return m_port_output_cb[6].bind(); }
+	auto out_ph_callback() { return m_port_output_cb[7].bind(); }
+	auto in_an0_callback() { return m_analog_cb[0].bind(); }
+	auto in_an1_callback() { return m_analog_cb[1].bind(); }
+	auto in_an2_callback() { return m_analog_cb[2].bind(); }
+	auto in_an3_callback() { return m_analog_cb[3].bind(); }
+	auto in_an4_callback() { return m_analog_cb[4].bind(); }
+	auto in_an5_callback() { return m_analog_cb[5].bind(); }
+	auto in_an6_callback() { return m_analog_cb[6].bind(); }
+	auto in_an7_callback() { return m_analog_cb[7].bind(); }
+	auto in_spi2_data_callback() { return m_spi2_data_input_cb.bind(); }
+	auto out_spi2_data_callback() { return m_spi2_data_output_cb.bind(); }
 
 protected:
+	mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int reg_bits, uint16_t internal_ram_size, uint8_t init_value, address_map_constructor reg_map);
+
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -70,8 +71,42 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	template <int P> uint8_t port_r();
+	template <int P> void port_w(uint8_t data);
+	template <int P> uint8_t ddr_r();
+	template <int P> void ddr_w(uint8_t data);
+	uint8_t pioc_r();
+	uint8_t tcnt_r(offs_t offset);
+	void tcnt_w(offs_t offset, uint8_t data);
+	uint8_t toc1_r(offs_t offset);
+	void toc1_w(offs_t offset, uint8_t data);
+	uint8_t tmsk1_r();
+	void tmsk1_w(uint8_t data);
+	uint8_t tflg1_r();
+	void tflg1_w(uint8_t data);
+	void tmsk2_w(uint8_t data);
+	uint8_t pactl_r();
+	void pactl_w(uint8_t data);
+	template <int N> uint8_t spcr_r();
+	template <int N> uint8_t spsr_r();
+	template <int N> uint8_t spdr_r();
+	template <int N> void spdr_w(uint8_t data);
+	uint8_t adctl_r();
+	void adctl_w(uint8_t data);
+	uint8_t adr_r(offs_t offset);
+	uint8_t opt2_r();
+	uint8_t init_r();
+	void init_w(uint8_t data);
+	uint8_t scbd_r(offs_t offset);
+	uint8_t sccr1_r();
+	uint8_t sccr2_r();
+	uint8_t scsr1_r();
+	uint8_t scrdl_r();
+	uint8_t opt4_r();
+
 private:
 	address_space_config m_program_config;
+	address_space_config m_data_config;
 	address_space_config m_io_config;
 
 	union {
@@ -94,22 +129,32 @@ private:
 	uint16_t m_ppc;
 	uint8_t m_ccr;
 
+protected:
+	uint8_t m_port_data[8];
+private:
+	uint8_t m_port_dir[8];
+
 	uint8_t m_adctl;
 	int m_ad_channel;
 
 	uint8_t m_irq_state[2];
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_program;
+	address_space *m_data;
 	address_space *m_io;
+	devcb_read8 m_port_input_cb[8];
+	devcb_write8 m_port_output_cb[8];
+	devcb_read8 m_analog_cb[8];
+	devcb_read8 m_spi2_data_input_cb;
+	devcb_write8 m_spi2_data_output_cb;
 	int m_icount;
 
 	int m_ram_position;
 	int m_reg_position;
-	std::vector<uint8_t> m_internal_ram;
 
-	int m_has_extended_io; // extended I/O enable flag
-	int m_internal_ram_size;
-	int m_init_value;
+	const uint16_t m_reg_block_size; // size of internal I/O space
+	const uint16_t m_internal_ram_size;
+	const uint8_t m_init_value; // default value for INIT register
 
 	uint8_t m_wait_state;
 	uint8_t m_stop_state;
@@ -120,6 +165,7 @@ private:
 	uint16_t m_tcnt;
 //  uint8_t m_por;
 	uint8_t m_pr;
+	uint8_t m_pactl;
 
 	uint64_t m_frc_base;
 
@@ -137,8 +183,8 @@ private:
 	ophandler hc11_optable_page3[256];
 	ophandler hc11_optable_page4[256];
 
-	uint8_t hc11_regs_r(uint32_t address);
-	void hc11_regs_w(uint32_t address, uint8_t value);
+	void ram_map(address_map &map);
+
 	uint8_t FETCH();
 	uint16_t FETCH16();
 	uint8_t READ8(uint32_t address);
@@ -463,6 +509,56 @@ private:
 	void hc11_page4();
 	void hc11_invalid();
 	void check_irq_lines();
+};
+
+class mc68hc11a1_device : public mc68hc11_cpu_device
+{
+public:
+	// construction/destruction
+	mc68hc11a1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+
+	uint8_t pactl_r();
+	void pactl_w(uint8_t data);
+
+	void io_map(address_map &map);
+};
+
+class mc68hc11d0_device : public mc68hc11_cpu_device
+{
+public:
+	// construction/destruction
+	mc68hc11d0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override;
+
+	uint8_t pactl_r();
+	void pactl_w(uint8_t data);
+
+	void io_map(address_map &map);
+};
+
+class mc68hc11k1_device : public mc68hc11_cpu_device
+{
+public:
+	// construction/destruction
+	mc68hc11k1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void io_map(address_map &map);
+};
+
+class mc68hc11m0_device : public mc68hc11_cpu_device
+{
+public:
+	// construction/destruction
+	mc68hc11m0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void io_map(address_map &map);
 };
 
 #endif // MAME_CPU_MC68HC11_MC68HC11_H

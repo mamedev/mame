@@ -33,6 +33,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class quickpick5_state : public driver_device
 {

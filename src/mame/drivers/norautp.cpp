@@ -32,6 +32,7 @@
    * Kimble Double HI-LO (z80 version),   198?,  Kimble Ireland.
    * PMA Poker,                           198?,  PMA.
    * Poker / Black Jack (Model 7521),     198?,  M. Kramer Manufacturing.
+   * Draw Poker (Joker Poker V.01),       1984,  Coinmaster.
 
   -- 8080 based --
 
@@ -58,7 +59,7 @@
   Blue Games, CGI, Micro Manufacturing, SMS Manufacturing, Drews Distributing,
   Drew Industries, Lynch Enterprises Inc, Hillside Gaming Corp, Electro Sport,
   Mainline London, Southern Systems, Americade Amusement Inc, Prologic Ireland,
-  Mosfat, Unique, GEI, Southern Systems & Assembly Ltd., etc...
+  Mosfat, Unique, GEI, Southern Systems, Assembly Ltd., Coinmaster, etc...
 
   You can see some legal issues in the following links:
   http://cases.justia.com/us-court-of-appeals/F2/783/421/41759/
@@ -827,6 +828,8 @@ READ8_MEMBER(norautp_state::test2_r)
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | pkii_dm  |   Z80?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | cdrawpkr |   Z80   |  0x70-0x73   |  0x90  |  0xB0-0xB3   |  0x92  |  0xD0-0xD3   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
 
 */
 void norautp_state::norautp_map(address_map &map)
@@ -1205,6 +1208,64 @@ static INPUT_PORTS_START( norautkl )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( cdrawpkr )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )  PORT_NAME("Bet / Half Gamble")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meter Mode")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN1-80")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-01")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-02")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-04")
+
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+
+
 /*************************
 *    Graphics Layouts    *
 *************************/
@@ -1227,7 +1288,7 @@ static const gfx_layout charlayout =
 
 static const gfx_layout charlayout32x32 =
 {
-	32,32,
+	32, 32,
 	RGN_FRAC(1,2),
 	1,
 	{ 0 },
@@ -1281,7 +1342,7 @@ void norautp_state::noraut_base(machine_config &config)
 	m_ppi8255[2]->out_pc_callback().set(FUNC(norautp_state::ppi2_obf_w)).bit(7);
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
 	 It means that port A should be bidirectional and port B just as output.
-	 Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets). */
+	 Port C high as hshk regs, and PC0-PC2 as input (norautp, norautjp) or output (other sets). */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1388,6 +1449,15 @@ void norautp_state::cgidjp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::cgidjp_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &norautp_state::cgidjp_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
+
+void norautp_state::cdrawpkr(machine_config &config)
+{
+	noraut_base(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+	m_screen->set_visarea(5*8, 61*8-1, (0*16) + 8, 16*16-1);
 }
 
 /********** 8080 based **********/
@@ -3510,6 +3580,34 @@ ROM_START( pkii_dm )
 	ROM_LOAD( "63s141n.u51",  0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
 ROM_END
 
+/*
+
+  Draw Poker
+  Coinmaster.
+  Based on Joker Poker V.01.
+
+  Noraut Z80 based HW.
+
+  1x Z80.
+  3x PPI 8255:
+     PPI #0:  offset 0x70-0x73  config = 0x90
+     PPI #1:  offset 0xB0-0xB3  config = 0x92
+     PPI #2:  offset 0xD0-0xD3  config = 0xC0
+
+  The game needs approx 20 seconds to boot the game.
+
+*/
+
+ROM_START( cdrawpkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jpk_a_1-1.ic29",   0x0000, 0x1000, CRC(f4eb1664) SHA1(f636279d3ef5c79277676f45388522b00625cc72) )
+	ROM_LOAD( "jpk_aus_2-1.ic25", 0x1000, 0x1000, CRC(9ed796bf) SHA1(31ffd4fe3cbbebbe502dbf7fd51524636bf74d6b) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                 0x0000, 0x0800, 0xff )
+	ROM_LOAD( "char_1.ic15",  0x0800, 0x0800, CRC(b114d647) SHA1(d507bad88bec5999b2b2a3f7c4472dedeaed1a29) )
+ROM_END
+
 
 /**************************
 *       Driver Init       *
@@ -3649,7 +3747,6 @@ void norautp_state::init_ssa()
 /**************************************************************************************/
 
 //     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                LAYOUT
-
 GAMEL( 1988, norautp,  0,       norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker",                        0,                   layout_noraut11 )
 GAMEL( 198?, norautdx, 0,       norautp,  norautpn, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",       0,                   layout_noraut12 )
 GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautp_state, empty_init, ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",       0,                   layout_noraut12 )
@@ -3672,6 +3769,7 @@ GAME(  198?, kimblz80, 0,       kimble,   norautp,  norautp_state, empty_init, R
 GAME(  1983, pma,      0,       nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                           MACHINE_NOT_WORKING )
 GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     MACHINE_NOT_WORKING, layout_noraut12 )
 GAME(  19??, newhilop, 0,       newhilop, norautp,  norautp_state, empty_init, ROT0, "Song Won?",                "New Hi-Low Poker",                    MACHINE_NOT_WORKING )
+GAMEL( 1984, cdrawpkr, 0,       cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",       0,                   layout_noraut11 )
 
 
 /************************************* 8080 sets **************************************/
@@ -3679,7 +3777,6 @@ GAME(  19??, newhilop, 0,       newhilop, norautp,  norautp_state, empty_init, R
 /**************************************************************************************/
 
 //     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS             LAYOUT
-
 GAME(  1983, dphl,     0,       dphl,     norautp, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      MACHINE_NOT_WORKING )
 GAME(  1983, dphla,    0,       dphla,    norautp, norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Alt)",           MACHINE_NOT_WORKING )
 GAME(  1983, dphljp,   0,       dphl,     norautp, norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      MACHINE_NOT_WORKING )
@@ -3700,8 +3797,7 @@ GAME(  1993, tpoker2,  0,       dphltest, norautp, norautp_state, empty_init, RO
 /**************************************************************************************/
 
 //     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS             LAYOUT
-
 GAME(  198?, fastdrwp, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunka, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   MACHINE_NOT_WORKING )
 GAME(  198?, dphlunkb, 0,       dphl,     norautp, norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   MACHINE_NOT_WORKING )
-GAME(  198?, pkii_dm,  0,       nortest1, norautp, norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",               MACHINE_NOT_WORKING )
+GAME(  198?, pkii_dm,  0,       nortest1, norautp, norautp_state, empty_init, ROT0, "<unknown>",                "unknown poker game PKII/DM",          MACHINE_NOT_WORKING )

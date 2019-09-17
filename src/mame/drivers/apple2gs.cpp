@@ -87,6 +87,7 @@
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/a2vulcan.h"
+#include "bus/a2bus/4play.h"
 //#include "bus/a2bus/pc_xporter.h"
 
 #include "bus/a2gameio/gameio.h"
@@ -622,7 +623,7 @@ private:
 {   \
 	if (m_last_speed) \
 	{\
-		m_slow_counter += 0x0003cccc; \
+		m_slow_counter += 0x0001999a; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \
 		m_slow_counter &= 0xffff; \
 		m_maincpu->adjust_icount(-cycles); \
@@ -4510,6 +4511,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ezcgi9958", A2BUS_EZCGI_9958);   /* E-Z Color Graphics Interface (TMS9958) */
 	device.option_add("vulcan", A2BUS_VULCAN); /* Applied Engineering Vulcan IDE drive */
 	device.option_add("vulcangold", A2BUS_VULCANGOLD); /* Applied Engineering Vulcan Gold IDE drive */
+	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
 }

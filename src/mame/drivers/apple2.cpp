@@ -86,6 +86,8 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/ssbapple.h"
+#include "bus/a2bus/4play.h"
+#include "bus/a2bus/computereyes2.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -971,7 +973,7 @@ static const uint8_t a2_key_remap[0x32][4] =
 	{ 0x55,0x55,0x15,0x15 },    /* u U     10     */
 	{ 0x49,0x49,0x09,0x09 },    /* i I     11     */
 	{ 0x4f,0x4f,0x0f,0x0f },    /* o O     12     */
-	{ 0x50,0x40,0x10,0x40 },    /* p P     13     */
+	{ 0x50,0x40,0x10,0x00 },    /* p P     13     */
 	{ 0x44,0x44,0x04,0x04 },    /* d D     14     */
 	{ 0x46,0x46,0x06,0x06 },    /* f F     15     */
 	{ 0x47,0x47,0x07,0x07 },    /* g G     16     */
@@ -987,8 +989,8 @@ static const uint8_t a2_key_remap[0x32][4] =
 	{ 0x43,0x43,0x03,0x03 },    /* c C     20     */
 	{ 0x56,0x56,0x16,0x16 },    /* v V     21     */
 	{ 0x42,0x42,0x02,0x02 },    /* b B     22     */
-	{ 0x4e,0x5e,0x0e,0x5e },    /* n N     23     */
-	{ 0x4d,0x4d,0x0d,0x0d },    /* m M     24     */
+	{ 0x4e,0x5e,0x0e,0x1e },    /* n N     23     */
+	{ 0x4d,0x5d,0x0d,0x1d },    /* m M     24     */
 	{ 0x2c,0x3c,0x2c,0x3c },    /* , <     25     */
 	{ 0x2e,0x3e,0x2e,0x3e },    /* . >     26     */
 	{ 0x2f,0x3f,0x2f,0x3f },    /* / ?     27     */
@@ -1015,12 +1017,8 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
 		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
 
 		m_transchar = a2_key_remap[m_lastchar&0x3f][mod];
-
-		if (m_transchar != 0)
-		{
-			m_strobe = 0x80;
-//          printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
-		}
+		m_strobe = 0x80;
+//      printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
 	}
 }
 
@@ -1264,6 +1262,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ezcgi9958", A2BUS_EZCGI_9958);   /* E-Z Color Graphics Interface (TMS9958) */
 	device.option_add("ssprite", A2BUS_SSPRITE);    /* Synetix SuperSprite Board */
 	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
+	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
+	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 }
 
@@ -1666,6 +1666,22 @@ ROM_START( basis108 )
 	ROM_LOAD( "fdccard_fdc4_slot6.bin",  0x0000, 0x0800, CRC(2bd452bb) SHA1(10ba81d34117ef713c546d748bf0e1a8c04d1ae3) )
 ROM_END
 
+// The bit1 and bit2 of each byte swap positions.
+// 原机器ROM每个字节的第1位和第2位互换了位置
+ROM_START(hkc8800a)
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD ( "341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
+
+	ROM_REGION(0x4000, "maincpu", ROMREGION_LE)
+	ROM_LOAD ( "hkc8800a_c0.bin", 0x0000, 0x0800, CRC(8dceea26) SHA1(57623fd9ddef05cb56e8f0bcf0baa8902ebba2bb))
+	ROM_LOAD ( "hkc8800a_c8.bin", 0x0800, 0x0800, CRC(a337c7b5) SHA1(bc3f021a85124785b78dd781fcabc66bc5645515))
+	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
+	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
+	ROM_LOAD ( "hkc8800a_f8.bin", 0x3800, 0x0800, CRC(f2287c5f) SHA1(0b6c2d6df11a0aa8c5737831758d9668fce11887))
+ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY                FULLNAME
@@ -1689,3 +1705,4 @@ COMP( 1985, am64,     apple2, 0,      space84,  apple2p, apple2_state, empty_ini
 //COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2p, apple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, laser2c,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Basis",               "Basis 108", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )

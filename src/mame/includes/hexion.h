@@ -8,6 +8,7 @@
 #include "machine/k053252.h"
 #include "machine/timer.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class hexion_state : public driver_device
 {

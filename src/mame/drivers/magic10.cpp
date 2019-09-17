@@ -127,6 +127,7 @@ Both setups show different variants for components layout, memory size, NVRAM, e
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "sgsafari.lh"
 #include "musicsrt.lh"

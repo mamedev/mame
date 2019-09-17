@@ -45,7 +45,7 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 void xxx_state::video_start()

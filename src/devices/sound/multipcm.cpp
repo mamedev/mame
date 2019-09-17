@@ -92,53 +92,53 @@ void multipcm_device::init_sample(sample_t *sample, uint32_t index)
 	sample->m_lfo_amplitude_reg = read_byte(address + 11) & 0xf;
 }
 
-int32_t multipcm_device::envelope_generator_update(slot_t *slot)
+int32_t multipcm_device::envelope_generator_update(slot_t &slot)
 {
-	switch(slot->m_envelope_gen.m_state)
+	switch(slot.m_envelope_gen.m_state)
 	{
 		case state_t::ATTACK:
-			slot->m_envelope_gen.m_volume += slot->m_envelope_gen.m_attack_rate;
-			if (slot->m_envelope_gen.m_volume >= (0x3ff << EG_SHIFT))
+			slot.m_envelope_gen.m_volume += slot.m_envelope_gen.m_attack_rate;
+			if (slot.m_envelope_gen.m_volume >= (0x3ff << EG_SHIFT))
 			{
-				slot->m_envelope_gen.m_state = state_t::DECAY1;
-				if (slot->m_envelope_gen.m_decay1_rate >= (0x400 << EG_SHIFT)) //Skip DECAY1, go directly to DECAY2
+				slot.m_envelope_gen.m_state = state_t::DECAY1;
+				if (slot.m_envelope_gen.m_decay1_rate >= (0x400 << EG_SHIFT)) //Skip DECAY1, go directly to DECAY2
 				{
-					slot->m_envelope_gen.m_state = state_t::DECAY2;
+					slot.m_envelope_gen.m_state = state_t::DECAY2;
 				}
-				slot->m_envelope_gen.m_volume = 0x3ff << EG_SHIFT;
+				slot.m_envelope_gen.m_volume = 0x3ff << EG_SHIFT;
 			}
 			break;
 		case state_t::DECAY1:
-			slot->m_envelope_gen.m_volume -= slot->m_envelope_gen.m_decay1_rate;
-			if (slot->m_envelope_gen.m_volume <= 0)
+			slot.m_envelope_gen.m_volume -= slot.m_envelope_gen.m_decay1_rate;
+			if (slot.m_envelope_gen.m_volume <= 0)
 			{
-				slot->m_envelope_gen.m_volume = 0;
+				slot.m_envelope_gen.m_volume = 0;
 			}
-			if (slot->m_envelope_gen.m_volume >> EG_SHIFT <= (slot->m_envelope_gen.m_decay_level << 6))
+			if (slot.m_envelope_gen.m_volume >> EG_SHIFT <= (slot.m_envelope_gen.m_decay_level << 6))
 			{
-				slot->m_envelope_gen.m_state = state_t::DECAY2;
+				slot.m_envelope_gen.m_state = state_t::DECAY2;
 			}
 			break;
 		case state_t::DECAY2:
-			slot->m_envelope_gen.m_volume -= slot->m_envelope_gen.m_decay2_rate;
-			if (slot->m_envelope_gen.m_volume <= 0)
+			slot.m_envelope_gen.m_volume -= slot.m_envelope_gen.m_decay2_rate;
+			if (slot.m_envelope_gen.m_volume <= 0)
 			{
-				slot->m_envelope_gen.m_volume = 0;
+				slot.m_envelope_gen.m_volume = 0;
 			}
 			break;
 		case state_t::RELEASE:
-			slot->m_envelope_gen.m_volume -= slot->m_envelope_gen.m_release_rate;
-			if (slot->m_envelope_gen.m_volume <= 0)
+			slot.m_envelope_gen.m_volume -= slot.m_envelope_gen.m_release_rate;
+			if (slot.m_envelope_gen.m_volume <= 0)
 			{
-				slot->m_envelope_gen.m_volume = 0;
-				slot->m_playing = false;
+				slot.m_envelope_gen.m_volume = 0;
+				slot.m_playing = false;
 			}
 			break;
 		default:
 			return 1 << TL_SHIFT;
 	}
 
-	return m_linear_to_exp_volume[slot->m_envelope_gen.m_volume >> EG_SHIFT];
+	return m_linear_to_exp_volume[slot.m_envelope_gen.m_volume >> EG_SHIFT];
 }
 
 uint32_t multipcm_device::get_rate(uint32_t *steps, uint32_t rate, uint32_t val)
@@ -159,28 +159,28 @@ uint32_t multipcm_device::get_rate(uint32_t *steps, uint32_t rate, uint32_t val)
 	return steps[r];
 }
 
-void multipcm_device::envelope_generator_calc(slot_t *slot)
+void multipcm_device::envelope_generator_calc(slot_t &slot)
 {
-	int32_t octave = ((slot->m_regs[3] >> 4) - 1) & 0xf;
+	int32_t octave = ((slot.m_regs[3] >> 4) - 1) & 0xf;
 	if (octave & 8) {
 		octave = octave - 16;
 	}
 
 	int32_t rate;
-	if (slot->m_sample.m_key_rate_scale != 0xf)
+	if (slot.m_sample.m_key_rate_scale != 0xf)
 	{
-		rate = (octave + slot->m_sample.m_key_rate_scale) * 2 + ((slot->m_regs[3] >> 3) & 1);
+		rate = (octave + slot.m_sample.m_key_rate_scale) * 2 + ((slot.m_regs[3] >> 3) & 1);
 	}
 	else
 	{
 		rate = 0;
 	}
 
-	slot->m_envelope_gen.m_attack_rate = get_rate(m_attack_step, rate, slot->m_sample.m_attack_reg);
-	slot->m_envelope_gen.m_decay1_rate = get_rate(m_decay_release_step, rate, slot->m_sample.m_decay1_reg);
-	slot->m_envelope_gen.m_decay2_rate = get_rate(m_decay_release_step, rate, slot->m_sample.m_decay2_reg);
-	slot->m_envelope_gen.m_release_rate = get_rate(m_decay_release_step, rate, slot->m_sample.m_release_reg);
-	slot->m_envelope_gen.m_decay_level = 0xf - slot->m_sample.m_decay_level;
+	slot.m_envelope_gen.m_attack_rate = get_rate(m_attack_step.get(), rate, slot.m_sample.m_attack_reg);
+	slot.m_envelope_gen.m_decay1_rate = get_rate(m_decay_release_step.get(), rate, slot.m_sample.m_decay1_reg);
+	slot.m_envelope_gen.m_decay2_rate = get_rate(m_decay_release_step.get(), rate, slot.m_sample.m_decay2_reg);
+	slot.m_envelope_gen.m_release_rate = get_rate(m_decay_release_step.get(), rate, slot.m_sample.m_release_reg);
+	slot.m_envelope_gen.m_decay_level = 0xf - slot.m_sample.m_decay_level;
 
 }
 
@@ -228,8 +228,8 @@ const float multipcm_device::AMPLITUDE_SCALE_LIMIT[8] = // In Decibels
 
 void multipcm_device::lfo_init()
 {
-	m_pitch_table = auto_alloc_array_clear(machine(), int32_t, 256);
-	m_amplitude_table = auto_alloc_array_clear(machine(), int32_t, 256);
+	m_pitch_table = make_unique_clear<int32_t[]>(256);
+	m_amplitude_table = make_unique_clear<int32_t[]>(256);
 	for (int32_t i = 0; i < 256; ++i)
 	{
 		if (i < 64)
@@ -259,12 +259,10 @@ void multipcm_device::lfo_init()
 		}
 	}
 
-	m_pitch_scale_tables = auto_alloc_array_clear(machine(), int32_t*, 8);
-	m_amplitude_scale_tables = auto_alloc_array_clear(machine(), int32_t*, 8);
 	for (int32_t table = 0; table < 8; ++table)
 	{
 		float limit = PHASE_SCALE_LIMIT[table];
-		m_pitch_scale_tables[table] = auto_alloc_array_clear(machine(), int32_t, 256);
+		m_pitch_scale_tables[table] = make_unique_clear<int32_t[]>(256);
 		for(int32_t i = -128; i < 128; ++i)
 		{
 			const float value = (limit * (float)i) / 128.0f;
@@ -273,7 +271,7 @@ void multipcm_device::lfo_init()
 		}
 
 		limit = -AMPLITUDE_SCALE_LIMIT[table];
-		m_amplitude_scale_tables[table] = auto_alloc_array_clear(machine(), int32_t, 256);
+		m_amplitude_scale_tables[table] = make_unique_clear<int32_t[]>(256);
 		for(int32_t i = 0; i < 256; ++i)
 		{
 			const float value = (limit * (float)i) / 256.0f;
@@ -289,53 +287,53 @@ uint32_t multipcm_device::value_to_fixed(const uint32_t bits, const float value)
 	return uint32_t(float_shift * value);
 }
 
-int32_t multipcm_device::pitch_lfo_step(lfo_t *lfo)
+int32_t multipcm_device::pitch_lfo_step(lfo_t &lfo)
 {
-	lfo->m_phase += lfo->m_phase_step;
-	int32_t p = lfo->m_table[(lfo->m_phase >> LFO_SHIFT) & 0xff];
-	p = lfo->m_scale[p];
+	lfo.m_phase += lfo.m_phase_step;
+	int32_t p = lfo.m_table[(lfo.m_phase >> LFO_SHIFT) & 0xff];
+	p = lfo.m_scale[p];
 	return p << (TL_SHIFT - LFO_SHIFT);
 }
 
-int32_t multipcm_device::amplitude_lfo_step(lfo_t *lfo)
+int32_t multipcm_device::amplitude_lfo_step(lfo_t &lfo)
 {
-	lfo->m_phase += lfo->m_phase_step;
-	int32_t p = lfo->m_table[(lfo->m_phase >> LFO_SHIFT) & 0xff];
-	p = lfo->m_scale[p];
+	lfo.m_phase += lfo.m_phase_step;
+	int32_t p = lfo.m_table[(lfo.m_phase >> LFO_SHIFT) & 0xff];
+	p = lfo.m_scale[p];
 	return p << (TL_SHIFT - LFO_SHIFT);
 }
 
-void multipcm_device::lfo_compute_step(lfo_t *lfo, uint32_t lfo_frequency, uint32_t lfo_scale, int32_t amplitude_lfo)
+void multipcm_device::lfo_compute_step(lfo_t &lfo, uint32_t lfo_frequency, uint32_t lfo_scale, int32_t amplitude_lfo)
 {
 	float step = (float)LFO_FREQ[lfo_frequency] * 256.0f / (float)m_rate;
-	lfo->m_phase_step = uint32_t(float(1 << LFO_SHIFT) * step);
+	lfo.m_phase_step = uint32_t(float(1 << LFO_SHIFT) * step);
 	if (amplitude_lfo)
 	{
-		lfo->m_table = m_amplitude_table;
-		lfo->m_scale = m_amplitude_scale_tables[lfo_scale];
+		lfo.m_table = m_amplitude_table.get();
+		lfo.m_scale = m_amplitude_scale_tables[lfo_scale].get();
 	}
 	else
 	{
-		lfo->m_table = m_pitch_table;
-		lfo->m_scale = m_pitch_scale_tables[lfo_scale];
+		lfo.m_table = m_pitch_table.get();
+		lfo.m_scale = m_pitch_scale_tables[lfo_scale].get();
 	}
 }
 
-void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
+void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 {
-	slot->m_regs[reg] = data;
+	slot.m_regs[reg] = data;
 
 	switch(reg)
 	{
 		case 0: // PANPOT
-			slot->m_pan = (data >> 4) & 0xf;
+			slot.m_pan = (data >> 4) & 0xf;
 			break;
 		case 1: // Sample
 		{
 			//according to YMF278 sample write causes some base params written to the regs (envelope+lfos)
 			//the game should never change the sample while playing.
 			sample_t sample;
-			init_sample(&sample, slot->m_regs[1] | ((slot->m_regs[2] & 1) << 8));
+			init_sample(&sample, slot.m_regs[1] | ((slot.m_regs[2] & 1) << 8));
 			write_slot(slot, 6, sample.m_lfo_vibrato_reg);
 			write_slot(slot, 7, sample.m_lfo_amplitude_reg);
 			break;
@@ -343,8 +341,8 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 		case 2: //Pitch
 		case 3:
 			{
-				uint32_t oct = ((slot->m_regs[3] >> 4) - 1) & 0xf;
-				uint32_t pitch = ((slot->m_regs[3] & 0xf) << 6) | (slot->m_regs[2] >> 2);
+				uint32_t oct = ((slot.m_regs[3] >> 4) - 1) & 0xf;
+				uint32_t pitch = ((slot.m_regs[3] & 0xf) << 6) | (slot.m_regs[2] >> 2);
 				pitch = m_freq_step_table[pitch];
 				if (oct & 0x8)
 				{
@@ -354,68 +352,68 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 				{
 					pitch <<= oct;
 				}
-				slot->m_step = pitch / m_rate;
+				slot.m_step = pitch / m_rate;
 			}
 			break;
 		case 4:     //KeyOn/Off (and more?)
 			if (data & 0x80)       //KeyOn
 			{
-				init_sample(&slot->m_sample, slot->m_regs[1] | ((slot->m_regs[2] & 1) << 8));
-				slot->m_playing = true;
-				slot->m_base = slot->m_sample.m_start;
-				slot->m_offset = 0;
-				slot->m_prev_sample = 0;
-				slot->m_total_level = slot->m_dest_total_level << TL_SHIFT;
+				init_sample(&slot.m_sample, slot.m_regs[1] | ((slot.m_regs[2] & 1) << 8));
+				slot.m_playing = true;
+				slot.m_base = slot.m_sample.m_start;
+				slot.m_offset = 0;
+				slot.m_prev_sample = 0;
+				slot.m_total_level = slot.m_dest_total_level << TL_SHIFT;
 
 				envelope_generator_calc(slot);
-				slot->m_envelope_gen.m_state = state_t::ATTACK;
-				slot->m_envelope_gen.m_volume = 0;
+				slot.m_envelope_gen.m_state = state_t::ATTACK;
+				slot.m_envelope_gen.m_volume = 0;
 			}
 			else
 			{
-				if (slot->m_playing)
+				if (slot.m_playing)
 				{
-					if (slot->m_sample.m_release_reg != 0xf)
+					if (slot.m_sample.m_release_reg != 0xf)
 					{
-						slot->m_envelope_gen.m_state = state_t::RELEASE;
+						slot.m_envelope_gen.m_state = state_t::RELEASE;
 					}
 					else
 					{
-						slot->m_playing = false;
+						slot.m_playing = false;
 					}
 				}
 			}
 			break;
 		case 5: // TL + Interpolation
-			slot->m_dest_total_level = (data >> 1) & 0x7f;
+			slot.m_dest_total_level = (data >> 1) & 0x7f;
 			if (!(data & 1))   //Interpolate TL
 			{
-				if ((slot->m_total_level >> TL_SHIFT) > slot->m_dest_total_level)
+				if ((slot.m_total_level >> TL_SHIFT) > slot.m_dest_total_level)
 				{
-					slot->m_total_level_step = m_total_level_steps[0]; // decrease
+					slot.m_total_level_step = m_total_level_steps[0]; // decrease
 				}
 				else
 				{
-					slot->m_total_level_step = m_total_level_steps[1]; // increase
+					slot.m_total_level_step = m_total_level_steps[1]; // increase
 				}
 			}
 			else
 			{
-				slot->m_total_level = slot->m_dest_total_level << TL_SHIFT;
+				slot.m_total_level = slot.m_dest_total_level << TL_SHIFT;
 			}
 			break;
 		case 6: // LFO frequency + Pitch LFO
 			if (data)
 			{
-				lfo_compute_step(&(slot->m_pitch_lfo), (slot->m_regs[6] >> 3) & 7, slot->m_regs[6] & 7, 0);
-				lfo_compute_step(&(slot->m_amplitude_lfo), (slot->m_regs[6] >> 3) & 7, slot->m_regs[7] & 7, 1);
+				lfo_compute_step(slot.m_pitch_lfo, (slot.m_regs[6] >> 3) & 7, slot.m_regs[6] & 7, 0);
+				lfo_compute_step(slot.m_amplitude_lfo, (slot.m_regs[6] >> 3) & 7, slot.m_regs[7] & 7, 1);
 			}
 			break;
 		case 7: // Amplitude LFO
 			if (data)
 			{
-				lfo_compute_step(&(slot->m_pitch_lfo), (slot->m_regs[6] >> 3) & 7, slot->m_regs[6] & 7, 0);
-				lfo_compute_step(&(slot->m_amplitude_lfo), (slot->m_regs[6] >> 3) & 7, slot->m_regs[7] & 7, 1);
+				lfo_compute_step(slot.m_pitch_lfo, (slot.m_regs[6] >> 3) & 7, slot.m_regs[6] & 7, 0);
+				lfo_compute_step(slot.m_amplitude_lfo, (slot.m_regs[6] >> 3) & 7, slot.m_regs[7] & 7, 1);
 			}
 			break;
 	}
@@ -431,7 +429,7 @@ WRITE8_MEMBER( multipcm_device::write )
 	switch(offset)
 	{
 		case 0:     //Data write
-			write_slot(m_slots + m_cur_slot, m_address, data);
+			write_slot(m_slots[m_cur_slot], m_address, data);
 			break;
 		case 1:
 			m_cur_slot = VALUE_TO_CHANNEL[data & 0x1f];
@@ -462,9 +460,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 		m_left_pan_table(nullptr),
 		m_right_pan_table(nullptr),
 		m_linear_to_exp_volume(nullptr),
-		m_total_level_steps(nullptr),
-		m_pitch_scale_tables(nullptr),
-		m_amplitude_scale_tables(nullptr)
+		m_total_level_steps(nullptr)
 {
 }
 
@@ -481,8 +477,8 @@ void multipcm_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
 
 	// Volume + pan table
-	m_left_pan_table = auto_alloc_array_clear(machine(), int32_t, 0x800);
-	m_right_pan_table = auto_alloc_array_clear(machine(), int32_t, 0x800);
+	m_left_pan_table = make_unique_clear<int32_t[]>(0x800);
+	m_right_pan_table = make_unique_clear<int32_t[]>(0x800);
 	for (int32_t level = 0; level < 0x80; ++level)
 	{
 		const float vol_db = (float)level * (-24.0f) / 64.0f;
@@ -535,7 +531,7 @@ void multipcm_device::device_start()
 	}
 
 	//Pitch steps
-	m_freq_step_table = auto_alloc_array_clear(machine(), uint32_t, 0x400);
+	m_freq_step_table = make_unique_clear<uint32_t[]>(0x400);
 	for (int32_t i = 0; i < 0x400; ++i)
 	{
 		const float fcent = m_rate * (1024.0f + (float)i) / 1024.0f;
@@ -543,8 +539,8 @@ void multipcm_device::device_start()
 	}
 
 	// Envelope steps
-	m_attack_step = auto_alloc_array_clear(machine(), uint32_t, 0x40);
-	m_decay_release_step = auto_alloc_array_clear(machine(), uint32_t, 0x40);
+	m_attack_step = make_unique_clear<uint32_t[]>(0x40);
+	m_decay_release_step = make_unique_clear<uint32_t[]>(0x40);
 	const double attack_rate_to_decay_rate = 14.32833;
 	for (int32_t i = 4; i < 0x40; ++i)
 	{
@@ -557,12 +553,12 @@ void multipcm_device::device_start()
 	m_decay_release_step[0] = m_decay_release_step[1] = m_decay_release_step[2] = m_decay_release_step[3] = 0;
 
 	// Total level interpolation steps
-	m_total_level_steps = auto_alloc_array_clear(machine(), int32_t, 2);
+	m_total_level_steps = make_unique_clear<int32_t[]>(2);
 	m_total_level_steps[0] = -(float)(0x80 << TL_SHIFT) / (78.2f * 44100.0f / 1000.0f); // lower
 	m_total_level_steps[1] = (float)(0x80 << TL_SHIFT) / (78.2f * 2 * 44100.0f / 1000.0f); // raise
 
 	// build the linear->exponential ramps
-	m_linear_to_exp_volume = auto_alloc_array_clear(machine(), int32_t, 0x400);
+	m_linear_to_exp_volume = make_unique_clear<int32_t[]>(0x400);
 	for(int32_t i = 0; i < 0x400; ++i)
 	{
 		const float db = -(96.0f - (96.0f * (float)i / (float)0x400));
@@ -574,7 +570,7 @@ void multipcm_device::device_start()
 	save_item(NAME(m_address));
 
 	// Slots
-	m_slots = auto_alloc_array_clear(machine(), slot_t, 28);
+	m_slots = make_unique_clear<slot_t[]>(28);
 	for (int32_t slot = 0; slot < 28; ++slot)
 	{
 		m_slots[slot].m_slot_index = slot;
@@ -663,41 +659,41 @@ void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 		int32_t smpr = 0;
 		for (int32_t sl = 0; sl < 28; ++sl)
 		{
-			slot_t *slot = m_slots + sl;
-			if (slot->m_playing)
+			slot_t &slot = m_slots[sl];
+			if (slot.m_playing)
 			{
-				uint32_t vol = (slot->m_total_level >> TL_SHIFT) | (slot->m_pan << 7);
-				uint32_t adr = slot->m_offset >> TL_SHIFT;
-				uint32_t step = slot->m_step;
-				int32_t csample = (int16_t) (read_byte(slot->m_base + adr) << 8);
-				int32_t fpart = slot->m_offset & ((1 << TL_SHIFT) - 1);
-				int32_t sample = (csample * fpart + slot->m_prev_sample * ((1 << TL_SHIFT) - fpart)) >> TL_SHIFT;
+				uint32_t vol = (slot.m_total_level >> TL_SHIFT) | (slot.m_pan << 7);
+				uint32_t adr = slot.m_offset >> TL_SHIFT;
+				uint32_t step = slot.m_step;
+				int32_t csample = (int16_t) (read_byte(slot.m_base + adr) << 8);
+				int32_t fpart = slot.m_offset & ((1 << TL_SHIFT) - 1);
+				int32_t sample = (csample * fpart + slot.m_prev_sample * ((1 << TL_SHIFT) - fpart)) >> TL_SHIFT;
 
-				if (slot->m_regs[6] & 7) // Vibrato enabled
+				if (slot.m_regs[6] & 7) // Vibrato enabled
 				{
-					step = step * pitch_lfo_step(&(slot->m_pitch_lfo));
+					step = step * pitch_lfo_step(slot.m_pitch_lfo);
 					step >>= TL_SHIFT;
 				}
 
-				slot->m_offset += step;
-				if (slot->m_offset >= (slot->m_sample.m_end << TL_SHIFT))
+				slot.m_offset += step;
+				if (slot.m_offset >= (slot.m_sample.m_end << TL_SHIFT))
 				{
-					slot->m_offset = slot->m_sample.m_loop << TL_SHIFT;
+					slot.m_offset = slot.m_sample.m_loop << TL_SHIFT;
 				}
 
-				if (adr ^ (slot->m_offset >> TL_SHIFT))
+				if (adr ^ (slot.m_offset >> TL_SHIFT))
 				{
-					slot->m_prev_sample = csample;
+					slot.m_prev_sample = csample;
 				}
 
-				if ((slot->m_total_level >> TL_SHIFT) != slot->m_dest_total_level)
+				if ((slot.m_total_level >> TL_SHIFT) != slot.m_dest_total_level)
 				{
-					slot->m_total_level += slot->m_total_level_step;
+					slot.m_total_level += slot.m_total_level_step;
 				}
 
-				if (slot->m_regs[7] & 7) // Tremolo enabled
+				if (slot.m_regs[7] & 7) // Tremolo enabled
 				{
-					sample = sample * amplitude_lfo_step(&(slot->m_amplitude_lfo));
+					sample = sample * amplitude_lfo_step(slot.m_amplitude_lfo);
 					sample >>= TL_SHIFT;
 				}
 

@@ -25,9 +25,9 @@ CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
 			((CLEAR_LINE != m_mcuintf->mcu_semaphore_r()) ? 0x00 : 0x02);
 }
 
-CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
+uint8_t arkanoid_state::input_mux_r()
 {
-	return m_muxports[(0 == m_paddle_select) ? 0 : 1]->read();
+	return m_muxports[(0 == m_paddle_select) ? 0 : 1].read_safe(0xff);
 }
 
 /*

@@ -9,6 +9,7 @@
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class sprint4_state : public driver_device
 {
@@ -31,9 +32,9 @@ public:
 
 	void sprint4(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_lever);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_wheel);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_collision);
+	template <int N> DECLARE_READ_LINE_MEMBER(lever_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(wheel_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(collision_flipflop_r);
 
 private:
 	DECLARE_READ8_MEMBER(wram_r);

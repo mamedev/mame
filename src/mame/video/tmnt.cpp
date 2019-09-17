@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 #include "emu.h"
 #include "includes/tmnt.h"
+#include "screen.h"
 
 TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
 {

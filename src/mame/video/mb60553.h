@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 
 class mb60553_zooming_tilemap_device : public device_t
 {

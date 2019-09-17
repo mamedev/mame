@@ -20,8 +20,8 @@
 #include "emuopts.h" // Used by PNG logging
 #include "png.h" // Used by PNG logging
 
-#include "rapidjson/include/rapidjson/prettywriter.h" // Used by JSON logging
-#include "rapidjson/include/rapidjson/stringbuffer.h" // Used by JSON logging
+#include <rapidjson/prettywriter.h> // Used by JSON logging
+#include <rapidjson/stringbuffer.h> // Used by JSON logging
 
 DEFINE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device, "tunitvid", "Midway T-Unit Video")
 DEFINE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device, "wunitvid", "Midway W-Unit Video")

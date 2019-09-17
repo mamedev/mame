@@ -735,7 +735,7 @@ void cave_state::korokoro_eeprom_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(cave_state::korokoro_hopper_r)
+READ_LINE_MEMBER(cave_state::korokoro_hopper_r)
 {
 	return m_hopper ? 1 : 0;
 }
@@ -1123,7 +1123,7 @@ void cave_state::tjumpman_leds_w(u8 data)
 //  popmessage("led %04X", data);
 }
 
-CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
+READ_LINE_MEMBER(cave_state::tjumpman_hopper_r)
 {
 	return (m_hopper && !(m_screen[0]->frame_number() % 10)) ? 0 : 1;
 }
@@ -1608,7 +1608,7 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // service medal out?
 	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,korokoro_hopper_r, nullptr) // motor / hopper status ???
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cave_state, korokoro_hopper_r) // motor / hopper status ???
 
 	PORT_START("IN1")
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
@@ -1625,7 +1625,7 @@ static INPUT_PORTS_START( tekkencw )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cave_state, tjumpman_hopper_r)
 
 	PORT_START("IN1")
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
@@ -1647,7 +1647,7 @@ static INPUT_PORTS_START( tekkenbs )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cave_state, tjumpman_hopper_r)
 
 	PORT_START("IN1")
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
@@ -1668,7 +1668,7 @@ static INPUT_PORTS_START( tjumpman )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cave_state, tjumpman_hopper_r)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1691,7 +1691,7 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state, tjumpman_hopper_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cave_state, tjumpman_hopper_r)
 
 	PORT_START("IN1")
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )

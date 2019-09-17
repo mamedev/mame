@@ -26,7 +26,7 @@ protected:
 	};
 
 public:
-	h8_disassembler(const disasm_entry *_table);
+	h8_disassembler(const disasm_entry *_table, bool _advanced);
 	h8_disassembler();
 
 	virtual u32 opcode_alignment() const override;
@@ -93,7 +93,8 @@ protected:
 
 	void disassemble_am(std::ostream &stream, int am, offs_t pc, const data_buffer &opcodes, u32 opcode, int slot, int offset);
 
-	const disasm_entry *table;
+	const disasm_entry *const table;
+	const bool advanced;
 
 	static const disasm_entry disasm_entries[];
 };

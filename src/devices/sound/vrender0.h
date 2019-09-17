@@ -22,7 +22,7 @@ public:
 	DECLARE_READ32_MEMBER( vr0_snd_read );
 	DECLARE_WRITE32_MEMBER( vr0_snd_write );
 
-	void set_areas(uint32_t *texture, uint32_t *frame);
+	void set_areas(uint16_t *texture, uint16_t *frame);
 
 protected:
 	// device-level overrides
@@ -32,8 +32,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	uint32_t *m_TexBase;
-	uint32_t *m_FBBase;
+	int16_t *m_TexBase;
+	int16_t *m_FBBase;
 	uint32_t m_SOUNDREGS[0x10000/4];
 	sound_stream *m_stream;
 

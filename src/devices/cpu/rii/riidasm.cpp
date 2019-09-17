@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "util/disasmintf.h"
 #include "riidasm.h"
 
@@ -59,6 +60,11 @@ void riscii_disassembler::format_immediate(std::ostream &stream, u8 data) const
 	util::stream_format(stream, "%02Xh", data);
 }
 
+void riscii_disassembler::format_address(std::ostream &stream, u32 dst) const
+{
+	util::stream_format(stream, "%05Xh", dst);
+}
+
 offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const riscii_disassembler::data_buffer &opcodes, const riscii_disassembler::data_buffer &params)
 {
 	u16 opcode = opcodes.r16(pc);
@@ -68,8 +74,8 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 	{
 		if (BIT(opcode, 14))
 		{
-			u32 dst = (pc & 0x3e000) | (opcode & 0x1fff);
-			util::stream_format(stream, "%-8s%05X", BIT(opcode, 13) ? "SCALL" : "SJMP", dst);
+			util::stream_format(stream, "%-8s", BIT(opcode, 13) ? "SCALL" : "SJMP");
+			format_address(stream, (pc & 0x3e000) | (opcode & 0x1fff));
 			if (BIT(opcode, 13))
 				words |= STEP_OVER;
 		}
@@ -103,18 +109,18 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 			stream << "SLEP";
 		else if ((opcode & 0x00f0) == 0x0020)
 		{
-			u32 dst = u32(opcode & 0x000f) << 16 | opcodes.r16(pc + 1);
-			util::stream_format(stream, "%-8s%05X", "LJMP", dst);
+			util::stream_format(stream, "%-8s", "LJMP");
+			format_address(stream, u32(opcode & 0x000f) << 16 | opcodes.r16(pc + 1));
 			words = 2;
 		}
 		else if ((opcode & 0x00f0) == 0x0030)
 		{
-			u32 dst = u32(opcode & 0x000f) << 16 | opcodes.r16(pc + 1);
-			util::stream_format(stream, "%-8s%05X", "LCALL", dst);
+			util::stream_format(stream, "%-8s", "LCALL");
+			format_address(stream, u32(opcode & 0x000f) << 16 | opcodes.r16(pc + 1));
 			words = 2 | STEP_OVER;
 		}
 		else
-			stream << "???";
+			util::stream_format(stream, "%-8s%04Xh", "DW", opcode);
 		break;
 
 	case 0x0200:
@@ -315,6 +321,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 	case 0x2700:
 		util::stream_format(stream, "%-8s", "RPT");
 		format_register(stream, opcode & 0x00ff);
+		words |= STEP_OVER | step_over_extra(1);
 		break;
 
 	case 0x2b00:
@@ -331,7 +338,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 			break;
 
 		default:
-			stream << "???";
+			util::stream_format(stream, "%-8s%04Xh", "DW", opcode);
 			break;
 		}
 		break;
@@ -360,7 +367,8 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 	case 0x3400: case 0x3500: case 0x3600: case 0x3700:
 	case 0x3800: case 0x3900: case 0x3a00: case 0x3b00:
 	case 0x3c00: case 0x3d00: case 0x3e00: case 0x3f00:
-		util::stream_format(stream, "%-8s%05X", "S0CALL", opcode & 0x0fff);
+		util::stream_format(stream, "%-8s", "S0CALL");
+		format_address(stream, opcode & 0x0fff);
 		words |= STEP_OVER;
 		break;
 
@@ -402,21 +410,24 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 	case 0x4700:
 		util::stream_format(stream, "%-8sA,", "JGE");
 		format_immediate(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
 	case 0x4800:
 		util::stream_format(stream, "%-8sA,", "JLE");
 		format_immediate(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
 	case 0x4900:
 		util::stream_format(stream, "%-8sA,", "JE");
 		format_immediate(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
@@ -453,49 +464,56 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 	case 0x5000:
 		util::stream_format(stream, "%-8sA,", "JDNZ");
 		format_register(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
 	case 0x5100:
 		util::stream_format(stream, "%-8s", "JDNZ");
 		format_register(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
 	case 0x5200:
 		util::stream_format(stream, "%-8sA,", "JINZ");
 		format_register(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
 	case 0x5300:
 		util::stream_format(stream, "%-8s", "JINZ");
 		format_register(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
 	case 0x5500:
 		util::stream_format(stream, "%-8sA,", "JGE");
 		format_register(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
 	case 0x5600:
 		util::stream_format(stream, "%-8sA,", "JLE");
 		format_register(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
 	case 0x5700:
 		util::stream_format(stream, "%-8sA,", "JE");
 		format_register(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%05X", (pc & 0x30000) | opcodes.r16(pc + 1));
+		stream << ",";
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
@@ -503,7 +521,8 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 	case 0x5c00: case 0x5d00: case 0x5e00: case 0x5f00:
 		util::stream_format(stream, "%-8s", "JBC");
 		format_register(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%d,%05X", (opcode & 0x0700) >> 8, (pc & 0x30000) | opcodes.r16(pc + 1));
+		util::stream_format(stream, ",%d,", (opcode & 0x0700) >> 8);
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
@@ -511,7 +530,8 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 	case 0x6400: case 0x6500: case 0x6600: case 0x6700:
 		util::stream_format(stream, "%-8s", "JBS");
 		format_register(stream, opcode & 0x00ff);
-		util::stream_format(stream, ",%d,%05X", (opcode & 0x0700) >> 8, (pc & 0x30000) | opcodes.r16(pc + 1));
+		util::stream_format(stream, ",%d,", (opcode & 0x0700) >> 8);
+		format_address(stream, (pc & 0x30000) | opcodes.r16(pc + 1));
 		words = 2;
 		break;
 
@@ -537,7 +557,7 @@ offs_t riscii_disassembler::disassemble(std::ostream &stream, offs_t pc, const r
 		break;
 
 	default:
-		stream << "???";
+		util::stream_format(stream, "%-8s%04Xh", "DW", opcode);
 		break;
 
 	}

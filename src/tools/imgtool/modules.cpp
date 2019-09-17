@@ -26,8 +26,8 @@ static void (*const modules[])(const imgtool_class *imgclass, uint32_t state, un
 #include "modules.cpp"
 };
 
-/* step 3: declare imgtool_create_cannonical_library() */
-imgtoolerr_t imgtool_create_cannonical_library(bool omit_untested, std::unique_ptr<imgtool::library> &library)
+/* step 3: declare imgtool_create_canonical_library() */
+imgtoolerr_t imgtool_create_canonical_library(bool omit_untested, std::unique_ptr<imgtool::library> &library)
 {
 	size_t i;
 

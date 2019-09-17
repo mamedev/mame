@@ -33,7 +33,13 @@ dpb7000_brushproc_card_device::dpb7000_brushproc_card_device(const machine_confi
 	, m_k_invert(false)
 	, m_k_product(0)
 	, m_ext_product(0)
+	, m_final_product(0)
+	, m_final_result(0)
+	, m_brush_value(0)
+	, m_final_brush_value(0)
+	, m_compare_b_value(0)
 	, m_func(0)
+	, m_subtract_result(false)
 	, m_sel_eh(false)
 	, m_b_bus_ah(false)
 	, m_fcs(false)
@@ -51,7 +57,9 @@ dpb7000_brushproc_card_device::dpb7000_brushproc_card_device(const machine_confi
 	, m_prom_out(0)
 	, m_pal_in(0)
 	, m_pal_base(nullptr)
-	, m_pal_out(0)
+	, m_pal_data_out(0)
+	, m_pal_bpinv_out(false)
+	, m_pal_sel_out(false)
 	, m_store1(*this)
 	, m_store2(*this)
 	, m_mult_fa(*this, "mult_fa")
@@ -69,6 +77,7 @@ dpb7000_brushproc_card_device::dpb7000_brushproc_card_device(const machine_confi
 void dpb7000_brushproc_card_device::device_start()
 {
 	save_item(NAME(m_store_in));
+	save_item(NAME(m_store_out));
 	save_item(NAME(m_ext_in));
 	save_item(NAME(m_brush_in));
 	save_item(NAME(m_cbus_in));
@@ -77,11 +86,19 @@ void dpb7000_brushproc_card_device::device_start()
 	save_item(NAME(m_k_enable));
 	save_item(NAME(m_k_zero));
 	save_item(NAME(m_k_invert));
-	save_item(NAME(m_k_product));
 
+	save_item(NAME(m_k_product));
 	save_item(NAME(m_ext_product));
+	save_item(NAME(m_final_product));
+	save_item(NAME(m_final_result));
+
+	save_item(NAME(m_brush_value));
+	save_item(NAME(m_final_brush_value));
+	save_item(NAME(m_compare_b_value));
 
 	save_item(NAME(m_func));
+
+	save_item(NAME(m_subtract_result));
 
 	save_item(NAME(m_sel_luma));
 	save_item(NAME(m_sel_eh));
@@ -103,7 +120,9 @@ void dpb7000_brushproc_card_device::device_start()
 	save_item(NAME(m_prom_out));
 
 	save_item(NAME(m_pal_in));
-	save_item(NAME(m_pal_out));
+	save_item(NAME(m_pal_data_out));
+	save_item(NAME(m_pal_bpinv_out));
+	save_item(NAME(m_pal_sel_out));
 
 	m_store1.resolve_safe();
 	m_store2.resolve_safe();
@@ -112,6 +131,7 @@ void dpb7000_brushproc_card_device::device_start()
 void dpb7000_brushproc_card_device::device_reset()
 {
 	memset(m_store_in, 0, 2);
+	memset(m_store_out, 0, 2);
 	m_ext_in = 0;
 	m_brush_in = 0;
 	m_cbus_in = 0;
@@ -120,11 +140,19 @@ void dpb7000_brushproc_card_device::device_reset()
 	m_k_enable = false;
 	m_k_zero = false;
 	m_k_invert = false;
-	m_k_product = 0;
 
+	m_k_product = 0;
 	m_ext_product = 0;
+	m_final_product = 0;
+	m_final_result = 0;
+
+	m_brush_value = 0;
+	m_final_brush_value = 0;
+	m_compare_b_value = 0;
 
 	m_func = 0;
+
+	m_subtract_result = false;
 
 	memset(m_sel_luma, 0, 2);
 	m_sel_eh = false;
@@ -148,7 +176,9 @@ void dpb7000_brushproc_card_device::device_reset()
 
 	m_pal_in = 0;
 	m_pal_base = m_pal->base();
-	m_pal_out = 0;
+	m_pal_data_out = 0;
+	m_pal_bpinv_out = false;
+	m_pal_sel_out = false;
 
 	m_mult_fa->xm_w(0);
 	m_mult_fa->ym_w(0);
@@ -226,19 +256,26 @@ void dpb7000_brushproc_card_device::k_w(uint8_t data)
 
 void dpb7000_brushproc_card_device::k_en_w(int state)
 {
+	const bool old = m_k_enable;
 	m_k_enable = (bool)state;
-	if (m_k_enable && !m_disable_k_data)
+	if (!old && m_k_enable && !m_disable_k_data)
 		update_k_product();
 }
 
 void dpb7000_brushproc_card_device::k_zero_w(int state)
 {
+	const bool old = m_k_zero;
 	m_k_zero = (bool)state;
+	if (old != m_k_zero)
+		update_ext_product();
 }
 
 void dpb7000_brushproc_card_device::k_inv_w(int state)
 {
+	const bool old = m_k_invert;
 	m_k_invert = (bool)state;
+	if (old != m_k_invert)
+		update_pal_signals();
 }
 
 void dpb7000_brushproc_card_device::func_w(uint8_t data)
@@ -330,6 +367,32 @@ void dpb7000_brushproc_card_device::update_prom_signals()
 		set_k_eq_il(BIT(m_prom_out, 6));
 	if (BIT(old, 7) != BIT(m_prom_out, 7))
 		set_oe4(BIT(m_prom_out, 7));
+	update_brush_value();
+	update_compare_b_value();
+}
+
+void dpb7000_brushproc_card_device::update_pal_signals()
+{
+	const uint16_t old_data = m_pal_data_out;
+	const bool old_bpinv = m_pal_bpinv_out;
+	const uint16_t old_addr = m_pal_in;
+	m_pal_in = m_ext_product | (m_pal_proc_in ? 0x100 : 0) | (m_k_invert ? 0x200 : 0);
+	if (old_addr != m_pal_in)
+	{
+		const uint16_t shifted_addr = m_pal_in << 1;
+		const uint8_t pal_msb = m_pal_base[shifted_addr];
+		m_pal_data_out = m_pal_base[shifted_addr + 1];
+		m_pal_bpinv_out = BIT(pal_msb, 0);
+		m_pal_sel_out = BIT(pal_msb, 1);
+		if (old_bpinv != m_pal_bpinv_out)
+		{
+			m_final_brush_value = m_brush_value ^ (m_pal_bpinv_out ? 0xff : 0x00);
+		}
+		if (old_data != m_pal_data_out)
+		{
+			update_final_product();
+		}
+	}
 }
 
 void dpb7000_brushproc_card_device::update_k_product()
@@ -344,7 +407,6 @@ void dpb7000_brushproc_card_device::update_k_product()
 
 void dpb7000_brushproc_card_device::update_ext_product()
 {
-	//const uint16_t old = m_ext_product;
 	const uint16_t y = (uint16_t)m_k_product;
 	uint16_t x = 0;
 	if (!m_k_zero)
@@ -354,7 +416,40 @@ void dpb7000_brushproc_card_device::update_ext_product()
 		else
 			x = 0xff;
 	}
+	const uint16_t old = m_ext_product;
 	m_ext_product = (uint8_t)((x * y + 0x0080) >> 8);
+	if (old != m_ext_product)
+		update_final_product();
+}
+
+void dpb7000_brushproc_card_device::update_final_product()
+{
+	const uint16_t x = (uint16_t)update_brush_alu_result();
+	const uint16_t y = (uint16_t)m_pal_data_out;
+	m_final_product = x * y + (m_output_16bit ? 0x80 : 0x00);
+	uint16_t a = (m_compare_b_value << 8) | m_store_in[1];
+	m_final_result = m_subtract_result ? (a - m_final_product) : (a + m_final_product);
+	m_store_out[0] = m_pal_sel_out ? (uint8_t)(m_final_result >> 8) : m_final_brush_value;
+	m_store_out[1] = m_output_16bit ? (uint8_t)m_final_result : m_store_out[0];
+	m_store1(m_store_out[0]);
+	m_store2(m_store_out[1]);
+}
+
+uint8_t dpb7000_brushproc_card_device::update_brush_alu_result()
+{
+	// Handled by a pair of 74S85 comparators (BB, CB), a pair of 74S381 ALUs (CD, DD) and a 74S182 carry lookahead generator (ED).
+	const uint8_t a = m_brush_value;
+	const uint8_t b = m_compare_b_value;
+	if (a <= b)
+	{
+		m_subtract_result = false;
+		return b - a;
+	}
+	else
+	{
+		m_subtract_result = true;
+		return a - b;
+	}
 }
 
 void dpb7000_brushproc_card_device::set_oe1(int state)
@@ -362,8 +457,8 @@ void dpb7000_brushproc_card_device::set_oe1(int state)
 	// When 0, force Store I or Store Ext. data onto Brush Data lanes
 	m_oe[0] = (bool)state;
 	m_use_store1_or_ext_for_brush = !m_oe[0];
-	m_use_store1_for_brush = m_use_store1_or_ext_for_brush && m_oe[2];
-	m_use_ext_for_brush = m_use_store1_or_ext_for_brush && !m_oe[2];
+	m_use_store1_for_brush = m_use_store1_or_ext_for_brush && !m_oe[2];
+	m_use_ext_for_brush = m_use_store1_or_ext_for_brush && m_oe[2];
 }
 
 void dpb7000_brushproc_card_device::set_oe2(int state)
@@ -379,6 +474,42 @@ void dpb7000_brushproc_card_device::set_oe3(int state)
 	m_oe[2] = (bool)state;
 	m_use_store1_for_brush = m_use_store1_or_ext_for_brush && m_oe[2];
 	m_use_ext_for_brush = m_use_store1_or_ext_for_brush && !m_oe[2];
+}
+
+void dpb7000_brushproc_card_device::update_brush_value()
+{
+	if (m_use_store1_for_brush)
+	{
+		m_brush_value = m_store_in[0];
+	}
+	else if (m_use_store2_for_brush)
+	{
+		m_brush_value = m_store_in[1];
+	}
+	else if (m_use_ext_for_brush)
+	{
+		m_brush_value = m_ext_in;
+	}
+	else
+	{
+		m_brush_value = m_brush_in;
+	}
+}
+
+void dpb7000_brushproc_card_device::update_compare_b_value()
+{
+	if (m_use_store2_for_store1)
+	{
+		m_compare_b_value = m_store_in[1];
+	}
+	else if (m_oe[2])
+	{
+		m_compare_b_value = m_ext_in;
+	}
+	else
+	{
+		m_compare_b_value = m_store_in[0];
+	}
 }
 
 void dpb7000_brushproc_card_device::set_oe4(int state)
@@ -404,14 +535,14 @@ void dpb7000_brushproc_card_device::set_proc_sel_h(int state)
 {
 	// When 1, enables the PROC input pin on PAL 20L10 HB, not yet dumped.
 	m_pal_proc_in = (bool)state;
+	update_pal_signals();
 }
 
 void dpb7000_brushproc_card_device::set_k_eq_il(int state)
 {
 	// When 1, disables K data lanes, which collectively get pulled to 1.0 (0xff).
-	const bool old = m_disable_k_data;
 	m_disable_k_data = (bool)state;
-	if (old != m_disable_k_data && !m_disable_k_data && m_k_enable)
+	if (!m_disable_k_data && m_k_enable)
 		update_k_product();
 }
 

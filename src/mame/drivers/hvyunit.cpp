@@ -69,6 +69,7 @@ To Do:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 
@@ -571,26 +572,9 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout tile_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{
-		0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4,
-		8*32+0*4,8*32+1*4,8*32+2*4,8*32+3*4,8*32+4*4,8*32+5*4,8*32+6*4,8*32+7*4
-	},
-	{
-		0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,
-		16*32+0*32,16*32+1*32,16*32+2*32,16*32+3*32,16*32+4*32,16*32+5*32,16*32+6*32,16*32+7*32
-	},
-	4*8*32
-};
-
 static GFXDECODE_START( gfx_hvyunit )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x100, 16 ) /* sprite bank */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x000, 16 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16 ) /* sprite bank */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
 
 
@@ -634,7 +618,6 @@ void hvyunit_state::hvyunit(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sound_memory);
 	m_soundcpu->set_addrmap(AS_IO, &hvyunit_state::sound_io);
-	m_soundcpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
 
 	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_mermaid->port_in_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_r));
@@ -674,7 +657,9 @@ void hvyunit_state::hvyunit(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	YM2203(config, "ymsnd", XTAL(12'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80); /* 3MHz verified on PCB */
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); // 3MHz verified on PCB
+	ymsnd.irq_handler().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 

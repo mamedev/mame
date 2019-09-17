@@ -60,6 +60,8 @@ class namco56xx_device : public namcoio_device
 public:
 	namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 	virtual void customio_run() override;
 };
 
@@ -68,6 +70,8 @@ class namco58xx_device : public namcoio_device
 public:
 	namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 	virtual void customio_run() override;
 };
 
@@ -75,6 +79,8 @@ class namco59xx_device : public namcoio_device
 {
 public:
 	namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual void customio_run() override;
 };

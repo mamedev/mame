@@ -5,6 +5,7 @@
 #include "machine/timer.h"
 #include "video/jalblend.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class psychic5_state : public driver_device
 {

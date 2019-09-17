@@ -9,6 +9,7 @@
 #include "sound/discrete.h"
 #include "sound/samples.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class circus_state : public driver_device
 {

@@ -391,6 +391,7 @@ function cheat.startplugin()
 					time = time,
 					input_trans = input_trans,
 					input_run = function(list) input_run(cheat, list) end,
+					os = { time = os.time, date = os.date, difftime = os.difftime },
 					table =
 					{ insert = table.insert,
 						  remove = table.remove } }

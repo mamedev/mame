@@ -2531,10 +2531,10 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("OUTPUT")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, 0)
 
 	PORT_START("P1")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY1\0KEY2\0KEY3\0KEY4\0KEY5")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, naomi_mp_r)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEY1")
@@ -2587,7 +2587,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( suchie3 )
 	PORT_INCLUDE( naomi_mp )
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY5\0KEY2\0KEY3\0KEY4\0KEY1")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, suchie3_mp_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_kb )
@@ -2615,7 +2615,7 @@ static INPUT_PORTS_START( naomi_kb )
 	// ---- ---x num lock
 
 	PORT_START("P1.KC1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state, naomi_kb_r, 0)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, naomi_kb_r)
 
 	PORT_START("P1.KC2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3184,7 +3184,7 @@ void atomiswave_state::aw_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atomiswave_state::aw_map);
 	m_maincpu->set_addrmap(AS_IO, &atomiswave_state::aw_port);
 	MACRONIX_29L001MC(config, "awflash");
-	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board", 0, "rom_key"));
+	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board", 0));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
@@ -8769,7 +8769,7 @@ ROM_START( ggxxsla )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0033a", 0, SHA1(c2a6b57b11f2528a212e186f9fa2127120aca111) )
+	DISK_IMAGE_READONLY( "gdl-0033a", 0, SHA1(b156456d645512a70d89d120cc3ce427b47e9fe9) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C621A (317-5111-JPN)
@@ -10150,7 +10150,7 @@ ROM_START( initdv2ja )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0026a", 0, SHA1(f56a85ebb842838561c15cb53ce81eb341e91300) )
+	DISK_IMAGE_READONLY( "gds-0026a", 0, SHA1(44790194a7a32ca9faf02403821bf23015ec8f3c) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0345-JPN)
@@ -10533,8 +10533,7 @@ ROM_START( fotns )
 	ROM_LOAD( "ax1906m01.ic16", 0x6000000, 0x1000000,  CRC(fe6da168) SHA1(d4ab6443383469bb5a4337005de917627a2e21cc) )
 	ROM_LOAD( "ax1907m01.ic17", 0x7000000, 0x1000000,  CRC(9d3a0520) SHA1(78583fd171b34439f77a04a97ebe3c9d1bab61cc) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax1901f01.bin", 0, 4, CRC(0283c08d) SHA1(5d62b6769ae7f1fc68bd3db028d782621aaa6f9c) )
+	ROM_PARAMETER(":rom_board:key", "c2") // ax1901f01
 ROM_END
 
 ROM_START( rangrmsn )
@@ -10548,8 +10547,7 @@ ROM_START( rangrmsn )
 	ROM_LOAD( "ax1604m01.ic14", 0x4000000, 0x1000000, CRC(d2369144) SHA1(da1eae9957d27d1682c4191780cf51b32dfe6659) )
 	ROM_LOAD( "ax1605m01.ic15", 0x5000000, 0x1000000, CRC(0c11c1f9) SHA1(0585db60618c5b97f9b7c203baf7e5ac90883ca6) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax1601f01.bin", 0, 4, CRC(278f1df7) SHA1(bf3e92e0b19dc1604b764382b859e73158d18025) )
+	ROM_PARAMETER(":rom_board:key", "88") // ax1601f01
 ROM_END
 
 ROM_START( sprtshot )
@@ -10562,8 +10560,7 @@ ROM_START( sprtshot )
 	ROM_LOAD( "ax0103m01.ic13", 0x3000000, 0x1000000, CRC(6144e7a8) SHA1(4d4341082f008dfd93ef5bf32a44c80869ef02a8) )
 	ROM_LOAD( "ax0104m01.ic14", 0x4000000, 0x1000000, CRC(ccb72150) SHA1(a1032d321c27f9ff43da41f20b8687bf1958ddc9) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax0101f01.bin", 0, 4, CRC(2144df1c) SHA1(9069ca78e7450a285173431b3e52c5c25299e473) )
+	ROM_PARAMETER(":rom_board:key", "64") // ax0101f01
 ROM_END
 
 ROM_START( xtrmhunt )
@@ -10578,8 +10575,7 @@ ROM_START( xtrmhunt )
 	ROM_LOAD( "ax2405m01.ic15", 0x5000000, 0x1000000,  CRC(940d77f1) SHA1(eefdfcb92873032dc7d9ff9310bf5ed715c8bf4f) )
 	ROM_LOAD( "ax2406m01.ic16", 0x6000000, 0x1000000,  CRC(cbcf2c5d) SHA1(61362fabcbb3bfc01c996748a7ca65f8a0e02f2f) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax2401f01.bin", 0, 4, CRC(2f578ea4) SHA1(6775daa4b4081186905cc20f56df0f8ab147428b) )
+	ROM_PARAMETER(":rom_board:key", "e4") // ax2401f01
 ROM_END
 
 ROM_START( xtrmhnt2 )
@@ -10595,8 +10591,7 @@ ROM_START( xtrmhnt2 )
 	ROM_LOAD( "610-0752.u14", 0x6000000, 0x1000000, CRC(ce83bcc7) SHA1(e2d324a5a7eacbec7b0df9a4b9e276521bb9ab80) )
 	ROM_LOAD( "610-0752.u16", 0x7000000, 0x1000000, CRC(8ac71c76) SHA1(080e41e633bf082fc536781541c6031d1ac81939) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "315-6248.bin", 0, 4, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
 
 	ROM_REGION( 0x1400000, "network", 0)    // network board
 	ROM_LOAD( "fpr-24330a.ic2", 0x000000, 0x400000, CRC(8d89877e) SHA1(6caafc49114eb0358e217bc2d1a3ab58a93c8d19) )
@@ -10618,8 +10613,7 @@ ROM_START( anmlbskt )
 	// U14 Populated, Empty
 	// U16 Populated, Empty
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vm2001f01.bin", 0, 4, CRC(d8d6c32e) SHA1(255a437bdb4bb8372167f33f0ca1668bcd74ea32) )
+	ROM_PARAMETER(":rom_board:key", "45") // vm2001f01
 ROM_END
 
 // no case, Sega 171-8355A type board, stickers: VM20-6101-1 V20T0069
@@ -10634,8 +10628,7 @@ ROM_START( anmlbskta )
 	ROM_LOAD( "u2",  0x3000000, 0x1000000, CRC(b9162d97) SHA1(7f561617fa0538da554ad6f6c4d6a20e739491dc) ) // data not belongs to this game, more looks like random trash
 	// U14-U17 not populated
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vm2001f01.bin", 0, 4, CRC(d8d6c32e) SHA1(255a437bdb4bb8372167f33f0ca1668bcd74ea32) )
+	ROM_PARAMETER(":rom_board:key", "45") // vm2001f01
 ROM_END
 
 // game have 2 sets of graphics switched via "LOCATION" setting: SC (Shopping Center) kids oriented, and NORMAL
@@ -10651,8 +10644,7 @@ ROM_START( blokpong )
 	//ROM_LOAD( "u2",  0x3000000, 0x1000000, CRC(b9162d97) SHA1(7f561617fa0538da554ad6f6c4d6a20e739491dc) ) // garbage data not used by this game, match anmlbskta U2
 	// U14-U17 not populated
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vm2001f01.bin", 0, 4, CRC(d8d6c32e) SHA1(255a437bdb4bb8372167f33f0ca1668bcd74ea32) )
+	ROM_PARAMETER(":rom_board:key", "45") // vm2001f01
 ROM_END
 
 ROM_START( dolphin )
@@ -10666,8 +10658,7 @@ ROM_START( dolphin )
 	ROM_LOAD( "ax0404m01.ic14", 0x4000000, 0x1000000, CRC(f82a4ca3) SHA1(da686d86e176a9f24874d2916b1932f03a99a52d) )
 	ROM_LOAD( "ax0405m01.ic15", 0x5000000, 0x1000000, CRC(b88298d7) SHA1(490c3ec471018895b7268ee33498dddaccbbfd5a) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax0401f01.bin", 0, 4, CRC(394b52c9) SHA1(aa05d82e7c384f536cf68af48b5c0eb89e6f5dfa) )
+	ROM_PARAMETER(":rom_board:key", "40") // ax0401f01
 ROM_END
 
 ROM_START( demofist )
@@ -10683,8 +10674,7 @@ ROM_START( demofist )
 	ROM_LOAD( "ax0606m01.ic16", 0x6000000, 0x1000000, CRC(42c81617) SHA1(1cc686af5e3fc56143836e3dcc0067893f82fcf9) )
 	ROM_LOAD( "ax0607m01.ic17", 0x7000000, 0x1000000, CRC(96e5aa84) SHA1(e9841f550f2ef409d97004542bcadabb6b9e84af) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax0601f01.bin", 0, 4, CRC(25c9a3ae) SHA1(060c3fa1f8cd7d41785630db22e107790ade702a) )
+	ROM_PARAMETER(":rom_board:key", "90") // ax0601f01
 ROM_END
 
 // (C)Dimps Wed Mar 10 19:08:51 2004 TANAKA (build 0028)
@@ -10701,8 +10691,7 @@ ROM_START( rumblef )
 	ROM_LOAD( "ax1806m01.ic16", 0x6000000, 0x1000000, CRC(ac2751bb) SHA1(5070fa12bf109ab87e8f7ea46ac4ae78a73105da) )
 	ROM_LOAD( "ax1807m01.ic17", 0x7000000, 0x1000000, CRC(3b2fbdb0) SHA1(f9f7e06785d3a07282247aaedd9999aa7c2670b9) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax1801f01.bin", 0, 4, CRC(5b2e82d9) SHA1(de0d9c2511c72b95777897403cb63b690f74dfa1))
+	ROM_PARAMETER(":rom_board:key", "aa") // ax1801f01
 ROM_END
 
 // Prototype, (C)Dimps Fri Feb 20 11:00:43 2004 TANAKA (build 0028)
@@ -10727,8 +10716,7 @@ ROM_START( rumblefp )
 	ROM_LOAD("ic26", 0x07000000, 0x00800000, CRC(6421720d) SHA1(6eaeb93d462542c3cf3e815d5fb309c337a8673b) )
 	// IC27 populated, empty
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "key.bin", 0, 4, CRC(757054c4) SHA1(7d5556d0940c582adbcf5697c7b81453d0c91153) )
+	ROM_PARAMETER(":rom_board:key", "25") // Julie
 ROM_END
 
 // Build:Jun 25 2005 17:00:38
@@ -10745,8 +10733,7 @@ ROM_START( ngbc )
 	ROM_LOAD( "ax3306m01.mrom6", 0x0e000000, 0x2000000, CRC(5cf32fbd) SHA1(b6ae0abe5791b3d6f8db07b8c8ca22219a153801) )
 	ROM_LOAD( "ax3307m01.mrom7", 0x12000000, 0x2000000, CRC(26d9da53) SHA1(0015b4be670005a451274de68279b4302fc42a97) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax3301f01.bin", 0, 4, CRC(9afe949b) SHA1(4f7b039f3287da61a53a2d012993bfb57e1459bd) )
+	ROM_PARAMETER(":rom_board:key", "a0") // ax3301f01
 ROM_END
 
 // same as above EN-dump, but CustomerID not FF-filled
@@ -10764,8 +10751,7 @@ ROM_START( ngbcj )
 	ROM_LOAD( "ax3306m01.mrom6", 0x0e000000, 0x2000000, CRC(5cf32fbd) SHA1(b6ae0abe5791b3d6f8db07b8c8ca22219a153801) )
 	ROM_LOAD( "ax3307m01.mrom7", 0x12000000, 0x2000000, CRC(26d9da53) SHA1(0015b4be670005a451274de68279b4302fc42a97) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax3301f01.bin", 0, 4, CRC(9afe949b) SHA1(4f7b039f3287da61a53a2d012993bfb57e1459bd) )
+	ROM_PARAMETER(":rom_board:key", "a0") // ax3301f01
 ROM_END
 
 // Build:Jul 09 2004 15:05:53
@@ -10781,8 +10767,7 @@ ROM_START( kofnw )
 	ROM_LOAD( "ax2205m01.ic15", 0x5000000, 0x1000000, CRC(2851b791) SHA1(566ef95ea066b7bf548986085670242be217befc) )
 	ROM_LOAD( "ax2206m01.ic16", 0x6000000, 0x1000000, CRC(e53eb965) SHA1(f50cd53a5859f081d8a278d24a519c9d9b49ab96) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax2201f01.bin", 0, 4, CRC(b1fff0c8) SHA1(d83177e3672378a2bbc08653b4b73704333ca30a) )
+	ROM_PARAMETER(":rom_board:key", "99") // ax2201f01
 ROM_END
 
 // Build:Sep 10 2004 12:05:34
@@ -10800,8 +10785,7 @@ ROM_START( kofnwj )
 	ROM_LOAD( "ax2205m01.ic15", 0x5000000, 0x1000000, CRC(2851b791) SHA1(566ef95ea066b7bf548986085670242be217befc) )
 	ROM_LOAD( "ax2206m01.ic16", 0x6000000, 0x1000000, CRC(e53eb965) SHA1(f50cd53a5859f081d8a278d24a519c9d9b49ab96) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax2201f01.bin", 0, 4, CRC(b1fff0c8) SHA1(d83177e3672378a2bbc08653b4b73704333ca30a) )
+	ROM_PARAMETER(":rom_board:key", "99") // ax2201f01
 ROM_END
 
 ROM_START( kov7sprt )
@@ -10817,8 +10801,7 @@ ROM_START( kov7sprt )
 	ROM_LOAD( "ax1301m06.ic16", 0x6000000, 0x1000000, CRC(cb8cacb4) SHA1(5d008e8a934451b9bfa33fedfd492c86d9226ef5) )
 	ROM_LOAD( "ax1301m07.ic17", 0x7000000, 0x1000000, CRC(0ca92213) SHA1(115c50fa55e6de3439de23e74621695510c6a7ba) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax1301f01.bin", 0, 4, CRC(2a189821) SHA1(d15c9df83782d49ea85e201cba844f5a9e33f15c) )
+	ROM_PARAMETER(":rom_board:key", "35") // ax1301f01
 ROM_END
 
 ROM_START( ggisuka )
@@ -10835,8 +10818,7 @@ ROM_START( ggisuka )
 	ROM_LOAD( "ax1207m01.ic16", 0x6000000, 0x1000000, CRC(6636d1b8) SHA1(9bd8fc114557f6fbe772f85eeb246f7336d4255e) )
 	ROM_LOAD( "ax1208m01.ic17", 0x7000000, 0x1000000, CRC(38bda476) SHA1(0234a6f5fbaf5e958b3ba0db311dff157f80addc) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax1201f01.bin", 0, 4, CRC(325cf843) SHA1(c51d19a4fce37433f37e7ce23801a7fc4e09013d) )
+	ROM_PARAMETER(":rom_board:key", "ed") // ax1201f01
 /*
   Sammy AM3AHT/AWMPSYSTEM
     4-cabinet splitter device, likely was used in GG Isuka, and maybe in 2-player AW-NET games too.
@@ -10872,8 +10854,7 @@ ROM_START( maxspeed )
 	ROM_LOAD( "ax0504m01.ic14", 0x4000000, 0x1000000, CRC(7955b55a) SHA1(927f58d6961e702c2a8afce79bac5e5cff3dfed6) )
 	ROM_LOAD( "ax0505m01.ic15", 0x5000000, 0x1000000, CRC(e8ccc660) SHA1(a5f414f200a0d41e958430d0fc2d4e1fda1cc67c) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax0501f01.bin", 0, 4, CRC(c35d9a95) SHA1(bf260caf33821be51014b06480a11ec982fa4fcd) )
+	ROM_PARAMETER(":rom_board:key", "55") // ax0501f01
 ROM_END
 
 ROM_START( vfurlong )
@@ -10889,8 +10870,7 @@ ROM_START( vfurlong )
 	ROM_LOAD( "ax2006m01.ic16", 0x6000000, 0x1000000, CRC(8134ec55) SHA1(843e473d4f99237ded641cce9515b7802cfe3742) )
 	ROM_LOAD( "ax2007m01.ic17", 0x7000000, 0x1000000, CRC(d0557e8a) SHA1(df8057597eb690bd18c5d26736f5d4f86e3b1225) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax2001f01.bin", 0, 4, CRC(42d45ab8) SHA1(25bc9c046ff085e5219109316fbc0c1fae183d1f) )
+	ROM_PARAMETER(":rom_board:key", "db") // ax2001f01
 ROM_END
 
 ROM_START( salmankt )
@@ -10906,8 +10886,7 @@ ROM_START( salmankt )
 	ROM_LOAD( "ax1406m01.ic16", 0x6000000, 0x1000000, CRC(437673e6) SHA1(66f7e5f246ebbb1bdbf074da41ec16bf32720a82) )
 	ROM_LOAD( "ax1407m01.ic17", 0x7000000, 0x1000000, CRC(6b6acc0a) SHA1(a8c692c875271a0806460caa79c67fd756231273) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax1401f01.bin", 0, 4, CRC(67e742ae) SHA1(7c2e955bcb753ff8756db4bd75409583ffbadf62) )
+	ROM_PARAMETER(":rom_board:key", "77") // ax1401f01
 ROM_END
 
 ROM_START( ftspeed )
@@ -10922,8 +10901,7 @@ ROM_START( ftspeed )
 	ROM_LOAD( "ax1705m01.ic15", 0x5000000, 0x1000000, CRC(996f68e1) SHA1(3fa505c641127d9027bfc7ec0ab16905344a4e2c) )
 	ROM_LOAD( "ax1706m01.ic16", 0x6000000, 0x1000000, CRC(804b2eb2) SHA1(fcca02a5a8c09eb16548255115fb105c9c49c4e0) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax1701f01.bin", 0, 4, CRC(f3f03c35) SHA1(2a8329a29cdcc0219e9360cc573c0f3ad44d0175) )
+	ROM_PARAMETER(":rom_board:key", "6b") // ax1701f01
 ROM_END
 
 // contents of cartridges labeled as JP and EN is the same
@@ -10941,8 +10919,7 @@ ROM_START( kofxi )
 	ROM_LOAD( "ax3206m01.mrom6", 0x0e000000, 0x2000000, CRC(cb81e5f5) SHA1(07faee02a58ac9c600ab3cdd525d22c16b35222d) )
 	ROM_LOAD( "ax3207m01.mrom7", 0x12000000, 0x2000000, CRC(164f6329) SHA1(a72c8cbe4ac7b98edda3d4434f6c81a370b8c39b) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax3201f01.bin", 0, 4, CRC(065d7fc6) SHA1(e4f18126e9f4e6747ffc5d0664766986fc07c127) )
+	ROM_PARAMETER(":rom_board:key", "d3") // ax3201f01
 ROM_END
 
 ROM_START( dirtypig )
@@ -10958,8 +10935,7 @@ ROM_START( dirtypig )
 	ROM_LOAD( "695-0014.u14", 0x6000000, 0x1000000, CRC(55470242) SHA1(789036189ae5488a9da565774bdf91b49cd8264e) )
 	ROM_LOAD( "695-0014.u16", 0x7000000, 0x1000000, CRC(730180a4) SHA1(017b82e2d2744695e3e521d35a8511ecc1c8ab43) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "315-6248.bin", 0, 4, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
 ROM_END
 
 // Ver 2005/12/16
@@ -10974,8 +10950,7 @@ ROM_START( mslug6 )
 	ROM_LOAD( "ax3003m01.mrom3", 0x6000000, 0x2000000, CRC(4fe37370) SHA1(85d51db94c3e34265e37b636d6545ed2801ba5a6) )
 	ROM_LOAD( "ax3004m01.mrom4", 0xa000000, 0x2000000, CRC(2f4c4c6f) SHA1(5815c28fdaf0429003986e725c0015fe4c08721f) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax3001f01.bin", 0, 4, CRC(0b9939e9) SHA1(4ca1225c7c9993542a67035a054ac579ed021de5) )
+	ROM_PARAMETER(":rom_board:key", "82") // ax3001f01
 ROM_END
 
 // Build:Aug 05 2005 16:43:48
@@ -10992,8 +10967,7 @@ ROM_START( samsptk )
 	ROM_LOAD( "ax2906m01.mrom6", 0x0e000000, 0x2000000, CRC(cb95298d) SHA1(5fb5d5a0d6801df61101a1b23de0c14ff29ef654) )
 	ROM_LOAD( "ax2907m01.mrom7", 0x12000000, 0x2000000, CRC(48015081) SHA1(3c0a0a6dc9ab7bf889579477699e612c3092f9bf) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax2901f01.bin", 0, 4, CRC(8a6267aa) SHA1(9705bed35acb87d578f0efcf4f74b2a4b1a7be2e) )
+	ROM_PARAMETER(":rom_board:key", "1d") // ax2901f01
 ROM_END
 
 ROM_START( ggx15 )
@@ -11009,8 +10983,7 @@ ROM_START( ggx15 )
 	ROM_LOAD( "ax0806m01.ic16", 0x6000000, 0x1000000, CRC(3bf8ecba) SHA1(43e7fbf21d8ee60bab72ce558640730fd9c3e3b8) )
 	ROM_LOAD( "ax0807m01.ic17", 0x7000000, 0x1000000, CRC(e397dd79) SHA1(5fec32dc19dd71ef0d451f8058186f998015723b) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax0801f01.bin", 0, 4, CRC(a36e5017) SHA1(fd763a4c708fe37c7561ba5b5d0b8d2118cff16b) )
+	ROM_PARAMETER(":rom_board:key", "c9") // ax0801f01
 ROM_END
 
 // (C)Dimps Fri Mar 4 19:27:57 2005 NONAME (build 2319)
@@ -11025,8 +10998,7 @@ ROM_START( rumblef2 )
 	ROM_LOAD( "ax3404m01.mrom4", 0xa000000, 0x2000000, CRC(a426b443) SHA1(617aab42e432a80b0663281fb7faa6c14ef4f149) )
 	ROM_LOAD( "ax3405m01.mrom5", 0xc000000, 0x2000000, CRC(4766ce56) SHA1(349b82013a75905ae5520b14a87702c9038a5def) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ax3401f01.bin", 0, 4, CRC(952919a1) SHA1(d343fdbbd1d8b651401133f21facc1584bb66c04) )
+	ROM_PARAMETER(":rom_board:key", "07") // ax3401f01
 ROM_END
 
 // Prototype ROM board
@@ -11052,8 +11024,7 @@ ROM_START( rumblf2p )
 	ROM_LOAD("ic26", 0x07000000, 0x00800000, CRC(ff9a2c4c) SHA1(81ac8fb41d7af605da0dcd92104cef0f045777bf) )
 	// IC27 populated, empty
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "julie_dev.bin", 0, 4, CRC(757054c4) SHA1(7d5556d0940c582adbcf5697c7b81453d0c91153) )
+	ROM_PARAMETER(":rom_board:key", "25") // Julie
 ROM_END
 
 ROM_START( claychal )
@@ -11069,8 +11040,7 @@ ROM_START( claychal )
 	ROM_LOAD( "608-2161.u14", 0x6000000, 0x1000100, CRC(2e7d966f) SHA1(3304fd0c5140a13f6fe2ea9aaa74d7885e1505e1) )
 	ROM_LOAD( "608-2161.u16", 0x7000000, 0x1000100, CRC(14f8ca87) SHA1(778c048da9434ffda600e35ad5aca29e02cc98c0) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
 ROM_END
 
 // Build:Feb 08 2009 22:35:34
@@ -11087,8 +11057,7 @@ ROM_START( basschalo )
 	ROM_LOAD("610-0811.u14", 0x06000000, 0x01000000, CRC(f2769383) SHA1(c580577df9d140bb6ecce192efafb0284d22c32d) )
 	ROM_LOAD("vera.u16",     0x07000000, 0x01000000, CRC(3590072d) SHA1(3375a0334c35de1d7d8231d7cc27775451042f91) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
 ROM_END
 
 // Version A
@@ -11106,8 +11075,7 @@ ROM_START( basschal )
 	ROM_LOAD("vera.u14", 0x06000000, 0x01000000, CRC(35df044f) SHA1(eeac6c4062f697205558846d6ac262cb5c1b10cf) )
 	ROM_LOAD("vera.u16", 0x07000000, 0x01000000, CRC(3590072d) SHA1(3375a0334c35de1d7d8231d7cc27775451042f91) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_PARAMETER(":rom_board:key", "2a") // 315-6248
 ROM_END
 
 // no case, Sega 171-8355A type board, stickers: VM20-6101-1 V20T0031
@@ -11121,8 +11089,7 @@ ROM_START( waidrive )
 	//ROM_LOAD( "u2",  0x3000000, 0x1000000, CRC(b9162d97) SHA1(7f561617fa0538da554ad6f6c4d6a20e739491dc) ) // garbage data not used by this game, match anmlbskta U2
 	// U14-U17 not populated
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vm2001f01.bin", 0, 4, CRC(d8d6c32e) SHA1(255a437bdb4bb8372167f33f0ca1668bcd74ea32) )
+	ROM_PARAMETER(":rom_board:key", "45") // vm2001f01
 ROM_END
 
 // Prototype ROM board
@@ -11140,8 +11107,7 @@ ROM_START( sushibar )
 	ROM_LOAD("ic18", 0x03000000, 0x00800000, CRC(b9957c76) SHA1(6d72c7ac8e1e0cbed7eb01b66f71bedf46a833e1) )
 	// IC19 - IC27 populated, empty
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "julie_dev.bin", 0, 4, CRC(757054c4) SHA1(7d5556d0940c582adbcf5697c7b81453d0c91153) )
+	ROM_PARAMETER(":rom_board:key", "25") // Julie
 ROM_END
 
 /* All games have the regional titles at the start of the IC22 rom in the following order
@@ -11284,6 +11250,7 @@ ROM_END
 // 01xx Mushiking 2K3 1ST (Japan)
 // 01xx Mushiking 2K4 1ST (Japan)
 // 01xx Mushiking 2K5 2ND (Japan)
+// 0xxx Nittere Shiki! Mirai Yosou Studio
 // 0xxx Star Horse 2001 (main screens, server)
 // 0xxx Star Horse 2002 (whole set)
 // 0xxx Star Horse Progress Returns (main screens, server)

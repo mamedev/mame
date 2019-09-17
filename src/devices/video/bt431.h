@@ -35,6 +35,8 @@ public:
 		CR_D4   = 0x10, // cursor format control
 		CR_D5   = 0x20, // cross hair cursor enable
 		CR_D6   = 0x40, // 64x64 cursor enable
+
+		CR_WM   = 0x7f, // write mask
 	};
 
 	enum cr_d1d0_mask : u8
@@ -62,7 +64,7 @@ protected:
 	virtual void device_reset() override;
 
 	template <unsigned S> u8 addr_r() { return m_address >> S; }
-	template <unsigned S> void addr_w(u8 data) { m_address = (m_address & (0xff00 >> S)) | (u16(data) << S); }
+	template <unsigned S> void addr_w(u8 data) { m_address = ((m_address & (0xff00 >> S)) | (u16(data) << S)) & ADDRESS_MASK; }
 
 	u8 ram_r();
 	void ram_w(u8 data);

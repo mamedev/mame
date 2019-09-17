@@ -76,7 +76,7 @@ public:
 
 	void r2dtank(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_ttl74123_output);
+	DECLARE_READ_LINE_MEMBER(ttl74123_output_r);
 
 protected:
 	virtual void machine_start() override;
@@ -239,7 +239,7 @@ WRITE_LINE_MEMBER(r2dtank_state::ttl74123_output_changed)
 }
 
 
-CUSTOM_INPUT_MEMBER(r2dtank_state::get_ttl74123_output)
+READ_LINE_MEMBER(r2dtank_state::ttl74123_output_r)
 {
 	return m_ttl74123_output;
 }
@@ -372,7 +372,7 @@ static INPUT_PORTS_START( r2dtank )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, r2dtank_state,get_ttl74123_output, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(r2dtank_state, ttl74123_output_r)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL

@@ -13,6 +13,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "tilemap.h"
 
 class ashnojoe_state : public driver_device
 {

@@ -64,6 +64,7 @@ public:
 	int index() const { return m_index; }
 	void *dataptr() const { return entry_baseptr(); }
 	u64 datamask() const { return m_datamask; }
+	u8 datasize() const { return m_datasize; }
 	const char *symbol() const { return m_symbol.c_str(); }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
 	bool writeable() const { return ((m_flags & DSF_READONLY) == 0); }

@@ -129,6 +129,8 @@ private:
 	uint8_t m_wheel_board_output;
 	uint32_t m_wheel_board_last;
 	uint32_t m_wheel_board_u8_latch;
+	uint8_t m_comm_flags;
+	uint16_t m_comm_data;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
@@ -166,6 +168,9 @@ private:
 	DECLARE_READ32_MEMBER(generic_speedup_r);
 	DECLARE_READ32_MEMBER(midvunit_wheel_board_r);
 	DECLARE_WRITE32_MEMBER(midvunit_wheel_board_w);
+	DECLARE_READ32_MEMBER(midvunit_intcs_r);
+	DECLARE_READ32_MEMBER(midvunit_comcs_r);
+	DECLARE_WRITE32_MEMBER(midvunit_comcs_w);
 	void set_input(const char *s);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);
@@ -191,6 +196,9 @@ private:
 	optional_ioport m_dsw;
 	optional_ioport m_motion;
 	void postload();
+
+	uint16_t comm_bus_out();
+	uint16_t comm_bus_in();
 
 	void midvplus_map(address_map &map);
 	void midvunit_map(address_map &map);

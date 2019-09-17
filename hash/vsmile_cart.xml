@@ -7,6 +7,7 @@ V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
 V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
 V.Smile Baby                  80-099***  (Smartridges are yellow, incompatible with TV based V.Smile consoles)
+V.Baby                        80-22****  (Smartridges are orange, incompatible with other V.Smile consoles, including V.Smile Baby)
 
 Language:
 ********0 = US                (White labels on back)
@@ -31,12 +32,14 @@ Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
 |        | 80-091440(US)     | V.Smile Smart Keyboard                                                     |
 |        | 80-091443(UK)     | V.Smile Smart Keyboard                                                     |
-|        | 80-091444(GE)     | V.Smile Tastatur fuer Lernkonsole                                          |
+|   XX   | 80-091444(GE)     | Schreibspaß (52-091444 on back label)                                      |
+|        | 80-091447(SP)     | Teclado Interactivo V.Smile                                                |
 +========+===================+============================================================================+
 |        | 80-03600(US)      | V.Smile PC Pal Island                                                      |
 +========+===================+============================================================================+
 |   XX   | 80-036800(US)     | V.Smile PC Pal Island (cart serial)                                        |
-|        | 80-036822(SP)     | V.Smile PC Pal Island (cart serial)                                        |
+|   XX   | 80-036804(GE)     | V.Smile Mein erster Mausklick (52-036804(GE) on back label)                |
+|   XX   | 80-036822(SP)     | V.Smile PC (52-036822(SP) on back label)                                   |
 +========+===================+============================================================================+
 |   XX   | 80-067000(US)     | V.Smile Art Studio                                                         |
 |        | 80-067003(UK)     | V.Smile Art Studio                                                         |
@@ -45,6 +48,7 @@ Addons (w/ yellow Smartridges)
 |        |          (DK)     | V.Smile Tegnestudie                                                        |
 |   XX   | 80-067021(SE)     | V.Smile Tecknarstudio                                                      |
 |        | 80-067022(SP)     | V.Smile Estudio de Arte (orange)                                           |
+|   XX   | 80-067022(SP)     | V.Smile Estudio de Arte (yellow)                                           |
 |        | 80-067033(NO)     | V.Smile Tegnestudio                                                        |
 |        | 80-067057(SP)     | V.Smile Estudio de Arte (pink)                                             |
 |        |          (CN)     | 智乐学习通小画室                                                            |
@@ -52,13 +56,12 @@ Addons (w/ yellow Smartridges)
 |        | 80-091320(US)     | V.Smile Jamming Gym Class                                                  |
 |        | 80-091322(NL)     | V.Smile Muziek en Leer Mat                                                 |
 |        | 80-091323(UK)     | V.Smile Dance'n'Learn                                                      |
-|        | 80-091324(GE)     | V.Smile Lern- und Tanzmatte                                                |
-|        | 80-091325(FR)     | V.Smile Defi Gym                                                           |
-|        | 80-091325(FR)     | V.Smile Tapis Multisport (box serial)                                      |
+|   XX   | 80-091324(GE)     | V.Smile Tanz Mit Center (cart labeled as "Lern- und Tanzmatte")            |
+|        | 80-091325(FR)     | V.Smile Défi Gym (box labeled as "Tapis Multisport")                       |
 |   XX   | 80-091327(SP)     | V.Smile Gimnasio Interactivo                                               |
 +========+===================+============================================================================+
 
-Game cartridges
+Regular game cartridges
 +========+===================+================================================================================================+
 | Dumped |      Serial       |                                    Name                                                        |
 +========+===================+================================================================================================+
@@ -92,7 +95,7 @@ Game cartridges
 |        | 80-090142(NL)     | Mijn Puppy!                                                                                    |
 |   XX   | 80-090144(GE)     | Mein erster Hund                                                                               |
 |        | 80-090145(FR)     | Mon Toutou Tout Fou!                                                                           |
-|        | 80-090147(SP)     | Dakota y su mascota (EAN 3417766901475)                                                        |
+|  SOON  | 80-090147(SP)     | Dakota y su mascota (EAN 3417766901475, 52-090147(SP) on back label)                           |
 |        |          (DK)     | Min hundehvalp                                                                                 |
 |   XX   | 80-090154(SE)     | Min hundvalp                                                                                   |
 |        |          (NO)     | Min valp                                                                                       |
@@ -102,7 +105,7 @@ Game cartridges
 |        | 80-090163(UK)     | Monsters vs. Aliens                                                                            |
 |   XX   | 80-090164(GE)     | Monsters vs. Aliens                                                                            |
 |        | 80-090165(FR)     | Monsters Contre Aliens                                                                         |
-|   XX   | 80-090167(SP)     | Monstruos contra Alienígenas  (52-090167(SP) on back label, green sticker: "P ○○○○")           |
+|   XX   | 80-090167(SP)     | Monstruos contra Alienígenas  (52-090167(SP) on back label)                                    |
 +========+===================+================================================================================================+
 |        | 80-090180(US)     | <Unknown>                                                                                      |
 |        | 80-090183(UK)     | Wonder Pets! - Save the Animals                                                                |
@@ -110,7 +113,7 @@ Game cartridges
 |        | 80-090200(US)     | <Unknown>                                                                                      |
 +========+===================+================================================================================================+
 |        | 80-090220(US)     | <Unknown> should be Wild Waves (purple)                                                        |
-|        | 80-090224(GE)     | Dolphis Wasser-abenteuer                                                                       |
+|        | 80-090224(GE)     | Dolphis Wasser-abenteuer (52-090224(GE) on back label)                                         |
 +========+===================+================================================================================================+
 |        | 80-090240(US)     | <Unknown>                                                                                      |
 +========+===================+================================================================================================+
@@ -120,7 +123,7 @@ Game cartridges
 |        | 80-090275(NO)     | Disney Fairies - Tingeling                                                                     |
 |        |          (FI)     | Disney Fairies - Helinä-keiju                                                                  |
 +========+===================+================================================================================================+
-|   XX   | 52-091444(GE)     | Schreibspaß                                                                                    |
+
 +========+===================+================================================================================================+
 |                                                                                                                             |
 |  Oldest Smartidges start here                                                                                               |
@@ -133,10 +136,11 @@ Game cartridges
 |   XX   | 80-092002(NL)     | Alfabet Pretpark                                                                               |
 |        | 80-092003(UK)     | Alphabet Park Adventure (Red Haired Girl Version)                                              |
 |   XX   | 80-092004(GE)     | Abenteuer im ABC Park                                                                          |
+|   XX   | 80-092004(GE)     | Abenteuer im ABC Park (Rev. 3, translucent blue cart)                                          |
 |   XX   | 80-092005(FR)     | ABC Land Aventure                                                                              |
 |        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                                                |
-|   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB, green sticker: "449 ○○○○")
-|        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent) (No # on label)                                  |
+|   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB)                          |
+|        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent blue cart, no # on label)                         |
 |        |          (KOR)    | Alphabet Park Adventure - 알파벳 공원 대탐험                                                     |
 |        |          (CN)     | 英语乐园                                                                                        |
 +========+===================+================================================================================================+
@@ -162,8 +166,8 @@ Game cartridges
 |   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie                                                  |
 |   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (ALT)                                            |
 |        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)                                              |
-|   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB, green sticker: "449 ○○○○") |
-|   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (092067-1 on PCB, green sticker: "732 ○○○○")  |
+|   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB)                            |
+|   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (092067-1 on PCB)                             |
 |   XX   | 80-092073(DK)     | Peter Plys - Honningjagten                                                                     |
 |   XX   | 80-092074(SE)     | Nalle Puh - Honungsjakten                                                                      |
 |        |          (NO)     | Winnie the Pooh - Honningjakten                                                                |
@@ -179,7 +183,7 @@ Game cartridges
 |   XX   | 80-092084(GE)     | Micky - Mickys magisches Abenteuer                                                             |
 |        | 80-092085(FR)     | Mickey - Mickey a la recherche de Pluto                                                        |
 |        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)                         |
-|   XX   | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB, green sticker: "528 ○●○○") |
+|   XX   | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB)                            |
 |        |          (DK)     | Mickey                                                                                         |
 |   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                                            |
 |        |          (NO)     | Mickey                                                                                         |
@@ -209,7 +213,7 @@ Game cartridges
 |   XX   | 80-092124(GE)     | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer                                      |
 |   XX   | 80-092125(FR)     | La Petite Sirene - Ariel devient une princesse                                                 |
 |        | 80-092126(PT)     |                                                                                                |
-|   XX   | 80-092127(SP)     | La Sirenita - El Viaje Fantástico de Ariel (no # on label, green sticker: "451 ○●○○")          |
+|   XX   | 80-092127(SP)     | La Sirenita - El Viaje Fantástico de Ariel (no # on label)                                     |
 |   XX   | 80-092133(DK)     | Den Lille Havfrue - Ariels majestætiske rejse!                                                 |
 |   XX   | 80-092134(SE)     | Den Lilla Sjöjungfrun - Ariels majestätiska resa!                                              |
 |        |          (NO)     | Den Lille Havfruen - Ariels majestetiske reise!                                                |
@@ -228,9 +232,9 @@ Game cartridges
 |   XX   | 80-092145(FR)     | Spider-Man & ses amis - Missions Secrètes (white webs)                                         |
 |        | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (yellow webs)                                        |
 |        | 80-092146(PT)     | Spider-man & Amigos - Missoes Secretas                                                         |
-|   XX   | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs, 2005, green sticker: "518 ○○○○")          |
+|   XX   | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs, 2005)                                     |
 |        | 80-092147-122(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2007)                                    |
-|        | 80-092147-222(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2008)                                    |
+|   XX   | 80-092147-222(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs, 2008)                                    |
 +========+===================+================================================================================================+
 |   XX   | 80-092160(US)     | Scooby-Doo! - Funland Frenzy                                                                   |
 |        | 80-092160-101(US) | Scooby-Doo! - Funland Frenzy (ALT)                                                             |
@@ -242,8 +246,8 @@ Game cartridges
 |        | 80-092163-293(UK) | Scooby-Doo! - Funland Frenzy (Yellow, only Scooby on label might be motion version)            |
 |   XX   | 80-092164(GE)     | Scooby-Doo! - Im Lernpark                                                                      |
 |   XX   | 80-092165(FR)     | Scooby-Doo! - Panique à Funland                                                                |
-|        | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (translucent purple, packin)                                   |
-|        | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent purple)                                        |
+|        | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (translucent blue cart)                                        |
+|  SOON  | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent blue cart)                                     |
 |   XX   | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (purple, # on back label)                                   |
 |   XX   | 80-092173(DK)     | Scooby-Doo! - Sjov i forlystelsesparken                                                        |
 |   XX   | 80-092174(SE)     | Scooby-Doo! - Tivoli-tokerier                                                                  |
@@ -254,7 +258,7 @@ Game cartridges
 |        | 80-092183(UK)     | Care Bears - A Lesson in Caring                                                                |
 |        | 80-092184(GE)     | Gluecksbarchis  <- existance not proven                                                        |
 |        | 80-092185(FR)     | Les Bisounours - Le Monde Merveilleux des Bisounours                                           |
-|   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB, green sticker: "522 ○○○○")                  |
+|   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB)                                             |
 +========+===================+================================================================================================+
 |        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092201(IT)     | Aladdin - Il magico mondo di Aladdin                                                           |
@@ -262,7 +266,7 @@ Game cartridges
 |        | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                                             |
 |        | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                                                   |
-|   XX   | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label, green sticker: "534 ○○○○")
+|   XX   | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label)                         |
 |        | 80-092210(KOR)    | Aladdin - 알라딘의 신비한 모험 게임 (50-92210(KOR) on back label)                                 |
 +========+===================+================================================================================================+
 |   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody!                                                          |
@@ -272,12 +276,12 @@ Game cartridges
 |   XX   | 80-092224(GE)     | Toy Story 2 - Woodys Spannende Rettung                                                         |
 |        | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                                             |
 |        | 80-092226(PT)     | Toy Story 2 - O Resgate de Woody (92236 on cart)                                               |
-|   XX   | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label, green sticker: "528 ○○○○")      |
+|   XX   | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label)                                 |
 |        |          (DK)     | Toy Story 2 - Operation: Red Woody!                                                            |
 |   XX   | 80-092234(SE)     | Toy Story 2 - Operation: Rädda Woody!                                                          |
 |        |          (NO)     | Toy Story 2 - Operasjon: Redd Woody!                                                           |
 |        |          (FI)     | Toy Story 2                                                                                    |
-|        |          (CN)     | 玩具总动员2 - 营救胡迪                                                                            |
+|        |          (CN)     | 玩具总动员 2 - 营救胡迪                                                                           |
 +========+===================+================================================================================================+
 |   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                                         |
 |   XX   | 80-092241(IT)     | Cenerentola - I desideri magici di Cenerentola (cart says 52-92251 Ita)                        |
@@ -288,14 +292,14 @@ Game cartridges
 |        | 80-092243-203(UK) | Cinderella - Cinderella's Magic Wishes (2008)                                                  |
 |   XX   | 80-092244(GE)     | Cinderella - Lernen im Märchenland (2005)                                                      |
 |   XX   | 80-092244-104(GE) | Cinderella - Lernen im Märchenland (2007)                                                      |
-|   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (2008) (52-092244-205(GER) on back label, white sticker: "827 ○○○○")
+|   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (2008) (52-092244-205(GER) on back label)                   |
 |   XX   | 80-092245(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
 |        | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
 |        | 80-092245-205(FR) | Cendrillon - Le reve enchante de Cendrillon                                                    |
 |        | 80-092246(PT)     | Cinderela - Os Sonhos Magicos da Cinderela (Cart#92256)                                        |
-|        | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
+|   XX   | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
 |  SOON  | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (white/light pink cart label background)      |
-|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (no # on front label, 52-092247-222(SP) on back label, green sticker: "P ○○○○", non motion#, but V.Motion in spanish catalog)
+|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (no # on front label, 52-092247-222(SP) on back label, non motion#, but V.Motion in Spanish catalog)
 |   XX   | 80-092253(DK)     | Cinderella - Askepots magiske ønsker                                                           |
 |   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                      |
 |        | 80-092255(NO)     | Cinderella - Askepotts magiske ønsker                                                          |
@@ -312,24 +316,24 @@ Game cartridges
 |   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT 2)                                            |
 |        | 80-092282(NL)     | Dora - Doras Reparatie Avontuur!                                                               |
 |   XX   | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure (same ROM as "80-092280(US)"                       |
-|        | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                                              |
+|   XX   | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (ALT, orange sticker: "723 ○●○○")                  |
 |        | 80-092284(GE)     | Dora - Doras Reparatur-Abenteuer                                                               |
 |   XX   | 80-092284-104(GE) | Dora - Doras Reparatur-Abenteuer                                                               |
 |   XX   | 80-092285(FR)     | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                   |
 |        | 80-092285-1?5(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (NTSC French-Canadian)            |
 |        | 80-092286(PT)     | Dora - em busca das pecas perdidas (cart# 92296)                                               |
-|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label, green sticker: "P ○○○○")
+|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label)
 |        | 80-092287-122(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora                                         |
 +========+===================+================================================================================================+
 |   XX   | 80-092300(US)     | Bob the Builder - Bob's Busy Day                                                               |
 |   XX   | 80-092303(UK)     | Bob the Builder - Bob's Busy Day                                                               |
 |        | 80-092303-103(UK) | Bob the Builder - Bob's Busy Day (Yellow Label)                                                |
 |   XX   | 80-092304(GE)     | Bob der Baumeister - Bobs Spannender Arbeitstag                                                |
-|        | 80-092304-104(GE) | Bob der Baumeister - Bobs Spannender Arbeitstag                                                |
+|   XX   | 80-092304-104(GE) | Bob der Baumeister - Bobs Spannender Arbeitstag (52-092304-104(GER) on back label)             |
 |        | 80-092305(FR)     | Bob le Bricoleur: Les P'tits Chantiers de Bob                                                  |
 |        | 80-092305-105(FR) | Bob le Bricoleur: Les P'tits Chantiers de Bob (ALT)                                            |
 |        | 80-092306(PT)     | Bob o Construtor - Um dia Atarefado (92316 on cart)                                            |
-|        | 80-092307(SP)     | Bob y sus Amigos - Un día de trabajo                                                           |
+|   XX   | 80-092307(SP)     | Bob y sus Amigos - Un día de trabajo                                                           |
 |   XX   | 80-092313(DK)     | Byggemand Bob - Bobs travle dag                                                                |
 |   XX   | 80-092314(SE)     | Byggare Bob - Bobs stressiga dag                                                               |
 |        |          (NO)     | Byggmester Bob - Bobs travle dag                                                               |
@@ -362,7 +366,7 @@ Game cartridges
 |   XX   | 80-092363-103(UK) | Zayzoo: An Earth Adventure                                                                     |
 |   XX   | 80-092364(GE)     | Zayzoos Lernall                                                                                |
 |   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                                              |
-|   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label, green sticker: "531 ○○○○")          |
+|   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label)                                     |
 |        |          (CN)     | 我的外星人同学                                                                                   |
 +========+===================+================================================================================================+
 |        | 80-092380(US)     | Barney - The Land of Make Believe                                                              |
@@ -374,10 +378,10 @@ Game cartridges
 |   XX   | 80-092420(US)     | Finding Nemo - Nemo's Ocean Discoveries                                                        |
 |   XX   | 80-092422(NL)     | Finding Nemo - De wonderwereld van Nemo                                                        |
 |        | 80-092423(UK)     | Finding Nemo - Nemo's Ocean Discoveries                                                        |
-|   XX   | 50-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer (52-92424(GER) on back label, blue sticker: "P ○○○○", "VT8321" silscreened on the cart)
+|   XX   | 80-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer (52-92424(GER) on back label, "VT8321" silscreened on the cart)
 |        | 80-092425(FR)     | Le Monde de Nemo - Nemo à la découverte de l'océan                                             |
-|        | 80-092426(PT)     | Nemo - A descoberta do Oceano  (Cart#92436)                                                    |
-|   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label, green sticker: "542 ○○○●")
+|   XX   | 80-092436(PT)     | A Procura de Nemo - À descoberta do Oceano  (Cart#92436, 52-092436(Port) on back label)        |
+|   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label)                     |
 |        |          (CN)     | 海底总动员                                                                                      |
 +========+===================+================================================================================================+
 |   XX   | 80-092440(US)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
@@ -385,13 +389,13 @@ Game cartridges
 |        | 80-092443(UK)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
 |   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                                   |
 |        | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                            |
-|   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label, green sticker: "634 ○○○○")
+|   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label)                    |
 +========+===================+================================================================================================+
 |        | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                                         |
 |        | 80-092462(NL)     | Sesamstraat - Bert and Ernie's Fantasie Avontuur                                               |
 |   XX   | 80-092464(GE)     | Sesame Street - Ernie and Berts Fantastisches Abenteuer                                        |
 |        | 80-092465(FR)     | 5, Rue Sesame - Les Aventures Imaginaires d'Ernest et Bert                                     |
-|   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label, green sticker: "735 ○○○○")
+|   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label)
 +========+===================+================================================================================================+
 |        | 80-092480(US)     | The Batman - Gotham City Rescue                                                                |
 |        |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492??, GPZ06629)                             |
@@ -399,17 +403,17 @@ Game cartridges
 |   XX   | 80-092483(UK)     | The Batman - Gotham City Rescue                                                                |
 |        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                           |
 |        | 80-092485(FR)     | The Batman - Panique a Gotham City                                                             |
-|        | 80-092487(SP)     | The Batman - Rescate en Gotham City                                                            |
+|   XX   | 80-092487(SP)     | The Batman - Rescate en Gotham City                                                            |
 |        |          (CN)     | 蝙蝠侠 - 拯救城市                                                                                |
 +========+===================+================================================================================================+
 |        | 80-092500(US)     | Whiz Kid Wheels  (note to self.. no rider in this blue car)                                    |
 |        | 80-092502(NL)     | Truckie's Rekenrace                                                                            |
 |        | 80-092503(UK)     | Whiz Kid Wheels                                                                                |
 |        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (diff color)                                                      |
-|        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (normal purple)                                                   |
+|   XX   | 80-092504(GE)     | Flitzers Schlaue Staedtetour (purple, 52-092504(GER) on back label)                            |
 |        | 80-092505(FR)     | Mission Pilote                                                                                 |
 |        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                                               |
-|   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label, green sticker: "534 ○○○○")                   |
+|   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label)                                              |
 |        | 80-092510(KOR)    | Whiz Kid Wheels - 꼬마 자동차 트러클 (50-92510(KOR) on back label)                               |
 |        |          (CN)     | 数学快车                                                                                        |
 +========+===================+================================================================================================+
@@ -418,7 +422,7 @@ Game cartridges
 |        | 80-092523(UK)     | Spider-Man & Friends Doc Ock's Challenge                                                       |
 |   XX   | 80-092524(GE)     | Spider-Man & Freunde Wettkampf im Space Labor                                                  |
 |        | 80-092525(FR)     | Spider-Man & ses amis Le défi du docteur Ock                                                   |
-|   XX   | 80-092527(SP)     | Spider-Man y Amigos - La Aventura Del Doctor Octopus (52-92527(SP) on back label, green sticker: "624 ○○○○")
+|   XX   | 80-092527(SP)     | Spider-Man y Amigos - La Aventura Del Doctor Octopus (52-92527(SP) on back label)              |
 +========+===================+================================================================================================+
 |   XX   | 80-092540(US)     | Noddy - Detective for a Day                                                                    |
 |   XX   | 80-092543(UK)     | Noddy - Detective for a Day                                                                    |
@@ -427,7 +431,7 @@ Game cartridges
 |   XX   | 80-092544-104(GE) | Noddy - Detektiv fuer einen Tag (ALT)                                                          |
 |   XX   | 80-092545(FR)     | Oui-Oui - Détective d'un Jour                                                                  |
 |        | 80-092545-105(FR) | Oui-Oui - Détective d'un Jour (ALT)                                                            |
-|        | 80-092546(PT)     | Noddy - Detective por um dia (92556 on cart)                                                   |
+|   XX   | 80-092556(PT)     | Noddy - Detective por um dia (092556(Port) on cart)                                            |
 +========+===================+================================================================================================+
 |        | 80-092560(US)     | 101 Dalmations (one pic on german site with USA code)                                          |
 |        | 80-092564(GE)     | 101 Dalmatiner (EAN on german site with USA pic... wtf)                                        |
@@ -441,18 +445,18 @@ Game cartridges
 |   XX   | 80-092602(NL)     | Shrek - Het verhaal van Draakje                                                                |
 |   XX   | 80-092604(GE)     | Shrek - Die Geschichte des Drachen                                                             |
 |   XX   | 80-092605(FR)     | Shrek - Le Rhume de Dragonne                                                                   |
-|        | 80-092607(SP)     | Shrek - El Cuento de la Dragona                                                                |
+|   XX   | 80-092607(SP)     | Shrek - El Cuento de la Dragona                                                                |
 +========+===================+================================================================================================+
 |        | 80-092620(US)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |        | 80-092623(UK)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
-|  SOON  | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                          |
+|   XX   | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                          |
 +========+===================+================================================================================================+
 |   XX   | 80-092640(US)     | Superman - The Greatest Hero                                                                   |
 |   XX   | 80-092642(NL)     | Superman - De Grootste Held                                                                    |
 |        | 80-092643(UK)     | Superman - The Greatest Hero                                                                   |
 |   XX   | 80-092644(GE)     | Superman - Der Superheld                                                                       |
 |   XX   | 80-092645(FR)     | Superman - À la rescousse !                                                                    |
-|  SOON  | 80-092647(SP)     | Superman - El Hombre de Acero                                                                  |
+|   XX   | 80-092647(SP)     | Superman - El Hombre de Acero                                                                  |
 |        |          (CN)     | 超人 - 超级英雄                                                                                  |
 +========+===================+================================================================================================+
 |   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                                           |
@@ -463,7 +467,7 @@ Game cartridges
 |   XX   | 80-092664(GE)     | Cars - Vollgas in Radiator Springs                                                             |
 |   XX   | 80-092665(FR)     | Cars - Quatre Roues                                                                            |
 |        | 80-092666(PT)     | Carros - Aventura em Radiator Springs (92676 on cart)                                          |
-|        | 80-092667(SP)     | Cars - Acelera el Motor en Radiador Springs                                                    |
+|   XX   | 80-092667(SP)     | Cars - Acelera el Motor en Radiador Springs                                                    |
 |   XX   | 80-092673(DK)     | Biler - Ræs i Kølerkildekøbing                                                                 |
 |   XX   | 80-092674(SE)     | Bilar - Kör ikapp i Kylarköping                                                                |
 |        | 80-092674(SE)     | Biler - Kör ikapp i Kylarköping (Misprinted label)                                             |
@@ -481,7 +485,7 @@ Game cartridges
 |   XX   | 80-092824(GE)     | Fußball Schule                                                                                 |
 |        | 80-092825(FR)     | Football Challenge                                                                             |
 |        | 80-092826(PT)     | Football Challenge (cart# 92836)                                                               |
-|        | 80-092827(SP)     | Campeonato de Fútbol                                                                           |
+|  SOON  | 80-092827(SP)     | Campeonato de Fútbol                                                                           |
 +========+===================+================================================================================================+
 |        | 80-092840(US)     | Wall-E                                                                                         |
 |        |          (IT)     | Wall-E  (GPZ07996)                                                                             |
@@ -489,7 +493,7 @@ Game cartridges
 |        | 80-092843(UK)     | Wall-E                                                                                         |
 |   XX   | 80-092844(GE)     | Wall-E                                                                                         |
 |        | 80-092845(FR)     | Wall-E                                                                                         |
-|   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label, green sticker: "P ○○○○")                                      |
+|   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label)                                                               |
 |        |          (DK)     | Wall-E                                                                                         |
 |   XX   | 80-092854(SE)     | Wall-E                                                                                         |
 |        |          (NO)     | Wall-E                                                                                         |
@@ -511,7 +515,7 @@ Game cartridges
 |   XX   | 80-092884(GE)     | Ratatouille - Remys neue Rezepte                                                               |
 |        | 80-092884-104(GE) | Ratatouille - Remys neue Rezepte (ALT)                                                         |
 |        | 80-092885(FR)     | Ratatouille - Les nouvelles recettes de Rémy                                                   |
-|   XX   | 80-092887(SP)     | Ratatouille - Las recetas del Remy (52-092887(SP) on back label, green sticker: "735 ○○○○")    |
+|   XX   | 80-092887(SP)     | Ratatouille - Las recetas del Remy (52-092887(SP) on back label)                               |
 +========+===================+================================================================================================+
 |   XX   | 80-092900(US)     | Go Diego Go! - Save the Animal Familes!                                                        |
 |        | 80-092902(NL)     | Go Diego Go! - Red de dierenfamilies!                                                          |
@@ -520,8 +524,9 @@ Game cartridges
 +========+===================+================================================================================================+
 |   XX   | 80-092920(US)     | Cranium - Partyland Park                                                                       |
 |        | 80-092922(UK)     | Cranium - Partyland Park                                                                       |
-|        | 80-092924(GE)     | Cranium - Freizeit Park                                                                        |
+|   XX   | 80-092924(GE)     | Cranium - Freizeit Park                                                                        |
 |        | 80-092925(FR)     | Cranium - Le Parc D'attractions                                                                |
+|   XX   | 80-092927(SP)     | Cranium - Parque de atracciones de Cranium (52-092927(SP) on back label)                       |
 +========+===================+================================================================================================+
 |        | 80-092940(US)     | <Unknown> (should be Mickey Mouse Clubhouse, 80-084180 exists in V.Link database)              |
 |        |          (IT)     | La Casa di Topolino                                                                            |
@@ -529,7 +534,7 @@ Game cartridges
 |        | 80-092943(UK)     | Mickey Mouse Clubhouse                                                                         |
 |   XX   | 80-092944(GE)     | Micky Maus Wunderhaus                                                                          |
 |        | 80-092945(FR)     | La Maison de Mickey                                                                            |
-|   XX   | 80-092947(SP)     | La Casa de Mickey Mouse (52-092947(SP) on back label, green sticker: "P ○○○○")                 |
+|   XX   | 80-092947(SP)     | La Casa de Mickey Mouse (52-092947(SP) on back label)                                          |
 |        |          (DK)     | Mickey Mouse Clubhouse                                                                         |
 |   XX   | 80-092954(SE)     | Mickey Mouse Clubhouse                                                                         |
 |        |          (NO)     | Mickey Mouse Clubhouse                                                                         |
@@ -540,15 +545,29 @@ Game cartridges
 |   XX   | 80-092963(UK)     | Kung Fu Panda - Path of the Panda                                                              |
 |   XX   | 80-092964(GE)     | Kung Fu Panda - Der Weg des Panda                                                              |
 |        | 80-092965(FR)     | Kung Fu Panda - La Mission de Po                                                               |
-|        | 80-092967(SP)     | Kung Fu Panda - Aventura en el Valle de la Paz                                                 |
+|  SOON  | 80-092967(SP)     | Kung Fu Panda - Aventura en el Valle de la Paz (52-092967(SP) on back label)                   |
 +========+===================+================================================================================================+
 |   XX   | 80-092980(US)     | Disney's Little Einsteins: The Glass Slipper Ball                                              |
 |        | 80-092983(UK)     | Disney's Little Einsteins: The Glass Slipper Ball (purple cart on front of UK box, but V.Motion listed)
 |   XX   | 80-092984(GE)     | Kleine Einsteins                                                                               |
 |        | 80-092985(FR)     | Disney - Les petits Einsteins: Le bal du soulier de verre                                      |
-|  SOON  | 80-092987(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal                                   |
+|   XX   | 80-092987(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal                                   |
 +========+===================+================================================================================================+
 |        |          (CN)     | 小学英语 - Primary English                                                                      |
++========+===================+================================================================================================+
+
+V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regular V.Smile console)
++========+===================+================================================================================================+
+| Dumped |      Serial       |                                    Name                                                        |
++========+===================+================================================================================================+
+|        | 80-089000(US)     | Spider-Man &amp; Friends - Where is Hulk?                                                      |
++========+===================+================================================================================================+
+|   XX   | 80-089020(US)     | Toy Story 2                                                                                    |
++========+===================+================================================================================================+
+|   XX   | 80-089040(US)     | Dora the Explorer - Dora's Got a Puppy                                                         |
+|        | 80-089045(FR)     | Dora's ??????                                                                                  |
++========+===================+================================================================================================+
+|   XX   | 80-089060(US)     | Scooby-Doo! - A Night Of Fright Is No Delight (52-089060(US) on back label)                    |
 +========+===================+================================================================================================+
 
 -->
@@ -720,6 +739,23 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="alphaprkgr3" cloneof="alphaprkr101" supported="yes">
+		<description>Abenteuer im ABC Park (Germany, Rev. 3)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092004(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="translucent blue" />
+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092004 - Abenteuer im ABC Park (GER) (Rev 3) (different Cartridge-Color).bin" size="8388608" crc="823aeece" sha1="86f834b61bef6231f4e7d6c7b2f81ef3b99b9532" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alphaprkf" cloneof="alphaprkr101" supported="yes">
 		<description>ABC Land Aventure (France)</description>
 		<year>200?</year>
@@ -882,6 +918,23 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="backyardigf" supported="yes"> <!-- Will be clone of "backyardig" once found and dumped. -->
+		<description>Nickelodeon Les Mélodilous - Les explorateurs vikings (France)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092585(FR)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092585.u1" size="8388608" crc="99d3d704" sha1="5ba4489849a4e49a22a5083750b4e41a565a4cd6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmanuk" supported="yes">
 		<description>The Batman - Gotham City Rescue (UK)</description>
 		<year>2005</year> <!-- (s05) -->
@@ -892,6 +945,39 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Batman - Gotham City Rescue (Europe).bin" size="8388608" crc="fde620e9" sha1="81d014800f06bb964f23919fa16f9d14c8189c7d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batmans" cloneof="batmanuk" supported="yes">
+		<description>The Batman - Rescate en Gotham City (Spain)</description>
+		<year>2006</year> <!-- (s06) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092487(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092487 - The Batman - Rescate en Gotham City (SP).bin" size="8388608" crc="5526c511" sha1="f49ed294dd7259bf077423a99b65dbe1c387b35b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batmang" supported="yes">
+		<description>The Batman - Rettung von Gotham City (Germany)</description>
+		<year>2006</year> <!-- (s06) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092484(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092484 - Batman - Rettung von Gotham City (GER).bin" size="8388608" crc="7718f2f2" sha1="4b34dcfae721d82392dc486ac531b7b8def97257" />
 			</dataarea>
 		</part>
 	</software>
@@ -979,6 +1065,40 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="bobbdaygr104" cloneof="bobbday" supported="yes">
+		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Germany, Rev. 104)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092304-104(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092304-104 - Bob der Baumeister - Bobs spannender Arbeitstag (GER).bin" size="8388608" crc="b0623371" sha1="9c5d7cfbdf21495b8a461408a1969f5095d4d914" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbdays" cloneof="bobbday" supported="yes">
+		<description>Bob y sus Amigos - Un Día De Trabajo (Spain)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092307(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092307 - Bob y sus Amigos - Un Dia De Trabajo (SP).bin" size="8388608" crc="c39b08f9" sha1="c38a77fc615302a649b6f0668fbcad7f2ade02bd" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bobbdaydk" cloneof="bobbday" supported="yes">
 		<description>Byggemand Bob - Bobs travle dag (Denmark)</description>
 		<year>2006?</year>
@@ -1013,7 +1133,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="carebears" supported="yes"> <!-- Will be cloneof="carebear" when dumped -->
+	<software name="carebears" supported="yes"> <!-- Will be clone of "carebear" once found and dumped. -->
 		<description>Osos Amorosos - Una Lección de Amor (Spain)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1107,6 +1227,23 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="092665.u1" size="8388608" crc="c1f63c2e" sha1="3a6726a0a5dd5543d632dfbf57144da780994ba5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carss" cloneof="carsr201" supported="yes">
+		<description>Disney/Pixar Cars - Acelera el Motor en Radiador Springs (Spain)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092667(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092667 - Cars - Acelera el Motor en Radiador Springs (SP).bin" size="8388608" crc="52ebefe2" sha1="12c0545c01e71fd3d192c3456974de3e01be4621" />
 			</dataarea>
 		</part>
 	</software>
@@ -1236,6 +1373,23 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="cinderlas" cloneof="cinderla" supported="yes">
+		<description>Walt Disney La Cenicienta - Los sueños mágicos de Cenicienta (Spain)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092247(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092247 - Disney Princess - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="8388608" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cinderlasr222" cloneof="cinderla" supported="yes">
 		<description>Walt Disney La Cenicienta - Los sueños mágicos de Cenicienta (Spain, Rev. 222)</description>
 		<year>2008</year>
@@ -1274,7 +1428,7 @@ Game cartridges
 		<description>Disney's Princess Cinderella - Lernen im Märchenland (Germany, Rev. 204)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-092244-104(GE)" />
+		<info name="serial" value="80-092244-104(GER)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
@@ -1368,6 +1522,24 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92280.u1" size="8388608" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="dorauk" cloneof="dorar201" supported="no">
+		<description>Nick Jr. Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092283-103(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092283-103 - Dora's Fix-it Adventure (UK).bin" size="8388608" crc="3a96b71d" sha1="1ad68250dab5be23b634c5528e28ab5198012ee9" />
 			</dataarea>
 		</part>
 	</software>
@@ -1509,6 +1681,23 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="findnemop" cloneof="findnemo" supported="yes">
+		<description>Disney/Pixar À Procura de Nemo - Nemo À Descoberta do Oceano (Portugal)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092436(Port)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092436 - A Procura de Nemo - Nemo A Descoberta do Oceano (Port).bin" size="8388608" crc="4f9324a4" sha1="5c8f557dce6a94111a9b5064d71e8c88ea23855f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="findnemonl" cloneof="findnemo" supported="yes">
 		<description>Disney/Pixar Finding Nemo - De wonderwereld van Nemo (Netherlands)</description>
 		<year>2005?</year>
@@ -1592,9 +1781,27 @@ Game cartridges
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- No inputs, uses a dance mat controller -->
+	<software name="jamgymg" supported="no"> <!-- Will be clone of "jamgym" once found and dumped. -->
+		<description>V.Smile Tanz Mit Center (Germany)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091324(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" />
+			</dataarea>
+		</part>
+	</software>
 
-	<!-- No inputs -->
-	<software name="gyms" supported="no">
+	<!-- No inputs, uses a dance mat controller -->
+	<software name="jamgyms" cloneof="jamgymg" supported="no">
 		<description>Gimnasio Interactivo V.Smile (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1642,6 +1849,24 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92984-3.u1" size="8388608" crc="8f671aa7" sha1="a6a0a5cd5c5bf14c1b546354bfe9209820955975" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="ltleinstns" cloneof="ltleinstnr5" supported="no">
+		<description>Disney's Little Einsteins (Spain)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092987(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092987 - Little Einsteins (SP).bin" size="8388608" crc="3e944146" sha1="ae457b8140f6b695390647b80b21ede82a074495" />
 			</dataarea>
 		</part>
 	</software>
@@ -1808,6 +2033,23 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="lbratzs" supported="yes">
+		<description>Lil' Bratz Estrellas De La Moda- Amigos, Moda y Diversión (Spain)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092627(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092627 - Lil Bratz - Amigos, Moda y Diversion (SP).bin" size="8388608" crc="10c1e031" sha1="20ec494294480fbacd1f9ed9a8b21d5bb70541f8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mannyg" supported="yes">
 		<description>Meister Manny's Werkzeugkiste (Germany)</description>
 		<year>2009?</year>
@@ -1821,23 +2063,6 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="90024 OK.u1" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="melodil">
-		<description>Nickelodeon Les Mélodilous - Les explorateurs vikings (France)</description>
-		<year>2006?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-092585(FR)" />
-		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_rom" />
-			<feature name="pcb" value="707180" />
-			<feature name="pcb_model" value="707180-2" />
-			<feature name="cart_type" value="lilac" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092585.u1" size="8388608" crc="99d3d704" sha1="5ba4489849a4e49a22a5083750b4e41a565a4cd6" />
 			</dataarea>
 		</part>
 	</software>
@@ -2123,7 +2348,24 @@ Game cartridges
 		</part>
 	</software>
 
-	<!-- No inputs -->
+	<software name="noddyp" cloneof="noddy" supported="yes">
+		<description>Noddy - Detective Por um Dia (Portugal)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092556(Port)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092556 - Noddy - Detective Por um Dia (Port).bin" size="8388608" crc="c2293d0c" sha1="625c186cb56871c0a8b7e5136cd7302812c81823" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs, uses keyboard and mouse -->
 	<software name="pcpalisr3" supported="no">
 		<description>V.Smile PC Pal Island (USA, Rev. 3?)</description>
 		<year>200?</year>
@@ -2135,6 +2377,42 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile36800-3.bin" size="8388608" crc="7e53c0a1" sha1="68b8d09c933b17e1342ef31cfb283dc5609e990a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs, uses keyboard and mouse -->
+	<software name="pcpalisg" cloneof="pcpalisr3" supported="yes">
+		<description>V.Smile Mein erster Mausklick (Germany)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-036804(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-036804 - Mein erster Mausklick (GER).bin" size="8388608" crc="df4474f0" sha1="d858eb61efe23643a45c10ee1c332344caaed0fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs, uses keyboard and mouse -->
+	<software name="pcpaliss" cloneof="pcpalisr3" supported="yes">
+		<description>V.Smile PC (Spain)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-036822(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-036822 - V.Smile PC (SP).bin" size="8388608" crc="e08afbf5" sha1="ff5f6b283b552f0130d30a574559bfbfa7332bf1" />
 			</dataarea>
 		</part>
 	</software>
@@ -2200,6 +2478,42 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92920(2).u1" size="8388608" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="partyprkg" cloneof="partyprk" supported="no">
+		<description>Cranium - Freizeit Park - Ein Jahrmarkt voller Spiel- und Lernspaß (Germany)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092924(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092924 - Cranium - Freizeit Park - Ein Jahrmarkt voller Spiel- und Lernspass (GER).bin" size="8388608" crc="ccaa8438" sha1="33e6c815d669888bdf6d43a4aade97e8a9e693ea" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="partyprks" cloneof="partyprk" supported="no">
+		<description>Cranium - Parque de Atracciones de Cranium (Spain)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092927(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092927 - Cranium - Parque de Atracciones de Cranium (SP).bin" size="8388608" crc="8fd7aff1" sha1="2723f4c72edd087ceb8c306bbb993811ba480fb7" />
 			</dataarea>
 		</part>
 	</software>
@@ -2612,6 +2926,23 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="shreks" cloneof="shreknl" supported="yes">
+		<description>DreamWorks Shrek - El Cuento de la Dragona (Spain)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092607(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092607 - Shrek - El Cuento de la Dragona (SP).bin" size="8388608" crc="4145d0ad" sha1="ab249596bffd661097d51a42e5b582dfe1ec1e07" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="soccerch" supported="yes">
 		<description>V.Smile Soccer Challenge (USA)</description>
 		<year>200?</year>
@@ -2742,6 +3073,24 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-092147 - Spider-Man y Amigos - Misiones Secretas (SP).bin" size="8388608" crc="ffda1d3d" sha1="12c52915d758d50ae221a4dafe1a8f2892219089" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="spidermissr222" cloneof="spidermisr101" supported="no">
+		<description>Spider-Man y Amigos - Misiones Secretas (Spain, Rev. 222)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092147-222(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092147-222 - Spider-Man y Amigos - Misiones Secretas (SP).bin" size="8388608" crc="a377ece5" sha1="2e4f646780f61121bfc32e171cdcacbb8dbb1e0a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2878,6 +3227,23 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="092645.u1" size="8388608" crc="0e42dee7" sha1="2aa140b000e702d253ca72e5e54c9087608fe199" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supermans" cloneof="superman" supported="yes">
+		<description>Superman - El Hombre de Acero (Spain)</description>
+		<year>2006</year> <!-- (s06) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092647(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092647 - Superman - El Hombre de Acero (SP).bin" size="8388608" crc="9e461d7f" sha1="76b933694a1eb068e9a681aed2f93df0a6d803b6" />
 			</dataarea>
 		</part>
 	</software>
@@ -3346,19 +3712,20 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="lerntanz" supported="yes">
-		<description>V.Smile - Lern- und Tanzmatte (Germany)</description>
+	<!-- No inputs, uses a keyboard controller -->
+	<software name="smartkbg" supported="no"> <!-- Will be clone of "smartkb" once found and dumped. -->
+		<description>V.Smile Schreibspaß (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-091324(GE)" />
+		<info name="serial" value="80-091444(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
-			<feature name="pcb_model" value="707180-2" />
+			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" />
+				<rom name="091444.u1" size="8388608" crc="1fcf586f" sha1="e13d229887ea31bfd9fea43683f65162b9626ffa" />
 			</dataarea>
 		</part>
 	</software>
@@ -3424,7 +3791,47 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="wkwheels" supported="yes"> <!-- Will be clone of "wkwheel" once found and dumped. -->
+	<!-- Crashes MAME -->
+	<software name="techarts" cloneof="techart" supported="no">
+		<description>V.Smile Estudio De Arte (Spain)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-067022(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_nvram" />
+			<feature name="pcb" value="67000C" />
+			<feature name="pcb_model" value="67000C-1" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u2" value="U2" /> <!-- SRAM -->
+			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="4194304">
+				<rom name="80-067022 - V.Smile Estudio De Arte (SP).bin" size="4194304" crc="f9911730" sha1="bff0b2ca61a2e5a8ae42b5d78103862e7f6a357f" />
+			</dataarea>
+			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wkwheelg" supported="yes"> <!-- Will be clone of "wkwheel" once found and dumped. -->
+		<description>Flitzers Schlaue Städtetour (Germany)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092504(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_nvram" />
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092504 - Flitzers Schlaue Stadtetour (GER).bin" size="8388608" crc="1bdd6066" sha1="1e2a9090c0bfe08c31e750e263bad4a4a1fb2e73" />
+			</dataarea>
+			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wkwheels" cloneof="wkwheelg" supported="yes"> <!-- Will be clone of "wkwheel" once found and dumped. -->
 		<description>Conducción Divertida (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -3437,6 +3844,26 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-092507 - Conduccion Divertida (SP).bin" size="8388608" crc="c52ff5d8" sha1="ce48bb9ea53cbdfa243170217908cc1f4352e4f0" />
+			</dataarea>
+			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="wwavesg" supported="no"> <!-- Will be clone of "wwaves" once found and dumped. -->
+		<description>Dolphis Wasser-abenteuer (Germany)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090224(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_nvram" />
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-090224 - Dolphis Wasserabenteuer (GE).bin" size="8388608" crc="3fd78b1b" sha1="eadbc8b2a9bf09f623f27d3b94a1b19643685629" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
 			</dataarea>
@@ -3538,19 +3965,53 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="schreib" supported="no">
-		<description>V.Smile Schreibspaß (Germany)</description>
-		<year>200?</year>
+	<!-- *********** V.Smile Smartbook games *********** -->
+	<!-- Will need to emulate and add the Smartbook touch tablet as a bus/controller on MAME and then add it as a shared feature on the XML -->
+
+	<software name="dorapuppysb" supported="no">
+		<description>Nick Jr. Dora the Explorer - Dora's Got a Puppy (Smartbook) (USA)</description>
+		<year>2007</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-091444(GE)" />
+		<info name="serial" value="90-089040(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<feature name="pcb" value="707180" />
-			<feature name="pcb_model" value="707180-3" />
-			<feature name="cart_type" value="yellow" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<feature name="pcb" value="707180"/>
+			<feature name="pcb_model" value="707180-3"/>
+			<feature name="cart_type" value="red" />
 			<dataarea name="rom" size="8388608">
-				<rom name="091444.u1" size="8388608" crc="1fcf586f" sha1="e13d229887ea31bfd9fea43683f65162b9626ffa" />
+				<rom name="90-089040 - Dora the Explorer - Dora's Got a Puppy (US) (Smartbook).bin" size="8388608" crc="aabcbb49" sha1="7edc5ba03125b9fef55b4d8f7993b415fb99c639" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobynsb" supported="no">
+		<description>Scooby-Doo! - A Night Of Fright Is No Delight (Smartbook) (USA)</description>
+		<year>2007</year> <!-- (s07) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-089060(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180"/>
+			<feature name="pcb_model" value="707180-3"/>
+			<feature name="cart_type" value="red" />
+			<dataarea name="rom" size="8388608">
+				<rom name="80-089060 - Scooby-Doo! - A Night Of Fright Is No Delight (US).bin" size="8388608" crc="4bf757be" sha1="8436b8e1e0cf20c93dbc9d0e887d4a3f28612aac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystry2sb" supported="no">
+		<description>Disney/Pixar Toy Story 2 (Smartbook) (USA)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="90-089020(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180"/>
+			<feature name="pcb_model" value="707180-3"/>
+			<feature name="cart_type" value="red" />
+			<dataarea name="rom" size="8388608">
+				<rom name="90-089020 - Toy Story 2 (US) (Smartbook).bin" size="8388608" crc="4f5e84e0" sha1="7d82f4607b69221a565556e3f63ee3b20b8cd318" />
 			</dataarea>
 		</part>
 	</software>

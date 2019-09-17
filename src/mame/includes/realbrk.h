@@ -8,6 +8,7 @@
 #include "machine/tmp68301.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class realbrk_state : public driver_device
 {

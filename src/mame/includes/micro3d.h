@@ -58,7 +58,7 @@ public:
 	void init_micro3d();
 	void init_botss();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
+	DECLARE_READ_LINE_MEMBER(botss_hwchk_r);
 
 protected:
 	enum

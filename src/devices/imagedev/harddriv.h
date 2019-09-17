@@ -51,7 +51,7 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return m_interface; }
-	virtual const char *file_extensions() const override { return "chd,hd"; }
+	virtual const char *file_extensions() const override { return "chd,hd,hdv,2mg,hdi"; }
 	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation

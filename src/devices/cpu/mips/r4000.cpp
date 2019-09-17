@@ -20,7 +20,6 @@
  *   - it's very very very slow
  *
  * TODO
- *   - find a better way to deal with software interrupts
  *   - enforce mode checks for cp1
  *   - cache instructions
  *   - check/improve instruction timing
@@ -86,11 +85,11 @@ DEFINE_DEVICE_TYPE(R4000, r4000_device, "r4000", "MIPS R4000")
 DEFINE_DEVICE_TYPE(R4400, r4400_device, "r4400", "MIPS R4400")
 DEFINE_DEVICE_TYPE(R4600, r4600_device, "r4600", "QED R4600")
 
-r4000_base_device::r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, cache_size_t icache_size, cache_size_t dcache_size)
+r4000_base_device::r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size_t icache_size, cache_size_t dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
 	, m_program_config_be("program", ENDIANNESS_BIG, 64, 32)
-	, m_fcr0(0x00000500U)
+	, m_fcr0(fcr)
 {
 	m_cp0[CP0_PRId] = prid;
 
@@ -257,18 +256,18 @@ std::unique_ptr<util::disasm_interface> r4000_base_device::create_disassembler()
 
 void r4000_base_device::execute_run()
 {
-	// check interrupts
-	if ((CAUSE & SR & CAUSE_IP) && (SR & SR_IE) && !(SR & (SR_EXL | SR_ERL)))
-		cpu_exception(EXCEPTION_INT);
-
-	while (m_icount > 0)
+	while (m_icount-- > 0)
 	{
 		debugger_instruction_hook(m_pc);
 
 		fetch(m_pc,
 			[this](u32 const op)
 			{
-				cpu_execute(op);
+				// check interrupts
+				if ((CAUSE & SR & CAUSE_IP) && (SR & SR_IE) && !(SR & (SR_EXL | SR_ERL)))
+					cpu_exception(EXCEPTION_INT);
+				else
+					cpu_execute(op);
 
 				// zero register zero
 				m_r[0] = 0;
@@ -300,8 +299,6 @@ void r4000_base_device::execute_run()
 			m_pc += 8;
 			break;
 		}
-
-		m_icount--;
 	}
 }
 
@@ -1372,47 +1369,51 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 {
 	switch (reg)
 	{
+	case CP0_Index:
+		m_cp0[CP0_Index] = data & 0x3f;
+		break;
+	case CP0_EntryLo0:
+		m_cp0[CP0_EntryLo0] = data & (EL_PFN | EL_C | EL_D | EL_V | EL_G);
+		break;
+	case CP0_EntryLo1:
+		m_cp0[CP0_EntryLo1] = data & (EL_PFN | EL_C | EL_D | EL_V | EL_G);
+		break;
+	case CP0_Context:
+		m_cp0[CP0_Context] = data & ~0xf;
+		break;
+	case CP0_PageMask:
+		m_cp0[CP0_PageMask] = data & PAGEMASK;
+		break;
+	case CP0_Wired:
+		m_cp0[CP0_Wired] = data & 0x3f;
+		break;
 	case CP0_Count:
 		m_cp0[CP0_Count] = u32(data);
 		m_cp0_timer_zero = total_cycles() - m_cp0[CP0_Count] * 2;
 
 		cp0_update_timer();
 		break;
-
 	case CP0_EntryHi:
 		m_cp0[CP0_EntryHi] = data & (EH_R | EH_VPN2_64 | EH_ASID);
 		break;
-
 	case CP0_Compare:
 		m_cp0[CP0_Compare] = u32(data);
 		CAUSE &= ~CAUSE_IPEX5;
 
 		cp0_update_timer(true);
 		break;
-
 	case CP0_Status:
-		m_cp0[CP0_Status] = u32(data);
-
-		// FIXME: software interrupt check
-		if (CAUSE & SR & SR_IMSW)
-			m_icount = 0;
+		m_cp0[CP0_Status] = u32(data) & ~u32(0x01a80000);
 
 		if (data & SR_RE)
 			fatalerror("unimplemented reverse endian mode enabled (%s)\n", machine().describe_context().c_str());
 		break;
-
 	case CP0_Cause:
-		CAUSE = (CAUSE & ~CAUSE_IPSW) | (data & CAUSE_IPSW);
-
-		// FIXME: software interrupt check
-		if (CAUSE & SR & SR_IMSW)
-			m_icount = 0;
+		m_cp0[CP0_Cause] = (m_cp0[CP0_Cause] & ~CAUSE_IPSW) | (data & CAUSE_IPSW);
 		break;
-
-	case CP0_PRId:
-		// read-only register
+	case CP0_EPC:
+		m_cp0[CP0_EPC] = data;
 		break;
-
 	case CP0_Config:
 		m_cp0[CP0_Config] = (m_cp0[CP0_Config] & ~CONFIG_WM) | (data & CONFIG_WM);
 
@@ -1432,9 +1433,32 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 		LOGMASKED(LOG_CACHE, "icache/dcache line sizes %d/%d bytes\n",
 			m_icache_line_size, m_cp0[CP0_Config] & CONFIG_DB ? 32 : 16);
 		break;
-
+	case CP0_LLAddr:
+		m_cp0[CP0_LLAddr] = data;
+		break;
+	case CP0_WatchLo:
+		m_cp0[CP0_WatchLo] = data & ~0x4;
+		break;
+	case CP0_WatchHi:
+		m_cp0[CP0_WatchHi] = data & 0xf;
+		break;
+	case CP0_XContext:
+		m_cp0[CP0_XContext] = data & ~0xf;
+		break;
+	case CP0_ECC:
+		m_cp0[CP0_ECC] = data & 0xff;
+		break;
+	case CP0_TagLo:
+		m_cp0[CP0_TagLo] = data;
+		break;
+	case CP0_TagHi:
+		m_cp0[CP0_TagHi] = data;
+		break;
+	case CP0_ErrorEPC:
+		m_cp0[CP0_ErrorEPC] = data;
+		break;
 	default:
-		m_cp0[reg] = data;
+		logerror("write to read-only or undefined cp0 register %d\n data 0x%x", reg, data);
 		break;
 	}
 }

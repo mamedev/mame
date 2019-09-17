@@ -130,10 +130,351 @@
 		</part>
 	</software>
 
+	<software name="blueflop" supported="partial">
+		<description>blueflops-2.0.15</description>
+		<year>2006</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.15" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.15-bf-1.img" size="1474560" crc="5517bff7" sha1="34dcda0153a9f00f547a7c705505e133e3a2ae06"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.15-bf-2.img" size="1474560" crc="0b6aa63e" sha1="2f10c12354c4724108d8fadeac3546ea4b0ee2d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf100" cloneof="blueflop" supported="no">
+		<description>blueflops-1.0.0</description>
+		<year>2003</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="1.0.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-1.0.0-bf-1.img" size="1474560" crc="d5532911" sha1="4e798ccafa724204fca165a46b151cdccc73d6c2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-1.0.0-bf-2.img" size="1474560" crc="800852fb" sha1="418e62146d64d9f5ff55a682c94f78fa345ebf49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf110" cloneof="blueflop" supported="no">
+		<description>blueflops-1.1.0</description>
+		<year>2003</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="1.1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-1.1.0-bf-1.img" size="1474560" crc="ef122543" sha1="9df21aaec526a4dfa8bec9d7c48ad3db62aafc88"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-1.1.0-bf-2.img" size="1474560" crc="5a86b791" sha1="90bdb9140b5e47c6312364c755501a312b106e47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf111" cloneof="blueflop" supported="no">
+		<description>blueflops-1.1.1</description>
+		<year>2003</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="1.1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-1.1.1-bf-1.img" size="1474560" crc="22532ff2" sha1="aea8e1fc8bc6e5d4766e29a2f79bbd2222523a54"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-1.1.1-bf-2.img" size="1474560" crc="c915729d" sha1="b299306e1f6f2067d3f4937ef80a4bfdc02d3181"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf112" cloneof="blueflop" supported="no">
+		<description>blueflops-1.1.2</description>
+		<year>2003</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="1.1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-1.1.2-bf-1.img" size="1474560" crc="6d4453c8" sha1="98d14889dcb38ece9f2310ca43747c334d45325a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-1.1.2-bf-2.img" size="1474560" crc="ec0cd943" sha1="b9df2532e33c8f3c2af8c259f15c5cef8bb0d53a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf200" cloneof="blueflop" supported="no">
+		<description>blueflops-2.0.0</description>
+		<year>2003</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.0-bf-1.img" size="1474560" crc="e5286ba5" sha1="d3437b269ea72c993f7adfee0376bf8e965d91bb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.0-bf-2.img" size="1474560" crc="f1b6f919" sha1="e4378e3b5e34990e801ed55ec65e332e2efda1cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf201" cloneof="blueflop" supported="no">
+		<description>blueflops-2.0.1-pre1</description>
+		<year>2004</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.1-pre1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.1-pre1-bf-1.img" size="1474560" crc="90b660bb" sha1="c9626e2af90b6b0819bbdcd6bc1325ee137dbbf9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.1-pre1-bf-2.img" size="1474560" crc="14c5d5b5" sha1="b2aaab3835511fa68076540138f886e91ec727e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf202" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.2</description>
+		<year>2004</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.2-bf-1.img" size="1474560" crc="53fbf38b" sha1="06f7c30515f3809f37da41c9b6166553928b1a13"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.2-bf-2.img" size="1474560" crc="702b1aa5" sha1="f16cbb231ee0a666b61e2cb3cf6368ebe66616b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf203" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.3</description>
+		<year>2004</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.3" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.3-bf-1.img" size="1474560" crc="0a363c28" sha1="bfeb36f63246ec0e20e9655a9668af5e8ab0df6b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.3-bf-2.img" size="1474560" crc="969112e5" sha1="271484f1f2c3e64ff522201ba86d42d7c3952a55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf204" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.4</description>
+		<year>2004</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.4" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.4-bf-1.img" size="1474560" crc="ad649e78" sha1="7b0fe7706157215840c7e6e291d301c322a0c5fd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.4-bf-2.img" size="1474560" crc="3d460185" sha1="46808625ff8e752ea0b026606e7c6c7ee26ede1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf205" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.5</description>
+		<year>2004</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.5" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.5-bf-1.img" size="1474560" crc="9e50de11" sha1="69cd1611b09903ff3d557f8cdfe98b2681f9de61"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.5-bf-2.img" size="1474560" crc="728fe287" sha1="342967a59397c5bb6049d48b11b5b429a0eaa182"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf206" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.6</description>
+		<year>2004</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.6" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.6-bf-1.img" size="1474560" crc="02b2bdae" sha1="e6bf767e0aa3147c97c821a91c8bdedcc8cd85c1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.6-bf-2.img" size="1474560" crc="16a0aa5f" sha1="7eaa9e9b3109759214932bb4b439fd42339040d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf207" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.7</description>
+		<year>2004</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.7" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.7-bf-1.img" size="1474560" crc="b4d3daf2" sha1="d6b240ec5b676d54e58610216b70c71459720256"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.7-bf-2.img" size="1474560" crc="019c341c" sha1="fd945b2ef40e3f27d1f54c64b51592c8b00967af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf208" cloneof="blueflop" supported="no">
+		<description>blueflops-2.0.8</description>
+		<year>2004</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.8" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.8-bf-1.img" size="1474560" crc="20c18692" sha1="3f49551361b3479f7a15c2fd2a26ff5dfae673b6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.8-bf-2.img" size="1474560" crc="da5471f4" sha1="eb06ee745bf838700530b3ed419b03707e1abb2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf209" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.9</description>
+		<year>2005</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.9" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.9-bf-1.img" size="1474560" crc="6345abdf" sha1="e75f9ab8ce31580faac6b1d0ec1e6ea826f24dfa"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.9-bf-2.img" size="1474560" crc="3153246c" sha1="6013f6819700d3aa3ec3e5a257bd7dbecbbd632c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf2010" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.10</description>
+		<year>2005</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.10" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.10-bf-1.img" size="1474560" crc="548734e4" sha1="3f2a7fbfcba3cf54aa8e4412c4ae2385f550681d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.10-bf-2.img" size="1474560" crc="ddb428b6" sha1="feaf005da07c7702b98cf4c665af98e76947485b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf2011" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.11</description>
+		<year>2005</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.11" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.11-bf-1.img" size="1474560" crc="a7c510bb" sha1="d363f23266ecd75fe7cc9b9cc6b76e6c0ebdf31f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.11-bf-2.img" size="1474560" crc="7af7df6c" sha1="7511d12cf864897e1f5cdd7e0b9e0ffb7b2088da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf2012" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.12</description>
+		<year>2005</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.12" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.12-bf-1.img" size="1474560" crc="9fa8e74d" sha1="36ec0a45a4b94cc55f991dbe673e22339633feae"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.12-bf-2.img" size="1474560" crc="6e5930a5" sha1="21c1b62ea3a4f8495380d65e0e7afa6c6c179c42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf2013" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.13</description>
+		<year>2005</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.13" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.13-bf-1.img" size="1474560" crc="2b3541ad" sha1="3a7a347f84cce9707505c2042edefd36d39f3c5e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.13-bf-2.img" size="1474560" crc="cb28b062" sha1="dd944ef5ca67439589e17ad2fa7b07f6eb1e8cbc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf2014" cloneof="blueflop" supported="partial">
+		<description>blueflops-2.0.14</description>
+		<year>2005</year>
+		<publisher>Ștefan Tălpălaru</publisher>
+		<info name="version" value="2.0.14" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="blueflops-2.0.14-bf-1.img" size="1474560" crc="e60066c2" sha1="3364341ee9b46147ef95cc0b0907abac8a68e258"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="rom" size = "1474560">
+				<rom name="blueflops-2.0.14-bf-2.img" size="1474560" crc="622b1adc" sha1="c413aea75c4696da41dfc95b71503eb25e3e8a0f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="brutware" supported="no">
 		<description>Brutalware Linux 1.1</description>
 		<year>1999</year>
 		<publisher>Brutalware</publisher>
+		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Load disk for MS-DOS" />
 			<dataarea name="flop" size = "1474560">
@@ -209,10 +550,12 @@
 		</part>
 	</software>
 
-	<software name="drafix">
+	<software name="drafix" supported="yes">
 		<description>Drafix Windows CAD (Demo)</description>
 		<year>1990</year>
 		<publisher>Fox Data</publisher>
+		<info name="usage" value="Start from DOS with: DEMO"/>
+		<info name="version" value="3.5" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="drafix windows cad (demo).img" size="1228800" crc="95f50d9f" sha1="bc9de150a22e58a8ad4a0948d66f203527d84f32"/>
@@ -596,14 +939,123 @@
 		</part>
 	</software>
 
-	<!-- Bundled with Mastering Borland C++ 3.1 by Tom Swan. ISBN10: 0-672-30274-8 -->
-	<software name="brlndcpp">
-		<description>Mastering Borland C++ 3.1</description>
+	<software name="nvldos51">
+		<description>Novell DR Multiuser DOS Release 5.1</description>
 		<year>1992</year>
-		<publisher>Sams Publishing</publisher>
+		<publisher>Novell</publisher>
+		<info name="version" value="5.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Novell DR Multiuser DOS v5.1 (1992)(Novell)(Disk 1 of 2).img" size="1474560" crc="1ef66436" sha1="8f241985e2016477c0ac81a2551c84ce319c1c0b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Novell DR Multiuser DOS v5.1 (1992)(Novell)(Disk 2 of 2).img" size="1474560" crc="64be4a45" sha1="9e0dc09d87b769f4594664023b292f1abfc20a5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvldos7">
+		<description>Novell DOS 7 (3.5")</description>
+		<year>1994</year>
+		<publisher>Novell</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk1_35.img" size="1474560" crc="e2bccaf5" sha1="2c9db6676736751c1f52cb45f097286084566ad2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="disk_label" value="Utilities 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk2_35.img" size="1474560" crc="f2a2f62b" sha1="6e960f2f86614c92c219eac56001a0871a0b69ad"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="disk_label" value="Utilities 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk3_35.img" size="1474560" crc="ab8e90b2" sha1="e18b6bdf3dbed64cce11a411f080fd66c5f7dba1"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="disk_label" value="Utilities 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk4_35.img" size="1474560" crc="6b3b9257" sha1="b5c98d057aeeae8f51ffa835815d14a13acb3b79"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="disk_label" value="Utilities 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk5_35.img" size="1474560" crc="8179ac5d" sha1="36f8acc0bbb2a02763e973d014909a973ff498cc"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="disk_label" value="Utilities 6" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk6_35.img" size="1474560" crc="7611aa19" sha1="198be0a2bc6678f8c8232c22d5f98bae2e5334ed"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk7_35.img" size="1474560" crc="7347f5fb" sha1="4d69c48fe0f89b568e896dbb58985be792515248"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nvldos7_525" cloneof="nvldos7">
+		<description>Novell DOS 7 (5.25")</description>
+		<year>1994</year>
+		<publisher>Novell</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1228800">
-				<rom name="mastering borland c plus plus 3.1.img" size="1228800" crc="578fb2b0" sha1="a13fbef38ee478ce783d357d2ea8b9992269699e"/>
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk1_525.img" size="1228800" crc="4746c864" sha1="d44e62fbc73bc94ee38198ce92ab7f621cc9616d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="disk_label" value="Utilities 2" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk2_525.img" size="1228800" crc="f0a6acef" sha1="83b1811a657cb0a65f00e364f5519a3bc213850d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="disk_label" value="Utilities 3" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk3_525.img" size="1228800" crc="10ff2591" sha1="1ceb67e6e622169e5f1adc68d0c309dbaf317a15"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="disk_label" value="Utilities 4" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk4_525.img" size="1228800" crc="af07d0f5" sha1="d69c185ebae29e6cdea4a82bf7865d200a4dae91"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="disk_label" value="Utilities 5" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk5_525.img" size="1228800" crc="026cba9f" sha1="4ceecfeb53ce26847193e01ec14f73dd7ebe5690"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="disk_label" value="Utilities 6" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk6_525.img" size="1228800" crc="4897e359" sha1="102f6085f2b9c5c5ad858b42804776fc364e53e7"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="disk_label" value="Utilities 7" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk7_525.img" size="1228800" crc="314fe8b8" sha1="97b3ce1e4287f4d092b8c4d15bfbba84f839b248"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="disk_label" value="Utilities 8" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk8_525.img" size="1228800" crc="47133189" sha1="86de8f7a4a64a2e0a1cd302220e65f237ada9fe2"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk9_525.img" size="1228800" crc="9b5a2990" sha1="806842131438128c9aedf074752abe7d7e4a6b09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4766,7 +5218,7 @@
 
 	<software name="divaisdn">
 		<description>DIVA T/A ISDN Modem Setup Wizard for Windows 3.x</description>
-		<year>1997?</year>
+		<year>1997</year>
 		<publisher>Eicon Technology Corporation</publisher>
 		<info name="version" value="1 Release 4" />
 		<part name="flop1" interface="floppy_3_5">
@@ -5033,8 +5485,8 @@
 		<info name="version" value="6.0" />
 		<info name="release" value="19931125"/>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="mitsumi mouse driver 6.0.img" size="1474560" crc="591804ee" sha1="bb41f6447f631a4efe850431be3c720f9cadc4d1"/>
+			<dataarea name="flop" size="88372">
+				<rom name="mitsumi mouse driver 6.0.imd" size="88372" crc="0b009fd5" sha1="3cdad00105af7a69ba7bd941498f5816039a0596"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5098,8 +5550,8 @@
 		<publisher>Unex Technology Corporation</publisher>
 		<info name="version" value="3.02" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1492992">
-				<rom name="nexnic nd010 pci adapter (ethernet-fast ethernet) 3.02.img" size="1492992" crc="2324ce96" sha1="aae7140dfd7603ffcf48f8fd80c026744c584e8a"/>
+			<dataarea name="flop" size="1153756">
+				<rom name="nexnic nd010 pci adapter (ethernet-fast ethernet) 3.02.imd" size="1153756" crc="192166ce" sha1="976a03cfdf875361c2ecb10c819b9486a4ad4f6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5131,15 +5583,15 @@
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<feature name="disk_serial" value="26-00195-02" />
-			<dataarea name="flop" size="1474560">
-				<rom name="26-00195-02.img" size="1474560" crc="f293e498" sha1="835144d594a7ee07cf8586c4b4b5f5609fa2cd2b"/>
+			<dataarea name="flop" size="1455715">
+				<rom name="26-00195-02.imd" size="1455715" crc="835f05ef" sha1="84057a9b3d691554244b2af37a59b9a0d3f39e30"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<feature name="disk_serial" value="26-00195-03" />
-			<dataarea name="flop" size="1474560">
-				<rom name="26-00195-03.img" size="1474560" crc="fe7b2947" sha1="e16288117726d21649492fd4bc7e1ad3f00bf572"/>
+			<dataarea name="flop" size="1429654">
+				<rom name="26-00195-03.imd" size="1429654" crc="98314f6b" sha1="5313272d0dd1c05f6cd12c0bc5264191f1fff05f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5212,8 +5664,8 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1474560">
-				<rom name="scroll 3d mouse setup disk for ps2 and serial 2.0.img" size="1474560" crc="97c2f7ad" sha1="1fcb7beb6926934bdbdbeb35bc18213a0fb22584"/>
+			<dataarea name="flop" size="4236544">
+				<rom name="scroll 3d mouse setup disk for ps2 and serial 2.0.mfm" size="4236544" crc="7e408ad4" sha1="7f88263de01478f42f2a937540fee0a70eae5dc5" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5393,20 +5845,20 @@
 		<info name="version" value="3.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #1" />
-			<dataarea name="flop" size="1474560">
-				<rom name="soundwave 32 series 3.0 (disk 1).img" size="1474560" crc="8420c21c" sha1="337f31df6ec72fb1c62a0d7409421b618282f16d"/>
+			<dataarea name="flop" size="1419945">
+				<rom name="soundwave 32 series 3.0 (disk 1).imd" size="1419945" crc="017306e3" sha1="5a187ed0ddc3c309477f97cb8f50b768a7968dbd"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #2" />
-			<dataarea name="flop" size="1474560">
-				<rom name="soundwave 32 series 3.0 (disk 2).img" size="1474560" crc="a4f80a83" sha1="50ac37c8fc7b3fcba3e6d1fb81e8288e643f622a"/>
+			<dataarea name="flop" size="1478710">
+				<rom name="soundwave 32 series 3.0 (disk 2).imd" size="1478710" crc="e0ac2ea6" sha1="4031d18ff855e1f985d07d66b804a9a2e35b9386"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Install/Driver Disk #3" />
-			<dataarea name="flop" size="1474560">
-				<rom name="soundwave 32 series 3.0 (disk 3).img" size="1474560" crc="a26402fd" sha1="9386134e27286db48e076aaa98f7c86b86277c53"/>
+			<dataarea name="flop" size="1422500">
+				<rom name="soundwave 32 series 3.0 (disk 3).imd" size="1422500" crc="18d3bf4d" sha1="9f112e853334f7c97842b666a5bd6319d40b9e99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5664,7 +6116,7 @@
 
 	<software name="autoconv">
 		<description>Auto Convert</description>
-		<year>1989?</year>
+		<year>1989</year>
 		<publisher>Generic Software</publisher>
 		<info name="version" value="4.0" />
 		<info name="serial" value="IAC-57008-I" />
@@ -5799,21 +6251,21 @@
 
 	<software name="cpavfw">
 		<description>Central Point Anti-Virus for Windows</description>
-		<year>1992?</year>
+		<year>1992</year>
 		<publisher>Central Point Software, Inc.</publisher>
 		<info name="usage" value="To start, type SETUP at A: and press ENTER." />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Setup Disk" />
 			<feature name="disk_serial" value="103347.001" />
-			<dataarea name="flop" size="737280">
-				<rom name="103347.001.img" size="737280" crc="8a5400ce" sha1="e30c347d9e64bdb4aa97a91880fcad487509b7e5" status="baddump"/>
+			<dataarea name="flop" size="2550386">
+				<rom name="103347.001.mfm" size="2550386" crc="414f1718" sha1="114de7a5b09659305cec8f9130ed9462ce0f0865" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<feature name="disk_serial" value="103348.001" />
-			<dataarea name="flop" size="737280">
-				<rom name="103348.001.img" size="737280" crc="2db0ec1b" sha1="757a26ca8ede74aa531b9d18497c8222547e7826" status="baddump"/>
+			<dataarea name="flop" size="2737329">
+				<rom name="103348.001.mfm" size="2737329" crc="8bbb6532" sha1="90d348477198b7fc119d49351d4379fcee4e0145" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5917,9 +6369,9 @@
 		</part>
 	</software>
 
-	<software name="5250emu">
+	<software name="5250emu" supported="yes">
 		<description>Enhanced 5250 Emulation Program</description>
-		<year>1986?</year>
+		<year>1986</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="2.12" />
 		<part name="flop1" interface="floppy_3_5">
@@ -6156,6 +6608,7 @@
 		<description>The Greatest Little PIC Book</description>
 		<year>1997?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires Windows 3.1 or later"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1474560">
@@ -6197,7 +6650,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 of 3 - Install Disk" />
 			<dataarea name="flop" size="1474560">
-				<rom name="hijaak pro 2.0 (disk 1).img" size="1474560" crc="2777a9bc" sha1="e518434bc7a4dcd4e377bb54729ab8a06a7f4753"/>
+				<rom name="hijaak pro 2.0 (disk 1).img" size="1474560" crc="56de8bb6" sha1="f3cdf765ed17f2560e60ce0369a8a21ce41ee2d7"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -6236,7 +6689,7 @@
 		</part>
 	</software>
 
-	<!-- Bundled with Integration i Microsoft Office 97: Step by Step by Susanne Freet et al. ISBN10: 91-644-0153-7 -->
+	<!-- Bundled with "Integration i Microsoft Office 97: Step by Step" by Susanne Freet et al. ISBN10: 91-644-0153-7 -->
 	<software name="iimso97">
 		<description>Integration i Microsoft Office 97: Step by Step (Swe)</description>
 		<year>1997</year>
@@ -6268,7 +6721,7 @@
 			<feature name="part_id" value="Disk 1 of 3" />
 			<feature name="disk_serial" value="IB10-DSK-1of3" />
 			<dataarea name="flop" size="1474560">
-				<rom name="ib10-dsk-1of3.img" size="1474560" crc="0b248ec8" sha1="5c6cf65435facb324f08809ffc340df4687f24a6"/>
+				<rom name="ib10-dsk-1of3.img" size="1474560" crc="9f307ff0" sha1="17cd05ebee49ec2e8ef467a97449290106f1f0bd"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -6293,7 +6746,7 @@
 		<publisher>Accolade</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="jack nicklaus screen savers.img" size="1474560" crc="680c9114" sha1="430e9d3827430aa4e795300005556a43fa652548"/>
+				<rom name="jack nicklaus screen savers.img" size="1474560" crc="175f8c1b" sha1="2da53c4d4b3de47d7f4eb31772caf39101790322"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6420,6 +6873,18 @@
 		</part>
 	</software>
 
+	<!-- Bundled with "Mastering Borland C++ 3.1" by Tom Swan. ISBN10: 0-672-30274-8 -->
+	<software name="brlndcpp" supported="yes">
+		<description>Mastering Borland C++ 3.1</description>
+		<year>1992</year>
+		<publisher>Sams Publishing</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="mastering borland c plus plus 3.1.img" size="1228800" crc="578fb2b0" sha1="a13fbef38ee478ce783d357d2ea8b9992269699e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcafboot">
 		<description>McAfee Software Emergency Boot Diskette</description>
 		<year>1998</year>
@@ -6435,13 +6900,14 @@
 
 	<software name="microcp3">
 		<description>Micro-Cap III</description>
-		<year>1989?</year>
-		<publisher>Spectrum</publisher>
-		<info name="version" value="2.0" />
+		<year>1989</year>
+		<publisher>Spectrum Software</publisher>
+		<info name="version" value="2.04" />
+		<info name="usage" value="Run from DOS with: MC3" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Diskette A - Main Program" />
-			<dataarea name="flop" size="737280">
-				<rom name="micro-cap iii 2.0 (disk a).img" size="737280" crc="b3cdeb35" sha1="2fa7acf79df636caf7cb9354400d2539764b369c"/>
+			<dataarea name="flop" size="2295223">
+				<rom name="micro-cap iii 2.0 (disk a).mfm" size="2295223" crc="00f887fe" sha1="74387f094f112422d31848723800cf276e1fa9d0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -7065,6 +7531,17 @@
 		</part>
 	</software>
 
+	<software name="quiklink2">
+		<description>QuickLink II Fax</description>
+		<year>1993</year>
+		<publisher>Smith Micro Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="quicklink ii fax.img" size="1474560" crc="184c21ee" sha1="011ec2c43527e7e153e013e36b8f16a0cac02ae5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moneynet">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Reuters Money Network</description>
@@ -7110,10 +7587,12 @@
 		</part>
 	</software>
 
-	<software name="tms320c5x">
-		<description>TMS320C5x DSK - Applications Guide/Application Software</description>
+	<!-- Bundled with "TMS320C5x DSK - Applications Guide" by Texas Instruments. TI ID: BPRA063 -->
+	<software name="tms320c5x" supported="yes">
+		<description>TMS320C5x DSK - Applications Guide - Application Software</description>
 		<year>1997</year>
 		<publisher>Texas Instruments</publisher>
+		<info name="usage" value="Install from DOS with: INSTALL"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="tms320c5x dsk - applications guide application software.img" size="1474560" crc="3ca3e247" sha1="e8d4e2bb9093ffac1c4034fb7ef023d9f0b2efb2"/>
@@ -7207,6 +7686,18 @@
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk3.img" size="737280" crc="86b13b21" sha1="4b4182380cdeaf8a327fa9c46263b0c911c814cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vinguide">
+		<description>Vinguiden 1.0 (Sweden)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="4229016">
+				<rom name="21-046-015472.mfm" size="4229016" crc="5387eea6" sha1="a25043518a0e30ca515324bc0a866945b9b9d383" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7596,8 +8087,8 @@
 		<publisher>WordFinder Software AB</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Registreringsdiskett" />
-			<dataarea name="flop" size="737280">
-				<rom name="registreringsdiskett.img" size="737280" crc="26700ec2" sha1="51d0deb495af37a09bc2a6facd73c372e776b670"/>
+			<dataarea name="flop" size="2235328">
+				<rom name="registreringsdiskett.mfm" size="2235328" crc="7744282c" sha1="26b6074aad47dce199872b13ba6cb8f908d67111"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -7608,20 +8099,20 @@
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Sv-En Verkst.tekn. lexikon - Lexikondiskett 2" />
-			<dataarea name="flop" size="737280">
-				<rom name="sv-en verkst tekn lexikon - lexikondiskett 2.img" size="737280" crc="8ba40420" sha1="39c5c520f7337f6dc2ecfda8cf637cb95f3c84b3"/>
+			<dataarea name="flop" size="253611">
+				<rom name="sv-en verkst tekn lexikon - lexikondiskett 2.imd" size="253611" crc="a4479a8a" sha1="b1e0beaa3b8da40462b4096d29a2558cc54a4dfb"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Svenskt lexikon (SAOL) - Lexikondiskett 3" />
-			<dataarea name="flop" size="1474560">
-				<rom name="svenskt lexikon (saol) - lexikondiskett 3.img" size="1474560" crc="dee45b52" sha1="0a60c29e231514448751fd023fef1e2ae81f6483"/>
+			<dataarea name="flop" size="969243">
+				<rom name="svenskt lexikon (saol) - lexikondiskett 3.imd" size="969243" crc="a828a253" sha1="715890240b160984f2f16cc18dbe8c6f761087ac"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Svenskt lexikon (SAOL) - Lexikondiskett 4" />
-			<dataarea name="flop" size="1474560">
-				<rom name="svenskt lexikon (saol) - lexikondiskett 4.img" size="1474560" crc="56ef5cd6" sha1="a2084e8b00dde0a34a80690ccca709eafdaa4bd2"/>
+			<dataarea name="flop" size="886461">
+				<rom name="svenskt lexikon (saol) - lexikondiskett 4.imd" size="886461" crc="60c6b6ec" sha1="d08e9110c4e4be9575a9d5f4ab4943c7801c8f8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8589,6 +9080,25 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 2).img" size="1474560" crc="20c4dc37" sha1="e39ac3f58f81813e515e8fa203dff7e9b9ebf9d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bundliga">
+		<description>Bundesliga Manager Professional</description>
+		<year>1991</year>
+		<publisher>Software 2000</publisher>
+		<info name="usage" value="Install from DOS with: INSTALL" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "2404046">
+				<rom name="bundesliga manager professional disk 1.mfm" size="2404046" crc="f0cb0b78" sha1="5251bd64d890106f14946157370691080bf122b5" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "3783439">
+				<rom name="bundesliga manager professional disk 2.mfm" size="3783439" crc="1542912f" sha1="059e6c54239e11ad5dcbd43fe2e4f574cd922475" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9823,14 +10333,14 @@
 		</part>
 		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "4227419">
-				<rom name="gilis presentask - diskett 2.mfm" size="4227419" crc="5d6167dd" sha1="3c13d298f68d0b5c98f3da64fa72df2c52658040"/>
+			<dataarea name="flop" size = "1477688">
+				<rom name="gilis presentask - diskett 2.imd" size="1477688" crc="6739361d" sha1="7bf0a4565ce4c342a498c914462fc53cf0b62353"/>
 			</dataarea>
 		</part>
 		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
 		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "4227928">
-				<rom name="gilis presentask - diskett 3.mfm" size="4227928" crc="87cb316c" sha1="561cf3024b3835e4893aa6a52a745f4ebe998392"/>
+			<dataarea name="flop" size = "1478710">
+				<rom name="gilis presentask - diskett 3.imd" size="1478710" crc="3ea9d9fe" sha1="8dabbfb2be7930eb0c269da5d882533fdf2ae54e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10273,6 +10783,7 @@
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Dynamix" />
 		<info name="version" value="1.0" />
+		<info name="usage" value="Start from DOS with: TIM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="incredible machine.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e"/>
@@ -11211,11 +11722,12 @@
 		</part>
 	</software>
 
-	<software name="nova9_525">
+	<software name="nova9_525" supported="yes">
 		<description>Nova 9 (International Version, 5.25")</description>
 		<year>1991</year>
 		<publisher>Dynamix</publisher>
 		<info name="version" value="1.0" />
+		<info name="usage" value="Install from DOS with: INSTALL" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1228800">
@@ -12030,6 +12542,98 @@
 		</part>
 	</software>
 
+	<software name="strkcomm" supported="no">
+		<description>Strike Commander</description>
+		<year>1992</year>
+		<publisher>Origin</publisher>
+		<info name="version" value="F1.4" />
+		<info name="usage" value="Install from DOS with: INSTALL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 1.img" size="1474560" crc="9a1c4ab7" sha1="91abf66c7082e0161da01ff22273d31eda514fac"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 2.img" size="1474560" crc="92019646" sha1="ee1bf5c13752c6a6bba3b203ed3f21ffd4c57a1a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 3.img" size="1474560" crc="05ff13dc" sha1="e532d66ddebfacd7efd241ed23c5bbbfe3c5d725"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 4.img" size="1474560" crc="89bfed90" sha1="47e364bfb946c547d8146d6601d45c3424a8a604"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 5.img" size="1474560" crc="af24628a" sha1="d6c67860a1ff8f77bcbe3d9db3465532ba2d8f1c"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 6.img" size="1474560" crc="69a93bb1" sha1="9ebff1daeaeea017e983dfcebeb9a89780d46204"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 7.img" size="1474560" crc="a00f4589" sha1="27c0fc8b4d44fccd3194ada3b496151674dc6bbd"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander disk 8.img" size="1474560" crc="937ccb56" sha1="05d3eb7f471c60c8aba27898438ad461bf586824"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speechpk" supported="no">
+		<description>Strike Commander: Speech Pack</description>
+		<year>1993</year>
+		<publisher>Origin</publisher>
+		<info name="usage" value="Install from DOS with: SPEECH"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander speech pack disk 1.img" size="1474560" crc="330a2acc" sha1="566b363c02bbc819adb7bff03786caddabf409fe"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander speech pack disk 2.img" size="1474560" crc="851cd0ee" sha1="36c408510468fda350cec8a8f5c7cc6c70f8e235"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander speech pack disk 3.img" size="1474560" crc="5e0325e6" sha1="bb0bafd104b24c35a8205190b22a51e876853732"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tactops" supported="no">
+		<description>Strike Commander: Tactical Operations</description>
+		<year>1993</year>
+		<publisher>Origin</publisher>
+		<info name="usage" value="Install from DOS with: INSTALL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander tactical operations disk 1.img" size="1474560" crc="0bdc6fcd" sha1="3944b61ca4f734211f6dbc51a2b6706cef183364"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander tactical operations disk 2.img" size="1474560" crc="65f4dd43" sha1="498f36a093442032c6d01158a4315503afebaa88"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="strike commander tactical operations disk 3.img" size="1474560" crc="8b2304c2" sha1="5942808d9d3d1409d6330dfa6a908f7751370f46"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thndrhwk">
 		<description>Thunderhawk AH-73M</description>
 		<year>1991</year>
@@ -12042,8 +12646,8 @@
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size = "1474560">
-				<rom name="thunderhawk ah-73m disk 2.img" size="1474560" crc="aabeac50" sha1="af127a034efbd1b4fa815c3ec5255ab9597f5f88"/>
+			<dataarea name="flop" size = "4312032">
+				<rom name="thunderhawk ah-73m disk 2.mfm" size="4312032" crc="af736d24" sha1="9cd7a03fd44b908a654d13bdb7e41f15fa16d648" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12154,6 +12758,29 @@
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="disk 4.img" size="1228800" crc="caf1057e" sha1="bff9d7c21675da1197cbcf039823982e69d9c6c0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="veildark" supported="yes">
+		<description>Veil of Darkness</description>
+		<year>1993</year>
+		<publisher>Strategic Simulations, Inc.</publisher>
+		<info name="version" value="1.0" />
+		<info name="usage" value="Install from DOS with: INSTALL"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="veil of darkness disk 1.img" size="1474560" crc="9b9b0525" sha1="0a8d58c2c06c51c2e3e4aa580212e8b7cae47658"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="veil of darkness disk 2.img" size="1474560" crc="09ea1968" sha1="6e425fc719b62dd3314d2e7192ddbe93f4fa39d9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="veil of darkness disk 3.img" size="1474560" crc="848ccdbf" sha1="731ef4102cbd302a0442a8d40c095c56e9c10b8e"/>
 			</dataarea>
 		</part>
 	</software>

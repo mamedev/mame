@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class armedf_state : public driver_device
 {

@@ -21,7 +21,11 @@
 #include "emu.h"
 #include "emuopts.h"
 
-#ifndef OSD_WINDOWS
+#ifdef OSD_MAC
+#define GL_SILENCE_DEPRECATION (1)
+#endif
+
+#if !defined(OSD_WINDOWS) && !defined(OSD_MAC)
 // standard SDL headers
 #define TOBEMIGRATED 1
 #include <SDL2/SDL.h>
@@ -36,7 +40,7 @@
 #include "modules/opengl/gl_shader_tool.h"
 #include "modules/opengl/gl_shader_mgr.h"
 
-#if defined(SDLMAME_MACOSX)
+#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
 #ifndef APIENTRY
 #define APIENTRY
 #endif
@@ -237,7 +241,7 @@ void renderer_ogl::set_blendmode(int blendmode)
 //============================================================
 
 // OGL 1.3
-#ifdef GL_ARB_multitexture
+#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
 static PFNGLACTIVETEXTUREARBPROC pfn_glActiveTexture    = nullptr;
 #else
 static PFNGLACTIVETEXTUREPROC pfn_glActiveTexture   = nullptr;
@@ -558,6 +562,9 @@ int renderer_ogl::create()
 	// create renderer
 #if defined(OSD_WINDOWS)
 	m_gl_context = global_alloc(win_gl_context(std::static_pointer_cast<win_window_info>(win)->platform_window()));
+#elif defined(OSD_MAC)
+// TODO
+//  m_gl_context = global_alloc(mac_gl_context(std::static_pointer_cast<mac_window_info>(win)->platform_window()));
 #else
 	m_gl_context = global_alloc(sdl_gl_context(std::static_pointer_cast<sdl_window_info>(win)->platform_window()));
 #endif
@@ -886,7 +893,7 @@ void renderer_ogl::loadGLExtensions()
 
 	if ( m_useglsl )
 	{
-		#ifdef GL_ARB_multitexture
+		#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
 		pfn_glActiveTexture = (PFNGLACTIVETEXTUREARBPROC) m_gl_context->getProcAddress("glActiveTextureARB");
 		#else
 		pfn_glActiveTexture = (PFNGLACTIVETEXTUREPROC) m_gl_context->getProcAddress("glActiveTexture");

@@ -19,6 +19,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class metro_state : public driver_device
 {
@@ -95,7 +96,7 @@ public:
 	void init_metro();
 	void init_lastfortg();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(custom_soundstatus_r);
+	DECLARE_READ_LINE_MEMBER(custom_soundstatus_r);
 
 private:
 	enum

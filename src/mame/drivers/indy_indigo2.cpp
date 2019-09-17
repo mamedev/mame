@@ -5,8 +5,9 @@
 *   SGI IP22/IP24 Indigo2/Indy workstation
 *
 *  Known Issues:
-*  - The proper hookup for the MAC address is unknown, requiring
-*    a fake MAC to be set up before any IRIX installers will proceed.
+*  - The MAC address is supplied by the NVRAM, requiring the user to
+*    use "setenv -f eaddr 08:00:69:xx:yy:zz" from the Indy boot PROM
+*    before any IRIX installers will proceed.
 *  - The Gentoo Linux live CD hangs on starting the kernel.
 *
 *  Memory map:
@@ -68,12 +69,15 @@
 #include "bus/nscsi/hd.h"
 #include "machine/sgi.h"
 #include "machine/vino.h"
+#include "machine/saa7191.h"
 #include "machine/wd33c9x.h"
 
 #include "sound/cdda.h"
 
 #include "emupal.h"
 #include "screen.h"
+
+#include "logmacro.h"
 
 class ip24_state : public driver_device
 {
@@ -91,6 +95,7 @@ public:
 		, m_ioc2(*this, "ioc2")
 		, m_rtc(*this, "rtc")
 		, m_vino(*this, "vino")
+		, m_dmsd(*this, "dmsd")
 		, m_gio64(*this, "gio64")
 		, m_gio64_gfx(*this, "gio64_gfx")
 		, m_gio64_exp0(*this, "gio64_exp0")
@@ -109,7 +114,8 @@ protected:
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE64_MEMBER(write_ram);
-	DECLARE_READ32_MEMBER(bus_error);
+	template <uint32_t addr_base> DECLARE_READ64_MEMBER(bus_error_r);
+	template <uint32_t addr_base> DECLARE_WRITE64_MEMBER(bus_error_w);
 
 	uint8_t volume_r(offs_t offset);
 	void volume_w(offs_t offset, uint8_t data);
@@ -138,6 +144,7 @@ protected:
 	required_device<ioc2_device> m_ioc2;
 	required_device<ds1386_device> m_rtc;
 	optional_device<vino_device> m_vino;
+	optional_device<saa7191_device> m_dmsd;
 	optional_device<gio64_device> m_gio64;
 	optional_device<gio64_slot_device> m_gio64_gfx;
 	optional_device<gio64_slot_device> m_gio64_exp0;
@@ -170,10 +177,21 @@ private:
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
 
-READ32_MEMBER(ip24_state::bus_error)
+template <uint32_t addr_base>
+READ64_MEMBER(ip24_state::bus_error_r)
 {
+	logerror("Bus error (read)\n");
 	m_maincpu->bus_error();
+	m_mem_ctrl->set_cpu_buserr(addr_base + (offset << 3), mem_mask);
 	return 0;
+}
+
+template <uint32_t addr_base>
+WRITE64_MEMBER(ip24_state::bus_error_w)
+{
+	logerror("Bus error (write)\n");
+	m_maincpu->bus_error();
+	m_mem_ctrl->set_cpu_buserr(addr_base + (offset << 3), mem_mask);
 }
 
 READ32_MEMBER(ip22_state::eisa_io_r)
@@ -228,7 +246,7 @@ void ip24_state::ip24_base_map(address_map &map)
 	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip24_state::write_ram));     /* 128 MB of main RAM */
 	map(0x1f000000, 0x1f9fffff).rw(m_gio64, FUNC(gio64_device::read), FUNC(gio64_device::write));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
-	map(0x1fb00000, 0x1fb7ffff).r(FUNC(ip24_state::bus_error));
+	map(0x1fb00000, 0x1fb7ffff).rw(FUNC(ip24_state::bus_error_r<0x1fb00000>), FUNC(ip24_state::bus_error_w<0x1fb00000>));
 	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
 	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip24_state::write_ram));
@@ -312,6 +330,7 @@ void ip24_state::ip24_base(machine_config &config)
 {
 	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
 	m_mem_ctrl->int_dma_done_cb().set(m_ioc2, FUNC(ioc2_device::mc_dma_done_w));
+	m_mem_ctrl->eisa_present().set_constant(1);
 
 	NSCSI_BUS(config, "scsibus", 0);
 	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93B)
@@ -378,7 +397,13 @@ void ip24_state::ip24(machine_config &config)
 	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip24_state::pio6_map);
 
 	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
+
+	SAA7191(config, m_dmsd);
 	VINO(config, m_vino);
+	m_vino->i2c_data_out().set(m_dmsd, FUNC(saa7191_device::i2c_data_w));
+	m_vino->i2c_data_in().set(m_dmsd, FUNC(saa7191_device::i2c_data_r));
+	m_vino->i2c_stop().set(m_dmsd, FUNC(saa7191_device::i2c_stop_w));
+
 	DS1386_8K(config, m_rtc, 32768);
 }
 

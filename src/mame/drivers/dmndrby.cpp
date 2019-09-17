@@ -60,6 +60,7 @@ DD10 DD14  DD18     H5            DD21
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class dmndrby_state : public driver_device

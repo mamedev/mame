@@ -24,15 +24,28 @@ void v25_common_device::ida_sfr_map(address_map &map)
 	map(0x112, 0x112).w(FUNC(v25_common_device::pmc2_w));
 	map(0x138, 0x138).r(FUNC(v25_common_device::pt_r));
 	map(0x13b, 0x13b).w(FUNC(v25_common_device::pmt_w));
+	map(0x140, 0x140).rw(FUNC(v25_common_device::intm_r), FUNC(v25_common_device::intm_w));
+	map(0x144, 0x146).rw(FUNC(v25_common_device::ems_r), FUNC(v25_common_device::ems_w));
 	map(0x14c, 0x14c).rw(FUNC(v25_common_device::exic0_r), FUNC(v25_common_device::exic0_w));
 	map(0x14d, 0x14d).rw(FUNC(v25_common_device::exic1_r), FUNC(v25_common_device::exic1_w));
 	map(0x14e, 0x14e).rw(FUNC(v25_common_device::exic2_r), FUNC(v25_common_device::exic2_w));
+	map(0x165, 0x165).rw(FUNC(v25_common_device::srms0_r), FUNC(v25_common_device::srms0_w));
+	map(0x166, 0x166).rw(FUNC(v25_common_device::stms0_r), FUNC(v25_common_device::stms0_w));
+	map(0x16c, 0x16c).rw(FUNC(v25_common_device::seic0_r), FUNC(v25_common_device::seic0_w));
+	map(0x16d, 0x16d).rw(FUNC(v25_common_device::sric0_r), FUNC(v25_common_device::sric0_w));
+	map(0x16e, 0x16e).rw(FUNC(v25_common_device::stic0_r), FUNC(v25_common_device::stic0_w));
+	map(0x175, 0x175).rw(FUNC(v25_common_device::srms1_r), FUNC(v25_common_device::srms1_w));
+	map(0x176, 0x176).rw(FUNC(v25_common_device::stms1_r), FUNC(v25_common_device::stms1_w));
+	map(0x17c, 0x17c).rw(FUNC(v25_common_device::seic1_r), FUNC(v25_common_device::seic1_w));
+	map(0x17d, 0x17d).rw(FUNC(v25_common_device::sric1_r), FUNC(v25_common_device::sric1_w));
+	map(0x17e, 0x17e).rw(FUNC(v25_common_device::stic1_r), FUNC(v25_common_device::stic1_w));
 	map(0x180, 0x181).rw(FUNC(v25_common_device::tm0_r), FUNC(v25_common_device::tm0_w));
 	map(0x182, 0x183).rw(FUNC(v25_common_device::md0_r), FUNC(v25_common_device::md0_w));
 	map(0x188, 0x189).rw(FUNC(v25_common_device::tm1_r), FUNC(v25_common_device::tm1_w));
 	map(0x18a, 0x18b).rw(FUNC(v25_common_device::md1_r), FUNC(v25_common_device::md1_w));
 	map(0x190, 0x190).w(FUNC(v25_common_device::tmc0_w));
 	map(0x191, 0x191).w(FUNC(v25_common_device::tmc1_w));
+	map(0x194, 0x196).rw(FUNC(v25_common_device::tmms_r), FUNC(v25_common_device::tmms_w));
 	map(0x19c, 0x19c).rw(FUNC(v25_common_device::tmic0_r), FUNC(v25_common_device::tmic0_w));
 	map(0x19d, 0x19d).rw(FUNC(v25_common_device::tmic1_r), FUNC(v25_common_device::tmic1_w));
 	map(0x19e, 0x19e).rw(FUNC(v25_common_device::tmic2_r), FUNC(v25_common_device::tmic2_w));
@@ -50,6 +63,7 @@ uint8_t v25_common_device::read_irqcontrol(int /*INTSOURCES*/ source, uint8_t pr
 {
 	return  (((m_pending_irq & source)     ? 0x80 : 0x00)
 			| ((m_unmasked_irq & source)   ? 0x00 : 0x40)
+			| ((m_macro_service & source)  ? 0x20 : 0x00)
 			| ((m_bankswitch_irq & source) ? 0x10 : 0x00)
 			| priority);
 }
@@ -67,7 +81,13 @@ void v25_common_device::write_irqcontrol(int /*INTSOURCES*/ source, uint8_t d)
 		m_unmasked_irq |= source;
 
 	if (BIT(d, 5))
-		logerror("%06x: Warning: macro service function not implemented\n",PC());
+	{
+		if ((m_macro_service & source) == 0)
+			logerror("%06x: Warning: macro service function not implemented\n",PC());
+		m_macro_service |= source;
+	}
+	else
+		m_macro_service &= ~source;
 
 	if (BIT(d, 4))
 		m_bankswitch_irq |= source;
@@ -151,6 +171,28 @@ void v25_common_device::pmt_w(uint8_t d)
 	logerror("%06x: PMT set to %02x\n", PC(), d);
 }
 
+uint8_t v25_common_device::intm_r()
+{
+	return m_intm;
+}
+
+void v25_common_device::intm_w(uint8_t d)
+{
+	logerror("%06x: INTM set to %02x\n", PC(), d & 0x55);
+	m_intm = d & 0x55;
+}
+
+uint8_t v25_common_device::ems_r(offs_t a)
+{
+	return m_ems[a];
+}
+
+void v25_common_device::ems_w(offs_t a, uint8_t d)
+{
+	logerror("%06x: EMS%d set to %02x\n", PC(), a, d & 0xf7);
+	m_ems[a] = d & 0xf7;
+}
+
 uint8_t v25_common_device::exic0_r()
 {
 	return read_irqcontrol(INTP0, m_priority_intp);
@@ -180,6 +222,118 @@ uint8_t v25_common_device::exic2_r()
 void v25_common_device::exic2_w(uint8_t d)
 {
 	write_irqcontrol(INTP2, d);
+}
+
+uint8_t v25_common_device::srms0_r()
+{
+	return m_srms[0];
+}
+
+void v25_common_device::srms0_w(uint8_t d)
+{
+	logerror("%06x: SRMS0 set to %02x\n", PC(), d & 0xf7);
+	m_srms[0] = d & 0xf7;
+}
+
+uint8_t v25_common_device::stms0_r()
+{
+	return m_stms[0];
+}
+
+void v25_common_device::stms0_w(uint8_t d)
+{
+	logerror("%06x: STMS0 set to %02x\n", PC(), d & 0xf7);
+	m_stms[0] = d & 0xf7;
+}
+
+uint8_t v25_common_device::seic0_r()
+{
+	return read_irqcontrol(INTSER0, m_priority_ints0);
+}
+
+void v25_common_device::seic0_w(uint8_t d)
+{
+	// no macro service for error interrupt
+	write_irqcontrol(INTSER0, d & 0xd0);
+	m_priority_ints0 = d & 0x7;
+}
+
+uint8_t v25_common_device::sric0_r()
+{
+	return read_irqcontrol(INTSR0, m_priority_ints0);
+}
+
+void v25_common_device::sric0_w(uint8_t d)
+{
+	write_irqcontrol(INTSR0, d);
+	m_priority_ints0 = d & 0x7;
+}
+
+uint8_t v25_common_device::stic0_r()
+{
+	return read_irqcontrol(INTST0, m_priority_ints0);
+}
+
+void v25_common_device::stic0_w(uint8_t d)
+{
+	write_irqcontrol(INTST0, d);
+	m_priority_ints0 = d & 0x7;
+}
+
+uint8_t v25_common_device::srms1_r()
+{
+	return m_srms[1];
+}
+
+void v25_common_device::srms1_w(uint8_t d)
+{
+	logerror("%06x: SRMS1 set to %02x\n", PC(), d & 0xf7);
+	m_srms[1] = d & 0xf7;
+}
+
+uint8_t v25_common_device::stms1_r()
+{
+	return m_stms[1];
+}
+
+void v25_common_device::stms1_w(uint8_t d)
+{
+	logerror("%06x: STMS1 set to %02x\n", PC(), d & 0xf7);
+	m_stms[1] = d & 0xf7;
+}
+
+uint8_t v25_common_device::seic1_r()
+{
+	return read_irqcontrol(INTSER1, m_priority_ints1);
+}
+
+void v25_common_device::seic1_w(uint8_t d)
+{
+	// no macro service for error interrupt
+	write_irqcontrol(INTSER1, d & 0xd0);
+	m_priority_ints1 = d & 0x7;
+}
+
+uint8_t v25_common_device::sric1_r()
+{
+	return read_irqcontrol(INTSR1, m_priority_ints1);
+}
+
+void v25_common_device::sric1_w(uint8_t d)
+{
+	write_irqcontrol(INTSR1, d);
+	m_priority_ints1 = d & 0x7;
+}
+
+uint8_t v25_common_device::stic1_r()
+{
+	return read_irqcontrol(INTST1, m_priority_ints1);
+}
+
+void v25_common_device::stic1_w(uint8_t d)
+{
+	write_irqcontrol(INTST1, d);
+	m_priority_ints1 = d & 0x7;
 }
 
 uint16_t v25_common_device::tm0_r()
@@ -283,6 +437,17 @@ void v25_common_device::tmc1_w(uint8_t d)
 	}
 	else
 		m_timers[2]->adjust(attotime::never);
+}
+
+uint8_t v25_common_device::tmms_r(offs_t a)
+{
+	return m_tmms[a];
+}
+
+void v25_common_device::tmms_w(offs_t a, uint8_t d)
+{
+	logerror("%06x: TMMS%d set to %02x\n", PC(), a, d & 0xf7);
+	m_tmms[a] = d & 0xf7;
 }
 
 uint8_t v25_common_device::tmic0_r()

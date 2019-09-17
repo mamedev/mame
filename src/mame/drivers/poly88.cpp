@@ -9,13 +9,14 @@ Poly-88 driver by Miodrag Milanovic
 
 All input must be UPPERcase.
 
-11K is the minimal amount of user RAM required to run BASIC. PolyMorphic's
-"System 16" package shipped with 16K of RAM (as did the 8813), though some
-of their lesser systems did not.
+11K is the minimal amount of user RAM required to run the later version of
+BASIC. PolyMorphic's "System 16" package shipped with 16K of RAM (as did
+the 8813), though their earlier systems had only 8K or less.
 
 ToDo:
-- Polyphase format not working because 8251 device doesn't support sync.
-
+- More accurate interrupt emulation.
+- Single-step control.
+- .CAS file format support (http://deramp.com/polymorphic-computers/emu88.html).
 
 Poly-8813 is a disk-based computer with 3 mini-floppy drives.
 Booting is done by pressing the "Load" button, mounted on the
@@ -146,7 +147,7 @@ void poly88_state::poly88(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	TIMER(config, "kansas_r").configure_periodic(FUNC(poly88_state::kansas_r), attotime::from_hz(40000));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(poly88_state::kansas_r), attotime::from_hz(38400));
 
 	/* uart */
 	I8251(config, m_usart, 16.5888_MHz_XTAL / 9);

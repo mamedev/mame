@@ -29,7 +29,7 @@ public:
 
 	virtual ~nl_convert_base_t();
 
-	const pstring &result() { return m_buf.str(); }
+	pstring result() { return pstring(m_buf.str()); }
 
 	virtual void convert(const pstring &contents) = 0;
 

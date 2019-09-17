@@ -14,6 +14,7 @@
 #include "machine/taitoio.h"
 #include "video/tc0100scn.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class wgp_state : public driver_device

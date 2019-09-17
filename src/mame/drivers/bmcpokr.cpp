@@ -26,6 +26,7 @@ Other:  BMC B816140 (CPLD)
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class bmcpokr_state : public driver_device
 {
@@ -43,7 +44,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 	void bmcpokr(machine_config &config);
 	void mjmaglmp(machine_config &config);
@@ -335,7 +336,7 @@ READ16_MEMBER(bmcpokr_state::dsw_r)
 	return 0xff << 8;
 }
 
-CUSTOM_INPUT_MEMBER(bmcpokr_state::hopper_r)
+READ_LINE_MEMBER(bmcpokr_state::hopper_r)
 {
 	// motor off should clear the sense bit (I guess ticket.c should actually do this).
 	// Otherwise a hopper bit stuck low will prevent several keys from being registered.
@@ -488,7 +489,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // SCORE
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // BET             [BET, credit -1]
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_READ_LINE_MEMBER(bmcpokr_state, hopper_r)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // ACCOUNT         [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // KEY-OUT         [KEY-OUT, no hopper]
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_CONDITION("DSW4",0x80,EQUALS,0x80) // DOUBLE-UP
@@ -506,7 +507,7 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // n.a.            [START, ESC in service mode]
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Left>2 (3rd)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_BET     )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // <Down>1 (2nd)   [BET, credit -1]
-//  PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HP [HOPPER, credit -100]
+//  PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM       ) PORT_READ_LINE_MEMBER(bmcpokr_state, hopper_r)  // HP [HOPPER, credit -100]
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW      )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // A2              [SERVICE MODE]
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // C2              [KEY-OUT, no hopper]
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )                PORT_CONDITION("DSW4",0x80,EQUALS,0x00) // S1              [START, ESC in service mode]
@@ -608,7 +609,7 @@ static INPUT_PORTS_START( mjmaglmp )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2          ) // NOTE
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  ) // KEY DOWN
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // PAY
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM        ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, nullptr)  // HOPPER
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM        ) PORT_READ_LINE_MEMBER(bmcpokr_state, hopper_r)  // HOPPER
 	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW       ) // ACCOUNT
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1       ) PORT_NAME("Reset") // RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // (unused)

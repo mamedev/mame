@@ -9,6 +9,7 @@
 #include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tbowl_state : public driver_device
 {

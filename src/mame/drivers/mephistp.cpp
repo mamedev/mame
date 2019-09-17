@@ -108,7 +108,7 @@ WRITE8_MEMBER(mephisto_pinball_state::sound_rombank_w)
 
 void mephisto_pinball_state::mephisto_map(address_map &map)
 {
-	map(0x00000, 0x07fff).rom().mirror(0x08000).region("maincpu", 0);
+	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
 	map(0x10000, 0x107ff).ram().share("nvram");
 	map(0x12000, 0x1201f).noprw(); //AM_DEVREADWRITE("muart", i8256_device, read, write)
 	map(0x13000, 0x130ff).rw("ic20", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
@@ -117,7 +117,7 @@ void mephisto_pinball_state::mephisto_map(address_map &map)
 	map(0x14800, 0x14807).rw("ic9", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x16000, 0x16000).w(FUNC(mephisto_pinball_state::shift_load_w));
 	map(0x17000, 0x17001).nopw(); //???
-	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
+	map(0xf0000, 0xfffff).rom().region("maincpu", 0);
 }
 
 void mephisto_pinball_state::mephisto_8051_map(address_map &map)
@@ -215,8 +215,9 @@ void mephisto_pinball_state::sport2k(machine_config &config)
 / Mephisto
 /-------------------------------------------------------------------*/
 ROM_START(mephistp)
-	ROM_REGION(0x08000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu_ver1.2", 0x00000, 0x8000, CRC(845c8eb4) SHA1(2a705629990950d4e2d3a66a95e9516cf112cc88))
+	ROM_RELOAD(0x08000, 0x8000)
 
 	ROM_REGION(0x08000, "soundcpu", 0)
 	ROM_LOAD("ic15_02", 0x00000, 0x8000, CRC(2accd446) SHA1(7297e4825c33e7cf23f86fe39a0242e74874b1e2))
@@ -233,8 +234,9 @@ ROM_START(mephistp)
 ROM_END
 
 ROM_START(mephistp1)
-	ROM_REGION(0x08000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cpu_ver1.1", 0x00000, 0x8000, CRC(ce584902) SHA1(dd05d008bbd9b6588cb204e8d901537ffe7ddd43))
+	ROM_RELOAD(0x08000, 0x8000)
 
 	ROM_REGION(0x08000, "soundcpu", 0)
 	ROM_LOAD("ic15_02", 0x00000, 0x8000, CRC(2accd446) SHA1(7297e4825c33e7cf23f86fe39a0242e74874b1e2))
@@ -266,6 +268,6 @@ ROM_START(sport2k)
 	ROM_LOAD("s511_512.bin", 0x40000, 0x10000, CRC(ca9afa80) SHA1(6f219bdc1ad06e340b2930610897b70369a43684))
 ROM_END
 
-GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.1)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_pinball_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",              MACHINE_IS_SKELETON_MECHANICAL)
