@@ -277,6 +277,8 @@ uint32_t arm_cpu_device::cpu_read32( int addr )
 		if (ARM_DEBUG_CORE && !WORD_ALIGNED(addr))
 			logerror("%08x: Unaligned byte read %08x\n",R15,addr);
 
+		// TODO: RMW bugs in various Acorn Archimedes games don't want this for whatever reason
+		// (even tho removing these causes other glitches such as no mouse cursor)
 		if ((addr&3)==1)
 			return ((result&0x000000ff)<<24)|((result&0xffffff00)>> 8);
 		if ((addr&3)==2)

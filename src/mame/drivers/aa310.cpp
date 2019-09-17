@@ -64,7 +64,7 @@
  *  3400000 - 37FFFFF - Low ROM  (4 meg, I think this is expansion ROMs)
  *  3800000 - 3FFFFFF - High ROM (main OS ROM)
  *
- *  3400000 - 35FFFFF - VICD10 (write - supervisor only)
+ *  3400000 - 35FFFFF - VIDC10 (write - supervisor only)
  *  3600000 - 3FFFFFF - MEMC (write - supervisor only)
  *
  *****************************************************************************/
