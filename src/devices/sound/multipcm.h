@@ -107,9 +107,9 @@ private:
 	std::unique_ptr<int32_t[]> m_total_level_steps;
 
 	std::unique_ptr<int32_t[]> m_pitch_table;
-	std::unique_ptr<std::unique_ptr<int32_t[]>[]> m_pitch_scale_tables;
+	std::unique_ptr<int32_t[]> m_pitch_scale_tables[8];
 	std::unique_ptr<int32_t[]> m_amplitude_table;
-	std::unique_ptr<std::unique_ptr<int32_t[]>[]> m_amplitude_scale_tables;
+	std::unique_ptr<int32_t[]> m_amplitude_scale_tables[8];
 
 	uint32_t value_to_fixed(const uint32_t bits, const float value);
 
