@@ -2453,6 +2453,7 @@ pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops
 pcd4nl                          // 1995 Siemens-Nixdorf PCD-4NL 486 subnotebook
 pcd4nd                          // 1993 Siemens-Nixdorf 486 notebook
 ct386sx                         //
+wy220001						// WYSEpc
 cxsxd                           //
 ec1842                          //
 ec1849                          //
@@ -2464,6 +2465,15 @@ ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
 ftsserv                         // 1991 Apricot FTs (Scorpion)
 aubam12s2						// AUVA COMPUTER, INC. BAM/12-S2 motherboard (286)
+bi025c							// BI-025C HT 12 286 motherboard (286)
+kma202f							// KMA-202F-12R motherboard (286)
+cdtekg2							// CDTEK motherboard with Headland G2 chipset (286)
+octekg2							// Octek motherboard with Headland G2 chipset (286)
+olim203							// Olivetti 286 motherboard
+headg2							// 286 motherboards with Headland G2 chipset
+mb1212c							// Biostar MB-1212C motherboard (286)
+bam16a0							// VIP-M21502A BAM16-A0 motherboard (286)
+cmpa286							// CMP enterprise CO.LTD. motherboard (286)
 suntac5							// 286 motherboards using the 5-chip SUNTAC chipset
 ht12a                           // 286 motherboards using the Headland HT12/A chipset
 vlsi5							// 286 motherboards using the 5-chip VLSI chipset
@@ -31645,6 +31655,10 @@ sicpc1605                       // Siemens Sicomp PC16-05
 ssam88s                         //
 sx16                            // Sanyo SX-16
 zdsupers                        //
+ledgmodm						// Leading Edge Model M
+eaglepc2						// Eagle PC-2
+mpx16							// Ciarcia's Circuit Cellar Micromint MPX-16
+hstrtpls						// Vendex HeadStart Plus
 
 @source:pc100.cpp
 pc100                           //

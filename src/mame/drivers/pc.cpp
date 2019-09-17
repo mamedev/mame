@@ -70,7 +70,7 @@ public:
 	void juko16(machine_config &config);
 	void hyo88t(machine_config &config);
 	void kyoxt(machine_config &config);
-
+	
 	void init_bondwell();
 
 	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
@@ -486,6 +486,22 @@ ROM_START( eagle1600 )
 	ROM_LOAD("eagle 1600 video char gen u301.bin", 0x00000, 0x1000, CRC(1a7e552f) SHA1(749058783eec9d96a70dc5fdbfccb56196f889dc))
 ROM_END
 
+/*************************************************************** Eagle PC-2 ***
+
+Links: http://www.digibarn.com/collections/systems/eagle-pc/index.html , https://www.atarimagazines.com/creative/v10n2/28_Eagle_PC2.php http://www.old-computers.com/museum/computer.asp?st=1&c=529
+Form Factor: Desktop
+
+Error message: Cannot read boot sector
+******************************************************************************/
+
+ROM_START( eaglepc2 )
+	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_LOAD("eagle_pc-2_bios_2.812_1986_u1101.bin", 0xe000, 0x2000, CRC(cd0fc034) SHA1(883cb4808c565f2582873a51cc637ab25b457f88))
+
+	ROM_REGION(0x8000,"gfx1", 0)
+	ROM_LOAD("eagle_pc-2_cga_char_rom_u401.bin", 0x00000, 0x1000, CRC(e85da08d) SHA1(176a7027bd14cc7efbb5cec5c2ac89ba002912d0))
+
+ROM_END
 
 /********************************************************** Eagle PC Spirit ***
 
@@ -1291,6 +1307,48 @@ ROM_START( nixpc01 )
 	ROM_LOAD( "nx01.bin", 0xc000, 0x4000, CRC(b0a75d1f) SHA1(7c2890eced917969968fc2e7491cda90a9734e03))
 ROM_END
 
+/******************************************************Leading Edge Model M ***
+
+aka the Sperry PC, the "Sperry HT - 4.71 Bios" that can be found online is identical to the v.4.71 below
+E-TD10 - TOD Error
+acording to http://www.o3one.org/hwdocs/bios_doc/dosref22.html this machine had AT-like RTC services
+The "M" stood for a Mitsubishi made machine, the "Leading Edge Model D" was made by Daewoo
+Works with the "siemens" config, so instead of duplicating it until more is known we'll use that.
+
+******************************************************************************/
+
+ROM_START( ledgmodm )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v330", "Version 3.30")
+	ROMX_LOAD( "leading_edge-model_m-version_3.30.bin", 0xc000, 0x4000, CRC(386dd187) SHA1(848ccdc8209c24478a4f75dd941760c43d3bc732), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "v471", "Version 4.71")
+	ROMX_LOAD( "leading_edge-model_m-version_4.71.bin", 0xc000, 0x4000, CRC(0d5d8bee) SHA1(6c35adf6a8da149e420b5aa8dd0e18e02488cfa0), ROM_BIOS(1) )
+ROM_END
+
+/************************************** CCI Micromint MPX-16 PC Motherboard ***
+
+Circuit Cellar Project
+The ROMs are marked "Micromint MPX16 5/8 PC/Term 3/1/84"
+hangs on boot, maybe they are waiting for a serial connection
+
+******************************************************************************/
+
+ROM_START( mpx16 )
+	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_LOAD("mpx16u84.bin", 0xe000, 0x1000, CRC(8a557a25) SHA1(90f8112c094cc0ac44c2d5d43fbb577333dfc165))
+	ROM_LOAD("mpx16u85.bin", 0xf000, 0x1000, CRC(42097571) SHA1(2acaca033242e35e512b30b2233da02bde561cc3))
+ROM_END
+
+/*************************************************** Vendex HeadStart Plus ***
+
+Samsung manufactured - Chipset: Faraday FE2010A - "Keyboard Error or no keyboard present"
+On-board: FDC
+
+******************************************************************************/
+ROM_START( hstrtpls )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD("bios.bin",  0xc000, 0x04000, CRC(19d705f8) SHA1(5e607fec6b533bc59d8d804e399bb9d438d6999d))
+ROM_END
 
 /***************************************************************************
 
@@ -1333,3 +1391,7 @@ COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state,
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
 COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kyocera",                         "XT",                    MACHINE_NOT_WORKING )
 COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )
+COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Leading Edge",                    "Model M",               MACHINE_NOT_WORKING )
+COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                    	   "PC-2",                  MACHINE_NOT_WORKING )
+COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Micromint",                   	   "MPX-16",                MACHINE_NOT_WORKING )
+COMP( 198?, hstrtpls,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                   	   "HeadStart Plus",        MACHINE_NOT_WORKING )
