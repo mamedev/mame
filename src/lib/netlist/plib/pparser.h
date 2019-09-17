@@ -12,7 +12,7 @@
 #include "pstream.h"
 #include "pstring.h"
 
-#include <cstdint>
+//#include <cstdint>
 #include <unordered_map>
 
 
@@ -204,7 +204,7 @@ public:
 
 protected:
 
-	size_type vread(value_type *buf, const size_type n) override;
+	size_type vread(char_type *buf, const size_type n) override;
 	void vseek(const pos_type n) override
 	{
 		plib::unused_var(n);

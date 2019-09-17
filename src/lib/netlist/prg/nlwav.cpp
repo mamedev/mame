@@ -7,7 +7,7 @@
 #include "plib/ppmf.h"
 #include "plib/pstream.h"
 
-#include <cstring>
+#include <cstdio>
 
 /* From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
  * The most compatible way to make a wav header for unknown length is to put
@@ -58,7 +58,7 @@ public:
 	template <typename T>
 	void write(const T &val)
 	{
-		m_f.write(reinterpret_cast<const plib::postream::value_type *>(&val), sizeof(T));
+		m_f.write(reinterpret_cast<const plib::postream::char_type *>(&val), sizeof(T));
 	}
 
 	void write_sample(int *sample)
@@ -146,7 +146,7 @@ public:
 				{
 					// sscanf is very fast ...
 					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-					sscanf(line.c_str(), "%lf %lf", &m_e[i].t, &m_e[i].v);
+					std::sscanf(line.c_str(), "%lf %lf", &m_e[i].t, &m_e[i].v);
 					m_e[i].need_more = false;
 				}
 			}
@@ -304,7 +304,7 @@ public:
 	, m_format(format)
 	{
 		for (pstring::value_type c = 64; c < 64+26; c++)
-			m_ids.emplace_back(pstring(c));
+			m_ids.emplace_back(pstring(1, c));
 		write("$date Sat Jan 19 14:14:17 2019\n");
 		write("$end\n");
 		write("$version Netlist nlwav 0.1\n");
@@ -355,9 +355,7 @@ public:
 private:
 	void write(const pstring &line)
 	{
-		auto p = static_cast<const char *>(line.c_str());
-		std::size_t len = std::strlen(p);
-		m_fo.write(p, len);
+		m_fo.write(line.c_str(), plib::strlen(line.c_str()));
 	}
 
 	std::size_t m_channels;

@@ -14,6 +14,7 @@
 #include <initializer_list>
 #include <sstream>
 #include <vector>
+#include <locale>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
@@ -129,66 +130,57 @@ namespace plib
 	// number conversions
 	// ----------------------------------------------------------------------------------------
 
-	template <typename T, bool CLOCALE, typename E = void>
+	template <typename T, typename S>
+	T pstonum_locale(std::locale loc, const S &arg, std::size_t *idx)
+	{
+		std::stringstream ss;
+		ss.imbue(loc);
+		ss << arg;
+		long int len(ss.tellp());
+		auto x(constants<long double>::zero());
+		if (ss >> x)
+		{
+			long int pos(ss.tellg());
+			if (pos == -1)
+				pos = len;
+			*idx = static_cast<std::size_t>(pos);
+		}
+		else
+			*idx = constants<std::size_t>::zero();
+		//printf("%s, %f, %lu %ld\n", arg, (double)x, *idx, (long int) ss.tellg());
+		return x;
+	}
+
+	template <typename T, typename E = void>
 	struct pstonum_helper;
 
-	template<typename T, bool CLOCALE>
-	struct pstonum_helper<T, CLOCALE, typename std::enable_if<std::is_integral<T>::value
-		&& std::is_signed<T>::value>::type>
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value>::type>
 	{
 		template <typename S>
-		long long operator()(const S &arg, std::size_t *idx)
+		long long operator()(std::locale loc, const S &arg, std::size_t *idx)
 		{
-			return std::stoll(arg, idx);
+			//return std::stoll(arg, idx);
+			return pstonum_locale<long long>(loc, arg, idx);
 		}
 	};
 
-	template<typename T, bool CLOCALE>
-	struct pstonum_helper<T, CLOCALE, typename std::enable_if<std::is_integral<T>::value
-		&& !std::is_signed<T>::value>::type>
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
 	{
 		template <typename S>
-		unsigned long long operator()(const S &arg, std::size_t *idx)
+		long double operator()(std::locale loc, const S &arg, std::size_t *idx)
 		{
-			return std::stoull(arg, idx);
+			return pstonum_locale<long double>(loc, arg, idx);
 		}
 	};
 
-	template<typename T, bool CLOCALE>
-	struct pstonum_helper<T, CLOCALE, typename std::enable_if<std::is_floating_point<T>::value>::type>
-	{
-		template <typename S>
-		long double operator()(const S &arg, std::size_t *idx)
-		{
-			if (CLOCALE)
-			{
-				std::stringstream  ss;
-				ss.imbue(std::locale::classic());
-				ss << arg;
-				long int len(ss.tellp());
-				auto x(constants<long double>::zero());
-				long int pos(0);
-				if (ss >> x)
-				{
-					pos = static_cast<long int>(ss.tellg());
-					if (pos == -1)
-						pos = len;
-				}
-				*idx = static_cast<std::size_t>(pos);
-				//printf("%s, %f, %lu %ld\n", arg, (double)x, *idx, (long int) ss.tellg());
-				return x;
-			}
-			else
-				return std::stold(arg, idx);
-		}
-	};
-
-	template<typename T, bool CLOCALE, typename S>
-	T pstonum(const S &arg)
+	template<typename T, typename S>
+	T pstonum(const S &arg, std::locale loc = std::locale::classic())
 	{
 		decltype(arg.c_str()) cstr = arg.c_str();
 		std::size_t idx(0);
-		auto ret = pstonum_helper<T, CLOCALE>()(cstr, &idx);
+		auto ret = pstonum_helper<T>()(loc, cstr, &idx);
 		using ret_type = decltype(ret);
 		if (ret >= static_cast<ret_type>(std::numeric_limits<T>::lowest())
 			&& ret <= static_cast<ret_type>(std::numeric_limits<T>::max()))
@@ -205,12 +197,12 @@ namespace plib
 	}
 
 	template<typename R, bool CLOCALE, typename T>
-	R pstonum_ne(const T &str, bool &err) noexcept
+	R pstonum_ne(const T &str, bool &err, std::locale loc = std::locale::classic()) noexcept
 	{
 		try
 		{
 			err = false;
-			return pstonum<R, CLOCALE>(str);
+			return pstonum<R>(str, loc);
 		}
 		catch (...)
 		{

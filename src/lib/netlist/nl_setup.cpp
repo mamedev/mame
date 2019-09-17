@@ -1199,13 +1199,13 @@ bool source_t::parse(nlparse_t &setup, const pstring &name)
 plib::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique<plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
+	return plib::make_unique<plib::pistringstream>(m_str);
 }
 
 plib::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique<plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
+	return plib::make_unique<plib::pistringstream>(m_str);
 }
 
 plib::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)

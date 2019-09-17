@@ -213,7 +213,7 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 		++p;
 	pstring val = plib::left(sin, p);
 	pstring unit = sin.substr(p);
-	double ret = get_sp_unit(unit) * plib::pstonum<double, true>(val);
+	double ret = get_sp_unit(unit) * plib::pstonum<double>(val);
 	return ret;
 }
 
@@ -532,7 +532,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 					else if (plib::ucase(sval) == "LOW")
 						add_device("TTL_INPUT", name, 0);
 					else
-						add_device("ANALOG_INPUT", name, plib::pstonum<double, true>(sval));
+						add_device("ANALOG_INPUT", name, plib::pstonum<double>(sval));
 					add_pin_alias(name, "1", "Q");
 					break;
 				case 'D':

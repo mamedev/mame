@@ -15,7 +15,7 @@
 #include "netlist/solver/nld_solver.h"
 #include "netlist/tools/nl_convert.h"
 
-#include <cstring>
+#include <cstdio> // scanf
 
 #define NLTOOL_VERSION  20190420
 
@@ -292,7 +292,7 @@ struct input_t
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 		double t;
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
+		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
@@ -794,6 +794,8 @@ int tool_app_t::execute()
 
 	if (opt_help())
 	{
+		pout(plib::pfmt("{:10.3}\n").f(20.0));
+		//pout(plib::pfmt("{10.3}\n").f(20));
 		pout(usage());
 		return 0;
 	}
