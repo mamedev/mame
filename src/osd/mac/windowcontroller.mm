@@ -102,20 +102,30 @@ void *CreateMAMEWindow(char *title, int x, int y, int w, int h, bool isFullscree
 	NSWindow *window = [NSWindow alloc];
 	MAMEWindowController *controller = [MAMEWindowController alloc];
 
+	/* To avoid event handling issues like SDL has, we run MAME in
+	   a separate NSThread.  This means all UI calls from MAME
+	   must be delegated over to the main thread because the
+	   Cocoa UI stuff is not thread-safe */
 	dispatch_sync(dispatch_get_main_queue(), ^{
 		[window initWithContentRect:bounds
 			styleMask:style
 			backing:NSBackingStoreBuffered
 			defer:NO];
 		[controller initWithWindow:window];
+
+		NSString *nstitle = [[NSString alloc] initWithUTF8String:title];
+		[window setTitle:nstitle];
+		[nstitle release];
+
+		if (isFullscreen)
+		{
+			[controller goFullscreen];
+		}
+		else
+		{
+			[window makeKeyAndOrderFront:nil];
+		}
 	});
-
-	if (isFullscreen)
-	{
-		[controller goFullscreen];
-	}
-
-	[window makeKeyAndOrderFront:nil];
 
 	return (void *)controller;
 }
