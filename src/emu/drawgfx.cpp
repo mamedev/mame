@@ -2455,17 +2455,17 @@ void primask_copyscrollbitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src,
     pixels
 -------------------------------------------------*/
 
-void copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound)
+void copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound)
 {
 	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, [](u16 &destp, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
-void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound)
+void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound)
 {
 	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, [](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
-void prio_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask)
+void prio_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -2473,7 +2473,7 @@ void prio_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bit
 	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
-void prio_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask)
+void prio_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -2481,7 +2481,7 @@ void prio_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bit
 	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
-void primask_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+void primask_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
 {
 	if (pcode == 0 && pmask == 0xff)
 		copyrozbitmap(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound);
@@ -2489,7 +2489,7 @@ void primask_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const 
 		copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pcode, pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
-void primask_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+void primask_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
 {
 	if (pcode == 0 && pmask == 0xff)
 		copyrozbitmap(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound);
@@ -2505,17 +2505,17 @@ void primask_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const 
     transpen
 -------------------------------------------------*/
 
-void copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen)
+void copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 trans_pen)
 {
 	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, [trans_pen](u16 &destp, const u16 &srcp) { PIXEL_OP_COPY_TRANSPEN(destp, srcp); });
 }
 
-void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen)
+void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 trans_pen)
 {
 	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, [trans_pen](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN(destp, srcp); });
 }
 
-void prio_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+void prio_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -2523,7 +2523,7 @@ void prio_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, con
 	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pmask, trans_pen](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
-void prio_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+void prio_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -2531,7 +2531,7 @@ void prio_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, con
 	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pmask, trans_pen](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
-void primask_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+void primask_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
 {
 	if (pcode == 0 && pmask == 0xff)
 		copyrozbitmap_trans(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, trans_pen);
@@ -2539,7 +2539,7 @@ void primask_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, 
 		copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [trans_pen, pcode, pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIMASK(destp, pri, srcp); });
 }
 
-void primask_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+void primask_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
 {
 	if (pcode == 0 && pmask == 0xff)
 		copyrozbitmap_trans(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, trans_pen);

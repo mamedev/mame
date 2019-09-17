@@ -213,7 +213,7 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_gfx_palette_hilight(*this, "gfx_palette_hilight")
 {
 	m_use_alt_timing = 0;
-	m_palwrite_base =  - 1;
+	m_palwrite_base = -1;
 }
 
 //-------------------------------------------------
@@ -375,7 +375,7 @@ void sega315_5313_device::device_reset()
 	m_vdp_address = 0;
 	m_vram_fill_pending = 0;
 	m_vram_fill_length = 0;
-	m_irq4counter =  - 1;
+	m_irq4counter = -1;
 	m_imode_odd_frame = 0;
 	m_sprite_collision = 0;
 	m_imode = 0;
@@ -450,7 +450,7 @@ void sega315_5313_device::write_cram_value(int offset, int data)
 		m_palette_lookup[offset] = data;
 		if (m_ext_palette != nullptr)
 		{
-			if (m_palwrite_base !=  - 1)
+			if (m_palwrite_base != -1)
 			{
 				m_ext_palette->set_pen_color(offset + m_palwrite_base, m_palette_lut->pen(data));
 				m_ext_palette->set_pen_color(offset + m_palwrite_base + 0x40, m_palette_lut->pen(0x200 | data));
@@ -2284,8 +2284,8 @@ void sega315_5313_device::vdp_handle_eof()
 	m_vblank_flag = 0;
 	//m_irq6_pending = 0; /* NO! (breaks warlock) */
 
-	/* Set it to  - 1 here, so it becomes 0 when the first timer kicks in */
-	if (!m_use_alt_timing) m_scanline_counter =  - 1;
+	/* Set it to -1 here, so it becomes 0 when the first timer kicks in */
+	if (!m_use_alt_timing) m_scanline_counter = -1;
 	m_sprite_collision = 0;//? when to reset this ..
 	m_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
 	m_imode_odd_frame ^= 1;
@@ -2317,7 +2317,7 @@ void sega315_5313_device::vdp_handle_eof()
 
 	switch (MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1))
 	{
-			/* note, add 240 mode + init new timings! */
+		/* note, add 240 mode + init new timings! */
 		case 0: scr_width = 256; break;
 		case 1: scr_width = 256; break;
 		case 2: scr_width = 320; break;

@@ -10,10 +10,10 @@
 
 *********************************************************************/
 
-#pragma once
-
 #ifndef MAME_EMU_DRAWGFXT_IPP
 #define MAME_EMU_DRAWGFXT_IPP
+
+#pragma once
 
 
 /***************************************************************************
@@ -25,7 +25,7 @@
     regardless of pen, copying directly
 -------------------------------------------------*/
 
-#define PIXEL_OP_COPY_OPAQUE(DEST, SOURCE)                                \
+#define PIXEL_OP_COPY_OPAQUE(DEST, SOURCE)                                          \
 do                                                                                  \
 {                                                                                   \
 	(DEST) = SOURCE;                                                                \
@@ -53,7 +53,7 @@ while (0)
     directly
 -------------------------------------------------*/
 
-#define PIXEL_OP_COPY_TRANSPEN(DEST, SOURCE)                              \
+#define PIXEL_OP_COPY_TRANSPEN(DEST, SOURCE)                                        \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
@@ -91,7 +91,7 @@ while (0)
     directly
 -------------------------------------------------*/
 
-#define PIXEL_OP_COPY_TRANSALPHA(DEST, SOURCE)                            \
+#define PIXEL_OP_COPY_TRANSALPHA(DEST, SOURCE)                                      \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
@@ -129,7 +129,7 @@ while (0)
     'paldata' array
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_OPAQUE(DEST, SOURCE)                               \
+#define PIXEL_OP_REMAP_OPAQUE(DEST, SOURCE)                                         \
 do                                                                                  \
 {                                                                                   \
 	(DEST) = paldata[SOURCE];                                                       \
@@ -157,7 +157,7 @@ while (0)
     pen value
 -------------------------------------------------*/
 
-#define PIXEL_OP_REBASE_OPAQUE(DEST, SOURCE)                              \
+#define PIXEL_OP_REBASE_OPAQUE(DEST, SOURCE)                                        \
 do                                                                                  \
 {                                                                                   \
 	(DEST) = color + (SOURCE);                                                      \
@@ -178,7 +178,7 @@ while (0)
     pen via the 'paldata' array
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_TRANSPEN(DEST, SOURCE)                             \
+#define PIXEL_OP_REMAP_TRANSPEN(DEST, SOURCE)                                       \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
@@ -205,7 +205,7 @@ while (0)
     'color' to the pen value
 -------------------------------------------------*/
 
-#define PIXEL_OP_REBASE_TRANSPEN(DEST, SOURCE)                            \
+#define PIXEL_OP_REBASE_TRANSPEN(DEST, SOURCE)                                      \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
@@ -232,7 +232,7 @@ while (0)
     pen via the 'paldata' array
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_TRANSMASK(DEST, SOURCE)                            \
+#define PIXEL_OP_REMAP_TRANSMASK(DEST, SOURCE)                                      \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
@@ -259,7 +259,7 @@ while (0)
     'color' to the pen value
 -------------------------------------------------*/
 
-#define PIXEL_OP_REBASE_TRANSMASK(DEST, SOURCE)                           \
+#define PIXEL_OP_REBASE_TRANSMASK(DEST, SOURCE)                                     \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
@@ -296,7 +296,7 @@ while (0)
     the destination pixel using 'shadowtable'
 -------------------------------------------------*/
 
-#define PIXEL_OP_REBASE_TRANSTABLE16(DEST, SOURCE)                        \
+#define PIXEL_OP_REBASE_TRANSTABLE16(DEST, SOURCE)                                  \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
@@ -310,7 +310,7 @@ do                                                                              
 	}                                                                               \
 }                                                                                   \
 while (0)
-#define PIXEL_OP_REMAP_TRANSTABLE32(DEST, SOURCE)                         \
+#define PIXEL_OP_REMAP_TRANSTABLE32(DEST, SOURCE)                                   \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
@@ -377,7 +377,7 @@ while (0)
     against the destination using 'alpha'
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_TRANSPEN_ALPHA32(DEST, SOURCE)                     \
+#define PIXEL_OP_REMAP_TRANSPEN_ALPHA32(DEST, SOURCE)                               \
 do                                                                                  \
 {                                                                                   \
 	u32 srcdata = (SOURCE);                                                         \
@@ -419,7 +419,7 @@ while (0)
 
 
 template <typename BitmapType, typename FunctionClass>
-void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, FunctionClass pixel_op)
+inline void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, FunctionClass pixel_op)
 {
 	g_profiler.start(PROFILER_DRAWGFX);
 	do {
@@ -556,7 +556,7 @@ void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
-void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, PriorityType &priority, FunctionClass pixel_op)
+inline void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, PriorityType &priority, FunctionClass pixel_op)
 {
 	g_profiler.start(PROFILER_DRAWGFX);
 	do {
@@ -722,7 +722,7 @@ void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprect, u32 
 
 
 template <typename BitmapType, typename FunctionClass>
-void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, FunctionClass pixel_op)
+inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, FunctionClass pixel_op)
 {
 	g_profiler.start(PROFILER_DRAWGFX);
 	do {
@@ -763,10 +763,7 @@ void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, 
 		// compute final pixel in Y and exit if we are entirely clipped
 		s32 destendy = desty + dstheight - 1;
 		if (desty > cliprect.bottom() || destendy < cliprect.top())
-		{
-			g_profiler.stop();
-			return;
-		}
+			break;
 
 		// apply top clip
 		s32 srcy = 0;
@@ -838,7 +835,7 @@ void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, 
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
-void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, PriorityType &priority, FunctionClass pixel_op)
+inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, PriorityType &priority, FunctionClass pixel_op)
 {
 	g_profiler.start(PROFILER_DRAWGFX);
 	do {
@@ -976,7 +973,7 @@ void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, 
 */
 
 template <typename BitmapType, typename FunctionClass>
-void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, FunctionClass pixel_op)
+inline void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, FunctionClass pixel_op)
 {
 	g_profiler.start(PROFILER_COPYBITMAP);
 	do {
@@ -1116,7 +1113,7 @@ void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, int fli
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
-void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, PriorityType &priority, FunctionClass pixel_op)
+inline void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, PriorityType &priority, FunctionClass pixel_op)
 {
 	g_profiler.start(PROFILER_COPYBITMAP);
 	do {
@@ -1279,12 +1276,12 @@ void copybitmap_core(BitmapType &dest, const BitmapType &src, int flipx, int fli
         s32 incyx - the 16.16 amount to increment in source Y for each destination X pixel
         s32 incxy - the 16.16 amount to increment in source X for each destination Y pixel
         s32 incyy - the 16.16 amount to increment in source Y for each destination Y pixel
-        int wraparound - non-zero means wrap when hitting the edges of the source
+        bool wraparound - true means wrap when hitting the edges of the source
         bitmap_t &priority - the priority bitmap (if and only if priority is to be applied)
 */
 
 template <typename BitmapType, typename FunctionClass>
-void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, const BitmapType &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, FunctionClass pixel_op)
+inline void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, const BitmapType &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, FunctionClass pixel_op)
 {
 	g_profiler.start(PROFILER_COPYBITMAP);
 
@@ -1545,7 +1542,7 @@ void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, const Bitma
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
-void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, const BitmapType &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, PriorityType &priority, FunctionClass pixel_op)
+inline void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, const BitmapType &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, PriorityType &priority, FunctionClass pixel_op)
 {
 	g_profiler.start(PROFILER_COPYBITMAP);
 
@@ -1835,7 +1832,7 @@ void copyrozbitmap_core(BitmapType &dest, const rectangle &cliprect, const Bitma
 */
 
 template <typename BitmapType, typename SourceType, typename FunctionClass>
-void drawscanline_core(BitmapType &bitmap, s32 destx, s32 desty, s32 length, const SourceType *srcptr, FunctionClass pixel_op)
+inline void drawscanline_core(BitmapType &bitmap, s32 destx, s32 desty, s32 length, const SourceType *srcptr, FunctionClass pixel_op)
 {
 	assert(bitmap.valid());
 	assert(destx >= 0);
@@ -1870,7 +1867,7 @@ void drawscanline_core(BitmapType &bitmap, s32 destx, s32 desty, s32 length, con
 
 
 template <typename BitmapType, typename SourceType, typename PriorityType, typename FunctionClass>
-void drawscanline_core(BitmapType &bitmap, s32 destx, s32 desty, s32 length, const SourceType *srcptr, PriorityType &priority, FunctionClass pixel_op)
+inline void drawscanline_core(BitmapType &bitmap, s32 destx, s32 desty, s32 length, const SourceType *srcptr, PriorityType &priority, FunctionClass pixel_op)
 {
 	assert(bitmap.valid());
 	assert(destx >= 0);

@@ -76,28 +76,28 @@ static constexpr u32 BG_TRANSPEN = 0x00ff00ff; // used for representing transpar
 //#define DEBUG_MESSAGE
 
 // take ARGB pixel with stored alpha and blend in to RGB32 bitmap
-#define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, SOURCE)                             \
+#define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, SOURCE)                                           \
 do                                                                                                  \
 {                                                                                                   \
-	const rgb_t srcdata = (SOURCE);                                                                      \
+	const rgb_t srcdata = (SOURCE);                                                                 \
 	if (srcdata != transpen)                                                                        \
-		(DEST) = alpha_blend_r32((DEST), srcdata, srcdata.a());                              \
+		(DEST) = alpha_blend_r32((DEST), srcdata, srcdata.a());                                     \
 }                                                                                                   \
 while (0)
 // take RGB pixel with separate alpha and blend in to RGB32 bitmap
-#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, SOURCE)                                \
+#define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, SOURCE)                                          \
 do                                                                                                  \
 {                                                                                                   \
-	const u32 srcdata = (SOURCE);                                                                      \
+	const u32 srcdata = (SOURCE);                                                                   \
 	if (srcdata != transpen)                                                                        \
-		(DEST) = alpha_blend_r32((DEST), srcdata, alpha);                               \
+		(DEST) = alpha_blend_r32((DEST), srcdata, alpha);                                           \
 }                                                                                                   \
 while (0)
 // take ARGB pixel with stored alpha and copy in to RGB32 bitmap, scipping BG_TRANSPEN
-#define PIXEL_OP_COPY_TRANSPEN_RENDER32(DEST, SOURCE)                             \
+#define PIXEL_OP_COPY_TRANSPEN_RENDER32(DEST, SOURCE)                                               \
 do                                                                                                  \
 {                                                                                                   \
-	const u32 srcdata = (SOURCE);                                                                      \
+	const u32 srcdata = (SOURCE);                                                                   \
 	if (srcdata != transpen)                                                                        \
 		(DEST) = srcdata;                                                                           \
 }                                                                                                   \

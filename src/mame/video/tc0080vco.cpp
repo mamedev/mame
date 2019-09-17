@@ -710,7 +710,7 @@ void tc0080vco_device::bg1_tilemap_draw(screen_device &screen, bitmap_ind16 &bit
 			sy =  (( 0x3fe - m_scroll_ram[layer + 3]) << 16) - (max_y + min_y) * (zy - 0x10000);
 		}
 
-		copyrozbitmap_core(bitmap, cliprect, srcbitmap, sx, sy, zx, 0, 0, zy, 0, screen.priority(), [privalue = priority, primask = pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANS0_SET_PRIORITY(destp, pri, srcp); });
+		copyrozbitmap_core(bitmap, cliprect, srcbitmap, sx, sy, zx, 0, 0, zy, false, screen.priority(), [privalue = priority, primask = pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANS0_SET_PRIORITY(destp, pri, srcp); });
 	}
 }
 
