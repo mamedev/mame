@@ -37,7 +37,7 @@ for:
       only:
         - BUILD: GCC
     build_script:
-      - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 OPTIMIZE=0 IGNORE_GIT=1 -j4"
+      - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 OPTIMIZE=0 ARCHOPTS=-Wa,-mbig-obj IGNORE_GIT=1 -j4"
     test_script:
       - \projects\mame\mametiny64.exe -validate
     after_test:
