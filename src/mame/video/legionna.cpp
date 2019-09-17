@@ -66,37 +66,20 @@ void legionna_state::tile_scroll_base_w(offs_t offset, u16 data)
 
 void legionna_state::heatbrl_setgfxbank(u16 data)
 {
-	unsigned newbank = (data & 0x4000) >> 2;
-	if (m_back_gfx_bank != newbank)
-	{
-		m_back_gfx_bank = newbank;
-		m_background_layer->mark_all_dirty();
-	}
+	m_back_gfx_bank = (data & 0x4000) >> 2;
+	m_background_layer->mark_all_dirty();
 }
 
 /*xxx- --- ---- ---- banking*/
 void legionna_state::denjinmk_setgfxbank(u16 data)
 {
-	unsigned newbank = (data & 0x2000) >> 1;//???
-	if (m_fore_gfx_bank != newbank)
-	{
-		m_fore_gfx_bank = newbank;
-		m_foreground_layer->mark_all_dirty();
-	}
+	m_fore_gfx_bank = (data & 0x2000) >> 1;//???
+	m_back_gfx_bank = (data & 0x4000) >> 2;
+	m_mid_gfx_bank  = (data & 0x8000) >> 3;//???
 
-	newbank = (data & 0x4000) >> 2;
-	if (m_back_gfx_bank != newbank)
-	{
-		m_back_gfx_bank = newbank;
-		m_background_layer->mark_all_dirty();
-	}
-
-	newbank = (data & 0x8000) >> 3;//???
-	if (m_mid_gfx_bank != newbank)
-	{
-		m_mid_gfx_bank = newbank;
-		m_midground_layer->mark_all_dirty();
-	}
+	m_foreground_layer->mark_all_dirty();
+	m_background_layer->mark_all_dirty();
+	m_midground_layer->mark_all_dirty();
 }
 
 void legionna_state::videowrite_cb_w(offs_t offset, u16 data)
