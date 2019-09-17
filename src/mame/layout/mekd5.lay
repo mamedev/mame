@@ -1,0 +1,296 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.85" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+	</element>
+
+	<element name="btn_0">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="0"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_1">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="1"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_2">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="2"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_3">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="3"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_4">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="4"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_5">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="5"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_6">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="6"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_7">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="7"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_8">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="8"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_9">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="9"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_a">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="A"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_b">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="B"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_c">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="C"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_d">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="D"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_e">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="E"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_f">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.92" green="0.92" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.96" green="0.96" blue="0.96" /></rect>
+		<text string="F"><bounds x="0.1" y="0.2" width="0.8" height="0.6" /><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="btn_rst">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.18" green="0.40" blue="0.49" /></rect>
+		<text string="RS"><bounds x="0.1" y="0.25" width="0.8" height="0.5" /><color red="0.96" green="0.96" blue="0.96" /></text>
+	</element>
+	<element name="btn_fs">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.18" green="0.40" blue="0.49" /></rect>
+		<text string="FS"><bounds x="0.1" y="0.25" width="0.8" height="0.5" /><color red="0.96" green="0.96" blue="0.96" /></text>
+	</element>
+	<element name="btn_fc">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.18" green="0.40" blue="0.49" /></rect>
+		<text string="FC"><bounds x="0.1" y="0.25" width="0.8" height="0.5" /><color red="0.96" green="0.96" blue="0.96" /></text>
+	</element>
+	<element name="btn_pl">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.18" green="0.40" blue="0.49" /></rect>
+		<text string="P/L"><bounds x="0.1" y="0.25" width="0.8" height="0.5" /><color red="0.96" green="0.96" blue="0.96" /></text>
+	</element>
+	<element name="btn_tb">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.18" green="0.40" blue="0.49" /></rect>
+		<text string="T/B"><bounds x="0.1" y="0.25" width="0.8" height="0.5" /><color red="0.96" green="0.96" blue="0.96" /></text>
+	</element>
+	<element name="btn_m">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.18" green="0.40" blue="0.49" /></rect>
+		<text string="M"><bounds x="0.1" y="0.25" width="0.8" height="0.5" /><color red="0.96" green="0.96" blue="0.96" /></text>
+	</element>
+	<element name="btn_ex">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.18" green="0.40" blue="0.49" /></rect>
+		<text string="EX"><bounds x="0.1" y="0.25" width="0.8" height="0.5" /><color red="0.96" green="0.96" blue="0.96" /></text>
+	</element>
+	<element name="btn_rd">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.18" green="0.40" blue="0.49" /></rect>
+		<text string="RD"><bounds x="0.1" y="0.25" width="0.8" height="0.5" /><color red="0.96" green="0.96" blue="0.96" /></text>
+	</element>
+	<element name="btn_go">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.14" green="0.36" blue="0.45" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.22" green="0.44" blue="0.53" /></rect>
+		<rect><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.18" green="0.40" blue="0.49" /></rect>
+		<text string="GO"><bounds x="0.1" y="0.25" width="0.8" height="0.5" /><color red="0.96" green="0.96" blue="0.96" /></text>
+	</element>
+
+	<group name="displays">
+		<!-- Black background -->
+		<bezel element="background">
+			<bounds left="0" top="0" right="3485.0" bottom="738" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="62.5" top="219" right="312.5" bottom="519" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds left="562.5" top="219" right="812.5" bottom="519" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="1062.5" top="219" right="1312.5" bottom="519" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="1562.5" top="219" right="1812.5" bottom="519" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="2672.5" top="219" right="2922.5" bottom="519" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds left="3172." top="219" right="3422.5" bottom="519" />
+		</bezel>
+	</group>
+
+	<group name="keypad">
+		<bezel element="background">
+			<bounds x="0" y="0" width="7.1" height="6.70" />
+		</bezel>
+
+		<cpanel element="btn_rst" inputtag="RESET" inputmask="0x01"><bounds x="0.35" y="0.15" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_fs" inputtag="COL0" inputmask="0x10"><bounds x="1.70" y="0.15" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_fc" inputtag="COL1" inputmask="0x10"><bounds x="3.05" y="0.15" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_pl" inputtag="COL2" inputmask="0x10"><bounds x="4.40" y="0.15" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_tb" inputtag="COL3" inputmask="0x10"><bounds x="5.75" y="0.15" width="1.0" height="1.0" /></cpanel>
+
+		<cpanel element="btn_7" inputtag="COL0" inputmask="0x08"><bounds x="0.35" y="1.50" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_8" inputtag="COL1" inputmask="0x08"><bounds x="1.70" y="1.50" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_9" inputtag="COL2" inputmask="0x08"><bounds x="3.05" y="1.50" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_a" inputtag="COL3" inputmask="0x08"><bounds x="4.40" y="1.50" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_m" inputtag="COL0" inputmask="0x20"><bounds x="5.75" y="1.50" width="1.0" height="1.0" /></cpanel>
+
+		<cpanel element="btn_4" inputtag="COL0" inputmask="0x04"><bounds x="0.35" y="2.85" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_5" inputtag="COL1" inputmask="0x04"><bounds x="1.70" y="2.85" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_6" inputtag="COL2" inputmask="0x04"><bounds x="3.05" y="2.85" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_b" inputtag="COL3" inputmask="0x04"><bounds x="4.40" y="2.85" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_ex" inputtag="COL1" inputmask="0x20"><bounds x="5.75" y="2.85" width="1.0" height="1.0" /></cpanel>
+
+		<cpanel element="btn_1" inputtag="COL0" inputmask="0x02"><bounds x="0.35" y="4.20" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_2" inputtag="COL1" inputmask="0x02"><bounds x="1.70" y="4.20" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_3" inputtag="COL2" inputmask="0x02"><bounds x="3.05" y="4.20" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_c" inputtag="COL3" inputmask="0x02"><bounds x="4.40" y="4.20" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_rd" inputtag="COL2" inputmask="0x20"><bounds x="5.75" y="4.20" width="1.0" height="1.0" /></cpanel>
+
+		<cpanel element="btn_0" inputtag="COL0" inputmask="0x01"><bounds x="0.35" y="5.55" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_f" inputtag="COL1" inputmask="0x01"><bounds x="1.70" y="5.55" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_e" inputtag="COL2" inputmask="0x01"><bounds x="3.05" y="5.55" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_d" inputtag="COL3" inputmask="0x01"><bounds x="4.40" y="5.55" width="1.0" height="1.0" /></cpanel>
+		<cpanel element="btn_go" inputtag="COL3" inputmask="0x20"><bounds x="5.75" y="5.55" width="1.0" height="1.0" /></cpanel>
+	</group>
+
+
+	<view name="LED Displays and Keypad" index="0">
+		<group ref="displays"><bounds x="0" y="0" width="320" height="68" /></group>
+		<group ref="keypad"><bounds x="55" y="80" width="240" height="226" /></group>
+	</view>
+
+	<view name="LED Displays" index="1">
+		<group ref="displays"><bounds x="0" y="0" width="320" height="68" /></group>
+	</view>
+
+	<view name="LED Displays, Terminal" index="2">
+		<group ref="displays"><bounds x="160" y="0" width="320" height="68" /></group>
+		<screen index="0"><bounds x="0" y="80" width="640" height="480" /></screen>
+	</view>
+
+	<view name="Terminal" index="3">
+		<screen index="0"><bounds x="0" y="0" width="640" height="480" /></screen>
+	</view>
+
+</mamelayout>
