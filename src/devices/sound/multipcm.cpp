@@ -460,9 +460,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 		m_left_pan_table(nullptr),
 		m_right_pan_table(nullptr),
 		m_linear_to_exp_volume(nullptr),
-		m_total_level_steps(nullptr),
-		m_pitch_scale_tables(nullptr),
-		m_amplitude_scale_tables(nullptr)
+		m_total_level_steps(nullptr)
 {
 }
 
