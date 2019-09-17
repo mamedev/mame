@@ -2477,6 +2477,11 @@ cmpa286							// CMP enterprise CO.LTD. motherboard (286)
 suntac5							// 286 motherboards using the 5-chip SUNTAC chipset
 ht12a                           // 286 motherboards using the Headland HT12/A chipset
 vlsi5							// 286 motherboards using the 5-chip VLSI chipset
+sy012							// SY-012 16/25 386MB VER: 5.2 motherboard (386)
+frxc402							// 386 motherboards using FOREX FRX46C402/FRX36C300/SIS85C206 chips
+gs611606a						// Goldstar P/N 611-606A Rev 1.0A motherboard (386)
+pem2530							// DTK PEM 2530 motherboard (386)
+tam3340ma0						// TAM/33/40-MA0 (CM318R00,M31-R00)
 u3911v3							// Uniron U3911-V3 motherboard (286)
 mkp286							// Morse KP-286 motherboard (286)
 mba009							// HLB-286 MBA-009 motherboard (286)
