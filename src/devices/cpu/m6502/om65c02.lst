@@ -765,8 +765,7 @@ wai_imp
 
 #   exceptions
 reset_c
-	read_pc_noinc();
-	read(0xffff);
+	read_arg(0xffff);
 	read_pc_noinc();
 	read(SP); dec_SP();
 	read(SP); dec_SP();
