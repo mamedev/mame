@@ -2197,26 +2197,33 @@ ROM_START( at386 )
 	// 11: BIOS-String: 40-0400-001107-00101111-111192-U4800VLX-0 / UNICHIP BIOS VER 2.0A 09/27/1993
 	ROM_SYSTEM_BIOS(11, "386bw367", "386BW367 Rev. 1.0")
 	ROMX_LOAD( "unichip_386bw_367_rev_1.0.bin", 0x10000, 0x10000, CRC(7922a8f9) SHA1(785008e10edfd393dc39e921a12d1a07a14bac25), ROM_BIOS(11))
-	// 12: 
-	// Chipset: Ali M1429 A1 and M1431 A2, doesn't boot
-	ROM_SYSTEM_BIOS(12, "386ali", "386 board with Ali chipset")
-	ROMX_LOAD( "386_ali_ami_511767.bin", 0x10000, 0x10000, CRC(3c218db4) SHA1(785ea7c36e8be5e7410524e90170d4985cbc9c24), ROM_BIOS(12))
-	//13: BIOS-String: 40-0100-001266-00101111-121291-UMCAUTO-0 - 3DIUD-1.2
+	//12: BIOS-String: 40-0100-001266-00101111-121291-UMCAUTO-0 - 3DIUD-1.2
 	// Chipset: // UMC UM92C206F, UM82C482AF, UM82C481BF - MB manufacturer according to BIOS is Modula Tech Co
-	ROM_SYSTEM_BIOS(13, "3diud", "386 UMC 3DIUD")
-	ROMX_LOAD( "386-umc-3flud.bin", 0x10000, 0x10000, CRC(2e795a01) SHA1(02e9e2871c1c1a542f44ab5eef66aee4b04225c1), ROM_BIOS(13))
-	//14: BIOS-String: 305-3.2 000-00 - Chipset: TACT82206FN; Intel A82385-33 - Keyboard Controller: P/N: 191106-2 C/S E4F4 Rev. 1.4
+	ROM_SYSTEM_BIOS(12, "3diud", "386 UMC 3DIUD")
+	ROMX_LOAD( "386-umc-3flud.bin", 0x10000, 0x10000, CRC(2e795a01) SHA1(02e9e2871c1c1a542f44ab5eef66aee4b04225c1), ROM_BIOS(12))
+	//13: BIOS-String: 305-3.2 000-00 - Chipset: TACT82206FN; Intel A82385-33 - Keyboard Controller: P/N: 191106-2 C/S E4F4 Rev. 1.4
 	// Board with Tandon and Micronics stickers - BIOS: 192475-305A V305 3.2
 	// ISA8: 2, ISA16: 5 - OSC: 14.31818 MHz - 66.0000 MHz, CPU: Intel 80386DX-33, FPU: Intel 80387DX-33
-	ROM_SYSTEM_BIOS(14, "tanmic385", "Tandon/Micronics with 385")
-	ROMX_LOAD( "386-micronics-09-00021-even_32k.bin", 0x10000, 0x8000, CRC(0d4f0093) SHA1(f66364a82c957862a0e54afc3a2f85f911adfd49), ROM_SKIP(1) | ROM_BIOS(14))
-	ROMX_LOAD( "386-micronics-09-00021-odd_32k.bin", 0x10001, 0x8000, CRC(54195986) SHA1(f3536340ef1697763e5cd70d0de7bb9b2a4ecde9), ROM_SKIP(1) | ROM_BIOS(14))
+	ROM_SYSTEM_BIOS(13, "tanmic385", "Tandon/Micronics with 385")
+	ROMX_LOAD( "386-micronics-09-00021-even_32k.bin", 0x10000, 0x8000, CRC(0d4f0093) SHA1(f66364a82c957862a0e54afc3a2f85f911adfd49), ROM_SKIP(1) | ROM_BIOS(13))
+	ROMX_LOAD( "386-micronics-09-00021-odd_32k.bin", 0x10001, 0x8000, CRC(54195986) SHA1(f3536340ef1697763e5cd70d0de7bb9b2a4ecde9), ROM_SKIP(1) | ROM_BIOS(13))
+	// 14: Board is only marked "rev.0.3, looks like 386GRN - CPU: AMD AM386DX-40 - OSC: 14.31818 - ISA8: 1, ISA16: 5
+	// Chipset: UMC UM82C491F - BIOS-String: 08/30/93-UMC-491-214X2000-OO - BIOS: Award 386 D2026361 - Keyboard BIOS: JETkey V3.0
+	ROM_SYSTEM_BIOS(14, "386grn", "386GRN-like board rev.03")
+	ROMX_LOAD( "386dx40-27c512.bin", 0x10000, 0x10000, CRC(692a4d52) SHA1(7970a05586eacfe4bfdc575b17bbbfb7ff1c86b0), ROM_BIOS(14))
 ROM_END
 
 
 //**************************************************************************
 //  80386 SX and DX motherboard
 //**************************************************************************
+
+// Shuttle HOT-304 - Chipset: Opti F82C382, Opti (erased), UMC UM82C206L - OSC: 14.31818MHz, 50.000MHz 
+// BIOS: AMI, Ser.Nr. 150796 - BIOS-String: 30-0101-DK1343-00001111-050591-OPBC-0 - Keyboard BIOS: AMI Ser.Nr. 209210 - ISA8: 1, ISA16: 6, ISA16/Memory: 1
+ROM_START( hot304 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "386-hot-304.bin", 0x10000, 0x10000, CRC(cd4ad4ec) SHA1(50f1b7a15096fff7442d575a47728ba4709b2f39))
+ROM_END
 
 // TAM/33/40-MA0 (CM318R00,M31-R00) - Chipset: MX83C305, MX83C306 - CPU: AMD Am386DX-40 - ISA16:8
 // OSC: 80.000MHz - 14.31818 - BIOS: AMI 386 BIOS PLUS S/N OA2050592 - BIOS-String: 31-0100-001105-00101111-121291-MXIC-0 - 386DX/Cx486DLX TAM/33,30-MA0/MA01, 09/10/1992
@@ -2312,6 +2319,19 @@ ROM_START( fu340 )
 	ROM_LOAD( "ami_abit_fu340.bin", 0x10000, 0x10000,CRC(9ea90d90) SHA1(091bdae7b1e36ac5168823d80d5907af2a95e583))
 ROM_END
 
+
+// Motherboards using the Ali M1429 A1 and M1431 A2 chipsets ... they both don't hang before initializing the graphics card
+
+ROM_START( alim1429 )
+	ROM_REGION(0x20000, "bios", 0)
+	// 0: 
+	ROM_SYSTEM_BIOS(0, "386ali", "386 board with Ali chipset")
+	ROMX_LOAD( "386_ali_ami_511767.bin", 0x10000, 0x10000, CRC(3c218db4) SHA1(785ea7c36e8be5e7410524e90170d4985cbc9c24), ROM_BIOS(0))
+	// 1: SER-386AD III (written on the underside of the board) - CPU: AMD Am386DX-40 - ISA16: 5
+	// BIOS : AMIBIOS 04/04/1993 Ser.# 579092 - BIOS-String : 40-0212-001133-00101111-040493-ALI1429-F - Keyboard BIOS: Regional HT6542
+	ROM_SYSTEM_BIOS(1, "ser386ad", "SER-386AD III")
+	ROMX_LOAD( "ser386ad3.bin", 0x10000, 0x10000, CRC(d80d6deb) SHA1(9f889f7464255431c13ac91d7df31b325447fef5), ROM_BIOS(1))
+ROM_END
 
 // Motherboards using the Forex FRX36C300 + FRX46C402; SiS 85C206 chipset
 
@@ -2781,6 +2801,7 @@ COMP( 1988, dsys200,   ibm5170, 0,       atvga,     0,     at_state,     init_at
 COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_atpci,     "First International Computer", "486-PIO-2", MACHINE_NOT_WORKING )
 COMP( 1994, ficvipio,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO", MACHINE_NOT_WORKING )
 COMP( 199?, ficvipio2, ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO2", MACHINE_NOT_WORKING )
+COMP( 198?, hot304,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-304", MACHINE_NOT_WORKING )
 COMP( 199?, hot409,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-409", MACHINE_NOT_WORKING )
 COMP( 198?, aubam12s2, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "AUVA COMPUTER, INC.", "BAM/12-S2", MACHINE_NOT_WORKING )
 COMP( 198?, wy220001,  ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Wyse", "WYSEpc 286", MACHINE_NOT_WORKING )
@@ -2815,6 +2836,7 @@ COMP( 199?, kma202f,   ibm5170, 0,       atvga,     0,     at_state,     init_at
 COMP( 199?, sy012,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "SY-012 16/25 386MB VER: 5.2", MACHINE_NOT_WORKING )
 COMP( 198?, gs611606a, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Goldstar",    "GOLDSTAR P/N 611-606A Rev 1.0A", MACHINE_NOT_WORKING )
 COMP( 199?, tam3340ma0,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "TAM/33/40-MA0 (CM318R00,M31-R00)", MACHINE_NOT_WORKING )
+COMP( 199?, alim1429,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 Motherboards using the ALi M1429 A1 and M1431 A2 chipset", MACHINE_NOT_WORKING )
 COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
 COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx Notebook Computer", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
