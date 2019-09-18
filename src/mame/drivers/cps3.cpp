@@ -1016,16 +1016,8 @@ static inline int to_s10(int data)
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-void cps3_state::draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void cps3_state::draw_tilemapsprite_line(u32* regs, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u32* tmapregs[4] = { m_tilemap20_regs_base, m_tilemap30_regs_base, m_tilemap40_regs_base, m_tilemap50_regs_base };
-	if (tmnum > 3)
-	{
-		logerror("draw_tilemapsprite_line Illegal tilemap number %d\n", tmnum);
-		return;
-	}
-	u32* regs = tmapregs[tmnum];
-
 	int scrolly = ((regs[0] & 0x0000ffff) >> 0) + 4;
 	int line = drawline + scrolly;
 	line &= 0x3ff;
@@ -1211,15 +1203,29 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			{
 				int tilemapnum = ((value3 & 0x00000030) >> 4);
 
-				/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
-				    which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
+				u32* tmapregs[4] = { m_tilemap20_regs_base, m_tilemap30_regs_base, m_tilemap40_regs_base, m_tilemap50_regs_base };
+
+				/* NOTE: 
+				   The startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom which probably means the fullscreen zoom need to be
+				   calculated for while rendering, not by scaling the framebuffer afterwards */
+
+				u32* regs = tmapregs[tilemapnum];
+
+				int tmap_yflip = (regs[1] & 0x00000400);
+			//	int tmap_xflip = (regs[1] & 0x00000800);
+
+				if (tmap_yflip)
+				{
+					printf("tilemap %d is y-flipped\n", tilemapnum);
+					continue;
+				}
 
 				for (int yy = 0; yy < ysizedraw2; yy++)
 				{
 					int cury_pos = to_s10(yy - (to_s10(ypos2) + to_s10(gscrolly)) - 19); // OK for sfiii Alex's stage, but not sure if hardware realy works this way
 
 					if (cury_pos >= m_renderbuffer_clip.top() && cury_pos <= m_renderbuffer_clip.bottom())
-						draw_tilemapsprite_line(tilemapnum, cury_pos, m_renderbuffer_bitmap, m_renderbuffer_clip);
+						draw_tilemapsprite_line(regs, cury_pos, m_renderbuffer_bitmap, m_renderbuffer_clip);
 				}
 			}
 			else

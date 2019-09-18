@@ -177,7 +177,7 @@ private:
 	void decrypt_bios();
 	void init_crypt(u32 key1, u32 key2, int altEncryption);
 	void set_mame_colours(int colournum, u16 data, u32 fadeval);
-	void draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void draw_tilemapsprite_line(u32* regs, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	u32 flashmain_r(int which, u32 offset, u32 mem_mask);
 	void flashmain_w(int which, u32 offset, u32 data, u32 mem_mask);
 	u32 process_byte( u8 real_byte, u32 destination, int max_length );
