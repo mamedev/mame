@@ -136,7 +136,6 @@ private:
 	u8 m_dr4;
 
 	util::fifo<u64, 512> m_fifo;
-	u32 m_ff[2];
 
 	std::unique_ptr<u32[]> m_vram;
 	std::unique_ptr<u32[]> m_dram;
