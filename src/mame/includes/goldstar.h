@@ -177,6 +177,7 @@ public:
 	void init_rp96sub();
 	void init_tcl();
 	void init_super7();
+	void init_chthree();
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -187,6 +188,7 @@ public:
 	void amcoe2(machine_config &config);
 	void amcoe1(machine_config &config);
 	void chryangl(machine_config &config);
+	void chthree(machine_config &config);
 	void amcoe1_portmap(address_map &map);
 	void amcoe2_portmap(address_map &map);
 	void cm_portmap(address_map &map);

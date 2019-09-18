@@ -8864,6 +8864,12 @@ void cmaster_state::chryangl(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
 }
 
+void cmaster_state::chthree(machine_config &config)
+{
+	cm(config);
+	// need new video hardware
+}
+
 void goldstar_state::cmast91(machine_config &config)
 {
 	/* basic machine hardware */
@@ -10361,6 +10367,41 @@ Notes:
       WF19054 = AY-3-8910 @ 1.5MHz [12/8]
       ?DIP40 - Maybe another 8255 or HD6845 or something else?
 */
+
+ROM_START( chthree )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.u40",   0x0000, 0x8000, CRC(3d677758) SHA1(d2d13e54d3b55460a05b0ca42e12d8a6d72954ba) )
+	ROM_IGNORE(0X8000)
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "7.u46",  0x00000, 0x10000, CRC(65e2e9e9) SHA1(3085aec35ac6d232fcf9be847ab4fcde586dd4f5) )
+	ROM_LOAD( "8.u47",  0x20000, 0x10000, CRC(0ec483a9) SHA1(55913f830ee310c2326f50af4527aeb63649e68d) )
+	ROM_LOAD( "9.u48",  0x10000, 0x10000, CRC(39f528f7) SHA1(29d31783afdb256cd9454c87170591d3f9c53665) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "3.u49",   0x0000, 0x2000, CRC(b541cbc0) SHA1(ab8666c06a71fa8364c71d14715ddf9e222064cd) )
+	ROM_LOAD( "4.u50",   0x2000, 0x2000, CRC(95ecd2aa) SHA1(73452c77dd83f96038d197bad5e37f0b3d9de561) )
+	ROM_LOAD( "5.u51",   0x4000, 0x2000, CRC(a99c87ba) SHA1(4d74ded22da25e093b09d0a4abfbd3e1eabd816c) )
+	ROM_LOAD( "6.u52",   0x6000, 0x2000, CRC(5b19025d) SHA1(8e861ed8249811fdf50de8ca9c44fe1176a7e340) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "2.u53",  0x0000, 0x10000, CRC(4124228a) SHA1(d1a6c98cac20ae49daaaa165ac9ccfaca14323b1) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u23", 0x0000, 0x0100, CRC(fdb15bef) SHA1(68c6539f5c9136e5f822dce86fcf3335e8c3874d) )
+	
+	ROM_REGION( 0x200, "proms2", 0 )
+	ROM_LOAD( "82s129.u35", 0x0000, 0x0100, CRC(fd90f7e6) SHA1(6bfa15ab2db8667e28277c9a5cd80ad3d5a0ea4d) ) 
+
+	ROM_REGION( 0x200, "unkprom", 0 )
+	ROM_LOAD( "82s129.u24", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+	
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "16l8_u18.bin", 0x0000, 0x117, NO_DUMP ) // dump binary conversion in progress
+	ROM_LOAD( "16l8_u31.bin", 0x0200, 0x117, CRC(ca21a99d) SHA1(e151de8fc7f79abc30f2858c9c99c9823255b8d4) )
+	ROM_LOAD( "16l8_u32.bin", 0x0400, 0x117, CRC(56284de7) SHA1(b73e4cb547a399a2183604f5a46a412487496292) )
+	ROM_LOAD( "16l8_u30.bin", 0x0600, 0x117, CRC(559422D5) SHA1(510EA9E90D4387D7F24E8A4061A7B33AE59A5D12) )
+ROM_END
 
 ROM_START( cmv4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -17671,6 +17712,38 @@ void wingco_state::init_luckylad()
 	}
 }
 
+void cmaster_state::init_chthree()
+{
+	// Address swapping in 0x10 bytes blocks.
+	// 01234567-89abcdef <> c9ba8dfe - 41320576
+ 
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t row; 
+	uint16_t addr;
+
+	for (int A = 0000; A < 0x8000; A++)
+	{
+		row = A & 0x07;
+		switch (row)
+		{
+			case 0x00:  addr = 0x0c;break;
+			case 0x01:  addr = 0x09;break;
+			case 0x02:  addr = 0x0b;break;
+			case 0x03:  addr = 0x0a;break;
+			case 0x04:  addr = 0x08;break;
+			case 0x05:  addr = 0x0d;break;
+			case 0x06:  addr = 0x0f;break;
+			case 0x07:  addr = 0x0e;break;
+		}
+		addr = (A & 0xfff0) | addr;
+		if(!BIT(A,3)) std::swap(ROM[A], ROM[addr]);
+	}
+	// Temporal hacks - PPI settings and checksum correction
+	ROM[0x1FF]=0xBD;
+	ROM[0x209]=0x9B;
+	ROM[0x20D]=0x9B;
+}
+
 /*********************************************
 *                Game Drivers                *
 **********************************************
@@ -17735,7 +17808,7 @@ GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrma
 GAME(  1999, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V512)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
-
+GAME(  199?, chthree,   cmaster,  chthree,  cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               MACHINE_NOT_WORKING)  // encrypted
 
 GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
