@@ -1014,12 +1014,21 @@ static inline int to_s10(int data)
 	return (data & 0x1ff) - (data & 0x200);
 }
 
-// the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
 void cps3_state::draw_tilemapsprite_line(u32* regs, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int scrolly = ((regs[0] & 0x0000ffff) >> 0) + 4;
-	int line = drawline + scrolly;
+	int line;
+	
+	int tmap_yflip = (regs[1] & 0x00000400); // sfiii2 loading screens (capcom background and title logo during flashing)
+	//int tmap_xflip = (regs[1] & 0x00000800); // warzard special moves
+
+	// might be better calculating the flip case by using different tileline / tilesubline instead? (is the -0x20 here due to the +! on tileline?)
+	if (tmap_yflip)
+		line = 0x3ff - 0x20 - (drawline + scrolly);
+	else
+		line = drawline + scrolly;
+	
 	line &= 0x3ff;
 
 	if (!(regs[1] & 0x00008000)) return;
@@ -1053,6 +1062,7 @@ void cps3_state::draw_tilemapsprite_line(u32* regs, int drawline, bitmap_rgb32 &
 
 	drawline &= 0x3ff;
 
+	// is this +4 safe?
 	if (drawline > cliprect.bottom() + 4) return;
 
 	clip.set(cliprect.left(), cliprect.right(), drawline, drawline);
@@ -1207,18 +1217,9 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 				/* NOTE: 
 				   The startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom which probably means the fullscreen zoom need to be
-				   calculated for while rendering, not by scaling the framebuffer afterwards */
+				   incorporated in the main rendering pass, not by scaling the framebuffer afterwards */
 
 				u32* regs = tmapregs[tilemapnum];
-
-				int tmap_yflip = (regs[1] & 0x00000400);
-			//	int tmap_xflip = (regs[1] & 0x00000800);
-
-				if (tmap_yflip)
-				{
-					printf("tilemap %d is y-flipped\n", tilemapnum);
-					continue;
-				}
 
 				for (int yy = 0; yy < ysizedraw2; yy++)
 				{
