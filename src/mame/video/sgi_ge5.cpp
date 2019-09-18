@@ -262,6 +262,7 @@ void sgi_ge5_device::execute_run()
 					// fifo read stall
 					m_state = READ;
 					m_icount = 0;
+					suspend(SUSPEND_REASON_TRIGGER, false);
 				}
 				else
 					m_bus = m_fifo_read();
