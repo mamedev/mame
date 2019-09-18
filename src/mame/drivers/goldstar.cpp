@@ -17717,31 +17717,31 @@ void cmaster_state::init_chthree()
 	// Address swapping in 0x10 bytes blocks.
 	// 01234567-89abcdef <> c9ba8dfe - 41320576
  
-	uint8_t *ROM = memregion("maincpu")->base();
+	const uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t row; 
 	uint16_t addr;
 
-	for (int A = 0000; A < 0x8000; A++)
+	for (int i = 0000; i < 0x8000; i++)
 	{
-		row = A & 0x07;
+		row = i & 0x07;
 		switch (row)
 		{
-			case 0x00:  addr = 0x0c;break;
-			case 0x01:  addr = 0x09;break;
-			case 0x02:  addr = 0x0b;break;
-			case 0x03:  addr = 0x0a;break;
-			case 0x04:  addr = 0x08;break;
-			case 0x05:  addr = 0x0d;break;
-			case 0x06:  addr = 0x0f;break;
-			case 0x07:  addr = 0x0e;break;
+			case 0x00:  addr = 0x0c; break;
+			case 0x01:  addr = 0x09; break;
+			case 0x02:  addr = 0x0b; break;
+			case 0x03:  addr = 0x0a; break;
+			case 0x04:  addr = 0x08; break;
+			case 0x05:  addr = 0x0d; break;
+			case 0x06:  addr = 0x0f; break;
+			case 0x07:  addr = 0x0e; break;
 		}
-		addr = (A & 0xfff0) | addr;
-		if(!BIT(A,3)) std::swap(ROM[A], ROM[addr]);
+		addr = (i & 0xfff0) | addr;
+		if(!BIT(i, 3)) std::swap(ROM[i], ROM[addr]);
 	}
-	// Temporal hacks - PPI settings and checksum correction
-	ROM[0x1FF]=0xBD;
-	ROM[0x209]=0x9B;
-	ROM[0x20D]=0x9B;
+	// Temporary hacks - PPI settings and checksum correction
+	ROM[0x1ff]=0xbd;
+	ROM[0x209]=0x9b;
+	ROM[0x20d]=0x9b;
 }
 
 /*********************************************
