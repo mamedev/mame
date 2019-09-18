@@ -6,9 +6,9 @@
     <software name="avpext">
         <description>Aliens Versus Predator: Extinction (Europe)</description>
         <year>2003</year>
-        <publisher>Fox Interactive</publisher> <!-- Distributed by Electronic Arts -->
+        <publisher>Fox Interactive</publisher>        <!-- Distributed by Electronic Arts -->
         <info name="serial" value="SLES-51792, SLES-51792#"/>
-		<info name="release" value="20030806"/>
+        <info name="release" value="20030806"/>
         <info name="ring_code" value="Sony DADC   A0100471852-0101   38"/>
         <info name="barcode" value="5 030930 034269, 5 030945 034261"/>
         <part interface="cdrom" name="cdrom">
@@ -23,7 +23,7 @@
         <year>2001</year>
         <publisher>Infogrames</publisher>
         <info name="serial" value="SLES-50185"/>
-		<info name="release" value="20010919"/>
+        <info name="release" value="20010919"/>
         <info name="ring_code" value="Sony DADC   A0100380707-A511   17, Sony DADC   A0100380707-A511   28"/>
         <info name="barcode" value="3 546430 016039, 3 546430 016077"/>
         <part interface="cdrom" name="dvdrom">
@@ -38,8 +38,8 @@
         <year>2002</year>
         <publisher>Capcom</publisher>
         <info name="serial" value="SLPM 65124"/>
-		<info name="release" value="20020822"/>
-		<info name="alt_title" value="アウトモデリスタ"/>
+        <info name="release" value="20020822"/>
+        <info name="alt_title" value="アウトモデリスタ"/>
         <info name="ring_code" value="SLPM-65124   1, SLPM-65124   2"/>
         <info name="barcode" value="4 976219 754200"/>
         <part interface="cdrom" name="dvdrom">
@@ -68,7 +68,7 @@
         <year>2005</year>
         <publisher>Sony Computer Entertainment</publisher>
         <info name="serial" value="SCES-51719, SCES-51719 ANZ/P, SCES-51719/ANZ, SCES-51719/GER, SCES-51719/P, SCES-51719/P/GER#, SCES-51719/PR"/>
-		<info name="release" value="20050309"/>
+        <info name="release" value="20050309"/>
         <info name="ring_code_l0" value="Sony DADC   A0100586872-A911   17, Sony DADC   A0100586872-A911   37, Sony DADC   A0100586872-A911   56"/>
         <info name="ring_code_l1" value="Sony DADC   A0100586872-B911   37, Sony DADC   A0100586872-B911   47, Sony DADC   A0100586872-B911   67"/>
         <info name="barcode" value="7 11719 61735 8, 7 11719 65611 1, 7 11719 65621 0, 7 11719 65631 9, 7 11719 65631 9, 7 11719 65671 5, 7 11719 65681 4, 7 11719 69016 0, 7 11719 69036 8, 7 11719 69056 6, 7 11719 69096 2"/>
@@ -84,7 +84,7 @@
         <year>2003</year>
         <publisher>Sony Computer Entertainment</publisher>
         <info name="serial" value="SCES-51164"/>
-		<info name="release" value="20030314"/>
+        <info name="release" value="20030314"/>
         <info name="ring_code" value="Sony DADC   A0100450440-A511   17"/>
         <info name="barcode" value="7 11719 43542 6"/>
         <part interface="cdrom" name="dvdrom">
@@ -99,7 +99,7 @@
         <year>2004</year>
         <publisher>Activision</publisher>
         <info name="serial" value="SLES-52289"/>
-		<info name="release" value="20040326"/>
+        <info name="release" value="20040326"/>
         <info name="ring_code" value="Sony DADC   A0100512941-A511   17"/>
         <info name="barcode" value="5 030917 022432"/>
         <part interface="cdrom" name="dvdrom">
