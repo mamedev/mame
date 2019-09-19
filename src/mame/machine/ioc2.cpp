@@ -759,3 +759,10 @@ WRITE_LINE_MEMBER(ioc2_device::enet_int_w)
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_ETHERNET);
 }
 
+WRITE_LINE_MEMBER(ioc2_device::video_int_w)
+{
+	if (state)
+		raise_local_irq(1, ioc2_device::INT3_LOCAL1_VIDEO);
+	else
+		lower_local_irq(1, ioc2_device::INT3_LOCAL1_VIDEO);
+}
