@@ -540,8 +540,8 @@ void mycom_state::mycom(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mycom);
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
-	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
-	MC6845(config, m_crtc, 1008000);
+	The start registers need to be readable. */
+	MC6845_1(config, m_crtc, 1008000);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
