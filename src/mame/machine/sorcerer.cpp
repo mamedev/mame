@@ -42,7 +42,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		sorcerer_reset(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in sorcerer_state::device_timer");
+		throw emu_fatalerror("Unknown id in sorcerer_state::device_timer");
 	}
 }
 

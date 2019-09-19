@@ -1038,7 +1038,8 @@ void ymf278b_device::device_start()
 	/* stream system initialize */
 	int ymf262_clock = clock() / (19/8.0);
 	m_ymf262 = ymf262_init(this, ymf262_clock, ymf262_clock / 288);
-	assert_always(m_ymf262 != nullptr, "Error creating YMF262 chip");
+	if (!m_ymf262)
+		throw emu_fatalerror("ymf278b_device(%s): Error creating YMF262 chip", tag());
 
 	m_stream_ymf262 = machine().sound().stream_alloc(*this, 0, 4, ymf262_clock / 288);
 

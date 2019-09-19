@@ -55,7 +55,7 @@ void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_upd71059c->ir1_w(1);
 		break;
 	default:
-		assert_always(false, "Unknown id in m92_state::device_timer");
+		throw emu_fatalerror("Unknown id in m92_state::device_timer");
 	}
 }
 

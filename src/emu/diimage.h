@@ -243,7 +243,7 @@ protected:
 
 	void clear_error();
 
-	void check_for_file() const { assert_always(m_file, "Illegal operation on unmounted image"); }
+	void check_for_file() const { if (!m_file) throw emu_fatalerror("%s(%s): Illegal operation on unmounted image", device().shortname(), device().tag()); }
 
 	void setup_working_directory();
 	bool try_change_working_directory(const std::string &subdir);

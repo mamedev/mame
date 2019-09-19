@@ -1577,16 +1577,14 @@ READ32_MEMBER(gba_lcd_device::video_r)
 		break;
 	}
 
-	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_lcd_device");
+	if (offset >= ARRAY_LENGTH(reg_names) / 2)
+		throw emu_fatalerror("gba_lcd_device::video_r: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)
-	{
 		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2], retval & 0x0000ffff);
-	}
+
 	if (ACCESSING_BITS_16_31)
-	{
 		verboselog(*this, 2, "GBA I/O Read: %s = %04x\n", reg_names[offset * 2 + 1], (retval & 0xffff0000) >> 16);
-	}
 
 	return retval;
 }
@@ -1595,16 +1593,14 @@ WRITE32_MEMBER(gba_lcd_device::video_w)
 {
 	COMBINE_DATA(&m_regs[offset]);
 
-	assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_lcd_device");
+	if (offset >= ARRAY_LENGTH(reg_names) / 2)
+		throw emu_fatalerror("gba_lcd_device::video_w: Not enough register names in gba_lcd_device");
 
 	if (ACCESSING_BITS_0_15)
-	{
 		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2], data & 0x0000ffff);
-	}
+
 	if (ACCESSING_BITS_16_31)
-	{
 		verboselog(*this, 2, "GBA I/O Write: %s = %04x\n", reg_names[offset * 2 + 1], (data & 0xffff0000) >> 16);
-	}
 
 	switch (offset)
 	{

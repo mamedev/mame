@@ -114,6 +114,8 @@
 #include "jclub2o.lh"
 #include "jclub2.lh"
 
+namespace {
+
 // Common between all hardware (jclub2o, jclub2 and darkhors)
 class common_state : public driver_device
 {
@@ -235,6 +237,14 @@ public:
 		m_gfxdecode(*this,   "gfxdecode")
 	{ }
 
+	void init_darkhors();
+
+	void darkhors(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE32_MEMBER(input_sel_w);
 	DECLARE_READ32_MEMBER(input_r);
 	DECLARE_WRITE32_MEMBER(out1_w);
@@ -248,12 +258,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void init_darkhors();
-	DECLARE_VIDEO_START(darkhors);
-
-	void darkhors(machine_config &config);
 	void darkhors_map(address_map &map);
-private:
+
 	required_shared_ptr<uint32_t> m_tmapram;
 	required_shared_ptr<uint32_t> m_tmapscroll;
 	required_shared_ptr<uint32_t> m_tmapram2;
@@ -391,8 +397,10 @@ void darkhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-VIDEO_START_MEMBER(darkhors_state,darkhors)
+void darkhors_state::video_start()
 {
+	common_state::video_start();
+
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	m_tmap->set_transparent_pen(0);
@@ -1232,7 +1240,6 @@ void darkhors_state::darkhors(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darkhors);
-	MCFG_VIDEO_START_OVERRIDE(darkhors_state, darkhors)
 
 	// layout
 	config.set_default_layout(layout_jclub2);
@@ -1530,6 +1537,8 @@ void darkhors_state::init_darkhors()
 		memcpy(eeprom, &temp[0], len);
 	}
 }
+
+} // anonymous namespace
 
 
 // Older hardware (ST-0020 + ST-0016)

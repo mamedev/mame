@@ -74,7 +74,7 @@ void parodius_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in parodius_state::device_timer");
+		throw emu_fatalerror("Unknown id in parodius_state::device_timer");
 	}
 }
 

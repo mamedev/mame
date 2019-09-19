@@ -196,7 +196,7 @@ static void write_m2_reg(uint32_t &reg, uint32_t data, m2_reg_wmode mode)
 		case REG_SET:   reg |= data;    break;
 		case REG_CLEAR: reg &= ~data;   break;
 		default:
-			assert_always(false, "Bad register write mode");
+			throw emu_fatalerror("write_m2_reg: Bad register write mode");
 	}
 }
 
@@ -1605,7 +1605,7 @@ void m2_cde_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			break;
 
 		default:
-			assert_always(false, "Unknown CDE timer ID");
+			throw emu_fatalerror("m2_cde_device::device_timer: Unknown CDE timer ID");
 	}
 }
 
@@ -1947,7 +1947,7 @@ void m2_cde_device::start_dma(uint32_t ch)
 	if (dma_ch.m_cntl & CDE_DMA_DIRECTION)
 	{
 		// PowerBus to BioBus
-		assert_always(false, "CDE PowerBus to BioBus DMA currently unsupported");
+		throw emu_fatalerror("m2_cde_device::start_dma: CDE PowerBus to BioBus DMA currently unsupported");
 	}
 	else
 	{

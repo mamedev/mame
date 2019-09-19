@@ -1754,7 +1754,7 @@ void aristmk4_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_POWER_FAIL: power_fail(); break;
-	default: assert_always(false, "Unknown id in aristmk4_state::device_timer");
+	default: throw emu_fatalerror("Unknown id in aristmk4_state::device_timer");
 	}
 }
 

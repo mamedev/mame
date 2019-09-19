@@ -157,7 +157,7 @@ void slapshot_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(6, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in slapshot_state::device_timer");
+		throw emu_fatalerror("Unknown id in slapshot_state::device_timer");
 	}
 }
 

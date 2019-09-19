@@ -91,7 +91,8 @@ void ym2612_device::device_start()
 
 	/**** initialize YM2612 ****/
 	m_chip = ym2612_init(this,clock(),rate,&ym2612_device::static_timer_handler,&ym2612_device::static_irq_handler);
-	assert_always(m_chip != nullptr, "Error creating YM2612 chip");
+	if (!m_chip)
+		throw emu_fatalerror("ym2612_device(%s): Error creating YM2612 chip", tag());
 }
 
 void ym2612_device::device_clock_changed()

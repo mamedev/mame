@@ -544,9 +544,10 @@ inline void drcbe_x64::normalize_commutative(be_parameter &inner, be_parameter &
 
 inline int32_t drcbe_x64::offset_from_rbp(const void *ptr)
 {
-	int64_t delta = reinterpret_cast<uint8_t *>(const_cast<void *>(ptr)) - m_rbpvalue;
-	assert_always((int32_t)delta == delta, "offset_from_rbp: delta out of range");
-	return (int32_t)delta;
+	const int64_t delta = reinterpret_cast<const uint8_t *>(ptr) - m_rbpvalue;
+	if (int32_t(delta) != delta)
+		throw emu_fatalerror("drcbe_x64::offset_from_rbp: delta out of range");
+	return int32_t(delta);
 }
 
 
@@ -558,7 +559,7 @@ inline int32_t drcbe_x64::offset_from_rbp(const void *ptr)
 
 inline int drcbe_x64::get_base_register_and_offset(x86code *&dst, void *target, uint8_t reg, int32_t &offset)
 {
-	int64_t delta = (uint8_t *)target - m_rbpvalue;
+	const int64_t delta = reinterpret_cast<uint8_t *>(target) - m_rbpvalue;
 	if (short_immediate(delta))
 	{
 		offset = delta;
@@ -567,7 +568,7 @@ inline int drcbe_x64::get_base_register_and_offset(x86code *&dst, void *target, 
 	else
 	{
 		offset = 0;
-		emit_mov_r64_imm(dst, reg, (uintptr_t)target);                                       // mov   reg,target
+		emit_mov_r64_imm(dst, reg, uintptr_t(target));                                       // mov   reg,target
 		return reg;
 	}
 }
@@ -580,12 +581,12 @@ inline int drcbe_x64::get_base_register_and_offset(x86code *&dst, void *target, 
 
 inline void drcbe_x64::emit_smart_call_r64(x86code *&dst, x86code *target, uint8_t reg)
 {
-	int64_t delta = target - (dst + 5);
+	const int64_t delta = target - (dst + 5);
 	if (short_immediate(delta))
 		emit_call(dst, target);                                                         // call  target
 	else
 	{
-		emit_mov_r64_imm(dst, reg, (uintptr_t)target);                                       // mov   reg,target
+		emit_mov_r64_imm(dst, reg, uintptr_t(target));                                  // mov   reg,target
 		emit_call_r64(dst, reg);                                                        // call  reg
 	}
 }
@@ -598,7 +599,7 @@ inline void drcbe_x64::emit_smart_call_r64(x86code *&dst, x86code *target, uint8
 
 inline void drcbe_x64::emit_smart_call_m64(x86code *&dst, x86code **target)
 {
-	int64_t delta = *target - (dst + 5);
+	const int64_t delta = *target - (dst + 5);
 	if (short_immediate(delta))
 		emit_call(dst, *target);                                                        // call  *target
 	else

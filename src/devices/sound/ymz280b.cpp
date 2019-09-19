@@ -636,7 +636,7 @@ void ymz280b_device::device_reset()
 	m_ext_mem_address = 0;
 
 	/* clear other voice parameters */
-	for (auto & elem : m_voice)
+	for (auto &elem : m_voice)
 	{
 		struct YMZ280BVoice *voice = &elem;
 
@@ -653,7 +653,7 @@ void ymz280b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	if (id < 8)
 		update_irq_state_timer_common( id );
 	else
-		assert_always(false, "Unknown id in ymz280b_device::device_timer");
+		throw emu_fatalerror("Unknown id in ymz280b_device::device_timer");
 }
 
 

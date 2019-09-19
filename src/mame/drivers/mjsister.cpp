@@ -212,7 +212,7 @@ void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		dac_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in mjsister_state::device_timer");
+		throw emu_fatalerror("Unknown id in mjsister_state::device_timer");
 	}
 }
 

@@ -262,7 +262,7 @@ void astinvad_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		kamizake_int_gen(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in astinvad_state::device_timer");
+		throw emu_fatalerror("Unknown id in astinvad_state::device_timer");
 	}
 }
 

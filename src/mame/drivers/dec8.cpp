@@ -149,7 +149,7 @@ void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in dec8_state::device_timer");
+		throw emu_fatalerror("Unknown id in dec8_state::device_timer");
 	}
 }
 

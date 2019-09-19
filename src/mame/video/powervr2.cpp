@@ -1486,7 +1486,7 @@ WRITE32_MEMBER( powervr2_device::ta_list_init_w )
 				}
 
 		if (grabsel < 0)
-			assert_always(0, "TA grabber error B!\n");
+			throw emu_fatalerror("powervr2_device::ta_list_init_w: TA grabber error B!");
 		grabsellast=grabsel;
 		grab[grabsel].ispbase=ta_isp_base;
 		grab[grabsel].busy=0;

@@ -207,7 +207,7 @@ void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		update_irq_state();
 		break;
 	default:
-		assert_always(false, "Unknown id in metro_state::device_timer");
+		throw emu_fatalerror("Unknown id in metro_state::device_timer");
 	}
 }
 

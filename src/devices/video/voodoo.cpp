@@ -5751,7 +5751,8 @@ voodoo_device::raster_info *voodoo_device::add_rasterizer(voodoo_device *vd, con
 	raster_info *info = &vd->rasterizer[vd->next_rasterizer++];
 	int hash = cinfo->compute_hash();
 
-	assert_always(vd->next_rasterizer <= MAX_RASTERIZERS, "Out of space for new rasterizers!");
+	if (vd->next_rasterizer > MAX_RASTERIZERS)
+		throw emu_fatalerror("voodoo_device::add_rasterizer: Out of space for new rasterizers!");
 
 	/* make a copy of the info */
 	*info = *cinfo;

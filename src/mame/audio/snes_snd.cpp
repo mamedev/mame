@@ -240,10 +240,7 @@ inline void snes_sound_device::update_timer_tick(u8 which)
 void snes_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id != TIMER_TICK_ID)
-	{
-		assert_always(false, "Unknown id in snes_sound_device::device_timer");
-		return;
-	}
+		throw emu_fatalerror("Unknown id in snes_sound_device::device_timer");
 
 	for (int ch = 0; ch < 3; ch++)
 		update_timer_tick(ch);

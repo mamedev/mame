@@ -625,7 +625,8 @@ bool device_image_interface::support_command_line_image_creation() const
 
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
-	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	if (!buffer || (length <= 0))
+		throw emu_fatalerror("device_image_interface::battery_load: Must specify sensical buffer/length");
 
 	osd_file::error filerr;
 	int bytes_read = 0;
@@ -643,7 +644,8 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 
 void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
 {
-	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	if (!buffer || (length <= 0))
+		throw emu_fatalerror("device_image_interface::battery_load: Must specify sensical buffer/length");
 
 	osd_file::error filerr;
 	int bytes_read = 0;
@@ -670,7 +672,8 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 
 void device_image_interface::battery_save(const void *buffer, int length)
 {
-	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	if (!buffer || (length <= 0))
+		throw emu_fatalerror("device_image_interface::battery_save: Must specify sensical buffer/length");
 
 	if (!device().machine().options().nvram_save())
 		return;

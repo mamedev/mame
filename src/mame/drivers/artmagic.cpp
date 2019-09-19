@@ -128,7 +128,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		update_irq_state();
 		break;
 	default:
-		assert_always(false, "Unknown id in artmagic_state::device_timer");
+		throw emu_fatalerror("Unknown id in artmagic_state::device_timer");
 	}
 }
 

@@ -175,7 +175,7 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_hd63450->drq3_w(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in x68k_state::device_timer");
+		throw emu_fatalerror("Unknown id in x68k_state::device_timer");
 	}
 }
 

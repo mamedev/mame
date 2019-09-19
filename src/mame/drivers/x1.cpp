@@ -2153,7 +2153,7 @@ static const gfx_layout x1_pcg_8x8 =
 	8*8
 };
 
-MACHINE_START_MEMBER(x1_state,x1)
+void x1_state::machine_start()
 {
 	/* set up RTC */
 	{
@@ -2217,7 +2217,6 @@ void x1_state::x1(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
 	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
 
-	MCFG_MACHINE_START_OVERRIDE(x1_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)
 
 	/* video hardware */
@@ -2236,8 +2235,6 @@ void x1_state::x1(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK, 0x10+0x1000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
-
-	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
 	MB8877(config, m_fdc, MAIN_CLOCK / 16);
 	// TODO: guesswork, try to implicitly start the motor
