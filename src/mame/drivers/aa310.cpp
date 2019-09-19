@@ -198,7 +198,7 @@ void aa310_state::aa310_mem(address_map &map)
 	map(0x00000000, 0x01ffffff).rw(FUNC(aa310_state::archimedes_memc_logical_r), FUNC(aa310_state::archimedes_memc_logical_w));
 	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	map(0x03000000, 0x033fffff).rw(FUNC(aa310_state::archimedes_ioc_r), FUNC(aa310_state::archimedes_ioc_w));
-	map(0x03400000, 0x035fffff).rom().region("extension", 0x000000).w(FUNC(aa310_state::archimedes_vidc_w));
+	map(0x03400000, 0x035fffff).rom().region("extension", 0x000000).w(m_vidc, FUNC(acorn_vidc10_device::write));
 	map(0x03600000, 0x037fffff).rom().region("extension", 0x200000).w(FUNC(aa310_state::archimedes_memc_w));
 	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(FUNC(aa310_state::archimedes_memc_page_w));
 }
@@ -428,12 +428,9 @@ void aa310_state::aa310(machine_config &config)
 
 	I2CMEM(config, "i2cmem", 0).set_data_size(0x100);
 
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 735, 624/2, 0, 292); // RiscOS 3 default screen settings
-	m_screen->set_screen_update(FUNC(archimedes_state::screen_update));
-
-	PALETTE(config, m_palette).set_entries(32768);
+	ACORN_VIDC10(config, m_vidc, 0);
+	m_vidc->vblank().set(FUNC(aa310_state::vblank_irq));
+	m_vidc->sound_drq().set(FUNC(aa310_state::sound_drq));
 
 	RAM(config, m_ram).set_default_size("1M");
 
@@ -447,21 +444,6 @@ void aa310_state::aa310(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", aa310_floppies, nullptr, aa310_state::floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("archimedes");
-
-	SPEAKER(config, "speaker").front_center();
-	for (int i = 0; i < 8; i++)
-	{
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, "speaker", 0.1); // unknown DAC
-	}
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac7", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Expansion slots - 2-card backplane */
 }
@@ -546,7 +528,9 @@ void aa310_state::aa4(machine_config &config)
 	m_maincpu->set_clock(24_MHz_XTAL); // ARM3
 
 	/* video hardware */
-	m_screen->set_type(SCREEN_TYPE_LCD);
+	ACORN_VIDC10_LCD(config.replace(), m_vidc, 0);
+	m_vidc->vblank().set(FUNC(aa310_state::vblank_irq));
+	m_vidc->sound_drq().set(FUNC(aa310_state::sound_drq));
 
 	/* 765 FDC */
 
@@ -619,7 +603,7 @@ ROM_START( aa305 )
 	ROMX_LOAD( "0276,148-01.ic26", 0x000002, 0x10000, CRC(1ab02f2d) SHA1(dd7d216967524e64d1a03076a6081461ec8528c3), ROM_BIOS(8) | ROM_SKIP(3) )
 	ROMX_LOAD( "0276,149-01.ic27", 0x000003, 0x10000, CRC(5fd6a406) SHA1(790af8a4c74d0f6714d528f7502443ce5898a618), ROM_BIOS(8) | ROM_SKIP(3) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
@@ -663,7 +647,7 @@ ROM_START( aa3000 )
 	ROM_SYSTEM_BIOS( 5, "319", "RISC OS 3.19 (09 Jun 1993)" ) // Parts 0296,241-01, 0296,242-01, 0296,243-01, 0296,244-01,
 	ROMX_LOAD( "riscos319.bin", 0x000000, 0x200000, CRC(00c7a3d3) SHA1(be7a8cba5d6c6c0e1c4838712524056cf4b8c8cb), ROM_BIOS(5) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
@@ -700,7 +684,7 @@ ROM_START( aa5000 )
 	ROM_SYSTEM_BIOS( 3, "319", "RISC OS 3.19 (09 Jun 1993)" ) // Parts 0296,241-01, 0296,242-01, 0296,243-01, 0296,244-01,
 	ROMX_LOAD( "riscos319.bin", 0x000000, 0x200000, CRC(00c7a3d3) SHA1(be7a8cba5d6c6c0e1c4838712524056cf4b8c8cb), ROM_BIOS(3) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
@@ -714,7 +698,7 @@ ROM_START( aa4 )
 	ROM_LOAD32_WORD( "0296,061-01.ic4",  0x000000, 0x100000, CRC(b77fe215) SHA1(57b19ea4b97a9b6a240aa61211c2c134cb295aa0) )
 	ROM_LOAD32_WORD( "0296,062-01.ic15", 0x000002, 0x100000, CRC(d42e196e) SHA1(64243d39d1bca38b10761f66a8042c883bde87a4) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 	/* Power Management */
 	ROM_LOAD32_BYTE( "0296,063-01.ic38", 0x000003, 0x010000, CRC(9ca3a6be) SHA1(75905b031f49960605d55c3e7350d309559ed440) )
@@ -728,7 +712,7 @@ ROM_START( aa3010 )
 	ROM_LOAD32_WORD( "0296,061-02.ic17", 0x000000, 0x100000, CRC(552fc3aa) SHA1(b2f1911e53d7377f2e69e1a870139745d3df494b) )
 	ROM_LOAD32_WORD( "0296,062-02.ic18", 0x000002, 0x100000, CRC(308d5a4a) SHA1(b309e1dd85670a06d77ec504dbbec6c42336329f) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+	
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
