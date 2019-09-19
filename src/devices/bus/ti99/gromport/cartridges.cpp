@@ -1514,7 +1514,8 @@ void ti99_cartridge_device::rpk::close()
 		if (socket.second->persistent_ram())
 		{
 			// try to open the battery file and write it if possible
-			assert_always(socket.second->get_contents() && (socket.second->get_content_length() > 0), "Buffer is null or length is 0");
+			if (!socket.second->get_contents() || (socket.second->get_content_length() <= 0))
+				throw emu_fatalerror("ti99_cartridge_device::rpk::close: Buffer is null or length is 0");
 
 			emu_file file(m_options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			osd_file::error filerr = file.open(socket.second->get_pathname());
@@ -1699,12 +1700,13 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 			LOGMASKED(LOG_RPK, "[RPK handler] Loading NVRAM contents from '%s'\n", ram_pname.c_str());
 
 			// Load the NVRAM contents
-			int bytes_read = 0;
-			assert_always(contents && (length > 0), "Buffer is null or length is 0");
+			if (!contents || (length <= 0))
+				throw emu_fatalerror("ti99_cartridge_device::rpk_reader::load_ram_resource: Buffer is null or length is 0");
 
 			// try to open the battery file and read it if possible
 			emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
 			osd_file::error filerr = file.open(ram_pname);
+			int bytes_read = 0;
 			if (filerr == osd_file::error::NONE)
 				bytes_read = file.read(contents, length);
 

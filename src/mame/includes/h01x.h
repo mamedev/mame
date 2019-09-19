@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "screen.h"
 #include "speaker.h"
 #include "emupal.h"

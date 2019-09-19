@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-/*  Namco System NA1 / 2 Video Hardware */
+/*  Namco System NA1/2 Video Hardware */
 
 /*
 Notes:
