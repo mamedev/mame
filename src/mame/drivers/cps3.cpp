@@ -15,10 +15,6 @@ SCSI code by ElSemi
 
 Known Issues:
 
-Tilemap Global X/Y flip not emulated
-    Street Fighter 3 2nd Impact uses Y-flipped tilemaps during flashing.
-    Warzard uses X-flipped tilemaps during special effects.
-
 Whole screen flip not emulated
 
 Miscellaneous TO-DOs:
@@ -583,8 +579,6 @@ Hardware registers info
 
 #include "sfiii2.lh"
 
-#define MASTER_CLOCK    42954500
-
 #define DEBUG_PRINTF 0
 
 
@@ -765,17 +759,24 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 								if (c != transparent_color)
 								{
 									/* blending isn't 100% understood */
-									// is it really ORed or bits should be replaced same as in Seta/SSV hardware ?
+									// is it really ORed or bits should be replaced same as in Seta/SSV hardware ? both produce same results in games
 									if (gfx->granularity() == 64)
 									{
-										// OK for sfiii2 spotlight
+										// OK for sfiii world map spotlight
+#if 1
 										dest[x] |= (c & 0xf) << 13;
-										//if (c & 0xf0) dest[x] = machine().rand(); // ?? not used?
+#else
+										dest[x] = (dest[x] & 0x01fff) | ((c & 0xf) << 13);
+#endif
 									}
 									else
 									{
 										// OK for jojo intro, and warzard swords, and various shadows in sf games
+#if 1
 										dest[x] |= ((c & 1) << 15) | ((color & 1) << 16);
+#else
+										dest[x] = (dest[x] & 0x07fff) | ((c & 1) << 15) | ((color & 1) << 16);
+#endif
 									}
 								}
 								x_index += dx;
@@ -891,8 +892,7 @@ void cps3_state::init_crypt(u32 key1, u32 key2, int altEncryption)
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY);
 	m_maincpu->sh2drc_add_fastram(0x02000000, 0x0207ffff, 0, &m_mainram[0]);
 	m_maincpu->sh2drc_add_fastram(0x04000000, 0x0407ffff, 0, &m_spriteram[0]);
-	m_maincpu->sh2drc_add_fastram(0x040C0020, 0x040C002b, 0, &m_tilemap20_regs_base[0]);
-	m_maincpu->sh2drc_add_fastram(0x040C0030, 0x040C003b, 0, &m_tilemap30_regs_base[0]);
+	m_maincpu->sh2drc_add_fastram(0x040C0020, 0x040C005f, 0, &m_tilemap_regs[0]);
 
 	decrypt_bios();
 }
@@ -1009,75 +1009,54 @@ void cps3_state::video_start()
 	save_pointer(NAME(m_spritelist), 0x80000/4);
 }
 
-static inline int to_s10(int data)
+void cps3_state::draw_tilemapsprite_line(u32 *regs, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return (data & 0x1ff) - (data & 0x200);
-}
+	if (!(regs[1] & 0x00008000)) return;
 
-// the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
+	int scrollx =            (regs[0] & 0xffff0000) >> 16;
+	int scrolly =            (regs[0] & 0x0000ffff) >> 0;
+	bool linescroll_enable = (regs[1] & 0x00004000) >> 14;
+	int global_flip_x =      (regs[1] & 0x00000800) >> 11; // warzard special moves
+	int global_flip_y =      (regs[1] & 0x00000400) >> 10; // sfiii2 loading screens (capcom background and title logo during flashing)
+	u32 linebase =           (regs[2] & 0x7f000000) >> 24;
+	u32 mapbase =            (regs[2] & 0x007f0000) >> 16;
 
-void cps3_state::draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	u32* tmapregs[4] = { m_tilemap20_regs_base, m_tilemap30_regs_base, m_tilemap40_regs_base, m_tilemap50_regs_base };
-	if (tmnum > 3)
-	{
-		logerror("draw_tilemapsprite_line Illegal tilemap number %d\n", tmnum);
-		return;
-	}
-	u32* regs = tmapregs[tmnum];
+	mapbase <<= 10;
+	linebase <<= 10;
+	scrolly += 4;
 
-	int scrolly = ((regs[0] & 0x0000ffff) >> 0) + 4;
 	int line = drawline + scrolly;
 	line &= 0x3ff;
 
-	if (!(regs[1] & 0x00008000)) return;
+	if (global_flip_y) line ^= 0x3ff;	// these probably needs compensation of our scrolly and tileline tweaks, but it's fine for sfiii2.
+	int xflip_mask = (global_flip_x) ? 0x3f : 0;
 
-	u32 mapbase = (regs[2] & 0x007f0000) >> 16;
-	u32 linebase = (regs[2] & 0x7f000000) >> 24;
-	int linescroll_enable = (regs[1] & 0x00004000);
-
-	int scrollx;
 	int tileline = (line / 16) + 1;
 	int tilesubline = line % 16;
-	rectangle clip;
 
-	mapbase = mapbase << 10;
-	linebase = linebase << 10;
-
-	if (!linescroll_enable)
-	{
-		scrollx = (regs[0] & 0xffff0000) >> 16;
-	}
-	else
-	{
-		//logerror("linebase %08x\n", linebase);
-
-		scrollx = (regs[0] & 0xffff0000) >> 16;
+	if (linescroll_enable)
 		scrollx += (m_spriteram[linebase + ((line + 16 - 4) & 0x3ff)] >> 16) & 0x3ff;
 
-	}
-
-	//zoombase = (layerregs[1] & 0xffff0000)>>16;
-
-	drawline &= 0x3ff;
-
-	if (drawline > cliprect.bottom() + 4) return;
-
-	clip.set(cliprect.left(), cliprect.right(), drawline, drawline);
+	rectangle clip(cliprect.left(), cliprect.right(), drawline, drawline);
 
 	for (int x = cliprect.left() / 16; x < (cliprect.right() / 16) + 2; x++)
 	{
-		u32 const dat = m_spriteram[mapbase + ((tileline & 63) * 64) + ((x + scrollx / 16) & 63)];
+		u32 const dat = m_spriteram[mapbase + ((tileline & 63) * 64) + (((x + scrollx / 16) & 63) ^ xflip_mask)];
 		u32 const tileno = (dat & 0xfffe0000) >> 17;
-		bool const xflip = (dat & 0x00001000) >> 12;
+		//u32 tilenoH =    (dat & 0x00008000) >> 15; // games put here tile number's bit 16, probably for (unreleased) mobos with expanded to 16Mbyte character RAM
+		int xflip =        (dat & 0x00001000) >> 12;
 		bool const yflip = (dat & 0x00000800) >> 11;
+		bool const alpha = (dat & 0x00000400) >> 10; // enabled at jojo's "country town" and "in air plane" stages, but associated tile is empty - shadowing have no effect, why ?
 		bool const bpp =   (dat & 0x00000200) >> 9;
 		u32 const colour = (dat & 0x000001ff) >> 0;
 
-		if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
-		else m_gfxdecode->gfx(1)->set_granularity(64);
+		int trans = alpha ? CPS3_TRANSPARENCY_PEN_INDEX_BLEND : CPS3_TRANSPARENCY_PEN_INDEX;
 
-		cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(1), tileno, colour, xflip, yflip, (x * 16) - scrollx % 16, drawline - tilesubline, CPS3_TRANSPARENCY_PEN_INDEX, 0, 0x10000, 0x10000);
+		m_gfxdecode->gfx(1)->set_granularity(bpp ? 64 : 256);
+
+		xflip ^= xflip_mask & 1;
+
+		cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(1), tileno, colour, xflip, yflip, (x * 16) - scrollx % 16, drawline - tilesubline, trans, 0, 0x10000, 0x10000);
 	}
 }
 
@@ -1102,8 +1081,8 @@ void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, cons
 			u16 data = m_ss_ram[offset] | (m_ss_ram[offset + 1] << 8) ;
 			u32 tile =  (data & 0x01ff) >> 0;
 			int pal =   (data & 0x3e00) >> 9;
-			int flipy = (data & 0x4000) >> 14; // 
-			int flipx = (data & 0x8000) >> 15; // is this right or should be vice versa ?
+			int flipy = (data & 0x4000) >> 14;
+			int flipx = (data & 0x8000) >> 15;
 			pal += m_ss_pal_base << 5;
 
 			cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000);
@@ -1167,13 +1146,13 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		bool const whichpal =     (m_spritelist[i + 2] & 0x20000000) >> 29;
 		u8 const global_xflip =   (m_spritelist[i + 2] & 0x10000000) >> 28;
 		u8 const global_yflip =   (m_spritelist[i + 2] & 0x08000000) >> 27;
-		bool const global_alpha = (m_spritelist[i + 2] & 0x04000000) >> 26; // alpha / shadow? set on sfiii2 shadows, and big black image in jojo intro
+		bool const global_alpha = (m_spritelist[i + 2] & 0x04000000) >> 26; // all games except warzard
 		bool const global_bpp =   (m_spritelist[i + 2] & 0x02000000) >> 25;
 		u32 const global_pal =    (m_spritelist[i + 2] & 0x01ff0000) >> 16;
 		//int const tilemapnum =  (m_spritelist[i + 2] & 0x00000030) >> 4; // jojo and jojoba only
 
-		int const gscrollx = (m_ppu_gscroll[gscroll] & 0x03ff0000) >> 16;
-		int const gscrolly = (m_ppu_gscroll[gscroll] & 0x000003ff) >> 0;
+		int const gscrollx = (m_ppu_gscroll_buff[gscroll] & 0x03ff0000) >> 16;
+		int const gscrolly = (m_ppu_gscroll_buff[gscroll] & 0x000003ff) >> 0;
 		start = (start * 0x100) >> 2;
 
 		for (int j = 0; j < (length) * 4; j += 4)
@@ -1185,9 +1164,10 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			static const int tilestable[4] = { 8,1,2,4 };
 
 			u32 const tileno = (value1 & 0xfffe0000) >> 17;
+			//u8 unk2000 =     (value1 & 0x00002000) >> 13); //? sfiii2/3 bonus stages - score numbers and balls icons, sfiii3 staff roll texts
 			u8 flipx =         (value1 & 0x00001000) >> 12;
 			u8 flipy =         (value1 & 0x00000800) >> 11;
-			bool const alpha = (value1 & 0x00000400) >> 10; //? this one is used for alpha effects on warzard
+			bool const alpha = (value1 & 0x00000400) >> 10; // warzard alpha effects
 			bool const bpp =   (value1 & 0x00000200) >> 9;
 			u32 const pal =    (value1 & 0x000001ff);
 
@@ -1210,16 +1190,18 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			if (xsize2 == 0) // xsize of 0 tiles seems to be a special command to draw tilemaps
 			{
 				int tilemapnum = ((value3 & 0x00000030) >> 4);
-
-				/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
-				    which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
+				u32* regs = &m_tilemap_regs[tilemapnum * 4];
 
 				for (int yy = 0; yy < ysizedraw2; yy++)
 				{
-					int cury_pos = to_s10(yy - (to_s10(ypos2) + to_s10(gscrolly)) - 19); // OK for sfiii Alex's stage, but not sure if hardware realy works this way
+					// positioning similar to sprites Y coord, but relative to edge, not center
+					int cury_pos = ypos2 + gscrolly - yy;
+					cury_pos = ~cury_pos;
+					cury_pos -= 18;
+					cury_pos &= 0x3ff;
 
 					if (cury_pos >= m_renderbuffer_clip.top() && cury_pos <= m_renderbuffer_clip.bottom())
-						draw_tilemapsprite_line(tilemapnum, cury_pos, m_renderbuffer_bitmap, m_renderbuffer_clip);
+						draw_tilemapsprite_line(regs, cury_pos, m_renderbuffer_bitmap, m_renderbuffer_clip);
 				}
 			}
 			else
@@ -1414,8 +1396,8 @@ WRITE16_MEMBER(cps3_state::spritedma_w)
 	u16 prev = m_spritelist_dma;
 	COMBINE_DATA(&m_spritelist_dma);
 
-	// display list caching (into PPU on-chip RAM ?)
-	if ((m_spritelist_dma & 8) && !(prev & 8)) // 0->1
+	// display list DMA. actual DMA probably combine coordinates and control fields from main/sub list records and gscroll registers, we just save them for further processing.
+	if (!(m_dma_status & 1) && (m_spritelist_dma & 9) == 8 && (prev & 9) == 9) // 0->1
 	{
 		for (int i = 0; i < 0x2000/4; i += 4)
 		{
@@ -1427,6 +1409,10 @@ WRITE16_MEMBER(cps3_state::spritedma_w)
 			u32 length = (dat & 0x01ff0000) >> 16;
 			std::copy(&m_spriteram[offs], &m_spriteram[offs + length*4], &m_spritelist[offs]); // copy sublist
 		}
+		std::copy(&m_ppu_gscroll[0], &m_ppu_gscroll[8], &m_ppu_gscroll_buff[0]);
+
+		m_dma_status |= 1;
+		m_spritelist_dma_timer->adjust(attotime::from_usec(4)); // slight delay to skip multiple 8/9 writes. actual DMA speed is unknown.
 	}
 }
 
@@ -1762,7 +1748,7 @@ WRITE32_MEMBER(cps3_state::eeprom_w)
 	}
 	else if (addr >= 0x180 && addr <= 0x1ff)
 	{
-		// always 00000000 ? incrememnt access?
+		// write 0 before data word write, erase ? which also means above probably may only reset data bits.
 	}
 	else
 	{
@@ -2149,12 +2135,8 @@ void cps3_state::cps3_map(address_map &map)
 	// PPU registers
 	map(0x040c0000, 0x040c0007).nopr(); // ?? warzard reads this but not use values, dev/debug leftovers ?
 	map(0x040c000c, 0x040c000d).r(FUNC(cps3_state::dma_status_r));
-
-	map(0x040c0000, 0x040c001f).w(FUNC(cps3_state::ppu_gscroll_w));
-	map(0x040c0020, 0x040c002b).writeonly().share("tmap20_regs");
-	map(0x040c0030, 0x040c003b).writeonly().share("tmap30_regs");
-	map(0x040c0040, 0x040c004b).writeonly().share("tmap40_regs");
-	map(0x040c0050, 0x040c005b).writeonly().share("tmap50_regs");
+	map(0x040c0000, 0x040c001f).writeonly().share("ppu_gscroll_regs");
+	map(0x040c0020, 0x040c005f).writeonly().share("ppu_tmap_regs");
 	map(0x040c0060, 0x040c007f).writeonly().share("ppu_crtc_zoom");
 	map(0x040c0080, 0x040c0083).w(FUNC(cps3_state::spritedma_w)).umask32(0x0000ffff);
 	map(0x040c0084, 0x040c0087).w(FUNC(cps3_state::cram_bank_w));
@@ -2280,6 +2262,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps3_state::dma_interrupt)
 	m_maincpu->set_input_line(10, ASSERT_LINE);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(cps3_state::sprite_dma_cb)
+{
+	m_dma_status &= ~1;
+}
+
 
 void cps3_state::machine_start()
 {
@@ -2299,7 +2286,7 @@ void cps3_state::machine_start()
 	save_item(NAME(m_chardma_other));
 	save_item(NAME(m_current_table_address));
 	save_item(NAME(m_dma_status));
-	save_item(NAME(m_ppu_gscroll));
+	save_item(NAME(m_ppu_gscroll_buff));
 	save_item(NAME(m_ss_hscroll));
 	save_item(NAME(m_ss_vscroll));
 	save_item(NAME(m_ss_pal_base));
@@ -2532,6 +2519,7 @@ void cps3_state::cps3(machine_config &config)
 */
 
 	TIMER(config, m_dma_timer).configure_generic(FUNC(cps3_state::dma_interrupt));
+	TIMER(config, m_spritelist_dma_timer).configure_generic(FUNC(cps3_state::sprite_dma_cb));
 
 	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
 	PALETTE(config, m_palette).set_entries(0x10000); // actually 0x20000 ...
@@ -2542,7 +2530,7 @@ void cps3_state::cps3(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	CPS3(config, m_cps3sound, MASTER_CLOCK / 3);
+	CPS3(config, m_cps3sound, XTAL(42'954'545) / 3);
 	m_cps3sound->add_route(1, "lspeaker", 1.0);
 	m_cps3sound->add_route(0, "rspeaker", 1.0);
 }
