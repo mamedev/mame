@@ -159,7 +159,6 @@ private:
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(palettedma_w);
 	DECLARE_WRITE32_MEMBER(characterdma_w);
-	DECLARE_WRITE32_MEMBER(ppu_gscroll_w);
 	DECLARE_READ16_MEMBER(colourram_r);
 	DECLARE_WRITE16_MEMBER(colourram_w);
 	DECLARE_WRITE16_MEMBER(outport_w);

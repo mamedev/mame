@@ -2105,11 +2105,6 @@ WRITE32_MEMBER(cps3_state::characterdma_w)
 	}
 }
 
-WRITE32_MEMBER(cps3_state::ppu_gscroll_w)
-{
-	COMBINE_DATA(&m_ppu_gscroll[offset]);
-}
-
 READ16_MEMBER(cps3_state::colourram_r)
 {
 	return m_colourram[offset];
