@@ -1964,8 +1964,10 @@ void m2_cde_device::start_dma(uint32_t ch)
 		if (setup & CDE_DATAWIDTH_16)
 		{
 			// 16-bit case
-			assert_always((dma_ch.m_ccnt & 1) == 0, "16-bit DMA: Byte count must be even?");
-			assert_always((dma_ch.m_cpad & 1) == 0, "16-bit DMA: DMA destination must be word aligned?");
+			if (dma_ch.m_ccnt & 1)
+				throw emu_fatalerror("m2_cde_device::start_dma: 16-bit DMA: Byte count must be even?");
+			if (dma_ch.m_cpad & 1)
+				throw emu_fatalerror("m2_cde_device::start_dma: 16-bit DMA: DMA destination must be word aligned?");
 
 			const uint32_t srcinc = setup & CDE_READ_SETUP_IO ? 0 : 2;
 
@@ -2012,7 +2014,8 @@ void m2_cde_device::next_dma(uint32_t ch)
 	m_cpu1->set_cache_dirty();
 #endif
 
-	assert_always(dma_ch.m_ccnt == 0, "DMA count non-zero during next DMA");
+	if (dma_ch.m_ccnt != 0)
+		throw emu_fatalerror("m2_cde_device::next_dma: DMA count non-zero during next DMA");
 
 	if (dma_ch.m_cntl & CDE_DMA_NEXT_VALID)
 	{
