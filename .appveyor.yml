@@ -28,6 +28,8 @@ for:
     matrix:
       only:
         - BUILD: GCC
+    cache:
+      - C:\msys64\var\cache\pacman\pkg
     install:
       - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
       - set MSYSTEM=MINGW64
