@@ -751,8 +751,8 @@ uint32_t vino_device::bilinear_pixel(float s, float t)
 	LOGMASKED(LOG_INPUTS, "%08x, %08x, %08x, %08x\n", p00, p01, p10, p11);
 
 	float ip = 0.0f;
-	const float sf = modf(s, &ip);
-	const float tf = modf(t, &ip);
+	const float sf = modff(s, &ip);
+	const float tf = modff(t, &ip);
 	const uint32_t top = linear_rgb(p00, p01, sf);
 	const uint32_t bot = linear_rgb(p10, p11, sf);
 	LOGMASKED(LOG_INPUTS, "%08x, %08x\n", top, bot);
