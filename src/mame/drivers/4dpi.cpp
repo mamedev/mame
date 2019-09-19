@@ -31,7 +31,7 @@
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/sgimips/
  *
  * TODO:
- *   - graphics, audio, printer
+ *   - audio, printer
  *   - devicify ioc1 and ctl1
  *
  * Status:

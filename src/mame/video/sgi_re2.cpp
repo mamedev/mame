@@ -51,10 +51,12 @@ DEFINE_DEVICE_TYPE(SGI_RE2, sgi_re2_device, "sgi_re2", "SGI Raster Engine 2")
 
 sgi_re2_device::sgi_re2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SGI_RE2, tag, owner, clock)
+	, m_xmap(*this, "^xmap%u", 0U)
+	, m_cursor(*this, "^cursor%u", 0U)
+	, m_ramdac(*this, "^ramdac%u", 0U)
+	, m_options_port(*this, "^options")
 	, m_rdy_cb(*this)
 	, m_drq_cb(*this)
-	, m_vram_r(*this)
-	, m_vram_w(*this)
 	, m_rdy(false)
 	, m_drq(false)
 {
@@ -65,8 +67,8 @@ void sgi_re2_device::device_start()
 	m_rdy_cb.resolve();
 	m_drq_cb.resolve();
 
-	m_vram_r.resolve();
-	m_vram_w.resolve();
+	m_vram = std::make_unique<u32[]>(1280 * 1024);
+	m_dram = std::make_unique<u32[]>(1280 * 1024);
 
 	// save state
 	for (unsigned i = 0; i < ARRAY_LENGTH(m_reg); i++)
@@ -81,6 +83,10 @@ void sgi_re2_device::device_start()
 
 void sgi_re2_device::device_reset()
 {
+	u8 const options = m_options_port->read();
+	m_vram_mask = 0xffffffffU;
+	m_dram_mask = (options & 0x10) ? 0xffffffff : 0;
+
 	m_state = IDLE;
 	m_ir_pending = false;
 
@@ -281,12 +287,12 @@ void sgi_re2_device::draw_shaded_span()
 {
 /*
  * raster operation logic:
- * 
-	u32 const result =
-		(m_func[0] & src & dst) +
-		(m_func[1] & src & ~dst) +
-		(m_func[2] & ~src & dst) +
-		(m_func[3] & ~src & ~dst);
+ *
+    u32 const result =
+        (m_func[0] & src & dst) +
+        (m_func[1] & src & ~dst) +
+        (m_func[2] & ~src & dst) +
+        (m_func[3] & ~src & ~dst);
 */
 
 	u32 const mask = (m_reg[REG_AUXMASK] << 24) | m_reg[REG_PIXMASK];
@@ -307,7 +313,7 @@ void sgi_re2_device::draw_shaded_span()
 				{
 					u32 const color = (m_r >> 11) << 0 | (m_g >> 11) << 8 | (m_b >> 11) << 16;
 
-					m_vram_w(offset, aux | color, mask);
+					vram_w(offset, aux | color, mask);
 				}
 			}
 		}
@@ -332,7 +338,7 @@ void sgi_re2_device::draw_flat_span(unsigned const n)
 		{
 			u32 const color = (m_r >> 11) << 0 | (m_g >> 11) << 8 | (m_b >> 11) << 16;
 
-			m_vram_w(offset + i, aux | color, mask);
+			vram_w(offset + i, aux | color, mask);
 		}
 
 		if ((i % n) == 0)
@@ -360,7 +366,7 @@ void sgi_re2_device::read_buffer()
 		switch (m_reg[REG_RWMODE])
 		{
 		case RWMODE_FB_P:
-			m_reg[REG_RWDATA] = m_vram_r((m_y >> 14) * 0x500 + (m_x >> 14));
+			m_reg[REG_RWDATA] = m_vram[(m_y >> 14) * 0x500 + (m_x >> 14)];
 			break;
 		}
 
@@ -401,7 +407,7 @@ void sgi_re2_device::write_buffer()
 					switch (m_reg[REG_RWMODE])
 					{
 					case RWMODE_UAUX:
-						m_vram_w(offset, data << 24, (m_reg[REG_AUXMASK] & (m_nopup ? 0xf : 0xc)) << 24);
+						vram_w(offset, data << 24, (m_reg[REG_AUXMASK] & (m_nopup ? 0xf : 0xc)) << 24);
 						break;
 					}
 				}
@@ -439,9 +445,10 @@ bool sgi_re2_device::wid(unsigned const ir, offs_t const offset)
 	if ((ir == IR_TOPLINE || ir == IR_BOTLINE) && !m_reg[REG_ENABLWID])
 		return true;
 
-	unsigned const wid = m_vram_r(offset) >> 28;
+	unsigned const wid = m_vram[offset] >> 28;
 
-	if (m_reg[REG_FBOPTION])
+	// 2 or 4 wid bitplanes?
+	if (m_reg[REG_FBOPTION] & 1)
 	{
 		if (BIT(m_reg[REG_DEPTHFN], 3))
 			return (wid & 0xe) == (m_reg[REG_CURWID] & 0xe);
@@ -460,4 +467,77 @@ bool sgi_re2_device::pattern(unsigned const x, unsigned const n) const
 	unsigned const index = (m_reg[REG_ALIGNPAT] ? x : n) % 32;
 
 	return BIT(m_pat, 31 - index);
+}
+
+u32 sgi_re2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+{
+	// TODO: variable topscan row and column
+	for (unsigned screen_y = screen.visible_area().min_y, mem_y = 1023; screen_y <= screen.visible_area().max_y; screen_y++, mem_y--)
+		for (unsigned screen_x = screen.visible_area().min_x, mem_x = 0; screen_x <= screen.visible_area().max_x; screen_x++, mem_x++)
+		{
+			unsigned const channel = mem_x % 5;
+			u32 const data = m_vram[(mem_y * 0x500) + mem_x];
+			u16 const mode = m_xmap[channel]->mode_r(data >> 28);
+
+			// default is 24 bit rgb single buffered
+			rgb_t color = rgb_t(data >> 0, data >> 8, data >> 16);
+
+			// check overlay or underlay
+			if (((data >> 20) & mode & sgi_xmap2_device::MODE_OE) || ((mode & sgi_xmap2_device::MODE_UE) && !(data & 0x00ffffffU)))
+				color = m_xmap[channel]->overlay_r(data >> 24);
+			else
+				switch (mode & sgi_xmap2_device::MODE_DM)
+				{
+				case 0: // 8 bit indexed single buffered
+					{
+						u16 const index = BIT(mode, sgi_xmap2_device::BIT_ME) ? ((mode & sgi_xmap2_device::MODE_MC) >> 2) | u8(data) : u8(data);
+
+						color = m_xmap[channel]->pen_color(index);
+					}
+					break;
+
+				case 1: // 4 bit indexed double buffered
+					{
+						u8 const buffer = BIT(mode, sgi_xmap2_device::BIT_BS) ? u8(data) >> 4 : data & 0x0f;
+						u16 const index = BIT(mode, sgi_xmap2_device::BIT_ME) ? ((mode & sgi_xmap2_device::MODE_MC) >> 2) | buffer : buffer;
+
+						color = m_xmap[channel]->pen_color(index);
+					}
+					break;
+
+				case 2: // 12 bit indexed double buffered
+					{
+						u16 const buffer = u16(BIT(mode, sgi_xmap2_device::BIT_BS) ? data >> 12 : data) & 0x0fff;
+						u16 const index = BIT(mode, sgi_xmap2_device::BIT_ME) ? ((mode & sgi_xmap2_device::MODE_MC) >> 2) | (buffer & 0xff) : buffer;
+
+						color = m_xmap[channel]->pen_color(index);
+					}
+					break;
+
+				case 5: // 12 bit rgb double buffered
+					color = BIT(mode, sgi_xmap2_device::BIT_BS) ?
+						rgb_t(
+							((data >> 0x00) & 0xf0) | ((data >> 0x04) & 0x0f),
+							((data >> 0x08) & 0xf0) | ((data >> 0x0c) & 0x0f),
+							((data >> 0x10) & 0xf0) | ((data >> 0x14) & 0x0f)) :
+						rgb_t(
+							((data << 0x04) & 0xf0) | ((data >> 0x00) & 0x0f),
+							((data >> 0x04) & 0xf0) | ((data >> 0x08) & 0x0f),
+							((data >> 0x0c) & 0xf0) | ((data >> 0x10) & 0x0f));
+					break;
+				}
+
+			// read the cursor devices
+			u8 const cursor =
+				(m_cursor[0]->cur_r(screen_x, screen_y) ? 1 : 0) |
+				(m_cursor[1]->cur_r(screen_x, screen_y) ? 2 : 0);
+
+			// apply the gamma ramp and output the pixel
+			bitmap.pix(screen_y, screen_x) = rgb_t(
+				m_ramdac[0]->lookup(color.r(), cursor),
+				m_ramdac[1]->lookup(color.g(), cursor),
+				m_ramdac[2]->lookup(color.b(), cursor));
+		}
+
+	return 0;
 }

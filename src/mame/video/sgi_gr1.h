@@ -10,6 +10,7 @@
 #include "screen.h"
 #include "video/sgi_ge5.h"
 #include "video/sgi_re2.h"
+#include "video/sgi_xmap2.h"
 #include "video/bt45x.h"
 #include "video/bt431.h"
 
@@ -31,11 +32,10 @@ public:
 
 protected:
 	// device_t overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
 	u8 dr0_r() { return m_dr0; }
 	u8 dr1_r() { return m_dr1; }
@@ -46,27 +46,17 @@ protected:
 	void dr1_w(u8 data) { m_dr1 = (m_dr1 & ~DR1_WM) | (data & DR1_WM); m_ge->cwen_w(BIT(data, 1)); }
 	void dr2_w(u8 data) { m_dr2 = (m_dr2 & ~DR2_WM) | (data & DR2_WM); }
 	void dr3_w(u8 data) { m_dr3 = (m_dr3 & ~DR3_WM) | (data & DR3_WM); }
-	void dr4_w(u8 data) { m_dr4 = (m_dr4 & ~DR4_WM) | (data & DR4_WM); }
+	void dr4_w(u8 data);
 
 	u64 ge_fifo_r();
 	u32 fifo_r() { return u32(ge_fifo_r()); }
 	void fifo_w(offs_t offset, u32 data, u32 mem_mask);
 
-	template <unsigned Channel> u8 xmap2_r(offs_t offset);
-	template <unsigned Channel> void xmap2_w(offs_t offset, u8 data);
-	void xmap2_bc_w(offs_t offset, u8 data)
-	{
-		xmap2_w<0>(offset, data);
-		xmap2_w<1>(offset, data);
-		xmap2_w<2>(offset, data);
-		xmap2_w<3>(offset, data);
-		xmap2_w<4>(offset, data);
-	}
-
 private:
 	required_device<screen_device> m_screen;
-	required_device<sgi_re2_device> m_re;
 	required_device<sgi_ge5_device> m_ge;
+	required_device<sgi_re2_device> m_re;
+	required_device_array<sgi_xmap2_device, 5> m_xmap;
 	required_device_array<bt431_device, 2> m_cursor;
 	required_device_array<bt457_device, 3> m_ramdac;
 
@@ -136,19 +126,6 @@ private:
 	u8 m_dr4;
 
 	util::fifo<u64, 512> m_fifo;
-
-	std::unique_ptr<u32[]> m_vram;
-	std::unique_ptr<u32[]> m_dram;
-
-	struct xmap2
-	{
-		u16 addr;
-		rgb_t color[8192];
-		rgb_t overlay[16];
-		u16 mode[16];
-		bool wid_aux;
-	}
-	m_xmap2[5];
 
 	bool m_reset;
 };
