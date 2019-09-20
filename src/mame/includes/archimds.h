@@ -14,7 +14,7 @@
 #include "machine/aakart.h"
 #include "machine/i2cmem.h"
 #include "machine/wd_fdc.h"
-#include "video/acorn_vidc.h"
+#include "machine/acorn_vidc.h"
 
 // interrupt definitions.  these are for the real Archimedes computer - arcade
 // and gambling knockoffs likely are a bit different.
