@@ -937,16 +937,12 @@ static const gfx_layout cps3_tiles8x8_layout =
 
 static inline u8 get_fade(int c, int f)
 {
-	// bit 7 unknown
+	// bit 7 unused, explicit masked out
 	// bit 6 fade enable / disable
-	// bit 5 fade mode
+	// bit 5 fade mode (1 = invert input values and output)
 	// bit 4-0 fade value
 	if (f & 0x40) // Fading enable / disable
-	{
-		f &= 0x3f;
-		c = (f & 0x20) ? (c + (((0x1f - c) * (f & 0x1f)) / 0x1f)) : ((c * f) / 0x1f);
-		c = std::max(0, std::min(0x1f, c));
-	}
+		c = (f & 0x20) ? ((((c ^ 0x1f) * (~f & 0x1f)) >> 5) ^ 0x1f) : (c * (f & 0x1f) >> 5);
 	return c;
 }
 
@@ -959,8 +955,6 @@ void cps3_state::set_mame_colours(int colournum, u16 data, u32 fadeval)
 	/* is this 100% correct? */
 	if (fadeval & 0x40400040)
 	{
-		//logerror("fadeval %08x\n",fadeval);
-
 		r = get_fade(r, (fadeval & 0x7f000000)>>24);
 		g = get_fade(g, (fadeval & 0x007f0000)>>16);
 		b = get_fade(b, (fadeval & 0x0000007f)>>0);
