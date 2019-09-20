@@ -9696,6 +9696,9 @@ cbm730                          //
 p500                            // Commodore P500 (proto, a.k.a. C128-40, PET-II)
 p500p                           //
 
+@source:cbnt2039.cpp
+cbnt2039                        //
+
 @source:cbuster.cpp
 cbuster                         // MAB (c) 1990 Data East Corporation (World)
 cbusterj                        // MAB (c) 1990 Data East Corporation (Japan)

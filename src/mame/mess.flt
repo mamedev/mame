@@ -132,6 +132,7 @@ cardinal.cpp
 casloopy.cpp
 cat.cpp
 cbm2.cpp
+cbnt2039.cpp
 cc40.cpp
 ccs2810.cpp
 ccs300.cpp
