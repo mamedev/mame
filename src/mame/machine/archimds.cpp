@@ -34,7 +34,6 @@
 #include "debugger.h"
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
-//static const uint32_t pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
 
 #define IOC_LOG 0
 #define CRTC_LOG 0
@@ -97,9 +96,6 @@ void archimedes_state::device_timer(emu_timer &timer, device_timer_id id, int pa
 {
 	switch (id)
 	{
-		//case TIMER_VBLANK: vidc_vblank();break;
-		//case TIMER_VIDEO: vidc_video_tick(); break;
-		//case TIMER_AUDIO: vidc_audio_tick(); break;
 		case TIMER_IOC: ioc_timer(param); break;
 	}
 }
@@ -113,10 +109,6 @@ WRITE_LINE_MEMBER( archimedes_state::vblank_irq )
 		if (m_video_dma_on)
 			vidc_video_tick();
 	}
-
-
-	// set up for next vbl
-	//m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
 }
 
 WRITE_LINE_MEMBER( archimedes_state::sound_drq )
@@ -897,7 +889,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 
 			case 5: /* sound end */
 				//logerror("MEMC: SNDEND %08x\n",data);
-				m_vidc_sndend = 0x2000000 | ((data>>2)&0x7fff)*16;
+				// end buffer is actually +16 bytes wrt sound start
+				m_vidc_sndend = 0x2000000 | (((data>>2)+1)&0x7fff)*16;
 				break;
 
 			case 6:

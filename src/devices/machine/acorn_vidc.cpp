@@ -387,7 +387,7 @@ void acorn_vidc10_device::write_dac(uint8_t channel, uint8_t data)
 { 
 	uint8_t ulaw_comp;
 	int16_t res;
-	const int16_t mulawTable[256] =
+	static constexpr int16_t mulawTable[256] =
 	{
 		-32124,-31100,-30076,-29052,-28028,-27004,-25980,-24956,
 		-23932,-22908,-21884,-20860,-19836,-18812,-17788,-16764,
