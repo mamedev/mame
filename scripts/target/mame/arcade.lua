@@ -982,7 +982,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/aristmk5.cpp",
 	MAME_DIR .. "src/mame/machine/archimds.cpp",
 	MAME_DIR .. "src/mame/includes/archimds.h",
-	MAME_DIR .. "src/mame/video/archimds.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "adp")
