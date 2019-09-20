@@ -12,8 +12,9 @@
 	  * nebulus: 20 lines off with aa310;
 	  * lotustc2: abuses color flipping;
 	  * quazer: needs in-flight DMA;
-	- support for stereo image;
+	- improve sound DAC writes;
 	- subclass this for VIDC20 emulation (RiscPC);
+	- Are CRTC values correct? VGA modes have a +1 in display line;
 
 **********************************************************************************************/
 
@@ -42,7 +43,7 @@ void acorn_vidc10_device::regs_map(address_map &map)
 {
 	map(0x00, 0x3f).w(FUNC(acorn_vidc10_device::pal_data_display_w));
 	map(0x40, 0x4f).w(FUNC(acorn_vidc10_device::pal_data_cursor_w));
-//	map(0x60, 0x7f).w(FUNC(acorn_vidc10_device::stereo_image_w));
+	map(0x60, 0x7f).w(FUNC(acorn_vidc10_device::stereo_image_w));
 	map(0x80, 0xbf).w(FUNC(acorn_vidc10_device::crtc_w));
 	map(0xc0, 0xc3).w(FUNC(acorn_vidc10_device::sound_frequency_w));
 	map(0xe0, 0xe3).w(FUNC(acorn_vidc10_device::control_w));
@@ -56,7 +57,8 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_screen(*this, "screen")
   	, m_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_device::regs_map), this))
 	, m_palette(*this, "palette")
-//  , m_speaker(*this, "speaker%u", 0)
+	, m_lspeaker(*this, "lspeaker")
+	, m_rspeaker(*this, "rspeaker")
 	, m_dac(*this, "dac%u", 0)
 	, m_vblank_cb(*this)
 	, m_sound_drq_cb(*this)
@@ -97,12 +99,13 @@ void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 	// 8bpp + 1/2/4bpp + 2bpp for cursor 
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x100+0x10+4);
 	
-	// TODO: stereo speaker, with regulable mixing
-	SPEAKER(config, "speaker").front_center();
+	SPEAKER(config, m_lspeaker).front_left();
+	SPEAKER(config, m_rspeaker).front_right();
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < m_sound_max_channels; i++)
 	{
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, "speaker", 0.05); // unknown DAC
+		// custom DAC
+		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, m_lspeaker, m_sound_input_gain).add_route(0, m_rspeaker, m_sound_input_gain); 
 		vref.add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, m_dac[i], -1.0, DAC_VREF_NEG_INPUT);
 	}
 }
@@ -134,6 +137,7 @@ void acorn_vidc10_device::device_start()
 	m_cursor_vram = auto_alloc_array_clear(machine(), u8, m_cursor_vram_size);
 	save_pointer(NAME(m_data_vram), m_data_vram_size);
 	save_pointer(NAME(m_cursor_vram), m_cursor_vram_size);
+	save_pointer(NAME(m_stereo_image), m_sound_max_channels);
 	
 	m_video_timer = timer_alloc(TIMER_VIDEO);
 	m_sound_timer = timer_alloc(TIMER_SOUND);
@@ -149,8 +153,10 @@ void acorn_vidc10_device::device_reset()
 	m_cursor_enable = false;
 	memset(m_data_vram, 0, m_data_vram_size);
 	memset(m_cursor_vram, 0, m_cursor_vram_size);
+	memset(m_stereo_image, 4, m_sound_max_channels);
 	m_video_timer->adjust(attotime::never);
-	m_sound_timer->adjust(attotime::never);
+	m_sound_timer->adjust(attotime::never);	
+	refresh_stereo_image();
 }
 
 //-------------------------------------------------
@@ -177,11 +183,8 @@ void acorn_vidc10_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 inline void acorn_vidc10_device::screen_vblank_line_update()
 {
-	int vline = (m_crtc_regs[CRTC_VDER]) * (m_crtc_interlace + 1);	
-	if (vline > 1)
-		m_video_timer->adjust(m_screen->time_until_pos(vline));
-	else
-		m_video_timer->adjust(attotime::never);
+	int vline = (m_crtc_regs[CRTC_VDER]) * (m_crtc_interlace + 1);
+	m_video_timer->adjust((vline > 2) ? m_screen->time_until_pos(vline) : attotime::never);
 }
 
 void acorn_vidc10_device::screen_dynamic_res_change()
@@ -209,12 +212,15 @@ void acorn_vidc10_device::screen_dynamic_res_change()
 			0, m_crtc_regs[CRTC_HBER] - m_crtc_regs[CRTC_HBSR] - 1,
 			0, (m_crtc_regs[CRTC_VBER] - m_crtc_regs[CRTC_VBSR]) * (m_crtc_interlace + 1));
 
-	//m_vidc_vblank_time = m_crtc_regs[CRTC_VBER] * (m_crtc_interlace+1);
-	//logerror("Configuring: htotal %d vtotal %d border %d x %d display origin %d x %d vblank = %d\n",
-	//  m_crtc_regs[CRTC_HCR], m_crtc_regs[CRTC_VCR],
-	//  visarea.right(), visarea.bottom(),
-	//  m_crtc_regs[CRTC_HDER]-m_crtc_regs[CRTC_HDSR],m_crtc_regs[CRTC_VDER]-m_crtc_regs[CRTC_VDSR]+1,
-	//  m_vidc_vblank_time);
+#if 0
+	// TODO: move to debugger custom command
+	const int m_vidc_vblank_time = m_crtc_regs[CRTC_VDER] * (m_crtc_interlace+1);
+	printf("Configuring: htotal %d vtotal %d border %d x %d display origin %d x %d vblank = %d\n",
+		m_crtc_regs[CRTC_HCR], m_crtc_regs[CRTC_VCR],
+		visarea.right(), visarea.bottom(),
+		m_crtc_regs[CRTC_HDER]-m_crtc_regs[CRTC_HDSR],m_crtc_regs[CRTC_VDER]-m_crtc_regs[CRTC_VDSR]+1,
+		m_vidc_vblank_time);
+#endif
 
 	attoseconds_t const refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_pixel_clock]) * m_crtc_regs[CRTC_HCR] * m_crtc_regs[CRTC_VCR];
 
@@ -234,42 +240,39 @@ WRITE32_MEMBER( acorn_vidc10_device::write )
 	this->space(AS_IO).write_dword(reg, val);
 }
 
-WRITE32_MEMBER( acorn_vidc10_device::pal_data_display_w )
+inline void acorn_vidc10_device::update_4bpp_palette(uint16_t index, uint32_t paldata)
 {
 	int r,g,b;
 
-	//i = (data & 0x1000) >> 12; //supremacy bit
-	b = (data & 0x0f00) >> 8;
-	g = (data & 0x00f0) >> 4;
-	r = (data & 0x000f) >> 0;
+	// TODO: for TV Tuner we need to output this, also check if cursor mode actually sets this up for offset = 0
+//	i = (paldata & 0x1000) >> 12; //supremacy bit
+	b = (paldata & 0x0f00) >> 8;
+	g = (paldata & 0x00f0) >> 4;
+	r = (paldata & 0x000f) >> 0;
 
-	m_palette->set_pen_color(offset+0x100, pal4bit(r), pal4bit(g), pal4bit(b) );
+	m_palette->set_pen_color(index, pal4bit(r), pal4bit(g), pal4bit(b) );
+	m_screen->update_partial(m_screen->vpos());
+}
+
+WRITE32_MEMBER( acorn_vidc10_device::pal_data_display_w )
+{
+	update_4bpp_palette(offset+0x100, data);
 	//printf("%02x: %01x %01x %01x [%d]\n",offset,r,g,b,m_screen->vpos());
 	
+	// 8bpp
 	for(int idx=0;idx<0x100;idx+=0x10)
 	{
-		b = ((data & 0x700) >> 8) | ((idx & 0x80) >> 4);
-		g = ((data & 0x030) >> 4) | ((idx & 0x60) >> 3);
-		r = ((data & 0x007) >> 0) | ((idx & 0x10) >> 1);
+		int b = ((data & 0x700) >> 8) | ((idx & 0x80) >> 4);
+		int g = ((data & 0x030) >> 4) | ((idx & 0x60) >> 3);
+		int r = ((data & 0x007) >> 0) | ((idx & 0x10) >> 1);
 
 		m_palette->set_pen_color(offset + idx, pal4bit(r), pal4bit(g), pal4bit(b) );
 	}
-	
-	m_screen->update_partial(m_screen->vpos());
 }
 
 WRITE32_MEMBER( acorn_vidc10_device::pal_data_cursor_w )
 {
-	int r,g,b;
-
-	//i = (data & 0x1000) >> 12; //supremacy bit
-	b = (data & 0x0f00) >> 8;
-	g = (data & 0x00f0) >> 4;
-	r = (data & 0x000f) >> 0;
-
-	m_palette->set_pen_color(offset+0x110, pal4bit(r), pal4bit(g), pal4bit(b) );
-
-	m_screen->update_partial(m_screen->vpos());
+	update_4bpp_palette(offset+0x110, data);
 }
 
 WRITE32_MEMBER( acorn_vidc10_device::control_w )
@@ -297,11 +300,11 @@ WRITE32_MEMBER( acorn_vidc10_device::crtc_w )
 		case CRTC_HDSR: m_crtc_regs[CRTC_HDSR] = (data >> 14);   			break;
 		case CRTC_HDER: m_crtc_regs[CRTC_HDER] = (data >> 14);   			break;
 		case CRTC_HBER: m_crtc_regs[CRTC_HBER] = ((data >> 14)<<1)+1;    	break;
-		case CRTC_HCSR: m_crtc_regs[CRTC_HCSR] = ((data >> 13) & 0x7ff) + 6; break;
+		case CRTC_HCSR: m_crtc_regs[CRTC_HCSR] = ((data >> 13) & 0x7ff) + 6; return;
 //      case CRTC_HIR: // ...
 
-		case CRTC_VCR:  m_crtc_regs[CRTC_VCR] = ((data >> 14))+1; 			break;
-//      case CRTC_VSWR: // ...
+		case CRTC_VCR:  m_crtc_regs[CRTC_VCR] = (data >> 14)+1; 			break;
+		case CRTC_VSWR: m_crtc_regs[CRTC_VSWR] = (data >> 14)+1;            break;
 		case CRTC_VBSR: 
 			m_crtc_regs[CRTC_VBSR] = (data >> 14)+1;
 			break;
@@ -315,11 +318,41 @@ WRITE32_MEMBER( acorn_vidc10_device::crtc_w )
 		case CRTC_VBER: 
 			m_crtc_regs[CRTC_VBER] = (data >> 14)+1;
 			break;
-		case CRTC_VCSR: m_crtc_regs[CRTC_VCSR] = ((data >> 14) & 0x3ff) + 1; break;
-		case CRTC_VCER: m_crtc_regs[CRTC_VCER] = ((data >> 14) & 0x3ff) + 1; break;
+		case CRTC_VCSR: m_crtc_regs[CRTC_VCSR] = ((data >> 14) & 0x3ff) + 1; return;
+		case CRTC_VCER: m_crtc_regs[CRTC_VCER] = ((data >> 14) & 0x3ff) + 1; return;
 	}
 	
 	screen_dynamic_res_change();
+}
+
+inline void acorn_vidc10_device:: refresh_stereo_image()
+{
+	/*
+		-111 full right
+		-110 83% right, 17% left
+		-101 67% right, 33% left
+		-100 center
+		-011 67% left, 33% right
+		-010 83% left, 17% right
+		-001 full left
+		-000 "undefined" TODO: verify what it actually means
+	*/
+	const float left_gain[8] = { 1.0, 2.0, 1.66, 1.34, 1.0, 0.66, 0.34, 0.0 };
+	const float right_gain[8] = { 1.0, 0.0, 0.34, 0.66, 1.0, 1.34, 1.66, 2.0 };
+	
+	for (int channel=0;channel<m_sound_max_channels;channel++)
+	{
+		m_lspeaker->set_input_gain(channel,left_gain[m_stereo_image[channel]]*m_sound_input_gain);
+		m_rspeaker->set_input_gain(channel,right_gain[m_stereo_image[channel]]*m_sound_input_gain);
+		//printf("%d %f %f\n",channel,m_lspeaker->input_gain(channel),m_rspeaker->input_gain(channel));
+	}
+}
+
+
+WRITE32_MEMBER( acorn_vidc10_device::stereo_image_w )
+{
+	m_stereo_image[(offset + 7) & 0x7] = data & 0x7;
+	refresh_stereo_image();
 }
 
 WRITE32_MEMBER( acorn_vidc10_device::sound_frequency_w )

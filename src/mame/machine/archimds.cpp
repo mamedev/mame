@@ -688,10 +688,11 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 					}
 				case 2:
 					// RTFM joystick interface routes here
+					// TODO: slot interface for econet (reads registers 0 and 1 during boot)
 					switch(ioc_addr)
 					{
 						case 0x3a0000:
-							return 0xed; // ID? Status?
+							return 0xed; // ID for econet
 						case 0x3a0004:
 							return m_joy[0].read_safe(0xff);
 						case 0x3a0008: 
@@ -711,12 +712,13 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 				case 5:
 					if (m_fdc)
 					{
+						// TODO: IOEB slot interface
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x18: return 0xff; // FDC latch B
 							case 0x40: return 0xff; // FDC latch A
-							case 0x50: return 0; //fdc type, new model returns 5 here
-							case 0x70: return 0x0f;
+							case 0x50: return 0; //fdc type, an 82c711 returns 5 here
+							case 0x70: return 0x0f; // monitor type, TBD
 							case 0x74: return 0xff; // unknown
 							case 0x78: // serial joystick?
 							case 0x7c:
