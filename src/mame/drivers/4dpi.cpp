@@ -444,6 +444,8 @@ void pi4d2x_state::map(address_map &map)
 	map(0x1faa0000, 0x1faa0003).lrw8("clrerr", [this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); return 0; }, [this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); });
 	map(0x1faa0004, 0x1faa0007).lr8("parerr", [this]() { return m_parerr; }).umask32(0x00ff0000);
 
+	map(0x1fac0000, 0x1fac0003).lrw8("vrrst", [this]() { lio_interrupt<LIO_VR>(1); return 0; }, [this](u8 data) { lio_interrupt<LIO_VR>(1); }).umask32(0xff000000);
+
 	map(0x1fb00000, 0x1fb00003).rw(m_scsi, FUNC(wd33c93_device::indir_addr_r), FUNC(wd33c93_device::indir_addr_w)).umask32(0x00ff0000);
 	map(0x1fb00100, 0x1fb00103).rw(m_scsi, FUNC(wd33c93_device::indir_reg_r), FUNC(wd33c93_device::indir_reg_w)).umask32(0x00ff0000);
 
@@ -607,12 +609,12 @@ void pi4d2x_state::common(machine_config &config)
 		[this](int state)
 		{
 			if (state)
-				m_lio_isr |= (1U << LIO_VRSTAT);
-			else
+			{
 				m_lio_isr &= ~(1U << LIO_VRSTAT);
-
-			// FIXME: still problematic?
-			//lio_interrupt<LIO_VR>(!state);
+				lio_interrupt<LIO_VR>(0);
+			}
+			else
+				m_lio_isr |= (1U << LIO_VRSTAT);
 		});
 	m_gfx->out_int_ge().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_GE>)).invert();
 	m_gfx->out_int_fifo().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_FIFO>)).invert();
@@ -641,6 +643,7 @@ void pi4d2x_state::initialize()
 
 void pi4d2x_state::lio_interrupt(unsigned number, int state)
 {
+	// TODO: special handling for fifo half-full interrupt
 	u16 const mask = 1 << number;
 
 	// record interrupt state
@@ -651,7 +654,7 @@ void pi4d2x_state::lio_interrupt(unsigned number, int state)
 
 	// update interrupt line
 	bool const lio_int = ~m_lio_isr & m_lio_imr;
-	if (m_lio_imr ^ lio_int)
+	if (m_lio_int ^ lio_int)
 	{
 		m_lio_int = lio_int;
 		m_cpu->set_input_line(INPUT_LINE_IRQ1, m_lio_int);
