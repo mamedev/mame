@@ -154,9 +154,10 @@ void acorn_vidc10_device::device_reset()
 	memset(m_data_vram, 0, m_data_vram_size);
 	memset(m_cursor_vram, 0, m_cursor_vram_size);
 	memset(m_stereo_image, 4, m_sound_max_channels);
+	for (int ch=0;ch<m_sound_max_channels;ch++)
+		refresh_stereo_image(ch);
 	m_video_timer->adjust(attotime::never);
-	m_sound_timer->adjust(attotime::never);	
-	refresh_stereo_image();
+	m_sound_timer->adjust(attotime::never);
 }
 
 //-------------------------------------------------
@@ -325,7 +326,7 @@ WRITE32_MEMBER( acorn_vidc10_device::crtc_w )
 	screen_dynamic_res_change();
 }
 
-inline void acorn_vidc10_device:: refresh_stereo_image()
+inline void acorn_vidc10_device::refresh_stereo_image(uint8_t channel)
 {
 	/*
 		-111 full right
@@ -340,19 +341,17 @@ inline void acorn_vidc10_device:: refresh_stereo_image()
 	const float left_gain[8] = { 1.0, 2.0, 1.66, 1.34, 1.0, 0.66, 0.34, 0.0 };
 	const float right_gain[8] = { 1.0, 0.0, 0.34, 0.66, 1.0, 1.34, 1.66, 2.0 };
 	
-	for (int channel=0;channel<m_sound_max_channels;channel++)
-	{
-		m_lspeaker->set_input_gain(channel,left_gain[m_stereo_image[channel]]*m_sound_input_gain);
-		m_rspeaker->set_input_gain(channel,right_gain[m_stereo_image[channel]]*m_sound_input_gain);
-		//printf("%d %f %f\n",channel,m_lspeaker->input_gain(channel),m_rspeaker->input_gain(channel));
-	}
+	m_lspeaker->set_input_gain(channel,left_gain[m_stereo_image[channel]]*m_sound_input_gain);
+	m_rspeaker->set_input_gain(channel,right_gain[m_stereo_image[channel]]*m_sound_input_gain);
+	//printf("%d %f %f\n",channel,m_lspeaker->input_gain(channel),m_rspeaker->input_gain(channel));
 }
 
 
 WRITE32_MEMBER( acorn_vidc10_device::stereo_image_w )
 {
-	m_stereo_image[(offset + 7) & 0x7] = data & 0x7;
-	refresh_stereo_image();
+	uint8_t channel = (offset + 7) & 0x7;
+	m_stereo_image[channel] = data & 0x7;
+	refresh_stereo_image(channel);
 }
 
 WRITE32_MEMBER( acorn_vidc10_device::sound_frequency_w )

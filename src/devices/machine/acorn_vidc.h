@@ -119,7 +119,7 @@ private:
 	const float m_sound_input_gain = 0.05;
 	const int m_sound_max_channels = 8;
 	void refresh_sound_frequency();
-	inline void refresh_stereo_image();
+	inline void refresh_stereo_image(uint8_t channel);
 };
 
 class acorn_vidc10_lcd_device : public acorn_vidc10_device
