@@ -534,7 +534,7 @@ void aa310_state::aa4(machine_config &config)
 	/* video hardware */
 	SCREEN(config.replace(), "screen", SCREEN_TYPE_LCD);
 
-	ACORN_VIDC10_LCD(config.replace(), m_vidc, 0);
+	ACORN_VIDC10_LCD(config.replace(), m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(FUNC(aa310_state::vblank_irq));
 	m_vidc->sound_drq().set(FUNC(aa310_state::sound_drq));
