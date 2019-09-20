@@ -2292,7 +2292,10 @@ void aristmk5_state::aristmk5(machine_config &config)
 	/* TODO: this isn't supposed to access a keyboard ... */
 	AAKART(config, m_kart, 12000000/128); // TODO: frequency
 
-	ACORN_VIDC10(config, m_vidc, 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
+	ACORN_VIDC10(config, m_vidc, MASTER_CLOCK/3);
+	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(FUNC(aristmk5_state::vblank_irq));
 	m_vidc->sound_drq().set(FUNC(aristmk5_state::sound_drq));
 

@@ -11,9 +11,7 @@
 
 #pragma once
 
-#include "screen.h"
 #include "speaker.h"
-#include "emupal.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
@@ -31,6 +29,7 @@
 
 class acorn_vidc10_device : public device_t,
 							public device_memory_interface,
+							public device_palette_interface,
 							public device_video_interface
 {
 public:
@@ -57,20 +56,19 @@ protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual uint32_t palette_entries() const override;
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual space_config_vector memory_space_config() const override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<screen_device> m_screen;
-
 private:
 	const address_space_config  m_space_config;
 	
 	void regs_map(address_map &map);
 
-	required_device<palette_device> m_palette;
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
 	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;

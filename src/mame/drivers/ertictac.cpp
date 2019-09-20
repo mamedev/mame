@@ -27,6 +27,7 @@ PCB has a single OSC at 24MHz
 #include "cpu/arm/arm.h"
 #include "machine/aakart.h"
 #include "machine/i2cmem.h"
+#include "screen.h"
 
 
 class ertictac_state : public archimedes_state
@@ -224,15 +225,18 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 
 void ertictac_state::ertictac(machine_config &config)
 {
-	ARM(config, m_maincpu, XTAL(24'000'000)/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
+	ARM(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ertictac_state::ertictac_map);
 	m_maincpu->set_periodic_int(FUNC(ertictac_state::ertictac_podule_irq), attotime::from_hz(60)); // FIXME: timing of this
 
 	I2CMEM(config, "i2cmem", 0).set_page_size(NVRAM_PAGE_SIZE).set_data_size(NVRAM_SIZE);
 
-//  AAKART(config, m_kart, XTAL(24'000'000)/3); // TODO: frequency
+//  AAKART(config, m_kart, 24_MHz_XTAL/3); // TODO: frequency
 
-	ACORN_VIDC10(config, m_vidc, 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
+	ACORN_VIDC10(config, m_vidc, 24_MHz_XTAL);
+	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(FUNC(ertictac_state::vblank_irq));
 	m_vidc->sound_drq().set(FUNC(ertictac_state::sound_drq));
 }

@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "acorn_vidc.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -53,10 +54,9 @@ void acorn_vidc10_device::regs_map(address_map &map)
 acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_screen(*this, "screen")
   	, m_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_device::regs_map), this))
-	, m_palette(*this, "palette")
 	, m_lspeaker(*this, "lspeaker")
 	, m_rspeaker(*this, "rspeaker")
 	, m_dac(*this, "dac%u", 0)
@@ -91,14 +91,6 @@ device_memory_interface::space_config_vector acorn_vidc10_device::memory_space_c
 
 void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(16'000'000), 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
-	m_screen->set_screen_update(FUNC(acorn_vidc10_device::screen_update));
-//	m_screen->screen_vblank().set(FUNC(acorn_vidc10_device::screen_vblank));
-
-	// 8bpp + 1/2/4bpp + 2bpp for cursor 
-	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0x100+0x10+4);
-	
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
@@ -113,8 +105,30 @@ void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 void acorn_vidc10_lcd_device::device_add_mconfig(machine_config &config)
 {
 	acorn_vidc10_device::device_add_mconfig(config);
-	m_screen->set_type(SCREEN_TYPE_LCD);
 	// TODO: verify !Configure with automatic type detection, there must be an ID telling this is a LCD machine.
+}
+
+uint32_t acorn_vidc10_device::palette_entries() const
+{
+	return 0x100+0x10+4; // 8bpp + 1/2/4bpp + 2bpp for cursor
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void acorn_vidc10_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(acorn_vidc10_device::screen_update), this));
 }
 
 //-------------------------------------------------
@@ -125,7 +139,10 @@ void acorn_vidc10_device::device_start()
 {
 	m_vblank_cb.resolve_safe();
 	m_sound_drq_cb.resolve_safe();
-	
+
+	for (int i = 0; i < entries(); i++)
+		set_pen_color(i, rgb_t::black());
+
 	save_item(NAME(m_bpp_mode));
 	save_item(NAME(m_crtc_interlace));
 	save_item(NAME(m_pixel_clock));
@@ -185,7 +202,7 @@ void acorn_vidc10_device::device_timer(emu_timer &timer, device_timer_id id, int
 inline void acorn_vidc10_device::screen_vblank_line_update()
 {
 	int vline = (m_crtc_regs[CRTC_VDER]) * (m_crtc_interlace + 1);
-	m_video_timer->adjust((vline > 2) ? m_screen->time_until_pos(vline) : attotime::never);
+	m_video_timer->adjust((vline > 2) ? screen().time_until_pos(vline) : attotime::never);
 }
 
 void acorn_vidc10_device::screen_dynamic_res_change()
@@ -225,7 +242,7 @@ void acorn_vidc10_device::screen_dynamic_res_change()
 
 	attoseconds_t const refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_pixel_clock]) * m_crtc_regs[CRTC_HCR] * m_crtc_regs[CRTC_VCR];
 
-	m_screen->configure(m_crtc_regs[CRTC_HCR], m_crtc_regs[CRTC_VCR] * (m_crtc_interlace+1), visarea, refresh);
+	screen().configure(m_crtc_regs[CRTC_HCR], m_crtc_regs[CRTC_VCR] * (m_crtc_interlace+1), visarea, refresh);
 }
 
 //**************************************************************************
@@ -251,14 +268,14 @@ inline void acorn_vidc10_device::update_4bpp_palette(uint16_t index, uint32_t pa
 	g = (paldata & 0x00f0) >> 4;
 	r = (paldata & 0x000f) >> 0;
 
-	m_palette->set_pen_color(index, pal4bit(r), pal4bit(g), pal4bit(b) );
-	m_screen->update_partial(m_screen->vpos());
+	set_pen_color(index, pal4bit(r), pal4bit(g), pal4bit(b) );
+	screen().update_partial(screen().vpos());
 }
 
 WRITE32_MEMBER( acorn_vidc10_device::pal_data_display_w )
 {
 	update_4bpp_palette(offset+0x100, data);
-	//printf("%02x: %01x %01x %01x [%d]\n",offset,r,g,b,m_screen->vpos());
+	//printf("%02x: %01x %01x %01x [%d]\n",offset,r,g,b,screen().vpos());
 	
 	// 8bpp
 	for(int idx=0;idx<0x100;idx+=0x10)
@@ -267,7 +284,7 @@ WRITE32_MEMBER( acorn_vidc10_device::pal_data_display_w )
 		int g = ((data & 0x030) >> 4) | ((idx & 0x60) >> 3);
 		int r = ((data & 0x007) >> 0) | ((idx & 0x10) >> 1);
 
-		m_palette->set_pen_color(offset + idx, pal4bit(r), pal4bit(g), pal4bit(b) );
+		set_pen_color(offset + idx, pal4bit(r), pal4bit(g), pal4bit(b) );
 	}
 }
 
@@ -458,9 +475,9 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 				if (is_cursor == true && dot == 0)
 					continue;
 				dot += pen_base;
-				bitmap.pix32(dsty, dstx+xi) = m_palette->pen(dot);
+				bitmap.pix32(dsty, dstx+xi) = this->pen(dot);
 				if (m_crtc_interlace)
-					bitmap.pix32(dsty+1, dstx+xi) = m_palette->pen(dot);
+					bitmap.pix32(dsty+1, dstx+xi) = this->pen(dot);
 			}
 		}
 	}
@@ -474,7 +491,7 @@ u32 acorn_vidc10_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	const uint8_t x_step[4] = { 19, 11, 7, 5 };
 
 	/* border color */
-	bitmap.fill(m_palette->pen(0x110), cliprect);
+	bitmap.fill(pen(0x110), cliprect);
 
 	/* define X display area through BPP mode register */
 	calc_dxs = (m_crtc_regs[CRTC_HDSR]*2)+x_step[m_bpp_mode & 3];
@@ -512,7 +529,7 @@ u32 acorn_vidc10_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 READ_LINE_MEMBER(acorn_vidc10_device::flyback_r )
 {
-	int vert_pos = m_screen->vpos();
+	int vert_pos = screen().vpos();
 	bool flyback = (vert_pos <= m_crtc_regs[CRTC_VDSR] || vert_pos >= m_crtc_regs[CRTC_VDER]);
 	return flyback;
 }

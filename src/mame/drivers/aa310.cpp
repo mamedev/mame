@@ -95,6 +95,7 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -428,7 +429,10 @@ void aa310_state::aa310(machine_config &config)
 
 	I2CMEM(config, "i2cmem", 0).set_data_size(0x100);
 
-	ACORN_VIDC10(config, m_vidc, 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
+	ACORN_VIDC10(config, m_vidc, 24_MHz_XTAL);
+	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(FUNC(aa310_state::vblank_irq));
 	m_vidc->sound_drq().set(FUNC(aa310_state::sound_drq));
 
@@ -528,7 +532,10 @@ void aa310_state::aa4(machine_config &config)
 	m_maincpu->set_clock(24_MHz_XTAL); // ARM3
 
 	/* video hardware */
+	SCREEN(config.replace(), "screen", SCREEN_TYPE_LCD);
+
 	ACORN_VIDC10_LCD(config.replace(), m_vidc, 0);
+	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(FUNC(aa310_state::vblank_irq));
 	m_vidc->sound_drq().set(FUNC(aa310_state::sound_drq));
 
