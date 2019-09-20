@@ -43,6 +43,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/acorn_vidc.h,MACHINES["ACORN_VIDC"] = true
+--------------------------------------------------
+
+if (VIDEOS["ACORN_VIDC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/acorn_vidc.cpp",
+		MAME_DIR .. "src/devices/video/acorn_vidc.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/am8052.h,VIDEOS["AM8052"] = true
 --------------------------------------------------
 

@@ -284,6 +284,7 @@ SOUNDS["LC7535"] = true
 
 VIDEOS["SEGA315_5124"] = true
 VIDEOS["SEGA315_5313"] = true
+VIDEOS["ACORN_VIDC"] = true
 --VIDEOS["AM8052"] = true
 VIDEOS["BUFSPRITE"] = true
 --VIDEOS["CDP1861"] = true

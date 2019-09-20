@@ -4161,15 +4161,3 @@ if (MACHINES["VRENDER0"]~=null) then
 		MAME_DIR .. "src/devices/machine/vrender0.h",
 	}
 end
-
---------------------------------------------------
---
---@src/devices/machine/acorn_vidc.h,MACHINES["ACORN_VIDC10"] = true
---------------------------------------------------
-
-if (MACHINES["ACORN_VIDC10"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/acorn_vidc.cpp",
-		MAME_DIR .. "src/devices/machine/acorn_vidc.h",
-	}
-end
