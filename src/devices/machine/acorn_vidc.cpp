@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, R. Belmont, Juergen Buchmueller
 /**********************************************************************************************
 
 	Acorn VIDC10 (VIDeo Controller) device chip
@@ -8,7 +8,10 @@
 
 	TODO:
 	- subclass screen_device, derive h/vsync signals out there;
-	- support for raster effects;
+	- improve timings for raster effects:
+	  * nebulus: 20 lines off with aa310;
+	  * lotustc2: abuses color flipping;
+	  * quazer: needs in-flight DMA;
 	- support for stereo image;
 	- subclass this for VIDC20 emulation (RiscPC);
 
@@ -108,7 +111,7 @@ void acorn_vidc10_lcd_device::device_add_mconfig(machine_config &config)
 {
 	acorn_vidc10_device::device_add_mconfig(config);
 	m_screen->set_type(SCREEN_TYPE_LCD);
-	// TODO: there must be some ID bit that tells being a LCD machine
+	// TODO: verify !Configure with automatic type detection, there must be an ID telling this is a LCD machine.
 }
 
 //-------------------------------------------------
@@ -241,6 +244,7 @@ WRITE32_MEMBER( acorn_vidc10_device::pal_data_display_w )
 	r = (data & 0x000f) >> 0;
 
 	m_palette->set_pen_color(offset+0x100, pal4bit(r), pal4bit(g), pal4bit(b) );
+	//printf("%02x: %01x %01x %01x [%d]\n",offset,r,g,b,m_screen->vpos());
 	
 	for(int idx=0;idx<0x100;idx+=0x10)
 	{
@@ -287,7 +291,7 @@ WRITE32_MEMBER( acorn_vidc10_device::crtc_w )
 {
 	switch(offset)
 	{
-		case CRTC_HCR:  m_crtc_regs[CRTC_HCR] =  ((data >> 14)<<1)+1;    	break;
+		case CRTC_HCR:  m_crtc_regs[CRTC_HCR] =  ((data >> 14)<<1)+2;    	break;
 //		case CRTC_HSWR: m_crtc_regs[CRTC_HSWR] = (data >> 14)+1;   			break;
 		case CRTC_HBSR: m_crtc_regs[CRTC_HBSR] = ((data >> 14)<<1)+1;    	break;
 		case CRTC_HDSR: m_crtc_regs[CRTC_HDSR] = (data >> 14);   			break;
@@ -385,7 +389,7 @@ void acorn_vidc10_device::refresh_sound_frequency()
 		double sndhz = 1e6 / ((m_sound_frequency_latch & 0xff) + 2);
 		sndhz /= 8.0;
 		m_sound_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
-		//printf("MEMC: audio DMA start, sound freq %d, sndhz = %f\n", (m_crtc_regs[0xc0] & 0xff)-2, sndhz);
+		//printf("VIDC: audio DMA start, sound freq %d, sndhz = %f\n", (m_crtc_regs[0xc0] & 0xff)-2, sndhz);
 	}
 	else
 		m_sound_timer->adjust(attotime::never);
@@ -403,17 +407,18 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 	const u16 xchar_size = 1 << (3 - bpp);
 	const u8 pen_byte_sizes[4] = { 1, 2, 4, 1 };
 	const u16 pen_byte_size = pen_byte_sizes[bpp];
-	int srcx, srcy, dstx, dsty;
+	const int raster_ystart = std::max(0, cliprect.min_y-ystart);
 	xsize >>= 3-bpp;
 
-	for (srcy = cliprect.min_y; srcy<ysize; srcy++)
+	//printf("%d %d %d %d\n",ystart, ysize, cliprect.min_y, cliprect.max_y);
+
+	for (int srcy = raster_ystart; srcy<ysize; srcy++)
 	{
-		dsty = (srcy + ystart)*(m_crtc_interlace+1);
-		for (srcx = 0; srcx<xsize; srcx++)
+		int dsty = (srcy + ystart)*(m_crtc_interlace+1);
+		for (int srcx = 0; srcx<xsize; srcx++)
 		{
 			u8 pen = vram[srcx + srcy * xsize];
-
-			dstx = (srcx*xchar_size) + xstart;
+			int dstx = (srcx*xchar_size) + xstart;
 			
 			for (int xi=0;xi<xchar_size;xi++)
 			{
@@ -458,11 +463,6 @@ u32 acorn_vidc10_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 	if (xsize <= 0 || ysize <= 0)
 		return 0;
-	
-	// TODO: update for rasters
-//	printf("%d %d %d %d\n",ystart,ysize, cliprect.min_y, cliprect.max_y);
-//	ystart = std::max(ystart, cliprect.min_y);
-	ysize = std::min(ysize, cliprect.max_y);
 
 	draw(bitmap, cliprect, m_data_vram, m_bpp_mode, xstart, ystart, xsize, ysize, false);
 	if (m_cursor_enable == true)

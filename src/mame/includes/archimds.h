@@ -123,8 +123,7 @@ private:
 	uint32_t m_vidc_sndstart, m_vidc_sndend, m_vidc_sndcur, m_vidc_sndendcur;
 	uint8_t m_video_dma_on,m_audio_dma_on;
 	bool m_cursor_enabled;
-	emu_timer *m_timer[4], *m_vid_timer;
-	emu_timer *m_vbl_timer;
+	emu_timer *m_timer[4];
 	uint8_t m_floppy_select;
 	bool check_floppy_ready();
 	uint8_t m_joy_serial_data;
