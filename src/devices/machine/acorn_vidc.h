@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ACORN_VIDC10_H
-#define MAME_VIDEO_ACORN_VIDC10_H
+#ifndef MAME_MACHINE_ACORN_VIDC_H
+#define MAME_MACHINE_ACORN_VIDC_H
 
 #pragma once
 
@@ -71,13 +71,15 @@ private:
 	void regs_map(address_map &map);
 
 	required_device<palette_device> m_palette;
-	//required_device_array<speaker_device, 2> m_speaker;
+	required_device<speaker_device> m_lspeaker;
+	required_device<speaker_device> m_rspeaker;
 	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
 	devcb_write_line m_vblank_cb;
 	devcb_write_line m_sound_drq_cb;
 
 	DECLARE_WRITE32_MEMBER( pal_data_display_w );
 	DECLARE_WRITE32_MEMBER( pal_data_cursor_w );
+	DECLARE_WRITE32_MEMBER( stereo_image_w );
 	DECLARE_WRITE32_MEMBER( crtc_w );
 	DECLARE_WRITE32_MEMBER( sound_frequency_w );
 	DECLARE_WRITE32_MEMBER( control_w );
@@ -108,11 +110,16 @@ private:
 	const u32 m_cursor_vram_size = m_cursor_vram_mask+1;
 	bool     m_cursor_enable;
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *vram, uint8_t bpp, int xstart, int ystart, int xsize, int ysize, bool is_cursor);
+	inline void update_4bpp_palette(uint16_t index, uint32_t paldata);
 
 	u8       m_sound_frequency_latch;
 	bool     m_sound_frequency_test_bit;
 	bool     m_sound_mode;
+	u8       m_stereo_image[8];
+	const float m_sound_input_gain = 0.05;
+	const int m_sound_max_channels = 8;
 	void refresh_sound_frequency();
+	inline void refresh_stereo_image();
 };
 
 class acorn_vidc10_lcd_device : public acorn_vidc10_device
