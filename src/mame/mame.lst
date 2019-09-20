@@ -2480,6 +2480,13 @@ vlsi5							// 286 motherboards using the 5-chip VLSI chipset
 sy012							// SY-012 16/25 386MB VER: 5.2 motherboard (386)
 frxc402							// 386 motherboards using FOREX FRX46C402/FRX36C300/SIS85C206 chips
 gs611606a						// Goldstar P/N 611-606A Rev 1.0A motherboard (386)
+dfi386							// DFI 386-20.REV0  motherboard (386)
+386sc							// 386 SC Rev A2 motherboard
+386sc2c							//
+opti495xlc						// Motherboards using the OPTi 82C495XLC chipset (386)
+isa386u30						// Asus ISA-386U30 REV.2.2 motherboard (386)
+isa386c							// Asus ISA-386C motherboard (386)
+pt581392						// Motherboard using the Forex FRX46C402 + FRX46C411 + SiS 85C206 chipset (386)
 pem2530							// DTK PEM 2530 motherboard (386)
 tam3340ma0						// TAM/33/40-MA0 (CM318R00,M31-R00)
 alim1429						// Motherboards using the ALi M1429 A1 and M1431 A2 chipset (386)
@@ -2533,7 +2540,8 @@ xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
 xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
 xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17)
 lion3500                        // 1993 Lion 3500C/T notebook
-o286foxii                       // Octek Fox II 286 motherboard
+o286foxii                       // Octek Fox II motherboard (286)
+ocjagv							// Octek Jaguar V motherboard (386)
 
 @source:atari_s1.cpp
 aavenger                        //
