@@ -2457,8 +2457,8 @@ ROM_END
 // OSC: OSC1: 14.31818, OSC2: 16.000MHz, OSC3: unreadable, OSC4: 40.000MHz
 ROM_START( dfi386 )
 	ROM_REGION(0x20000, "bios", 0)
-	ROMX_LOAD( "386-dfi-386-20_even_32k.bin", 0x00000, 0x10000, CRC(2d1309f8) SHA1(a75816b97d1f763dba39bdccf8e58729a58b0e56), ROM_SKIP(1) )
-	ROMX_LOAD( "386-dfi-386-20_odd_32k.bin", 0x00001, 0x10000, CRC(1968fe11) SHA1(b5662daa57751859d2cfa7740f708277cbe35080), ROM_SKIP(1) )
+	ROMX_LOAD( "386-dfi-386-20_even_32k.bin", 0x10000, 0x8000, CRC(2d1309f8) SHA1(a75816b97d1f763dba39bdccf8e58729a58b0e56), ROM_SKIP(1) )
+	ROMX_LOAD( "386-dfi-386-20_odd_32k.bin", 0x10001, 0x8000, CRC(1968fe11) SHA1(b5662daa57751859d2cfa7740f708277cbe35080), ROM_SKIP(1) )
 ROM_END
 
 //**************************************************************************
