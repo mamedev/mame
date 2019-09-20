@@ -1658,8 +1658,8 @@ READ8_MEMBER(apple2e_state::c000_r)
 				return rv;
 			}
 
-		case 0x11:  // read LCRAM2 (LC Dxxx bank), also reads like $C010 without strobe reset
-			return (m_lcram2 ? 0x80 : 0x00) | m_strobe | m_transchar;
+		case 0x11:  // read LCRAM2 (LC Dxxx bank)
+			return (m_lcram2 ? 0x80 : 0x00) | m_transchar;
 
 		case 0x12:  // read LCRAM (is LC readable?)
 			return (m_lcram ? 0x80 : 0x00) | m_transchar;
