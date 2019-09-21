@@ -1,5 +1,6 @@
 // license: BSD-3-Clause
 // copyright-holders: Dirk Best
+// thanks-to: Rob Krum
 /***************************************************************************
 
     Sega Billboard
