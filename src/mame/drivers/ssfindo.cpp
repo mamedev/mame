@@ -128,6 +128,7 @@ Notes:
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/i2cmem.h"
+#include "machine/acorn_vidc.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -192,12 +193,12 @@ enum
 	ATODCNT3,
 	ATODCNT4,
 
-	SD0CURA=96,
-	SD0ENDA,
-	SD0CURB,
-	SD0ENDB,
-	SD0CR,
-	SD0ST,
+	SDCURA=96,
+	SDENDA,
+	SDCURB,
+	SDENDB,
+	SDCR,
+	SDST,
 
 	CURSCUR=112,
 	CURSINIT,
@@ -224,11 +225,10 @@ public:
 	ssfindo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
 		m_i2cmem(*this, "i2cmem"),
-		m_vram(*this, "vram"),
 		m_flashrom(*this, "flash"),
-		m_io_ps7500(*this, "PS7500") { }
+		m_vidc(*this, "vidc")
+		{ }
 
 	void ssfindo(machine_config &config);
 	void ppcar(machine_config &config);
@@ -240,14 +240,10 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
 	optional_device<i2cmem_device> m_i2cmem;
 
-	required_shared_ptr<uint32_t> m_vram;
-
 	required_region_ptr<uint16_t> m_flashrom;
-
-	required_ioport m_io_ps7500;
+	required_device<arm_vidc20_device> m_vidc;
 
 	// driver init configuration
 	uint32_t m_flashType;
@@ -266,7 +262,6 @@ private:
 	uint32_t m_flashN;
 
 	// common
-	DECLARE_WRITE32_MEMBER(FIFO_w);
 	DECLARE_READ32_MEMBER(PS7500_IO_r);
 	DECLARE_WRITE32_MEMBER(PS7500_IO_w);
 
@@ -285,13 +280,11 @@ private:
 	// tetfight
 	DECLARE_READ32_MEMBER(tetfight_unk_r);
 	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
-
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(sound_drq);
 	void init_common();
 	virtual void machine_reset() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(PS7500_Timer0_callback);
 	TIMER_CALLBACK_MEMBER(PS7500_Timer1_callback);
 
@@ -307,44 +300,15 @@ private:
 	void ppcar_map(address_map &map);
 	void ssfindo_map(address_map &map);
 	void tetfight_map(address_map &map);
+	
+	uint32_t m_vidc_sndcur, m_vidc_sndend;
+	bool m_audio_dma_on;
+	uint8_t m_vidc_sndcur_buffer, m_vidc_snd_overrun, m_vidc_snd_int;
+	bool m_vidc_sndbuffer_ok[2];
+	inline void sound_swap_buffer();
 };
 
 
-uint32_t ssfindo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int s,x,y;
-
-	if( m_PS7500_IO[VIDCR]&0x20) //video DMA enabled
-	{
-		s=( (m_PS7500_IO[VIDINITA]&0x1fffffff)-0x10000000)/4;
-
-		if(s>=0 && s<(0x10000000/4))
-		{
-			for(y=0;y<256;y++)
-				for(x=0;x<320;x+=4)
-				{
-					bitmap.pix16(y, x+0) = m_vram[s]&0xff;
-					bitmap.pix16(y, x+1) = (m_vram[s]>>8)&0xff;
-					bitmap.pix16(y, x+2) = (m_vram[s]>>16)&0xff;
-					bitmap.pix16(y, x+3) = (m_vram[s]>>24)&0xff;
-					s++;
-				}
-		}
-	}
-
-	return 0;
-}
-
-WRITE32_MEMBER(ssfindo_state::FIFO_w)
-{
-	m_PS7500_FIFO[data>>28]=data;
-
-	if(!(data>>28))
-	{
-		m_palette->set_pen_color(m_PS7500_FIFO[1]&0xff, data&0xff,(data>>8)&0xff,(data>>16)&0xff);
-		m_PS7500_FIFO[1]++; //autoinc
-	}
-}
 TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer0_callback)
 {
 	m_PS7500_IO[IRQSTA]|=0x20;
@@ -382,22 +346,106 @@ void ssfindo_state::PS7500_startTimer1()
 		m_PS7500timer1->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
-INTERRUPT_GEN_MEMBER(ssfindo_state::interrupt)
+WRITE_LINE_MEMBER(ssfindo_state::vblank_irq)
 {
+	if (!state)
+		return;
+
+	//printf("%02x %02x\n",m_PS7500_IO[IRQSTA], m_PS7500_IO[IRQMSKA]);
+	//printf("%08x %08x %08x\n",m_PS7500_IO[VIDCR], m_PS7500_IO[VIDINITA], m_PS7500_IO[VIDEND]);
+
 	m_PS7500_IO[IRQSTA]|=0x08;
-		if(m_PS7500_IO[IRQMSKA]&0x08)
+	if(m_PS7500_IO[IRQMSKA]&0x08)
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+
+	if( m_PS7500_IO[VIDCR]&0x20) //video DMA enabled
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+
+		// TODO: much more complex
+		uint32_t src = m_PS7500_IO[VIDINITA]&0x1ffffff0;
+		uint32_t size = m_PS7500_IO[VIDEND];
+
+
+		for (uint32_t m_vidc_vidcur = 0; m_vidc_vidcur<size; m_vidc_vidcur++)
 		{
-			device.execute().pulse_input_line(ARM7_IRQ_LINE, device.execute().minimum_quantum_time());
+			m_vidc->write_vram(m_vidc_vidcur, space.read_byte(src));
+			src++;
+			src &= 0x1fffffff;
 		}
+	}
+}
+
+inline void ssfindo_state::sound_swap_buffer()
+{
+	if (m_vidc_sndcur_buffer == 1)
+	{
+		m_vidc_sndcur = m_PS7500_IO[SDCURB] & 0x1fffffff;
+		m_vidc_sndend = m_vidc_sndcur + (m_PS7500_IO[SDENDB] + 0x10);
+		m_vidc_sndbuffer_ok[1] = true;
+	}
+	else
+	{
+		m_vidc_sndcur = m_PS7500_IO[SDCURA] & 0x1fffffff;
+		m_vidc_sndend = m_vidc_sndcur + (m_PS7500_IO[SDENDA] + 0x10);
+		m_vidc_sndbuffer_ok[0] = true;
+	}
+
+	// TODO: actual condition for int
+	m_vidc_snd_overrun = false;
+	m_vidc_snd_int = false;
+}
+
+WRITE_LINE_MEMBER(ssfindo_state::sound_drq)
+{
+	if (!state)
+		return;
+	
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	
+	if (m_vidc->get_dac_mode() == true)
+	{
+		for (int ch=0;ch<2;ch++)
+			m_vidc->write_dac32(ch, (space.read_word(m_vidc_sndcur + ch*2)));
+		
+		m_vidc_sndcur += 4;
+		
+		if (m_vidc_sndcur >= m_vidc_sndend)
+		{
+			// TODO: interrupt bit
+
+			m_vidc->update_sound_mode(m_audio_dma_on);
+			if (m_audio_dma_on)
+			{
+				m_vidc_sndbuffer_ok[m_vidc_sndcur_buffer] = false;
+				m_vidc_sndcur_buffer ^= 1;
+				m_vidc_snd_overrun = (m_vidc_sndbuffer_ok[m_vidc_sndcur_buffer] == false);				
+				sound_swap_buffer();
+			}
+			else
+			{
+				// ...
+			}
+		}
+	}
+	else
+	{
+		// ...
+	}
 }
 
 void ssfindo_state::PS7500_reset()
 {
-		m_PS7500_IO[IOCR]            =   0x3f;
-		m_PS7500_IO[VIDCR]       =   0;
+	m_PS7500_IO[IOCR]  = 0x3f;
+	m_PS7500_IO[VIDCR] = 0;
+	m_vidc_snd_overrun = 1;
+	m_vidc_snd_int = 1;
+	m_vidc_sndcur_buffer = 0;
+	m_vidc_sndbuffer_ok[0] = false;
+	m_vidc_sndbuffer_ok[1] = false;
 
-		m_PS7500timer0->adjust( attotime::never);
-		m_PS7500timer1->adjust( attotime::never);
+	m_PS7500timer0->adjust( attotime::never);
+	m_PS7500timer1->adjust( attotime::never);
 }
 
 
@@ -446,10 +494,10 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 
 			if( m_iocr_hack)
 			{
-				return (m_io_ps7500->read() & 0x80) | 0x34 | (m_i2cmem->read_sda() ? 0x03 : 0x00); //eeprom read
+				return (m_vidc->flyback_r()<<7) | 0x34 | (m_i2cmem->read_sda() ? 0x03 : 0x00); //eeprom read
 			}
 
-			return (m_io_ps7500->read() & 0x80) | 0x37;
+			return (m_vidc->flyback_r()<<7) | 0x37;
 
 		case VIDCR:
 			return (m_PS7500_IO[offset] | 0x50) & 0xfffffff0;
@@ -462,10 +510,15 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 		case VIDEND:
 		case VIDSTART:
 		case VIDINITA: //TODO: bits 29 ("equal") and 30 (last bit)  p.105
-
+		case SDCR:
+		case SDCURA:
+		case SDCURB:
+		case SDENDA:
+		case SDENDB:
 			return m_PS7500_IO[offset];
-
-
+		
+		case SDST:
+			return (m_vidc_snd_overrun<<2) | (m_vidc_snd_int<<1) | m_vidc_sndcur_buffer;
 	}
 	return machine().rand();//m_PS7500_IO[offset];
 }
@@ -523,9 +576,34 @@ WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 			m_i2cmem->write_sda((data & 0x02) ? 1 : 0);
 			break;
 
+		case SDCR:
+			COMBINE_DATA(&m_PS7500_IO[offset]);
+			m_audio_dma_on = BIT(m_PS7500_IO[SDCR], 5);
+
+			m_vidc->update_sound_mode(m_audio_dma_on);
+			if (m_audio_dma_on)
+			{
+				m_vidc_sndcur_buffer = 0;
+				sound_swap_buffer();
+			}
+			else
+			{
+				// ...
+			}
+			break;
+
+		case SDCURA:
+		case SDENDA:
+			COMBINE_DATA(&m_PS7500_IO[offset]);
+			break;
+
+		case SDCURB:
+		case SDENDB:
+			COMBINE_DATA(&m_PS7500_IO[offset]);
+			break;
+
 		case REFCR:
 		case DRAMCR:
-		case SD0CR:
 		case ROMCR0:
 		case VIDMUX:
 		case CLKCTL:
@@ -534,7 +612,7 @@ WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 		case T1high:
 		case T0high:
 		case VIDCR:
-		case VIDINITA: //TODO: bit 30 (last bit) p.105
+		case VIDINITA: //TODO: bit 30 (last bit) p.105ù
 			COMBINE_DATA(&m_PS7500_IO[offset]);
 			break;
 	}
@@ -621,8 +699,8 @@ void ssfindo_state::ssfindo_map(address_map &map)
 	map(0x03243000, 0x03243003).portr("DSW").nopw();
 	map(0x0324f000, 0x0324f003).r(FUNC(ssfindo_state::SIMPLEIO_r));
 	map(0x03245000, 0x03245003).nopw(); /* sound ? */
-	map(0x03400000, 0x03400003).w(FUNC(ssfindo_state::FIFO_w));
-	map(0x10000000, 0x11ffffff).ram().share("vram");
+	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
+	map(0x10000000, 0x11ffffff).ram();
 }
 
 void ssfindo_state::ppcar_map(address_map &map)
@@ -636,9 +714,9 @@ void ssfindo_state::ppcar_map(address_map &map)
 	map(0x03340000, 0x03340007).nopw();
 	map(0x03341000, 0x0334101f).nopw();
 	map(0x033c0000, 0x033c0003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
-	map(0x03400000, 0x03400003).w(FUNC(ssfindo_state::FIFO_w));
+	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
 	map(0x08000000, 0x08ffffff).ram();
-	map(0x10000000, 0x10ffffff).ram().share("vram");
+	map(0x10000000, 0x10ffffff).ram();
 }
 
 READ32_MEMBER(ssfindo_state::tetfight_unk_r)
@@ -656,12 +734,12 @@ void ssfindo_state::tetfight_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
 	map(0x03200000, 0x032001ff).rw(FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
-	map(0x03400000, 0x03400003).w(FUNC(ssfindo_state::FIFO_w));
 	map(0x03240000, 0x03240003).portr("IN0");
 	map(0x03240004, 0x03240007).portr("IN1");
 	map(0x03240008, 0x0324000b).portr("DSW2");
 	map(0x03240020, 0x03240023).rw(FUNC(ssfindo_state::tetfight_unk_r), FUNC(ssfindo_state::tetfight_unk_w));
-	map(0x10000000, 0x14ffffff).ram().share("vram");
+	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
+	map(0x10000000, 0x14ffffff).ram();
 }
 
 void ssfindo_state::machine_reset()
@@ -670,9 +748,6 @@ void ssfindo_state::machine_reset()
 }
 
 static INPUT_PORTS_START( ssfindo )
-	PORT_START("PS7500")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_START("IN0")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )               // IPT_START2 ??
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1    ) PORT_PLAYER(1)
@@ -720,9 +795,6 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( ppcar )
-	PORT_START("PS7500")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_START("IN0")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1   )
 
@@ -737,9 +809,6 @@ static INPUT_PORTS_START( ppcar )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tetfight )
-	PORT_START("PS7500")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -801,19 +870,16 @@ void ssfindo_state::ssfindo(machine_config &config)
 	/* basic machine hardware */
 	ARM7(config, m_maincpu, 54000000); // guess...
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ssfindo_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ssfindo_state::interrupt));
+//	m_maincpu->set_vblank_int("screen", FUNC(ssfindo_state::interrupt));
 
 	I2C_24C01(config, m_i2cmem);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(320, 256);
-	screen.set_visarea(0, 319, 0, 239);
-	screen.set_screen_update(FUNC(ssfindo_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	PALETTE(config, m_palette).set_entries(256);
+	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
+	m_vidc->set_screen("screen");
+	m_vidc->vblank().set(FUNC(ssfindo_state::vblank_irq));
+	m_vidc->sound_drq().set(FUNC(ssfindo_state::sound_drq));
 }
 
 void ssfindo_state::ppcar(machine_config &config)

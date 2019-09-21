@@ -64,14 +64,37 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-private:
-	const address_space_config  m_space_config;
-	
+	address_space_config  m_space_config;
 	void regs_map(address_map &map);
 
+	enum {
+		CRTC_HCR = 0, CRTC_HSWR, CRTC_HBSR, CRTC_HDSR, CRTC_HDER, CRTC_HBER, CRTC_HCSR, CRTC_HIR,
+		CRTC_VCR,     CRTC_VSWR, CRTC_VBSR, CRTC_VDSR, CRTC_VDER, CRTC_VBER, CRTC_VCSR, CRTC_VCER
+	};
+	uint32_t m_crtc_regs[16];
+	enum {
+		TIMER_VIDEO = 1,
+		TIMER_SOUND = 2
+	};
+
+	inline void screen_vblank_line_update();
+	inline void screen_dynamic_res_change();
+	void refresh_sound_frequency();
+
+	const uint16_t m_pal_4bpp_base = 0x100;
+	const uint16_t m_pal_cursor_base = 0x10;
+	const uint16_t m_pal_border_base = 0x110;
+	const double m_sound_internal_divider = 8.0;
+
+	uint8_t m_bpp_mode, m_crtc_interlace;
+	u8       m_sound_frequency_latch;
+	bool     m_sound_mode;
+
+	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
+
+private:
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
-	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
 	devcb_write_line m_vblank_cb;
 	devcb_write_line m_sound_drq_cb;
 
@@ -82,23 +105,11 @@ private:
 	DECLARE_WRITE32_MEMBER( sound_frequency_w );
 	DECLARE_WRITE32_MEMBER( control_w );
 	
-	uint8_t m_pixel_clock, m_bpp_mode, m_crtc_interlace;
+	uint8_t m_pixel_clock;
 	//bool m_flyback;
-	enum {
-		TIMER_VIDEO = 1,
-		TIMER_SOUND = 2
-	};
 	emu_timer *m_video_timer;
 	emu_timer *m_sound_timer;
-	
-	inline void screen_vblank_line_update();
-	void screen_dynamic_res_change();
-	
-	enum {
-		CRTC_HCR = 0, CRTC_HSWR, CRTC_HBSR, CRTC_HDSR, CRTC_HDER, CRTC_HBER, CRTC_HCSR, CRTC_HIR,
-		CRTC_VCR,     CRTC_VSWR, CRTC_VBSR, CRTC_VDSR, CRTC_VDER, CRTC_VBER, CRTC_VCSR, CRTC_VCER
-	};
-	uint32_t m_crtc_regs[16];
+		
 	u8 	     *m_data_vram;
 	u8       *m_cursor_vram;
 	// TODO: correct data vram size
@@ -109,15 +120,14 @@ private:
 	bool     m_cursor_enable;
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *vram, uint8_t bpp, int xstart, int ystart, int xsize, int ysize, bool is_cursor);
 	inline void update_4bpp_palette(uint16_t index, uint32_t paldata);
+	uint32_t m_crtc_raw_horz[2];
+	inline uint32_t convert_crtc_hdisplay(uint8_t index);
 
-	u8       m_sound_frequency_latch;
 	bool     m_sound_frequency_test_bit;
-	bool     m_sound_mode;
 	u8       m_stereo_image[8];
 	const float m_sound_input_gain = 0.05;
 	const int m_sound_max_channels = 8;
 	int16_t  m_ulaw_lookup[256];
-	void refresh_sound_frequency();
 	inline void refresh_stereo_image(uint8_t channel);
 };
 
@@ -134,6 +144,43 @@ protected:
 DECLARE_DEVICE_TYPE(ACORN_VIDC10, acorn_vidc10_device)
 DECLARE_DEVICE_TYPE(ACORN_VIDC10_LCD, acorn_vidc10_lcd_device)
 
+class arm_vidc20_device : public acorn_vidc10_device
+{
+public:
+	// construction/destruction
+	arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void write_dac32(uint8_t channel, uint16_t data);
+	bool get_dac_mode();
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	void regs_map(address_map &map);
+	virtual uint32_t palette_entries() const override;
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	const uint16_t m_pal_4bpp_base = 0x000;
+	const uint16_t m_pal_cursor_base = 0x100;
+	const uint16_t m_pal_border_base = 0x100;
+	const double m_sound_internal_divider = 1.0;
+
+private:
+	DECLARE_WRITE32_MEMBER( vidc20_pal_data_display_w );
+	DECLARE_WRITE32_MEMBER( vidc20_pal_data_index_w );
+	DECLARE_WRITE32_MEMBER( vidc20_crtc_w );
+	DECLARE_WRITE32_MEMBER( vidc20_control_w );
+	DECLARE_WRITE32_MEMBER( vidc20_sound_frequency_w );
+	DECLARE_WRITE32_MEMBER( vidc20_sound_control_w );
+	
+	uint8_t m_pal_data_index;
+	inline void update_8bpp_palette(uint16_t index, uint32_t paldata);
+	bool m_dac_serial_mode;
+};
+
+DECLARE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device)
 
 
 //**************************************************************************

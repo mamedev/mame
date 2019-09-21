@@ -80,7 +80,6 @@ if (MACHINES["ACORN_VIDC"]~=null) then
 	}
 end
 
-
 ---------------------------------------------------
 --
 --@src/devices/machine/akiko.h,MACHINES["AKIKO"] = true
