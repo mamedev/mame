@@ -1009,7 +1009,7 @@ void riscpc_state::a7000p(machine_config &config)
 void riscpc_state::sarpc(machine_config &config)
 {
 	/* Basic machine hardware */
-	ARM7(config, m_maincpu, 202000000); // StrongARM
+	SA1110(config, m_maincpu, 202000000); // StrongARM
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 	base_config(config);
 }
@@ -1017,7 +1017,7 @@ void riscpc_state::sarpc(machine_config &config)
 void riscpc_state::sarpc_j233(machine_config &config)
 {
 	/* Basic machine hardware */
-	ARM7(config, m_maincpu, 233000000); // StrongARM
+	SA1110(config, m_maincpu, 233000000); // StrongARM
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 	base_config(config);
 }

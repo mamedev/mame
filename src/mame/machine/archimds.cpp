@@ -882,19 +882,22 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				break;
 
 			case 4: /* sound start */
-				//logerror("MEMC: SNDSTART %08x\n",data);
 				archimedes_clear_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 				m_vidc_sndstart = 0x2000000 | ((data>>2)&0x7fff)*16;
+				//printf("MEMC: SNDSTART %08x\n",m_vidc_sndstart);
 				break;
 
 			case 5: /* sound end */
-				//logerror("MEMC: SNDEND %08x\n",data);
 				// end buffer is actually +16 bytes wrt sound start
+				// TODO: it actually don't apply for ertictac and poizone?
 				m_vidc_sndend = 0x2000000 | (((data>>2)+1)&0x7fff)*16;
+				//printf("MEMC: SNDEND %08x\n",m_vidc_sndend);
 				break;
 
 			case 6:
-				m_vidc_sndcur = 0;
+				//printf("MEMC: SNDPTR\n");
+				m_vidc_sndcur = m_vidc_sndstart;
+				m_vidc_sndendcur = m_vidc_sndend;
 				archimedes_request_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 				break;
 
