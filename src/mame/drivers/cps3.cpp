@@ -158,9 +158,13 @@ key and it didn't run so it is known that the custom CPU will not run standard (
 The flashROM in the cart contains an encrypted program which is decrypted by the CPU in the cart. The CPU has built-in
 decryption and the key is held in some static RAM on the CPU die and kept there by a battery. The code is executed by
 the CPU to boot the system. Even though the code in the flashROM is encrypted, the cart can run it even if it is
-dead/suicided because it has been discovered that the program contains a hidden security menu allowing the cart to be
-loaded with the security data. This proves the cart runs the code even if the battery is dead. The special security
-menu is not normally available but is likely accessed with a special key/button combination which is currently unknown.
+dead/suicided.
+It is thought that when a cartridge dies it will set the decryption keys identical to the ones of SFIII-2nd Impact, so
+removing the battery and changing the content of the flashROM (if it's not a 2nd Impact) will make it run as a normal
+SFIII-2nd Impact cartridge (verified).
+Decryption always applied when reading boot flash ROM or SH-2's On-chip cache areas. Based of the fact, what SFIII-2nd uses
+encrypted boot ROM but plain not encrypted SIMMs 1&2 code&data - besides of key, static RAM inside of CPU also
+should contain decryption range for SIMMs1&2, or some flag which enable or disable it.
 
 Because the CPU in the cart is always powered by the battery, it has stealth capability that allows it to continually
 monitor the situation. If the custom CPU detects any tampering (generally things such as voltage fluctuation or voltage
@@ -168,10 +172,6 @@ dropping or even removal of the cart with the power on), it immediately erases t
 inside the CPU which effectively kills the security cart. It is known (from decapping it) that the CPU in the security
 cart contains an amount of static RAM for data storage and a SH2 core based on the Hitachi SH7010-series (SH7014)
 SuperH RISC engine family of Microprocessors.
-
-It is thought that when a cartridge dies it will set the decryption keys identical to the ones of SFIII-2nd Impact, so
-removing the battery and changing the content of the flashROM (if it's not a 2nd Impact) will make it run as a normal
-SFIII-2nd Impact cartridge (verified).
 
 The main board uses the familiar Capcom SIMM modules to hold the data from the CDROM so that the life of the CD drive
 is maximized. The SIMMs don't contain RAM, but instead TSOP48 surface mounted flashROMs that can be updated with
@@ -373,10 +373,7 @@ Cartridge types A/B are identical and cartridge types C/D are identical.
 Type A/B have extra space on the back side to solder a 28F400 SOP44 flashROM which shares all electrical connections
 with the 29F400 TSOP48 flashROM on the front side of the PCB. Either chip can be used to store the 512k cart program,
 but no cart has been seen with a SOP44 flashROM populated, nor with both SOP44 and TSOP48 populated on one cart.
-A and B cartridges also contain a FM1208S NVRAM which holds game settings or other per-game data. It is definitely
-used. If the NVRAM data is not present when the game boots or the NVRAM is not working or inaccessible a message is
-displayed 'EEPROM ERROR' and the game halts. This error can also occur if the security cart edge connector is dirty
-and not contacting properly.
+A and B cartridges also contain a FM1208S NVRAM, it is NOT used to save settings or game data, purpose is unknown.
 C and D cartridges lack the extra space to solder a SOP44 flashROM. A space is available on the back side for a FM1208S
 NVRAM but it is not populated. A MACH111 CPLD is present on the back side and stamped 'CP3B1A'
 
