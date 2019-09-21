@@ -24,26 +24,26 @@ Sega VERSUS CITY BILLBOARD CONTROL BD 837-11854 (C) 1991
 |--      74F74N  M74LS393P  HD74HC4040P   315-5338A                           |
 |                                                                             |
 |     z                                                                    -- |
-|     8  M27C512                                                          C|| |
+|     8  M27C512                   32.000MHz                              C|| |
 |     0           LH5268AD                                                N|| |
 |                                                                         2|| |
 |                     GAL16V8B         SN74LS32N SN74LS04N MB3771          -- |
 |    LED                                                                      |
 |-----------------------------------------------------------------------------|
-    Setup:
-        Z80        	ZILOG Z0840008PSC Z80 CPU (DIP40)
-        LH5268A    	SHARP LH5268AD-10LL 8k x8 SRAM (DIP28, labeled as MB8464A-15LL on PCB silkscreen)
-        PS2501     	NEC PS2501-4 ISOLATOR (DIP16)
-        M54583P   	MITSUBISHI M54583P DARLINGTON TRANSISTOR ARRAY (DIP18)
-	74F74N    	PHILLIPS 74F74N DUAL D-TYPE FLIP-FLIP (DIP14)
-	M74LS393P 	MITSUBISHI M74LS393P DUAL BINARY COUNTER (DIP14)
-	HD74HC4040P 	RENESAS HD74HC4040P 12-STAGE BINARY COUNTER (DIP16)
-	315-5338A	SEGA CUSTOM (QFP100)
-	M27C512		ST MICROELECTRONICS M27C512-15F1 (DIP28, labeled 'EPR-18022', socketed)
-	GAL16V8B    	LATTICE GAL16V8B-25LP HIGH PERFORMANCE E2CMOS PLD GENERIC ARRAY LOGIC (DIP28, socketed)
-	SN74LS32N	MOTOROLA SN74LS32N QUAD 2-INPUT OR GATE (DIP14)
-	SN74LS04N	MOTOROLA SN74LS04N HEX INVERTER (DIP14)
-	MB3771		FUJITSU MB3771 POWER SUPPLY VOLTAGE MONITOR (SOP8)
+   Setup:
+    Z80         ZILOG Z0840008PSC Z80 CPU (DIP40)
+    LH5268A     SHARP LH5268AD-10LL 8k x8 SRAM (DIP28, labeled as MB8464A-15LL on PCB silkscreen)
+    PS2501      NEC PS2501-4 ISOLATOR (DIP16)
+    M54583P     MITSUBISHI M54583P DARLINGTON TRANSISTOR ARRAY (DIP18)
+    74F74N      PHILLIPS 74F74N DUAL D-TYPE FLIP-FLIP (DIP14)
+    M74LS393P   MITSUBISHI M74LS393P DUAL BINARY COUNTER (DIP14)
+    HD74HC4040P RENESAS HD74HC4040P 12-STAGE BINARY COUNTER (DIP16)
+    315-5338A   SEGA CUSTOM (QFP100)
+    M27C512     ST MICROELECTRONICS M27C512-15F1 (DIP28, labeled 'EPR-18022', socketed)
+    GAL16V8B    LATTICE GAL16V8B-25LP HIGH PERFORMANCE E2CMOS PLD GENERIC ARRAY LOGIC (DIP28, socketed)
+    SN74LS32N   MOTOROLA SN74LS32N QUAD 2-INPUT OR GATE (DIP14)
+    SN74LS04N   MOTOROLA SN74LS04N HEX INVERTER (DIP14)
+    MB3771      FUJITSU MB3771 POWER SUPPLY VOLTAGE MONITOR (SOP8)
     Board:
         837-11854  Sega VERSUS CITY BILLBOARD CONTROL BD
     EEPROM:
@@ -148,7 +148,7 @@ const tiny_rom_entry *sega_billboard_device::device_rom_region() const
 
 void sega_billboard_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_billcpu, 32_MHz_XTAL / 8); // divisor guessed
+	Z80(config, m_billcpu, 32_MHz_XTAL / 4); // Z0840008PSC 8MHz rated part - not verified
 	m_billcpu->set_addrmap(AS_PROGRAM, &sega_billboard_device::mem_map);
 	m_billcpu->set_addrmap(AS_IO, &sega_billboard_device::io_map);
 	m_billcpu->set_periodic_int(FUNC(sega_billboard_device::irq0_line_hold), attotime::from_hz(32_MHz_XTAL/65536)); // timing?
