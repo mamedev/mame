@@ -69606,17 +69606,17 @@
 	</hash>
 	<hash crc32="892434dd" sha1="dfd47797dedddb36f5ca73f0e7d994ed792e2adf" name="Ultimate Stuntman (Camerica)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>71 0 16 0</extrainfo>
+		<extrainfo>71 1 16 0</extrainfo>
 
 	</hash>
 	<hash crc32="a7b81345" sha1="ad0f29158b3c2116dd8cb9d815824a8be002c492" name="Ultimate Stuntman (Camerica)">
 		<status>Known Bad Image</status>
-		<extrainfo>71 0 16 0</extrainfo>
+		<extrainfo>71 1 16 0</extrainfo>
 
 	</hash>
 	<hash crc32="c67fe3e5" sha1="e3952f831b37d4f3fbab610992a711bad4aad957" name="Ultimate Stuntman (Camerica)">
 		<status>Overdumped Image</status>
-		<extrainfo>71 0 16 0</extrainfo>
+		<extrainfo>71 1 16 0</extrainfo>
 
 	</hash>
 	<hash crc32="8ad0f417" sha1="1ea30e90fd8cf2284ff117377a4f8431cb51ad0c" name="Ultimate Super Mario Bros 3 (Final) (SMB3 PRG1 Hack)">
