@@ -148,7 +148,7 @@ public:
 	: m_str(fmt), m_locale(std::locale::classic()), m_arg(0)
 	{
 	}
-	explicit pfmt(std::locale loc, const pstring &fmt)
+	explicit pfmt(const std::locale &loc, const pstring &fmt)
 	: m_str(fmt), m_locale(loc), m_arg(0)
 	{
 	}
@@ -212,21 +212,28 @@ public:
 		return format_element('o', x);
 	}
 
+    friend std::ostream& operator<<(std::ostream &ostrm, const pfmt &fmt)
+    {
+    	ostrm << fmt.m_str;
+    	return ostrm;
+    }
+
 protected:
 
 	struct rtype
 	{
-		rtype() : ret(0), p(0), sl(0), pend(0) {}
+		rtype() : ret(0), p(0), sl(0), pend(0), width(0) {}
 		int	ret;
 		pstring::size_type p;
 		pstring::size_type sl;
-		pstring::value_type pend;
+		char32_t pend;
+		pstring::size_type width;
 
 	};
-	rtype setfmt(std::stringstream &strm, unsigned cfmt_spec);
+	rtype setfmt(std::stringstream &strm, char32_t cfmt_spec);
 
 	template <typename T>
-	pfmt &format_element(const unsigned cfmt_spec, T &&val)
+	pfmt &format_element(const char32_t cfmt_spec, T &&val)
 	{
 		rtype ret;
 
@@ -239,7 +246,12 @@ protected:
 			if (ret.ret>=0)
 			{
 				strm << std::forward<T>(val);
-				m_str = m_str.substr(0, ret.p) + pstring(strm.str()) + m_str.substr(ret.p + ret.sl);
+				const pstring ps(strm.str());
+				pstring pad("");
+				if (ret.width > ps.length())
+					pad = pstring(ret.width - ps.length(), ' ');
+
+				m_str = m_str.substr(0, ret.p) + pad + ps + m_str.substr(ret.p + ret.sl);
 			}
 		} while (ret.ret == 1);
 

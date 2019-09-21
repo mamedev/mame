@@ -13,6 +13,7 @@
 #include "pconfig.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <type_traits>
 

@@ -186,6 +186,7 @@ public:
 	pstring_t& operator+=(const code_t c) { traits_type::encode(c, m_str); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const pstring_t &rhs) { return pstring_t(lhs) += rhs; }
 	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
+	friend pstring_t operator+(const code_t lhs, const pstring_t &rhs) { return pstring_t(1, lhs) += rhs; }
 
 	// comparison operators
 	bool operator==(const pstring_t &string) const { return (compare(string) == 0); }
@@ -195,6 +196,12 @@ public:
 	bool operator<=(const pstring_t &string) const { return (compare(string) <= 0); }
 	bool operator>(const pstring_t &string) const { return (compare(string) > 0); }
 	bool operator>=(const pstring_t &string) const { return (compare(string) >= 0); }
+
+    friend std::ostream& operator<<(std::ostream &ostrm, const pstring_t &str)
+    {
+    	ostrm << str.m_str;
+    	return ostrm;
+    }
 
 	const_reference at(const size_type pos) const { return *reinterpret_cast<const ref_value_type *>(F::nthcode(m_str.c_str(),pos)); }
 
@@ -475,11 +482,12 @@ extern template struct pstring_t<putf16_traits>;
 extern template struct pstring_t<pwchar_traits>;
 
 #if (PSTRING_USE_STD_STRING)
-typedef std::string pstring;
+using pstring = std::string;
 static inline pstring::size_type pstring_mem_t_size(const pstring &s) { return s.size(); }
 #else
 using pstring = pstring_t<putf8_traits>;
-static inline pstring::size_type pstring_mem_t_size(const pstring &s) { return s.mem_t_size(); }
+template <typename T>
+static inline pstring::size_type pstring_mem_t_size(const pstring_t<T> &s) { return s.mem_t_size(); }
 #endif
 using putf8string = pstring_t<putf8_traits>;
 using pu16string = pstring_t<putf16_traits>;
@@ -618,7 +626,7 @@ namespace plib
 		const T *p = str;
 		while (*p)
 			p++;
-		return p - str;
+		return static_cast<std::size_t>(p - str);
 	}
 
 	template<typename T>

@@ -33,6 +33,8 @@ namespace plib {
 // Input file stream
 // -----------------------------------------------------------------------------
 
+#if !USE_CSTREAM
+
 pifilestream::pifilestream(const pstring &fname)
 : pistream(0)
 , m_file(fopen(fname.c_str(), "rb"))
@@ -119,6 +121,7 @@ pstdin::pstdin()
 {
 	/* nothing to do */
 }
+#endif
 
 // -----------------------------------------------------------------------------
 // Output file stream
@@ -223,13 +226,11 @@ pstream::pos_type pomemstream::vtell() const
 	return m_pos;
 }
 
-#endif
 
 // -----------------------------------------------------------------------------
 // pstderr: write to stderr
 // -----------------------------------------------------------------------------
 
-#if 1
 pstderr::pstderr()
 #ifdef _WIN32
 : pofilestream(fdopen(_dup(fileno(stderr)), "wb"), "<stderr>", true)
@@ -252,6 +253,9 @@ pstdout::pstdout()
 {
 }
 #endif
+
+#if !USE_CSTREAM
+
 // -----------------------------------------------------------------------------
 // Memory stream
 // -----------------------------------------------------------------------------
@@ -299,7 +303,7 @@ pimemstream::pos_type pimemstream::vtell() const
 {
 	return m_pos;
 }
-
+#endif
 
 bool putf8_reader::readline(pstring &line)
 {

@@ -264,7 +264,11 @@ void ptokenizer::error(const pstring &errs)
 // ----------------------------------------------------------------------------------------
 
 ppreprocessor::ppreprocessor(defines_map_type *defines)
+#if !USE_CSTREAM
 : pistream()
+#else
+: pistream(new st(this))
+#endif
 , m_ifflag(0)
 , m_level(0)
 , m_lineno(0)
@@ -296,9 +300,10 @@ void ppreprocessor::error(const pstring &err)
 	throw pexception("PREPRO ERROR: " + err);
 }
 
+#if !USE_CSTREAM
 pstream::size_type ppreprocessor::vread(char_type *buf, const pstream::size_type n)
 {
-	size_type bytes = std::min(m_buf.size() - m_pos, n);
+	size_type bytes = std::min(m_buf.size() - m_pos, static_cast<std::size_t>(n));
 
 	if (bytes==0)
 		return 0;
@@ -307,6 +312,7 @@ pstream::size_type ppreprocessor::vread(char_type *buf, const pstream::size_type
 	m_pos += bytes;
 	return bytes;
 }
+#endif
 
 #define CHECKTOK2(p_op, p_prio) \
 	else if (tok == # p_op)                         \

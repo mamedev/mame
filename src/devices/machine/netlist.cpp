@@ -316,7 +316,7 @@ plib::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstrin
 	if (m_dev.has_running_machine())
 	{
 		memory_region *mem = m_dev.memregion(m_name.c_str());
-		return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+		return plib::make_unique<plib::pistringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes()));
 	}
 	else
 		throw memregion_not_set("memregion unavailable for {1} in source {2}", name, m_name);
@@ -354,7 +354,7 @@ plib::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring
 	{
 		memory_region *mem = m_dev.memregion(name.c_str());
 		if (mem != nullptr)
-			return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+			return plib::make_unique<plib::pistringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes()));
 		else
 			return plib::unique_ptr<plib::pistream>(nullptr);
 	}

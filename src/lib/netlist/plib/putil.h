@@ -12,9 +12,10 @@
 #include "pstring.h"
 #include <algorithm>
 #include <initializer_list>
+#include <locale>
 #include <sstream>
 #include <vector>
-#include <locale>
+#include <iostream>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
@@ -131,16 +132,16 @@ namespace plib
 	// ----------------------------------------------------------------------------------------
 
 	template <typename T, typename S>
-	T pstonum_locale(std::locale loc, const S &arg, std::size_t *idx)
+	T pstonum_locale(const std::locale &loc, const S &arg, std::size_t *idx)
 	{
 		std::stringstream ss;
 		ss.imbue(loc);
 		ss << arg;
-		long int len(ss.tellp());
-		auto x(constants<long double>::zero());
+		auto len(ss.tellp());
+		T x(constants<T>::zero());
 		if (ss >> x)
 		{
-			long int pos(ss.tellg());
+			auto pos(ss.tellg());
 			if (pos == -1)
 				pos = len;
 			*idx = static_cast<std::size_t>(pos);
@@ -155,13 +156,24 @@ namespace plib
 	struct pstonum_helper;
 
 	template<typename T>
-	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value>::type>
+	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value>::type>
 	{
 		template <typename S>
 		long long operator()(std::locale loc, const S &arg, std::size_t *idx)
 		{
 			//return std::stoll(arg, idx);
 			return pstonum_locale<long long>(loc, arg, idx);
+		}
+	};
+
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value>::type>
+	{
+		template <typename S>
+		unsigned long long operator()(std::locale loc, const S &arg, std::size_t *idx)
+		{
+			//return std::stoll(arg, idx);
+			return pstonum_locale<unsigned long long>(loc, arg, idx);
 		}
 	};
 

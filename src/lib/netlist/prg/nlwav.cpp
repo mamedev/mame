@@ -24,11 +24,12 @@ class wav_t
 {
 public:
 	// XXNOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-	wav_t(plib::postream &strm, std::size_t sr, std::size_t channels)
+	wav_t(plib::postream &strm, bool is_seekable, std::size_t sr, std::size_t channels)
 	: m_f(strm)
+	, m_stream_is_seekable(is_seekable)
 	/* force "play" to play and warn about eof instead of being silent */
 	, m_fmt(static_cast<std::uint16_t>(channels), static_cast<std::uint32_t>(sr))
-	, m_data(m_f.seekable() ? 0 : 0xffffffff)
+	, m_data(is_seekable ? 0 : 0xffffffff)
 	{
 
 		write(m_fh);
@@ -40,7 +41,7 @@ public:
 
 	~wav_t()
 	{
-		if (m_f.seekable())
+		if (m_stream_is_seekable)
 		{
 			m_fh.filelen = m_data.len + sizeof(m_data) + sizeof(m_fh) + sizeof(m_fmt) - 8;
 			m_f.seekp(0);
@@ -107,6 +108,7 @@ private:
 	};
 
 	plib::postream &m_f;
+	bool m_stream_is_seekable;
 
 	riff_chunk_t m_fh;
 	riff_format_t m_fmt;
@@ -238,7 +240,7 @@ private:
 class wavwriter
 {
 public:
-	wavwriter(plib::postream &fo, std::size_t channels, std::size_t sample_rate, double ampa)
+	wavwriter(plib::postream &fo, bool is_seekable, std::size_t channels, std::size_t sample_rate, double ampa)
 	: mean(channels, 0.0)
 	, means(channels, 0.0)
 	, maxsam(channels, -1e9)
@@ -248,7 +250,7 @@ public:
 	, m_last_time(0)
 	, m_fo(fo)
 	, m_amp(ampa)
-	, m_wo(m_fo, sample_rate, channels)
+	, m_wo(m_fo, is_seekable, sample_rate, channels)
 	{ }
 
 	void process(std::size_t chan, double time, double outsam)
@@ -355,7 +357,7 @@ public:
 private:
 	void write(const pstring &line)
 	{
-		m_fo.write(line.c_str(), plib::strlen(line.c_str()));
+		m_fo.write(line.c_str(), static_cast<std::streamsize>(plib::strlen(line.c_str())));
 	}
 
 	std::size_t m_channels;
@@ -418,8 +420,9 @@ private:
 	plib::option_bool   opt_help;
 	plib::option_example   opt_ex1;
 	plib::option_example   opt_ex2;
+#if !USE_CSTREAM
 	plib::pstdin pin_strm;
-
+#endif
 	std::vector<plib::unique_ptr<plib::pistream>> m_instrms;
 	plib::postream *m_outstrm;
 };
@@ -429,7 +432,7 @@ void nlwav_app::convert_wav()
 
 	double dt = 1.0 / static_cast<double>(opt_rate());
 
-	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(*m_outstrm, m_instrms.size(), opt_rate(), opt_amp());
+	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(*m_outstrm, opt_out() != "-", m_instrms.size(), opt_rate(), opt_amp());
 	plib::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));
 	aggregator::callback_type agcb = log_processor::callback_type(&aggregator::process, ago.get());
 
@@ -499,13 +502,22 @@ int nlwav_app::execute()
 		return 0;
 	}
 
+#if !USE_CSTREAM
 	m_outstrm = (opt_out() == "-" ? &pout_strm : plib::pnew<plib::pofilestream>(opt_out()));
+#else
+	m_outstrm = (opt_out() == "-" ? &std::cout : plib::pnew<plib::pofilestream>(opt_out()));
+#endif
 
 	for (auto &oi: opt_args())
 	{
+#if !USE_CSTREAM
 		plib::unique_ptr<plib::pistream> fin = (oi == "-" ?
 			  plib::make_unique<plib::pstdin>()
 			: plib::make_unique<plib::pifilestream>(oi));
+#else
+		//FIXME:
+		plib::unique_ptr<plib::pistream> fin = plib::make_unique<plib::pifilestream>(oi);
+#endif
 		m_instrms.push_back(std::move(fin));
 	}
 

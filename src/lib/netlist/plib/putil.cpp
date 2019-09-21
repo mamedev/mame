@@ -25,7 +25,7 @@ namespace plib
 					#ifdef _WIN32
 					ret = ret + '\\' + elem;
 					#else
-					ret = ret + '/' + elem;
+					ret += ('/' + elem);
 					#endif
 			}
 			return ret;
@@ -137,7 +137,7 @@ namespace plib
 	int penum_base::from_string_int(const char *str, const char *x)
 	{
 		int cnt = 0;
-		for (auto s : psplit(str, ",", false))
+		for (auto &s : psplit(str, ",", false))
 		{
 			if (s == x)
 				return cnt;

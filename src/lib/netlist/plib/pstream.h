@@ -19,20 +19,27 @@
 #include <array>
 #include <type_traits>
 #include <vector>
+#include <ios>
 
 #if USE_CSTREAM
 #include <fstream>
 //#include <strstream>
+#include <iostream>
 #include <sstream>
 #endif
 
 namespace plib {
 
 #if USE_CSTREAM
-typedef std::ostream postream;
-typedef std::ofstream pofilestream;
-typedef std::ostringstream postringstream;
-typedef std::ostringstream pomemstream;
+using postream = std::ostream;
+using pofilestream = std::ofstream;
+using postringstream = std::ostringstream;
+using pomemstream = std::ostringstream;
+
+using pistream = std::istream;
+using pifilestream = std::ifstream;
+using pistringstream = std::istringstream;
+using pimemstream = std::istringstream;
 
 #endif
 
@@ -44,8 +51,8 @@ class pstream
 {
 public:
 
-	using pos_type = std::size_t;
-	using size_type = std::size_t;
+	using pos_type = std::streamsize;
+	using size_type = std::streamsize;
 
 	static constexpr pos_type SEEK_EOF = static_cast<pos_type>(-1);
 
@@ -95,6 +102,8 @@ private:
 	unsigned m_flags;
 };
 
+#if !USE_CSTREAM
+
 // -----------------------------------------------------------------------------
 // pistream: input stream
 // -----------------------------------------------------------------------------
@@ -133,7 +142,6 @@ using pistream = pistream_base<char>;
 // postream: output stream
 // -----------------------------------------------------------------------------
 
-#if !USE_CSTREAM
 template <typename T>
 class postream_base : public pstream
 {
@@ -195,7 +203,7 @@ public:
 	~pomemstream() override = default;
 
 	const char *memory() const { return m_mem.data(); }
-	pos_type size() const { return m_mem.size(); }
+	pos_type size() const { return static_cast<pos_type>(m_mem.size()); }
 
 protected:
 	/* write n bytes to stream */
@@ -230,10 +238,10 @@ protected:
 	void vwrite(const char_type *buf, const pos_type n) override
 	{
 		//m_buf += pstring(reinterpret_cast<const pstring::mem_t *>(buf), n);
-		m_buf += pstring(buf, n);
+		m_buf += pstring(buf, static_cast<pstring::size_type>(n));
 	}
 	void vseek(const pos_type n) override { unused_var(n); }
-	pos_type vtell() const override { return m_buf.size(); }
+	pos_type vtell() const override { return static_cast<pos_type>(m_buf.size()); }
 
 private:
 	pstring m_buf;
@@ -282,7 +290,6 @@ private:
 // -----------------------------------------------------------------------------
 // pstderr: write to stderr
 // -----------------------------------------------------------------------------
-#endif
 
 class pstderr : public pofilestream
 {
@@ -309,6 +316,7 @@ public:
 
 	~pstdout() noexcept override = default;
 };
+
 
 // -----------------------------------------------------------------------------
 // pifilestream: file input stream
@@ -423,12 +431,12 @@ public:
 	: pimemstream()
 	, m_str(str)
 	{
-		set_mem(m_str.c_str(), pstring_mem_t_size(m_str));
+		set_mem(m_str.c_str(), static_cast<pos_type>(pstring_mem_t_size(m_str)));
 	}
 	pistringstream(pistringstream &&src) noexcept
 	: pimemstream(std::move(src)), m_str(src.m_str)
 	{
-		set_mem(m_str.c_str(), pstring_mem_t_size(m_str));
+		set_mem(m_str.c_str(), static_cast<pos_type>(pstring_mem_t_size(m_str)));
 	}
 	COPYASSIGN(pistringstream, delete)
 	pistringstream &operator=(pistringstream &&src) = delete;
@@ -439,6 +447,7 @@ private:
 	/* only needed for a reference till destruction */
 	const pstring m_str;
 };
+#endif
 
 // -----------------------------------------------------------------------------
 // putf8reader_t: reader on top of istream
@@ -473,6 +482,8 @@ public:
 	bool eof() const { return m_strm->eof(); }
 	bool readline(pstring &line);
 
+
+#if !USE_CSTREAM
 	bool readbyte1(pistream::char_type &b)
 	{
 		return (m_strm->read(&b, 1) == 1);
@@ -490,7 +501,32 @@ public:
 		c = putf8string::traits_type::code(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
 		return true;
 	}
+#else
+	bool readbyte1(pistream::char_type &b)
+	{
+		if (m_strm->eof())
+			return false;
+		m_strm->read(&b, 1);
+		return true;
+	}
+	bool readcode(putf8string::traits_type::code_t &c)
+	{
+		std::array<pistream::char_type, 4> b{0};
+		if (m_strm->eof())
+			return false;
+		m_strm->read(&b[0], 1);
+		const std::size_t l = putf8string::traits_type::codelen(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
+		for (std::size_t i = 1; i < l; i++)
+		{
+			if (m_strm->eof())
+				return false;
+			m_strm->read(&b[i], 1);
+		}
+		c = putf8string::traits_type::code(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
+		return true;
+	}
 
+#endif
 private:
 	plib::unique_ptr<pistream> m_strm;
 	putf8string m_linebuf;
@@ -535,7 +571,7 @@ public:
 	{
 		// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
 		const putf8string conv_utf8(text);
-		m_strm->write(conv_utf8.c_str(), plib::strlen(conv_utf8.c_str()));
+		m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str())));
 	}
 
 	void write(const pstring::value_type c) const
@@ -592,7 +628,7 @@ public:
 	void write(const pstring &s)
 	{
 		const auto sm = reinterpret_cast<const postream::char_type *>(s.c_str());
-		const std::size_t sl(pstring_mem_t_size(s));
+		const std::streamsize sl(static_cast<std::streamsize>(pstring_mem_t_size(s)));
 		write(sl);
 		m_strm.write(sm, sl);
 	}
@@ -600,9 +636,9 @@ public:
 	template <typename T>
 	void write(const std::vector<T> &val)
 	{
-		std::size_t sz = val.size();
+		const std::streamsize sz(static_cast<std::streamsize>(val.size()));
 		write(sz);
-		m_strm.write(reinterpret_cast<const postream::char_type *>(val.data()), sizeof(T) * sz);
+		m_strm.write(reinterpret_cast<const postream::char_type *>(val.data()), sz * static_cast<std::streamsize>(sizeof(T)));
 	}
 
 private:
@@ -631,7 +667,7 @@ public:
 		std::size_t sz = 0;
 		read(sz);
 		std::vector<plib::string_info<pstring>::mem_t> buf(sz+1);
-		m_strm.read(buf.data(), sz);
+		m_strm.read(buf.data(), static_cast<std::streamsize>(sz));
 		buf[sz] = 0;
 		s = pstring(buf.data());
 	}
@@ -642,7 +678,7 @@ public:
 		std::size_t sz = 0;
 		read(sz);
 		val.resize(sz);
-		m_strm.read(reinterpret_cast<pistream::char_type *>(val.data()), sizeof(T) * sz);
+		m_strm.read(reinterpret_cast<pistream::char_type *>(val.data()), static_cast<std::streamsize>(sizeof(T) * sz));
 	}
 
 private:
@@ -651,10 +687,20 @@ private:
 
 inline void copystream(postream &dest, pistream &src)
 {
+	// FIXME: optimize
+#if !USE_CSTREAM
 	std::array<postream::char_type, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 	pstream::pos_type r;
 	while ((r=src.read(buf.data(), 1024)) > 0)
 		dest.write(buf.data(), r);
+#else
+	std::array<postream::char_type, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
+	while (!src.eof())
+	{
+		src.read(buf.data(), 1);
+		dest.write(buf.data(), 1);
+	}
+#endif
 }
 
 struct perrlogger
@@ -667,8 +713,12 @@ struct perrlogger
 private:
 	static putf8_fmt_writer &h()
 	{
+#if !USE_CSTREAM
 		static plib::pstderr perr_strm;
 		static plib::putf8_fmt_writer perr(&perr_strm);
+#else
+		static plib::putf8_fmt_writer perr(&std::cerr);
+#endif
 		return perr;
 	}
 };

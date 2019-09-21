@@ -10,9 +10,9 @@
 
 #include <algorithm>
 #include <array>
-#include <iostream>
-#include <iomanip>
 #include <cmath>
+#include <iomanip>
+#include <iostream>
 
 namespace plib {
 
@@ -42,7 +42,7 @@ private:
 };
 #endif
 
-pfmt::rtype pfmt::setfmt(std::stringstream &strm, unsigned cfmt_spec)
+pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
 {
 	pstring fmt;
 	pstring search("{");
@@ -50,11 +50,11 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, unsigned cfmt_spec)
 	rtype r;
 
 	r.sl = search.size();
-	r.p = m_str.find(search + ":");
+	r.p = m_str.find(search + ':');
 	r.sl++; // ":"
 	if (r.p == pstring::npos) // no further specifiers
 	{
-		r.p = m_str.find(search + "}");
+		r.p = m_str.find(search + '}');
 		if (r.p == pstring::npos) // not found try default
 		{
 			r.sl = 2;
@@ -69,7 +69,7 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, unsigned cfmt_spec)
 			r.p = m_str.find("{:");
 			if (r.p != pstring:: npos)
 			{
-				auto p1 = m_str.find("}", r.p);
+				auto p1 = m_str.find('}', r.p);
 				if (p1 != pstring::npos)
 				{
 					r.sl = p1 - r.p + 1;
@@ -81,7 +81,7 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, unsigned cfmt_spec)
 	else
 	{
 		// found absolute positional place holder
-		auto p1 = m_str.find("}", r.p);
+		auto p1 = m_str.find('}', r.p);
 		if (p1 != pstring::npos)
 		{
 			r.sl = p1 - r.p + 1;
@@ -92,11 +92,11 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, unsigned cfmt_spec)
 	if (r.p != pstring::npos)
 	{
 		// a.b format here ...
-		if (fmt != "" && pstring("duxofge").find(cfmt_spec) != pstring::npos)
+		if (fmt != "" && pstring("duxofge").find(static_cast<pstring::value_type>(cfmt_spec)) != pstring::npos)
 		{
-			r.pend = fmt.at(fmt.size() - 1);
-			if (pstring("duxofge").find(r.pend) == pstring::npos)
-				r.pend = static_cast<pstring::value_type>(cfmt_spec);
+			r.pend = static_cast<char32_t>(fmt.at(fmt.size() - 1));
+			if (pstring("duxofge").find(static_cast<pstring::value_type>(r.pend)) == pstring::npos)
+				r.pend = cfmt_spec;
 			else
 				fmt = plib::left(fmt, fmt.size() - 1);
 		}
@@ -104,16 +104,19 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, unsigned cfmt_spec)
 			// FIXME: Error
 			r.pend = cfmt_spec;
 
-		int pdot(fmt.find('.'));
+		auto pdot(fmt.find('.'));
 
 		if (pdot==0)
 			strm << std::setprecision(pstonum<int>(fmt.substr(1)));
-		else if (r.p != pstring::npos)
+		else if (pdot != pstring::npos)
 		{
-			strm << std::setprecision(pstonum<int>(fmt.substr(pdot + 1))) << std::setw(pstonum<int>(left(fmt,pdot)));
+			//strm << std::setprecision(pstonum<int>(fmt.substr(pdot + 1))) << std::setw(pstonum<int>(left(fmt,pdot)));
+			strm << std::setprecision(pstonum<int>(fmt.substr(pdot + 1)));
+			r.width = pstonum<pstring::size_type>(left(fmt,pdot));
 		}
 		else if (fmt != "")
-			strm << std::setw(pstonum<int>(fmt));
+			//strm << std::setw(pstonum<int>(fmt));
+			r.width = pstonum<pstring::size_type>(fmt);
 
 		switch (r.pend)
 		{
