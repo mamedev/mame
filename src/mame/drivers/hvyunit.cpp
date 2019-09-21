@@ -670,7 +670,7 @@ void hvyunit_state::hvyunit(machine_config &config)
  *
  *************************************/
 
-/* This is likely a World version using the newer (B73_25 - B73_28) graphics ROMs with a program ROM labeled B73_29 */
+/* There is likely a World version using the newer (B73_25 - B73_28) graphics ROMs with a program ROM labeled B73_29 */
 
 ROM_START( hvyunit )
 	ROM_REGION( 0x20000, "master", 0 )
