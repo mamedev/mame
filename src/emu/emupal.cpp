@@ -535,7 +535,7 @@ void palette_device::device_start()
 		{
 			// forcing endianness only makes sense when the RAM is narrower than the palette format and not split
 			if (share_ext || (m_paletteram.membits() / 8) >= bytes_per_entry)
-				   throw emu_fatalerror("palette_device(%s): Improper use of MCFG_PALETTE_ENDIANNESS", tag());
+				throw emu_fatalerror("palette_device(%s): Improper use of MCFG_PALETTE_ENDIANNESS", tag());
 			m_paletteram.set_endianness(m_endianness);
 		}
 	}
