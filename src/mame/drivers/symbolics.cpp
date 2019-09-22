@@ -355,7 +355,7 @@ ROM_START( s3670 )
 	ROM_CONTINUE( 0x18000, 0x2000 )
 	ROMX_LOAD("10l.127.27c128.d10", 0x08001, 0x2000, CRC(b8ddb3c8) SHA1(e6c3b96340c5c767ef18abf48b73fa8e5d7353b9), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "10L.127" @D10
 	ROM_CONTINUE( 0x18001, 0x2000 )
-	// D17, D11 are empty sockets; these would map to 0x0c000-0ffff and 0x1c000-0x1ffff; these are verfied from real hardware to read as 0xFF so there must be pullups on the eprom bus/auto-dtack area
+	// D17, D11 are empty sockets; these would map to 0x0c000-0ffff and 0x1c000-0x1ffff; these are verified from real hardware to read as 0xFF, so there must be pull-up resistors on the EPROM bus/auto-DTACK area
 	ROM_REGION16_BE( 0x20,"fep_paddle_prom", 0)
 	ROM_LOAD("fpa-458.bin", 0x0000, 0x0020, CRC(5e034b33) SHA1(fea84183825013b2adc290f71d97e5cffd0cf7fd)) // nFEP Paddle S/N 458
 	ROM_REGION16_BE( 0x20,"fep_prom", 0)
