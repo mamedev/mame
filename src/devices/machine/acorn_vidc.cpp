@@ -2,19 +2,19 @@
 // copyright-holders:Angelo Salese, R. Belmont, Juergen Buchmueller
 /**********************************************************************************************
 
-	Acorn VIDC10 (VIDeo Controller) device chip
-	
-	based off legacy AA VIDC implementation by Angelo Salese, R. Belmont, Juergen Buchmueller
+    Acorn VIDC10 (VIDeo Controller) device chip
 
-	TODO:
-	- subclass screen_device, derive h/vsync signals out there;
-	- improve timings for raster effects:
-	  * nebulus: 20 lines off with aa310;
-	  * lotustc2: abuses color flipping;
-	  * quazer: needs in-flight DMA;
-	- improve sound DAC writes;
-	- subclass this for VIDC20 emulation (RiscPC);
-	- Are CRTC values correct? VGA modes have a +1 in display line;
+    based off legacy AA VIDC implementation by Angelo Salese, R. Belmont, Juergen Buchmueller
+
+    TODO:
+    - subclass screen_device, derive h/vsync signals out there;
+    - improve timings for raster effects:
+      * nebulus: 20 lines off with aa310;
+      * lotustc2: abuses color flipping;
+      * quazer: needs in-flight DMA;
+    - improve sound DAC writes;
+    - subclass this for VIDC20 emulation (RiscPC);
+    - Are CRTC values correct? VGA modes have a +1 in display line;
 
 **********************************************************************************************/
 
@@ -56,7 +56,7 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, device_memory_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-  	, m_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_device::regs_map), this))
+	, m_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_device::regs_map), this))
 	, m_lspeaker(*this, "lspeaker")
 	, m_rspeaker(*this, "rspeaker")
 	, m_dac(*this, "dac%u", 0)
@@ -97,7 +97,7 @@ void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 	for (int i = 0; i < m_sound_max_channels; i++)
 	{
 		// custom DAC
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, m_lspeaker, m_sound_input_gain).add_route(0, m_rspeaker, m_sound_input_gain); 
+		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, m_lspeaker, m_sound_input_gain).add_route(0, m_rspeaker, m_sound_input_gain);
 		vref.add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, m_dac[i], -1.0, DAC_VREF_NEG_INPUT);
 	}
 }
@@ -155,10 +155,10 @@ void acorn_vidc10_device::device_start()
 	save_pointer(NAME(m_data_vram), m_data_vram_size);
 	save_pointer(NAME(m_cursor_vram), m_cursor_vram_size);
 	save_pointer(NAME(m_stereo_image), m_sound_max_channels);
-	
+
 	m_video_timer = timer_alloc(TIMER_VIDEO);
 	m_sound_timer = timer_alloc(TIMER_SOUND);
-	
+
 	// generate u255 law lookup table
 	// cfr. page 48 of the VIDC20 manual, page 33 of the VIDC manual
 	// TODO: manual mentions a format difference between VIDC10 revisions
@@ -229,11 +229,11 @@ void acorn_vidc10_device::screen_dynamic_res_change()
 	// sanity checks
 	if (m_crtc_regs[CRTC_HCR] <= 1 || m_crtc_regs[CRTC_VCR] <= 1)
 		return;
-	
+
 	if (m_crtc_regs[CRTC_HBER] <= 1 || m_crtc_regs[CRTC_VBER] <= 1)
 		return;
 
-	//	total cycles >= border end >= border start
+	//  total cycles >= border end >= border start
 	if (m_crtc_regs[CRTC_HCR] < m_crtc_regs[CRTC_HBER])
 		return;
 
@@ -271,7 +271,7 @@ WRITE32_MEMBER( acorn_vidc10_device::write )
 	// TODO: check against mem_mask not 32-bit wide
 	uint8_t reg = data >> 24;
 	uint32_t val = data & 0xffffff;
-	
+
 	this->space(AS_IO).write_dword(reg, val);
 }
 
@@ -280,7 +280,7 @@ inline void acorn_vidc10_device::update_4bpp_palette(uint16_t index, uint32_t pa
 	int r,g,b;
 
 	// TODO: for TV Tuner we need to output this, also check if cursor mode actually sets this up for offset = 0
-//	i = (paldata & 0x1000) >> 12; //supremacy bit
+//  i = (paldata & 0x1000) >> 12; //supremacy bit
 	b = (paldata & 0x0f00) >> 8;
 	g = (paldata & 0x00f0) >> 4;
 	r = (paldata & 0x000f) >> 0;
@@ -293,7 +293,7 @@ WRITE32_MEMBER( acorn_vidc10_device::pal_data_display_w )
 {
 	update_4bpp_palette(offset+0x100, data);
 	//printf("%02x: %01x %01x %01x [%d]\n",offset,r,g,b,screen().vpos());
-	
+
 	// 8bpp
 	for(int idx=0;idx<0x100;idx+=0x10)
 	{
@@ -319,7 +319,7 @@ WRITE32_MEMBER( acorn_vidc10_device::control_w )
 	m_crtc_interlace = ((data & 0x40) >> 6);
 	//m_composite_sync = BIT(data, 7);
 	//m_test_mode = (data & 0xc100) != 0xc100;
-	
+
 	//todo: vga/svga modes sets 0x1000?
 	screen_vblank_line_update();
 	screen_dynamic_res_change();
@@ -329,52 +329,52 @@ WRITE32_MEMBER( acorn_vidc10_device::crtc_w )
 {
 	switch(offset)
 	{
-		case CRTC_HCR:  m_crtc_regs[CRTC_HCR] =  ((data >> 14)<<1)+2;    	break;
-//		case CRTC_HSWR: m_crtc_regs[CRTC_HSWR] = (data >> 14)+1;   			break;
-		case CRTC_HBSR: m_crtc_regs[CRTC_HBSR] = ((data >> 14)<<1)+1;    	break;
-		case CRTC_HDSR: m_crtc_regs[CRTC_HDSR] = (data >> 14);   			break;
-		case CRTC_HDER: m_crtc_regs[CRTC_HDER] = (data >> 14);   			break;
-		case CRTC_HBER: m_crtc_regs[CRTC_HBER] = ((data >> 14)<<1)+1;    	break;
+		case CRTC_HCR:  m_crtc_regs[CRTC_HCR] =  ((data >> 14)<<1)+2;       break;
+//      case CRTC_HSWR: m_crtc_regs[CRTC_HSWR] = (data >> 14)+1;            break;
+		case CRTC_HBSR: m_crtc_regs[CRTC_HBSR] = ((data >> 14)<<1)+1;       break;
+		case CRTC_HDSR: m_crtc_regs[CRTC_HDSR] = (data >> 14);              break;
+		case CRTC_HDER: m_crtc_regs[CRTC_HDER] = (data >> 14);              break;
+		case CRTC_HBER: m_crtc_regs[CRTC_HBER] = ((data >> 14)<<1)+1;       break;
 		case CRTC_HCSR: m_crtc_regs[CRTC_HCSR] = ((data >> 13) & 0x7ff) + 6; return;
 //      case CRTC_HIR: // ...
 
-		case CRTC_VCR:  m_crtc_regs[CRTC_VCR] = (data >> 14)+1; 			break;
+		case CRTC_VCR:  m_crtc_regs[CRTC_VCR] = (data >> 14)+1;             break;
 		case CRTC_VSWR: m_crtc_regs[CRTC_VSWR] = (data >> 14)+1;            break;
-		case CRTC_VBSR: 
+		case CRTC_VBSR:
 			m_crtc_regs[CRTC_VBSR] = (data >> 14)+1;
 			break;
-		case CRTC_VDSR: 
+		case CRTC_VDSR:
 			m_crtc_regs[CRTC_VDSR] = (data >> 14)+1;
 			break;
 		case CRTC_VDER:
 			m_crtc_regs[CRTC_VDER] = (data >> 14)+1;
 			screen_vblank_line_update();
 			break;
-		case CRTC_VBER: 
+		case CRTC_VBER:
 			m_crtc_regs[CRTC_VBER] = (data >> 14)+1;
 			break;
 		case CRTC_VCSR: m_crtc_regs[CRTC_VCSR] = ((data >> 14) & 0x3ff) + 1; return;
 		case CRTC_VCER: m_crtc_regs[CRTC_VCER] = ((data >> 14) & 0x3ff) + 1; return;
 	}
-	
+
 	screen_dynamic_res_change();
 }
 
 inline void acorn_vidc10_device::refresh_stereo_image(uint8_t channel)
 {
 	/*
-		-111 full right
-		-110 83% right, 17% left
-		-101 67% right, 33% left
-		-100 center
-		-011 67% left, 33% right
-		-010 83% left, 17% right
-		-001 full left
-		-000 "undefined" TODO: verify what it actually means
+	    -111 full right
+	    -110 83% right, 17% left
+	    -101 67% right, 33% left
+	    -100 center
+	    -011 67% left, 33% right
+	    -010 83% left, 17% right
+	    -001 full left
+	    -000 "undefined" TODO: verify what it actually means
 	*/
 	const float left_gain[8] = { 1.0, 2.0, 1.66, 1.34, 1.0, 0.66, 0.34, 0.0 };
 	const float right_gain[8] = { 1.0, 0.0, 0.34, 0.66, 1.0, 1.34, 1.66, 2.0 };
-	
+
 	m_lspeaker->set_input_gain(channel,left_gain[m_stereo_image[channel]]*m_sound_input_gain);
 	m_rspeaker->set_input_gain(channel,right_gain[m_stereo_image[channel]]*m_sound_input_gain);
 	//printf("%d %f %f\n",channel,m_lspeaker->input_gain(channel),m_rspeaker->input_gain(channel));
@@ -401,7 +401,7 @@ WRITE32_MEMBER( acorn_vidc10_device::sound_frequency_w )
 //**************************************************************************
 
 void acorn_vidc10_device::write_dac(uint8_t channel, uint8_t data)
-{ 
+{
 	int16_t res;
 	res = m_ulaw_lookup[data];
 	m_dac[channel & 7]->write(res);
@@ -446,7 +446,7 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 		{
 			u8 pen = vram[srcx + srcy * xsize];
 			int dstx = (srcx*xchar_size) + xstart;
-			
+
 			for (int xi=0;xi<xchar_size;xi++)
 			{
 				u16 dot = ((pen>>(xi*pen_byte_size)) & pen_mask);

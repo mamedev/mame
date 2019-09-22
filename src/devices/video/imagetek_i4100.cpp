@@ -22,7 +22,7 @@
     - Some gfx problems in ladykill, 3kokushi, puzzli, gakusai, seem related to how we handle
       windows, wrapping, read-modify-write areas;
     - puzzli: emulate hblank irq and fix video routines here (water effect not emulated?);
-	- Fix flipped screen behavior
+    - Fix flipped screen behavior
 
 ============================================================================
 

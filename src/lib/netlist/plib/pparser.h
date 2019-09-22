@@ -239,29 +239,29 @@ protected:
 	public:
 		st(ppreprocessor *strm) : m_strm(strm) {        setg(nullptr, nullptr, nullptr); }
 		st(st &&rhs) noexcept : m_strm(rhs.m_strm) {}
-	    int_type underflow() override
-	    {
-	    	//printf("here\n");
-	        if (this->gptr() == this->egptr())
-	        {
-	        	/* clang reports sign error - weird */
-	        	std::size_t bytes = pstring_mem_t_size(m_strm->m_buf) - static_cast<std::size_t>(m_strm->m_pos);
+		int_type underflow() override
+		{
+			//printf("here\n");
+			if (this->gptr() == this->egptr())
+			{
+				/* clang reports sign error - weird */
+				std::size_t bytes = pstring_mem_t_size(m_strm->m_buf) - static_cast<std::size_t>(m_strm->m_pos);
 
-	        	if (bytes > m_buf.size())
-	            	bytes = m_buf.size();
-	        	std::copy(m_strm->m_buf.c_str() + m_strm->m_pos, m_strm->m_buf.c_str() + m_strm->m_pos + bytes, m_buf.data());
-	        	//printf("%ld\n", (long int)bytes);
-	            this->setg(m_buf.data(), m_buf.data(), m_buf.data() + bytes);
+				if (bytes > m_buf.size())
+					bytes = m_buf.size();
+				std::copy(m_strm->m_buf.c_str() + m_strm->m_pos, m_strm->m_buf.c_str() + m_strm->m_pos + bytes, m_buf.data());
+				//printf("%ld\n", (long int)bytes);
+				this->setg(m_buf.data(), m_buf.data(), m_buf.data() + bytes);
 
-	            m_strm->m_pos += static_cast</*pos_type*/long>(bytes);
-	        }
-	        return this->gptr() == this->egptr()
-	             ? std::char_traits<char>::eof()
-	             : std::char_traits<char>::to_int_type(*this->gptr());
-	    }
+				m_strm->m_pos += static_cast</*pos_type*/long>(bytes);
+			}
+			return this->gptr() == this->egptr()
+				 ? std::char_traits<char>::eof()
+				 : std::char_traits<char>::to_int_type(*this->gptr());
+		}
 	private:
-	    ppreprocessor *m_strm;
-	    std::array<char_type, 1024> m_buf;
+		ppreprocessor *m_strm;
+		std::array<char_type, 1024> m_buf;
 	};
 	//friend class st;
 #endif

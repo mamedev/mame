@@ -100,7 +100,7 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 			const u8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
 			// alphaMode & 0xc0 = 0xc0 : Shadow, 0 : Alpha or Pre-shadowed, Other bits unknown
 			if (shadowMode && (alphaMode & 0xc0))
-			{	/* TODO : 8bpp and shadow can use simultaneously? */
+			{   /* TODO : 8bpp and shadow can use simultaneously? */
 				int x, x_index = x_index_base;
 				for (x = sx; x < ex; x++)
 				{

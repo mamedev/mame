@@ -55,7 +55,7 @@ protected:
 
 	int m_romcs;
 	int m_romlatch;
-//	int m_masterportdisable;
+//  int m_masterportdisable;
 
 	void fetch(offs_t offset);
 };

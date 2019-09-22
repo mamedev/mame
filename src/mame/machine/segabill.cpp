@@ -5,10 +5,10 @@
 
     Sega Billboard
 
-	TODO: Timing, vs298 needs a higher interrupt frequency, but then
-	the animations seem to fast?
-	Document and add support for Blast City Billboard with EPR-19158.IC3
-	( https://www.arcade-projects.com/forums/index.php?attachment/1477-blast-city-billboard-pcb-jpg/ )
+    TODO: Timing, vs298 needs a higher interrupt frequency, but then
+    the animations seem to fast?
+    Document and add support for Blast City Billboard with EPR-19158.IC3
+    ( https://www.arcade-projects.com/forums/index.php?attachment/1477-blast-city-billboard-pcb-jpg/ )
 
 ***************************************************************************/
 
@@ -49,14 +49,14 @@ Sega VERSUS CITY BILLBOARD CONTROL BD 837-11854 (C) 1991
     EEPROM:
         EPR-18022.IC2    Sega VERSUS CITY BILLBOARD
     Notes:
-    	SW1 	8-DIP switch
-    	CN2 	10 pin connector for power input (5v)
-    	CN3	J50 pin connector for two 7-SEG UNITs (VSC-0220, connects at VSC-0221 7SEG BASE)
-	CN4	J20 pin connector to BLUE(U-P) PANEL
-		(600-6770-005 WIRE HARN BILLBOARD FLT BD, CN7(?) and CN11 for Model3, CN6 and CN12 for Model2)
-    	CN5 has no connector soldered and as such is unused and has two silkscreened PS2501-4 ICs below,
-		similar to the ICs under CN4
-    	171-6218B is printed to right of (C) SEGA 1991 on bottom of board
+        SW1     8-DIP switch
+        CN2     10 pin connector for power input (5v)
+        CN3 J50 pin connector for two 7-SEG UNITs (VSC-0220, connects at VSC-0221 7SEG BASE)
+    CN4 J20 pin connector to BLUE(U-P) PANEL
+        (600-6770-005 WIRE HARN BILLBOARD FLT BD, CN7(?) and CN11 for Model3, CN6 and CN12 for Model2)
+        CN5 has no connector soldered and as such is unused and has two silkscreened PS2501-4 ICs below,
+        similar to the ICs under CN4
+        171-6218B is printed to right of (C) SEGA 1991 on bottom of board
 */
 #include "emu.h"
 #include "segabill.h"

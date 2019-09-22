@@ -1799,7 +1799,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- No inputs, uses a dance mat controller -->
 	<software name="jamgymg" supported="no"> <!-- Will be clone of "jamgym" once found and dumped. -->
 		<description>V.Smile Tanz Mit Center (Germany)</description>

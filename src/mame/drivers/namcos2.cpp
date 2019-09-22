@@ -5827,7 +5827,7 @@ GAMEL( 1987, finallapjb, finallap, finallap, finallap, namcos2_state, init_final
 GAME(  1988, assault,    0,        base2,    assault,  namcos2_state, init_assault,  ROT90,  "Namco", "Assault (Rev B)", 0 )
 GAME(  1988, assaultj,   assault,  base2,    assault,  namcos2_state, init_assaultj, ROT90,  "Namco", "Assault (Japan)", 0 )
 GAME(  1988, assaultp,   assault,  assaultp, assault,  namcos2_state, init_assaultp, ROT90,  "Namco", "Assault Plus (Japan)", 0)
-																							 
+
 GAME(  1988, metlhawk,   0,        metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", 0 )
 GAME(  1988, metlhawkj,  metlhawk, metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", 0 )
 

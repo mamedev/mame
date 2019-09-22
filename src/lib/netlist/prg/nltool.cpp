@@ -874,7 +874,7 @@ int tool_app_t::execute()
 	std::cout << plib::pfmt("{:20}")("Общая ком") << "|" << "\n";
 
 	//char x = 'a';
-	auto b= U'щ';
+	auto b= U'\U0449';
 	std::cout << "b: <" << b << ">";
 #endif
 	return 0;

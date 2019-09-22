@@ -171,5 +171,5 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/file/posixptty.cpp",
 		MAME_DIR .. "src/osd/modules/file/posixsocket.cpp",
 	}
-	
+
 

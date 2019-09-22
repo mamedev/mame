@@ -698,7 +698,7 @@ bool mc6845_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 		return false;
 
 	if ((m_cursor_addr < line_addr) ||
-	    (m_cursor_addr >= (line_addr + m_horiz_disp)))
+		(m_cursor_addr >= (line_addr + m_horiz_disp)))
 	{
 		// Not a cursor character line.
 		return false;
@@ -737,7 +737,7 @@ bool hd6845s_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 		return false;
 
 	if ((m_cursor_addr < line_addr) ||
-	    (m_cursor_addr >= (line_addr + m_horiz_disp)))
+		(m_cursor_addr >= (line_addr + m_horiz_disp)))
 	{
 		// Not a cursor character line.
 		return false;

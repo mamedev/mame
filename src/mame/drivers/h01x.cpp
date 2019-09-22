@@ -229,7 +229,7 @@ void h01x_state::machine_start()
 
 void h01x_state::machine_reset()
 {
-	m_bank	=	0x00;
+	m_bank  =   0x00;
 
 	m_rom_ptr = m_rom->base();
 	m_hzrom_ptr = m_hzrom->base();
@@ -251,7 +251,7 @@ void h01x_state::init_h01x()
 /*
 uint32_t h01x_state::screen_update_h01x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return 0;
+    return 0;
 }
 */
 
@@ -268,7 +268,7 @@ WRITE8_MEMBER( h01x_state::port_64_w )
 
 WRITE8_MEMBER( h01x_state::port_70_w )
 {
-	m_bank	=	data&0xC0;
+	m_bank  =   data&0xC0;
 
 	// bit5, speaker
 	m_speaker->level_w(BIT(data,5));
@@ -400,23 +400,23 @@ ROM_END
 
 // H-01B中文教育电脑
 // 普乐电器公司
-// cpu		Z-80A 2MHz
+// cpu      Z-80A 2MHz
 
 // NF500A教学电脑
 // 国营八三〇厂制造
-// cpu		Z-80A 4MHz
-// video	MC6845P
-// sysrom	16KB EPROM
-// hzrom	32KB EPROM
-// ram		32KB SRAM
-// vram		16Kx4bit DRAM
+// cpu      Z-80A 4MHz
+// video    MC6845P
+// sysrom   16KB EPROM
+// hzrom    32KB EPROM
+// ram      32KB SRAM
+// vram     16Kx4bit DRAM
 
 // JCE
 // 广东江门计算机应用设备厂
-// video	HD6845SP
-// sysrom	16KB EPROM
-// hzrom	32KB EPROM
-// extrom	16KB EPROM
+// video    HD6845SP
+// sysrom   16KB EPROM
+// hzrom    32KB EPROM
+// extrom   16KB EPROM
 
 // 开机画面
 // H-01B  : H-01型中文教育电脑 普乐电器公司制造

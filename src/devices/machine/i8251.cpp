@@ -594,7 +594,7 @@ void i8251_device::mode_w(uint8_t data)
 		    1 = x1
 		    2 = x16
 		    3 = x64
-		
+
 		    Synchronous
 
 		    bit 7: Number of sync characters

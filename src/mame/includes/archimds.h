@@ -105,7 +105,7 @@ private:
 
 	static const device_timer_id TIMER_IOC = 3;
 
-//	void vidc_vblank();
+//  void vidc_vblank();
 	void vidc_video_tick();
 	void vidc_audio_tick();
 	void ioc_timer(int param);

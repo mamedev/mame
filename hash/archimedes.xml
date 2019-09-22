@@ -4,8 +4,8 @@
 <softwarelist name="archimedes" description="Acorn Archimedes floppy images">
 
 <!-- Notes of interest -->
-<!-- 
- - "Missing SWI $401c0" means that it needs RISCOS 3.10 
+<!--
+ - "Missing SWI $401c0" means that it needs RISCOS 3.10
 -->
 
 <!-- Games -->
@@ -494,7 +494,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- boot OK -->
 	<software name="bigbang" supported="yes">
 		<description>Big Bang</description>
@@ -1351,7 +1351,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- "Disc error", launcher has no icon? --> 
+	<!-- "Disc error", launcher has no icon? -->
 	<software name="ftt" supported="no">
 		<description>FTT</description>
 		<year>1994</year>
@@ -2359,7 +2359,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- reports 0 bytes of applications workspace, title screen is blackened, gameplay has flickering vertical scroll (mid-frame raster?) -->
 	<software name="quazer" supported="no">
 		<description>Quazer (v2.00)</description>
@@ -2443,7 +2443,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK but flickers like mad due of incorrect raster effects, also seems very slow with timing on gameplay even on A5000 class machine --> 
+	<!-- boot OK but flickers like mad due of incorrect raster effects, also seems very slow with timing on gameplay even on A5000 class machine -->
 	<software name="rotoros3" cloneof="rotor" supported="no">
 		<description>Rotor (Patched RiscOS3)</description>
 		<year>1989</year>
@@ -3106,7 +3106,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Has trainer and copy protection? -->
 	<software name="zool">
 		<description>Zool</description>

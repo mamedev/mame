@@ -70,7 +70,7 @@ public:
 	void juko16(machine_config &config);
 	void hyo88t(machine_config &config);
 	void kyoxt(machine_config &config);
-	
+
 	void init_bondwell();
 
 	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
@@ -1392,6 +1392,6 @@ COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kyocera",                         "XT",                    MACHINE_NOT_WORKING )
 COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )
 COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Leading Edge",                    "Model M",               MACHINE_NOT_WORKING )
-COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                    	   "PC-2",                  MACHINE_NOT_WORKING )
-COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Micromint",                   	   "MPX-16",                MACHINE_NOT_WORKING )
-COMP( 198?, hstrtpls,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                   	   "HeadStart Plus",        MACHINE_NOT_WORKING )
+COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "PC-2",                  MACHINE_NOT_WORKING )
+COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Micromint",                       "MPX-16",                MACHINE_NOT_WORKING )
+COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )

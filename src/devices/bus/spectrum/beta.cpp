@@ -3,79 +3,79 @@
 /*********************************************************************
 
     Technology Research Beta Disk interface & clones
-	these are designed for the 48k Spectrum models
+    these are designed for the 48k Spectrum models
 
-	There are multiple versions of this
+    There are multiple versions of this
 
-	'hand made' PCB with V2 ROM:
-	 - possible prototype / low production run
-	 - 4k ROM
-	 - FORMAT, COPY etc. must be loaded from a disk to be used
-	 - disks are password protected
-	 - uses 1771 disk controller
-	   https://www.youtube.com/watch?v=gSJIuZjbFYs
+    'hand made' PCB with V2 ROM:
+     - possible prototype / low production run
+     - 4k ROM
+     - FORMAT, COPY etc. must be loaded from a disk to be used
+     - disks are password protected
+     - uses 1771 disk controller
+       https://www.youtube.com/watch?v=gSJIuZjbFYs
 
-	Original Beta Disk release with V3 ROM:
-	 - same features as above
-	 - uses a 1793 controller
+    Original Beta Disk release with V3 ROM:
+     - same features as above
+     - uses a 1793 controller
 
-	Re-release dubbed "Beta Disk plus" with V4 ROM:	
-	 - many operations moved into a larger capacity (8k) ROM rather
-	   than requiring a utility disk
-	 - uses a 1793 controller
-	 - adds 'magic button' to dump the running state of the machine
-	   to disk
-	 - disk password system removed
+    Re-release dubbed "Beta Disk plus" with V4 ROM:
+     - many operations moved into a larger capacity (8k) ROM rather
+       than requiring a utility disk
+     - uses a 1793 controller
+     - adds 'magic button' to dump the running state of the machine
+       to disk
+     - disk password system removed
 
-	Many clones exist, some specific to the various Spectrum clones.
-	(not yet added)
+    Many clones exist, some specific to the various Spectrum clones.
+    (not yet added)
 
-	Original Beta Disk (V3) clones
-	 - Sandy FDD2 SP-DOS
-	 - AC DOS P.Z.APINA 
+    Original Beta Disk (V3) clones
+     - Sandy FDD2 SP-DOS
+     - AC DOS P.Z.APINA
 
-	Beta Disk plus (V4) clones
-	 - CAS DOS Cheyenne Advanced System
-	 - CBI-95
-	 - SYNCHRON IDS91 
-	 - SYNCHRON IDS2001ne
-	 - ARCADE AR-20
-	 - Vision Desktop Betadisk 
+    Beta Disk plus (V4) clones
+     - CAS DOS Cheyenne Advanced System
+     - CBI-95
+     - SYNCHRON IDS91
+     - SYNCHRON IDS2001ne
+     - ARCADE AR-20
+     - Vision Desktop Betadisk
 
-	Some units also exist that allow population of both V3 and V4
-	ROM types with a switch (unofficial, for compatibility?)
+    Some units also exist that allow population of both V3 and V4
+    ROM types with a switch (unofficial, for compatibility?)
 
-	---
+    ---
 
-	NOTE:
+    NOTE:
 
-	ROMs really need verifying, real dumps appear to be bitswapped
-	on original boards, so we're using those ones where possible,
-	however sizes are unconfirmed (some sources state that the data
-	is duplicated across the 16k in ROM, others state it just mirrors
-	in memory) and some might be modified or bad.
+    ROMs really need verifying, real dumps appear to be bitswapped
+    on original boards, so we're using those ones where possible,
+    however sizes are unconfirmed (some sources state that the data
+    is duplicated across the 16k in ROM, others state it just mirrors
+    in memory) and some might be modified or bad.
 
-	beta128.cpp could be modified to expand on this, as it builds
-	on the features of the betaplus, but for now I've kept them
-	separate as the enable / disable mechanisms are different and
-	remaining mappings of devices unconfirmed
+    beta128.cpp could be modified to expand on this, as it builds
+    on the features of the betaplus, but for now I've kept them
+    separate as the enable / disable mechanisms are different and
+    remaining mappings of devices unconfirmed
 
-	---
+    ---
 
-	Based on older BDI schematics, it seems the logic is like:
+    Based on older BDI schematics, it seems the logic is like:
 
-	memory access 0x3CXX (any type of access: code or data, read or write) -> temporary use BDI ROM (NOT permanent latch/switch like in beta128)
-	memory access <0x4000 area and BDI ROM_latch==true -> use BDI ROM
-   
-	IO write to port 0bxxxxxx00 -> D7 master_latch, 0=enable, 1=disable
+    memory access 0x3CXX (any type of access: code or data, read or write) -> temporary use BDI ROM (NOT permanent latch/switch like in beta128)
+    memory access <0x4000 area and BDI ROM_latch==true -> use BDI ROM
 
-	while master_latch is enabled access to regular Spectrum IO is blocked (output /IORQ forced to 1) but enabled BDI ports:
+    IO write to port 0bxxxxxx00 -> D7 master_latch, 0=enable, 1=disable
 
-	IO write to port 0b1xxxx111 -> D7 BDI ROM_latch (0=enable, 1=disble), D6 - FDC DDEN, D4 - SIDE, D3 - FDC HLT, D2 - FDC /MR (reset), D0-1 - floppy drive select.
-	IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
-	IO read/write ports 0b0YYxx111 - access FDC ports YY
+    while master_latch is enabled access to regular Spectrum IO is blocked (output /IORQ forced to 1) but enabled BDI ports:
 
-	So mostly the same as beta128, except for new BDI ROM_latch bit
+    IO write to port 0b1xxxx111 -> D7 BDI ROM_latch (0=enable, 1=disble), D6 - FDC DDEN, D4 - SIDE, D3 - FDC HLT, D2 - FDC /MR (reset), D0-1 - floppy drive select.
+    IO read port 0b1xxxx111 <- D7 - FDC INTRQ, D6 - FDC DRQ
+    IO read/write ports 0b0YYxx111 - access FDC ports YY
+
+    So mostly the same as beta128, except for new BDI ROM_latch bit
 
 
 *********************************************************************/
@@ -140,11 +140,11 @@ ROM_START(betav3)
 	ROM_RELOAD(0x1000,0x1000)
 	ROM_RELOAD(0x2000,0x1000)
 	ROM_RELOAD(0x3000,0x1000)
-//	ROM_SYSTEM_BIOS(1, "trd30a", "TR-DOS v3.0 (set 2)")
-//	ROMX_LOAD("trd30_alt.bin", 0x0000, 0x1000, CRC(48f9149f) SHA1(52774757096fdc93ea94c55306481f6f41204e96), ROM_BIOS(1))
-//	ROM_RELOAD(0x1000,0x1000)
-//	ROM_RELOAD(0x2000,0x1000)
-//	ROM_RELOAD(0x3000,0x1000)
+//  ROM_SYSTEM_BIOS(1, "trd30a", "TR-DOS v3.0 (set 2)")
+//  ROMX_LOAD("trd30_alt.bin", 0x0000, 0x1000, CRC(48f9149f) SHA1(52774757096fdc93ea94c55306481f6f41204e96), ROM_BIOS(1))
+//  ROM_RELOAD(0x1000,0x1000)
+//  ROM_RELOAD(0x2000,0x1000)
+//  ROM_RELOAD(0x3000,0x1000)
 	ROM_SYSTEM_BIOS(1, "trd30p", "TR-DOS v3.0 (set 2, Profisoft)") // is this a clone device?
 	ROMX_LOAD("trd30ps.bin", 0x0000, 0x1000, CRC(b0f175a3) SHA1(ac95bb4d89072224deef58a1655e8029f811a7fa), ROM_BIOS(1))
 	ROM_RELOAD(0x1000,0x1000)
@@ -282,7 +282,7 @@ void spectrum_betav2_device::device_reset()
 	// always paged in on boot? (no mode switch like beta128)
 	m_romcs = 1;
 	m_romlatch = 0;
-//	m_masterportdisable = 1;
+//  m_masterportdisable = 1;
 }
 
 //**************************************************************************
@@ -302,7 +302,7 @@ void spectrum_betav2_device::fetch(offs_t offset)
 			m_romcs = 1;
 		else
 			m_romcs = 0;
-	
+
 		if (!m_romlatch)
 		{
 			if (offset < 0x4000)
@@ -327,9 +327,9 @@ uint8_t spectrum_betav2_device::iorq_r(offs_t offset)
 {
 	uint8_t data = m_exp->iorq_r(offset);
 
-//	if (!m_masterportdisable)
+//  if (!m_masterportdisable)
 	if (m_romcs)
-	{ 
+	{
 		switch (offset & 0xff)
 		{
 		case 0x1f: case 0x3f: case 0x5f: case 0x7f:
@@ -349,12 +349,12 @@ uint8_t spectrum_betav2_device::iorq_r(offs_t offset)
 
 void spectrum_betav2_device::iorq_w(offs_t offset, uint8_t data)
 {
-//	if ((offset & 0x03) == 0x00)
-//	{
-//		m_masterportdisable = data & 0x80;
-//	}
+//  if ((offset & 0x03) == 0x00)
+//  {
+//      m_masterportdisable = data & 0x80;
+//  }
 
-//	if (!m_masterportdisable)
+//  if (!m_masterportdisable)
 	if (m_romcs)
 	{
 		switch (offset & 0xff)

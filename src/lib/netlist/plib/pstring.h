@@ -197,11 +197,11 @@ public:
 	bool operator>(const pstring_t &string) const { return (compare(string) > 0); }
 	bool operator>=(const pstring_t &string) const { return (compare(string) >= 0); }
 
-    friend std::ostream& operator<<(std::ostream &ostrm, const pstring_t &str)
-    {
-    	ostrm << str.m_str;
-    	return ostrm;
-    }
+	friend std::ostream& operator<<(std::ostream &ostrm, const pstring_t &str)
+	{
+		ostrm << str.m_str;
+		return ostrm;
+	}
 
 	const_reference at(const size_type pos) const { return *reinterpret_cast<const ref_value_type *>(F::nthcode(m_str.c_str(),pos)); }
 

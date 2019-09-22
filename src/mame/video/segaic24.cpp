@@ -665,7 +665,7 @@ void segas24_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 		cclip = clip[countspr];
 
 		if(cclip) {
-			// Crackdown uses this on pre-title screen intro 
+			// Crackdown uses this on pre-title screen intro
 			// for masking both avatars and the Sega logo itself.
 			clip_reverse_y = (cclip[1] & 0x2000) >> 13;
 			min_y = (cclip[2] & 511);

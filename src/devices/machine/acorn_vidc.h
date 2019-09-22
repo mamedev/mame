@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, R. Belmont, Juergen Buchmueller
 /***************************************************************************
 
-	Acorn VIDC10 (VIDeo Controller) device chip
+    Acorn VIDC10 (VIDeo Controller) device chip
 
 ***************************************************************************/
 
@@ -49,7 +49,7 @@ public:
 	void update_sound_mode(bool state) { m_sound_mode = state; refresh_sound_frequency(); }
 	void set_cursor_enable(bool state) { m_cursor_enable = state; }
 	uint32_t get_cursor_size() { return (m_crtc_regs[CRTC_VCER] - m_crtc_regs[CRTC_VCSR]) * (32/4); }
-	
+
 protected:
 	acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -66,7 +66,7 @@ protected:
 
 private:
 	const address_space_config  m_space_config;
-	
+
 	void regs_map(address_map &map);
 
 	required_device<speaker_device> m_lspeaker;
@@ -81,7 +81,7 @@ private:
 	DECLARE_WRITE32_MEMBER( crtc_w );
 	DECLARE_WRITE32_MEMBER( sound_frequency_w );
 	DECLARE_WRITE32_MEMBER( control_w );
-	
+
 	uint8_t m_pixel_clock, m_bpp_mode, m_crtc_interlace;
 	//bool m_flyback;
 	enum {
@@ -90,19 +90,19 @@ private:
 	};
 	emu_timer *m_video_timer;
 	emu_timer *m_sound_timer;
-	
+
 	inline void screen_vblank_line_update();
 	void screen_dynamic_res_change();
-	
+
 	enum {
 		CRTC_HCR = 0, CRTC_HSWR, CRTC_HBSR, CRTC_HDSR, CRTC_HDER, CRTC_HBER, CRTC_HCSR, CRTC_HIR,
 		CRTC_VCR,     CRTC_VSWR, CRTC_VBSR, CRTC_VDSR, CRTC_VDER, CRTC_VBER, CRTC_VCSR, CRTC_VCER
 	};
 	uint32_t m_crtc_regs[16];
-	u8 	     *m_data_vram;
+	u8       *m_data_vram;
 	u8       *m_cursor_vram;
 	// TODO: correct data vram size
-	const u32 m_data_vram_mask = 0x1fffff; 
+	const u32 m_data_vram_mask = 0x1fffff;
 	const u32 m_cursor_vram_mask = 0x7fff;
 	const u32 m_data_vram_size = m_data_vram_mask+1;
 	const u32 m_cursor_vram_size = m_cursor_vram_mask+1;

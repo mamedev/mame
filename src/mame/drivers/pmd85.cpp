@@ -612,9 +612,9 @@ INPUT_PORTS_END
 
 //static const struct CassetteOptions pmd85_cassette_options =
 //{
-//	1,      /* channels */
-//	16,     /* bits per sample */
-//	7200    /* sample frequency */
+//  1,      /* channels */
+//  16,     /* bits per sample */
+//  7200    /* sample frequency */
 //};
 
 /* machine definition */
@@ -670,7 +670,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(pmd85_cassette_formats);
-//	m_cassette->set_create_opts(&pmd85_cassette_options);
+//  m_cassette->set_create_opts(&pmd85_cassette_options);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("pmd85_cass");

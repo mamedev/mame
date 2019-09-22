@@ -84,11 +84,11 @@ public:
 
 	std::shared_ptr<osd_monitor_info> monitor_from_window(const osd_window& window) override
 	{
-//		if (!m_initialized)
+//      if (!m_initialized)
 			return nullptr;
 
-//		std::uint64_t display = SDL_GetWindowDisplayIndex(static_cast<const mac_window_info &>(window).platform_window());
-//		return monitor_from_handle(display);
+//      std::uint64_t display = SDL_GetWindowDisplayIndex(static_cast<const mac_window_info &>(window).platform_window());
+//      return monitor_from_handle(display);
 	}
 
 protected:

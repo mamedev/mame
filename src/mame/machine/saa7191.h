@@ -6,8 +6,8 @@
 
     Philips SAA7191B Digital Multistandard Colour Decoder (DMSD)
 
-	TODO:
-	- Actual functionality
+    TODO:
+    - Actual functionality
 
 *********************************************************************/
 

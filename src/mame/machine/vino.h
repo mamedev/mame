@@ -98,7 +98,7 @@ private:
 		ISR_CHB_EOF                 = (1 << 3),
 		ISR_CHB_FIFO                = (1 << 4),
 		ISR_CHB_DESC                = (1 << 5),
-		ISR_MASK					= 0x3f,
+		ISR_MASK                    = 0x3f,
 
 		ALPHA_MASK                  = 0xff,
 

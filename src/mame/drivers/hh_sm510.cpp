@@ -698,7 +698,7 @@ public:
 // config
 
 static INPUT_PORTS_START( gnw_judge )
-    PORT_START("IN.0") // R2
+	PORT_START("IN.0") // R2
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3

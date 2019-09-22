@@ -66,7 +66,7 @@ TODO:
 
 - Sets cpoker & cpokert spit 660K of whatever they have in the hopper when keyout...
 - Check if the cpoker sets still lock at some point due to protection.
-- Fix lamps to cpoker101. 
+- Fix lamps to cpoker101.
 
 *****************************************************************************/
 
@@ -2215,10 +2215,10 @@ void igspoker_state::init_cpoker101()  // same decryption as cpokert
 
 /*  Patch to avoid traps at $0ec5 (cpoker101),
     $0ef0 (cpoker201f), $0f20 (cpoker210ks) and
-	$206e (cpoker101, cpoker201f & cpoker210ks),
+    $206e (cpoker101, cpoker201f & cpoker210ks),
     that run subs in RAM, operate registers,
     and finally lock the game at $732e (cpoker101),
-	$72c2 (cpoker201f) & $72c6 (cpoker210ks).
+    $72c2 (cpoker201f) & $72c6 (cpoker210ks).
 
     All these are triggered if RAM contents of $ff18
     matches the $ff19 (normally 0x20 due to an AND

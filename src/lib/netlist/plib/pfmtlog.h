@@ -212,18 +212,18 @@ public:
 		return format_element('o', x);
 	}
 
-    friend std::ostream& operator<<(std::ostream &ostrm, const pfmt &fmt)
-    {
-    	ostrm << fmt.m_str;
-    	return ostrm;
-    }
+	friend std::ostream& operator<<(std::ostream &ostrm, const pfmt &fmt)
+	{
+		ostrm << fmt.m_str;
+		return ostrm;
+	}
 
 protected:
 
 	struct rtype
 	{
 		rtype() : ret(0), p(0), sl(0), pend(0), width(0) {}
-		int	ret;
+		int ret;
 		pstring::size_type p;
 		pstring::size_type sl;
 		char32_t pend;

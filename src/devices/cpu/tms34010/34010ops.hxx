@@ -2076,9 +2076,9 @@ void tms340x0_device::blmove(uint16_t op)
 	}
 
 	/*
-		TODO: We do not currently emulate precisely how B0 and B2 are modified during the operation:
-		if D == 0, then B0 and B2 remain fixed during execution and are only incremented after operation completes.
-		if D == 1, then B2 is incremented during move, B0 remains fixed until operation completes.
+	    TODO: We do not currently emulate precisely how B0 and B2 are modified during the operation:
+	    if D == 0, then B0 and B2 remain fixed during execution and are only incremented after operation completes.
+	    if D == 1, then B2 is incremented during move, B0 remains fixed until operation completes.
 	*/
 
 	BREG(0) = src;
