@@ -2481,6 +2481,8 @@ sy012							// SY-012 16/25 386MB VER: 5.2 motherboard (386)
 frxc402							// 386 motherboards using FOREX FRX46C402/FRX36C300/SIS85C206 chips
 gs611606a						// Goldstar P/N 611-606A Rev 1.0A motherboard (386)
 dfi386							// DFI 386-20.REV0  motherboard (386)
+alacou							// Alaris Cougar motherboard (386/IBM Blue Lightning)
+mx83c305						// Motherboards using the MX83C305(A)(FC), MX83C05(A)(FC) chipset
 386sc							// 386 SC Rev A2 motherboard
 386sc2c							//
 opti495slc						// Motherboards using the OPTi495SLC chipset (386)

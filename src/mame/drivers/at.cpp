@@ -2235,6 +2235,15 @@ ROM_END
 //  80386 SX and DX motherboard
 //**************************************************************************
 
+
+
+// Alaris Cougar - Chipset: OPTi 82C499 - ISA16: 5, ISA16/VL: 2
+// BIOS: MR BIOS (r) V1.65 - CPU: 75MHz IBM Blue Lightning
+ROM_START( alacou )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "cougrmrb.bin", 0x10000, 0x10000, CRC(c018f1ff) SHA1(92c4689e31b367baf42b12cad8800a851cc3e828))
+ROM_END
+
 // OPTi 386WB VER.1.0 - Chipset: Opti F82C206, 82C391B, 82C392
 // BIOS: 1006229 - BIOS-String: 30-0201-D41107-00101111-050591-OPWB-0 - Keyboard-BIOS: Intel P8942AHP
 // OSC: 66.6670MHz, 50.000MHz, 14,31818 - ISA8: 1, ISA16: 7
@@ -2249,19 +2258,6 @@ ROM_END
 ROM_START( fic4386vchd )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD( "4386-vc-hd v1.15k.bin", 0x10000, 0x10000, CRC(acc5db45) SHA1(cb93322735e96614d3c54fbfcd4291ff1b3ca57c))
-ROM_END
-
-// Octek Jaguar V rev.1.4 - Chipset: MX83C: MX83C305FC, MX83C306FC
-// CPU: AMD 386DX-40, FPU socket provided - OSC: 80.000MHz, 14.31818
-ROM_START( ocjagv )
-	ROM_REGION(0x20000, "bios", 0)
-	// 0: MR BIOS (r) V1.40 
-	ROM_SYSTEM_BIOS(0, "jagvmr14", "Jaguar V MR-BIOS 1.40")
-	ROMX_LOAD( "bios.bin", 0x10000, 0x10000, CRC(a552d6ad) SHA1(91bae14c3ec7edbc9ef240fec1be17f3582d7ec2), ROM_BIOS(0))
-	//1: AMI BIOS// BIOS: AMI 386DX ISA BIOS AA0797325 - BIOS-String: 31-0100-426069-00101111-121291-MXIC-0 MX-DIR_001
-	// Keyboard-BIOS: Intel
-	ROM_SYSTEM_BIOS(1, "jagvami", "Jaguar V AMI BIOS")
-	ROMX_LOAD( "octek_jaguar_v_ami_bios_isa386dx.bin", 0x10000, 0x10000, CRC(f8d14914) SHA1(14e8ecc4794920dc530fc6bd12ad64494e2544e5), ROM_BIOS(1))
 ROM_END
 
 // ASUS ISA-386C - Chipset : SIS Rabbit : 85C310 / 85C320 / 85C330 / 85C206
@@ -2284,13 +2280,6 @@ ROM_END
 ROM_START( hot304 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD( "386-hot-304.bin", 0x10000, 0x10000, CRC(cd4ad4ec) SHA1(50f1b7a15096fff7442d575a47728ba4709b2f39))
-ROM_END
-
-// TAM/33/40-MA0 (CM318R00,M31-R00) - Chipset: MX83C305, MX83C306 - CPU: AMD Am386DX-40 - ISA16:8
-// OSC: 80.000MHz - 14.31818 - BIOS: AMI 386 BIOS PLUS S/N OA2050592 - BIOS-String: 31-0100-001105-00101111-121291-MXIC-0 - 386DX/Cx486DLX TAM/33,30-MA0/MA01, 09/10/1992
-ROM_START( tam3340ma0 )
-	ROM_REGION(0x20000, "bios", 0)
-	ROM_LOAD( "tam_33_40-ma0.bin", 0x10000, 0x10000, CRC(56411a9f) SHA1(a6c80ea531912b758fd5b573d4fa125172cacce7))
 ROM_END
 
 // DTK PEM 2530 - Chipset: VLSI 9032BT/217203/VL82C100-0C
@@ -2381,6 +2370,36 @@ ROM_START( fu340 )
 ROM_END
 
 
+// Motherboards using the MX83C305(A)(FC), MX83C05(A)(FC) chipset
+
+// TAM/33/40-MA0 (CM318R00,M31-R00) - Chipset: MX83C305, MX83C306 - CPU: AMD Am386DX-40 - ISA16:8
+// OSC: 80.000MHz - 14.31818 - BIOS: AMI 386 BIOS PLUS S/N OA2050592 - BIOS-String: 31-0100-001105-00101111-121291-MXIC-0 - 386DX/Cx486DLX TAM/33,30-MA0/MA01, 09/10/1992
+ROM_START( tam3340ma0 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "tam_33_40-ma0.bin", 0x10000, 0x10000, CRC(56411a9f) SHA1(a6c80ea531912b758fd5b573d4fa125172cacce7))
+ROM_END
+
+// Octek Jaguar V rev.1.4 - Chipset: MX83C: MX83C305FC, MX83C306FC
+// CPU: AMD 386DX-40, FPU socket provided - OSC: 80.000MHz, 14.31818
+ROM_START( ocjagv )
+	ROM_REGION(0x20000, "bios", 0)
+	// 0: MR BIOS (r) V1.40 
+	ROM_SYSTEM_BIOS(0, "jagvmr14", "Jaguar V MR-BIOS 1.40")
+	ROMX_LOAD( "bios.bin", 0x10000, 0x10000, CRC(a552d6ad) SHA1(91bae14c3ec7edbc9ef240fec1be17f3582d7ec2), ROM_BIOS(0))
+	//1: AMI BIOS// BIOS: AMI 386DX ISA BIOS AA0797325 - BIOS-String: 31-0100-426069-00101111-121291-MXIC-0 MX-DIR_001
+	// Keyboard-BIOS: Intel
+	ROM_SYSTEM_BIOS(1, "jagvami", "Jaguar V AMI BIOS")
+	ROMX_LOAD( "octek_jaguar_v_ami_bios_isa386dx.bin", 0x10000, 0x10000, CRC(f8d14914) SHA1(14e8ecc4794920dc530fc6bd12ad64494e2544e5), ROM_BIOS(1))
+ROM_END
+
+// AMI BIOS, BIOS-String:  31-0101-009999-00101111-121291-MXIC-0 / 09/02/1992 - Keyboard-BIOS: JETkey V5.0
+// Chipset MX83C05AFC, MX8306AFC - CPU: AMD AM386DX-40, OSC: 14.31818 - ISA8: 1, ISA16: 5
+ROM_START( mx83c305 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "mxic.bin", 0x10000, 0x10000, CRC(81853049) SHA1(d855b8d935417cfcfd6580fe3ed4ea393dd49b35))
+ROM_END
+
+
 // Motherboards using the UM82C491F chipset
 
 ROM_START( um82c491f )
@@ -2400,7 +2419,7 @@ ROM_END
 
 ROM_START( opti495slc )
 	ROM_REGION(0x20000, "bios", 0)
-	// 0: Chipset: OPTi 82495SLC / F82C206, BIOS: AMI 486086 - BIOS-String: 40-040A-001102-00101111-111192-OP495SLC-0
+	// 0: Chipset: OPTi 82C495SLC / F82C206, BIOS: AMI 486086 - BIOS-String: 40-040A-001102-00101111-111192-OP495SLC-0
 	// Keyboard-BIOS: AMI - CPU: AM386DX-40, FPU socket provided - ISA8: 1, ISA16: 5 - OSC: 14.31818
 	ROM_SYSTEM_BIOS(0, "op495slc01", "OP495SLC #1")
 	ROMX_LOAD( "op495slc.bin", 0x10000, 0x10000, CRC(0b25044b) SHA1(1b585f0d73ea963dcfbf421325e7da6dd3dd918f), ROM_BIOS(0))
@@ -2408,6 +2427,9 @@ ROM_START( opti495slc )
 	// Keyboard-BIOS: AMI 386C BIOS Keyboard  ISA8: 1, ISA16: 5 - CPU: AMD AM386DX-40 - OSC: 14.3
 	ROM_SYSTEM_BIOS(1, "op495slc02", "OP495SLC #2")
 	ROMX_LOAD( "op495slc.bin", 0x10000, 0x10000, CRC(4ff251a2) SHA1(e8655217bd46d50af6b30184bf462376d0e388c6), ROM_BIOS(1))
+	// 2: BIOS-String: - Same board exists with an OPTi495XLC chip, possibly from A-Trend
+	ROM_SYSTEM_BIOS(2, "op495slc03", "OP495SLC #3") // no display
+	ROMX_LOAD( "486dlc-unknown.bin", 0x10000, 0x10000, CRC(2799e876) SHA1(ce7b421ecb27d915585c1a98bebb17cc5c2463e7), ROM_BIOS(2))
 ROM_END
 
 
@@ -2420,6 +2442,10 @@ ROM_START( opti495xlc )
 	// 1: MR BIOS (r) V1.60
 	ROM_SYSTEM_BIOS(1, "mr495xlc", "MR BIOS for OPTi 82C495XLC") // use Hercules
 	ROMX_LOAD( "mr-3dx94.rom", 0x10000, 0x10000, CRC(6925759c) SHA1(540177fe2c10e20037893c9763b0bf6e35163c9c), ROM_BIOS(1) )
+	// 2: possibly from A-Trend (A1742X REV.C 94V-0), exists with an OPTi495SLC chip, see above section, ISA8: 2, ISA16: 4, ISA16/VL: 2
+	// BIOS-String: X0-0804-001117-00101111-080893-OP395XLC-0 / OPTI 495XLC 3/486 BIOS VER 5.02_T 94/07/07
+	ROM_SYSTEM_BIOS(2, "op82c495xlc", "82C495XLC") // this one could also be listed as a 486 board as it has solder pads and sockets for CPUs from 386 to true 486s
+	ROMX_LOAD( "at080893.bin", 0x10000, 0x10000, CRC(6b49fdaa) SHA1(5b490d1d1216763ef89688c8e383c46470272005), ROM_BIOS(2) )
 ROM_END
 
 
@@ -2928,6 +2954,7 @@ COMP( 1990, xb42664a,  ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 1993, apxena1,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
 COMP( 1993, apxenp2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
 COMP( 1992, a433cc,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "J-Bond",      "A433C-C/A450C-C", MACHINE_NOT_WORKING )
+COMP( 199?, alacou,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Alaris",      "Cougar", MACHINE_NOT_WORKING )
 COMP( 1994, a486ap4,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "PVI-486AP4", MACHINE_NOT_WORKING )
 COMP( 1994, a486sp3,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "PVI-486SP3", MACHINE_NOT_WORKING )
 COMP( 1994, a486sp3g,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "PCI/I-486SP3G", MACHINE_NOT_WORKING )
@@ -2979,6 +3006,7 @@ COMP( 198?, vlsi5,     ibm5170, 0,       atvga,     0,     at_state,     init_at
 COMP( 199?, frxc402,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards with a FOREX FRX46C402/FRX36C300/SIS85C206 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, opti495slc,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using a OPTi 82C495SLC chipset", MACHINE_NOT_WORKING )
 COMP( 199?, opti495xlc,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using a OPTi 82C495XLC chipset", MACHINE_NOT_WORKING )
+COMP( 199?, mx83c305,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using the MX83C305(A)(FC)/MX83C05(A)(FC) chipset", MACHINE_NOT_WORKING )
 COMP( 198?, dfi386,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "DFI", "386-20.REV0", MACHINE_NOT_WORKING )
 COMP( 198?, pem2530,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "DTK", "PEM 2539", MACHINE_NOT_WORKING )
 COMP( 198?, u3911v3,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Uniron", "U3911-V3", MACHINE_NOT_WORKING )
