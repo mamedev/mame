@@ -76,8 +76,7 @@ void cfx9850_state::cfx9850(address_map &map)
 //  AM_RANGE( 0x100000, 0x10ffff ) // some memory mapped i/o???
 //  AM_RANGE( 0x110000, 0x11ffff ) // some memory mapped i/o???
 	map(0x200000, 0x27ffff).rom().region("bios", 0);
-	map(0x400000, 0x407fff).ram().share("data_ram");
-	map(0x408000, 0x40ffff).ram().share("data_ram");
+	map(0x400000, 0x407fff).mirror(0x008000).ram();
 	map(0x600000, 0x6007ff).mirror(0xf800).ram().share("display_ram");
 //  AM_RANGE( 0xe10000, 0xe1ffff ) // some memory mapped i/o???
 }
