@@ -2453,7 +2453,7 @@ pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops
 pcd4nl                          // 1995 Siemens-Nixdorf PCD-4NL 486 subnotebook
 pcd4nd                          // 1993 Siemens-Nixdorf 486 notebook
 ct386sx                         //
-wy220001						// WYSEpc
+wy220001						// WYSEpc 286
 cxsxd                           //
 ec1842                          //
 ec1849                          //
@@ -2483,7 +2483,11 @@ gs611606a						// Goldstar P/N 611-606A Rev 1.0A motherboard (386)
 dfi386							// DFI 386-20.REV0  motherboard (386)
 386sc							// 386 SC Rev A2 motherboard
 386sc2c							//
+opti495slc						// Motherboards using the OPTi495SLC chipset (386)
 opti495xlc						// Motherboards using the OPTi 82C495XLC chipset (386)
+um82c491f						// Motherboards using the UMC UM82C491F chipset (386)
+fic4386vchd						// FIC 4386-VC-HD motherboard (386)
+op386wb							// OPTi 386WB VER.1.0 motherboard (386)
 isa386u30						// Asus ISA-386U30 REV.2.2 motherboard (386)
 isa386c							// Asus ISA-386C motherboard (386)
 pt581392						// Motherboard using the Forex FRX46C402 + FRX46C411 + SiS 85C206 chipset (386)
@@ -2501,6 +2505,7 @@ snomi286						// Snobol Mini 286 motherboard (286)
 sy019hi							// Soyo SY-019H and SY-019I motherboards (386)
 sm38640f						// SM 386-40F motherboard (386)
 4nd04a							// 386-4N-D04A motherboard (386)
+al486vd							// Daewoo AL486V-D Rev:1.1 motherboard (386)
 hot304							// Shuttle HOT-304
 hot409                          // Shuttle HOT-409
 ibm5162                         // 1986 IBM XT 5162 (XT w/80286)
@@ -2525,7 +2530,7 @@ n8810m16c                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - CGA ver
 n8810m16v                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - VGA version
 n8810m30                        // 1990 Nixdorf 8810 M30
 n8810m55                        // 1986 Nixdorf 8810 M55
-//nws286                          // 1988 Nokia WS286
+//nws286                        // 1988 Nokia WS286
 pc2386                          //
 qi600                           // 1988 Apricot Qi 600 (Neptune Motherboard
 qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
