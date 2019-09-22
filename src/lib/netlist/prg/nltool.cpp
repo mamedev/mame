@@ -864,7 +864,7 @@ int tool_app_t::execute()
 		perr("plib exception caught: {}\n", e.text());
 		return 2;
 	}
-#if 1
+#if 0
 	std::cout.imbue(std::locale("de_DE.utf8"));
 	std::cout.imbue(std::locale("C.UTF-8"));
 	std::cout << std::fixed << 20.003 << "\n";
