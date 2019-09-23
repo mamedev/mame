@@ -2454,7 +2454,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs, uses keyboard and mouse -->
-	<software name="pcpaliss" cloneof="pcpalisr3" supported="yes">
+	<software name="pcpaliss" cloneof="pcpalisr3" supported="no">
 		<description>V.Smile PC (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
