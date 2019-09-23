@@ -2242,7 +2242,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Mario Bros. (model MW-56)
-  * PCB label MW-56-M
+  * PCB label MW-56-M-I (left), MW-56-S (right)
   * Sharp SM510 label MW-56 533C (no decap)
   * horizontal dual lcd screens with custom segments, 1-bit sound
 
