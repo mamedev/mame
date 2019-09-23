@@ -1026,7 +1026,7 @@ void cps3_state::draw_tilemapsprite_line(u32 *regs, int drawline, bitmap_rgb32 &
 	int tilesubline = line % 16;
 
 	if (linescroll_enable)
-		scrollx += (m_spriteram[linebase + ((line + 16 - 4) & 0x3ff)] >> 16) & 0x3ff;
+		scrollx += (m_spriteram[linebase + ((line + 16) & 0x3ff)] >> 16) & 0x3ff; // test case: sfiii Ryu's stage 2nd round floor
 
 	rectangle clip(cliprect.left(), cliprect.right(), drawline, drawline);
 
@@ -2022,8 +2022,8 @@ void cps3_state::process_character_dma(u32 address)
 		u32 real_destination =  dat2 << 3;
 		u32 real_length      = (((dat1 & 0x001fffff) + 1) << 3);
 
-		/* 0x01000000 is the end of list marker, 0x13131313 is our default fill */
-		if ((dat1 == 0x01000000) || (dat1 == 0x13131313)) break;
+		// 0x01000000 is the end of list marker
+		if (dat1 & 0x01000000) break;
 
 		//logerror("%08x %08x %08x real_source %08x (rom %d offset %08x) real_destination %08x, real_length %08x\n", dat1, dat2, dat3, real_source, real_source/0x800000, real_source%0x800000, real_destination, real_length);
 
