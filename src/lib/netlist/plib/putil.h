@@ -142,7 +142,7 @@ namespace plib
 		if (ss >> x)
 		{
 			auto pos(ss.tellg());
-			if (pos == -1LL)
+			if (pos == static_cast<decltype(pos)>(-1))
 				pos = len;
 			*idx = static_cast<std::size_t>(pos);
 		}
