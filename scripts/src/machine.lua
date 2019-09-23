@@ -65,6 +65,8 @@ files {
 	MAME_DIR .. "src/devices/imagedev/snapquik.h",
 	MAME_DIR .. "src/devices/imagedev/wafadrive.cpp",
 	MAME_DIR .. "src/devices/imagedev/wafadrive.h",
+	MAME_DIR .. "src/devices/imagedev/avivideo.cpp",
+	MAME_DIR .. "src/devices/imagedev/avivideo.h",
 }
 
 

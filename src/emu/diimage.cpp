@@ -27,26 +27,27 @@
 //**************************************************************************
 const image_device_type_info device_image_interface::m_device_info_array[] =
 	{
-		{ IO_UNKNOWN,   "unknown",      "unkn" },
-		{ IO_CARTSLOT,  "cartridge",    "cart" }, /*  0 */
-		{ IO_FLOPPY,    "floppydisk",   "flop" }, /*  1 */
-		{ IO_HARDDISK,  "harddisk",     "hard" }, /*  2 */
-		{ IO_CYLINDER,  "cylinder",     "cyln" }, /*  3 */
-		{ IO_CASSETTE,  "cassette",     "cass" }, /*  4 */
-		{ IO_PUNCHCARD, "punchcard",    "pcrd" }, /*  5 */
-		{ IO_PUNCHTAPE, "punchtape",    "ptap" }, /*  6 */
-		{ IO_PRINTER,   "printout",     "prin" }, /*  7 */
-		{ IO_SERIAL,    "serial",       "serl" }, /*  8 */
-		{ IO_PARALLEL,  "parallel",     "parl" }, /*  9 */
-		{ IO_SNAPSHOT,  "snapshot",     "dump" }, /* 10 */
-		{ IO_QUICKLOAD, "quickload",    "quik" }, /* 11 */
-		{ IO_MEMCARD,   "memcard",      "memc" }, /* 12 */
-		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
-		{ IO_MAGTAPE,   "magtape",      "magt" }, /* 14 */
-		{ IO_ROM,       "romimage",     "rom"  }, /* 15 */
-		{ IO_MIDIIN,    "midiin",       "min"  }, /* 16 */
-		{ IO_MIDIOUT,   "midiout",      "mout" }, /* 17 */
-		{ IO_PICTURE,   "picture",      "pic"  }  /* 18 */
+		{ IO_UNKNOWN,   "unknown",      "unkn" }, /*  0 */
+		{ IO_CARTSLOT,  "cartridge",    "cart" }, /*  1 */
+		{ IO_FLOPPY,    "floppydisk",   "flop" }, /*  2 */
+		{ IO_HARDDISK,  "harddisk",     "hard" }, /*  3 */
+		{ IO_CYLINDER,  "cylinder",     "cyln" }, /*  4 */
+		{ IO_CASSETTE,  "cassette",     "cass" }, /*  5 */
+		{ IO_PUNCHCARD, "punchcard",    "pcrd" }, /*  6 */
+		{ IO_PUNCHTAPE, "punchtape",    "ptap" }, /*  7 */
+		{ IO_PRINTER,   "printout",     "prin" }, /*  8 */
+		{ IO_SERIAL,    "serial",       "serl" }, /*  9 */
+		{ IO_PARALLEL,  "parallel",     "parl" }, /* 10 */
+		{ IO_SNAPSHOT,  "snapshot",     "dump" }, /* 11 */
+		{ IO_QUICKLOAD, "quickload",    "quik" }, /* 12 */
+		{ IO_MEMCARD,   "memcard",      "memc" }, /* 13 */
+		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 14 */
+		{ IO_MAGTAPE,   "magtape",      "magt" }, /* 15 */
+		{ IO_ROM,       "romimage",     "rom"  }, /* 16 */
+		{ IO_MIDIIN,    "midiin",       "min"  }, /* 17 */
+		{ IO_MIDIOUT,   "midiout",      "mout" }, /* 18 */
+		{ IO_PICTURE,   "picture",      "pic"  }, /* 19 */
+		{ IO_VIDEO,     "vidfile",      "vid"  }  /* 20 */
 	};
 
 

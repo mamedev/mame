@@ -15,6 +15,7 @@
 
 #include "bitmap.h"
 #include "imagedev/picture.h"
+#include "imagedev/avivideo.h"
 
 class vino_device : public device_t
 {
@@ -247,6 +248,7 @@ private:
 	devcb_write_line m_interrupt_cb;
 
 	required_device<picture_image_device> m_picture;
+	required_device<avivideo_image_device> m_avivideo;
 	required_address_space m_space;
 
 	bitmap_argb32 *m_input_bitmap;
