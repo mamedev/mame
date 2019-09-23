@@ -74,7 +74,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="u" size="0x2000" crc="b0cc7564" sha1="59f7b3a9df26053fdcb720fe07a22f437a7a2241"/>
+				<rom name="u" size="0x2000" crc="b0cc7564" sha1="59f7b3a9df26053fdcb720fe07a22f437a7a2241" offset="0x0000" />
 				<rom name="3" size="0x2000" crc="ef80b1e7" sha1="80392a04bc9ca2fea006653a507f6f5338a10beb" offset="0x2000" />
 			</dataarea>
 
@@ -224,7 +224,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="79" size="0x8000" crc="58f8aeeb" sha1="0450d8f999d89b284b08118da5c1b82a491292e7"/>
+				<rom name="79" size="0x8000" crc="58f8aeeb" sha1="0450d8f999d89b284b08118da5c1b82a491292e7" offset="0x0000" />
 				<rom name="zs3" size="0x8000" crc="2967d75a" sha1="d11098168cbcb8b4260116ea723e6b9399153d29" offset="0x8000" />
 			</dataarea>
 
@@ -243,7 +243,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="1" size="0x8000" crc="6ae3976d" sha1="e704cb4ca1bfff2a9359a49dee8d89f12724980e"/>
+				<rom name="1" size="0x8000" crc="6ae3976d" sha1="e704cb4ca1bfff2a9359a49dee8d89f12724980e" offset="0x0000" />
 				<rom name="2" size="0x8000" crc="cc3a012b" sha1="2afd7efb282f7a8e19aebd36214fd0bb1fe19cd2" offset="0x8000" />
 			</dataarea>
 
@@ -262,7 +262,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="u1.bin" size="0x8000" crc="dd6c545a" sha1="d32005405cb944f77932901916608232e3c05a42"/>
+				<rom name="u1.bin" size="0x8000" crc="dd6c545a" sha1="d32005405cb944f77932901916608232e3c05a42" offset="0x0000" />
 				<rom name="u2.bin" size="0x8000" crc="3dc43ab1" sha1="1a21771e7bf61ca1771de450c8230bd5ac46b1c6" offset="0x8000" />
 			</dataarea>
 
@@ -306,7 +306,7 @@
 			</dataarea>
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="ecrblu" size="0x2000" crc="db0b4295" sha1="557769a9b8b6d6f71d8450d55d669b8cbf499c4b"/>
+				<rom name="ecrblu" size="0x2000" crc="db0b4295" sha1="557769a9b8b6d6f71d8450d55d669b8cbf499c4b" offset="0x0000" />
 				<rom name="ecrgrn" size="0x2000" crc="ca7917c0" sha1="2b54658dcec78e365ace3d61cac26b82568fa03a" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -338,7 +338,7 @@
 			<feature name="pcb" value="SC041/1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="shelp-$8.ba1" size="0x1000" crc="32fc1c44" sha1="5af8f291deff11cb894db87fb4a22f7318e64e25"/>
+				<rom name="shelp-$8.ba1" size="0x1000" crc="32fc1c44" sha1="5af8f291deff11cb894db87fb4a22f7318e64e25" offset="0x0000" />
 				<rom name="shelp-$9.ba2" size="0x1000" crc="844082ef" sha1="ca9174b53fec9e4b73c593ede120fb30b0409f49" offset="0x1000" />
 			</dataarea>
 		</part>
@@ -393,14 +393,14 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="4040.bin" size="0x2000" crc="bab8bb5f" sha1="e1b602f476bf7baddd3b7f6964a5db4b44e7c7c1"/>
+				<rom name="4040.bin" size="0x2000" crc="bab8bb5f" sha1="e1b602f476bf7baddd3b7f6964a5db4b44e7c7c1" offset="0x0000" />
 				<rom name="hackem.bin" size="0x2000" crc="8edd53a5" sha1="ac1a159e27060aa1c95669eb510c3864032968e8" offset="0x2000" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="fast_hackem_9.5a.d64" size="174848" crc="76fcbbee" sha1="e3e5e8563989e169b28bb1c568ac88b31e7a2f14" offset="0" />
+				<rom name="fast_hackem_9.5a.d64" size="174848" crc="76fcbbee" sha1="e3e5e8563989e169b28bb1c568ac88b31e7a2f14" />
 			</dataarea>
 		</part>
 	</software>
@@ -417,7 +417,7 @@
 			<feature name="pcb" value="e9048" />
 
 			<dataarea name="roml" size="0x20000">
-				<rom name="hugo 2012" size="0x20000" crc="7059dfc6" sha1="7cc9ac838f1eb02c7e1bab3b3b4da1d791409dea" offset="0x0000"/>
+				<rom name="hugo 2012" size="0x20000" crc="7059dfc6" sha1="7cc9ac838f1eb02c7e1bab3b3b4da1d791409dea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -462,7 +462,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="xl 80 system software.d64" size="174848" crc="7fc45fca" sha1="c8c890ecd826dd9c3b1a1254793f73dc0ef9ef95" offset="0" />
+				<rom name="xl 80 system software.d64" size="174848" crc="7fc45fca" sha1="c8c890ecd826dd9c3b1a1254793f73dc0ef9ef95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -563,47 +563,47 @@
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="utility.d64" size="174848" crc="72d827a9" sha1="96cb8fc0f5c7f3fbfbcece2a09c08c6a751617c2" offset="0" />
+				<rom name="utility.d64" size="174848" crc="72d827a9" sha1="96cb8fc0f5c7f3fbfbcece2a09c08c6a751617c2"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="expert21.d64" size="174848" crc="3281c3bb" sha1="cd34b8a2e6980f6e7ea068b37a5c0e32a7920610" offset="0" />
+				<rom name="expert21.d64" size="174848" crc="3281c3bb" sha1="cd34b8a2e6980f6e7ea068b37a5c0e32a7920610"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="expert27.d64" size="174848" crc="e49c6a5b" sha1="7eaf7c0399221f7c7628310b351f06a1db79ed9e" offset="0" />
+				<rom name="expert27.d64" size="174848" crc="e49c6a5b" sha1="7eaf7c0399221f7c7628310b351f06a1db79ed9e"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="expert29.d64" size="174848" crc="df734252" sha1="9f0c95692a4b8d0ec39aadd754a175be2803a4fc" offset="0" />
+				<rom name="expert29.d64" size="174848" crc="df734252" sha1="9f0c95692a4b8d0ec39aadd754a175be2803a4fc"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="euc29.d64" size="174848" crc="0068933c" sha1="7cdc43f7fca6ad02f67f169c05d961bde5e5d4ed" offset="0" />
+				<rom name="euc29.d64" size="174848" crc="0068933c" sha1="7cdc43f7fca6ad02f67f169c05d961bde5e5d4ed"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="expert32.d64" size="174848" crc="460b6c0d" sha1="414f37425a328f48b842ad48b7159cdd5b509379" offset="0" />
+				<rom name="expert32.d64" size="174848" crc="460b6c0d" sha1="414f37425a328f48b842ad48b7159cdd5b509379"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="ex32.d64" size="174848" crc="5c4526ba" sha1="43f69cfc6f6f31cfc5bd56886e40d598ab98e87e" offset="0" />
+				<rom name="ex32.d64" size="174848" crc="5c4526ba" sha1="43f69cfc6f6f31cfc5bd56886e40d598ab98e87e"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="ex32u.d64" size="174848" crc="495d0046" sha1="71dfdd8bdd56a2ab2e4207fe654935909c4402fb" offset="0" />
+				<rom name="ex32u.d64" size="174848" crc="495d0046" sha1="71dfdd8bdd56a2ab2e4207fe654935909c4402fb"/>
 			</dataarea>
 		</part>
 		<part name="cass" interface="cass">
 			<dataarea name="side1" size="91001">
-				<rom name="demo.t64" size="91001" crc="cdea83a9" sha1="6a6ca1916ae9082e47ab364dcabc1d17cb7f3041" offset="0" />
+				<rom name="demo.t64" size="91001" crc="cdea83a9" sha1="6a6ca1916ae9082e47ab364dcabc1d17cb7f3041"/>
 			</dataarea>
 		</part>
 	</software>
@@ -875,20 +875,20 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="rom" size="0x10000">
-				<rom name="ramlink1.bin" size="0x8000" crc="da953716" sha1="adde7308c7155fc1942c98b674189e89f4965f91"/>
+				<rom name="ramlink1.bin" size="0x8000" crc="da953716" sha1="adde7308c7155fc1942c98b674189e89f4965f91" offset="0x0000" />
 				<rom name="ramlink2.bin" size="0x8000" crc="ab8b6dda" sha1="e35e776387bd8b9ab16bacff70c2a3f3ef9b65bd" offset="0x8000" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" offset="0" />
+				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" offset="0" />
+				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
 			</dataarea>
 		</part>
 	</software>
@@ -904,19 +904,19 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dos_v140.bin" size="0x10000" crc="31d1c877" sha1="fe536cb7a14c8ecbac55ef2799267855f1447d9f"/>
+				<rom name="cmd_ramlink_dos_v140.bin" size="0x10000" crc="31d1c877" sha1="fe536cb7a14c8ecbac55ef2799267855f1447d9f" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" offset="0" />
+				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" offset="0" />
+				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
 			</dataarea>
 		</part>
 	</software>
@@ -938,13 +938,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" offset="0" />
+				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" offset="0" />
+				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
 			</dataarea>
 		</part>
 	</software>
@@ -960,13 +960,13 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x20000">
-				<rom name="supercpu_dos_204.bin" size="0x20000" crc="f4151454" sha1="6aa529a7b1b6de53e8979e407a77b4d5657727f5" offset="0" />
+				<rom name="supercpu_dos_204.bin" size="0x20000" crc="f4151454" sha1="6aa529a7b1b6de53e8979e407a77b4d5657727f5" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="cmdscpuu.d64" size="174848" crc="caad286d" sha1="2c1258505148763f13ab2fcdaf247138a933817e" offset="0" />
+				<rom name="cmdscpuu.d64" size="174848" crc="caad286d" sha1="2c1258505148763f13ab2fcdaf247138a933817e" />
 			</dataarea>
 		</part>
 	</software>
@@ -982,7 +982,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="grap.u6" size="0x1000" crc="7d26ca10" sha1="7c21199ec71ee691b9e67f1e1103c801123e75a5"/>
+				<rom name="grap.u6" size="0x1000" crc="7d26ca10" sha1="7c21199ec71ee691b9e67f1e1103c801123e75a5" offset="0x0000" />
 				<rom name="grap.u5" size="0x1000" crc="899467df" sha1="71ff1989b792dc027872c7a688102427d12d7c81" offset="0x1000" />
 			</dataarea>
 		</part>
@@ -1168,7 +1168,7 @@
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="cie utilities.d64" size="174848" status="nodump" offset="0" />
+				<rom name="cie utilities.d64" size="174848" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1317,7 +1317,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="fortress of narzod.bin" size="0x4000" crc="3c00d620" sha1="7c859627ad4156da5eff4f5da0ec844655ba5747" offset="0" />
+				<rom name="fortress of narzod.bin" size="0x4000" crc="3c00d620" sha1="7c859627ad4156da5eff4f5da0ec844655ba5747" />
 			</dataarea>
 		</part>
 	</software>
@@ -1367,7 +1367,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="jars' revenge.bin" size="0x4000" crc="9f94df24" sha1="11455419d5bf18d0c2416a041cc7d1734424e0cf" offset="0" />
+				<rom name="jars' revenge.bin" size="0x4000" crc="9f94df24" sha1="11455419d5bf18d0c2416a041cc7d1734424e0cf" />
 			</dataarea>
 		</part>
 	</software>
@@ -1384,7 +1384,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="panic analogue.bin" size="0x4000" crc="e0a96952" sha1="b611bf196e799d918c1879e02a5b4c1e293bfdb0" offset="0" />
+				<rom name="panic analogue.bin" size="0x4000" crc="e0a96952" sha1="b611bf196e799d918c1879e02a5b4c1e293bfdb0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1401,7 +1401,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0xa0000">
-				<rom name="rom-menu.bin" size="0xa0000" crc="a3842c0d" sha1="a147584a959034c8a5679e72c183c82f7e876fd6" offset="0" />
+				<rom name="rom-menu.bin" size="0xa0000" crc="a3842c0d" sha1="a147584a959034c8a5679e72c183c82f7e876fd6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1417,11 +1417,11 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="1" size="0x2000" crc="a8bdbbcf" sha1="4758c7cd4b094b7894ddc5cfa8b5a925c6b01979" offset="0" />
+				<rom name="1" size="0x2000" crc="a8bdbbcf" sha1="4758c7cd4b094b7894ddc5cfa8b5a925c6b01979" />
 			</dataarea>
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="2" size="0x2000" crc="ab55db10" sha1="c6f53801645e07d0413dc91bae71a79a636762c4"/>
+				<rom name="2" size="0x2000" crc="ab55db10" sha1="c6f53801645e07d0413dc91bae71a79a636762c4" offset="0x0000" />
 				<rom name="3" size="0x2000" crc="407a8273" sha1="971ca48cd6e80cc77f166709207e68b0b5d0d8c1" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -1438,18 +1438,18 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="1121" size="0x2000" crc="a8bdbbcf" sha1="4758c7cd4b094b7894ddc5cfa8b5a925c6b01979" offset="0" />
+				<rom name="1121" size="0x2000" crc="a8bdbbcf" sha1="4758c7cd4b094b7894ddc5cfa8b5a925c6b01979" />
 			</dataarea>
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="2122" size="0x2000" crc="635407a5" sha1="b174c20153032307560707e4f73997fb3633deae"/>
+				<rom name="2122" size="0x2000" crc="635407a5" sha1="b174c20153032307560707e4f73997fb3633deae" offset="0x0000" />
 				<rom name="3121" size="0x2000" crc="8de1d013" sha1="8052819719b0234b999ac8af18116bdbb0463013" offset="0x2000" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="s'more.d64" size="174848" crc="268eb91b" sha1="c8672643441a6714093382fd018fc3ead722bc5a" offset="0" />
+				<rom name="s'more.d64" size="174848" crc="268eb91b" sha1="c8672643441a6714093382fd018fc3ead722bc5a" />
 			</dataarea>
 		</part>
 	</software>
@@ -1482,7 +1482,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="smart 64 c intelligent terminal commodore 654 cartridge.bin" size="0x2000" crc="f030b179" sha1="5521fa90fee29397c705eb91760df082b99c1414" offset="0" />
+				<rom name="smart 64 c intelligent terminal commodore 654 cartridge.bin" size="0x2000" crc="f030b179" sha1="5521fa90fee29397c705eb91760df082b99c1414" />
 			</dataarea>
 		</part>
 	</software>
@@ -1513,7 +1513,7 @@
 			<feature name="game" value="0" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="315102-01.u1" size="0x8000" crc="2fe1c208" sha1="d037d867244221ea8f5f05e3048d9e2af39e2cc9"/>
+				<rom name="315102-01.u1" size="0x8000" crc="2fe1c208" sha1="d037d867244221ea8f5f05e3048d9e2af39e2cc9" offset="0x0000" />
 				<rom name="315103-01.u2" size="0x8000" crc="f8b7adf0" sha1="02a7640b69b09663df988ba0d1674d63d2f76616" offset="0x8000" />
 			</dataarea>
 		</part>
@@ -1620,7 +1620,7 @@
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="vikingraider.d64" size="174848" crc="f3489d8f" sha1="1b85f123d9bab8c2cb7168f5d019427e79073530" offset="0" />
+				<rom name="vikingraider.d64" size="174848" crc="f3489d8f" sha1="1b85f123d9bab8c2cb7168f5d019427e79073530" />
 			</dataarea>
 		</part>
 	</software>
@@ -3355,11 +3355,11 @@
 			<feature name="game" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="324872-03.u1" size="0x2000" crc="d6f297b8" sha1="5df910498a3ac177ca72de56565655ce4133d315" offset="0" />
+				<rom name="324872-03.u1" size="0x2000" crc="d6f297b8" sha1="5df910498a3ac177ca72de56565655ce4133d315" />
 			</dataarea>
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="324872-04.u2" size="0x2000" crc="857d801f" sha1="c7a058090513cfc4f22b7d0e459bc2788c393a87" offset="0" />
+				<rom name="324872-04.u2" size="0x2000" crc="857d801f" sha1="c7a058090513cfc4f22b7d0e459bc2788c393a87" />
 			</dataarea>
 		</part>
 	</software>
@@ -3404,11 +3404,11 @@
 			<feature name="game" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="324874-03.u1" size="0x2000" crc="ebf384be" sha1="d2761fdf092e2278187c46a4942d766f285f1cbd" offset="0" />
+				<rom name="324874-03.u1" size="0x2000" crc="ebf384be" sha1="d2761fdf092e2278187c46a4942d766f285f1cbd" />
 			</dataarea>
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="324874-04.u2" size="0x2000" crc="bcfdb48d" sha1="96739f2d2a72669a0cd802ce90aa664a70cce09c" offset="0" />
+				<rom name="324874-04.u2" size="0x2000" crc="bcfdb48d" sha1="96739f2d2a72669a0cd802ce90aa664a70cce09c" />
 			</dataarea>
 		</part>
 	</software>
@@ -3455,17 +3455,17 @@
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="teil1.d64" size="174848" crc="cb06a7dd" sha1="76ee0ed5b25cd0a0c9e98f12171da1a3eb7c6208" offset="0" />
+				<rom name="teil1.d64" size="174848" crc="cb06a7dd" sha1="76ee0ed5b25cd0a0c9e98f12171da1a3eb7c6208" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="teil2.d64" size="174848" crc="3e279184" sha1="6857c1570baf89fd76c29ab6533969ffd2768c64" offset="0" />
+				<rom name="teil2.d64" size="174848" crc="3e279184" sha1="6857c1570baf89fd76c29ab6533969ffd2768c64" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="teil3.d64" size="174848" crc="41a40ecb" sha1="18266141101dacb2f3a41b9daf834d854efe4084" offset="0" />
+				<rom name="teil3.d64" size="174848" crc="41a40ecb" sha1="18266141101dacb2f3a41b9daf834d854efe4084" />
 			</dataarea>
 		</part>
 	</software>
@@ -4886,7 +4886,7 @@
 		</part>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="calc_result.d64" size="174848" crc="ed84c27b" sha1="b5d6169e4e42701ee4ddef17dbc1049754642a19" offset="0" />
+				<rom name="calc_result.d64" size="174848" crc="ed84c27b" sha1="b5d6169e4e42701ee4ddef17dbc1049754642a19" />
 			</dataarea>
 		</part>
 	</software>
@@ -5703,7 +5703,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_cartridge_plus_5___5.3_german_1988_pal.bin" size="0x8000" crc="746b3f5a" sha1="68a5f7d5c8d68b574cdb48c718836e604949cee8" offset="0x0000"/>
+				<rom name="action_cartridge_plus_5___5.3_german_1988_pal.bin" size="0x8000" crc="746b3f5a" sha1="68a5f7d5c8d68b574cdb48c718836e604949cee8" />
 			</dataarea>
 		</part>
 	</software>
@@ -5718,7 +5718,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_cartridge_plus_6.0_tkit25_german_pal.bin" size="0x8000" crc="5a0d146d" sha1="c9c037f630b7ec74f2b36c1e23396b0e1e14ecd4" offset="0x0000"/>
+				<rom name="action_cartridge_plus_6.0_tkit25_german_pal.bin" size="0x8000" crc="5a0d146d" sha1="c9c037f630b7ec74f2b36c1e23396b0e1e14ecd4" />
 			</dataarea>
 		</part>
 	</software>
@@ -5733,7 +5733,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_cartridge_plus_6.0_tkit25_german_pal_aus.bin" size="0x8000" crc="080278e7" sha1="c57ce1d3d5bf13c8adad5dc803cdf163fdddaf6a" offset="0x0000"/>
+				<rom name="action_cartridge_plus_6.0_tkit25_german_pal_aus.bin" size="0x8000" crc="080278e7" sha1="c57ce1d3d5bf13c8adad5dc803cdf163fdddaf6a" />
 			</dataarea>
 		</part>
 	</software>
@@ -5748,7 +5748,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action_replay_v7.3_20x_atrax_1991_pal.bin" size="0x8000" crc="4d59d964" sha1="662c4d579907b0ebc4123910537be600ad50dc08" offset="0x0000"/>
+				<rom name="action_replay_v7.3_20x_atrax_1991_pal.bin" size="0x8000" crc="4d59d964" sha1="662c4d579907b0ebc4123910537be600ad50dc08" />
 			</dataarea>
 		</part>
 	</software>
@@ -5915,7 +5915,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="freeze_frame_mk1_v1_1986.bin" size="0x2000" crc="0239c47b" sha1="62906c0d22dca6ba48aa4a4ead467c57d207ac75" offset="0" />
+				<rom name="freeze_frame_mk1_v1_1986.bin" size="0x2000" crc="0239c47b" sha1="62906c0d22dca6ba48aa4a4ead467c57d207ac75" />
 			</dataarea>
 		</part>
 	</software>
@@ -5932,7 +5932,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="freeze_frame_mk1_v2_1986.bin" size="0x2000" crc="58f11c8b" sha1="a04ce32caf23d29334d17a9cc0149749027b75c4" offset="0" />
+				<rom name="freeze_frame_mk1_v2_1986.bin" size="0x2000" crc="58f11c8b" sha1="a04ce32caf23d29334d17a9cc0149749027b75c4" />
 			</dataarea>
 		</part>
 	</software>
@@ -5949,7 +5949,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="freeze_frame_mk4_1987.bin" size="0x4000" crc="6b4ac766" sha1="8d98d15ff38e184434edecf59242b028950bd8fe" offset="0" />
+				<rom name="freeze_frame_mk4_1987.bin" size="0x4000" crc="6b4ac766" sha1="8d98d15ff38e184434edecf59242b028950bd8fe" />
 			</dataarea>
 		</part>
 	</software>
@@ -5966,7 +5966,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x8000">
-				<rom name="freeze_machine_v1_1987_au.bin" size="0x8000" crc="a9995e50" sha1="cdc57d9759d2c5eb5b9c7e75bb3c82728cf30bfc" offset="0" />
+				<rom name="freeze_machine_v1_1987_au.bin" size="0x8000" crc="a9995e50" sha1="cdc57d9759d2c5eb5b9c7e75bb3c82728cf30bfc" />
 			</dataarea>
 		</part>
 	</software>
@@ -5983,7 +5983,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x8000">
-				<rom name="freeze_machine_v1_1987_uk.bin" size="0x8000" crc="71329d4e" sha1="a9a3dbf7e9f69100e9e3955ab9d7eba8edbf9968" offset="0" />
+				<rom name="freeze_machine_v1_1987_uk.bin" size="0x8000" crc="71329d4e" sha1="a9a3dbf7e9f69100e9e3955ab9d7eba8edbf9968" />
 			</dataarea>
 		</part>
 	</software>
@@ -6000,7 +6000,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x8000">
-				<rom name="freeze_machine_v2_1987_uk.bin" size="0x8000" crc="66b76d76" sha1="3be23e5278a31fab3d4c6b397d6d2c41b747e133" offset="0" />
+				<rom name="freeze_machine_v2_1987_uk.bin" size="0x8000" crc="66b76d76" sha1="3be23e5278a31fab3d4c6b397d6d2c41b747e133" />
 			</dataarea>
 		</part>
 	</software>
@@ -6269,7 +6269,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="317004-01.u1" size="0x2000" crc="3b47e9f0" sha1="19fde6707a4c60fdc3bb9df07e2f3ddf28a94900"/>
+				<rom name="317004-01.u1" size="0x2000" crc="3b47e9f0" sha1="19fde6707a4c60fdc3bb9df07e2f3ddf28a94900" offset="0x0000" />
 				<rom name="317005-01.u2" size="0x2000" crc="9f3e210d" sha1="c78af8d162e19d09770d4df1c154c4e95418a7c0" offset="0x2000" />
 				<rom name="317006-01.u3" size="0x2000" crc="ef1323fa" sha1="a7238a85b9f65720164dcd9278b9550670e00394" offset="0x4000" />
 				<rom name="317007-01.u4" size="0x2000" crc="e5c87f9d" sha1="2df19a613646de7cc5c5545a5004ae7568dd5b50" offset="0x6000" />
@@ -6376,7 +6376,7 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x1000">
-				<rom name="codebuster.bin" size="0x1000" crc="f549da3e" sha1="6a1cdc9f51c0df5cc2b4833b6002443c4e54565b" offset="0" />
+				<rom name="codebuster.bin" size="0x1000" crc="f549da3e" sha1="6a1cdc9f51c0df5cc2b4833b6002443c4e54565b" />
 			</dataarea>
 		</part>
 	</software>
@@ -6392,13 +6392,13 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x1000">
-				<rom name="snapshot64_v1_1985.bin" size="0x1000" crc="2a29a872" sha1="0f0096c25246123a236b61540d38949290d887d2" offset="0" />
+				<rom name="snapshot64_v1_1985.bin" size="0x1000" crc="2a29a872" sha1="0f0096c25246123a236b61540d38949290d887d2" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="snapshot64.d64" size="174848" crc="f86a0bfc" sha1="2d5f5bdb4711a02662bc18e75bd056abc81086e7" offset="0" />
+				<rom name="snapshot64.d64" size="174848" crc="f86a0bfc" sha1="2d5f5bdb4711a02662bc18e75bd056abc81086e7" />
 			</dataarea>
 		</part>
 	</software>
@@ -6414,13 +6414,13 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x1000">
-				<rom name="snapshot64_v2_1985.bin" size="0x1000" crc="ea336bcb" sha1="3010ae8189e2f78fe5e94841ec0d33cfa6f8d0c7" offset="0" />
+				<rom name="snapshot64_v2_1985.bin" size="0x1000" crc="ea336bcb" sha1="3010ae8189e2f78fe5e94841ec0d33cfa6f8d0c7" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="snapshot64.d64" size="174848" crc="f86a0bfc" sha1="2d5f5bdb4711a02662bc18e75bd056abc81086e7" offset="0" />
+				<rom name="snapshot64.d64" size="174848" crc="f86a0bfc" sha1="2d5f5bdb4711a02662bc18e75bd056abc81086e7" />
 			</dataarea>
 		</part>
 	</software>
@@ -6436,7 +6436,7 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x8000">
-				<rom name="super_snapshot_v2.0_plus_b.bin" size="0x8000" crc="86b17f3c" sha1="a19a9a6dcfd99a91b23422494359783f7ea2f138" offset="0" />
+				<rom name="super_snapshot_v2.0_plus_b.bin" size="0x8000" crc="86b17f3c" sha1="a19a9a6dcfd99a91b23422494359783f7ea2f138" />
 			</dataarea>
 		</part>
 	</software>
@@ -6453,7 +6453,7 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x8000">
-				<rom name="super_snapshot_v3.0_1988_ntsc.bin" size="0x8000" crc="1ea0d9f9" sha1="c3f907ff40ab8c8179fa322e3c361eadf949e818" offset="0" />
+				<rom name="super_snapshot_v3.0_1988_ntsc.bin" size="0x8000" crc="1ea0d9f9" sha1="c3f907ff40ab8c8179fa322e3c361eadf949e818" />
 			</dataarea>
 		</part>
 	</software>
@@ -6470,7 +6470,7 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x8000">
-				<rom name="super_snapshot_v4.0_1989_ntsc.bin" size="0x8000" crc="8f7e9eef" sha1="0c33e86cf98eb23f4a866efff0bf1c007d5fc422" offset="0" />
+				<rom name="super_snapshot_v4.0_1989_ntsc.bin" size="0x8000" crc="8f7e9eef" sha1="0c33e86cf98eb23f4a866efff0bf1c007d5fc422" />
 			</dataarea>
 		</part>
 	</software>
@@ -6487,7 +6487,7 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x8000">
-				<rom name="super_snapshot_v4.0_1989_pal.bin" size="0x8000" crc="bf736f28" sha1="6819c655b7b3e08346236f649de5245bc9a41d25" offset="0" />
+				<rom name="super_snapshot_v4.0_1989_pal.bin" size="0x8000" crc="bf736f28" sha1="6819c655b7b3e08346236f649de5245bc9a41d25" />
 			</dataarea>
 		</part>
 	</software>
@@ -6503,7 +6503,7 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="2c" size="0x10000" crc="6766ae59" sha1="43f3ba654be03eec0d52e4790b39bea9383bd2b2" offset="0" />
+				<rom name="2c" size="0x10000" crc="6766ae59" sha1="43f3ba654be03eec0d52e4790b39bea9383bd2b2" />
 			</dataarea>
 		</part>
 	</software>
@@ -6520,19 +6520,19 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="super_snapshot_v5.01_1990_ntsc.bin" size="0x10000" crc="8d281cf8" sha1="2420ad183577371d323fb9efa81adc513acbd682" offset="0" />
+				<rom name="super_snapshot_v5.01_1990_ntsc.bin" size="0x10000" crc="8d281cf8" sha1="2420ad183577371d323fb9efa81adc513acbd682" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="super_snapshot_v5.00_system_a_ntsc.d64" size="174848" crc="3e4734ba" sha1="6b4595ad96b97412a46253b335b5ae6e5cb828d5" offset="0" />
+				<rom name="super_snapshot_v5.00_system_a_ntsc.d64" size="174848" crc="3e4734ba" sha1="6b4595ad96b97412a46253b335b5ae6e5cb828d5" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" offset="0" />
+				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" />
 			</dataarea>
 		</part>
 	</software>
@@ -6549,19 +6549,19 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="super_snapshot_v5.22_1990_ntsc.bin" size="0x10000" crc="fece58ea" sha1="63aa52b3b76c7a844109e43516a655b7373e602c" offset="0" />
+				<rom name="super_snapshot_v5.22_1990_ntsc.bin" size="0x10000" crc="fece58ea" sha1="63aa52b3b76c7a844109e43516a655b7373e602c" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="super_snapshot_v5.00_system_a_ntsc.d64" size="174848" crc="3e4734ba" sha1="6b4595ad96b97412a46253b335b5ae6e5cb828d5" offset="0" />
+				<rom name="super_snapshot_v5.00_system_a_ntsc.d64" size="174848" crc="3e4734ba" sha1="6b4595ad96b97412a46253b335b5ae6e5cb828d5" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" offset="0" />
+				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" />
 			</dataarea>
 		</part>
 	</software>
@@ -6578,19 +6578,19 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="super_snapshot_v5.22_v1_1990_pal.bin" size="0x10000" crc="58b404e8" sha1="0eae11f615090fd38c049865f494a0cd2922679f" offset="0" />
+				<rom name="super_snapshot_v5.22_v1_1990_pal.bin" size="0x10000" crc="58b404e8" sha1="0eae11f615090fd38c049865f494a0cd2922679f" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="super_snapshot_v5.00_system_a_pal.d64" size="174848" crc="82cf52bd" sha1="f9d5067d6a1b77ce6453b940e37fed3b2ea582f3" offset="0" />
+				<rom name="super_snapshot_v5.00_system_a_pal.d64" size="174848" crc="82cf52bd" sha1="f9d5067d6a1b77ce6453b940e37fed3b2ea582f3" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" offset="0" />
+				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" />
 			</dataarea>
 		</part>
 	</software>
@@ -6607,19 +6607,19 @@
 			<feature name="game" value="1" />
 
 			<dataarea name="roml" size="0x10000">
-				<rom name="super_snapshot_v5.22_v2_1990_pal.bin" size="0x10000" crc="ed5cb065" sha1="10c34bd6d4651c2549e62cc448412e6d2b193609" offset="0" />
+				<rom name="super_snapshot_v5.22_v2_1990_pal.bin" size="0x10000" crc="ed5cb065" sha1="10c34bd6d4651c2549e62cc448412e6d2b193609" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="super_snapshot_v5.00_system_a_pal.d64" size="174848" crc="82cf52bd" sha1="f9d5067d6a1b77ce6453b940e37fed3b2ea582f3" offset="0" />
+				<rom name="super_snapshot_v5.00_system_a_pal.d64" size="174848" crc="82cf52bd" sha1="f9d5067d6a1b77ce6453b940e37fed3b2ea582f3" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" offset="0" />
+				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" />
 			</dataarea>
 		</part>
 	</software>
@@ -6642,21 +6642,21 @@
 		<!-- Rev. 5/4/91 -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="turbo master cpu.d64" size="174848" crc="3b7de1d4" sha1="40822b53f9db9483c1007799f39ee0c904fd98db" offset="0" />
+				<rom name="turbo master cpu.d64" size="174848" crc="3b7de1d4" sha1="40822b53f9db9483c1007799f39ee0c904fd98db" />
 			</dataarea>
 		</part>
 
 		<!-- dated 2/18/92 -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="turbomst.d64" size="174848" crc="c0464978" sha1="185c98671b08d528d43c0baa88f5693a2955b613" offset="0" />
+				<rom name="turbomst.d64" size="174848" crc="c0464978" sha1="185c98671b08d528d43c0baa88f5693a2955b613" />
 			</dataarea>
 		</part>
 
 		<!-- 02/18/1992 version, Master Adapter GEOS REU patches included -->
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="turbomaster.d64" size="174848" crc="1ac1d03f" sha1="a5d29bd073b91acba3543bc72ff2af280a4b5905" offset="0" />
+				<rom name="turbomaster.d64" size="174848" crc="1ac1d03f" sha1="a5d29bd073b91acba3543bc72ff2af280a4b5905" />
 			</dataarea>
 		</part>
 	</software>
@@ -6736,7 +6736,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="ide64:u3" size="0x20000">
-				<rom name="u3" size="0x20000" crc="a52ff8fa" sha1="65fb2dc7d6bc6e96c4d60aca7eb103e7d1e58412" offset="0" />
+				<rom name="u3" size="0x20000" crc="a52ff8fa" sha1="65fb2dc7d6bc6e96c4d60aca7eb103e7d1e58412" />
 			</dataarea>
 		</part>
 	</software>
@@ -6753,11 +6753,11 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="easyflash:u3" size="0x80000">
-				<rom name="u3" size="0x80000" crc="eef0fd43" sha1="ac7dd49f1b8acb01d074e882006a134c4eca432f" offset="0" />
+				<rom name="u3" size="0x80000" crc="eef0fd43" sha1="ac7dd49f1b8acb01d074e882006a134c4eca432f" />
 			</dataarea>
 
 			<dataarea name="easyflash:u4" size="0x80000">
-				<rom name="u4" size="0x80000" crc="2946a6d0" sha1="768e2bf9a0fab68d65cb942a7248f5c0c7f3a292" offset="0" />
+				<rom name="u4" size="0x80000" crc="2946a6d0" sha1="768e2bf9a0fab68d65cb942a7248f5c0c7f3a292" />
 			</dataarea>
 		</part>
 	</software>
@@ -6774,7 +6774,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="seq64.0.1" size="0x4000" crc="fe43ccdc" sha1="7119615cccdeca5d5006eb04bcf788cc609fbc91" offset="0" />
+				<rom name="seq64.0.1" size="0x4000" crc="fe43ccdc" sha1="7119615cccdeca5d5006eb04bcf788cc609fbc91" />
 			</dataarea>
 		</part>
 	</software>
@@ -6791,13 +6791,13 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="moog song producer" size="0x2000" status="nodump" offset="0" />
+				<rom name="moog song producer" size="0x2000" status="nodump" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="moogsp.d64" size="174848" crc="71a59974" sha1="d67c127b4ce3995b7e77cb92e5201768639c3e91" offset="0" />
+				<rom name="moogsp.d64" size="174848" crc="71a59974" sha1="d67c127b4ce3995b7e77cb92e5201768639c3e91" />
 			</dataarea>
 		</part>
 	</software>
@@ -6814,7 +6814,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x40000">
-				<rom name="prophet64.bin" size="0x40000" crc="cd55b218" sha1="903c707a058b4690436eea7832373e45c1066849" offset="0" />
+				<rom name="prophet64.bin" size="0x40000" crc="cd55b218" sha1="903c707a058b4690436eea7832373e45c1066849" />
 			</dataarea>
 		</part>
 	</software>
@@ -6831,21 +6831,21 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="u7" size="0x2000" status="nodump" offset="0" />
+				<rom name="u7" size="0x2000" status="nodump" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="SYSGEN (v7.2) - Side 1"/>
 			<dataarea name="flop" size="174848">
-				<rom name="dos72-s1.d64" size="174848" crc="696545d4" sha1="fe698ceaab25c013c9e940e406c3b620f7131934" offset="0" />
+				<rom name="dos72-s1.d64" size="174848" crc="696545d4" sha1="fe698ceaab25c013c9e940e406c3b620f7131934" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="SYSGEN (v7.2) - Side 2"/>
 			<dataarea name="flop" size="174848">
-				<rom name="dos72-s2.d64" size="174848" crc="08938b41" sha1="24a891ad1a418bdd71b05f0a61e3754d4bfa82e6" offset="0" />
+				<rom name="dos72-s2.d64" size="174848" crc="08938b41" sha1="24a891ad1a418bdd71b05f0a61e3754d4bfa82e6" />
 			</dataarea>
 		</part>
 	</software>
@@ -6861,7 +6861,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="sean's diag cart for c64 cs=87e7" size="0x2000" crc="653ec679" sha1="b2d3e90113d7360c7d01a1f017a8edd8ae4441b7" offset="0" />
+				<rom name="sean's diag cart for c64 cs=87e7" size="0x2000" crc="653ec679" sha1="b2d3e90113d7360c7d01a1f017a8edd8ae4441b7" />
 			</dataarea>
 		</part>
 	</software>
@@ -6878,13 +6878,13 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x1000">
-				<rom name="v" size="0x1000" crc="d17689a0" sha1="4df4d254d7fae916c473d421515b2b74d77e9fd9" offset="0" />
+				<rom name="v" size="0x1000" crc="d17689a0" sha1="4df4d254d7fae916c473d421515b2b74d77e9fd9" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="350952">
-				<rom name="vizastar 64 xl4.g64" size="350952" crc="c4f327ac" sha1="c4d35b895f73d7133a72a5d7642e3a588df5370f" offset="0" />
+				<rom name="vizastar 64 xl4.g64" size="350952" crc="c4f327ac" sha1="c4d35b895f73d7133a72a5d7642e3a588df5370f" />
 			</dataarea>
 		</part>
 	</software>
@@ -6900,13 +6900,13 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="vizastar xl8" size="0x2000" crc="a1e961c9" sha1="d1f2eb048ea2db005f6fb00e88030b7b42b28499" offset="0" />
+				<rom name="vizastar xl8" size="0x2000" crc="a1e961c9" sha1="d1f2eb048ea2db005f6fb00e88030b7b42b28499" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="vizastar 64 xl8.d64" status="nodump" size="174848" offset="0" />
+				<rom name="vizastar 64 xl8.d64" status="nodump" size="174848" />
 			</dataarea>
 		</part>
 	</software>
@@ -6922,7 +6922,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="final1.bin" size="0x1000" crc="2637962a" sha1="bfcf38cd187a84093e822bd7cf991a6751c8524b" offset="0" />
+				<rom name="final1.bin" size="0x1000" crc="2637962a" sha1="bfcf38cd187a84093e822bd7cf991a6751c8524b" />
 			</dataarea>
 		</part>
 	</software>
@@ -6938,7 +6938,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="bbv1.bin" size="0x4000" crc="47930727" sha1="e0cedb54023b5ac6ed9adf5c1cf5a37e4f58c301" offset="0" />
+				<rom name="bbv1.bin" size="0x4000" crc="47930727" sha1="e0cedb54023b5ac6ed9adf5c1cf5a37e4f58c301" />
 			</dataarea>
 		</part>
 	</software>
@@ -6954,7 +6954,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="bb3d.bin" size="0x2000" crc="36d882ca" sha1="06c7a49080a6103c39739e82b06c5699a596f9ab" offset="0" />
+				<rom name="bb3d.bin" size="0x2000" crc="36d882ca" sha1="06c7a49080a6103c39739e82b06c5699a596f9ab" />
 			</dataarea>
 		</part>
 	</software>
@@ -6970,7 +6970,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="bisplus.bin" size="0x2000" crc="26328a96" sha1="27cecacba10cf88c42940350413a3c7e82c9e0ec" offset="0" />
+				<rom name="bisplus.bin" size="0x2000" crc="26328a96" sha1="27cecacba10cf88c42940350413a3c7e82c9e0ec" />
 			</dataarea>
 		</part>
 	</software>
@@ -6988,7 +6988,7 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x4000">
-				<rom name="a-bee-c.rom" size="0x4000" crc="5cfe999c" sha1="57202c3829f1d668c445ae7e792ae80245682a99" offset="0" />
+				<rom name="a-bee-c.rom" size="0x4000" crc="5cfe999c" sha1="57202c3829f1d668c445ae7e792ae80245682a99" />
 			</dataarea>
 		</part>
 	</software>
@@ -7005,7 +7005,7 @@
 			<feature name="exrom" value="1" />
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="timeworks c-64 ver 2-16-87" size="0x4000" crc="d40ec888" sha1="c9050ce93f9375b81800953a38450b0de3751bca" offset="0" />
+				<rom name="timeworks c-64 ver 2-16-87" size="0x4000" crc="d40ec888" sha1="c9050ce93f9375b81800953a38450b0de3751bca" />
 			</dataarea>
 		</part>
 	</software>
@@ -7021,11 +7021,11 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="2.5 v low" size="0x2000" crc="66986152" sha1="ee4ad8ec165a9a3dfad1337a530df64170ad7522" offset="0" />
+				<rom name="2.5 v low" size="0x2000" crc="66986152" sha1="ee4ad8ec165a9a3dfad1337a530df64170ad7522" />
 			</dataarea>
 
 			<dataarea name="romh" size="0x2000">
-				<rom name="2.5 v. high" size="0x2000" crc="bc62db7f" sha1="4a3c97174b9912588009de28b0c9040e013f020e" offset="0" />
+				<rom name="2.5 v. high" size="0x2000" crc="bc62db7f" sha1="4a3c97174b9912588009de28b0c9040e013f020e" />
 			</dataarea>
 		</part>
 	</software>
@@ -7041,13 +7041,13 @@
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="0200-0173.5" size="0x2000" crc="c3f915da" sha1="6a9d1852d6408571baf346502b47fba0ac541698" offset="0" />
+				<rom name="0200-0173.5" size="0x2000" crc="c3f915da" sha1="6a9d1852d6408571baf346502b47fba0ac541698" />
 			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="279582">
-				<rom name="insta-calc version 2.0.g64" size="279582" crc="ba827aef" sha1="ddafbb0550575c1a43da66f9348135fb7f6ab899" offset="0" />
+				<rom name="insta-calc version 2.0.g64" size="279582" crc="ba827aef" sha1="ddafbb0550575c1a43da66f9348135fb7f6ab899" />
 			</dataarea>
 		</part>
 	</software>
