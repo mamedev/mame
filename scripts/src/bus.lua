@@ -3804,6 +3804,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/hp_optroms/hp_optrom.h,BUSES["HP_OPTROM"] = true
+---------------------------------------------------
+
+if (BUSES["HP9825_OPTROM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp9825_optroms/hp9825_optrom.cpp",
+		MAME_DIR .. "src/devices/bus/hp9825_optroms/hp9825_optrom.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/hp9845_io/hp9845_io.h,BUSES["HP9845_IO"] = true
 ---------------------------------------------------
 

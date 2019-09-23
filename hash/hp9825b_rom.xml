@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- HP9825B option ROMs -->
+<!-- Compiled by F.Ulivi with data from http://www.hpmuseum.net/ (mostly) -->
+
+<softwarelist name="hp9825b_rom" description="HP 9825B Option ROMs">
+  <software name="mass">
+	<description>9885 ROM for 9825</description>
+	<year>1976</year>
+	<publisher>Hewlett-Packard</publisher>
+	<info name="serial" value="98217A"  />
+	<part name="rom" interface="hp9825_rom">
+	  <dataarea name="rom3000" size="0x800" width="16" endianness="big">
+		<rom name="98217a.bin" size="0x800" crc="ee41c924" sha1="eac268523c09291a9939bc2dac201e4285185b51" offset="0x0000"/>
+	  </dataarea>
+	</part>
+  </software>
+
+  <software name="matrix">
+	<description>Matrix ROM for 9825</description>
+	<year>1976</year>
+	<publisher>Hewlett-Packard</publisher>
+	<info name="serial" value="98211A"  />
+	<part name="rom" interface="hp9825_rom">
+	  <dataarea name="rom3c00" size="0x800" width="16" endianness="big">
+		<rom name="98211a.bin" size="0x800" crc="2cec553f" sha1="95c8d8becae6948accb342d23bc7072f0adb2c67" offset="0x0000"/>
+	  </dataarea>
+	</part>
+  </software>
+</softwarelist>

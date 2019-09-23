@@ -41,11 +41,13 @@
 #include "machine/timer.h"
 #include "machine/hp9825_tape.h"
 #include "machine/hp98x5_io_sys.h"
+#include "bus/hp9825_optroms/hp9825_optrom.h"
 #include "bus/hp9845_io/hp9845_io.h"
 #include "imagedev/bitbngr.h"
 #include "speaker.h"
 #include "sound/beep.h"
 #include "hp9825.lh"
+#include "softlist.h"
 
 // Debugging
 #define VERBOSE 0
@@ -99,6 +101,7 @@ public:
 	hp9825_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this , "cpu")
+		, m_rom_drawers(*this , "drawer%u" , 0U)
 		, m_io_sys(*this , "io_sys")
 		, m_cursor_timer(*this , "cursor_timer")
 		, m_tape(*this , "tape")
@@ -123,6 +126,7 @@ protected:
 	virtual void machine_reset() override;
 
 	required_device<hp_09825_67907_cpu_device> m_cpu;
+	required_device_array<hp9825_optrom_slot_device , 4> m_rom_drawers;
 
 private:
 	required_device<hp98x5_io_sys_device> m_io_sys;
@@ -673,6 +677,11 @@ void hp9825_state::hp9825_base(machine_config &config)
 		tmp.dmar().set([this , slot](int state) { set_dmar_slot(slot , state); });
 	}
 
+	// Optional ROM slots
+	for (auto& finder : m_rom_drawers) {
+		HP9825_OPTROM_SLOT(config , finder);
+	}
+
 	config.set_default_layout(layout_hp9825);
 }
 
@@ -841,6 +850,9 @@ public:
 
 	void hp9825b(machine_config &config);
 
+protected:
+	virtual void device_reset() override;
+
 private:
 	void cpu_mem_map(address_map &map);
 };
@@ -849,12 +861,30 @@ void hp9825b_state::hp9825b(machine_config &config)
 {
 	hp9825_base(config);
 	m_cpu->set_addrmap(AS_PROGRAM , &hp9825b_state::cpu_mem_map);
+
+	for (auto& finder : m_rom_drawers) {
+		finder->set_rom_limit(0x5000);
+	}
+
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9825b_rom");
+}
+
+void hp9825b_state::device_reset()
+{
+	hp9825_state::device_reset();
+
+	auto space = &m_cpu->space(AS_PROGRAM);
+
+	for (auto& finder : m_rom_drawers) {
+		finder->install_rw_handlers(space , nullptr);
+	}
 }
 
 void hp9825b_state::cpu_mem_map(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000 , 0x3bff).rom();
+	map(0x0000 , 0x2fff).rom();
+	map(0x3400 , 0x3bff).rom();
 	map(0x4000 , 0x4fff).rom();
 	map(0x5000 , 0x7fff).ram();
 }
@@ -1080,7 +1110,6 @@ ROM_START(hp9825b)
 	ROM_LOAD("sysrom1.bin" , 0x0000 , 0x2000 , CRC(fe429268) SHA1(f2fe7c5abca92bd13f81b4385fc4fce0cafb0da0))
 	ROM_LOAD("sysrom2.bin" , 0x2000 , 0x2000 , CRC(96093b5d) SHA1(c6ec4cafd019887df0fa849b3c7070bb74faee54))
 	ROM_LOAD("sysrom3.bin" , 0x4000 , 0x2000 , CRC(f9470f67) SHA1(b80cb4a366d93bd7acc3508ce987bb11c5986b2a))
-	ROM_LOAD("98217.bin"   , 0x6000 , 0x0800 , BAD_DUMP CRC(ea1fcf63) SHA1(e535c82897210a1c67c1ca16f44f936d4c470463))
 	ROM_LOAD("genio_t.bin" , 0x6800 , 0x0800 , CRC(ade1d1ed) SHA1(9af74a65b29ef1885f74164238ecf8d16ac995d6))
 	ROM_LOAD("plot72.bin"  , 0x7000 , 0x0800 , CRC(0a9cb8db) SHA1(d0d126fca108f2715e1e408cb31b09ba69385ac4))
 	ROM_LOAD("advpgm_t.bin", 0x8000 , 0x0800 , CRC(965b5e5a) SHA1(ff44dd15f8fa4ca03dfd970ed8b200e8a071ec13))
