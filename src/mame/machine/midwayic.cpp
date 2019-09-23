@@ -191,7 +191,7 @@ u8 midway_serial_pic_device::status_r()
 
 u8 midway_serial_pic_device::read()
 {
-	logerror("%s:security R = %04X\n", machine().describe_context(), m_buff);
+	logerror("%s:security R = %04X\n", machine().describe_context().c_str(), m_buff);
 	m_status = 1;
 	return m_buff;
 }
@@ -199,7 +199,7 @@ u8 midway_serial_pic_device::read()
 
 void midway_serial_pic_device::write(u8 data)
 {
-	logerror("%s:security W = %04X\n", machine().describe_context(), data);
+	logerror("%s:security W = %04X\n", machine().describe_context().c_str(), data);
 
 	/* status seems to reflect the clock bit */
 	m_status = (data >> 4) & 1;
@@ -400,7 +400,7 @@ u8 midway_serial_pic2_device::status_r()
 		result = 1;
 	}
 
-	logerror("%s:PIC status %d\n", machine().describe_context(), result);
+	logerror("%s:PIC status %d\n", machine().describe_context().c_str(), result);
 	return result;
 }
 
@@ -410,7 +410,7 @@ u8 midway_serial_pic2_device::read()
 	uint8_t result = 0;
 
 	/* PIC data register */
-	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", machine().describe_context(), m_index, m_total, m_latch);
+	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", machine().describe_context().c_str(), m_index, m_total, m_latch);
 
 	/* return the current result */
 	if (m_latch & 0xf00)
@@ -433,9 +433,9 @@ void midway_serial_pic2_device::write(u8 data)
 
 	/* PIC command register */
 	if (m_state == 0)
-		logerror("%s:PIC command %02X\n", machine().describe_context(), data);
+		logerror("%s:PIC command %02X\n", machine().describe_context().c_str(), data);
 	else
-		logerror("%s:PIC data %02X\n", machine().describe_context(), data);
+		logerror("%s:PIC data %02X\n", machine().describe_context().c_str(), data);
 
 	/* store in the latch, along with a bit to indicate we have data */
 	m_latch = (data & 0x00f) | 0x480;
@@ -929,7 +929,7 @@ WRITE_LINE_MEMBER(midway_ioasic_device::fifo_reset_w)
 		update_ioasic_irq();
 	}
 	if (LOG_FIFO)
-		logerror("%s:fifo_reset(%d)\n", machine().describe_context(), state);
+		logerror("%s:fifo_reset(%d)\n", machine().describe_context().c_str(), state);
 }
 
 
@@ -1018,7 +1018,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 		case IOASIC_UARTIN:
 			m_reg[offset] &= ~0x1000;
 			if (result & 0x1000)
-				logerror("%s: ioasic_r(%d) = %08X\n", machine().describe_context(), offset, result);
+				logerror("%s: ioasic_r(%d) = %08X\n", machine().describe_context().c_str(), offset, result);
 			// Add lf
 			if ((result & 0xff)==0x0d)
 				m_reg[offset] = 0x300a;
@@ -1068,7 +1068,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 	}
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDSTAT && offset != IOASIC_SOUNDIN)
-		logerror("%s:ioasic_r(%d) = %08X\n", machine().describe_context(), offset, result);
+		logerror("%s:ioasic_r(%d) = %08X\n", machine().describe_context().c_str(), offset, result);
 
 	return result;
 }
@@ -1112,7 +1112,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 	newreg = m_reg[offset];
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDOUT)
-		logerror("%s ioasic_w(%d) = %08X\n", machine().describe_context(), offset, data);
+		logerror("%s ioasic_w(%d) = %08X\n", machine().describe_context().c_str(), offset, data);
 
 	switch (offset)
 	{
@@ -1135,7 +1135,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			break;
 
 		case IOASIC_UARTCONTROL:
-			logerror("%s: IOASIC uart control = %04X INTCTRL=%04x\n", machine().describe_context(), data, m_reg[IOASIC_INTCTL]);
+			logerror("%s: IOASIC uart control = %04X INTCTRL=%04x\n", machine().describe_context().c_str(), data, m_reg[IOASIC_INTCTL]);
 			break;
 
 		case IOASIC_UARTOUT:
@@ -1159,7 +1159,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 
 		case IOASIC_SOUNDCTL:
 			if (LOG_IOASIC)
-				logerror("%s: write IOASIC_SOUNDCTL=%04x\n", machine().describe_context(), data);
+				logerror("%s: write IOASIC_SOUNDCTL=%04x\n", machine().describe_context().c_str(), data);
 			/* sound reset? */
 			if (m_has_dcs)
 			{
