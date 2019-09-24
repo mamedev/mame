@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Skeleton driver for mechanical games by Island Design:
+    Skeleton driver for mechanical games by Island Design Inc.:
 
     * Spider Stompin' Deluxe (undumped)
     * Tortoise and the Hare (undumped)
@@ -43,7 +43,7 @@ void island_state::prog_map(address_map &map)
 
 void island_state::ext_map(address_map &map)
 {
-	map(0x2008, 0x200d).nopw();
+	map(0x2008, 0x200d).noprw();
 	map(0x4000, 0x7fff).ram();
 }
 
@@ -69,6 +69,8 @@ ROM_START(isld_vortex)
 	// vortex program w test  version 1.4  u17 = 27c040
 	ROM_REGION(0x80000, "program", 0)
 	ROM_LOAD("vortex.u17", 0x00000, 0x80000, CRC(4a47626c) SHA1(c11c59ad382f4dffc3062cd434a7efeb9dbe7b18))
+	ROM_FILL(0x000d8, 1, 0x00) // workaround for unemulated DS80C320 watchdog timer
+	ROM_FILL(0x000d9, 1, 0x00)
 
 	// vortex sound u29 = 27c040  vers. 1.0
 	ROM_REGION(0x80000, "oki", 0)
