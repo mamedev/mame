@@ -25,8 +25,13 @@
 TODO:
 - Super Stingray MCU irq controls timer speed, needs the MCU to be hooked up.
 - Super Champion Baseball "ball speed" protection
-- Fix sound CPU crashes properly on Alpha 68k II / V HW games (nested NMIs)
-- Sky Soldiers : BGM Fade out before boss battle isn't implemented
+- II & V board: bit 15 of palette RAM isn't hooked up, according to Sky Adventure 
+  service mode enables "bright";
+- II & V board: Fix sound CPU crashes properly (nested NMIs)
+- Sky Soldiers: BGM Fade out before boss battle isn't implemented
+- Sky Adventure, probably others: sprite drawing is off-sync, cfr. notes in video file;
+- Refactor sprite chips into proper devices, they all have 8-bit data buses and 
+  have suspicious similarities with other SNK/Alpha HWs.
 
 General notes:
 
