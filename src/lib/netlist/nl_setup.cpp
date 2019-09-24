@@ -206,7 +206,7 @@ namespace netlist
 		return false;
 	}
 
-	bool nlparse_t::parse_stream(plib::unique_ptr<plib::pistream> &&istrm, const pstring &name)
+	bool nlparse_t::parse_stream(plib::unique_ptr<std::istream> &&istrm, const pstring &name)
 	{
 		plib::ppreprocessor y(&m_defines);
 		plib::ppreprocessor &x(y.process(std::move(istrm)));
@@ -1018,7 +1018,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 // Sources
 // ----------------------------------------------------------------------------------------
 
-plib::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
+plib::unique_ptr<std::istream> setup_t::get_data_stream(const pstring &name)
 {
 	for (auto &source : m_sources)
 	{
@@ -1030,7 +1030,7 @@ plib::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 		}
 	}
 	log().warning(MW_DATA_1_NOT_FOUND(name));
-	return plib::unique_ptr<plib::pistream>(nullptr);
+	return plib::unique_ptr<std::istream>(nullptr);
 }
 
 
@@ -1199,22 +1199,27 @@ bool source_t::parse(nlparse_t &setup, const pstring &name)
 	}
 }
 
-plib::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
+plib::unique_ptr<std::istream> source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique<plib::pistringstream>(m_str);
+	auto ret(plib::make_unique<std::istringstream>(m_str));
+	ret->imbue(std::locale::classic());
+	return std::move(ret);
 }
 
-plib::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
+plib::unique_ptr<std::istream> source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique<plib::pistringstream>(m_str);
+	auto ret(plib::make_unique<std::istringstream>(m_str, std::ios_base::binary));
+	ret->imbue(std::locale::classic());
+	return std::move(ret);
 }
 
-plib::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
+plib::unique_ptr<std::istream> source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	return plib::make_unique<plib::pifilestream>(m_filename);
+	auto ret(plib::make_unique<std::ifstream>(plib::filesystem::u8path(m_filename)));
+	return std::move(ret);
 }
 
 bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
@@ -1228,10 +1233,10 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 		return false;
 }
 
-plib::unique_ptr<plib::pistream> source_proc_t::stream(const pstring &name)
+plib::unique_ptr<std::istream> source_proc_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	plib::unique_ptr<plib::pistream> p(nullptr);
+	plib::unique_ptr<std::istream> p(nullptr);
 	return p;
 }
 

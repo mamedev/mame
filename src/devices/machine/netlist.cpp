@@ -289,7 +289,7 @@ public:
 	{
 	}
 
-	virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+	virtual plib::unique_ptr<std::istream> stream(const pstring &name) override;
 private:
 	device_t &m_dev;
 	pstring m_name;
@@ -300,7 +300,7 @@ class netlist_data_memregions_t : public netlist::source_t
 public:
 	netlist_data_memregions_t(const device_t &dev);
 
-	virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+	virtual plib::unique_ptr<std::istream> stream(const pstring &name) override;
 
 private:
 	const device_t &m_dev;
@@ -311,12 +311,14 @@ private:
 // memregion source support
 // ----------------------------------------------------------------------------------------
 
-plib::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
+plib::unique_ptr<std::istream> netlist_source_memregion_t::stream(const pstring &name)
 {
 	if (m_dev.has_running_machine())
 	{
 		memory_region *mem = m_dev.memregion(m_name.c_str());
-		return plib::make_unique<plib::pistringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes()));
+		auto ret(plib::make_unique<std::istringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes())));
+		ret->imbue(std::locale::classic());
+		return ret;
 	}
 	else
 		throw memregion_not_set("memregion unavailable for {1} in source {2}", name, m_name);
@@ -347,24 +349,32 @@ static bool rom_exists(device_t &root, pstring name)
 	return false;
 }
 
-plib::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring &name)
+plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &name)
 {
 	//memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).parent().memregion(name.c_str());
 	if (m_dev.has_running_machine())
 	{
 		memory_region *mem = m_dev.memregion(name.c_str());
 		if (mem != nullptr)
-			return plib::make_unique<plib::pistringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes()));
+		{
+			auto ret(plib::make_unique<std::istringstream>(std::string(reinterpret_cast<char *>(mem->base()), mem->bytes()), std::ios_base::binary));
+			ret->imbue(std::locale::classic());
+			return ret;
+		}
 		else
-			return plib::unique_ptr<plib::pistream>(nullptr);
+			return plib::unique_ptr<std::istream>(nullptr);
 	}
 	else
 	{
 		/* validation */
 		if (rom_exists(m_dev.mconfig().root_device(), pstring(m_dev.tag()) + ":" + name))
-			return plib::make_unique<plib::pimemstream>();
+		{
+			auto ret(plib::make_unique<std::istringstream>(std::ios_base::binary));
+			ret->imbue(std::locale::classic());
+			return ret;
+		}
 		else
-			return plib::unique_ptr<plib::pistream>(nullptr);
+			return plib::unique_ptr<std::istream>(nullptr);
 	}
 }
 

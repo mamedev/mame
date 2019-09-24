@@ -196,7 +196,7 @@ namespace netlist
 		type_t type() const { return m_type; }
 
 	protected:
-		virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
+		virtual plib::unique_ptr<std::istream> stream(const pstring &name) = 0;
 
 	private:
 		const type_t m_type;
@@ -278,7 +278,7 @@ namespace netlist
 		bool device_exists(const pstring &name) const;
 
 		/* FIXME: used by source_t - need a different approach at some time */
-		bool parse_stream(plib::unique_ptr<plib::pistream> &&istrm, const pstring &name);
+		bool parse_stream(plib::unique_ptr<std::istream> &&istrm, const pstring &name);
 
 		void add_define(const pstring &def, const pstring &val)
 		{
@@ -363,7 +363,7 @@ namespace netlist
 		void register_dynamic_log_devices();
 		void resolve_inputs();
 
-		plib::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
+		plib::unique_ptr<std::istream> get_data_stream(const pstring &name);
 
 		factory::list_t &factory() { return m_factory; }
 		const factory::list_t &factory() const { return m_factory; }
@@ -434,7 +434,7 @@ namespace netlist
 		}
 
 	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		plib::unique_ptr<std::istream> stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -450,7 +450,7 @@ namespace netlist
 		}
 
 	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		plib::unique_ptr<std::istream> stream(const pstring &name) override;
 
 	private:
 		pstring m_filename;
@@ -465,7 +465,7 @@ namespace netlist
 		}
 
 	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		plib::unique_ptr<std::istream> stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -484,7 +484,7 @@ namespace netlist
 		bool parse(nlparse_t &setup, const pstring &name) override;
 
 	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		plib::unique_ptr<std::istream> stream(const pstring &name) override;
 
 	private:
 		void (*m_setup_func)(nlparse_t &);

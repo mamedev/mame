@@ -142,6 +142,12 @@ namespace netlist
 
 	PERRMSGV(MW_MOSFET_THRESHOLD_VOLTAGE,           1, "Mosfet: Threshold voltage not specified for {1}")
 
+	// nl_tool.cpp
+
+	PERRMSGV(MF_FILE_OPEN_ERROR,                    1, "Error opening file: {1}")
+
+
+
 } // namespace netlist
 
 
