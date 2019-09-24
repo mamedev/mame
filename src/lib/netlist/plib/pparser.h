@@ -125,6 +125,7 @@ public:
 	token_t get_token_internal();
 	void error(const pstring &errs);
 
+	putf8_reader &stream() { return m_strm; }
 protected:
 	virtual void verror(const pstring &msg, int line_num, const pstring &line) = 0;
 
@@ -158,11 +159,7 @@ private:
 };
 
 
-#if !USE_CSTREAM
-class ppreprocessor : public pistream
-#else
-class ppreprocessor : public /*std::streambuf,*/ pistream
-#endif
+class ppreprocessor : public std::istream
 {
 public:
 
@@ -178,14 +175,11 @@ public:
 	using defines_map_type = std::unordered_map<pstring, define_t>;
 
 	explicit ppreprocessor(defines_map_type *defines = nullptr);
-#if !USE_CSTREAM
-	~ppreprocessor() override = default;
-#else
 	~ppreprocessor() override
 	{
 		delete rdbuf();
 	}
-#endif
+
 	template <typename T>
 	ppreprocessor & process(T &&istrm)
 	{
@@ -205,12 +199,7 @@ public:
 
 
 	ppreprocessor(ppreprocessor &&s) noexcept
-	//: pistream(s.rdbuf())
-#if !USE_CSTREAM
-	: pistream()
-#else
-	: pistream(new st(this))
-#endif
+	: std::istream(new st(this))
 	, m_defines(std::move(s.m_defines))
 	, m_expr_sep(std::move(s.m_expr_sep))
 	, m_ifflag(s.m_ifflag)
@@ -225,15 +214,6 @@ public:
 
 protected:
 
-#if !USE_CSTREAM
-	size_type vread(char_type *buf, const pos_type n) override;
-	void vseek(const pos_type n) override
-	{
-		plib::unused_var(n);
-		/* FIXME throw exception - should be done in base unless implemented */
-	}
-	pos_type vtell() const override { return m_pos; }
-#else
 	class st : public std::streambuf
 	{
 	public:
@@ -264,7 +244,7 @@ protected:
 		std::array<char_type, 1024> m_buf;
 	};
 	//friend class st;
-#endif
+
 	int expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio);
 	define_t *get_define(const pstring &name);
 	pstring replace_macros(const pstring &line);
@@ -288,7 +268,7 @@ private:
 	int m_level;
 	int m_lineno;
 	pstring_t<pu8_traits> m_buf;
-	pistream::pos_type m_pos;
+	std::istream::pos_type m_pos;
 	state_e m_state;
 	pstring m_line;
 	bool m_comment;

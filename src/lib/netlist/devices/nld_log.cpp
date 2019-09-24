@@ -19,9 +19,13 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(log)
 		, m_I(*this, "I")
-		, m_strm(pstring(plib::pfmt("{1}.log")(this->name())))
+		, m_strm(plib::filesystem::u8path(plib::pfmt("{1}.log")(this->name())))
 		, m_writer(&m_strm)
 		{
+			if (m_strm.fail())
+				throw plib::file_open_e(plib::pfmt("{1}.log")(this->name()));
+
+			m_strm.imbue(std::locale::classic());
 		}
 
 		NETLIB_UPDATEI()
@@ -33,7 +37,7 @@ namespace netlist
 		NETLIB_RESETI() { }
 	protected:
 		analog_input_t m_I;
-		plib::pofilestream m_strm;
+		std::ofstream m_strm;
 		plib::putf8_writer m_writer;
 	};
 

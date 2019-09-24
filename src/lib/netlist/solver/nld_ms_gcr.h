@@ -262,7 +262,8 @@ namespace devices
 	template <typename FT, int SIZE>
 	pstring matrix_solver_GCR_t<FT, SIZE>::static_compile_name()
 	{
-		plib::postringstream t;
+		std::stringstream t;
+		t.imbue(std::locale::classic());
 		plib::putf8_fmt_writer w(&t);
 		csc_private(w);
 		std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
@@ -273,7 +274,8 @@ namespace devices
 	template <typename FT, int SIZE>
 	std::pair<pstring, pstring> matrix_solver_GCR_t<FT, SIZE>::create_solver_code()
 	{
-		plib::postringstream t;
+		std::stringstream t;
+		t.imbue(std::locale::classic());
 		plib::putf8_fmt_writer strm(&t);
 		pstring name = static_compile_name();
 
@@ -281,7 +283,7 @@ namespace devices
 		strm.writeline("{\n");
 		csc_private(strm);
 		strm.writeline("}\n");
-		return std::pair<pstring, pstring>(name, t.str());
+		return std::pair<pstring, pstring>(name, pstring(t.str()));
 	}
 
 	template <typename FT, int SIZE>

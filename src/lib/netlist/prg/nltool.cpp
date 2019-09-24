@@ -11,6 +11,7 @@
 #include "netlist/plib/pmain.h"
 #include "netlist/devices/net_lib.h"
 #include "netlist/nl_parser.h"
+#include "netlist/nl_errstr.h"
 #include "netlist/nl_setup.h"
 #include "netlist/solver/nld_solver.h"
 #include "netlist/tools/nl_convert.h"
@@ -18,6 +19,7 @@
 #include <cstdio> // scanf
 #include <iomanip> // scanf
 #include <iostream> // scanf
+#include <ios>
 
 #define NLTOOL_VERSION  20190420
 
@@ -137,20 +139,17 @@ public:
 	{
 	}
 
-	plib::unique_ptr<plib::pistream> stream(const pstring &file) override
+	plib::unique_ptr<std::istream> stream(const pstring &file) override
 	{
 		pstring name = m_folder + "/" + file;
-		try
+		auto strm(plib::make_unique<std::ifstream>(plib::filesystem::u8path(name)));
+		if (strm->fail())
+			return plib::unique_ptr<std::istream>(nullptr);
+		else
 		{
-			auto strm = plib::make_unique<plib::pifilestream>(name);
+			strm->imbue(std::locale::classic());
 			return std::move(strm);
 		}
-		catch (const plib::pexception &e)
-		{
-			if (dynamic_cast<const plib::file_open_e *>(&e) == nullptr )
-				throw;
-		}
-		return plib::unique_ptr<plib::pistream>(nullptr);
 	}
 
 private:
@@ -330,7 +329,10 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstr
 	std::vector<input_t> ret;
 	if (fname != "")
 	{
-		plib::putf8_reader r = plib::putf8_reader(plib::pifilestream(fname));
+		plib::putf8_reader r = plib::putf8_reader(std::ifstream(plib::filesystem::u8path(fname)));
+		if (r.stream().fail())
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
+		r.stream().imbue(std::locale::classic());
 		pstring l;
 		while (r.readline(l))
 		{
@@ -385,7 +387,10 @@ void tool_app_t::run()
 		// FIXME: error handling
 		if (opt_loadstate.was_specified())
 		{
-			plib::pifilestream strm(opt_loadstate());
+			std::ifstream strm(plib::filesystem::u8path(opt_loadstate()));
+			if (strm.fail())
+				throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_loadstate()));
+			strm.imbue(std::locale::classic());
 			plib::pbinary_reader reader(strm);
 			std::vector<char> loadstate;
 			reader.read(loadstate);
@@ -420,7 +425,11 @@ void tool_app_t::run()
 		if (opt_savestate.was_specified())
 		{
 			auto savestate = nt.save_state();
-			plib::pofilestream strm(opt_savestate());
+			std::ofstream strm(plib::filesystem::u8path(opt_savestate()), std::ios_base::binary);
+			if (strm.fail())
+				throw plib::file_open_e(opt_savestate());
+			strm.imbue(std::locale::classic());
+
 			plib::pbinary_writer writer(strm);
 			writer.write(savestate);
 		}
@@ -728,20 +737,19 @@ void tool_app_t::listdevices()
 void tool_app_t::convert()
 {
 	pstring contents;
-	plib::postringstream ostrm;
+	std::stringstream ostrm;
+	ostrm.imbue(std::locale::classic());
 	if (opt_file() == "-")
 	{
-#if !USE_CSTREAM
-		plib::pstdin f;
-		plib::copystream(ostrm, f);
-#else
 		plib::copystream(ostrm, std::cin);
-#endif
 	}
 	else
 	{
-		plib::pifilestream f(opt_file());
-		plib::copystream(ostrm, f);
+		std::ifstream strm(plib::filesystem::u8path(opt_file()));
+		if (strm.fail())
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_file()));
+		strm.imbue(std::locale::classic());
+		plib::copystream(ostrm, strm);
 	}
 	contents = pstring(ostrm.str());
 
@@ -874,6 +882,8 @@ int tool_app_t::execute()
 	std::cout << plib::pfmt("{:20}")("Общая ком") << "|" << "\n";
 
 	//char x = 'a';
+	//auto b= U'щ';
+
 	auto b= U'\U00000449';
 	std::cout << "b: <" << b << ">";
 #endif

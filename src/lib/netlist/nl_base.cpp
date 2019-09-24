@@ -1033,7 +1033,7 @@ nl_double param_model_t::value(const pstring &entity)
 }
 
 
-plib::unique_ptr<plib::pistream> param_data_t::stream()
+plib::unique_ptr<std::istream> param_data_t::stream()
 {
 	return device().setup().get_data_stream(str());
 }

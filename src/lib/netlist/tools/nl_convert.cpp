@@ -43,7 +43,8 @@ using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
 
 static lib_map_t read_lib_map(const pstring &lm)
 {
-	auto reader = plib::putf8_reader(plib::pistringstream(lm));
+	auto reader = plib::putf8_reader(std::istringstream(lm));
+	reader.stream().imbue(std::locale::classic());
 	lib_map_t m;
 	pstring line;
 	while (reader.readline(line))
@@ -62,6 +63,7 @@ nl_convert_base_t::nl_convert_base_t()
 	: out(&m_buf)
 	, m_numberchars("0123456789-+e.")
 {
+	m_buf.imbue(std::locale::classic());
 	m_units = {
 			{"T",   "",      1.0e12 },
 			{"G",   "",      1.0e9  },
@@ -484,7 +486,8 @@ void nl_convert_eagle_t::tokenizer::verror(const pstring &msg, int line_num, con
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
 
-	tokenizer tok(*this, plib::putf8_reader(plib::pistringstream(contents)));
+	tokenizer tok(*this, plib::putf8_reader(std::istringstream(contents)));
+	tok.stream().stream().imbue(std::locale::classic());
 
 	out("NETLIST_START(dummy)\n");
 	add_term("GND", "GND");
@@ -631,7 +634,8 @@ void nl_convert_rinf_t::tokenizer::verror(const pstring &msg, int line_num, cons
 
 void nl_convert_rinf_t::convert(const pstring &contents)
 {
-	tokenizer tok(*this, plib::putf8_reader(plib::pistringstream(contents)));
+	tokenizer tok(*this, plib::putf8_reader(std::istringstream(contents)));
+	tok.stream().stream().imbue(std::locale::classic());
 	auto lm = read_lib_map(s_lib_map);
 
 	out("NETLIST_START(dummy)\n");

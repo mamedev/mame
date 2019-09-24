@@ -139,7 +139,7 @@ private:
 
 	void add_device(plib::unique_ptr<dev_t> dev);
 
-	plib::postringstream m_buf;
+	std::stringstream m_buf;
 
 	std::vector<plib::unique_ptr<dev_t>> m_devs;
 	std::unordered_map<pstring, plib::unique_ptr<net_t> > m_nets;
