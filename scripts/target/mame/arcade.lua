@@ -4745,6 +4745,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ichiban.cpp",
 	MAME_DIR .. "src/mame/drivers/imolagp.cpp",
 	MAME_DIR .. "src/mame/drivers/intrscti.cpp",
+	MAME_DIR .. "src/mame/drivers/island.cpp",
 	MAME_DIR .. "src/mame/drivers/istellar.cpp",
 	MAME_DIR .. "src/mame/drivers/itgambl2.cpp",
 	MAME_DIR .. "src/mame/drivers/itgambl3.cpp",

@@ -16176,6 +16176,9 @@ isbc8030                        //
 iskr1030m                       //
 iskr1031                        //
 
+@source:island.cpp
+isld_vortex                     //
+
 @source:istellar.cpp
 istellar                        // (c) 1983 Funai / Gakken
 
