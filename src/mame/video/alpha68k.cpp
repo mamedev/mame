@@ -30,8 +30,8 @@ TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
 {
 	const u8 tile = m_videoram[2 * tile_index] & 0xff;
 	const u8 attr =  m_videoram[2 * tile_index + 1] & 0xff;
-	const u32 color = attr & 0x0f;
-	const int opaque = attr & 0x10;
+	const u8 color = attr & 0x0f;
+	const bool opaque = BIT(attr, 4);
 
 	SET_TILE_INFO_MEMBER(0, tile | (m_bank_base << 8), color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
@@ -73,7 +73,7 @@ void alpha68k_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		for (int i = 0; i < 0x40; i += 2)
 		{
 			u16 tile        = m_spriteram[offs + 1 + i + (0x800 * j) + 0x800];
-			const u16 color = m_spriteram[offs + i + (0x800 * j) + 0x800] & 0x7f;
+			const u8 color = m_spriteram[offs + i + (0x800 * j) + 0x800] & 0x7f;
 
 			int fy = tile & 0x8000;
 			int fx = tile & 0x4000;
@@ -211,7 +211,7 @@ void alpha68k_state::draw_sprites_V(bitmap_ind16 &bitmap, const rectangle &clipr
 		for (int i = 0; i < 0x40; i += 2)
 		{
 			u16 tile        = m_spriteram[offs + 1 + i + (0x800 * j) + 0x800];
-			const u16 color = m_spriteram[offs + 0 + i + (0x800 * j) + 0x800] & 0xff;
+			const u8 color  = m_spriteram[offs + 0 + i + (0x800 * j) + 0x800] & 0xff;
 
 			int fx = tile & fx_mask;
 			int fy = tile & fy_mask;
@@ -253,7 +253,7 @@ else
 
 u32 alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// TODO: should be an user selectable feature instead of using the MCU ID ...
+	// TODO: should be an user selectable feature instead of using the MCU ID, it's also repeated below.
 	bool is_skyadventure = (m_microcontroller_id == 0x8814);
 	const u16 flipxmask = is_skyadventure ? 0 : 0x8000;
 	const u16 flipymask = is_skyadventure ? 0x8000 : 0;
