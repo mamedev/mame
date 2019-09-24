@@ -18515,14 +18515,12 @@ madgearj                        // 2/1989 (c) 1989 (Japan)
 lastfght                        // (c) 2000 Subsino
 
 @source:laz_aftrshok.cpp
-aftrshok                        // Lazer-tron After Shock
+aftrshok                        // Lazer-Tron After Shock
 aftrshoka                       //
 
-@source:laz_awetoss.cpp
-awetoss                         // Lazer-tron Awesome Toss'em
-
 @source:laz_ribrac.cpp
-ribrac                          // Lazer-tron Ribbit Racing
+awetoss                         // Lazer-Tron Awesome Toss 'Em
+ribrac                          // Lazer-Tron Ribbit Racin
 
 @source:lazercmd.cpp
 bbonk                           // [1976?]

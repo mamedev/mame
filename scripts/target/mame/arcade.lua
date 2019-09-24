@@ -4765,7 +4765,6 @@ files {
 	MAME_DIR .. "src/mame/includes/ladyfrog.h",
 	MAME_DIR .. "src/mame/video/ladyfrog.cpp",
 	MAME_DIR .. "src/mame/drivers/laserbas.cpp",
-	MAME_DIR .. "src/mame/drivers/laz_awetoss.cpp",
 	MAME_DIR .. "src/mame/drivers/laz_aftrshok.cpp",
 	MAME_DIR .. "src/mame/drivers/laz_ribrac.cpp",
 	MAME_DIR .. "src/mame/drivers/lethalj.cpp",
