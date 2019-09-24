@@ -251,5 +251,5 @@ ROM_START( aftrshoka )
 ROM_END
 
 
-GAME( 19??, aftrshok,  0,        aftrshok, aftrshok, aftrshok_state, empty_init, ROT0, "Lazer-Tron", "After Shock (Lazer-Tron, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 19??, aftrshoka, aftrshok, aftrshok, aftrshok, aftrshok_state, empty_init, ROT0, "Lazer-Tron", "After Shock (Lazer-Tron, set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 19??, aftrshok,  0,        aftrshok, aftrshok, aftrshok_state, empty_init, ROT0, "Lazer-Tron", "Aftershock (Lazer-Tron, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 19??, aftrshoka, aftrshok, aftrshok, aftrshok, aftrshok_state, empty_init, ROT0, "Lazer-Tron", "Aftershock (Lazer-Tron, set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
