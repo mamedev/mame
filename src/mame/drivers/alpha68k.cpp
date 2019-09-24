@@ -665,7 +665,7 @@ void alpha68k_state::alpha68k_V_map(address_map &map)
 	map(0x0e0000, 0x0e0001).nopr(); /* IRQ ack? */
 	map(0x0e8000, 0x0e8001).nopr(); /* watchdog? */
 	map(0x100000, 0x100fff).ram().w(FUNC(alpha68k_state::videoram_w)).share("videoram");
-	map(0x200000, 0x207fff).ram().share("spriteram");
+	map(0x200000, 0x207fff).ram().share("spriteram"); 	// 16k for gang wars/sky adventure, 32k for sbaseball (mirror?)
 	map(0x300000, 0x303fff).r(FUNC(alpha68k_state::alpha_V_trigger_r));
 	map(0x300000, 0x3001ff).w(FUNC(alpha68k_state::alpha_microcontroller_w));
 	map(0x303e00, 0x303fff).w(FUNC(alpha68k_state::alpha_microcontroller_w)); /* Gang Wars mirror */
@@ -1481,8 +1481,6 @@ static INPUT_PORTS_START( sbasebal )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
-
-
 
 static INPUT_PORTS_START( sbasebalj )
 	PORT_START("IN0")
@@ -2840,7 +2838,7 @@ ROM_START( skyadvnt )
 	ROM_REGION( 0x08000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "sa.7",           0x000000, 0x08000, CRC(ea26e9c5) SHA1(13cb5a5955c813cd48f98f62f045a4cbc61806a1) )
 
-	ROM_REGION( 0x280000, "gfx2", 0 )  /* sprites */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASEFF )  /* sprites */
 	ROM_LOAD32_BYTE( "sachr3",         0x000000, 0x80000, CRC(a986b8d5) SHA1(e8e2f3e0f85b9565243eab7dc8606168811f41e4) )
 	ROM_LOAD32_BYTE( "sachr2",         0x000001, 0x80000, CRC(504b07ae) SHA1(ba74f74c1cb04dd1ab4acf518099605ec9c71f94) )
 	ROM_LOAD32_BYTE( "sachr1",         0x000002, 0x80000, CRC(e734dccd) SHA1(24258dd5994f1b14600fc354b0ab36f870967afc) )
@@ -2864,7 +2862,7 @@ ROM_START( skyadvntu )
 	ROM_REGION( 0x08000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "sa.7",           0x000000, 0x08000, CRC(ea26e9c5) SHA1(13cb5a5955c813cd48f98f62f045a4cbc61806a1) )
 
-	ROM_REGION( 0x280000, "gfx2", 0 )  /* sprites */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASEFF )  /* sprites */
 	ROM_LOAD32_BYTE( "sachr3",         0x000000, 0x80000, CRC(a986b8d5) SHA1(e8e2f3e0f85b9565243eab7dc8606168811f41e4) )
 	ROM_LOAD32_BYTE( "sachr2",         0x000001, 0x80000, CRC(504b07ae) SHA1(ba74f74c1cb04dd1ab4acf518099605ec9c71f94) )
 	ROM_LOAD32_BYTE( "sachr1",         0x000002, 0x80000, CRC(e734dccd) SHA1(24258dd5994f1b14600fc354b0ab36f870967afc) )
@@ -2888,7 +2886,7 @@ ROM_START( skyadvntj )
 	ROM_REGION( 0x08000, "gfx1", 0 )  /* chars */
 	ROM_LOAD( "sa.7",           0x000000, 0x08000, CRC(ea26e9c5) SHA1(13cb5a5955c813cd48f98f62f045a4cbc61806a1) )
 
-	ROM_REGION( 0x280000, "gfx2", 0 )  /* sprites */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASEFF )  /* sprites */
 	ROM_LOAD32_BYTE( "sachr3",         0x000000, 0x80000, CRC(a986b8d5) SHA1(e8e2f3e0f85b9565243eab7dc8606168811f41e4) )
 	ROM_LOAD32_BYTE( "sachr2",         0x000001, 0x80000, CRC(504b07ae) SHA1(ba74f74c1cb04dd1ab4acf518099605ec9c71f94) )
 	ROM_LOAD32_BYTE( "sachr1",         0x000002, 0x80000, CRC(e734dccd) SHA1(24258dd5994f1b14600fc354b0ab36f870967afc) )
@@ -3081,7 +3079,7 @@ ROM_START( sbasebal )
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "sb-7.l3", 0x000000, 0x10000, CRC(8f3c2e25) SHA1(a5b3880f3079cce607678fd4ea5971560ce9ed8d) )
 
-	ROM_REGION( 0x280000, "gfx2", 0 ) /* sprites */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
 	ROM_LOAD32_BYTE( "kcb-chr3.h21", 0x000000, 0x80000, CRC(719071c7) SHA1(47eded73eae25af04cf369f1a8ee657fd06b6480) )
 	ROM_LOAD32_BYTE( "kcb-chr2.h19", 0x000001, 0x80000, CRC(014f0f90) SHA1(e80594f06faf303c4034a711fe55dad046ebf9aa) )
 	ROM_LOAD32_BYTE( "kcb-chr1.h18", 0x000002, 0x80000, CRC(a5ce1e10) SHA1(c91cad45a918166155be3f93f4ed299389579f4a) )
@@ -3105,7 +3103,7 @@ ROM_START( sbasebalj )
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "sb-7.l3", 0x000000, 0x10000, CRC(8f3c2e25) SHA1(a5b3880f3079cce607678fd4ea5971560ce9ed8d) )
 
-	ROM_REGION( 0x280000, "gfx2", 0 ) /* sprites */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
 	ROM_LOAD32_BYTE( "kcb-chr3.h21", 0x000000, 0x80000, CRC(719071c7) SHA1(47eded73eae25af04cf369f1a8ee657fd06b6480) )
 	ROM_LOAD32_BYTE( "kcb-chr2.h19", 0x000001, 0x80000, CRC(014f0f90) SHA1(e80594f06faf303c4034a711fe55dad046ebf9aa) )
 	ROM_LOAD32_BYTE( "kcb-chr1.h18", 0x000002, 0x80000, CRC(a5ce1e10) SHA1(c91cad45a918166155be3f93f4ed299389579f4a) )
