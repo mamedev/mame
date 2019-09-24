@@ -29,6 +29,8 @@ TODO:
   service mode enables "bright";
 - II & V board: Fix sound CPU crashes properly (nested NMIs)
 - Sky Soldiers: BGM Fade out before boss battle isn't implemented
+- Sky Adventure, probably others: on a real PCB reference BGM stutters when using 
+  30 Hz autofire (not enough sound resources?)
 - Sky Adventure, probably others: sprite drawing is off-sync, cfr. notes in video file;
 - Refactor sprite chips into proper devices, they all have 8-bit data buses and 
   have suspicious similarities with other SNK/Alpha HWs.
