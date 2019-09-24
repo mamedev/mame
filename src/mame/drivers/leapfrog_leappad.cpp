@@ -114,6 +114,7 @@ void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_mfleappad_cart");
+	SOFTWARE_LIST(config, "cart_list2").set_original("leapfrog_ltleappad_cart");
 }
 
 // All of these contain the string "Have you copied our ROM?" near the date codes
