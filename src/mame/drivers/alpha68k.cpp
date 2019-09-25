@@ -26,12 +26,14 @@ TODO:
 - Super Stingray MCU irq controls timer speed, needs the MCU to be hooked up.
 - Super Champion Baseball "ball speed" protection
 - II & V board: bit 15 of palette RAM isn't hooked up, according to Sky Adventure 
-  service mode enables "bright";
+  service mode enables "bright", it is actually same as NeoGeo device;
 - II & V board: Fix sound CPU crashes properly (nested NMIs)
 - Sky Soldiers: BGM Fade out before boss battle isn't implemented
 - Sky Adventure, probably others: on a real PCB reference BGM stutters when using 
   30 Hz autofire (not enough sound resources?)
 - Sky Adventure, probably others: sprite drawing is off-sync, cfr. notes in video file;
+- Gold Medalist: attract mode has missing finger on button 1, may be btanb;
+- Gold Medalist: missing blank effect on shooting pistol for dash events (palette bank actually used?);
 - Refactor sprite chips into proper devices, they all have 8-bit data buses and 
   have suspicious similarities with other SNK/Alpha HWs.
 
@@ -676,8 +678,15 @@ void alpha68k_state::alpha68k_V_map(address_map &map)
 	map(0x300000, 0x303fff).r(FUNC(alpha68k_state::alpha_V_trigger_r));
 	map(0x300000, 0x3001ff).w(FUNC(alpha68k_state::alpha_microcontroller_w));
 	map(0x303e00, 0x303fff).w(FUNC(alpha68k_state::alpha_microcontroller_w)); /* Gang Wars mirror */
-	map(0x400000, 0x401fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x401fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // upper bank actually a mirror?
 	map(0x800000, 0x83ffff).rom().region("maincpu", 0x40000);
+}
+
+void alpha68k_state::alpha68k_III_map(address_map &map)
+{
+	alpha68k_V_map(map);
+	map(0x300000, 0x3001ff).rw(FUNC(alpha68k_state::alpha_II_trigger_r), FUNC(alpha68k_state::alpha_microcontroller_w));
+	map(0x300200, 0x303fff).unmaprw();
 }
 
 u16 alpha68k_state::sound_cpu_r(){ return 1; }
@@ -1232,23 +1241,25 @@ static INPUT_PORTS_START( skysoldr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( goldmedl )
-	PORT_START("IN0")  /* 3 buttons per player, no joystick */
+	// 3 buttons per player, no joystick
+	// arrangement confirmed by attract mode
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* START3 is mapped elsewhere */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // START3 is mapped on dip
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")  /* 3 buttons per player, no joystick */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -1259,19 +1270,20 @@ static INPUT_PORTS_START( goldmedl )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 
 	/* 2 physical sets of _6_ dip switches */
-	PORT_DIPNAME( 0x04, 0x00, "Event Select" )      PORT_DIPLOCATION("SW1:1")
+	// defaults are retrieved from Gold Medalist Romstar manual
+	PORT_DIPNAME( 0x04, 0x04, "Event Select" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x88, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:2,6")
+	PORT_DIPNAME( 0x88, 0x80, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:2,6")
 	PORT_DIPSETTING(    0x00, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x80, "Upright 4 Players" )
 	PORT_DIPSETTING(    0x88, DEF_STR( Cocktail ) )
-	//PORT_DIPSETTING(  0x08, DEF_STR( Cocktail ) )     /* Not documented. */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 )     PORT_DIPLOCATION("SW1:3") /* Listed as "Always OFF". */
-	PORT_DIPNAME( 0x20, 0x20, "Speed For 100M Dash" )   PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "Cocktail (duplicate)" ) // not documented in manual
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 ) PORT_DIPLOCATION("SW1:3") // dip listed as "Always OFF" in manual, is start3 really routed here?
+	PORT_DIPNAME( 0x20, 0x00, "Speed For 100M Dash" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "10 Beats For Max Speed" )
 	PORT_DIPSETTING(    0x20, "14 Beats For Max Speed" )
-	PORT_DIPNAME( 0x40, 0x40, "Computer Demonstration" )    PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x40, 0x00, "Computer Demonstration" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
@@ -1282,6 +1294,7 @@ static INPUT_PORTS_START( goldmedl )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 	ALPHA68K_COINAGE_BITS_2TO4
+	// TODO: default is actually demo sounds OFF
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2203,6 +2216,16 @@ void alpha68k_state::alpha68k_V_sb(machine_config &config)
 	m_screen->set_screen_update(FUNC(alpha68k_state::screen_update_alpha68k_V_sb));
 }
 
+// goldmedla
+void alpha68k_state::alpha68k_III(machine_config &config)
+{
+	// TODO: we conveniently override this, base should really be shuffled around in the first place.
+	alpha68k_V_sb(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alpha68k_state::alpha68k_III_map);
+	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_state::irq1_line_hold));
+	m_maincpu->set_periodic_int(FUNC(alpha68k_state::irq2_line_hold), attotime::from_hz(60*3)); // MCU irq
+}
+
 void alpha68k_state::tnextspc(machine_config &config)
 {
 	/* basic machine hardware */
@@ -2782,8 +2805,7 @@ ROM_START( goldmedla )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD16_BYTE( "gm.6",     0x00001, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
-	ROM_LOAD16_BYTE( "gm.5",     0x00000, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
+	ROM_LOAD( "gm5-1.bin", 0x000000, 0x10000, CRC(77c601a3) SHA1(5db88b0000fa5e460aa431ca7b75e8fcf629e31e) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
 	ROM_LOAD32_BYTE( "goldchr3.c46",   0x000000, 0x80000, CRC(6faaa07a) SHA1(8c81ac35220835691d7620b334e83f1fb4f79a52) )
@@ -2791,8 +2813,9 @@ ROM_START( goldmedla )
 	ROM_LOAD32_BYTE( "goldchr1.c44",   0x000002, 0x80000, CRC(55db41cd) SHA1(15fa192ea2b829dc6dc0cb88fc2c5e5a30af6c91) )
 	ROM_LOAD32_BYTE( "goldchr0.c43",   0x000003, 0x80000, CRC(76572c3f) SHA1(e7a1abf4240510810a0f9663295c0fbab9e55a63) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) // unknown
-	ROM_LOAD( "gm5-1.bin", 0x000000, 0x10000, CRC(77c601a3) SHA1(5db88b0000fa5e460aa431ca7b75e8fcf629e31e) )
+	ROM_REGION( 0x10000, "user1", 0 ) // TODO: legacy gfx roms, are these even on this specific board? 
+	ROM_LOAD16_BYTE( "gm.6",     0x00001, 0x08000, BAD_DUMP CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
+	ROM_LOAD16_BYTE( "gm.5",     0x00000, 0x08000, BAD_DUMP CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
 ROM_END
 
 //AT: the bootleg set has strong resemblance of "goldmed7" on an Alpha-68K96III system board
@@ -2811,10 +2834,7 @@ ROM_START( goldmedlb )
 	ROM_LOAD( "1.bin",           0x30000,  0x10000, CRC(1e78062c) SHA1(821c037edf32eb8b03e5c487d3bab0622337e80b) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
-	ROM_LOAD16_BYTE( "gm.6",     0x00001, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
-	ROM_LOAD16_BYTE( "gm.5",     0x00000, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
-	// TODO: recover this!
-	//  ROM_LOAD( "33.bin",          0x00000, 0x10000, CRC(05600b13) )
+	ROM_LOAD( "l_5.bin",   0x00000,  0x10000, CRC(77c601a3) SHA1(5db88b0000fa5e460aa431ca7b75e8fcf629e31e) ) // identical to gm5-1.bin in "goldmed7"
 
 	/* I haven't yet verified if these are the same as the bootleg */
 
@@ -2824,8 +2844,11 @@ ROM_START( goldmedlb )
 	ROM_LOAD32_BYTE( "goldchr1.c44",   0x000002, 0x80000, CRC(55db41cd) SHA1(15fa192ea2b829dc6dc0cb88fc2c5e5a30af6c91) )
 	ROM_LOAD32_BYTE( "goldchr0.c43",   0x000003, 0x80000, CRC(76572c3f) SHA1(e7a1abf4240510810a0f9663295c0fbab9e55a63) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) //AT: banked data for the main 68k code?
-	ROM_LOAD( "l_5.bin",   0x00000,  0x10000, CRC(77c601a3) SHA1(5db88b0000fa5e460aa431ca7b75e8fcf629e31e) ) // identical to gm5-1.bin in "goldmed7"
+	ROM_REGION( 0x10000, "user1", 0 ) // TODO: legacy gfx roms, are these even on this specific board? 
+	ROM_LOAD16_BYTE( "gm.6",     0x00001, 0x08000, BAD_DUMP CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
+	ROM_LOAD16_BYTE( "gm.5",     0x00000, 0x08000, BAD_DUMP CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
+	// TODO: recover this!
+	//  ROM_LOAD( "33.bin",          0x00000, 0x10000, CRC(05600b13) )
 ROM_END
 
 ROM_START( skyadvnt )
@@ -3373,9 +3396,9 @@ GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr,  alpha68k_state, init
 GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr,  alpha68k_state, init_skysoldr,  ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl,  alpha68k_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl,  alpha68k_state, init_goldmedla, ROT0,  "SNK",                                               "Gold Medalist (set 2)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // current handling never really accesses video banking other than boot time.
-GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl,  alpha68k_state, init_goldmedla, ROT0,  "bootleg",                                           "Gold Medalist (bootleg)", MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // same as above
+GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl,  alpha68k_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1, Alpha68k II PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, goldmedla, goldmedl, alpha68k_III,   goldmedl,  alpha68k_state, init_goldmedla, ROT0,  "SNK",                                               "Gold Medalist (set 2, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, goldmedlb, goldmedl, alpha68k_III,   goldmedl,  alpha68k_state, init_goldmedla, ROT0,  "bootleg",                                               "Gold Medalist (bootleg, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE ) 
 
 GAME( 1989, skyadvnt,  0,        alpha68k_V,     skyadvnt,  alpha68k_state, init_skyadvnt,  ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvntu, alpha68k_state, init_skyadvntu, ROT90, "Alpha Denshi Co. (SNK of America license)",         "Sky Adventure (US)", MACHINE_SUPPORTS_SAVE )

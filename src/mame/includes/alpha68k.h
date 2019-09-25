@@ -46,6 +46,7 @@ public:
 	void jongbou(machine_config &config);
 	void alpha68k_V(machine_config &config);
 	void alpha68k_II_gm(machine_config &config);
+	void alpha68k_III(machine_config &config);
 
 	void init_paddlema();
 	void init_btlfield();
@@ -117,6 +118,7 @@ private:
 	void alpha68k_I_map(address_map &map);
 	void alpha68k_I_s_map(address_map &map);
 	void alpha68k_V_map(address_map &map);
+	void alpha68k_III_map(address_map &map);
 	void jongbou_sound_map(address_map &map);
 	void jongbou_sound_portmap(address_map &map);
 	void kyros_map(address_map &map);

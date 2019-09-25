@@ -85,12 +85,11 @@ void alpha68k_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				if (fy) fy = 0; else fy = 1;
 			}
 
-			if (color)
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-					tile,
-					color,
-					fx,fy,
-					mx,my,0);
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				tile,
+				color,
+				fx,fy,
+				mx,my,0);
 
 			if (m_flipscreen)
 				my = (my - 16) & 0x1ff;
@@ -223,13 +222,13 @@ void alpha68k_state::draw_sprites_V(bitmap_ind16 &bitmap, const rectangle &clipr
 				if (fy) fy = 0; else fy = 1;
 			}
 
-			// TODO: color 0 is actually selectable (cfr. Sky Adventure service mode), understand actual sprite disable conditions.
-			if (color)
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-					tile,
-					color,
-					fx,fy,
-					mx,my,0);
+			// color 0 is actually selectable, cfr. Sky Adventure service mode or Gold Medalist player 1 status bar on long jump
+			// TODO: are there any actual sprite disable conditions?
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				tile,
+				color,
+				fx,fy,
+				mx,my,0);
 
 			if (m_flipscreen)
 				my = (my - 16) & 0x1ff;
@@ -304,7 +303,7 @@ void alpha68k_state::draw_sprites_I(bitmap_ind16 &bitmap, const rectangle &clipr
 			const bool fy = data & 0x4000;
 			const u8 color = m_color_proms[tile << 1 | data >> 15];
 
-				gfx->transpen(bitmap,cliprect, tile, color, 0, fy, mx, my, 0);
+			gfx->transpen(bitmap,cliprect, tile, color, 0, fy, mx, my, 0);
 
 			my = (my + 8) & 0xff;
 		}
