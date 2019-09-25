@@ -923,17 +923,17 @@ void deco_mlc_state::descramble_sound(  )
 	for (u32 x = 0; x < length; x++)
 	{
 		const u32 addr = bitswap<24>(x,
-		23,22,21,0, 20,
-		19,18,17,16,
-		15,14,13,12,
-		11,10,9, 8,
-		7, 6, 5, 4,
-		3, 2, 1 );
+				23,22,21, 0,20,
+				19,18,17,16,
+				15,14,13,12,
+				11,10, 9, 8,
+				 7, 6, 5, 4,
+				 3, 2, 1);
 
 		buf[addr] = rom[x];
 	}
 
-	std::copy(buf.begin(),buf.end(),&rom[0]);
+	std::copy(buf.begin(), buf.end(), &rom[0]);
 }
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
