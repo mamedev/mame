@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli, Bryan McPhail,Stephane Humbert
+// copyright-holders:Pierpaolo Prazzoli, Bryan McPhail, Stephane Humbert, Angelo Salese
 /***************************************************************************
 
    Alpha 68k video emulation - Bryan McPhail, mish@tendril.co.uk
@@ -9,6 +9,29 @@
 #include "emu.h"
 #include "includes/alpha68k.h"
 
+// TODO: used by alpha68k_i.cpp and _k.cpp, move to own file
+void alpha68k_prom_state::palette_init(palette_device &palette) const
+{
+	const u8 *color_prom = memregion("proms")->base();
+	const u8 *clut_proms = memregion("clut_proms")->base();
+	const u32 clut_romsize =  memregion("clut_proms")->bytes()/2;
+
+	/* create a lookup table for the palette */
+	for (int i = 0; i < 0x100; i++)
+	{
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	for (int i = 0; i < clut_romsize; i++)
+	{
+		u8 const ctabentry = ((clut_proms[i + clut_romsize] & 0x0f) << 4) | (clut_proms[i] & 0x0f);
+		palette.set_pen_indirect(i, ctabentry);
+	}
+}
 
 void alpha68k_state::flipscreen_w(int flip)
 {
@@ -281,218 +304,5 @@ u32 alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitmap_in
 	draw_sprites_V(bitmap, cliprect, 0, 0x0000, 0x07c0, 0x4000, 0x8000, 0x3fff);
 
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-/******************************************************************************/
-//AT
-void alpha68k_state::draw_sprites_I(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d, int yshift)
-{
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-
-	for (int offs = 0; offs < 0x400; offs += 0x20)
-	{
-		int mx = m_spriteram[offs + c];
-		int my = (yshift - (mx >> 8)) & 0xff;
-		mx &= 0xff;
-
-		for (int i = 0; i < 0x20; i++)
-		{
-			const u16 data = m_spriteram[offs + d + i];
-			const u16 tile = data & 0x3fff;
-			const bool fy = data & 0x4000;
-			const u8 color = m_color_proms[tile << 1 | data >> 15];
-
-			gfx->transpen(bitmap,cliprect, tile, color, 0, fy, mx, my, 0);
-
-			my = (my + 8) & 0xff;
-		}
-	}
-}
-
-u32 alpha68k_state::screen_update_alpha68k_I(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int yshift = (m_microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	/* This appears to be correct priority */
-	draw_sprites_I(bitmap, cliprect, 2, 0x0800, yshift);
-	draw_sprites_I(bitmap, cliprect, 3, 0x0c00, yshift);
-	draw_sprites_I(bitmap, cliprect, 1, 0x0400, yshift);
-	return 0;
-}
-//ZT
-/******************************************************************************/
-
-void alpha68k_state::kyros_palette(palette_device &palette) const
-{
-	const u8 *color_prom = memregion("proms")->base();
-
-	/* create a lookup table for the palette */
-	for (int i = 0; i < 0x100; i++)
-	{
-		int const r = pal4bit(color_prom[i + 0x000]);
-		int const g = pal4bit(color_prom[i + 0x100]);
-		int const b = pal4bit(color_prom[i + 0x200]);
-
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	/* color_prom now points to the beginning of the lookup table */
-	color_prom += 0x300;
-
-	for (int i = 0; i < 0x100; i++)
-	{
-		u8 const ctabentry = ((color_prom[i] & 0x0f) << 4) | (color_prom[i + 0x100] & 0x0f);
-		palette.set_pen_indirect(i, ctabentry);
-	}
-}
-
-void alpha68k_state::paddlem_palette(palette_device &palette) const
-{
-	const u8 *color_prom = memregion("proms")->base();
-
-	/* create a lookup table for the palette */
-	for (int i = 0; i < 0x100; i++)
-	{
-		int const r = pal4bit(color_prom[i + 0x000]);
-		int const g = pal4bit(color_prom[i + 0x100]);
-		int const b = pal4bit(color_prom[i + 0x200]);
-
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	/* color_prom now points to the beginning of the lookup table */
-	color_prom += 0x300;
-
-	for (int i = 0; i < 0x400; i++)
-	{
-		u8 const ctabentry = ((color_prom[i + 0x400] & 0x0f) << 4) | (color_prom[i] & 0x0f);
-		palette.set_pen_indirect(i, ctabentry);
-	}
-}
-
-void alpha68k_state::kyros_video_banking(u8 *bank, int data)
-{
-	*bank = (data >> 13 & 4) | (data >> 10 & 3);
-}
-
-void alpha68k_state::jongbou_video_banking(u8 *bank, int data)
-{
-	*bank = (data >> 11 & 4) | (data >> 10 & 3);
-}
-
-void alpha68k_state::kyros_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d)
-{
-//AT
-	for (int offs = 0; offs < 0x400; offs += 0x20)
-	{
-		int mx = m_spriteram[offs + c];
-		int my = -(mx >> 8) & 0xff;
-		mx &= 0xff;
-
-		if (m_flipscreen)
-			my = 249 - my;
-
-		for (int i = 0; i < 0x20; i++)
-		{
-			const u16 data = m_spriteram[offs + d + i];
-			if (data != 0x20)
-			{
-				const u8 color = m_color_proms[(data >> 1 & 0x1000) | (data & 0xffc) | (data >> 14 & 3)];
-				if (color != 0xff)
-				{
-					int fy = data & 0x1000;
-					int fx = 0;
-
-					if (m_flipscreen)
-					{
-						if (fy) fy = 0; else fy = 1;
-						fx = 1;
-					}
-
-					u8 bank = 0;
-					const u32 tile = (data >> 3 & 0x400) | (data & 0x3ff);
-					if (m_game_id == ALPHA68K_KYROS)
-						kyros_video_banking(&bank, data);
-					else
-						jongbou_video_banking(&bank, data);
-
-					m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect, tile, color, fx, fy, mx, my, 0);
-				}
-			}
-//ZT
-			if (m_flipscreen)
-				my = (my - 8) & 0xff;
-			else
-				my = (my + 8) & 0xff;
-		}
-	}
-}
-
-u32 alpha68k_state::screen_update_kyros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_palette->set_pen_indirect(0x100, *m_videoram & 0xff);
-	bitmap.fill(0x100, cliprect); //AT
-
-	kyros_draw_sprites(bitmap, cliprect, 2, 0x0800);
-	kyros_draw_sprites(bitmap, cliprect, 3, 0x0c00);
-	kyros_draw_sprites(bitmap, cliprect, 1, 0x0400);
-	return 0;
-}
-
-/******************************************************************************/
-
-void alpha68k_state::sstingry_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d)
-{
-//AT
-	for (int offs = 0; offs < 0x400; offs += 0x20)
-	{
-		int mx = m_spriteram[offs + c];
-		int my = -(mx >> 8) & 0xff;
-		mx &= 0xff;
-		if (mx > 0xf8)
-			mx -= 0x100;
-
-		if (m_flipscreen)
-			my = 249 - my;
-
-		for (int i = 0; i < 0x20; i++)
-		{
-			const u16 data = m_spriteram[offs + d + i];
-			if (data != 0x40)
-			{
-				int fy = data & 0x1000;
-				int fx = 0;
-
-				if (m_flipscreen)
-				{
-					if (fy) fy = 0; else fy = 1;
-					fx = 1;
-				}
-
-				const u16 color = (data >> 7 & 0x18) | (data >> 13 & 7);
-				const u16 tile = data & 0x3ff;
-				const u8 bank = data >> 10 & 3;
-				m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect, tile, color, fx, fy, mx, my, 0);
-			}
-//ZT
-			if (m_flipscreen)
-				my = (my - 8) & 0xff;
-			else
-				my = (my + 8) & 0xff;
-		}
-	}
-}
-
-u32 alpha68k_state::screen_update_sstingry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_palette->set_pen_indirect(0x100, *m_videoram & 0xff);
-	bitmap.fill(0x100, cliprect); //AT
-
-	sstingry_draw_sprites(bitmap, cliprect, 2, 0x0800);
-	sstingry_draw_sprites(bitmap, cliprect, 3, 0x0c00);
-	sstingry_draw_sprites(bitmap, cliprect, 1, 0x0400);
 	return 0;
 }

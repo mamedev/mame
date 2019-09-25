@@ -1011,6 +1011,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/alpha68k.cpp",
 	MAME_DIR .. "src/mame/includes/alpha68k.h",
 	MAME_DIR .. "src/mame/video/alpha68k.cpp",
+	MAME_DIR .. "src/mame/drivers/alpha68k_i.cpp",
+	MAME_DIR .. "src/mame/drivers/alpha68k_n.cpp",
 	MAME_DIR .. "src/mame/drivers/champbas.cpp",
 	MAME_DIR .. "src/mame/includes/champbas.h",
 	MAME_DIR .. "src/mame/video/champbas.cpp",

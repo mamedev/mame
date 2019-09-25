@@ -1112,12 +1112,8 @@ gangwarsb                       // bootleg
 gangwarsj                       // Alpha-68K96V       (c) 1989 Alpha Denshi Co.
 gangwarsu                       // Alpha-68K96V       (c) 1989 Alpha Denshi Co.
 goldmedl                        // Alpha-68K96II 'GM' (c) 1988 SNK
-goldmedla                       // Alpha-68K96II 'GM' (c) 1988 SNK
-goldmedlb                       // Alpha-68K96II bootleg
-jongbou                         // (c) 1987 SNK
-kyros                           // (c) 1987 World Games
-kyrosj                          // (c) 1986 Alpha Denshi Co.
-paddlema                        // Alpha-68K96I  'PM' (c) 1988 SNK
+goldmedla                       // Alpha-68K96III 'GM' (c) 1988 SNK
+goldmedlb                       // Alpha-68K96III bootleg
 sbasebal                        // Alpha-68K96V       (c) 1989 SNK of America licensed from Alpha
 sbasebalj                       // Alpha-68K96V
 skyadvnt                        // Alpha-68K96V  'SA' (c) 1989 Alpha Denshi Co.
@@ -1125,12 +1121,21 @@ skyadvntj                       // Alpha-68K96V  'SA' (c) 1989 Alpha Denshi Co.
 skyadvntu                       // Alpha-68K96V  'SA' (c) 1989 SNK of America licensed from Alpha
 skysoldr                        // Alpha-68K96II 'SS' (c) 1988 SNK (Romstar with dip switch)
 skysoldrbl                      // bootleg
-sstingry                        // (c) 1986 Alpha Denshi Co.
 timesold                        // Alpha-68K96II 'BT' (c) 1987 SNK / Romstar
 timesold1                       // Alpha-68K96II 'BT' (c) 1987
+
+
+@source:alpha68k_i.cpp
+paddlema                        // Alpha-68K96I  'PM' (c) 1988 SNK
 tnextspc                        // A8003 'NS' (c) 1989 - MASKROM
 tnextspc2                       // A8003 'NS' (c) 1989 - EPROMs
 tnextspcj                       // A8003 'NS' (c) 1989 - Japan
+
+@source:alpha68k_n.cpp
+jongbou                         // (c) 1987 SNK
+kyros                           // (c) 1987 World Games
+kyrosj                          // (c) 1986 Alpha Denshi Co.
+sstingry                        // (c) 1986 Alpha Denshi Co.
 
 @source:alphasma.cpp
 asma2k                          //

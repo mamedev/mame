@@ -40,6 +40,8 @@ aliens.cpp
 alinvade.cpp
 allied.cpp
 alpha68k.cpp
+alpha68k_i.cpp
+alpha68k_n.cpp
 alvg.cpp
 amaticmg.cpp
 ambush.cpp
