@@ -2166,6 +2166,8 @@ files {
 createMESSProjects(_target, _subtarget, "ericsson")
 files {
 	MAME_DIR .. "src/mame/drivers/eispc.cpp",
+	MAME_DIR .. "src/mame/machine/eispc_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/eispc_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "exidy")
