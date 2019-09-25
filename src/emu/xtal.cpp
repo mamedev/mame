@@ -331,7 +331,7 @@ const double XTAL::known_xtals[] = {
 	 29'491'200, /* 29.4912_MHz_XTAL       Xerox Alto-II system clock (tagged 29.4MHz in the schematics) */
 	 30'000'000, /* 30_MHz_XTAL            Impera Magic Card */
 	 30'209'800, /* 30.2098_MHz_XTAL       Philips CD-i NTSC (1920x NTSC line rate) */
-	 30'476'100, /* 30.4761_MHz_XTAL       Taito JC */
+	 30'476'180, /* 30.47618_MHz_XTAL      Taito F3, JC, Under Fire */
 	 30'800'000, /* 30.8_MHz_XTAL          15IE-00-013 */
 	 31'279'500, /* 31.2795_MHz_XTAL       Wyse WY-30+ */
 	 31'684'000, /* 31.684_MHz_XTAL        TeleVideo TVI-955 132-column display clock */
