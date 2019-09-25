@@ -49,6 +49,7 @@ public:
 	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
 	void on_frame_done();
+	void on_sound_update();
 	void on_periodic();
 	bool on_missing_mandatory_image(const std::string &instance_name);
 	void on_machine_before_load_settings();
