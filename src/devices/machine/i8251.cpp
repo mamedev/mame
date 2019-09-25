@@ -20,8 +20,9 @@
 #define LOG_STAT    (1U << 1)
 #define LOG_COM     (1U << 2)
 #define LOG_MODE    (1U << 3)
+#define LOG_BITS    (1U << 4)
 
-//#define VERBOSE (LOG_GENERAL | LOG_STAT | LOG_COM | LOG_MODE)
+//#define VERBOSE (LOG_BITS|LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -29,6 +30,7 @@
 #define LOGSTAT(...)  LOGMASKED(LOG_STAT,  __VA_ARGS__)
 #define LOGCOM(...)   LOGMASKED(LOG_COM,   __VA_ARGS__)
 #define LOGMODE(...)  LOGMASKED(LOG_MODE,  __VA_ARGS__)
+#define LOGBITS(...)  LOGMASKED(LOG_BITS,  __VA_ARGS__)
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -147,6 +149,7 @@ void i8251_device::receive_clock()
 
 		//logerror("I8251\n");
 		/* get bit received from other side and update receive register */
+		//LOGBITS("8251: Rx Sampled %d\n", m_rxd);
 		receive_register_update_bit(m_rxd);
 		if (is_receive_register_synchronized())
 			m_rxc_count = sync ? m_br_factor : (3 * m_br_factor / 2);
@@ -177,7 +180,9 @@ bool i8251_device::is_tx_enabled() const
 void i8251_device::check_for_tx_start()
 {
 	if (is_tx_enabled() && (m_status & (I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY)) == I8251_STATUS_TX_EMPTY)
+	{
 		start_tx();
+	}
 }
 
 /*-------------------------------------------------
@@ -218,6 +223,7 @@ void i8251_device::transmit_clock()
 	if (!is_transmit_register_empty())
 	{
 		uint8_t data = transmit_register_get_data_bit();
+		LOGBITS("8251: Tx Present a %d\n", data);
 		m_txd_handler(data);
 	}
 
@@ -554,7 +560,7 @@ uint8_t i8251_device::status_r()
 {
 	uint8_t status = (m_dsr << 7) | m_status;
 
-	LOG("status read: %02x\n", status);
+	//LOG("status read: %02x\n", status);
 	LOGSTAT(" TxRDY  : %d\n", status & 0x01 ? 1 : 0);
 	LOGSTAT(" RxRDY  : %d\n", status & 0x02 ? 1 : 0);
 	LOGSTAT(" TxEMPTY: %d\n", status & 0x04 ? 1 : 0);
@@ -577,11 +583,11 @@ void i8251_device::data_w(uint8_t data)
 {
 	m_tx_data = data;
 
-	LOG("data_w %02x\n" , data);
+	LOG("8251: data_w %02x\n" , data);
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
-	LOGSTAT("status cleared TX_READY by data_w\n");
+	LOGSTAT("8251: status cleared TX_READY by data_w\n");
 	update_tx_ready();
 
 	// Store state of tx enable when writing to DB buffer
@@ -668,7 +674,8 @@ void i8251_device::write(offs_t offset, uint8_t data)
 WRITE_LINE_MEMBER(i8251_device::write_rxd)
 {
 	m_rxd = state;
-//  device_serial_interface::rx_w(state);
+	LOGBITS("8251: Presented a %d\n", m_rxd);
+	//  device_serial_interface::rx_w(state);
 }
 
 WRITE_LINE_MEMBER(i8251_device::write_cts)
