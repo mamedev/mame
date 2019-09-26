@@ -26,12 +26,11 @@ install:
   - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
   - set MSYSTEM=MINGW64
   - set PreferredToolArchitecture=x64
-  - set MSBUILDTREATALLTOOLSVERSIONSASCURRENT=1
   - cinst windows-sdk-8.1
 
 build_script:
   - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=0 vs2017 -j4"
-  - msbuild "build\projects\windows\mametiny\vs2017\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - msbuild "build\projects\windows\mametiny\vs2017\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /tv:Current /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 for:
   -
