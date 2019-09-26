@@ -1013,7 +1013,7 @@ void menu_select_launch::check_for_icons(char const *listname)
 				current.append(PATH_SEPARATOR);
 			current.append(listname);
 		}
-		osd_printf_verbose("Checking for icons in directory %s\n", current.c_str());
+		osd_printf_verbose("Checking for icons in directory %s\n", current);
 
 		// open and walk the directory
 		osd::directory::ptr const dir(osd::directory::open(current));

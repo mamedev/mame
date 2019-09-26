@@ -686,7 +686,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 	// if map is narrower than 64 bits, check the mask width as well
 	if (m_map.m_databits < 64 && (unitmask >> m_map.m_databits) != 0)
 	{
-		osd_printf_error("Handler %s specified a mask of %08X%08X, too wide to be used in a %d-bit address map\n", string, (u32)(unitmask >> 32), (u32)unitmask, m_map.m_databits);
+		osd_printf_error("Handler %s specified a mask of %016X, too wide to be used in a %d-bit address map\n", string, unitmask, m_map.m_databits);
 		return false;
 	}
 
@@ -700,7 +700,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 			count++;
 		else if ((unitmask & singlemask) != 0)
 		{
-			osd_printf_error("Handler %s specified a mask of %08X%08X; needs to be in even chunks of %X\n", string, (u32)(unitmask >> 32), (u32)unitmask, basemask);
+			osd_printf_error("Handler %s specified a mask of %016X; needs to be in even chunks of %X\n", string, unitmask, basemask);
 			return false;
 		}
 		singlemask <<= width;
@@ -718,7 +718,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 		|| (unitmask_wh != 0 && unitmask_wl != 0 && unitmask_wh != unitmask_wl)
 		|| (unitmask_dh != 0 && unitmask_dl != 0 && unitmask_dh != unitmask_dl))
 	{
-		osd_printf_error("Handler %s specified an asymmetrical mask of %08X%08X\n", string, (u32)(unitmask >> 32), (u32)unitmask);
+		osd_printf_error("Handler %s specified an asymmetrical mask of %016X\n", string, unitmask);
 		return false;
 	}
 #endif

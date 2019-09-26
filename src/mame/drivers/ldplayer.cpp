@@ -332,7 +332,7 @@ void ldplayer_state::machine_reset()
 	timer_set(attotime::zero, TIMER_ID_AUTOPLAY);
 
 	// indicate the name of the file we opened
-	popmessage("Opened %s\n", m_filename.c_str());
+	popmessage("Opened %s\n", m_filename);
 }
 
 

@@ -326,7 +326,7 @@ void rsp_device::unimplemented_opcode(uint32_t op)
 		std::ostringstream string;
 		rsp_disassembler rspd;
 		rspd.dasm_one(string, m_ppc, op);
-		osd_printf_debug("%08X: %s\n", m_ppc, string.str().c_str());
+		osd_printf_debug("%08X: %s\n", m_ppc, string.str());
 	}
 
 #if SAVE_DISASM

@@ -842,8 +842,8 @@ std::vector<u32> device_image_interface::determine_open_plan(bool is_create)
 
 static void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes)
 {
-	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string().c_str());
-	osd_printf_error("       FOUND: %s\n", acthashes.macro_string().c_str());
+	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string());
+	osd_printf_error("       FOUND: %s\n", acthashes.macro_string());
 }
 
 
@@ -918,9 +918,9 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 
 				u32 supported = swinfo->supported();
 				if (supported == SOFTWARE_SUPPORTED_PARTIAL)
-					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name().c_str());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
 				if (supported == SOFTWARE_SUPPORTED_NO)
-					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name().c_str());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
 
 				// attempt reading up the chain through the parents and create a locationtag std::string in the format
 				// " swlist % clonename % parentname "
@@ -1051,7 +1051,7 @@ done:
 			if (device().machine().phase() == machine_phase::RUNNING)
 				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
 			else
-				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path.c_str(), error());
+				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
 		}
 		clear();
 	}

@@ -225,12 +225,12 @@ void menu_select_software::handle()
 						if (!mfav.is_favorite_system_software(*swinfo))
 						{
 							mfav.add_favorite_software(*swinfo);
-							machine().popmessage(_("%s\n added to favorites list."), swinfo->longname.c_str());
+							machine().popmessage(_("%s\n added to favorites list."), swinfo->longname);
 						}
 
 						else
 						{
-							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
+							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname);
 							mfav.remove_favorite_software(*swinfo);
 						}
 					}

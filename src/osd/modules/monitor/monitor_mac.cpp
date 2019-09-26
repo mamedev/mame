@@ -115,7 +115,7 @@ protected:
 				// allocate a new monitor info
 				std::shared_ptr<osd_monitor_info> monitor = std::make_shared<mac_monitor_info>(*this, displayList[disp], temp, 1.0f);
 
-				osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->devicename().c_str(),
+				osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->devicename(),
 				monitor->position_size().width(), monitor->position_size().height());
 
 				// guess the aspect ratio assuming square pixels

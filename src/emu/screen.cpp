@@ -1707,5 +1707,5 @@ void screen_device::load_effect_overlay(const char *filename)
 	if (m_screen_overlay_bitmap.valid())
 		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else
-		osd_printf_warning("Unable to load effect PNG file '%s'\n", fullname.c_str());
+		osd_printf_warning("Unable to load effect PNG file '%s'\n", fullname);
 }

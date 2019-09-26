@@ -285,7 +285,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 			fullpath.append(PATH_SEPARATOR);
 			fullpath.append((const char*)filectx.filename);
 			if(osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE)
-				osd_printf_error("Error opening %s\n", fullpath.c_str());
+				osd_printf_error("Error opening %s\n", fullpath);
 			filectx.bytecount = 0;
 		}
 		break;
@@ -298,7 +298,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 			fullpath.append((const char*)filectx.filename);
 			uint64_t filesize; // unused, but it's an output from the open call
 			if(osd_file::open(fullpath, OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE)
-				osd_printf_error("Error opening %s\n", fullpath.c_str());
+				osd_printf_error("Error opening %s\n", fullpath);
 			filectx.bytecount = 0;
 		}
 		break;

@@ -13,6 +13,9 @@
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
 
+#include <iostream>
+
+
 const options_entry osd_options::s_option_entries[] =
 {
 	{ nullptr,                               nullptr,           OPTION_HEADER,    "OSD KEYBOARD MAPPING OPTIONS" },
@@ -381,28 +384,28 @@ void osd_common_t::update_option(const std::string &key, std::vector<const char 
 //-------------------------------------------------
 //  output_callback  - callback for osd_printf_...
 //-------------------------------------------------
-void osd_common_t::output_callback(osd_output_channel channel, const char *msg, va_list args)
+void osd_common_t::output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)
 {
 	switch (channel)
 	{
-		case OSD_OUTPUT_CHANNEL_ERROR:
-		case OSD_OUTPUT_CHANNEL_WARNING:
-			vfprintf(stderr, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_INFO:
-		case OSD_OUTPUT_CHANNEL_LOG:
-			vfprintf(stdout, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_VERBOSE:
-			if (verbose()) vfprintf(stdout, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_DEBUG:
+	case OSD_OUTPUT_CHANNEL_ERROR:
+	case OSD_OUTPUT_CHANNEL_WARNING:
+		util::stream_format(std::cerr, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_INFO:
+	case OSD_OUTPUT_CHANNEL_LOG:
+		util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_VERBOSE:
+		if (verbose()) util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_DEBUG:
 #ifdef MAME_DEBUG
-			vfprintf(stdout, msg, args);
+		util::stream_format(std::cout, args);
 #endif
-			break;
-		default:
-			break;
+		break;
+	default:
+		break;
 	}
 }
 

@@ -1878,7 +1878,7 @@ inline int atomiswave_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask,
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != 0xffffffff00000000U) && (mem_mask != 0x00000000ffffffffU))
 	{
-		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context().c_str());
+		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
 		//machine().debug_break();
 	}
 
@@ -1946,7 +1946,7 @@ WRITE64_MEMBER(atomiswave_state::aw_modem_w )
 	        0x0060028C rw POUT CN304 (EX. IO board)
 	*/
 
-	osd_printf_verbose("%s",string_format("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask).c_str());
+	osd_printf_verbose("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
 void atomiswave_state::aw_map(address_map &map)

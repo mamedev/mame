@@ -109,13 +109,13 @@ protected:
 		case plib::plog_level::VERBOSE:
 			break;
 		case plib::plog_level::INFO:
-			osd_printf_verbose("netlist INFO: %s\n", ls.c_str());
+			osd_printf_verbose("netlist INFO: %s\n", ls);
 			break;
 		case plib::plog_level::WARNING:
-			osd_printf_warning("netlist WARNING: %s\n", ls.c_str());
+			osd_printf_warning("netlist WARNING: %s\n", ls);
 			break;
 		case plib::plog_level::ERROR:
-			osd_printf_error("netlist ERROR: %s\n", ls.c_str());
+			osd_printf_error("netlist ERROR: %s\n", ls);
 			break;
 		case plib::plog_level::FATAL:
 			throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
