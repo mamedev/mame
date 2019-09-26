@@ -2,7 +2,7 @@ version: 1.0.{build}
 image:
   - Visual Studio 2017
   - Visual Studio 2017 Preview
-  - Visual Studio 2019 Preview
+  - Visual Studio 2019
   - Previous Visual Studio 2017
 
 shallow_clone: true
@@ -17,7 +17,7 @@ matrix:
   exclude:
     - image: Visual Studio 2017 Preview
       BUILD: GCC
-    - image: Visual Studio 2019 Preview
+    - image: Visual Studio 2019
       BUILD: GCC
     - image: Previous Visual Studio 2017
       BUILD: GCC
