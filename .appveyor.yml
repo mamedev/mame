@@ -26,7 +26,7 @@ install:
   - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
   - set MSYSTEM=MINGW64
   - set PreferredToolArchitecture=x64
-  - WebpiCmd /Install /Products:"Windows 8.1 SDK"
+  - cinst windows-sdk-8.1
 
 build_script:
   - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=0 vs2017 -j4"
