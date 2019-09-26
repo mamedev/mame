@@ -545,73 +545,73 @@ void mips3_device::device_start()
 
 #if USE_ABI_REG_NAMES
 	state_add( MIPS3_R0,           "zero", m_core->r[0]).callimport().formatstr("%016X");   // Can't change R0
-	state_add( MIPS3_R1,           "at", m_core->r[1]).formatstr("%016X");
-	state_add( MIPS3_R2,           "v0", m_core->r[2]).formatstr("%016X");
-	state_add( MIPS3_R3,           "v1", m_core->r[3]).formatstr("%016X");
-	state_add( MIPS3_R4,           "a0", m_core->r[4]).formatstr("%016X");
-	state_add( MIPS3_R5,           "a1", m_core->r[5]).formatstr("%016X");
-	state_add( MIPS3_R6,           "a2", m_core->r[6]).formatstr("%016X");
-	state_add( MIPS3_R7,           "a3", m_core->r[7]).formatstr("%016X");
-	state_add( MIPS3_R8,           "t0", m_core->r[8]).formatstr("%016X");
-	state_add( MIPS3_R9,           "t1", m_core->r[9]).formatstr("%016X");
-	state_add( MIPS3_R10,          "t2", m_core->r[10]).formatstr("%016X");
-	state_add( MIPS3_R11,          "t3", m_core->r[11]).formatstr("%016X");
-	state_add( MIPS3_R12,          "t4", m_core->r[12]).formatstr("%016X");
-	state_add( MIPS3_R13,          "t5", m_core->r[13]).formatstr("%016X");
-	state_add( MIPS3_R14,          "t6", m_core->r[14]).formatstr("%016X");
-	state_add( MIPS3_R15,          "t7", m_core->r[15]).formatstr("%016X");
-	state_add( MIPS3_R16,          "s0", m_core->r[16]).formatstr("%016X");
-	state_add( MIPS3_R17,          "s1", m_core->r[17]).formatstr("%016X");
-	state_add( MIPS3_R18,          "s2", m_core->r[18]).formatstr("%016X");
-	state_add( MIPS3_R19,          "s3", m_core->r[19]).formatstr("%016X");
-	state_add( MIPS3_R20,          "s4", m_core->r[20]).formatstr("%016X");
-	state_add( MIPS3_R21,          "s5", m_core->r[21]).formatstr("%016X");
-	state_add( MIPS3_R22,          "s6", m_core->r[22]).formatstr("%016X");
-	state_add( MIPS3_R23,          "s7", m_core->r[23]).formatstr("%016X");
-	state_add( MIPS3_R24,          "t8", m_core->r[24]).formatstr("%016X");
-	state_add( MIPS3_R25,          "t9", m_core->r[25]).formatstr("%016X");
-	state_add( MIPS3_R26,          "k0", m_core->r[26]).formatstr("%016X");
-	state_add( MIPS3_R27,          "k1", m_core->r[27]).formatstr("%016X");
-	state_add( MIPS3_R28,          "gp", m_core->r[28]).formatstr("%016X");
-	state_add( MIPS3_R29,          "sp", m_core->r[29]).formatstr("%016X");
-	state_add( MIPS3_R30,          "fp", m_core->r[30]).formatstr("%016X");
-	state_add( MIPS3_R31,          "ra", m_core->r[31]).formatstr("%016X");
+	state_add( MIPS3_R1,           "at", m_core->r[1]).formatstr("%016X").callimport();
+	state_add( MIPS3_R2,           "v0", m_core->r[2]).formatstr("%016X").callimport();
+	state_add( MIPS3_R3,           "v1", m_core->r[3]).formatstr("%016X").callimport();
+	state_add( MIPS3_R4,           "a0", m_core->r[4]).formatstr("%016X").callimport();
+	state_add( MIPS3_R5,           "a1", m_core->r[5]).formatstr("%016X").callimport();
+	state_add( MIPS3_R6,           "a2", m_core->r[6]).formatstr("%016X").callimport();
+	state_add( MIPS3_R7,           "a3", m_core->r[7]).formatstr("%016X").callimport();
+	state_add( MIPS3_R8,           "t0", m_core->r[8]).formatstr("%016X").callimport();
+	state_add( MIPS3_R9,           "t1", m_core->r[9]).formatstr("%016X").callimport();
+	state_add( MIPS3_R10,          "t2", m_core->r[10]).formatstr("%016X").callimport();
+	state_add( MIPS3_R11,          "t3", m_core->r[11]).formatstr("%016X").callimport();
+	state_add( MIPS3_R12,          "t4", m_core->r[12]).formatstr("%016X").callimport();
+	state_add( MIPS3_R13,          "t5", m_core->r[13]).formatstr("%016X").callimport();
+	state_add( MIPS3_R14,          "t6", m_core->r[14]).formatstr("%016X").callimport();
+	state_add( MIPS3_R15,          "t7", m_core->r[15]).formatstr("%016X").callimport();
+	state_add( MIPS3_R16,          "s0", m_core->r[16]).formatstr("%016X").callimport();
+	state_add( MIPS3_R17,          "s1", m_core->r[17]).formatstr("%016X").callimport();
+	state_add( MIPS3_R18,          "s2", m_core->r[18]).formatstr("%016X").callimport();
+	state_add( MIPS3_R19,          "s3", m_core->r[19]).formatstr("%016X").callimport();
+	state_add( MIPS3_R20,          "s4", m_core->r[20]).formatstr("%016X").callimport();
+	state_add( MIPS3_R21,          "s5", m_core->r[21]).formatstr("%016X").callimport();
+	state_add( MIPS3_R22,          "s6", m_core->r[22]).formatstr("%016X").callimport();
+	state_add( MIPS3_R23,          "s7", m_core->r[23]).formatstr("%016X").callimport();
+	state_add( MIPS3_R24,          "t8", m_core->r[24]).formatstr("%016X").callimport();
+	state_add( MIPS3_R25,          "t9", m_core->r[25]).formatstr("%016X").callimport();
+	state_add( MIPS3_R26,          "k0", m_core->r[26]).formatstr("%016X").callimport();
+	state_add( MIPS3_R27,          "k1", m_core->r[27]).formatstr("%016X").callimport();
+	state_add( MIPS3_R28,          "gp", m_core->r[28]).formatstr("%016X").callimport();
+	state_add( MIPS3_R29,          "sp", m_core->r[29]).formatstr("%016X").callimport();
+	state_add( MIPS3_R30,          "fp", m_core->r[30]).formatstr("%016X").callimport();
+	state_add( MIPS3_R31,          "ra", m_core->r[31]).formatstr("%016X").callimport();
 #else
 	state_add( MIPS3_R0,           "R0", m_core->r[0]).callimport().formatstr("%016X");   // Can't change R0
-	state_add( MIPS3_R1,           "R1", m_core->r[1]).formatstr("%016X");
-	state_add( MIPS3_R2,           "R2", m_core->r[2]).formatstr("%016X");
-	state_add( MIPS3_R3,           "R3", m_core->r[3]).formatstr("%016X");
-	state_add( MIPS3_R4,           "R4", m_core->r[4]).formatstr("%016X");
-	state_add( MIPS3_R5,           "R5", m_core->r[5]).formatstr("%016X");
-	state_add( MIPS3_R6,           "R6", m_core->r[6]).formatstr("%016X");
-	state_add( MIPS3_R7,           "R7", m_core->r[7]).formatstr("%016X");
-	state_add( MIPS3_R8,           "R8", m_core->r[8]).formatstr("%016X");
-	state_add( MIPS3_R9,           "R9", m_core->r[9]).formatstr("%016X");
-	state_add( MIPS3_R10,          "R10", m_core->r[10]).formatstr("%016X");
-	state_add( MIPS3_R11,          "R11", m_core->r[11]).formatstr("%016X");
-	state_add( MIPS3_R12,          "R12", m_core->r[12]).formatstr("%016X");
-	state_add( MIPS3_R13,          "R13", m_core->r[13]).formatstr("%016X");
-	state_add( MIPS3_R14,          "R14", m_core->r[14]).formatstr("%016X");
-	state_add( MIPS3_R15,          "R15", m_core->r[15]).formatstr("%016X");
-	state_add( MIPS3_R16,          "R16", m_core->r[16]).formatstr("%016X");
-	state_add( MIPS3_R17,          "R17", m_core->r[17]).formatstr("%016X");
-	state_add( MIPS3_R18,          "R18", m_core->r[18]).formatstr("%016X");
-	state_add( MIPS3_R19,          "R19", m_core->r[19]).formatstr("%016X");
-	state_add( MIPS3_R20,          "R20", m_core->r[20]).formatstr("%016X");
-	state_add( MIPS3_R21,          "R21", m_core->r[21]).formatstr("%016X");
-	state_add( MIPS3_R22,          "R22", m_core->r[22]).formatstr("%016X");
-	state_add( MIPS3_R23,          "R23", m_core->r[23]).formatstr("%016X");
-	state_add( MIPS3_R24,          "R24", m_core->r[24]).formatstr("%016X");
-	state_add( MIPS3_R25,          "R25", m_core->r[25]).formatstr("%016X");
-	state_add( MIPS3_R26,          "R26", m_core->r[26]).formatstr("%016X");
-	state_add( MIPS3_R27,          "R27", m_core->r[27]).formatstr("%016X");
-	state_add( MIPS3_R28,          "R28", m_core->r[28]).formatstr("%016X");
-	state_add( MIPS3_R29,          "R29", m_core->r[29]).formatstr("%016X");
-	state_add( MIPS3_R30,          "R30", m_core->r[30]).formatstr("%016X");
-	state_add( MIPS3_R31,          "R31", m_core->r[31]).formatstr("%016X");
+	state_add( MIPS3_R1,           "R1", m_core->r[1]).formatstr("%016X").callimport();
+	state_add( MIPS3_R2,           "R2", m_core->r[2]).formatstr("%016X").callimport();
+	state_add( MIPS3_R3,           "R3", m_core->r[3]).formatstr("%016X").callimport();
+	state_add( MIPS3_R4,           "R4", m_core->r[4]).formatstr("%016X").callimport();
+	state_add( MIPS3_R5,           "R5", m_core->r[5]).formatstr("%016X").callimport();
+	state_add( MIPS3_R6,           "R6", m_core->r[6]).formatstr("%016X").callimport();
+	state_add( MIPS3_R7,           "R7", m_core->r[7]).formatstr("%016X").callimport();
+	state_add( MIPS3_R8,           "R8", m_core->r[8]).formatstr("%016X").callimport();
+	state_add( MIPS3_R9,           "R9", m_core->r[9]).formatstr("%016X").callimport();
+	state_add( MIPS3_R10,          "R10", m_core->r[10]).formatstr("%016X").callimport();
+	state_add( MIPS3_R11,          "R11", m_core->r[11]).formatstr("%016X").callimport();
+	state_add( MIPS3_R12,          "R12", m_core->r[12]).formatstr("%016X").callimport();
+	state_add( MIPS3_R13,          "R13", m_core->r[13]).formatstr("%016X").callimport();
+	state_add( MIPS3_R14,          "R14", m_core->r[14]).formatstr("%016X").callimport();
+	state_add( MIPS3_R15,          "R15", m_core->r[15]).formatstr("%016X").callimport();
+	state_add( MIPS3_R16,          "R16", m_core->r[16]).formatstr("%016X").callimport();
+	state_add( MIPS3_R17,          "R17", m_core->r[17]).formatstr("%016X").callimport();
+	state_add( MIPS3_R18,          "R18", m_core->r[18]).formatstr("%016X").callimport();
+	state_add( MIPS3_R19,          "R19", m_core->r[19]).formatstr("%016X").callimport();
+	state_add( MIPS3_R20,          "R20", m_core->r[20]).formatstr("%016X").callimport();
+	state_add( MIPS3_R21,          "R21", m_core->r[21]).formatstr("%016X").callimport();
+	state_add( MIPS3_R22,          "R22", m_core->r[22]).formatstr("%016X").callimport();
+	state_add( MIPS3_R23,          "R23", m_core->r[23]).formatstr("%016X").callimport();
+	state_add( MIPS3_R24,          "R24", m_core->r[24]).formatstr("%016X").callimport();
+	state_add( MIPS3_R25,          "R25", m_core->r[25]).formatstr("%016X").callimport();
+	state_add( MIPS3_R26,          "R26", m_core->r[26]).formatstr("%016X").callimport();
+	state_add( MIPS3_R27,          "R27", m_core->r[27]).formatstr("%016X").callimport();
+	state_add( MIPS3_R28,          "R28", m_core->r[28]).formatstr("%016X").callimport();
+	state_add( MIPS3_R29,          "R29", m_core->r[29]).formatstr("%016X").callimport();
+	state_add( MIPS3_R30,          "R30", m_core->r[30]).formatstr("%016X").callimport();
+	state_add( MIPS3_R31,          "R31", m_core->r[31]).formatstr("%016X").callimport();
 #endif
-	state_add( MIPS3_HI,           "HI", m_core->r[REG_HI]).formatstr("%016X");
-	state_add( MIPS3_LO,           "LO", m_core->r[REG_LO]).formatstr("%016X");
+	state_add( MIPS3_HI,           "HI", m_core->r[REG_HI]).formatstr("%016X").callimport();
+	state_add( MIPS3_LO,           "LO", m_core->r[REG_LO]).formatstr("%016X").callimport();
 
 	state_add( MIPS3_CCR1_31,      "CCR31", m_core->ccr[1][31]).formatstr("%08X");
 
@@ -816,6 +816,16 @@ void mips3_device::state_export(const device_state_entry &entry)
 	}
 }
 
+void mips3_device::state_import(const device_state_entry &entry)
+{
+	if (m_isdrc && (entry.index() >= MIPS3_R1) && (entry.index() <= MIPS3_LO))
+	{
+		// this refers to HI as R32 and LO as R33 because I'm lazy
+		const unsigned regnum = entry.index() - MIPS3_R0;
+		if (m_regmap[regnum].is_int_register())
+			logerror("debugger R%u = %08X, must update UML I%u\n", regnum, m_core->r[regnum], m_regmap[regnum].ireg() - uml::REG_I0);
+	}
+}
 
 void mips3_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
