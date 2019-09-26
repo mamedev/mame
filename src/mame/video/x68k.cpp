@@ -277,7 +277,10 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 						if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 							m_special.pix16(scanline, pixel) = colour;
 						else
+						{
 							bitmap.pix16(scanline, pixel) = colour;
+							m_special.pix16(scanline, pixel) = 0;
+						}
 					}
 					loc++;
 					loc &= 0x3ff;
@@ -322,7 +325,15 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 							else if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 								m_special.pix16(scanline, pixel) = colour;
 							else
+							{
+								m_special.pix16(scanline, pixel) = 0;
 								bitmap.pix16(scanline, pixel) = colour;
+							}
+						}
+						else if(((m_video.reg[2] & 0x1800) == 0x1000) && m_special.pix16(scanline, pixel))
+						{
+							bitmap.pix16(scanline, pixel) = m_special.pix16(scanline, pixel);
+							m_special.pix16(scanline, pixel) = 0;
 						}
 						loc++;
 						loc &= 0x1ff;
@@ -360,7 +371,15 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 								else if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
 									m_special.pix16(scanline, pixel) = colour;
 								else
+								{
 									bitmap.pix16(scanline, pixel) = colour;
+									m_special.pix16(scanline, pixel) = 0;
+								}
+							}
+							else if(((m_video.reg[2] & 0x1800) == 0x1000) && m_special.pix16(scanline, pixel))
+							{
+								bitmap.pix16(scanline, pixel) = m_special.pix16(scanline, pixel);
+								m_special.pix16(scanline, pixel) = 0;
 							}
 							loc++;
 							loc &= 0x1ff;
