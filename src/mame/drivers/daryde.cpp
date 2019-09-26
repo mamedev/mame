@@ -184,4 +184,4 @@ ROM_END
 
 GAME(1995, cricket, 0, pandart, pandart, daryde_state, empty_init, ROT0, "Daryde S. L.", "Cricket",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1999, pandart, 0, pandart, pandart, daryde_state, empty_init, ROT0, "Daryde S. L.", "Panther Darts", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?, kurdart, 0, pandart, pandart, daryde_state, empty_init, ROT0, "Kursaal K7",   "Kursaal Darts", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, kurdart, 0, pandart, pandart, daryde_state, empty_init, ROT0, "K7 Kursaal",   "Kursaal Darts", MACHINE_IS_SKELETON_MECHANICAL)
