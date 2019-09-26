@@ -46,7 +46,6 @@ public:
 	void ncrpc4i(machine_config &config);
 	void kaypro16(machine_config &config);
 	void kaypropc(machine_config &config);
-	void epc(machine_config &config);
 	void m15(machine_config &config);
 	void bondwell(machine_config &config);
 	void siemens(machine_config &config);
@@ -86,7 +85,6 @@ private:
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_720K(device_t *device);
 
-	void epc_io(address_map &map);
 	void ibm5550_io(address_map &map);
 	void pc16_io(address_map &map);
 	void pc16_map(address_map &map);
@@ -530,55 +528,6 @@ ROM_START( mc1702 )
 	ROM_LOAD16_BYTE("2764_2,573rf4.rom", 0xc000,  0x2000, CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
 	ROM_LOAD16_BYTE("2764_3,573rf4.rom", 0xc001, 0x2000, CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
 	ROM_LOAD("ba1m,573rf5.rom", 0x0000, 0x0800, CRC(08d938e8) SHA1(957b6c691dbef75c1c735e8e4e81669d056971e4))
-ROM_END
-
-
-/************************************************************** Ericsson PC ***
-
-Links: https://youtu.be/6uilOdMJc24
-Form Factor: Desktop
-CPU: 8088 @ 4.77MHz
-RAM: 256K
-Bus: 6x ISA
-Video: Monchrome or Color 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
-Display: Orange Gas Plasma (GP) display
-Mass storage: 2 x 5.25" 360K or 1 20Mb HDD
-On board ports: Beeper,
-Ports: serial, parallel
-Internal Options: Up to 640K RAM through add-on RAM card
-Misc: The hardware was not 100% PC compatible so non BIOS based software would not run. 50.000+ units sold
-
-******************************************************************************/
-
-void pc_state::epc_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x0070, 0x0071).rw("i8251", FUNC(i8251_device::read), FUNC(i8251_device::write));
-}
-
-void pc_state::epc(machine_config &config)
-{
-	pccga(config);
-
-	i8088_cpu_device &maincpu(I8088(config.replace(), "maincpu", 4772720));
-	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
-	maincpu.set_addrmap(AS_IO, &pc_state::epc_io);
-	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
-
-	subdevice<isa8_slot_device>("isa1")->set_default_option("ega");
-	I8251(config, "i8251", 0); // clock?
-}
-
-ROM_START( epc )
-	ROM_REGION(0x10000,"bios", 0)
-	ROM_DEFAULT_BIOS("p860110")
-	ROM_SYSTEM_BIOS(0, "p840705", "P840705")
-	ROMX_LOAD("ericsson_8088.bin", 0xe000, 0x2000, CRC(3953c38d) SHA1(2bfc1f1d11d0da5664c3114994fc7aa3d6dd010d), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "p860110", "P860110")
-	ROMX_LOAD("epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55), ROM_BIOS(1))
-	ROMX_LOAD("epcbios2.bin",  0xa000, 0x02000, CRC(3ca764ca) SHA1(02232fedef22d31a641f4b65933b9e269afce19e), ROM_BIOS(1))
-	ROMX_LOAD("epcbios3.bin",  0xc000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f), ROM_BIOS(1))
 ROM_END
 
 
@@ -1358,7 +1307,6 @@ ROM_END
 
 //    YEAR  NAME            PARENT   COMPAT  MACHINE         INPUT     CLASS     INIT           COMPANY                            FULLNAME                 FLAGS
 COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,     MACHINE_NOT_WORKING )
-COMP( 1985, epc,            ibm5150, 0,      epc,            pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson PC" ,          MACHINE_NOT_WORKING )
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )

@@ -220,6 +220,7 @@ ec184x.cpp
 ec65.cpp
 ec7915.cpp
 einstein.cpp
+eispc.cpp
 elan_eu3a05.cpp
 elan_eu3a14.cpp
 electron.cpp
