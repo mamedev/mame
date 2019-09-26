@@ -30,7 +30,7 @@ install:
 
 build_script:
   - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=0 vs2017 -j4"
-  - msbuild "build\projects\windows\mametiny\vs2017\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /tv:Current /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - msbuild "build\projects\windows\mametiny\vs2017\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /p:PlatformToolset=v142 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 for:
   -
