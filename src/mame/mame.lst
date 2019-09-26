@@ -2421,6 +2421,11 @@ at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
 at386sx                         // 19?? AT VGA 386sx
 a433cc                          // J-Bond A433C-C/A450C-C
+anch386s						// ANIX CH-386S-16/20/25G
+scamp386sx						// motherboards using the SCAMPSX chipset (386sx)
+sh386sx20						// Shuttle 386SX REV 2.0A motherboard (386sx)
+ppm3333p						// DTK Computer PPM-3333P
+scsxaio							// Peacock 386sx Ver. 2.0 motherboard SCsxAIO (386sx)
 a486ap4                         // ASUS PVI-486AP4
 a486sp3                         // ASUS PVI-486SP3
 a486sp3g                        // ASUS PCI/I-486SP3G
@@ -2428,6 +2433,7 @@ aa486s                          // ASUS PCI/I-A486S
 a486sv1                         // ASUS VL/EISA-486SV1
 a486sv2g                        // ASUS VL/I-486SV2G
 mb8433uud                       // Biostar MB8433UUD-A
+mb133340						// Biostar MB-1333/40PMB-CH, rev B.3
 c286lt                          // 1990 Commodore Laptop 286-LT
 csl286                          // Commodore SL 286-16
 c386sx16                        // 1990 Commodore 386SX-16
