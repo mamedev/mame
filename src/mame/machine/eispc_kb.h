@@ -36,7 +36,7 @@ protected:
 	bool    m_txd_high; // state of Tx output line
 	bool    m_hold;
 	uint16_t m_col_select;
-	uint16_t keys[6];
+	uint16_t m_keys[6];
 	uint8_t m_p1;
 
 	void eispc_kb_mem(address_map &map);

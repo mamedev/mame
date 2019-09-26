@@ -1243,7 +1243,6 @@ void mc6845_device::device_start()
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_has_valid_parameters));
-	save_item(NAME(m_display_disabled_msg_shown));
 }
 
 

@@ -96,7 +96,7 @@ static GFXDECODE_START( gfx_pcmda )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(isa8_mda_device::pc_cpu_line)
+WRITE_LINE_MEMBER( isa8_mda_device::pc_cpu_line )
 {
 	m_isa->irq7_w(state);
 }
@@ -453,7 +453,7 @@ WRITE8_MEMBER( isa8_mda_device::mode_control_w )
  *      2-1  reserved
  *      0    horizontal drive enable
  */
-READ8_MEMBER( isa8_mda_device::status_r)
+READ8_MEMBER( isa8_mda_device::status_r )
 {
 	// Faking pixel stream here
 	m_pixel++;
@@ -468,7 +468,7 @@ READ8_MEMBER( isa8_mda_device::status_r)
  *      monochrome display adapter
  *
  *************************************************************************/
-WRITE8_MEMBER( isa8_mda_device::io_write)
+WRITE8_MEMBER( isa8_mda_device::io_write )
 {
 	switch( offset )
 	{
@@ -487,7 +487,7 @@ WRITE8_MEMBER( isa8_mda_device::io_write)
 	}
 }
 
-READ8_MEMBER( isa8_mda_device::io_read)
+READ8_MEMBER( isa8_mda_device::io_read )
 {
 	int data = 0xff;
 	switch( offset )
@@ -1125,15 +1125,15 @@ const tiny_rom_entry *isa8_epc_mda_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_epc_mda_device::isa8_epc_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	isa8_mda_device(mconfig, ISA8_EPC_MDA, tag, owner, clock)
-	, m_soft_chr_gen(nullptr)
-	, m_s1(*this, "S1")
-	, m_color_mode(0)
-	, m_mode_control2(0)
-	, m_screen(*this, EPC_MDA_SCREEN)
-	, m_io_monitor(*this, "MONITOR")
-	, m_chargen(*this, "chargen")
-	, m_installed(false)
+	isa8_mda_device(mconfig, ISA8_EPC_MDA, tag, owner, clock),
+	m_soft_chr_gen(nullptr),
+	m_s1(*this, "S1"),
+	m_color_mode(0),
+	m_mode_control2(0),
+	m_screen(*this, EPC_MDA_SCREEN),
+	m_io_monitor(*this, "MONITOR"),
+	m_chargen(*this, "chargen"),
+	m_installed(false)
 {
 }
 
@@ -1164,6 +1164,7 @@ void isa8_epc_mda_device::device_start()
 	m_videoram.resize(0x8000);
 	set_isa_device();
 	m_installed = false;
+	m_hd6845s = subdevice<hd6845s_device>(MC6845_NAME);
 }
 
 void isa8_epc_mda_device::device_reset()
@@ -1204,19 +1205,18 @@ void isa8_epc_mda_device::device_reset()
  * Status Register        0x3ba      0x3da     r  CGA/MDA status reg (incompatible)
  *                                              w EGA/VGA feature ccontrol reg (not used by this board)
  */
-WRITE8_MEMBER( isa8_epc_mda_device::io_write)
+WRITE8_MEMBER(isa8_epc_mda_device::io_write )
 {
 	LOG("%s: %04x <- %02x\n", FUNCNAME, offset, data);
-	hd6845s_device *hd6845s = subdevice<hd6845s_device>(MC6845_NAME);
 	switch( offset )
 	{
 		case 0x04:
-		  //LOGSETUP(" - HD6845S address write\n");
-			hd6845s->address_w( data );
+			//LOGSETUP(" - HD6845S address write\n");
+			m_hd6845s->address_w( data );
 			break;
 		case 0x05:
-		  //LOGSETUP(" - HD6845S register write\n");
-			hd6845s->register_w( data );
+			//LOGSETUP(" - HD6845S register write\n");
+			m_hd6845s->register_w( data );
 			break;
 		case 0x08: // Mode 1 reg
 			LOGMODE(" - Mode register 1 write: %02x\n", data);
@@ -1254,15 +1254,13 @@ WRITE8_MEMBER( isa8_epc_mda_device::io_write)
 			break;
 		default:
 			LOG("EPC MDA: io_write at wrong offset:%02x\n", offset);
-			logerror("EPC MDA: io_write at wrong offset:%02x\n", offset);
 	}
 }
 
-READ8_MEMBER( isa8_epc_mda_device::io_read)
+READ8_MEMBER( isa8_epc_mda_device::io_read )
 {
 	LOG("%s: %04x <- ???\n", FUNCNAME, offset);
 	int data = 0xff;
-	hd6845s_device *hd6845s = subdevice<hd6845s_device>(MC6845_NAME);
 	switch( offset )
 	{
 		case 0x04:
@@ -1270,7 +1268,7 @@ READ8_MEMBER( isa8_epc_mda_device::io_read)
 			break;
 		case 0x05:
 			LOGR(" - hd6845s register read\n");
-			data = hd6845s->register_r();
+			data = m_hd6845s->register_r();
 			break;
 		case 0x08: // Mode 1 reg
 			data = m_mode_control;
@@ -1302,7 +1300,7 @@ inline int isa8_epc_mda_device::get_yres()
 	return (m_vmode & VM_GRAPH) ? ( (m_vmode & VM_VER400) ? 400 : 200 ) : 400;
 }
 
-MC6845_UPDATE_ROW( isa8_epc_mda_device::crtc_update_row )
+MC6845_UPDATE_ROW(isa8_epc_mda_device::crtc_update_row)
 {
   	uint32_t  *p = &bitmap.pix32(y);
 	uint16_t  chr_base = ra;
@@ -1458,19 +1456,19 @@ MC6845_UPDATE_ROW( isa8_epc_mda_device::crtc_update_row )
 //  Port definitions
 //--------------------------------------------------------------------
 static INPUT_PORTS_START( epc_mda )
-	PORT_START("S1")
+	PORT_START( "S1" )
 	PORT_DIPNAME( 0x01, 0x00, "Color emulation") PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING( 0x00, "Disabled" )
 	PORT_DIPSETTING( 0x01, "Enabled" )
 	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "S1:2")
 
-	PORT_START("MONITOR")
-	PORT_CONFNAME( 0x01, 0x00, "Ericsson Monochrome HR Monitors") PORT_CHANGED_MEMBER(DEVICE_SELF, isa8_epc_mda_device, monitor_changed, 0)
+	PORT_START( "MONITOR" )
+	PORT_CONFNAME( 0x01, 0x00, "Ericsson Monochrome HR Monitors") PORT_CHANGED_MEMBER( DEVICE_SELF, isa8_epc_mda_device, monitor_changed, 0 )
 	PORT_CONFSETTING(    0x00, "Amber 3111")
 	PORT_CONFSETTING(    0x01, "B&W 3712/3715")
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(isa8_epc_mda_device::monitor_changed)
+INPUT_CHANGED_MEMBER( isa8_epc_mda_device::monitor_changed )
 {
 	if ((m_io_monitor->read() & 1) == 1)
 	{

@@ -213,6 +213,7 @@ private:
 	rgb_t m_3111_pal[4];
 	rgb_t m_371x_pal[4];
 	bool m_installed;
+	hd6845s_device *m_hd6845s;
 };
 
 // device type definition

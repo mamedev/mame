@@ -260,25 +260,25 @@ eispc_keyboard_device::eispc_keyboard_device(
 
 INPUT_CHANGED_MEMBER( eispc_keyboard_device::key )
 {
-		if (oldval && !newval)
+	if (oldval && !newval)
 	{
 		LOGUI("Key Pressed - name: %s field: %04x param: %04x oldval: %04x newval: %04x\n", field.name(), field.defvalue(), param, oldval, newval);
 		int idx = *((int *)(&param));
-		if (idx >= sizeof(keys))
+		if (idx >= ARRAY_LENGTH(m_keys))
 			logerror("Out of bounds access in keys array\n");
 		else
-			keys[idx] |= (uint16_t) field.defvalue();
+			m_keys[idx] |= (uint16_t) field.defvalue();
 	}
 	else if (newval && !oldval)
 	{
 		LOGUI("Key Released - name: %s field: %04x param: %04x oldval: %04x newval: %04x\n", field.name(), field.defvalue(), param, oldval, newval);
 		int idx = *((int *)(&param));
-		if (idx >= sizeof(keys))
+		if (idx >= ARRAY_LENGTH(m_keys))
 			logerror("Out of bounds access in keys array\n");
 		else
-			keys[idx] &= ~(uint16_t)field.defvalue();
+			m_keys[idx] &= ~(uint16_t)field.defvalue();
 	}
-	for (int i = 0; i < 6; i++) LOGUI("%04x ", keys[i]); LOGUI("\n");
+	for (int i = 0; i < 6; i++) LOGUI("%04x ", m_keys[i]); LOGUI("\n");
 }
 
 WRITE_LINE_MEMBER(eispc_keyboard_device::rxd_w)
@@ -315,7 +315,7 @@ void eispc_keyboard_device::device_reset()
 {
 	LOGRST("KBD: Keyboard is in reset until host computer explicitly releases the reset line\n");
 	m_mcu->suspend(SUSPEND_REASON_RESET, 0);
-	for (auto & elem : keys) elem = 0;
+	for (auto & elem : m_keys) elem = 0;
 }
 
 
@@ -351,7 +351,7 @@ void eispc_keyboard_device::device_add_mconfig(machine_config &config)
 	{
 		uint8_t data = 0; // Indicate what keys are pressed in selected column
 
-		for (int i = 0; i < 6; i++) data |= (keys[i] & m_col_select ? 1 << i : 0);
+		for (int i = 0; i < 6; i++) data |= (m_keys[i] & m_col_select ? 1 << i : 0);
 
 		// Update txd bit
 		data &= 0x3f;
