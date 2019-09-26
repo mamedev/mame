@@ -227,6 +227,67 @@ u16 alpha68k_N_state::kyros_alpha_trigger_r(offs_t offset)
 	return 0; /* Values returned don't matter */
 }
 
+u8 sstingray_state::alpha8511_command_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_alpha8511_sync_timer->adjust(attotime::zero, offset << 8 | 0x100ff);
+	return 0;
+}
+
+void sstingray_state::alpha8511_command_w(offs_t offset, u8 data)
+{
+	m_alpha8511_sync_timer->adjust(attotime::zero, offset << 8 | data);
+}
+
+TIMER_CALLBACK_MEMBER(sstingray_state::alpha8511_sync)
+{
+	m_microcontroller_data = param & 0xff;
+	m_alpha8511_address = (param >> 8) & 0xff;
+	m_alpha8511_read_mode = BIT(param, 16);
+	if (BIT(m_alpha8511_control, 4))
+	{
+		m_alpha8511->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
+		if (m_alpha8511_read_mode)
+			m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	}
+}
+
+u8 sstingray_state::alpha8511_bus_r()
+{
+	return m_microcontroller_data;
+}
+
+void sstingray_state::alpha8511_bus_w(u8 data)
+{
+	m_microcontroller_data = data;
+}
+
+u8 sstingray_state::alpha8511_address_r()
+{
+	return m_alpha8511_address;
+}
+
+u8 sstingray_state::alpha8511_rw_r()
+{
+	return m_alpha8511_read_mode ? 0xff : 0xf7;
+}
+
+void sstingray_state::alpha8511_control_w(u8 data)
+{
+	if (!BIT(data, 4))
+		m_alpha8511->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
+	if (BIT(data, 5))
+		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
+	if (!BIT(data, 6))
+	{
+		m_shared_ram[m_alpha8511_address] = (m_shared_ram[m_alpha8511_address] & 0xff00) | m_microcontroller_data;
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
+	flipscreen_w(!BIT(data, 7));
+
+	m_alpha8511_control = data;
+}
+
 u16 jongbou_state::dial_inputs_r()
 {
 	u8 inp1 = m_in[3]->read();
@@ -242,13 +303,24 @@ u16 jongbou_state::dial_inputs_r()
  *
  */
 
+void sstingray_state::main_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();                       // main program
+	map(0x020000, 0x020fff).ram().share("shared_ram");  // work RAM
+	map(0x040000, 0x041fff).ram().share("spriteram"); // sprite RAM
+	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
+	map(0x080000, 0x0801ff).rw(FUNC(sstingray_state::alpha8511_command_r), FUNC(sstingray_state::alpha8511_command_w)).umask16(0x00ff);
+	map(0x0c0000, 0x0c0001).portr("IN0");
+	map(0x0e0000, 0x0e0000).lr8("kyros_dip_r", [this]() -> u8 { return m_in[1]->read(); }).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+}
+
 void alpha68k_N_state::main_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();                       // main program
 	map(0x020000, 0x020fff).ram().share("shared_ram");  // work RAM
 	map(0x040000, 0x041fff).ram().share("spriteram"); // sprite RAM
 	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
-	map(0x080000, 0x0801ff).rw(FUNC(alpha68k_N_state::kyros_alpha_trigger_r), FUNC(alpha68k_N_state::alpha_microcontroller_w));
+	map(0x080000, 0x0801ff).rw(FUNC(kyros_state::kyros_alpha_trigger_r), FUNC(kyros_state::alpha_microcontroller_w));
 	map(0x0c0000, 0x0c0001).portr("IN0");
 	map(0x0e0000, 0x0e0000).lr8("kyros_dip_r", [this]() -> u8 { return m_in[1]->read(); }).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
@@ -276,7 +348,7 @@ void alpha68k_N_state::sound_map(address_map &map)
 */
 }
 
-void superstingray_state::sound_map(address_map &map)
+void sstingray_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
@@ -613,29 +685,29 @@ void alpha68k_N_state::video_config(machine_config &config, u8 tile_transchar, u
 	m_is_super_stingray = is_super_stingray;
 }
 
-void superstingray_state::sstingry(machine_config &config)
+void sstingray_state::sstingry(machine_config &config)
 {
 	base_config(config);
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 6000000); /* 24MHz/4? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &superstingray_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(superstingray_state::irq1_line_hold));
-	m_maincpu->set_periodic_int(FUNC(superstingray_state::irq2_line_hold), attotime::from_hz(60)); // MCU irq
+	m_maincpu->set_addrmap(AS_PROGRAM, &sstingray_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sstingray_state::irq1_line_hold));
+	//m_maincpu->set_periodic_int(FUNC(sstingray_state::irq2_line_hold), attotime::from_hz(60)); // MCU irq
 
 	Z80(config, m_audiocpu, 3579545);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &superstingray_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &superstingray_state::sound_iomap);
-	m_audiocpu->set_vblank_int("screen", FUNC(superstingray_state::irq0_line_hold));
-	m_audiocpu->set_periodic_int(FUNC(superstingray_state::nmi_line_pulse), attotime::from_hz(4000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sstingray_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &sstingray_state::sound_iomap);
+	m_audiocpu->set_vblank_int("screen", FUNC(sstingray_state::irq0_line_hold));
+	m_audiocpu->set_periodic_int(FUNC(sstingray_state::nmi_line_pulse), attotime::from_hz(4000));
 
-	i8748_device &mcu(I8748(config, "mcu", 9263750));     /* 9.263750 MHz oscillator, divided by 3*5 internally */
-//  mcu.set_addrmap(AS_PROGRAM, &alpha68k_N_state::i8748_map);
-//  mcu.bus_in_cb().set(FUNC(alpha68k_N_state::saiyugoub1_mcu_command_r));
-//  MCFG_MCS48_PORT_T0_CLK_CUSTOM(alpha68k_N_state, saiyugoub1_m5205_clk_w)     /* Drives the clock on the m5205 at 1/8 of this frequency */
-//  mcu.t1_in_cb().set(FUNC(alpha68k_N_state::saiyugoub1_m5205_irq_r));
-//  mcu.p1_out_cb().set(FUNC(alpha68k_N_state::saiyugoub1_adpcm_rom_addr_w));
-//  mcu.p2_out_cb().set(FUNC(alpha68k_N_state::saiyugoub1_adpcm_control_w));
-	mcu.set_disable();
+	I8748(config, m_alpha8511, 9263750);     /* 9.263750 MHz(?) oscillator, divided by 3*5 internally */
+	m_alpha8511->bus_in_cb().set(FUNC(sstingray_state::alpha8511_bus_r));
+	m_alpha8511->bus_out_cb().set(FUNC(sstingray_state::alpha8511_bus_w));
+	m_alpha8511->p1_in_cb().set(FUNC(sstingray_state::alpha8511_address_r));
+	m_alpha8511->p2_in_cb().set(FUNC(sstingray_state::alpha8511_rw_r));
+	m_alpha8511->p2_out_cb().set(FUNC(sstingray_state::alpha8511_control_w));
+	m_alpha8511->t0_in_cb().set_ioport("IN2").bit(0);
+	m_alpha8511->t1_in_cb().set_ioport("IN2").bit(1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sstingry);
 	video_config(config, 0x40, 0, true);
@@ -730,7 +802,7 @@ ROM_START( sstingry )
 	ROM_LOAD( "ss_01.rom",       0x0000,  0x4000, CRC(fef09a92) SHA1(77b6aded1eed1bd5e6ffb25b56b62b10b7b9a304) )
 	ROM_LOAD( "ss_02.rom",       0x4000,  0x4000, CRC(ab4e8c01) SHA1(d96e7f97945fff48fb7b4661fdb575ac7ff77445) )
 
-	ROM_REGION( 0x0400, "mcu", 0 )    /* 8748 MCU code */
+	ROM_REGION( 0x0400, "alpha8511", 0 )    /* 8748 MCU code */
 	ROM_LOAD( "d8748.bin",       0x0000, 0x0400, CRC(7fcbfc30) SHA1(6d087a3d44e475b6c8260a5134952097f26459b7) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
@@ -873,12 +945,17 @@ ROM_START( jongbou )
 	ROM_LOAD( "p3.i15", 0x0000, 0x2000, CRC(8c09cd2a) SHA1(317764e0f5af29e78fd764bdf28579bf6be5630f) )
 ROM_END
 
-void superstingray_state::init_sstingry()
+void sstingray_state::init_sstingry()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x00ff;
 	m_coin_id = 0x22 | (0x22 << 8);
 	m_game_id = 0;
+
+	m_alpha8511_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sstingray_state::alpha8511_sync), this));
+	save_item(NAME(m_alpha8511_address));
+	save_item(NAME(m_alpha8511_control));
+	save_item(NAME(m_alpha8511_read_mode));
 }
 
 void kyros_state::init_kyros()
@@ -897,7 +974,7 @@ void jongbou_state::init_jongbou()
 	m_game_id = ALPHA68K_JONGBOU;
 }
 
-GAME( 1986, sstingry,  0,        sstingry,       sstingry,  superstingray_state, init_sstingry,  ROT90, "Alpha Denshi Co.",                                  "Super Stingray (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, sstingry,  0,        sstingry,       sstingry,  sstingray_state, init_sstingry,  ROT90, "Alpha Denshi Co.",                                  "Super Stingray (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
 GAME( 1987, kyros,     0,        kyros,          kyros,     kyros_state, init_kyros,     ROT90, "Alpha Denshi Co. (World Games Inc. license)",       "Kyros", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, kyrosj,    kyros,    kyros,          kyros,     kyros_state, init_kyros,     ROT90, "Alpha Denshi Co.",                                  "Kyros no Yakata (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -178,7 +178,7 @@ public:
 
 protected:
 	void main_map(address_map &map);
-	
+
 	void base_config(machine_config &config);
 	void video_config(machine_config &config, u8 tile_transchar, u8 tile_bankshift, bool is_super_stingray);
 	
@@ -195,18 +195,35 @@ private:
 	bool m_is_super_stingray;
 };
 
-class superstingray_state : public alpha68k_N_state
+class sstingray_state : public alpha68k_N_state
 {
 public:
-	superstingray_state(const machine_config &mconfig, device_type type, const char *tag)
+	sstingray_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alpha68k_N_state(mconfig, type, tag)
+		, m_alpha8511(*this, "alpha8511")
 	{}
 
 	void init_sstingry();
 	void sstingry(machine_config &config);
 
 private:
+	u8 alpha8511_command_r(offs_t offset);
+	void alpha8511_command_w(offs_t offset, u8 data);
+	TIMER_CALLBACK_MEMBER(alpha8511_sync);
+	u8 alpha8511_bus_r();
+	void alpha8511_bus_w(u8 data);
+	u8 alpha8511_address_r();
+	u8 alpha8511_rw_r();
+	void alpha8511_control_w(u8 data);
+
+	void main_map(address_map &map);
 	void sound_map(address_map &map);
+
+	required_device<mcs48_cpu_device> m_alpha8511;
+	u8 m_alpha8511_address;
+	u8 m_alpha8511_control;
+	bool m_alpha8511_read_mode;
+	emu_timer *m_alpha8511_sync_timer;
 };
 
 class kyros_state : public alpha68k_N_state
