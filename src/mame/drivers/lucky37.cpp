@@ -5,7 +5,7 @@
   This hardware seems to be an evolution of the one found in lucky74.cpp. Its main components are:
   * A001 CPU block, containing probably a Z80 or compatible CPU and ROM(s) (not dumped).
     Dumper description after opening it: 3 unknown/white chips, which had no pins, with no markings.
-  * HD647180X0P6 MCU with internal ROM (not dumped)
+  * HD647180X0P6 MCU with internal ROM (decapped and dumped but for lucky25)
   * 1 32.000 MHz and 1 21.000 MHz XTALs
   * 1 OKI M6295V with 1.056 MHz resonator
   * 1 custom 06B30P
@@ -32,7 +32,7 @@
   A001: marked B 9G1. Sticker: 8907 1991.03 L-21-D BET/WON
   MCU: Sticker: 8907 1990.10 L21-D M.COM
 
-  Not much can be done until main CPU and MCU ROMs are dumped.
+  Not much can be done until main CPU ROMs are dumped.
 */
 
 #include "emu.h"
@@ -128,7 +128,7 @@ ROM_START( lucky21 )
 	ROM_LOAD( "a001-a9b2",    0x0000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x8000, "mcu", 0 )
-	ROM_LOAD( "internal_rom", 0x0000, 0x8000, NO_DUMP )
+	ROM_LOAD( "internal_rom", 0x0000, 0x8000, CRC(bfa1214c) SHA1(34a3dc0fadc8a86f0cd35944437fc6f362cb7bf5) ) // decapped
 
 	ROM_REGION( 0xc0000, "unsorted", 0 ) // no ROM 6 present
 	ROM_LOAD( "1.bin", 0x00000, 0x20000, CRC(2198b736) SHA1(556fd89dc9d1183a672324b7e1bb6350331459d2) )
@@ -144,7 +144,7 @@ ROM_START( lucky21d )
 	ROM_LOAD( "a001-b9g1",    0x0000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x8000, "mcu", 0 )
-	ROM_LOAD( "internal_rom", 0x0000, 0x8000, NO_DUMP )
+	ROM_LOAD( "internal_rom", 0x0000, 0x8000, CRC(93fe39b6) SHA1(e9951173682f4566ed0e0a5a77fd51fdf5cb6058) ) // decapped
 
 	ROM_REGION( 0xe0000, "unsorted", 0 )
 	ROM_LOAD( "1.bin", 0x00000, 0x20000, CRC(e512ec6d) SHA1(28925c54edc002ee9d575e2ef53bccb02df176a0) )
@@ -177,7 +177,7 @@ ROM_START( lucky37 )
 	ROM_LOAD( "a001-a9a2",    0x0000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x8000, "mcu", 0 )
-	ROM_LOAD( "internal_rom", 0x0000, 0x8000, NO_DUMP )
+	ROM_LOAD( "internal_rom", 0x0000, 0x8000,  CRC(047c26e1) SHA1(a3bd5aa4eebb92a8dcd8611b1bf29621e095f7fd) ) // decapped
 
 	ROM_REGION( 0xc0000, "unsorted", 0 )
 	ROM_LOAD( "1.bin", 0x00000, 0x20000, CRC(15729cbb) SHA1(2e3255f0ff2e084311be41c908ab5a2be8c1b25d) )
