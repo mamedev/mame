@@ -26,7 +26,7 @@ install:
   - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
   - set MSYSTEM=MINGW64
   - set PreferredToolArchitecture=x64
-  - set MSBUILDTREATALLTOOLSVERSIONSASCURRENT
+  - set MSBUILDTREATALLTOOLSVERSIONSASCURRENT=1
   - cinst windows-sdk-8.1
 
 build_script:
