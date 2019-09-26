@@ -1,9 +1,9 @@
 version: 1.0.{build}
 image:
-  - Visual Studio 2017
-  - Visual Studio 2017 Preview
+#  - Visual Studio 2017
+#  - Visual Studio 2017 Preview
   - Visual Studio 2019
-  - Previous Visual Studio 2017
+#  - Previous Visual Studio 2017
 
 shallow_clone: true
 clone_depth: 1
@@ -26,7 +26,8 @@ install:
   - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
   - set MSYSTEM=MINGW64
   - set PreferredToolArchitecture=x64
-  
+  - WebpiCmd /Install /Products:"Windows 8.1 SDK"
+
 build_script:
   - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=0 vs2017 -j4"
   - msbuild "build\projects\windows\mametiny\vs2017\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
