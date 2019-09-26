@@ -104,7 +104,6 @@ protected:
 	bool head_control;
 	bool motor_control;
 	bool ready_hooked;
-	bool nonsticky_immint;
 	int clock_ratio;
 	const int *step_times;
 	int delay_register_commit;
