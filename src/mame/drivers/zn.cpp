@@ -5573,8 +5573,8 @@ GAME( 1997, gdarius2,  coh1000t, coh1002tb,   znt,      zn_state, init_coh1000tb
 
 /* Eighting / Raizing */
 GAME( 1997, coh1002e,  0,        coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "PS Arcade 95",              MACHINE_IS_BIOS_ROOT )
-GAME( 1997, beastrzr,  coh1002e, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA)",         MACHINE_IMPERFECT_SOUND )
-GAME( 1997, beastrzra, beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA, alt)",    MACHINE_IMPERFECT_SOUND )
+GAME( 1997, beastrzr,  coh1002e, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA, set 1)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1997, beastrzra, beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA, set 2)",  MACHINE_IMPERFECT_SOUND )
 GAME( 1997, bldyroar,  beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)",       MACHINE_IMPERFECT_SOUND )
 GAME( 1997, beastrzrb, beastrzr, beastrzrb,   znt,      zn_state, empty_init, ROT0, "bootleg",            "Beastorizer (USA bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
