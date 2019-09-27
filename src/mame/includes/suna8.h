@@ -155,6 +155,8 @@ private:
 	void brickzn_sound_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void hardhea2_map(address_map &map);
+	void hardhea2b_map(address_map &map);
+	void hardhea2b_decrypted_opcodes_map(address_map &map);
 	void hardhead_io_map(address_map &map);
 	void hardhead_map(address_map &map);
 	void hardhead_sound_io_map(address_map &map);

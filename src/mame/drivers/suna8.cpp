@@ -1016,6 +1016,19 @@ void suna8_state::hardhea2_map(address_map &map)
 }
 
 
+void suna8_state::hardhea2b_map(address_map &map)
+{
+	hardhea2_map(map);
+
+	map(0x0000, 0x7fff).rom().region("maincpu", 0x8000); // data is in the second half of the ROM
+}
+
+void suna8_state::hardhea2b_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0x0000); // opcodes are in the first half of the ROM
+}
+
+
 /***************************************************************************
                                 Star Fighter
 ***************************************************************************/
@@ -2104,7 +2117,8 @@ void suna8_state::hardhea2b(machine_config &config)
 {
 	hardhea2(config);
 	Z80(config.replace(), m_maincpu, SUNA8_MASTER_CLOCK / 4); //bootleg clock not verified (?)
-	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhea2_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhea2b_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::hardhea2b_decrypted_opcodes_map);
 }
 
 
