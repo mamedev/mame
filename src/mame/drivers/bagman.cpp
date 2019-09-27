@@ -274,9 +274,9 @@ static INPUT_PORTS_START( pickin )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x40, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) /* Cabinet type set through edge connector, not dip switch (verified on real pcb) */
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_CONFNAME(0x80, 0x80, DEF_STR( Cabinet ) ) // sense line on wiring harness
+	PORT_CONFSETTING(   0x80, DEF_STR( Upright ) )
+	PORT_CONFSETTING(   0x00, DEF_STR( Cocktail ) )
 
 INPUT_PORTS_END
 
