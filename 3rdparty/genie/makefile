@@ -4,7 +4,7 @@
 #
 
 UNAME := $(shell uname)
-ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin SunOS FreeBSD GNU/kFreeBSD NetBSD OpenBSD GNU))
+ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin SunOS FreeBSD GNU/kFreeBSD NetBSD OpenBSD GNU Haiku))
 ifeq ($(UNAME),$(filter $(UNAME),Darwin))
 OS=darwin
 else
@@ -14,7 +14,11 @@ else
 ifeq ($(UNAME),$(filter $(UNAME),FreeBSD GNU/kFreeBSD NetBSD OpenBSD))
 OS=bsd
 else
+ifeq ($(UNAME),$(filter $(UNAME),Haiku))
+OS=haiku
+else
 OS=linux
+endif
 endif
 endif
 endif
@@ -42,6 +46,7 @@ projgen:
 	$(SILENT) $(GENIE) --to=../build/gmake.linux --os=linux gmake
 	$(SILENT) $(GENIE) --to=../build/gmake.darwin --os=macosx --platform=universal32 gmake
 	$(SILENT) $(GENIE) --to=../build/gmake.freebsd --os=bsd gmake
+	$(SILENT) $(GENIE) --to=../build/gmake.haiku   --os=haiku gmake
 
 rebuild:
 	$(SILENT) $(MAKE) -C build/gmake.$(OS) clean all
@@ -56,6 +61,7 @@ release-linux: $(GENIE)
 	$(SILENT) $(MAKE) -C build/gmake.darwin  clean all CC=x86_64-apple-darwin15-clang
 	$(SILENT) $(MAKE) -C build/gmake.linux   clean all
 	$(SILENT) $(MAKE) -C build/gmake.windows clean all CC=i686-w64-mingw32-gcc
+	$(SILENT) $(MAKE) -C build/gmake.haiku   clean all
 	$(SILENT) git checkout src/host/version.h
 
 release: release-$(OS)

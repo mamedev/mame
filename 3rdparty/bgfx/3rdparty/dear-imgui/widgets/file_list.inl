@@ -32,6 +32,7 @@ namespace ImGui
 				}
 				else if (0 != ImStricmp(item->d_name, ".") )
 				{
+#ifndef __HAIKU__
 					if (item->d_type & DT_DIR)
 					{
 						FileList.push_back(ImFileInfo(item->d_name, -1) );
@@ -42,6 +43,7 @@ namespace ImGui
 						stat(item->d_name, &statbuf);
 						FileList.push_back(ImFileInfo(item->d_name, statbuf.st_size) );
 					}
+#endif
 				}
 			}
 

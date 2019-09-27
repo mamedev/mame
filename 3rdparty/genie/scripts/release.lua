@@ -40,6 +40,7 @@ function dorelease()
 	exec(_PREMAKE_COMMAND .. " /to=../build/gmake.windows /os=windows gmake")
 	exec(_PREMAKE_COMMAND .. " /to=../build/gmake.linux /os=linux gmake")
 	exec(_PREMAKE_COMMAND .. " /to=../build/gmake.darwin /os=macosx /platform=universal32 gmake")
+	exec(_PREMAKE_COMMAND .. " /to=../build/gmake.haiku /os=haiku gmake")
 
 	print("")
 	print( "Finished.")

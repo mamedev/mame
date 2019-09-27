@@ -215,6 +215,7 @@ GENIEOS := darwin
 endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 OS := haiku
+GENIEOS := haiku
 endif
 ifndef OS
 $(error Unable to detect OS from uname -a: $(UNAME))
@@ -443,6 +444,10 @@ OSD := sdl
 endif
 
 ifeq ($(TARGETOS),asmjs)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),haiku)
 OSD := sdl
 endif
 endif
@@ -1568,6 +1573,28 @@ ifndef CI20_SYSROOT
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-ci20 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-ci20 config=$(CONFIG)
+
+#-------------------------------------------------
+# gmake-haiku
+#-------------------------------------------------
+
+$(PROJECTDIR)/$(MAKETYPE)-haiku/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=haiku --gcc_version=$(GCC_VERSION) $(MAKETYPE)
+
+.PHONY: haiku_x64
+haiku_x64: generate $(PROJECTDIR)/$(MAKETYPE)-haiku/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)64
+
+.PHONY: haiku_x86
+haiku_x86: generate $(PROJECTDIR)/$(MAKETYPE)-haiku/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)32
+
+.PHONY: haiku
+haiku: generate $(PROJECTDIR)/$(MAKETYPE)-haiku/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-haiku config=$(CONFIG)
 
 #-------------------------------------------------
 # cmake

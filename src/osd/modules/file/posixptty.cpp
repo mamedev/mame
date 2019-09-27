@@ -19,6 +19,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#ifdef __HAIKU__
+#define _BSD_SOURCE
+#endif
+
 #if defined(__FreeBSD_kernel__) || defined(__DragonFly__)
 #include <termios.h>
 #include <libutil.h>
