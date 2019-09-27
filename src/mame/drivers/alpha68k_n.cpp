@@ -7,8 +7,8 @@
 	derived from alpha68k.cpp
 
 	TODO:
-	- Super Stingray MCU irq controls timer speed, needs the MCU to be 
-	  hooked up to define actual timings.
+	- Super Stingray MCU irq controls timer speed. The MCU has been
+          hooked up but the clock is almost certainly wrong.
 	- GFX region can eventually overflow in jongbou, and in general all three 
 	  games can probably be run with the same gfx_layout structs
 
@@ -809,6 +809,7 @@ ROM_START( sstingry )
 	ROM_LOAD( "ss_02.rom",       0x4000,  0x4000, CRC(ab4e8c01) SHA1(d96e7f97945fff48fb7b4661fdb575ac7ff77445) )
 
 	ROM_REGION( 0x0400, "alpha8511", 0 )    /* 8748 MCU code */
+	// Was this dumped from a bootleg? The original "ALPHA-8511" MCU appears to be some sort of Hitachi part.
 	ROM_LOAD( "d8748.bin",       0x0000, 0x0400, CRC(7fcbfc30) SHA1(6d087a3d44e475b6c8260a5134952097f26459b7) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
