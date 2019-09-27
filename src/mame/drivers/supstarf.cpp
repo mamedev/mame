@@ -194,7 +194,8 @@ void supstarf_state::supstarf(machine_config &config)
 
 	I8212(config, m_soundlatch[1]);
 	m_soundlatch[1]->md_rd_callback().set_constant(0);
-	m_soundlatch[1]->int_wr_callback().set_inputline("soundcpu", MCS48_INPUT_IRQ)/*.append_inputline(m_maincpu, I8085_READY_LINE)*/;
+	m_soundlatch[1]->int_wr_callback().set_inputline("soundcpu", MCS48_INPUT_IRQ);
+	//m_soundlatch[1]->int_wr_callback().append_inputline(m_maincpu, I8085_READY_LINE);
 
 	SPEAKER(config, "mono").front_center();
 
