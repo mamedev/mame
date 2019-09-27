@@ -1190,8 +1190,8 @@ ROM_START( chelnovj ) /* at least 1 PCB found with all labels as 'EPR-EExx' like
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound CPU */
 	ROM_LOAD( "ee05.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // created from the world version by patching the id byte, internal checksum matches
-	ROM_LOAD( "ee-j.14k", 0x0000, 0x1000, BAD_DUMP CRC(b3dc380c) SHA1(81cc4ded918da9f232481f4e67cf71de814efc48) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "ee.14k", 0x0000, 0x1000, CRC(b3dc380c) SHA1(81cc4ded918da9f232481f4e67cf71de814efc48) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ee00.c5",     0x00000, 0x08000, CRC(1abf2c6d) SHA1(86d625ae94cd9ea69e4e613895410640efb175b3) )  /* Characters */
