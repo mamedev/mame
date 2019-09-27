@@ -1353,11 +1353,6 @@ void segas16b_state::altbeasj_i8751_sim()
 	altbeast_common_i8751_sim(0x30d4/2, 0x30d0/2, 1);
 }
 
-void segas16b_state::altbeas5_i8751_sim()
-{
-	altbeast_common_i8751_sim(0x3098/2, 0x3096/2, 1);
-}
-
 
 
 //-------------------------------------------------
@@ -4690,7 +4685,7 @@ ROM_START( altbeast6 )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "317-0076.c2", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "317-0076.c2", 0x00000, 0x1000, CRC(32c91f89) SHA1(30660b24ebc890f878ecb81e38296b0755c33d09) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -9387,12 +9382,6 @@ void segas16b_state::init_altbeasj_5521()
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeasj_i8751_sim, this);
 }
 
-void segas16b_state::init_altbeas5_5521()
-{
-	init_generic_5521();
-	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeas5_i8751_sim, this);
-}
-
 void segas16b_state::init_altbeas4_5521()
 {
 	init_generic_5521();
@@ -9532,7 +9521,7 @@ GAME( 1986, afighterh,  afighter, system16b_fd1089a,     afighter, segas16b_stat
 
 GAME( 1988, altbeast,   0,        system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 8) (8751 317-0078)", 0 )
 GAME( 1988, altbeastj,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_altbeasj_5521,      ROT0,   "Sega", "Juuouki (set 7, Japan) (8751 317-0077)", 0 )
-GAME( 1988, altbeast6,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_altbeas5_5521,      ROT0,   "Sega", "Altered Beast (set 6) (8751 317-0076)", 0 )
+GAME( 1988, altbeast6,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 6) (8751 317-0076)", 0 )
 GAME( 1988, altbeast5,  altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 5) (FD1094 317-0069)", 0 )
 GAME( 1988, altbeast4,  altbeast, system16b_mc8123,      altbeast, segas16b_state, init_altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4) (MC-8123B 317-0066)", 0 )
 GAME( 1988, altbeastj3, altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Juuouki (set 3, Japan) (FD1094 317-0068)", 0 )

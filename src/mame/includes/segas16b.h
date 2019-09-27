@@ -108,7 +108,6 @@ public:
 	void init_tturf_5704();
 	void init_wb3_5704();
 	void init_hwchamp_5521();
-	void init_altbeas5_5521();
 	void init_sdi_5358_small();
 	void init_fpointbla();
 	void init_altbeasj_5521();
@@ -227,7 +226,6 @@ protected:
 	// i8751 simulations
 	void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank);
 	void altbeasj_i8751_sim();
-	void altbeas5_i8751_sim();
 	void ddux_i8751_sim();
 	void tturf_i8751_sim();
 	void wb3_i8751_sim();
