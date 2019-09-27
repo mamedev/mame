@@ -2417,6 +2417,9 @@ ecs38632                        // Elitegroup ECS-386/32 mainboard
 ecsum386                        // Elitegroup UM386 mainboard
 fu340                           // Abit FU340
 smih0107                        //
+elt286b							// Chaintech ELT-286B-160B(E) motherboard (286)
+uni386w							// UNICHIP 386W 367C REV 1.0 motherboard (386)
+mokp386sx						// MORSE KP 386SX V2.21
 at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
 at386sx                         // 19?? AT VGA 386sx
@@ -2426,6 +2429,7 @@ scamp386sx						// motherboards using the SCAMPSX chipset (386sx)
 sh386sx20						// Shuttle 386SX REV 2.0A motherboard (386sx)
 ppm3333p						// DTK Computer PPM-3333P
 scsxaio							// Peacock 386sx Ver. 2.0 motherboard SCsxAIO (386sx)
+pcd204							// Philips PCD204 (PCD200 series, 286)
 a486ap4                         // ASUS PVI-486AP4
 a486sp3                         // ASUS PVI-486SP3
 a486sp3g                        // ASUS PCI/I-486SP3G
