@@ -110,10 +110,10 @@ public:
 		return ret;
 	}
 
-	ptokenizer & identifier_chars(pstring s) { m_identifier_chars = std::move(s); return *this; }
-	ptokenizer & number_chars(pstring st, pstring rem) { m_number_chars_start = std::move(st); m_number_chars = std::move(rem); return *this; }
+	ptokenizer & identifier_chars(const pstring &s) { m_identifier_chars = s; return *this; }
+	ptokenizer & number_chars(const pstring &st, const pstring & rem) { m_number_chars_start = st; m_number_chars = rem; return *this; }
 	ptokenizer & string_char(pstring::value_type c) { m_string = c; return *this; }
-	ptokenizer & whitespace(pstring s) { m_whitespace = std::move(s); return *this; }
+	ptokenizer & whitespace(const pstring & s) { m_whitespace = s; return *this; }
 	ptokenizer & comment(const pstring &start, const pstring &end, const pstring &line)
 	{
 		m_tok_comment_start = register_token(start);
@@ -123,7 +123,7 @@ public:
 	}
 
 	token_t get_token_internal();
-	void error(const pstring &errs);
+	void error(const pstring &errs) { verror(errs, currentline_no(), currentline_str()); }
 
 	putf8_reader &stream() { return m_strm; }
 protected:
@@ -217,8 +217,8 @@ protected:
 	class st : public std::streambuf
 	{
 	public:
-		st(ppreprocessor *strm) : m_strm(strm) {        setg(nullptr, nullptr, nullptr); }
-		st(st &&rhs) noexcept : m_strm(rhs.m_strm) {}
+		st(ppreprocessor *strm) : m_strm(strm), m_buf() { setg(nullptr, nullptr, nullptr); }
+		st(st &&rhs) noexcept : m_strm(rhs.m_strm), m_buf()  {}
 		int_type underflow() override
 		{
 			//printf("here\n");

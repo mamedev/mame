@@ -183,7 +183,7 @@ public:
 	void write(const pstring &s)
 	{
 		const auto sm = reinterpret_cast<const std::ostream::char_type *>(s.c_str());
-		const std::streamsize sl(static_cast<std::streamsize>(pstring_mem_t_size(s)));
+		const auto sl(static_cast<std::streamsize>(pstring_mem_t_size(s)));
 		write(sl);
 		m_strm.write(sm, sl);
 	}
@@ -191,7 +191,7 @@ public:
 	template <typename T>
 	void write(const std::vector<T> &val)
 	{
-		const std::streamsize sz(static_cast<std::streamsize>(val.size()));
+		const auto sz(static_cast<std::streamsize>(val.size()));
 		write(sz);
 		m_strm.write(reinterpret_cast<const std::ostream::char_type *>(val.data()), sz * static_cast<std::streamsize>(sizeof(T)));
 	}
@@ -278,7 +278,7 @@ namespace filesystem
 		return pstring(source);
 	}
 
-}
+} // namespace filesystem
 
 } // namespace plib
 

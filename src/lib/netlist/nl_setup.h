@@ -223,7 +223,7 @@ namespace netlist
 		using model_map_t = std::unordered_map<pstring, pstring>;
 
 		void model_parse(const pstring &model, model_map_t &map);
-		pstring model_string(model_map_t &map);
+		pstring model_string(const model_map_t &map) const;
 
 		std::unordered_map<pstring, pstring> m_models;
 		std::unordered_map<pstring, model_map_t> m_cache;

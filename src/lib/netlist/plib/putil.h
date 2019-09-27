@@ -26,8 +26,8 @@ namespace plib
 
 	namespace util
 	{
-		const pstring buildpath(std::initializer_list<pstring> list );
-		const pstring environment(const pstring &var, const pstring &default_val);
+		pstring buildpath(std::initializer_list<pstring> list );
+		pstring environment(const pstring &var, const pstring &default_val);
 	} // namespace util
 
 	namespace container

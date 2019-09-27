@@ -396,16 +396,16 @@ public:
 		opt_ex1(*this, "./nlwav -f vcdd -o x.vcd log_V*",
 			"convert all files starting with \"log_V\" into a digital vcd file"),
 		opt_ex2(*this, "./nlwav -f wav -o x.wav log_V*",
-			"convert all files starting with \"log_V\" into a multichannel wav file"),
-		m_outstrm(nullptr)
+			"convert all files starting with \"log_V\" into a multichannel wav file")
 	{}
 
 	int execute() override;
 	pstring usage() override;
 
 private:
-	void convert_wav();
-	void convert_vcd(vcdwriter::format_e format);
+	void convert_wav(std::ostream &ostrm);
+	void convert_vcd(std::ostream &ostrm, vcdwriter::format_e format);
+	void convert(std::ostream &ostrm);
 
 	plib::option_str_limit<unsigned> opt_fmt;
 	plib::option_str    opt_out;
@@ -421,15 +421,14 @@ private:
 	plib::option_example   opt_ex1;
 	plib::option_example   opt_ex2;
 	std::vector<plib::unique_ptr<std::istream>> m_instrms;
-	std::ostream *m_outstrm;
 };
 
-void nlwav_app::convert_wav()
+void nlwav_app::convert_wav(std::ostream &ostrm)
 {
 
 	double dt = 1.0 / static_cast<double>(opt_rate());
 
-	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(*m_outstrm, opt_out() != "-", m_instrms.size(), opt_rate(), opt_amp());
+	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(ostrm, opt_out() != "-", m_instrms.size(), opt_rate(), opt_amp());
 	plib::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));
 	aggregator::callback_type agcb = log_processor::callback_type(&aggregator::process, ago.get());
 
@@ -448,10 +447,10 @@ void nlwav_app::convert_wav()
 	}
 }
 
-void nlwav_app::convert_vcd(vcdwriter::format_e format)
+void nlwav_app::convert_vcd(std::ostream &ostrm, vcdwriter::format_e format)
 {
 
-	plib::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(*m_outstrm, opt_args(),
+	plib::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(ostrm, opt_args(),
 		format, opt_high(), opt_low());
 	log_processor::callback_type agcb = log_processor::callback_type(&vcdwriter::process, wo.get());
 
@@ -476,6 +475,21 @@ pstring nlwav_app::usage()
 			"nlwav [OPTION] ... [FILE] ...");
 }
 
+void nlwav_app::convert(std::ostream &ostrm)
+{
+	switch (opt_fmt())
+	{
+		case 0:
+			convert_wav(ostrm); break;
+		case 1:
+			convert_vcd(ostrm, vcdwriter::ANALOG); break;
+		case 2:
+			convert_vcd(ostrm, vcdwriter::DIGITAL); break;
+		default:
+			// tease compiler - can't happen
+			break;
+	}
+}
 
 int nlwav_app::execute()
 {
@@ -499,11 +513,6 @@ int nlwav_app::execute()
 		return 0;
 	}
 
-	m_outstrm = (opt_out() == "-" ? &std::cout : plib::pnew<std::ofstream>(plib::filesystem::u8path(opt_out())));
-	if (m_outstrm->fail())
-		throw plib::file_open_e(opt_out());
-	m_outstrm->imbue(std::locale::classic());
-
 	for (auto &oi: opt_args())
 	{
 		plib::unique_ptr<std::istream> fin;
@@ -520,21 +529,19 @@ int nlwav_app::execute()
 		m_instrms.push_back(std::move(fin));
 	}
 
-	switch (opt_fmt())
-	{
-		case 0:
-			convert_wav(); break;
-		case 1:
-			convert_vcd(vcdwriter::ANALOG); break;
-		case 2:
-			convert_vcd(vcdwriter::DIGITAL); break;
-		default:
-			// tease compiler - can't happen
-			break;
-	}
-
 	if (opt_out() != "-")
-		plib::pdelete(m_outstrm);
+	{
+		auto outstrm(std::ofstream(plib::filesystem::u8path(opt_out())));
+		if (outstrm.fail())
+			throw plib::file_open_e(opt_out());
+		outstrm.imbue(std::locale::classic());
+		convert(outstrm);
+	}
+	else
+	{
+		std::cout.imbue(std::locale::classic());
+		convert(std::cout);
+	}
 
 	return 0;
 }

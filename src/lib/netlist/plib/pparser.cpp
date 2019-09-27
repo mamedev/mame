@@ -253,12 +253,6 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 	}
 }
 
-void ptokenizer::error(const pstring &errs)
-{
-	verror(errs, currentline_no(), currentline_str());
-	//throw error;
-}
-
 // ----------------------------------------------------------------------------------------
 // A simple preprocessor
 // ----------------------------------------------------------------------------------------
@@ -423,7 +417,7 @@ pstring ppreprocessor::process_comments(pstring line)
 	return ret;
 }
 
-pstring  ppreprocessor::process_line(pstring line)
+pstring ppreprocessor::process_line(pstring line)
 {
 	bool line_cont = plib::right(line, 1) == "\\";
 	if (line_cont)

@@ -14,7 +14,7 @@ namespace plib
 {
 	namespace util
 	{
-		const pstring buildpath(std::initializer_list<pstring> list )
+		pstring buildpath(std::initializer_list<pstring> list )
 		{
 			pstring ret = "";
 			for( const auto &elem : list )
@@ -31,7 +31,7 @@ namespace plib
 			return ret;
 		}
 
-		const pstring environment(const pstring &var, const pstring &default_val)
+		pstring environment(const pstring &var, const pstring &default_val)
 		{
 			if (std::getenv(var.c_str()) == nullptr)
 				return default_val;
