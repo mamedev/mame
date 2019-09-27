@@ -247,8 +247,7 @@ TIMER_CALLBACK_MEMBER(sstingray_state::alpha8511_sync)
 	if (BIT(m_alpha8511_control, 4))
 	{
 		m_alpha8511->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
-		if (m_alpha8511_read_mode)
-			m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -275,14 +274,14 @@ u8 sstingray_state::alpha8511_rw_r()
 void sstingray_state::alpha8511_control_w(u8 data)
 {
 	if (!BIT(data, 4))
+	{
 		m_alpha8511->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
 	if (BIT(data, 5))
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 	if (!BIT(data, 6))
-	{
 		m_shared_ram[m_alpha8511_address] = (m_shared_ram[m_alpha8511_address] & 0xff00) | m_microcontroller_data;
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	}
 	flipscreen_w(!BIT(data, 7));
 
 	m_alpha8511_control = data;
@@ -561,7 +560,15 @@ static INPUT_PORTS_START( sstingry )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	ALPHA68K_COINAGE_BITS_1TO3
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "A 1C/1C B 1C/1C" )
+	PORT_DIPSETTING(    0x02, "A 1C/2C B 2C/1C" )
+	PORT_DIPSETTING(    0x04, "A 1C/3C B 3C/1C" )
+	PORT_DIPSETTING(    0x06, "A 1C/4C B 4C/1C" )
+	PORT_DIPSETTING(    0x08, "A 1C/5C B 5C/1C" )
+	PORT_DIPSETTING(    0x0a, "A 1C/6C B 6C/1C" )
+	PORT_DIPSETTING(    0x0c, "A 2C/3C B 7C/1C" )
+	PORT_DIPSETTING(    0x0e, "A 3C/2C B 8C/1C" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
@@ -586,7 +593,6 @@ static INPUT_PORTS_START( kyros )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	//ALPHA68K_COINAGE_BITS_1TO3
 	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(    0x0e, "A 1C/1C B 1C/1C" )
 	PORT_DIPSETTING(    0x06, "A 1C/2C B 2C/1C" )

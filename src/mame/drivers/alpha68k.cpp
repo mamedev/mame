@@ -582,6 +582,17 @@ void alpha68k_state::sound_portmap(address_map &map)
 	PORT_DIPSETTING(    0x01, "A 2C/3C B 7C/1C" )   \
 	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )
 
+#define ALPHA68K_COINAGE_BITS_1TO3 \
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:4,5,6") \
+	PORT_DIPSETTING(    0x0e, "A 1C/1C B 1C/1C" )   \
+	PORT_DIPSETTING(    0x06, "A 1C/2C B 2C/1C" )   \
+	PORT_DIPSETTING(    0x0a, "A 1C/3C B 3C/1C" )   \
+	PORT_DIPSETTING(    0x02, "A 1C/4C B 4C/1C" )   \
+	PORT_DIPSETTING(    0x0c, "A 1C/5C B 5C/1C" )   \
+	PORT_DIPSETTING(    0x04, "A 1C/6C B 6C/1C" )   \
+	PORT_DIPSETTING(    0x08, "A 2C/3C B 7C/1C" )   \
+	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )
+
 #define ALPHA68K_COINAGE_BITS_2TO4 \
 	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW2:2,3,4") \
 	PORT_DIPSETTING(    0x1c, "A 1C/1C B 1C/1C" )   \
@@ -592,11 +603,6 @@ void alpha68k_state::sound_portmap(address_map &map)
 	PORT_DIPSETTING(    0x08, "A 1C/6C B 6C/1C" )   \
 	PORT_DIPSETTING(    0x04, "A 2C/3C B 7C/1C" )   \
 	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )
-
-#define ALPHA68K_MCU \
-	PORT_START("IN2")  /* Coin input to microcontroller */\
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )\
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 
 static INPUT_PORTS_START( timesold )
 	PORT_START("IN0")
