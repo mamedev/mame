@@ -943,7 +943,7 @@ nl_double models_t::value(const pstring &model, const pstring &entity)
 	switch (*p)
 	{
 		case 'M': factor = 1e6; break;
-		case 'k': factor = 1e3; break;
+		case 'k':
 		case 'K': factor = 1e3; break;
 		case 'm': factor = 1e-3; break;
 		case 'u': factor = 1e-6; break;

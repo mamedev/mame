@@ -188,7 +188,7 @@ namespace plib
 	};
 
 	template<typename T, typename S>
-	T pstonum(const S &arg, std::locale loc = std::locale::classic())
+	T pstonum(const S &arg, const std::locale &loc = std::locale::classic())
 	{
 		decltype(arg.c_str()) cstr = arg.c_str();
 		std::size_t idx(0);

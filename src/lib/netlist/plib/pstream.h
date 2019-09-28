@@ -256,7 +256,7 @@ struct perrlogger
 	template <typename ... Args>
 	explicit perrlogger(Args&& ... args)
 	{
-		h()(std::forward<Args>(args)...);
+		h()(std::forward<Args>(args)...); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
 	}
 private:
 	static putf8_fmt_writer &h()

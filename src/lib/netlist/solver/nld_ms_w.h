@@ -97,18 +97,20 @@ protected:
 
 
 private:
+	template <typename T, std::size_t N, std::size_t M>
+	using array2D = std::array<std::array<T, M>, N>;
 	static constexpr std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
-	float_ext_type m_A[storage_N][m_pitch];
-	float_ext_type m_Ainv[storage_N][m_pitch];
-	float_ext_type m_W[storage_N][m_pitch];
+	array2D<float_ext_type, storage_N, m_pitch> m_A;
+	array2D<float_ext_type, storage_N, m_pitch> m_Ainv;
+	array2D<float_ext_type, storage_N, m_pitch> m_W;
 	std::array<float_ext_type, storage_N> m_RHS; // right hand side - contains currents
 
-	float_ext_type m_lA[storage_N][m_pitch];
+	array2D<float_ext_type, storage_N, m_pitch> m_lA;
 
 	/* temporary */
-	float_type H[storage_N][m_pitch] ;
+	array2D<float_ext_type, storage_N, m_pitch> H;
 	std::array<unsigned, storage_N> rows;
-	unsigned cols[storage_N][m_pitch];
+	array2D<unsigned, storage_N, m_pitch> cols;
 	std::array<unsigned, storage_N> colcount;
 
 	unsigned m_cnt;

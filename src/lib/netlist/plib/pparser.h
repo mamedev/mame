@@ -220,6 +220,7 @@ protected:
 		readbuffer(readbuffer &&rhs) noexcept : m_strm(rhs.m_strm), m_buf()  {}
 		COPYASSIGN(readbuffer, delete)
 		readbuffer &operator=(readbuffer &&src) = delete;
+		~readbuffer() override = default;
 
 		int_type underflow() override
 		{

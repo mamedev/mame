@@ -147,7 +147,7 @@ namespace devices
 			pstring ml = "";
 			for (std::size_t j = 0; j < iN; j++)
 			{
-				ml += fill[k][j] == 0 ? "X" : fill[k][j] < decltype(mat)::FILL_INFINITY ? "+" : ".";
+				ml += fill[k][j] == 0 ? 'X' : fill[k][j] < decltype(mat)::FILL_INFINITY ? '+' : '.';
 				if (fill[k][j] < decltype(mat)::FILL_INFINITY)
 					if (fill[k][j] > fm)
 						fm = fill[k][j];

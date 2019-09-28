@@ -191,7 +191,7 @@ namespace plib
 				const std::size_t piie = row_idx[i+1];
 				const auto &nz = nzbd[i];
 
-				while (auto j = nz[nzbdp++])
+				while (auto j = nz[nzbdp++]) // NOLINT(bugprone-infinite-loop)
 				{
 					// proceed to column i
 

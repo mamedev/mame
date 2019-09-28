@@ -1474,7 +1474,7 @@ namespace netlist
 	// netlist_t
 	// -----------------------------------------------------------------------------
 
-	class netlist_t
+	class netlist_t // NOLINT(clang-analyzer-optin.performance.Padding)
 	{
 	public:
 
@@ -1496,9 +1496,9 @@ namespace netlist
 		void qpush(detail::queue_t::entry_t && e) noexcept
 		{
 			if (!USE_QUEUE_STATS || !m_stats)
-				m_queue.push_nostats(std::move(e));
+				m_queue.push_nostats(std::move(e)); // NOLINT(performance-move-const-arg)
 			else
-				m_queue.push(std::move(e));
+				m_queue.push(std::move(e)); // NOLINT(performance-move-const-arg)
 		}
 
 		template <class R>
