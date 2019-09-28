@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Henrik Algestam
-// thanks-to:Sean Riddle, Igor
+// thanks-to:Sean Riddle, Igor, Lee Robson
 /***************************************************************************
 
 Sharp SM5xx family handhelds.
@@ -4040,7 +4040,7 @@ void gnw_ssparky_state::gnw_ssparky(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1080, 1861);
+	screen.set_size(627, 1080);
 	screen.set_visarea_full();
 
 	/* sound hardware */
