@@ -15,12 +15,12 @@
 #include "pstring.h"
 
 #include <array>
-#include <type_traits>
-#include <vector>
-#include <ios>
 #include <fstream>
+#include <ios>
 #include <iostream>
 #include <sstream>
+#include <type_traits>
+#include <vector>
 
 namespace plib {
 

@@ -71,8 +71,8 @@ namespace netlist
 		}
 	};
 
-	constexpr const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(25) };
-	constexpr const netlist_time delay_clear[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+	constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(25) };
+	constexpr const std::array<netlist_time, 2> delay_clear = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 
 	NETLIB_HANDLER(74175, clk)
 	{

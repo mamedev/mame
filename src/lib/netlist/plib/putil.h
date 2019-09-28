@@ -12,10 +12,10 @@
 #include "pstring.h"
 #include <algorithm>
 #include <initializer_list>
+#include <iostream>
 #include <locale>
 #include <sstream>
 #include <vector>
-#include <iostream>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)

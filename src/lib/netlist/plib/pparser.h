@@ -197,9 +197,8 @@ public:
 	COPYASSIGN(ppreprocessor, delete)
 	ppreprocessor &operator=(ppreprocessor &&src) = delete;
 
-
 	ppreprocessor(ppreprocessor &&s) noexcept
-	: std::istream(new st(this))
+	: std::istream(new readbuffer(this))
 	, m_defines(std::move(s.m_defines))
 	, m_expr_sep(std::move(s.m_expr_sep))
 	, m_ifflag(s.m_ifflag)
@@ -214,11 +213,14 @@ public:
 
 protected:
 
-	class st : public std::streambuf
+	class readbuffer : public std::streambuf
 	{
 	public:
-		st(ppreprocessor *strm) : m_strm(strm), m_buf() { setg(nullptr, nullptr, nullptr); }
-		st(st &&rhs) noexcept : m_strm(rhs.m_strm), m_buf()  {}
+		readbuffer(ppreprocessor *strm) : m_strm(strm), m_buf() { setg(nullptr, nullptr, nullptr); }
+		readbuffer(readbuffer &&rhs) noexcept : m_strm(rhs.m_strm), m_buf()  {}
+		COPYASSIGN(readbuffer, delete)
+		readbuffer &operator=(readbuffer &&src) = delete;
+
 		int_type underflow() override
 		{
 			//printf("here\n");

@@ -258,7 +258,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 // ----------------------------------------------------------------------------------------
 
 ppreprocessor::ppreprocessor(defines_map_type *defines)
-: std::istream(new st(this))
+: std::istream(new readbuffer(this))
 , m_ifflag(0)
 , m_level(0)
 , m_lineno(0)

@@ -10,16 +10,16 @@
 
 #include "netlist/plib/pmain.h"
 #include "netlist/devices/net_lib.h"
-#include "netlist/nl_parser.h"
 #include "netlist/nl_errstr.h"
+#include "netlist/nl_parser.h"
 #include "netlist/nl_setup.h"
 #include "netlist/solver/nld_solver.h"
 #include "netlist/tools/nl_convert.h"
 
 #include <cstdio> // scanf
 #include <iomanip> // scanf
-#include <iostream> // scanf
 #include <ios>
+#include <iostream> // scanf
 
 #define NLTOOL_VERSION  20190420
 

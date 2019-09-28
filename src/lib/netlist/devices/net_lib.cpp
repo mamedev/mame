@@ -16,7 +16,6 @@
 #define xstr(s) # s
 
 #define NETLIB_DEVICE_DECL(chip) extern factory::constructor_ptr_t decl_ ## chip
-
 #define LIB_DECL(nic, decl) factory.register_device( decl ( pstring(xstr(nic))) );
 #define LIB_ENTRY(nic) { NETLIB_DEVICE_DECL(nic); LIB_DECL(NETLIB_NAME(nic), decl_ ## nic) }
 
