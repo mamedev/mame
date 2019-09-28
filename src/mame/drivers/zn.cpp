@@ -5572,11 +5572,11 @@ GAME( 1997, gdariusb,  gdarius2, coh1002tb,   znt,      zn_state, init_coh1000tb
 GAME( 1997, gdarius2,  coh1000t, coh1002tb,   znt,      zn_state, init_coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)",     MACHINE_IMPERFECT_SOUND )
 
 /* Eighting / Raizing */
-GAME( 1997, coh1002e,  0,        coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "PS Arcade 95",              MACHINE_IS_BIOS_ROOT )
-GAME( 1997, beastrzr,  coh1002e, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA, newer)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1997, beastrzro, beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA, older)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1997, bldyroar,  beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)",       MACHINE_IMPERFECT_SOUND )
-GAME( 1997, beastrzrb, beastrzr, beastrzrb,   znt,      zn_state, empty_init, ROT0, "bootleg",            "Beastorizer (USA bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, coh1002e,  0,        coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "PS Arcade 95",                   MACHINE_IS_BIOS_ROOT )
+GAME( 1997, beastrzr,  coh1002e, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA, Sep 22 1997)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, beastrzro, beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA, Jun 21 1997)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, bldyroar,  beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)",            MACHINE_IMPERFECT_SOUND )
+GAME( 1997, beastrzrb, beastrzr, beastrzrb,   znt,      zn_state, empty_init, ROT0, "bootleg",            "Beastorizer (USA bootleg)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 /* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
 GAME( 1998, bldyror2,  coh1002e, coh1002e,    bldyror2, zn_state, empty_init, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", MACHINE_IMPERFECT_SOUND ) // locks up if you coin up during the fmw with interlace enabled
