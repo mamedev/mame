@@ -97,7 +97,7 @@ YM-105    nws  SM511   Super Mario Bros.
 DR-106    nws  SM511   Climber
 BF-107    nws  SM511   Balloon Fight
 MJ-108*   nws  SM511?  Mario The Juggler
-BU-201*   sc   SM510?  Spitball Sparky
+BU-201    sc   SM510   Spitball Sparky
 UD-202*   sc   SM510?  Crab Grab
 BX-301    mvs  SM511   Boxing (aka Punch Out)
 AK-302*   mvs  SM511?  Donkey Kong 3
@@ -3971,6 +3971,92 @@ ROM_START( gnw_bfightn )
 
 	ROM_REGION( 558342, "screen", 0)
 	ROM_LOAD( "gnw_bfightn.svg", 0, 558342, CRC(361e03c3) SHA1(2883bc3de07f71fff8ea95dbc4f6955fd13abacd) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Spitball Sparky (model BU-201)
+  * PCB label BU-201
+  * Sharp SM510 label BU-201 542A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_ssparky_state : public hh_sm510_state
+{
+public:
+	gnw_ssparky_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_ssparky(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_ssparky )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_ssparky_state::gnw_ssparky(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1080, 1861);
+	screen.set_visarea_full();
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_ssparky )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bu-201", 0x0000, 0x1000, CRC(ae0d28e7) SHA1(1427cca1f3aaf3ef6fc3499171a5220428d9894f) )
+
+	ROM_REGION( 136760, "screen", 0)
+	ROM_LOAD( "gnw_ssparky.svg", 0, 136760, CRC(7488bc84) SHA1(32f41a7f50b7c4a92e023b7bf4c184dd87398f87) )
 ROM_END
 
 
@@ -10242,6 +10328,9 @@ CONS( 1988, gnw_bfightn, gnw_bfight, 0, gnw_bfightn, gnw_bfight,  gnw_bfight_sta
 // Nintendo G&W: table top / panorama screen
 CONS( 1983, gnw_dkjrp,   0,          0, gnw_dkjrp,   gnw_dkjrp,   gnw_dkjrp_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (panorama screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mbaway,  0,          0, gnw_mbaway,  gnw_mbaway,  gnw_mbaway_state,  empty_init, "Nintendo", "Game & Watch: Mario's Bombs Away", MACHINE_SUPPORTS_SAVE )
+
+// Nintendo G&W: super color screen
+CONS( 1984, gnw_ssparky, 0,          0, gnw_ssparky, gnw_ssparky, gnw_ssparky_state, empty_init, "Nintendo", "Game & Watch: Spitball Sparky", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: micro vs. system (actually, no official Game & Watch logo anywhere)
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE )
