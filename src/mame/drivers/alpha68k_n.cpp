@@ -848,7 +848,7 @@ ROM_START( kyros )
 	// not hooked up yet
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "kyros_68705u3.bin",    0x0000, 0x1000, CRC(c20880b7) SHA1(b041c36cbc4f348d74e0548df5cb14727f2d353b) ) // this one is from a bootleg PCB, program code *might* be compatible.
-	ROM_LOAD( "kyros_mcu.bin",    0x0800, 0x1000,  BAD_DUMP CRC(3a902a19) SHA1(af1be8894c899b27b1106663ffaf2ab43fa1cdaa) ) // original MCU? (HD6805U1) zero-page ROM not dumped
+	ROM_LOAD( "kyros_mcu.bin",    0x0800, 0x0800,  BAD_DUMP CRC(3a902a19) SHA1(af1be8894c899b27b1106663ffaf2ab43fa1cdaa) ) // original MCU? (HD6805U1) zero-page ROM not dumped
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "8.9pr",  0x00000, 0x8000, CRC(c5290944) SHA1(ec97482dc59220002780ae4d02be4cd172cf65ac) )
@@ -894,7 +894,7 @@ ROM_START( kyrosj )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // these comes from original set
 	ROM_LOAD( "kyros_68705u3.bin",    0x0000, 0x1000, BAD_DUMP CRC(c20880b7) SHA1(b041c36cbc4f348d74e0548df5cb14727f2d353b) ) // this one is from a bootleg PCB, program code *might* be compatible.
-	ROM_LOAD( "kyros_mcu.bin",    0x0800, 0x1000,  BAD_DUMP CRC(3a902a19) SHA1(af1be8894c899b27b1106663ffaf2ab43fa1cdaa) ) // original MCU? (HD6805U1)
+	ROM_LOAD( "kyros_mcu.bin",    0x0800, 0x0800,  BAD_DUMP CRC(3a902a19) SHA1(af1be8894c899b27b1106663ffaf2ab43fa1cdaa) ) // original MCU? (HD6805U1)
 
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "8.9r",   0x00000, 0x8000, CRC(d8203284) SHA1(7dede410239be6b674644fa76c91dd01837f841f) )
