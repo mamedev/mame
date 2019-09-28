@@ -55,15 +55,37 @@ public:
 	{}
 
 	bool eof() const { return m_strm->eof(); }
-	bool readline(pstring &line);
 
-	bool readbyte1(std::istream::char_type &b)
+	bool readline(pstring &line)
+	{
+		putf8string::code_t c = 0;
+		m_linebuf = "";
+		if (!this->readcode(c))
+		{
+			line = "";
+			return false;
+		}
+		while (true)
+		{
+			if (c == 10)
+				break;
+			else if (c != 13) /* ignore CR */
+				m_linebuf += putf8string(1, c);
+			if (!this->readcode(c))
+				break;
+		}
+		line = m_linebuf.c_str();
+		return true;
+	}
+
+	bool readbyte(std::istream::char_type &b)
 	{
 		if (m_strm->eof())
 			return false;
 		m_strm->read(&b, 1);
 		return true;
 	}
+
 	bool readcode(putf8string::traits_type::code_t &c)
 	{
 		std::array<std::istream::char_type, 4> b{0};
@@ -154,7 +176,11 @@ public:
 	~putf8_fmt_writer() override = default;
 
 //protected:
-	void vdowrite(const pstring &ls) const;
+	void vdowrite(const pstring &s) const
+	{
+		write(s);
+	}
+
 
 private:
 };

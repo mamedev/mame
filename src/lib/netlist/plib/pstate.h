@@ -113,9 +113,40 @@ public:
 		save_state_ptr(owner, stname, dtype<C>(), N, a.data());
 	}
 
-	void pre_save();
-	void post_load();
-	void remove_save_items(const void *owner);
+	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t &dt, const std::size_t count, void *ptr)
+	{
+		m_save.push_back(plib::make_unique<entry_t>(stname, dt, owner, count, ptr));
+	}
+
+	void pre_save()
+	{
+		for (auto & s : m_custom)
+			s->m_callback->on_pre_save(*this);
+	}
+
+	void post_load()
+	{
+		for (auto & s : m_custom)
+			s->m_callback->on_post_load(*this);
+	}
+
+	void remove_save_items(const void *owner)
+	{
+		auto i = m_save.end();
+		while (i != m_save.begin())
+		{
+			i--;
+			if (i->get()->m_owner == owner)
+				i = m_save.erase(i);
+		}
+		i = m_custom.end();
+		while (i > m_custom.begin())
+		{
+			i--;
+			if (i->get()->m_owner == owner)
+				i = m_custom.erase(i);
+		}
+	}
 
 	const std::vector<const entry_t *> save_list() const
 	{
@@ -125,8 +156,6 @@ public:
 		return ret;
 	}
 
-	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t &dt, const std::size_t count, void *ptr);
-
 protected:
 
 private:
@@ -135,7 +164,12 @@ private:
 
 };
 
-template<> void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname);
+template<> inline void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname)
+{
+	m_custom.push_back(plib::make_unique<entry_t>(stname, owner, &state));
+	state.register_state(*this, stname);
+}
+
 
 } // namespace plib
 

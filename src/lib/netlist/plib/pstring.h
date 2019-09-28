@@ -178,9 +178,6 @@ public:
 	size_type find(const pstring_t &search, size_type start = 0) const;
 	size_type find(code_t search, size_type start = 0) const;
 
-	size_type find_first_not_of(const pstring_t &no) const;
-	size_type find_last_not_of(const pstring_t &no) const;
-
 	// concatenation operators
 	pstring_t& operator+=(const pstring_t &string) { m_str.append(string.m_str); return *this; }
 	pstring_t& operator+=(const code_t c) { traits_type::encode(c, m_str); return *this; }

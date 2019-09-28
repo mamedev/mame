@@ -79,15 +79,12 @@ OBJS = $(POBJS) $(NLOBJS)
 
 POBJS := \
 	$(POBJ)/pstring.o \
-	$(POBJ)/pchrono.o \
 	$(POBJ)/pdynlib.o \
 	$(POBJ)/pexception.o \
 	$(POBJ)/pfunction.o \
 	$(POBJ)/pfmtlog.o \
 	$(POBJ)/poptions.o \
 	$(POBJ)/pparser.o \
-	$(POBJ)/pstate.o \
-	$(POBJ)/pstream.o \
 	$(POBJ)/putil.o \
 
 PMAIN := $(POBJ)/pmain.o

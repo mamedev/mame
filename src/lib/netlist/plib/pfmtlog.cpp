@@ -110,12 +110,10 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
 			strm << std::setprecision(pstonum<int>(fmt.substr(1)));
 		else if (pdot != pstring::npos)
 		{
-			//strm << std::setprecision(pstonum<int>(fmt.substr(pdot + 1))) << std::setw(pstonum<int>(left(fmt,pdot)));
 			strm << std::setprecision(pstonum<int>(fmt.substr(pdot + 1)));
 			r.width = pstonum<pstring::size_type>(left(fmt,pdot));
 		}
 		else if (fmt != "")
-			//strm << std::setw(pstonum<int>(fmt));
 			r.width = pstonum<pstring::size_type>(fmt);
 
 		switch (r.pend)
