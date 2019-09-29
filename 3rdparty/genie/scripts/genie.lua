@@ -21,10 +21,11 @@
 		language "C"
 		kind "ConsoleApp"
 		flags {
-			"No64BitChecks",
 			"ExtraWarnings",
+			"No64BitChecks",
 			"StaticRuntime"
 		}
+
 		includedirs {
 			"../src/host/lua-5.3.0/src"
 		}
@@ -42,6 +43,10 @@
 			"../src/host/lua-5.3.0/src/luac.c",
 			"../src/host/lua-5.3.0/**.lua",
 			"../src/host/lua-5.3.0/etc/*.c",
+		}
+
+		buildoptions {
+			"-m64",
 		}
 
 		configuration "Debug"
@@ -66,16 +71,11 @@
 		configuration "bsd"
 			targetdir   "../bin/bsd"
 
-		configuration "solaris"
-			targetdir   "../bin/solaris"
-			defines     { "_REENTRANT" }
-			buildoptions { "-std=gnu99" }
-			links       { "dl" }
-
-		configuration "linux or bsd or solaris"
-			defines     { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
-			links       { "m" }
-			linkoptions { "-rdynamic" }
+		configuration "linux or bsd"
+			defines      { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
+			buildoptions { "-Wno-implicit-fallthrough" }
+			links        { "m" }
+			linkoptions  { "-rdynamic" }
 
 		configuration "macosx"
 			targetdir   "../bin/darwin"
@@ -83,8 +83,10 @@
 			links       { "CoreServices.framework" }
 
 		configuration { "macosx", "gmake" }
-			buildoptions { "-mmacosx-version-min=10.4" }
-			linkoptions  { "-mmacosx-version-min=10.4" }
+			buildoptions { "-mmacosx-version-min=10.6" }
+			linkoptions  { "-mmacosx-version-min=10.6" }
+
+		configuration {}
 
 
 --

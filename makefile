@@ -405,6 +405,21 @@ LD := $(SILENT)g++
 CXX:= $(SILENT)g++
 
 #-------------------------------------------------
+# determine the whether -m32, -m64 or nothing
+# should be passed to gcc when building genie
+#-------------------------------------------------
+
+ifeq ($(ARCHITECTURE),_x86)
+MPARAM := -m32
+else
+ifeq ($(ARCHITECTURE),_x64)
+MPARAM := -m64
+else
+MPARAM :=
+endif
+endif
+
+#-------------------------------------------------
 # specify OSD layer: windows, sdl, etc.
 # build scripts will be run from
 # scripts/src/osd/$(OSD).lua
@@ -1177,6 +1192,38 @@ ifdef FASTBUILD
 endif
 
 #-------------------------------------------------
+# Visual Studio 2019
+#-------------------------------------------------
+
+.PHONY: vs2019
+vs2019: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2019
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2019_intel
+vs2019_intel: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2019
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2019_uwp
+vs2019_uwp: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2015
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2019_fastbuild
+vs2019_fastbuild: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2019-fastbuild
+ifdef FASTBUILD
+	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2019-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
+endif
+
+#-------------------------------------------------
 # Visual Studio LLVM
 #-------------------------------------------------
 
@@ -1590,13 +1637,13 @@ endif
 GENIE_SRC=$(wildcard 3rdparty/genie/src/host/*.c)
 
 $(GENIE): $(GENIE_SRC)
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make MPARAM=$(MPARAM)
 
 3rdparty/genie/src/hosts/%.c:
 
 .PHONY: genieclean
 genieclean:
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make MPARAM=$(MPARAM) clean
 
 clean: genieclean
 	@echo Cleaning...

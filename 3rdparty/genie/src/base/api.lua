@@ -4,708 +4,10 @@
 -- Copyright (c) 2002-2011 Jason Perkins and the Premake project
 --
 
+premake.fields = {}
 
---
--- Here I define all of the getter/setter functions as metadata. The actual
--- functions are built programmatically below.
---
 
-	premake.fields =
-	{
-		archivesplit_size =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		basedir =
-		{
-			kind  = "path",
-			scope = "container",
-		},
-
-		buildaction =
-		{
-			kind  = "string",
-			scope = "config",
-			allowed = {
-				"Compile",
-				"Copy",
-				"Embed",
-				"None"
-			}
-		},
-
-		buildoptions =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		buildoptions_asm =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		buildoptions_c =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		buildoptions_cpp =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		buildoptions_objc =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		buildoptions_objcpp =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		buildoptions_vala =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		clrreferences =
-		{
-			kind = "list",
-			scope = "container",
-		},
-
-		configurations =
-		{
-			kind  = "list",
-			scope = "solution",
-		},
-
-		custombuildtask =
-		{
-			kind  = "table",
-			scope = "config",
-		},
-
-		debugargs =
-		{
-			kind = "list",
-			scope = "config",
-		},
-
-		debugdir =
-		{
-			kind = "path",
-			scope = "config",
-		},
-
-		debugenvs  =
-		{
-			kind = "list",
-			scope = "config",
-		},
-
-		defines =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		deploymentoptions =
-		{
-			kind  = "list",
-			scope = "config",
-			usagecopy = true,
-		},
-
-		dependency =
-		{
-			kind  = "table",
-			scope = "config",
-		},
-
-		deploymode =
-		{
-			kind = "string",
-			scope = "config",
-		},
-
-		excludes =
-		{
-			kind  = "filelist",
-			scope = "config",
-		},
-
-		forcenative =
-		{
-			kind = "filelist",
-			scope = "config",
-		},
-
-		nopch =
-		{
-			kind  = "filelist",
-			scope = "config",
-		},
-
-		files =
-		{
-			kind  = "filelist",
-			scope = "config",
-		},
-
-		removefiles =
-		{
-			kind  = "filelist",
-			scope = "config",
-		},
-
-		flags =
-		{
-			kind  = "list",
-			scope = "config",
-			isflags = true,
-			usagecopy = true,
-			allowed = function(value)
-
-				local allowed_flags = {
-					ATL = 1,
-					C7DebugInfo = 1,
-					DebugEnvsDontMerge = 1,
-					DebugEnvsInherit = 1,
-					DeploymentContent = 1,
-					EnableMinimalRebuild = 1,
-					EnableSSE = 1,
-					EnableSSE2 = 1,
-					EnableAVX = 1,
-					EnableAVX2 = 1,
-					PedanticWarnings = 1,
-					ExtraWarnings = 1,
-					FatalWarnings = 1,
-					FloatFast = 1,
-					FloatStrict = 1,
-					Managed = 1,
-					MinimumWarnings = 1,
-					MFC = 1,
-					NativeWChar = 1,
-					No64BitChecks = 1,
-					NoBufferSecurityCheck = 1,
-					NoEditAndContinue = 1,
-					NoExceptions = 1,
-					NoFramePointer = 1,
-					NoImportLib = 1,
-					NoIncrementalLink = 1,
-					NoManifest = 1,
-					NoMultiProcessorCompilation = 1,
-					NoNativeWChar = 1,
-					NoPCH = 1,
-					NoRTTI = 1,
-					NoWinMD = 1,    -- explicitly disables Windows Metadata
-					NoWinRT = 1,    -- explicitly disables Windows Runtime Extension
-					FastCall = 1,
-					StdCall = 1,
-					SingleOutputDir = 1,
-					ObjcARC = 1,
-					Optimize = 1,
-					OptimizeSize = 1,
-					OptimizeSpeed = 1,
-					DebugRuntime = 1,
-					ReleaseRuntime = 1,
-					SEH = 1,
-					StaticATL = 1,
-					StaticRuntime = 1,
-					Symbols = 1,
-					Unicode = 1,
-					Unsafe = 1,
-					UnsignedChar = 1,
-					UseFullPaths = 1,
-					WinMain = 1,
-				}
-
-				local englishToAmericanSpelling =
-				{
-					optimise = 'optimize',
-					optimisesize = 'optimizesize',
-					optimisespeed = 'optimizespeed',
-				}
-
-				local lowervalue = value:lower()
-				lowervalue = englishToAmericanSpelling[lowervalue] or lowervalue
-				for v, _ in pairs(allowed_flags) do
-					if v:lower() == lowervalue then
-						return v
-					end
-				end
-				return nil, "invalid flag"
-			end,
-		},
-
-		framework =
-		{
-			kind = "string",
-			scope = "container",
-			allowed = {
-				"1.0",
-				"1.1",
-				"2.0",
-				"3.0",
-				"3.5",
-				"4.0",
-				"4.5",
-				"4.5.1",
-				"4.5.2",
-				"4.6",
-				"4.6.1",
-				"4.6.2",
-			}
-		},
-
-		windowstargetplatformversion =
-		{
-			kind  = "string",
-			scope = "project",
-		},
-
-		windowstargetplatformminversion =
-		{
-			kind = "string",
-			scope = "project",
-		},
-
-		forcedincludes =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		imagepath =
-		{
-			kind = "path",
-			scope = "config",
-		},
-
-		imageoptions =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		implibdir =
-		{
-			kind  = "path",
-			scope = "config",
-		},
-
-		implibextension =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		implibname =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		implibprefix =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		implibsuffix =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		includedirs =
-		{
-			kind  = "dirlist",
-			scope = "config",
-			usagecopy = true,
-		},
-
-		userincludedirs =
-		{
-			kind  = "dirlist",
-			scope = "config",
-			usagecopy = true,
-		},
-
-		usingdirs =
-		{
-			kind  = "dirlist",
-			scope = "config",
-			usagecopy = true,
-		},
-
-		kind =
-		{
-			kind  = "string",
-			scope = "config",
-			allowed = {
-				"ConsoleApp",
-				"WindowedApp",
-				"StaticLib",
-				"SharedLib",
-				"Bundle",
-			}
-		},
-
-		language =
-		{
-			kind  = "string",
-			scope = "container",
-			allowed = {
-				"C",
-				"C++",
-				"C#",
-				"Vala",
-				"Swift",
-			}
-		},
-
-		libdirs =
-		{
-			kind  = "dirlist",
-			scope = "config",
-			linkagecopy = true,
-		},
-
-		linkoptions =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		links =
-		{
-			kind  = "list",
-			scope = "config",
-			allowed = function(value)
-				-- if library name contains a '/' then treat it as a path to a local file
-				if value:find('/', nil, true) then
-					value = path.getabsolute(value)
-				end
-				return value
-			end,
-			linkagecopy = true,
-			mergecopiestotail = true,
-		},
-
-		location =
-		{
-			kind  = "path",
-			scope = "container",
-		},
-
-		makesettings =
-		{
-			kind = "list",
-			scope = "config",
-		},
-
-
-		messageskip =
-		{
-			kind  = "list",
-			scope = "solution",
-			isflags = true,
-			usagecopy = true,
-			allowed = function(value)
-
-				local allowed_messages = {
-					SkipCreatingMessage = 1,
-					SkipBuildingMessage = 1,
-					SkipCleaningMessage = 1,
-				}
-
-				local lowervalue = value:lower()
-				for v, _ in pairs(allowed_messages) do
-					if v:lower() == lowervalue then
-						return v
-					end
-				end
-				return nil, "invalid message to skip"
-			end,
-		},
-
-		msgarchiving =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		msgcompile =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		msgprecompile =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		msgcompile_objc =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		msgresource =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		msglinking =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		objdir =
-		{
-			kind  = "path",
-			scope = "config",
-		},
-
-		options =
-		{
-			kind  = "list",
-			scope = "container",
-			isflags = true,
-			usagecopy = true,
-			allowed = function(value)
-
-				local allowed_options = {
-					ForceCPP = 1,
-					ArchiveSplit = 1
-				}
-
-				local lowervalue = value:lower()
-				for v, _ in pairs(allowed_options) do
-					if v:lower() == lowervalue then
-						return v
-					end
-				end
-				return nil, "invalid option"
-			end,
-		},
-
-		pchheader =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		pchsource =
-		{
-			kind  = "path",
-			scope = "config",
-		},
-
-		platforms =
-		{
-			kind  = "list",
-			scope = "solution",
-			allowed = table.keys(premake.platforms),
-		},
-
-		postbuildcommands =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		prebuildcommands =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		postcompiletasks =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		prelinkcommands =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		propertysheets =
-		{
-			kind  = "dirlist",
-			scope = "config",
-		},
-
-		pullmappingfile =
-		{
-			kind  = "path",
-			scope = "config",
-		},
-
-		resdefines =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		resincludedirs =
-		{
-			kind  = "dirlist",
-			scope = "config",
-		},
-
-		resoptions =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		sdkreferences =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		startproject =
-		{
-			kind  = "string",
-			scope = "solution",
-		},
-
-		targetdir =
-		{
-			kind  = "path",
-			scope = "config",
-		},
-
-		targetsubdir =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		targetextension =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		targetname =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		targetprefix =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		targetsuffix =
-		{
-			kind  = "string",
-			scope = "config",
-		},
-
-		trimpaths =
-		{
-			kind = "dirlist",
-			scope = "config",
-		},
-
-		uuid =
-		{
-			kind  = "string",
-			scope = "container",
-			allowed = function(value)
-				local ok = true
-				if (#value ~= 36) then ok = false end
-				for i=1,36 do
-					local ch = value:sub(i,i)
-					if (not ch:find("[ABCDEFabcdef0123456789-]")) then ok = false end
-				end
-				if (value:sub(9,9) ~= "-")   then ok = false end
-				if (value:sub(14,14) ~= "-") then ok = false end
-				if (value:sub(19,19) ~= "-") then ok = false end
-				if (value:sub(24,24) ~= "-") then ok = false end
-				if (not ok) then
-					return nil, "invalid UUID"
-				end
-				return value:upper()
-			end
-		},
-
-		uses =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		vapidirs =
-		{
-			kind  = "dirlist",
-			scope = "config",
-		},
-
-		vpaths =
-		{
-			kind = "keypath",
-			scope = "container",
-		},
-
-		vsimportreferences =
-		{
-			kind = "filelist",
-			scope = "container",
-		},
-
-		-- swift options
-		swiftmodulemaps =
-		{
-			kind  = "filelist",
-			scope = "config",
-		},
-
-		buildoptions_swift =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-
-		linkoptions_swift =
-		{
-			kind  = "list",
-			scope = "config",
-		},
-	}
-
-
---
--- End of metadata
---
-
-
-	premake.check_paths = false
+premake.check_paths = false
 
 --
 -- Check to see if a value exists in a list of values, using a
@@ -999,34 +301,6 @@
 		end
 	end
 
-
-
---
--- Build all of the getter/setter functions from the metadata above.
---
-
-	for name, info in pairs(premake.fields) do
-		_G[name] = function(value)
-			return accessor(name, value)
-		end
-
-		-- list value types get a remove() call too
-		if info.kind == "list"
-		or info.kind == "dirlist"
-		or info.kind == "filelist"
-		or info.kind == "absolutefilelist"
-		then
-			if  name ~= "removefiles"
-			and name ~= "files" then
-				_G["remove"..name] = function(value)
-					premake.remove(name, value)
-				end
-			end
-		end
-	end
-
-
-
 --
 -- Project object constructors.
 --
@@ -1303,7 +577,6 @@
 		table.insert(sln.importedprojects, project)
     end
 
-
 --
 -- Define a new action.
 --
@@ -1336,3 +609,950 @@
 	function enablefilelevelconfig()
 		premake._filelevelconfig = true
 	end
+
+
+
+--
+-- Define a new API field.
+-- Build the getter/setter functions from its metadata.
+--
+-- @param a
+--    The new field/API object.
+--
+
+function newapifield(field)
+	premake.fields[field.name] = field
+
+	_G[field.name] = function(value)
+		return accessor(field.name, value)
+	end
+
+	-- list value types get a remove() call too
+	if field.kind == "list"
+	or field.kind == "dirlist"
+	or field.kind == "filelist"
+	or field.kind == "absolutefilelist"
+	then
+		if  field.name ~= "removefiles"
+		and field.name ~= "files" then
+			_G["remove"..field.name] = function(value)
+				premake.remove(field.name, value)
+			end
+		end
+	end
+end
+
+--
+-- This builds the API functions from their metadata.
+--
+
+	newapifield {
+		name  = "archivesplit_size",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "basedir",
+		kind  = "path",
+		scope = "container",
+	}
+
+	newapifield {
+		name  = "buildaction",
+		kind  = "string",
+		scope = "config",
+		allowed = {
+			"Compile",
+			"Copy",
+			"Embed",
+			"None"
+		}
+	}
+
+	newapifield {
+		name  = "buildoptions",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "buildoptions_asm",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "buildoptions_c",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "buildoptions_cpp",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "buildoptions_objc",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "buildoptions_objcpp",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "buildoptions_vala",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "clrreferences",
+		kind = "list",
+		scope = "container",
+	}
+
+	newapifield {
+		name  = "configurations",
+		kind  = "list",
+		scope = "solution",
+	}
+
+	newapifield {
+		name  = "custombuildtask",
+		kind  = "table",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "debugcmd",
+		kind = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "debugargs",
+		kind = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "debugdir",
+		kind = "path",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "debugenvs" ,
+		kind = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "defines",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "deploymentoptions",
+		kind  = "list",
+		scope = "config",
+		usagecopy = true,
+	}
+
+	newapifield {
+		name  = "dependency",
+		kind  = "table",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "deploymode",
+		kind = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "excludes",
+		kind  = "filelist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "forcenative",
+		kind = "filelist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "nopch",
+		kind  = "filelist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "files",
+		kind  = "filelist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "removefiles",
+		kind  = "filelist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "flags",
+		kind  = "list",
+		scope = "config",
+		isflags = true,
+		usagecopy = true,
+		allowed = function(value)
+			local allowed_flags = {
+				AntBuildDebuggable = 1,
+				ATL = 1,
+				C7DebugInfo = 1,
+				Cpp11 = 1,
+				Cpp14 = 1,
+				Cpp17 = 1,
+				CppLatest = 1,
+				DebugEnvsDontMerge = 1,
+				DebugEnvsInherit = 1,
+				DeploymentContent = 1,
+				EnableMinimalRebuild = 1,
+				EnableSSE = 1,
+				EnableSSE2 = 1,
+				EnableAVX = 1,
+				EnableAVX2 = 1,
+				PedanticWarnings = 1,
+				ExtraWarnings = 1,
+				FatalWarnings = 1,
+				FloatFast = 1,
+				FloatStrict = 1,
+				FullSymbols = 1,
+				Hotpatchable = 1,
+				LinkSupportCircularDependencies = 1,
+				Managed = 1,
+				MinimumWarnings = 1,
+				MFC = 1,
+				NativeWChar = 1,
+				No64BitChecks = 1,
+				NoBufferSecurityCheck = 1,
+				NoEditAndContinue = 1,
+				NoExceptions = 1,
+				NoFramePointer = 1,
+				NoImportLib = 1,
+				NoIncrementalLink = 1,
+				NoJMC = 1,
+				NoManifest = 1,
+				NoMultiProcessorCompilation = 1,
+				NoNativeWChar = 1,
+				NoOptimizeLink = 1,
+				NoPCH = 1,
+				NoRTTI = 1,
+				NoRuntimeChecks = 1,
+				NoWinMD = 1,    -- explicitly disables Windows Metadata
+				NoWinRT = 1,    -- explicitly disables Windows Runtime Extension
+				FastCall = 1,
+				StdCall = 1,
+				SingleOutputDir = 1,
+				ObjcARC = 1,
+				Optimize = 1,
+				OptimizeSize = 1,
+				OptimizeSpeed = 1,
+				DebugRuntime = 1,
+				ReleaseRuntime = 1,
+				SEH = 1,
+				StaticATL = 1,
+				StaticRuntime = 1,
+				Symbols = 1,
+				Unicode = 1,
+				UnitySupport = 1,
+				Unsafe = 1,
+				UnsignedChar = 1,
+				UseFullPaths = 1,
+				UseLDResponseFile = 1,
+				UseObjectResponseFile = 1,
+				WinMain = 1
+			}
+
+			local englishToAmericanSpelling =
+			{
+				nooptimiselink = 'nooptimizelink',
+				optimise = 'optimize',
+				optimisesize = 'optimizesize',
+				optimisespeed = 'optimizespeed',
+			}
+
+			local lowervalue = value:lower()
+			lowervalue = englishToAmericanSpelling[lowervalue] or lowervalue
+			for v, _ in pairs(allowed_flags) do
+				if v:lower() == lowervalue then
+					return v
+				end
+			end
+			return nil, "invalid flag"
+		end,
+	}
+
+	newapifield {
+		name  = "framework",
+		kind = "string",
+		scope = "container",
+		allowed = {
+			"1.0",
+			"1.1",
+			"2.0",
+			"3.0",
+			"3.5",
+			"4.0",
+			"4.5",
+			"4.5.1",
+			"4.5.2",
+			"4.6",
+			"4.6.1",
+			"4.6.2",
+		}
+	}
+
+	newapifield {
+		name  = "iostargetplatformversion",
+		kind  = "string",
+		scope = "project",
+	}
+
+	newapifield {
+		name  = "macostargetplatformversion",
+		kind  = "string",
+		scope = "project",
+	}
+
+	newapifield {
+		name  = "tvostargetplatformversion",
+		kind  = "string",
+		scope = "project",
+	}
+
+	newapifield {
+		name  = "windowstargetplatformversion",
+		kind  = "string",
+		scope = "project",
+	}
+
+	newapifield {
+		name  = "windowstargetplatformminversion",
+		kind = "string",
+		scope = "project",
+	}
+
+	newapifield {
+		name  = "forcedincludes",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "imagepath",
+		kind = "path",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "imageoptions",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "implibdir",
+		kind  = "path",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "implibextension",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "implibname",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "implibprefix",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "implibsuffix",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "includedirs",
+		kind  = "dirlist",
+		scope = "config",
+		usagecopy = true,
+	}
+
+	newapifield {
+		name  = "systemincludedirs",
+		kind  = "dirlist",
+		scope = "config",
+		usagecopy = true,
+	}
+
+	newapifield {
+		name  = "userincludedirs",
+		kind  = "dirlist",
+		scope = "config",
+		usagecopy = true,
+	}
+
+	newapifield {
+		name  = "usingdirs",
+		kind  = "dirlist",
+		scope = "config",
+		usagecopy = true,
+	}
+
+	newapifield {
+		name  = "kind",
+		kind  = "string",
+		scope = "config",
+		allowed = {
+			"ConsoleApp",
+			"WindowedApp",
+			"StaticLib",
+			"SharedLib",
+			"Bundle",
+		}
+	}
+
+	newapifield {
+		name  = "language",
+		kind  = "string",
+		scope = "container",
+		allowed = {
+			"C",
+			"C++",
+			"C#",
+			"Vala",
+			"Swift",
+		}
+	}
+
+	newapifield {
+		name  = "libdirs",
+		kind  = "dirlist",
+		scope = "config",
+		linkagecopy = true,
+	}
+
+	newapifield {
+		name  = "linkoptions",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "links",
+		kind  = "list",
+		scope = "config",
+		allowed = function(value)
+			-- if library name contains a '/' then treat it as a path to a local file
+			if value:find('/', nil, true) then
+				value = path.getabsolute(value)
+			end
+			return value
+		end,
+		linkagecopy = true,
+		mergecopiestotail = true,
+	}
+
+	newapifield {
+		name  = "location",
+		kind  = "path",
+		scope = "container",
+	}
+
+	newapifield {
+		name  = "makesettings",
+		kind = "list",
+		scope = "config",
+	}
+
+
+	newapifield {
+		name  = "messageskip",
+		kind  = "list",
+		scope = "solution",
+		isflags = true,
+		usagecopy = true,
+		allowed = function(value)
+			local allowed_messages = {
+				SkipCreatingMessage = 1,
+				SkipBuildingMessage = 1,
+				SkipCleaningMessage = 1,
+			}
+
+			local lowervalue = value:lower()
+			for v, _ in pairs(allowed_messages) do
+				if v:lower() == lowervalue then
+					return v
+				end
+			end
+			return nil, "invalid message to skip"
+		end,
+	}
+
+	newapifield {
+		name  = "msgarchiving",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "msgcompile",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "msgprecompile",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "msgcompile_objc",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "msgresource",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "msglinking",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "objdir",
+		kind  = "path",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "options",
+		kind  = "list",
+		scope = "container",
+		isflags = true,
+		usagecopy = true,
+		allowed = function(value)
+			local allowed_options = {
+				ForceCPP = 1,
+				ArchiveSplit = 1,
+				SkipBundling = 1,
+				XcodeLibrarySchemes = 1,
+				XcodeSchemeNoConfigs = 1,
+			}
+
+			local lowervalue = value:lower()
+			for v, _ in pairs(allowed_options) do
+				if v:lower() == lowervalue then
+					return v
+				end
+			end
+			return nil, "invalid option"
+		end,
+	}
+
+	newapifield {
+		name  = "pchheader",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "pchsource",
+		kind  = "path",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "platforms",
+		kind  = "list",
+		scope = "solution",
+		allowed = table.keys(premake.platforms),
+	}
+
+	newapifield {
+		name  = "postbuildcommands",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "prebuildcommands",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "postcompiletasks",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "prelinkcommands",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "propertysheets",
+		kind  = "dirlist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "pullmappingfile",
+		kind  = "path",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "applicationdatadir",
+		kind  = "path",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "finalizemetasource",
+		kind  = "path",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "resdefines",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "resincludedirs",
+		kind  = "dirlist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "resoptions",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "sdkreferences",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "startproject",
+		kind  = "string",
+		scope = "solution",
+	}
+
+	newapifield {
+		name  = "targetdir",
+		kind  = "path",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "targetsubdir",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "targetextension",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "targetname",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "targetprefix",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "targetsuffix",
+		kind  = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "trimpaths",
+		kind = "dirlist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "uuid",
+		kind  = "string",
+		scope = "container",
+		allowed = function(value)
+			local ok = true
+			if (#value ~= 36) then ok = false end
+			for i=1,36 do
+				local ch = value:sub(i,i)
+				if (not ch:find("[ABCDEFabcdef0123456789-]")) then ok = false end
+			end
+			if (value:sub(9,9) ~= "-")   then ok = false end
+			if (value:sub(14,14) ~= "-") then ok = false end
+			if (value:sub(19,19) ~= "-") then ok = false end
+			if (value:sub(24,24) ~= "-") then ok = false end
+			if (not ok) then
+				return nil, "invalid UUID"
+			end
+			return value:upper()
+		end
+	}
+
+	newapifield {
+		name  = "uses",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "vapidirs",
+		kind  = "dirlist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "vpaths",
+		kind = "keypath",
+		scope = "container",
+	}
+
+	newapifield {
+		name  = "vsimportreferences",
+		kind = "filelist",
+		scope = "container",
+	}
+
+	newapifield {
+		name  = "dpiawareness",
+		kind = "string",
+		scope = "config",
+		allowed = {
+			"None",
+			"High",
+			"HighPerMonitor",
+		}
+	}
+
+	newapifield {
+		name  = "xcodeprojectopts",
+		kind = "table",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "xcodetargetopts",
+		kind = "table",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "xcodescriptphases",
+		kind  = "table",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "xcodecopyresources",
+		kind  = "table",
+		scope = "project",
+	}
+
+	newapifield {
+		name  = "xcodecopyframeworks",
+		kind  = "filelist",
+		scope = "project",
+	}
+
+	newapifield {
+		name  = "wholearchive",
+		kind  = "list",
+		scope = "config",
+	}
+
+		-- swift options
+	newapifield {
+		name  = "swiftmodulemaps",
+		kind  = "filelist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "buildoptions_swift",
+		kind  = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "linkoptions_swift",
+		kind  = "list",
+		scope = "config",
+	}
+
+		-- Tegra Android options
+	newapifield {
+		name  = "androidtargetapi",
+		kind = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "androidminapi",
+		kind = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "androidarch",
+		kind = "string",
+		scope = "config",
+		allowed = {
+			"armv7-a",
+			"armv7-a-hard",
+			"arm64-v8a",
+			"x86",
+			"x86_64",
+		}
+	}
+
+	newapifield {
+		name  = "androidndktoolchainversion",
+		kind = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "androidstltype",
+		kind = "string",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "androidcppstandard",
+		kind = "string",
+		scope = "config",
+		allowed = {
+			"c++98",
+			"c++11",
+			"c++1y",
+			"gnu++98",
+			"gnu++11",
+			"gnu++1y",
+		}
+	}
+
+	newapifield {
+		name  = "androidlinker",
+		kind = "string",
+		scope = "config",
+		allowed = {
+			"bfd",
+			"gold",
+		}
+	}
+
+	newapifield {
+		name  = "androiddebugintentparams",
+		kind = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "antbuildjavasourcedirs",
+		kind = "dirlist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "antbuildjardirs",
+		kind = "dirlist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "antbuildjardependencies",
+		kind = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "antbuildnativelibdirs",
+		kind = "dirlist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "antbuildnativelibdependencies",
+		kind = "list",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "antbuildassetsdirs",
+		kind = "dirlist",
+		scope = "config",
+	}
+
+	newapifield {
+		name  = "postsolutioncallbacks",
+		kind  = "list",
+		scope = "solution",
+	}
+
+	newapifield {
+		name  = "postprojectcallbacks",
+		kind  = "list",
+		scope = "project",
+	}
+
+--
+-- End of API
+--

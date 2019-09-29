@@ -1,22 +1,22 @@
 --
 -- vs2015.lua
--- Baseline support for Visual Studio 2017.
+-- Baseline support for Visual Studio 2019.
 --
 
-	premake.vstudio.vc2017 = {}
-	local vc2017 = premake.vstudio.vc2017
+	premake.vstudio.vc2019 = {}
+	local vc2019 = premake.vstudio.vc2019
 	local vstudio = premake.vstudio
 
 
 ---
--- Register a command-line action for Visual Studio 2017.
+-- Register a command-line action for Visual Studio 2019.
 ---
 
 	newaction
 	{
-		trigger         = "vs2017",
-		shortname       = "Visual Studio 2017",
-		description     = "Generate Microsoft Visual Studio 2017 project files",
+		trigger         = "vs2019",
+		shortname       = "Visual Studio 2019",
+		description     = "Generate Microsoft Visual Studio 2019 project files",
 		os              = "windows",
 
 		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
@@ -55,9 +55,9 @@
 
 		vstudio = {
 			solutionVersion = "12",
-			targetFramework = "4.5.2",
-			toolsVersion    = "15.0",
-			windowsTargetPlatformVersion = "8.1",
+			targetFramework = "4.7.2",
+			toolsVersion    = "16.0",
+			windowsTargetPlatformVersion = "10.0",
 			supports64bitEditContinue    = true,
 			intDirAbsolute  = false,
 		}
