@@ -66,8 +66,9 @@ public:
 	{
 		PSG_DEFAULT = 0x0,
 		PSG_PIN26_IS_CLKSEL = 0x1,
-		PSG_EXTENDED_ENVELOPE = 0x2,
-		PSG_HAS_EXPANDED_MODE = 0x4
+		PSG_HAS_INTERNAL_DIVIDER = 0x2,
+		PSG_EXTENDED_ENVELOPE = 0x4,
+		PSG_HAS_EXPANDED_MODE = 0x8
 	};
 
 	// construction/destruction
@@ -388,6 +389,14 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(YMZ294, ymz294_device)
+
+class sunsoft_5b_sound_device : public ay8910_device
+{
+public:
+	sunsoft_5b_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+DECLARE_DEVICE_TYPE(SUNSOFT_5B_SOUND, sunsoft_5b_sound_device)
 
 
 #endif // MAME_DEVICES_SOUND_AY8910_H
