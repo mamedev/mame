@@ -28,6 +28,13 @@
 #include <string>
 #include <utility>
 
+// Workaround for return value optimization failure in some older versions of clang
+#if defined(__APPLE__) && defined(__clang__) && __clang_major__ < 8
+#define MOVE_UNIQUE_PTR(x) (std::move(x))
+#else
+#define MOVE_UNIQUE_PTR(x) (x)
+#endif
+
 
 
 DEFINE_DEVICE_TYPE(NETLIST_CORE,  netlist_mame_device,       "netlist_core",  "Netlist Core Device")
@@ -318,7 +325,7 @@ plib::unique_ptr<std::istream> netlist_source_memregion_t::stream(const pstring 
 		memory_region *mem = m_dev.memregion(m_name.c_str());
 		auto ret(plib::make_unique<std::istringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes())));
 		ret->imbue(std::locale::classic());
-		return ret;
+		return MOVE_UNIQUE_PTR(ret);
 	}
 	else
 		throw memregion_not_set("memregion unavailable for {1} in source {2}", name, m_name);
@@ -359,7 +366,7 @@ plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &
 		{
 			auto ret(plib::make_unique<std::istringstream>(std::string(reinterpret_cast<char *>(mem->base()), mem->bytes()), std::ios_base::binary));
 			ret->imbue(std::locale::classic());
-			return ret;
+			return MOVE_UNIQUE_PTR(ret);
 		}
 		else
 			return plib::unique_ptr<std::istream>(nullptr);
@@ -371,7 +378,7 @@ plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &
 		{
 			auto ret(plib::make_unique<std::istringstream>(std::ios_base::binary));
 			ret->imbue(std::locale::classic());
-			return ret;
+			return MOVE_UNIQUE_PTR(ret);
 		}
 		else
 			return plib::unique_ptr<std::istream>(nullptr);
