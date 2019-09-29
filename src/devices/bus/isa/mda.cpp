@@ -1060,13 +1060,7 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::crtc_update_row )
   Trivia: https://www.pinterest.se/pin/203084264425177097/
  */
 
-#define EPC_MDA_SCREEN "epc_mda_screen"
-
-#if 0
-static GFXDECODE_START( pcepc )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
-GFXDECODE_END
-#endif
+#define EPC_MDA_SCREEN "epc_mda_screen" // TODO: use a device finder reference instead
 
 ROM_START( epc )
 	ROM_REGION(0x2000,"chargen", 0)

@@ -297,11 +297,14 @@ WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
 	if (state == CLEAR_LINE)
 	{
 		m_mcu->resume(SUSPEND_REASON_RESET);
+		//m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		LOGRST("KBD: Keyboard mcu reset line is cleared\n");
 	}
 	else
 	{
-		m_mcu->suspend(SUSPEND_REASON_RESET, 0);
+		// set_input_line suspends with a true argument which causes "Keyboard error" 
+		m_mcu->suspend(SUSPEND_REASON_RESET, false);
+		//m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		LOGRST("KBD: Keyboard mcu reset line is asserted\n");
 	}
 
@@ -313,8 +316,6 @@ WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
 
 void eispc_keyboard_device::device_reset()
 {
-	LOGRST("KBD: Keyboard is in reset until host computer explicitly releases the reset line\n");
-	m_mcu->suspend(SUSPEND_REASON_RESET, 0);
 	for (auto & elem : m_keys) elem = 0;
 }
 
