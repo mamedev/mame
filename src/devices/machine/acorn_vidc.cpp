@@ -372,8 +372,8 @@ inline void acorn_vidc10_device::refresh_stereo_image(uint8_t channel)
 	    -001 full left
 	    -000 "undefined" TODO: verify what it actually means
 	*/
-	const float left_gain[8] = { 1.0, 2.0, 1.66, 1.34, 1.0, 0.66, 0.34, 0.0 };
-	const float right_gain[8] = { 1.0, 0.0, 0.34, 0.66, 1.0, 1.34, 1.66, 2.0 };
+	const float left_gain[8] = { 1.0f, 2.0f, 1.66f, 1.34f, 1.0f, 0.66f, 0.34f, 0.0f };
+	const float right_gain[8] = { 1.0f, 0.0f, 0.34f, 0.66f, 1.0f, 1.34f, 1.66f, 2.0f };
 
 	m_lspeaker->set_input_gain(channel,left_gain[m_stereo_image[channel]]*m_sound_input_gain);
 	m_rspeaker->set_input_gain(channel,right_gain[m_stereo_image[channel]]*m_sound_input_gain);

@@ -12,6 +12,8 @@
 #ifndef MAME_BUS_SMS_CTRL_SMSCTRL_H
 #define MAME_BUS_SMS_CTRL_SMSCTRL_H
 
+#include "screen.h"
+
 #pragma once
 
 
