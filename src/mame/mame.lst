@@ -2486,6 +2486,7 @@ bam16a0							// VIP-M21502A BAM16-A0 motherboard (286)
 cmpa286							// CMP enterprise CO.LTD. motherboard (286)
 suntac5							// 286 motherboards using the 5-chip SUNTAC chipset
 ht12a                           // 286 motherboards using the Headland HT12/A chipset
+ht18c							// 286 motherboards using the Headland HT18/C chipset
 vlsi5							// 286 motherboards using the 5-chip VLSI chipset
 sy012							// SY-012 16/25 386MB VER: 5.2 motherboard (386)
 frxc402							// 386 motherboards using FOREX FRX46C402/FRX36C300/SIS85C206 chips
@@ -2497,6 +2498,9 @@ cs8230							// Motherboards using the Chips CS8230 chipset (386)
 mx83c305						// Motherboards using the MX83C305(A)(FC), MX83C05(A)(FC) chipset
 386sc							// 386 SC Rev A2 motherboard
 386sc2c							//
+td60c							// TD60C motherboard (286)
+td70n							// TD70N motherboard (386sx)
+td70a							// TD70A and TD70AN motherboards (386sx)
 opti495slc						// Motherboards using the OPTi495SLC chipset (386)
 opti495xlc						// Motherboards using the OPTi 82C495XLC chipset (386)
 fic4386vchd						// FIC 4386-VC-HD motherboard (386)
