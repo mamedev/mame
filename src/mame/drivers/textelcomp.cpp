@@ -12,7 +12,9 @@
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
 #include "machine/msm58321.h"
-//#include "video/sed1330.h"
+#include "video/sed1330.h"
+#include "emupal.h"
+#include "screen.h"
 
 
 class textelcomp_state : public driver_device
@@ -32,6 +34,8 @@ private:
 	void rtc_w(u8 data);
 
 	void mem_map(address_map &map);
+	void lcdc_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<msm58321_device> m_rtc;
 	required_region_ptr<u8> m_chargen;
@@ -76,11 +80,17 @@ void textelcomp_state::mem_map(address_map &map)
 	map(0x1f20, 0x1f2f).m("via2", FUNC(via6522_device::map));
 	map(0x1f30, 0x1f3f).m("via3", FUNC(via6522_device::map));
 	map(0x1f40, 0x1f43).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x1f70, 0x1f70).noprw();//rw("lcdc", FUNC(sed1330_device::status_r), FUNC(sed1330_device::data_w));
-	map(0x1f71, 0x1f71).noprw();//rw("lcdc", FUNC(sed1330_device::data_r), FUNC(sed1330_device::command_w));
-	map(0x4000, 0x7fff).ram(); // HY65226ALP-10 (battery backed?)
+	map(0x1f70, 0x1f70).rw("lcdc", FUNC(sed1330_device::status_r), FUNC(sed1330_device::data_w));
+	map(0x1f71, 0x1f71).rw("lcdc", FUNC(sed1330_device::data_r), FUNC(sed1330_device::command_w));
+	map(0x4000, 0x7fff).ram(); // HY62256ALP-10 (battery backed?)
 	map(0x8000, 0x9fff).ram(); // MB8464A-10L (battery backed?)
 	map(0xa000, 0xffff).rom().region("maincpu", 0x2000);
+}
+
+void textelcomp_state::lcdc_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0xf000, 0xffff).rom().region("chargen", 0x1000);
 }
 
 
@@ -116,7 +126,18 @@ void textelcomp_state::textelcomp(machine_config &config)
 	acia.set_xtal(3.6864_MHz_XTAL / 2);
 	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	//SED1330(config, "lcdc", 6.4_MHz_XTAL); // SED1330F + B&W LCD
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_size(480, 128);
+	screen.set_visarea(0, 480-1, 0, 128-1);
+	screen.set_palette("palette");
+	screen.set_screen_update("lcdc", FUNC(sed1330_device::screen_update));
+
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	sed1330_device &lcdc(SED1330(config, "lcdc", 6.4_MHz_XTAL)); // SED1330F + B&W LCD
+	lcdc.set_addrmap(0, &textelcomp_state::lcdc_map);
+	lcdc.set_screen("screen");
 
 	MSM58321(config, m_rtc, 32.768_kHz_XTAL); // RTC58321A
 	m_rtc->d0_handler().set("via3", FUNC(via6522_device::write_pa0));

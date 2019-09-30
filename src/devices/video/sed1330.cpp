@@ -33,9 +33,9 @@
 #define INSTRUCTION_HDOT_SCR        0x5a
 #define INSTRUCTION_OVLAY           0x5b
 #define INSTRUCTION_CSRW            0x46
-#define INSTRUCTION_CSRR            0x47    // unimplemented
+#define INSTRUCTION_CSRR            0x47
 #define INSTRUCTION_MWRITE          0x42
-#define INSTRUCTION_MREAD           0x43    // unimplemented
+#define INSTRUCTION_MREAD           0x43
 
 
 #define CSRDIR_RIGHT                0x00
@@ -235,7 +235,8 @@ device_memory_interface::space_config_vector sed1330_device::memory_space_config
 
 READ8_MEMBER( sed1330_device::status_r )
 {
-	LOG("SED1330 Status Read: %s\n", m_bf ? "busy" : "ready");
+	if (!machine().side_effects_disabled())
+		LOG("SED1330 Status Read: %s\n", m_bf ? "busy" : "ready");
 
 	return m_bf << 6;
 }
@@ -280,11 +281,44 @@ WRITE8_MEMBER( sed1330_device::command_w )
 
 READ8_MEMBER( sed1330_device::data_r )
 {
-	uint8_t data = readbyte(m_csr);
+	uint8_t data = 0;
 
-	LOG("SED1330 Memory Read %02x from %04x\n", data, m_csr);
+	switch (m_ir)
+	{
+	case INSTRUCTION_MREAD:
+		data = readbyte(m_csr);
+		if (!machine().side_effects_disabled())
+		{
+			LOG("SED1330 Memory Read %02x from %04x\n", data, m_csr);
+			increment_csr();
+		}
+		break;
 
-	increment_csr();
+	case INSTRUCTION_CSRR:
+		switch (m_pbc)
+		{
+		case 0:
+			data = m_csr & 0xff;
+			break;
+
+		case 1:
+			data = (m_csr & 0xff00) >> 8;
+			break;
+
+		default:
+			logerror("SED1330 Invalid parameter byte %02x\n", data);
+		}
+		if (!machine().side_effects_disabled())
+		{
+			LOG("SED1330 Cursor Byte %d Read %02x\n", m_pbc, data);
+			m_pbc++;
+		}
+		break;
+
+	default:
+		logerror("SED1330 Unsupported instruction %02x\n", m_ir);
+		break;
+	}
 
 	return data;
 }
