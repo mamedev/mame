@@ -194,7 +194,7 @@ public:
 	bool operator>(const pstring_t &string) const { return (compare(string) > 0); }
 	bool operator>=(const pstring_t &string) const { return (compare(string) >= 0); }
 
-	friend std::ostream& operator<<(std::ostream &ostrm, const pstring_t &str)
+	friend auto operator<<(std::basic_ostream<typename string_type::value_type> &ostrm, const pstring_t &str) -> std::basic_ostream<typename string_type::value_type> &
 	{
 		ostrm << str.m_str;
 		return ostrm;
