@@ -47,8 +47,8 @@
 			return result
 		else
 			-- handle simple replacements
-			result = value:gsub(" ", "\\ ")
-			result = result:gsub("\"", "\\\"")
+			--result = value:gsub(" ", "\\ ")
+			--result = result:gsub("\"", "\\\"")
 			return result
 		end
 	end
