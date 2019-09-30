@@ -49,7 +49,8 @@
 			-- handle simple replacements
 			--result = value:gsub(" ", "\\ ")
 			--result = result:gsub("\"", "\\\"")
-			return result
+			--return result
+			return value
 		end
 	end
 
