@@ -55,6 +55,7 @@ newoption {
 		{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
 		{ "vs2017-clang",  "Clang 3.6"         },
 		{ "vs2017-xp",     "Visual Studio 2017 targeting XP" },
+		{ "clangcl",       "Visual Studio 2019 using Clang/LLVM" },
 		{ "winphone8",     "Windows Phone 8.0" },
 		{ "winphone81",    "Windows Phone 8.1" },
 		{ "winstore81",    "Windows Store 8.1" },
@@ -451,6 +452,12 @@ function toolchain(_buildDir, _subDir)
 		if ("vs2017-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v141_xp")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
+		end
+	elseif _ACTION == "vs2019" or _ACTION == "vs2019-fastbuild" then
+
+		if ("clangcl") == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("ClangCL")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
 		end
 	elseif _ACTION == "xcode4" then
 
