@@ -107,8 +107,6 @@ void textelcomp_state::textelcomp(machine_config &config)
 
 	via6522_device &via0(VIA6522(config, "via0", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
 	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
-	// TODO: CA1 falling edge generates interrupt
-	// TODO: PB6 falling edges are counted to generate another interrupt
 
 	VIA6522(config, "via1", 3.6864_MHz_XTAL / 2); // GS65SC22P-2
 	// IRQ might be connected on hardware, but is never enabled
@@ -144,6 +142,7 @@ void textelcomp_state::textelcomp(machine_config &config)
 	m_rtc->d1_handler().set("via3", FUNC(via6522_device::write_pa1));
 	m_rtc->d2_handler().set("via3", FUNC(via6522_device::write_pa2));
 	m_rtc->d3_handler().set("via3", FUNC(via6522_device::write_pa3));
+	m_rtc->busy_handler().set("via0", FUNC(via6522_device::write_ca1)); // source of periodic falling edge interrupt?
 }
 
 
