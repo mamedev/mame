@@ -2877,7 +2877,32 @@ void tlcs90_device::state_string_export(const device_state_entry &entry, std::st
 	}
 }
 
-std::unique_ptr<util::disasm_interface> tlcs90_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tmp90840_device::create_disassembler()
 {
-	return std::make_unique<tlcs90_disassembler>();
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp90841_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp90845_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp91640_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp91641_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp90ph44_device::create_disassembler()
+{
+	return std::make_unique<tmp90844_disassembler>();
 }
