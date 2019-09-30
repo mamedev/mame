@@ -351,19 +351,21 @@ void textelcomp_state::textelcomp(machine_config &config)
 	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_color(rgb_t(0x00, 0xff, 0x80));
 	screen.set_refresh_hz(50);
 	screen.set_size(640, 201);
 	screen.set_visarea(0, 640-1, 0, 201-1);
 	screen.set_palette("palette");
 	screen.set_screen_update("lcdc", FUNC(sed1330_device::screen_update));
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	sed1330_device &lcdc(SED1330(config, "lcdc", 6.4_MHz_XTAL)); // SED1330F + B&W LCD
 	lcdc.set_addrmap(0, &textelcomp_state::lcdc_map);
 	lcdc.set_screen("screen");
 
 	MSM58321(config, m_rtc, 32.768_kHz_XTAL); // RTC58321A
+	m_rtc->set_default_24h(true);
 	m_rtc->d0_handler().set("via3", FUNC(via6522_device::write_pa0));
 	m_rtc->d1_handler().set("via3", FUNC(via6522_device::write_pa1));
 	m_rtc->d2_handler().set("via3", FUNC(via6522_device::write_pa2));
