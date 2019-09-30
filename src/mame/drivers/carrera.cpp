@@ -3,7 +3,7 @@
 /*
 
 This is a simple 'Pairs' game called
-Carrera by BS Electronics
+Carrera or Bomberman by BS Electronics
 
 
 
@@ -37,7 +37,6 @@ Notes:
 
 Emulation Notes:
  Corrupt Tile on the first R in Carrera? (unlikely to be a bug, HW is very simple..)
- There is also a 'Bomberman' title in the GFX roms, unused from what I can see.
 
 TODO:
 - Are colors 100% correct? Needs a reference to be sure.
@@ -72,9 +71,9 @@ public:
 
 private:
 	DECLARE_READ8_MEMBER(unknown_r);
-	void carrera_palette(palette_device &palette) const;
-	uint32_t screen_update_carrera(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void carrera_map(address_map &map);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void prg_map(address_map &map);
 	void io_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_tileram;
@@ -84,13 +83,13 @@ private:
 };
 
 
-void carrera_state::carrera_map(address_map &map)
+void carrera_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xe800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xe801, 0xe801).w("crtc", FUNC(mc6845_device::register_w));
-	map(0xf000, 0xffff).ram().share("tileram");
+	map(0xf000, 0xffff).ram().share(m_tileram);
 }
 
 void carrera_state::io_map(address_map &map)
@@ -117,9 +116,7 @@ static INPUT_PORTS_START( carrera )
 	PORT_DIPNAME( 0x20, 0x20, "0" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_NAME("Master Reset")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -268,14 +265,13 @@ static GFXDECODE_START( gfx_carrera )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-uint32_t carrera_state::screen_update_carrera(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t carrera_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
 	int count = 0;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<64;x++)
+		for (int x = 0; x < 64; x++)
 		{
 			int tile = m_tileram[count&0x7ff] | m_tileram[(count&0x7ff)+0x800]<<8;
 
@@ -291,7 +287,7 @@ READ8_MEMBER(carrera_state::unknown_r)
 	return machine().rand();
 }
 
-void carrera_state::carrera_palette(palette_device &palette) const
+void carrera_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 	for (int i = 0; i < 0x20; ++i)
@@ -319,7 +315,7 @@ void carrera_state::carrera(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK / 6);
-	m_maincpu->set_addrmap(AS_PROGRAM, &carrera_state::carrera_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &carrera_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &carrera_state::io_map);
 
 	/* video hardware */
@@ -328,7 +324,7 @@ void carrera_state::carrera(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(carrera_state::screen_update_carrera));
+	screen.set_screen_update(FUNC(carrera_state::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
 	crtc.set_screen("screen");
@@ -337,7 +333,7 @@ void carrera_state::carrera(machine_config &config)
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_carrera);
-	PALETTE(config, m_palette, FUNC(carrera_state::carrera_palette), 32);
+	PALETTE(config, m_palette, FUNC(carrera_state::palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -365,5 +361,20 @@ ROM_START( carrera )
 	ROM_LOAD( "82s123.ic39", 0x00, 0x20, CRC(af16359f) SHA1(1ff5c9d7807e52be09c0ded56fb68a47e41b3fcf) )
 ROM_END
 
+ROM_START( bsebman )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic22", 0x00000, 0x10000, CRC(294a205f) SHA1(b088617354b6a37520060f19f77d841ad8ee1538) )
 
-GAME( 19??, carrera, 0, carrera, carrera, carrera_state, empty_init, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )
+	ROM_REGION( 0x50000, "gfx1", 0 )
+	ROM_LOAD( "ic1", 0x00000, 0x10000, CRC(bf4868e1) SHA1(ca91343dbdb9f43d9b981b9b3f958edb17bf188d) )
+	ROM_LOAD( "ic2", 0x10000, 0x10000, CRC(26e1c17e) SHA1(ea0669e87207104eeaa3eae6a6708dbdf94e3c3c) )
+	ROM_LOAD( "ic3", 0x20000, 0x10000, CRC(8401248d) SHA1(f8c8ed93d76709ead0b262ab3039df6febe3c005) )
+	ROM_LOAD( "ic4", 0x30000, 0x10000, CRC(6b569989) SHA1(e00263fae310094ad5119e3a9673fb342f643ddc) )
+	ROM_LOAD( "ic5", 0x40000, 0x10000, CRC(21635791) SHA1(514078694269582c33fb7dddd6171089f9e21ee2) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "82s123.ic39", 0x00, 0x20, BAD_DUMP CRC(af16359f) SHA1(1ff5c9d7807e52be09c0ded56fb68a47e41b3fcf) ) // BPROM had broken legs, not dumped for now, probably same as carrera
+ROM_END
+
+GAME( 19??, carrera, 0,       carrera, carrera, carrera_state, empty_init, ROT0, "BS Electronics", "Carrera (Version 6.7)",   MACHINE_SUPPORTS_SAVE )
+GAME( 19??, bsebman, carrera, carrera, carrera, carrera_state, empty_init, ROT0, "BS Electronics", "Bomberman (Version 6.6)", MACHINE_SUPPORTS_SAVE )
