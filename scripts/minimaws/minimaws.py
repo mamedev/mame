@@ -26,8 +26,9 @@
 ## $ python minimaws.py listclones "unkch*"
 ## $ python minimaws.py listbrothers superx
 ##
-## The romident command does not support archives, but it's far faster
-## than using MAME as it has optimised indexes:
+## The romident command does not support archives or software lists, but
+## it's far faster than using MAME as it has optimised indexes, and
+## results are grouped by machine rather than by file:
 ##
 ## $ python minimaws.py romident 27c64.bin dump-dir
 ##
