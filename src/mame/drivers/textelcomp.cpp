@@ -26,7 +26,11 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%X", 0U)
+		, m_leds(*this, "led%u", 0U)
 		, m_keyscan(0)
+		, m_shift_register(0)
+		, m_shift_data(true)
+		, m_shift_clock(true)
 	{ }
 
 	void textelcomp(machine_config &config);
@@ -35,6 +39,9 @@ private:
 	virtual void machine_start() override;
 	void keyscan_w(u8 data);
 	u8 keyboard_r();
+	DECLARE_WRITE_LINE_MEMBER(shift_data_w);
+	DECLARE_WRITE_LINE_MEMBER(shift_clock_w);
+	void update_shift_output();
 	void rtc_w(u8 data);
 
 	void mem_map(address_map &map);
@@ -44,8 +51,12 @@ private:
 	required_device<msm58321_device> m_rtc;
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<16> m_keys;
+	output_finder<16> m_leds;
 
 	u8 m_keyscan;
+	u16 m_shift_register;
+	bool m_shift_data;
+	bool m_shift_clock;
 };
 
 
@@ -54,17 +65,50 @@ void textelcomp_state::machine_start()
 	m_rtc->cs1_w(1);
 	subdevice<mos6551_device>("acia")->write_cts(0);
 
+	m_leds.resolve();
+
 	save_item(NAME(m_keyscan));
+	save_item(NAME(m_shift_register));
+	save_item(NAME(m_shift_data));
+	save_item(NAME(m_shift_clock));
 }
 
 void textelcomp_state::keyscan_w(u8 data)
 {
+	// 2x TC4094BP driving keyboard lights
+	if (BIT(data, 4) && !BIT(m_keyscan, 4))
+		update_shift_output();
+
 	m_keyscan = data;
 }
 
 u8 textelcomp_state::keyboard_r()
 {
 	return m_keys[m_keyscan & 0x0f]->read();
+}
+
+WRITE_LINE_MEMBER(textelcomp_state::shift_data_w)
+{
+	m_shift_data = state;
+}
+
+WRITE_LINE_MEMBER(textelcomp_state::shift_clock_w)
+{
+	if (state && !m_shift_clock)
+	{
+		m_shift_clock = true;
+		m_shift_register = (m_shift_register << 1) | m_shift_data;
+		if (BIT(m_keyscan, 4))
+			update_shift_output();
+	}
+	else if (!state && m_shift_clock)
+		m_shift_clock = false;
+}
+
+void textelcomp_state::update_shift_output()
+{
+	for (int i = 0; i < 16; i++)
+		m_leds[i] = BIT(m_shift_register, i);
 }
 
 void textelcomp_state::rtc_w(u8 data)
@@ -293,7 +337,8 @@ void textelcomp_state::textelcomp(machine_config &config)
 	via6522_device &via2(VIA6522(config, "via2", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
 	via2.readpa_handler().set(FUNC(textelcomp_state::keyboard_r));
 	via2.writepb_handler().set(FUNC(textelcomp_state::keyscan_w));
-	// TODO: CB1, CB2 and PB4 control 2x TC4094BP driving keyboard lights
+	via2.cb1_handler().set(FUNC(textelcomp_state::shift_clock_w));
+	via2.cb2_handler().set(FUNC(textelcomp_state::shift_data_w));
 
 	via6522_device &via3(VIA6522(config, "via3", 3.6864_MHz_XTAL / 2)); // GS65SC22P-2
 	via3.writepa_handler().set(FUNC(textelcomp_state::rtc_w));
