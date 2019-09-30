@@ -8093,6 +8093,7 @@ ROM_END
 // 834-14921, SHE-0010, communication? unit, not NAOMI-based, uses 2x Motorola MC68360 QUICC
 
 // currently we have only Satellite unit ROM board dumped, server/control and large screen units is missing.
+// Satellite, ID# 837-14926, SATL BD SHE PROG RET
 // ROM board ID# 840-0186B
 ROM_START( shorsepr )
 	NAOMI_BIOS
