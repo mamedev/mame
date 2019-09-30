@@ -438,9 +438,12 @@ class RomIdentHandler(QueryPageHandler):
             return self.error_page(405)
         else:
             self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
-            yield htmltmpl.ROMIDENT_PAGE.substitute(
-                    app=self.js_escape(cgi.escape(self.application_uri, True)),
-                    assets=self.js_escape(cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True))).encode('utf-8')
+            return self.form_page()
+
+    def form_page(self):
+        yield htmltmpl.ROMIDENT_PAGE.substitute(
+                app=self.js_escape(cgi.escape(self.application_uri, True)),
+                assets=self.js_escape(cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True))).encode('utf-8')
 
 
 class BiosRpcHandler(MachineRpcHandlerBase):
