@@ -82,6 +82,9 @@ public:
 	void rtype(machine_config &config);
 	void imgfightb(machine_config &config);
 	void lohtb(machine_config &config);
+	void imgfightj(machine_config &config);
+	void mrheli(machine_config &config);
+	void nspiritj(machine_config &config);
 
 	void init_dkgenm72();
 	void init_bchopper();
@@ -193,6 +196,9 @@ private:
 	void machine_start() override;
 	void machine_reset() override;
 	DECLARE_VIDEO_START(m72);
+	DECLARE_VIDEO_START(imgfightj);
+	DECLARE_VIDEO_START(mrheli);
+	DECLARE_VIDEO_START(nspiritj);
 	DECLARE_VIDEO_START(xmultipl);
 	DECLARE_VIDEO_START(hharry);
 	DECLARE_VIDEO_START(rtype2);
