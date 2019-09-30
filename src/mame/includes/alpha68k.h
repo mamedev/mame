@@ -22,6 +22,7 @@
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "video/snk68_spr.h"
+#include "video/alpha68k_palette.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -37,13 +38,11 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
 		m_outlatch(*this, "outlatch"),
 		m_soundlatch(*this, "soundlatch"),
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_color_proms(*this, "color_proms"),
 		m_in(*this, "IN%u", 0U),
 		m_audiobank(*this, "audiobank")
 	{ }
@@ -54,7 +53,6 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	optional_device<ls259_device> m_outlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
 
@@ -63,8 +61,6 @@ protected:
 	required_shared_ptr<u16> m_spriteram;
 	optional_shared_ptr<u16> m_videoram;
 	
-	optional_region_ptr<u8> m_color_proms;
-
 	optional_ioport_array<7> m_in;
 	optional_memory_bank m_audiobank;
 
@@ -97,6 +93,7 @@ public:
 	alpha68k_II_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alpha68k_state(mconfig, type, tag)
 		, m_sprites(*this, "sprites")
+		, m_palette(*this, "palette")
 	{}
 	
 	void alpha68k_II(machine_config &config);
@@ -110,6 +107,7 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<snk68_spr_device> m_sprites;
+	required_device<alpha68k_palette_device> m_palette;
 	
 	void base_config(machine_config &config);
 	DECLARE_VIDEO_START(alpha68k);
@@ -147,7 +145,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(video_control2_w);
 	DECLARE_WRITE_LINE_MEMBER(video_control3_w);
 private:
-	u16      m_backdrop_pen;
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
@@ -233,11 +230,16 @@ class alpha68k_prom_state : public alpha68k_state
 {
 public:
 	alpha68k_prom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: alpha68k_state(mconfig, type, tag)
+		: alpha68k_state(mconfig, type, tag),
+		m_palette(*this, "palette"),
+		m_color_proms(*this, "color_proms")
 	{}
 	
 protected:	
 	void palette_init(palette_device &palette) const;
+
+	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_color_proms;
 };
 
 /*

@@ -23,7 +23,7 @@
     The Next Space          A8004-1 PIC      SNK 1989
 
 TODO:
-- Super Champion Baseball "ball speed" protection
+- Super Champion Baseball "ball speed pitch" protection;
 - II & V board: bit 15 of palette RAM isn't hooked up, according to Sky Adventure 
   service mode enables "bright", it is actually same as NeoGeo device;
 - II & V board: Fix sound CPU crashes properly (nested NMIs)
@@ -33,8 +33,9 @@ TODO:
 - Sky Adventure, probably others: sprite drawing is off-sync, cfr. notes in video file;
 - Gold Medalist: attract mode has missing finger on button 1, may be btanb;
 - Gold Medalist: missing blank effect on shooting pistol for dash events (palette bank actually used?);
-- Refactor sprite chips into proper devices, they all have 8-bit data buses and 
-  have suspicious similarities with other SNK/Alpha HWs.
+- Super Champion Baseball: enables opacity bit on fix layer, those are transparent on SNK Arcade Classics 0 
+  but actually opaque on a reference shot, sounds like a btanb;
+- Fix layer tilemap should be a common device between this, snk68.cpp and other Alpha/SNK-based games;
 
 General notes:
 
@@ -510,7 +511,7 @@ void alpha68k_II_state::alpha68k_II_map(address_map &map)
 	map(0x100000, 0x100fff).ram().w(FUNC(alpha68k_II_state::videoram_w)).share("videoram");
 	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram"); 
 	map(0x300000, 0x3001ff).rw(FUNC(alpha68k_II_state::alpha_II_trigger_r), FUNC(alpha68k_II_state::alpha_microcontroller_w));
-	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x400fff).rw(m_palette, FUNC(alpha68k_palette_device::read), FUNC(alpha68k_palette_device::write));
 	map(0x800000, 0x83ffff).rom().region("maincpu", 0x40000);
 }
 
@@ -531,7 +532,7 @@ void alpha68k_III_state::alpha68k_V_map(address_map &map)
 	map(0x300000, 0x303fff).r(FUNC(alpha68k_III_state::alpha_V_trigger_r));
 	map(0x300000, 0x3001ff).w(FUNC(alpha68k_III_state::alpha_microcontroller_w));
 	map(0x303e00, 0x303fff).w(FUNC(alpha68k_III_state::alpha_microcontroller_w)); /* Gang Wars mirror */
-	map(0x400000, 0x401fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // upper bank actually a mirror?
+	map(0x400000, 0x401fff).rw(m_palette, FUNC(alpha68k_palette_device::read), FUNC(alpha68k_palette_device::write));
 	map(0x800000, 0x83ffff).rom().region("maincpu", 0x40000);
 }
 
@@ -1279,9 +1280,8 @@ void alpha68k_II_state::video_config(machine_config &config, u16 num_pens)
 	m_sprites->set_color_entry_mask((num_pens / 16) - 1);
 
 	// TODO: change into NeoGeo palette format ...
-	PALETTE(config, m_palette).set_format(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder, num_pens);
-	// TODO: ... and make this a configuration option
-	m_backdrop_pen = num_pens - 1;
+	ALPHA68K_PALETTE(config, m_palette, 0);
+	m_palette->set_entries(num_pens);
 }
 
 void alpha68k_II_state::alpha68k_II(machine_config &config)
@@ -1613,18 +1613,13 @@ ROM_START( skysoldrbl )
 	ROM_LOAD32_BYTE( "5.ic18",          0x1c0003, 0x10000, CRC(fe34cd89) SHA1(ea86405da4d83e2f438fe28cdbc4e460d680e5e8) )
 ROM_END
 
-
-
-
-
-
 ROM_START( goldmedl )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "gm.3",      0x00000,  0x10000, CRC(ddf0113c) SHA1(1efe39da1e25e7a556c48243a15d95388bc67e69) )
 	ROM_LOAD16_BYTE( "gm.4",      0x00001,  0x10000, CRC(16db4326) SHA1(7c82afcdabbb9ce082025b444ad967817ba36879) )
 	ROM_LOAD16_BYTE( "gm.1",      0x20000,  0x10000, CRC(54a11e28) SHA1(5e36c86b4d30b07539d9d00c682cbc3d88b6ba01) )
 	ROM_LOAD16_BYTE( "gm.2",      0x20001,  0x10000, CRC(4b6a13e4) SHA1(fb6bd4690f4f7aa7ae082c31c366c09e1eda801d) )
-//AT
+
 #if 0 // old ROM map
 	ROM_REGION( 0x80000, "audiocpu", 0 )   /* Sound CPU */
 	ROM_LOAD( "goldsnd0.c47",   0x00000,  0x08000, BAD_DUMP CRC(031d27dc) ) // bad dump
@@ -1639,7 +1634,7 @@ ROM_START( goldmedl )
 	ROM_LOAD( "39.bin",          0x10000,  0x10000, BAD_DUMP CRC(1d92be86) SHA1(9b6e7141653ee7b7b1915a545d381419aec4e483) )
 	ROM_LOAD( "40.bin",          0x20000,  0x10000, BAD_DUMP CRC(8dafc4e8) SHA1(7d4898557ad638ab8461060bc7ae406d7d24c5a4) )
 	ROM_LOAD( "1.bin",           0x30000,  0x10000, BAD_DUMP CRC(1e78062c) SHA1(821c037edf32eb8b03e5c487d3bab0622337e80b) )
-//ZT
+
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
 	ROM_LOAD16_BYTE( "gm.6",     0x00001, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
 	ROM_LOAD16_BYTE( "gm.5",     0x00000, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
@@ -2050,7 +2045,7 @@ void alpha68k_II_state::init_skysoldr()
 void goldmedal_II_state::init_goldmedl()
 {
 	m_invert_controls = 0;
-	m_microcontroller_id = 0x8803; //AT
+	m_microcontroller_id = 0x8803;
 	m_coin_id = 0x23 | (0x24 << 8);
 	m_game_id = 0;
 }
@@ -2104,6 +2099,7 @@ void alpha68k_V_state::init_sbasebal()
 	   just returns 49 mi/h every time that this event happens.
 	   68k reads at [0x4023e], then subtracts this value with [0x41838], presumably it's raw speed minus angle.
 	   main CPU then writes the result to RAM location [0x41866], probably just to signal the result to the MCU.
+	   Update: Game also have max pitch speeds, how this is taken into account?
 	   */
 	rom[0xb672/2] = 0x4e71;
 
@@ -2156,6 +2152,6 @@ GAME( 1989, gangwarsj, gangwars, gangwars,     gangwars,  gangwars_state, init_g
 GAME( 1989, gangwarsu, gangwars, gangwars,     gangwarsu, gangwars_state, init_gangwarsu, ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gangwarsb, gangwars, gangwars,     gangwars,  gangwars_state, init_gangwars,  ROT0,  "bootleg",                                           "Gang Wars (bootleg)", MACHINE_SUPPORTS_SAVE ) // has (undumped) 68705 MCU in place of Alpha MCU, otherwise the same as 'gangwars'
 
-GAME( 1989, sbasebal,  0,        alpha68k_V,  sbasebal,  alpha68k_V_state, init_sbasebal,  ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed
-GAME( 1989, sbasebalj, sbasebal, alpha68k_V,  sbasebalj, alpha68k_V_state, init_sbasebalj, ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // same as above
+GAME( 1989, sbasebal,  0,        alpha68k_V,   sbasebal,  alpha68k_V_state, init_sbasebal,  ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed
+GAME( 1989, sbasebalj, sbasebal, alpha68k_V,   sbasebalj, alpha68k_V_state, init_sbasebalj, ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // same as above
 

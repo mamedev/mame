@@ -9,19 +9,19 @@
  *
  * 0x0000-0x1000
  * [0]
- * ???? ???? untested in POST, actually written to by Gang Wars (likely NOP)
+ * ???? ???? untested in POST, actually written to by Gang Wars ($ff in snk68.cpp so NOP)
  * [1]
  * XXXX XXXX lower X offset
  * [2]
  * X--- ---- upper X offset
- * -*** ---- unknown, more fractional X?
+ * -*** ---- unknown, more fractional X? Definitely used by snk68.cpp
  * ---- ---Y upper Y offset
  * [3]
  * YYYY YYYY lower Y offset
  *
  * Second bank has the actual tile info, and is arranged in vertical strips.
  * [0]
- * ???? ????  untested in POST, actually written to by Sky Adventure (likely NOP)
+ * ???? ????  untested in POST, actually written to by Sky Adventure ($ff in snk68.cpp so NOP)
  * [1]
  * cccc cccc color entry
  * [2]
@@ -37,7 +37,10 @@
  *   - glitchy first frame on title screen;
  *   Given how this and the actual HW works it is pretty likely this having a consistent delay, 
  *   however it isn't known how exactly DMA triggers, and one frame of bufferd spriteram isn't enough.
- * - Why entry 0x7c0 requires a one line and a priority hack?
+ * - Why entry 0x7c0 requires a one line and a priority hack for alpha68k.cpp games?
+ * - Super Champion Baseball: selecting a 3rd or 5th column team causes a shadow to appear on the drawn 
+ *   object which isn't present on the other columns, verify real HW behaviour;
+ * - Sky Adventure: stage 1 priest priority goes above the bonus ship, confirmed to be a btanb;
  *
  */
 

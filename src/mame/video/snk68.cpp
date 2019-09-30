@@ -129,7 +129,7 @@ WRITE8_MEMBER(searchar_state::flipscreen_w)
 
 uint32_t snk68_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0x7ff, cliprect);
+	bitmap.fill(m_palette->get_backdrop_pen(), cliprect);
 
 	m_sprites->draw_sprites_all(bitmap, cliprect);
 

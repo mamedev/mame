@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/alpha68k.h"
 
-// TODO: used by alpha68k_i.cpp and _k.cpp, move to own file
+// TODO: used by alpha68k_i.cpp and _n.cpp, move to own file
 void alpha68k_prom_state::palette_init(palette_device &palette) const
 {
 	const u8 *color_prom = memregion("proms")->base();
@@ -113,7 +113,7 @@ void alpha68k_II_state::tile_callback_noflipy(int &tile, int& fx, int& fy, int& 
 
 uint32_t alpha68k_II_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_backdrop_pen, cliprect);
+	bitmap.fill(m_palette->get_backdrop_pen(), cliprect);
 
 	m_sprites->draw_sprites_alt(bitmap, cliprect);
 
