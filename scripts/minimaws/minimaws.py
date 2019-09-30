@@ -78,12 +78,16 @@
 ## and see dependent slots update.  Required command-line arguments to
 ## produce the selected configuration are also displayed.
 
+import argparse
+import os
+import os.path
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import lib.auxverbs
 import lib.lxparse
 import lib.wsgiserve
-
-import argparse
-import sys
 
 
 if __name__ == '__main__':
@@ -135,3 +139,5 @@ if __name__ == '__main__':
         lib.wsgiserve.run_server(options)
     elif options.command == 'load':
         lib.lxparse.load_info(options)
+else:
+    application = lib.wsgiserve.MiniMawsApp(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'minimaws.sqlite3'))

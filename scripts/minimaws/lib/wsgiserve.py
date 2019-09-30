@@ -589,6 +589,8 @@ class MiniMawsApp(object):
 
     def __call__(self, environ, start_response):
         application_uri = wsgiref.util.application_uri(environ)
+        if application_uri[-1] != '/':
+            application_uri += '/'
         module = wsgiref.util.shift_path_info(environ)
         if module == 'machine':
             return MachineHandler(self, application_uri, environ, start_response)
