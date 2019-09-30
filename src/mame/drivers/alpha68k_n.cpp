@@ -282,7 +282,7 @@ void sstingray_state::alpha8511_control_w(u8 data)
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 	if (!BIT(data, 6))
 		m_shared_ram[m_alpha8511_address] = (m_shared_ram[m_alpha8511_address] & 0xff00) | m_microcontroller_data;
-	flipscreen_w(!BIT(data, 7));
+	m_flipscreen = !BIT(data, 7);
 
 	m_alpha8511_control = data;
 }

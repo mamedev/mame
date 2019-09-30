@@ -600,6 +600,8 @@ void snk68_state::pow(machine_config &config)
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
 	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_pow), this);
+	m_sprites->set_xpos_shift(12);
+	m_sprites->set_color_entry_mask(0x7f);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

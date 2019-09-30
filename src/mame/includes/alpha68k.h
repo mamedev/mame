@@ -21,6 +21,7 @@
 #include "sound/ym2413.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
+#include "video/snk68_spr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -47,27 +48,6 @@ public:
 		m_audiobank(*this, "audiobank")
 	{ }
 
-	void alpha68k_II(machine_config &config);
-	void btlfieldb(machine_config &config);
-	void alpha68k_II_gm(machine_config &config);
-	void alpha68k_III(machine_config &config);
-	void alpha68k_V(machine_config &config);
-	void alpha68k_V_sb(machine_config &config);
-
-	void init_btlfield();
-	void init_goldmedl();
-	void init_skyadvnt();
-	void init_goldmedla();
-	void init_gangwarsu();
-	void init_gangwars();
-	void init_timesold1();
-	void init_sbasebal();
-	void init_sbasebalj();
-	void init_skysoldr();
-	void init_skyadvntu();
-	void init_btlfieldb();
-	void init_timesold();
-
 protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -88,14 +68,6 @@ protected:
 	optional_ioport_array<7> m_in;
 	optional_memory_bank m_audiobank;
 
-	void flipscreen_w(int flip);
-	u16 sound_cpu_r();
-	void sound_bank_w(u8 data);
-
-	DECLARE_MACHINE_START(common);
-	DECLARE_MACHINE_RESET(common);
-	DECLARE_VIDEO_START(alpha68k);
-
 	int           m_flipscreen;
 
 	// MCU sims
@@ -114,44 +86,148 @@ protected:
 
 	void set_screen_raw_params(machine_config &config);
 
-private:
-	u16 control_1_r();
-	u16 control_2_r();
-	u16 control_3_r();
-	u16 control_4_r();
-	void outlatch_w(offs_t offset, u8 data = 0);
-	u16 alpha_II_trigger_r(offs_t offset);
-	u16 alpha_V_trigger_r(offs_t offset);
-	void porta_w(u8 data);
-	void videoram_w(offs_t offset, u16 data);
-	DECLARE_WRITE_LINE_MEMBER(video_control2_w);
-	DECLARE_WRITE_LINE_MEMBER(video_control3_w);
+	DECLARE_MACHINE_START(common);
+	DECLARE_MACHINE_RESET(common);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+};
+
+class alpha68k_II_state : public alpha68k_state
+{
+public:
+	alpha68k_II_state(const machine_config &mconfig, device_type type, const char *tag)
+		: alpha68k_state(mconfig, type, tag)
+		, m_sprites(*this, "sprites")
+	{}
+	
+	void alpha68k_II(machine_config &config);
+	void btlfieldb(machine_config &config);
+	
+	void init_skysoldr();
+	void init_timesold();
+	void init_timesold1();
+	void init_btlfield();
+	void init_btlfieldb();
+protected:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<snk68_spr_device> m_sprites;
+	
+	void base_config(machine_config &config);
+	DECLARE_VIDEO_START(alpha68k);
+	void video_config(machine_config &config, u16 num_pens);
+	void tile_callback(int &tile, int& fx, int& fy, int& region);
+	void tile_callback_noflipx(int &tile, int& fx, int& fy, int& region);
+	void tile_callback_noflipy(int &tile, int& fx, int& fy, int& region);
+
+	INTERRUPT_GEN_MEMBER(sound_nmi);
+	void sound_bank_w(u8 data);
+	void flipscreen_w(int flip);
+	void porta_w(u8 data);
+	u8       m_sound_nmi_mask;
+	u8       m_sound_pa_latch;
+
 	DECLARE_MACHINE_START(alpha68k_II);
 	DECLARE_MACHINE_RESET(alpha68k_II);
-	DECLARE_MACHINE_START(alpha68k_V);
-	DECLARE_MACHINE_RESET(alpha68k_V);
-	u32 screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void video_bank_w(u8 data);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e);
-	void draw_sprites_V(bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, u16 fx_mask, u16 fy_mask, u16 sprite_mask);
 	void alpha68k_II_map(address_map &map);
-	void alpha68k_III_map(address_map &map);
-	void alpha68k_V_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 
-	u8       m_sound_nmi_mask;
-	u8       m_sound_pa_latch;
+	u16 alpha_II_trigger_r(offs_t offset);
 
 	/* video-related */
 	tilemap_t     *m_fix_tilemap;
 	int           m_bank_base;
+
+	void outlatch_w(offs_t offset, u8 data = 0);
+	u16 control_1_r();
+	u16 control_2_r();
+	u16 control_3_r();
+	u16 control_4_r();
+	void videoram_w(offs_t offset, u16 data);
+	DECLARE_WRITE_LINE_MEMBER(video_control2_w);
+	DECLARE_WRITE_LINE_MEMBER(video_control3_w);
+private:
+	u16      m_backdrop_pen;
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
+
+class goldmedal_II_state : public alpha68k_II_state
+{
+public:
+	goldmedal_II_state(const machine_config &mconfig, device_type type, const char *tag)
+		: alpha68k_II_state(mconfig, type, tag)
+	{}
+	
+	void init_goldmedl();
+	void goldmedal(machine_config &config);
+};
+
+class alpha68k_III_state : public alpha68k_II_state
+{
+public:
+	alpha68k_III_state(const machine_config &mconfig, device_type type, const char *tag)
+		: alpha68k_II_state(mconfig, type, tag)
+	{}
+	
+	void alpha68k_III(machine_config &config);
+protected:
+	DECLARE_MACHINE_START(alpha68k_V);
+	DECLARE_MACHINE_RESET(alpha68k_V);
+	void alpha68k_III_map(address_map &map);
+	void alpha68k_V_map(address_map &map);
+	u16 alpha_V_trigger_r(offs_t offset);
+};
+
+class goldmedal_III_state : public alpha68k_III_state
+{
+public:
+	goldmedal_III_state(const machine_config &mconfig, device_type type, const char *tag)
+		: alpha68k_III_state(mconfig, type, tag)
+	{}
+	
+	void init_goldmedla();
+	void goldmedal(machine_config &config);
+};
+
+class alpha68k_V_state : public alpha68k_III_state
+{
+public:
+	alpha68k_V_state(const machine_config &mconfig, device_type type, const char *tag)
+		: alpha68k_III_state(mconfig, type, tag)
+	{}
+
+	void init_skyadvnt();
+	void init_skyadvntu();
+	void init_sbasebal();
+	void init_sbasebalj();
+	void init_gangwarsu();
+	void init_gangwars();
+	void alpha68k_V(machine_config &config);
+};
+
+class skyadventure_state : public alpha68k_V_state
+{
+public:
+	skyadventure_state(const machine_config &mconfig, device_type type, const char *tag)
+		: alpha68k_V_state(mconfig, type, tag)
+	{}
+
+	void skyadventure(machine_config &config);
+};
+
+class gangwars_state : public alpha68k_V_state
+{
+public:
+	gangwars_state(const machine_config &mconfig, device_type type, const char *tag)
+		: alpha68k_V_state(mconfig, type, tag)
+	{}
+
+	void gangwars(machine_config &config);
+};
+
+/*
+ * Base class for HWs with 4bpp PROMs for colors
+ */
 
 class alpha68k_prom_state : public alpha68k_state
 {
@@ -309,6 +385,7 @@ private:
 	void tnextspc_coin_counters_w(offs_t offset, u16 data);
 	void tnextspc_unknown_w(offs_t offset, u16 data);
 	void tnextspc_soundlatch_w(u8 data);
+	u16 sound_cpu_r();
 };
 
 /* game_id - used to deal with a few game specific situations */

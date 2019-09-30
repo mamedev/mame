@@ -204,12 +204,12 @@ void alpha68k_state::alpha_microcontroller_w(offs_t offset, u16 data, u16 mem_ma
 	logerror("%04x:  Alpha write trigger at %04x (%04x)\n", m_maincpu->pc(), offset, data);
 	/* 0x44 = coin clear signal to microcontroller? */
 	if (offset == 0x2d && ACCESSING_BITS_0_7)
-		flipscreen_w(data & 1);
+		m_flipscreen = (data & 1);
 }
 
 /******************************************************************************/
 
-u16 alpha68k_state::control_1_r()
+u16 alpha68k_II_state::control_1_r()
 {
 	if (m_invert_controls)
 		return ~(m_in[0]->read() + (m_in[1]->read() << 8));
@@ -217,7 +217,7 @@ u16 alpha68k_state::control_1_r()
 	return m_in[0]->read() + (m_in[1]->read() << 8);
 }
 
-u16 alpha68k_state::control_2_r()
+u16 alpha68k_II_state::control_2_r()
 {
 	if (m_invert_controls)
 		return ~(m_in[3]->read() + ((~(1 << m_in[5]->read())) << 8));
@@ -226,7 +226,7 @@ u16 alpha68k_state::control_2_r()
 		((~(1 << m_in[5]->read())) << 8);
 }
 
-u16 alpha68k_state::control_3_r()
+u16 alpha68k_II_state::control_3_r()
 {
 	if (m_invert_controls)
 		return ~(((~(1 << m_in[6]->read())) << 8) & 0xff00);
@@ -235,7 +235,7 @@ u16 alpha68k_state::control_3_r()
 }
 
 /* High 4 bits of CN1 & CN2 */
-u16 alpha68k_state::control_4_r()
+u16 alpha68k_II_state::control_4_r()
 {
 	if (m_invert_controls)
 		return ~((((~(1 << m_in[6]->read())) << 4) & 0xf000)
@@ -245,7 +245,7 @@ u16 alpha68k_state::control_4_r()
 			+ (((~(1 << m_in[5]->read()))) & 0x0f00);
 }
 
-void alpha68k_state::outlatch_w(offs_t offset, u8 data)
+void alpha68k_II_state::outlatch_w(offs_t offset, u8 data)
 {
 	m_outlatch->write_bit((offset >> 3) & 7, BIT(offset, 6));
 }
@@ -253,7 +253,7 @@ void alpha68k_state::outlatch_w(offs_t offset, u8 data)
 /******************************************************************************/
 
 /* Time Soldiers, Sky Soldiers, Gold Medalist */
-u16 alpha68k_state::alpha_II_trigger_r(offs_t offset)
+u16 alpha68k_II_state::alpha_II_trigger_r(offs_t offset)
 {
 	/* possible jump codes:
 	     - Time Soldiers : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
@@ -347,7 +347,7 @@ u16 alpha68k_state::alpha_II_trigger_r(offs_t offset)
 }
 
 /* Sky Adventure, Gang Wars, Super Champion Baseball */
-u16 alpha68k_state::alpha_V_trigger_r(offs_t offset)
+u16 alpha68k_III_state::alpha_V_trigger_r(offs_t offset)
 {
 	/* possible jump codes:
 	     - Sky Adventure           : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
@@ -493,72 +493,70 @@ u16 alpha68k_state::alpha_V_trigger_r(offs_t offset)
 
 /******************************************************************************/
 
-void alpha68k_state::alpha68k_II_map(address_map &map)
+void alpha68k_II_state::alpha68k_II_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x008ffe, 0x008fff).nopw();
 	map(0x040000, 0x040fff).ram().share("shared_ram");
-	map(0x080000, 0x080001).r(FUNC(alpha68k_state::control_1_r)); /* Joysticks */
+	map(0x080000, 0x080001).r(FUNC(alpha68k_II_state::control_1_r)); /* Joysticks */
 	map(0x080001, 0x080001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0c0000, 0x0c0001).r(FUNC(alpha68k_state::control_2_r)); /* CN1 & Dip 1 */
-	map(0x0c0001, 0x0c0001).select(0x78).w(FUNC(alpha68k_state::outlatch_w));
-	map(0x0c8000, 0x0c8001).r(FUNC(alpha68k_state::control_3_r)); /* Bottom of CN2 */
-	map(0x0d0000, 0x0d0001).r(FUNC(alpha68k_state::control_4_r)); /* Top of CN1 & CN2 */
+	map(0x0c0000, 0x0c0001).r(FUNC(alpha68k_II_state::control_2_r)); /* CN1 & Dip 1 */
+	map(0x0c0001, 0x0c0001).select(0x78).w(FUNC(alpha68k_II_state::outlatch_w));
+	map(0x0c8000, 0x0c8001).r(FUNC(alpha68k_II_state::control_3_r)); /* Bottom of CN2 */
+	map(0x0d0000, 0x0d0001).r(FUNC(alpha68k_II_state::control_4_r)); /* Top of CN1 & CN2 */
 	map(0x0d8000, 0x0d8001).nopr(); /* IRQ ack? */
 	map(0x0e0000, 0x0e0001).nopr(); /* IRQ ack? */
 	map(0x0e8000, 0x0e8001).nopr(); /* watchdog? */
-	map(0x100000, 0x100fff).ram().w(FUNC(alpha68k_state::videoram_w)).share("videoram");
-	map(0x200000, 0x207fff).ram().share("spriteram");
-	map(0x300000, 0x3001ff).rw(FUNC(alpha68k_state::alpha_II_trigger_r), FUNC(alpha68k_state::alpha_microcontroller_w));
+	map(0x100000, 0x100fff).ram().w(FUNC(alpha68k_II_state::videoram_w)).share("videoram");
+	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram"); 
+	map(0x300000, 0x3001ff).rw(FUNC(alpha68k_II_state::alpha_II_trigger_r), FUNC(alpha68k_II_state::alpha_microcontroller_w));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x83ffff).rom().region("maincpu", 0x40000);
 }
 
-void alpha68k_state::alpha68k_V_map(address_map &map)
+void alpha68k_III_state::alpha68k_V_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram().share("shared_ram");
-	map(0x080000, 0x080001).r(FUNC(alpha68k_state::control_1_r)); /* Joysticks */
-	map(0x080000, 0x080000).w(FUNC(alpha68k_state::video_bank_w));
+	map(0x080000, 0x080001).r(FUNC(alpha68k_III_state::control_1_r)); /* Joysticks */
+	map(0x080000, 0x080000).w(FUNC(alpha68k_III_state::video_bank_w));
 	map(0x080001, 0x080001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0c0000, 0x0c0001).lr16("control_2_V_r", [this]() -> u16 { return m_in[3]->read(); }); /* Dip 2 */
-	map(0x0c0001, 0x0c0001).select(0x78).w(FUNC(alpha68k_state::outlatch_w));
+	map(0x0c0001, 0x0c0001).select(0x78).w(FUNC(alpha68k_III_state::outlatch_w));
 	map(0x0d8000, 0x0d8001).nopr(); /* IRQ ack? */
 	map(0x0e0000, 0x0e0001).nopr(); /* IRQ ack? */
 	map(0x0e8000, 0x0e8001).nopr(); /* watchdog? */
-	map(0x100000, 0x100fff).ram().w(FUNC(alpha68k_state::videoram_w)).share("videoram");
-	map(0x200000, 0x207fff).ram().share("spriteram"); 	// 16k for gang wars/sky adventure, 32k for sbaseball (mirror?)
-	map(0x300000, 0x303fff).r(FUNC(alpha68k_state::alpha_V_trigger_r));
-	map(0x300000, 0x3001ff).w(FUNC(alpha68k_state::alpha_microcontroller_w));
-	map(0x303e00, 0x303fff).w(FUNC(alpha68k_state::alpha_microcontroller_w)); /* Gang Wars mirror */
+	map(0x100000, 0x100fff).ram().w(FUNC(alpha68k_III_state::videoram_w)).share("videoram");
+	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram"); 
+	map(0x300000, 0x303fff).r(FUNC(alpha68k_III_state::alpha_V_trigger_r));
+	map(0x300000, 0x3001ff).w(FUNC(alpha68k_III_state::alpha_microcontroller_w));
+	map(0x303e00, 0x303fff).w(FUNC(alpha68k_III_state::alpha_microcontroller_w)); /* Gang Wars mirror */
 	map(0x400000, 0x401fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // upper bank actually a mirror?
 	map(0x800000, 0x83ffff).rom().region("maincpu", 0x40000);
 }
 
-void alpha68k_state::alpha68k_III_map(address_map &map)
+void alpha68k_III_state::alpha68k_III_map(address_map &map)
 {
-	alpha68k_V_map(map);
-	map(0x300000, 0x3001ff).rw(FUNC(alpha68k_state::alpha_II_trigger_r), FUNC(alpha68k_state::alpha_microcontroller_w));
+	alpha68k_III_state::alpha68k_V_map(map);
+	map(0x300000, 0x3001ff).rw(FUNC(alpha68k_III_state::alpha_II_trigger_r), FUNC(alpha68k_III_state::alpha_microcontroller_w));
 	map(0x300200, 0x303fff).unmaprw();
 }
 
-u16 alpha68k_state::sound_cpu_r(){ return 1; }
-
 /******************************************************************************/
 
-void alpha68k_state::sound_bank_w(u8 data)
+void alpha68k_II_state::sound_bank_w(u8 data)
 {
 	m_audiobank->set_entry(data & 0x1f);
 }
 
-void alpha68k_state::sound_map(address_map &map)
+void alpha68k_II_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xffff).bankr("audiobank");
 }
 
-void alpha68k_state::sound_portmap(address_map &map)
+void alpha68k_II_state::sound_portmap(address_map &map)
 {
 	map.global_mask(0x0f);
 	map(0x00, 0x00).mirror(0x0f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
@@ -566,7 +564,7 @@ void alpha68k_state::sound_portmap(address_map &map)
 	map(0x08, 0x08).mirror(0x01).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x0a, 0x0b).w("ym2", FUNC(ym2413_device::write));
 	map(0x0c, 0x0d).w("ym1", FUNC(ym2203_device::write));
-	map(0x0e, 0x0e).mirror(0x01).w(FUNC(alpha68k_state::sound_bank_w));
+	map(0x0e, 0x0e).mirror(0x01).w(FUNC(alpha68k_II_state::sound_bank_w));
 }
 
 /******************************************************************************/
@@ -1143,7 +1141,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-void alpha68k_state::porta_w(u8 data)
+void alpha68k_II_state::porta_w(u8 data)
 {
 	if (data == 0xff)
 		return; // skip
@@ -1186,7 +1184,7 @@ MACHINE_RESET_MEMBER(alpha68k_state,common)
 	m_flipscreen = 0;
 }
 
-MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
+MACHINE_START_MEMBER(alpha68k_III_state,alpha68k_V)
 {
 	u8 *ROM = memregion("audiocpu")->base();
 
@@ -1199,19 +1197,19 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
 	save_item(NAME(m_sound_pa_latch));
 }
 
-MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_V)
+MACHINE_RESET_MEMBER(alpha68k_III_state,alpha68k_V)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_bank_base = 0;
 }
 
-MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_II)
+MACHINE_RESET_MEMBER(alpha68k_II_state,alpha68k_II)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
 }
 
-MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
+MACHINE_START_MEMBER(alpha68k_II_state,alpha68k_II)
 {
 	u8 *ROM = memregion("audiocpu")->base();
 
@@ -1225,131 +1223,36 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 }
 
 #define ALPHA68K_PIXEL_CLOCK (24_MHz_XTAL / 4)
-#define ALPHA68K_HTOTAL 394
+#define ALPHA68K_HTOTAL 384
 
 void alpha68k_state::set_screen_raw_params(machine_config &config)
 {
-// Pixel clock, assuming that it can't be 4 MHz because 4 MHz / 15,20 KHz = 263 HTOTAL (VERY unlikely).
-	m_screen->set_raw(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,0,256,253,16,240);
+//  TODO: Same as snk68.cpp, which in turn is awfully similar to NeoGeo CRTC parameters
+	m_screen->set_raw(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,0,256,264,16,240);
 }
 
-INTERRUPT_GEN_MEMBER(alpha68k_state::sound_nmi)
+INTERRUPT_GEN_MEMBER(alpha68k_II_state::sound_nmi)
 {
 	if (m_sound_nmi_mask)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void alpha68k_state::alpha68k_II(machine_config &config)
+void alpha68k_II_state::base_config(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000); /* Correct */
-	m_maincpu->set_addrmap(AS_PROGRAM, &alpha68k_state::alpha68k_II_map);
-	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_state::irq3_line_hold)); /* VBL */
-
-	Z80(config, m_audiocpu, 6000000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &alpha68k_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &alpha68k_state::sound_portmap);
-	m_audiocpu->set_periodic_int(FUNC(alpha68k_state::sound_nmi), attotime::from_hz(7614));
-
 	LS259(config, m_outlatch); // 14A
-	m_outlatch->q_out_cb<2>().set(FUNC(alpha68k_state::video_control2_w));
-	m_outlatch->q_out_cb<3>().set(FUNC(alpha68k_state::video_control3_w));
-	m_outlatch->parallel_out_cb().set(FUNC(alpha68k_state::video_bank_w)).rshift(4).mask(0x07);
-
-	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
-	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(60);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	set_screen_raw_params(config);
-	m_screen->set_screen_update(FUNC(alpha68k_state::screen_update_alpha68k_II));
-	m_screen->set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_alpha68k_II);
-	PALETTE(config, m_palette).set_format(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder, 2048);
-
-	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
-
+	m_outlatch->q_out_cb<2>().set(FUNC(alpha68k_II_state::video_control2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(alpha68k_II_state::video_control3_w));
+	
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
-	ym1.port_a_write_callback().set(FUNC(alpha68k_state::porta_w));
+	ym2203_device &ym1(YM2203(config, "ym1", ALPHA68K_PIXEL_CLOCK / 2)); // TODO: verify me
+	ym1.port_a_write_callback().set(FUNC(alpha68k_II_state::porta_w));
 	ym1.add_route(ALL_OUTPUTS, "speaker", 0.65);
 
-	ym2413_device &ym2(YM2413(config, "ym2", 3.579545_MHz_XTAL));
-	ym2.add_route(ALL_OUTPUTS, "speaker", 1.0);
-
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-}
-
-void alpha68k_state::btlfieldb(machine_config &config)
-{
-	alpha68k_II(config);
-	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_state::irq1_line_hold));
-	m_maincpu->set_periodic_int(FUNC(alpha68k_state::irq2_line_hold), attotime::from_hz(60*4)); // MCU irq
-}
-
-void alpha68k_state::alpha68k_II_gm(machine_config &config)
-{
-	alpha68k_II(config);
-	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_state::irq1_line_hold));
-	m_maincpu->set_periodic_int(FUNC(alpha68k_state::irq2_line_hold), attotime::from_hz(60*3)); // MCU irq
-}
-
-void alpha68k_state::alpha68k_V(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &alpha68k_state::alpha68k_V_map);
-	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_state::irq3_line_hold)); /* VBL */
-
-	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &alpha68k_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &alpha68k_state::sound_portmap);
-	m_audiocpu->set_periodic_int(FUNC(alpha68k_state::sound_nmi), attotime::from_hz(ALPHA68K_PIXEL_CLOCK / ALPHA68K_HTOTAL / 2));
-
-	LS259(config, m_outlatch); // 13C
-	m_outlatch->q_out_cb<2>().set(FUNC(alpha68k_state::video_control2_w));
-	m_outlatch->q_out_cb<3>().set(FUNC(alpha68k_state::video_control3_w));
-
-	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
-	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(60);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  m_screen->set_soze(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);;
-	set_screen_raw_params(config);
-	m_screen->set_screen_update(FUNC(alpha68k_state::screen_update_alpha68k_V));
-	m_screen->set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_alpha68k_V);
-	PALETTE(config, m_palette).set_format(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder, 4096);
-
-	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	ym2203_device &ym1(YM2203(config, "ym1", ALPHA68K_PIXEL_CLOCK / 2));
-	ym1.port_a_write_callback().set(FUNC(alpha68k_state::porta_w));
-	ym1.add_route(ALL_OUTPUTS, "speaker", 0.65);
-
-	ym2413_device &ym2(YM2413(config, "ym2", 3.579545_MHz_XTAL));
+	ym2413_device &ym2(YM2413(config, "ym2", 3.579545_MHz_XTAL)); // TODO: verify me
 	ym2.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // ALPHA-VOICE88 custom DAC
@@ -1358,24 +1261,110 @@ void alpha68k_state::alpha68k_V(machine_config &config)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
-void alpha68k_state::alpha68k_V_sb(machine_config &config)
+void alpha68k_II_state::video_config(machine_config &config, u16 num_pens)
 {
-	alpha68k_V(config);
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	set_screen_raw_params(config);
+	m_screen->set_screen_update(FUNC(alpha68k_II_state::screen_update));
+	m_screen->set_palette(m_palette);
+	
+	// TODO: should really be same as snk68.cpp
+	MCFG_VIDEO_START_OVERRIDE(alpha68k_II_state,alpha68k)
+
+	SNK68_SPR(config, m_sprites, 0);
+	m_sprites->set_gfxdecode_tag(m_gfxdecode);
+	m_sprites->set_tile_indirect_cb(FUNC(alpha68k_II_state::tile_callback), this);
+	m_sprites->set_xpos_shift(15);
+	m_sprites->set_color_entry_mask((num_pens / 16) - 1);
+
+	// TODO: change into NeoGeo palette format ...
+	PALETTE(config, m_palette).set_format(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder, num_pens);
+	// TODO: ... and make this a configuration option
+	m_backdrop_pen = num_pens - 1;
+}
+
+void alpha68k_II_state::alpha68k_II(machine_config &config)
+{
+	base_config(config);
+	m_outlatch->parallel_out_cb().set(FUNC(alpha68k_II_state::video_bank_w)).rshift(4).mask(0x07);	
+	
+	/* basic machine hardware */
+	M68000(config, m_maincpu, 8000000); // TODO: verify me
+	m_maincpu->set_addrmap(AS_PROGRAM, &alpha68k_II_state::alpha68k_II_map);
+	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_state::irq3_line_hold)); /* VBL */
+
+	Z80(config, m_audiocpu, 6000000); // TODO: verify me
+	m_audiocpu->set_addrmap(AS_PROGRAM, &alpha68k_II_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &alpha68k_II_state::sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(alpha68k_II_state::sound_nmi), attotime::from_hz(7614));
+
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_II_state,alpha68k_II)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_II_state,alpha68k_II)
+
+	video_config(config, 2048);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_alpha68k_II);
+}
+
+void alpha68k_II_state::btlfieldb(machine_config &config)
+{
+	alpha68k_II(config);
+	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_II_state::irq1_line_hold));
+	m_maincpu->set_periodic_int(FUNC(alpha68k_II_state::irq2_line_hold), attotime::from_hz(60*4)); // MCU irq
+}
+
+void goldmedal_II_state::goldmedal(machine_config &config)
+{
+	alpha68k_II(config);
+	m_maincpu->set_vblank_int("screen", FUNC(goldmedal_II_state::irq1_line_hold));
+	m_maincpu->set_periodic_int(FUNC(goldmedal_II_state::irq2_line_hold), attotime::from_hz(60*3)); // MCU irq
+}
+
+void alpha68k_III_state::alpha68k_III(machine_config &config)
+{
+	base_config(config);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alpha68k_III_state::alpha68k_III_map);
+	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_III_state::irq1_line_hold)); /* VBL */
+
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &alpha68k_III_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &alpha68k_III_state::sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(alpha68k_III_state::sound_nmi), attotime::from_hz(ALPHA68K_PIXEL_CLOCK / ALPHA68K_HTOTAL / 2));
+
+	MCFG_MACHINE_START_OVERRIDE(alpha68k_III_state,alpha68k_V)
+	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_III_state,alpha68k_V)
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(alpha68k_state::screen_update_alpha68k_V_sb));
+	video_config(config, 4096);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_alpha68k_V);
 }
 
 // goldmedla
-void alpha68k_state::alpha68k_III(machine_config &config)
+void goldmedal_III_state::goldmedal(machine_config &config)
 {
-	// TODO: we conveniently override this, base should really be shuffled around in the first place.
-	alpha68k_V_sb(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &alpha68k_state::alpha68k_III_map);
-	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_state::irq1_line_hold));
-	m_maincpu->set_periodic_int(FUNC(alpha68k_state::irq2_line_hold), attotime::from_hz(60*3)); // MCU irq
+	alpha68k_III_state::alpha68k_III(config);
+	m_maincpu->set_periodic_int(FUNC(goldmedal_III_state::irq2_line_hold), attotime::from_hz(60*3)); // MCU irq
 }
 
+void alpha68k_V_state::alpha68k_V(machine_config &config)
+{
+	alpha68k_III_state::alpha68k_III(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alpha68k_V_state::alpha68k_V_map);
+	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_V_state::irq3_line_hold)); /* VBL */
+}
+
+void skyadventure_state::skyadventure(machine_config &config)
+{
+	alpha68k_V_state::alpha68k_V(config);
+	m_sprites->set_tile_indirect_cb(FUNC(skyadventure_state::tile_callback_noflipx), this);
+}
+
+void gangwars_state::gangwars(machine_config &config)
+{
+	alpha68k_V_state::alpha68k_V(config);
+	m_sprites->set_tile_indirect_cb(FUNC(gangwars_state::tile_callback_noflipy), this);
+}
 
 /******************************************************************************/
 
@@ -2018,7 +2007,7 @@ ROM_END
 
 /******************************************************************************/
 
-void alpha68k_state::init_timesold()
+void alpha68k_II_state::init_timesold()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0;
@@ -2026,7 +2015,7 @@ void alpha68k_state::init_timesold()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_timesold1()
+void alpha68k_II_state::init_timesold1()
 {
 	m_invert_controls = 1;
 	m_microcontroller_id = 0;
@@ -2034,7 +2023,7 @@ void alpha68k_state::init_timesold1()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_btlfield()
+void alpha68k_II_state::init_btlfield()
 {
 	m_invert_controls = 1;
 	m_microcontroller_id = 0;
@@ -2042,7 +2031,7 @@ void alpha68k_state::init_btlfield()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_btlfieldb()
+void alpha68k_II_state::init_btlfieldb()
 {
 	m_invert_controls = 1;
 	m_microcontroller_id = 0;
@@ -2050,7 +2039,7 @@ void alpha68k_state::init_btlfieldb()
 	m_game_id = ALPHA68K_BTLFIELDB;
 }
 
-void alpha68k_state::init_skysoldr()
+void alpha68k_II_state::init_skysoldr()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0;
@@ -2058,7 +2047,7 @@ void alpha68k_state::init_skysoldr()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_goldmedl()
+void goldmedal_II_state::init_goldmedl()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8803; //AT
@@ -2066,7 +2055,7 @@ void alpha68k_state::init_goldmedl()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_goldmedla()
+void goldmedal_III_state::init_goldmedla()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
@@ -2074,7 +2063,7 @@ void alpha68k_state::init_goldmedla()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_skyadvnt()
+void alpha68k_V_state::init_skyadvnt()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8814;
@@ -2082,7 +2071,7 @@ void alpha68k_state::init_skyadvnt()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_skyadvntu()
+void alpha68k_V_state::init_skyadvntu()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8814;
@@ -2090,7 +2079,7 @@ void alpha68k_state::init_skyadvntu()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_gangwarsu()
+void alpha68k_V_state::init_gangwarsu()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8512;
@@ -2098,7 +2087,7 @@ void alpha68k_state::init_gangwarsu()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_gangwars()
+void alpha68k_V_state::init_gangwars()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8512;
@@ -2106,7 +2095,7 @@ void alpha68k_state::init_gangwars()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_sbasebal()
+void alpha68k_V_state::init_sbasebal()
 {
 	u16 *rom = (u16 *)memregion("maincpu")->base();
 
@@ -2130,7 +2119,7 @@ void alpha68k_state::init_sbasebal()
 	m_game_id = 0;
 }
 
-void alpha68k_state::init_sbasebalj()
+void alpha68k_V_state::init_sbasebalj()
 {
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8512;  // Same as 'gangwars' ?
@@ -2140,29 +2129,33 @@ void alpha68k_state::init_sbasebalj()
 
 /******************************************************************************/
 
-GAME( 1987, timesold,  0,        alpha68k_II,    timesold,  alpha68k_state, init_timesold,  ROT90, "Alpha Denshi Co. (SNK/Romstar license)",            "Time Soldiers (US Rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, timesold1, timesold, alpha68k_II,    timesold,  alpha68k_state, init_timesold1, ROT90, "Alpha Denshi Co. (SNK/Romstar license)",            "Time Soldiers (US Rev 1)", MACHINE_SUPPORTS_SAVE )
+// Alpha II HW
+GAME( 1987, timesold,  0,        alpha68k_II,    timesold,  alpha68k_II_state, init_timesold,  ROT90, "Alpha Denshi Co. (SNK/Romstar license)",            "Time Soldiers (US Rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, timesold1, timesold, alpha68k_II,    timesold,  alpha68k_II_state, init_timesold1, ROT90, "Alpha Denshi Co. (SNK/Romstar license)",            "Time Soldiers (US Rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield,  alpha68k_state, init_btlfield,  ROT90, "Alpha Denshi Co. (SNK license)",                    "Battle Field (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb, alpha68k_state, init_btlfieldb, ROT90, "bootleg",                                           "Battle Field (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield,  alpha68k_II_state, init_btlfield,  ROT90, "Alpha Denshi Co. (SNK license)",                    "Battle Field (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb, alpha68k_II_state, init_btlfieldb, ROT90, "bootleg",                                           "Battle Field (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr,  alpha68k_state, init_skysoldr,  ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr,  alpha68k_state, init_skysoldr,  ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl,  alpha68k_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1, Alpha68k II PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedla, goldmedl, alpha68k_III,   goldmedl,  alpha68k_state, init_goldmedla, ROT0,  "SNK",                                               "Gold Medalist (set 2, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedlb, goldmedl, alpha68k_III,   goldmedl,  alpha68k_state, init_goldmedla, ROT0,  "bootleg",                                               "Gold Medalist (bootleg, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE ) 
+GAME( 1988, goldmedl,  0,        goldmedal,   goldmedl,  goldmedal_II_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1, Alpha68k II PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, skyadvnt,  0,        alpha68k_V,     skyadvnt,  alpha68k_state, init_skyadvnt,  ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvntu, alpha68k_state, init_skyadvntu, ROT90, "Alpha Denshi Co. (SNK of America license)",         "Sky Adventure (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, skyadvntj, skyadvnt, alpha68k_V,     skyadvnt,  alpha68k_state, init_skyadvnt,  ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (Japan)", MACHINE_SUPPORTS_SAVE )
+// Alpha III HW
+GAME( 1988, goldmedla, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "SNK",                                               "Gold Medalist (set 2, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, goldmedlb, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "bootleg",                                               "Gold Medalist (bootleg, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE ) 
 
-GAME( 1989, gangwars,  0,        alpha68k_V,     gangwars,  alpha68k_state, init_gangwars,  ROT0,  "Alpha Denshi Co.",                                  "Gang Wars", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gangwarsj, gangwars, alpha68k_V,     gangwars,  alpha68k_state, init_gangwars,  ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gangwarsu, gangwars, alpha68k_V,     gangwarsu, alpha68k_state, init_gangwarsu, ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gangwarsb, gangwars, alpha68k_V,     gangwars,  alpha68k_state, init_gangwars,  ROT0,  "bootleg",                                           "Gang Wars (bootleg)", MACHINE_SUPPORTS_SAVE ) // has (undumped) 68705 MCU in place of Alpha MCU, otherwise the same as 'gangwars'
+// Alpha V HW
+GAME( 1989, skyadvnt,  0,        skyadventure,     skyadvnt,  skyadventure_state, init_skyadvnt,  ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyadvntu, skyadvnt, skyadventure,     skyadvntu, skyadventure_state, init_skyadvntu, ROT90, "Alpha Denshi Co. (SNK of America license)",         "Sky Adventure (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyadvntj, skyadvnt, skyadventure,     skyadvnt,  skyadventure_state, init_skyadvnt,  ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal,  alpha68k_state, init_sbasebal,  ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed
-GAME( 1989, sbasebalj, sbasebal, alpha68k_V_sb,  sbasebalj, alpha68k_state, init_sbasebalj, ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // same as above
+GAME( 1989, gangwars,  0,        gangwars,     gangwars,  gangwars_state, init_gangwars,  ROT0,  "Alpha Denshi Co.",                                  "Gang Wars", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gangwarsj, gangwars, gangwars,     gangwars,  gangwars_state, init_gangwars,  ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gangwarsu, gangwars, gangwars,     gangwarsu, gangwars_state, init_gangwarsu, ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gangwarsb, gangwars, gangwars,     gangwars,  gangwars_state, init_gangwars,  ROT0,  "bootleg",                                           "Gang Wars (bootleg)", MACHINE_SUPPORTS_SAVE ) // has (undumped) 68705 MCU in place of Alpha MCU, otherwise the same as 'gangwars'
+
+GAME( 1989, sbasebal,  0,        alpha68k_V,  sbasebal,  alpha68k_V_state, init_sbasebal,  ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed
+GAME( 1989, sbasebalj, sbasebal, alpha68k_V,  sbasebalj, alpha68k_V_state, init_sbasebalj, ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // same as above
 

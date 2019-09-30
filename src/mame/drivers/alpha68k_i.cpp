@@ -79,8 +79,12 @@ void thenextspace_state::tnextspc_unknown_w(offs_t offset, u16 data)
 {
 	logerror("tnextspc_unknown_w : PC = %04x - offset = %04x - data = %04x\n", m_maincpu->pc(), offset, data);
 	if (offset == 0)
-		flipscreen_w(data & 0x100);
+		m_flipscreen = data & 0x100;
 }
+
+// TODO: check me
+u16 thenextspace_state::sound_cpu_r(){ return 1; }
+
 
 /*
  *
