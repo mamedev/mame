@@ -164,7 +164,8 @@ function request_dumps(name, group, crc, sha1, url, progress)
 				if (req.status == 200)
 				{
 					var machines = Object.create(null);
-					if (Object.keys(req.response).length > 0)
+					var matched = Object.keys(req.response);
+					if (matched.length > 0)
 					{
 						Object.keys(machine_info).forEach(
 								function (shortname)
@@ -174,20 +175,22 @@ function request_dumps(name, group, crc, sha1, url, progress)
 									{
 										machines[shortname] = req.response[shortname].matches;
 										add_matches(table, group.names, req.response[shortname].matches);
-										delete req.response[shortname];
 									}
 									else
 									{
 										add_matches(table, group.names, null);
 									}
 								});
-						Object.keys(req.response).forEach(
+						matched.forEach(
 								function (shortname)
 								{
-									var info = req.response[shortname];
-									var table = get_machine_table(shortname, info.description);
-									machines[shortname] = req.response[shortname].matches;
-									add_matches(table, group.names, info.matches);
+									if (!Object.hasOwnProperty.call(machine_info, shortname))
+									{
+										var info = req.response[shortname];
+										var table = get_machine_table(shortname, info.description);
+										machines[shortname] = req.response[shortname].matches;
+										add_matches(table, group.names, info.matches);
+									}
 								});
 						for (var i = 0; i < group.names.length; i++)
 							matched_names.push(group.names[i]);
