@@ -126,8 +126,8 @@ void textelcomp_state::textelcomp(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_size(480, 128);
-	screen.set_visarea(0, 480-1, 0, 128-1);
+	screen.set_size(640, 201);
+	screen.set_visarea(0, 640-1, 0, 201-1);
 	screen.set_palette("palette");
 	screen.set_screen_update("lcdc", FUNC(sed1330_device::screen_update));
 
