@@ -620,9 +620,9 @@ class QueryConnection(object):
     def __init__(self, database, **kwargs):
         super(QueryConnection, self).__init__(**kwargs)
         if sys.version_info >= (3, 4):
-            self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True)
+            self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True, check_same_thread=False)
         else:
-            self.dbconn = sqlite3.connect(database)
+            self.dbconn = sqlite3.connect(database, check_same_thread=False)
         self.dbconn.row_factory = sqlite3.Row
         self.dbconn.execute('PRAGMA foreign_keys = ON')
 
