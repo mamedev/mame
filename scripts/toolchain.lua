@@ -455,9 +455,30 @@ function toolchain(_buildDir, _subDir)
 		end
 	elseif _ACTION == "vs2019" or _ACTION == "vs2019-fastbuild" then
 
-		if ("clangcl") == _OPTIONS["vs"] then
+		if "clangcl" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("ClangCL")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
+		end
+
+		if "winstore82" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v142"
+			premake.vstudio.storeapp = "10.0"
+
+			-- If needed, depending on GENie version, enable file-level configuration
+			if enablefilelevelconfig ~= nil then
+				enablefilelevelconfig()
+			end
+
+			local action = premake.action.current()
+			action.vstudio.windowsTargetPlatformVersion = windowsPlatform
+
+			platforms { "ARM" }
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winstore82")
+		end
+
+		if "intel-15" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "Intel C++ Compiler XE 15.0"
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
 		end
 	elseif _ACTION == "xcode4" then
 
