@@ -123,7 +123,7 @@ hd64180rp_device::hd64180rp_device(const machine_config &mconfig, const char *ta
 	: z180_device(mconfig, HD64180RP, tag, owner, clock, false, address_map_constructor())
 {
 	// 64-pin DIP versions omit A19
-	set_data_width(19);
+	set_address_width(19);
 }
 
 z8s180_device::z8s180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -451,10 +451,10 @@ static std::unique_ptr<uint8_t[]> SZHVC_sub;
 #include "z180op.hxx"
 
 
-void z180_device::set_data_width(int bits)
+void z180_device::set_address_width(int bits)
 {
-	m_program_config.m_data_width = bits;
-	m_decrypted_opcodes_config.m_data_width = bits;
+	m_program_config.m_addr_width = bits;
+	m_decrypted_opcodes_config.m_addr_width = bits;
 }
 
 device_memory_interface::space_config_vector z180_device::memory_space_config() const

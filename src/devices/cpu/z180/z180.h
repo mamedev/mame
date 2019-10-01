@@ -147,7 +147,7 @@ protected:
 	address_space_config m_io_config;
 	address_space_config m_decrypted_opcodes_config;
 
-	void set_data_width(int bits);
+	void set_address_width(int bits);
 
 private:
 	int memory_wait_states() const { return (m_dcntl & 0xc0) >> 6; }
