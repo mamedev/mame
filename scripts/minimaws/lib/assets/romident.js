@@ -145,7 +145,7 @@ function get_machine_table(shortname, description)
 		var heading = div.appendChild(document.createElement('h2'));
 		var link = heading.appendChild(document.createElement('a'));
 		link.textContent = description;
-		link.setAttribute('href', appurl + 'machine/' + shortname);
+		link.setAttribute('href', appurl + 'machine/' + encodeURIComponent(shortname));
 		var table = div.appendChild(document.createElement('table'));
 		machine_info[shortname] = table;
 		add_matches(table, matched_names, null);

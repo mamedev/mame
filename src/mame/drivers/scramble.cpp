@@ -1464,12 +1464,10 @@ void scramble_state::hotshock(machine_config &config)
 	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
-	subdevice<ay8910_device>("8910.1")->reset_routes();
-	subdevice<ay8910_device>("8910.1")->add_route(ALL_OUTPUTS, "mono", 0.33);
+	subdevice<ay8910_device>("8910.1")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.33);
 
 	subdevice<ay8910_device>("8910.2")->port_a_read_callback().set(FUNC(scramble_state::hotshock_soundlatch_r));
-	subdevice<ay8910_device>("8910.2")->reset_routes();
-	subdevice<ay8910_device>("8910.2")->add_route(ALL_OUTPUTS, "mono", 0.33);
+	subdevice<ay8910_device>("8910.2")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
 void scramble_state::cavelon(machine_config &config)
@@ -1514,8 +1512,7 @@ void scramble_state::triplep(machine_config &config)
 
 	/* sound hardware */
 	subdevice<ay8910_device>("8910.1")->set_clock(18432000/12); // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
-	subdevice<ay8910_device>("8910.1")->reset_routes();
-	subdevice<ay8910_device>("8910.1")->add_route(ALL_OUTPUTS, "mono", 1.0);
+	subdevice<ay8910_device>("8910.1")->reset_routes().add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	config.device_remove("8910.2");
 }

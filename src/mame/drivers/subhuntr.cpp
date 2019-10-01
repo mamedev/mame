@@ -153,9 +153,9 @@ void subhuntr_state::subhuntr(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(subhuntr_state::subhuntr_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 
-	s2636_device &s2636(S2636(config, "s2636", 0));
-	s2636.set_offsets(3, -21);
-	s2636.add_route(ALL_OUTPUTS, "mono", 0.10);
+	//s2636_device &s2636(S2636(config, "s2636", 0));
+	//s2636.set_offsets(3, -21);
+	//s2636.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

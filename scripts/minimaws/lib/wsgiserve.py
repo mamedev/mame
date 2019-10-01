@@ -13,13 +13,15 @@ import mimetypes
 import os.path
 import re
 import sys
-import wsgiref.simple_server
+import urllib
 import wsgiref.util
 
 if sys.version_info >= (3, ):
     import urllib.parse as urlparse
+    urlquote = urlparse.quote
 else:
     import urlparse
+    urlquote = urllib.quote
 
 
 class HandlerBase(object):
@@ -96,10 +98,10 @@ class QueryPageHandler(HandlerBase):
         self.dbcurs = app.dbconn.cursor()
 
     def machine_href(self, shortname):
-        return cgi.escape(urlparse.urljoin(self.application_uri, 'machine/%s' % (shortname, )), True)
+        return cgi.escape(urlparse.urljoin(self.application_uri, 'machine/%s' % (urlquote(shortname), )), True)
 
     def sourcefile_href(self, sourcefile):
-        return cgi.escape(urlparse.urljoin(self.application_uri, 'sourcefile/%s' % (sourcefile, )), True)
+        return cgi.escape(urlparse.urljoin(self.application_uri, 'sourcefile/%s' % (urlquote(sourcefile), )), True)
 
 
 class MachineRpcHandlerBase(QueryPageHandler):
@@ -174,21 +176,21 @@ class MachineHandler(QueryPageHandler):
             if parent:
                 yield (
                         '    <tr><th>Parent Machine:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
-                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['cloneof']), True), cgi.escape(parent[1]), cgi.escape(machine_info['cloneof']))).encode('utf-8')
+                        (self.machine_href(machine_info['cloneof']), cgi.escape(parent[1]), cgi.escape(machine_info['cloneof']))).encode('utf-8')
             else:
                 yield (
                         '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
-                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['cloneof']), True), cgi.escape(machine_info['cloneof']))).encode('utf-8')
+                        (self.machine_href(machine_info['cloneof']), cgi.escape(machine_info['cloneof']))).encode('utf-8')
         if (machine_info['romof'] is not None) and (machine_info['romof'] != machine_info['cloneof']):
             parent = self.dbcurs.listfull(machine_info['romof']).fetchone()
             if parent:
                 yield (
                         '    <tr><th>Parent ROM set:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
-                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['romof']), True), cgi.escape(parent[1]), cgi.escape(machine_info['romof']))).encode('utf-8')
+                        (self.machine_href(machine_info['romof']), cgi.escape(parent[1]), cgi.escape(machine_info['romof']))).encode('utf-8')
             else:
                 yield (
                         '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
-                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['romof']), True), cgi.escape(machine_info['romof']))).encode('utf-8')
+                        (self.machine_href(machine_info['romof']), cgi.escape(machine_info['romof']))).encode('utf-8')
         unemulated = []
         imperfect = []
         for feature, status, overall in self.dbcurs.get_feature_flags(id):
@@ -404,10 +406,10 @@ class SourceFileHandler(QueryPageHandler):
         uri = urlparse.urljoin(self.application_uri, 'sourcefile')
         title = ''
         for part in parts:
-            uri = urlparse.urljoin(uri + '/', part)
+            uri = urlparse.urljoin(uri + '/', urlquote(part))
             title += '<a href="{0}">{1}</a>/'.format(cgi.escape(uri, True), cgi.escape(part))
         if linkfinal:
-            uri = urlparse.urljoin(uri + '/', final)
+            uri = urlparse.urljoin(uri + '/', urlquote(final))
             return title + '<a href="{0}">{1}</a>'.format(cgi.escape(uri, True), cgi.escape(final))
         else:
             return title + final
@@ -615,12 +617,3 @@ class MiniMawsApp(object):
 
     def js_escape(self, str):
         return self.JS_ESCAPE.sub('\\\\\\1', str).replace('\0', '\\0')
-
-
-def run_server(options):
-    application = MiniMawsApp(options.database)
-    server = wsgiref.simple_server.make_server(options.host, options.port, application)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass

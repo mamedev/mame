@@ -5,7 +5,9 @@
 
 from __future__ import with_statement
 
+import io
 import sys
+
 ## to ignore include of emu.h add it always to list
 
 files_included = ['src/emu/emu.h']
@@ -61,111 +63,111 @@ def add_rest_if_exists(root, srcfile,folder):
 
 def parse_file_for_deps(root, srcfile, folder):
     try:
-        fp = open(root + srcfile, 'r')
+        fp = io.open(root + srcfile, 'r', encoding='utf-8')
     except IOError:
         return 1
     in_comment = 0
     linenum = 0
-    for line in fp.readlines():
-        content = ''
-        linenum+=1
-        srcptr = 0
-        while srcptr < len(line):
-            c = line[srcptr]
-            srcptr+=1
-            if ord(c)==13 or ord(c)==10:
-                if ord(c)==13 and ord(line[srcptr])==10:
+    with fp:
+        for line in fp.readlines():
+            content = ''
+            linenum+=1
+            srcptr = 0
+            while srcptr < len(line):
+                c = line[srcptr]
+                srcptr+=1
+                if ord(c)==13 or ord(c)==10:
+                    if ord(c)==13 and ord(line[srcptr])==10:
+                        srcptr+=1
+                    continue
+                if c==' ' or ord(c)==9:
+                    continue
+                if in_comment==1 and c=='*' and line[srcptr]=='/' :
                     srcptr+=1
-                continue
-            if c==' ' or ord(c)==9:
-                continue
-            if in_comment==1 and c=='*' and line[srcptr]=='/' :
-                srcptr+=1
-                in_comment = 0
-                continue
-            if in_comment:
-                continue
-            if c=='/' and line[srcptr]=='*' :
-                srcptr+=1
-                in_comment = 1
-                continue
-            if c=='/' and line[srcptr]=='/' :
-                break
-            content += c
-        content = content.strip()
-        if len(content)>0:
-            if content.startswith('#include'):
-               name = content[8:]
-               name = name.replace('"','')
-               fullname = file_exists(root, name, folder,deps_include_dirs)
-               if fullname in deps_files_included:
+                    in_comment = 0
+                    continue
+                if in_comment:
+                    continue
+                if c=='/' and line[srcptr]=='*' :
+                    srcptr+=1
+                    in_comment = 1
+                    continue
+                if c=='/' and line[srcptr]=='/' :
+                    break
+                content += c
+            content = content.strip()
+            if len(content)>0:
+                if content.startswith('#include'):
+                   name = content[8:]
+                   name = name.replace('"','')
+                   fullname = file_exists(root, name, folder,deps_include_dirs)
+                   if fullname in deps_files_included:
+                       continue
+                   if fullname!='':
+                       deps_files_included.append(fullname)
+                       add_c_if_exists(root, fullname.replace('.h','.cpp'))
+                       add_rest_if_exists(root, fullname,folder)
+                       newfolder = fullname.rsplit('/', 1)[0] + '/'
+                       parse_file_for_deps(root, fullname, newfolder)
                    continue
-               if fullname!='':
-                   deps_files_included.append(fullname)
-                   add_c_if_exists(root, fullname.replace('.h','.cpp'))
-                   add_rest_if_exists(root, fullname,folder)
-                   newfolder = fullname.rsplit('/', 1)[0] + '/'
-                   parse_file_for_deps(root, fullname, newfolder)
-               continue
-    fp.close()
     return 0
 
 def parse_file(root, srcfile, folder):
     try:
-        fp = open(root + srcfile, 'r')
+        fp = io.open(root + srcfile, 'r', encoding='utf-8')
     except IOError:
         return 1
     in_comment = 0
     linenum = 0
-    for line in fp.readlines():
-        content = ''
-        linenum+=1
-        srcptr = 0
-        while srcptr < len(line):
-            c = line[srcptr]
-            srcptr+=1
-            if ord(c)==13 or ord(c)==10:
-                if ord(c)==13 and ord(line[srcptr])==10:
+    with fp:
+        for line in fp.readlines():
+            content = ''
+            linenum+=1
+            srcptr = 0
+            while srcptr < len(line):
+                c = line[srcptr]
+                srcptr+=1
+                if ord(c)==13 or ord(c)==10:
+                    if ord(c)==13 and ord(line[srcptr])==10:
+                        srcptr+=1
+                    continue
+                if c==' ' or ord(c)==9:
+                    continue
+                if in_comment==1 and c=='*' and line[srcptr]=='/' :
                     srcptr+=1
-                continue
-            if c==' ' or ord(c)==9:
-                continue
-            if in_comment==1 and c=='*' and line[srcptr]=='/' :
-                srcptr+=1
-                in_comment = 0
-                continue
-            if in_comment:
-                continue
-            if c=='/' and line[srcptr]=='*' :
-                srcptr+=1
-                in_comment = 1
-                continue
-            if c=='/' and line[srcptr]=='/' :
-                break
-            content += c
-        content = content.strip()
-        if len(content)>0:
-            if content.startswith('#include'):
-               name = content[8:]
-               name = name.replace('"','')
-               fullname = file_exists(root, name, folder,include_dirs)
-               if fullname in files_included:
+                    in_comment = 0
+                    continue
+                if in_comment:
+                    continue
+                if c=='/' and line[srcptr]=='*' :
+                    srcptr+=1
+                    in_comment = 1
+                    continue
+                if c=='/' and line[srcptr]=='/' :
+                    break
+                content += c
+            content = content.strip()
+            if len(content)>0:
+                if content.startswith('#include'):
+                   name = content[8:]
+                   name = name.replace('"','')
+                   fullname = file_exists(root, name, folder,include_dirs)
+                   if fullname in files_included:
+                       continue
+                   if "src/lib/netlist/" in fullname:
+                       continue
+                   if fullname!='':
+                       if fullname in mappings.keys():
+                            if not(mappings[fullname] in components):
+                                components.append(mappings[fullname])
+                       files_included.append(fullname)
+                       newfolder = fullname.rsplit('/', 1)[0] + '/'
+                       parse_file(root, fullname, newfolder)
+                       if (fullname.endswith('.h') and not("src/emu" in fullname) and not("src/devices" in fullname) and not("src/lib" in fullname) and not("src/osd" in fullname)):
+                           parse_file_for_deps(root, fullname.replace('.h','.cpp'), newfolder)
+                       elif fullname.endswith('.h'):
+                           parse_file(root, fullname.replace('.h','.cpp'), newfolder)
                    continue
-               if "src/lib/netlist/" in fullname:
-                   continue
-               if fullname!='':
-                   if fullname in mappings.keys():
-                        if not(mappings[fullname] in components):
-                            components.append(mappings[fullname])
-                   files_included.append(fullname)
-                   newfolder = fullname.rsplit('/', 1)[0] + '/'
-                   parse_file(root, fullname, newfolder)
-                   if (fullname.endswith('.h') and not("src/emu" in fullname) and not("src/devices" in fullname) and not("src/lib" in fullname) and not("src/osd" in fullname)):
-                       parse_file_for_deps(root, fullname.replace('.h','.cpp'), newfolder)
-                   elif fullname.endswith('.h'):
-                       parse_file(root, fullname.replace('.h','.cpp'), newfolder)
-               continue
-    fp.close()
     return 0
 
 def parse_file_for_drivers(root, srcfile):
@@ -177,16 +179,17 @@ def parse_file_for_drivers(root, srcfile):
 
 def parse_lua_file(srcfile):
     try:
-        fp = open(srcfile, 'r')
+        fp = io.open(srcfile, 'r', encoding='utf-8')
     except IOError:
         sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
-    for line in fp.readlines():
-        content = line.strip()
-        if len(content)>0:
-            if content.startswith('--@'):
-               name = content[3:]
-               mappings[name.rsplit(',', 1)[0]] = name.rsplit(',', 1)[1]
+    with fp:
+        for line in fp.readlines():
+            content = line.strip()
+            if len(content)>0:
+                if content.startswith('--@'):
+                   name = content[3:]
+                   mappings[name.rsplit(',', 1)[0]] = name.rsplit(',', 1)[1]
     return 0
 
 if len(sys.argv) < 5:

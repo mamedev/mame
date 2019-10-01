@@ -78,19 +78,9 @@
 ## and see dependent slots update.  Required command-line arguments to
 ## produce the selected configuration are also displayed.
 
-import argparse
-import os
-import os.path
-import sys
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-import lib.auxverbs
-import lib.lxparse
-import lib.wsgiserve
-
-
 if __name__ == '__main__':
+    import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--database', metavar='<dbfile>', default='minimaws.sqlite3', help='SQLite 3 info database file (defaults to minimaws.sqlite3)')
     subparsers = parser.add_subparsers(title='commands', dest='command', metavar='<command>')
@@ -123,6 +113,8 @@ if __name__ == '__main__':
     group.add_argument('--file', metavar='<xmlfile>', help='XML machine information file')
 
     options = parser.parse_args()
+
+    import lib.auxverbs
     if options.command == 'listfull':
         lib.auxverbs.do_listfull(options)
     elif options.command == 'listsource':
@@ -136,8 +128,14 @@ if __name__ == '__main__':
     elif options.command == 'romident':
         lib.auxverbs.do_romident(options)
     elif options.command == 'serve':
-        lib.wsgiserve.run_server(options)
+        import wsgiref.simple_server
+        import lib.wsgiserve
+        application = lib.wsgiserve.MiniMawsApp(options.database)
+        server = wsgiref.simple_server.make_server(options.host, options.port, application)
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
     elif options.command == 'load':
+        import lib.lxparse
         lib.lxparse.load_info(options)
-else:
-    application = lib.wsgiserve.MiniMawsApp(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'minimaws.sqlite3'))

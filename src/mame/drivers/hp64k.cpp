@@ -1456,14 +1456,14 @@ void hp64k_state::hp64k(machine_config &config)
 	m_phi->sys_cntrl_read_cb().set(FUNC(hp64k_state::hp64k_phi_sys_ctrl_r));
 	m_phi->dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_phi->dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_EOI>().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_DAV>().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_NRFD>().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_NDAC>().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_IFC>().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_SRQ>().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_ATN>().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_REN>().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
+	m_phi->eoi_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	m_phi->dav_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
+	m_phi->nrfd_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
+	m_phi->ndac_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
+	m_phi->ifc_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
+	m_phi->srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
+	m_phi->atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	m_phi->ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
 
 	ieee488_device &ieee(IEEE488(config, IEEE488_TAG));
 	ieee.eoi_callback().set(m_phi, FUNC(phi_device::eoi_w));
