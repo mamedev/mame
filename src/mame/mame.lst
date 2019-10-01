@@ -2532,6 +2532,8 @@ sy019hi							// Soyo SY-019H and SY-019I motherboards (386)
 sm38640f						// SM 386-40F motherboard (386)
 sisrabb							// motherboards using the SiS Rabbit chipset (386)
 qdu386dx						// QD-U386DX VER 1.0 motherboard (386)
+4nd04a
+um82c481af						// motherboards using the UMC UM82C481AF chipset (386)
 um82c491f						// motherboards using the UMC UM82C491F chipset (386)
 um82c493f						// motherboards using the UMC UM82C491F + UM82C493F chipset or BIOTEQ equivalents (386)
 al486vd							// Daewoo AL486V-D Rev:1.1 motherboard (386)
