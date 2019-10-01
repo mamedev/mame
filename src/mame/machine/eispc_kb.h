@@ -23,20 +23,18 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual tiny_rom_entry const *device_rom_region() const override;
 
 	required_device<m6801_cpu_device> m_mcu;
 	required_ioport_array<6>       m_rows;
-	devcb_write_line                m_txd_cb; // Callback for KBD-> EPC
+	devcb_write_line               m_txd_cb; // Callback for KBD-> EPC
 
 	bool    m_rxd_high; // state of Rx input line
 	bool    m_txd_high; // state of Tx output line
 	bool    m_hold;
 	uint16_t m_col_select;
-	uint16_t m_keys[6];
 	uint8_t m_p1;
 
 	void eispc_kb_mem(address_map &map);

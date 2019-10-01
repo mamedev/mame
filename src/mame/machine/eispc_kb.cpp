@@ -27,7 +27,7 @@
   Tx/Hold is bidirectional, connected to the TX line of the SCI in the MCU, P24
   bit 4 of port 2, but can also be kept low by the host CPU to temporarily inhibit
   the keyboard from sending more scan codes. This is sensed by P16 through a
-  74HC04 inverter.
+  74HC04 inverter. The keyboard is specified to be able to buffer up to 20 scan codes.
 
   The data is exchanged in both direction asynchronously at 1200 baud, 8 databits,
   1 start and 1 stop bit. At startup the host CPU sends a $00 (zero) byte to the
@@ -102,118 +102,116 @@
 
 #define M6801_TAG       "mcu"
 
-#define PCM(handler, parameter) PORT_CHANGED_MEMBER(DEVICE_SELF, eispc_keyboard_device, handler, parameter)
-
 namespace {
 
 INPUT_PORTS_START(eispc_kb)
 	PORT_START("P15")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 6")    PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR('6') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))  PCM(key, 0) // 77
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP +")    PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')                                  PCM(key, 0) // 78
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 5")    PORT_CODE(KEYCODE_5_PAD)    PORT_CHAR('5')                                  PCM(key, 0) // 76
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("* PRINT") PORT_CODE(KEYCODE_TILDE)    PORT_CHAR('*') PORT_CHAR(UCHAR_MAMEKEY(PRTSCR)) PCM(key, 0) // 55
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R Shift") PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)                        PCM(key, 0) // 54
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_MINUS)    PORT_CHAR('-') PORT_CHAR('_')                   PCM(key, 0) // 53
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(". :")     PORT_CODE(KEYCODE_STOP)     PORT_CHAR('.') PORT_CHAR(':')                   PCM(key, 0) // 52
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F5")      PORT_CODE(KEYCODE_F5)       PORT_CHAR(UCHAR_MAMEKEY(F5))                    PCM(key, 0) // 63
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F6")      PORT_CODE(KEYCODE_F6)       PORT_CHAR(UCHAR_MAMEKEY(F6))                    PCM(key, 0) // 64
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                    PCM(key, 0) // no scancode is sent
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL")    PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))              PCM(key, 0) // 29
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(", ;")     PORT_CODE(KEYCODE_COMMA)    PORT_CHAR(',') PORT_CHAR(';')                   PCM(key, 0) // 51
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_D)        PORT_CHAR('D') PORT_CHAR('d')                   PCM(key, 0) // 32
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_X)        PORT_CHAR('X') PORT_CHAR('x')                   PCM(key, 0) // 45
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_C)        PORT_CHAR('C') PORT_CHAR('c')                   PCM(key, 0) // 46
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_J)        PORT_CHAR('J') PORT_CHAR('j')                   PCM(key, 0) // 36
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 6")    PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR('6') PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // 77
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP +")    PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')                                  // 78
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 5")    PORT_CODE(KEYCODE_5_PAD)    PORT_CHAR('5')                                  // 76
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("* PRINT") PORT_CODE(KEYCODE_TILDE)    PORT_CHAR('*') PORT_CHAR(UCHAR_MAMEKEY(PRTSCR)) // 55
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R Shift") PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)                        // 54
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_MINUS)    PORT_CHAR('-') PORT_CHAR('_')                   // 53
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(". :")     PORT_CODE(KEYCODE_STOP)     PORT_CHAR('.') PORT_CHAR(':')                   // 52
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F5")      PORT_CODE(KEYCODE_F5)       PORT_CHAR(UCHAR_MAMEKEY(F5))                    // 63
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F6")      PORT_CODE(KEYCODE_F6)       PORT_CHAR(UCHAR_MAMEKEY(F6))                    // 64
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                    // no scancode is sent
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL")    PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))              // 29
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(", ;")     PORT_CODE(KEYCODE_COMMA)    PORT_CHAR(',') PORT_CHAR(';')                   // 51
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_D)        PORT_CHAR('D') PORT_CHAR('d')                   // 32
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_X)        PORT_CHAR('X') PORT_CHAR('x')                   // 45
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_C)        PORT_CHAR('C') PORT_CHAR('c')                   // 46
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_J)        PORT_CHAR('J') PORT_CHAR('j')                   // 36
 
 	PORT_START("P14")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                        PCM(key, 1) // 00 - keyboard error
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")   PORT_CODE(KEYCODE_PAUSE)     PORT_CHAR(UCHAR_MAMEKEY(PAUSE))                    PCM(key, 1) // 70
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 7")    PORT_CODE(KEYCODE_7_PAD)     PORT_CHAR('7') PORT_CHAR(UCHAR_MAMEKEY(HOME))      PCM(key, 1) // 71
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                        PCM(key, 1) // ff - keyboard error
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_TILDE)     PORT_CHAR('^') PORT_CHAR('~') PORT_CHAR(']')       PCM(key, 1) // 27
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00e5) PORT_CHAR(0x00c5) PORT_CHAR('[') PCM(key, 1) // 26 å Å
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_P)         PORT_CHAR('P') PORT_CHAR('p')                      PCM(key, 1) // 25
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F1")      PORT_CODE(KEYCODE_F1)        PORT_CHAR(UCHAR_MAMEKEY(F1))                       PCM(key, 1) // 59
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F2")      PORT_CODE(KEYCODE_F2)        PORT_CHAR(UCHAR_MAMEKEY(F2))                       PCM(key, 1) // 60
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_W)         PORT_CHAR('w') PORT_CHAR('W')                      PCM(key, 1) // 17
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_E)         PORT_CHAR('e') PORT_CHAR('E')                      PCM(key, 1) // 18
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_O)         PORT_CHAR('o') PORT_CHAR('O')                      PCM(key, 1) // 24
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_R)         PORT_CHAR('r') PORT_CHAR('R')                      PCM(key, 1) // 19
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_T)         PORT_CHAR('t') PORT_CHAR('T')                      PCM(key, 1) // 20
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_Y)         PORT_CHAR('y') PORT_CHAR('Y')                      PCM(key, 1) // 21
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_I)         PORT_CHAR('i') PORT_CHAR('I')                      PCM(key, 1) // 23
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                        // 00 - keyboard error
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")   PORT_CODE(KEYCODE_PAUSE)     PORT_CHAR(UCHAR_MAMEKEY(PAUSE))                    // 70
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 7")    PORT_CODE(KEYCODE_7_PAD)     PORT_CHAR('7') PORT_CHAR(UCHAR_MAMEKEY(HOME))      // 71
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                        // ff - keyboard error
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_TILDE)     PORT_CHAR('^') PORT_CHAR('~') PORT_CHAR(']')       // 27
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00e5) PORT_CHAR(0x00c5) PORT_CHAR('[') // 26 å Å
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_P)         PORT_CHAR('P') PORT_CHAR('p')                      // 25
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F1")      PORT_CODE(KEYCODE_F1)        PORT_CHAR(UCHAR_MAMEKEY(F1))                       // 59
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F2")      PORT_CODE(KEYCODE_F2)        PORT_CHAR(UCHAR_MAMEKEY(F2))                       // 60
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_W)         PORT_CHAR('w') PORT_CHAR('W')                      // 17
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_E)         PORT_CHAR('e') PORT_CHAR('E')                      // 18
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_O)         PORT_CHAR('o') PORT_CHAR('O')                      // 24
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_R)         PORT_CHAR('r') PORT_CHAR('R')                      // 19
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_T)         PORT_CHAR('t') PORT_CHAR('T')                      // 20
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_Y)         PORT_CHAR('y') PORT_CHAR('Y')                      // 21
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                      PORT_CODE(KEYCODE_I)         PORT_CHAR('i') PORT_CHAR('I')                      // 23
 
 	PORT_START("P13")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_NUMLOCK)      PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))        PCM(key, 2) // 69
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                PCM(key, 2) // ff - keyboard error
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BS DEL") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(DEL)) PCM(key, 2) // 14
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')              PCM(key, 2) // 13
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('_')              PCM(key, 2) // 12
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR(')')              PCM(key, 2) // 11
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')              PCM(key, 2) // 10
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')              PCM(key, 2) // 02
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC")    PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))              PCM(key, 2) // 01
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('@')              PCM(key, 2) // 03
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')              PCM(key, 2) // 04
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('*')              PCM(key, 2) // 09
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')              PCM(key, 2) // 05
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')              PCM(key, 2) // 06
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('^')              PCM(key, 2) // 07
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('&')              PCM(key, 2) // 08
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_NUMLOCK)      PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))        // 69
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                // ff - keyboard error
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BS DEL") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(DEL)) // 14
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')              // 13
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('_')              // 12
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR(')')              // 11
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')              // 10
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')              // 02
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC")    PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))              // 01
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('@')              // 03
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')              // 04
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('*')              // 09
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')              // 05
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')              // 06
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('^')              // 07
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('&')              // 08
 
 	PORT_START("P12")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 9")      PORT_CODE(KEYCODE_9_PAD)     PORT_CHAR('9') PORT_CHAR(UCHAR_MAMEKEY(PGUP))      PCM(key, 3) // 73
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP -")      PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PCM(key, 3) // 74
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 8")      PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_UP) PORT_CHAR('8') PORT_CHAR(UCHAR_MAMEKEY(UP)) PCM(key, 3) // 72
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_TILDE)     PORT_CHAR('`') PORT_CHAR('~')       PCM(key, 3) // 41
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR('\'') PORT_CHAR('"')      PCM(key, 3) // 40
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_COLON)     PORT_CHAR(';') PORT_CHAR(':')       PCM(key, 3) // 39
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_L)         PORT_CHAR('l') PORT_CHAR('L')       PCM(key, 3) // 38
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F3")        PORT_CODE(KEYCODE_F3)        PORT_CHAR(UCHAR_MAMEKEY(F3))        PCM(key, 3) // 61
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F4")        PORT_CODE(KEYCODE_F4)        PORT_CHAR(UCHAR_MAMEKEY(F4))        PCM(key, 3) // 62
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_Q)         PORT_CHAR('q') PORT_CHAR('Q')       PCM(key, 3) // 16
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB")       PORT_CODE(KEYCODE_TAB)       PORT_CHAR(9)                        PCM(key, 3) // 15
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_K)         PORT_CHAR('k') PORT_CHAR('K')       PCM(key, 3) // 37
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_F)         PORT_CHAR('f') PORT_CHAR('F')       PCM(key, 3) // 33
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_G)         PORT_CHAR('g') PORT_CHAR('G')       PCM(key, 3) // 34
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_H)         PORT_CHAR('h') PORT_CHAR('H')       PCM(key, 3) // 35
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_U)         PORT_CHAR('u') PORT_CHAR('U')       PCM(key, 3) // 22
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 9")      PORT_CODE(KEYCODE_9_PAD)     PORT_CHAR('9') PORT_CHAR(UCHAR_MAMEKEY(PGUP))   // 73
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP -")      PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))             // 74
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 8")      PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_UP) PORT_CHAR('8') PORT_CHAR(UCHAR_MAMEKEY(UP)) // 72
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_TILDE)     PORT_CHAR('`') PORT_CHAR('~')       // 41
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR('\'') PORT_CHAR('"')      // 40
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_COLON)     PORT_CHAR(';') PORT_CHAR(':')       // 39
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_L)         PORT_CHAR('l') PORT_CHAR('L')       // 38
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F3")        PORT_CODE(KEYCODE_F3)        PORT_CHAR(UCHAR_MAMEKEY(F3))        // 61
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F4")        PORT_CODE(KEYCODE_F4)        PORT_CHAR(UCHAR_MAMEKEY(F4))        // 62
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_Q)         PORT_CHAR('q') PORT_CHAR('Q')       // 16
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB")       PORT_CODE(KEYCODE_TAB)       PORT_CHAR(9)                        // 15
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_K)         PORT_CHAR('k') PORT_CHAR('K')       // 37
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_F)         PORT_CHAR('f') PORT_CHAR('F')       // 33
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_G)         PORT_CHAR('g') PORT_CHAR('G')       // 34
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_H)         PORT_CHAR('h') PORT_CHAR('H')       // 35
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                        PORT_CODE(KEYCODE_U)         PORT_CHAR('u') PORT_CHAR('U')       // 22
 
 	PORT_START("P11")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_DEL_PAD)       PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))        PCM(key, 4) // 83
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER)         PORT_CHAR(13)                              PCM(key, 4) // 28
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 0")    PORT_CODE(KEYCODE_0_PAD)        PORT_CHAR('0') PORT_CHAR(UCHAR_MAMEKEY(INSERT))           PCM(key, 4) // 82
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   PCM(key, 4) // 89 - no key
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   PCM(key, 4) // 86 - no key
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   PCM(key, 4) // 87 - no key
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   PCM(key, 4) // 88 - no key
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F9")         PORT_CODE(KEYCODE_F9)        PORT_CHAR(UCHAR_MAMEKEY(F9))               PCM(key, 4) // 67
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F10")        PORT_CODE(KEYCODE_F10)       PORT_CHAR(UCHAR_MAMEKEY(F10))              PCM(key, 4) // 68
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   PCM(key, 4) // scan code ff - keyboard error
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD )                         PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')                            PCM(key, 4) // 43
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK")  PORT_CODE(KEYCODE_CAPSLOCK)  PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))         PCM(key, 4) // 58
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_LALT)                                                 PCM(key, 4) // 56
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   PCM(key, 4) // 85 - no key
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                         PORT_CODE(KEYCODE_V)         PORT_CHAR('v') PORT_CHAR('V')              PCM(key, 4) // 47
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                         PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ')                             PCM(key, 4) // 57
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_DEL_PAD)       PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))        // 83
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER)         PORT_CHAR(13)                              // 28
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 0")    PORT_CODE(KEYCODE_0_PAD)        PORT_CHAR('0') PORT_CHAR(UCHAR_MAMEKEY(INSERT)) // 82
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   // 89 - no key
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   // 86 - no key
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   // 87 - no key
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   // 88 - no key
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F9")         PORT_CODE(KEYCODE_F9)        PORT_CHAR(UCHAR_MAMEKEY(F9))               // 67
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F10")        PORT_CODE(KEYCODE_F10)       PORT_CHAR(UCHAR_MAMEKEY(F10))              // 68
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   // scan code ff - keyboard error
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD )                         PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')                            // 43
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK")  PORT_CODE(KEYCODE_CAPSLOCK)  PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))         // 58
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_LALT)                                                 // 56
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                   // 85 - no key
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                         PORT_CODE(KEYCODE_V)         PORT_CHAR('v') PORT_CHAR('V')              // 47
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                         PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ')                             // 57
 
 	PORT_START("P10")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 3")     PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_PGDN)                           PCM(key, 5) // 81
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                    PCM(key, 5) // ff - keyboard error
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 2")     PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PCM(key, 5) // 80
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NEW LINE") PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))          PCM(key, 5) // 84 (programmable, default is 28)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 1")     PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))                   PCM(key, 5) // 79
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 4")     PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR('4') PORT_CHAR(UCHAR_MAMEKEY(LEFT))     PCM(key, 5) // 75
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                    PCM(key, 5) // ff - keyboard error
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F7")       PORT_CODE(KEYCODE_F7)         PORT_CHAR(UCHAR_MAMEKEY(F7))                 PCM(key, 5) // 65
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F8")       PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))                 PCM(key, 5) // 66
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD )                       PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)                         PCM(key, 5) // 42
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')                  PCM(key, 5) // 44
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')                  PCM(key, 5) // 50
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')                  PCM(key, 5) // 30
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')                  PCM(key, 5) // 31
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')                  PCM(key, 5) // 48
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                     PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')                  PCM(key, 5) // 49
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 3")     PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_PGDN)                           // 81
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                    // ff - keyboard error
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 2")     PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) // 80
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NEW LINE") PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))          // 84 (programmable, default is 28)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 1")     PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))                   // 79
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("KP 4")     PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_LEFT) PORT_CHAR('4') PORT_CHAR(UCHAR_MAMEKEY(LEFT))     // 75
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )                                                                                                    // ff - keyboard error
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F7")       PORT_CODE(KEYCODE_F7)         PORT_CHAR(UCHAR_MAMEKEY(F7))                 // 65
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F8")       PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))                 // 66
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD )                       PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)                         // 42
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD )                       PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')                // 44
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD )                       PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')                // 50
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD )                       PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')                // 30
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD )                       PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')                // 31
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_KEYBOARD )                       PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')                // 48
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYBOARD )                       PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')                // 49
 INPUT_PORTS_END
 
 
@@ -258,29 +256,6 @@ eispc_keyboard_device::eispc_keyboard_device(
 {
 }
 
-INPUT_CHANGED_MEMBER( eispc_keyboard_device::key )
-{
-	if (oldval && !newval)
-	{
-		LOGUI("Key Pressed - name: %s field: %04x param: %04x oldval: %04x newval: %04x\n", field.name(), field.defvalue(), param, oldval, newval);
-		int idx = *((int *)(&param));
-		if (idx >= ARRAY_LENGTH(m_keys))
-			logerror("Out of bounds access in keys array\n");
-		else
-			m_keys[idx] |= (uint16_t) field.defvalue();
-	}
-	else if (newval && !oldval)
-	{
-		LOGUI("Key Released - name: %s field: %04x param: %04x oldval: %04x newval: %04x\n", field.name(), field.defvalue(), param, oldval, newval);
-		int idx = *((int *)(&param));
-		if (idx >= ARRAY_LENGTH(m_keys))
-			logerror("Out of bounds access in keys array\n");
-		else
-			m_keys[idx] &= ~(uint16_t)field.defvalue();
-	}
-	for (int i = 0; i < 6; i++) LOGUI("%04x ", m_keys[i]); LOGUI("\n");
-}
-
 WRITE_LINE_MEMBER(eispc_keyboard_device::rxd_w)
 {
 	LOGBITS("KBD bit presented: %d\n", state);
@@ -309,16 +284,6 @@ WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
 	}
 
 }
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void eispc_keyboard_device::device_reset()
-{
-	for (auto & elem : m_keys) elem = 0;
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -352,7 +317,7 @@ void eispc_keyboard_device::device_add_mconfig(machine_config &config)
 	{
 		uint8_t data = 0; // Indicate what keys are pressed in selected column
 
-		for (int i = 0; i < 6; i++) data |= (m_keys[i] & m_col_select ? 1 << i : 0);
+		for (int i = 0; i < 6; i++) data |= ( (~m_rows[i]->read() & m_col_select) ? 0x20 >> i : 0 );
 
 		// Update txd bit
 		data &= 0x3f;
