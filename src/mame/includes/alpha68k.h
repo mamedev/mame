@@ -239,7 +239,7 @@ protected:
 	void palette_init(palette_device &palette) const;
 
 	required_device<palette_device> m_palette;
-	required_region_ptr<u8> m_color_proms;
+	optional_region_ptr<u8> m_color_proms;
 };
 
 /*
