@@ -63,7 +63,6 @@ public:
 	void acrobatm(machine_config &config);
 	void strahl(machine_config &config);
 	void tdragon3h(machine_config &config);
-	void atombjt(machine_config &config);
 	void hachamf_prot(machine_config &config);
 	void macross(machine_config &config);
 	void mustangb(machine_config &config);
@@ -82,7 +81,6 @@ public:
 	void init_banked_audiocpu();
 	void init_gunnailb();
 	void init_bjtwin();
-	void init_atombjt();
 
 	DECLARE_VIDEO_START(gunnail);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
@@ -166,7 +164,6 @@ protected:
 	void set_hacky_interrupt_timing(machine_config &config);
 	void set_hacky_screen_lowres(machine_config &config);
 	void set_hacky_screen_hires(machine_config &config);
-	void set_common_sprites(machine_config &config);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
 	template<unsigned Layer, unsigned Gfx> TILE_GET_INFO_MEMBER(common_get_bg_tile_info);
@@ -201,7 +198,6 @@ protected:
 	void decode_ssmissin();
 
 	void acrobatm_map(address_map &map);
-	void atombjt_map(address_map &map);
 	void bioship_map(address_map &map);
 	void bjtwin_map(address_map &map);
 	void gunnail_map(address_map &map);
