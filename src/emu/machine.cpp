@@ -265,6 +265,15 @@ void running_machine::start()
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
 	manager().load_cheatfiles(*this);
 
+	// start recording movie if specified
+	const char *filename = options().mng_write();
+	if (filename[0] != 0)
+		m_video->begin_recording(filename, video_manager::MF_MNG);
+
+	filename = options().avi_write();
+	if (filename[0] != 0)
+		m_video->begin_recording(filename, video_manager::MF_AVI);
+
 	// if we're coming in with a savegame request, process it now
 	const char *savegame = options().state();
 	if (savegame[0] != 0)
