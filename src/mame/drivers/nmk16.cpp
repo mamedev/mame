@@ -5508,6 +5508,7 @@ void afega_state::firehawk(machine_config &config)
 
 	/* video hardware */
 	set_hacky_screen_lowres(config);
+	m_spritegen->set_colpri_callback(FUNC(afega_state::get_colour_4bit), this);
 	m_spritegen->set_ext_callback(FUNC(afega_state::get_sprite_flip), this);
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_firehawk));
 
