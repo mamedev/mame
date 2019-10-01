@@ -927,7 +927,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		int ix = 0;
 		int tx;
 		uint32_t o = offset;
-		int pre, post;
+		int pre = 0, post = 0;
 
 		/* handle skipping */
 		if (Skip)
