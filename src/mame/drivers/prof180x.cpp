@@ -12,7 +12,6 @@
 
     TODO:
 
-    - HD64180 CPU (DMA, MMU, SIO, etc) (Z80180 like)
     - memory banking
     - keyboard
     - floppy
@@ -26,7 +25,7 @@
 #include "emu.h"
 #include "includes/prof180x.h"
 
-#include "cpu/z80/z80.h"
+#include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
@@ -241,7 +240,7 @@ void prof180x_state::machine_reset()
 void prof180x_state::prof180x(machine_config &config)
 {
 	/* basic machine hardware */
-	z80_device &maincpu(Z80(config, HD64180_TAG, XTAL(9'216'000)));
+	z180_device &maincpu(HD64180RP(config, HD64180_TAG, 18.432_MHz_XTAL / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &prof180x_state::prof180x_mem);
 	maincpu.set_addrmap(AS_IO, &prof180x_state::prof180x_io);
 
