@@ -1362,9 +1362,6 @@ files {
 	MAME_DIR .. "src/mame/includes/ohmygod.h",
 	MAME_DIR .. "src/mame/video/ohmygod.cpp",
 	MAME_DIR .. "src/mame/drivers/patapata.cpp",
-	MAME_DIR .. "src/mame/drivers/powerins.cpp",
-	MAME_DIR .. "src/mame/includes/powerins.h",
-	MAME_DIR .. "src/mame/video/powerins.cpp",
 	MAME_DIR .. "src/mame/drivers/bowltry.cpp",
 }
 
@@ -3115,7 +3112,12 @@ files {
 	MAME_DIR .. "src/mame/machine/nmk004.cpp",
 	MAME_DIR .. "src/mame/machine/nmk004.h",
 	MAME_DIR .. "src/mame/video/nmk16.cpp",
+	MAME_DIR .. "src/mame/video/nmk16spr.cpp",
+	MAME_DIR .. "src/mame/video/nmk16spr.h",
 	MAME_DIR .. "src/mame/drivers/nmkmedal.cpp",
+	MAME_DIR .. "src/mame/drivers/powerins.cpp",
+	MAME_DIR .. "src/mame/includes/powerins.h",
+	MAME_DIR .. "src/mame/video/powerins.cpp",
 	MAME_DIR .. "src/mame/drivers/quizdna.cpp",
 	MAME_DIR .. "src/mame/includes/quizdna.h",
 	MAME_DIR .. "src/mame/video/quizdna.cpp",
