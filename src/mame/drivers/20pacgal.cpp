@@ -400,7 +400,7 @@ WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
 void _20pacgal_state::_20pacgal(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, MAIN_CPU_CLOCK);
+	Z8S180(config, m_maincpu, MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_20pacgal_state::_20pacgal_map);
 	m_maincpu->set_addrmap(AS_IO, &_20pacgal_state::_20pacgal_io_map);
 

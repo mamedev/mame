@@ -44,7 +44,7 @@ INPUT_PORTS_END
 
 void daryde_state::pandart(machine_config &config)
 {
-	cpu_device &maincpu(Z180(config, "maincpu", XTAL(18'432'000)));
+	cpu_device &maincpu(Z80180(config, "maincpu", XTAL(18'432'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &daryde_state::mem_map);
 	maincpu.set_addrmap(AS_IO, &daryde_state::io_map);
 

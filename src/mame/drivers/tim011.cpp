@@ -135,7 +135,7 @@ static const floppy_format_type tim011_floppy_formats[] = {
 void tim011_state::tim011(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'288'000) / 2); // location U17 HD64180
+	HD64180RP(config, m_maincpu, XTAL(12'288'000) / 2); // location U17 HD64180
 	m_maincpu->set_addrmap(AS_PROGRAM, &tim011_state::tim011_mem);
 	m_maincpu->set_addrmap(AS_IO, &tim011_state::tim011_io);
 	m_maincpu->set_vblank_int("screen", FUNC(tim011_state::irq0_line_hold));

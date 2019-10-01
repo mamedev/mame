@@ -367,7 +367,7 @@ void chsuper_state::ramdac_map(address_map &map)
 void chsuper_state::chsuper(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 4);   /* HD64180RP8, 8 MHz? */
+	HD64180RP(config, m_maincpu, XTAL(12'000'000) / 4);   /* HD64180RP8, 8 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &chsuper_state::chsuper_prg_map);
 	m_maincpu->set_addrmap(AS_IO, &chsuper_state::chsuper_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(chsuper_state::irq0_line_hold));

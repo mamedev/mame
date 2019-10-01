@@ -612,7 +612,7 @@ void spoker_state::machine_reset()
 void spoker_state::spoker(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 2);   /* HD64180RP8, 8 MHz? */
+	HD64180RP(config, m_maincpu, XTAL(12'000'000) / 2);   /* HD64180RP8, 8 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::spoker_map);
 	m_maincpu->set_addrmap(AS_IO, &spoker_state::spoker_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(spoker_state::nmi_line_assert));

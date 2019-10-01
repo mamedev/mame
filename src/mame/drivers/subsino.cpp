@@ -223,7 +223,7 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/subsino.h"
@@ -2690,7 +2690,7 @@ GFXDECODE_END
 void subsino_state::victor21(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
+	HD647180X(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::victor21_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2739,7 +2739,7 @@ void subsino_state::victor5(machine_config &config)
 void subsino_state::crsbingo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown CPU and clock */
+	HD647180X(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown CPU and clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2770,7 +2770,7 @@ void subsino_state::crsbingo(machine_config &config)
 void subsino_state::srider(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
+	HD647180X(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::srider_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2821,7 +2821,7 @@ void subsino_state::sharkpy(machine_config &config)
 void subsino_state::tisub(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown CPU and clock */
+	HD647180X(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown CPU and clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::tisub_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
@@ -2861,7 +2861,7 @@ void subsino_state::tisub(machine_config &config)
 void subsino_state::stbsub(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
+	HD647180X(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::stbsub_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 

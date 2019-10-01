@@ -76,7 +76,7 @@
 
 
 #include "emu.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "machine/msm6242.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -116,7 +116,7 @@ private:
 	required_shared_ptr_array<uint8_t, 4> m_reel_scroll;
 	required_shared_ptr_array<uint8_t, 3> m_luck_vram;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<hd647180x_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	output_finder<12> m_lamps;
@@ -299,7 +299,6 @@ uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void luckgrln_state::mainmap(address_map &map)
 {
-	map(0x00000, 0x03fff).rom();
 	map(0x10000, 0x1ffff).rom().region("rom_data", 0x10000);
 	map(0x20000, 0x2ffff).rom().region("rom_data", 0x00000);
 
@@ -343,6 +342,8 @@ void luckgrln_state::_7smash_map(address_map &map)
 
 WRITE8_MEMBER(luckgrln_state::output_w)
 {
+	data &= 0xc7;
+
 	/* correct? */
 	if (data==0x84)
 		m_nmi_enable = 0;
@@ -446,8 +447,7 @@ WRITE8_MEMBER(luckgrln_state::counters_w)
 void luckgrln_state::common_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x003f).ram(); // Z180 internal regs
-	map(0x0060, 0x0060).w(FUNC(luckgrln_state::output_w));
+	map(0x0000, 0x007f).noprw(); // Z180 internal regs
 
 	map(0x00a0, 0x00a0).w(FUNC(luckgrln_state::palette_offset_low_w));
 	map(0x00a1, 0x00a1).w(FUNC(luckgrln_state::palette_offset_high_w));
@@ -511,7 +511,6 @@ READ8_MEMBER(luckgrln_state::test_r)
 void luckgrln_state::_7smash_io(address_map &map)
 {
 	common_portmap(map);
-	map(0x66, 0x66).r(FUNC(luckgrln_state::test_r));
 }
 
 static INPUT_PORTS_START( luckgrln )
@@ -864,10 +863,11 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::irq)
 
 void luckgrln_state::luckgrln(machine_config &config)
 {
-	Z180(config, m_maincpu, 8000000);
+	HD647180X(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::mainmap);
 	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::luckgrln_io);
 	m_maincpu->set_vblank_int("screen", FUNC(luckgrln_state::irq));
+	m_maincpu->out_pa_callback().set(FUNC(luckgrln_state::output_w));
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 6000000/4)); /* HD6845SP; unknown clock, hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
@@ -894,6 +894,7 @@ void luckgrln_state::_7smash(machine_config &config)
 	luckgrln(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::_7smash_map);
 	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::_7smash_io);
+	m_maincpu->in_pg_callback().set(FUNC(luckgrln_state::test_r));
 
 	config.device_remove("rtc");
 }

@@ -207,7 +207,7 @@ GFXDECODE_END
 void pda600_state::pda600(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(14'318'181));
+	Z8S180(config, m_maincpu, XTAL(14'318'181));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pda600_state::pda600_mem);
 	m_maincpu->set_addrmap(AS_IO, &pda600_state::pda600_io);
 
