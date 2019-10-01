@@ -217,7 +217,7 @@ void chsuper_state::chsuper_prg_map(address_map &map)
 	map(0x00000, 0x0efff).rom();
 	map(0x00000, 0x01fff).w(FUNC(chsuper_state::chsuper_vram_w));
 	map(0x0f000, 0x0ffff).ram().region("maincpu", 0xf000);
-	map(0x7b000, 0x7bfff).ram().share("nvram");
+	map(0xfb000, 0xfbfff).ram().share("nvram");
 }
 
 //  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
@@ -367,7 +367,7 @@ void chsuper_state::ramdac_map(address_map &map)
 void chsuper_state::chsuper(machine_config &config)
 {
 	/* basic machine hardware */
-	HD64180RP(config, m_maincpu, XTAL(12'000'000) / 4);   /* HD64180RP8, 8 MHz? */
+	Z80180(config, m_maincpu, XTAL(12'000'000) / 4);   /* HD64180RP8, 8 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &chsuper_state::chsuper_prg_map);
 	m_maincpu->set_addrmap(AS_IO, &chsuper_state::chsuper_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(chsuper_state::irq0_line_hold));
