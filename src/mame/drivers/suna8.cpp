@@ -19,7 +19,7 @@ Year + Game         Game     PCB         Epoxy CPU  Samples  Notes
 88  Rough Ranger    K030087  ?           S562008    Yes      Not Encrypted
 89  Spark Man       KRB-16   60136-081   T568009    Yes      Encryption + Protection
 90  Star Fighter    KRB-17   60484-0082  T568009    Yes      Encryption + Protection
-91  Hard Head 2     ?        ?           T568009    -        Encryption + Protection
+91  Hard Head 2     KRB-18   70523-0083  T568009    -        Encryption + Protection
 92  Brick Zone      KRB-19   70523-0084  Yes        -        Encryption + Protection
 --------------------------------------------------------------------------------------
 
