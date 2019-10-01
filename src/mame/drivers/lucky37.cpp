@@ -38,7 +38,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "machine/mb8421.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
@@ -121,6 +121,8 @@ void lucky37_state::lucky37(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, "maincpu", 32_MHz_XTAL / 8); // not verified
+
+	HD647180X(config, "mcu", 32_MHz_XTAL / 8); // clock not verified
 }
 
 ROM_START( lucky21 )
