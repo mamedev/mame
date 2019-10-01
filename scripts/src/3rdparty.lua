@@ -1227,6 +1227,7 @@ project "bgfx"
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4310", -- warning C4310: cast truncates constant value
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
 		}
 
 	configuration { "vsllvm" }
