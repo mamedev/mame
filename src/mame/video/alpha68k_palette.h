@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-Template for skeleton device
+	Alpha Denshi "NeoGeo" palette devices
 
 ***************************************************************************/
 
