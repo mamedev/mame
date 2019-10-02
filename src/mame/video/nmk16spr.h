@@ -22,7 +22,7 @@ public:
 	void set_videoshift(int shift) { m_videoshift = shift; }
 	void set_mask(int xmask, int ymask) { m_xmask = xmask, m_ymask = ymask; }
 	void set_screen_size(int width, int height) { m_screen_width = width, m_screen_height = height; }
-	void set_max_sprite_clock(u32 max) { m_max_sprite_clock = max; } // related to screen total size?
+	void set_max_sprite_clock(u32 max) { m_max_sprite_clock = max; }
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size);
 	void set_flip_screen(bool flip) { m_flip_screen = flip; }
@@ -34,19 +34,18 @@ protected:
 private:
 	struct sprite_t
 	{
-		int height;
 		u32 code, colour;
 		int x, y;
 		bool flipx, flipy;
 		u32 pri_mask;
 	};
-	nmk16_spr_colpri_cb_delegate m_colpri_cb;
-	nmk16_spr_ext_cb_delegate m_ext_cb;
-	bool m_flip_screen;
-	int m_videoshift;
-	int m_xmask, m_ymask;
-	int m_screen_width, m_screen_height;
-	u32 m_max_sprite_clock;
+	nmk16_spr_colpri_cb_delegate m_colpri_cb;  // callback for colour, priority
+	nmk16_spr_ext_cb_delegate m_ext_cb;        // callback for flipx, flipy or code bit modification
+	bool m_flip_screen;                        // flip screen
+	int m_videoshift;                          // video shifting needs for more than 256 horizontal screen pixels
+	int m_xmask, m_ymask;                      // x,y position masking
+	int m_screen_width, m_screen_height;       // screen size related to flipscreen
+	u32 m_max_sprite_clock;                    // max sprite cycles, related to screen total size?
 	std::unique_ptr<struct sprite_t[]> m_spritelist;
 };
 
