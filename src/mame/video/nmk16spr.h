@@ -22,7 +22,7 @@ public:
 	void set_videoshift(int shift) { m_videoshift = shift; }
 	void set_mask(int xmask, int ymask) { m_xmask = xmask, m_ymask = ymask; }
 	void set_screen_size(int width, int height) { m_screen_width = width, m_screen_height = height; }
-	void set_max_sprite_clock(u32 max) { m_max_sprite_clock = max; }
+	void set_max_sprite_clock(u32 max) { m_max_sprite_clock = max; } // related to screen total size?
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size);
 	void set_flip_screen(bool flip) { m_flip_screen = flip; }
