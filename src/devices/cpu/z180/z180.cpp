@@ -91,9 +91,9 @@ DEFINE_DEVICE_TYPE(Z80182, z80182_device, "z80182", "Zilog Z80182") // further e
 z180_device::z180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extended_io, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, internal_map)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, 16, 12, internal_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_decrypted_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 20, 0)
+	, m_decrypted_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 20, 0, 16, 12, internal_map)
 	, m_extended_io(extended_io)
 {
 	// some arbitrary initial values
