@@ -103,7 +103,7 @@ void hawk_state::hawk_palette(palette_device &palette) const
 void hawk_state::hawk(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80180(config, m_maincpu, 12.288_MHz_XTAL / 2); /* HD64B180R0F */
+	Z80180(config, m_maincpu, 12.288_MHz_XTAL); /* HD64B180R0F */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hawk_state::hawk_mem);
 	m_maincpu->set_addrmap(AS_IO, &hawk_state::hawk_io);
 

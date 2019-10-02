@@ -140,7 +140,7 @@
 
      Timing
 
-     - HD647180 runs at 12.000 / 2 MHz
+     - HD647180 runs at 12.000 / 2 MHz (divider is internal)
      - SAA1099 PSG runs at 6.000 MHz
      - Display pixel clock is 6.000 MHz
      - Oki MSM5205 has a 384 KHz oscillator, this is the standard setup
@@ -805,7 +805,7 @@ void mastboy_state::machine_reset()
 
 void mastboy_state::mastboy(machine_config &config)
 {
-	HD647180X(config, m_maincpu, 12000000/2);   /* HD647180X0CP6-1M1R */
+	HD647180X(config, m_maincpu, 24_MHz_XTAL / 2);   /* HD647180X0CP6-1M1R */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mastboy_state::mastboy_map);
 	m_maincpu->set_addrmap(AS_IO, &mastboy_state::mastboy_io_map);
 

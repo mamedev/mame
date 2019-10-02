@@ -2928,7 +2928,7 @@ void subsino2_state::humlan(machine_config &config)
 
 void subsino2_state::mtrain(machine_config &config)
 {
-	Z80180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
+	Z80180(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::mtrain_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::mtrain_io);
 

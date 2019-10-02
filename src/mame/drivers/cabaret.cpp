@@ -369,7 +369,7 @@ INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 void cabaret_state::cabaret(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80180(config, m_maincpu, XTAL(12'000'000) / 2);
+	Z80180(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cabaret_state::cabaret_map);
 	m_maincpu->set_addrmap(AS_IO, &cabaret_state::cabaret_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(cabaret_state::cabaret_interrupt));

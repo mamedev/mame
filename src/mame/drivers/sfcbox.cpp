@@ -469,7 +469,7 @@ void sfcbox_state::sfcbox(machine_config &config)
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* sfcbox hardware */
-	Z80180(config, m_bios, XTAL(12'000'000) / 2);  /* HD64180RF6X */
+	Z80180(config, m_bios, XTAL(12'000'000));  /* HD64180RF6X */
 	m_bios->set_addrmap(AS_PROGRAM, &sfcbox_state::sfcbox_map);
 	m_bios->set_addrmap(AS_IO, &sfcbox_state::sfcbox_io);
 

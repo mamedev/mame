@@ -222,7 +222,7 @@ void prof180x_state::machine_reset()
 void prof180x_state::prof180x(machine_config &config)
 {
 	/* basic machine hardware */
-	z180_device &maincpu(HD64180RP(config, HD64180_TAG, 18.432_MHz_XTAL / 2));
+	z180_device &maincpu(HD64180RP(config, HD64180_TAG, 18.432_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &prof180x_state::prof180x_mem);
 	maincpu.set_addrmap(AS_IO, &prof180x_state::prof180x_io);
 

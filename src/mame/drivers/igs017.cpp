@@ -3497,7 +3497,7 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 
 void igs017_state::iqblocka(machine_config &config)
 {
-	HD64180RP(config, m_maincpu, XTAL(16'000'000) / 2);
+	HD64180RP(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::iqblocka_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::iqblocka_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -3836,7 +3836,7 @@ void igs017_state::mgdha(machine_config &config)
 
 void igs017_state::tjsb(machine_config &config)
 {
-	HD64180RP(config, m_maincpu, XTAL(16'000'000) / 2);
+	HD64180RP(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::tjsb_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::tjsb_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -3874,7 +3874,7 @@ void igs017_state::tjsb(machine_config &config)
 
 void igs017_state::spkrform(machine_config &config)
 {
-	HD64180RP(config, m_maincpu, XTAL(16'000'000) / 2);
+	HD64180RP(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::spkrform_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::spkrform_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);

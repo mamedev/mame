@@ -287,7 +287,7 @@ void mosaic_state::machine_reset()
 void mosaic_state::mosaic(machine_config &config)
 {
 	/* basic machine hardware */
-	HD64180RP(config, m_maincpu, XTAL(12'288'000)/2);  /* 6.144MHz - Verified */
+	HD64180RP(config, m_maincpu, XTAL(12'288'000));  /* 6.144MHz - Verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mosaic_state::mosaic_map);
 	m_maincpu->set_addrmap(AS_IO, &mosaic_state::mosaic_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mosaic_state::irq0_line_hold));

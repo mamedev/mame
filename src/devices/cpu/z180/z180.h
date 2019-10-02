@@ -119,6 +119,8 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 16; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
 	virtual uint32_t execute_input_lines() const override { return 5; }
 	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0xff; }
 	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }

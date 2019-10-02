@@ -863,13 +863,13 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::irq)
 
 void luckgrln_state::luckgrln(machine_config &config)
 {
-	HD647180X(config, m_maincpu, 8000000);
+	HD647180X(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::mainmap);
 	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::luckgrln_io);
 	m_maincpu->set_vblank_int("screen", FUNC(luckgrln_state::irq));
 	m_maincpu->out_pa_callback().set(FUNC(luckgrln_state::output_w));
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 6000000/4)); /* HD6845SP; unknown clock, hand tuned to get ~60 fps */
+	hd6845s_device &crtc(HD6845S(config, "crtc", 12_MHz_XTAL / 8)); /* HD6845SP; unknown clock, hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

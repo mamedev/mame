@@ -2103,7 +2103,7 @@ void toaplan1_samesame_state::samesame(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_samesame_state::main_map);
 
-	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 8));   /* HD647180XOFS6 CPU */
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 4));   /* HD647180XOFS6 CPU */
 	// 16k byte ROM and 512 byte RAM are internal
 	audiocpu.set_addrmap(AS_IO, &toaplan1_samesame_state::hd647180_io_map);
 	audiocpu.in_pd_callback().set(FUNC(toaplan1_samesame_state::cmdavailable_r));
@@ -2200,7 +2200,7 @@ void toaplan1_state::vimana(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000));    /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_main_map);
 
-	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 8));   /* HD647180XOFS6 CPU */
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 4));   /* HD647180XOFS6 CPU */
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_hd647180_mem_map);
 	audiocpu.set_addrmap(AS_IO, &toaplan1_state::vimana_hd647180_io_map);
 	audiocpu.in_pa_callback().set(FUNC(toaplan1_state::vimana_dswb_invert_r)); // note these inputs seem to be inverted, unlike the DSWA ones.
