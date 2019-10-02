@@ -39,14 +39,14 @@ private:
 		bool flipx, flipy;
 		u32 pri_mask;
 	};
-	colpri_cb_delegate m_colpri_cb;  // callback for colour, priority
-	ext_cb_delegate m_ext_cb;        // callback for flipx, flipy or code bit modification
-	bool m_flip_screen;                        // flip screen
-	int m_videoshift;                          // x offset needs for more than 256 horizontal screen pixels
-	int m_xmask, m_ymask;                      // x,y position masking
-	int m_screen_width, m_screen_height;       // screen size related to flipscreen
-	u32 m_max_sprite_clock;                    // max sprite cycles, related to screen total size?
-	std::unique_ptr<struct sprite_t[]> m_spritelist;
+	colpri_cb_delegate m_colpri_cb;                  // callback for colour, priority
+	ext_cb_delegate m_ext_cb;                        // callback for flipx, flipy or code bit modification
+	bool m_flip_screen;                              // flip screen
+	int m_videoshift;                                // x offset needs for more than 256 horizontal screen pixels
+	int m_xmask, m_ymask;                            // x,y position masking
+	int m_screen_width, m_screen_height;             // screen size related to flipscreen
+	u32 m_max_sprite_clock;                          // max sprite cycles, related to screen total size?
+	std::unique_ptr<struct sprite_t[]> m_spritelist; // sprite list caches
 };
 
 DECLARE_DEVICE_TYPE(NMK_16BIT_SPRITE, nmk_16bit_sprite_device)
