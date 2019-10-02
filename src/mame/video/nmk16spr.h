@@ -42,7 +42,7 @@ private:
 	nmk16_spr_colpri_cb_delegate m_colpri_cb;  // callback for colour, priority
 	nmk16_spr_ext_cb_delegate m_ext_cb;        // callback for flipx, flipy or code bit modification
 	bool m_flip_screen;                        // flip screen
-	int m_videoshift;                          // video shifting needs for more than 256 horizontal screen pixels
+	int m_videoshift;                          // x offset needs for more than 256 horizontal screen pixels
 	int m_xmask, m_ymask;                      // x,y position masking
 	int m_screen_width, m_screen_height;       // screen size related to flipscreen
 	u32 m_max_sprite_clock;                    // max sprite cycles, related to screen total size?
