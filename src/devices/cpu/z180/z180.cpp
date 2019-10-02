@@ -25,7 +25,7 @@ Known clock speeds (from ZiLOG): 6 (actually ~6.15), 8, 10, 20 & 33MHz
 
 Much like the 80186/188, the operating frequency is generated from the
 XTAL/EXTAL clock by an internal divide-by-2 circuit. The maximum frequency of
-the XTAL input is therefore twice the speed rating for the specific part.
+the EXTAL input is therefore twice the speed rating for the specific part.
 
 ZiLOG Z180 codes:
 
