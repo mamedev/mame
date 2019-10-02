@@ -11,6 +11,7 @@
 #include "machine/nmk004.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "video/nmk16spr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -26,6 +27,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_spritegen(*this, "spritegen"),
 		m_nmk004(*this, "nmk004"),
 		m_soundlatch(*this, "soundlatch"),
 		m_bgvideoram(*this, "bgvideoram%u", 0U),
@@ -61,7 +63,6 @@ public:
 	void acrobatm(machine_config &config);
 	void strahl(machine_config &config);
 	void tdragon3h(machine_config &config);
-	void atombjt(machine_config &config);
 	void hachamf_prot(machine_config &config);
 	void macross(machine_config &config);
 	void mustangb(machine_config &config);
@@ -80,7 +81,6 @@ public:
 	void init_banked_audiocpu();
 	void init_gunnailb();
 	void init_bjtwin();
-	void init_atombjt();
 
 	DECLARE_VIDEO_START(gunnail);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
@@ -99,6 +99,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<nmk_16bit_sprite_device> m_spritegen;
 	optional_device<nmk004_device> m_nmk004;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
@@ -174,18 +175,17 @@ protected:
 	DECLARE_VIDEO_START(strahl);
 	DECLARE_VIDEO_START(macross2);
 	DECLARE_VIDEO_START(bjtwin);
+	void get_colour_4bit(u32 &colour, u32 &pri_mask);
+	void get_colour_5bit(u32 &colour, u32 &pri_mask);
+	void get_sprite_flip(u16 attr, int &flipx, int &flipy, int &code);
 	u32 screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(tdragon_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(hachamf_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 	void video_init();
-	inline void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *spr);
-	inline void draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *spr);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bg_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer = 0);
 	void tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mcu_run(u8 dsw_setting);
@@ -198,7 +198,6 @@ protected:
 	void decode_ssmissin();
 
 	void acrobatm_map(address_map &map);
-	void atombjt_map(address_map &map);
 	void bioship_map(address_map &map);
 	void bjtwin_map(address_map &map);
 	void gunnail_map(address_map &map);
