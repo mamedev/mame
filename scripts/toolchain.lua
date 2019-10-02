@@ -700,6 +700,9 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "ci20/bin/Debug")
 
 	configuration { "mingw-clang" }
+		buildoptions {
+			"-femulated-tls",
+		}
 		linkoptions {
 			"-Wl,--allow-multiple-definition",
 		}
