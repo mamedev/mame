@@ -12,7 +12,7 @@
 		<info name="usage" value="Start with &quot;RUN&quot;" />
 		<part name="cass1" interface="zx80_cass">
 			<dataarea name="cass" size="842">
-				<rom name="Breakout (Macronics 1980).o" size="842" crc="e2843c13" sha1="a70d60f82affa744ae219b1a808d73e09430fd32" offset="0"/>
+				<rom name="Breakout (Macronics 1980).o" size="842" crc="e2843c13" sha1="a70d60f82affa744ae219b1a808d73e09430fd32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24,7 +24,7 @@
 		<info name="usage" value="Start with &quot;GO TO 1&quot;" />
 		<part name="cass1" interface="zx80_cass">
 			<dataarea name="cass" size="726">
-				<rom name="ZX80 Double Breakout (Beam Software 1981).o" size="726" crc="de689c74" sha1="d380dc5bbda27212e7d7c6ca281c04a8ea7742cb" offset="0"/>
+				<rom name="ZX80 Double Breakout (Beam Software 1981).o" size="726" crc="de689c74" sha1="d380dc5bbda27212e7d7c6ca281c04a8ea7742cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36,7 +36,7 @@
 		<info name="usage" value="Start with &quot;RUN&quot;" />
 		<part name="cass1" interface="zx80_cass">
 			<dataarea name="cass" size="3950">
-				<rom name="Mastermind.o" size="3950" crc="daf6da5b" sha1="18eae1df9d719fcd13703a392d29bdee46e675eb" offset="0"/>
+				<rom name="Mastermind.o" size="3950" crc="daf6da5b" sha1="18eae1df9d719fcd13703a392d29bdee46e675eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48,7 +48,7 @@
 		<info name="usage" value="Start with &quot;GO TO 100&quot;" />
 		<part name="cass1" interface="zx80_cass">
 			<dataarea name="cass" size="676">
-				<rom name="Space Invaders 1K (Macronics 1981) Reconstruction.o" size="676" crc="38a1e5df" sha1="e68e867cbb8364e8b651e16f35e4a8b0f68fcd86" offset="0"/>
+				<rom name="Space Invaders 1K (Macronics 1981) Reconstruction.o" size="676" crc="38a1e5df" sha1="e68e867cbb8364e8b651e16f35e4a8b0f68fcd86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -60,7 +60,7 @@
 		<info name="usage" value="Start with &quot;RUN&quot;" />
 		<part name="cass1" interface="zx80_cass">
 			<dataarea name="cass" size="1878">
-				<rom name="Space Invaders 3K (Macronics 1981).o" size="1878" crc="ae9cefbe" sha1="043c8102118ac179959f57bc31997fcbd9d8837d" offset="0"/>
+				<rom name="Space Invaders 3K (Macronics 1981).o" size="1878" crc="ae9cefbe" sha1="043c8102118ac179959f57bc31997fcbd9d8837d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -73,13 +73,13 @@
 		<part name="cass1" interface="zx80_cass">
 			<feature name="part_id" value="1K"/>
 			<dataarea name="cass" size="900">
-				<rom name="ZX80 Super Invasion 1K (Beam Software 1981).o" size="900" crc="bd61a8c2" sha1="e3381f600eedf2a5309fec4baa4ebfe2eacd8ee9" offset="0"/>
+				<rom name="ZX80 Super Invasion 1K (Beam Software 1981).o" size="900" crc="bd61a8c2" sha1="e3381f600eedf2a5309fec4baa4ebfe2eacd8ee9"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="zx80_cass">
 			<feature name="part_id" value="2K"/>
 			<dataarea name="cass" size="1268">
-				<rom name="ZX80 Super Invasion 2K (Beam Software 1981).o" size="1268" crc="d7d99f55" sha1="456fa58fd684592c02d911c1745fd958e13fa5a4" offset="0"/>
+				<rom name="ZX80 Super Invasion 2K (Beam Software 1981).o" size="1268" crc="d7d99f55" sha1="456fa58fd684592c02d911c1745fd958e13fa5a4"/>
 			</dataarea>
 		</part>
 	</software>

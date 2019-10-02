@@ -15,22 +15,22 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="114341">
-				<rom name="pac-land_a.t88" size="114341" crc="42e990c5" sha1="46cbd8e91421ff701e9f0e98444a27a526e33867" offset="0" />
+				<rom name="pac-land_a.t88" size="114341" crc="42e990c5" sha1="46cbd8e91421ff701e9f0e98444a27a526e33867"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="pc8801_cass">
 			<dataarea name="cass" size="106404">
-				<rom name="pac-land_b.t88" size="106404" crc="0c8a5a96" sha1="ea71b6f51c8cd2fdcd7d62e31fbd5ad356df8168" offset="0" />
+				<rom name="pac-land_b.t88" size="106404" crc="0c8a5a96" sha1="ea71b6f51c8cd2fdcd7d62e31fbd5ad356df8168"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="pc8801_cass">
 			<dataarea name="cass" size="110004">
-				<rom name="pac-land_c.t88" size="110004" crc="5c29c64a" sha1="4e1a9dc18a026be4add67db8724ef05da1275e1a" offset="0" />
+				<rom name="pac-land_c.t88" size="110004" crc="5c29c64a" sha1="4e1a9dc18a026be4add67db8724ef05da1275e1a"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="pc8801_cass">
 			<dataarea name="cass" size="111401">
-				<rom name="pac-land_d.t88" size="111401" crc="d22bd412" sha1="0858e14003b65bd5024eb5a4a46f3cae4be12f7f" offset="0" />
+				<rom name="pac-land_d.t88" size="111401" crc="d22bd412" sha1="0858e14003b65bd5024eb5a4a46f3cae4be12f7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46,12 +46,12 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ザ・ブラックオニキス"/>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="64295">
-				<rom name="the_black_onyx_v80.t88" size="64295" crc="3671cfd9" sha1="5e7289c85cd12cb3012533077ceb4355cc151349" offset="0" />
+				<rom name="the_black_onyx_v80.t88" size="64295" crc="3671cfd9" sha1="5e7289c85cd12cb3012533077ceb4355cc151349"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="pc8801_cass">
 			<dataarea name="cass" size="29795">
-				<rom name="the_black_onyx_v80_character creation.t88" size="29795" crc="23f62174" sha1="3960a0cd2987cf655faa406e58b1dc05ec6f9ebf" offset="0" />
+				<rom name="the_black_onyx_v80_character creation.t88" size="29795" crc="23f62174" sha1="3960a0cd2987cf655faa406e58b1dc05ec6f9ebf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="3Dゴルフシミュレーション"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="64126">
-				<rom name="3d golf simulation.t88" size="64126" crc="1e2d085c" sha1="4070737ede0f4eda0c0102468127cd0abf3725d9" offset="0" />
+				<rom name="3d golf simulation.t88" size="64126" crc="1e2d085c" sha1="4070737ede0f4eda0c0102468127cd0abf3725d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +79,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="アルフォス"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="42135">
-				<rom name="alphos.cmt" size="42135" crc="c4acb7d3" sha1="edc1b698caff39a68e86c062a1df0b64c77f26ee" offset="0" />
+				<rom name="alphos.cmt" size="42135" crc="c4acb7d3" sha1="edc1b698caff39a68e86c062a1df0b64c77f26ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="アルフォス"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="43001">
-				<rom name="alphos.t88" size="43001" crc="1f56879c" sha1="50640e39609d549b5763ec3bbac185200260ff0f" offset="0" />
+				<rom name="alphos.t88" size="43001" crc="1f56879c" sha1="50640e39609d549b5763ec3bbac185200260ff0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +107,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="アップルーン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="38600">
-				<rom name="apploon.t88" size="38600" crc="a112dcc3" sha1="37003cc7810b9093e6779d47216a4d8e25a2db5c" offset="0" />
+				<rom name="apploon.t88" size="38600" crc="a112dcc3" sha1="37003cc7810b9093e6779d47216a4d8e25a2db5c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,7 +120,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="AY-1 フォートロレス・ソロモン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="30241">
-				<rom name="ay-1.t88" size="30241" crc="f5706072" sha1="be83344cff7fdaadbfb329d5357db7124a1bacd0" offset="0" />
+				<rom name="ay-1.t88" size="30241" crc="f5706072" sha1="be83344cff7fdaadbfb329d5357db7124a1bacd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,7 +131,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="6079">
-				<rom name="base-kun block.t88" size="6079" crc="dc9654b5" sha1="bde18ee095c084ccaf765624055fde8391dd97db" offset="0" />
+				<rom name="base-kun block.t88" size="6079" crc="dc9654b5" sha1="bde18ee095c084ccaf765624055fde8391dd97db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -145,7 +145,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="美少女ひっぱがしゲーム"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="22194">
-				<rom name="bishojo hippagashi game.t88" size="22194" crc="d4b6a8d3" sha1="419c1cf949b9d20a4fc64cbe8074779796baecb4" offset="0" />
+				<rom name="bishojo hippagashi game.t88" size="22194" crc="d4b6a8d3" sha1="419c1cf949b9d20a4fc64cbe8074779796baecb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -159,7 +159,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ボコスカウォーズ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="39963">
-				<rom name="bokosuka wars.t88" size="39963" crc="1abbc035" sha1="b32bca451ad79106ad1bc7a7b7015f2c09b5b448" offset="0" />
+				<rom name="bokosuka wars.t88" size="39963" crc="1abbc035" sha1="b32bca451ad79106ad1bc7a7b7015f2c09b5b448"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +173,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ホーンテッドケイブ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="49431">
-				<rom name="haunted cave.cmt" size="49431" crc="de05ecf9" sha1="097ef1a5e33dcbffc8caf4f15773ff696aa0d1ec" offset="0" />
+				<rom name="haunted cave.cmt" size="49431" crc="de05ecf9" sha1="097ef1a5e33dcbffc8caf4f15773ff696aa0d1ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +184,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="23460">
-				<rom name="chin-san mahjong.t88" size="23460" crc="6d5fcfba" sha1="f0d74fa85f8442e64a901849a8ba0a2622be18be" offset="0" />
+				<rom name="chin-san mahjong.t88" size="23460" crc="6d5fcfba" sha1="f0d74fa85f8442e64a901849a8ba0a2622be18be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19730">
-				<rom name="combat.t88" size="19730" crc="d5f635d6" sha1="e59098c33706b69683575b9644c434e6bf389203" offset="0" />
+				<rom name="combat.t88" size="19730" crc="d5f635d6" sha1="e59098c33706b69683575b9644c434e6bf389203"/>
 			</dataarea>
 		</part>
 	</software>
@@ -206,7 +206,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="85436">
-				<rom name="cosmo cross.t88" size="85436" crc="2670e10c" sha1="e7a089abf1b258cb4885d7cc1fb528727f45cef4" offset="0" />
+				<rom name="cosmo cross.t88" size="85436" crc="2670e10c" sha1="e7a089abf1b258cb4885d7cc1fb528727f45cef4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -220,7 +220,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="コスモミューター"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="54216">
-				<rom name="cosmo mutar.cmt" size="54216" crc="a360bd92" sha1="a53673882faa68c4dba30a9d2013a37101370eab" offset="0" />
+				<rom name="cosmo mutar.cmt" size="54216" crc="a360bd92" sha1="a53673882faa68c4dba30a9d2013a37101370eab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -234,13 +234,13 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="サイクロプスクラッシャー&amp;ウォーターマン"/>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="7658">
-				<rom name="cyclops crusher.t88" size="7658" crc="1d8f5671" sha1="065682e65074e3ba35ec977a04112766b74c568e" offset="0" />
+				<rom name="cyclops crusher.t88" size="7658" crc="1d8f5671" sha1="065682e65074e3ba35ec977a04112766b74c568e"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="pc8801_cass">
 			<dataarea name="cass" size="30290">
-				<rom name="waterman.t88" size="30290" crc="b041f530" sha1="2faafae8cbe6502517e0cc845f32a1174bb64ddf" offset="0" />
+				<rom name="waterman.t88" size="30290" crc="b041f530" sha1="2faafae8cbe6502517e0cc845f32a1174bb64ddf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -252,7 +252,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="大富豪"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="23542">
-				<rom name="daifugo.t88" size="23542" crc="4c1c500c" sha1="0fa8e1fb388423a16c6901cc8c7748543ec4670c" offset="0" />
+				<rom name="daifugo.t88" size="23542" crc="4c1c500c" sha1="0fa8e1fb388423a16c6901cc8c7748543ec4670c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -267,7 +267,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ディグダグ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="47299">
-				<rom name="dig dug.cmt" size="47299" crc="6025fe7b" sha1="5ad555bad5b83cb93354208781cd2013a8f38140" offset="0" />
+				<rom name="dig dug.cmt" size="47299" crc="6025fe7b" sha1="5ad555bad5b83cb93354208781cd2013a8f38140"/>
 			</dataarea>
 		</part>
 	</software>
@@ -278,7 +278,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="6389">
-				<rom name="dipper.t88" size="6389" crc="bc460095" sha1="b547b95e2cbd64c9926f53014a88894fe4951f7d" offset="0" />
+				<rom name="dipper.t88" size="6389" crc="bc460095" sha1="b547b95e2cbd64c9926f53014a88894fe4951f7d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -291,7 +291,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ドンキーゴリラ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="6958">
-				<rom name="donkey gorilla.t88" size="6958" crc="8359a32a" sha1="255ca88bedb466e9313c025e3f4397733f000e96" offset="0" />
+				<rom name="donkey gorilla.t88" size="6958" crc="8359a32a" sha1="255ca88bedb466e9313c025e3f4397733f000e96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -305,7 +305,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ドアドア"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="26714">
-				<rom name="door door.cmt" size="26714" crc="9f5abc75" sha1="2380232d569b3438778e6fd117bac9e175e9568f" offset="0" />
+				<rom name="door door.cmt" size="26714" crc="9f5abc75" sha1="2380232d569b3438778e6fd117bac9e175e9568f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -319,7 +319,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ドアメイズ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="23282">
-				<rom name="door maze.t88" size="23282" crc="2c0693a3" sha1="5de8c7218b5913ca575bb6403b6e314de6d762d5" offset="0" />
+				<rom name="door maze.t88" size="23282" crc="2c0693a3" sha1="5de8c7218b5913ca575bb6403b6e314de6d762d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -330,7 +330,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="1433">
-				<rom name="downmaze.t88" size="1433" crc="04dcd527" sha1="2b53984c4f83dcca05fb1b6f6dbd2635f155672b" offset="0" />
+				<rom name="downmaze.t88" size="1433" crc="04dcd527" sha1="2b53984c4f83dcca05fb1b6f6dbd2635f155672b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +344,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="デュアルエイリアン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="6696">
-				<rom name="dual alien.t88" size="6696" crc="4bedc799" sha1="8fa64706626663396f98941239e5335e91641ab9" offset="0" />
+				<rom name="dual alien.t88" size="6696" crc="4bedc799" sha1="8fa64706626663396f98941239e5335e91641ab9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -358,7 +358,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ダンジョン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="54499">
-				<rom name="dungeon.t88" size="54499" crc="ffd71bd4" sha1="f43705e6f2cc5df89bfea1167b42617029ca2113" offset="0" />
+				<rom name="dungeon.t88" size="54499" crc="ffd71bd4" sha1="f43705e6f2cc5df89bfea1167b42617029ca2113"/>
 			</dataarea>
 		</part>
 	</software>
@@ -369,7 +369,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="1818">
-				<rom name="dungeon player tape.t88" size="1818" crc="a645d7a5" sha1="7ae45894c378883d71d591caef83e4b3b6784179" offset="0" />
+				<rom name="dungeon player tape.t88" size="1818" crc="a645d7a5" sha1="7ae45894c378883d71d591caef83e4b3b6784179"/>
 			</dataarea>
 		</part>
 	</software>
@@ -383,7 +383,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="エギー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="58367">
-				<rom name="eggy.cmt" size="58367" crc="e0925596" sha1="a60b19faef2298fd8aeace88431131f924edb157" offset="0" />
+				<rom name="eggy.cmt" size="58367" crc="e0925596" sha1="a60b19faef2298fd8aeace88431131f924edb157"/>
 			</dataarea>
 		</part>
 	</software>
@@ -397,7 +397,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ファンファン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="23168">
-				<rom name="fanfun.t88" size="23168" crc="7e087464" sha1="5a5ef975ecfc5f24556ffb6db77004e5f8d62ece" offset="0" />
+				<rom name="fanfun.t88" size="23168" crc="7e087464" sha1="5a5ef975ecfc5f24556ffb6db77004e5f8d62ece"/>
 			</dataarea>
 		</part>
 	</software>
@@ -411,7 +411,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ファンファン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="523940">
-				<rom name="fanfun (alt maybe).t88" size="523940" crc="9aa09f20" sha1="1eced4485695044a72784485f7f2b0aa913f3941" offset="0" />
+				<rom name="fanfun (alt maybe).t88" size="523940" crc="9aa09f20" sha1="1eced4485695044a72784485f7f2b0aa913f3941"/>
 			</dataarea>
 		</part>
 	</software>
@@ -424,7 +424,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="フラッピー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="38418">
-				<rom name="flappy.t88" size="38418" crc="f73d4b31" sha1="efb4b9c1a60d82ce5b93d945f8fcb981e91375ed" offset="0" />
+				<rom name="flappy.t88" size="38418" crc="f73d4b31" sha1="efb4b9c1a60d82ce5b93d945f8fcb981e91375ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -438,7 +438,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="フライングエース"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="24564">
-				<rom name="flying ace.t88" size="24564" crc="5291fe16" sha1="9c7e8b63191de1dc09237a52c1e1b5aa9a4ede4b" offset="0" />
+				<rom name="flying ace.t88" size="24564" crc="5291fe16" sha1="9c7e8b63191de1dc09237a52c1e1b5aa9a4ede4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -451,7 +451,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="フォーサイス"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="28547">
-				<rom name="forsice.t88" size="28547" crc="bd01cd7a" sha1="ebc6fe69ec80bf9585283ee56e21400a9779fcf7" offset="0" />
+				<rom name="forsice.t88" size="28547" crc="bd01cd7a" sha1="ebc6fe69ec80bf9585283ee56e21400a9779fcf7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -465,7 +465,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ギャラクシアン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="20574">
-				<rom name="galaxian.cmt" size="20574" crc="91723a4b" sha1="49bef0ed48c29b94632b5cc29d2e34cc8854402b" offset="0" />
+				<rom name="galaxian.cmt" size="20574" crc="91723a4b" sha1="49bef0ed48c29b94632b5cc29d2e34cc8854402b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -479,7 +479,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ギャラクシアン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="18426">
-				<rom name="galaxian_dempa_v80.t88" size="18426" crc="da9fec0d" sha1="4b8992cec6deaecd6efe7fe401c1d134ec6465a5" offset="0" />
+				<rom name="galaxian_dempa_v80.t88" size="18426" crc="da9fec0d" sha1="4b8992cec6deaecd6efe7fe401c1d134ec6465a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -493,7 +493,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="銀河を救え"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="103503">
-				<rom name="gingawo sukue.t88" size="103503" crc="8b0f4438" sha1="fc542fcbeba01c71e8447479cabf29718772eb67" offset="0" />
+				<rom name="gingawo sukue.t88" size="103503" crc="8b0f4438" sha1="fc542fcbeba01c71e8447479cabf29718772eb67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -507,7 +507,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ひつじやーい"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19259">
-				<rom name="hitsuji yaai.t88" size="19259" crc="c7027c11" sha1="0cf7a14fd778830e41c0364ba96446c12bc3b8d4" offset="0" />
+				<rom name="hitsuji yaai.t88" size="19259" crc="c7027c11" sha1="0cf7a14fd778830e41c0364ba96446c12bc3b8d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -521,7 +521,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ホールインワン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="64979">
-				<rom name="hole in one.cmt" size="64979" crc="e796e3e7" sha1="ef741d167c6dd8a004e49af895ee8ab66ac4bc27" offset="0" />
+				<rom name="hole in one.cmt" size="64979" crc="e796e3e7" sha1="ef741d167c6dd8a004e49af895ee8ab66ac4bc27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -532,7 +532,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="32532">
-				<rom name="honoo no yakata.t88" size="32532" crc="dd835108" sha1="e4819b78ad16b28b9c7e057e9018c835f7d187ce" offset="0" />
+				<rom name="honoo no yakata.t88" size="32532" crc="dd835108" sha1="e4819b78ad16b28b9c7e057e9018c835f7d187ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -546,7 +546,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ホラーハウス"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="50422">
-				<rom name="horror house.t88" size="50422" crc="8a6100a2" sha1="3ba80f042acb22b53da0d433c02d74e239879572" offset="0" />
+				<rom name="horror house.t88" size="50422" crc="8a6100a2" sha1="3ba80f042acb22b53da0d433c02d74e239879572"/>
 			</dataarea>
 		</part>
 	</software>
@@ -557,7 +557,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="5561">
-				<rom name="hosi.t88" size="5561" crc="1fca5d2e" sha1="7c5b7b1e8901b3d64213d760525521d85f83568c" offset="0" />
+				<rom name="hosi.t88" size="5561" crc="1fca5d2e" sha1="7c5b7b1e8901b3d64213d760525521d85f83568c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -571,7 +571,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ジャギー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="33527">
-				<rom name="jagey.t88" size="33527" crc="7984d148" sha1="db6b68dc4e1268682ed18c2727daaa749924c65f" offset="0" />
+				<rom name="jagey.t88" size="33527" crc="7984d148" sha1="db6b68dc4e1268682ed18c2727daaa749924c65f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -585,7 +585,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ジェルダ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="39326">
-				<rom name="jelda.cmt" size="39326" crc="929e32ec" sha1="3e5ac57a209b90dce0a7415282643d071d90ccdf" offset="0" />
+				<rom name="jelda.cmt" size="39326" crc="929e32ec" sha1="3e5ac57a209b90dce0a7415282643d071d90ccdf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -599,7 +599,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ジェルダ2"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="76886">
-				<rom name="jelda 2.t88" size="76886" crc="c9d394b2" sha1="a5c2526b9425de781f7d65f333cbc5de39623df6" offset="0" />
+				<rom name="jelda 2.t88" size="76886" crc="c9d394b2" sha1="a5c2526b9425de781f7d65f333cbc5de39623df6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -613,7 +613,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ジェルダ2"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="63227">
-				<rom name="jelda ii.cmt" size="63227" crc="bde37e2d" sha1="6b1048b5a3c1341afdd0fb7fc33d014103581aad" offset="0" />
+				<rom name="jelda ii.cmt" size="63227" crc="bde37e2d" sha1="6b1048b5a3c1341afdd0fb7fc33d014103581aad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -624,7 +624,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19816">
-				<rom name="juo kaimei - jissen tsugi no isshu.t88" size="19816" crc="093dc2ab" sha1="c1e8a76560c6ec3ae2791d7f073d97d93f7824ca" offset="0" />
+				<rom name="juo kaimei - jissen tsugi no isshu.t88" size="19816" crc="093dc2ab" sha1="c1e8a76560c6ec3ae2791d7f073d97d93f7824ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -635,7 +635,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="2427">
-				<rom name="kabuki advgame.t88" size="2427" crc="4c325021" sha1="437f0b9ef0646c666ce197dffb3e66154cc3af28" offset="0" />
+				<rom name="kabuki advgame.t88" size="2427" crc="4c325021" sha1="437f0b9ef0646c666ce197dffb3e66154cc3af28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -649,7 +649,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="キン肉マン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="101946">
-				<rom name="kinniku-man.t88" size="101946" crc="48358134" sha1="7c709f50d88adbb51fb614f0f80bb1b5089d6760" offset="0" />
+				<rom name="kinniku-man.t88" size="101946" crc="48358134" sha1="7c709f50d88adbb51fb614f0f80bb1b5089d6760"/>
 			</dataarea>
 		</part>
 	</software>
@@ -660,7 +660,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="26241">
-				<rom name="kuchusen - sky tactics.t88" size="26241" crc="b2e760d8" sha1="448483be5a97c73e4eda49b12e5d9e809be4047e" offset="0" />
+				<rom name="kuchusen - sky tactics.t88" size="26241" crc="b2e760d8" sha1="448483be5a97c73e4eda49b12e5d9e809be4047e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -674,7 +674,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="狂気の館"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="31965">
-				<rom name="kyoki no yakata.t88" size="31965" crc="a71301f0" sha1="9cce3f606c42f697838cefadbadc13c2413bed10" offset="0" />
+				<rom name="kyoki no yakata.t88" size="31965" crc="a71301f0" sha1="9cce3f606c42f697838cefadbadc13c2413bed10"/>
 			</dataarea>
 		</part>
 	</software>
@@ -688,7 +688,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ラブアドベンチャー プレイボーイ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="39684">
-				<rom name="playboy.t88" size="39684" crc="1e407d90" sha1="2862c80b150134e0e2a78acf2c4f8a4e7d5f773a" offset="0" />
+				<rom name="playboy.t88" size="39684" crc="1e407d90" sha1="2862c80b150134e0e2a78acf2c4f8a4e7d5f773a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -702,7 +702,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ルナーボール"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="50187">
-				<rom name="lunar ball.cmt" size="50187" crc="37ba2beb" sha1="fcc3b967e0c83959e8e96de91df90a2068c4e4cd" offset="0" />
+				<rom name="lunar ball.cmt" size="50187" crc="37ba2beb" sha1="fcc3b967e0c83959e8e96de91df90a2068c4e4cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -715,7 +715,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="マリオブラザーズ スペシャル"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="44752">
-				<rom name="mario bros. special.cmt" size="44752" crc="b82e3920" sha1="c60f2128963d1a2570ad3b86a472a40241c1585e" offset="0" />
+				<rom name="mario bros. special.cmt" size="44752" crc="b82e3920" sha1="c60f2128963d1a2570ad3b86a472a40241c1585e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -729,7 +729,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="マックスゼロワンG"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="43816">
-				<rom name="max-01g.t88" size="43816" crc="74f9ff5e" sha1="98bbd498b56a9ed240f6af24e9fa269cc8717768" offset="0" />
+				<rom name="max-01g.t88" size="43816" crc="74f9ff5e" sha1="98bbd498b56a9ed240f6af24e9fa269cc8717768"/>
 			</dataarea>
 		</part>
 	</software>
@@ -743,19 +743,19 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="スターアーサー伝説 Ⅰ -惑星メフィウス-"/>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="29241">
-				<rom name="mephius1.t88" size="29241" crc="ead080db" sha1="ce97274f0ab588b2d2f9ca522a80ecba23d357ba" offset="0" />
+				<rom name="mephius1.t88" size="29241" crc="ead080db" sha1="ce97274f0ab588b2d2f9ca522a80ecba23d357ba"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="pc8801_cass">
 			<dataarea name="cass" size="34926">
-				<rom name="mephius2.t88" size="34926" crc="60b533bc" sha1="d0aa13bb90a3798adc77e4b2d875ebca4a0ad2e8" offset="0" />
+				<rom name="mephius2.t88" size="34926" crc="60b533bc" sha1="d0aa13bb90a3798adc77e4b2d875ebca4a0ad2e8"/>
 			</dataarea>
 		</part>
 
 		<part name="cass3" interface="pc8801_cass">
 			<dataarea name="cass" size="32287">
-				<rom name="mephius3.t88" size="32287" crc="a84a9b35" sha1="f1d5eb3246236e60157f60d30d7ca4c0c55e44aa" offset="0" />
+				<rom name="mephius3.t88" size="32287" crc="a84a9b35" sha1="f1d5eb3246236e60157f60d30d7ca4c0c55e44aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -769,7 +769,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="デビッド ミッドナイト・マジック"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="78052">
-				<rom name="midnight magic.cmt" size="78052" crc="801229d2" sha1="12abbbf51c6a2c9fa243ff07cbc07f5e0676a6d7" offset="0" />
+				<rom name="midnight magic.cmt" size="78052" crc="801229d2" sha1="12abbbf51c6a2c9fa243ff07cbc07f5e0676a6d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -783,7 +783,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="南太平洋アドベンチャー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="43983">
-				<rom name="minami taihei-yo adventure.t88" size="43983" crc="802fe88f" sha1="8a9976d4bae7982a39e7e222c6aac128d7d36f74" offset="0" />
+				<rom name="minami taihei-yo adventure.t88" size="43983" crc="802fe88f" sha1="8a9976d4bae7982a39e7e222c6aac128d7d36f74"/>
 			</dataarea>
 		</part>
 	</software>
@@ -795,7 +795,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="メピウス"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="793">
-				<rom name="moebius.t88" size="793" crc="4c4ab8c4" sha1="e7b0145fb1e087778ff52598a8521f4ad98d0a8a" offset="0" />
+				<rom name="moebius.t88" size="793" crc="4c4ab8c4" sha1="e7b0145fb1e087778ff52598a8521f4ad98d0a8a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -806,7 +806,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="3744">
-				<rom name="n-quest.t88" size="3744" crc="aba453b7" sha1="c3a631a3326249daceedd6e1eec8177a3acf461a" offset="0" />
+				<rom name="n-quest.t88" size="3744" crc="aba453b7" sha1="c3a631a3326249daceedd6e1eec8177a3acf461a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -818,19 +818,19 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="メネシス88"/>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="2146">
-				<rom name="nemesis-88-1.t88" size="2146" crc="14d144a0" sha1="a4d7b39aa41ea3c243b9fe65b02f1ab51d392da2" offset="0" />
+				<rom name="nemesis-88-1.t88" size="2146" crc="14d144a0" sha1="a4d7b39aa41ea3c243b9fe65b02f1ab51d392da2"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="pc8801_cass">
 			<dataarea name="cass" size="20972">
-				<rom name="nemesis-88-2.t88" size="20972" crc="a36cb665" sha1="7ac0870184dcc0d213084d2df7afbc96ff3ece0b" offset="0" />
+				<rom name="nemesis-88-2.t88" size="20972" crc="a36cb665" sha1="7ac0870184dcc0d213084d2df7afbc96ff3ece0b"/>
 			</dataarea>
 		</part>
 
 		<part name="cass3" interface="pc8801_cass">
 			<dataarea name="cass" size="12106">
-				<rom name="nemesis-88-3.t88" size="12106" crc="b66746f0" sha1="1f177d8d8fd894075724e3c7de5e3d57baebc84d" offset="0" />
+				<rom name="nemesis-88-3.t88" size="12106" crc="b66746f0" sha1="1f177d8d8fd894075724e3c7de5e3d57baebc84d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -844,7 +844,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ニュートロン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="64653">
-				<rom name="newtron.cmt" size="64653" crc="e33f1410" sha1="fd12dcc9ea3a88ecdcfe59b499f8908db6c2a689" offset="0" />
+				<rom name="newtron.cmt" size="64653" crc="e33f1410" sha1="fd12dcc9ea3a88ecdcfe59b499f8908db6c2a689"/>
 			</dataarea>
 		</part>
 	</software>
@@ -858,7 +858,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ナッツ&amp;ミルク"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="26590">
-				<rom name="nuts &amp; milk.t88" size="26590" crc="864ceee5" sha1="1c02d3966e4a646d478b5e2cdb615747916554a7" offset="0" />
+				<rom name="nuts &amp; milk.t88" size="26590" crc="864ceee5" sha1="1c02d3966e4a646d478b5e2cdb615747916554a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -872,7 +872,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="パックマン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25430">
-				<rom name="pacman.cmt" size="25430" crc="458ef928" sha1="4ca27b63d2dde02942f9b74dbee25a28469a99cf" offset="0" />
+				<rom name="pacman.cmt" size="25430" crc="458ef928" sha1="4ca27b63d2dde02942f9b74dbee25a28469a99cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -886,7 +886,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="パラレルワールド"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="44460">
-				<rom name="parallel world.t88" size="44460" crc="3cf088f8" sha1="2f36ece33559409627e3574734dc09df99fc665f" offset="0" />
+				<rom name="parallel world.t88" size="44460" crc="3cf088f8" sha1="2f36ece33559409627e3574734dc09df99fc665f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -900,7 +900,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="パスコンタワー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="40694">
-				<rom name="pascom tower.t88" size="40694" crc="0bbfb6e7" sha1="3e66bdd96b80905a3031dd60a3ba34960114ad47" offset="0" />
+				<rom name="pascom tower.t88" size="40694" crc="0bbfb6e7" sha1="3e66bdd96b80905a3031dd60a3ba34960114ad47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -914,7 +914,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="プラズマライン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="41127">
-				<rom name="plazma line.t88" size="41127" crc="a3ff546b" sha1="f8069b60751412a1838a7ca1f62c2289fe3b405e" offset="0" />
+				<rom name="plazma line.t88" size="41127" crc="a3ff546b" sha1="f8069b60751412a1838a7ca1f62c2289fe3b405e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -928,7 +928,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ポイボスPart1 -脱出-"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="32727">
-				<rom name="poibos.t88" size="32727" crc="e14bb4ce" sha1="93a33d391336b7e36db5a4a706ee18dec63eab69" offset="0" />
+				<rom name="poibos.t88" size="32727" crc="e14bb4ce" sha1="93a33d391336b7e36db5a4a706ee18dec63eab69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -942,7 +942,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ポンコツ船サバイバル"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19962">
-				<rom name="bonkotsu-sen survival.t88" size="19962" crc="2d6430a6" sha1="d9c4dea1308aec82c044d168fcc3447678132bd3" offset="0" />
+				<rom name="bonkotsu-sen survival.t88" size="19962" crc="2d6430a6" sha1="d9c4dea1308aec82c044d168fcc3447678132bd3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -953,7 +953,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="37140">
-				<rom name="pro yakyu (super simulation).t88" size="37140" crc="62690f03" sha1="7932626dde2e2fd7c6b66c55b85750c6ea593325" offset="0" />
+				<rom name="pro yakyu (super simulation).t88" size="37140" crc="62690f03" sha1="7932626dde2e2fd7c6b66c55b85750c6ea593325"/>
 			</dataarea>
 		</part>
 	</software>
@@ -967,7 +967,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="パズルアドベンチャー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19939">
-				<rom name="puzzle adventure.t88" size="19939" crc="df4a9f9a" sha1="6cdece913d5e2450b0fc17d6a8a2abf8fafbd8a2" offset="0" />
+				<rom name="puzzle adventure.t88" size="19939" crc="df4a9f9a" sha1="6cdece913d5e2450b0fc17d6a8a2abf8fafbd8a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -978,7 +978,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="2658">
-				<rom name="river.t88" size="2658" crc="fc1c5fad" sha1="92f7614d81f8c27ce506c6b2ae1eff4b41b64e02" offset="0" />
+				<rom name="river.t88" size="2658" crc="fc1c5fad" sha1="92f7614d81f8c27ce506c6b2ae1eff4b41b64e02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -990,7 +990,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ロケットマン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="41248">
-				<rom name="rocketman.cmt" size="41248" crc="edc03094" sha1="47bcd0a1fd3d21c3b878e8c8b4d470d5c24b7060" offset="0" />
+				<rom name="rocketman.cmt" size="41248" crc="edc03094" sha1="47bcd0a1fd3d21c3b878e8c8b4d470d5c24b7060"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1003,7 +1003,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="将棋道場2"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="35748">
-				<rom name="shogi dojo 2.cmt" size="35748" crc="1fe187b2" sha1="23eb03c0bd6af75772bd3bff37734f1a05055b6f" offset="0" />
+				<rom name="shogi dojo 2.cmt" size="35748" crc="1fe187b2" sha1="23eb03c0bd6af75772bd3bff37734f1a05055b6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1017,7 +1017,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="将棋名人"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25655">
-				<rom name="shogi meijin.cmt" size="25655" crc="27409c81" sha1="7037a65e2b004d6a124fd115b06a536e93581aa0" offset="0" />
+				<rom name="shogi meijin.cmt" size="25655" crc="27409c81" sha1="7037a65e2b004d6a124fd115b06a536e93581aa0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1032,7 +1032,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="将棋対局V2"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="40719">
-				<rom name="shogi taikyoku v2.t88" size="40719" crc="6e8a325d" sha1="84d3ffaf88a150c232e00acafa874363e5da41bb" offset="0" />
+				<rom name="shogi taikyoku v2.t88" size="40719" crc="6e8a325d" sha1="84d3ffaf88a150c232e00acafa874363e5da41bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1046,7 +1046,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="倉庫番"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="26146">
-				<rom name="sokoban.t88" size="26146" crc="6b8d6cf6" sha1="4454b8069a35d7e3131f47de44cb93a285d0a02b" offset="0" />
+				<rom name="sokoban.t88" size="26146" crc="6b8d6cf6" sha1="4454b8069a35d7e3131f47de44cb93a285d0a02b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1060,7 +1060,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="スベースダイヤモンド"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="56465">
-				<rom name="space diamond.cmt" size="56465" crc="f74d2162" sha1="43da0884f6b775942e66e220864ddf77b068ba0c" offset="0" />
+				<rom name="space diamond.cmt" size="56465" crc="f74d2162" sha1="43da0884f6b775942e66e220864ddf77b068ba0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1074,7 +1074,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="スパルタンX"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="56269">
-				<rom name="spartan x.t88" size="56269" crc="20438372" sha1="0ae04f7cc6862451b7def8cc71b99394dd2feaa3" offset="0" />
+				<rom name="spartan x.t88" size="56269" crc="20438372" sha1="0ae04f7cc6862451b7def8cc71b99394dd2feaa3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1088,7 +1088,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="スターフリート"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="20553">
-				<rom name="star_fleet_v80.t88" size="20553" crc="47ac3ccb" sha1="2e3d459f12acccc13247f7dc2c42d6732ce7dcdd" offset="0" />
+				<rom name="star_fleet_v80.t88" size="20553" crc="47ac3ccb" sha1="2e3d459f12acccc13247f7dc2c42d6732ce7dcdd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1099,7 +1099,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="26620">
-				<rom name="star quest.t88" size="26620" crc="c1295c1d" sha1="ce9fe4649a363c4eb6681efaa55d48fab68f369e" offset="0" />
+				<rom name="star quest.t88" size="26620" crc="c1295c1d" sha1="ce9fe4649a363c4eb6681efaa55d48fab68f369e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1113,7 +1113,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="スターライトアドベンチャー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="36281">
-				<rom name="starlight adventure.t88" size="36281" crc="73a93d80" sha1="739304386278be0125e3f6abecb7f227b03afdf3" offset="0" />
+				<rom name="starlight adventure.t88" size="36281" crc="73a93d80" sha1="739304386278be0125e3f6abecb7f227b03afdf3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1125,7 +1125,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="シュガーファグトリー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="11443">
-				<rom name="sugar factory.cmt" size="11443" crc="21ca17b4" sha1="204f8988487b89abd90e37b8d0a4089c2091b27b" offset="0" />
+				<rom name="sugar factory.cmt" size="11443" crc="21ca17b4" sha1="204f8988487b89abd90e37b8d0a4089c2091b27b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1136,7 +1136,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="56331">
-				<rom name="survival game.t88" size="56331" crc="c802794c" sha1="00e91224f84002502d02e9dd075dea9ba925c865" offset="0" />
+				<rom name="survival game.t88" size="56331" crc="c802794c" sha1="00e91224f84002502d02e9dd075dea9ba925c865"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1150,7 +1150,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ザ・スパイダー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25318">
-				<rom name="the spider.cmt" size="25318" crc="b2d0f4f1" sha1="73eda7b80ca817bc49e5f432fcd348e5d3374eaf" offset="0" />
+				<rom name="the spider.cmt" size="25318" crc="b2d0f4f1" sha1="73eda7b80ca817bc49e5f432fcd348e5d3374eaf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1164,7 +1164,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ザ・ストレイストーリー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="49234">
-				<rom name="the stray story.t88" size="49234" crc="1528b28a" sha1="54ae8b73623495600dd14287c16035504e7bd1de" offset="0" />
+				<rom name="the stray story.t88" size="49234" crc="1528b28a" sha1="54ae8b73623495600dd14287c16035504e7bd1de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1178,7 +1178,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="サンダーフォース"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="45784">
-				<rom name="thunder force.cmt" size="45784" crc="721192ad" sha1="66e68bea4ad394aec5237c27f3debba5b255582d" offset="0" />
+				<rom name="thunder force.cmt" size="45784" crc="721192ad" sha1="66e68bea4ad394aec5237c27f3debba5b255582d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1192,7 +1192,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="タイムシークレット"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="60979">
-				<rom name="time secret.t88" size="60979" crc="2d4e41cc" sha1="f169c3ede23cb05f4da6a436cb7cc68dc2ecd675" offset="0" />
+				<rom name="time secret.t88" size="60979" crc="2d4e41cc" sha1="f169c3ede23cb05f4da6a436cb7cc68dc2ecd675"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1206,7 +1206,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="トロピカルボーイ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25650">
-				<rom name="tropical boy.t88" size="25650" crc="1af889f3" sha1="c8136db4c0f12bd04c2d9efa153dfaae2580caf3" offset="0" />
+				<rom name="tropical boy.t88" size="25650" crc="1af889f3" sha1="c8136db4c0f12bd04c2d9efa153dfaae2580caf3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1220,7 +1220,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="宇宙の戦士"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="27723">
-				<rom name="uchu no senshi.t88" size="27723" crc="613dae17" sha1="e488a209b43bb727f8036b115de2043d3d22f08e" offset="0" />
+				<rom name="uchu no senshi.t88" size="27723" crc="613dae17" sha1="e488a209b43bb727f8036b115de2043d3d22f08e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1232,7 +1232,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ウルトラ四人麻雀"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25537">
-				<rom name="ultra yonin mahjong.t88" size="25537" crc="4839239d" sha1="7d2e207e3cbf983b07717e15cd0ce64be7fa1993" offset="0" />
+				<rom name="ultra yonin mahjong.t88" size="25537" crc="4839239d" sha1="7d2e207e3cbf983b07717e15cd0ce64be7fa1993"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1243,7 +1243,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="12515">
-				<rom name="universal adventure.t88" size="12515" crc="a1f5aea0" sha1="5d1a28c0fc0d3c8b88bfa4d3fb19da5079c98432" offset="0" />
+				<rom name="universal adventure.t88" size="12515" crc="a1f5aea0" sha1="5d1a28c0fc0d3c8b88bfa4d3fb19da5079c98432"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1256,7 +1256,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ゼノン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="37237">
-				<rom name="xenon.cmt" size="37237" crc="7ac5ab1c" sha1="4fdf68f89e0b4f6845592d34e405d1fa9764b877" offset="0" />
+				<rom name="xenon.cmt" size="37237" crc="7ac5ab1c" sha1="4fdf68f89e0b4f6845592d34e405d1fa9764b877"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1270,7 +1270,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="四次元の家"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19259">
-				<rom name="4 dimension house.t88" size="24890" crc="40e6938c" sha1="b642f87dc619975e60561499dc35b9b5d7afff07" offset="0" />
+				<rom name="4 dimension house.t88" size="24890" crc="40e6938c" sha1="b642f87dc619975e60561499dc35b9b5d7afff07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1284,7 +1284,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ゼクサス光速2000光年"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="30744">
-				<rom name="zexas.cmt" size="30744" crc="ee5b97eb" sha1="c5e0ca4dcce1fd600643089c76aebb2d0ffc3610" offset="0" />
+				<rom name="zexas.cmt" size="30744" crc="ee5b97eb" sha1="c5e0ca4dcce1fd600643089c76aebb2d0ffc3610"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1297,7 +1297,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="release" value="198407xx"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="15662">
-				<rom name="zold.t88" size="15662" crc="ca948d73" sha1="2a751237c7474a31d4280117b44344ca7baad732" offset="0" />
+				<rom name="zold.t88" size="15662" crc="ca948d73" sha1="2a751237c7474a31d4280117b44344ca7baad732"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1311,7 +1311,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ズームインスペース"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="13757">
-				<rom name="zoom in space.t88" size="13757" crc="eddf96e4" sha1="dee0b32189fbeda23cfa226c3c4ca03f463e4076" offset="0" />
+				<rom name="zoom in space.t88" size="13757" crc="eddf96e4" sha1="dee0b32189fbeda23cfa226c3c4ca03f463e4076"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1322,7 +1322,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="42884">
-				<rom name="champion boulderdash.t88" size="42884" crc="ded95084" sha1="e095f1406df311e8eef1eecf95531e29a69b301d" offset="0" />
+				<rom name="champion boulderdash.t88" size="42884" crc="ded95084" sha1="e095f1406df311e8eef1eecf95531e29a69b301d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1333,7 +1333,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="31605">
-				<rom name="enterprise.t88" size="31605" crc="9ab8b63d" sha1="16c10eb3a6b42293b5ef4f25b6f05684fbb057f7" offset="0" />
+				<rom name="enterprise.t88" size="31605" crc="9ab8b63d" sha1="16c10eb3a6b42293b5ef4f25b6f05684fbb057f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1344,7 +1344,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19646">
-				<rom name="intern adventure.t88" size="19646" crc="2392d3f8" sha1="1c7dd07f678a8121da848072966f1a857736570b" offset="0" />
+				<rom name="intern adventure.t88" size="19646" crc="2392d3f8" sha1="1c7dd07f678a8121da848072966f1a857736570b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1355,7 +1355,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="24466">
-				<rom name="jump!.t88" size="24466" crc="92d695f5" sha1="77bb7af0fa4c67db5f6655e68fd5028c052ddaee" offset="0" />
+				<rom name="jump!.t88" size="24466" crc="92d695f5" sha1="77bb7af0fa4c67db5f6655e68fd5028c052ddaee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1366,13 +1366,13 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="109907">
-				<rom name="kido senshi gundam 2 1.t88" size="109907" crc="43f9c027" sha1="aac45310ac2bf16303dbd57f23aea053811c0ae8" offset="0" />
+				<rom name="kido senshi gundam 2 1.t88" size="109907" crc="43f9c027" sha1="aac45310ac2bf16303dbd57f23aea053811c0ae8"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="pc8801_cass">
 			<dataarea name="cass" size="74824">
-				<rom name="kido senshi gundam 2 2.t88" size="74824" crc="668c55d9" sha1="640275f3cb50a2b7d7a2e156bf1215324cef548a" offset="0" />
+				<rom name="kido senshi gundam 2 2.t88" size="74824" crc="668c55d9" sha1="640275f3cb50a2b7d7a2e156bf1215324cef548a"/>
 			</dataarea>
 		</part>
 	</software>

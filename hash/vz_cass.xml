@@ -83,7 +83,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7275" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="2854400">
-				<rom name="chess.wav" size="2854400" crc="7cc80cf3" sha1="770b09e8755fad97e12f320cd5fea3416669cd36" offset="0" />
+				<rom name="chess.wav" size="2854400" crc="7cc80cf3" sha1="770b09e8755fad97e12f320cd5fea3416669cd36"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +95,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7236" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="1317376">
-				<rom name="circus.wav" size="1317376" crc="ab3ba833" sha1="1b33e2f3f2389f61f2e815be626b5d84083be77e" offset="0" />
+				<rom name="circus.wav" size="1317376" crc="ab3ba833" sha1="1b33e2f3f2389f61f2e815be626b5d84083be77e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +107,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7333" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="3640544">
-				<rom name="dawn.wav" size="3640544" crc="22d096f5" sha1="ac480a16b6d6b8d6f08875e9c6ca13cadc413fa1" offset="0" />
+				<rom name="dawn.wav" size="3640544" crc="22d096f5" sha1="ac480a16b6d6b8d6f08875e9c6ca13cadc413fa1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,7 +120,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="author" value="Tom Thiel" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="1926592">
-				<rom name="defpen.wav" size="1926592" crc="b3dfa117" sha1="b7b53d11483fd78dfc81484e0830e6f6913c6e47" offset="0" />
+				<rom name="defpen.wav" size="1926592" crc="b3dfa117" sha1="b7b53d11483fd78dfc81484e0830e6f6913c6e47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -132,7 +132,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7332" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="1628976">
-				<rom name="galaxon.wav" size="1628976" crc="8909df05" sha1="4ee1ce9aa8538b8aad9d0839fdb1396335074945" offset="0" />
+				<rom name="galaxon.wav" size="1628976" crc="8909df05" sha1="4ee1ce9aa8538b8aad9d0839fdb1396335074945"/>
 			</dataarea>
 		</part>
 	</software>
@@ -145,7 +145,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7242" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="1732336">
-				<rom name="ghost.wav" size="1732336" crc="b5ed2320" sha1="f58e328e0b20d453a1c0486fd8e10c5f3e7ecfa7" offset="0" />
+				<rom name="ghost.wav" size="1732336" crc="b5ed2320" sha1="f58e328e0b20d453a1c0486fd8e10c5f3e7ecfa7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +156,7 @@ Demonstration Tape (included with the VZ300)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="5109472">
-				<rom name="hamsam.wav" size="5109472" crc="7aed86a7" sha1="b5061edb1401cea4aee97d8cd92c582c9c14e66b" offset="0" />
+				<rom name="hamsam.wav" size="5109472" crc="7aed86a7" sha1="b5061edb1401cea4aee97d8cd92c582c9c14e66b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -168,7 +168,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7243" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="3172080">
-				<rom name="hoppy.wav" size="3172080" crc="60e7e15a" sha1="1d56a04af700a94d44d6bb0ddfaf89213db39ce8" offset="0" />
+				<rom name="hoppy.wav" size="3172080" crc="60e7e15a" sha1="1d56a04af700a94d44d6bb0ddfaf89213db39ce8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -181,7 +181,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7239" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="1723824">
-				<rom name="invaders.wav" size="1723824" crc="f959681e" sha1="e12bc9384e7fe1efc0ecff6356c3e3ded7ee8373" offset="0" />
+				<rom name="invaders.wav" size="1723824" crc="f959681e" sha1="e12bc9384e7fe1efc0ecff6356c3e3ded7ee8373"/>
 			</dataarea>
 		</part>
 	</software>
@@ -193,7 +193,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7268" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="1622288">
-				<rom name="ladder.wav" size="1622288" crc="47ab9ccf" sha1="e6d72b7bc26b124c906b9c0e0015137ae8844a4d" offset="0" />
+				<rom name="ladder.wav" size="1622288" crc="47ab9ccf" sha1="e6d72b7bc26b124c906b9c0e0015137ae8844a4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -204,7 +204,7 @@ Demonstration Tape (included with the VZ300)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="5109776">
-				<rom name="missile.wav" size="5109776" crc="55a1fda4" sha1="1de495534447cee16d3db22b043d53b6d15f05fe" offset="0" />
+				<rom name="missile.wav" size="5109776" crc="55a1fda4" sha1="1de495534447cee16d3db22b043d53b6d15f05fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -216,7 +216,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7270" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="1708928">
-				<rom name="panik.wav" size="1708928" crc="8b8c4c5a" sha1="e9e2ae5c406f9ac79b186cb34b2849b9e2a477e3" offset="0" />
+				<rom name="panik.wav" size="1708928" crc="8b8c4c5a" sha1="e9e2ae5c406f9ac79b186cb34b2849b9e2a477e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -228,7 +228,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7266" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="2107776">
-				<rom name="ppatrol.wav" size="2107776" crc="3eb828ed" sha1="b56777b732587856f554d978d844a3815ec50f69" offset="0" />
+				<rom name="ppatrol.wav" size="2107776" crc="3eb828ed" sha1="b56777b732587856f554d978d844a3815ec50f69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -241,7 +241,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="usage" value="Needs 16k memory expansion" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="3327120">
-				<rom name="starblas.wav" size="3327120" crc="e6a5b55f" sha1="07715fd8104891d0d4d3b06b5609674ca93af920" offset="0" />
+				<rom name="starblas.wav" size="3327120" crc="e6a5b55f" sha1="07715fd8104891d0d4d3b06b5609674ca93af920"/>
 			</dataarea>
 		</part>
 	</software>
@@ -253,7 +253,7 @@ Demonstration Tape (included with the VZ300)
 		<info name="serial" value="X-7264" />
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="2100784">
-				<rom name="tennis.wav" size="2100784" crc="3eb5ed00" sha1="6c2f2d4c9d60b6f2bd977eddd397d6dbdbfc52f1" offset="0" />
+				<rom name="tennis.wav" size="2100784" crc="3eb5ed00" sha1="6c2f2d4c9d60b6f2bd977eddd397d6dbdbfc52f1"/>
 			</dataarea>
 		</part>
 	</software>

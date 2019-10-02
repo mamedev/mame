@@ -45,13 +45,13 @@ Loading Tape BASIC Programs
 		<part name="cass1" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 1 (Lettura)"/>
 			<dataarea name="cass" size="1102980">
-				<rom name="basic 1' parte 1200bps.wav" size="1102980" crc="ce366f71" sha1="877c5ad33f6f5d502c950170bc1616f157526d43" offset="0" />
+				<rom name="basic 1' parte 1200bps.wav" size="1102980" crc="ce366f71" sha1="877c5ad33f6f5d502c950170bc1616f157526d43"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 2 (BASIC)"/>
 			<dataarea name="cass" size="2908430">
-				<rom name="basic 2' parte 1200bps.wav" size="2908430" crc="5775a8a0" sha1="bc2a02739db5dfe2460c01ead167edb73a9cb921" offset="0" />
+				<rom name="basic 2' parte 1200bps.wav" size="2908430" crc="5775a8a0" sha1="bc2a02739db5dfe2460c01ead167edb73a9cb921"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,13 +65,13 @@ Loading Tape BASIC Programs
 		<part name="cass1" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 1 (Lettura)"/>
 			<dataarea name="cass" size="1566466">
-				<rom name="basic 1' parte 600bps.wav" size="1566466" crc="c323b144" sha1="961fe7cbd1dd80a706533f7f52c80582237fc7ed" offset="0" />
+				<rom name="basic 1' parte 600bps.wav" size="1566466" crc="c323b144" sha1="961fe7cbd1dd80a706533f7f52c80582237fc7ed"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 2 (BASIC)"/>
 			<dataarea name="cass" size="5177366">
-				<rom name="basic 2' parte 600bps.wav" size="5177366" crc="37eac04d" sha1="941d5d25253df6876e106e31bb5c76aae7540467" offset="0" />
+				<rom name="basic 2' parte 600bps.wav" size="5177366" crc="37eac04d" sha1="941d5d25253df6876e106e31bb5c76aae7540467"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,13 +85,13 @@ Loading Tape BASIC Programs
 		<part name="cass1" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 1 (Lettura)"/>
 			<dataarea name="cass" size="2471412">
-				<rom name="basic 1' parte 300bps.wav" size="2471412" crc="4aa6746c" sha1="f4aa0edd0fe9397c51e21cf1ae1cdd166f8789c2" offset="0" />
+				<rom name="basic 1' parte 300bps.wav" size="2471412" crc="4aa6746c" sha1="f4aa0edd0fe9397c51e21cf1ae1cdd166f8789c2"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 2 (BASIC)"/>
 			<dataarea name="cass" size="9693228">
-				<rom name="basic 2' parte 300bps.wav" size="9693228" crc="ffa4fe39" sha1="d7bc385bb84017d9453b26c944ca4a6c58bd8014" offset="0" />
+				<rom name="basic 2' parte 300bps.wav" size="9693228" crc="ffa4fe39" sha1="d7bc385bb84017d9453b26c944ca4a6c58bd8014"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,19 +105,19 @@ Loading Tape BASIC Programs
 		<part name="cass1" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="1069906">
-				<rom name="bioritmi 1' parte 1200bps.wav" size="1069906" crc="2161f939" sha1="2e6a62d2aaaf718eed7cb1f9c6835a28b8650030" offset="0" />
+				<rom name="bioritmi 1' parte 1200bps.wav" size="1069906" crc="2161f939" sha1="2e6a62d2aaaf718eed7cb1f9c6835a28b8650030"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="1069906">
-				<rom name="bioritmi 2' parte 1200bps.wav" size="1069906" crc="e47265bb" sha1="d0140ff99e0a11b9a5bcb2273fe15ab85d106c65" offset="0" />
+				<rom name="bioritmi 2' parte 1200bps.wav" size="1069906" crc="e47265bb" sha1="d0140ff99e0a11b9a5bcb2273fe15ab85d106c65"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="1069906">
-				<rom name="bioritmi 3' parte 1200bps.wav" size="1069906" crc="0ef56c4a" sha1="53a437c5c698833125869b2486dcaaeeb8fcb432" offset="0" />
+				<rom name="bioritmi 3' parte 1200bps.wav" size="1069906" crc="0ef56c4a" sha1="53a437c5c698833125869b2486dcaaeeb8fcb432"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,19 +131,19 @@ Loading Tape BASIC Programs
 		<part name="cass1" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="1500316">
-				<rom name="bioritmi 1' parte 600bps.wav" size="1500316" crc="5a9fd253" sha1="3f7b4639b2bb0cc06bc3c5d5334f79990af7e00d" offset="0" />
+				<rom name="bioritmi 1' parte 600bps.wav" size="1500316" crc="5a9fd253" sha1="3f7b4639b2bb0cc06bc3c5d5334f79990af7e00d"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="1500316">
-				<rom name="bioritmi 2' parte 600bps.wav" size="1500316" crc="44445b6a" sha1="5c2b48eecbb7c4c97e4b6a669b77e4344cfd1195" offset="0" />
+				<rom name="bioritmi 2' parte 600bps.wav" size="1500316" crc="44445b6a" sha1="5c2b48eecbb7c4c97e4b6a669b77e4344cfd1195"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="1500316">
-				<rom name="bioritmi 3' parte 600bps.wav" size="1500316" crc="a7bcc270" sha1="4b87d322f77a5c4d77b9e474f22bc92d2316711e" offset="0" />
+				<rom name="bioritmi 3' parte 600bps.wav" size="1500316" crc="a7bcc270" sha1="4b87d322f77a5c4d77b9e474f22bc92d2316711e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -157,19 +157,19 @@ Loading Tape BASIC Programs
 		<part name="cass1" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="2339112">
-				<rom name="bioritmi 1' parte 300bps.wav" size="2339112" crc="b3f968fb" sha1="7ec33662d41d69bf6cf911ef893c4bc97e22fe5f" offset="0" />
+				<rom name="bioritmi 1' parte 300bps.wav" size="2339112" crc="b3f968fb" sha1="7ec33662d41d69bf6cf911ef893c4bc97e22fe5f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 2"/>
 			<dataarea name="cass" size="2339112">
-				<rom name="bioritmi 2' parte 300bps.wav" size="2339112" crc="fcabdd05" sha1="0306197e1bb49d6b71195744b9ebb876c140d667" offset="0" />
+				<rom name="bioritmi 2' parte 300bps.wav" size="2339112" crc="fcabdd05" sha1="0306197e1bb49d6b71195744b9ebb876c140d667"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="z80ne_cass">
 			<feature name="part_id" value="Tape 3"/>
 			<dataarea name="cass" size="2339112">
-				<rom name="bioritmi 3' parte 300bps.wav" size="2339112" crc="ff1d19fc" sha1="014bb647159a323f9870a2b8bfb132a74d310777" offset="0" />
+				<rom name="bioritmi 3' parte 300bps.wav" size="2339112" crc="ff1d19fc" sha1="014bb647159a323f9870a2b8bfb132a74d310777"/>
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +184,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1422264">
-				<rom name="bioritmi (basic) 1200bps.wav" size="1422264" crc="fd7593de" sha1="5d1ed3622f47503e7a4ed4d9ed386e194d13df52" offset="0" />
+				<rom name="bioritmi (basic) 1200bps.wav" size="1422264" crc="fd7593de" sha1="5d1ed3622f47503e7a4ed4d9ed386e194d13df52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2205034">
-				<rom name="bioritmi (basic) 600bps.wav" size="2205034" crc="1eb6b06a" sha1="615ea4ad9e2cef4d0fc24556e4f0d3234c840b8b" offset="0" />
+				<rom name="bioritmi (basic) 600bps.wav" size="2205034" crc="1eb6b06a" sha1="615ea4ad9e2cef4d0fc24556e4f0d3234c840b8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -210,7 +210,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3748548">
-				<rom name="bioritmi (basic) 300bps.wav" size="3748548" crc="a1ce7c0b" sha1="2bd62b27d85c599cd760386d097d78a8c3f9eafe" offset="0" />
+				<rom name="bioritmi (basic) 300bps.wav" size="3748548" crc="a1ce7c0b" sha1="2bd62b27d85c599cd760386d097d78a8c3f9eafe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -223,7 +223,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1384780">
-				<rom name="calcolo equo canone 1200bps.wav" size="1384780" crc="c71e3f9e" sha1="a6bf6d1898ac1adc3894f24baa458521aa616dd1" offset="0" />
+				<rom name="calcolo equo canone 1200bps.wav" size="1384780" crc="c71e3f9e" sha1="a6bf6d1898ac1adc3894f24baa458521aa616dd1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -236,7 +236,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2130064">
-				<rom name="calcolo equo canone 600bps.wav" size="2130064" crc="6a068ef5" sha1="b40f81a4601901b7a9107277048cfa48c7906f51" offset="0" />
+				<rom name="calcolo equo canone 600bps.wav" size="2130064" crc="6a068ef5" sha1="b40f81a4601901b7a9107277048cfa48c7906f51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3598608">
-				<rom name="calcolo equo canone 300bps.wav" size="3598608" crc="d94b5a74" sha1="7fe07dc58ed4a0700bdef13c0d96cec0d7b69aaa" offset="0" />
+				<rom name="calcolo equo canone 300bps.wav" size="3598608" crc="d94b5a74" sha1="7fe07dc58ed4a0700bdef13c0d96cec0d7b69aaa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2765550">
-				<rom name="cannibali 1200bps.wav" size="2765550" crc="7488c244" sha1="5f8dc94f010a958f0bf24a982548c5dcc794f1cd" offset="0" />
+				<rom name="cannibali 1200bps.wav" size="2765550" crc="7488c244" sha1="5f8dc94f010a958f0bf24a982548c5dcc794f1cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -275,7 +275,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="4891606">
-				<rom name="cannibali 600bps.wav" size="4891606" crc="b70f337f" sha1="41fc68e7e42d85dde56693c39fca301fa8120273" offset="0" />
+				<rom name="cannibali 600bps.wav" size="4891606" crc="b70f337f" sha1="41fc68e7e42d85dde56693c39fca301fa8120273"/>
 			</dataarea>
 		</part>
 	</software>
@@ -288,7 +288,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="9121692">
-				<rom name="cannibali 300bps.wav" size="9121692" crc="c57e34a3" sha1="8e8e2913c12d2b546f303f80eefafb439967303b" offset="0" />
+				<rom name="cannibali 300bps.wav" size="9121692" crc="c57e34a3" sha1="8e8e2913c12d2b546f303f80eefafb439967303b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -301,7 +301,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1601752">
-				<rom name="coda di bue 1200bps.wav" size="1601752" crc="1f2c6bd5" sha1="e77a733302441c6c221cb362eb589b4fbb047f98" offset="0" />
+				<rom name="coda di bue 1200bps.wav" size="1601752" crc="1f2c6bd5" sha1="e77a733302441c6c221cb362eb589b4fbb047f98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -314,7 +314,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2564008">
-				<rom name="coda di bue 600bps.wav" size="2564008" crc="250fd3cc" sha1="b04e30836710cb6cedac22fa0b027e9cdaa66fc5" offset="0" />
+				<rom name="coda di bue 600bps.wav" size="2564008" crc="250fd3cc" sha1="b04e30836710cb6cedac22fa0b027e9cdaa66fc5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -327,7 +327,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="4466496">
-				<rom name="coda di bue 300bps.wav" size="4466496" crc="b589615d" sha1="4fcffffc9c9440b63e50272c4765eeb3b4657b2d" offset="0" />
+				<rom name="coda di bue 300bps.wav" size="4466496" crc="b589615d" sha1="4fcffffc9c9440b63e50272c4765eeb3b4657b2d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -340,7 +340,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1335828">
-				<rom name="conto alla rovescia 1200bps.wav" size="1335828" crc="66c39a43" sha1="6e7949f2bec2d0a991e7dd8fc0220d0df3a44410" offset="0" />
+				<rom name="conto alla rovescia 1200bps.wav" size="1335828" crc="66c39a43" sha1="6e7949f2bec2d0a991e7dd8fc0220d0df3a44410"/>
 			</dataarea>
 		</part>
 	</software>
@@ -353,7 +353,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2032162">
-				<rom name="conto alla rovescia 600bps.wav" size="2032162" crc="b89a0bd3" sha1="bd3f4b642f26dfc422a1e5003ed9cdc18a6a6446" offset="0" />
+				<rom name="conto alla rovescia 600bps.wav" size="2032162" crc="b89a0bd3" sha1="bd3f4b642f26dfc422a1e5003ed9cdc18a6a6446"/>
 			</dataarea>
 		</part>
 	</software>
@@ -366,7 +366,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3402804">
-				<rom name="conto alla rovescia 300bps.wav" size="3402804" crc="0c06f1f5" sha1="fa8af5ca9ba826cffa8a7891df8d0a5e6fe1f7d6" offset="0" />
+				<rom name="conto alla rovescia 300bps.wav" size="3402804" crc="0c06f1f5" sha1="fa8af5ca9ba826cffa8a7891df8d0a5e6fe1f7d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -379,7 +379,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="866604">
-				<rom name="disegni 1200bps.wav" size="866604" crc="61c98421" sha1="c627b2dcb609d9aae73983a1d3d5e12337061376" offset="0" />
+				<rom name="disegni 1200bps.wav" size="866604" crc="61c98421" sha1="c627b2dcb609d9aae73983a1d3d5e12337061376"/>
 			</dataarea>
 		</part>
 	</software>
@@ -392,7 +392,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1093714">
-				<rom name="disegni 600bps.wav" size="1093714" crc="719a2612" sha1="f12f15b1e9c330a23d087cf93b2e311ffaad2fc3" offset="0" />
+				<rom name="disegni 600bps.wav" size="1093714" crc="719a2612" sha1="f12f15b1e9c330a23d087cf93b2e311ffaad2fc3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -405,7 +405,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1525908">
-				<rom name="disegni 300bps.wav" size="1525908" crc="fb70f364" sha1="39665e606bf095a0007555efe2919f0fb4816c1d" offset="0" />
+				<rom name="disegni 300bps.wav" size="1525908" crc="fb70f364" sha1="39665e606bf095a0007555efe2919f0fb4816c1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -418,7 +418,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="875866">
-				<rom name="estrazione ambi 1200bps.wav" size="875866" crc="4de178b1" sha1="77d696b352009d5dcca90662bd518945ae27bb5e" offset="0" />
+				<rom name="estrazione ambi 1200bps.wav" size="875866" crc="4de178b1" sha1="77d696b352009d5dcca90662bd518945ae27bb5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -431,7 +431,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1112236">
-				<rom name="estrazione ambi 600bps.wav" size="1112236" crc="098ac18e" sha1="6b73bd3caa7502210e62afaf3c1c43169e1148f0" offset="0" />
+				<rom name="estrazione ambi 600bps.wav" size="1112236" crc="098ac18e" sha1="6b73bd3caa7502210e62afaf3c1c43169e1148f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -444,7 +444,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1562952">
-				<rom name="estrazione ambi 300bps.wav" size="1562952" crc="3a5ac731" sha1="53acc2bb6d1b3bd9b69881c2185c0f525757baf2" offset="0" />
+				<rom name="estrazione ambi 300bps.wav" size="1562952" crc="3a5ac731" sha1="53acc2bb6d1b3bd9b69881c2185c0f525757baf2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -457,7 +457,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3047790">
-				<rom name="gestione magazzino 1200bps.wav" size="3047790" crc="4e3c3ccb" sha1="9c99e17b971cf10d93a1ebdb2101ddd6b51ad912" offset="0" />
+				<rom name="gestione magazzino 1200bps.wav" size="3047790" crc="4e3c3ccb" sha1="9c99e17b971cf10d93a1ebdb2101ddd6b51ad912"/>
 			</dataarea>
 		</part>
 	</software>
@@ -470,7 +470,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="5456086">
-				<rom name="gestione magazzino 600bps.wav" size="5456086" crc="601c6416" sha1="242590368e24806ca4ab3f9b33f254c16dc9f69c" offset="0" />
+				<rom name="gestione magazzino 600bps.wav" size="5456086" crc="601c6416" sha1="242590368e24806ca4ab3f9b33f254c16dc9f69c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -483,7 +483,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="10250652">
-				<rom name="gestione magazzino 300bps.wav" size="10250652" crc="89732d8e" sha1="7816e452df4860a46fbc97a2a06bc85ebce9d01c" offset="0" />
+				<rom name="gestione magazzino 300bps.wav" size="10250652" crc="89732d8e" sha1="7816e452df4860a46fbc97a2a06bc85ebce9d01c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -496,7 +496,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1359642">
-				<rom name="il buco nero 1200bps.wav" size="1359642" crc="b0254015" sha1="02d37a2ce8eea38c87d4cb84d8763d2cbeabc3e0" offset="0" />
+				<rom name="il buco nero 1200bps.wav" size="1359642" crc="b0254015" sha1="02d37a2ce8eea38c87d4cb84d8763d2cbeabc3e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -509,7 +509,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2079790">
-				<rom name="il buco nero 600bps.wav" size="2079790" crc="8ea540b8" sha1="f6f5d7a5a42020580da3c047e3ba4354122d535b" offset="0" />
+				<rom name="il buco nero 600bps.wav" size="2079790" crc="8ea540b8" sha1="f6f5d7a5a42020580da3c047e3ba4354122d535b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -522,7 +522,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3498060">
-				<rom name="il buco nero 300bps.wav" size="3498060" crc="1dc74011" sha1="b1dd5d63c8453320dd2acfd7c4e81d968c2547b8" offset="0" />
+				<rom name="il buco nero 300bps.wav" size="3498060" crc="1dc74011" sha1="b1dd5d63c8453320dd2acfd7c4e81d968c2547b8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -535,7 +535,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1680250">
-				<rom name="il dado e tratto 1200bps.wav" size="1680250" crc="d6aa6dba" sha1="8de95b1340cb6fc4cf9a77eda3f7c88a57fb5458" offset="0" />
+				<rom name="il dado e tratto 1200bps.wav" size="1680250" crc="d6aa6dba" sha1="8de95b1340cb6fc4cf9a77eda3f7c88a57fb5458"/>
 			</dataarea>
 		</part>
 	</software>
@@ -548,7 +548,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2721004">
-				<rom name="il dado e tratto 600bps.wav" size="2721004" crc="35029330" sha1="8d362e4067e35231dc15f342492590e664f01dd3" offset="0" />
+				<rom name="il dado e tratto 600bps.wav" size="2721004" crc="35029330" sha1="8d362e4067e35231dc15f342492590e664f01dd3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -561,7 +561,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="4780488">
-				<rom name="il dado e tratto 300bps.wav" size="4780488" crc="d219a73a" sha1="705febdc9d0a43026c83b4a209ce7a4b2b27ce31" offset="0" />
+				<rom name="il dado e tratto 300bps.wav" size="4780488" crc="d219a73a" sha1="705febdc9d0a43026c83b4a209ce7a4b2b27ce31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -574,7 +574,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1668342">
-				<rom name="il flipper della fortuna 1200bps.wav" size="1668342" crc="97f77d38" sha1="6d9d021e670f57ae7df870d2ad49565d5a0b56f0" offset="0" />
+				<rom name="il flipper della fortuna 1200bps.wav" size="1668342" crc="97f77d38" sha1="6d9d021e670f57ae7df870d2ad49565d5a0b56f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -587,7 +587,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2697190">
-				<rom name="il flipper della fortuna 600bps.wav" size="2697190" crc="df0c3556" sha1="6e397a3cf0f43ab33e6aa17e319eb97628ff8524" offset="0" />
+				<rom name="il flipper della fortuna 600bps.wav" size="2697190" crc="df0c3556" sha1="6e397a3cf0f43ab33e6aa17e319eb97628ff8524"/>
 			</dataarea>
 		</part>
 	</software>
@@ -600,7 +600,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="4732860">
-				<rom name="il flipper della fortuna 300bps.wav" size="4732860" crc="a03313c0" sha1="8b5497e97239e2c9fca6b54ffe9c25a9e224c8e4" offset="0" />
+				<rom name="il flipper della fortuna 300bps.wav" size="4732860" crc="a03313c0" sha1="8b5497e97239e2c9fca6b54ffe9c25a9e224c8e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -613,7 +613,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1085340">
-				<rom name="il gioco delle rane 1200bps.wav" size="1085340" crc="3ac72b5c" sha1="b7034acd8e0cdd29d5f2fd54cfd4c1f4b467149a" offset="0" />
+				<rom name="il gioco delle rane 1200bps.wav" size="1085340" crc="3ac72b5c" sha1="b7034acd8e0cdd29d5f2fd54cfd4c1f4b467149a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -626,7 +626,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1531186">
-				<rom name="il gioco delle rane 600bps.wav" size="1531186" crc="376e79af" sha1="07e28581952f48a14d653400fff74688b1a1697b" offset="0" />
+				<rom name="il gioco delle rane 600bps.wav" size="1531186" crc="376e79af" sha1="07e28581952f48a14d653400fff74688b1a1697b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -639,7 +639,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2400852">
-				<rom name="il gioco delle rane 300bps.wav" size="2400852" crc="93f159f2" sha1="dc42abf6d904798dc6d26385d6bd69112a1ae76d" offset="0" />
+				<rom name="il gioco delle rane 300bps.wav" size="2400852" crc="93f159f2" sha1="dc42abf6d904798dc6d26385d6bd69112a1ae76d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -652,7 +652,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1394922">
-				<rom name="legge 373 1200bps.wav" size="1394922" crc="4dc70af1" sha1="2f888c7ef52456076cbf2eda52e2c77fae08f2b3" offset="0" />
+				<rom name="legge 373 1200bps.wav" size="1394922" crc="4dc70af1" sha1="2f888c7ef52456076cbf2eda52e2c77fae08f2b3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -665,7 +665,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2150350">
-				<rom name="legge 373 600bps.wav" size="2150350" crc="543bb917" sha1="561e3697f45f1b2e4ae8a519e1365cb51ff9223c" offset="0" />
+				<rom name="legge 373 600bps.wav" size="2150350" crc="543bb917" sha1="561e3697f45f1b2e4ae8a519e1365cb51ff9223c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -678,7 +678,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3639180">
-				<rom name="legge 373 300bps.wav" size="3639180" crc="939719a5" sha1="cc608f735fe0ef6baca078cc71bdcf628b682a22" offset="0" />
+				<rom name="legge 373 300bps.wav" size="3639180" crc="939719a5" sha1="cc608f735fe0ef6baca078cc71bdcf628b682a22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -691,7 +691,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1501644">
-				<rom name="lunghezza della vita 1200bps.wav" size="1501644" crc="c5ec4dcb" sha1="29ae6902a729d74ff2742b82827080a2b1e95785" offset="0" />
+				<rom name="lunghezza della vita 1200bps.wav" size="1501644" crc="c5ec4dcb" sha1="29ae6902a729d74ff2742b82827080a2b1e95785"/>
 			</dataarea>
 		</part>
 	</software>
@@ -704,7 +704,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2363794">
-				<rom name="lunghezza della vita 600bps.wav" size="2363794" crc="c8f74e67" sha1="298b8eba7da77d471ba409f3e376734bea8a1241" offset="0" />
+				<rom name="lunghezza della vita 600bps.wav" size="2363794" crc="c8f74e67" sha1="298b8eba7da77d471ba409f3e376734bea8a1241"/>
 			</dataarea>
 		</part>
 	</software>
@@ -717,7 +717,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="4066068">
-				<rom name="lunghezza della vita 300bps.wav" size="4066068" crc="90aff84b" sha1="0d9c4a6d5698efe394558451d665d28743298a7f" offset="0" />
+				<rom name="lunghezza della vita 300bps.wav" size="4066068" crc="90aff84b" sha1="0d9c4a6d5698efe394558451d665d28743298a7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -730,7 +730,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1424910">
-				<rom name="master mind 1200bps.wav" size="1424910" crc="9fc6b581" sha1="4d63e0427537675be7246acb01eb652f495a3939" offset="0" />
+				<rom name="master mind 1200bps.wav" size="1424910" crc="9fc6b581" sha1="4d63e0427537675be7246acb01eb652f495a3939"/>
 			</dataarea>
 		</part>
 	</software>
@@ -743,7 +743,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2210326">
-				<rom name="master mind 600bps.wav" size="2210326" crc="c908794c" sha1="47cedd508f8a39c70f5500126828af726e0b2943" offset="0" />
+				<rom name="master mind 600bps.wav" size="2210326" crc="c908794c" sha1="47cedd508f8a39c70f5500126828af726e0b2943"/>
 			</dataarea>
 		</part>
 	</software>
@@ -756,7 +756,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3759132">
-				<rom name="master mind 300bps.wav" size="3759132" crc="b420557f" sha1="3c943e00e34b6b4968c4f701479df2da827eae4b" offset="0" />
+				<rom name="master mind 300bps.wav" size="3759132" crc="b420557f" sha1="3c943e00e34b6b4968c4f701479df2da827eae4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -769,7 +769,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2307792">
-				<rom name="missione bombardamento 1200bps.wav" size="2307792" crc="e9026984" sha1="c5207bcd6781436b8689aebd1aebffa35ff5db5b" offset="0" />
+				<rom name="missione bombardamento 1200bps.wav" size="2307792" crc="e9026984" sha1="c5207bcd6781436b8689aebd1aebffa35ff5db5b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -782,7 +782,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3976090">
-				<rom name="missione bombardamento 600bps.wav" size="3976090" crc="382549e0" sha1="2c1aeb9c289526c062768af8663403038192c786" offset="0" />
+				<rom name="missione bombardamento 600bps.wav" size="3976090" crc="382549e0" sha1="2c1aeb9c289526c062768af8663403038192c786"/>
 			</dataarea>
 		</part>
 	</software>
@@ -795,7 +795,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="7290660">
-				<rom name="missione bombardamento 300bps.wav" size="7290660" crc="3ee9449f" sha1="4b0edf4a623f0aeb8157109d9b7af0932f07a818" offset="0" />
+				<rom name="missione bombardamento 300bps.wav" size="7290660" crc="3ee9449f" sha1="4b0edf4a623f0aeb8157109d9b7af0932f07a818"/>
 			</dataarea>
 		</part>
 	</software>
@@ -808,7 +808,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="5696436">
-				<rom name="misto 1200bps.wav" size="5696436" crc="3bf38ca1" sha1="7f1fa383e7d38235a80f367ee5e37c6a08eb5366" offset="0" />
+				<rom name="misto 1200bps.wav" size="5696436" crc="3bf38ca1" sha1="7f1fa383e7d38235a80f367ee5e37c6a08eb5366"/>
 			</dataarea>
 		</part>
 	</software>
@@ -821,7 +821,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="10753378">
-				<rom name="misto 600bps.wav" size="10753378" crc="113b57dc" sha1="23edcbb05cf3ed2e6c8a2eedcabd58a1d9257fce" offset="0" />
+				<rom name="misto 600bps.wav" size="10753378" crc="113b57dc" sha1="23edcbb05cf3ed2e6c8a2eedcabd58a1d9257fce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -834,7 +834,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="20845236">
-				<rom name="misto 300bps.wav" size="20845236" crc="d10c2d85" sha1="105d8903eabbf006b6e400cd87116244e17512fe" offset="0" />
+				<rom name="misto 300bps.wav" size="20845236" crc="d10c2d85" sha1="105d8903eabbf006b6e400cd87116244e17512fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -847,7 +847,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1030656">
-				<rom name="nim 1200bps.wav" size="1030656" crc="17321bbf" sha1="0e11cda7958350389d27ba7df0c5f2efbc96b27d" offset="0" />
+				<rom name="nim 1200bps.wav" size="1030656" crc="17321bbf" sha1="0e11cda7958350389d27ba7df0c5f2efbc96b27d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -860,7 +860,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1421818">
-				<rom name="nim 600bps.wav" size="1421818" crc="28fcdd4f" sha1="54273a7fda5e95d3bab0db3ae0ea9bff248826cf" offset="0" />
+				<rom name="nim 600bps.wav" size="1421818" crc="28fcdd4f" sha1="54273a7fda5e95d3bab0db3ae0ea9bff248826cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -873,7 +873,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2182116">
-				<rom name="nim 300bps.wav" size="2182116" crc="4bab2f29" sha1="354dc913a0401a4915a3d9d6c0fee9ae9646c3e3" offset="0" />
+				<rom name="nim 300bps.wav" size="2182116" crc="4bab2f29" sha1="354dc913a0401a4915a3d9d6c0fee9ae9646c3e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -886,7 +886,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1590726">
-				<rom name="numeri lotto 1200bps.wav" size="1590726" crc="a5b0e439" sha1="88a9f01e50d87b5b332841f60168939e8962c056" offset="0" />
+				<rom name="numeri lotto 1200bps.wav" size="1590726" crc="a5b0e439" sha1="88a9f01e50d87b5b332841f60168939e8962c056"/>
 			</dataarea>
 		</part>
 	</software>
@@ -899,7 +899,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2541958">
-				<rom name="numeri lotto 600bps.wav" size="2541958" crc="3843b0a6" sha1="93f661d8dce02d8fcd2d4c9b7e9dbf92ce31bf06" offset="0" />
+				<rom name="numeri lotto 600bps.wav" size="2541958" crc="3843b0a6" sha1="93f661d8dce02d8fcd2d4c9b7e9dbf92ce31bf06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -912,7 +912,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="4422396">
-				<rom name="numeri lotto 300bps.wav" size="4422396" crc="938408e1" sha1="8249b0fe33d5155768a1c1408931f00d70d23ba5" offset="0" />
+				<rom name="numeri lotto 300bps.wav" size="4422396" crc="938408e1" sha1="8249b0fe33d5155768a1c1408931f00d70d23ba5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -925,7 +925,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1291728">
-				<rom name="odissea nello spazio 1200bps.wav" size="1291728" crc="0fd8e125" sha1="ce3e3294192079beb0aec41671d35b1525814e47" offset="0" />
+				<rom name="odissea nello spazio 1200bps.wav" size="1291728" crc="0fd8e125" sha1="ce3e3294192079beb0aec41671d35b1525814e47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -938,7 +938,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1943962">
-				<rom name="odissea nello spazio 600bps.wav" size="1943962" crc="479a5f62" sha1="2ef81ad0be1a352f23c93dd86a916a8d25895863" offset="0" />
+				<rom name="odissea nello spazio 600bps.wav" size="1943962" crc="479a5f62" sha1="2ef81ad0be1a352f23c93dd86a916a8d25895863"/>
 			</dataarea>
 		</part>
 	</software>
@@ -951,7 +951,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3226404">
-				<rom name="odissea nello spazio 300bps.wav" size="3226404" crc="7f01232b" sha1="84b14967a4cc1c02b5e8c33e28e45d804b585a9b" offset="0" />
+				<rom name="odissea nello spazio 300bps.wav" size="3226404" crc="7f01232b" sha1="84b14967a4cc1c02b5e8c33e28e45d804b585a9b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -964,7 +964,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1291728">
-				<rom name="omini gialli 1200bps.wav" size="1291728" crc="11f9f132" sha1="e00ae32b2eddd9d38f6aedeb7c9c2f835de5708e" offset="0" />
+				<rom name="omini gialli 1200bps.wav" size="1291728" crc="11f9f132" sha1="e00ae32b2eddd9d38f6aedeb7c9c2f835de5708e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -977,7 +977,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1943962">
-				<rom name="omini gialli 600bps.wav" size="1943962" crc="e38cd969" sha1="18191f012142101c33d19071fbc18cf2868714d3" offset="0" />
+				<rom name="omini gialli 600bps.wav" size="1943962" crc="e38cd969" sha1="18191f012142101c33d19071fbc18cf2868714d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -990,7 +990,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3226404">
-				<rom name="omini gialli 300bps.wav" size="3226404" crc="90621126" sha1="1ac603c40c9b6a6f3f059f7b5d9341bba5801402" offset="0" />
+				<rom name="omini gialli 300bps.wav" size="3226404" crc="90621126" sha1="1ac603c40c9b6a6f3f059f7b5d9341bba5801402"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1003,7 +1003,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1721704">
-				<rom name="partita a dadi 1200bps.wav" size="1721704" crc="b8279c64" sha1="a2f430d48a13ba4e11b0b145a937c544153a265b" offset="0" />
+				<rom name="partita a dadi 1200bps.wav" size="1721704" crc="b8279c64" sha1="a2f430d48a13ba4e11b0b145a937c544153a265b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1016,7 +1016,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2803912">
-				<rom name="partita a dadi 600bps.wav" size="2803912" crc="6f20083c" sha1="96dedac65697c4bb84a6643a843c6644cc37a0f0" offset="0" />
+				<rom name="partita a dadi 600bps.wav" size="2803912" crc="6f20083c" sha1="96dedac65697c4bb84a6643a843c6644cc37a0f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1029,7 +1029,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="4946304">
-				<rom name="partita a dadi 300bps.wav" size="4946304" crc="29d56b70" sha1="d726809f26cbec6a36e7a7ed34042a38b4294677" offset="0" />
+				<rom name="partita a dadi 300bps.wav" size="4946304" crc="29d56b70" sha1="d726809f26cbec6a36e7a7ed34042a38b4294677"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1042,7 +1042,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2099200">
-				<rom name="pronostici totocalcio 1200bps.wav" size="2099200" crc="0dc84aa9" sha1="4e335959343754c596bc1128a2c73b62582c5e05" offset="0" />
+				<rom name="pronostici totocalcio 1200bps.wav" size="2099200" crc="0dc84aa9" sha1="4e335959343754c596bc1128a2c73b62582c5e05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1055,7 +1055,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3558904">
-				<rom name="pronostici totocalcio 600bps.wav" size="3558904" crc="9d9f530d" sha1="ad895d1dda2e91c802a2e874ab23fd80fd0ad5e1" offset="0" />
+				<rom name="pronostici totocalcio 600bps.wav" size="3558904" crc="9d9f530d" sha1="ad895d1dda2e91c802a2e874ab23fd80fd0ad5e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1068,7 +1068,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="6456288">
-				<rom name="pronostici totocalcio 300bps.wav" size="6456288" crc="a9abf69b" sha1="8030af47bb681426d3d46881b0dbeab50d04a3af" offset="0" />
+				<rom name="pronostici totocalcio 300bps.wav" size="6456288" crc="a9abf69b" sha1="8030af47bb681426d3d46881b0dbeab50d04a3af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1081,7 +1081,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="908940">
-				<rom name="quadrati consecutivi 1200bps.wav" size="908940" crc="d0a927b5" sha1="38ebaca63b3667d6413a8c1cd757b388d60222c2" offset="0" />
+				<rom name="quadrati consecutivi 1200bps.wav" size="908940" crc="d0a927b5" sha1="38ebaca63b3667d6413a8c1cd757b388d60222c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1094,7 +1094,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1178386">
-				<rom name="quadrati consecutivi 600bps.wav" size="1178386" crc="4b0bc855" sha1="125206f47bcb65dc700f36ab9112a64764990785" offset="0" />
+				<rom name="quadrati consecutivi 600bps.wav" size="1178386" crc="4b0bc855" sha1="125206f47bcb65dc700f36ab9112a64764990785"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1107,7 +1107,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1695252">
-				<rom name="quadrati consecutivi 300bps.wav" size="1695252" crc="4720505b" sha1="91d85df895956dd58fc6e038d5ab7384c80b3eb4" offset="0" />
+				<rom name="quadrati consecutivi 300bps.wav" size="1695252" crc="4720505b" sha1="91d85df895956dd58fc6e038d5ab7384c80b3eb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1120,7 +1120,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="1405948">
-				<rom name="randomize 1200bps.wav" size="1405948" crc="a078b828" sha1="a6375a5030e651fc30bb8411e6174c6b0ce53753" offset="0" />
+				<rom name="randomize 1200bps.wav" size="1405948" crc="a078b828" sha1="a6375a5030e651fc30bb8411e6174c6b0ce53753"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1133,7 +1133,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="2172400">
-				<rom name="randomize 600bps.wav" size="2172400" crc="fdd940e5" sha1="6df6dac2d9ffd287e31e3d021986c200209f448b" offset="0" />
+				<rom name="randomize 600bps.wav" size="2172400" crc="fdd940e5" sha1="6df6dac2d9ffd287e31e3d021986c200209f448b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1146,7 +1146,7 @@ Loading Tape BASIC Programs
 
 		<part name="cass1" interface="z80ne_cass">
 			<dataarea name="cass" size="3683280">
-				<rom name="randomize 300bps.wav" size="3683280" crc="a303a877" sha1="7fa22c43468d1349d51917f627ef91c33fae0ab8" offset="0" />
+				<rom name="randomize 300bps.wav" size="3683280" crc="a303a877" sha1="7fa22c43468d1349d51917f627ef91c33fae0ab8"/>
 			</dataarea>
 		</part>
 	</software>
