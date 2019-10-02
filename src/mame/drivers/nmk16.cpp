@@ -4106,8 +4106,9 @@ void nmk16_state::set_hacky_screen_lowres(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_palette(m_palette);
 
-	NMK_16BIT_SPRITE(config, m_spritegen, 384 * 263);
+	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(12'000'000)/2);
 	m_spritegen->set_screen_size(384, 256);
+	m_spritegen->set_max_sprite_clock(384 * 263); // from hardware manual
 }
 
 void nmk16_state::set_hacky_screen_hires(machine_config &config)
@@ -4120,8 +4121,9 @@ void nmk16_state::set_hacky_screen_hires(machine_config &config)
 	m_screen->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
 	m_screen->set_palette(m_palette);
 
-	NMK_16BIT_SPRITE(config, m_spritegen, 512 * 263);
+	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(16'000'000)/2);
 	m_spritegen->set_screen_size(384, 256);
+	m_spritegen->set_max_sprite_clock(512 * 263); // not verified?
 	m_spritegen->set_videoshift(64);
 }
 
@@ -4922,10 +4924,11 @@ void nmk16_state::manybloc(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 	m_screen->set_palette(m_palette);
 
-	NMK_16BIT_SPRITE(config, m_spritegen, 384 * 263);
+	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(12'000'000)/2);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit), this);
 	m_spritegen->set_ext_callback(FUNC(nmk16_state::get_sprite_flip), this);
 	m_spritegen->set_screen_size(256, 256);
+	m_spritegen->set_max_sprite_clock(384 * 263); // from hardware manual
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);

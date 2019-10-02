@@ -294,11 +294,12 @@ void powerins_state::powerins(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(powerins_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	NMK_16BIT_SPRITE(config, m_spritegen, 448 * 263);
+	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(14'000'000) / 2);
 	m_spritegen->set_colpri_callback(FUNC(powerins_state::get_colour_6bit), this);
 	m_spritegen->set_ext_callback(FUNC(powerins_state::get_flip_extcode), this);
 	m_spritegen->set_mask(0x3ff, 0x3ff);
 	m_spritegen->set_screen_size(320, 256);
+	m_spritegen->set_max_sprite_clock(448 * 263); // not verified?
 	m_spritegen->set_videoshift(32);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);

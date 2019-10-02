@@ -43,6 +43,7 @@ nmk_16bit_sprite_device::nmk_16bit_sprite_device(const machine_config &mconfig, 
 	, m_videoshift(0)
 	, m_xmask(0x1ff), m_ymask(0x1ff)
 	, m_screen_width(384), m_screen_height(256)
+	, m_max_sprite_clock(384 * 263)
 {
 }
 
@@ -58,7 +59,7 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 	for (int offs = 0; offs < size; offs += 8)
 	{
 		clk += 16; // 16 clock per each sprites
-		if (clk >= clock())
+		if (clk >= m_max_sprite_clock)
 			break;
 
 		if (!(spriteram[offs + 0] & 0x0001))
@@ -81,7 +82,7 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 			m_ext_cb(spriteram[offs + 1], flipx, flipy, code);
 
 		clk += 128 * w * h; // 128 clock per each 16x16 tile
-		if (clk >= clock())
+		if (clk >= m_max_sprite_clock)
 			break;
 
 		int delta = 16;
