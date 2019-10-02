@@ -1443,6 +1443,29 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
+if _OPTIONS["vs"]=="clangcl" then
+		buildoptions {
+			"-Wno-enum-conversion",
+			"-Wno-ignored-qualifiers",
+			"-Wno-missing-braces",
+			"-Wno-missing-field-initializers",
+			"-Wno-new-returns-null",
+			"-Wno-nonportable-include-path",
+			"-Wno-pointer-bool-conversion",
+			"-Wno-pragma-pack",
+			"-Wno-switch",
+			"-Wno-tautological-constant-out-of-range-compare",
+			"-Wno-tautological-pointer-compare",
+			"-Wno-unknown-warning-option",
+			"-Wno-unused-const-variable",
+			"-Wno-unused-function",
+			"-Wno-unused-label",
+			"-Wno-unused-local-typedef",
+			"-Wno-unused-private-field",
+			"-Wno-unused-variable",
+		}
+end
+
 		linkoptions {
 			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
 		}
