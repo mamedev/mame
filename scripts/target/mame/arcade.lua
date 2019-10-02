@@ -3941,6 +3941,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/slapshot.cpp",
 	MAME_DIR .. "src/mame/includes/slapshot.h",
 	MAME_DIR .. "src/mame/video/slapshot.cpp",
+	MAME_DIR .. "src/mame/drivers/spdheat.cpp",
+	MAME_DIR .. "src/mame/includes/spdheat.h",
 	MAME_DIR .. "src/mame/drivers/ssrj.cpp",
 	MAME_DIR .. "src/mame/includes/ssrj.h",
 	MAME_DIR .. "src/mame/video/ssrj.cpp",

@@ -36362,6 +36362,9 @@ meteors                         // (c) 1981 Amusement World
 spcforc2                        // bootleg
 spcforce                        // (c) 1980 Venture Line
 
+@source:spdheat.cpp
+spdheat                         // (c) 1985 Taito
+
 @source:spdodgeb.cpp
 nkdodge                         // TA-0022 (c) 1987 (Japan)
 nkdodgeb                        // TA-0022 (c) 1987 (Japan)
