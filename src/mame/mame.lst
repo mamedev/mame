@@ -2422,10 +2422,19 @@ ecs38632                        // Elitegroup ECS-386/32 mainboard
 ecsum386                        // Elitegroup UM386 mainboard
 fu340                           // Abit FU340
 smih0107                        //
+elt286b							// Chaintech ELT-286B-160B(E) motherboard (286)
+uni386w							// UNICHIP 386W 367C REV 1.0 motherboard (386)
+mokp386sx						// MORSE KP 386SX V2.21
 at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
 at386sx                         // 19?? AT VGA 386sx
 a433cc                          // J-Bond A433C-C/A450C-C
+anch386s						// ANIX CH-386S-16/20/25G
+scamp386sx						// motherboards using the SCAMPSX chipset (386sx)
+sh386sx20						// Shuttle 386SX REV 2.0A motherboard (386sx)
+ppm3333p						// DTK Computer PPM-3333P
+scsxaio							// Peacock 386sx Ver. 2.0 motherboard SCsxAIO (386sx)
+pcd204							// Philips PCD204 (PCD200 series, 286)
 a486ap4                         // ASUS PVI-486AP4
 a486sp3                         // ASUS PVI-486SP3
 a486sp3g                        // ASUS PCI/I-486SP3G
@@ -2433,6 +2442,7 @@ aa486s                          // ASUS PCI/I-A486S
 a486sv1                         // ASUS VL/EISA-486SV1
 a486sv2g                        // ASUS VL/I-486SV2G
 mb8433uud                       // Biostar MB8433UUD-A
+mb133340						// Biostar MB-1333/40PMB-CH, rev B.3
 c286lt                          // 1990 Commodore Laptop 286-LT
 csl286                          // Commodore SL 286-16
 c386sx16                        // 1990 Commodore 386SX-16
@@ -2458,62 +2468,88 @@ pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops
 pcd4nl                          // 1995 Siemens-Nixdorf PCD-4NL 486 subnotebook
 pcd4nd                          // 1993 Siemens-Nixdorf 486 notebook
 ct386sx                         //
-wy220001                        // WYSEpc
+wy220001						// WYSEpc 286
 cxsxd                           //
 ec1842                          //
 ec1849                          //
 ev1806                          // Everex EV-1806
-ev1815                          // Everex EV-1815
+ev1815							// Everex EV-1815
 ews286                          // 1986 Ericsson WS286
 ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
 ftsserv                         // 1991 Apricot FTs (Scorpion)
-aubam12s2                       // AUVA COMPUTER, INC. BAM/12-S2 motherboard (286)
-bi025c                          // BI-025C HT 12 286 motherboard (286)
-kma202f                         // KMA-202F-12R motherboard (286)
-cdtekg2                         // CDTEK motherboard with Headland G2 chipset (286)
-octekg2                         // Octek motherboard with Headland G2 chipset (286)
-olim203                         // Olivetti 286 motherboard
-headg2                          // 286 motherboards with Headland G2 chipset
-mb1212c                         // Biostar MB-1212C motherboard (286)
-bam16a0                         // VIP-M21502A BAM16-A0 motherboard (286)
-cmpa286                         // CMP enterprise CO.LTD. motherboard (286)
-suntac5                         // 286 motherboards using the 5-chip SUNTAC chipset
+aubam12s2						// AUVA COMPUTER, INC. BAM/12-S2 motherboard (286)
+bi025c							// BI-025C HT 12 286 motherboard (286)
+kma202f							// KMA-202F-12R motherboard (286)
+cdtekg2							// CDTEK motherboard with Headland G2 chipset (286)
+octekg2							// Octek motherboard with Headland G2 chipset (286)
+olim203							// Olivetti 286 motherboard
+headg2							// motherboards with Headland G2 chipset (286)
+mb1212c							// Biostar MB-1212C motherboard (286)
+bam16a0							// VIP-M21502A BAM16-A0 motherboard (286)
+cmpa286							// CMP enterprise CO.LTD. motherboard (286)
+suntac5							// 286 motherboards using the 5-chip SUNTAC chipset
 ht12a                           // 286 motherboards using the Headland HT12/A chipset
-vlsi5                           // 286 motherboards using the 5-chip VLSI chipset
-sy012                           // SY-012 16/25 386MB VER: 5.2 motherboard (386)
-frxc402                         // 386 motherboards using FOREX FRX46C402/FRX36C300/SIS85C206 chips
-gs611606a                       // Goldstar P/N 611-606A Rev 1.0A motherboard (386)
-dfi386                          // DFI 386-20.REV0  motherboard (386)
-386sc                           // 386 SC Rev A2 motherboard
-386sc2c                         //
-opti495xlc                      // Motherboards using the OPTi 82C495XLC chipset (386)
-isa386u30                       // Asus ISA-386U30 REV.2.2 motherboard (386)
-isa386c                         // Asus ISA-386C motherboard (386)
-pt581392                        // Motherboard using the Forex FRX46C402 + FRX46C411 + SiS 85C206 chipset (386)
-pem2530                         // DTK PEM 2530 motherboard (386)
-tam3340ma0                      // TAM/33/40-MA0 (CM318R00,M31-R00)
-alim1429                        // Motherboards using the ALi M1429 A1 and M1431 A2 chipset (386)
-u3911v3                         // Uniron U3911-V3 motherboard (286)
-mkp286                          // Morse KP-286 motherboard (286)
-mba009                          // HLB-286 MBA-009 motherboard (286)
-pccm205                         // PC-Chips M205 motherboard (286)
-pccm321                         // PC-Chips M321 motherboard (386)
-pccm326                         // PC-Chips M326 motherboard (386)
-pccm919                         // PC-Chips M919 motherboard (486)
-snomi286                        // Snobol Mini 286 motherboard (286)
-sy019hi                         // Soyo SY-019H and SY-019I motherboards (386)
-sm38640f                        // SM 386-40F motherboard (386)
-4nd04a                          // 386-4N-D04A motherboard (386)
-hot304                          // Shuttle HOT-304
+ht18c							// 286 motherboards using the Headland HT18/C chipset
+vlsi5							// 286 motherboards using the 5-chip VLSI chipset
+sy012							// SY-012 16/25 386MB VER: 5.2 motherboard (386)
+frxc402							// 386 motherboards using FOREX FRX46C402/FRX36C300/SIS85C206 chips
+gs611606a						// Goldstar P/N 611-606A Rev 1.0A motherboard (386)
+dfi386							// DFI 386-20.REV0  motherboard (386)
+alacou							// Alaris Cougar motherboard (386/IBM Blue Lightning)
+ges9051n						// GES 9051N-386C VER -0.01 motherboard (386)
+cs8230							// motherboards using the Chips CS8230 chipset (386)
+mx83c305						// motherboards using the MX83C305(A)(FC), MX83C05(A)(FC) chipset
+386sc							// 386 SC Rev A2 motherboard
+386sc2c							//
+td60c							// TD60C motherboard (286)
+td70n							// TD70N motherboard (386sx)
+td70a							// TD70A and TD70AN motherboards (386sx)
+fic4386vchd						// FIC 4386-VC-HD motherboard (386)
+opti495slc						// motherboards using the OPTi495SLC chipset (386)
+opti495xlc						// motherboards using the OPTi 82C495XLC chipset (386)
+op82c283						// motherboards using the Opti F82C206, Opti 82C283 chipset (386sx)
+op82c291						// motherboards using the OPTi 82C291 chipset (386sx)
+op82c381						// motherboards using the OPTi 82C381 chipset (386)
+op82c391						// motherboards using the OPTi 82C391 chipset (386)
+op386wb							// OPTi 386WB VER.1.0
+isa386u30						// Asus ISA-386U30 REV.2.2 motherboard (386)
+isa386c							// Asus ISA-386C motherboard (386)
+pt581392						// Motherboard using the Forex FRX46C402 + FRX46C411 + SiS 85C206 chipset (386)
+pem2530							// DTK PEM 2530 motherboard (386)
+tam3340ma0						// TAM/33/40-MA0 (CM318R00,M31-R00)
+alim1217						// motherboards using the ALi M1217 chipset (386sx)
+alim1419						// motherboards using the ALi M1419 chipset (386)
+alim1429						// motherboards using the ALi M1429 A1 and M1431 A2 chipset (386)
+u3911v3							// Uniron U3911-V3 motherboard (286)
+mkp286							// Morse KP-286 motherboard (286)
+mba009							// HLB-286 MBA-009 motherboard (286)
+pccm205							// PC-Chips M205 motherboard (286)
+pccm216							// PC-Chips M216 motherboard (286)
+pccm321							// PC-Chips M321 motherboard (386)
+pccm326							// PC-Chips M326 motherboard (386)
+pccm396f						// PC-Chips M396F motherboard (386sx)
+pccm919							// PC-Chips M919 motherboard (486)
+pt319a							// Pint PT-319A motherboard (386sx)
+snomi286						// Snobol Mini 286 motherboard (286)
+sy019hi							// Soyo SY-019H and SY-019I motherboards (386)
+sm38640f						// SM 386-40F motherboard (386)
+sisrabb							// motherboards using the SiS Rabbit chipset (386)
+qdu386dx						// QD-U386DX VER 1.0 motherboard (386)
+4nd04a
+um82c481af						// motherboards using the UMC UM82C481AF chipset (386)
+um82c491f						// motherboards using the UMC UM82C491F chipset (386)
+um82c493f						// motherboards using the UMC UM82C491F + UM82C493F chipset or BIOTEQ equivalents (386)
+al486vd							// Daewoo AL486V-D Rev:1.1 motherboard (386)
+hot304							// Shuttle HOT-304
 hot409                          // Shuttle HOT-409
 ibm5162                         // 1986 IBM XT 5162 (XT w/80286)
 ibm5170                         // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a                        // 1985 IBM PC/AT 5170, enhanced 8 MHz model
 ibmps1es                        // IBM PS/1 (Spanish)
 k286i                           // 1985 Kaypro 286i
-elanht286                       // Leanord Elan High Tech 286
+elanht286						// Leanord Elan High Tech 286
 kt216wb5                        // KT216WB5-HI Rev.2
 lm103s                          //
 m290                            // Olivetti M290
@@ -2530,7 +2566,7 @@ n8810m16c                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - CGA ver
 n8810m16v                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - VGA version
 n8810m30                        // 1990 Nixdorf 8810 M30
 n8810m55                        // 1986 Nixdorf 8810 M55
-//nws286                          // 1988 Nokia WS286
+//nws286                        // 1988 Nokia WS286
 pc2386                          //
 qi600                           // 1988 Apricot Qi 600 (Neptune Motherboard
 qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
@@ -2546,7 +2582,7 @@ xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) 
 xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17)
 lion3500                        // 1993 Lion 3500C/T notebook
 o286foxii                       // Octek Fox II motherboard (286)
-ocjagv                          // Octek Jaguar V motherboard (386)
+ocjagv							// Octek Jaguar V motherboard (386)
 
 @source:atari_s1.cpp
 aavenger                        //
