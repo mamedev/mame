@@ -53,7 +53,23 @@ public:
 	{ }
 
 	void lucky37(machine_config &config);
+
+private:
+	void mcu_mem_map(address_map &map);
+	void mcu_io_map(address_map &map);
 };
+
+void lucky37_state::mcu_mem_map(address_map &map)
+{
+	map(0x04000, 0x047ff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0x08000, 0x09fff).ram();
+}
+
+void lucky37_state::mcu_io_map(address_map &map)
+{
+	map(0x0000, 0x007f).noprw(); // internal registers
+	map(0x0083, 0x0083).mirror(0xff00).nopw();
+}
 
 static INPUT_PORTS_START( lucky37 )
 	PORT_START("DSW1")
@@ -120,9 +136,14 @@ INPUT_PORTS_END
 void lucky37_state::lucky37(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, "maincpu", 32_MHz_XTAL / 8); // not verified
+	Z80(config, "maincpu", 32_MHz_XTAL / 8).set_disable(); // not verified
 
-	HD647180X(config, "mcu", 32_MHz_XTAL / 2); // clock not verified
+	hd647180x_device &mcu(HD647180X(config, "mcu", 32_MHz_XTAL / 2)); // clock not verified
+	mcu.set_addrmap(AS_PROGRAM, &lucky37_state::mcu_mem_map);
+	mcu.set_addrmap(AS_IO, &lucky37_state::mcu_io_map);
+
+	mb8421_device &dpram(MB8421(config, "dpram"));
+	dpram.intl_callback().set_inputline("mcu", INPUT_LINE_NMI);
 }
 
 ROM_START( lucky21 )
