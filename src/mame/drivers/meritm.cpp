@@ -1924,7 +1924,7 @@ ROM_START( megat3te ) /* Dallas DS1204V security key at U5 labeled 9255-30-01 U5
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat3tg ) /* Dallas DS1204V security key at U5 labeled 9255-30-01 U5-RO1 C1995 MII */
+ROM_START( megat3tg ) /* Dallas DS1204V security key at U5 labeled 9255-30-50 U5-RO1 C1995 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "9255-30-01_u32-r0",  0x000000, 0x100000, CRC(31ac0004) SHA1(4bec97a852a7dadb0ab4f193bc376ed149102082) ) /* Location U32 */
 	ROM_LOAD( "qs9255-01_u36-r0",   0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */

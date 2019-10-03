@@ -1279,7 +1279,7 @@ ROM_START( chelnovjbla )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
-	ROM_REGION( 0x2000, "mcu", 0 )    /* MAB8031AH */ // unique to the bootlegs (rewritten, or an exact copy of original Data East internal rom?)
+	ROM_REGION( 0x2000, "mcu", 0 )    /* MAB8031AH */ // unique to the bootlegs (rewritten or adjusted to be 8031 compatible)
 	ROM_LOAD( "17o.bin", 0x0000, 0x2000, CRC(9af64150) SHA1(0f478d9f79baebd2ad90615c98c6bc2d73c0056a) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
