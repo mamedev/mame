@@ -307,7 +307,8 @@ namespace devices
 		}
 		else
 		{
-			// mat.gaussian_elimination_parallel(RHS);
+			// parallel is slow -- very slow
+			//mat.gaussian_elimination_parallel(RHS);
 			mat.gaussian_elimination(RHS);
 			/* backward substitution */
 			mat.gaussian_back_substitution(new_V, RHS);

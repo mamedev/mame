@@ -490,12 +490,15 @@ void tool_app_t::static_compile()
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
+	nt.log().warning.set_enabled(false);
 
 	nt.read_netlist(opt_file(), opt_name(),
 			opt_logs(),
 			m_options, opt_rfolders());
 
-	// no reset needed ...
+	// need to reset ...
+
+	nt.reset();
 
 	std::map<pstring, pstring> mp;
 

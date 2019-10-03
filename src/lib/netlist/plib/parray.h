@@ -119,6 +119,7 @@ namespace plib {
 	private:
 		PALIGNAS_VECTOROPT()
 		base_type               m_a;
+		PALIGNAS_CACHELINE()
 		size_type               m_size;
 	};
 } // namespace plib

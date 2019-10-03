@@ -223,6 +223,7 @@ namespace plib
 		{
 			// FIXME: move into solver creation ...
 			plib::omp::set_num_threads(4);
+			//printf("omp: %ld\n", m_ge_par.size());
 			for (auto l = 0ul; l < m_ge_par.size(); l++)
 			plib::omp::for_static(0ul, m_ge_par[l].size(), [this, &RHS, &l] (unsigned ll)
 			{
@@ -421,7 +422,7 @@ namespace plib
 		}
 
 		template <typename R>
-		void solveLUx (R &r)
+		void solveLU (R &r)
 		{
 			/*
 			 * Solve a linear equation Ax = r

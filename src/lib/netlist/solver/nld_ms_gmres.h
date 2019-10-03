@@ -37,8 +37,7 @@ namespace devices
 		 */
 		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
-			//, m_ops(size, 2)
-			, m_ops(size, 4)
+			, m_ops(size, 1)
 			, m_gmres(size)
 			{
 			}

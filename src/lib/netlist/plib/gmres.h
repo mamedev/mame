@@ -25,11 +25,10 @@ namespace plib
 	{
 		using mat_type = plib::matrix_compressed_rows_t<FT, SIZE>;
 
-		mat_precondition_ILU(std::size_t size, int ilu_scale = 4
+		mat_precondition_ILU(std::size_t size, std::size_t ilu_scale = 4
 			, std::size_t bw = plib::matrix_compressed_rows_t<FT, SIZE>::FILL_INFINITY)
 		: m_mat(static_cast<typename mat_type::index_type>(size))
 		, m_LU(static_cast<typename mat_type::index_type>(size))
-		, m_use_iLU_preconditioning(ilu_scale >= 0)
 		, m_ILU_scale(static_cast<std::size_t>(ilu_scale))
 		, m_band_width(bw)
 		{
@@ -39,12 +38,9 @@ namespace plib
 		void build(M &fill)
 		{
 			m_mat.build_from_fill_mat(fill, 0);
-			if (m_use_iLU_preconditioning)
-			{
-				m_LU.gaussian_extend_fill_mat(fill);
-				m_LU.build_from_fill_mat(fill, m_ILU_scale, m_band_width); // ILU(2)
-				//m_LU.build_from_fill_mat(fill, 9999, 20); // Band matrix width 20
-			}
+			m_LU.gaussian_extend_fill_mat(fill);
+			m_LU.build_from_fill_mat(fill, m_ILU_scale, m_band_width); // ILU(2)
+			//m_LU.build_from_fill_mat(fill, 9999, 20); // Band matrix width 20
 		}
 
 
@@ -56,30 +52,23 @@ namespace plib
 
 		void precondition()
 		{
-			if (m_use_iLU_preconditioning)
-			{
-				if (m_ILU_scale < 1)
-					m_LU.raw_copy_from(m_mat);
-				else
-					m_LU.reduction_copy_from(m_mat);
-				m_LU.incomplete_LU_factorization();
-			}
+			if (m_ILU_scale < 1)
+				m_LU.raw_copy_from(m_mat);
+			else
+				m_LU.reduction_copy_from(m_mat);
+			m_LU.incomplete_LU_factorization();
 		}
 
 		template<typename V>
 		void solve_LU_inplace(V &v)
 		{
-			if (m_use_iLU_preconditioning)
-			{
-				m_LU.solveLUx(v);
-			}
+			m_LU.solveLU(v);
 		}
 
 		PALIGNAS_VECTOROPT()
 		mat_type                m_mat;
 		PALIGNAS_VECTOROPT()
 		mat_type                m_LU;
-		bool                    m_use_iLU_preconditioning;
 		std::size_t             m_ILU_scale;
 		std::size_t             m_band_width;
 	};
@@ -87,10 +76,9 @@ namespace plib
 	template <typename FT, int SIZE>
 	struct mat_precondition_diag
 	{
-		mat_precondition_diag(std::size_t size)
+		mat_precondition_diag(std::size_t size, int dummy = 0)
 		: m_mat(size)
 		, m_diag(size)
-		, m_use_iLU_preconditioning(true)
 		{
 		}
 
@@ -108,28 +96,21 @@ namespace plib
 
 		void precondition()
 		{
-			if (m_use_iLU_preconditioning)
+			for (std::size_t i = 0; i< m_diag.size(); i++)
 			{
-				for (std::size_t i = 0; i< m_diag.size(); i++)
-				{
-					m_diag[i] = 1.0 / m_mat.A[m_mat.diag[i]];
-				}
+				m_diag[i] = 1.0 / m_mat.A[m_mat.diag[i]];
 			}
 		}
 
 		template<typename V>
 		void solve_LU_inplace(V &v)
 		{
-			if (m_use_iLU_preconditioning)
-			{
-				for (std::size_t i = 0; i< m_diag.size(); i++)
-					v[i] = v[i] * m_diag[i];
-			}
+			for (std::size_t i = 0; i< m_diag.size(); i++)
+				v[i] = v[i] * m_diag[i];
 		}
 
 		plib::matrix_compressed_rows_t<FT, SIZE> m_mat;
 		plib::parray<FT, SIZE> m_diag;
-		bool m_use_iLU_preconditioning;
 	};
 
 	/* FIXME: hardcoding RESTART to 20 becomes an issue on very large
