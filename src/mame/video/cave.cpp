@@ -59,62 +59,6 @@ Note:   if MAME_DEBUG is defined, pressing:
 #define SPRITE_VISIBLE_CAVE         0x04
 
 
-/***************************************************************************
-
-                                  Tiles Format
-
-    Offset:     Bits:                   Value:
-
-    0.w         fe-- ---- ---- ---      Priority
-                --dc ba98 ---- ----     Color
-                ---- ---- 7654 3210
-
-    2.w                                 Code
-
-
-    When a row-scroll / row-select effect is enabled, the scroll values are
-    fetched starting from tile RAM + $1000, 4 bytes per scan line:
-
-    Offset:     Value:
-
-    0.w         Tilemap line to display
-    2.w         X Scroll value
-
-***************************************************************************/
-
-template<int Chip, int Gfx>
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info)
-{
-	u16 *VRAM = m_vram[Chip];
-	const bool TDIM = m_tiledim[Chip];
-	u32 code, color, pri, tile;
-
-	if (TDIM)
-	{
-		tile  = (tile_index % (512 / 8)) / 2 + ((tile_index / (512 / 8)) / 2) * (512 / 16);
-		code  = (VRAM[tile * 2 + 0x0000 / 2] << 16) + VRAM[tile * 2 + 0x0002 / 2];
-
-		color   = (code & 0x3f000000) >> (32-8);
-		pri   = (code & 0xc0000000) >> (32-2);
-		code  = (code & 0x00ffffff) * 4;
-
-		code += tile_index & 1;
-		code += ((tile_index / (512 / 8)) & 1) * 2;
-	}
-	else
-	{
-		code  = (VRAM[tile_index * 2 + 0x4000 / 2] << 16) + VRAM[tile_index * 2 + 0x4002 / 2];
-
-		color = (code & 0x3f000000) >> (32 - 8);
-		pri   = (code & 0xc0000000) >> (32 - 2);
-		code  = (code & 0x00ffffff);
-	}
-
-	SET_TILE_INFO_MEMBER(Gfx, code, color, 0);
-	tileinfo.category = pri;
-}
-
-
 /* Sailormn: the lower 2 Megabytes of tiles banked */
 
 void cave_state::sailormn_tilebank_w(int bank)
@@ -126,36 +70,13 @@ void cave_state::sailormn_tilebank_w(int bank)
 	}
 }
 
-TILE_GET_INFO_MEMBER(cave_state::sailormn_get_tile_info_2)
+void cave_state::sailormn_get_banked_code(bool tiledim, u32 &color, u32 &pri, u32 &code)
 {
-	u32 code, color, pri;
-
-	if (m_tiledim[2])
+	if (!tiledim)
 	{
-		u32 tile;
-		tile  = (tile_index % (512 / 8)) / 2 + ((tile_index / (512 / 8)) / 2) * (512 / 16);
-		code  = (m_vram[2][tile * 2 + 0x0000 / 2] << 16) + m_vram[2][tile * 2 + 0x0002 / 2];
-
-		color = (code & 0x3f000000) >> (32 - 8);
-		pri   = (code & 0xc0000000) >> (32 - 2);
-		code  = (code & 0x00ffffff) * 4;
-
-		code += tile_index & 1;
-		code += ((tile_index / (512 / 8)) & 1) * 2;
-	}
-	else
-	{
-		code  = (m_vram[2][tile_index * 2 + 0x4000 / 2] << 16) + m_vram[2][tile_index * 2 + 0x4002 / 2];
-
-		color = (code & 0x3f000000) >> (32 - 8);
-		pri   = (code & 0xc0000000) >> (32 - 2);
-		code  = (code & 0x00ffffff);
 		if ((code < 0x10000) && (m_sailormn_tilebank))
 			code += 0x40000;
 	}
-
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
-	tileinfo.category = pri;
 }
 
 
@@ -168,64 +89,10 @@ TILE_GET_INFO_MEMBER(cave_state::sailormn_get_tile_info_2)
 
 ***************************************************************************/
 
-void cave_state::vh_start(int num, u16 sprcol_base, u16 sprcol_granularity)
+void cave_state::vh_start(u16 sprcol_base, u16 sprcol_granularity)
 {
 	m_sprite_base_pal = sprcol_base;
 	m_sprite_granularity = sprcol_granularity;
-
-	m_tilemap[0] = nullptr;
-	m_tilemap[1] = nullptr;
-	m_tilemap[2] = nullptr;
-	m_tilemap[3] = nullptr;
-
-	m_tiledim[0] = false;
-	m_tiledim[1] = false;
-	m_tiledim[2] = false;
-	m_tiledim[3] = false;
-
-	m_old_tiledim[0] = false;
-	m_old_tiledim[1] = false;
-	m_old_tiledim[2] = false;
-	m_old_tiledim[3] = false;
-
-	assert((num >= 1) && (num <= 4));
-
-	switch (num)
-	{
-		case 4:
-			m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(&cave_state::get_tile_info<3, 3>, "screen0_layer3",this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
-			m_tilemap[3]->set_transparent_pen(0);
-			m_tilemap[3]->set_scroll_rows(1);
-			m_tilemap[3]->set_scroll_cols(1);
-			save_item(NAME(m_tiledim[3]));
-			save_item(NAME(m_old_tiledim[3]));
-
-		case 3:
-			m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(&cave_state::get_tile_info<2, 2>, "screen0_layer2",this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
-			m_tilemap[2]->set_transparent_pen(0);
-			m_tilemap[2]->set_scroll_rows(1);
-			m_tilemap[2]->set_scroll_cols(1);
-			save_item(NAME(m_tiledim[2]));
-			save_item(NAME(m_old_tiledim[2]));
-
-		case 2:
-			m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(&cave_state::get_tile_info<1, 1>, "screen0_layer1",this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
-			m_tilemap[1]->set_transparent_pen(0);
-			m_tilemap[1]->set_scroll_rows(1);
-			m_tilemap[1]->set_scroll_cols(1);
-			save_item(NAME(m_tiledim[1]));
-			save_item(NAME(m_old_tiledim[1]));
-
-		case 1:
-			m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(&cave_state::get_tile_info<0, 0>, "screen0_layer0",this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
-			m_tilemap[0]->set_transparent_pen(0);
-			m_tilemap[0]->set_scroll_rows(1);
-			m_tilemap[0]->set_scroll_cols(1);
-			save_item(NAME(m_tiledim[0]));
-			save_item(NAME(m_old_tiledim[0]));
-
-			break;
-	}
 
 	sprite_init();
 
@@ -255,48 +122,28 @@ void cave_state::vh_start(int num, u16 sprcol_base, u16 sprcol_granularity)
 	}
 }
 
-// ddonpach esprade gaia guwange (8bpp tilemap)
-VIDEO_START_MEMBER(cave_state,ddonpach)
+// 4 bit sprite granularity
+VIDEO_START_MEMBER(cave_state,spr_4bpp)
 {
-	vh_start(3, 0, 256);
+	vh_start(0, 16);
 }
 
-// dfeveron mazinger
-VIDEO_START_MEMBER(cave_state,dfeveron)
+// 8 bit sprite granularity
+VIDEO_START_MEMBER(cave_state,spr_8bpp)
 {
-	vh_start(2, 0, 16);
-}
-
-// donpachi hotdogst metmqstr
-VIDEO_START_MEMBER(cave_state,donpachi)
-{
-	vh_start(3, 0, 16);
+	vh_start(0, 256);
 }
 
 // korokoro (different sprite base palette)
 VIDEO_START_MEMBER(cave_state,korokoro)
 {
-	vh_start(1, 0x3c00, 16);
+	vh_start(0x3c00, 16);
 }
 
 // ppsatan (3 screen)
 VIDEO_START_MEMBER(cave_state,ppsatan)
 {
-	vh_start(1, 0x3c00, 16);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode[2], tilemap_get_info_delegate(&cave_state::get_tile_info<2, 0>, "screen2_layer0",this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
-	m_tilemap[2]->set_transparent_pen(0);
-	m_tilemap[2]->set_scroll_rows(1);
-	m_tilemap[2]->set_scroll_cols(1);
-	save_item(NAME(m_tiledim[2]));
-	save_item(NAME(m_old_tiledim[2]));
-
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode[1], tilemap_get_info_delegate(&cave_state::get_tile_info<1, 0>, "screen1_layer0",this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
-	m_tilemap[1]->set_transparent_pen(0);
-	m_tilemap[1]->set_scroll_rows(1);
-	m_tilemap[1]->set_scroll_cols(1);
-	save_item(NAME(m_tiledim[1]));
-	save_item(NAME(m_old_tiledim[1]));
-
+	vh_start(0x3c00, 16);
 	for (int chip = 1; chip < 3; chip++)
 	{
 		m_background_pen[chip] = m_gfxdecode[chip]->gfx(0)->colorbase() +
@@ -311,33 +158,6 @@ VIDEO_START_MEMBER(cave_state,ppsatan)
 				break;
 		}
 	}
-}
-
-// pwrinst2
-VIDEO_START_MEMBER(cave_state,pwrinst2)
-{
-	vh_start(4, 0, 16);
-}
-
-// sailormn agallet
-VIDEO_START_MEMBER(cave_state,sailormn)
-{
-	vh_start(2, 0, 16);
-
-	/* Layer 2 (8x8) needs to be handled differently */
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(FUNC(cave_state::sailormn_get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
-
-	m_tilemap[2]->set_transparent_pen(0);
-	m_tilemap[2]->set_scroll_rows(1);
-	m_tilemap[2]->set_scroll_cols(1);
-	save_item(NAME(m_tiledim[2]));
-	save_item(NAME(m_old_tiledim[2]));
-}
-
-// uopoko tjumpman (8bpp tilemap, but single tilemap layer)
-VIDEO_START_MEMBER(cave_state,uopoko)
-{
-	vh_start(1, 0, 256);
 }
 
 /***************************************************************************
@@ -1273,19 +1093,19 @@ inline void cave_state::tilemap_draw(int chip,
 	screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	u32 flags, u32 priority, u32 priority2, int GFX)
 {
-	tilemap_t *TILEMAP = m_tilemap[GFX];
-	const u16 *VRAM = m_vram[GFX];
-	const u16 *VCTRL = m_vctrl[GFX];
+	tilemap038_device *TILEMAP = m_tilemap[GFX];
 
 	/* Bail out if ... */
 
-	if ((!TILEMAP) ||                               /* no tilemap; */
-			((VCTRL[2] & 0x0003) != priority2) ||   /* tilemap's global priority not the requested one; */
-			((VCTRL[2] & 0x0010)))                  /* tilemap's disabled. */
+	if (!TILEMAP)                                              /* no tilemap; */
 		return;
 
-	const bool flipx = ~VCTRL[0] & 0x8000;
-	const bool flipy = ~VCTRL[1] & 0x8000;
+	if (((TILEMAP->external() & 0x0003) != priority2) ||       /* tilemap's global priority not the requested one; */
+			((!TILEMAP->enable())))                            /* tilemap's disabled. */
+		return;
+
+	const bool flipx = TILEMAP->flipx();
+	const bool flipy = TILEMAP->flipy();
 	TILEMAP->set_flip((flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0));
 
 	int offs_x         = m_layers_offs_x;
@@ -1296,15 +1116,15 @@ inline void cave_state::tilemap_draw(int chip,
 	/* An additional 8 pixel offset for layers with 8x8 tiles. Plus
 	   Layer 0 is displaced by 1 pixel wrt Layer 1, so is Layer 2 wrt
 	   Layer 1 */
-	if      (TILEMAP == m_tilemap[0])    offs_x -= (m_tiledim[0] ? 1 : (1 + 8));
-	else if (TILEMAP == m_tilemap[1])    offs_x -= (m_tiledim[1] ? 2 : (2 + 8));
-	else if (TILEMAP == m_tilemap[2])    offs_x -= (m_tiledim[2] ? 3 : (3 + 8));
-	else if (TILEMAP == m_tilemap[3])    offs_x -= (m_tiledim[3] ? 4 : (4 + 8));
+	if      (TILEMAP == m_tilemap[0])    offs_x -= (TILEMAP->tiledim() ? 1 : (1 + 8));
+	else if (TILEMAP == m_tilemap[1])    offs_x -= (TILEMAP->tiledim() ? 2 : (2 + 8));
+	else if (TILEMAP == m_tilemap[2])    offs_x -= (TILEMAP->tiledim() ? 3 : (3 + 8));
+	else if (TILEMAP == m_tilemap[3])    offs_x -= (TILEMAP->tiledim() ? 4 : (4 + 8));
 
-	const int sx = VCTRL[0] - m_videoregs[chip][0] + (flipx ? (offs_x + 2) : -offs_x);
-	const int sy = VCTRL[1] - m_videoregs[chip][1] + (flipy ? (offs_y + 2) : -offs_y);
+	const int sx = TILEMAP->scrollx() - m_videoregs[chip][0] + (flipx ? (offs_x + 2) : -offs_x);
+	const int sy = TILEMAP->scrolly() - m_videoregs[chip][1] + (flipy ? (offs_y + 2) : -offs_y);
 
-	if (VCTRL[1] & 0x4000)  // row-select
+	if (TILEMAP->rowselect_en())  // row-select
 	{
 		rectangle clip;
 		int endline, vramdata0, vramdata1;
@@ -1323,26 +1143,26 @@ inline void cave_state::tilemap_draw(int chip,
 		for (int startline = cliprect.min_y; startline <= cliprect.max_y;)
 		{
 			/* Find the largest slice */
-			vramdata0 = (vramdata1 = VRAM[(0x1002 + (((sy + offs_row + startline) * 4) & 0x7ff)) / 2]);
+			vramdata0 = (vramdata1 = TILEMAP->rowselect(sy + offs_row + startline));
 			for (endline = startline + 1; endline <= cliprect.max_y; endline++)
-				if ((++vramdata1) != VRAM[(0x1002 + (((sy + offs_row + endline) * 4) & 0x7ff)) / 2]) break;
+				if ((++vramdata1) != TILEMAP->rowselect(sy + offs_row + endline)) break;
 
 			TILEMAP->set_scrolly(0, vramdata0 - startline);
 
-			if (VCTRL[0] & 0x4000)  // row-scroll, row-select
+			if (TILEMAP->rowscroll_en())  // row-scroll, row-select
 			{
 				/*
 				    Row-scroll:
 
 				    A different scroll value is specified for each scan line.
-				    This is handled using tilemap_set_scroll_rows and calling
-				    tilemap_draw just once.
+				    This is handled using tilemap->set_scroll_rows and calling
+				    tilemap->draw just once.
 				*/
 
 				TILEMAP->set_scroll_rows(512);
 				for (int line = startline; line < endline; line++)
 					TILEMAP->set_scrollx((vramdata0 - startline + line) & 511,
-										sx + VRAM[(0x1000 + (((sy + offs_row + line) * 4) & 0x7ff)) / 2]);
+										sx + TILEMAP->rowscroll(sy + offs_row + line));
 			}
 			else                    // no row-scroll, row-select
 			{
@@ -1366,18 +1186,18 @@ inline void cave_state::tilemap_draw(int chip,
 			startline = endline;
 		}
 	}
-	else if (VCTRL[0] & 0x4000) // row-scroll, no row-select
+	else if (TILEMAP->rowscroll_en()) // row-scroll, no row-select
 	{
 		TILEMAP->set_scroll_rows(512);
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 			TILEMAP->set_scrollx((line + sy) & 511,
-							sx + VRAM[(0x1000+(((sy + offs_row + line) * 4) & 0x7ff)) / 2]);
+							sx + TILEMAP->rowscroll(sy + offs_row + line));
 		TILEMAP->set_scrolly(0, sy);
 		TILEMAP->draw(screen, bitmap, cliprect, flags, priority);
 	}
 	else
 	{
-		/* DEF_STR(Normal) scrolling */
+		/* Normal scrolling */
 		TILEMAP->set_scroll_rows(1);
 		TILEMAP->set_scroll_cols(1);
 		TILEMAP->set_scrollx(0, sx);
@@ -1396,16 +1216,10 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	m_blit.baseaddr_zbuf = reinterpret_cast<u8 *>(m_sprite_zbuf[0].raw_pixptr(0));
 	m_blit.line_offset_zbuf = m_sprite_zbuf[0].rowbytes();
 
-	/* Choose the tilemap to display (8x8 tiles or 16x16 tiles) */
 	for (int GFX = 0; GFX < 4; GFX++)
 	{
 		if (m_tilemap[GFX])
-		{
-			m_tiledim[GFX] = m_vctrl[GFX][1] & 0x2000;
-			if (m_tiledim[GFX] != m_old_tiledim[GFX])
-				m_tilemap[GFX]->mark_all_dirty();
-			m_old_tiledim[GFX] = m_tiledim[GFX];
-		}
+			m_tilemap[GFX]->prepare();
 	}
 
 #ifdef MAME_DEBUG
@@ -1435,10 +1249,10 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			m_videoregs[0][4], m_videoregs[0][5], m_videoregs[0][6], m_videoregs[0][7]);
 #endif
 		/* Show the scroll / flags registers of the selected layer */
-		if ((m_tilemap[0]) && (msk & 0x000f))   popmessage("x:%04X y:%04X f:%04X", m_vctrl[0][0],m_vctrl[0][1],m_vctrl[0][2]);
-		if ((m_tilemap[1]) && (msk & 0x00f0))   popmessage("x:%04X y:%04X f:%04X", m_vctrl[1][0],m_vctrl[1][1],m_vctrl[1][2]);
-		if ((m_tilemap[2]) && (msk & 0x0f00))   popmessage("x:%04X y:%04X f:%04X", m_vctrl[2][0],m_vctrl[2][1],m_vctrl[2][2]);
-		if ((m_tilemap[3]) && (msk & 0xf000))   popmessage("x:%04X y:%04X f:%04X", m_vctrl[3][0],m_vctrl[3][1],m_vctrl[3][2]);
+		if ((m_tilemap[0]) && (msk & 0x000f))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[0]->vregs(0),m_tilemap[0]->vregs(1),m_tilemap[0]->vregs(2));
+		if ((m_tilemap[1]) && (msk & 0x00f0))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[1]->vregs(0),m_tilemap[1]->vregs(1),m_tilemap[1]->vregs(2));
+		if ((m_tilemap[2]) && (msk & 0x0f00))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[2]->vregs(0),m_tilemap[2]->vregs(1),m_tilemap[2]->vregs(2));
+		if ((m_tilemap[3]) && (msk & 0xf000))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[3]->vregs(0),m_tilemap[3]->vregs(1),m_tilemap[3]->vregs(2));
 	}
 
 	/* Show the row / "column" scroll enable flags, when they change state */
@@ -1447,8 +1261,8 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	{
 		if (m_tilemap[GFX])
 		{
-			m_rasflag |= (m_vctrl[GFX][0] & 0x4000) ? 0x0001 << (4*GFX) : 0;
-			m_rasflag |= (m_vctrl[GFX][1] & 0x4000) ? 0x0002 << (4*GFX) : 0;
+			m_rasflag |= (m_tilemap[GFX]->vregs(0) & 0x4000) ? 0x0001 << (4*GFX) : 0;
+			m_rasflag |= (m_tilemap[GFX]->vregs(1) & 0x4000) ? 0x0002 << (4*GFX) : 0;
 		}
 	}
 
@@ -1540,10 +1354,7 @@ u32 cave_state::screen_update_ppsatan_core(screen_device &screen, bitmap_rgb32 &
 	m_blit.baseaddr_zbuf = reinterpret_cast<u8 *>(m_sprite_zbuf[chip].raw_pixptr(0));
 	m_blit.line_offset_zbuf = m_sprite_zbuf[chip].rowbytes();
 
-	m_tiledim[chip] = m_vctrl[chip][1] & 0x2000;
-	if (m_tiledim[chip] != m_old_tiledim[chip])
-		m_tilemap[chip]->mark_all_dirty();
-	m_old_tiledim[chip] = m_tiledim[chip];
+	m_tilemap[chip]->prepare();
 
 	sprite_check(chip, chip, screen, cliprect);
 
