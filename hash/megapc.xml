@@ -8,7 +8,7 @@
 		<publisher>Oberwerk Corporation / Amstrad PLC</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="cntrpnt.img" size="737280" crc="62559a4f" sha1="a2b85e7f8b87e1eb74431beb2a560617e4831843" offset="0" />
+				<rom name="cntrpnt.img" size="737280" crc="62559a4f" sha1="a2b85e7f8b87e1eb74431beb2a560617e4831843"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,19 +19,19 @@
 		<publisher>Microsoft Corp / Amstrad PLC</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="msdos5.img" size="737280" crc="215b0cdc" sha1="d7792f24a8731f3043e3c4a35fb141a7bf945385" offset="0" />
+				<rom name="msdos5.img" size="737280" crc="215b0cdc" sha1="d7792f24a8731f3043e3c4a35fb141a7bf945385"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="msdos5d2.img" size="737280" crc="91ff5b34" sha1="0d248ab0a3b3e26ea80f3f5e60e428631a5b2577" offset="0" />
+				<rom name="msdos5d2.img" size="737280" crc="91ff5b34" sha1="0d248ab0a3b3e26ea80f3f5e60e428631a5b2577"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="msdos5d3.img" size="737280" crc="e2257f06" sha1="ece1cfd21043da8155e493b82079fde2ebd2a9a8" offset="0" />
+				<rom name="msdos5d3.img" size="737280" crc="e2257f06" sha1="ece1cfd21043da8155e493b82079fde2ebd2a9a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>Amstrad PLC</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="svgadrv2.img" size="1474560" crc="23a910eb" sha1="5cb58fda38741c1c20f23a8e0406053a185d95de" offset="0" />
+				<rom name="svgadrv2.img" size="1474560" crc="23a910eb" sha1="5cb58fda38741c1c20f23a8e0406053a185d95de"/>
 			</dataarea>
 		</part>
 	</software>

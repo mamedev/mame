@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="radio86_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="romdisk.bin" size="32768" crc="6b16fc04" sha1="8c09322ae184f4d900f1032d20b5cf3eb2f1a24b" offset="0" />
+				<rom name="romdisk.bin" size="32768" crc="6b16fc04" sha1="8c09322ae184f4d900f1032d20b5cf3eb2f1a24b"/>
 			</dataarea>
 		</part>
 	</software>

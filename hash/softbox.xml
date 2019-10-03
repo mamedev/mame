@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="softbox-distrib.d80" size="533248" crc="48b070d5" sha1="acab30ea2859433bb75312936d6380dad3c61a00" offset="0" />
+				<rom name="softbox-distrib.d80" size="533248" crc="48b070d5" sha1="acab30ea2859433bb75312936d6380dad3c61a00"/>
 			</dataarea>
 		</part>
 	</software>

@@ -10,7 +10,7 @@
 		<!-- Included on the disk: Wordstar, SuperCalc2, CP/M Utilities, MailMerge -->
 		<!-- P/N: 3D49005-01 REV 1.2 03/20/85 -->
 			<dataarea name="flop" size="380287">
-				<rom name="disk1.imd" size="380287" crc="8fe4129b" sha1="3cbc937bd0b0c44dac98af0427ab4430f25a24f3" offset="0" />
+				<rom name="disk1.imd" size="380287" crc="8fe4129b" sha1="3cbc937bd0b0c44dac98af0427ab4430f25a24f3"/>
 			</dataarea>
 		</part>
 
@@ -18,7 +18,7 @@
 		<!-- Included on the disk: MEDIA MASTER, MBASIC, OSBOARD -->
 		<!-- P/N: 3D490005-02 REV 1.2 03/20/85 -->
 			<dataarea name="flop" size="360899">
-				<rom name="disk2.imd" size="360899" crc="ccadbac9" sha1="4987b41ced5dd23145f6e3f63c8c30e16c79c400" offset="0" />
+				<rom name="disk2.imd" size="360899" crc="ccadbac9" sha1="4987b41ced5dd23145f6e3f63c8c30e16c79c400"/>
 			</dataarea>
 		</part>
 
@@ -26,7 +26,7 @@
 		<!-- Included on the disk: SUPERCALC2 Templates -->
 		<!-- P/N: 3D490005-03 REV 1.2 03/20/85 -->
 			<dataarea name="flop" size="195152">
-				<rom name="disk3.imd" size="195152" crc="64141c47" sha1="79aedfc6f2bd8f6bc78a2a7cb69b393aca2339ad" offset="0" />
+				<rom name="disk3.imd" size="195152" crc="64141c47" sha1="79aedfc6f2bd8f6bc78a2a7cb69b393aca2339ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -38,13 +38,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="69161">
-				<rom name="cpm_system.imd" size="69161" crc="54629cd6" sha1="670690338541246de37c19887ad8a7644d95abdd" offset="0" />
+				<rom name="cpm_system.imd" size="69161" crc="54629cd6" sha1="670690338541246de37c19887ad8a7644d95abdd"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="50987">
-				<rom name="cpm_utilities.imd" size="50987" crc="4f3f644b" sha1="ba7ca8ade978cc2c17443cbb9018c6d0aeb4b330" offset="0" />
+				<rom name="cpm_utilities.imd" size="50987" crc="4f3f644b" sha1="ba7ca8ade978cc2c17443cbb9018c6d0aeb4b330"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +56,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="189090">
-				<rom name="crosstalk.imd" size="189090" crc="0259c65d" sha1="e9dae67b4d75cbb22fe77f69f1a6ad3d5ccf32a2" offset="0" />
+				<rom name="crosstalk.imd" size="189090" crc="0259c65d" sha1="e9dae67b4d75cbb22fe77f69f1a6ad3d5ccf32a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -68,7 +68,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="14964">
-				<rom name="turnkey.imd" size="14964" crc="42be74d0" sha1="de6debd4ac79a93886ed742ca5d5ed03be697554" offset="0" />
+				<rom name="turnkey.imd" size="14964" crc="42be74d0" sha1="de6debd4ac79a93886ed742ca5d5ed03be697554"/>
 			</dataarea>
 		</part>
 	</software>
@@ -80,13 +80,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="382201">
-				<rom name="ws disk1.imd" size="382201" crc="def979cd" sha1="9dd9d1d4c7e64933629e675b00069f738a2cdd49" offset="0" />
+				<rom name="ws disk1.imd" size="382201" crc="def979cd" sha1="9dd9d1d4c7e64933629e675b00069f738a2cdd49"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="177824">
-				<rom name="ws disk2.imd" size="177824" crc="3adc8b8e" sha1="5ffa2590b5a8f8e4a95fbb8d2663e254e04db759" offset="0" />
+				<rom name="ws disk2.imd" size="177824" crc="3adc8b8e" sha1="5ffa2590b5a8f8e4a95fbb8d2663e254e04db759"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="213413">
-				<rom name="vixen fix program.imd" size="213413" crc="4a5ba489" sha1="1ba7ed2a63ef2e3ec971ccbf64ad542e14c183dd" offset="0" />
+				<rom name="vixen fix program.imd" size="213413" crc="4a5ba489" sha1="1ba7ed2a63ef2e3ec971ccbf64ad542e14c183dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +110,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="389393">
-				<rom name="vixen demonstration program.imd" size="389393" crc="90323539" sha1="21536759f0828b82e574902d89c1de6d890f1353" offset="0" />
+				<rom name="vixen demonstration program.imd" size="389393" crc="90323539" sha1="21536759f0828b82e574902d89c1de6d890f1353"/>
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="99156">
-				<rom name="vixen demonstration program.imd" size="99156" crc="5d45f8e2" sha1="b6125d32eaceae4431bf5770b3ca6762738e6f90" offset="0" />
+				<rom name="vixen demonstration program.imd" size="99156" crc="5d45f8e2" sha1="b6125d32eaceae4431bf5770b3ca6762738e6f90"/>
 			</dataarea>
 		</part>
 	</software>
@@ -137,7 +137,7 @@
 			<!-- x3.094 -->
 			<!-- Revision: Date: 4/4/83 -->
 			<dataarea name="flop" size="45868">
-				<rom name="vixen sysgen1.imd" size="45868" crc="82c05f22" sha1="311d78f78196db4dd1fb170299972febcaf395d7" offset="0" />
+				<rom name="vixen sysgen1.imd" size="45868" crc="82c05f22" sha1="311d78f78196db4dd1fb170299972febcaf395d7"/>
 			</dataarea>
 		</part>
 
@@ -146,7 +146,7 @@
 			<!-- Date: 4/8/83 -->
 			<!-- Seems to be a upgrade disk for x3.094 -->
 			<dataarea name="flop" size="20319">
-				<rom name="vixen sysgen2.imd" size="20319" crc="076ef4a3" sha1="75bcac5565951d6b21364a04040129944e17a8eb" offset="0" />
+				<rom name="vixen sysgen2.imd" size="20319" crc="076ef4a3" sha1="75bcac5565951d6b21364a04040129944e17a8eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +160,7 @@
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/4/83 -->
 			<dataarea name="flop" size="91903">
-				<rom name="vixen setup1.imd" size="91903" crc="9858ed77" sha1="29a3acdaf7e1823aa030d942e03880d7c3694e6e" offset="0" />
+				<rom name="vixen setup1.imd" size="91903" crc="9858ed77" sha1="29a3acdaf7e1823aa030d942e03880d7c3694e6e"/>
 			</dataarea>
 		</part>
 
@@ -169,7 +169,7 @@
 			<!-- Date: 4/8/83 -->
 			<!-- Seems to be a upgrade disk for x3.094 -->
 			<dataarea name="flop" size="65304">
-				<rom name="vixen setup2.imd" size="65304" crc="19139872" sha1="a86fdf9b8d291e21b44d2d7ffe9c47588c81127c" offset="0" />
+				<rom name="vixen setup2.imd" size="65304" crc="19139872" sha1="a86fdf9b8d291e21b44d2d7ffe9c47588c81127c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -183,7 +183,7 @@
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/5/83 -->
 			<dataarea name="flop" size="197270">
-				<rom name="vixen monitor rom.imd" size="197270" crc="3e3c301e" sha1="be697c4a7dea332a009df956639bfaad1c33619d" offset="0" />
+				<rom name="vixen monitor rom.imd" size="197270" crc="3e3c301e" sha1="be697c4a7dea332a009df956639bfaad1c33619d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/5/83 -->
 			<dataarea name="flop" size="69398">
-				<rom name="vixen mov cpm.imd" size="69398" crc="b1c264df" sha1="dc002ac2b0d4a2629fd75dec3d93182c332a6e54" offset="0" />
+				<rom name="vixen mov cpm.imd" size="69398" crc="b1c264df" sha1="dc002ac2b0d4a2629fd75dec3d93182c332a6e54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -211,7 +211,7 @@
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/4/83 -->
 			<dataarea name="flop" size="69396">
-				<rom name="vixen cbios.imd" size="69396" crc="f8c21f1d" sha1="a69d823cef0d5b2231407ee80c17e453174dcb03" offset="0" />
+				<rom name="vixen cbios.imd" size="69396" crc="f8c21f1d" sha1="a69d823cef0d5b2231407ee80c17e453174dcb03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -225,7 +225,7 @@
 			<!-- Revision: x3.094 -->
 			<!-- Date: 4/4/83 -->
 			<dataarea name="flop" size="62235">
-				<rom name="vixen disk utility.imd" size="62235" crc="31d2cc4a" sha1="0dda3fff018432e596378c8631584503794815e5" offset="0" />
+				<rom name="vixen disk utility.imd" size="62235" crc="31d2cc4a" sha1="0dda3fff018432e596378c8631584503794815e5"/>
 			</dataarea>
 		</part>
 	</software>

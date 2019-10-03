@@ -7,7 +7,7 @@
 		<publisher>JungleTac/KenSingTon</publisher>
 		<part name="cart" interface="vii_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="7in1.bin" size="8388608" crc="b541afaa" sha1="20437027a5d98ad26bb34b575007038b10b93577" offset="0" />
+				<rom name="7in1.bin" size="8388608" crc="b541afaa" sha1="20437027a5d98ad26bb34b575007038b10b93577"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18,7 +18,7 @@
 		<publisher>JungleTac/KenSingTon</publisher>
 		<part name="cart" interface="vii_cart">
 			<dataarea name="rom" size="8388864">
-				<rom name="10in1.bin" size="8388864" crc="73914c71" sha1="b3c311e83e62534e61a329c7b373ccf3a743d404" offset="0" />
+				<rom name="10in1.bin" size="8388864" crc="73914c71" sha1="b3c311e83e62534e61a329c7b373ccf3a743d404"/>
 			</dataarea>
 		</part>
 	</software>

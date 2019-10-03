@@ -24,7 +24,7 @@ CAS-190 Inspiration (Bagua and Biorhythm)               no       霊感
 
 		<part name="cart" interface="visicom_cart">
 			<dataarea name="rom" size="0x800">
-				<rom name="cas130.rom" size="0x800" crc="9da5c845" sha1="438d9fc67de1ef408718b4737c0d0fd48844dacb" offset="0" />
+				<rom name="cas130.rom" size="0x800" crc="9da5c845" sha1="438d9fc67de1ef408718b4737c0d0fd48844dacb"/>
 			</dataarea>
 		</part>
 	</software>
