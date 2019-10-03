@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, Paul Priest, David Haywood
-/* 038 Tilemap generator */
+/* 038 Tilemap generator manufactured by NEC */
 
 /*
     [ Scrolling Layers ]
