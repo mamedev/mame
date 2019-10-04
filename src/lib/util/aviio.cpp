@@ -3264,6 +3264,9 @@ avi_file::error avi_file_impl::write_indx_chunk(avi_stream &stream, bool initial
 			if (chunks_this_index == 0)
 				continue;
 
+			if (master_entries >= MAX_AVI_SIZE_IN_GB / 4)
+				return error::WRITE_ERROR;
+
 			/* allocate memory */
 			std::unique_ptr<std::uint8_t []> tempbuf;
 			try { tempbuf.reset(new std::uint8_t[24 + 8 * chunks_this_index]); }
