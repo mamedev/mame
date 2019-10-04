@@ -543,10 +543,13 @@ void megasys1_state::kickoffb_sound_map(address_map &map)
 
 void megasys1_state::p47b_sound_map(address_map &map)
 {
-	kickoffb_sound_map(map);
-
+	map(0x000000, 0x01ffff).rom();
+	map(0x040000, 0x040001).r(m_soundlatch[0], FUNC(generic_latch_16_device::read));
+	map(0x060000, 0x060001).w(m_soundlatch[1], FUNC(generic_latch_16_device::write));   // to main cpu
+	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
 	map(0x0a0000, 0x0a0003).noprw(); // OKI1 on the original
 	map(0x0c0000, 0x0c0003).noprw(); // OKI2 on the original
+	map(0x0e0000, 0x0fffff).ram();
 }
 
 /***************************************************************************
