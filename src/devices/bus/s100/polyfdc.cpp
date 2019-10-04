@@ -61,7 +61,7 @@ u8 poly_fdc_device::s100_sinp_r(offs_t offset)
 {
 	if ((offset & 0x00f0) == 0x0020)
 	{
-		if (BIT(offset, 11))
+		if (BIT(offset, 3))
 			return m_pio->read(offset & 3);
 		else
 			return m_usrt->read(offset & 1);
@@ -74,7 +74,7 @@ void poly_fdc_device::s100_sout_w(offs_t offset, u8 data)
 {
 	if ((offset & 0x00f0) == 0x20)
 	{
-		if (BIT(offset, 11))
+		if (BIT(offset, 3))
 			m_pio->write(offset & 3, data);
 		else
 			m_usrt->write(offset & 1, data);
