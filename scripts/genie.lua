@@ -1520,12 +1520,6 @@ configuration { "vsllvm" }
 		}
 
 
--- adding this till we sort out asserts in debug mode
-configuration { "Debug", "gmake" }
-	buildoptions_cpp {
-		"-Wno-terminate",
-	}
-
 configuration { }
 
 if (_OPTIONS["SOURCES"] ~= nil) then
