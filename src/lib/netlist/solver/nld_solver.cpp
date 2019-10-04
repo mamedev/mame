@@ -364,15 +364,21 @@ namespace devices
 					{
 						ms = create_solver<double, -32>(net_count, sname);
 					}
-					else
-						if (net_count <= 64)
+					else if (net_count <= 64)
 					{
 						ms = create_solver<double, -64>(net_count, sname);
 					}
-					else
-						if (net_count <= 128)
+					else if (net_count <= 128)
 					{
 						ms = create_solver<double, -128>(net_count, sname);
+					}
+					else if (net_count <= 256)
+					{
+						ms = create_solver<double, -256>(net_count, sname);
+					}
+					else if (net_count <= 512)
+					{
+						ms = create_solver<double, -512>(net_count, sname);
 					}
 					else
 					{

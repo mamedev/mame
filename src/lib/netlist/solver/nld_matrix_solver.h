@@ -84,19 +84,18 @@ namespace devices
 		analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
 	};
 
+	P_ENUM(matrix_sort_type_e,
+		NOSORT,
+		ASCENDING,
+		DESCENDING,
+		PREFER_IDENTITY_TOP_LEFT,
+		PREFER_BAND_MATRIX
+	)
+
 	class matrix_solver_t : public device_t
 	{
 	public:
 		using list_t = std::vector<matrix_solver_t *>;
-
-		enum eSortType
-		{
-			NOSORT,
-			ASCENDING,
-			DESCENDING,
-			PREFER_IDENTITY_TOP_LEFT,
-			PREFER_BAND_MATRIX
-		};
 
 		void setup(analog_net_t::list_t &nets)
 		{
@@ -142,9 +141,9 @@ namespace devices
 	protected:
 
 		matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
-				eSortType sort, const solver_parameters_t *params);
+			matrix_sort_type_e sort, const solver_parameters_t *params);
 
-		void sort_terms(eSortType sort);
+		void sort_terms(matrix_sort_type_e sort);
 
 		void setup_base(analog_net_t::list_t &nets);
 		void update_dynamic();
@@ -280,7 +279,7 @@ namespace devices
 		void step(const netlist_time &delta);
 
 		std::size_t m_ops;
-		const eSortType m_sort;
+		const matrix_sort_type_e m_sort;
 	};
 
 	template <typename T>

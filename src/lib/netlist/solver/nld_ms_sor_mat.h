@@ -33,7 +33,7 @@ namespace devices
 		using float_type = FT;
 
 		matrix_solver_SOR_mat_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, std::size_t size)
-			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
+			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_sort_type_e::ASCENDING, params, size)
 			, m_Vdelta(*this, "m_Vdelta", std::vector<float_type>(size))
 			, m_omega(*this, "m_omega", params->m_gs_sor)
 			, m_lp_fact(*this, "m_lp_fact", 0)

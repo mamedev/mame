@@ -44,7 +44,7 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 
 	matrix_solver_t::matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
-			const eSortType sort, const solver_parameters_t *params)
+			const matrix_sort_type_e sort, const solver_parameters_t *params)
 		: device_t(anetlist, name)
 		, m_params(*params)
 		, m_stat_calculations(*this, "m_stat_calculations", 0)
@@ -138,7 +138,7 @@ namespace devices
 		setup_matrix();
 	}
 
-	void matrix_solver_t::sort_terms(eSortType sort)
+	void matrix_solver_t::sort_terms(matrix_sort_type_e sort)
 	{
 		/* Sort in descending order by number of connected matrix voltages.
 		 * The idea is, that for Gauss-Seidel algo the first voltage computed
@@ -164,7 +164,7 @@ namespace devices
 
 		switch (sort)
 		{
-			case PREFER_BAND_MATRIX:
+			case matrix_sort_type_e::PREFER_BAND_MATRIX:
 				{
 					for (std::size_t k = 0; k < iN - 1; k++)
 					{
@@ -182,7 +182,7 @@ namespace devices
 					}
 				}
 				break;
-			case PREFER_IDENTITY_TOP_LEFT:
+			case matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT:
 				{
 					for (std::size_t k = 0; k < iN - 1; k++)
 					{
@@ -200,10 +200,10 @@ namespace devices
 					}
 				}
 				break;
-			case ASCENDING:
-			case DESCENDING:
+			case matrix_sort_type_e::ASCENDING:
+			case matrix_sort_type_e::DESCENDING:
 				{
-					int sort_order = (m_sort == DESCENDING ? 1 : -1);
+					int sort_order = (m_sort == matrix_sort_type_e::DESCENDING ? 1 : -1);
 
 					for (std::size_t k = 0; k < iN - 1; k++)
 						for (std::size_t i = k+1; i < iN; i++)
@@ -216,7 +216,7 @@ namespace devices
 						}
 				}
 				break;
-			case NOSORT:
+			case matrix_sort_type_e::NOSORT:
 				break;
 		}
 		/* rebuild */

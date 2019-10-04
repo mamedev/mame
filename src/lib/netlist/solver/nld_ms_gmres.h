@@ -36,8 +36,9 @@ namespace devices
 		 * This is already preconditioning.
 		 */
 		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
-			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
-			, m_ops(size, 1)
+			// matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
+				: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT, params, size)
+			, m_ops(size, 0)
 			, m_gmres(size)
 			{
 			}
@@ -104,7 +105,6 @@ namespace devices
 		const std::size_t iN = this->size();
 
 		plib::parray<FT, SIZE> RHS(iN);
-		//float_type new_V[storage_N];
 
 		m_ops.m_mat.set_scalar(0.0);
 

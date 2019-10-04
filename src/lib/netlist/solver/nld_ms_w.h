@@ -369,7 +369,7 @@ unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphs
 template <typename FT, int SIZE>
 matrix_solver_w_t<FT, SIZE>::matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
-	: matrix_solver_t(anetlist, name, NOSORT, params)
+	: matrix_solver_t(anetlist, name, matrix_sort_type_e::NOSORT, params)
 	, m_cnt(0)
 	, m_dim(size)
 {

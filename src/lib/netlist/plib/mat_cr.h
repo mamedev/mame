@@ -221,43 +221,42 @@ namespace plib
 		template <typename V>
 		void gaussian_elimination_parallel(V & RHS)
 		{
-			// FIXME: move into solver creation ...
-			plib::omp::set_num_threads(4);
-			//printf("omp: %ld\n", m_ge_par.size());
+			//printf("omp: %ld %d %d\n", m_ge_par.size(), nz_num, (int)m_ge_par[m_ge_par.size()-2].size());
 			for (auto l = 0ul; l < m_ge_par.size(); l++)
-			plib::omp::for_static(0ul, m_ge_par[l].size(), [this, &RHS, &l] (unsigned ll)
-			{
-				auto &i = m_ge_par[l][ll];
+				plib::omp::for_static(nz_num, 0ul, m_ge_par[l].size(), [this, &RHS, &l] (unsigned ll)
 				{
-					std::size_t nzbdp = 0;
-					std::size_t pi = diag[i];
-					const value_type f = 1.0 / A[pi++];
-					const std::size_t piie = row_idx[i+1];
-
-					while (auto j = nzbd[i][nzbdp++])
+					auto &i = m_ge_par[l][ll];
 					{
-						// proceed to column i
+						std::size_t nzbdp = 0;
+						std::size_t pi = diag[i];
+						const value_type f = 1.0 / A[pi++];
+						const std::size_t piie = row_idx[i+1];
+						const auto &nz = nzbd[i];
 
-						std::size_t pj = row_idx[j];
-
-						while (col_idx[pj] < i)
-							pj++;
-
-						const value_type f1 = - A[pj++] * f;
-
-						// subtract row i from j
-						// fill-in available assumed, i.e. matrix was prepared
-						for (std::size_t pii = pi; pii<piie; pii++)
+						while (auto j = nz[nzbdp++])
 						{
-							while (col_idx[pj] < col_idx[pii])
+							// proceed to column i
+
+							std::size_t pj = row_idx[j];
+
+							while (col_idx[pj] < i)
 								pj++;
-							if (col_idx[pj] == col_idx[pii])
-								A[pj++] += A[pii] * f1;
+
+							const value_type f1 = - A[pj++] * f;
+
+							// subtract row i from j
+							// fill-in available assumed, i.e. matrix was prepared
+							for (std::size_t pii = pi; pii<piie; pii++)
+							{
+								while (col_idx[pj] < col_idx[pii])
+									pj++;
+								if (col_idx[pj] == col_idx[pii])
+									A[pj++] += A[pii] * f1;
+							}
+							RHS[j] += f1 * RHS[i];
 						}
-						RHS[j] += f1 * RHS[i];
 					}
-				}
-			});
+				});
 		}
 
 		template <typename V1, typename V2>
@@ -303,11 +302,29 @@ namespace plib
 			/*
 			 * res = A * x
 			 */
+#if 0
+			parray<value_type, N < 0 ? -N * N : N *N> xi(m_size*m_size);
+			//std::vector<value_type> xi(m_size*m_size);
 
+			plib::omp::for_static(0, constants<index_type>::zero(), row_idx[m_size], [this, &x, &xi](index_type k)
+			{
+				xi[k] = x[col_idx[k]];
+			});
+#endif
+#if 1
+			//plib::omp::set_num_threads(4);
+			plib::omp::for_static(0, constants<index_type>::zero(), m_size, [this, &res, &x](index_type row)
+			{
+				T tmp = 0.0;
+				const index_type e = row_idx[row+1];
+				for (index_type k = row_idx[row]; k < e; k++)
+					tmp += A[k] * x[col_idx[k]];
+				res[row] = tmp;
+			});
+#else
 			std::size_t row = 0;
 			std::size_t k = 0;
 			const std::size_t oe = nz_num;
-
 			while (k < oe)
 			{
 				T tmp = 0.0;
@@ -316,6 +333,7 @@ namespace plib
 					tmp += A[k] * x[col_idx[k]];
 				res[row++] = tmp;
 			}
+#endif
 		}
 
 		/* throws error if P(source)>P(destination) */
@@ -409,7 +427,7 @@ namespace plib
 					{
 						// we can assume that within a row ja increases continuously */
 						const std::size_t c_i_j = col_idx[i_j]; // row i, column j
-						const std::size_t c_k_j = col_idx[k_j]; // row i, column j
+						const std::size_t c_k_j = col_idx[k_j]; // row k, column j
 						if (c_k_j < c_i_j)
 							k_j++;
 						else if (c_k_j == c_i_j)
@@ -520,6 +538,8 @@ namespace plib
 			m_ge_par.resize(cl+1);
 			for (index_type k = 0; k < size(); k++)
 				m_ge_par[levGE[k]].push_back(k);
+			//for (std::size_t k = 0; k < m_ge_par.size(); k++)
+			//	printf("%d %d\n", (int) k, (int) m_ge_par[k].size());
 		}
 
 		index_type m_size;

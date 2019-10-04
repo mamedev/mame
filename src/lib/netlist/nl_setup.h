@@ -79,7 +79,8 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 
 #define SUBMODEL(model, name)                                                  \
 		setup.namespace_push(# name);                                          \
-		NETLIST_NAME(model)(setup);                                            \
+		setup.include(# model);												   \
+		/*NETLIST_NAME(model)(setup);*/                                        \
 		setup.namespace_pop();
 
 #define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                 \
