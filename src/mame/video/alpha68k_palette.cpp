@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/******************************************************************************
 
 	Alpha Denshi "NeoGeo" palette devices
 
@@ -11,10 +11,19 @@
 	- Make mods to support NeoGeo HW (palette bank, shadows);
 	- Are alpha68k.cpp/snk68.cpp with or without shadows?
 	- Reference color, research exact consequences about this wiki claim: 
-	  "It always has to be pure black ($8000) otherwise monitors won't be happy and other colors won't be displayed correctly."
-	  (note: tested nam1975/skyadvnt, they actually setup $0000);
+	  "It always has to be pure black ($8000)(*) otherwise monitors won't 
+	   be happy and other colors won't be displayed correctly."
+	  (*) tested nam1975/skyadvnt, they actually setup $0000.
+	  Update: Gold Medalist actually setup $0fff when starter pistol is shot 
+	  on dash events, according to a reference video it causes generally darker
+	  colors on playfield and a color overflow in the border area.
+	  We currently just dim the palette to simulate the effect, it's totally 
+	  possible that the side effects are different depending on type of monitor 
+	  used, and maybe the dimming is caused by the capture card uncapable of 
+	  catching up the actual signal and intended behaviour is actually a bright 
+	  flash (without palette clamp?).
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "alpha68k_palette.h"
@@ -124,15 +133,34 @@ READ16_MEMBER( alpha68k_palette_device::read )
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER( alpha68k_palette_device::write )
+inline void alpha68k_palette_device::set_color_entry(u16 offset, u16 pal_data, int shift)
 {
-	COMBINE_DATA(&m_paletteram[offset]);
-	
-	u16 pal_data = m_paletteram[offset];
 	int dark = pal_data >> 15;
 	int r = ((pal_data >> 14) & 0x1) | ((pal_data >> 7) & 0x1e);
 	int g = ((pal_data >> 13) & 0x1) | ((pal_data >> 3) & 0x1e);
 	int b = ((pal_data >> 12) & 0x1) | ((pal_data << 1) & 0x1e);
+	
+	r >>= shift;
+	g >>= shift;
+	b >>= shift;
 
 	set_pen_color(offset, m_palette_lookup[r][dark], m_palette_lookup[g][dark], m_palette_lookup[b][dark]);
+}
+
+WRITE16_MEMBER( alpha68k_palette_device::write )
+{
+	COMBINE_DATA(&m_paletteram[offset]);
+	u16 pal_data = m_paletteram[offset];
+	set_color_entry(offset, pal_data, 0);
+
+	// reference color
+	if (offset == 0)
+	{
+		// TODO: actual behaviour, needs HW tests.
+		bool is_sync_color = (pal_data & 0x7fff) == 0;
+		int sync_color_shift = is_sync_color ? 0 : 2;
+		
+		for (int i=0; i<m_entries; i++)
+			set_color_entry(i, m_paletteram[i], sync_color_shift);
+	}
 }
