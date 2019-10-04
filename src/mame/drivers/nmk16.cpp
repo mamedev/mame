@@ -4357,6 +4357,7 @@ void nmk16_state::acrobatm(machine_config &config)
 
 	/* video hardware */
 	set_hacky_screen_lowres(config);
+	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit), this);
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
