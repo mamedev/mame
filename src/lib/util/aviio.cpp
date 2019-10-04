@@ -39,7 +39,7 @@
 /** @brief  Size of the maximum riff. */
 #define MAX_RIFF_SIZE           (2UL * 1024 * 1024 * 1024 - 1024)   /* just under 2GB */
 /** @brief  The maximum avi size in gigabytes. */
-#define MAX_AVI_SIZE_IN_GB      (256)
+#define MAX_AVI_SIZE_IN_GB      (1024)
 
 /**
  * @def FOUR_GB
