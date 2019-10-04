@@ -478,11 +478,11 @@ void mcatadv_state::nost(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mcatadv_state::nost_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &mcatadv_state::nost_sound_io_map);
 
-	ym2610_device *ymsnd = subdevice<ym2610_device>("ymsnd"); /* XTAL(16'000'000)/2) verified on pcb */
-	ymsnd->reset_routes();
-	ymsnd->add_route(0, "mono", 0.2);
-	ymsnd->add_route(1, "mono", 0.5);
-	ymsnd->add_route(2, "mono", 0.5);
+	ym2610_device &ymsnd(YM2610(config.replace(), "ymsnd", XTAL(16'000'000)/2)); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "mono", 0.2);
+	ymsnd.add_route(1, "mono", 0.5);
+	ymsnd.add_route(2, "mono", 0.5);
 }
 
 
