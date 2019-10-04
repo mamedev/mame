@@ -10,6 +10,8 @@
 #include "cpu/v60/v60.h"
 #include "includes/model1.h"
 
+#define DS 0x8000
+
 #define TGP_FUNCTION(name) void name()
 
 void model1_state::fifoout_push(u32 data)
@@ -58,12 +60,12 @@ float model1_state::tsin(s16 a)
 
 u16 model1_state::ram_get_i()
 {
-	return m_copro_ram_data[(m_copro_hle_ram_scan_adr++) & 0x7fff];
+	return m_copro_ram_data[(m_copro_hle_ram_scan_adr++) & (DS-1)];
 }
 
 float model1_state::ram_get_f()
 {
-	return u2f(m_copro_ram_data[(m_copro_hle_ram_scan_adr++) & 0x7fff]);
+	return u2f(m_copro_ram_data[(m_copro_hle_ram_scan_adr++) & (DS-1)]);
 }
 
 TGP_FUNCTION( model1_state::fadd )
@@ -1728,9 +1730,9 @@ void model1_state::machine_start()
 	m_digits.resolve();
 	m_outs.resolve();
 
-	m_copro_ram_data = std::make_unique<u32[]>(0x8000);
+	m_copro_ram_data = std::make_unique<u32[]>(DS);
 
-	save_pointer(NAME(m_copro_ram_data), 0x8000);
+	save_pointer(NAME(m_copro_ram_data), DS);
 	save_item(NAME(m_v60_copro_ram_adr));
 	save_item(NAME(m_copro_hle_ram_scan_adr));
 	save_item(NAME(m_v60_copro_ram_latch));
@@ -1799,13 +1801,16 @@ void model1_state::machine_start()
 void model1_state::copro_reset()
 {
 	m_v60_copro_ram_adr = 0;
-	m_copro_ram_adr = 0;
+	m_copro_ram_adr[0] = 0;
+	m_copro_ram_adr[1] = 0;
+	m_copro_ram_adr[2] = 0;
+	m_copro_ram_adr[3] = 0;
 	m_copro_sincos_base = 0;
 	m_copro_inv_base = 0;
 	m_copro_isqrt_base = 0;
 	std::fill(std::begin(m_copro_atan_base), std::end(m_copro_atan_base), 0);
 	std::fill(std::begin(m_v60_copro_ram_latch), std::end(m_v60_copro_ram_latch), 0);
-	memset(m_copro_ram_data.get(), 0, 0x8000*4);
+	memset(m_copro_ram_data.get(), 0, DS*4);
 
 	if(!m_tgp_copro) {
 		m_acc = 0;
@@ -1836,10 +1841,10 @@ READ16_MEMBER(model1_state::v60_copro_ram_r)
 	u16 r;
 
 	if (!offset)
-		r = m_copro_ram_data[m_v60_copro_ram_adr & 0x7fff];
+		r = m_copro_ram_data[m_v60_copro_ram_adr & (DS-1)];
 
 	else {
-		r = m_copro_ram_data[m_v60_copro_ram_adr & 0x7fff] >> 16;
+		r = m_copro_ram_data[m_v60_copro_ram_adr & (DS-1)] >> 16;
 
 		if(m_v60_copro_ram_adr & 0x8000)
 			m_v60_copro_ram_adr ++;
@@ -1854,7 +1859,7 @@ WRITE16_MEMBER(model1_state::v60_copro_ram_w)
 
 	if (offset) {
 		u32 v = m_v60_copro_ram_latch[0] | (m_v60_copro_ram_latch[1] << 16);
-		m_copro_ram_data[m_v60_copro_ram_adr & 0x7fff] = v;
+		m_copro_ram_data[m_v60_copro_ram_adr & (DS-1)] = v;
 		if(m_v60_copro_ram_adr & 0x8000)
 			m_v60_copro_ram_adr++;
 	}
@@ -1898,8 +1903,8 @@ void model1_state::copro_data_map(address_map &map)
 
 void model1_state::copro_io_map(address_map &map)
 {
-	map(0x0008, 0x0008).rw(FUNC(model1_state::copro_ramadr_r), FUNC(model1_state::copro_ramadr_w));
-	map(0x0009, 0x0009).rw(FUNC(model1_state::copro_ramdata_r), FUNC(model1_state::copro_ramdata_w));
+	map(0x0000, 0x0000).rw(FUNC(model1_state::copro_ramadr_r), FUNC(model1_state::copro_ramadr_w)).select(0x18);
+	map(0x0001, 0x0001).rw(FUNC(model1_state::copro_ramdata_r), FUNC(model1_state::copro_ramdata_w)).select(0x18);
 	map(0x0020, 0x0023).rw(FUNC(model1_state::copro_sincos_r), FUNC(model1_state::copro_sincos_w));
 	map(0x0024, 0x0027).rw(FUNC(model1_state::copro_atan_r), FUNC(model1_state::copro_atan_w));
 	map(0x0028, 0x0029).rw(FUNC(model1_state::copro_inv_r), FUNC(model1_state::copro_inv_w));
@@ -1915,24 +1920,24 @@ void model1_state::copro_rf_map(address_map &map)
 
 WRITE32_MEMBER(model1_state::copro_ramadr_w)
 {
-	COMBINE_DATA(&m_copro_ram_adr);
+	COMBINE_DATA(&m_copro_ram_adr[offset >> 3]);
 }
 
 READ32_MEMBER(model1_state::copro_ramadr_r)
 {
-	return m_copro_ram_adr;
+	return m_copro_ram_adr[offset >> 3];
 }
 
 WRITE32_MEMBER(model1_state::copro_ramdata_w)
 {
-	COMBINE_DATA(&m_copro_ram_data[m_copro_ram_adr & 0x7fff]);
-	m_copro_ram_adr ++;
+	COMBINE_DATA(&m_copro_ram_data[m_copro_ram_adr[offset >> 3] & (DS-1)]);
+	m_copro_ram_adr[offset >> 3] ++;
 }
 
 READ32_MEMBER(model1_state::copro_ramdata_r)
 {
-	u32 val = m_copro_ram_data[m_copro_ram_adr & 0x7fff];
-	m_copro_ram_adr ++;
+	u32 val = m_copro_ram_data[m_copro_ram_adr[offset >> 3] & (DS-1)];
+	m_copro_ram_adr[offset >> 3] ++;
 	return val;
 }
 
@@ -1996,10 +2001,7 @@ WRITE32_MEMBER(model1_state::copro_atan_w)
 
 READ32_MEMBER(model1_state::copro_atan_r)
 {
-	offs_t index = (m_copro_atan_base[3] << 1);
-	if(index == 0x4000)
-		index = 0x3fff;
-	u32 result = m_copro_tables[index | 0x4000];
+	u32 result = m_copro_tables[(m_copro_atan_base[3] & 0x3fff) | 0x4000];
 
 	bool s0 = m_copro_atan_base[0] & 0x80000000;
 	bool s1 = m_copro_atan_base[1] & 0x80000000;
