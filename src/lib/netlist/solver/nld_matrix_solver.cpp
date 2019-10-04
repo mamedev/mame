@@ -44,7 +44,7 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 
 	matrix_solver_t::matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
-			const matrix_sort_type_e sort, const solver_parameters_t *params)
+			const solver_parameters_t *params)
 		: device_t(anetlist, name)
 		, m_params(*params)
 		, m_stat_calculations(*this, "m_stat_calculations", 0)
@@ -56,7 +56,6 @@ namespace devices
 		, m_fb_sync(*this, "FB_sync")
 		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
-		, m_sort(sort)
 	{
 		connect_post_start(m_fb_sync, m_Q_sync);
 	}
@@ -203,7 +202,7 @@ namespace devices
 			case matrix_sort_type_e::ASCENDING:
 			case matrix_sort_type_e::DESCENDING:
 				{
-					int sort_order = (m_sort == matrix_sort_type_e::DESCENDING ? 1 : -1);
+					int sort_order = (sort == matrix_sort_type_e::DESCENDING ? 1 : -1);
 
 					for (std::size_t k = 0; k < iN - 1; k++)
 						for (std::size_t i = k+1; i < iN; i++)
@@ -244,7 +243,7 @@ namespace devices
 		// free all - no longer needed
 		m_rails_temp.clear();
 
-		sort_terms(m_sort);
+		sort_terms(m_params.m_sort_type);
 
 		this->set_pointers();
 
@@ -438,7 +437,7 @@ namespace devices
 			if (this_resched > 1 && !m_Q_sync.net().is_queued())
 			{
 				log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
-				m_Q_sync.net().toggle_and_push_to_queue(m_params.m_nr_recalc_delay);
+				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_double(m_params.m_nr_recalc_delay));
 			}
 		}
 		else

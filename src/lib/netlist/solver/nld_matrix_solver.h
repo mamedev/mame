@@ -21,22 +21,66 @@ namespace netlist
 {
 namespace devices
 {
-	/* FIXME: these should become proper devices */
+	P_ENUM(matrix_sort_type_e,
+		NOSORT,
+		ASCENDING,
+		DESCENDING,
+		PREFER_IDENTITY_TOP_LEFT,
+		PREFER_BAND_MATRIX
+	)
 
 	struct solver_parameters_t
 	{
-		bool m_pivot;
-		nl_double m_accuracy;
-		nl_double m_dynamic_lte;
+		solver_parameters_t(device_t &parent)
+		: m_freq(parent, "FREQ", 48000.0)
+
+		/* iteration parameters */
+		, m_gs_sor(parent, "SOR_FACTOR", 1.059)
+		, m_method(parent, "METHOD", "MAT_CR")
+		, m_accuracy(parent, "ACCURACY", 1e-7)
+		, m_gs_loops(parent, "GS_LOOPS", 9)              // Gauss-Seidel loops
+
+		/* general parameters */
+		, m_gmin(parent, "GMIN", 1e-9)
+		, m_pivot(parent, "PIVOT", false)                    // use pivoting - on supported solvers
+		, m_nr_loops(parent, "NR_LOOPS", 250)            // Newton-Raphson loops
+		, m_nr_recalc_delay(parent, "NR_RECALC_DELAY", netlist_time::quantum().as_double()) // Delay to next solve attempt if nr loops exceeded
+		, m_parallel(parent, "PARALLEL", 0)
+
+		/* automatic time step */
+		, m_dynamic_ts(parent, "DYNAMIC_TS", false)
+		, m_dynamic_lte(parent, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
+		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
+
+		/* matrix sorting */
+		, m_sort_type(parent, "SORT_TYPE", matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT)
+
+		/* special */
+		, m_use_gabs(parent, "USE_GABS", true)
+		, m_use_linear_prediction(parent, "USE_LINEAR_PREDICTION", false) // // savings are eaten up by effort
+
+		{}
+
+		param_double_t m_freq;
+		param_double_t m_gs_sor;
+		param_str_t m_method;
+		param_double_t m_accuracy;
+		param_num_t<std::size_t> m_gs_loops;
+		param_double_t m_gmin;
+		param_logic_t  m_pivot;
+		param_int_t m_nr_loops;
+		param_double_t m_nr_recalc_delay;
+		param_int_t m_parallel;
+		param_logic_t  m_dynamic_ts;
+		param_double_t m_dynamic_lte;
+		param_double_t m_dynamic_min_ts;
+		param_enum_t<matrix_sort_type_e> m_sort_type;
+
+		param_logic_t m_use_gabs;
+		param_logic_t m_use_linear_prediction;
+
 		nl_double m_min_timestep;
 		nl_double m_max_timestep;
-		nl_double m_gs_sor;
-		bool m_dynamic_ts;
-		std::size_t m_gs_loops;
-		std::size_t m_nr_loops;
-		netlist_time m_nr_recalc_delay;
-		bool m_use_gabs;
-		bool m_use_linear_prediction;
 	};
 
 
@@ -83,14 +127,6 @@ namespace devices
 	private:
 		analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
 	};
-
-	P_ENUM(matrix_sort_type_e,
-		NOSORT,
-		ASCENDING,
-		DESCENDING,
-		PREFER_IDENTITY_TOP_LEFT,
-		PREFER_BAND_MATRIX
-	)
 
 	class matrix_solver_t : public device_t
 	{
@@ -141,7 +177,7 @@ namespace devices
 	protected:
 
 		matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
-			matrix_sort_type_e sort, const solver_parameters_t *params);
+			const solver_parameters_t *params);
 
 		void sort_terms(matrix_sort_type_e sort);
 
@@ -279,7 +315,6 @@ namespace devices
 		void step(const netlist_time &delta);
 
 		std::size_t m_ops;
-		const matrix_sort_type_e m_sort;
 	};
 
 	template <typename T>

@@ -1015,10 +1015,25 @@ namespace netlist
 	public:
 		param_num_t(device_t &device, const pstring &name, const T val);
 
-		const T operator()() const NL_NOEXCEPT { return m_param; }
+		T operator()() const NL_NOEXCEPT { return m_param; }
+		operator T() const  NL_NOEXCEPT { return m_param; }
+
 		void setTo(const T &param) { set(m_param, param); }
 	private:
 		T m_param;
+	};
+
+	template <typename T>
+	class param_enum_t final: public param_t
+	{
+	public:
+		param_enum_t(device_t &device, const pstring &name, const T val);
+
+		T operator()() const NL_NOEXCEPT { return T(m_param); }
+		operator T() const NL_NOEXCEPT { return T(m_param); }
+		void setTo(const T &param) { set(m_param, static_cast<int>(param)); }
+	private:
+		int m_param;
 	};
 
 	/* FIXME: these should go as well */
@@ -1624,6 +1639,24 @@ namespace netlist
 		}
 		else
 			m_param = val;
+
+		device.state().save(*this, m_param, this->name(), "m_param");
+	}
+
+	template <typename T>
+	param_enum_t<T>::param_enum_t(device_t &device, const pstring &name, const T val)
+	: param_t(device, name), m_param(val)
+	{
+		bool found = false;
+		pstring p = this->get_initial(device, &found);
+		if (found)
+		{
+			T temp(val);
+			bool ok = temp.set_from_string(p);
+			if (!ok)
+				device.state().log().fatal(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
+			m_param = temp;
+		}
 
 		device.state().save(*this, m_param, this->name(), "m_param");
 	}

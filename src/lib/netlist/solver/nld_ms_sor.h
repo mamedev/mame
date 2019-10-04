@@ -30,7 +30,7 @@ public:
 	using float_type = FT;
 
 	matrix_solver_SOR_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_sort_type_e::ASCENDING, params, size)
+		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, params, size)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		, w(size, 0.0)
 		, one_m_w(size, 0.0)

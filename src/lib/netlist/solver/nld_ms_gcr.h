@@ -36,7 +36,7 @@ namespace devices
 
 		matrix_solver_GCR_t(netlist_state_t &anetlist, const pstring &name,
 				const solver_parameters_t *params, const std::size_t size)
-			: matrix_solver_t(anetlist, name, matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT, params)
+			: matrix_solver_t(anetlist, name, params)
 			, m_dim(size)
 			, RHS(size)
 			, new_V(size)

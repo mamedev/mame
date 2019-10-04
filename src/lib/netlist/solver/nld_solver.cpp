@@ -80,7 +80,7 @@ namespace devices
 		/* FIXME: Needs a more elegant solution */
 		bool force_solve = (now < netlist_time::from_double(2 * m_params.m_max_timestep));
 
-		std::size_t nthreads = std::min(static_cast<std::size_t>(m_parallel()), plib::omp::get_max_threads());
+		std::size_t nthreads = std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 
 		std::vector<matrix_solver_t *> &solvers = (force_solve ? m_mat_solvers_all : m_mat_solvers_timestepping);
 
@@ -119,13 +119,13 @@ namespace devices
 	template <typename FT, int SIZE>
 	pool_owned_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 	{
-		if (m_method() == "SOR_MAT")
+		if (m_params.m_method() == "SOR_MAT")
 		{
 			return create_it<matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, m_params, size);
 			//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
 			//return plib::make_unique<solver_sor_mat>(state(), solvername, &m_params, size);
 		}
-		else if (m_method() == "MAT_CR")
+		else if (m_params.m_method() == "MAT_CR")
 		{
 			if (size > 0) // GCR always outperforms MAT solver
 			{
@@ -136,51 +136,32 @@ namespace devices
 				return create_it<matrix_solver_direct_t<FT, SIZE>>(state(), solvername, m_params, size);
 			}
 		}
-		else if (m_method() == "MAT")
+		else if (m_params.m_method() == "MAT")
 		{
 			return create_it<matrix_solver_direct_t<FT, SIZE>>(state(), solvername, m_params, size);
 		}
-		else if (m_method() == "SM")
+		else if (m_params.m_method() == "SM")
 		{
 			/* Sherman-Morrison Formula */
 			return create_it<matrix_solver_sm_t<FT, SIZE>>(state(), solvername, m_params, size);
 		}
-		else if (m_method() == "W")
+		else if (m_params.m_method() == "W")
 		{
 			/* Woodbury Formula */
 			return create_it<matrix_solver_w_t<FT, SIZE>>(state(), solvername, m_params, size);
 		}
-		else if (m_method() == "SOR")
+		else if (m_params.m_method() == "SOR")
 		{
 			return create_it<matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, m_params, size);
 		}
-		else if (m_method() == "GMRES")
+		else if (m_params.m_method() == "GMRES")
 		{
 			return create_it<matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, m_params, size);
 		}
 		else
 		{
-			log().fatal(MF_UNKNOWN_SOLVER_TYPE(m_method()));
+			log().fatal(MF_UNKNOWN_SOLVER_TYPE(m_params.m_method()));
 			return pool_owned_ptr<matrix_solver_t>();
-		}
-	}
-
-	template <typename FT, int SIZE>
-	pool_owned_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver_x(std::size_t size, const pstring &solvername)
-	{
-		if (SIZE > 0)
-		{
-			if (size == SIZE)
-				return create_solver<FT, SIZE>(size, solvername);
-			else
-				return this->create_solver_x<FT, SIZE-1>(size, solvername);
-		}
-		else
-		{
-			if (size * 2 > -SIZE )
-				return create_solver<FT, SIZE>(size, solvername);
-			else
-				return this->create_solver_x<FT, SIZE / 2>(size, solvername);
 		}
 	}
 
@@ -245,22 +226,8 @@ namespace devices
 
 	void NETLIB_NAME(solver)::post_start()
 	{
-		m_params.m_pivot = m_pivot();
-		m_params.m_accuracy = m_accuracy();
-		/* FIXME: Throw when negative */
-		m_params.m_gs_loops = static_cast<unsigned>(m_gs_loops());
-		m_params.m_nr_loops = static_cast<unsigned>(m_nr_loops());
-		m_params.m_nr_recalc_delay = netlist_time::from_double(m_nr_recalc_delay());
-		m_params.m_dynamic_lte = m_dynamic_lte();
-		m_params.m_gs_sor = m_gs_sor();
-
-		m_params.m_min_timestep = m_dynamic_min_ts();
-		m_params.m_dynamic_ts = (m_dynamic_ts() == 1 ? true : false);
-		m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
-
-		m_params.m_use_gabs = m_use_gabs();
-		m_params.m_use_linear_prediction = m_use_linear_prediction();
-
+		m_params.m_min_timestep = m_params.m_dynamic_min_ts();
+		m_params.m_max_timestep = netlist_time::from_double(1.0 / m_params.m_freq()).as_double();
 
 		if (m_params.m_dynamic_ts)
 		{

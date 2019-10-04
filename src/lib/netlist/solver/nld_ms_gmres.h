@@ -37,7 +37,7 @@ namespace devices
 		 */
 		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 			// matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
-				: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT, params, size)
+				: matrix_solver_direct_t<FT, SIZE>(anetlist, name, params, size)
 			, m_ops(size, 0)
 			, m_gmres(size)
 			{
@@ -118,7 +118,7 @@ namespace devices
 
 		const float_type accuracy = this->m_params.m_accuracy;
 
-		auto iter = std::max(plib::constants<std::size_t>::one(), this->m_params.m_gs_loops);
+		auto iter = std::max(plib::constants<std::size_t>::one(), this->m_params.m_gs_loops());
 		auto gsl = m_gmres.solve(m_ops, this->m_new_V, RHS, iter, accuracy);
 
 		this->m_iterative_total += gsl;
