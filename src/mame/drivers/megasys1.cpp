@@ -543,7 +543,7 @@ void megasys1_state::kickoffb_sound_map(address_map &map)
 
 void megasys1_state::p47b_sound_map(address_map &map)
 {
-	kickoffb_sound_map(map)
+	kickoffb_sound_map(map);
 
 	map(0x0a0000, 0x0a0003).noprw(); // OKI1 on the original
 	map(0x0c0000, 0x0c0003).noprw(); // OKI2 on the original
