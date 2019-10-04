@@ -647,11 +647,11 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS                  INIT        COMPANY             FULLNAME                      FLAGS */
-CONS( 1985, mondial,   0,        0,      mondial,   mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, smondial,  0,        0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial (Ver A)",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, smondialb, smondial, 0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial (Ver B)",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, montec,    0,        0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mondial2,  0,        0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, smondial2, 0,        0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, megaiv,    0,        0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, monteciv,  montec,   0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mondial,   0,        0,      mondial,   mondial2,  mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mondial",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, smondial,  0,        0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (Ver A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, smondialb, smondial, 0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (Ver B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, montec,    0,        0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mondial2,  0,        0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, smondial2, 0,        0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, megaiv,    0,        0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, monteciv,  montec,   0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

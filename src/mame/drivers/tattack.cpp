@@ -54,6 +54,7 @@
 #include "screen.h"
 #include "sound/samples.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class tattack_state : public driver_device

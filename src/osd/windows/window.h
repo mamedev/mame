@@ -42,6 +42,14 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+enum class win_window_focus
+{
+	NONE,       // neither this window nor this thread have focus
+	THREAD,     // a window in this thread has focus
+	WINDOW      // this window has focus directly
+};
+
+
 class win_window_info  : public osd_window_t<HWND>
 {
 public:
@@ -51,6 +59,8 @@ public:
 
 	virtual render_target *target() override { return m_target; }
 	int fullscreen() const override { return m_fullscreen; }
+	bool attached_mode() const { return m_attached_mode; }
+	win_window_focus focus() const;
 
 	void update() override;
 
@@ -144,6 +154,7 @@ private:
 #endif
 
 	running_machine &   m_machine;
+	bool                m_attached_mode;
 };
 
 struct osd_draw_callbacks

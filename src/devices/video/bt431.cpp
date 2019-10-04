@@ -118,7 +118,7 @@ void bt431_device::reg_w(u8 data)
 	switch (m_address & 0xf)
 	{
 	case REG_COMMAND:
-		m_command = data;
+		m_command = data & CR_WM;
 		LOG("64x64 cursor %s, cross hair cursor %s, cursor format %s, cross hair thickness %d\n",
 			(data & CR_D6) ? "enable" : "disable",
 			(data & CR_D5) ? "enable" : "disable",
@@ -131,7 +131,7 @@ void bt431_device::reg_w(u8 data)
 		LOG("cursor x low register: 0x%02x\n", data);
 		break;
 	case REG_CURSOR_X_HI:
-		m_cursor_x = ((data & 0xf) << 8) | (m_cursor_x & 0xff);
+		m_cursor_x = (u16(data & 0xf) << 8) | (m_cursor_x & 0xff);
 		LOG("cursor x high register: 0x%02x\n", data);
 		break;
 	case REG_CURSOR_Y_LO:
@@ -139,7 +139,7 @@ void bt431_device::reg_w(u8 data)
 		LOG("cursor y low register: 0x%02x\n", data);
 		break;
 	case REG_CURSOR_Y_HI:
-		m_cursor_y = ((data & 0xf) << 8) | (m_cursor_y & 0xff);
+		m_cursor_y = (u16(data & 0xf) << 8) | (m_cursor_y & 0xff);
 		LOG("cursor y high register: 0x%02x\n", data);
 		break;
 
@@ -148,7 +148,7 @@ void bt431_device::reg_w(u8 data)
 		LOG("window x low register: 0x%02x\n", data);
 		break;
 	case REG_WINDOW_X_HI:
-		m_window_x = ((data & 0xf) << 8) | (m_window_x & 0xff);
+		m_window_x = (u16(data & 0xf) << 8) | (m_window_x & 0xff);
 		LOG("window x high register: 0x%02x\n", data);
 		break;
 	case REG_WINDOW_Y_LO:
@@ -156,7 +156,7 @@ void bt431_device::reg_w(u8 data)
 		LOG("window y low register: 0x%02x\n", data);
 		break;
 	case REG_WINDOW_Y_HI:
-		m_window_y = ((data & 0xf) << 8) | (m_window_y & 0xff);
+		m_window_y = (u16(data & 0xf) << 8) | (m_window_y & 0xff);
 		LOG("window y high register: 0x%02x\n", data);
 		break;
 
@@ -165,7 +165,7 @@ void bt431_device::reg_w(u8 data)
 		LOG("window width low register: 0x%02x\n", data);
 		break;
 	case REG_WINDOW_W_HI:
-		m_window_w = ((data & 0xf) << 8) | (m_window_w & 0xff);
+		m_window_w = (u16(data & 0xf) << 8) | (m_window_w & 0xff);
 		LOG("window width high register: 0x%02x\n", data);
 		break;
 	case REG_WINDOW_H_LO:
@@ -173,7 +173,7 @@ void bt431_device::reg_w(u8 data)
 		LOG("window height low register: 0x%02x\n", data);
 		break;
 	case REG_WINDOW_H_HI:
-		m_window_h = ((data & 0xf) << 8) | (m_window_h & 0xff);
+		m_window_h = (u16(data & 0xf) << 8) | (m_window_h & 0xff);
 		LOG("window height high register: 0x%02x\n", data);
 		break;
 

@@ -34,6 +34,7 @@
 #include "bus/cpc/magicsound.h"
 #include "bus/cpc/doubler.h"
 #include "bus/cpc/transtape.h"
+#include "bus/cpc/musicmachine.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"

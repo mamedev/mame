@@ -134,9 +134,9 @@ void osd_break_into_debugger(const char *message)
 //  get_clipboard_text_by_format
 //============================================================
 
-static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LPCVOID data))
+static bool get_clipboard_text_by_format(std::string &result_text, UINT format, std::string (*convert)(LPCVOID data))
 {
-	char *result = nullptr;
+	bool result = false;
 	HANDLE data_handle;
 	LPVOID data;
 
@@ -155,12 +155,8 @@ static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LP
 				if (data != nullptr)
 				{
 					// invoke the convert
-					std::string s = (*convert)(data);
-
-					// copy the string
-					result = (char *) malloc(s.size() + 1);
-					if (result != nullptr)
-						memcpy(result, s.data(), (s.size() + 1) * sizeof(*result));
+					result_text = (*convert)(data);
+					result = true;
 
 					// unlock the data
 					GlobalUnlock(data_handle);
@@ -196,14 +192,16 @@ static std::string convert_ansi(LPCVOID data)
 //  osd_get_clipboard_text
 //============================================================
 
-char *osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text(void)
 {
-	// try to access unicode text
-	char *result = get_clipboard_text_by_format(CF_UNICODETEXT, convert_wide);
+	std::string result;
 
-	// try to access ANSI text
-	if (result == nullptr)
-		result = get_clipboard_text_by_format(CF_TEXT, convert_ansi);
+	// try to access unicode text
+	if (!get_clipboard_text_by_format(result, CF_UNICODETEXT, convert_wide))
+	{
+		// try to access ANSI text
+		get_clipboard_text_by_format(result, CF_TEXT, convert_ansi);
+	}
 
 	return result;
 }

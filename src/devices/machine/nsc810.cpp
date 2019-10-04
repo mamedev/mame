@@ -8,7 +8,6 @@
  *  TODO:
  *    - 128 byte RAM
  *    - other timer modes (only mode 1 - event counter - is implemented currently)
- *    - port bit set/clear
  *    - and lots of other stuff
  */
 
@@ -232,25 +231,45 @@ void nsc810_device::write(offs_t offset, uint8_t data)
 			LOG("NSC810: Port C direction write %02x\n",data);
 			break;
 		case REG_MODE_DEF:
+			if ((data & 0x01) == 0x00)
+				m_mode = 0;
+			else if ((data & 0x03) == 0x01)
+				m_mode = 1;
+			else if ((data & 0x07) == 0x03)
+				m_mode = 2;
+			else if ((data & 0x07) == 0x07)
+				m_mode = 3;
 			LOG("NSC810: Mode Definition write %02x\n",data);
 			break;
 		case REG_PORTA_BITCLR:
-			LOG("NSC810: Port A bit-clear write %02x\n",data);
+			m_portA_latch &= ~data;
+			m_portA_w((0xff & ~m_ddrA) | (m_portA_latch & m_ddrA));
+			LOG("NSC810: Port A bit-clear write %02x (PA=%02x)\n",data,m_portA_latch);
 			break;
 		case REG_PORTB_BITCLR:
-			LOG("NSC810: Port B bit-clear write %02x\n",data);
+			m_portB_latch &= ~data;
+			m_portB_w((0xff & ~m_ddrB) | (m_portB_latch & m_ddrB));
+			LOG("NSC810: Port B bit-clear write %02x (PB=%02x)\n",data,m_portB_latch);
 			break;
 		case REG_PORTC_BITCLR:
-			LOG("NSC810: Port C bit-clear write %02x\n",data);
+			m_portC_latch &= ~data;
+			m_portC_w((0xff & ~m_ddrC) | (m_portC_latch & m_ddrC));
+			LOG("NSC810: Port C bit-clear write %02x (PC=%02x)\n",data,m_portC_latch);
 			break;
 		case REG_PORTA_BITSET:
-			LOG("NSC810: Port A bit-set write %02x\n",data);
+			m_portA_latch |= data;
+			m_portA_w((0xff & ~m_ddrA) | (m_portA_latch & m_ddrA));
+			LOG("NSC810: Port A bit-set write %02x (PA=%02x)\n",data,m_portA_latch);
 			break;
 		case REG_PORTB_BITSET:
-			LOG("NSC810: Port B bit-set write %02x\n",data);
+			m_portB_latch |= data;
+			m_portB_w((0xff & ~m_ddrB) | (m_portB_latch & m_ddrB));
+			LOG("NSC810: Port B bit-set write %02x (PB=%02x)\n",data,m_portB_latch);
 			break;
 		case REG_PORTC_BITSET:
-			LOG("NSC810: Port C bit-set write %02x\n",data);
+			m_portC_latch |= data;
+			m_portC_w((0xff & ~m_ddrC) | (m_portC_latch & m_ddrC));
+			LOG("NSC810: Port C bit-set write %02x (PC=%02x)\n",data,m_portC_latch);
 			break;
 		case REG_TIMER0_LOW:
 			m_timer0_base = (m_timer0_base & 0xff00) | data;

@@ -245,7 +245,7 @@ WRITE8_MEMBER(xain_state::irqB_clear_w)
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(xain_state::vblank_r)
+READ_LINE_MEMBER(xain_state::vblank_r)
 {
 	return m_vblank;
 }
@@ -425,8 +425,8 @@ static INPUT_PORTS_START( xsleena )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3 )
-	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state, mcu_status_r, nullptr)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state, vblank_r, nullptr)   /* VBLANK */
+	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(xain_state, mcu_status_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xain_state, vblank_r)   // VBLANK
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 

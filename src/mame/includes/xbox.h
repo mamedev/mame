@@ -134,10 +134,6 @@ protected:
 
 	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ohci_usb_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(smbus_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(nv2a_interrupt_changed);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	nv2a_renderer *nvidia_nv2a;

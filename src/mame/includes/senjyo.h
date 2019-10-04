@@ -10,6 +10,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class senjyo_state : public driver_device
 {

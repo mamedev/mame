@@ -3,8 +3,6 @@
 
 #include "pchrono.h"
 
-#include <chrono>
-
 namespace plib {
 namespace chrono {
 #if defined(__x86_64__) &&  !defined(_clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))

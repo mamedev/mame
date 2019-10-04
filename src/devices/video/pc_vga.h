@@ -620,6 +620,7 @@ protected:
 		uint8_t cr3a;
 		uint8_t cr42;
 		uint8_t cr43;
+		uint8_t cr51;
 		uint8_t cr53;
 		uint8_t id_high;
 		uint8_t id_low;

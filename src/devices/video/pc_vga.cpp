@@ -2722,6 +2722,9 @@ uint8_t s3_vga_device::s3_crtc_reg_read(uint8_t index)
 				res |= ((svga.bank_w & 0x30) >> 2);
 				res |= ((vga.crtc.offset & 0x0300) >> 4);
 				break;
+			case 0x53:
+				res = s3.cr53;
+				break;
 			case 0x55:
 				res = s3.extended_dac_ctrl;
 				break;

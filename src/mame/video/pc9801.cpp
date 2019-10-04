@@ -448,15 +448,20 @@ READ16_MEMBER(pc9801_state::tvram_r)
 	if((offset & 0x1000) && (mem_mask == 0xff00))
 		return 0xffff;
 
-	res = m_tvram[offset];
+	if(offset < (0x3fe2>>1))
+		res = m_tvram[offset];
+	else
+		res = m_memsw->read(offset & 0xf);
 
 	return res;
 }
 
 WRITE16_MEMBER(pc9801_state::tvram_w)
 {
-	if(offset < (0x3fe2>>1) || m_video_ff[MEMSW_REG])
+	if(offset < (0x3fe2>>1))
 		COMBINE_DATA(&m_tvram[offset]);
+	else if(m_video_ff[MEMSW_REG] && ACCESSING_BITS_0_7)
+		m_memsw->write(offset & 0x0f, data & 0xff);
 
 	COMBINE_DATA(&m_video_ram_1[offset]); //TODO: check me
 }

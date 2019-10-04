@@ -15,6 +15,7 @@
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 

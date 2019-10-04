@@ -246,7 +246,7 @@ protected:
 	unsigned m_destination;
 	int m_ICount;
 	int m_cpu_type;
-	uint8_t m_rw8_cycles, m_rw16_cycles, m_rw24_cycles;
+	uint8_t m_divider;
 	uint32_t m_debugger_temp;
 
 	/* 5A22 specific registers */

@@ -27815,6 +27815,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>ナツメ (Natsume)</publisher>
 		<info name="alt_title" value="魔浄理子 淫靡界 インビゾーン" />
 		<info name="release" value="198907xx" />
+		<info name="usage" value="Set MEMSW4 to $08 otherwise sound fails to detect during boot" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">

@@ -314,7 +314,7 @@ template<bool sub1> WRITE16_MEMBER(polepos_state::z8002_nvi_enable_w)
 		(sub1 ? m_subcpu : m_subcpu2)->set_input_line(z8002_device::NVI_LINE, CLEAR_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
+READ_LINE_MEMBER(polepos_state::auto_start_r)
 {
 	return m_auto_start_mask;
 }
@@ -477,7 +477,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,auto_start_r, nullptr)  // start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(polepos_state, auto_start_r)  // start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )

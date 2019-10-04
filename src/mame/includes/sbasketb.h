@@ -12,6 +12,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class sbasketb_state : public driver_device
 {

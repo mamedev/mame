@@ -11,6 +11,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class compgolf_state : public driver_device
 {

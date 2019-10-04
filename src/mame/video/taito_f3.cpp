@@ -227,7 +227,7 @@ struct F3config
 	int sprite_lag;
 };
 
-static const struct F3config f3_config_table[] =
+static const F3config f3_config_table[] =
 {
 	/* Name    Extend  Lag */
 	{ RINGRAGE,  0,     2 },
@@ -459,7 +459,7 @@ WRITE_LINE_MEMBER(taito_f3_state::screen_vblank)
 
 void taito_f3_state::video_start()
 {
-	const struct F3config *pCFG = &f3_config_table[0];
+	const F3config *pCFG = &f3_config_table[0];
 
 	m_alpha_level_2as = 127;
 	m_alpha_level_2ad = 127;
@@ -552,12 +552,12 @@ void taito_f3_state::video_start()
 	}
 
 	m_spriteram16_buffered = std::make_unique<u16[]>(0x10000 / 2);
-	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x400);
-	m_sprite_end = m_spritelist;
+	m_spritelist = std::make_unique<tempsprite[]>(0x400);
+	m_sprite_end = &m_spritelist[0];
 	m_vram_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info_text), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_pixel_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info_pixel), this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
-	m_pf_line_inf = auto_alloc_array(machine(), struct f3_playfield_line_inf, 5);
-	m_sa_line_inf = auto_alloc_array(machine(), struct f3_spritealpha_line_inf, 1);
+	m_pf_line_inf = std::make_unique<f3_playfield_line_inf[]>(5);
+	m_sa_line_inf = std::make_unique<f3_spritealpha_line_inf[]>(1);
 	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
 	m_tile_opaque_sp = std::make_unique<u8[]>(m_gfxdecode->gfx(2)->elements());
 	for (int i = 0; i < 8; i++)
@@ -1276,7 +1276,7 @@ void taito_f3_state::init_alpha_blend_func()
 
 #define GET_PIXMAP_POINTER(pf_num) \
 { \
-	const struct f3_playfield_line_inf *line_tmp = line_t[pf_num]; \
+	const f3_playfield_line_inf *line_tmp = line_t[pf_num]; \
 	m_src[pf_num] = line_tmp->src[y]; \
 	m_src_s[pf_num] = line_tmp->src_s[y]; \
 	m_src_e[pf_num] = line_tmp->src_e[y]; \
@@ -1331,7 +1331,7 @@ void taito_f3_state::init_alpha_blend_func()
 
 inline void taito_f3_state::draw_scanlines(
 							bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num,
-							const struct f3_playfield_line_inf **line_t,
+							const f3_playfield_line_inf **line_t,
 							const int *sprite,
 							u32 orient,
 							int skip_layer_num)
@@ -1449,7 +1449,7 @@ inline void taito_f3_state::draw_scanlines(
 /******************************************************************************/
 
 void taito_f3_state::visible_tile_check(
-						struct f3_playfield_line_inf *line_t,
+						f3_playfield_line_inf *line_t,
 						int line,
 						u32 x_index_fx,u32 y_index,
 						u16 *pf_data_n)
@@ -1521,7 +1521,7 @@ void taito_f3_state::visible_tile_check(
 
 void taito_f3_state::calculate_clip(int y, u16 pri, u32 *clip0, u32 *clip1, int *line_enable)
 {
-	const struct f3_spritealpha_line_inf *sa_line_t = &m_sa_line_inf[0];
+	const f3_spritealpha_line_inf *sa_line_t = &m_sa_line_inf[0];
 
 	switch (pri)
 	{
@@ -1625,7 +1625,7 @@ void taito_f3_state::calculate_clip(int y, u16 pri, u32 *clip0, u32 *clip1, int 
 
 void taito_f3_state::get_spritealphaclip_info()
 {
-	struct f3_spritealpha_line_inf *line_t = &m_sa_line_inf[0];
+	f3_spritealpha_line_inf *line_t = &m_sa_line_inf[0];
 
 	int y, y_end, y_inc;
 
@@ -1722,7 +1722,7 @@ void taito_f3_state::get_spritealphaclip_info()
 /* sx and sy are 16.16 fixed point numbers */
 void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, u16 *pf_data_n)
 {
-	struct f3_playfield_line_inf *line_t = &m_pf_line_inf[pos];
+	f3_playfield_line_inf *line_t = &m_pf_line_inf[pos];
 
 	int y_start, y_end, y_inc;
 	int line_base, zoom_base, col_base, pri_base, inc;
@@ -1925,8 +1925,8 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 
 void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy)
 {
-	const struct f3_spritealpha_line_inf *sprite_alpha_line_t = &m_sa_line_inf[0];
-	struct f3_playfield_line_inf *line_t = &m_pf_line_inf[4];
+	const f3_spritealpha_line_inf *sprite_alpha_line_t = &m_sa_line_inf[0];
+	f3_playfield_line_inf *line_t = &m_pf_line_inf[4];
 
 	int y_start, y_end, y_inc;
 	int pri_base, inc;
@@ -2075,11 +2075,11 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 		u8 sprite_alpha_check;
 		u8 sprite_alpha_all_2a;
 		int layer_tmp[5];
-		struct f3_playfield_line_inf *pf_line_inf = m_pf_line_inf;
-		struct f3_spritealpha_line_inf *sa_line_inf = m_sa_line_inf;
+		f3_playfield_line_inf *pf_line_inf = m_pf_line_inf.get();
+		f3_spritealpha_line_inf *sa_line_inf = m_sa_line_inf.get();
 		int count_skip_layer = 0;
 		int sprite[6] = {0, 0, 0, 0, 0, 0};
-		const struct f3_playfield_line_inf *line_t[5];
+		const f3_playfield_line_inf *line_t[5];
 
 		/* find same status of scanlines */
 		pri[0] = pf_line_inf[0].pri[y_start];
@@ -2735,7 +2735,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 
 	int x_addition_left = 8, y_addition_left = 8;
 
-	struct tempsprite *sprite_ptr = m_spritelist;
+	tempsprite *sprite_ptr = &m_spritelist[0];
 
 	int total_sprites = 0;
 
@@ -3008,7 +3008,7 @@ void taito_f3_state::get_sprite_info(const u16 *spriteram16_ptr)
 
 void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const struct tempsprite *sprite_ptr;
+	const tempsprite *sprite_ptr;
 	gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
 
 	sprite_ptr = m_sprite_end;
@@ -3017,7 +3017,7 @@ void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	// if sprites use more than 4bpp, the bottom bits of the color code must be masked out.
 	// This fixes (at least) stage 1 battle ships and attract mode explosions in Ray Force.
 
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != &m_spritelist[0])
 	{
 		sprite_ptr--;
 

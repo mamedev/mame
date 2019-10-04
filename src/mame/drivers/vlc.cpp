@@ -135,6 +135,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(16'000'000)

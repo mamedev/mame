@@ -19,7 +19,7 @@
  *
  *************************************/
 
-VIDEO_START_MEMBER(x1_state,x1)
+void x1_state::video_start()
 {
 	m_gfx_bitmap_ram = make_unique_clear<uint8_t[]>(0xc000*2);
 	m_bitmapbank->configure_entries(0, 2, m_gfx_bitmap_ram.get(), 0xc000);

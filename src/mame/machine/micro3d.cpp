@@ -133,7 +133,7 @@ void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		mac_done_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in micro3d_state::device_timer");
+		throw emu_fatalerror("Unknown id in micro3d_state::device_timer");
 	}
 }
 
@@ -370,7 +370,7 @@ READ8_MEMBER( micro3d_state::adc_volume_r )
 	return (uint8_t)((255.0/100.0) * m_volume->read() + 0.5);
 }
 
-CUSTOM_INPUT_MEMBER(micro3d_state::botss_hwchk_r)
+READ_LINE_MEMBER(micro3d_state::botss_hwchk_r)
 {
 	return m_botss_latch;
 }

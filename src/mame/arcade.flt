@@ -262,6 +262,7 @@ crgolf.cpp
 crimfght.cpp
 cromptons.cpp
 crospang.cpp
+crospuzl.cpp
 crshrace.cpp
 crystal.cpp
 csplayh5.cpp
@@ -298,6 +299,7 @@ ddenlovr.cpp
 ddragon.cpp
 ddragon3.cpp
 ddribble.cpp
+ddz.cpp
 de_2.cpp
 de_3.cpp
 de_3b.cpp
@@ -724,6 +726,7 @@ megasys1.cpp
 megatech.cpp
 megazone.cpp
 meijinsn.cpp
+menghong.cpp
 mephistp.cpp
 merit.cpp
 merit3xx.cpp
@@ -741,6 +744,7 @@ mgavegas.cpp
 mgolf.cpp
 mhavoc.cpp
 micro3d.cpp
+microdar.cpp
 micropin.cpp
 midas.cpp
 midqslvr.cpp
@@ -936,6 +940,7 @@ plygonet.cpp
 pntnpuzl.cpp
 pokechmp.cpp
 poker72.cpp
+pokerout.cpp
 polepos.cpp
 policetr.cpp
 polyplay.cpp
@@ -953,6 +958,7 @@ ppmast93.cpp
 prehisle.cpp
 proconn.cpp
 progolf.cpp
+psattack.cpp
 pse.cpp
 psikyo.cpp
 psikyo4.cpp
@@ -1121,6 +1127,7 @@ slotcarn.cpp
 smsmcorp.cpp
 sms_bootleg.cpp
 snesb.cpp
+snesb51.cpp
 snk.cpp
 snk6502.cpp
 snk68.cpp
@@ -1289,6 +1296,7 @@ trackfld.cpp
 travrusa.cpp
 triforce.cpp
 triplhnt.cpp
+trivrus.cpp
 truco.cpp
 trucocl.cpp
 trvmadns.cpp

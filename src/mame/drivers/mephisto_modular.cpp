@@ -1,36 +1,45 @@
 // license:LGPL-2.1+
 // copyright-holders:Dirk Verwiebe, Cowering, Sandro Ronco
 /******************************************************************************
- Mephisto Chess Computers using plugin modules
 
- (most of the magnetic sensor versions with 680x0 family modules)
+Hegener + Glaser Mephisto Chess Computers using plugin modules
 
- Almeria 68000 12Mhz
- Almeria 68020 12Mhz
- Portorose 68000 12Mhz
- Portorose 68020 12Mhz
- Lyon 68000 12Mhz
- Lyon 68020 12Mhz
- Vancouver 68000 12Mhz
- Vancouver 68020 12Mhz
- Genius 68030 V4.00 33.333 Mhz
- Genius 68030 V4.01 33.333 Mhz
- Berlin Pro 68020 24.576 Mhz (not modular board, but otherwise close to milano)
- Berlin Pro (London) 68020 24.576 Mhz (not modular board, but otherwise close to milano)
- London 68030 V5.00k 33.333 Mhz (probably the Genius 3/4 update ROM)
+(most of the magnetic sensor versions with 680x0 family modules)
+After Roma, H+G started naming the different versions 16 Bit/32 Bit instead of 68000/68020.
+With Genius and the TM versions, they still applied "68030".
 
- Notes by Cowering (2011)
+Almeria 16 Bit 12Mhz
+Almeria 32 Bit 12Mhz
+Portorose 16 Bit 12Mhz
+Portorose 32 Bit 12Mhz
+Lyon 16 Bit 12Mhz
+Lyon 32 Bit 12Mhz
+Vancouver 16 Bit 12Mhz
+Vancouver 32 Bit 12Mhz
+Genius 68030 V4.00 33.333 Mhz
+Genius 68030 V4.01 33.333 Mhz
+Berlin Pro 68020 24.576 Mhz (not modular board, but otherwise close to milano)
+Berlin Pro (London) 68020 24.576 Mhz (not modular board, but otherwise close to milano)
+London 68030 V5.00k 33.333 Mhz (probably the Genius 3/4 update ROM)
 
- TODO:   add Bavaria sensor support (unknown1,2,3 handlers in current driver)
-         proper 'bezel' for all games/cpuspeeds so 'Vancouver' does not say 'Almeria', etc
-         custom handler to read/write the Battery RAM so 68000 can share files with 020/030 (real modular machine can do this)
-         add the missing machines.. including the very rare overclocked 'TM' Tournament Machines
-         match I/S= diag speed test with real hardware (good test for proper waitstates)
-         remove gen32/lond030 ROM patch
+The London program (1994 competition) is not a dedicated module, but an EPROM upgrade
+released by Richard Lang for Almeria, Lyon, Portorose and Vancouver modules, and also
+available as upgrades for Berlin/Berlin Pro and Genius.
+No Mephisto modules were released anymore after Saitek took over H+G, engine is assumed
+to be same as Saitek's 1996 Mephisto London 68030 (limited release TM version).
 
- Undocumented buttons: holding ENTER and LEFT cursor on cold boot runs diagnostics on modular 680x0 boards
-                       holding UP and RIGHT cursor will clear the Battery Backed RAM on modular 680x0 boards
-                       holding CLEAR clears Battery Backed RAM on the Berlin (Pro) 68020
+TODO:
+- add Bavaria sensor support (unknown1,2,3 handlers in current driver)
+- custom handler to read/write the Battery RAM so 68000 can share files with 020/030 (real modular machine can do this)
+- add the missing machines.. including the very rare overclocked 'TM' Tournament Machines
+- match I/S= diag speed test with real hardware (good test for proper waitstates)
+- remove gen32/gen32l ROM patch
+- move berlin to its own driver file
+
+Undocumented buttons:
+- holding ENTER and LEFT cursor on cold boot runs diagnostics on modular 680x0 boards
+- holding UP and RIGHT cursor will clear the Battery Backed RAM on modular 680x0 boards
+- holding CLEAR clears Battery Backed RAM on the Berlin (Pro) 68020
 
 ******************************************************************************/
 
@@ -368,7 +377,10 @@ ROM_END
 
 ROM_START( port32 )
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD("port32.bin", 0x00000, 0x20000, CRC(405bd668) SHA1(8c6eacff7f6784fa1d38344d594c7e52ac828a23))
+	ROM_SYSTEM_BIOS( 0, "v103", "V1.03" )
+	ROMX_LOAD("portorose_32bit_v103", 0x00000, 0x20000, CRC(02c091b3) SHA1(f1d48e73b24093288dbb8a06617bb62420c07508), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "v101", "V1.01" )
+	ROMX_LOAD("portorose_32bit_v101", 0x00000, 0x20000, CRC(405bd668) SHA1(8c6eacff7f6784fa1d38344d594c7e52ac828a23), ROM_BIOS(1))
 ROM_END
 
 ROM_START( gen32 )
@@ -377,6 +389,11 @@ ROM_START( gen32 )
 	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v40", "V4.0" )
 	ROMX_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6cc4da88) SHA1(ea72acf9c67ed17c6ac8de56a165784aa629c4a1), ROM_BIOS(1))
+ROM_END
+
+ROM_START( gen32l )
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD("gen32l.bin", 0x00000, 0x40000, CRC(853baa4e) SHA1(946951081d4e91e5bdd9e93d0769568a7fe79bad))
 ROM_END
 
 ROM_START( van16 )
@@ -390,14 +407,15 @@ ROM_START( van32 )
 	ROM_LOAD("vanc32.bin", 0x00000, 0x40000, CRC(f872beb5) SHA1(9919f207264f74e2b634b723b048ae9ca2cefbc7))
 ROM_END
 
-ROM_START( lond020 )
-	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("lond020.bin", 0x00000, 0x40000, CRC(3225b8da) SHA1(fd8f6f4e9c03b6cdc86d8405e856c26041bfad12))
+ROM_START( lond16 )
+	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("london_program_68000_module_even", 0x00000, 0x20000, CRC(68cfc2de) SHA1(93b551180f01f8ed6991c082795cd9ead922179a))
+	ROM_LOAD16_BYTE("london_program_68000_module_odd",  0x00001, 0x20000, CRC(2d75e2cf) SHA1(2ec9222c95f4be9667fb3b4be1b6f90fd4ad11c4))
 ROM_END
 
-ROM_START( lond030 )
+ROM_START( lond32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("lond030.bin", 0x00000, 0x40000, CRC(853baa4e) SHA1(946951081d4e91e5bdd9e93d0769568a7fe79bad))
+	ROM_LOAD("london_program_68020_module", 0x00000, 0x40000, CRC(3225b8da) SHA1(fd8f6f4e9c03b6cdc86d8405e856c26041bfad12))
 ROM_END
 
 ROM_START( lyon16 )
@@ -438,21 +456,22 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY             FULLNAME                                FLAGS */
-CONS( 1988, alm16,   0,       0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Almeria 68000",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, alm32,   0,       0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Almeria 68020",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port16,  alm16,   0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Portorose 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32,  alm32,   0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Portorose 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon16,  alm16,   0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Lyon 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon32,  alm32,   0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Lyon 68020",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van16,   alm16,   0,      van16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Vancouver 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van32,   alm32,   0,      van32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Vancouver 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, gen32,   0,       0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener & Glaser", "Mephisto Genius 68030",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, lond020, alm32,   0,      van32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto London 68020",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, lond030, gen32,   0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener & Glaser", "Mephisto Genius 68030 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY             FULLNAME                     FLAGS */
+CONS( 1988, alm32,   0,       0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, alm16,   alm32,   0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32,  0,       0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port16,  port32,  0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon32,  0,       0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon16,  lyon32,  0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van32,   0,       0,      van32,   alm32,   mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van16,   van32,   0,      van16,   alm16,   mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, gen32,   0,       0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener + Glaser", "Mephisto Genius 68030",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, gen32l,  gen32,   0,      gen32,   gen32,   mmodular_state, init_gen32, "Richard Lang",     "Mephisto Genius 68030 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, lond32,  0,       0,      van32,   alm32,   mmodular_state, empty_init, "Richard Lang",     "Mephisto London 32 Bit",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
+CONS( 1996, lond16,  lond32,  0,      van16,   alm16,   mmodular_state, empty_init, "Richard Lang",     "Mephisto London 16 Bit",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16
 
 // not modular boards
-CONS( 1992, berl16,  0,       0,      berl16,  berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin 68000",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1994, berlinp, 0,       0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro 68020",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, berl16l, berl16,  0,      berl16,  berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin 68000 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, bpl32,   berlinp, 0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro London Upgrade",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, berl16,  0,       0,      berl16,  berlinp, berlinp_state,  empty_init, "Hegener + Glaser", "Mephisto Berlin 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1994, berlinp, 0,       0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, berl16l, berl16,  0,      berl16,  berlinp, berlinp_state,  empty_init, "Richard Lang",     "Mephisto Berlin 68000 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, bpl32,   berlinp, 0,      berlinp, berlinp, berlinp_state,  empty_init, "Richard Lang",     "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )

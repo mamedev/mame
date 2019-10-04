@@ -98,7 +98,7 @@ READ8_MEMBER(pecom_state::pecom_keyboard_r)
 	   used to determine keyboard line reading
 	*/
 	uint16_t addr = m_cdp1802->state_int(cosmac_device::COSMAC_R0 + m_cdp1802->state_int(cosmac_device::COSMAC_X));
-	/* just in case somone is reading non existing ports */
+	/* just in case someone is reading non existing ports */
 	if (addr<0x7cca || addr>0x7ce3) return 0;
 	return m_io_ports[addr - 0x7cca]->read() & 0x03;
 }

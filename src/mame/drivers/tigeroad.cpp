@@ -785,7 +785,7 @@ void pushman_state::bballs(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( tigeroad ) /* ECT program roms */
+ROM_START( tigeroad ) /* N86614A-5 + N86614B-6 board combo - ECT program roms */
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 256K for 68000 code */
 	ROM_LOAD16_BYTE( "tre_02.6j", 0x00000, 0x20000, CRC(c394add0) SHA1(f71cceca92ed7d2211f508df9ddfa97e0dd28d11) ) /* Blue ink underline */
 	ROM_LOAD16_BYTE( "tre_04.6k", 0x00001, 0x20000, CRC(73bfbf4a) SHA1(821af477953f7a64f4f1b09e8978fb2bce4138ff) ) /* Blue ink underline */
@@ -793,6 +793,8 @@ ROM_START( tigeroad ) /* ECT program roms */
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "tru_05.12k", 0x0000, 0x8000, CRC(f9a7c9bf) SHA1(4d37c71aa6523ac21c6e8b23f9957e75ec4304bf) ) /* Red ink underline */
 
+	/* i8751 microcontroller not populated */
+
 	/* no samples player in the English version */
 
 	ROM_REGION( 0x008000, "text", 0 )
@@ -821,7 +823,7 @@ ROM_START( tigeroad ) /* ECT program roms */
 	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) - N82S129A or compatible */
 ROM_END
 
-ROM_START( tigeroadu ) /* US ROMSTAR program roms */
+ROM_START( tigeroadu ) /* N86614A-5 + N86614B-6 board combo - US ROMSTAR program roms */
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 256K for 68000 code */
 	ROM_LOAD16_BYTE( "tru_02.6j", 0x00000, 0x20000, CRC(8d283a95) SHA1(eb6c9225f79f62c22ae1e8980a557d896f598947) ) /* Red ink underline */
 	ROM_LOAD16_BYTE( "tru_04.6k", 0x00001, 0x20000, CRC(72e2ef20) SHA1(57ab7df2050042690ccfb1f2d170840f926dcf46) ) /* Red ink underline */
@@ -829,6 +831,8 @@ ROM_START( tigeroadu ) /* US ROMSTAR program roms */
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "tru_05.12k", 0x0000, 0x8000, CRC(f9a7c9bf) SHA1(4d37c71aa6523ac21c6e8b23f9957e75ec4304bf) ) /* Red ink underline */
 
+	/* i8751 microcontroller not populated */
+
 	/* no samples player in the English version */
 
 	ROM_REGION( 0x008000, "text", 0 )
@@ -857,13 +861,15 @@ ROM_START( tigeroadu ) /* US ROMSTAR program roms */
 	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) - N82S129A or compatible */
 ROM_END
 
-ROM_START( toramich )
+ROM_START( toramich ) /* N86614A-5 + N86614B-6 board combo */
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 256K for 68000 code */
 	ROM_LOAD16_BYTE( "tr_02.6j", 0x00000, 0x20000, CRC(b54723b1) SHA1(dfad82e96dff072c967dd59e3db71fb3b43b6dcb) )
 	ROM_LOAD16_BYTE( "tr_04.6k", 0x00001, 0x20000, CRC(ab432479) SHA1(b8ec547f7bab67107a7c83931c7ed89142a7af69) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "tr_05.12k", 0x0000, 0x8000, CRC(3ebe6e62) SHA1(6f5708b6ff8c91bc706f73300e0785f15999d570) )
+
+	/* i8751 microcontroller not populated */
 
 	ROM_REGION( 0x10000, "sample", 0 ) /* samples player */
 	ROM_LOAD( "tr_03.11j", 0x0000, 0x10000, CRC(ea1807ef) SHA1(f856e7b592c6df81586821284ea2220468c5ea9d) )
@@ -933,39 +939,39 @@ ROM_START( tigeroadb )
 	ROM_LOAD( "trprom.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
 ROM_END
 
-ROM_START( f1dream )
+ROM_START( f1dream ) /* N86614A-5 + N86614B-6 board combo */
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 256K for 68000 code */
-	ROM_LOAD16_BYTE( "06j_02.bin",   0x00000, 0x20000, CRC(3c2ec697) SHA1(bccb431ad92455484420f91770e91db6d69b09ec) )
-	ROM_LOAD16_BYTE( "06k_03.bin",   0x00001, 0x20000, CRC(85ebad91) SHA1(000f5c617417ff20ee9b378166776fecfacdff95) )
+	ROM_LOAD16_BYTE( "f1_02.6j", 0x00000, 0x20000, CRC(3c2ec697) SHA1(bccb431ad92455484420f91770e91db6d69b09ec) )
+	ROM_LOAD16_BYTE( "f1_03.6k", 0x00001, 0x20000, CRC(85ebad91) SHA1(000f5c617417ff20ee9b378166776fecfacdff95) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU */
-	ROM_LOAD( "12k_04.bin",   0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
+	ROM_LOAD( "f1_04.12k", 0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "8751.mcu",     0x0000, 0x1000, CRC(c8e6075c) SHA1(d98bd358d30d22a8009cd2728dde1871a8140c23) )
+	ROM_LOAD( "f1.9j", 0x0000, 0x1000, CRC(c8e6075c) SHA1(d98bd358d30d22a8009cd2728dde1871a8140c23) ) /* labeled F1 */
 
 	ROM_REGION( 0x008000, "text", 0 )
-	ROM_LOAD( "10d_01.bin",   0x00000, 0x08000, CRC(361caf00) SHA1(8a109e4e116d0c5eea86f9c57c05359754daa5b9) ) /* 8x8 text */
+	ROM_LOAD( "f1_01.10d", 0x00000, 0x08000, CRC(361caf00) SHA1(8a109e4e116d0c5eea86f9c57c05359754daa5b9) ) /* 8x8 text */
 
 	ROM_REGION( 0x060000, "tiles", 0 )
-	ROM_LOAD( "03f_12.bin",   0x00000, 0x10000, CRC(bc13e43c) SHA1(f9528839858d7a45395062a43b71d80400c73173) ) /* tiles */
-	ROM_LOAD( "01f_10.bin",   0x10000, 0x10000, CRC(f7617ad9) SHA1(746a0ec433d5246ac4dbae17d6498e3d154e2df1) )
-	ROM_LOAD( "03h_14.bin",   0x20000, 0x10000, CRC(e33cd438) SHA1(89a6faea19e8a01b38ba45413609603e559877e9) )
-	ROM_LOAD( "02f_11.bin",   0x30000, 0x10000, CRC(4aa49cd7) SHA1(b7052d51a3cb570299f4db1492a1293c4d8b067f) )
-	ROM_LOAD( "17f_09.bin",   0x40000, 0x10000, CRC(ca622155) SHA1(00ae4a8e9cad2c42a10b410b594b0e414ada6cfe) )
-	ROM_LOAD( "02h_13.bin",   0x50000, 0x10000, CRC(2a63961e) SHA1(a35e9bf0408716f460487a8d2ae336572a98d2fb) )
+	ROM_LOAD( "f1_12.3f",  0x00000, 0x10000, CRC(bc13e43c) SHA1(f9528839858d7a45395062a43b71d80400c73173) ) /* tiles */
+	ROM_LOAD( "f1_10.1f",  0x10000, 0x10000, CRC(f7617ad9) SHA1(746a0ec433d5246ac4dbae17d6498e3d154e2df1) )
+	ROM_LOAD( "f1_14.3h",  0x20000, 0x10000, CRC(e33cd438) SHA1(89a6faea19e8a01b38ba45413609603e559877e9) )
+	ROM_LOAD( "f1_11.2f",  0x30000, 0x10000, CRC(4aa49cd7) SHA1(b7052d51a3cb570299f4db1492a1293c4d8b067f) )
+	ROM_LOAD( "f1_09.17f", 0x40000, 0x10000, CRC(ca622155) SHA1(00ae4a8e9cad2c42a10b410b594b0e414ada6cfe) )
+	ROM_LOAD( "f1_13.2h",  0x50000, 0x10000, CRC(2a63961e) SHA1(a35e9bf0408716f460487a8d2ae336572a98d2fb) )
 
 	ROM_REGION( 0x040000, "spritegen", 0 )
-	ROM_LOAD32_BYTE( "03b_06.bin",   0x00003, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
-	ROM_LOAD32_BYTE( "02b_05.bin",   0x00002, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
-	ROM_LOAD32_BYTE( "03d_08.bin",   0x00001, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
-	ROM_LOAD32_BYTE( "02d_07.bin",   0x00000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
+	ROM_LOAD32_BYTE( "f1_06.3b", 0x00003, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
+	ROM_LOAD32_BYTE( "f1_05.2b", 0x00002, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
+	ROM_LOAD32_BYTE( "f1_08.3d", 0x00001, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
+	ROM_LOAD32_BYTE( "f1_07.2d", 0x00000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
 
 	ROM_REGION( 0x08000, "bgmap", 0 )    /* background tilemaps */
-	ROM_LOAD( "07l_15.bin",   0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
+	ROM_LOAD( "f1_15.7l", 0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "09e_tr.bin",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) )    /* priority (not used) */
+	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) /* priority (not used) - N82S129A or compatible */
 ROM_END
 
 ROM_START( f1dreamb )

@@ -752,13 +752,8 @@ void osd_break_into_debugger(const char *message);
 
 /*-----------------------------------------------------------------------------
     osd_get_clipboard_text: retrieves text from the clipboard
-
-    Return value:
-
-        the returned string needs to be osd_free()-ed!
-
 -----------------------------------------------------------------------------*/
-char *osd_get_clipboard_text(void);
+std::string osd_get_clipboard_text(void);
 
 
 /***************************************************************************
@@ -1052,5 +1047,8 @@ std::vector<std::string> osd_get_command_line(int argc, char *argv[]);
 #undef printf
 #define printf !MUST_USE_osd_printf_*_CALLS_WITHIN_THE_CORE!
 */
+
+// specifies "aggressive focus" - should MAME capture input for any windows co-habiting a MAME window?
+void osd_set_aggressive_input_focus(bool aggressive_focus);
 
 #endif // MAME_OSD_OSDCORE_H

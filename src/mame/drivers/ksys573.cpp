@@ -466,8 +466,8 @@ public:
 	void init_drmn();
 
 	DECLARE_CUSTOM_INPUT_MEMBER( gn845pwbb_read );
-	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_tank_shutter_sensor );
-	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_cable_holder_sensor );
+	DECLARE_READ_LINE_MEMBER( gunmania_tank_shutter_sensor );
+	DECLARE_READ_LINE_MEMBER( gunmania_cable_holder_sensor );
 
 	DECLARE_READ_LINE_MEMBER( h8_d0_r );
 	DECLARE_READ_LINE_MEMBER( h8_d1_r );
@@ -2026,7 +2026,7 @@ WRITE16_MEMBER( ksys573_state::gunmania_w )
 	verboselog( 2, "gunmania_w %08x %08x %08x\n", offset, mem_mask, data );
 }
 
-CUSTOM_INPUT_MEMBER( ksys573_state::gunmania_tank_shutter_sensor )
+READ_LINE_MEMBER( ksys573_state::gunmania_tank_shutter_sensor )
 {
 	if( m_tank_shutter_position == 0 )
 	{
@@ -2036,7 +2036,7 @@ CUSTOM_INPUT_MEMBER( ksys573_state::gunmania_tank_shutter_sensor )
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER( ksys573_state::gunmania_cable_holder_sensor )
+READ_LINE_MEMBER( ksys573_state::gunmania_cable_holder_sensor )
 {
 	return m_cable_holder_release;
 }
@@ -2713,7 +2713,7 @@ static INPUT_PORTS_START( ddr )
 	PORT_INCLUDE( konami573 )
 
 	PORT_MODIFY( "IN2" )
-	PORT_BIT( 0x00000f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER( DEVICE_SELF, ksys573_state,gn845pwbb_read, nullptr )
+	PORT_BIT( 0x00000f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER( ksys573_state, gn845pwbb_read )
 
 	PORT_START( "STAGE" )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_PLAYER( 1 )
@@ -2873,11 +2873,11 @@ static INPUT_PORTS_START( gunmania )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER( 1 ) PORT_NAME( "Bullet Tube-1 Sensor" )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER( 1 ) PORT_NAME( "Bullet Tube-2 Sensor" )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER( 1 ) PORT_NAME( "Safety Sensor Under" )
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER( DEVICE_SELF,ksys573_state,gunmania_tank_shutter_sensor, nullptr )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ksys573_state, gunmania_tank_shutter_sensor)
 
 	PORT_MODIFY( "IN3" )
 	PORT_BIT( 0x0d000b00, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER( DEVICE_SELF,ksys573_state,gunmania_cable_holder_sensor, nullptr )
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ksys573_state, gunmania_cable_holder_sensor)
 
 	PORT_START( "GUNX" )
 	PORT_BIT( 0x7f, 0x2f, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_MINMAX( 0x00,0x5f ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 15 ) PORT_PLAYER( 1 )

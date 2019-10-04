@@ -89,7 +89,7 @@ public:
 	void init_argh();
 
 	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
+	template <int Coin> DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
 	DECLARE_WRITE8_MEMBER(arcadia_cia_0_portb_w);
 
@@ -162,18 +162,17 @@ WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
  *
  *************************************/
 
+template <int Coin>
 CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 {
-	int coin = (uintptr_t)param;
-
 	/* return coin counter values */
-	return m_coin_counter[coin] & 3;
+	return m_coin_counter[Coin] & 3;
 }
 
 
 INPUT_CHANGED_MEMBER(arcadia_amiga_state::coin_changed_callback)
 {
-	int coin = (uintptr_t)param;
+	int coin = param;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval && m_coin_counter[coin] < 3)
@@ -257,15 +256,15 @@ static INPUT_PORTS_START( arcadia )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, (void *)0)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_counter_r, (void *)1)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, coin_counter_r<0>)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, coin_counter_r<1>)
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,amiga_joystick_convert, (void *)0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, amiga_joystick_convert<0>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arcadia_amiga_state,amiga_joystick_convert, (void *)1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, amiga_joystick_convert<1>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")

@@ -4148,8 +4148,21 @@
 	</software>
 
 	<software name="brokenc">
+		<description>Broken Circle (Euro)</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="release" value="20151106"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="16777216">
+				<rom name="broken circle (europe) (en,it) (unl).bin" size="16777216" crc="3212c09b" sha1="e04a71dbe7b640cc53e81f447856e60666e64aa3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brokencp" cloneof="brokenc">
 		<description>Broken Circle (Euro, Prototype)</description>
-		<year>200?</year>
+		<year>2009</year>
 		<publisher>7 Raven Studios</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
@@ -27339,9 +27352,12 @@
 		<publisher>Zoo Digital Publishing</publisher>
 		<info name="serial" value="AGB-BPMP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E02-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 512K/1M FLASH [39VF512]" />
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="4194304">
-				<rom name="premier manager 2003-04 (europe) (en,fr,de,it).bin" size="4194304" crc="a959f638" sha1="674f9259e3f24c81aecd14a19103e90606077fb9"/>
+				<rom name="agb-bpmb-0.u1" size="4194304" crc="a959f638" sha1="674f9259e3f24c81aecd14a19103e90606077fb9"/>
 			</dataarea>
 		</part>
 	</software>

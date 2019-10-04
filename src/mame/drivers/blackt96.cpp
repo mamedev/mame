@@ -39,6 +39,7 @@ D.G.R.M. NO 1947
 Notes:
       68000 clock 9.000MHz [18/2]
       M6295 clocks 1.000MHz [8/8] pin 7 high
+      PIC16C57 clock 4.000MHz [8/2]
 
 
 2008-07
@@ -85,6 +86,7 @@ Bugs (all of these looks BTANBs):
 #include "video/snk68_spr.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class blackt96_state : public driver_device
@@ -479,11 +481,11 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 
 void blackt96_state::blackt96(machine_config &config)
 {
-	M68000(config, m_maincpu, 18000000 /2);
+	M68000(config, m_maincpu, 18_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackt96_state::blackt96_map);
 	m_maincpu->set_vblank_int("screen", FUNC(blackt96_state::irq1_line_hold));
 
-	pic16c57_device &audiocpu(PIC16C57(config, "audiocpu", 8000000)); /* ? */
+	pic16c57_device &audiocpu(PIC16C57(config, "audiocpu", 8_MHz_XTAL / 2));
 	audiocpu.write_a().set(FUNC(blackt96_state::blackt96_soundio_port_a_w));
 	audiocpu.read_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_r));
 	audiocpu.write_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_w));
@@ -511,12 +513,12 @@ void blackt96_state::blackt96(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki[0], 8000000/8, okim6295_device::PIN7_HIGH); // music
+	OKIM6295(config, m_oki[0], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // music
 	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
 	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
 	m_oki[0]->set_addrmap(0, &blackt96_state::oki1_map);
 
-	OKIM6295(config, m_oki[1], 8000000/8, okim6295_device::PIN7_HIGH); // sfx
+	OKIM6295(config, m_oki[1], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // sfx
 	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
 	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
 }

@@ -23,6 +23,7 @@ TODO:
 #include "machine/74259.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
@@ -185,7 +186,7 @@ void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 
 	default:
-		assert_always(false, "Unknown id in flyball_state::device_timer");
+		throw emu_fatalerror("Unknown id in flyball_state::device_timer");
 	}
 }
 

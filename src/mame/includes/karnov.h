@@ -6,10 +6,12 @@
 
 *************************************************************************/
 
+#include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "video/deckarn.h"
 #include "video/decrmc3.h"
+#include "tilemap.h"
 
 class karnov_state : public driver_device
 {
@@ -18,6 +20,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu"),
+		m_screen(*this, "screen"),
 		m_spriteram(*this, "spriteram") ,
 		m_spritegen(*this, "spritegen"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -31,6 +35,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<mcs51_cpu_device> m_mcu;
+	required_device<screen_device> m_screen;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<deco_karnovsprites_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -78,6 +84,7 @@ public:
 	DECLARE_VIDEO_START(wndrplnt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vbint_w);
+	void chelnovjbl_vbint_w(int state);
 	void karnov_i8751_w( int data );
 	void wndrplnt_i8751_w( int data );
 	void chelnov_i8751_w( int data );
@@ -87,9 +94,29 @@ public:
 	void karnovjbl(machine_config &config);
 	void base_sound_map(address_map &map);
 	void chelnovjbl_mcu_map(address_map &map);
+	void chelnovjbl_mcu_io_map(address_map &map);
 	void karnov_map(address_map &map);
+	void chelnovjbl_map(address_map &map);
 	void karnov_sound_map(address_map &map);
 	void karnovjbl_sound_map(address_map &map);
+
+private:
+	// protection mcu (bootleg)
+	void chelnovjbl_mcu_ack_w(uint16_t data);
+	uint16_t chelnovjbl_mcu_r();
+	void chelnovjbl_mcu_w(uint16_t data);
+
+	uint8_t mcu_data_l_r();
+	void mcu_data_l_w(uint8_t data);
+	uint8_t mcu_data_h_r();
+	void mcu_data_h_w(uint8_t data);
+
+	void mcu_p1_w(uint8_t data);
+
+	uint8_t m_mcu_p1;
+
+	uint16_t m_mcu_to_maincpu;
+	uint16_t m_maincpu_to_mcu;
 };
 
 enum {

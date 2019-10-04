@@ -19,6 +19,7 @@
 #include "sound/ym2151.h"
 #include "video/atarimo.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class atarisy1_state : public atarigen_state
 {

@@ -66,6 +66,8 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 protected:
+	virtual void disassemble_op_ljmp(std::ostream& stream, unsigned& PC, const data_buffer& params);
+	virtual void disassemble_op_lcall(std::ostream& stream, unsigned& PC, const data_buffer& params);
 	virtual offs_t disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op);
 
 	std::string get_data_address( uint8_t arg ) const;

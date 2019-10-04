@@ -180,7 +180,6 @@ void tourtabl_state::tourtabl(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200);
 	screen.set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
-	screen.set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

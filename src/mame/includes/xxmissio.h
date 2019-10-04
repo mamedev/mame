@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class xxmissio_state : public driver_device
 {
@@ -23,7 +24,7 @@ public:
 
 	void xxmissio(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(status_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(status_r);
 
 protected:
 	virtual void machine_start() override;

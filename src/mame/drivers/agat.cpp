@@ -88,6 +88,7 @@
 #include "bus/a2bus/agat7ram.h"
 #include "bus/a2bus/agat840k_hle.h"
 #include "bus/a2bus/agat_fdc.h"
+#include "bus/a2bus/nippelclock.h"
 #include "cpu/m6502/r65c02.h"
 
 #include "screen.h"
@@ -1477,6 +1478,7 @@ static void agat9_cards(device_slot_interface &device)
 	device.option_add("a9fdc140", A2BUS_AGAT9_FDC); // Disk II clone -- decimal 3.089.173 (reworked for agat9)
 	device.option_add("a9fdchle", A2BUS_AGAT840K_HLE); // 840K floppy controller -- decimal 7.104.351 or 3.089.023?
 	device.option_add("a9fdc", A2BUS_AGAT_FDC); // 840K floppy controller LLE
+	device.option_add("a9nclock", A2BUS_NIPPELCLOCK); // Nippel Clock (mc146818)
 }
 
 void agat7_state::agat7(machine_config &config)

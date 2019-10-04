@@ -663,7 +663,7 @@ void toaplan2_state::shared_ram_w(offs_t offset, u8 data)
 }
 
 
-CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
+READ_LINE_MEMBER(toaplan2_state::c2map_r)
 {
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
@@ -1632,7 +1632,7 @@ static INPUT_PORTS_START( tekipaki )
 //  PORT_CONFSETTING(        0x000d, DEF_STR( Japan ) )
 //  PORT_CONFSETTING(        0x000e, DEF_STR( Japan ) )
 	PORT_CONFSETTING(       0x000f, "Japan (Distributed by Tecmo)" )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, nullptr)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(toaplan2_state, c2map_r)
 INPUT_PORTS_END
 
 
@@ -2045,7 +2045,7 @@ static INPUT_PORTS_START( whoopee )
 	PORT_INCLUDE( pipibibs )
 
 	PORT_MODIFY("JMPR")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, nullptr)   // bit 0x10 sound ready
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(toaplan2_state, c2map_r)   // bit 0x10 sound ready
 INPUT_PORTS_END
 
 
@@ -2394,15 +2394,15 @@ static INPUT_PORTS_START( pwrkick )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Button")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Center Button")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Right Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SLOT_STOP1 ) PORT_NAME("Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 ) PORT_NAME("Center")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SLOT_STOP3 ) PORT_NAME("Right")
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin 2 (" UNICODE_YEN "10)")
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Down Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SLOT_STOP4 ) PORT_NAME("Down") // does this button really exist?
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MEMORY_RESET )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -4455,13 +4455,14 @@ ROM_START( pipibibsp )
 ROM_END
 
 
+// TODO: this runs on oneshot.cpp hardware. Move to that driver and remove the hacks in video/gp9001.cpp needed to run it in this driver
 ROM_START( pipibibsbl ) /* Based off the proto code. */
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_BYTE( "ppbb06.bin", 0x000000, 0x020000, CRC(14c92515) SHA1(2d7f7c89272bb2a8115f163ad651bef3bca5107e) )
 	ROM_LOAD16_BYTE( "ppbb05.bin", 0x000001, 0x020000, CRC(3d51133c) SHA1(d7bd94ad11e9aeb5a5165c5ac6f71950849bcd2f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )            /* Sound Z80 code */
-	ROM_LOAD( "ppbb08.bin", 0x0000, 0x8000, CRC(101c0358) SHA1(162e02d00b7bdcdd3b48a0cd0527b7428435ec50) )
+	ROM_LOAD( "ppbb08.bin", 0x0000, 0x8000, CRC(101c0358) SHA1(162e02d00b7bdcdd3b48a0cd0527b7428435ec50) ) // same data as komocomo in oneshot.cpp
 
 	ROM_REGION( 0x200000, "gp9001_0", 0 )
 	/* GFX data differs slightly from Toaplan boards ??? */
@@ -4471,9 +4472,28 @@ ROM_START( pipibibsbl ) /* Based off the proto code. */
 	ROM_LOAD16_BYTE( "ppbb04.bin", 0x100001, 0x080000, CRC(70faa734) SHA1(4448f4dbded56c142e57293d371e0a422c3a667e) )
 
 	ROM_REGION( 0x8000, "user1", 0 )            /* ??? Some sort of table */
-	ROM_LOAD( "ppbb07.bin", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+	ROM_LOAD( "ppbb07.bin", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) ) // 1xxxxxxxxxxxxxx = 0xFF, same data as komocomo in oneshot.cpp
 ROM_END
 
+
+// TODO: determine if this is the correct driver or if this needs to be moved somewhere else, too
+ROM_START( pipibibsbl2 ) // PIPI001 PCB
+	ROM_REGION( 0x040000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_BYTE( "06.bin", 0x000000, 0x020000, CRC(25f49c2f) SHA1(a61246ec8a07ba14ee0a01c3458c59840b435c0b) )
+	ROM_LOAD16_BYTE( "07.bin", 0x000001, 0x020000, CRC(15250177) SHA1(a5ee5ccc219f300d7387b45dc8f8b72fd0f37d7e) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )            /* Sound Z80 code */
+	ROM_LOAD( "08.bin", 0x00000, 0x10000, CRC(f2080071) SHA1(68cbae9559879b2dc19c41a7efbd13ab4a569d3f) ) //  // 1ST AND 2ND HALF IDENTICAL, same as komocomo in oneshot.cpp
+
+	ROM_REGION( 0x200000, "gp9001_0", 0 )
+	ROM_LOAD16_BYTE( "01.bin", 0x000000, 0x80000, CRC(505e9e9f) SHA1(998995d94585d785263cc926f68632065aa6c366) )
+	ROM_LOAD16_BYTE( "02.bin", 0x000001, 0x80000, CRC(860018f5) SHA1(7f42dffb27940629447d688e1771b4ecf04f3b43) )
+	ROM_LOAD16_BYTE( "03.bin", 0x100000, 0x80000, CRC(ece1bc0f) SHA1(d29f1520f1a3a9d276d36af650bc0d70bcb5b8da) )
+	ROM_LOAD16_BYTE( "04.bin", 0x100001, 0x80000, CRC(f328d7a3) SHA1(2c4fb5d6202f847aaf7c7be719c0c92b8bb5946b) )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD( "5.bin", 0x00000, 0x20000, CRC(8107c4bd) SHA1(64e2fafa808c16c722454b611a8492a4620a925c) ) // motherboard ROM, unknown purpose
+ROM_END
 
 #define ROMS_FIXEIGHT \
 	ROM_REGION( 0x080000, "maincpu", 0 ) \
@@ -5610,7 +5630,8 @@ GAME( 1991, pipibibsa,   pipibibs, pipibibs,     pipibibs,   toaplan2_state, emp
 GAME( 1991, pipibibsp,   pipibibs, pipibibs,     pipibibsp,  toaplan2_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (prototype)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1991, whoopee,     pipibibs, tekipaki,     whoopee,    toaplan2_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (Teki Paki hardware)",   MACHINE_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
 
-GAME( 1991, pipibibsbl,  pipibibs, pipibibsbl,   pipibibsbl, toaplan2_state, init_pipibibsbl, ROT0,   "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsbl,  pipibibs, pipibibsbl,   pipibibsbl, toaplan2_state, init_pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pipibibsbl2, pipibibs, pipibibsbl,   pipibibsbl, toaplan2_state, empty_init,    ROT0,   "bootleg",                 "Pipi & Bibis / Whoopee!! (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map, not scrambled
 
 GAME( 1993, enmadaio,    0,        enmadaio,     enmadaio,   toaplan2_state, init_enmadaio, ROT0,   "Toaplan / Taito",  "Enma Daio (Japan)", 0 ) // TP-031
 

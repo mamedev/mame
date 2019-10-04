@@ -506,7 +506,8 @@ void palette_device::device_start()
 		const memory_share *share_ext = memshare(tag_ext.c_str());
 
 		// make sure we have specified a format
-		assert_always(m_raw_to_rgb.bytes_per_entry() > 0, "Palette has memory share but no format specified");
+		if (m_raw_to_rgb.bytes_per_entry() <= 0)
+			throw emu_fatalerror("palette_device(%s): Palette has memory share but no format specified", tag());
 
 		// determine bytes per entry and configure
 		int bytes_per_entry = m_raw_to_rgb.bytes_per_entry();
@@ -522,7 +523,8 @@ void palette_device::device_start()
 		if (m_membits_supplied)
 		{
 			// forcing width only makes sense when narrower than the native bus width
-			assert_always(m_membits < share->bitwidth(), "Improper use of MCFG_PALETTE_MEMBITS");
+			if (m_membits >= share->bitwidth())
+				throw emu_fatalerror("palette_device(%s): Improper use of MCFG_PALETTE_MEMBITS", tag());
 			m_paletteram.set_membits(m_membits);
 			if (share_ext != nullptr)
 				m_paletteram_ext.set_membits(m_membits);
@@ -532,7 +534,8 @@ void palette_device::device_start()
 		if (m_endianness_supplied)
 		{
 			// forcing endianness only makes sense when the RAM is narrower than the palette format and not split
-			assert_always((share_ext == nullptr && m_paletteram.membits() / 8 < bytes_per_entry), "Improper use of MCFG_PALETTE_ENDIANNESS");
+			if (share_ext || (m_paletteram.membits() / 8) >= bytes_per_entry)
+				throw emu_fatalerror("palette_device(%s): Improper use of MCFG_PALETTE_ENDIANNESS", tag());
 			m_paletteram.set_endianness(m_endianness);
 		}
 	}

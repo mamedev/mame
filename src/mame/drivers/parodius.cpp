@@ -20,12 +20,6 @@
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(parodius_state::parodius_interrupt)
-{
-	if (m_k052109->is_irq_enabled())
-		device.execute().set_input_line(0, HOLD_LINE);
-}
-
 WRITE8_MEMBER(parodius_state::parodius_videobank_w)
 {
 	if (data & 0xf8)
@@ -80,7 +74,7 @@ void parodius_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in parodius_state::device_timer");
+		throw emu_fatalerror("Unknown id in parodius_state::device_timer");
 	}
 }
 
@@ -233,7 +227,6 @@ void parodius_state::parodius(machine_config &config)
 	/* basic machine hardware */
 	KONAMI(config, m_maincpu, 3000000); /* 053248 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &parodius_state::parodius_map);
-	m_maincpu->set_vblank_int("screen", FUNC(parodius_state::parodius_interrupt));
 	m_maincpu->line().set(FUNC(parodius_state::banking_callback));
 
 	Z80(config, m_audiocpu, 3579545);
@@ -257,7 +250,9 @@ void parodius_state::parodius(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(parodius_state::tile_callback), this);
+	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K053245(config, m_k053245, 0);
 	m_k053245->set_palette("palette");

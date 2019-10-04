@@ -10,7 +10,7 @@
 
 #include <algorithm>
 #include <cstdio>
-#include <cstdlib>
+//#include <cstdlib>
 
 // VS2015 prefers _dup
 #ifdef _WIN32
@@ -32,6 +32,8 @@ namespace plib {
 // -----------------------------------------------------------------------------
 // Input file stream
 // -----------------------------------------------------------------------------
+
+#if !USE_CSTREAM
 
 pifilestream::pifilestream(const pstring &fname)
 : pistream(0)
@@ -71,7 +73,7 @@ pifilestream::~pifilestream()
 	}
 }
 
-pifilestream::pos_type pifilestream::vread(value_type *buf, const pos_type n)
+pifilestream::pos_type pifilestream::vread(char_type *buf, const pos_type n)
 {
 	pos_type r = fread(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
@@ -119,10 +121,13 @@ pstdin::pstdin()
 {
 	/* nothing to do */
 }
+#endif
 
 // -----------------------------------------------------------------------------
 // Output file stream
 // -----------------------------------------------------------------------------
+
+#if !USE_CSTREAM
 
 pofilestream::pofilestream(const pstring &fname)
 : postream(0), m_file(fopen(fname.c_str(), "wb")), m_pos(0), m_actually_close(true), m_filename(fname)
@@ -156,7 +161,7 @@ pofilestream::~pofilestream()
 	}
 }
 
-void pofilestream::vwrite(const value_type *buf, const pos_type n)
+void pofilestream::vwrite(const char_type *buf, const pos_type n)
 {
 	std::size_t r = fwrite(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
@@ -191,6 +196,38 @@ pstream::pos_type pofilestream::vtell() const
 }
 
 // -----------------------------------------------------------------------------
+// Output memory stream
+// -----------------------------------------------------------------------------
+
+pomemstream::pomemstream()
+: postream(FLAG_SEEKABLE), m_pos(0), m_mem(1024)
+{
+	m_mem.clear();
+}
+
+void pomemstream::vwrite(const char_type *buf, const pos_type n)
+{
+	if (m_pos + n >= m_mem.size())
+		m_mem.resize(m_pos + n);
+
+	std::copy(buf, buf + n, &m_mem[0] + m_pos);
+	m_pos += n;
+}
+
+void pomemstream::vseek(const pos_type n)
+{
+	m_pos = n;
+	if (m_pos>=m_mem.size())
+		m_mem.resize(m_pos);
+}
+
+pstream::pos_type pomemstream::vtell() const
+{
+	return m_pos;
+}
+
+
+// -----------------------------------------------------------------------------
 // pstderr: write to stderr
 // -----------------------------------------------------------------------------
 
@@ -215,6 +252,9 @@ pstdout::pstdout()
 #endif
 {
 }
+#endif
+
+#if !USE_CSTREAM
 
 // -----------------------------------------------------------------------------
 // Memory stream
@@ -229,13 +269,14 @@ pimemstream::pimemstream()
 	: pistream(FLAG_SEEKABLE), m_pos(0), m_len(0), m_mem(static_cast<const char *>(nullptr))
 {
 }
-
+#if 0
 pimemstream::pimemstream(const pomemstream &ostrm)
 : pistream(FLAG_SEEKABLE), m_pos(0), m_len(ostrm.size()), m_mem(reinterpret_cast<const char *>(ostrm.memory()))
 {
 }
+#endif
 
-pimemstream::pos_type pimemstream::vread(value_type *buf, const pos_type n)
+pimemstream::pos_type pimemstream::vread(char_type *buf, const pos_type n)
 {
 	pos_type ret = (m_pos + n <= m_len) ? n :  m_len - m_pos;
 
@@ -262,37 +303,7 @@ pimemstream::pos_type pimemstream::vtell() const
 {
 	return m_pos;
 }
-
-// -----------------------------------------------------------------------------
-// Output memory stream
-// -----------------------------------------------------------------------------
-
-pomemstream::pomemstream()
-: postream(FLAG_SEEKABLE), m_pos(0), m_mem(1024)
-{
-	m_mem.clear();
-}
-
-void pomemstream::vwrite(const value_type *buf, const pos_type n)
-{
-	if (m_pos + n >= m_mem.size())
-		m_mem.resize(m_pos + n);
-
-	std::copy(buf, buf + n, &m_mem[0] + m_pos);
-	m_pos += n;
-}
-
-void pomemstream::vseek(const pos_type n)
-{
-	m_pos = n;
-	if (m_pos>=m_mem.size())
-		m_mem.resize(m_pos);
-}
-
-pstream::pos_type pomemstream::vtell() const
-{
-	return m_pos;
-}
+#endif
 
 bool putf8_reader::readline(pstring &line)
 {
@@ -308,7 +319,7 @@ bool putf8_reader::readline(pstring &line)
 		if (c == 10)
 			break;
 		else if (c != 13) /* ignore CR */
-			m_linebuf += putf8string(c);
+			m_linebuf += putf8string(1, c);
 		if (!this->readcode(c))
 			break;
 	}

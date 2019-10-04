@@ -14,4 +14,17 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- According to the boxart, this is compatible with: Leader 6000 SL -->
+	<software name="update" supported="no">
+		<description>Update - Rechtschreibreform</description>
+		<year>199?</year>
+		<publisher>Video Technology</publisher>
+		<info name="serial" value="" />
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="27-05985-000-000.u1" size="0x80000" crc="139906cd" sha1="69072eaa70d9cf80f08a3f67b5755967a96deb01"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

@@ -21,6 +21,7 @@ Witch / Pinball Champ '95 / Keirin Ou
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MAIN_CLOCK        XTAL(12'000'000)
 #define CPU_CLOCK         MAIN_CLOCK / 4

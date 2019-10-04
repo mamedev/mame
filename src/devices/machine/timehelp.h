@@ -37,15 +37,16 @@ public:
 				*tens_carry = true;
 			bcd &= 0xf0;
 			bcd += 0x10;
-			if (bcd > max)
-			{
-				bcd = min;
-				carry = 1;
-			}
 		}
 		else if (tens_carry)
 		{
 			*tens_carry = false;
+		}
+
+		if (bcd > max)
+		{
+			bcd = min;
+			carry = 1;
 		}
 
 		*data = (*data & ~mask) | (bcd & mask);

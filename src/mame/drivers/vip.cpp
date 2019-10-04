@@ -224,10 +224,11 @@ Usage:
       (you will see the memory editor) then choose a command (0 for example).
     - If you load a chip-8 cart, press R twice. If it doesn't do anything you may
       need to do a hard reset, then hit R twice. R toggles between the CPU running
-      or stopped. Only about half of the chip-8 programs in my collection work.
-    - There's also support for Super-Chip8 carts, but none seem to work.
+      or stopped. Most chip-8 (.c8) programs work, but make sure 4k RAM is enabled.
     - There's a slot option to use Tiny Basic, this starts up, but unable to type
       anything.
+    - Not known if (.bin) files work - don't have any for this machine.
+    - (.c8x) files do not work.
     - Cassette records and plays back, however about 10% of the data is
       consistently loaded wrongly.
 

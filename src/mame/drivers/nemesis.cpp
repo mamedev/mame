@@ -1997,7 +1997,6 @@ void nemesis_state::salamand(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
@@ -2044,7 +2043,6 @@ void nemesis_state::blkpnthr(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
@@ -2086,7 +2084,6 @@ void nemesis_state::citybomb(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
@@ -2132,7 +2129,6 @@ void nemesis_state::nyanpani(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);

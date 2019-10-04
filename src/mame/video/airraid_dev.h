@@ -8,6 +8,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 DECLARE_DEVICE_TYPE(AIRRAID_VIDEO, airraid_video_device)

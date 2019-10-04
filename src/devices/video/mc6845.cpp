@@ -692,6 +692,71 @@ bool mc6845_device::match_line()
 }
 
 
+bool mc6845_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
+{
+	if (!m_cursor_state)
+		return false;
+
+	if ((m_cursor_addr < line_addr) ||
+		(m_cursor_addr >= (line_addr + m_horiz_disp)))
+	{
+		// Not a cursor character line.
+		return false;
+	}
+
+	uint16_t cursor_start_ras = m_cursor_start_ras & 0x1f;
+	uint16_t max_ras_addr = m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1;
+
+	if (cursor_start_ras > max_ras_addr)
+	{
+		// No cursor.
+		return false;
+	}
+
+	// TODO explore the edge cases in the 'interlace and video' mode.
+
+	if (cursor_start_ras <= m_cursor_end_ras)
+	{
+		if (m_cursor_end_ras > max_ras_addr)
+		{
+			// Wraps to produce a full cursor.
+			return true;
+		}
+		// Cursor from start to end inclusive.
+		return (ra >= cursor_start_ras) && (ra <= m_cursor_end_ras);
+	}
+
+	// Otherwise cursor_start_ras > m_cursor_end_ras giving a split cursor.
+	return (ra <= m_cursor_end_ras) || (ra >= cursor_start_ras);
+}
+
+// The HD6845 cursor does not wrap as it does for the MC6845.
+bool hd6845s_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
+{
+	if (!m_cursor_state)
+		return false;
+
+	if ((m_cursor_addr < line_addr) ||
+		(m_cursor_addr >= (line_addr + m_horiz_disp)))
+	{
+		// Not a cursor character line.
+		return false;
+	}
+
+	uint16_t cursor_start_ras = m_cursor_start_ras & 0x1f;
+	uint16_t max_ras_addr = m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1;
+
+	if (cursor_start_ras > max_ras_addr || cursor_start_ras > m_cursor_end_ras)
+	{
+		// No cursor.
+		return false;
+	}
+
+	// Cursor from start to end inclusive.
+	return (ra >= cursor_start_ras) && (ra <= m_cursor_end_ras);
+}
+
+
 void mc6845_device::handle_line_timer()
 {
 	bool new_vsync = m_vsync;
@@ -776,11 +841,7 @@ void mc6845_device::handle_line_timer()
 		m_de_off_timer->adjust(cclks_to_attotime(m_horiz_disp));
 
 		/* Is cursor visible on this line? */
-		if ( m_cursor_state &&
-			(m_raster_counter >= (m_cursor_start_ras & 0x1f)) &&
-			(m_raster_counter <= m_cursor_end_ras) &&
-			(m_cursor_addr >= m_line_address) &&
-			(m_cursor_addr < (m_line_address + m_horiz_disp)) )
+		if (check_cursor_visible(m_raster_counter, m_line_address))
 		{
 			m_cursor_x = m_cursor_addr - m_line_address;
 
@@ -969,14 +1030,12 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 	/* compute the current raster line */
 	uint8_t ra = y % (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
 
-	/* check if the cursor is visible and is on this scanline */
-	int cursor_visible = m_cursor_state &&
-						(ra >= (m_cursor_start_ras & 0x1f)) &&
-						(ra <= m_cursor_end_ras) &&
-						(m_cursor_addr >= m_current_disp_addr) &&
-						(m_cursor_addr < (m_current_disp_addr + m_horiz_disp));
+	// Check if the cursor is visible and is on this scanline.
+	int cursor_visible = check_cursor_visible(ra, m_current_disp_addr);
 
-	/* compute the cursor X position, or -1 if not visible */
+	// Compute the cursor X position, or -1 if not visible. This position
+	// is in units of characters and is relative to the start of the
+	// displayable area, not relative to the screen bitmap origin.
 	int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
 	int de = (y < m_max_visible_y) ? 1 : 0;
 	int vbp = m_vert_pix_total - m_vsync_off_pos;

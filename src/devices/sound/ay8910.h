@@ -43,8 +43,9 @@
 #define AY8910_RESISTOR_OUTPUT      (0x08)
 
 /*
- * This define specifies the initial state of YM2149
- * pin 26 (SEL pin). By default it is set to high,
+ * This define specifies the initial state of
+ * YM2149, YM3439, AY8930 pin 26 (SEL pin).
+ * By default it is set to high,
  * compatible with AY8910.
  */
 /* TODO: make it controllable while it's running (used by any hw???) */
@@ -59,6 +60,14 @@ public:
 	{
 		PSG_TYPE_AY,
 		PSG_TYPE_YM
+	};
+
+	enum config_t
+	{
+		PSG_DEFAULT = 0x0,
+		PSG_PIN26_IS_CLKSEL = 0x1,
+		PSG_EXTENDED_ENVELOPE = 0x2,
+		PSG_HAS_EXPANDED_MODE = 0x4
 	};
 
 	// construction/destruction
@@ -77,8 +86,12 @@ public:
 	void address_w(u8 data);
 	void data_w(u8 data);
 
-	/* /RES */
+	// /RES
 	void reset_w(u8 data = 0) { ay8910_reset_ym(); }
+
+	// /SEL
+	void set_pin26_low_w(u8 data = 0);
+	void set_pin26_high_w(u8 data = 0);
 
 	// use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address'
 	void data_address_w(offs_t offset, u8 data) { ay8910_write_ym(~offset & 1, data); } // note that directly connecting BC1 to A0 puts data on 0 and address on 1
@@ -113,7 +126,7 @@ public:
 
 protected:
 	ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner,
-					u32 clock, psg_type_t psg_type, int streams, int ioports);
+					u32 clock, psg_type_t psg_type, int streams, int ioports, int feature = PSG_DEFAULT);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -131,6 +144,134 @@ protected:
 
 private:
 	static constexpr unsigned NUM_CHANNELS = 3;
+
+	/* register id's */
+	enum
+	{
+		AY_AFINE    = 0x00,
+		AY_ACOARSE  = 0x01,
+		AY_BFINE    = 0x02,
+		AY_BCOARSE  = 0x03,
+		AY_CFINE    = 0x04,
+		AY_CCOARSE  = 0x05,
+		AY_NOISEPER = 0x06,
+		AY_ENABLE   = 0x07,
+		AY_AVOL     = 0x08,
+		AY_BVOL     = 0x09,
+		AY_CVOL     = 0x0a,
+		AY_EAFINE   = 0x0b,
+		AY_EACOARSE = 0x0c,
+		AY_EASHAPE  = 0x0d,
+		AY_PORTA    = 0x0e,
+		AY_PORTB    = 0x0f,
+		AY_EBFINE   = 0x10,
+		AY_EBCOARSE = 0x11,
+		AY_ECFINE   = 0x12,
+		AY_ECCOARSE = 0x13,
+		AY_EBSHAPE  = 0x14,
+		AY_ECSHAPE  = 0x15,
+		AY_ADUTY    = 0x16,
+		AY_BDUTY    = 0x17,
+		AY_CDUTY    = 0x18,
+		AY_NOISEAND = 0x19,
+		AY_NOISEOR  = 0x1a,
+		AY_TEST     = 0x1f
+	};
+
+	// structs
+	struct tone_t
+	{
+		u32 period;
+		u8 volume;
+		u8 duty;
+		s32 count;
+		u8 duty_cycle;
+		u8 output;
+
+		void reset()
+		{
+			period = 0;
+			volume = 0;
+			duty = 0;
+			count = 0;
+			duty_cycle = 0;
+			output = 0;
+		}
+
+		void set_period(u8 fine, u8 coarse)
+		{
+			period = fine | (coarse << 8);
+		}
+
+		void set_volume(u8 val)
+		{
+			volume = val;
+		}
+
+		void set_duty(u8 val)
+		{
+			duty = val;
+		}
+	};
+
+	struct envelope_t
+	{
+		u32 period;
+		s32 count;
+		s8 step;
+		u32 volume;
+		u8 hold, alternate, attack, holding;
+
+		void reset()
+		{
+			period = 0;
+			count = 0;
+			step = 0;
+			volume = 0;
+			hold = 0;
+			alternate = 0;
+			attack = 0;
+			holding = 0;
+		}
+
+		void set_period(u8 fine, u8 coarse)
+		{
+			period = fine | (coarse << 8);
+		}
+
+		void set_shape(u8 shape, u8 mask)
+		{
+			attack = (shape & 0x04) ? mask : 0x00;
+			if ((shape & 0x08) == 0)
+			{
+				/* if Continue = 0, map the shape to the equivalent one which has Continue = 1 */
+				hold = 1;
+				alternate = attack;
+			}
+			else
+			{
+				hold = shape & 0x01;
+				alternate = shape & 0x02;
+			}
+			step = mask;
+			holding = 0;
+			volume = (step ^ attack);
+		}
+	};
+
+	// inlines
+	inline bool tone_enable(int chan) { return BIT(m_regs[AY_ENABLE], chan); }
+	inline u8 tone_volume(tone_t *tone) { return tone->volume & (is_expanded_mode() ? 0x1f : 0x0f); }
+	inline u8 tone_envelope(tone_t *tone) { return (tone->volume >> (is_expanded_mode() ? 5 : 4)) & ((m_feature & PSG_EXTENDED_ENVELOPE) ? 3 : 1); }
+	inline u8 tone_duty(tone_t *tone) { return is_expanded_mode() ? (tone->duty & 0x8 ? 0x8 : (tone->duty & 0xf)) : 0x4; }
+	inline u8 get_envelope_chan(int chan) { return is_expanded_mode() ? chan : 0; }
+
+	inline bool noise_enable(int chan) { return BIT(m_regs[AY_ENABLE], 3 + chan); }
+	inline u8 noise_period() { return is_expanded_mode() ? m_regs[AY_NOISEPER] & 0xff : (m_regs[AY_NOISEPER] & 0x1f) << 1; }
+	inline u8 noise_output() { return m_rng & 1; }
+
+	inline bool is_expanded_mode() { return ((m_feature & PSG_HAS_EXPANDED_MODE) && ((m_mode & 0xe) == 0xa)); }
+	inline u8 get_register_bank() { return is_expanded_mode() ? (m_mode & 0x1) << 4 : 0; }
 
 	// internal helpers
 	void set_type(psg_type_t psg_type);
@@ -151,16 +292,12 @@ private:
 	sound_stream *m_channel;
 	bool m_active;
 	s32 m_register_latch;
-	u8 m_regs[16];
+	u8 m_regs[16 * 2];
 	s32 m_last_enable;
-	s32 m_count[NUM_CHANNELS];
-	u8 m_output[NUM_CHANNELS];
+	tone_t m_tone[NUM_CHANNELS];
+	envelope_t m_envelope[NUM_CHANNELS];
 	u8 m_prescale_noise;
 	s32 m_count_noise;
-	s32 m_count_env;
-	s8 m_env_step;
-	u32 m_env_volume;
-	u8 m_hold,m_alternate,m_attack,m_holding;
 	s32 m_rng;
 	u8 m_mode;
 	u8 m_env_step_mask;
@@ -174,6 +311,7 @@ private:
 	s32 m_env_table[NUM_CHANNELS][32];
 	std::unique_ptr<s32[]> m_vol3d_table;
 	int m_flags;          /* Flags */
+	int m_feature;        /* Chip specific features */
 	int m_res_load[3];    /* Load on channel in ohms */
 	devcb_read8 m_port_a_read_cb;
 	devcb_read8 m_port_b_read_cb;

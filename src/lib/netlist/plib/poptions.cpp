@@ -118,7 +118,7 @@ namespace plib {
 					if (has_equal_arg)
 					{
 						for (std::size_t j = 1; j < v.size() - 1; j++)
-							opt_arg = opt_arg + v[j] + "=";
+							opt_arg += (v[j] + "=");
 						opt_arg += v[v.size()-1];
 					}
 				}

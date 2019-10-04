@@ -10,6 +10,7 @@
 #include "video/decospr.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class tumbleb_state : public driver_device
 {

@@ -135,6 +135,7 @@ protected:
 	void pulse_output_w(offs_t offset, uint8_t data);
 	uint8_t ad_control_r();
 	void ad_control_w(uint8_t data);
+	TIMER_CALLBACK_MEMBER(ad_timer_cb);
 	uint8_t ad_sweep_r();
 	void ad_sweep_w(uint8_t data);
 	uint16_t ad_result_r(offs_t offset);
@@ -267,6 +268,8 @@ private:
 	// A/D
 	uint8_t m_ad_control;
 	uint8_t m_ad_sweep;
+	uint16_t m_ad_result[8];
+	emu_timer *m_ad_timer;
 
 	// UARTs
 	uint8_t m_uart_mode[2];

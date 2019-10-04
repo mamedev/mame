@@ -541,7 +541,7 @@ void pasogo_state::machine_reset()
 	membank("bank27")->set_base(m_cart_rom->base());
 	m_ems_index = 0;
 	memset(m_ems_bank, 0, sizeof(m_ems_bank));
-	contrast(*color->fields().first(), nullptr, 0, color->read());
+	contrast(*color->fields().first(), 0, 0, color->read());
 }
 
 void pasogo_state::pasogo(machine_config &config)

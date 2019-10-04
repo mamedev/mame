@@ -2531,10 +2531,10 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("OUTPUT")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, 0)
 
 	PORT_START("P1")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY1\0KEY2\0KEY3\0KEY4\0KEY5")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, naomi_mp_r)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEY1")
@@ -2587,7 +2587,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( suchie3 )
 	PORT_INCLUDE( naomi_mp )
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY5\0KEY2\0KEY3\0KEY4\0KEY1")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, suchie3_mp_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_kb )
@@ -2615,7 +2615,7 @@ static INPUT_PORTS_START( naomi_kb )
 	// ---- ---x num lock
 
 	PORT_START("P1.KC1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state, naomi_kb_r, 0)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, naomi_kb_r)
 
 	PORT_START("P1.KC2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -8769,7 +8769,7 @@ ROM_START( ggxxsla )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0033a", 0, SHA1(c2a6b57b11f2528a212e186f9fa2127120aca111) )
+	DISK_IMAGE_READONLY( "gdl-0033a", 0, SHA1(b156456d645512a70d89d120cc3ce427b47e9fe9) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C621A (317-5111-JPN)
@@ -10150,7 +10150,7 @@ ROM_START( initdv2ja )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0026a", 0, SHA1(f56a85ebb842838561c15cb53ce81eb341e91300) )
+	DISK_IMAGE_READONLY( "gds-0026a", 0, SHA1(44790194a7a32ca9faf02403821bf23015ec8f3c) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0345-JPN)
@@ -10901,7 +10901,7 @@ ROM_START( ftspeed )
 	ROM_LOAD( "ax1705m01.ic15", 0x5000000, 0x1000000, CRC(996f68e1) SHA1(3fa505c641127d9027bfc7ec0ab16905344a4e2c) )
 	ROM_LOAD( "ax1706m01.ic16", 0x6000000, 0x1000000, CRC(804b2eb2) SHA1(fcca02a5a8c09eb16548255115fb105c9c49c4e0) )
 
-	ROM_PARAMETER(":rom_board:key", "6d") // ax1701f01
+	ROM_PARAMETER(":rom_board:key", "6b") // ax1701f01
 ROM_END
 
 // contents of cartridges labeled as JP and EN is the same
@@ -11250,6 +11250,7 @@ ROM_END
 // 01xx Mushiking 2K3 1ST (Japan)
 // 01xx Mushiking 2K4 1ST (Japan)
 // 01xx Mushiking 2K5 2ND (Japan)
+// 0xxx Nittere Shiki! Mirai Yosou Studio
 // 0xxx Star Horse 2001 (main screens, server)
 // 0xxx Star Horse 2002 (whole set)
 // 0xxx Star Horse Progress Returns (main screens, server)

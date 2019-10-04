@@ -7,6 +7,10 @@ http.cpp
 HTTP server handling
 
 ***************************************************************************/
+#ifdef __sun
+#define ASIO_DISABLE_DEV_POLL
+#define ASIO_HAS_EPOLL
+#endif
 
 #include "emu.h"
 #include "server_ws_impl.hpp"

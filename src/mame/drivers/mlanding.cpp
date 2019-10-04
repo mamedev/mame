@@ -425,12 +425,12 @@ void mlanding_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-		case TIMER_DMA_COMPLETE:
-			m_dma_busy = 0;
-			break;
+	case TIMER_DMA_COMPLETE:
+		m_dma_busy = 0;
+		break;
 
-		default:
-			assert_always(false, "Unknown id in mlanding_state::device_timer");
+	default:
+		throw emu_fatalerror("Unknown id in mlanding_state::device_timer");
 	}
 }
 

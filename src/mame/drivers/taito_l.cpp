@@ -1932,6 +1932,19 @@ ROM_START( kurikint )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
 ROM_END
 
+ROM_START( kurikintw )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "b42-10.ic2",  0x00000, 0x20000, CRC(87460109) SHA1(78d0726f5d344673828191bf2e56e9741e977350) )
+	ROM_LOAD( "b42-06.ic6",  0x20000, 0x20000, CRC(fa15fd65) SHA1(a810d7315878212e4e5344a24addf117ea6baeab) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b42-07.ic22", 0x00000, 0x10000, CRC(0f2719c0) SHA1(f870335a75f236f0059522f9a577dee7ca3acb2f) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "b42-01.ic1",  0x00000, 0x80000, CRC(7d1a1fec) SHA1(28311b07673686c18988400d0254533a454f07f4) )
+	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
+ROM_END
+
 ROM_START( kurikintu )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "b42-08.ic2",  0x00000, 0x20000, CRC(7075122e) SHA1(55f5f0cf3b91b7b408f9c05c91f9839c43b49c5f) )
@@ -2370,6 +2383,7 @@ GAME( 1989, champwru,  champwr,  champwr,   champwru,  champwr_state,     empty_
 GAME( 1989, champwrj,  champwr,  champwr,   champwrj,  champwr_state,     empty_init,     ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1988, kurikint,  0,        kurikint,  kurikint,  taitol_2cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Kuri Kinton (World)", 0 )
+GAME( 1988, kurikintw, kurikint, kurikint,  kurikintj, taitol_2cpu_state, empty_init,     ROT0,   "Taito Corporation (World Games, Inc. license)", "Kuri Kinton (US, World Games license)", 0 )
 GAME( 1988, kurikintu, kurikint, kurikint,  kurikintj, taitol_2cpu_state, empty_init,     ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
 GAME( 1988, kurikintj, kurikint, kurikint,  kurikintj, taitol_2cpu_state, empty_init,     ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
 GAME( 1988, kurikinta, kurikint, kurikint,  kurikinta, taitol_2cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )

@@ -22,6 +22,7 @@
 #include "sound/tms5110.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 /*

@@ -481,39 +481,11 @@ static INPUT_PORTS_START( airbustrj )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
-/* Graphics Layout */
-
-static const gfx_layout tile_gfxlayout =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{  1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4,
-		1*4+32*8, 0*4+32*8, 3*4+32*8, 2*4+32*8, 5*4+32*8, 4*4+32*8, 7*4+32*8, 6*4+32*8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
-	16*16*4
-};
-
-static const gfx_layout sprite_gfxlayout =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-		0*4+32*8, 1*4+32*8, 2*4+32*8, 3*4+32*8, 4*4+32*8, 5*4+32*8, 6*4+32*8, 7*4+32*8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		0*32+64*8, 1*32+64*8, 2*32+64*8, 3*32+64*8, 4*32+64*8, 5*32+64*8, 6*32+64*8, 7*32+64*8 },
-	16*16*4
-};
-
 /* Graphics Decode Information */
 
 static GFXDECODE_START( gfx_airbustr )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_gfxlayout,   0, 32 ) // tiles
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_gfxlayout, 512, 16 ) // sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_lsb,   0, 32 ) // tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 512, 16 ) // sprites
 GFXDECODE_END
 
 
@@ -578,7 +550,6 @@ void airbustr_state::airbustr(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(12'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &airbustr_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &airbustr_state::sound_io_map);
-	m_audiocpu->set_vblank_int("screen", FUNC(airbustr_state::irq0_line_hold));       // nmi are caused by sub cpu writing a sound command
 
 	config.m_minimum_quantum = attotime::from_hz(6000);  // Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
@@ -613,6 +584,7 @@ void airbustr_state::airbustr(machine_config &config)
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4));   /* verified on pcb */
 	ymsnd.port_a_read_callback().set_ioport("DSW1");       // DSW-1 connected to port A
 	ymsnd.port_b_read_callback().set_ioport("DSW2");       // DSW-2 connected to port B
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 0.25);
 	ymsnd.add_route(2, "mono", 0.25);

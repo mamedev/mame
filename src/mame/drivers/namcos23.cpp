@@ -1267,6 +1267,7 @@ Notes:
 #include "video/poly.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include <float.h>
 

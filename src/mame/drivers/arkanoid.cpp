@@ -854,7 +854,7 @@ void arkanoid_state::bootleg_map(address_map &map)
 	map(0xd008, 0xd008).w(FUNC(arkanoid_state::arkanoid_d008_w));  /* gfx bank, flip screen etc. */
 	map(0xd00c, 0xd00c).portr("SYSTEM");
 	map(0xd010, 0xd010).portr("BUTTONS").w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xd018, 0xd018).portr("MUX").nopw();
+	map(0xd018, 0xd018).r(FUNC(arkanoid_state::input_mux_r)).nopw();
 	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 	map(0xe800, 0xe83f).ram().share("spriteram");
 	map(0xe840, 0xefff).ram();
@@ -1010,7 +1010,7 @@ static INPUT_PORTS_START( arkanoid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state, arkanoid_semaphore_input_r, nullptr) // Z80 and MCU Semaphores
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arkanoid_state, arkanoid_semaphore_input_r) // Z80 and MCU Semaphores
 
 	PORT_START("SYSTEM2") // these are the secondary "RH" joystick ports for P1 and P2; the circuitry to read them is populated on the arkanoid PCB, but the game never actually reads these.
 	/*PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )
@@ -1031,9 +1031,6 @@ static INPUT_PORTS_START( arkanoid )
 	//PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MUX")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state,arkanoid_input_mux, "P1\0P2")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:8")
@@ -1182,9 +1179,6 @@ static INPUT_PORTS_START( tetrsark )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/* Inputs are read by the ay8910. For simplicity, we use tags from other sets (even if not appropriate) */
@@ -1354,7 +1348,7 @@ void arkanoid_state::arkanoid(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
 
 	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
-	m_mcuintf->portb_r_cb().set_ioport("MUX");
+	m_mcuintf->portb_r_cb().set(FUNC(arkanoid_state::input_mux_r));
 
 	config.m_minimum_quantum = attotime::from_hz(6000);                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
@@ -1387,7 +1381,7 @@ void arkanoid_state::p3mcu(machine_config &config)
 
 	/* unprotected MCU */
 	ARKANOID_68705P3(config.replace(), m_mcuintf, 12_MHz_XTAL / 4);
-	m_mcuintf->portb_r_cb().set_ioport("MUX");
+	m_mcuintf->portb_r_cb().set(FUNC(arkanoid_state::input_mux_r));
 }
 
 void arkanoid_state::p3mcuay(machine_config &config)

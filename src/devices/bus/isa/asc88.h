@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #ifndef MAME_BUS_ISA_ASC88_H
-#define MAME_BUS_ISA_ASC88_H 1
+#define MAME_BUS_ISA_ASC88_H
 
 #pragma once
 

@@ -7,6 +7,7 @@
 
 #include "machine/taito68705interface.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {
@@ -79,7 +80,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hexaa_sub_80_w);
 	DECLARE_READ8_MEMBER(hexaa_sub_90_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
+	uint8_t input_mux_r();
 	void init_block2();
 	void init_arkblock();
 	void init_hexa();

@@ -135,7 +135,7 @@ void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_mcu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in bublbobl_state::device_timer");
+		throw emu_fatalerror("Unknown id in bublbobl_state::device_timer");
 	}
 }
 

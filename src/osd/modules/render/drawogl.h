@@ -15,7 +15,11 @@
 
 // OSD headers
 #ifndef OSD_WINDOWS
+#ifdef OSD_MAC
+#include "osdmac.h"
+#else
 #include "osdsdl.h"
+#endif
 #include "window.h"
 #else
 #include "../windows/window.h"
@@ -24,6 +28,7 @@ typedef uint64_t HashT;
 
 #if defined(OSD_WINDOWS)
 #include "winglcontext.h"
+#elif defined (OSD_MAC)
 #else
 #include "sdlglcontext.h"
 #endif

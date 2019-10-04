@@ -73,10 +73,13 @@
 		</part>
 	</software>
 
+<!-- According to the boxart, this is compatible with: Leader 1000/2000/2000 Plus
+     A (later) sticker says compatibility extends to Leader 3000S/4000 Quadro/4004 Quadro L/6000 SL -->
 	<software name="bol">
 		<description>Berühmte Orte und Leute</description>
-		<year>199?</year>
+		<year>1993</year>
 		<publisher>Video Technology</publisher>
+		<info name="serial" value="80-1589" />
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
 				<rom name="80-1587" size="0x20000" crc="55eef702" sha1="52923c2b337a49a006affbd30f953c406dc745c6"/>

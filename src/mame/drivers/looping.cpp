@@ -69,6 +69,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 /*************************************

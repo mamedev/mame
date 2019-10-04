@@ -57,6 +57,7 @@ SOUNDS["SPEAKER"] = true
 --------------------------------------------------
 
 VIDEOS["FIXFREQ"] = true
+VIDEOS["PWM_DISPLAY"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -108,7 +109,7 @@ function createProjects_mame_nl(_target, _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame-nl"))
 	addprojectflags()
-	precompiledheaders()
+	precompiledheaders_novs()
 
 	includedirs {
 		MAME_DIR .. "src/osd",

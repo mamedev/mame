@@ -20,8 +20,8 @@
 #include "emuopts.h" // Used by PNG logging
 #include "png.h" // Used by PNG logging
 
-#include "rapidjson/include/rapidjson/prettywriter.h" // Used by JSON logging
-#include "rapidjson/include/rapidjson/stringbuffer.h" // Used by JSON logging
+#include <rapidjson/prettywriter.h> // Used by JSON logging
+#include <rapidjson/stringbuffer.h> // Used by JSON logging
 
 DEFINE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device, "tunitvid", "Midway T-Unit Video")
 DEFINE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device, "wunitvid", "Midway W-Unit Video")
@@ -625,7 +625,7 @@ void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, i
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in midtunit_video_device::device_timer");
+		throw emu_fatalerror("Unknown id in midtunit_video_device::device_timer");
 	}
 }
 

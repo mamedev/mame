@@ -54,6 +54,7 @@
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class i7000_state : public driver_device

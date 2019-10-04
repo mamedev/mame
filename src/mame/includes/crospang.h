@@ -12,6 +12,7 @@
 
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
+#include "tilemap.h"
 
 class crospang_state : public driver_device
 {

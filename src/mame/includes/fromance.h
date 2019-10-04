@@ -19,6 +19,7 @@
 #include "video/vsystem_spr2.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class fromance_state : public driver_device
 {

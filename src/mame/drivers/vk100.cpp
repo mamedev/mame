@@ -342,7 +342,7 @@ void vk100_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		execute_vg(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in vk100_state::device_timer");
+		throw emu_fatalerror("Unknown id in vk100_state::device_timer");
 	}
 }
 

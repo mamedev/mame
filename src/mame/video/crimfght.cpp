@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+
 #include "emu.h"
 #include "includes/crimfght.h"
+#include "screen.h"
 
 /***************************************************************************
 

@@ -86,6 +86,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class rabbit_state : public driver_device
@@ -589,7 +590,7 @@ void rabbit_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_maincpu->set_input_line(m_bltirqlevel, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in rabbit_state::device_timer");
+		throw emu_fatalerror("Unknown id in rabbit_state::device_timer");
 	}
 }
 

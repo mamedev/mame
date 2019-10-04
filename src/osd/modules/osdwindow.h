@@ -178,14 +178,16 @@ public:
 	static const int FLAG_NEEDS_ASYNCBLIT       = 0x0200;
 
 	osd_renderer(std::shared_ptr<osd_window> window, const int flags)
-	: m_sliders_dirty(false), m_window(window), m_flags(flags) { }
+		: m_sliders_dirty(false), m_window(window), m_flags(flags)
+	{ }
 
 	virtual ~osd_renderer() { }
 
 	std::shared_ptr<osd_window> assert_window() const
 	{
 		auto win = m_window.lock();
-		assert_always(win != nullptr, "Window weak_ptr is not available!");
+		if (!win)
+			throw emu_fatalerror("osd_renderer::assert_window: Window weak_ptr is not available!");
 		return win;
 	}
 

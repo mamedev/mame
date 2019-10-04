@@ -161,7 +161,7 @@
 		<bezel element="nothing" inputtag="IN.3" inputmask="0x08" inputraw="1"><bounds x="9.805" y="9.55" width="0.39" height="0.39" /></bezel>
 		<bezel element="nothing" inputtag="IN.3" inputmask="0x07" inputraw="1"><bounds x="9.805" y="9.95" width="0.39" height="0.39" /></bezel>
 
-		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01"><bounds x="10.2" y="8.7" width="1.1" height="1.8" /></bezel>
+		<bezel element="nothing" inputtag="FAKE" inputmask="0x00" inputraw="1"><bounds x="10.2" y="8.7" width="1.1" height="1.8" /></bezel>
 		<bezel element="switch_music" inputtag="FAKE" inputmask="0x02" inputraw="1"><bounds x="10.25" y="8.8" width="1" height="0.29" /></bezel>
 		<bezel element="switch_speed" inputtag="IN.4" inputmask="0x01" inputraw="1"><bounds x="10.25" y="9.2" width="1" height="0.29" /></bezel>
 		<bezel element="switch_skill" inputtag="IN.3" inputmask="0x08" inputraw="1"><bounds x="10.25" y="9.6" width="1" height="0.29" /></bezel>

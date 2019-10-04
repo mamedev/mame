@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class firetrap_state : public driver_device
 {

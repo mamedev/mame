@@ -22,7 +22,7 @@ static void jasmin_floppies(device_slot_interface &device)
 
 INPUT_PORTS_START( jasmin )
 	PORT_START("JASMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, 0)
 INPUT_PORTS_END
 
 void jasmin_device::map(address_map &map)

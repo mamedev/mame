@@ -9,6 +9,7 @@
 #include "machine/i2cmem.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "tilemap.h"
 
 class funworld_state : public driver_device
 {

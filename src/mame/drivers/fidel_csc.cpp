@@ -585,7 +585,7 @@ static INPUT_PORTS_START( su9 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, su9_state, su9_cpu_freq, nullptr) // factory set
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, su9_state, su9_cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "1.95MHz (original)" )
 	PORT_CONFSETTING(    0x01, "2.5MHz (Deluxe)" )
 	PORT_CONFSETTING(    0x02, "3MHz (Septennial)" )

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 class kaneko_view2_tilemap_device : public device_t, public device_gfx_interface
 {
 public:

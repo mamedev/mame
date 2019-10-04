@@ -20,6 +20,7 @@
 #include "machine/v3021.h"
 #include "sound/ics2115.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #define PGMARM7LOGERROR 0
 

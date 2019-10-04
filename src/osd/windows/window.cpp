@@ -32,6 +32,7 @@
 #include "winutf8.h"
 
 #include "winutil.h"
+#include "strconv.h"
 
 #include "modules/monitor/monitor_common.h"
 
@@ -87,10 +88,6 @@ using namespace Windows::UI::Core;
 
 static DWORD main_threadid;
 
-// actual physical resolution
-static int win_physical_width;
-static int win_physical_height;
-
 
 
 //============================================================
@@ -109,6 +106,8 @@ static DWORD window_threadid;
 static DWORD last_update_time;
 
 static HANDLE ui_pause_event;
+
+static bool s_aggressive_focus;
 
 
 
@@ -315,7 +314,8 @@ win_window_info::win_window_info(
 		m_lastclicktime(std::chrono::system_clock::time_point::min()),
 		m_lastclickx(0),
 		m_lastclicky(0),
-		m_machine(machine)
+		m_machine(machine),
+		m_attached_mode(false)
 {
 	memset(m_title,0,sizeof(m_title));
 	m_non_fullscreen_bounds.left = 0;
@@ -660,14 +660,37 @@ void winwindow_toggle_full_screen(void)
 
 bool winwindow_has_focus(void)
 {
-	HWND focuswnd = GetFocus();
-
 	// see if one of the video windows has focus
 	for (auto window : osd_common_t::s_window_list)
-		if (focuswnd == std::static_pointer_cast<win_window_info>(window)->platform_window())
+	{
+		switch (std::static_pointer_cast<win_window_info>(window)->focus())
+		{
+		case win_window_focus::NONE:
+			break;
+
+		case win_window_focus::THREAD:
+			if (s_aggressive_focus)
+				return true;
+			break;
+
+		case win_window_focus::WINDOW:
 			return true;
 
+		default:
+			throw false;
+		}
+	}
 	return false;
+}
+
+
+//============================================================
+//  osd_set_aggressive_input_focus
+//============================================================
+
+void osd_set_aggressive_input_focus(bool aggressive_focus)
+{
+	s_aggressive_focus = aggressive_focus;
 }
 
 
@@ -885,7 +908,19 @@ void win_window_info::update()
 			// post a redraw request with the primitive list as a parameter
 			last_update_time = timeGetTime();
 
-			SendMessage(platform_window(), WM_USER_REDRAW, 0, (LPARAM)primlist);
+			if (attached_mode())
+			{
+				HDC hdc = GetDC(platform_window());
+
+				m_primlist = primlist;
+				draw_video_contents(hdc, FALSE);
+
+				ReleaseDC(platform_window(), hdc);
+			}
+			else
+			{
+				SendMessage(platform_window(), WM_USER_REDRAW, 0, (LPARAM)primlist);
+			}
 		}
 	}
 }
@@ -1058,8 +1093,21 @@ int win_window_info::complete_create()
 			return 1;
 	}
 
-	// create the window, but don't show it yet
-	HWND hwnd = win_create_window_ex_utf8(
+	// are we in worker UI mode?
+	HWND hwnd;
+	const char *attach_window_name = downcast<windows_options &>(machine().options()).attach_window();
+	m_attached_mode = attach_window_name && *attach_window_name ? true : false;
+	if (m_attached_mode)
+	{
+		// we are in worker UI mode; either this value is an HWND or a window name
+		hwnd = (HWND)atoll(attach_window_name);
+		if (!hwnd)
+			hwnd = FindWindowEx(nullptr, nullptr, nullptr, osd::text::to_tstring(attach_window_name).c_str());
+	}
+	else
+	{
+		// create the window, but don't show it yet
+		hwnd = win_create_window_ex_utf8(
 						fullscreen() ? FULLSCREEN_STYLE_EX : WINDOW_STYLE_EX,
 						"MAME",
 						m_title,
@@ -1070,6 +1118,7 @@ int win_window_info::complete_create()
 						menu,
 						GetModuleHandleUni(),
 						nullptr);
+	}
 
 	if (hwnd == nullptr)
 		return 1;
@@ -1077,10 +1126,11 @@ int win_window_info::complete_create()
 	set_platform_window(hwnd);
 
 	// set a pointer back to us
-	SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
+	if (!attached_mode())
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
-	// skip the positioning stuff for -video none */
-	if (video_config.mode == VIDEO_MODE_NONE)
+	// skip the positioning stuff for '-video none' or '-attach_window'
+	if (video_config.mode == VIDEO_MODE_NONE || attached_mode())
 	{
 		set_renderer(osd_renderer::make_for_type(video_config.mode, shared_from_this()));
 		renderer().create();
@@ -1743,11 +1793,7 @@ void win_window_info::adjust_window_position_after_major_change()
 
 	// take note of physical window size (used for lightgun coordinate calculation)
 	if (m_index == 0)
-	{
-		win_physical_width = newrect.width();
-		win_physical_height = newrect.height();
-		osd_printf_verbose("Physical width %d, height %d\n",win_physical_width,win_physical_height);
-	}
+		osd_printf_verbose("Physical width %d, height %d\n", newrect.width(), newrect.height());
 }
 
 
@@ -1834,6 +1880,47 @@ void win_window_info::set_fullscreen(int fullscreen)
 	// ensure we're still adjusted correctly
 	adjust_window_position_after_major_change();
 }
+
+
+//============================================================
+//  focus
+//  (main or window thread)
+//============================================================
+
+win_window_focus win_window_info::focus() const
+{
+	HWND focuswnd = nullptr;
+	if (attached_mode())
+	{
+		// if this window is in attached mode, we need to see if it has
+		// focus in its context; first find out what thread owns it
+		DWORD window_thread_id = GetWindowThreadProcessId(platform_window(), nullptr);
+
+		// and then identify which window has focus in that thread's context
+		GUITHREADINFO gti;
+		gti.cbSize = sizeof(gti);
+		focuswnd = GetGUIThreadInfo(window_thread_id, &gti)
+			? gti.hwndFocus
+			: nullptr;
+	}
+	else
+	{
+		// life is simpler in non-attached mode
+		focuswnd = GetFocus();
+	}
+
+	if (focuswnd == platform_window())
+		return win_window_focus::WINDOW;
+	else if (focuswnd)
+		return win_window_focus::THREAD;
+	else
+		return win_window_focus::NONE;
+}
+
+
+//============================================================
+//  winwindow_qt_filter
+//============================================================
 
 #if (USE_QTDEBUG)
 bool winwindow_qt_filter(void *message)

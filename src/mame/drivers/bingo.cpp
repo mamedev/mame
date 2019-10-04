@@ -319,6 +319,20 @@ ROM_START(tripjok)
 ROM_END
 
 
+// CPU-85  SIRMO - BELGIUM  PCB 28-B
+// 1x P8085A
+// 1x 6.1xx MHz (not readable) XTAL
+// 3x P8155
+
+ROM_START(missamer)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("c48327.6p", 0x0000, 0x0800, CRC(45fd79f7) SHA1(67b115b13ef7fb94b63176e8e17d97e9480ab4d3))
+	ROM_LOAD("c48328.6q", 0x0800, 0x0800, CRC(0cd444ec) SHA1(a797053dbfeb67428f08e914220c34cd440181f1))
+	ROM_LOAD("c48329.6s", 0x1000, 0x0800, CRC(82b87e2d) SHA1(0727ddb5792e1dc105ed7478474cc97839b87106))
+	ROM_LOAD("c48330.6u", 0x1800, 0x0800, CRC(f76142c6) SHA1(727d657f19d5341323d1ccb6eb96e48a402e089d))
+	ROM_LOAD("c48331.6w", 0x2000, 0x0800, CRC(5dd0b97a) SHA1(38d8183865e7c182aef0a0a7d514acf6f961f72c))
+ROM_END
+
 GAME(1980,  cntinntl,   0,        bingo,  bingo,  bingo_state,  init_bingo,  ROT0, "Bally",            "Continental (Bingo)",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1980,  cntinntl2,  cntinntl, bingo,  bingo,  bingo_state,  init_bingo,  ROT0, "Bally",            "Continental (Bingo, alternate version)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME(19??,  goldgame,   0,        splin,  splin,  splin_state,  init_splin,  ROT0, "Splin",            "Golden Game (Bingo)",                      MACHINE_IS_SKELETON_MECHANICAL)
@@ -344,3 +358,4 @@ GAME(19??,  domino2,    0,        seeben, seeben, seeben_state, init_seeben, ROT
 GAME(19??,  tripjok,    0,        seeben, seeben, seeben_state, init_seeben, ROT0, "Seeben (Belgium)", "Triple Joker (Bingo)",                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(19??,  ggate,      0,        seeben, seeben, seeben_state, init_seeben, ROT0, "Seeben (Belgium)", "Golden Gate (set 1) (Bingo)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(19??,  ggatea,     ggate,    seeben, seeben, seeben_state, init_seeben, ROT0, "Seeben (Belgium)", "Golden Gate (set 2) (Bingo)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  missamer,   0,        seeben, seeben, seeben_state, init_seeben, ROT0, "Sirmo (Belgium)",  "Miss Americana (Bingo)",                   MACHINE_IS_SKELETON_MECHANICAL)

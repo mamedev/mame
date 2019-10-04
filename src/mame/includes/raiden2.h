@@ -11,6 +11,7 @@
 #include "video/seibu_crtc.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #include <algorithm>
 

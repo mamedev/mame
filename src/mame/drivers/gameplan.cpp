@@ -970,9 +970,6 @@ void gameplan_state::gameplan(machine_config &config)
 	m_riot->out_pb_callback().set(FUNC(gameplan_state::r6532_soundlatch_w));
 	m_riot->irq_callback().set(FUNC(gameplan_state::r6532_irq));
 
-	MCFG_MACHINE_START_OVERRIDE(gameplan_state,gameplan)
-	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,gameplan)
-
 	/* video hardware */
 	gameplan_video(config);
 

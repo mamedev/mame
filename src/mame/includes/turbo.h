@@ -16,6 +16,7 @@
 #include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 /* sprites are scaled in the analog domain; to give a better */
 /* rendition of this, we scale in the X direction by this factor */

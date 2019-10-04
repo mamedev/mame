@@ -563,6 +563,7 @@ void konmedal_state::shuriboy(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback), this);
 
 	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
@@ -587,8 +588,6 @@ void konmedal_state::fuusenpn(machine_config &config)
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_fuusenpn));
 	screen.set_palette(m_palette);
 
-	K052109(config.replace(), m_k052109, 0);
-	m_k052109->set_palette(m_palette);
 	m_k052109->set_tile_callback(FUNC(konmedal_state::fuusenpn_tile_callback), this);
 }
 

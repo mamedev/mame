@@ -174,7 +174,6 @@ protected:
 
 	// interrupts
 	void generate_exception(u32 exception, bool refill = false);
-	void check_irqs();
 
 	// cop0
 	virtual void handle_cop0(u32 const op);

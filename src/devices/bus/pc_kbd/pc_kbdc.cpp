@@ -16,6 +16,10 @@ The following basic program can be useful for identifying scancodes:
 #include "emu.h"
 #include "pc_kbdc.h"
 
+#define LOG_SIGNALS         (1U<<1)
+#define VERBOSE ( LOG_GENERAL )
+
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -109,7 +113,7 @@ void pc_kbdc_device::device_start()
 }
 
 
-void pc_kbdc_device::update_clock_state()
+void pc_kbdc_device::update_clock_state(bool fromkb)
 {
 	int new_clock_state = m_mb_clock_state & m_kb_clock_state;
 
@@ -117,7 +121,7 @@ void pc_kbdc_device::update_clock_state()
 	{
 		// We first set our state to prevent possible endless loops
 		m_clock_state = new_clock_state;
-
+		LOGMASKED(LOG_SIGNALS, "%s Clock: %d\n", fromkb? "<-" : "->", m_clock_state);
 		// Send state to keyboard interface logic on mainboard
 		m_out_clock_cb(m_clock_state);
 
@@ -128,7 +132,7 @@ void pc_kbdc_device::update_clock_state()
 }
 
 
-void pc_kbdc_device::update_data_state()
+void pc_kbdc_device::update_data_state(bool fromkb)
 {
 	int new_data_state = m_mb_data_state & m_kb_data_state;
 
@@ -136,6 +140,7 @@ void pc_kbdc_device::update_data_state()
 	{
 		// We first set our state to prevent possible endless loops
 		m_data_state = new_data_state;
+		LOGMASKED(LOG_SIGNALS, "%s Data:  %d\n", fromkb? "<-" : "->", m_data_state);
 
 		// Send state to keyboard interface logic on mainboard
 		m_out_data_cb(m_data_state);
@@ -150,28 +155,28 @@ void pc_kbdc_device::update_data_state()
 WRITE_LINE_MEMBER(pc_kbdc_device::clock_write_from_mb)
 {
 	m_mb_clock_state = state;
-	update_clock_state();
+	update_clock_state(false);
 }
 
 
 WRITE_LINE_MEMBER(pc_kbdc_device::data_write_from_mb)
 {
 	m_mb_data_state = state;
-	update_data_state();
+	update_data_state(false);
 }
 
 
 WRITE_LINE_MEMBER(pc_kbdc_device::clock_write_from_kb)
 {
 	m_kb_clock_state = state;
-	update_clock_state();
+	update_clock_state(true);
 }
 
 
 WRITE_LINE_MEMBER(pc_kbdc_device::data_write_from_kb)
 {
 	m_kb_data_state = state;
-	update_data_state();
+	update_data_state(true);
 }
 
 

@@ -12,8 +12,8 @@
 #include "pstring.h"
 #include "ptypes.h"
 
-#include <cstddef>
-#include <cstdlib>
+#include <cstddef>      // for std::max_align_t (usually long long)
+//#include <cstdlib>
 #include <memory>
 #include <type_traits>
 #include <utility>

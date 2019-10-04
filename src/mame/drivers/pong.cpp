@@ -324,7 +324,7 @@ private:
 
 INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
-	int numpad = uintptr_t(param);
+	int numpad = param;
 
 	switch (numpad)
 	{
@@ -337,7 +337,7 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 
 INPUT_CHANGED_MEMBER(rebound_state::input_changed)
 {
-	int numpad = uintptr_t(param);
+	int numpad = param;
 
 	switch (numpad)
 	{

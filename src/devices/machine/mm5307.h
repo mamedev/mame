@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 #ifndef MAME_MACHINE_MM5307_H
-#define MAME_MACHINE_MM5307_H 1
+#define MAME_MACHINE_MM5307_H
 
 #pragma once
 

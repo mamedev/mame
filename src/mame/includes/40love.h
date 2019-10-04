@@ -11,6 +11,7 @@
 #include "sound/ay8910.h"
 #include "sound/ta7630.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class fortyl_state : public driver_device
 {

@@ -3,9 +3,8 @@
 // thanks-to:Berger
 /******************************************************************************
 
-SciSys Delta-1, the chess engine seems similar to Boris (see aci_boris.cpp)
-It was sold by both Novag and SciSys, ROM has "COPY RIGHT WINKLER HK 1979",
-Winkler was the founder of SciSys(later renamed to Saitek).
+SciSys Delta-1, it was sold by both Novag and SciSys, ROM has "COPY RIGHT WINKLER
+HK 1979", Winkler was the founder of SciSys(later renamed to Saitek).
 
 Hardware notes:
 - 3850PK CPU at ~2MHz, 3853PK memory interface
@@ -195,7 +194,7 @@ static INPUT_PORTS_START( delta1 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("RESET") // not on matrix
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, delta1_state, reset_button, nullptr) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, delta1_state, reset_button, 0) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 

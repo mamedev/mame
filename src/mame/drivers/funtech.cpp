@@ -29,6 +29,7 @@ and an unpopulated position for a YM2413 or UM3567
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "fts2in1.lh"
 

@@ -16,10 +16,10 @@
 #include "pstring.h"
 #include "putil.h"
 
-#include <cwchar>
 #include <memory>
 
 #ifdef _WIN32
+#include <cwchar>
 #define PMAIN(appclass) \
 extern "C" int wmain(int argc, wchar_t *argv[]) { return plib::app::mainrun<appclass, wchar_t>(argc, argv); }
 #else
@@ -44,10 +44,10 @@ namespace plib {
 
 		virtual pstring usage() = 0;
 		virtual int execute() = 0;
-
+#if !USE_CSTREAM
 		plib::pstdout pout_strm;
 		plib::pstderr perr_strm;
-
+#endif
 		plib::putf8_fmt_writer pout;
 		plib::putf8_fmt_writer perr;
 

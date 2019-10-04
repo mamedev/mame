@@ -10,6 +10,7 @@
 #include "machine/input_merger.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class bking_state : public driver_device
 {

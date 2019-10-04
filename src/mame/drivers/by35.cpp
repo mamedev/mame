@@ -95,9 +95,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(kickback_x3);
+	template <int Param> DECLARE_READ_LINE_MEMBER(outhole_x0);
+	template <int Param> DECLARE_READ_LINE_MEMBER(drop_target_x0);
+	template <int Param> DECLARE_READ_LINE_MEMBER(kickback_x3);
 
 	void by35(machine_config &config);
 	void nuovo(machine_config &config);
@@ -402,7 +402,7 @@ static INPUT_PORTS_START( by35 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 //  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, outhole_x0, (void *)0x07) // PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, outhole_x0<0x07>) // PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -843,14 +843,14 @@ static INPUT_PORTS_START( playboy )
 	PORT_DIPSETTING(    0x40, "Extra Ball or Special Held Until Collected")
 
 	PORT_MODIFY("X0")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x00) // PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x01) // PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x02) // PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x03) // PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x04) // PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x00>) // PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x01>) // PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x02>) // PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x03>) // PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x04>) // PORT_CODE(KEYCODE_BACKSLASH)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, kickback_x3, (void *)0x37) // PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, kickback_x3<0x37>) // PORT_CODE(KEYCODE_Q)
 
 	PORT_START("RT2")
 	PORT_ADJUSTER( 50, "RT2 - Tone Sustain" )
@@ -952,10 +952,11 @@ static INPUT_PORTS_START( frontier )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
+template <int Param>
+READ_LINE_MEMBER( by35_state::outhole_x0 )
 {
-	int bit_shift = ((uintptr_t)param & 0x07);
-	int port = (((uintptr_t)param >> 4) & 0x07);
+	int bit_shift = (Param & 0x07);
+	int port = ((Param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in the Outhole so the Outhole Solenoid can release it */
 
@@ -965,10 +966,11 @@ CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-CUSTOM_INPUT_MEMBER( by35_state::kickback_x3 )
+template <int Param>
+READ_LINE_MEMBER( by35_state::kickback_x3 )
 {
-	int bit_shift = ((uintptr_t)param & 0x07);
-	int port = (((uintptr_t)param >> 4) & 0x07);
+	int bit_shift = (Param & 0x07);
+	int port = ((Param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in a Saucer so the Saucer Solenoid can release it */
 
@@ -978,12 +980,13 @@ CUSTOM_INPUT_MEMBER( by35_state::kickback_x3 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-CUSTOM_INPUT_MEMBER( by35_state::drop_target_x0 )
+template <int Param>
+READ_LINE_MEMBER( by35_state::drop_target_x0 )
 {
 	/* Here we simulate the Drop Target switch states so the Drop Target Reset Solenoid can also release the switches */
 
-	int bit_shift = ((uintptr_t)param & 0x07);
-	int port = (((uintptr_t)param >> 4) & 0x07);
+	int bit_shift = (Param & 0x07);
+	int port = ((Param >> 4) & 0x07);
 
 	switch (bit_shift)
 	{
@@ -1933,6 +1936,24 @@ ROM_START(flashgdnv)
 	ROM_LOAD("834-09_7.532", 0xe000, 0x1000, CRC(19ceabd1) SHA1(37e7780f2ba3e06462e775547278dcba1b6d2ac8))
 ROM_END
 
+ROM_START(flashgdnfv)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD( "834-23_2.732", 0x1000, 0x0800, CRC(0c7a0d91) SHA1(1f79be15817975acbc35cb08591e2289e2eca938))
+	ROM_CONTINUE( 0x5000, 0x0800)
+	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7))
+	ROM_CONTINUE( 0x5800, 0x0800)
+	ROM_RELOAD( 0x7000, 0x1000)
+	ROM_REGION(0x10000, "sounds_plus:cpu", 0)
+	ROM_LOAD("834-37_4.532", 0xf000, 0x1000, CRC(c4687fe1) SHA1(104a44fd05d7ca0640971cc52152ac7a03349fc7))
+	ROM_LOAD("834-27_1.532", 0x8000, 0x1000, CRC(2152efff) SHA1(07d2af3e1f9077548e3932fd1d104275de889eae))
+	ROM_LOAD("834-28_2.532", 0x9000, 0x1000, CRC(01d0bb0f) SHA1(77a35f357d712e9d24e56b45d04dc28b372d8634))
+	ROM_LOAD("834-29_3.532", 0xa000, 0x1000, CRC(8beb4a87) SHA1(bd415303e73950a19b02226d35ee5c12fe58e300))
+	ROM_LOAD("834-30_4.532", 0xb000, 0x1000, CRC(35040596) SHA1(3167d29f6346aef8ce3bdf51652ba248c1b7bdf0))
+	ROM_LOAD("834-31_5.532", 0xc000, 0x1000, CRC(a2e4cfd3) SHA1(ba1501d9d1d7af406affd53e80eb08afa6219036))
+	ROM_LOAD("834-32_6.532", 0xd000, 0x1000, CRC(d18c6803) SHA1(a24a8a63280ed365618592de8690985ed1797cfd))
+	ROM_LOAD("834-09_7.532", 0xe000, 0x1000, CRC(19ceabd1) SHA1(37e7780f2ba3e06462e775547278dcba1b6d2ac8))
+ROM_END
+
 /*--------------------------------
 / Frontier #1217
 /-------------------------------*/
@@ -2808,22 +2829,23 @@ GAME( 1983, goldball,   0,        as3022,      by35,      by35_state, init_by35_
 GAME( 1983, goldballn,  goldball, as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // Squawk & Talk sound
-GAME( 1981, flashgdn,  0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, flashgdnf, flashgdn, squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, flashgdnv, flashgdn, sounds_plus,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, fball_ii,  0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball II",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, eballdlx,  0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, eballd14,  eballdlx, squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, embryon,   0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Embryon",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, fathom,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fathom",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, centaur,   0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Centaur",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, medusa,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Medusa",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, vector,    0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Vector",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, elektra,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Elektra",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, spectrm,   0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, spectrm4,  spectrm,  squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, rapidfip,  0,        squawk_n_talk,    by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, m_mpac,    0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, flashgdn,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, flashgdnf,  flashgdn, squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, flashgdnv,  flashgdn, sounds_plus,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, flashgdnfv, flashgdn, sounds_plus,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French Vocalizer sound)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, fball_ii,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball II",                           MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, eballdlx,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, eballd14,   eballdlx, squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, embryon,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Embryon",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, fathom,     0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fathom",                                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, centaur,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Centaur",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, medusa,     0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Medusa",                                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, vector,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Vector",                                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1981, elektra,    0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Elektra",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, spectrm,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, spectrm4,   spectrm,  squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, rapidfip,   0,        squawk_n_talk,    by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1982, m_mpac,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 // Cheap Squeak sound
 GAME( 1984, kosteel,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

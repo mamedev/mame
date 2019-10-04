@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 
 #define DECO_32x32  0
 #define DECO_64x32  1

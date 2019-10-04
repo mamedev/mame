@@ -11,7 +11,7 @@
 #include "ptypes.h"
 
 #include <cmath> // std::floor
-#include <cstdint>
+//#include <cstdint>
 
 // ----------------------------------------------------------------------------------------
 // netlist_time

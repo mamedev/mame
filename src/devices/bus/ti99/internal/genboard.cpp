@@ -1,13 +1,52 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /***************************************************************************
-    Geneve 9640 mapper and more components
+    Geneve 9640 Gate Array and more components
 
-    This file contains 2 classes:
-    - mapper: main function of the Gate Array on the Geneve board. Maps logical
-        memory accesses to a wider address space using map registers.
-    - keyboard: an implementation of a XT-style keyboard. This should be dropped
-        and replaced by a proper XT keyboard implementation.
+    This file contains the emulation of the gate array and of the PAL chip
+    that is used to control wait state generation.
+
+    Pins of the Gate Array:
+
+    in:  AMC, AMB, AMA, A0..A15: Address bus
+    in:  CLKOUT
+    in:  IAQ/HOLDA
+    in?: NMI*
+    in?: RESET*
+
+    i/o: D0..D7: Data bus
+
+    out: KBDINT*:  Keyboard interrupt
+    i/o: KBDCLK:   Keyboard clock line
+    i/o: KBDDATA:  Keyboard data line
+
+    out: SNDEN*: Sound chip select
+    out: RTCEN*: RTC chip select
+
+    out: RAS*
+    out: CAS* (2x for two banks)
+    out: DRA0..DRA8: Address bus for DRAM (1+18 bit = 512K)
+
+    out: PSIEN*:   9901 enable
+    out: CRUCLK*
+
+    out: CSW*: v9938 write
+    out: CSR*: v9938 read
+
+    out: RAMENX*: SRAM expansion
+    out: RAMEN*:  SRAM
+    out: ROMEN*:  EPROM
+    out: AB0, AB1, AB2: Mapped address bits
+    in:  DBIN*
+    ? :  ABUS* / HOLDA
+    out: DBIN
+    ? :  HOLD*
+    ? :  READY*
+    out: DBEN*: External data bus enable
+    in:  MEMEN*
+    in:  SNDRDY
+    out: WE* / CRUCLK
+    out: PhiCLK: System clock for 9901
 
     Onboard SRAM configuration:
     There is an adjustable SRAM configuration on board, representing the
@@ -221,6 +260,7 @@
 #define LOG_VIDEOWS  (1U<<9)
 #define LOG_PFM      (1U<<10)
 #define LOG_DECODE   (1U<<11)
+#define LOG_INVADDR  (1U<<12)
 
 // Minimum log should be settings and warnings
 #define VERBOSE ( LOG_SETTING | LOG_WARN )
@@ -228,14 +268,15 @@
 #include "genboard.h"
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(GENEVE_KEYBOARD, bus::ti99::internal, geneve_keyboard_device, "geneve_keyboard", "Geneve XT-style keyboard")
-DEFINE_DEVICE_TYPE_NS(GENEVE_MAPPER, bus::ti99::internal, geneve_mapper_device, "geneve_mapper", "Geneve Gate Array")
-DEFINE_DEVICE_TYPE_NS(GENMOD_MAPPER, bus::ti99::internal, genmod_mapper_device, "genmod_mapper", "Geneve Mod Gate Array")
+DEFINE_DEVICE_TYPE_NS(GENEVE_GATE_ARRAY, bus::ti99::internal, geneve_gate_array_device, "geneve_gate_array", "Geneve Gate Array")
+DEFINE_DEVICE_TYPE_NS(GENMOD_GATE_ARRAY, bus::ti99::internal, genmod_gate_array_device, "genmod_gate_array", "Geneve Mod Gate Array")
 
 namespace bus { namespace ti99 { namespace internal {
 
-geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock), m_gromwaddr_LSB(false),
+geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+	m_boot_rom(0),
+	m_gromwaddr_LSB(false),
 	m_gromraddr_LSB(false),
 	m_grom_address(0),
 	m_video_waitstates(false),
@@ -249,36 +290,40 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, device
 	m_cartridge_secondpage(false),
 	m_cartridge6_writable(false),
 	m_cartridge7_writable(false),
-	m_boot_rom(0),
 	m_pfm_bank(0),
 	m_pfm_output_enable(false),
 	m_sram_mask(0),
 	m_sram_val(0),
 	m_ready(*this),
+	m_keyint(*this),
 	m_waitcount(0),
 	m_video_waitcount(0),
-	m_clock(*owner, GENEVE_CLOCK_TAG),
+	m_keyboard_shift_reg(0),
+	m_keyboard_last_clock(CLEAR_LINE),
+	m_keyboard_data_in(CLEAR_LINE),
+	m_shift_reg_enabled(false),
 	m_cpu(*owner, "maincpu"),
+	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_video(*owner, TI_VDP_TAG),
+	m_rtc(*owner, GENEVE_CLOCK_TAG),
+	m_sram(*this, GENEVE_SRAM_PAR_TAG),
+	m_dram(*this, GENEVE_DRAM_PAR_TAG),
+	m_peribox(*owner, TI_PERIBOX_TAG),
 	m_pfm512(*owner, GENEVE_PFM512_TAG),
 	m_pfm512a(*owner, GENEVE_PFM512A_TAG),
-	m_sound(*owner, TI_SOUNDCHIP_TAG),
-	m_keyboard(*owner, GENEVE_KEYBOARD_TAG),
-	m_video(*owner, TI_VDP_TAG),
-	m_peribox(*owner, TI_PERIBOX_TAG),
-	m_sram(*this, GENEVE_SRAM_PAR_TAG),
-	m_dram(*this, GENEVE_DRAM_PAR_TAG)
+	m_keyb_conn(*owner, GENEVE_KEYBOARD_CONN_TAG)
 {
 }
 
-geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: geneve_mapper_device(mconfig, GENEVE_MAPPER, tag, owner, clock)
+geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: geneve_gate_array_device(mconfig, GENEVE_GATE_ARRAY, tag, owner, clock)
 {
 	m_eprom = nullptr;
 	m_pbox_prefix = 0x070000;
 }
 
-genmod_mapper_device::genmod_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: geneve_mapper_device(mconfig, GENMOD_MAPPER, tag, owner, clock),
+genmod_gate_array_device::genmod_gate_array_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: geneve_gate_array_device(mconfig, GENMOD_GATE_ARRAY, tag, owner, clock),
 	m_gm_timode(false),
 	m_turbo(false)
 {
@@ -286,15 +331,15 @@ genmod_mapper_device::genmod_mapper_device(const machine_config &mconfig, const 
 	m_pbox_prefix = 0x170000;
 }
 
-INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
+INPUT_CHANGED_MEMBER( geneve_gate_array_device::settings_changed )
 {
 	// Used when switching the boot ROMs during runtime, especially the PFM
 	m_boot_rom = newval;
 }
 
-INPUT_CHANGED_MEMBER( genmod_mapper_device::setgm_changed )
+INPUT_CHANGED_MEMBER( genmod_gate_array_device::setgm_changed )
 {
-	int number = (int)((uint64_t)param&0x03);
+	int number = int(param&0x03);
 	int value = newval;
 
 	switch (number)
@@ -329,7 +374,7 @@ INPUT_CHANGED_MEMBER( genmod_mapper_device::setgm_changed )
     within the gate array. Unlike with real GROMs, no address wrapping occurs,
     and the complete 64K space is available.
 */
-uint8_t geneve_mapper_device::read_grom(offs_t offset)
+uint8_t geneve_gate_array_device::read_grom(offs_t offset)
 {
 	uint8_t reply;
 	if (offset & 0x0002)
@@ -364,7 +409,7 @@ uint8_t geneve_mapper_device::read_grom(offs_t offset)
     Simulates GROM. The real Geneve does not use GROMs but simulates them
     within the gate array.
 */
-void geneve_mapper_device::write_grom(offs_t offset, uint8_t data)
+void geneve_gate_array_device::write_grom(offs_t offset, uint8_t data)
 {
 	if (offset & 0x0002)
 	{
@@ -393,7 +438,7 @@ void geneve_mapper_device::write_grom(offs_t offset, uint8_t data)
 	}
 }
 
-void geneve_mapper_device::set_wait(int min)
+void geneve_gate_array_device::set_wait(int min)
 {
 	if (m_extra_waitstates && min < 2) min = 2;
 
@@ -411,38 +456,38 @@ void geneve_mapper_device::set_wait(int min)
 	}
 }
 
-void geneve_mapper_device::set_video_waitcount(int min)
+void geneve_gate_array_device::set_video_waitcount(int min)
 {
 	if (m_debug_no_ws) return;
 	m_video_waitcount = min;
 }
 
-void geneve_mapper_device::set_geneve_mode(bool geneve)
+void geneve_gate_array_device::set_geneve_mode(bool geneve)
 {
 	LOGMASKED(LOG_SETTING, "Setting Geneve mode = %d\n", geneve);
 	m_geneve_mode = geneve;
 }
 
-void geneve_mapper_device::set_direct_mode(bool direct)
+void geneve_gate_array_device::set_direct_mode(bool direct)
 {
 	LOGMASKED(LOG_SETTING, "Setting direct mode = %d\n", direct);
 	m_direct_mode = direct;
 }
 
-void geneve_mapper_device::set_cartridge_size(int size)
+void geneve_gate_array_device::set_cartridge_size(int size)
 {
 	LOGMASKED(LOG_SETTING, "Setting cartridge size to %d\n", size);
 	m_cartridge_size = size;
 }
 
-void geneve_mapper_device::set_cartridge_writable(int base, bool write)
+void geneve_gate_array_device::set_cartridge_writable(int base, bool write)
 {
 	LOGMASKED(LOG_SETTING, "Cartridge %04x space writable = %d\n", base, write);
 	if (base==0x6000) m_cartridge6_writable = write;
 	else m_cartridge7_writable = write;
 }
 
-void geneve_mapper_device::set_video_waitstates(bool wait)
+void geneve_gate_array_device::set_video_waitstates(bool wait)
 {
 	// Tends to be called repeatedly
 	if (m_video_waitstates != wait)
@@ -452,12 +497,105 @@ void geneve_mapper_device::set_video_waitstates(bool wait)
 	m_video_waitstates = wait;
 }
 
-void geneve_mapper_device::set_extra_waitstates(bool wait)
+void geneve_gate_array_device::set_extra_waitstates(bool wait)
 {
 	LOGMASKED(LOG_SETTING, "Setting extra waitstates = %d\n", wait);
 	m_extra_waitstates = wait;
 }
 
+/******************************************************************
+   Keyboard support
+   XT protocol:
+
+    Original XT: 0 1 bit0 bit1 bit2 bit3 bit4 bit5 bit6 bit7
+    Some clones:   1 bit0 bit1 bit2 bit3 bit4 bit5 bit6 bit7
+
+    bit0 = LSB, bit7 = MSB
+
+   For now we assume that the Geneve needs the original XT keyboard.
+
+   We can use the start 1 bit to control bit reception. When it reaches the
+   rightmost position, we suspend transfer and raise the interrupt.
+
+   With the flagging of the interrupt, the data line towards the keyboard
+   is held low until the interrupt is cleared. This is done by clearing the
+   shift register by setting the CRU address 1EF2 to 0.
+
+   Note that lowering the clock line to 0 for more than 20ms will trigger
+   a keyboard reset.
+
+******************************************************************/
+
+/*
+    Pull down or release the clock line.
+    Called by setting CRU bit 1EF0 to 0 or 1.
+*/
+WRITE_LINE_MEMBER( geneve_gate_array_device::set_keyboard_clock)
+{
+	m_keyb_conn->clock_write_from_mb(state);
+}
+
+/*
+    Enable the shift register. Setting to 0 will clear the register and
+    lock it. At the same time, the interrupt is cleared, and the data line
+    is released. If further scancodes are expected, the shift register should
+    immediately be enabled again.
+
+    Called by setting CRU bit 1EF2 to 0 or 1
+*/
+WRITE_LINE_MEMBER( geneve_gate_array_device::enable_shift_register)
+{
+	m_shift_reg_enabled = (state==ASSERT_LINE);
+
+	if (!m_shift_reg_enabled)
+	{
+		LOGMASKED(LOG_KEYBOARD, "Clear shift register, disable\n");
+		m_keyboard_shift_reg = 0;
+		shift_reg_changed();
+	}
+	else
+		LOGMASKED(LOG_KEYBOARD, "Enable shift register\n");
+}
+
+void geneve_gate_array_device::shift_reg_changed()
+{
+	// The level of the data line is the inverse of the rightmost bit of
+	// the shift register. This means that once the start bit reaches that
+	// position, it will pull down the data line and stop the transfer.
+	m_keyb_conn->data_write_from_mb(1 - (m_keyboard_shift_reg & 1));
+	m_keyint((m_keyboard_shift_reg & 1)? ASSERT_LINE : CLEAR_LINE);
+	if (m_keyboard_shift_reg & 1)
+		LOGMASKED(LOG_KEYBOARD, "Scan code complete; raise interrupt, hold down data line\n");
+	else
+		LOGMASKED(LOG_KEYBOARD, "Clear keyboard interrupt, release data line\n");
+}
+
+/*
+    Incoming keyboard strobe. When 0, push the current data line level into
+    the shift register at the leftmost position.
+*/
+WRITE_LINE_MEMBER( geneve_gate_array_device::kbdclk )
+{
+	LOGMASKED(LOG_KEYBOARD, "Keyboard clock: %d\n", state);
+	bool clock_falling_edge = (m_keyboard_last_clock == ASSERT_LINE && state == CLEAR_LINE);
+
+	if (m_shift_reg_enabled && clock_falling_edge)
+	{
+		m_keyboard_shift_reg = (m_keyboard_shift_reg>>1) | (m_keyboard_data_in? 0x100 : 0x00);
+		LOGMASKED(LOG_KEYBOARD, "Shift register = %02x\n", m_keyboard_shift_reg>>1);
+		shift_reg_changed();
+	}
+	m_keyboard_last_clock = (line_state)state;
+}
+
+/*
+    Latch the value of the incoming data line.
+*/
+WRITE_LINE_MEMBER( geneve_gate_array_device::kbddata )
+{
+	LOGMASKED(LOG_KEYBOARD, "Keyboard data: %d\n", state);
+	m_keyboard_data_in = (line_state)state;
+}
 
 /************************************************************************
     Called by the address map
@@ -468,7 +606,7 @@ void geneve_mapper_device::set_extra_waitstates(bool wait)
     SETADDRESS method, and we re-use the values stored there to quickly
     access the appropriate component.
 */
-uint8_t geneve_mapper_device::readm(offs_t offset)
+uint8_t geneve_gate_array_device::readm(offs_t offset)
 {
 	uint8_t value = 0;
 
@@ -525,8 +663,8 @@ uint8_t geneve_mapper_device::readm(offs_t offset)
 
 	case MLKEY:
 		// key
-		if (!machine().side_effects_disabled()) value = m_keyboard->get_recent_key();
-		LOGMASKED(LOG_READ, "Read keyboard -> %02x\n", value);
+		value = m_keyboard_shift_reg>>1;
+		LOGMASKED(LOG_KEYBOARD, "Read keyboard -> %02x\n", value);
 		break;
 
 	case MLCLOCK:
@@ -538,7 +676,7 @@ uint8_t geneve_mapper_device::readm(offs_t offset)
 		// Needs more investigation. We might as well ignore this,
 		// as the high nibble is obviously undefined and takes some past
 		// value floating around.
-		value = m_clock->read(dec->offset & 0x000f);
+		value = m_rtc->read(dec->offset & 0x000f);
 		if (m_geneve_mode) value |= 0xf0;
 		else value |= ((dec->offset & 0x000f)==0x000f)? 0x20 : 0x10;
 		LOGMASKED(LOG_READ, "Read clock %04x -> %02x\n", dec->offset, value);
@@ -582,7 +720,7 @@ uint8_t geneve_mapper_device::readm(offs_t offset)
 		}
 		else
 		{
-			LOGMASKED(LOG_WARN, "Decoded as SRAM read, but no SRAM at %06x\n", dec->physaddr);
+			LOGMASKED(LOG_INVADDR, "Decoded as SRAM read, but no SRAM at %06x\n", dec->physaddr);
 			value = 0;
 		}
 		// Return in any case
@@ -605,7 +743,7 @@ uint8_t geneve_mapper_device::readm(offs_t offset)
 	return value;
 }
 
-void geneve_mapper_device::writem(offs_t offset, uint8_t data)
+void geneve_gate_array_device::writem(offs_t offset, uint8_t data)
 {
 	decdata *dec;
 	decdata debug;
@@ -666,7 +804,7 @@ void geneve_mapper_device::writem(offs_t offset, uint8_t data)
 	case MLCLOCK:
 		// clock
 		// ++++ ++++ ++++ ----
-		m_clock->write(dec->offset & 0x000f, data);
+		m_rtc->write(dec->offset & 0x000f, data);
 		LOGMASKED(LOG_WRITE, "Write clock %04x <- %02x\n", offset, data);
 		break;
 
@@ -702,7 +840,7 @@ void geneve_mapper_device::writem(offs_t offset, uint8_t data)
 		// Ignore EPROM write (unless PFM)
 		if (m_boot_rom != GENEVE_EPROM) write_to_pfm(dec->physaddr, data);
 		else
-			LOGMASKED(LOG_WARN, "Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
+			LOGMASKED(LOG_INVADDR, "Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
 		break;
 
 	case MPSRAM:
@@ -713,7 +851,7 @@ void geneve_mapper_device::writem(offs_t offset, uint8_t data)
 		}
 		else
 		{
-			LOGMASKED(LOG_WARN, "Decoded as SRAM write, but no SRAM at %06x\n", dec->physaddr);
+			LOGMASKED(LOG_INVADDR, "Decoded as SRAM write, but no SRAM at %06x\n", dec->physaddr);
 		}
 		break;
 
@@ -730,7 +868,18 @@ void geneve_mapper_device::writem(offs_t offset, uint8_t data)
 	}
 }
 
-void geneve_mapper_device::decode_logical(bool reading, geneve_mapper_device::decdata* dec)
+const geneve_gate_array_device::logentry_t geneve_gate_array_device::s_logmap[7] =
+{
+	{ 0xf100, 0x000e, 0x8800, 0x03fe, 0x0400, MLVIDEO,  "video" },
+	{ 0xf110, 0x0007, 0x8000, 0x0007, 0x0000, MLMAPPER, "mapper" },
+	{ 0xf118, 0x0007, 0x8008, 0x0007, 0x0000, MLKEY,    "keyboard" },
+	{ 0xf120, 0x000e, 0x8400, 0x03fe, 0x0000, MLSOUND,  "sound" },
+	{ 0xf130, 0x000f, 0x8010, 0x000f, 0x0000, MLCLOCK,  "clock" },
+	{ 0x0000, 0x0000, 0x9000, 0x03fe, 0x0400, MBOX,     "speech (in P-Box)" },
+	{ 0x0000, 0x0000, 0x9800, 0x03fe, 0x0400, MLGROM,   "GROM" },
+};
+
+void geneve_gate_array_device::decode_logical(bool reading, geneve_gate_array_device::decdata* dec)
 {
 	dec->function = MUNDEF;
 	dec->physaddr = m_pbox_prefix | dec->offset;
@@ -742,19 +891,19 @@ void geneve_mapper_device::decode_logical(bool reading, geneve_mapper_device::de
 		if (m_geneve_mode)
 		{
 			// Skip when genbase is 0
-			if ((m_logmap[i].genbase != 0) && ((dec->offset & ~m_logmap[i].genmask) == m_logmap[i].genbase))
+			if ((s_logmap[i].genbase != 0) && ((dec->offset & ~s_logmap[i].genmask) == s_logmap[i].genbase))
 				break;
 		}
 		else
 		{
 			if (reading)
 			{
-				if ((dec->offset & ~m_logmap[i].timask) == m_logmap[i].tibase)
+				if ((dec->offset & ~s_logmap[i].timask) == s_logmap[i].tibase)
 					break;
 			}
 			else
 			{
-				if ((dec->offset & ~m_logmap[i].timask) == (m_logmap[i].tibase | m_logmap[i].writeoff))
+				if ((dec->offset & ~s_logmap[i].timask) == (s_logmap[i].tibase | s_logmap[i].writeoff))
 					break;
 			}
 		}
@@ -762,12 +911,12 @@ void geneve_mapper_device::decode_logical(bool reading, geneve_mapper_device::de
 	}
 	if (i != 7)
 	{
-		LOGMASKED(LOG_DECODE, "Decoded as %s: %04x\n", m_logmap[i].description, dec->offset);
-		dec->function = m_logmap[i].function;
+		LOGMASKED(LOG_DECODE, "Decoded as %s: %04x\n", s_logmap[i].description, dec->offset);
+		dec->function = s_logmap[i].function;
 	}
 }
 
-void geneve_mapper_device::map_address(bool reading, geneve_mapper_device::decdata* dec)
+void geneve_gate_array_device::map_address(bool reading, geneve_gate_array_device::decdata* dec)
 {
 	int logpage = (dec->offset & 0xe000) >> 13;
 	int physpage = 0;
@@ -812,22 +961,30 @@ void geneve_mapper_device::map_address(bool reading, geneve_mapper_device::decda
 	dec->physaddr = ((physpage << 13) | (dec->offset & 0x1fff)) & 0x1fffff;
 }
 
-void geneve_mapper_device::decode_physical(geneve_mapper_device::decdata* dec)
+const geneve_gate_array_device::physentry_t geneve_gate_array_device::s_physmap[4] =
+{
+	{ 0x000000, 0x07ffff, MPDRAM,  1, "DRAM" },
+	{ 0x080000, 0x07ffff, MPEXP,   1, "on-board expansion" },
+	{ 0x1e0000, 0x01ffff, MPEPROM, 0, "EPROM" },
+	{ 0x180000, 0x07ffff, MPSRAM,  0, "SRAM" }
+};
+
+void geneve_gate_array_device::decode_physical(geneve_gate_array_device::decdata* dec)
 {
 	dec->function = MUNDEF;
 
 	int i = 0;
 	while (i < 4)
 	{
-		if ((dec->physaddr & ~m_physmap[i].mask) == m_physmap[i].base)
+		if ((dec->physaddr & ~s_physmap[i].mask) == s_physmap[i].base)
 			break;
 		i++;
 	}
 	if (i != 4)
 	{
-		LOGMASKED(LOG_DECODE, "Decoded as %s: %06x\n", m_physmap[i].description, dec->physaddr);
-		dec->function = m_physmap[i].function;
-		dec->wait = m_physmap[i].wait;
+		LOGMASKED(LOG_DECODE, "Decoded as %s: %06x\n", s_physmap[i].description, dec->physaddr);
+		dec->function = s_physmap[i].function;
+		dec->wait = s_physmap[i].wait;
 	}
 	else
 	{
@@ -837,7 +994,7 @@ void geneve_mapper_device::decode_physical(geneve_mapper_device::decdata* dec)
 	}
 }
 
-void genmod_mapper_device::decode_mod(geneve_mapper_device::decdata* dec)
+void genmod_gate_array_device::decode_mod(geneve_gate_array_device::decdata* dec)
 {
 	// GenMod mode
 	// The TI Mode switch activates the DRAM on the board (1 WS)
@@ -854,7 +1011,7 @@ void genmod_mapper_device::decode_mod(geneve_mapper_device::decdata* dec)
 /*
     Boot ROM handling, from EPROM or PFM.
 */
-uint8_t geneve_mapper_device::boot_rom(offs_t offset)
+uint8_t geneve_gate_array_device::boot_rom(offs_t offset)
 {
 	uint8_t value;
 	int pfmaddress = (offset & 0x01ffff) | (m_pfm_bank<<17);
@@ -881,7 +1038,7 @@ uint8_t geneve_mapper_device::boot_rom(offs_t offset)
 	return value;
 }
 
-void geneve_mapper_device::write_to_pfm(offs_t offset, uint8_t data)
+void geneve_gate_array_device::write_to_pfm(offs_t offset, uint8_t data)
 {
 	// Nota bene: The PFM must be write protected on startup, or the RESET
 	// of the 9995 will attempt to write the return vector into the flash EEPROM
@@ -907,7 +1064,7 @@ void geneve_mapper_device::write_to_pfm(offs_t offset, uint8_t data)
     This decoding will later be used in the READ/WRITE member functions. Also,
     we initiate wait state creation here.
 */
-void geneve_mapper_device::setaddress(offs_t address, uint8_t busctrl)
+void geneve_gate_array_device::setaddress(offs_t address, uint8_t busctrl)
 {
 	LOGMASKED(LOG_DETAIL, "setaddress = %04x\n", address);
 	m_debug_no_ws = false;
@@ -944,7 +1101,7 @@ void geneve_mapper_device::setaddress(offs_t address, uint8_t busctrl)
     affect the video access itself but become effective after the access; if
     the code runs on the chip, these wait states are ignored.)
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
+WRITE_LINE_MEMBER( geneve_gate_array_device::clock_in )
 {
 	if (state==ASSERT_LINE)
 	{
@@ -1000,21 +1157,21 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 /*
     PFM expansion: Setting the bank.
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_lsb )
+WRITE_LINE_MEMBER( geneve_gate_array_device::pfm_select_lsb )
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 1;
 	else m_pfm_bank &= 0xfe;
 	LOGMASKED(LOG_PFM, "Setting bank (l) = %d\n", m_pfm_bank);
 }
 
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_msb )
+WRITE_LINE_MEMBER( geneve_gate_array_device::pfm_select_msb )
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 2;
 	else m_pfm_bank &= 0xfd;
 	LOGMASKED(LOG_PFM, "Setting bank (u) = %d\n", m_pfm_bank);
 }
 
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
+WRITE_LINE_MEMBER( geneve_gate_array_device::pfm_output_enable )
 {
 	// Negative logic
 	m_pfm_output_enable = (state==CLEAR_LINE);
@@ -1025,9 +1182,10 @@ WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
 //  Common device lifecycle
 //====================================================================
 
-void geneve_mapper_device::device_start()
+void geneve_gate_array_device::device_start()
 {
-	m_ready.resolve();
+	m_ready.resolve_safe();
+	m_keyint.resolve_safe();
 
 	m_geneve_mode = false;
 	m_direct_mode = true;
@@ -1060,7 +1218,7 @@ void geneve_mapper_device::device_start()
 	save_item(NAME(m_video_waitcount));
 }
 
-void geneve_mapper_device::common_reset()
+void geneve_gate_array_device::common_reset()
 {
 	m_extra_waitstates = false;
 	m_video_waitstates = true;
@@ -1092,7 +1250,7 @@ void geneve_mapper_device::common_reset()
 	LOGMASKED(LOG_SETTING, "Video RAM set to %d KiB\n", videoram / 1024);
 }
 
-void geneve_mapper_device::device_reset()
+void geneve_gate_array_device::device_reset()
 {
 	common_reset();
 
@@ -1121,7 +1279,7 @@ void geneve_mapper_device::device_reset()
 	}
 }
 
-void genmod_mapper_device::device_reset()
+void genmod_gate_array_device::device_reset()
 {
 	common_reset();
 	LOGMASKED(LOG_SETTING, "Using GenMod modification\n");
@@ -1129,521 +1287,6 @@ void genmod_mapper_device::device_reset()
 	m_gm_timode = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TIM)!=0);
 }
 
-/****************************************************************************
-    Keyboard support
-
-    The XT keyboard interface is described in various places on the internet,
-    like (http://www-2.cs.cmu.edu/afs/cs/usr/jmcm/www/info/key2.txt).  It is a
-    synchronous unidirectional serial interface: the data line is driven by the
-    keyboard to send data to the CPU; the CTS/clock line has a pull up resistor
-    and can be driven low by both keyboard and CPU.  To send data to the CPU,
-    the keyboard pulses the clock line low 9 times, and the Geneve samples all
-    8 bits of data (plus one start bit) on each falling edge of the clock.
-    When the key code buffer is full, the Geneve gate array asserts the kbdint*
-    line (connected to 9901 int8_t*).  The Geneve gate array will hold the
-    CTS/clock line low as long as the keyboard buffer is full or CRU bit @>F78
-    is 0.  Writing a 0 to >F79 will clear the Geneve keyboard buffer, and
-    writing a 1 will resume normal operation: you need to write a 0 to >F78
-    before clearing >F79, or the keyboard will be enabled to send data the gate
-    array when >F79 is is set to 0, and any such incoming data from the
-    keyboard will be cleared as soon as it is buffered by the gate array.
-
-****************************************************************************/
-
-static const uint8_t MF1_CODE[0xe] =
-{
-	/* extended keys that are equivalent to non-extended keys */
-	0x1c,   /* keypad enter */
-	0x1d,   /* right control */
-	0x38,   /* alt gr */
-	// extra codes are 0x5b for Left Windows, 0x5c for Right Windows, 0x5d
-	// for Menu, 0x5e for power, 0x5f for sleep, 0x63 for wake, but I doubt
-	// any Geneve program would take advantage of these. */
-
-	// extended key that is equivalent to a non-extended key
-	// with shift off
-	0x35,   /* pad slash */
-
-	// extended keys that are equivalent to non-extended keys
-	// with numlock off
-	0x47,   /* home */
-	0x48,   /* up */
-	0x49,   /* page up */
-	0x4b,   /* left */
-	0x4d,   /* right */
-	0x4f,   /* end */
-	0x50,   /* down */
-	0x51,   /* page down */
-	0x52,   /* insert */
-	0x53    /* delete */
-};
-
-geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GENEVE_KEYBOARD, tag, owner, clock),
-	m_interrupt(*this),
-	m_keys(*this, "KEY%u", 0),
-	m_key_reset(false), m_key_queue_length(0), m_key_queue_head(0), m_key_in_buffer(false), m_key_numlock_state(false), m_key_ctrl_state(0), m_key_alt_state(0),
-	m_key_real_shift_state(0), m_key_fake_shift_state(false), m_key_fake_unshift_state(false), m_key_autorepeat_key(0), m_key_autorepeat_timer(0), m_keep_keybuf(false),
-	m_keyboard_clock(false), m_timer(nullptr)
-{
-}
-
-void geneve_keyboard_device::post_in_key_queue(int keycode)
-{
-	m_key_queue[(m_key_queue_head + m_key_queue_length) % KEYQUEUESIZE] = keycode;
-	m_key_queue_length++;
-
-	LOGMASKED(LOG_KEYBOARD, "Posting keycode %02x\n", keycode);
-}
-
-void geneve_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	poll();
-}
-
-void geneve_keyboard_device::poll()
-{
-	uint32_t keystate;
-	uint32_t key_transitions;
-	int i, j;
-	int keycode;
-	int pressed;
-	LOGMASKED(LOG_KEYBOARD, "Poll keyboard\n");
-	if (m_key_reset) return;
-
-	/* Poll keyboard */
-	for (i = 0; (i < 4) && (m_key_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); i++)
-	{
-		keystate = m_keys[2*i]->read() | (m_keys[2*i + 1]->read() << 16);
-		key_transitions = keystate ^ m_key_state_save[i];
-		if (key_transitions)
-		{
-			for (j = 0; (j < 32) && (m_key_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); j++)
-			{
-				if ((key_transitions >> j) & 1)
-				{
-					keycode = (i << 5) | j;
-					pressed = ((keystate >> j) & 1);
-					if (pressed)
-						m_key_state_save[i] |= (1 << j);
-					else
-						m_key_state_save[i] &= ~ (1 << j);
-
-					/* Update auto-repeat */
-					if (pressed)
-					{
-						m_key_autorepeat_key = keycode;
-						m_key_autorepeat_timer = KEYAUTOREPEATDELAY+1;
-					}
-					else /*if (keycode == m_key_autorepeat_key)*/
-						m_key_autorepeat_key = 0;
-
-					// Release Fake Shift/Unshift if another key is pressed
-					// We do so if a key is released, though it is actually
-					// required only if it is a modifier key
-					/*if (pressed)*/
-					//{
-					if (m_key_fake_shift_state)
-					{
-						/* Fake shift release */
-						post_in_key_queue(0xe0);
-						post_in_key_queue(0xaa);
-						m_key_fake_shift_state = false;
-					}
-					if (m_key_fake_unshift_state)
-					{
-						/* Fake shift press */
-						post_in_key_queue(0xe0);
-						post_in_key_queue(0x2a);
-						m_key_fake_unshift_state = false;
-					}
-					//}
-
-					/* update shift and numlock state */
-					if ((keycode == 0x2a) || (keycode == 0x36))
-						m_key_real_shift_state = m_key_real_shift_state + (pressed ? +1 : -1);
-					if ((keycode == 0x1d) || (keycode == 0x61))
-						m_key_ctrl_state = m_key_ctrl_state + (pressed ? +1 : -1);
-					if ((keycode == 0x38) || (keycode == 0x62))
-						m_key_alt_state = m_key_alt_state + (pressed ? +1 : -1);
-					if ((keycode == 0x45) && pressed)
-						m_key_numlock_state = !m_key_numlock_state;
-
-					if ((keycode >= 0x60) && (keycode < 0x6e))
-					{   /* simpler extended keys */
-						/* these keys are emulated */
-
-						if ((keycode >= 0x63) && pressed)
-						{
-							/* Handle shift state */
-							if (keycode == 0x63)
-							{   /* non-shifted key */
-								if (m_key_real_shift_state!=0)
-									/* Fake shift unpress */
-									m_key_fake_unshift_state = true;
-							}
-							else /*if (keycode >= 0x64)*/
-							{   /* non-numlock mode key */
-								if (m_key_numlock_state & (m_key_real_shift_state==0))
-									/* Fake shift press if numlock is active */
-									m_key_fake_shift_state = true;
-								else if ((!m_key_numlock_state) & (m_key_real_shift_state!=0))
-									/* Fake shift unpress if shift is down */
-									m_key_fake_unshift_state = true;
-							}
-
-							if (m_key_fake_shift_state)
-							{
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0x2a);
-							}
-
-							if (m_key_fake_unshift_state)
-							{
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0xaa);
-							}
-						}
-
-						keycode = MF1_CODE[keycode-0x60];
-						if (!pressed) keycode |= 0x80;
-						post_in_key_queue(0xe0);
-						post_in_key_queue(keycode);
-					}
-					else if (keycode == 0x6e)
-					{   /* emulate Print Screen / System Request (F13) key */
-						/* this is a bit complex, as Alt+PrtScr -> SysRq */
-						/* Additionally, Ctrl+PrtScr involves no fake shift press */
-						if (m_key_alt_state!=0)
-						{
-							/* SysRq */
-							keycode = 0x54;
-							if (!pressed) keycode |= 0x80;
-							post_in_key_queue(keycode);
-						}
-						else
-						{
-							/* Handle shift state */
-							if (pressed && (m_key_real_shift_state==0) && (m_key_ctrl_state==0))
-							{   /* Fake shift press */
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0x2a);
-								m_key_fake_shift_state = true;
-							}
-
-							keycode = 0x37;
-							if (!pressed) keycode |= 0x80;
-							post_in_key_queue(0xe0);
-							post_in_key_queue(keycode);
-						}
-					}
-					else if (keycode == 0x6f)
-					{   // emulate pause (F15) key
-						// this is a bit complex, as Pause -> Ctrl+NumLock and
-						// Ctrl+Pause -> Ctrl+ScrLock.  Furthermore, there is no
-						// repeat or release.
-						if (pressed)
-						{
-							if (m_key_ctrl_state!=0)
-							{
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0x46);
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0xc6);
-							}
-							else
-							{
-								post_in_key_queue(0xe1);
-								post_in_key_queue(0x1d);
-								post_in_key_queue(0x45);
-								post_in_key_queue(0xe1);
-								post_in_key_queue(0x9d);
-								post_in_key_queue(0xc5);
-							}
-						}
-					}
-					else
-					{
-						if (!pressed) keycode |= 0x80;
-						post_in_key_queue(keycode);
-					}
-					signal_when_key_available();
-				}
-			}
-		}
-	}
-
-	/* Handle auto-repeat */
-	if ((m_key_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)) && (m_key_autorepeat_key!=0) && (--m_key_autorepeat_timer == 0))
-	{
-		if ((m_key_autorepeat_key >= 0x60) && (m_key_autorepeat_key < 0x6e))
-		{
-			post_in_key_queue(0xe0);
-			post_in_key_queue(MF1_CODE[m_key_autorepeat_key-0x60]);
-		}
-		else if (m_key_autorepeat_key == 0x6e)
-		{
-			if (m_key_alt_state!=0)
-				post_in_key_queue(0x54);
-			else
-			{
-				post_in_key_queue(0xe0);
-				post_in_key_queue(0x37);
-			}
-		}
-		else if (m_key_autorepeat_key == 0x6f)
-			;
-		else
-		{
-			post_in_key_queue(m_key_autorepeat_key);
-		}
-		signal_when_key_available();
-		m_key_autorepeat_timer = KEYAUTOREPEATRATE;
-	}
-}
-
-uint8_t geneve_keyboard_device::get_recent_key()
-{
-	if (m_key_in_buffer) return m_key_queue[m_key_queue_head];
-	else return 0;
-}
-
-void geneve_keyboard_device::signal_when_key_available()
-{
-	// if keyboard reset is not asserted, and key clock is enabled, and key
-	// buffer clear is disabled, and key queue is not empty. */
-	if ((!m_key_reset) && (m_keyboard_clock) && (m_keep_keybuf) && (m_key_queue_length != 0))
-	{
-		LOGMASKED(LOG_KEYBOARD, "Key available\n");
-		m_interrupt(ASSERT_LINE);
-		m_key_in_buffer = true;
-	}
-}
-
-WRITE_LINE_MEMBER( geneve_keyboard_device::clock_control )
-{
-	bool rising_edge = (!m_keyboard_clock && (state==ASSERT_LINE));
-	m_keyboard_clock = (state==ASSERT_LINE);
-	LOGMASKED(LOG_KEYBOARD, "Keyboard clock_control state=%d\n", m_keyboard_clock);
-	if (rising_edge)
-		signal_when_key_available();
-}
-
-WRITE_LINE_MEMBER( geneve_keyboard_device::send_scancodes )
-{
-	bool rising_edge = (!m_keep_keybuf && (state==ASSERT_LINE));
-	bool falling_edge = (m_keep_keybuf && (state==CLEAR_LINE));
-	m_keep_keybuf = (state==ASSERT_LINE);
-
-	if (rising_edge) signal_when_key_available();
-	else
-	{
-		if (falling_edge)
-		{
-			if (m_key_queue_length != 0)
-			{
-				m_key_queue_head = (m_key_queue_head + 1) % KEYQUEUESIZE;
-				m_key_queue_length--;
-			}
-			/* clear keyboard interrupt */
-			m_interrupt(CLEAR_LINE);
-			m_key_in_buffer = false;
-		}
-	}
-}
-
-WRITE_LINE_MEMBER( geneve_keyboard_device::reset_line )
-{
-	m_key_reset = !(state==ASSERT_LINE);
-
-	if (m_key_reset)
-	{
-		/* reset -> clear keyboard key queue, but not geneve key buffer */
-		m_key_queue_length = (m_key_in_buffer)? 1 : 0;
-		m_key_queue_head = 0;
-		memset(m_key_state_save, 0, sizeof(m_key_state_save));
-		m_key_numlock_state = false;
-		m_key_ctrl_state = 0;
-		m_key_alt_state = 0;
-		m_key_real_shift_state = 0;
-		m_key_fake_shift_state = false;
-		m_key_fake_unshift_state = false;
-		m_key_autorepeat_key = 0;
-	}
-}
-
-void geneve_keyboard_device::device_start()
-{
-	m_timer = timer_alloc(0);
-	m_interrupt.resolve();
-
-	// State registration
-	save_item(NAME(m_key_reset));
-	save_item(NAME(m_key_queue_length));
-	save_item(NAME(m_key_queue_head));
-	save_item(NAME(m_key_in_buffer));
-	save_item(NAME(m_key_numlock_state));
-	save_item(NAME(m_key_ctrl_state));
-	save_item(NAME(m_key_alt_state));
-	save_item(NAME(m_key_real_shift_state));
-	save_item(NAME(m_key_fake_shift_state));
-	save_item(NAME(m_key_fake_unshift_state));
-	save_item(NAME(m_key_autorepeat_key));
-	save_item(NAME(m_key_autorepeat_timer));
-	save_item(NAME(m_keep_keybuf));
-	save_item(NAME(m_keyboard_clock));
-	save_pointer(NAME(m_key_queue),KEYQUEUESIZE);
-	save_pointer(NAME(m_key_state_save),4);
-}
-
-void geneve_keyboard_device::device_reset()
-{
-	m_key_in_buffer = false;
-	reset_line(CLEAR_LINE);
-	m_key_queue_length = 0;
-	m_key_reset = true;
-	m_keyboard_clock = false;
-	m_keep_keybuf = false;
-	m_timer->adjust(attotime::from_usec(1), 0, attotime::from_hz(120));
-}
-
-INPUT_PORTS_START( genkeys )
-	PORT_START("KEY0")  /* IN3 */
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) /* Esc                       01  81 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) /* 1                           02  82 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) /* 2                           03  83 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) /* 3                           04  84 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) /* 4                           05  85 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) /* 5                           06  86 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6 ^") PORT_CODE(KEYCODE_6) /* 6                           07  87 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) /* 7                           08  88 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 *") PORT_CODE(KEYCODE_8) /* 8                           09  89 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) /* 9                           0A  8A */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) /* 0                           0B  8B */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) /* -                           0C  8C */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) /* =                          0D  8D */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) /* Backspace                 0E  8E */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) /* Tab                       0F  8F */
-
-	PORT_START("KEY1")  /* IN4 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) /* Q                         10  90 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) /* W                         11  91 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) /* E                         12  92 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) /* R                         13  93 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) /* T                         14  94 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) /* Y                         15  95 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) /* U                         16  96 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) /* I                         17  97 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) /* O                         18  98 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) /* P                         19  99 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) /* [                           1A  9A */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) /* ]                          1B  9B */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) /* Enter                     1C  9C */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L-Ctrl") PORT_CODE(KEYCODE_LCONTROL) /* Left Ctrl                 1D  9D */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) /* A                         1E  9E */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) /* S                         1F  9F */
-
-	PORT_START("KEY2")  /* IN5 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) /* D                         20  A0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) /* F                         21  A1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) /* G                         22  A2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) /* H                         23  A3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) /* J                         24  A4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) /* K                         25  A5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) /* L                         26  A6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) /* ;                           27  A7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("' \"") PORT_CODE(KEYCODE_QUOTE) /* '                          28  A8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_TILDE) /* `                           29  A9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L-Shift") PORT_CODE(KEYCODE_LSHIFT) /* Left Shift                 2A  AA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) /* \                          2B  AB */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) /* Z                         2C  AC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) /* X                         2D  AD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) /* C                         2E  AE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) /* V                         2F  AF */
-
-	PORT_START("KEY3")  /* IN6 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) /* B                         30  B0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) /* N                         31  B1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) /* M                         32  B2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) /* ,                           33  B3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) /* .                            34  B4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) /* /                           35  B5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-Shift") PORT_CODE(KEYCODE_RSHIFT) /* Right Shift                36  B6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP * (PrtScr)") PORT_CODE(KEYCODE_ASTERISK    ) /* Keypad *  (PrtSc)          37  B7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alt") PORT_CODE(KEYCODE_LALT) /* Left Alt                 38  B8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) /* Space                     39  B9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) /* Caps Lock                   3A  BA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) /* F1                          3B  BB */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) /* F2                          3C  BC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) /* F3                          3D  BD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) /* F4                          3E  BE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5) /* F5                          3F  BF */
-
-	PORT_START("KEY4")  /* IN7 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) /* F6                          40  C0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7) /* F7                          41  C1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8) /* F8                          42  C2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F9") PORT_CODE(KEYCODE_F9) /* F9                          43  C3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10) /* F10                       44  C4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK) /* Num Lock                  45  C5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ScrLock (F14)") PORT_CODE(KEYCODE_SCRLOCK) /* Scroll Lock             46  C6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 (Home)") PORT_CODE(KEYCODE_7_PAD     ) /* Keypad 7  (Home)           47  C7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 (Up)") PORT_CODE(KEYCODE_8_PAD       ) /* Keypad 8  (Up arrow)       48  C8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD     ) /* Keypad 9  (PgUp)           49  C9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP -") PORT_CODE(KEYCODE_MINUS_PAD) /* Keypad -                   4A  CA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 4 (Left)") PORT_CODE(KEYCODE_4_PAD     ) /* Keypad 4  (Left arrow)     4B  CB */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 5") PORT_CODE(KEYCODE_5_PAD) /* Keypad 5                   4C  CC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 6 (Right)") PORT_CODE(KEYCODE_6_PAD        ) /* Keypad 6  (Right arrow)    4D  CD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP +") PORT_CODE(KEYCODE_PLUS_PAD) /* Keypad +                    4E  CE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 1 (End)") PORT_CODE(KEYCODE_1_PAD      ) /* Keypad 1  (End)            4F  CF */
-
-	PORT_START("KEY5")  /* IN8 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 2 (Down)") PORT_CODE(KEYCODE_2_PAD     ) /* Keypad 2  (Down arrow)     50  D0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 3 (PgDn)") PORT_CODE(KEYCODE_3_PAD     ) /* Keypad 3  (PgDn)           51  D1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 0 (Ins)") PORT_CODE(KEYCODE_0_PAD      ) /* Keypad 0  (Ins)            52  D2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP . (Del)") PORT_CODE(KEYCODE_DEL_PAD        ) /* Keypad .  (Del)            53  D3 */
-	PORT_BIT ( 0x0030, 0x0000, IPT_UNUSED )
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(84/102)\\") PORT_CODE(KEYCODE_BACKSLASH2) /* Backslash 2             56  D6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)F11") PORT_CODE(KEYCODE_F11) /* F11                      57  D7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)F12") PORT_CODE(KEYCODE_F12) /* F12                      58  D8 */
-	PORT_BIT ( 0xfe00, 0x0000, IPT_UNUSED )
-
-	PORT_START("KEY6")  /* IN9 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)KP Enter") PORT_CODE(KEYCODE_ENTER_PAD) /* PAD Enter                 60  e0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)R-Control") PORT_CODE(KEYCODE_RCONTROL) /* Right Control             61  e1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)ALTGR") PORT_CODE(KEYCODE_RALT) /* ALTGR                     64  e4 */
-
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)KP /") PORT_CODE(KEYCODE_SLASH_PAD) /* PAD Slash                 62  e2 */
-
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Home") PORT_CODE(KEYCODE_HOME) /* Home                       66  e6 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Up") PORT_CODE(KEYCODE_UP) /* Up                          67  e7 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Page Up") PORT_CODE(KEYCODE_PGUP) /* Page Up                 68  e8 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Left") PORT_CODE(KEYCODE_LEFT) /* Left                        69  e9 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Right") PORT_CODE(KEYCODE_RIGHT) /* Right                     6a  ea */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)End") PORT_CODE(KEYCODE_END) /* End                      6b  eb */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Down") PORT_CODE(KEYCODE_DOWN) /* Down                        6c  ec */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Page Down") PORT_CODE(KEYCODE_PGDN) /* Page Down                 6d  ed */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Insert") PORT_CODE(KEYCODE_INSERT) /* Insert                     6e  ee */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Delete") PORT_CODE(KEYCODE_DEL) /* Delete                        6f  ef */
-
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)PrtScr (F13)") PORT_CODE(KEYCODE_PRTSCR) /* Print Screen             63  e3 */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Pause (F15)") PORT_CODE(KEYCODE_PAUSE) /* Pause                      65  e5 */
-
-	PORT_START("KEY7")  /* IN10 */
-	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
-#if 0
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Print Screen") PORT_CODE(KEYCODE_PRTSCR) /* Print Screen alternate        77  f7 */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Win") /* Left Win                    7d  fd */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Win") /* Right Win                  7e  fe */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Menu") /* Menu                        7f  ff */
-#endif
-INPUT_PORTS_END
-
-ioport_constructor geneve_keyboard_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( genkeys );
-}
 
 } } } // end namespace bus::ti99::internal
 

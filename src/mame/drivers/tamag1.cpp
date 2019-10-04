@@ -114,7 +114,7 @@ INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
 {
 	// inputs are hooked up backwards here, because MCU input
 	// ports are all tied to its interrupt controller
-	int line = (int)(uintptr_t)param;
+	int line = param;
 	int state = newval ? ASSERT_LINE : CLEAR_LINE;
 	m_maincpu->set_input_line(line, state);
 }

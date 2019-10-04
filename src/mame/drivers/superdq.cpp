@@ -26,6 +26,7 @@
 #include "video/resnet.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    20000000

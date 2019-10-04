@@ -233,5 +233,5 @@ void pk8020_state::machine_reset()
 INTERRUPT_GEN_MEMBER(pk8020_state::pk8020_interrupt)
 {
 	m_takt ^= 1;
-	m_inr->ir4_w(1);
+	m_inr->ir4_w(m_takt);
 }

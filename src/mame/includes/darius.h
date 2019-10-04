@@ -14,6 +14,7 @@
 #include "sound/msm5205.h"
 #include "video/pc080sn.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #define VOL_MAX    (3 * 2 + 2)
 #define PAN_MAX    (2 + 2 + 1)   /* FM 2port + PSG 2port + DA 1port */

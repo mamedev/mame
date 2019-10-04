@@ -6,6 +6,7 @@
 #pragma once
 
 #include "screen.h"
+#include "tilemap.h"
 #include <memory>
 
 class deco_bac06_device : public device_t
@@ -21,6 +22,7 @@ public:
 		m_gfxregion16x16 = region16x16;
 		m_wide = wide;
 	}
+	void set_thedeep_kludge() { m_thedeep_kludge = 1; } // thedeep requires TILE_FLIPX always set, for reasons to be investigated
 	void disable_8x8() { m_supports_8x8 = false; }
 	void disable_16x16() { m_supports_16x16 = false; }
 	void disable_rc_scroll() { m_supports_rc_scroll = false; }
@@ -101,6 +103,8 @@ public:
 	void pf_data_8bit_swap_w(offs_t offset, u8 data);
 	u8 pf_rowscroll_8bit_swap_r(offs_t offset);
 	void pf_rowscroll_8bit_swap_w(offs_t offset, u8 data);
+	u8 pf_colscroll_8bit_swap_r(offs_t offset);
+	void pf_colscroll_8bit_swap_w(offs_t offset, u8 data);
 
 protected:
 	virtual void device_start() override;
@@ -139,6 +143,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_pf8x8_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf16x16_tile_info);
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	bool m_thedeep_kludge;
 };
 
 DECLARE_DEVICE_TYPE(DECO_BAC06, deco_bac06_device)

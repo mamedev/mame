@@ -49,6 +49,7 @@ PROMs : NEC B406 (1kx4) x2
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class sbowling_state : public driver_device

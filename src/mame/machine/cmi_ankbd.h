@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #ifndef MAME_MACHINE_CMI_ANKBD_H
-#define MAME_MACHINE_CMI_ANKBD_H 1
+#define MAME_MACHINE_CMI_ANKBD_H
 
 #pragma once
 

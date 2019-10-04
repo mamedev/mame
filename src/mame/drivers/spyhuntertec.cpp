@@ -25,6 +25,7 @@ sound system appears to be the same as 'spartanxtec.cpp'
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "spyhunttec.lh"
 

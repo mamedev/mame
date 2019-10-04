@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 class pass_state : public driver_device
 {
 public:

@@ -7,6 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tryout_state : public driver_device
 {

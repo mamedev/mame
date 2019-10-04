@@ -38,7 +38,7 @@ HB-PCB-A5   M6100691A (distributed by Taito)
 |         GAL.U89  16.000MHz  28.000MHz                     |
 |       YM2203C                                             |
 |                   +----+  +------+    SS004.U46 SS003.U47 |
-|     Y3014B  Z80   |DE71|  |  DE  |                        |
+|VR1  Y3014B  Z80   |DE71|  |  DE  |                        |
 |                   +----+  |  52  |                        |
 |         SS008-1   +----+  +------+          U36*      U38*|
 |                   |DE71|  +------+                        |
@@ -73,6 +73,7 @@ HB-PCB-A5   M6100691A (distributed by Taito)
  Custom: Data East 52 x 2 + Data East 71 x 2 (Sprites)
          Data East 55 (Playfield)
          Data East 146 (I/O, Protection)
+         VR1 - Sound pot
 
 ***************************************************************************/
 
@@ -534,6 +535,30 @@ ROM_START( sshanghaj )
 	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )
 ROM_END
 
+ROM_START( sshanghak ) /* Korean censored version - No girls in Paradise games */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "ss007k.u28", 0x00000, 0x20000, CRC(90dbf11c) SHA1(60ab0f3d3f43939e719196ff1775a3cd1c8c9aa0) )
+	ROM_LOAD16_BYTE( "ss006k.u27", 0x00001, 0x20000, CRC(07d94579) SHA1(25e4fb1669e12c7329e45a8ac0d52ac157a83d46) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "ss008.u82", 0x000000, 0x010000, CRC(04dc3647) SHA1(c06a7e8932c03de5759a9b69da0d761006b49517) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "ss001.u8",  0x000000, 0x100000, CRC(ebeca5b7) SHA1(1746e757ad9bbef2aa9028c54f25d4aa4dedf79e) )
+	ROM_LOAD( "ss002.u7",  0x100000, 0x100000, CRC(67659f29) SHA1(50944877665b7b848b3f7063892bd39a96a847cf) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) // 2 sprite chips, 2 copies of sprite ROMs on PCB
+	ROM_LOAD( "ss003.u47", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) )
+	ROM_LOAD( "ss004.u46", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )
+ROM_END
+
 ROM_START( sshanghab )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "sshanb_2.010", 0x00000, 0x20000, CRC(bc7ed254) SHA1(aeee4b8a8265902bb41575cc143738ecf3aff57d) )
@@ -578,6 +603,7 @@ void sshangha_state::init_sshangha()
 }
 
 
-GAME( 1992, sshangha,  0,        sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sshanghaj, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sshanghab, sshangha, sshanghab, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshangha,  0,        sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd.",                 "Super Shanghai Dragon's Eye (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghaj, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd.",                 "Super Shanghai Dragon's Eye (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghak, sshangha, sshangha,  sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B Co., Ltd. (Taito license)", "Super Shanghai Dragon's Eye (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sshanghab, sshangha, sshanghab, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg",                         "Super Shanghai Dragon's Eye (World, bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -63,6 +63,7 @@
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(22'118'400)

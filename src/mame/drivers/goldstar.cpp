@@ -217,6 +217,7 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/segacrp2_device.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
@@ -940,7 +941,7 @@ void goldstar_state::lucky8_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
-void goldstar_state::lucky8f_decrypted_opcodes_map(address_map &map)
+void goldstar_state::common_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
 }
@@ -8966,7 +8967,17 @@ void wingco_state::lucky8f(machine_config &config)
 {
 	lucky8(config);
 
-	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::lucky8f_decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
+}
+
+void wingco_state::lucky8k(machine_config &config)
+{
+	lucky8(config);
+
+	nec_315_5136_device &maincpu(NEC_315_5136(config.replace(), m_maincpu, CPU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
+	maincpu.set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
 }
 
 void wingco_state::bingowng(machine_config &config)
@@ -9218,6 +9229,14 @@ void goldstar_state::ladylinr(machine_config &config)
 	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	AY8930(config, "aysnd", AY_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50); // unused?
+}
+
+
+void goldstar_state::ladylinrb(machine_config &config)
+{
+	ladylinr(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &goldstar_state::common_decrypted_opcodes_map);
 }
 
 
@@ -11660,6 +11679,7 @@ ROM_START( lucky8e )
 	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+
 ROM_START( lucky8f ) // like the parent, but encrypted. Has an extra ROM (unverified purpose). Possibly bootleg? PCB has no Wing markings or stickers
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a2.ic85",   0x0000, 0x8000, CRC(b80f3c11) SHA1(6a4e1f986ef019d41d0236992faa17bdb2e095ad) )
@@ -11691,6 +11711,250 @@ ROM_START( lucky8f ) // like the parent, but encrypted. Has an extra ROM (unveri
 	ROM_REGION( 0x1000, "dec_table", 0 ) // possibly related to encryption? currently unused by the emulation
 	ROM_LOAD( "a1.ic91", 0x0000, 0x01000, CRC(8a660a97) SHA1(8d23e98886276824353c6c6572e3d93ddb40f0f0) )
 ROM_END
+
+
+/*
+  Lucky 8 lines.
+
+  Only four bytes of difference against the parent set.
+
+  Original   This set
+
+  165B: 02   165B: 09
+  165F: 08   165F: 0F
+
+  21F0: 00   21F0: 30
+  21F1: 00   21F1: 1E
+
+
+  Original set:                               This set:
+
+  21E0: 22 E5 3A   ld   ($3AE5),hl            21E0: 22 E5 3A   ld   ($3AE5),hl
+  21E3: 2D         dec  l                     21E3: 2D         dec  l
+  21E4: 83         add  a,e                   21E4: 83         add  a,e
+  21E5: B7         or   a                     21E5: B7         or   a
+  21E6: 20 0E      jr   nz,$21F6              21E6: 20 0E      jr   nz,$21F6
+  21E8: 2A 70 82   ld   hl,($8270)            21E8: 2A 70 82   ld   hl,($8270)
+  21EB: 3A 2C 83   ld   a,($832C)             21EB: 3A 2C 83   ld   a,($832C)
+  21EE: 3C         inc  a                     21EE: 3C         inc  a
+  21EF: BE         cp   (hl)                  21EF: BE         cp   (hl)
+  21F0: 00         nop <-------- patched      21F0: 30 1E      jr   nc,$2210 <--- original jump.
+  21F1: 00         nop <-------- patched
+  21F2: CD 45 22   call $2245                 21F2: CD 45 22   call $2245
+  21F5: C9         ret                        21F5: C9         ret
+
+  Need to investigate what the $2210 routine does...
+
+*/
+ROM_START( lucky8g )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "48.b12",   0x0000, 0x4000, CRC(30718aa5) SHA1(0ce1d24a074d2b815640f43fd42a883aae1078c3) )
+	ROM_LOAD( "49.b14",   0x4000, 0x4000, CRC(6f62672e) SHA1(05662ef1a70f93b09e48de497b049a282f070735) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.h7",   0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6.h8",   0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7.h10",  0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",   0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.h3",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.h4",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.h5",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	/* missing prom? - using one from other dump */
+	ROM_LOAD( "prom4", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
+/*
+  New Lucky 8 Lines Super Turbo (Hack).
+
+  Sticker of Impera Austria in the PCB.
+
+  It takes 15 seconds for the nag, and extra 30 seconds to boot the game.
+
+  This set needs proper DIP switches and lamps.
+
+*/
+ROM_START( lucky8h )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "luckyturbo.b14",  0x0000, 0x8000, CRC(ae192509) SHA1(2e01ccce3d06e23bfa64046ed75ff89adc9ae266) )
+	ROM_IGNORE(                          0x8000)  // identical halves.... discarding one.
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.h7",  0x00000, 0x8000, CRC(fd3ff9a7) SHA1(f009ce36a9e2190bafca5b0ce3268b54bdc9a8b5) )
+	ROM_LOAD( "6.h8",  0x08000, 0x8000, CRC(80888d64) SHA1(91ec96709df77c534d381e391839984a88aeb1e0) )
+	ROM_LOAD( "7.h10", 0x10000, 0x8000, CRC(255d5860) SHA1(f171fde3d542594132b38b44300f750d45fb67a2) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",  0x0000, 0x2000, CRC(b45f41e2) SHA1(890c94c802f5ada97bc73f5a7a09e69c3207966c) )
+	ROM_LOAD( "2.h3",  0x2000, 0x2000, CRC(0463413a) SHA1(061b8335fdd44767e8c1832f5b5101276ad0f689) )
+	ROM_LOAD( "3.h4",  0x4000, 0x2000, CRC(6be213c8) SHA1(bf5a002961b0827581cbab4249321ae5b51316f0) )
+	ROM_LOAD( "4.h5",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "72s287.g13", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "72s287.g14", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "74s288.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "74s288.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
+/*
+  New Lucky 8 Lines.
+  Eagle, licensed by Wing.
+
+  Original stickers on PCB.
+
+  ROHM BU18400B-PS (Z80B)
+  instead of stock Z80.
+
+*/
+ROM_START( lucky8i )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "48.b12",   0x0000, 0x4000, CRC(1aa5ddb6) SHA1(df615ff3f013582a5ebd06e6f85b4abd184bfeb4) )
+	ROM_LOAD( "49.b14",   0x4000, 0x4000, CRC(0eff3f80) SHA1(b273fec096f4506dfffdb79c7f4816fa54640ea6) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.h7",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6.h8",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7.h10", 0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",   0x0000, 0x2000, CRC(ad6a3f72) SHA1(b93d5830542aaa10795b5b0ada8e7bc3b867072b) )
+	ROM_IGNORE(                 0x6000)  // identical quarters.... discarding three.
+	ROM_LOAD( "2.h3",   0x2000, 0x2000, CRC(e2ef08cf) SHA1(c03654a9033db9d655cfef627909942b6cb99ba4) )
+	ROM_IGNORE(                 0x6000)  // identical quarters.... discarding three.
+	ROM_LOAD( "3.h4",   0x4000, 0x2000, CRC(c1a7a113) SHA1(2efb1addea53ed42bd14a7775443ee46c407ca81) )
+	ROM_IGNORE(                 0x6000)  // identical quarters.... discarding three.
+	ROM_LOAD( "4.h6",   0x6000, 0x2000, CRC(9e939979) SHA1(c6e93df6465c076557ff5dccf650aff3a9064e0d) )
+	ROM_IGNORE(                 0x6000)  // identical quarters.... discarding three.
+
+	// neeed proper bipolar proms dumps...
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s129an.g13", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "n82s129an.g14", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "n82s123n.d13",  0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "n82s129an.f3",  0x0000, 0x0100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "n82s123n.d12",  0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
+/*
+  New Lucky 8 Lines Crown Turbo (hack)
+
+  It takes 15 seconds for the nag, and extra 30 seconds to boot the game.
+
+  The program has a nasty protection that checks a value mirrored
+  from $1249 to $D249. If this fails, just reset the machine.
+  This routine is used when BET, and other critical things.
+
+  3831: ld   a,($D249)
+  3834: cp   $4F
+  3836: jp   nz,$0000
+
+  This set needs proper DIP switches and lamps.
+
+*/
+ROM_START( lucky8j )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pr.b14",  0x0000, 0x8000, CRC(245ab833) SHA1(0e73c7a4cd387ae71752b422c537f9b7e5dbb770) )
+	ROM_RELOAD(          0xc000, 0x2000)
+	ROM_IGNORE(                  0x6000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )  // the original devices 5 & 7 are half the size, and have only the second half of the required data.
+	ROM_LOAD( "5.h7",  0x00000, 0x8000, BAD_DUMP CRC(994a9894) SHA1(4063c2c5e111f24a85df1665fd3f9fbb20fda4da) )  // from a gfx match set
+	ROM_LOAD( "6.h8",  0x08000, 0x8000, CRC(80888d64) SHA1(91ec96709df77c534d381e391839984a88aeb1e0) )
+	ROM_LOAD( "7.h10", 0x10000, 0x8000, BAD_DUMP CRC(255d5860) SHA1(f171fde3d542594132b38b44300f750d45fb67a2) )  // from a gfx match set
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",  0x0000, 0x2000, CRC(275265ee) SHA1(7075dbe2d59b8cae4f355bcecfbbb9853fe9ca75) )
+	ROM_LOAD( "2.h3",  0x2000, 0x2000, CRC(146d17da) SHA1(8647d2d9eaf7d242e04d41c263c2dc9434c55ab6) )
+	ROM_LOAD( "3.h4",  0x4000, 0x2000, CRC(5c85f883) SHA1(9c5760e75d526903e160d60e39111723eb97855b) )
+	ROM_LOAD( "4.h6",  0x6000, 0x2000, CRC(10d896f3) SHA1(16f74a287dd0e8511fb8bbff7a29710de898061a) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "74s287.g13", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "74s287.g14", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "82s123.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "74s287.f3",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "82s123.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
+/*
+  New Lucky 8 Lines (encrypted).
+  Original of Wing.
+
+  Ths board has a custom Sega/NEC CPU (D315-5136)
+  instead of a regular Z80.
+
+  The custom CPU performs XOR masks and bitswaps relative to addressing
+  and involves M1 line for different encryption betweeen opcodes and data.
+
+*/
+ROM_START( lucky8k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "48.b12",   0x0000, 0x4000, CRC(d9fb41b4) SHA1(bf33d0a5e0167eb48b3ae00e7e4136cd57cf0a4d) )
+	ROM_LOAD( "49.b14",   0x4000, 0x4000, CRC(ef89f730) SHA1(20d28fde72ace10f476fd42131c76f2969d5b1e4) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.h7",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6.h8",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7.h10", 0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1",   0x0000, 0x2000, CRC(0452b3c5) SHA1(7d432247d14ac13712beba682e169054f664b81d) )
+	ROM_LOAD( "2.h3",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.h4",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.h5",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	// neeed proper bipolar proms dumps...
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.g13",  0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "tbp24s10n.g14",  0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "tbp18s030n.d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "tbp24s10n.f3",   0x0000, 0x0100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "tbp18s030n.d12", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
 
 /*
   New Lucky 8 Lines / New Super 8 Lines.
@@ -12767,7 +13031,7 @@ ROM_END
 */
 ROM_START( ladylinr )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "ladybrd.bin",    0x0000, 0x8000, CRC(44d2aed0) SHA1(1afe6178d1bf4ad0b623f33be879ed5180ad2db1) )
+	ROM_LOAD( "ladybrd.bin",  0x0000, 0x8000, CRC(44d2aed0) SHA1(1afe6178d1bf4ad0b623f33be879ed5180ad2db1) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "ll73.bin",   0x00000, 0x8000, CRC(afa4a705) SHA1(779340713df7029553cfc1c57997dfdd96a0f0cc) )
@@ -12792,6 +13056,165 @@ ROM_START( ladylinr )
 
 	ROM_REGION( 0x40, "unkprom2", 0 )
 	ROM_LOAD( "am27s19pc.73",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+ROM_START( ladylinra )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "6895a.bin",  0x0000, 0x8000, CRC(edf477ed) SHA1(abb54a7d5dcb9b32871272274a4fb850c0c5f633) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(b9a018de) SHA1(fea5a428c6b970c9ad054cbc0ac9727491300d5f) )
+	ROM_LOAD( "72.bin",   0x08000, 0x8000, CRC(819498e0) SHA1(8e68400419bada80f8bbaf6e9d19bf8eeadddd2a) )
+	ROM_LOAD( "71.bin",   0x10000, 0x8000, CRC(36ccd3f8) SHA1(fd1b4e24d9bbadc4f82810fa5fd18ca0bbd968de) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "63s141.38",   0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "63s141.37",   0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "63s081.39",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "63s141.96",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "63s081.73",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+/*
+  Lady Liner (encrypted)
+
+  These have a custom module with an encapsulated Z80
+  "CSP Z80" by SPL, Swiss made.
+
+  Encryption seems close to custom Sega/NEC 315-xxx CPUs
+  Data, address and M1 line (opcodes/data) are involved.
+
+  Each set has different encryption, and seems that the
+  encryption range is 0000-3b77. Beyond the offset, all
+  seems to be unencrypted.
+
+*/
+ROM_START( ladylinrb )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "5067a.bin",  0x0000, 0x8000, CRC(41fc18a9) SHA1(2825a3f6b556993a16c2ea3f0a14c73bebb74d9c) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(b9a018de) SHA1(fea5a428c6b970c9ad054cbc0ac9727491300d5f) )
+	ROM_LOAD( "72.bin",   0x08000, 0x8000, CRC(819498e0) SHA1(8e68400419bada80f8bbaf6e9d19bf8eeadddd2a) )
+	ROM_LOAD( "71.bin",   0x10000, 0x8000, CRC(36ccd3f8) SHA1(fd1b4e24d9bbadc4f82810fa5fd18ca0bbd968de) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "63s141.38",   0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "63s141.37",   0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "63s081.39",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "63s141.96",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "63s081.73",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+ROM_START( ladylinrc )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "4012a.bin",  0x0000, 0x8000, CRC(a741cd75) SHA1(84f9ae2421fe60548925cf262b4d3ebee2d30e9c) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(afa4a705) SHA1(779340713df7029553cfc1c57997dfdd96a0f0cc) )
+	ROM_LOAD( "72.bin",   0x08000, 0x8000, CRC(bd1d8a39) SHA1(01e37704c753352024e79b0b83b040f8288b9aed) )
+	ROM_LOAD( "71.bin",   0x10000, 0x8000, CRC(1c417efa) SHA1(491579a76d80c4f488ef94393d12a190571ae285) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.38",   0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "82s129.37",   0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "82s123.39",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.96",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "82s123.73",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+ROM_START( ladylinrd )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "6092a.bin",  0x0000, 0x8000, CRC(fdf3d899) SHA1(40cb78d808ed153ff0232bc043e3d404face8cab) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(b9a018de) SHA1(fea5a428c6b970c9ad054cbc0ac9727491300d5f) )
+	ROM_LOAD( "72.bin",   0x08000, 0x8000, CRC(819498e0) SHA1(8e68400419bada80f8bbaf6e9d19bf8eeadddd2a) )
+	ROM_LOAD( "71.bin",   0x10000, 0x8000, CRC(36ccd3f8) SHA1(fd1b4e24d9bbadc4f82810fa5fd18ca0bbd968de) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom_38.bin",   0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "prom_37.bin",   0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "prom_39.bin",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "prom_96.bin",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "prom_73.bin",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+ROM_START( ladylinre )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "6095a.bin",  0x0000, 0x8000, CRC(7c3a3697) SHA1(5f348407ec26ce6d92edf54157652f7cbde86b91) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "73.bin",   0x00000, 0x8000, CRC(b9a018de) SHA1(fea5a428c6b970c9ad054cbc0ac9727491300d5f) )
+	ROM_LOAD( "72.bin",   0x08000, 0x8000, CRC(819498e0) SHA1(8e68400419bada80f8bbaf6e9d19bf8eeadddd2a) )
+	ROM_LOAD( "71.bin",   0x10000, 0x8000, CRC(36ccd3f8) SHA1(fd1b4e24d9bbadc4f82810fa5fd18ca0bbd968de) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom_38.bin",   0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "prom_37.bin",   0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "prom_39.bin",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "prom_96.bin",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "prom_73.bin",   0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
 ROM_END
 
 
@@ -16078,6 +16501,294 @@ void goldstar_state::init_jkrmast()
 	}
 }
 
+void goldstar_state::init_ladylinrb()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	uint8_t unkn = 0x00;
+
+	static const uint8_t xor_table_00[0x08][0x08] =
+	{
+		{ 0x10, 0x01, unkn, 0x75, 0x01, 0x11, 0x41, 0x11 }, // 0x0x and 0x2x
+		{ 0x43, 0x53, 0x42, 0x12, unkn, 0x40, 0x50, 0x40 }, // 0x1x and 0x3x
+		{ 0x51, 0x52, 0x13, 0x51, 0x10, 0x00, 0x51, 0x41 }, // 0x4x and 0x6x
+		{ 0x52, 0x03, 0x12, 0x50, 0x41, 0x51, 0x51, 0x01 }, // 0x5x and 0x7x
+		{ 0x50, 0x43, 0x43, 0x02, 0x02, 0x43, 0x50, 0x10 }, // 0x8x and 0xax
+		{ 0x42, 0x01, 0x43, unkn, 0x13, 0x03, unkn, 0x42 }, // 0x9x and 0xbx
+		{ 0x52, 0x42, 0x01, unkn, 0x13, 0x00, unkn, 0x03 }, // 0xcx and 0xex
+		{ 0x10, 0x53, 0x52, 0x42, unkn, 0x01, 0x43, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_01[0x08][0x08] =
+	{
+		{ 0x12, 0x11, 0x42, 0x51, 0x03, 0x52, 0x53, 0x41 }, // 0x0x and 0x2x
+		{ 0x53, 0x41, 0x11, 0x52, 0x01, 0x03, 0x13, 0x11 }, // 0x1x and 0x3x
+		{ 0x13, 0x41, 0x53, 0x01, unkn, 0x00, 0x10, 0x50 }, // 0x4x and 0x6x
+		{ 0x51, 0x53, 0x41, 0x02, 0x40, 0x01, 0x52, 0x10 }, // 0x5x and 0x7x
+		{ 0x10, 0x50, unkn, 0x03, 0x03, unkn, unkn, 0x10 }, // 0x8x and 0xax
+		{ 0x01, 0x53, 0x13, 0x10, 0x42, 0x03, 0x52, unkn }, // 0x9x and 0xbx
+		{ 0x42, 0x53, 0x12, 0x03, 0x11, 0x00, 0x01, 0x01 }, // 0xcx and 0xex
+		{ 0x43, 0x10, unkn, 0x10, unkn, 0x02, 0x50, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_02[0x08][0x08] =
+	{
+		{ 0x13, 0x02, 0x40, 0x52, 0x03, 0x53, 0x51, unkn }, // 0x0x and 0x2x
+		{ 0x12, unkn, 0x12, 0x01, 0x02, 0x41, 0x50, 0x03 }, // 0x1x and 0x3x
+		{ 0x01, 0x11, 0x01, 0x03, 0x40, 0x00, 0x02, unkn }, // 0x4x and 0x6x
+		{ 0x51, 0x03, 0x01, 0x43, 0x52, 0x50, 0x03, 0x42 }, // 0x5x and 0x7x
+		{ unkn, 0x40, 0x13, 0x13, unkn, unkn, 0x40, 0x01 }, // 0x8x and 0xax
+		{ 0x13, 0x41, 0x52, 0x12, unkn, 0x43, 0x41, unkn }, // 0x9x and 0xbx
+		{ 0x03, 0x13, unkn, unkn, unkn, 0x00, 0x02, unkn }, // 0xcx and 0xex
+		{ 0x01, 0x43, 0x52, 0x11, 0x42, unkn, 0x51, 0x40 }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_03[0x08][0x08] =
+	{
+		{ 0x50, 0x13, 0x41, 0x42, 0x11, 0x53, 0x10, 0x41 }, // 0x0x and 0x2x
+		{ 0x42, unkn, 0x41, 0x51, 0x12, 0x40, 0x51, 0x40 }, // 0x1x and 0x3x
+		{ 0x50, 0x52, 0x40, 0x12, 0x50, 0x00, 0x02, 0x50 }, // 0x4x and 0x6x
+		{ 0x10, 0x51, 0x53, 0x50, 0x53, 0x01, 0x53, 0x53 }, // 0x5x and 0x7x
+		{ unkn, unkn, 0x01, 0x13, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, 0x10, 0x40, 0x52, 0x13, 0x43, 0x41, unkn }, // 0x9x and 0xbx
+		{ 0x03, 0x53, 0x13, 0x50, 0x42, 0x00, unkn, 0x50 }, // 0xcx and 0xex
+		{ unkn, 0x40, 0x12, 0x11, 0x10, 0x43, 0x03, 0x53 }, // 0xdx and 0xfx
+	};
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		uint8_t row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
+
+		uint8_t xor_v = x & 0x07;
+
+		switch(i & 0x03)
+		{
+			case 0x00: x ^= xor_table_00[row][xor_v]; break;
+			case 0x01: x ^= xor_table_01[row][xor_v]; break;
+			case 0x02: x ^= xor_table_02[row][xor_v]; break;
+			case 0x03: x ^= xor_table_03[row][xor_v]; break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+}
+
+
+void goldstar_state::init_ladylinrc()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	uint8_t unkn = 0x00;
+
+	static const uint8_t xor_table_00[0x08][0x08] =
+	{
+		{ 0x00, 0x40, 0x40, 0x10, 0x02, 0x10, 0x10, 0x51 }, // 0x0x and 0x2x
+		{ 0x02, 0x40, 0x11, 0x41, 0x13, 0x02, unkn, 0x40 }, // 0x1x and 0x3x
+		{ 0x51, unkn, 0x11, 0x03, 0x40, 0x00, unkn, unkn }, // 0x4x and 0x6x
+		{ 0x51, 0x53, 0x02, 0x43, unkn, unkn, 0x53, 0x43 }, // 0x5x and 0x7x
+		{ unkn, 0x40, 0x03, 0x03, 0x02, 0x02, 0x51, 0x11 }, // 0x8x and 0xax
+		{ 0x12, 0x43, unkn, 0x42, 0x41, unkn, 0x01, unkn }, // 0x9x and 0xbx
+		{ 0x43, 0x11, unkn, 0x53, unkn, 0x00, 0x10, 0x01 }, // 0xcx and 0xex
+		{ 0x41, 0x43, 0x12, 0x10, unkn, unkn, 0x02, 0x42 }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_01[0x08][0x08] =
+	{
+		{ 0x02, 0x42, 0x53, 0x51, 0x50, 0x53, 0x53, 0x41 }, // 0x0x and 0x2x
+		{ 0x13, 0x01, unkn, 0x53, 0x53, 0x42, 0x52, 0x13 }, // 0x1x and 0x3x
+		{ 0x51, 0x52, 0x03, 0x01, 0x41, 0x00, 0x40, 0x40 }, // 0x4x and 0x6x
+		{ unkn, 0x50, 0x01, 0x53, 0x42, 0x41, 0x43, 0x40 }, // 0x5x and 0x7x
+		{ 0x40, 0x11, 0x13, 0x01, 0x03, 0x13, 0x40, 0x52 }, // 0x8x and 0xax
+		{ 0x02, 0x50, 0x11, 0x51, 0x12, 0x11, unkn, unkn }, // 0x9x and 0xbx
+		{ 0x53, 0x02, 0x12, 0x12, unkn, 0x00, 0x51, 0x03 }, // 0xcx and 0xex
+		{ 0x02, unkn, 0x52, 0x52, 0x13, 0x01, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_02[0x08][0x08] =
+	{
+		{ 0x52, 0x13, 0x43, 0x41, 0x42, 0x13, 0x02, unkn }, // 0x0x and 0x2x
+		{ 0x43, 0x52, 0x12, 0x11, 0x50, 0x10, 0x10, 0x41 }, // 0x1x and 0x3x
+		{ 0x50, 0x42, 0x12, 0x12, 0x11, 0x00, 0x01, 0x53 }, // 0x4x and 0x6x
+		{ 0x43, 0x50, 0x43, 0x13, unkn, 0x52, 0x01, 0x42 }, // 0x5x and 0x7x
+		{ 0x01, 0x02, unkn, 0x12, unkn, 0x43, unkn, 0x51 }, // 0x8x and 0xax
+		{ 0x50, 0x52, 0x42, 0x13, 0x03, 0x51, unkn, unkn }, // 0x9x and 0xbx
+		{ 0x11, unkn, 0x03, 0x11, 0x11, 0x00, unkn, 0x10 }, // 0xcx and 0xex
+		{ 0x42, 0x41, 0x10, unkn, 0x52, 0x52, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		uint8_t row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
+
+		uint8_t xor_v = x & 0x07;
+
+		switch(i & 0x03)
+		{
+			case 0x00: x ^= xor_table_00[row][xor_v]; break;
+			case 0x01: x ^= xor_table_01[row][xor_v]; break;
+			case 0x02: x ^= xor_table_02[row][xor_v]; break;
+			case 0x03: x ^= xor_table_01[row][xor_v]; break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+}
+
+
+void goldstar_state::init_ladylinrd()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	uint8_t unkn = 0x00;
+
+	static const uint8_t xor_table_00[0x08][0x08] =
+	{
+		{ 0x41, 0x11, 0x42, unkn, 0x52, 0x10, unkn, unkn }, // 0x0x and 0x2x
+		{ 0x13, 0x02, unkn, 0x11, 0x43, 0x41, 0x51, 0x12 }, // 0x1x and 0x3x
+		{ 0x10, 0x13, 0x42, 0x42, 0x53, 0x00, 0x50, 0x41 }, // 0x4x and 0x6x
+		{ 0x01, 0x40, 0x01, 0x11, 0x50, 0x41, 0x10, 0x02 }, // 0x5x and 0x7x
+		{ 0x12, 0x11, 0x53, unkn, unkn, 0x13, 0x52, 0x12 }, // 0x8x and 0xax
+		{ 0x12, 0x52, 0x13, unkn, unkn, 0x53, 0x11, 0x42 }, // 0x9x and 0xbx
+		{ 0x01, 0x01, 0x12, unkn, 0x13, 0x00, 0x02, 0x41 }, // 0xcx and 0xex
+		{ 0x41, 0x03, 0x52, 0x11, 0x02, unkn, 0x41, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_01[0x08][0x08] =
+	{
+		{ 0x53, 0x43, 0x02, 0x43, 0x12, 0x50, 0x12, 0x03 }, // 0x0x and 0x2x
+		{ unkn, 0x02, 0x11, 0x43, 0x43, 0x53, 0x03, 0x43 }, // 0x1x and 0x3x
+		{ 0x03, unkn, 0x10, 0x42, 0x12, 0x00, 0x40, 0x40 }, // 0x4x and 0x6x
+		{ 0x42, 0x53, 0x43, 0x02, 0x51, 0x42, 0x11, 0x13 }, // 0x5x and 0x7x
+		{ 0x43, 0x02, 0x13, 0x03, 0x02, 0x50, 0x52, 0x51 }, // 0x8x and 0xax
+		{ unkn, 0x50, 0x13, 0x51, 0x52, 0x52, unkn, unkn }, // 0x9x and 0xbx
+		{ 0x11, 0x01, 0x50, 0x41, 0x43, 0x00, 0x02, 0x10 }, // 0xcx and 0xex
+		{ unkn, 0x42, unkn, 0x43, unkn, 0x43, 0x41, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_02[0x08][0x08] =
+	{
+		{ 0x53, 0x50, 0x41, 0x12, 0x52, 0x43, unkn, 0x52 }, // 0x0x and 0x2x
+		{ 0x03, 0x41, 0x40, 0x12, unkn, 0x13, 0x13, 0x02 }, // 0x1x and 0x3x
+		{ 0x52, 0x01, unkn, 0x40, unkn, 0x00, 0x12, unkn }, // 0x4x and 0x6x
+		{ 0x50, 0x53, 0x42, 0x12, 0x03, 0x52, 0x52, 0x41 }, // 0x5x and 0x7x
+		{ 0x11, 0x53, 0x41, 0x03, 0x12, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ 0x02, 0x10, 0x11, unkn, unkn, unkn, 0x41, unkn }, // 0x9x and 0xbx
+		{ 0x11, unkn, 0x02, unkn, 0x02, 0x00, 0x51, 0x41 }, // 0xcx and 0xex
+		{ unkn, 0x01, 0x10, 0x43, 0x01, 0x03, 0x12, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_03[0x08][0x08] =
+	{
+		{ 0x52, 0x01, 0x42, 0x52, 0x02, 0x13, 0x52, 0x03 }, // 0x0x and 0x2x
+		{ 0x53, 0x01, 0x50, unkn, 0x13, 0x53, 0x03, 0x12 }, // 0x1x and 0x3x
+		{ 0x42, 0x42, 0x43, 0x52, 0x12, 0x00, 0x52, 0x50 }, // 0x4x and 0x6x
+		{ 0x42, 0x02, 0x13, 0x03, 0x03, unkn, 0x12, 0x10 }, // 0x5x and 0x7x
+		{ 0x11, 0x11, 0x52, 0x42, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, 0x03, 0x01, unkn, 0x41, 0x43, unkn, 0x10 }, // 0x9x and 0xbx
+		{ 0x41, 0x01, 0x41, 0x01, unkn, 0x00, 0x40, unkn }, // 0xcx and 0xex
+		{ 0x02, 0x12, 0x52, 0x02, 0x12, 0x43, 0x01, 0x40 }, // 0xdx and 0xfx
+	};
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		uint8_t row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
+
+		uint8_t xor_v = x & 0x07;
+
+		switch(i & 0x03)
+		{
+			case 0x00: x ^= xor_table_00[row][xor_v]; break;
+			case 0x01: x ^= xor_table_01[row][xor_v]; break;
+			case 0x02: x ^= xor_table_02[row][xor_v]; break;
+			case 0x03: x ^= xor_table_03[row][xor_v]; break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+}
+
+
+void goldstar_state::init_ladylinre()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	uint8_t unkn = 0x00;
+
+	static const uint8_t xor_table_00[0x08][0x08] =
+	{
+		{ 0x03, 0x03, 0x53, 0x13, 0x12, 0x10, 0x02, 0x02 }, // 0x0x and 0x2x
+		{ 0x10, 0x02, 0x53, 0x53, unkn, 0x53, unkn, 0x50 }, // 0x1x and 0x3x
+		{ 0x41, 0x13, 0x12, unkn, 0x12, 0x00, 0x40, 0x40 }, // 0x4x and 0x6x
+		{ 0x03, 0x40, 0x40, 0x11, unkn, 0x42, 0x03, unkn }, // 0x5x and 0x7x
+		{ 0x40, 0x11, 0x13, 0x11, unkn, 0x13, unkn, 0x10 }, // 0x8x and 0xax
+		{ 0x41, unkn, 0x11, 0x11, 0x01, unkn, 0x42, 0x10 }, // 0x9x and 0xbx
+		{ 0x03, 0x40, unkn, 0x01, unkn, 0x00, 0x02, unkn }, // 0xcx and 0xex
+		{ unkn, 0x51, 0x13, 0x01, 0x12, 0x02, 0x03, 0x01 }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_01[0x08][0x08] =
+	{
+		{ 0x51, 0x03, 0x40, 0x03, 0x53, 0x43, 0x42, 0x53 }, // 0x0x and 0x2x
+		{ 0x02, 0x02, 0x41, 0x12, unkn, 0x11, 0x51, 0x02 }, // 0x1x and 0x3x
+		{ 0x03, 0x11, 0x10, 0x03, 0x53, 0x00, 0x41, 0x42 }, // 0x4x and 0x6x
+		{ 0x41, 0x10, 0x42, 0x50, 0x02, unkn, 0x40, 0x51 }, // 0x5x and 0x7x
+		{ 0x10, 0x42, 0x11, 0x43, 0x52, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ 0x51, unkn, 0x40, 0x11, 0x40, unkn, 0x10, 0x40 }, // 0x9x and 0xbx
+		{ 0x40, 0x40, unkn, 0x01, unkn, 0x00, unkn, 0x01 }, // 0xcx and 0xex
+		{ 0x42, unkn, 0x02, 0x50, 0x43, 0x12, 0x03, 0x41 }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_02[0x08][0x08] =
+	{
+		{ 0x40, 0x02, 0x10, 0x12, 0x02, 0x01, 0x42, 0x02 }, // 0x0x and 0x2x
+		{ 0x03, 0x43, 0x13, 0x52, 0x02, 0x12, 0x50, 0x40 }, // 0x1x and 0x3x
+		{ 0x13, 0x03, 0x13, unkn, unkn, 0x00, 0x53, 0x13 }, // 0x4x and 0x6x
+		{ 0x50, 0x01, 0x42, 0x51, 0x13, 0x41, unkn, 0x02 }, // 0x5x and 0x7x
+		{ unkn, unkn, 0x53, 0x12, unkn, 0x53, 0x01, unkn }, // 0x8x and 0xax
+		{ 0x42, 0x03, 0x51, 0x51, 0x03, unkn, 0x43, 0x51 }, // 0x9x and 0xbx
+		{ unkn, 0x41, 0x52, 0x03, 0x13, 0x00, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, 0x52, 0x13, unkn, 0x52, 0x11, unkn, 0x41 }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_03[0x08][0x08] =
+	{
+		{ 0x53, 0x43, 0x01, 0x02, 0x43, 0x53, 0x51, 0x52 }, // 0x0x and 0x2x
+		{ 0x42, 0x11, 0x03, 0x42, 0x02, 0x53, 0x42, 0x02 }, // 0x1x and 0x3x
+		{ 0x03, 0x43, 0x51, 0x51, 0x50, 0x00, 0x02, 0x50 }, // 0x4x and 0x6x
+		{ 0x11, 0x41, 0x12, 0x03, 0x51, 0x51, 0x51, 0x51 }, // 0x5x and 0x7x
+		{ unkn, 0x41, 0x03, 0x12, 0x40, 0x53, unkn, unkn }, // 0x8x and 0xax
+		{ 0x02, 0x52, 0x01, 0x41, unkn, 0x11, unkn, 0x40 }, // 0x9x and 0xbx
+		{ 0x02, 0x51, 0x42, 0x02, 0x43, 0x00, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, 0x52, 0x03, unkn, 0x01, 0x43, unkn, 0x40 }, // 0xdx and 0xfx
+	};
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		uint8_t row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
+
+		uint8_t xor_v = x & 0x07;
+
+		switch(i & 0x03)
+		{
+			case 0x00: x ^= xor_table_00[row][xor_v]; break;
+			case 0x01: x ^= xor_table_01[row][xor_v]; break;
+			case 0x02: x ^= xor_table_02[row][xor_v]; break;
+			case 0x03: x ^= xor_table_03[row][xor_v]; break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+}
+
+
 //  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
 void cb3_state::do_blockswaps(uint8_t* ROM)
@@ -16680,6 +17391,7 @@ void cmaster_state::init_po33()
 	/* oki6295 at 0x20 */
 }
 
+
 void cmaster_state::init_match133()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -16702,40 +17414,45 @@ void cmaster_state::init_match133()
 	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(cmaster_state::fixedvale4_r), this));
 }
 
+
 void cb3_state::init_cherrys()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	unsigned char rawData[256] = {
-		0xCC, 0xCD, 0xCE, 0xCF, 0xC8, 0xC9, 0xCA, 0xCB, 0xC4, 0xC5, 0xC6, 0xC7,
-		0xC0, 0xC1, 0xC2, 0xC3, 0xDC, 0xDD, 0xDE, 0xDF, 0xD8, 0xD9, 0xDA, 0xDB,
-		0xD4, 0xD5, 0xD6, 0xD7, 0xD0, 0xD1, 0xD2, 0xD3, 0xEC, 0xED, 0xEE, 0xEF,
-		0xE8, 0xE9, 0xEA, 0xEB, 0xE4, 0xE5, 0xE6, 0xE7, 0xE0, 0xE1, 0xE2, 0xE3,
-		0xFC, 0xFD, 0xFE, 0xFF, 0xF8, 0xF9, 0xFA, 0xFB, 0xF4, 0xF5, 0xF6, 0xF7,
-		0xF0, 0xF1, 0xF2, 0xF3, 0x8C, 0x8D, 0x8E, 0x8F, 0x88, 0x89, 0x8A, 0x8B,
-		0x84, 0x85, 0x86, 0x87, 0x80, 0x81, 0x82, 0x83, 0x9C, 0x9D, 0x9E, 0x9F,
-		0x98, 0x99, 0x9A, 0x9B, 0x94, 0x95, 0x96, 0x97, 0x90, 0x91, 0x92, 0x93,
-		0xAC, 0xAD, 0xAE, 0xAF, 0xA8, 0xA9, 0xAA, 0xAB, 0xA4, 0xA5, 0xA6, 0xA7,
-		0xA0, 0xA1, 0xA2, 0xA3, 0xBC, 0xBD, 0xBE, 0xBF, 0xB8, 0xB9, 0xBA, 0xBB,
-		0xB4, 0xB5, 0xB6, 0xB7, 0xB0, 0xB1, 0xB2, 0xB3, 0x4C, 0x4D, 0x4E, 0x4F,
-		0x48, 0x49, 0x4A, 0x4B, 0x44, 0x45, 0x46, 0x47, 0x40, 0x41, 0x42, 0x43,
-		0x5C, 0x5D, 0x5E, 0x5F, 0x58, 0x59, 0x5A, 0x5B, 0x54, 0x55, 0x56, 0x57,
-		0x50, 0x51, 0x52, 0x53, 0x6C, 0x6D, 0x6E, 0x6F, 0x68, 0x69, 0x6A, 0x6B,
-		0x64, 0x65, 0x66, 0x67, 0x60, 0x61, 0x62, 0x63, 0x7C, 0x7D, 0x7E, 0x7F,
-		0x78, 0x79, 0x7A, 0x7B, 0x74, 0x75, 0x76, 0x77, 0x70, 0x71, 0x72, 0x73,
-		0x0C, 0x0D, 0x0E, 0x0F, 0x08, 0x09, 0x0A, 0x0B, 0x04, 0x05, 0x06, 0x07,
-		0x00, 0x01, 0x02, 0x03, 0x1C, 0x1D, 0x1E, 0x1F, 0x18, 0x19, 0x1A, 0x1B,
-		0x14, 0x15, 0x16, 0x17, 0x10, 0x11, 0x12, 0x13, 0x2C, 0x2D, 0x2E, 0x2F,
-		0x28, 0x29, 0x2A, 0x2B, 0x24, 0x25, 0x26, 0x27, 0x20, 0x21, 0x22, 0x23,
-		0x3C, 0x3D, 0x3E, 0x3F, 0x38, 0x39, 0x3A, 0x3B, 0x34, 0x35, 0x36, 0x37,
-		0x30, 0x31, 0x32, 0x33
-	};
+	for (int i = 0; i < 0x10000; i++)
+	{
+		ROM[i] ^= (i & 0xff) ^ 0xcc;
+	}
+}
+
+
+void cb3_state::init_cb3e()
+{
+/*  program bitswap */
+	uint8_t *ROM = memregion("maincpu")->base();
+	do_blockswaps(ROM);
 
 	for (int i = 0; i < 0x10000; i++)
 	{
-		ROM[i] = ROM[i] ^ rawData[i & 0xff];
+		uint8_t dat = ROM[i];
+		dat =  bitswap<8>(dat, 5, 6, 3, 4, 7, 2, 1, 0);
+		ROM[i] = dat;
 	}
 
+/*  bank 1 graphics */
+	uint8_t *src = memregion("gfx1")->base();
+	for (int i = 0; i < 0x20000; i++)
+	{
+		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
+	}
+
+/*  bank 2 graphics */
+	uint8_t *src2 = memregion("gfx2")->base();
+	for (int i = 0; i < 0x8000; i++)
+	{
+		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
+	}
 }
+
 
 /* todo: remove these patches! */
 void unkch_state::init_unkch1()
@@ -16798,33 +17515,6 @@ void goldstar_state::init_super9()
 
 }
 
-void cb3_state::init_cb3e()
-{
-/*  program bitswap */
-	uint8_t *ROM = memregion("maincpu")->base();
-	do_blockswaps(ROM);
-
-	for (int i = 0; i < 0x10000; i++)
-	{
-		uint8_t dat = ROM[i];
-		dat =  bitswap<8>(dat, 5, 6, 3, 4, 7, 2, 1, 0);
-		ROM[i] = dat;
-	}
-
-/*  bank 1 graphics */
-	uint8_t *src = memregion("gfx1")->base();
-	for (int i = 0; i < 0x20000; i++)
-	{
-		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
-	}
-
-/*  bank 2 graphics */
-	uint8_t *src2 = memregion("gfx2")->base();
-	for (int i = 0; i < 0x8000; i++)
-	{
-		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
-	}
-}
 
 void goldstar_state::init_wcherry()
 {
@@ -17063,6 +17753,11 @@ GAMEL( 1989, lucky8c,   lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky
 GAMEL( 1989, lucky8d,   lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 5, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8e,   lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 6, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8f,   lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8f,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 7, W-4, encrypted)",                0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8g,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 8, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1991, lucky8h,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Super Turbo (Hack)",                     0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8i,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Eagle/Wing",        "New Lucky 8 Lines (set 9, W-4, Eagle, licensed by Wing)",  0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 199?, lucky8j,   lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Crown Turbo (Hack)",                     MACHINE_NOT_WORKING,   layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8k,   lucky8,   lucky8k,  lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
@@ -17070,7 +17765,12 @@ GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init
 GAMEL( 198?, super972,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8 )    // ???
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
-GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner",                                               0 )
+GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (set 1)",                                       0 )
+GAME(  198?, ladylinra, ladylinr, ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (set 2)",                                       0 )
+GAME(  198?, ladylinrb, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrb, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 1)",                            0 )
+GAME(  198?, ladylinrc, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrc, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            0 )
+GAME(  198?, ladylinrd, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
+GAME(  198?, ladylinre, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   empty_init,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
 
 GAME(  1985, luckylad,  0,        lucky8,   luckylad, wingco_state,   init_luckylad,  ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...

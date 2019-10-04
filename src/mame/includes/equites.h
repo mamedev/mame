@@ -21,6 +21,7 @@
 #include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class equites_state : public driver_device
@@ -142,7 +143,7 @@ class gekisou_state : public equites_state
 {
 public:
 	using equites_state::equites_state;
-	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);
+	DECLARE_READ_LINE_MEMBER(gekisou_unknown_bit_r);
 	void bngotime(machine_config &config);
 	void gekisou(machine_config &config);
 

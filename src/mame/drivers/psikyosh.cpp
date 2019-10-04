@@ -403,7 +403,7 @@ P1KEY11  29|30  P2KEY11
 			KEY11 = 0x0800  // JAMMA P1 Button 1
 		}; // Mahjong->JAMMA mapping specific to this game pcb
 
-		u16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
+		static const u16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
 //          ROW (distinct pins for P1 or P2) | COLUMN (shared for P1+P2)
 			KEY4 | KEY3,  // A
 			KEY4 | KEY2,  // B
@@ -437,7 +437,7 @@ P1KEY11  29|30  P2KEY11
 		value |= 0xFFFF0000; // set top word
 		do {
 			// since we can't handle multiple keys, just return the first one depressed
-			if((keys & which_key) && (count < ARRAY_LENGTH(key_codes)))
+			if ((keys & which_key) && (count < ARRAY_LENGTH(key_codes)))
 			{
 				value &= ~((u32)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
 				break;

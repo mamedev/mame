@@ -69,6 +69,7 @@ To Do:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 
@@ -571,26 +572,9 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout tile_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{
-		0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4,
-		8*32+0*4,8*32+1*4,8*32+2*4,8*32+3*4,8*32+4*4,8*32+5*4,8*32+6*4,8*32+7*4
-	},
-	{
-		0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,
-		16*32+0*32,16*32+1*32,16*32+2*32,16*32+3*32,16*32+4*32,16*32+5*32,16*32+6*32,16*32+7*32
-	},
-	4*8*32
-};
-
 static GFXDECODE_START( gfx_hvyunit )
-	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x100, 16 ) /* sprite bank */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x000, 16 ) /* background tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x100, 16 ) /* sprite bank */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
 
 
@@ -634,7 +618,6 @@ void hvyunit_state::hvyunit(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sound_memory);
 	m_soundcpu->set_addrmap(AS_IO, &hvyunit_state::sound_io);
-	m_soundcpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
 
 	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_mermaid->port_in_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_r));
@@ -674,7 +657,9 @@ void hvyunit_state::hvyunit(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	YM2203(config, "ymsnd", XTAL(12'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80); /* 3MHz verified on PCB */
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); // 3MHz verified on PCB
+	ymsnd.irq_handler().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 
@@ -684,6 +669,8 @@ void hvyunit_state::hvyunit(machine_config &config)
  *  ROM definition(s)
  *
  *************************************/
+
+/* There is likely a World version using the newer (B73_25 - B73_28) graphics ROMs with a program ROM labeled B73_29 */
 
 ROM_START( hvyunit )
 	ROM_REGION( 0x20000, "master", 0 )
@@ -727,19 +714,23 @@ ROM_START( hvyunitj )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* note, the rom ordering on this is different to the other Japan set */
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
-	ROM_LOAD( "b73_07.2c",  0x100000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
-	ROM_LOAD( "b73_06.2b",  0x110000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
-	ROM_LOAD( "b73_01.1b",  0x120000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
-	ROM_LOAD( "b73_02.1c",  0x130000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
-	ROM_LOAD( "b73_03.1d",  0x140000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
-	ROM_LOAD( "b73_04.1f",  0x150000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
-	ROM_LOAD( "b73_05.1h",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
+	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) )
+	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) )
+	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* the data in first half of this actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles */
+	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_05.1h, despite the different label */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
+
+/*
+
+There is known to exist a currently undumped Japanese version with graphic ROMs numbered B73_15 through B73_23, while
+using B73_12 sound CPU code & B73_14 slave CPU code. The label for the program was missing, presumed to B73_24
+
+*/
 
 ROM_START( hvyunitjo )
 	ROM_REGION( 0x20000, "master", 0 )

@@ -15,13 +15,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define ECONET_TAG          "econet"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -95,16 +88,25 @@ public:
 	// construction/destruction
 	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T, typename U>
+	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&econet_tag, U &&devs)
+		: econet_slot_device(mconfig, tag, owner, 0U)
+	{
+		set_econet_tag(std::forward<T>(econet_tag));
+		devs(*this);
+	}
+
 	// device-level overrides
 	virtual void device_start() override;
 
 	// inline configuration
+	template <typename T> void set_econet_tag(T &&tag) { m_econet.set_tag(std::forward<T>(tag)); }
 	void set_slot(int address) { m_address = address; }
 
 private:
 	// configuration
 	uint8_t m_address;
-	econet_device  *m_econet;
+	required_device<econet_device> m_econet;
 };
 
 

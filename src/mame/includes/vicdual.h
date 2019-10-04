@@ -72,13 +72,13 @@ public:
 	void tranqgun(machine_config &config);
 	void tranqgun_audio(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(read_coin_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_64v);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_composite_blank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_timer_value);
-	DECLARE_CUSTOM_INPUT_MEMBER(fake_lives_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(samurai_protection_r);
+	DECLARE_READ_LINE_MEMBER(coin_status_r);
+	DECLARE_READ_LINE_MEMBER(get_64v);
+	DECLARE_READ_LINE_MEMBER(vblank_comp_r);
+	DECLARE_READ_LINE_MEMBER(cblank_comp_r);
+	DECLARE_READ_LINE_MEMBER(timer_value_r);
+	template <int Param> DECLARE_READ_LINE_MEMBER(fake_lives_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(samurai_protection_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 
 protected:

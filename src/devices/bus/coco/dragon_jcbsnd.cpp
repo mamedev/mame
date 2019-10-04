@@ -54,9 +54,6 @@ dragon_jcbsnd_device::dragon_jcbsnd_device(const machine_config &mconfig, const 
 
 void dragon_jcbsnd_device::device_start()
 {
-	install_write_handler(0xfefe, 0xfefe, write8smo_delegate(FUNC(ay8910_device::address_w), (ay8910_device *)m_ay8910));
-	install_readwrite_handler(0xfeff, 0xfeff, read8smo_delegate(FUNC(ay8910_device::data_r), (ay8910_device *)m_ay8910), write8smo_delegate(FUNC(ay8910_device::data_w), (ay8910_device *)m_ay8910));
-
 	set_line_value(line::CART, line_value::Q);
 }
 
@@ -104,5 +101,18 @@ const tiny_rom_entry *dragon_jcbsnd_device::device_rom_region() const
 
 READ8_MEMBER(dragon_jcbsnd_device::cts_read)
 {
-	return m_eprom->base()[offset & 0x1fff];
+	if (offset == 0x3eff)
+		return m_ay8910->data_r();
+	else
+		return m_eprom->base()[offset & 0x1fff];
+}
+
+//-------------------------------------------------
+//  cts_write
+//-------------------------------------------------
+
+WRITE8_MEMBER(dragon_jcbsnd_device::cts_write)
+{
+	if ((offset & ~1) == 0x3efe)
+		m_ay8910->address_data_w(offset & 1, data);
 }

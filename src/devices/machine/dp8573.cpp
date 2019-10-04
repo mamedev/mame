@@ -23,8 +23,8 @@ DEFINE_DEVICE_TYPE(DP8573, dp8573_device, "dp8573", "DP8573 Real-Time Clock")
 dp8573_device::dp8573_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DP8573, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
-	, m_irq(*this)
-	, m_pfail(*this)
+	, m_intr_cb(*this)
+	, m_mfo_cb(*this)
 {
 }
 
@@ -38,31 +38,36 @@ void dp8573_device::device_start()
 	m_timer = timer_alloc(TIMER_ID);
 	m_timer->adjust(attotime::never);
 
-	m_irq.resolve_safe();
-	m_pfail.resolve_safe();
-}
+	m_intr_cb.resolve_safe();
+	m_mfo_cb.resolve_safe();
 
-void dp8573_device::device_reset()
-{
 	memset(m_ram, 0, 32);
+	sync_time();
 
 	m_tscr = 0;
-	m_pfr = 0;
-	m_millis = 0;
 
+	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+}
+
+void dp8573_device::sync_time()
+{
 	system_time systime;
 	machine().base_datetime(systime);
 
-	m_ram[REG_SECOND] = time_helper::make_bcd(systime.local_time.second);
-	m_ram[REG_MINUTE] = time_helper::make_bcd(systime.local_time.minute);
-	m_ram[REG_HOUR] = time_helper::make_bcd(systime.local_time.hour);
-	m_ram[REG_DAY] = time_helper::make_bcd(systime.local_time.mday);
-	m_ram[REG_MONTH] = time_helper::make_bcd(systime.local_time.month + 1);
-	m_ram[REG_YEAR] = time_helper::make_bcd(systime.local_time.year % 100);
-	m_ram[REG_DAYOFWEEK] = time_helper::make_bcd(systime.local_time.weekday + 1);
-	m_ram[REG_RTMR] = RTMR_CSS;
+	m_millis = 0;
+	m_ram[REG_HUNDREDTH] = 0;
+	m_ram[REG_SECOND] = time_helper::make_bcd(systime.utc_time.second);
+	m_ram[REG_MINUTE] = time_helper::make_bcd(systime.utc_time.minute);
+	m_ram[REG_HOUR] = time_helper::make_bcd(systime.utc_time.hour);
+	m_ram[REG_DAY] = time_helper::make_bcd(systime.utc_time.mday);
+	m_ram[REG_MONTH] = time_helper::make_bcd(systime.utc_time.month + 1);
+	m_ram[REG_YEAR] = time_helper::make_bcd(systime.utc_time.year % 100);
+	m_ram[REG_DAYOFWEEK] = time_helper::make_bcd(systime.utc_time.weekday + 1);
 
-	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_pfr = 0;
+
+	// FIXME: should probably rely on nvram start/stop state
+	m_ram[REG_RTMR] = RTMR_CSS;
 }
 
 void dp8573_device::save_registers()
@@ -82,29 +87,28 @@ void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		return;
 	}
 
-	m_pfr ^= PFR_1MS;
+	m_pfr |= PFR_1MS;
 
-	m_millis++;
 	bool carry = false;
 	bool tens_carry = false;
 	time_helper::inc_bcd(&m_millis, 0xff, 0x00, 0x09, &tens_carry);
 	if (tens_carry)
 	{
-		m_pfr ^= PFR_10MS;
+		m_pfr |= PFR_10MS;
 		carry = time_helper::inc_bcd(&m_ram[REG_HUNDREDTH], 0xff, 0x00, 0x99, &tens_carry);
 		if (tens_carry)
-			m_pfr ^= PFR_100MS;
+			m_pfr |= PFR_100MS;
 	}
 	if (carry)
 	{
-		m_pfr ^= PFR_1S;
+		m_pfr |= PFR_1S;
 		carry = time_helper::inc_bcd(&m_ram[REG_SECOND], 0xff, 0x00, 0x59, &tens_carry);
 		if (tens_carry)
-			m_pfr ^= PFR_10S;
+			m_pfr |= PFR_10S;
 	}
 	if (carry)
 	{
-		m_pfr ^= PFR_1MIN;
+		m_pfr |= PFR_1MIN;
 		carry = time_helper::inc_bcd(&m_ram[REG_MINUTE], 0xff, 0x00, 0x59);
 	}
 	if (carry)
@@ -114,7 +118,7 @@ void dp8573_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			carry = time_helper::inc_bcd(&m_ram[REG_HOUR], 0xff, 0x01, 0x12);
 			if (carry)
 			{
-				m_ram[REG_HOUR] ^= 0x20;
+				m_ram[REG_HOUR] |= 0x20;
 				carry = !(m_ram[REG_HOUR] & 0x20);
 			}
 		}
@@ -202,7 +206,7 @@ void dp8573_device::set_interrupt(uint8_t mask)
 		m_ram[REG_MSR] |= MSR_INT;
 
 	if (!was_intr && (m_ram[REG_MSR] & MSR_INT))
-		m_irq(1);
+		m_intr_cb(0);
 }
 
 void dp8573_device::clear_interrupt(uint8_t mask)
@@ -211,10 +215,10 @@ void dp8573_device::clear_interrupt(uint8_t mask)
 	m_ram[REG_MSR] &= ~mask;
 
 	if (was_intr && !(m_ram[REG_MSR] & MSR_INT))
-		m_irq(0);
+		m_intr_cb(1);
 }
 
-WRITE8_MEMBER(dp8573_device::write)
+void dp8573_device::write(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_GENERAL, "%s: DP8573 - Register Write: %02x = %02x\n", machine().describe_context(), offset, data);
 
@@ -302,7 +306,7 @@ WRITE8_MEMBER(dp8573_device::write)
 	}
 }
 
-READ8_MEMBER(dp8573_device::read)
+u8 dp8573_device::read(offs_t offset)
 {
 	uint8_t ret = m_ram[offset];
 
@@ -339,14 +343,13 @@ READ8_MEMBER(dp8573_device::read)
 void dp8573_device::nvram_default()
 {
 	memset(m_ram, 0, 32);
-
-	m_pfr = 0;
-	m_ram[REG_RTMR] = RTMR_CSS;
+	sync_time();
 }
 
 void dp8573_device::nvram_read(emu_file &file)
 {
 	file.read(m_ram, 32);
+	sync_time();
 }
 
 void dp8573_device::nvram_write(emu_file &file)

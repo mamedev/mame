@@ -56,6 +56,7 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class wallc_state : public driver_device

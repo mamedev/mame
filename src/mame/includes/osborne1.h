@@ -28,6 +28,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class osborne1_state : public driver_device

@@ -53,6 +53,7 @@ Note
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class jackie_state : public driver_device
@@ -76,7 +77,7 @@ public:
 
 	void init_jackie();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 private:
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
@@ -374,7 +375,7 @@ void jackie_state::io_map(address_map &map)
 	map(0x8000, 0xffff).r(FUNC(jackie_state::expram_r));
 }
 
-CUSTOM_INPUT_MEMBER(jackie_state::hopper_r)
+READ_LINE_MEMBER(jackie_state::hopper_r)
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);
@@ -453,7 +454,7 @@ static INPUT_PORTS_START( jackie )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9) PORT_NAME("Attendent")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jackie_state,hopper_r, nullptr) PORT_NAME("HPSW")    // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jackie_state, hopper_r) PORT_NAME("HPSW")    // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")

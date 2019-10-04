@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0
+copyright-holders: Dirk Best
+Sega Billboard layout (vertical games)
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.1" blue="0.1" />
+		</led7seg>
+	</element>
+
+	<element name="led_red" defstate="0">
+		<disk state="0">
+			<color red="0.2" green="0.05" blue="0.05" />
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0.05" blue="0.05" />
+		</disk>
+	</element>
+
+	<element name="text_P1"><text string="Player 1"><color red="1.00" green="1.00" blue="1.00" /></text></element>
+	<element name="text_P2"><text string="Player 2"><color red="1.00" green="1.00" blue="1.00" /></text></element>
+	<element name="text_WINNER"><text string="WINNER"><color red="1.00" green="1.00" blue="1.00" /></text></element>
+
+	<view name="Default">
+		<screen tag="screen">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</screen>
+	</view>
+
+	<view name="Billboard">
+
+		<!-- Player 1 -->
+
+		<element ref="text_P1">
+			<bounds left="10" top="10" right="100" bottom="30" />
+		</element>
+
+		<element ref="text_WINNER">
+			<bounds left="50" top="40" right="150" bottom="60" />
+		</element>
+
+		<bezel name="led_winner0" element="led_red">
+			<bounds x="150" y="45" width="10" height="10" />
+		</bezel>
+
+		<bezel name="digit0" element="digit">
+			<bounds x="200" y="30" width="15" height="30" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="230" y="30" width="15" height="30" />
+		</bezel>
+
+		<!-- Player 2 -->
+
+		<element ref="text_P2">
+			<bounds left="310" top="10" right="400" bottom="30" />
+		</element>
+
+		<element ref="text_WINNER">
+			<bounds left="350" top="40" right="450" bottom="60" />
+		</element>
+
+		<bezel name="led_winner1" element="led_red">
+			<bounds x="450" y="45" width="10" height="10" />
+		</bezel>
+
+		<bezel name="digit2" element="digit">
+			<bounds x="500" y="30" width="15" height="30" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="530" y="30" width="15" height="30" />
+		</bezel>
+
+		<screen tag="screen">
+			<bounds left="0" top="100" right="600" bottom="900" />
+		</screen>
+
+	</view>
+
+</mamelayout>

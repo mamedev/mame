@@ -2,12 +2,12 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-	Wafadrive 'cartridges'
-	These are infinite tape loop based devices that act like discs
+    Wafadrive 'cartridges'
+    These are infinite tape loop based devices that act like discs
 -->
 <softwarelist name="spectrum_wafadrive" description="Sinclair ZX Wafadrive tapes/cartridges">
 
-	<software name="spctrlwr" supported="no"> 
+	<software name="spctrlwr" supported="no">
 		<description>Spectral Writer</description>
 		<year>1984</year>
 		<publisher>Softek International Ltd</publisher>

@@ -16,6 +16,7 @@
 #include "video/bufsprite.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 struct pf_layer_info
 {

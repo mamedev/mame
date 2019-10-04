@@ -101,8 +101,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_s18);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_s18);
 
-	DECLARE_READ16_MEMBER( genesis_vdp_r ) { return m_vdp->vdp_r(space, offset, mem_mask); }
-	DECLARE_WRITE16_MEMBER( genesis_vdp_w ) { m_vdp->vdp_w(space, offset, data, mem_mask); }
+	DECLARE_READ16_MEMBER( genesis_vdp_r ) { return m_vdp->vdp_r(offset, mem_mask); }
+	DECLARE_WRITE16_MEMBER( genesis_vdp_w ) { m_vdp->vdp_w(offset, data, mem_mask); }
 	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space, offset, data, mem_mask); }
 	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space, offset, data, mem_mask); }
 

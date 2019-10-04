@@ -31,7 +31,8 @@ public:
 	void bwidow_audio(machine_config &config);
 	void gravitar_audio(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	DECLARE_READ_LINE_MEMBER(clock_r);
+
 protected:
 	DECLARE_READ8_MEMBER(spacduel_IN3_r);
 	DECLARE_READ8_MEMBER(bwidowp_in_r);

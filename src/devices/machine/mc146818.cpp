@@ -54,12 +54,15 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 
 void mc146818_device::device_start()
 {
-	m_data.resize(data_size());
+	m_data = make_unique_clear<uint8_t[]>(data_size());
 	m_last_refresh = machine().time();
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 
 	m_write_irq.resolve_safe();
+
+	save_pointer(NAME(m_data), data_size());
+	save_item(NAME(m_index));
 }
 
 
@@ -147,7 +150,20 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 							{
 								set_month(1);
 
-								set_year((get_year() + 1) % 100);
+								int year = get_year() + 1;
+								if (year <= 99)
+								{
+									set_year(year);
+								}
+								else
+								{
+									set_year(0);
+
+									if (century_count_enabled())
+									{
+										set_century((get_century() + 1) % 100);
+									}
+								}
 							}
 						}
 					}
@@ -181,15 +197,14 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 void mc146818_device::nvram_default()
 {
 	// populate from a memory region if present
-	memory_region *region = memregion(DEVICE_SELF);
-	if (region != nullptr)
+	if (m_region.found())
 	{
-		uint32_t bytes = region->bytes();
+		uint32_t bytes = m_region->bytes();
 
 		if (bytes > data_size())
 			bytes = data_size();
 
-		memcpy(&m_data[0], region->base(), bytes);
+		memcpy(&m_data[0], m_region->base(), bytes);
 	}
 	else
 	{
@@ -237,7 +252,7 @@ void mc146818_device::nvram_write(emu_file &file)
 //  to_ram - convert value to current ram format
 //-------------------------------------------------
 
-int mc146818_device::to_ram(int a)
+int mc146818_device::to_ram(int a) const
 {
 	if (!(m_data[REG_B] & REG_B_DM))
 		return dec_2_bcd(a);
@@ -250,7 +265,7 @@ int mc146818_device::to_ram(int a)
 //  from_ram - convert value from current ram format
 //-------------------------------------------------
 
-int mc146818_device::from_ram(int a)
+int mc146818_device::from_ram(int a) const
 {
 	if (!(m_data[REG_B] & REG_B_DM))
 		return bcd_2_dec(a);
@@ -259,7 +274,7 @@ int mc146818_device::from_ram(int a)
 }
 
 
-int mc146818_device::get_seconds()
+int mc146818_device::get_seconds() const
 {
 	return from_ram(m_data[REG_SECONDS]);
 }
@@ -269,7 +284,7 @@ void mc146818_device::set_seconds(int seconds)
 	m_data[REG_SECONDS] = to_ram(seconds);
 }
 
-int mc146818_device::get_minutes()
+int mc146818_device::get_minutes() const
 {
 	return from_ram(m_data[REG_MINUTES]);
 }
@@ -279,7 +294,7 @@ void mc146818_device::set_minutes(int minutes)
 	m_data[REG_MINUTES] = to_ram(minutes);
 }
 
-int mc146818_device::get_hours()
+int mc146818_device::get_hours() const
 {
 	if (!(m_data[REG_B] & REG_B_24_12))
 	{
@@ -328,7 +343,7 @@ void mc146818_device::set_hours(int hours)
 	}
 }
 
-int mc146818_device::get_dayofweek()
+int mc146818_device::get_dayofweek() const
 {
 	return from_ram(m_data[REG_DAYOFWEEK]);
 }
@@ -338,7 +353,7 @@ void mc146818_device::set_dayofweek(int dayofweek)
 	m_data[REG_DAYOFWEEK] = to_ram(dayofweek);
 }
 
-int mc146818_device::get_dayofmonth()
+int mc146818_device::get_dayofmonth() const
 {
 	return from_ram(m_data[REG_DAYOFMONTH]);
 }
@@ -348,7 +363,7 @@ void mc146818_device::set_dayofmonth(int dayofmonth)
 	m_data[REG_DAYOFMONTH] = to_ram(dayofmonth);
 }
 
-int mc146818_device::get_month()
+int mc146818_device::get_month() const
 {
 	return from_ram(m_data[REG_MONTH]);
 }
@@ -358,7 +373,7 @@ void mc146818_device::set_month(int month)
 	m_data[REG_MONTH] = to_ram(month);
 }
 
-int mc146818_device::get_year()
+int mc146818_device::get_year() const
 {
 	return from_ram(m_data[REG_YEAR]);
 }
@@ -366,6 +381,18 @@ int mc146818_device::get_year()
 void mc146818_device::set_year(int year)
 {
 	m_data[REG_YEAR] = to_ram(year);
+}
+
+int mc146818_device::get_century() const
+{
+	assert(m_century_index != -1);
+	return from_ram(m_data[m_century_index]);
+}
+
+void mc146818_device::set_century(int century)
+{
+	assert(m_century_index != -1);
+	m_data[m_century_index] = to_ram(century);
 }
 
 
@@ -400,7 +427,7 @@ void mc146818_device::set_base_datetime()
 		set_year((current_time.year - m_epoch) % 100);
 
 	if (m_century_index >= 0)
-		m_data[m_century_index] = to_ram(current_time.year / 100);
+		set_century(current_time.year / 100);
 }
 
 
@@ -410,9 +437,7 @@ void mc146818_device::set_base_datetime()
 
 void mc146818_device::update_timer()
 {
-	int bypass;
-
-	bypass = get_timer_bypass();
+	int bypass = get_timer_bypass();
 
 	attotime update_period = attotime::never;
 	attotime update_interval = attotime::never;
@@ -452,7 +477,7 @@ void mc146818_device::update_timer()
 //  get_timer_bypass - get main clock divisor based on A register
 //---------------------------------------------------------------
 
-int mc146818_device::get_timer_bypass()
+int mc146818_device::get_timer_bypass() const
 {
 	int bypass;
 
@@ -520,7 +545,8 @@ uint8_t mc146818_device::read(offs_t offset)
 		break;
 
 	case 1:
-		data = read_direct(m_index);
+		data = internal_read(m_index);
+		LOG("mc146818_port_r(): offset=0x%02x data=0x%02x\n", m_index, data);
 		break;
 	}
 
@@ -528,6 +554,54 @@ uint8_t mc146818_device::read(offs_t offset)
 }
 
 uint8_t mc146818_device::read_direct(offs_t offset)
+{
+	offset %= data_logical_size();
+	if (!machine().side_effects_disabled())
+		internal_set_address(offset);
+
+	uint8_t data = internal_read(offset);
+
+	LOG("mc146818_port_r(): offset=0x%02x data=0x%02x\n", offset, data);
+
+	return data;
+}
+
+//-------------------------------------------------
+//  write - I/O handler for writing
+//-------------------------------------------------
+
+void mc146818_device::write(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+	case 0:
+		internal_set_address(data % data_logical_size());
+		break;
+
+	case 1:
+		LOG("mc146818_port_w(): offset=0x%02x data=0x%02x\n", m_index, data);
+		internal_write(m_index, data);
+		break;
+	}
+}
+
+void mc146818_device::write_direct(offs_t offset, uint8_t data)
+{
+	offset %= data_logical_size();
+	if (!machine().side_effects_disabled())
+		internal_set_address(offset);
+
+	LOG("mc146818_port_w(): offset=0x%02x data=0x%02x\n", offset, data);
+
+	internal_write(offset, data);
+}
+
+void mc146818_device::internal_set_address(uint8_t address)
+{
+	m_index = address;
+}
+
+uint8_t mc146818_device::internal_read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -546,8 +620,11 @@ uint8_t mc146818_device::read_direct(offs_t offset)
 		// the unused bits b0 ... b3 are always read as 0
 		data = m_data[REG_C] & (REG_C_IRQF | REG_C_PF | REG_C_AF | REG_C_UF);
 		// read 0x0c will clear all IRQ flags in register 0x0c
-		m_data[REG_C] &= ~(REG_C_IRQF | REG_C_PF | REG_C_AF | REG_C_UF);
-		update_irq();
+		if (!machine().side_effects_disabled())
+		{
+			m_data[REG_C] &= ~(REG_C_IRQF | REG_C_PF | REG_C_AF | REG_C_UF);
+			update_irq();
+		}
 		break;
 
 	case REG_D:
@@ -560,33 +637,11 @@ uint8_t mc146818_device::read_direct(offs_t offset)
 		break;
 	}
 
-	LOG("mc146818_port_r(): offset=0x%02x data=0x%02x\n", offset, data);
-
 	return data;
 }
 
-//-------------------------------------------------
-//  write - I/O handler for writing
-//-------------------------------------------------
-
-void mc146818_device::write(offs_t offset, uint8_t data)
+void mc146818_device::internal_write(offs_t offset, uint8_t data)
 {
-	switch (offset)
-	{
-	case 0:
-		m_index = data % data_size();
-		break;
-
-	case 1:
-		write_direct(m_index, data);
-		break;
-	}
-}
-
-void mc146818_device::write_direct(offs_t offset, uint8_t data)
-{
-	LOG("mc146818_port_w(): offset=0x%02x data=0x%02x\n", offset, data);
-
 	switch (offset)
 	{
 	case REG_SECONDS:

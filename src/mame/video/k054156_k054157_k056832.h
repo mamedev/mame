@@ -6,6 +6,7 @@
 #pragma once
 
 #include "video/k055555.h" // still needs k055555_get_palette_index
+#include "tilemap.h"
 
 typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k056832_cb_delegate;
 #define K056832_CB_MEMBER(_name)   void _name(int layer, int *code, int *color, int *flags)

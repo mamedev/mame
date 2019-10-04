@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 enum
 {
 	TC0480SCP_LAYOUT_COMMON = 0, // default layout

@@ -22,6 +22,7 @@
 #include "sound/hc55516.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class williams_state : public driver_device
 {
@@ -286,7 +287,7 @@ public:
 
 	void tshoot(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(maxvol_w);

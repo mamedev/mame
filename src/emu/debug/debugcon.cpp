@@ -399,8 +399,10 @@ CMDERR debugger_console::validate_command(const char *command)
 
 void debugger_console::register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler)
 {
-	assert_always(m_machine.phase() == machine_phase::INIT, "Can only call register_command() at init time!");
-	assert_always((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call register_command() when debugger is not running");
+	if (m_machine.phase() != machine_phase::INIT)
+		throw emu_fatalerror("Can only call debugger_console::register_command() at init time!");
+	if (!(m_machine.debug_flags & DEBUG_FLAG_ENABLED))
+		throw emu_fatalerror("Cannot call debugger_console::register_command() when debugger is not running");
 
 	debug_command *cmd = auto_alloc_clear(m_machine, <debug_command>());
 

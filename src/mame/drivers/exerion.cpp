@@ -237,7 +237,7 @@ void exerion_state::sub_map(address_map &map)
 /* verified from Z80 code */
 static INPUT_PORTS_START( exerion )
 	PORT_START("IN0")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exerion_state, exerion_controls_r, nullptr)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exerion_state, exerion_controls_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 

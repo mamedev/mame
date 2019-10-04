@@ -63,7 +63,7 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 				if (inputs[i] == cmd)
 				{
 					rc.m_cmd = PUSH_INPUT;
-					rc.m_param = i;
+					rc.m_param = static_cast<double>(i);
 					stk += 1;
 					break;
 				}

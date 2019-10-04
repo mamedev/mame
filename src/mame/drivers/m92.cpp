@@ -283,7 +283,7 @@ WRITE8_MEMBER(m92_state::bankswitch_w)
 		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
 
-CUSTOM_INPUT_MEMBER(m92_state::m92_sprite_busy_r)
+READ_LINE_MEMBER(m92_state::sprite_busy_r)
 {
 	return m_sprite_buffer_busy;
 }
@@ -420,7 +420,7 @@ static INPUT_PORTS_START( m92_2player )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, m92_state,m92_sprite_busy_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(m92_state, sprite_busy_r)
 	/* DIP switch bank 3 */
 	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW3:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW3:2" )

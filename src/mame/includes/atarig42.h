@@ -16,6 +16,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"
 #include "machine/asic65.h"
+#include "tilemap.h"
 
 class atarig42_state : public atarigen_state
 {

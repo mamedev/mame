@@ -37,7 +37,7 @@ const char *m20_format::extensions() const
 
 bool m20_format::supports_save() const
 {
-	return false;
+	return true;
 }
 
 int m20_format::identify(io_generic *io, uint32_t form_factor)
@@ -49,13 +49,13 @@ int m20_format::identify(io_generic *io, uint32_t form_factor)
 
 bool m20_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	for(int track = 0; track < 35; track++)
-		for(int head = 0; head < 2; head ++) {
+	for (int track = 0; track < 35; track++)
+		for (int head = 0; head < 2; head ++) {
 			bool mfm = track || head;
 			desc_pc_sector sects[16];
 			uint8_t sectdata[16*256];
 			io_generic_read(io, sectdata, 16*256*(track*2+head), 16*256);
-			for(int i=0; i<16; i++) {
+			for (int i = 0; i < 16; i++) {
 				int j = i/2 + (i & 1 ? 0 : 8);
 				sects[i].track = track;
 				sects[i].head = head;
@@ -78,7 +78,45 @@ bool m20_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 bool m20_format::save(io_generic *io, floppy_image *image)
 {
-	return false;
+	uint8_t bitstream[500000/8];
+	uint8_t sector_data[50000];
+	desc_xs sectors[256];
+	int track_size;
+	uint64_t file_offset = 0;
+
+	int track_count, head_count;
+	track_count = 35; head_count = 2;  //FIXME: use image->get_actual_geometry(track_count, head_count) instead
+
+	// initial fm track
+	generate_bitstream_from_track(0, 0, 4000, bitstream, track_size, image);
+	extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+
+	for (int i = 0; i < 16; i++)
+	{
+		io_generic_write(io, sectors[i + 1].data, file_offset, 128);
+		file_offset += 256; //128;
+	}
+
+	// rest are mfm tracks
+	for (int track = 0; track < track_count; track++)
+	{
+		for (int head = 0; head < head_count; head++)
+		{
+			// skip track 0, head 0
+			if (track == 0) { if (head_count == 1) break; else head++; }
+
+			generate_bitstream_from_track(track, head, 2000, bitstream, track_size, image);
+			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+
+			for (int i = 0; i < 16; i++)
+			{
+				io_generic_write(io, sectors[i + 1].data, file_offset, 256);
+				file_offset += 256;
+			}
+		}
+	}
+
+	return true;
 }
 
 const floppy_format_type FLOPPY_M20_FORMAT = &floppy_image_format_creator<m20_format>;

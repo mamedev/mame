@@ -6,8 +6,8 @@
 #include "ptypes.h"
 
 #include <algorithm>
-#include <cstdlib>
-#include <cstring>
+//#include <cstdlib>
+//#include <cstring>
 #include <initializer_list>
 
 namespace plib
@@ -25,7 +25,7 @@ namespace plib
 					#ifdef _WIN32
 					ret = ret + '\\' + elem;
 					#else
-					ret = ret + '/' + elem;
+					ret += ('/' + elem);
 					#endif
 			}
 			return ret;
@@ -137,30 +137,15 @@ namespace plib
 	int penum_base::from_string_int(const char *str, const char *x)
 	{
 		int cnt = 0;
-		const char *cur = str;
-		std::size_t lx = strlen(x);
-		while (*str)
+		for (auto &s : psplit(str, ",", false))
 		{
-			if (*str == ',')
-			{
-				std::ptrdiff_t l = str-cur;
-				if (static_cast<std::size_t>(l) == lx)
-					if (strncmp(cur, x, lx) == 0)
-						return cnt;
-			}
-			else if (*str == ' ')
-			{
-				cur = str + 1;
-				cnt++;
-			}
-			str++;
-		}
-		std::ptrdiff_t l = str-cur;
-		if (static_cast<std::size_t>(l) == lx)
-			if (strncmp(cur, x, lx) == 0)
+			if (s == x)
 				return cnt;
+			cnt++;
+		}
 		return -1;
 	}
+
 	std::string penum_base::nthstr(int n, const char *str)
 	{
 		return psplit(str, ",", false)[static_cast<std::size_t>(n)];

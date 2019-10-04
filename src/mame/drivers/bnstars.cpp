@@ -98,6 +98,7 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 
 #include "rendlay.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class bnstars_state : public ms32_state
@@ -125,7 +126,7 @@ public:
 
 	void init_bnstars();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
 
 private:
 
@@ -557,7 +558,7 @@ uint32_t bnstars_state::screen_update_bnstars_right(screen_device &screen, bitma
 
 static INPUT_PORTS_START( bnstars )
 	PORT_START("P1")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)0)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(bnstars_state, mahjong_ctrl_r<0>)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -600,7 +601,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)1)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(bnstars_state, mahjong_ctrl_r<1>)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -751,9 +752,10 @@ static GFXDECODE_START( gfx_bnstars )
 	GFXDECODE_ENTRY( "gfx7", 0, txlayout,     0x6000, 0x10 ) /* Tx scr2 */
 GFXDECODE_END
 
+template <int P>
 CUSTOM_INPUT_MEMBER(bnstars_state::mahjong_ctrl_r)
 {
-	required_ioport_array<4> &keys = (((int)(uintptr_t)param) == 0) ? m_p1_keys : m_p2_keys;
+	required_ioport_array<4> &keys = (P == 0) ? m_p1_keys : m_p2_keys;
 
 	switch (m_bnstars1_mahjong_select & 0x2080)
 	{

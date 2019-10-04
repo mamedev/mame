@@ -4,7 +4,9 @@
 
 #ifndef __M7700DS_H__
 #define __M7700DS_H__
-
+#ifdef __sun
+#undef SEC
+#endif
 /*
 
 Mitsubishi 7700 CPU Emulator v0.10

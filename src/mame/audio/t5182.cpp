@@ -225,11 +225,11 @@ void t5182_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 {
 	switch (id)
 	{
-		case SETIRQ_CB:
-			setirq_callback(ptr, param);
-			break;
-		default:
-			assert_always(false, "Unknown id in t5182_device::device_timer");
+	case SETIRQ_CB:
+		setirq_callback(ptr, param);
+		break;
+	default:
+		throw emu_fatalerror("Unknown id in t5182_device::device_timer");
 	}
 }
 

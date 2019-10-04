@@ -360,11 +360,7 @@ WRITE8_MEMBER(replicator_state::port_w)
 					uint8_t lcd_data = shift_register_value & 0xF0;
 
 					if (enable && RW==0){
-						if (RS==0){
-							m_lcdc->control_write(lcd_data);
-						} else {
-							m_lcdc->data_write(lcd_data);
-						}
+						m_lcdc->write(RS, lcd_data);
 					}
 				}
 			}

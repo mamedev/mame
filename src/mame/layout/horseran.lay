@@ -7,129 +7,129 @@
 
 	<element name="text_places" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="PLACES" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="PLACES" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="PLACES" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="PLACES" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_shows" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="SHOWS" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="SHOWS" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="SHOWS" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="SHOWS" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_earnings" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="EARNINGS" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="EARNINGS" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="EARNINGS" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="EARNINGS" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_oflast5" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="OF LAST 5 RACES" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="OF LAST 5 RACES" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="OF LAST 5 RACES" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="OF LAST 5 RACES" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_rating" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="RATING" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="RATING" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="RATING" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="RATING" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_finpos" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="FINISH POSITION" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="FINISH POSITION" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="FINISH POSITION" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="FINISH POSITION" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_finish" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="FINISH" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="FINISH" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="FINISH" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="FINISH" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_3call" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="3RD CALL" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="3RD CALL" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="3RD CALL" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="3RD CALL" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 
 	<element name="text_curyear" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="CURRENT YEAR" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="CURRENT YEAR" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="CURRENT YEAR" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="CURRENT YEAR" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_pastyear" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="PAST YEAR" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="PAST YEAR" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="PAST YEAR" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="PAST YEAR" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_rsl" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="RACES SINCE LAYOFF" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="RACES SINCE LAYOFF" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="RACES SINCE LAYOFF" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="RACES SINCE LAYOFF" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_distance" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="DISTANCE" align="2"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="DISTANCE" align="2"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="DISTANCE" align="2"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="DISTANCE" align="2"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_postpos" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="POST POSITION" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="POST POSITION" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="POST POSITION" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="POST POSITION" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_3rb" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="3RD RACE BACK" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="3RD RACE BACK" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="3RD RACE BACK" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="3RD RACE BACK" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_2rb" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="2ND RACE BACK" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="2ND RACE BACK" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="2ND RACE BACK" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="2ND RACE BACK" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_lastrace" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="LAST RACE" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="LAST RACE" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="LAST RACE" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="LAST RACE" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_purse" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="PURSE" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="PURSE" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="PURSE" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="PURSE" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 
 	<element name="text_lback" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="LENGTHS BACK" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="LENGTHS BACK" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="LENGTHS BACK" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="LENGTHS BACK" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_1call" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="1ST CALL" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="1ST CALL" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="1ST CALL" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="1ST CALL" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_2call" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="2ND CALL" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="2ND CALL" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="2ND CALL" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="2ND CALL" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_2bsr" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="2 BEST SPEED RATINGS" align="0"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="2 BEST SPEED RATINGS" align="0"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="2 BEST SPEED RATINGS" align="0"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="2 BEST SPEED RATINGS" align="0"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_daysaway" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="DAYS AWAY" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="DAYS AWAY" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="DAYS AWAY" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="DAYS AWAY" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_wins" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="WINS" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="WINS" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="WINS" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="WINS" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 	<element name="text_races" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="0" string="RACES" align="1"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
-		<text state="1" string="RACES" align="1"><color red="0.31" green="0.28" blue="0.29" /></text>
+		<text state="0" string="RACES" align="1"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="RACES" align="1"><color red="0.2" green="0.16" blue="0.16" /></text>
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
+		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
 	</element>
 
 

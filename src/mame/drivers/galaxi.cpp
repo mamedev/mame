@@ -40,6 +40,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "galaxi.lh"
 
@@ -69,8 +70,8 @@ public:
 	void lastfour(machine_config &config);
 	void magjoker(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(ticket_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 protected:
 	virtual void machine_start() override;
@@ -296,12 +297,12 @@ WRITE16_MEMBER(galaxi_state::_500004_w)
 	show_out();
 }
 
-CUSTOM_INPUT_MEMBER(galaxi_state::ticket_r)
+READ_LINE_MEMBER(galaxi_state::ticket_r)
 {
 	return m_ticket && !(m_screen->frame_number() % 10);
 }
 
-CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
+READ_LINE_MEMBER(galaxi_state::hopper_r)
 {
 	return m_hopper && !(m_screen->frame_number() % 10);
 }
@@ -375,11 +376,11 @@ static INPUT_PORTS_START( galaxi )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(galaxi_state, hopper_r)   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN3 )   // pin 25LC
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxi_state, ticket_r)  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // (pin 26LC)
@@ -395,11 +396,11 @@ static INPUT_PORTS_START( magjoker )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxi_state, hopper_r)   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxi_state, ticket_r)  // ticket sensor
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )   // (pin 26LC)

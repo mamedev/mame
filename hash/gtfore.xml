@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="gtfore" description="Incredible Technologies Golden Tee Fore! upgrade CD-ROM images">
+
+	<software name="gtfore02">
+		<description>Golden Tee Fore! 2002 (V2.00.00)</description>
+		<year>2001</year>
+		<publisher>Incredible Technologies</publisher>
+		<info name="disc_matrix" value="FUTURE MEDIA \ CA   FM 20372 (GOLF FORE 2002 N2.00.00/IN0006)" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="golden tee fore! 2002 (v2.00.00)" sha1="525ccfd713fa7de4c8ba7770cd0086726f0132cd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gtfore03">
+		<description>Golden Tee Fore! 2003 (V3.00.04)</description>
+		<year>2002</year>
+		<publisher>Incredible Technologies</publisher>
+		<info name="disc_matrix" value="GT42003RM·" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="golden tee fore! 2003 (v3.00.04)" sha1="29f5a04c15a9f6ccd49de2752545370077b2b4b8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gtfore04">
+		<description>Golden Tee Fore! 2004 (V4.00.XX)</description>
+		<year>2003</year>
+		<publisher>Incredible Technologies</publisher>
+		<info name="disc_matrix" value="GOLFV40000RM·" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="golden tee fore! 2004 (v4.00.xx)" sha1="ceb65c40a34bcceed282fd9bfd79aa3a25e267dc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gtfore05">
+		<description>Golden Tee Fore! 2005 (V5.00.XX)</description>
+		<year>2004</year>
+		<publisher>Incredible Technologies</publisher>
+		<info name="disc_matrix" value="ITGT2005RM:" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="golden tee fore! 2005 (v5.00.xx)" sha1="6b92b048c89e4f75ad12892becb283b6a6533127" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gtfore06">
+		<description>Golden Tee Fore! Complete (V6.00.XX)</description>
+		<year>2005</year>
+		<publisher>Incredible Technologies</publisher>
+		<info name="disc_matrix" value="0369382 02   10/12/2005 12:37:11 AM" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="golden tee fore! complete (v6.00.xx)" sha1="f201f872f9018cde0caf43a898344cdedf66cab0" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

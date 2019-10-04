@@ -1287,6 +1287,7 @@ ROM_START(wwfr_106)
 	ROM_LOAD("wfsndu21.400", 0x080000, 0x80000, CRC(242dcdcb) SHA1(af7220e14b0956ef40f75b2749eb1b9d715a1af0))
 	ROM_LOAD("wfsndu36.400", 0x100000, 0x80000, CRC(39db8d85) SHA1(a55dd88fd4d9154b523dca9160bf96119af1f94d))
 ROM_END
+
 ROM_START(wwfr_103)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("wfcpuc5.512", 0x0000, 0x10000, CRC(7e9ead89) SHA1(6cfd64899128b5f9b4ccc37b7bfdbb0a2a75a3a5))
@@ -1301,6 +1302,19 @@ ROM_START(wwfr_103)
 	ROM_LOAD("wfsndu36.400", 0x100000, 0x80000, CRC(39db8d85) SHA1(a55dd88fd4d9154b523dca9160bf96119af1f94d))
 ROM_END
 
+ROM_START(wwfr_103f)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("wfcpucf.103", 0x0000, 0x10000, CRC(0e211494) SHA1(c601a075636f84ad12ec0693772a8759049077d5))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("wfdspf.101", 0x00000, 0x80000, CRC(4c39bda9) SHA1(2ea61a2020a4a4e3f23853ab8780d6999053e8ae))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("wfsndu7.512", 0x0000, 0x10000, CRC(eb01745c) SHA1(7222e39c52ed298b737aadaa5b57d2068d39287e))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("wfsndu17.400", 0x000000, 0x80000, CRC(7d9c2ca8) SHA1(5d84559455fe7e27634b28bcab81d54f2676390e))
+	ROM_LOAD("wfsndu21.400", 0x080000, 0x80000, CRC(242dcdcb) SHA1(af7220e14b0956ef40f75b2749eb1b9d715a1af0))
+	ROM_LOAD("wfsndu36.400", 0x100000, 0x80000, CRC(39db8d85) SHA1(a55dd88fd4d9154b523dca9160bf96119af1f94d))
+ROM_END
 
 GAME(1993,  rab_320,   0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Adventures of Rocky and Bullwinkle and Friends (3.20)",        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  rab_130,   rab_320,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "Adventures of Rocky and Bullwinkle and Friends (1.30)",        MACHINE_IS_SKELETON_MECHANICAL)
@@ -1362,3 +1376,4 @@ GAME(1994,  tomy_h30,  tomy_400, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, 
 GAME(1994,  tomy_102,  tomy_400, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "The Who's Tommy Pinball Wizard (1.02)",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  wwfr_106,  0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "WWF Royal Rumble (1.06)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  wwfr_103,  wwfr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "WWF Royal Rumble (1.03)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  wwfr_103f, wwfr_106, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East",    "WWF Royal Rumble (1.03 French)",       MACHINE_IS_SKELETON_MECHANICAL)

@@ -13,7 +13,8 @@ Microchess, originally made for the KIM-1. Jennings went on to co-found Personal
 Jennings also licensed Chessmate to Novag, and they released it as the MK II. The hardware
 is almost identical and the software is the same(identical ROM labels). Two designs were made,
 one jukebox shape, and one brick shape. The one in MAME came from the jukebox, but both
-models have the same ROMs.
+models have the same ROMs. Note that like MK I, although it is a Winkler/Auge production,
+it doesn't involve SciSys company. SciSys was founded by Winkler after MK II.
 
 TODO:
 - is there an older version of chmate? chips on pcb photos are dated 1979, but
@@ -221,7 +222,7 @@ static INPUT_PORTS_START( chmate )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chmate_state, reset_button, nullptr) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chmate_state, reset_button, 0) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mk2 ) // meaning of black/white reversed
@@ -254,7 +255,7 @@ static INPUT_PORTS_START( mk2a )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_S) PORT_TOGGLE PORT_NAME("Sound Switch")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chmate_state, reset_button, nullptr) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chmate_state, reset_button, 0) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 

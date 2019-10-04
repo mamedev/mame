@@ -38,7 +38,7 @@ public:
 	void xmen(machine_config &config);
 	void xmen6p(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(xmen_frame_r);
+	DECLARE_READ_LINE_MEMBER(xmen_frame_r);
 
 private:
 	/* video-related */

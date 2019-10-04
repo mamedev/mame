@@ -30,7 +30,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_mainram(*this, "mainram"),
-		m_otherram(*this, "otherram")
+		m_otherram(*this, "otherram"),
+		m_bootcopy(0)
 	{ }
 
 	void monon_color(machine_config &config);
@@ -54,6 +55,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void monon_color_map(address_map &map);
+	int m_bootcopy;
 };
 
 void monon_color_state::machine_start()
@@ -63,18 +65,37 @@ void monon_color_state::machine_start()
 
 	memcpy(maincpu, flash+0x200, 0x1e00); // 0x4000-0x5dff fixed code?
 
-	// there are a whole bunch of blocks that map at 0x5e00 (boot code jumps straight to 0x5e00)
 
-	memcpy(maincpu+0x1e00, flash+0x2000, 0x1000); // BANK0 - clears RAM, sets up stack etc. but then jumps to 0x9xxx where we have nothing (probably the correct initial block tho)
-//  memcpy(maincpu+0x1e00, flash+0x4200, 0x0a00); // BANK1 - just set register + a jump (to function that writes to UART)
-//  memcpy(maincpu+0x1e00, flash+0x4c00, 0x0a00); // BANK2
-//  memcpy(maincpu+0x1e00, flash+0x5600, 0x0a00); // BANK3
-//  memcpy(maincpu+0x1e00, flash+0x6000, 0x0a00); // BANK4 - ends up reting with nothing on the stack
-//  memcpy(maincpu+0x1e00, flash+0x6a00, 0x0a00); // BANK5
-//  memcpy(maincpu+0x1e00, flash+0x7400, 0x0a00); // BANK6
-//  memcpy(maincpu+0x1e00, flash+0x7e00, 0x0a00); // BANK7
-//  memcpy(maincpu+0x1e00, flash+0x8800, 0x0a00); // BANK8
-//  memcpy(maincpu+0x1e00, flash+0x9200, 0x0a00); // BANK9
+}
+
+
+
+void monon_color_state::machine_reset()
+{
+	m_maincpu->set_state_int(MCS51_PC, 0x4000);
+
+	uint8_t* flash = memregion("flash")->base();
+	uint8_t* maincpu = &m_mainram[0];
+
+	memset(maincpu + 0x1e00, 0x00, 0x1000);
+
+	switch (m_bootcopy)
+	{
+	// there are a whole bunch of blocks that map at 0x5e00 (boot code jumps straight to 0x5e00)
+	case 0x0: memcpy(maincpu + 0x1e00, flash + 0x2000, 0x1000); break; // BANK0 - clears RAM, sets up stack etc. but then jumps to 0x9xxx where we have nothing (probably the correct initial block tho)
+	case 0x1: memcpy(maincpu + 0x1e00, flash + 0x4200, 0x0a00); break; // BANK1 - just set register + a jump (to function that writes to UART)
+	case 0x2: memcpy(maincpu + 0x1e00, flash + 0x4c00, 0x0a00); break; // BANK2
+	case 0x3: memcpy(maincpu + 0x1e00, flash + 0x5600, 0x0a00); break; // BANK3
+	case 0x4: memcpy(maincpu + 0x1e00, flash + 0x6000, 0x0a00); break; // BANK4 - ends up reting with nothing on the stack
+	case 0x5: memcpy(maincpu + 0x1e00, flash + 0x6a00, 0x0a00); break; // BANK5
+	case 0x6: memcpy(maincpu + 0x1e00, flash + 0x7400, 0x0a00); break; // BANK6
+	case 0x7: memcpy(maincpu + 0x1e00, flash + 0x7e00, 0x0a00); break; // BANK7
+	case 0x8: memcpy(maincpu + 0x1e00, flash + 0x8800, 0x0a00); break; // BANK8
+	case 0x9: memcpy(maincpu + 0x1e00, flash + 0x9200, 0x0a00); break; // BANK9
+	}
+
+	m_bootcopy++;
+	if (m_bootcopy == 0xa) m_bootcopy = 0x0;
 
 	/*  block starting at e000 in flash is not code? (or encrypted?)
 	    no code to map at 0x9000 in address space (possible BIOS?)
@@ -90,13 +111,6 @@ void monon_color_state::machine_start()
 	    201                              (3rd revision)
 	    202,203,204,205,301,302,303,304  (4th revision)
 	*/
-}
-
-
-
-void monon_color_state::machine_reset()
-{
-	m_maincpu->set_state_int(MCS51_PC, 0x4000);
 }
 
 void monon_color_state::video_start()

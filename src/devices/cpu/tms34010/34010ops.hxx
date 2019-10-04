@@ -2050,49 +2050,42 @@ void tms340x0_device::blmove(uint16_t op)
 
 	if (!m_is_34020) { unimpl(op); return; }
 
-	/* src and dst are aligned */
-	if (!(src & 0x0f) && !(dst & 0x0f))
-	{
-		while (bits >= 16 && m_icount > 0)
-		{
-			TMS34010_WRMEM_WORD(dst, TMS34010_RDMEM_WORD(src));
-			src += 0x10;
-			dst += 0x10;
-			bits -= 0x10;
-			m_icount -= 2;
-		}
-		if (bits != 0 && m_icount > 0)
-		{
-			(this->*s_wfield_functions[bits])(dst, (this->*s_rfield_functions[bits])(src));
-			dst += bits;
-			src += bits;
-			bits = 0;
-			m_icount -= 2;
-		}
+	bool S = op & (1 << 1);
+	bool D = op & (1 << 0);
+
+	if ((S == false && (src & 0xf)) || (D == false && (dst & 0xf))) {
+		logerror("020:BLMOVE alignment error: PC=%x: S=%d, D=%d, src=%x, dst=%x, bits=%d\n", m_pc, S, D, src, dst, bits);
 	}
 
-	/* src is aligned, dst is not */
-	else if (!(src & 0x0f))
+	// logerror("020:BLMOVE: PC=%x: S=%d, D=%d, src=%x, dst=%x, bits=%d\n", m_pc, S, D, src, dst, bits);
+	while (bits >= 16 && m_icount > 0)
 	{
-		logerror("020:BLMOVE with aligned src and unaligned dst\n");
+		TMS34010_WRMEM_WORD(dst, TMS34010_RDMEM_WORD(src));
+		src += 0x10;
+		dst += 0x10;
+		bits -= 0x10;
+		m_icount -= 2;
+	}
+	if (bits != 0 && m_icount > 0)
+	{
+		(this->*s_wfield_functions[bits])(dst, (this->*s_rfield_functions[bits])(src));
+		dst += bits;
+		src += bits;
+		bits = 0;
+		m_icount -= 2;
 	}
 
-	/* dst is aligned, src is not */
-	else if (!(dst & 0x0f))
-	{
-		logerror("020:BLMOVE with unaligned src and aligned dst\n");
-	}
+	/*
+	    TODO: We do not currently emulate precisely how B0 and B2 are modified during the operation:
+	    if D == 0, then B0 and B2 remain fixed during execution and are only incremented after operation completes.
+	    if D == 1, then B2 is incremented during move, B0 remains fixed until operation completes.
+	*/
 
-	/* neither are aligned */
-	else
-	{
-		logerror("020:BLMOVE with completely unaligned src and dst\n");
-	}
-
-	/* update the final results */
 	BREG(0) = src;
 	BREG(2) = dst;
 	BREG(7) = bits;
+
+	// logerror("020:BLMOVE: PC=%x: finished: B0=%x, B2=%x, B7=%d\n", m_pc, src, dst, bits);
 
 	/* if we're not done yet, back up the PC */
 	if (bits != 0)

@@ -90,6 +90,7 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, C140, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 21)
+	, m_int1_callback(*this)
 	, m_sample_rate(0)
 	, m_stream(nullptr)
 	, m_banking_type(C140_TYPE::SYSTEM2)
@@ -109,6 +110,9 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 void c140_device::device_start()
 {
 	m_sample_rate = m_baserate = clock();
+
+	m_int1_callback.resolve_safe();
+	m_int1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c140_device::int1_on), this));
 
 	m_stream = stream_alloc(0, 2, m_sample_rate);
 
@@ -388,7 +392,7 @@ void c140_device::c140_w(offs_t offset, u8 data)
 	offset&=0x1ff;
 
 	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
-	if ((offset >= 0x1f8) && (m_banking_type == C140_TYPE::ASIC219))
+	if ((offset >= 0x1f8) && BIT(offset, 0) && (m_banking_type == C140_TYPE::ASIC219))
 	{
 		offset -= 8;
 	}
@@ -440,6 +444,36 @@ void c140_device::c140_w(offs_t offset, u8 data)
 			}
 		}
 	}
+	else if (offset == 0x1fa)
+	{
+		m_int1_callback(CLEAR_LINE);
+
+		// timing not verified
+		unsigned div = m_REG[0x1f8] != 0 ? m_REG[0x1f8] : 256;
+		attotime interval = attotime::from_ticks(div * 2, m_baserate);
+		if (BIT(m_REG[0x1fe], 0))
+			m_int1_timer->adjust(interval);
+	}
+	else if (offset == 0x1fe)
+	{
+		if (BIT(data, 0))
+		{
+			// kyukaidk and marvlandj want the first interrupt to happen immediately
+			if (!m_int1_timer->enabled())
+				m_int1_callback(ASSERT_LINE);
+		}
+		else
+		{
+			m_int1_callback(CLEAR_LINE);
+			m_int1_timer->enable(false);
+		}
+	}
+}
+
+
+TIMER_CALLBACK_MEMBER(c140_device::int1_on)
+{
+	m_int1_callback(ASSERT_LINE);
 }
 
 

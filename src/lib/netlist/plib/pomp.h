@@ -10,8 +10,9 @@
 #define POMP_H_
 
 #include "pconfig.h"
+#include "ptypes.h"
 
-#include <cstddef>
+#include <cstdint>
 
 #if HAS_OPENMP
 #include "omp.h"

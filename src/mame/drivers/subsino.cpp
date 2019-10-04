@@ -235,6 +235,7 @@ To Do:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "victor5.lh"
 #include "victor21.lh"
@@ -2924,7 +2925,7 @@ void subsino_state::mtrainnv(machine_config &config)
   with CPU brick.
 
   Dumped by Team Europe.
-  
+
 ***************************************************************************/
 
 ROM_START( victor5 )
@@ -3897,7 +3898,7 @@ void subsino_state::init_mtrainnv()
 GAMEL( 1990, victor21,    0,       victor21, victor21, subsino_state, init_victor21,    ROT0, "Subsino / Buffy", "Victor 21",                            0,               layout_victor21 )
 
 GAMEL( 1991, victor5,     0,       victor5,  victor5,  subsino_state, init_victor5,     ROT0, "Subsino / Buffy", "Victor 5",                             0,               layout_victor5  ) // Original PCB and game from Subsino.
-GAMEL( 1991, victor5a,    0,       victor5,  victor5,  subsino_state, init_victor5,     ROT0, "Subsino",         "G.E.A.",                               0,               layout_victor5  ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
+GAMEL( 1991, victor5a,    victor5, victor5,  victor5,  subsino_state, init_victor5,     ROT0, "Subsino",         "G.E.A.",                               0,               layout_victor5  ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
 
 GAMEL( 1992, tisub,       0,       tisub,    tisub,    subsino_state, init_tisub,       ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",     0,               layout_tisub    )
 GAMEL( 1992, tisuba,      tisub,   tisub,    tisub,    subsino_state, init_tisuba,      ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",     0,               layout_tisub    )

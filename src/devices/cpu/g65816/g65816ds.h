@@ -16,6 +16,11 @@ All rights reserved.
 
 */
 
+#ifdef __sun
+#undef SEC
+#undef op
+#endif
+
 class g65816_disassembler : public util::disasm_interface
 {
 public:

@@ -84,6 +84,7 @@ const double XTAL::known_xtals[] = {
 	  3'000'000, /* 3_MHz_XTAL             Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
 	  3'072'000, /* 3.072_MHz_XTAL         INS 8520 input clock rate */
 	  3'120'000, /* 3.12_MHz_XTAL          SP0250 clock on Gottlieb games */
+	  3'276'800, /* 3.2768_MHz_XTAL        SP0256 clock in Speech Synthesis for Dragon 32 */
 	  3'521'280, /* 3.52128_MHz_XTAL       RCA COSMAC VIP */
 	  3'570'000, /* 3.57_MHz_XTAL          Telmac TMC-600 */
 	  3'578'640, /* 3.57864_MHz_XTAL       Atari Portfolio PCD3311T */
@@ -158,6 +159,7 @@ const double XTAL::known_xtals[] = {
 	 10'717'200, /* 10.7172_MHz_XTAL       Eltec EurocomII */
 	 10'730'000, /* 10.73_MHz_XTAL         Ruleta RE-900 VDP Clock */
 	 10'733'000, /* 10.733_MHz_XTAL        The Fairyland Story */
+	 10'738'000, /* 10.738_MHz_XTAL        Pokerout (poker+breakout) TMS9129 VDP Clock */
 	 10'738'635, /* 10.738635_MHz_XTAL     TMS9918 family (3x NTSC subcarrier) */
 	 10'816'000, /* 10.816_MHz_XTAL        Universal 1979-1980 (Cosmic Alien, etc) */
 	 10'886'400, /* 10.8864_MHz_XTAL       Systel System 100 */

@@ -13,6 +13,7 @@
 #include "video/k007121.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class contra_state : public driver_device
 {

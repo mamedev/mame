@@ -23,6 +23,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class pzletime_state : public driver_device
@@ -46,7 +47,7 @@ public:
 
 	void pzletime(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
+	DECLARE_READ_LINE_MEMBER(ticket_status_r);
 
 private:
 	/* memory pointers */
@@ -218,7 +219,7 @@ WRITE16_MEMBER(pzletime_state::oki_bank_w)
 	m_oki->set_rom_bank(data & 0x3);
 }
 
-CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
+READ_LINE_MEMBER(pzletime_state::ticket_status_r)
 {
 	return (m_ticket && !(m_screen->frame_number() % 128));
 }
@@ -250,7 +251,7 @@ static INPUT_PORTS_START( pzletime )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* eeprom */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pzletime_state,ticket_status_r, nullptr) /* ticket dispenser */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(pzletime_state, ticket_status_r) /* ticket dispenser */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUT")

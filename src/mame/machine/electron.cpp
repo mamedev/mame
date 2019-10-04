@@ -42,7 +42,7 @@ void electron_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		electron_scanline_interrupt(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in electron_state::device_timer");
+		throw emu_fatalerror("Unknown id in electron_state::device_timer");
 	}
 }
 

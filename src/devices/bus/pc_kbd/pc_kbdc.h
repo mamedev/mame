@@ -79,8 +79,8 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
-	void update_clock_state();
-	void update_data_state();
+	void update_clock_state(bool fromkb);
+	void update_data_state(bool fromkb);
 
 	devcb_write_line    m_out_clock_cb;
 	devcb_write_line    m_out_data_cb;

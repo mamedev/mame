@@ -8,6 +8,7 @@
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class drgnmst_state : public driver_device
 {

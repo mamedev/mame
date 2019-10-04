@@ -9,7 +9,7 @@
 
     original driver by Tomasz Slanina, Steve Ellenoff, Nicola Salmoria
     rewrite to use AA functions by R. Belmont & Angelo Salese
-    special thanks to Tom Walker (author of the Acorn Archimedes Arculator emulator)
+    special thanks to Sarah Walker (author of the Acorn Archimedes Arculator emulator)
 
     TODO (specific issues only):
     - Sound is currently ugly in both games, recognizable but still nowhere near perfection
@@ -21,13 +21,13 @@
 PCB has a single OSC at 24MHz
 
 *******************************************************************************************/
+
 #include "emu.h"
 #include "includes/archimds.h"
 #include "cpu/arm/arm.h"
 #include "machine/aakart.h"
 #include "machine/i2cmem.h"
-#include "sound/volt_reg.h"
-#include "speaker.h"
+#include "screen.h"
 
 
 class ertictac_state : public archimedes_state
@@ -73,8 +73,8 @@ void ertictac_state::ertictac_map(address_map &map)
 	map(0x03000000, 0x033fffff).rw(FUNC(ertictac_state::archimedes_ioc_r), FUNC(ertictac_state::archimedes_ioc_w));
 	map(0x03340000, 0x0334001f).r(FUNC(ertictac_state::ertictac_podule_r));
 	map(0x033c0000, 0x033c001f).r(FUNC(ertictac_state::ertictac_podule_r));
-	map(0x03400000, 0x035fffff).rw(FUNC(ertictac_state::archimedes_vidc_r), FUNC(ertictac_state::archimedes_vidc_w));
-	map(0x03600000, 0x037fffff).rw(FUNC(ertictac_state::archimedes_memc_r), FUNC(ertictac_state::archimedes_memc_w));
+	map(0x03400000, 0x035fffff).w(m_vidc, FUNC(acorn_vidc10_device::write));
+	map(0x03600000, 0x037fffff).w(FUNC(ertictac_state::archimedes_memc_w));
 	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(FUNC(ertictac_state::archimedes_memc_page_w));
 }
 
@@ -225,34 +225,20 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 
 void ertictac_state::ertictac(machine_config &config)
 {
-	ARM(config, m_maincpu, XTAL(24'000'000)/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
+	ARM(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ertictac_state::ertictac_map);
 	m_maincpu->set_periodic_int(FUNC(ertictac_state::ertictac_podule_irq), attotime::from_hz(60)); // FIXME: timing of this
 
 	I2CMEM(config, "i2cmem", 0).set_page_size(NVRAM_PAGE_SIZE).set_data_size(NVRAM_SIZE);
 
-//  AAKART(config, m_kart, XTAL(24'000'000)/3); // TODO: frequency
+//  AAKART(config, m_kart, 24_MHz_XTAL/3); // TODO: frequency
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(16'000'000), 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
-	m_screen->set_screen_update(FUNC(archimedes_state::screen_update));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	PALETTE(config, m_palette).set_entries(0x200);
-
-	SPEAKER(config, "speaker").front_center();
-	for (int i = 0; i < 8; i++)
-	{
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, "speaker", 0.05); // unknown DAC
-	}
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac7", -1.0, DAC_VREF_NEG_INPUT);
+	ACORN_VIDC10(config, m_vidc, 24_MHz_XTAL);
+	m_vidc->set_screen("screen");
+	m_vidc->vblank().set(FUNC(ertictac_state::vblank_irq));
+	m_vidc->sound_drq().set(FUNC(ertictac_state::sound_drq));
 }
 
 ROM_START( ertictac )
@@ -273,8 +259,6 @@ ROM_START( ertictac )
 	ROM_LOAD32_BYTE( "eroti_ver01_-14-", 0xc0001, 0x10000, CRC(3029567c) SHA1(6d49bea3a3f6f11f4182a602d37b53f1f896c154) )
 	ROM_LOAD32_BYTE( "eroti_ver01_-15-", 0xc0002, 0x10000, CRC(500997ab) SHA1(028c7b3ca03141e5b596ab1e2ab98d0ccd9bf93a) )
 	ROM_LOAD32_BYTE( "eroti_ver01_-16-", 0xc0003, 0x10000, CRC(70a8d136) SHA1(50b11f5701ed5b79a5d59c9a3c7d5b7528e66a4d) )
-
-	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
 
@@ -296,8 +280,6 @@ ROM_START( ertictaca ) /* PCB had sticker printed "092121 EROTICTAC" */
 	ROM_LOAD32_BYTE( "eroti_ver01_-14-", 0xc0001, 0x10000, CRC(3029567c) SHA1(6d49bea3a3f6f11f4182a602d37b53f1f896c154) )
 	ROM_LOAD32_BYTE( "eroti_ver01_-15-", 0xc0002, 0x10000, CRC(500997ab) SHA1(028c7b3ca03141e5b596ab1e2ab98d0ccd9bf93a) )
 	ROM_LOAD32_BYTE( "eroti_ver01_-16-", 0xc0003, 0x10000, CRC(70a8d136) SHA1(50b11f5701ed5b79a5d59c9a3c7d5b7528e66a4d) )
-
-	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( ertictacb )
@@ -318,8 +300,6 @@ ROM_START( ertictacb )
 	ROM_LOAD32_BYTE( "eroti_ver01_-14-", 0xc0001, 0x10000, CRC(3029567c) SHA1(6d49bea3a3f6f11f4182a602d37b53f1f896c154) )
 	ROM_LOAD32_BYTE( "eroti_ver01_-15-", 0xc0002, 0x10000, CRC(500997ab) SHA1(028c7b3ca03141e5b596ab1e2ab98d0ccd9bf93a) )
 	ROM_LOAD32_BYTE( "eroti_ver01_-16-", 0xc0003, 0x10000, CRC(70a8d136) SHA1(50b11f5701ed5b79a5d59c9a3c7d5b7528e66a4d) )
-
-	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
 
@@ -342,8 +322,6 @@ ROM_START( poizone )
 	ROM_LOAD32_BYTE( "p_son22.bin", 0x140001, 0x10000, CRC(16f0bb52) SHA1(893ab1e72b84de7a38f88f9d713769968ebd4553) )
 	ROM_LOAD32_BYTE( "p_son23.bin", 0x140002, 0x10000, CRC(e9c118b2) SHA1(110d9a204e701b9b54d89f027f8892c3f3a819c7) )
 	ROM_LOAD32_BYTE( "p_son24.bin", 0x140003, 0x10000, CRC(a09d7f55) SHA1(e0d562c655c16034b40db93de801b98b7948beb2) )
-
-	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
 GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)

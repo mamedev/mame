@@ -288,7 +288,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 								0xffff << 16,
 								1 << 16,
 								0 << 16,
-								0, 0);
+								false, 0);
 
 						currx = (sx - (y + 1) * ydim) / 0x10000;
 						curry = (sy + x * xdim) / 0x10000;
@@ -302,7 +302,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 								0 << 16,
 								0 << 16,
 								0xffff << 16,
-								0, 0);
+								false, 0);
 
 						currx = (sx - (x + 1) * xdim) / 0x10000;
 						curry = (sy - (y + 1) * ydim) / 0x10000;
@@ -316,7 +316,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 								1 << 16,
 								0xffff << 16,
 								0 << 16,
-								0, 0);
+								false, 0);
 
 						currx = (sx + y * ydim) / 0x10000;
 						curry = (sy - (x + 1) * xdim) / 0x10000;

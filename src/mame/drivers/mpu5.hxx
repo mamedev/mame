@@ -7666,7 +7666,7 @@ GAMEL( 199?, m5rub,       0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "B
 GAMEL( 199?, m5ritj,      0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Rumble In The Jungle (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5ritj )
 
 GAMEL( 199?, m5rfymc,     0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5rfymc )
-GAMEL( 199?, m5rfymc06,   m5rfymc,  mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5) (Set 2)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5rfymc )
+GAMEL( 199?, m5rfymc06,   m5rfymc,  mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5rfymc )
 
 GAMEL( 199?, m5seven,     0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Seven Deadly Spins (Barcrest) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5seven )
 

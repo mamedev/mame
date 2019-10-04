@@ -68,9 +68,9 @@ public:
 	void init_mkyturbo();
 	void init_term2la2();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_strobe_r);
+	DECLARE_READ_LINE_MEMBER(narc_talkback_strobe_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
+	DECLARE_READ_LINE_MEMBER(adpcm_irq_state_r);
 
 private:
 	/* protection data types */

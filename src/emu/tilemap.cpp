@@ -9,6 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "tilemap.h"
+
 #include "screen.h"
 
 
@@ -945,6 +947,8 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 
 g_profiler.start(PROFILER_TILEMAP_DRAW);
 	// configure the blit parameters based on the input parameters
+	assert(dest.cliprect().contains(cliprect));
+	assert(screen.cliprect().contains(cliprect));
 	blit_parameters blit;
 	configure_blit_parameters(blit, screen.priority(), cliprect, flags, priority, priority_mask);
 
@@ -1080,6 +1084,8 @@ void tilemap_t::draw_roz_common(screen_device &screen, _BitmapClass &dest, const
 
 g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	// configure the blit parameters
+	assert(dest.cliprect().contains(cliprect));
+	assert(screen.cliprect().contains(cliprect));
 	blit_parameters blit;
 	configure_blit_parameters(blit, screen.priority(), cliprect, flags, priority, priority_mask);
 
