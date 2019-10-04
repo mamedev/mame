@@ -60,24 +60,25 @@ public:
 	void set_scrolly(int which, int value) { m_tmap->set_scrolly(which, value); }
 
 	// getters
-	u16 lineram(offs_t offset) { return m_lineram[offset]; }
+	u16 lineram(offs_t offset) const { return m_lineram[offset]; }
 
-	u16 rowscroll(offs_t line) { return rowscroll_en() ? m_lineram[((line & 0x1ff) * 2) + 0] : 0; }
-	u16 rowselect(offs_t line) { return rowselect_en() ? m_lineram[((line & 0x1ff) * 2) + 1] : 0; }
+	u16 rowscroll(offs_t line) const { return rowscroll_en() ? m_lineram[((line & 0x1ff) * 2) + 0] : 0; }
+	u16 rowselect(offs_t line) const { return rowselect_en() ? m_lineram[((line & 0x1ff) * 2) + 1] : 0; }
 
-	u16 vregs(offs_t offset) { return m_vregs[offset]; }
+	u16 vregs(offs_t offset) const { return m_vregs[offset]; }
 
-	bool flipx()        { return BIT(~m_vregs[0], 15); }
-	bool rowscroll_en() { return BIT(m_vregs[0], 14) && (m_lineram != nullptr); }
-	u16 scrollx()       { return m_vregs[0] & 0x1ff; }
+	// vregs
+	bool flipx() const        { return BIT(~m_vregs[0], 15); }
+	bool rowscroll_en() const { return BIT(m_vregs[0], 14) && (m_lineram != nullptr); }
+	u16 scrollx() const       { return m_vregs[0] & 0x1ff; }
 
-	bool flipy()        { return BIT(~m_vregs[1], 15); }
-	bool rowselect_en() { return BIT(m_vregs[1], 14) && (m_lineram != nullptr); }
-	bool tiledim()      { return m_tiledim; }
-	u16 scrolly()       { return m_vregs[1] & 0x1ff; }
+	bool flipy() const        { return BIT(~m_vregs[1], 15); }
+	bool rowselect_en() const { return BIT(m_vregs[1], 14) && (m_lineram != nullptr); }
+	bool tiledim() const      { return m_tiledim; }
+	u16 scrolly() const       { return m_vregs[1] & 0x1ff; }
 
-	bool enable()       { return BIT(~m_vregs[2], 4); }
-	u16 external()      { return m_vregs[2] & 0xf; }
+	bool enable() const       { return BIT(~m_vregs[2], 4); }
+	u16 external() const      { return m_vregs[2] & 0xf; }
 
 protected:
 	virtual void device_start() override;
