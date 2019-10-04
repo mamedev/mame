@@ -2107,7 +2107,12 @@ void tms340x0_device::cexec_s(uint16_t op)
 void tms340x0_device::clip(uint16_t op)
 {
 	if (!m_is_34020) { unimpl(op); return; }
-	logerror("020:clip\n");
+	XY daddr = DADDR_XY();
+	XY wstart = WSTART_XY();
+	XY wend = WEND_XY();
+	XY dydx = DYDX_XY();
+	logerror("020:clip PC=0x%08x: DADDR=(%dx%d) WSTART=(%dx%d) WEND=(%dx%d) DYDX=(%dx%d)\n",
+			m_pc, daddr.x, daddr.y, wstart.x, wstart.y, wend.x, wend.y, dydx.x, dydx.y);
 }
 
 void tms340x0_device::cmovcg_a(uint16_t op)
