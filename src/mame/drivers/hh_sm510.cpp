@@ -147,9 +147,9 @@ void hh_sm510_state::machine_start()
 		}
 	}
 
-	// 1ms display decay ticks
+	// 1kHz display decay ticks
 	m_display_decay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hh_sm510_state::display_decay_tick),this));
-	m_display_decay_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_display_decay_timer->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
 
 	// zerofill
 	m_inp_mux = 0;
@@ -238,13 +238,14 @@ void hh_sm510_state::set_display_size(u8 x, u8 y, u8 z)
 
 WRITE16_MEMBER(hh_sm510_state::sm510_lcd_segment_w)
 {
+	m_display_wait = 8;
 	set_display_size(2, 16, 2);
 	m_display_state[offset] = data;
 }
 
 WRITE16_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
 {
-	m_display_wait = 32;
+	m_display_wait = 12;
 	set_display_size(4, 4, 1);
 	m_display_state[offset] = data;
 }
