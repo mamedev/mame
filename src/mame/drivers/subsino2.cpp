@@ -775,7 +775,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 			if (mask_y[i])
 				scroll_dx = l->scrollram[y & mask_y[i]];
 
-			l->tmap->set_scrollx(y, scroll_dx);
+			l->tmap->set_scrollx(y, l->scroll_x + scroll_dx);
 		}
 	}
 
@@ -792,7 +792,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 
 			for (int y = 0; y < 0x20/4; y++)
 			{
-				for (int x = 0; x < 0x40; x++)
+				for (int x = 0; x < 0x80; x++)
 				{
 					rectangle visible;
 					visible.min_x = 8 * x;
@@ -803,7 +803,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 					int reeladdr = y * 0x80 * 4 + x;
 					uint16_t reelscroll = m_ss9601_reelram[reeladdr];
 
-					l->tmap->set_scrollx(0, l->scroll_x + (reelscroll >> 9) * 8 - visible.min_x);
+					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.min_x);
 
 					// wrap around at half tilemap (0x100)
 					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll - visible.min_y) & 0xff);
