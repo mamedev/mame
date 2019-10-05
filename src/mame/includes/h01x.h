@@ -2,6 +2,9 @@
 /***************************************************************************
         NF500A (TRS80 Level II Basic)
         09/01/2019
+
+        H-01B (TRS80 Level II Basic)
+        10/05/2019
 ****************************************************************************/
 
 #ifndef MAME_INCLUDES_H01X_H
@@ -37,6 +40,7 @@ public:
 
 	void init_h01x();
 
+	void h01b(machine_config &config);
 	void nf500a(machine_config &config);
 	void h01jce(machine_config &config);
 
