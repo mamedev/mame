@@ -93,17 +93,17 @@ void trs80dt1_state::machine_reset()
 
 READ8_MEMBER( trs80dt1_state::dma_r )
 {
-	m_crtc->dack_w(space, 0, m_p_videoram[offset]); // write to /BS pin
+	m_crtc->dack_w(m_p_videoram[offset]); // write to /BS pin
 	// Temporary hack to work around a timing issue
 	// timer interrupts fires too early and ends the psuedo-dma transfer after only 77 chars
 	// we send the last three manually until this is fixed
 	if (offset%80 == 76) {
 		offset++;
-		m_crtc->dack_w(space, 0, m_p_videoram[offset]);
+		m_crtc->dack_w(m_p_videoram[offset]);
 		offset++;
-		m_crtc->dack_w(space, 0, m_p_videoram[offset]);
+		m_crtc->dack_w(m_p_videoram[offset]);
 		offset++;
-		m_crtc->dack_w(space, 0, m_p_videoram[offset]);
+		m_crtc->dack_w(m_p_videoram[offset]);
 	}
 	return 0x7f;
 }

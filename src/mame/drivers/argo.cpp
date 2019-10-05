@@ -132,7 +132,7 @@ READ8_MEMBER(argo_state::argo_io_r)
 	case 0xC0:
 	case 0xC4:
 		offset >>= 2;
-		return m_crtc->read(space, offset&1);
+		return m_crtc->read(offset&1);
 
 	case 0xE8: // wants bit 4 low then high
 		{
@@ -175,7 +175,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 	case 0xC0:
 	case 0xC4:
 		offset >>= 2;
-		m_crtc->write(space, offset&1, data);
+		m_crtc->write(offset&1, data);
 		break;
 
 	case 0xE8: // hardware scroll

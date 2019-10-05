@@ -201,14 +201,14 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_attr) // TODO: attributes
 
 READ8_MEMBER(ms6102_state::crtc_r)
 {
-	m_crtc2->read(space, offset);
-	return m_crtc1->read(space, offset); // cs is same for both crtcs so they should return the same thing
+	m_crtc2->read(offset);
+	return m_crtc1->read(offset); // cs is same for both crtcs so they should return the same thing
 }
 
 WRITE8_MEMBER(ms6102_state::crtc_w)
 {
-	m_crtc1->write(space, offset, data);
-	m_crtc2->write(space, offset, data);
+	m_crtc1->write(offset, data);
+	m_crtc2->write(offset, data);
 }
 
 READ8_MEMBER(ms6102_state::misc_status_r)
@@ -240,9 +240,9 @@ WRITE8_MEMBER(ms6102_state::pic_w)
 WRITE8_MEMBER(ms6102_state::vdack_w)
 {
 	if(m_dmaaddr & 1)
-		m_crtc1->dack_w(space, offset, data);
+		m_crtc1->dack_w(data);
 	else
-		m_crtc2->dack_w(space, offset, data | 0x80);
+		m_crtc2->dack_w(data | 0x80);
 }
 
 IRQ_CALLBACK_MEMBER(ms6102_state::ms6102_int_ack)

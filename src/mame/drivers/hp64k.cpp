@@ -448,7 +448,7 @@ uint8_t hp64k_state::hp64k_crtc_filter(uint8_t data)
 
 WRITE16_MEMBER(hp64k_state::hp64k_crtc_w)
 {
-		m_crtc->write(space , offset == 0 , hp64k_crtc_filter((uint8_t)data));
+		m_crtc->write(offset == 0 , hp64k_crtc_filter((uint8_t)data));
 }
 
 WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
@@ -465,7 +465,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_crtc_drq_w)
 
 				m_crtc_ptr++;
 
-				m_crtc->dack_w(prog_space , 0 , hp64k_crtc_filter(data));
+				m_crtc->dack_w(hp64k_crtc_filter(data));
 		}
 }
 
