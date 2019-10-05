@@ -16,7 +16,7 @@ static const int16_t speaker_levels[] = {-32768, 0, 32767, 0};
 void h01x_state::h01x(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 10.6445_MHz_XTAL / 6);
+	Z80(config, m_maincpu, 10.6445_MHz_XTAL / 6); // TRS-80 clock frequency
 	m_maincpu->set_addrmap(AS_PROGRAM, &h01x_state::h01x_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &h01x_state::h01x_io_map);
 
@@ -49,21 +49,21 @@ void h01x_state::h01b(machine_config &config)
 {
 	// H-01B CPU: 2MHz ROM: 16KB + 32KB
 	h01x(config);
-	m_maincpu->set_clock(16_MHz_XTAL/8);
+	//m_maincpu->set_clock(16_MHz_XTAL/8); using TRS-80 clock frequency until original cassettes can be found
 }
 
 void h01x_state::nf500a(machine_config &config)
 {
 	// NF-500A CPU: 4MHz ROM: 16KB + 32KB
 	h01x(config);
-	m_maincpu->set_clock(16_MHz_XTAL/4);
+	//m_maincpu->set_clock(16_MHz_XTAL/4); using TRS-80 clock frequency until original cassettes can be found
 }
 
 void h01x_state::h01jce(machine_config &config)
 {
 	// JCE CPU: 4MHz ROM: 16KB + 32KB + 16KB
 	h01x(config);
-	m_maincpu->set_clock(16_MHz_XTAL/4);
+	//m_maincpu->set_clock(16_MHz_XTAL/4); using TRS-80 clock frequency until original cassettes can be found
 }
 
 void h01x_state::h01x_mem_map(address_map &map)
@@ -87,8 +87,8 @@ void h01x_state::h01x_io_map(address_map &map)
 
 /*
 H-01B
-   KD7 KD6 KD5 KD4 KD3 KD2 KD1 KD0  扫描用地址
-A0             空格 Z   A   Q   1    BFFEH
+   KD7 KD6 KD5 KD4 KD3 KD2 KD1 KD0  scan address
+A0            space Z   A   Q   1    BFFEH
 A1             BRK  X   S   W   2    BFFDH
 A2             (16) C   D   E   3    BFFBH
 A3             E/C  V   F   R   4    BFF7H
@@ -100,7 +100,7 @@ A8            BS 左 .   L   O   9    BEFFH
 A9              :   /   ;   P   0    BDFFH
 A10           SHIFT            下    BBFFH
 
-需要确定的键
+need to determine keys:
 Ctrl ESC
 */
 
@@ -224,36 +224,36 @@ INPUT_PORTS_END
 
 NF-500A
 
-   KD7 KD6 KD5 KD4 KD3 KD2 KD1 KD0  扫描用地址
+   KD7 KD6 KD5 KD4 KD3 KD2 KD1 KD0  scan address
 A0      R   E   5 CTRL? 6   T   W    BFFEH
 A1      3   2   Y  E/C  U   4   1    BFFDH
 A2      9   :   8   -   7   0   下   BFFBH
 A3      D   S   G  ESC  H   F   Q    BFF7H
 A4      X   A   V   Z       C  BRK   BFEFH
-A5      L BS 左 K  空格 J   ;   右   BFDFH
+A5      L BS 左 K space J   ;   右   BFDFH
 A6      M   .   N       B   ,   /    BFBFH
 A7      P  RETN O SHIFT I   [        BF7FH
 
-按键 3 56 34 51 功能未验证，暂时放在 ] TAB \ ' 位置。
+3 56 34 51 key functions not verified, temporarily mapped to ] TAB \ '
 
-E/C E汉 = ~  对应 ascii 20
-ESC 对应 ascii 31
-BS 对应 ascii 8
-61 对应 ascii 13 回车键
-16 对应 ascii 10 下
-56 对应 ascii 16
-27 3 34 51  无反应
+E/C E汉 = ~  translates to ASCII 20
+ESC translates to ASCII 31
+BS translates to ASCII 8
+61 translates to ASCII 13 enter
+16 translates to ASCII 10 down
+56 translates to ASCII 16
+27 3 34 51  no action
 
-测试按键 ASCII 码的程序
+Program to test key ASCII codes
 10 A$=INKEY$
 20 IF LEN(A$)>0 THEN PRINT ASC(A$)
 30 GOTO 10
 
 TRS-80
-左8 右9 上91 下10
+left 8 right 9 up 91 down 10
 Clear 31
 @ 64
-退格 8
+backspace 8
 
 */
 
@@ -577,17 +577,17 @@ ROM_END
 // hzrom    32KB EPROM
 // extrom   16KB EPROM
 
-// 开机画面
+// Startup screens
 // H-01B  : H-01型中文教育电脑 普乐电器公司制造
 // NF500A : H-01型汉字微电脑   中国科学院H电脑公司
 // JCE    : H-01型中文普及电脑 北岳电子有限公司制造
 
-// 未完成功能：
-// 录音输入输出未完成，另机器主频设置与 TRS-80 相同
-// 视频芯片 MC6845P 功能未模拟
-// JCE 的 16KB 扩展 ROM 功能不详，功能未模拟
+// Incomplete features:
+// Cassette I/O is incomplete, and the TRS-80 main CPU frequency is used
+// MC6845P video chip functionality is not emulated
+// JCE's 16KB extended ROM functionality is not understood, functionality is unemulated
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT           COMPANY                        FULLNAME                           FLAGS
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT           COMPANY                                      FULLNAME     FLAGS
 COMP( 1985, h01b,    0,      0,      h01b,    h01b,    h01x_state,   init_h01x,     "China H Computer Company",                  "H-01B",     0 )
 COMP( 1985, nf500a,  0,      0,      nf500a,  h01x,    h01x_state,   init_h01x,     "China State-owned 830 Factory",             "NF500A",    0 )
 COMP( 1987, h01jce,  0,      0,      h01jce,  h01x,    h01x_state,   init_h01x,     "China Jiangmen Computer Equipment Factory", "H-01 JCE",  0 )

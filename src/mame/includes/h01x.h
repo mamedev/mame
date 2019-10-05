@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:zzemu-cn
 /***************************************************************************
         NF500A (TRS80 Level II Basic)
         09/01/2019

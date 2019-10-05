@@ -12,7 +12,7 @@ class floppy_image_device;
 /*
  * ready = true if the ready line is physically connected to the floppy drive
  * select = true if the fdc controls the floppy drive selection
- * mode = MODE_AT, MODE_PS2 or MODE_M30 for the fdcs that have reset-time selection
+ * mode = mode_t::AT, mode_t::PS2 or mode_t::M30 for the fdcs that have reset-time selection
  */
 
 /* Interface required for PC ISA wrapping */
@@ -40,7 +40,7 @@ public:
 
 class upd765_family_device : public pc_fdc_interface {
 public:
-	enum { MODE_AT, MODE_PS2, MODE_M30 };
+	enum class mode_t { AT, PS2, M30 };
 
 	auto intrq_wr_callback() { return intrq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }
@@ -77,7 +77,7 @@ public:
 
 	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 
-	void set_mode(int mode);
+	void set_mode(mode_t mode);
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);
 	void set_floppy(floppy_image_device *image);
@@ -261,7 +261,7 @@ protected:
 
 	bool external_ready;
 
-	int mode;
+	mode_t mode;
 	int main_phase;
 
 	live_info cur_live, checkpoint_live;
@@ -483,8 +483,8 @@ public:
 
 class n82077aa_device : public upd765_family_device {
 public:
-	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int mode)
-		: n82077aa_device(mconfig, tag, owner, clock)
+	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, mode_t mode)
+		: n82077aa_device(mconfig, tag, owner, 0U)
 	{
 		set_mode(mode);
 	}
