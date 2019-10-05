@@ -783,7 +783,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "subwoofer").seat();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
@@ -889,7 +889,7 @@ void ninjaw_state::darius2(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "subwoofer").seat();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);

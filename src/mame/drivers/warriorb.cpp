@@ -453,7 +453,7 @@ void warriorb_state::darius2d(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "subwoofer").seat();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
@@ -530,6 +530,7 @@ void warriorb_state::warriorb(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+	// subwoofer under seat is exists like other taito multiscreen games?
 
 	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
