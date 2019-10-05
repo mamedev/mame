@@ -997,7 +997,7 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 
 	/* subsystems */
 	to7_game_init();
-	to7_floppy_init(mem + 0x20000);
+	to7_floppy_init();
 	to7_modem_init();
 	to7_midi_init();
 
@@ -1220,7 +1220,7 @@ MACHINE_START_MEMBER( thomson_state, to770 )
 
 	/* subsystems */
 	to7_game_init();
-	to7_floppy_init( mem + 0x20000 );
+	to7_floppy_init();
 	to7_modem_init();
 	to7_midi_init();
 
@@ -1599,7 +1599,7 @@ MACHINE_START_MEMBER( thomson_state, mo5 )
 
 	/* subsystems */
 	to7_game_init();
-	to7_floppy_init( mem + 0x20000 );
+	to7_floppy_init();
 	to7_modem_init();
 	to7_midi_init();
 	m_mo5_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::mo5_periodic_cb),this));
@@ -2541,7 +2541,7 @@ MACHINE_START_MEMBER( thomson_state, to9 )
 
 	/* subsystems */
 	to7_game_init();
-	to9_floppy_init( mem + 0xe000, mem + 0x40000 );
+	to9_floppy_init( mem + 0xe000 );
 	to9_kbd_init();
 	to9_palette_init();
 	to7_modem_init();
@@ -3156,8 +3156,7 @@ READ8_MEMBER( thomson_state::to8_cartridge_r )
 
 void thomson_state::to8_floppy_init()
 {
-	uint8_t* mem = memregion("maincpu")->base();
-	to7_floppy_init( mem + 0x34000 );
+	to7_floppy_init();
 }
 
 
@@ -3167,7 +3166,7 @@ void thomson_state::to8_floppy_reset()
 	uint8_t* mem = memregion("maincpu")->base();
 	to7_floppy_reset();
 	if ( THOM_FLOPPY_INT )
-		thmfc_floppy_reset();
+		m_thmfc->floppy_reset();
 	m_flopbank->configure_entries( TO7_NB_FLOP_BANK, 2, mem + 0x30000, 0x2000 );
 }
 
@@ -3183,7 +3182,7 @@ READ8_MEMBER( thomson_state::to8_floppy_r )
 		return to7_floppy_r( space, offset );
 	else if ( ! (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_INT )
 		/* internal controller */
-		return thmfc_floppy_r( space, offset );
+		return m_thmfc->floppy_r( offset );
 	else
 		/* no controller */
 		return 0;
@@ -3198,7 +3197,7 @@ WRITE8_MEMBER( thomson_state::to8_floppy_w )
 		to7_floppy_w( space, offset, data );
 	else if ( ! (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_INT )
 		/* internal controller */
-		thmfc_floppy_w( space, offset, data );
+		m_thmfc->floppy_w( offset, data );
 }
 
 
@@ -4383,7 +4382,7 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 
 	/* subsystems */
 	mo6_game_init();
-	to7_floppy_init( mem + 0x30000 );
+	to7_floppy_init();
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
@@ -4605,7 +4604,7 @@ MACHINE_START_MEMBER( thomson_state, mo5nr )
 
 	/* subsystems */
 	mo5nr_game_init();
-	to7_floppy_init( mem + 0x30000 );
+	to7_floppy_init();
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();

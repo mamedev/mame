@@ -240,6 +240,7 @@ namespace plib
 	struct ename : public plib::penum_base { \
 		enum E { __VA_ARGS__ }; \
 		ename (E v) : m_v(v) { } \
+		template <typename T> explicit ename(T val) { m_v = static_cast<E>(val); } \
 		bool set_from_string (const std::string &s) { \
 			static char const *const strings = # __VA_ARGS__; \
 			int f = from_string_int(strings, s.c_str()); \

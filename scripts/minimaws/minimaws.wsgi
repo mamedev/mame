@@ -3,13 +3,14 @@
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
 ##
-## Simple script for deploying minimaws with mod_wsgi.
+## Simple wrapper for deploying minimaws with mod_wsgi.
 
 import os.path
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+scriptdir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, scriptdir)
 
 import lib.wsgiserve
 
-application = lib.wsgiserve.MiniMawsApp(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'minimaws.sqlite3'))
+application = lib.wsgiserve.MiniMawsApp(os.path.join(scriptdir, 'minimaws.sqlite3'))

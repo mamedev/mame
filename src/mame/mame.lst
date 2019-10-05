@@ -3117,7 +3117,7 @@ qosb                            // 1992 BFM
 quizvadr                        // 1991 BFM
 trebltop                        // 1991 BFM
 
-@source:bfm_ad5.cpp
+@source:bfm_ad5sw.cpp
 ad5bpfpm                        // Bullseye Pounds For Points (Mazooma)
 ad5bpfpma                       //
 ad5bpfpmb                       //
@@ -7196,7 +7196,7 @@ sc4ziggye                       //
 sc4ziggyf                       //
 sc4ziggyg                       //
 
-@source:bfm_sc5.cpp
+@source:bfm_sc5sw.cpp
 sc5_3414                        //
 sc5_3434                        //
 sc5_3435                        //
@@ -15093,6 +15093,7 @@ sprbreaks                       //
 tagteamp                        //
 tagteamp2                       //
 tagteampg                       //
+topsound                        //
 triplay                         //
 triplaya                        //
 txsector                        //
@@ -15148,6 +15149,7 @@ gyrussce                        // GX347 (c) 1983 + Centuri license
 venus                           // bootleg
 
 @source:h01x.cpp
+h01b                            // H-01B  - TRS-80 Level II BASIC
 nf500a                          // NF500A - TRS-80 Level II BASIC
 h01jce                          // H-01 JCE - TRS-80 Level II BASIC
 
@@ -15382,6 +15384,7 @@ gnw_ghouse                      // Nintendo
 gnw_helmet                      // Nintendo
 gnw_judge                       // Nintendo
 gnw_lboat                       // Nintendo
+gnw_lion                        // Nintendo
 gnw_manhole                     // Nintendo
 gnw_mario                       // Nintendo
 gnw_mariocm                     // Nintendo
@@ -19295,7 +19298,7 @@ mf_bdash                        // (c) 1984 Exidy / First Star Software
 mf_brist                        // (c) 1983 Exidy / First Star Software
 mf_flip                         // (c) 1983 Exidy / First Star Software
 
-@source:maygay1b.cpp
+@source:maygay1bsw.cpp
 m1albsq                         // Albert Square (Maygay)
 m1albsq1                        //
 m1albsq1p                       //
@@ -21174,7 +21177,7 @@ ep_xspotb                       //
 ep_xtra                         // X-tra X-tra (Maygay)
 ep_xtraa                        //
 
-@source:maygaysw.cpp
+@source:maygayew.cpp
 mg_alad                         // Aladdin's Cave
 mg_bb                           // Big Break
 mg_ewg                          // Each Way Gambler
@@ -21439,6 +21442,7 @@ lordofk                         // (c) 1989 (Japan)
 makaiden                        // (c) 1988 (Japan)
 monkelf                         // bootleg
 p47                             // (c) 1988
+p47b                            // bootleg
 p47j                            // (c) 1988 (Japan)
 p47je                           // (c) 1988 (Japan, Export)
 peekaboo                        // (c) 1993
@@ -28227,7 +28231,7 @@ v4vgpok                         // Vegas Poker (prototype release 2)
 v4wize                          // Wize Move (v1.3d)
 v4wizea                         // Wize Move
 
-@source:mpu5.cpp
+@source:mpu5sw.cpp
 m55050                          // Fifty Fifty (Bwb)
 m5aceclb                        // Ace Of Clubs (Empire)
 m5aceclba                       //
@@ -30091,6 +30095,7 @@ dragntra                        // 2003.05 Dragon Treasure (Rev A)
 dragntr                         // 2003.10 Dragon Treasure (Rev B)
 dragntr2                        // 2004.?? Dragon Treasure 2 (Rev A)
 dragntr3                        // 2005.11 Dragon Treasure 3 (Rev A)
+drbyocwa                        // 2001.?? Derby Owners Club World Edition (Rev A)
 drbyocwb                        // 2001.?? Derby Owners Club World Edition (Rev B)
 drbyocwc                        // 2001.?? Derby Owners Club World Edition (Rev C)
 dybb99                          // 1999.11 Dynamite Baseball '99 (Rev B)
@@ -32862,6 +32867,7 @@ sklflite                        //
 spain82                         //
 starfirp                        //
 starfirpa                       //
+terrlake                        //
 theraid                         //
 trailer                         //
 ufo_x                           //

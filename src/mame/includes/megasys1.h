@@ -51,6 +51,7 @@ public:
 	void system_A_iganinju(machine_config &config);
 	void system_A_hachoo(machine_config &config);
 	void kickoffb(machine_config &config);
+	void p47b(machine_config &config);
 	void system_D(machine_config &config);
 	void system_C(machine_config &config);
 	void system_Bbl(machine_config &config);
@@ -190,6 +191,7 @@ private:
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
 	void kickoffb_sound_map(address_map &map);
+	void p47b_sound_map(address_map &map);
 	void megasys1A_map(address_map &map);
 	void megasys1A_sound_map(address_map &map);
 	void megasys1A_jitsupro_sound_map(address_map &map);

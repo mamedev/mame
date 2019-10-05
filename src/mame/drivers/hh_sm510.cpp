@@ -18,8 +18,8 @@ TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
 - improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
-- confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
-  confident that it's same)
+- confirm gnw_egg rom (now using gnw_mmouse rom, but pretty confident that it's
+  the same)
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
 - confirm gnw_climber rom (assumed to be the same as gnw_climbern)
 - dump/add purple version of gnw_judge
@@ -53,7 +53,7 @@ RC-04     s    SM5A    Fire (aka Fireman Fireman)
 IP-05     s    SM5A    Judge
 MN-06*    g    SM5A?   Manhole
 CN-07     g    SM5A    Helmet (aka Headache)
-LN-08*    g    SM5A?   Lion
+LN-08     g    SM5A    Lion
 PR-21     ws   SM5A    Parachute
 OC-22     ws   SM5A    Octopus
 PP-23     ws   SM5A    Popeye
@@ -147,9 +147,9 @@ void hh_sm510_state::machine_start()
 		}
 	}
 
-	// 1ms display decay ticks
+	// 1kHz display decay ticks
 	m_display_decay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hh_sm510_state::display_decay_tick),this));
-	m_display_decay_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_display_decay_timer->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
 
 	// zerofill
 	m_inp_mux = 0;
@@ -238,13 +238,14 @@ void hh_sm510_state::set_display_size(u8 x, u8 y, u8 z)
 
 WRITE16_MEMBER(hh_sm510_state::sm510_lcd_segment_w)
 {
+	m_display_wait = 8;
 	set_display_size(2, 16, 2);
 	m_display_state[offset] = data;
 }
 
 WRITE16_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
 {
-	m_display_wait = 32;
+	m_display_wait = 12;
 	set_display_size(4, 4, 1);
 	m_display_state[offset] = data;
 }
@@ -850,6 +851,95 @@ ROM_END
 
 /***************************************************************************
 
+  Nintendo Game & Watch: Lion (model LN-08)
+  * PCB label LN-08
+  * Sharp SM5A label LN-08 519A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  BTANB: The game doesn't support simultaneous button presses for the controls,
+  it's the same as in eg. gnw_mmouse but in this game it doesn't make much sense
+  with the 2 separate guys. More likely a bad game design choice than bug.
+
+***************************************************************************/
+
+class gnw_lion_state : public hh_sm510_state
+{
+public:
+	gnw_lion_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_lion(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_lion )
+	PORT_START("IN.0") // R2
+	PORT_CONFNAME( 0x01, 0x00, "Increase Speed (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // "
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_lion_state::gnw_lion(machine_config &config)
+{
+	/* basic machine hardware */
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1646, 1080);
+	screen.set_visarea_full();
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gnw_lion )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ln-08", 0x0000, 0x0740, CRC(9677681d) SHA1(6f7c960e04b63f1b7d926b598413f4c818b8fe53) )
+
+	ROM_REGION( 155699, "screen", 0)
+	ROM_LOAD( "gnw_lion.svg", 0, 155699, CRC(32b28c6f) SHA1(95aa397ed39408c80957f0f850e36dfe73e337fd) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Nintendo Game & Watch: Parachute (model PR-21)
   * PCB label PR-21Y
   * Sharp SM5A label PR-21 52XC (no decap)
@@ -1229,7 +1319,7 @@ ROM_END
 
   Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
   * PCB label MC-25 EG-26 (yes, both listed)
-  * Sharp SM5A label MC-25 51YD / ?
+  * Sharp SM5A label MC-25 51YD (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
@@ -1354,7 +1444,7 @@ void gnw_mmouse_state::exospace(machine_config &config)
 
 ROM_START( gnw_mmouse )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mc-25", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
+	ROM_LOAD( "mc-25", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
 	ROM_REGION( 102453, "screen", 0)
 	ROM_LOAD( "gnw_mmouse.svg", 0, 102453, BAD_DUMP CRC(88cc7c49) SHA1(c000d51d1b99750116b97f9bafc0314ea506366d) )
@@ -1362,7 +1452,7 @@ ROM_END
 
 ROM_START( gnw_egg )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
+	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from MC-25
 
 	ROM_REGION( 102848, "screen", 0)
 	ROM_LOAD( "gnw_egg.svg", 0, 102848, BAD_DUMP CRC(742c2605) SHA1(984d430ad2ff47ad7a3f9b25b7d3f3d51b10cca5) )
@@ -10283,6 +10373,7 @@ CONS( 1980, gnw_vermin,  0,          0, gnw_vermin,  gnw_vermin,  gnw_vermin_sta
 CONS( 1980, gnw_fires,   0,          0, gnw_fires,   gnw_fires,   gnw_fires_state,   empty_init, "Nintendo", "Game & Watch: Fire (silver)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_judge,   0,          0, gnw_judge,   gnw_judge,   gnw_judge_state,   empty_init, "Nintendo", "Game & Watch: Judge (green)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_helmet,  0,          0, gnw_helmet,  gnw_helmet,  gnw_helmet_state,  empty_init, "Nintendo", "Game & Watch: Helmet (Rev. 2)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_lion,    0,          0, gnw_lion,    gnw_lion,    gnw_lion_state,    empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: wide screen
 CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE )
@@ -10290,7 +10381,7 @@ CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_st
 CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE)
-CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )

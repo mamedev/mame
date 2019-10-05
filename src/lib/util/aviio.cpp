@@ -39,7 +39,7 @@
 /** @brief  Size of the maximum riff. */
 #define MAX_RIFF_SIZE           (2UL * 1024 * 1024 * 1024 - 1024)   /* just under 2GB */
 /** @brief  The maximum avi size in gigabytes. */
-#define MAX_AVI_SIZE_IN_GB      (256)
+#define MAX_AVI_SIZE_IN_GB      (1024)
 
 /**
  * @def FOUR_GB
@@ -3263,6 +3263,9 @@ avi_file::error avi_file_impl::write_indx_chunk(avi_stream &stream, bool initial
 			/* if no chunks, skip */
 			if (chunks_this_index == 0)
 				continue;
+
+			if (master_entries >= MAX_AVI_SIZE_IN_GB / 4)
+				return error::WRITE_ERROR;
 
 			/* allocate memory */
 			std::unique_ptr<std::uint8_t []> tempbuf;

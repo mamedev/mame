@@ -11,9 +11,10 @@
     Many sound roms are missing!
 
 */
+#include "emu.h"
+#include "includes/bfm_sc5.h"
+#include "includes/bfm_sc4.h" // TODO: untangle from this
 
-
-INPUT_PORTS_EXTERN( bfm_sc5 );
 
 #define sc5pld \
 	ROM_REGION( 0x157, "pld", 0 ) \

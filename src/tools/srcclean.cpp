@@ -24,10 +24,12 @@
       #define MY_MACRO \
               "string that \
               continues"
-    * Will not produce expected output for a string continuation that
-      breaks an escape sequence, e.g. this:
-      "bad\\
-      tbehaviour"
+    * Numeric literals broken by line continuations are not recognised
+    * Will not recognise a comment delimiter broken by multiple line
+      continuations. e.g. this:
+      /\
+      \
+      / preprocessor abuse
 
     Known Lua limitations:
     * Whitespace normalisation is applied inside long string literals
@@ -868,19 +870,19 @@ private:
 
 	bool tail_is(char32_t ch) const
 	{
-		return !m_tail.empty() && (m_tail.front() == ch);
+		return !m_tail.empty() && (m_tail.back() == ch);
 	}
 
 	void pop_tail()
 	{
 		if (!m_tail.empty())
-			m_tail.pop_front();
+			m_tail.pop_back();
 	}
 
 	void replace_tail(char32_t ch)
 	{
 		assert(!m_tail.empty());
-		*m_tail.begin() = ch;
+		m_tail.back() = ch;
 	}
 
 	void flush_tail()
@@ -938,10 +940,12 @@ private:
 	bool                        m_escape        = false;
 	std::deque<char32_t>        m_tail;
 	std::uint64_t               m_comment_line  = 0U;
+	bool                        m_broken_escape = false;
 	char32_t                    m_lead_digit    = 0U;
 	unsigned                    m_radix         = 0U;
 
 	std::uint64_t   m_tabs_escaped                  = 0U;
+	std::uint64_t   m_broken_comment_delimiters     = 0U;
 	std::uint64_t   m_line_comment_continuations    = 0U;
 	std::uint64_t   m_string_continuations          = 0U;
 	std::uint64_t   m_uppercase_radix               = 0U;
@@ -965,6 +969,7 @@ bool cpp_cleaner::affected() const
 	return
 			cleaner_base::affected() ||
 			m_tabs_escaped ||
+			m_broken_comment_delimiters ||
 			m_line_comment_continuations ||
 			m_string_continuations ||
 			m_uppercase_radix ||
@@ -977,6 +982,8 @@ void cpp_cleaner::summarise(std::ostream &os) const
 	cleaner_base::summarise(os);
 	if (m_tabs_escaped)
 		util::stream_format(os, "%1$u tab(s) escaped\n", m_tabs_escaped);
+	if (m_broken_comment_delimiters)
+		util::stream_format(os, "%1$u broken comment delimiter(s) replaced\n", m_broken_comment_delimiters);
 	if (m_line_comment_continuations)
 		util::stream_format(os, "%1$u line comment continuation(s) replaced\n", m_line_comment_continuations);
 	if (m_string_continuations)
@@ -1016,16 +1023,17 @@ void cpp_cleaner::output_character(char32_t ch)
 
 	switch (ch)
 	{
+	case HORIZONTAL_TAB:
+	case SPACE:
+	case BACKSLASH:
+		m_tail.emplace_back(ch);
+		break;
 	default:
 		flush_tail();
 		if (LINE_FEED == ch)
-		{
 			cleaner_base::output_character(ch);
-			break;
-		}
-	case HORIZONTAL_TAB:
-	case SPACE:
-		m_tail.emplace_back(ch);
+		else
+			m_tail.emplace_back(ch);
 	}
 }
 
@@ -1085,6 +1093,13 @@ void cpp_cleaner::process_default(char32_t ch)
 {
 	switch (ch)
 	{
+	case LINE_FEED:
+		if (m_escape && tail_is(BACKSLASH))
+		{
+			m_broken_escape = true;
+			return;
+		}
+		break;
 	case DOUBLE_QUOTE:
 		m_parse_state = parse_state::STRING_CONSTANT;
 		break;
@@ -1097,11 +1112,35 @@ void cpp_cleaner::process_default(char32_t ch)
 			m_parse_state = parse_state::COMMENT;
 			m_comment_line = m_input_line;
 			set_tab_limit();
+			if (m_broken_escape)
+			{
+				++m_broken_comment_delimiters;
+				assert(tail_is(BACKSLASH));
+				pop_tail();
+				output_character(ch);
+				output_character(LINE_FEED);
+				m_escape = false;
+				m_broken_escape = false;
+				return;
+			}
 		}
 		break;
 	case SLASH:
 		if (m_escape)
+		{
 			m_parse_state = parse_state::LINE_COMMENT;
+			if (m_broken_escape)
+			{
+				++m_broken_comment_delimiters;
+				assert(tail_is(BACKSLASH));
+				pop_tail();
+				assert(tail_is(SLASH));
+				pop_tail();
+				output_character(LINE_FEED);
+				output_character(SLASH);
+				m_broken_escape = false;
+			}
+		}
 		break;
 	default:
 		if (is_token_lead(ch))
@@ -1112,11 +1151,15 @@ void cpp_cleaner::process_default(char32_t ch)
 		{
 			m_parse_state = parse_state::NUMERIC_CONSTANT;
 			m_escape = false;
+			m_broken_escape = false;
 			process_numeric(ch);
 			return;
 		}
 	}
-	m_escape = (SLASH == ch) ? !m_escape : false;
+	if (m_broken_escape)
+		output_character(LINE_FEED);
+	m_escape = m_escape ? ((BACKSLASH == ch) && tail_is(SLASH)) : (SLASH == ch);
+	m_broken_escape = false;
 	output_character(ch);
 }
 
@@ -1125,18 +1168,65 @@ void cpp_cleaner::process_comment(char32_t ch)
 {
 	switch (ch)
 	{
-	case SLASH:
-		if (m_escape)
+	case LINE_FEED:
+		if (m_escape && tail_is(BACKSLASH))
+		{
+			m_broken_escape = true;
+		}
+		else
 		{
 			m_escape = false;
+			m_broken_escape = false;
+			output_character(ch);
+		}
+		break;
+	case SLASH:
+		if (m_broken_escape)
+		{
+			m_parse_state = parse_state::DEFAULT;
+			m_comment_line = 0U;
+			++m_broken_comment_delimiters;
+			assert(tail_is(BACKSLASH));
+			pop_tail();
+			assert(tail_is(ASTERISK));
+			pop_tail();
+			output_character(LINE_FEED);
+			output_character(ASTERISK);
+			output_character(ch);
+			reset_tab_limit();
+		}
+		else if (m_escape)
+		{
 			m_parse_state = parse_state::DEFAULT;
 			m_comment_line = 0U;
 			output_character(ch);
 			reset_tab_limit();
-			break;
 		}
+		else
+		{
+			output_character(ch);
+		}
+		m_escape = false;
+		m_broken_escape = false;
+		break;
+	case BACKSLASH:
+		if (m_broken_escape)
+		{
+			m_escape = false;
+			m_broken_escape = false;
+			output_character(LINE_FEED);
+		}
+		else if (m_escape)
+		{
+			m_escape = tail_is(ASTERISK);
+		}
+		output_character(ch);
+		break;
 	default:
+		if (m_broken_escape)
+			output_character(LINE_FEED);
 		m_escape = ASTERISK == ch;
+		m_broken_escape = false;
 		output_character(ch);
 	}
 }
@@ -1195,9 +1285,24 @@ void cpp_cleaner::process_text(char32_t ch)
 		else if (tail_is(BACKSLASH))
 		{
 			++m_string_continuations;
-			replace_tail(DOUBLE_QUOTE);
-			output_character(ch);
-			output_character(DOUBLE_QUOTE);
+			if (m_escape)
+			{
+				replace_tail(DOUBLE_QUOTE);
+				output_character(ch);
+				output_character(DOUBLE_QUOTE);
+			}
+			else
+			{
+				pop_tail();
+				assert(tail_is(BACKSLASH));
+				pop_tail();
+				output_character(DOUBLE_QUOTE);
+				output_character(ch);
+				output_character(DOUBLE_QUOTE);
+				output_character(BACKSLASH);
+				m_escape = true;
+				return;
+			}
 		}
 		else
 		{

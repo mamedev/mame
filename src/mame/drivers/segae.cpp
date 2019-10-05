@@ -1056,6 +1056,8 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Riddle of Pythagoras (Japan), Sega System E
+//   Game ID# 833-6200 ピタゴラス ノ ナゾ
+//   I/O board 834-6193 © SEGA 1986
 //
 ROM_START( ridleofp )
 	ROM_REGION( 0x30000, "maincpu", 0 )

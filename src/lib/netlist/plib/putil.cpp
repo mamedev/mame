@@ -139,7 +139,7 @@ namespace plib
 		int cnt = 0;
 		for (auto &s : psplit(str, ",", false))
 		{
-			if (s == x)
+			if (trim(s) == x)
 				return cnt;
 			cnt++;
 		}

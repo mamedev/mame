@@ -22,18 +22,29 @@ namespace plib {
 namespace omp {
 
 template <typename I, class T>
-void for_static(const I start, const I end, const T &what)
+void for_static(std::size_t numops, const I start, const I end, const T &what)
 {
-#if HAS_OPENMP && USE_OPENMP
-	#pragma omp parallel
-#endif
+	if (numops>1000)
 	{
-#if HAS_OPENMP && USE_OPENMP
-		#pragma omp for //schedule(static)
-#endif
+	#if HAS_OPENMP && USE_OPENMP
+		#pragma omp parallel for schedule(static)
+	#endif
 		for (I i = start; i <  end; i++)
 			what(i);
 	}
+	else
+		for (I i = start; i <  end; i++)
+			what(i);
+}
+
+template <typename I, class T>
+void for_static(const I start, const I end, const T &what)
+{
+#if HAS_OPENMP && USE_OPENMP
+	#pragma omp parallel for schedule(static)
+#endif
+	for (I i = start; i <  end; i++)
+		what(i);
 }
 
 template <typename I, class T>

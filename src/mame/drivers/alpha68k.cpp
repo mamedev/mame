@@ -32,7 +32,7 @@ TODO:
   30 Hz autofire (not enough sound resources?)
 - Sky Adventure, probably others: sprite drawing is off-sync, cfr. notes in video file;
 - Gold Medalist: attract mode has missing finger on button 1, may be btanb;
-- Gold Medalist: missing blank effect on shooting pistol for dash events (palette bank actually used?);
+- Gold Medalist: incorrect blank effect on shooting pistol for dash events (cfr. alpha68k_palette_device);
 - Super Champion Baseball: enables opacity bit on fix layer, those are transparent on SNK Arcade Classics 0 
   but actually opaque on a reference shot, sounds like a btanb;
 - Fix layer tilemap should be a common device between this, snk68.cpp and other Alpha/SNK-based games;

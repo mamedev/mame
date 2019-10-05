@@ -297,7 +297,7 @@ namespace devices
 	template <typename FT, int SIZE>
 	matrix_solver_sm_t<FT, SIZE>::matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size)
-	: matrix_solver_t(anetlist, name, NOSORT, params)
+	: matrix_solver_t(anetlist, name, params)
 	, m_dim(size)
 	, m_cnt(0)
 	{

@@ -75,9 +75,9 @@ public:
 private:
 	struct riff_chunk_t
 	{
-		std::array<uint8_t, 4> group_id = {'R','I','F','F'};
+		std::array<uint8_t, 4> group_id = {{'R','I','F','F'}};
 		uint32_t  			   filelen  = 0;
-		std::array<uint8_t, 4> rifftype = {'W','A','V','E'};
+		std::array<uint8_t, 4> rifftype = {{'W','A','V','E'}};
 	};
 
 	struct riff_format_t
@@ -89,7 +89,7 @@ private:
 			block_align = channels * ((bits_sample + 7) / 8);
 			bytes_per_second = sample_rate * block_align;
 		}
-		std::array<uint8_t, 4> signature = {'f','m','t',' '};
+		std::array<uint8_t, 4> signature = {{'f','m','t',' '}};
 		uint32_t            fmt_length   = 16;
 		uint16_t            format_tag   = 0x0001; // PCM
 		uint16_t            channels;
@@ -102,7 +102,7 @@ private:
 	struct riff_data_t
 	{
 		riff_data_t(uint32_t alen) : len(alen) {}
-		std::array<uint8_t, 4> signature = {'d','a','t','a'};
+		std::array<uint8_t, 4> signature = {{'d','a','t','a'}};
 		uint32_t    len;
 		// data follows
 	};

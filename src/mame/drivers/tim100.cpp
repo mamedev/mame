@@ -143,10 +143,7 @@ I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 WRITE_LINE_MEMBER( tim100_state::drq_w )
 {
 	if (state)
-	{
-		address_space& mem = m_maincpu->space(AS_PROGRAM);
-		m_crtc->dack_w(mem, 0, m_p_videoram[m_dma_adr++]);
-	}
+		m_crtc->dack_w(m_p_videoram[m_dma_adr++]);
 }
 
 WRITE_LINE_MEMBER( tim100_state::irq_w )

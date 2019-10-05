@@ -17,8 +17,8 @@ public:
 	typedef device_delegate<void (u16 attr, int &flipx, int &flipy, int &code)> ext_cb_delegate;
 
 	// configuration
-	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb = nmk_16bit_sprite_device::colpri_cb_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_ext_callback(T &&... args) { m_ext_cb = nmk_16bit_sprite_device::ext_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb = colpri_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_ext_callback(T &&... args) { m_ext_cb = ext_cb_delegate(std::forward<T>(args)...); }
 	void set_videoshift(int shift) { m_videoshift = shift; }
 	void set_mask(int xmask, int ymask) { m_xmask = xmask, m_ymask = ymask; }
 	void set_screen_size(int width, int height) { m_screen_width = width, m_screen_height = height; }

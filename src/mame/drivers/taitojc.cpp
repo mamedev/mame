@@ -1139,7 +1139,7 @@ void taitojc_state::dendego(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitojc_state::screen_update_dendego));
 
 	/* sound hardware */
-	SPEAKER(config, "vibration").subwoofer();
+	SPEAKER(config, "vibration").seat();
 
 	/* clock frequency & pin 7 not verified */
 	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "vibration", 0.20);

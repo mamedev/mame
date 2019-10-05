@@ -12,9 +12,10 @@
     Many sound roms are missing!
 
 */
+#include "emu.h"
+#include "includes/bfm_ad5.h"
+#include "includes/bfm_sc4.h" // TODO: untangle from this
 
-
-INPUT_PORTS_EXTERN( bfm_ad5 );
 
 #define ad5plds \
 	ROM_REGION( 0x400, "plds", 0 ) \

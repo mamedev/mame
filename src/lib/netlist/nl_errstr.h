@@ -69,6 +69,7 @@ namespace netlist
 	PERRMSGV(MF_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1, 1,"You must pass an equal number of pins to DIPPINS {1}")
 	PERRMSGV(MF_UNKNOWN_OBJECT_TYPE_1,              1, "Unknown object type {1}")
 	PERRMSGV(MF_INVALID_NUMBER_CONVERSION_1_2,      2, "Invalid number conversion {1} : {2}")
+	PERRMSGV(MF_INVALID_ENUM_CONVERSION_1_2,        2, "Invalid element found {1} : {2}")
 	PERRMSGV(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST,1, "Error adding parameter {1} to parameter list")
 	PERRMSGV(MF_ADDING_1_2_TO_TERMINAL_LIST,        2, "Error adding {1} {2} to terminal list")
 	PERRMSGV(MF_NET_C_NEEDS_AT_LEAST_2_TERMINAL,    0, "You must pass at least 2 terminals to NET_C")

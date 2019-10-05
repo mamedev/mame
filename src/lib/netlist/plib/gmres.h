@@ -20,6 +20,18 @@
 namespace plib
 {
 
+	template <int k>
+	struct do_khelper
+	{
+		static constexpr bool value = true;
+	};
+
+	template <>
+	struct do_khelper<-1>
+	{
+		static constexpr float value = 0.0;
+	};
+
 	template <typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
@@ -143,6 +155,72 @@ namespace plib
 
 		std::size_t size() const { return (SIZE<=0) ? m_size : static_cast<std::size_t>(SIZE); }
 
+		template <int k, typename OPS, typename VT>
+		void do_k(OPS &ops, VT &x, FT rho_delta, int &last_k, bool dummy)
+		{
+			//printf("%d\n", k);
+			do_k<k-1, OPS>(ops, x, rho_delta, last_k, do_khelper<k-1>::value);
+
+			if (last_k < RESTART)
+				return;
+
+			const std::size_t kp1 = k + 1;
+			const    std::size_t n = size();
+
+			ops.calc_rhs(m_v[kp1], m_v[k]);
+			ops.solve_LU_inplace(m_v[kp1]);
+
+			for (std::size_t j = 0; j <= k; j++)
+			{
+				m_ht[j][k] = vec_mult<FT>(n, m_v[kp1], m_v[j]);
+				vec_add_mult_scalar(n, m_v[kp1], m_v[j], -m_ht[j][k]);
+			}
+			m_ht[kp1][k] = std::sqrt(vec_mult2<FT>(n, m_v[kp1]));
+
+			if (m_ht[kp1][k] != 0.0)
+				vec_scale(n, m_v[kp1], constants<FT>::one() / m_ht[kp1][k]);
+
+			for (std::size_t j = 0; j < k; j++)
+				givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
+
+			const float_type mu = 1.0 / std::hypot(m_ht[k][k], m_ht[kp1][k]);
+
+			m_c[k] = m_ht[k][k] * mu;
+			m_s[k] = -m_ht[kp1][k] * mu;
+			m_ht[k][k] = m_c[k] * m_ht[k][k] - m_s[k] * m_ht[kp1][k];
+			m_ht[kp1][k] = 0.0;
+
+			givens_mult(m_c[k], m_s[k], m_g[k], m_g[kp1]);
+
+			FT rho = std::abs(m_g[kp1]);
+
+			// FIXME ..
+			//itr_used = itr_used + 1;
+
+			if (rho <= rho_delta || k == RESTART-1)
+			{
+				last_k = k;
+				/* Solve the system H * y = g */
+				/* x += m_v[j] * m_y[j]       */
+				for (std::size_t i = k + 1; i-- > 0;)
+				{
+					double tmp = m_g[i];
+					for (std::size_t j = i + 1; j <= k; j++)
+						tmp -= m_ht[i][j] * m_y[j];
+					m_y[i] = tmp / m_ht[i][i];
+				}
+
+				for (std::size_t i = 0; i <= k; i++)
+					vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
+			}
+		}
+
+		template <int k, typename OPS, typename VT>
+		void do_k(OPS &ops, VT &x, FT rho_delta, int &last_k, float dummy)
+		{
+			//printf("here\n");
+		}
+
 		template <typename OPS, typename VT, typename VRHS>
 		std::size_t solve(OPS &ops, VT &x, const VRHS & rhs, const std::size_t itr_max, float_type accuracy)
 		{
@@ -215,7 +293,7 @@ namespace plib
 
 			while (itr_used < itr_max)
 			{
-				std::size_t last_k = RESTART;
+				int last_k = RESTART;
 				float_type rho;
 
 				ops.calc_rhs(Ax, x);
@@ -241,64 +319,19 @@ namespace plib
 
 				vec_mult_scalar(n, m_v[0], residual, constants<FT>::one() / rho);
 
-				for (std::size_t k = 0; k < RESTART; k++)
-				{
-					const std::size_t kp1 = k + 1;
+				do_k<RESTART-1>(ops, x, rho_delta, last_k, true);
 
-					ops.calc_rhs(m_v[kp1], m_v[k]);
-					ops.solve_LU_inplace(m_v[kp1]);
-
-					for (std::size_t j = 0; j <= k; j++)
-					{
-						m_ht[j][k] = vec_mult<FT>(n, m_v[kp1], m_v[j]);
-						vec_add_mult_scalar(n, m_v[kp1], m_v[j], -m_ht[j][k]);
-					}
-					m_ht[kp1][k] = std::sqrt(vec_mult2<FT>(n, m_v[kp1]));
-
-					if (m_ht[kp1][k] != 0.0)
-						vec_scale(n, m_v[kp1], constants<FT>::one() / m_ht[kp1][k]);
-
-					for (std::size_t j = 0; j < k; j++)
-						givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
-
-					const float_type mu = 1.0 / std::hypot(m_ht[k][k], m_ht[kp1][k]);
-
-					m_c[k] = m_ht[k][k] * mu;
-					m_s[k] = -m_ht[kp1][k] * mu;
-					m_ht[k][k] = m_c[k] * m_ht[k][k] - m_s[k] * m_ht[kp1][k];
-					m_ht[kp1][k] = 0.0;
-
-					givens_mult(m_c[k], m_s[k], m_g[k], m_g[kp1]);
-
-					rho = std::abs(m_g[kp1]);
-
-					itr_used = itr_used + 1;
-
-					if (rho <= rho_delta)
-					{
-						last_k = k;
-						break;
-					}
-				}
+				bool converged(true);
 
 				if (last_k >= RESTART)
+				{
 					/* didn't converge within accuracy */
 					last_k = RESTART - 1;
-
-				/* Solve the system H * y = g */
-				/* x += m_v[j] * m_y[j]       */
-				for (std::size_t i = last_k + 1; i-- > 0;)
-				{
-					double tmp = m_g[i];
-					for (std::size_t j = i + 1; j <= last_k; j++)
-						tmp -= m_ht[i][j] * m_y[j];
-					m_y[i] = tmp / m_ht[i][i];
+					converged = false;
 				}
 
-				for (std::size_t i = 0; i <= last_k; i++)
-					vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
 
-				if (rho <= rho_delta)
+				if (converged)
 					break;
 
 			}

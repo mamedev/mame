@@ -51,6 +51,7 @@ private:
 	u32 m_entries;
 	void create_rgb_lookups();
 	uint8_t      m_palette_lookup[32][4];
+	inline void set_color_entry(u16 offset, u16 pal_data, int shift);
 };
 
 

@@ -36,7 +36,7 @@ namespace devices
 
 		matrix_solver_GCR_t(netlist_state_t &anetlist, const pstring &name,
 				const solver_parameters_t *params, const std::size_t size)
-			: matrix_solver_t(anetlist, name, matrix_solver_t::PREFER_IDENTITY_TOP_LEFT, params)
+			: matrix_solver_t(anetlist, name, params)
 			, m_dim(size)
 			, RHS(size)
 			, new_V(size)
@@ -299,10 +299,8 @@ namespace devices
 
 		/* now solve it */
 
-		//if (m_proc != nullptr)
 		if (m_proc.resolved())
 		{
-			//static_solver(m_A, RHS);
 			m_proc(&mat.A[0], &RHS[0], &new_V[0]);
 		}
 		else
