@@ -18,8 +18,6 @@ Core bugs noted:
 ToDo:
 - Serial i/o
 - Centronics printer
-- Fix video - displays every other line on top & bottom half of the screen
-- Check that attributes are correctly applied
 - Connect up ports 1 and 3.
 - Fix timing issue with timer interrupt and remove hack
 
@@ -94,17 +92,6 @@ void trs80dt1_state::machine_reset()
 READ8_MEMBER( trs80dt1_state::dma_r )
 {
 	m_crtc->dack_w(m_p_videoram[offset]); // write to /BS pin
-	// Temporary hack to work around a timing issue
-	// timer interrupts fires too early and ends the psuedo-dma transfer after only 77 chars
-	// we send the last three manually until this is fixed
-	if (offset%80 == 76) {
-		offset++;
-		m_crtc->dack_w(m_p_videoram[offset]);
-		offset++;
-		m_crtc->dack_w(m_p_videoram[offset]);
-		offset++;
-		m_crtc->dack_w(m_p_videoram[offset]);
-	}
 	return 0x7f;
 }
 
@@ -295,14 +282,18 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 	linecount &= 15;
 
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 gfx = (lten) ? 0xff : 0;
-	if (!vsp)
+	u8 gfx = 0;
+
+	if (lten) // underline attr
+		gfx = 0xff;
+	else
+	if ((gpa | vsp)==0) // blinking and invisible attributes
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
-	if (rvv)
+	if (rvv) // reverse video attr
 		gfx ^= 0xff;
 
-	if (m_bow)
+	if (m_bow) // black-on-white
 		gfx ^= 0xff;
 
 	for(u8 i=0; i<8; i++)
@@ -343,7 +334,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 	X2210(config, "nvram");
 
 	TTL7474(config, m_7474, 0);
-	m_7474->comp_output_cb().set_inputline(m_maincpu, MCS51_INT1_LINE).invert(); // /Q connects directly to /INT1, so we need to invert?
+	m_7474->comp_output_cb().set_inputline(m_maincpu, MCS51_INT1_LINE).invert(); // /Q connects directly to /INT1, so we need to invert
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -355,6 +346,7 @@ ROM_START( trs80dt1 )
 
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trs80dt1.u12", 0x0000, 0x1000, CRC(04e8a53f) SHA1(7b5d5047319ef8f230b82684d97a918b564d466e) )
+	ROM_FILL(0x9a,1,0xd4) // fix for timer0 problem
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "8045716.u8",   0x0000, 0x0800, CRC(e2c5e59b) SHA1(0d571888d5f9fea4e565486ea8d3af8998ca46b1) )
