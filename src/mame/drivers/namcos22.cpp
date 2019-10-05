@@ -3966,9 +3966,8 @@ void namcos22s_state::airco22b(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "bodysonic").backrest(); // FIXME: is this seat or backrest?
-
-	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer
+	SPEAKER(config, "bodysonic").backrest();
+	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer behind back
 }
 
 void namcos22s_state::alpine(machine_config &config)
@@ -3992,7 +3991,6 @@ void namcos22s_state::cybrcycc(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "tank", 0.0, 0.0, 0.0);
-
 	m_c352->add_route(2, "tank", 1.00);
 }
 
@@ -4001,7 +3999,6 @@ void namcos22s_state::dirtdash(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "road", 0.0, 0.0, 0.0);
-
 	m_c352->add_route(3, "road", 1.00);
 }
 
