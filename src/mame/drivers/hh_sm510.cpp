@@ -856,6 +856,10 @@ ROM_END
   * Sharp SM5A label LN-08 519A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
+  BTANB: The game doesn't support simultaneous button presses for the controls,
+  it's the same as in eg. gnw_mmouse but in this game it doesn't make much sense
+  with the 2 separate guys. More likely a bad game design choice than bug.
+
 ***************************************************************************/
 
 class gnw_lion_state : public hh_sm510_state
@@ -10377,7 +10381,7 @@ CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_st
 CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE)
-CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
