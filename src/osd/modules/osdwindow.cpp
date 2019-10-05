@@ -10,7 +10,9 @@
 #include "osdwindow.h"
 
 #include "render/drawnone.h"
+#if (USE_BGFX)
 #include "render/drawbgfx.h"
+#endif
 #if (USE_OPENGL)
 #include "render/drawogl.h"
 #endif
@@ -35,8 +37,10 @@ std::unique_ptr<osd_renderer> osd_renderer::make_for_type(int mode, std::shared_
 		case VIDEO_MODE_NONE:
 			return std::make_unique<renderer_none>(window);
 #endif
+#if (USE_BGFX)
 		case VIDEO_MODE_BGFX:
 			return std::make_unique<renderer_bgfx>(window);
+#endif
 #if (USE_OPENGL)
 		case VIDEO_MODE_OPENGL:
 			return std::make_unique<renderer_ogl>(window);

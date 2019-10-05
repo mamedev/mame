@@ -153,6 +153,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_AUDIO_EFFECT "9",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 9" },
 #endif
 
+#if (USE_BGFX)
 	{ nullptr,                                nullptr,           OPTION_HEADER, "BGFX POST-PROCESSING OPTIONS" },
 	{ OSDOPTION_BGFX_PATH,                    "bgfx",            OPTION_STRING, "path to BGFX-related files" },
 	{ OSDOPTION_BGFX_BACKEND,                 "auto",            OPTION_STRING, "BGFX backend to use (d3d9, d3d11, metal, opengl, gles)" },
@@ -161,6 +162,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   OPTION_STRING, "shadow mask texture name" },
 	{ OSDOPTION_BGFX_LUT,                     "",                OPTION_STRING, "LUT texture name" },
 	{ OSDOPTION_BGFX_AVI_NAME,                OSDOPTVAL_AUTO,    OPTION_STRING, "filename for BGFX output logging" },
+#endif
 
 		// End of list
 	{ nullptr }
@@ -239,9 +241,12 @@ void osd_common_t::register_options()
 #ifndef OSD_MINI
 	REGISTER_MODULE(m_mod_man, DEBUG_WINDOWS);
 	REGISTER_MODULE(m_mod_man, DEBUG_QT);
-	REGISTER_MODULE(m_mod_man, DEBUG_IMGUI);
 	REGISTER_MODULE(m_mod_man, DEBUG_GDBSTUB);
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
+#endif
+
+#if (USE_BGFX)
+	REGISTER_MODULE(m_mod_man, DEBUG_IMGUI);
 #endif
 
 	REGISTER_MODULE(m_mod_man, NETDEV_TAPTUN);

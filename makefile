@@ -24,6 +24,7 @@
 # BENCHMARKS = 1
 # OSD = sdl
 
+# NO_BGFX = 0
 # NO_OPENGL = 0
 # USE_DISPATCH_GL = 0
 # MODERN_WIN_API = 0
@@ -712,6 +713,10 @@ endif
 
 ifdef DONT_USE_NETWORK
 PARAMS += --DONT_USE_NETWORK='$(DONT_USE_NETWORK)'
+endif
+
+ifdef NO_BGFX
+PARAMS += --NO_BGFX='$(NO_BGFX)'
 endif
 
 ifdef NO_OPENGL

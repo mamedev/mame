@@ -49,6 +49,11 @@ function osdmodulesbuild()
 		"SingleOutputDir",
 	}
 
+	if _OPTIONS["NO_BGFX"]~="1" then
+	files {
+		MAME_DIR .. "src/osd/modules/debugger/debugimgui.cpp",
+	}
+	end
 	files {
 		MAME_DIR .. "src/osd/osdnet.cpp",
 		MAME_DIR .. "src/osd/osdnet.h",
@@ -67,7 +72,6 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/diagnostics/diagnostics_win32.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/none.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugwin.cpp",
-		MAME_DIR .. "src/osd/modules/debugger/debugimgui.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debuggdbstub.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_windows.cpp",
@@ -165,12 +169,24 @@ function osdmodulesbuild()
 	}
 
 	files {
-		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
 		MAME_DIR .. "src/osd/modules/render/aviwrite.cpp",
 		MAME_DIR .. "src/osd/modules/render/aviwrite.h",
+		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
+	}
+	if _OPTIONS["NO_BGFX"]=="1" then
+		defines {
+			"USE_BGFX=0"
+		}
+	else
+		defines {
+			"USE_BGFX=1"
+		}
+	end
+	if _OPTIONS["NO_BGFX"]~="1" then
+	files {
+		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfxutil.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfxutil.h",
-		MAME_DIR .. "src/osd/modules/render/binpacker.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/blendreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/chain.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/chainentry.cpp",
@@ -213,11 +229,16 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/view.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
 	}
+	end
+	if _OPTIONS["NO_BGFX"]~="1" then
 	includedirs {
 		MAME_DIR .. "3rdparty/bgfx/examples/common",
 		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
+	}
+	end
+	includedirs {
 		ext_includedir("rapidjson")
 	}
 

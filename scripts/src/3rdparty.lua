@@ -1086,6 +1086,7 @@ end
 -- BX library objects
 --------------------------------------------------
 
+if _OPTIONS["NO_BGFX"]~="1" then
 project "bx"
 	uuid "238318fe-49f5-4eb4-88be-0618900f5eac"
 	kind "StaticLib"
@@ -1159,11 +1160,13 @@ project "bx"
 		MAME_DIR .. "3rdparty/bx/src/timer.cpp",
 		MAME_DIR .. "3rdparty/bx/src/url.cpp",
 	}
+end
 
 --------------------------------------------------
 -- BIMG library objects
 --------------------------------------------------
 
+if _OPTIONS["NO_BGFX"]~="1" then
 project "bimg"
 	uuid "5603611b-8bf8-4ffd-85bc-76858cd7df39"
 	kind "StaticLib"
@@ -1212,11 +1215,13 @@ project "bimg"
 		MAME_DIR .. "3rdparty/bimg/src/image.cpp",
 		MAME_DIR .. "3rdparty/bimg/src/image_gnf.cpp",
 	}
+end
 
 --------------------------------------------------
 -- BGFX library objects
 --------------------------------------------------
 
+if _OPTIONS["NO_BGFX"]~="1" then
 project "bgfx"
 	uuid "d3e7e119-35cf-4f4f-aba0-d3bdcd1b879a"
 	kind "StaticLib"
@@ -1377,6 +1382,7 @@ end
 			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
 		}
 	end
+end
 
 --------------------------------------------------
 -- PortAudio library objects

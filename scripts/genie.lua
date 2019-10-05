@@ -426,6 +426,15 @@ newoption {
 	description = "Select projects to be built. Will look into project folder for files.",
 }
 
+newoption {
+	trigger = "NO_BGFX",
+	description = "Do not build BGFX. May be useful on some SBCs lacking OpenGL and X11",
+	allowed = {
+		{ "0",   "Disabled"     },
+		{ "1",   "Enabled"      },
+	}
+}
+
 dofile ("extlib.lua")
 
 if _OPTIONS["SHLIB"]=="1" then

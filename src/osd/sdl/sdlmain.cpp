@@ -379,7 +379,9 @@ void sdl_osd_interface::video_register()
 #if USE_OPENGL
 	video_options_add("opengl", nullptr);
 #endif
+#if USE_BGFX
 	video_options_add("bgfx", nullptr);
+#endif
 	//video_options_add("auto", nullptr); // making d3d video default one
 }
 
