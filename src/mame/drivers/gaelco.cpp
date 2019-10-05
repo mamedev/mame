@@ -635,10 +635,11 @@ void gaelco_state::machine_start()
 		m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
+// TODO: verify all clocks (XTALs are 8867.23 kHz and 24.000 MHz)
 void gaelco_state::bigkarnk(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);   /* MC68000P10, 10 MHz */
+	M68000(config, m_maincpu, 10000000);   /* MC68000P10, 10 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
 
@@ -673,7 +674,7 @@ void gaelco_state::bigkarnk(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 
-	YM3812(config, "ymsnd", 3580000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM3812(config, "ymsnd", 24_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 1.0); // 4 MHz matches PCB recording
 
 	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
