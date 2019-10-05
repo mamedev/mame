@@ -3966,7 +3966,7 @@ void namcos22s_state::airco22b(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "bodysonic").subwoofer();
+	SPEAKER(config, "bodysonic").backrest(); // FIXME: is this seat or backrest?
 
 	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer
 }
@@ -4016,8 +4016,8 @@ void namcos22s_state::tokyowar(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "vibration").subwoofer();
-	SPEAKER(config, "seat").rear_center();
+	SPEAKER(config, "vibration").seat();
+	SPEAKER(config, "seat").headrest_center();
 
 	m_c352->add_route(2, "vibration", 0.50); // to "bass shaker"
 	m_c352->add_route(3, "seat", 1.00);
