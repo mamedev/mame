@@ -329,7 +329,7 @@ void thomson_state::to7_map(address_map &map)
 	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
-/* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
+/* 18 KB floppy / network ROM controllers */
 
 /* RAM mapping:
    0x0000 - 0x3fff: 16 KB video RAM (actually 8 K x 8 bits + 8 K x 6 bits)
@@ -344,65 +344,74 @@ void thomson_state::to7_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 /* external floppy controllers */
-#define ROM_FLOPPY( base )                      \
+#define ROM_FLOPPY                              \
 		/* no controller */                     \
-	ROM_FILL( base, 0x800, 0x39 )                   \
+	ROM_REGION( 0x800, "floppy_none", 0 )           \
+	ROM_FILL( 0, 0x800, 0x39 )                      \
 		/* CD 90-015 (5"1/4) */                     \
-	ROM_LOAD ( "cd90-015.rom", base+0x800, 0x7c0,           \
+	ROM_REGION( 0x800, "floppy_cd90_015", 0 )           \
+	ROM_LOAD ( "cd90-015.rom", 0x000, 0x7c0,                \
 		CRC(821d34c1)                       \
 		SHA1(31a6bb81baaeec5fc8de457c97264f9dfa92c18b) )    \
 		/* CD 90-640 (5"1/4) */                     \
-	ROM_LOAD ( "cd90-640.rom", base+0x1000, 0x7c0,          \
+	ROM_REGION( 0x800, "floppy_cd90_640", 0 )           \
+	ROM_LOAD ( "cd90-640.rom", 0x000, 0x7c0,                \
 		CRC(5114c0a5)                       \
 		SHA1(5c72566c22d8160ef0c75959e1863a1309bbbe49) )    \
 		/* CD 90-351 (3"1/2) */                     \
-	ROM_LOAD ( "cd-351-0.rom", base+0x1800, 0x7c0,          \
+	ROM_REGION( 0x2000, "floppy_cd90_351", 0 )          \
+	ROM_LOAD ( "cd-351-0.rom", 0x0000, 0x7c0,               \
 		CRC(2c0159fd)                       \
 		SHA1(bab5395ed8bc7c06f9897897f836054e6546e8e8) )    \
-	ROM_LOAD ( "cd-351-1.rom", base+0x2000, 0x7c0,          \
+	ROM_LOAD ( "cd-351-1.rom", 0x0800, 0x7c0,               \
 		CRC(8e58d159)                       \
 		SHA1(dcf992c96e7556b2faee6bacd3f744e56998e6ea) )    \
-	ROM_LOAD ( "cd-351-2.rom", base+0x2800, 0x7c0,          \
+	ROM_LOAD ( "cd-351-2.rom", 0x1000, 0x7c0,               \
 		CRC(c9228b60)                       \
 		SHA1(179e10107d5be91e684069dee80f94847b83201f) )    \
-	ROM_LOAD ( "cd-351-3.rom", base+0x3000, 0x7c0,          \
+	ROM_LOAD ( "cd-351-3.rom", 0x1800, 0x7c0,               \
 		CRC(3ca8e5dc)                       \
 		SHA1(7118636fb5c597c78c2fce17b02aed5e4ba38635) )    \
 		/* CQ 90-028 (2"8, aka QDD) */                  \
-	ROM_LOAD ( "cq90-028.rom", base+0x3800, 0x7c0,          \
+	ROM_REGION( 0x800, "floppy_cq90_028", 0 )               \
+	ROM_LOAD ( "cq90-028.rom", 0x000, 0x7c0,                \
 		CRC(ca4dba3d)                       \
 		SHA1(949c1f777c892da62c242215d79757d61e71e62b) )
 
 /* external floppy / network controller: 9 banks */
-#define ROM_FLOPPY5( base )             \
-	ROM_FLOPPY( base )                  \
-	ROM_LOAD ( "nano5.rom", base+0x4000, 0x7c0, \
+#define ROM_FLOPPY5                     \
+	ROM_FLOPPY                          \
+	ROM_REGION( 0x800, "floppy_nano", 0 )       \
+	ROM_LOAD ( "nano5.rom", 0x000, 0x7c0,       \
 			CRC(2f756868)               \
 			SHA1(b5b7cb6d12493d849330b6b5628efd1a83a4bbf5) )
 
-#define ROM_FLOPPY7( base )             \
-	ROM_FLOPPY( base )                  \
-	ROM_LOAD ( "nano7.rom", base+0x4000, 0x7c0, \
+#define ROM_FLOPPY7                     \
+	ROM_FLOPPY                          \
+	ROM_REGION( 0x800, "floppy_nano", 0 )       \
+	ROM_LOAD ( "nano7.rom", 0x000, 0x7c0,       \
 			CRC(42a1d1a6)               \
 			SHA1(973209f4baa5e81bf7885c0602949e064bac7862) )
 
 
 ROM_START ( to7 )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x20000, "maincpu", 0 )
 	ROM_LOAD ( "to7.rom", 0xe800, 0x1800,
 		CRC(0e7826da)
 		SHA1(23a2f84b03c01d385cc1923c8ece95c43756297a) )
 	ROM_FILL ( 0x10000, 0x10000, 0x39 )
-	ROM_FLOPPY7 ( 0x20000 )
+
+	ROM_FLOPPY7
 ROM_END
 
 ROM_START ( t9000 )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x20000, "maincpu", 0 )
 	ROM_LOAD ( "t9000.rom", 0xe800, 0x1800,
 		CRC(daa8cfbf)
 		SHA1(a5735db1ad4e529804fc46603f838d3f4ccaf5cf) )
 	ROM_FILL ( 0x10000, 0x10000, 0x39 )
-	ROM_FLOPPY7 ( 0x20000 )
+
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -663,6 +672,9 @@ void thomson_state::to7_base(machine_config &config)
 	m_cassette->set_interface("to_cass");
 
 /* floppy */
+	THMFC1(config, m_thmfc, 0);
+	m_thmfc->floppy_active_cb().set(FUNC(thomson_state::thom_floppy_active));
+
 	MC6843(config, m_mc6843, 16_MHz_XTAL / 16 / 2);
 
 	LEGACY_FLOPPY(config, m_floppy_image[0], 0, &thomson_floppy_interface);
@@ -836,7 +848,7 @@ void thomson_state::to770_map(address_map &map)
 	map(0xe800, 0xffff).rom();       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
-/* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
+/* 18 KB floppy / network ROM controllers */
 
 /* RAM mapping:
    0x00000 - 0x03fff: 16 KB video RAM
@@ -851,21 +863,23 @@ void thomson_state::to770_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to770 )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x20000, "maincpu", 0 )
 	ROM_LOAD ( "to770.rom", 0xe800, 0x1800, /* BIOS */
 		CRC(89518862)
 		SHA1(cd34474c0bcc758f6d71c90fbd40cef379d61374) )
-	ROM_FLOPPY7 ( 0x20000 )
 	ROM_FILL ( 0x10000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 ROM_START ( to770a )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x20000, "maincpu", 0 )
 	ROM_LOAD ( "to770a.rom", 0xe800, 0x1800,
 		CRC(378ea808)
 		SHA1(f4575b537dfdb46ff2a0e7cbe8dfe4ba63161b8e) )
-	ROM_FLOPPY7 ( 0x20000 )
 	ROM_FILL ( 0x10000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -1032,7 +1046,7 @@ void thomson_state::mo5_map(address_map &map)
 	map(0xf000, 0xffff).rom();       /* system bios */
 
 /* 0x10000 - 0x1ffff: 16 KB integrated BASIC / 64 KB external cartridge */
-/* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
+/* 18 KB floppy / network ROM controllers */
 
 /* RAM mapping:
    0x00000 - 0x03fff: 16 KB video RAM
@@ -1047,25 +1061,27 @@ void thomson_state::mo5_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5 )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x20000, "maincpu", 0 )
 	ROM_LOAD ( "mo5.rom", 0xf000, 0x1000,
 		CRC(f0ea9140)
 		SHA1(36ce2d3df1866ec2fe368c1c28757e2f5401cf44) )
 	ROM_LOAD ( "basic5.rom", 0x11000, 0x3000,
 		CRC(c2c11b9d)
 		SHA1(512dd40fb45bc2b51a24c84b3723a32bc8e80c06) )
-	ROM_FLOPPY5 ( 0x20000 )
+
+	ROM_FLOPPY5
 ROM_END
 
 ROM_START ( mo5e )
-	ROM_REGION ( 0x24800, "maincpu", 0 )
+	ROM_REGION ( 0x20000, "maincpu", 0 )
 	ROM_LOAD ( "mo5e.rom", 0xf000, 0x1000,
 		CRC(6520213a)
 		SHA1(f17a7a59baf2819ec80991b34b204795536a5e01) )
 	ROM_LOAD ( "basic5e.rom", 0x11000, 0x3000,
 		CRC(934a72b2)
 		SHA1(b37e2b1afbfba368c19be87b3bf61dfe6ad8b0bb) )
-	ROM_FLOPPY5 ( 0x20000 )
+
+	ROM_FLOPPY5
 ROM_END
 
 
@@ -1253,7 +1269,7 @@ void thomson_state::to9_map(address_map &map)
 
 /* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
 /* 0x20000 - 0x3ffff: 128 KB internal software ROM */
-/* 0x40000 - 0x447ff: 18  KB external floppy / network ROM controllers */
+/* 18 KB external floppy / network ROM controllers */
 
 /* RAM mapping:
    0x00000 - 0x03fff: 16 KB video RAM
@@ -1273,7 +1289,7 @@ void thomson_state::to9_map(address_map &map)
  */
 
 ROM_START ( to9 )
-	ROM_REGION ( 0x44800, "maincpu", 0 )
+	ROM_REGION ( 0x40000, "maincpu", 0 )
 	ROM_LOAD ( "to9.rom", 0xe000, 0x2000, /* BIOS & floppy controller */
 		CRC(f9278bf7)
 		SHA1(9e99e6ae0285950f007b19161de642a4031fe46e) )
@@ -1304,9 +1320,9 @@ ROM_START ( to9 )
 		CRC(214fe527)
 		SHA1(0d8e3f1ca347026e906c3d00a0371e8238c44a60) )
 
-	ROM_FLOPPY7( 0x40000 )
-
 	ROM_FILL( 0x10000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -1582,7 +1598,7 @@ void thomson_state::to8_map(address_map &map)
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
 /* 0x30000 - 0x33fff: 16 KB BIOS ROM */
-/* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
+/* 18 KB external floppy / network ROM controllers */
 
 /* RAM mapping: 512 KB flat (including video) */
 
@@ -1592,7 +1608,7 @@ void thomson_state::to8_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to8 )
-	ROM_REGION ( 0x38800, "maincpu", 0 )
+	ROM_REGION ( 0x34000, "maincpu", 0 )
 
 		/* BIOS & floppy */
 	ROM_LOAD ( "to8-0.rom", 0x30000, 0x2000,
@@ -1616,13 +1632,13 @@ ROM_START ( to8 )
 		CRC(f552e7e3)
 		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
-	ROM_FLOPPY7( 0x34000 )
-
 	ROM_FILL( 0x10000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 ROM_START ( to8d )
-	ROM_REGION ( 0x38800, "maincpu", 0 )
+	ROM_REGION ( 0x34000, "maincpu", 0 )
 
 		/* BIOS & floppy */
 	ROM_LOAD ( "to8d-0.rom", 0x30000, 0x2000,
@@ -1646,9 +1662,9 @@ ROM_START ( to8d )
 		CRC(f552e7e3)
 		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
-	ROM_FLOPPY7( 0x34000 )
-
 	ROM_FILL( 0x10000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -1793,7 +1809,7 @@ void thomson_state::to9p_map(address_map &map)
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
 /* 0x30000 - 0x33fff: 16 KB BIOS ROM */
-/* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
+/* 18 KB external floppy / network ROM controllers */
 
 /* RAM mapping: 512 KB flat (including video) */
 
@@ -1803,7 +1819,7 @@ void thomson_state::to9p_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to9p )
-	ROM_REGION ( 0x38800, "maincpu", 0 )
+	ROM_REGION ( 0x34000, "maincpu", 0 )
 
 		/* BIOS & floppy */
 	ROM_LOAD ( "to9p-0.rom", 0x30000, 0x2000,
@@ -1827,9 +1843,9 @@ ROM_START ( to9p )
 		CRC(ebe9c8d9)
 		SHA1(b667ad09a1181f65059a2cbb4c95421bc544a334) )
 
-	ROM_FLOPPY7( 0x34000 )
-
 	ROM_FILL( 0x10000, 0x10000, 0x39 )
+
+	ROM_FLOPPY7
 ROM_END
 
 
@@ -1966,7 +1982,7 @@ void thomson_state::mo6_map(address_map &map)
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
-/* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
+/* 16 KB floppy / network ROM controllers */
 
 /* RAM mapping: 128 KB flat (including video) */
 
@@ -1976,7 +1992,7 @@ void thomson_state::mo6_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo6 )
-	ROM_REGION ( 0x34800, "maincpu", 0 )
+	ROM_REGION ( 0x30000, "maincpu", 0 )
 
 		/* BIOS */
 	ROM_LOAD ( "mo6-0.rom", 0x23000, 0x1000,
@@ -2000,12 +2016,13 @@ ROM_START ( mo6 )
 		CRC(19d66dc4)
 		SHA1(301b6366269181b74cb5d7ccdf5455b7290ae99b) )
 
-	ROM_FLOPPY5 ( 0x30000 )
 	ROM_FILL ( 0x10000, 0x10000, 0x39 )
+
+	ROM_FLOPPY5
 ROM_END
 
 ROM_START ( pro128 )
-	ROM_REGION ( 0x34800, "maincpu", 0 )
+	ROM_REGION ( 0x30000, "maincpu", 0 )
 
 		/* BIOS */
 	ROM_LOAD ( "pro128-0.rom", 0x23000, 0x1000,
@@ -2029,8 +2046,9 @@ ROM_START ( pro128 )
 		CRC(2c2befa6)
 		SHA1(3e94e182bacbb55bb07be2af4c76c0b0df47b3bf) )
 
-	ROM_FLOPPY5 ( 0x30000 )
 	ROM_FILL ( 0x10000, 0x10000, 0x39 )
+
+	ROM_FLOPPY5
 ROM_END
 
 
@@ -2317,7 +2335,7 @@ void thomson_state::mo5nr_map(address_map &map)
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
-/* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
+/* 16 KB floppy / network ROM controllers */
 
 /* RAM mapping: 128 KB flat (including video) */
 
@@ -2327,7 +2345,7 @@ void thomson_state::mo5nr_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5nr )
-	ROM_REGION ( 0x34800, "maincpu", 0 )
+	ROM_REGION ( 0x30000, "maincpu", 0 )
 
 		/* BIOS */
 	ROM_LOAD ( "mo5nr-0.rom", 0x23000, 0x1000,
@@ -2351,8 +2369,9 @@ ROM_START ( mo5nr )
 		CRC(7785610f)
 		SHA1(c38b0be404d8af6f409a1b52cb79a4e10fc33177) )
 
-	ROM_FLOPPY5 ( 0x30000 )
 	ROM_FILL ( 0x10000, 0x10000, 0x39 ) /* TODO: network ROM */
+
+	ROM_FLOPPY5
 ROM_END
 
 
