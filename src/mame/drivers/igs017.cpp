@@ -98,7 +98,7 @@ public:
 	void data_w(u8 data);
 	u8 data_r();
 
-	void set_m3_bits(int m3, u8 b0, u8 b1, u8 b2, u8 b3);
+	template <unsigned N> void set_m3_bits(u8 b0, u8 b1, u8 b2, u8 b3);
 	void set_mf_bits(u8 b0, u8 b1, u8 b2, u8 b3);
 	void set_val_xor(u16 val_xor);
 
@@ -123,12 +123,12 @@ private:
 	u16 m_val_xor;
 };
 
-void igs_bitswap_device::set_m3_bits(int m3, u8 b0, u8 b1, u8 b2, u8 b3)
+template <unsigned N> void igs_bitswap_device::set_m3_bits(u8 b0, u8 b1, u8 b2, u8 b3)
 {
-	m_m3_bits[m3][0] = b0;
-	m_m3_bits[m3][1] = b1;
-	m_m3_bits[m3][2] = b2;
-	m_m3_bits[m3][3] = b3;
+	m_m3_bits[N][0] = b0;
+	m_m3_bits[N][1] = b1;
+	m_m3_bits[N][2] = b2;
+	m_m3_bits[N][3] = b3;
 
 #if 0
 	printf("igs_bitswap: INIT m3_bits[%x] =", m3);
@@ -3518,10 +3518,10 @@ void igs017_state::iqblocka(machine_config &config)
 	m_igs_bitswap->out_pa_callback().set(FUNC(igs017_state::iqblocka_keyin_w));
 	m_igs_bitswap->set_val_xor(0x15d6);
 	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
-	m_igs_bitswap->set_m3_bits(0, ~5,  8, ~10, ~15);
-	m_igs_bitswap->set_m3_bits(1,  3, ~8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits(2,  2, ~6, ~11, ~15);
-	m_igs_bitswap->set_m3_bits(3,  0, ~1, ~3,  ~15);
+	m_igs_bitswap->set_m3_bits<0>(~5,  8, ~10, ~15);
+	m_igs_bitswap->set_m3_bits<1>( 3, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits<2>( 2, ~6, ~11, ~15);
+	m_igs_bitswap->set_m3_bits<3>( 0, ~1, ~3,  ~15);
 
 	IGS_INCDEC(config, m_igs_incdec, 0);
 
@@ -3547,6 +3547,7 @@ void igs017_state::iqblocka(machine_config &config)
 void igs017_state::iqblockf(machine_config &config)
 {
 	iqblocka(config);
+
 	// tweaked protection bitswap
 	m_igs_bitswap->out_pb_callback().set(FUNC(igs017_state::iqblockf_keyout_w));
 	m_igs_bitswap->set_mf_bits(0, 5, 9, 13);
@@ -3555,12 +3556,13 @@ void igs017_state::iqblockf(machine_config &config)
 void igs017_state::genius6(machine_config &config)
 {
 	iqblockf(config);
+
 	// tweaked protection bitswap
 	m_igs_bitswap->set_mf_bits(2, 7, 9, 13);
-	m_igs_bitswap->set_m3_bits(0, ~5,  6,  ~7, ~15);
-	m_igs_bitswap->set_m3_bits(1,  1, ~6,  ~9, ~15);
-	m_igs_bitswap->set_m3_bits(2,  4, ~8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits(3,  3, ~5,  ~6, ~15);
+	m_igs_bitswap->set_m3_bits<0>(~5,  6,  ~7, ~15);
+	m_igs_bitswap->set_m3_bits<1>( 1, ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits<2>( 4, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits<3>( 3, ~5,  ~6, ~15);
 }
 
 void igs017_state::starzan(machine_config &config)
@@ -3689,10 +3691,10 @@ void igs017_state::lhzb2a(machine_config &config)
 	IGS_BITSWAP(config, m_igs_bitswap, 0);
 	m_igs_bitswap->set_val_xor(0x289a);
 	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
-	m_igs_bitswap->set_m3_bits(0, ~3,   8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits(1, ~3,  ~6,  ~9, ~15);
-	m_igs_bitswap->set_m3_bits(2, ~3,   4,  ~5, ~15);
-	m_igs_bitswap->set_m3_bits(3, ~9, ~11,  12, ~15);
+	m_igs_bitswap->set_m3_bits<0>(~3,   8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits<1>(~3,  ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits<2>(~3,   4,  ~5, ~15);
+	m_igs_bitswap->set_m3_bits<3>(~9, ~11,  12, ~15);
 
 	IGS_INCDEC(config, m_igs_incdec, 0);
 

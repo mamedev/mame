@@ -376,13 +376,13 @@ INPUT_PORTS_END
 
 void h01x_state::machine_start()
 {
-	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h01x_state::cassette_data_callback),this));
-	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
+	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h01x_state::cassette_data_callback), this));
+	m_cassette_data_timer->adjust(attotime::zero, 0, attotime::from_hz(11025));
 }
 
 void h01x_state::machine_reset()
 {
-	m_bank  =   0x00;
+	m_bank = 0x00;
 
 	m_rom_ptr = m_rom->base();
 	m_hzrom_ptr = m_hzrom->base();
@@ -421,10 +421,10 @@ WRITE8_MEMBER( h01x_state::port_64_w )
 
 WRITE8_MEMBER( h01x_state::port_70_w )
 {
-	m_bank  =   data&0xC0;
+	m_bank = data & 0xc0;
 
 	// bit5, speaker
-	m_speaker->level_w(BIT(data,5));
+	m_speaker->level_w(BIT(data, 5));
 
 	// bit4, cassette
 	m_cassette->output(BIT(data, 4) ? 1.0 : -1.0);
@@ -436,7 +436,7 @@ READ8_MEMBER( h01x_state::port_50_r )
 	// bit 7, cassette input
 	//return (m_cassette->input() > 0.04) ? 0x7f : 0xff;
 
-	return (m_cassette_data ? 0xff : 0x7f);
+	return m_cassette_data ? 0xff : 0x7f;
 }
 
 
@@ -464,63 +464,61 @@ WRITE8_MEMBER(h01x_state::mem_4000_w)
 // 0x8000 --- 0xBFFF
 READ8_MEMBER(h01x_state::mem_8000_r)
 {
-	u8 result = 0xff;
-
-	switch(m_bank) {
-		case 0xC0:
-			return m_hzrom_ptr[offset];
-		case 0x40:
-		if((offset&0xf000) == 0x3000) {
-				//for(int i=0; i<11; i++) {
-				for(int i=0; i<11; i++) {
-					if(!BIT(offset, i))
-						result &= m_io_keyboard[i]->read();
-				}
+	switch (m_bank) {
+	case 0xc0:
+		return m_hzrom_ptr[offset];
+	case 0x40:
+		if ((offset & 0xf000) == 0x3000) {
+			u8 result = 0xff;
+			for (int i = 0; i < 11; i++) {
+				if (!BIT(offset, i))
+					result &= m_io_keyboard[i]->read();
 			}
 			return result;
-		case 0x00:
-			return m_ram_ptr[offset + 0x4000];
-		default:
+		} else {
 			return 0xff;
+		}
+	case 0x00:
+		return m_ram_ptr[offset + 0x4000];
+	default:
+		return 0xff;
 	}
 }
 
 WRITE8_MEMBER(h01x_state::mem_8000_w)
 {
-	if(m_bank == 0x00)
-		m_ram_ptr[offset+0x4000] = data;
+	if (m_bank == 0x00)
+		m_ram_ptr[offset + 0x4000] = data;
 }
 
 
 // 0xC000 --- 0xFFFF
 READ8_MEMBER(h01x_state::mem_c000_r)
 {
-	if(m_bank == 0xC0) {
+	if (m_bank == 0xc0)
 		return m_hzrom_ptr[offset + 0x4000];
-	} else {
-		if(m_bank == 0x40)
-			return m_vram_ptr[offset];
-		else
-			return 0xff;
-	}
+	else if (m_bank == 0x40)
+		return m_vram_ptr[offset];
+	else
+		return 0xff;
 }
 
 WRITE8_MEMBER(h01x_state::mem_c000_w)
 {
-	if(m_bank == 0x40)
-		m_vram_ptr[offset] = (data&0x0f)|0xf0;
+	if (m_bank == 0x40)
+		m_vram_ptr[offset] = (data & 0x0f) | 0xf0;
 }
 
 
 TIMER_CALLBACK_MEMBER(h01x_state::cassette_data_callback)
 {
-/* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
-    1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
+	/* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
+	    1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
 
-	double new_val = (m_cassette->input());
+	double new_val = m_cassette->input();
 
 	/* Check for HI-LO transition */
-	if ( m_old_cassette_val > -0.2 && new_val < -0.2 )
+	if (m_old_cassette_val > -0.2 && new_val < -0.2)
 		m_cassette_data = true;
 
 	m_old_cassette_val = new_val;
