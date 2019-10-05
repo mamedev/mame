@@ -8,9 +8,8 @@
 DEFINE_DEVICE_TYPE(SUPERFX1, superfx1_device, "superfx1", "Nintendo SuperFX 1")
 DEFINE_DEVICE_TYPE(SUPERFX2, superfx2_device, "superfx2", "Nintendo SuperFX 2")
 
-superfx_device::superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpi)
+superfx_device::superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_cycles_per_insn(cpi)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 32, 0)
 	, m_out_irq_func(*this), m_pipeline(0), m_ramaddr(0), m_sfr(0), m_pbr(0), m_rombr(0), m_rambr(0), m_cbr(0), m_scbr(0), m_scmr(0), m_colr(0), m_por(0)
 	, m_bramr(0), m_vcr(0), m_cfgr(0), m_clsr(0), m_romcl(0), m_romdr(0), m_ramcl(0), m_ramar(0), m_ramdr(0), m_sreg(nullptr), m_sreg_idx(0), m_dreg(nullptr)
@@ -19,12 +18,12 @@ superfx_device::superfx_device(const machine_config &mconfig, device_type type, 
 }
 
 superfx1_device::superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: superfx_device(mconfig, SUPERFX1, tag, owner, clock, 2)
+	: superfx_device(mconfig, SUPERFX1, tag, owner, clock)
 {
 }
 
 superfx2_device::superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: superfx_device(mconfig, SUPERFX2, tag, owner, clock, 1)
+	: superfx_device(mconfig, SUPERFX2, tag, owner, clock)
 {
 }
 
@@ -1453,7 +1452,7 @@ void superfx_device::execute_run()
 		//printf( " r8:%04x  r9:%04x r10:%04x r11:%04x r12:%04x r13:%04x r14:%04x r15:%04x\n",  m_r[8],  m_r[9], m_r[10], m_r[11], m_r[12], m_r[13], m_r[14], m_r[15] );
 		//printf( "sfr:%04x\n", m_sfr );
 
-		m_icount -= m_cycles_per_insn;
+		m_icount -= 1;
 	}
 }
 

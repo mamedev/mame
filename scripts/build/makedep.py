@@ -432,6 +432,7 @@ class DriverFilter(object):
                         sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
                         sys.exit(1)
                     includes.add(text)
+                    excludes.discard(text)
                 elif text.startswith('-'):
                     text = text[1:].lstrip()
                     if not text:
@@ -440,6 +441,7 @@ class DriverFilter(object):
                     elif not all(x in self.DRIVER_CHARS for x in text):
                         sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
                         sys.exit(1)
+                    includes.discard(text)
                     excludes.add(text)
                 elif text:
                     sources.add(text)
@@ -473,7 +475,7 @@ class DriverFilter(object):
             do_parse(path)
             sys.stderr.write('%d source file(s) found\n' % (len(sources), ))
         self.sources = frozenset(sources)
-        self.includes = frozenset(includes - excludes)
+        self.includes = frozenset(includes)
         self.excludes = frozenset(excludes)
 
     def parse_list(self, path):

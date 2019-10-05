@@ -92,9 +92,6 @@ enum
 class superfx_device :  public cpu_device, public superfx_disassembler::config
 {
 public:
-	// construction/destruction
-	superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpi);
-
 	// configuration helpers
 	auto irq() { return m_out_irq_func.bind(); }
 
@@ -107,6 +104,9 @@ public:
 	virtual u16 get_alt() const override;
 
 protected:
+	// construction/destruction
+	superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -124,9 +124,6 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	// helpers
-	int m_cycles_per_insn;
 
 private:
 	address_space_config m_program_config;
@@ -219,8 +216,8 @@ public:
 
 protected:
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return m_cycles_per_insn; }
-	virtual uint32_t execute_max_cycles() const override { return m_cycles_per_insn; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
 };
 
 class superfx2_device :  public superfx_device
@@ -228,11 +225,6 @@ class superfx2_device :  public superfx_device
 public:
 	// construction/destruction
 	superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return m_cycles_per_insn; }
-	virtual uint32_t execute_max_cycles() const override { return m_cycles_per_insn; }
 };
 
 DECLARE_DEVICE_TYPE(SUPERFX1, superfx1_device)
