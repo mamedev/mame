@@ -1837,7 +1837,7 @@ protected:
 	static void raster_##name(void *destbase, int32_t y, const poly_extent *extent, const void *extradata, int threadid);
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER_HEADER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1)
-#include "voodoo_rast.hxx"
+#include "voodoo_rast.ipp"
 
 #undef RASTERIZER_ENTRY
 

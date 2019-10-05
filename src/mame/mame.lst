@@ -3117,7 +3117,7 @@ qosb                            // 1992 BFM
 quizvadr                        // 1991 BFM
 trebltop                        // 1991 BFM
 
-@source:bfm_ad5.cpp
+@source:bfm_ad5sw.cpp
 ad5bpfpm                        // Bullseye Pounds For Points (Mazooma)
 ad5bpfpma                       //
 ad5bpfpmb                       //
@@ -7196,7 +7196,7 @@ sc4ziggye                       //
 sc4ziggyf                       //
 sc4ziggyg                       //
 
-@source:bfm_sc5.cpp
+@source:bfm_sc5sw.cpp
 sc5_3414                        //
 sc5_3434                        //
 sc5_3435                        //
@@ -19297,7 +19297,7 @@ mf_bdash                        // (c) 1984 Exidy / First Star Software
 mf_brist                        // (c) 1983 Exidy / First Star Software
 mf_flip                         // (c) 1983 Exidy / First Star Software
 
-@source:maygay1b.cpp
+@source:maygay1bsw.cpp
 m1albsq                         // Albert Square (Maygay)
 m1albsq1                        //
 m1albsq1p                       //
@@ -21176,7 +21176,7 @@ ep_xspotb                       //
 ep_xtra                         // X-tra X-tra (Maygay)
 ep_xtraa                        //
 
-@source:maygaysw.cpp
+@source:maygayew.cpp
 mg_alad                         // Aladdin's Cave
 mg_bb                           // Big Break
 mg_ewg                          // Each Way Gambler
@@ -28230,7 +28230,7 @@ v4vgpok                         // Vegas Poker (prototype release 2)
 v4wize                          // Wize Move (v1.3d)
 v4wizea                         // Wize Move
 
-@source:mpu5.cpp
+@source:mpu5sw.cpp
 m55050                          // Fifty Fifty (Bwb)
 m5aceclb                        // Ace Of Clubs (Empire)
 m5aceclba                       //

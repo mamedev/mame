@@ -357,5 +357,3 @@ void bfm_sc5_state::bfm_sc5(machine_config &config)
 	YMZ280B(config, m_ymz, 16000000); // ?? Mhz
 	m_ymz->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
-
-#include "bfm_sc5sw.hxx"

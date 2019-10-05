@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_VOODDEFS_H
-#define MAME_VIDEO_VOODDEFS_H
+#ifndef MAME_VIDEO_VOODDEFS_IPP
+#define MAME_VIDEO_VOODDEFS_IPP
 
 #pragma once
 
@@ -3173,4 +3173,4 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	return blend_color;
 }
 
-#endif // MAME_VIDEO_VOODDEFS_H
+#endif // MAME_VIDEO_VOODDEFS_IPP

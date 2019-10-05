@@ -117,11 +117,11 @@ belatra.cpp
 berzerk.cpp
 bestleag.cpp
 bfcobra.cpp
-bfm_ad5.cpp
+bfm_ad5sw.cpp
 bfm_sc1.cpp
 bfm_sc2.cpp
 bfm_sc4.cpp
-bfm_sc5.cpp
+bfm_sc5sw.cpp
 bfm_swp.cpp
 bfmsys83.cpp
 bfmsys85.cpp
@@ -709,9 +709,9 @@ mastboy.cpp
 mastboyo.cpp
 matmania.cpp
 maxaflex.cpp
-maygay1b.cpp
+maygay1bsw.cpp
 maygayep.cpp
-maygaysw.cpp
+maygayew.cpp
 maygayv1.cpp
 mazerbla.cpp
 mcatadv.cpp
@@ -802,7 +802,7 @@ mpu4plasma.cpp
 mpu4sw.cpp
 mpu4union.cpp
 mpu4vid.cpp
-mpu5.cpp
+mpu5sw.cpp
 mquake.cpp
 mrdo.cpp
 mrflea.cpp

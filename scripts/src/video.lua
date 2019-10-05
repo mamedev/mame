@@ -1038,7 +1038,8 @@ if (VIDEOS["VOODOO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/voodoo.cpp",
 		MAME_DIR .. "src/devices/video/voodoo.h",
-		MAME_DIR .. "src/devices/video/vooddefs.h",
+		MAME_DIR .. "src/devices/video/vooddefs.ipp",
+		MAME_DIR .. "src/devices/video/voodoo_rast.ipp",
 	}
 end
 
