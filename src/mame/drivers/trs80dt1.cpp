@@ -16,13 +16,19 @@ Core bugs noted:
 
 
 ToDo:
-- Serial i/o
-- Centronics printer
-- Connect up ports 1 and 3.
-- Fix timing issue with timer interrupt and remove hack
+- Serial printer + (P1.1, P1.2, P3.5)
+- Fix cpu bug with timer interrupt and then remove hack.
+- Check the existing serial comms and LPTR that polarities are correct.
 
 You can get into the setup menu by pressing Ctrl+Shift+Enter.
 
+Note: The printer and serial interfaces are cheap and nasty. Connecting things
+      up wrongly will lead to malfunction. Read the user manual for more info.
+
+The LPTR (parallel printer) works by sending everything on the databus to the
+printer, then asserting STROBE only for data that needs to print. The address-map
+mechanism can't really handle this, but after investigation, it turns out that
+the printer data goes to B800 which is a spare address range in the real machine.
 
 **********************************************************************************/
 
@@ -32,10 +38,12 @@ You can get into the setup menu by pressing Ctrl+Shift+Enter.
 #include "machine/7474.h"
 #include "machine/x2212.h"
 #include "sound/beep.h"
+#include "bus/rs232/rs232.h"
+#include "bus/centronics/ctronics.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-//#include "logmacro.h"
+
 
 class trs80dt1_state : public driver_device
 {
@@ -48,9 +56,11 @@ public:
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
 		, m_nvram(*this,"nvram")
-		, m_keyboard(*this, "X%u", 0)
+		, m_io_keyboard(*this, "X%u", 0)
 		, m_beep(*this, "beeper")
 		, m_7474(*this, "7474")
+		, m_rs232(*this, "rs232")
+		, m_centronics(*this, "centronics")
 	{ }
 
 	void trs80dt1(machine_config &config);
@@ -58,6 +68,7 @@ public:
 private:
 	DECLARE_READ8_MEMBER(dma_r);
 	DECLARE_READ8_MEMBER(key_r);
+	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_WRITE8_MEMBER(store_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port3_w);
@@ -67,6 +78,7 @@ private:
 	void prg_map(address_map &map);
 
 	bool m_bow;
+	bool m_cent_busy;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;
@@ -75,9 +87,11 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<i8276_device> m_crtc;
 	required_device<x2210_device> m_nvram;
-	required_ioport_array<10> m_keyboard;
+	required_ioport_array<9> m_io_keyboard;
 	required_device<beep_device> m_beep;
 	required_device<ttl7474_device> m_7474;
+	required_device<rs232_port_device> m_rs232;
+	required_device<centronics_device> m_centronics;
 };
 
 void trs80dt1_state::machine_reset()
@@ -99,7 +113,7 @@ READ8_MEMBER( trs80dt1_state::key_r )
 {
 	offset &= 15;
 	if (offset < 9)
-		return m_keyboard[offset]->read();
+		return m_io_keyboard[offset]->read();
 	else
 		return 0xff;
 }
@@ -111,18 +125,27 @@ WRITE8_MEMBER( trs80dt1_state::store_w )
 	m_nvram->store(0);
 }
 
+READ8_MEMBER( trs80dt1_state::port1_r )
+{
+	u8 data = m_cent_busy << 6;
+	return data;
+}
+
 /*
 d0 : /PSTRB (centronics strobe)
-d1 : TRPRT
-d2 : /SP BUSY
+d1 : TRPRT (for serial printer)
+d2 : /SP BUSY (for serial printer)
 d3 : /RTS
 d4 : BOW (applies reverse video to entire screen)
 d5 : /DTR
-d6 : PP BUSY (printer busy - input)
+d6 : PP BUSY (parallel printer busy - input)
 d7 : n/c */
 WRITE8_MEMBER( trs80dt1_state::port1_w )
 {
+	m_centronics->write_strobe(BIT(data, 0));
 	m_bow = BIT(data, 4);
+	m_rs232->write_dtr(BIT(data, 5));
+	m_rs232->write_rts(BIT(data, 3));
 }
 
 /*
@@ -130,6 +153,7 @@ d4 : beeper
 d5 : Printer enable */
 WRITE8_MEMBER( trs80dt1_state::port3_w )
 {
+	m_rs232->write_txd(BIT(data, 1));
 	m_beep->set_state(BIT(data, 4));
 }
 
@@ -145,8 +169,9 @@ void trs80dt1_state::io_map(address_map &map)
 	map(0xa000, 0xa7ff).ram().share("videoram");
 	map(0xa800, 0xa83f).mirror(0x3c0).rw(m_nvram, FUNC(x2210_device::read), FUNC(x2210_device::write)); // X2210
 	map(0xac00, 0xafff).r(FUNC(trs80dt1_state::key_r));
-	map(0xb000, 0xb3ff).portr("X9"); // also reads some RS232 inputs
+	map(0xb000, 0xb3ff).portr("X9");
 	map(0xb400, 0xb7ff).w(FUNC(trs80dt1_state::store_w));
+	map(0xb800, 0xbbff).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0xbc00, 0xbc01).mirror(0x3fe).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
 }
 
@@ -248,9 +273,9 @@ static INPUT_PORTS_START( trs80dt1 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED) // Jumper - LOW for 60Hz, high for 50Hz
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED) // No Connect
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, dcd_r)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, cts_r)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, dsr_r)
 INPUT_PORTS_END
 
 void trs80dt1_state::machine_start()
@@ -308,6 +333,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80dt1_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &trs80dt1_state::io_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(trs80dt1_state::port1_w));
+	m_maincpu->port_in_cb<1>().set(FUNC(trs80dt1_state::port1_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(trs80dt1_state::port3_w));
 
 	/* video hardware */
@@ -340,6 +366,16 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 2000);
 	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set_inputline("maincpu", MCS51_RX_LINE);
+
+	/* printer */
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set([this] (bool state) { m_cent_busy = state; });
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 }
 
 ROM_START( trs80dt1 )
@@ -352,4 +388,4 @@ ROM_START( trs80dt1 )
 	ROM_LOAD( "8045716.u8",   0x0000, 0x0800, CRC(e2c5e59b) SHA1(0d571888d5f9fea4e565486ea8d3af8998ca46b1) )
 ROM_END
 
-COMP( 1989, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1", MACHINE_NOT_WORKING )
+COMP( 1989, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1", 0 )
