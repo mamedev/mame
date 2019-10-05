@@ -1347,6 +1347,12 @@ end
 		"__STDC_CONSTANT_MACROS",
 		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
 	}
+	if _OPTIONS["NO_X11"]=="1" then
+		defines {
+		"BGFX_CONFIG_RENDERER_OPENGLES=1",
+		"BGFX_CONFIG_RENDERER_OPENGL=0",
+		}
+	end
 	files {
 		MAME_DIR .. "3rdparty/bgfx/src/bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
