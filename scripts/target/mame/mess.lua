@@ -4081,7 +4081,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/pencil2.cpp",
 	MAME_DIR .. "src/mame/drivers/perq.cpp",
 	MAME_DIR .. "src/mame/drivers/pes.cpp",
-	MAME_DIR .. "src/mame/includes/pes.h",
 	MAME_DIR .. "src/mame/drivers/picno.cpp",
 	MAME_DIR .. "src/mame/drivers/pipbug.cpp",
 	MAME_DIR .. "src/mame/drivers/plan80.cpp",

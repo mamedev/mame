@@ -12,7 +12,7 @@ BASIC-52 is an official Intel release.
 
 BASIC-31 (and variants) as found on the below url, are homebrews.
 
-http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
+https://web.archive.org/web/20110908004037/http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
 
 
 The driver is working, however there are issues with the cpu serial code.
