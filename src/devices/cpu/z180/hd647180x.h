@@ -51,7 +51,7 @@ public:
 	void prom_w(offs_t offset, u8 data)
 	{
 		if (mode_promwrite())
-			m_data->write_byte(offset & 0x3fff, data);
+			m_data->write_byte(offset & 0x3fff, m_data->read_byte(offset & 0x3fff) & data);
 	}
 
 protected:
