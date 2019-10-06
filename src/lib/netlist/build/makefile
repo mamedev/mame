@@ -30,7 +30,7 @@ space +=
 TIDY_FLAGS = $(subst $(space),,$(TIDY_FLAGSX))
 TIDY_SOURCES = $(SOURCES)
 
-#TIDY_SOURCES = $(SRC)/plib/pparser.cpp
+#TIDY_SOURCES = $(SRC)/solver/nld_solver.cpp
 
 #TIDY_FLAGS = -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
 #TIDY_FLAGS = -checks=llvm-include-order -fix

@@ -59,7 +59,7 @@ public:
 	bool readline(pstring &line)
 	{
 		putf8string::code_t c = 0;
-		m_linebuf = "";
+		m_linebuf = putf8string("");
 		if (!this->readcode(c))
 		{
 			line = "";
@@ -74,7 +74,7 @@ public:
 			if (!this->readcode(c))
 				break;
 		}
-		line = m_linebuf.c_str();
+		line = m_linebuf;
 		return true;
 	}
 
@@ -153,7 +153,7 @@ public:
 
 	void write(const pstring::value_type c) const
 	{
-		pstring t = pstring("") + c;
+		pstring t(1,c);
 		write(t);
 	}
 
@@ -301,7 +301,7 @@ namespace filesystem
 	template< class Source >
 	pstring /*path */ u8path( const Source& source )
 	{
-		return pstring(source);
+		return source;
 	}
 
 } // namespace filesystem

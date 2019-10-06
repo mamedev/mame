@@ -1384,12 +1384,12 @@ namespace netlist
 		template<typename O, typename C>
 		void save(O &owner, C &state, const pstring &module, const pstring &stname)
 		{
-			this->run_state_manager().save_item(static_cast<void *>(&owner), state, module + pstring(".") + stname);
+			this->run_state_manager().save_item(static_cast<void *>(&owner), state, module + "." + stname);
 		}
 		template<typename O, typename C>
 		void save(O &owner, C *state, const pstring &module, const pstring &stname, const std::size_t count)
 		{
-			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), module + pstring(".") + stname, plib::state_manager_t::dtype<C>(), count, state);
+			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), module + "." + stname, plib::state_manager_t::dtype<C>(), count, state);
 		}
 
 		detail::net_t *find_net(const pstring &name) const;

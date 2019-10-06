@@ -226,19 +226,6 @@ namespace devices
 
 	void NETLIB_NAME(solver)::post_start()
 	{
-		m_params.m_min_timestep = m_params.m_dynamic_min_ts();
-		m_params.m_max_timestep = netlist_time::from_double(1.0 / m_params.m_freq()).as_double();
-
-		if (m_params.m_dynamic_ts)
-		{
-			m_params.m_max_timestep *= 1;//NL_FCONST(1000.0);
-		}
-		else
-		{
-			m_params.m_min_timestep = m_params.m_max_timestep;
-		}
-
-		//m_params.m_max_timestep = std::max(m_params.m_max_timestep, m_params.m_max_timestep::)
 
 		log().verbose("Scanning net groups ...");
 		// determine net groups

@@ -318,9 +318,9 @@ public:
 		{
 			//      $var real 64 N1X1 N1X1 $end
 			if (format == ANALOG)
-				write(pstring("$var real 64 ") + m_ids[i++] + " " + ch + " $end\n");
+				write("$var real 64 " + m_ids[i++] + " " + ch + " $end\n");
 			else if (format == DIGITAL)
-				write(pstring("$var wire 1 ") + m_ids[i++] + " " + ch + " $end\n");
+				write("$var wire 1 " + m_ids[i++] + " " + ch + " $end\n");
 		}
 		write("$enddefinitions $end\n");
 		if (format == ANALOG)
@@ -328,7 +328,7 @@ public:
 			write("$dumpvars\n");
 			//r0.0 N1X1
 			for (i = 0; i < channels.size(); i++)
-				write(pstring("r0.0 ") + m_ids[i] + "\n");
+				write("r0.0 " + m_ids[i] + "\n");
 			write("$end\n");
 		}
 
@@ -338,7 +338,7 @@ public:
 	{
 		if (time > m_last_time)
 		{
-			write(pstring("#") + plib::to_string(static_cast<std::int64_t>(m_last_time * 1e9)) + " ");
+			write("#" + plib::to_string(static_cast<std::int64_t>(m_last_time * 1e9)) + " ");
 			write(m_buf + "\n");
 			m_buf = "";
 			m_last_time = time;
@@ -348,9 +348,9 @@ public:
 		else
 		{
 			if (outsam >= m_high_level)
-				m_buf += pstring("1") + m_ids[chan] + " ";
+				m_buf += "1" + m_ids[chan] + " ";
 			else if (outsam <= m_low_level)
-				m_buf += pstring("0") + m_ids[chan] + " ";
+				m_buf += "0" + m_ids[chan] + " ";
 		}
 	}
 
@@ -494,7 +494,7 @@ void nlwav_app::convert(std::ostream &ostrm)
 int nlwav_app::execute()
 {
 	for (auto &i : opt_args())
-		pout(pstring("Hello : ") + i + "\n");
+		pout("Hello : " + i + "\n");
 	if (opt_help())
 	{
 		pout(usage());

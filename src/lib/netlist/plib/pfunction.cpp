@@ -115,7 +115,7 @@ void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring 
 {
 	// Shunting-yard infix parsing
 	std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^"};
-	std::vector<pstring> sexpr(plib::psplit(plib::replace_all(expr, pstring(" "), pstring("")), sep));
+	std::vector<pstring> sexpr(plib::psplit(plib::replace_all(expr, " ", ""), sep));
 	std::stack<pstring> opstk;
 	std::vector<pstring> postfix;
 

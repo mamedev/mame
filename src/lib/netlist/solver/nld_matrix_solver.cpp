@@ -113,7 +113,7 @@ namespace devices
 
 							if (net_proxy_output == nullptr)
 							{
-								pstring nname = this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size()));
+								pstring nname(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size())));
 								nl_assert(p->net().is_analog());
 								auto net_proxy_output_u = pool().make_poolptr<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
 								net_proxy_output = net_proxy_output_u.get();

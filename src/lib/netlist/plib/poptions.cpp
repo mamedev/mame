@@ -111,7 +111,7 @@ namespace plib {
 			if (!seen_other_args && plib::startsWith(arg, "--"))
 			{
 				auto v = psplit(arg.substr(2),"=");
-				if (v.size() && v[0] != pstring(""))
+				if (v.size() && v[0] != "")
 				{
 					opt = getopt_long(v[0]);
 					has_equal_arg = (v.size() > 1);

@@ -134,7 +134,7 @@ namespace plib
 	}
 
 
-	int penum_base::from_string_int(const char *str, const char *x)
+	int penum_base::from_string_int(const pstring &str, const pstring &x)
 	{
 		int cnt = 0;
 		for (auto &s : psplit(str, ",", false))
@@ -146,7 +146,7 @@ namespace plib
 		return -1;
 	}
 
-	std::string penum_base::nthstr(int n, const char *str)
+	std::string penum_base::nthstr(int n, const pstring &str)
 	{
 		return psplit(str, ",", false)[static_cast<std::size_t>(n)];
 	}

@@ -94,27 +94,29 @@ public:
 	pstring_t() = default;
 	~pstring_t() noexcept = default;
 
-	// FIXME: Do something with encoding
-	pstring_t(const mem_t *string)
-	: m_str(string)
-	{
-	}
-
 	pstring_t(const mem_t *string, const size_type len)
 	: m_str(string, len)
 	{
 	}
 
+	/* mingw treats string constants as char* instead of char[N] */
+#if !defined(_WIN32) && !defined(_WIN64)
+	explicit
+#endif
+	pstring_t(const mem_t *string)
+	: m_str(string)
+	{
+	}
+
 	template<typename C, std::size_t N,
 		class = typename std::enable_if<std::is_same<C, const mem_t>::value>::type>
-	pstring_t(C (*string)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+	pstring_t(C (&string)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	{
 		static_assert(N > 0,"pstring from array of length 0");
 		if (string[N-1] != 0)
 			throw std::exception();
 		m_str.assign(string, N - 1);
 	}
-
 
 	explicit pstring_t(const string_type &string)
 		: m_str(string)
@@ -605,14 +607,14 @@ namespace plib
 		return (right(str, arg.length()) == arg);
 	}
 
-	template<typename T>
-	bool startsWith(const T &str, const char *arg)
+	template<typename T, typename TA>
+	bool startsWith(const T &str, const TA &arg)
 	{
 		return startsWith(str, static_cast<pstring>(arg));
 	}
 
-	template<typename T>
-	bool endsWith(const T &str, const char *arg)
+	template<typename T, typename TA>
+	bool endsWith(const T &str, const TA &arg)
 	{
 		return endsWith(str, static_cast<pstring>(arg));
 	}

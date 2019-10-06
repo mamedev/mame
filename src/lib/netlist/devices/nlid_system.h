@@ -131,7 +131,7 @@ namespace devices
 		, m_funcparam({0.0})
 		{
 			if (m_func() != "")
-				m_compiled.compile(std::vector<pstring>({{"T"}}), m_func());
+				m_compiled.compile(std::vector<pstring>({{pstring("T")}}), m_func());
 			connect(m_feedback, m_Q);
 		}
 		//NETLIB_RESETI();
@@ -435,7 +435,8 @@ namespace devices
 	class nld_power_pins
 	{
 	public:
-		nld_power_pins(device_t &owner, const char *sVCC = "VCC", const char *sGND = "GND", bool force_analog_input = false)
+		nld_power_pins(device_t &owner, const pstring &sVCC = "VCC",
+			const pstring &sGND = "GND", bool force_analog_input = false)
 		{
 			if (owner.setup().is_validation() || force_analog_input)
 			{

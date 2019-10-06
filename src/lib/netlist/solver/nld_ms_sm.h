@@ -210,7 +210,14 @@ namespace devices
 		static constexpr const bool incremental = true;
 		const std::size_t iN = size();
 
-		std::array<float_type, storage_N> new_V; // = { 0.0 };
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+		std::array<float_type, storage_N> new_V;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+		std::array<float_type, m_pitch> v;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+		std::array<std::size_t, m_pitch> cols;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+		std::array<float_type, m_pitch> z;
 
 		if ((m_cnt % 50) == 0)
 		{
@@ -227,8 +234,6 @@ namespace devices
 			}
 			for (std::size_t row = 0; row < iN; row ++)
 			{
-				std::array<float_type, m_pitch> v = {0};
-				std::array<std::size_t, m_pitch> cols;
 				std::size_t colcount = 0;
 
 				auto &nz = m_terms[row]->m_nz;
@@ -246,7 +251,6 @@ namespace devices
 					float_type lamba = 0.0;
 					std::array<float_type, m_pitch> w = {0};
 
-					std::array<float_type, m_pitch> z;
 					/* compute w and lamba */
 					for (std::size_t i = 0; i < iN; i++)
 						z[i] = Ainv(i, row); /* u is row'th column */

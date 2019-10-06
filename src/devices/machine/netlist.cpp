@@ -347,7 +347,7 @@ static bool rom_exists(device_t &root, pstring name)
 		{
 			if (ROMENTRY_ISREGION(romp)) // if this is a region, check for rom
 			{
-				char const *const basetag = romp->name;
+				auto basetag(pstring(romp->name));
 				if (name == pstring(":") + basetag)
 					return true;
 			}
@@ -1135,9 +1135,9 @@ void netlist_mame_device::device_start()
 
 	common_dev_start(m_netlist.get());
 
-	m_netlist->nlstate().save(*this, m_rem, this->name(), "m_rem");
-	m_netlist->nlstate().save(*this, m_div, this->name(), "m_div");
-	m_netlist->nlstate().save(*this, m_old, this->name(), "m_old");
+	m_netlist->nlstate().save(*this, m_rem, pstring(this->name()), "m_rem");
+	m_netlist->nlstate().save(*this, m_div, pstring(this->name()), "m_div");
+	m_netlist->nlstate().save(*this, m_old, pstring(this->name()), "m_old");
 
 	save_state();
 

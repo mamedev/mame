@@ -224,7 +224,12 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 {
 	const auto iN = size();
 
-	std::array<float_type, storage_N> new_V; // = { 0.0 };
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+	std::array<float_type, storage_N> new_V;
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+	std::array<float_type, storage_N> t;  // FIXME: convert to member
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+	std::array<float_type, storage_N> w;
 
 	if ((m_cnt % 50) == 0)
 	{
@@ -262,7 +267,6 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 			/* construct w = transform(V) * y
 			 * dim: rowcount x iN
 			 * */
-			std::array<float_type, storage_N> w;
 			for (unsigned i = 0; i < rowcount; i++)
 			{
 				const unsigned r = rows[i];
@@ -312,7 +316,6 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 			}
 			/* Back substitution */
 			//inv(H) w = t     w = H t
-			std::array<float_type, storage_N> t;  // FIXME: convert to member
 			for (unsigned j = rowcount; j-- > 0; )
 			{
 				float_type tmp = 0;

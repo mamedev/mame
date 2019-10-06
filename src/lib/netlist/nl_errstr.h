@@ -30,8 +30,8 @@
 namespace netlist
 {
 
-	static constexpr const char * sHINT_NO_DEACTIVATE = ".HINT_NO_DEACTIVATE";
-	static constexpr const char * sPowerDevRes = "_RVG";
+	static constexpr const char sHINT_NO_DEACTIVATE[] = ".HINT_NO_DEACTIVATE";
+	static constexpr const char sPowerDevRes[] = "_RVG";
 
 	// nl_base.cpp
 

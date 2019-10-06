@@ -622,7 +622,7 @@ void tool_app_t::create_header()
 		{
 			last_source = e->sourcefile();
 			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
-			pout("{1}{2}\n", pstring("// Source: "), plib::replace_all(e->sourcefile(), "../", ""));
+			pout("{1}{2}\n", "// Source: ", plib::replace_all(e->sourcefile(), "../", ""));
 			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
 		}
 		header_entry(e.get());

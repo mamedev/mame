@@ -59,7 +59,19 @@ namespace devices
 		, m_use_gabs(parent, "USE_GABS", true)
 		, m_use_linear_prediction(parent, "USE_LINEAR_PREDICTION", false) // // savings are eaten up by effort
 
-		{}
+		{
+			m_min_timestep = m_dynamic_min_ts();
+			m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
+
+			if (m_dynamic_ts)
+			{
+				m_max_timestep *= 1;//NL_FCONST(1000.0);
+			}
+			else
+			{
+				m_min_timestep = m_max_timestep;
+			}
+		}
 
 		param_double_t m_freq;
 		param_double_t m_gs_sor;

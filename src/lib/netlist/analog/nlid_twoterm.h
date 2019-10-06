@@ -402,7 +402,7 @@ namespace analog
 			register_subalias("P", m_P);
 			register_subalias("N", m_N);
 			if (m_func() != "")
-				m_compiled.compile(std::vector<pstring>({{"T"}}), m_func());
+				m_compiled.compile(std::vector<pstring>({{pstring("T")}}), m_func());
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
@@ -451,7 +451,7 @@ namespace analog
 			register_subalias("P", m_P);
 			register_subalias("N", m_N);
 			if (m_func() != "")
-				m_compiled.compile(std::vector<pstring>({{"T"}}), m_func());
+				m_compiled.compile(std::vector<pstring>({{pstring("T")}}), m_func());
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")

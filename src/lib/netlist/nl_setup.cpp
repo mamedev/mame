@@ -252,14 +252,14 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 	switch (in.type())
 	{
 		case detail::terminal_type::TERMINAL:
-			return pstring("TERMINAL");
+			return "TERMINAL";
 		case detail::terminal_type::INPUT:
-			return pstring("INPUT");
+			return "INPUT";
 		case detail::terminal_type::OUTPUT:
-			return pstring("OUTPUT");
+			return "OUTPUT";
 	}
 	log().fatal(MF_UNKNOWN_OBJECT_TYPE_1(static_cast<unsigned>(in.type())));
-	return pstring("Error");
+	return "Error";
 }
 
 pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
@@ -577,7 +577,7 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	else if (inp.is_logic())
 	{
 		log().verbose("connect terminal {1} (in, {2}) to {3}\n", inp.name(),
-				inp.is_analog() ? pstring("analog") : inp.is_logic() ? pstring("logic") : pstring("?"), term.name());
+				inp.is_analog() ? "analog" : inp.is_logic() ? "logic" : "?", term.name());
 		auto proxy = get_a_d_proxy(inp);
 
 		//out.net().register_con(proxy->proxy_term());

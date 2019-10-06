@@ -183,7 +183,7 @@ namespace plib
 			/* build ilu_rows */
 
 			index_type p(0);
-			for (std::size_t k=1; k < size(); k++)
+			for (index_type k=1; k < size(); k++)
 				if (row_idx[k] < diag[k])
 					ilu_rows[p++] = k;
 			ilu_rows[p] = 0; // end of array
@@ -421,9 +421,8 @@ namespace plib
 			 *
 			 */
 
-			//for (std::size_t i = 1; i < size(); i++) // row i
 			index_type p(0);
-			while (std::size_t i = ilu_rows[p++]) // row i
+			while (std::size_t i = ilu_rows[p++]) // NOLINT(bugprone-infinite-loop)
 			{
 				const std::size_t p_i_end = row_idx[i + 1];
 				// loop over all columns k left of diag in row i

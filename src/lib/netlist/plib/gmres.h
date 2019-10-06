@@ -154,6 +154,7 @@ namespace plib
 		template<typename V>
 		void solve_LU_inplace(V &v)
 		{
+			plib::unused_var(v);
 		}
 
 		plib::matrix_compressed_rows_t<FT, SIZE> m_mat;
