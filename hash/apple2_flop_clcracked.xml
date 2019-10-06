@@ -35345,4 +35345,44 @@
 		</part>
 	</software>
 
+	<software name="hmwnmult">
+		<description>Whole Numbers: Multiplication (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2019-10-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="whole numbers- multiplication (4am crack).dsk" size="143360" crc="edc88a92" sha1="4c24102023914a9ac9a9ddd1ffd00139cacb29e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewstat33">
+		<description>Statistics (Version 3.3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2019-10-03"/>
+		<!-- This is version 3.3, dated February 20, 1982. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="statistics v3.3 (4am crack).dsk" size="143360" crc="388e039d" sha1="01b45f202602a2846d0b437b2c729ee88280fc45" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frcbaskl">
+		<description>Fractions: Basic Skills (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2019-10-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fractions- basic skills (4am crack).dsk" size="143360" crc="ee5ef674" sha1="8d0a1486283fbddcfd36d0aaca3f30a27043eb33" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
