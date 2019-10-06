@@ -29,54 +29,102 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+static constexpr offs_t RAM_BASE = 0xfe00;
 // device type definition
-DEFINE_DEVICE_TYPE(HD647180X, hd647180x_device, "hd647180x", "Hitachi HD647180X MCU")
+DEFINE_DEVICE_TYPE(HD641180X, hd641180x_device, "hd641180x", "Hitachi HD641180X MCU") // ROMless
+DEFINE_DEVICE_TYPE(HD643180X, hd643180x_device, "hd643180x", "Hitachi HD643180X MCU") // MaskROM
+DEFINE_DEVICE_TYPE(HD647180X, hd647180x_device, "hd647180x", "Hitachi HD647180X MCU") // PROM
 
-hd647180x_device::hd647180x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z180_device(mconfig, HD647180X, tag, owner, clock, true, address_map_constructor(FUNC(hd647180x_device::prom_map), this))
+hd64x180x_base_device::hd64x180x_base_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, uint32_t clock,
+											address_map_constructor internal_map)
+	: z180_device(mconfig, type, tag, owner, clock, true, address_map_constructor())
 	, m_port_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_port_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0, address_map_constructor(FUNC(hd647180x_device::ram_map), this))
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
+	, m_mp(0)
 {
 	// arbitrary initial states
 	m_ccsr = 0;
 	std::fill(std::begin(m_odr), std::end(m_odr), 0);
 }
 
+hd641180x_device::hd641180x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd64x180x_base_device(mconfig, HD641180X, tag, owner, clock, address_map_constructor(FUNC(hd641180x_device::romless_map), this))
+{
+}
+
+hd643180x_device::hd643180x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd64x180x_base_device(mconfig, HD643180X, tag, owner, clock, address_map_constructor(FUNC(hd643180x_device::maskrom_map), this))
+{
+}
+
+hd647180x_device::hd647180x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd64x180x_base_device(mconfig, HD647180X, tag, owner, clock, address_map_constructor(FUNC(hd647180x_device::prom_map), this))
+{
+}
+
+void hd641180x_device::romless_map(address_map &map)
+{
+	map(0x0000, 0x3fff).noprw(); // ROMless
+	map(RAM_BASE, RAM_BASE | 0x01ff).ram(); // 512 bytes remappable internal RAM (available in all modes)
+}
+
+void hd643180x_device::maskrom_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("rom", 0).nopw(); // 16 KB internal Mask ROM (not used in mode 1)
+	map(RAM_BASE, RAM_BASE | 0x01ff).ram(); // 512 bytes remappable internal RAM (available in all modes)
+}
+
 void hd647180x_device::prom_map(address_map &map)
 {
-	map(0x00000, 0x03fff).rom().region(DEVICE_SELF, 0); // 16 KB internal PROM (not used in mode 1)
+	map(0x0000, 0x3fff).ram().region("rom", 0); // 16 KB internal PROM (not used in mode 1)
+	map(RAM_BASE, RAM_BASE | 0x01ff).ram(); // 512 bytes remappable internal RAM (available in all modes)
 }
 
-void hd647180x_device::ram_map(address_map &map)
-{
-	map(0x000, 0x1ff).ram(); // 512 bytes remappable internal RAM (available in all modes)
-}
-
-device_memory_interface::space_config_vector hd647180x_device::memory_space_config() const
+device_memory_interface::space_config_vector hd64x180x_base_device::memory_space_config() const
 {
 	auto spaces = z180_device::memory_space_config();
 	spaces.emplace_back(AS_DATA, &m_data_config);
 	return spaces;
 }
 
-uint8_t hd647180x_device::z180_read_memory(offs_t addr)
+uint8_t hd64x180x_base_device::z180_read_memory(offs_t addr)
 {
 	if ((addr & 0xffe00) == (offs_t(m_rmcr) << 12 | 0x0fe00))
-		return m_data->read_byte(addr & 0x1ff);
-	else
+		return m_data->read_byte(RAM_BASE | (addr & 0x1ff));
+	else if (!(mode_expanded_nointrom()) && addr < 0x4000)
+		return m_data->read_byte(addr);
+	else if (!(mode_single()))
 		return z180_device::z180_read_memory(addr);
+
+	return ~0;
 }
 
-void hd647180x_device::z180_write_memory(offs_t addr, uint8_t data)
+void hd64x180x_base_device::z180_write_memory(offs_t addr, uint8_t data)
 {
 	if ((addr & 0xffe00) == (offs_t(m_rmcr) << 12 | 0x0fe00))
-		m_data->write_byte(addr & 0x1ff, data);
-	else
+		m_data->write_byte(RAM_BASE | (addr & 0x1ff), data);
+	else if (!(mode_expanded_nointrom()) && addr < 0x4000)
+		return; // internal ROM
+	else if (!(mode_single()))
 		z180_device::z180_write_memory(addr, data);
 }
 
-uint8_t hd647180x_device::z180_internal_port_read(uint8_t port)
+uint8_t hd64x180x_base_device::z180_read_port(offs_t port)
+{
+	if (!(mode_single()))
+		return z180_device::z180_read_port(port);
+
+	return ~0;
+}
+
+void hd64x180x_base_device::z180_write_port(offs_t port, uint8_t data)
+{
+	if (!(mode_single()))
+		z180_device::z180_write_port(port, data);
+}
+
+uint8_t hd64x180x_base_device::z180_internal_port_read(uint8_t port)
 {
 	uint8_t data = 0xff;
 
@@ -184,7 +232,7 @@ uint8_t hd647180x_device::z180_internal_port_read(uint8_t port)
 	return data;
 }
 
-void hd647180x_device::z180_internal_port_write(uint8_t port, uint8_t data)
+void hd64x180x_base_device::z180_internal_port_write(uint8_t port, uint8_t data)
 {
 	switch (port)
 	{
@@ -273,7 +321,7 @@ void hd647180x_device::z180_internal_port_write(uint8_t port, uint8_t data)
 	}
 }
 
-void hd647180x_device::device_resolve_objects()
+void hd64x180x_base_device::device_resolve_objects()
 {
 	for (auto &cb : m_port_input_cb)
 		cb.resolve_safe(0xff);
@@ -281,7 +329,7 @@ void hd647180x_device::device_resolve_objects()
 		cb.resolve_safe();
 }
 
-void hd647180x_device::device_start()
+void hd64x180x_base_device::device_start()
 {
 	z180_device::device_start();
 
@@ -314,7 +362,7 @@ void hd647180x_device::device_start()
 	save_item(NAME(m_ddr));
 }
 
-void hd647180x_device::device_reset()
+void hd64x180x_base_device::device_reset()
 {
 	z180_device::device_reset();
 

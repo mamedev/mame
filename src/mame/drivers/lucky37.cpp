@@ -139,6 +139,7 @@ void lucky37_state::lucky37(machine_config &config)
 	Z80(config, "maincpu", 32_MHz_XTAL / 8).set_disable(); // not verified
 
 	hd647180x_device &mcu(HD647180X(config, "mcu", 32_MHz_XTAL / 2)); // clock not verified
+	mcu.set_mp(1,0);
 	mcu.set_addrmap(AS_PROGRAM, &lucky37_state::mcu_mem_map);
 	mcu.set_addrmap(AS_IO, &lucky37_state::mcu_io_map);
 
@@ -150,7 +151,7 @@ ROM_START( lucky21 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a001-a9b2",    0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x4000, "mcu", 0 )
+	ROM_REGION( 0x4000, "mcu:rom", 0 )
 	ROM_LOAD( "internal_rom", 0x0000, 0x4000, CRC(23291c00) SHA1(881f722f75e621fe7aa743d005c5c6b336f4e033) ) // decapped
 
 	ROM_REGION( 0xc0000, "unsorted", 0 ) // no ROM 6 present
@@ -166,7 +167,7 @@ ROM_START( lucky21d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a001-b9g1",    0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x4000, "mcu", 0 )
+	ROM_REGION( 0x4000, "mcu:rom", 0 )
 	ROM_LOAD( "internal_rom", 0x0000, 0x4000, CRC(b990a28e) SHA1(afaa1fa9d1e314c67af5e23ef2a1b28f6e995a0e) ) // decapped
 
 	ROM_REGION( 0xe0000, "unsorted", 0 )
@@ -183,7 +184,7 @@ ROM_START( lucky25 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a001-b9f2",    0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x4000, "mcu", 0 )
+	ROM_REGION( 0x4000, "mcu:rom", 0 )
 	ROM_LOAD( "internal_rom", 0x0000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, "unsorted", 0 )
@@ -199,7 +200,7 @@ ROM_START( lucky37 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a001-a9a2",    0x0000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x4000, "mcu", 0 )
+	ROM_REGION( 0x4000, "mcu:rom", 0 )
 	ROM_LOAD( "internal_rom", 0x0000, 0x4000,  CRC(c57e6818) SHA1(1d746fed6d13f7f711bcac6685af13e295891a38) ) // decapped
 
 	ROM_REGION( 0xc0000, "unsorted", 0 )

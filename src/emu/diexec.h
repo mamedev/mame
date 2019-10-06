@@ -113,7 +113,7 @@ public:
 	bool input_edge_triggered(int linenum) const { return execute_input_edge_triggered(linenum); }
 
 	// inline configuration helpers
-	void set_disable() { m_disabled = true; }
+	void set_disable(bool disable = true) { m_disabled = disable; }
 	template <typename Object> void set_vblank_int(Object &&cb, const char *tag)
 	{
 		m_vblank_interrupt = std::forward<Object>(cb);

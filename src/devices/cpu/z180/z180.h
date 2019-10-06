@@ -142,6 +142,8 @@ protected:
 
 	virtual uint8_t z180_read_memory(offs_t addr);
 	virtual void z180_write_memory(offs_t addr, uint8_t data);
+	virtual uint8_t z180_read_port(offs_t port);
+	virtual void z180_write_port(offs_t port, uint8_t data);
 	virtual uint8_t z180_internal_port_read(uint8_t port);
 	virtual void z180_internal_port_write(uint8_t port, uint8_t data);
 

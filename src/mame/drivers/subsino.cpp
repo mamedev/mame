@@ -2690,9 +2690,10 @@ GFXDECODE_END
 void subsino_state::victor21(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::victor21_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown clock */
+	maincpu.set_mp(0,1);
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::victor21_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(subsino_state::out_a_w));
@@ -2739,9 +2740,10 @@ void subsino_state::victor5(machine_config &config)
 void subsino_state::crsbingo(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown CPU and clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown CPU and clock */
+	maincpu.set_mp(0,1);
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -2770,9 +2772,10 @@ void subsino_state::crsbingo(machine_config &config)
 void subsino_state::srider(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::srider_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown clock */
+	maincpu.set_mp(0,1);
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::srider_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("SW1");
@@ -2821,9 +2824,10 @@ void subsino_state::sharkpy(machine_config &config)
 void subsino_state::tisub(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown CPU and clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::tisub_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown CPU and clock */
+	maincpu.set_mp(0,1);
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::tisub_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("SW1");
@@ -2861,9 +2865,10 @@ void subsino_state::tisub(machine_config &config)
 void subsino_state::stbsub(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::stbsub_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown clock */
+	maincpu.set_mp(0,1);
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::stbsub_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("SW1");
@@ -2916,6 +2921,10 @@ void subsino_state::mtrainnv(machine_config &config)
 *                               ROMs Loading                               *
 ***************************************************************************/
 
+// internal ROM not used or not dumped?
+#define EMPTY_HD64X180X_ROM(tag) \
+	ROM_REGION(0x4000, tag##":rom", ROMREGION_ERASEFF)
+
 /***************************************************************************
 
   Victor 5
@@ -2929,6 +2938,8 @@ void subsino_state::mtrainnv(machine_config &config)
 ***************************************************************************/
 
 ROM_START( victor5 )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(bc4d6ed6) SHA1(6b2087360ea0ae9e48a623934cb2fb973a80f1ec) )
 	ROM_CONTINUE(0x0000,0xc000)
@@ -2983,6 +2994,8 @@ Info by f205v (26/03/2008)
 ***************************************************************************/
 
 ROM_START( victor5a )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
 	ROM_CONTINUE(0x0000,0xc000)
@@ -3039,6 +3052,8 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 ***************************************************************************/
 
 ROM_START( victor21 )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
 	ROM_CONTINUE(     0x00000, 0xc000)
@@ -3066,6 +3081,8 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( tisub )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "rom_1.bin", 0x10000, 0x4000,  CRC(ed3b4a69) SHA1(c57985e8d19b2b495fc768e52b83cbbd75f027ad) )
 	ROM_CONTINUE(0x0000,0xc000)
@@ -3106,6 +3123,8 @@ ROM_END
 */
 
 ROM_START( tisuba )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "01.bin", 0x10000, 0x4000,  CRC(9967dd38) SHA1(63b74bc0c0952114b7321e8f399bd64dc293aade) )
 	ROM_CONTINUE(0x0000,0xc000)
@@ -3168,6 +3187,8 @@ Info by f205v (14/12/2008)
 ***************************************************************************/
 
 ROM_START( crsbingo )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "1.u36", 0x10000, 0x4000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
 	ROM_CONTINUE(0x0000,0xc000)
@@ -3229,6 +3250,8 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpy )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "shark_n.1.u18", 0x0a000, 0x6000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) ) // is this mapped correctly? - used during gameplay?
 	ROM_CONTINUE(0x0000, 0xa000)
@@ -3293,6 +3316,8 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpya )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "shark1.6.u18", 0x0a000, 0x6000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
 	ROM_CONTINUE(0x0000, 0xa000)
@@ -3327,6 +3352,8 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( sharkpye )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "sharkpye.u18", 0x0a000, 0x6000, CRC(12473814) SHA1(9c24ed41781aefee0161add912e730ba0d4f4d3e) )
 	ROM_CONTINUE(0x0000, 0xa000)
@@ -3365,6 +3392,8 @@ ROM_END
 ****************************************************************************/
 
 ROM_START( victor6 )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "victor_6ii-rom_1.ver2.3n.u18", 0x0a000, 0x6000, CRC(d496ecbd) SHA1(1f982b42bc46c09298916a6cb2db0b38c6451ec3) )
 	ROM_CONTINUE(0x0000, 0xa000)
@@ -3389,6 +3418,8 @@ ROM_START( victor6 )
 ROM_END
 
 ROM_START( victor6a )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "victor_6ii_alpha_1_ver2.3.u18", 0x0a000, 0x6000, CRC(2a3eaecd) SHA1(18bf2dfec8cd5690d6465f750093942afda66475) )
 	ROM_CONTINUE(0x0000, 0xa000)
@@ -3413,6 +3444,8 @@ ROM_START( victor6a )
 ROM_END
 
 ROM_START( victor6b )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "victor_6ii_rom_1_ver1.2.u18", 0x0a000, 0x6000, CRC(309876fc) SHA1(305c4cf347b512607e2c58a580075a34b48bedd5) )
 	ROM_CONTINUE(0x0000, 0xa000)
@@ -3477,6 +3510,8 @@ Info by f205v (29/12/2005)
 ***************************************************************************/
 
 ROM_START( smoto16 )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rideritaly_1ver1.6.u18", 0x0000, 0x10000, CRC(c7c0c3e8) SHA1(5dc80bc775f370653135a7b3ea9c8d3c92263804) )
 
@@ -3547,6 +3582,8 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 ***************************************************************************/
 
 ROM_START( smoto20 )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "italyv2.0-25.u18", 0x00000, 0x10000, CRC(91abc76e) SHA1(b0eb3afda1d94111056559017802b16b2e72a9a5) )
 
@@ -3580,6 +3617,8 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( stbsub )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trbon-rlu16.u12", 0x00000, 0x10000, CRC(07771290) SHA1(c485943045396d8580271504a1fec7c88579f4a2) )
 
@@ -3597,6 +3636,8 @@ ROM_START( stbsub )
 ROM_END
 
 ROM_START( stisub )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1", 0x00000, 0x10000, CRC(3f7adf66) SHA1(6ff37d070c7866133853c7cb3e2fbcb5610d87e8) )
 
@@ -3650,6 +3691,8 @@ Other:
 ***************************************************************************/
 
 ROM_START( tesorone )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tesorone.d.isol.italy_1ver2.41.u12", 0x00000, 0x10000, CRC(b019b689) SHA1(ba7acd15842b29e6ac37795a4d6e0f93d99393a4) )
 
@@ -3667,6 +3710,8 @@ ROM_START( tesorone )
 ROM_END
 
 ROM_START( tesorone230 )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tesorone.d.isol.italy_1ver2.3.u12", 0x00000, 0x10000, CRC(46cd019b) SHA1(40412ac1234ae0f31b13c4d3b48681da34f1ded9) )
 
@@ -3684,6 +3729,8 @@ ROM_START( tesorone230 )
 ROM_END
 
 ROM_START( tesorone240 )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tesorone.d.isol.italy_1ver2.4.u12", 0x00000, 0x10000, CRC(6a7d5395) SHA1(448184b78b6a3e28f891731c83a4e2d1e283c205) )
 
@@ -3716,6 +3763,8 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( mtrainnv )
+	EMPTY_HD64X180X_ROM("maincpu");
+
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mtrain_settings.bin", 0x00000, 0x10000, CRC(584af1b5) SHA1(91d966d282823dddfdc455bb03728fcdf3713dd7) )
 

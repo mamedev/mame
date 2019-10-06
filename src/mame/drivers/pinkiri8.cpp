@@ -1116,6 +1116,7 @@ GFXDECODE_END
 void pinkiri8_state::pinkiri8(machine_config &config)
 {
 	HD647180X(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_mp(1,0);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pinkiri8_state::pinkiri8_map);
 	m_maincpu->set_addrmap(AS_IO, &pinkiri8_state::pinkiri8_io);
 	m_maincpu->set_vblank_int("screen", FUNC(pinkiri8_state::nmi_line_assert));
@@ -1155,9 +1156,11 @@ void pinkiri8_state::ronjan(machine_config &config)
 ***************************************************************************/
 
 ROM_START( pinkiri8 )
+	ROM_REGION( 0x04000, "maincpu:rom", 0 )
+	ROM_LOAD( "bios.rom", 0x0000, 0x4000, CRC(399df1ee) SHA1(8251f3aa7da4c7899c8e739c10b61260f4471311) ) //overlapped internal ROM
+
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pinkiri8-ver.1.02.l1",   0x0000, 0x20000, CRC(f2df5b12) SHA1(e374e184a6a1e932550516011ec09a5accec9b03) )
-	ROM_LOAD( "bios.rom", 0x0000, 0x4000, CRC(399df1ee) SHA1(8251f3aa7da4c7899c8e739c10b61260f4471311) ) //overlapped internal ROM
 
 	ROM_REGION( 0x20000*5, "gfx1", 0 )
 	ROM_LOAD( "pinkiri8-chr-01.a1",  0x00000, 0x20000, CRC(8ec73662) SHA1(9098348e519ce753dd7f38f0d855181bfc65aa42) )
@@ -1171,9 +1174,11 @@ ROM_END
 
 
 ROM_START( janshi )
-	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "11.1l",    0x00000, 0x20000, CRC(a7692ddf) SHA1(5e7f43d8337583977baf22a28bbcd9b2182c0cde) )
+	ROM_REGION( 0x04000, "maincpu:rom", 0 )
 	ROM_LOAD( "=3= 9009 1992.1 new jansh.bin", 0x0000, 0x4000, CRC(63cd3f12) SHA1(aebac739bffaf043e6acffa978e935f73ee1385f) ) //overlapped internal ROM
+
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "11.1l",    0x00000, 0x20000, CRC(a7692ddf) SHA1(5e7f43d8337583977baf22a28bbcd9b2182c0cde) )
 
 	ROM_REGION( 0x140000, "gfx1", 0 )
 	ROM_LOAD( "1.1a", 0x000000, 0x40000, CRC(92b140a5) SHA1(f3b38563f74650604ed0faaf84460e0b04b386b7) )
@@ -1187,9 +1192,11 @@ ROM_START( janshi )
 ROM_END
 
 ROM_START( ronjans )
-	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "ver201.bin",    0x00000, 0x20000, CRC(caa98c79) SHA1(e18f52fc910e3a77142ad2a3167805cfd664f0f4) )
+	ROM_REGION( 0x04000, "maincpu:rom", 0 )
 	ROM_LOAD( "9009 1996.08 ron jan.bin", 0x00000, 0x4000, CRC(4eb74322) SHA1(84f864c0da3fb69948f6eb7ffecf0e722a882efc) ) //overlapped internal ROM
+
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ver201.bin",    0x00000, 0x20000, CRC(caa98c79) SHA1(e18f52fc910e3a77142ad2a3167805cfd664f0f4) )
 
 	ROM_REGION( 0x140000, "gfx1", 0 )
 	ROM_LOAD( "eagle.1", 0x000000, 0x40000, CRC(11cef2c4) SHA1(fcd46bfa123cd91053f8d49892778e02a275ffdd) )
@@ -1203,9 +1210,11 @@ ROM_START( ronjans )
 ROM_END
 
 ROM_START( ronjan ) // the Z180 internal ROM wasn't extracted from this PCB. Using the one from the above set for the time being, which might be the same but should be checked.
-	ROM_REGION( 0x24000, "maincpu", 0 )
-	ROM_LOAD( "9.l1",    0x00000, 0x20000, CRC(1bc4468e) SHA1(5b317c922d9a6f533958526e676f95af0ee6a19f) )
+	ROM_REGION( 0x04000, "maincpu:rom", 0 )
 	ROM_LOAD( "9009 1991.11 ron jan.bin", 0x00000, 0x4000, BAD_DUMP CRC(4eb74322) SHA1(84f864c0da3fb69948f6eb7ffecf0e722a882efc) ) //overlapped internal ROM
+
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "9.l1",    0x00000, 0x20000, CRC(1bc4468e) SHA1(5b317c922d9a6f533958526e676f95af0ee6a19f) )
 
 	ROM_REGION( 0x140000, "gfx1", 0 )
 	ROM_LOAD( "1.a1", 0x000000, 0x20000, CRC(8242a791) SHA1(bb753e81293685499513e83b7a103396b3a32ad8) )

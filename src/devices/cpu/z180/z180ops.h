@@ -27,7 +27,7 @@ inline u8 z180_device::IN(u16 port)
 	if (is_internal_io_address(port))
 		return z180_readcontrol(port);
 	m_extra_cycles += io_wait_states();
-	return m_iospace->read_byte(port);
+	return z180_read_port(port);
 }
 
 /***************************************************************
@@ -40,7 +40,7 @@ inline void z180_device::OUT(u16 port, u8 value)
 	else
 	{
 		m_extra_cycles += io_wait_states();
-		m_iospace->write_byte(port, value);
+		z180_write_port(port, value);
 	}
 }
 

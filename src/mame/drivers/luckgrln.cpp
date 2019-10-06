@@ -864,6 +864,7 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::irq)
 void luckgrln_state::luckgrln(machine_config &config)
 {
 	HD647180X(config, m_maincpu, 16000000);
+	m_maincpu->set_mp(1,0);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::mainmap);
 	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::luckgrln_io);
 	m_maincpu->set_vblank_int("screen", FUNC(luckgrln_state::irq));
@@ -932,7 +933,7 @@ void luckgrln_state::init_luckgrln()
 
 
 ROM_START( luckgrln )
-	ROM_REGION( 0x4000, "maincpu", 0 ) // internal Z180 rom
+	ROM_REGION( 0x4000, "maincpu:rom", 0 ) // internal Z180 rom
 	ROM_LOAD( "lucky74.bin",  0x00000, 0x4000, CRC(fa128e05) SHA1(97a9534b8414f984159271db48b153b0724d22f9) )
 
 	ROM_REGION( 0x20000, "rom_data", 0 ) // external data / cpu rom
@@ -950,12 +951,13 @@ ROM_START( luckgrln )
 ROM_END
 
 ROM_START( 7smash )
+	ROM_REGION( 0x4000, "maincpu:rom", 0 ) // internal Z180 rom
+	ROM_LOAD( "7smash.bin",   0x000000, 0x004000, CRC(58396efa) SHA1(b957d28e321a5c4f9a90e0a7eaf8f01450662c0e) )
+
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "eagle.8",      0x000000, 0x020000, CRC(b115c5d5) SHA1(3f80613886b7f8092ec914c9bfb416078aca82a3) )
-	ROM_LOAD( "7smash.bin",   0x000000, 0x004000, CRC(58396efa) SHA1(b957d28e321a5c4f9a90e0a7eaf8f01450662c0e) ) // internal Z180 rom
 
 	ROM_REGION( 0x20000, "rom_data", ROMREGION_ERASEFF ) // external data / cpu rom
-
 
 	ROM_REGION( 0x60000, "reels", ROMREGION_ERASE00 ) // reel gfxs
 	ROM_LOAD( "eagle.3",      0x40000, 0x020000, CRC(d75b3b2f) SHA1(1d90bc17f9e645966126fa19c42a7c4d54098776) )
