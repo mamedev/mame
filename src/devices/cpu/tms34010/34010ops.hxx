@@ -2107,7 +2107,60 @@ void tms340x0_device::cexec_s(uint16_t op)
 void tms340x0_device::clip(uint16_t op)
 {
 	if (!m_is_34020) { unimpl(op); return; }
-	logerror("020:clip\n");
+	XY daddr = DADDR_XY();
+	XY wstart = WSTART_XY();
+	XY wend = WEND_XY();
+	XY dydx = DYDX_XY();
+	// logerror("020:clip PC=0x%08x: WSTART=(%dx%d) WEND=(%dx%d) DADDR=(%dx%d) DYDX=(%dx%d)\n",
+	//		m_pc, wstart.x, wstart.y, wend.x, wend.y, daddr.x, daddr.y, dydx.x, dydx.y);
+
+	// Check whether array intersects with window...
+	bool is_l = wstart.x < (daddr.x + dydx.x);
+	bool is_r = wend.x > daddr.x;
+	bool is_t = wstart.y < (daddr.y + dydx.y);
+	bool is_b = wend.y > daddr.y;
+	if (!(is_l || is_r || is_t || is_b))
+	{
+		// ...no itersection, set flags and return
+		m_st |= STBIT_Z | STBIT_V;
+		// TODO: manual does not specify cycles, only states that this is complex instruction
+		COUNT_CYCLES(3);
+		return;
+	}
+
+	CLR_V();
+	CLR_Z();
+
+	// Handle clipping if needed
+	bool array_clipped = false;
+
+	if (wstart.x > daddr.x)
+	{
+		DADDR_X() = wstart.x;
+		array_clipped = true;
+	}
+	if (wend.x < (daddr.x + dydx.x - 1))
+	{
+		DYDX_X() = wend.x - daddr.x;
+		array_clipped = true;
+	}
+
+	if (wstart.y > daddr.y)
+	{
+		DADDR_Y() = wstart.y;
+		array_clipped = true;
+	}
+	if (wend.y < (daddr.y + dydx.y - 1))
+	{
+		DYDX_Y() = wend.y - daddr.y;
+		array_clipped = true;
+	}
+
+	if (array_clipped)
+		m_st |= STBIT_V;
+
+	// TODO: manual does not specify cycles, only states that this is complex instruction
+	COUNT_CYCLES(3);
 }
 
 void tms340x0_device::cmovcg_a(uint16_t op)
