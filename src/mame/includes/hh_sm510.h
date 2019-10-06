@@ -24,7 +24,8 @@ public:
 		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_inp_lines(0),
 		m_inp_fixed(-1),
-		m_display_wait(8)
+		m_decay_pivot(7),
+		m_decay_len(17)
 	{ }
 
 	// devices
@@ -58,7 +59,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(piezo2bit_input_w);
 
 	// display common
-	int m_display_wait;             // lcd segment on/off-delay in 1kHz ticks
+	int m_decay_pivot;              // lcd segment off-to-on delay in 1kHz ticks (affects input lag)
+	int m_decay_len;                // lcd segment on-to-off delay in 1kHz ticks (lcd persistence)
 	u8 m_display_x_len;             // lcd number of groups
 	u8 m_display_y_len;             // lcd number of segments
 	u8 m_display_z_len;             // lcd number of commons

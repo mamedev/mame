@@ -170,12 +170,13 @@ void hh_sm510_state::machine_start()
 	save_item(NAME(m_s));
 	save_item(NAME(m_r));
 
-	save_item(NAME(m_display_wait));
 	save_item(NAME(m_display_x_len));
 	save_item(NAME(m_display_y_len));
 	save_item(NAME(m_display_z_len));
 	save_item(NAME(m_display_state));
 	save_item(NAME(m_display_decay));
+	save_item(NAME(m_decay_pivot));
+	save_item(NAME(m_decay_len));
 }
 
 void hh_sm510_state::machine_reset()
@@ -205,12 +206,12 @@ TIMER_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 			// delay lcd segment on/off state
 			if (m_display_state[zx] >> y & 1)
 			{
-				if (m_display_decay[y][zx] < (2 * m_display_wait - 1))
+				if (m_display_decay[y][zx] < (m_decay_pivot + m_decay_len))
 					m_display_decay[y][zx]++;
 			}
 			else if (m_display_decay[y][zx] > 0)
 				m_display_decay[y][zx]--;
-			u8 active_state = (m_display_decay[y][zx] < m_display_wait) ? 0 : 1;
+			u8 active_state = (m_display_decay[y][zx] < m_decay_pivot) ? 0 : 1;
 
 			// SM510 series: output to x.y.z, where:
 			// x = group a/b/bs/c (0/1/2/3)
@@ -238,14 +239,12 @@ void hh_sm510_state::set_display_size(u8 x, u8 y, u8 z)
 
 WRITE16_MEMBER(hh_sm510_state::sm510_lcd_segment_w)
 {
-	m_display_wait = 8;
 	set_display_size(2, 16, 2);
 	m_display_state[offset] = data;
 }
 
 WRITE16_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
 {
-	m_display_wait = 12;
 	set_display_size(4, 4, 1);
 	m_display_state[offset] = data;
 }
@@ -1487,6 +1486,7 @@ ROM_END
 
   This is the wide screen version, there's also a silver version. Doing a
   hex-compare between the two, this one seems to be a complete rewrite.
+  FR-27 is the last G&W on SM5A, they were followed with SM51x.
 
   In 1989 Elektronika(USSR) released a clone: Космический мост (Kosmicheskiy most,
   export version: Space Bridge). This game shares the same ROM, though the
@@ -1613,7 +1613,11 @@ class gnw_tbridge_state : public hh_sm510_state
 public:
 	gnw_tbridge_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
-	{ }
+	{
+		// increase lcd decay: unwanted segments light up
+		m_decay_pivot = 25;
+		m_decay_len = 25;
+	}
 
 	void gnw_tbridge(machine_config &config);
 };
@@ -2725,7 +2729,10 @@ class gnw_squish_state : public hh_sm510_state
 public:
 	gnw_squish_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
-	{ }
+	{
+		// increase lcd decay: unwanted segments light up
+		m_decay_pivot = 17;
+	}
 
 	void gnw_squish(machine_config &config);
 };
@@ -4441,7 +4448,10 @@ class kcontra_state : public hh_sm510_state
 public:
 	kcontra_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
-	{ }
+	{
+		// increase lcd decay: score digit flickers
+		m_decay_len = 20;
+	}
 
 	void kcontra(machine_config &config);
 };
@@ -4838,7 +4848,10 @@ class knfl_state : public hh_sm510_state
 public:
 	knfl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
-	{ }
+	{
+		// increase lcd decay: too much overall flicker
+		m_decay_len = 35;
+	}
 
 	void knfl(machine_config &config);
 };
@@ -5073,7 +5086,10 @@ class kgarfld_state : public hh_sm510_state
 public:
 	kgarfld_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
-	{ }
+	{
+		// increase lcd decay: too much overall flicker
+		m_decay_len = 30;
+	}
 
 	void kgarfld(machine_config &config);
 };
