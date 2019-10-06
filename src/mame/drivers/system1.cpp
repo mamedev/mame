@@ -4710,7 +4710,7 @@ ROM_START( tokisensa )
 ROM_END
 
 
-ROM_START( wbml )
+ROM_START( wbml ) /* Sega game ID# 834-6409 MONSTER LAND */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr-11031a.90", 0x00000, 0x8000, CRC(bd3349e5) SHA1(65cc16e5d3b08429388946df254b8122ad1da339) ) /* encrypted */
 	ROM_LOAD( "epr-11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
@@ -4742,7 +4742,7 @@ ROM_START( wbml )
 	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
-ROM_START( wbmljo )
+ROM_START( wbmljo ) /* Sega game ID# 834-6409 MONSTER LAND */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr-11031.90",  0x00000, 0x8000, CRC(497ebfb4) SHA1(d90872c7d5285c85b05879bc67638f640e0339d5) ) /* encrypted */
 	ROM_LOAD( "epr-11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
