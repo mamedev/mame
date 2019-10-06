@@ -51,7 +51,8 @@ namespace plib
 		parray<std::vector<index_type>, N > nzbd;    // Support for gaussian elimination
 		// contains elimination rows below the diagonal
 		// FIXME: convert to pvector
-		std::vector<std::vector<index_type>> m_ge_par;
+		parray<index_type, (N == 0) ? 0 : (N < 0 ? N - 1 : N + 1)> ilu_rows;
+		std::vector<std::vector<index_type>> m_ge_par; // parallel execution support for Gauss
 
 		index_type nz_num;
 
@@ -62,6 +63,7 @@ namespace plib
 		, A(n*n)
 		//, nzbd(n * (n+1) / 2)
 		, nzbd(n)
+		, ilu_rows(n+1)
 		, nz_num(0)
 		, m_size(n)
 		{
@@ -167,6 +169,7 @@ namespace plib
 
 			row_idx[size()] = nz;
 			nz_num = nz;
+
 			/* build nzbd */
 
 			for (std::size_t k=0; k < size(); k++)
@@ -176,6 +179,14 @@ namespace plib
 						nzbd[k].push_back(static_cast<C>(j));
 				nzbd[k].push_back(0); // end of sequence
 			}
+
+			/* build ilu_rows */
+
+			index_type p(0);
+			for (std::size_t k=1; k < size(); k++)
+				if (row_idx[k] < diag[k])
+					ilu_rows[p++] = k;
+			ilu_rows[p] = 0; // end of array
 		}
 
 		template <typename V>
@@ -410,10 +421,14 @@ namespace plib
 			 *
 			 */
 
-			for (std::size_t i = 1; i < size(); i++) // row i
+			//for (std::size_t i = 1; i < size(); i++) // row i
+			index_type p(0);
+			while (std::size_t i = ilu_rows[p++]) // row i
 			{
 				const std::size_t p_i_end = row_idx[i + 1];
 				// loop over all columns k left of diag in row i
+				//if (row_idx[i] < diag[i])
+				//	printf("occ %d\n", (int)i);
 				for (std::size_t i_k = row_idx[i]; i_k < diag[i]; i_k++)
 				{
 					const std::size_t k = col_idx[i_k];

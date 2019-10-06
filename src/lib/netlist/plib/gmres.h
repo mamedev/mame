@@ -92,6 +92,7 @@ namespace plib
 		: m_mat(size)
 		, m_diag(size)
 		{
+			plib::unused_var(dummy);
 		}
 
 		template <typename M>
@@ -125,6 +126,39 @@ namespace plib
 		plib::parray<FT, SIZE> m_diag;
 	};
 
+	template <typename FT, int SIZE>
+	struct mat_precondition_none
+	{
+		mat_precondition_none(std::size_t size, int dummy = 0)
+		: m_mat(size)
+		{
+			plib::unused_var(dummy);
+		}
+
+		template <typename M>
+		void build(M &fill)
+		{
+			m_mat.build_from_fill_mat(fill, 0);
+		}
+
+		template<typename R, typename V>
+		void calc_rhs(R &rhs, const V &v)
+		{
+			m_mat.mult_vec(rhs, v);
+		}
+
+		void precondition()
+		{
+		}
+
+		template<typename V>
+		void solve_LU_inplace(V &v)
+		{
+		}
+
+		plib::matrix_compressed_rows_t<FT, SIZE> m_mat;
+	};
+
 	/* FIXME: hardcoding RESTART to 20 becomes an issue on very large
 	 * systems.
 	 */
@@ -156,13 +190,12 @@ namespace plib
 		std::size_t size() const { return (SIZE<=0) ? m_size : static_cast<std::size_t>(SIZE); }
 
 		template <int k, typename OPS, typename VT>
-		void do_k(OPS &ops, VT &x, FT rho_delta, int &last_k, bool dummy)
+		bool do_k(OPS &ops, VT &x, FT rho_delta, bool dummy)
 		{
+			plib::unused_var(dummy);
 			//printf("%d\n", k);
-			do_k<k-1, OPS>(ops, x, rho_delta, last_k, do_khelper<k-1>::value);
-
-			if (last_k < RESTART)
-				return;
+			if (do_k<k-1, OPS>(ops, x, rho_delta, do_khelper<k-1>::value))
+				return true;
 
 			const std::size_t kp1 = k + 1;
 			const    std::size_t n = size();
@@ -199,7 +232,6 @@ namespace plib
 
 			if (rho <= rho_delta || k == RESTART-1)
 			{
-				last_k = k;
 				/* Solve the system H * y = g */
 				/* x += m_v[j] * m_y[j]       */
 				for (std::size_t i = k + 1; i-- > 0;)
@@ -212,13 +244,18 @@ namespace plib
 
 				for (std::size_t i = 0; i <= k; i++)
 					vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
+				return true;
 			}
+			else
+				return false;
 		}
 
 		template <int k, typename OPS, typename VT>
-		void do_k(OPS &ops, VT &x, FT rho_delta, int &last_k, float dummy)
+		bool do_k(OPS &ops, VT &x, FT rho_delta, float dummy)
 		{
+			plib::unused_var(ops, x, rho_delta, dummy);
 			//printf("here\n");
+			return false;
 		}
 
 		template <typename OPS, typename VT, typename VRHS>
@@ -293,7 +330,6 @@ namespace plib
 
 			while (itr_used < itr_max)
 			{
-				int last_k = RESTART;
 				float_type rho;
 
 				ops.calc_rhs(Ax, x);
@@ -314,26 +350,11 @@ namespace plib
 				vec_set_scalar(RESTART+1, m_g, +constants<FT>::zero());
 				m_g[0] = rho;
 
-				//for (std::size_t i = 0; i < mr + 1; i++)
-				//  vec_set_scalar(mr, m_ht[i], NL_FCONST(0.0));
-
 				vec_mult_scalar(n, m_v[0], residual, constants<FT>::one() / rho);
 
-				do_k<RESTART-1>(ops, x, rho_delta, last_k, true);
-
-				bool converged(true);
-
-				if (last_k >= RESTART)
-				{
-					/* didn't converge within accuracy */
-					last_k = RESTART - 1;
-					converged = false;
-				}
-
-
-				if (converged)
+				if (do_k<RESTART-1>(ops, x, rho_delta, true))
+					// converged
 					break;
-
 			}
 			return itr_used;
 		}

@@ -101,6 +101,12 @@ namespace netlist
 	template <typename T>
 	using pool_owned_ptr = nlmempool::owned_pool_ptr<T>;
 
+	/*! Unique pointer type for pooled allocations.
+	 *
+	 */
+	template <typename T>
+	using unique_pool_ptr = nlmempool::unique_pool_ptr<T>;
+
 	inline nlmempool &pool()
 	{
 		static nlmempool static_pool;

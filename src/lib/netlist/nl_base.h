@@ -1216,7 +1216,7 @@ namespace netlist
 			nperfcount_t<true> m_stat_inc_active;
 		};
 
-		plib::unique_ptr<stats_t> m_stats;
+		unique_pool_ptr<stats_t> m_stats;
 
 		virtual void update() NL_NOEXCEPT { }
 		virtual void reset() { }
@@ -1510,7 +1510,7 @@ namespace netlist
 
 		void qpush(detail::queue_t::entry_t && e) noexcept
 		{
-			if (!USE_QUEUE_STATS || !m_stats)
+			if (!USE_QUEUE_STATS || !m_use_stats)
 				m_queue.push_nostats(std::move(e)); // NOLINT(performance-move-const-arg)
 			else
 				m_queue.push(std::move(e)); // NOLINT(performance-move-const-arg)
@@ -1519,7 +1519,7 @@ namespace netlist
 		template <class R>
 		void qremove(const R &elem) noexcept
 		{
-			if (!USE_QUEUE_STATS || !m_stats)
+			if (!USE_QUEUE_STATS || !m_use_stats)
 				m_queue.remove_nostats(elem);
 			else
 				m_queue.remove(elem);
@@ -1553,8 +1553,8 @@ namespace netlist
 
 		void print_stats() const;
 
-		bool stats_enabled() const { return m_stats; }
-		void enable_stats(bool val) { m_stats = val; }
+		bool stats_enabled() const { return m_use_stats; }
+		void enable_stats(bool val) { m_use_stats = val; }
 
 	private:
 
@@ -1571,7 +1571,7 @@ namespace netlist
 
 		PALIGNAS_CACHELINE()
 		detail::queue_t                     m_queue;
-		bool                                m_stats;
+		bool                                m_use_stats;
 
 		// performance
 		nperftime_t<true>                   m_stat_mainloop;

@@ -185,6 +185,9 @@ namespace plib {
 		template <typename T>
 		using owned_pool_ptr = plib::owned_ptr<T, arena_deleter<mempool, T>>;
 
+		template <typename T>
+		using unique_pool_ptr = std::unique_ptr<T, arena_deleter<mempool, T>>;
+
 		template<typename T, typename... Args>
 		owned_pool_ptr<T> make_poolptr(Args&&... args)
 		{
@@ -193,6 +196,22 @@ namespace plib {
 			{
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
 				return owned_pool_ptr<T>(mema, true, arena_deleter<mempool, T>(this));
+			}
+			catch (...)
+			{
+				this->deallocate(mem);
+				throw;
+			}
+		}
+
+		template<typename T, typename... Args>
+		unique_pool_ptr<T> make_unique(Args&&... args)
+		{
+			auto *mem = this->allocate(alignof(T), sizeof(T));
+			try
+			{
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return unique_pool_ptr<T>(mema, arena_deleter<mempool, T>(this));
 			}
 			catch (...)
 			{

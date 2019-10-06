@@ -190,7 +190,7 @@ netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbac
 	, m_time(netlist_time::zero())
 	, m_mainclock(nullptr)
 	, m_queue(*m_state)
-	, m_stats(false)
+	, m_use_stats(false)
 {
 	devices::initialize_factory(nlstate().setup().factory());
 	NETLIST_NAME(base)(nlstate().setup());
@@ -386,7 +386,7 @@ void netlist_state_t::reset()
 
 void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 {
-	if (!m_stats)
+	if (!m_use_stats)
 		process_queue_stats<false>(delta);
 	else
 	{
@@ -446,7 +446,7 @@ void netlist_t::process_queue_stats(const netlist_time delta) NL_NOEXCEPT
 
 void netlist_t::print_stats() const
 {
-	if (m_stats)
+	if (m_use_stats)
 	{
 		std::vector<size_t> index;
 		for (size_t i=0; i < m_state->m_devices.size(); i++)
@@ -555,7 +555,7 @@ core_device_t::core_device_t(netlist_state_t &owner, const pstring &name)
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
 	if (exec().stats_enabled())
-		m_stats = plib::make_unique<stats_t>();
+		m_stats = pool().make_unique<stats_t>();
 }
 
 core_device_t::core_device_t(core_device_t &owner, const pstring &name)
@@ -570,7 +570,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 		set_logic_family(family_TTL());
 	state().add_dev(this->name(), pool_owned_ptr<core_device_t>(this, false));
 	if (exec().stats_enabled())
-		m_stats = plib::make_unique<stats_t>();
+		m_stats = pool().make_unique<stats_t>();
 }
 
 void core_device_t::set_default_delegate(detail::core_terminal_t &term)

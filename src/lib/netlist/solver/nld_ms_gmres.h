@@ -50,7 +50,9 @@ namespace devices
 
 		using mattype = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
 
+		//plib::mat_precondition_none<FT, SIZE> m_ops;
 		plib::mat_precondition_ILU<FT, SIZE> m_ops;
+		//plib::mat_precondition_diag<FT, SIZE> m_ops;
 		plib::gmres_t<FT, SIZE> m_gmres;
 	};
 

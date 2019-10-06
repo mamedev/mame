@@ -68,7 +68,7 @@ namespace devices
 		param_num_t<std::size_t> m_gs_loops;
 		param_double_t m_gmin;
 		param_logic_t  m_pivot;
-		param_int_t m_nr_loops;
+		param_num_t<std::size_t> m_nr_loops;
 		param_double_t m_nr_recalc_delay;
 		param_int_t m_parallel;
 		param_logic_t  m_dynamic_ts;
