@@ -498,7 +498,7 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 			case 2:
 				ret |= 0x0c;
 				if(m_flop[1]->get_device() && m_flop[1]->get_device()->exists())
-						ret |= 0x03;
+					ret |= 0x03;
 				break;
 			case 3:
 			case 4:
