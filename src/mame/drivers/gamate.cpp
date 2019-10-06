@@ -152,7 +152,7 @@ void gamate_state::init_gamate()
 
 void gamate_state::machine_start()
 {
-	memset(m_ram, 0xff, 0x400);  /* memory seems to contain 0xff at power up */
+	memset(m_ram, 0xff, m_ram.bytes());  /* memory seems to contain 0xff at power up */
 	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(1000));
 
