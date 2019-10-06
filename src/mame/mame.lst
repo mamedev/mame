@@ -2597,6 +2597,10 @@ alator2                         // Alaris Tornado 2 motherboard (486)
 ochipvlp                        // Octek Hippo VL+ motherboard (486)
 sto486wb                        // Auva-Cam-33-P2 = See-Thru Sto486Wb motherboard (486)
 ga486vs                         // Gigabyte GA-486VS motherboard (486)
+amibaby                         // AMI Mark V Baby Screamer motherboard (386)
+ecsfx3000                       // Elitegroup FX-3000 motherboard (386)
+frx386c                         // Micro-Express Inc. Forex 386 Cache
+um486v                          // Elitegroup UM486V-AIO motherboard (486)
 
 @source:atari_s1.cpp
 aavenger                        //
