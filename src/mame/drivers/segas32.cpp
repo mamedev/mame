@@ -3574,6 +3574,11 @@ ROM_END
 /**************************************************************************************************************************
     Dark Edge (Japan)
     protected via FD1149 317-0204
+
+    Sega Game ID codes:
+       Game BD: 833-9230 DARK EDGE
+    ROM PCB No: 834-9231
+     A/D BD NO. 837-7968
 */
 ROM_START( darkedgej )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */

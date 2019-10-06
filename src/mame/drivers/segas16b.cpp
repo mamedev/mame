@@ -5230,6 +5230,7 @@ ROM_END
 //  Aurail, Sega System 16B
 //  CPU: FD1089A (317-0167)
 //  ROM Board type: 171-5704
+//  Sega ID# for ROM board: 834-7702
 //
 //  S1  - -
 //  S2  ---
@@ -5395,6 +5396,7 @@ ROM_END
 //  Bay Route, Sega System 16B
 //  CPU: FD1094 (317-0115)
 //  ROM Board type: 171-5704
+//  Sega ID# for ROM board: 834-7014-03
 //
 ROM_START( bayroutej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5740,7 +5742,8 @@ ROM_END
 //  Cotton (Japan), Sega System 16B
 //  CPU: FD1094 (317-0179B)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-8022-04
+//  Sega game ID: 833-8021-04 COTTON
+//     ROM board: 834-8022-04
 //
 ROM_START( cottonj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5825,7 +5828,8 @@ ROM_END
 //  Cotton (Japan), Sega System 16B
 //  CPU: FD1094 (317-0179A)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-8022-04
+//  Sega game ID: 833-8021-04 COTTON
+//     ROM board: 834-8022-04
 //
 
 ROM_START( cottonja )

@@ -2683,6 +2683,9 @@ ROM_END
     Moonwalker, Sega System 18
     CPU: FD1094 (317-0159)
     ROM Board: 171-5873B
+   Main board: 837-7530-02
+      Game BD: 833-7528-02 MOONWALKER
+    ROM Board: 834-7529-02
 */
 ROM_START( mwalk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom cpu 317-0159
