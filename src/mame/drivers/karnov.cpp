@@ -29,9 +29,6 @@
     roms work fine.
     ^^ This should be added (DH, 30/03/11)
 
-    One of the two color PROMs for chelnov and chelnoj is different; one is most
-    likely a bad read, but I don't know which one.
-
     Thanks to Oliver Stabel <stabel@rhein-neckar.netsurf.de> for confirming some
     of the sprite & control information :)
 
