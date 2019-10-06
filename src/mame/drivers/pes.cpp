@@ -184,7 +184,7 @@ void pes_state::pes(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	TMS5220C(config, m_speech, 640000); /* 640Khz clock, 8khz sample-rate, adjustable with 10-turn trimpot */
+	TMS5220C(config, m_speech, 720000); /* 720Khz clock, 9khz sample-rate, adjustable with 10-turn trimpot */
 	m_speech->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	GENERIC_TERMINAL(config, m_terminal, 0);
