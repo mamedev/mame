@@ -141,11 +141,7 @@ class towns_state : public driver_device
 	void townsmx(machine_config &config);
 	void townssj(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
 	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
-	DECLARE_READ16_MEMBER(towns_scsi_dma_r);
-	DECLARE_WRITE16_MEMBER(towns_scsi_dma_w);
 	
 protected:
 	uint16_t m_towns_machine_id;  // default is 0x0101
@@ -168,6 +164,11 @@ protected:
 	optional_device<fmscsi_device> m_scsi;
 	required_device_array<floppy_connector, 2> m_flop;
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
+	DECLARE_READ16_MEMBER(towns_scsi_dma_r);
+	DECLARE_WRITE16_MEMBER(towns_scsi_dma_w);
 
 private:
 	/* devices */

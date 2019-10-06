@@ -492,14 +492,12 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 			{
 			case 1:
 				ret |= 0x0c;
-				if(m_flop[0]->get_device())
-					if(m_flop[0]->get_device()->exists())
-						ret |= 0x03;
+				if(m_flop[0]->get_device() && m_flop[0]->get_device()->exists())
+					ret |= 0x03;
 				break;
 			case 2:
 				ret |= 0x0c;
-				if(m_flop[1]->get_device())
-					if(m_flop[1]->get_device()->exists())
+				if(m_flop[1]->get_device() && m_flop[1]->get_device()->exists())
 						ret |= 0x03;
 				break;
 			case 3:
@@ -2908,13 +2906,13 @@ void towns16_state::townsux(machine_config &config)
 
 	FMSCSI(config, m_scsi, 0);
 	m_scsi->set_scsi_port("scsi");
-	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
-	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
+	m_scsi->irq_handler().set(FUNC(towns16_state::towns_scsi_irq));
+	m_scsi->drq_handler().set(FUNC(towns16_state::towns_scsi_drq));
 
-	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
-	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
-	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+	m_dma[0]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
+	m_dma[0]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
+	m_dma[1]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
+	m_dma[1]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
 
 	// 2 MB onboard, one SIMM slot with 2-8 MB
 	m_ram->set_default_size("2M").set_extra_options("4M,6M,10M");
