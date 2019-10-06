@@ -278,6 +278,10 @@ int renderer_bgfx::create()
 		{
 			init.type = bgfx::RendererType::Direct3D11;
 		}
+		else if (backend == "dx12" || backend == "d3d12")
+		{
+			init.type = bgfx::RendererType::Direct3D12;
+		}
 		else if (backend == "gles")
 		{
 			init.type = bgfx::RendererType::OpenGLES;
@@ -285,6 +289,10 @@ int renderer_bgfx::create()
 		else if (backend == "glsl" || backend == "opengl")
 		{
 			init.type = bgfx::RendererType::OpenGL;
+		}
+		else if (backend == "vulkan")
+		{
+			init.type = bgfx::RendererType::Vulkan;
 		}
 		else if (backend == "metal")
 		{
