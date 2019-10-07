@@ -109,7 +109,7 @@ DEBUG TRICKS:
 #define LOG_ALL			(LOG_UNKNOWNS | LOG_DMA | LOG_VIDEO | LOG_HFVIDEO | LOG_IRQS | LOG_SOUND)
 #define LOG_DEFAULT		(LOG_ALL & ~(LOG_HFVIDEO))
 
-#define VERBOSE			(LOG_DEFAULT)
+#define VERBOSE			(0)
 #include "logmacro.h"
 
 struct acan_dma_regs_t
@@ -748,8 +748,6 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 		int prio = (supracan_vram[i + 2] >> 9) & 3;
 		//int xscale = supracan_vram[i + 2] >> 13;
 		gfx_element *gfx = m_gfxdecode->gfx(region);
-		if (machine().input().code_pressed(KEYCODE_W))
-			printf("P:%d M:%d | ", (supracan_vram[i + 2] >> 9) & 3, (supracan_vram[i + 1] >> 8) & 3);
 
 		// wraparound
 		if (y >= 0x180) y -= 0x200;
@@ -840,9 +838,6 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 
 		}
 	}
-
-	if (machine().input().code_pressed(KEYCODE_W))
-		printf("\n");
 }
 
 
@@ -988,9 +983,6 @@ uint32_t supracan_state::screen_update_supracan(screen_device &screen, bitmap_in
 	int xsize = 0, ysize = 0;
 //  int tilemap_num;
 	int priority = 0;
-
-	if (machine().input().code_pressed(KEYCODE_W))
-		printf("%3d..%3d: %d %d %d %d\n", cliprect.min_y, cliprect.max_y, m_tilemap_flags[0] >> 13, m_tilemap_flags[1] >> 13, m_tilemap_flags[2] >> 13, m_roz_mode >> 13);
 
 	for (int pri = 7; pri >= 0; pri--)
 	{
