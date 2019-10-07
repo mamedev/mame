@@ -226,8 +226,8 @@ private:
 
 	tilemap_t *m_tilemap_sizes[4][4];
 	bitmap_ind16 m_sprite_final_bitmap;
-	bitmap_ind16 m_sprite_mask_bitmap;
-	bitmap_ind16 m_sprite_masked_bitmap;
+	bitmap_ind8 m_sprite_mask_bitmap;
+	bitmap_ind8 m_prio_bitmap;
 	void write_swapped_byte(int offset, uint8_t byte);
 	TILE_GET_INFO_MEMBER(get_supracan_tilemap0_tile_info);
 	TILE_GET_INFO_MEMBER(get_supracan_tilemap1_tile_info);
@@ -249,9 +249,12 @@ private:
 	void supracan_tilemap_get_info_common(int layer, tile_data &tileinfo, int count);
 	void supracan_tilemap_get_info_roz(int layer, tile_data &tileinfo, int count);
 	int get_tilemap_dimensions(int &xsize, int &ysize, int layer);
-	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &maskmap, bitmap_ind16 &maskedmap, const rectangle &cliprect);
+	void draw_sprite_tile(bitmap_ind16 &dst, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette, bool xflip, bool yflip, int dstx, int dsty, int prio);
+	void draw_sprite_tile_mask(bitmap_ind8 &dst, const rectangle &cliprect, gfx_element *gfx, int tile, bool xflip, bool yflip, int dstx, int dsty);
+	void draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mask, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette, bool xflip, bool yflip, int dstx, int dsty, int prio);
+	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bitmap_ind8 &priomap, const rectangle &cliprect);
 	void mark_active_tilemap_all_dirty(int layer);
-	void supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
+	void draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 	void supracan_mem(address_map &map);
 	void supracan_sound_mem(address_map &map);
 };
@@ -417,8 +420,8 @@ TILE_GET_INFO_MEMBER(supracan_state::get_supracan_roz_tile_info)
 void supracan_state::video_start()
 {
 	m_sprite_final_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
-	m_sprite_mask_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
-	m_sprite_masked_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
+	m_sprite_mask_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND8);
+	m_prio_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND8);
 
 	m_vram_addr_swapped.resize(0x20000); // hack for 1bpp layer at startup
 	m_gfxdecode->gfx(4)->set_source(&m_vram_addr_swapped[0]);
@@ -479,9 +482,229 @@ int supracan_state::get_tilemap_dimensions(int &xsize, int &ysize, int layer)
 	}
 }
 
+void supracan_state::draw_sprite_tile(bitmap_ind16 &dst, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette,
+	bool xflip, bool yflip, int dstx, int dsty, int prio)
+{
+	// compute final pixel in X and exit if we are entirely clipped
+	int dstendx = dstx + 7;
+	if (dstx > cliprect.right() || dstendx < cliprect.left())
+		return;
 
+	// apply left clip
+	int srcx = 0;
+	if (dstx < cliprect.left())
+	{
+		srcx = cliprect.left() - dstx;
+		dstx = cliprect.left();
+	}
 
-void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &maskmap, bitmap_ind16 &maskedmap, const rectangle &cliprect)
+	// apply right clip
+	if (dstendx > cliprect.right())
+		dstendx = cliprect.right();
+
+	// compute final pixel in Y and exit if we are entirely clipped
+	int dstendy = dsty + 7;
+	if (dsty > cliprect.bottom() || dstendy < cliprect.top())
+		return;
+
+	// apply top clip
+	int srcy = 0;
+	if (dsty < cliprect.top())
+	{
+		srcy = cliprect.top() - dsty;
+		dsty = cliprect.top();
+	}
+
+	// apply bottom clip
+	if (dstendy > cliprect.bottom())
+		dstendy = cliprect.bottom();
+
+	// apply X flipping
+	int dx = 1;
+	if (xflip)
+	{
+		srcx = 7 - srcx;
+		dx = -dx;
+	}
+
+	// apply Y flipping
+	int dy = gfx->rowbytes();
+	if (yflip)
+	{
+		srcy = 7 - srcy;
+		dy = -dy;
+	}
+
+	const int color = gfx->colorbase() + gfx->granularity() * (palette % gfx->colors());
+	const uint8_t *src_data = &gfx->get_data(tile % gfx->elements())[srcy * gfx->rowbytes()];
+	for (int y = dsty; y <= dstendy; y++)
+	{
+		const uint8_t *srcp = &src_data[srcx];
+		uint8_t *priop = &priomap.pix8(y, dstx);
+		uint16_t *dstp = &dst.pix16(y, dstx);
+		for (int x = dstx; x <= dstendx; x++)
+		{
+			const uint32_t srcdata = *srcp;
+			if (srcdata != 0)
+			{
+				*dstp = (uint16_t)(srcdata + color);
+				*priop = (*priop & 0xf0) | (uint8_t)prio;
+			}
+			srcp += dx;
+			priop++;
+			dstp++;
+		}
+		src_data += dy;
+	}
+}
+
+void supracan_state::draw_sprite_tile_mask(bitmap_ind8 &dst, const rectangle &cliprect, gfx_element *gfx, int tile, bool xflip, bool yflip, int dstx, int dsty)
+{
+	// compute final pixel in X and exit if we are entirely clipped
+	int dstendx = dstx + 7;
+	if (dstx > cliprect.right() || dstendx < cliprect.left())
+		return;
+
+	// apply left clip
+	int srcx = 0;
+	if (dstx < cliprect.left())
+	{
+		srcx = cliprect.left() - dstx;
+		dstx = cliprect.left();
+	}
+
+	// apply right clip
+	if (dstendx > cliprect.right())
+		dstendx = cliprect.right();
+
+	// compute final pixel in Y and exit if we are entirely clipped
+	int dstendy = dsty + 7;
+	if (dsty > cliprect.bottom() || dstendy < cliprect.top())
+		return;
+
+	// apply top clip
+	int srcy = 0;
+	if (dsty < cliprect.top())
+	{
+		srcy = cliprect.top() - dsty;
+		dsty = cliprect.top();
+	}
+
+	// apply bottom clip
+	if (dstendy > cliprect.bottom())
+		dstendy = cliprect.bottom();
+
+	// apply X flipping
+	int dx = 1;
+	if (xflip)
+	{
+		srcx = 7 - srcx;
+		dx = -dx;
+	}
+
+	// apply Y flipping
+	int dy = gfx->rowbytes();
+	if (yflip)
+	{
+		srcy = 7 - srcy;
+		dy = -dy;
+	}
+
+	const uint8_t *src_data = &gfx->get_data(tile % gfx->elements())[srcy * gfx->rowbytes()];
+	for (int y = dsty; y <= dstendy; y++)
+	{
+		const uint8_t *srcp = &src_data[srcx];
+		uint8_t *dstp = &dst.pix8(y, dstx);
+		for (int x = dstx; x <= dstendx; x++)
+		{
+			if (*srcp)
+				*dstp = 1;
+			srcp += dx;
+			dstp++;
+		}
+		src_data += dy;
+	}
+}
+
+void supracan_state::draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mask, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile,
+	int palette, bool xflip, bool yflip, int dstx, int dsty, int prio)
+{
+	// compute final pixel in X and exit if we are entirely clipped
+	int dstendx = dstx + 7;
+	if (dstx > cliprect.right() || dstendx < cliprect.left())
+		return;
+
+	// apply left clip
+	int srcx = 0;
+	if (dstx < cliprect.left())
+	{
+		srcx = cliprect.left() - dstx;
+		dstx = cliprect.left();
+	}
+
+	// apply right clip
+	if (dstendx > cliprect.right())
+		dstendx = cliprect.right();
+
+	// compute final pixel in Y and exit if we are entirely clipped
+	int dstendy = dsty + 7;
+	if (dsty > cliprect.bottom() || dstendy < cliprect.top())
+		return;
+
+	// apply top clip
+	int srcy = 0;
+	if (dsty < cliprect.top())
+	{
+		srcy = cliprect.top() - dsty;
+		dsty = cliprect.top();
+	}
+
+	// apply bottom clip
+	if (dstendy > cliprect.bottom())
+		dstendy = cliprect.bottom();
+
+	// apply X flipping
+	int dx = 1;
+	if (xflip)
+	{
+		srcx = 7 - srcx;
+		dx = -dx;
+	}
+
+	// apply Y flipping
+	int dy = gfx->rowbytes();
+	if (yflip)
+	{
+		srcy = 7 - srcy;
+		dy = -dy;
+	}
+
+	const int color = gfx->colorbase() + gfx->granularity() * (palette % gfx->colors());
+	const uint8_t *src_data = &gfx->get_data(tile % gfx->elements())[srcy * gfx->rowbytes()];
+	for (int y = dsty; y <= dstendy; y++)
+	{
+		const uint8_t *srcp = &src_data[srcx];
+		uint16_t *dstp = &dst.pix16(y, dstx);
+		uint8_t *priop = &priomap.pix8(y, dstx);
+		uint8_t *maskp = &mask.pix8(y, dstx);
+		for (int x = dstx; x <= dstendx; x++)
+		{
+			const uint32_t srcdata = *srcp;
+			if (srcdata != 0 && *maskp != 0)
+			{
+				*dstp = (uint16_t)(srcdata + color);
+				*priop = (*priop & 0xf0) | (uint8_t)prio;
+			}
+			srcp += dx;
+			dstp++;
+			priop++;
+			maskp++;
+		}
+		src_data += dy;
+	}
+}
+
+void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bitmap_ind8 &priomap, const rectangle &cliprect)
 {
 	uint16_t *supracan_vram = m_vram;
 
@@ -496,7 +719,9 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &maskmap, b
 //      ---- --mm ---- ---- Masking mode
 //      ---- ---- ---- -www X size
 //      [2]
-//      zzzz ---- ---- ---- X scale
+//      zzz- ---- ---- ---- X scale
+//      ---- ???- ---- ---- Unknown, but often written.
+//                          Values include 111 and 110 for the Super A'Can logo, 110 in the Sango Fighter intro, and 101/100 in the Boom Zoo intro.
 //      ---- ---x xxxx xxxx X position
 //      [3]
 //      d--- ---- ---- ---- Direct Sprite (use details from here, not looked up in vram)
@@ -520,9 +745,11 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &maskmap, b
 		int mask = (supracan_vram[i + 1] & 0x0300) >> 8;
 		int sprite_xflip = (supracan_vram[i + 1] & 0x0800) >> 11;
 		int sprite_yflip = (supracan_vram[i + 1] & 0x0400) >> 10;
-		//int xscale = (supracan_vram[i + 2] & 0xf000) >> 12;
+		int prio = (supracan_vram[i + 2] >> 9) & 3;
+		//int xscale = supracan_vram[i + 2] >> 13;
 		gfx_element *gfx = m_gfxdecode->gfx(region);
-		bitmap_ind16 &dst = (mask & 2) ? maskmap : bitmap;
+		if (machine().input().code_pressed(KEYCODE_W))
+			printf("P:%d M:%d | ", (supracan_vram[i + 2] >> 9) & 3, (supracan_vram[i + 1] >> 8) & 3);
 
 		// wraparound
 		if (y >= 0x180) y -= 0x200;
@@ -556,28 +783,12 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &maskmap, b
 
 				// printf("sprite data %04x %04x %04x %04x\n", supracan_vram[i+0] , supracan_vram[i+1] , supracan_vram[i+2] ,supracan_vram[i+3]  );
 
-				if (mask == 1)
-				{
-					gfx->transpen(maskedmap, cliprect, tile, palette, sprite_xflip, sprite_yflip, x, y, 0);
-					for (int py = 0; py < 8; py++)
-					{
-						uint16_t *dstp = &bitmap.pix16(y + py, x);
-						uint16_t *maskp = &maskmap.pix16(y + py, x);
-						uint16_t *maskedp = &maskedmap.pix16(y + py, x);
-						for (int px = 0; px < 8; px++)
-						{
-							if (*maskp)
-								*dstp = *maskedp;
-							dstp++;
-							maskp++;
-							maskedp++;
-						}
-					}
-				}
+				if (mask > 1)
+					draw_sprite_tile_mask(maskmap, cliprect, gfx, tile, sprite_xflip, sprite_yflip, x, y);
+				else if (mask == 1)
+					draw_sprite_tile_masked(bitmap, maskmap, priomap, cliprect, gfx, tile, palette, sprite_xflip, sprite_yflip, x, y, prio);
 				else
-				{
-					gfx->transpen(dst, cliprect, tile, palette, sprite_xflip, sprite_yflip, x, y, 0);
-				}
+					draw_sprite_tile(bitmap, priomap, cliprect, gfx, tile, palette, sprite_xflip, sprite_yflip, x, y, prio);
 			}
 			else
 			{
@@ -589,59 +800,24 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &maskmap, b
 
 				for (int ytile = 0; ytile < ysize; ytile++)
 				{
-					for (int xtile = 0; xtile< xsize; xtile++)
+					for (int xtile = 0; xtile < xsize; xtile++)
 					{
 						uint16_t data = supracan_vram[(sprite_offset + ytile * xsize + xtile) & VRAM_MASK];
 						int tile = (bank * 0x200) + (data & 0x03ff);
 						int palette = (data & 0xf000) >> 12;
 
-						int ypos;
-						if (!sprite_yflip)
-						{
-							ypos = y + ytile*8;
-						}
-						else
-						{
-							ypos = y - (ytile+1)*8;
-							ypos += ysize*8;
-						}
-
-						int xpos;
-						if (!sprite_xflip)
-						{
-							xpos = x + xtile*8;
-						}
-						else
-						{
-							xpos = x - (xtile+1)*8;
-							xpos += xsize*8;
-						}
+						int xpos = sprite_xflip ? (x - (xtile + 1) * 8 + xsize * 8) : (x + xtile * 8);
+						int ypos = sprite_yflip ? (y - (ytile + 1) * 8 + ysize * 8) : (y + ytile * 8);
 
 						int tile_xflip = sprite_xflip ^ ((data & 0x0800) >> 11);
 						int tile_yflip = sprite_yflip ^ ((data & 0x0400) >> 10);
 
-						if (mask == 1)
-						{
-							gfx->transpen(maskedmap, cliprect, tile, palette, tile_xflip, tile_yflip, xpos, ypos, 0);
-							for (int py = 0; py < 8; py++)
-							{
-								uint16_t *dstp = &bitmap.pix16(y + ytile*8 + py, x + xtile*8);
-								uint16_t *maskp = &maskmap.pix16(y + ytile*8 + py, x + xtile*8);
-								uint16_t *maskedp = &maskedmap.pix16(y + ytile*8 + py, x + xtile*8);
-								for (int px = 0; px < 8; px++)
-								{
-									if (*maskp)
-										*dstp = *maskedp;
-									dstp++;
-									maskp++;
-									maskedp++;
-								}
-							}
-						}
+						if (mask > 1)
+							draw_sprite_tile_mask(maskmap, cliprect, gfx, tile, tile_xflip, tile_yflip, xpos, ypos);
+						else if (mask == 1)
+							draw_sprite_tile_masked(bitmap, maskmap, priomap, cliprect, gfx, tile, palette, tile_xflip, tile_yflip, xpos, ypos, prio);
 						else
-						{
-							gfx->transpen(dst, cliprect, tile, palette, tile_xflip, tile_yflip, xpos, ypos, 0);
-						}
+							draw_sprite_tile(bitmap, priomap, cliprect, gfx, tile, palette, tile_xflip, tile_yflip, xpos, ypos, prio);
 					}
 				}
 			}
@@ -664,6 +840,9 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &maskmap, b
 
 		}
 	}
+
+	if (machine().input().code_pressed(KEYCODE_W))
+		printf("\n");
 }
 
 
@@ -681,21 +860,14 @@ void supracan_state::mark_active_tilemap_all_dirty(int layer)
 
 
 
-/* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-void supracan_state::supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask)
+/* draws tilemap with linescroll OR columnscroll to 16-bit indexed bitmap */
+void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask)
 {
-	//bitmap_ind16 *destbitmap = bitmap;
 	bitmap_ind16 &srcbitmap = tmap->pixmap();
-	//bitmap_ind16 &srcbitmapflags = tmap->flagsmap();
 	const int xmask = srcbitmap.width() - 1;
 	const int ymask = srcbitmap.height() - 1;
 	const int widthshifted = srcbitmap.width() << 16;
 	const int heightshifted = srcbitmap.height() << 16;
-//  uint8_t* destflags;
-//  uint8_t *pri;
-	//const uint16_t *src;
-	//const uint8_t *maskptr;
-	//int destadvance = destbitmap->bpp / 8;
 
 	/* pre-advance based on the cliprect */
 	startx += cliprect.min_x * incxx + cliprect.min_y * incyx;
@@ -718,7 +890,6 @@ void supracan_state::supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rect
 
 			/* get dest and priority pointers */
 			uint16_t *dest = &bitmap.pix16(sy, sx);
-			//destflags = &bitmapflags->pix8(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
@@ -734,8 +905,6 @@ void supracan_state::supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rect
 
 						if ((data & transmask) != 0)
 							dest[0] = data;
-
-						//destflags[0] = &srcbitmapflags.pix8(((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
 					}
 					else
 					#endif
@@ -744,9 +913,7 @@ void supracan_state::supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rect
 						uint16_t data =  srcbitmap.pix16((cy >> 16) & ymask, ((cx >> 16) - scroll) & xmask);
 
 						if ((data & transmask) != 0)
-							dest[0] = data;
-
-						//destflags[0] = &srcbitmapflags.pix8((cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+							*dest = data;
 					}
 				}
 
@@ -755,8 +922,6 @@ void supracan_state::supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rect
 				cy += incxy;
 				x++;
 				dest++;
-//            destflags++;
-//            pri++;
 			}
 
 			/* advance in Y */
@@ -803,26 +968,29 @@ uint32_t supracan_state::screen_update_supracan(screen_device &screen, bitmap_in
 
 			m_sprite_final_bitmap.fill(0x00, visarea);
 			m_sprite_mask_bitmap.fill(0x00, cliprect);
-			m_sprite_masked_bitmap.fill(0x00, cliprect);
+			m_prio_bitmap.fill(0xff, cliprect);
 			bitmap.fill(0x80, visarea);
 
-			draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_sprite_masked_bitmap, visarea);
+			draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_prio_bitmap, visarea);
 		}
 	}
 	else
 	{
 		m_sprite_final_bitmap.fill(0x00, cliprect);
 		m_sprite_mask_bitmap.fill(0x00, cliprect);
-		m_sprite_masked_bitmap.fill(0x00, cliprect);
+		m_prio_bitmap.fill(0xff, cliprect);
 		bitmap.fill(0x80, cliprect);
 
-		draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_sprite_masked_bitmap, cliprect);
+		draw_sprites(m_sprite_final_bitmap, m_sprite_mask_bitmap, m_prio_bitmap, cliprect);
 	}
 
 	// mix screen
 	int xsize = 0, ysize = 0;
 //  int tilemap_num;
 	int priority = 0;
+
+	if (machine().input().code_pressed(KEYCODE_W))
+		printf("%3d..%3d: %d %d %d %d\n", cliprect.min_y, cliprect.max_y, m_tilemap_flags[0] >> 13, m_tilemap_flags[1] >> 13, m_tilemap_flags[2] >> 13, m_roz_mode >> 13);
 
 	for (int pri = 7; pri >= 0; pri--)
 	{
@@ -897,6 +1065,7 @@ uint32_t supracan_state::screen_update_supracan(screen_device &screen, bitmap_in
 									continue;
 
 							uint16_t* src = &src_bitmap.pix16(realy & ((ysize * 8) - 1));
+							uint8_t* priop = &m_prio_bitmap.pix8(y);
 
 							for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 							{
@@ -909,8 +1078,11 @@ uint32_t supracan_state::screen_update_supracan(screen_device &screen, bitmap_in
 
 								uint16_t srcpix = src[realx & ((xsize * 8) - 1)];
 
-								if ((srcpix & transmask) != 0)
+								if ((srcpix & transmask) != 0 && priority < (priop[x] >> 4))
+								{
 									screen[x] = srcpix;
+									priop[x] = (priop[x] & 0x0f) | (priority << 4);
+								}
 							}
 						}
 					}
@@ -967,12 +1139,12 @@ uint32_t supracan_state::screen_update_supracan(screen_device &screen, bitmap_in
 								if (incxx & 0x8000) incxx -= 0x10000;
 
 								if (m_vram[m_roz_unk_base0/2 + y]) // incxx = 0, no draw?
-									supracan_suprnova_draw_roz(bitmap, clip, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+									draw_roz_layer(bitmap, clip, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 							}
 						}
 						else
 						{
-							supracan_suprnova_draw_roz(bitmap, cliprect, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+							draw_roz_layer(bitmap, cliprect, m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 						}
 					}
 				}
@@ -981,18 +1153,24 @@ uint32_t supracan_state::screen_update_supracan(screen_device &screen, bitmap_in
 	}
 
 
-	// just draw the sprites on top for now
+	// combine sprites
 	if (m_video_flags & 0x08)
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint16_t* src = &m_sprite_final_bitmap.pix16(y);
-			uint16_t* dst = &bitmap.pix16(y);
+			uint16_t* dstp = &bitmap.pix16(y);
+			uint8_t* priop = &m_prio_bitmap.pix8(y);
+			uint16_t* spritep = &m_sprite_final_bitmap.pix16(y);
 
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				uint16_t dat = src[x];
-				if (dat) dst[x] = dat;
+				uint16_t sprite_pix = spritep[x];
+				uint8_t tile_prio = priop[x] >> 4;
+				uint8_t sprite_prio = priop[x] & 0x0f;
+				if (sprite_pix != 0 && sprite_prio <= tile_prio)
+				{
+					dstp[x] = sprite_pix;
+				}
 			}
 		}
 	}
