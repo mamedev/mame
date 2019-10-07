@@ -187,98 +187,6 @@ void hh_sm510_state::machine_reset()
 
 /***************************************************************************
 
-  Common Machine Configurations
-
-***************************************************************************/
-
-static const s16 piezo2bit_r1_120k_s1_39k[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff }; // R via 120K resistor, S1 via 39K resistor (eg. tsonic, tsonic2, tbatmana)
-
-void hh_sm510_state::common_base(machine_config &config, u16 width, u16 height)
-{
-	/* basic machine hardware */
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(width, height);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-void hh_sm510_state::sm500_base(machine_config &config, u16 width, u16 height)
-{
-	common_base(config, width, height);
-
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-}
-
-void hh_sm510_state::sm510_base(machine_config &config, u16 width, u16 height)
-{
-	common_base(config, width, height);
-
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-}
-
-void hh_sm510_state::common_sm511(machine_config &config, u16 width, u16 height)
-{
-	SM511(config, m_maincpu);
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	sm510_base(config, width, height);
-}
-
-void hh_sm510_state::konami_sm510(machine_config &config, u16 width, u16 height)
-{
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2);
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	sm510_base(config, width, height);
-}
-
-void hh_sm510_state::tiger_sm510_1bit(machine_config &config, u16 width, u16 height)
-{
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	sm510_base(config, width, height);
-}
-
-void hh_sm510_state::tiger_sm511_1bit(machine_config &config, u16 width, u16 height)
-{
-	common_sm511(config, width, height);
-
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-}
-
-void hh_sm510_state::tiger_sm511_2bit(machine_config &config, u16 width, u16 height)
-{
-	SM511(config, m_maincpu);
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	sm510_base(config, width, height);
-
-	m_speaker->set_levels(4, piezo2bit_r1_120k_s1_39k);
-}
-
-
-/***************************************************************************
-
   Helper Functions
 
 ***************************************************************************/
@@ -431,11 +339,101 @@ WRITE8_MEMBER(hh_sm510_state::piezo2bit_input_w)
 
 /***************************************************************************
 
-  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+  Common Machine Configurations
 
 ***************************************************************************/
 
+// misc
+
+static const s16 piezo2bit_r1_120k_s1_39k[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff }; // R via 120K resistor, S1 via 39K resistor (eg. tsonic, tsonic2, tbatmana)
+
+void hh_sm510_state::common_base(machine_config &config, u16 width, u16 height)
+{
+	/* basic machine hardware */
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(width, height);
+	screen.set_visarea_full();
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void hh_sm510_state::sm500_base(machine_config &config, u16 width, u16 height)
+{
+	common_base(config, width, height);
+
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+}
+
+void hh_sm510_state::sm510_base(machine_config &config, u16 width, u16 height)
+{
+	common_base(config, width, height);
+
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+}
+
+void hh_sm510_state::common_sm511(machine_config &config, u16 width, u16 height)
+{
+	SM511(config, m_maincpu);
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+
+	sm510_base(config, width, height);
+}
+
+void hh_sm510_state::konami_sm510(machine_config &config, u16 width, u16 height)
+{
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2);
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+
+	sm510_base(config, width, height);
+}
+
+void hh_sm510_state::tiger_sm510_1bit(machine_config &config, u16 width, u16 height)
+{
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	sm510_base(config, width, height);
+}
+
+void hh_sm510_state::tiger_sm511_1bit(machine_config &config, u16 width, u16 height)
+{
+	common_sm511(config, width, height);
+
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+}
+
+void hh_sm510_state::tiger_sm511_2bit(machine_config &config, u16 width, u16 height)
+{
+	SM511(config, m_maincpu);
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	sm510_base(config, width, height);
+
+	m_speaker->set_levels(4, piezo2bit_r1_120k_s1_39k);
+}
+
+
 namespace {
+
+// Game & Watch
 
 class gnw_state : public hh_sm510_state
 {
@@ -605,6 +603,13 @@ void gnw_state::gnw_dualv(machine_config &config, u16 topwidth, u16 topheight, u
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+
+
+/***************************************************************************
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+***************************************************************************/
 
 /***************************************************************************
 
