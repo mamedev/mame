@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -46,7 +46,7 @@ namespace entry
 		virtual bool open(const bx::FilePath& _filePath, bx::Error* _err) override
 		{
 			String filePath(s_currentDir);
-			filePath.append(_filePath.get() );
+			filePath.append(_filePath);
 			return super::open(filePath.getPtr(), _err);
 		}
 	};
@@ -59,7 +59,7 @@ namespace entry
 		virtual bool open(const bx::FilePath& _filePath, bool _append, bx::Error* _err) override
 		{
 			String filePath(s_currentDir);
-			filePath.append(_filePath.get() );
+			filePath.append(_filePath);
 			return super::open(filePath.getPtr(), _append, _err);
 		}
 	};
@@ -446,10 +446,11 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		return bx::kExitFailure;
 	}
 
-	AppI::AppI(const char* _name, const char* _description)
+	AppI::AppI(const char* _name, const char* _description, const char* _url)
 	{
 		m_name        = _name;
 		m_description = _description;
+		m_url         = _url;
 		m_next        = s_apps;
 
 		s_apps = this;
@@ -488,6 +489,11 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 	const char* AppI::getDescription() const
 	{
 		return m_description;
+	}
+
+	const char* AppI::getUrl() const
+	{
+		return m_url;
 	}
 
 	AppI* AppI::getNext()
@@ -752,7 +758,7 @@ restart:
 				case Event::DropFile:
 					{
 						const DropFileEvent* drop = static_cast<const DropFileEvent*>(ev);
-						DBG("%s", drop->m_filePath.get() );
+						DBG("%s", drop->m_filePath.getCPtr() );
 					}
 					break;
 
