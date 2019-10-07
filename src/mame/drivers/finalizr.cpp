@@ -274,6 +274,7 @@ void finalizr_state::finalizr(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &finalizr_state::sound_io_map);
 	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_audiocpu->p2_out_cb().set(FUNC(finalizr_state::i8039_irqen_w));
+	//m_audiocpu->set_t0_clk_cb(finalizr_state::i8039_t0_w));
 	m_audiocpu->t1_in_cb().set(FUNC(finalizr_state::i8039_t1_r));
 
 	WATCHDOG_TIMER(config, "watchdog");

@@ -82,18 +82,6 @@ protected:
 
 	void common_sm511(machine_config &config, u16 width, u16 height);
 
-	void gnw_sm5a(machine_config &config, u16 width, u16 height);
-	void gnw_sm5a_matrix(machine_config &config, u16 width, u16 height);
-	void gnw_kb1013vk12_matrix(machine_config &config, u16 width, u16 height);
-	void gnw_sm510(machine_config &config, u16 width, u16 height);
-	void gnw_sm511(machine_config &config, u16 width, u16 height);
-	void gnw_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
-	void gnw_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
-	void gnw_sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
-	void gnw_sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
-	void gnw_sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
-	void gnw_sm512_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
-
 	void konami_sm510(machine_config &config, u16 width, u16 height);
 
 	void tiger_sm510_1bit(machine_config &config, u16 width, u16 height);
