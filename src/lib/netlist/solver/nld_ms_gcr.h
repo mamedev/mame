@@ -283,12 +283,8 @@ namespace devices
 		strm.writeline("{\n");
 		csc_private(strm);
 		strm.writeline("}\n");
-		// mingw 5.3 workaround
-#if !defined(_WIN32) && !defined(_WIN64)
-		return std::pair<pstring, pstring>(name, t.str());
-#else
+		// some compilers (_WIN32, _WIN64, mac osx) need an explicit cast
 		return std::pair<pstring, pstring>(name, pstring(t.str()));
-#endif
 	}
 
 	template <typename FT, int SIZE>
