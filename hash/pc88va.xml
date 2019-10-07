@@ -731,19 +731,19 @@ PC88VA doujin games (mostly undumped)
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<info name="release" value="19901102"/>
 
-		<part name="flop1" interface="floppy_5_25" >
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 1).d88" size="1281968" crc="cd855b7a" sha1="508e25ca306631be64e69e476d49116e7ac04bce"/>
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_5_25" >
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 2).d88" size="1281968" crc="3927cdcf" sha1="555daba18a61ea2219b5685a850b512dea085cf2"/>
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25" >
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 3).d88" size="1281968" crc="42e25779" sha1="897b62c7fdb604f5bb729e0aeb183566e08c4e33"/>
 			</dataarea>
@@ -757,25 +757,25 @@ PC88VA doujin games (mostly undumped)
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="フレイ"/>
 
-		<part name="flop1" interface="floppy_5_25" >
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 1).fdi" size="1261568" crc="3a88990a" sha1="252e2589bb8c12800cdd678508b0abd868d0ab83"/>
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_5_25" >
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 2).fdi" size="1261568" crc="9cbfb7b4" sha1="b040e4ed4e3e516effb1f6997b0f766f4b376ab4"/>
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25" >
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 3).fdi" size="1261568" crc="9f79f4bb" sha1="2d3ebbaa844bd451190d899a7f53829b07b830eb"/>
 			</dataarea>
 		</part>
 
-		<part name="flop4" interface="floppy_5_25" >
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 4).fdi" size="1261568" crc="c074800a" sha1="bf114221bdcc8e6545c4566ae58cea1af324aa9a"/>
 			</dataarea>

@@ -34,7 +34,7 @@
 
 <softwarelist name="pockchalv2" description="Pocket Challenge V2 cartridges">
 
-	<software name="chuu1eng" supported="no" >
+	<software name="chuu1eng" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuu1 English (2EC)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
@@ -56,7 +56,7 @@
 		</part>
 	</software>
 
-	<software name="chuchire" supported="no" >
+	<software name="chuchire" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri - Chuugaku Rekishi (2PS)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
@@ -72,7 +72,7 @@
 		</part>
 	</software>
 
-	<software name="chuchire4" cloneof="chuchire" supported="no" >
+	<software name="chuchire4" cloneof="chuchire" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri - Chuugaku Rekishi (4PS)</description>
 		<year>2004</year>
 		<publisher>Benesse Corporation</publisher>
@@ -88,7 +88,7 @@
 		</part>
 	</software>
 
-	<software name="chuchire6" cloneof="chuchire" supported="no" >
+	<software name="chuchire6" cloneof="chuchire" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri - Chuugaku Rekishi (6PS)</description>
 		<year>2006</year>
 		<publisher>Benesse Corporation</publisher>
@@ -104,7 +104,7 @@
 		</part>
 	</software>
 
-	<software name="churika" supported="no" >
+	<software name="churika" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1 Bunya) (2 Bunya) (2PL)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
@@ -120,7 +120,7 @@
 		</part>
 	</software>
 
-	<software name="churika6" cloneof="churika" supported="no" >
+	<software name="churika6" cloneof="churika" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika (1 Bunya) (2 Bunya) (6PL)</description>
 		<year>2006</year>
 		<publisher>Benesse Corporation</publisher>
@@ -136,7 +136,7 @@
 		</part>
 	</software>
 
-	<software name="jitsugi4" supported="no" >
+	<software name="jitsugi4" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Jitsugi 4 Kyouka (2BG)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
@@ -152,7 +152,7 @@
 		</part>
 	</software>
 
-	<software name="jitsugi43" cloneof="jitsugi4" supported="no" >
+	<software name="jitsugi43" cloneof="jitsugi4" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Jitsugi 4 Kyouka (3BG)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
@@ -174,7 +174,7 @@
 		</part>
 	</software>
 
-	<software name="chukoku" supported="no" >
+	<software name="chukoku" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuu1 Kokugo-Hyakunin Isshu (2JA)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>
@@ -190,7 +190,7 @@
 		</part>
 	</software>
 
-	<software name="chu1suga" supported="no" >
+	<software name="chu1suga" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuu1 Suugaku (2M1)</description>
 		<year>2002</year>
 		<publisher>Benesse Corporation</publisher>

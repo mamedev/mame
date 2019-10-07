@@ -895,7 +895,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<year>1980</year>
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Personal Software" />
-		<info name="author" value=" Peter Jennings" />
+		<info name="author" value="Peter Jennings" />
 		<info name="serial" value="26-3050" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">

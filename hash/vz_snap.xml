@@ -475,9 +475,9 @@ The text "v1" or "v2" are simply to distinguish different versions. It isn't an 
 	</software>
 	<software name="diskops4">
 		<description>Disk Ops 4</description>
-		<info name="developer" value="Leslie Milburn"/>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Leslie Milburn"/>
 		<part name="snap" interface="vzsnap">
 			<dataarea name="snap" size="0x002e49">
 				<rom name="diskops4.vz" size="0x002e49" crc="4a7d0b57" sha1="b022d72f37e8996c147ce922dafda846c060fb0e"/>

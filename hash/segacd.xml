@@ -2977,7 +2977,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="slamcity" >
+	<software name="slamcity">
 		<!-- Source: redump.org - http://redump.org/disc/28031/ http://redump.org/disc/28032/ http://redump.org/disc/28033/ http://redump.org/disc/28034/
 		<rom name="Slam City with Scottie Pippen (USA) (Disc 1) (Fingers).cue" size="301" crc="3f50c8bc" md5="35ca36913af0a3df72cf8c3492eceec1" sha1="e3511c717bb78966f75e0dd4a2190b5d390faefe"/>
 		<rom name="Slam City with Scottie Pippen (USA) (Disc 1) (Fingers) (Track 1).bin" size="587070960" crc="becd1484" md5="99a012c46ec31fec5f9538eaa510bd5a" sha1="f32cf26f6fa4acf12807e7f1064e9e202d11cff3"/>

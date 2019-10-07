@@ -1564,13 +1564,13 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="release" value="198801xx"/>
 		<info name="alt_title" value="麻雀狂時代スペシャル"/>
 
-		<part name="flop1" interface="floppy_5_25" >
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414144">
 				<rom name="mahjong kyo jidai special (disk a).d88" size="414144" crc="9b311819" sha1="bebaa9bfcf36bedde90ef8cf51f19b9d66cc215b"/>
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_5_25" >
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
 				<rom name="mahjong kyo jidai special (disk b).d88" size="416688" crc="b76b529b" sha1="0fa69cce2672d984723b6a9f8d6c226a01319d5b"/>
 			</dataarea>

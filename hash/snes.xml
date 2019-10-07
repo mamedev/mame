@@ -33144,7 +33144,7 @@ Alternate board (XL-1)
 		<info name="serial" value="SHVC-AKYJ-JPN" />
 		<info name="release" value="19950630" />
 		<info name="alt_title" value="スーパー競艇" />
-		<part name="cart" interface="snes_cart" >
+		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2A3M-20" />
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
@@ -47990,7 +47990,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Planning Office WADA</publisher>
 		<info name="serial" value="SHVC-AFAJ-JPN" />
 		<info name="release" value="19950421" />
-		<info name="alt_title" value=" 宮路社長のパチンコファン勝利 宣言2" />
+		<info name="alt_title" value="宮路社長のパチンコファン勝利 宣言2" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
@@ -61523,7 +61523,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="SHVC-ATUJ-JPN" />
 		<info name="release" value="19950321" />
-		<info name="alt_title" value=" ターフヒーロー" />
+		<info name="alt_title" value="ターフヒーロー" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
