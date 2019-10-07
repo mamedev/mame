@@ -825,11 +825,11 @@ void epc_state::epc(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], epc_sd_floppies, "525sd", epc_floppy_formats);
 	//SOFTWARE_LIST(config, "epc_flop_list").set_original("epc_flop");
 
-	// system board UART
+	// system board UART TODO: Implement the descrete "Baud Rate Clock" from schematics that generates clocks for the 8250
 	INS8250(config, m_uart, XTAL(18'432'000) / 10); // TEW crystal marked X2 verified. TODO: Let 8051 DTR control RCLK (see above)
-		m_uart->out_tx_callback().set("uart", FUNC(rs232_port_device::write_txd));
-		m_uart->out_dtr_callback().set("uart", FUNC(rs232_port_device::write_dtr));
-		m_uart->out_rts_callback().set("uart", FUNC(rs232_port_device::write_rts));
+	m_uart->out_tx_callback().set("uart", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set("uart", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set("uart", FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set([this](int state)
 	{   // Jumper field J10 decides what IRQ to pull
 		if ((m_io_j10->read() & 0x03) == 0x02) { LOGIRQ("UART IRQ2: %d\n", state); m_pic8259->ir2_w(state); }
@@ -838,15 +838,12 @@ void epc_state::epc(machine_config &config)
 		if ((m_io_j10->read() & 0xc0) == 0x80) { LOGIRQ("UART IRQ7: %d\n", state); m_pic8259->ir7_w(state); }
 	});
 
-		rs232_port_device &rs232(RS232_PORT(config, "uart", default_rs232_devices, nullptr));
-		rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
-		rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
-		rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
-		rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
-		rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
-
-
-
+	rs232_port_device &rs232(RS232_PORT(config, "uart", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 }
 
 void epc_state::update_nmi()
@@ -949,7 +946,7 @@ INPUT_PORTS_END
 ROM_START( epc )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_DEFAULT_BIOS("p860110")
-	ROM_SYSTEM_BIOS(0, "p840705", "P840705")
+	ROM_SYSTEM_BIOS(0, "p840705", "P840705") // TODO: Fix "Keyboard error" for this bios
 	ROMX_LOAD("ericsson_8088.bin", 0xe000, 0x2000, CRC(3953c38d) SHA1(2bfc1f1d11d0da5664c3114994fc7aa3d6dd010d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "p860110", "P860110")
 	ROMX_LOAD("epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55), ROM_BIOS(1))
