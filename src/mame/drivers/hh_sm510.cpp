@@ -17,7 +17,7 @@ Use -autosave to at least make them remember the highscores.
 TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
-- improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
+- improve/redo SVGs of: gnw_egg, exospace
 - confirm gnw_egg rom (now using gnw_mmouse rom, but pretty confident that it's
   the same)
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
@@ -1438,7 +1438,7 @@ INPUT_PORTS_END
 
 void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1711, 1080); // R mask option ?
+	gnw_sm5a_matrix(config, 1684, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::gnw_egg(machine_config &config)
@@ -1462,8 +1462,8 @@ ROM_START( gnw_mmouse )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mc-25", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 102453, "screen", 0)
-	ROM_LOAD( "gnw_mmouse.svg", 0, 102453, BAD_DUMP CRC(88cc7c49) SHA1(c000d51d1b99750116b97f9bafc0314ea506366d) )
+	ROM_REGION( 181536, "screen", 0)
+	ROM_LOAD( "gnw_mmouse.svg", 0, 181536, CRC(ee87484f) SHA1(f30c504066fa7ef098184cd490c9409f7e672c02) )
 ROM_END
 
 ROM_START( gnw_egg )
