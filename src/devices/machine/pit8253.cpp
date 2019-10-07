@@ -311,7 +311,7 @@ void pit_counter_device::simulate(int64_t elapsed_cycles)
 	static const uint32_t CYCLES_NEVER = (0xffffffff);
 	uint32_t cycles_to_output = 0;
 
-	LOG2("simulate2(): simulating %d cycles in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
+	LOG2("simulate(): simulating %d cycles in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
 			(int)elapsed_cycles, mode, bcd, m_phase, m_gate, m_output, m_value);
 
 	switch (mode)
@@ -694,7 +694,7 @@ void pit_counter_device::simulate(int64_t elapsed_cycles)
 		m_updatetimer->adjust(next_fire_time - machine().time());
 	}
 
-	LOG2("simulate2(): simulating %d cycles in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
+	LOG2("simulate(): simulating %d cycles in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
 			(int)elapsed_cycles, mode, bcd, m_phase, m_gate, m_output, m_value, cycles_to_output);
 }
 
