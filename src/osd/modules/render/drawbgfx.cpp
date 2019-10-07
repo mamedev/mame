@@ -441,7 +441,7 @@ int renderer_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  drawbgfx_window_draw
 //============================================================
 
-bgfx::VertexDecl ScreenVertex::ms_decl;
+bgfx::VertexLayout ScreenVertex::ms_decl;
 
 void renderer_bgfx::put_packed_quad(render_primitive *prim, uint32_t hash, ScreenVertex* vertices)
 {
