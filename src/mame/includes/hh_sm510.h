@@ -28,6 +28,10 @@ public:
 		m_decay_len(17)
 	{ }
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(acl_button);
+
+protected:
 	// devices
 	required_device<sm510_base_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;
@@ -46,8 +50,6 @@ public:
 	u8 read_inputs(int columns, int fixed = -1);
 
 	virtual void update_k_line();
-	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(acl_button);
 	virtual DECLARE_WRITE16_MEMBER(sm510_lcd_segment_w);
 	virtual DECLARE_WRITE16_MEMBER(sm500_lcd_segment_w);
 	virtual DECLARE_READ8_MEMBER(input_r);
@@ -71,9 +73,32 @@ public:
 	TIMER_CALLBACK_MEMBER(display_decay_tick);
 	emu_timer *m_display_decay_timer;
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void common_base(machine_config &config, u16 width, u16 height);
+	void sm500_base(machine_config &config, u16 width, u16 height);
+	void sm510_base(machine_config &config, u16 width, u16 height);
+
+	void common_sm511(machine_config &config, u16 width, u16 height);
+
+	void gnw_sm5a(machine_config &config, u16 width, u16 height);
+	void gnw_sm5a_matrix(machine_config &config, u16 width, u16 height);
+	void gnw_kb1013vk12_matrix(machine_config &config, u16 width, u16 height);
+	void gnw_sm510(machine_config &config, u16 width, u16 height);
+	void gnw_sm511(machine_config &config, u16 width, u16 height);
+	void gnw_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
+	void gnw_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
+	void gnw_sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
+	void gnw_sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
+	void gnw_sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
+	void gnw_sm512_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
+
+	void konami_sm510(machine_config &config, u16 width, u16 height);
+
+	void tiger_sm510_1bit(machine_config &config, u16 width, u16 height);
+	void tiger_sm511_1bit(machine_config &config, u16 width, u16 height);
+	void tiger_sm511_2bit(machine_config &config, u16 width, u16 height);
 };
 
 

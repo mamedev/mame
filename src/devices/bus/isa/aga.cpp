@@ -610,7 +610,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_1bpp_update_row )
 	uint8_t const *const videoram = m_videoram.get();
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix32(y);
-	uint8_t const  fg = m_cga_color_select & 0x0f;
+	uint8_t const fg = m_cga_color_select & 0x0f;
 
 	if (y == 0) logerror("cga_gfx_1bpp_update_row\n");
 	for (int i = 0; i < x_count; i++) {
@@ -826,7 +826,7 @@ void isa8_aga_device::pc_aga_set_mode(mode_t mode)
 }
 
 
-WRITE8_MEMBER ( isa8_aga_device::pc_aga_videoram_w )
+WRITE8_MEMBER( isa8_aga_device::pc_aga_videoram_w )
 {
 	switch (m_mode) {
 	case AGA_COLOR:
@@ -846,7 +846,7 @@ READ8_MEMBER( isa8_aga_device::pc_aga_videoram_r )
 	switch (m_mode) {
 	case AGA_COLOR:
 		if (offset >= 0x8000)
-			return m_videoram[offset-0x8000];
+			return m_videoram[offset - 0x8000];
 		return 0;
 	case AGA_MONO:
 		return m_videoram[offset];
@@ -869,7 +869,7 @@ READ8_MEMBER( isa8_aga_pc200_device::pc200_videoram_r )
 	}
 }
 
-WRITE8_MEMBER ( isa8_aga_pc200_device::pc200_videoram_w )
+WRITE8_MEMBER( isa8_aga_pc200_device::pc200_videoram_w )
 {
 	switch (m_mode) {
 	default:
@@ -921,7 +921,7 @@ WRITE8_MEMBER( isa8_aga_pc200_device::pc200_cga_w )
 	}
 }
 
-READ8_MEMBER ( isa8_aga_pc200_device::pc200_cga_r )
+READ8_MEMBER( isa8_aga_pc200_device::pc200_cga_r )
 {
 	uint8_t result;
 
