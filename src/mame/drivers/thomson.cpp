@@ -672,7 +672,7 @@ void thomson_state::to7_base(machine_config &config)
 	m_cassette->set_interface("to_cass");
 
 /* floppy */
-	THMFC1(config, m_thmfc, 0);
+	THMFC1(config, m_thmfc, 16_MHz_XTAL);
 	m_thmfc->floppy_active_cb().set(FUNC(thomson_state::thom_floppy_active));
 
 	MC6843(config, m_mc6843, 16_MHz_XTAL / 16 / 2);
