@@ -1198,6 +1198,14 @@ project "bimg"
 
 	configuration { }
 
+	if _OPTIONS["targetos"]=="macosx" or  _OPTIONS["targetos"]=="linux" then
+		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+			buildoptions_cpp {
+				"-Wno-unused-const-variable",
+			}
+		end
+	end
+
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
