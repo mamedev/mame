@@ -11,7 +11,7 @@
 #include "uniform.h"
 
 const uniform_reader::string_to_enum uniform_reader::TYPE_NAMES[uniform_reader::TYPE_COUNT] = {
-	{ "int",    bgfx::UniformType::Int1 },
+	{ "int",    bgfx::UniformType::Sampler },
 	{ "vec4",   bgfx::UniformType::Vec4 },
 	{ "mat3",   bgfx::UniformType::Mat3 },
 	{ "mat4",   bgfx::UniformType::Mat4 }
