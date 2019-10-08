@@ -20,7 +20,7 @@
 #include "nl_errstr.h"
 
 #include <cmath>
-#include <cstring>
+//#include <cstring>
 #include <limits>
 
 namespace netlist
@@ -256,22 +256,23 @@ void netlist_state_t::rebuild_lists()
 
 void netlist_state_t::compile_defines(std::vector<std::pair<pstring, pstring>> &defs)
 {
-#define ENTRY(x) { #x, PSTRINGIFY(x) }
-	defs.push_back(ENTRY(PHAS_RDTSCP));
-	defs.push_back(ENTRY(PUSE_ACCURATE_STATS));
-	defs.push_back(ENTRY(PHAS_INT128));
-	defs.push_back(ENTRY(USE_ALIGNED_OPTIMIZATIONS));
-	defs.push_back(ENTRY(NVCCBUILD));
-	defs.push_back(ENTRY(USE_MEMPOOL));
-	defs.push_back(ENTRY(USE_QUEUE_STATS));
-	defs.push_back(ENTRY(USE_COPY_INSTEAD_OF_REFERENCE));
-	defs.push_back(ENTRY(USE_TRUTHTABLE_7448));
-	defs.push_back(ENTRY(NL_DEBUG));
-	defs.push_back(ENTRY(HAS_OPENMP));
-	defs.push_back(ENTRY(USE_OPENMP));
+//#define ENTRY(x) { #x, PSTRINGIFY(x) }
+#define ENTRY(x) std::pair<pstring, pstring>(#x, PSTRINGIFY(x))
+	defs.emplace_back(ENTRY(PHAS_RDTSCP));
+	defs.emplace_back(ENTRY(PUSE_ACCURATE_STATS));
+	defs.emplace_back(ENTRY(PHAS_INT128));
+	defs.emplace_back(ENTRY(USE_ALIGNED_OPTIMIZATIONS));
+	defs.emplace_back(ENTRY(NVCCBUILD));
+	defs.emplace_back(ENTRY(USE_MEMPOOL));
+	defs.emplace_back(ENTRY(USE_QUEUE_STATS));
+	defs.emplace_back(ENTRY(USE_COPY_INSTEAD_OF_REFERENCE));
+	defs.emplace_back(ENTRY(USE_TRUTHTABLE_7448));
+	defs.emplace_back(ENTRY(NL_DEBUG));
+	defs.emplace_back(ENTRY(HAS_OPENMP));
+	defs.emplace_back(ENTRY(USE_OPENMP));
 
-	defs.push_back(ENTRY(PPMF_TYPE));
-	defs.push_back(ENTRY(PHAS_PMF_INTERNAL));
+	defs.emplace_back(ENTRY(PPMF_TYPE));
+	defs.emplace_back(ENTRY(PHAS_PMF_INTERNAL));
 
 #undef ENTRY
 }

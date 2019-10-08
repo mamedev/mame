@@ -18,6 +18,7 @@
 #include "video/konami_helper.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class rungun_state : public driver_device
 {

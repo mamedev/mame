@@ -176,22 +176,9 @@ static INPUT_PORTS_START( quizpani )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
-};
-
 static GFXDECODE_START( gfx_quizpani )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0x100, 16 ) /* Background */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x000, 16 ) /* Text */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) /* Background */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) /* Text */
 GFXDECODE_END
 
 

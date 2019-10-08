@@ -883,6 +883,6 @@ void gp9001vdp_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		m_vint_out_cb(1);
 		break;
 	default:
-		assert_always(false, "Unknown id in gp9001vdp_device::device_timer");
+		throw emu_fatalerror("Unknown id in gp9001vdp_device::device_timer");
 	}
 }

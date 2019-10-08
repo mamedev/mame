@@ -50,6 +50,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK    XTAL(16'000'000)
 

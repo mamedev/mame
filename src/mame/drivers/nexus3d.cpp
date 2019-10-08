@@ -19,6 +19,7 @@
 #include "machine/serflash.h"
 #include "emupal.h"
 #include "screen.h"
+#include "debugger.h"
 
 //#include "machine/i2cmem.h"
 
@@ -29,97 +30,285 @@ class nexus3d_state : public driver_device
 public:
 	nexus3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_mainram(*this, "mainram"),
 		m_maincpu(*this, "maincpu"),
-		m_serflash(*this, "flash")
+		m_mainram(*this, "mainram"),
+		m_fbram(*this, "fbram"),
+		m_serflash(*this, "flash"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	void nexus3d(machine_config &config);
 
-	void init_nexus3d();
+	void init_acheart();
+	void init_acheartf();
 
 private:
-	required_shared_ptr<uint32_t> m_mainram;
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_fbram;
 	required_device<serflash_device> m_serflash;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
-	DECLARE_READ32_MEMBER(nexus3d_unk_r);
 //  DECLARE_READ32_MEMBER(nexus3d_unk2_r);
 //  DECLARE_READ32_MEMBER(nexus3d_unk3_r);
 //  DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
 //  DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void nexus3d_map(address_map &map);
+
+	uint32_t m_intpend, m_intmask, m_intlevel;
+	DECLARE_READ32_MEMBER(int_pending_r);
+	DECLARE_WRITE32_MEMBER(int_ack_w);
+	DECLARE_READ32_MEMBER(int_level_r);
+	DECLARE_READ32_MEMBER(int_mask_r);
+	DECLARE_WRITE32_MEMBER(int_mask_w);
+	void IntReq(int level);
+
+	DECLARE_READ32_MEMBER(vrender3d_status_r);
+	DECLARE_WRITE32_MEMBER(rop_data_w);
+	DECLARE_WRITE16_MEMBER(rop_register_w);
+	DECLARE_READ16_MEMBER(rop_status_r);
+
+	DECLARE_READ32_MEMBER(timer_status_r);
+	DECLARE_WRITE32_MEMBER(timer_status_w);
+	DECLARE_READ32_MEMBER(timer_count_r);
+	DECLARE_WRITE32_MEMBER(timer_count_w);
+	uint32_t m_timer_status;
+	uint32_t m_timer_count;
+	emu_timer  *m_timer;
+	TIMER_CALLBACK_MEMBER(timercb);
+	bool m_timer_irq;
+	bool m_timer_result;
+
+	DECLARE_READ32_MEMBER(crtc_vblank_r);
 };
 
-
-
-READ32_MEMBER(nexus3d_state::nexus3d_unk_r)
+void nexus3d_state::video_start()
 {
-	return machine().rand() ^ (machine().rand() << 16);
+	// ...
 }
 
-//READ32_MEMBER(nexus3d_state::nexus3d_unk2_r)
-//{
-//  return 0x00000000;//machine().rand() ^ (machine().rand() << 16);
-//}
-//
-//READ32_MEMBER(nexus3d_state::nexus3d_unk3_r)
-//{
-//  return 0x00000000;//machine().rand() ^ (machine().rand() << 16);
-//}
-//
-//WRITE32_MEMBER(nexus3d_state::nexus3d_unk2_w)
-//{
-//
-//}
-//
-//WRITE32_MEMBER(nexus3d_state::nexus3d_unk3_w)
-//{
-//
-//}
+uint32_t nexus3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint16_t *fbram = reinterpret_cast<uint16_t *>(m_fbram.target());
+	const int width = 640;
+
+	uint16_t *visible = fbram + (m_screen->frame_number() & 1) * (0x96000/2);
+
+	uint32_t const dx = cliprect.left();
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		std::copy_n(&visible[(y * width) + dx], width, &bitmap.pix16(y, dx));
+
+	return 0;
+}
+
+READ32_MEMBER(nexus3d_state::vrender3d_status_r)
+{
+	return (0xbf<<16) | m_screen->vpos();
+}
+
+void nexus3d_state::IntReq(int level)
+{
+	if (level != -1)
+	{
+		m_intlevel = level;
+		m_intpend |= 1 << level;
+	}
+	uint32_t inten = m_intmask ^ 0xffffffff;
+
+	if (m_intpend & inten)
+		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+}
+
+
+READ32_MEMBER(nexus3d_state::int_mask_r)
+{
+	return m_intmask;
+}
+
+WRITE32_MEMBER(nexus3d_state::int_mask_w)
+{
+	COMBINE_DATA(&m_intmask);
+}
+
+READ32_MEMBER(nexus3d_state::int_pending_r)
+{
+	return m_intpend;
+}
+
+WRITE32_MEMBER(nexus3d_state::int_ack_w)
+{
+	m_intpend &= ~data;
+	IntReq(-1);
+}
+
+READ32_MEMBER(nexus3d_state::int_level_r)
+{
+	return m_intlevel;
+}
+
+WRITE16_MEMBER(nexus3d_state::rop_register_w)
+{
+	//printf("%04x REG\n",data);
+}
+
+WRITE32_MEMBER(nexus3d_state::rop_data_w)
+{
+	//printf("%04x DATA\n",data);
+}
+
+READ16_MEMBER(nexus3d_state::rop_status_r)
+{
+	return machine().rand() & 0x1000;
+}
+
+READ32_MEMBER(nexus3d_state::timer_status_r)
+{
+	uint32_t res = (m_timer_status & ~0x30) | ((m_timer_irq == true) << 5) | ((m_timer_result == true) << 4);
+	return res;
+}
+
+WRITE32_MEMBER(nexus3d_state::timer_status_w)
+{
+	COMBINE_DATA(&m_timer_status);
+	//printf("%08x %08x\n",m_timer_status, m_timer_count);
+
+	if (m_timer_status & 0x20)
+		m_timer_irq = false;
+
+	if (m_timer_status & 8)
+	{
+		m_timer_result = false;
+		// TODO: unknown formula, should be counter / (bits 0-1 and maybe 2)
+		attotime period = attotime::from_hz(14318180 * 3);
+		m_timer->adjust(period);
+	}
+}
+
+READ32_MEMBER(nexus3d_state::timer_count_r)
+{
+	return m_timer_count;
+}
+
+WRITE32_MEMBER(nexus3d_state::timer_count_w)
+{
+	COMBINE_DATA(&m_timer_count);
+}
+
+TIMER_CALLBACK_MEMBER(nexus3d_state::timercb)
+{
+	m_timer_result = true;
+	m_timer_status &= ~8;
+	#if 0
+	if (m_timer_irq == false && m_timer_status & 0x10)
+	{
+		m_timer_irq = true;
+		// lv 10 (the only enabled irq at POST) should be UART
+		IntReq(?);
+	}
+	#endif
+}
+
+
+READ32_MEMBER(nexus3d_state::crtc_vblank_r)
+{
+	uint16_t res = (m_screen->vblank()<<1) | (m_screen->hblank()<<0);
+
+	return (res<<16);
+}
 
 void nexus3d_state::nexus3d_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).ram().share("mainram");
+	map(0x00000000, 0x01ffffff).ram().share("mainram");
+	map(0x02000000, 0x023fffff).ram().share("fbram"); // boundary tbd
 
-	map(0x00400000, 0x01ffffff).ram(); // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related
+	map(0x03720000, 0x0373ffff).ram(); // 3d fifo, boundary tbd
+	map(0x046c0000, 0x046fffff).ram(); // """
+
+	map(0x60000000, 0x67ffffff).ram(); // color tables?
+
+	// actually USB hubs (prints "USB STRAGE" if 0)
+	map(0x8c000000, 0x8c000003).portr("IN0");
+	map(0x8c800000, 0x8c800003).portr("IN1");
+	map(0x8d000000, 0x8d000003).portr("IN2");
 
 	// flash
 	map(0x9C000000, 0x9C000003).r(m_serflash, FUNC(serflash_device::n3d_flash_r));
 	map(0x9C000010, 0x9C000013).w(m_serflash, FUNC(serflash_device::n3d_flash_cmd_w));
 	map(0x9C000018, 0x9C00001b).w(m_serflash, FUNC(serflash_device::n3d_flash_addr_w));
 
+	// read on irq 9 service, unknown purpose
+	map(0xc0000200, 0xc00002bf).nopr();
+
+	// on irq, acknowledge happens to both 800 and 810 ports
+	map(0xc0000800, 0xc0000803).nopw();
+	map(0xc0000808, 0xc000080b).rw(FUNC(nexus3d_state::int_mask_r), FUNC(nexus3d_state::int_mask_w));
+	map(0xc0000810, 0xc0000813).rw(FUNC(nexus3d_state::int_pending_r), FUNC(nexus3d_state::int_ack_w));
+	map(0xc0000814, 0xc0000817).r(FUNC(nexus3d_state::int_level_r));
+
 	// lots of accesses in this range
 	// 0xc00018xx seems CRTC related
 	// 0xc000091x loads a "gfx charset"?
-//  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE(nexus3d_unk2_r, nexus3d_unk2_w ) // often, status for something.
-//  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE(nexus3d_unk3_r, nexus3d_unk3_w ) // often
+	map(0xc0000910, 0xc0000913).w(FUNC(nexus3d_state::rop_data_w));
+	map(0xc000091c, 0xc000091f).w(FUNC(nexus3d_state::rop_register_w)).umask32(0xffff0000);
 
-	map(0xE0000014, 0xE0000017).r(FUNC(nexus3d_state::nexus3d_unk_r)); // sits waiting for this
+	map(0xc0000d00, 0xc0000d03).rw(FUNC(nexus3d_state::timer_status_r), FUNC(nexus3d_state::timer_status_w));
+	map(0xc0000d04, 0xc0000d07).rw(FUNC(nexus3d_state::timer_count_r), FUNC(nexus3d_state::timer_count_w));
 
+	map(0xc0001844, 0xc0001847).r(FUNC(nexus3d_state::crtc_vblank_r));
+
+//  map(0xc0000f40, 0xc0000f4f).ram();
+//  map(0xC0000F44, 0xC0000F47) (nexus3d_unk2_r, nexus3d_unk2_w ) // often, status for something.
+	map(0xc0000f4c, 0xc0000f4f).r(FUNC(nexus3d_state::rop_status_r)).umask32(0xffff0000);
+
+	map(0xe0000014, 0xe0000017).r(FUNC(nexus3d_state::vrender3d_status_r));
+
+//  map(0xe0000000, 0xe00000ff) General / Control registers
+//  map(0xe0000300, 0xe00003ff) GTE constant vector registers
 
 }
 
 static INPUT_PORTS_START( nexus3d )
+	PORT_START("IN0")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("IN1")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-
-void nexus3d_state::video_start()
+void nexus3d_state::machine_start()
 {
-}
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nexus3d_state::timercb),this), 0);
 
-uint32_t nexus3d_state::screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
 }
 
 void nexus3d_state::machine_reset()
 {
+	// the first part of the flash ROM automatically gets copied to RAM
+	memcpy(m_mainram, memregion("flash")->base(), 4 * 1024);
+}
+
+WRITE_LINE_MEMBER(nexus3d_state::screen_vblank)
+{
+	// rising edge
+	if (state)
+	{
+		// EXTINT1?
+		//IntReq(9);
+		IntReq(1);
+	}
 }
 
 void nexus3d_state::nexus3d(machine_config &config)
@@ -128,14 +317,13 @@ void nexus3d_state::nexus3d(machine_config &config)
 	ARM920T(config, m_maincpu, 200000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nexus3d_state::nexus3d_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(320, 256);
-	screen.set_visarea(0, 320-1, 0, 256-1);
-	screen.set_screen_update(FUNC(nexus3d_state::screen_update_nexus3d));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw((XTAL(14'318'180)*2), 454*2, 0, 640, 262*2, 0, 480); // not accurate, needs CRTC understanding
+	m_screen->set_screen_update(FUNC(nexus3d_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(nexus3d_state::screen_vblank));
+	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette").set_entries(256);
+	PALETTE(config, "palette", palette_device::RGB_565);
 
 	SERFLASH(config, m_serflash, 0);
 }
@@ -173,11 +361,20 @@ ROM_START( acheartf )
 //  ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) // missing from this set, but should be the same
 ROM_END
 
-void nexus3d_state::init_nexus3d()
+void nexus3d_state::init_acheart()
 {
-	// the first part of the flash ROM automatically gets copied to RAM
-	memcpy(m_mainram, memregion("flash")->base(), 4 * 1024);
+	// 0x1230 BL <vector>
+	// 0x1234 CMPS, #$0 <- if R0 = 1 then stops at 0x1244
 }
 
-GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )
+void nexus3d_state::init_acheartf()
+{
+	// 0x1290 BL <vector>
+	// 0x1294 CMPS, #$0 <- if R0 = 1 then stops at 0x1244
+
+	// patch additional unknown check after $c0000a00
+	// 0x107c serial?
+}
+
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_acheart,  ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_acheartf, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )

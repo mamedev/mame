@@ -932,7 +932,7 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_beeper->set_clock(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in tmc1800_state::device_timer");
+		throw emu_fatalerror("Unknown id in tmc1800_state::device_timer");
 	}
 }
 

@@ -21,6 +21,7 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class pkscram_state : public driver_device

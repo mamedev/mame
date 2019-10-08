@@ -57,7 +57,6 @@ private:
 	void decrease_counter_value(int64_t cycles);
 	void load_counter_value();
 	void set_output(int output);
-	void simulate2(int64_t elapsed_cycles);
 	void simulate(int64_t elapsed_cycles);
 	void update();
 	uint16_t masked_value() const;

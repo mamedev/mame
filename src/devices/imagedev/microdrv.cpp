@@ -5,8 +5,8 @@
     microdrv.cpp
 
     MAME interface to the Sinclair Microdrive image abstraction code
-	(this seems to be QL format specific and hardcoded to a specific
-	 size, Spectrum might need a different implementation?)
+    (this seems to be QL format specific and hardcoded to a specific
+     size, Spectrum might need a different implementation?)
 
 *********************************************************************/
 

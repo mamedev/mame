@@ -21,6 +21,8 @@
 #include "sound/pokey.h"
 #include "emupal.h"
 #include "speaker.h"
+#include "tilemap.h"
+
 #include "akkaarrh.lh"
 
 

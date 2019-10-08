@@ -11,6 +11,8 @@ Attached to the keyboard is a backlit LCD module displaying one row of 16 charac
 
 The main board incorporates two DSWs and a "BLMHYB01" hybrid module containing unknown interface logic.
 
+TODO: figure out keycodes (are they translated externally?)
+
 ***********************************************************************************************************************************/
 
 #include "emu.h"
@@ -29,6 +31,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "lcdc")
+		, m_key_row(*this, "ROW%u", 0U)
 	{
 	}
 
@@ -43,23 +46,37 @@ private:
 
 	u8 p1_r();
 	void p1_w(u8 data);
-	void p24_latch_w(u8 data);
+	void scan_load_w(u8 data);
+	u8 scan_shift_r();
 	void lcd_control_w(u8 data);
+	void serial_tx_w(u8 data) { logerror("Serial TX: %02X\n", data); }
 
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
 
 	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
+	optional_ioport_array<16> m_key_row;
 
-	u8 m_lcd_data;
+	u8 m_p1_data;
 	u8 m_lcd_control;
+	u16 m_key_scan;
+	u16 m_shift_output;
+	u8 m_row_counter;
 };
 
 void sk101bl_state::machine_start()
 {
-	save_item(NAME(m_lcd_data));
+	m_p1_data = 0xff;
+	m_shift_output = 0;
+	m_key_scan = 0xffff;
+	m_row_counter = 0;
+
+	save_item(NAME(m_p1_data));
 	save_item(NAME(m_lcd_control));
+	save_item(NAME(m_key_scan));
+	save_item(NAME(m_shift_output));
+	save_item(NAME(m_row_counter));
 }
 
 void sk101bl_state::machine_reset()
@@ -69,32 +86,51 @@ void sk101bl_state::machine_reset()
 
 HD44780_PIXEL_UPDATE(sk101bl_state::pixel_update)
 {
-	if (pos < 16)
+	if (pos < 16 && line == 0)
 		bitmap.pix16(line * 10 + y, pos * 6 + x) = state;
 }
 
 u8 sk101bl_state::p1_r()
 {
-	if (BIT(m_lcd_control, 1) && BIT(m_lcd_control, 3))
-		return m_lcdc->read(BIT(m_lcd_control, 2));
-
-	return m_lcd_data;
+	return m_lcdc->db_r();
 }
 
 void sk101bl_state::p1_w(u8 data)
 {
-	m_lcd_data = data;
+	if (BIT(m_p1_data, 7) && BIT(m_p1_data, 6) && !BIT(data, 6) && !BIT(m_lcd_control, 2))
+		m_row_counter = (m_row_counter - 1) & 0x0f;
+
+	m_p1_data = data;
+	m_lcdc->db_w(data);
 }
 
-void sk101bl_state::p24_latch_w(u8 data)
+void sk101bl_state::scan_load_w(u8 data)
 {
-	logerror("%s: Writing %02X to P2.4 latch\n", machine().describe_context(), data);
+	m_key_scan = m_key_row[m_row_counter & 0x0f].read_safe(0xffff);
+	m_maincpu->set_input_line(MCS51_INT0_LINE, BIT(m_key_scan, 15) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+u8 sk101bl_state::scan_shift_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_key_scan = (m_key_scan << 1) | 1;
+		m_maincpu->set_input_line(MCS51_INT0_LINE, BIT(m_key_scan, 15) ? CLEAR_LINE : ASSERT_LINE);
+	}
+	return 0xff;
 }
 
 void sk101bl_state::lcd_control_w(u8 data)
 {
-	if (BIT(data, 1) && !BIT(data, 3))
-		m_lcdc->write(BIT(data, 2), m_lcd_data);
+	if (BIT(data, 7) && !BIT(m_lcd_control, 7))
+		m_shift_output = (m_shift_output << 1) | (BIT(m_p1_data, 7) ? 0 : 1);
+
+	m_lcdc->rw_w(BIT(data, 3));
+	m_lcdc->rs_w(BIT(data, 2));
+	m_lcdc->e_w(BIT(data, 1));
+
+	if (BIT(data, 0))
+		m_row_counter = 0;
 
 	m_lcd_control = data;
 }
@@ -106,7 +142,9 @@ void sk101bl_state::prog_map(address_map &map)
 
 void sk101bl_state::ext_map(address_map &map)
 {
-	map(0x1000, 0x1000).mirror(0x0fff).w(FUNC(sk101bl_state::p24_latch_w));
+	map(0x0000, 0x0000).mirror(0x1fff).r(FUNC(sk101bl_state::scan_shift_r));
+	map(0x1000, 0x1000).mirror(0x0fff).w(FUNC(sk101bl_state::scan_load_w));
+	map(0x2000, 0x7fff).rom().region("program", 0x2000);
 	map(0x4000, 0x4000).mirror(0x0fff).w(FUNC(sk101bl_state::lcd_control_w));
 	map(0xe000, 0xffff).ram(); // TC5565APL-15L
 }
@@ -122,12 +160,13 @@ void sk101bl_state::sk101bl(machine_config &config)
 	m_maincpu->port_in_cb<1>().set(FUNC(sk101bl_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(sk101bl_state::p1_w));
 	m_maincpu->port_out_cb<3>().set("alarm", FUNC(speaker_sound_device::level_w)).bit(3);
+	m_maincpu->serial_tx_cb().set(FUNC(sk101bl_state::serial_tx_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
-	screen.set_size(16*6, 20);
-	screen.set_visarea(0, 16*6-1, 0, 20-1);
+	screen.set_size(16*6, 10);
+	screen.set_visarea(0, 16*6-1, 0, 10-1);
 	screen.set_palette("palette");
 
 	HD44780(config, m_lcdc).set_lcd_size(1, 16);

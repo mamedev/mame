@@ -399,7 +399,7 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		clear_irq_cb(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in socrates_state::device_timer");
+		throw emu_fatalerror("Unknown id in socrates_state::device_timer");
 	}
 }
 
@@ -985,7 +985,7 @@ WRITE8_MEMBER( iqunlimz_state::colors_w )
 
 INPUT_CHANGED_MEMBER( iqunlimz_state::send_input )
 {
-	uint8_t data = (uint8_t)(uintptr_t)param;
+	uint8_t data = (uint8_t)param;
 
 	if (newval)
 	{

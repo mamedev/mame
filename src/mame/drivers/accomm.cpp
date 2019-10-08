@@ -875,9 +875,7 @@ void accomm_state::accomm(machine_config &config)
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 
-	econet_slot_device &econet_slot(ECONET_SLOT(config, "econet254", 0));
-	econet_devices(econet_slot);
-	econet_slot.set_slot(254);
+	ECONET_SLOT(config, "econet254", "econet", econet_devices).set_slot(254);
 
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));

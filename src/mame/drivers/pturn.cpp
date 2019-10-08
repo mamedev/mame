@@ -84,6 +84,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class pturn_state : public driver_device

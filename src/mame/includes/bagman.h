@@ -9,6 +9,7 @@
 #include "machine/74259.h"
 #include "sound/tms5110.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class bagman_state : public driver_device
 {

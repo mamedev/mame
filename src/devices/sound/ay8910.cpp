@@ -142,8 +142,7 @@
         http://mametesters.org/view.php?id=3043
 
   TODO:
-  * The AY8930 has an extended mode which is currently
-    not emulated.
+  * Measure volume / envelope parameters for AY8930 expanded mode
   * YM2610 & YM2608 will need a separate flag in their config structures
     to distinguish between legacy and discrete mode.
 
@@ -587,42 +586,14 @@ YM2203 Japanese datasheet contents, translated: http://www.larwe.com/technical/c
 
 /*************************************
  *
- *  Defines
+ *  constants
  *
  *************************************/
 
 #define ENABLE_REGISTER_TEST        (0)     /* Enable preprogrammed registers */
 #define LOG_IGNORED_WRITES          (0)
 
-#define MAX_OUTPUT 0x7fff
-
-/* register id's */
-#define AY_AFINE    (0)
-#define AY_ACOARSE  (1)
-#define AY_BFINE    (2)
-#define AY_BCOARSE  (3)
-#define AY_CFINE    (4)
-#define AY_CCOARSE  (5)
-#define AY_NOISEPER (6)
-#define AY_ENABLE   (7)
-#define AY_AVOL     (8)
-#define AY_BVOL     (9)
-#define AY_CVOL     (10)
-#define AY_EFINE    (11)
-#define AY_ECOARSE  (12)
-#define AY_ESHAPE   (13)
-
-#define AY_PORTA    (14)
-#define AY_PORTB    (15)
-
-#define NOISE_ENABLEQ(_chan)  ((m_regs[AY_ENABLE] >> (3 + _chan)) & 1)
-#define TONE_ENABLEQ(_chan)   ((m_regs[AY_ENABLE] >> (_chan)) & 1)
-#define TONE_PERIOD(_chan)    ( m_regs[(_chan) << 1] | ((m_regs[((_chan) << 1) | 1] & 0x0f) << 8) )
-#define NOISE_PERIOD()          ( m_regs[AY_NOISEPER] & 0x1f)
-#define TONE_VOLUME(_chan)    ( m_regs[AY_AVOL + (_chan)] & 0x0f)
-#define TONE_ENVELOPE(_chan)  ((m_regs[AY_AVOL + (_chan)] >> 4) & ((type() == AY8914) ? 3 : 1))
-#define ENVELOPE_PERIOD()       ((m_regs[AY_EFINE] | (m_regs[AY_ECOARSE]<<8)))
-#define NOISE_OUTPUT()          (m_rng & 1)
+static constexpr int MAX_OUTPUT = 0x7fff;
 
 /*************************************
  *
@@ -636,6 +607,20 @@ YM2203 Japanese datasheet contents, translated: http://www.larwe.com/technical/c
  *  Static
  *
  *************************************/
+
+// duty cycle used for AY8930 expanded mode
+static const u32 duty_cycle[9] =
+{
+	0x80000000, // 3.125 %
+	0xc0000000, // 6.25 %
+	0xf0000000, // 12.50 %
+	0xff000000, // 25.00 %
+	0xffff0000, // 50.00 %
+	0xffffff00, // 75.00 %
+	0xfffffff0, // 87.50 %
+	0xfffffffc, // 93.75 %
+	0xfffffffe  // 96.875 %
+};
 
 static const ay8910_device::ay_ym_param ym2149_param =
 {
@@ -791,15 +776,15 @@ static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *p
 
 	std::vector<double> temp(8*32*32*32, 0);
 
-	for (int e=0; e < 8; e++)
+	for (int e = 0; e < 8; e++)
 	{
 		const ay8910_device::ay_ym_param *par_ch1 = (e & 0x01) ? par_env : par;
 		const ay8910_device::ay_ym_param *par_ch2 = (e & 0x02) ? par_env : par;
 		const ay8910_device::ay_ym_param *par_ch3 = (e & 0x04) ? par_env : par;
 
-		for (int j1=0; j1 < par_ch1->res_count; j1++)
-			for (int j2=0; j2 < par_ch2->res_count; j2++)
-				for (int j3=0; j3 < par_ch3->res_count; j3++)
+		for (int j1 = 0; j1 < par_ch1->res_count; j1++)
+			for (int j2 = 0; j2 < par_ch2->res_count; j2++)
+				for (int j3 = 0; j3 < par_ch3->res_count; j3++)
 				{
 					double n;
 					if (zero_is_off)
@@ -821,7 +806,7 @@ static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *p
 					rw += 1.0 / par_ch3->res[j3];
 					rt += 1.0 / par_ch3->res[j3];
 
-					int indx = (e << 15) | (j3<<10) | (j2<<5) | j1;
+					int indx = (e << 15) | (j3 << 10) | (j2 << 5) | j1;
 					temp[indx] = rw / rt;
 					if (temp[indx] < min)
 						min = temp[indx];
@@ -832,26 +817,25 @@ static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *p
 
 	if (normalize)
 	{
-		for (int j=0; j < 32*32*32*8; j++)
+		for (int j = 0; j < 32*32*32*8; j++)
 			tab[j] = MAX_OUTPUT * (((temp[j] - min)/(max-min))) * factor;
 	}
 	else
 	{
-		for (int j=0; j < 32*32*32*8; j++)
+		for (int j = 0; j < 32*32*32*8; j++)
 			tab[j] = MAX_OUTPUT * temp[j];
 	}
 
-	/* for (e=0;e<16;e++) printf("%d %d\n",e<<10, tab[e<<10]); */
+	/* for (e = 0;e<16;e++) printf("%d %d\n",e << 10, tab[e << 10]); */
 }
 
 static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, s32 *tab, int zero_is_off)
 {
-	int j;
 	double rt;
 	double rw;
-	double temp[32], min=10.0, max=0.0;
+	double temp[32], min = 10.0, max = 0.0;
 
-	for (j=0; j < par->res_count; j++)
+	for (int j = 0; j < par->res_count; j++)
 	{
 		rt = 1.0 / par->r_down + 1.0 / rl;
 
@@ -872,12 +856,12 @@ static inline void build_single_table(double rl, const ay8910_device::ay_ym_para
 	}
 	if (normalize)
 	{
-		for (j=0; j < par->res_count; j++)
+		for (int j = 0; j < par->res_count; j++)
 			tab[j] = MAX_OUTPUT * (((temp[j] - min)/(max-min)) - 0.25) * 0.5;
 	}
 	else
 	{
-		for (j=0; j < par->res_count; j++)
+		for (int j = 0; j < par->res_count; j++)
 			tab[j] = MAX_OUTPUT * temp[j];
 	}
 
@@ -885,9 +869,7 @@ static inline void build_single_table(double rl, const ay8910_device::ay_ym_para
 
 static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, s32 *tab)
 {
-	int j;
-
-	for (j=0; j < par.m_count; j++)
+	for (int j = 0; j < par.m_count; j++)
 	{
 		const double Vd = 5.0;
 		const double Vg = par.m_Vg - par.m_Vth;
@@ -895,7 +877,7 @@ static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param
 		const double p2 = 1.0 / (2.0 * kn * rd) + Vg;
 		const double Vs = p2 - sqrt(p2 * p2 - Vg * Vg);
 
-		const double res = rd * ( Vd / Vs - 1.0);
+		const double res = rd * (Vd / Vs - 1.0);
 		/* That's the biggest value we can stream on to netlist. */
 
 		if (res > (1 << 28))
@@ -909,24 +891,39 @@ static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param
 
 u16 ay8910_device::mix_3D()
 {
-	int indx = 0, chan;
+	int indx = 0;
 
-	for (chan = 0; chan < NUM_CHANNELS; chan++)
-		if (TONE_ENVELOPE(chan) != 0)
+	for (int chan = 0; chan < NUM_CHANNELS; chan++)
+	{
+		tone_t *tone = &m_tone[chan];
+		if (tone_envelope(tone) != 0)
 		{
-			if (type() == AY8914) // AY8914 Has a two bit tone_envelope field
+			envelope_t *envelope = &m_envelope[get_envelope_chan(chan)];
+			u32 env_volume = envelope->volume;
+			u32 env_mask = (1 << (chan + 15));
+			if (m_feature & PSG_HAS_EXPANDED_MODE)
 			{
-				indx |= (1 << (chan+15)) | ( m_vol_enabled[chan] ? ((m_env_volume >> (3-TONE_ENVELOPE(chan))) << (chan*5)) : 0);
+				if (!is_expanded_mode())
+				{
+					env_volume >>= 1;
+					env_mask = 0;
+				}
+			}
+			if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
+			{
+				indx |= env_mask | (m_vol_enabled[chan] ? ((env_volume >> (3-tone_envelope(tone))) << (chan*5)) : 0);
 			}
 			else
 			{
-				indx |= (1 << (chan+15)) | ( m_vol_enabled[chan] ? m_env_volume << (chan*5) : 0);
+				indx |= env_mask | (m_vol_enabled[chan] ? env_volume << (chan*5) : 0);
 			}
 		}
 		else
 		{
-			indx |= (m_vol_enabled[chan] ? TONE_VOLUME(chan) << (chan*5) : 0);
+			const u32 tone_mask = is_expanded_mode() ? (1 << (chan + 15)) : 0;
+			indx |= tone_mask | (m_vol_enabled[chan] ? tone_volume(tone) << (chan*5) : 0);
 		}
+	}
 	return m_vol3d_table[indx];
 }
 
@@ -938,29 +935,47 @@ u16 ay8910_device::mix_3D()
 
 void ay8910_device::ay8910_write_reg(int r, int v)
 {
-	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
-	device_type chip_type = type();
-	m_regs[r] = v;
+	if ((r & 0xf) == AY_EASHAPE) // shared register
+		r &= 0xf;
 
-	switch( r )
+	//if (r >= 11 && r <= 13) printf("%d %x %02x\n", PSG->index, r, v);
+	m_regs[r] = v;
+	u8 coarse;
+
+	switch(r)
 	{
 		case AY_AFINE:
 		case AY_ACOARSE:
+			coarse = m_regs[AY_ACOARSE] & (is_expanded_mode() ? 0xff : 0xf);
+			m_tone[0].set_period(m_regs[AY_AFINE], coarse);
+			break;
 		case AY_BFINE:
 		case AY_BCOARSE:
+			coarse = m_regs[AY_BCOARSE] & (is_expanded_mode() ? 0xff : 0xf);
+			m_tone[1].set_period(m_regs[AY_BFINE], coarse);
+			break;
 		case AY_CFINE:
 		case AY_CCOARSE:
+			coarse = m_regs[AY_CCOARSE] & (is_expanded_mode() ? 0xff : 0xf);
+			m_tone[2].set_period(m_regs[AY_CFINE], coarse);
+			break;
 		case AY_NOISEPER:
-		case AY_AVOL:
-		case AY_BVOL:
-		case AY_CVOL:
-		case AY_EFINE:
 			/* No action required */
 			break;
-		case AY_ECOARSE:
-			if ( (v & 0x0f) > 0)
+		case AY_AVOL:
+			m_tone[0].set_volume(m_regs[AY_AVOL]);
+			break;
+		case AY_BVOL:
+			m_tone[1].set_volume(m_regs[AY_BVOL]);
+			break;
+		case AY_CVOL:
+			m_tone[2].set_volume(m_regs[AY_CVOL]);
+			break;
+		case AY_EACOARSE:
+			if ((v & 0x0f) > 0)
 				osd_printf_verbose("ECoarse\n");
-			/* No action required */
+		case AY_EAFINE:
+			m_envelope[0].set_period(m_regs[AY_EAFINE], m_regs[AY_EACOARSE]);
 			break;
 		case AY_ENABLE:
 			if ((m_last_enable == -1) ||
@@ -980,32 +995,28 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			}
 			m_last_enable = m_regs[AY_ENABLE];
 			break;
-		case AY_ESHAPE:
-			if (chip_type == AY8930)
+		case AY_EASHAPE:
+			if (m_feature & PSG_HAS_EXPANDED_MODE)
 			{
+				const u8 old_mode = m_mode;
 				m_mode = (v >> 4) & 0xf;
-				if ((m_mode & 0xe) == 0xa) // AY8930 expanded mode
-					logerror("warning: activated unemulated extended mode at %s, bank %02x\n", name(), m_mode & 1);
-				else if (m_mode & 0xf)
-					logerror("warning: activated unknown mode %02x at %s\n", m_mode & 0xf, name());
+				if (old_mode != m_mode)
+				{
+					if (((old_mode & 0xe) == 0xa) ^ ((m_mode & 0xe) == 0xa)) // AY8930 expanded mode
+					{
+						for (int i = 0; i < AY_EASHAPE; i++)
+						{
+							ay8910_write_reg(i, 0);
+							ay8910_write_reg(i + 0x10, 0);
+						}
+					}
+					else if (m_mode & 0xf)
+						logerror("warning: activated unknown mode %02x at %s\n", m_mode & 0xf, name());
+				}
 			}
-			if ( (v & 0x0f) > 0)
+			if ((v & 0x0f) > 0)
 				osd_printf_verbose("EShape\n");
-			m_attack = (m_regs[AY_ESHAPE] & 0x04) ? m_env_step_mask : 0x00;
-			if ((m_regs[AY_ESHAPE] & 0x08) == 0)
-			{
-				/* if Continue = 0, map the shape to the equivalent one which has Continue = 1 */
-				m_hold = 1;
-				m_alternate = m_attack;
-			}
-			else
-			{
-				m_hold = m_regs[AY_ESHAPE] & 0x01;
-				m_alternate = m_regs[AY_ESHAPE] & 0x02;
-			}
-			m_env_step = m_env_step_mask;
-			m_holding = 0;
-			m_env_volume = (m_env_step ^ m_attack);
+			m_envelope[0].set_shape(m_regs[AY_EASHAPE], m_env_step_mask);
 			break;
 		case AY_PORTA:
 			if (m_regs[AY_ENABLE] & 0x40)
@@ -1037,6 +1048,36 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 #endif
 			}
 			break;
+		case AY_EBFINE:
+		case AY_EBCOARSE:
+			m_envelope[1].set_period(m_regs[AY_EBFINE], m_regs[AY_EBCOARSE]);
+			break;
+		case AY_ECFINE:
+		case AY_ECCOARSE:
+			m_envelope[2].set_period(m_regs[AY_ECFINE], m_regs[AY_ECCOARSE]);
+			break;
+		case AY_EBSHAPE:
+			m_envelope[1].set_shape(m_regs[AY_EBSHAPE], m_env_step_mask);
+			break;
+		case AY_ECSHAPE:
+			m_envelope[2].set_shape(m_regs[AY_ECSHAPE], m_env_step_mask);
+			break;
+		case AY_ADUTY:
+			m_tone[0].set_duty(m_regs[AY_ADUTY]);
+			break;
+		case AY_BDUTY:
+			m_tone[1].set_duty(m_regs[AY_BDUTY]);
+			break;
+		case AY_CDUTY:
+			m_tone[2].set_duty(m_regs[AY_CDUTY]);
+			break;
+		case AY_NOISEAND:
+		case AY_NOISEOR:
+			// not implemented
+			break;
+		default:
+			m_regs[r] = 0; // reserved, set as 0
+			break;
 	}
 }
 
@@ -1047,7 +1088,8 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *buf[NUM_CHANNELS];
-	int chan;
+	tone_t *tone;
+	envelope_t *envelope;
 
 	buf[0] = outputs[0];
 	buf[1] = nullptr;
@@ -1061,7 +1103,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	/* hack to prevent us from hanging when starting filtered outputs */
 	if (!m_ready)
 	{
-		for (chan = 0; chan < NUM_CHANNELS; chan++)
+		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 			if (buf[chan] != nullptr)
 				memset(buf[chan], 0, samples * sizeof(*buf[chan]));
 	}
@@ -1076,93 +1118,128 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	/* buffering loop */
 	while (samples)
 	{
-		for (chan = 0; chan < NUM_CHANNELS; chan++)
+		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 		{
-			m_count[chan]++;
-			if (m_count[chan] >= TONE_PERIOD(chan))
+			tone = &m_tone[chan];
+			tone->count++;
+			if (tone->count >= tone->period)
 			{
-				m_output[chan] ^= 1;
-				m_count[chan] = 0;
+				tone->duty_cycle = (tone->duty_cycle - 1) & 0x1f;
+				tone->output = (m_feature & PSG_HAS_EXPANDED_MODE) ? BIT(duty_cycle[tone_duty(tone)], tone->duty_cycle) : BIT(tone->duty_cycle, 0);
+				tone->count = 0;
 			}
 		}
 
 		m_count_noise++;
-		if (m_count_noise >= NOISE_PERIOD())
+		if (m_count_noise >= noise_period())
 		{
 			/* toggle the prescaler output. Noise is no different to
 			 * channels.
 			 */
 			m_count_noise = 0;
-			m_prescale_noise ^= 1;
 
-			if ( m_prescale_noise)
+			if (!m_prescale_noise)
 			{
 				/* The Random Number Generator of the 8910 is a 17-bit shift */
 				/* register. The input to the shift register is bit0 XOR bit3 */
 				/* (bit0 is the output). This was verified on AY-3-8910 and YM2149 chips. */
 
+				// TODO : get actually algorithm for AY8930
 				m_rng ^= (((m_rng & 1) ^ ((m_rng >> 3) & 1)) << 17);
 				m_rng >>= 1;
+				m_prescale_noise = (m_feature & PSG_HAS_EXPANDED_MODE) ? 16 : 1;
 			}
+			m_prescale_noise--;
 		}
 
-		for (chan = 0; chan < NUM_CHANNELS; chan++)
+		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 		{
-			m_vol_enabled[chan] = (m_output[chan] | TONE_ENABLEQ(chan)) & (NOISE_OUTPUT() | NOISE_ENABLEQ(chan));
+			tone = &m_tone[chan];
+			m_vol_enabled[chan] = (tone->output | tone_enable(chan)) & (noise_output() | noise_enable(chan));
 		}
 
 		/* update envelope */
-		if (m_holding == 0)
+		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 		{
-			m_count_env++;
-			if (m_count_env >= ENVELOPE_PERIOD() * m_step )
+			envelope = &m_envelope[chan];
+			if (envelope->holding == 0)
 			{
-				m_count_env = 0;
-				m_env_step--;
-
-				/* check envelope current position */
-				if (m_env_step < 0)
+				const u32 period = envelope->period * m_step;
+				envelope->count++;
+				if (envelope->count >= period)
 				{
-					if (m_hold)
-					{
-						if (m_alternate)
-							m_attack ^= m_env_step_mask;
-						m_holding = 1;
-						m_env_step = 0;
-					}
-					else
-					{
-						/* if CountEnv has looped an odd number of times (usually 1), */
-						/* invert the output. */
-						if (m_alternate && (m_env_step & (m_env_step_mask + 1)))
-							m_attack ^= m_env_step_mask;
+					envelope->count = 0;
+					envelope->step--;
 
-						m_env_step &= m_env_step_mask;
+					/* check envelope current position */
+					if (envelope->step < 0)
+					{
+						if (envelope->hold)
+						{
+							if (envelope->alternate)
+								envelope->attack ^= m_env_step_mask;
+							envelope->holding = 1;
+							envelope->step = 0;
+						}
+						else
+						{
+							/* if CountEnv has looped an odd number of times (usually 1), */
+							/* invert the output. */
+							if (envelope->alternate && (envelope->step & (m_env_step_mask + 1)))
+								envelope->attack ^= m_env_step_mask;
+
+							envelope->step &= m_env_step_mask;
+						}
 					}
+
 				}
-
 			}
+			envelope->volume = (envelope->step ^ envelope->attack);
 		}
-		m_env_volume = (m_env_step ^ m_attack);
 
 		if (m_streams == 3)
 		{
-			for (chan = 0; chan < NUM_CHANNELS; chan++)
-				if (TONE_ENVELOPE(chan) != 0)
+			for (int chan = 0; chan < NUM_CHANNELS; chan++)
+			{
+				tone = &m_tone[chan];
+				if (tone_envelope(tone) != 0)
 				{
-					if (type() == AY8914) // AY8914 Has a two bit tone_envelope field
+					envelope = &m_envelope[get_envelope_chan(chan)];
+					u32 env_volume = envelope->volume;
+					if (m_feature & PSG_HAS_EXPANDED_MODE)
 					{
-						*(buf[chan]++) = m_env_table[chan][m_vol_enabled[chan] ? m_env_volume >> (3-TONE_ENVELOPE(chan)) : 0];
+						if (!is_expanded_mode())
+						{
+							env_volume >>= 1;
+							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
+								*(buf[chan]++) = m_vol_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0];
+							else
+								*(buf[chan]++) = m_vol_table[chan][m_vol_enabled[chan] ? env_volume : 0];
+						}
+						else
+						{
+							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
+								*(buf[chan]++) = m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0];
+							else
+								*(buf[chan]++) = m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0];
+						}
 					}
 					else
 					{
-						*(buf[chan]++) = m_env_table[chan][m_vol_enabled[chan] ? m_env_volume : 0];
+						if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
+							*(buf[chan]++) = m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0];
+						else
+							*(buf[chan]++) = m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0];
 					}
 				}
 				else
 				{
-					*(buf[chan]++) = m_vol_table[chan][m_vol_enabled[chan] ? TONE_VOLUME(chan) : 0];
+					if (is_expanded_mode())
+						*(buf[chan]++) = m_env_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0];
+					else
+						*(buf[chan]++) = m_vol_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0];
 				}
+			}
 		}
 		else
 		{
@@ -1175,7 +1252,6 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 void ay8910_device::build_mixer_table()
 {
 	int normalize = 0;
-	int chan;
 
 	if ((m_flags & AY8910_LEGACY_OUTPUT) != 0)
 	{
@@ -1188,7 +1264,7 @@ void ay8910_device::build_mixer_table()
 		if (m_type != PSG_TYPE_AY)
 			fatalerror("AY8910_RESISTOR_OUTPUT currently only supported for AY8910 devices.");
 
-		for (chan=0; chan < NUM_CHANNELS; chan++)
+		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 		{
 			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_vol_table[chan]);
 			build_mosfet_resistor_table(ay8910_mosfet_param, m_res_load[chan], m_env_table[chan]);
@@ -1196,7 +1272,7 @@ void ay8910_device::build_mixer_table()
 	}
 	else if (m_streams == NUM_CHANNELS)
 	{
-		for (chan=0; chan < NUM_CHANNELS; chan++)
+		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 		{
 			build_single_table(m_res_load[chan], m_par, normalize, m_vol_table[chan], m_zero_is_off);
 			build_single_table(m_res_load[chan], m_par_env, normalize, m_env_table[chan], 0);
@@ -1214,27 +1290,36 @@ void ay8910_device::build_mixer_table()
 
 void ay8910_device::ay8910_statesave()
 {
+	for (int chan = 0; chan < NUM_CHANNELS; chan++)
+	{
+		save_item(NAME(m_tone[chan].period), chan);
+		save_item(NAME(m_tone[chan].volume), chan);
+		save_item(NAME(m_tone[chan].duty), chan);
+		save_item(NAME(m_tone[chan].count), chan);
+		save_item(NAME(m_tone[chan].duty_cycle), chan);
+		save_item(NAME(m_tone[chan].output), chan);
+
+		save_item(NAME(m_envelope[chan].period), chan);
+		save_item(NAME(m_envelope[chan].count), chan);
+		save_item(NAME(m_envelope[chan].step), chan);
+		save_item(NAME(m_envelope[chan].volume), chan);
+		save_item(NAME(m_envelope[chan].hold), chan);
+		save_item(NAME(m_envelope[chan].alternate), chan);
+		save_item(NAME(m_envelope[chan].attack), chan);
+		save_item(NAME(m_envelope[chan].holding), chan);
+	}
+
 	save_item(NAME(m_active));
 	save_item(NAME(m_register_latch));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_last_enable));
 
-	save_item(NAME(m_count));
 	save_item(NAME(m_count_noise));
-	save_item(NAME(m_count_env));
-
-	save_item(NAME(m_env_volume));
-
-	save_item(NAME(m_output));
 	save_item(NAME(m_prescale_noise));
 
-	save_item(NAME(m_env_step));
-	save_item(NAME(m_hold));
-	save_item(NAME(m_alternate));
-	save_item(NAME(m_attack));
-	save_item(NAME(m_holding));
 	save_item(NAME(m_rng));
 	save_item(NAME(m_mode));
+	save_item(NAME(m_flags));
 }
 
 //-------------------------------------------------
@@ -1243,7 +1328,7 @@ void ay8910_device::ay8910_statesave()
 
 void ay8910_device::device_start()
 {
-	int master_clock = clock();
+	const int master_clock = clock();
 
 	if (m_ioports < 1 && !(m_port_a_read_cb.isnull() && m_port_a_write_cb.isnull()))
 		fatalerror("Device '%s' is a %s and has no port A!", tag(), name());
@@ -1267,33 +1352,29 @@ void ay8910_device::device_start()
 	build_mixer_table();
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
-	/* This handled by the step parameter. Consequently we use a divider of 8 here. */
-	m_channel = machine().sound().stream_alloc(*this, 0, m_streams, master_clock / 8);
+	/* This handled by the step parameter. Consequently we use a multipler of 2 here. */
+	m_channel = machine().sound().stream_alloc(*this, 0, m_streams, (m_feature & PSG_HAS_EXPANDED_MODE) ? master_clock * 2 : master_clock / 8);
 
 	ay_set_clock(master_clock);
 	ay8910_statesave();
 }
 
 
-
 void ay8910_device::ay8910_reset_ym()
 {
-	int i;
-
 	m_active = false;
 	m_register_latch = 0;
 	m_rng = 1;
-	m_output[0] = 0;
-	m_output[1] = 0;
-	m_output[2] = 0;
-	m_count[0] = 0;
-	m_count[1] = 0;
-	m_count[2] = 0;
+	m_mode = 0; // ay-3-8910 compatible mode
+	for (int chan = 0; chan < NUM_CHANNELS; chan++)
+	{
+		m_tone[chan].reset();
+		m_envelope[chan].reset();
+	}
 	m_count_noise = 0;
-	m_count_env = 0;
 	m_prescale_noise = 0;
 	m_last_enable = -1;  /* force a write */
-	for (i = 0; i < AY_PORTA; i++)
+	for (int i = 0; i < AY_PORTA; i++)
 		ay8910_write_reg(i,0);
 	m_ready = 1;
 #if ENABLE_REGISTER_TEST
@@ -1308,17 +1389,15 @@ void ay8910_device::ay8910_reset_ym()
 	ay8910_write_reg(AY_AVOL, 10);
 	ay8910_write_reg(AY_BVOL, 10);
 	ay8910_write_reg(AY_CVOL, 10);
-	//#define AY_EFINE  (11)
-	//#define AY_ECOARSE    (12)
-	//#define AY_ESHAPE (13)
+	//#define AY_EAFINE  (11)
+	//#define AY_EACOARSE    (12)
+	//#define AY_EASHAPE (13)
 #endif
 }
 
 void ay8910_device::set_volume(int channel,int volume)
 {
-	int ch;
-
-	for (ch = 0; ch < m_streams; ch++)
+	for (int ch = 0; ch < m_streams; ch++)
 		if (channel == ch || m_streams == 1 || channel == ALL_8910_CHANNELS)
 			m_channel->set_output_gain(ch, volume / 100.0);
 }
@@ -1326,11 +1405,10 @@ void ay8910_device::set_volume(int channel,int volume)
 void ay8910_device::ay_set_clock(int clock)
 {
 	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
-	if (type() == YM2149 && (m_flags & YM2149_PIN26_LOW))
-	{
-		clock /= 2;
-	}
-	m_channel->set_sample_rate( clock / 8 );
+	if ((m_feature & PSG_PIN26_IS_CLKSEL) && (m_flags & YM2149_PIN26_LOW))
+		m_channel->set_sample_rate((m_feature & PSG_HAS_EXPANDED_MODE) ? clock : clock / 16);
+	else
+		m_channel->set_sample_rate((m_feature & PSG_HAS_EXPANDED_MODE) ? clock * 2 : clock / 8);
 }
 
 void ay8910_device::device_clock_changed()
@@ -1344,14 +1422,15 @@ void ay8910_device::ay8910_write_ym(int addr, u8 data)
 	{
 		if (m_active)
 		{
+			const u8 register_latch = m_register_latch + get_register_bank();
 			/* Data port */
-			if (m_register_latch == AY_ESHAPE || m_regs[m_register_latch] != data)
+			if (m_register_latch == AY_EASHAPE || m_regs[register_latch] != data)
 			{
 				/* update the output buffer before changing the register */
 				m_channel->update();
 			}
 
-			ay8910_write_reg(m_register_latch, data);
+			ay8910_write_reg(register_latch, data);
 		}
 	}
 	else
@@ -1372,9 +1451,12 @@ void ay8910_device::ay8910_write_ym(int addr, u8 data)
 u8 ay8910_device::ay8910_read_ym()
 {
 	device_type chip_type = type();
-	int r = m_register_latch;
+	int r = m_register_latch + get_register_bank();
 
 	if (!m_active) return 0xff; // high impedance
+
+	if ((r & 0xf) == AY_EASHAPE) // shared register
+		r &= 0xf;
 
 	/* There are no state dependent register in the AY8910! */
 	/* m_channel->update(); */
@@ -1491,6 +1573,25 @@ void ay8910_device::write_bc1_bc2(offs_t offset, u8 data)
 	}
 }
 
+// /SEL
+void ay8910_device::set_pin26_low_w(u8 data)
+{
+	if ((m_feature & PSG_PIN26_IS_CLKSEL) && (!(m_flags & YM2149_PIN26_LOW)))
+	{
+		m_flags |= YM2149_PIN26_LOW;
+		ay_set_clock(clock());
+	}
+}
+
+void ay8910_device::set_pin26_high_w(u8 data)
+{
+	if ((m_feature & PSG_PIN26_IS_CLKSEL) && (m_flags & YM2149_PIN26_LOW))
+	{
+		m_flags &= ~YM2149_PIN26_LOW;
+		ay_set_clock(clock());
+	}
+}
+
 static const u8 mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8, 9, 10, 14, 15 };
 
 u8 ay8914_device::read(offs_t offset)
@@ -1517,7 +1618,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 }
 
 ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
-								psg_type_t psg_type, int streams, int ioports)
+								psg_type_t psg_type, int streams, int ioports, int feature)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_type(psg_type),
@@ -1530,35 +1631,30 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_last_enable(0),
 		m_prescale_noise(0),
 		m_count_noise(0),
-		m_count_env(0),
-		m_env_step(0),
-		m_env_volume(0),
-		m_hold(0),
-		m_alternate(0),
-		m_attack(0),
-		m_holding(0),
 		m_rng(0),
 		m_mode(0),
-		m_env_step_mask(psg_type == PSG_TYPE_AY ? 0x0f : 0x1f),
-		m_step(         psg_type == PSG_TYPE_AY ? 2 : 1),
-		m_zero_is_off(  psg_type == PSG_TYPE_AY ? 1 : 0),
-		m_par(          psg_type == PSG_TYPE_AY ? &ay8910_param : &ym2149_param),
-		m_par_env(      psg_type == PSG_TYPE_AY ? &ay8910_param : &ym2149_param_env),
+		m_env_step_mask((!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 0x0f : 0x1f),
+		m_step(         (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 2 : 1),
+		m_zero_is_off(  (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 1 : 0),
+		m_par(          (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param),
+		m_par_env(      (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param_env),
 		m_flags(AY8910_LEGACY_OUTPUT),
+		m_feature(feature),
 		m_port_a_read_cb(*this),
 		m_port_b_read_cb(*this),
 		m_port_a_write_cb(*this),
 		m_port_b_write_cb(*this)
 {
 	memset(&m_regs,0,sizeof(m_regs));
-	memset(&m_count,0,sizeof(m_count));
-	memset(&m_output,0,sizeof(m_output));
+	memset(&m_tone,0,sizeof(m_tone));
+	memset(&m_envelope,0,sizeof(m_envelope));
 	memset(&m_vol_enabled,0,sizeof(m_vol_enabled));
 	memset(&m_vol_table,0,sizeof(m_vol_table));
 	memset(&m_env_table,0,sizeof(m_env_table));
 	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 
-	set_type(psg_type);
+	// TODO : measure ay8930 volume parameters (PSG_TYPE_YM for temporary 5 bit handling)
+	set_type((m_feature & PSG_HAS_EXPANDED_MODE) ? PSG_TYPE_YM : psg_type);
 }
 
 void ay8910_device::set_type(psg_type_t psg_type)
@@ -1580,6 +1676,8 @@ void ay8910_device::set_type(psg_type_t psg_type)
 		m_par = &ym2149_param;
 		m_par_env = &ym2149_param_env;
 	}
+	if (m_feature & PSG_HAS_EXPANDED_MODE)
+		m_step *= 16;
 }
 
 DEFINE_DEVICE_TYPE(AY8912, ay8912_device, "ay8912", "AY-3-8912A PSG")
@@ -1601,7 +1699,7 @@ ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, dev
 DEFINE_DEVICE_TYPE(AY8914, ay8914_device, "ay8914", "AY-3-8914A PSG")
 
 ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ay8910_device(mconfig, AY8914, tag, owner, clock, PSG_TYPE_AY, 3, 2)
+	: ay8910_device(mconfig, AY8914, tag, owner, clock, PSG_TYPE_AY, 3, 2, PSG_EXTENDED_ENVELOPE)
 {
 }
 
@@ -1609,7 +1707,7 @@ ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, dev
 DEFINE_DEVICE_TYPE(AY8930, ay8930_device, "ay8930", "AY8930 EPSG")
 
 ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ay8910_device(mconfig, AY8930, tag, owner, clock, PSG_TYPE_AY, 3, 2)
+	: ay8910_device(mconfig, AY8930, tag, owner, clock, PSG_TYPE_YM, 3, 2, PSG_PIN26_IS_CLKSEL | PSG_HAS_EXPANDED_MODE)
 {
 }
 
@@ -1617,7 +1715,7 @@ ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, dev
 DEFINE_DEVICE_TYPE(YM2149, ym2149_device, "ym2149", "YM2149 SSG")
 
 ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ay8910_device(mconfig, YM2149, tag, owner, clock, PSG_TYPE_YM, 3, 2)
+	: ay8910_device(mconfig, YM2149, tag, owner, clock, PSG_TYPE_YM, 3, 2, PSG_PIN26_IS_CLKSEL)
 {
 }
 
@@ -1625,7 +1723,7 @@ ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, dev
 DEFINE_DEVICE_TYPE(YM3439, ym3439_device, "ym3439", "YM3439 SSGC")
 
 ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ay8910_device(mconfig, YM3439, tag, owner, clock, PSG_TYPE_YM, 3, 2)
+	: ay8910_device(mconfig, YM3439, tag, owner, clock, PSG_TYPE_YM, 3, 2, PSG_PIN26_IS_CLKSEL)
 {
 }
 

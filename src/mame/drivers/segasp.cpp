@@ -532,7 +532,7 @@ ROM_START( tetgiant )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, BAD_DUMP CRC(e8dd2b86) SHA1(765ffd2e4a36302b1db0815e842c9656e29f2457) )
+	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, CRC(a46dfd47) SHA1(9e24739ecaaf85ef3b862485064450db6c607189) )
 ROM_END
 
 
@@ -659,7 +659,7 @@ ROM_START( tetgiano )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, BAD_DUMP CRC(e8dd2b86) SHA1(765ffd2e4a36302b1db0815e842c9656e29f2457) )
+	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, CRC(a46dfd47) SHA1(9e24739ecaaf85ef3b862485064450db6c607189) )
 ROM_END
 
 

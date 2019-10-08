@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #ifndef MAME_CPU_BCP_DP8344_H
-#define MAME_CPU_BCP_DP8344_H 1
+#define MAME_CPU_BCP_DP8344_H
 
 #pragma once
 

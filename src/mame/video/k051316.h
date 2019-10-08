@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 
 typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_delegate;
 #define K051316_CB_MEMBER(_name)   void _name(int *code, int *color, int *flags)

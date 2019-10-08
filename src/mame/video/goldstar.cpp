@@ -484,7 +484,7 @@ uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_rgb32 
 
 		// are these hardcoded, or registers?
 		//const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
-		const rectangle visible2(0*8, (14+48)*8-1, 14*8, (36+7)*8-1);  // seems to be the one used...
+		const rectangle visible2(0*8, (14+48)*8-1, 14*8, 32*8-1);  // seems to be the one used...
 		//const rectangle visible3(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
 
 //      m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);

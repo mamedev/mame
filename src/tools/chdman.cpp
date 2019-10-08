@@ -894,14 +894,14 @@ static int print_help(const char *argv0, const command_description &desc, const 
 //  big_int_string - create a 64-bit string
 //-------------------------------------------------
 
-const char *big_int_string(std::string &str, uint64_t intvalue)
+std::string big_int_string(uint64_t intvalue)
 {
 	// 0 is a special case
 	if (intvalue == 0)
-		return str.assign("0").c_str();
+		return "0";
 
 	// loop until all chunks are done
-	str.clear();
+	std::string str;
 	bool first = true;
 	while (intvalue != 0)
 	{
@@ -911,11 +911,11 @@ const char *big_int_string(std::string &str, uint64_t intvalue)
 		std::string insert = string_format((intvalue != 0) ? "%03d" : "%d", chunk);
 
 		if (!first)
-			str.insert(0, ",").c_str();
+			str.insert(0, ",");
 		first = false;
 		str.insert(0, insert);
 	}
-	return str.c_str();
+	return str;
 }
 
 
@@ -924,10 +924,9 @@ const char *big_int_string(std::string &str, uint64_t intvalue)
 //  number of frames in M:S:F format
 //-------------------------------------------------
 
-const char *msf_string_from_frames(std::string &str, uint32_t frames)
+std::string msf_string_from_frames(uint32_t frames)
 {
-	str = string_format("%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75);
-	return str.c_str();
+	return string_format("%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75);
 }
 
 
@@ -1193,14 +1192,14 @@ static void parse_numprocessors(const parameters_t &params)
 //  describing a set of compressors
 //-------------------------------------------------
 
-static const char *compression_string(std::string &str, chd_codec_type compression[4])
+static std::string compression_string(chd_codec_type compression[4])
 {
 	// output compression types
-	str.clear();
 	if (compression[0] == CHD_CODEC_NONE)
-		return str.assign("none").c_str();
+		return "none";
 
 	// iterate over types
+	std::string str;
 	for (int index = 0; index < 4; index++)
 	{
 		chd_codec_type type = compression[index];
@@ -1214,7 +1213,7 @@ static const char *compression_string(std::string &str, chd_codec_type compressi
 		str.push_back(type & 0xff);
 		str.append(" (").append(chd_codec_list::codec_name(type)).append(")");
 	}
-	return str.c_str();
+	return str;
 }
 
 
@@ -1330,29 +1329,29 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 		}
 
 		// output TRACK entry
-		file.printf("  TRACK %02d %s\n", tracknum + 1, tempstr.c_str());
+		file.printf("  TRACK %02d %s\n", tracknum + 1, tempstr);
 
 		// output PREGAP tag if pregap sectors are not in the file
 		if ((info.pregap > 0) && (info.pgdatasize == 0))
 		{
-			file.printf("    PREGAP %s\n", msf_string_from_frames(tempstr, info.pregap));
-			file.printf("    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
+			file.printf("    PREGAP %s\n", msf_string_from_frames(info.pregap));
+			file.printf("    INDEX 01 %s\n", msf_string_from_frames(frameoffs));
 		}
 		else if ((info.pregap > 0) && (info.pgdatasize > 0))
 		{
-			file.printf("    INDEX 00 %s\n", msf_string_from_frames(tempstr, frameoffs));
-			file.printf("    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs+info.pregap));
+			file.printf("    INDEX 00 %s\n", msf_string_from_frames(frameoffs));
+			file.printf("    INDEX 01 %s\n", msf_string_from_frames(frameoffs+info.pregap));
 		}
 
 		// if no pregap at all, output index 01 only
 		if (info.pregap == 0)
 		{
-			file.printf("    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
+			file.printf("    INDEX 01 %s\n", msf_string_from_frames(frameoffs));
 		}
 
 		// output POSTGAP
 		if (info.postgap > 0)
-			file.printf("    POSTGAP %s\n", msf_string_from_frames(tempstr, info.postgap));
+			file.printf("    POSTGAP %s\n", msf_string_from_frames(info.postgap));
 	}
 	// non-CUE mode
 	else if (mode == MODE_NORMAL)
@@ -1368,7 +1367,7 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 			modesubmode = string_format("%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
 		else
 			modesubmode = string_format("%s", cdrom_get_type_string(info.trktype));
-		file.printf("TRACK %s\n", modesubmode.c_str());
+		file.printf("TRACK %s\n", modesubmode);
 
 		// write out the attributes
 		file.printf("NO COPY\n");
@@ -1379,19 +1378,18 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 		}
 
 		// output pregap
-		std::string tempstr;
 		if (info.pregap > 0)
-			file.printf("ZERO %s %s\n", modesubmode.c_str(), msf_string_from_frames(tempstr, info.pregap));
+			file.printf("ZERO %s %s\n", modesubmode, msf_string_from_frames(info.pregap));
 
 		// all tracks but the first one have a file offset
 		if (tracknum > 0)
-			file.printf("DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, uint32_t(discoffs), msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
+			file.printf("DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, uint32_t(discoffs), msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
 		else
-			file.printf("DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
+			file.printf("DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(info.frames), info.frames * (info.datasize + info.subsize));
 
 		// tracks with pregaps get a START marker too
 		if (info.pregap > 0)
-			file.printf("START %s\n", msf_string_from_frames(tempstr, info.pregap));
+			file.printf("START %s\n", msf_string_from_frames(info.pregap));
 
 		file.printf("\n\n");
 	}
@@ -1412,7 +1410,6 @@ static void do_info(parameters_t &params)
 	parse_input_chd_parameters(params, input_chd, input_parent_chd);
 
 	// print filename and version
-	std::string tempstr;
 	printf("Input file:   %s\n", params.find(OPTION_INPUT)->second->c_str());
 	printf("File Version: %d\n", input_chd.version());
 	if (input_chd.version() < 3)
@@ -1420,13 +1417,13 @@ static void do_info(parameters_t &params)
 
 	// output cmpression and size information
 	chd_codec_type compression[4] = { input_chd.compression(0), input_chd.compression(1), input_chd.compression(2), input_chd.compression(3) };
-	printf("Logical size: %s bytes\n", big_int_string(tempstr, input_chd.logical_bytes()));
-	printf("Hunk Size:    %s bytes\n", big_int_string(tempstr, input_chd.hunk_bytes()));
-	printf("Total Hunks:  %s\n", big_int_string(tempstr, input_chd.hunk_count()));
-	printf("Unit Size:    %s bytes\n", big_int_string(tempstr, input_chd.unit_bytes()));
-	printf("Total Units:  %s\n", big_int_string(tempstr, input_chd.unit_count()));
-	printf("Compression:  %s\n", compression_string(tempstr, compression));
-	printf("CHD size:     %s bytes\n", big_int_string(tempstr, static_cast<util::core_file &>(input_chd).size()));
+	printf("Logical size: %s bytes\n", big_int_string(input_chd.logical_bytes()).c_str());
+	printf("Hunk Size:    %s bytes\n", big_int_string(input_chd.hunk_bytes()).c_str());
+	printf("Total Hunks:  %s\n", big_int_string(input_chd.hunk_count()).c_str());
+	printf("Unit Size:    %s bytes\n", big_int_string(input_chd.unit_bytes()).c_str());
+	printf("Total Units:  %s\n", big_int_string(input_chd.unit_count()).c_str());
+	printf("Compression:  %s\n", compression_string(compression).c_str());
+	printf("CHD size:     %s bytes\n", big_int_string(static_cast<util::core_file &>(input_chd).size()).c_str());
 	if (compression[0] != CHD_CODEC_NONE)
 		printf("Ratio:        %.1f%%\n", 100.0 * double(static_cast<util::core_file &>(input_chd).size()) / double(input_chd.logical_bytes()));
 
@@ -1538,9 +1535,8 @@ static void do_info(parameters_t &params)
 				}
 
 				// output the stats
-				std::string tempstr;
 				printf("%10s   %5.1f%%  %-40s\n",
-						big_int_string(tempstr, compression_types[comptype]),
+						big_int_string(compression_types[comptype]).c_str(),
 						100.0 * double(compression_types[comptype]) / double(input_chd.hunk_count()),
 						name);
 			}
@@ -1676,19 +1672,18 @@ static void do_create_raw(parameters_t &params)
 	parse_numprocessors(params);
 
 	// print some info
-	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
 	printf("Input file:   %s\n", input_file_str->second->c_str());
 	if (input_start != 0 || input_end != input_file->size())
 	{
-		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-		printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+		printf("Input start:  %s\n", big_int_string(input_start).c_str());
+		printf("Input length: %s\n", big_int_string(input_end - input_start).c_str());
 	}
-	printf("Compression:  %s\n", compression_string(tempstr, compression));
-	printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
-	printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
+	printf("Compression:  %s\n", compression_string(compression).c_str());
+	printf("Hunk size:    %s\n", big_int_string(hunk_size).c_str());
+	printf("Logical size: %s\n", big_int_string(input_end - input_start).c_str());
 
 	// catch errors so we can close & delete the output file
 	try
@@ -1865,7 +1860,6 @@ static void do_create_hd(parameters_t &params)
 	uint32_t totalsectors = cylinders * heads * sectors;
 
 	// print some info
-	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
@@ -1874,17 +1868,17 @@ static void do_create_hd(parameters_t &params)
 		printf("Input file:   %s\n", input_file_str->second->c_str());
 		if (input_start != 0 || input_end != input_file->size())
 		{
-			printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-			printf("Input length: %s\n", big_int_string(tempstr, filesize));
+			printf("Input start:  %s\n", big_int_string(input_start).c_str());
+			printf("Input length: %s\n", big_int_string(filesize).c_str());
 		}
 	}
-	printf("Compression:  %s\n", compression_string(tempstr, compression));
+	printf("Compression:  %s\n", compression_string(compression).c_str());
 	printf("Cylinders:    %d\n", cylinders);
 	printf("Heads:        %d\n", heads);
 	printf("Sectors:      %d\n", sectors);
 	printf("Bytes/sector: %d\n", sector_size);
 	printf("Sectors/hunk: %d\n", hunk_size / sector_size);
-	printf("Logical size: %s\n", big_int_string(tempstr, uint64_t(totalsectors) * uint64_t(sector_size)));
+	printf("Logical size: %s\n", big_int_string(uint64_t(totalsectors) * uint64_t(sector_size)).c_str());
 
 	// catch errors so we can close & delete the output file
 	try
@@ -1977,15 +1971,14 @@ static void do_create_cd(parameters_t &params)
 	}
 
 	// print some info
-	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
 	printf("Input file:   %s\n", input_file_str->second->c_str());
 	printf("Input tracks: %d\n", toc.numtrks);
-	printf("Input length: %s\n", msf_string_from_frames(tempstr, origtotalsectors));
-	printf("Compression:  %s\n", compression_string(tempstr, compression));
-	printf("Logical size: %s\n", big_int_string(tempstr, uint64_t(totalsectors) * CD_FRAME_SIZE));
+	printf("Input length: %s\n", msf_string_from_frames(origtotalsectors).c_str());
+	printf("Compression:  %s\n", compression_string(compression).c_str());
+	printf("Logical size: %s\n", big_int_string(uint64_t(totalsectors) * CD_FRAME_SIZE).c_str());
 
 	// catch errors so we can close & delete the output file
 	chd_cd_compressor *chd = nullptr;
@@ -2087,23 +2080,22 @@ static void do_create_ld(parameters_t &params)
 	parse_numprocessors(params);
 
 	// print some info
-	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
 	printf("Input file:   %s\n", input_file_str->second->c_str());
 	if (input_start != 0 && input_end != aviinfo.video_numsamples)
-		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-	printf("Input length: %s (%02d:%02d:%02d)\n", big_int_string(tempstr, input_end - input_start),
+		printf("Input start:  %s\n", big_int_string(input_start).c_str());
+	printf("Input length: %s (%02d:%02d:%02d)\n", big_int_string(input_end - input_start).c_str(),
 			uint32_t((uint64_t(input_end - input_start) * 1000000 / info.fps_times_1million / 60 / 60)),
 			uint32_t(((uint64_t(input_end - input_start) * 1000000 / info.fps_times_1million / 60) % 60)),
 			uint32_t(((uint64_t(input_end - input_start) * 1000000 / info.fps_times_1million) % 60)));
 	printf("Frame rate:   %d.%06d\n", info.fps_times_1million / 1000000, info.fps_times_1million % 1000000);
 	printf("Frame size:   %d x %d %s\n", info.width, info.height * (info.interlaced ? 2 : 1), info.interlaced ? "interlaced" : "non-interlaced");
 	printf("Audio:        %d channels at %d Hz\n", info.channels, info.rate);
-	printf("Compression:  %s\n", compression_string(tempstr, compression));
-	printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
-	printf("Logical size: %s\n", big_int_string(tempstr, uint64_t(input_end - input_start) * hunk_size));
+	printf("Compression:  %s\n", compression_string(compression).c_str());
+	printf("Hunk size:    %s\n", big_int_string(hunk_size).c_str());
+	printf("Logical size: %s\n", big_int_string(uint64_t(input_end - input_start) * hunk_size).c_str());
 
 	// catch errors so we can close & delete the output file
 	chd_avi_compressor *chd = nullptr;
@@ -2199,19 +2191,18 @@ static void do_copy(parameters_t &params)
 	parse_numprocessors(params);
 
 	// print some info
-	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
 	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->second->c_str());
 	if (input_start != 0 || input_end != input_chd.logical_bytes())
 	{
-		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-		printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+		printf("Input start:  %s\n", big_int_string(input_start).c_str());
+		printf("Input length: %s\n", big_int_string(input_end - input_start).c_str());
 	}
-	printf("Compression:  %s\n", compression_string(tempstr, compression));
-	printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
-	printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
+	printf("Compression:  %s\n", compression_string(compression).c_str());
+	printf("Hunk size:    %s\n", big_int_string(hunk_size).c_str());
+	printf("Logical size: %s\n", big_int_string(input_end - input_start).c_str());
 
 	// catch errors so we can close & delete the output file
 	chd_chdfile_compressor *chd = nullptr;
@@ -2308,13 +2299,12 @@ static void do_extract_raw(parameters_t &params)
 		check_existing_output_file(params, output_file_str->second->c_str());
 
 	// print some info
-	std::string tempstr;
 	printf("Output File:  %s\n", output_file_str->second->c_str());
 	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->second->c_str());
 	if (input_start != 0 || input_end != input_chd.logical_bytes())
 	{
-		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-		printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+		printf("Input start:  %s\n", big_int_string(input_start).c_str());
+		printf("Input length: %s\n", big_int_string(input_end - input_start).c_str());
 	}
 
 	// catch errors so we can close & delete the output file
@@ -2405,7 +2395,6 @@ static void do_extract_cd(parameters_t &params)
 	check_existing_output_file(params, output_bin_file_str->c_str());
 
 	// print some info
-	std::string tempstr;
 	printf("Output TOC:   %s\n", output_file_str->second->c_str());
 	printf("Output Data:  %s\n", output_bin_file_str->c_str());
 	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->second->c_str());
@@ -2632,13 +2621,12 @@ static void do_extract_ld(parameters_t &params)
 		check_existing_output_file(params, output_file_str->second->c_str());
 
 	// print some info
-	std::string tempstr;
 	printf("Output File:  %s\n", output_file_str->second->c_str());
 	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->second->c_str());
 	if (input_start != 0 || input_end != input_chd.hunk_count())
 	{
-		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-		printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+		printf("Input start:  %s\n", big_int_string(input_start).c_str());
+		printf("Input length: %s\n", big_int_string(input_end - input_start).c_str());
 	}
 
 	// catch errors so we can close & delete the output file
@@ -2745,7 +2733,7 @@ static void do_add_metadata(parameters_t &params)
 	{
 		text = *text_str->second;
 		if (text[0] == '"' && text[text.length() - 1] == '"')
-			text.substr(1, text.length() - 2);
+			*text_str->second = text.substr(1, text.length() - 2);
 	}
 
 	// process file input
@@ -2770,7 +2758,6 @@ static void do_add_metadata(parameters_t &params)
 		flags &= ~CHD_MDFLAGS_CHECKSUM;
 
 	// print some info
-	std::string tempstr;
 	printf("Input file:   %s\n", params.find(OPTION_INPUT)->second->c_str());
 	printf("Tag:          %c%c%c%c\n", (tag >> 24) & 0xff, (tag >> 16) & 0xff, (tag >> 8) & 0xff, tag & 0xff);
 	printf("Index:        %d\n", index);
@@ -2819,7 +2806,6 @@ static void do_del_metadata(parameters_t &params)
 		index = atoi(index_str->second->c_str());
 
 	// print some info
-	std::string tempstr;
 	printf("Input file:   %s\n", params.find(OPTION_INPUT)->second->c_str());
 	printf("Tag:          %c%c%c%c\n", (tag >> 24) & 0xff, (tag >> 16) & 0xff, (tag >> 8) & 0xff, tag & 0xff);
 	printf("Index:        %d\n", index);
@@ -2888,8 +2874,7 @@ static void do_dump_metadata(parameters_t &params)
 			output_file.reset();
 
 			// provide some feedback
-			std::string tempstr;
-			printf("File (%s) written, %s bytes\n", output_file_str->second->c_str(), big_int_string(tempstr, buffer.size()));
+			printf("File (%s) written, %s bytes\n", output_file_str->second->c_str(), big_int_string(buffer.size()).c_str());
 		}
 
 		// flush to stdout

@@ -188,7 +188,7 @@ void quantum_state::main_map(address_map &map)
 static INPUT_PORTS_START( quantum )
 	PORT_START("SYSTEM")
 	/* YHALT here MUST BE ALWAYS 0  */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_quantum_device, done_r, nullptr) /* vg YHALT */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_quantum_device, done_r) // vg YHALT
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )

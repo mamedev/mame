@@ -574,7 +574,7 @@ void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 	else
 		sprite_y = (m_sprite_dma_rel_y & 0x78) + (abs_y)-((m_sprite_dma_rel_y & 0x80) ? 0x80 : 0);
 
-	// 3rd midboss enables this bit for the sections that should be covered by the ground layers, 
+	// 3rd midboss enables this bit for the sections that should be covered by the ground layers,
 	// effectively changing the priority value to 2
 	if (m_cop_sprite_dma_param & 0x00020000)
 	{

@@ -7,6 +7,7 @@
 
 #include "screen.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class edevices_device : public device_t
 {

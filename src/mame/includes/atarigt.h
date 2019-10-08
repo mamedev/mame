@@ -11,6 +11,7 @@
 #include "machine/atarigen.h"
 #include "video/atarirle.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #define CRAM_ENTRIES        0x4000
 #define TRAM_ENTRIES        0x4000

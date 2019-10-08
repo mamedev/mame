@@ -9,6 +9,7 @@
 #include "sound/3812intf.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class bloodbro_state : public driver_device, public seibu_sound_common
 {

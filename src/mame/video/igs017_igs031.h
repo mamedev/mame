@@ -7,6 +7,7 @@
 
 #include "machine/i8255.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 typedef device_delegate<u16 (u16)> igs017_igs031_palette_scramble_delegate;
 

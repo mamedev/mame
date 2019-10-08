@@ -162,7 +162,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// coincounter on coin insert
-	if (((int)(uintptr_t)param) == 0)
+	if (param == 0)
 		machine().bookkeeping().coin_counter_w(0, newval);
 }
 
@@ -243,10 +243,10 @@ static INPUT_PORTS_START( destiny )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, destiny_state, coin_inserted, (void *)0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, destiny_state, coin_inserted, 0)
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, destiny_state, coin_inserted, (void *)1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, destiny_state, coin_inserted, 1)
 INPUT_PORTS_END
 
 

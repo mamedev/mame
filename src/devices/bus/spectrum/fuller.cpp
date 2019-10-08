@@ -93,9 +93,9 @@ READ_LINE_MEMBER(spectrum_fuller_device::romcs)
 	return m_exp->romcs();
 }
 
-void spectrum_fuller_device::opcode_fetch(offs_t offset)
+void spectrum_fuller_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch(offset);
+	m_exp->pre_opcode_fetch(offset);
 }
 
 uint8_t spectrum_fuller_device::mreq_r(offs_t offset)

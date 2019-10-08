@@ -252,7 +252,7 @@ WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 
 INPUT_CHANGED_MEMBER(juicebox_state::port_changed)
 {
-	m_s3c44b0->request_eint((uintptr_t)param);
+	m_s3c44b0->request_eint(param);
 }
 
 // ...
@@ -342,11 +342,11 @@ void juicebox_state::juicebox(machine_config &config)
 
 static INPUT_PORTS_START( juicebox )
 	PORT_START( "PORTG" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("RETURN") PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("PLAY") PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("FORWARD") PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("REVERSE") PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("STAR") PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("RETURN") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("PLAY") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("FORWARD") PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("REVERSE") PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("STAR") PORT_PLAYER(1)
 INPUT_PORTS_END
 
 /***************************************************************************

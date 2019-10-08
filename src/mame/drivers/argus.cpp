@@ -455,46 +455,24 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,    /* 8x8 characters */
-	RGN_FRAC(1,1),   /* number of characters */
-	4,      /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16x16 characters */
-	RGN_FRAC(1,1),    /* number of characters */
-	4,      /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*16, 4) },
-	{ STEP16(0,4*8) },
-	128*8
-};
-
 static GFXDECODE_START( gfx_argus )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16,  8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  8*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 24*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 40*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb,  0*16,  8 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb,  8*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 24*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb,               40*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_valtric )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 32*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb,  0*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 16*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb,               32*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_butasan )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 12*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 32*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb,  0*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 16*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 12*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb,               32*16, 16 )
 GFXDECODE_END
 
 

@@ -45,11 +45,11 @@
         * Trivial Pursuit (Volumen III, Spanish, Maibesa license)
         * Trivial Pursuit (Volumen II, Spanish, Maibesa license)
         * Trivial Pursuit (Volumen IV, Spanish, Maibesa hardware)
+        * Trivial Pursuit (Volumen V, Spanish, Maibesa hardware)
 
     Looking for ROMs for these:
         * Euro Stocker
         * Trivial Pursuit (Volumen I, Spanish, Maibesa)
-        * Trivial Pursuit (Volumen V, Spanish, Maibesa) [probably running on Maibesa hardware]
 
     Known bugs:
         * CEM3394 emulation is not perfect
@@ -1022,7 +1022,7 @@ static INPUT_PORTS_START( nstocker )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "G1:7" )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, balsente_state,nstocker_bits_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(balsente_state, nstocker_bits_r)
 
 	/* cheese alert -- we have to map this to player 2 so that it doesn't interfere with
 	   the crosshair controls */

@@ -196,7 +196,7 @@ static void write_m2_reg(uint32_t &reg, uint32_t data, m2_reg_wmode mode)
 		case REG_SET:   reg |= data;    break;
 		case REG_CLEAR: reg &= ~data;   break;
 		default:
-			assert_always(false, "Bad register write mode");
+			throw emu_fatalerror("write_m2_reg: Bad register write mode");
 	}
 }
 
@@ -1605,7 +1605,7 @@ void m2_cde_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			break;
 
 		default:
-			assert_always(false, "Unknown CDE timer ID");
+			throw emu_fatalerror("m2_cde_device::device_timer: Unknown CDE timer ID");
 	}
 }
 
@@ -1947,7 +1947,7 @@ void m2_cde_device::start_dma(uint32_t ch)
 	if (dma_ch.m_cntl & CDE_DMA_DIRECTION)
 	{
 		// PowerBus to BioBus
-		assert_always(false, "CDE PowerBus to BioBus DMA currently unsupported");
+		throw emu_fatalerror("m2_cde_device::start_dma: CDE PowerBus to BioBus DMA currently unsupported");
 	}
 	else
 	{
@@ -1964,8 +1964,10 @@ void m2_cde_device::start_dma(uint32_t ch)
 		if (setup & CDE_DATAWIDTH_16)
 		{
 			// 16-bit case
-			assert_always((dma_ch.m_ccnt & 1) == 0, "16-bit DMA: Byte count must be even?");
-			assert_always((dma_ch.m_cpad & 1) == 0, "16-bit DMA: DMA destination must be word aligned?");
+			if (dma_ch.m_ccnt & 1)
+				throw emu_fatalerror("m2_cde_device::start_dma: 16-bit DMA: Byte count must be even?");
+			if (dma_ch.m_cpad & 1)
+				throw emu_fatalerror("m2_cde_device::start_dma: 16-bit DMA: DMA destination must be word aligned?");
 
 			const uint32_t srcinc = setup & CDE_READ_SETUP_IO ? 0 : 2;
 
@@ -2012,7 +2014,8 @@ void m2_cde_device::next_dma(uint32_t ch)
 	m_cpu1->set_cache_dirty();
 #endif
 
-	assert_always(dma_ch.m_ccnt == 0, "DMA count non-zero during next DMA");
+	if (dma_ch.m_ccnt != 0)
+		throw emu_fatalerror("m2_cde_device::next_dma: DMA count non-zero during next DMA");
 
 	if (dma_ch.m_cntl & CDE_DMA_NEXT_VALID)
 	{

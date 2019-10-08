@@ -231,6 +231,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class nmg5_state : public driver_device

@@ -963,7 +963,7 @@ void bbc_state::bbcb(machine_config &config)
 
 	/* econet */
 	MC6854(config, m_adlc);
-	m_adlc->out_txd_cb().set(ECONET_TAG, FUNC(econet_device::host_data_w));
+	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbc_state::adlc_irq_w));
 
 	econet_device &econet(ECONET(config, "econet", 0));
@@ -971,9 +971,7 @@ void bbc_state::bbcb(machine_config &config)
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 
-	econet_slot_device &econet_slot(ECONET_SLOT(config, "econet254", 0));
-	econet_devices(econet_slot);
-	econet_slot.set_slot(254);
+	ECONET_SLOT(config, "econet254", "econet", econet_devices).set_slot(254);
 
 	/* analogue port */
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
@@ -1432,7 +1430,7 @@ void bbcm_state::bbcm(machine_config &config)
 
 	/* econet */
 	MC6854(config, m_adlc);
-	m_adlc->out_txd_cb().set(ECONET_TAG, FUNC(econet_device::host_data_w));
+	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbc_state::adlc_irq_w));
 
 	econet_device &econet(ECONET(config, "econet", 0));
@@ -1440,9 +1438,7 @@ void bbcm_state::bbcm(machine_config &config)
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 
-	econet_slot_device &econet_slot(ECONET_SLOT(config, "econet254", 0));
-	econet_devices(econet_slot);
-	econet_slot.set_slot(254);
+	ECONET_SLOT(config, "econet254", "econet", econet_devices).set_slot(254);
 
 	/* analogue port */
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);

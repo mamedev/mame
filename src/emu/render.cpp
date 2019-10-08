@@ -460,7 +460,8 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 			for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
 				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap))
 					lowest = scalenum;
-			assert_always(lowest != -1, "Too many live texture instances!");
+			if (-1 == lowest)
+				throw emu_fatalerror("render_texture::get_scaled: Too many live texture instances!");
 
 			// throw out any existing entries
 			scaled = &m_scaled[lowest];
@@ -2057,7 +2058,27 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		return false;
 
 	// read the file
-	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, nullptr));
+	util::xml::parse_options parseopt;
+	util::xml::parse_error parseerr;
+	parseopt.error = &parseerr;
+	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, &parseopt));
+	if (!rootnode)
+	{
+		if (parseerr.error_message)
+		{
+			osd_printf_warning(
+					"Error parsing XML file '%s' at line %d column %d: %s, ignoring\n",
+					filename,
+					parseerr.error_line,
+					parseerr.error_column,
+					parseerr.error_message);
+		}
+		else
+		{
+			osd_printf_warning("Error parsing XML file '%s', ignorning\n", filename);
+		}
+		return false;
+	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
 	if (!load_layout_file(m_manager.machine().root_device(), dirname, *rootnode))
@@ -2691,7 +2712,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 				// make a copy of this extent
 				memmove(&ext[ext[1] + 2], &ext[0], (last - ext) * sizeof(*ext));
 				last += ext[1] + 2;
-				assert_always(last < max, "Ran out of clear extents!\n");
+				if (last >= max)
+					throw emu_fatalerror("render_target::remove_clear_extent: Ran out of clear extents!");
 
 				// split the extent between pieces
 				ext[ext[1] + 2] = -(-ext[0] - diff);
@@ -2711,7 +2733,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 				// make a copy of this extent
 				memmove(&ext[ext[1] + 2], &ext[0], (last - ext) * sizeof(*ext));
 				last += ext[1] + 2;
-				assert_always(last < max, "Ran out of clear extents!\n");
+				if (last >= max)
+					throw emu_fatalerror("render_target::remove_clear_extent: Ran out of clear extents!");
 
 				// split the extent between pieces
 				ext[ext[1] + 2] = -diff;
@@ -2736,7 +2759,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 					memmove(&xext[2], &xext[0], (last - xext) * sizeof(*xext));
 					last += 2;
 					linelast += 2;
-					assert_always(last < max, "Ran out of clear extents!\n");
+					if (last >= max)
+						throw emu_fatalerror("render_target::remove_clear_extent: Ran out of clear extents!");
 
 					// split this extent into three parts
 					xext[0] = boundsx0 - x0;

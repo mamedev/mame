@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 
 #ifndef MAME_BUS_NSCSI_CDRN820S_H
-#define MAME_BUS_NSCSI_CDRN820S_H 1
+#define MAME_BUS_NSCSI_CDRN820S_H
 
 #pragma once
 

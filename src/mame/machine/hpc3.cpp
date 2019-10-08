@@ -248,7 +248,7 @@ void hpc3_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		LOGMASKED(LOG_UNKNOWN, "HPC3: Ignoring active PBUS DMA on channel %d\n", id - TIMER_PBUS_DMA);
 		break;
 	default:
-		assert_always(false, "Unknown id in hpc3_device::device_timer");
+		throw emu_fatalerror("Unknown id in hpc3_device::device_timer");
 	}
 }
 

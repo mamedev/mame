@@ -5,7 +5,7 @@
 	<software name="memomakr">
 		<description>MemoMaker for Integral</description>
 		<year>1984</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="652950">
@@ -17,7 +17,7 @@
 	<software name="multipln">
 		<description>Multiplan for Integral</description>
 		<year>1984</year>
-		<publisher>???</publisher>
+		<publisher>Microsoft</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="172162">
@@ -27,11 +27,12 @@
 	</software>
 
 	<software name="basic_r5">
-		<description>Integral BASIC Release 5</description>
-		<year>1984</year>
-		<publisher>???</publisher>
+		<description>Technical BASIC Release 5</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82860-12009" />
 			<dataarea name="flop" size="602609">
 				<rom name="intbasic.td0" size="602609" crc="49a70601" sha1="f884a3ff678b57167451a269d1b551374614f679"/>
 			</dataarea>
@@ -41,9 +42,10 @@
 	<software name="datacomm">
 		<description>Datacomm r1.0.1</description>
 		<year>1984</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82815-12002" />
 			<dataarea name="flop" size="220544">
 				<rom name="ipcdatac.td0" size="220544" crc="97c35bcb" sha1="a4e006459b24400383c2e136645ae5ab863e7483"/>
 			</dataarea>
@@ -53,9 +55,10 @@
 	<software name="ipccdoc">
 		<description>C Language 1of3 (docs)</description>
 		<year>1984</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82857-12002" />
 			<dataarea name="flop" size="456537">
 				<rom name="ipccdoc.td0" size="456537" crc="5c90332c" sha1="1f1a971e99d929a45d28654d6c32dbfeb20feb4d"/>
 			</dataarea>
@@ -65,9 +68,10 @@
 	<software name="ipccprep">
 		<description>C Language 2of3 (preprocessor)</description>
 		<year>1984</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82857-12005" />
 			<dataarea name="flop" size="554063">
 				<rom name="ipccprep.td0" size="554063" crc="f80fb865" sha1="547aa6174d4c0e08cc9005bb3c59fc88c288c8a1"/>
 			</dataarea>
@@ -77,9 +81,10 @@
 	<software name="ipcctran">
 		<description>C Language 3of3 (translator)</description>
 		<year>1984</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82857-12004" />
 			<dataarea name="flop" size="452140">
 				<rom name="ipcctran.td0" size="452140" crc="ef2494e0" sha1="ffd764fd701f4ffe896b919b18dc3474eff95f2a"/>
 			</dataarea>
@@ -87,11 +92,12 @@
 	</software>
 
 	<software name="basicut">
-		<description>HP-UX BASIC Utilities for Integral</description>
+		<description>Technical BASIC Utilities</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82860-12008" />
 			<dataarea name="flop" size="218967">
 				<rom name="basicut.td0" size="218967" crc="bd92ec7a" sha1="611eea08494ce123052453cd8cf45ce6fcc3e09f"/>
 			</dataarea>
@@ -99,11 +105,12 @@
 	</software>
 
 	<software name="ipcforut">
-		<description>FORTRAN r5.0.0 1of2 (utilities)</description>
+		<description>FORTRAN r5.0.0 2of2 (utilities)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82858-12002" />
 			<dataarea name="flop" size="581442">
 				<rom name="ipcforut.td0" size="581442" crc="fb7c2093" sha1="2d8492a8c74e06c405998d848826a4fd139cf6fe"/>
 			</dataarea>
@@ -111,11 +118,12 @@
 	</software>
 
 	<software name="ipcforcp">
-		<description>FORTRAN r5.0.0 2of2 (translator)</description>
+		<description>FORTRAN r5.0.0 1of2 (translator)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82858-12001" />
 			<dataarea name="flop" size="549753">
 				<rom name="ipcforcp.td0" size="549753" crc="a4a8c914" sha1="ec76c80f81e0b55843ff4028baacb0137b94ec84"/>
 			</dataarea>
@@ -125,7 +133,7 @@
 	<software name="lisppilt">
 		<description>LISP and PILOT Languages</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="565866">
@@ -137,7 +145,7 @@
 	<software name="tksolve">
 		<description>Tk!Solver</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Software Arts</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="190676">
@@ -149,7 +157,7 @@
 	<software name="diagpgrm">
 		<description>Diagraph for Integral 1of2 (program)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Computer Support Corporation</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="634074">
@@ -161,7 +169,7 @@
 	<software name="diagsymb">
 		<description>Diagraph for Integral 2of2 (symbols)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Computer Support Corporation</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="690608">
@@ -173,7 +181,7 @@
 	<software name="microtrk">
 		<description>MicroTrak v1.4f</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Softrak Systems</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="111659">
@@ -208,7 +216,7 @@
 
 	<software name="ipcforth">
 		<description>FORTH v1.0 for Integral</description>
-		<year>1985</year>
+		<year>1987</year>
 		<publisher>???</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -221,9 +229,10 @@
 	<software name="tutor">
 		<description>Utility Discs for Integral 1of6 (Tutor)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="00095-12062" />
 			<dataarea name="flop" size="404018">
 				<rom name="tutor.td0" size="404018" crc="c5af6ff5" sha1="47eb431f609fcc6f87d3a7b5c9cafb7f9c232135"/>
 			</dataarea>
@@ -233,9 +242,10 @@
 	<software name="utilitie">
 		<description>Utility Discs for Integral 2of6 (Utilities)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="00095-12058" />
 			<dataarea name="flop" size="571098">
 				<rom name="utilitie.td0" size="571098" crc="1f9420ad" sha1="97ef267109214f2bdc183032f4d87bd1cc0e7be3"/>
 			</dataarea>
@@ -245,9 +255,10 @@
 	<software name="diagnstc">
 		<description>Utility Discs for Integral 3of6 (Diagnostic)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="00095-12061" />
 			<dataarea name="flop" size="206296">
 				<rom name="diagnstc.td0" size="206296" crc="e3b7461e" sha1="276f82b1b4cc1bb4cf8a40311afa3ee15716004c"/>
 			</dataarea>
@@ -257,9 +268,10 @@
 	<software name="sysmdisc">
 		<description>Utility Discs for Integral 4of6 (System Disc)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="00095-12063" />
 			<dataarea name="flop" size="325235">
 				<rom name="sysmdisc.td0" size="325235" crc="5773decd" sha1="46a23f0fb2c4ea9b738ee68390bb349dd738ae6b"/>
 			</dataarea>
@@ -269,9 +281,10 @@
 	<software name="hp_ux1">
 		<description>Utility Discs for Integral 5of6 (HP-UX Commands 1)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="00095-12059" />
 			<dataarea name="flop" size="626512">
 				<rom name="hp-ux1.td0" size="626512" crc="cf5da5fa" sha1="4bde09a9d37f5f8f6e55925f2428c342d95db19c"/>
 			</dataarea>
@@ -281,9 +294,10 @@
 	<software name="hp_ux2">
 		<description>Utility Discs for Integral 6of6 (HP-UX Commands 2)</description>
 		<year>1985</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="00095-12073" />
 			<dataarea name="flop" size="648152">
 				<rom name="hp-ux2.td0" size="648152" crc="9f843794" sha1="de4b2276aba66d4c28e9bb44db60c62472ec6441"/>
 			</dataarea>
@@ -292,7 +306,7 @@
 
 	<software name="intgame1">
 		<description>Integral Games 1of3</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>???</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -304,7 +318,7 @@
 
 	<software name="intgame2">
 		<description>Integral Games 2of3</description>
-		<year>1985</year>
+		<year>1988</year>
 		<publisher>???</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -316,7 +330,7 @@
 
 	<software name="intgame3">
 		<description>Integral Games 3of3</description>
-		<year>1985</year>
+		<year>1989</year>
 		<publisher>???</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -328,7 +342,7 @@
 
 	<software name="inthack">
 		<description>Hack 3.0.2 for Integral</description>
-		<year>1985</year>
+		<year>1990</year>
 		<publisher>???</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -341,7 +355,7 @@
 	<software name="plotrack">
 		<description>PlotTrack Rev 1.2b</description>
 		<year>1986</year>
-		<publisher>???</publisher>
+		<publisher>Softrak Systems</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="297583">
@@ -353,7 +367,7 @@
 	<software name="ipcromtl">
 		<description>EPROM/ROM Tools r5.0</description>
 		<year>1986</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="400488">
@@ -365,7 +379,7 @@
 	<software name="ipcapl">
 		<description>APL Plus v3.0 1of2</description>
 		<year>1986</year>
-		<publisher>???</publisher>
+		<publisher>STSC, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="486723">
@@ -377,7 +391,7 @@
 	<software name="ipcaplw">
 		<description>APL Plus v3.0 2of2</description>
 		<year>1986</year>
-		<publisher>???</publisher>
+		<publisher>STSC, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="381652">
@@ -398,14 +412,14 @@
 		</part>
 	</software>
 
-	<software name="ipcsuput">
-		<description>Super Utilities (LIF format file!)</description>
+	<software name="superutl">
+		<description>Super Utilities Disc</description>
 		<year>1986</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="587264">
-				<rom name="ipcsuput.td0" size="587264" crc="15a881cd" sha1="c4673a2f7188ea0b29b8a4d9bd4a60856ed8f3d2"/>
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Super_Utilities.img" size="709632" crc="da0b6733" sha1="4170adf798a12ce7052238fb8602ea63bfcd3de6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -437,7 +451,7 @@
 	<software name="ipcdwd">
 		<description>Driver Writers Disc</description>
 		<year>1987</year>
-		<publisher>???</publisher>
+		<publisher>Hewlett-Packard</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="641039">
@@ -449,11 +463,256 @@
 	<software name="ipcmandl">
 		<description>Mandelbrot</description>
 		<year>1988</year>
-		<publisher>???</publisher>
+		<publisher>Ted Cline</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="285987">
 				<rom name="ipcmandl.td0" size="285987" crc="e31c0a41" sha1="59045fcecc336b048595d589815cfb301c594389"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ipcrcs">
+		<description>RCS (Revision Control System)</description>
+		<year>1988</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="606991">
+				<rom name="ipcrcs.td0" size="606991" crc="bbe0bfce" sha1="7d5c2a9acc8099d5c03c0821eac6abafe441c180"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="502upgrd">
+		<description>System Disc Release 5.0.2</description>
+		<year>1986</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="00095-12081" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_5.02_Upgrade_Disc.img" size="709632" crc="4eb04ec5" sha1="51f35b88023558e25ea7e08ebbce4f4807bc8307" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo">
+		<description>Demo Disc</description>
+		<year>1986</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Demos.img" size="709632" crc="4033f9c9" sha1="ab7e5427aedc7cf3bbc42c92b1b165517890222f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool06">
+		<description>HP-UX Communications &amp; Maintenance A (VI)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12016" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Comm_And_Maint_Tools_A.img" size="709632" crc="28cc1bf7" sha1="08fbf3462859b769e3164d2208a9c2a298b32afc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool07">
+		<description>HP-UX Communications &amp; Maintenance B (VII)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12017" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Comm_And_Maint_Tools_B.img" size="709632" crc="9ef76892" sha1="0e5206f0bc61a1438f25cfd347117c420ea9594d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool02">
+		<description>HP-UX Software Development (II)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12015" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Development_Tools_A.img" size="709632" crc="6dee8465" sha1="2300dc4f17226ad661b96e8e23753640732ebf01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool03">
+		<description>HP-UX Software Development (III)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12019" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Development_Tools_B.img" size="709632" crc="87d8bec7" sha1="02d0ecea519e04d7b89c8e59e2d80f3e3f39248f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool10">
+		<description>HP-UX Documentation (X)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12013" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Documentation.img" size="709632" crc="5a0a96c1" sha1="68bf43e6690c2ff06037004afa3183bceae9f5cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool09">
+		<description>HP-UX Miscellaneous Tools (IX)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12012" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Miscellaneous.img" size="709632" crc="3514763c" sha1="a26b18d6d69f17e69a1f3cc80c09ba2cbb2de2d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool08">
+		<description>HP-UX Nucleus (VIII)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12018" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Nucleus_Tools.img" size="709632" crc="1b740689" sha1="7c1a059e7c1ebc3531bacb6eaf339213c3e33273" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool01">
+		<description>HP-UX Programmers Tools (I)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12014" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Programmers_Utilities.img" size="709632" crc="70a0af6a" sha1="385a6a0337df818872ea61288d096feeb6d32561" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool04">
+		<description>HP-UX Writers Tools A (IV)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12020" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Writers_Tools_A.img" size="709632" crc="65d55a7e" sha1="255b0715d6d3963e8cedbfe3a8a468846d5cf4e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hptool05">
+		<description>HP-UX Writers Tools B (V)</description>
+		<year>1985</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82856-12021" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_Writers_Tools_B.img" size="709632" crc="589815eb" sha1="aab1b18ccf79451f251cb0599f124332f9c74555" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swengr01">
+		<description>Software Engineering Module - Programmers's and Miscellaneous Tools (I)</description>
+		<year>1986</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82987-12001" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_SW_Engineering_ROM_1.img" size="709632" crc="f912dd24" sha1="a11094934d32a3c4a3821da39a0db70650ea3d32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swengr02">
+		<description>Software Engineering Module - Communication and Maintenance Tools (II)</description>
+		<year>1986</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82987-12002" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_SW_Engineering_ROM_2.img" size="709632" crc="299affbb" sha1="2cce67d1a50701cb79090f28b7e13129361b38ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swengr03">
+		<description>Software Engineering Module - Writer's Tools (III)</description>
+		<year>1986</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82987-12003" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_SW_Engineering_ROM_3.img" size="709632" crc="e139f1fc" sha1="3f8b0d331472833b80938f58387fa53bac47dd03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swengr04">
+		<description>Software Engineering Module - C Development Supplement (IV)</description>
+		<year>1986</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82987-12004" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_SW_Engineering_ROM_4.img" size="709632" crc="66eda86a" sha1="7fb1ce5e64562bf898837cf8e878400f4e76fbf1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swengr05">
+		<description>Software Engineering Module - Section 1 &amp; 1m Documentation (V)</description>
+		<year>1986</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82987-12005" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_SW_Engineering_ROM_5.img" size="709632" crc="a036a8d5" sha1="67ae72b6d9570dbf4c9a96f3c9627376d7ec7571" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swengr06">
+		<description>Software Engineering Module - Sections 2, 3, 4 and l Documentation (VI)</description>
+		<year>1986</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="82987-12006" />
+			<dataarea name="flop" size="709632">
+				<rom name="IPC_SW_Engineering_ROM_6.img" size="709632" crc="24858c1a" sha1="a794cccca5dc0d6a3442fd684f5da69f372773bb" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -165,7 +165,7 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
-READ8_MEMBER(spectrum_state::spectrum_128_opcode_fetch_r)
+READ8_MEMBER(spectrum_state::spectrum_128_pre_opcode_fetch_r)
 {
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses */
 	if (BIT(m_port_7ffd_data, 4))
@@ -174,9 +174,9 @@ READ8_MEMBER(spectrum_state::spectrum_128_opcode_fetch_r)
 		   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
 		   enable paged ROM and then fetches at 0700 to disable it
 		*/
-		m_exp->opcode_fetch(offset);
+		m_exp->pre_opcode_fetch(offset);
 		uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
-		m_exp->opcode_fetch_post(offset);
+		m_exp->post_opcode_fetch(offset);
 		return retval;
 	}
 
@@ -271,7 +271,7 @@ void spectrum_state::spectrum_128_mem(address_map &map)
 
 void spectrum_state::spectrum_128_fetch(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(spectrum_state::spectrum_128_opcode_fetch_r));
+	map(0x0000, 0xffff).r(FUNC(spectrum_state::spectrum_128_pre_opcode_fetch_r));
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)

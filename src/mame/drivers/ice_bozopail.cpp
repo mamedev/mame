@@ -61,7 +61,7 @@ void ice_bozopail_state::machine_reset()
 void ice_bozopail_state::ice_bozo(machine_config &config)
 {
 	/* basic machine hardware */
-	MC68HC11(config, m_maincpu, 8000000); // unknown clock
+	MC68HC11A1(config, m_maincpu, 8000000); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &ice_bozopail_state::ice_bozo_map);
 
 	/* sound hardware */

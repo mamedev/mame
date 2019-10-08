@@ -72,7 +72,7 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 }
 
 
-WRITE_LINE_MEMBER(sms_state::gg_ext_th_input)
+WRITE_LINE_MEMBER(gamegear_state::gg_ext_th_input)
 {
 	if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
 		return;
@@ -218,7 +218,7 @@ READ8_MEMBER(sms_state::sms_count_r)
 /*
  If the gamegear is in sms mode, the start button performs the pause function.
  */
-WRITE_LINE_MEMBER(sms_state::gg_pause_callback)
+WRITE_LINE_MEMBER(gamegear_state::gg_pause_callback)
 {
 	if (!state)
 	{
@@ -248,7 +248,7 @@ WRITE_LINE_MEMBER(sms_state::gg_pause_callback)
 }
 
 
-WRITE_LINE_MEMBER(sms_state::sms_n_csync_callback)
+WRITE_LINE_MEMBER(sms_state::rapid_n_csync_callback)
 {
 	if (m_port_rapid.found())
 	{
@@ -528,7 +528,7 @@ WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
 }
 
 
-WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
+WRITE8_MEMBER(gamegear_state::gg_psg_stereo_w)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
@@ -537,7 +537,7 @@ WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
 }
 
 
-READ8_MEMBER(sms_state::gg_input_port_00_r)
+READ8_MEMBER(gamegear_state::gg_input_port_00_r)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return 0xff;
@@ -557,7 +557,7 @@ READ8_MEMBER(sms_state::gg_input_port_00_r)
 }
 
 
-READ8_MEMBER(sms_state::sms_sscope_r)
+READ8_MEMBER(sms1_state::sscope_r)
 {
 	int sscope = m_port_scope->read();
 
@@ -574,7 +574,7 @@ READ8_MEMBER(sms_state::sms_sscope_r)
 }
 
 
-WRITE8_MEMBER(sms_state::sms_sscope_w)
+WRITE8_MEMBER(sms1_state::sscope_w)
 {
 	write_ram(space, 0x3ff8 + offset, data);
 
@@ -829,7 +829,7 @@ WRITE8_MEMBER(sms_state::sg1000m3_peripheral_w)
 }
 
 
-WRITE8_MEMBER(sms_state::gg_sio_w)
+WRITE8_MEMBER(gamegear_state::gg_sio_w)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
@@ -857,7 +857,7 @@ WRITE8_MEMBER(sms_state::gg_sio_w)
 }
 
 
-READ8_MEMBER(sms_state::gg_sio_r)
+READ8_MEMBER(gamegear_state::gg_sio_r)
 {
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return 0xff;
@@ -1051,7 +1051,6 @@ void sms_state::machine_start()
 
 	m_lphaser_th_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_th_generate),this));
 
-	save_item(NAME(m_gg_paused));
 	save_item(NAME(m_mapper));
 	save_item(NAME(m_port_dc_reg));
 	save_item(NAME(m_port_dd_reg));
@@ -1083,16 +1082,6 @@ void sms_state::machine_start()
 		save_item(NAME(m_lphaser_x_offs));
 	}
 
-	if (m_is_gamegear)
-	{
-		save_item(NAME(m_gg_sio));
-		// The game Ecco requires SP to be initialized, so, to run on a BIOS-less Game
-		// Gear, probably a custom chip like the 315-5378 does the initialization, as
-		// done by the 315-5342 chip on the Power Base Converter for Sega Genesis/MD.
-		// Reference: http://www.smspower.org/forums/14084-PowerBaseConverterInfo
-		m_maincpu->set_state_int(Z80_SP, 0xdff0);
-	}
-
 	if (m_cartslot)
 		m_cartslot->save_ram();
 }
@@ -1103,6 +1092,20 @@ void smssdisp_state::machine_start()
 
 	save_item(NAME(m_store_control));
 	save_item(NAME(m_store_cart_selection_data));
+}
+
+void gamegear_state::machine_start()
+{
+	sms_state::machine_start();
+
+	save_item(NAME(m_gg_paused));
+	save_item(NAME(m_gg_sio));
+
+	// The game Ecco requires SP to be initialized, so, to run on a BIOS-less Game
+	// Gear, probably a custom chip like the 315-5378 does the initialization, as
+	// done by the 315-5342 chip on the Power Base Converter for Sega Genesis/MD.
+	// Reference: http://www.smspower.org/forums/14084-PowerBaseConverterInfo
+	m_maincpu->set_state_int(Z80_SP, 0xdff0);
 }
 
 void sms_state::machine_reset()
@@ -1133,19 +1136,6 @@ void sms_state::machine_reset()
 		m_ctrl2_th_state = 1;
 	}
 
-	if (m_is_gamegear)
-	{
-		if (m_cartslot->exists() && m_cartslot->get_sms_mode())
-			m_vdp->set_sega315_5124_compatibility_mode(true);
-
-		/* Initialize SIO stuff for GG */
-		m_gg_sio[0] = 0x7f;
-		m_gg_sio[1] = 0xff;
-		m_gg_sio[2] = 0x00;
-		m_gg_sio[3] = 0xff;
-		m_gg_sio[4] = 0x00;
-	}
-
 	setup_bios();
 	setup_media_slots();
 }
@@ -1155,6 +1145,21 @@ void smssdisp_state::machine_reset()
 	m_store_control = 0;
 	m_store_cart_selection_data = 0;
 	store_select_cart(m_store_cart_selection_data);
+
+	sms_state::machine_reset();
+}
+
+void gamegear_state::machine_reset()
+{
+	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
+		m_vdp->set_sega315_5124_compatibility_mode(true);
+
+	/* Initialize SIO stuff for GG */
+	m_gg_sio[0] = 0x7f;
+	m_gg_sio[1] = 0xff;
+	m_gg_sio[2] = 0x00;
+	m_gg_sio[3] = 0xff;
+	m_gg_sio[4] = 0x00;
 
 	sms_state::machine_reset();
 }
@@ -1239,7 +1244,7 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 }
 
 
-VIDEO_START_MEMBER(sms_state,sms1)
+void sms1_state::video_start()
 {
 	m_main_scr->register_screen_bitmap(m_prevleft_bitmap);
 	m_main_scr->register_screen_bitmap(m_prevright_bitmap);
@@ -1253,7 +1258,7 @@ VIDEO_START_MEMBER(sms_state,sms1)
 }
 
 
-VIDEO_RESET_MEMBER(sms_state,sms1)
+void sms1_state::video_reset()
 {
 	if (m_port_scope->read())
 	{
@@ -1270,7 +1275,7 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 }
 
 
-WRITE_LINE_MEMBER(sms_state::screen_vblank_sms1)
+WRITE_LINE_MEMBER(sms1_state::sscope_vblank)
 {
 	// on falling edge
 	if (!state)
@@ -1285,13 +1290,7 @@ WRITE_LINE_MEMBER(sms_state::screen_vblank_sms1)
 	}
 }
 
-uint32_t sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_vdp->screen_update(screen, bitmap, cliprect);
-	return 0;
-}
-
-uint32_t sms_state::screen_update_sms1_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sms1_state::screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t sscope = m_port_scope->read();
 
@@ -1321,7 +1320,7 @@ uint32_t sms_state::screen_update_sms1_left(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-uint32_t sms_state::screen_update_sms1_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sms1_state::screen_update_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t sscope = m_port_scope->read();
 
@@ -1357,7 +1356,7 @@ uint32_t sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-VIDEO_START_MEMBER(sms_state,gamegear)
+void gamegear_state::video_start()
 {
 	m_prev_bitmap_copied = false;
 	m_main_scr->register_screen_bitmap(m_prev_bitmap);
@@ -1370,7 +1369,7 @@ VIDEO_START_MEMBER(sms_state,gamegear)
 	save_pointer(NAME(m_line_buffer), 160 * 4);
 }
 
-VIDEO_RESET_MEMBER(sms_state,gamegear)
+void gamegear_state::video_reset()
 {
 	if (m_prev_bitmap_copied)
 	{
@@ -1385,7 +1384,7 @@ VIDEO_RESET_MEMBER(sms_state,gamegear)
 }
 
 
-void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void gamegear_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
 	const rectangle visarea = screen.visible_area();
@@ -1522,7 +1521,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 }
 
 
-uint32_t sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gamegear_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 *source_bitmap;
 

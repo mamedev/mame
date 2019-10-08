@@ -12,6 +12,7 @@
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class suprridr_state : public driver_device
 {

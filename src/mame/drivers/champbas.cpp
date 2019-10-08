@@ -98,7 +98,7 @@ TODO:
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(champbas_state::watchdog_bit2)
+READ_LINE_MEMBER(champbas_state::watchdog_bit2)
 {
 	return (0x10 - m_watchdog->get_vblank_counter()) >> 2 & 1;
 }
@@ -337,7 +337,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, watchdog_bit2, nullptr) // bit 2 of the watchdog counter
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(champbas_state, watchdog_bit2) // bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -512,10 +512,10 @@ void champbas_state::machine_start()
 	save_item(NAME(m_gfx_bank));
 }
 
-INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
+WRITE_LINE_MEMBER(champbas_state::vblank_irq)
 {
-	if (m_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -524,7 +524,6 @@ void champbas_state::talbot(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbasj_map);
-	m_maincpu->set_vblank_int("screen", FUNC(champbas_state::vblank_irq));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
@@ -548,6 +547,7 @@ void champbas_state::talbot(machine_config &config)
 	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(champbas_state::screen_update_champbas));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(champbas_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_talbot);
 	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
@@ -566,7 +566,6 @@ void champbas_state::champbas(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbas_map);
-	m_maincpu->set_vblank_int("screen", FUNC(champbas_state::vblank_irq));
 
 	LS259(config, m_mainlatch); // 9D; 8G on Champion Baseball II Double Board Configuration
 	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
@@ -590,6 +589,7 @@ void champbas_state::champbas(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(champbas_state::screen_update_champbas));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(champbas_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_champbas);
 	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
@@ -668,7 +668,6 @@ void exctsccr_state::exctsccr(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &exctsccr_state::exctsccr_map);
-	m_maincpu->set_vblank_int("screen", FUNC(exctsccr_state::vblank_irq));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
@@ -701,6 +700,7 @@ void exctsccr_state::exctsccr(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(exctsccr_state::screen_update_exctsccr));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(exctsccr_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exctsccr);
 	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
@@ -732,7 +732,6 @@ void exctsccr_state::exctsccrb(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &exctsccr_state::exctsccrb_map);
-	m_maincpu->set_vblank_int("screen", FUNC(exctsccr_state::vblank_irq));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
@@ -759,6 +758,7 @@ void exctsccr_state::exctsccrb(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(exctsccr_state::screen_update_exctsccr));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(exctsccr_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exctsccr);
 	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);

@@ -327,10 +327,10 @@ GFXDECODE_END
 
 void supbtime_state::supbtime(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(28'000'000) / 2);
+	M68000(config, m_maincpu, XTAL(21'477'272) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supbtime_state::supbtime_map);
 
-	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
+	H6280(config, m_audiocpu, XTAL(32'220'000) / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &supbtime_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 

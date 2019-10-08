@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include "tilemap.h"
+
+
 class pc080sn_device : public device_t
 {
 public:

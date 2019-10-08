@@ -152,6 +152,7 @@ DEVICE_INPUT_DEFAULTS_END
 //-------------------------------------------------
 
 // slot devices
+#include "bus/s100/am310.h"
 //#include "bus/s100/dj2db.h"
 //#include "bus/s100/djdma.h"
 //#include "bus/s100/mm65k16s.h"
@@ -170,6 +171,7 @@ static void horizon_s100_cards(device_slot_interface &device)
 	//device.option_add("fpb", S100_FPB);
 	device.option_add("8ksc", S100_8K_SC);
 	device.option_add("8kscbb", S100_8K_SC_BB);
+	device.option_add("am310", S100_AM310);
 }
 
 

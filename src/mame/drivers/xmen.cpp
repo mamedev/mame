@@ -223,7 +223,7 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER(xmen_state::xmen_frame_r)
+READ_LINE_MEMBER(xmen_state::xmen_frame_r)
 {
 	return m_screen->frame_number() & 1;
 }
@@ -252,7 +252,7 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START5 ) /* not verified */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) /* not verified */
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xmen_state,xmen_frame_r, nullptr)  /* screen indicator? */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xmen_state, xmen_frame_r)  // screen indicator?
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
@@ -326,6 +326,7 @@ void xmen_state::xmen(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
 	K053246(config, m_k053246, 0);
@@ -388,6 +389,7 @@ void xmen_state::xmen6p(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
+	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
 	K053246(config, m_k053246, 0);

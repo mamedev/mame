@@ -37,6 +37,9 @@ public:
 
 	void init_vegaeo();
 
+protected:
+	void video_start() override;
+
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport m_system_io;
@@ -51,8 +54,6 @@ private:
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
-
-	DECLARE_VIDEO_START(vega);
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vega_map(address_map &map);
@@ -128,7 +129,7 @@ static INPUT_PORTS_START( crazywar )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vegaeo_state, eolith_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vegaeo_state, speedup_vblank_r)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -153,7 +154,7 @@ static INPUT_PORTS_START( crazywar )
 INPUT_PORTS_END
 
 
-VIDEO_START_MEMBER(vegaeo_state,vega)
+void vegaeo_state::video_start()
 {
 	m_vram = std::make_unique<uint8_t[]>(0x14000*2);
 	save_pointer(NAME(m_vram), 0x14000*2);
@@ -191,8 +192,6 @@ void vegaeo_state::vega(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 	m_palette->set_membits(16);
-
-	MCFG_VIDEO_START_OVERRIDE(vegaeo_state,vega)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

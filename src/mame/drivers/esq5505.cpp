@@ -545,7 +545,7 @@ WRITE_LINE_MEMBER(esq5505_state::dma_irq)
 #if KEYBOARD_HACK
 INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 {
-	int val = (uint8_t)(uintptr_t)param;
+	int val = (uint8_t)param;
 	int cmp = 0x60;
 
 	if (m_system_type == SQ1)
@@ -588,7 +588,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		}
 		else if (oldval == 1 && newval == 0)
 		{
-	//        printf("key off %x\n", (uint8_t)(uintptr_t)param);
+	//        printf("key off %x\n", (uint8_t)param);
 			m_panel->xmit_char(val&0x7f);
 			m_panel->xmit_char(0x00);
 		}

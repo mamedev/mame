@@ -10,6 +10,7 @@
 #include "video/k054000.h"
 #include "machine/k054321.h"
 #include "machine/timer.h"
+#include "tilemap.h"
 
 class mystwarr_state : public konamigx_state
 {

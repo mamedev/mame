@@ -54,6 +54,8 @@ TODO:
   maybe it has a pre-NMK004 chip using the same communication protocol but used
   for protection instead.
 
+- tharrier: Current emulation is stuck when try to access test mode.
+
 - Protection is patched in several games.
 
 - Hacha Mecha Fighter: mcu simulation is wrong/incorrect (see notes).
@@ -74,6 +76,8 @@ TODO:
 - Verify sprite limits for games when resolution is 384x224
 
 NOT BUGS:
+- Black Heart: test mode text are buggy
+
 - Hacha Mecha Fighter: (BTANB) the bomb graphics are pretty weird when the game
   is in japanese mode, but it's like this on the original game.
 
@@ -87,12 +91,18 @@ NOT BUGS:
 
 ----
 
+tharrier test mode:
+
+1)  Press player 2 buttons 1+2 during reset.  "Are you ready?" will appear
+2)  Press player 1 buttons in this sequence:
+    2,1,2,2,1,1,↓,↓
+
 tdragon and hachamf test mode:
 
 1)  Press player 2 buttons 1+2 during reset.  "Ready?" will appear
 2)  Press player 1 button 2 14 (!) times
 
-mustang test mode:
+mustang and blkheart test mode:
 
 1)  Press player 2 buttons 1+2 during reset.  "Ready?" will appear
 2)  Press player 1 button 1 14 (!) times
@@ -3980,53 +3990,42 @@ static INPUT_PORTS_START( dolmen )
 INPUT_PORTS_END
 
 
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*16,4) },
-	{ STEP16(0,4*8) },
-	32*32
-};
-
 static GFXDECODE_START( gfx_tharrier )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_macross )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x200, 16 ) /* color 0x200-0x2ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 16 ) /* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_macross2 )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x300, 16 ) /* color 0x300-0x3ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 32 ) /* color 0x100-0x2ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x300, 16 ) /* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 32 ) /* color 0x100-0x2ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bjtwin )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bioship )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x300, 16 ) /* color 0x300-0x3ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x200, 16 ) /* color 0x200-0x2ff */
-	GFXDECODE_ENTRY( "gfx4",    0, tilelayout,           0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x300, 16 ) /* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16 ) /* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( "gfx4",    0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_strahl )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout,           0x300, 16 ) /* color 0x300-0x3ff */
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) /* color 0x100-0x1ff */
-	GFXDECODE_ENTRY( "gfx4",    0, tilelayout,           0x200, 16 ) /* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x300, 16 ) /* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "gfx4",    0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16 ) /* color 0x200-0x2ff */
 GFXDECODE_END
 
 
@@ -4100,6 +4099,7 @@ void nmk16_state::set_hacky_interrupt_timing(machine_config &config)
 void nmk16_state::set_hacky_screen_lowres(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//m_screen->set_raw(XTAL(12'000'000)/2, 384, 0, 256, 278, 16, 240); // confirmed
 	m_screen->set_refresh_hz(56.18);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
 	m_screen->set_size(256, 256);
@@ -4110,6 +4110,7 @@ void nmk16_state::set_hacky_screen_lowres(machine_config &config)
 void nmk16_state::set_hacky_screen_hires(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//m_screen->set_raw(XTAL(16'000'000)/2, 512, 0, 384, 278, 16, 240); // confirmed
 	m_screen->set_refresh_hz(56.18);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
 	m_screen->set_size(512, 256);
@@ -4692,11 +4693,11 @@ void nmk16_state::gunnailb(machine_config &config)
 void nmk16_state::macross2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000); /* 10 MHz ? */
+	M68000(config, m_maincpu, XTAL(10'000'000)); /* MC68000P12 10 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000); /* 4 MHz ? */
+	Z80(config, m_audiocpu, 4000000); /* Z8400B PS 4 MHz ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::macross2_sound_io_map);
 
@@ -4714,17 +4715,17 @@ void nmk16_state::macross2(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
@@ -4735,11 +4736,11 @@ void nmk16_state::macross2(machine_config &config)
 void nmk16_state::tdragon2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000); /* 10 MHz  */
+	M68000(config, m_maincpu, XTAL(10'000'000)); /* TMP68000P-12 10 MHz  */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragon2_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000); /* 4 MHz  */
+	Z80(config, m_audiocpu, 4000000); /* Z0840006PSC 4 MHz  */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::macross2_sound_io_map);
 
@@ -4757,17 +4758,17 @@ void nmk16_state::tdragon2(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
@@ -4786,11 +4787,11 @@ void nmk16_state::tdragon3h(machine_config &config)
 void nmk16_state::raphero(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14000000); /* 14 MHz measured */
+	M68000(config, m_maincpu, XTAL(14'000'000)); /* MC68HC000P12 or MC68000P12F or TMP68HC000P-16 14 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::raphero_map);
 	set_hacky_interrupt_timing(config);
 
-	TMP90841(config, m_audiocpu, 8000000);
+	TMP90841(config, m_audiocpu, XTAL(16'000'000) / 2); // TMP90C841AN 8 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::raphero_sound_mem_map);
 
 	/* video hardware */
@@ -4807,17 +4808,17 @@ void nmk16_state::raphero(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
@@ -5359,27 +5360,16 @@ static const gfx_layout tilelayout_8bpp =
 };
 
 
-static const gfx_layout tilelayout_swapnibble =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4,0,12,8,20,16,28,24, 512+4,512+0,512+12,512+8,512+20,512+16,512+28,512+24 },
-	{ STEP16(0,4*8) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_grdnstrm )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb, 0x200, 16 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout_8bpp,      0x000,  1 ) // [1] Layer 0
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0x100, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "bgtile",  0, tilelayout_8bpp,                    0x000,  1 ) // [1] Layer 0
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) // [0] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_redhawkb )
-	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,  0x200, 16 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "bgtile",  0, tilelayout_swapnibble, 0x000, 16 ) // [1] Layer 0
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout_swapnibble, 0x100, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x200, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_lsb, 0x000, 16 ) // [1] Layer 0
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_lsb, 0x100, 16 ) // [0] Sprites
 GFXDECODE_END
 
 
@@ -5407,7 +5397,7 @@ void afega_state::stagger1(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,afega)
+	MCFG_VIDEO_START_OVERRIDE(afega_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

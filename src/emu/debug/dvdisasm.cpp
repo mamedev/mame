@@ -109,7 +109,7 @@ void debug_view_disasm::enumerate_sources()
 
 void debug_view_disasm::view_notify(debug_view_notification type)
 {
-	if(type == VIEW_NOTIFY_CURSOR_CHANGED)
+	if((type == VIEW_NOTIFY_CURSOR_CHANGED) && (m_cursor_visible == true))
 		adjust_visible_y_for_cursor();
 
 	else if(type == VIEW_NOTIFY_SOURCE_CHANGED)
@@ -353,8 +353,8 @@ void debug_view_disasm::complete_information(const debug_view_disasm_source &sou
 		dasm.m_is_pc = adr == pc;
 
 		dasm.m_is_bp = false;
-		for(device_debug::breakpoint *bp = source.device()->debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
-			if(adr ==(bp->address() & source.m_space.logaddrmask())) {
+		for(const device_debug::breakpoint &bp : source.device()->debug()->breakpoint_list())
+			if(adr == (bp.address() & source.m_space.logaddrmask())) {
 				dasm.m_is_bp = true;
 				break;
 			}

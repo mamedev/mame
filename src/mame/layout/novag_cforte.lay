@@ -8,17 +8,17 @@
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
+		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
 	</element>
 	<element name="seg_m" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="1" string="M"><color red="0.31" green="0.28" blue="0.29" /></text>
-		<text state="0" string="M"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
+		<text state="1" string="M"><color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="0" string="M"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
 	</element>
 	<element name="seg_ap" defstate="0">
 		<rect><color red="0.54" green="0.57" blue="0.58" /></rect>
-		<text state="1" string="'"><color red="0.31" green="0.28" blue="0.29" /></text>
-		<text state="0" string="'"><color red="0.5098" green="0.5333" blue="0.5412" /></text>
+		<text state="1" string="'"><color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="0" string="'"><color red="0.49412" green="0.51765" blue="0.51765" /></text>
 	</element>
 
 	<element name="ledr" defstate="0">
@@ -139,30 +139,12 @@
 	<element name="text_r8a"><text string="Go"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_r8b"><text string=" "><color red="0.51" green="0.5" blue="0.49" /></text></element>
 
-	<element name="text_king">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[K]"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_queen">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[Q]"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_rook">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[R]"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_bishop">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[B]"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_knight">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[N]"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
-	<element name="text_pawn">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[P]"><color red="0.1" green="0.1" blue="0.1" /></text>
-	</element>
+	<element name="text_p7"><image file="chess/bp.png"/></element>
+	<element name="text_p8"><image file="chess/bn.png"/></element>
+	<element name="text_p9"><image file="chess/bb.png"/></element>
+	<element name="text_p10"><image file="chess/br.png"/></element>
+	<element name="text_p11"><image file="chess/bq.png"/></element>
+	<element name="text_p12"><image file="chess/bk.png"/></element>
 
 
 <!-- sb board -->
@@ -509,11 +491,11 @@
 		<bezel name="digit12" element="digit"><bounds x="104.125" y="9" width="2" height="3" /></bezel>
 		<bezel name="digit13" element="digit"><bounds x="106.125" y="9" width="2" height="3" /></bezel>
 
-		<bezel element="text_l7"><bounds x="87" y="68.64" width="14" height="1.4" /></bezel>
-		<bezel element="text_l8"><bounds x="87" y="76.35" width="14" height="1.4" /></bezel>
+		<bezel element="text_l7"><bounds x="86" y="68.64" width="14" height="1.4" /></bezel>
+		<bezel element="text_l8"><bounds x="86" y="76.35" width="14" height="1.4" /></bezel>
 
-		<bezel name="0.6" element="ledg"><bounds x="87" y="70.29" width="1" height="2" /></bezel>
-		<bezel name="0.7" element="ledg"><bounds x="87" y="78.00" width="1" height="2" /></bezel>
+		<bezel name="0.6" element="ledg"><bounds x="86" y="71.29" width="1" height="2" /></bezel>
+		<bezel name="0.7" element="ledg"><bounds x="86" y="79.00" width="1" height="2" /></bezel>
 
 	<!-- right side buttons -->
 
@@ -551,12 +533,12 @@
 		<bezel element="white"><bounds x="101.4" y="70.44" width="5.7" height="3.7" /></bezel>
 		<bezel element="static_red"><bounds x="101.4" y="78.15" width="5.7" height="3.7" /></bezel>
 
-		<bezel element="text_king"><bounds x="93.13" y="24.70" width="3" height="2.2" /></bezel>
-		<bezel element="text_queen"><bounds x="93.13" y="32.41" width="3" height="2.2" /></bezel>
-		<bezel element="text_bishop"><bounds x="93.13" y="40.13" width="3" height="2.2" /></bezel>
-		<bezel element="text_knight"><bounds x="93.13" y="47.84" width="3" height="2.2" /></bezel>
-		<bezel element="text_rook"><bounds x="93.13" y="55.56" width="3" height="2.2" /></bezel>
-		<bezel element="text_pawn"><bounds x="93.13" y="63.27" width="3" height="2.2" /></bezel>
+		<bezel element="text_p12"><bounds x="93.33" y="24.70" width="2.5" height="2.5" /><color alpha="0.9" /></bezel>
+		<bezel element="text_p11"><bounds x="93.33" y="32.41" width="2.5" height="2.5" /><color alpha="0.9" /></bezel>
+		<bezel element="text_p9"><bounds x="93.33" y="40.13" width="2.5" height="2.5" /><color alpha="0.9" /></bezel>
+		<bezel element="text_p8"><bounds x="93.33" y="47.84" width="2.5" height="2.5" /><color alpha="0.9" /></bezel>
+		<bezel element="text_p10"><bounds x="93.33" y="55.56" width="2.5" height="2.5" /><color alpha="0.9" /></bezel>
+		<bezel element="text_p7"><bounds x="93.33" y="63.27" width="2.5" height="2.5" /><color alpha="0.9" /></bezel>
 
 		<bezel element="text_r2x"><bounds x="101.4" y="33.01" width="5.7" height="1.4" /></bezel>
 		<bezel element="text_r3x"><bounds x="101.4" y="40.73" width="5.7" height="1.4" /></bezel>

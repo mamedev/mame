@@ -15,7 +15,9 @@
 #include "netlist/solver/nld_solver.h"
 #include "netlist/tools/nl_convert.h"
 
-#include <cstring>
+#include <cstdio> // scanf
+#include <iomanip> // scanf
+#include <iostream> // scanf
 
 #define NLTOOL_VERSION  20190420
 
@@ -292,7 +294,7 @@ struct input_t
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 		double t;
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
+		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
@@ -486,14 +488,13 @@ void tool_app_t::static_compile()
 
 	// no reset needed ...
 
-	plib::putf8_writer w(&pout_strm);
 	std::map<pstring, pstring> mp;
 
 	nt.solver()->create_solver_code(mp);
 
 	for (auto &e : mp)
 	{
-		w.write(e.second);
+		pout.write(e.second);
 	}
 
 	nt.stop();
@@ -730,15 +731,19 @@ void tool_app_t::convert()
 	plib::postringstream ostrm;
 	if (opt_file() == "-")
 	{
+#if !USE_CSTREAM
 		plib::pstdin f;
 		plib::copystream(ostrm, f);
+#else
+		plib::copystream(ostrm, std::cin);
+#endif
 	}
 	else
 	{
 		plib::pifilestream f(opt_file());
 		plib::copystream(ostrm, f);
 	}
-	contents = ostrm.str();
+	contents = pstring(ostrm.str());
 
 	pstring result;
 	if (opt_type.as_string() == "spice")
@@ -794,6 +799,8 @@ int tool_app_t::execute()
 
 	if (opt_help())
 	{
+		pout(plib::pfmt("{:10.3}\n").f(20.0));
+		//pout(plib::pfmt("{10.3}\n").f(20));
 		pout(usage());
 		return 0;
 	}
@@ -857,7 +864,19 @@ int tool_app_t::execute()
 		perr("plib exception caught: {}\n", e.text());
 		return 2;
 	}
+#if 0
+	std::cout.imbue(std::locale("de_DE.utf8"));
+	std::cout.imbue(std::locale("C.UTF-8"));
+	std::cout << std::fixed << 20.003 << "\n";
+	std::cout << std::setw(20) << std::left << "01234567890" << "|" << "\n";
+	std::cout << std::setw(20) << "Общая ком" << "|" << "\n";
+	std::cout << "Общая ком" << pstring(20 - pstring("Общая ком").length(), ' ') << "|" << "\n";
+	std::cout << plib::pfmt("{:20}")("Общая ком") << "|" << "\n";
 
+	//char x = 'a';
+	auto b= U'\U00000449';
+	std::cout << "b: <" << b << ">";
+#endif
 	return 0;
 }
 

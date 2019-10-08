@@ -25,6 +25,7 @@
 #include "machine/timer.h"
 #include "bus/tanbus/tanbus.h"
 #include "imagedev/snapquik.h"
+#include "tilemap.h"
 
 class microtan_state : public driver_device
 {

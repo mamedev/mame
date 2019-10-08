@@ -205,7 +205,7 @@ void ultraman_state::ultraman(machine_config &config)
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");
-	m_k051960->set_screen_tag("screen");
+	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(ultraman_state::sprite_callback), this);
 
 	K051316(config, m_k051316[0], 0);

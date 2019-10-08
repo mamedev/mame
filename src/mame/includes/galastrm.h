@@ -57,7 +57,7 @@ public:
 	{ }
 
 	void galastrm(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
+	DECLARE_READ_LINE_MEMBER(frame_counter_r);
 
 protected:
 	virtual void video_start() override;

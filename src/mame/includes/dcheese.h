@@ -36,8 +36,6 @@ public:
 	void fredmem(machine_config &config);
 	void dcheese(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
-
 protected:
 	enum
 	{

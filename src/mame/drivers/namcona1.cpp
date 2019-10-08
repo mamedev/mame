@@ -927,10 +927,6 @@ void namcona1_state::scanline_interrupt(int scanline)
 {
 	const u16 enabled = m_mEnableInterrupts ? ~m_vreg[0x1a / 2] : 0;
 
-	// adc (timing guessed, when does this trigger?)
-	if (scanline == 0)
-		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-
 	// vblank
 	if (scanline == 224)
 	{
@@ -1235,10 +1231,10 @@ ROM_END
 This bootleg is running on the older type rom board (Cosmo Gang etc). Super World Court normally runs on the newer type 'B' board with extra chip at 6J.
 It has a small pcb replacement keycus with a 74hc4060 , LS04 and 2 chips with the ID scratched (possibly PAL chips).
 Program ROMs are almost identical. They hacked the keycus routine and the copyright year (from 1992 to 1994):
-sc2-ep0l.4c  [2 / 2]      0l.0l        [2 / 2]      IDENTICAL
-sc2-ep0u.4f  [2 / 2]      0u.0u        [2 / 2]      IDENTICAL
-sc2-ep0u.4f  [1 / 2]      0u.0u        [1 / 2]      99.997711%
-sc2-ep0l.4c  [1 / 2]      0l.0l        [1 / 2]      99.997330%
+sc2-ep0l.4c  [2/2]      0l.0l        [2/2]      IDENTICAL
+sc2-ep0u.4f  [2/2]      0u.0u        [2/2]      IDENTICAL
+sc2-ep0u.4f  [1/2]      0u.0u        [1/2]      99.997711%
+sc2-ep0l.4c  [1/2]      0l.0l        [1/2]      99.997330%
 
 GFX ROMs are 27c040's double stacked with flying wires to the PAL board. They are the same as the 801 dumps, chopped in half. Pin 22 of OLH and OUH go to C pad on custom board.
 Pin 22 of 1LH and 1UH go to B pad on custom board. All Lower pin '22's are tied high.

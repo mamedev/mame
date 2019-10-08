@@ -1279,7 +1279,7 @@ u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t 
 						util::stream_format( stream, "INVALID");
 						break;
 					case COND_NV:
-						util::stream_format( stream, "SWI %02x\n", opcode & 0xff);
+						util::stream_format( stream, "SWI %02x", opcode & 0xff);
 						break;
 				}
 				break;

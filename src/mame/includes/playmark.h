@@ -10,6 +10,7 @@
 #include "machine/ticket.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class playmark_state : public driver_device
 {

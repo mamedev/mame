@@ -101,62 +101,6 @@
 
 /*******************************************
  *
- *  Hardware 3D Rasterizer Internal State
- *
- *******************************************/
-
-#define MAX_TRIANGLES       32768
-
-struct raster_state
-{
-//  uint32_t mode;                      /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
-	uint16_t *texture_rom;              /* Texture ROM pointer */
-	uint32_t texture_rom_mask;          /* Texture ROM mask */
-	int16_t viewport[4];                /* View port (startx,starty,endx,endy) */
-	int16_t center[4][2];               /* Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y]) */
-	uint16_t center_sel;                /* Selected center */
-	uint32_t reverse;                   /* Left/Right Reverse */
-	float z_adjust;                     /* ZSort Mode */
-	float triangle_z;                   /* Current Triangle z value */
-	uint8_t master_z_clip;              /* Master Z-Clip value */
-	uint32_t cur_command;               /* Current command */
-	uint32_t command_buffer[32];        /* Command buffer */
-	uint32_t command_index;             /* Command buffer index */
-	triangle tri_list[MAX_TRIANGLES];   /* Triangle list */
-	uint32_t tri_list_index;            /* Triangle list index */
-	triangle *tri_sorted_list[0x10000]; /* Sorted Triangle list */
-	uint16_t min_z;                     /* Minimum sortable Z value */
-	uint16_t max_z;                     /* Maximum sortable Z value */
-	uint16_t texture_ram[0x10000];      /* Texture RAM pointer */
-	uint8_t log_ram[0x40000];           /* Log RAM pointer */
-};
-
-/*******************************************
- *
- *  Geometry Engine Internal State
- *
- *******************************************/
-
-struct geo_state
-{
-	raster_state *          raster;
-	uint32_t              mode;                   /* bit 0 = Enable Specular, bit 1 = Calculate Normals */
-	uint32_t *          polygon_rom;            /* Polygon ROM pointer */
-	uint32_t            polygon_rom_mask;       /* Polygon ROM mask */
-	float               matrix[12];             /* Current Transformation Matrix */
-	poly_vertex         focus;                  /* Focus (x,y) */
-	poly_vertex         light;                  /* Light Vector */
-	float               lod;                    /* LOD */
-	float               coef_table[32];         /* Distane Coefficient table */
-	texture_parameter   texture_parameters[32]; /* Texture parameters */
-	uint32_t          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
-	uint32_t          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
-	model2_state    *state;
-};
-
-
-/*******************************************
- *
  *  Generic 3D Math Functions
  *
  *******************************************/
@@ -341,7 +285,7 @@ inline bool model2_state::check_culling( raster_state *raster, uint32_t attr, fl
 
 void model2_state::raster_init( memory_region *texture_rom )
 {
-	m_raster = auto_alloc_clear(machine(), <raster_state>());
+	m_raster = make_unique_clear<raster_state>();
 
 	m_raster->texture_rom = (uint16_t *)texture_rom->base();
 	m_raster->texture_rom_mask = (texture_rom->bytes() / 2) - 1;
@@ -826,7 +770,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t at
 
 void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 {
-	model2_renderer *poly = m_state.m_poly;
+	model2_renderer *poly = m_state.m_poly.get();
 	m2_poly_extra_data& extra = poly->object_data_alloc();
 	uint8_t renderer;
 
@@ -942,7 +886,7 @@ inline void model2_state::model2_3d_project( triangle *tri )
 /* 3D Rasterizer frame start: Resets frame variables */
 void model2_state::model2_3d_frame_start( void )
 {
-	raster_state *raster = m_raster;
+	raster_state *raster = m_raster.get();
 
 	/* reset the triangle list index */
 	raster->tri_list_index = 0;
@@ -957,7 +901,7 @@ void model2_state::model2_3d_frame_start( void )
 
 void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	raster_state *raster = m_raster;
+	raster_state *raster = m_raster.get();
 	int32_t z;
 
 	/* if we have nothing to render, bail */
@@ -1216,10 +1160,10 @@ void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 
 void model2_state::geo_init(memory_region *polygon_rom)
 {
-	m_geo = auto_alloc_clear(machine(), <geo_state>());
+	m_geo = make_unique_clear<geo_state>();
 	m_geo->state = this;
 
-	m_geo->raster = m_raster;
+	m_geo->raster = m_raster.get();
 	m_geo->polygon_rom = (uint32_t *)polygon_rom->base();
 	m_geo->polygon_rom_mask = (polygon_rom->bytes() / 4) - 1;
 
@@ -2599,7 +2543,7 @@ void model2_state::geo_parse( void )
 		}
 
 		/* process it */
-		input = geo_process_command( m_geo, opcode, input, &end_code );
+		input = geo_process_command( m_geo.get(), opcode, input, &end_code );
 	}
 }
 
@@ -2614,7 +2558,7 @@ void model2_state::video_start()
 
 	m_sys24_bitmap.allocate(width, height+4);
 
-	m_poly = auto_alloc(machine(), model2_renderer(*this));
+	m_poly = std::make_unique<model2_renderer>(*this);
 
 	/* initialize the hardware rasterizer */
 	raster_init( memregion("textures") );

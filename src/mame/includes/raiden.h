@@ -13,6 +13,7 @@
 #include "audio/seibu.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class raiden_state : public driver_device, public seibu_sound_common
 {

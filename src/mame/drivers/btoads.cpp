@@ -73,13 +73,13 @@ READ16_MEMBER( btoads_state::main_sound_r )
 }
 
 
-CUSTOM_INPUT_MEMBER( btoads_state::main_to_sound_r )
+READ_LINE_MEMBER( btoads_state::main_to_sound_r )
 {
 	return m_main_to_sound_ready;
 }
 
 
-CUSTOM_INPUT_MEMBER( btoads_state::sound_to_main_r )
+READ_LINE_MEMBER( btoads_state::sound_to_main_r )
 {
 	return m_sound_to_main_ready;
 }
@@ -264,9 +264,9 @@ static INPUT_PORTS_START( btoads )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, sound_to_main_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(btoads_state, sound_to_main_r)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, main_to_sound_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(btoads_state, main_to_sound_r)
 	PORT_BIT( 0xff7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")

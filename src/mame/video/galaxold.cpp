@@ -457,7 +457,7 @@ VIDEO_START_MEMBER(galaxold_state,stratgyx)
 	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
 	m_draw_background = &galaxold_state::stratgyx_draw_background;
-	
+
 	// level 3 tank bullets
 	m_draw_bullets = &galaxold_state::scrambold_draw_bullets;
 }

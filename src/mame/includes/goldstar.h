@@ -9,6 +9,7 @@
 #include "machine/i8255.h"
 #include "machine/ticket.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class goldstar_state : public driver_device
@@ -54,6 +55,10 @@ public:
 	void init_cmast91();
 	void init_wcherry();
 	void init_super9();
+	void init_ladylinrb();
+	void init_ladylinrc();
+	void init_ladylinrd();
+	void init_ladylinre();
 	DECLARE_VIDEO_START(goldstar);
 	void cm_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(cherrym);
@@ -63,6 +68,7 @@ public:
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void ladylinr(machine_config &config);
+	void ladylinrb(machine_config &config);
 	void wcherry(machine_config &config);
 	void pkrmast(machine_config &config);
 	void moonlght(machine_config &config);
@@ -82,7 +88,7 @@ public:
 	void kkotnoli_map(address_map &map);
 	void ladylinr_map(address_map &map);
 	void lucky8_map(address_map &map);
-	void lucky8f_decrypted_opcodes_map(address_map &map);
+	void common_decrypted_opcodes_map(address_map &map);
 	void mbstar_map(address_map &map);
 	void megaline_portmap(address_map &map);
 	void ncb3_readwriteport(address_map &map);
@@ -247,6 +253,7 @@ public:
 	void flaming7(machine_config &config);
 	void lucky8(machine_config &config);
 	void lucky8f(machine_config &config);
+	void lucky8k(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);
 	void flam7_w4(machine_config &config);

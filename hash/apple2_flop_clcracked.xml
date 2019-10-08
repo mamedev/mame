@@ -34606,4 +34606,691 @@
 		</part>
 	</software>
 
+	<software name="dinodypl">
+		<description>Dinosaur Days Plus (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Pelican Software</publisher>
+		<info name="release" value="2019-08-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur days plus (4am crack) disk 1a - program.dsk" size="143360" crc="9c1f7a33" sha1="1db7919a4bc7faad7f4eee2d23b6cd06b0c87bb0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Artwork"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur days plus (4am crack) disk 1b - artwork.dsk" size="143360" crc="ce3f5c47" sha1="15328506f5ef39cc1abb39bcb0afa2593556d311" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Learning disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur days plus (4am crack) disk 2a - learning disk.dsk" size="143360" crc="33d43d67" sha1="76c0592075087b824191e4d9c98923f8dbf526d1" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Learning disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur days plus (4am crack) disk 2b - learning disk.dsk" size="143360" crc="153b4ea8" sha1="e6116d613bb0aed1491c6df9c0bdf34231ea42f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdwrgr12">
+		<description>KidWriter (German Level I, II) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2019-08-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="kidwriter (german level i, ii) (4am crack).dsk" size="143360" crc="122e4098" sha1="94a07dd053f198b02cd2dbf6b62964a64d806516" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="workfrc2">
+		<description>Work Force II (Version 2.10) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Core Concepts</publisher>
+		<info name="release" value="2019-08-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="work force ii (4am crack).dsk" size="143360" crc="5ec62699" sha1="ff2ae804cabb542eae0326bf8e31cf20e3775939" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbcircrs">
+		<description>The Human Body: Circulation and Respiration (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Silver, Burdett and Ginn</publisher>
+		<info name="release" value="2019-08-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the human body- circulation and respiration (4am crack) side a.dsk" size="143360" crc="60c1eb9d" sha1="f9f8a4eb79fdea09905d44685dc261fcacd263b9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the human body- circulation and respiration (4am crack) side b.dsk" size="143360" crc="c8b5d5c2" sha1="174730396613bd87b0cf4bb423cfc1de3eb62aee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fltficcs">
+		<description>Flights Into Fiction: Classic Stories (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2019-08-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="flights into fiction - classic stories (4am crack) side a.dsk" size="143360" crc="cbbbe92d" sha1="90fa76a99753eb71e788d483aa3b477ffab0c203" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="flights into fiction - classic stories (4am crack) side b.dsk" size="143360" crc="93961a53" sha1="dfc757d24e7ff8aabd6554b61984ca6d80962a5d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf0684">
+		<description>Castle Wolfenstein (Version 06/19/84) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<!-- This re-release, with updated graphics and different copy protection,
+		is dated 06/19/84. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="castle wolfenstein 061984 (4am crack).dsk" size="143360" crc="e2e2383f" sha1="c3cb5c2c2789d5931b66c1bcdbb528dc6294b7f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="byndwolf">
+		<description>Beyond Castle Wolfenstein (Version 07/12/84) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="beyond castle wolfenstein (4am crack).dsk" size="143360" crc="71b196b1" sha1="f8ec7ba8717c92be4ecab59fba54f2fbbebc6541" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backaid">
+		<description>BackAid (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>BrainBank</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Start disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 1 - the start disk.dsk" size="143360" crc="e6a4b752" sha1="20d25220943529777b384e9a68b14a79066ca017" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Physical inventory"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 2 - physical inventory.dsk" size="143360" crc="af35c101" sha1="2a64f167d15f725d166b659345b8061d047420fa" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Stress inventory"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 3 - stress inventory.dsk" size="143360" crc="b4422575" sha1="1bdcfb52b5b31c5d654b5496b3614e81927ff29a" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Wear and tear"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 4 - wear and tear.dsk" size="143360" crc="6198ed77" sha1="cd3004b105d2f1d7230816b7b54af4356ce6ccae" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 5 - data disk.dsk" size="143360" crc="99bcbe7a" sha1="4c65c0231bf7680af25d5bb96eb9717d487c3056" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nlptl111">
+		<description>NLP Tools Vol. 1 (Version 1.1) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Behavioral Engineering</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="nlp tools vol. 1 (4am crack).dsk" size="143360" crc="55fb3eea" sha1="2891d54d1c0ad8c5f3204047490414f6ae698913" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grddsgnr">
+		<description>Grid Designer (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Channelmark Corporation</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="grid designer (4am crack) side a.dsk" size="143360" crc="cf6b0064" sha1="571bfb958b2b19fa6f85de7960429aff051de449" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="grid designer (4am crack) side b.dsk" size="143360" crc="e06d89a3" sha1="7d785d660d6d36830f9107c263d09e489aebde96" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbfiler">
+		<description>Phi Beta Filer (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Scarborough Systems</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="phi beta filer (4am crack) disk 1.dsk" size="143360" crc="e56552b6" sha1="73ef9577a5c536a4a46c926a5f7a7399beac8b5c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="phi beta filer (4am crack) disk 2.dsk" size="143360" crc="c8ab6a48" sha1="bbcb328abc59158c77d7220c90f3e1c1ed422acb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addfacts">
+		<description>The Addition Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the addition facts (4am crack).dsk" size="143360" crc="3c6b27dc" sha1="246226f17617f98c223ef794f7a1d93cc4f795f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mulfacts">
+		<description>The Multiplication Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the multiplication facts (4am crack).dsk" size="143360" crc="a45e2e14" sha1="99b0bc274136a37ab5632edaf89d17f88258bc82" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theorems">
+		<description>Theorems and Proofs of Theorems (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="release" value="2019-08-15"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="theorems and proofs of theorems (4am crack) disk 1.dsk" size="143360" crc="ad7ed7dd" sha1="e5f8fbeb9067f5f659f6c814319c385ce3e3156a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="theorems and proofs of theorems (4am crack) disk 2.dsk" size="143360" crc="3e52785c" sha1="58225c032534c9eabf771825c03818e0d474e4cc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslat101">
+		<description>Muppet Slate (Version 1.01) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Teacher disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="muppet slate v1.01 (4am crack) disk 1 - teacher disk.dsk" size="143360" crc="3c2145cc" sha1="eebdb82b0fdd231e38a8528fed37e08bfa6c6946" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Master student disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="muppet slate v1.01 (4am crack) disk 2 - master student disk.dsk" size="143360" crc="b5647cd7" sha1="f2d5c724a8412e450344f43b10d977728cf52b19" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Seasons and special days"/>
+			<dataarea name="flop" size="143360">
+				<rom name="muppet slate v1.01 (4am crack) disk 3 - seasons and special days.dsk" size="143360" crc="0a353a3d" sha1="6029f36906448b6d1fe31ddfe0a2b206dc2530ec" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - More special days"/>
+			<dataarea name="flop" size="143360">
+				<rom name="muppet slate v1.01 (4am crack) disk 4 - more special days.dsk" size="143360" crc="486aea9b" sha1="7fae54f5e54b53d39b816a4d2988d057b1443309" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bignlitl">
+		<description>BIG &amp; little (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="big and little (4am crack).dsk" size="143360" crc="3d30f609" sha1="3414a3ba8e8ab189c64536b68316a3aaf217d07c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flficftl">
+		<description>Flights Into Fiction: Fairy Tales (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program only"/>
+			<dataarea name="flop" size="143360">
+				<rom name="flights into fiction- fairy tales (4am crack) side a - program only.dsk" size="143360" crc="2a62967a" sha1="b0f6dda1adbd7cf51de1cf23fe4a606764e97052" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Program plus editor"/>
+			<dataarea name="flop" size="143360">
+				<rom name="flights into fiction- fairy tales (4am crack) side b - program plus editor.dsk" size="143360" crc="a1e861f8" sha1="859f0f12d44ace48b622fd2ad64211b0eb773195" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="divfacts">
+		<description>The Division Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the division facts (4am crack).dsk" size="143360" crc="b9e08fd8" sha1="ffa9105be822543526f7ed63de8d2789d5746f4e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subfacts">
+		<description>The Subtraction Facts (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the subtraction facts (4am crack).dsk" size="143360" crc="2601b318" sha1="e505996ea77d65d5dfb451282bc4bebe57ffb638" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z1bfdemo">
+		<description>Zork I Demo (Catch A Butterfly) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-08-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zork i demo (4am crack).dsk" size="143360" crc="b2fd73b0" sha1="ace8b7dca76c5048cf03b4d5fc6179c4844bbfa4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msnastrd">
+		<description>Mission: Asteroid (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2019-08-18"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mission asteroid (4am and san inc crack).dsk" size="143360" crc="a9c9e1ab" sha1="006865ece389e8daa676de7365eed76ece64726a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="charlweb">
+		<description>A Newbery Adventure: Charlotte's Web (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-08-18"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="a newbery adventure - charlotte's web (4am crack).dsk" size="143360" crc="158943a0" sha1="afc5c41c8249ce3a2764115e5379e2b561914285" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poetryex">
+		<description>Poetry Express (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Learning Well</publisher>
+		<info name="release" value="2019-08-20"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="poetry express (4am crack).dsk" size="143360" crc="f250b9c8" sha1="cf080f71a9559bc005258a139f408912d8b4f3fc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chipwits">
+		<description>Chipwits</description>
+		<year>1985</year>
+		<publisher>Brainpower, Inc.</publisher>
+		<info name="release" value="2019-08-15"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="chipwits (logo crack).dsk" size="143360" crc="a79830de" sha1="c172fad40f566ba671829a18bfba790ce06f3fbd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glschred">
+		<description>Professor Davensteev's Galaxy Search: Red Level (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Learning Well</publisher>
+		<info name="release" value="2019-08-24"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="galaxy search - red level (4am crack).dsk" size="143360" crc="d673e271" sha1="a8c1ca0c80c3560805aa501d10f08bbd321229a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glschblu">
+		<description>Professor Davensteev's Galaxy Search: Blue Level (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Learning Well</publisher>
+		<info name="release" value="2019-08-24"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="galaxy search - blue level (4am crack).dsk" size="143360" crc="b3d86651" sha1="fed5df3a9a3e57d829cd44c7491096f94b2b45b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metstbkm">
+		<description>MicroExam Test Bank for Computer Mathematics: Structured BASIC with Math Applications (Version 1.01) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>South-Western Publishing</publisher>
+		<info name="release" value="2019-08-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Master"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microexam test bank for computer mathematics- structured basic with math applications (4am crack) disk 1 - master.dsk" size="143360" crc="7e820ae0" sha1="f203ea7bbb46bd54d303c5fee72de17a0776651e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Chapters 1-10"/>
+			<dataarea name="flop" size="143360">
+				<rom name="microexam test bank for computer mathematics- structured basic with math applications (4am crack) disk 2 - chapters 1-10.dsk" size="143360" crc="e87d74a1" sha1="e922fa2ae51ec1c59c9a9be4ab150821bbef7d0d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="djlb1on1">
+		<description>Julius Erving and Larry Bird Go One on One (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-08-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="one on one (4am and san inc crack).dsk" size="143360" crc="ab1717ad" sha1="0b9331f3a44b13ceefd8f201b01a41118d6ab4c0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quizcstl">
+		<description>Quiz Castle (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Didatech</publisher>
+		<info name="release" value="2019-09-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quiz castle (4am crack) side a.dsk" size="143360" crc="6806575a" sha1="a85a9fc2ed2238c79d4c4541e262172e736ce387" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quiz castle (4am crack) side b.dsk" size="143360" crc="294cba3b" sha1="8944bd8ed48858606f988a9439d90dfc6a81ee30" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cb123q">
+		<description>Charlie Brown's 1, 2, 3's (1990 Queue re-release) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2019-09-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="charlie brown's 1, 2, 3's (1990 re-release)(4am crack) side a.dsk" size="143360" crc="62ff3f40" sha1="c7cd861c9000a6169cc8e14af661ba7cb02227a1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="charlie brown's 1, 2, 3's (1990 re-release)(4am crack) side b.dsk" size="143360" crc="4b8a2eb6" sha1="61fe7bb3f9e88c430a743c39ed6f378539eff31a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buckzoom">
+		<description>Buck Rogers - Planet of Zoom (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sega Enterprises</publisher>
+		<info name="release" value="2019-09-04"/>
+		<!-- Press open-apple during boot to read a message from the programmer. -->
+
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sega - buck rogers - planet of zoom (logo crack).dsk" size="143360" crc="49bc53af" sha1="a565aefbdaa2b94a4c5a18ec5ddd801abfe78827" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="millv21">
+		<description>Millionaire (Version 2.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Blue Chip Software</publisher>
+		<info name="release" value="2019-09-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="millionaire v2.1 (4am crack).dsk" size="143360" crc="80f60f65" sha1="fa63ed4f174a7f40e35e5e0df5ba7d2377d667c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saleedge">
+		<description>The Sales Edge (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Human Edge Software</publisher>
+		<info name="release" value="2019-09-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the sales edge (4am crack) disk 1 - program.dsk" size="143360" crc="85039152" sha1="9607cd12259cf7e803d98a9cfd2cedf7bc3002b5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Output 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the sales edge (4am crack) disk 2 - output 1.dsk" size="143360" crc="d2102e6b" sha1="aefac69d88ce5f4e1e6014c0e963f6648b74a805" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Output 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the sales edge (4am crack) disk 3 - output 2.dsk" size="143360" crc="003b69bd" sha1="5793d7b5164836c8d94a8ba8e19bf9f8effc1de4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpsat11a">
+		<description>Computer Preparation for the SAT (Version 1.1A) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Harcourt Brace Jovanovich</publisher>
+		<info name="release" value="2019-09-05"/>
+		<!--"Computer Preparation for the SAT" is a 1986 educational program distributed by Harcourt Brace Jovanovich. This is version 1.1A. It is preserved here for the first time.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Mathematics"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (4am crack) disk 1 - mathematics.dsk" size="143360" crc="3fd1ba92" sha1="4d5c88056164044a42035fd8b135fabbfefc5f04" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Vocabulary"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (4am crack) disk 2 - vocabulary.dsk" size="143360" crc="44cf4f2a" sha1="dde57f4bba46dd3218123828907da63abb1a98e4" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Verbal item banks"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (4am crack) disk 3 - verbal item banks.dsk" size="143360" crc="6e22a81e" sha1="5095b94df65225ebe9b28a4e5de94ea1cd30ac65" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Practice tests"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hbj computer preparation for the sat (4am crack) disk 4 - practice tests.dsk" size="143360" crc="8ad412c8" sha1="68417e227245307801fc79bf6b89cb72e801fcac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crchoru4">
+		<description>Creature Chorus (Version 4.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Laureate Learning Systems</publisher>
+		<info name="release" value="2019-09-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="creature chorus v4.0 (4am crack).dsk" size="143360" crc="86db4bac" sha1="4f511f09dc1f94079fed1eba0902abfce26da333" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chivalr2">
+		<description>Chivalry (Revision 2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2019-09-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="chivalry rev. 2 (4am and san inc crack).dsk" size="143360" crc="ba08b7bb" sha1="af10167662e98448dbeacd64ce2782d268162097" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="istarflt1">
+		<description>Star Fleet 1: The War Begins (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Interstel</publisher>
+		<info name="release" value="2019-09-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star fleet i side a (san inc crack).dsk" size="143360" crc="c2befd2f" sha1="5f1bcbf6d20da209e356d2bcf9114bde9611673f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star fleet i side b (san inc crack).dsk" size="143360" crc="e570fc3b" sha1="9f884be8b09b08e2afab66d92f619f6718de2c10" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="univ2v10">
+		<description>Universe II (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Omnitrend Software</publisher>
+		<info name="release" value="2019-09-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk a.dsk" size="143360" crc="9def255e" sha1="dcb5adef707bf11ad664ab159aa45b4ef0c9527d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk b.dsk" size="143360" crc="c731084d" sha1="0219209822ccae52b408857c186636a405cb8e12" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk c.dsk" size="143360" crc="fff0a9c5" sha1="52ecefe3e7a69cbd2546c50c7856f639ae3520e5" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk d.dsk" size="143360" crc="1a85db1c" sha1="0c51842a2c8c861ae9f5e3240383e89cdea07885" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="143360">
+				<rom name="universe ii v1.0 (4am crack) disk e.dsk" size="143360" crc="ec4ca89a" sha1="9093ad172abc7ba7895bc8d105a5b1be64e8144f" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

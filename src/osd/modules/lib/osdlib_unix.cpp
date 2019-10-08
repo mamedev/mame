@@ -100,24 +100,23 @@ void osd_break_into_debugger(const char *message)
 }
 
 #ifdef SDLMAME_ANDROID
-char *osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text(void)
 {
-	return nullptr;
+	return std::string();
 }
 #else
 //============================================================
 //  osd_get_clipboard_text
 //============================================================
 
-char *osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text(void)
 {
-	char *result = nullptr;
+	std::string result;
 
 	if (SDL_HasClipboardText())
 	{
 		char *temp = SDL_GetClipboardText();
-		result = (char *) malloc(strlen(temp) + 1);
-		strcpy(result, temp);
+		result.assign(temp);
 		SDL_free(temp);
 	}
 	return result;

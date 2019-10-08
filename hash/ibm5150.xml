@@ -1847,7 +1847,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="pitstop2">
-		<description>Pitstop 2</description>
+		<description>Pitstop II (5.25")</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 		<info name="developer" value="Synergistic Software" />
@@ -2722,12 +2722,13 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="2630fa">
 		<description>2630 Fourier Analyzer (Demo)</description>
-		<year>1987?</year>
+		<year>1987</year>
 		<publisher>Tektronix</publisher>
+		<info name="usage" value="Start from DOS with: IPD" />
 		<info name="version" value="1.70" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="2630 fourier analyzer 1.70 (demo).img" size="368640" crc="2a593b4a" sha1="bc8fb32634cc1e2beff1d518d9db77d272269d27"/>
+			<dataarea name="flop" size="2795439">
+				<rom name="2630 fourier analyzer 1.70 (demo).mfm" size="2795439" crc="6b878f2a" sha1="420223b960f51ca6d475832c078e698a6cdb1424" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2994,8 +2995,9 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="easypc">
 		<description>Easy-PC Demonstrator for Printed Circuit Boards and Schematics</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>Number One Systems</publisher>
+		<info name="usage" value="Start from DOS with: DEMO" />
 		<info name="version" value="Rev. I0123" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -3022,8 +3024,8 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<year>1985</year>
 		<publisher>Simon &amp; Schuster</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="the great international paper airplane construction kit.img" size="368640" crc="a55cdfa9" sha1="bef12645b6851977805226ca1b44586b0a4a6cb8"/>
+			<dataarea name="flop" size="2862183">
+				<rom name="the great international paper airplane construction kit.mfm" size="2862183" crc="f47c4753" sha1="32e0fa0c51a65b432712d9910dbf48e61d613312" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3151,7 +3153,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="mitt forsta ordbehandlingsprogram (swe).img" size="368640" crc="e237d825" sha1="57fbdbfa0d91ee5ca8f2b5428a2e2257e523ebfe"/>
+				<rom name="n2-046-020059.img" size="368640" crc="e237d825" sha1="57fbdbfa0d91ee5ca8f2b5428a2e2257e523ebfe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3223,7 +3225,86 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<!-- marked as bad since source is questionable, needs a redump -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="norton utilities 310.img" size="368640" crc="b27b8cbb" sha1="34b5973fe5354a08b4d2a987473f82cd82a581cd" offset="0x00000" status="baddump" />
+				<rom name="norton utilities 310.img" size="368640" crc="b27b8cbb" sha1="34b5973fe5354a08b4d2a987473f82cd82a581cd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1_87_1">
+		<description>Olivetti Prodest PC1 coverdisk (1987 No. 1)</description>
+		<year>1987</year>
+		<publisher>Gruppo Editoriale JCE</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC1-Magazine_AnnoI_n1.dsk" size="737280" crc="bcd0f2e6" sha1="ff50c80c8e1bd4cfd1bda5e522bc1a414d60c81f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1_89_1">
+		<description>Olivetti Prodest PC1 coverdisk (1989 No. 1, Jan/Feb)</description>
+		<year>1989</year>
+		<publisher>Gruppo Editoriale JCE</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC1-Magazine_Anno3_n1_1989.dsk" size="737280" crc="b21f0044" sha1="a4fbaf14d1fbbb822db9a0d40559c38a84c774f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1_89_2">
+		<description>Olivetti Prodest PC1 coverdisk (1989 No. 2, Apr/May)</description>
+		<year>1989</year>
+		<publisher>Gruppo Editoriale JCE</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC1-Magazine_AnnoIII_n2_1989.dsk" size="737280" crc="46061abf" sha1="ca8c34f8c8c059f9cc4b1400332343f011269027" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1_89_4">
+		<description>Olivetti Prodest PC1 coverdisk (1989 No. 4, Aug/Sep)</description>
+		<year>1989</year>
+		<publisher>Gruppo Editoriale JCE</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC1-Magazine_AnnoIII_n4_1989.dsk" size="737280" crc="5e8a45be" sha1="55f38f1b0f013e6005ca88aa43e9d99960df9801"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1_89_5">
+		<description>Olivetti Prodest PC1 coverdisk (1989 No. 5, Nov/Dec)</description>
+		<year>1989</year>
+		<publisher>Gruppo Editoriale JCE</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC1_Magazine-n5.dsk" size="737280" crc="7530693a" sha1="bbbc85e68b093a8d2abdb514f88bd72ed140b193"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1pc" supported="partial">
+		<description>Olivetti Prodest PC1 - Per Cominciare</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Subito 1 - Menù di Inizio / Gioca 13 / L'albero del Sapere"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="Per Cominciare Subito 1.dsk" size="737280" crc="953d9f97" sha1="d3297b772550c2a520b829b8dedcfa3578924b4b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Subito 2 - Introduzione al PC1 / Uno Paint"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="Per Cominciare Subito 2.dsk" size="737280" crc="4a1600e3" sha1="8b08a3144d86a35825b90aa39cbf3cdb1fa2b2f8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Subito 3 - Wordprocessor Io Scrivo"/>
+			<dataarea name="flop" size = "737280">
+				<rom name="Per Cominciare Subito 3.dsk" size="737280" crc="9e258d1b" sha1="f27f6b9831c821a65cd79b7e8dbb0dd469e9a06d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3553,7 +3634,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="ranger1">
 		<description>Ranger 1 (Demo)</description>
-		<year>1991?</year>
+		<year>1991</year>
 		<publisher>Seetrax CAE</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -3569,8 +3650,8 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="368640">
-				<rom name="ranger 1 (demo, disk 3).img" size="368640" crc="351cf1f2" sha1="e1a49c5055a0405940aba2b4bb740d7f80b10792"/>
+			<dataarea name="flop" size="2670150">
+				<rom name="ranger 1 (demo, disk 3).mfm" size="2670150" crc="69b0c9ad" sha1="5bc30f9a76eae75eb53efd41fde6d1f946ecfbcb" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5755,6 +5836,30 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pc1dos" supported="partial">
+		<description>Olivetti Prodest PC1 MS-DOS 3.20 / GW BASIC / Lode Runner</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="version" value="3.03" />
+		<info name="serial" value="020347" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC1 DOS 3.2.dsk" size="737280" crc="4aef73af" sha1="5d270f7ad21bc4e6c406700259fd6a6d3e4f288c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1doses" cloneof="pc1dos">
+		<description>Olivetti Prodest PC1 MS-DOS 3.20 (Spanish)</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="pc1.dsk" size="737280" crc="cdcd6b16" sha1="61f8372b5857a4be1dc85cb950d1631fea4b99ae"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos1">
 		<description>IBM Personal Computer DOS (Version 1.00)</description>
 		<year>1981</year>
@@ -6490,16 +6595,56 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Driver disks -->
+
+	<software name="pc1hdu" supported="no">
+		<description>Olivetti Prodest PC1 HDU Install</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="version" value="1.00" />
+		<info name="serial" value="718165 E" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="HDU-Install1.dsk" size="737280" crc="8d53e47f" sha1="583e93681b9bd65f521036bc90f0484a7b84033d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1mouse" supported="no">
+		<description>Olivetti Prodest PC1 Mouse Driver</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="version" value="1.02" />
+		<info name="serial" value="961248 M" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Driver Mouse.dsk" size="737280" crc="c7b67dd4" sha1="80fb80702e2a673d71df588ea42566ac3bf66f43"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- DOS-based games -->
 
 	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM  -->
-		<description>2400 A.D.</description>
+		<description>2400 A.D. (set 1)</description>
 		<year>1987</year>
 		<publisher>Origin</publisher>
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="2400ad.img" size="368640" crc="bf246734" sha1="a9f0be5fa2a5077375dae572622926bb8aa9e28a"/>
+				<rom name="2400ad.img" size="368640" crc="bf246734" sha1="a9f0be5fa2a5077375dae572622926bb8aa9e28a" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Listed as clone of 2400ad because not sure if different version -->
+	<software name="2400ad1" cloneof="2400ad" supported="yes">
+		<description>2400 A.D. (set 2)</description>
+		<year>1987</year>
+		<publisher>Origin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="2840406">
+				<rom name="2400ad.mfm" size="2840406" crc="5dd2e4aa" sha1="e7deec7be1abb1e1b95f72b5d64eb5f8953edee8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6756,6 +6901,19 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="918252">
 				<rom name="(sps3040)actionfighter (pc disk).ipf" size="918252" crc="809bfb3b" sha1="a6b2a61b6fd30f671706bf3da37f479bf24fd0d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="actnserv" supported="no">
+		<description>Action Service</description>
+		<year>1988</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Cobra Soft" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="ActionService.dsk" size="368640" crc="eda62ae8" sha1="1917192e6c2eedf109029693c07194d13355578b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7396,6 +7554,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="bobo" supported="no">
+		<description>Bobo</description>
+		<year>1988</year>
+		<publisher>Infogrames</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="bobo.dsk" size="737280" crc="9234d795" sha1="f90767c67d676934cc6a989f598c92ecf6308228"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bdashkit" supported="no">
 		<description>Boulder Dash Construction Kit</description>
 		<year>1987</year>
@@ -7534,6 +7704,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="cadf3-4.img" size="737280" crc="89ab4461" sha1="a8904599cfec8df6d316dd43d9f19fca9937e7e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="capblood" supported="no">
+		<description>Captain Blood</description>
+		<year>1988</year>
+		<publisher>Ere Informatique</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Captain Blood.dsk" size="737280" crc="d79d16a9" sha1="54c37701d5d9579e7552d7352364a5f3a8eb0c27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7732,9 +7914,32 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<!-- copied disks with copy utility watermark on final track -->
 	<software name="cyeagaft">
-		<description>Chuck Yeager's Advanced Flight Trainer (French)</description>
+		<description>Chuck Yeager's Advanced Flight Trainer (5.25")</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Chuck Yeager's Advanced Flight Trainer (World) (5.25'').img" size="368640" crc="56122f9f" sha1="d128c0d619f784d222f039eb4a4aefff37f20c6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="cyeagaft35" cloneof="cyeagaft">
+		<description>Chuck Yeager's Advanced Flight Trainer (3.5")</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Chuck_Yeagers.dsk" size="737280" crc="ec475434" sha1="e6e8012bb65fd8fc339ce3729591b155c78a47fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- copied disks with copy utility watermark on final track -->
+	<software name="cyeagaftfr" cloneof="cyeagaft">
+		<description>Chuck Yeager's Advanced Flight Trainer (5.25", French)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="version" value="2.0" />
@@ -7746,6 +7951,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "387072">
 				<rom name="[PC] Chuck Yeager's AFT D2.2 [5.25].img" size="387072" crc="3d2fecd4" sha1="6224ba3cca920cab74ada05304e7e4767c2c687e" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colossus4">
+		<description>Colossus Bridge 4</description>
+		<year>1988</year>
+		<publisher>CDS Software</publisher>
+		<info name="usage" value="Turn power on load system Insert COLOSSUS disk type BRIDGE or TUTOR" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="colossus 4 bridge.img" size="737280" crc="e8d92247" sha1="fa6ff45a9314a66e6eadc57f0a242f2e35edf391"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8132,6 +8349,20 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="empire">
+		<description>Empire - Wargame of the Century</description>
+		<year>1988</year>
+		<publisher>Interstel</publisher>
+		<info name="version" value="2.05C 24-OCT-88" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<!-- modified with chklist.ms file -->
+				<rom name="Empire.dsk" size="737280" crc="35b1cdd8" sha1="a99415fb5597197efcfde2a2fd54fa1326e48065" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f19">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>F-19 Stealth Fighter (Version 435.04)</description>
@@ -8149,6 +8380,24 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="diskb.img" size="737280" crc="2b0662a2" sha1="5843c7bb6e4d6ad998042cfe53a6c6f07d3fd3e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fta1">
+		<description>The Faery Tale Adventure: Book I</description>
+		<year>1989</year>
+		<publisher>MicroIllusions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A &amp; B" />
+			<dataarea name="flop" size="737280">
+				<rom name="the faery tale adventure book i (disk a and b).img" size="737280" crc="86cfd792" sha1="b368702f2e958eabd7b87dc605158e7c55995239" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="737280">
+				<rom name="the faery tale adventure book i (disk c).img" size="737280" crc="3e78d895" sha1="de9519bef38d558bf108e188cc848f268081adb7" />
 			</dataarea>
 		</part>
 	</software>
@@ -9075,9 +9324,46 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="loomfr">
+	<software name="loom">
+		<description>Loom (5.25")</description>
+		<year>1990</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk1.img" size="368640" crc="ab2ddc74" sha1="1d8877b58e282c63ac2968259c665619838d96e1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk2.img" size="368640" crc="0b4ac73f" sha1="7c484107bcf768fda9fadccd6dd1be2c79b319e9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk3.img" size="368640" crc="d70f5490" sha1="46bb1203d2d11a08860a8ae91351686506ef86dc"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk4.img" size="368640" crc="bf19a5a0" sha1="daae465ecdb7b60c6f32ae0ba78509069affe28a"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk5.img" size="368640" crc="493462c3" sha1="72bd6ca8f500fd821140fa1b7f4e0e6cedcd2ddb"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk6.img" size="368640" crc="c5f65522" sha1="c1046af2aeae58b2b9f35a2a3289672cef5fd000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loomfr" cloneof="loom">
 		<!-- Dumped from copied disks -->
-		<description>Loom (French)</description>
+		<description>Loom (3.5", French)</description>
 		<year>1990</year>
 		<publisher>Lucasfilm Games</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -9098,8 +9384,8 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="loomde">
-		<description>Loom (German)</description>
+	<software name="loomde" cloneof="loom">
+		<description>Loom (3.5", German)</description>
 		<year>1990</year>
 		<publisher>Lucasfilm Games</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -9362,6 +9648,20 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="lunarexp">
+		<description>Lunar Explorer - A Space Flight Simulator</description>
+		<year>1986</year>
+		<publisher>Electric Transit</publisher>
+		<info name="developer" value="L. Roberts" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Lunar_Explorer.dsk" size="737280" crc="60fd5f00" sha1="86c28a56a3e3b021adbba1728f525c08883029e5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mathblst">
 		<description>Math Blaster</description>
 		<year>1983</year>
@@ -9377,6 +9677,19 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="Side 2 - Data"/>
 			<dataarea name="flop" size = "163840">
 				<rom name="Math Blaster! (USA) (Side 2 - Data).img" size="163840" crc="8880c9f6" sha1="b09383d9746665d90d0d9435857e7d4e3e89eb28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="mean18">
+		<description>Mean 18</description>
+		<year>1987</year>
+		<publisher>Accolade</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<!-- modified with a saved game file -->
+				<rom name="Mean_18_Golf_DSK.dsk" size="737280" crc="94c6df0b" sha1="048a0eb740feeef82f7ee18d5a6c7d9af19b5320" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9479,6 +9792,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Metal Gear (USA) (5.25'').img" size="368640" crc="837e245f" sha1="367f55a67525d4afd7a2eca9ff2f2239d07e75ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minesttn">
+		<description>Mines of Titan</description>
+		<year>1989</year>
+		<publisher>Infocom</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Mines of Titan.dsk" size="737280" crc="7aebdd88" sha1="e481483b5aeecc0f429acba326d1f68c22ed091a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9647,12 +9972,13 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<!-- matches dump of 3.5" "International Version" -->
-	<software name="nova9a" cloneof="nova9">
+	<software name="nova9a" cloneof="nova9" supported="yes">
 		<description>Nova 9: The Return of Gir Draxon (version 1.0)</description>
 		<year>1991</year>
 		<publisher>Sierra</publisher>
 		<info name="developer" value="Dynamix" />
 		<info name="version" value="1.0" />
+		<info name="usage" value="Install from DOS with: INSTALL" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Nova 9 (v1.0) [Dynamix] [1991] [3.5DD] [Disk 1 of 6].img" size="737280" crc="a14599bc" sha1="f94be59a1426c00b2b0421c8b47433b1fda48b19"/>
@@ -9697,6 +10023,44 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Oliver &amp; Company [5.25DD] [Disk 2 of 2].img" size="368640" crc="73f5373f" sha1="a391c79a6fb7ac3c8ca78765847ebcddad80a8e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Master Memory, Squrm, Backgammon, Yaht-zee -->
+	<software name="pc1game1" supported="no">
+		<description>Olivetti Prodest PC1 Games Collection 1</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Games_Collection_n1.dsk" size="737280" crc="2737ae34" sha1="604f26478b87d82c711f9c80880e4648fd1743da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- BlackJack, Solitaire, Keno -->
+	<software name="pc1game6" supported="no">
+		<description>Olivetti Prodest PC1 Games Collection 6</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Games_Collection_n6.dsk" size="737280" crc="40f3ee6d" sha1="e6616cf44b2f61802ba8d0c5956d478919812a7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Spacewar, Invader, Moon Lander, Space Zombies -->
+	<software name="pc1game7">
+		<description>Olivetti Prodest PC1 Games Collection 7</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<info name="developer" value="Andromeda" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<!-- modified with chklist.ms file -->
+				<rom name="Game Collection 7.dsk" size="737280" crc="1b6330f8" sha1="1be3ed17f400ce8d8ac66ae05b31e08f34e3eaa8" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9750,6 +10114,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Over the Net (1991)(Genias).dsk" size="737280" crc="71e8f2d0" sha1="e2b758f7484e602d6ac5b7375b46591f5f7230ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="pegasus">
+		<description>P.H.M. Pegasus</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PHM_PEGASUS.dsk" size="737280" crc="cc8487ac" sha1="7869f99363f6076697ae701c6c2cfe1fbdc7ca58"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9830,6 +10206,18 @@ has been replaced with an all-zero block. -->
 			<!-- High score file modified -->
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Pick'n Pile [5.25].img" size="368640" crc="82b72c98" sha1="afc3130b69c4d1e36b1e182020ef058a6c21f046" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- dumped from an Olivetti Prodest PC1 branded release -->
+	<software name="pitstop2_35" cloneof="pitstop2">
+		<description>Pitstop II (3.5")</description>
+		<year>1987</year>
+		<publisher>Olivetti Prodest</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Pitstop II.dsk" size="737280" crc="5289b9e5" sha1="ba59f3e5074909f788ad1530b7e09da854662438"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10760,6 +11148,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="starpack">
+		<description>Star Pack</description>
+		<year>1992</year>
+		<publisher>Prism Leisure</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="star pack.img" size="737280" crc="c355fed7" sha1="3b3aef860f05cea1cfd880a2e5fb20ddde5b92fa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strek5">
 		<description>Star Trek V: The Final Frontier (5.25")</description>
 		<year>1989</year>
@@ -11197,6 +11596,24 @@ has been replaced with an all-zero block. -->
 			<dataarea name="flop" size = "368640">
 				<!-- modified with high scores, user-created circuits, etc. -->
 				<rom name="[PC] Turbo Driver [5.25].img" size="368640" crc="cac778cc" sha1="e2d725c8dc3d530231489cab827bc1b938af4bdc" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ums2pe">
+		<description>UMS II: Nations at War - Planet Editor</description>
+		<year>1992</year>
+		<publisher>Microplay Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "2223360">
+				<rom name="50591 a.mfm" size="2223360" crc="fef2a244" sha1="d6575e480990fa13997258ddeb5e07b2deca4b50"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="50591 b.img" size="737280" crc="a8a8f3eb" sha1="d4ffef36418332516eb125d56956113e04968579"/>
 			</dataarea>
 		</part>
 	</software>

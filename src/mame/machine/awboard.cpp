@@ -229,7 +229,7 @@ const aw_rom_board::sbox_set aw_rom_board::sboxes_table[4] =
 
 const int aw_rom_board::xor_table[16] =  // -1 = unknown/unused
 {
-	0x0000, -1, 0x97CF, 0x4BE3, 0x2255, 0x8DD6, -1, 0xC6A2,	0xA1E8, 0xB3BF, 0x3B1A, 0x547A, -1, 0x935F, -1, -1
+	0x0000, -1, 0x97CF, 0x4BE3, 0x2255, 0x8DD6, -1, 0xC6A2, 0xA1E8, 0xB3BF, 0x3B1A, 0x547A, -1, 0x935F, -1, -1
 };
 
 uint16_t aw_rom_board::decrypt(uint16_t cipherText, uint32_t address, const uint8_t key)

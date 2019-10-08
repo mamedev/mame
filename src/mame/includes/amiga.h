@@ -427,7 +427,7 @@ public:
 	TIMER_CALLBACK_MEMBER( amiga_blitter_proc );
 	void update_irqs();
 
-	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
 	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
 
 	DECLARE_WRITE_LINE_MEMBER( m68k_reset );

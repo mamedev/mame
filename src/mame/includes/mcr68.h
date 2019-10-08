@@ -17,6 +17,7 @@
 #include "machine/6840ptm.h"
 #include "machine/adc0844.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class mcr68_state : public driver_device
 {

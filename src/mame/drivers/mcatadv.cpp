@@ -407,20 +407,9 @@ INPUT_PORTS_END
 
 /*** GFX Decode ***/
 
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*8,4) },
-	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_mcatadv )
-	GFXDECODE_ENTRY( "bg0", 0, layout_16x16x4, 0, 0x200 )
-	GFXDECODE_ENTRY( "bg1", 0, layout_16x16x4, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg0", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x200 )
 GFXDECODE_END
 
 

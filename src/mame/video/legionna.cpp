@@ -66,37 +66,21 @@ void legionna_state::tile_scroll_base_w(offs_t offset, u16 data)
 
 void legionna_state::heatbrl_setgfxbank(u16 data)
 {
-	unsigned newbank = (data & 0x4000) >> 2;
-	if (m_back_gfx_bank != newbank)
-	{
-		m_back_gfx_bank = newbank;
-		m_background_layer->mark_all_dirty();
-	}
+	m_back_gfx_bank = (data & 0x4000) >> 2;
+	m_background_layer->mark_all_dirty();
 }
 
 /*xxx- --- ---- ---- banking*/
 void legionna_state::denjinmk_setgfxbank(u16 data)
 {
-	unsigned newbank = (data & 0x2000) >> 1;//???
-	if (m_fore_gfx_bank != newbank)
-	{
-		m_fore_gfx_bank = newbank;
-		m_foreground_layer->mark_all_dirty();
-	}
+	// this is either 0x0000 or 0xe000, except in two endings (MT #07416)
+	m_back_gfx_bank = (data & 0x2000) >> 1; // Makai/Tarukusu endings
+	m_mid_gfx_bank = (data & 0x4000) >> 2; //???
+	m_fore_gfx_bank  = (data & 0x8000) >> 3; //???
 
-	newbank = (data & 0x4000) >> 2;
-	if (m_back_gfx_bank != newbank)
-	{
-		m_back_gfx_bank = newbank;
-		m_background_layer->mark_all_dirty();
-	}
-
-	newbank = (data & 0x8000) >> 3;//???
-	if (m_mid_gfx_bank != newbank)
-	{
-		m_mid_gfx_bank = newbank;
-		m_midground_layer->mark_all_dirty();
-	}
+	m_foreground_layer->mark_all_dirty();
+	m_background_layer->mark_all_dirty();
+	m_midground_layer->mark_all_dirty();
 }
 
 void legionna_state::videowrite_cb_w(offs_t offset, u16 data)
@@ -288,7 +272,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 VIDEO_START_MEMBER(legionna_state,cupsoc)
 {
 	common_video_start(false, false, false);
-	
+
 	m_sprite_pri_mask[0] = 0xfff0; // title screen "Seibu Cup Soccer" elements
 	m_sprite_pri_mask[1] = 0xfffc; // ?
 	m_sprite_pri_mask[2] = 0xfffe; // ?
@@ -299,7 +283,7 @@ VIDEO_START_MEMBER(legionna_state,grainbow)
 {
 	common_video_start(false, false, true);
 	m_sprite_xoffs = m_sprite_yoffs = 16;
-	m_sprite_pri_mask[0] = 0xfff0; // 
+	m_sprite_pri_mask[0] = 0xfff0; //
 	m_sprite_pri_mask[1] = 0xfffc; // level 2 and 3
 	m_sprite_pri_mask[2] = 0xfffe; // swamp monster mask effect
 	m_sprite_pri_mask[3] = 0x0000; // Insert coin

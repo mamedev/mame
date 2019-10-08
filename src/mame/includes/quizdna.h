@@ -2,6 +2,7 @@
 // copyright-holders:Uki
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class quizdna_state : public driver_device
 {

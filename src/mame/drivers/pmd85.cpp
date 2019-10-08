@@ -177,10 +177,38 @@ JUMP aaaa - start program at aaaa
 MEM aaaa  - show 16 bytes from aaaa-up
 MGLD xx   - load file number xx from cassette
 MGSV xx aaaa bbbb yyyyyyyy - save memory range aaaa to bbbb to cassette with file number xx and filename yyyyyyyy
+MGEND - ?
 SUB aaaa bb cc dd... - write bytes to memory starting at aaaa with bb,cc,dd...
 
 
-*******************************************************************************/
+Cassette
+--------
+The systems belong to 3 groups which are not compatible with each other.
+- pmd851, alfa
+- mato
+- pmd852, pmd852a, pmd852b, pmd853, c2717, c2717pmd
+
+Cassettes tested with Basic
+- pmd852,pmd852a,pmd852b,pmd853,c2717,c2717pmd - these can save and load back their own files
+- pmd851 - won't go into basic
+- mato,alfa - don't come with basic?
+
+Software list items
+- mato - not compatible
+- all others - recognise headers of sw-item-tapes, but won't load? Maybe the usage is not understood properly.
+
+- Some software items will crash the emulator, for example >mame pmd851 bdash
+
+Header information from what I can understand
+xx/z yyyyyyyy
+xx = file number
+z = status code (guesses below)
+    > - only loadable by Basic
+    ? - only loadable by the monitor - it gives no clue as to the exec address
+    P - protected? I've had no luck getting one to load
+yyyyyyyy = filename
+
+*******************************************************************************************************************/
 
 #include "emu.h"
 #include "includes/pmd85.h"
@@ -474,7 +502,7 @@ static INPUT_PORTS_START( pmd85 )
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET") /* port 0x10 */
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE)) PORT_CHANGED_MEMBER(DEVICE_SELF, pmd85_state, pmd85_reset, 0)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, pmd85_state, pmd85_reset, 0)
 
 	PORT_START("DSW0") /* port 0x11 */
 		PORT_CONFNAME( 0x01, 0x00, "Basic ROM Module" )
@@ -577,23 +605,23 @@ static INPUT_PORTS_START (mato)
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Continue") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("RESET") /* port 0x09 */
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE)) PORT_CHANGED_MEMBER(DEVICE_SELF, pmd85_state, pmd85_reset, 0)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, pmd85_state, pmd85_reset, 0)
 INPUT_PORTS_END
 
 
 
-static const struct CassetteOptions pmd85_cassette_options =
-{
-	1,      /* channels */
-	16,     /* bits per sample */
-	7200    /* sample frequency */
-};
+//static const struct CassetteOptions pmd85_cassette_options =
+//{
+//  1,      /* channels */
+//  16,     /* bits per sample */
+//  7200    /* sample frequency */
+//};
 
 /* machine definition */
 void pmd85_state::pmd85(machine_config &config, bool with_uart)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2000000);     /* 2.048MHz ??? */
+	I8080(config, m_maincpu, XTAL(18'432'000)/9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmd85_state::pmd85_mem);
 	m_maincpu->set_addrmap(AS_IO, &pmd85_state::pmd85_io_map);
 	config.m_minimum_quantum = attotime::from_hz(60);
@@ -621,7 +649,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(0);
-	m_pit8253->set_clk<1>(2000000);
+	m_pit8253->set_clk<1>(XTAL(18'432'000)/9);
 	m_pit8253->set_clk<2>(1);
 
 	/* video hardware */
@@ -642,7 +670,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(pmd85_cassette_formats);
-	m_cassette->set_create_opts(&pmd85_cassette_options);
+//  m_cassette->set_create_opts(&pmd85_cassette_options);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("pmd85_cass");
@@ -654,7 +682,8 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	if (with_uart)
 	{
 		I8251(config, m_uart, 0);
-		m_uart->txd_handler().set(FUNC(pmd85_state::write_cas_tx));
+		m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
+		m_uart->rts_handler().set([this] (bool state) { m_uart->write_cts(state); });
 	}
 
 	/* internal ram */
@@ -834,7 +863,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT          COMPANY             FULLNAME                     FLAGS
 COMP( 1985, pmd851,   0,      0,      pmd851,  pmd85, pmd85_state, init_pmd851,  "Tesla",            "PMD-85.1",                  0 )
-COMP( 1985, pmd852,   pmd851, 0,      pmd851,  pmd85, pmd85_state, init_pmd851,  "Tesla",            "PMD-85.2",                  0 )
+COMP( 1985, pmd852,   pmd851, 0,      pmd851,  pmd85, pmd85_state, init_pmd852,  "Tesla",            "PMD-85.2",                  0 )
 COMP( 1985, pmd852a,  pmd851, 0,      pmd852a, pmd85, pmd85_state, init_pmd852a, "Tesla",            "PMD-85.2A",                 0 )
 COMP( 1985, pmd852b,  pmd851, 0,      pmd852a, pmd85, pmd85_state, init_pmd852a, "Tesla",            "PMD-85.2B",                 0 )
 COMP( 1988, pmd853,   pmd851, 0,      pmd853,  pmd85, pmd85_state, init_pmd853,  "Tesla",            "PMD-85.3",                  0 )

@@ -35,10 +35,15 @@ namespace plib {
 
 	app::app()
 	: options()
+#if !USE_CSTREAM
 	, pout_strm()
 	, perr_strm()
 	, pout(&pout_strm)
 	, perr(&perr_strm)
+#else
+	, pout(&std::cout)
+	, perr(&std::cerr)
+#endif
 	{
 
 	}

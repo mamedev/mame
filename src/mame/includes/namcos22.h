@@ -20,6 +20,7 @@
 #include "video/poly.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 enum
 {
@@ -532,7 +533,7 @@ public:
 	void init_alpiner();
 	void init_alpinesa();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(alpine_motor_read);
+	template <int N> DECLARE_READ_LINE_MEMBER(alpine_motor_r);
 
 protected:
 	virtual void machine_start() override;

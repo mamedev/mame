@@ -8,6 +8,7 @@
 #include "machine/gen_latch.h"
 #include "video/vsystem_spr2.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class welltris_state : public driver_device
 {

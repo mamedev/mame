@@ -276,7 +276,7 @@ void tomcat_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( tomcat )
 	PORT_START("IN0")   /* INPUTS */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_tomcat_device, done_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_tomcat_device, done_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED ) // SPARE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON5 ) // DIAGNOSTIC
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )

@@ -62,6 +62,26 @@ nl_convert_base_t::nl_convert_base_t()
 	: out(&m_buf)
 	, m_numberchars("0123456789-+e.")
 {
+	m_units = {
+			{"T",   "",      1.0e12 },
+			{"G",   "",      1.0e9  },
+			{"MEG", "RES_M({1})", 1.0e6  },
+			{"k",   "RES_K({1})", 1.0e3  }, /* eagle */
+			{"K",   "RES_K({1})", 1.0e3  },
+			{"",    "{1}",        1.0e0  },
+			{"M",   "CAP_M({1})", 1.0e-3 },
+			{"u",   "CAP_U({1})", 1.0e-6 }, /* eagle */
+			{"U",   "CAP_U({1})", 1.0e-6 },
+			{"μ",   "CAP_U({1})",  1.0e-6 },
+			{"µ",   "CAP_U({1})",  1.0e-6 },
+			{"N",   "CAP_N({1})", 1.0e-9 },
+			{"pF",  "CAP_P({1})", 1.0e-12},
+			{"P",   "CAP_P({1})", 1.0e-12},
+			{"F",   "{1}e-15",    1.0e-15},
+
+			{"MIL", "{1}",  25.4e-6}
+	};
+
 }
 
 nl_convert_base_t::~nl_convert_base_t()
@@ -182,25 +202,20 @@ void nl_convert_base_t::dump_nl()
 
 const pstring nl_convert_base_t::get_nl_val(const double val)
 {
+	for (auto &e : m_units)
 	{
-		int i = 0;
-		while (pstring(m_units[i].m_unit) != "-" )
-		{
-			if (m_units[i].m_mult <= std::abs(val))
-				break;
-			i++;
-		}
-		return plib::pfmt(pstring(m_units[i].m_func))(val / m_units[i].m_mult);
+		if (e.m_mult <= std::abs(val))
+			return plib::pfmt(e.m_func)(val / e.m_mult);
 	}
+	return plib::pfmt("{1}")(val);
 }
+
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
 {
-	int i = 0;
-	while (pstring(m_units[i].m_unit) != "-")
+	for (auto &e : m_units)
 	{
-		if (pstring(m_units[i].m_unit) == unit)
-			return m_units[i].m_mult;
-		i++;
+		if (e.m_unit == unit)
+			return e.m_mult;
 	}
 	plib::perrlogger("Unit {} unknown\n", unit);
 	return 0.0;
@@ -213,11 +228,12 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 		++p;
 	pstring val = plib::left(sin, p);
 	pstring unit = sin.substr(p);
-	double ret = get_sp_unit(unit) * plib::pstonum<double, true>(val);
+	double ret = get_sp_unit(unit) * plib::pstonum<double>(val);
 	return ret;
 }
 
-nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
+#if 0
+std::vector<nl_convert_base_t::unit_t> nl_convert_base_t::m_units = {
 		{"T",   "",      1.0e12 },
 		{"G",   "",      1.0e9  },
 		{"MEG", "RES_M({1})", 1.0e6  },
@@ -234,11 +250,9 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"P",   "CAP_P({1})", 1.0e-12},
 		{"F",   "{1}e-15",    1.0e-15},
 
-		{"MIL", "{1}",  25.4e-6},
-
-		{"-",   "{1}",  1.0  }
+		{"MIL", "{1}",  25.4e-6}
 };
-
+#endif
 
 void nl_convert_spice_t::convert(const pstring &contents)
 {
@@ -257,7 +271,7 @@ void nl_convert_spice_t::convert(const pstring &contents)
 		// Basic preprocessing
 		pstring inl = plib::ucase(plib::trim(i));
 		if (plib::startsWith(inl, "+"))
-			line = line + inl.substr(1);
+			line += inl.substr(1);
 		else
 		{
 			process_line(line);
@@ -532,7 +546,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 					else if (plib::ucase(sval) == "LOW")
 						add_device("TTL_INPUT", name, 0);
 					else
-						add_device("ANALOG_INPUT", name, plib::pstonum<double, true>(sval));
+						add_device("ANALOG_INPUT", name, plib::pstonum<double>(sval));
 					add_pin_alias(name, "1", "Q");
 					break;
 				case 'D':

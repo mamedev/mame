@@ -195,7 +195,7 @@
 		<bezel element="text_game">
 			<bounds x="68" y="93" width="20" height="4" />
 		</bezel>
-		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01">
+		<bezel element="nothing" inputtag="IN.0" inputmask="0x00" inputraw="1">
 			<bounds x="73.9" y="97.9" width="3.2" height="4.2" />
 		</bezel>
 		<bezel element="switch_game" inputtag="IN.0" inputmask="0x07" inputraw="1">
@@ -217,7 +217,7 @@
 		<bezel element="text_skill">
 			<bounds x="112" y="93" width="30" height="4" />
 		</bezel>
-		<bezel element="nothing" inputtag="DUMMY" inputmask="0x01">
+		<bezel element="nothing" inputtag="IN.3" inputmask="0x00" inputraw="1">
 			<bounds x="122.9" y="97.9" width="3.2" height="4.2" />
 		</bezel>
 		<bezel element="switch_skill" inputtag="IN.3" inputmask="0x0f" inputraw="1">

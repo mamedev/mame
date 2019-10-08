@@ -414,7 +414,7 @@ void okean240_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in okean240_state::device_timer");
+		throw emu_fatalerror("Unknown id in okean240_state::device_timer");
 	}
 }
 

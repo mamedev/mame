@@ -64,7 +64,7 @@ void meters_device::device_reset()
 void meters_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id >= m_number_mtr)
-			assert_always(false, "Unknown id in meters_device::device_timer");
+			throw emu_fatalerror("Unknown id in meters_device::device_timer");
 
 	m_meter_info[param].count++;
 }

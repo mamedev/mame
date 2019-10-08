@@ -10,6 +10,7 @@
 #include "video/vsystem_gga.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class rpunch_state : public driver_device
 {

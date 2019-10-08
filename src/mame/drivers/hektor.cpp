@@ -4,10 +4,16 @@
 
     Open University Hektor
 
+    Hektor III usage notes:
+    - t  - system test
+    - a1 - audio test (plays The Entertainer)
+    - a3 - graphic test
+    - ay - run analyser software in ROM1
+    - az - run analyser software in ROM2
+
     TODO:
-    Hektor II:
-    - Dump the ROMs, maybe 2 or 3 versions.
-    - Emulate Peripheral Boards.
+    - Dump Hektor II ROMs, maybe 2 or 3 versions.
+    - Emulate Expansion Bus and Peripheral Boards.
 
 **********************************************************************/
 

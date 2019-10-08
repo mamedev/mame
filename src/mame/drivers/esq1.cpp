@@ -584,7 +584,7 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 	 {
 		if (!kpc_calibrated)
 		 { // ack SQ80 keyboard calibration
-			send_through_panel((u8)(uintptr_t)0xff);
+			send_through_panel((u8)0xff);
 			kpc_calibrated = true;
 		}
 		offset = 2; // SQ80 keycodes are offset by -2
@@ -592,13 +592,13 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 
 	if (oldval == 0 && newval == 1)
 	{
-		send_through_panel((u8)(uintptr_t)param - offset);
-		send_through_panel((u8)(uintptr_t)0x00);
+		send_through_panel((u8)param - offset);
+		send_through_panel((u8)0x00);
 	}
 	else if (oldval == 1 && newval == 0)
 	{
-		send_through_panel(((u8)(uintptr_t)param - offset)&0x7f);
-		send_through_panel((u8)(uintptr_t)0x00);
+		send_through_panel(((u8)param - offset)&0x7f);
+		send_through_panel((u8)0x00);
 	}
 }
 

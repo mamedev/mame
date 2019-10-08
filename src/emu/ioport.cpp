@@ -597,8 +597,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_flags(0),
 		m_impulse(0),
 		m_name(name),
-		m_read_param(nullptr),
-		m_write_param(nullptr),
+		m_write_param(0),
 		m_digital_value(false),
 		m_min(0),
 		m_max(maskbits),
@@ -1210,7 +1209,7 @@ void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty
 
 	// apply custom mapping if necessary
 	if (!m_crosshair_mapper.isnull())
-		value = m_crosshair_mapper(*this, value);
+		value = m_crosshair_mapper(value);
 
 	// handle X axis
 	if (m_crosshair_axis == CROSSHAIR_AXIS_X)
@@ -1469,7 +1468,8 @@ ioport_field *ioport_port::field(ioport_value mask) const
 
 ioport_value ioport_port::read()
 {
-	assert_always(manager().safe_to_read(), "Input ports cannot be read at init time!");
+	if (!manager().safe_to_read())
+		throw emu_fatalerror("Input ports cannot be read at init time!");
 
 	// start with the digital state
 	ioport_value result = m_live->digital;
@@ -2717,7 +2717,8 @@ void ioport_manager::record_init()
 
 	// open the record file
 	osd_file::error filerr = m_record_file.open(filename);
-	assert_always(filerr == osd_file::error::NONE, "Failed to open file for recording");
+	if (filerr != osd_file::error::NONE)
+		throw emu_fatalerror("ioport_manager::record_init: Failed to open file for recording");
 
 	// get the base time
 	system_time systime;
@@ -2739,15 +2740,18 @@ void ioport_manager::record_init()
 }
 
 
-void ioport_manager::timecode_init() {
+void ioport_manager::timecode_init()
+{
 	// check if option -record_timecode is enabled
-	if (!machine().options().record_timecode()) {
+	if (!machine().options().record_timecode())
+	{
 		machine().video().set_timecode_enabled(false);
 		return;
 	}
 	// if no file, nothing to do
 	const char *record_filename = machine().options().record();
-	if (record_filename[0] == 0) {
+	if (record_filename[0] == 0)
+	{
 		machine().video().set_timecode_enabled(false);
 		return;
 	}
@@ -2760,7 +2764,8 @@ void ioport_manager::timecode_init() {
 	osd_printf_info("Record input timecode file: %s\n", record_filename);
 
 	osd_file::error filerr = m_timecode_file.open(filename.c_str());
-	assert_always(filerr == osd_file::error::NONE, "Failed to open file for input timecode recording");
+	if (filerr != osd_file::error::NONE)
+		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording");
 
 	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
 	m_timecode_file.puts(std::string("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n").c_str());
@@ -3189,7 +3194,7 @@ void dynamic_field::read(ioport_value &result)
 		return;
 
 	// call the callback to read a new value
-	ioport_value newval = m_field.m_read(m_field, m_field.m_read_param);
+	ioport_value newval = m_field.m_read();
 	m_oldval = newval;
 
 	// merge in the bits (don't invert yet, as all digitals are inverted together)

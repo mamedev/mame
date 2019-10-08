@@ -106,6 +106,7 @@ Lower PCB is plugged in with components facing up.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MAIN_CLOCK XTAL(9'987'000)
 

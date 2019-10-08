@@ -16,9 +16,9 @@
 **********************************************************************/
 
 #include "emu.h"
-//#include "cpu/dsp56k/dsp56k.h"
+//#include "cpu/dsp56156/dsp56156.h"
 #include "cpu/mips/mips1.h"
-#include "cpu/mips/mips3.h"
+#include "cpu/mips/r4000.h"
 #include "machine/eepromser.h"
 #include "machine/hpc1.h"
 #include "machine/sgi.h"
@@ -100,7 +100,7 @@ protected:
 
 	DECLARE_WRITE64_MEMBER(write_ram);
 
-	required_device<r4000be_device> m_maincpu;
+	required_device<r4000_device> m_maincpu;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_shared_ptr<uint64_t> m_share1;
 };
@@ -214,12 +214,13 @@ void indigo4k_state::indigo4k(machine_config &config)
 {
 	indigo_base(config);
 
-	mips3_device &cpu(R4000BE(config, m_maincpu, 50000000*2));
-	cpu.set_icache_size(32768);
-	cpu.set_dcache_size(32768);
-	cpu.set_addrmap(AS_PROGRAM, &indigo4k_state::mem_map);
+	R4000(config, m_maincpu, 50000000*2);
+	//m_maincpu->set_icache_size(32768);
+	//m_maincpu->set_dcache_size(32768);
+	m_maincpu->set_addrmap(AS_PROGRAM, &indigo4k_state::mem_map);
 
 	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
+	m_mem_ctrl->eisa_present().set_constant(0);
 	SGI_HPC1(config, m_hpc, m_maincpu, m_eeprom);
 }
 

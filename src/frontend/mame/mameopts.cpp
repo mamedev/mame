@@ -143,7 +143,7 @@ void mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	catch (options_exception &ex)
 	{
 		if (error_stream)
-			util::stream_format(*error_stream, "While parsing %s:\n%s\n", ex.message(), file.fullpath(), ex.message());
+			util::stream_format(*error_stream, "While parsing %s:\n%s\n", file.fullpath(), ex.message());
 		return;
 	}
 

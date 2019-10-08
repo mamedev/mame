@@ -11,6 +11,7 @@
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 #define MYSTSTON_MASTER_CLOCK   (XTAL(12'000'000))

@@ -134,14 +134,6 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 }
 
 
-+ (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address forDevice:(device_t &)device {
-	device_debug *const cpuinfo = device.debug();
-	device_debug::breakpoint *bp = cpuinfo->breakpoint_first();
-	while ((bp != nullptr) && (address != bp->address())) bp = bp->next();
-	return bp;
-}
-
-
 - (id)initWithMachine:(running_machine &)m title:(NSString *)t {
 	if (!(self = [super init]))
 		return nil;

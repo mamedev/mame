@@ -14,6 +14,7 @@
 #include "sound/ym2151.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class amspdwy_state : public driver_device
 {

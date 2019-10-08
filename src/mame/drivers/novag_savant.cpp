@@ -4,7 +4,8 @@
 /******************************************************************************
 
 Novag Savant, chess computer with touchscreen. It was followed by Savant II and
-Savant Royale on similar hardware, the latter was a German limited release overclock
+Savant Royale on the same hardware, the program is the same and they just added
+a bigger opening book. Savant Royale was a German limited release overclock
 version of Savant II. The chess engine is MyChess by David Kittinger.
 
 Hardware overview:
@@ -89,6 +90,7 @@ private:
 	void mcu_io(address_map &map);
 
 	// I/O handlers
+	DECLARE_WRITE8_MEMBER(nvram_w);
 	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_READ8_MEMBER(stall_r);
 	DECLARE_WRITE8_MEMBER(stall_w);
@@ -136,9 +138,14 @@ void savant_state::machine_start()
 
 // Z80 side
 
-READ8_MEMBER(savant_state::nvram_r)
+WRITE8_MEMBER(savant_state::nvram_w)
 {
 	// nvram is only d0-d3
+	m_nvram[offset] = data & 0xf;
+}
+
+READ8_MEMBER(savant_state::nvram_r)
+{
 	return m_nvram[offset] & 0xf;
 }
 
@@ -271,9 +278,9 @@ READ8_MEMBER(savant_state::input_r)
 
 void savant_state::main_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();
+	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd0ff).mirror(0x0300).ram().r(FUNC(savant_state::nvram_r)).share("nvram");
+	map(0xd000, 0xd0ff).mirror(0x0300).ram().rw(FUNC(savant_state::nvram_r), FUNC(savant_state::nvram_w)).share("nvram");
 }
 
 void savant_state::main_io(address_map &map)
@@ -337,7 +344,7 @@ static INPUT_PORTS_START( savant )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Set Up")
 
 	PORT_START("LIGHT")
-	PORT_CONFNAME( 0x01, 0x01, "LCD Backlight" ) PORT_CHANGED_MEMBER(DEVICE_SELF, savant_state, light_switch, nullptr)
+	PORT_CONFNAME( 0x01, 0x01, "LCD Light" ) PORT_CHANGED_MEMBER(DEVICE_SELF, savant_state, light_switch, 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -411,6 +418,20 @@ ROM_START( savant )
 	ROM_LOAD("savant.svg", 0, 763850, CRC(f29a5ca4) SHA1(9fabfb86e6235057b60232e987872a645ee4112e) )
 ROM_END
 
+ROM_START( savant2 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("5605_1f_orange.u13",    0x0000, 0x2000, CRC(0f24fd37) SHA1(b9426b53623d2a98aa2b3099010a7579b0f51db5) ) // TMM2364
+	ROM_LOAD("5606_1g_white.u14",     0x2000, 0x2000, CRC(e8b2eddd) SHA1(5f148a3c1c2cd099bd19a48d972a01e5e26ef2ff) ) // "
+	ROM_LOAD("5607_1e_blue.u15",      0x4000, 0x2000, CRC(a07f845a) SHA1(e45218fdf955777e571a71ae9d501567b760a3c0) ) // "
+	ROM_LOAD("c2m040_savant_red.u17", 0x8000, 0x2000, CRC(0025afb4) SHA1(4f1b63754ed1cc6d765165ec217556b5e7705df6) ) // "
+
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
+
+	ROM_REGION( 763850, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 763850, CRC(f29a5ca4) SHA1(9fabfb86e6235057b60232e987872a645ee4112e) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -419,5 +440,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, savant, 0,      0, savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1981, savant,  0,      0, savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, savant2, savant, 0, savant,  savant, savant_state, empty_init, "Novag", "Savant II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

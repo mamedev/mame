@@ -450,7 +450,7 @@ void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
 		break;
 	default:
-		assert_always(false, "Unknown id in wgp_state::device_timer");
+		throw emu_fatalerror("Unknown id in wgp_state::device_timer");
 	}
 }
 

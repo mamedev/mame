@@ -8,6 +8,7 @@
 #include "machine/s2636.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class zac2650_state : public driver_device
 {

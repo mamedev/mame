@@ -8,8 +8,6 @@
     Technical manual and schematics: http://doc.pdp-11.org.ru/Terminals/CM7238/
 
     To do:
-    . handle more text_control_w bits
-    - downloadable fonts (stored in nvram)
     - graphics options
     - colors
     - document hardware and ROM variants, verify if pixel stretching is done
@@ -31,6 +29,11 @@
 #include "screen.h"
 
 
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+
 #define KSM_COLUMNS_MAX 132
 
 #define KSM_TOTAL_HORZ (KSM_COLUMNS_MAX*10)
@@ -38,19 +41,6 @@
 
 #define KSM_TOTAL_VERT 260
 #define KSM_DISP_VERT  250
-
-
-#define VERBOSE_DBG 1       /* general debug messages */
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
 
 
 class sm7238_state : public driver_device
@@ -63,6 +53,7 @@ public:
 		, m_videobank(*this, "videobank")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_p_charram(*this, "charram")
 		, m_pic8259(*this, "pic8259")
 		, m_i8251line(*this, "i8251line")
 		, m_rs232(*this, "rs232")
@@ -112,8 +103,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
 	required_device<address_map_bank_device> m_videobank;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
+	required_shared_ptr<u8> m_p_charram;
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8251_device> m_i8251line;
 	required_device<rs232_port_device> m_rs232;
@@ -136,7 +128,7 @@ void sm7238_state::sm7238_mem(address_map &map)
 	map(0xb000, 0xb3ff).ram().share("nvram");
 	map(0xb800, 0xb800).w(FUNC(sm7238_state::text_control_w));
 	map(0xbc00, 0xbc00).w(FUNC(sm7238_state::control_w));
-	map(0xc000, 0xcfff).ram(); // chargen
+	map(0xc000, 0xcfff).ram().share("charram");
 	map(0xe000, 0xffff).m(m_videobank, FUNC(address_map_bank_device::amap8));
 }
 
@@ -149,7 +141,7 @@ void sm7238_state::videobank_map(address_map &map)
 void sm7238_state::sm7238_io(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE (0x40, 0x4f) AM_RAM // LUT
+//  map(0x40, 0x4f).ram() // LUT
 	map(0xa0, 0xa1).rw(m_i8251line, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa4, 0xa5).rw(m_i8251kbd, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa8, 0xab).rw(m_t_color, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -172,16 +164,16 @@ void sm7238_state::video_start()
 
 WRITE8_MEMBER(sm7238_state::control_w)
 {
-	DBG_LOG(1, "Control Write", ("%02xh: lut %d nvram %d c2 %d iack %d\n",
-		data, BIT(data, 0), BIT(data, 2), BIT(data, 3), BIT(data, 5)));
+	LOG("Control Write: %02xh: lut %d nvram %d c2 %d iack %d\n",
+		data, BIT(data, 0), BIT(data, 2), BIT(data, 3), BIT(data, 5));
 }
 
 WRITE8_MEMBER(sm7238_state::text_control_w)
 {
 	if (data ^ m_video.control)
 	{
-		DBG_LOG(1, "Text Control Write", ("%02xh: 80/132 %d dma %d clr %d dlt %d inv %d ?? %d\n",
-			data, BIT(data, 0), BIT(data, 1), BIT(data, 2), BIT(data, 3), BIT(data, 4), BIT(data, 5)));
+		LOG("Text Control Write: %02xh: 80/132 %d dma %d clr %d dlt %d inv %d ?? %d\n",
+			data, BIT(data, 0), BIT(data, 1), BIT(data, 2), BIT(data, 3), BIT(data, 4), BIT(data, 5));
 	}
 
 	if (BIT((data ^ m_video.control), 0))
@@ -239,8 +231,9 @@ void sm7238_state::recompute_parameters()
 uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y, ra, gfx, fg, bg, attr, ctl1, ctl2 = 0;
-	uint16_t chr, sy = 0, ma = 0, x = 0;
+	uint16_t chr, chraddr, sy = 0, ma = 0, x = 0;
 	bool double_width = false, double_height = false, bottom_half = false;
+	bool blink((m_screen->frame_number() % 30) > 14); // XXX guess
 
 	if (!BIT(m_video.control, 3))
 	{
@@ -267,22 +260,27 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				{
 					chr += 0x1000;
 				}
-				// alternate font 2 -- only in models .05 and .06
-				if (BIT(attr, 7))
-				{
-					chr = 0x11a << 4;
-				}
 
 				bg = 0;
 				fg = 1;
 
 				if (double_height)
 				{
-					gfx = m_p_chargen[chr | (bottom_half ? (5 + (ra >> 1)) : (ra >> 1))] ^ 255;
+					chraddr = chr | (bottom_half ? (5 + (ra >> 1)) : (ra >> 1));
 				}
 				else
 				{
-					gfx = m_p_chargen[chr | ra] ^ 255;
+					chraddr = chr | ra;
+				}
+
+				// alternate font 2 (downloadable font) -- only in models .05 and .06
+				if (BIT(attr, 7) && m_p_charram[chr + 15])
+				{
+					gfx = m_p_charram[chraddr] ^ 255;
+				}
+				else
+				{
+					gfx = m_p_chargen[chraddr] ^ 255;
 				}
 
 				/* Process attributes */
@@ -290,7 +288,10 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				{
 					gfx = 0xff; // underline
 				}
-				// 2 = blink
+				if (BIT(attr, 2) && blink)
+				{
+					gfx = 0;
+				}
 				if (BIT(attr, 3))
 				{
 					gfx ^= 0xff; // reverse video

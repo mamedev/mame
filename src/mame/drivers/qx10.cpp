@@ -580,7 +580,7 @@ void qx10_state::qx10_io(address_map &map)
 {
     if(newval && !oldval)
     {
-        m_keyb.rx = (uint8_t)(uintptr_t)(param) & 0x7f;
+        m_keyb.rx = uint8_t(param & 0x7f);
         m_pic_m->ir4_w(1);
     }
 

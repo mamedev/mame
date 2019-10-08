@@ -126,12 +126,12 @@ void homerun_state::io_map(address_map &map)
 }
 
 
-CUSTOM_INPUT_MEMBER(homerun_state::homerun_d7756_busy_r)
+READ_LINE_MEMBER(homerun_state::homerun_d7756_busy_r)
 {
 	return m_samples->playing(0) ? 0 : 1;
 }
 
-CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_d7756_busy_r)
+READ_LINE_MEMBER(homerun_state::ganjaja_d7756_busy_r)
 {
 	return m_d7756->busy_r();
 }
@@ -152,8 +152,8 @@ CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, sprite0_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homerun_state, sprite0_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homerun_state, homerun_d7756_busy_r)
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -189,7 +189,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, sprite0_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homerun_state, sprite0_r)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // doesn't have d7756
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -227,8 +227,8 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, sprite0_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homerun_state, sprite0_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(homerun_state, ganjaja_d7756_busy_r)
 	PORT_BIT( 0x36, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -236,7 +236,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_NAME("P1 Down / Paper")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Right / Scissors")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) // unused?
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_hopper_status_r, nullptr)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(homerun_state, ganjaja_hopper_status_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 

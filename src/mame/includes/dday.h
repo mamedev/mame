@@ -13,6 +13,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "sound/ay8910.h"
+#include "tilemap.h"
 
 
 class dday_state : public driver_device

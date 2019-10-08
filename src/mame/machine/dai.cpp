@@ -31,7 +31,7 @@ void dai_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		timer_set(attotime::from_hz(100), TIMER_TMS5501);
 		break;
 	default:
-		assert_always(false, "Unknown id in dai_state::device_timer");
+		throw emu_fatalerror("Unknown id in dai_state::device_timer");
 	}
 }
 

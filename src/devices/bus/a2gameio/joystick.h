@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #ifndef MAME_BUS_A2GAMEIO_JOYSTICK_H
-#define MAME_BUS_A2GAMEIO_JOYSTICK_H 1
+#define MAME_BUS_A2GAMEIO_JOYSTICK_H
 
 #pragma once
 

@@ -10,6 +10,7 @@
 #include "machine/ticket.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define igrosoft_gamble_ROM_SIZE 0x80000
 #define igrosoft_gamble_VIDRAM_SIZE (0x2000*0x04)

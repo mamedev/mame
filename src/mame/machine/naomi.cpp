@@ -232,18 +232,34 @@ INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
 
 CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 {
-	const char *tagptr = (const char *)param;
 	uint8_t retval = 0;
 
-	for (int i = 0x80; i >= 0x08; i >>= 1)
+	int port = 0;
+	for (int i = 0x80; i >= 0x08; i >>= 1, port++)
+	{
+		if (m_mp_mux & i)
+			retval |= m_mp[port].read_safe(0);
+	}
+	return retval;
+}
+
+CUSTOM_INPUT_MEMBER(naomi_state::suchie3_mp_r)
+{
+	uint8_t retval = 0;
+
+	int port = 0;
+	for (int i = 0x80; i >= 0x08; i >>= 1, port++)
 	{
 		if (m_mp_mux & i)
 		{
-			ioport_port *port = ioport(tagptr);
-			if (port != nullptr)
-				retval |= port->read();
+			// KEY1 and KEY5 are swapped
+			if (port == 0)
+				retval |= m_mp[4].read_safe(0);
+			else if (port == 4)
+				retval |= m_mp[0].read_safe(0);
+			else
+				retval |= m_mp[port].read_safe(0);
 		}
-		tagptr += strlen(tagptr) + 1;
 	}
 	return retval;
 }
@@ -251,7 +267,6 @@ CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
 {
 	// TODO: player 2 input reading
-//  const int *tagptr = (const int *)param;
 	uint8_t retval = 0;
 	static const char *const keynames[] =
 	{

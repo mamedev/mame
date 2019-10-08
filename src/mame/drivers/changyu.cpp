@@ -140,7 +140,9 @@ void changyu_state::machine_start()
 {
 }
 
-
+static GFXDECODE_START( gfx_changyu )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar, 0, 16 )
+GFXDECODE_END
 
 void changyu_state::changyu(machine_config &config)
 {
@@ -160,6 +162,7 @@ void changyu_state::changyu(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x100);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_changyu);
 
 	mc6845_device &crtc(MC6845(config, "crtc", XTAL(12'000'000) / 6));  // HD46505RP-2, divisor not verified
 	crtc.set_screen("screen");
@@ -188,23 +191,23 @@ ROM_START( changyu )
 	ROM_REGION(0x1000, "mcu", 0)
 	ROM_LOAD( "15a.sub", 0x00000, 0x1000, CRC(c7c24394) SHA1(e290f0b49f3bb536e1bc0cd06e04ed9e99f12e47) )
 
-	ROM_REGION(0x100000, "unsorted", 0)
+	ROM_REGION(0x20000, "gfx1", 0)
+	ROM_LOAD( "5.u21",   0x00000, 0x08000, CRC(25b23b14) SHA1(cb42442c09475941ffcb9940d130f9b2188ce79e) ) // 27C256
+	ROM_LOAD( "6.u20",   0x08000, 0x08000, CRC(35bcfdef) SHA1(5c4173ddf55a3bf4731d819be267f738dfe9fd29) ) // 27C256
+	ROM_LOAD( "7.u19",   0x10000, 0x08000, CRC(ed69d69d) SHA1(adbcea3045bec61aef9ee2ee8425f429bf5e0fc8) ) // 27C256
+	ROM_LOAD( "8.u42",   0x18000, 0x08000, CRC(4013b219) SHA1(735c64647595285fc0c79c617cd6833c473daa12) ) // 27C256
+
+	ROM_REGION(0x58000, "unsorted", 0)
 	ROM_LOAD( "1.u1",    0x00000, 0x08000, CRC(8d60cb76) SHA1(f33e14549ceb6511509be16dd1c238512e6ae758) ) // 27C256
 	ROM_LOAD( "2.u2",    0x08000, 0x08000, CRC(b9d78664) SHA1(763876f075f2b5b07e96b36b4e670dc466808f08) ) // 27C256
 	ROM_LOAD( "3.u3",    0x10000, 0x08000, CRC(17cc6716) SHA1(df8af0fbe93b8f92219721a35772ef93bca7adb5) ) // 27C256
 	ROM_LOAD( "4.u4",    0x18000, 0x08000, CRC(31b76c13) SHA1(c46da02aff8f57c0277e493c82e01970c0acd4fb) ) // 27C256
 
-	ROM_LOAD( "5.u21",   0x20000, 0x08000, CRC(25b23b14) SHA1(cb42442c09475941ffcb9940d130f9b2188ce79e) ) // 27C256
-	ROM_LOAD( "6.u20",   0x28000, 0x08000, CRC(35bcfdef) SHA1(5c4173ddf55a3bf4731d819be267f738dfe9fd29) ) // 27C256
-	ROM_LOAD( "7.u19",   0x30000, 0x08000, CRC(ed69d69d) SHA1(adbcea3045bec61aef9ee2ee8425f429bf5e0fc8) ) // 27C256
+	ROM_LOAD( "9a.u74",  0x20000, 0x10000, CRC(12f3fd7a) SHA1(e220694b8fa5cfc172bf23149fceaeeb6d0b6230) ) // 27C512
+	ROM_LOAD( "10a.u61", 0x30000, 0x10000, CRC(8869968b) SHA1(fbab29436acde19d7d559160ef2394d43a6ebb87) ) // 27C512
+	ROM_LOAD( "11a.u62", 0x40000, 0x10000, CRC(d05e6348) SHA1(5b8bd4c94631aed46cbf7cd4db749e4855d4516c) ) // 27C512
 
-	ROM_LOAD( "8.u42",   0x38000, 0x08000, CRC(4013b219) SHA1(735c64647595285fc0c79c617cd6833c473daa12) ) // 27C256
-
-	ROM_LOAD( "9a.u74",  0x40000, 0x10000, CRC(12f3fd7a) SHA1(e220694b8fa5cfc172bf23149fceaeeb6d0b6230) ) // 27C512
-	ROM_LOAD( "10a.u61", 0x50000, 0x10000, CRC(8869968b) SHA1(fbab29436acde19d7d559160ef2394d43a6ebb87) ) // 27C512
-	ROM_LOAD( "11a.u62", 0x60000, 0x10000, CRC(d05e6348) SHA1(5b8bd4c94631aed46cbf7cd4db749e4855d4516c) ) // 27C512
-
-	ROM_LOAD( "14.u70",  0x70000, 0x08000, CRC(cdfdfe11) SHA1(b170f9a6e2c77ce3ae01aabc8a963a11eb7fe74e) ) // under the sub board and near an empty socket (u77), program for a removed second CPU? or for the first?
+	ROM_LOAD( "14.u70",  0x50000, 0x08000, CRC(cdfdfe11) SHA1(b170f9a6e2c77ce3ae01aabc8a963a11eb7fe74e) ) // under the sub board and near an empty socket (u77), program for a removed second CPU? or for the first?
 
 	// u9 and u63 not populated
 
@@ -224,20 +227,21 @@ ROM_START( changyu2 ) // 999 ROM999 II BY HUANGYEH string
 	ROM_REGION(0x1000, "mcu", 0)
 	ROM_LOAD( "99c.bin", 0x00000, 0x1000, NO_DUMP ) // needs decap
 
-	ROM_REGION(0x50000, "unsorted", 0)
+	ROM_REGION(0x20000, "gfx1", 0)
 	ROM_LOAD( "91.bin",  0x00000, 0x08000, CRC(747c98e3) SHA1(30926ee500c6ee21b7e73424afc76f34d84cb896) ) // 27256
 	ROM_LOAD( "92.bin",  0x08000, 0x08000, CRC(93ac967a) SHA1(41914ccdb6d07e7a74b4db3d5473f8949462ee1c) ) // 27256
 	ROM_LOAD( "93.bin",  0x10000, 0x08000, CRC(1d2b75de) SHA1(89b201b75691ee6ac3fc71fb8a998dbf05a1b0b2) ) // 27256
 	ROM_LOAD( "94.bin",  0x18000, 0x08000, CRC(f61a8410) SHA1(3c4df3e973322200aa72cf1d1df827c2ba69671b) ) // 27256
 
-	ROM_LOAD( "96c.bin", 0x20000, 0x10000, CRC(06d11350) SHA1(3c65d1d71010a3f10b00c799ede2debc96f6f3cf) ) // 27C512
-	ROM_LOAD( "97c.bin", 0x30000, 0x10000, CRC(e242ab79) SHA1(a7b14692556605eb039d1ef98fb3b8b007717c12) ) // 27C512
-	ROM_LOAD( "98c.bin", 0x40000, 0x10000, CRC(c8879f76) SHA1(6bcc686720dc63f50509f3f003b1f62ff43fc6b1) ) // 27C512
+	ROM_REGION(0x30000, "unsorted", 0)
+	ROM_LOAD( "96c.bin", 0x00000, 0x10000, CRC(06d11350) SHA1(3c65d1d71010a3f10b00c799ede2debc96f6f3cf) ) // 27C512
+	ROM_LOAD( "97c.bin", 0x10000, 0x10000, CRC(e242ab79) SHA1(a7b14692556605eb039d1ef98fb3b8b007717c12) ) // 27C512
+	ROM_LOAD( "98c.bin", 0x20000, 0x10000, CRC(c8879f76) SHA1(6bcc686720dc63f50509f3f003b1f62ff43fc6b1) ) // 27C512
 
 	ROM_REGION(0x400, "pals", 0)
 	ROM_LOAD( "9a", 0x000, 0x104, NO_DUMP )
 	ROM_LOAD( "9b", 0x200, 0x104, NO_DUMP )
 ROM_END
 
-GAME( 1989, changyu,  0, changyu,  changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 1", MACHINE_IS_SKELETON ) // year taken from start of maincpu ROM
-GAME( 19??, changyu2, 0, changyu2, changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 2", MACHINE_IS_SKELETON )
+GAME( 1989, changyu,  0, changyu,  changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 1", MACHINE_IS_SKELETON ) // Wing Co. in GFX1, year taken from start of maincpu ROM
+GAME( 19??, changyu2, 0, changyu2, changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 2", MACHINE_IS_SKELETON ) // Wing Co. in GFX1

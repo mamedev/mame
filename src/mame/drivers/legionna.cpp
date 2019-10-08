@@ -45,11 +45,13 @@ Denjin Makai
 
 - Needs to patch a sound-related comm to make this to work, same as SD Gundam Psycho Salamander No Kyoui (68k never writes to port 6 for whatever reason).
 
-- There are a bunch of unemulated registers, one of them seems to be a brightness control of some sort. Needs a PCB side-by-side test.
-
-- backdrop color is ugly, especially noticeable in the port harbour stage (level 4). It should be dark blue or black but it's currently grey.
-
 - there are some ROM writes from time to time, could be a coding bug or something related to the protection.
+
+- There's a minor gap in one of the transitions during final stage, after the conveyor belt and the horizontal elevator (the one with tons of grenades), this is known to not happen on a real PCB.
+
+- "Mai T Joplin" text in credits is slightly off of screen area even on real HW (btanb)
+
+- Initials can be entered into ranking screen only if player(s) never ever continues (btanb)
 
 Godzilla
 --------

@@ -413,21 +413,6 @@ uint16_t amiga_state::joy1dat_r()
 		return (m_p2_mouse_y.read_safe(0xff) << 8) | m_p2_mouse_x.read_safe(0xff);
 }
 
-CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
-{
-	uint8_t bits = m_joy_ports[(int)(uintptr_t)param].read_safe(0xff);
-
-	int up = (bits >> 0) & 1;
-	int down = (bits >> 1) & 1;
-	int left = (bits >> 2) & 1;
-	int right = (bits >> 3) & 1;
-
-	if (left) up ^= 1;
-	if (right) down ^= 1;
-
-	return down | (right << 1) | (up << 8) | (left << 9);
-}
-
 
 
 /*************************************

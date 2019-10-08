@@ -57,7 +57,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+	DECLARE_READ_LINE_MEMBER(hopper_sensors_r);
 
 private:
 	DECLARE_READ8_MEMBER(coin_counter_r);
@@ -131,7 +131,7 @@ INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
 		m_coin_start_cycles = m_maincpu->total_cycles();
 }
 
-CUSTOM_INPUT_MEMBER( segajw_state::hopper_sensors_r )
+READ_LINE_MEMBER( segajw_state::hopper_sensors_r )
 {
 	uint8_t data = 0;
 
@@ -241,17 +241,17 @@ static INPUT_PORTS_START( segajw )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Last Game")   PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("M-Door")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("D-Door")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )       PORT_CUSTOM_MEMBER(DEVICE_SELF, segajw_state, hopper_sensors_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )       PORT_READ_LINE_MEMBER(segajw_state, hopper_sensors_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Full")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Fill")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segajw_state, coin_sensors_r, nullptr)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(segajw_state, coin_sensors_r)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN1") // start the coin drop sequence (see coin_sensors_r)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, segajw_state, coin_drop_start, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, segajw_state, coin_drop_start, 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0000, "Progressive" )   PORT_DIPLOCATION("SW1:1")

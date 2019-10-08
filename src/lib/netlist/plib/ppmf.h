@@ -10,7 +10,7 @@
 
 #include "pconfig.h"
 
-#include <cstdint>
+#include <cstdint> // uintptr_t
 #include <utility>
 
 /*

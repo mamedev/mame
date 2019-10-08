@@ -10,6 +10,7 @@
 #include "sound/k007232.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class twin16_state : public driver_device
 {

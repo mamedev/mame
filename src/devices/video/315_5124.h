@@ -201,7 +201,7 @@ protected:
 	static constexpr device_timer_id TIMER_NMI = 6;
 	static constexpr device_timer_id TIMER_FLAGS = 7;
 
-	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette_lut;
 	required_device<sn76496_base_device> m_snsnd;
 };
 

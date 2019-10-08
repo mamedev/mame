@@ -115,7 +115,7 @@ WRITE8_MEMBER(timeplt_state::chkun_sound_w)
 		m_tc8830f->reset();
 }
 
-CUSTOM_INPUT_MEMBER(timeplt_state::chkun_hopper_status_r)
+READ_LINE_MEMBER(timeplt_state::chkun_hopper_status_r)
 {
 	// temp workaround, needs hopper
 	return machine().rand();
@@ -272,7 +272,7 @@ static INPUT_PORTS_START( chkun )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Bet 3B")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(timeplt_state, chkun_hopper_status_r)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet 1B")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Bet 2B")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( bikkuric )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(timeplt_state, chkun_hopper_status_r)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )

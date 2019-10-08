@@ -14,6 +14,7 @@
 #include "machine/timer.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class lastduel_state : public driver_device
 {

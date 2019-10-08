@@ -129,7 +129,7 @@ void osd_break_into_debugger(const char *message)
 //  get_clipboard_text_by_format
 //============================================================
 
-static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LPCVOID data))
+static bool get_clipboard_text_by_format(std::string &result_text, UINT format, std::string (*convert)(LPCVOID data))
 {
 	DataPackageView^ dataPackageView;
 	IAsyncOperation<String^>^ getTextOp;
@@ -139,7 +139,8 @@ static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LP
 	getTextOp = dataPackageView->GetTextAsync();
 	clipboardText = getTextOp->GetResults();
 
-	return (char *)convert(clipboardText->Data()).c_str();
+	result_text = convert(clipboardText->Data());
+	return !result_text.empty();
 }
 
 //============================================================
@@ -164,14 +165,16 @@ static std::string convert_ansi(LPCVOID data)
 //  osd_get_clipboard_text
 //============================================================
 
-char *osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text(void)
 {
-	// try to access unicode text
-	char *result = get_clipboard_text_by_format(CF_UNICODETEXT, convert_wide);
+	std::string result;
 
-	// try to access ANSI text
-	if (result == nullptr)
-		result = get_clipboard_text_by_format(CF_TEXT, convert_ansi);
+	// try to access unicode text
+	if (!get_clipboard_text_by_format(result, CF_UNICODETEXT, convert_wide))
+	{
+		// try to access ANSI text
+		get_clipboard_text_by_format(result, CF_TEXT, convert_ansi);
+	}
 
 	return result;
 }

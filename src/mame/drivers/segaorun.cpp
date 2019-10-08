@@ -605,7 +605,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 
 		default:
-			assert_always(false, "Unknown id in segaorun_state::device_timer");
+			throw emu_fatalerror("Unknown id in segaorun_state::device_timer");
 	}
 }
 
@@ -951,7 +951,7 @@ static INPUT_PORTS_START( outrun_generic )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
 	PORT_START("ADC.3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segaorun_state, bankmotor_pos_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(segaorun_state, bankmotor_pos_r)
 INPUT_PORTS_END
 
 

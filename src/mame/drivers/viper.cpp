@@ -382,7 +382,7 @@ public:
 		m_ds2430_bit_timer(*this, "ds2430_timer2"),
 		m_workram(*this, "workram"),
 		m_ds2430_rom(*this, "ds2430"),
-		m_io_ports(*this, {"IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7"})
+		m_io_ports(*this, "IN%u", 0U)
 	{
 	}
 
@@ -392,7 +392,7 @@ public:
 	void init_vipercf();
 	void init_viperhd();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
+	DECLARE_READ_LINE_MEMBER(ds2430_unk_r);
 
 private:
 	DECLARE_READ32_MEMBER(epic_r);
@@ -2132,7 +2132,7 @@ void viper_state::viper_map(address_map &map)
 
 /*****************************************************************************/
 
-CUSTOM_INPUT_MEMBER(viper_state::ds2430_unk_r)
+READ_LINE_MEMBER(viper_state::ds2430_unk_r)
 {
 	return m_ds2430_unk_status;
 }
@@ -2159,7 +2159,7 @@ static INPUT_PORTS_START( viper )
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, viper_state, ds2430_unk_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_unk_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // if this bit is 0, loads a disk copier instead
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 

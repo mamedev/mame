@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class battlane_state : public driver_device
 {

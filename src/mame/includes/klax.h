@@ -12,6 +12,7 @@
 
 #include "machine/atarigen.h"
 #include "video/atarimo.h"
+#include "tilemap.h"
 
 class klax_state : public atarigen_state
 {

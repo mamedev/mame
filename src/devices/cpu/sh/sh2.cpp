@@ -168,7 +168,7 @@ void sh2_device::sh7604_map(address_map &map)
 	map(0xfffffe82, 0xfffffe83).rw(FUNC(sh2_device::rstcsr_r), FUNC(sh2_device::rstcsr_w));
 
 	// standby and cache control
-	map(0xfffffe91, 0xfffffe91).rw(FUNC(sh2_device::sbycr_r), FUNC(sh2_device::sbycr_w));
+	map(0xfffffe90, 0xfffffe91).rw(FUNC(sh2_device::fmr_sbycr_r), FUNC(sh2_device::fmr_sbycr_w));
 	map(0xfffffe92, 0xfffffe92).rw(FUNC(sh2_device::ccr_r), FUNC(sh2_device::ccr_w));
 
 	// INTC second section

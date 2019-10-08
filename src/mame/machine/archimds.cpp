@@ -34,9 +34,9 @@
 #include "debugger.h"
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
-static const uint32_t pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
 
 #define IOC_LOG 0
+#define CRTC_LOG 0
 
 /* TODO: fix pending irqs */
 void archimedes_state::archimedes_request_irq_a(int mask)
@@ -96,32 +96,36 @@ void archimedes_state::device_timer(emu_timer &timer, device_timer_id id, int pa
 {
 	switch (id)
 	{
-		case TIMER_VBLANK: vidc_vblank();break;
-		case TIMER_VIDEO: vidc_video_tick(); break;
-		case TIMER_AUDIO: vidc_audio_tick(); break;
 		case TIMER_IOC: ioc_timer(param); break;
 	}
 }
 
 
-void archimedes_state::vidc_vblank()
+WRITE_LINE_MEMBER( archimedes_state::vblank_irq )
 {
-	archimedes_request_irq_a(ARCHIMEDES_IRQA_VBL);
-
-	// set up for next vbl
-	m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
+	if (state)
+	{
+		archimedes_request_irq_a(ARCHIMEDES_IRQA_VBL);
+		if (m_video_dma_on)
+			vidc_video_tick();
+	}
 }
 
+WRITE_LINE_MEMBER( archimedes_state::sound_drq )
+{
+	if (state)
+		vidc_audio_tick();
+}
+
+
 /* video DMA */
-/* TODO: what type of DMA this is, burst or cycle steal? Docs doesn't explain it (4 usec is the DRAM refresh). */
-/* TODO: change m_region_vram into proper alloc array */
-/* TODO: Erotictac and Poizone sets up vidinit register AFTER vidend, for double buffering? (fixes Poizone "Eterna" logo display on attract) */
+// TODO: what type of DMA this is, burst or cycle steal? Docs doesn't explain it (4 usec is the DRAM refresh). */
+// TODO: Erotictac and Poizone sets up vidinit register AFTER vidend, for double buffering? (fixes Poizone "Eterna" logo display on attract)
+// TODO: understand how to make quazer to work (sets video DMA param in-flight)
 void archimedes_state::vidc_video_tick()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	static uint8_t *vram = m_region_vram->base();
 	uint32_t size;
-	uint32_t m_vidc_ccur;
 	uint32_t offset_ptr;
 
 	size = (m_vidc_vidend - m_vidc_vidstart + 0x10) & 0x1fffff;
@@ -134,7 +138,7 @@ void archimedes_state::vidc_video_tick()
 
 	for(m_vidc_vidcur = 0;m_vidc_vidcur < size;m_vidc_vidcur++)
 	{
-		vram[m_vidc_vidcur] = (space.read_byte(offset_ptr));
+		m_vidc->write_vram(m_vidc_vidcur, space.read_byte(offset_ptr));
 		offset_ptr++;
 		if(offset_ptr >= m_vidc_vidend+0x10) // TODO: correct?
 			offset_ptr = m_vidc_vidstart;
@@ -142,71 +146,21 @@ void archimedes_state::vidc_video_tick()
 
 	if(m_cursor_enabled == true)
 	{
-		for(m_vidc_ccur = 0;m_vidc_ccur < 0x200;m_vidc_ccur++)
-			m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
-	}
+		uint32_t ccur_size = m_vidc->get_cursor_size();
 
-	if(m_video_dma_on)
-	{
-		m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time+1));
+		for(uint32_t ccur = 0; ccur < ccur_size; ccur++)
+			m_vidc->write_cram(ccur, space.read_byte(m_vidc_cinit+ccur));
 	}
-	else
-		m_vid_timer->adjust(attotime::never);
 }
 
 /* audio DMA */
 void archimedes_state::vidc_audio_tick()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t ulaw_comp;
-	int16_t res;
 	uint8_t ch;
-	static const int16_t mulawTable[256] =
-	{
-		-32124,-31100,-30076,-29052,-28028,-27004,-25980,-24956,
-		-23932,-22908,-21884,-20860,-19836,-18812,-17788,-16764,
-		-15996,-15484,-14972,-14460,-13948,-13436,-12924,-12412,
-		-11900,-11388,-10876,-10364, -9852, -9340, -8828, -8316,
-		-7932, -7676, -7420, -7164, -6908, -6652, -6396, -6140,
-		-5884, -5628, -5372, -5116, -4860, -4604, -4348, -4092,
-		-3900, -3772, -3644, -3516, -3388, -3260, -3132, -3004,
-		-2876, -2748, -2620, -2492, -2364, -2236, -2108, -1980,
-		-1884, -1820, -1756, -1692, -1628, -1564, -1500, -1436,
-		-1372, -1308, -1244, -1180, -1116, -1052,  -988,  -924,
-		-876,  -844,  -812,  -780,  -748,  -716,  -684,  -652,
-		-620,  -588,  -556,  -524,  -492,  -460,  -428,  -396,
-		-372,  -356,  -340,  -324,  -308,  -292,  -276,  -260,
-		-244,  -228,  -212,  -196,  -180,  -164,  -148,  -132,
-		-120,  -112,  -104,   -96,   -88,   -80,   -72,   -64,
-		-56,   -48,   -40,   -32,   -24,   -16,    -8,     -1,
-		32124, 31100, 30076, 29052, 28028, 27004, 25980, 24956,
-		23932, 22908, 21884, 20860, 19836, 18812, 17788, 16764,
-		15996, 15484, 14972, 14460, 13948, 13436, 12924, 12412,
-		11900, 11388, 10876, 10364,  9852,  9340,  8828,  8316,
-		7932,  7676,  7420,  7164,  6908,  6652,  6396,  6140,
-		5884,  5628,  5372,  5116,  4860,  4604,  4348,  4092,
-		3900,  3772,  3644,  3516,  3388,  3260,  3132,  3004,
-		2876,  2748,  2620,  2492,  2364,  2236,  2108,  1980,
-		1884,  1820,  1756,  1692,  1628,  1564,  1500,  1436,
-		1372,  1308,  1244,  1180,  1116,  1052,   988,   924,
-		876,   844,   812,   780,   748,   716,   684,   652,
-		620,   588,   556,   524,   492,   460,   428,   396,
-		372,   356,   340,   324,   308,   292,   276,   260,
-		244,   228,   212,   196,   180,   164,   148,   132,
-		120,   112,   104,    96,    88,    80,    72,    64,
-		56,    48,    40,    32,    24,    16,     8,     0
-	};
 
 	for(ch=0; ch<8; ch++)
-	{
-		uint8_t ulaw_temp = (space.read_byte(m_vidc_sndcur + ch)) ^ 0xff;
-
-		ulaw_comp = (ulaw_temp>>1) | ((ulaw_temp&1)<<7);
-
-		res = mulawTable[ulaw_comp];
-
-		m_dac[ch & 7]->write(res);
-	}
+		m_vidc->write_dac(ch, (space.read_byte(m_vidc_sndcur + ch)));
 
 	m_vidc_sndcur+=8;
 
@@ -214,13 +168,12 @@ void archimedes_state::vidc_audio_tick()
 	{
 		archimedes_request_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 
+		// TODO: nuke this implementation detail, repeated below
+		m_vidc->update_sound_mode(m_audio_dma_on);
 		if(!m_audio_dma_on)
 		{
-			m_snd_timer->adjust(attotime::never);
 			for(ch=0; ch<8; ch++)
-			{
-				m_dac[ch & 7]->write(0);
-			}
+				m_vidc->clear_dac(ch);
 		}
 		else
 		{
@@ -291,17 +244,11 @@ void archimedes_state::archimedes_reset()
 	m_ioc_regs[IRQ_STATUS_B] = 0x00; //set up IL[1] On
 	m_ioc_regs[FIQ_STATUS] = 0x80;   //set up Force FIQ
 	m_ioc_regs[CONTROL] = 0xff;
-
-	m_vidc_vblank_time = 10000; // set a stupidly high time so it doesn't fire off
-	m_vbl_timer->adjust(attotime::never);
 }
 
 void archimedes_state::archimedes_init()
 {
 	m_memc_pagesize = 0;
-
-	m_vbl_timer = timer_alloc(TIMER_VBLANK);
-	m_vbl_timer->adjust(attotime::never);
 
 	m_timer[0] = timer_alloc(TIMER_IOC);
 	m_timer[1] = timer_alloc(TIMER_IOC);
@@ -311,10 +258,6 @@ void archimedes_state::archimedes_init()
 	m_timer[1]->adjust(attotime::never);
 	m_timer[2]->adjust(attotime::never);
 	m_timer[3]->adjust(attotime::never);
-
-	m_vid_timer = timer_alloc(TIMER_VIDEO);
-	m_snd_timer = timer_alloc(TIMER_AUDIO);
-	m_snd_timer->adjust(attotime::never);
 }
 
 READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
@@ -515,12 +458,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 		case CONTROL:
 		{
 			uint8_t i2c_data = 1;
-			uint8_t flyback; //internal name for vblank here
-			int vert_pos;
 			bool floppy_ready_state;
-
-			vert_pos = m_screen->vpos();
-			flyback = (vert_pos <= m_vidc_regs[VIDC_VDSR] || vert_pos >= m_vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
 
 			if ( m_i2cmem )
 			{
@@ -529,7 +467,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 
 			floppy_ready_state = check_floppy_ready();
 
-			return (flyback) | (m_ioc_regs[CONTROL] & 0x78) | (floppy_ready_state<<2) | (m_i2c_clk<<1) | i2c_data;
+			return (m_vidc->flyback_r()<<7) | (m_ioc_regs[CONTROL] & 0x78) | (floppy_ready_state<<2) | (m_i2c_clk<<1) | i2c_data;
 		}
 
 		case KART:  // keyboard read
@@ -607,6 +545,8 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			---- --x- I2C clock
 			---- ---x I2C data
 			*/
+
+			//m_ioc_regs[CONTROL] = data & 0x38;
 			//if(data & 0x40)
 			//  popmessage("Muting sound, contact MAME/MESSdev");
 			break;
@@ -621,8 +561,8 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			/* bit 7 forces an IRQ trap */
 			archimedes_request_irq_a((data & 0x80) ? ARCHIMEDES_IRQA_FORCE : 0);
 
-			if(data & 0x08) //set up the VBLANK timer
-				m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
+			//if(data & 0x08) //set up the VBLANK timer
+			//  m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
 
 			break;
 
@@ -739,7 +679,21 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 						return 0;
 					}
 				case 2:
-					logerror("IOC: Econet Read %08x\n",ioc_addr);
+					// RTFM joystick interface routes here
+					// TODO: slot interface for econet (reads registers 0 and 1 during boot)
+					switch(ioc_addr)
+					{
+						case 0x3a0000:
+							return 0xed; // ID for econet
+						case 0x3a0004:
+							return m_joy[0].read_safe(0xff);
+						case 0x3a0008:
+							// Top Banana reads there and do various checks,
+							// disallowing player 1 joy use if they fails (?)
+							return m_joy[1].read_safe(0xff);
+					}
+
+					logerror("IOC: Econet Read %08x at PC=%08x\n",ioc_addr, m_maincpu->pc());
 					return 0xffff;
 				case 3:
 					logerror("IOC: Serial Read\n");
@@ -750,15 +704,19 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 				case 5:
 					if (m_fdc)
 					{
+						// TODO: IOEB slot interface
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x18: return 0xff; // FDC latch B
 							case 0x40: return 0xff; // FDC latch A
-							case 0x50: return 0; //fdc type, new model returns 5 here
-							case 0x70: return 0x0F;
-							case 0x74: return 0xFF; // unknown
-//                          case 0x78: /* joystick */
-//                          case 0x7c:
+							case 0x50: return 0; //fdc type, an 82c711 returns 5 here
+							case 0x70: return 0x0f; // monitor type, TBD
+							case 0x74: return 0xff; // unknown
+							case 0x78: // serial joystick?
+							case 0x7c:
+								logerror("FDC: reading Joystick port %04x at PC=%08x\n",ioc_addr, m_maincpu->pc());
+								return 0xff;
+
 						}
 					}
 
@@ -818,6 +776,38 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 					{
 						switch(ioc_addr & 0xfffc)
 						{
+							// serial joy port (!JS application)
+							case 0x10:
+							{
+								// compared to RTFM they reversed bits 0-3 (or viceversa, dunno what came out first)
+								// for pragmatic convenience we bitswap here, but this should really be a slot option at some point.
+								// TODO: understand how player 2 inputs routes, related somehow to CONTROL bit 6 (cfr. blitz in SW list)
+								// TODO: paradr2k polls here with bit 7 and fails detection (Vertical Twist)
+								uint8_t cur_joy_in = bitswap<8>(m_joy[0].read_safe(0xff),7,6,5,4,0,1,2,3);
+
+								m_joy_serial_data = (data & 0xff) ^ 0xff;
+								bool serial_on = false;
+
+								if (m_joy_serial_data == 0x20)
+									serial_on = true;
+								else if (m_joy_serial_data & cur_joy_in)
+									serial_on = true;
+
+
+								// wants printer irq for some reason (connected on parallel?)
+								if (serial_on == true)
+								{
+									archimedes_request_irq_a(ARCHIMEDES_IRQA_PRINTER_BUSY);
+									//m_ioc_regs[CONTROL] |= 0x40;
+								}
+								else
+								{
+									archimedes_clear_irq_a(ARCHIMEDES_IRQA_PRINTER_BUSY);
+									//m_ioc_regs[CONTROL] &= ~0x40;
+								}
+
+								return;
+							}
 							case 0x18: // latch B
 								/*
 								---- x--- floppy controller reset
@@ -862,178 +852,6 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 	logerror("(PC=%08x) I/O: W %x @ %x (mask %08x)\n", m_maincpu->pc(), data, (offset*4)+0x3000000, mem_mask);
 }
 
-READ32_MEMBER(archimedes_state::archimedes_vidc_r)
-{
-	return 0;
-}
-
-void archimedes_state::vidc_dynamic_res_change()
-{
-	/* sanity checks - first pass */
-	/*
-	    total cycles + border end
-	*/
-	if(m_vidc_regs[VIDC_HCR] && m_vidc_regs[VIDC_HBER] &&
-		m_vidc_regs[VIDC_VCR] && m_vidc_regs[VIDC_VBER])
-	{
-		/* sanity checks - second pass */
-		/*
-		total cycles >= border end >= border start
-		*/
-		if((m_vidc_regs[VIDC_HCR] >= m_vidc_regs[VIDC_HBER]) &&
-			(m_vidc_regs[VIDC_HBER] >= m_vidc_regs[VIDC_HBSR]) &&
-			(m_vidc_regs[VIDC_VBER] >= m_vidc_regs[VIDC_VBSR]))
-		{
-			rectangle const visarea(
-					0, m_vidc_regs[VIDC_HBER] - m_vidc_regs[VIDC_HBSR] - 1,
-					0, (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace + 1));
-
-			m_vidc_vblank_time = m_vidc_regs[VIDC_VBER] * (m_vidc_interlace+1);
-			//logerror("Configuring: htotal %d vtotal %d border %d x %d display origin %d x %d vblank = %d\n",
-			//  m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
-			//  visarea.right(), visarea.bottom(),
-			//  m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1,
-			//  m_vidc_vblank_time);
-
-			attoseconds_t const refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
-
-			m_screen->configure(m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR] * (m_vidc_interlace+1), visarea, refresh);
-		}
-	}
-}
-
-WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
-{
-	uint32_t reg = data>>24;
-	uint32_t val = data & 0xffffff;
-	//#ifdef MAME_DEBUG
-	static const char *const vrnames[] =
-	{
-		"horizontal total",
-		"horizontal sync width",
-		"horizontal border start",
-		"horizontal display start",
-		"horizontal display end",
-		"horizontal border end",
-		"horizontal cursor start",
-		"horizontal interlace",
-		"vertical total",
-		"vertical sync width",
-		"vertical border start",
-		"vertical display start",
-		"vertical display end",
-		"vertical border end",
-		"vertical cursor start",
-		"vertical cursor end",
-	};
-	//#endif
-
-
-	// 0x00 - 0x3c Video Palette Logical Colors (16 colors)
-	// 0x40 Border Color
-	// 0x44 - 0x4c Cursor Palette Logical Colors
-	if (reg <= 0x4c)
-	{
-		int r,g,b;
-
-		//i = (val & 0x1000) >> 12; //supremacy bit
-		b = (val & 0x0f00) >> 8;
-		g = (val & 0x00f0) >> 4;
-		r = (val & 0x000f) >> 0;
-
-		if(reg == 0x40 && val & 0xfff)
-			logerror("WARNING: border color write here (PC=%08x)!\n",m_maincpu->pc());
-
-		m_palette->set_pen_color(reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
-
-		/* handle 8bpp colors here */
-		if(reg <= 0x3c)
-		{
-			int i;
-
-			for(i=0;i<0x100;i+=0x10)
-			{
-				b = ((val & 0x700) >> 8) | ((i & 0x80) >> 4);
-				g = ((val & 0x030) >> 4) | ((i & 0x60) >> 3);
-				r = ((val & 0x007) >> 0) | ((i & 0x10) >> 1);
-
-				m_palette->set_pen_color((reg >> 2) + 0x100 + i, pal4bit(r), pal4bit(g), pal4bit(b) );
-			}
-		}
-
-		// update partials
-		m_screen->update_partial(m_screen->vpos());
-	}
-	else if (reg >= 0x60 && reg <= 0x7c)
-	{
-		m_vidc_stereo_reg[(reg >> 2) & 7] = val & 0x07;
-
-//      popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",vidc_stereo_reg[0],vidc_stereo_reg[1],vidc_stereo_reg[2],vidc_stereo_reg[3]
-//      ,vidc_stereo_reg[4],vidc_stereo_reg[5],vidc_stereo_reg[6],vidc_stereo_reg[7]);
-	}
-	else if (reg >= 0x80 && reg <= 0xbc)
-	{
-		switch(reg)
-		{
-			case VIDC_HCR:  m_vidc_regs[VIDC_HCR] =  ((val >> 14)<<1)+1;    break;
-//          case VIDC_HSWR: m_vidc_regs[VIDC_HSWR] = (val >> 14)+1;   break;
-			case VIDC_HBSR: m_vidc_regs[VIDC_HBSR] = ((val >> 14)<<1)+1;    break;
-			case VIDC_HDSR: m_vidc_regs[VIDC_HDSR] = (val >> 14);   break;
-			case VIDC_HDER: m_vidc_regs[VIDC_HDER] = (val >> 14);   break;
-			case VIDC_HBER: m_vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1;    break;
-			case VIDC_HCSR: m_vidc_regs[VIDC_HCSR] = ((val >> 13) & 0x7ff) + 6; break;
-//          #define VIDC_HIR        0x9c
-
-			case VIDC_VCR:  m_vidc_regs[VIDC_VCR] = ((val >> 14))+1; break;
-//          #define VIDC_VSWR       0xa4
-			case VIDC_VBSR: m_vidc_regs[VIDC_VBSR] = (val >> 14)+1; break;
-			case VIDC_VDSR: m_vidc_regs[VIDC_VDSR] = (val >> 14)+1; break;
-			case VIDC_VDER: m_vidc_regs[VIDC_VDER] = (val >> 14)+1; break;
-			case VIDC_VBER: m_vidc_regs[VIDC_VBER] = (val >> 14)+1; break;
-			case VIDC_VCSR: m_vidc_regs[VIDC_VCSR] = ((val >> 14) & 0x3ff) + 1; break;
-			case VIDC_VCER: m_vidc_regs[VIDC_VCER] = ((val >> 14) & 0x3ff) + 1; break;
-		}
-
-
-		//#ifdef MAME_DEBUG
-		if(reg != VIDC_VCSR && reg != VIDC_VCER && reg != VIDC_HCSR)
-		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], m_vidc_regs[reg]);
-		//#endif
-
-		vidc_dynamic_res_change();
-	}
-	else if (reg == 0xc0)
-	{
-		m_vidc_regs[reg] = val & 0xffff;
-
-		if (m_audio_dma_on)
-		{
-			double sndhz = 1e6 / ((m_vidc_regs[0xc0] & 0xff) + 2);
-			sndhz /= 8.0;
-			m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
-			//printf("VIDC: sound freq to %d, sndhz = %f\n", (val & 0xff)-2, sndhz);
-		}
-	}
-	else if (reg == 0xe0)
-	{
-		m_vidc_bpp_mode = ((val & 0x0c) >> 2);
-		m_vidc_interlace = ((val & 0x40) >> 6);
-		m_vidc_pixel_clk = (val & 0x03);
-		//todo: vga/svga modes sets 0x1000
-		vidc_dynamic_res_change();
-	}
-	else
-	{
-		logerror("VIDC: %x to register %x\n", val, reg);
-		m_vidc_regs[reg] = val&0xffff;
-	}
-}
-
-READ32_MEMBER(archimedes_state::archimedes_memc_r)
-{
-	return 0;
-}
-
 WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 {
 	// is it a register?
@@ -1042,7 +860,6 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 		switch ((data >> 17) & 7)
 		{
 			case 0: /* video init */
-				m_cursor_enabled = false;
 				m_vidc_vidinit = 0x2000000 | ((data>>2)&0x7fff)*16;
 				//printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
 				break;
@@ -1059,23 +876,28 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 
 			case 3: /* cursor init */
 				m_cursor_enabled = true;
+				m_vidc->set_cursor_enable(m_cursor_enabled);
 				m_vidc_cinit = 0x2000000 | (((data>>2)&0x7fff)*16);
 				//printf("MEMC: CURSOR INIT %08x\n",((data>>2)&0x7fff)*16);
 				break;
 
 			case 4: /* sound start */
-				//logerror("MEMC: SNDSTART %08x\n",data);
 				archimedes_clear_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 				m_vidc_sndstart = 0x2000000 | ((data>>2)&0x7fff)*16;
+				//printf("MEMC: SNDSTART %08x\n",m_vidc_sndstart);
 				break;
 
 			case 5: /* sound end */
-				//logerror("MEMC: SNDEND %08x\n",data);
-				m_vidc_sndend = 0x2000000 | ((data>>2)&0x7fff)*16;
+				// end buffer is actually +16 bytes wrt sound start
+				// TODO: it actually don't apply for ertictac and poizone?
+				m_vidc_sndend = 0x2000000 | (((data>>2)+1)&0x7fff)*16;
+				//printf("MEMC: SNDEND %08x\n",m_vidc_sndend);
 				break;
 
 			case 6:
-				m_vidc_sndcur = 0;
+				//printf("MEMC: SNDPTR\n");
+				m_vidc_sndcur = m_vidc_sndstart;
+				m_vidc_sndendcur = m_vidc_sndend;
 				archimedes_request_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 				break;
 
@@ -1084,22 +906,25 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 
 				logerror("(PC = %08x) MEMC: %x to Control (page size %d, %s, %s)\n", m_maincpu->pc(), data & 0x1ffc, page_sizes[m_memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
 
-				m_video_dma_on = ((data>>10)&1);
-				m_audio_dma_on = ((data>>11)&1);
+				m_video_dma_on = BIT(data, 10);
+				m_audio_dma_on = BIT(data, 11);
 
-				if ((data>>10)&1)
+				if (m_video_dma_on)
 				{
 					m_vidc_vidcur = 0;
-					m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time+1));
+					// TODO: update internally
+				}
+				else
+				{
+					m_cursor_enabled = false;
+					m_vidc->set_cursor_enable(m_cursor_enabled);
 				}
 
-				if ((data>>11) & 1)
+				m_vidc->update_sound_mode(m_audio_dma_on);
+				if (m_audio_dma_on)
 				{
 					//printf("MEMC: Starting audio DMA at %d uSec, buffer from %x to %x\n", ((m_vidc_regs[0xc0]&0xff)-2)*8, m_vidc_sndstart, m_vidc_sndend);
 
-					double sndhz = 1e6 / ((m_vidc_regs[0xc0] & 0xff) + 2);
-					sndhz /= 8.0;
-					m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
 					//printf("MEMC: audio DMA start, sound freq %d, sndhz = %f\n", (m_vidc_regs[0xc0] & 0xff)-2, sndhz);
 
 					m_vidc_sndcur = m_vidc_sndstart;

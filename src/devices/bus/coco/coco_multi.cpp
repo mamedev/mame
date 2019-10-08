@@ -205,7 +205,7 @@ void coco_multipak_device::device_add_mconfig(machine_config &config)
 
 INPUT_PORTS_START( coco_multipack )
 	PORT_START( SWITCH_CONFIG_TAG )
-	PORT_CONFNAME( 0x03, 0x03, "Multi-Pak Slot Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, coco_multipak_device, switch_changed, nullptr)
+	PORT_CONFNAME( 0x03, 0x03, "Multi-Pak Slot Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, coco_multipak_device, switch_changed, 0)
 		PORT_CONFSETTING( 0x00, "Slot 1" )
 		PORT_CONFSETTING( 0x01, "Slot 2" )
 		PORT_CONFSETTING( 0x02, "Slot 3" )

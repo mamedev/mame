@@ -609,18 +609,19 @@ void md_cons_state::genesis_32x(machine_config &config)
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
 	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
 	m_vdp->reset_routes();
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.25)/2);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.50)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_screen("megadriv");
+	m_32x->add_route(0, "lspeaker", 1.00);
+	m_32x->add_route(1, "rspeaker", 1.00);
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the YM because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
-	config.device_remove("ymsnd");
-
-	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7);
+	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
 
@@ -643,18 +644,19 @@ void md_cons_state::mdj_32x(machine_config &config)
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
 	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
 	m_vdp->reset_routes();
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.25)/2);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.50)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_screen("megadriv");
+	m_32x->add_route(0, "lspeaker", 1.00);
+	m_32x->add_route(1, "rspeaker", 1.00);
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
-	config.device_remove("ymsnd");
-
-	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7);
+	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
 
@@ -677,18 +679,19 @@ void md_cons_state::md_32x(machine_config &config)
 	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
 	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
 	m_vdp->reset_routes();
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.25)/2);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.50)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.50)/2);
 
 	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_screen("megadriv");
+	m_32x->add_route(0, "lspeaker", 1.00);
+	m_32x->add_route(1, "rspeaker", 1.00);
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
-	config.device_remove("ymsnd");
-
-	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7);
+	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
 
@@ -742,8 +745,9 @@ void md_cons_state::genesis_scd(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
+	m_segacd->set_screen("megadriv");
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -760,8 +764,9 @@ void md_cons_state::md_scd(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
+	m_segacd->set_screen("megadriv");
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -778,8 +783,9 @@ void md_cons_state::mdj_scd(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
+	m_segacd->set_screen("megadriv");
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -793,8 +799,9 @@ void md_cons_state::genesis_32x_scd(machine_config &config)
 	genesis_32x(config);
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
+	m_segacd->set_screen("megadriv");
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -812,8 +819,9 @@ void md_cons_state::md_32x_scd(machine_config &config)
 	md_32x(config);
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
+	m_segacd->set_screen("megadriv");
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -831,8 +839,9 @@ void md_cons_state::mdj_32x_scd(machine_config &config)
 	mdj_32x(config);
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
-	m_segacd->set_palette("gen_vdp:palette");
+	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
+	m_segacd->set_screen("megadriv");
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 

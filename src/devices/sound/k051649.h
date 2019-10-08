@@ -16,18 +16,18 @@ class k051649_device : public device_t,
 						public device_sound_interface
 {
 public:
-	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void    k051649_waveform_w(offs_t offset, uint8_t data);
-	uint8_t k051649_waveform_r(offs_t offset);
-	void    k051649_volume_w(offs_t offset, uint8_t data);
-	void    k051649_frequency_w(offs_t offset, uint8_t data);
-	void    k051649_keyonoff_w(uint8_t data);
-	void    k051649_test_w(uint8_t data);
-	uint8_t k051649_test_r();
+	void k051649_waveform_w(offs_t offset, u8 data);
+	u8   k051649_waveform_r(offs_t offset);
+	void k051649_volume_w(offs_t offset, u8 data);
+	void k051649_frequency_w(offs_t offset, u8 data);
+	void k051649_keyonoff_w(u8 data);
+	void k051649_test_w(u8 data);
+	u8   k051649_test_r();
 
-	void    k052539_waveform_w(offs_t offset, uint8_t data);
-	uint8_t k052539_waveform_r(offs_t offset);
+	void k052539_waveform_w(offs_t offset, u8 data);
+	u8   k052539_waveform_r(offs_t offset);
 
 	void scc_map(address_map &map);
 protected:
@@ -48,16 +48,16 @@ private:
 			counter(0),
 			frequency(0),
 			volume(0),
-			key(0)
+			key(false)
 		{
 			std::fill(std::begin(waveram), std::end(waveram), 0);
 		}
 
-		unsigned long counter;
+		u64 counter;
 		int frequency;
 		int volume;
-		int key;
-		signed char waveram[32];
+		bool key;
+		s8 waveram[32];
 	};
 
 	void make_mixer_table(int voices);
@@ -70,12 +70,12 @@ private:
 	int m_rate;
 
 	/* mixer tables and internal buffers */
-	std::unique_ptr<int16_t[]> m_mixer_table;
-	int16_t *m_mixer_lookup;
-	std::vector<short> m_mixer_buffer;
+	std::unique_ptr<s16[]> m_mixer_table;
+	s16 *m_mixer_lookup;
+	std::vector<s16> m_mixer_buffer;
 
 	/* chip registers */
-	uint8_t m_test;
+	u8 m_test;
 };
 
 DECLARE_DEVICE_TYPE(K051649, k051649_device)

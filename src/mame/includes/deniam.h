@@ -10,6 +10,7 @@
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class deniam_state : public driver_device
 {

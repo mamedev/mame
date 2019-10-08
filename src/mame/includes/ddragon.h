@@ -17,6 +17,7 @@
 #include "sound/msm5205.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class ddragon_state : public driver_device
@@ -54,7 +55,7 @@ public:
 	void init_ddragon();
 	void init_ddragon6809();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_bus_free);
+	DECLARE_READ_LINE_MEMBER(subcpu_bus_free_r);
 
 protected:
 	required_device<cpu_device> m_maincpu;

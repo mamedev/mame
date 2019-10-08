@@ -6,6 +6,7 @@
 #pragma once
 
 #include "galaga.h"
+#include "tilemap.h"
 
 class bosco_state : public galaga_state
 {

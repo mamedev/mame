@@ -10,29 +10,107 @@
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 1).img" size="1474560" crc="25da86b7" sha1="99e9fa57e0d7d03fb89611745bd04b4d7c4af998" offset="0" />
+				<rom name="clarisworks 2.0 (swe) (disk 1).img" size="1474560" crc="25da86b7" sha1="99e9fa57e0d7d03fb89611745bd04b4d7c4af998" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 2).img" size="1474560" crc="76e73be8" sha1="46921d446169d949b37879f6cbbdfb802323b7ef" offset="0" />
+				<rom name="clarisworks 2.0 (swe) (disk 2).img" size="1474560" crc="76e73be8" sha1="46921d446169d949b37879f6cbbdfb802323b7ef" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 3).img" size="1474560" crc="8e2dbabc" sha1="6b2b982348874be31899b6b2bace55518e5e9477" offset="0" />
+				<rom name="clarisworks 2.0 (swe) (disk 3).img" size="1474560" crc="8e2dbabc" sha1="6b2b982348874be31899b6b2bace55518e5e9477" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 4).img" size="1474560" crc="9ad039ef" sha1="18777ffd48cb9a016b169e38cf867f81367271b0" offset="0" />
+				<rom name="clarisworks 2.0 (swe) (disk 4).img" size="1474560" crc="9ad039ef" sha1="18777ffd48cb9a016b169e38cf867f81367271b0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_3_5">
+		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 5).img" size="1474560" crc="f74f6289" sha1="b60aae3606fec538dc60ba15bbec47e3da607a65" offset="0" />
+				<rom name="clarisworks 2.0 (swe) (disk 5).img" size="1474560" crc="f74f6289" sha1="b60aae3606fec538dc60ba15bbec47e3da607a65" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="losttime" supported="no">
+		<description>Lost in Time - Parts 1 &amp; 2</description>
+		<year>1994</year>
+		<publisher>Coktel Vision</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 0/11" />
+			<dataarea name="flop" size="4225901">
+				<rom name="lost in time parts 1 and 2 disk 0.mfm" size="4225901" crc="40b4cbe8" sha1="8cd3b6630a5f2c1c919fe5467cb01d182dab815c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1/11" />
+			<dataarea name="flop" size="4227608">
+				<rom name="lost in time parts 1 and 2 disk 1.mfm" size="4227608" crc="d6539f2a" sha1="41b93b11deda1699829871642070f195521c6658" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2/11" />
+			<dataarea name="flop" size="4230944">
+				<rom name="lost in time parts 1 and 2 disk 2.mfm" size="4230944" crc="1840d8bb" sha1="9388e3ae4378eb56468c9f3c2593978fa9a08d89" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3/11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="lost in time parts 1 and 2 disk 3.img" size="1474560" crc="ac9a184c" sha1="76ebc2add400c70e4cf423f148ae8448b51862b4" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4/11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="lost in time parts 1 and 2 disk 4.img" size="1474560" crc="2079d94b" sha1="af717f6c7f2a02a95b9454d67d77f3d04598dd5a" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5/11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="lost in time parts 1 and 2 disk 5.img" size="1474560" crc="4981d7e8" sha1="6ce0a76ee931f1694ebaa98b92707fc3a3d9ebac" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6/11" />
+			<dataarea name="flop" size="4229723">
+				<rom name="lost in time parts 1 and 2 disk 6.mfm" size="4229723" crc="820ded1c" sha1="53ae8c0b6615d2b2f39f97b33b8e00a2e5d4107b" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7/11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="lost in time parts 1 and 2 disk 7.img" size="1474560" crc="9fa7a219" sha1="b487d5362918b2155c41be6aba6369d70b2fbc2c" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8/11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="lost in time parts 1 and 2 disk 8.img" size="1474560" crc="bde51c41" sha1="a6051b2c35941c72bd61c38ef47e192ad0ddd16e" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9/11" />
+			<dataarea name="flop" size="4228962">
+				<rom name="lost in time parts 1 and 2 disk 9.mfm" size="4228962" crc="32133326" sha1="b7f51902a5b26a9628ab93a69341f15b8ede06b1" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 10/11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="lost in time parts 1 and 2 disk 10.img" size="1474560" crc="37d1202d" sha1="2d8d6cfe679d5a5d8c6f1df70a68c710c3aa98ce" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 11/11" />
+			<dataarea name="flop" size="4225984">
+				<rom name="lost in time parts 1 and 2 disk 11.mfm" size="4225984" crc="00626ee8" sha1="87b70f342762eb88a3e625e43914aadae8660217" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

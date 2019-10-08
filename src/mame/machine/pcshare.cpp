@@ -221,7 +221,7 @@ void pcat_base_state::pcat_common(machine_config &config)
 	m_mc146818->set_century_index(0x32);
 
 	KBDC8042(config, m_kbdc, 0);
-	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	m_kbdc->input_buffer_full_callback().set(m_pic8259_1, FUNC(pic8259_device::ir1_w));

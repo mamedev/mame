@@ -16,6 +16,7 @@
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
+#include "tilemap.h"
 
 class gauntlet_state : public atarigen_state
 {

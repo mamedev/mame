@@ -77,7 +77,7 @@ public:
 
 	void famibox(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
+	DECLARE_READ_LINE_MEMBER(coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -421,7 +421,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(famibox_state::famibox_coin_r)
+READ_LINE_MEMBER(famibox_state::coin_r)
 {
 	return m_coins > 0;
 }
@@ -480,7 +480,7 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPSETTING(    0x08, "Key position 4" )
 	PORT_DIPSETTING(    0x10, "Key position 5" )
 	PORT_DIPSETTING(    0x20, "Key position 6" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, famibox_state,famibox_coin_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(famibox_state, coin_r)
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state,coin_inserted, 0)

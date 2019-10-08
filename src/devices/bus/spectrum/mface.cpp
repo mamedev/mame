@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_MPRINT, spectrum_mprint_device, "spectrum_mprint", "
 
 INPUT_PORTS_START(mface)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Multiface") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_mface1_device, magic_button, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Multiface") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_mface1_device, magic_button, 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -177,9 +177,9 @@ READ_LINE_MEMBER(spectrum_mface1_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
-void spectrum_mface1_device::opcode_fetch(offs_t offset)
+void spectrum_mface1_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp->opcode_fetch(offset);
+	m_exp->pre_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{

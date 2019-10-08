@@ -41,7 +41,7 @@ public:
 	void init_esb();
 	void init_starwars();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(matrix_flag_r);
+	DECLARE_READ_LINE_MEMBER(matrix_flag_r);
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;

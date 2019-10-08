@@ -415,10 +415,9 @@ void device_serial_interface::transmit_register_setup(u8 data_byte)
 	}
 
 	/* stop bit(s) + 1 extra bit as delay between bytes, needed to get 1 stop bit to work.  */
-	for (i=0; i<=m_df_stop_bit_count; i++)
-	{
-		transmit_register_add_bit(1);
-	}
+	if (m_df_stop_bit_count)  // no stop bits for synchronous
+		for (i=0; i<=m_df_stop_bit_count; i++)   // ToDo - see if the hack on this line is still needed (was added 2016-04-10)
+			transmit_register_add_bit(1);
 }
 
 

@@ -79,7 +79,7 @@ MACHINE_START_MEMBER(playch10_state,playch10_hboard)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(playch10_state::pc10_int_detect_r)
+READ_LINE_MEMBER(playch10_state::int_detect_r)
 {
 	return ~m_pc10_int_detect & 1;
 }

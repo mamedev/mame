@@ -9,6 +9,7 @@
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /*************************************************************************
 

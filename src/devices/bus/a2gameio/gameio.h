@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #ifndef MAME_BUS_A2GAMEIO_GAMEIO_H
-#define MAME_BUS_A2GAMEIO_GAMEIO_H 1
+#define MAME_BUS_A2GAMEIO_GAMEIO_H
 
 #pragma once
 

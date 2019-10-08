@@ -6,9 +6,8 @@ Argo
 
 2011-03-16 Skeleton driver.
 
-Some info obtained from EMU-80.
 There are no manuals, diagrams, or anything else available afaik.
-The entire driver is guesswork.
+The entire driver is guesswork, however it appears to be related to UNIOR.
 
 The monitor will only allow certain characters to be typed, thus the
 modifier keys appear to do nothing. There is no need to use the enter
@@ -17,21 +16,24 @@ key; using spacebar and the correct parameters is enough.
 Commands: same as UNIOR
 
 ToDo:
-- Add devices
+- Add remaining devices, most likely 8255.
 - There is no obvious evidence of sound.
-- Cassette
--- no info available but seems to be much the same as Unior, so code copied over
--- clock not hooked up, don't know where it comes from
--- unable to test as the i8251 device needs work to support syndet
+- our dma doesn't emulate the update_flag, so had to use a hack for the L command
+- cursor is one character further to the right than it should be, used another hack
 
 ****************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
+#include "machine/pit8253.h"
+#include "machine/i8257.h"
+#include "video/i8275.h"
 #include "imagedev/cassette.h"
 //#include "sound/spkrdev.h"
 #include "speaker.h"
+#include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -44,7 +46,12 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_uart(*this, "uart")
+		, m_pit(*this, "pit")
+		, m_dma(*this, "dma")
+		, m_crtc(*this, "crtc")
 		, m_cass(*this, "cassette")
+		, m_palette(*this, "palette")
+		, m_io_keyboard(*this, "X%d", 0)
 	{ }
 
 	void argo(machine_config &config);
@@ -60,23 +67,31 @@ private:
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
 	DECLARE_READ8_MEMBER(argo_io_r);
 	DECLARE_WRITE8_MEMBER(argo_io_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(z0_w);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void argo_palette(palette_device &palette) const;
+	DECLARE_READ8_MEMBER(dma_r);
+	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<i8251_device> m_uart;
+	required_device<pit8253_device> m_pit;
+	required_device<i8257_device> m_dma;
+	required_device<i8275_device> m_crtc;
 	required_device<cassette_image_device> m_cass;
+	required_device<palette_device> m_palette;
+	required_ioport_array<11> m_io_keyboard;
 	uint8_t m_framecnt;
-	uint8_t m_cursor_pos[3];
-	uint8_t m_p_cursor_pos;
 	bool m_ram_ctrl;
 	uint8_t m_scroll_ctrl;
-	bool m_txd, m_txe;
+	bool m_txe, m_txd, m_rts, m_casspol;
+	u8 m_cass_data[4];
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -86,11 +101,12 @@ WRITE8_MEMBER(argo_state::argo_videoram_w)
 {
 	uint8_t *RAM;
 	if (m_ram_ctrl)
-		RAM = memregion("videoram")->base();
+		m_p_videoram[offset] = data;
 	else
+	{
 		RAM = memregion("extraram")->base();
-
-	RAM[offset] = data;
+		RAM[offset] = data;
+	}
 }
 
 READ8_MEMBER(argo_state::argo_io_r)
@@ -99,19 +115,31 @@ READ8_MEMBER(argo_state::argo_io_r)
 
 	switch (low_io)
 	{
-	case 0xC1: // uart data
-		return m_uart->data_r();
-
-	case 0xC3: // uart status
-		return m_uart->status_r();
-
 	case 0xA1: // keyboard
-		char kbdrow[6];
-		sprintf(kbdrow,"X%X",uint8_t(offset>>8));
-		return ioport(kbdrow)->read();
+		offset >>= 8;
+		if (offset < 11)
+			return m_io_keyboard[offset]->read();
+		else
+			return 0xff;
+
+	case 0xA0:
+	case 0xA2:
+	case 0xA4:
+	case 0xA6:
+		offset >>= 1;
+		return m_pit->read(offset&3);
+
+	case 0xC0:
+	case 0xC4:
+		offset >>= 2;
+		return m_crtc->read(space, offset&1);
 
 	case 0xE8: // wants bit 4 low then high
-		return m_framecnt << 4;
+		{
+			u8 data = m_dma->read(space, 8);
+			data |= (m_framecnt << 4);  // hack because dma update_flag is not emulated
+			return data;
+		}
 
 	default:
 		logerror("%s: In %X\n",machine().describe_context(),low_io);
@@ -121,16 +149,14 @@ READ8_MEMBER(argo_state::argo_io_r)
 
 WRITE8_MEMBER(argo_state::argo_io_w)
 {
-	uint8_t low_io = offset;
-
-	switch (low_io)
+	switch (offset)
 	{
-	case 0xC1: // uart data
-		m_uart->data_w(data);
-		break;
-
-	case 0xC3: // uart control
-		m_uart->control_w(data);
+	case 0xA0:
+	case 0xA2:
+	case 0xA4:
+	case 0xA6:
+		offset >>= 1;
+		m_pit->write(offset&3, data);
 		break;
 
 	case 0xA1: // prep scroll step 1
@@ -142,65 +168,157 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 			m_scroll_ctrl++;
 		break;
 
-	case 0xE8: // hardware scroll - we should use ports E0,E1,E2,E3
-		if ((m_scroll_ctrl == 2) & (data == 0xe3))
-		{
-			uint8_t *RAM = memregion("videoram")->base();
-			m_scroll_ctrl = 0;
-			memmove(RAM, RAM+80, 24*80);
-		}
-		break;
-
-	case 0xC4: // prepare to receive cursor position
-		m_p_cursor_pos = (data == 0x80);
-		break;
-
-	case 0xC0: // store cursor position if it followed 'out c4,80'
-		if (m_p_cursor_pos)
-		{
-			m_cursor_pos[m_p_cursor_pos]=data;
-			if (m_p_cursor_pos == 1) m_p_cursor_pos++;
-		}
-		break;
-
 	case 0xB9: // switch between videoram and extraram
 		m_ram_ctrl = (data == 0x61);
 		break;
 
+	case 0xC0:
+	case 0xC4:
+		offset >>= 2;
+		m_crtc->write(space, offset&1, data);
+		break;
+
+	case 0xE8: // hardware scroll
+		if ((m_scroll_ctrl == 2) & (data == 0xe3))
+		{
+			memmove(m_p_videoram, m_p_videoram+80, 24*80);
+			m_scroll_ctrl = 0;
+		}
+		m_dma->write(space, 8, data);
+		break;
+
 	default:
-		logerror("%s: Out %X,%X\n",machine().describe_context(),low_io,data);
+		logerror("%s: Out %X,%X\n",machine().describe_context(),offset,data);
 	}
 }
 
-// Untested. This needs to be driven by a 2400Hz clock.
-WRITE_LINE_MEMBER(argo_state::ctc_z1_w)
+TIMER_DEVICE_CALLBACK_MEMBER( argo_state::kansas_r )
 {
-	// write
-	if (m_txe)
-		m_cass->output(1);
-	else
-		m_cass->output((m_txd ^ state) ? 1 : 0);
+	if (m_rts)
+	{
+		m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
+		m_casspol = 1;
+		return;
+	}
 
-	m_uart->write_txc(state);
+	m_cass_data[1]++;
+	m_cass_data[2]++;
 
-	// read - untested
-	m_uart->write_rxd((m_cass->input() > 0.04) ? 1 : 0);
-	m_uart->write_rxc(state);
+	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		if (m_cass_data[1] > 13)
+			m_casspol ^= 1;
+		m_cass_data[1] = 0;
+		m_cass_data[2] = 0;
+		m_uart->write_rxd(m_casspol);
+	}
+	if ((m_cass_data[2] & 7)==2)
+	{
+		m_cass_data[3]++;
+		m_uart->write_rxc(BIT(m_cass_data[3], 0));
+	}
 }
 
+WRITE_LINE_MEMBER(argo_state::z0_w)
+{
+	// write - incoming 2400Hz
+	m_uart->write_txc(state);
+	if (!m_txe)
+	{
+		m_cass->output((m_txd ^ state) ? -1.0 : 1.0);
+	}
+
+	// read - incoming 2514Hz
+}
+
+READ8_MEMBER(argo_state::dma_r)
+{
+	if (offset < 0xf800)
+		return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	else
+		return m_p_videoram[offset & 0x7ff];
+}
+
+WRITE_LINE_MEMBER( argo_state::hrq_w )
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_dma->hlda_w(state);
+}
+
+I8275_DRAW_CHARACTER_MEMBER(argo_state::display_pixels)
+{
+	if ((x == 0) && (y == 0))
+		m_framecnt++;
+
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	uint8_t gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
+
+	if (vsp)
+		gfx = 0;
+
+	if (lten)
+	{
+		gfx = 0xff;
+		if (x > 6)
+			x-=6; // hack to fix cursor position
+	}
+
+	if (rvv)
+		gfx ^= 0xff;
+
+	for(uint8_t i=0;i<7;i++)
+		bitmap.pix32(y, x + i) = palette[BIT(gfx, 6-i) ? (hlgt ? 2 : 1) : 0];
+}
+
+static constexpr rgb_t argo_pens[3] =
+{
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0xa0, 0xa0, 0xa0 }, // white
+	{ 0xff, 0xff, 0xff }  // highlight
+};
+
+void argo_state::argo_palette(palette_device &palette) const
+{
+	palette.set_pen_colors(0, argo_pens);
+}
+
+
+/* F4 Character Displayer */
+static const gfx_layout argo_charlayout =
+{
+	8, 9,                   /* 8 x 9 characters */
+	512,                    /* 512 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
+	8*16                    /* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( gfx_argo )
+	GFXDECODE_ENTRY( "chargen", 0x0000, argo_charlayout, 0, 1 )
+GFXDECODE_END
 
 void argo_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).bankrw("boot");
-	map(0x0800, 0xf7af).ram();
-	map(0xf7b0, 0xf7ff).ram().share("videoram");
+	map(0x0800, 0xf7ff).ram();
 	map(0xf800, 0xffff).rom().w(FUNC(argo_state::argo_videoram_w));
 }
 
 void argo_state::io_map(address_map &map)
 {
-	map(0x0000, 0xFFFF).rw(FUNC(argo_state::argo_io_r), FUNC(argo_state::argo_io_w));
+	map(0x0000, 0xFFFF).r(FUNC(argo_state::argo_io_r));
+	map(0x0000, 0x00ff).mirror(0xff00).w(FUNC(argo_state::argo_io_w));
+	map(0x00c1, 0x00c1).mirror(0xff00).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x00c3, 0x00c3).mirror(0xff00).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00e0, 0x00e7).mirror(0xff00).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 }
 
 /* Input ports */
@@ -295,7 +413,7 @@ static INPUT_PORTS_START( argo ) // Keyboard was worked out by trial & error;'F'
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\'")          PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[")           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-")           PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-')
-	PORT_START("XA")
+	PORT_START("X10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")           PORT_CODE(KEYCODE_9)          PORT_CHAR('9')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")           PORT_CODE(KEYCODE_O)          PORT_CHAR('O')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")           PORT_CODE(KEYCODE_L)          PORT_CHAR('L') // if L is the first character, computer hangs
@@ -304,8 +422,6 @@ static INPUT_PORTS_START( argo ) // Keyboard was worked out by trial & error;'F'
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";")           PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")           PORT_CODE(KEYCODE_P)          PORT_CHAR('P')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
-	PORT_START("XB")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -318,7 +434,7 @@ void argo_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in argo_state::device_timer");
+		throw emu_fatalerror("Unknown id in argo_state::device_timer");
 	}
 }
 
@@ -334,78 +450,22 @@ void argo_state::init_argo()
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
-uint32_t argo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x;
-	uint8_t *p_vram = m_p_videoram;
-
-	m_framecnt++;
-
-	for (y = 0; y < 25; y++)
-	{
-		for (ra = 0; ra < 10; ra++)
-		{
-			uint32_t *p = &bitmap.pix32(sy++);
-
-			for (x = 1; x < 81; x++) // align x to the cursor position numbers
-			{
-				gfx = 0;
-
-				if (ra < 9)
-				{
-					chr = p_vram[x+ma-1];
-
-					/* Take care of flashing characters */
-					//if ((chr & 0x80) && (m_framecnt & 0x08))
-					//  chr = 0x20;
-
-					chr &= 0x7f;
-
-					gfx = m_p_chargen[(chr<<4) | ra ];
-				}
-				else
-				// display cursor if at cursor position and flash on
-				if ((x==m_cursor_pos[1]) && (y==m_cursor_pos[2]) && (m_framecnt & 0x08))
-					gfx = 0xff;
-
-				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7) ? rgb_t::white() : rgb_t::black();
-				*p++ = BIT(gfx, 6) ? rgb_t::white() : rgb_t::black();
-				*p++ = BIT(gfx, 5) ? rgb_t::white() : rgb_t::black();
-				*p++ = BIT(gfx, 4) ? rgb_t::white() : rgb_t::black();
-				*p++ = BIT(gfx, 3) ? rgb_t::white() : rgb_t::black();
-				*p++ = BIT(gfx, 2) ? rgb_t::white() : rgb_t::black();
-				*p++ = BIT(gfx, 1) ? rgb_t::white() : rgb_t::black();
-				*p++ = BIT(gfx, 0) ? rgb_t::white() : rgb_t::black();
-			}
-		}
-
-		if (y)
-			ma+=80;
-		else
-		{
-			ma=0;
-			p_vram = memregion("videoram")->base();
-		}
-	}
-	return 0;
-}
 
 void argo_state::argo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3500000);
+	Z80(config, m_maincpu, 3500000); // unknown frequency
 	m_maincpu->set_addrmap(AS_PROGRAM, &argo_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &argo_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(argo_state::screen_update));
-	screen.set_size(640, 250);
+	screen.set_size(640, 200);
 	screen.set_visarea_full();
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_argo);
+	PALETTE(config, m_palette, FUNC(argo_state::argo_palette), 3);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -414,11 +474,30 @@ void argo_state::argo(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(argo_state::kansas_r), attotime::from_hz(38400));
 
 	/* Devices */
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
 	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
+	m_uart->rts_handler().set([this] (bool state) { m_rts = state; });
+
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(1689600); // this gives the 2400Hz required by the cassette
+	m_pit->out_handler<0>().set(FUNC(argo_state::z0_w));
+	m_pit->set_clk<1>(0);
+	m_pit->set_clk<2>(0);
+
+	I8257(config, m_dma, XTAL(20'000'000) / 9);  // unknown frequency
+	m_dma->out_hrq_cb().set(FUNC(argo_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(argo_state::dma_r));
+	m_dma->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
+
+	i8275_device &crtc(I8275(config, "crtc", XTAL(20'000'000) / 12));  // unknown frequency
+	crtc.set_character_width(6);
+	crtc.set_display_callback(FUNC(argo_state::display_pixels), this);
+	crtc.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	crtc.set_screen("screen");
 }
 
 /* ROM definition */
@@ -437,4 +516,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY      FULLNAME  FLAGS */
-COMP( 1986, argo, 0,      0,      argo,    argo,  argo_state, init_argo, "<unknown>", "Argo",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, argo, unior,  0,      argo,    argo,  argo_state, init_argo, "<unknown>", "Argo",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

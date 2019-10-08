@@ -37,6 +37,7 @@ ft5_v6_c4.u58 /
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define NVRAM_HACK 1

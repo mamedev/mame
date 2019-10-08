@@ -519,3 +519,34 @@ READ_LINE_MEMBER( namcoio_device::read_reset_line )
 {
 	return m_reset;
 }
+
+
+ROM_START(namco_56xx)
+	ROM_REGION(0x400, "mcu", 0)
+	ROM_LOAD("56xx.bin", 0x0000, 0x0400, NO_DUMP)
+ROM_END
+
+ROM_START(namco_58xx)
+	ROM_REGION(0x400, "mcu", 0)
+	ROM_LOAD("58xx.bin", 0x0000, 0x0400, NO_DUMP)
+ROM_END
+
+ROM_START(namco_59xx)
+	ROM_REGION(0x400, "mcu", 0)
+	ROM_LOAD("59xx.bin", 0x0000, 0x0400, NO_DUMP)
+ROM_END
+
+const tiny_rom_entry *namco56xx_device::device_rom_region() const
+{
+	return ROM_NAME(namco_56xx);
+}
+
+const tiny_rom_entry *namco58xx_device::device_rom_region() const
+{
+	return ROM_NAME(namco_58xx);
+}
+
+const tiny_rom_entry *namco59xx_device::device_rom_region() const
+{
+	return ROM_NAME(namco_59xx);
+}

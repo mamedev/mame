@@ -808,7 +808,7 @@ int video_manager::effective_frameskip() const
 inline bool video_manager::effective_throttle() const
 {
 	// if we're paused, or if the UI is active, we always throttle
-	if (machine().paused()) //|| machine().ui().is_menu_active())
+	if (machine().paused() && !machine().options().update_in_pause()) //|| machine().ui().is_menu_active())
 		return true;
 
 	// if we're fast forwarding, we don't throttle

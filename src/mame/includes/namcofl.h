@@ -91,7 +91,6 @@ private:
 	TIMER_CALLBACK_MEMBER(raster_interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 	void common_init();
 	int FLobjcode2tile(int code);
 	void TilemapCB(uint16_t code, int *tile, int *mask);

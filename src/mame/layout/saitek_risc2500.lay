@@ -3,7 +3,7 @@
 <!-- define elements -->
 	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.2" green="0.16" blue="0.16" />
 		</led7seg>
 	</element>
 	<element name="led" defstate="1">
@@ -58,19 +58,59 @@
 	<element name="text_p4">      <image file="chess/bb.png"/></element>
 	<element name="text_p5">      <image file="chess/bn.png"/></element>
 	<element name="text_p6">      <image file="chess/bp.png"/></element>
-	<element name="sym_colon">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string=":"  state="1"> <color red="1.0" green="1.0" blue="1.0" /></text> </element>
-	<element name="sym_left">     <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x2190;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
-	<element name="sym_right">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x2192;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
-	<element name="sym_p1">       <image file="chess/wk.png" state="1"/> </element>
-	<element name="sym_p2">       <image file="chess/wq.png" state="1"/> </element>
-	<element name="sym_p3">       <image file="chess/wr.png" state="1"/> </element>
-	<element name="sym_p4">       <image file="chess/wb.png" state="1"/> </element>
-	<element name="sym_p5">       <image file="chess/wn.png" state="1"/> </element>
-	<element name="sym_p6">       <image file="chess/wp.png" state="1"/> </element>
-	<element name="sym_white">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x25cb;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
-	<element name="sym_black">    <text string="&#x25cf;" state="1">    <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_colon">
+		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
+		<text state="0" string=":"> <color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string=":"> <color red="0.2" green="0.16" blue="0.16" /></text>
+	</element>
+	<element name="sym_left">
+		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
+		<text state="0" string="&#x2190;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="&#x2190;">  <color red="0.2" green="0.16" blue="0.16" /></text>
+	</element>
+	<element name="sym_right">
+		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
+		<text state="0" string="&#x2192;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="&#x2192;">  <color red="0.2" green="0.16" blue="0.16" /></text>
+	</element>
+	<element name="sym_white">
+		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
+		<text state="0" string="&#x25cb;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
+		<text state="1" string="&#x25cb;">  <color red="0.2" green="0.16" blue="0.16" /></text>
+	</element>
+	<element name="sym_black">
+		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<text state="0" string="&#x25cf;">  <color red="0.91300" green="0.90411" blue="0.89188" /></text>
+		<text state="1" string="&#x25cf;">  <color red="0.36954" green="0.27945" blue="0.27567" /></text>
+	</element>
+	<element name="sym_p1">
+		<image state="0" file="chess/bk.png"><color alpha="0.06"/></image>
+		<image state="1" file="chess/bk.png"><color alpha="0.65"/></image>
+	</element>
+	<element name="sym_p2">
+		<image state="0" file="chess/bq.png"><color alpha="0.06"/></image>
+		<image state="1" file="chess/bq.png"><color alpha="0.65"/></image>
+	</element>
+	<element name="sym_p3">
+		<image state="0" file="chess/br.png"><color alpha="0.06"/></image>
+		<image state="1" file="chess/br.png"><color alpha="0.65"/></image>
+	</element>
+	<element name="sym_p4">
+		<image state="0" file="chess/bb.png"><color alpha="0.06"/></image>
+		<image state="1" file="chess/bb.png"><color alpha="0.65"/></image>
+	</element>
+	<element name="sym_p5">
+		<image state="0" file="chess/bn.png"><color alpha="0.06"/></image>
+		<image state="1" file="chess/bn.png"><color alpha="0.65"/></image>
+	</element>
+	<element name="sym_p6">
+		<image state="0" file="chess/bp.png"><color alpha="0.06"/></image>
+		<image state="1" file="chess/bp.png"><color alpha="0.65"/></image>
+	</element>
+
+	<element name="lcd_bg"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 	<element name="background"><rect><color red="0.63" green="0.63" blue="0.63" /></rect></element>
-	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="blackb"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
 
 	<element name="piece" defstate="0">
 		<image file="chess/wp.png" state="1"/>
@@ -355,7 +395,8 @@
 	<!-- LCD panel -->
 	<group name="lcd">
 		<bounds x="0" y="0" width="30" height="11.2" />
-		<screen index="0" blend="alpha"><bounds x="0" y="0" width="30" height="4" /></screen>
+		<element ref="lcd_bg"><bounds x="0" y="0" width="30.0" height="11.2" /></element>
+		<screen index="0" blend="alpha"><bounds x="0" y="0.3" width="30" height="3.5" /></screen>
 
 		<bezel name="sym12"  element="sym_colon" ><bounds x="12.0"   y="4.5" width="1.5" height="3" /></bezel>
 		<bezel name="sym13"  element="sym_colon" ><bounds x="24.2"   y="4.5" width="1.5" height="3" /></bezel>
@@ -373,14 +414,14 @@
 		<bezel name="digit0"  element="digit" ><bounds x="27.85" y="4.5" width="1.6" height="3" /></bezel>
 
 		<bezel name="sym1" element="sym_right" >  <bounds x="26.60"  y="7.7" width="3"   height="3" /></bezel>
-		<bezel name="sym2" element="sym_p6" >     <bounds x="21.60"  y="8.1" width="2.5" height="2.2" /></bezel>
-		<bezel name="sym3" element="sym_p5" >     <bounds x="18.85"  y="8.1" width="2.5" height="2.2" /></bezel>
-		<bezel name="sym4" element="sym_p4" >     <bounds x="16.08"  y="8.1" width="2.5" height="2.2" /></bezel>
-		<bezel name="sym6" element="sym_p3" >     <bounds x="13.30"  y="8.1" width="2.5" height="2.2" /></bezel>
-		<bezel name="sym7" element="sym_p2" >     <bounds x="10.53"  y="8.1" width="2.5" height="2.2" /></bezel>
+		<bezel name="sym2" element="sym_p6" >     <bounds x="24.0"  y="8.1" width="2.5" height="2.2" /></bezel>
+		<bezel name="sym3" element="sym_p5" >     <bounds x="20.75" y="8.1" width="2.5" height="2.2" /></bezel>
+		<bezel name="sym4" element="sym_p4" >     <bounds x="17.50" y="8.1" width="2.5" height="2.2" /></bezel>
+		<bezel name="sym6" element="sym_p3" >     <bounds x="14.25"  y="8.1" width="2.5" height="2.2" /></bezel>
+		<bezel name="sym7" element="sym_p2" >     <bounds x="11.00" y="8.1" width="2.5" height="2.2" /></bezel>
 		<bezel name="sym8" element="sym_p1" >     <bounds x="7.75"   y="8.1" width="2.5" height="2.2" /></bezel>
-		<bezel name="sym9" element="sym_white" >  <bounds x="4.00"   y="7.5"   width="4"   height="3" /></bezel>
-		<bezel name="sym10" element="sym_black" > <bounds x="4.91"   y="7.97" width="2.2" height="2.2" /></bezel>
+		<element name="sym9" ref="sym_white" >    <bounds x="3.55"   y="7.5"   width="4"   height="3" /></element>
+		<element name="sym10" ref="sym_black" blend="multiply"> <bounds x="4.45"   y="7.97" width="2.2" height="2.2" /></element>
 		<bezel name="sym11" element="sym_left" >  <bounds x="0.40"   y="7.7" width="3"   height="3" /></bezel>
 	</group>
 
@@ -389,7 +430,7 @@
 		<bounds x="0" y="0" width="167" height="90" />
 
 		<element ref="background"><bounds x="13" y="0" width="154" height="90" /></element>
-		<element ref="blackb"><bounds x="108" y="4" width="30" height="12" /></element>
+		<element ref="blackb"><bounds x="107.8" y="4.3" width="30.4" height="11.6" /></element>
 
 		<bezel element="text_8"     ><bounds x="18" y="6"  width="2" height="2" /></bezel>
 		<bezel element="text_7"     ><bounds x="18" y="16" width="2" height="2" /></bezel>

@@ -296,9 +296,10 @@ Switches   Aux-RS232   Aux Port   Alpha      Vend-Bus
 class mpu5_state : public driver_device
 {
 public:
-	mpu5_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+	mpu5_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_sec(*this, "sec")
 	{ }
 
 	void mpu5(machine_config &config);
@@ -320,7 +321,6 @@ private:
 
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
-	SEC sec;
 
 	uint8_t m_led_strobe_temp;
 	uint8_t m_led_strobe;
@@ -335,6 +335,7 @@ private:
 
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
+	required_device<sec_device> m_sec;
 };
 
 READ8_MEMBER(mpu5_state::asic_r8)
@@ -476,9 +477,9 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 		case 0x09:
 		{
 			//Assume SEC fitted for now
-			sec.write_data_line(~data&0x01);
-			sec.write_clock_line(~data&0x02);
-			sec.write_cs_line(~data&0x04);
+			m_sec->data_w(~data&0x01);
+			m_sec->clk_w(~data&0x02);
+			m_sec->cs_w(~data&0x04);
 		}
 		case 0x0b:
 		{
@@ -644,6 +645,8 @@ void mpu5_state::mpu5(machine_config &config)
 {
 	M68340(config, m_maincpu, 16000000);    // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu5_state::mpu5_map);
+
+	SEC(config, m_sec);
 
 	config.set_default_layout(layout_mpu5);
 

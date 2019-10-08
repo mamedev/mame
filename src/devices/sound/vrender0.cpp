@@ -149,10 +149,10 @@ WRITE32_MEMBER(vr0sound_device::vr0_snd_write)
 }
 
 
-void vr0sound_device::set_areas(uint32_t *texture, uint32_t *frame)
+void vr0sound_device::set_areas(uint16_t *texture, uint16_t *frame)
 {
-	m_TexBase=texture;
-	m_FBBase=frame;
+	m_TexBase=(int16_t *)texture;
+	m_FBBase=(int16_t *)frame;
 }
 
 
@@ -170,9 +170,9 @@ void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 
 
 	if(CT1&0x20)
-		SAMPLES=(int16_t *)m_TexBase;
+		SAMPLES = m_TexBase;
 	else
-		SAMPLES=(int16_t *)m_FBBase;
+		SAMPLES = m_FBBase;
 
 	if(CLK)
 		div=((30<<16)|0x8000)/(CLK+1);

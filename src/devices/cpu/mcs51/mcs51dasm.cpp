@@ -408,6 +408,20 @@ std::string mcs51_disassembler::get_bit_address( uint8_t arg ) const
 	}
 }
 
+void mcs51_disassembler::disassemble_op_ljmp(std::ostream& stream, unsigned &PC, const data_buffer& params)
+{
+	uint16_t addr = (params.r8(PC++)<<8) & 0xff00;
+	addr|= params.r8(PC++);
+	util::stream_format(stream, "ljmp  $%04X", addr);
+}
+
+void mcs51_disassembler::disassemble_op_lcall(std::ostream& stream, unsigned &PC, const data_buffer& params)
+{
+	uint16_t addr = (params.r8(PC++)<<8) & 0xff00;
+	addr|= params.r8(PC++);
+	util::stream_format(stream, "lcall $%04X", addr);
+}
+
 offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op)
 {
 	uint32_t flags = 0;
@@ -439,9 +453,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 
 		//LJMP code addr
 		case 0x02:              /* 1: 0000 0010 */
-			addr = (params.r8(PC++)<<8) & 0xff00;
-			addr|= params.r8(PC++);
-			util::stream_format(stream, "ljmp  $%04X", addr);
+			disassemble_op_ljmp(stream, PC, params);
 			break;
 
 		//RR A
@@ -501,9 +513,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 
 		//LCALL code addr
 		case 0x12:              /* 1: 0001 0010 */
-			addr = (params.r8(PC++)<<8) & 0xff00;
-			addr|= params.r8(PC++);
-			util::stream_format(stream, "lcall $%04X", addr);
+			disassemble_op_lcall(stream, PC, params);
 			flags = STEP_OVER;
 			break;
 
@@ -1101,7 +1111,7 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 		//Unable to test
 		//DA A
 		case 0xd4:                      /* 1: 1101 0100 */
-			util::stream_format(stream, "da   a");
+			util::stream_format(stream, "da    a");
 			break;
 
 		//DJNZ data addr, code addr

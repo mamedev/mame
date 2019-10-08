@@ -83,6 +83,7 @@
 #include "image.h"
 #include "network.h"
 #include "romload.h"
+#include "tilemap.h"
 #include "ui/uimain.h"
 #include <time.h>
 #include <rapidjson/writer.h>
@@ -298,7 +299,8 @@ int running_machine::run(bool quiet)
 		{
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			osd_file::error filerr = m_logfile->open("error.log");
-			assert_always(filerr == osd_file::error::NONE, "unable to open log file");
+			if (filerr != osd_file::error::NONE)
+				throw emu_fatalerror("running_machine::run: unable to open log file");
 
 			using namespace std::placeholders;
 			add_logerror_callback(std::bind(&running_machine::logfile_callback, this, _1));
@@ -308,6 +310,7 @@ int running_machine::run(bool quiet)
 		start();
 
 		// load the configuration settings
+		manager().before_load_settings(*this);
 		m_configuration->load_settings();
 
 		// disallow save state registrations starting here.
@@ -340,7 +343,7 @@ int running_machine::run(bool quiet)
 
 		m_hard_reset_pending = false;
 
-#if defined(EMSCRIPTEN)
+#if defined(__EMSCRIPTEN__)
 		// break out to our async javascript loop and halt
 		emscripten_set_running_machine(this);
 #endif
@@ -774,9 +777,10 @@ void running_machine::toggle_pause()
 
 void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback, bool first)
 {
-	assert_always(m_current_phase == machine_phase::INIT, "Can only call add_notifier at init time!");
+	if (m_current_phase != machine_phase::INIT)
+		throw emu_fatalerror("Can only call running_machine::add_notifier at init time!");
 
-	if(first)
+	if (first)
 		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
 
 	// exit notifiers are added to the head, and executed in reverse order
@@ -796,8 +800,9 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
-	assert_always(m_current_phase == machine_phase::INIT, "Can only call add_logerror_callback at init time!");
-		m_string_buffer.reserve(1024);
+	if (m_current_phase != machine_phase::INIT)
+		throw emu_fatalerror("Can only call running_machine::add_logerror_callback at init time!");
+	m_string_buffer.reserve(1024);
 	m_logerror_list.push_back(std::make_unique<logerror_callback_item>(callback));
 }
 
@@ -1503,10 +1508,10 @@ void running_machine::retro_loop(){
 
 		// call all exit callbacks registered
 		call_notifiers(MACHINE_NOTIFY_EXIT);
-	
+
 		util::archive_file::cache_clear();
 
-		m_logfile.reset();		
+		m_logfile.reset();
 
 		ENDEXEC=1;
 	}

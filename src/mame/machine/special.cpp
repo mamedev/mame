@@ -119,14 +119,12 @@ void special_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_bank1->set_entry(0);
 		break;
 	case TIMER_PIT8253_GATES:
-	{
 		m_pit->write_gate0(0);
 		m_pit->write_gate1(0);
 		m_pit->write_gate2(0);
 		break;
-	}
 	default:
-		assert_always(false, "Unknown id in special_state::device_timer");
+		throw emu_fatalerror("Unknown id in special_state::device_timer");
 	}
 }
 

@@ -210,7 +210,7 @@ void fm7_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		fm77av_vsync(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in fm7_state::device_timer");
+		throw emu_fatalerror("Unknown id in fm7_state::device_timer");
 	}
 }
 

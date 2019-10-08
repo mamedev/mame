@@ -19,6 +19,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define T1PROM 1
 #define T1DIRECT 2

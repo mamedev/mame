@@ -83,7 +83,7 @@ READ_LINE_MEMBER(spectrum_usource_device::romcs)
 	return m_romcs;
 }
 
-void spectrum_usource_device::opcode_fetch(offs_t offset)
+void spectrum_usource_device::pre_opcode_fetch(offs_t offset)
 {
 	if (!machine().side_effects_disabled() && (offset == 0x2bae))
 	{

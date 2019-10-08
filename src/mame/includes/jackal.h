@@ -7,6 +7,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK         XTAL(18'432'000)
 #define SOUND_CLOCK          XTAL(3'579'545)

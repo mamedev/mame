@@ -11,6 +11,7 @@
 #include "machine/segaic16.h"
 #include "sound/msm5205.h"
 #include "sound/upd7759.h"
+#include "tilemap.h"
 
 class segas1x_bootleg_state : public sega_16bit_common_base
 {

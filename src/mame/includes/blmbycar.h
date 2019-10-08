@@ -6,8 +6,9 @@
 
 ***************************************************************************/
 
-#include "emupal.h"
 #include "video/gaelco_wrally_sprites.h"
+#include "emupal.h"
+#include "tilemap.h"
 
 class blmbycar_state : public driver_device
 {

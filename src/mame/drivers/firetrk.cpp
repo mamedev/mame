@@ -46,7 +46,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 {
 	if (newval)
 	{
-		m_gear = (uintptr_t)param;
+		m_gear = param;
 		output().set_value("P1gear", m_gear+1);
 	}
 }
@@ -178,25 +178,27 @@ READ8_MEMBER(firetrk_state::montecar_dip_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::steer_dir_r)
+template <int P>
+READ_LINE_MEMBER(firetrk_state::steer_dir_r)
 {
-	return m_steer_dir[(uintptr_t)param];
+	return m_steer_dir[P];
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::steer_flag_r)
+template <int P>
+READ_LINE_MEMBER(firetrk_state::steer_flag_r)
 {
-	return m_steer_flag[(uintptr_t)param];
+	return m_steer_flag[P];
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
+template <int P>
+READ_LINE_MEMBER(firetrk_state::skid_r)
 {
 	uint32_t ret;
-	int which = (uintptr_t)param;
 
-	if (which != 2)
-		ret = m_skid[which];
+	if (P != 2)
+		ret = m_skid[P];
 	else
 		ret = m_skid[0] | m_skid[1];
 
@@ -204,13 +206,13 @@ CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
+template <int P>
+READ_LINE_MEMBER(firetrk_state::crash_r)
 {
 	uint32_t ret;
-	int which = (uintptr_t)param;
 
-	if (which != 2)
-		ret = m_crash[which];
+	if (P != 2)
+		ret = m_crash[P];
 	else
 		ret = m_crash[0] | m_crash[1];
 
@@ -218,9 +220,10 @@ CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::gear_r)
+template <int P>
+READ_LINE_MEMBER(firetrk_state::gear_r)
 {
-	return (m_gear == (uintptr_t)param) ? 1 : 0;
+	return (m_gear == P) ? 1 : 0;
 }
 
 
@@ -417,11 +420,11 @@ static INPUT_PORTS_START( firetrk )
 	PORT_START("BIT_0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gas") PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, steer_dir_r, (void *)0)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, steer_dir_r, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, steer_dir_r<0>)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, steer_dir_r<1>)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Bell") PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, skid_r, (void *)2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, skid_r<2>)
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, service_mode_switch_changed, 0)
 
 	PORT_START("BIT_6")
@@ -439,11 +442,11 @@ static INPUT_PORTS_START( firetrk )
 	PORT_START("BIT_7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, steer_flag_r, (void *)0)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, steer_flag_r, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, steer_flag_r<0>)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, steer_flag_r<1>)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, crash_r, (void *)2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, crash_r<2>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Diag Step")
 
 	PORT_START("HORN")
@@ -485,30 +488,30 @@ static INPUT_PORTS_START( superbug )
 	PORT_DIPSETTING(    0xc0, DEF_STR( German ) )
 
 	PORT_START("BIT_0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, gear_r, (void *)1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, gear_r<1>)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gas")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, steer_dir_r, (void *)0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, steer_dir_r<0>)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("Hiscore Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, skid_r, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, skid_r<0>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
 
 	PORT_START("BIT_7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, gear_r, (void *)2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, gear_r, (void *)0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, steer_flag_r, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, gear_r<2>)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, gear_r<0>)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, steer_flag_r<0>)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, crash_r, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, crash_r<0>)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Track Select")
 
 	PORT_START("GEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, (void *)2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, (void *)3)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, 2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, 3)
 
 	PORT_START("R62")
 	PORT_ADJUSTER( 20, "R62 - Motor Frequency" )
@@ -557,14 +560,14 @@ static INPUT_PORTS_START( montecar )
 	PORT_DIPSETTING(    0x00, DEF_STR( German ) )
 
 	PORT_START("BIT_6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, gear_r, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, gear_r, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, gear_r, (void *)2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, gear_r<0>)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, gear_r<1>)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, gear_r<2>)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Track Select")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gas")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, steer_dir_r, (void *)0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, skid_r, (void *)1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, steer_dir_r<0>)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, skid_r<1>)
 
 	PORT_START("BIT_7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -573,14 +576,14 @@ static INPUT_PORTS_START( montecar )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, steer_flag_r, (void *)0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state, skid_r, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, steer_flag_r<0>)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(firetrk_state, skid_r<0>)
 
 	PORT_START("GEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, (void *)2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, (void *)3)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, 2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state, gear_changed, 3)
 
 	PORT_START("R89")
 	PORT_ADJUSTER( 20, "R89 - Motor Frequency" )

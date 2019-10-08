@@ -85,7 +85,7 @@ private:
 	evpc_palette                            m_palette;
 	required_device<v9938_device>           m_video;
 	required_device<sn76496_base_device>    m_sound;
-	required_device<bus::ti99::colorbus::ti99_colorbus_device>   m_colorbus;
+	required_device<bus::ti99::colorbus::v9938_colorbus_device>   m_colorbus;
 	optional_device<bus::ti99::internal::evpc_clock_connector>   m_console_conn;
 };
 

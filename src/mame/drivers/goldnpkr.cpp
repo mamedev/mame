@@ -1289,6 +1289,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "pmpoker.lh"
 #include "goldnpkr.lh"
@@ -1545,7 +1546,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
   In test mode, the DIP switches status are assigned with code 00,
   so you can't see them since they are black on black background.
 
-*/  
+*/
 }
 
 void goldnpkr_state::video_start()
@@ -6423,6 +6424,47 @@ ROM_END
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "24s10.bin",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
 	ROM_LOAD( "82s137_epoxy.bin",   0x0100, 0x0400, CRC(4ae3ecf5) SHA1(e1e540ae13e7ce5ac6391f325160ec997ea6cc2f) ) /* original epoxy block PROM */
+ROM_END
+
+
+/*
+  Joker Card (witch game)
+  PCB with daugtherboard c/6502 and rom.
+
+  Program tries to show jokers in the attract,
+  but these aren't in the graphics set.
+
+  The GFX roms for cards, have identical halves,
+  and the jokers extended GFX should be placed
+  in the second half.
+
+  Fortunatelly we have an identical GFX set from
+  another game (that match 100% the first half),
+  so for now could assume we can use it instead
+  till the original devices appear...
+
+  The game apparently uses jokers and has 3's
+  and 7's bonus.
+
+  Depending of the bet, you can have one or two
+  witches as bonus if you win a hand.
+
+*/
+ROM_START( jokercar )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1-5.sub", 0x4000, 0x4000, CRC(fa99f263) SHA1(209c8801a253de562bac091e37b091c8176c0943) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                  0x0000, 0x2000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "4u.8a", 0x2000, 0x1000, CRC(85044094) SHA1(06db79dd47a47886480bd7a6546a2252cd48b3e3) )    // chars gfx
+
+	ROM_REGION( 0x3000, "gfx2", 0 )  // these are from another set that match 100% the first half of the original devices, that have identical halves...
+	ROM_LOAD( "7.4a",  0x0000, 0x1000, BAD_DUMP CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    // cards deck gfx, bitplane 1
+	ROM_LOAD( "6.6a",  0x1000, 0x1000, BAD_DUMP CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    // cards deck gfx, bitplane 2
+	ROM_LOAD( "5.7a",  0x2000, 0x1000, BAD_DUMP CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 
@@ -12075,6 +12117,8 @@ GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init
 
 GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
 GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
+
+GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    0 )
 
 GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, init_vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",     0,                   layout_goldnpkr )
 

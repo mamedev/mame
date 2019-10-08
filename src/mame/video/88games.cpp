@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 #include "emu.h"
 #include "includes/88games.h"
+#include "screen.h"
 
 
 /***************************************************************************

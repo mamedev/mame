@@ -113,14 +113,6 @@ if (CPUS["ARCOMPACT"]~=null) then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.h",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp",
 	}
-	dependency {
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact.cpp",       GEN_DIR .. "emu/cpu/arcompact/arcompact.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp", GEN_DIR .. "emu/cpu/arcompact/arcompact.hxx" },
-	}
-
-	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/arcompact/arcompact_make.py" , GEN_DIR .. "emu/cpu/arcompact/arcompact.hxx",   { MAME_DIR .. "src/devices/cpu/arcompact/arcompact_make.py" }, {"@echo Generating ARCOMPACT source files...", PYTHON .. " $(1)  $(@)" }},
-	}
 end
 
 if (CPUS["ARCOMPACT"]~=null or _OPTIONS["with-tools"]) then
@@ -1683,34 +1675,34 @@ if (CPUS["M680X0"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Motorola/Freescale dsp56k
---@src/devices/cpu/dsp56k/dsp56k.h,CPUS["DSP56156"] = true
+-- Motorola/Freescale DSP56156
+--@src/devices/cpu/dsp56156/dsp56156.h,CPUS["DSP56156"] = true
 --------------------------------------------------
 
 if (CPUS["DSP56156"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56k.cpp",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56k.h",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56mem.cpp",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56mem.h",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56pcu.cpp",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56pcu.h",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56def.h",
-		MAME_DIR .. "src/devices/cpu/dsp56k/dsp56ops.hxx",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56156.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56156.h",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56mem.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56mem.h",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56pcu.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56pcu.h",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56def.h",
+		MAME_DIR .. "src/devices/cpu/dsp56156/dsp56ops.hxx",
 	}
 end
 
 if (CPUS["DSP56156"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/dsp56dsm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/dsp56dsm.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/opcode.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/opcode.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/inst.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/inst.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/pmove.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/pmove.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/tables.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56k/tables.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/dsp56dsm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/dsp56dsm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/opcode.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/opcode.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/inst.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/inst.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/pmove.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/pmove.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/tables.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56156/tables.h")
 end
 
 --------------------------------------------------

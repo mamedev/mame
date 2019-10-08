@@ -10,6 +10,7 @@
 #include "cpu/m6502/m6502.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class mgolf_state : public driver_device
 {
@@ -153,7 +154,7 @@ void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in mgolf_state::device_timer");
+		throw emu_fatalerror("Unknown id in mgolf_state::device_timer");
 	}
 }
 

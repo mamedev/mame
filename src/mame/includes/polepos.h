@@ -16,6 +16,7 @@
 #include "sound/namco.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class polepos_state : public driver_device
@@ -39,7 +40,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(auto_start_r);
+	DECLARE_READ_LINE_MEMBER(auto_start_r);
 
 	void init_polepos2();
 

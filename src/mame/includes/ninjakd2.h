@@ -13,6 +13,7 @@
 #include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class ninjakd2_state : public driver_device
 {

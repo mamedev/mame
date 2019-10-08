@@ -15,6 +15,7 @@
 #include "video/decmxc06.h"
 #include "video/decrmc3.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class dec8_state : public driver_device
 {
@@ -133,7 +134,6 @@ private:
 	DECLARE_READ8_MEMBER(gondo_player_1_r);
 	DECLARE_READ8_MEMBER(gondo_player_2_r);
 	DECLARE_WRITE8_MEMBER(dec8_i8751_w);
-	DECLARE_WRITE8_MEMBER(lastmisn_i8751_w);
 	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
 	DECLARE_WRITE8_MEMBER(ghostb_bank_w);

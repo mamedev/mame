@@ -459,12 +459,12 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="speech" supported="no">
+	<software name="speech">
 		<description>Speech Synthesis Module</description>
 		<year>1983</year>
 		<publisher>J.C.B. (Microsystems)</publisher>
 		<part name="cart" interface="coco_cart">
-			<!-- <feature name="slot" value="jcbspch" /> -->
+			<feature name="slot" value="jcbspch" />
 			<dataarea name="rom" size="4096">
 				<rom name="jcb-speech.rom" size="4096" crc="e88dfe36" sha1="df3f64a7a3beeb91469932035af5e4f8a7872aad"/>
 			</dataarea>

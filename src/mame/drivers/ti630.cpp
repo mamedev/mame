@@ -83,9 +83,9 @@ void ti630_state::init_ti630()
 
 void ti630_state::i80c31_io(address_map &map)
 {
-	map(0x0000, 0x0000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::control_write));
-	map(0x1000, 0x1000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::data_write));
-	map(0x2000, 0x2000) /*.mirror(?)*/ .r("hd44780", FUNC(hd44780_device::control_read));
+	map(0x0000, 0x0000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::control_w));
+	map(0x1000, 0x1000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::data_w));
+	map(0x2000, 0x2000) /*.mirror(?)*/ .r("hd44780", FUNC(hd44780_device::control_r));
 	map(0x8000, 0xffff).ram(); /*TODO: verify the ammont of RAM and the correct address range to which it is mapped. This is just a first reasonable guess that apparently yields good results in the emulation */
 }
 
