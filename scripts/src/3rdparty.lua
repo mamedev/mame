@@ -154,6 +154,10 @@ project "softfloat"
 		"ForceCPP",
 	}
 
+	buildoptions_cpp {
+		"-x c++",
+	}
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
@@ -186,6 +190,10 @@ kind "StaticLib"
 
 options {
 	"ForceCPP",
+}
+
+buildoptions_cpp {
+	"-x c++",
 }
 
 includedirs {
