@@ -1204,7 +1204,7 @@ endif
 
 .PHONY: vs2019_clang
 vs2019_clang: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=clangcl vs2019
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=clangcl --NO_USE_PORTAUDIO=1 vs2019
 ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-clang/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
