@@ -103,9 +103,9 @@ static discrete_lfsr_desc const midway_lfsr =
 DEFINE_DEVICE_TYPE(SEAWOLF_AUDIO,  seawolf_audio_device,  "seawolf_audio",  "Nutting Sea Wolf Audio")
 DEFINE_DEVICE_TYPE(GUNFIGHT_AUDIO, gunfight_audio_device, "gunfight_audio", "Nutting Gun Fight Audio")
 DEFINE_DEVICE_TYPE(GMISSILE_AUDIO, gmissile_audio_device, "gmissile_audio", "Midway Guided Missile Audio")
+DEFINE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device,       "m4_audio",       "Midway M-4 Audio")
 DEFINE_DEVICE_TYPE(CLOWNS_AUDIO,   clowns_audio_device,   "clowns_audio",   "Midway Clowns Audio")
 DEFINE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device, "spcenctr_audio", "Midway Space Encounters Audio")
-DEFINE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device,       "m4_audio",       "Midway M-4 Audio")
 DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "pantom2_audio",  "Midway Phantom 2 Audio")
 
 
@@ -328,6 +328,91 @@ void gmissile_audio_device::device_start()
 	m_p1 = 0U;
 
 	save_item(NAME(m_p1));
+}
+
+
+/*************************************
+ *
+ *  M-4
+ *
+ *************************************/
+
+// Noise clock was breadboarded and measured at 3760Hz
+
+m4_audio_device::m4_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, M4_AUDIO, tag, owner, clock),
+	m_samples(*this, "samples%u", 1U),
+	m_p1(0U),
+	m_p2(0U)
+{
+}
+
+void m4_audio_device::p1_w(u8 data)
+{
+	u8 const rising(data & ~m_p1);
+	m_p1 = data;
+
+	// D0 and D1 are not connected
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+
+	machine().sound().system_enable(BIT(data, 3));
+
+	if (BIT(rising, 4)) m_samples[0]->start(0, 0); // LEFT PLAYER SHOT sound (goes to left speaker)
+	if (BIT(rising, 5)) m_samples[1]->start(0, 0); // RIGHT PLAYER SHOT sound (goes to right speaker)
+	if (BIT(rising, 6)) m_samples[0]->start(1, 1); // LEFT PLAYER EXPLOSION sound via 300K res (goes to left speaker)
+	if (BIT(rising, 7)) m_samples[1]->start(1, 1); // RIGHT PLAYER EXPLOSION sound via 300K res (goes to right speaker)
+}
+
+
+void m4_audio_device::p2_w(u8 data)
+{
+	u8 const rising(data & ~m_p2);
+	m_p2 = data;
+
+	if (BIT(rising, 0)) m_samples[0]->start(1, 1); // LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker)
+	if (BIT(rising, 1)) m_samples[1]->start(1, 1); // RIGHT PLAYER EXPLOSION sound via 510K res (goes to right speaker)
+
+	// if (data & 0x04)  enable LEFT TANK MOTOR sound (goes to left speaker)
+
+	// if (data & 0x08)  enable RIGHT TANK MOTOR sound (goes to right speaker)
+
+	// if (data & 0x10)  enable sound that is playing while the right plane is flying.  Circuit not named on schematics  (goes to left speaker)
+
+	// if (data & 0x20)  enable sound that is playing while the left plane is flying.  Circuit not named on schematics  (goes to right speaker)
+
+	// D6 and D7 are not connected
+}
+
+void m4_audio_device::device_add_mconfig(machine_config &config)
+{
+	static char const *const sample_names[] = {
+			"*m4",
+			"1",        // missle
+			"2",        // explosion
+			nullptr };
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	SAMPLES(config, m_samples[0]);
+	m_samples[0]->set_channels(2);
+	m_samples[0]->set_samples_names(sample_names);
+	m_samples[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+
+	SAMPLES(config, m_samples[1]);
+	m_samples[1]->set_channels(2);
+	m_samples[1]->set_samples_names(sample_names);
+	m_samples[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void m4_audio_device::device_start()
+{
+	m_p1 = 0U;
+	m_p2 = 0U;
+
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p2));
 }
 
 
@@ -568,7 +653,7 @@ void clowns_audio_device::device_start()
 	m_p1 = 0U;
 	m_p2 = 0U;
 
-	save_item(NAME(m_p2));
+	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
 }
 
@@ -1125,91 +1210,6 @@ TIMER_CALLBACK_MEMBER(spcenctr_audio_device::strobe_callback)
 	m_strobe_timer->adjust(
 			attotime::from_hz(STROBE_FREQ) * (param ? (100 - STROBE_DUTY_CYCLE) : STROBE_DUTY_CYCLE) / 100,
 			param ? 0 : 1);
-}
-
-
-/*************************************
- *
- *  M-4
- *
- *************************************/
-
-// Noise clock was breadboarded and measured at 3760Hz
-
-m4_audio_device::m4_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, M4_AUDIO, tag, owner, clock),
-	m_samples(*this, "samples%u", 1U),
-	m_p1(0U),
-	m_p2(0U)
-{
-}
-
-void m4_audio_device::p1_w(u8 data)
-{
-	u8 const rising(data & ~m_p1);
-	m_p1 = data;
-
-	// D0 and D1 are not connected
-
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
-
-	machine().sound().system_enable(BIT(data, 3));
-
-	if (BIT(rising, 4)) m_samples[0]->start(0, 0); // LEFT PLAYER SHOT sound (goes to left speaker)
-	if (BIT(rising, 5)) m_samples[1]->start(0, 0); // RIGHT PLAYER SHOT sound (goes to right speaker)
-	if (BIT(rising, 6)) m_samples[0]->start(1, 1); // LEFT PLAYER EXPLOSION sound via 300K res (goes to left speaker)
-	if (BIT(rising, 7)) m_samples[1]->start(1, 1); // RIGHT PLAYER EXPLOSION sound via 300K res (goes to right speaker)
-}
-
-
-void m4_audio_device::p2_w(u8 data)
-{
-	u8 const rising(data & ~m_p2);
-	m_p2 = data;
-
-	if (BIT(rising, 0)) m_samples[0]->start(1, 1); // LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker)
-	if (BIT(rising, 1)) m_samples[1]->start(1, 1); // RIGHT PLAYER EXPLOSION sound via 510K res (goes to right speaker)
-
-	// if (data & 0x04)  enable LEFT TANK MOTOR sound (goes to left speaker)
-
-	// if (data & 0x08)  enable RIGHT TANK MOTOR sound (goes to right speaker)
-
-	// if (data & 0x10)  enable sound that is playing while the right plane is flying.  Circuit not named on schematics  (goes to left speaker)
-
-	// if (data & 0x20)  enable sound that is playing while the left plane is flying.  Circuit not named on schematics  (goes to right speaker)
-
-	// D6 and D7 are not connected
-}
-
-void m4_audio_device::device_add_mconfig(machine_config &config)
-{
-	static char const *const sample_names[] = {
-			"*m4",
-			"1",        // missle
-			"2",        // explosion
-			nullptr };
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	SAMPLES(config, m_samples[0]);
-	m_samples[0]->set_channels(2);
-	m_samples[0]->set_samples_names(sample_names);
-	m_samples[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-
-	SAMPLES(config, m_samples[1]);
-	m_samples[1]->set_channels(2);
-	m_samples[1]->set_samples_names(sample_names);
-	m_samples[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-void m4_audio_device::device_start()
-{
-	m_p1 = 0U;
-	m_p2 = 0U;
-
-	save_item(NAME(m_p1));
-	save_item(NAME(m_p2));
 }
 
 

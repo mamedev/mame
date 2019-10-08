@@ -71,6 +71,25 @@ private:
 };
 
 
+class m4_audio_device : public device_t
+{
+public:
+	m4_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+	void p1_w(u8 data);
+	void p2_w(u8 data);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
+	required_device_array<samples_device, 2> m_samples;
+	u8 m_p1;
+	u8 m_p2;
+};
+
+
 class clowns_audio_device : public device_t
 {
 public:
@@ -119,25 +138,6 @@ private:
 };
 
 
-class m4_audio_device : public device_t
-{
-public:
-	m4_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
-
-	void p1_w(u8 data);
-	void p2_w(u8 data);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-
-private:
-	required_device_array<samples_device, 2> m_samples;
-	u8 m_p1;
-	u8 m_p2;
-};
-
-
 class phantom2_audio_device : public device_t
 {
 public:
@@ -161,9 +161,9 @@ private:
 DECLARE_DEVICE_TYPE(SEAWOLF_AUDIO,  seawolf_audio_device)
 DECLARE_DEVICE_TYPE(GUNFIGHT_AUDIO, gunfight_audio_device)
 DECLARE_DEVICE_TYPE(GMISSILE_AUDIO, gmissile_audio_device)
+DECLARE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device)
 DECLARE_DEVICE_TYPE(CLOWNS_AUDIO,   clowns_audio_device)
 DECLARE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device)
-DECLARE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device)
 DECLARE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device)
 
 #endif // MAME_AUDIO_MW8080BW_H
