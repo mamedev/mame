@@ -20,10 +20,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> saturn_segatap_device
-
-class saturn_segatap_device : public device_t,
-							public device_saturn_control_port_interface
+class saturn_segatap_device : public device_t, public device_saturn_control_port_interface
 {
 public:
 	// construction/destruction
@@ -32,9 +29,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_saturn_control_port_interface overrides

@@ -115,7 +115,7 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// evolution soccer defaults
-	m_screen->set_raw((XTAL(14'318'180)*2)/4, 455, 0, 320, 262, 0, 240);
+	m_screen->set_raw((XTAL(14'318'181)*2)/4, 455, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(vrender0soc_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
 	m_screen->set_palette(m_palette);

@@ -6,6 +6,12 @@
     Midway 8080-based black and white hardware
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_MW8080BW_H
+#define MAME_INCLUDES_MW8080BW_H
+
+#pragma once
+
+#include "audio/mw8080bw.h"
 
 #include "machine/mb14241.h"
 #include "machine/timer.h"
@@ -33,16 +39,15 @@
 #define MW8080BW_INT_TRIGGER_VBLANK_2     (1)
 #define MW8080BW_60HZ                     (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)
 
-/* +4 is added to HBSTART because the hardware displays that many pixels after
-   setting HBLANK */
+// +4 is added to HBSTART because the hardware displays that many pixels after setting HBLANK
 #define MW8080BW_HPIXCOUNT                (MW8080BW_HBSTART + 4)
 
 
 class mw8080bw_state : public driver_device
 {
 public:
-	mw8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mw8080bw_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mb14241(*this,"mb14241"),
 		m_watchdog(*this, "watchdog"),
@@ -51,8 +56,6 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_discrete(*this, "discrete"),
 		m_samples(*this, "samples"),
-		m_samples1(*this, "samples1"),
-		m_samples2(*this, "samples2"),
 		m_sn1(*this, "sn1"),
 		m_sn2(*this, "sn2"),
 		m_sn(*this, "snsnd"),
@@ -68,7 +71,6 @@ public:
 	void checkmat(machine_config &config);
 	void checkmat_audio(machine_config &config);
 	void clowns(machine_config &config);
-	void clowns_audio(machine_config &config);
 	void desertgu(machine_config &config);
 	void desertgu_audio(machine_config &config);
 	void dogpatch(machine_config &config);
@@ -76,29 +78,21 @@ public:
 	void dplay(machine_config &config);
 	void dplay_audio(machine_config &config);
 	void gmissile(machine_config &config);
-	void gmissile_audio(machine_config &config);
-	void gunfight(machine_config &config);
-	void gunfight_audio(machine_config &config);
 	void invad2ct(machine_config &config);
 	void invad2ct_audio(machine_config &config);
 	void invaders(machine_config &config);
 	void invaders_audio(machine_config &config);
 	void invaders_samples_audio(machine_config &config);
 	void m4(machine_config &config);
-	void m4_audio(machine_config &config);
 	void maze(machine_config &config);
 	void maze_audio(machine_config &config);
 	void mw8080bw_root(machine_config &config);
 	void phantom2(machine_config &config);
-	void phantom2_audio(machine_config &config);
 	void seawolf(machine_config &config);
-	void seawolf_audio(machine_config &config);
 	void shuffle(machine_config &config);
 	void shuffle_audio(machine_config &config);
 	void spacwalk(machine_config &config);
 	void spacwalk_audio(machine_config &config);
-	void spcenctr(machine_config &config);
-	void spcenctr_audio(machine_config &config);
 	void tornbase(machine_config &config);
 	void tornbase_audio(machine_config &config);
 	void zzzap(machine_config &config);
@@ -142,16 +136,12 @@ protected:
 
 	/* other devices */
 	optional_device<samples_device> m_samples;
-	optional_device<samples_device> m_samples1;
-	optional_device<samples_device> m_samples2;
 	optional_device<sn76477_device> m_sn1;
 	optional_device<sn76477_device> m_sn2;
 	optional_device<sn76477_device> m_sn;
 	required_device<screen_device> m_screen;
 
 	/* sound-related */
-	uint8_t       m_port_1_last;
-	uint8_t       m_port_2_last;
 	uint8_t       m_port_1_last_extra;
 	uint8_t       m_port_2_last_extra;
 	uint8_t       m_port_3_last_extra;
@@ -176,13 +166,6 @@ private:
 	uint8_t       m_desertgun_controller_select;
 	uint8_t       m_clowns_controller_select;
 
-	uint8_t       m_spcenctr_strobe_state;
-	uint8_t       m_spcenctr_trench_width;
-	uint8_t       m_spcenctr_trench_center;
-	uint8_t       m_spcenctr_trench_slope[16];  /* 16x4 bit RAM */
-	uint8_t       m_spcenctr_bright_control;
-	uint8_t       m_spcenctr_brightness;
-
 	/* timers */
 	emu_timer   *m_interrupt_timer;
 	emu_timer   *m_maze_tone_timer;
@@ -194,27 +177,15 @@ private:
 	DECLARE_WRITE8_MEMBER(mw8080bw_reversable_shift_count_w);
 	DECLARE_WRITE8_MEMBER(seawolf_explosion_lamp_w);
 	DECLARE_WRITE8_MEMBER(seawolf_periscope_lamp_w);
-	DECLARE_WRITE8_MEMBER(gunfight_io_w);
 	DECLARE_WRITE8_MEMBER(tornbase_io_w);
 	DECLARE_WRITE8_MEMBER(maze_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(maze_io_w);
 	DECLARE_WRITE8_MEMBER(checkmat_io_w);
-	DECLARE_WRITE8_MEMBER(spcenctr_io_w);
 	DECLARE_READ8_MEMBER(bowler_shift_result_r);
 	DECLARE_WRITE8_MEMBER(bowler_lights_1_w);
 	DECLARE_WRITE8_MEMBER(bowler_lights_2_w);
-	DECLARE_WRITE8_MEMBER(seawolf_audio_w);
-	DECLARE_WRITE8_MEMBER(gunfight_audio_w);
 	DECLARE_WRITE8_MEMBER(zzzap_audio_1_w);
 	DECLARE_WRITE8_MEMBER(zzzap_audio_2_w);
-	DECLARE_WRITE8_MEMBER(gmissile_audio_1_w);
-	DECLARE_WRITE8_MEMBER(gmissile_audio_2_w);
-	DECLARE_WRITE8_MEMBER(gmissile_audio_3_w);
-	DECLARE_WRITE8_MEMBER(m4_audio_1_w);
-	DECLARE_WRITE8_MEMBER(m4_audio_2_w);
-	DECLARE_WRITE8_MEMBER(clowns_audio_1_w);
-	DECLARE_WRITE8_MEMBER(phantom2_audio_1_w);
-	DECLARE_WRITE8_MEMBER(phantom2_audio_2_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_2_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_3_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_4_w);
@@ -226,16 +197,12 @@ private:
 	DECLARE_MACHINE_START(gmissile);
 	DECLARE_MACHINE_START(m4);
 	DECLARE_MACHINE_START(clowns);
-	DECLARE_MACHINE_START(spcenctr);
 	DECLARE_MACHINE_START(phantom2);
 	DECLARE_MACHINE_START(invaders);
-	DECLARE_SOUND_START(samples);
-	uint32_t screen_update_spcenctr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_trigger);
-	TIMER_DEVICE_CALLBACK_MEMBER(spcenctr_strobe_timer_callback);
 	DECLARE_WRITE8_MEMBER(midway_tone_generator_lo_w);
 	DECLARE_WRITE8_MEMBER(midway_tone_generator_hi_w);
 	DECLARE_WRITE8_MEMBER(tornbase_audio_w);
@@ -244,15 +211,11 @@ private:
 	DECLARE_WRITE8_MEMBER(desertgu_audio_1_w);
 	DECLARE_WRITE8_MEMBER(desertgu_audio_2_w);
 	DECLARE_WRITE8_MEMBER(dplay_audio_w);
-	DECLARE_WRITE8_MEMBER(clowns_audio_2_w);
 	DECLARE_WRITE8_MEMBER(spacwalk_audio_1_w);
 	DECLARE_WRITE8_MEMBER(spacwalk_audio_2_w);
 	DECLARE_WRITE8_MEMBER(shuffle_audio_1_w);
 	DECLARE_WRITE8_MEMBER(shuffle_audio_2_w);
 	DECLARE_WRITE8_MEMBER(dogpatch_audio_w);
-	DECLARE_WRITE8_MEMBER(spcenctr_audio_1_w);
-	DECLARE_WRITE8_MEMBER(spcenctr_audio_2_w);
-	DECLARE_WRITE8_MEMBER(spcenctr_audio_3_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_1_w);
 	DECLARE_WRITE8_MEMBER(blueshrk_audio_w);
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_1_w);
@@ -276,7 +239,6 @@ private:
 	void dogpatch_io_map(address_map &map);
 	void dplay_io_map(address_map &map);
 	void gmissile_io_map(address_map &map);
-	void gunfight_io_map(address_map &map);
 	void invad2ct_io_map(address_map &map);
 	void invaders_io_map(address_map &map);
 	void m4_io_map(address_map &map);
@@ -286,9 +248,58 @@ private:
 	void seawolf_io_map(address_map &map);
 	void shuffle_io_map(address_map &map);
 	void spacwalk_io_map(address_map &map);
-	void spcenctr_io_map(address_map &map);
 	void tornbase_io_map(address_map &map);
 	void zzzap_io_map(address_map &map);
+};
+
+
+class gunfight_state : public mw8080bw_state
+{
+public:
+	gunfight_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag),
+		m_soundboard(*this, "soundboard")
+	{
+	}
+
+	void gunfight(machine_config &config);
+
+private:
+	void io_w(offs_t offset, u8 data);
+
+	void io_map(address_map &map);
+
+	required_device<gunfight_audio_device> m_soundboard;
+};
+
+
+class spcenctr_state : public mw8080bw_state
+{
+public:
+	spcenctr_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag),
+		m_soundboard(*this, "soundboard")
+	{
+	}
+
+	void spcenctr(machine_config &config);
+
+protected:
+	DECLARE_MACHINE_START(spcenctr);
+
+private:
+	void io_w(offs_t offset, u8 data);
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
+
+	void io_map(address_map &map);
+
+	required_device<spcenctr_audio_device> m_soundboard;
+	u8 m_trench_width;
+	u8 m_trench_center;
+	u8 m_trench_slope[16];  // 16x4 bit RAM
+	u8 m_bright_control;
+	u8 m_brightness;
 };
 
 
@@ -334,3 +345,4 @@ private:
 
 extern const internal_layout layout_invaders;
 
+#endif // MAME_INCLUDES_MW8080BW_H

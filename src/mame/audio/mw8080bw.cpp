@@ -8,22 +8,10 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "audio/mw8080bw.h"
+
 #include "includes/mw8080bw.h"
 #include "speaker.h"
-
-
-/*************************************
- *
- *  Audio setup
- *
- *************************************/
-
-SOUND_START_MEMBER( mw8080bw_state, samples )
-{
-	/* setup for save states */
-	save_item(NAME(m_port_1_last));
-	save_item(NAME(m_port_2_last));
-}
 
 
 /*************************************
@@ -53,26 +41,26 @@ SOUND_START_MEMBER( mw8080bw_state, samples )
 
 
 /* most common values based on clowns schematic */
-static const discrete_op_amp_tvca_info midway_music_tvca_info =
+static discrete_op_amp_tvca_info const midway_music_tvca_info =
 {
-	RES_M(3.3),             /* r502 */
-	RES_K(10) + RES_K(680), /* r505 + r506 */
+	RES_M(3.3),             // r502
+	RES_K(10) + RES_K(680), // r505 + r506
 	0,
-	RES_K(680),             /* r503 */
-	RES_K(10),              /* r500 */
+	RES_K(680),             // r503
+	RES_K(10),              // r500
 	0,
-	RES_K(680),             /* r501 */
-	0,
-	0,
+	RES_K(680),             // r501
 	0,
 	0,
-	CAP_U(.001),            /* c500 */
+	0,
+	0,
+	CAP_U(.001),            // c500
 	0,
 	0, 0,
-	12,         /* v1 */
-	0,          /* v2 */
-	0,          /* v3 */
-	12,         /* vP */
+	12,                     // v1
+	0,                      // v2
+	0,                      // v3
+	12,                     // vP
 	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
 	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,
@@ -81,6 +69,1231 @@ static const discrete_op_amp_tvca_info midway_music_tvca_info =
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
 };
 
+
+/*************************************
+ *
+ *  Implementation of the common
+ *  noise circuits
+ *
+ *************************************/
+
+static discrete_lfsr_desc const midway_lfsr =
+{
+	DISC_CLK_IS_FREQ,
+	17,                 // bit length
+						// the RC network fed into pin 4 has the effect of presetting all bits high at power up
+	0x1ffff,            // reset value
+	4,                  // use bit 4 as XOR input 0
+	16,                 // use bit 16 as XOR input 1
+	DISC_LFSR_XOR,      // feedback stage1 is XOR
+	DISC_LFSR_OR,       // feedback stage2 is just stage 1 output OR with external feed
+	DISC_LFSR_REPLACE,  // feedback stage3 replaces the shifted register contents
+	0x000001,           // everything is shifted into the first bit only
+	0,                  // output is not inverted
+	12                  // output bit
+};
+
+
+/*************************************
+ *
+ *  Device type globals
+ *
+ *************************************/
+
+DEFINE_DEVICE_TYPE(SEAWOLF_AUDIO,  seawolf_audio_device,  "seawolf_audio",  "Nutting Sea Wolf Audio")
+DEFINE_DEVICE_TYPE(GUNFIGHT_AUDIO, gunfight_audio_device, "gunfight_audio", "Nutting Gun Fight Audio")
+DEFINE_DEVICE_TYPE(GMISSILE_AUDIO, gmissile_audio_device, "gmissile_audio", "Midway Guided Missile Audio")
+DEFINE_DEVICE_TYPE(CLOWNS_AUDIO,   clowns_audio_device,   "clowns_audio",   "Midway Clowns Audio")
+DEFINE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device, "spcenctr_audio", "Midway Space Encounters Audio")
+DEFINE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device,       "m4_audio",       "Midway M-4 Audio")
+DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "pantom2_audio",  "Midway Phantom 2 Audio")
+
+
+/*************************************
+ *
+ *  Sea Wolf
+ *
+ *************************************/
+
+seawolf_audio_device::seawolf_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, SEAWOLF_AUDIO, tag, owner, clock),
+	m_samples(*this, "samples"),
+	m_prev(0U)
+{
+}
+
+void seawolf_audio_device::write(u8 data)
+{
+	u8 const rising(data & ~m_prev);
+	m_prev = data;
+
+	if (BIT(rising, 0)) m_samples->start(0, 0); // SHIP HIT sound
+	if (BIT(rising, 1)) m_samples->start(1, 1); // TORPEDO sound
+	if (BIT(rising, 2)) m_samples->start(2, 2); // DIVE sound
+	if (BIT(rising, 3)) m_samples->start(3, 3); // SONAR sound
+	if (BIT(rising, 4)) m_samples->start(4, 4); // MINE HIT sound
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
+
+	// D6 and D7 are not connected
+}
+
+void seawolf_audio_device::device_add_mconfig(machine_config &config)
+{
+	static char const *const sample_names[] = {
+			"*seawolf",
+			"shiphit",
+			"torpedo",
+			"dive",
+			"sonar",
+			"minehit",
+			nullptr };
+
+	SPEAKER(config, "mono").front_center();
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
+}
+
+void seawolf_audio_device::device_start()
+{
+	m_prev = 0U;
+
+	save_item(NAME(m_prev));
+}
+
+
+/*************************************
+ *
+ *  Gun Fight
+ *
+ *************************************/
+
+gunfight_audio_device::gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, GUNFIGHT_AUDIO, tag, owner, clock),
+	m_samples(*this, "samples%u", 1U)
+{
+}
+
+void gunfight_audio_device::write(u8 data)
+{
+	// D0 and D1 are just tied to 1k resistors
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+
+	// the 74175 latches and inverts the top 4 bits
+	switch ((~data >> 4) & 0x0f)
+	{
+	case 0x00:
+		break;
+	case 0x01: // LEFT SHOOT sound (left speaker)
+		m_samples[0]->start(0, 0);
+		break;
+	case 0x02: // RIGHT SHOOT sound (right speaker)
+		m_samples[1]->start(0, 0);
+		break;
+	case 0x03: // LEFT HIT sound (left speaker)
+		m_samples[0]->start(0, 1);
+		break;
+	case 0x04: // enable RIGHT HIT sound (right speaker)
+		m_samples[1]->start(0, 1);
+		break;
+	default:
+		logerror("%s: Unknown sh port write %02x\n", machine().describe_context(), data);
+		break;
+	}
+}
+
+void gunfight_audio_device::device_add_mconfig(machine_config &config)
+{
+	static char const *const sample_names[] = {
+			"*gunfight",
+			"gunshot",
+			"killed",
+			nullptr };
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	SAMPLES(config, m_samples[0]);
+	m_samples[0]->set_channels(1);
+	m_samples[0]->set_samples_names(sample_names);
+	m_samples[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+
+	SAMPLES(config, m_samples[1]);
+	m_samples[1]->set_channels(1);
+	m_samples[1]->set_samples_names(sample_names);
+	m_samples[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+}
+
+void gunfight_audio_device::device_start()
+{
+}
+
+
+/*************************************
+ *
+ *  Guided Missile
+ *
+ *************************************/
+
+gmissile_audio_device::gmissile_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, GMISSILE_AUDIO, tag, owner, clock),
+	m_samples(*this, "samples%u", 1U),
+	m_l_exp(*this, "L_EXP_LIGHT"),
+	m_r_exp(*this, "R_EXP_LIGHT"),
+	m_p1(0U)
+{
+}
+
+void gmissile_audio_device::p1_w(u8 data)
+{
+	/* note that the schematics shows the left and right explosions
+	   reversed (D5=R, D7=L), but the software confirms that
+	   ours is right */
+
+	u8 const rising(data & ~m_p1);
+	m_p1 = data;
+
+	// D0 and D1 are not connected
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+
+	machine().sound().system_enable(BIT(data, 3));
+
+	if (BIT(rising, 4)) m_samples[1]->start(0, 0); // RIGHT MISSILE sound (goes to right speaker)
+
+	m_l_exp = BIT(data, 5);
+	if (BIT(rising, 5)) m_samples[0]->start(0, 1); // LEFT EXPLOSION sound (goes to left speaker)
+
+	if (BIT(rising, 6)) m_samples[0]->start(0, 0); // LEFT MISSILE sound (goes to left speaker)
+
+	m_r_exp = BIT(data, 7);
+	if (BIT(rising, 7)) m_samples[1]->start(0, 1); // RIGHT EXPLOSION sound (goes to right speaker)
+}
+
+void gmissile_audio_device::p2_w(u8 data)
+{
+	// set AIRPLANE/COPTER/JET PAN(data & 0x07)
+
+	// set TANK PAN((data >> 3) & 0x07)
+
+	// D6 and D7 are not connected
+}
+
+void gmissile_audio_device::p3_w(u8 data)
+{
+	// if (data & 0x01)  enable AIRPLANE (bi-plane) sound (goes to AIRPLANE/COPTER/JET panning circuit)
+
+	// if (data & 0x02)  enable TANK sound (goes to TANK panning circuit)
+
+	// if (data & 0x04)  enable COPTER sound (goes to AIRPLANE/COPTER/JET panning circuit)
+
+	// D3 and D4 are not connected
+
+	// if (data & 0x20)  enable JET (3 fighter jets) sound (goes to AIRPLANE/COPTER/JET panning circuit)
+
+	// D6 and D7 are not connected
+}
+
+void gmissile_audio_device::device_add_mconfig(machine_config &config)
+{
+	static char const *const sample_names[] = {
+			"*gmissile",
+			"1",        // missle
+			"2",        // explosion
+			nullptr };
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	SAMPLES(config, m_samples[0]);
+	m_samples[0]->set_channels(1);
+	m_samples[0]->set_samples_names(sample_names);
+	m_samples[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+
+	SAMPLES(config, m_samples[1]);
+	m_samples[1]->set_channels(1);
+	m_samples[1]->set_samples_names(sample_names);
+	m_samples[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void gmissile_audio_device::device_start()
+{
+	m_l_exp.resolve();
+	m_r_exp.resolve();
+
+	m_p1 = 0U;
+
+	save_item(NAME(m_p1));
+}
+
+
+/*************************************
+ *
+ *  Clowns
+ *
+ *  Discrete sound emulation: Mar 2005, D.R.
+ *
+ *************************************/
+
+// nodes - inputs
+#define CLOWNS_POP_BOTTOM_EN        NODE_01
+#define CLOWNS_POP_MIDDLE_EN        NODE_02
+#define CLOWNS_POP_TOP_EN           NODE_03
+#define CLOWNS_SPRINGBOARD_HIT_EN   NODE_04
+#define CLOWNS_SPRINGBOARD_MISS_EN  NODE_05
+
+// nodes - sounds
+#define CLOWNS_NOISE                NODE_06
+#define CLOWNS_POP_SND              NODE_07
+#define CLOWNS_SB_HIT_SND           NODE_08
+#define CLOWNS_SB_MISS_SND          NODE_09
+
+// nodes - adjusters
+#define CLOWNS_R507_POT             NODE_11
+
+static discrete_op_amp_tvca_info const clowns_pop_tvca_info =
+{
+	RES_M(2.7),     // r304
+	RES_K(680),     // r303
+	0,
+	RES_K(680),     // r305
+	RES_K(1),       // j3
+	0,
+	RES_K(470),     // r300
+	RES_K(1),       // j3
+	RES_K(510),     // r301
+	RES_K(1),       // j3
+	RES_K(680),     // r302
+	CAP_U(.015),    // c300
+	CAP_U(.1),      // c301
+	CAP_U(.082),    // c302
+	0,              // no c4
+	5,              // v1
+	5,              // v2
+	5,              // v3
+	12,             // vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG2
+};
+
+static discrete_op_amp_osc_info const clowns_sb_hit_osc_info =
+{
+	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	RES_K(820),     // r200
+	RES_K(33),      // r203
+	RES_K(150),     // r201
+	RES_K(240),     // r204
+	RES_M(1),       // r202
+	0,
+	0,
+	0,
+	CAP_U(0.01),    // c200
+	12
+};
+
+static discrete_op_amp_tvca_info const clowns_sb_hit_tvca_info =
+{
+	RES_M(2.7),     // r207
+	RES_K(680),     // r205
+	0,
+	RES_K(680),     // r208
+	RES_K(1),       // j3
+	0,
+	RES_K(680),     // r206
+	0,0,0,0,
+	CAP_U(1),       // c201
+	0,
+	0, 0,
+	5,              // v1
+	0,              // v2
+	0,              // v3
+	12,             // vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+static discrete_mixer_desc const clowns_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,
+	{ RES_K(10),
+		RES_K(10),
+		RES_K(10) + 1.0 / (1.0 / RES_K(15) + 1.0 / RES_K(39)),
+		RES_K(1) },
+	{ 0,
+		0,
+		0,
+		CLOWNS_R507_POT },
+	{ 0,
+		CAP_U(0.022),
+		0,
+		0 },
+	0,
+	RES_K(100),
+	0,
+	CAP_U(1),
+	0,
+	1
+};
+
+static DISCRETE_SOUND_START(clowns_discrete)
+
+	/************************************************
+	 * Input register mapping
+	 ************************************************/
+	DISCRETE_INPUT_LOGIC(CLOWNS_POP_BOTTOM_EN)
+	DISCRETE_INPUT_LOGIC(CLOWNS_POP_MIDDLE_EN)
+	DISCRETE_INPUT_LOGIC(CLOWNS_POP_TOP_EN)
+	DISCRETE_INPUT_LOGIC(CLOWNS_SPRINGBOARD_HIT_EN)
+	DISCRETE_INPUT_LOGIC(CLOWNS_SPRINGBOARD_MISS_EN)
+
+	// The low value of the pot is set to 7000.  A real 1M pot will never go to 0 anyways.
+	// This will give the control more apparent volume range.
+	// The music way overpowers the rest of the sounds anyways.
+	DISCRETE_ADJUSTMENT(CLOWNS_R507_POT, RES_M(1), 7000, DISC_LOGADJ, "R507")
+
+	/************************************************
+	 * Tone generator
+	 ************************************************/
+	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
+
+	/************************************************
+	 * Balloon hit sounds
+	 * The LFSR is the same as boothill
+	 ************************************************/
+	// Noise clock was breadboarded and measured at 7700Hz
+	DISCRETE_LFSR_NOISE(CLOWNS_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
+
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, CLOWNS_POP_TOP_EN, CLOWNS_POP_MIDDLE_EN, CLOWNS_POP_BOTTOM_EN, CLOWNS_NOISE, 0, &clowns_pop_tvca_info)
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(15), CAP_U(.01))
+	DISCRETE_CRFILTER(NODE_32, NODE_31, RES_K(15) + RES_K(39), CAP_U(.01))
+	DISCRETE_GAIN(CLOWNS_POP_SND, NODE_32, RES_K(39)/(RES_K(15) + RES_K(39)))
+
+	/************************************************
+	 * Springboard hit
+	 ************************************************/
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_40, 1, &clowns_sb_hit_osc_info)
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_41, CLOWNS_SPRINGBOARD_HIT_EN, 0, 0, NODE_40, 0, &clowns_sb_hit_tvca_info)
+	// The rest of the circuit is a filter.  The frequency response was calculated with SPICE.
+	DISCRETE_FILTER2(NODE_42, 1, NODE_41, 500, 1.0/.8, DISC_FILTER_LOWPASS)
+	// The filter has a gain of 0.5
+	DISCRETE_GAIN(CLOWNS_SB_HIT_SND, NODE_42, 0.5)
+
+	/************************************************
+	 * Springboard miss - INCOMPLETE
+	 ************************************************/
+	DISCRETE_CONSTANT(CLOWNS_SB_MISS_SND, 0) // Placeholder for incomplete sound
+
+	/************************************************
+	 * Combine all sound sources.
+	 ************************************************/
+	DISCRETE_MIXER4(NODE_91, 1, CLOWNS_SB_HIT_SND, CLOWNS_SB_MISS_SND, CLOWNS_POP_SND, MIDWAY_TONE_SND, &clowns_mixer)
+
+	DISCRETE_OUTPUT(NODE_91, 11000)
+DISCRETE_SOUND_END
+
+clowns_audio_device::clowns_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, CLOWNS_AUDIO, tag, owner, clock),
+	m_samples(*this, "samples"),
+	m_discrete(*this, "discrete"),
+	m_ctrl_sel_out(*this),
+	m_p1(0U),
+	m_p2(0U)
+{
+}
+
+void clowns_audio_device::p1_w(u8 data)
+{
+	u8 const changed(data ^ m_p1);
+	m_p1 = data;
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
+	if (BIT(changed, 1)) m_ctrl_sel_out(BIT(data, 1));
+
+	// D2-D7 are not connected
+}
+
+void clowns_audio_device::p2_w(u8 data)
+{
+	u8 const rising(data & ~m_p2);
+	m_p2 = data;
+
+	m_discrete->write(CLOWNS_POP_BOTTOM_EN, BIT(data, 0));
+	m_discrete->write(CLOWNS_POP_MIDDLE_EN, BIT(data, 1));
+	m_discrete->write(CLOWNS_POP_TOP_EN, BIT(data, 2));
+
+	machine().sound().system_enable(BIT(data, 3));
+
+	m_discrete->write(CLOWNS_SPRINGBOARD_HIT_EN, BIT(data, 4));
+
+	if (BIT(rising, 5)) m_samples->start(0, 0);  // springboard miss
+
+	// D6 and D7 are not connected
+}
+
+void clowns_audio_device::device_add_mconfig(machine_config &config)
+{
+	static char const *const sample_names[] = {
+			"*clowns",
+			"miss",
+			nullptr };
+
+	SPEAKER(config, "mono").front_center();
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.70);
+
+	DISCRETE(config, m_discrete, clowns_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void clowns_audio_device::device_start()
+{
+	m_ctrl_sel_out.resolve_safe();
+
+	m_p1 = 0U;
+	m_p2 = 0U;
+
+	save_item(NAME(m_p2));
+	save_item(NAME(m_p2));
+}
+
+
+/*************************************
+ *
+ *  Space Encounters
+ *
+ *  Discrete sound emulation:
+ *  Apr 2007, D.R.
+ *************************************/
+
+// nodes - inputs
+#define SPCENCTR_ENEMY_SHIP_SHOT_EN       NODE_01
+#define SPCENCTR_PLAYER_SHOT_EN           NODE_02
+#define SPCENCTR_SCREECH_EN               NODE_03
+#define SPCENCTR_CRASH_EN                 NODE_04
+#define SPCENCTR_EXPLOSION_EN             NODE_05
+#define SPCENCTR_BONUS_EN                 NODE_06
+#define SPCENCTR_WIND_DATA                NODE_07
+
+// nodes - sounds
+#define SPCENCTR_NOISE                    NODE_10
+#define SPCENCTR_ENEMY_SHIP_SHOT_SND      NODE_11
+#define SPCENCTR_PLAYER_SHOT_SND          NODE_12
+#define SPCENCTR_SCREECH_SND              NODE_13
+#define SPCENCTR_CRASH_SND                NODE_14
+#define SPCENCTR_EXPLOSION_SND            NODE_15
+#define SPCENCTR_BONUS_SND                NODE_16
+#define SPCENCTR_WIND_SND                 NODE_17
+
+static discrete_op_amp_info const spcenctr_enemy_ship_shot_op_amp_E1 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	0,                      // no r1
+	RES_K(510),             // R100
+	RES_M(2.2),             // R101
+	RES_M(2.2),             // R102
+	CAP_U(0.1),             // C100
+	0,                      // vN
+	12                      // vP
+};
+
+static discrete_op_amp_osc_info const spcenctr_enemy_ship_shot_op_amp_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	RES_K(560),             // R103
+	RES_K(7.5),             // R118
+	RES_K(22),              // R104
+	RES_K(47),              // R106
+	RES_K(100),             // R105
+	0,                      // no r6
+	0,                      // no r7
+	0,                      // no r8
+	CAP_U(0.0022),          // C101
+	12,                     // vP
+};
+
+
+static discrete_op_amp_info const spcenctr_enemy_ship_shot_op_amp_D1 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	RES_K(100),             // R107
+	RES_K(100),             // R109
+	RES_M(2.7),             // R108
+	RES_K(100),             // R110
+	0,                      // no c
+	0,                      // vN
+	12                      // vP
+};
+
+static discrete_op_amp_filt_info const spcenctr_enemy_ship_shot_filt =
+{
+	RES_K(100),             // R112
+	RES_K(10),              // R113
+	RES_M(4.3),             // r3
+	0,                      // no r4
+	RES_M(2.2),             // R114
+	CAP_U(0.001),           // c1
+	CAP_U(0.001),           // c2
+	0,                      // no c3
+	0,                      // vRef
+	12,                     // vP
+	0                       // vN
+};
+
+static discrete_op_amp_1sht_info const spcenctr_player_shot_1sht =
+{
+	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(4.7),             // R500
+	RES_K(100),             // R502
+	RES_M(1),               // R501
+	RES_M(1),               // R503
+	RES_M(2.2),             // R504
+	CAP_U(1),               // C500
+	CAP_P(470),             // C501
+	0,                      // vN
+	12                      // vP
+};
+
+static discrete_op_amp_info const spcenctr_player_shot_op_amp_E1 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	0,                      // no r1
+	RES_K(10),              // R505
+	RES_M(1.5),             // R506
+	0,                      // no r4
+	CAP_U(0.22),            // C502
+	0,                      // vN
+	12                      // vP
+};
+
+static discrete_op_amp_osc_info const spcenctr_player_shot_op_amp_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	1.0 / (1.0 / RES_M(1) + 1.0 / RES_K(330)) + RES_M(1.5),     // R507||R509 + R508
+	RES_M(1),               // R513
+	RES_K(560),             // R512
+	RES_M(2.7),             // R516
+	RES_M(1),               // R515
+	RES_M(4.7),             // R510
+	RES_M(3.3),             // R511
+	0,                      // no r8
+	CAP_P(330),             // C504
+	12,                     // vP
+};
+
+static discrete_op_amp_info const spcenctr_player_shot_op_amp_C1 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	RES_K(560),             // R517
+	RES_K(470),             // R514
+	RES_M(2.7),             // R518
+	RES_K(560),             // R524
+	0,                      // no c
+	0,                      // vN
+	12                      // vP
+};
+
+static discrete_op_amp_tvca_info const spcenctr_player_shot_tvca =
+{
+	RES_M(2.7),                         // R522
+	RES_K(560),                         // R521
+	0,                                  // no r3
+	RES_K(560),                         // R560
+	RES_K(1),                           // R42
+	0,                                  // no r6
+	RES_K(560),                         // R523
+	0,                                  // no r8
+	0,                                  // no r9
+	0,                                  // no r10
+	0,                                  // no r11
+	CAP_U(1),                           // C506
+	0,                                  // no c2
+	0, 0,                               // no c3, c4
+	12,                                 // v1
+	0,                                  // no v2
+	0,                                  // no v3
+	12,                                 // vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f0
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f1
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  // f2
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f3
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f4
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   // no f5
+};
+
+static discrete_op_amp_tvca_info const spcenctr_crash_tvca =
+{
+	RES_M(2.7),                         // R302
+	RES_K(470),                         // R300
+	0,                                  // no r3
+	RES_K(470),                         // R303
+	RES_K(1),                           // R56
+	0,                                  // no r6
+	RES_K(470),                         // R301
+	0,                                  // no r8
+	0,                                  // no r9
+	0,                                  // no r10
+	0,                                  // no r11
+	CAP_U(2.2),                         // C304
+	0,                                  // no c2
+	0, 0,                               // no c3, c4
+	5,                                  // v1
+	0,                                  // no v2
+	0,                                  // no v3
+	12,                                 // vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f0
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f1
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  // f2
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f3
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f4
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   // no f5
+};
+
+static discrete_op_amp_tvca_info const spcenctr_explosion_tvca =
+{
+	RES_M(2.7),                         // R402
+	RES_K(680),                         // R400
+	0,                                  // no r3
+	RES_K(680),                         // R403
+	RES_K(1),                           // R41
+	0,                                  // no r6
+	RES_K(680),                         // R401
+	0,                                  // no r8
+	0,                                  // no r9
+	0,                                  // no r10
+	0,                                  // no r11
+	CAP_U(2.2),                         // C400
+	0,                                  // no c2
+	0, 0,                               // no c3, c4
+	12,                                 // v1
+	0,                                  // no v2
+	0,                                  // no v3
+	12,                                 // vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f0
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f1
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  // f2
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f3
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f4
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   // no f5
+};
+
+static const discrete_555_desc spcenctr_555_bonus =
+{
+	DISC_555_OUT_SQW | DISC_555_OUT_DC,
+	5,                      // B+ voltage of 555
+	DEFAULT_555_VALUES
+};
+
+static const discrete_mixer_desc spcenctr_mixer =
+{
+	DISC_MIXER_IS_RESISTOR, // type
+	{ RES_K(15),            // R117
+		RES_K(15),          // R526
+		RES_K(22),          // R211
+		RES_K(3.6),         // R309
+		RES_K(1.8) +  RES_K(3.6) + RES_K(4.7),  // R405 + R406 + R407
+		RES_K(27),          // R715
+		RES_K(27)},         // R51
+	{0},                    // no rNode{}
+	{ 0,
+		CAP_U(0.001),       // C505
+		CAP_U(0.1),         // C202
+		CAP_U(1),           // C303
+		0,
+		0,
+		CAP_U(10)},         // C16
+	0,                      // no rI
+	0,                      // no rF
+	0,                      // no cF
+	CAP_U(1),               // C900
+	0,                      // vRef = ground
+	1                       // gain
+};
+
+static DISCRETE_SOUND_START(spcenctr_discrete)
+
+	/************************************************
+	 * Input register mapping
+	 ************************************************/
+	DISCRETE_INPUTX_LOGIC(SPCENCTR_ENEMY_SHIP_SHOT_EN, 12, 0, 0)
+	DISCRETE_INPUTX_LOGIC(SPCENCTR_PLAYER_SHOT_EN, 12, 0, 0)
+	DISCRETE_INPUT_LOGIC (SPCENCTR_SCREECH_EN)
+	DISCRETE_INPUT_LOGIC (SPCENCTR_CRASH_EN)
+	DISCRETE_INPUT_LOGIC (SPCENCTR_EXPLOSION_EN)
+	DISCRETE_INPUT_LOGIC (SPCENCTR_BONUS_EN)
+	DISCRETE_INPUT_DATA  (SPCENCTR_WIND_DATA)
+
+	/************************************************
+	 * Noise Generator
+	 ************************************************/
+	// Noise clock was breadboarded and measured at 7515
+	DISCRETE_LFSR_NOISE(SPCENCTR_NOISE,                 // IC A0, pin 10
+					1,                                  // ENAB
+					1,                                  // no RESET
+					7515,                               // CLK in Hz
+					12,                                 // p-p AMPL
+					0,                                  // no FEED input
+					12.0/2,                             // dc BIAS
+					&midway_lfsr)
+
+	/************************************************
+	 * Enemy Ship Shot
+	 ************************************************/
+	DISCRETE_OP_AMP(NODE_20,                            // IC E1, pin 10
+					1,                                  // ENAB
+					0,                                  // no IN0
+					SPCENCTR_ENEMY_SHIP_SHOT_EN,        // IN1
+					&spcenctr_enemy_ship_shot_op_amp_E1)
+	DISCRETE_OP_AMP_VCO1(NODE_21,                       // IC D1, pin 5
+					1,                                  // ENAB
+					NODE_20,                            // VMOD1
+					&spcenctr_enemy_ship_shot_op_amp_osc)
+	DISCRETE_OP_AMP(NODE_22,                            // IC D1, pin 9
+					1,                                  // ENAB
+					NODE_21,                            // IN0
+					NODE_20,                            // IN1
+					&spcenctr_enemy_ship_shot_op_amp_D1)
+	DISCRETE_OP_AMP_FILTER(NODE_23,                     // IC D1, pin 10
+					1,                                  // ENAB
+					NODE_22,                            // INP0
+					0,                                  // no INP1
+					DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON,
+					&spcenctr_enemy_ship_shot_filt)
+	DISCRETE_CRFILTER(SPCENCTR_ENEMY_SHIP_SHOT_SND,
+					NODE_23,                            // IN0
+					RES_K(1.8),                         // R116
+					CAP_U(0.1) )                        // C104
+
+	/************************************************
+	 * Player Shot
+	 ************************************************/
+	DISCRETE_OP_AMP_ONESHOT(NODE_30,                    // IC E1, pin 4
+					SPCENCTR_PLAYER_SHOT_EN,            // TRIG
+					&spcenctr_player_shot_1sht)         // breadboarded and scoped at 325mS
+	DISCRETE_OP_AMP(NODE_31,                            // IC E1, pin 5
+					1,                                  // ENAB
+					0,                                  // no IN0
+					NODE_30,                            // IN1
+					&spcenctr_player_shot_op_amp_E1)
+	// next 2 modules simulate the D502 voltage drop
+	DISCRETE_ADDER2(NODE_32,
+					1,                                  // ENAB
+					NODE_31,                            // IN0
+					-0.5)                               // IN1
+	DISCRETE_CLAMP(NODE_33,
+					NODE_32,                            // IN0
+					0,                                  // MIN
+					12)                                 // MAX
+	DISCRETE_CRFILTER(NODE_34,
+					SPCENCTR_NOISE,                     // IN0
+					RES_M(1) + RES_K(330),              // R507, R509
+					CAP_U(0.1) )                        // C503
+	DISCRETE_GAIN(NODE_35,
+					NODE_34,                            // IN0
+					RES_K(330)/(RES_M(1) + RES_K(330))) // GAIN - R507 : R509
+	DISCRETE_OP_AMP_VCO2(NODE_36,                       // IC C1, pin 4
+					1,                                  // ENAB
+					NODE_35,                            // VMOD1
+					NODE_33,                            // VMOD2
+					&spcenctr_player_shot_op_amp_osc)
+	DISCRETE_OP_AMP(NODE_37,                            // IC C1, pin 9
+					1,                                  // ENAB
+					NODE_36,                            // IN0
+					NODE_33,                            // IN1
+					&spcenctr_player_shot_op_amp_C1)
+	DISCRETE_OP_AMP_TRIG_VCA(SPCENCTR_PLAYER_SHOT_SND,  // IC C1, pin 10
+					SPCENCTR_PLAYER_SHOT_EN,            // TRG0
+					0,                                  // no TRG1
+					0,                                  // no TRG2
+					NODE_37,                            // IN0
+					0,                                  // no IN1
+					&spcenctr_player_shot_tvca)
+
+	/************************************************
+	 *Screech - unemulated
+	 ************************************************/
+	DISCRETE_CONSTANT(SPCENCTR_SCREECH_SND, 0)
+
+	/************************************************
+	 * Crash
+	 ************************************************/
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_60,                   // IC C2, pin 4
+					SPCENCTR_CRASH_EN,                  // TRG0
+					0,                                  // no TRG1
+					0,                                  // no TRG2
+					SPCENCTR_NOISE,                     // IN0
+					0,                                  // no IN1
+					&spcenctr_crash_tvca)
+	// The next 5 modules emulate the filter.
+	// The DC level was breadboarded and the frequency response was SPICEd
+	DISCRETE_ADDER2(NODE_61,                            // center on filter DC level
+					1,                                  // ENAB
+					NODE_60,                            // IN0
+					-6.8)                               // IN1
+	DISCRETE_FILTER2(NODE_62,
+					1,                                  // ENAB
+					NODE_61,                            // INP0
+					130,                                // FREQ
+					1.0 / 8,                            // DAMP
+					DISC_FILTER_BANDPASS)
+	DISCRETE_GAIN(NODE_63,
+					NODE_62,                            // IN0
+					6)                                  // GAIN
+	DISCRETE_ADDER2(NODE_64,                            // center on filter DC level
+					1,                                  // ENAB
+					NODE_63,                            // IN0
+					6.8)                                // IN1
+	DISCRETE_CLAMP(SPCENCTR_CRASH_SND,                  // IC C2, pin 5
+					NODE_64,                            // IN0
+					0,                                  // MIN
+					12.0 - OP_AMP_NORTON_VBE)           // MAX
+
+	/************************************************
+	 * Explosion
+	 ************************************************/
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_70,                   // IC D2, pin 10
+					SPCENCTR_EXPLOSION_EN,              // TRG0
+					0,                                  // no TRG1
+					0,                                  // no TRG2
+					SPCENCTR_NOISE,                     // IN0
+					0,                                  // no IN1
+					&spcenctr_explosion_tvca)
+	DISCRETE_RCFILTER(NODE_71,
+					NODE_70,                            // IN0
+					RES_K(1.8),                         // R405
+					CAP_U(0.22) )                       // C401
+	DISCRETE_RCFILTER(SPCENCTR_EXPLOSION_SND,
+					NODE_71,                            // IN0
+					RES_K(1.8) + RES_K(3.6),            // R405 + R406
+					CAP_U(0.22) )                       // C402
+
+	/************************************************
+	 *Bonus
+	 ************************************************/
+	DISCRETE_555_ASTABLE(NODE_80,                       // pin 5
+					// the pin 4 reset is not connected in schematic, but should be
+					SPCENCTR_BONUS_EN,                  // RESET
+					RES_K(1),                           // R710
+					RES_K(27),                          // R711
+					CAP_U(0.047),                       // C710
+					&spcenctr_555_bonus)
+	DISCRETE_555_ASTABLE(NODE_81,                       // pin 9
+					SPCENCTR_BONUS_EN,                  // RESET pin 10
+					RES_K(100),                         // R713
+					RES_K(47),                          // R714
+					CAP_U(1),                           // C713
+					&spcenctr_555_bonus)
+	DISCRETE_LOGIC_AND3(NODE_82,                        // IC C-D, pin 6
+					NODE_80,                            // INP0
+					NODE_81,                            // INP1
+					SPCENCTR_BONUS_EN)                  // INP2
+	DISCRETE_GAIN(SPCENCTR_BONUS_SND,                   // adjust from logic to TTL voltage level
+					NODE_82,                            // IN0
+					DEFAULT_TTL_V_LOGIC_1)              // GAIN
+
+	/************************************************
+	 *Wind - unemulated
+	 ************************************************/
+	DISCRETE_CONSTANT(SPCENCTR_WIND_SND, 0)
+
+	/************************************************
+	 * Final mix
+	 ************************************************/
+	DISCRETE_MIXER7(NODE_91,
+					1,                                  // ENAB
+					SPCENCTR_ENEMY_SHIP_SHOT_SND,       // IN0
+					SPCENCTR_PLAYER_SHOT_SND,           // IN1
+					SPCENCTR_SCREECH_SND,               // IN2
+					SPCENCTR_CRASH_SND,                 // IN3
+					SPCENCTR_EXPLOSION_SND,             // IN4
+					SPCENCTR_BONUS_SND,                 // IN5
+					SPCENCTR_WIND_SND,                  // IN6
+					&spcenctr_mixer)
+
+	DISCRETE_OUTPUT(NODE_91, 20000)
+DISCRETE_SOUND_END
+
+spcenctr_audio_device::spcenctr_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, SPCENCTR_AUDIO, tag, owner, clock),
+	m_sn(*this, "snsnd"),
+	m_discrete(*this, "discrete"),
+	m_lamp(*this, "LAMP"),
+	m_strobe(*this, "STROBE"),
+	m_strobe_timer(nullptr),
+	m_strobe_enable(0U)
+{
+}
+
+void spcenctr_audio_device::p1_w(u8 data)
+{
+	machine().sound().system_enable(BIT(data, 0));
+
+	// D1 is marked as 'OPTIONAL SWITCH VIDEO FOR COCKTAIL', but it is never set by the software
+
+	m_discrete->write(SPCENCTR_CRASH_EN, BIT(data, 2));
+
+	// D3-D7 are not connected
+}
+
+void spcenctr_audio_device::p2_w(u8 data)
+{
+	// set WIND SOUND FREQ(data & 0x0f)  0, if no wind
+
+	m_discrete->write(SPCENCTR_EXPLOSION_EN, BIT(data, 4));
+	m_discrete->write(SPCENCTR_PLAYER_SHOT_EN, BIT(data, 5));
+
+	// D6 and D7 are not connected
+}
+
+
+void spcenctr_audio_device::p3_w(u8 data)
+{
+	// if (data & 0x01)  enable SCREECH (hit the sides) sound
+
+	m_discrete->write(SPCENCTR_ENEMY_SHIP_SHOT_EN, BIT(data, 1));
+
+	m_strobe_enable = BIT(data, 2);
+
+	m_lamp = BIT(data, 3);
+
+	m_discrete->write(SPCENCTR_BONUS_EN, BIT(data, 4));
+
+	m_sn->enable_w(BIT(data, 5));
+
+	// D6 and D7 are not connected
+}
+
+void spcenctr_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, RES_K(100));
+	m_sn->set_amp_res(RES_K(56));
+	m_sn->set_feedback_res(RES_K(10));
+	m_sn->set_vco_params(0, CAP_U(0.047), RES_K(56));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(150));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.20);
+
+	DISCRETE(config, m_discrete, spcenctr_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.45);
+}
+
+void spcenctr_audio_device::device_start()
+{
+	m_lamp.resolve();
+	m_strobe.resolve();
+
+	m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spcenctr_audio_device::strobe_callback), this));
+
+	m_strobe_enable = 0U;
+
+	save_item(NAME(m_strobe_enable));
+
+	strobe_callback(nullptr, 0U);
+}
+
+TIMER_CALLBACK_MEMBER(spcenctr_audio_device::strobe_callback)
+{
+	constexpr double STROBE_FREQ = 9.00;    // Hz - calculated from the 555 timer
+	constexpr u32 STROBE_DUTY_CYCLE = 95;   // %
+
+	m_strobe = (param && m_strobe_enable) ? 1 : 0;
+	m_strobe_timer->adjust(
+			attotime::from_hz(STROBE_FREQ) * (param ? (100 - STROBE_DUTY_CYCLE) : STROBE_DUTY_CYCLE) / 100,
+			param ? 0 : 1);
+}
+
+
+/*************************************
+ *
+ *  M-4
+ *
+ *************************************/
+
+// Noise clock was breadboarded and measured at 3760Hz
+
+m4_audio_device::m4_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, M4_AUDIO, tag, owner, clock),
+	m_samples(*this, "samples%u", 1U),
+	m_p1(0U),
+	m_p2(0U)
+{
+}
+
+void m4_audio_device::p1_w(u8 data)
+{
+	u8 const rising(data & ~m_p1);
+	m_p1 = data;
+
+	// D0 and D1 are not connected
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+
+	machine().sound().system_enable(BIT(data, 3));
+
+	if (BIT(rising, 4)) m_samples[0]->start(0, 0); // LEFT PLAYER SHOT sound (goes to left speaker)
+	if (BIT(rising, 5)) m_samples[1]->start(0, 0); // RIGHT PLAYER SHOT sound (goes to right speaker)
+	if (BIT(rising, 6)) m_samples[0]->start(1, 1); // LEFT PLAYER EXPLOSION sound via 300K res (goes to left speaker)
+	if (BIT(rising, 7)) m_samples[1]->start(1, 1); // RIGHT PLAYER EXPLOSION sound via 300K res (goes to right speaker)
+}
+
+
+void m4_audio_device::p2_w(u8 data)
+{
+	u8 const rising(data & ~m_p2);
+	m_p2 = data;
+
+	if (BIT(rising, 0)) m_samples[0]->start(1, 1); // LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker)
+	if (BIT(rising, 1)) m_samples[1]->start(1, 1); // RIGHT PLAYER EXPLOSION sound via 510K res (goes to right speaker)
+
+	// if (data & 0x04)  enable LEFT TANK MOTOR sound (goes to left speaker)
+
+	// if (data & 0x08)  enable RIGHT TANK MOTOR sound (goes to right speaker)
+
+	// if (data & 0x10)  enable sound that is playing while the right plane is flying.  Circuit not named on schematics  (goes to left speaker)
+
+	// if (data & 0x20)  enable sound that is playing while the left plane is flying.  Circuit not named on schematics  (goes to right speaker)
+
+	// D6 and D7 are not connected
+}
+
+void m4_audio_device::device_add_mconfig(machine_config &config)
+{
+	static char const *const sample_names[] = {
+			"*m4",
+			"1",        // missle
+			"2",        // explosion
+			nullptr };
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	SAMPLES(config, m_samples[0]);
+	m_samples[0]->set_channels(2);
+	m_samples[0]->set_samples_names(sample_names);
+	m_samples[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+
+	SAMPLES(config, m_samples[1]);
+	m_samples[1]->set_channels(2);
+	m_samples[1]->set_samples_names(sample_names);
+	m_samples[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void m4_audio_device::device_start()
+{
+	m_p1 = 0U;
+	m_p2 = 0U;
+
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p2));
+}
+
+
+/*************************************
+ *
+ *  Phantom II
+ *
+ *************************************/
+
+phantom2_audio_device::phantom2_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, PHANTOM2_AUDIO, tag, owner, clock),
+	m_samples(*this, "samples"),
+	m_exp(*this, "EXPLAMP"),
+	m_p1(0U),
+	m_p2(0U)
+{
+}
+
+void phantom2_audio_device::p1_w(u8 data)
+{
+	u8 const rising(data & ~m_p1);
+	m_p1 = data;
+
+	if (BIT(rising, 0)) m_samples->start(0, 0); // PLAYER SHOT sound
+
+	// if (data & 0x02)  enable ENEMY SHOT sound
+
+	machine().sound().system_mute(!BIT(data, 5));
+	machine().sound().system_enable(BIT(data, 2));
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
+
+	// if (data & 0x10)  enable RADAR sound
+
+	// D5-D7 are not connected
+}
+
+void phantom2_audio_device::p2_w(u8 data)
+{
+	u8 const rising(data & ~m_p2);
+	m_p2 = data;
+
+	// D0-D2 are not connected
+
+	if (BIT(rising, 3)) m_samples->start(1, 1); // enable EXPLOSION sound
+
+	m_exp = BIT(data, 4);
+
+	// set JET SOUND FREQ((data >> 5) & 0x07)  0, if no jet sound
+}
+
+void phantom2_audio_device::device_add_mconfig(machine_config &config)
+{
+	static char const *const sample_names[] = {
+			"*phantom2",
+			"1",        // shot
+			"2",        // explosion
+			nullptr };
+
+	SPEAKER(config, "mono").front_center();
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_names(sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void phantom2_audio_device::device_start()
+{
+	m_exp.resolve();
+
+	m_p1 = 0U;
+	m_p2 = 0U;
+
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p2));
+}
+
+
+/*************************************
+ *
+ *  Audio setup
+ *
+ *************************************/
 
 WRITE8_MEMBER(mw8080bw_state::midway_tone_generator_lo_w)
 {
@@ -98,164 +1311,6 @@ WRITE8_MEMBER(mw8080bw_state::midway_tone_generator_hi_w)
 
 	/* D6 and D7 are not connected */
 }
-
-
-
-/*************************************
- *
- *  Implementation of the common
- *  noise circuits
- *
- *************************************/
-
-static const discrete_lfsr_desc midway_lfsr =
-{
-	DISC_CLK_IS_FREQ,
-	17,                 /* bit length */
-						/* the RC network fed into pin 4, has the effect
-						   of presetting all bits high at power up */
-	0x1ffff,            /* reset value */
-	4,                  /* use bit 4 as XOR input 0 */
-	16,                 /* use bit 16 as XOR input 1 */
-	DISC_LFSR_XOR,      /* feedback stage1 is XOR */
-	DISC_LFSR_OR,       /* feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,  /* feedback stage3 replaces the shifted register contents */
-	0x000001,           /* everything is shifted into the first bit only */
-	0,                  /* output is not inverted */
-	12                  /* output bit */
-};
-
-
-
-/*************************************
- *
- *  Sea Wolf
- *
- *************************************/
-
-static const char *const seawolf_sample_names[] =
-{
-	"*seawolf",
-	"shiphit",
-	"torpedo",
-	"dive",
-	"sonar",
-	"minehit",
-	nullptr
-};
-
-void mw8080bw_state::seawolf_audio(machine_config &config)
-{
-	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
-
-	SPEAKER(config, "mono").front_center();
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(5);
-	m_samples->set_samples_names(seawolf_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::seawolf_audio_w)
-{
-	uint8_t rising_bits = data & ~m_port_1_last;
-
-	/* if (data & 0x01)  enable SHIP HIT sound */
-	if (rising_bits & 0x01) m_samples->start(0, 0);
-
-	/* if (data & 0x02)  enable TORPEDO sound */
-	if (rising_bits & 0x02) m_samples->start(1, 1);
-
-	/* if (data & 0x04)  enable DIVE sound */
-	if (rising_bits & 0x04) m_samples->start(2, 2);
-
-	/* if (data & 0x08)  enable SONAR sound */
-	if (rising_bits & 0x08) m_samples->start(3, 3);
-
-	/* if (data & 0x10)  enable MINE HIT sound */
-	if (rising_bits & 0x10) m_samples->start(4, 4);
-
-	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
-
-	/* D6 and D7 are not connected */
-
-	m_port_1_last = data;
-}
-
-
-
-/*************************************
- *
- *  Gun Fight
- *
- *************************************/
-
-static const char *const gunfight_sample_names[] =
-{
-	"*gunfight",
-	"gunshot",
-	"killed",
-	nullptr
-};
-
-
-void mw8080bw_state::gunfight_audio(machine_config &config)
-{
-	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	SAMPLES(config, m_samples1);
-	m_samples1->set_channels(1);
-	m_samples1->set_samples_names(gunfight_sample_names);
-	m_samples1->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-
-	SAMPLES(config, m_samples2);
-	m_samples2->set_channels(1);
-	m_samples2->set_samples_names(gunfight_sample_names);
-	m_samples2->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::gunfight_audio_w)
-{
-	/* D0 and D1 are just tied to 1k resistors */
-
-	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
-
-	/* the 74175 latches and inverts the top 4 bits */
-	switch ((~data >> 4) & 0x0f)
-	{
-	case 0x00:
-		break;
-
-	case 0x01:
-		/* enable LEFT SHOOT sound (left speaker) */
-		m_samples1->start(0, 0);
-		break;
-
-	case 0x02:
-		/* enable RIGHT SHOOT sound (right speaker) */
-		m_samples2->start(0, 0);
-		break;
-
-	case 0x03:
-		/* enable LEFT HIT sound (left speaker) */
-		m_samples1->start(0, 1);
-		break;
-
-	case 0x04:
-		/* enable RIGHT HIT sound (right speaker) */
-		m_samples2->start(0, 1);
-		break;
-
-	default:
-		logerror("%04x:  Unknown sh port write %02x\n", m_maincpu->pc(), data);
-		break;
-	}
-}
-
 
 
 /*************************************
@@ -1539,421 +2594,6 @@ WRITE8_MEMBER(mw8080bw_state::dplay_audio_w)
 
 /*************************************
  *
- *  Guided Missile
- *
- *************************************/
-
-static const char *const gmissile_sample_names[] =
-{
-	"*gmissile",
-	"1",    /* missle */
-	"2",    /* explosion */
-	nullptr
-};
-
-void mw8080bw_state::gmissile_audio(machine_config &config)
-{
-	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	SAMPLES(config, m_samples1);
-	m_samples1->set_channels(1);
-	m_samples1->set_samples_names(gmissile_sample_names);
-	m_samples1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-
-	SAMPLES(config, m_samples2);
-	m_samples2->set_channels(1);
-	m_samples2->set_samples_names(gmissile_sample_names);
-	m_samples2->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::gmissile_audio_1_w)
-{
-	/* note that the schematics shows the left and right explosions
-	   reversed (D5=R, D7=L), but the software confirms that
-	   ours is right */
-
-	uint8_t rising_bits = data & ~m_port_1_last;
-
-	/* D0 and D1 are not connected */
-
-	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
-
-	machine().sound().system_enable((data >> 3) & 0x01);
-
-	/* if (data & 0x10)  enable RIGHT MISSILE sound (goes to right speaker) */
-	if (rising_bits & 0x10) m_samples2->start(0, 0);
-
-	/* if (data & 0x20)  enable LEFT EXPLOSION sound (goes to left speaker) */
-	output().set_value("L_EXP_LIGHT", (data >> 5) & 0x01);
-	if (rising_bits & 0x20) m_samples1->start(0, 1);
-
-	/* if (data & 0x40)  enable LEFT MISSILE sound (goes to left speaker) */
-	if (rising_bits & 0x40) m_samples1->start(0, 0);
-
-	/* if (data & 0x80)  enable RIGHT EXPLOSION sound (goes to right speaker) */
-	output().set_value("R_EXP_LIGHT", (data >> 7) & 0x01);
-	if (rising_bits & 0x80) m_samples2->start(0, 1);
-
-	m_port_1_last = data;
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::gmissile_audio_2_w)
-{
-	/* set AIRPLANE/COPTER/JET PAN(data & 0x07) */
-
-	/* set TANK PAN((data >> 3) & 0x07) */
-
-	/* D6 and D7 are not connected */
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::gmissile_audio_3_w)
-{
-	/* if (data & 0x01)  enable AIRPLANE (bi-plane) sound (goes to AIRPLANE/COPTER/JET panning circuit) */
-
-	/* if (data & 0x02)  enable TANK sound (goes to TANK panning circuit) */
-
-	/* if (data & 0x04)  enable COPTER sound (goes to AIRPLANE/COPTER/JET panning circuit) */
-
-	/* D3 and D4 are not connected */
-
-	/* if (data & 0x20)  enable JET (3 fighter jets) sound (goes to AIRPLANE/COPTER/JET panning circuit) */
-
-	/* D6 and D7 are not connected */
-}
-
-
-
-/*************************************
- *
- *  M-4
- *
- *************************************/
-
-/* Noise clock was breadboarded and measured at 3760Hz */
-
-static const char *const m4_sample_names[] =
-{
-	"*m4",
-	"1",    /* missle */
-	"2",    /* explosion */
-	nullptr
-};
-
-
-void mw8080bw_state::m4_audio(machine_config &config)
-{
-	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	SAMPLES(config, m_samples1);
-	m_samples1->set_channels(2);
-	m_samples1->set_samples_names(m4_sample_names);
-	m_samples1->add_route(ALL_OUTPUTS, "lspeaker", 1);
-
-	SAMPLES(config, m_samples2);
-	m_samples2->set_channels(2);
-	m_samples2->set_samples_names(m4_sample_names);
-	m_samples2->add_route(ALL_OUTPUTS, "rspeaker", 1);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::m4_audio_1_w)
-{
-	uint8_t rising_bits = data & ~m_port_1_last;
-
-	/* D0 and D1 are not connected */
-
-	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
-
-	machine().sound().system_enable((data >> 3) & 0x01);
-
-	/* if (data & 0x10)  enable LEFT PLAYER SHOT sound (goes to left speaker) */
-	if (rising_bits & 0x10) m_samples1->start(0, 0);
-
-	/* if (data & 0x20)  enable RIGHT PLAYER SHOT sound (goes to right speaker) */
-	if (rising_bits & 0x20) m_samples2->start(0, 0);
-
-	/* if (data & 0x40)  enable LEFT PLAYER EXPLOSION sound via 300K res (goes to left speaker) */
-	if (rising_bits & 0x40) m_samples1->start(1, 1);
-
-	/* if (data & 0x80)  enable RIGHT PLAYER EXPLOSION sound via 300K res (goes to right speaker) */
-	if (rising_bits & 0x80) m_samples2->start(1, 1);
-
-	m_port_1_last = data;
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::m4_audio_2_w)
-{
-	uint8_t rising_bits = data & ~m_port_2_last;
-
-	/* if (data & 0x01)  enable LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker) */
-	if (rising_bits & 0x01) m_samples1->start(1, 1);
-
-	/* if (data & 0x02)  enable RIGHT PLAYER EXPLOSION sound via 510K res (goes to right speaker) */
-	if (rising_bits & 0x02) m_samples2->start(1, 1);
-
-	/* if (data & 0x04)  enable LEFT TANK MOTOR sound (goes to left speaker) */
-
-	/* if (data & 0x08)  enable RIGHT TANK MOTOR sound (goes to right speaker) */
-
-	/* if (data & 0x10)  enable sound that is playing while the right plane is
-	                     flying.  Circuit not named on schematics  (goes to left speaker) */
-
-	/* if (data & 0x20)  enable sound that is playing while the left plane is
-	                     flying.  Circuit not named on schematics  (goes to right speaker) */
-
-	/* D6 and D7 are not connected */
-
-	m_port_2_last = data;
-}
-
-
-
-/*************************************
- *
- *  Clowns
- *
- *  Discrete sound emulation: Mar 2005, D.R.
- *
- *************************************/
-
-/* nodes - inputs */
-#define CLOWNS_POP_BOTTOM_EN        NODE_01
-#define CLOWNS_POP_MIDDLE_EN        NODE_02
-#define CLOWNS_POP_TOP_EN           NODE_03
-#define CLOWNS_SPRINGBOARD_HIT_EN   NODE_04
-#define CLOWNS_SPRINGBOARD_MISS_EN  NODE_05
-
-/* nodes - sounds */
-#define CLOWNS_NOISE                NODE_06
-#define CLOWNS_POP_SND              NODE_07
-#define CLOWNS_SB_HIT_SND           NODE_08
-#define CLOWNS_SB_MISS_SND          NODE_09
-
-/* nodes - adjusters */
-#define CLOWNS_R507_POT             NODE_11
-
-
-static const discrete_op_amp_tvca_info clowns_pop_tvca_info =
-{
-	RES_M(2.7),     /* r304 */
-	RES_K(680),     /* r303 */
-	0,
-	RES_K(680),     /* r305 */
-	RES_K(1),       /* j3 */
-	0,
-	RES_K(470),     /* r300 */
-	RES_K(1),       /* j3 */
-	RES_K(510),     /* r301 */
-	RES_K(1),       /* j3 */
-	RES_K(680),     /* r302 */
-	CAP_U(.015),    /* c300 */
-	CAP_U(.1),      /* c301 */
-	CAP_U(.082),    /* c302 */
-	0,              /* no c4 */
-	5,          /* v1 */
-	5,          /* v2 */
-	5,          /* v3 */
-	12,         /* vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG2
-};
-
-
-static const discrete_op_amp_osc_info clowns_sb_hit_osc_info =
-{
-	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
-	RES_K(820),     /* r200 */
-	RES_K(33),      /* r203 */
-	RES_K(150),     /* r201 */
-	RES_K(240),     /* r204 */
-	RES_M(1),       /* r202 */
-	0,
-	0,
-	0,
-	CAP_U(0.01),    /* c200 */
-	12
-};
-
-
-static const discrete_op_amp_tvca_info clowns_sb_hit_tvca_info =
-{
-	RES_M(2.7),     /* r207 */
-	RES_K(680),     /* r205 */
-	0,
-	RES_K(680),     /* r208 */
-	RES_K(1),       /* j3 */
-	0,
-	RES_K(680),     /* r206 */
-	0,0,0,0,
-	CAP_U(1),       /* c201 */
-	0,
-	0, 0,
-	5,          /* v1 */
-	0,          /* v2 */
-	0,          /* v3 */
-	12,         /* vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-static const discrete_mixer_desc clowns_mixer =
-{
-	DISC_MIXER_IS_OP_AMP,
-	{ RES_K(10),
-		RES_K(10),
-		RES_K(10) + 1.0 / (1.0 / RES_K(15) + 1.0 / RES_K(39)),
-		RES_K(1) },
-	{ 0,
-		0,
-		0,
-		CLOWNS_R507_POT },
-	{ 0,
-		CAP_U(0.022),
-		0,
-		0 },
-	0,
-	RES_K(100),
-	0,
-	CAP_U(1),
-	0,
-	1
-};
-
-
-static DISCRETE_SOUND_START(clowns_discrete)
-
-	/************************************************
-	 * Input register mapping
-	 ************************************************/
-	DISCRETE_INPUT_LOGIC(CLOWNS_POP_BOTTOM_EN)
-	DISCRETE_INPUT_LOGIC(CLOWNS_POP_MIDDLE_EN)
-	DISCRETE_INPUT_LOGIC(CLOWNS_POP_TOP_EN)
-	DISCRETE_INPUT_LOGIC(CLOWNS_SPRINGBOARD_HIT_EN)
-	DISCRETE_INPUT_LOGIC(CLOWNS_SPRINGBOARD_MISS_EN)
-
-	/* The low value of the pot is set to 7000.  A real 1M pot will never go to 0 anyways. */
-	/* This will give the control more apparent volume range. */
-	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT(CLOWNS_R507_POT, RES_M(1), 7000, DISC_LOGADJ, "R507")
-
-	/************************************************
-	 * Tone generator
-	 ************************************************/
-	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
-
-	/************************************************
-	 * Balloon hit sounds
-	 * The LFSR is the same as boothill
-	 ************************************************/
-	/* Noise clock was breadboarded and measured at 7700Hz */
-	DISCRETE_LFSR_NOISE(CLOWNS_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
-
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, CLOWNS_POP_TOP_EN, CLOWNS_POP_MIDDLE_EN, CLOWNS_POP_BOTTOM_EN, CLOWNS_NOISE, 0, &clowns_pop_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(15), CAP_U(.01))
-	DISCRETE_CRFILTER(NODE_32, NODE_31, RES_K(15) + RES_K(39), CAP_U(.01))
-	DISCRETE_GAIN(CLOWNS_POP_SND, NODE_32, RES_K(39)/(RES_K(15) + RES_K(39)))
-
-	/************************************************
-	 * Springboard hit
-	 ************************************************/
-	DISCRETE_OP_AMP_OSCILLATOR(NODE_40, 1, &clowns_sb_hit_osc_info)
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_41, CLOWNS_SPRINGBOARD_HIT_EN, 0, 0, NODE_40, 0, &clowns_sb_hit_tvca_info)
-	/* The rest of the circuit is a filter.  The frequency response was calculated with SPICE. */
-	DISCRETE_FILTER2(NODE_42, 1, NODE_41, 500, 1.0/.8, DISC_FILTER_LOWPASS)
-	/* The filter has a gain of 0.5 */
-	DISCRETE_GAIN(CLOWNS_SB_HIT_SND, NODE_42, 0.5)
-
-	/************************************************
-	 * Springboard miss - INCOMPLETE
-	 ************************************************/
-	DISCRETE_CONSTANT(CLOWNS_SB_MISS_SND, 0) /* Placeholder for incomplete sound */
-
-	/************************************************
-	 * Combine all sound sources.
-	 ************************************************/
-	DISCRETE_MIXER4(NODE_91, 1, CLOWNS_SB_HIT_SND, CLOWNS_SB_MISS_SND, CLOWNS_POP_SND, MIDWAY_TONE_SND, &clowns_mixer)
-
-	DISCRETE_OUTPUT(NODE_91, 11000)
-DISCRETE_SOUND_END
-
-
-static const char *const clowns_sample_names[] =
-{
-	"*clowns",
-	"miss",
-	nullptr
-};
-
-void mw8080bw_state::clowns_audio(machine_config &config)
-{
-	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
-
-	SPEAKER(config, "mono").front_center();
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
-	m_samples->set_samples_names(clowns_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.70);
-
-	DISCRETE(config, m_discrete, clowns_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::clowns_audio_1_w)
-{
-	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 0x01);
-
-	m_clowns_controller_select = (data >> 1) & 0x01;
-
-	/* D2-D7 are not connected */
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::clowns_audio_2_w)
-{
-	uint8_t rising_bits = data & ~m_port_2_last;
-
-	m_discrete->write(CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
-
-	m_discrete->write(CLOWNS_POP_MIDDLE_EN, (data >> 1) & 0x01);
-
-	m_discrete->write(CLOWNS_POP_TOP_EN, (data >> 2) & 0x01);
-
-	machine().sound().system_enable((data >> 3) & 0x01);
-
-	m_discrete->write(CLOWNS_SPRINGBOARD_HIT_EN, (data >> 4) & 0x01);
-
-	if (rising_bits & 0x20) m_samples->start(0, 0);  /* springboard miss */
-
-	/* D6 and D7 are not connected */
-
-	m_port_2_last = data;
-}
-
-
-
-/*************************************
- *
  *  Space Walk
  *
  *  Discrete sound emulation: Oct 2009, D.R.
@@ -2715,622 +3355,6 @@ WRITE8_MEMBER(mw8080bw_state::dogpatch_audio_w)
 
 /*************************************
  *
- *  Space Encounters
- *
- *  Discrete sound emulation:
- *  Apr 2007, D.R.
- *************************************/
-
-/* nodes - inputs */
-#define SPCENCTR_ENEMY_SHIP_SHOT_EN       NODE_01
-#define SPCENCTR_PLAYER_SHOT_EN           NODE_02
-#define SPCENCTR_SCREECH_EN               NODE_03
-#define SPCENCTR_CRASH_EN                 NODE_04
-#define SPCENCTR_EXPLOSION_EN             NODE_05
-#define SPCENCTR_BONUS_EN                 NODE_06
-#define SPCENCTR_WIND_DATA                NODE_07
-
-/* nodes - sounds */
-#define SPCENCTR_NOISE                    NODE_10
-#define SPCENCTR_ENEMY_SHIP_SHOT_SND      NODE_11
-#define SPCENCTR_PLAYER_SHOT_SND          NODE_12
-#define SPCENCTR_SCREECH_SND              NODE_13
-#define SPCENCTR_CRASH_SND                NODE_14
-#define SPCENCTR_EXPLOSION_SND            NODE_15
-#define SPCENCTR_BONUS_SND                NODE_16
-#define SPCENCTR_WIND_SND                 NODE_17
-
-
-static const discrete_op_amp_info spcenctr_enemy_ship_shot_op_amp_E1 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	0,                      /* no r1 */
-	RES_K(510),             /* R100 */
-	RES_M(2.2),             /* R101 */
-	RES_M(2.2),             /* R102 */
-	CAP_U(0.1),             /* C100 */
-	0,                      /* vN */
-	12                      /* vP */
-};
-
-
-static const discrete_op_amp_osc_info spcenctr_enemy_ship_shot_op_amp_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
-	RES_K(560),     /* R103 */
-	RES_K(7.5),     /* R118 */
-	RES_K(22),      /* R104 */
-	RES_K(47),      /* R106 */
-	RES_K(100),     /* R105 */
-	0,              /* no r6 */
-	0,              /* no r7 */
-	0,              /* no r8 */
-	CAP_U(0.0022),  /* C101 */
-	12,             /* vP */
-};
-
-
-static const discrete_op_amp_info spcenctr_enemy_ship_shot_op_amp_D1 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	RES_K(100),             /* R107 */
-	RES_K(100),             /* R109 */
-	RES_M(2.7),             /* R108 */
-	RES_K(100),             /* R110 */
-	0,                      /* no c */
-	0,                      /* vN */
-	12                      /* vP */
-};
-
-
-static const discrete_op_amp_filt_info spcenctr_enemy_ship_shot_filt =
-{
-	RES_K(100),     /* R112 */
-	RES_K(10),      /* R113 */
-	RES_M(4.3),     /* r3 */
-	0,              /* no r4 */
-	RES_M(2.2),     /* R114 */
-	CAP_U(0.001),   /* c1 */
-	CAP_U(0.001),   /* c2 */
-	0,              /* no c3 */
-	0,              /* vRef */
-	12,             /* vP */
-	0               /* vN */
-};
-
-
-static const discrete_op_amp_1sht_info spcenctr_player_shot_1sht =
-{
-	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(4.7),     /* R500 */
-	RES_K(100),     /* R502 */
-	RES_M(1),       /* R501 */
-	RES_M(1),       /* R503 */
-	RES_M(2.2),     /* R504 */
-	CAP_U(1),       /* C500 */
-	CAP_P(470),     /* C501 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_info spcenctr_player_shot_op_amp_E1 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	0,              /* no r1 */
-	RES_K(10),      /* R505 */
-	RES_M(1.5),     /* R506 */
-	0,              /* no r4 */
-	CAP_U(0.22),    /* C502 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_osc_info spcenctr_player_shot_op_amp_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
-	1.0 / (1.0 / RES_M(1) + 1.0 / RES_K(330)) + RES_M(1.5),     /* R507||R509 + R508 */
-	RES_M(1),       /* R513 */
-	RES_K(560),     /* R512 */
-	RES_M(2.7),     /* R516 */
-	RES_M(1),       /* R515 */
-	RES_M(4.7),     /* R510 */
-	RES_M(3.3),     /* R511 */
-	0,              /* no r8 */
-	CAP_P(330),     /* C504 */
-	12,             /* vP */
-};
-
-
-static const discrete_op_amp_info spcenctr_player_shot_op_amp_C1 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	RES_K(560),     /* R517 */
-	RES_K(470),     /* R514 */
-	RES_M(2.7),     /* R518 */
-	RES_K(560),     /* R524 */
-	0,              /* no c */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_tvca_info spcenctr_player_shot_tvca =
-{
-	RES_M(2.7),                         /* R522 */
-	RES_K(560),                         /* R521 */
-	0,                                  /* no r3 */
-	RES_K(560),                         /* R560 */
-	RES_K(1),                           /* R42 */
-	0,                                  /* no r6 */
-	RES_K(560),                         /* R523 */
-	0,                                  /* no r8 */
-	0,                                  /* no r9 */
-	0,                                  /* no r10 */
-	0,                                  /* no r11 */
-	CAP_U(1),                           /* C506 */
-	0,                                  /* no c2 */
-	0, 0,                               /* no c3, c4 */
-	12,                                 /* v1 */
-	0,                                  /* no v2 */
-	0,                                  /* no v3 */
-	12,                                 /* vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f0 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f1 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  /* f2 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f3 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f4 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   /* no f5 */
-};
-
-
-static const discrete_op_amp_tvca_info spcenctr_crash_tvca =
-{
-	RES_M(2.7),                         /* R302 */
-	RES_K(470),                         /* R300 */
-	0,                                  /* no r3 */
-	RES_K(470),                         /* R303 */
-	RES_K(1),                           /* R56 */
-	0,                                  /* no r6 */
-	RES_K(470),                         /* R301 */
-	0,                                  /* no r8 */
-	0,                                  /* no r9 */
-	0,                                  /* no r10 */
-	0,                                  /* no r11 */
-	CAP_U(2.2),                         /* C304 */
-	0,                                  /* no c2 */
-	0, 0,                               /* no c3, c4 */
-	5,                                  /* v1 */
-	0,                                  /* no v2 */
-	0,                                  /* no v3 */
-	12,                                 /* vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f0 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f1 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  /* f2 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f3 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f4 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   /* no f5 */
-};
-
-
-static const discrete_op_amp_tvca_info spcenctr_explosion_tvca =
-{
-	RES_M(2.7),                         /* R402 */
-	RES_K(680),                         /* R400 */
-	0,                                  /* no r3 */
-	RES_K(680),                         /* R403 */
-	RES_K(1),                           /* R41 */
-	0,                                  /* no r6 */
-	RES_K(680),                         /* R401 */
-	0,                                  /* no r8 */
-	0,                                  /* no r9 */
-	0,                                  /* no r10 */
-	0,                                  /* no r11 */
-	CAP_U(2.2),                         /* C400 */
-	0,                                  /* no c2 */
-	0, 0,                               /* no c3, c4 */
-	12,                                 /* v1 */
-	0,                                  /* no v2 */
-	0,                                  /* no v3 */
-	12,                                 /* vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f0 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f1 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  /* f2 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f3 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f4 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   /* no f5 */
-};
-
-
-static const discrete_555_desc spcenctr_555_bonus =
-{
-	DISC_555_OUT_SQW | DISC_555_OUT_DC,
-	5,              /* B+ voltage of 555 */
-	DEFAULT_555_VALUES
-};
-
-
-static const discrete_mixer_desc spcenctr_mixer =
-{
-	DISC_MIXER_IS_RESISTOR,     /* type */
-	{ RES_K(15),                /* R117 */
-		RES_K(15),              /* R526 */
-		RES_K(22),              /* R211 */
-		RES_K(3.6),             /* R309 */
-		RES_K(1.8) +  RES_K(3.6) + RES_K(4.7),  /* R405 + R406 + R407 */
-		RES_K(27),              /* R715 */
-		RES_K(27)},             /* R51 */
-	{0},                        /* no rNode{} */
-	{ 0,
-		CAP_U(0.001),               /* C505 */
-		CAP_U(0.1),             /* C202 */
-		CAP_U(1),                   /* C303 */
-		0,
-		0,
-		CAP_U(10)},             /* C16 */
-	0,                          /* no rI */
-	0,                          /* no rF */
-	0,                          /* no cF */
-	CAP_U(1),                   /* C900 */
-	0,                          /* vRef = ground */
-	1                           /* gain */
-};
-
-
-static DISCRETE_SOUND_START(spcenctr_discrete)
-
-	/************************************************
-	 * Input register mapping
-	 ************************************************/
-	DISCRETE_INPUTX_LOGIC(SPCENCTR_ENEMY_SHIP_SHOT_EN, 12, 0, 0)
-	DISCRETE_INPUTX_LOGIC(SPCENCTR_PLAYER_SHOT_EN, 12, 0, 0)
-	DISCRETE_INPUT_LOGIC (SPCENCTR_SCREECH_EN)
-	DISCRETE_INPUT_LOGIC (SPCENCTR_CRASH_EN)
-	DISCRETE_INPUT_LOGIC (SPCENCTR_EXPLOSION_EN)
-	DISCRETE_INPUT_LOGIC (SPCENCTR_BONUS_EN)
-	DISCRETE_INPUT_DATA  (SPCENCTR_WIND_DATA)
-
-
-	/************************************************
-	 * Noise Generator
-	 ************************************************/
-	/* Noise clock was breadboarded and measured at 7515 */
-	DISCRETE_LFSR_NOISE(SPCENCTR_NOISE,         /* IC A0, pin 10 */
-					1,                          /* ENAB */
-					1,                          /* no RESET */
-					7515,                       /* CLK in Hz */
-					12,                         /* p-p AMPL */
-					0,                          /* no FEED input */
-					12.0/2,                     /* dc BIAS */
-					&midway_lfsr)
-
-
-	/************************************************
-	 * Enemy Ship Shot
-	 ************************************************/
-	DISCRETE_OP_AMP(NODE_20,                            /* IC E1, pin 10 */
-					1,                                  /* ENAB */
-					0,                                  /* no IN0 */
-					SPCENCTR_ENEMY_SHIP_SHOT_EN,        /* IN1 */
-					&spcenctr_enemy_ship_shot_op_amp_E1)
-	DISCRETE_OP_AMP_VCO1(NODE_21,                       /* IC D1, pin 5 */
-					1,                                  /* ENAB */
-					NODE_20,                            /* VMOD1 */
-					&spcenctr_enemy_ship_shot_op_amp_osc)
-	DISCRETE_OP_AMP(NODE_22,                            /* IC D1, pin 9 */
-					1,                                  /* ENAB */
-					NODE_21,                            /* IN0 */
-					NODE_20,                            /* IN1 */
-					&spcenctr_enemy_ship_shot_op_amp_D1)
-	DISCRETE_OP_AMP_FILTER(NODE_23,                     /* IC D1, pin 10 */
-					1,                                  /* ENAB */
-					NODE_22,                            /* INP0 */
-					0,                                  /* no INP1 */
-					DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON,
-					&spcenctr_enemy_ship_shot_filt)
-	DISCRETE_CRFILTER(SPCENCTR_ENEMY_SHIP_SHOT_SND,
-					NODE_23,                            /* IN0 */
-					RES_K(1.8),                         /* R116 */
-					CAP_U(0.1) )                        /* C104 */
-
-
-	/************************************************
-	 * Player Shot
-	 ************************************************/
-	DISCRETE_OP_AMP_ONESHOT(NODE_30,                    /* IC E1, pin 4 */
-					SPCENCTR_PLAYER_SHOT_EN,            /* TRIG */
-					&spcenctr_player_shot_1sht)         /* breadboarded and scoped at 325mS */
-	DISCRETE_OP_AMP(NODE_31,                            /* IC E1, pin 5 */
-					1,                                  /* ENAB */
-					0,                                  /* no IN0 */
-					NODE_30,                            /* IN1 */
-					&spcenctr_player_shot_op_amp_E1)
-	/* next 2 modules simulate the D502 voltage drop */
-	DISCRETE_ADDER2(NODE_32,
-					1,                                  /* ENAB */
-					NODE_31,                            /* IN0 */
-					-0.5)                               /* IN1 */
-	DISCRETE_CLAMP(NODE_33,
-					NODE_32,                            /* IN0 */
-					0,                                  /* MIN */
-					12)                                 /* MAX */
-	DISCRETE_CRFILTER(NODE_34,
-					SPCENCTR_NOISE,                     /* IN0 */
-					RES_M(1) + RES_K(330),              /* R507, R509 */
-					CAP_U(0.1) )                        /* C503 */
-	DISCRETE_GAIN(NODE_35,
-					NODE_34,                            /* IN0 */
-					RES_K(330)/(RES_M(1) + RES_K(330))) /* GAIN - R507 : R509 */
-	DISCRETE_OP_AMP_VCO2(NODE_36,                       /* IC C1, pin 4 */
-					1,                                  /* ENAB */
-					NODE_35,                            /* VMOD1 */
-					NODE_33,                            /* VMOD2 */
-					&spcenctr_player_shot_op_amp_osc)
-	DISCRETE_OP_AMP(NODE_37,                            /* IC C1, pin 9 */
-					1,                                  /* ENAB */
-					NODE_36,                            /* IN0 */
-					NODE_33,                            /* IN1 */
-					&spcenctr_player_shot_op_amp_C1)
-	DISCRETE_OP_AMP_TRIG_VCA(SPCENCTR_PLAYER_SHOT_SND,  /* IC C1, pin 10 */
-					SPCENCTR_PLAYER_SHOT_EN,            /* TRG0 */
-					0,                                  /* no TRG1 */
-					0,                                  /* no TRG2 */
-					NODE_37,                            /* IN0 */
-					0,                                  /* no IN1 */
-					&spcenctr_player_shot_tvca)
-
-
-	/************************************************
-	 *Screech - unemulated
-	 ************************************************/
-	DISCRETE_CONSTANT(SPCENCTR_SCREECH_SND, 0)
-
-
-	/************************************************
-	 * Crash
-	 ************************************************/
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_60,           /* IC C2, pin 4 */
-					SPCENCTR_CRASH_EN,          /* TRG0 */
-					0,                          /* no TRG1 */
-					0,                          /* no TRG2 */
-					SPCENCTR_NOISE,             /* IN0 */
-					0,                          /* no IN1 */
-					&spcenctr_crash_tvca)
-	/* The next 5 modules emulate the filter. */
-	/* The DC level was breadboarded and the frequency response was SPICEd */
-	DISCRETE_ADDER2(NODE_61,                    /* center on filter DC level */
-					1,                          /* ENAB */
-					NODE_60,                    /* IN0 */
-					-6.8)                       /* IN1 */
-	DISCRETE_FILTER2(NODE_62,
-					1,                          /* ENAB */
-					NODE_61,                    /* INP0 */
-					130,                        /* FREQ */
-					1.0 / 8,                    /* DAMP */
-					DISC_FILTER_BANDPASS)
-	DISCRETE_GAIN(NODE_63,
-					NODE_62,                    /* IN0 */
-					6)                          /* GAIN */
-	DISCRETE_ADDER2(NODE_64,                    /* center on filter DC level */
-					1,                          /* ENAB */
-					NODE_63,                    /* IN0 */
-					6.8)                        /* IN1 */
-	DISCRETE_CLAMP(SPCENCTR_CRASH_SND,          /* IC C2, pin 5 */
-					NODE_64,                    /* IN0 */
-					0,                          /* MIN */
-					12.0 - OP_AMP_NORTON_VBE)   /* MAX */
-
-
-	/************************************************
-	 * Explosion
-	 ************************************************/
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_70,           /* IC D2, pin 10 */
-					SPCENCTR_EXPLOSION_EN,      /* TRG0 */
-					0,                          /* no TRG1 */
-					0,                          /* no TRG2 */
-					SPCENCTR_NOISE,             /* IN0 */
-					0,                          /* no IN1 */
-					&spcenctr_explosion_tvca)
-	DISCRETE_RCFILTER(NODE_71,
-					NODE_70,                    /* IN0 */
-					RES_K(1.8),                 /* R405 */
-					CAP_U(0.22) )               /* C401 */
-	DISCRETE_RCFILTER(SPCENCTR_EXPLOSION_SND,
-					NODE_71,                    /* IN0 */
-					RES_K(1.8) + RES_K(3.6),    /* R405 + R406 */
-					CAP_U(0.22) )               /* C402 */
-
-
-	/************************************************
-	 *Bonus
-	 ************************************************/
-	DISCRETE_555_ASTABLE(NODE_80,               /* pin 5 */
-					/* the pin 4 reset is not connected in schematic, but should be */
-					SPCENCTR_BONUS_EN,          /* RESET */
-					RES_K(1),                   /* R710 */
-					RES_K(27),                  /* R711 */
-					CAP_U(0.047),               /* C710 */
-					&spcenctr_555_bonus)
-	DISCRETE_555_ASTABLE(NODE_81,               /* pin 9 */
-					SPCENCTR_BONUS_EN,          /* RESET pin 10 */
-					RES_K(100),                 /* R713 */
-					RES_K(47),                  /* R714 */
-					CAP_U(1),                   /* C713 */
-					&spcenctr_555_bonus)
-	DISCRETE_LOGIC_AND3(NODE_82,                /* IC C-D, pin 6 */
-					NODE_80,                    /* INP0 */
-					NODE_81,                    /* INP1 */
-					SPCENCTR_BONUS_EN)          /* INP2 */
-	DISCRETE_GAIN(SPCENCTR_BONUS_SND,           /* adjust from logic to TTL voltage level */
-					NODE_82,                    /* IN0 */
-					DEFAULT_TTL_V_LOGIC_1)      /* GAIN */
-
-
-	/************************************************
-	 *Wind - unemulated
-	 ************************************************/
-	DISCRETE_CONSTANT(SPCENCTR_WIND_SND, 0)
-
-
-	/************************************************
-	 * Final mix
-	 ************************************************/
-	DISCRETE_MIXER7(NODE_91,
-					1,                              /* ENAB */
-					SPCENCTR_ENEMY_SHIP_SHOT_SND,   /* IN0 */
-					SPCENCTR_PLAYER_SHOT_SND,       /* IN1 */
-					SPCENCTR_SCREECH_SND,           /* IN2 */
-					SPCENCTR_CRASH_SND,             /* IN3 */
-					SPCENCTR_EXPLOSION_SND,         /* IN4 */
-					SPCENCTR_BONUS_SND,             /* IN5 */
-					SPCENCTR_WIND_SND,              /* IN6 */
-					&spcenctr_mixer)
-
-	DISCRETE_OUTPUT(NODE_91, 20000)
-DISCRETE_SOUND_END
-
-
-void mw8080bw_state::spcenctr_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	SN76477(config, m_sn);
-	m_sn->set_noise_params(0, 0, 0);
-	m_sn->set_decay_res(0);
-	m_sn->set_attack_params(0, RES_K(100));
-	m_sn->set_amp_res(RES_K(56));
-	m_sn->set_feedback_res(RES_K(10));
-	m_sn->set_vco_params(0, CAP_U(0.047), RES_K(56));
-	m_sn->set_pitch_voltage(5.0);
-	m_sn->set_slf_params(CAP_U(1.0), RES_K(150));
-	m_sn->set_oneshot_params(0, 0);
-	m_sn->set_vco_mode(1);
-	m_sn->set_mixer_params(0, 0, 0);
-	m_sn->set_envelope_params(1, 0);
-	m_sn->set_enable(1);
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.20);
-
-	DISCRETE(config, m_discrete, spcenctr_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.45);
-}
-
-
-
-WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_1_w)
-{
-	machine().sound().system_enable((data >> 0) & 0x01);
-
-	/* D1 is marked as 'OPTIONAL SWITCH VIDEO FOR COCKTAIL',
-	   but it is never set by the software */
-
-	m_discrete->write(SPCENCTR_CRASH_EN, (data >> 2) & 0x01);
-
-	/* D3-D7 are not connected */
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_2_w)
-{
-	/* set WIND SOUND FREQ(data & 0x0f)  0, if no wind */
-
-	m_discrete->write(SPCENCTR_EXPLOSION_EN, (data >> 4) & 0x01);
-
-	m_discrete->write(SPCENCTR_PLAYER_SHOT_EN, (data >> 5) & 0x01);
-
-	/* D6 and D7 are not connected */
-
-	m_port_2_last = data;
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_3_w)
-{
-	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
-
-	m_discrete->write(SPCENCTR_ENEMY_SHIP_SHOT_EN, (data >> 1) & 0x01);
-
-	m_spcenctr_strobe_state = (data >> 2) & 0x01;
-
-	output().set_value("LAMP", (data >> 3) & 0x01);
-
-	m_discrete->write(SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
-
-	m_sn->enable_w((data >> 5) & 0x01); /* saucer sound */
-
-	/* D6 and D7 are not connected */
-}
-
-
-
-/*************************************
- *
- *  Phantom II
- *
- *************************************/
-
-static const char *const phantom2_sample_names[] =
-{
-	"*phantom2",
-	"1",    /* shot */
-	"2",    /* explosion */
-	nullptr
-};
-
-void mw8080bw_state::phantom2_audio(machine_config &config)
-{
-	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
-
-	SPEAKER(config, "mono").front_center();
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(2);
-	m_samples->set_samples_names(phantom2_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::phantom2_audio_1_w)
-{
-	uint8_t rising_bits = data & ~m_port_1_last;
-
-	/* if (data & 0x01)  enable PLAYER SHOT sound */
-	if (rising_bits & 0x01) m_samples->start(0, 0);
-
-	/* if (data & 0x02)  enable ENEMY SHOT sound */
-
-	machine().sound().system_mute(!(data & 0x20));
-	machine().sound().system_enable((data >> 2) & 0x01);
-
-	machine().bookkeeping().coin_counter_w(0, (data >> 3) & 0x01);
-
-	/* if (data & 0x10)  enable RADAR sound */
-
-	/* D5-D7 are not connected */
-
-	m_port_1_last = data;
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::phantom2_audio_2_w)
-{
-	uint8_t rising_bits = data & ~m_port_2_last;
-
-	/* D0-D2 are not connected */
-
-	/* if (data & 0x08)  enable EXPLOSION sound */
-	if (rising_bits & 0x08) m_samples->start(1, 1);
-
-	output().set_value("EXPLAMP", (data >> 4) & 0x01);
-
-	/* set JET SOUND FREQ((data >> 5) & 0x07)  0, if no jet sound */
-
-	m_port_2_last = data;
-}
-
-
-
-/*************************************
- *
  *  Bowling Alley
  *
  *  Discrete sound emulation:
@@ -3525,8 +3549,6 @@ static const char *const invaders_sample_names[] =
 /* left in for all games that hack into invaders samples for audio */
 void mw8080bw_state::invaders_samples_audio(machine_config &config)
 {
-	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
-
 	SPEAKER(config, "mono").front_center();
 
 	SN76477(config, m_sn);

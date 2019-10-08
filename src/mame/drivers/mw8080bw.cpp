@@ -151,9 +151,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/mw8080bw.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/rescap.h"
-#include "includes/mw8080bw.h"
+
+#include <algorithm>
 
 #include "280zzzap.lh"
 #include "clowns.lh"
@@ -177,7 +180,7 @@
 
 READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
 {
-	uint8_t ret = m_mb14241->shift_result_r(space, 0);
+	uint8_t ret = m_mb14241->shift_result_r();
 
 	return bitswap<8>(ret,0,1,2,3,4,5,6,7);
 }
@@ -188,20 +191,16 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_result_r)
 	uint8_t ret;
 
 	if (m_rev_shift_res)
-	{
 		ret = mw8080bw_shift_result_rev_r(space, 0);
-	}
 	else
-	{
-		ret = m_mb14241->shift_result_r(space, 0);
-	}
+		ret = m_mb14241->shift_result_r();
 
 	return ret;
 }
 
 WRITE8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_count_w)
 {
-	m_mb14241->shift_count_w(space, offset, data);
+	m_mb14241->shift_count_w(data);
 
 	m_rev_shift_res = data & 0x08;
 }
@@ -345,7 +344,7 @@ void mw8080bw_state::seawolf_io_map(address_map &map)
 	map(0x02, 0x02).w(FUNC(mw8080bw_state::seawolf_periscope_lamp_w));
 	map(0x03, 0x03).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x05, 0x05).w(FUNC(mw8080bw_state::seawolf_audio_w));
+	map(0x05, 0x05).w("soundboard", FUNC(seawolf_audio_device::write));
 }
 
 
@@ -421,7 +420,7 @@ void mw8080bw_state::seawolf(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	/* audio hardware */
-	seawolf_audio(config);
+	SEAWOLF_AUDIO(config, "soundboard");
 }
 
 
@@ -432,21 +431,20 @@ void mw8080bw_state::seawolf(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(mw8080bw_state::gunfight_io_w)
+void gunfight_state::io_w(offs_t offset, u8 data)
 {
 	if (offset & 0x01)
-		gunfight_audio_w(space, 0, data);
+		m_soundboard->write(data);
 
 	if (offset & 0x02)
-		m_mb14241->shift_count_w(space, 0, data);
+		m_mb14241->shift_count_w(data);
 
 	if (offset & 0x04)
-		m_mb14241->shift_data_w(space, 0, data);
-
+		m_mb14241->shift_data_w(data);
 }
 
 
-void mw8080bw_state::gunfight_io_map(address_map &map)
+void gunfight_state::io_map(address_map &map)
 {
 	map.global_mask(0x7);
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
@@ -454,8 +452,7 @@ void mw8080bw_state::gunfight_io_map(address_map &map)
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
-	/* no decoder, just 3 AND gates */
-	map(0x00, 0x07).w(FUNC(mw8080bw_state::gunfight_io_w));
+	map(0x00, 0x07).w(FUNC(gunfight_state::io_w)); // no decoder, just 3 AND gates
 }
 
 
@@ -510,19 +507,20 @@ static INPUT_PORTS_START( gunfight )
 INPUT_PORTS_END
 
 
-void mw8080bw_state::gunfight(machine_config &config)
+void gunfight_state::gunfight(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::gunfight_io_map);
-	/* there is no watchdog */
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &gunfight_state::io_map);
 
-	/* add shifter */
+	// there is no watchdog
+
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* audio hardware */
-	gunfight_audio(config);
+	// audio hardware
+	GUNFIGHT_AUDIO(config, m_soundboard);
 }
 
 
@@ -634,10 +632,10 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
 		tornbase_audio_w(space, 0, data);
 
 	if (offset & 0x02)
-		m_mb14241->shift_count_w(space, 0, data);
+		m_mb14241->shift_count_w(data);
 
 	if (offset & 0x04)
-		m_mb14241->shift_data_w(space, 0, data);
+		m_mb14241->shift_data_w(data);
 }
 
 
@@ -1533,11 +1531,11 @@ void mw8080bw_state::gmissile_io_map(address_map &map)
 
 	map(0x01, 0x01).w(FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(FUNC(mw8080bw_state::gmissile_audio_1_w));
+	map(0x03, 0x03).w("soundboard", FUNC(gmissile_audio_device::p1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(FUNC(mw8080bw_state::gmissile_audio_2_w));
+	map(0x05, 0x05).w("soundboard", FUNC(gmissile_audio_device::p2_w));
 	/* also writes 0x00 to 0x06, but it is not connected */
-	map(0x07, 0x07).w(FUNC(mw8080bw_state::gmissile_audio_3_w));
+	map(0x07, 0x07).w("soundboard", FUNC(gmissile_audio_device::p3_w));
 }
 
 
@@ -1600,7 +1598,7 @@ void mw8080bw_state::gmissile(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	/* audio hardware */
-	gmissile_audio(config);
+	GMISSILE_AUDIO(config, "soundboard");
 }
 
 
@@ -1630,9 +1628,9 @@ void mw8080bw_state::m4_io_map(address_map &map)
 
 	map(0x01, 0x01).w(FUNC(mw8080bw_state::mw8080bw_reversable_shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(FUNC(mw8080bw_state::m4_audio_1_w));
+	map(0x03, 0x03).w("soundboard", FUNC(m4_audio_device::p1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(FUNC(mw8080bw_state::m4_audio_2_w));
+	map(0x05, 0x05).w("soundboard", FUNC(m4_audio_device::p2_w));
 }
 
 
@@ -1695,7 +1693,7 @@ void mw8080bw_state::m4(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	/* audio hardware */
-	m4_audio(config);
+	M4_AUDIO(config, "soundboard");
 }
 
 
@@ -1746,11 +1744,11 @@ void mw8080bw_state::clowns_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(FUNC(mw8080bw_state::clowns_audio_1_w));
+	map(0x03, 0x03).w("soundboard", FUNC(clowns_audio_device::p1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
 	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
-	map(0x07, 0x07).w(FUNC(mw8080bw_state::clowns_audio_2_w));
+	map(0x07, 0x07).w("soundboard", FUNC(clowns_audio_device::p2_w));
 }
 
 
@@ -1865,7 +1863,7 @@ void mw8080bw_state::clowns(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	/* audio hardware */
-	clowns_audio(config);
+	CLOWNS_AUDIO(config, "soundboard").ctrl_sel_out().set([this] (int state) { m_clowns_controller_select = state ? 1 : 0; });
 }
 
 
@@ -2142,70 +2140,55 @@ void mw8080bw_state::dogpatch(machine_config &config)
  *
  *************************************/
 
-#define SPCENCTR_STROBE_FREQ        (9.00)  /* Hz - calculated from the 555 timer */
-#define SPCENCTR_STROBE_DUTY_CYCLE  (95.0)  /* % */
-
-
-TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
+MACHINE_START_MEMBER(spcenctr_state, spcenctr)
 {
-	output().set_value("STROBE", param && m_spcenctr_strobe_state);
-}
+	m_trench_width = 0U;
+	m_trench_center = 0U;
+	std::fill(std::begin(m_trench_slope), std::end(m_trench_slope), 0U);
+	m_bright_control = 0U;
+	m_brightness = 0U;
 
-
-MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
-{
-	/* setup for save states */
-	save_item(NAME(m_spcenctr_strobe_state));
-	save_item(NAME(m_spcenctr_trench_width));
-	save_item(NAME(m_spcenctr_trench_center));
-	save_item(NAME(m_spcenctr_trench_slope));
-	save_item(NAME(m_spcenctr_bright_control));
-	save_item(NAME(m_spcenctr_brightness));
+	save_item(NAME(m_trench_width));
+	save_item(NAME(m_trench_center));
+	save_item(NAME(m_trench_slope));
+	save_item(NAME(m_bright_control));
+	save_item(NAME(m_brightness));
 
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
-{                                               /* A7 A6 A5 A4 A3 A2 A1 A0 */
-
-	if ((offset & 0x07) == 0x02)
-		m_watchdog->watchdog_reset();       /*  -  -  -  -  -  0  1  0 */
-
-	else if ((offset & 0x5f) == 0x01)
-		spcenctr_audio_1_w(space, 0, data); /*  -  0  -  0  0  0  0  1 */
-
-	else if ((offset & 0x5f) == 0x09)
-		spcenctr_audio_2_w(space, 0, data); /*  -  0  -  0  1  0  0  1 */
-
-	else if ((offset & 0x5f) == 0x11)
-		spcenctr_audio_3_w(space, 0, data); /*  -  0  -  1  0  0  0  1 */
-
-	else if ((offset & 0x07) == 0x03)
-	{                                           /*  -  -  -  -  -  0  1  1 */
-		uint8_t addr = ((offset & 0xc0) >> 4) | ((offset & 0x18) >> 3);
-		m_spcenctr_trench_slope[addr] = data;
-	}
-	else if ((offset & 0x07) == 0x04)
-		m_spcenctr_trench_center = data;            /*  -  -  -  -  -  1  0  0 */
-
-	else if ((offset & 0x07) == 0x07)
-		m_spcenctr_trench_width = data;             /*  -  -  -  -  -  1  1  1 */
-
-	else if ((offset & 0x07) == 0x00)
+void spcenctr_state::io_w(offs_t offset, u8 data)
+{                                           // A7 A6 A5 A4 A3 A2 A1 A0
+	if ((offset & 0x07) == 0x00)
 		// hex flip-flop B5
 		// bit 3: /BRITE
 		// bit 2: /NO_PLANET
 		// bit 1: /SET_WSL
 		// bit 0: COIN_COUNTER
-		m_spcenctr_bright_control = ~data & 0x08;    /*  -  -  -  -  -  0  0  0 */
-
+		m_bright_control = BIT(~data, 3);   //  -  -  -  -  -  0  0  0
+	else if ((offset & 0x5f) == 0x01)
+		m_soundboard->p1_w(data);           //  -  0  -  0  0  0  0  1
+	else if ((offset & 0x5f) == 0x09)
+		m_soundboard->p2_w(data);           //  -  0  -  0  1  0  0  1
+	else if ((offset & 0x5f) == 0x11)
+		m_soundboard->p3_w(data);           //  -  0  -  1  0  0  0  1
+	else if ((offset & 0x07) == 0x02)
+		m_watchdog->watchdog_reset();       //  -  -  -  -  -  0  1  0
+	else if ((offset & 0x07) == 0x03)
+	{                                       //  -  -  -  -  -  0  1  1
+		m_trench_slope[bitswap<4>(offset, 7, 6, 4, 3)] = data;
+	}
+	else if ((offset & 0x07) == 0x04)
+		m_trench_center = data;             //  -  -  -  -  -  1  0  0
+	else if ((offset & 0x07) == 0x07)
+		m_trench_width = data;              //  -  -  -  -  -  1  1  1
 	else
-		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", m_maincpu->pc(), offset, data);
+		logerror("%s:  Unmapped I/O port write to %02x = %02x\n", machine().describe_context(), offset, data);
 }
 
 
-void mw8080bw_state::spcenctr_io_map(address_map &map)
+void spcenctr_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).mirror(0xfc).portr("IN0");
@@ -2213,8 +2196,7 @@ void mw8080bw_state::spcenctr_io_map(address_map &map)
 	map(0x02, 0x02).mirror(0xfc).portr("IN2");
 	map(0x03, 0x03).mirror(0xfc).nopr();
 
-	/* complicated addressing logic */
-	map(0x00, 0xff).w(FUNC(mw8080bw_state::spcenctr_io_w));
+	map(0x00, 0xff).w(FUNC(spcenctr_state::io_w)); // complicated addressing logic
 }
 
 
@@ -2268,32 +2250,22 @@ static INPUT_PORTS_START( spcenctr )
 INPUT_PORTS_END
 
 
-void mw8080bw_state::spcenctr(machine_config &config)
+void spcenctr_state::spcenctr(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::spcenctr_io_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &spcenctr_state::io_map);
 
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,spcenctr)
+	MCFG_MACHINE_START_OVERRIDE(spcenctr_state, spcenctr)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
-	/* timers */
-	timer_device &strobeon(TIMER(config, "strobeon"));
-	strobeon.configure_periodic(FUNC(mw8080bw_state::spcenctr_strobe_timer_callback), attotime::from_hz(SPCENCTR_STROBE_FREQ));
-	strobeon.config_param(true);  /* indicates strobe ON */
+	// video hardware
+	m_screen->set_screen_update(FUNC(spcenctr_state::screen_update));
 
-	timer_device &strobeoff(TIMER(config, "strobeoff"));
-	strobeoff.configure_periodic(FUNC(mw8080bw_state::spcenctr_strobe_timer_callback), attotime::from_hz(SPCENCTR_STROBE_FREQ));
-	strobeoff.set_start_delay(attotime::from_hz(SPCENCTR_STROBE_FREQ) * (100 - SPCENCTR_STROBE_DUTY_CYCLE) / 100);
-	strobeoff.config_param(false); /* indicates strobe OFF */
-
-	/* video hardware */
-	m_screen->set_screen_update(FUNC(mw8080bw_state::screen_update_spcenctr));
-
-	/* audio hardware */
-	spcenctr_audio(config);
+	// audio hardware
+	SPCENCTR_AUDIO(config, m_soundboard);
 }
 
 
@@ -2325,8 +2297,8 @@ void mw8080bw_state::phantom2_io_map(address_map &map)
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(FUNC(mw8080bw_state::phantom2_audio_1_w));
-	map(0x06, 0x06).w(FUNC(mw8080bw_state::phantom2_audio_2_w));
+	map(0x05, 0x05).w("soundboard", FUNC(phantom2_audio_device::p1_w));
+	map(0x06, 0x06).w("soundboard", FUNC(phantom2_audio_device::p2_w));
 }
 
 
@@ -2385,7 +2357,7 @@ void mw8080bw_state::phantom2(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	/* audio hardware */
-	phantom2_audio(config);
+	PHANTOM2_AUDIO(config, "soundboard");
 }
 
 
@@ -2402,7 +2374,7 @@ READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
 	   anything unusual on the schematics that would cause
 	   the bits to flip */
 
-	return ~m_mb14241->shift_result_r(space, 0);
+	return ~m_mb14241->shift_result_r();
 }
 
 WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
@@ -3244,12 +3216,12 @@ ROM_END
  *
  *************************************/
 
-/* PCB #        year  rom         parent    machine   inp       init              monitor,company,fullname,flags */
+// PCB #         year  rom         parent    machine   inp       state           init        monitor company,fullname,flags
 
 /* 596 */ GAMEL( 1976, seawolf,    0,        seawolf,  seawolf,  mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
 /* 596 */ GAMEL( 1976, seawolfo,   seawolf,  seawolf,  seawolf,  mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 597 */ GAMEL( 1975, gunfight,   0,        gunfight, gunfight, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
-/* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 597 */ GAMEL( 1975, gunfight,   0,        gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 597 */ GAMEL( 1975, gunfighto,  gunfight, gunfight, gunfight, gunfight_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME(  1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 610 */ GAMEL( 1976, 280zzzap,   0,        zzzap,    zzzap,    mw8080bw_state, empty_init, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_280zzzap )
@@ -3268,7 +3240,7 @@ ROM_END
 /* 642 */ GAME(  1978, einning,    0,        dplay,    einning,  mw8080bw_state, empty_init, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", MACHINE_SUPPORTS_SAVE )
 /* 643 */ GAME(  1978, shuffle,    0,        shuffle,  shuffle,  mw8080bw_state, empty_init, ROT90,  "Midway", "Shuffleboard", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 644 */ GAME(  1977, dogpatch,   0,        dogpatch, dogpatch, mw8080bw_state, empty_init, ROT0,   "Midway", "Dog Patch", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 645 */ GAMEL( 1980, spcenctr,   0,        spcenctr, spcenctr, mw8080bw_state, empty_init, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
+/* 645 */ GAMEL( 1980, spcenctr,   0,        spcenctr, spcenctr, spcenctr_state, empty_init, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
 /* 652 */ GAMEL( 1979, phantom2,   0,        phantom2, phantom2, mw8080bw_state, empty_init, ROT0,   "Midway", "Phantom II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
 /* 730 */ GAME(  1978, bowler,     0,        bowler,   bowler,   mw8080bw_state, empty_init, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 739 */ GAMEL( 1978, invaders,   0,        invaders, invaders, mw8080bw_state, empty_init, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )

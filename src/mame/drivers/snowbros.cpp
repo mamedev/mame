@@ -1952,6 +1952,7 @@ void snowbros_state::finalttr(machine_config &config)
 	ymsnd.add_route(1, "mono", 0.08);
 
 	m_oki->set_clock(999900);
+	m_oki->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.4);
 }
 
 
