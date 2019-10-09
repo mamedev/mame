@@ -8006,4 +8006,19 @@
 		</part>
 	</software>
 
+	<software name="simlineq">
+		<description>Simultaneous Linear Equations</description>
+		<year>1984</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2019-10-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="252755">
+				<rom name="simultaneous linear equations.woz" size="252755" crc="de565e61" sha1="6f11ae0b7b74e130503cea4a347b662db6fdc9b8" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
