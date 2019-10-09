@@ -21,10 +21,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_inputs(*this, "IN.%u", 0),
+		m_io_ba(*this, "BA"),
+		m_io_b(*this, "B"),
 		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_inp_lines(0),
 		m_inp_fixed(-1),
-		m_decay_pivot(7),
+		m_decay_pivot(8),
 		m_decay_len(17)
 	{ }
 
@@ -36,6 +38,7 @@ protected:
 	required_device<sm510_base_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_ioport_array<8+1> m_inputs; // max 8
+	optional_ioport m_io_ba, m_io_b;
 	output_finder<16, 16, 4> m_out_x;
 
 	// misc common
@@ -76,17 +79,29 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void common_base(machine_config &config, u16 width, u16 height);
-	void sm500_base(machine_config &config, u16 width, u16 height);
-	void sm510_base(machine_config &config, u16 width, u16 height);
+	// machine configs
+	void mcfg_cpu_common(machine_config &config);
+	void mcfg_cpu_sm5a(machine_config &config);
+	void mcfg_cpu_kb1013vk12(machine_config &config);
+	void mcfg_cpu_sm510(machine_config &config);
+	void mcfg_cpu_sm511(machine_config &config);
+	void mcfg_cpu_sm512(machine_config &config);
+	void mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag = "screen");
+	void mcfg_sound_r1(machine_config &config);
 
-	void common_sm511(machine_config &config, u16 width, u16 height);
+	void sm5a_common(machine_config &config, u16 width, u16 height);
+	void kb1013vk12_common(machine_config &config, u16 width, u16 height);
+	void sm510_common(machine_config &config, u16 width, u16 height);
+	void sm511_common(machine_config &config, u16 width, u16 height);
+	//void sm512_common(machine_config &config, u16 width, u16 height);
 
-	void konami_sm510(machine_config &config, u16 width, u16 height);
-
-	void tiger_sm510_1bit(machine_config &config, u16 width, u16 height);
-	void tiger_sm511_1bit(machine_config &config, u16 width, u16 height);
-	void tiger_sm511_2bit(machine_config &config, u16 width, u16 height);
+	void sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
+	void sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
+	void sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
+	void sm512_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
+	void sm510_tiger(machine_config &config, u16 width, u16 height);
+	void sm511_tiger1bit(machine_config &config, u16 width, u16 height);
+	void sm511_tiger2bit(machine_config &config, u16 width, u16 height);
 };
 
 

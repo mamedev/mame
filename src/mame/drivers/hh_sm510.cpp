@@ -343,264 +343,175 @@ WRITE8_MEMBER(hh_sm510_state::piezo2bit_input_w)
 
 ***************************************************************************/
 
-// misc
+// building blocks
 
-static const s16 piezo2bit_r1_120k_s1_39k[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff }; // R via 120K resistor, S1 via 39K resistor (eg. tsonic, tsonic2, tbatmana)
-
-void hh_sm510_state::common_base(machine_config &config, u16 width, u16 height)
+void hh_sm510_state::mcfg_cpu_common(machine_config &config)
 {
-	/* basic machine hardware */
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(width, height);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
+	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
 }
 
-void hh_sm510_state::sm500_base(machine_config &config, u16 width, u16 height)
+void hh_sm510_state::mcfg_cpu_sm5a(machine_config &config)
 {
-	common_base(config, width, height);
-
+	SM5A(config, m_maincpu);
+	mcfg_cpu_common(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
 	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
 }
 
-void hh_sm510_state::sm510_base(machine_config &config, u16 width, u16 height)
+void hh_sm510_state::mcfg_cpu_kb1013vk12(machine_config &config)
 {
-	common_base(config, width, height);
-
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-}
-
-void hh_sm510_state::common_sm511(machine_config &config, u16 width, u16 height)
-{
-	SM511(config, m_maincpu);
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	sm510_base(config, width, height);
-}
-
-void hh_sm510_state::konami_sm510(machine_config &config, u16 width, u16 height)
-{
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2);
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	sm510_base(config, width, height);
-}
-
-void hh_sm510_state::tiger_sm510_1bit(machine_config &config, u16 width, u16 height)
-{
-	SM510(config, m_maincpu);
+	KB1013VK12(config, m_maincpu);
+	mcfg_cpu_common(config);
 	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	sm510_base(config, width, height);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
 }
 
-void hh_sm510_state::tiger_sm511_1bit(machine_config &config, u16 width, u16 height)
+void hh_sm510_state::mcfg_cpu_sm510(machine_config &config)
 {
-	common_sm511(config, width, height);
-
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
+	SM510(config, m_maincpu);
+	mcfg_cpu_common(config);
+	m_maincpu->set_r_mask_option(2);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 }
 
-void hh_sm510_state::tiger_sm511_2bit(machine_config &config, u16 width, u16 height)
+void hh_sm510_state::mcfg_cpu_sm511(machine_config &config)
 {
 	SM511(config, m_maincpu);
+	mcfg_cpu_common(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+}
+
+void hh_sm510_state::mcfg_cpu_sm512(machine_config &config)
+{
+	SM512(config, m_maincpu);
+	mcfg_cpu_common(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+}
+
+void hh_sm510_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
+{
+	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(width, height);
+	screen.set_visarea_full();
+}
+
+void hh_sm510_state::mcfg_sound_r1(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+}
+
+
+// common presets
+
+void hh_sm510_state::sm5a_common(machine_config &config, u16 width, u16 height)
+{
+	mcfg_cpu_sm5a(config);
+	mcfg_sound_r1(config);
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	mcfg_svg_screen(config, width, height);
+}
+
+void hh_sm510_state::kb1013vk12_common(machine_config &config, u16 width, u16 height)
+{
+	mcfg_cpu_kb1013vk12(config);
+	mcfg_sound_r1(config);
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	mcfg_svg_screen(config, width, height);
+}
+
+void hh_sm510_state::sm510_common(machine_config &config, u16 width, u16 height)
+{
+	mcfg_cpu_sm510(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, width, height);
+}
+
+void hh_sm510_state::sm511_common(machine_config &config, u16 width, u16 height)
+{
+	mcfg_cpu_sm511(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, width, height);
+}
+
+
+// deviations
+
+// multi-screen
+
+void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight)
+{
+	mcfg_cpu_sm510(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
+	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
+}
+
+void hh_sm510_state::sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
+{
+	mcfg_cpu_sm510(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
+	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
+}
+
+void hh_sm510_state::sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
+{
+	mcfg_cpu_sm511(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
+	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
+}
+
+void hh_sm510_state::sm512_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
+{
+	mcfg_cpu_sm512(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
+	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
+}
+
+
+// Tiger (SM510 R mask is direct, BA/B pins always connected)
+
+void hh_sm510_state::sm510_tiger(machine_config &config, u16 width, u16 height)
+{
+	sm510_common(config, width, height);
+
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+}
+
+void hh_sm510_state::sm511_tiger1bit(machine_config &config, u16 width, u16 height)
+{
+	sm511_common(config, width, height);
+
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+}
+
+void hh_sm510_state::sm511_tiger2bit(machine_config &config, u16 width, u16 height)
+{
+	sm511_common(config, width, height);
+
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
 	m_maincpu->read_ba().set_ioport("BA");
 	m_maincpu->read_b().set_ioport("B");
 
-	sm510_base(config, width, height);
-
-	m_speaker->set_levels(4, piezo2bit_r1_120k_s1_39k);
-}
-
-
-namespace {
-
-// Game & Watch
-
-class gnw_state : public hh_sm510_state
-{
-protected:
-	gnw_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag),
-		m_io_ba(*this, "BA"),
-		m_io_b(*this, "B")
-	{
-	}
-
-	void gnw_sm5a(machine_config &config, u16 width, u16 height);
-	void gnw_sm5a_matrix(machine_config &config, u16 width, u16 height);
-	void gnw_kb1013vk12_matrix(machine_config &config, u16 width, u16 height);
-	void gnw_sm510(machine_config &config, u16 width, u16 height);
-	void gnw_sm511(machine_config &config, u16 width, u16 height);
-	void gnw_sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
-	void gnw_sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
-	void gnw_sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
-	void gnw_sm512_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
-
-private:
-	void gnw_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
-	void gnw_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
-
-	optional_ioport m_io_ba, m_io_b;
-};
-
-void gnw_state::gnw_sm5a(machine_config &config, u16 width, u16 height)
-{
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_r().set(FUNC(gnw_state::piezo_r1_w));
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
-
-	sm500_base(config, width, height);
-}
-
-void gnw_state::gnw_sm5a_matrix(machine_config &config, u16 width, u16 height)
-{
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_r().set(FUNC(gnw_state::piezo_input_w));
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
-
-	sm500_base(config, width, height);
-}
-
-void gnw_state::gnw_kb1013vk12_matrix(machine_config &config, u16 width, u16 height)
-{
-	KB1013VK12(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_r().set(FUNC(gnw_state::piezo_input_w));
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
-
-	sm500_base(config, width, height);
-}
-
-void gnw_state::gnw_sm510(machine_config &config, u16 width, u16 height)
-{
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2);
-	m_maincpu->write_s().set(FUNC(gnw_state::input_w));
-	m_maincpu->write_r().set(FUNC(gnw_state::piezo_r1_w));
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
-
-	sm510_base(config, width, height);
-}
-
-void gnw_state::gnw_sm511(machine_config &config, u16 width, u16 height)
-{
-	common_sm511(config, width, height);
-
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
-}
-
-void gnw_state::gnw_sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight)
-{
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2);
-
-	gnw_dualh(config, leftwidth, leftheight, rightwidth, rightheight);
-}
-
-void gnw_state::gnw_sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
-{
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2);
-
-	gnw_dualv(config, topwidth, topheight, botwidth, botheight);
-}
-
-void gnw_state::gnw_sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
-{
-	SM511(config, m_maincpu);
-
-	gnw_dualv(config, topwidth, topheight, botwidth, botheight);
-}
-
-void gnw_state::gnw_sm512_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
-{
-	SM512(config, m_maincpu);
-
-	gnw_dualv(config, topwidth, topheight, botwidth, botheight);
-}
-
-void gnw_state::gnw_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight)
-{
-	/* basic machine hardware */
-	m_maincpu->write_segs().set(FUNC(gnw_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(gnw_state::input_r));
-	m_maincpu->write_s().set(FUNC(gnw_state::input_w));
-	m_maincpu->write_r().set(FUNC(gnw_state::piezo_r1_w));
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
-
-	/* video hardware */
-	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_SVG));
-	screen_left.set_refresh_hz(60);
-	screen_left.set_size(leftwidth, leftheight);
-	screen_left.set_visarea_full();
-
-	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_SVG));
-	screen_right.set_refresh_hz(60);
-	screen_right.set_size(rightwidth, rightheight);
-	screen_right.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualh);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-void gnw_state::gnw_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
-{
-	/* basic machine hardware */
-	m_maincpu->write_segs().set(FUNC(gnw_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(gnw_state::input_r));
-	m_maincpu->write_s().set(FUNC(gnw_state::input_w));
-	m_maincpu->write_r().set(FUNC(gnw_state::piezo_r1_w));
-	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
-	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(topwidth, topheight);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(botwidth, botheight);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	// R via 120K resistor, S1 via 39K resistor (eg. tsonic, tsonic2, tbatmana)
+	static const s16 speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff };
+	m_speaker->set_levels(4, speaker_levels);
 }
 
 
@@ -610,6 +521,8 @@ void gnw_state::gnw_dualv(machine_config &config, u16 topwidth, u16 topheight, u
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
+
+namespace {
 
 /***************************************************************************
 
@@ -622,11 +535,11 @@ void gnw_state::gnw_dualv(machine_config &config, u16 topwidth, u16 topheight, u
 
 ***************************************************************************/
 
-class gnw_ball_state : public gnw_state
+class gnw_ball_state : public hh_sm510_state
 {
 public:
 	gnw_ball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{
 		inp_fixed_last();
 	}
@@ -657,7 +570,7 @@ INPUT_PORTS_END
 
 void gnw_ball_state::gnw_ball(machine_config &config)
 {
-	gnw_sm5a(config, 1671, 1080); // R option mask confirmed
+	sm5a_common(config, 1671, 1080); // R option mask confirmed
 }
 
 // roms
@@ -685,11 +598,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_flagman_state : public gnw_state
+class gnw_flagman_state : public hh_sm510_state
 {
 public:
 	gnw_flagman_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_flagman(machine_config &config);
@@ -722,7 +635,7 @@ INPUT_PORTS_END
 
 void gnw_flagman_state::gnw_flagman(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1511, 1080); // R mask option confirmed
+	sm5a_common(config, 1511, 1080); // R mask option confirmed
 }
 
 // roms
@@ -750,11 +663,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_vermin_state : public gnw_state
+class gnw_vermin_state : public hh_sm510_state
 {
 public:
 	gnw_vermin_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{
 		inp_fixed_last();
 	}
@@ -785,7 +698,7 @@ INPUT_PORTS_END
 
 void gnw_vermin_state::gnw_vermin(machine_config &config)
 {
-	gnw_sm5a(config, 1650, 1080); // R mask option confirmed
+	sm5a_common(config, 1650, 1080); // R mask option confirmed
 }
 
 // roms
@@ -815,11 +728,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_fires_state : public gnw_state
+class gnw_fires_state : public hh_sm510_state
 {
 public:
 	gnw_fires_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{
 		inp_fixed_last();
 	}
@@ -850,7 +763,7 @@ INPUT_PORTS_END
 
 void gnw_fires_state::gnw_fires(machine_config &config)
 {
-	gnw_sm5a(config, 1646, 1080); // R mask option confirmed
+	sm5a_common(config, 1646, 1080); // R mask option confirmed
 }
 
 // roms
@@ -880,11 +793,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_judge_state : public gnw_state
+class gnw_judge_state : public hh_sm510_state
 {
 public:
 	gnw_judge_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_judge(machine_config &config);
@@ -917,7 +830,7 @@ INPUT_PORTS_END
 
 void gnw_judge_state::gnw_judge(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1647, 1080); // R mask option confirmed
+	sm5a_common(config, 1647, 1080); // R mask option confirmed
 }
 
 // roms
@@ -947,11 +860,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_helmet_state : public gnw_state
+class gnw_helmet_state : public hh_sm510_state
 {
 public:
 	gnw_helmet_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_helmet(machine_config &config);
@@ -989,7 +902,7 @@ INPUT_PORTS_END
 
 void gnw_helmet_state::gnw_helmet(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1657, 1080); // R mask option confirmed
+	sm5a_common(config, 1657, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1019,11 +932,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_lion_state : public gnw_state
+class gnw_lion_state : public hh_sm510_state
 {
 public:
 	gnw_lion_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_lion(machine_config &config);
@@ -1061,7 +974,7 @@ INPUT_PORTS_END
 
 void gnw_lion_state::gnw_lion(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1646, 1080); // R mask option confirmed
+	sm5a_common(config, 1646, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1087,11 +1000,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_pchute_state : public gnw_state
+class gnw_pchute_state : public hh_sm510_state
 {
 public:
 	gnw_pchute_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_pchute(machine_config &config);
@@ -1129,7 +1042,7 @@ INPUT_PORTS_END
 
 void gnw_pchute_state::gnw_pchute(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1602, 1080); // R mask option confirmed
+	sm5a_common(config, 1602, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1159,11 +1072,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_octopus_state : public gnw_state
+class gnw_octopus_state : public hh_sm510_state
 {
 public:
 	gnw_octopus_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_octopus(machine_config &config);
@@ -1201,7 +1114,7 @@ INPUT_PORTS_END
 
 void gnw_octopus_state::gnw_octopus(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1586, 1080); // R mask option confirmed
+	sm5a_common(config, 1586, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1229,11 +1142,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_popeye_state : public gnw_state
+class gnw_popeye_state : public hh_sm510_state
 {
 public:
 	gnw_popeye_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_popeye(machine_config &config);
@@ -1271,7 +1184,7 @@ INPUT_PORTS_END
 
 void gnw_popeye_state::gnw_popeye(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1604, 1080); // R mask option confirmed
+	sm5a_common(config, 1604, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1301,11 +1214,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_chef_state : public gnw_state
+class gnw_chef_state : public hh_sm510_state
 {
 public:
 	gnw_chef_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void merrycook(machine_config &config);
@@ -1341,12 +1254,12 @@ INPUT_PORTS_END
 
 void gnw_chef_state::gnw_chef(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1666, 1080); // assuming same R mask option as merry cook
+	sm5a_common(config, 1666, 1080); // assuming same R mask option as merry cook
 }
 
 void gnw_chef_state::merrycook(machine_config & config)
 {
-	gnw_kb1013vk12_matrix(config, 1679, 1080); // R mask option confirmed
+	kb1013vk12_common(config, 1679, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1389,11 +1302,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_mmouse_state : public gnw_state
+class gnw_mmouse_state : public hh_sm510_state
 {
 public:
 	gnw_mmouse_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void exospace(machine_config &config);
@@ -1438,22 +1351,22 @@ INPUT_PORTS_END
 
 void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1684, 1080); // R mask option ?
+	sm5a_common(config, 1684, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::gnw_egg(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1694, 1080); // R mask option ?
+	sm5a_common(config, 1694, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::nupogodi(machine_config &config)
 {
-	gnw_kb1013vk12_matrix(config, 1715, 1080); // R mask option ?
+	kb1013vk12_common(config, 1715, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::exospace(machine_config &config)
 {
-	gnw_kb1013vk12_matrix(config, 1756, 1080); // R mask option ?
+	kb1013vk12_common(config, 1756, 1080); // R mask option ?
 }
 
 // roms
@@ -1511,11 +1424,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_fire_state : public gnw_state
+class gnw_fire_state : public hh_sm510_state
 {
 public:
 	gnw_fire_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void spacebridge(machine_config &config);
@@ -1554,12 +1467,12 @@ INPUT_PORTS_END
 
 void gnw_fire_state::gnw_fire(machine_config &config)
 {
-	gnw_sm5a_matrix(config, 1624, 1080); // R mask option confirmed
+	sm5a_common(config, 1624, 1080); // R mask option confirmed
 }
 
 void gnw_fire_state::spacebridge(machine_config & config)
 {
-	gnw_kb1013vk12_matrix(config, 1673, 1080); // R mask option confirmed
+	kb1013vk12_common(config, 1673, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1593,11 +1506,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_tbridge_state : public gnw_state
+class gnw_tbridge_state : public hh_sm510_state
 {
 public:
 	gnw_tbridge_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{
 		// increase lcd decay: unwanted segments light up
 		m_decay_pivot = 25;
@@ -1638,7 +1551,7 @@ INPUT_PORTS_END
 
 void gnw_tbridge_state::gnw_tbridge(machine_config &config)
 {
-	gnw_sm510(config, 1587, 1080); // R mask option confirmed
+	sm510_common(config, 1587, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1664,11 +1577,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_fireatk_state : public gnw_state
+class gnw_fireatk_state : public hh_sm510_state
 {
 public:
 	gnw_fireatk_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_fireatk(machine_config &config);
@@ -1705,7 +1618,7 @@ INPUT_PORTS_END
 
 void gnw_fireatk_state::gnw_fireatk(machine_config &config)
 {
-	gnw_sm510(config, 1655, 1080); // R mask option confirmed
+	sm510_common(config, 1655, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1731,11 +1644,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_stennis_state : public gnw_state
+class gnw_stennis_state : public hh_sm510_state
 {
 public:
 	gnw_stennis_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_stennis(machine_config &config);
@@ -1772,7 +1685,7 @@ INPUT_PORTS_END
 
 void gnw_stennis_state::gnw_stennis(machine_config &config)
 {
-	gnw_sm510(config, 1581, 1080); // R mask option confirmed
+	sm510_common(config, 1581, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1798,11 +1711,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_opanic_state : public gnw_state
+class gnw_opanic_state : public hh_sm510_state
 {
 public:
 	gnw_opanic_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_opanic(machine_config &config);
@@ -1839,7 +1752,7 @@ INPUT_PORTS_END
 
 void gnw_opanic_state::gnw_opanic(machine_config &config)
 {
-	gnw_sm510_dualv(config, 1920/2, 1292/2, 1920/2, 1230/2); // R mask option confirmed
+	sm510_dualv(config, 1920/2, 1292/2, 1920/2, 1230/2); // R mask option confirmed
 }
 
 // roms
@@ -1868,11 +1781,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_dkong_state : public gnw_state
+class gnw_dkong_state : public hh_sm510_state
 {
 public:
 	gnw_dkong_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_dkong(machine_config &config);
@@ -1908,7 +1821,7 @@ INPUT_PORTS_END
 
 void gnw_dkong_state::gnw_dkong(machine_config &config)
 {
-	gnw_sm510_dualv(config, 1920/2, 1266/2, 1920/2, 1266/2); // R mask option confirmed
+	sm510_dualv(config, 1920/2, 1266/2, 1920/2, 1266/2); // R mask option confirmed
 }
 
 // roms
@@ -1937,11 +1850,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_mickdon_state : public gnw_state
+class gnw_mickdon_state : public hh_sm510_state
 {
 public:
 	gnw_mickdon_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_mickdon(machine_config &config);
@@ -1973,8 +1886,7 @@ INPUT_PORTS_END
 
 void gnw_mickdon_state::gnw_mickdon(machine_config &config)
 {
-	gnw_sm510_dualv(config, 1920/2, 1281/2, 1920/2, 1236/2); // R mask option confirmed
-
+	sm510_dualv(config, 1920/2, 1281/2, 1920/2, 1236/2); // R mask option confirmed
 	m_maincpu->write_r().set(FUNC(gnw_mickdon_state::piezo_r2_w));
 }
 
@@ -2004,11 +1916,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_ghouse_state : public gnw_state
+class gnw_ghouse_state : public hh_sm510_state
 {
 public:
 	gnw_ghouse_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_ghouse(machine_config &config);
@@ -2049,7 +1961,7 @@ INPUT_PORTS_END
 
 void gnw_ghouse_state::gnw_ghouse(machine_config &config)
 {
-	gnw_sm510_dualv(config, 1920/2, 1303/2, 1920/2, 1274/2); // R mask option confirmed
+	sm510_dualv(config, 1920/2, 1303/2, 1920/2, 1274/2); // R mask option confirmed
 }
 
 // roms
@@ -2078,11 +1990,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_dkong2_state : public gnw_state
+class gnw_dkong2_state : public hh_sm510_state
 {
 public:
 	gnw_dkong2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_dkong2(machine_config &config);
@@ -2118,7 +2030,7 @@ INPUT_PORTS_END
 
 void gnw_dkong2_state::gnw_dkong2(machine_config &config)
 {
-	gnw_sm510_dualv(config, 1920/2, 1241/2, 1920/2, 1237/2); // R mask option confirmed
+	sm510_dualv(config, 1920/2, 1241/2, 1920/2, 1237/2); // R mask option confirmed
 }
 
 // roms
@@ -2147,11 +2059,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_mario_state : public gnw_state
+class gnw_mario_state : public hh_sm510_state
 {
 public:
 	gnw_mario_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_mario(machine_config &config);
@@ -2188,7 +2100,7 @@ INPUT_PORTS_END
 
 void gnw_mario_state::gnw_mario(machine_config &config)
 {
-	gnw_sm510_dualh(config, 2258/2, 1440/2, 2261/2, 1440/2); // R mask option confirmed
+	sm510_dualh(config, 2258/2, 1440/2, 2261/2, 1440/2); // R mask option confirmed
 }
 
 // roms
@@ -2217,11 +2129,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_rshower_state : public gnw_state
+class gnw_rshower_state : public hh_sm510_state
 {
 public:
 	gnw_rshower_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_rshower(machine_config &config);
@@ -2264,7 +2176,7 @@ INPUT_PORTS_END
 
 void gnw_rshower_state::gnw_rshower(machine_config &config)
 {
-	gnw_sm510_dualh(config, 2126/2, 1440/2, 2146/2, 1440/2); // R mask option confirmed
+	sm510_dualh(config, 2126/2, 1440/2, 2146/2, 1440/2); // R mask option confirmed
 }
 
 // roms
@@ -2293,11 +2205,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_lboat_state : public gnw_state
+class gnw_lboat_state : public hh_sm510_state
 {
 public:
 	gnw_lboat_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_lboat(machine_config &config);
@@ -2334,7 +2246,7 @@ INPUT_PORTS_END
 
 void gnw_lboat_state::gnw_lboat(machine_config &config)
 {
-	gnw_sm510_dualh(config, 2116/2, 1440/2, 2057/2, 1440/2); // R mask option confirmed
+	sm510_dualh(config, 2116/2, 1440/2, 2057/2, 1440/2); // R mask option confirmed
 }
 
 // roms
@@ -2363,11 +2275,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_bjack_state : public gnw_state
+class gnw_bjack_state : public hh_sm510_state
 {
 public:
 	gnw_bjack_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_bjack(machine_config &config);
@@ -2394,7 +2306,7 @@ INPUT_PORTS_END
 
 void gnw_bjack_state::gnw_bjack(machine_config &config)
 {
-	gnw_sm512_dualv(config, 1920/2, 1290/2, 1920/2, 1297/2);
+	sm512_dualv(config, 1920/2, 1290/2, 1920/2, 1297/2);
 }
 
 // roms
@@ -2426,11 +2338,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_squish_state : public gnw_state
+class gnw_squish_state : public hh_sm510_state
 {
 public:
 	gnw_squish_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{
 		// increase lcd decay: unwanted segments light up
 		m_decay_pivot = 17;
@@ -2470,7 +2382,7 @@ INPUT_PORTS_END
 
 void gnw_squish_state::gnw_squish(machine_config &config)
 {
-	gnw_sm510_dualv(config, 1920/2, 1285/2, 1920/2, 1287/2); // R mask option confirmed
+	sm510_dualv(config, 1920/2, 1285/2, 1920/2, 1287/2); // R mask option confirmed
 }
 
 // roms
@@ -2499,11 +2411,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_bsweep_state : public gnw_state
+class gnw_bsweep_state : public hh_sm510_state
 {
 public:
 	gnw_bsweep_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_bsweep(machine_config &config);
@@ -2540,7 +2452,7 @@ INPUT_PORTS_END
 
 void gnw_bsweep_state::gnw_bsweep(machine_config &config)
 {
-	gnw_sm512_dualv(config, 1920/2, 1291/2, 1920/2, 1239/2);
+	sm512_dualv(config, 1920/2, 1291/2, 1920/2, 1239/2);
 }
 
 // roms
@@ -2572,11 +2484,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_sbuster_state : public gnw_state
+class gnw_sbuster_state : public hh_sm510_state
 {
 public:
 	gnw_sbuster_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_sbuster(machine_config &config);
@@ -2612,7 +2524,7 @@ INPUT_PORTS_END
 
 void gnw_sbuster_state::gnw_sbuster(machine_config &config)
 {
-	gnw_sm511_dualv(config, 1920/2, 1246/2, 1920/2, 1269/2);
+	sm511_dualv(config, 1920/2, 1246/2, 1920/2, 1269/2);
 }
 
 // roms
@@ -2644,11 +2556,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_gcliff_state : public gnw_state
+class gnw_gcliff_state : public hh_sm510_state
 {
 public:
 	gnw_gcliff_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_gcliff(machine_config &config);
@@ -2689,7 +2601,7 @@ INPUT_PORTS_END
 
 void gnw_gcliff_state::gnw_gcliff(machine_config &config)
 {
-	gnw_sm512_dualv(config, 1920/2, 1257/2, 1920/2, 1239/2);
+	sm512_dualv(config, 1920/2, 1257/2, 1920/2, 1239/2);
 }
 
 // roms
@@ -2721,11 +2633,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_zelda_state : public gnw_state
+class gnw_zelda_state : public hh_sm510_state
 {
 public:
 	gnw_zelda_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_zelda(machine_config &config);
@@ -2766,7 +2678,7 @@ INPUT_PORTS_END
 
 void gnw_zelda_state::gnw_zelda(machine_config &config)
 {
-	gnw_sm512_dualv(config, 1920/2, 1346/2, 1920/2, 1291/2);
+	sm512_dualv(config, 1920/2, 1346/2, 1920/2, 1291/2);
 }
 
 // roms
@@ -2804,11 +2716,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_dkjrp_state : public gnw_state
+class gnw_dkjrp_state : public hh_sm510_state
 {
 public:
 	gnw_dkjrp_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_dkjrp(machine_config &config);
@@ -2849,7 +2761,7 @@ INPUT_PORTS_END
 
 void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
 {
-	gnw_sm511(config, 1920, 1049);
+	sm511_common(config, 1920, 1049);
 }
 
 // roms
@@ -2878,11 +2790,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_mbaway_state : public gnw_state
+class gnw_mbaway_state : public hh_sm510_state
 {
 public:
 	gnw_mbaway_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_mbaway(machine_config &config);
@@ -2919,7 +2831,7 @@ INPUT_PORTS_END
 
 void gnw_mbaway_state::gnw_mbaway(machine_config &config)
 {
-	gnw_sm511(config, 1920, 1031);
+	sm511_common(config, 1920, 1031);
 }
 
 // roms
@@ -2950,11 +2862,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_dkjr_state : public gnw_state
+class gnw_dkjr_state : public hh_sm510_state
 {
 public:
 	gnw_dkjr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_dkjr(machine_config &config);
@@ -2995,7 +2907,7 @@ INPUT_PORTS_END
 
 void gnw_dkjr_state::gnw_dkjr(machine_config &config)
 {
-	gnw_sm510(config, 1647, 1080); // R mask option confirmed
+	sm510_common(config, 1647, 1080); // R mask option confirmed
 }
 
 // roms
@@ -3022,11 +2934,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_mariocm_state : public gnw_state
+class gnw_mariocm_state : public hh_sm510_state
 {
 public:
 	gnw_mariocm_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_mariocm(machine_config &config);
@@ -3063,7 +2975,7 @@ INPUT_PORTS_END
 
 void gnw_mariocm_state::gnw_mariocm(machine_config &config)
 {
-	gnw_sm510(config, 1647, 1080); // R mask option confirmed
+	sm510_common(config, 1647, 1080); // R mask option confirmed
 }
 
 // roms
@@ -3091,11 +3003,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_manhole_state : public gnw_state
+class gnw_manhole_state : public hh_sm510_state
 {
 public:
 	gnw_manhole_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_manhole(machine_config &config);
@@ -3132,7 +3044,7 @@ INPUT_PORTS_END
 
 void gnw_manhole_state::gnw_manhole(machine_config &config)
 {
-	gnw_sm510(config, 1560, 1080); // R mask option confirmed
+	sm510_common(config, 1560, 1080); // R mask option confirmed
 }
 
 // roms
@@ -3158,11 +3070,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_tfish_state : public gnw_state
+class gnw_tfish_state : public hh_sm510_state
 {
 public:
 	gnw_tfish_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_tfish(machine_config &config);
@@ -3194,7 +3106,7 @@ INPUT_PORTS_END
 
 void gnw_tfish_state::gnw_tfish(machine_config &config)
 {
-	gnw_sm510(config, 1572, 1080); // R mask option confirmed
+	sm510_common(config, 1572, 1080); // R mask option confirmed
 }
 
 // roms
@@ -3226,11 +3138,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_smb_state : public gnw_state
+class gnw_smb_state : public hh_sm510_state
 {
 public:
 	gnw_smb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_smb(machine_config &config);
@@ -3266,7 +3178,7 @@ INPUT_PORTS_END
 
 void gnw_smb_state::gnw_smb(machine_config &config)
 {
-	gnw_sm511(config, 1677, 1080);
+	sm511_common(config, 1677, 1080);
 }
 
 // roms
@@ -3304,11 +3216,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_climber_state : public gnw_state
+class gnw_climber_state : public hh_sm510_state
 {
 public:
 	gnw_climber_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_climber(machine_config &config);
@@ -3345,12 +3257,12 @@ INPUT_PORTS_END
 
 void gnw_climber_state::gnw_climber(machine_config &config)
 {
-	gnw_sm511(config, 1756, 1080);
+	sm511_common(config, 1756, 1080);
 }
 
 void gnw_climber_state::gnw_climbern(machine_config &config)
 {
-	gnw_sm511(config, 1677, 1080);
+	sm511_common(config, 1677, 1080);
 }
 
 // roms
@@ -3403,11 +3315,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_bfight_state : public gnw_state
+class gnw_bfight_state : public hh_sm510_state
 {
 public:
 	gnw_bfight_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_bfight(machine_config &config);
@@ -3444,12 +3356,12 @@ INPUT_PORTS_END
 
 void gnw_bfight_state::gnw_bfight(machine_config &config)
 {
-	gnw_sm511(config, 1771, 1080);
+	sm511_common(config, 1771, 1080);
 }
 
 void gnw_bfight_state::gnw_bfightn(machine_config &config)
 {
-	gnw_sm511(config, 1549, 1080);
+	sm511_common(config, 1549, 1080);
 }
 
 // roms
@@ -3489,11 +3401,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_ssparky_state : public gnw_state
+class gnw_ssparky_state : public hh_sm510_state
 {
 public:
 	gnw_ssparky_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_ssparky(machine_config &config);
@@ -3530,7 +3442,7 @@ INPUT_PORTS_END
 
 void gnw_ssparky_state::gnw_ssparky(machine_config &config)
 {
-	gnw_sm510(config, 627, 1080); // R mask option confirmed
+	sm510_common(config, 627, 1080); // R mask option confirmed
 }
 
 // roms
@@ -3557,11 +3469,11 @@ ROM_END
 
 ***************************************************************************/
 
-class gnw_boxing_state : public gnw_state
+class gnw_boxing_state : public hh_sm510_state
 {
 public:
 	gnw_boxing_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gnw_state(mconfig, type, tag)
+		hh_sm510_state(mconfig, type, tag)
 	{ }
 
 	void gnw_boxing(machine_config &config);
@@ -3620,7 +3532,7 @@ INPUT_PORTS_END
 
 void gnw_boxing_state::gnw_boxing(machine_config &config)
 {
-	gnw_sm511(config, 1920, 524);
+	sm511_common(config, 1920, 524);
 }
 
 // roms
@@ -3648,6 +3560,7 @@ ROM_END
 
   BTANB: At the basket, the ball goes missing sometimes for 1 frame, or
   may show 2 balls at the same time. It's the same on the real handheld.
+  BTANB: players flicker (increasing LCD delay won't improve it much)
   Another BTANB? If a period is over at the same time a defender on the
   2nd column grabs the ball, his arm won't be erased until it's redrawn.
 
@@ -3688,7 +3601,7 @@ INPUT_PORTS_END
 
 void kdribble_state::kdribble(machine_config &config)
 {
-	konami_sm510(config, 1524, 1080); // R mask option confirmed
+	sm510_common(config, 1524, 1080); // R mask option confirmed
 }
 
 // roms
@@ -3749,7 +3662,7 @@ INPUT_PORTS_END
 
 void ktopgun_state::ktopgun(machine_config &config)
 {
-	konami_sm510(config, 1515, 1080); // R mask option confirmed
+	sm510_common(config, 1515, 1080); // R mask option confirmed
 }
 
 // roms
@@ -3815,7 +3728,7 @@ INPUT_PORTS_END
 
 void kcontra_state::kcontra(machine_config &config)
 {
-	common_sm511(config, 1505, 1080);
+	sm511_common(config, 1505, 1080);
 }
 
 // roms
@@ -3880,7 +3793,7 @@ INPUT_PORTS_END
 
 void ktmnt_state::ktmnt(machine_config &config)
 {
-	common_sm511(config, 1505, 1080);
+	sm511_common(config, 1505, 1080);
 }
 
 // roms
@@ -3942,7 +3855,7 @@ INPUT_PORTS_END
 
 void kgradius_state::kgradius(machine_config &config)
 {
-	common_sm511(config, 1420, 1080);
+	sm511_common(config, 1420, 1080);
 }
 
 // roms
@@ -4002,7 +3915,7 @@ INPUT_PORTS_END
 
 void kloneran_state::kloneran(machine_config &config)
 {
-	common_sm511(config, 1497, 1080);
+	sm511_common(config, 1497, 1080);
 }
 
 // roms
@@ -4036,7 +3949,10 @@ class kblades_state : public hh_sm510_state
 public:
 	kblades_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
-	{ }
+	{
+		// increase lcd decay: too much overall flicker
+		m_decay_len = 25;
+	}
 
 	void kblades(machine_config &config);
 };
@@ -4066,7 +3982,7 @@ INPUT_PORTS_END
 
 void kblades_state::kblades(machine_config &config)
 {
-	common_sm511(config, 1516, 1080);
+	sm511_common(config, 1516, 1080);
 }
 
 // roms
@@ -4135,7 +4051,7 @@ INPUT_PORTS_END
 
 void knfl_state::knfl(machine_config &config)
 {
-	common_sm511(config, 1449, 1080);
+	sm511_common(config, 1449, 1080);
 }
 
 // roms
@@ -4200,7 +4116,7 @@ INPUT_PORTS_END
 
 void kbilly_state::kbilly(machine_config &config)
 {
-	common_sm511(config, 1490, 1080);
+	sm511_common(config, 1490, 1080);
 }
 
 // roms
@@ -4259,7 +4175,7 @@ INPUT_PORTS_END
 
 void kbucky_state::kbucky(machine_config &config)
 {
-	common_sm511(config, 1490, 1080);
+	sm511_common(config, 1490, 1080);
 }
 
 // roms
@@ -4325,7 +4241,7 @@ INPUT_PORTS_END
 
 void kgarfld_state::kgarfld(machine_config &config)
 {
-	common_sm511(config, 1500, 1080);
+	sm511_common(config, 1500, 1080);
 }
 
 // roms
@@ -4426,12 +4342,12 @@ INPUT_PORTS_END
 
 void tgaunt_state::tgaunt(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1425, 1080);
+	sm510_tiger(config, 1425, 1080);
 }
 
 void tgaunt_state::trobhood(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1468, 1080);
+	sm510_tiger(config, 1468, 1080);
 }
 
 // roms
@@ -4520,7 +4436,7 @@ INPUT_PORTS_END
 
 void tddragon_state::tddragon(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1467, 1080); // R mask option confirmed
+	sm510_tiger(config, 1467, 1080); // R mask option confirmed
 }
 
 // roms
@@ -4602,7 +4518,7 @@ INPUT_PORTS_END
 
 void tkarnov_state::tkarnov(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1477, 1080);
+	sm510_tiger(config, 1477, 1080);
 }
 
 // roms
@@ -4683,7 +4599,7 @@ INPUT_PORTS_END
 
 void tvindictr_state::tvindictr(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1459, 1080);
+	sm510_tiger(config, 1459, 1080);
 }
 
 // roms
@@ -4775,7 +4691,7 @@ INPUT_PORTS_END
 
 void tgaiden_state::tgaiden(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1476, 1080);
+	sm510_tiger(config, 1476, 1080);
 
 	m_maincpu->write_r().append(FUNC(tgaiden_state::led_w));
 }
@@ -4854,7 +4770,7 @@ INPUT_PORTS_END
 
 void tbatman_state::tbatman(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1442, 1080);
+	sm510_tiger(config, 1442, 1080);
 }
 
 // roms
@@ -4935,7 +4851,7 @@ INPUT_PORTS_END
 
 void tsharr2_state::tsharr2(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1493, 1080); // R mask option confirmed
+	sm510_tiger(config, 1493, 1080); // R mask option confirmed
 }
 
 // roms
@@ -5013,7 +4929,7 @@ INPUT_PORTS_END
 
 void tstrider_state::tstrider(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1479, 1080);
+	sm510_tiger(config, 1479, 1080);
 }
 
 // roms
@@ -5095,7 +5011,7 @@ INPUT_PORTS_END
 
 void tgoldnaxe_state::tgoldnaxe(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1456, 1080);
+	sm510_tiger(config, 1456, 1080);
 }
 
 // roms
@@ -5194,12 +5110,12 @@ INPUT_PORTS_END
 
 void trobocop2_state::trobocop2(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1487, 1080);
+	sm510_tiger(config, 1487, 1080);
 }
 
 void trobocop2_state::trockteer(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1463, 1080);
+	sm510_tiger(config, 1463, 1080);
 }
 
 // roms
@@ -5293,7 +5209,7 @@ INPUT_PORTS_END
 
 void taltbeast_state::taltbeast(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1455, 1080); // R mask option confirmed
+	sm510_tiger(config, 1455, 1080); // R mask option confirmed
 }
 
 // roms
@@ -5375,7 +5291,7 @@ INPUT_PORTS_END
 
 void tsf2010_state::tsf2010(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1465, 1080);
+	sm510_tiger(config, 1465, 1080);
 }
 
 // roms
@@ -5453,7 +5369,7 @@ INPUT_PORTS_END
 
 void tswampt_state::tswampt(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1450, 1080);
+	sm510_tiger(config, 1450, 1080);
 }
 
 // roms
@@ -5535,7 +5451,7 @@ INPUT_PORTS_END
 
 void tspidman_state::tspidman(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1440, 1080);
+	sm510_tiger(config, 1440, 1080);
 }
 
 // roms
@@ -5617,7 +5533,7 @@ INPUT_PORTS_END
 
 void txmen_state::txmen(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1467, 1080);
+	sm510_tiger(config, 1467, 1080);
 }
 
 // roms
@@ -5699,7 +5615,7 @@ INPUT_PORTS_END
 
 void tddragon3_state::tddragon3(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1514, 1080);
+	sm510_tiger(config, 1514, 1080);
 }
 
 // roms
@@ -5781,7 +5697,7 @@ INPUT_PORTS_END
 
 void tflash_state::tflash(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1444, 1080);
+	sm510_tiger(config, 1444, 1080);
 }
 
 // roms
@@ -5864,7 +5780,7 @@ INPUT_PORTS_END
 
 void tmchammer_state::tmchammer(machine_config &config)
 {
-	tiger_sm511_1bit(config, 1471, 1080);
+	sm511_tiger1bit(config, 1471, 1080);
 }
 
 // roms
@@ -5949,7 +5865,7 @@ INPUT_PORTS_END
 
 void tbtoads_state::tbtoads(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1454, 1080);
+	sm510_tiger(config, 1454, 1080);
 }
 
 // roms
@@ -6031,7 +5947,7 @@ INPUT_PORTS_END
 
 void thook_state::thook(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1489, 1080);
+	sm510_tiger(config, 1489, 1080);
 }
 
 // roms
@@ -6112,7 +6028,7 @@ INPUT_PORTS_END
 
 void tbttf_state::tbttf(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1466, 1080);
+	sm510_tiger(config, 1466, 1080);
 }
 
 // roms
@@ -6196,7 +6112,7 @@ INPUT_PORTS_END
 
 void taddams_state::taddams(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1464, 1080);
+	sm510_tiger(config, 1464, 1080);
 }
 
 // roms
@@ -6278,7 +6194,7 @@ INPUT_PORTS_END
 
 void thalone_state::thalone(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1448, 1080);
+	sm510_tiger(config, 1448, 1080);
 }
 
 // roms
@@ -6356,7 +6272,7 @@ INPUT_PORTS_END
 
 void txmenpx_state::txmenpx(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1464, 1080);
+	sm510_tiger(config, 1464, 1080);
 }
 
 // roms
@@ -6438,7 +6354,7 @@ INPUT_PORTS_END
 
 void thalone2_state::thalone2(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1454, 1080);
+	sm510_tiger(config, 1454, 1080);
 }
 
 // roms
@@ -6515,7 +6431,7 @@ INPUT_PORTS_END
 
 void tsonic_state::tsonic(machine_config &config)
 {
-	tiger_sm511_2bit(config, 1517, 1080);
+	sm511_tiger2bit(config, 1517, 1080);
 }
 
 // roms
@@ -6600,7 +6516,7 @@ INPUT_PORTS_END
 
 void trobocop3_state::trobocop3(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1464, 1080);
+	sm510_tiger(config, 1464, 1080);
 }
 
 // roms
@@ -6678,7 +6594,7 @@ INPUT_PORTS_END
 
 void tdummies_state::tdummies(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1441, 1080);
+	sm510_tiger(config, 1441, 1080);
 }
 
 // roms
@@ -6760,7 +6676,7 @@ INPUT_PORTS_END
 
 void tsfight2_state::tsfight2(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1444, 1080);
+	sm510_tiger(config, 1444, 1080);
 }
 
 // roms
@@ -6842,7 +6758,7 @@ INPUT_PORTS_END
 
 void twworld_state::twworld(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1429, 1080);
+	sm510_tiger(config, 1429, 1080);
 }
 
 // roms
@@ -6920,7 +6836,7 @@ INPUT_PORTS_END
 
 void tjpark_state::tjpark(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1454, 1080);
+	sm510_tiger(config, 1454, 1080);
 }
 
 // roms
@@ -6997,7 +6913,7 @@ INPUT_PORTS_END
 
 void tsonic2_state::tsonic2(machine_config &config)
 {
-	tiger_sm511_2bit(config, 1475, 1080);
+	sm511_tiger2bit(config, 1475, 1080);
 }
 
 // roms
@@ -7087,7 +7003,7 @@ INPUT_PORTS_END
 
 void tsddragon_state::tsddragon(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1503, 1080);
+	sm510_tiger(config, 1503, 1080);
 }
 
 // roms
@@ -7170,7 +7086,7 @@ INPUT_PORTS_END
 
 void tdennis_state::tdennis(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1467, 1080);
+	sm510_tiger(config, 1467, 1080);
 }
 
 // roms
@@ -7256,7 +7172,7 @@ INPUT_PORTS_END
 
 void tnmarebc_state::tnmarebc(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1456, 1080);
+	sm510_tiger(config, 1456, 1080);
 }
 
 // roms
@@ -7338,7 +7254,7 @@ INPUT_PORTS_END
 
 void ttransf2_state::ttransf2(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1476, 1080);
+	sm510_tiger(config, 1476, 1080);
 }
 
 // roms
@@ -7416,7 +7332,7 @@ INPUT_PORTS_END
 
 void topaliens_state::topaliens(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1450, 1080);
+	sm510_tiger(config, 1450, 1080);
 }
 
 // roms
@@ -7499,7 +7415,7 @@ INPUT_PORTS_END
 
 void tmkombat_state::tmkombat(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1468, 1080);
+	sm510_tiger(config, 1468, 1080);
 }
 
 // roms
@@ -7581,7 +7497,7 @@ INPUT_PORTS_END
 
 void tshadow_state::tshadow(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1484, 1080);
+	sm510_tiger(config, 1484, 1080);
 }
 
 // roms
@@ -7663,7 +7579,7 @@ INPUT_PORTS_END
 
 void tskelwarr_state::tskelwarr(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1444, 1080);
+	sm510_tiger(config, 1444, 1080);
 }
 
 // roms
@@ -7746,7 +7662,7 @@ INPUT_PORTS_END
 
 void tbatfor_state::tbatfor(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1493, 1080);
+	sm510_tiger(config, 1493, 1080);
 }
 
 // roms
@@ -7829,7 +7745,7 @@ INPUT_PORTS_END
 
 void tjdredd_state::tjdredd(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1444, 1080);
+	sm510_tiger(config, 1444, 1080);
 }
 
 // roms
@@ -7912,7 +7828,7 @@ INPUT_PORTS_END
 
 void tapollo13_state::tapollo13(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1467, 1080);
+	sm510_tiger(config, 1467, 1080);
 }
 
 // roms
@@ -7995,7 +7911,7 @@ INPUT_PORTS_END
 
 void tgoldeye_state::tgoldeye(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1461, 1080);
+	sm510_tiger(config, 1461, 1080);
 }
 
 // roms
@@ -8078,7 +7994,7 @@ INPUT_PORTS_END
 
 void tkazaam_state::tkazaam(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1452, 1080); // no external XTAL
+	sm510_tiger(config, 1452, 1080); // no external XTAL
 }
 
 // roms
@@ -8156,7 +8072,7 @@ INPUT_PORTS_END
 
 void tsjam_state::tsjam(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1421, 1080); // no external XTAL
+	sm510_tiger(config, 1421, 1080); // no external XTAL
 }
 
 // roms
@@ -8234,7 +8150,7 @@ INPUT_PORTS_END
 
 void tinday_state::tinday(machine_config &config)
 {
-	tiger_sm510_1bit(config, 1463, 1080);
+	sm510_tiger(config, 1463, 1080);
 }
 
 // roms
@@ -8312,7 +8228,7 @@ INPUT_PORTS_END
 
 void tbatmana_state::tbatmana(machine_config &config)
 {
-	tiger_sm511_2bit(config, 1478, 1080);
+	sm511_tiger2bit(config, 1478, 1080);
 }
 
 // roms
@@ -8410,17 +8326,12 @@ INPUT_PORTS_END
 
 void trshutvoy_state::trshutvoy(machine_config &config)
 {
-	konami_sm510(config, 1496, 1080); // R mask options confirmed
+	sm510_common(config, 1496, 1080); // R mask options confirmed
 }
 
 void trshutvoy_state::tigarden(machine_config &config)
 {
-	trshutvoy(config);
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1515, 1080);
-	screen->set_visarea_full();
+	sm510_common(config, 1515, 1080);
 }
 
 // roms
@@ -8485,7 +8396,7 @@ INPUT_PORTS_END
 
 void trsrescue_state::trsrescue(machine_config &config)
 {
-	konami_sm510(config, 1533, 1080); // R mask options confirmed
+	sm510_common(config, 1533, 1080); // R mask options confirmed
 }
 
 // roms
@@ -8574,7 +8485,7 @@ INPUT_PORTS_END
 
 void nummunch_state::nummunch(machine_config &config)
 {
-	common_sm511(config, 1920, 875);
+	sm511_common(config, 1920, 875);
 }
 
 // roms
