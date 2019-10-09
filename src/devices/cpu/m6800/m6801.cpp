@@ -262,8 +262,8 @@ void m6801_cpu_device::m6803_mem(address_map &map)
 }
 
 
-DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "Motorola M6801")
-DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "Motorola M6803")
+DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "Motorola MC6801")
+DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "Motorola MC6803")
 DEFINE_DEVICE_TYPE(HD6301, hd6301_cpu_device, "hd6301", "Hitachi HD6301")
 DEFINE_DEVICE_TYPE(HD63701, hd63701_cpu_device, "hd63701", "Hitachi HD63701")
 DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6303r", "Hitachi HD6303R")

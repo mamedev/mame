@@ -322,9 +322,9 @@ const uint8_t m6800_cpu_device::cycles_nsc8105[256] =
 #undef XX // /invalid opcode unknown cc
 
 
-DEFINE_DEVICE_TYPE(M6800, m6800_cpu_device, "m6800", "Motorola M6800")
-DEFINE_DEVICE_TYPE(M6802, m6802_cpu_device, "m6802", "Motorola M6802")
-DEFINE_DEVICE_TYPE(M6808, m6808_cpu_device, "m6808", "Motorola M6808")
+DEFINE_DEVICE_TYPE(M6800, m6800_cpu_device, "m6800", "Motorola MC6800")
+DEFINE_DEVICE_TYPE(M6802, m6802_cpu_device, "m6802", "Motorola MC6802")
+DEFINE_DEVICE_TYPE(M6808, m6808_cpu_device, "m6808", "Motorola MC6808")
 DEFINE_DEVICE_TYPE(NSC8105, nsc8105_cpu_device, "nsc8105", "NSC8105")
 
 
