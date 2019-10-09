@@ -2707,6 +2707,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mekd5.cpp",
 	MAME_DIR .. "src/mame/drivers/mvme147.cpp",
 	MAME_DIR .. "src/mame/drivers/mvme162.cpp",
+	MAME_DIR .. "src/mame/drivers/uchroma68.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "multitch")

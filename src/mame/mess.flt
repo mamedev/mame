@@ -878,6 +878,7 @@ tvboy.cpp
 tvc.cpp
 tvgame.cpp
 tx0.cpp
+uchroma68.cpp
 uknc.cpp
 unichamp.cpp
 unior.cpp
