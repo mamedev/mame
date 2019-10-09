@@ -351,40 +351,37 @@ WRITE_LINE_MEMBER(mw8080bw_state::screen_vblank_phantom2)
  *************************************/
 
 
-/* the flip screen circuit is just a couple of relays on the monitor PCB */
+// the flip screen circuit is just a couple of relays on the monitor PCB
 
 uint32_t mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t x = 0;
 	uint8_t y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	uint8_t video_data = 0;
-	uint8_t flip = m_flip_screen;
 
 	while (1)
 	{
-		/* plot the current pixel */
+		// plot the current pixel
 		pen_t pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
 
-		if (flip)
+		if (m_flip_screen)
 			bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pen;
 		else
 			bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
-		/* next pixel */
+		// next pixel
 		video_data = video_data >> 1;
 		x = x + 1;
 
-		/* end of line? */
+		// end of line?
 		if (x == 0)
 		{
-			/* yes, flush out the shift register */
-			int i;
-
-			for (i = 0; i < 4; i++)
+			// yes, flush out the shift register
+			for (int i = 0; i < 4; i++)
 			{
 				pen = (video_data & 0x01) ? rgb_t::white() : rgb_t::black();
 
-				if (flip)
+				if (m_flip_screen)
 					bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + i)) = pen;
 				else
 					bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
@@ -392,18 +389,16 @@ uint32_t mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rg
 				video_data = video_data >> 1;
 			}
 
-			/* next row, video_data is now 0, so the next line will start
-			   with 4 blank pixels */
+			// next row, video_data is now 0, so the next line will start with 4 blank pixels
 			y = y + 1;
 
-			/* end of screen? */
+			// end of screen?
 			if (y == 0)
 				break;
 		}
-		/* the video RAM is read at every 8 pixels starting with pixel 4 */
-		else if ((x & 0x07) == 0x04)
+		else if ((x & 0x07) == 0x04) // the video RAM is read at every 8 pixels starting with pixel 4
 		{
-			offs_t offs = ((offs_t)y << 5) | (x >> 3);
+			offs_t const offs = (offs_t(y) << 5) | (x >> 3);
 			video_data = m_main_ram[offs];
 		}
 	}

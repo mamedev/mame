@@ -52,54 +52,33 @@ public:
 		m_mb14241(*this,"mb14241"),
 		m_watchdog(*this, "watchdog"),
 		m_main_ram(*this, "main_ram"),
-		m_colorram(*this, "colorram"),
-		m_colorram2(*this, "colorram2"),
 		m_discrete(*this, "discrete"),
 		m_samples(*this, "samples"),
-		m_sn1(*this, "sn1"),
-		m_sn2(*this, "sn2"),
-		m_sn(*this, "snsnd"),
 		m_screen(*this, "screen")
 	{ }
 
 	void blueshrk(machine_config &config);
-	void blueshrk_audio(machine_config &config);
 	void boothill(machine_config &config);
-	void boothill_audio(machine_config &config);
 	void bowler(machine_config &config);
-	void bowler_audio(machine_config &config);
 	void checkmat(machine_config &config);
-	void checkmat_audio(machine_config &config);
 	void clowns(machine_config &config);
 	void desertgu(machine_config &config);
-	void desertgu_audio(machine_config &config);
 	void dogpatch(machine_config &config);
-	void dogpatch_audio(machine_config &config);
 	void dplay(machine_config &config);
-	void dplay_audio(machine_config &config);
 	void gmissile(machine_config &config);
 	void invad2ct(machine_config &config);
-	void invad2ct_audio(machine_config &config);
 	void invaders(machine_config &config);
-	void invaders_audio(machine_config &config);
-	void invaders_samples_audio(machine_config &config);
 	void m4(machine_config &config);
 	void maze(machine_config &config);
-	void maze_audio(machine_config &config);
 	void mw8080bw_root(machine_config &config);
 	void phantom2(machine_config &config);
-	void seawolf(machine_config &config);
 	void shuffle(machine_config &config);
-	void shuffle_audio(machine_config &config);
 	void spacwalk(machine_config &config);
-	void spacwalk_audio(machine_config &config);
 	void tornbase(machine_config &config);
-	void tornbase_audio(machine_config &config);
 	void zzzap(machine_config &config);
-	void zzzap_audio(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(direct_coin_count);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(seawolf_erase_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_left_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_right_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_left_input_r);
@@ -110,53 +89,41 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_left_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_right_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clowns_controller_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(invaders_coin_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw5_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in1_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in2_control_r);
 
-	DECLARE_MACHINE_START(mw8080bw);
 	DECLARE_MACHINE_RESET(mw8080bw);
 
 	IRQ_CALLBACK_MEMBER(interrupt_vector);
 
 protected:
+	virtual void machine_start() override;
 
-	/* device/memory pointers */
+	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
+
+	int invaders_is_cabinet_cocktail();
+
+	uint32_t screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mw8080bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	// device/memory pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<mb14241_device> m_mb14241;
 	optional_device<watchdog_timer_device> m_watchdog;
 	required_shared_ptr<uint8_t> m_main_ram;
-	optional_shared_ptr<uint8_t> m_colorram;
-	optional_shared_ptr<uint8_t> m_colorram2;
 	optional_device<discrete_sound_device> m_discrete;
 
-	/* other devices */
+	// other devices
 	optional_device<samples_device> m_samples;
-	optional_device<sn76477_device> m_sn1;
-	optional_device<sn76477_device> m_sn2;
-	optional_device<sn76477_device> m_sn;
 	required_device<screen_device> m_screen;
 
-	/* sound-related */
-	uint8_t       m_port_1_last_extra;
-	uint8_t       m_port_2_last_extra;
-	uint8_t       m_port_3_last_extra;
-
-	/* misc game specific */
+	// misc game specific
 	uint8_t       m_flip_screen;
-
-	DECLARE_WRITE8_MEMBER(invaders_audio_1_w);
-	DECLARE_WRITE8_MEMBER(invaders_audio_2_w);
-
-	std::unique_ptr<uint8_t[]> m_scattered_colorram;
-	std::unique_ptr<uint8_t[]> m_scattered_colorram2;
-
-	uint32_t screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_mw8080bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	/* misc game specific */
@@ -172,11 +139,8 @@ private:
 
 	attotime m_interrupt_time;
 
-	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
 	DECLARE_READ8_MEMBER(mw8080bw_reversable_shift_result_r);
 	DECLARE_WRITE8_MEMBER(mw8080bw_reversable_shift_count_w);
-	DECLARE_WRITE8_MEMBER(seawolf_explosion_lamp_w);
-	DECLARE_WRITE8_MEMBER(seawolf_periscope_lamp_w);
 	DECLARE_WRITE8_MEMBER(tornbase_io_w);
 	DECLARE_WRITE8_MEMBER(maze_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(maze_io_w);
@@ -218,10 +182,6 @@ private:
 	DECLARE_WRITE8_MEMBER(dogpatch_audio_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_1_w);
 	DECLARE_WRITE8_MEMBER(blueshrk_audio_w);
-	DECLARE_WRITE8_MEMBER(invad2ct_audio_1_w);
-	DECLARE_WRITE8_MEMBER(invad2ct_audio_2_w);
-	DECLARE_WRITE8_MEMBER(invad2ct_audio_3_w);
-	DECLARE_WRITE8_MEMBER(invad2ct_audio_4_w);
 	void maze_update_discrete();
 	void maze_write_discrete(uint8_t maze_tone_timing_state);
 	uint8_t vpos_to_vysnc_chain_counter( int vpos );
@@ -229,7 +189,20 @@ private:
 	void mw8080bw_create_interrupt_timer(  );
 	void mw8080bw_start_interrupt_timer(  );
 	uint8_t tornbase_get_cabinet_type();
-	int invaders_is_cabinet_cocktail();
+
+	void blueshrk_audio(machine_config &config);
+	void boothill_audio(machine_config &config);
+	void bowler_audio(machine_config &config);
+	void checkmat_audio(machine_config &config);
+	void desertgu_audio(machine_config &config);
+	void dogpatch_audio(machine_config &config);
+	void dplay_audio(machine_config &config);
+	void maze_audio(machine_config &config);
+	void shuffle_audio(machine_config &config);
+	void spacwalk_audio(machine_config &config);
+	void tornbase_audio(machine_config &config);
+	void zzzap_audio(machine_config &config);
+
 	void blueshrk_io_map(address_map &map);
 	void boothill_io_map(address_map &map);
 	void bowler_io_map(address_map &map);
@@ -245,11 +218,49 @@ private:
 	void main_map(address_map &map);
 	void maze_io_map(address_map &map);
 	void phantom2_io_map(address_map &map);
-	void seawolf_io_map(address_map &map);
 	void shuffle_io_map(address_map &map);
 	void spacwalk_io_map(address_map &map);
 	void tornbase_io_map(address_map &map);
 	void zzzap_io_map(address_map &map);
+};
+
+
+#define SEAWOLF_ERASE_SW_PORT_TAG   ("ERASESW")
+#define SEAWOLF_ERASE_DIP_PORT_TAG  ("ERASEDIP")
+
+class seawolf_state : public mw8080bw_state
+{
+public:
+	seawolf_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag),
+		m_erase_sw(*this, SEAWOLF_ERASE_SW_PORT_TAG),
+		m_erase_dip(*this, SEAWOLF_ERASE_DIP_PORT_TAG),
+		m_exp_lamps(*this, "EXP_LAMP_%X", 0U),
+		m_torp_lamps(*this, "TORP_LAMP_%u", 1U),
+		m_ready_lamp(*this, "READY_LAMP"),
+		m_reload_lamp(*this, "RELOAD_LAMP")
+	{
+	}
+
+	void seawolf(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(erase_input_r);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void explosion_lamp_w(u8 data);
+	void periscope_lamp_w(u8 data);
+
+	void io_map(address_map &map);
+
+	required_ioport m_erase_sw;
+	required_ioport m_erase_dip;
+	output_finder<15> m_exp_lamps;
+	output_finder<4> m_torp_lamps;
+	output_finder<> m_ready_lamp;
+	output_finder<> m_reload_lamp;
 };
 
 
@@ -285,7 +296,7 @@ public:
 	void spcenctr(machine_config &config);
 
 protected:
-	DECLARE_MACHINE_START(spcenctr);
+	virtual void machine_start() override;
 
 private:
 	void io_w(offs_t offset, u8 data);
@@ -303,8 +314,6 @@ private:
 };
 
 
-#define SEAWOLF_GUN_PORT_TAG            ("GUN")
-
 #define TORNBASE_CAB_TYPE_UPRIGHT_OLD   (0)
 #define TORNBASE_CAB_TYPE_UPRIGHT_NEW   (1)
 #define TORNBASE_CAB_TYPE_COCKTAIL      (2)
@@ -315,7 +324,6 @@ private:
 #define INVADERS_CAB_TYPE_PORT_TAG      ("CAB")
 #define INVADERS_P1_CONTROL_PORT_TAG    ("CONTP1")
 #define INVADERS_P2_CONTROL_PORT_TAG    ("CONTP2")
-#define INVADERS_COIN_INPUT_PORT_TAG    ("COIN")
 #define INVADERS_SW6_SW7_PORT_TAG       ("SW6SW7")
 #define INVADERS_SW5_PORT_TAG           ("SW5")
 

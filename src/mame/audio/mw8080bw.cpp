@@ -14,6 +14,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 /*************************************
  *
  *  Implementation of tone generator used
@@ -40,8 +42,8 @@
 		DISCRETE_OP_AMP_TRIG_VCA(MIDWAY_TONE_SND, MIDWAY_TONE_BEFORE_AMP_SND, MIDWAY_TONE_EN, 0, 12, 0, &discrete_op_amp_tvca_info)
 
 
-/* most common values based on clowns schematic */
-static discrete_op_amp_tvca_info const midway_music_tvca_info =
+// most common values based on clowns schematic
+discrete_op_amp_tvca_info const midway_music_tvca_info =
 {
 	RES_M(3.3),             // r502
 	RES_K(10) + RES_K(680), // r505 + r506
@@ -77,7 +79,7 @@ static discrete_op_amp_tvca_info const midway_music_tvca_info =
  *
  *************************************/
 
-static discrete_lfsr_desc const midway_lfsr =
+discrete_lfsr_desc const midway_lfsr =
 {
 	DISC_CLK_IS_FREQ,
 	17,                 // bit length
@@ -96,6 +98,517 @@ static discrete_lfsr_desc const midway_lfsr =
 
 /*************************************
  *
+ *  Shared by Space Invaders and
+ *  Space Invaders II (cocktail)
+ *
+ *************************************/
+
+// sound board 1 or 2, for multi-board games
+#define INVADERS_NODE(_node, _board)    (NODE(_node + ((_board - 1) * 100)))
+
+// nodes - inputs
+#define INVADERS_SAUCER_HIT_EN                01
+#define INVADERS_FLEET_DATA                   02
+#define INVADERS_BONUS_MISSLE_BASE_EN         03
+#define INVADERS_INVADER_HIT_EN               04
+#define INVADERS_EXPLOSION_EN                 05
+#define INVADERS_MISSILE_EN                   06
+
+// nodes - sounds
+#define INVADERS_NOISE                        NODE_10
+#define INVADERS_SAUCER_HIT_SND               11
+#define INVADERS_FLEET_SND                    12
+#define INVADERS_BONUS_MISSLE_BASE_SND        13
+#define INVADERS_INVADER_HIT_SND              14
+#define INVADERS_EXPLOSION_SND                15
+#define INVADERS_MISSILE_SND                  16
+
+
+/************************************************
+ * Noise Generator
+ ************************************************/
+
+// Noise clock was breadboarded and measured at 7515
+#define INVADERS_NOISE_GENERATOR                                                \
+		DISCRETE_LFSR_NOISE(INVADERS_NOISE,             /* IC N5, pin 10 */     \
+				1,                                      /* ENAB */              \
+				1,                                      /* no RESET */          \
+				7515,                                   /* CLK in Hz */         \
+				12,                                     /* p-p AMPL */          \
+				0,                                      /* no FEED input */     \
+				12.0/2,                                 /* dc BIAS */           \
+				&midway_lfsr)
+
+
+/************************************************
+ * Saucer Hit
+ ************************************************/
+
+discrete_op_amp_info const invaders_saucer_hit_op_amp_B3_9 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	0,              // no r1
+	RES_K(100),     // R72
+	RES_M(1),       // R71
+	0,              // no r4
+	CAP_U(1),       // C23
+	0,              // vN
+	12              // vP
+};
+
+
+discrete_op_amp_osc_info const invaders_saucer_hit_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	RES_M(1),       // R70
+	RES_K(470),     // R64
+	RES_K(100),     // R61
+	RES_K(120),     // R63
+	RES_M(1),       // R62
+	0,              // no r6
+	0,              // no r7
+	0,              // no r8
+	CAP_U(0.1),     // C21
+	12,             // vP
+};
+
+discrete_op_amp_osc_info const invaders_saucer_hit_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	RES_M(1),       // R65
+	RES_K(470),     // R66
+	RES_K(680),     // R67
+	RES_M(1),       // R69
+	RES_M(1),       // R68
+	0,              // no r6
+	0,              // no r7
+	0,              // no r8
+	CAP_P(470),     // C22
+	12,             // vP
+};
+
+discrete_op_amp_info const invaders_saucer_hit_op_amp_B3_10 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	RES_K(680),     // R73
+	RES_K(680),     // R77
+	RES_M(2.7),     // R74
+	RES_K(680),     // R75
+	0,              // no c
+	0,              // vN
+	12              // vP
+};
+
+#define INVADERS_SAUCER_HIT(_board)                                                     \
+		DISCRETE_INPUTX_LOGIC(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, _board), 12, 0, 0)      \
+		DISCRETE_OP_AMP(INVADERS_NODE(20, _board),                      /* IC B3, pin 9 */  \
+				1,                                                      /* ENAB */          \
+				0,                                                      /* no IN0 */        \
+				INVADERS_NODE(INVADERS_SAUCER_HIT_EN, _board),          /* IN1 */           \
+				&invaders_saucer_hit_op_amp_B3_9)                                   \
+		DISCRETE_OP_AMP_OSCILLATOR(INVADERS_NODE(21, _board),           /* IC A4, pin 5 */  \
+				1,                                                      /* ENAB */          \
+				&invaders_saucer_hit_osc)                                           \
+		DISCRETE_OP_AMP_VCO1(INVADERS_NODE(22, _board),                 /* IC A4, pin 9 */  \
+				1,                                                      /* ENAB */          \
+				INVADERS_NODE(21, _board),                              /* VMOD1 */         \
+				&invaders_saucer_hit_vco)                                           \
+		DISCRETE_OP_AMP(INVADERS_NODE(INVADERS_SAUCER_HIT_SND, _board), /* IC B3, pin 10 */ \
+				1,                                                      /* ENAB */          \
+				INVADERS_NODE(22, _board),                              /* IN0 */           \
+				INVADERS_NODE(20, _board),                              /* IN1 */           \
+				&invaders_saucer_hit_op_amp_B3_10)
+
+
+/************************************************
+ * Fleet movement
+ ************************************************/
+
+discrete_comp_adder_table const invaders_thump_resistors =
+{
+	DISC_COMP_P_RESISTOR,
+	0,                          // no cDefault
+	4,                          // length
+	{ RES_K(20) + RES_K(20),    // R126 + R127
+		RES_K(68),              // R128
+		RES_K(82),              // R129
+		RES_K(100) }            // R130
+};
+
+discrete_555_desc const invaders_thump_555 =
+{
+	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
+	5,
+	5.0 - 0.6,                  // 5V - diode drop
+	DEFAULT_TTL_V_LOGIC_1       // Output of F3 7411 buffer
+};
+
+#define INVADERS_FLEET(_board)                                                              \
+		DISCRETE_INPUT_DATA  (INVADERS_NODE(INVADERS_FLEET_DATA, _board))                   \
+		DISCRETE_COMP_ADDER(INVADERS_NODE(30, _board),                                      \
+				INVADERS_NODE(INVADERS_FLEET_DATA, _board),             /* DATA */          \
+				&invaders_thump_resistors)                                                  \
+		DISCRETE_555_ASTABLE(INVADERS_NODE(31, _board),                 /* IC F3, pin 6 */  \
+				1,                                                      /* RESET */         \
+				INVADERS_NODE(30, _board),                              /* R1 */            \
+				RES_K(75),                                              /* R131 */          \
+				CAP_U(0.1),                                             /* C29 */           \
+				&invaders_thump_555)                                                        \
+		DISCRETE_RCFILTER(INVADERS_NODE(32, _board),                                        \
+				INVADERS_NODE(31, _board),                              /* IN0 */           \
+				100,                                                    /* R132 */          \
+				CAP_U(4.7) )                                            /* C31 */           \
+		DISCRETE_RCFILTER(INVADERS_NODE(INVADERS_FLEET_SND, _board),                        \
+				INVADERS_NODE(32, _board),                              /* IN0 */           \
+				100 + 100,                                              /* R132 + R133 */   \
+				CAP_U(10) )                                             /* C32 */
+
+
+/************************************************
+ * Bonus Missle Base
+ ************************************************/
+
+discrete_555_desc const invaders_bonus_555 =
+{
+	DISC_555_OUT_SQW | DISC_555_OUT_DC,
+	5.0,                        // 5V
+	DEFAULT_555_VALUES
+};
+
+#define INVADERS_BONUS_MISSLE_BASE(_board)                                                  \
+		DISCRETE_INPUT_LOGIC (INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, _board))         \
+		DISCRETE_555_ASTABLE(INVADERS_NODE(40, _board),                 /* IC F4, pin 9 */  \
+				INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, _board),   /* RESET */         \
+				RES_K(100),                                             /* R94 */           \
+				RES_K(47),                                              /* R95 */           \
+				CAP_U(1),                                               /* C34 */           \
+				&invaders_bonus_555)                                                        \
+		DISCRETE_SQUAREWFIX(INVADERS_NODE(41, _board),                                      \
+				1,                                                      /* ENAB */          \
+				480,                                                    /* FREQ */          \
+				1,                                                      /* AMP */           \
+				50,                                                     /* DUTY */          \
+				1.0/2,                                                  /* BIAS */          \
+				0)                                                      /* PHASE */         \
+		DISCRETE_LOGIC_AND3(INVADERS_NODE(42, _board),                  /* IC F3, pin 12 */ \
+				INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, _board),    /* INP0 */         \
+				INVADERS_NODE(41, _board),                              /* INP1 */          \
+				INVADERS_NODE(40, _board) )                             /* INP2 */          \
+		DISCRETE_GAIN(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_SND, _board),/* adjust from logic to TTL voltage level */\
+				INVADERS_NODE(42, _board),                              /* IN0 */           \
+				DEFAULT_TTL_V_LOGIC_1)                                  /* GAIN */
+
+
+/************************************************
+ * Invader Hit
+ ************************************************/
+
+discrete_op_amp_info const invaders_invader_hit_op_amp_D3_10 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	0,                          // no r1
+	RES_K(10),                  // R53
+	RES_M(1),                   // R137
+	0,                          // no r4
+	CAP_U(0.47),                // C19
+	0,                          // vN
+	12                          // vP
+};
+
+discrete_op_amp_osc_info const invaders_invader_hit_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	RES_M(1),                   // R42
+	RES_K(470),                 // R43
+	RES_K(680),                 // R44
+	RES_M(1),                   // R46
+	RES_M(1),                   // R45
+	0,                          // no r6
+	0,                          // no r7
+	0,                          // no r8
+	CAP_P(330),                 // C16
+	12,                         // vP
+};
+
+discrete_op_amp_info const invaders_invader_hit_op_amp_D3_4 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	RES_K(470),                 // R55
+	RES_K(680),                 // R54
+	RES_M(2.7),                 // R56
+	RES_K(680),                 // R57
+	0,                          // no c
+	0,                          // vN
+	12                          // vP
+};
+
+#define INVADERS_INVADER_HIT(_board, _type)                                                 \
+		DISCRETE_INPUTX_LOGIC(INVADERS_NODE(INVADERS_INVADER_HIT_EN, _board), 5, 0, 0)      \
+		DISCRETE_OP_AMP_ONESHOT(INVADERS_NODE(50, _board),              /* IC D3, pin 9 */  \
+				INVADERS_NODE(INVADERS_INVADER_HIT_EN, _board),         /* TRIG */          \
+				&_type##_invader_hit_1sht)                                                  \
+		DISCRETE_OP_AMP(INVADERS_NODE(51, _board),                      /* IC D3, pin 10 */ \
+				1,                                                      /* ENAB */          \
+				0,                                                      /* no IN0 */        \
+				INVADERS_NODE(50, _board),                              /* IN1 */           \
+				&invaders_invader_hit_op_amp_D3_10)                                         \
+		DISCRETE_OP_AMP_OSCILLATOR(INVADERS_NODE(52, _board),           /* IC B4, pin 5 */  \
+				1,                                                      /* ENAB */          \
+				&_type##_invader_hit_osc)                                                   \
+		DISCRETE_OP_AMP_VCO1(INVADERS_NODE(53, _board),                 /* IC B4, pin 4 */  \
+				1,                                                      /* ENAB */          \
+				INVADERS_NODE(52, _board),                              /* VMOD1 */         \
+				&invaders_invader_hit_vco)                                                  \
+		DISCRETE_OP_AMP(INVADERS_NODE(INVADERS_INVADER_HIT_SND, _board),/* IC D3, pin 4 */  \
+				1,                                                      /* ENAB */          \
+				INVADERS_NODE(53, _board),                              /* IN0 */           \
+				INVADERS_NODE(51, _board),                              /* IN1 */           \
+				&invaders_invader_hit_op_amp_D3_4)
+
+
+/************************************************
+ * Missle Sound
+ ************************************************/
+
+discrete_op_amp_1sht_info const invaders_missle_1sht =
+{
+	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(4.7),                         // R32
+	RES_K(100),                         // R30
+	RES_M(1),                           // R31
+	RES_M(1),                           // R33
+	RES_M(2.2),                         // R34
+	CAP_U(1),                           // C12
+	CAP_P(470),                         // C15
+	0,                                  // vN
+	12                                  // vP
+};
+
+discrete_op_amp_info const invaders_missle_op_amp_B3 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	0,                                  // no r1
+	RES_K(10),                          // R35
+	RES_M(1.5),                         // R36
+	0,                                  // no r4
+	CAP_U(0.22),                        // C13
+	0,                                  // vN
+	12                                  // vP
+};
+
+discrete_op_amp_osc_info const invaders_missle_op_amp_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	1.0 / (1.0 / RES_M(1) + 1.0 / RES_K(330)) + RES_M(1.5),     // R29||R11 + R12
+	RES_M(1),                           // R16
+	RES_K(560),                         // R17
+	RES_M(2.2),                         // R19
+	RES_M(1),                           // R16
+	RES_M(4.7),                         // R14
+	RES_M(3.3),                         // R13
+	0,                                  // no r8
+	CAP_P(330),                         // C58
+	12,                                 // vP
+};
+
+discrete_op_amp_info const invaders_missle_op_amp_A3 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	RES_K(560),                         // R22
+	RES_K(470),                         // R15
+	RES_M(2.7),                         // R20
+	RES_K(560),                         // R21
+	0,                                  // no c
+	0,                                  // vN
+	12                                  // vP
+};
+
+discrete_op_amp_tvca_info const invaders_missle_tvca =
+{
+	RES_M(2.7),                         // R25
+	RES_K(560),                         // R23
+	0,                                  // no r3
+	RES_K(560),                         // R26
+	RES_K(1),                           //
+	0,                                  // no r6
+	RES_K(560),                         // R60
+	0,                                  // no r8
+	0,                                  // no r9
+	0,                                  // no r10
+	0,                                  // no r11
+	CAP_U(0.1),                         // C14
+	0,                                  // no c2
+	0, 0,                               // no c3, c4
+	5,                                  // v1
+	0,                                  // no v2
+	0,                                  // no v3
+	12,                                 // vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f0
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f1
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  // f2
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f3
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f4
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   // no f5
+};
+
+#define INVADERS_MISSILE(_board, _type)                                                     \
+		DISCRETE_INPUTX_LOGIC(INVADERS_NODE(INVADERS_MISSILE_EN, _board), 5, 0, 0)          \
+		DISCRETE_OP_AMP_ONESHOT(INVADERS_NODE(70, _board),              /* IC B3, pin 4 */  \
+				INVADERS_NODE(INVADERS_MISSILE_EN, _board),             /* TRIG */          \
+				&_type##_missle_1sht)                                                       \
+		DISCRETE_OP_AMP(INVADERS_NODE(71, _board),                      /* IC B3, pin 5 */  \
+				1,                                                      /* ENAB */          \
+				0,                                                      /* no IN0 */        \
+				INVADERS_NODE(70, _board),                              /* IN1 */           \
+				&invaders_missle_op_amp_B3)                                                 \
+		/* next 2 modules simulate the D1 voltage drop */                                   \
+		DISCRETE_ADDER2(INVADERS_NODE(72, _board),                                          \
+				1,                                                      /* ENAB */          \
+				INVADERS_NODE(71, _board),                              /* IN0 */           \
+				-0.5)                                                   /* IN1 */           \
+		DISCRETE_CLAMP(INVADERS_NODE(73, _board),                                           \
+				INVADERS_NODE(72, _board),                              /* IN0 */           \
+				0,                                                      /* MIN */           \
+				12)                                                     /* MAX */           \
+		DISCRETE_CRFILTER(INVADERS_NODE(74, _board),                                        \
+				INVADERS_NOISE,                                         /* IN0 */           \
+				RES_M(1) + RES_K(330),                                  /* R29, R11 */      \
+				CAP_U(0.1) )                                            /* C57 */           \
+		DISCRETE_GAIN(INVADERS_NODE(75, _board),                                            \
+				INVADERS_NODE(74, _board),                              /* IN0 */           \
+				RES_K(330)/(RES_M(1) + RES_K(330)))                     /* GAIN - R29 : R11 */  \
+		DISCRETE_OP_AMP_VCO2(INVADERS_NODE(76, _board),                 /* IC C1, pin 4 */  \
+				1,                                                      /* ENAB */          \
+				INVADERS_NODE(75, _board),                              /* VMOD1 */         \
+				INVADERS_NODE(73, _board),                              /* VMOD2 */         \
+				&invaders_missle_op_amp_osc)                                                \
+		DISCRETE_OP_AMP(INVADERS_NODE(77, _board),                      /* IC A3, pin 9 */  \
+				1,                                                      /* ENAB */          \
+				INVADERS_NODE(76, _board),                              /* IN0 */           \
+				INVADERS_NODE(73, _board),                              /* IN1 */           \
+				&invaders_missle_op_amp_A3)                                                 \
+		DISCRETE_OP_AMP_TRIG_VCA(INVADERS_NODE(INVADERS_MISSILE_SND, _board),   /* IC A3, pin 10 */     \
+				INVADERS_NODE(INVADERS_MISSILE_EN, _board),             /* TRG0 */          \
+				0,                                                      /* no TRG1 */       \
+				0,                                                      /* no TRG2 */       \
+				INVADERS_NODE(77, _board),                              /* IN0 */           \
+				0,                                                      /* no IN1 */        \
+				&invaders_missle_tvca)
+
+
+/************************************************
+ * Explosion
+ ************************************************/
+
+discrete_op_amp_1sht_info const invaders_explosion_1sht =
+{
+	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(4.7),                         // R90
+	RES_K(100),                         // R88
+	RES_M(1),                           // R91
+	RES_M(1),                           // R89
+	RES_M(2.2),                         // R92
+	CAP_U(2.2),                         // C24
+	CAP_P(470),                         // C25
+	0,                                  // vN
+	12                                  // vP
+};
+
+discrete_op_amp_tvca_info const invaders_explosion_tvca =
+{
+	RES_M(2.7),                         // R80
+	RES_K(680),                         // R79
+	0,                                  // no r3
+	RES_K(680),                         // R82
+	RES_K(10),                          // R93
+	0,                                  // no r6
+	RES_K(680),                         // R83
+	0,                                  // no r8
+	0,                                  // no r9
+	0,                                  // no r10
+	0,                                  // no r11
+	CAP_U(1),                           // C26
+	0,                                  // no c2
+	0, 0,                               // no c3, c4
+	12.0 - OP_AMP_NORTON_VBE,           // v1
+	0,                                  // no v2
+	0,                                  // no v3
+	12,                                 // vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f0
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f1
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  // f2
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f3
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  // no f4
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   // no f5
+};
+
+#define INVADERS_EXPLOSION(_board)                                                          \
+		DISCRETE_INPUTX_LOGIC(INVADERS_NODE(INVADERS_EXPLOSION_EN, _board), 5, 0, 0)        \
+		DISCRETE_OP_AMP_ONESHOT(INVADERS_NODE(60, _board),              /* IC D2, pin 10 */ \
+				INVADERS_NODE(INVADERS_EXPLOSION_EN, _board),           /* TRIG */          \
+				&invaders_explosion_1sht)                                                   \
+		DISCRETE_OP_AMP_TRIG_VCA(INVADERS_NODE(61, _board),             /* IC D2, pin 4 */  \
+				INVADERS_NODE(60, _board),                              /* TRG0 */          \
+				0,                                                      /* no TRG1 */       \
+				0,                                                      /* no TRG2 */       \
+				INVADERS_NOISE,                                         /* IN0 */           \
+				0,                                                      /* no IN1 */        \
+				&invaders_explosion_tvca)                                                   \
+		DISCRETE_RCFILTER(INVADERS_NODE(62, _board),                                        \
+				INVADERS_NODE(61, _board),                              /* IN0 */           \
+				RES_K(5.6),                                             /* R84 */           \
+				CAP_U(0.1) )                                            /* C27 */           \
+		DISCRETE_RCFILTER(INVADERS_NODE(INVADERS_EXPLOSION_SND, _board),                    \
+				INVADERS_NODE(62, _board),                              /* IN0 */           \
+				RES_K(5.6) + RES_K(6.8),                                /* R84 + R85 */     \
+				CAP_U(0.1) )                                            /* C28 */
+
+
+/************************************************
+ * Final mix
+ ************************************************/
+
+discrete_mixer_desc const invaders_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,               // type
+	{ RES_K(200),                       // R78
+		RES_K(10) + 100 + 100,          // R134 + R133 + R132
+		RES_K(150),                     // R136
+		RES_K(200),                     // R59
+		RES_K(2) + RES_K(6.8) + RES_K(5.6), // R86 + R85 + R84
+		RES_K(150) },                   // R28
+	{0},                                // no rNode{}
+	{ 0,
+		0,
+		0,
+		0,
+		0,
+		CAP_U(0.001) },                 // C11
+	0,                                  // no rI
+	RES_K(100),                         // R105
+	0,                                  // no cF
+	CAP_U(0.1),                         // C45
+	0,                                  // vRef = ground
+	1                                   // gain
+};
+
+#define INVADERS_MIXER(_board, _type)                                                       \
+		DISCRETE_MIXER6(INVADERS_NODE(90, _board),                                          \
+				1,                                                      /* ENAB */          \
+				INVADERS_NODE(INVADERS_SAUCER_HIT_SND, _board),         /* IN0 */           \
+				INVADERS_NODE(INVADERS_FLEET_SND, _board),              /* IN1 */           \
+				INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_SND, _board),  /* IN2 */           \
+				INVADERS_NODE(INVADERS_INVADER_HIT_SND, _board),        /* IN3 */           \
+				INVADERS_NODE(INVADERS_EXPLOSION_SND, _board),          /* IN4 */           \
+				INVADERS_NODE(INVADERS_MISSILE_SND, _board),            /* IN5 */           \
+				&_type##_mixer)                                                             \
+		DISCRETE_OUTPUT(INVADERS_NODE(90, _board), 2500)
+
+} // anonymous namespace
+
+
+/*************************************
+ *
  *  Device type globals
  *
  *************************************/
@@ -106,7 +619,9 @@ DEFINE_DEVICE_TYPE(GMISSILE_AUDIO, gmissile_audio_device, "gmissile_audio", "Mid
 DEFINE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device,       "m4_audio",       "Midway M-4 Audio")
 DEFINE_DEVICE_TYPE(CLOWNS_AUDIO,   clowns_audio_device,   "clowns_audio",   "Midway Clowns Audio")
 DEFINE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device, "spcenctr_audio", "Midway Space Encounters Audio")
-DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "pantom2_audio",  "Midway Phantom 2 Audio")
+DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "phantom2_audio", "Midway Phantom 2 Audio")
+DEFINE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device, "invaders_audio", "Taito Space Invaders Audio")
+DEFINE_DEVICE_TYPE(INVAD2CT_AUDIO, invad2ct_audio_device, "invad2ct_audio", "Midway Space Invaders II Audio")
 
 
 /*************************************
@@ -928,86 +1443,86 @@ static DISCRETE_SOUND_START(spcenctr_discrete)
 	 ************************************************/
 	// Noise clock was breadboarded and measured at 7515
 	DISCRETE_LFSR_NOISE(SPCENCTR_NOISE,                 // IC A0, pin 10
-					1,                                  // ENAB
-					1,                                  // no RESET
-					7515,                               // CLK in Hz
-					12,                                 // p-p AMPL
-					0,                                  // no FEED input
-					12.0/2,                             // dc BIAS
-					&midway_lfsr)
+			1,                                          // ENAB
+			1,                                          // no RESET
+			7515,                                       // CLK in Hz
+			12,                                         // p-p AMPL
+			0,                                          // no FEED input
+			12.0/2,                                     // dc BIAS
+			&midway_lfsr)
 
 	/************************************************
 	 * Enemy Ship Shot
 	 ************************************************/
 	DISCRETE_OP_AMP(NODE_20,                            // IC E1, pin 10
-					1,                                  // ENAB
-					0,                                  // no IN0
-					SPCENCTR_ENEMY_SHIP_SHOT_EN,        // IN1
-					&spcenctr_enemy_ship_shot_op_amp_E1)
+			1,                                          // ENAB
+			0,                                          // no IN0
+			SPCENCTR_ENEMY_SHIP_SHOT_EN,                // IN1
+			&spcenctr_enemy_ship_shot_op_amp_E1)
 	DISCRETE_OP_AMP_VCO1(NODE_21,                       // IC D1, pin 5
-					1,                                  // ENAB
-					NODE_20,                            // VMOD1
-					&spcenctr_enemy_ship_shot_op_amp_osc)
+			1,                                          // ENAB
+			NODE_20,                                    // VMOD1
+			&spcenctr_enemy_ship_shot_op_amp_osc)
 	DISCRETE_OP_AMP(NODE_22,                            // IC D1, pin 9
-					1,                                  // ENAB
-					NODE_21,                            // IN0
-					NODE_20,                            // IN1
-					&spcenctr_enemy_ship_shot_op_amp_D1)
+			1,                                          // ENAB
+			NODE_21,                                    // IN0
+			NODE_20,                                    // IN1
+			&spcenctr_enemy_ship_shot_op_amp_D1)
 	DISCRETE_OP_AMP_FILTER(NODE_23,                     // IC D1, pin 10
-					1,                                  // ENAB
-					NODE_22,                            // INP0
-					0,                                  // no INP1
-					DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON,
-					&spcenctr_enemy_ship_shot_filt)
+			1,                                          // ENAB
+			NODE_22,                                    // INP0
+			0,                                          // no INP1
+			DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON,
+			&spcenctr_enemy_ship_shot_filt)
 	DISCRETE_CRFILTER(SPCENCTR_ENEMY_SHIP_SHOT_SND,
-					NODE_23,                            // IN0
-					RES_K(1.8),                         // R116
-					CAP_U(0.1) )                        // C104
+			NODE_23,                                    // IN0
+			RES_K(1.8),                                 // R116
+			CAP_U(0.1) )                                // C104
 
 	/************************************************
 	 * Player Shot
 	 ************************************************/
 	DISCRETE_OP_AMP_ONESHOT(NODE_30,                    // IC E1, pin 4
-					SPCENCTR_PLAYER_SHOT_EN,            // TRIG
-					&spcenctr_player_shot_1sht)         // breadboarded and scoped at 325mS
+			SPCENCTR_PLAYER_SHOT_EN,                    // TRIG
+			&spcenctr_player_shot_1sht)                 // breadboarded and scoped at 325mS
 	DISCRETE_OP_AMP(NODE_31,                            // IC E1, pin 5
-					1,                                  // ENAB
-					0,                                  // no IN0
-					NODE_30,                            // IN1
-					&spcenctr_player_shot_op_amp_E1)
+			1,                                          // ENAB
+			0,                                          // no IN0
+			NODE_30,                                    // IN1
+			&spcenctr_player_shot_op_amp_E1)
 	// next 2 modules simulate the D502 voltage drop
 	DISCRETE_ADDER2(NODE_32,
-					1,                                  // ENAB
-					NODE_31,                            // IN0
-					-0.5)                               // IN1
+			1,                                          // ENAB
+			NODE_31,                                    // IN0
+			-0.5)                                       // IN1
 	DISCRETE_CLAMP(NODE_33,
-					NODE_32,                            // IN0
-					0,                                  // MIN
-					12)                                 // MAX
+			NODE_32,                                    // IN0
+			0,                                          // MIN
+			12)                                         // MAX
 	DISCRETE_CRFILTER(NODE_34,
-					SPCENCTR_NOISE,                     // IN0
-					RES_M(1) + RES_K(330),              // R507, R509
-					CAP_U(0.1) )                        // C503
+			SPCENCTR_NOISE,                             // IN0
+			RES_M(1) + RES_K(330),                      // R507, R509
+			CAP_U(0.1) )                                // C503
 	DISCRETE_GAIN(NODE_35,
-					NODE_34,                            // IN0
-					RES_K(330)/(RES_M(1) + RES_K(330))) // GAIN - R507 : R509
+			NODE_34,                                    // IN0
+			RES_K(330)/(RES_M(1) + RES_K(330)))         // GAIN - R507 : R509
 	DISCRETE_OP_AMP_VCO2(NODE_36,                       // IC C1, pin 4
-					1,                                  // ENAB
-					NODE_35,                            // VMOD1
-					NODE_33,                            // VMOD2
+			1,                                          // ENAB
+			NODE_35,                                    // VMOD1
+			NODE_33,                                    // VMOD2
 					&spcenctr_player_shot_op_amp_osc)
 	DISCRETE_OP_AMP(NODE_37,                            // IC C1, pin 9
-					1,                                  // ENAB
-					NODE_36,                            // IN0
-					NODE_33,                            // IN1
-					&spcenctr_player_shot_op_amp_C1)
+			1,                                          // ENAB
+			NODE_36,                                    // IN0
+			NODE_33,                                    // IN1
+			&spcenctr_player_shot_op_amp_C1)
 	DISCRETE_OP_AMP_TRIG_VCA(SPCENCTR_PLAYER_SHOT_SND,  // IC C1, pin 10
-					SPCENCTR_PLAYER_SHOT_EN,            // TRG0
-					0,                                  // no TRG1
-					0,                                  // no TRG2
-					NODE_37,                            // IN0
-					0,                                  // no IN1
-					&spcenctr_player_shot_tvca)
+			SPCENCTR_PLAYER_SHOT_EN,                    // TRG0
+			0,                                          // no TRG1
+			0,                                          // no TRG2
+			NODE_37,                                    // IN0
+			0,                                          // no IN1
+			&spcenctr_player_shot_tvca)
 
 	/************************************************
 	 *Screech - unemulated
@@ -1018,78 +1533,78 @@ static DISCRETE_SOUND_START(spcenctr_discrete)
 	 * Crash
 	 ************************************************/
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_60,                   // IC C2, pin 4
-					SPCENCTR_CRASH_EN,                  // TRG0
-					0,                                  // no TRG1
-					0,                                  // no TRG2
-					SPCENCTR_NOISE,                     // IN0
-					0,                                  // no IN1
-					&spcenctr_crash_tvca)
+			SPCENCTR_CRASH_EN,                          // TRG0
+			0,                                          // no TRG1
+			0,                                          // no TRG2
+			SPCENCTR_NOISE,                             // IN0
+			0,                                          // no IN1
+			&spcenctr_crash_tvca)
 	// The next 5 modules emulate the filter.
 	// The DC level was breadboarded and the frequency response was SPICEd
 	DISCRETE_ADDER2(NODE_61,                            // center on filter DC level
-					1,                                  // ENAB
-					NODE_60,                            // IN0
-					-6.8)                               // IN1
+			1,                                          // ENAB
+			NODE_60,                                    // IN0
+			-6.8)                                       // IN1
 	DISCRETE_FILTER2(NODE_62,
-					1,                                  // ENAB
-					NODE_61,                            // INP0
-					130,                                // FREQ
-					1.0 / 8,                            // DAMP
-					DISC_FILTER_BANDPASS)
+			1,                                          // ENAB
+			NODE_61,                                    // INP0
+			130,                                        // FREQ
+			1.0 / 8,                                    // DAMP
+			DISC_FILTER_BANDPASS)
 	DISCRETE_GAIN(NODE_63,
-					NODE_62,                            // IN0
-					6)                                  // GAIN
-	DISCRETE_ADDER2(NODE_64,                            // center on filter DC level
-					1,                                  // ENAB
-					NODE_63,                            // IN0
-					6.8)                                // IN1
-	DISCRETE_CLAMP(SPCENCTR_CRASH_SND,                  // IC C2, pin 5
-					NODE_64,                            // IN0
-					0,                                  // MIN
-					12.0 - OP_AMP_NORTON_VBE)           // MAX
+			NODE_62,                                    // IN0
+			6)                                          // GAIN
+	DISCRETE_ADDER2(NODE_64,                                    // center on filter DC level
+			1,                                          // ENAB
+			NODE_63,                                    // IN0
+			6.8)                                        // IN1
+	DISCRETE_CLAMP(SPCENCTR_CRASH_SND,                          // IC C2, pin 5
+			NODE_64,                                    // IN0
+			0,                                          // MIN
+			12.0 - OP_AMP_NORTON_VBE)                   // MAX
 
 	/************************************************
 	 * Explosion
 	 ************************************************/
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_70,                   // IC D2, pin 10
-					SPCENCTR_EXPLOSION_EN,              // TRG0
-					0,                                  // no TRG1
-					0,                                  // no TRG2
-					SPCENCTR_NOISE,                     // IN0
-					0,                                  // no IN1
-					&spcenctr_explosion_tvca)
+			SPCENCTR_EXPLOSION_EN,                      // TRG0
+			0,                                          // no TRG1
+			0,                                          // no TRG2
+			SPCENCTR_NOISE,                             // IN0
+			0,                                          // no IN1
+			&spcenctr_explosion_tvca)
 	DISCRETE_RCFILTER(NODE_71,
-					NODE_70,                            // IN0
-					RES_K(1.8),                         // R405
-					CAP_U(0.22) )                       // C401
+			NODE_70,                                    // IN0
+			RES_K(1.8),                                 // R405
+			CAP_U(0.22) )                               // C401
 	DISCRETE_RCFILTER(SPCENCTR_EXPLOSION_SND,
-					NODE_71,                            // IN0
-					RES_K(1.8) + RES_K(3.6),            // R405 + R406
-					CAP_U(0.22) )                       // C402
+			NODE_71,                                    // IN0
+			RES_K(1.8) + RES_K(3.6),                    // R405 + R406
+			CAP_U(0.22) )                               // C402
 
 	/************************************************
 	 *Bonus
 	 ************************************************/
 	DISCRETE_555_ASTABLE(NODE_80,                       // pin 5
-					// the pin 4 reset is not connected in schematic, but should be
-					SPCENCTR_BONUS_EN,                  // RESET
-					RES_K(1),                           // R710
-					RES_K(27),                          // R711
-					CAP_U(0.047),                       // C710
-					&spcenctr_555_bonus)
+			// the pin 4 reset is not connected in schematic, but should be
+			SPCENCTR_BONUS_EN,                          // RESET
+			RES_K(1),                                   // R710
+			RES_K(27),                                  // R711
+			CAP_U(0.047),                               // C710
+			&spcenctr_555_bonus)
 	DISCRETE_555_ASTABLE(NODE_81,                       // pin 9
-					SPCENCTR_BONUS_EN,                  // RESET pin 10
-					RES_K(100),                         // R713
-					RES_K(47),                          // R714
-					CAP_U(1),                           // C713
-					&spcenctr_555_bonus)
+			SPCENCTR_BONUS_EN,                          // RESET pin 10
+			RES_K(100),                                 // R713
+			RES_K(47),                                  // R714
+			CAP_U(1),                                   // C713
+			&spcenctr_555_bonus)
 	DISCRETE_LOGIC_AND3(NODE_82,                        // IC C-D, pin 6
-					NODE_80,                            // INP0
-					NODE_81,                            // INP1
-					SPCENCTR_BONUS_EN)                  // INP2
+			NODE_80,                                    // INP0
+			NODE_81,                                    // INP1
+			SPCENCTR_BONUS_EN)                          // INP2
 	DISCRETE_GAIN(SPCENCTR_BONUS_SND,                   // adjust from logic to TTL voltage level
-					NODE_82,                            // IN0
-					DEFAULT_TTL_V_LOGIC_1)              // GAIN
+			NODE_82,                                    // IN0
+			DEFAULT_TTL_V_LOGIC_1)                      // GAIN
 
 	/************************************************
 	 *Wind - unemulated
@@ -1100,15 +1615,15 @@ static DISCRETE_SOUND_START(spcenctr_discrete)
 	 * Final mix
 	 ************************************************/
 	DISCRETE_MIXER7(NODE_91,
-					1,                                  // ENAB
-					SPCENCTR_ENEMY_SHIP_SHOT_SND,       // IN0
-					SPCENCTR_PLAYER_SHOT_SND,           // IN1
-					SPCENCTR_SCREECH_SND,               // IN2
-					SPCENCTR_CRASH_SND,                 // IN3
-					SPCENCTR_EXPLOSION_SND,             // IN4
-					SPCENCTR_BONUS_SND,                 // IN5
-					SPCENCTR_WIND_SND,                  // IN6
-					&spcenctr_mixer)
+			1,                                          // ENAB
+			SPCENCTR_ENEMY_SHIP_SHOT_SND,               // IN0
+			SPCENCTR_PLAYER_SHOT_SND,                   // IN1
+			SPCENCTR_SCREECH_SND,                       // IN2
+			SPCENCTR_CRASH_SND,                         // IN3
+			SPCENCTR_EXPLOSION_SND,                     // IN4
+			SPCENCTR_BONUS_SND,                         // IN5
+			SPCENCTR_WIND_SND,                          // IN6
+			&spcenctr_mixer)
 
 	DISCRETE_OUTPUT(NODE_91, 20000)
 DISCRETE_SOUND_END
@@ -1286,6 +1801,351 @@ void phantom2_audio_device::device_start()
 
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
+}
+
+
+/*************************************
+ *
+ *  Space Invaders
+ *
+ *  Discrete sound emulation:
+ *  Apr 2007, D.R.
+ *
+ *************************************/
+
+static discrete_op_amp_1sht_info const invaders_invader_hit_1sht =
+{
+	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(4.7),     // R49
+	RES_K(100),     // R51
+	RES_M(1),       // R48
+	RES_M(1),       // R50
+	RES_M(2.2),     // R52
+	CAP_U(0.1),     // C18
+	CAP_P(470),     // C20
+	0,              // vN
+	12              // vP
+};
+
+static const discrete_op_amp_osc_info invaders_invader_hit_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	RES_M(1),       // R37
+	RES_K(10),      // R41
+	RES_K(100),     // R38
+	RES_K(120),     // R40
+	RES_M(1),       // R39
+	0,              // no r6
+	0,              // no r7
+	0,              // no r8
+	CAP_U(0.1),     // C16
+	12,             // vP
+};
+
+// Schematic M051-00739-A005 and M051-00739-B005
+// P.C.      A084-90700-B000 and A084-90700-C000
+static DISCRETE_SOUND_START(invaders_discrete)
+	INVADERS_NOISE_GENERATOR
+	INVADERS_SAUCER_HIT(1)
+	INVADERS_FLEET(1)
+	INVADERS_BONUS_MISSLE_BASE(1)
+	INVADERS_INVADER_HIT(1, invaders)
+	INVADERS_EXPLOSION(1)
+	INVADERS_MISSILE(1, invaders)
+	INVADERS_MIXER(1, invaders)
+DISCRETE_SOUND_END
+
+invaders_audio_device::invaders_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, INVADERS_AUDIO, tag, owner, clock),
+	m_sn(*this, "snsnd"),
+	m_discrete(*this, "discrete"),
+	m_flip_screen_out(*this),
+	m_p2(0U)
+{
+}
+
+void invaders_audio_device::p1_w(u8 data)
+{
+	m_sn->enable_w(BIT(~data, 0));    // saucer sound
+
+	m_discrete->write(INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
+	m_discrete->write(INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
+	m_discrete->write(INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
+	m_discrete->write(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
+
+	machine().sound().system_enable(data & 0x20);
+
+	// D6 and D7 are not connected
+}
+
+
+void invaders_audio_device::p2_w(u8 data)
+{
+	u8 const changed(data ^ m_p2);
+	m_p2 = data;
+
+	m_discrete->write(INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
+	m_discrete->write(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
+
+	if (BIT(changed, 5)) m_flip_screen_out(BIT(data, 5));
+
+	// D6 and D7 are not connected
+}
+
+void invaders_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, RES_K(100));
+	m_sn->set_amp_res(RES_K(56));
+	m_sn->set_feedback_res(RES_K(10));
+	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	DISCRETE(config, m_discrete, invaders_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+void invaders_audio_device::device_start()
+{
+	m_flip_screen_out.resolve_safe();
+
+	m_p2 = 0U;
+
+	save_item(NAME(m_p2));
+}
+
+
+/*************************************
+ *
+ *  Space Invaders II (cocktail)
+ *
+ *************************************/
+
+static discrete_op_amp_1sht_info const invad2ct_invader_hit_1sht =
+{
+	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(4.7),                 // R49
+	RES_K(100),                 // R51
+	RES_M(1),                   // R48
+	RES_M(1),                   // R50
+	RES_M(2.2),                 // R52
+	CAP_U(0.22),                // C18
+	CAP_P(470),                 // C20
+	0,                          // vN
+	12                          // vP
+};
+
+static discrete_op_amp_osc_info const invad2ct_invader_hit_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	RES_M(1),                   // R37
+	RES_K(10),                  // R41
+	RES_K(100),                 // R38
+	RES_K(120),                 // R40
+	RES_M(1),                   // R39
+	0,                          // no r6
+	0,                          // no r7
+	0,                          // no r8
+	CAP_U(0.22),                // C16
+	12,                         // vP
+};
+
+static discrete_op_amp_1sht_info const invad2ct_brd2_invader_hit_1sht =
+{
+	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(4.7),                 // R49
+	RES_K(100),                 // R51
+	RES_M(1),                   // R48
+	RES_M(1),                   // R50
+	RES_M(2.2),                 // R52
+	CAP_U(1),                   // C18
+	CAP_P(470),                 // C20
+	0,                          // vN
+	12                          // vP
+};
+
+static discrete_op_amp_osc_info const invad2ct_brd2_invader_hit_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	RES_M(1),                   // R37
+	RES_K(10),                  // R41
+	RES_K(100),                 // R38
+	RES_K(120),                 // R40
+	RES_M(1),                   // R39
+	0,                          // no r6
+	0,                          // no r7
+	0,                          // no r8
+	CAP_U(0.1),                 // C16
+	12,                         // vP
+};
+
+static discrete_op_amp_1sht_info const invad2ct_missle_1sht =
+{
+	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(4.7),                 // R32
+	RES_K(100),                 // R30
+	RES_M(1),                   // R31
+	RES_M(1),                   // R33
+	RES_M(2.2),                 // R34
+	CAP_U(0.22),                // C12
+	CAP_P(470),                 // C15
+	0,                          // vN
+	12                          // vP
+};
+
+static discrete_mixer_desc const invad2ct_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,       // type
+	{ RES_K(100),               // R78
+		RES_K(15) + 100 + 100,  // R134 + R133 + R132
+		RES_K(150),             // R136
+		RES_K(150),             // R59
+		RES_K(10) + RES_K(6.8) + RES_K(5.6),    // R86 + R85 + R84
+		RES_K(150) },           // R28
+	{0},                        // no rNode{}
+	{ 0,
+		0,
+		0,
+		0,
+		0,
+		CAP_U(0.001) },         // C11
+	0,                          // no rI
+	RES_K(100),                 // R105
+	0,                          // no cF
+	CAP_U(0.1),                 // C45
+	0,                          // vRef = ground
+	1                           // gain
+};
+
+static DISCRETE_SOUND_START(invad2ct_discrete)
+	// sound board 1
+	// P.C. A082-90700-A000
+	// Schematic M051-00851-A002
+	INVADERS_NOISE_GENERATOR
+	INVADERS_SAUCER_HIT(1)
+	INVADERS_FLEET(1)
+	INVADERS_BONUS_MISSLE_BASE(1)
+	INVADERS_INVADER_HIT(1, invad2ct)
+	INVADERS_EXPLOSION(1)
+	INVADERS_MISSILE(1, invad2ct)
+	INVADERS_MIXER(1, invad2ct)
+
+	// sound board 2
+	// P.C. A084-90901-C851
+	// Schematic M051-00851-A005
+	INVADERS_SAUCER_HIT(2)
+	INVADERS_FLEET(2)
+	INVADERS_BONUS_MISSLE_BASE(2)
+	INVADERS_INVADER_HIT(2, invad2ct_brd2)
+	INVADERS_EXPLOSION(2)
+	INVADERS_MISSILE(2, invaders)
+	INVADERS_MIXER(2, invaders)
+DISCRETE_SOUND_END
+
+invad2ct_audio_device::invad2ct_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, INVAD2CT_AUDIO, tag, owner, clock),
+	m_discrete(*this, "discrete"),
+	m_sn(*this, "sn%u", 1U)
+{
+}
+
+void invad2ct_audio_device::p1_w(u8 data)
+{
+	m_sn[0]->enable_w(BIT(~data, 0));   // saucer sound
+
+	m_discrete->write(INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
+	m_discrete->write(INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
+	m_discrete->write(INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
+	m_discrete->write(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
+
+	machine().sound().system_enable(data & 0x20);
+
+	// D6 and D7 are not connected
+}
+
+void invad2ct_audio_device::p2_w(u8 data)
+{
+	m_discrete->write(INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
+	m_discrete->write(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
+
+	// D5-D7 are not connected
+}
+
+void invad2ct_audio_device::p3_w(u8 data)
+{
+	m_sn[1]->enable_w(BIT(~data, 0));   // saucer sound
+
+	m_discrete->write(INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
+	m_discrete->write(INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);
+	m_discrete->write(INVADERS_NODE(INVADERS_INVADER_HIT_EN, 2), data & 0x08);
+	m_discrete->write(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 2), data & 0x10);
+
+	// D5-D7 are not connected
+}
+
+void invad2ct_audio_device::p4_w(u8 data)
+{
+	m_discrete->write(INVADERS_NODE(INVADERS_FLEET_DATA, 2), data & 0x0f);
+	m_discrete->write(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 2), data & 0x10);
+
+	// D5-D7 are not connected
+}
+
+void invad2ct_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "spk1").front_left();
+	SPEAKER(config, "spk2").front_right();
+
+	DISCRETE(config, m_discrete, invad2ct_discrete);
+	m_discrete->add_route(0, "spk1", 0.5);
+	m_discrete->add_route(1, "spk2", 0.5);
+
+	SN76477(config, m_sn[0]);
+	m_sn[0]->set_noise_params(0, 0, 0);
+	m_sn[0]->set_decay_res(0);
+	m_sn[0]->set_attack_params(0, RES_K(100));
+	m_sn[0]->set_amp_res(RES_K(56));
+	m_sn[0]->set_feedback_res(RES_K(10));
+	m_sn[0]->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	m_sn[0]->set_pitch_voltage(5.0);
+	m_sn[0]->set_slf_params(CAP_U(1.0), RES_K(120));
+	m_sn[0]->set_oneshot_params(0, 0);
+	m_sn[0]->set_vco_mode(1);
+	m_sn[0]->set_mixer_params(0, 0, 0);
+	m_sn[0]->set_envelope_params(1, 0);
+	m_sn[0]->set_enable(1);
+	m_sn[0]->add_route(ALL_OUTPUTS, "spk1", 0.3);
+
+	SN76477(config, m_sn[1]);
+	m_sn[1]->set_noise_params(0, 0, 0);
+	m_sn[1]->set_decay_res(0);
+	m_sn[1]->set_attack_params(0, RES_K(100));
+	m_sn[1]->set_amp_res(RES_K(56));
+	m_sn[1]->set_feedback_res(RES_K(10));
+	m_sn[1]->set_vco_params(0, CAP_U(0.047),  RES_K(39));
+	m_sn[1]->set_pitch_voltage(5.0);
+	m_sn[1]->set_slf_params(CAP_U(1.0), RES_K(120));
+	m_sn[1]->set_oneshot_params(0, 0);
+	m_sn[1]->set_vco_mode(1);
+	m_sn[1]->set_mixer_params(0, 0, 0);
+	m_sn[1]->set_envelope_params(1, 0);
+	m_sn[1]->set_enable(1);
+	m_sn[1]->add_route(ALL_OUTPUTS, "spk2", 0.3);
+}
+
+void invad2ct_audio_device::device_start()
+{
 }
 
 
@@ -3513,679 +4373,6 @@ WRITE8_MEMBER(mw8080bw_state::bowler_audio_6_w)
 
 /*************************************
  *
- *  Space Invaders
- *
- *  Author      : Tormod Tjaberg
- *  Created     : 1997-04-09
- *  Description : Sound routines for the 'invaders' games
- *
- *  Note:
- *  The samples were taken from Michael Strutt's (mstrutt@pixie.co.za)
- *  excellent space invader emulator and converted to signed samples so
- *  they would work under SEAL. The port info was also gleaned from
- *  his emulator. These sounds should also work on all the invader games.
- *
- *  Discrete sound emulation:
- *  Apr 2007, D.R.
- *
- *************************************/
-
-static const char *const invaders_sample_names[] =
-{
-	"*invaders",
-	"1",        /* shot/missle */
-	"2",        /* base hit/explosion */
-	"3",        /* invader hit */
-	"4",        /* fleet move 1 */
-	"5",        /* fleet move 2 */
-	"6",        /* fleet move 3 */
-	"7",        /* fleet move 4 */
-	"8",        /* UFO/saucer hit */
-	"9",        /* bonus base */
-	nullptr
-};
-
-
-/* left in for all games that hack into invaders samples for audio */
-void mw8080bw_state::invaders_samples_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	SN76477(config, m_sn);
-	m_sn->set_noise_params(0, 0, 0);
-	m_sn->set_decay_res(0);
-	m_sn->set_attack_params(0, RES_K(100));
-	m_sn->set_amp_res(RES_K(56));
-	m_sn->set_feedback_res(RES_K(10));
-	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
-	m_sn->set_pitch_voltage(5.0);
-	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
-	m_sn->set_oneshot_params(0, 0);
-	m_sn->set_vco_mode(1);
-	m_sn->set_mixer_params(0, 0, 0);
-	m_sn->set_envelope_params(1, 0);
-	m_sn->set_enable(1);
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(6);
-	m_samples->set_samples_names(invaders_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
-
-/* nodes - inputs */
-#define INVADERS_SAUCER_HIT_EN                01
-#define INVADERS_FLEET_DATA                   02
-#define INVADERS_BONUS_MISSLE_BASE_EN         03
-#define INVADERS_INVADER_HIT_EN               04
-#define INVADERS_EXPLOSION_EN                 05
-#define INVADERS_MISSILE_EN                   06
-
-/* nodes - sounds */
-#define INVADERS_NOISE                        NODE_10
-#define INVADERS_SAUCER_HIT_SND               11
-#define INVADERS_FLEET_SND                    12
-#define INVADERS_BONUS_MISSLE_BASE_SND        13
-#define INVADERS_INVADER_HIT_SND              14
-#define INVADERS_EXPLOSION_SND                15
-#define INVADERS_MISSILE_SND                  16
-
-
-static const discrete_op_amp_info invaders_saucer_hit_op_amp_B3_9 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	0,                      /* no r1 */
-	RES_K(100),             /* R72 */
-	RES_M(1),               /* R71 */
-	0,                      /* no r4 */
-	CAP_U(1),               /* C23 */
-	0,                      /* vN */
-	12                      /* vP */
-};
-
-
-static const discrete_op_amp_osc_info invaders_saucer_hit_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
-	RES_M(1),       /* R70 */
-	RES_K(470),     /* R64 */
-	RES_K(100),     /* R61 */
-	RES_K(120),     /* R63 */
-	RES_M(1),       /* R62 */
-	0,              /* no r6 */
-	0,              /* no r7 */
-	0,              /* no r8 */
-	CAP_U(0.1),     /* C21 */
-	12,             /* vP */
-};
-
-static const discrete_op_amp_osc_info invaders_saucer_hit_vco =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
-	RES_M(1),       /* R65 */
-	RES_K(470),     /* R66 */
-	RES_K(680),     /* R67 */
-	RES_M(1),       /* R69*/
-	RES_M(1),       /* R68 */
-	0,              /* no r6 */
-	0,              /* no r7 */
-	0,              /* no r8 */
-	CAP_P(470),     /* C22 */
-	12,             /* vP */
-};
-
-
-static const discrete_op_amp_info invaders_saucer_hit_op_amp_B3_10 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	RES_K(680),             /* R73 */
-	RES_K(680),             /* R77 */
-	RES_M(2.7),             /* R74 */
-	RES_K(680),             /* R75 */
-	0,                      /* no c */
-	0,                      /* vN */
-	12                      /* vP */
-};
-
-
-static const discrete_comp_adder_table invaders_thump_resistors =
-{
-	DISC_COMP_P_RESISTOR,
-	0,                          /* no cDefault */
-	4,                          /* length */
-	{ RES_K(20) + RES_K(20),    /* R126 + R127 */
-		RES_K(68),              /* R128 */
-		RES_K(82),              /* R129 */
-		RES_K(100) }                /* R130 */
-};
-
-
-static const discrete_555_desc invaders_thump_555 =
-{
-	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
-	5,
-	5.0 - 0.6,              /* 5V - diode drop */
-	DEFAULT_TTL_V_LOGIC_1   /* Output of F3 7411 buffer */
-};
-
-
-static const discrete_555_desc invaders_bonus_555 =
-{
-	DISC_555_OUT_SQW | DISC_555_OUT_DC,
-	5.0,                    /* 5V */
-	DEFAULT_555_VALUES
-};
-
-
-static const discrete_op_amp_1sht_info invaders_invader_hit_1sht =
-{
-	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(4.7),     /* R49 */
-	RES_K(100),     /* R51 */
-	RES_M(1),       /* R48 */
-	RES_M(1),       /* R50 */
-	RES_M(2.2),     /* R52 */
-	CAP_U(0.1),     /* C18 */
-	CAP_P(470),     /* C20 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_info invaders_invader_hit_op_amp_D3_10 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	0,              /* no r1 */
-	RES_K(10),      /* R53 */
-	RES_M(1),       /* R137 */
-	0,              /* no r4 */
-	CAP_U(0.47),    /* C19 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_osc_info invaders_invader_hit_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
-	RES_M(1),       /* R37 */
-	RES_K(10),      /* R41 */
-	RES_K(100),     /* R38 */
-	RES_K(120),     /* R40 */
-	RES_M(1),       /* R39 */
-	0,              /* no r6 */
-	0,              /* no r7 */
-	0,              /* no r8 */
-	CAP_U(0.1),     /* C16 */
-	12,             /* vP */
-};
-
-
-static const discrete_op_amp_osc_info invaders_invader_hit_vco =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
-	RES_M(1),       /* R42 */
-	RES_K(470),     /* R43 */
-	RES_K(680),     /* R44 */
-	RES_M(1),       /* R46 */
-	RES_M(1),       /* R45 */
-	0,              /* no r6 */
-	0,              /* no r7 */
-	0,              /* no r8 */
-	CAP_P(330),     /* C16 */
-	12,             /* vP */
-};
-
-
-static const discrete_op_amp_info invaders_invader_hit_op_amp_D3_4 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	RES_K(470),     /* R55 */
-	RES_K(680),     /* R54 */
-	RES_M(2.7),     /* R56 */
-	RES_K(680),     /* R57 */
-	0,              /* no c */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_1sht_info invaders_explosion_1sht =
-{
-	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(4.7),     /* R90 */
-	RES_K(100),     /* R88 */
-	RES_M(1),       /* R91 */
-	RES_M(1),       /* R89 */
-	RES_M(2.2),     /* R92 */
-	CAP_U(2.2),     /* C24 */
-	CAP_P(470),     /* C25 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_tvca_info invaders_explosion_tvca =
-{
-	RES_M(2.7),                         /* R80 */
-	RES_K(680),                         /* R79 */
-	0,                                  /* no r3 */
-	RES_K(680),                         /* R82 */
-	RES_K(10),                          /* R93 */
-	0,                                  /* no r6 */
-	RES_K(680),                         /* R83 */
-	0,                                  /* no r8 */
-	0,                                  /* no r9 */
-	0,                                  /* no r10 */
-	0,                                  /* no r11 */
-	CAP_U(1),                           /* C26 */
-	0,                                  /* no c2 */
-	0, 0,                               /* no c3, c4 */
-	12.0 - OP_AMP_NORTON_VBE,           /* v1 */
-	0,                                  /* no v2 */
-	0,                                  /* no v3 */
-	12,                                 /* vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f0 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f1 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  /* f2 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f3 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f4 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   /* no f5 */
-};
-
-
-static const discrete_op_amp_1sht_info invaders_missle_1sht =
-{
-	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(4.7),     /* R32 */
-	RES_K(100),     /* R30 */
-	RES_M(1),       /* R31 */
-	RES_M(1),       /* R33 */
-	RES_M(2.2),     /* R34 */
-	CAP_U(1),       /* C12 */
-	CAP_P(470),     /* C15 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_info invaders_missle_op_amp_B3 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	0,              /* no r1 */
-	RES_K(10),      /* R35 */
-	RES_M(1.5),     /* R36 */
-	0,              /* no r4 */
-	CAP_U(0.22),    /* C13 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_osc_info invaders_missle_op_amp_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
-	1.0 / (1.0 / RES_M(1) + 1.0 / RES_K(330)) + RES_M(1.5),     /* R29||R11 + R12 */
-	RES_M(1),       /* R16 */
-	RES_K(560),     /* R17 */
-	RES_M(2.2),     /* R19 */
-	RES_M(1),       /* R16 */
-	RES_M(4.7),     /* R14 */
-	RES_M(3.3),     /* R13 */
-	0,              /* no r8 */
-	CAP_P(330),     /* C58 */
-	12,             /* vP */
-};
-
-
-static const discrete_op_amp_info invaders_missle_op_amp_A3 =
-{
-	DISC_OP_AMP_IS_NORTON,
-	RES_K(560),     /* R22 */
-	RES_K(470),     /* R15 */
-	RES_M(2.7),     /* R20 */
-	RES_K(560),     /* R21 */
-	0,              /* no c */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_tvca_info invaders_missle_tvca =
-{
-	RES_M(2.7),                         /* R25 */
-	RES_K(560),                         /* R23 */
-	0,                                  /* no r3 */
-	RES_K(560),                         /* R26 */
-	RES_K(1),                           /*  */
-	0,                                  /* no r6 */
-	RES_K(560),                         /* R60 */
-	0,                                  /* no r8 */
-	0,                                  /* no r9 */
-	0,                                  /* no r10 */
-	0,                                  /* no r11 */
-	CAP_U(0.1),                         /* C14 */
-	0,                                  /* no c2 */
-	0, 0,                               /* no c3, c4 */
-	5,                                  /* v1 */
-	0,                                  /* no v2 */
-	0,                                  /* no v3 */
-	12,                                 /* vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f0 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f1 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,  /* f2 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f3 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,  /* no f4 */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE   /* no f5 */
-};
-
-
-static const discrete_mixer_desc invaders_mixer =
-{
-	DISC_MIXER_IS_OP_AMP,       /* type */
-	{ RES_K(200),               /* R78 */
-		RES_K(10) + 100 + 100,  /* R134 + R133 + R132 */
-		RES_K(150),             /* R136 */
-		RES_K(200),             /* R59 */
-		RES_K(2) + RES_K(6.8) + RES_K(5.6), /* R86 + R85 + R84 */
-		RES_K(150) },               /* R28 */
-	{0},                        /* no rNode{} */
-	{ 0,
-		0,
-		0,
-		0,
-		0,
-		CAP_U(0.001) },         /* C11 */
-	0,                          /* no rI */
-	RES_K(100),                 /* R105 */
-	0,                          /* no cF */
-	CAP_U(0.1),                 /* C45 */
-	0,                          /* vRef = ground */
-	1                           /* gain */
-};
-
-
-/* sound board 1 or 2, for multi-board games */
-#define INVADERS_NODE(_node, _board)    (NODE(_node + ((_board - 1) * 100)))
-
-/************************************************
- * Noise Generator
- ************************************************/
-/* Noise clock was breadboarded and measured at 7515 */
-#define INVADERS_NOISE_GENERATOR                                                \
-	DISCRETE_LFSR_NOISE(INVADERS_NOISE,                 /* IC N5, pin 10 */     \
-					1,                                  /* ENAB */              \
-					1,                                  /* no RESET */          \
-					7515,                               /* CLK in Hz */         \
-					12,                                 /* p-p AMPL */          \
-					0,                                  /* no FEED input */     \
-					12.0/2,                             /* dc BIAS */           \
-					&midway_lfsr)
-
-
-/************************************************
- * Saucer Hit
- ************************************************/
-#define INVADERS_SAUCER_HIT(_board)                                                     \
-	DISCRETE_INPUTX_LOGIC(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, _board), 12, 0, 0)      \
-	DISCRETE_OP_AMP(INVADERS_NODE(20, _board),                      /* IC B3, pin 9 */  \
-					1,                                              /* ENAB */          \
-					0,                                              /* no IN0 */        \
-					INVADERS_NODE(INVADERS_SAUCER_HIT_EN, _board),  /* IN1 */           \
-					&invaders_saucer_hit_op_amp_B3_9)                                   \
-	DISCRETE_OP_AMP_OSCILLATOR(INVADERS_NODE(21, _board),           /* IC A4, pin 5 */  \
-					1,                                              /* ENAB */          \
-					&invaders_saucer_hit_osc)                                           \
-	DISCRETE_OP_AMP_VCO1(INVADERS_NODE(22, _board),                 /* IC A4, pin 9 */  \
-					1,                                              /* ENAB */          \
-					INVADERS_NODE(21, _board),                      /* VMOD1 */         \
-					&invaders_saucer_hit_vco)                                           \
-	DISCRETE_OP_AMP(INVADERS_NODE(INVADERS_SAUCER_HIT_SND, _board), /* IC B3, pin 10 */ \
-					1,                                              /* ENAB */          \
-					INVADERS_NODE(22, _board),                      /* IN0 */           \
-					INVADERS_NODE(20, _board),                      /* IN1 */           \
-					&invaders_saucer_hit_op_amp_B3_10)
-
-
-/************************************************
- * Fleet movement
- ************************************************/
-#define INVADERS_FLEET(_board)                                                          \
-	DISCRETE_INPUT_DATA  (INVADERS_NODE(INVADERS_FLEET_DATA, _board))                   \
-	DISCRETE_COMP_ADDER(INVADERS_NODE(30, _board),                                      \
-					INVADERS_NODE(INVADERS_FLEET_DATA, _board),     /* DATA */          \
-					&invaders_thump_resistors)                                          \
-	DISCRETE_555_ASTABLE(INVADERS_NODE(31, _board),                 /* IC F3, pin 6 */  \
-					1,                                              /* RESET */         \
-					INVADERS_NODE(30, _board),                      /* R1 */            \
-					RES_K(75),                                      /* R131 */          \
-					CAP_U(0.1),                                     /* C29 */           \
-					&invaders_thump_555)                                                \
-	DISCRETE_RCFILTER(INVADERS_NODE(32, _board),                                        \
-					INVADERS_NODE(31, _board),                      /* IN0 */           \
-					100,                                            /* R132 */          \
-					CAP_U(4.7) )                                    /* C31 */           \
-	DISCRETE_RCFILTER(INVADERS_NODE(INVADERS_FLEET_SND, _board),                        \
-					INVADERS_NODE(32, _board),                      /* IN0 */           \
-					100 + 100,                                      /* R132 + R133 */   \
-					CAP_U(10) )                                     /* C32 */
-
-
-/************************************************
- * Bonus Missle Base
- ************************************************/
-#define INVADERS_BONUS_MISSLE_BASE(_board)                                                                          \
-	DISCRETE_INPUT_LOGIC (INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, _board))                                     \
-	DISCRETE_555_ASTABLE(INVADERS_NODE(40, _board),                     /* IC F4, pin 9 */                          \
-					INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, _board),/* RESET */                                \
-					RES_K(100),                                         /* R94 */                                   \
-					RES_K(47),                                          /* R95 */                                   \
-					CAP_U(1),                                           /* C34 */                                   \
-					&invaders_bonus_555)                                                                            \
-	DISCRETE_SQUAREWFIX(INVADERS_NODE(41, _board),                                                                  \
-					1,                                                  /* ENAB */                                  \
-					480,                                                /* FREQ */                                  \
-					1,                                                  /* AMP */                                   \
-					50,                                                 /* DUTY */                                  \
-					1.0/2,                                              /* BIAS */                                  \
-					0)                                                  /* PHASE */                                 \
-	DISCRETE_LOGIC_AND3(INVADERS_NODE(42, _board),                      /* IC F3, pin 12 */                         \
-					INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, _board),/* INP0 */                                 \
-					INVADERS_NODE(41, _board),                          /* INP1 */                                  \
-					INVADERS_NODE(40, _board) )                         /* INP2 */                                  \
-	DISCRETE_GAIN(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_SND, _board),/* adjust from logic to TTL voltage level */\
-					INVADERS_NODE(42, _board),                          /* IN0 */                                   \
-					DEFAULT_TTL_V_LOGIC_1)                              /* GAIN */
-
-
-/************************************************
- * Invader Hit
- ************************************************/
-#define INVADERS_INVADER_HIT(_board, _type)                                                 \
-	DISCRETE_INPUTX_LOGIC(INVADERS_NODE(INVADERS_INVADER_HIT_EN, _board), 5, 0, 0)          \
-	DISCRETE_OP_AMP_ONESHOT(INVADERS_NODE(50, _board),                  /* IC D3, pin 9 */  \
-					INVADERS_NODE(INVADERS_INVADER_HIT_EN, _board),     /* TRIG */          \
-					&_type##_invader_hit_1sht)                                              \
-	DISCRETE_OP_AMP(INVADERS_NODE(51, _board),                          /* IC D3, pin 10 */ \
-					1,                                                  /* ENAB */          \
-					0,                                                  /* no IN0 */        \
-					INVADERS_NODE(50, _board),                          /* IN1 */           \
-					&invaders_invader_hit_op_amp_D3_10)                                     \
-	DISCRETE_OP_AMP_OSCILLATOR(INVADERS_NODE(52, _board),               /* IC B4, pin 5 */  \
-					1,                                                  /* ENAB */          \
-					&_type##_invader_hit_osc)                                               \
-	DISCRETE_OP_AMP_VCO1(INVADERS_NODE(53, _board),                     /* IC B4, pin 4 */  \
-					1,                                                  /* ENAB */          \
-					INVADERS_NODE(52, _board),                          /* VMOD1 */         \
-					&invaders_invader_hit_vco)                                              \
-	DISCRETE_OP_AMP(INVADERS_NODE(INVADERS_INVADER_HIT_SND, _board),    /* IC D3, pin 4 */  \
-					1,                                                  /* ENAB */          \
-					INVADERS_NODE(53, _board),                          /* IN0 */           \
-					INVADERS_NODE(51, _board),                          /* IN1 */           \
-					&invaders_invader_hit_op_amp_D3_4)
-
-
-/************************************************
- * Explosion
- ************************************************/
-#define INVADERS_EXPLOSION(_board)                                                      \
-	DISCRETE_INPUTX_LOGIC(INVADERS_NODE(INVADERS_EXPLOSION_EN, _board), 5, 0, 0)        \
-	DISCRETE_OP_AMP_ONESHOT(INVADERS_NODE(60, _board),              /* IC D2, pin 10 */ \
-					INVADERS_NODE(INVADERS_EXPLOSION_EN, _board),   /* TRIG */          \
-					&invaders_explosion_1sht)                                           \
-	DISCRETE_OP_AMP_TRIG_VCA(INVADERS_NODE(61, _board),             /* IC D2, pin 4 */  \
-					INVADERS_NODE(60, _board),                      /* TRG0 */          \
-					0,                                              /* no TRG1 */       \
-					0,                                              /* no TRG2 */       \
-					INVADERS_NOISE,                                 /* IN0 */           \
-					0,                                              /* no IN1 */        \
-					&invaders_explosion_tvca)                                           \
-	DISCRETE_RCFILTER(INVADERS_NODE(62, _board),                                        \
-					INVADERS_NODE(61, _board),                      /* IN0 */           \
-					RES_K(5.6),                                     /* R84 */           \
-					CAP_U(0.1) )                                    /* C27 */           \
-	DISCRETE_RCFILTER(INVADERS_NODE(INVADERS_EXPLOSION_SND, _board),                    \
-					INVADERS_NODE(62, _board),                      /* IN0 */           \
-					RES_K(5.6) + RES_K(6.8),                        /* R84 + R85 */     \
-					CAP_U(0.1) )                                    /* C28 */
-
-
-/************************************************
- * Missle Sound
- ************************************************/
-#define INVADERS_MISSILE(_board, _type)                                                             \
-	DISCRETE_INPUTX_LOGIC(INVADERS_NODE(INVADERS_MISSILE_EN, _board), 5, 0, 0)                      \
-	DISCRETE_OP_AMP_ONESHOT(INVADERS_NODE(70, _board),                      /* IC B3, pin 4 */      \
-					INVADERS_NODE(INVADERS_MISSILE_EN, _board),             /* TRIG */              \
-					&_type##_missle_1sht)                                                           \
-	DISCRETE_OP_AMP(INVADERS_NODE(71, _board),                              /* IC B3, pin 5 */      \
-					1,                                                      /* ENAB */              \
-					0,                                                      /* no IN0 */            \
-					INVADERS_NODE(70, _board),                              /* IN1 */               \
-					&invaders_missle_op_amp_B3)                                                     \
-	/* next 2 modules simulate the D1 voltage drop */                                               \
-	DISCRETE_ADDER2(INVADERS_NODE(72, _board),                                                      \
-					1,                                                      /* ENAB */              \
-					INVADERS_NODE(71, _board),                              /* IN0 */               \
-					-0.5)                                                   /* IN1 */               \
-	DISCRETE_CLAMP(INVADERS_NODE(73, _board),                                                       \
-					INVADERS_NODE(72, _board),                              /* IN0 */               \
-					0,                                                      /* MIN */               \
-					12)                                                     /* MAX */               \
-	DISCRETE_CRFILTER(INVADERS_NODE(74, _board),                                                    \
-					INVADERS_NOISE,                                         /* IN0 */               \
-					RES_M(1) + RES_K(330),                                  /* R29, R11 */          \
-					CAP_U(0.1) )                                            /* C57 */               \
-	DISCRETE_GAIN(INVADERS_NODE(75, _board),                                                        \
-					INVADERS_NODE(74, _board),                              /* IN0 */               \
-					RES_K(330)/(RES_M(1) + RES_K(330)))                     /* GAIN - R29 : R11 */  \
-	DISCRETE_OP_AMP_VCO2(INVADERS_NODE(76, _board),                         /* IC C1, pin 4 */      \
-					1,                                                      /* ENAB */              \
-					INVADERS_NODE(75, _board),                              /* VMOD1 */             \
-					INVADERS_NODE(73, _board),                              /* VMOD2 */             \
-					&invaders_missle_op_amp_osc)                                                    \
-	DISCRETE_OP_AMP(INVADERS_NODE(77, _board),                              /* IC A3, pin 9 */      \
-					1,                                                      /* ENAB */              \
-					INVADERS_NODE(76, _board),                              /* IN0 */               \
-					INVADERS_NODE(73, _board),                              /* IN1 */               \
-					&invaders_missle_op_amp_A3)                                                     \
-	DISCRETE_OP_AMP_TRIG_VCA(INVADERS_NODE(INVADERS_MISSILE_SND, _board),   /* IC A3, pin 10 */     \
-					INVADERS_NODE(INVADERS_MISSILE_EN, _board),             /* TRG0 */              \
-					0,                                                      /* no TRG1 */           \
-					0,                                                      /* no TRG2 */           \
-					INVADERS_NODE(77, _board),                              /* IN0 */               \
-					0,                                                      /* no IN1 */            \
-					&invaders_missle_tvca)
-
-
-/************************************************
- * Final mix
- ************************************************/
-#define INVADERS_MIXER(_board, _type)                                                   \
-	DISCRETE_MIXER6(INVADERS_NODE(90, _board),                                          \
-					1,                                                      /* ENAB */  \
-					INVADERS_NODE(INVADERS_SAUCER_HIT_SND, _board),         /* IN0 */   \
-					INVADERS_NODE(INVADERS_FLEET_SND, _board),              /* IN1 */   \
-					INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_SND, _board),  /* IN2 */   \
-					INVADERS_NODE(INVADERS_INVADER_HIT_SND, _board),        /* IN3 */   \
-					INVADERS_NODE(INVADERS_EXPLOSION_SND, _board),          /* IN4 */   \
-					INVADERS_NODE(INVADERS_MISSILE_SND, _board),            /* IN5 */   \
-					&_type##_mixer)                                                     \
-	DISCRETE_OUTPUT(INVADERS_NODE(90, _board), 2500)
-
-/* Schematic M051-00739-A005 and M051-00739-B005 */
-/* P.C.      A084-90700-B000 and A084-90700-C000 */
-static DISCRETE_SOUND_START(invaders_discrete)
-	INVADERS_NOISE_GENERATOR
-	INVADERS_SAUCER_HIT(1)
-	INVADERS_FLEET(1)
-	INVADERS_BONUS_MISSLE_BASE(1)
-	INVADERS_INVADER_HIT(1, invaders)
-	INVADERS_EXPLOSION(1)
-	INVADERS_MISSILE(1, invaders)
-	INVADERS_MIXER(1, invaders)
-DISCRETE_SOUND_END
-
-
-void mw8080bw_state::invaders_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	SN76477(config, m_sn);
-	m_sn->set_noise_params(0, 0, 0);
-	m_sn->set_decay_res(0);
-	m_sn->set_attack_params(0, RES_K(100));
-	m_sn->set_amp_res(RES_K(56));
-	m_sn->set_feedback_res(RES_K(10));
-	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
-	m_sn->set_pitch_voltage(5.0);
-	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
-	m_sn->set_oneshot_params(0, 0);
-	m_sn->set_vco_mode(1);
-	m_sn->set_mixer_params(0, 0, 0);
-	m_sn->set_envelope_params(1, 0);
-	m_sn->set_enable(1);
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
-
-	DISCRETE(config, m_discrete, invaders_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.5);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::invaders_audio_1_w)
-{
-	m_sn->enable_w((~data >> 0) & 0x01);    /* saucer sound */
-
-	m_discrete->write(INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
-	m_discrete->write(INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
-	m_discrete->write(INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
-	m_discrete->write(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
-
-	machine().sound().system_enable(data & 0x20);
-
-	/* D6 and D7 are not connected */
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::invaders_audio_2_w)
-{
-	m_discrete->write(INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
-	m_discrete->write(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
-
-	/* the flip screen line is only connected on the cocktail PCB */
-	if (invaders_is_cabinet_cocktail())
-	{
-		m_flip_screen = (data >> 5) & 0x01;
-	}
-
-	/* D6 and D7 are not connected */
-}
-
-
-
-/*************************************
- *
  *  Blue Shark
  *
  *  Discrete sound emulation:
@@ -4570,228 +4757,4 @@ WRITE8_MEMBER(mw8080bw_state::blueshrk_audio_w)
 	m_discrete->write(BLUESHRK_OCTOPUS_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
-}
-
-
-
-/*************************************
- *
- *  Space Invaders II (cocktail)
- *
- *************************************/
-
-static const discrete_op_amp_1sht_info invad2ct_invader_hit_1sht =
-{
-	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(4.7),     /* R49 */
-	RES_K(100),     /* R51 */
-	RES_M(1),       /* R48 */
-	RES_M(1),       /* R50 */
-	RES_M(2.2),     /* R52 */
-	CAP_U(0.22),    /* C18 */
-	CAP_P(470),     /* C20 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_osc_info invad2ct_invader_hit_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
-	RES_M(1),       /* R37 */
-	RES_K(10),      /* R41 */
-	RES_K(100),     /* R38 */
-	RES_K(120),     /* R40 */
-	RES_M(1),       /* R39 */
-	0,              /* no r6 */
-	0,              /* no r7 */
-	0,              /* no r8 */
-	CAP_U(0.22),    /* C16 */
-	12,             /* vP */
-};
-
-
-static const discrete_op_amp_1sht_info invad2ct_brd2_invader_hit_1sht =
-{
-	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(4.7),     /* R49 */
-	RES_K(100),     /* R51 */
-	RES_M(1),       /* R48 */
-	RES_M(1),       /* R50 */
-	RES_M(2.2),     /* R52 */
-	CAP_U(1),       /* C18 */
-	CAP_P(470),     /* C20 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_op_amp_osc_info invad2ct_brd2_invader_hit_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
-	RES_M(1),       /* R37 */
-	RES_K(10),      /* R41 */
-	RES_K(100),     /* R38 */
-	RES_K(120),     /* R40 */
-	RES_M(1),       /* R39 */
-	0,              /* no r6 */
-	0,              /* no r7 */
-	0,              /* no r8 */
-	CAP_U(0.1),     /* C16 */
-	12,             /* vP */
-};
-
-
-static const discrete_op_amp_1sht_info invad2ct_missle_1sht =
-{
-	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(4.7),     /* R32 */
-	RES_K(100),     /* R30 */
-	RES_M(1),       /* R31 */
-	RES_M(1),       /* R33 */
-	RES_M(2.2),     /* R34 */
-	CAP_U(0.22),    /* C12 */
-	CAP_P(470),     /* C15 */
-	0,              /* vN */
-	12              /* vP */
-};
-
-
-static const discrete_mixer_desc invad2ct_mixer =
-{
-	DISC_MIXER_IS_OP_AMP,       /* type */
-	{ RES_K(100),               /* R78 */
-		RES_K(15) + 100 + 100,  /* R134 + R133 + R132 */
-		RES_K(150),             /* R136 */
-		RES_K(150),             /* R59 */
-		RES_K(10) + RES_K(6.8) + RES_K(5.6),    /* R86 + R85 + R84 */
-		RES_K(150) },               /* R28 */
-	{0},                        /* no rNode{} */
-	{ 0,
-		0,
-		0,
-		0,
-		0,
-		CAP_U(0.001) },         /* C11 */
-	0,                          /* no rI */
-	RES_K(100),                 /* R105 */
-	0,                          /* no cF */
-	CAP_U(0.1),                 /* C45 */
-	0,                          /* vRef = ground */
-	1                           /* gain */
-};
-
-
-static DISCRETE_SOUND_START(invad2ct_discrete)
-	/* sound board 1 */
-	/* P.C. A082-90700-A000 */
-	/* Schematic M051-00851-A002 */
-	INVADERS_NOISE_GENERATOR
-	INVADERS_SAUCER_HIT(1)
-	INVADERS_FLEET(1)
-	INVADERS_BONUS_MISSLE_BASE(1)
-	INVADERS_INVADER_HIT(1, invad2ct)
-	INVADERS_EXPLOSION(1)
-	INVADERS_MISSILE(1, invad2ct)
-	INVADERS_MIXER(1, invad2ct)
-
-	/* sound board 2 */
-	/* P.C. A084-90901-C851 */
-	/* Schematic M051-00851-A005 */
-	INVADERS_SAUCER_HIT(2)
-	INVADERS_FLEET(2)
-	INVADERS_BONUS_MISSLE_BASE(2)
-	INVADERS_INVADER_HIT(2, invad2ct_brd2)
-	INVADERS_EXPLOSION(2)
-	INVADERS_MISSILE(2, invaders)
-	INVADERS_MIXER(2, invaders)
-DISCRETE_SOUND_END
-
-
-void mw8080bw_state::invad2ct_audio(machine_config &config)
-{
-	SPEAKER(config, "spk1").front_left();
-	SPEAKER(config, "spk2").front_right();
-
-	DISCRETE(config, m_discrete, invad2ct_discrete);
-	m_discrete->add_route(0, "spk1", 0.5);
-	m_discrete->add_route(1, "spk2", 0.5);
-
-	SN76477(config, m_sn1);
-	m_sn1->set_noise_params(0, 0, 0);
-	m_sn1->set_decay_res(0);
-	m_sn1->set_attack_params(0, RES_K(100));
-	m_sn1->set_amp_res(RES_K(56));
-	m_sn1->set_feedback_res(RES_K(10));
-	m_sn1->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
-	m_sn1->set_pitch_voltage(5.0);
-	m_sn1->set_slf_params(CAP_U(1.0), RES_K(120));
-	m_sn1->set_oneshot_params(0, 0);
-	m_sn1->set_vco_mode(1);
-	m_sn1->set_mixer_params(0, 0, 0);
-	m_sn1->set_envelope_params(1, 0);
-	m_sn1->set_enable(1);
-	m_sn1->add_route(ALL_OUTPUTS, "spk1", 0.3);
-
-	SN76477(config, m_sn2);
-	m_sn2->set_noise_params(0, 0, 0);
-	m_sn2->set_decay_res(0);
-	m_sn2->set_attack_params(0, RES_K(100));
-	m_sn2->set_amp_res(RES_K(56));
-	m_sn2->set_feedback_res(RES_K(10));
-	m_sn2->set_vco_params(0, CAP_U(0.047),  RES_K(39));
-	m_sn2->set_pitch_voltage(5.0);
-	m_sn2->set_slf_params(CAP_U(1.0), RES_K(120));
-	m_sn2->set_oneshot_params(0, 0);
-	m_sn2->set_vco_mode(1);
-	m_sn2->set_mixer_params(0, 0, 0);
-	m_sn2->set_envelope_params(1, 0);
-	m_sn2->set_enable(1);
-	m_sn2->add_route(ALL_OUTPUTS, "spk2", 0.3);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_1_w)
-{
-	m_sn1->enable_w((~data >> 0) & 0x01);   /* saucer sound */
-
-	m_discrete->write(INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
-	m_discrete->write(INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
-	m_discrete->write(INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
-	m_discrete->write(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
-
-	machine().sound().system_enable(data & 0x20);
-
-	/* D6 and D7 are not connected */
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_2_w)
-{
-	m_discrete->write(INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
-	m_discrete->write(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
-
-	/* D5-D7 are not connected */
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_3_w)
-{
-	m_sn2->enable_w((~data >> 0) & 0x01);   /* saucer sound */
-
-	m_discrete->write(INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
-	m_discrete->write(INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);
-	m_discrete->write(INVADERS_NODE(INVADERS_INVADER_HIT_EN, 2), data & 0x08);
-	m_discrete->write(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 2), data & 0x10);
-
-	/* D5-D7 are not connected */
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_4_w)
-{
-	m_discrete->write(INVADERS_NODE(INVADERS_FLEET_DATA, 2), data & 0x0f);
-	m_discrete->write(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 2), data & 0x10);
-
-	/* D5-D7 are not connected */
 }
