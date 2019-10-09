@@ -790,6 +790,7 @@ svision.cpp
 svmu.cpp
 swtpc.cpp
 swtpc09.cpp
+swtpc8212.cpp
 swyft.cpp
 sym1.cpp
 symbolics.cpp
