@@ -126,14 +126,14 @@ protected:
 	uint8_t       m_flip_screen;
 
 private:
-	/* misc game specific */
+	// misc game specific
 	uint16_t      m_phantom2_cloud_counter;
 	uint8_t       m_rev_shift_res;
-	uint8_t       m_maze_tone_timing_state;   /* output of IC C1, pin 5 */
+	uint8_t       m_maze_tone_timing_state;   // output of IC C1, pin 5
 	uint8_t       m_desertgun_controller_select;
 	uint8_t       m_clowns_controller_select;
 
-	/* timers */
+	// timers
 	emu_timer   *m_interrupt_timer;
 	emu_timer   *m_maze_tone_timer;
 
@@ -257,7 +257,7 @@ private:
 
 	required_ioport m_erase_sw;
 	required_ioport m_erase_dip;
-	output_finder<15> m_exp_lamps;
+	output_finder<16> m_exp_lamps;
 	output_finder<4> m_torp_lamps;
 	output_finder<> m_ready_lamp;
 	output_finder<> m_reload_lamp;
