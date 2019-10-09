@@ -1054,3 +1054,12 @@ retro_window_info::~retro_window_info()
 {
 	global_free(m_original_mode);
 }
+
+//============================================================
+//  osd_set_aggressive_input_focus
+//============================================================
+
+void osd_set_aggressive_input_focus(bool aggressive_focus)
+{
+	// dummy implementation for now?
+}
