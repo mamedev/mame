@@ -119,50 +119,33 @@ namespace devices
 	template <typename FT, int SIZE>
 	plib::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 	{
-		if (m_params.m_method() == "SOR_MAT")
+		switch (m_params.m_method())
 		{
-			return create_it<matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, m_params, size);
-			//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
-			//return plib::make_unique<solver_sor_mat>(state(), solvername, &m_params, size);
-		}
-		else if (m_params.m_method() == "MAT_CR")
-		{
-			if (size > 0) // GCR always outperforms MAT solver
-			{
-				return create_it<matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, m_params, size);
-			}
-			else
-			{
+			case matrix_type_e::MAT_CR:
+				if (size > 0) // GCR always outperforms MAT solver
+				{
+					return create_it<matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, m_params, size);
+				}
+				else
+				{
+					return create_it<matrix_solver_direct_t<FT, SIZE>>(state(), solvername, m_params, size);
+				}
+			case matrix_type_e::SOR_MAT:
+				return create_it<matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, m_params, size);
+			case matrix_type_e::MAT:
 				return create_it<matrix_solver_direct_t<FT, SIZE>>(state(), solvername, m_params, size);
-			}
+			case matrix_type_e::SM:
+				/* Sherman-Morrison Formula */
+				return create_it<matrix_solver_sm_t<FT, SIZE>>(state(), solvername, m_params, size);
+			case matrix_type_e::W:
+				/* Woodbury Formula */
+				return create_it<matrix_solver_w_t<FT, SIZE>>(state(), solvername, m_params, size);
+			case matrix_type_e::SOR:
+				return create_it<matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, m_params, size);
+			case matrix_type_e::GMRES:
+				return create_it<matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, m_params, size);
 		}
-		else if (m_params.m_method() == "MAT")
-		{
-			return create_it<matrix_solver_direct_t<FT, SIZE>>(state(), solvername, m_params, size);
-		}
-		else if (m_params.m_method() == "SM")
-		{
-			/* Sherman-Morrison Formula */
-			return create_it<matrix_solver_sm_t<FT, SIZE>>(state(), solvername, m_params, size);
-		}
-		else if (m_params.m_method() == "W")
-		{
-			/* Woodbury Formula */
-			return create_it<matrix_solver_w_t<FT, SIZE>>(state(), solvername, m_params, size);
-		}
-		else if (m_params.m_method() == "SOR")
-		{
-			return create_it<matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, m_params, size);
-		}
-		else if (m_params.m_method() == "GMRES")
-		{
-			return create_it<matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, m_params, size);
-		}
-		else
-		{
-			log().fatal(MF_UNKNOWN_SOLVER_TYPE(m_params.m_method()));
-			return plib::unique_ptr<matrix_solver_t>();
-		}
+		return plib::unique_ptr<matrix_solver_t>();
 	}
 
 	struct net_splitter

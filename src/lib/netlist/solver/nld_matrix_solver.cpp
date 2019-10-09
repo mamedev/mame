@@ -15,15 +15,16 @@ namespace netlist
 namespace devices
 {
 
-	terms_for_net_t::terms_for_net_t()
+	terms_for_net_t::terms_for_net_t(analog_net_t * net)
 		: m_railstart(0)
 		, m_last_V(0.0)
 		, m_DD_n_m_1(0.0)
 		, m_h_n_m_1(1e-12)
+		, m_net(net)
 	{
 	}
 
-	void terms_for_net_t::add(terminal_t *term, int net_other, bool sorted)
+	void terms_for_net_t::add_terminal(terminal_t *term, int net_other, bool sorted)
 	{
 		if (sorted)
 			for (std::size_t i=0; i < m_connected_net_idx.size(); i++)
@@ -65,13 +66,11 @@ namespace devices
 
 		log().debug("New solver setup\n");
 
-		m_nets.clear();
 		m_terms.clear();
 
 		for (auto & net : nets)
 		{
-			m_nets.push_back(net);
-			m_terms.push_back(plib::make_unique<terms_for_net_t>());
+			m_terms.push_back(plib::make_unique<terms_for_net_t>(net));
 			m_rails_temp.push_back(plib::make_unique<terms_for_net_t>());
 		}
 
@@ -159,7 +158,7 @@ namespace devices
 		 *
 		 */
 
-		const std::size_t iN = m_nets.size();
+		const std::size_t iN = m_terms.size();
 
 		switch (sort)
 		{
@@ -174,7 +173,6 @@ namespace devices
 							if (pi < pk)
 							{
 								std::swap(m_terms[i], m_terms[k]);
-								std::swap(m_nets[i], m_nets[k]);
 								pk = get_weight_around_diag(k,k);
 							}
 						}
@@ -183,7 +181,7 @@ namespace devices
 				break;
 			case matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT:
 				{
-					for (std::size_t k = 0; k < iN - 1; k++)
+					for (std::size_t k = 0; k < iN - 2; k++)
 					{
 						auto pk = get_left_right_of_diag(k,k);
 						for (std::size_t i = k+1; i < iN; i++)
@@ -192,7 +190,6 @@ namespace devices
 							if (pi.first <= pk.first && pi.second >= pk.second)
 							{
 								std::swap(m_terms[i], m_terms[k]);
-								std::swap(m_nets[i], m_nets[k]);
 								pk = get_left_right_of_diag(k,k);
 							}
 						}
@@ -210,7 +207,6 @@ namespace devices
 							if ((static_cast<int>(m_terms[k]->m_railstart) - static_cast<int>(m_terms[i]->m_railstart)) * sort_order < 0)
 							{
 								std::swap(m_terms[i], m_terms[k]);
-								std::swap(m_nets[i], m_nets[k]);
 							}
 						}
 				}
@@ -231,13 +227,13 @@ namespace devices
 
 	void matrix_solver_t::setup_matrix()
 	{
-		const std::size_t iN = m_nets.size();
+		const std::size_t iN = m_terms.size();
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			m_terms[k]->m_railstart = m_terms[k]->count();
 			for (std::size_t i = 0; i < m_rails_temp[k]->count(); i++)
-				this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->m_connected_net_idx.data()[i], false);
+				this->m_terms[k]->add_terminal(m_rails_temp[k]->terms()[i], m_rails_temp[k]->m_connected_net_idx.data()[i], false);
 		}
 
 		// free all - no longer needed
@@ -464,10 +460,10 @@ namespace devices
 		return next_time_step;
 	}
 
-	int matrix_solver_t::get_net_idx(detail::net_t *net)
+	int matrix_solver_t::get_net_idx(const analog_net_t *net) const
 	{
-		for (std::size_t k = 0; k < m_nets.size(); k++)
-			if (m_nets[k] == net)
+		for (std::size_t k = 0; k < m_terms.size(); k++)
+			if (m_terms[k]->isNet(net))
 				return static_cast<int>(k);
 		return -1;
 	}
@@ -539,19 +535,19 @@ namespace devices
 	{
 		if (term->connected_terminal()->net().isRailNet())
 		{
-			m_rails_temp[k]->add(term, -1, false);
+			m_rails_temp[k]->add_terminal(term, -1, false);
 		}
 		else
 		{
 			int ot = get_net_idx(&term->connected_terminal()->net());
 			if (ot>=0)
 			{
-				m_terms[k]->add(term, ot, true);
+				m_terms[k]->add_terminal(term, ot, true);
 			}
 			/* Should this be allowed ? */
 			else // if (ot<0)
 			{
-				m_rails_temp[k]->add(term, ot, true);
+				m_rails_temp[k]->add_terminal(term, ot, true);
 				log().fatal(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
 			}
 		}
@@ -565,12 +561,11 @@ namespace devices
 		{
 			for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 			{
-				analog_net_t *n = m_nets[k];
 				terms_for_net_t *t = m_terms[k].get();
 
 				//const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 				// avoid floating point exceptions
-				const nl_double DD_n = std::max(-1e100, std::min(1e100,(n->Q_Analog() - t->m_last_V)));
+				const nl_double DD_n = std::max(-1e100, std::min(1e100,(t->getV() - t->m_last_V)));
 				const nl_double hn = cur_ts;
 
 				//printf("%g %g %g %g\n", DD_n, hn, t->m_DD_n_m_1, t->m_h_n_m_1);
@@ -587,7 +582,7 @@ namespace devices
 				if (new_net_timestep < new_solver_timestep)
 					new_solver_timestep = new_net_timestep;
 
-				t->m_last_V = n->Q_Analog();
+				t->m_last_V = t->getV();
 			}
 			if (new_solver_timestep < m_params.m_min_timestep)
 			{
@@ -608,7 +603,7 @@ namespace devices
 		{
 			log().verbose("==============================================");
 			log().verbose("Solver {1}", this->name());
-			log().verbose("       ==> {1} nets", this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
+			log().verbose("       ==> {1} nets", this->m_terms.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
 			log().verbose("       has {1} elements", this->has_dynamic_devices() ? "dynamic" : "no dynamic");
 			log().verbose("       has {1} elements", this->has_timestep_devices() ? "timestep" : "no timestep");
 			log().verbose("       {1:6.3} average newton raphson loops",

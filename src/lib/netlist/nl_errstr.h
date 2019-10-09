@@ -125,7 +125,7 @@ namespace netlist
 
 	// nld_solver.cpp
 
-	PERRMSGV(MF_UNKNOWN_SOLVER_TYPE,                1, "Unknown solver type: {1}")
+	//PERRMSGV(MF_UNKNOWN_SOLVER_TYPE,                1, "Unknown solver type: {1}")
 	PERRMSGV(MF_NETGROUP_SIZE_EXCEEDED_1,           1, "Encountered netgroup with > {1} nets")
 
 	PERRMSGV(MI_NO_SPECIFIC_SOLVER,                 1, "No specific solver found for netlist of size {1}")

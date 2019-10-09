@@ -166,7 +166,7 @@ namespace devices
 	#endif
 
 		for (std::size_t k = 0; k < iN; k++)
-			this->m_new_V[k] = this->m_nets[k]->Q_Analog();
+			this->m_new_V[k] = this->m_terms[k]->getV();
 
 		do {
 			resched = false;

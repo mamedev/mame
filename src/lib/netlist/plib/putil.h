@@ -242,18 +242,21 @@ namespace plib
 		ename (E v) : m_v(v) { } \
 		template <typename T> explicit ename(T val) { m_v = static_cast<E>(val); } \
 		bool set_from_string (const pstring &s) { \
-			static const pstring strings = # __VA_ARGS__; \
-			int f = from_string_int(strings, s); \
+			int f = from_string_int(strings(), s); \
 			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
 		} \
 		operator E() const {return m_v;} \
 		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
 		bool operator==(const E &rhs) const {return m_v == rhs;} \
 		std::string name() const { \
-			static const pstring strings = # __VA_ARGS__; \
-			return nthstr(static_cast<int>(m_v), strings); \
+			return nthstr(static_cast<int>(m_v), strings()); \
 		} \
-		private: E m_v; };
+		private: E m_v; \
+		static pstring strings() {\
+			static const pstring lstrings = # __VA_ARGS__; \
+			return lstrings; \
+		} \
+	};
 
 
 #endif /* PUTIL_H_ */

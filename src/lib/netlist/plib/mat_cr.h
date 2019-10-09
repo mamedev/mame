@@ -207,6 +207,7 @@ namespace plib
 					// proceed to column i
 
 					std::size_t pj = row_idx[j];
+					std::size_t pje = row_idx[j+1];
 
 					while (col_idx[pj] < i)
 						pj++;
@@ -216,7 +217,7 @@ namespace plib
 					// subtract row i from j
 					// fill-in available assumed, i.e. matrix was prepared
 
-					for (std::size_t pii = pi; pii<piie; pii++)
+					for (std::size_t pii = pi; pii<piie && pj < pje; pii++)
 					{
 						while (col_idx[pj] < col_idx[pii])
 							pj++;
@@ -227,6 +228,14 @@ namespace plib
 					RHS[j] += f1 * RHS[i];
 				}
 			}
+		}
+
+		int get_parallel_level(std::size_t k) const
+		{
+			for (std::size_t i = 0; i <  m_ge_par.size(); i++)
+				if (plib::container::contains( m_ge_par[i], k))
+					return static_cast<int>(i);
+			return -1;
 		}
 
 		template <typename V>
@@ -314,25 +323,17 @@ namespace plib
 			 * res = A * x
 			 */
 #if 0
-			parray<value_type, N < 0 ? -N * N : N *N> xi(m_size*m_size);
-			//std::vector<value_type> xi(m_size*m_size);
-
-			plib::omp::for_static(0, constants<index_type>::zero(), row_idx[m_size], [this, &x, &xi](index_type k)
-			{
-				xi[k] = x[col_idx[k]];
-			});
-#endif
-#if 1
 			//plib::omp::set_num_threads(4);
 			plib::omp::for_static(0, constants<index_type>::zero(), m_size, [this, &res, &x](index_type row)
 			{
-				T tmp = 0.0;
-				const index_type e = row_idx[row+1];
+				T tmp(0.0);
+				const index_type e(row_idx[row+1]);
 				for (index_type k = row_idx[row]; k < e; k++)
 					tmp += A[k] * x[col_idx[k]];
 				res[row] = tmp;
 			});
 #else
+			// this is a bit faster than the version above
 			std::size_t row = 0;
 			std::size_t k = 0;
 			const std::size_t oe = nz_num;
@@ -373,10 +374,10 @@ namespace plib
 		template <typename LUMAT>
 		void reduction_copy_from(LUMAT & src)
 		{
-			C sp = 0;
-			for (std::size_t r=0; r<src.size(); r++)
+			C sp(0);
+			for (index_type r=0; r<src.size(); r++)
 			{
-				C dp = row_idx[r];
+				C dp(row_idx[r]);
 				while(sp < src.row_idx[r+1])
 				{
 					/* advance dp to source column and fill 0s if necessary */
@@ -397,7 +398,7 @@ namespace plib
 		template <typename LUMAT>
 		void raw_copy_from(LUMAT & src)
 		{
-			for (std::size_t k = 0; k < nz_num; k++)
+			for (index_type k = 0; k < nz_num; k++)
 				A[k] = src.A[k];
 		}
 
@@ -422,32 +423,32 @@ namespace plib
 			 */
 
 			index_type p(0);
-			while (std::size_t i = ilu_rows[p++]) // NOLINT(bugprone-infinite-loop)
+			while (auto i = ilu_rows[p++]) // NOLINT(bugprone-infinite-loop)
 			{
-				const std::size_t p_i_end = row_idx[i + 1];
+				const auto p_i_end = row_idx[i + 1];
 				// loop over all columns k left of diag in row i
 				//if (row_idx[i] < diag[i])
 				//	printf("occ %d\n", (int)i);
-				for (std::size_t i_k = row_idx[i]; i_k < diag[i]; i_k++)
+				for (auto i_k = row_idx[i]; i_k < diag[i]; i_k++)
 				{
-					const std::size_t k = col_idx[i_k];
-					const std::size_t p_k_end = row_idx[k + 1];
+					const auto k(col_idx[i_k]);
+					const auto p_k_end(row_idx[k + 1]);
 					const T LUp_i_k = A[i_k] = A[i_k] / A[diag[k]];
 
-					std::size_t k_j = diag[k] + 1;
-					std::size_t i_j = i_k + 1;
+					auto k_j(diag[k] + 1);
+					auto i_j(i_k + 1);
 
 					while (i_j < p_i_end && k_j < p_k_end )  // pj = (i, j)
 					{
 						// we can assume that within a row ja increases continuously */
-						const std::size_t c_i_j = col_idx[i_j]; // row i, column j
-						const std::size_t c_k_j = col_idx[k_j]; // row k, column j
-						if (c_k_j < c_i_j)
-							k_j++;
-						else if (c_k_j == c_i_j)
-							A[i_j++] -= LUp_i_k * A[k_j++];
-						else
-							i_j++;
+						const auto c_i_j(col_idx[i_j]); // row i, column j
+						const auto c_k_j(col_idx[k_j]); // row k, column j
+
+						if (c_k_j == c_i_j)
+							A[i_j] -= LUp_i_k * A[k_j];
+						k_j += (c_k_j <= c_i_j ? 1 : 0);
+						i_j += (c_k_j >= c_i_j ? 1 : 0);
+
 					}
 				}
 			}
@@ -477,23 +478,23 @@ namespace plib
 			 * This can be solved for x using backwards elimination in U.
 			 *
 			 */
-			for (std::size_t i = 1; i < size(); ++i )
+			for (index_type i = 1; i < size(); ++i )
 			{
 				T tmp = 0.0;
-				const std::size_t j1 = row_idx[i];
-				const std::size_t j2 = diag[i];
+				const auto j1(row_idx[i]);
+				const auto j2(diag[i]);
 
-				for (std::size_t j = j1; j < j2; ++j )
+				for (auto j = j1; j < j2; ++j )
 					tmp +=  A[j] * r[col_idx[j]];
 				r[i] -= tmp;
 			}
 			// i now is equal to n;
-			for (std::size_t i = size(); i-- > 0; )
+			for (auto i = size(); i-- > 0; )
 			{
 				T tmp = 0.0;
-				const std::size_t di = diag[i];
-				const std::size_t j2 = row_idx[i+1];
-				for (std::size_t j = di + 1; j < j2; j++ )
+				const auto di(diag[i]);
+				const auto j2(row_idx[i+1]);
+				for (auto j = di + 1; j < j2; j++ )
 					tmp += A[j] * r[col_idx[j]];
 				r[i] = (r[i] - tmp) / A[di];
 			}

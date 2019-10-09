@@ -56,9 +56,7 @@ namespace devices
 
 		using mat_index_type = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
 
-		void csc_private(plib::putf8_fmt_writer &strm);
-
-		using extsolver = void (*)(double * m_A, double * RHS, double * V);
+		void generate_code(plib::putf8_fmt_writer &strm);
 
 		pstring static_compile_name();
 
@@ -68,7 +66,6 @@ namespace devices
 
 		mat_type mat;
 
-		//extsolver m_proc;
 		plib::dynproc<void, double * , double * , double * > m_proc;
 
 	};
@@ -76,16 +73,6 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 	// matrix_solver - GCR
 	// ----------------------------------------------------------------------------------------
-
-	// FIXME: namespace or static class member
-	template <typename V>
-	std::size_t inline get_level(const V &v, std::size_t k)
-	{
-		for (std::size_t i = 0; i < v.size(); i++)
-			if (plib::container::contains(v[i], k))
-				return i;
-		throw plib::pexception("Error in get_level");
-	}
 
 	template <typename FT, int SIZE>
 	void matrix_solver_GCR_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
@@ -113,48 +100,7 @@ namespace devices
 
 		auto gr = mat.gaussian_extend_fill_mat(fill);
 
-		/* FIXME: move this to the cr matrix class and use computed
-		 * parallel ordering once it makes sense.
-		 */
-
-		std::vector<unsigned> levL(iN, 0);
-		std::vector<unsigned> levU(iN, 0);
-
-		// parallel scheme for L x = y
-		for (std::size_t k = 0; k < iN; k++)
-		{
-			unsigned lm=0;
-			for (std::size_t j = 0; j<k; j++)
-				if (fill[k][j] < decltype(mat)::FILL_INFINITY)
-					lm = std::max(lm, levL[j]);
-			levL[k] = 1+lm;
-		}
-
-		// parallel scheme for U x = y
-		for (std::size_t k = iN; k-- > 0; )
-		{
-			unsigned lm=0;
-			for (std::size_t j = iN; --j > k; )
-				if (fill[k][j] < decltype(mat)::FILL_INFINITY)
-					lm = std::max(lm, levU[j]);
-			levU[k] = 1+lm;
-		}
-
-
-		for (std::size_t k = 0; k < iN; k++)
-		{
-			unsigned fm = 0;
-			pstring ml = "";
-			for (std::size_t j = 0; j < iN; j++)
-			{
-				ml += fill[k][j] == 0 ? 'X' : fill[k][j] < decltype(mat)::FILL_INFINITY ? '+' : '.';
-				if (fill[k][j] < decltype(mat)::FILL_INFINITY)
-					if (fill[k][j] > fm)
-						fm = fill[k][j];
-			}
-			this->log().verbose("{1:4} {2} {3:4} {4:4} {5:4} {6:4}", k, ml, levL[k], levU[k], get_level(mat.m_ge_par, k), fm);
-		}
-
+		log_fill(fill, mat);
 
 		mat.build_from_fill_mat(fill);
 
@@ -197,7 +143,7 @@ namespace devices
 	}
 
 	template <typename FT, int SIZE>
-	void matrix_solver_GCR_t<FT, SIZE>::csc_private(plib::putf8_fmt_writer &strm)
+	void matrix_solver_GCR_t<FT, SIZE>::generate_code(plib::putf8_fmt_writer &strm)
 	{
 		const std::size_t iN = N();
 
@@ -265,7 +211,7 @@ namespace devices
 		std::stringstream t;
 		t.imbue(std::locale::classic());
 		plib::putf8_fmt_writer w(&t);
-		csc_private(w);
+		generate_code(w);
 		std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
 
 		return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
@@ -281,7 +227,7 @@ namespace devices
 
 		strm.writeline(plib::pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS, double * __restrict V)\n")(name));
 		strm.writeline("{\n");
-		csc_private(strm);
+		generate_code(strm);
 		strm.writeline("}\n");
 		// some compilers (_WIN32, _WIN64, mac osx) need an explicit cast
 		return std::pair<pstring, pstring>(name, pstring(t.str()));
