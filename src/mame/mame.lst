@@ -38965,6 +38965,9 @@ blazlaz                         // (c) 1989 Hudson Soft
 keith                           // (c) 1989 Hudson Soft
 paclandp                        // (c) 1989 Namco
 
+@source:uchroma68.cpp
+uchroma68                       // 1980 Motorola evaluation board for the MC6847
+
 @source:uknc.cpp
 uknc                            //
 
