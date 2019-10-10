@@ -101,7 +101,7 @@ private:
 void sv8000_state::sv8000_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x0000, 0x0fff)      // mapped by the cartslot
+	//map(0x0000, 0x0fff)      // mapped by the cartslot
 	map(0x8000, 0x83ff).ram(); // Work RAM??
 	map(0xc000, 0xcbff).ram().share("videoram");
 }

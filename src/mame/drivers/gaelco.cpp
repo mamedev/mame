@@ -109,7 +109,7 @@ void gaelco_state::bigkarnk_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");               /* Video RAM */
 	map(0x102000, 0x103fff).ram();                                                         /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_DEVWRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w)); /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
 	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
 	map(0x700000, 0x700001).portr("DSW1");
@@ -126,7 +126,7 @@ void gaelco_state::bigkarnk_snd_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();                                         /* RAM */
 	map(0x0800, 0x0801).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   /* OKI6295 */
-//  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
+//  map(0x0900, 0x0900).nopw();                                    /* enable sound output? */
 	map(0x0a00, 0x0a01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));        /* YM3812 */
 	map(0x0b00, 0x0b00).r(m_soundlatch, FUNC(generic_latch_8_device::read));      /* Sound latch */
 	map(0x0c00, 0xffff).rom();                                         /* ROM */
@@ -138,7 +138,7 @@ void gaelco_state::maniacsq_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");               /* Video RAM */
 	map(0x102000, 0x103fff).ram();                                                         /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));  /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
 	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
 	map(0x700000, 0x700001).portr("DSW2");
@@ -156,7 +156,7 @@ void gaelco_state::squash_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram");         /* Video RAM */
 	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");                /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w)); /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
 	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
 	map(0x700000, 0x700001).portr("DSW2");
@@ -175,7 +175,7 @@ void gaelco_state::thoop_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram");          /* Video RAM */
 	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");             /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
-//  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                     /* INT 6 ACK/Watchdog timer */
+//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));  /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");        /* Palette */
 	map(0x440000, 0x440fff).ram().share("spriteram");                               /* Sprite RAM */
 	map(0x700000, 0x700001).portr("DSW2");
@@ -327,7 +327,7 @@ static INPUT_PORTS_START( biomtoy )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPNAME( 0x30, 0x30, "Lives in Reserve" ) PORT_DIPLOCATION("SW2:4,3") // Test mode doesn't show the value of the lives given, but of the ones after you die the first time
 	PORT_DIPSETTING(    0x20, "0" )
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x30, "2" )

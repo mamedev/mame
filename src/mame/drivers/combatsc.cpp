@@ -351,7 +351,7 @@ void combatsc_state::combatsc_map(address_map &map)
 	map(0x0000, 0x0007).w(FUNC(combatsc_state::combatsc_pf_control_w));
 	map(0x001f, 0x001f).r(FUNC(combatsc_state::unk_r));
 	map(0x0020, 0x005f).rw(FUNC(combatsc_state::combatsc_scrollram_r), FUNC(combatsc_state::combatsc_scrollram_w));
-//  AM_RANGE(0x0060, 0x00ff) AM_WRITEONLY                 /* RAM */
+//  map(0x0060, 0x00ff).writeonly();                 /* RAM */
 
 	map(0x0200, 0x0201).rw(FUNC(combatsc_state::protection_r), FUNC(combatsc_state::protection_w));
 	map(0x0206, 0x0206).w(FUNC(combatsc_state::protection_clock_w));

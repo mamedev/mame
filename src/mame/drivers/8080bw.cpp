@@ -3218,12 +3218,12 @@ READ8_MEMBER(_8080bw_state::claybust_gun_hi_r)
 
 void _8080bw_state::claybust_io_map(address_map &map)
 {
-	//AM_RANGE(0x00, 0x00) AM_WRITENOP // ?
+	//map(0x00, 0x00).nopw(); // ?
 	map(0x01, 0x01).portr("IN1").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).r(FUNC(_8080bw_state::claybust_gun_lo_r)).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)); //AM_WRITENOP // port3 write looks sound-related
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)); //.nopw(); // port3 write looks sound-related
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	//AM_RANGE(0x05, 0x05) AM_WRITENOP // ?
+	//map(0x05, 0x05).nopw(); // ?
 	map(0x06, 0x06).r(FUNC(_8080bw_state::claybust_gun_hi_r));
 }
 

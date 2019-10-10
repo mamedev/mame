@@ -126,11 +126,11 @@ void m90_state::dynablsb_main_cpu_io_map(address_map &map)
 	map(0x00, 0x01).portr("P1_P2");
 	map(0x02, 0x03).w(FUNC(m90_state::coincounter_w));
 	map(0x02, 0x03).portr("SYSTEM");
-//  AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)      /* dynablsb: write continuously 0x6000 */
+//  map(0x04, 0x05).w(FUNC(m90_state::unknown_w));      /* dynablsb: write continuously 0x6000 */
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
 	map(0x80, 0x8f).writeonly().share("video_control");
-//  AM_RANGE(0x90, 0x91) AM_WRITE(unknown_w)
+//  map(0x90, 0x91).w(FUNC(m90_state::unknown_w));
 }
 
 /*****************************************************************************/

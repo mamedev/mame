@@ -182,18 +182,18 @@ void gt_device_base::map(address_map &map)
 
 	map(0x16c, 0x16f).w(FUNC(gt_device_base::ri_control_w)); // mask 1ff?
 
-	//AM_RANGE(0x174, 0x177) AM_READWRITE(ri_xfer_r, ri_xfer_w)
-	//AM_RANGE(0x178, 0x17b) AM_READWRITE(ri_xfer_r, ri_xfer_w)
+	//map(0x174, 0x177).rw(FUNC(gt_device_base::ri_xfer_r), FUNC(gt_device_base::ri_xfer_w));
+	//map(0x178, 0x17b).rw(FUNC(gt_device_base::ri_xfer_r), FUNC(gt_device_base::ri_xfer_w));
 	map(0x17c, 0x17f).w(FUNC(gt_device_base::ri_xfer_w));
 
 	map(0x1a4, 0x1ab).w(FUNC(gt_device_base::bsga_float_w));
 
 	map(0x1b0, 0x1b3).nopr(); //?
 
-	//AM_RANGE(0x1c0, 0x1c3)
-	//AM_RANGE(0x1c4, 0x1c7)
-	//AM_RANGE(0x1c8, 0x1cb)
-	//AM_RANGE(0x1cc, 0x1cf) // write32 - float conversion control (inhibit/enable overflow detection?)
+	//map(0x1c0, 0x1c3)
+	//map(0x1c4, 0x1c7)
+	//map(0x1c8, 0x1cb)
+	//map(0x1cc, 0x1cf) // write32 - float conversion control (inhibit/enable overflow detection?)
 
 /*
  * Don't know where/how these fifos come into play yet:

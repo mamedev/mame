@@ -170,10 +170,10 @@ void nanos_state::io_map(address_map &map)
 	map(0xA4, 0xA7).rw(m_ctc_1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	/* 256-k RAM card I  -  64k OS-Memory + 192k-RAM-Floppy */
-	//AM_RANGE(0xC0, 0xC7)
+	//map(0xC0, 0xC7)
 
 	/* 256-k RAM card II -  64k OS-Memory + 192k-RAM-Floppy */
-	//AM_RANGE(0xC8, 0xCF)
+	//map(0xC8, 0xCF)
 }
 
 /* Input ports */

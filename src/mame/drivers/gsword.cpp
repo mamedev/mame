@@ -641,7 +641,7 @@ void josvolly_state::josvolly_cpu2_map(address_map &map)
 	/* NEC D8255A with silkscreen removed and replaced with "AA 007" */
 	map(0x8000, 0x8003).rw("aa_007", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-//  map(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
+//  map(0x6000, 0x6000).w(FUNC(josvolly_state::adpcm_soundcommand_w));
 	map(0xA000, 0xA001).rw("mcu2", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 }
 

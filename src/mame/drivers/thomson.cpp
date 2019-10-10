@@ -1275,7 +1275,7 @@ void thomson_state::to9_map(address_map &map)
 	map(0xe7de, 0xe7df).rw(FUNC(thomson_state::to9_kbd_r), FUNC(thomson_state::to9_kbd_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(thomson_state::to9_gatearray_r), FUNC(thomson_state::to9_gatearray_w));
 	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(thomson_state::to9_ieee_r), FUNC(thomson_state::to9_ieee_w )); */
 	map(0xe7f2, 0xe7f3).rw(FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
 	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7fe, 0xe7ff).rw(FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
@@ -1604,7 +1604,7 @@ void thomson_state::to8_map(address_map &map)
 	map(0xe7da, 0xe7dd).rw(FUNC(thomson_state::to8_vreg_r), FUNC(thomson_state::to8_vreg_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(thomson_state::to8_gatearray_r), FUNC(thomson_state::to8_gatearray_w));
 	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(thomson_state::to9_ieee_r), FUNC(thomson_state::to9_ieee_w )); */
 	map(0xe7f2, 0xe7f3).rw(FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
 	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7fe, 0xe7ff).rw(FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));
@@ -1817,7 +1817,7 @@ void thomson_state::to9p_map(address_map &map)
 	map(0xe7de, 0xe7df).rw(FUNC(thomson_state::to9_kbd_r), FUNC(thomson_state::to9_kbd_w));
 	map(0xe7e4, 0xe7e7).rw(FUNC(thomson_state::to8_gatearray_r), FUNC(thomson_state::to8_gatearray_w));
 	map(0xe7e8, 0xe7eb).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(thomson_state::to9_ieee_r), FUNC(thomson_state::to9_ieee_w )); */
 	map(0xe7f2, 0xe7f3).rw(FUNC(thomson_state::to7_midi_r), FUNC(thomson_state::to7_midi_w));
 	map(0xe7f8, 0xe7fb).rw("pia_3", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7fe, 0xe7ff).rw(FUNC(thomson_state::to7_modem_mea8000_r), FUNC(thomson_state::to7_modem_mea8000_w));

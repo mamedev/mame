@@ -123,7 +123,7 @@ void good_state::good_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 
-	//AM_RANGE(0x270000, 0x270007) AM_RAM // scroll?
+	//map(0x270000, 0x270007).ram(); // scroll?
 	map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x280000, 0x280001).portr("IN0");

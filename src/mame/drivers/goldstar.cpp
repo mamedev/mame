@@ -1307,7 +1307,7 @@ void unkch_state::megaline_map(address_map &map)
 /* Reels stuff are there just as placeholder, and obviously in wrong offset */
 	map(0x0000, 0x9fff).rom();
 
-	map(0xd000, 0xd7ff).ram(); //AM_SHARE("nvram")
+	map(0xd000, 0xd7ff).ram(); //.share("nvram");
 
 	map(0xd840, 0xd87f).ram().share("reel1_scroll");
 	map(0xd880, 0xd8bf).ram().share("reel2_scroll");

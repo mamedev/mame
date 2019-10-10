@@ -159,7 +159,7 @@ void proconn_state::proconn_map(address_map &map)
 // r0/r1/r2/r3 and w0/w1/w2/w3 might still be in the wrong order at the moment.
 void proconn_state::proconn_portmap(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+//  map.global_mask(0x3ff);
 
 	// sio (vfd should be connected to it?)
 	map(0x00ff, 0x00ff).rw(FUNC(proconn_state::sio_r<0>), FUNC(proconn_state::sio_w<0>));

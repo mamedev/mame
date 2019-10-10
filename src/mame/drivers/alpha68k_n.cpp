@@ -339,11 +339,11 @@ void alpha68k_N_state::sound_map(address_map &map)
 	map(0xe004, 0xe004).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe006, 0xe00e).nopw(); // soundboard I/O's, ignored
 /* reference only
-    AM_RANGE(0xe006, 0xe006) AM_WRITENOP // NMI: diminishing saw-tooth
-    AM_RANGE(0xe008, 0xe008) AM_WRITENOP // NMI: 00
-    AM_RANGE(0xe00a, 0xe00a) AM_WRITENOP // RST38: 20
-    AM_RANGE(0xe00c, 0xe00c) AM_WRITENOP // RST30: 00 on entry
-    AM_RANGE(0xe00e, 0xe00e) AM_WRITENOP // RST30: 00,02,ff on exit(0x1d88)
+    map(0xe006, 0xe006).nopw(); // NMI: diminishing saw-tooth
+    map(0xe008, 0xe008).nopw(); // NMI: 00
+    map(0xe00a, 0xe00a).nopw(); // RST38: 20
+    map(0xe00c, 0xe00c).nopw(); // RST30: 00 on entry
+    map(0xe00e, 0xe00e).nopw(); // RST30: 00,02,ff on exit(0x1d88)
 */
 }
 

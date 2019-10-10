@@ -114,14 +114,14 @@ private:
 
 void st_mp200_state::st_mp200_map(address_map &map)
 {
-	//ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	//map.global_mask(0x7fff);
 	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x00a0, 0x00a7).nopw(); // to sound board
 	map(0x00c0, 0x00c7); // to sound board
 	map(0x0200, 0x02ff).ram().share("nvram");
-	map(0x1000, 0xffff).rom(); //AM_REGION("roms", 0 )
+	map(0x1000, 0xffff).rom(); //.region("roms", 0 );
 }
 
 static INPUT_PORTS_START( mp200 )

@@ -253,7 +253,7 @@ void paso1600_state::paso1600_io(address_map &map)
 	map(0x0048, 0x0049).r(FUNC(paso1600_state::test_hi_r));
 	map(0x0090, 0x0090).rw(FUNC(paso1600_state::paso1600_6845_status_r), FUNC(paso1600_state::paso1600_6845_address_w));
 	map(0x0091, 0x0091).rw(FUNC(paso1600_state::paso1600_6845_data_r), FUNC(paso1600_state::paso1600_6845_data_w));
-//  AM_RANGE(0x00d8,0x00df) //fdc, unknown type
+//  map(0x00d8,0x00df) //fdc, unknown type
 // other undefined ports: 18, 1C, 92
 }
 

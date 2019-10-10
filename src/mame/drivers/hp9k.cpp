@@ -319,7 +319,7 @@ void hp9k_state::hp9k_mem(address_map &map)
 	map(0x530000, 0x53ffff).ram(); // graphic memory
 	map(0x540000, 0x5effff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0x5f0000, 0x5f3fff).rw(FUNC(hp9k_state::hp9k_prom_r), FUNC(hp9k_state::hp9k_prom_w));
-	//AM_RANGE(0x5f0000, 0x5f3fff) AM_READWRITE(buserror_r,buserror_w)
+	//map(0x5f0000, 0x5f3fff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0x5f4000, 0xfbffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0xFC0000, 0xffffff).ram(); // system ram
 }

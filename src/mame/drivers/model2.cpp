@@ -1115,11 +1115,11 @@ void model2_state::model2_base_mem(address_map &map)
 	map(0x00500000, 0x005fffff).ram().share("workram");
 
 	map(0x00800000, 0x00803fff).rw(FUNC(model2_state::geo_r), FUNC(model2_state::geo_w));
-	//AM_RANGE(0x00800010, 0x00800013) AM_WRITENOP
-	//AM_RANGE(0x008000b0, 0x008000b3) AM_WRITENOP
-	//AM_RANGE(0x00804004, 0x0080400f) AM_WRITENOP  // quiet psikyo games
+	//map(0x00800010, 0x00800013).nopw();
+	//map(0x008000b0, 0x008000b3).nopw();
+	//map(0x00804004, 0x0080400f).nopw();  // quiet psikyo games
 
-	//AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_w)
+	//map(0x00880000, 0x00883fff).w(FUNC(model2_state::copro_w));
 
 	map(0x00900000, 0x0091ffff).mirror(0x60000).ram().share("bufferram");
 
@@ -1153,12 +1153,12 @@ void model2_state::model2_base_mem(address_map &map)
 	map(0x06000000, 0x06ffffff).rom().region("main_data", 0x1000000);
 
 	map(0x10000000, 0x101fffff).rw(FUNC(model2_state::render_mode_r), FUNC(model2_state::render_mode_w));
-//  AM_RANGE(0x10200000, 0x103fffff) renderer status register
+//  map(0x10200000, 0x103fffff) renderer status register
 	map(0x10400000, 0x105fffff).r(FUNC(model2_state::polygon_count_r));
-//  AM_RANGE(0x10600000, 0x107fffff) polygon data ping
-//  AM_RANGE(0x10800000, 0x109fffff) polygon data pong
-//  AM_RANGE(0x10a00000, 0x10bfffff) fill memory ping
-//  AM_RANGE(0x10c00000, 0x10dfffff) fill memory pong
+//  map(0x10600000, 0x107fffff) polygon data ping
+//  map(0x10800000, 0x109fffff) polygon data pong
+//  map(0x10a00000, 0x10bfffff) fill memory ping
+//  map(0x10c00000, 0x10dfffff) fill memory pong
 
 	// format is xGGGGGRRRRRBBBBB (512x400)
 	map(0x11600000, 0x1167ffff).rw(FUNC(model2_state::fbvram_bankA_r), FUNC(model2_state::fbvram_bankA_w)); // framebuffer A (last bronx title screen)
@@ -1425,8 +1425,8 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x00200000, 0x0023ffff).ram();
 
 	map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_prg_r), FUNC(model2b_state::geo_prg_w));
-	//AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_sharc_fifo_r, geo_sharc_fifo_w)
-	//AM_RANGE(0x00840000, 0x00840fff) AM_WRITE(geo_sharc_iop_w)
+	//map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_sharc_fifo_r), FUNC(model2b_state::geo_sharc_fifo_w));
+	//map(0x00840000, 0x00840fff).w(FUNC(model2b_state::geo_sharc_iop_w));
 
 	map(0x00880000, 0x00883fff).w(FUNC(model2b_state::copro_function_port_w));
 	map(0x00884000, 0x00887fff).rw(FUNC(model2b_state::copro_fifo_r), FUNC(model2b_state::copro_fifo_w));
@@ -1435,7 +1435,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2b_state::copro_ctl1_r), FUNC(model2b_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_ctl1_w));
 	map(0x00980014, 0x00980017).r(FUNC(model2b_state::copro_status_r));
-	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_sharc_ctl1_w )
+	//map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_sharc_ctl1_w));
 
 	map(0x009c0000, 0x009cffff).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
 

@@ -926,8 +926,8 @@ void rainbow_state::rainbow8088_map(address_map &map)
 	//    So NVRAM is hidden and loads & saves are triggered within the
 	//    'diagnostic_w' handler (similar to real hardware).
 
-	//  - Address bits 8-12 are ignored (-> AM_MIRROR).
-	map(0xed000, 0xed0ff).ram().share("vol_ram"); //AM_MIRROR(0x1f00)
+	//  - Address bits 8-12 are ignored (-> mirror()).
+	map(0xed000, 0xed0ff).ram().share("vol_ram"); //.mirror(0x1f00);
 	map(0xed100, 0xed1ff).ram().share("nvram");
 
 	map(0xee000, 0xeffff).ram().share("p_ram");
@@ -1022,7 +1022,7 @@ void rainbow_state::rainbow8088_io(address_map &map)
 	// ===========================================================
 	// 0x70 -> 0x7f ***** Option Select 4
 	// ===========================================================
-	// 0x10c -> (MHFU disable register handled by 0x0c + AM_SELECT)
+	// 0x10c -> (MHFU disable register handled by 0x0c + select())
 }
 
 void rainbow_state::rainbowz80_mem(address_map &map)

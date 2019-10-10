@@ -541,7 +541,7 @@ void taitol_1cpu_state::puzznici_map(address_map &map)
 	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).nopr(); // Watchdog
 	map(0xb801, 0xb801).r(FUNC(taitol_1cpu_state::mcu_control_r));
-//  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
+//  map(0xb801, 0xb801).w(FUNC(taitol_1cpu_state::mcu_control_w));
 	map(0xbc00, 0xbc00).nopw();    // Control register, function unknown
 }
 

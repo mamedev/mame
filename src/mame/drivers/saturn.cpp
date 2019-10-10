@@ -530,9 +530,9 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
 	map(0x01000000, 0x017fffff).w(FUNC(sat_console_state::saturn_minit_w));
 	map(0x01800000, 0x01ffffff).w(FUNC(sat_console_state::saturn_sinit_w));
-//  AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_MIRROR(0x20000000) // Cartridge area
-//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM // External Data RAM area
-//  AM_RANGE(0x04000000, 0x047fffff) AM_RAM // External Battery RAM area
+//  map(0x02000000, 0x023fffff).rom().mirror(0x20000000); // Cartridge area
+//  map(0x02400000, 0x027fffff).ram(); // External Data RAM area
+//  map(0x04000000, 0x047fffff).ram(); // External Battery RAM area
 	map(0x04ffffff, 0x04ffffff).r(FUNC(sat_console_state::saturn_cart_type_r));
 	map(0x05000000, 0x057fffff).r(FUNC(sat_console_state::abus_dummy_r));
 	map(0x05800000, 0x0589ffff).rw(m_stvcd, FUNC(stvcd_device::stvcd_r), FUNC(stvcd_device::stvcd_w));
@@ -546,7 +546,7 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(sat_console_state::saturn_vdp2_vram_r), FUNC(sat_console_state::saturn_vdp2_vram_w));
 	map(0x05f00000, 0x05f7ffff).rw(FUNC(sat_console_state::saturn_vdp2_cram_r), FUNC(sat_console_state::saturn_vdp2_cram_w));
 	map(0x05f80000, 0x05fbffff).rw(FUNC(sat_console_state::saturn_vdp2_regs_r), FUNC(sat_console_state::saturn_vdp2_regs_w));
-	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //AM_READWRITE(saturn_scu_r, saturn_scu_w)
+	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //rw(FUNC(sat_console_state::saturn_scu_r), FUNC(sat_console_state::saturn_scu_w));
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
 	map(0x45000000, 0x46ffffff).nopw();
 	map(0x60000000, 0x600003ff).nopw(); // cache address array

@@ -176,7 +176,7 @@ void nbmj8991_state::galkoku_io_map(address_map &map)
 	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
 	map(0xc0, 0xc0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport3_r), FUNC(nb1413m3_device::nmi_clock_w));
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
-//  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
+//  map(0xe0, 0xe0).nopw();
 	map(0xf0, 0xf0).rw(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r), FUNC(nb1413m3_device::outcoin_w));
 	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 }
@@ -192,7 +192,7 @@ void nbmj8991_state::hyouban_io_map(address_map &map)
 	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
 	map(0xc0, 0xc0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport3_r), FUNC(nb1413m3_device::nmi_clock_w));
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
-//  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
+//  map(0xe0, 0xe0).nopw();
 	map(0xf0, 0xf0).rw(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r), FUNC(nb1413m3_device::outcoin_w));
 	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 }
@@ -204,9 +204,9 @@ void nbmj8991_state::pstadium_io_map(address_map &map)
 	map(0x80, 0x80).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x90, 0x90).r(m_nb1413m3, FUNC(nb1413m3_device::inputport0_r));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
-	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)); //AM_WRITENOP
+	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)); //.nopw();
 	map(0xc0, 0xc0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport3_r));
-//  AM_RANGE(0xd0, 0xd0) AM_WRITENOP
+//  map(0xd0, 0xd0).nopw();
 	map(0xf0, 0xf0).rw(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r), FUNC(nb1413m3_device::outcoin_w));
 	map(0xf8, 0xf8).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 }
@@ -220,9 +220,9 @@ void nbmj8991_state::av2mj1bb_io_map(address_map &map)
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
 	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::vcrctrl_w));
 	map(0xc0, 0xc0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport3_r));
-//  AM_RANGE(0xd0, 0xd0) AM_WRITENOP
+//  map(0xd0, 0xd0).nopw();
 	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
-//  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
+//  map(0xf0, 0xf0).nopw();
 	map(0xf8, 0xf8).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 }
 

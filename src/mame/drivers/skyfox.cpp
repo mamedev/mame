@@ -74,9 +74,9 @@ void skyfox_state::skyfox_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-//  AM_RANGE(0x9000, 0x9001) AM_WRITENOP // ??
+//  map(0x9000, 0x9001).nopw(); // ??
 	map(0xa000, 0xa001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  AM_RANGE(0xb000, 0xb001) AM_WRITENOP // ??
+//  map(0xb000, 0xb001).nopw(); // ??
 	map(0xc000, 0xc001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb000, 0xb000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }

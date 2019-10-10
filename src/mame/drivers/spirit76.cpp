@@ -53,7 +53,7 @@ private:
 void spirit76_state::maincpu_map(address_map &map)
 {
 	map.unmap_value_high();
-//  ADDRESS_MAP_GLOBAL_MASK(0xfff) // this could most likely go in once the memory map is sorted
+//  map.global_mask(0xfff); // this could most likely go in once the memory map is sorted
 	map(0x0000, 0x00ff).ram(); // 2x 2112
 	map(0x2200, 0x2203).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // 6820
 	map(0x2400, 0x2400).r(FUNC(spirit76_state::unk_r));

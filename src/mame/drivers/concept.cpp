@@ -52,7 +52,7 @@ void concept_state::concept_memmap(address_map &map)
 	map(0x020000, 0x021fff).rom().region("macsbug", 0x0);       /* macsbugs ROM (optional) */
 	map(0x030000, 0x03ffff).rw(FUNC(concept_state::io_r), FUNC(concept_state::io_w)).umask16(0x00ff);    /* I/O space */
 
-	map(0x080000, 0x0fffff).ram().share("videoram");/* AM_RAMBANK(2) */ /* DRAM */
+	map(0x080000, 0x0fffff).ram().share("videoram"); /* .bankrw(2); */ /* DRAM */
 }
 
 

@@ -322,8 +322,8 @@ void undrfire_state::undrfire_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).ram().share("ram");
 	map(0x300000, 0x303fff).ram().share("spriteram");
-//  AM_RANGE(0x304000, 0x304003) AM_RAM // debugging - doesn't change ???
-//  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
+//  map(0x304000, 0x304003).ram(); // debugging - doesn't change ???
+//  map(0x304400, 0x304403).ram(); // debugging - doesn't change ???
 	map(0x400002, 0x400002).w(FUNC(undrfire_state::motor_control_w));      /* gun vibration */
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x600000, 0x600007).noprw(); // space for ADC0809, not fitted on pcb

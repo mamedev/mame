@@ -78,7 +78,7 @@ void amspdwy_state::amspdwy_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
 	map(0x9800, 0x9bff).ram().w(FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
 	map(0x9c00, 0x9fff).ram(); // unused?
-//  AM_RANGE(0xa000, 0xa000) AM_WRITENOP // ?
+//  map(0xa000, 0xa000).nopw(); // ?
 	map(0xa000, 0xa000).portr("DSW1");
 	map(0xa400, 0xa400).portr("DSW2").w(FUNC(amspdwy_state::amspdwy_flipscreen_w));
 	map(0xa800, 0xa800).r(FUNC(amspdwy_state::amspdwy_wheel_0_r));
@@ -107,7 +107,7 @@ void amspdwy_state::amspdwy_portmap(address_map &map)
 void amspdwy_state::amspdwy_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-//  AM_RANGE(0x8000, 0x8000) AM_WRITENOP // ? writes 0 at start
+//  map(0x8000, 0x8000).nopw(); // ? writes 0 at start
 	map(0x9000, 0x9000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xa000, 0xa001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xc000, 0xdfff).ram();

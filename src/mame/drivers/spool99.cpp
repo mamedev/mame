@@ -296,7 +296,7 @@ void spool99_state::vcarn_map(address_map &map)
 	map(0xa800, 0xabff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 
 	map(0xb000, 0xdfff).ram();
-//  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_SHARE("vcarn_io")
+//  map(0xdf00, 0xdfff).rw(FUNC(spool99_state::vcarn_io_r), FUNC(spool99_state::vcarn_io_w)).share("vcarn_io");
 	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share("vram");
 	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share("cram");
 }

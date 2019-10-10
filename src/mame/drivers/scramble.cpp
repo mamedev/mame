@@ -165,7 +165,7 @@ void scramble_state::newsin7_map(address_map &map)
 	map(0x5080, 0x50ff).ram();
 	map(0x6800, 0x6800).w(FUNC(scramble_state::galaxold_coin_counter_1_w));
 	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_stars_enable_w));
-	//AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_nmi_enable_w)
+	//map(0x6802, 0x6802).w(FUNC(scramble_state::galaxold_nmi_enable_w));
 	map(0x6808, 0x6808).w(FUNC(scramble_state::galaxold_coin_counter_0_w));
 	map(0x6809, 0x6809).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
 	map(0x680b, 0x680b).w(FUNC(scramble_state::galaxold_flip_screen_y_w));

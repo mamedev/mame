@@ -785,9 +785,9 @@ void cmi_state::midicpu_map(address_map &map)
 {
 	map(0x000000, 0x003fff).rom();
 	map(0x040000, 0x05ffff).rw(FUNC(cmi_state::midi_dma_r), FUNC(cmi_state::midi_dma_w));
-//  AM_RANGE(0x060000, 0x06001f) TIMERS
-//  AM_RANGE(0x060050, 0x06005f) ACIA
-//  AM_RANGE(0x060070, 0x06007f) SMPTE
+//  map(0x060000, 0x06001f) TIMERS
+//  map(0x060050, 0x06005f) ACIA
+//  map(0x060070, 0x06007f) SMPTE
 	map(0x080000, 0x083fff).ram();
 }
 
@@ -1287,7 +1287,7 @@ WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
 	m_i8214[1]->b_w(data & 0x7);
 }
 
-// TODO: replace with AM_SHARE
+// TODO: replace with share()
 READ8_MEMBER( cmi_state::shared_ram_r )
 {
 	return m_shared_ram[offset];

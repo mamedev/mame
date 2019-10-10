@@ -429,7 +429,7 @@ void calchase_state::calchase_io(address_map &map)
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x0200, 0x021f).noprw(); //To debug
 	map(0x0260, 0x026f).noprw(); //To debug
-	map(0x0278, 0x027b).nopw();//AM_WRITE(pnp_config_w)
+	map(0x0278, 0x027b).nopw();//.w(FUNC(calchase_state::pnp_config_w));
 	map(0x0280, 0x0287).noprw(); //To debug
 	map(0x02a0, 0x02a7).noprw(); //To debug
 	map(0x02c0, 0x02c7).noprw(); //To debug
@@ -446,7 +446,7 @@ void calchase_state::calchase_io(address_map &map)
 	// map(0x03b0, 0x03df).noprw();
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
-	map(0x0a78, 0x0a7b).nopw();//AM_WRITE(pnp_data_w)
+	map(0x0a78, 0x0a7b).nopw();//.w(FUNC(calchase_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 	map(0x42e8, 0x43ef).noprw(); //To debug
 	map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register

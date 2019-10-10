@@ -182,7 +182,7 @@ void mcatadv_state::mcatadv_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
 
-//  AM_RANGE(0x180018, 0x18001f) AM_READNOP // ?
+//  map(0x180018, 0x18001f).nopr(); // ?
 
 	map(0x200000, 0x200005).ram().share("scroll1");
 	map(0x300000, 0x300005).ram().share("scroll2");
@@ -198,7 +198,7 @@ void mcatadv_state::mcatadv_map(address_map &map)
 
 	map(0x800000, 0x800001).portr("P1");
 	map(0x800002, 0x800003).portr("P2");
-//  AM_RANGE(0x900000, 0x900001) AM_WRITE(mcat_coin_w) // Lockout / Counter MCAT Only
+//  map(0x900000, 0x900001).w(FUNC(mcatadv_state::mcat_coin_w)); // Lockout / Counter MCAT Only
 	map(0xa00000, 0xa00001).portr("DSW1");
 	map(0xa00002, 0xa00003).portr("DSW2");
 

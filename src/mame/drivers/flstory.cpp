@@ -70,7 +70,7 @@ void flstory_state::flstory_map(address_map &map)
 	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 
 	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
-//  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
+//  map(0xda00, 0xda00).writeonly();
 	map(0xdcc0, 0xdcff).ram(); /* unknown */
 	map(0xdf03, 0xdf03).w(FUNC(flstory_state::flstory_gfxctrl_w));
 }
@@ -78,9 +78,9 @@ void flstory_state::flstory_map(address_map &map)
 void flstory_state::onna34ro_map(address_map &map)
 {
 	base_map(map);
-//  AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-//  AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
-//  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
+//  map(0xd000, 0xd000).rw("bmcu", FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+//  map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
+//  map(0xda00, 0xda00).writeonly();
 	map(0xdcc0, 0xdcff).ram(); /* unknown */
 	map(0xdf03, 0xdf03).w(FUNC(flstory_state::flstory_gfxctrl_w));
 }
@@ -106,7 +106,7 @@ void flstory_state::victnine_map(address_map &map)
 
 	map(0xd805, 0xd805).portr("EXTRA_P1");   /* also mcu */
 	map(0xd807, 0xd807).portr("EXTRA_P2");
-//  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
+//  map(0xda00, 0xda00).writeonly();
 	map(0xdce0, 0xdce0).rw(FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
 	map(0xdce1, 0xdce1).nopw();    /* unknown */
 }
@@ -118,9 +118,9 @@ void flstory_state::rumba_map(address_map &map)
 
 	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
 	map(0xd807, 0xd807).portr("EXTRA_P2");
-//  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
+//  map(0xda00, 0xda00).writeonly();
 	map(0xdce0, 0xdce0).rw(FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
-//  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
+//  map(0xdce1, 0xdce1).nopw();    /* unknown */
 }
 
 

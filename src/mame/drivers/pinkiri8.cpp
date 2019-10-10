@@ -144,8 +144,8 @@ void janshi_vdp_device::map(address_map &map)
 
 	map(0xfc3800, 0xfc3fff).ram().share("vram2"); // y pos + unknown
 
-	map(0xff0000, 0xff07ff).ram().share("paletteram"); //AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w)
-	map(0xff2000, 0xff27ff).ram().share("paletteram2"); //AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w)
+	map(0xff0000, 0xff07ff).ram().share("paletteram"); //ram().w(FUNC(janshi_vdp_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w));
+	map(0xff2000, 0xff27ff).ram().share("paletteram2"); //ram().w(FUNC(janshi_vdp_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w));
 
 	map(0xff6000, 0xff601f).ram().share("crtc_regs");
 }

@@ -297,7 +297,7 @@ void spoker_state::spoker_portmap(address_map &map)
 
 void spoker_state::_3super8_portmap(address_map &map)
 {
-//  AM_RANGE(0x1000, 0x1fff) AM_WRITENOP
+//  map(0x1000, 0x1fff).nopw();
 	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share(m_bg_tile_ram);
@@ -306,7 +306,7 @@ void spoker_state::_3super8_portmap(address_map &map)
 	map(0x4002, 0x4002).portr("DSW3");
 	map(0x4003, 0x4003).portr("DSW4");
 	map(0x4004, 0x4004).portr("DSW5");
-//  AM_RANGE(0x4000, 0x40ff) AM_WRITENOP
+//  map(0x4000, 0x40ff).nopw();
 	map(0x5000, 0x5fff).ram().w(FUNC(spoker_state::fg_tile_w)).share(m_fg_tile_ram);
 
 //  The following one (0x6480) should be output. At beginning of code, there is a PPI initialization

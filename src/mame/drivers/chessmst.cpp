@@ -109,7 +109,7 @@ void chessmst_state::chessmst_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0x03) AM_MIRROR(0xf0) read/write in both, not used by the software
+	//map(0x00, 0x03).mirror(0xf0); read/write in both, not used by the software
 	map(0x04, 0x07).mirror(0xf0).rw(m_pio[0], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x08, 0x0b).mirror(0xf0).rw(m_pio[1], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }

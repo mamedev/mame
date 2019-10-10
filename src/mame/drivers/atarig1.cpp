@@ -191,7 +191,7 @@ void atarig1_state::main_map(address_map &map)
 	map(0xfc8000, 0xfc8007).rw(FUNC(atarig1_state::a2d_data_r), FUNC(atarig1_state::a2d_select_w));
 	map(0xfd0000, 0xfd0000).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0xfd8000, 0xfdffff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-/*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
+/*  map(0xfe0000, 0xfe7fff).r(FUNC(atarig1_state::from_r));*/
 	map(0xfe8000, 0xfe89ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xff0fff).ram().share("rle");
 	map(0xff1000, 0xff1fff).ram();

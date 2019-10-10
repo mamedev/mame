@@ -92,10 +92,10 @@ void summit_state::mainmap(address_map &map)
 	map(0x2800, 0x2bff).ram().share("vram");
 
 	map(0x3800, 0x3800).portr("IN0");
-//  AM_RANGE(0x3880, 0x3880) AM_WRITE(out_w)
+//  map(0x3880, 0x3880).w(FUNC(summit_state::out_w));
 	map(0x3900, 0x3900).portr("IN1").w(FUNC(summit_state::out_w)); // lamps
-//  AM_RANGE(0x3980, 0x3980) AM_WRITE(out_w)
-	map(0x3a00, 0x3a00).portr("IN2"); //AM_WRITE(out_w)
+//  map(0x3980, 0x3980).w(FUNC(summit_state::out_w));
+	map(0x3a00, 0x3a00).portr("IN2"); //.w(FUNC(summit_state::out_w));
 	map(0x3b00, 0x3b00).portr("IN3");
 
 	map(0x7000, 0x71ff).ram();

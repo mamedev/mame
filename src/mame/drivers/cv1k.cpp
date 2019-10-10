@@ -349,7 +349,7 @@ void cv1k_state::cv1k_map(address_map &map)
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
 	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
-//  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
+//  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
 
@@ -360,7 +360,7 @@ void cv1k_state::cv1k_d_map(address_map &map)
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
 	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
-//  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
+//  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
 

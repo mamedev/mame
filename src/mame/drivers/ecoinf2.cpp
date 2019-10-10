@@ -245,10 +245,10 @@ void ecoinf2_state::oxo_portmap(address_map &map)
 	map(0x48, 0x4b).rw("ic22_inpt", FUNC(i8255_device::read), FUNC(i8255_device::write)); //*
 	map(0x4c, 0x4f).rw("ic23_reel", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x50, 0x53).rw("ic13_leds", FUNC(i8255_device::read), FUNC(i8255_device::write)); //*
-//  AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ic25_dips", i8255_device, read, write) // is this an 8255, or a mirrored byte read?
+//  map(0x54, 0x57).rw("ic25_dips", FUNC(i8255_device::read), FUNC(i8255_device::write)); // is this an 8255, or a mirrored byte read?
 
 
-//  AM_RANGE(0x5c, 0x5c) AM_WRITE(ox_port5c_out_w)
+//  map(0x5c, 0x5c).w(FUNC(ecoinf2_state::ox_port5c_out_w));
 }
 
 

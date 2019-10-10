@@ -166,13 +166,13 @@ void speglsht_state::st0016_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("st0016_bank");
-	//AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
-	//AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
+	//map(0xc000, 0xcfff).rw(FUNC(speglsht_state::st0016_sprite_ram_r), FUNC(speglsht_state::st0016_sprite_ram_w));
+	//map(0xd000, 0xdfff).rw(FUNC(speglsht_state::st0016_sprite2_ram_r), FUNC(speglsht_state::st0016_sprite2_ram_w));
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xe87f).ram();
-	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
-	//AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
-	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	//map(0xe900, 0xe9ff) // sound - internal
+	//map(0xea00, 0xebff).rw(FUNC(speglsht_state::st0016_palette_ram_r), FUNC(speglsht_state::st0016_palette_ram_w));
+	//map(0xec00, 0xec1f).rw(FUNC(speglsht_state::st0016_character_ram_r), FUNC(speglsht_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram().share("shared");
 }
 
@@ -191,14 +191,14 @@ WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
 void speglsht_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
+	//map(0x00, 0xbf).rw(FUNC(speglsht_state::st0016_vregs_r), FUNC(speglsht_state::st0016_vregs_w));
 	map(0xe1, 0xe1).w(FUNC(speglsht_state::st0016_rom_bank_w));
-	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
-	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
-	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
+	//map(0xe2, 0xe2).w(FUNC(speglsht_state::st0016_sprite_bank_w));
+	//map(0xe3, 0xe4).w(FUNC(speglsht_state::st0016_character_bank_w));
+	//map(0xe5, 0xe5).w(FUNC(speglsht_state::st0016_palette_bank_w));
 	map(0xe6, 0xe6).nopw();
 	map(0xe7, 0xe7).nopw();
-	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	//map(0xf0, 0xf0).r(FUNC(speglsht_state::st0016_dma_r));
 }
 
 READ32_MEMBER(speglsht_state::shared_r)

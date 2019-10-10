@@ -111,7 +111,7 @@ void badlandsbl_state::bootleg_map(address_map &map)
 	map(0xfc0000, 0xfc0001).r(FUNC(badlandsbl_state::badlandsb_unk_r)).nopw();
 
 	map(0xfd0000, 0xfd1fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	//AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	//map(0xfe0000, 0xfe1fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xfe2000, 0xfe3fff).w(FUNC(badlandsbl_state::video_int_ack_w));
 
 	map(0xfe0000, 0xfe0001).nopw();

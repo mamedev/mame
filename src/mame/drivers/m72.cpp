@@ -1018,7 +1018,7 @@ void m72_state::m84_v33_portmap(address_map &map)
 	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
 	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
 	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
-//  AM_RANGE(0x8c, 0x8f) AM_WRITENOP    /* ??? */
+//  map(0x8c, 0x8f).nopw();    /* ??? */
 }
 
 
@@ -1130,7 +1130,7 @@ void m72_state::rtype2_sound_portmap(address_map &map)
 	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
 	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
-//  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
+//  map(0x87, 0x87).nopw();    /* ??? */
 }
 
 void m72_state::poundfor_sound_portmap(address_map &map)

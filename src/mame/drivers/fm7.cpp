@@ -1555,7 +1555,7 @@ void fm7_state::fm11_sub_mem(address_map &map)
 	map(0x9000, 0x9f7f).ram(); // Work RAM(?)
 	map(0x9f80, 0x9fff).ram().share("shared_ram");
 	map(0xafe0, 0xafe3).ram();
-//  AM_RANGE(0xafe4,0xafe4) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+//  map(0xafe4, 0xafe4).rw(FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
 	map(0xafe6, 0xafe6).rw(FUNC(fm7_state::fm77av_video_flags_r), FUNC(fm7_state::fm77av_video_flags_w));
 	map(0xaff0, 0xaff0).rw(FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
 	map(0xc000, 0xffff).rom(); // sybsystem ROM
@@ -1599,15 +1599,15 @@ void fm7_state::fm16_io(address_map &map)
 	map(0xfd03, 0xfd03).rw(FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
 	map(0xfd04, 0xfd04).r(FUNC(fm7_state::fm7_fd04_r));
 	map(0xfd05, 0xfd05).rw(FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
-//  AM_RANGE(0xfd06,0xfd0c) AM_READ8(fm7_unknown_r,0xffff)
+//  map(0xfd06, 0xfd0c).r(FUNC(fm7_state::fm7_unknown_r));
 	map(0xfd0f, 0xfd0f).rw(FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
-//  AM_RANGE(0xfd10,0xfd17) AM_READ8(fm7_unknown_r,0xffff)
+//  map(0xfd10, 0xfd17).r(FUNC(fm7_state::fm7_unknown_r));
 	map(0xfd18, 0xfd1f).rw(FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
 	map(0xfd20, 0xfd23).rw(FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
-//  AM_RANGE(0xfd24,0xfd36) AM_READ8(fm7_unknown_r,0xffff)
+//  map(0xfd24, 0xfd36).r(FUNC(fm7_state::fm7_unknown_r));
 	map(0xfd37, 0xfd37).w(FUNC(fm7_state::fm7_multipage_w));
 	map(0xfd38, 0xfd3f).rw(FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
-//  AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
+//  map(0xfd40, 0xfdff).r(FUNC(fm7_state::fm7_unknown_r));
 }
 
 void fm7_state::fm16_sub_mem(address_map &map)

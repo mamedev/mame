@@ -1023,14 +1023,14 @@ void pacman_state::birdiy_map(address_map &map)
 	map(0x0000, 0x3fff).mirror(0x8000).rom();
 	map(0x4000, 0x43ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
 	map(0x4400, 0x47ff).mirror(0xa000).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
-//  AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
+//  map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5080, 0x509f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x50a0, 0x50af).mirror(0xaf00).writeonly().share("spriteram2");
-//  AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
-//  AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
+//  map(0x5070, 0x507f).mirror(0xaf00).nopw();
+//  map(0x5080, 0x5080).mirror(0xaf3f).nopw();
 	map(0x50c0, 0x50c0).mirror(0xaf3f).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x5000, 0x5000).mirror(0xaf3f).portr("IN0");
 	map(0x5040, 0x5040).mirror(0xaf3f).portr("IN1");
@@ -1112,13 +1112,13 @@ void pacman_state::numcrash_map(address_map &map)
 	map(0x5000, 0x5007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).writeonly().share("spriteram2");
-//  AM_RANGE(0x5070, 0x507f) AM_WRITENOP
-//  AM_RANGE(0x5080, 0x5080) AM_WRITENOP
+//  map(0x5070, 0x507f).nopw();
+//  map(0x5080, 0x5080).nopw();
 	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x5000, 0x5000).portr("IN0");
 	map(0x5040, 0x5040).portr("IN1");
 	map(0x5080, 0x5080).portr("DSW1");
-//  AM_RANGE(0x50c0, 0x50c0) AM_READ_PORT("DSW2") // only one DSW on the PCB
+//  map(0x50c0, 0x50c0).portr("DSW2"); // only one DSW on the PCB
 }
 
 
@@ -1158,7 +1158,7 @@ void pacman_state::dremshpr_map(address_map &map)
 	map(0x4800, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
-//  AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
+//  map(0x5040, 0x505f).mirror(0xaf00).w("namco", FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1336,14 +1336,14 @@ void pacman_state::crushs_map(address_map &map)
 void pacman_state::pengojpm_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-//  AM_RANGE(0x1000, 0x1fff) // header check for 0x55aa at POST, diagnostic ROM?
+//  map(0x1000, 0x1fff) // header check for 0x55aa at POST, diagnostic ROM?
 	map(0x4000, 0x7fff).rom();
 
 	map(0x8000, 0x83ff).ram().w(FUNC(pacman_state::pacman_videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 
 	map(0x8800, 0x8bff).ram();
-//  AM_RANGE(0x8800, 0x8bff) AM_READ(pacman_read_nop) AM_WRITENOP
+//  map(0x8800, 0x8bff).r(FUNC(pacman_state::pacman_read_nop)).nopw();
 	map(0x8c00, 0x8fef).ram();
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 	map(0x9000, 0x9007).w(m_mainlatch, FUNC(ls259_device::write_d0));

@@ -2235,7 +2235,7 @@ void towns_state::ux_mem(address_map &map)
 	map(0x000da000, 0x000effff).ram(); //READWRITE(SMH_BANK(11),SMH_BANK(11))
 	map(0x000f0000, 0x000f7fff).ram(); //READWRITE(SMH_BANK(12),SMH_BANK(12))
 	map(0x000f8000, 0x000fffff).bankr("bank_f8000_r").bankw("bank_f8000_w");
-//  AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
+//  map(0x00680000, 0x0087ffff).rom().region("user",0x280000);  // EX ROM
 	map(0x00a00000, 0x00a7ffff).rw(FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x180000); // VRAM
 	map(0x00b00000, 0x00b7ffff).rw(FUNC(towns_state::towns_gfx_packed_r), FUNC(towns_state::towns_gfx_packed_w)).mirror(0x80000); // VRAM
 	map(0x00c00000, 0x00c1ffff).rw(FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
@@ -2299,7 +2299,7 @@ void towns_state::towns_io(address_map &map)
 	// CMOS
 	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask32(0x00ff00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
-	//AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
+	//map(0x41fc,0x41ff).r(FUNC(towns_state::towns_41ff_r)).umask32(0xff000000);
 	// CRTC / Video (again)
 	map(0xfd90, 0xfda3).rw(FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
 	map(0xff80, 0xffff).rw(FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
@@ -2363,7 +2363,7 @@ void towns_state::towns16_io(address_map &map)
 	// CMOS
 	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask16(0x00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
-	//AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
+	//map(0x41fc,0x41ff).r(FUNC(towns_state::towns_41ff_r)).umask32(0xff000000);
 	// CRTC / Video (again)
 	map(0xfd90, 0xfda3).rw(FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
 	map(0xff80, 0xffff).rw(FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));

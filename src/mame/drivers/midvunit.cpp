@@ -651,7 +651,7 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x980082, 0x980083).r(FUNC(midvunit_state::midvunit_dma_trigger_r));
 	map(0x990000, 0x990000).r(FUNC(midvunit_state::midvunit_intcs_r));
 	map(0x991030, 0x991030).lr16("991030", [this]() { return uint16_t(m_in1->read()); });
-//  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
+//  map(0x991050, 0x991050).readonly(); // seems to be another port
 	map(0x991060, 0x991060).r(FUNC(midvunit_state::port0_r));
 	map(0x992000, 0x992000).lr16("992000", [this]() { return uint16_t(m_dsw->read()); });
 	map(0x993000, 0x993000).rw(FUNC(midvunit_state::adc_r), FUNC(midvunit_state::adc_w));

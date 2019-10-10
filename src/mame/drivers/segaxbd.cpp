@@ -953,7 +953,7 @@ void segaxbd_state::main_map(address_map &map)
 	map(0x2e8000, 0x2e800f).mirror(0x003ff0).rw("cmptimer_subx", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
 	map(0x2ec000, 0x2ecfff).mirror(0x001000).ram().share("segaic16road:roadram");
 	map(0x2ee000, 0x2effff).rw("segaic16road", FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
-//  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE(excs_r, excs_w)
+//  map(0x2f0000, 0x2f3fff).rw(FUNC(segaxbd_state::excs_r), FUNC(segaxbd_state::excs_w));
 	map(0x3f8000, 0x3fbfff).ram().share("backup1");
 	map(0x3fc000, 0x3fffff).ram().share("backup2");
 }

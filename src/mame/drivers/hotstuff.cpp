@@ -81,7 +81,7 @@ uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rg
 void hotstuff_state::hotstuff_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x0fffff).noprw(); //ROM AM_REGION("data", 0)
+	map(0x080000, 0x0fffff).noprw(); //.rom().region("data", 0);
 
 	map(0x400000, 0x40ffff).ram();
 

@@ -566,7 +566,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 void myb3k_state::myb3k_map(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM installed by machine_start()
+	//map(0x00000,0x3ffff).ram(); // It's either 128Kb or 256Kb RAM installed by machine_start()
 	map(0x40000, 0x7ffff).noprw();
 	map(0x80000, 0xcffff).noprw(); // Expansion Unit connected through an ISA8 cable
 	map(0xd0000, 0xeffff).ram().share("vram");  // Area 6, physical at 30000-3FFFF (128Kb RAM) or 10000-1FFFF (256KB RAM)

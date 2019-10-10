@@ -9,7 +9,7 @@ Tandy's Data Terminal.
 Skeleton driver commenced on 2017-10-25.
 
 Core bugs noted:
-- If AM_REGION used to locate the main rom in another region, validation
+- If region() used to locate the main rom in another region, validation
   complains that region ':maincpu' not found.
 - If region 'maincpu' changed to 0x1000 (same size as the rom), a fatal error
   of duplicate save state occurs at start.

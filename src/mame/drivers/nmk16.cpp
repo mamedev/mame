@@ -982,11 +982,11 @@ void nmk16_state::tdragon_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x044022, 0x044023).nopr();  /* No Idea */
-//  AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM    /* Work RAM */
-//  AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM AM_SHARE("spriteram") /* Sprite RAM */
-//  AM_RANGE(0x0b9000, 0x0bdfff) AM_RAM AM_SHARE("mcu_work_ram")   /* Work RAM */
-//  AM_RANGE(0x0be000, 0x0befff) AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_SHARE("mcu_shared_ram")  /* Work RAM */
-//  AM_RANGE(0x0bf000, 0x0bffff) AM_RAM    /* Work RAM */
+//  map(0x0b0000, 0x0b7fff).ram();    /* Work RAM */
+//  map(0x0b8000, 0x0b8fff).ram().share("spriteram"); /* Sprite RAM */
+//  map(0x0b9000, 0x0bdfff).ram().share("mcu_work_ram");   /* Work RAM */
+//  map(0x0be000, 0x0befff).rw(FUNC(nmk16_state::mcu_shared_r), FUNC(nmk16_state::tdragon_mcu_shared_w)).share("mcu_shared_ram");  /* Work RAM */
+//  map(0x0bf000, 0x0bffff).ram();    /* Work RAM */
 	map(0x0b0000, 0x0bffff).ram().share("mainram");
 	map(0x0c0000, 0x0c0001).portr("IN0");
 	map(0x0c0002, 0x0c0003).portr("IN1");
@@ -1034,7 +1034,7 @@ void nmk16_state::ssmissin_map(address_map &map)
 	map(0x0c0000, 0x0c0001).portr("IN0");
 	map(0x0c0004, 0x0c0005).portr("IN1");
 	map(0x0c0006, 0x0c0007).portr("DSW1");
-//  AM_RANGE(0x0c000e, 0x0c000f) AM_READ(??)
+//  map(0x0c000e, 0x0c000f).r(FUNC(nmk16_state::??));
 	map(0x0c0015, 0x0c0015).w(FUNC(nmk16_state::flipscreen_w)); /* Maybe */
 	map(0x0c0019, 0x0c0019).w(FUNC(nmk16_state::tilebank_w)); /* Tile Bank ? */
 	map(0x0c001f, 0x0c001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));

@@ -637,9 +637,9 @@ void ppking_state::ppking_cpu3_map(address_map &map)
 
 void ppking_state::ppking_cpu1_io(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 	map(0xc000, 0xc007).w("mainlatch", FUNC(ls259_device::write_d0));
-//  map(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
+//  map(0xc004, 0xc004).noprw(); //.w(FUNC(ppking_state::ppking_irq_patch_w));
 	map(0xc09e, 0xc09f).r(FUNC(ppking_state::ppking_qx0_r)).w(FUNC(ppking_state::ppking_qx0_w));
 	map(0xc0bf, 0xc0bf).noprw(); // watchdog
 	map(0xc0c0, 0xc0c1).r(FUNC(ppking_state::ppking_qxcomu_r)).w(FUNC(ppking_state::ppking_qxcomu_w));

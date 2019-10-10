@@ -862,7 +862,7 @@ void tumbleb_state::semicom_sound_map(address_map &map)
 	map(0xd000, 0xd7ff).ram();
 	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//AM_RANGE(0xf006, 0xf006) ??
+	//map(0xf006, 0xf006) ??
 	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xf00e, 0xf00e).w(FUNC(tumbleb_state::oki_sound_bank_w));
 }
@@ -872,7 +872,7 @@ void tumbleb_state::suprtrio_sound_map(address_map &map)
 	map(0x0000, 0xcfff).rom();
 	map(0xd000, 0xd7ff).ram();
 	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//AM_RANGE(0xf006, 0xf006) ??
+	//map(0xf006, 0xf006) ??
 	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xf00e, 0xf00e).w(FUNC(tumbleb_state::oki_sound_bank_w));
 }

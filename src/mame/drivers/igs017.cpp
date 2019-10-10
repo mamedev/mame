@@ -2292,7 +2292,7 @@ void igs017_state::lhzb2a_map(address_map &map)
 	map(0x00320a, 0x00320b).r(m_igs_incdec, FUNC(igs_incdec_device::val_r));
 
 	map(0x500000, 0x503fff).ram();
-//  AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
+//  map(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 
 	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 

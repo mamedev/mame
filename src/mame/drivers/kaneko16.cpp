@@ -350,7 +350,7 @@ void kaneko16_state::blazeon_map(address_map &map)
 	map(0xe00000, 0xe00001).nopr(); // Read = IRQ Ack ?
 	map(0xe00000, 0xe00000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xe40000, 0xe40001).nopr(); // IRQ Ack ?
-//  map(0xe80000, 0xe80001) AM_READNOP // IRQ Ack ?
+//  map(0xe80000, 0xe80001).nopr(); // IRQ Ack ?
 	map(0xec0000, 0xec0001).nopr(); // Lev 4 IRQ Ack ?
 }
 
@@ -546,7 +546,7 @@ void kaneko16_gtmr_state::gtmr2_map(address_map &map)
 	map(0xa00000, 0xa00001).rw(m_watchdog, FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));   // Watchdog
 
 	map(0xb00000, 0xb00001).portr("P1");
-//  map(0xb00002, 0xb00003) AM_READ_PORT("P2")
+//  map(0xb00002, 0xb00003).portr("P2");
 	map(0xb00002, 0xb00003).r(FUNC(kaneko16_gtmr_state::gtmr2_IN1_r));
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("EXTRA");

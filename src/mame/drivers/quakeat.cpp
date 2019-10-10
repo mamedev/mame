@@ -103,13 +103,13 @@ void quakeat_state::quake_io(address_map &map)
 {
 	pcat32_io_common(map);
 	map(0x00e8, 0x00eb).noprw();
-//  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
+//  map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
 	map(0x0300, 0x03af).noprw();
 	map(0x03b0, 0x03df).noprw();
-//  AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
-//  AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
-//  AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
-//  AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
+//  map(0x0278, 0x027b).w(FUNC(quakeat_state::pnp_config_w));
+//  map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+//  map(0x0a78, 0x0a7b).w(FUNC(quakeat_state::pnp_data_w));
+//  map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
 /*************************************************************/

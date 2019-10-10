@@ -672,7 +672,7 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0050, 0x0057).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / i8255 floppy port (2d?)
 	map(0x0060, 0x0063).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
-//  AM_RANGE(0x006c, 0x006f) border color / <undefined>
+//  map(0x006c, 0x006f) border color / <undefined>
 	map(0x0070, 0x007f).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0070, 0x007f).rw(FUNC(pc9801_state::txt_scrl_r), FUNC(pc9801_state::txt_scrl_w)).umask16(0x00ff); //display registers / i8253 pit
 	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
@@ -1098,7 +1098,7 @@ void pc9801_state::pc9801ux_io(address_map &map)
 void pc9801_state::pc9801rs_map(address_map &map)
 {
 	pc9801ux_map(map);
-//  AM_RANGE(0x0d8000, 0x0d9fff) AM_ROM AM_REGION("ide",0)
+//  map(0x0d8000, 0x0d9fff).rom().region("ide",0);
 	map(0x0da000, 0x0dbfff).ram(); // ide ram
 	map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xfe8000, 0xffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
@@ -1420,7 +1420,7 @@ void pc9801_state::pc9821_map(address_map &map)
 
 void pc9801_state::pc9821_io(address_map &map)
 {
-//  ADDRESS_MAP_UNMAP_HIGH // TODO: a read to somewhere makes this to fail at POST
+//  map.unmap_value_high(); // TODO: a read to somewhere makes this to fail at POST
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
 	map(0x0000, 0x001f).r(read8_delegate([this](address_space &s, offs_t o, u8 mm) { return BIT(o, 1) ? 0xff : pic_r(s, o, mm); }, "pc9821_pic")).umask32(0x00ff00ff);
 	map(0x0000, 0x001f).w(FUNC(pc9801_state::pic_w)).umask32(0x00ff00ff);  // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
@@ -1440,36 +1440,36 @@ void pc9801_state::pc9821_io(address_map &map)
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
 	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
 	map(0x00a0, 0x00af).rw(FUNC(pc9801_state::pc9821_a0_r), FUNC(pc9801_state::pc9821_a0_w)); //upd7220 bitmap ports / display registers
-//  AM_RANGE(0x00b0, 0x00b3) PC9861k (serial port?)
-//  AM_RANGE(0x00b9, 0x00b9) PC9861k
-//  AM_RANGE(0x00bb, 0x00bb) PC9861k
+//  map(0x00b0, 0x00b3) PC9861k (serial port?)
+//  map(0x00b9, 0x00b9) PC9861k
+//  map(0x00bb, 0x00bb) PC9861k
 	map(0x00bc, 0x00bf).rw(FUNC(pc9801_state::fdc_mode_ctrl_r), FUNC(pc9801_state::fdc_mode_ctrl_w));
 	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
 	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
-	//  AM_RANGE(0x00d8, 0x00df) AMD98 (sound?) board
+	//  map(0x00d8, 0x00df) AMD98 (sound?) board
 	map(0x00f0, 0x00ff).rw(FUNC(pc9801_state::a20_ctrl_r), FUNC(pc9801_state::a20_ctrl_w)).umask32(0x00ff00ff);
-//  AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
-//  AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
+//  map(0x0188, 0x018f).rw(FUNC(pc9801_state::pc9801_opn_r), FUNC(pc9801_state::pc9801_opn_w)); //ym2203 opn / <undefined>
+//  map(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
 	map(0x0430, 0x0433).rw(FUNC(pc9801_state::ide_ctrl_r), FUNC(pc9801_state::ide_ctrl_w)).umask32(0x00ff00ff);
 	map(0x0438, 0x043b).rw(FUNC(pc9801_state::access_ctrl_r), FUNC(pc9801_state::access_ctrl_w));
-//  AM_RANGE(0x043d, 0x043d) ROM/RAM bank (NEC)
+//  map(0x043d, 0x043d) ROM/RAM bank (NEC)
 	map(0x043c, 0x043f).w(FUNC(pc9801_state::pc9801rs_bank_w)); //ROM/RAM bank (EPSON)
 	map(0x0460, 0x0463).rw(FUNC(pc9801_state::window_bank_r), FUNC(pc9801_state::window_bank_w));
 	map(0x04a0, 0x04af).w(FUNC(pc9801_state::egc_w));
-//  AM_RANGE(0x04be, 0x04be) FDC "RPM" register
+//  map(0x04be, 0x04be) FDC "RPM" register
 	map(0x0640, 0x064f).rw(FUNC(pc9801_state::ide_cs0_r), FUNC(pc9801_state::ide_cs0_w));
 	map(0x0740, 0x074f).rw(FUNC(pc9801_state::ide_cs1_r), FUNC(pc9801_state::ide_cs1_w));
-//  AM_RANGE(0x08e0, 0x08ea) <undefined> / EMM SIO registers
+//  map(0x08e0, 0x08ea) <undefined> / EMM SIO registers
 	map(0x09a0, 0x09a0).rw(FUNC(pc9801_state::ext2_video_ff_r), FUNC(pc9801_state::ext2_video_ff_w)); // GDC extended register r/w
-//  AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
-//  AM_RANGE(0x0c07, 0x0c07) EPSON register w
-//  AM_RANGE(0x0c03, 0x0c03) EPSON register 0 r
-//  AM_RANGE(0x0c13, 0x0c14) EPSON register 1 r
-//  AM_RANGE(0x0c24, 0x0c24) cs4231 PCM board register control
-//  AM_RANGE(0x0c2b, 0x0c2b) cs4231 PCM board low byte control
-//  AM_RANGE(0x0c2d, 0x0c2d) cs4231 PCM board hi byte control
-//  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
-//  AM_RANGE(0x0cfc, 0x0cff) PCI bus
+//  map(0x09a8, 0x09a8) GDC 31KHz register r/w
+//  map(0x0c07, 0x0c07) EPSON register w
+//  map(0x0c03, 0x0c03) EPSON register 0 r
+//  map(0x0c13, 0x0c14) EPSON register 1 r
+//  map(0x0c24, 0x0c24) cs4231 PCM board register control
+//  map(0x0c2b, 0x0c2b) cs4231 PCM board low byte control
+//  map(0x0c2d, 0x0c2d) cs4231 PCM board hi byte control
+//  map(0x0cc0, 0x0cc7) SCSI interface / <undefined>
+//  map(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
 	map(0x2ed0, 0x2edf).r(read8_delegate([](address_space &s, offs_t o, u8 mm) { return 0xff; }, "pc9821_unkaudio")).umask32(0xffffffff); // unknown sound related
 	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
@@ -1486,24 +1486,24 @@ void pc9801_state::pc9821_io(address_map &map)
 	map(0x8d1c, 0x8d1f).rw(FUNC(pc9801_state::sdip_9_r), FUNC(pc9801_state::sdip_9_w));
 	map(0x8e1c, 0x8e1f).rw(FUNC(pc9801_state::sdip_a_r), FUNC(pc9801_state::sdip_a_w));
 	map(0x8f1c, 0x8f1f).rw(FUNC(pc9801_state::sdip_b_r), FUNC(pc9801_state::sdip_b_w));
-//  AM_RANGE(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
-//  AM_RANGE(0xbfdb, 0xbfdb) mouse timing port
-//  AM_RANGE(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
-//  AM_RANGE(0xc4d0, 0xc4d3) MIDI port, option 1 / <undefined>
-//  AM_RANGE(0xc8d0, 0xc8d3) MIDI port, option 2 / <undefined>
-//  AM_RANGE(0xccd0, 0xccd3) MIDI port, option 3 / <undefined>
-//  AM_RANGE(0xd0d0, 0xd0d3) MIDI port, option 4 / <undefined>
-//  AM_RANGE(0xd4d0, 0xd4d3) MIDI port, option 5 / <undefined>
-//  AM_RANGE(0xd8d0, 0xd8d3) MIDI port, option 6 / <undefined>
-//  AM_RANGE(0xdcd0, 0xdcd3) MIDI port, option 7 / <undefined>
+//  map(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
+//  map(0xbfdb, 0xbfdb) mouse timing port
+//  map(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
+//  map(0xc4d0, 0xc4d3) MIDI port, option 1 / <undefined>
+//  map(0xc8d0, 0xc8d3) MIDI port, option 2 / <undefined>
+//  map(0xccd0, 0xccd3) MIDI port, option 3 / <undefined>
+//  map(0xd0d0, 0xd0d3) MIDI port, option 4 / <undefined>
+//  map(0xd4d0, 0xd4d3) MIDI port, option 5 / <undefined>
+//  map(0xd8d0, 0xd8d3) MIDI port, option 6 / <undefined>
+//  map(0xdcd0, 0xdcd3) MIDI port, option 7 / <undefined>
 	map(0xe0d0, 0xe0d3).r(FUNC(pc9801_state::midi_r)); // MIDI port, option 8 / <undefined>
-//  AM_RANGE(0xe4d0, 0xe4d3) MIDI port, option 9 / <undefined>
-//  AM_RANGE(0xe8d0, 0xe8d3) MIDI port, option A / <undefined>
-//  AM_RANGE(0xecd0, 0xecd3) MIDI port, option B / <undefined>
-//  AM_RANGE(0xf0d0, 0xf0d3) MIDI port, option C / <undefined>
-//  AM_RANGE(0xf4d0, 0xf4d3) MIDI port, option D / <undefined>
-//  AM_RANGE(0xf8d0, 0xf8d3) MIDI port, option E / <undefined>
-//  AM_RANGE(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
+//  map(0xe4d0, 0xe4d3) MIDI port, option 9 / <undefined>
+//  map(0xe8d0, 0xe8d3) MIDI port, option A / <undefined>
+//  map(0xecd0, 0xecd3) MIDI port, option B / <undefined>
+//  map(0xf0d0, 0xf0d3) MIDI port, option C / <undefined>
+//  map(0xf4d0, 0xf4d3) MIDI port, option D / <undefined>
+//  map(0xf8d0, 0xf8d3) MIDI port, option E / <undefined>
+//  map(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
 }
 
 // TODO: identify this, might be an alt way to access SDIP?

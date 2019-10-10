@@ -2419,7 +2419,7 @@ void segas32_trackball_state::system32_trackball_map(address_map &map)
 {
 	map.unmap_value_high();
 	system32_map(map);
-	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
+	//map(0xc00040, 0xc0005f).mirror(0x0fff80).rw(FUNC(segas32_trackball_state::sonic_custom_io_r), FUNC(segas32_trackball_state::sonic_custom_io_w)).umask16(0x00ff);
 	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
 	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
 	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);

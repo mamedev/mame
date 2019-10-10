@@ -286,7 +286,7 @@ void taitowlf_state::taitowlf_map(address_map &map)
 	map(0x000f0000, 0x000fffff).bankr("bank1");
 	map(0x000f0000, 0x000fffff).w(FUNC(taitowlf_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
-//  AM_RANGE(0xf8000000, 0xf83fffff) AM_ROM AM_REGION("user3", 0)
+//  map(0xf8000000, 0xf83fffff).rom().region("user3", 0);
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);   /* System BIOS */
 }
 

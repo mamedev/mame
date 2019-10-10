@@ -114,7 +114,7 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
 	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
 	map(0x1800, 0x1800).w("aysnd_1", FUNC(ay8910_device::address_w));
-	//AM_RANGE(0x2800, 0x2800) AM_WRITE(auxlamps_w)
+	//map(0x2800, 0x2800).w(FUNC(ltd_state::auxlamps_w));
 	map(0x3000, 0x3000).w("aysnd_0", FUNC(ay8910_device::data_w));
 	map(0x3800, 0x3800).w("aysnd_1", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xdfff).rom().mirror(0x2000).region("roms", 0);

@@ -159,7 +159,7 @@ void mpu4dealem_state::dealem_memmap(address_map &map)
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
+/*  map(0x08e0, 0x08e7).rw(FUNC(mpu4dealem_state::68681_duart_r), FUNC(mpu4dealem_state::68681_duart_w)); */ //Runs hoppers
 
 	map(0x0900, 0x0907).rw(m_6840ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));/* PTM6840 IC2 */
 

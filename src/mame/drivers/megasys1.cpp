@@ -335,7 +335,7 @@ void megasys1_state::megasys1B_edfbl_map(address_map &map)
 	map(0x0e0006, 0x0e0007).portr("P2");
 	map(0x0e0008, 0x0e0009).portr("DSW1");
 	map(0x0e000a, 0x0e000b).portr("DSW2");
-	//AM_RANGE(0x0e000e, 0x0e000f) AM_WRITE(soundlatch_w)
+	//map(0x0e000e, 0x0e000f).w(FUNC(megasys1_state::soundlatch_w));
 }
 
 void megasys1_state::megasys1B_monkelf_map(address_map &map)
@@ -410,7 +410,7 @@ void megasys1_state::megasys1D_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x0c2000, 0x0c2005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2008, 0x0c200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x0c2108, 0x0c2109).nopw(); //AM_WRITE(sprite_bank_w)
+	map(0x0c2108, 0x0c2109).nopw(); //.w(FUNC(megasys1_state::sprite_bank_w));
 	map(0x0c2200, 0x0c2201).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
 	map(0x0c2208, 0x0c2209).w(FUNC(megasys1_state::active_layers_w));
 	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_state::screen_flag_w));
@@ -1770,6 +1770,8 @@ void megasys1_state::p47b(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::p47b_sound_map);
 
 	config.device_remove("oki1");
+
+	subdevice<ym2203_device>("ymsnd")->set_clock(7.2_MHz_XTAL / 2);
 
 	// what's this for? SFX?
 	//z80_device &extracpu(Z80(config, "extracpu", 7.2_MHz_XTAL / 2)); // divisor not verified

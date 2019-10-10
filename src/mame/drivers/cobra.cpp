@@ -2042,7 +2042,7 @@ void cobra_state::cobra_sub_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("sub_ram");                       // Main RAM
 	map(0x70000000, 0x7003ffff).rw(FUNC(cobra_state::sub_comram_r), FUNC(cobra_state::sub_comram_w));         // Double buffered shared RAM between Main and Sub
-//  AM_RANGE(0x78000000, 0x780000ff) AM_NOP                                           // SCSI controller (unused)
+//  map(0x78000000, 0x780000ff).noprw();                                           // SCSI controller (unused)
 	map(0x78040000, 0x7804ffff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
 	map(0x78080000, 0x7808000f).rw(FUNC(cobra_state::sub_ata0_r), FUNC(cobra_state::sub_ata0_w));
 	map(0x780c0010, 0x780c001f).rw(FUNC(cobra_state::sub_ata1_r), FUNC(cobra_state::sub_ata1_w));

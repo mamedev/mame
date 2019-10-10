@@ -318,8 +318,7 @@ void luckgrln_state::mainmap(address_map &map)
 	map(0x0ce00, 0x0cfff).ram().w(FUNC(luckgrln_state::reel_attr_w<3>)).share("reel_attr.3");
 	map(0x0d600, 0x0d63f).ram().share("reel_scroll.3");
 
-//  AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
-
+//  map(0x0d200, 0x0d2ff).ram();
 
 	map(0x0d800, 0x0dfff).ram(); // nvram
 
@@ -480,7 +479,7 @@ void luckgrln_state::common_portmap(address_map &map)
 	map(0x00f8, 0x00f8).portr("DSW2");
 	map(0x00f9, 0x00f9).portr("DSW3");
 	map(0x00fa, 0x00fa).portr("DSW4");
-	map(0x00fb, 0x00fb).portr("DSW5"); //AM_WRITENOP
+	map(0x00fb, 0x00fb).portr("DSW5"); //.nopw();
 	map(0x00fc, 0x00fc).nopw();
 	map(0x00fd, 0x00fd).nopw();
 	map(0x00fe, 0x00fe).nopw();

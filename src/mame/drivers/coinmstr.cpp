@@ -501,7 +501,7 @@ E0-E1 CRTC
 	map(0xc8, 0xcb).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));    /* confirmed */
 	map(0xd0, 0xd3).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd8, 0xdb).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));    /* confirmed */
-//  AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
+//  map(0xc0, 0xc1).r(FUNC(coinmstr_state::ff_r));  /* needed to boot */
 	map(0xc4, 0xc4).r(FUNC(coinmstr_state::ff_r));  /* needed to boot */
 }
 

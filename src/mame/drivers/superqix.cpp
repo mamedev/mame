@@ -991,7 +991,7 @@ void superqix_state_base::main_map(address_map &map)
 void hotsmash_state::pbillian_port_map(address_map &map)
 { // used by both pbillian and hotsmash
 	map(0x0000, 0x01ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 6116 sram near the jamma connector, "COLOR RAM" during POST
-	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
+	//map(0x0200, 0x03ff).ram(); // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
 	map(0x0401, 0x0401).r(m_ay1, FUNC(ay8910_device::data_r)); // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
 	map(0x0402, 0x0403).w(m_ay1, FUNC(ay8910_device::data_address_w));
 	map(0x0408, 0x0408).rw(FUNC(hotsmash_state::hotsmash_z80_mcu_r), FUNC(hotsmash_state::hotsmash_z80_mcu_w));
@@ -1016,7 +1016,7 @@ void superqix_state::sqix_port_map(address_map &map)
 	// following two ranges are made of two 64kx4 4464 DRAM chips at 9L and 9M, "GRAPHICS RAM" or "GRP BIT" if there is an error in POST
 	map(0x0800, 0x77ff).ram().w(FUNC(superqix_state::superqix_bitmapram_w)).share("bitmapram");
 	map(0x8800, 0xf7ff).ram().w(FUNC(superqix_state::superqix_bitmapram2_w)).share("bitmapram2");
-	//AM_RANGE(0xf970, 0xfa6f) AM_RAM // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
+	//map(0xf970, 0xfa6f).ram(); // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
 }
 
 void superqix_state::sqix_8031_map(address_map &map)

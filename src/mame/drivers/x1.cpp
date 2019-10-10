@@ -1355,7 +1355,7 @@ void x1_state::x1_io_banks(address_map &map)
 {
 	x1_io_banks_common(map);
 
-//  AM_RANGE(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
+//  map(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
 
 	map(0x1000, 0x1000).mirror(0x00ff).w(FUNC(x1_state::x1_pal_b_w));
 	map(0x1100, 0x1100).mirror(0x00ff).w(FUNC(x1_state::x1_pal_r_w));
@@ -1401,7 +1401,7 @@ void x1_state::x1turbo_io_banks(address_map &map)
 	map(0x1fc3, 0x1fc3).w(FUNC(x1_state::z_chroma_key_w));                         // Z only!
 	map(0x1fc4, 0x1fc4).w(FUNC(x1_state::z_extra_scroll_w));                       // Z only!
 	map(0x1fc5, 0x1fc5).rw(FUNC(x1_state::x1turbo_gfxpal_r), FUNC(x1_state::x1turbo_gfxpal_w)); // Z only!
-//  AM_RANGE(0x1fd0, 0x1fdf)                   AM_READ(x1_scrn_r)                               // Z only!
+//  map(0x1fd0, 0x1fdf).r(FUNC(x1_state::x1_scrn_r));                               // Z only!
 	map(0x1fd0, 0x1fd0).mirror(0x000f).w(FUNC(x1_state::x1_scrn_w));
 	map(0x1fe0, 0x1fe0).rw(FUNC(x1_state::x1turboz_blackclip_r), FUNC(x1_state::x1turbo_blackclip_w));
 	map(0x1ff0, 0x1ff0).portr("X1TURBO_DSW");
