@@ -454,6 +454,8 @@ void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 left
 	mcfg_sound_r1(config);
 	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
 	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
+
+	config.set_default_layout(layout_gnw_dualh);
 }
 
 void hh_sm510_state::sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
@@ -462,6 +464,8 @@ void hh_sm510_state::sm510_dualv(machine_config &config, u16 topwidth, u16 tophe
 	mcfg_sound_r1(config);
 	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
 	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
+
+	config.set_default_layout(layout_gnw_dualv);
 }
 
 void hh_sm510_state::sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
@@ -470,6 +474,8 @@ void hh_sm510_state::sm511_dualv(machine_config &config, u16 topwidth, u16 tophe
 	mcfg_sound_r1(config);
 	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
 	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
+
+	config.set_default_layout(layout_gnw_dualv);
 }
 
 void hh_sm510_state::sm512_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
@@ -478,6 +484,8 @@ void hh_sm510_state::sm512_dualv(machine_config &config, u16 topwidth, u16 tophe
 	mcfg_sound_r1(config);
 	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
 	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
+
+	config.set_default_layout(layout_gnw_dualv);
 }
 
 
@@ -502,12 +510,10 @@ void hh_sm510_state::sm511_tiger1bit(machine_config &config, u16 width, u16 heig
 
 void hh_sm510_state::sm511_tiger2bit(machine_config &config, u16 width, u16 height)
 {
-	sm511_common(config, width, height);
+	sm511_tiger1bit(config, width, height);
 
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
 
 	// R via 120K resistor, S1 via 39K resistor (eg. tsonic, tsonic2, tbatmana)
 	static const s16 speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff };
@@ -1887,6 +1893,7 @@ INPUT_PORTS_END
 void gnw_mickdon_state::gnw_mickdon(machine_config &config)
 {
 	sm510_dualv(config, 1920/2, 1281/2, 1920/2, 1236/2); // R mask option confirmed
+
 	m_maincpu->write_r().set(FUNC(gnw_mickdon_state::piezo_r2_w));
 }
 
