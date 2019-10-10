@@ -158,7 +158,7 @@ void mmodular_state::van32_mem(address_map &map)
 
 //  map(0x98000008, 0x9800000b).w(FUNC(mmodular_state::write_unknown2));   // Bavaria sensors
 //  map(0x98000004, 0x98000007).r(FUNC(mmodular_state::read_unknown1));    // Bavaria sensors
-//  map(0x98000008, 0x9800000b).r(FUNC(mmodular_state::read_unknown3));    // Bavaria sensors
+//  map(0x9800000c, 0x9800000f).r(FUNC(mmodular_state::read_unknown3));    // Bavaria sensors
 }
 
 void mmodular_state::gen32_mem(address_map &map)
