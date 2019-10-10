@@ -2518,7 +2518,7 @@ void galaxold_state::drivfrcg(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &galaxold_state::drivfrcg_program);
 	maincpu.set_addrmap(AS_IO, &galaxold_state::drivfrcg_io);
 	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
-	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
+	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank)); // ???
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
