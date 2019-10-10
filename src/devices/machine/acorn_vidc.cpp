@@ -558,6 +558,7 @@ void arm_vidc20_device::device_add_mconfig(machine_config &config)
 {
 	acorn_vidc10_device::device_add_mconfig(config);
 	// ...
+	// TODO: for simplicity we may as well add separate DACs for 32-bit mode
 }
 
 void arm_vidc20_device::device_config_complete()
