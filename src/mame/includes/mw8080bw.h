@@ -61,7 +61,6 @@ public:
 	void boothill(machine_config &config);
 	void bowler(machine_config &config);
 	void checkmat(machine_config &config);
-	void clowns(machine_config &config);
 	void dogpatch(machine_config &config);
 	void dplay(machine_config &config);
 	void gmissile(machine_config &config);
@@ -72,7 +71,6 @@ public:
 	void mw8080bw_root(machine_config &config);
 	void phantom2(machine_config &config);
 	void shuffle(machine_config &config);
-	void spacwalk(machine_config &config);
 	void tornbase(machine_config &config);
 	void zzzap(machine_config &config);
 
@@ -85,7 +83,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_score_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_left_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_right_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(clowns_controller_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
@@ -127,7 +124,6 @@ private:
 	uint16_t      m_phantom2_cloud_counter;
 	uint8_t       m_rev_shift_res;
 	uint8_t       m_maze_tone_timing_state;   // output of IC C1, pin 5
-	uint8_t       m_clowns_controller_select;
 
 	// timers
 	emu_timer   *m_interrupt_timer;
@@ -155,7 +151,6 @@ private:
 	DECLARE_MACHINE_START(boothill);
 	DECLARE_MACHINE_START(gmissile);
 	DECLARE_MACHINE_START(m4);
-	DECLARE_MACHINE_START(clowns);
 	DECLARE_MACHINE_START(phantom2);
 	DECLARE_MACHINE_START(invaders);
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -168,8 +163,6 @@ private:
 	DECLARE_WRITE8_MEMBER(boothill_audio_w);
 	DECLARE_WRITE8_MEMBER(checkmat_audio_w);
 	DECLARE_WRITE8_MEMBER(dplay_audio_w);
-	DECLARE_WRITE8_MEMBER(spacwalk_audio_1_w);
-	DECLARE_WRITE8_MEMBER(spacwalk_audio_2_w);
 	DECLARE_WRITE8_MEMBER(shuffle_audio_1_w);
 	DECLARE_WRITE8_MEMBER(shuffle_audio_2_w);
 	DECLARE_WRITE8_MEMBER(dogpatch_audio_w);
@@ -191,7 +184,6 @@ private:
 	void dplay_audio(machine_config &config);
 	void maze_audio(machine_config &config);
 	void shuffle_audio(machine_config &config);
-	void spacwalk_audio(machine_config &config);
 	void tornbase_audio(machine_config &config);
 	void zzzap_audio(machine_config &config);
 
@@ -199,7 +191,6 @@ private:
 	void boothill_io_map(address_map &map);
 	void bowler_io_map(address_map &map);
 	void checkmat_io_map(address_map &map);
-	void clowns_io_map(address_map &map);
 	void dogpatch_io_map(address_map &map);
 	void dplay_io_map(address_map &map);
 	void gmissile_io_map(address_map &map);
@@ -210,7 +201,6 @@ private:
 	void maze_io_map(address_map &map);
 	void phantom2_io_map(address_map &map);
 	void shuffle_io_map(address_map &map);
-	void spacwalk_io_map(address_map &map);
 	void tornbase_io_map(address_map &map);
 	void zzzap_io_map(address_map &map);
 };
@@ -304,6 +294,32 @@ private:
 
 	required_ioport_array<2> m_gun_port;
 	required_ioport_array<2> m_dip_sw_0_1;
+	u8 m_controller_select;
+};
+
+
+class clowns_state : public mw8080bw_state
+{
+public:
+	clowns_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag),
+		m_controllers(*this, "CONTP%u", 1U)
+	{
+	}
+
+	void clowns(machine_config &config);
+	void spacwalk(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(controller_r);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void clowns_io_map(address_map &map);
+	void spacwalk_io_map(address_map &map);
+
+	required_ioport_array<2> m_controllers;
 	u8 m_controller_select;
 };
 

@@ -563,6 +563,7 @@ DEFINE_DEVICE_TYPE(DESERTGU_AUDIO, desertgu_audio_device, "desertgu_audio", "Mid
 DEFINE_DEVICE_TYPE(GMISSILE_AUDIO, gmissile_audio_device, "gmissile_audio", "Midway Guided Missile Audio")
 DEFINE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device,       "m4_audio",       "Midway M-4 Audio")
 DEFINE_DEVICE_TYPE(CLOWNS_AUDIO,   clowns_audio_device,   "clowns_audio",   "Midway Clowns Audio")
+DEFINE_DEVICE_TYPE(SPACWALK_AUDIO, spacwalk_audio_device, "spacwalk_audio", "Midway Space Walk Audio")
 DEFINE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device, "spcenctr_audio", "Midway Space Encounters Audio")
 DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "phantom2_audio", "Midway Phantom 2 Audio")
 DEFINE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device, "invaders_audio", "Taito Space Invaders Audio")
@@ -999,6 +1000,7 @@ void desertgu_audio_device::p2_w(u8 data)
 void desertgu_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
+
 	DISCRETE(config, m_discrete, desertgu_discrete);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.8);
 }
@@ -1450,6 +1452,388 @@ void clowns_audio_device::device_start()
 
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
+}
+
+
+/*************************************
+ *
+ *  Space Walk
+ *
+ *  Discrete sound emulation: Oct 2009, D.R.
+ *
+ *************************************/
+
+// Discrete Sound Input Nodes
+#define SPACWALK_TARGET_HIT_BOTTOM_EN         NODE_01
+#define SPACWALK_TARGET_HIT_MIDDLE_EN         NODE_02
+#define SPACWALK_TARGET_HIT_TOP_EN            NODE_03
+#define SPACWALK_SPRINGBOARD_HIT1_EN          NODE_04
+#define SPACWALK_SPRINGBOARD_HIT2_EN          NODE_05
+#define SPACWALK_SPRINGBOARD_MISS_EN          NODE_06
+#define SPACWALK_SPACE_SHIP_EN                NODE_07
+
+// Discrete Sound Output Nodes
+#define SPACWALK_NOISE                        NODE_10
+#define SPACWALK_TARGET_HIT_SND               NODE_11
+#define SPACWALK_SPRINGBOARD_HIT1_SND         NODE_12
+#define SPACWALK_SPRINGBOARD_HIT2_SND         NODE_13
+#define SPACWALK_SPRINGBOARD_MISS_SND         NODE_14
+#define SPACWALK_SPACE_SHIP_SND               NODE_15
+
+// Adjusters
+#define SPACWALK_R507_POT                     NODE_19
+
+// Parts List - Resistors
+#define SPACWALK_R200       RES_K(820)
+#define SPACWALK_R201       RES_K(150)
+#define SPACWALK_R202       RES_M(1)
+#define SPACWALK_R203       RES_K(82)
+#define SPACWALK_R204       RES_K(240)
+#define SPACWALK_R205       RES_K(220)
+#define SPACWALK_R206       RES_K(120)
+#define SPACWALK_R207       RES_M(1)
+#define SPACWALK_R208       RES_K(300)
+#define SPACWALK_R210       RES_K(56)
+#define SPACWALK_R211       RES_K(100)
+#define SPACWALK_R213       RES_K(300)
+#define SPACWALK_R214       RES_K(27)
+#define SPACWALK_R215       RES_K(51)
+#define SPACWALK_R216       RES_K(30)
+#define SPACWALK_R300       RES_K(270)
+#define SPACWALK_R301       RES_K(300)
+#define SPACWALK_R302       RES_K(330)
+#define SPACWALK_R303       RES_K(680)
+#define SPACWALK_R304       RES_M(1)
+#define SPACWALK_R305       RES_K(3680)
+#define SPACWALK_R307       RES_K(20)
+#define SPACWALK_R308       RES_K(20)       // not labeled but it's beside R307
+#define SPACWALK_R400       RES_K(1)
+#define SPACWALK_R401       RES_K(200)
+#define SPACWALK_R403       RES_K(51)
+#define SPACWALK_R404       RES_K(220)
+#define SPACWALK_R406       RES_M(1)
+#define SPACWALK_R407       RES_K(820)
+#define SPACWALK_R410       RES_K(47)
+#define SPACWALK_R411       RES_K(300)
+#define SPACWALK_R412       RES_K(330)
+#define SPACWALK_R413       RES_M(1)
+#define SPACWALK_R414       RES_M(1)
+#define SPACWALK_R416       RES_M(4.7)
+#define SPACWALK_R417       RES_K(10)
+#define SPACWALK_R418       RES_K(100)
+#define SPACWALK_R419       RES_K(2.7)
+#define SPACWALK_R420       RES_K(20)
+#define SPACWALK_R421       RES_K(11)
+#define SPACWALK_R422       RES_K(75)
+#define SPACWALK_R507       RES_M(1)
+#define SPACWALK_RJ3        RES_K(1)
+
+// Parts List - Capacitors
+#define SPACWALK_C200       CAP_U(0.0022)
+#define SPACWALK_C201       CAP_U(3.3)
+#define SPACWALK_C203       CAP_U(0.0033)
+#define SPACWALK_C204       CAP_U(0.0033)
+#define SPACWALK_C300       CAP_U(2.2)
+#define SPACWALK_C301       CAP_U(2.2)
+#define SPACWALK_C302       CAP_U(2.2)
+#define SPACWALK_C303       CAP_U(0.0047)
+#define SPACWALK_C304       CAP_U(0.0047)   // not labeled but it's beside C303
+#define SPACWALK_C401       CAP_U(1)
+#define SPACWALK_C402       CAP_U(0.68)
+#define SPACWALK_C403       CAP_U(0.0022)
+#define SPACWALK_C451       CAP_U(0.001)
+#define SPACWALK_C452       CAP_U(0.001)
+#define SPACWALK_C453       CAP_U(0.001)
+#define SPACWALK_C602       CAP_U(1)
+
+static discrete_op_amp_tvca_info const spacwalk_hit_tvca_info =
+{
+	SPACWALK_R304, SPACWALK_R303, 0, SPACWALK_R305,                     // r1, r2, r3, r4
+	SPACWALK_RJ3, 0, SPACWALK_R300,                                     // r5, r6, r7
+	SPACWALK_RJ3, SPACWALK_R301,                                        // r8, r9
+	SPACWALK_RJ3, SPACWALK_R302,                                        // r10, r11
+	SPACWALK_C300, SPACWALK_C301, SPACWALK_C302, 0,                     // c1, c2, c3, c4
+	5, 5, 5, 12,                                                        // v1, v2, v3, vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG2
+};
+
+static discrete_op_amp_osc_info const spacwalk_sb_hit_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON,
+	RES_K(330 + 150 + 30), SPACWALK_R203, SPACWALK_R201, SPACWALK_R204, // r1, r2, r3, r4
+	SPACWALK_R202, 0, SPACWALK_R200, 0,                                 // r5, r6, r7, r8
+	SPACWALK_C200, 12                                                   // c, vP
+};
+
+static discrete_op_amp_tvca_info const spacwalk_sb_hit_tvca_info =
+{
+	SPACWALK_R207, SPACWALK_R205, 0, SPACWALK_R208,                     // r1, r2, r3, r4
+	SPACWALK_RJ3, 0, SPACWALK_R206,                                     // r5, r6, r7
+	0, 0, 0, 0                  ,                                       // r8, r9, r10, r11
+	SPACWALK_C201, 0, 0, 0,                                             // c1, c2, c3, c4
+	5, 0, 0, 12,                                                        // v1, v2, v3, vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+static discrete_integrate_info const spacwalk_sb_miss_integrate =
+{
+	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
+	SPACWALK_R406, SPACWALK_R401, 0, SPACWALK_C402,                     // r1, r2, r3, c
+	12, 12,                                                             // v1, vP
+	0, 0, 0                                                             // f0, f1, f2
+};
+
+static discrete_op_amp_osc_info const spacwalk_sb_miss_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
+	SPACWALK_R407, SPACWALK_R412, SPACWALK_R410, SPACWALK_R411, SPACWALK_R413, 0, 0, 0, // r1, r2, r3, r4, r5, r6, r7, r8
+	SPACWALK_C403, 12                                                   // c, vP
+};
+
+static discrete_op_amp_filt_info const spacwalk_sb_miss_filter =
+{
+	// we use r1, not r2 because vref is taken into acount by the CRFILTER
+	SPACWALK_R417, 0, SPACWALK_R414, 0, SPACWALK_R416,                  // r1, r2, r3, r4, rF
+	SPACWALK_C451, SPACWALK_C452, 0,                                    // c1, c2, c3
+	0, 12, 0                                                            // vRef, vP, vN
+};
+
+static discrete_op_amp_info const spacwalk_sb_miss_amp =
+{
+	DISC_OP_AMP_IS_NORTON,
+	SPACWALK_R418, SPACWALK_R404, 0, SPACWALK_R403, /* r1, r2, r3, r4 */
+	0,  /* c */
+	0, 12,  /* vN, vP */
+};
+
+static discrete_op_amp_osc_info const spacwalk_spaceship_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	RES_K(75), RES_M(1), RES_M(6.8), RES_M(2.4), 0, 0, 0, 0,            // r1, r2, r3, r4, r5, r6, r7, r8
+	CAP_U(2.2), 12                                                      // c, vP
+};
+
+static discrete_op_amp_osc_info const spacwalk_spaceship_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
+	RES_K(680), RES_K(300), RES_K(100), RES_K(150), RES_K(120), 0, 0, 0,    // r1, r2, r3, r4, r5, r6, r7, r8
+	CAP_U(0.0012), 12                                                   // c, vP
+};
+
+static discrete_mixer_desc const spacwalk_mixer =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{SPACWALK_R422, SPACWALK_R422, RES_K(39 + 10 + 1), SPACWALK_R421, SPACWALK_R420, SPACWALK_R419},
+	{0, 0, 0, 0, 0, SPACWALK_R507_POT},                                 // r_nodes
+	{0}, 0, 0, 0, SPACWALK_C602, 0, 1                                   // c, rI, rF, cF, cAmp, vRef, gain
+};
+
+
+/************************************************
+ * Springboard Hit Circuit   1 or 2
+ ************************************************/
+#define SPACWALK_SPRINGBOARD_HIT_CIRCUIT(_num)                                                          \
+		DISCRETE_RCFILTER(NODE_RELATIVE(NODE_29, _num),                                                 \
+				SPACWALK_NOISE,                                                 /* IN0 */               \
+				RES_K(330), CAP_U(.1))                                                                  \
+		DISCRETE_RCFILTER(NODE_RELATIVE(NODE_31, _num),                                                 \
+				NODE_RELATIVE(NODE_29, _num),                                   /* IN0 */               \
+				RES_K(330) + RES_K(150), CAP_U(.1))                                                     \
+		DISCRETE_OP_AMP_VCO1(NODE_RELATIVE(NODE_33, _num),                      /* IC M2-3, pin 5 */    \
+				1,                                                              /* ENAB */              \
+				NODE_RELATIVE(NODE_31, _num),                                   /* VMOD1 */             \
+				&spacwalk_sb_hit_vco)                                                                   \
+		DISCRETE_OP_AMP_TRIG_VCA(NODE_RELATIVE(NODE_35, _num),                  /* IC M2-3, pin 9 */    \
+				NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_EN, _num - 1), 0, 0,    /* TRG0, TRG1, TRG2 */  \
+				NODE_RELATIVE(NODE_33, _num), 0,                                /* IN0, IN1 */          \
+				&spacwalk_sb_hit_tvca_info)                                                             \
+		/* Wrong values.  Untested */                                                                   \
+		/* The rest of the circuit is a filter. */                                                      \
+		DISCRETE_FILTER2(NODE_RELATIVE(NODE_37, _num),                                                  \
+				1,                                                              /* ENAB */              \
+				NODE_RELATIVE(NODE_35, _num),                                   /* INP0 */              \
+				2000.0 - _num * 500, 1.0/.8,                                    /* FREQ, DAMP */        \
+				DISC_FILTER_LOWPASS)                                                                    \
+		/* The filter has a gain of 0.5 */                                                              \
+		DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),                           \
+				NODE_RELATIVE(NODE_37, _num), 0.5)
+
+static DISCRETE_SOUND_START(spacwalk_discrete)
+
+	/************************************************
+	 * Input register mapping
+	 ************************************************/
+	DISCRETE_INPUT_LOGIC(SPACWALK_TARGET_HIT_BOTTOM_EN)
+	DISCRETE_INPUT_LOGIC(SPACWALK_TARGET_HIT_MIDDLE_EN)
+	DISCRETE_INPUT_LOGIC(SPACWALK_TARGET_HIT_TOP_EN)
+	DISCRETE_INPUT_LOGIC(SPACWALK_SPRINGBOARD_HIT1_EN)
+	DISCRETE_INPUT_LOGIC(SPACWALK_SPRINGBOARD_HIT2_EN)
+	DISCRETE_INPUT_LOGIC(SPACWALK_SPRINGBOARD_MISS_EN)
+	DISCRETE_INPUT_LOGIC(SPACWALK_SPACE_SHIP_EN)
+
+	// The low value of the pot is set to 7000.  A real 1M pot will never go to 0 anyways.
+	// This will give the control more apparent volume range.
+	// The music way overpowers the rest of the sounds anyways.
+	DISCRETE_ADJUSTMENT(SPACWALK_R507_POT, SPACWALK_R507, 7000, DISC_LOGADJ, "R507")
+
+	/************************************************
+	 * Tone generator
+	 ************************************************/
+	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
+
+	/************************************************
+	 * Target hit sounds
+	 * The LFSR is the same as boothill
+	 ************************************************/
+	// Noise clock was breadboarded and measured at 7700Hz
+	DISCRETE_LFSR_NOISE(SPACWALK_NOISE,             // IC L4, pin 10
+			1, 1,                                   // ENAB, RESET
+			7700, 12.0, 0, 12.0/2, &midway_lfsr)    // CLK,AMPL,FEED,BIAS,LFSRTB
+
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_20,               // IC K3, pin 9
+			SPACWALK_TARGET_HIT_TOP_EN, SPACWALK_TARGET_HIT_MIDDLE_EN, SPACWALK_TARGET_HIT_BOTTOM_EN,
+			SPACWALK_NOISE, 0,                      // IN0, IN1
+			&spacwalk_hit_tvca_info)
+	DISCRETE_RCFILTER(NODE_21,
+			NODE_20,                                // IN0
+			SPACWALK_R307, SPACWALK_C303)
+	DISCRETE_RCFILTER(SPACWALK_TARGET_HIT_SND,
+			NODE_21,                                // IN0
+			SPACWALK_R307 + SPACWALK_R308, SPACWALK_C304)
+
+	/************************************************
+	 * Springboard hit sounds
+	 ************************************************/
+	/* Nodes 30 - 40 */
+	SPACWALK_SPRINGBOARD_HIT_CIRCUIT(1)
+	SPACWALK_SPRINGBOARD_HIT_CIRCUIT(2)
+
+	/************************************************
+	 * Springboard miss sound
+	 ************************************************/
+	DISCRETE_RCDISC2(NODE_50,                       // voltage on C401
+			SPACWALK_SPRINGBOARD_MISS_EN,           // SWITCH
+			OP_AMP_NORTON_VBE, RES_2_PARALLEL(SPACWALK_R401, SPACWALK_R407),    // INP0,RVAL0
+			12.0 - .5, SPACWALK_R400,               // INP1,RVAL1
+			SPACWALK_C401)
+	DISCRETE_INTEGRATE(NODE_51,                     // IC K4, pin 9
+			NODE_50, 0,                             // TRG0,TRG1
+			&spacwalk_sb_miss_integrate)
+	DISCRETE_OP_AMP_VCO1(NODE_52,                   // IC K4, pin 5
+			1,                                      // ENAB
+			NODE_50,                                // VMOD1
+			&spacwalk_sb_miss_vco)
+	DISCRETE_CRFILTER(NODE_53,
+			NODE_52,                                // IN0
+			SPACWALK_R417, SPACWALK_C453)
+	// this filter type probably does not work right. I need to test it.
+	DISCRETE_OP_AMP_FILTER(NODE_54,                 // IC K3, pin 5
+			1,                                      // ENAB
+			NODE_53, 0,                             // INP0,INP1
+			DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON, &spacwalk_sb_miss_filter)
+	DISCRETE_OP_AMP(SPACWALK_SPRINGBOARD_MISS_SND,  // IC K4, pin 10
+			1,                                      // ENAB
+			NODE_54, NODE_51,                       // IN0,IN1
+			&spacwalk_sb_miss_amp)
+
+	/************************************************
+	 * Space ship sound
+	 ************************************************/
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_60,             // voltage on 2.2uF cap near IC JK-2
+			1,                                      // ENAB
+			&spacwalk_spaceship_osc)
+	DISCRETE_OP_AMP_VCO1(NODE_61,                   // IC JK-2, pin 5
+			SPACWALK_SPACE_SHIP_EN,                 // ENAB
+			NODE_60,                                // VMOD1
+			&spacwalk_spaceship_vco)
+	DISCRETE_RCFILTER(NODE_62,
+			NODE_61,                                // IN0
+			RES_K(1), CAP_U(0.15))
+	DISCRETE_RCFILTER(SPACWALK_SPACE_SHIP_SND,
+			NODE_62,                                // IN0
+			RES_K(1) + RES_K(10), CAP_U(0.015))
+
+	/************************************************
+	 * Combine all sound sources.
+	 ************************************************/
+	DISCRETE_MIXER6(NODE_90,
+			1,                                      // ENAB
+			SPACWALK_SPRINGBOARD_HIT1_SND,
+			SPACWALK_SPRINGBOARD_HIT2_SND,
+			SPACWALK_SPACE_SHIP_SND,
+			SPACWALK_SPRINGBOARD_MISS_SND,
+			SPACWALK_TARGET_HIT_SND,
+			MIDWAY_TONE_SND,
+			&spacwalk_mixer)
+	DISCRETE_OUTPUT(NODE_90, 11000)
+DISCRETE_SOUND_END
+
+static INPUT_PORTS_START(spacwalk_audio)
+	PORT_START("R507")
+	PORT_ADJUSTER( 40, "R507 - Music Volume" )
+INPUT_PORTS_END
+
+spacwalk_audio_device::spacwalk_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	midway_tone_generator_device_base(mconfig, SPACWALK_AUDIO, tag, owner, clock),
+	m_ctrl_sel_out(*this),
+	m_p1(0U)
+{
+}
+
+void spacwalk_audio_device::p1_w(u8 data)
+{
+	u8 const changed(data ^ m_p1);
+	m_p1 = data;
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
+	if (BIT(changed, 1)) m_ctrl_sel_out(BIT(data, 1));
+
+	machine().sound().system_enable(BIT(data, 2));
+
+	m_discrete->write(SPACWALK_SPACE_SHIP_EN, (data >> 3) & 0x01);
+}
+
+void spacwalk_audio_device::p2_w(u8 data)
+{
+	m_discrete->write(SPACWALK_TARGET_HIT_BOTTOM_EN, (data >> 0) & 0x01);
+	m_discrete->write(SPACWALK_TARGET_HIT_MIDDLE_EN, (data >> 1) & 0x01);
+	m_discrete->write(SPACWALK_TARGET_HIT_TOP_EN, (data >> 2) & 0x01);
+	m_discrete->write(SPACWALK_SPRINGBOARD_HIT1_EN, (data >> 3) & 0x01);
+	m_discrete->write(SPACWALK_SPRINGBOARD_HIT2_EN, (data >> 4) & 0x01);
+	m_discrete->write(SPACWALK_SPRINGBOARD_MISS_EN, (data >> 5) & 0x01);
+}
+
+void spacwalk_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	DISCRETE(config, m_discrete, spacwalk_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+ioport_constructor spacwalk_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(spacwalk_audio);
+}
+
+void spacwalk_audio_device::device_start()
+{
+	m_ctrl_sel_out.resolve();
+
+	m_p1 = 0U;
+
+	save_item(NAME(m_p1));
 }
 
 
@@ -3500,366 +3884,6 @@ WRITE8_MEMBER(mw8080bw_state::dplay_audio_w)
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
-}
-
-
-
-/*************************************
- *
- *  Space Walk
- *
- *  Discrete sound emulation: Oct 2009, D.R.
- *
- *************************************/
-
-	/* Discrete Sound Input Nodes */
-#define SPACWALK_TARGET_HIT_BOTTOM_EN         NODE_01
-#define SPACWALK_TARGET_HIT_MIDDLE_EN         NODE_02
-#define SPACWALK_TARGET_HIT_TOP_EN            NODE_03
-#define SPACWALK_SPRINGBOARD_HIT1_EN          NODE_04
-#define SPACWALK_SPRINGBOARD_HIT2_EN          NODE_05
-#define SPACWALK_SPRINGBOARD_MISS_EN          NODE_06
-#define SPACWALK_SPACE_SHIP_EN                NODE_07
-
-/* Discrete Sound Output Nodes */
-#define SPACWALK_NOISE                        NODE_10
-#define SPACWALK_TARGET_HIT_SND               NODE_11
-#define SPACWALK_SPRINGBOARD_HIT1_SND         NODE_12
-#define SPACWALK_SPRINGBOARD_HIT2_SND         NODE_13
-#define SPACWALK_SPRINGBOARD_MISS_SND         NODE_14
-#define SPACWALK_SPACE_SHIP_SND               NODE_15
-
-/* Adjusters */
-#define SPACWALK_R507_POT                     NODE_19
-
-/* Parts List - Resistors */
-#define SPACWALK_R200       RES_K(820)
-#define SPACWALK_R201       RES_K(150)
-#define SPACWALK_R202       RES_M(1)
-#define SPACWALK_R203       RES_K(82)
-#define SPACWALK_R204       RES_K(240)
-#define SPACWALK_R205       RES_K(220)
-#define SPACWALK_R206       RES_K(120)
-#define SPACWALK_R207       RES_M(1)
-#define SPACWALK_R208       RES_K(300)
-#define SPACWALK_R210       RES_K(56)
-#define SPACWALK_R211       RES_K(100)
-#define SPACWALK_R213       RES_K(300)
-#define SPACWALK_R214       RES_K(27)
-#define SPACWALK_R215       RES_K(51)
-#define SPACWALK_R216       RES_K(30)
-#define SPACWALK_R300       RES_K(270)
-#define SPACWALK_R301       RES_K(300)
-#define SPACWALK_R302       RES_K(330)
-#define SPACWALK_R303       RES_K(680)
-#define SPACWALK_R304       RES_M(1)
-#define SPACWALK_R305       RES_K(3680)
-#define SPACWALK_R307       RES_K(20)
-#define SPACWALK_R308       RES_K(20)   /* not labeled but it's beside R307 */
-#define SPACWALK_R400       RES_K(1)
-#define SPACWALK_R401       RES_K(200)
-#define SPACWALK_R403       RES_K(51)
-#define SPACWALK_R404       RES_K(220)
-#define SPACWALK_R406       RES_M(1)
-#define SPACWALK_R407       RES_K(820)
-#define SPACWALK_R410       RES_K(47)
-#define SPACWALK_R411       RES_K(300)
-#define SPACWALK_R412       RES_K(330)
-#define SPACWALK_R413       RES_M(1)
-#define SPACWALK_R414       RES_M(1)
-#define SPACWALK_R416       RES_M(4.7)
-#define SPACWALK_R417       RES_K(10)
-#define SPACWALK_R418       RES_K(100)
-#define SPACWALK_R419       RES_K(2.7)
-#define SPACWALK_R420       RES_K(20)
-#define SPACWALK_R421       RES_K(11)
-#define SPACWALK_R422       RES_K(75)
-#define SPACWALK_R507       RES_M(1)
-#define SPACWALK_RJ3        RES_K(1)
-
-/* Parts List - Capacitors */
-#define SPACWALK_C200       CAP_U(0.0022)
-#define SPACWALK_C201       CAP_U(3.3)
-#define SPACWALK_C203       CAP_U(0.0033)
-#define SPACWALK_C204       CAP_U(0.0033)
-#define SPACWALK_C300       CAP_U(2.2)
-#define SPACWALK_C301       CAP_U(2.2)
-#define SPACWALK_C302       CAP_U(2.2)
-#define SPACWALK_C303       CAP_U(0.0047)
-#define SPACWALK_C304       CAP_U(0.0047)   /* not labeled but it's beside C303 */
-#define SPACWALK_C401       CAP_U(1)
-#define SPACWALK_C402       CAP_U(0.68)
-#define SPACWALK_C403       CAP_U(0.0022)
-#define SPACWALK_C451       CAP_U(0.001)
-#define SPACWALK_C452       CAP_U(0.001)
-#define SPACWALK_C453       CAP_U(0.001)
-#define SPACWALK_C602       CAP_U(1)
-
-
-static const discrete_op_amp_tvca_info spacwalk_hit_tvca_info =
-{
-	SPACWALK_R304,  SPACWALK_R303, 0, SPACWALK_R305,    /* r1, r2, r3, r4 */
-	SPACWALK_RJ3, 0, SPACWALK_R300,                     /* r5, r6, r7 */
-	SPACWALK_RJ3, SPACWALK_R301,                        /* r8, r9 */
-	SPACWALK_RJ3, SPACWALK_R302,                        /* r10, r11 */
-	SPACWALK_C300, SPACWALK_C301, SPACWALK_C302, 0,     /* c1, c2, c3, c4 */
-	5, 5, 5, 12,                                        /* v1, v2, v3, vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG2
-};
-
-static const discrete_op_amp_osc_info spacwalk_sb_hit_vco =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON,
-	RES_K(330 + 150 + 30), SPACWALK_R203, SPACWALK_R201, SPACWALK_R204, /* r1, r2, r3, r4 */
-	SPACWALK_R202, 0, SPACWALK_R200, 0,                                 /* r5, r6, r7, r8*/
-	SPACWALK_C200, 12                                                    /* c, vP*/
-};
-
-static const discrete_op_amp_tvca_info spacwalk_sb_hit_tvca_info =
-{
-	SPACWALK_R207,  SPACWALK_R205, 0, SPACWALK_R208,    /* r1, r2, r3, r4 */
-	SPACWALK_RJ3, 0, SPACWALK_R206,                     /* r5, r6, r7 */
-	0, 0, 0, 0                  ,                       /* r8, r9, r10, r11 */
-	SPACWALK_C201, 0, 0, 0,                             /* c1, c2, c3, c4 */
-	5, 0, 0, 12,                                        /* v1, v2, v3, vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-static const discrete_integrate_info spacwalk_sb_miss_integrate =
-{
-	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
-	SPACWALK_R406, SPACWALK_R401, 0, SPACWALK_C402, /* r1, r2, r3, c */
-	12, 12, /* v1, vP */
-	0, 0, 0 /* f0, f1, f2 */
-};
-
-static const discrete_op_amp_osc_info spacwalk_sb_miss_vco =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
-	SPACWALK_R407, SPACWALK_R412, SPACWALK_R410, SPACWALK_R411, SPACWALK_R413, 0, 0, 0, /* r1, r2, r3, r4, r5, r6, r7, r8 */
-	SPACWALK_C403, 12                                               /* c, vP */
-};
-
-static const discrete_op_amp_filt_info spacwalk_sb_miss_filter =
-{
-	/* we use r1, not r2 because vref is taken into acount by the CRFILTER */
-	SPACWALK_R417, 0, SPACWALK_R414, 0, SPACWALK_R416,  /* r1, r2, r3, r4, rF */
-	SPACWALK_C451, SPACWALK_C452, 0,                    /* c1, c2, c3 */
-	0, 12, 0                                            /* vRef, vP, vN */
-};
-
-static const discrete_op_amp_info spacwalk_sb_miss_amp =
-{
-	DISC_OP_AMP_IS_NORTON,
-	SPACWALK_R418, SPACWALK_R404, 0, SPACWALK_R403, /* r1, r2, r3, r4 */
-	0,  /* c */
-	0, 12,  /* vN, vP */
-};
-
-static const discrete_op_amp_osc_info spacwalk_spaceship_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
-	RES_K(75), RES_M(1), RES_M(6.8), RES_M(2.4), 0, 0, 0, 0,    /* r1, r2, r3, r4, r5, r6, r7, r8 */
-	CAP_U(2.2), 12                                              /* c, vP */
-};
-
-static const discrete_op_amp_osc_info spacwalk_spaceship_vco =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
-	RES_K(680), RES_K(300), RES_K(100), RES_K(150), RES_K(120), 0, 0, 0,    /* r1, r2, r3, r4, r5, r6, r7, r8 */
-	CAP_U(0.0012), 12                                                       /* c, vP */
-};
-
-static const discrete_mixer_desc spacwalk_mixer =
-{
-	DISC_MIXER_IS_RESISTOR,
-	{SPACWALK_R422, SPACWALK_R422, RES_K(39 + 10 + 1), SPACWALK_R421, SPACWALK_R420, SPACWALK_R419},
-	{0, 0, 0, 0, 0, SPACWALK_R507_POT},     /* r_nodes */
-	{0}, 0, 0, 0, SPACWALK_C602, 0, 1       /* c, rI, rF, cF, cAmp, vRef, gain */
-};
-
-
-/************************************************
- * Springboard Hit Circuit   1 or 2
- ************************************************/
-#define SPACWALK_SPRINGBOARD_HIT_CIRCUIT(_num)                                              \
-DISCRETE_RCFILTER(NODE_RELATIVE(NODE_29, _num),                                             \
-	SPACWALK_NOISE,                                 /* IN0 */                               \
-	RES_K(330), CAP_U(.1))                                                                  \
-DISCRETE_RCFILTER(NODE_RELATIVE(NODE_31, _num),                                             \
-	NODE_RELATIVE(NODE_29, _num),                   /* IN0 */                               \
-	RES_K(330) + RES_K(150), CAP_U(.1))                                                     \
-DISCRETE_OP_AMP_VCO1(NODE_RELATIVE(NODE_33, _num),  /* IC M2-3, pin 5 */                    \
-	1,                                              /* ENAB */                              \
-	NODE_RELATIVE(NODE_31, _num),                   /* VMOD1 */                             \
-	&spacwalk_sb_hit_vco)                                                                   \
-DISCRETE_OP_AMP_TRIG_VCA(NODE_RELATIVE(NODE_35, _num),              /* IC M2-3, pin 9 */    \
-	NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_EN, _num - 1), 0, 0,    /* TRG0, TRG1, TRG2 */  \
-	NODE_RELATIVE(NODE_33, _num), 0,                                /* IN0, IN1 */          \
-	&spacwalk_sb_hit_tvca_info)                                                             \
-/* Wrong values.  Untested */                                                               \
-/* The rest of the circuit is a filter. */                                                  \
-DISCRETE_FILTER2(NODE_RELATIVE(NODE_37, _num),                                              \
-	1,                                              /* ENAB */                              \
-	NODE_RELATIVE(NODE_35, _num),                   /* INP0 */                              \
-	2000.0 - _num * 500, 1.0/.8,                    /* FREQ, DAMP */                        \
-	DISC_FILTER_LOWPASS)                                                                    \
-/* The filter has a gain of 0.5 */                                                          \
-DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),                       \
-	NODE_RELATIVE(NODE_37, _num), 0.5)
-
-	static DISCRETE_SOUND_START(spacwalk_discrete)
-
-	/************************************************
-	 * Input register mapping
-	 ************************************************/
-	DISCRETE_INPUT_LOGIC(SPACWALK_TARGET_HIT_BOTTOM_EN)
-	DISCRETE_INPUT_LOGIC(SPACWALK_TARGET_HIT_MIDDLE_EN)
-	DISCRETE_INPUT_LOGIC(SPACWALK_TARGET_HIT_TOP_EN)
-	DISCRETE_INPUT_LOGIC(SPACWALK_SPRINGBOARD_HIT1_EN)
-	DISCRETE_INPUT_LOGIC(SPACWALK_SPRINGBOARD_HIT2_EN)
-	DISCRETE_INPUT_LOGIC(SPACWALK_SPRINGBOARD_MISS_EN)
-	DISCRETE_INPUT_LOGIC(SPACWALK_SPACE_SHIP_EN)
-
-	/* The low value of the pot is set to 7000.  A real 1M pot will never go to 0 anyways. */
-	/* This will give the control more apparent volume range. */
-	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT(SPACWALK_R507_POT, SPACWALK_R507, 7000, DISC_LOGADJ, "R507")
-
-	/************************************************
-	 * Tone generator
-	 ************************************************/
-	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
-
-	/************************************************
-	 * Target hit sounds
-	 * The LFSR is the same as boothill
-	 ************************************************/
-	/* Noise clock was breadboarded and measured at 7700Hz */
-	DISCRETE_LFSR_NOISE(SPACWALK_NOISE,         /* IC L4, pin 10 */
-		1, 1,                                   /* ENAB, RESET */
-		7700, 12.0, 0, 12.0/2, &midway_lfsr)    /* CLK,AMPL,FEED,BIAS,LFSRTB */
-
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_20,           /* IC K3, pin 9 */
-		SPACWALK_TARGET_HIT_TOP_EN, SPACWALK_TARGET_HIT_MIDDLE_EN, SPACWALK_TARGET_HIT_BOTTOM_EN,
-		SPACWALK_NOISE, 0,                      /* IN0, IN1 */
-		&spacwalk_hit_tvca_info)
-	DISCRETE_RCFILTER(NODE_21,
-		NODE_20,                                /* IN0 */
-		SPACWALK_R307, SPACWALK_C303)
-	DISCRETE_RCFILTER(SPACWALK_TARGET_HIT_SND,
-		NODE_21,                                /* IN0 */
-		SPACWALK_R307 + SPACWALK_R308, SPACWALK_C304)
-
-	/************************************************
-	 * Springboard hit sounds
-	 ************************************************/
-	/* Nodes 30 - 40 */
-	SPACWALK_SPRINGBOARD_HIT_CIRCUIT(1)
-	SPACWALK_SPRINGBOARD_HIT_CIRCUIT(2)
-
-	/************************************************
-	 * Springboard miss sound
-	 ************************************************/
-	DISCRETE_RCDISC2(NODE_50,                   /* voltage on C401 */
-		SPACWALK_SPRINGBOARD_MISS_EN,           /* SWITCH */
-		OP_AMP_NORTON_VBE, RES_2_PARALLEL(SPACWALK_R401, SPACWALK_R407),    /* INP0,RVAL0 */
-		12.0 - .5, SPACWALK_R400,               /* INP1,RVAL1 */
-		SPACWALK_C401)
-	DISCRETE_INTEGRATE(NODE_51,                 /* IC K4, pin 9 */
-		NODE_50, 0,                             /* TRG0,TRG1*/
-		&spacwalk_sb_miss_integrate)
-	DISCRETE_OP_AMP_VCO1(NODE_52,               /* IC K4, pin 5 */
-		1,                                      /* ENAB */
-		NODE_50,                                /* VMOD1 */
-		&spacwalk_sb_miss_vco)
-	DISCRETE_CRFILTER(NODE_53,
-		NODE_52,                                /* IN0 */
-		SPACWALK_R417, SPACWALK_C453)
-	/* this filter type probably does not work right. I need to test it. */
-	DISCRETE_OP_AMP_FILTER(NODE_54,             /* IC K3, pin 5 */
-		1,                                      /* ENAB */
-		NODE_53, 0,                             /* INP0,INP1 */
-		DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON, &spacwalk_sb_miss_filter)
-	DISCRETE_OP_AMP(SPACWALK_SPRINGBOARD_MISS_SND,  /* IC K4, pin 10 */
-		1,                                      /* ENAB */
-		NODE_54, NODE_51,                       /* IN0,IN1 */
-		&spacwalk_sb_miss_amp)
-
-	/************************************************
-	 * Space ship sound
-	 ************************************************/
-	DISCRETE_OP_AMP_OSCILLATOR(NODE_60,         /* voltage on 2.2uF cap near IC JK-2 */
-		1,                                      /* ENAB */
-		&spacwalk_spaceship_osc)
-	DISCRETE_OP_AMP_VCO1(NODE_61,               /* IC JK-2, pin 5 */
-		SPACWALK_SPACE_SHIP_EN,                 /* ENAB */
-		NODE_60,                                /* VMOD1*/
-		&spacwalk_spaceship_vco)
-	DISCRETE_RCFILTER(NODE_62,
-		NODE_61,                                /* IN0 */
-		RES_K(1), CAP_U(0.15))
-	DISCRETE_RCFILTER(SPACWALK_SPACE_SHIP_SND,
-		NODE_62,                                /* IN0 */
-		RES_K(1) + RES_K(10), CAP_U(0.015))
-
-	/************************************************
-	 * Combine all sound sources.
-	 ************************************************/
-	DISCRETE_MIXER6(NODE_90,
-		1,                                      /* ENAB */
-		SPACWALK_SPRINGBOARD_HIT1_SND,
-		SPACWALK_SPRINGBOARD_HIT2_SND,
-		SPACWALK_SPACE_SHIP_SND,
-		SPACWALK_SPRINGBOARD_MISS_SND,
-		SPACWALK_TARGET_HIT_SND,
-		MIDWAY_TONE_SND,
-		&spacwalk_mixer)
-	DISCRETE_OUTPUT(NODE_90, 11000)
-DISCRETE_SOUND_END
-
-void mw8080bw_state::spacwalk_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-
-	DISCRETE(config, m_discrete, spacwalk_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
-WRITE8_MEMBER(mw8080bw_state::spacwalk_audio_1_w)
-{
-	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 0x01);
-
-	m_clowns_controller_select = (data >> 1) & 0x01;
-
-	machine().sound().system_enable((data >> 2) & 0x01);
-
-	m_discrete->write(SPACWALK_SPACE_SHIP_EN, (data >> 3) & 0x01);
-}
-
-WRITE8_MEMBER(mw8080bw_state::spacwalk_audio_2_w)
-{
-	m_discrete->write(SPACWALK_TARGET_HIT_BOTTOM_EN, (data >> 0) & 0x01);
-
-	m_discrete->write(SPACWALK_TARGET_HIT_MIDDLE_EN, (data >> 1) & 0x01);
-
-	m_discrete->write(SPACWALK_TARGET_HIT_TOP_EN, (data >> 2) & 0x01);
-
-	m_discrete->write(SPACWALK_SPRINGBOARD_HIT1_EN, (data >> 3) & 0x01);
-
-	m_discrete->write(SPACWALK_SPRINGBOARD_HIT2_EN, (data >> 4) & 0x01);
-
-	m_discrete->write(SPACWALK_SPRINGBOARD_MISS_EN, (data >> 5) & 0x01);
 }
 
 

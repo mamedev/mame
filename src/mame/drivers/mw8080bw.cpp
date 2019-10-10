@@ -1685,29 +1685,23 @@ void mw8080bw_state::m4(machine_config &config)
 #define CLOWNS_CONTROLLER_P2_TAG        ("CONTP2")
 
 
-MACHINE_START_MEMBER(mw8080bw_state,clowns)
+void clowns_state::machine_start()
 {
 	mw8080bw_state::machine_start();
 
-	/* setup for save states */
-	save_item(NAME(m_clowns_controller_select));
+	m_controller_select = 0U;
+
+	save_item(NAME(m_controller_select));
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::clowns_controller_r)
+CUSTOM_INPUT_MEMBER(clowns_state::controller_r)
 {
-	uint32_t ret;
-
-	if (m_clowns_controller_select)
-		ret = ioport(CLOWNS_CONTROLLER_P2_TAG)->read();
-	else
-		ret = ioport(CLOWNS_CONTROLLER_P1_TAG)->read();
-
-	return ret;
+	return m_controllers[m_controller_select]->read();
 }
 
 
-void mw8080bw_state::clowns_io_map(address_map &map)
+void clowns_state::clowns_io_map(address_map &map)
 {
 	map.global_mask(0x7);
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
@@ -1727,17 +1721,17 @@ void mw8080bw_state::clowns_io_map(address_map &map)
 
 static INPUT_PORTS_START( clowns )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, clowns_controller_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clowns_state, controller_r)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  // not connected
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_CONDITION("IN2", 0x80, EQUALS, 0x00) PORT_DIPLOCATION("SW:1,2")
@@ -1759,10 +1753,10 @@ static INPUT_PORTS_START( clowns )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) ) PORT_CONDITION("IN2", 0x80, EQUALS, 0x00) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
-	/* test mode - press coin button for input test */
+	// test mode - press coin button for input test
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW:8" )
 
-	/* fake ports for two analog controls multiplexed */
+	// fake ports for two analog controls multiplexed
 	PORT_START(CLOWNS_CONTROLLER_P1_TAG)
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(1)
 
@@ -1773,7 +1767,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( clowns1 )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, clowns_controller_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clowns_state, controller_r)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1815,22 +1809,20 @@ static INPUT_PORTS_START( clowns1 )
 INPUT_PORTS_END
 
 
-void mw8080bw_state::clowns(machine_config &config)
+void clowns_state::clowns(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::clowns_io_map);
-
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,clowns)
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &clowns_state::clowns_io_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
-	/* add shifter */
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* audio hardware */
-	CLOWNS_AUDIO(config, "soundboard").ctrl_sel_out().set([this] (int state) { m_clowns_controller_select = state ? 1 : 0; });
+	// audio hardware
+	CLOWNS_AUDIO(config, "soundboard").ctrl_sel_out().set([this] (int state) { m_controller_select = state ? 1U : 0U; });
 }
 
 
@@ -1841,7 +1833,7 @@ void mw8080bw_state::clowns(machine_config &config)
  *
  *************************************/
 
-void mw8080bw_state::spacwalk_io_map(address_map &map)
+void clowns_state::spacwalk_io_map(address_map &map)
 {
 	map.global_mask(0x7);
 
@@ -1852,16 +1844,16 @@ void mw8080bw_state::spacwalk_io_map(address_map &map)
 
 	map(0x01, 0x01).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).w(FUNC(mw8080bw_state::spacwalk_audio_1_w));
+	map(0x03, 0x03).w("soundboard", FUNC(spacwalk_audio_device::p1_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x05, 0x05).w(FUNC(mw8080bw_state::midway_tone_generator_lo_w));
-	map(0x06, 0x06).w(FUNC(mw8080bw_state::midway_tone_generator_hi_w));
-	map(0x07, 0x07).w(FUNC(mw8080bw_state::spacwalk_audio_2_w));
+	map(0x05, 0x05).w("soundboard", FUNC(spacwalk_audio_device::tone_generator_lo_w));
+	map(0x06, 0x06).w("soundboard", FUNC(spacwalk_audio_device::tone_generator_hi_w));
+	map(0x07, 0x07).w("soundboard", FUNC(spacwalk_audio_device::p2_w));
 }
 
 static INPUT_PORTS_START( spacwalk )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, clowns_controller_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(clowns_state, controller_r)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1873,7 +1865,7 @@ static INPUT_PORTS_START( spacwalk )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/* 8 pin DIP Switch on location C2 on PCB A084-90700-D640 */
+	// 8 pin DIP Switch on location C2 on PCB A084-90700-D640
 	/* PCB picture also shows a 2nd DIP Switch on location B2, supposedly for language selection,
 	but ROM contents suggests it's not connected (no different languages or unmapped reads) */
 	PORT_START("IN2")
@@ -1901,33 +1893,28 @@ static INPUT_PORTS_START( spacwalk )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "C2:8" ) // RAM-ROM Test
 
-	/* fake ports for two analog controls multiplexed */
+	// fake ports for two analog controls multiplexed
 	PORT_START(CLOWNS_CONTROLLER_P1_TAG)
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(1)
 
 	PORT_START(CLOWNS_CONTROLLER_P2_TAG)
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
-
-	PORT_START("R507")
-	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
-void mw8080bw_state::spacwalk(machine_config &config)
+void clowns_state::spacwalk(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &mw8080bw_state::spacwalk_io_map);
-
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,clowns)
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &clowns_state::spacwalk_io_map);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(255 * attotime::from_hz(MW8080BW_60HZ));
 
-	/* add shifter */
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* audio hardware */
-	spacwalk_audio(config);
+	// audio hardware
+	SPACWALK_AUDIO(config, "soundboard").ctrl_sel_out().set([this] (int state) { m_controller_select = state ? 1U : 0U; });
 }
 
 
@@ -3149,9 +3136,9 @@ ROM_END
 /* 622 */ GAMEL( 1977, lagunar,    0,        zzzap,    lagunar,  mw8080bw_state, empty_init, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
 /* 623 */ GAME(  1977, gmissile,   0,        gmissile, gmissile, mw8080bw_state, empty_init, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 626 */ GAME(  1977, m4,         0,        m4,       m4,       mw8080bw_state, empty_init, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 630 */ GAMEL( 1978, clowns,     0,        clowns,   clowns,   mw8080bw_state, empty_init, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 630 */ GAMEL( 1978, clowns1,    clowns,   clowns,   clowns1,  mw8080bw_state, empty_init, ROT0,   "Midway", "Clowns (rev. 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 640 */ GAMEL( 1978, spacwalk,   0,        spacwalk, spacwalk, mw8080bw_state, empty_init, ROT0,   "Midway", "Space Walk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
+/* 630 */ GAMEL( 1978, clowns,     0,        clowns,   clowns,   clowns_state,   empty_init, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 630 */ GAMEL( 1978, clowns1,    clowns,   clowns,   clowns1,  clowns_state,   empty_init, ROT0,   "Midway", "Clowns (rev. 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 640 */ GAMEL( 1978, spacwalk,   0,        spacwalk, spacwalk, clowns_state,   empty_init, ROT0,   "Midway", "Space Walk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
 /* 642 */ GAME(  1978, einning,    0,        dplay,    einning,  mw8080bw_state, empty_init, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", MACHINE_SUPPORTS_SAVE )
 /* 643 */ GAME(  1978, shuffle,    0,        shuffle,  shuffle,  mw8080bw_state, empty_init, ROT90,  "Midway", "Shuffleboard", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 644 */ GAME(  1977, dogpatch,   0,        dogpatch, dogpatch, mw8080bw_state, empty_init, ROT0,   "Midway", "Dog Patch", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
