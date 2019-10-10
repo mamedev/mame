@@ -16,6 +16,19 @@
 #include "sound/sn76477.h"
 
 
+class midway_tone_generator_device_base : public device_t
+{
+public:
+	void tone_generator_lo_w(u8 data);
+	void tone_generator_hi_w(u8 data);
+
+protected:
+	midway_tone_generator_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
+	required_device<discrete_sound_device> m_discrete;
+};
+
+
 class seawolf_audio_device : public device_t
 {
 public:
@@ -48,6 +61,27 @@ private:
 	required_device_array<samples_device, 2> m_samples;
 };
 
+
+class desertgu_audio_device : public midway_tone_generator_device_base
+{
+public:
+	auto ctrl_sel_out() { return m_ctrl_sel_out.bind(); }
+
+	desertgu_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+	void p1_w(u8 data);
+	void p2_w(u8 data);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+
+private:
+	devcb_write_line m_ctrl_sel_out;
+	output_finder<> m_recoil;
+	u8 m_p2;
+};
 
 
 class gmissile_audio_device : public device_t
@@ -90,7 +124,7 @@ private:
 };
 
 
-class clowns_audio_device : public device_t
+class clowns_audio_device : public midway_tone_generator_device_base
 {
 public:
 	auto ctrl_sel_out() { return m_ctrl_sel_out.bind(); }
@@ -102,11 +136,11 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
 private:
 	required_device<samples_device> m_samples;
-	required_device<discrete_sound_device> m_discrete;
 	devcb_write_line m_ctrl_sel_out;
 	u8 m_p1;
 	u8 m_p2;
@@ -202,6 +236,7 @@ private:
 
 DECLARE_DEVICE_TYPE(SEAWOLF_AUDIO,  seawolf_audio_device)
 DECLARE_DEVICE_TYPE(GUNFIGHT_AUDIO, gunfight_audio_device)
+DECLARE_DEVICE_TYPE(DESERTGU_AUDIO, desertgu_audio_device)
 DECLARE_DEVICE_TYPE(GMISSILE_AUDIO, gmissile_audio_device)
 DECLARE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device)
 DECLARE_DEVICE_TYPE(CLOWNS_AUDIO,   clowns_audio_device)

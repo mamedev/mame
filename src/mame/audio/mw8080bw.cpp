@@ -18,62 +18,6 @@ namespace {
 
 /*************************************
  *
- *  Implementation of tone generator used
- *  by a few of these games
- *
- *************************************/
-
-#define MIDWAY_TONE_EN              NODE_100
-#define MIDWAY_TONE_DATA_L          NODE_101
-#define MIDWAY_TONE_DATA_H          NODE_102
-#define MIDWAY_TONE_SND             NODE_103
-#define MIDWAY_TONE_TRASFORM_OUT    NODE_104
-#define MIDWAY_TONE_BEFORE_AMP_SND  NODE_105
-
-
-#define MIDWAY_TONE_GENERATOR(discrete_op_amp_tvca_info) \
-		/* bit 0 of tone data is always 0 */ \
-		/* join the L & H tone bits */ \
-		DISCRETE_INPUT_LOGIC(MIDWAY_TONE_EN) \
-		DISCRETE_INPUT_DATA (MIDWAY_TONE_DATA_L) \
-		DISCRETE_INPUT_DATA (MIDWAY_TONE_DATA_H) \
-		DISCRETE_TRANSFORM4(MIDWAY_TONE_TRASFORM_OUT, MIDWAY_TONE_DATA_H, 0x40, MIDWAY_TONE_DATA_L, 0x02, "01*23*+") \
-		DISCRETE_NOTE(MIDWAY_TONE_BEFORE_AMP_SND, 1, (double)MW8080BW_MASTER_CLOCK/10/2, MIDWAY_TONE_TRASFORM_OUT, 0xfff, 1, DISC_CLK_IS_FREQ) \
-		DISCRETE_OP_AMP_TRIG_VCA(MIDWAY_TONE_SND, MIDWAY_TONE_BEFORE_AMP_SND, MIDWAY_TONE_EN, 0, 12, 0, &discrete_op_amp_tvca_info)
-
-
-// most common values based on clowns schematic
-discrete_op_amp_tvca_info const midway_music_tvca_info =
-{
-	RES_M(3.3),             // r502
-	RES_K(10) + RES_K(680), // r505 + r506
-	0,
-	RES_K(680),             // r503
-	RES_K(10),              // r500
-	0,
-	RES_K(680),             // r501
-	0,
-	0,
-	0,
-	0,
-	CAP_U(.001),            // c500
-	0,
-	0, 0,
-	12,                     // v1
-	0,                      // v2
-	0,                      // v3
-	12,                     // vP
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-/*************************************
- *
  *  Implementation of the common
  *  noise circuits
  *
@@ -613,8 +557,9 @@ discrete_mixer_desc const invaders_mixer =
  *
  *************************************/
 
-DEFINE_DEVICE_TYPE(SEAWOLF_AUDIO,  seawolf_audio_device,  "seawolf_audio",  "Nutting Sea Wolf Audio")
-DEFINE_DEVICE_TYPE(GUNFIGHT_AUDIO, gunfight_audio_device, "gunfight_audio", "Nutting Gun Fight Audio")
+DEFINE_DEVICE_TYPE(SEAWOLF_AUDIO,  seawolf_audio_device,  "seawolf_audio",  "Midway Sea Wolf Audio")
+DEFINE_DEVICE_TYPE(GUNFIGHT_AUDIO, gunfight_audio_device, "gunfight_audio", "Midway Gun Fight Audio")
+DEFINE_DEVICE_TYPE(DESERTGU_AUDIO, desertgu_audio_device, "desertgu_audio", "Midway Desert Gun Audio")
 DEFINE_DEVICE_TYPE(GMISSILE_AUDIO, gmissile_audio_device, "gmissile_audio", "Midway Guided Missile Audio")
 DEFINE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device,       "m4_audio",       "Midway M-4 Audio")
 DEFINE_DEVICE_TYPE(CLOWNS_AUDIO,   clowns_audio_device,   "clowns_audio",   "Midway Clowns Audio")
@@ -622,6 +567,83 @@ DEFINE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device, "spcenctr_audio", "Mid
 DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "phantom2_audio", "Midway Phantom 2 Audio")
 DEFINE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device, "invaders_audio", "Taito Space Invaders Audio")
 DEFINE_DEVICE_TYPE(INVAD2CT_AUDIO, invad2ct_audio_device, "invad2ct_audio", "Midway Space Invaders II Audio")
+
+
+/*************************************
+ *
+ *  Implementation of tone generator used
+ *  by a few of these games
+ *
+ *************************************/
+
+#define MIDWAY_TONE_EN              NODE_100
+#define MIDWAY_TONE_DATA_L          NODE_101
+#define MIDWAY_TONE_DATA_H          NODE_102
+#define MIDWAY_TONE_SND             NODE_103
+#define MIDWAY_TONE_TRASFORM_OUT    NODE_104
+#define MIDWAY_TONE_BEFORE_AMP_SND  NODE_105
+
+#define MIDWAY_TONE_GENERATOR(discrete_op_amp_tvca_info) \
+		/* bit 0 of tone data is always 0 */ \
+		/* join the L & H tone bits */ \
+		DISCRETE_INPUT_LOGIC(MIDWAY_TONE_EN) \
+		DISCRETE_INPUT_DATA (MIDWAY_TONE_DATA_L) \
+		DISCRETE_INPUT_DATA (MIDWAY_TONE_DATA_H) \
+		DISCRETE_TRANSFORM4(MIDWAY_TONE_TRASFORM_OUT, MIDWAY_TONE_DATA_H, 0x40, MIDWAY_TONE_DATA_L, 0x02, "01*23*+") \
+		DISCRETE_NOTE(MIDWAY_TONE_BEFORE_AMP_SND, 1, (double)MW8080BW_MASTER_CLOCK/10/2, MIDWAY_TONE_TRASFORM_OUT, 0xfff, 1, DISC_CLK_IS_FREQ) \
+		DISCRETE_OP_AMP_TRIG_VCA(MIDWAY_TONE_SND, MIDWAY_TONE_BEFORE_AMP_SND, MIDWAY_TONE_EN, 0, 12, 0, &discrete_op_amp_tvca_info)
+
+// most common values based on clowns schematic
+static discrete_op_amp_tvca_info const midway_music_tvca_info =
+{
+	RES_M(3.3),             // r502
+	RES_K(10) + RES_K(680), // r505 + r506
+	0,
+	RES_K(680),             // r503
+	RES_K(10),              // r500
+	0,
+	RES_K(680),             // r501
+	0,
+	0,
+	0,
+	0,
+	CAP_U(.001),            // c500
+	0,
+	0, 0,
+	12,                     // v1
+	0,                      // v2
+	0,                      // v3
+	12,                     // vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+midway_tone_generator_device_base::midway_tone_generator_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_discrete(*this, "discrete")
+{
+}
+
+void midway_tone_generator_device_base::tone_generator_lo_w(u8 data)
+{
+	m_discrete->write(MIDWAY_TONE_EN, (data >> 0) & 0x01);
+
+	m_discrete->write(MIDWAY_TONE_DATA_L, (data >> 1) & 0x1f);
+
+	// D6 and D7 are not connected
+}
+
+
+void midway_tone_generator_device_base::tone_generator_hi_w(u8 data)
+{
+	m_discrete->write(MIDWAY_TONE_DATA_H, data & 0x3f);
+
+	// D6 and D7 are not connected
+}
 
 
 /*************************************
@@ -745,6 +767,255 @@ void gunfight_audio_device::device_add_mconfig(machine_config &config)
 
 void gunfight_audio_device::device_start()
 {
+}
+
+
+/*************************************
+ *
+ *  Desert Gun
+ *
+ *  Discrete sound emulation: Jan 2007, D.R.
+ *
+ *************************************/
+
+// nodes - inputs
+#define DESERTGU_GAME_ON_EN                   NODE_01
+#define DESERTGU_RIFLE_SHOT_EN                NODE_02
+#define DESERTGU_BOTTLE_HIT_EN                NODE_03
+#define DESERTGU_ROAD_RUNNER_HIT_EN           NODE_04
+#define DESERTGU_CREATURE_HIT_EN              NODE_05
+#define DESERTGU_ROADRUNNER_BEEP_BEEP_EN      NODE_06
+#define DESERTGU_TRIGGER_CLICK_EN             NODE_07
+
+// nodes - sounds
+#define DESERTGU_NOISE                        NODE_08
+#define DESERTGU_RIFLE_SHOT_SND               NODE_09
+#define DESERTGU_BOTTLE_HIT_SND               NODE_10
+#define DESERTGU_ROAD_RUNNER_HIT_SND          NODE_11
+#define DESERTGU_CREATURE_HIT_SND             NODE_12
+#define DESERTGU_ROADRUNNER_BEEP_BEEP_SND     NODE_13
+#define DESERTGU_TRIGGER_CLICK_SND            DESERTGU_TRIGGER_CLICK_EN
+
+// nodes - adjusters
+#define DESERTGU_MUSIC_ADJ                    NODE_15
+
+static discrete_op_amp_tvca_info const desertgu_rifle_shot_tvca_info =
+{
+	RES_M(2.7),
+	RES_K(680),
+	0,
+	RES_K(680),
+	RES_K(10),
+	0,
+	RES_K(680),
+	0,
+	0,
+	0,
+	0,
+	CAP_U(0.47),
+	0,
+	0, 0,
+	12,         // v1
+	0,          // v2
+	0,          // v3
+	12,         // vP
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+
+static discrete_mixer_desc const desertgu_filter_mixer =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{ RES_K(2),
+		RES_K(27),
+		RES_K(2) + RES_K(1) },
+	{ 0 },
+	{ 0 },
+	0,
+	0,
+	0,
+	0,
+	0,
+	1
+};
+
+
+static discrete_op_amp_filt_info const desertgu_filter =
+{
+	1.0 / ( 1.0 / RES_K(2) + 1.0 / RES_K(27) + 1.0 / (RES_K(2) + RES_K(1))),
+	0,
+	68,
+	0,
+	RES_K(39),
+	CAP_U(0.033),
+	CAP_U(0.033),
+	0,
+	0,
+	12,
+	0
+};
+
+
+static const discrete_mixer_desc desertgu_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,
+	{ RES_K(12) + RES_K(68) + RES_K(30),
+		RES_K(56),
+		RES_K(180),
+		RES_K(47),
+		RES_K(30) },
+	{ 0,
+		0,
+		0,
+		0,
+		DESERTGU_MUSIC_ADJ },
+	{ CAP_U(0.1),
+		CAP_U(0.1),
+		CAP_U(0.1),
+		CAP_U(0.1),
+		CAP_U(0.1) },
+	0,
+	RES_K(100),
+	0,
+	CAP_U(0.1),
+	0,
+	6000        // final gain
+};
+
+
+static DISCRETE_SOUND_START(desertgu_discrete)
+
+	/************************************************
+	 * Input register mapping
+	 ************************************************/
+	DISCRETE_INPUT_LOGIC(DESERTGU_GAME_ON_EN)
+	DISCRETE_INPUT_LOGIC(DESERTGU_RIFLE_SHOT_EN)
+	DISCRETE_INPUT_LOGIC(DESERTGU_BOTTLE_HIT_EN)
+	DISCRETE_INPUT_LOGIC(DESERTGU_ROAD_RUNNER_HIT_EN)
+	DISCRETE_INPUT_LOGIC(DESERTGU_CREATURE_HIT_EN)
+	DISCRETE_INPUT_LOGIC(DESERTGU_ROADRUNNER_BEEP_BEEP_EN)
+	DISCRETE_INPUTX_LOGIC(DESERTGU_TRIGGER_CLICK_SND, 12, 0, 0)
+
+	// The low value of the pot is set to 75000.  A real 1M pot will never go to 0 anyways.
+	// This will give the control more apparent volume range.
+	// The music way overpowers the rest of the sounds anyways.
+	DISCRETE_ADJUSTMENT(DESERTGU_MUSIC_ADJ, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
+
+	/************************************************
+	 * Tone generator
+	 ************************************************/
+	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
+
+	/************************************************
+	 * Rifle shot sound
+	 ************************************************/
+	// Noise clock was breadboarded and measured at 7515Hz
+	DISCRETE_LFSR_NOISE(DESERTGU_NOISE, 1, 1, 7515, 12.0, 0, 12.0/2, &midway_lfsr)
+
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, DESERTGU_RIFLE_SHOT_EN, 0, 0, DESERTGU_NOISE, 0, &desertgu_rifle_shot_tvca_info)
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
+	DISCRETE_CRFILTER(DESERTGU_RIFLE_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
+
+	/************************************************
+	 * Bottle hit sound
+	 ************************************************/
+	DISCRETE_CONSTANT(DESERTGU_BOTTLE_HIT_SND, 0)  // placeholder for incomplete sound
+
+	/************************************************
+	 * Road Runner hit sound
+	 ************************************************/
+	DISCRETE_CONSTANT(DESERTGU_ROAD_RUNNER_HIT_SND, 0)  // placeholder for incomplete sound
+
+	/************************************************
+	 * Creature hit sound
+	 ************************************************/
+	DISCRETE_CONSTANT(DESERTGU_CREATURE_HIT_SND, 0)  // placeholder for incomplete sound
+
+	/************************************************
+	 * Beep-Beep sound
+	 ************************************************/
+	DISCRETE_CONSTANT(DESERTGU_ROADRUNNER_BEEP_BEEP_SND, 0) // placeholder for incomplete sound
+
+	/************************************************
+	 * Mix and filter
+	 ************************************************/
+	DISCRETE_MIXER3(NODE_80, 1, DESERTGU_BOTTLE_HIT_SND, DESERTGU_ROADRUNNER_BEEP_BEEP_SND, DESERTGU_TRIGGER_CLICK_SND, &desertgu_filter_mixer)
+	DISCRETE_OP_AMP_FILTER(NODE_81, 1, NODE_80, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1, &desertgu_filter)
+
+	/************************************************
+	 * Combine all sound sources.
+	 ************************************************/
+	DISCRETE_MIXER5(NODE_91, DESERTGU_GAME_ON_EN, DESERTGU_RIFLE_SHOT_SND, DESERTGU_ROAD_RUNNER_HIT_SND, DESERTGU_CREATURE_HIT_SND, NODE_81, MIDWAY_TONE_SND, &desertgu_mixer)
+
+	DISCRETE_OUTPUT(NODE_91, 1)
+DISCRETE_SOUND_END
+
+INPUT_PORTS_START(desertgu_audio)
+	PORT_START("MUSIC_ADJ")  // 3
+	PORT_ADJUSTER( 60, "Music Volume" )
+INPUT_PORTS_END
+
+desertgu_audio_device::desertgu_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	midway_tone_generator_device_base(mconfig, DESERTGU_AUDIO, tag, owner, clock),
+	m_ctrl_sel_out(*this),
+	m_recoil(*this, "Player1_Gun_Recoil"),
+	m_p2(0U)
+{
+}
+
+void desertgu_audio_device::p1_w(u8 data)
+{
+	// D0 and D1 are not connected
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+
+	m_discrete->write(DESERTGU_GAME_ON_EN, (data >> 3) & 0x01);
+	m_discrete->write(DESERTGU_RIFLE_SHOT_EN, (data >> 4) & 0x01);
+	m_discrete->write(DESERTGU_BOTTLE_HIT_EN, (data >> 5) & 0x01);
+	m_discrete->write(DESERTGU_ROAD_RUNNER_HIT_EN, (data >> 6) & 0x01);
+	m_discrete->write(DESERTGU_CREATURE_HIT_EN, (data >> 7) & 0x01);
+}
+
+void desertgu_audio_device::p2_w(u8 data)
+{
+	u8 const changed(data ^ m_p2);
+	m_p2 = data;
+
+	m_discrete->write(DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
+	m_discrete->write(DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
+
+	m_recoil = BIT(data, 2);
+
+	if (BIT(changed, 3)) m_ctrl_sel_out(BIT(data, 3));
+
+	// D4-D7 are not connected
+}
+
+void desertgu_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, desertgu_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.8);
+}
+
+ioport_constructor desertgu_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(desertgu_audio);
+}
+
+void desertgu_audio_device::device_start()
+{
+	m_ctrl_sel_out.resolve();
+	m_recoil.resolve();
+
+	m_p2 = 0U;
+
+	save_item(NAME(m_p2));
 }
 
 
@@ -1103,10 +1374,14 @@ static DISCRETE_SOUND_START(clowns_discrete)
 	DISCRETE_OUTPUT(NODE_91, 11000)
 DISCRETE_SOUND_END
 
+static INPUT_PORTS_START(clowns_audio)
+	PORT_START("R507")
+	PORT_ADJUSTER( 40, "R507 - Music Volume" )
+INPUT_PORTS_END
+
 clowns_audio_device::clowns_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, CLOWNS_AUDIO, tag, owner, clock),
+	midway_tone_generator_device_base(mconfig, CLOWNS_AUDIO, tag, owner, clock),
 	m_samples(*this, "samples"),
-	m_discrete(*this, "discrete"),
 	m_ctrl_sel_out(*this),
 	m_p1(0U),
 	m_p2(0U)
@@ -1159,6 +1434,11 @@ void clowns_audio_device::device_add_mconfig(machine_config &config)
 
 	DISCRETE(config, m_discrete, clowns_discrete);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+ioport_constructor clowns_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(clowns_audio);
 }
 
 void clowns_audio_device::device_start()
@@ -2969,234 +3249,6 @@ WRITE8_MEMBER(mw8080bw_state::checkmat_audio_w)
 
 	m_discrete->write(CHECKMAT_TONE_DATA_45, (data >> 4) & 0x03);
 	m_discrete->write(CHECKMAT_TONE_DATA_67, (data >> 6) & 0x03);
-}
-
-
-
-/*************************************
- *
- *  Desert Gun
- *
- *  Discrete sound emulation: Jan 2007, D.R.
- *
- *************************************/
-
-/* nodes - inputs */
-#define DESERTGU_GAME_ON_EN                   NODE_01
-#define DESERTGU_RIFLE_SHOT_EN                NODE_02
-#define DESERTGU_BOTTLE_HIT_EN                NODE_03
-#define DESERTGU_ROAD_RUNNER_HIT_EN           NODE_04
-#define DESERTGU_CREATURE_HIT_EN              NODE_05
-#define DESERTGU_ROADRUNNER_BEEP_BEEP_EN      NODE_06
-#define DESERTGU_TRIGGER_CLICK_EN             NODE_07
-
-/* nodes - sounds */
-#define DESERTGU_NOISE                        NODE_08
-#define DESERTGU_RIFLE_SHOT_SND               NODE_09
-#define DESERTGU_BOTTLE_HIT_SND               NODE_10
-#define DESERTGU_ROAD_RUNNER_HIT_SND          NODE_11
-#define DESERTGU_CREATURE_HIT_SND             NODE_12
-#define DESERTGU_ROADRUNNER_BEEP_BEEP_SND     NODE_13
-#define DESERTGU_TRIGGER_CLICK_SND            DESERTGU_TRIGGER_CLICK_EN
-
-/* nodes - adjusters */
-#define DESERTGU_MUSIC_ADJ                    NODE_15
-
-
-static const discrete_op_amp_tvca_info desertgu_rifle_shot_tvca_info =
-{
-	RES_M(2.7),
-	RES_K(680),
-	0,
-	RES_K(680),
-	RES_K(10),
-	0,
-	RES_K(680),
-	0,
-	0,
-	0,
-	0,
-	CAP_U(0.47),
-	0,
-	0, 0,
-	12,         /* v1 */
-	0,          /* v2 */
-	0,          /* v3 */
-	12,         /* vP */
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-static const discrete_mixer_desc desertgu_filter_mixer =
-{
-	DISC_MIXER_IS_RESISTOR,
-	{ RES_K(2),
-		RES_K(27),
-		RES_K(2) + RES_K(1) },
-	{ 0 },
-	{ 0 },
-	0,
-	0,
-	0,
-	0,
-	0,
-	1
-};
-
-
-static const discrete_op_amp_filt_info desertgu_filter =
-{
-	1.0 / ( 1.0 / RES_K(2) + 1.0 / RES_K(27) + 1.0 / (RES_K(2) + RES_K(1))),
-	0,
-	68,
-	0,
-	RES_K(39),
-	CAP_U(0.033),
-	CAP_U(0.033),
-	0,
-	0,
-	12,
-	0
-};
-
-
-static const discrete_mixer_desc desertgu_mixer =
-{
-	DISC_MIXER_IS_OP_AMP,
-	{ RES_K(12) + RES_K(68) + RES_K(30),
-		RES_K(56),
-		RES_K(180),
-		RES_K(47),
-		RES_K(30) },
-	{ 0,
-		0,
-		0,
-		0,
-		DESERTGU_MUSIC_ADJ },
-	{ CAP_U(0.1),
-		CAP_U(0.1),
-		CAP_U(0.1),
-		CAP_U(0.1),
-		CAP_U(0.1) },
-	0,
-	RES_K(100),
-	0,
-	CAP_U(0.1),
-	0,
-	6000    /* final gain */
-};
-
-
-static DISCRETE_SOUND_START(desertgu_discrete)
-
-	/************************************************
-	 * Input register mapping
-	 ************************************************/
-	DISCRETE_INPUT_LOGIC(DESERTGU_GAME_ON_EN)
-	DISCRETE_INPUT_LOGIC(DESERTGU_RIFLE_SHOT_EN)
-	DISCRETE_INPUT_LOGIC(DESERTGU_BOTTLE_HIT_EN)
-	DISCRETE_INPUT_LOGIC(DESERTGU_ROAD_RUNNER_HIT_EN)
-	DISCRETE_INPUT_LOGIC(DESERTGU_CREATURE_HIT_EN)
-	DISCRETE_INPUT_LOGIC(DESERTGU_ROADRUNNER_BEEP_BEEP_EN)
-	DISCRETE_INPUTX_LOGIC(DESERTGU_TRIGGER_CLICK_SND, 12, 0, 0)
-
-	/* The low value of the pot is set to 75000.  A real 1M pot will never go to 0 anyways. */
-	/* This will give the control more apparent volume range. */
-	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT(DESERTGU_MUSIC_ADJ, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
-
-	/************************************************
-	 * Tone generator
-	 ************************************************/
-	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
-
-	/************************************************
-	 * Rifle shot sound
-	 ************************************************/
-	/* Noise clock was breadboarded and measured at 7515Hz */
-	DISCRETE_LFSR_NOISE(DESERTGU_NOISE, 1, 1, 7515, 12.0, 0, 12.0/2, &midway_lfsr)
-
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, DESERTGU_RIFLE_SHOT_EN, 0, 0, DESERTGU_NOISE, 0, &desertgu_rifle_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
-	DISCRETE_CRFILTER(DESERTGU_RIFLE_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
-
-	/************************************************
-	 * Bottle hit sound
-	 ************************************************/
-	DISCRETE_CONSTANT(DESERTGU_BOTTLE_HIT_SND, 0)  /* placeholder for incomplete sound */
-
-	/************************************************
-	 * Road Runner hit sound
-	 ************************************************/
-	DISCRETE_CONSTANT(DESERTGU_ROAD_RUNNER_HIT_SND, 0)  /* placeholder for incomplete sound */
-
-	/************************************************
-	 * Creature hit sound
-	 ************************************************/
-	DISCRETE_CONSTANT(DESERTGU_CREATURE_HIT_SND, 0)  /* placeholder for incomplete sound */
-
-	/************************************************
-	 * Beep-Beep sound
-	 ************************************************/
-	DISCRETE_CONSTANT(DESERTGU_ROADRUNNER_BEEP_BEEP_SND, 0) /* placeholder for incomplete sound */
-
-	/************************************************
-	 * Mix and filter
-	 ************************************************/
-	DISCRETE_MIXER3(NODE_80, 1, DESERTGU_BOTTLE_HIT_SND, DESERTGU_ROADRUNNER_BEEP_BEEP_SND, DESERTGU_TRIGGER_CLICK_SND, &desertgu_filter_mixer)
-	DISCRETE_OP_AMP_FILTER(NODE_81, 1, NODE_80, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1, &desertgu_filter)
-
-	/************************************************
-	 * Combine all sound sources.
-	 ************************************************/
-	DISCRETE_MIXER5(NODE_91, DESERTGU_GAME_ON_EN, DESERTGU_RIFLE_SHOT_SND, DESERTGU_ROAD_RUNNER_HIT_SND, DESERTGU_CREATURE_HIT_SND, NODE_81, MIDWAY_TONE_SND, &desertgu_mixer)
-
-	DISCRETE_OUTPUT(NODE_91, 1)
-DISCRETE_SOUND_END
-
-
-void mw8080bw_state::desertgu_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, desertgu_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.8);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::desertgu_audio_1_w)
-{
-	/* D0 and D1 are not connected */
-
-	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
-
-	m_discrete->write(DESERTGU_GAME_ON_EN, (data >> 3) & 0x01);
-
-	m_discrete->write(DESERTGU_RIFLE_SHOT_EN, (data >> 4) & 0x01);
-
-	m_discrete->write(DESERTGU_BOTTLE_HIT_EN, (data >> 5) & 0x01);
-
-	m_discrete->write(DESERTGU_ROAD_RUNNER_HIT_EN, (data >> 6) & 0x01);
-
-	m_discrete->write(DESERTGU_CREATURE_HIT_EN, (data >> 7) & 0x01);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::desertgu_audio_2_w)
-{
-	m_discrete->write(DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
-
-	m_discrete->write(DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
-
-	output().set_value("Player1_Gun_Recoil", (data >> 2) & 0x01);
-
-	m_desertgun_controller_select = (data >> 3) & 0x01;
-
-	/* D4-D7 are not connected */
 }
 
 
