@@ -278,10 +278,11 @@ int renderer_bgfx::create()
 		{
 			init.type = bgfx::RendererType::Direct3D11;
 		}
-		else if (backend == "dx12" || backend == "d3d12")
-		{
-			init.type = bgfx::RendererType::Direct3D12;
-		}
+// Throws exception on exit
+//		else if (backend == "dx12" || backend == "d3d12")
+//		{
+//			init.type = bgfx::RendererType::Direct3D12;
+//		}
 		else if (backend == "gles")
 		{
 			init.type = bgfx::RendererType::OpenGLES;
