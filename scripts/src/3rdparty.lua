@@ -1407,6 +1407,9 @@ end
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
 		}
+		buildoptions {
+			"-x objective-c++",
+		}
 	end
 
 --------------------------------------------------
