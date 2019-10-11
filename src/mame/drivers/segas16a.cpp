@@ -3951,9 +3951,9 @@ GAME( 1986, dumpmtmt,   bodyslam, system16a_i8751,          bodyslam,        seg
 
 GAME( 1985, mjleague,   0,        system16a,                mjleague,        segas16a_state,            init_mjleague,    ROT270, "Sega", "Major League", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, quartet,    0,        system16a_i8751,          quartet,         segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quartet,    0,        system16a_i8751,          quartet,         segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, quarteta,   quartet,  system16a_i8751,          quartet,         segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet (8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quarteta,   quartet,  system16a_i8751,          quartet,         segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet (8751 315-5194)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, quartet2,   quartet,  system16a_i8751,          quart2,          segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet 2 (8751 317-0010)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, quartet2a,  quartet,  system16a,                quart2,          segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet 2 (unprotected)", MACHINE_SUPPORTS_SAVE )
 
