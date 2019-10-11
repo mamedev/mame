@@ -69,7 +69,7 @@
 #define LOG_SYNC    (1U <<  9)
 #define LOG_BIT     (1U <<  10)
 
-//#define VERBOSE  (LOG_INT | LOG_READ | LOG_SETUP | LOG_TX | LOG_CMD | LOG_CTS)
+//#define VERBOSE  (LOG_GENERAL | LOG_SETUP | LOG_SYNC | LOG_CMD |LOG_TX | LOG_READ)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -1420,10 +1420,10 @@ int z80sio_channel::get_tx_word_length() const
  * Break/Abort latch. */
 uint8_t z80sio_channel::do_sioreg_rr0()
 {
-	LOGR("%s\n", FUNCNAME);
 	uint8_t tmp = m_rr0 & ~RR0_TX_BUFFER_EMPTY;
 	if (get_tx_empty())
 		tmp |= RR0_TX_BUFFER_EMPTY;
+	LOGR("%s: %02x\n", FUNCNAME, tmp);
 	return tmp;
 }
 
@@ -1531,7 +1531,7 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 	m_wr0 = data;
 
 	if ((data & WR0_COMMAND_MASK) != WR0_NULL)
-		LOGSETUP(" * %s %c Reg %02x <- %02x \n", owner()->tag(), 'A' + m_index, 0, data);
+		LOGSETUP("\n * %s %c Reg %02x <- %02x \n", owner()->tag(), 'A' + m_index, 0, data);
 	switch (data & WR0_COMMAND_MASK)
 	{
 	case WR0_NULL:
@@ -1643,16 +1643,16 @@ void z80sio_channel::do_sioreg_wr2(uint8_t data)
 
 void z80sio_channel::do_sioreg_wr3(uint8_t data)
 {
-	LOGSETUP("Z80SIO Channel %c : Receiver Enable %u\n", 'A' + m_index, (data & WR3_RX_ENABLE) ? 1 : 0);
-	LOGSETUP("Z80SIO Channel %c : Sync Character Load Inhibit %u\n", 'A' + m_index, (data & WR3_SYNC_CHAR_LOAD_INHIBIT) ? 1 : 0);
-	LOGSETUP("Z80SIO Channel %c : Receive CRC Enable %u\n", 'A' + m_index, (data & WR3_RX_CRC_ENABLE) ? 1 : 0);
-	LOGSETUP("Z80SIO Channel %c : Auto Enables %u\n", 'A' + m_index, (data & WR3_AUTO_ENABLES) ? 1 : 0);
-	LOGSETUP("Z80SIO Channel %c : Receiver Bits/Character %u\n", 'A' + m_index, get_rx_word_length());
+	LOG("Z80SIO Channel %c : Receiver Enable %u\n", 'A' + m_index, (data & WR3_RX_ENABLE) ? 1 : 0);
+	LOG("Z80SIO Channel %c : Sync Character Load Inhibit %u\n", 'A' + m_index, (data & WR3_SYNC_CHAR_LOAD_INHIBIT) ? 1 : 0);
+	LOG("Z80SIO Channel %c : Receive CRC Enable %u\n", 'A' + m_index, (data & WR3_RX_CRC_ENABLE) ? 1 : 0);
+	LOG("Z80SIO Channel %c : Auto Enables %u\n", 'A' + m_index, (data & WR3_AUTO_ENABLES) ? 1 : 0);
 	if (data & WR3_ENTER_HUNT_PHASE)
 		LOGCMD("Z80SIO Channel %c : Enter Hunt Phase\n", 'A' + m_index);
 
 	bool const was_allowed(receive_allowed());
 	m_wr3 = data;
+	LOG("Z80SIO Channel %c : Receiver Bits/Character %u\n", 'A' + m_index, get_rx_word_length()); // depends on m_wr3 being updated
 
 	if (!was_allowed && receive_allowed())
 	{
