@@ -593,10 +593,9 @@ private:
 			if (m_lightgun_map.initialized)
 			{
 				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
-				devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
-			}
-
-			return nullptr;
+				return devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
+			} else
+				return nullptr;
 		}
 
 		return devicelist()->create_device<x11_lightgun_device>(machine, m_lightgun_map.map[index].name.c_str(), m_lightgun_map.map[index].name.c_str(), *this);
