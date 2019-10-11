@@ -59,6 +59,7 @@
 //#include "bus/isa/isa_cards.h"
 #include "bus/isa/ega.h"
 #include "bus/isa/mda.h"
+#include "bus/isa/eis_twib.h"
 #include "machine/pc_lpt.h"
 
 #include "machine/ram.h"
@@ -698,6 +699,7 @@ static void epc_isa8_cards(device_slot_interface &device)
 {
 	device.option_add("epc_mda", ISA8_EPC_MDA);
 	device.option_add("ega", ISA8_EGA);
+	device.option_add("epc_twib", ISA8_EIS_TWIB);
 	// device.option_add("epc_hdc1065", ISA8_EPC_HDC1065);
 	// device.option_add("epc_mb1080", ISA8_EPC_MB1080);
 }
