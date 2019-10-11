@@ -2787,8 +2787,8 @@ ROM_START( imgfightj )
 	ROM_LOAD16_BYTE( "if-c-l3.bin",  0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "imgfightj_i8751h.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) )
+	ROM_REGION( 0x10000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "if_c-pr-.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) ) /* i8751 MCU labeled  IF C-PR- */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  /* sprites */
