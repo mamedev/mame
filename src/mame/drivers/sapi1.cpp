@@ -849,7 +849,7 @@ void sapi_state::sapi3b(machine_config &config)
 	crtc.set_update_row_callback(FUNC(sapi_state::crtc_update_row), this);
 
 	subdevice<screen_device>("screen")->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	subdevice<screen_device>("screen")->set_palette(finder_base::DUMMY_TAG);
+	subdevice<screen_device>("screen")->set_no_palette();
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )

@@ -2989,18 +2989,7 @@ void naomi_state::naomi_base(machine_config &config)
 	MIE_JVS(config, "mie", 16000000);
 
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
-	sega837.set_port_tag<0>("TILT");
-	sega837.set_port_tag<1>("P1");
-	sega837.set_port_tag<2>("P2");
-	sega837.set_port_tag<3>("A0");
-	sega837.set_port_tag<4>("A1");
-	sega837.set_port_tag<5>("A2");
-	sega837.set_port_tag<6>("A3");
-	sega837.set_port_tag<7>("A4");
-	sega837.set_port_tag<8>("A5");
-	sega837.set_port_tag<9>("A6");
-	sega837.set_port_tag<10>("A7");
-	sega837.set_port_tag<11>("OUTPUT");
+	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
 
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
@@ -3073,23 +3062,9 @@ void naomi_state::naomim2_kb(machine_config &config)
 {
 	naomim2(config);
 	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
-	dcctrl0.set_port_tag<0>("P1.M");
-	dcctrl0.set_port_tag<1>("P1.LD");
-	dcctrl0.set_port_tag<2>("P1.KC1");
-	dcctrl0.set_port_tag<3>("P1.KC2");
-	dcctrl0.set_port_tag<4>("P1.KC3");
-	dcctrl0.set_port_tag<5>("P1.KC4");
-	dcctrl0.set_port_tag<6>("P1.KC5");
-	dcctrl0.set_port_tag<7>("P1.KC6");
+	dcctrl0.set_port_tags("P1.M", "P1.LD", "P1.KC1", "P1.KC2", "P1.KC3", "P1.KC4", "P1.KC5", "P1.KC6");
 	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
-	dcctrl1.set_port_tag<0>("P2.M");
-	dcctrl1.set_port_tag<1>("P2.LD");
-	dcctrl1.set_port_tag<2>("P2.KC1");
-	dcctrl1.set_port_tag<3>("P2.KC2");
-	dcctrl1.set_port_tag<4>("P2.KC3");
-	dcctrl1.set_port_tag<5>("P2.KC4");
-	dcctrl1.set_port_tag<6>("P2.KC5");
-	dcctrl1.set_port_tag<7>("P2.KC6");
+	dcctrl1.set_port_tags("P2.M", "P2.LD", "P2.KC1", "P2.KC2", "P2.KC3", "P2.KC4", "P2.KC5", "P2.KC6");
 }
 
 /*
@@ -3100,23 +3075,9 @@ void naomi_state::naomigd_kb(machine_config &config)
 {
 	naomigd(config);
 	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
-	dcctrl0.set_port_tag<0>("P1.M");
-	dcctrl0.set_port_tag<1>("P1.LD");
-	dcctrl0.set_port_tag<2>("P1.KC1");
-	dcctrl0.set_port_tag<3>("P1.KC2");
-	dcctrl0.set_port_tag<4>("P1.KC3");
-	dcctrl0.set_port_tag<5>("P1.KC4");
-	dcctrl0.set_port_tag<6>("P1.KC5");
-	dcctrl0.set_port_tag<7>("P1.KC6");
+	dcctrl0.set_port_tags("P1.M", "P1.LD", "P1.KC1", "P1.KC2", "P1.KC3", "P1.KC4", "P1.KC5", "P1.KC6");
 	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
-	dcctrl1.set_port_tag<0>("P2.M");
-	dcctrl1.set_port_tag<1>("P2.LD");
-	dcctrl1.set_port_tag<2>("P2.KC1");
-	dcctrl1.set_port_tag<3>("P2.KC2");
-	dcctrl1.set_port_tag<4>("P2.KC3");
-	dcctrl1.set_port_tag<5>("P2.KC4");
-	dcctrl1.set_port_tag<6>("P2.KC5");
-	dcctrl1.set_port_tag<7>("P2.KC6");
+	dcctrl1.set_port_tags("P2.M", "P2.LD", "P2.KC1", "P2.KC2", "P2.KC3", "P2.KC4", "P2.KC5", "P2.KC6");
 }
 
 /*
@@ -3196,47 +3157,19 @@ void atomiswave_state::aw1c(machine_config &config)
 {
 	aw_base(config);
 	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tag<0>("P1.0");
-	dcctrl0.set_port_tag<1>("P1.1");
-	dcctrl0.set_port_tag<2>("P1.A0");
-	dcctrl0.set_port_tag<3>("P1.A1");
-	dcctrl0.set_port_tag<4>("P1.A2");
-	dcctrl0.set_port_tag<5>("P1.A3");
-	dcctrl0.set_port_tag<6>("P1.A4");
-	dcctrl0.set_port_tag<7>("P1.A5");
+	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
 	// TODO: isn't it supposed to be just one controller?
 	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tag<0>("P2.0");
-	dcctrl1.set_port_tag<1>("P2.1");
-	dcctrl1.set_port_tag<2>("P2.A0");
-	dcctrl1.set_port_tag<3>("P2.A1");
-	dcctrl1.set_port_tag<4>("P2.A2");
-	dcctrl1.set_port_tag<5>("P2.A3");
-	dcctrl1.set_port_tag<6>("P2.A4");
-	dcctrl1.set_port_tag<7>("P2.A5");
+	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
 }
 
 void atomiswave_state::aw2c(machine_config &config)
 {
 	aw_base(config);
 	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tag<0>("P1.0");
-	dcctrl0.set_port_tag<1>("P1.1");
-	dcctrl0.set_port_tag<2>("P1.A0");
-	dcctrl0.set_port_tag<3>("P1.A1");
-	dcctrl0.set_port_tag<4>("P1.A2");
-	dcctrl0.set_port_tag<5>("P1.A3");
-	dcctrl0.set_port_tag<6>("P1.A4");
-	dcctrl0.set_port_tag<7>("P1.A5");
+	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
 	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tag<0>("P2.0");
-	dcctrl1.set_port_tag<1>("P2.1");
-	dcctrl1.set_port_tag<2>("P2.A0");
-	dcctrl1.set_port_tag<3>("P2.A1");
-	dcctrl1.set_port_tag<4>("P2.A2");
-	dcctrl1.set_port_tag<5>("P2.A3");
-	dcctrl1.set_port_tag<6>("P2.A4");
-	dcctrl1.set_port_tag<7>("P2.A5");
+	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

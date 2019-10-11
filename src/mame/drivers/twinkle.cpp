@@ -1077,7 +1077,6 @@ void twinkle_state::cdrom_config(device_t *device)
 {
 	device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakerleft", 1.0);
 	device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakerright", 1.0);
-	device = device->subdevice("cdda");
 }
 
 void twinkle_state::twinkle(machine_config &config)
