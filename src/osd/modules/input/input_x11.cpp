@@ -446,6 +446,17 @@ public:
 	{
 	}
 
+	virtual bool probe() override
+	{
+		// If there is no X server, X11 lightguns cannot be supported
+		if (XOpenDisplay(nullptr) == nullptr)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	void input_init(running_machine &machine) override
 	{
 		int index;
