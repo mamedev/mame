@@ -181,7 +181,7 @@ namespace devices
 				break;
 			case matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT:
 				{
-					for (std::size_t k = 0; k < iN - 2; k++)
+					for (std::size_t k = 0; k < iN - 1; k++)
 					{
 						auto pk = get_left_right_of_diag(k,k);
 						for (std::size_t i = k+1; i < iN; i++)
