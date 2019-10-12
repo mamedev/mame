@@ -60,7 +60,7 @@ SHADER_PATH=shaders/glsl/$(SHADERS_DIR)
 else
 ifeq ($(TARGET), 5)
 VS_FLAGS=--platform osx -p metal
-FS_FLAGS=--platform osx -p metal
+FS_FLAGS=--platform osx -p metal --define TRANSPOSED_XYZ_TO_sRGB
 CS_FLAGS=--platform osx -p metal
 SHADER_PATH=shaders/metal/$(SHADERS_DIR)
 else
