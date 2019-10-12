@@ -37297,7 +37297,7 @@ swtpc09i                        // S09, DC4 Floppy + PIA IDE SBUG rom - FLEX
 swtpc09u                        // S09, DMF2 Floppy UNIBUG rom - UniFLEX
 
 @source:swtpc8212.cpp
-swtpc8212                       //
+swtpc8212                       // Terminal
 
 @source:swyft.cpp
 swyft                           //
