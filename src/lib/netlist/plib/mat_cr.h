@@ -31,12 +31,15 @@ namespace plib
 	// template<typename T, int N, typename C = std::size_t>
 
 	template<typename T, int N, typename C = uint16_t>
-	struct matrix_compressed_rows_t
+	struct pmatrix_cr_t
 	{
 		using index_type = C;
 		using value_type = T;
 
-		COPYASSIGNMOVE(matrix_compressed_rows_t, default)
+		static constexpr const int NSQ = (N > 0 ? -N * N : N * N);
+		static constexpr const int Np1 = (N == 0) ? 0 : (N < 0 ? N - 1 : N + 1);
+
+		COPYASSIGNMOVE(pmatrix_cr_t, default)
 
 		enum constants_e
 		{
@@ -44,34 +47,27 @@ namespace plib
 		};
 
 		parray<index_type, N> diag;      // diagonal index pointer n
-		parray<index_type, (N == 0) ? 0 : (N < 0 ? N - 1 : N + 1)> row_idx;      // row index pointer n + 1
-		parray<index_type, N < 0 ? -N * N : N *N> col_idx;       // column index array nz_num, initially (n * n)
-		parray<value_type, N < 0 ? -N * N : N *N> A;    // Matrix elements nz_num, initially (n * n)
-		//parray<C, N < 0 ? -N * (N-1) / 2 : N * (N+1) / 2 > nzbd;    // Support for gaussian elimination
-		parray<std::vector<index_type>, N > nzbd;    // Support for gaussian elimination
-		// contains elimination rows below the diagonal
-		// FIXME: convert to pvector
-		parray<index_type, (N == 0) ? 0 : (N < 0 ? N - 1 : N + 1)> ilu_rows;
-		std::vector<std::vector<index_type>> m_ge_par; // parallel execution support for Gauss
+		parray<index_type, Np1> row_idx;      // row index pointer n + 1
+		parray<index_type, NSQ> col_idx;       // column index array nz_num, initially (n * n)
+		parray<value_type, NSQ> A;    // Matrix elements nz_num, initially (n * n)
 
 		index_type nz_num;
 
-		explicit matrix_compressed_rows_t(const index_type n)
+		explicit pmatrix_cr_t(const index_type n)
 		: diag(n)
 		, row_idx(n+1)
 		, col_idx(n*n)
 		, A(n*n)
+		, nz_num(0)
 		//, nzbd(n * (n+1) / 2)
 		, nzbd(n)
-		, ilu_rows(n+1)
-		, nz_num(0)
 		, m_size(n)
 		{
 			for (index_type i=0; i<n+1; i++)
 				row_idx[i] = 0;
 		}
 
-		~matrix_compressed_rows_t() = default;
+		~pmatrix_cr_t() = default;
 
 		constexpr index_type size() const { return static_cast<index_type>((N>0) ? N : m_size); }
 
@@ -114,39 +110,6 @@ namespace plib
 		}
 
 		template <typename M>
-		std::pair<std::size_t, std::size_t> gaussian_extend_fill_mat(M &fill)
-		{
-			std::size_t ops = 0;
-			std::size_t fill_max = 0;
-
-			for (std::size_t k = 0; k < fill.size(); k++)
-			{
-				ops++; // 1/A(k,k)
-				for (std::size_t row = k + 1; row < fill.size(); row++)
-				{
-					if (fill[row][k] < FILL_INFINITY)
-					{
-						ops++;
-						for (std::size_t col = k + 1; col < fill[row].size(); col++)
-							//if (fill[k][col] < FILL_INFINITY)
-							{
-								auto f = std::min(fill[row][col], 1 + fill[row][k] + fill[k][col]);
-								if (f < FILL_INFINITY)
-								{
-									if (f > fill_max)
-										fill_max = f;
-									ops += 2;
-								}
-								fill[row][col] = f;
-							}
-					}
-				}
-			}
-			build_parallel_gaussian_execution_scheme(fill);
-			return { fill_max, ops };
-		}
-
-		template <typename M>
 		void build_from_fill_mat(const M &f, std::size_t max_fill = FILL_INFINITY - 1,
 			std::size_t band_width = FILL_INFINITY)
 		{
@@ -180,141 +143,7 @@ namespace plib
 				nzbd[k].push_back(0); // end of sequence
 			}
 
-			/* build ilu_rows */
-
-			index_type p(0);
-			for (index_type k=1; k < size(); k++)
-				if (row_idx[k] < diag[k])
-					ilu_rows[p++] = k;
-			ilu_rows[p] = 0; // end of array
 		}
-
-		template <typename V>
-		void gaussian_elimination(V & RHS)
-		{
-			const std::size_t iN = size();
-
-			for (std::size_t i = 0; i < iN - 1; i++)
-			{
-				std::size_t nzbdp = 0;
-				std::size_t pi = diag[i];
-				const value_type f = 1.0 / A[pi++];
-				const std::size_t piie = row_idx[i+1];
-				const auto &nz = nzbd[i];
-
-				while (auto j = nz[nzbdp++]) // NOLINT(bugprone-infinite-loop)
-				{
-					// proceed to column i
-
-					std::size_t pj = row_idx[j];
-					std::size_t pje = row_idx[j+1];
-
-					while (col_idx[pj] < i)
-						pj++;
-
-					const value_type f1 = - A[pj++] * f;
-
-					// subtract row i from j
-					// fill-in available assumed, i.e. matrix was prepared
-
-					for (std::size_t pii = pi; pii<piie && pj < pje; pii++)
-					{
-						while (col_idx[pj] < col_idx[pii])
-							pj++;
-						if (col_idx[pj] == col_idx[pii])
-							A[pj++] += A[pii] * f1;
-					}
-
-					RHS[j] += f1 * RHS[i];
-				}
-			}
-		}
-
-		int get_parallel_level(std::size_t k) const
-		{
-			for (std::size_t i = 0; i <  m_ge_par.size(); i++)
-				if (plib::container::contains( m_ge_par[i], k))
-					return static_cast<int>(i);
-			return -1;
-		}
-
-		template <typename V>
-		void gaussian_elimination_parallel(V & RHS)
-		{
-			//printf("omp: %ld %d %d\n", m_ge_par.size(), nz_num, (int)m_ge_par[m_ge_par.size()-2].size());
-			for (auto l = 0ul; l < m_ge_par.size(); l++)
-				plib::omp::for_static(nz_num, 0ul, m_ge_par[l].size(), [this, &RHS, &l] (unsigned ll)
-				{
-					auto &i = m_ge_par[l][ll];
-					{
-						std::size_t nzbdp = 0;
-						std::size_t pi = diag[i];
-						const value_type f = 1.0 / A[pi++];
-						const std::size_t piie = row_idx[i+1];
-						const auto &nz = nzbd[i];
-
-						while (auto j = nz[nzbdp++])
-						{
-							// proceed to column i
-
-							std::size_t pj = row_idx[j];
-
-							while (col_idx[pj] < i)
-								pj++;
-
-							const value_type f1 = - A[pj++] * f;
-
-							// subtract row i from j
-							// fill-in available assumed, i.e. matrix was prepared
-							for (std::size_t pii = pi; pii<piie; pii++)
-							{
-								while (col_idx[pj] < col_idx[pii])
-									pj++;
-								if (col_idx[pj] == col_idx[pii])
-									A[pj++] += A[pii] * f1;
-							}
-							RHS[j] += f1 * RHS[i];
-						}
-					}
-				});
-		}
-
-		template <typename V1, typename V2>
-		void gaussian_back_substitution(V1 &V, const V2 &RHS)
-		{
-			const std::size_t iN = size();
-			/* row n-1 */
-			V[iN - 1] = RHS[iN - 1] / A[diag[iN - 1]];
-
-			for (std::size_t j = iN - 1; j-- > 0;)
-			{
-				value_type tmp = 0;
-				const auto jdiag = diag[j];
-				const std::size_t e = row_idx[j+1];
-				for (std::size_t pk = jdiag + 1; pk < e; pk++)
-					tmp += A[pk] * V[col_idx[pk]];
-				V[j] = (RHS[j] - tmp) / A[jdiag];
-			}
-		}
-
-		template <typename V1>
-		void gaussian_back_substitution(V1 &V)
-		{
-			const std::size_t iN = size();
-			/* row n-1 */
-			V[iN - 1] = V[iN - 1] / A[diag[iN - 1]];
-
-			for (std::size_t j = iN - 1; j-- > 0;)
-			{
-				value_type tmp = 0;
-				const auto jdiag = diag[j];
-				const std::size_t e = row_idx[j+1];
-				for (std::size_t pk = jdiag + 1; pk < e; pk++)
-					tmp += A[pk] * V[col_idx[pk]];
-				V[j] = (V[j] - tmp) / A[jdiag];
-			}
-		}
-
 
 		template <typename VTV, typename VTR>
 		void mult_vec(VTR & res, const VTV & x)
@@ -394,7 +223,7 @@ namespace plib
 			}
 		}
 
-		/* checks at all - may crash */
+		/* no checks at all - may crash */
 		template <typename LUMAT>
 		void raw_copy_from(LUMAT & src)
 		{
@@ -402,7 +231,305 @@ namespace plib
 				A[k] = src.A[k];
 		}
 
-		void incomplete_LU_factorization()
+	protected:
+		parray<std::vector<index_type>, N > nzbd;    // Support for gaussian elimination
+	private:
+		//parray<C, N < 0 ? -N * (N-1) / 2 : N * (N+1) / 2 > nzbd;    // Support for gaussian elimination
+		index_type m_size;
+	};
+
+	template<typename B>
+	struct pGEmatrix_cr_t : public B
+	{
+		using base = B;
+		using index_type = typename base::index_type;
+
+		COPYASSIGNMOVE(pGEmatrix_cr_t, default)
+
+		explicit pGEmatrix_cr_t(const index_type n)
+		: B(n)
+		{
+		}
+
+		~pGEmatrix_cr_t() = default;
+
+		template <typename M>
+		std::pair<std::size_t, std::size_t> gaussian_extend_fill_mat(M &fill)
+		{
+			std::size_t ops = 0;
+			std::size_t fill_max = 0;
+
+			for (std::size_t k = 0; k < fill.size(); k++)
+			{
+				ops++; // 1/A(k,k)
+				for (std::size_t row = k + 1; row < fill.size(); row++)
+				{
+					if (fill[row][k] < base::FILL_INFINITY)
+					{
+						ops++;
+						for (std::size_t col = k + 1; col < fill[row].size(); col++)
+							//if (fill[k][col] < FILL_INFINITY)
+							{
+								auto f = std::min(fill[row][col], 1 + fill[row][k] + fill[k][col]);
+								if (f < base::FILL_INFINITY)
+								{
+									if (f > fill_max)
+										fill_max = f;
+									ops += 2;
+								}
+								fill[row][col] = f;
+							}
+					}
+				}
+			}
+			build_parallel_gaussian_execution_scheme(fill);
+			return { fill_max, ops };
+		}
+
+		template <typename V>
+		void gaussian_elimination(V & RHS)
+		{
+			const std::size_t iN = base::size();
+
+			for (std::size_t i = 0; i < iN - 1; i++)
+			{
+				std::size_t nzbdp = 0;
+				std::size_t pi = base::diag[i];
+				const typename base::value_type f = 1.0 / base::A[pi++];
+				const std::size_t piie = base::row_idx[i+1];
+				const auto &nz = base::nzbd[i];
+
+				while (auto j = nz[nzbdp++]) // NOLINT(bugprone-infinite-loop)
+				{
+					// proceed to column i
+
+					std::size_t pj = base::row_idx[j];
+					std::size_t pje = base::row_idx[j+1];
+
+					while (base::col_idx[pj] < i)
+						pj++;
+
+					const typename base::value_type f1 = - base::A[pj++] * f;
+
+					// subtract row i from j
+					// fill-in available assumed, i.e. matrix was prepared
+
+					for (std::size_t pii = pi; pii<piie && pj < pje; pii++)
+					{
+						while (base::col_idx[pj] < base::col_idx[pii])
+							pj++;
+						if (base::col_idx[pj] == base::col_idx[pii])
+							base::A[pj++] += base::A[pii] * f1;
+					}
+
+					RHS[j] += f1 * RHS[i];
+				}
+			}
+		}
+
+		int get_parallel_level(std::size_t k) const
+		{
+			for (std::size_t i = 0; i <  m_ge_par.size(); i++)
+				if (plib::container::contains( m_ge_par[i], k))
+					return static_cast<int>(i);
+			return -1;
+		}
+
+		template <typename V>
+		void gaussian_elimination_parallel(V & RHS)
+		{
+			//printf("omp: %ld %d %d\n", m_ge_par.size(), nz_num, (int)m_ge_par[m_ge_par.size()-2].size());
+			for (auto l = 0ul; l < m_ge_par.size(); l++)
+				plib::omp::for_static(base::nz_num, 0ul, m_ge_par[l].size(), [this, &RHS, &l] (unsigned ll)
+				{
+					auto &i = m_ge_par[l][ll];
+					{
+						std::size_t nzbdp = 0;
+						std::size_t pi = base::diag[i];
+						const typename base::value_type f = 1.0 / base::A[pi++];
+						const std::size_t piie = base::row_idx[i+1];
+						const auto &nz = base::nzbd[i];
+
+						while (auto j = nz[nzbdp++])
+						{
+							// proceed to column i
+
+							std::size_t pj = base::row_idx[j];
+
+							while (base::col_idx[pj] < i)
+								pj++;
+
+							const typename base::value_type f1 = - base::A[pj++] * f;
+
+							// subtract row i from j
+							// fill-in available assumed, i.e. matrix was prepared
+							for (std::size_t pii = pi; pii<piie; pii++)
+							{
+								while (base::col_idx[pj] < base::col_idx[pii])
+									pj++;
+								if (base::col_idx[pj] == base::col_idx[pii])
+									base::A[pj++] += base::A[pii] * f1;
+							}
+							RHS[j] += f1 * RHS[i];
+						}
+					}
+				});
+		}
+
+		template <typename V1, typename V2>
+		void gaussian_back_substitution(V1 &V, const V2 &RHS)
+		{
+			const std::size_t iN = base::size();
+			/* row n-1 */
+			V[iN - 1] = RHS[iN - 1] / base::A[base::diag[iN - 1]];
+
+			for (std::size_t j = iN - 1; j-- > 0;)
+			{
+				typename base::value_type tmp = 0;
+				const auto jdiag = base::diag[j];
+				const std::size_t e = base::row_idx[j+1];
+				for (std::size_t pk = jdiag + 1; pk < e; pk++)
+					tmp += base::A[pk] * V[base::col_idx[pk]];
+				V[j] = (RHS[j] - tmp) / base::A[jdiag];
+			}
+		}
+
+		template <typename V1>
+		void gaussian_back_substitution(V1 &V)
+		{
+			const std::size_t iN = base::size();
+			/* row n-1 */
+			V[iN - 1] = V[iN - 1] / base::A[base::diag[iN - 1]];
+
+			for (std::size_t j = iN - 1; j-- > 0;)
+			{
+				typename base::value_type tmp = 0;
+				const auto jdiag = base::diag[j];
+				const std::size_t e = base::row_idx[j+1];
+				for (std::size_t pk = jdiag + 1; pk < e; pk++)
+					tmp += base::A[pk] * V[base::col_idx[pk]];
+				V[j] = (V[j] - tmp) / base::A[jdiag];
+			}
+		}
+
+	private:
+		template <typename M>
+		void build_parallel_gaussian_execution_scheme(const M &fill)
+		{
+			// calculate parallel scheme for gaussian elimination
+			std::vector<std::vector<index_type>> rt(base::size());
+			for (index_type k = 0; k < base::size(); k++)
+			{
+				for (index_type j = k+1; j < base::size(); j++)
+				{
+					if (fill[j][k] < base::FILL_INFINITY)
+					{
+						rt[k].push_back(j);
+					}
+				}
+			}
+
+			std::vector<index_type> levGE(base::size(), 0);
+			index_type cl = 0;
+
+			for (index_type k = 0; k < base::size(); k++ )
+			{
+				if (levGE[k] >= cl)
+				{
+					std::vector<index_type> t = rt[k];
+					for (index_type j = k+1; j < base::size(); j++ )
+					{
+						bool overlap = false;
+						// is there overlap
+						if (plib::container::contains(t, j))
+							overlap = true;
+						for (auto &x : rt[j])
+							if (plib::container::contains(t, x))
+							{
+								overlap = true;
+								break;
+							}
+						if (overlap)
+							levGE[j] = cl + 1;
+						else
+						{
+							t.push_back(j);
+							for (auto &x : rt[j])
+								t.push_back(x);
+						}
+					}
+					cl++;
+				}
+			}
+
+			m_ge_par.clear();
+			m_ge_par.resize(cl+1);
+			for (index_type k = 0; k < base::size(); k++)
+				m_ge_par[levGE[k]].push_back(k);
+			//for (std::size_t k = 0; k < m_ge_par.size(); k++)
+			//	printf("%d %d\n", (int) k, (int) m_ge_par[k].size());
+		}
+		// contains elimination rows below the diagonal
+		std::vector<std::vector<index_type>> m_ge_par; // parallel execution support for Gauss
+	};
+
+	template<typename B>
+	struct pLUmatrix_cr_t : public B
+	{
+		using base = B;
+		using index_type = typename base::index_type;
+
+		COPYASSIGNMOVE(pLUmatrix_cr_t, default)
+
+		explicit pLUmatrix_cr_t(const index_type n)
+		: B(n)
+		, ilu_rows(n+1)
+		, m_ILUp(0)
+		{
+		}
+
+		~pLUmatrix_cr_t() = default;
+
+		template <typename M>
+		void build(M &fill, std::size_t ilup)
+		{
+			index_type p(0);
+			/* build ilu_rows */
+			for (index_type i=1; i < fill.size(); i++)
+			{
+				bool found(false);
+				for (index_type k = 0; k < i; k++)
+				{
+					// if (fill[i][k] < base::FILL_INFINITY)
+					if (fill[i][k] <= ilup)
+					{
+						// assume A[k][k]!=0
+						for (index_type j=k+1; j < fill.size(); j++)
+						{
+							auto f = std::min(fill[i][j], 1 + fill[i][k] + fill[k][j]);
+							//if (f < base::FILL_INFINITY)
+							if (f <= ilup)
+							{
+#if 0
+								if (f > fill_max)
+									fill_max = f;
+								ops += 2;
+#endif
+								fill[i][j] = f;
+							}
+						}
+						found = true;
+					}
+				}
+				if (found)
+					ilu_rows[p++] = i;
+			}
+			ilu_rows[p] = 0; // end of array
+			this->build_from_fill_mat(fill, ilup); //, m_band_width); // ILU(2)
+			m_ILUp = ilup;
+		}
+
+		void incomplete_LU_factorization(const base &mat)
 		{
 			/*
 			 * incomplete LU Factorization according to http://de.wikipedia.org/wiki/ILU-Zerlegung
@@ -421,31 +548,35 @@ namespace plib
 			 *    i=i+1
 			 *
 			 */
+			if (m_ILUp < 1)
+				this->raw_copy_from(mat);
+			else
+				this->reduction_copy_from(mat);
 
 			index_type p(0);
 			while (auto i = ilu_rows[p++]) // NOLINT(bugprone-infinite-loop)
 			{
-				const auto p_i_end = row_idx[i + 1];
+				const auto p_i_end = base::row_idx[i + 1];
 				// loop over all columns k left of diag in row i
 				//if (row_idx[i] < diag[i])
 				//	printf("occ %d\n", (int)i);
-				for (auto i_k = row_idx[i]; i_k < diag[i]; i_k++)
+				for (auto i_k = base::row_idx[i]; i_k < base::diag[i]; i_k++)
 				{
-					const auto k(col_idx[i_k]);
-					const auto p_k_end(row_idx[k + 1]);
-					const T LUp_i_k = A[i_k] = A[i_k] / A[diag[k]];
+					const auto k(base::col_idx[i_k]);
+					const auto p_k_end(base::row_idx[k + 1]);
+					const typename base::value_type LUp_i_k = base::A[i_k] = base::A[i_k] / base::A[base::diag[k]];
 
-					auto k_j(diag[k] + 1);
-					auto i_j(i_k + 1);
+					index_type k_j(base::diag[k] + 1);
+					index_type i_j(i_k + 1);
 
 					while (i_j < p_i_end && k_j < p_k_end )  // pj = (i, j)
 					{
 						// we can assume that within a row ja increases continuously */
-						const auto c_i_j(col_idx[i_j]); // row i, column j
-						const auto c_k_j(col_idx[k_j]); // row k, column j
+						const index_type c_i_j(base::col_idx[i_j]); // row i, column j
+						const auto c_k_j(base::col_idx[k_j]); // row k, column j
 
 						if (c_k_j == c_i_j)
-							A[i_j] -= LUp_i_k * A[k_j];
+							base::A[i_j] -= LUp_i_k * base::A[k_j];
 						k_j += (c_k_j <= c_i_j ? 1 : 0);
 						i_j += (c_k_j >= c_i_j ? 1 : 0);
 
@@ -478,86 +609,30 @@ namespace plib
 			 * This can be solved for x using backwards elimination in U.
 			 *
 			 */
-			for (index_type i = 1; i < size(); ++i )
+			for (index_type i = 1; i < base::size(); ++i )
 			{
-				T tmp = 0.0;
-				const auto j1(row_idx[i]);
-				const auto j2(diag[i]);
+				typename base::value_type tmp(0);
+				const auto j1(base::row_idx[i]);
+				const auto j2(base::diag[i]);
 
 				for (auto j = j1; j < j2; ++j )
-					tmp +=  A[j] * r[col_idx[j]];
+					tmp +=  base::A[j] * r[base::col_idx[j]];
 				r[i] -= tmp;
 			}
 			// i now is equal to n;
-			for (auto i = size(); i-- > 0; )
+			for (index_type i = base::size(); i-- > 0; )
 			{
-				T tmp = 0.0;
-				const auto di(diag[i]);
-				const auto j2(row_idx[i+1]);
-				for (auto j = di + 1; j < j2; j++ )
-					tmp += A[j] * r[col_idx[j]];
-				r[i] = (r[i] - tmp) / A[di];
+				typename base::value_type tmp(0);
+				const auto di(base::diag[i]);
+				const auto j2(base::row_idx[i+1]);
+				for (index_type j = di + 1; j < j2; j++ )
+					tmp += base::A[j] * r[base::col_idx[j]];
+				r[i] = (r[i] - tmp) / base::A[di];
 			}
 		}
 	private:
-		template <typename M>
-		void build_parallel_gaussian_execution_scheme(const M &fill)
-		{
-			// calculate parallel scheme for gaussian elimination
-			std::vector<std::vector<index_type>> rt(size());
-			for (index_type k = 0; k < size(); k++)
-			{
-				for (index_type j = k+1; j < size(); j++)
-				{
-					if (fill[j][k] < FILL_INFINITY)
-					{
-						rt[k].push_back(j);
-					}
-				}
-			}
-
-			std::vector<index_type> levGE(size(), 0);
-			index_type cl = 0;
-
-			for (index_type k = 0; k < size(); k++ )
-			{
-				if (levGE[k] >= cl)
-				{
-					std::vector<index_type> t = rt[k];
-					for (index_type j = k+1; j < size(); j++ )
-					{
-						bool overlap = false;
-						// is there overlap
-						if (plib::container::contains(t, j))
-							overlap = true;
-						for (auto &x : rt[j])
-							if (plib::container::contains(t, x))
-							{
-								overlap = true;
-								break;
-							}
-						if (overlap)
-							levGE[j] = cl + 1;
-						else
-						{
-							t.push_back(j);
-							for (auto &x : rt[j])
-								t.push_back(x);
-						}
-					}
-					cl++;
-				}
-			}
-
-			m_ge_par.clear();
-			m_ge_par.resize(cl+1);
-			for (index_type k = 0; k < size(); k++)
-				m_ge_par[levGE[k]].push_back(k);
-			//for (std::size_t k = 0; k < m_ge_par.size(); k++)
-			//	printf("%d %d\n", (int) k, (int) m_ge_par[k].size());
-		}
-
-		index_type m_size;
+		parray<index_type, base::Np1> ilu_rows;
+		std::size_t m_ILUp;
 	};
 
 } // namespace plib

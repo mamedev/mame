@@ -48,7 +48,7 @@ namespace devices
 
 	private:
 
-		using mattype = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
+		using mattype = typename plib::pmatrix_cr_t<FT, SIZE>::index_type;
 
 		//plib::mat_precondition_none<FT, SIZE> m_ops;
 		plib::mat_precondition_ILU<FT, SIZE> m_ops;

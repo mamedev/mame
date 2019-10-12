@@ -10,8 +10,8 @@
 
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"
-#include "plib/vector_ops.h"
 #include "plib/parray.h"
+#include "plib/vector_ops.h"
 
 #include <algorithm>
 #include <cmath>
@@ -95,10 +95,10 @@ namespace devices
 				const auto &nzrd = m_terms[i]->m_nzrd;
 				const auto &nzbd = m_terms[i]->m_nzbd;
 
-				for (std::size_t j : nzbd)
+				for (const std::size_t j : nzbd)
 				{
 					const FT f1 = -f * A(j, i);
-					for (std::size_t k : nzrd)
+					for (const std::size_t k : nzrd)
 						A(j, k) += A(i, k) * f1;
 					//RHS(j) += RHS(i) * f1;
 				}

@@ -7,6 +7,7 @@
 
 #include "poptions.h"
 #include "pexception.h"
+#include "pstrutil.h"
 #include "ptypes.h"
 
 namespace plib {

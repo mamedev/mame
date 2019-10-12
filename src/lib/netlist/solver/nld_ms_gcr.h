@@ -30,7 +30,7 @@ namespace devices
 	{
 	public:
 
-		using mat_type = plib::matrix_compressed_rows_t<FT, SIZE>;
+		using mat_type = plib::pGEmatrix_cr_t<plib::pmatrix_cr_t<FT, SIZE>>;
 		// FIXME: dirty hack to make this compile
 		static constexpr const std::size_t storage_N = 100;
 
@@ -54,7 +54,7 @@ namespace devices
 
 	private:
 
-		using mat_index_type = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
+		using mat_index_type = typename plib::pmatrix_cr_t<FT, SIZE>::index_type;
 
 		void generate_code(plib::putf8_fmt_writer &strm);
 

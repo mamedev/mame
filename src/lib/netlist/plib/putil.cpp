@@ -3,11 +3,10 @@
 
 #include "putil.h"
 #include "plists.h"
+#include "pstrutil.h"
 #include "ptypes.h"
 
 #include <algorithm>
-//#include <cstdlib>
-//#include <cstring>
 #include <initializer_list>
 
 namespace plib

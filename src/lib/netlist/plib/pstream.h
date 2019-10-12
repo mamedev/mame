@@ -13,6 +13,7 @@
 #include "pexception.h"
 #include "pfmtlog.h"
 #include "pstring.h"
+#include "pstrutil.h"
 
 #include <array>
 #include <fstream>

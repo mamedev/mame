@@ -227,7 +227,7 @@ namespace devices
 
 			switch (net_count)
 			{
-	#if 1
+	#if 0
 				case 1:
 					ms = plib::make_unique<matrix_solver_direct1_t<double>>(state(), sname, &m_params);
 					break;

@@ -7,6 +7,7 @@
 
 #include "pfmtlog.h"
 #include "palloc.h"
+#include "pstrutil.h"
 
 #include <algorithm>
 #include <array>

@@ -35,10 +35,11 @@ namespace plib
 	template <typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
-		using mat_type = plib::matrix_compressed_rows_t<FT, SIZE>;
+		using mat_type = plib::pmatrix_cr_t<FT, SIZE>;
+		using matLU_type = plib::pLUmatrix_cr_t<mat_type>;
 
 		mat_precondition_ILU(std::size_t size, std::size_t ilu_scale = 4
-			, std::size_t bw = plib::matrix_compressed_rows_t<FT, SIZE>::FILL_INFINITY)
+			, std::size_t bw = plib::pmatrix_cr_t<FT, SIZE>::FILL_INFINITY)
 		: m_mat(static_cast<typename mat_type::index_type>(size))
 		, m_LU(static_cast<typename mat_type::index_type>(size))
 		, m_ILU_scale(static_cast<std::size_t>(ilu_scale))
@@ -50,9 +51,7 @@ namespace plib
 		void build(M &fill)
 		{
 			m_mat.build_from_fill_mat(fill, 0);
-			m_LU.gaussian_extend_fill_mat(fill);
-			m_LU.build_from_fill_mat(fill, m_ILU_scale, m_band_width); // ILU(2)
-			//m_LU.build_from_fill_mat(fill, 9999, 20); // Band matrix width 20
+			m_LU.build(fill, m_ILU_scale);
 		}
 
 
@@ -64,11 +63,7 @@ namespace plib
 
 		void precondition()
 		{
-			if (m_ILU_scale < 1)
-				m_LU.raw_copy_from(m_mat);
-			else
-				m_LU.reduction_copy_from(m_mat);
-			m_LU.incomplete_LU_factorization();
+			m_LU.incomplete_LU_factorization(m_mat);
 		}
 
 		template<typename V>
@@ -80,7 +75,7 @@ namespace plib
 		PALIGNAS_VECTOROPT()
 		mat_type                m_mat;
 		PALIGNAS_VECTOROPT()
-		mat_type                m_LU;
+		matLU_type              m_LU;
 		std::size_t             m_ILU_scale;
 		std::size_t             m_band_width;
 	};
@@ -174,7 +169,7 @@ namespace plib
 				v[i] = v[i] * m_diag[i];
 		}
 
-		plib::matrix_compressed_rows_t<FT, SIZE> m_mat;
+		plib::pmatrix_cr_t<FT, SIZE> m_mat;
 		plib::parray<FT, SIZE> m_diag;
 		plib::parray<std::vector<std::size_t>, SIZE > nzcol;
 	};
@@ -210,7 +205,7 @@ namespace plib
 			plib::unused_var(v);
 		}
 
-		plib::matrix_compressed_rows_t<FT, SIZE> m_mat;
+		plib::pmatrix_cr_t<FT, SIZE> m_mat;
 	};
 
 	/* FIXME: hardcoding RESTART to 20 becomes an issue on very large

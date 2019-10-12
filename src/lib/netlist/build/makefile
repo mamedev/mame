@@ -24,6 +24,8 @@ TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
 TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
 TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses,
 TIDY_FLAGSX += -modernize-use-trailing-return-type
+TIDY_FLAGSX += -bugprone-too-small-loop-variable
+TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay
 
 space := 
 space += 

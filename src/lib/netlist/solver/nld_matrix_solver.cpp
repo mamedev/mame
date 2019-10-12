@@ -418,7 +418,7 @@ namespace devices
 		++m_stat_vsolver_calls;
 		if (has_dynamic_devices())
 		{
-			std::size_t this_resched;
+			std::size_t this_resched(0);
 			std::size_t newton_loops = 0;
 			do
 			{
@@ -559,10 +559,14 @@ namespace devices
 
 		if (m_params.m_dynamic_ts)
 		{
+#if 0
 			for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 			{
 				terms_for_net_t *t = m_terms[k].get();
-
+#else
+			for (auto &t : m_terms)
+			{
+#endif
 				//const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 				// avoid floating point exceptions
 				const nl_double DD_n = std::max(-1e100, std::min(1e100,(t->getV() - t->m_last_V)));
@@ -570,7 +574,7 @@ namespace devices
 
 				//printf("%g %g %g %g\n", DD_n, hn, t->m_DD_n_m_1, t->m_h_n_m_1);
 				nl_double DD2 = (DD_n / hn - t->m_DD_n_m_1 / t->m_h_n_m_1) / (hn + t->m_h_n_m_1);
-				nl_double new_net_timestep;
+				nl_double new_net_timestep(0);
 
 				t->m_h_n_m_1 = hn;
 				t->m_DD_n_m_1 = DD_n;
