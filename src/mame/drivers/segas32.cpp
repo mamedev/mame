@@ -5404,6 +5404,7 @@ void segas32_state::segas32_common_init()
 	uint8_t *Z80 = memregion("soundcpu")->base();
 	uint32_t size = memregion("soundcpu")->bytes();
 	m_soundrom_bank->configure_entries(0, size / 0x2000, &Z80[0], 0x2000);
+
 	/* reset the custom handlers and other pointers */
 	m_system32_prot_vblank = nullptr;
 	m_sw1_output = nullptr;

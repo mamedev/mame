@@ -3078,7 +3078,7 @@ ROM_END
   * lcd screen with custom segments, 1-bit sound
 
   This is the new wide screen version, there's also a Gold Series version
-  (MH-06). The both games are using different MCU types so this version seems
+  (MH-06). The two games are using different MCU types so this version seems
   to be a complete rewrite.
 
 ***************************************************************************/
