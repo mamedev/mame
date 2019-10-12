@@ -40,6 +40,8 @@ aliens.cpp
 alinvade.cpp
 allied.cpp
 alpha68k.cpp
+alpha68k_i.cpp
+alpha68k_n.cpp
 alvg.cpp
 amaticmg.cpp
 ambush.cpp
@@ -115,11 +117,11 @@ belatra.cpp
 berzerk.cpp
 bestleag.cpp
 bfcobra.cpp
-bfm_ad5.cpp
+bfm_ad5sw.cpp
 bfm_sc1.cpp
 bfm_sc2.cpp
 bfm_sc4.cpp
-bfm_sc5.cpp
+bfm_sc5sw.cpp
 bfm_swp.cpp
 bfmsys83.cpp
 bfmsys85.cpp
@@ -557,6 +559,7 @@ invqix.cpp
 iqblock.cpp
 irobot.cpp
 ironhors.cpp
+island.cpp
 istellar.cpp
 istrebiteli.cpp
 iteagle.cpp
@@ -639,7 +642,6 @@ lastbank.cpp
 lastduel.cpp
 lastfght.cpp
 laz_aftrshok.cpp
-laz_awetoss.cpp
 laz_ribrac.cpp
 lazercmd.cpp
 lbeach.cpp
@@ -707,9 +709,9 @@ mastboy.cpp
 mastboyo.cpp
 matmania.cpp
 maxaflex.cpp
-maygay1b.cpp
+maygay1bsw.cpp
 maygayep.cpp
-maygaysw.cpp
+maygayew.cpp
 maygayv1.cpp
 mazerbla.cpp
 mcatadv.cpp
@@ -800,7 +802,7 @@ mpu4plasma.cpp
 mpu4sw.cpp
 mpu4union.cpp
 mpu4vid.cpp
-mpu5.cpp
+mpu5sw.cpp
 mquake.cpp
 mrdo.cpp
 mrflea.cpp
@@ -1141,6 +1143,7 @@ spaceg.cpp
 spartanxtec.cpp
 spbactn.cpp
 spcforce.cpp
+spdheat.cpp
 spdodgeb.cpp
 spectra.cpp
 speedatk.cpp

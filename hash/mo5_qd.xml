@@ -13,25 +13,25 @@
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="jane.bin" size="65536" crc="18bf5e9d" sha1="60dc65955a195124f4f96408f1a831bbabdd0e7d" offset="0" />
+				<rom name="jane.bin" size="65536" crc="18bf5e9d" sha1="60dc65955a195124f4f96408f1a831bbabdd0e7d"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="thom_flop">
 			<feature name="part_id" value="Systeme"/>
 			<dataarea name="flop" size="51200">
-				<rom name="systeme.qd" size="51200" crc="6d1d8993" sha1="89d7a846c995b5c0a1f369e5a2b36ba759b6a232" offset="0" />
+				<rom name="systeme.qd" size="51200" crc="6d1d8993" sha1="89d7a846c995b5c0a1f369e5a2b36ba759b6a232"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
 			<feature name="part_id" value="Donnees"/>
 			<dataarea name="flop" size="51200">
-				<rom name="donnees.qd" size="51200" crc="694facba" sha1="bc04601134f873a087d83eaf9abdfad9e6a4ae79" offset="0" />
+				<rom name="donnees.qd" size="51200" crc="694facba" sha1="bc04601134f873a087d83eaf9abdfad9e6a4ae79"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
 			<feature name="part_id" value="Aide"/>
 			<dataarea name="flop" size="51200">
-				<rom name="aide.qd" size="51200" crc="0a7b4a7a" sha1="f2b225a096330dc94a776c401e11502d7b76ed07" offset="0" />
+				<rom name="aide.qd" size="51200" crc="0a7b4a7a" sha1="f2b225a096330dc94a776c401e11502d7b76ed07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,25 +44,25 @@
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="jane.bin" size="65536" crc="18bf5e9d" sha1="60dc65955a195124f4f96408f1a831bbabdd0e7d" offset="0" />
+				<rom name="jane.bin" size="65536" crc="18bf5e9d" sha1="60dc65955a195124f4f96408f1a831bbabdd0e7d"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="thom_flop">
 			<feature name="part_id" value="Systeme"/>
 			<dataarea name="flop" size="51200">
-				<rom name="systemea.qd" size="51200" crc="824c506e" sha1="286fa17e7876e3316332ee022dae57e21f8e7918" offset="0" />
+				<rom name="systemea.qd" size="51200" crc="824c506e" sha1="286fa17e7876e3316332ee022dae57e21f8e7918"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
 			<feature name="part_id" value="Donnees"/>
 			<dataarea name="flop" size="51200">
-				<rom name="donnees.qd" size="51200" crc="694facba" sha1="bc04601134f873a087d83eaf9abdfad9e6a4ae79" offset="0" />
+				<rom name="donnees.qd" size="51200" crc="694facba" sha1="bc04601134f873a087d83eaf9abdfad9e6a4ae79"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
 			<feature name="part_id" value="Aide"/>
 			<dataarea name="flop" size="51200">
-				<rom name="aide.qd" size="51200" crc="0a7b4a7a" sha1="f2b225a096330dc94a776c401e11502d7b76ed07" offset="0" />
+				<rom name="aide.qd" size="51200" crc="0a7b4a7a" sha1="f2b225a096330dc94a776c401e11502d7b76ed07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,25 +75,25 @@
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="janea.bin" size="65536" crc="e0e30406" sha1="78afd8d57aa35f899d725e560f29e02a2602ddc2" offset="0" />
+				<rom name="janea.bin" size="65536" crc="e0e30406" sha1="78afd8d57aa35f899d725e560f29e02a2602ddc2"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="thom_flop">
 			<feature name="part_id" value="Systeme"/>
 			<dataarea name="flop" size="51200">
-				<rom name="systeme.qd" size="51200" crc="6d1d8993" sha1="89d7a846c995b5c0a1f369e5a2b36ba759b6a232" offset="0" />
+				<rom name="systeme.qd" size="51200" crc="6d1d8993" sha1="89d7a846c995b5c0a1f369e5a2b36ba759b6a232"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
 			<feature name="part_id" value="Donnees"/>
 			<dataarea name="flop" size="51200">
-				<rom name="donnees.qd" size="51200" crc="694facba" sha1="bc04601134f873a087d83eaf9abdfad9e6a4ae79" offset="0" />
+				<rom name="donnees.qd" size="51200" crc="694facba" sha1="bc04601134f873a087d83eaf9abdfad9e6a4ae79"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
 			<feature name="part_id" value="Aide"/>
 			<dataarea name="flop" size="51200">
-				<rom name="aide.qd" size="51200" crc="0a7b4a7a" sha1="f2b225a096330dc94a776c401e11502d7b76ed07" offset="0" />
+				<rom name="aide.qd" size="51200" crc="0a7b4a7a" sha1="f2b225a096330dc94a776c401e11502d7b76ed07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -106,25 +106,25 @@
 
 		<part name="cart" interface="mo_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="janea.bin" size="65536" crc="e0e30406" sha1="78afd8d57aa35f899d725e560f29e02a2602ddc2" offset="0" />
+				<rom name="janea.bin" size="65536" crc="e0e30406" sha1="78afd8d57aa35f899d725e560f29e02a2602ddc2"/>
 			</dataarea>
 		</part>
 		<part name="flop1" interface="thom_flop">
 			<feature name="part_id" value="Systeme"/>
 			<dataarea name="flop" size="51200">
-				<rom name="systemea.qd" size="51200" crc="824c506e" sha1="286fa17e7876e3316332ee022dae57e21f8e7918" offset="0" />
+				<rom name="systemea.qd" size="51200" crc="824c506e" sha1="286fa17e7876e3316332ee022dae57e21f8e7918"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
 			<feature name="part_id" value="Donnees"/>
 			<dataarea name="flop" size="51200">
-				<rom name="donnees.qd" size="51200" crc="694facba" sha1="bc04601134f873a087d83eaf9abdfad9e6a4ae79" offset="0" />
+				<rom name="donnees.qd" size="51200" crc="694facba" sha1="bc04601134f873a087d83eaf9abdfad9e6a4ae79"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
 			<feature name="part_id" value="Aide"/>
 			<dataarea name="flop" size="51200">
-				<rom name="aide.qd" size="51200" crc="0a7b4a7a" sha1="f2b225a096330dc94a776c401e11502d7b76ed07" offset="0" />
+				<rom name="aide.qd" size="51200" crc="0a7b4a7a" sha1="f2b225a096330dc94a776c401e11502d7b76ed07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -136,7 +136,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="qddbasic.qd" size="51200" crc="b510b9be" sha1="a583cf9779add76a4488821b8cd9b1c5867b704d" offset="0" />
+				<rom name="qddbasic.qd" size="51200" crc="b510b9be" sha1="a583cf9779add76a4488821b8cd9b1c5867b704d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -150,7 +150,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic01.qd" size="51200" crc="202d3584" sha1="dbd8cef1bc53c9fd45373e75565a1267291a72ca" offset="0" />
+				<rom name="basic01.qd" size="51200" crc="202d3584" sha1="dbd8cef1bc53c9fd45373e75565a1267291a72ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -162,7 +162,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic02.qd" size="51200" crc="0d0f21b2" sha1="3d6a6b2e05a50e07887ab02db1e29bab2c246d15" offset="0" />
+				<rom name="basic02.qd" size="51200" crc="0d0f21b2" sha1="3d6a6b2e05a50e07887ab02db1e29bab2c246d15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -174,7 +174,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic03.qd" size="51200" crc="2a9dae9f" sha1="7ecd029fd788d3db086ccd67ded3a487a554a962" offset="0" />
+				<rom name="basic03.qd" size="51200" crc="2a9dae9f" sha1="7ecd029fd788d3db086ccd67ded3a487a554a962"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic04.qd" size="51200" crc="2d28c0d5" sha1="8c9e66df8e0ece017a5c77fdeebf97be8261077e" offset="0" />
+				<rom name="basic04.qd" size="51200" crc="2d28c0d5" sha1="8c9e66df8e0ece017a5c77fdeebf97be8261077e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -198,7 +198,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic05.qd" size="51200" crc="3266e583" sha1="9dbfeae886be506ad1c0422e7859cc0c715e412b" offset="0" />
+				<rom name="basic05.qd" size="51200" crc="3266e583" sha1="9dbfeae886be506ad1c0422e7859cc0c715e412b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -210,7 +210,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic06.qd" size="51200" crc="95cc8dba" sha1="c5e8054be9a532fd3351a33c1580af0c60a19605" offset="0" />
+				<rom name="basic06.qd" size="51200" crc="95cc8dba" sha1="c5e8054be9a532fd3351a33c1580af0c60a19605"/>
 			</dataarea>
 		</part>
 	</software>
@@ -222,7 +222,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic07.qd" size="51200" crc="6c0f15b4" sha1="066bbe8f56da9a427efa64a2d34337e6383a490a" offset="0" />
+				<rom name="basic07.qd" size="51200" crc="6c0f15b4" sha1="066bbe8f56da9a427efa64a2d34337e6383a490a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -234,7 +234,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic08.qd" size="51200" crc="bb55f4dc" sha1="3750a81a3ba5200a853ef7987590e9d290bd2a43" offset="0" />
+				<rom name="basic08.qd" size="51200" crc="bb55f4dc" sha1="3750a81a3ba5200a853ef7987590e9d290bd2a43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -246,7 +246,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic09.qd" size="51200" crc="b7ec472f" sha1="75caf221b8da4e0018f00fb7f80bf30ee6a5bc9c" offset="0" />
+				<rom name="basic09.qd" size="51200" crc="b7ec472f" sha1="75caf221b8da4e0018f00fb7f80bf30ee6a5bc9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -258,7 +258,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic10.qd" size="51200" crc="6654c44c" sha1="6c65701ca62f7c81fca00ed5c0a8141ca8dfe2a7" offset="0" />
+				<rom name="basic10.qd" size="51200" crc="6654c44c" sha1="6c65701ca62f7c81fca00ed5c0a8141ca8dfe2a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -270,7 +270,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic12.qd" size="51200" crc="a6d528bf" sha1="6be643fc8b9478c99df00eaa48b4938c1654b596" offset="0" />
+				<rom name="basic12.qd" size="51200" crc="a6d528bf" sha1="6be643fc8b9478c99df00eaa48b4938c1654b596"/>
 			</dataarea>
 		</part>
 	</software>
@@ -282,7 +282,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic13.qd" size="51200" crc="cb33fed3" sha1="917130f09cc472ec9c14affda733d6dc6627bf26" offset="0" />
+				<rom name="basic13.qd" size="51200" crc="cb33fed3" sha1="917130f09cc472ec9c14affda733d6dc6627bf26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -294,7 +294,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="basic14.qd" size="51200" crc="29f3454d" sha1="046dc7a581e996a6e2bfd5e32439aaf0122180fc" offset="0" />
+				<rom name="basic14.qd" size="51200" crc="29f3454d" sha1="046dc7a581e996a6e2bfd5e32439aaf0122180fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -308,7 +308,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="beachead.qd" size="51200" crc="e3f35d0e" sha1="69a63c4135d0abbe3ba54b2bae0c6e568d6e53ae" offset="0" />
+				<rom name="beachead.qd" size="51200" crc="e3f35d0e" sha1="69a63c4135d0abbe3ba54b2bae0c6e568d6e53ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -320,7 +320,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="bluewar.qd" size="51200" crc="1b3998e5" sha1="9da8fb68fad72b861ec8cc5ee4278029cee5749c" offset="0" />
+				<rom name="bluewar.qd" size="51200" crc="1b3998e5" sha1="9da8fb68fad72b861ec8cc5ee4278029cee5749c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -334,25 +334,25 @@
 		<part name="flop1" interface="thom_flop">
 			<feature name="part_id" value="Disk 1 Side A"/>
 			<dataarea name="flop" size="51200">
-				<rom name="erebus1a.qd" size="51200" crc="8bd3f65c" sha1="2c0d9e3abdb0003bd9341a2bcc439517c4a574ab" offset="0" />
+				<rom name="erebus1a.qd" size="51200" crc="8bd3f65c" sha1="2c0d9e3abdb0003bd9341a2bcc439517c4a574ab"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="thom_flop">
 			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="51200">
-				<rom name="erebus1b.qd" size="51200" crc="c3c0a0a6" sha1="ffa8696cfbefdfaf497ca3694fbea0c32747982f" offset="0" />
+				<rom name="erebus1b.qd" size="51200" crc="c3c0a0a6" sha1="ffa8696cfbefdfaf497ca3694fbea0c32747982f"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="thom_flop">
 			<feature name="part_id" value="Disk 2 Side A"/>
 			<dataarea name="flop" size="51200">
-				<rom name="erebus2a.qd" size="51200" crc="804f4d94" sha1="1be13476dd5f203c2c89ac035d99455ee2a4790c" offset="0" />
+				<rom name="erebus2a.qd" size="51200" crc="804f4d94" sha1="1be13476dd5f203c2c89ac035d99455ee2a4790c"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="thom_flop">
 			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="51200">
-				<rom name="erebus2b.qd" size="51200" crc="0a97ab6f" sha1="704e57de58c4663b26d424fa95270d7076bf48e5" offset="0" />
+				<rom name="erebus2b.qd" size="51200" crc="0a97ab6f" sha1="704e57de58c4663b26d424fa95270d7076bf48e5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -364,7 +364,7 @@
 
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="51200">
-				<rom name="malthaar.qd" size="51200" crc="7248952d" sha1="846cf2981ed3fa653db8f2e67efbfef4c2a6acaa" offset="0" />
+				<rom name="malthaar.qd" size="51200" crc="7248952d" sha1="846cf2981ed3fa653db8f2e67efbfef4c2a6acaa"/>
 			</dataarea>
 		</part>
 	</software>

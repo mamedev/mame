@@ -86,7 +86,7 @@ void selz80_state::selz80_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x27ff).ram(); // all 3 RAM sockets filled
-	// AM_RANGE(0x3000, 0x37ff) AM_ROM  // empty socket for ROM
+	// map(0x3000, 0x37ff).rom();  // empty socket for ROM
 	map(0xa000, 0xffff).rom();
 }
 

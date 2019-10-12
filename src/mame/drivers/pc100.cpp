@@ -340,7 +340,7 @@ void pc100_state::pc100_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
-//  AM_RANGE(0x04, 0x07) i8237?
+//  map(0x04, 0x07) i8237?
 	map(0x08, 0x0b).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // upd765
 	map(0x10, 0x17).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255 #1
 	map(0x18, 0x1f).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255 #2

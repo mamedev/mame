@@ -129,7 +129,8 @@ isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const ch
 
 void isa8_fdc_ps2_device::device_add_mconfig(machine_config &config)
 {
-	n82077aa_device &n82077aa(N82077AA(config, m_fdc, 24'000'000, n82077aa_device::MODE_PS2));
+	n82077aa_device &n82077aa(N82077AA(config, m_fdc, 24'000'000));
+	n82077aa.set_mode(n82077aa_device::mode_t::PS2);
 	n82077aa.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	n82077aa.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);

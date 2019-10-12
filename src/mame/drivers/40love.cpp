@@ -350,7 +350,7 @@ void fortyl_state::_40love_map(address_map &map)
 	map(0x9880, 0x98bf).rw(FUNC(fortyl_state::fortyl_bg_colorram_r), FUNC(fortyl_state::fortyl_bg_colorram_w)).share("colorram");      /* background attributes (2 bytes per line) */
 	map(0x98c0, 0x98ff).ram().share("spriteram2");/* sprites part 2 */
 	map(0xa000, 0xbfff).bankr("bank1");
-	//AM_RANGE(0xbf00, 0xbfff) writes here when zooms-in/out, left-over or pixel line clearance?
+	//map(0xbf00, 0xbfff) writes here when zooms-in/out, left-over or pixel line clearance?
 	map(0xc000, 0xffff).rw(FUNC(fortyl_state::fortyl_pixram_r), FUNC(fortyl_state::fortyl_pixram_w)); /* banked pixel layer */
 }
 

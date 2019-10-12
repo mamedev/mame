@@ -4,7 +4,7 @@
 dofile('modules.lua')
 
 forcedincludes {
---	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
+--  MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
 
 if not _OPTIONS["DONT_USE_NETWORK"] then

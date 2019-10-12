@@ -102,7 +102,7 @@ void sh7604_bus_device::bus_regs(address_map &map)
 	map(0x08, 0x09).rw(FUNC(sh7604_bus_device::refresh_timer_status_r), FUNC(sh7604_bus_device::refresh_timer_control_w));
 	map(0x0a, 0x0b).rw(FUNC(sh7604_bus_device::refresh_timer_counter_r), FUNC(sh7604_bus_device::refresh_timer_counter_w));
 	map(0x0c, 0x0d).rw(FUNC(sh7604_bus_device::refresh_timer_constant_r), FUNC(sh7604_bus_device::refresh_timer_constant_w));
-//  AM_RANGE(0x0e, 0x0f) unmapped, mirror?
+//  map(0x0e, 0x0f) unmapped, mirror?
 }
 
 //-------------------------------------------------

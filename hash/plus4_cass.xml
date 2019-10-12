@@ -9,13 +9,13 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="620778">
-				<rom name="dt_star_events_side1.tap" size="620778" crc="db63b2e2" sha1="400b61350103278e162a01978594313be6a0bc1d" offset="0" />
+				<rom name="dt_star_events_side1.tap" size="620778" crc="db63b2e2" sha1="400b61350103278e162a01978594313be6a0bc1d"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="662707">
-				<rom name="dt_star_events_side2.tap" size="662707" crc="2acbadbc" sha1="739753b12e98628707a11039fb344009504bed2c" offset="0" />
+				<rom name="dt_star_events_side2.tap" size="662707" crc="2acbadbc" sha1="739753b12e98628707a11039fb344009504bed2c"/>
 			</dataarea>
 		</part>
 	</software>

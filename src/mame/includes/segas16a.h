@@ -72,7 +72,6 @@ public:
 	// game-specific driver init
 	void init_generic();
 	void init_dumpmtmt();
-	void init_quartet();
 	void init_fantzonep();
 	void init_sjryukoa();
 	void init_aceattaca();
@@ -140,7 +139,6 @@ private:
 
 	// I8751 simulations
 	void dumpmtmt_i8751_sim();
-	void quartet_i8751_sim();
 
 	// custom I/O handlers
 	DECLARE_READ16_MEMBER( aceattaca_custom_io_r );

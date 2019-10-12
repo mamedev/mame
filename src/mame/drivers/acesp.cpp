@@ -76,8 +76,8 @@ void ace_sp_state::ace_sp_map(address_map &map)
 #if 0
 void ace_sp_state::ace_sp_portmap(address_map &map)
 {
-	//AM_RANGE(0x02, 0x02) // misc
-	//AM_RANGE(0x05, 0x06) // AYs
+	//map(0x02, 0x02) // misc
+	//map(0x05, 0x06) // AYs
 }
 #endif
 

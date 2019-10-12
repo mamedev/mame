@@ -27,27 +27,27 @@ C7 User Manual at http://www.sol20.org/manuals/proteus_c7.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="77646">
-				<rom name="proteus_1.svt" size="77646" crc="f40fd39a" sha1="fe0b70607dd556ba8dc5ffca7d087b68778cdbcf" offset="0" />
+				<rom name="proteus_1.svt" size="77646" crc="f40fd39a" sha1="fe0b70607dd556ba8dc5ffca7d087b68778cdbcf"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sol20_cass">
 			<dataarea name="cass" size="95354">
-				<rom name="proteus_2.svt" size="95354" crc="2b480f7b" sha1="06376865d8a0ce671c4a647c39f4ad2c4cef952d" offset="0" />
+				<rom name="proteus_2.svt" size="95354" crc="2b480f7b" sha1="06376865d8a0ce671c4a647c39f4ad2c4cef952d"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="sol20_cass">
 			<dataarea name="cass" size="57116">
-				<rom name="proteus_3.svt" size="57116" crc="b2ee57f0" sha1="561f205f37affbaeba6ef7060f36044f268bf133" offset="0" />
+				<rom name="proteus_3.svt" size="57116" crc="b2ee57f0" sha1="561f205f37affbaeba6ef7060f36044f268bf133"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="sol20_cass">
 			<dataarea name="cass" size="178406">
-				<rom name="proteus_7.svt" size="178406" crc="da305795" sha1="e9ce5023d288f52c303beb480e2a63531661ff90" offset="0" />
+				<rom name="proteus_7.svt" size="178406" crc="da305795" sha1="e9ce5023d288f52c303beb480e2a63531661ff90"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="sol20_cass">
 			<dataarea name="cass" size="79094">
-				<rom name="proteus_8.svt" size="79094" crc="d338d05a" sha1="8264f731acc676243e54d149d29b6cb13e691fa1" offset="0" />
+				<rom name="proteus_8.svt" size="79094" crc="d338d05a" sha1="8264f731acc676243e54d149d29b6cb13e691fa1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -71,7 +71,7 @@ Note: No more infos about!
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="56307">
-				<rom name="io_printer_sw.svt" size="56307" crc="46a4e367" sha1="8e5f0226dde3ea450077a945f9bf12c3c5b7ede3" offset="0" />
+				<rom name="io_printer_sw.svt" size="56307" crc="46a4e367" sha1="8e5f0226dde3ea450077a945f9bf12c3c5b7ede3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -92,7 +92,7 @@ User Manual at http://www.sol20.org/manuals/img/tad-img.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="23446">
-				<rom name="tad.svt" size="23446" crc="d9e60630" sha1="2cca9e3873a4acbfcde3ce4c417a9530f3c23de2" offset="0" />
+				<rom name="tad.svt" size="23446" crc="d9e60630" sha1="2cca9e3873a4acbfcde3ce4c417a9530f3c23de2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,7 +120,7 @@ Owner's Manual at http://primepuzzle.com/tc/tiny_c_docs_8080_PDP11.zip
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="30719">
-				<rom name="tinyc.svt" size="30719" crc="6140c147" sha1="294487f58ec607decb69900b169a6b03208a61b4" offset="0" />
+				<rom name="tinyc.svt" size="30719" crc="6140c147" sha1="294487f58ec607decb69900b169a6b03208a61b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -149,7 +149,7 @@ User Manual at http://www.sol20.org/manuals/als8.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="7142712">
-				<rom name="als8.wav" size="7142712" crc="fb273e61" sha1="da7900fb8a8ad4305f408b370f6da592541a202a" offset="0" />
+				<rom name="als8.wav" size="7142712" crc="fb273e61" sha1="da7900fb8a8ad4305f408b370f6da592541a202a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -170,7 +170,7 @@ User Manual at http://www.sol20.org/manuals/atc.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="2457454">
-				<rom name="atc.wav" size="2457454" crc="1aaebf0e" sha1="3b32f18353db7ce5bff268f3b20d1a623b80297a" offset="0" />
+				<rom name="atc.wav" size="2457454" crc="1aaebf0e" sha1="3b32f18353db7ce5bff268f3b20d1a623b80297a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -200,12 +200,12 @@ User Manual at http://www.sol20.org/manuals/basic5.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="9203116">
-				<rom name="basic5_orig.wav" size="9203116" crc="40c272f8" sha1="69e26f90b6baa5dcf807dbf817105902ec3b2533" offset="0" />
+				<rom name="basic5_orig.wav" size="9203116" crc="40c272f8" sha1="69e26f90b6baa5dcf807dbf817105902ec3b2533"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sol20_cass">
 			<dataarea name="cass" size="5735114">
-				<rom name="basic5_48k.wav" size="5735114" crc="c7ad6c9a" sha1="c6cce3565efa5d0ff6ff7af5e3a3f6bab228756d" offset="0" />
+				<rom name="basic5_48k.wav" size="5735114" crc="c7ad6c9a" sha1="c6cce3565efa5d0ff6ff7af5e3a3f6bab228756d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -227,7 +227,7 @@ User Manual at http://www.sol20.org/manuals/chess.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="5558420">
-				<rom name="chess.wav" size="5558420" crc="c33e7dac" sha1="c210655e27baa8cb2172e1410230cb6498757d69" offset="0" />
+				<rom name="chess.wav" size="5558420" crc="c33e7dac" sha1="c210655e27baa8cb2172e1410230cb6498757d69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@ User Manual at http://www.sol20.org/manuals/debug.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="20877642">
-				<rom name="debug.wav" size="20877642" crc="15820da0" sha1="f7a24bb585ac12c88141b6da62cdefb489d3e6e6" offset="0" />
+				<rom name="debug.wav" size="20877642" crc="15820da0" sha1="f7a24bb585ac12c88141b6da62cdefb489d3e6e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -279,7 +279,7 @@ User Manual at http://www.sol20.org/manuals/img/edit-img.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="8538414">
-				<rom name="edit.wav" size="8538414" crc="5810b0ec" sha1="370b86b7e46eb5a7db7c366655aedfca7836e634" offset="0" />
+				<rom name="edit.wav" size="8538414" crc="5810b0ec" sha1="370b86b7e46eb5a7db7c366655aedfca7836e634"/>
 			</dataarea>
 		</part>
 	</software>
@@ -311,12 +311,12 @@ User Manual at http://www.sol20.org/manuals/extcassbasic.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="13985418">
-				<rom name="extbasic_orig.wav" size="13985418" crc="a7210025" sha1="cd8a115f8b8ce0af857d3bdb9bb9a6404a32531f" offset="0" />
+				<rom name="extbasic_orig.wav" size="13985418" crc="a7210025" sha1="cd8a115f8b8ce0af857d3bdb9bb9a6404a32531f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sol20_cass">
 			<dataarea name="cass" size="13987042">
-				<rom name="extbasic_patched.wav" size="13987042" crc="2c091090" sha1="4f5ccec14b251f04a9ed4f05ac20cf796fde22f8" offset="0" />
+				<rom name="extbasic_patched.wav" size="13987042" crc="2c091090" sha1="4f5ccec14b251f04a9ed4f05ac20cf796fde22f8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -350,7 +350,7 @@ User Manual at http://www.sol20.org/manuals/focal.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="6722676">
-				<rom name="focal.wav" size="6722676" crc="62fba867" sha1="8175af744e12f3f48bb8907946131e0136615223" offset="0" />
+				<rom name="focal.wav" size="6722676" crc="62fba867" sha1="8175af744e12f3f48bb8907946131e0136615223"/>
 			</dataarea>
 		</part>
 	</software>
@@ -374,7 +374,7 @@ User Manual at http://www.sol20.org/manuals/gamepac1.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="4619686">
-				<rom name="gamepac1.wav" size="4619686" crc="7e14238e" sha1="467eed03ef32b73bc06b33d64d117c7736bc1d08" offset="0" />
+				<rom name="gamepac1.wav" size="4619686" crc="7e14238e" sha1="467eed03ef32b73bc06b33d64d117c7736bc1d08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -396,7 +396,7 @@ User Manual at http://www.sol20.org/manuals/gamepac2.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="5118738">
-				<rom name="gamepac2.wav" size="5118738" crc="f8136510" sha1="959e415bb65a7415365b4ccc7f60b8d7e9d48a3c" offset="0" />
+				<rom name="gamepac2.wav" size="5118738" crc="f8136510" sha1="959e415bb65a7415365b4ccc7f60b8d7e9d48a3c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -415,7 +415,7 @@ In SOLOS monitor "XEQ BASIC" to load/autorun or "GET BASIC" and then "EXEC 40".
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="13548458">
-				<rom name="mbasic.wav" size="13548458" crc="cb407f7e" sha1="8cfa984fb01702a81616f5249b5234990f7879fd" offset="0" />
+				<rom name="mbasic.wav" size="13548458" crc="cb407f7e" sha1="8cfa984fb01702a81616f5249b5234990f7879fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -446,7 +446,7 @@ User Manual at http://www.sol20.org/manuals/music.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="13654040">
-				<rom name="music.wav" size="13654040" crc="57fba4a5" sha1="5e86e80dcac037295958447f7fbb1e7461b6d8ea" offset="0" />
+				<rom name="music.wav" size="13654040" crc="57fba4a5" sha1="5e86e80dcac037295958447f7fbb1e7461b6d8ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -467,7 +467,7 @@ User Manual at http://www.sol20.org/manuals/pencil.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="3303146">
-				<rom name="pencil.wav" size="3303146" crc="b3407712" sha1="310d2707ae914c968913baa95827fdba0f1f8f24" offset="0" />
+				<rom name="pencil.wav" size="3303146" crc="b3407712" sha1="310d2707ae914c968913baa95827fdba0f1f8f24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -492,7 +492,7 @@ User Manual at http://www.sol20.org/manuals/img/pilot-img.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="19764422">
-				<rom name="pilot.wav" size="19764422" crc="adc016f1" sha1="bc3b68cb2ac43977c0eaacfaa0786eed5e7644c0" offset="0" />
+				<rom name="pilot.wav" size="19764422" crc="adc016f1" sha1="bc3b68cb2ac43977c0eaacfaa0786eed5e7644c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -523,7 +523,7 @@ User Manual at http://www.sol20.org/manuals/spacegames.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="18452132">
-				<rom name="spacegames.wav" size="18452132" crc="60f98ab1" sha1="ed2a5713ebf8bec7a68e48261c612693a68cdd51" offset="0" />
+				<rom name="spacegames.wav" size="18452132" crc="60f98ab1" sha1="ed2a5713ebf8bec7a68e48261c612693a68cdd51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -555,7 +555,7 @@ User Manual at http://www.sol20.org/manuals/strategygames2.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="25987662">
-				<rom name="startegygames2.wav" size="25987662" crc="fffb8567" sha1="1bcd218311aafe4588fe0478df962ec1f8af9c1f" offset="0" />
+				<rom name="startegygames2.wav" size="25987662" crc="fffb8567" sha1="1bcd218311aafe4588fe0478df962ec1f8af9c1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -576,7 +576,7 @@ User Manual at http://www.sol20.org/manuals/trek80.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="6757058">
-				<rom name="trek80.wav" size="6757058" crc="f4c3c7b0" sha1="e5a7379841c4c667d9b9685dd4c336c53ed6d411" offset="0" />
+				<rom name="trek80.wav" size="6757058" crc="f4c3c7b0" sha1="e5a7379841c4c667d9b9685dd4c336c53ed6d411"/>
 			</dataarea>
 		</part>
 	</software>
@@ -604,7 +604,7 @@ More docs find in http://www.sol20.org/tinytrek/tinytrek.zip
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="7041650">
-				<rom name="tinytrek.wav" size="7041650" crc="66c77155" sha1="dc7945d924e2c61847546715704d9506cdd3b599" offset="0" />
+				<rom name="tinytrek.wav" size="7041650" crc="66c77155" sha1="dc7945d924e2c61847546715704d9506cdd3b599"/>
 			</dataarea>
 		</part>
 	</software>
@@ -635,47 +635,47 @@ Note: If in some of games a screen starts blinking, then in MESS select in "Deep
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="22839364">
-				<rom name="deathmaze.wav" size="22839364" crc="7e6b1de5" sha1="40a12a0c6877017ab3871b6111b11a8d60ac43c5" offset="0" />
+				<rom name="deathmaze.wav" size="22839364" crc="7e6b1de5" sha1="40a12a0c6877017ab3871b6111b11a8d60ac43c5"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sol20_cass">
 			<dataarea name="cass" size="5993024">
-				<rom name="feudal.wav" size="5993024" crc="0dfd68da" sha1="b1f6c06dac2524e0f55154d82a64cc5663969189" offset="0" />
+				<rom name="feudal.wav" size="5993024" crc="0dfd68da" sha1="b1f6c06dac2524e0f55154d82a64cc5663969189"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="sol20_cass">
 			<dataarea name="cass" size="1837334">
-				<rom name="gobble.wav" size="1837334" crc="bce45a7b" sha1="2345f874e13042d6f6cb7a357ac18a49217b56b3" offset="0" />
+				<rom name="gobble.wav" size="1837334" crc="bce45a7b" sha1="2345f874e13042d6f6cb7a357ac18a49217b56b3"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="sol20_cass">
 			<dataarea name="cass" size="3097786">
-				<rom name="pacman.wav" size="3097786" crc="e3a7a2fa" sha1="9b101df9e2cf90ef28cc440e7d4ab4fcf520af9a" offset="0" />
+				<rom name="pacman.wav" size="3097786" crc="e3a7a2fa" sha1="9b101df9e2cf90ef28cc440e7d4ab4fcf520af9a"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="sol20_cass">
 			<dataarea name="cass" size="3264338">
-				<rom name="reversi.wav" size="3264338" crc="860ed4eb" sha1="2171dc8c0ee9106dfe5f903e037661455aa56f82" offset="0" />
+				<rom name="reversi.wav" size="3264338" crc="860ed4eb" sha1="2171dc8c0ee9106dfe5f903e037661455aa56f82"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="sol20_cass">
 			<dataarea name="cass" size="16010788">
-				<rom name="robot.wav" size="16010788" crc="49d7ae4d" sha1="c0ea68df70bcee9c06d36f3d34b8d1427cfc1a43" offset="0" />
+				<rom name="robot.wav" size="16010788" crc="49d7ae4d" sha1="c0ea68df70bcee9c06d36f3d34b8d1427cfc1a43"/>
 			</dataarea>
 		</part>
 		<part name="cass7" interface="sol20_cass">
 			<dataarea name="cass" size="14070748">
-				<rom name="skullcave.wav" size="14070748" crc="05f5b866" sha1="32f943e8e411d4f5efdddf34809f31e18d64a097" offset="0" />
+				<rom name="skullcave.wav" size="14070748" crc="05f5b866" sha1="32f943e8e411d4f5efdddf34809f31e18d64a097"/>
 			</dataarea>
 		</part>
 		<part name="cass8" interface="sol20_cass">
 			<dataarea name="cass" size="2083118">
-				<rom name="stomp.wav" size="2083118" crc="cb9a7cc0" sha1="d7c425ab328f17be875ed9e913b901799d3bb6a1" offset="0" />
+				<rom name="stomp.wav" size="2083118" crc="cb9a7cc0" sha1="d7c425ab328f17be875ed9e913b901799d3bb6a1"/>
 			</dataarea>
 		</part>
 		<part name="cass9" interface="sol20_cass">
 			<dataarea name="cass" size="1769420">
-				<rom name="tic_tac_toe.wav" size="1769420" crc="f7a06473" sha1="1502402948eaa0643fca77258922dc105764b4f2" offset="0" />
+				<rom name="tic_tac_toe.wav" size="1769420" crc="f7a06473" sha1="1502402948eaa0643fca77258922dc105764b4f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -717,47 +717,47 @@ A typical opening move might be entered as 64-44.
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="3952370">
-				<rom name="battleship.wav" size="3952370" crc="691fe9fb" sha1="e16eeb4adee1e4d5a27bd113e14c89d928e32a50" offset="0" />
+				<rom name="battleship.wav" size="3952370" crc="691fe9fb" sha1="e16eeb4adee1e4d5a27bd113e14c89d928e32a50"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sol20_cass">
 			<dataarea name="cass" size="1618232">
-				<rom name="chase.wav" size="1618232" crc="428a016c" sha1="d13830b5b6d0398343ff1db4d82eda0b06cb80c9" offset="0" />
+				<rom name="chase.wav" size="1618232" crc="428a016c" sha1="d13830b5b6d0398343ff1db4d82eda0b06cb80c9"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="sol20_cass">
 			<dataarea name="cass" size="8549502">
-				<rom name="chkr2.wav" size="8549502" crc="74840765" sha1="82d6535d4973b57c5663272d9092f959433f4b1f" offset="0" />
+				<rom name="chkr2.wav" size="8549502" crc="74840765" sha1="82d6535d4973b57c5663272d9092f959433f4b1f"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="sol20_cass">
 			<dataarea name="cass" size="926156">
-				<rom name="deflect.wav" size="926156" crc="01de1b7e" sha1="86cc9f4cbdc02391b2b5d528a3b059adb6a29f45" offset="0" />
+				<rom name="deflect.wav" size="926156" crc="01de1b7e" sha1="86cc9f4cbdc02391b2b5d528a3b059adb6a29f45"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="sol20_cass">
 			<dataarea name="cass" size="3717098">
-				<rom name="microchess.wav" size="3717098" crc="4812c7a1" sha1="75f486742f5eb38b8a3d60f3b0e53bf390623370" offset="0" />
+				<rom name="microchess.wav" size="3717098" crc="4812c7a1" sha1="75f486742f5eb38b8a3d60f3b0e53bf390623370"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="sol20_cass">
 			<dataarea name="cass" size="4671448">
-				<rom name="minefield.wav" size="4671448" crc="5a763441" sha1="43a806759dc123a14c35fd067b1e6cd87583665b" offset="0" />
+				<rom name="minefield.wav" size="4671448" crc="5a763441" sha1="43a806759dc123a14c35fd067b1e6cd87583665b"/>
 			</dataarea>
 		</part>
 		<part name="cass7" interface="sol20_cass">
 			<dataarea name="cass" size="2151032">
-				<rom name="piranha.wav" size="2151032" crc="bddaf8d8" sha1="490ebaa76ca51bc5e453dce14e1467c6e5c790a7" offset="0" />
+				<rom name="piranha.wav" size="2151032" crc="bddaf8d8" sha1="490ebaa76ca51bc5e453dce14e1467c6e5c790a7"/>
 			</dataarea>
 		</part>
 		<part name="cass8" interface="sol20_cass">
 			<dataarea name="cass" size="3954796">
-				<rom name="raiders.wav" size="3954796" crc="b3354e6d" sha1="95b2cfbe37d2aab743a417a56cddf338edc902cb" offset="0" />
+				<rom name="raiders.wav" size="3954796" crc="b3354e6d" sha1="95b2cfbe37d2aab743a417a56cddf338edc902cb"/>
 			</dataarea>
 		</part>
 		<part name="cass9" interface="sol20_cass">
 			<dataarea name="cass" size="577692">
-				<rom name="target.wav" size="577692" crc="7be287fa" sha1="f5868f21b1045620c3d1d34b8da43a6a545d7d7c" offset="0" />
+				<rom name="target.wav" size="577692" crc="7be287fa" sha1="f5868f21b1045620c3d1d34b8da43a6a545d7d7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -782,17 +782,17 @@ More infos http://www.sol20.org/articles/access_v1n4.pdf
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="2151032">
-				<rom name="galaxy.wav" size="2151032" crc="d910ab91" sha1="85d8e4e80e83eba3679442a36b61983f0559084c" offset="0" />
+				<rom name="galaxy.wav" size="2151032" crc="d910ab91" sha1="85d8e4e80e83eba3679442a36b61983f0559084c"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sol20_cass">
 			<dataarea name="cass" size="918070">
-				<rom name="train.wav" size="918070" crc="29512879" sha1="fa11f5efa5e211a238197affacc862fd61e5ff26" offset="0" />
+				<rom name="train.wav" size="918070" crc="29512879" sha1="fa11f5efa5e211a238197affacc862fd61e5ff26"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="sol20_cass">
 			<dataarea name="cass" size="769306">
-				<rom name="winzi.wav" size="769306" crc="77c656ad" sha1="9168be4ec9f1a1582244a556c8d0bf5ce6df3db9" offset="0" />
+				<rom name="winzi.wav" size="769306" crc="77c656ad" sha1="9168be4ec9f1a1582244a556c8d0bf5ce6df3db9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -826,47 +826,47 @@ Note if you using basic5_48K.wav instead od basic5_orig.wav, there is no need fo
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="4447494">
-				<rom name="bomb_bs5.wav" size="4447494" crc="2edc62a2" sha1="7b20a6d682fefe6a34cc831b49b6e6fc3b702ee1" offset="0" />
+				<rom name="bomb_bs5.wav" size="4447494" crc="2edc62a2" sha1="7b20a6d682fefe6a34cc831b49b6e6fc3b702ee1"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sol20_cass">
 			<dataarea name="cass" size="6522912">
-				<rom name="bomrn_bs5.wav" size="6522912" crc="3929f398" sha1="fa069a8b737c3802ffe4aca56fd36fb11f9013a4" offset="0" />
+				<rom name="bomrn_bs5.wav" size="6522912" crc="3929f398" sha1="fa069a8b737c3802ffe4aca56fd36fb11f9013a4"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="sol20_cass">
 			<dataarea name="cass" size="15889874">
-				<rom name="korps.bs5.wav" size="15889874" crc="45b6365c" sha1="5c8b89578d634514f517f3304b0efb566f7f5dba" offset="0" />
+				<rom name="korps.bs5.wav" size="15889874" crc="45b6365c" sha1="5c8b89578d634514f517f3304b0efb566f7f5dba"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="sol20_cass">
 			<dataarea name="cass" size="15632770">
-				<rom name="panzr.bs5.wav" size="15632770" crc="cf788eef" sha1="42aad567ca6a52e1ed16d1f95914e71abc9a6593" offset="0" />
+				<rom name="panzr.bs5.wav" size="15632770" crc="cf788eef" sha1="42aad567ca6a52e1ed16d1f95914e71abc9a6593"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="sol20_cass">
 			<dataarea name="cass" size="8732222">
-				<rom name="strwr.bs5.wav" size="8732222" crc="ca4ccc3d" sha1="243be8c18963a99cf0e091dac7d64cf03d665839" offset="0" />
+				<rom name="strwr.bs5.wav" size="8732222" crc="ca4ccc3d" sha1="243be8c18963a99cf0e091dac7d64cf03d665839"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="sol20_cass">
 			<dataarea name="cass" size="10130928">
-				<rom name="sttr.bs5.wav" size="10130928" crc="049d7f99" sha1="a9e4402af4d610a631d41411d92fb9904542c02d" offset="0" />
+				<rom name="sttr.bs5.wav" size="10130928" crc="049d7f99" sha1="a9e4402af4d610a631d41411d92fb9904542c02d"/>
 			</dataarea>
 		</part>
 		<part name="cass7" interface="sol20_cass">
 			<dataarea name="cass" size="15591536">
-				<rom name="swolf_bs5.wav" size="15591536" crc="041c5adb" sha1="a5054d9c57f068ff974bc61627cd659af32eb0e2" offset="0" />
+				<rom name="swolf_bs5.wav" size="15591536" crc="041c5adb" sha1="a5054d9c57f068ff974bc61627cd659af32eb0e2"/>
 			</dataarea>
 		</part>
 		<part name="cass8" interface="sol20_cass">
 			<dataarea name="cass" size="15866426">
-				<rom name="tanks_bs5.wav" size="15866426" crc="00756473" sha1="07958d3cf3140eb275d33f0e43eb31956758c1d4" offset="0" />
+				<rom name="tanks_bs5.wav" size="15866426" crc="00756473" sha1="07958d3cf3140eb275d33f0e43eb31956758c1d4"/>
 			</dataarea>
 		</part>
 		<part name="cass9" interface="sol20_cass">
 			<dataarea name="cass" size="15738684">
-				<rom name="tankz.bs5.wav" size="15738684" crc="0ffbfc6b" sha1="8096dff612d5d312168a30015575cd6aa2aff5fc" offset="0" />
+				<rom name="tankz.bs5.wav" size="15738684" crc="0ffbfc6b" sha1="8096dff612d5d312168a30015575cd6aa2aff5fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -892,27 +892,27 @@ How to load EC BASIC programs:
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="9266646">
-				<rom name="boule.ecb.wav" size="9266646" crc="027d6b84" sha1="7a23430c25e82f62e857bbf6d56de6c771c2ae6a" offset="0" />
+				<rom name="boule.ecb.wav" size="9266646" crc="027d6b84" sha1="7a23430c25e82f62e857bbf6d56de6c771c2ae6a"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sol20_cass">
 			<dataarea name="cass" size="17041990">
-				<rom name="iland.ecb.wav" size="17041990" crc="516e415f" sha1="7cb30b363a66b71709f61075657141b1e82d6f9e" offset="0" />
+				<rom name="iland.ecb.wav" size="17041990" crc="516e415f" sha1="7cb30b363a66b71709f61075657141b1e82d6f9e"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="sol20_cass">
 			<dataarea name="cass" size="9980552">
-				<rom name="numbr.ecb.wav" size="9980552" crc="fb696a8e" sha1="2636dc0a25123089a8ff6a29c4cae5fedb340724" offset="0" />
+				<rom name="numbr.ecb.wav" size="9980552" crc="fb696a8e" sha1="2636dc0a25123089a8ff6a29c4cae5fedb340724"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="sol20_cass">
 			<dataarea name="cass" size="12495794">
-				<rom name="plus.ecb.wav" size="12495794" crc="11a45f67" sha1="aa37eb1b344e70d6c93bdb9a4203787ca3acc5c3" offset="0" />
+				<rom name="plus.ecb.wav" size="12495794" crc="11a45f67" sha1="aa37eb1b344e70d6c93bdb9a4203787ca3acc5c3"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="sol20_cass">
 			<dataarea name="cass" size="10569140">
-				<rom name="rolet.ecb.wav" size="10569140" crc="e4880a81" sha1="3432bf1acbd8b05a96071d18cad99470774a2889" offset="0" />
+				<rom name="rolet.ecb.wav" size="10569140" crc="e4880a81" sha1="3432bf1acbd8b05a96071d18cad99470774a2889"/>
 			</dataarea>
 		</part>
 	</software>

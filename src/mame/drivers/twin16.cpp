@@ -177,7 +177,7 @@ void twin16_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram().share("comram");
-//  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
+//  map(0x044000, 0x04ffff).noprw();             // miaj
 	map(0x060000, 0x063fff).ram();
 	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x081000, 0x081fff).nopw();
@@ -192,7 +192,7 @@ void twin16_state::main_map(address_map &map)
 	map(0x0c0000, 0x0c000f).w(FUNC(twin16_state::video_register_w));
 	map(0x0c000e, 0x0c000f).r(FUNC(twin16_state::sprite_status_r));
 	map(0x100000, 0x103fff).ram().w(FUNC(twin16_state::fixram_w)).share("fixram");
-//  AM_RANGE(0x104000, 0x105fff) AM_NOP             // miaj
+//  map(0x104000, 0x105fff).noprw();             // miaj
 	map(0x120000, 0x121fff).ram().w(FUNC(twin16_state::videoram0_w)).share("videoram.0");
 	map(0x122000, 0x123fff).ram().w(FUNC(twin16_state::videoram1_w)).share("videoram.1");
 	map(0x140000, 0x143fff).ram().share("spriteram");
@@ -202,7 +202,7 @@ void twin16_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram().share("comram");
-//  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
+//  map(0x044000, 0x04ffff).noprw();             // miaj
 	map(0x060000, 0x063fff).ram();
 	map(0x080000, 0x09ffff).rom().region("data", 0);
 	map(0x0a0000, 0x0a0001).w(FUNC(twin16_state::CPUB_register_w));

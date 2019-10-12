@@ -567,7 +567,9 @@ void sr_state::cpu_wd_w(u8 data)
 {
 	// U22 (74LS161) parallel load zero
 	if ((data & 0x3e) == 0x14)
-		/* TODO: watchdog reset */;
+	{
+		/* TODO: watchdog reset */
+	}
 }
 
 u8 sr_state::cpu_nvram_r(address_space &space, offs_t offset)

@@ -691,9 +691,10 @@ private:
 	void start_dma(uint32_t ch);
 	void next_dma(uint32_t ch);
 
-	uint32_t address_to_biobus_slot(uint32_t addr) const
+	static uint32_t address_to_biobus_slot(uint32_t addr)
 	{
-		assert_always(addr >= 0x20000000 && addr <= 0x3fffffff, "Address not within BioBus address range");
+		if ((addr < 0x20000000) || (addr > 0x3fffffff))
+			throw emu_fatalerror("m2_cde_device::address_to_biobus_slot: Address not within BioBus address range");
 		return ((addr >> 24) >> 2) & 7;
 	}
 

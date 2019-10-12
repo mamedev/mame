@@ -167,13 +167,11 @@ detail::terminal_type detail::core_terminal_t::type() const
 {
 	if (dynamic_cast<const terminal_t *>(this) != nullptr)
 		return terminal_type::TERMINAL;
-	else if (dynamic_cast<const logic_input_t *>(this) != nullptr)
+	else if (dynamic_cast<const logic_input_t *>(this) != nullptr
+		|| dynamic_cast<const analog_input_t *>(this) != nullptr)
 		return terminal_type::INPUT;
-	else if (dynamic_cast<const logic_output_t *>(this) != nullptr)
-		return terminal_type::OUTPUT;
-	else if (dynamic_cast<const analog_input_t *>(this) != nullptr)
-		return terminal_type::INPUT;
-	else if (dynamic_cast<const analog_output_t *>(this) != nullptr)
+	else if (dynamic_cast<const logic_output_t *>(this) != nullptr
+		|| dynamic_cast<const analog_output_t *>(this) != nullptr)
 		return terminal_type::OUTPUT;
 	else
 	{
@@ -192,7 +190,7 @@ netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbac
 	, m_time(netlist_time::zero())
 	, m_mainclock(nullptr)
 	, m_queue(*m_state)
-	, m_stats(false)
+	, m_use_stats(false)
 {
 	devices::initialize_factory(nlstate().setup().factory());
 	NETLIST_NAME(base)(nlstate().setup());
@@ -256,22 +254,23 @@ void netlist_state_t::rebuild_lists()
 
 void netlist_state_t::compile_defines(std::vector<std::pair<pstring, pstring>> &defs)
 {
-#define ENTRY(x) { #x, PSTRINGIFY(x) }
-	defs.push_back(ENTRY(PHAS_RDTSCP));
-	defs.push_back(ENTRY(PUSE_ACCURATE_STATS));
-	defs.push_back(ENTRY(PHAS_INT128));
-	defs.push_back(ENTRY(USE_ALIGNED_OPTIMIZATIONS));
-	defs.push_back(ENTRY(NVCCBUILD));
-	defs.push_back(ENTRY(USE_MEMPOOL));
-	defs.push_back(ENTRY(USE_QUEUE_STATS));
-	defs.push_back(ENTRY(USE_COPY_INSTEAD_OF_REFERENCE));
-	defs.push_back(ENTRY(USE_TRUTHTABLE_7448));
-	defs.push_back(ENTRY(NL_DEBUG));
-	defs.push_back(ENTRY(HAS_OPENMP));
-	defs.push_back(ENTRY(USE_OPENMP));
+//#define ENTRY(x) { #x, PSTRINGIFY(x) }
+#define ENTRY(x) std::pair<pstring, pstring>(#x, PSTRINGIFY(x))
+	defs.emplace_back(ENTRY(PHAS_RDTSCP));
+	defs.emplace_back(ENTRY(PUSE_ACCURATE_STATS));
+	defs.emplace_back(ENTRY(PHAS_INT128));
+	defs.emplace_back(ENTRY(USE_ALIGNED_OPTIMIZATIONS));
+	defs.emplace_back(ENTRY(NVCCBUILD));
+	defs.emplace_back(ENTRY(USE_MEMPOOL));
+	defs.emplace_back(ENTRY(USE_QUEUE_STATS));
+	defs.emplace_back(ENTRY(USE_COPY_INSTEAD_OF_REFERENCE));
+	defs.emplace_back(ENTRY(USE_TRUTHTABLE_7448));
+	defs.emplace_back(ENTRY(NL_DEBUG));
+	defs.emplace_back(ENTRY(HAS_OPENMP));
+	defs.emplace_back(ENTRY(USE_OPENMP));
 
-	defs.push_back(ENTRY(PPMF_TYPE));
-	defs.push_back(ENTRY(PHAS_PMF_INTERNAL));
+	defs.emplace_back(ENTRY(PPMF_TYPE));
+	defs.emplace_back(ENTRY(PHAS_PMF_INTERNAL));
 
 #undef ENTRY
 }
@@ -387,7 +386,7 @@ void netlist_state_t::reset()
 
 void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 {
-	if (!m_stats)
+	if (!m_use_stats)
 		process_queue_stats<false>(delta);
 	else
 	{
@@ -447,7 +446,7 @@ void netlist_t::process_queue_stats(const netlist_time delta) NL_NOEXCEPT
 
 void netlist_t::print_stats() const
 {
-	if (m_stats)
+	if (m_use_stats)
 	{
 		std::vector<size_t> index;
 		for (size_t i=0; i < m_state->m_devices.size(); i++)
@@ -471,7 +470,7 @@ void netlist_t::print_stats() const
 		}
 
 		log().verbose("Total calls : {1:12} {2:12} {3:12}", total_count,
-			total_time, total_time / static_cast<decltype(total_time)>(total_count));
+			total_time, total_time / static_cast<decltype(total_time)>(total_count ? total_count : 1));
 
 		log().verbose("Total loop     {1:15}", m_stat_mainloop());
 		log().verbose("Total time     {1:15}", total_time);
@@ -556,7 +555,7 @@ core_device_t::core_device_t(netlist_state_t &owner, const pstring &name)
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
 	if (exec().stats_enabled())
-		m_stats = plib::make_unique<stats_t>();
+		m_stats = pool().make_unique<stats_t>();
 }
 
 core_device_t::core_device_t(core_device_t &owner, const pstring &name)
@@ -571,7 +570,7 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 		set_logic_family(family_TTL());
 	state().add_dev(this->name(), pool_owned_ptr<core_device_t>(this, false));
 	if (exec().stats_enabled())
-		m_stats = plib::make_unique<stats_t>();
+		m_stats = pool().make_unique<stats_t>();
 }
 
 void core_device_t::set_default_delegate(detail::core_terminal_t &term)
@@ -1032,7 +1031,7 @@ nl_double param_model_t::value(const pstring &entity)
 }
 
 
-plib::unique_ptr<plib::pistream> param_data_t::stream()
+plib::unique_ptr<std::istream> param_data_t::stream()
 {
 	return device().setup().get_data_stream(str());
 }

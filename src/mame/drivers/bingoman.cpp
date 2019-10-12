@@ -289,7 +289,7 @@ void bingoman_state::bingoman_prg_map(address_map &map)
 
 void bingoman_state::bingoman_io_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 }
 
 static INPUT_PORTS_START( bingoman )

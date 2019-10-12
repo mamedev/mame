@@ -19,7 +19,7 @@
 		<part name="cass" interface="samcoupe_cass">
 			<!-- side A is for the ZX Spectrum, see spectrum_cass.xml -->
 			<dataarea name="cass" size="67044">
-				<rom name="snare - alternate - side b.tzx" size="67044" crc="3278d671" sha1="9046c7b2ca54c8dd653cc797f7cc2ac6616791af" offset="0"/>
+				<rom name="snare - alternate - side b.tzx" size="67044" crc="3278d671" sha1="9046c7b2ca54c8dd653cc797f7cc2ac6616791af"/>
 			</dataarea>
 		</part>
 	</software>

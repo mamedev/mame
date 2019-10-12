@@ -316,11 +316,11 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void babypkr(machine_config &config);
-	void videodad(machine_config &config);
 	void videopkr(machine_config &config);
-	void fortune1(machine_config &config);
 	void blckjack(machine_config &config);
+	void videodad(machine_config &config);
+	void babypkr(machine_config &config);
+	void fortune1(machine_config &config);
 	void bpoker(machine_config &config);
 
 private:
@@ -1339,6 +1339,7 @@ void videopkr_state::fortune1(machine_config &config)
 void videopkr_state::bpoker(machine_config &config)
 {
 	babypkr(config);
+
 	i8751_device &maincpu(I8751(config.replace(), m_maincpu, XTAL(6'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8751_map);
 	maincpu.set_addrmap(AS_IO, &videopkr_state::i8751_io_port);

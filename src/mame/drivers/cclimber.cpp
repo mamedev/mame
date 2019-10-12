@@ -353,7 +353,7 @@ void cclimber_state::cannonb_map(address_map &map)
 	map(0x6000, 0x6bff).ram();
 	map(0x8000, 0x83ff).ram();
 	map(0x8800, 0x88ff).nopr().writeonly().share("bigspriteram"); /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
-//  AM_RANGE(0x8900, 0x8bff) AM_WRITEONLY  /* not used, but initialized */
+//  map(0x8900, 0x8bff).writeonly();  /* not used, but initialized */
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */

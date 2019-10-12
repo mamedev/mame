@@ -4222,7 +4222,7 @@ hippodrm:
 @:maincpu,program,ffbe00,50,08,01
 
 
-hbarrelw:
+hbarrel:
 @:maincpu,program,ffbe78,58,00,26
 
 
@@ -4255,7 +4255,7 @@ slyspy2:
 @:maincpu,program,306add,1,30,30
 
 
-hbarrel:
+hbarrelu:
 @:maincpu,program,ffbe9c,58,00,26
 
 
@@ -11488,7 +11488,7 @@ powerins:
 powerinsa:
 powerinsb:
 powerinsj:
-powerinsp:
+powerinspu:
 @:maincpu,program,18e800,28,00,05
 
 

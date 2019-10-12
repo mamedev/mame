@@ -137,8 +137,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
 		, m_ram_bank(*this, "ram_bank")
-		, m_roms(*this, "roms")
-		, m_rom_bank(*this, "rom_bank")
 		, m_mainirq(*this, "mainirq")
 		, m_mainnmi(*this, "mainnmi")
 		, m_mc6846(*this, "mc6846")
@@ -186,8 +184,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_ram_bank;
-	required_memory_region m_roms;
-	required_memory_bank m_rom_bank;
 	required_device<input_merger_device> m_mainirq;
 	required_device<input_merger_device> m_mainnmi;
 	required_device<mc6846_device> m_mc6846;
@@ -310,7 +306,6 @@ void mekd3_state::mekd3_mem(address_map &map)
 	map(0x9000, 0x9fff).ram().share(m_video_ram);
 
 	// a000-efff ROM banks.
-	map(0xa000, 0xefff).bankr("rom_bank");
 
 	// D3BUG2 ROM
 	map(0xf000, 0xf7ff).rom();
@@ -440,7 +435,7 @@ INPUT_PORTS_END
 WRITE8_MEMBER(mekd3_state::page_w)
 {
 	m_rom_page = data & 0x07;
-	m_rom_bank->set_entry(m_rom_page);
+	// TODO switch the ROM bank entry.
 	m_ram_page = (data >> 3) & 0x07;
 	m_ram_bank->set_entry(m_ram_page);
 }
@@ -796,14 +791,14 @@ MC6845_UPDATE_ROW(mekd3_state::update_row)
 		  int pixel = ((ra & 0x0c) >> 1) + 1;
 		  int dout = BIT(code, pixel);
 		  int grey = BIT(code, 6);
-		  int color = ((dcursor ^ dout) && de) << !grey;
+		  int color = ((dcursor ^ dout) && de) << (grey ^ 1);
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  pixel--;
 		  dout = BIT(code, pixel);
-		  color = ((dcursor ^ dout) && de) << !grey;
+		  color = ((dcursor ^ dout) && de) << (grey ^ 1);
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
@@ -847,8 +842,6 @@ void mekd3_state::machine_start()
 {
 	uint8_t* RAM = m_ram->pointer();
 	m_ram_bank->configure_entries(0, 8, RAM, 0x8000);
-	uint8_t* ROM = m_roms->base();
-	m_rom_bank->configure_entries(0, 8, ROM, 0x5000);
 }
 
 void mekd3_state::machine_reset()
@@ -856,7 +849,6 @@ void mekd3_state::machine_reset()
 	m_rom_page = 0;
 	m_ram_page = 0;
 	m_ram_bank->set_entry(0);
-	m_rom_bank->set_entry(0);
 
 	// Avoid triggering an early interrupt when CA1 lowered. The mc6821
 	// driver resets CA1 high and to trigger on a high to low
@@ -1017,7 +1009,6 @@ ROM_START(mekd3)
 	ROM_LOAD("d3bug2.rom", 0xf000, 0x0800, CRC(bf3640b0) SHA1(374362c4464ab3986af2f08395bf254d1ce7a52f))
 	ROM_REGION(0x0400, "chargen",0)
 	ROM_LOAD("mcm6674p.chr", 0x0000, 0x0400, CRC(1c22088a) SHA1(b5f0bd0cfdec0cd5c1cb764506bef3c17d6af0eb))
-	ROM_REGION(0x28000, "roms",0)
 ROM_END
 
 /***************************************************************************

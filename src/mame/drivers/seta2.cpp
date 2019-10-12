@@ -599,8 +599,8 @@ void staraudi_state::staraudi_map(address_map &map)
 
 	map(0x400000, 0x45ffff).rw(FUNC(staraudi_state::tileram_r), FUNC(staraudi_state::tileram_w)).share("tileram"); // Tile RAM
 
-//  AM_RANGE(0x500000, 0x53ffff) AM_RAM                             // Camera RAM (r8g8)
-//  AM_RANGE(0x540000, 0x57ffff) AM_RAM                             // Camera RAM (00b8)
+//  map(0x500000, 0x53ffff).ram();                             // Camera RAM (r8g8)
+//  map(0x540000, 0x57ffff).ram();                             // Camera RAM (00b8)
 	map(0x500000, 0x57ffff).ram().share("rgbram");
 
 	map(0x600001, 0x600001).w(FUNC(staraudi_state::camera_w));        // Camera Outputs
@@ -680,7 +680,7 @@ void seta2_state::telpacfl_map(address_map &map)
 	map(0xb40000, 0xb4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xb60000, 0xb6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
 	map(0xd00006, 0xd00007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0xe00000, 0xe00001) AM_WRITE
+//  map(0xe00000, 0xe00001).w(FUNC(seta2_state::));
 	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);              // Samples Banks
 }
 

@@ -281,7 +281,7 @@ void playmark_state::bigtwin_main_map(address_map &map)
 	map(0x70001c, 0x70001d).portr("DSW1");
 	map(0x70001e, 0x70001f).w(FUNC(playmark_state::playmark_snd_command_w));
 	map(0x780000, 0x7807ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-//  AM_RANGE(0xe00000, 0xe00001) ?? written on startup
+//  map(0xe00000, 0xe00001) ?? written on startup
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -314,14 +314,14 @@ void playmark_state::wbeachvl_main_map(address_map &map)
 	map(0x50f000, 0x50ffff).ram().share("rowscroll");
 	map(0x510000, 0x51000b).w(FUNC(playmark_state::wbeachvl_scroll_w));
 	map(0x51000c, 0x51000d).nopw();    /* 2 and 3 */
-//  AM_RANGE(0x700000, 0x700001) ?? written on startup
+//  map(0x700000, 0x700001) ?? written on startup
 	map(0x710010, 0x710011).portr("SYSTEM");
 	map(0x710012, 0x710013).portr("P1");
 	map(0x710014, 0x710015).portr("P2");
 	map(0x710016, 0x710017).w(FUNC(playmark_state::wbeachvl_coin_eeprom_w));
 	map(0x710018, 0x710019).portr("P3");
 	map(0x71001a, 0x71001b).portr("P4");
-//  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
+//  map(0x71001c, 0x71001d).r(FUNC(playmark_state::playmark_snd_status???));
 	map(0x71001e, 0x71001f).w(FUNC(playmark_state::playmark_snd_command_w));
 	map(0x780000, 0x780fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
@@ -370,7 +370,7 @@ void playmark_state::hrdtimes_main_map(address_map &map)
 	map(0x300016, 0x300017).w(FUNC(playmark_state::hrdtimes_coin_w));
 	map(0x30001a, 0x30001b).portr("DSW2");
 	map(0x30001c, 0x30001d).portr("DSW1");
-//  AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
+//  map(0x30001e, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
 	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
 }
 

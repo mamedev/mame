@@ -2293,7 +2293,8 @@ void cps_state::video_start()
 	m_cps_a_regs[CPS1_OTHER_BASE]   = 0x9100;
 
 	/* This should never be hit, since game_config is set in machine_reset */
-	assert_always(m_game_config, "state_game_config hasn't been set up yet");
+	if (!m_game_config)
+		throw emu_fatalerror("cps_state::video_start: m_game_config hasn't been set up yet");
 
 
 	/* Set up old base */

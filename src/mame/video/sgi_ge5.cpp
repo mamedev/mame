@@ -147,7 +147,7 @@ void sgi_ge5_device::device_add_mconfig(machine_config &config)
 {
 	WTL3132(config, m_fpu, clock());
 	m_fpu->out_fpcn().set([this](int state) { m_fpu_c = bool(state); });
-	m_fpu->out_port_x().set([this](u32 data) { m_bus = data; });
+	m_fpu->out_port_x().set([this](u32 data) { m_fpu_data = data; });
 }
 
 
@@ -186,6 +186,7 @@ void sgi_ge5_device::device_start()
 
 void sgi_ge5_device::device_reset()
 {
+	m_pc = 0;
 	m_sp = 0;
 	m_reptr = 0;
 	m_memptr = 0;
@@ -225,7 +226,7 @@ void sgi_ge5_device::execute_run()
 
 			// execute secondary operation
 			if (m_decode.secondary)
-				secondary(m_bus_latch);
+				secondary();
 
 			// increment memptr
 			if (m_decode.inc_memptr)
@@ -272,6 +273,7 @@ void sgi_ge5_device::execute_run()
 				break;
 			case 3: // fpu
 				m_decode.fpu |= (2ULL << wtl3132_device::S_IOCT);
+				m_bus = m_fpu_data;
 				break;
 			}
 			break;
@@ -445,7 +447,6 @@ void sgi_ge5_device::execute_run()
 			}
 
 			// FIXME: fpu condition has additional 1 cycle latency
-			m_bus_latch = m_bus;
 			m_fpu_c_latch = m_fpu_c;
 
 			// fpu operation
@@ -487,7 +488,7 @@ void sgi_ge5_device::decode()
 	}
 }
 
-void sgi_ge5_device::secondary(u64 bus)
+void sgi_ge5_device::secondary()
 {
 	switch (m_decode.operation)
 	{
@@ -520,7 +521,7 @@ void sgi_ge5_device::secondary(u64 bus)
 		break;
 
 	case 0xb0: // load memptr
-		m_memptr = bus & 0x7fff;
+		m_memptr = m_bus & 0x7fff;
 		break;
 
 	case 0xb4: // set memptr
@@ -529,6 +530,7 @@ void sgi_ge5_device::secondary(u64 bus)
 
 	case 0xb6: // set memptr; set finish flag
 		m_memptr = m_decode.immediate & 0x7fff;
+		LOG("finish flag %d set (%s)\n", m_decode.immediate & 1, machine().describe_context());
 		m_finish[m_decode.immediate & 1] = 1;
 		break;
 
@@ -693,7 +695,7 @@ offs_t sgi_ge5_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 	case 3:
 	case 5:
 	case 6:
-		fpu_ctrl |= 0x2'0000'0000; // ENCN=2
+		fpu_ctrl |= 0x1'0000'0000; // ENCN=1
 		break;
 	}
 

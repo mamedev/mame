@@ -134,7 +134,7 @@ void nvram_device::determine_final_base()
 	{
 		memory_share *share = owner()->memshare(tag());
 		if (share == nullptr)
-			throw emu_fatalerror("NVRAM device '%s' has no corresponding AM_SHARE region", tag());
+			throw emu_fatalerror("NVRAM device '%s' has no corresponding share() region", tag());
 		m_base = share->ptr();
 		m_length = share->bytes();
 	}

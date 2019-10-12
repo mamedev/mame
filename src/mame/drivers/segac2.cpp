@@ -1542,10 +1542,10 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 }
 
 /*
-	sound output balance (tfrceac)
-	reference : https://youtu.be/AOmeWp9qe5E
-	reference 2 : https://youtu.be/Tq8VkJYmij8
-	reference 3: https://youtu.be/VId_HWdNuyA
+    sound output balance (tfrceac)
+    reference : https://youtu.be/AOmeWp9qe5E
+    reference 2 : https://youtu.be/Tq8VkJYmij8
+    reference 3: https://youtu.be/VId_HWdNuyA
 */
 void segac2_state::segac(machine_config &config)
 {

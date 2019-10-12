@@ -240,10 +240,7 @@ inline void snes_sound_device::update_timer_tick(u8 which)
 void snes_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id != TIMER_TICK_ID)
-	{
-		assert_always(false, "Unknown id in snes_sound_device::device_timer");
-		return;
-	}
+		throw emu_fatalerror("Unknown id in snes_sound_device::device_timer");
 
 	for (int ch = 0; ch < 3; ch++)
 		update_timer_tick(ch);
@@ -1077,7 +1074,7 @@ u8 snes_sound_device::spc_io_r(offs_t offset)
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
-			// osd_printf_debug("%s SPC: rd %02x @ %d\n", machine().describe_context().c_str(), m_port_in[offset - 4], offset - 4);
+			// osd_printf_debug("%s SPC: rd %02x @ %d\n", machine().describe_context(), m_port_in[offset - 4], offset - 4);
 			return m_port_in[offset - 4];
 		case 0x8: //normal RAM, can be read even if the ram disabled flag ($f0 bit 1) is active
 		case 0x9:
@@ -1144,7 +1141,7 @@ void snes_sound_device::spc_io_w(offs_t offset, u8 data)
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
-			// osd_printf_debug("%s SPC: %02x to APU @ %d\n", machine().describe_context().c_str(), data, offset & 3);
+			// osd_printf_debug("%s SPC: %02x to APU @ %d\n", machine().describe_context(), data, offset & 3);
 			m_port_out[offset - 4] = data;
 			// Unneeded, we already run at perfect_interleave
 			// machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));

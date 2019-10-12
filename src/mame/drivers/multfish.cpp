@@ -953,11 +953,11 @@ void igrosoft_gamble_state::igrosoft_gamble_portmap(address_map &map)
 	/* Write ports not hooked up yet */
 	map(0x30, 0x30).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps1_w));
 		map(0x31, 0x31).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_counters_w));
-//  AM_RANGE(0x32, 0x32) AM_WRITE(igrosoft_gamble_port32_w)
+//  map(0x32, 0x32).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_port32_w));
 	map(0x33, 0x33).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_hopper_w));
 	map(0x34, 0x34).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps2_w));
 	map(0x35, 0x35).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps3_w));
-//  AM_RANGE(0x36, 0x36) AM_WRITE(igrosoft_gamble_port36_w)
+//  map(0x36, 0x36).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_port36_w));
 	map(0x37, 0x37).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x38, 0x38).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x39, 0x39).w("aysnd", FUNC(ay8910_device::data_w));

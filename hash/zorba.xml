@@ -31,7 +31,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="78499">
-				<rom name="compat v3.2 - application disk.td0" size="78499" crc="19a9d6a9" sha1="e496a9bdfa171b742425f11423c101abce8c9e85" offset="0" />
+				<rom name="compat v3.2 - application disk.td0" size="78499" crc="19a9d6a9" sha1="e496a9bdfa171b742425f11423c101abce8c9e85"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,17 +43,17 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174565">
-				<rom name="zorba1.imd" size="174565" crc="b7c4e257" sha1="be10a48c8e512476cd39c2ca0faa261bda280260" offset="0" />
+				<rom name="zorba1.imd" size="174565" crc="b7c4e257" sha1="be10a48c8e512476cd39c2ca0faa261bda280260"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="332397">
-				<rom name="zorba2.imd" size="332397" crc="9f4832b9" sha1="41b6ff86ac11077f3a16bd9ed7be991448b16968" offset="0" />
+				<rom name="zorba2.imd" size="332397" crc="9f4832b9" sha1="41b6ff86ac11077f3a16bd9ed7be991448b16968"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="351758">
-				<rom name="zorba5.imd" size="351758" crc="d3a2362a" sha1="4d291814b23144a7f122b565348fd5021af8c43e" offset="0" />
+				<rom name="zorba5.imd" size="351758" crc="d3a2362a" sha1="4d291814b23144a7f122b565348fd5021af8c43e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -66,17 +66,17 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174565">
-				<rom name="zorba1.imd" size="174565" crc="b7c4e257" sha1="be10a48c8e512476cd39c2ca0faa261bda280260" offset="0" status="baddump" />
+				<rom name="zorba1.imd" size="174565" crc="b7c4e257" sha1="be10a48c8e512476cd39c2ca0faa261bda280260" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="139002">
-				<rom name="cpm-80 v2.2 (zorba bios v1.7) - source disk.td0" size="139002" crc="1c549210" sha1="0ceff17dca1e9cfb7306d9e04d6c323cf434d2f2" offset="0" />
+				<rom name="cpm-80 v2.2 (zorba bios v1.7) - source disk.td0" size="139002" crc="1c549210" sha1="0ceff17dca1e9cfb7306d9e04d6c323cf434d2f2"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="109526">
-				<rom name="cpm-80 v2.2 (zorba bios v1.7) - utility disk.td0" size="109526" crc="da09bdd8" sha1="6d78efec8441833498025a2852504489dade9d94" offset="0" />
+				<rom name="cpm-80 v2.2 (zorba bios v1.7) - utility disk.td0" size="109526" crc="da09bdd8" sha1="6d78efec8441833498025a2852504489dade9d94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -88,12 +88,12 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="171898">
-				<rom name="cpm-80 v2.2 (zorba bios v1.6) - system disk.td0" size="171898" crc="6df3c58e" sha1="3a15e3b927f88fa34e6e6cdfffc272ff83b2a061" offset="0" />
+				<rom name="cpm-80 v2.2 (zorba bios v1.6) - system disk.td0" size="171898" crc="6df3c58e" sha1="3a15e3b927f88fa34e6e6cdfffc272ff83b2a061"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="226552">
-				<rom name="cpm-80 v2.2 (zorba bios v1.6) - utility disk.td0" size="226552" crc="b65c0436" sha1="9f8ed5dd2167f5b9f0abd27fa6d4ed1f50646d2f" offset="0" />
+				<rom name="cpm-80 v2.2 (zorba bios v1.6) - utility disk.td0" size="226552" crc="b65c0436" sha1="9f8ed5dd2167f5b9f0abd27fa6d4ed1f50646d2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,17 +105,17 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="193670">
-				<rom name="cpm-80 v2.2 (zorba bios v1.6) - system disk 1.td0" size="193670" crc="a4530528" sha1="ff29f06c57485e8ff41f2217daac63598bdaa74e" offset="0" />
+				<rom name="cpm-80 v2.2 (zorba bios v1.6) - system disk 1.td0" size="193670" crc="a4530528" sha1="ff29f06c57485e8ff41f2217daac63598bdaa74e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="171990">
-				<rom name="cpm-80 v2.2 (zorba bios v1.6) - system disk 2.td0" size="171990" crc="993b96ce" sha1="ac3bcd735244d3a6405dd02efbb37f944174ad3a" offset="0" />
+				<rom name="cpm-80 v2.2 (zorba bios v1.6) - system disk 2.td0" size="171990" crc="993b96ce" sha1="ac3bcd735244d3a6405dd02efbb37f944174ad3a"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="226552">
-				<rom name="cpm-80 v2.2 (zorba bios v1.6) - utility disk.td0" size="226552" crc="b65c0436" sha1="9f8ed5dd2167f5b9f0abd27fa6d4ed1f50646d2f" offset="0" />
+				<rom name="cpm-80 v2.2 (zorba bios v1.6) - utility disk.td0" size="226552" crc="b65c0436" sha1="9f8ed5dd2167f5b9f0abd27fa6d4ed1f50646d2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -127,7 +127,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="285491">
-				<rom name="datastar v1.41.td0" size="285491" crc="ff9ce693" sha1="e054c30a4738f94d6a66b21a0d8d1b6a98eecbb4" offset="0" />
+				<rom name="datastar v1.41.td0" size="285491" crc="ff9ce693" sha1="e054c30a4738f94d6a66b21a0d8d1b6a98eecbb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -139,7 +139,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="290987">
-				<rom name="zorba3.imd" size="290987" crc="d5cf92cb" sha1="d123e3763ac8da14ef7443361f77df34dcc5cd0f" offset="0" />
+				<rom name="zorba3.imd" size="290987" crc="d5cf92cb" sha1="d123e3763ac8da14ef7443361f77df34dcc5cd0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,27 +151,27 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="117176">
-				<rom name="ashton-tate dbase ii v2.41 application disk - disk 1.td0" size="117176" crc="4d51f8b4" sha1="617169d9e1d2e10460a3966968701ccd44c147f2" offset="0" />
+				<rom name="ashton-tate dbase ii v2.41 application disk - disk 1.td0" size="117176" crc="4d51f8b4" sha1="617169d9e1d2e10460a3966968701ccd44c147f2"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="94274">
-				<rom name="ashton-tate dbase ii v2.41 sample disk 1 - disk 2.td0" size="94274" crc="3f0b6f59" sha1="4af4aaee1f631ae1be0be11f2fc2131cf0bfbd77" offset="0" />
+				<rom name="ashton-tate dbase ii v2.41 sample disk 1 - disk 2.td0" size="94274" crc="3f0b6f59" sha1="4af4aaee1f631ae1be0be11f2fc2131cf0bfbd77"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="22058">
-				<rom name="ashton-tate dbase ii v2.41 sample disk 2 - disk 3.td0" size="22058" crc="cfc04630" sha1="c988d1b330d1cdecf25bd63625a6caae20b53393" offset="0" />
+				<rom name="ashton-tate dbase ii v2.41 sample disk 2 - disk 3.td0" size="22058" crc="cfc04630" sha1="c988d1b330d1cdecf25bd63625a6caae20b53393"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="22056">
-				<rom name="ashton-tate dbase ii v2.41 sample disk 3 - disk 4.td0" size="22056" crc="f54b6f10" sha1="769b7abd592431cb260f72ab43300fb23ea5ec40" offset="0" />
+				<rom name="ashton-tate dbase ii v2.41 sample disk 3 - disk 4.td0" size="22056" crc="f54b6f10" sha1="769b7abd592431cb260f72ab43300fb23ea5ec40"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="29424">
-				<rom name="ashton-tate dbase ii v2.41 sample disk 4 - disk 5.td0" size="29424" crc="fa4531f8" sha1="9791a692446540bcf57241e798cf7bd0d8a30ce8" offset="0" />
+				<rom name="ashton-tate dbase ii v2.41 sample disk 4 - disk 5.td0" size="29424" crc="fa4531f8" sha1="9791a692446540bcf57241e798cf7bd0d8a30ce8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -183,7 +183,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="161505">
-				<rom name="mite v3.0 - application disk.td0" size="161505" crc="4a1e5dec" sha1="1bd24b9481047a8c7db93c56fa2fd56b68e0aa49" offset="0" />
+				<rom name="mite v3.0 - application disk.td0" size="161505" crc="4a1e5dec" sha1="1bd24b9481047a8c7db93c56fa2fd56b68e0aa49"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="356678">
-				<rom name="wordstar v3.00.td0" size="356678" crc="37896ed4" sha1="df2c938987dda821863383cbbcb9b8e1008606f3" offset="0" />
+				<rom name="wordstar v3.00.td0" size="356678" crc="37896ed4" sha1="df2c938987dda821863383cbbcb9b8e1008606f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="259832">
-				<rom name="zorba4.imd" size="259832" crc="3c89eb7a" sha1="c54c579e9a24410870eed5f7a6c3a73f0f5f2633" offset="0" />
+				<rom name="zorba4.imd" size="259832" crc="3c89eb7a" sha1="c54c579e9a24410870eed5f7a6c3a73f0f5f2633"/>
 			</dataarea>
 		</part>
 	</software>
@@ -241,7 +241,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204828">
-				<rom name="zeuslib. 001 public domain software.td0" size="204828" crc="049704a6" sha1="8ad508756e2715d23f8da21825cca31b39e836ee" offset="0" />
+				<rom name="zeuslib. 001 public domain software.td0" size="204828" crc="049704a6" sha1="8ad508756e2715d23f8da21825cca31b39e836ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -272,7 +272,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="280008">
-				<rom name="zeuslib. 002 public domain software.td0" size="280008" crc="2eaa4c27" sha1="c2b443d710e5677b0af7bcc696e0fa78f6489796" offset="0" />
+				<rom name="zeuslib. 002 public domain software.td0" size="280008" crc="2eaa4c27" sha1="c2b443d710e5677b0af7bcc696e0fa78f6489796"/>
 			</dataarea>
 		</part>
 	</software>
@@ -308,7 +308,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="263142">
-				<rom name="zeuslib. 003 public domain software.td0" size="263142" crc="3f715516" sha1="fd22691481f0aab59f6ca5d3a9130eb00c064b77" offset="0" />
+				<rom name="zeuslib. 003 public domain software.td0" size="263142" crc="3f715516" sha1="fd22691481f0aab59f6ca5d3a9130eb00c064b77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -326,7 +326,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="269382">
-				<rom name="zeuslib. 004 public domain software.td0" size="269382" crc="a2a3005d" sha1="653329e738f2313e9515016d2a4aacd7d40293ce" offset="0" />
+				<rom name="zeuslib. 004 public domain software.td0" size="269382" crc="a2a3005d" sha1="653329e738f2313e9515016d2a4aacd7d40293ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -369,7 +369,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241178">
-				<rom name="zeuslib. 005 public domain software.td0" size="241178" crc="1e82d9bc" sha1="d6a6c1ece5ed55c8883a13c1cd9957e5979edf29" offset="0" />
+				<rom name="zeuslib. 005 public domain software.td0" size="241178" crc="1e82d9bc" sha1="d6a6c1ece5ed55c8883a13c1cd9957e5979edf29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -391,7 +391,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="268476">
-				<rom name="zeuslib. 006 public domain software.td0" size="268476" crc="1cd375f1" sha1="84d248b824b7d065fd7551fa4a2fd194d6ff2a24" offset="0" />
+				<rom name="zeuslib. 006 public domain software.td0" size="268476" crc="1cd375f1" sha1="84d248b824b7d065fd7551fa4a2fd194d6ff2a24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -409,7 +409,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="180484">
-				<rom name="zeuslib. 007 public domain software.td0" size="180484" crc="a22ea734" sha1="f66e320ccb4990372ab443a1f1006d175e4307e6" offset="0" />
+				<rom name="zeuslib. 007 public domain software.td0" size="180484" crc="a22ea734" sha1="f66e320ccb4990372ab443a1f1006d175e4307e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -433,7 +433,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="304818">
-				<rom name="zeuslib. 008 public domain software.td0" size="304818" crc="c173a8ed" sha1="d3b7fb35a95a1e88f1cacf30fa4690d91c058046" offset="0" />
+				<rom name="zeuslib. 008 public domain software.td0" size="304818" crc="c173a8ed" sha1="d3b7fb35a95a1e88f1cacf30fa4690d91c058046"/>
 			</dataarea>
 		</part>
 	</software>
@@ -452,7 +452,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="264184">
-				<rom name="zeuslib. 009 public domain software.td0" size="264184" crc="f41a5f53" sha1="f863263f211c328f124abf5a40e93aa6503aa20e" offset="0" />
+				<rom name="zeuslib. 009 public domain software.td0" size="264184" crc="f41a5f53" sha1="f863263f211c328f124abf5a40e93aa6503aa20e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -473,7 +473,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="249080">
-				<rom name="zeuslib. 010 public domain software.td0" size="249080" crc="aca92c7e" sha1="d05346cb40f9a2ab468c0173a8b9430caa15ecc0" offset="0" />
+				<rom name="zeuslib. 010 public domain software.td0" size="249080" crc="aca92c7e" sha1="d05346cb40f9a2ab468c0173a8b9430caa15ecc0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -497,7 +497,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="268902">
-				<rom name="zeuslib. 011 public domain software.td0" size="268902" crc="bbca9771" sha1="b8434a474971143ee9cd25e1fc665c5a8dc831e1" offset="0" />
+				<rom name="zeuslib. 011 public domain software.td0" size="268902" crc="bbca9771" sha1="b8434a474971143ee9cd25e1fc665c5a8dc831e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -522,7 +522,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="276624">
-				<rom name="zeuslib. 012 public domain software.td0" size="276624" crc="d85bf1cb" sha1="e5a3e46fb9c7258769bb185a6cfc9baf416de0a9" offset="0" />
+				<rom name="zeuslib. 012 public domain software.td0" size="276624" crc="d85bf1cb" sha1="e5a3e46fb9c7258769bb185a6cfc9baf416de0a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -570,7 +570,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="284364">
-				<rom name="zeuslib. 013 public domain software.td0" size="284364" crc="1412b3ac" sha1="6b9727a6cfe26e215b0928d3bdb53f2665c72865" offset="0" />
+				<rom name="zeuslib. 013 public domain software.td0" size="284364" crc="1412b3ac" sha1="6b9727a6cfe26e215b0928d3bdb53f2665c72865"/>
 			</dataarea>
 		</part>
 	</software>
@@ -605,7 +605,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="302842">
-				<rom name="zeuslib. 014 public domain software.td0" size="302842" crc="d4ffdd8a" sha1="7b2caae4c4623c25469e06d190b4fa53c67bdce8" offset="0" />
+				<rom name="zeuslib. 014 public domain software.td0" size="302842" crc="d4ffdd8a" sha1="7b2caae4c4623c25469e06d190b4fa53c67bdce8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -637,7 +637,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="238514">
-				<rom name="zeuslib. 015 public domain software.td0" size="238514" crc="200665b1" sha1="e8a690c2f2d3a4439b4b34f9c2077f8f3d4035ca" offset="0" />
+				<rom name="zeuslib. 015 public domain software.td0" size="238514" crc="200665b1" sha1="e8a690c2f2d3a4439b4b34f9c2077f8f3d4035ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -655,7 +655,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="284722">
-				<rom name="zeuslib. 016 public domain software.td0" size="284722" crc="6a2de0eb" sha1="a7804dd1a0dec12b5e8525fbdba08b0f3b360cff" offset="0" />
+				<rom name="zeuslib. 016 public domain software.td0" size="284722" crc="6a2de0eb" sha1="a7804dd1a0dec12b5e8525fbdba08b0f3b360cff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -687,7 +687,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="196860">
-				<rom name="zeuslib. 017 public domain software.td0" size="196860" crc="494998ae" sha1="495e97b1329370619b36769be10a90b70995de22" offset="0" />
+				<rom name="zeuslib. 017 public domain software.td0" size="196860" crc="494998ae" sha1="495e97b1329370619b36769be10a90b70995de22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -709,7 +709,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="232056">
-				<rom name="zeuslib. 018 public domain software.td0" size="232056" crc="d0cb40d8" sha1="34ce4b85f0245a70c98b79420643e179aaf94e1a" offset="0" />
+				<rom name="zeuslib. 018 public domain software.td0" size="232056" crc="d0cb40d8" sha1="34ce4b85f0245a70c98b79420643e179aaf94e1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -731,7 +731,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="202302">
-				<rom name="zeuslib. 019 public domain software.td0" size="202302" crc="5aab0c0f" sha1="a79d65730aa2fb8aa6bd8667a1a2a049b29e6b68" offset="0" />
+				<rom name="zeuslib. 019 public domain software.td0" size="202302" crc="5aab0c0f" sha1="a79d65730aa2fb8aa6bd8667a1a2a049b29e6b68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -753,7 +753,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="237880">
-				<rom name="zeuslib. 020 public domain software.td0" size="237880" crc="48dbec4f" sha1="cbf6ace0fdb29fdff8d7e01f21a029339fab7198" offset="0" />
+				<rom name="zeuslib. 020 public domain software.td0" size="237880" crc="48dbec4f" sha1="cbf6ace0fdb29fdff8d7e01f21a029339fab7198"/>
 			</dataarea>
 		</part>
 	</software>
@@ -770,7 +770,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="269470">
-				<rom name="zeuslib. 021 public domain software.td0" size="269470" crc="0efd6c68" sha1="a2b52a52694d9c75486f8573c4534442e3531c7f" offset="0" />
+				<rom name="zeuslib. 021 public domain software.td0" size="269470" crc="0efd6c68" sha1="a2b52a52694d9c75486f8573c4534442e3531c7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -790,7 +790,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="252560">
-				<rom name="zeuslib. 022 public domain software.td0" size="252560" crc="2bcd0db4" sha1="ccd3371ed90c68f88dede9dbbe6b3d4ee32b717f" offset="0" />
+				<rom name="zeuslib. 022 public domain software.td0" size="252560" crc="2bcd0db4" sha1="ccd3371ed90c68f88dede9dbbe6b3d4ee32b717f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -802,7 +802,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop43" interface="floppy_5_25">
 			<dataarea name="flop" size="116362">
-				<rom name="zorba bios v1.8z.td0" size="116362" crc="51e4746a" sha1="ed363b3ef97e273ac887a46c1a839dc8b5d15307" offset="0" />
+				<rom name="zorba bios v1.8z.td0" size="116362" crc="51e4746a" sha1="ed363b3ef97e273ac887a46c1a839dc8b5d15307"/>
 			</dataarea>
 		</part>
 	</software>
@@ -817,7 +817,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop19" interface="floppy_5_25">
 			<dataarea name="flop" size="39433">
-				<rom name="swp co-power 88.td0" size="39433" crc="f4134db7" sha1="fc270abad2f715b86138d192ccc7f9ab173e77c9" offset="0" />
+				<rom name="swp co-power 88.td0" size="39433" crc="f4134db7" sha1="fc270abad2f715b86138d192ccc7f9ab173e77c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -830,7 +830,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="247616">
-				<rom name="digital research cpm-86 v1.1.td0" size="247616" crc="d6137dca" sha1="0feba6c3c36f28be5aec57ec877ea57e67d1754a" offset="0" />
+				<rom name="digital research cpm-86 v1.1.td0" size="247616" crc="d6137dca" sha1="0feba6c3c36f28be5aec57ec877ea57e67d1754a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -843,7 +843,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop18" interface="floppy_5_25">
 			<dataarea name="flop" size="322343">
-				<rom name="pc dos 3.30 system disk.td0" size="322343" crc="ca6260df" sha1="2a0d4988ee2562a98b7af1d345d4899ce55aa8d2" offset="0" />
+				<rom name="pc dos 3.30 system disk.td0" size="322343" crc="ca6260df" sha1="2a0d4988ee2562a98b7af1d345d4899ce55aa8d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -856,12 +856,12 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="227363">
-				<rom name="pc dos 2.11 system disk 1.td0" size="227363" crc="c6291464" sha1="68b7ccd7ffac98f76bca48ae4cae2fccd70f8a51" offset="0" />
+				<rom name="pc dos 2.11 system disk 1.td0" size="227363" crc="c6291464" sha1="68b7ccd7ffac98f76bca48ae4cae2fccd70f8a51"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="228103">
-				<rom name="pc dos 2.11 system disk 2.td0" size="228103" crc="3f898887" sha1="0071c716f1c6d5be153c5013f29819869f449209" offset="0" />
+				<rom name="pc dos 2.11 system disk 2.td0" size="228103" crc="3f898887" sha1="0071c716f1c6d5be153c5013f29819869f449209"/>
 			</dataarea>
 		</part>
 	</software>

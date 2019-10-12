@@ -502,7 +502,7 @@ void ecoinfr_state::portmap(address_map &map)
 	map(0x0b, 0x0b).w(FUNC(ecoinfr_state::ec_port0b_out_w)); // 11 (Sound 2)
 	map(0x0c, 0x0c).w(FUNC(ecoinfr_state::ec_port0c_out_cred_strobe_w));
 	map(0x0d, 0x0d).w(FUNC(ecoinfr_state::ec_port0d_out_cred_data_w));
-//  AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
+//  map(0x0e, 0x0e).w(FUNC(ecoinfr_state::ec_port0e_out_w));
 	map(0x0f, 0x0f).w(FUNC(ecoinfr_state::ec_port0f_out_bank_segdata_w));
 	map(0x10, 0x10).w(FUNC(ecoinfr_state::ec_port10_out_w)); // 16 (Meter)
 	map(0x11, 0x11).w(FUNC(ecoinfr_state::ec_port11_out_w)); // SEC

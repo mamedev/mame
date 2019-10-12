@@ -100,7 +100,7 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 			const u8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
 			// alphaMode & 0xc0 = 0xc0 : Shadow, 0 : Alpha or Pre-shadowed, Other bits unknown
 			if (shadowMode && (alphaMode & 0xc0))
-			{	/* TODO : 8bpp and shadow can use simultaneously? */
+			{   /* TODO : 8bpp and shadow can use simultaneously? */
 				int x, x_index = x_index_base;
 				for (x = sx; x < ex; x++)
 				{
@@ -146,10 +146,9 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 	u32 *index_ptr = nullptr;
 	int sprite,h,w,fx1,fy1;
 	int xoffs,yoffs;
-	const u8 *rom = m_gfx2 + 0x20000, *index_ptr8;
-	const u8 *rawrom = m_gfx2;
+	const u8 *index_ptr8;
 	int blockIsTilemapIndex = 0;
-	int sprite2 = 0,indx2 = 0,use8bppMode = 0;
+	int sprite2 = 0,use8bppMode = 0;
 	int useIndicesInRom = 0;
 	int hibits = 0;
 	int tileFormat = 0;
@@ -235,7 +234,7 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 
 		int clipper = (spriteram[offs + 1] >> 8) & 0x3;
 
-		int indx = spriteram[offs + 0] & 0x3fff;
+		int indx = spriteram[offs + 0] & 0x7fff;
 		int yscale = spriteram[offs + 4] & 0x3ff;
 		int xscale = spriteram[offs + 5] & 0x3ff;
 		int colorOffset = 0;
@@ -268,13 +267,12 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 		if (use8bppMode)
 		{
 			color = (spriteram[offs + 1 - 8] & 0x7f);
-			indx2 = spriteram[offs + 0 - 8] & 0x3fff;
 		}
 
 		/* Lookup tiles / size in sprite index ram OR in the lookup rom */
-		if (spriteram[offs + 0] & 0x4000)
+		if (indx & 0x4000)
 		{
-			index_ptr8 = rom + indx * 8; /* Byte ptr */
+			index_ptr8 = m_gfx2 + indx * 8; /* Byte ptr */
 			h = (index_ptr8[1] >> 0) & 0xf;
 			w = (index_ptr8[3] >> 0) & 0xf;
 
@@ -284,11 +282,6 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 			sprite = (index_ptr8[7] << 8) | index_ptr8[6];
 			sprite |= (index_ptr8[4] & 3) << 16;
 
-			if (use8bppMode)
-			{
-				const u8* index_ptr28 = rom + indx2 * 8;
-				sprite2 = (index_ptr28[7] << 8) | index_ptr28[6];
-			}
 			//unused byte 5
 			yoffs = index_ptr8[0] & 0xff;
 			xoffs = index_ptr8[2] & 0xff;
@@ -315,12 +308,6 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 			if (!h) h = 16;
 			if (!w) w = 16;
 
-			if (use8bppMode)
-			{
-				u32* index_ptr2 = m_vram + ((indx2 * 4) & 0x7fff);
-				sprite2 = ((index_ptr2[2] & 0x3) << 16) | (index_ptr2[3] & 0xffff);
-			}
-
 			sprite = ((index_ptr[2] & 0x3) << 16) | (index_ptr[3] & 0xffff);
 			if (index_ptr[2] & 0xc0)
 				blockIsTilemapIndex = 1;
@@ -337,6 +324,22 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 
 			fy1 = (index_ptr[0] & 0x1000) >> 12;
 			fx1 = (index_ptr[1] & 0x1000) >> 12;
+		}
+
+		if (use8bppMode)
+		{
+			indx = spriteram[offs + 0 - 8] & 0x7fff;
+			if (indx & 0x4000)
+			{
+				index_ptr8 = m_gfx2 + indx * 8;
+				sprite2 = (index_ptr8[7] << 8) | index_ptr8[6];
+			}
+			else
+			{
+				indx &= 0x1fff;
+				index_ptr = m_vram + indx * 4;
+				sprite2 = ((index_ptr[2] & 0x3) << 16) | (index_ptr[3] & 0xffff);
+			}
 		}
 
 		if (fx1) fx ^= 0x8000;
@@ -464,12 +467,12 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 			{
 				if (useIndicesInRom)
 				{
-					const u8* ptr = rawrom + (tile * 2);
+					const u8* ptr = m_gfx2 + (tile * 2);
 					tile = (*ptr) + ((*(ptr + 1)) << 8);
 
 					if (use8bppMode)
 					{
-						const u8* ptr2 = rawrom + (tile2 * 2);
+						const u8* ptr2 = m_gfx2 + (tile2 * 2);
 						tile2 = (*ptr2) + ((*(ptr2 + 1)) << 8);
 					}
 					else

@@ -9,7 +9,7 @@
 
 		<part name="cass1" interface="ql_cass">
 			<dataarea name="cass" size="174930">
-				<rom name="abacus.mdv" size="174930" crc="332ec1d0" sha1="344245a775471a10aea485f1d083cc72d1ea1e45" offset="0" />
+				<rom name="abacus.mdv" size="174930" crc="332ec1d0" sha1="344245a775471a10aea485f1d083cc72d1ea1e45"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="cass1" interface="ql_cass">
 			<dataarea name="cass" size="174930">
-				<rom name="archive.mdv" size="174930" crc="7bb41d9a" sha1="3d7dcd11b9c807b0db68a7ad35a76621d4771b14" offset="0" />
+				<rom name="archive.mdv" size="174930" crc="7bb41d9a" sha1="3d7dcd11b9c807b0db68a7ad35a76621d4771b14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="cass1" interface="ql_cass">
 			<dataarea name="cass" size="174930">
-				<rom name="easel.mdv" size="174930" crc="d0fb3a25" sha1="e0e34e1b7e2b98c224f9da7e79a6bf6ac106dcb3" offset="0" />
+				<rom name="easel.mdv" size="174930" crc="d0fb3a25" sha1="e0e34e1b7e2b98c224f9da7e79a6bf6ac106dcb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 
 		<part name="cass1" interface="ql_cass">
 			<dataarea name="cass" size="174930">
-				<rom name="josiah.mdv" size="174930" crc="cee152c2" sha1="faf89d9627805cbb4f468a85acfbca7732849247" offset="0" />
+				<rom name="josiah.mdv" size="174930" crc="cee152c2" sha1="faf89d9627805cbb4f468a85acfbca7732849247"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 
 		<part name="cass1" interface="ql_cass">
 			<dataarea name="cass" size="174930">
-				<rom name="quill.mdv" size="174930" crc="8b9a7097" sha1="0b449544a5b2391f04dddd4f18338d36ac018943" offset="0" />
+				<rom name="quill.mdv" size="174930" crc="8b9a7097" sha1="0b449544a5b2391f04dddd4f18338d36ac018943"/>
 			</dataarea>
 		</part>
 	</software>

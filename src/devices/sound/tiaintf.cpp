@@ -33,7 +33,8 @@ void tia_device::device_start()
 {
 	m_channel = stream_alloc(0, 1, clock());
 	m_chip = tia_sound_init(this, clock(), clock(), 16);
-	assert_always(m_chip != nullptr, "Error creating TIA chip");
+	if (!m_chip)
+		throw emu_fatalerror("tia_device(%s): Error creating TIA chip", tag());
 }
 
 

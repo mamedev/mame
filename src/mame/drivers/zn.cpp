@@ -1686,7 +1686,7 @@ void zn_state::psarc_snd_map(address_map &map)
 
 void zn_state::beastrzrb_snd_map(address_map &map)
 { // Internal ROM Not dumped
-//  AM_RANGE(0x0000, 0x0fff) AM_ROM
+//  map(0x0000, 0x0fff).rom();
 }
 
 void zn_state::oki_map(address_map &map)
@@ -4971,41 +4971,67 @@ ROM_START( beastrzr )
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
-	ROM_LOAD16_BYTE( "b.roar_u0213",   0x000001, 0x080000, CRC(2c586534) SHA1(a38dfc3a45446d24a1caac89b0f560989d46ded5) ) /* For U0212 & U0213, 8ing used indentical ROM labels */
-	ROM_LOAD16_BYTE( "b.roar_u0212",   0x000000, 0x080000, CRC(1c85d7fb) SHA1(aa406a42c424cc16a9e5330c68dda9acf8760088) ) /* even though the content changes between versions   */
-	ROM_LOAD16_BYTE( "b.roar-u0215",   0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
-	ROM_LOAD16_BYTE( "b.roar-u0214",   0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )
-	ROM_LOAD( "ra-b-roar_rom-1.u0217", 0x400000, 0x400000, CRC(11f1ba36) SHA1(d41ae686c2c607640cbadf906215c89134758050) )
-	ROM_LOAD( "ra-b.roar_rom-2.u0216", 0x800000, 0x400000, CRC(d46d46b7) SHA1(1c42cb5dcda4b26c08c4ecf95efeadaf3a1d1dd2) )
+	ROM_LOAD16_BYTE( "b.roar_u0213.u0213",  0x000001, 0x080000, CRC(2c586534) SHA1(a38dfc3a45446d24a1caac89b0f560989d46ded5) ) // sldh - at offset 0x4C9C: Sep 22 1997 11:42:18
+	ROM_LOAD16_BYTE( "b.roar_u0212.u0212",  0x000000, 0x080000, CRC(1c85d7fb) SHA1(aa406a42c424cc16a9e5330c68dda9acf8760088) ) // sldh
+	ROM_LOAD16_BYTE( "b.roar_u0215.u0215",  0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
+	ROM_LOAD16_BYTE( "b.roar_u0214.u0214",  0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )
+	ROM_LOAD( "8ing_ra-b.roar_rom-1.u0217", 0x400000, 0x400000, CRC(11f1ba36) SHA1(d41ae686c2c607640cbadf906215c89134758050) )
+	ROM_LOAD( "8ing_ra-b.roar_rom-2.u0216", 0x800000, 0x400000, CRC(d46d46b7) SHA1(1c42cb5dcda4b26c08c4ecf95efeadaf3a1d1dd2) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "b.roar-u046",  0x000001, 0x040000, CRC(d4bb261a) SHA1(9a295b1354ef15f37ea09bb209cf0cb98437c462) )
-	ROM_LOAD16_BYTE( "b.roar-u042",  0x000000, 0x040000, CRC(4d537f88) SHA1(1760367d70a81606e29885ea315185d2c2a9409b) )
+	ROM_LOAD16_BYTE( "b.roar_u046.u046", 0x000001, 0x040000, CRC(d4bb261a) SHA1(9a295b1354ef15f37ea09bb209cf0cb98437c462) )
+	ROM_LOAD16_BYTE( "b.roar_u042.u042", 0x000000, 0x040000, CRC(4d537f88) SHA1(1760367d70a81606e29885ea315185d2c2a9409b) )
 
 	ROM_REGION( 0x400000, "ymf", 0 )
-	ROM_LOAD( "ra-b.roar3_rom-3.u0326", 0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
+	ROM_LOAD( "8ing_ra-b.roar_rom-3.u0326", 0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "et02", 0x000000, 0x000008, CRC(187ce61a) SHA1(521122b0f7b3f278dd2a2b1d73c252b952b5f55d) )
+ROM_END
+
+// ROM board: RA9701 SUB, CPU board: Sony ZN-1 1-659-709-12
+ROM_START( beastrzra )
+	PSARC95_BIOS
+
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
+	ROM_LOAD16_BYTE( "b.roar_u0213.u0213",  0x000001, 0x080000, CRC(5c3ca4d3) SHA1(f246de057c2ea725e5e628dd32597f3bc7d22070) ) // sldh - at offset 0x4C9C: Jun 21 1997 14:09:23
+	ROM_LOAD16_BYTE( "b.roar_u0212.u0212",  0x000000, 0x080000, CRC(45f1269b) SHA1(4754bc97c261dfcb5e379fe765689ea737dd5e1d) ) // sldh
+	ROM_LOAD16_BYTE( "b.roar_u0215.u0215",  0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
+	ROM_LOAD16_BYTE( "b.roar_u0214.u0214",  0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )
+	ROM_LOAD( "8ing_ra-b.roar_rom-1.u0217", 0x400000, 0x400000, BAD_DUMP CRC(11f1ba36) SHA1(d41ae686c2c607640cbadf906215c89134758050) ) // Not dumped on this set, taken from "beastrzr"
+	ROM_LOAD( "8ing_ra-b.roar_rom-2.u0216", 0x800000, 0x400000, BAD_DUMP CRC(d46d46b7) SHA1(1c42cb5dcda4b26c08c4ecf95efeadaf3a1d1dd2) ) // Not dumped on this set, taken from "beastrzr"
+
+	ROM_REGION( 0x080000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "b.roar_u046.u046", 0x000001, 0x040000, CRC(d4bb261a) SHA1(9a295b1354ef15f37ea09bb209cf0cb98437c462) )
+	ROM_LOAD16_BYTE( "b.roar_u042.u042", 0x000000, 0x040000, CRC(4d537f88) SHA1(1760367d70a81606e29885ea315185d2c2a9409b) )
+
+	ROM_REGION( 0x400000, "ymf", 0 )
+	ROM_LOAD( "8ing_ra-b.roar_rom-3.u0326", 0x000000, 0x400000, BAD_DUMP CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) ) // Not dumped on this set, taken from "beastrzr"
+
+	ROM_REGION( 0x8, "cat702_2", 0 )
+	ROM_LOAD( "et02", 0x000000, 0x000008, CRC(187ce61a) SHA1(521122b0f7b3f278dd2a2b1d73c252b952b5f55d) )
+
+	ROM_REGION( 0x114, "plds", 0 )
+	ROM_LOAD( "gal16v8b.u0219", 0x000000, 0x000114, NO_DUMP ) // On the ROM board
 ROM_END
 
 ROM_START( bldyroar )
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
-	ROM_LOAD16_BYTE( "b.roar-u0213",   0x000001, 0x080000, CRC(63769342) SHA1(7231188073b997b039467db85ce7c85383daf591) ) /* For U0212 & U0213, 8ing used indentical ROM labels */
-	ROM_LOAD16_BYTE( "b.roar-u0212",   0x000000, 0x080000, CRC(966b7169) SHA1(63e025cacb84e89d30b40ed6cfa5c63d84c298c4) ) /* even though the content changes between versions   */
-	ROM_LOAD16_BYTE( "b.roar-u0215",   0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
-	ROM_LOAD16_BYTE( "b.roar-u0214",   0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )
-	ROM_LOAD( "ra-b-roar_rom-1.u0217", 0x400000, 0x400000, CRC(11f1ba36) SHA1(d41ae686c2c607640cbadf906215c89134758050) )
-	ROM_LOAD( "ra-b.roar_rom-2.u0216", 0x800000, 0x400000, CRC(d46d46b7) SHA1(1c42cb5dcda4b26c08c4ecf95efeadaf3a1d1dd2) )
+	ROM_LOAD16_BYTE( "b.roar_u0213.u0213",  0x000001, 0x080000, CRC(63769342) SHA1(7231188073b997b039467db85ce7c85383daf591) ) // sldh - at offset 0x4C9C: Jun 21 1997 14:18:11
+	ROM_LOAD16_BYTE( "b.roar_u0212.u0212",  0x000000, 0x080000, CRC(966b7169) SHA1(63e025cacb84e89d30b40ed6cfa5c63d84c298c4) ) // sldh
+	ROM_LOAD16_BYTE( "b.roar_u0215.u0215",  0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
+	ROM_LOAD16_BYTE( "b.roar_u0214.u0214",  0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )
+	ROM_LOAD( "8ing_ra-b.roar_rom-1.u0217", 0x400000, 0x400000, CRC(11f1ba36) SHA1(d41ae686c2c607640cbadf906215c89134758050) )
+	ROM_LOAD( "8ing_ra-b.roar_rom-2.u0216", 0x800000, 0x400000, CRC(d46d46b7) SHA1(1c42cb5dcda4b26c08c4ecf95efeadaf3a1d1dd2) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "b.roar-u046",  0x000001, 0x040000, CRC(d4bb261a) SHA1(9a295b1354ef15f37ea09bb209cf0cb98437c462) )
-	ROM_LOAD16_BYTE( "b.roar-u042",  0x000000, 0x040000, CRC(4d537f88) SHA1(1760367d70a81606e29885ea315185d2c2a9409b) )
+	ROM_LOAD16_BYTE( "b.roar_u046.u046", 0x000001, 0x040000, CRC(d4bb261a) SHA1(9a295b1354ef15f37ea09bb209cf0cb98437c462) )
+	ROM_LOAD16_BYTE( "b.roar_u042.u042", 0x000000, 0x040000, CRC(4d537f88) SHA1(1760367d70a81606e29885ea315185d2c2a9409b) )
 
 	ROM_REGION( 0x400000, "ymf", 0 )
-	ROM_LOAD( "ra-b.roar3_rom-3.u0326", 0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
+	ROM_LOAD( "8ing_ra-b.roar_rom-3.u0326", 0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "et02", 0x000000, 0x000008, CRC(187ce61a) SHA1(521122b0f7b3f278dd2a2b1d73c252b952b5f55d) )
@@ -5546,10 +5572,11 @@ GAME( 1997, gdariusb,  gdarius2, coh1002tb,   znt,      zn_state, init_coh1000tb
 GAME( 1997, gdarius2,  coh1000t, coh1002tb,   znt,      zn_state, init_coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)",     MACHINE_IMPERFECT_SOUND )
 
 /* Eighting / Raizing */
-GAME( 1997, coh1002e,  0,        coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "PS Arcade 95",              MACHINE_IS_BIOS_ROOT )
-GAME( 1997, beastrzr,  coh1002e, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA)",         MACHINE_IMPERFECT_SOUND )
-GAME( 1997, bldyroar,  beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)",       MACHINE_IMPERFECT_SOUND )
-GAME( 1997, beastrzrb, beastrzr, beastrzrb,   znt,      zn_state, empty_init, ROT0, "bootleg",            "Beastorizer (USA bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, coh1002e,  0,        coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "PS Arcade 95",                     MACHINE_IS_BIOS_ROOT )
+GAME( 1997, beastrzr,  coh1002e, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA, Sep 22 1997)",   MACHINE_IMPERFECT_SOUND )
+GAME( 1997, beastrzra, beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Beastorizer (USA, Jun 21 1997)",   MACHINE_IMPERFECT_SOUND )
+GAME( 1997, bldyroar,  beastrzr, coh1002e,    znt,      zn_state, empty_init, ROT0, "Eighting / Raizing", "Bloody Roar (Japan, Jun 21 1997)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, beastrzrb, beastrzr, beastrzrb,   znt,      zn_state, empty_init, ROT0, "bootleg",            "Beastorizer (USA bootleg)",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 /* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
 GAME( 1998, bldyror2,  coh1002e, coh1002e,    bldyror2, zn_state, empty_init, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", MACHINE_IMPERFECT_SOUND ) // locks up if you coin up during the fmw with interlace enabled

@@ -435,8 +435,8 @@ void hvyunit_state::slave_io(address_map &map)
 	map(0x0c, 0x0c).r(FUNC(hvyunit_state::mermaid_status_r));
 	map(0x0e, 0x0e).w(FUNC(hvyunit_state::coin_count_w));
 
-//  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
-//  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
+//  map(0x22, 0x22).r(FUNC(hvyunit_state::hu_scrolly_hi_reset)); //22/a2 taken from ram $f065
+//  map(0xa2, 0xa2).r(FUNC(hvyunit_state::hu_scrolly_hi_set));
 }
 
 
@@ -670,6 +670,8 @@ void hvyunit_state::hvyunit(machine_config &config)
  *
  *************************************/
 
+/* There is likely a World version using the newer (B73_25 - B73_28) graphics ROMs with a program ROM labeled B73_29 */
+
 ROM_START( hvyunit )
 	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "b73_10.5c",  0x00000, 0x20000, CRC(ca52210f) SHA1(346951962aa5bbad641117dbd66f035dddc7c0bf) )
@@ -712,19 +714,23 @@ ROM_START( hvyunitj )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* note, the rom ordering on this is different to the other Japan set */
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
-	ROM_LOAD( "b73_07.2c",  0x100000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
-	ROM_LOAD( "b73_06.2b",  0x110000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
-	ROM_LOAD( "b73_01.1b",  0x120000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
-	ROM_LOAD( "b73_02.1c",  0x130000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
-	ROM_LOAD( "b73_03.1d",  0x140000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
-	ROM_LOAD( "b73_04.1f",  0x150000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
-	ROM_LOAD( "b73_05.1h",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
+	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) )
+	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) )
+	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* the data in first half of this actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles */
+	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_05.1h, despite the different label */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
+
+/*
+
+There is known to exist a currently undumped Japanese version with graphic ROMs numbered B73_15 through B73_23, while
+using B73_12 sound CPU code & B73_14 slave CPU code. The label for the program was missing, presumed to B73_24
+
+*/
 
 ROM_START( hvyunitjo )
 	ROM_REGION( 0x20000, "master", 0 )

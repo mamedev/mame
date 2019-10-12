@@ -67,14 +67,14 @@ void gaminator_state::gaminator_map(address_map &map)
 	map(0x20000000, 0x2003ffff).ram();
 
 	/* standard VGA */
-	//AM_RANGE(0x40000000, 0x40000fff) AM_RAM // regs
+	//map(0x40000000, 0x40000fff).ram(); // regs
 	map(0x400003b0, 0x400003bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x400003c0, 0x400003cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x400003d0, 0x400003df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 
 	map(0x44000000, 0x4401ffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w)); // VRAM
-//  AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_SHARE("tmapram1") // puts strings here, looks almost like a tilemap, but where are the tiles?
-//  AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_SHARE("tmapram2") // beetlem (like above, mirror?)
+//  map(0x44000000, 0x44007fff).ram().share("tmapram1"); // puts strings here, looks almost like a tilemap, but where are the tiles?
+//  map(0x440a0000, 0x440a1fff).ram().share("tmapram2"); // beetlem (like above, mirror?)
 
 	map(0xe0000000, 0xe00001ff).ram(); // nvram?
 	map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR

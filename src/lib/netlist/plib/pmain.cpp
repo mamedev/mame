@@ -35,10 +35,8 @@ namespace plib {
 
 	app::app()
 	: options()
-	, pout_strm()
-	, perr_strm()
-	, pout(&pout_strm)
-	, perr(&perr_strm)
+	, pout(&std::cout)
+	, perr(&std::cerr)
 	{
 
 	}

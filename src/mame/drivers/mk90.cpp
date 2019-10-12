@@ -50,13 +50,13 @@ void mk90_state::mk90_mem(address_map &map)
 	map(0x0000, 0x3fff).ram(); // RAM
 	map(0x4000, 0x7fff).rom(); // Extension ROM
 	map(0x8000, 0xffff).rom(); // Main ROM
-//  AM_RANGE(0xe800, 0xe801) LCD address
-//  AM_RANGE(0xe802, 0xe803) LCD data
-//  AM_RANGE(0xe810, 0xe810) serial bus controller data
-//  AM_RANGE(0xe812, 0xe813) serial bus controller transfer rate
-//  AM_RANGE(0xe814, 0xe814) serial bus controller control/status
-//  AM_RANGE(0xe816, 0xe816) serial bus controller command
-//  AM_RANGE(0xea00, 0xea7e) RTC
+//  map(0xe800, 0xe801) LCD address
+//  map(0xe802, 0xe803) LCD data
+//  map(0xe810, 0xe810) serial bus controller data
+//  map(0xe812, 0xe813) serial bus controller transfer rate
+//  map(0xe814, 0xe814) serial bus controller control/status
+//  map(0xe816, 0xe816) serial bus controller command
+//  map(0xea00, 0xea7e) RTC
 }
 
 /* Input ports */

@@ -53,7 +53,6 @@ Grndtour:
 #include "includes/iqblock.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "sound/ym2413.h"
 #include "emupal.h"

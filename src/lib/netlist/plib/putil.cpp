@@ -14,7 +14,7 @@ namespace plib
 {
 	namespace util
 	{
-		const pstring buildpath(std::initializer_list<pstring> list )
+		pstring buildpath(std::initializer_list<pstring> list )
 		{
 			pstring ret = "";
 			for( const auto &elem : list )
@@ -25,13 +25,13 @@ namespace plib
 					#ifdef _WIN32
 					ret = ret + '\\' + elem;
 					#else
-					ret = ret + '/' + elem;
+					ret += ('/' + elem);
 					#endif
 			}
 			return ret;
 		}
 
-		const pstring environment(const pstring &var, const pstring &default_val)
+		pstring environment(const pstring &var, const pstring &default_val)
 		{
 			if (std::getenv(var.c_str()) == nullptr)
 				return default_val;
@@ -134,19 +134,19 @@ namespace plib
 	}
 
 
-	int penum_base::from_string_int(const char *str, const char *x)
+	int penum_base::from_string_int(const pstring &str, const pstring &x)
 	{
 		int cnt = 0;
-		for (auto s : psplit(str, ",", false))
+		for (auto &s : psplit(str, ",", false))
 		{
-			if (s == x)
+			if (trim(s) == x)
 				return cnt;
 			cnt++;
 		}
 		return -1;
 	}
 
-	std::string penum_base::nthstr(int n, const char *str)
+	std::string penum_base::nthstr(int n, const pstring &str)
 	{
 		return psplit(str, ",", false)[static_cast<std::size_t>(n)];
 	}

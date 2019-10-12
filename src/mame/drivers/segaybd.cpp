@@ -591,7 +591,7 @@ void segaybd_state::main_map(address_map &map)
 	map(0x080000, 0x080007).mirror(0x001ff8).rw("multiplier_main", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
 	map(0x082001, 0x082001).mirror(0x001ffe).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x084000, 0x08401f).mirror(0x001fe0).rw("divider_main", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
-//  AM_RANGE(0x086000, 0x087fff) /DEA0
+//  map(0x086000, 0x087fff) /DEA0
 	map(0x0c0000, 0x0cffff).ram().share("shareram");
 	map(0x100000, 0x10001f).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0x100040, 0x100047).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask16(0x00ff);

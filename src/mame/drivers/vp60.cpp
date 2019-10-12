@@ -28,8 +28,8 @@ public:
 
 private:
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
+	u8 crtc_r(offs_t offset);
+	void crtc_w(offs_t offset, u8 data);
 
 	void io_map(address_map &map);
 	void kbd_map(address_map &map);
@@ -44,14 +44,14 @@ I8275_DRAW_CHARACTER_MEMBER(vp60_state::draw_character)
 {
 }
 
-READ8_MEMBER(vp60_state::crtc_r)
+u8 vp60_state::crtc_r(offs_t offset)
 {
-	return m_crtc->read(space, offset >> 8);
+	return m_crtc->read(offset >> 8);
 }
 
-WRITE8_MEMBER(vp60_state::crtc_w)
+void vp60_state::crtc_w(offs_t offset, u8 data)
 {
-	m_crtc->write(space, offset >> 8, data);
+	m_crtc->write(offset >> 8, data);
 }
 
 void vp60_state::mem_map(address_map &map)

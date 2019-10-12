@@ -51,7 +51,8 @@ enum iodevice_t
 	IO_MIDIIN,      /* 17 - MIDI In port */
 	IO_MIDIOUT,     /* 18 - MIDI Out port */
 	IO_PICTURE,     /* 19 - A single-frame image */
-	IO_COUNT        /* 20 - Total Number of IO_devices for searching */
+	IO_VIDEO,       /* 20 - A video file */
+	IO_COUNT        /* 21 - Total Number of IO_devices for searching */
 };
 
 enum image_error_t
@@ -243,7 +244,7 @@ protected:
 
 	void clear_error();
 
-	void check_for_file() const { assert_always(m_file, "Illegal operation on unmounted image"); }
+	void check_for_file() const { if (!m_file) throw emu_fatalerror("%s(%s): Illegal operation on unmounted image", device().shortname(), device().tag()); }
 
 	void setup_working_directory();
 	bool try_change_working_directory(const std::string &subdir);

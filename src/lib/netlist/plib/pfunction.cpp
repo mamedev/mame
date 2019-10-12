@@ -63,7 +63,7 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 				if (inputs[i] == cmd)
 				{
 					rc.m_cmd = PUSH_INPUT;
-					rc.m_param = i;
+					rc.m_param = static_cast<double>(i);
 					stk += 1;
 					break;
 				}
@@ -115,7 +115,7 @@ void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring 
 {
 	// Shunting-yard infix parsing
 	std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^"};
-	std::vector<pstring> sexpr(plib::psplit(plib::replace_all(expr, pstring(" "), pstring("")), sep));
+	std::vector<pstring> sexpr(plib::psplit(plib::replace_all(expr, " ", ""), sep));
 	std::stack<pstring> opstk;
 	std::vector<pstring> postfix;
 

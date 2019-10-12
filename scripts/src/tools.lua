@@ -813,6 +813,7 @@ if (_OPTIONS["osd"] == "sdl") then
 	end
 
 	links {
+		"utils",
 		"ocore_" .. _OPTIONS["osd"],
 		ext_lib("utf8proc"),
 	}
@@ -876,6 +877,7 @@ if (_OPTIONS["osd"] == "sdl") then
 
 	includedirs {
 		MAME_DIR .. "src/osd",
+		MAME_DIR .. "src/lib/util",
 	}
 
 	files {

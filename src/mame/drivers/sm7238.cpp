@@ -141,7 +141,7 @@ void sm7238_state::videobank_map(address_map &map)
 void sm7238_state::sm7238_io(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x40, 0x4f).ram() // LUT
+//  map(0x40, 0x4f).ram() // LUT
 	map(0xa0, 0xa1).rw(m_i8251line, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa4, 0xa5).rw(m_i8251kbd, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa8, 0xab).rw(m_t_color, FUNC(pit8253_device::read), FUNC(pit8253_device::write));

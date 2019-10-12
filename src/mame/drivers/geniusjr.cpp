@@ -274,13 +274,6 @@ void geniusjr_state::gln(machine_config &config)
 	subdevice<software_list_device>("cart_list")->set_original("gln");
 }
 
-void geniusjr_state::gls(machine_config &config)
-{
-	gj4000(config);
-
-	subdevice<software_list_device>("cart_list")->set_original("gls");
-}
-
 void geniusjr_state::gj5000(machine_config &config)
 {
 	M68HC05L9(config, m_maincpu, 8'000'000); // unknown clock (type also uncertain)
@@ -306,6 +299,13 @@ void geniusjr_state::gjmovie(machine_config &config)
 	gjrstar(config);
 
 	subdevice<software_list_device>("cart_list")->set_original("gjmovie");
+}
+
+void geniusjr_state::gls(machine_config &config)
+{
+	gjrstar(config);
+
+	subdevice<software_list_device>("cart_list")->set_original("gls");
 }
 
 
@@ -377,8 +377,8 @@ ROM_START( gls )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "extrom", 0 )
-	ROM_LOAD( "gls.bin", 0x000000, 0x080000, NO_DUMP )
+	ROM_REGION( 0x40000, "extrom", 0 )
+	ROM_LOAD( "27-5635-00.u2", 0x000000, 0x40000, CRC(bc3c0587) SHA1(fe98f162bd80d96ce3264087b5869f4505955464))
 ROM_END
 
 
@@ -391,4 +391,4 @@ COMP( 1996, gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty
 COMP( 1998, gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998, gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
 COMP( 1993, gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Notebook",            MACHINE_IS_SKELETON )
-COMP( 199?, gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Select",              MACHINE_IS_SKELETON ) // placeholder driver to attach cartridge dumps to
+COMP( 1995, gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Select",              MACHINE_IS_SKELETON )

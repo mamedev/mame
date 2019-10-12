@@ -28,6 +28,13 @@
 #include <string>
 #include <utility>
 
+// Workaround for return value optimization failure in some older versions of clang
+#if defined(__APPLE__) && defined(__clang__) && __clang_major__ < 8
+#define MOVE_UNIQUE_PTR(x) (std::move(x))
+#else
+#define MOVE_UNIQUE_PTR(x) (x)
+#endif
+
 
 
 DEFINE_DEVICE_TYPE(NETLIST_CORE,  netlist_mame_device,       "netlist_core",  "Netlist Core Device")
@@ -109,13 +116,13 @@ protected:
 		case plib::plog_level::VERBOSE:
 			break;
 		case plib::plog_level::INFO:
-			osd_printf_verbose("netlist INFO: %s\n", ls.c_str());
+			osd_printf_verbose("netlist INFO: %s\n", ls);
 			break;
 		case plib::plog_level::WARNING:
-			osd_printf_warning("netlist WARNING: %s\n", ls.c_str());
+			osd_printf_warning("netlist WARNING: %s\n", ls);
 			break;
 		case plib::plog_level::ERROR:
-			osd_printf_error("netlist ERROR: %s\n", ls.c_str());
+			osd_printf_error("netlist ERROR: %s\n", ls);
 			break;
 		case plib::plog_level::FATAL:
 			throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
@@ -289,7 +296,7 @@ public:
 	{
 	}
 
-	virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+	virtual plib::unique_ptr<std::istream> stream(const pstring &name) override;
 private:
 	device_t &m_dev;
 	pstring m_name;
@@ -300,7 +307,7 @@ class netlist_data_memregions_t : public netlist::source_t
 public:
 	netlist_data_memregions_t(const device_t &dev);
 
-	virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+	virtual plib::unique_ptr<std::istream> stream(const pstring &name) override;
 
 private:
 	const device_t &m_dev;
@@ -311,12 +318,14 @@ private:
 // memregion source support
 // ----------------------------------------------------------------------------------------
 
-plib::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
+plib::unique_ptr<std::istream> netlist_source_memregion_t::stream(const pstring &name)
 {
 	if (m_dev.has_running_machine())
 	{
 		memory_region *mem = m_dev.memregion(m_name.c_str());
-		return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+		auto ret(plib::make_unique<std::istringstream>(pstring(reinterpret_cast<char *>(mem->base()), mem->bytes())));
+		ret->imbue(std::locale::classic());
+		return MOVE_UNIQUE_PTR(ret);
 	}
 	else
 		throw memregion_not_set("memregion unavailable for {1} in source {2}", name, m_name);
@@ -338,7 +347,7 @@ static bool rom_exists(device_t &root, pstring name)
 		{
 			if (ROMENTRY_ISREGION(romp)) // if this is a region, check for rom
 			{
-				char const *const basetag = romp->name;
+				auto basetag(pstring(romp->name));
 				if (name == pstring(":") + basetag)
 					return true;
 			}
@@ -347,24 +356,32 @@ static bool rom_exists(device_t &root, pstring name)
 	return false;
 }
 
-plib::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring &name)
+plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &name)
 {
 	//memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().setup().exec()).parent().memregion(name.c_str());
 	if (m_dev.has_running_machine())
 	{
 		memory_region *mem = m_dev.memregion(name.c_str());
 		if (mem != nullptr)
-			return plib::make_unique<plib::pimemstream>(mem->base(), mem->bytes());
+		{
+			auto ret(plib::make_unique<std::istringstream>(std::string(reinterpret_cast<char *>(mem->base()), mem->bytes()), std::ios_base::binary));
+			ret->imbue(std::locale::classic());
+			return MOVE_UNIQUE_PTR(ret);
+		}
 		else
-			return plib::unique_ptr<plib::pistream>(nullptr);
+			return plib::unique_ptr<std::istream>(nullptr);
 	}
 	else
 	{
 		/* validation */
 		if (rom_exists(m_dev.mconfig().root_device(), pstring(m_dev.tag()) + ":" + name))
-			return plib::make_unique<plib::pimemstream>();
+		{
+			auto ret(plib::make_unique<std::istringstream>(std::ios_base::binary));
+			ret->imbue(std::locale::classic());
+			return MOVE_UNIQUE_PTR(ret);
+		}
 		else
-			return plib::unique_ptr<plib::pistream>(nullptr);
+			return plib::unique_ptr<std::istream>(nullptr);
 	}
 }
 
@@ -1118,9 +1135,9 @@ void netlist_mame_device::device_start()
 
 	common_dev_start(m_netlist.get());
 
-	m_netlist->nlstate().save(*this, m_rem, this->name(), "m_rem");
-	m_netlist->nlstate().save(*this, m_div, this->name(), "m_div");
-	m_netlist->nlstate().save(*this, m_old, this->name(), "m_old");
+	m_netlist->nlstate().save(*this, m_rem, pstring(this->name()), "m_rem");
+	m_netlist->nlstate().save(*this, m_div, pstring(this->name()), "m_div");
+	m_netlist->nlstate().save(*this, m_old, pstring(this->name()), "m_old");
 
 	save_state();
 

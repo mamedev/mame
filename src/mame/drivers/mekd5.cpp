@@ -253,7 +253,7 @@ void mekd5_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_kpd_pia->cb2_w(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in mekd5_state::device_timer");
+		throw emu_fatalerror("Unknown id in mekd5_state::device_timer");
 	}
 }
 

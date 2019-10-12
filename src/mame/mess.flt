@@ -132,6 +132,7 @@ cardinal.cpp
 casloopy.cpp
 cat.cpp
 cbm2.cpp
+cbnt2039.cpp
 cc40.cpp
 ccs2810.cpp
 ccs300.cpp
@@ -219,6 +220,7 @@ ec184x.cpp
 ec65.cpp
 ec7915.cpp
 einstein.cpp
+eispc.cpp
 elan_eu3a05.cpp
 elan_eu3a14.cpp
 electron.cpp
@@ -462,6 +464,7 @@ mccpm.cpp
 mdisk.cpp
 megadriv.cpp
 megadriv_rad.cpp
+mekd1.cpp
 mekd2.cpp
 mekd3.cpp
 mekd4.cpp
@@ -788,6 +791,7 @@ svision.cpp
 svmu.cpp
 swtpc.cpp
 swtpc09.cpp
+swtpc8212.cpp
 swyft.cpp
 sym1.cpp
 symbolics.cpp
@@ -875,6 +879,7 @@ tvboy.cpp
 tvc.cpp
 tvgame.cpp
 tx0.cpp
+uchroma68.cpp
 uknc.cpp
 unichamp.cpp
 unior.cpp

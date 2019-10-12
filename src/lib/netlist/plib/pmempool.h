@@ -32,19 +32,19 @@ namespace plib {
 	private:
 		struct block
 		{
-			block(mempool *mp, std::size_t min_bytes)
+			block(mempool &mp, std::size_t min_bytes)
 			: m_num_alloc(0)
 			, m_cur(0)
 			, m_data(nullptr)
 			, m_mempool(mp)
 			{
-				min_bytes = std::max(mp->m_min_alloc, min_bytes);
+				min_bytes = std::max(mp.m_min_alloc, min_bytes);
 				m_free = min_bytes;
-				std::size_t alloc_bytes = (min_bytes + mp->m_min_align); // - 1); // & ~(mp->m_min_align - 1);
+				std::size_t alloc_bytes = (min_bytes + mp.m_min_align); // - 1); // & ~(mp.m_min_align - 1);
 				//m_data_allocated = ::operator new(alloc_bytes);
 				m_data_allocated = new char[alloc_bytes];
 				void *r = m_data_allocated;
-				std::align(mp->m_min_align, min_bytes, r, alloc_bytes);
+				std::align(mp.m_min_align, min_bytes, r, alloc_bytes);
 				m_data  = reinterpret_cast<char *>(r);
 			}
 			~block()
@@ -63,7 +63,7 @@ namespace plib {
 			std::size_t m_cur;
 			char *m_data;
 			char *m_data_allocated;
-			mempool *m_mempool;
+			mempool &m_mempool;
 		};
 
 		struct info
@@ -79,7 +79,7 @@ namespace plib {
 
 		block * new_block(std::size_t min_bytes)
 		{
-			auto *b = plib::pnew<block>(this, min_bytes);
+			auto *b = plib::pnew<block>(*this, min_bytes);
 			m_blocks.push_back(b);
 			return b;
 		}
@@ -170,12 +170,12 @@ namespace plib {
 				//printf("Freeing in block %p %lu\n", b, b->m_num_alloc);
 				if (b->m_num_alloc == 0)
 				{
-					mempool *mp = b->m_mempool;
-					auto itb = std::find(mp->m_blocks.begin(), mp->m_blocks.end(), b);
-					if (itb == mp->m_blocks.end())
+					mempool &mp = b->m_mempool;
+					auto itb = std::find(mp.m_blocks.begin(), mp.m_blocks.end(), b);
+					if (itb == mp.m_blocks.end())
 						plib::terminate("mempool::free - block not found\n");
 
-					mp->m_blocks.erase(itb);
+					mp.m_blocks.erase(itb);
 					plib::pdelete(b);
 				}
 				sinfo().erase(it);
@@ -185,6 +185,9 @@ namespace plib {
 		template <typename T>
 		using owned_pool_ptr = plib::owned_ptr<T, arena_deleter<mempool, T>>;
 
+		template <typename T>
+		using unique_pool_ptr = std::unique_ptr<T, arena_deleter<mempool, T>>;
+
 		template<typename T, typename... Args>
 		owned_pool_ptr<T> make_poolptr(Args&&... args)
 		{
@@ -193,6 +196,22 @@ namespace plib {
 			{
 				auto *mema = new (mem) T(std::forward<Args>(args)...);
 				return owned_pool_ptr<T>(mema, true, arena_deleter<mempool, T>(this));
+			}
+			catch (...)
+			{
+				this->deallocate(mem);
+				throw;
+			}
+		}
+
+		template<typename T, typename... Args>
+		unique_pool_ptr<T> make_unique(Args&&... args)
+		{
+			auto *mem = this->allocate(alignof(T), sizeof(T));
+			try
+			{
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return unique_pool_ptr<T>(mema, arena_deleter<mempool, T>(this));
 			}
 			catch (...)
 			{

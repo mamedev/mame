@@ -327,8 +327,8 @@ void mhavoc_state::gamma_map(address_map &map)
 	map(0x4000, 0x4000).portr("DSW2").w(FUNC(mhavoc_state::mhavoc_gamma_irq_ack_w)).mirror(0x07ff); /* DSW at 8S, IRQ Acknowledge */
 	map(0x4800, 0x4800).w(FUNC(mhavoc_state::mhavoc_out_1_w)).mirror(0x07ff); /* Coin Counters    */
 	map(0x5000, 0x5000).w(FUNC(mhavoc_state::mhavoc_alpha_w)).mirror(0x07ff); /* Alpha Comm. Write Port */
-	//AM_RANGE(0x5800, 0x5800) AM_WRITE(mhavocrv_speech_data_w) AM_MIRROR(0x06ff) /* TMS5220 data write */
-	//AM_RANGE(0x5900, 0x5900) AM_WRITE(mhavocrv_speech_strobe_w) AM_MIRROR(0x06ff) /* TMS5220 /WS strobe write */
+	//map(0x5800, 0x5800).w(FUNC(mhavoc_state::mhavocrv_speech_data_w)).mirror(0x06ff); /* TMS5220 data write */
+	//map(0x5900, 0x5900).w(FUNC(mhavoc_state::mhavocrv_speech_strobe_w)).mirror(0x06ff); /* TMS5220 /WS strobe write */
 	map(0x6000, 0x61ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).mirror(0x1e00); /* EEROM */
 	map(0x8000, 0xbfff).rom().mirror(0x4000);                   /* Program ROM (16K) */
 }

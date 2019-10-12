@@ -31,6 +31,10 @@
     - Unlike the 65C816, the program bank register (known here as PG) is
       incremented when PC overflows from 0xFFFF, and may be incremented or
       decremented when the address for a relative branch is calculated.
+    - The external bus, if used, allows for 16-bit transfers, and can be
+      dynamically reduced to 8 bits by asserting the BYTE input. (The
+      65C816 has an 8-bit data bus.) Internal memory is also 16 bits wide,
+      but parallel port registers must be accessed as individual bytes.
 
     The various 7700 series models differ primarily by their on board
     peripherals.  The 7750 and later models do include some additional

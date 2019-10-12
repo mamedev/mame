@@ -350,7 +350,7 @@ void wiz_state::wiz_main_map(address_map &map)
 void wiz_state::stinger_main_map(address_map &map)
 {
 	kungfut_main_map(map);
-//  AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
+//  map(0xf008, 0xf00f).nopw(); // ?
 	map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xf808, 0xf808).w(FUNC(wiz_state::stinger_explosion_w));
 	map(0xf80a, 0xf80a).w(FUNC(wiz_state::stinger_shot_w));

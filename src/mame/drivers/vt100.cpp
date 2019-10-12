@@ -209,7 +209,7 @@ void vt100_state::vt100_io(address_map &map)
 	// 0xC2 Video processor DC011
 	map(0xc2, 0xc2).w(m_crtc, FUNC(vt100_video_device::dc011_w));
 	// 0xE2 Graphics port
-	// map (0xe2, 0xe2)
+	// map(0xe2, 0xe2)
 }
 
 u8 vt100_state::printer_r(offs_t offset)

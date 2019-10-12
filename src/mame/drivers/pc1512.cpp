@@ -625,7 +625,7 @@ void pc1512_state::pc1512_io(address_map &map)
 	// schematic calls for a stock 8086 and the I/O and data lines are multiplexed onto the same bus,
 	// plus address lines 20-10 are towards the middle of a standard ISA slot. If it turns out that this
 	// is not in fact accurate to hardware, please add this back in.
-	// ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	// map.global_mask(0x3ff);
 	map(0x000, 0x00f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x020, 0x021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x040, 0x043).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));

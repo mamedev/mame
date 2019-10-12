@@ -28,7 +28,6 @@ bool parser_t::parse(const pstring &nlname)
 {
 	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
 		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
-		//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 		.whitespace(pstring("") + ' ' + static_cast<char>(9) + static_cast<char>(10) + static_cast<char>(13))
 		.comment("/*", "*/", "//");
 	m_tok_param_left = register_token("(");
@@ -144,6 +143,8 @@ void parser_t::parse_netlist(const pstring &nlname)
 void parser_t::net_truthtable_start(const pstring &nlname)
 {
 	pstring name = get_identifier();
+	bool head_found(false);
+
 	require_token(m_tok_comma);
 	long ni = get_number_long();
 	require_token(m_tok_comma);
@@ -169,9 +170,12 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(m_tok_param_left);
 			desc.desc.push_back(get_string());
 			require_token(m_tok_param_right);
+			head_found = true;
 		}
 		else if (token.is(m_tok_TT_LINE))
 		{
+			if (!head_found)
+				m_setup.log().error("TT_LINE found without TT_HEAD");
 			require_token(m_tok_param_left);
 			desc.desc.push_back(get_string());
 			require_token(m_tok_param_right);

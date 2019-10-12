@@ -499,7 +499,7 @@ void dunhuang_state::dunhuang_io_map(address_map &map)
 
 	map(0x000f, 0x000f).w(FUNC(dunhuang_state::block_addr_lo_w));
 	map(0x0010, 0x0010).w(FUNC(dunhuang_state::block_addr_hi_w));
-//  AM_RANGE( 0x0011, 0x0011 ) ?
+//  map(0x0011, 0x0011) ?
 	map(0x0012, 0x0012).w(FUNC(dunhuang_state::block_c_w));
 	map(0x0015, 0x0015).w(FUNC(dunhuang_state::block_x_w));
 	map(0x0016, 0x0016).w(FUNC(dunhuang_state::block_y_w));

@@ -946,19 +946,19 @@ void gaiden_state::mastninj_map(address_map &map)
 	map(0x074000, 0x075fff).ram().w(FUNC(gaiden_state::bg_videoram_w)).share("videoram3");
 	map(0x076000, 0x077fff).ram().share("spriteram");
 	map(0x078000, 0x079fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-//  AM_RANGE(0x078800, 0x079fff) AM_RAM
+//  map(0x078800, 0x079fff).ram();
 	map(0x07a000, 0x07a001).portr("SYSTEM");
 	map(0x07a002, 0x07a003).portr("P1_P2");
 	map(0x07a004, 0x07a005).portr("DSW");
-//  AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
-//  AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
+//  map(0x07a104, 0x07a105).w(FUNC(gaiden_state::gaiden_txscrolly_w));
+//  map(0x07a10c, 0x07a10d).w(FUNC(gaiden_state::gaiden_txscrollx_w));
 	map(0x07f000, 0x07f001).w(FUNC(gaiden_state::gaiden_bgscrolly_w));
 	map(0x07f002, 0x07f003).w(FUNC(gaiden_state::gaiden_bgscrollx_w));
 	map(0x07f004, 0x07f005).w(FUNC(gaiden_state::gaiden_fgscrolly_w));
 	map(0x07f006, 0x07f007).w(FUNC(gaiden_state::gaiden_fgscrollx_w));
 	map(0x07a800, 0x07a801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-//  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
-//  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
+//  map(0x07a806, 0x07a807).nopw();
+//  map(0x07a808, 0x07a809).w(FUNC(gaiden_state::gaiden_flip_w));
 	map(0x07a00e, 0x07a00e).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x07e000, 0x07e000).w(FUNC(gaiden_state::drgnbowl_irq_ack_w));
 }

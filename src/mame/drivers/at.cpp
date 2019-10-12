@@ -905,7 +905,7 @@ ROM_START( ibm5170 )
 
 	ROM_SYSTEM_BIOS( 2, "landmark", "Landmark/Supersoft diagnostic ROMs") // use Hercules or MDA
 	ROMX_LOAD( "5170_even_u27_ 27256.bin", 0x10000, 0x8000, CRC(6790392d) SHA1(c4a5310341f346dd072d096152060ef5e4430a7f), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "5170_odd_u47_ 27256.bin", 0x10001, 0x8000, CRC(4c0f3db4) SHA1(97a0cf589b93551ed1d03bd622cbc8fd5634512f), ROM_SKIP(1) | ROM_BIOS(2))	
+	ROMX_LOAD( "5170_odd_u47_ 27256.bin", 0x10001, 0x8000, CRC(4c0f3db4) SHA1(97a0cf589b93551ed1d03bd622cbc8fd5634512f), ROM_SKIP(1) | ROM_BIOS(2))
 
 //  ROM_SYSTEM_BIOS( 3, "atdiag", "IBM PC/AT 5170 w/Super Diagnostics")
 //  ROMX_LOAD( "atdiage.bin", 0xf8000, 0x4000, CRC(e8855d0c) SHA1(c9d53e61c08da0a64f43d691bf6cadae5393843a), ROM_SKIP(1) | ROM_BIOS(3))
@@ -1512,8 +1512,8 @@ ROM_START( at )
 	// 28: CDTEK - BIOS-String: DSUN-1202-042088-K0 286-BIOS AMI for CDTEK - ISA8:2, ISA16:6 - Chipset ICs plus SN76LS612N, RTC MC146818P
 	ROM_SYSTEM_BIOS(28, "cdtekchips", "CDTEK 286") // ISA8:2, ISA16: 6 - OSC: 12.000, 14.31818, 16000.00KHz
 	ROMX_LOAD( "286-cdtek2-even_32k.bin", 0x10000, 0x8000, CRC(94867e8d) SHA1(12e61cc8b875b57324c93276c9f6093f2bd0e277), ROM_SKIP(1) | ROM_BIOS(28) )
-	ROMX_LOAD( "286-cdtek2-odd_32k.bin", 0x10001, 0x8000, CRC(153ed3bd) SHA1(10b711e0f0d79e0b6d181f24fe66544d2d72a310), ROM_SKIP(1) | ROM_BIOS(28) )	
-	// 29: This board looks identical to #2 but has different chips fitted: SN76LS612N = Zymos HCT612, Chips P82A204 = TACT80204FN, P82A203 = STK-5134, P82A205 = STK-5135, 
+	ROMX_LOAD( "286-cdtek2-odd_32k.bin", 0x10001, 0x8000, CRC(153ed3bd) SHA1(10b711e0f0d79e0b6d181f24fe66544d2d72a310), ROM_SKIP(1) | ROM_BIOS(28) )
+	// 29: This board looks identical to #2 but has different chips fitted: SN76LS612N = Zymos HCT612, Chips P82A204 = TACT80204FN, P82A203 = STK-5134, P82A205 = STK-5135,
 	// P82C201 = STK-5132, P82C202 = STK-5133 - BIOS-String: Phoenix 80286 ROM BIOS Version 3.06
 	ROM_SYSTEM_BIOS(29, "286tact", "286 TACT") // OSC: 20.0000MHz, 14.31818 - 24.000MHz
 	ROMX_LOAD( "286-tact-320548-1_32k.bin", 0x10000, 0x8000, CRC(0b528d19) SHA1(15f5a94d89461655c0f74681bbae5745db009ac2), ROM_SKIP(1) | ROM_BIOS(29) )
@@ -1583,11 +1583,11 @@ ROM_START( atvga )
 	ROMX_LOAD( "286-at system 6m8m10m-l_32k.bin", 0x10000, 0x8000, CRC(37e0e1c1) SHA1(f5cd17658554a73bb86c5c8e630dac3e34b38e51), ROM_SKIP(1) | ROM_BIOS(15) )
 	ROMX_LOAD( "286-at system 6m8m10m-r_32k.bin", 0x10001, 0x8000, CRC(c672efff) SHA1(7224bb6b4d25ef34bc0aa9d7c450baf9b47fd917), ROM_SKIP(1) | ROM_BIOS(15) )
 	// 16: same as BIOS '28' in VGA
-	ROM_SYSTEM_BIOS(16, "cdtekchips", "CDTEK 286") 
+	ROM_SYSTEM_BIOS(16, "cdtekchips", "CDTEK 286")
 	ROMX_LOAD( "286-cdtek2-even_32k.bin", 0x10000, 0x8000, CRC(94867e8d) SHA1(12e61cc8b875b57324c93276c9f6093f2bd0e277), ROM_SKIP(1) | ROM_BIOS(16) )
-	ROMX_LOAD( "286-cdtek2-odd_32k.bin", 0x10001, 0x8000, CRC(153ed3bd) SHA1(10b711e0f0d79e0b6d181f24fe66544d2d72a310), ROM_SKIP(1) | ROM_BIOS(16) )	
+	ROMX_LOAD( "286-cdtek2-odd_32k.bin", 0x10001, 0x8000, CRC(153ed3bd) SHA1(10b711e0f0d79e0b6d181f24fe66544d2d72a310), ROM_SKIP(1) | ROM_BIOS(16) )
 	// 17: same as BIOS '29' in VGA
-	ROM_SYSTEM_BIOS(17, "286tact", "286 TACT") 
+	ROM_SYSTEM_BIOS(17, "286tact", "286 TACT")
 	ROMX_LOAD( "286-tact-320548-1_32k.bin", 0x10000, 0x8000, CRC(0b528d19) SHA1(15f5a94d89461655c0f74681bbae5745db009ac2), ROM_SKIP(1) | ROM_BIOS(17) )
 	ROMX_LOAD( "286-tact-320548-2_32k.bin", 0x10001, 0x8000, CRC(418aa2d0) SHA1(b6af0b8aa595d8f8de6c0fc851bf1c226dcc7ca7), ROM_SKIP(1) | ROM_BIOS(17) )
 ROM_END
@@ -1619,7 +1619,7 @@ ROM_START( neat )
 	ROM_SYSTEM_BIOS(5, "bam1611", "VIP BAM/16-11") // OSC: 18.432 - 14.318 - 32.000MHz
 	ROMX_LOAD( "286-vip bam-6-11 m215100-lo_32k.bin", 0x10000, 0x8000, CRC(b51b8bc1) SHA1(a7ebbced98aca32a7f0cdf80d1b832dfeb92d5e7), ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "286-vip bam-6-11 m215100-hi_32k.bin", 0x10001, 0x8000, CRC(46ddd5a6) SHA1(fd4267af298c7f70e062a7c4e023caf852bbf082), ROM_SKIP(1) | ROM_BIOS(5) )
-	// 6: CP-805 - BIOS-String: ENET-1138-030390-K0 
+	// 6: CP-805 - BIOS-String: ENET-1138-030390-K0
 	ROM_SYSTEM_BIOS(6, "cp805", "CP-805")
 	ROMX_LOAD( "286-chips ami78384 even.bin", 0x10000, 0x8000, CRC(5280fee0) SHA1(25051ad6bbccddc0738861b614dbafbca5c3bff5), ROM_SKIP(1) | ROM_BIOS(6) )
 	ROMX_LOAD( "286-chips ami78384 odd.bin", 0x10001, 0x8000, CRC(24526bf3) SHA1(8f8b46fe2e708fa53d0eeb44a16924cd878bdd33), ROM_SKIP(1) | ROM_BIOS(6) )
@@ -1795,7 +1795,7 @@ ROM_END
 
 ROM_START( headg2 )
 	ROM_REGION( 0x20000, "bios", 0)
-	// 0: 286 board with Headland GC101A-PC; GC102-PC chipset and Phoenix BIOS 2493119, ISA8: 2, ISA16: 5		
+	// 0: 286 board with Headland GC101A-PC; GC102-PC chipset and Phoenix BIOS 2493119, ISA8: 2, ISA16: 5
 	ROM_SYSTEM_BIOS(0, "head_ph_1", "Headland/Phoenix #1") // Phoenix 80286 ROM BIOS PLUS Version 3.10.21 ((BIOS release date:: 15-01-1988)
 	ROMX_LOAD( "286-headland-lo_32k.bin", 0x10000, 0x8000, CRC(21b68bed) SHA1(1e4acda50b12ad463c169ba615805f5dcf257b18), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "286-headland-hi_32k.bin", 0x10001, 0x8000, CRC(04c8ab12) SHA1(b46c14528aca15464e4050b423c2f621a4313a85), ROM_SKIP(1) | ROM_BIOS(0) )
@@ -1823,7 +1823,7 @@ ROM_START( kma202f )
 	ROM_REGION(0x20000, "bios", 0)
 	ROMX_LOAD( "286_lo.bin", 0x10000, 0x8000, CRC(0ce69691) SHA1(6904ac54f30f2244058653aaa623804dd02b4332), ROM_SKIP(1) )
 	ROMX_LOAD( "286_hi.bin", 0x10001, 0x8000, CRC(1330b6f2) SHA1(691bb4a51ce3d9a026ee33c3fd02fc4e13b4a184), ROM_SKIP(1) )
-ROM_END	
+ROM_END
 
 
 // ***** Motherboards using the 5 chip VLSI chipset
@@ -1833,11 +1833,11 @@ ROM_START( vlsi5 )
 	// 0: MG Products (Japanese) - Chipset: VLSI VL82C102A; VLSI VL82C101B; VLSI VL82C104; VLSI VL82C103A; VLSI VL82C100; (VLSI 8908BT; 8906BT; 8852BT; 8907BT; 8906BT)
 	// BIOS: AMI 286 BIOS+ - BIOS-String: D286-9987-092588-K0 - ISA8: 2, ISA16: 8
 	// (BIOS release date:: 25-09-1988) (ISA8: 3, ISA16: 5)
-	ROM_SYSTEM_BIOS(0, "286vlsij", "Japanese 286 VLSI")	
+	ROM_SYSTEM_BIOS(0, "286vlsij", "Japanese 286 VLSI")
 	ROMX_LOAD( "286-vlsi_japan-2-even_32k.bin", 0x10000, 0x8000, CRC(e3e64cbc) SHA1(5259e3c8686f2239a5fb0dc38aa80380ef9ec5fa), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "286-vlsi_japan-2-odd_32k.bin", 0x10001, 0x8000, CRC(aa533f39) SHA1(d88c7d4029a283b94b99e2017d29fbf9eb9105b1), ROM_SKIP(1) | ROM_BIOS(0) )
 	// 1:  BIOS-String:  D286-1223-121589-K0 - 286-BIOS AMI for MBVLSI-168 - ISA8: 3, ISA16: 5
-	ROM_SYSTEM_BIOS(1, "mbvlsi168", "MBVLSI-168")	
+	ROM_SYSTEM_BIOS(1, "mbvlsi168", "MBVLSI-168")
 	ROMX_LOAD( "286-vlsi-002350-041_32k.bin", 0x10000, 0x8000, CRC(0e0e2bc9) SHA1(0af05b15ea8141ece84fb4420e6a21720f01c7a6), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "286-vlsi-002350-042_32k.bin", 0x10001, 0x8000, CRC(5ef7b91d) SHA1(d57c7f4c8d28708f128c5f0b1251d5943c7cdf76), ROM_SKIP(1) | ROM_BIOS(1) )
 ROM_END
@@ -1866,7 +1866,7 @@ ROM_END
 // SUNTAC Chipset, http://toastytech.com/manuals/Magitronic%20B233%20Manual.pdf
 // SUNTAC ST62BC002-B, ST62BC005-B, ST62BC003-B, ST62BC001-B, ST62C00B, ST62BC004-B1
 ROM_START( magb233 )
-	ROM_REGION(0x20000, "bios", 0)	// BIOS-String: DSUN-1105-043089-K0
+	ROM_REGION(0x20000, "bios", 0)  // BIOS-String: DSUN-1105-043089-K0
 	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_even_sa027343.bin", 0x10000, 0x8000, CRC(d4a18444) SHA1(d95242104fc9b51cf26de72ef5b6c52d99ccce30), ROM_SKIP(1) )
 	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_odd_sa027343.bin", 0x10001, 0x8000, CRC(7ac3db56) SHA1(4340140450c4f8b4f6a19eae50a5dc5449edfdf6), ROM_SKIP(1) )
 	// ROM_LOAD("magitronic_b233_ami_1986_keyboard_bios_plus_a025352.bin", 0x0000, 0x1000), CRC(84fd28fd) SHA1(43da0f49e52c921844e60b6f3d22f2a316d865cc) )
@@ -1930,13 +1930,13 @@ ROM_START( ht12a )
 	// Headland HT12/A; HM6818A RTC; AMI K053770 keyboard BIOS
 	// Jumpers at right edge of board are labeled "KEYLOCK" (J6), "SPEAKER" (J7), "TURBO LED" (J8), "TURBO S.W." (J9), "RESET" (J10)
 	// XTALs X3 and X4 in top right corner (behind 80C287) are both unpopulated
-	ROM_SYSTEM_BIOS(0, "dh12-k0", "AMI DH12-K0")	
+	ROM_SYSTEM_BIOS(0, "dh12-k0", "AMI DH12-K0")
 	ROMX_LOAD( "286_headland_even.bin", 0x10000, 0x8000, CRC(a2530914) SHA1(1aca289240caa6d4bf811d301c338c157b6902a1), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "286_headland_odd.bin", 0x10001, 0x8000, CRC(b5f69002) SHA1(ee9ceef1fc7a328ee82006cd504e72e16f21b3c8), ROM_SKIP(1) | ROM_BIOS(0) )
 	// 1: 286 board with Headland Headland HT12/A chipset, one ROM market IQS, Phoenix BIOS 3479808 - ISA8: 1, ISA16: 6
 	ROM_SYSTEM_BIOS(1, "head_ph_2", "Headland/Phoenix #2") // Phoenix BIOS A286 Version 1.01 - BIOS ID JLI01101 - IT9109 - Reference ID 01 - (BIOS release date:: 19-04-1990)
 	ROMX_LOAD( "286-headland-iqs-lo_32k.bin", 0x10000, 0x8000, CRC(60424e9d) SHA1(aa813bf48939fe7fcbbfec3133e702bfdff6234e), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD( "286-headland-iqs-hi_32k.bin", 0x10001, 0x8000, CRC(e56212e0) SHA1(2441845d632d19adc0592e094beb5ec1fbe074f6), ROM_SKIP(1) | ROM_BIOS(1) )	
+	ROMX_LOAD( "286-headland-iqs-hi_32k.bin", 0x10001, 0x8000, CRC(e56212e0) SHA1(2441845d632d19adc0592e094beb5ec1fbe074f6), ROM_SKIP(1) | ROM_BIOS(1) )
 ROM_END
 
 
@@ -2112,7 +2112,7 @@ ROM_START( n8810m16c )
 ROM_END
 
 // Nixdorf 8810 M16 Laptop - PC17 - VGA version - boot from harddisk doesn't work
-// Chipset: MX8945G/MX16C4520C, Chps P82C212B-12, P82C215, P82C206, WD37C65BJM, P82C211-12, Chips F82C455, 
+// Chipset: MX8945G/MX16C4520C, Chps P82C212B-12, P82C215, P82C206, WD37C65BJM, P82C211-12, Chips F82C455,
 ROM_START( n8810m16v )
 	// ROM_LOAD("8810m16vga_27c256_221vb_123g1.bin", 0x00000, 0x4000, CRC(3bc80739) SHA1(3d6d7fb01681eccbc0b560818654d5aa1e3c5230)) // C&T VGA BIOS for 82C455
 	ROM_REGION(0x20000, "bios", 0 )
@@ -2167,50 +2167,52 @@ ROM_START( at386 )
 	ROM_SYSTEM_BIOS(2, "amicg", "AMI CG")
 	ROMX_LOAD( "amicg.1",        0x10000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(2))
 	// 3:
-	ROM_SYSTEM_BIOS(3, "msi386", "MSI 386") // MSI 386 mainboard, initializes graphics card, then hangs - Chipset: Chips P82A304, P82A303, P82A302C, 2xP82B305, P82C301C, P82A306A, 
+	ROM_SYSTEM_BIOS(3, "msi386", "MSI 386") // MSI 386 mainboard, initializes graphics card, then hangs - Chipset: Chips P82A304, P82A303, P82A302C, 2xP82B305, P82C301C, P82A306A,
 	ROMX_LOAD( "ami_386_msi_02297_even.bin", 0x10000, 0x8000, CRC(768590a0) SHA1(90c5203d78591a093fd4f54ceb8d9827f1e64f39), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "ami_386_msi_02297_odd.bin", 0x10001, 0x8000, CRC(7b1360dc) SHA1(552ccda9f90826621e88d9abdc47306b9c2b2b15), ROM_SKIP(1) | ROM_BIOS(3) )
-	// 4: BIOS-String: 20-0200-DF1121-00101111-102591-SYM_386B-0 / 386DX/SX (S1A.P)
-	ROM_SYSTEM_BIOS(4, "386sc2c", "386-SC-2C") // Chipset: SYMPHONY SL82C362, SL82C461, SL82C465
-	ROMX_LOAD("386-sc-2c_ami_za492668.bin", 0x10000, 0x10000, CRC(b408eeb7) SHA1(cf1974492119e1aae623fa366d5760343e827e52), ROM_BIOS(4) )
-	// 5: BIOS-String: EC&T-1332-040990-K0
-	ROM_SYSTEM_BIOS(5, "cs8230", "CS8230")
-	ROMX_LOAD( "ami_386_cs8230_chipset.bin", 0x10000, 0x10000, CRC(1ee766d0) SHA1(75dba3c9817dfe6caca46f5f4f2f1d76ba88d3c7), ROM_BIOS(5) )
-	// 6
-	ROM_SYSTEM_BIOS(6, "ami2939", "AMI2939") // no display
-	ROMX_LOAD( "ami2939e.rom", 0x10000, 0x8000, CRC(65cbbd32) SHA1(d7d26b496f8e86f01722ad9f171a68f9fcdc477c), ROM_SKIP(1) | ROM_BIOS(6) )
-	ROMX_LOAD( "ami2939o.rom", 0x10001, 0x8000, CRC(8db6e739) SHA1(cdd47709d6036fad4be40c15bff41752d831d4b8), ROM_SKIP(1) | ROM_BIOS(6) )
-	// 7: NCR 386 slot CPU - Upgrade card for e.g. NCR PC-8 - set graphics card to CGA to see a "Timer One Error" message
-	ROM_SYSTEM_BIOS(7, "ncr386", "NCR 386 CPU card") // Chipset: SN76LS612PN, 2xAM9517A-5JC, NCR 006-3500402PT M472018 8650A
-	ROMX_LOAD( "ncr_386_card_04152_u44_ver5.0.bin", 0x10000, 0x10000, CRC(80e44318) SHA1(54e1d4d646a577c53c65b2292b383ed6d91b65b2), ROM_BIOS(7))
+	// 4: BIOS-String: EC&T-1332-040990-K0
+	ROM_SYSTEM_BIOS(4, "cs8230", "CS8230")
+	ROMX_LOAD( "ami_386_cs8230_chipset.bin", 0x10000, 0x10000, CRC(1ee766d0) SHA1(75dba3c9817dfe6caca46f5f4f2f1d76ba88d3c7), ROM_BIOS(4) )
+	// 5
+	ROM_SYSTEM_BIOS(5, "ami2939", "AMI2939") // no display
+	ROMX_LOAD( "ami2939e.rom", 0x10000, 0x8000, CRC(65cbbd32) SHA1(d7d26b496f8e86f01722ad9f171a68f9fcdc477c), ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "ami2939o.rom", 0x10001, 0x8000, CRC(8db6e739) SHA1(cdd47709d6036fad4be40c15bff41752d831d4b8), ROM_SKIP(1) | ROM_BIOS(5) )
+	// 6: NCR 386 slot CPU - Upgrade card for e.g. NCR PC-8 - set graphics card to CGA to see a "Timer One Error" message
+	ROM_SYSTEM_BIOS(6, "ncr386", "NCR 386 CPU card") // Chipset: SN76LS612PN, 2xAM9517A-5JC, NCR 006-3500402PT M472018 8650A
+	ROMX_LOAD( "ncr_386_card_04152_u44_ver5.0.bin", 0x10000, 0x10000, CRC(80e44318) SHA1(54e1d4d646a577c53c65b2292b383ed6d91b65b2), ROM_BIOS(6))
 	// ROM_LOAD ("ncr_386_card_keyboard_04181_u27_ver5.6.bin", 0x0000, 0x800, CRC(6c9004e7) SHA1(0fe77f47ff77333d1ff9bfcf8d6d92193ab1f208))
-	// 8: BIOS-String: Phoenix 80386 ROM BIOS PLUS Version 1.10 22
-	ROM_SYSTEM_BIOS(8, "cbm386", "Commodore 386")
-	ROMX_LOAD( "cbm-386-bios-lo-v1.022e-8100.bin", 0x10000, 0x8000, CRC(a054a1b8) SHA1(d952b02cc10534325c1c5aaa8b6dfb77bc20a179), ROM_SKIP(1) | ROM_BIOS(8))
-	ROMX_LOAD( "cbm-386-bios-hi-v1.022e-d100.bin", 0x10001, 0x8000, CRC(b9541f3d) SHA1(e37c704521e85b07369d21b0521f4d1871c318dd), ROM_SKIP(1) | ROM_BIOS(8))
-	// 9: flashing "K/B controller incorrect" - Chipset: ALi M1217-40
-	ROM_SYSTEM_BIOS(9, "gmb386sat", "GMB-386SAT_V1.0")
-	ROMX_LOAD( "gmb-386sat_v1.0.bin", 0x10000, 0x10000, CRC(59ecc773) SHA1(f2007fce76b3a91f51bfb5f43c1539d5ae06d35f), ROM_BIOS(9))
-	// 10: BIOS-String: X0-0100-000000-00101111-060692-RC2018A-0 / Ver 1.4b / Texas Instruments 486 DLC [S3Q]
-	ROM_SYSTEM_BIOS(10, "ti486dlc", "TI 486DLC") // board is equipped with a TI486DLC
-	ROMX_LOAD( "ti_486dlc_rev.s3q.bin", 0x10000, 0x10000, CRC(39b150ed) SHA1(5fc96c6232dd3a066349d8e707e938af55893297), ROM_BIOS(10))
-	// 11: BIOS-String: 40-0400-001107-00101111-111192-U4800VLX-0 / UNICHIP BIOS VER 2.0A 09/27/1993
-	ROM_SYSTEM_BIOS(11, "386bw367", "386BW367 Rev. 1.0")
-	ROMX_LOAD( "unichip_386bw_367_rev_1.0.bin", 0x10000, 0x10000, CRC(7922a8f9) SHA1(785008e10edfd393dc39e921a12d1a07a14bac25), ROM_BIOS(11))
-	//12: BIOS-String: 40-0100-001266-00101111-121291-UMCAUTO-0 - 3DIUD-1.2
+	// 7: BIOS-String: Phoenix 80386 ROM BIOS PLUS Version 1.10 22
+	ROM_SYSTEM_BIOS(7, "cbm386", "Commodore 386")
+	ROMX_LOAD( "cbm-386-bios-lo-v1.022e-8100.bin", 0x10000, 0x8000, CRC(a054a1b8) SHA1(d952b02cc10534325c1c5aaa8b6dfb77bc20a179), ROM_SKIP(1) | ROM_BIOS(7))
+	ROMX_LOAD( "cbm-386-bios-hi-v1.022e-d100.bin", 0x10001, 0x8000, CRC(b9541f3d) SHA1(e37c704521e85b07369d21b0521f4d1871c318dd), ROM_SKIP(1) | ROM_BIOS(7))
+	// 8: flashing "K/B controller incorrect" - Chipset: ALi M1217-40
+	ROM_SYSTEM_BIOS(8, "gmb386sat", "GMB-386SAT_V1.0")
+	ROMX_LOAD( "gmb-386sat_v1.0.bin", 0x10000, 0x10000, CRC(59ecc773) SHA1(f2007fce76b3a91f51bfb5f43c1539d5ae06d35f), ROM_BIOS(8))
+	// 9: BIOS-String: X0-0100-000000-00101111-060692-RC2018A-0 / Ver 1.4b / Texas Instruments 486 DLC [S3Q]
+	ROM_SYSTEM_BIOS(9, "ti486dlc", "TI 486DLC") // board is equipped with a TI486DLC
+	ROMX_LOAD( "ti_486dlc_rev.s3q.bin", 0x10000, 0x10000, CRC(39b150ed) SHA1(5fc96c6232dd3a066349d8e707e938af55893297), ROM_BIOS(9))
+	// 10: BIOS-String: 40-0400-001107-00101111-111192-U4800VLX-0 / UNICHIP BIOS VER 2.0A 09/27/1993
+	ROM_SYSTEM_BIOS(10, "386bw367", "386BW367 Rev. 1.0")
+	ROMX_LOAD( "unichip_386bw_367_rev_1.0.bin", 0x10000, 0x10000, CRC(7922a8f9) SHA1(785008e10edfd393dc39e921a12d1a07a14bac25), ROM_BIOS(10))
+	// 11: BIOS-String: 40-0100-001266-00101111-121291-UMCAUTO-0 - 3DIUD-1.2
 	// Chipset: // UMC UM92C206F, UM82C482AF, UM82C481BF - MB manufacturer according to BIOS is Modula Tech Co
-	ROM_SYSTEM_BIOS(12, "3diud", "386 UMC 3DIUD")
-	ROMX_LOAD( "386-umc-3flud.bin", 0x10000, 0x10000, CRC(2e795a01) SHA1(02e9e2871c1c1a542f44ab5eef66aee4b04225c1), ROM_BIOS(12))
-	//13: BIOS-String: 305-3.2 000-00 - Chipset: TACT82206FN; Intel A82385-33 - Keyboard Controller: P/N: 191106-2 C/S E4F4 Rev. 1.4
+	ROM_SYSTEM_BIOS(11, "3diud", "386 UMC 3DIUD")
+	ROMX_LOAD( "386-umc-3flud.bin", 0x10000, 0x10000, CRC(2e795a01) SHA1(02e9e2871c1c1a542f44ab5eef66aee4b04225c1), ROM_BIOS(11))
+	// 12: BIOS-String: 305-3.2 000-00 - Chipset: TACT82206FN; Intel A82385-33 - Keyboard Controller: P/N: 191106-2 C/S E4F4 Rev. 1.4
 	// Board with Tandon and Micronics stickers - BIOS: 192475-305A V305 3.2
 	// ISA8: 2, ISA16: 5 - OSC: 14.31818 MHz - 66.0000 MHz, CPU: Intel 80386DX-33, FPU: Intel 80387DX-33
-	ROM_SYSTEM_BIOS(13, "tanmic385", "Tandon/Micronics with 385")
-	ROMX_LOAD( "386-micronics-09-00021-even_32k.bin", 0x10000, 0x8000, CRC(0d4f0093) SHA1(f66364a82c957862a0e54afc3a2f85f911adfd49), ROM_SKIP(1) | ROM_BIOS(13))
-	ROMX_LOAD( "386-micronics-09-00021-odd_32k.bin", 0x10001, 0x8000, CRC(54195986) SHA1(f3536340ef1697763e5cd70d0de7bb9b2a4ecde9), ROM_SKIP(1) | ROM_BIOS(13))
-	// 14: Board is only marked "rev.0.3, looks like 386GRN - CPU: AMD AM386DX-40 - OSC: 14.31818 - ISA8: 1, ISA16: 5
+	ROM_SYSTEM_BIOS(12, "tanmic385", "Tandon/Micronics with 385")
+	ROMX_LOAD( "386-micronics-09-00021-even_32k.bin", 0x10000, 0x8000, CRC(0d4f0093) SHA1(f66364a82c957862a0e54afc3a2f85f911adfd49), ROM_SKIP(1) | ROM_BIOS(12))
+	ROMX_LOAD( "386-micronics-09-00021-odd_32k.bin", 0x10001, 0x8000, CRC(54195986) SHA1(f3536340ef1697763e5cd70d0de7bb9b2a4ecde9), ROM_SKIP(1) | ROM_BIOS(12))
+	// 13: Board is only marked "rev.0.3, looks like 386GRN - CPU: AMD AM386DX-40 - OSC: 14.31818 - ISA8: 1, ISA16: 5
 	// Chipset: UMC UM82C491F - BIOS-String: 08/30/93-UMC-491-214X2000-OO - BIOS: Award 386 D2026361 - Keyboard BIOS: JETkey V3.0
-	ROM_SYSTEM_BIOS(14, "386grn", "386GRN-like board rev.03")
-	ROMX_LOAD( "386dx40-27c512.bin", 0x10000, 0x10000, CRC(692a4d52) SHA1(7970a05586eacfe4bfdc575b17bbbfb7ff1c86b0), ROM_BIOS(14))
+	ROM_SYSTEM_BIOS(13, "386grn", "386GRN-like board rev.03")
+	ROMX_LOAD( "386dx40-27c512.bin", 0x10000, 0x10000, CRC(692a4d52) SHA1(7970a05586eacfe4bfdc575b17bbbfb7ff1c86b0), ROM_BIOS(13))
+	// 14: MB1325PM - Chipset: Chips P82C206 µIC MI9382 MI9381A
+	// BIOS: AMI 386 BIOS - BIOS-String: 30-0101-D61223-00101111-050591-OPBC-F / MB-1325PM. - Keyboard-BIOS: AMI
+	// CPU: AMD 386DX/DXL-25 - ISA8: 1, ISA16: 6, ISA8/Memory: 1
+	ROM_SYSTEM_BIOS(14, "mb1325pm", "MB1325PM")
+	ROMX_LOAD( "386-mb1325pm ok.bin", 0x10000, 0x10000, CRC(768689c1) SHA1(ce46b3baf3cd2586ffaccdded789a54583b73a3b), ROM_BIOS(14))
 ROM_END
 
 
@@ -2218,7 +2220,36 @@ ROM_END
 //  80386 SX and DX motherboard
 //**************************************************************************
 
-// Shuttle HOT-304 - Chipset: Opti F82C382, Opti (erased), UMC UM82C206L - OSC: 14.31818MHz, 50.000MHz 
+// Octek Jaguar V rev.1.4 - Chipset: MX83C: MX83C305FC, MX83C306FC
+// CPU: AMD 386DX-40, FPU socket provided - OSC: 80.000MHz, 14.31818
+ROM_START( ocjagv )
+	ROM_REGION(0x20000, "bios", 0)
+	// 0: MR BIOS (r) V1.40
+	ROM_SYSTEM_BIOS(0, "jagvmr14", "Jaguar V MR-BIOS 1.40")
+	ROMX_LOAD( "bios.bin", 0x10000, 0x10000, CRC(a552d6ad) SHA1(91bae14c3ec7edbc9ef240fec1be17f3582d7ec2), ROM_BIOS(0))
+	//1: AMI BIOS// BIOS: AMI 386DX ISA BIOS AA0797325 - BIOS-String: 31-0100-426069-00101111-121291-MXIC-0 MX-DIR_001
+	// Keyboard-BIOS: Intel
+	ROM_SYSTEM_BIOS(1, "jagvami", "Jaguar V AMI BIOS")
+	ROMX_LOAD( "octek_jaguar_v_ami_bios_isa386dx.bin", 0x10000, 0x10000, CRC(f8d14914) SHA1(14e8ecc4794920dc530fc6bd12ad64494e2544e5), ROM_BIOS(1))
+ROM_END
+
+
+// ASUS ISA-386C - Chipset : SIS Rabbit : 85C310 / 85C320 / 85C330 / 85C206
+// BIOS : AMI 05/05/1991, on a 27C512 type EPROM (64KB) - BIOS-String : 30-0105-001292-00101111-050591-SISDFC-386
+// ISA8: 2, ISA16:5, ISA16/Memory: 1
+ROM_START( isa386c )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "asus_isa-386c_bios.bin", 0x10000, 0x10000, CRC(55e6d1bb) SHA1(e1ac490a30f63b6e4d6d9d0fbaea3d132b8ff053))
+ROM_END
+
+// ASUS ISA-386U30 REV.2.2 - Chipset:UMC UM82C481AF, UM82C482AF, 82C206F - CPU: AM386DX-40 - OSC: 14.31818MHz, 32.000MHz - ISA8: 1, ISA16: 6
+// BIOS: AMI 386DX BIOS AA0974582 - BIOS-String: - Keyboard-BIOS: AMI U2518640 MEGA-KB-F-WP
+ROM_START( isa386u30 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "386-isa-386u30.bin", 0x10000, 0x10000, CRC(6d45a044) SHA1(63c06568f9db5ce12dc8dd0fb1ad1009a9fb24f6))
+ROM_END
+
+// Shuttle HOT-304 - Chipset: Opti F82C382, Opti (erased), UMC UM82C206L - OSC: 14.31818MHz, 50.000MHz
 // BIOS: AMI, Ser.Nr. 150796 - BIOS-String: 30-0101-DK1343-00001111-050591-OPBC-0 - Keyboard BIOS: AMI Ser.Nr. 209210 - ISA8: 1, ISA16: 6, ISA16/Memory: 1
 ROM_START( hot304 )
 	ROM_REGION(0x20000, "bios", 0)
@@ -2233,7 +2264,7 @@ ROM_START( tam3340ma0 )
 ROM_END
 
 // DTK PEM 2530 - Chipset: VLSI 9032BT/217203/VL82C100-0C
-// Board's original ROMs were damaged (Datatech dtk 386 V4.26 A1763), "original" ROMs came from another user, V3.10 ROMs from another board
+// Board's original ROMs were damaged (Datatech dtk 386 V4.26 A1763), "original" ROMs came from another user, V3.10 ROMs from a different board
 // ISA8: 2, ISA16: 5, Memory connector: 1 - OSC: 40.000 MHz - 14.31818 MHz
 ROM_START( pem2530 )
 	ROM_REGION(0x20000, "bios", 0)
@@ -2320,11 +2351,41 @@ ROM_START( fu340 )
 ROM_END
 
 
-// Motherboards using the Ali M1429 A1 and M1431 A2 chipsets ... they both don't hang before initializing the graphics card
+// Motherboards using the OPTi495XLC chipset
+
+// Chipset: OPTi 82C495XLC F82C206, BIOS: AMI 386DX BIOS Ser.#:AA2602776
+// Keyboard-BIOS: Lance LT38C41 - ISA8: 1, ISA16: 5
+ROM_START( opti495xlc )
+	ROM_REGION(0x20000, "bios", 0)
+	// 0: BIOS-String: 40-081L-001343-00101111-080893-OP495XLC-F  / OPTi495XLC For 386
+	ROM_SYSTEM_BIOS(0, "optimini", "OPTi Mini 82C495XLC")
+	ROMX_LOAD( "386-opti-mini.bio", 0x10000, 0x10000, CRC(04c75e45) SHA1(d5bf92421dda3191c6da12ae2fa31c9ee7a831e1), ROM_BIOS(0) )
+	// 1: MR BIOS (r) V1.60
+	ROM_SYSTEM_BIOS(1, "mr495xlc", "MR BIOS for OPTi 82C495XLC") // use Hercules
+	ROMX_LOAD( "mr-3dx94.rom", 0x10000, 0x10000, CRC(6925759c) SHA1(540177fe2c10e20037893c9763b0bf6e35163c9c), ROM_BIOS(1) )
+ROM_END
+
+// Motherboards  using the Symphony SL82C362 SL82C461 SL82C465 chipset
+
+// 386 SC Rev A2 - BIOS: AMI 386 BIOS Ser.#: ZZ006975, BIOS-String:  30-0200-DF1211-00101111-042591-SYMP-0 / 386DX BIOS for SYMLABS SL82C360 - Keyboard-BIOS: AMI #Z357365
+ROM_START( 386sc ) // CPU: unreadable, FPU: Cyrix 387DX-25 - OSC: 40.000MHz, 14.31818 - ISA8: 1, ISA16: 7
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "386_sc_symphony.bin", 0x10000, 0x10000, CRC(fabe369c) SHA1(211ff63dd874c273135d1427db3562d752c2bade))
+ROM_END
+
+// BIOS-String: 20-0200-DF1121-00101111-102591-SYM_386B-0 / 386DX/SX (S1A.P)
+	// ROM_SYSTEM_BIOS(4, "386sc2c", "386-SC-2C") // Chipset: SYMPHONY SL82C362, SL82C461, SL82C465
+ROM_START( 386sc2c )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "386-sc-2c_ami_za492668.bin", 0x10000, 0x10000, CRC(b408eeb7) SHA1(cf1974492119e1aae623fa366d5760343e827e52))
+ROM_END
+
+
+// Motherboards using the Ali M1429 A1 and M1431 A2 chipsets ... they both hang before initializing the graphics card
 
 ROM_START( alim1429 )
 	ROM_REGION(0x20000, "bios", 0)
-	// 0: 
+	// 0:
 	ROM_SYSTEM_BIOS(0, "386ali", "386 board with Ali chipset")
 	ROMX_LOAD( "386_ali_ami_511767.bin", 0x10000, 0x10000, CRC(3c218db4) SHA1(785ea7c36e8be5e7410524e90170d4985cbc9c24), ROM_BIOS(0))
 	// 1: SER-386AD III (written on the underside of the board) - CPU: AMD Am386DX-40 - ISA16: 5
@@ -2332,6 +2393,7 @@ ROM_START( alim1429 )
 	ROM_SYSTEM_BIOS(1, "ser386ad", "SER-386AD III")
 	ROMX_LOAD( "ser386ad3.bin", 0x10000, 0x10000, CRC(d80d6deb) SHA1(9f889f7464255431c13ac91d7df31b325447fef5), ROM_BIOS(1))
 ROM_END
+
 
 // Motherboards using the Forex FRX36C300 + FRX46C402; SiS 85C206 chipset
 
@@ -2350,6 +2412,17 @@ ROM_START( smih0107 )
 ROM_END
 
 
+// Motherboards using the Forex FRX46C402 + FRX46C411 + SiS 85C206 chipset
+
+// PT-581392 - CPU: AMD 386DX-40 FPU: ULSI Advanced Math Coprocessor DX/DLC 40MHz US83C87
+// BIOS : AMI 07/07/1991, on a 27C512 type EPROM (64KB) Ser.# 007139, BIOS-String : 30-0400-ZZ1101-00101111-070791-FORX-0 FRX/386DX CACHE SYSTEM
+// Keyboard-BIOS: AMI, Ser.# 007139 - OSC: 14.31818, 80.000MHz - ISA16: 8
+ROM_START( pt581392 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "pt-581392 386dx.bin", 0x10000, 0x10000, CRC(389a93de) SHA1(8f1320b1d163167272cfad073f58c355e31fcf6f))
+ROM_END
+
+
 // Motherboards using the Chips & Technologies CS8230 chip set: P82C301C, P82C302C, P82A303, P82A304, 2x P82B305, P82A306 A, P82C206
 
 // 8x SIMM, 5x 16-bit ISA, 2x 8-bit ISA, 1x 32-bit proprietary memory expansion slot
@@ -2360,22 +2433,32 @@ ROM_START( ecs38632 )
 	ROMX_LOAD( "ami_ecs-386_32_hi.bin", 0x10001, 0x8000, CRC(e3072bf8) SHA1(74eec72e190f682cfd5ae5425ebdc854e0ba7bc9), ROM_SKIP(1) )
 ROM_END
 
-// SY-012 16/25 386MB VER: 5.2 - Chipset: Chips P82C301C; P82A306; P82A303; P82C206; P82A304; P82C302; P82B305 
+// SY-012 16/25 386MB VER: 5.2 - Chipset: Chips P82C301C; P82A306; P82A303; P82C206; P82A304; P82C302; P82B305
 // BIOS: AMI 386 BIOS 10084 - BIOS-String: DC&T-1102-082588-K0 - CPU: i386DX-33, ISA8: 2, ISA16: 5, Memory: 1
 // OSC: 14.31818 - 20.000 MHz - 50.000 MHz - 32.000 MHz
 ROM_START( sy012 )
 	ROM_REGION(0x20000, "bios", 0)
-	ROMX_LOAD( "386-sy-012-h_32k.bin", 0x10000, 0x8000, CRC(6ab197f4) SHA1(7efd9033af3a0b36bc5be64cb28c6218cda4d13c), ROM_SKIP(1) )
+	ROMX_LOAD( "386-sy-012-l_32k.bin", 0x10000, 0x8000, CRC(6ab197f4) SHA1(7efd9033af3a0b36bc5be64cb28c6218cda4d13c), ROM_SKIP(1) )
 	ROMX_LOAD( "386-sy-012-h_32k.bin", 0x10001, 0x8000, CRC(61aedfdb) SHA1(0f492dc8102386a1c475c5637fb7853d81d3efb6), ROM_SKIP(1) )
 ROM_END
 
-// Goldstar 611-606A - Chipset: CHIPS P82C206 P82C301 P82A303 P82C302 P82A304 2xP82A305 - 
+// Goldstar 611-606A - Chipset: CHIPS P82C206 P82C301 P82A303 P82C302 P82A304 2xP82A305 -
 // OSC: 14.318 - 9.6000000 MHz - 40.000000 MHz - 16.000000 MHz
 // BIOS: TI CMC3000 - BIOS-String: Phoenix 80386 ROM BIOS PLUS Version 1.10 01 - release 2.7B
 ROM_START( gs611606a )
 	ROM_REGION(0x20000, "bios", 0)
 	ROMX_LOAD( "386-goldstar-e_32k.bin", 0x10000, 0x8000, CRC(3f358257) SHA1(1570f3de1955895c29c1c4240e1cd47aadff1be0), ROM_SKIP(1) )
 	ROMX_LOAD( "386-goldstar-o_32k.bin", 0x10001, 0x8000, CRC(c5d75635) SHA1(70ceb4089bfd3af6853c3d6e28dbded0c43f6a40), ROM_SKIP(1) )
+ROM_END
+
+// DFI386-20.REV0 - Chipset: Chips 2xP82B305 P82A304, P82C302 P82C301 P82C206, two unreadable - initializes graphics card then hangs
+// BIOS: AMI 386 BIOS PLUS Ser.#: 102856 - Keyboard BIOS: AMI 386 BIOS PLUS Ser.#:102856
+// CPU: i386DX-20 - ISA8: 1, ISA16: 5, Memory: 1 - Memory card shown in photos
+// OSC: OSC1: 14.31818, OSC2: 16.000MHz, OSC3: unreadable, OSC4: 40.000MHz
+ROM_START( dfi386 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROMX_LOAD( "386-dfi-386-20_even_32k.bin", 0x10000, 0x8000, CRC(2d1309f8) SHA1(a75816b97d1f763dba39bdccf8e58729a58b0e56), ROM_SKIP(1) )
+	ROMX_LOAD( "386-dfi-386-20_odd_32k.bin", 0x10001, 0x8000, CRC(1968fe11) SHA1(b5662daa57751859d2cfa7740f708277cbe35080), ROM_SKIP(1) )
 ROM_END
 
 //**************************************************************************
@@ -2781,6 +2864,8 @@ COMP( 1994, a486sp3g,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 1995, aa486s,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "PCI/I-A486S", MACHINE_NOT_WORKING )
 COMP( 1994, a486sv1,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "VL/EISA-486SV1", MACHINE_NOT_WORKING )
 COMP( 1994, a486sv2g,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "VL/I-486SV2G", MACHINE_NOT_WORKING )
+COMP( 199?, isa386u30, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Asus",        "ISA-386U30 REV.2.2", MACHINE_NOT_WORKING )
+COMP( 1989, isa386c,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Asus",        "ISA-386C", MACHINE_NOT_WORKING )
 COMP( 199?, mb8433uud, ibm5170, 0,       at486,     0,     at_state,     init_at,        "Biostar",     "MB8433-UUD-A", MACHINE_NOT_WORKING ) // lands in Award BootBlock BIOS
 COMP( 199?, mb1212c,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Biostar",     "MB-1212C", MACHINE_NOT_WORKING )
 COMP( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines", "386SX-16", MACHINE_NOT_WORKING )
@@ -2821,6 +2906,8 @@ COMP( 199?, sy019hi,   ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 199?, suntac5,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "286 motherboards with 5-chip SUNTAC chipset", MACHINE_NOT_WORKING )
 COMP( 198?, vlsi5,     ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>", "286 motherboards with 5-chip VLSI chipset", MACHINE_NOT_WORKING )
 COMP( 199?, frxc402,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards with a FOREX FRX46C402/FRX36C300/SIS85C206 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, opti495xlc,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using a OPTi 82C495XLC chipset", MACHINE_NOT_WORKING )
+COMP( 198?, dfi386,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "DFI", "386-20.REV0", MACHINE_NOT_WORKING )
 COMP( 198?, pem2530,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "DTK", "PEM 2539", MACHINE_NOT_WORKING )
 COMP( 198?, u3911v3,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Uniron", "U3911-V3", MACHINE_NOT_WORKING )
 COMP( 199?, mba009,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "HLB-286 MBA-009", MACHINE_NOT_WORKING )
@@ -2836,7 +2923,10 @@ COMP( 199?, kma202f,   ibm5170, 0,       atvga,     0,     at_state,     init_at
 COMP( 199?, sy012,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "SY-012 16/25 386MB VER: 5.2", MACHINE_NOT_WORKING )
 COMP( 198?, gs611606a, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Goldstar",    "GOLDSTAR P/N 611-606A Rev 1.0A", MACHINE_NOT_WORKING )
 COMP( 199?, tam3340ma0,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "TAM/33/40-MA0 (CM318R00,M31-R00)", MACHINE_NOT_WORKING )
-COMP( 199?, alim1429,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 Motherboards using the ALi M1429 A1 and M1431 A2 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, alim1429,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 motherboards using the ALi M1429 A1 and M1431 A2 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, 386sc,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 SC Rev A2", MACHINE_NOT_WORKING )
+COMP( 199?, 386sc2c,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 motherboard using the Symphony chipset", MACHINE_NOT_WORKING )
+COMP( 199?, pt581392,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 Motherboard using the Forex FRX46C402 + FRX46C411 + SiS 85C206 chipset", MACHINE_NOT_WORKING )
 COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
 COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx Notebook Computer", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
@@ -2866,4 +2956,5 @@ COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at
 COMP( 1987, m290,      ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 COMP( 1993, lion3500,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Lion",        "3500", MACHINE_NOT_WORKING )
 COMP( 198?, o286foxii, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Octek",       "Fox II", MACHINE_NOT_WORKING )
+COMP( 1992, ocjagv,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Octek",       "Jaguar V v1.4", MACHINE_NOT_WORKING )
 //COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )

@@ -22566,7 +22566,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 
-	<software name="puttsqup" >
+	<software name="puttsqup">
 		<description>Putty Squad (prototype)</description>
 		<year>1992</year>
 		<publisher>System 3 / Ocean</publisher>

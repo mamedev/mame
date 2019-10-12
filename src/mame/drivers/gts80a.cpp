@@ -453,13 +453,13 @@ void caveman_state::video_map(address_map &map)
 
 void caveman_state::video_io_map(address_map &map)
 {
-//  AM_RANGE(0x000, 0x002) AM_READWRITE() // 8259 irq controller
-//  AM_RANGE(0x100, 0x102) AM_READWRITE() // HD46505
-//  AM_RANGE(0x200, 0x200) AM_READWRITE() // 8212 in, ?? out
-//  AM_RANGE(0x300, 0x300) AM_READWRITE() // soundlatch (command?) in, ?? out
+//  map(0x000, 0x002).rw(FUNC(caveman_state::), FUNC(caveman_state::)); // 8259 irq controller
+//  map(0x100, 0x102).rw(FUNC(caveman_state::), FUNC(caveman_state::)); // HD46505
+//  map(0x200, 0x200).rw(FUNC(caveman_state::), FUNC(caveman_state::)); // 8212 in, ?? out
+//  map(0x300, 0x300).rw(FUNC(caveman_state::), FUNC(caveman_state::)); // soundlatch (command?) in, ?? out
 
-//  AM_RANGE(0x400, 0x400) AM_READ() // joystick inputs
-//  AM_RANGE(0x500, 0x506) AM_WRITE() // palette
+//  map(0x400, 0x400).r(FUNC(caveman_state::)); // joystick inputs
+//  map(0x500, 0x506).w(FUNC(caveman_state::)); // palette
 
 }
 

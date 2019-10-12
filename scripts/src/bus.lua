@@ -761,7 +761,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/coleco/exp.h,BUSES["COLECO_CART"] = true
+--@src/devices/bus/coleco/cartridge/exp.h,BUSES["COLECO_CART"] = true
 ---------------------------------------------------
 
 if (BUSES["COLECO_CART"]~=null) then

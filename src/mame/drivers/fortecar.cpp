@@ -558,7 +558,7 @@ void fortecar_state::fortecar_ports(address_map &map)
 	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x60, 0x63).rw("fcppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));//M5L8255AP
-//  AM_RANGE(0x80, 0x81) //8251A UART
+//  map(0x80, 0x81) //8251A UART
 	map(0xa0, 0xa0).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
 	map(0xa1, 0xa1).portr("DSW");
 }

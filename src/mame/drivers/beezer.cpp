@@ -175,8 +175,8 @@ void beezer_state::sound_map(address_map &map)
 	map(0x1000, 0x1007).mirror(0x07f8).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x1800, 0x180f).mirror(0x07f0).m(m_via_audio, FUNC(via6522_device::map));
 	map(0x8000, 0x8003).mirror(0x1ffc).w(FUNC(beezer_state::dac_w));
-//  AM_RANGE(0xa000, 0xbfff) AM_ROM // 2d (can be ram, unpopulated)
-//  AM_RANGE(0xc000, 0xdfff) AM_ROM // 4d (unpopulated)
+//  map(0xa000, 0xbfff).rom(); // 2d (can be ram, unpopulated)
+//  map(0xc000, 0xdfff).rom(); // 4d (unpopulated)
 	map(0xe000, 0xffff).rom().region("audiocpu", 0); // 6d
 }
 
@@ -302,7 +302,7 @@ void beezer_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	{
 	case TIMER_DAC: dac_update_cb(); break;
 	case TIMER_SCANLINE: scanline_cb(); break;
-	default: assert_always(false, "Unknown id in beezer_state::device_timer");
+	default: throw emu_fatalerror("Unknown id in beezer_state::device_timer");
 	}
 }
 

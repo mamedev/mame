@@ -131,44 +131,39 @@ image_init_result harddisk_image_device::call_load()
 image_init_result harddisk_image_device::call_create(int create_format, util::option_resolution *create_args)
 {
 	int err;
-	uint32_t sectorsize, hunksize;
-	uint32_t cylinders, heads, sectors, totalsectors;
 
-	assert_always(create_args != nullptr, "Expected create_args to not be nullptr");
-	cylinders   = create_args->lookup_int('C');
-	heads       = create_args->lookup_int('H');
-	sectors     = create_args->lookup_int('S');
-	sectorsize  = create_args->lookup_int('L');
-	hunksize    = create_args->lookup_int('K');
+	if (!create_args)
+		throw emu_fatalerror("harddisk_image_device::call_create: Expected create_args to not be nullptr");
 
-	totalsectors = cylinders * heads * sectors;
+	const uint32_t cylinders   = create_args->lookup_int('C');
+	const uint32_t heads       = create_args->lookup_int('H');
+	const uint32_t sectors     = create_args->lookup_int('S');
+	const uint32_t sectorsize  = create_args->lookup_int('L');
+	const uint32_t hunksize    = create_args->lookup_int('K');
+
+	const uint32_t totalsectors = cylinders * heads * sectors;
 
 	/* create the CHD file */
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
 	err = m_origchd.create(image_core_file(), (uint64_t)totalsectors * (uint64_t)sectorsize, hunksize, sectorsize, compression);
 	if (err != CHDERR_NONE)
-		goto error;
+		return image_init_result::FAIL;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
 	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize));
 	m_origchd.close();
 
 	if (err != CHDERR_NONE)
-		goto error;
+		return image_init_result::FAIL;
 
 	return internal_load_hd();
-
-error:
-	return image_init_result::FAIL;
 }
 
 void harddisk_image_device::call_unload()
 {
 	/* Check if there is an image_unload callback defined */
-	if ( !m_device_image_unload.isnull() )
-	{
+	if (!m_device_image_unload.isnull())
 		m_device_image_unload(*this);
-	}
 
 	if (m_hard_disk_handle != nullptr)
 	{

@@ -172,7 +172,7 @@ void vme_fcisio1_card_device::fcisio1_mem(address_map &map)
 	map(0xe60000, 0xe601ff).rw("duscc3", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)).umask16(0x00ff);
 	map(0xe80000, 0xe80dff).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 	map(0xf00000, 0xf7ffff).rom(); /* System EPROM Area 32Kb DEBUGGER supplied */
-//  AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
+//  map(0xc40000, 0xc800ff).rw(FUNC(vme_fcisio1_card_device::not_implemented_r), FUNC(vme_fcisio1_card_device::not_implemented_w));  /* Dummy mapping af address area to display message */
 }
 
 /* ROM definitions */

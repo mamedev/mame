@@ -102,7 +102,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *************************************/
 
 #define MASTER_CLOCK        (XTAL(73'728'000))
-#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)  /* divider is either 3 or 4 */
+#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 2)
 #define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 /  6 / 32)
 
 
@@ -250,11 +250,11 @@ void _25pacman_state::_25pacman_io_map(address_map &map)
 	map(0x80, 0x80).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x81, 0x81).w(FUNC(_25pacman_state::timer_pulse_w));        /* ??? pulsed by the timer irq */
 	map(0x82, 0x82).w(FUNC(_25pacman_state::irqack_w));
-//  AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
+//  map(0x84, 0x84).noprw(); /* ?? */
 	map(0x85, 0x86).writeonly().share("stars_seed");    /* stars: rng seed (lo/hi) */
 	map(0x87, 0x87).r(FUNC(_25pacman_state::_25pacman_io_87_r)); // not eeprom on this
 	map(0x87, 0x87).nopw();
-//  AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
+//  map(0x88, 0x88).w(FUNC(_25pacman_state::ram_bank_select_w));
 	map(0x89, 0x89).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x8a, 0x8a).writeonly().share("stars_ctrl");    /* stars: bits 3-4 = active set; bit 5 = enable */
 	map(0x8b, 0x8b).writeonly().share("flip");
@@ -400,7 +400,7 @@ WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
 void _20pacgal_state::_20pacgal(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, MAIN_CPU_CLOCK);
+	Z8S180(config, m_maincpu, MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_20pacgal_state::_20pacgal_map);
 	m_maincpu->set_addrmap(AS_IO, &_20pacgal_state::_20pacgal_io_map);
 

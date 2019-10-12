@@ -12,7 +12,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-20150-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-20150-t.ic1" size="524288" crc="5eebb20c" sha1="2230fcf87067c188c4c7229386873d3497e8aa65" offset="0" />
+				<rom name="mpr-20150-t.ic1" size="524288" crc="5eebb20c" sha1="2230fcf87067c188c4c7229386873d3497e8aa65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25,7 +25,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-19040" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-19040.ic1" size="524288" crc="0c9bae2f" sha1="bc5030fab99e8f4b1bcc8ed77c1cc07d8407df93" offset="0" />
+				<rom name="mpr-19040.ic1" size="524288" crc="0c9bae2f" sha1="bc5030fab99e8f4b1bcc8ed77c1cc07d8407df93"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40,7 +40,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-19042" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-19042.ic1" size="524288" crc="c2e06886" sha1="5b7a51c399ea508b23e24c3c9f240260a0933654" offset="0" />
+				<rom name="mpr-19042.ic1" size="524288" crc="c2e06886" sha1="5b7a51c399ea508b23e24c3c9f240260a0933654"/>
 			</dataarea>
 		</part>
 	</software>
@@ -55,7 +55,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-20788-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-20788-s.ic1" size="524288" crc="524b296b" sha1="7c8fe0e73a34bb0879c931d64493c5bb77d4d6d2" offset="0" />
+				<rom name="mpr-20788-s.ic1" size="524288" crc="524b296b" sha1="7c8fe0e73a34bb0879c931d64493c5bb77d4d6d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -70,7 +70,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-20789-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-20789-s.ic1" size="524288" crc="3f56c8d9" sha1="e7fbf4db85d35a51adab71f7a27a5915a64c1845" offset="0" />
+				<rom name="mpr-20789-s.ic1" size="524288" crc="3f56c8d9" sha1="e7fbf4db85d35a51adab71f7a27a5915a64c1845"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-19045" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-19045.ic1" size="524288" crc="8acd5a54" sha1="8d1e5358c5ff552437ec6fa9509879b7196e3e5b" offset="0" />
+				<rom name="mpr-19045.ic1" size="524288" crc="8acd5a54" sha1="8d1e5358c5ff552437ec6fa9509879b7196e3e5b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-19041" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-19041.ic1" size="524288" crc="ec924165" sha1="b25a5637c8cc1f2f6224595853d540195be86ec9" offset="0" />
+				<rom name="mpr-19041.ic1" size="524288" crc="ec924165" sha1="b25a5637c8cc1f2f6224595853d540195be86ec9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -113,7 +113,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-21836-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-21836-s.ic1" size="524288" crc="ea673a31" sha1="a7d48f6ffacda8b22febcc4fa30e766a92aa969e" offset="0" />
+				<rom name="mpr-21836-s.ic1" size="524288" crc="ea673a31" sha1="a7d48f6ffacda8b22febcc4fa30e766a92aa969e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -128,7 +128,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-20287-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-20287-t.ic1" size="524288" crc="047198f1" sha1="5e35321fc105d2597e309e880b03709e1a11c1d7" offset="0" />
+				<rom name="mpr-20287-t.ic1" size="524288" crc="047198f1" sha1="5e35321fc105d2597e309e880b03709e1a11c1d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -143,7 +143,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-20983-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-20983-s.ic1" size="524288" crc="035750ba" sha1="669a23458e7efa1fcbbb6ada555b6cba1c8425c9" offset="0" />
+				<rom name="mpr-20983-s.ic1" size="524288" crc="035750ba" sha1="669a23458e7efa1fcbbb6ada555b6cba1c8425c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +156,7 @@
 			<feature name="pcb" value="171-7323A" />
 			<feature name="ic1" value="MPR-19828-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-19828-t.ic1" size="524288" crc="57988dc7" sha1="438a35b2a46ec82b5e31478d9e244928f98891ab" offset="0" />
+				<rom name="mpr-19828-t.ic1" size="524288" crc="57988dc7" sha1="438a35b2a46ec82b5e31478d9e244928f98891ab"/>
 			</dataarea>
 		</part>
 	</software>

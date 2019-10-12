@@ -88,7 +88,7 @@ void mz6500_state::mz6500_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x9ffff).ram();
-//  AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
+//  map(0xa0000,0xbffff) kanji/dictionary ROM
 	map(0xc0000, 0xeffff).rw(FUNC(mz6500_state::mz6500_vram_r), FUNC(mz6500_state::mz6500_vram_w));
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
@@ -96,27 +96,27 @@ void mz6500_state::mz6500_map(address_map &map)
 void mz6500_state::mz6500_io(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x0000, 0x000f) i8237 dma
-//  AM_RANGE(0x0010, 0x001f) i8255
+//  map(0x0000, 0x000f) i8237 dma
+//  map(0x0010, 0x001f) i8255
 	map(0x0020, 0x0021).mirror(0xe).m(m_fdc, FUNC(upd765a_device::map));
-//  AM_RANGE(0x0030, 0x003f) i8259 master
-//  AM_RANGE(0x0040, 0x004f) i8259 slave
-//  AM_RANGE(0x0050, 0x0050) segment byte for DMA
-//  AM_RANGE(0x0060, 0x0060) system port A
-//  AM_RANGE(0x0070, 0x0070) system port C
-//  AM_RANGE(0x00cd, 0x00cd) MZ-1R32
+//  map(0x0030, 0x003f) i8259 master
+//  map(0x0040, 0x004f) i8259 slave
+//  map(0x0050, 0x0050) segment byte for DMA
+//  map(0x0060, 0x0060) system port A
+//  map(0x0070, 0x0070) system port C
+//  map(0x00cd, 0x00cd) MZ-1R32
 	map(0x0100, 0x0103).mirror(0xc).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x0110, 0x011f) video address / data registers (priority)
-//  AM_RANGE(0x0120, 0x012f) video registers
-//  AM_RANGE(0x0130, 0x013f) video register
-//  AM_RANGE(0x0140, 0x015f) palette pens
-//  AM_RANGE(0x0200, 0x020f) z80sio
-//  AM_RANGE(0x0210, 0x021f) z80ctc
-//  AM_RANGE(0x0220, 0x022f) rp5c01
-//  AM_RANGE(0x0230, 0x023f) ay-3-8912
-//  AM_RANGE(0x0240, 0x0240) z80ctc vector ack
-//  AM_RANGE(0x0250, 0x0250) z80sio vector ack
-//  AM_RANGE(0x0270, 0x0270) system port B
+//  map(0x0110, 0x011f) video address / data registers (priority)
+//  map(0x0120, 0x012f) video registers
+//  map(0x0130, 0x013f) video register
+//  map(0x0140, 0x015f) palette pens
+//  map(0x0200, 0x020f) z80sio
+//  map(0x0210, 0x021f) z80ctc
+//  map(0x0220, 0x022f) rp5c01
+//  map(0x0230, 0x023f) ay-3-8912
+//  map(0x0240, 0x0240) z80ctc vector ack
+//  map(0x0250, 0x0250) z80sio vector ack
+//  map(0x0270, 0x0270) system port B
 }
 
 /* Input ports */

@@ -11,7 +11,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="88693">
-				<rom name="130s21204_820_diag.imd" size="88693" crc="3aa8d976" sha1="fefc7d187d7ef149cd418e7ad68231da38dcd810" offset="0" />
+				<rom name="130s21204_820_diag.imd" size="88693" crc="3aa8d976" sha1="fefc7d187d7ef149cd418e7ad68231da38dcd810"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24,7 +24,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="88296">
-				<rom name="130s22100ds_cpmrev3.imd" size="88296" crc="43df2729" sha1="07c1c64984aedb9a8011c80625d9ef4aeedaa753" offset="0" />
+				<rom name="130s22100ds_cpmrev3.imd" size="88296" crc="43df2729" sha1="07c1c64984aedb9a8011c80625d9ef4aeedaa753"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37,19 +37,19 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="72026">
-				<rom name="analyst-1.imd" size="72026" crc="776ad4d8" sha1="04c3bb656aaded600400273da8c61285714739de" offset="0" />
+				<rom name="analyst-1.imd" size="72026" crc="776ad4d8" sha1="04c3bb656aaded600400273da8c61285714739de"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="74566">
-				<rom name="analyst-2.imd" size="74566" crc="7ea3f1dd" sha1="bea4e68362259bc84d34f5681d0d1293460ab9d6" offset="0" />
+				<rom name="analyst-2.imd" size="74566" crc="7ea3f1dd" sha1="bea4e68362259bc84d34f5681d0d1293460ab9d6"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="73169">
-				<rom name="analyst-3.imd" size="73169" crc="fe6f3be4" sha1="f60baec7ef8c08a0ed5b255442c1760a7557848c" offset="0" />
+				<rom name="analyst-3.imd" size="73169" crc="fe6f3be4" sha1="f60baec7ef8c08a0ed5b255442c1760a7557848c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,7 +62,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="46623">
-				<rom name="basic.imd" size="46623" crc="fb89cb9f" sha1="04a3b6755f961f086c506cdd3834badd0193799a" offset="0" />
+				<rom name="basic.imd" size="46623" crc="fb89cb9f" sha1="04a3b6755f961f086c506cdd3834badd0193799a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,14 +75,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Plus2 System Disk"/>
 			<dataarea name="flop" size="250062">
-				<rom name="plus2_system.imd" size="250062" crc="21751e40" sha1="6db8c75fc9c81b00f94bf33ae07f398cba156275" offset="0" />
+				<rom name="plus2_system.imd" size="250062" crc="21751e40" sha1="6db8c75fc9c81b00f94bf33ae07f398cba156275"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Plus2 Utilities"/>
 			<dataarea name="flop" size="61787">
-				<rom name="plus2_2_2-20-86.imd" size="61787" crc="2ed82c22" sha1="e2cd99324100de83c8b02276b34399f8a87b22ee" offset="0" />
+				<rom name="plus2_2_2-20-86.imd" size="61787" crc="2ed82c22" sha1="e2cd99324100de83c8b02276b34399f8a87b22ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,21 +95,21 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Plus2 Master Disk"/>
 			<dataarea name="flop" size="251088">
-				<rom name="plus2master.imd" size="251088" crc="30ca0981" sha1="30bc6e16df2de33d05cbd4470db0d2970677e205" offset="0" />
+				<rom name="plus2master.imd" size="251088" crc="30ca0981" sha1="30bc6e16df2de33d05cbd4470db0d2970677e205"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Plus2 System Disk"/>
 			<dataarea name="flop" size="250070">
-				<rom name="plus2_sy.imd" size="250070" crc="36d7c537" sha1="f32b0f57c799d2b2160f193accbd3a8dea8aedf8" offset="0" />
+				<rom name="plus2_sy.imd" size="250070" crc="36d7c537" sha1="f32b0f57c799d2b2160f193accbd3a8dea8aedf8"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Plus2 Utilities"/>
 			<dataarea name="flop" size="77662">
-				<rom name="plus2_22.imd" size="77662" crc="a9e01892" sha1="4a74d58ae181646ce83d832c888f4fbaf57dceff" offset="0" />
+				<rom name="plus2_22.imd" size="77662" crc="a9e01892" sha1="4a74d58ae181646ce83d832c888f4fbaf57dceff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="52980">
-				<rom name="programs.imd" size="52980" crc="3ce24c18" sha1="ed982100597da2bc86ce4fddf0fbd5f916f1e2ed" offset="0" />
+				<rom name="programs.imd" size="52980" crc="3ce24c18" sha1="ed982100597da2bc86ce4fddf0fbd5f916f1e2ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -135,7 +135,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="64023">
-				<rom name="supercalc.imd" size="64023" crc="bb0ab2d0" sha1="1695bcff2630eca6471205c2a0b86f149aaf655e" offset="0" />
+				<rom name="supercalc.imd" size="64023" crc="bb0ab2d0" sha1="1695bcff2630eca6471205c2a0b86f149aaf655e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="4974">
-				<rom name="training.imd" size="4974" crc="16d74242" sha1="763370d554ba9f9e9bef76b81a81550f92209a24" offset="0" />
+				<rom name="training.imd" size="4974" crc="16d74242" sha1="763370d554ba9f9e9bef76b81a81550f92209a24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -161,7 +161,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="87907">
-				<rom name="wordproc.imd" size="87907" crc="69f933d6" sha1="6b6c75133b9271d6977b98dbb811fa4635093d94" offset="0" />
+				<rom name="wordproc.imd" size="87907" crc="69f933d6" sha1="6b6c75133b9271d6977b98dbb811fa4635093d94"/>
 			</dataarea>
 		</part>
 	</software>

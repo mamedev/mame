@@ -162,9 +162,9 @@ void gameking_state::gameking_mem(address_map &map)
 
 	map(0x0600, 0x077f).rw(FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
 	map(0x0d00, 0x0fff).ram(); // d00, e00, f00 prooved on handheld
-//  AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
+//  map(0x1000, 0x1fff).ram();    // sthero writes to $19xx
 
-//  AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank3000")
+//  map(0x3000, 0x3fff).bankr("bank3000");
 	map(0x4000, 0x7fff).bankr("bank4000");
 	map(0x8000, 0xffaf).bankr("bank8000");
 	map(0xffb0, 0xffff).bankr("bankboot"); // cpu seems to read from 8000 bank, and for exceptions ignore bank

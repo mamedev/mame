@@ -605,7 +605,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 
 		default:
-			assert_always(false, "Unknown id in segaorun_state::device_timer");
+			throw emu_fatalerror("Unknown id in segaorun_state::device_timer");
 	}
 }
 

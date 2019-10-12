@@ -10,7 +10,7 @@
 
 #include "pconfig.h"
 
-//#include <cstdint>
+#include <cstdint> // uintptr_t
 #include <utility>
 
 /*
@@ -69,11 +69,11 @@ namespace plib {
 		using generic_function = void (*)();
 
 		template<typename MemberFunctionType>
-		mfp(MemberFunctionType mftp) // NOLINT(cppcoreguidelines-pro-type-member-init)
-
-		: m_function(0), m_this_delta(0), m_size(sizeof(mfp))
+		mfp(MemberFunctionType mftp)
+		: m_function(0), m_this_delta(0), m_dummy1(0), m_dummy2(0), m_size(sizeof(mfp))
 		{
-			*reinterpret_cast<MemberFunctionType *>(this) = mftp;
+			*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
+			// NOLINTNEXTLINE(clang-analyzer-optin.cplusplus.UninitializedObject)
 		}
 
 		template<typename MemberFunctionType, typename FunctionType, typename ObjectType>

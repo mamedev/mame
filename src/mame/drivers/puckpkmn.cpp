@@ -229,11 +229,11 @@ void md_boot_state::puckpkmn_map(address_map &map)
 
 	/* Unknown reads/writes: */
 	map(0xa00000, 0xa00551).nopw();                            /* ? */
-//  AM_RANGE(0xa10000, 0xa10001) AM_READNOP                                             /* ? once */
+//  map(0xa10000, 0xa10001).nopr();                                             /* ? once */
 	map(0xa10002, 0xa10005).noprw();                             /* ? alternative way of reading inputs ? */
 	map(0xa11100, 0xa11101).noprw();                             /* ? */
-//  AM_RANGE(0xa10008, 0xa1000d) AM_WRITENOP                                            /* ? once */
-//  AM_RANGE(0xa14000, 0xa14003) AM_WRITENOP                                            /* ? once */
+//  map(0xa10008, 0xa1000d).nopw();                                            /* ? once */
+//  map(0xa14000, 0xa14003).nopw();                                            /* ? once */
 	map(0xa11200, 0xa11201).nopw();                            /* ? */
 }
 

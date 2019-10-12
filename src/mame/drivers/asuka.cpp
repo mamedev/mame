@@ -243,7 +243,7 @@ void asuka_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(5, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in asuka_state::device_timer");
+		throw emu_fatalerror("Unknown id in asuka_state::device_timer");
 	}
 }
 
@@ -933,7 +933,7 @@ void asuka_state::cadash(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2);  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_z80_map);
 
-	z180_device &subcpu(Z180(config, "subcpu", XTAL(8'000'000)));   /* 8MHz HD64180RP8 Z180 */
+	z180_device &subcpu(HD64180RP(config, "subcpu", XTAL(8'000'000)));   /* 8MHz HD64180RP8 Z180 */
 	subcpu.set_addrmap(AS_PROGRAM, &asuka_state::cadash_sub_map);
 	subcpu.set_addrmap(AS_IO, &asuka_state::cadash_sub_io);
 

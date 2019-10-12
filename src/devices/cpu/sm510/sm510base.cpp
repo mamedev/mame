@@ -217,7 +217,7 @@ void sm510_base_device::init_lcd_driver()
 {
 	// note: in reality, this timer runs at high frequency off the main divider, strobing one segment at a time
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::lcd_timer_cb), this));
-	attotime period = attotime::from_ticks(0x200, unscaled_clock()); // 64hz default
+	attotime period = attotime::from_ticks(0x20, unscaled_clock()); // default 1kHz
 	m_lcd_timer->adjust(period, 0, period);
 }
 

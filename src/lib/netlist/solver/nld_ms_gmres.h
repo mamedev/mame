@@ -36,9 +36,9 @@ namespace devices
 		 * This is already preconditioning.
 		 */
 		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
-			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
-			//, m_ops(size, 2)
-			, m_ops(size, 4)
+			// matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
+				: matrix_solver_direct_t<FT, SIZE>(anetlist, name, params, size)
+			, m_ops(size, 0)
 			, m_gmres(size)
 			{
 			}
@@ -50,7 +50,9 @@ namespace devices
 
 		using mattype = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
 
+		//plib::mat_precondition_none<FT, SIZE> m_ops;
 		plib::mat_precondition_ILU<FT, SIZE> m_ops;
+		//plib::mat_precondition_diag<FT, SIZE> m_ops;
 		plib::gmres_t<FT, SIZE> m_gmres;
 	};
 
@@ -78,6 +80,7 @@ namespace devices
 		}
 
 		m_ops.build(fill);
+		this->log_fill(fill, m_ops.m_mat);
 
 		/* build pointers into the compressed row format matrix for each terminal */
 
@@ -105,7 +108,6 @@ namespace devices
 		const std::size_t iN = this->size();
 
 		plib::parray<FT, SIZE> RHS(iN);
-		//float_type new_V[storage_N];
 
 		m_ops.m_mat.set_scalar(0.0);
 
@@ -114,12 +116,12 @@ namespace devices
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			this->m_new_V[k] = this->m_nets[k]->Q_Analog();
+			this->m_new_V[k] = this->m_terms[k]->getV();
 		}
 
 		const float_type accuracy = this->m_params.m_accuracy;
 
-		auto iter = std::max(plib::constants<std::size_t>::one(), this->m_params.m_gs_loops);
+		auto iter = std::max(plib::constants<std::size_t>::one(), this->m_params.m_gs_loops());
 		auto gsl = m_gmres.solve(m_ops, this->m_new_V, RHS, iter, accuracy);
 
 		this->m_iterative_total += gsl;

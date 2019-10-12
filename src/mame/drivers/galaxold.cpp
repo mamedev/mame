@@ -303,8 +303,8 @@ void galaxold_state::ckongmc_map(address_map &map)
 	map(0x9880, 0x98ff).ram();
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa002).w(FUNC(galaxold_state::galaxold_leds_w));                                              /* GUESS */
-//  AM_RANGE(0xa002, 0xa002) AM_WRITE(galaxold_coin_lockout_w)                                      /* not written */
-//  AM_RANGE(0xa003, 0xa003) AM_WRITE(galaxold_coin_counter_w)                                      /* not written */
+//  map(0xa002, 0xa002).w(FUNC(galaxold_state::galaxold_coin_lockout_w));                                      /* not written */
+//  map(0xa003, 0xa003).w(FUNC(galaxold_state::galaxold_coin_counter_w));                                      /* not written */
 	map(0xa004, 0xa007).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));                            /* GUESS */
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xa800, 0xa802).w("cust", FUNC(galaxian_sound_device::background_enable_w));                   /* GUESS */
@@ -313,7 +313,7 @@ void galaxold_state::ckongmc_map(address_map &map)
 	map(0xa806, 0xa807).w("cust", FUNC(galaxian_sound_device::vol_w));                                 /* GUESS */
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb001, 0xb001).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-	map(0xb004, 0xb004).nopw();                                                            /* AM_WRITE(galaxold_stars_enable_w) */
+	map(0xb004, 0xb004).nopw();                                                            /* .w(FUNC(galaxold_state::galaxold_stars_enable_w)); */
 	map(0xb006, 0xb006).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));                                     /* GUESS */
 	map(0xb007, 0xb007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));                                     /* GUESS */
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("cust", FUNC(galaxian_sound_device::pitch_w));     /* GUESS */
@@ -422,7 +422,7 @@ void galaxold_state::scrambler_map(address_map &map)
 	map(0x6805, 0x6805).w("cust", FUNC(galaxian_sound_device::fire_enable_w));
 	map(0x6806, 0x6807).w("cust", FUNC(galaxian_sound_device::vol_w));
 	map(0x7000, 0x7000).portr("IN2").w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-//  AM_RANGE(0x7001, 0x7001)
+//  map(0x7001, 0x7001)
 	map(0x7002, 0x7002).w(FUNC(galaxold_state::galaxold_coin_counter_w));
 	map(0x7003, 0x7003).w(FUNC(galaxold_state::scrambold_background_enable_w));
 	map(0x7004, 0x7004).w(FUNC(galaxold_state::galaxold_stars_enable_w));
@@ -430,7 +430,7 @@ void galaxold_state::scrambler_map(address_map &map)
 	map(0x7007, 0x7007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
 	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x7800, 0x7800).w("cust", FUNC(galaxian_sound_device::pitch_w));
-//  AM_RANGE(0x8102, 0x8102) AM_READ(scramblb_protection_1_r)
+//  map(0x8102, 0x8102).r(FUNC(galaxold_state::scramblb_protection_1_r));
 	map(0x8202, 0x8202).r(FUNC(galaxold_state::scrambler_protection_2_r));
 }
 
@@ -491,12 +491,12 @@ void galaxold_state::_4in1_map(address_map &map)
 	map(0x5880, 0x58ff).ram();
 	map(0x6000, 0x6000).portr("IN0");
 	map(0x6000, 0x6001).w(FUNC(galaxold_state::galaxold_leds_w));
-//  AM_RANGE(0x6002, 0x6002) AM_WRITE(galaxold_coin_lockout_w)
+//  map(0x6002, 0x6002).w(FUNC(galaxold_state::galaxold_coin_lockout_w));
 	map(0x6003, 0x6003).w(FUNC(galaxold_state::galaxold_coin_counter_w));
 	map(0x6004, 0x6007).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
 	map(0x6800, 0x6800).portr("IN1");
 	map(0x6800, 0x6802).w("cust", FUNC(galaxian_sound_device::background_enable_w));
-//  AM_RANGE(0x6803, 0x6803) AM_WRITE(galaxian_noise_enable_w) /* not hooked up? */
+//  map(0x6803, 0x6803).w(FUNC(galaxold_state::galaxian_noise_enable_w)); /* not hooked up? */
 	map(0x6805, 0x6805).w("cust", FUNC(galaxian_sound_device::fire_enable_w));
 	map(0x6806, 0x6807).w("cust", FUNC(galaxian_sound_device::vol_w));
 	map(0x7000, 0x7000).portr("DSW0");
@@ -545,16 +545,16 @@ void galaxold_state::dkongjrm_map(address_map &map)
 	map(0x98c0, 0x98ff).writeonly().share("spriteram2");
 	map(0xa000, 0xa0ff).portr("IN0");
 	map(0xa003, 0xa003).w(FUNC(galaxold_state::galaxold_coin_counter_w));
-	//AM_RANGE(0xa004, 0xa007) AM_WRITE(galaxian_lfo_freq_w)
+	//map(0xa004, 0xa007).w(FUNC(galaxold_state::galaxian_lfo_freq_w));
 	map(0xa800, 0xa8ff).portr("IN1");
 	map(0xa800, 0xa802).w("cust", FUNC(galaxian_sound_device::background_enable_w));
 	map(0xa803, 0xa803).w("cust", FUNC(galaxian_sound_device::noise_enable_w));
-	//AM_RANGE(0xa805, 0xa805) AM_WRITE(galaxian)
+	//map(0xa805, 0xa805).w(FUNC(galaxold_state::galaxian));
 	map(0xa806, 0xa807).w("cust", FUNC(galaxian_sound_device::vol_w));
 	map(0xb000, 0xb0ff).portr("DSW");
 	map(0xb000, 0xb000).w(FUNC(galaxold_state::galaxold_gfxbank_w));
 	map(0xb001, 0xb001).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-	//AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_stars_enable_w)
+	//map(0xb004, 0xb004).w(FUNC(galaxold_state::galaxold_stars_enable_w));
 	map(0xb006, 0xb006).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
 	map(0xb007, 0xb007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("cust", FUNC(galaxian_sound_device::pitch_w));
@@ -768,8 +768,8 @@ void galaxold_state::racknrol_map(address_map &map)
 	map(0x1606, 0x1606).mirror(0x6000).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
 	map(0x1607, 0x1607).mirror(0x6000).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
 	map(0x1680, 0x1680).mirror(0x6000).nopr();
-//  AM_RANGE(0x1700, 0x1700) AM_MIRROR(0x6000) AM_READ(trvchlng_question_r)
-//  AM_RANGE(0x1701, 0x1703) AM_MIRROR(0x6000) AM_READ(trvchlng_question_w)
+//  map(0x1700, 0x1700).mirror(0x6000).r(FUNC(galaxold_state::trvchlng_question_r));
+//  map(0x1701, 0x1703).mirror(0x6000).w(FUNC(galaxold_state::trvchlng_question_w));
 	map(0x1800, 0x1bff).mirror(0x6000).w(FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x2fff).rom();
@@ -780,8 +780,8 @@ void galaxold_state::racknrol_map(address_map &map)
 void galaxold_state::racknrol_io(address_map &map)
 {
 	map(0x1d, 0x1d).w("snsnd", FUNC(sn76489a_device::write));
-//  AM_RANGE(0x1e, 0x1e) AM_WRITENOP
-//  AM_RANGE(0x1f, 0x1f) AM_WRITENOP
+//  map(0x1e, 0x1e).nopw();
+//  map(0x1f, 0x1f).nopw();
 	map(0x20, 0x3f).w(FUNC(galaxold_state::racknrol_tiles_bank_w)).share("racknrol_tbank");
 }
 
@@ -2518,7 +2518,7 @@ void galaxold_state::drivfrcg(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &galaxold_state::drivfrcg_program);
 	maincpu.set_addrmap(AS_IO, &galaxold_state::drivfrcg_io);
 	maincpu.set_vblank_int("screen", FUNC(galaxold_state::hunchbks_vh_interrupt));
-	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
+	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank)); // ???
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

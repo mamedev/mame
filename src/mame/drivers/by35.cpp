@@ -236,13 +236,13 @@ void by35_state::by35_map(address_map &map)
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0200, 0x02ff).ram().rw(FUNC(by35_state::nibble_nvram_r), FUNC(by35_state::nibble_nvram_w)).share("nvram");
-	map(0x1000, 0x7fff).rom(); // AM_REGION("roms", 0 )
+	map(0x1000, 0x7fff).rom(); // .region("roms", 0 );
 }
 
 void by35_state::nuovo_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
-//  AM_RANGE(0x0000, 0x007f) AM_RAM     // Schematics infer that the M6802 internal RAM is disabled.
+//  map(0x0000, 0x007f).ram();     // Schematics infer that the M6802 internal RAM is disabled.
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0xffff).rom();

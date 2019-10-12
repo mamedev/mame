@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="orion_cart">
 			<dataarea name="rom" size="56736">
-				<rom name="romdisk.bin" size="56736" crc="852b143d" sha1="ff9942c3396ef17d4c6e979f77ef291c690b3547" offset="0" />
+				<rom name="romdisk.bin" size="56736" crc="852b143d" sha1="ff9942c3396ef17d4c6e979f77ef291c690b3547"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="orion_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="ordos403.bin" size="2048" crc="57ff308a" sha1="8cb33f4b3ce9918d16fdbcd27cd3228938a82915" offset="0" />
+				<rom name="ordos403.bin" size="2048" crc="57ff308a" sha1="8cb33f4b3ce9918d16fdbcd27cd3228938a82915"/>
 			</dataarea>
 		</part>
 	</software>

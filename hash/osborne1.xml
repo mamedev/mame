@@ -9,7 +9,7 @@
 		<publisher>MicroCALL Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="40392">
-				<rom name="os1mcal.td0" size="40392" crc="ee61a8e9" sha1="1ad5d000e1865ebf7118cbd2fbeee581b3ad226f" offset="0" />
+				<rom name="os1mcal.td0" size="40392" crc="ee61a8e9" sha1="1ad5d000e1865ebf7118cbd2fbeee581b3ad226f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23,7 +23,7 @@
 			<feature name="disk_serial" value="1113" />
 			<feature name="part_number" value="2B50002-00" />
 			<dataarea name="flop" size="71587">
-				<rom name="amcall.imd" size="71587" crc="9f767e1d" sha1="aef5a9496312f2380d3f8b8bec22bb07fe51c76b" offset="0" />
+				<rom name="amcall.imd" size="71587" crc="9f767e1d" sha1="aef5a9496312f2380d3f8b8bec22bb07fe51c76b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36,7 +36,7 @@
 			<feature name="part_number" value="162880" />
 			<feature name="disk_label" value="Loader &amp; Archive" />
 			<dataarea name="flop" size="78223">
-				<rom name="drive_c.imd" size="78223" crc="eb70fcef" sha1="f3b743f61c6e84a6f970d63ca4a9f614df03d9d6" offset="0" />
+				<rom name="drive_c.imd" size="78223" crc="eb70fcef" sha1="f3b743f61c6e84a6f970d63ca4a9f614df03d9d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51,13 +51,13 @@
 			<feature name="part_number" value="2G011501-00" />
 			<feature name="disk_label" value="Milestone (tm)" />
 			<dataarea name="flop" size="91489">
-				<rom name="milst-1.imd" size="91489" crc="e10e14e6" sha1="f6145ae7b1289a9d8b0f9353b97a98964f557c85" offset="0" />
+				<rom name="milst-1.imd" size="91489" crc="e10e14e6" sha1="f6145ae7b1289a9d8b0f9353b97a98964f557c85"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Sample Data Files" />
 			<dataarea name="flop" size="16021">
-				<rom name="milstn-2.imd" size="16021" crc="0c20006d" sha1="0666ad4b1e29d473bc95b19b7566f3dd5ce67e64" offset="0" />
+				<rom name="milstn-2.imd" size="16021" crc="0c20006d" sha1="0666ad4b1e29d473bc95b19b7566f3dd5ce67e64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -70,7 +70,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_label" value="Drive Diagnostic Program" />
 			<dataarea name="flop" size="35037">
-				<rom name="intgr.imd" size="35037" crc="36969e37" sha1="05bd4022495cd19babbd935456aed71d9afc1bdd" offset="0" />
+				<rom name="intgr.imd" size="35037" crc="36969e37" sha1="05bd4022495cd19babbd935456aed71d9afc1bdd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +83,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="000835" />
 			<dataarea name="flop" size="6835">
-				<rom name="microlnk.imd" size="6835" crc="1115ea79" sha1="8c3895dbda2010065713a44acf6a5b8ba3db7d5a" offset="0" />
+				<rom name="microlnk.imd" size="6835" crc="1115ea79" sha1="8c3895dbda2010065713a44acf6a5b8ba3db7d5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -94,7 +94,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="85196">
-				<rom name="diag_2.04.imd" size="85196" crc="666ceb5e" sha1="c4e8d74ac67e38df3e9112114955331dd03f50ac" offset="0" />
+				<rom name="diag_2.04.imd" size="85196" crc="666ceb5e" sha1="c4e8d74ac67e38df3e9112114955331dd03f50ac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@
 		<info name="usage" value="Requires CP/M disk in drive A"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="46760">
-				<rom name="os1dias.td0" size="46760" crc="04b4bec8" sha1="d764df88e9f18ca67823f41797bd536e2d4cc606" offset="0" />
+				<rom name="os1dias.td0" size="46760" crc="04b4bec8" sha1="d764df88e9f18ca67823f41797bd536e2d4cc606"/>
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="26436">
-				<rom name="occ1_diag_2.1.imd" size="26436" crc="5bbc80d5" sha1="0e481b668e689ad47910f7e90b1371a416954758" offset="0" />
+				<rom name="occ1_diag_2.1.imd" size="26436" crc="5bbc80d5" sha1="0e481b668e689ad47910f7e90b1371a416954758"/>
 			</dataarea>
 		</part>
 	</software>
@@ -128,7 +128,7 @@
 		<publisher>Australian Computer &amp; Telecommunications</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89702">
-				<rom name="occ1_harddisk.imd" size="89702" crc="25d9be14" sha1="709dac1ab239d9ff46b1692b6d4847191a066a20" offset="0" />
+				<rom name="occ1_harddisk.imd" size="89702" crc="25d9be14" sha1="709dac1ab239d9ff46b1692b6d4847191a066a20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,7 +140,7 @@
 		<info name="release" value="19810529"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="57070">
-				<rom name="os1basic.td0" size="57070" crc="8d84da83" sha1="44ba697241dbdf9e1bbb7e93e37bf0c4ac34fe30" offset="0" />
+				<rom name="os1basic.td0" size="57070" crc="8d84da83" sha1="44ba697241dbdf9e1bbb7e93e37bf0c4ac34fe30"/>
 			</dataarea>
 		</part>
 	</software>
@@ -152,7 +152,7 @@
 		<info name="release" value="19820106"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="56706">
-				<rom name="os1dbase.td0" size="56706" crc="1266f67c" sha1="641c271af3681a00e7a2750e20d7fabcaa5adb9f" offset="0" />
+				<rom name="os1dbase.td0" size="56706" crc="1266f67c" sha1="641c271af3681a00e7a2750e20d7fabcaa5adb9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -164,7 +164,7 @@
 		<info name="programmer" value="Irvin M. Hoff"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="46928">
-				<rom name="os1mdm7.td0" size="46928" crc="2a6383d2" sha1="bf31f5cf2852744f661d20a8f7c6b57993b7c9b6" offset="0" />
+				<rom name="os1mdm7.td0" size="46928" crc="2a6383d2" sha1="bf31f5cf2852744f661d20a8f7c6b57993b7c9b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -175,7 +175,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="49640">
-				<rom name="os1syss.td0" size="49640" crc="47fcb5a7" sha1="287c56f0083303768eea526c98a098b04f0749be" offset="0" />
+				<rom name="os1syss.td0" size="49640" crc="47fcb5a7" sha1="287c56f0083303768eea526c98a098b04f0749be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="57670">
-				<rom name="os1sysd.td0" size="57670" crc="8b67b9cc" sha1="ab49f0ed731e197940b46bf79c6536a9f622d3bb" offset="0" />
+				<rom name="os1sysd.td0" size="57670" crc="8b67b9cc" sha1="ab49f0ed731e197940b46bf79c6536a9f622d3bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55960">
-				<rom name="os1utils.td0" size="55960" crc="65fc65e4" sha1="92c19e0e53917c4d5efc28bfd5fc30c7be0cbec5" offset="0" />
+				<rom name="os1utils.td0" size="55960" crc="65fc65e4" sha1="92c19e0e53917c4d5efc28bfd5fc30c7be0cbec5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -209,7 +209,7 @@
 		<info name="usage" value="Requires CP/M disk in drive A"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="35382">
-				<rom name="os1xutls.td0" size="35382" crc="630d7091" sha1="a8bc164cf8cb4f5fba49422ac10447ecacbb60dd" offset="0" />
+				<rom name="os1xutls.td0" size="35382" crc="630d7091" sha1="a8bc164cf8cb4f5fba49422ac10447ecacbb60dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -220,7 +220,7 @@
 		<publisher>Micropro International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="62774">
-				<rom name="os1wrdst.td0" size="62774" crc="147a38ba" sha1="8b4a7475febec0517fae459bd37926257eaff2f7" offset="0" />
+				<rom name="os1wrdst.td0" size="62774" crc="147a38ba" sha1="8b4a7475febec0517fae459bd37926257eaff2f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -231,7 +231,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="7218">
-				<rom name="os1blank.td0" size="7218" crc="1bddbfb4" sha1="f721ad6d307f8f22f229ae9345a56269d44a0c76" offset="0" />
+				<rom name="os1blank.td0" size="7218" crc="1bddbfb4" sha1="f721ad6d307f8f22f229ae9345a56269d44a0c76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -248,7 +248,7 @@
 			<feature name="disk_serial" value="1690" />
 			<feature name="disk_label" value="Osmosis CP/M Disk Emulation System for the Osborne 1 Microcomputer" />
 			<dataarea name="flop" size="3154">
-				<rom name="osmo-emu.td0" size="3154" crc="5040c443" sha1="49fc78621b7a9356ebe9ed88fe8ceb1dd9befdbf" offset="0" />
+				<rom name="osmo-emu.td0" size="3154" crc="5040c443" sha1="49fc78621b7a9356ebe9ed88fe8ceb1dd9befdbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -263,7 +263,7 @@
 			<feature name="disk_serial" value="2121" />
 			<feature name="disk_label" value="Double Density Distribution" />
 			<dataarea name="flop" size="834">
-				<rom name="osmos-dd.td0" size="834" crc="8b47a452" sha1="1a4746512678b498dce28f28f96396ba31043ccc" offset="0" />
+				<rom name="osmos-dd.td0" size="834" crc="8b47a452" sha1="1a4746512678b498dce28f28f96396ba31043ccc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -275,7 +275,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_label" value="RT-60A Software" />
 			<dataarea name="flop" size="13793">
-				<rom name="rt-60a.td0" size="13793" crc="241b2497" sha1="1385701061152202db14550f1aad6cd4b190286f" offset="0" />
+				<rom name="rt-60a.td0" size="13793" crc="241b2497" sha1="1385701061152202db14550f1aad6cd4b190286f"/>
 			</dataarea>
 		</part>
 	</software>

@@ -2026,10 +2026,11 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 				m_texhash[i] = texture;
 				break;
 			}
-		assert_always(i < HASH_SIZE + OVERFLOW_SIZE, "texture hash exhausted ...");
+		if ((HASH_SIZE + OVERFLOW_SIZE) <= i)
+			throw emu_fatalerror("renderer_ogl::texture_create: texture hash exhausted ...");
 	}
 
-	if(m_usevbo)
+	if (m_usevbo)
 	{
 		// Generate And Bind The Texture Coordinate Buffer
 		pfn_glGenBuffers( 1, &(texture->texCoordBufferName) );

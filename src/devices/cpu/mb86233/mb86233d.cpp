@@ -311,7 +311,7 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			break;
 
 		case 1:
-			util::stream_format(stream, "mov {1} %s, %s (e)", memory(r1, false, false), memory(r2, true, false));
+			util::stream_format(stream, "mov %s, %s (e)", memory(r1, false, false), memory(r2, true, false));
 			break;
 
 		case 2:

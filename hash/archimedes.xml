@@ -4,8 +4,8 @@
 <softwarelist name="archimedes" description="Acorn Archimedes floppy images">
 
 <!-- Notes of interest -->
-<!-- 
- - "Missing SWI $401c0" means that it needs RISCOS 3.10 
+<!--
+ - "Missing SWI $401c0" means that it needs RISCOS 3.10
 -->
 
 <!-- Games -->
@@ -494,7 +494,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- boot OK -->
 	<software name="bigbang" supported="yes">
 		<description>Big Bang</description>
@@ -1351,7 +1351,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- "Disc error", launcher has no icon? --> 
+	<!-- "Disc error", launcher has no icon? -->
 	<software name="ftt" supported="no">
 		<description>FTT</description>
 		<year>1994</year>
@@ -1638,9 +1638,9 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK but abuses of raster effects on menus, has trainer -->
-	<software name="jksquash" supported="no">
-		<description>Jahangir Khan Squash</description>
+	<!-- boot OK, raster effect bug on title screen, long loading screen with black afterwards?, entering player name has stuck keys, has trainer -->
+	<software name="jksquash" supported="partial">
+		<description>Jahangir Khan's World Championship Squash</description>
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1821,7 +1821,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Mouse cursor autocenters too much especially on A5000 class machine, raster effect is off on gameplay screen -->
+	<!-- Mouse cursor autocenters too much especially on A5000 class machine, raster effect bug on gameplay screen -->
 	<software name="lemmings2" supported="partial">
 		<description>Lemmings 2: The Tribes</description>
 		<year>1994</year>
@@ -1853,7 +1853,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK, has raster effect bugs on gameplay -->
+	<!-- boot OK, has raster effect bugs on gameplay (2p is even worse), sometimes inputs forgets being hit -->
 	<software name="lotustc2" supported="partial">
 		<description>Lotus Turbo Challenge 2</description>
 		<year>1992</year>
@@ -1952,7 +1952,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK, incorrectly trips raster effect on top of screen -->
+	<!-- boot OK, raster effect scroll & color bugs during gameplay, has CPU/RAM detection display after title screen -->
 	<software name="manchutd" supported="partial">
 		<description>Manchester United Europe</description>
 		<year>1991</year>
@@ -2044,7 +2044,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK, has raster effect issues -->
+	<!-- boot OK, has raster effect bugs on title/gameplay -->
 	<software name="nebulus" supported="partial">
 		<description>Nebulus</description>
 		<year>1992</year>
@@ -2359,7 +2359,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- reports 0 bytes of applications workspace, title screen is blackened, gameplay has flickering vertical scroll (mid-frame raster?) -->
 	<software name="quazer" supported="no">
 		<description>Quazer (v2.00)</description>
@@ -2443,7 +2443,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK but flickers like mad due of incorrect raster effects --> 
+	<!-- boot OK but flickers like mad due of incorrect raster effects, also seems very slow with timing on gameplay even on A5000 class machine -->
 	<software name="rotoros3" cloneof="rotor" supported="no">
 		<description>Rotor (Patched RiscOS3)</description>
 		<year>1989</year>
@@ -2565,7 +2565,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK, initial speech pitch sounds very low but it's likely a btanb -->
+	<!-- boot OK, initial speech pitch sounds very low (btanb) -->
 	<software name="small" supported="yes">
 		<description>Small</description>
 		<year>1993</year>
@@ -2954,8 +2954,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK, has incorrectly emulated raster effect when dying with the fan -->
-	<software name="wimpgame" supported="partial">
+	<!-- boot OK, has ZX Spectrum like raster effect when dying with the fan -->
+	<software name="wimpgame" supported="yes">
 		<description>The Wimp Game</description>
 		<year>1990</year>
 		<publisher>Fourth Dimension</publisher>
@@ -2967,8 +2967,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- boot OK, has incorrectly emulated raster effect when dying with the fan -->
-	<software name="wimpgamec" cloneof="wimpgame" supported="partial">
+	<!-- boot OK, has ZX Spectrum like raster effect when dying with the fan -->
+	<software name="wimpgamec" cloneof="wimpgame" supported="yes">
 		<description>The Wimp Game [cracked]</description>
 		<year>1990</year>
 		<publisher>Fourth Dimension</publisher>
@@ -3106,7 +3106,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Has trainer and copy protection? -->
 	<software name="zool">
 		<description>Zool</description>

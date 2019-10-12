@@ -6,6 +6,11 @@
 
 #pragma once
 
+#include "video/sgi_xmap2.h"
+#include "video/bt45x.h"
+#include "video/bt431.h"
+#include "screen.h"
+
 class sgi_re2_device : public device_t
 {
 public:
@@ -14,12 +19,11 @@ public:
 	auto out_rdy() { return m_rdy_cb.bind(); }
 	auto out_drq() { return m_drq_cb.bind(); }
 
-	auto vram_r() { return m_vram_r.bind(); }
-	auto vram_w() { return m_vram_w.bind(); }
-
 	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
 	enum re_register : unsigned
 	{
@@ -149,12 +153,16 @@ protected:
 
 	void increment();
 
+	void vram_w(offs_t const offset, u32 const data, u32 const mem_mask) { m_vram[offset] = (m_vram[offset] & ~mem_mask) | (data & mem_mask & m_vram_mask); }
+
 private:
+	required_device_array<sgi_xmap2_device, 5> m_xmap;
+	required_device_array<bt431_device, 2> m_cursor;
+	required_device_array<bt457_device, 3> m_ramdac;
+	required_ioport m_options_port;
+
 	devcb_write_line m_rdy_cb;
 	devcb_write_line m_drq_cb;
-
-	devcb_read32 m_vram_r;
-	devcb_write32 m_vram_w;
 
 	// state machine
 	emu_timer *m_step;
@@ -202,6 +210,11 @@ private:
 	unsigned m_ir;
 
 	rectangle m_clip;
+
+	std::unique_ptr<u32[]> m_vram;
+	std::unique_ptr<u32[]> m_dram;
+	u32 m_vram_mask;
+	u32 m_dram_mask;
 };
 
 DECLARE_DEVICE_TYPE(SGI_RE2, sgi_re2_device)

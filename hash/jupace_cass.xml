@@ -16,7 +16,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="4169">
-				<rom name="3d maze (2007-05)(lopes, ricardo fernandes)(pd)[19k].tap" size="4169" crc="a7d40f66" sha1="0ef5fec603846859c2780399b1d39ff7d9ba9020" offset="0x0000" />
+				<rom name="3d maze (2007-05)(lopes, ricardo fernandes)(pd)[19k].tap" size="4169" crc="a7d40f66" sha1="0ef5fec603846859c2780399b1d39ff7d9ba9020"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27,7 +27,7 @@
 		<publisher>Personal Computer World</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="874">
-				<rom name="ace avoider (1984-07)(personal computer world)(gb)[3k].tap" size="874" crc="5e9c9468" sha1="aa15ec8a4ef6e698aba63bd876d8b7aa2b7831a8" offset="0x0000" />
+				<rom name="ace avoider (1984-07)(personal computer world)(gb)[3k].tap" size="874" crc="5e9c9468" sha1="aa15ec8a4ef6e698aba63bd876d8b7aa2b7831a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -38,7 +38,7 @@
 		<publisher>Personal Computer World</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="332">
-				<rom name="ace case (1984-03)(personal computer world)(gb)[3k].tap" size="332" crc="85ed47c5" sha1="4aaf98b299f7d80ef43c05b36f897451bdcbdddb" offset="0x0000" />
+				<rom name="ace case (1984-03)(personal computer world)(gb)[3k].tap" size="332" crc="85ed47c5" sha1="4aaf98b299f7d80ef43c05b36f897451bdcbdddb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51,31 +51,31 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Banner"/>
 			<dataarea name="cass" size="993">
-				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 1 of 5)[banner][3k].tap" size="993" crc="9a416b66" sha1="e7aeaf0b971a145b7c883558829904542de27476" offset="0x0000"  status="baddump" />
+				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 1 of 5)[banner][3k].tap" size="993" crc="9a416b66" sha1="e7aeaf0b971a145b7c883558829904542de27476" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Lunar Lander"/>
 			<dataarea name="cass" size="823">
-				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 2 of 5)[lunar lander][3k].tap" size="823" crc="e9298f7d" sha1="a2511f46c6f9ea6b9011836c327a36c5a6bf610e" offset="0x0000"  status="baddump" />
+				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 2 of 5)[lunar lander][3k].tap" size="823" crc="e9298f7d" sha1="a2511f46c6f9ea6b9011836c327a36c5a6bf610e" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass">
 			<feature name="part_id" value="Music"/>
 			<dataarea name="cass" size="791">
-				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 3 of 5)[music][3k].tap" size="791" crc="e88b1ffa" sha1="14efe92c8902dfb15c55e7ca44102bfa946e4fd9" offset="0x0000"  status="baddump" />
+				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 3 of 5)[music][3k].tap" size="791" crc="e88b1ffa" sha1="14efe92c8902dfb15c55e7ca44102bfa946e4fd9" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="jupace_cass">
 			<feature name="part_id" value="Stack Demonstration"/>
 			<dataarea name="cass" size="528">
-				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 4 of 5)[stack demonstration][3k].tap" size="528" crc="c540cba5" sha1="3e161f7f452b20085ebd3cd5d5c107445a901ad8" offset="0x0000"  status="baddump" />
+				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 4 of 5)[stack demonstration][3k].tap" size="528" crc="c540cba5" sha1="3e161f7f452b20085ebd3cd5d5c107445a901ad8" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="jupace_cass">
 			<feature name="part_id" value="Worms"/>
 			<dataarea name="cass" size="937">
-				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 5 of 5)[worms][3k].tap" size="937" crc="1b0ea860" sha1="12cec44fa99fa1d7ae2b1d699353dc94dc5d377e" offset="0x0000"  status="baddump" />
+				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)(file 5 of 5)[worms][3k].tap" size="937" crc="1b0ea860" sha1="12cec44fa99fa1d7ae2b1d699353dc94dc5d377e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +86,7 @@
 		<publisher>Personal Computer World</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="93">
-				<rom name="ace graphics (1983-09)(personal computer world)(gb)[large][3k].tap" size="93" crc="5dc239b1" sha1="7fbb43fa71eac2f177d5fc97ab55b1d1f6898f0c" offset="0x0000" />
+				<rom name="ace graphics (1983-09)(personal computer world)(gb)[large][3k].tap" size="93" crc="5dc239b1" sha1="7fbb43fa71eac2f177d5fc97ab55b1d1f6898f0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -97,7 +97,7 @@
 		<publisher>Personal Computer World</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="85">
-				<rom name="ace graphics (1983-09)(personal computer world)(gb)[small][3k].tap" size="85" crc="6764333f" sha1="1b74c30727f1503e312fa43fe82cdcc925c6cf1e" offset="0x0000" />
+				<rom name="ace graphics (1983-09)(personal computer world)(gb)[small][3k].tap" size="85" crc="6764333f" sha1="1b74c30727f1503e312fa43fe82cdcc925c6cf1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,7 +108,7 @@
 		<publisher>Hi-Tech Microsoft</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1141">
-				<rom name="ace invaders (1982)(hi-tech microsoft)(gb)[3k].tap" size="1141" crc="e5d9c8e1" sha1="f914f71198eb62e7a61ddb3809131b2d5b53e7b4" offset="0x0000" />
+				<rom name="ace invaders (1982)(hi-tech microsoft)(gb)[3k].tap" size="1141" crc="e5d9c8e1" sha1="f914f71198eb62e7a61ddb3809131b2d5b53e7b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -119,7 +119,7 @@
 		<publisher>Forth Dimension</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="4689">
-				<rom name="ace invaders (1983)(forth dimension)[1k].tap" size="4689" crc="f8858cb9" sha1="082f81b8320a6d1d930e028cf88acefb94c4f1e3" offset="0x0000" />
+				<rom name="ace invaders (1983)(forth dimension)[1k].tap" size="4689" crc="f8858cb9" sha1="082f81b8320a6d1d930e028cf88acefb94c4f1e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="315">
-				<rom name="ace manual code examples - chapter 11 (2007)(lopes, ricardo fernandes)(pd)[mice][3k].tap" size="315" crc="37acd379" sha1="2e00991c6612a8653401ebff61bd319bc8a117b3" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 11 (2007)(lopes, ricardo fernandes)(pd)[mice][3k].tap" size="315" crc="37acd379" sha1="2e00991c6612a8653401ebff61bd319bc8a117b3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -142,19 +142,19 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (chars)"/>
 			<dataarea name="cass" size="63">
-				<rom name="ace manual code examples - chapter 12 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[chars][3k].tap" size="63" crc="29539f2b" sha1="077f0cc6e11e4d4fe87836f23cff19be990c20b4" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 12 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[chars][3k].tap" size="63" crc="29539f2b" sha1="077f0cc6e11e4d4fe87836f23cff19be990c20b4"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (gr)"/>
 			<dataarea name="cass" size="76">
-				<rom name="ace manual code examples - chapter 12 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[gr][3k].tap" size="76" crc="e80fb9f8" sha1="0763dc4c41e0944669bbb1f2ae90d134d2d78cfa" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 12 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[gr][3k].tap" size="76" crc="e80fb9f8" sha1="0763dc4c41e0944669bbb1f2ae90d134d2d78cfa"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass">
 			<feature name="part_id" value="Tape 3 (tab)"/>
 			<dataarea name="cass" size="59">
-				<rom name="ace manual code examples - chapter 12 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[tab][3k].tap" size="59" crc="4d608d8a" sha1="88cbcc636b2c7dae29c00dc4b7d088789734ddf3" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 12 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[tab][3k].tap" size="59" crc="4d608d8a" sha1="88cbcc636b2c7dae29c00dc4b7d088789734ddf3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -166,13 +166,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (draw)"/>
 			<dataarea name="cass" size="337">
-				<rom name="ace manual code examples - chapter 13 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[draw][3k].tap" size="337" crc="a4216359" sha1="7afaa718877c2b589b21e3fa8bac13bf4d9e341f" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 13 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[draw][3k].tap" size="337" crc="a4216359" sha1="7afaa718877c2b589b21e3fa8bac13bf4d9e341f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (random)"/>
 			<dataarea name="cass" size="152">
-				<rom name="ace manual code examples - chapter 13 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[random][3k].tap" size="152" crc="743c5a41" sha1="aa9a806de23e0925e6dca3964f5017f989cb5711" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 13 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[random][3k].tap" size="152" crc="743c5a41" sha1="aa9a806de23e0925e6dca3964f5017f989cb5711"/>
 			</dataarea>
 		</part>
 	</software>
@@ -184,19 +184,19 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (2cells)"/>
 			<dataarea name="cass" size="185">
-				<rom name="ace manual code examples - chapter 15 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[2cells][3k].tap" size="185" crc="f7b98532" sha1="2338c683af2fe73eb5dd72d93ef86dcdd8e78ded" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 15 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[2cells][3k].tap" size="185" crc="f7b98532" sha1="2338c683af2fe73eb5dd72d93ef86dcdd8e78ded"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (sqrt)"/>
 			<dataarea name="cass" size="238">
-				<rom name="ace manual code examples - chapter 15 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[sqrt][3k].tap" size="238" crc="3af2f97d" sha1="0529174383db9c7fe01ae54c0ede4f5a5ddaaf18" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 15 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[sqrt][3k].tap" size="238" crc="3af2f97d" sha1="0529174383db9c7fe01ae54c0ede4f5a5ddaaf18"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass">
 			<feature name="part_id" value="Tape 3 (trig)"/>
 			<dataarea name="cass" size="368">
-				<rom name="ace manual code examples - chapter 15 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[trig][3k].tap" size="368" crc="95a54bf0" sha1="7f0b6664ffeebc8c9660800803afda576bc8a205" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 15 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[trig][3k].tap" size="368" crc="95a54bf0" sha1="7f0b6664ffeebc8c9660800803afda576bc8a205"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,37 +208,37 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (count)"/>
 			<dataarea name="cass" size="53">
-				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 6)[count][3k].tap" size="53" crc="e491a628" sha1="8a20370e05b855ad3af4508025f7eaaf9efdb018" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 6)[count][3k].tap" size="53" crc="e491a628" sha1="8a20370e05b855ad3af4508025f7eaaf9efdb018"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (input)"/>
 			<dataarea name="cass" size="49">
-				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 6)[input][3k].tap" size="49" crc="eb16c9ad" sha1="0edd2ac821e04265b5d8ac427491d4c83251e705" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 6)[input][3k].tap" size="49" crc="eb16c9ad" sha1="0edd2ac821e04265b5d8ac427491d4c83251e705"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass">
 			<feature name="part_id" value="Tape 3 (integer)"/>
 			<dataarea name="cass" size="92">
-				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 6)[integer][3k].tap" size="92" crc="31ee2b30" sha1="f7abd297e0f867e4da72bee54dd7d59480964ded" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 6)[integer][3k].tap" size="92" crc="31ee2b30" sha1="f7abd297e0f867e4da72bee54dd7d59480964ded"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="jupace_cass">
 			<feature name="part_id" value="Tape 4 (key)"/>
 			<dataarea name="cass" size="53">
-				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 4 of 6)[key][3k].tap" size="53" crc="cd14c9e7" sha1="10462c7f31d2982798bee4b27d361df2b71e87f3" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 4 of 6)[key][3k].tap" size="53" crc="cd14c9e7" sha1="10462c7f31d2982798bee4b27d361df2b71e87f3"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="jupace_cass">
 			<feature name="part_id" value="Tape 5 (wait)"/>
 			<dataarea name="cass" size="52">
-				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 5 of 6)[wait][3k].tap" size="52" crc="657cdfb9" sha1="d8ec790cd72548f2ae60302f5949144bc69469d0" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 5 of 6)[wait][3k].tap" size="52" crc="657cdfb9" sha1="d8ec790cd72548f2ae60302f5949144bc69469d0"/>
 			</dataarea>
 		</part>
 		<part name="cass6" interface="jupace_cass">
 			<feature name="part_id" value="Tape 6 (y-n)"/>
 			<dataarea name="cass" size="91">
-				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 6 of 6)[y-n][3k].tap" size="91" crc="1baf9d9b" sha1="4cdd616844a58004b06aab9720836b9f579f13a9" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 16 (2007)(lopes, ricardo fernandes)(pd)(file 6 of 6)[y-n][3k].tap" size="91" crc="1baf9d9b" sha1="4cdd616844a58004b06aab9720836b9f579f13a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="51">
-				<rom name="ace manual code examples - chapter 17 (2007)(lopes, ricardo fernandes)(pd)[hex][3k].tap" size="51" crc="d497883e" sha1="a2c81b7d0b8e499a90a2725f31634e6fd238a194" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 17 (2007)(lopes, ricardo fernandes)(pd)[hex][3k].tap" size="51" crc="d497883e" sha1="a2c81b7d0b8e499a90a2725f31634e6fd238a194"/>
 			</dataarea>
 		</part>
 	</software>
@@ -261,19 +261,19 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (d)"/>
 			<dataarea name="cass" size="171">
-				<rom name="ace manual code examples - chapter 19 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[d][3k].tap" size="171" crc="e2b9526e" sha1="9921ea134bc28d8602468da9c01a9901ad67637a" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 19 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[d][3k].tap" size="171" crc="e2b9526e" sha1="9921ea134bc28d8602468da9c01a9901ad67637a"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (money)"/>
 			<dataarea name="cass" size="71">
-				<rom name="ace manual code examples - chapter 19 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[money][3k].tap" size="71" crc="411ea447" sha1="e38a63ecc06fb261d0ab8d346d08c5d40dace6c6" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 19 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[money][3k].tap" size="71" crc="411ea447" sha1="e38a63ecc06fb261d0ab8d346d08c5d40dace6c6"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass">
 			<feature name="part_id" value="Tape 3 (time)"/>
 			<dataarea name="cass" size="100">
-				<rom name="ace manual code examples - chapter 19 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[time][3k].tap" size="100" crc="b8454317" sha1="1b9f71852a1570e7cdbb80631e7c7b778e92f8ef" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 19 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[time][3k].tap" size="100" crc="b8454317" sha1="1b9f71852a1570e7cdbb80631e7c7b778e92f8ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -285,13 +285,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (stringcomma)"/>
 			<dataarea name="cass" size="95">
-				<rom name="ace manual code examples - chapter 20 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[stringcomma][3k].tap" size="95" crc="ede146f2" sha1="30944f01136bc04238ae307b2ffb66e998140604" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 20 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[stringcomma][3k].tap" size="95" crc="ede146f2" sha1="30944f01136bc04238ae307b2ffb66e998140604"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (tick)"/>
 			<dataarea name="cass" size="45">
-				<rom name="ace manual code examples - chapter 20 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[tick][3k].tap" size="45" crc="a647d0b8" sha1="480a4f827195560b6af1f8bae975c3f2e8cdbd57" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 20 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[tick][3k].tap" size="45" crc="a647d0b8" sha1="480a4f827195560b6af1f8bae975c3f2e8cdbd57"/>
 			</dataarea>
 		</part>
 	</software>
@@ -303,13 +303,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (2-d)"/>
 			<dataarea name="cass" size="341">
-				<rom name="ace manual code examples - chapter 21 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[2-d][3k].tap" size="341" crc="47c25818" sha1="cd19c41f548d26346f8f4d8e19c65b0d65b584cc" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 21 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[2-d][3k].tap" size="341" crc="47c25818" sha1="cd19c41f548d26346f8f4d8e19c65b0d65b584cc"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (string)"/>
 			<dataarea name="cass" size="388">
-				<rom name="ace manual code examples - chapter 21 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[string][3k].tap" size="388" crc="86960fd0" sha1="b478df2039e9f832171118b8eec8f7b84e765ba1" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 21 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[string][3k].tap" size="388" crc="86960fd0" sha1="b478df2039e9f832171118b8eec8f7b84e765ba1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -320,7 +320,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="73">
-				<rom name="ace manual code examples - chapter 23 (2007)(lopes, ricardo fernandes)(pd)[2literal][3k].tap" size="73" crc="e531f063" sha1="56b13910419eab97d341808a4f5dce328a649611" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 23 (2007)(lopes, ricardo fernandes)(pd)[2literal][3k].tap" size="73" crc="e531f063" sha1="56b13910419eab97d341808a4f5dce328a649611"/>
 			</dataarea>
 		</part>
 	</software>
@@ -332,19 +332,19 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (dots)"/>
 			<dataarea name="cass" size="92">
-				<rom name="ace manual code examples - chapter 24 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[dots][3k].tap" size="92" crc="a6b50e38" sha1="d28ec616f7330ec2c5d9ba5e09f230e1ceabed36" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 24 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[dots][3k].tap" size="92" crc="a6b50e38" sha1="d28ec616f7330ec2c5d9ba5e09f230e1ceabed36"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (sysvars)"/>
 			<dataarea name="cass" size="79">
-				<rom name="ace manual code examples - chapter 24 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[sysvars][3k].tap" size="79" crc="7a082da3" sha1="21bfd27e082cde3052422a64b3f4bf006bf6b0c3" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 24 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[sysvars][3k].tap" size="79" crc="7a082da3" sha1="21bfd27e082cde3052422a64b3f4bf006bf6b0c3"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (time)"/>
 			<dataarea name="cass" size="234">
-				<rom name="ace manual code examples - chapter 24 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[time][3k].tap" size="234" crc="a13e175f" sha1="97eaff16a2ac437658a9244fcb76d2b333121a6b" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 24 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[time][3k].tap" size="234" crc="a13e175f" sha1="97eaff16a2ac437658a9244fcb76d2b333121a6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -356,13 +356,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (code)"/>
 			<dataarea name="cass" size="55">
-				<rom name="ace manual code examples - chapter 25 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[code][3k].tap" size="55" crc="da49a1b8" sha1="99675d3d6a8ed99700f70e66953bf66df58e44a7" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 25 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[code][3k].tap" size="55" crc="da49a1b8" sha1="99675d3d6a8ed99700f70e66953bf66df58e44a7"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (pause)"/>
 			<dataarea name="cass" size="95">
-				<rom name="ace manual code examples - chapter 25 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[pause][3k].tap" size="95" crc="781a1cd8" sha1="465fb6cbd40a3ff7d62fcf79cce64a9e1a6ff632" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 25 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[pause][3k].tap" size="95" crc="781a1cd8" sha1="465fb6cbd40a3ff7d62fcf79cce64a9e1a6ff632"/>
 			</dataarea>
 		</part>
 	</software>
@@ -374,19 +374,19 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (noise)"/>
 			<dataarea name="cass" size="67">
-				<rom name="ace manual code examples - chapter 26 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[noise][3k].tap" size="67" crc="bb50388b" sha1="849669fb172a930917cd5b36130f1df08d134830" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 26 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 3)[noise][3k].tap" size="67" crc="bb50388b" sha1="849669fb172a930917cd5b36130f1df08d134830"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (runlights)"/>
 			<dataarea name="cass" size="252">
-				<rom name="ace manual code examples - chapter 26 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[runlights][3k].tap" size="252" crc="33b636d5" sha1="6c560944e3b18011e1a928d214c49b1556e8c2ec" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 26 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 3)[runlights][3k].tap" size="252" crc="33b636d5" sha1="6c560944e3b18011e1a928d214c49b1556e8c2ec"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass">
 			<feature name="part_id" value="Tape 3 (switches)"/>
 			<dataarea name="cass" size="249">
-				<rom name="ace manual code examples - chapter 26 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[switches][3k].tap" size="249" crc="9583579a" sha1="b1ea734f4b28646ba9cc234526e66b1e3d10b614" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 26 (2007)(lopes, ricardo fernandes)(pd)(file 3 of 3)[switches][3k].tap" size="249" crc="9583579a" sha1="b1ea734f4b28646ba9cc234526e66b1e3d10b614"/>
 			</dataarea>
 		</part>
 	</software>
@@ -398,13 +398,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (plusstore)"/>
 			<dataarea name="cass" size="54">
-				<rom name="ace manual code examples - chapter 8 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[plusstore][3k].tap" size="54" crc="3dd899e8" sha1="bb28dd9e04b1a2631ee70f1b1126a42b3e0351bf" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 8 (2007)(lopes, ricardo fernandes)(pd)(file 1 of 2)[plusstore][3k].tap" size="54" crc="3dd899e8" sha1="bb28dd9e04b1a2631ee70f1b1126a42b3e0351bf"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (queryvar)"/>
 			<dataarea name="cass" size="45">
-				<rom name="ace manual code examples - chapter 8 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[queryvar][3k].tap" size="45" crc="b7465670" sha1="5b3ffc899da9125444718be227588b6ded36cfd6" offset="0x0000" />
+				<rom name="ace manual code examples - chapter 8 (2007)(lopes, ricardo fernandes)(pd)(file 2 of 2)[queryvar][3k].tap" size="45" crc="b7465670" sha1="5b3ffc899da9125444718be227588b6ded36cfd6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -415,7 +415,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="3006">
-				<rom name="ace mines (2004)(lopes, ricardo fernandes)[19k].tap" size="3006" crc="d508f3e5" sha1="d2038a9e0ed23db9a834f0845e06ff132bcc8412" offset="0x0000" />
+				<rom name="ace mines (2004)(lopes, ricardo fernandes)[19k].tap" size="3006" crc="d508f3e5" sha1="d2038a9e0ed23db9a834f0845e06ff132bcc8412"/>
 			</dataarea>
 		</part>
 	</software>
@@ -426,7 +426,7 @@
 		<publisher>Jupiter Ace Archive Team</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="10365">
-				<rom name="ace star (2010)(jupiter ace archive team)(gb)(pd)[19k].tap" size="10365" crc="01217f3f" sha1="d3c69c182323c3ad45e01601611f36b40970e22d" offset="0x0000" />
+				<rom name="ace star (2010)(jupiter ace archive team)(gb)(pd)[19k].tap" size="10365" crc="01217f3f" sha1="d3c69c182323c3ad45e01601611f36b40970e22d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -437,7 +437,7 @@
 		<publisher>Personal Computer World</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="115">
-				<rom name="ace vocab select (1983-04)(personal computer world)(gb)[3k].tap" size="115" crc="587a7272" sha1="89ca8b51b686a964d3f710669493c61bfafcf2ea" offset="0x0000" />
+				<rom name="ace vocab select (1983-04)(personal computer world)(gb)[3k].tap" size="115" crc="587a7272" sha1="89ca8b51b686a964d3f710669493c61bfafcf2ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -448,7 +448,7 @@
 		<publisher>Micro Marketing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1307">
-				<rom name="acevaders (1983)(micro marketing)(gb)[3k].tap" size="1307" crc="9e8ef6c0" sha1="8ed92d3847e59730d16232426153d10dd53712e9" offset="0x0000" />
+				<rom name="acevaders (1983)(micro marketing)(gb)[3k].tap" size="1307" crc="9e8ef6c0" sha1="8ed92d3847e59730d16232426153d10dd53712e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -459,7 +459,7 @@
 		<publisher>Artic Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14811">
-				<rom name="adventure a - planet of death (1981)(artic computing)(pd)[19k].tap" size="14811" crc="be67ed38" sha1="e70ed38c14e2ba34ce8faa42e0c828081d53e4b5" offset="0x0000" />
+				<rom name="adventure a - planet of death (1981)(artic computing)(pd)[19k].tap" size="14811" crc="be67ed38" sha1="e70ed38c14e2ba34ce8faa42e0c828081d53e4b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -470,7 +470,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2667">
-				<rom name="alien defender (1984)(boldfield computing)(gb)[19k].tap" size="2667" crc="38259232" sha1="d3078ea35296466da62afc45170d0955af435801" offset="0x0000" />
+				<rom name="alien defender (1984)(boldfield computing)(gb)[19k].tap" size="2667" crc="38259232" sha1="d3078ea35296466da62afc45170d0955af435801"/>
 			</dataarea>
 		</part>
 	</software>
@@ -481,7 +481,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1570">
-				<rom name="alien swarm (1983-01-20)(popular computing weekly)(gb)[3k].tap" size="1570" crc="645fc362" sha1="65a29f0ed18fd7a5269d72c065e2c70b1c2fb61e" offset="0x0000" />
+				<rom name="alien swarm (1983-01-20)(popular computing weekly)(gb)[3k].tap" size="1570" crc="645fc362" sha1="65a29f0ed18fd7a5269d72c065e2c70b1c2fb61e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -492,7 +492,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1706">
-				<rom name="amazing maze (1984)(boldfield computing)(gb)[19k].tap" size="1706" crc="b8eb2dfa" sha1="b5b8a2684d8d81e715a962d697bf2a488ca89ea5" offset="0x0000" />
+				<rom name="amazing maze (1984)(boldfield computing)(gb)[19k].tap" size="1706" crc="b8eb2dfa" sha1="b5b8a2684d8d81e715a962d697bf2a488ca89ea5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -503,7 +503,7 @@
 		<publisher>Jupiter Ace Archive Team</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2103">
-				<rom name="ami sound toolkit (2007)(jupiter ace archive team)(gb)(pd)[19k].tap" size="2103" crc="20cd6c82" sha1="a9fa23e053b326295b12740445225cef4ef14347" offset="0x0000" />
+				<rom name="ami sound toolkit (2007)(jupiter ace archive team)(gb)(pd)[19k].tap" size="2103" crc="20cd6c82" sha1="a9fa23e053b326295b12740445225cef4ef14347"/>
 			</dataarea>
 		</part>
 	</software>
@@ -514,7 +514,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="13501">
-				<rom name="assembler &amp; dis-assembler (1984)(boldfield computing)(gb)[19k].tap" size="13501" crc="bd1df519" sha1="acc4f09e4b0849e89d32be9eff677fa96ea08849" offset="0x0000" />
+				<rom name="assembler &amp; dis-assembler (1984)(boldfield computing)(gb)[19k].tap" size="13501" crc="bd1df519" sha1="acc4f09e4b0849e89d32be9eff677fa96ea08849"/>
 			</dataarea>
 		</part>
 	</software>
@@ -525,7 +525,7 @@
 		<publisher>Brian Bates</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7538">
-				<rom name="astrian descent (1983-08)(bates, brian)[unreleased][19k].tap" size="7538" crc="ebbe6695" sha1="1316fdf0d33cc0874f8e9addba035361bca6b533" offset="0x0000" />
+				<rom name="astrian descent (1983-08)(bates, brian)[unreleased][19k].tap" size="7538" crc="ebbe6695" sha1="1316fdf0d33cc0874f8e9addba035361bca6b533"/>
 			</dataarea>
 		</part>
 	</software>
@@ -536,7 +536,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16587">
-				<rom name="atic raid (1984)(boldfield computing)(gb)(pd)[19k].tap" size="16587" crc="fd3fc960" sha1="f6758bf3e34a20260673a62d213021c5251fd419" offset="0x0000" />
+				<rom name="atic raid (1984)(boldfield computing)(gb)(pd)[19k].tap" size="16587" crc="fd3fc960" sha1="f6758bf3e34a20260673a62d213021c5251fd419"/>
 			</dataarea>
 		</part>
 	</software>
@@ -547,7 +547,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="67678">
-				<rom name="black island adventure (1984)(boldfield computing)(gb)[19k].tap" size="67678" crc="ec520816" sha1="68edb835f83ad1588bd7a840fd333cdb5ce9578f" offset="0x0000" />
+				<rom name="black island adventure (1984)(boldfield computing)(gb)[19k].tap" size="67678" crc="ec520816" sha1="68edb835f83ad1588bd7a840fd333cdb5ce9578f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -558,7 +558,7 @@
 		<publisher>Paul Robson</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1649">
-				<rom name="bomber (1997)(robson, paul)(pd)[3k].tap" size="1649" crc="feb62f38" sha1="95bc411f9d456d4f0a3d0d6a4d009de5cf69bf17" offset="0x0000" />
+				<rom name="bomber (1997)(robson, paul)(pd)[3k].tap" size="1649" crc="feb62f38" sha1="95bc411f9d456d4f0a3d0d6a4d009de5cf69bf17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -569,7 +569,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="844">
-				<rom name="breakout (1983-03-17)(popular computing weekly)(gb)[3k].tap" size="844" crc="1027393d" sha1="7dbe94751150c2b378fe6ea359c55a350f8babad" offset="0x0000" />
+				<rom name="breakout (1983-03-17)(popular computing weekly)(gb)[3k].tap" size="844" crc="1027393d" sha1="7dbe94751150c2b378fe6ea359c55a350f8babad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -580,7 +580,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="549">
-				<rom name="calendar (2007)(lopes, ricardo fernandes)(pd)[3k].tap" size="549" crc="f0952595" sha1="596e02f76327d1a82eb77b2069605781c11465d9" offset="0x0000" />
+				<rom name="calendar (2007)(lopes, ricardo fernandes)(pd)[3k].tap" size="549" crc="f0952595" sha1="596e02f76327d1a82eb77b2069605781c11465d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -591,7 +591,7 @@
 		<publisher>ACS Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8832">
-				<rom name="callisto (1983)(acs software)[16k].tap" size="8832" crc="aa6ba879" sha1="4e70e44db33c4197a6d68da3ff17ca82c23cff93" offset="0x0000" />
+				<rom name="callisto (1983)(acs software)[16k].tap" size="8832" crc="aa6ba879" sha1="4e70e44db33c4197a6d68da3ff17ca82c23cff93"/>
 			</dataarea>
 		</part>
 	</software>
@@ -602,7 +602,7 @@
 		<publisher>Hi-Tech Microsoft</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1026">
-				<rom name="cavern attack (1983)(hi-tech microsoft)(gb)[3k].tap" size="1026" crc="1518ca67" sha1="2153980802c9fd92cadcd74b729fa7ae3525142f" offset="0x0000" />
+				<rom name="cavern attack (1983)(hi-tech microsoft)(gb)[3k].tap" size="1026" crc="1518ca67" sha1="2153980802c9fd92cadcd74b729fa7ae3525142f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -613,7 +613,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="6361">
-				<rom name="cenipede (1984)(boldfield computing)(gb)[19k].tap" size="6361" crc="a3280ac0" sha1="32d8d0433ddd7598d03dd4acc74a891c31067a06" offset="0x0000" />
+				<rom name="cenipede (1984)(boldfield computing)(gb)[19k].tap" size="6361" crc="a3280ac0" sha1="32d8d0433ddd7598d03dd4acc74a891c31067a06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -625,13 +625,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Side A (Champs de Mines)"/>
 			<dataarea name="cass" size="1009">
-				<rom name="champs de mines + casse briques (1983)(ere)(fr)(side a)[champs de mines][3k].tap" size="1009" crc="4bb3e7d8" sha1="ed901497f02e6e22f4a3290f11ecc498a5922496" offset="0x0000" />
+				<rom name="champs de mines + casse briques (1983)(ere)(fr)(side a)[champs de mines][3k].tap" size="1009" crc="4bb3e7d8" sha1="ed901497f02e6e22f4a3290f11ecc498a5922496"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Side B (Casse Briques)"/>
 			<dataarea name="cass" size="1706">
-				<rom name="champs de mines + casse briques (1983)(ere)(fr)(side b)[casse briques][3k].tap" size="1706" crc="1e184506" sha1="b90d5216bbd7ef56b1e2d35a4b0a1058f4f6c52b" offset="0x0000" />
+				<rom name="champs de mines + casse briques (1983)(ere)(fr)(side b)[casse briques][3k].tap" size="1706" crc="1e184506" sha1="b90d5216bbd7ef56b1e2d35a4b0a1058f4f6c52b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -642,7 +642,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="557">
-				<rom name="chase (1983-01-27)(popular computing weekly)(gb)[3k].tap" size="557" crc="db067f32" sha1="14c2238920bd984003f500a175ec56c877a164fd" offset="0x0000" />
+				<rom name="chase (1983-01-27)(popular computing weekly)(gb)[3k].tap" size="557" crc="db067f32" sha1="14c2238920bd984003f500a175ec56c877a164fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -653,7 +653,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14409">
-				<rom name="chess (1984)(boldfield computing)(gb)[19k].tap" size="14409" crc="554a759c" sha1="376a638a45c13ba52105bb72cf79332d0cb4bc0f" offset="0x0000" />
+				<rom name="chess (1984)(boldfield computing)(gb)[19k].tap" size="14409" crc="554a759c" sha1="376a638a45c13ba52105bb72cf79332d0cb4bc0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -664,7 +664,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16549">
-				<rom name="cygnus (1984)(boldfield computing)(gb)[19k].tap" size="16549" crc="d0a31a28" sha1="5b0260200cafde332c514bdf319e7f29e3d312c2" offset="0x0000" />
+				<rom name="cygnus (1984)(boldfield computing)(gb)[19k].tap" size="16549" crc="d0a31a28" sha1="5b0260200cafde332c514bdf319e7f29e3d312c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -675,7 +675,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7414">
-				<rom name="database (1985)(boldfield computing)(gb)[19k].tap" size="7414" crc="fd4d1d6b" sha1="5144c48b796a45a1d07318307cfa46f23a72f521" offset="0x0000" />
+				<rom name="database (1985)(boldfield computing)(gb)[19k].tap" size="7414" crc="fd4d1d6b" sha1="5144c48b796a45a1d07318307cfa46f23a72f521"/>
 			</dataarea>
 		</part>
 	</software>
@@ -687,13 +687,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Side A (Dessin)"/>
 			<dataarea name="cass" size="796">
-				<rom name="dessin + cargen (1983)(ere)(fr)(side a)[dessin][3k].tap" size="796" crc="ae7a3ee1" sha1="38805f324845b65f5b1fed87e9b13c27a733468f" offset="0x0000" />
+				<rom name="dessin + cargen (1983)(ere)(fr)(side a)[dessin][3k].tap" size="796" crc="ae7a3ee1" sha1="38805f324845b65f5b1fed87e9b13c27a733468f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Side B (Cargen)"/>
 			<dataarea name="cass" size="807">
-				<rom name="dessin + cargen (1983)(ere)(fr)(side b)[cargen][3k].tap" size="807" crc="87bd3a13" sha1="d084bc5b56bc0057eab745f232a3598febef949f" offset="0x0000" />
+				<rom name="dessin + cargen (1983)(ere)(fr)(side b)[cargen][3k].tap" size="807" crc="87bd3a13" sha1="d084bc5b56bc0057eab745f232a3598febef949f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -704,7 +704,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="146">
-				<rom name="divn (2007)(lopes, ricardo fernandes)(pd)[3k].tap" size="146" crc="0f72521b" sha1="1c269e22f71d9356896077187d533bc3fdb712af" offset="0x0000" />
+				<rom name="divn (2007)(lopes, ricardo fernandes)(pd)[3k].tap" size="146" crc="0f72521b" sha1="1c269e22f71d9356896077187d533bc3fdb712af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -715,7 +715,7 @@
 		<publisher>Brian Bates</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8496">
-				<rom name="dodge (1983-07)(bates, brian)[unreleased][19k].tap" size="8496" crc="299438f5" sha1="fcf156fc3f23d8ab256feaed6b8b625abc381ff5" offset="0x0000" />
+				<rom name="dodge (1983-07)(bates, brian)[unreleased][19k].tap" size="8496" crc="299438f5" sha1="fcf156fc3f23d8ab256feaed6b8b625abc381ff5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -726,7 +726,7 @@
 		<publisher>Micro Marketing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1381">
-				<rom name="dot man (1983)(micro marketing)(gb)[3k].tap" size="1381" crc="ddb81ec6" sha1="6ee455454b1973c45f3766dcb7a181d2665477bd" offset="0x0000" />
+				<rom name="dot man (1983)(micro marketing)(gb)[3k].tap" size="1381" crc="ddb81ec6" sha1="6ee455454b1973c45f3766dcb7a181d2665477bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -737,7 +737,7 @@
 		<publisher>Micro Marketing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="802">
-				<rom name="duckshoot (1983)(micro marketing)(gb)[3k].tap" size="802" crc="105055d8" sha1="1286c483d0365acbf258336c89e940d981a1ed13" offset="0x0000" />
+				<rom name="duckshoot (1983)(micro marketing)(gb)[3k].tap" size="802" crc="105055d8" sha1="1286c483d0365acbf258336c89e940d981a1ed13"/>
 			</dataarea>
 		</part>
 	</software>
@@ -748,7 +748,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="4503">
-				<rom name="factorials (2008)(lopes, ricardo fernandes)(pd)[19k].tap" size="4503" crc="726648b4" sha1="e7db82193e9e30a3e469b074b1bb59f8cdbb1fdd" offset="0x0000" />
+				<rom name="factorials (2008)(lopes, ricardo fernandes)(pd)[19k].tap" size="4503" crc="726648b4" sha1="e7db82193e9e30a3e469b074b1bb59f8cdbb1fdd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -759,7 +759,7 @@
 		<publisher>Voyager Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="13767">
-				<rom name="firebird (1983)(voyager software)(gb)[19k].tap" size="13767" crc="a7717297" sha1="7a16edfab50c465fb7232ba57a329a685b127180" offset="0x0000" />
+				<rom name="firebird (1983)(voyager software)(gb)[19k].tap" size="13767" crc="a7717297" sha1="7a16edfab50c465fb7232ba57a329a685b127180"/>
 			</dataarea>
 		</part>
 	</software>
@@ -771,13 +771,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Fish)"/>
 			<dataarea name="cass" size="1053">
-				<rom name="fish + flutterer (1983)(jupiter cantab)(gb)(file 1 of 2)[fish][3k].tap" size="1053" crc="ad4da76f" sha1="372ae78b46e7885dc79ae5526f20368cf3810185" offset="0x0000" />
+				<rom name="fish + flutterer (1983)(jupiter cantab)(gb)(file 1 of 2)[fish][3k].tap" size="1053" crc="ad4da76f" sha1="372ae78b46e7885dc79ae5526f20368cf3810185"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Flutterer)"/>
 			<dataarea name="cass" size="1012">
-				<rom name="fish + flutterer (1983)(jupiter cantab)(gb)(file 2 of 2)[flutterer][3k].tap" size="1012" crc="eb6e3931" sha1="b334ab1c0ece079e55738d01f7803d4c41dfd225" offset="0x0000" />
+				<rom name="fish + flutterer (1983)(jupiter cantab)(gb)(file 2 of 2)[flutterer][3k].tap" size="1012" crc="eb6e3931" sha1="b334ab1c0ece079e55738d01f7803d4c41dfd225"/>
 			</dataarea>
 		</part>
 	</software>
@@ -788,7 +788,7 @@
 		<publisher>Remsoft</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7775">
-				<rom name="five compact games (1983)(remsoft)(gb)[3k].tap" size="7775" crc="1a3907b0" sha1="93094148539570bb5f2d5faafedb87535b1e1ca4" offset="0x0000" />
+				<rom name="five compact games (1983)(remsoft)(gb)[3k].tap" size="7775" crc="1a3907b0" sha1="93094148539570bb5f2d5faafedb87535b1e1ca4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -799,7 +799,7 @@
 		<publisher>Computing ToDay</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2706">
-				<rom name="floating point dictionary (1983-05)(computing today)(gb)[3k].tap" size="2706" crc="1ca6ac21" sha1="b850d624f75398268414c5319da0304e4efd704b" offset="0x0000" />
+				<rom name="floating point dictionary (1983-05)(computing today)(gb)[3k].tap" size="2706" crc="1ca6ac21" sha1="b850d624f75398268414c5319da0304e4efd704b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -810,7 +810,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2494">
-				<rom name="fonted v1.0 (2007-02)(lopes, ricardo fernandes)(pd)[3k].tap" size="2494" crc="e119eb90" sha1="114c0d84a6d7c1109257300a571bac4098156ee7" offset="0x0000" />
+				<rom name="fonted v1.0 (2007-02)(lopes, ricardo fernandes)(pd)[3k].tap" size="2494" crc="e119eb90" sha1="114c0d84a6d7c1109257300a571bac4098156ee7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -821,7 +821,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2722">
-				<rom name="fonted v2.0 (2007-10)(lopes, ricardo fernandes)(pd)[19k].tap" size="2722" crc="9a8e3077" sha1="9f5024e660dc11f1c2d4b3ad0a00a3d538784dc7" offset="0x0000" />
+				<rom name="fonted v2.0 (2007-10)(lopes, ricardo fernandes)(pd)[19k].tap" size="2722" crc="9a8e3077" sha1="9f5024e660dc11f1c2d4b3ad0a00a3d538784dc7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -832,7 +832,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8284">
-				<rom name="frogger (1984)(boldfield computing)(gb)(pd)[16k].tap" size="8284" crc="ff0f890c" sha1="d921609941c978d364f5cd0055c7618a9fa7d897" offset="0x0000" />
+				<rom name="frogger (1984)(boldfield computing)(gb)(pd)[16k].tap" size="8284" crc="ff0f890c" sha1="d921609941c978d364f5cd0055c7618a9fa7d897"/>
 			</dataarea>
 		</part>
 	</software>
@@ -843,7 +843,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="10966">
-				<rom name="frogger (1984)(plasma software)(gb)[unreleased][19k].tap" size="10966" crc="6af2e369" sha1="679e668b89894e309f5228e160f2e6b503f00132" offset="0x0000" />
+				<rom name="frogger (1984)(plasma software)(gb)[unreleased][19k].tap" size="10966" crc="6af2e369" sha1="679e668b89894e309f5228e160f2e6b503f00132"/>
 			</dataarea>
 		</part>
 	</software>
@@ -854,7 +854,7 @@
 		<publisher>Voyager Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7919">
-				<rom name="fungle monster (1983)(voyager software)(gb)[unreleased][19k].tap" size="7919" crc="f4bb53ba" sha1="49b215354d243a8a9bae560e0309a4fba8a328e1" offset="0x0000" />
+				<rom name="fungle monster (1983)(voyager software)(gb)[unreleased][19k].tap" size="7919" crc="f4bb53ba" sha1="49b215354d243a8a9bae560e0309a4fba8a328e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -867,19 +867,19 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Asteroids)"/>
 			<dataarea name="cass" size="1089">
-				<rom name="games tape one (1983)(voyager software)(gb)(file 1 of 3)[asteroids][3k].tap" size="1089" crc="da6c588b" sha1="07d77a50514487e658643ed68cea3cfdd014d884" offset="0x0000"  status="baddump" />
+				<rom name="games tape one (1983)(voyager software)(gb)(file 1 of 3)[asteroids][3k].tap" size="1089" crc="da6c588b" sha1="07d77a50514487e658643ed68cea3cfdd014d884" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Brickcatcher)"/>
 			<dataarea name="cass" size="872">
-				<rom name="games tape one (1983)(voyager software)(gb)(file 2 of 3)[brickcatcher][3k].tap" size="872" crc="7556a88e" sha1="53f764e7ceaa29b4ffe5fcacea17abec869d98e1" offset="0x0000"  status="baddump" />
+				<rom name="games tape one (1983)(voyager software)(gb)(file 2 of 3)[brickcatcher][3k].tap" size="872" crc="7556a88e" sha1="53f764e7ceaa29b4ffe5fcacea17abec869d98e1" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass">
 			<feature name="part_id" value="Tape 3 (Streetrace)"/>
 			<dataarea name="cass" size="1563">
-				<rom name="games tape one (1983)(voyager software)(gb)(file 3 of 3)[streetrace][3k].tap" size="1563" crc="c1d26d3c" sha1="8b36a1510fa286166b883231748c20caa68d705e" offset="0x0000"  status="baddump" />
+				<rom name="games tape one (1983)(voyager software)(gb)(file 3 of 3)[streetrace][3k].tap" size="1563" crc="c1d26d3c" sha1="8b36a1510fa286166b883231748c20caa68d705e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -891,13 +891,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Bomber)"/>
 			<dataarea name="cass" size="1320">
-				<rom name="games tape three (1983)(voyager software)(gb)(file 1 of 2)[bomber][3k].tap" size="1320" crc="a97802b9" sha1="5447861248e83f423907ee14ab1e1c0a089e37e3" offset="0x0000" />
+				<rom name="games tape three (1983)(voyager software)(gb)(file 1 of 2)[bomber][3k].tap" size="1320" crc="a97802b9" sha1="5447861248e83f423907ee14ab1e1c0a089e37e3"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Jackpot)"/>
 			<dataarea name="cass" size="1979">
-				<rom name="games tape three (1983)(voyager software)(gb)(file 2 of 2)[jackpot][3k].tap" size="1979" crc="80b93e84" sha1="05097c7101c03c970bcc2cd7aa772ba07846fcee" offset="0x0000" />
+				<rom name="games tape three (1983)(voyager software)(gb)(file 2 of 2)[jackpot][3k].tap" size="1979" crc="80b93e84" sha1="05097c7101c03c970bcc2cd7aa772ba07846fcee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -908,7 +908,7 @@
 		<publisher>Jupiter Cantab</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="9369">
-				<rom name="gobbledegook (1983)(jupiter cantab)(gb)[19k].tap" size="9369" crc="6f2300c1" sha1="176b5fc9e7e82a7350cd62ad5a118ed76e019ec6" offset="0x0000" />
+				<rom name="gobbledegook (1983)(jupiter cantab)(gb)[19k].tap" size="9369" crc="6f2300c1" sha1="176b5fc9e7e82a7350cd62ad5a118ed76e019ec6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -919,7 +919,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="9891">
-				<rom name="grandprix (1983)(plasma software)(gb)(alpha)[unreleased][19k].tap" size="9891" crc="6c9bc237" sha1="d5cc3ff3b07a3709efbd735c9eedb86feba269f6" offset="0x0000" />
+				<rom name="grandprix (1983)(plasma software)(gb)(alpha)[unreleased][19k].tap" size="9891" crc="6c9bc237" sha1="d5cc3ff3b07a3709efbd735c9eedb86feba269f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -930,7 +930,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="879">
-				<rom name="graphic exercises (1983-05-12)(popular computing weekly)(gb)[3k].tap" size="879" crc="f5a1888d" sha1="c7d65914241588403ed1988d1aa257fe6c812908" offset="0x0000" />
+				<rom name="graphic exercises (1983-05-12)(popular computing weekly)(gb)[3k].tap" size="879" crc="f5a1888d" sha1="c7d65914241588403ed1988d1aa257fe6c812908"/>
 			</dataarea>
 		</part>
 	</software>
@@ -942,13 +942,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Greedy Gobbler)"/>
 			<dataarea name="cass" size="1632">
-				<rom name="greedy gobbler + blowing up the world (1983)(jupiter cantab)(gb)(file 1 of 2)[greedy gobbler][3k].tap" size="1632" crc="fa1cd2dd" sha1="68d0025f9ca2a28e7e527be6854f0d8c985d8651" offset="0x0000" />
+				<rom name="greedy gobbler + blowing up the world (1983)(jupiter cantab)(gb)(file 1 of 2)[greedy gobbler][3k].tap" size="1632" crc="fa1cd2dd" sha1="68d0025f9ca2a28e7e527be6854f0d8c985d8651"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Blowing up the World)"/>
 			<dataarea name="cass" size="855">
-				<rom name="greedy gobbler + blowing up the world (1983)(jupiter cantab)(gb)(file 2 of 2)[blowing up the world][3k].tap" size="855" crc="5c1d617c" sha1="11185ca6ee522bd41505b80d8e1a2146ab1d569c" offset="0x0000" />
+				<rom name="greedy gobbler + blowing up the world (1983)(jupiter cantab)(gb)(file 2 of 2)[blowing up the world][3k].tap" size="855" crc="5c1d617c" sha1="11185ca6ee522bd41505b80d8e1a2146ab1d569c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -959,7 +959,7 @@
 		<publisher>Hi-Tech Microsoft</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1050">
-				<rom name="green x frog (1982)(hi-tech microsoft)(gb)[3k].tap" size="1050" crc="4aa7cdfc" sha1="cdeeb7a645e4d08d8af5c866a9f73a9f67aa78ba" offset="0x0000" />
+				<rom name="green x frog (1982)(hi-tech microsoft)(gb)[3k].tap" size="1050" crc="4aa7cdfc" sha1="cdeeb7a645e4d08d8af5c866a9f73a9f67aa78ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -970,7 +970,7 @@
 		<publisher>Practical Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="557">
-				<rom name="guessing game (1983-05)(practical computing)(gb)[3k].tap" size="557" crc="23b22442" sha1="46c96e4b48cb13fa2eeeca88119401561152c5d5" offset="0x0000" />
+				<rom name="guessing game (1983-05)(practical computing)(gb)[3k].tap" size="557" crc="23b22442" sha1="46c96e4b48cb13fa2eeeca88119401561152c5d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -981,7 +981,7 @@
 		<publisher>Edwin Blink</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="272">
-				<rom name="hdrmon (2007)(blink, edwin)(pd)[3k].tap" size="272" crc="d0e2b2fb" sha1="84e2bafdfba36b3c580dde45383425c7d6d9119f" offset="0x0000" />
+				<rom name="hdrmon (2007)(blink, edwin)(pd)[3k].tap" size="272" crc="d0e2b2fb" sha1="84e2bafdfba36b3c580dde45383425c7d6d9119f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -992,7 +992,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="11341">
-				<rom name="invaders (1984)(plasma software)(gb)[unreleased][19k].tap" size="11341" crc="84754081" sha1="0b7d720308d642cbc01c36f9ae440bd8b3d32eec" offset="0x0000" />
+				<rom name="invaders (1984)(plasma software)(gb)[unreleased][19k].tap" size="11341" crc="84754081" sha1="0b7d720308d642cbc01c36f9ae440bd8b3d32eec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1003,7 +1003,7 @@
 		<publisher>Callisto Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8735">
-				<rom name="jumpman (1984)(callisto software)[32k].tap" size="8735" crc="de04b476" sha1="94aea64e9f67bd936028b559a5824f3d6d9322a0" offset="0x0000" />
+				<rom name="jumpman (1984)(callisto software)[32k].tap" size="8735" crc="de04b476" sha1="94aea64e9f67bd936028b559a5824f3d6d9322a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1014,7 +1014,7 @@
 		<publisher>Voyager Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8243">
-				<rom name="krazy kong (19xx)(voyager software)(gb)[unreleased][19k].tap" size="8243" crc="ddd263b6" sha1="36f9be4b58c76f68791fefa228c610a3db2b2d53" offset="0x0000" />
+				<rom name="krazy kong (19xx)(voyager software)(gb)[unreleased][19k].tap" size="8243" crc="ddd263b6" sha1="36f9be4b58c76f68791fefa228c610a3db2b2d53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1025,7 +1025,7 @@
 		<publisher>Julian Skidmore</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7597">
-				<rom name="life (2006)(skidmore, julian)(pd)[19k].tap" size="7597" crc="fd48c670" sha1="1ed3e807aca1d6b58551b5761f6a747fe2f6a0f4" offset="0x0000" />
+				<rom name="life (2006)(skidmore, julian)(pd)[19k].tap" size="7597" crc="fd48c670" sha1="1ed3e807aca1d6b58551b5761f6a747fe2f6a0f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1036,7 +1036,7 @@
 		<publisher>Dutra de Lacerda</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="911">
-				<rom name="life v2 (1985)(de lacerda, dutra)[1k].tap" size="911" crc="97ac8f78" sha1="b12fa8f076da2f243115e1bf3e4a0da53331a451" offset="0x0000" />
+				<rom name="life v2 (1985)(de lacerda, dutra)[1k].tap" size="911" crc="97ac8f78" sha1="b12fa8f076da2f243115e1bf3e4a0da53331a451"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1048,13 +1048,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1"/>
 			<dataarea name="cass" size="623">
-				<rom name="life v3 (1985)(de lacerda, dutra)[1k].tap" size="623" crc="3e7532fe" sha1="61d1ee2b8b0e619b1d928e52f378f08bbc514ac1" offset="0x0000" />
+				<rom name="life v3 (1985)(de lacerda, dutra)[1k].tap" size="623" crc="3e7532fe" sha1="61d1ee2b8b0e619b1d928e52f378f08bbc514ac1"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1, Patched"/>
 			<dataarea name="cass" size="860">
-				<rom name="life v3 (1985)(de lacerda, dutra)[m patched][1k].tap" size="860" crc="679ef000" sha1="3009c4bd3cfaf0d0336aa59a0938e26538695a7a" offset="0x0000" />
+				<rom name="life v3 (1985)(de lacerda, dutra)[m patched][1k].tap" size="860" crc="679ef000" sha1="3009c4bd3cfaf0d0336aa59a0938e26538695a7a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1065,7 +1065,7 @@
 		<publisher>Brian Bates</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7770">
-				<rom name="light racer (1983-10)(bates, brian)[unreleased][19k].tap" size="7770" crc="24f5efc0" sha1="b7cd8e6fd4c191df907960caf66df1c85e994e33" offset="0x0000" />
+				<rom name="light racer (1983-10)(bates, brian)[unreleased][19k].tap" size="7770" crc="24f5efc0" sha1="b7cd8e6fd4c191df907960caf66df1c85e994e33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1076,7 +1076,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="212">
-				<rom name="loader (1983-03-01)(popular computing weekly)(gb)[3k].tap" size="212" crc="89cf2815" sha1="89b7a6d38399e67943ab5c87499e005f47706949" offset="0x0000" />
+				<rom name="loader (1983-03-01)(popular computing weekly)(gb)[3k].tap" size="212" crc="89cf2815" sha1="89b7a6d38399e67943ab5c87499e005f47706949"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1087,7 +1087,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="591">
-				<rom name="lunar lander (1983-04-21)(popular computing weekly)(gb)[3k].tap" size="591" crc="d2ed39d2" sha1="45ba6c6291df27a4b7be5f1b4aa5312cec0d05a3" offset="0x0000" />
+				<rom name="lunar lander (1983-04-21)(popular computing weekly)(gb)[3k].tap" size="591" crc="d2ed39d2" sha1="45ba6c6291df27a4b7be5f1b4aa5312cec0d05a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1098,7 +1098,7 @@
 		<publisher>Hi-Tech Microsoft</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="819">
-				<rom name="memory stars (1982)(hi-tech microsoft)(gb)[3k].tap" size="819" crc="a4075ebe" sha1="236cf7ca47a5ee18dd9e871fc6218df9d5b1332f" offset="0x0000" />
+				<rom name="memory stars (1982)(hi-tech microsoft)(gb)[3k].tap" size="819" crc="a4075ebe" sha1="236cf7ca47a5ee18dd9e871fc6218df9d5b1332f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1109,7 +1109,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="751">
-				<rom name="meteor (1983-03-24)(popular computing weekly)(gb)[3k].tap" size="751" crc="d468a6bd" sha1="58259d1409c84425009b64084ed1eb7b8cdb49fc" offset="0x0000" />
+				<rom name="meteor (1983-03-24)(popular computing weekly)(gb)[3k].tap" size="751" crc="d468a6bd" sha1="58259d1409c84425009b64084ed1eb7b8cdb49fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1120,7 +1120,7 @@
 		<publisher>Forth Dimension</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="3441">
-				<rom name="meteor racer (1983)(forth dimension)[1k].tap" size="3441" crc="653ceffd" sha1="04518005d92668be718ce60608ccc5664826348c" offset="0x0000" />
+				<rom name="meteor racer (1983)(forth dimension)[1k].tap" size="3441" crc="653ceffd" sha1="04518005d92668be718ce60608ccc5664826348c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1131,7 +1131,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="10481">
-				<rom name="meteors (1984)(plasma software)(gb)[unreleased][19k].tap" size="10481" crc="e4453013" sha1="46e128fe0bd7a8d6a59d4bde99c95747cdc58a05" offset="0x0000" />
+				<rom name="meteors (1984)(plasma software)(gb)[unreleased][19k].tap" size="10481" crc="e4453013" sha1="46e128fe0bd7a8d6a59d4bde99c95747cdc58a05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1142,7 +1142,7 @@
 		<publisher>Hi-Tech Microsoft</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2903">
-				<rom name="micro maze (1982)(hi-tech microsoft)(gb)[3k].tap" size="2903" crc="d19ff48a" sha1="cf21c6fd5bc41819e1ecea67612420457bb90bb3" offset="0x0000" />
+				<rom name="micro maze (1982)(hi-tech microsoft)(gb)[3k].tap" size="2903" crc="d19ff48a" sha1="cf21c6fd5bc41819e1ecea67612420457bb90bb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1153,7 +1153,7 @@
 		<publisher>Micro Marketing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="839">
-				<rom name="minefield (1983)(micro marketing)(gb)[3k].tap" size="839" crc="dc70bee6" sha1="6245ed5e8c97ef22189c874dfc1c703c36d21922" offset="0x0000" />
+				<rom name="minefield (1983)(micro marketing)(gb)[3k].tap" size="839" crc="dc70bee6" sha1="6245ed5e8c97ef22189c874dfc1c703c36d21922"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1165,13 +1165,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Missle Man)"/>
 			<dataarea name="cass" size="855">
-				<rom name="missle man + space fighter pilot (1983)(jupiter cantab)(gb)(file 1 of 2)[missile man][3k].tap" size="855" crc="eee45ab4" sha1="9d36b57ea34b2865ac34846687fccf29be0398a3" offset="0x0000" />
+				<rom name="missle man + space fighter pilot (1983)(jupiter cantab)(gb)(file 1 of 2)[missile man][3k].tap" size="855" crc="eee45ab4" sha1="9d36b57ea34b2865ac34846687fccf29be0398a3"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Space Fighter Pilot)"/>
 			<dataarea name="cass" size="1612">
-				<rom name="missle man + space fighter pilot (1983)(jupiter cantab)(gb)(file 2 of 2)[space fighter pilot][3k].tap" size="1612" crc="6ec4cd1b" sha1="a2b922dc8a40617a631483f2b83f9a264731dbff" offset="0x0000" />
+				<rom name="missle man + space fighter pilot (1983)(jupiter cantab)(gb)(file 2 of 2)[space fighter pilot][3k].tap" size="1612" crc="6ec4cd1b" sha1="a2b922dc8a40617a631483f2b83f9a264731dbff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1182,7 +1182,7 @@
 		<publisher>Jupiter Cantab</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="651">
-				<rom name="monitor (1983)(jupiter cantab)(gb)[3k].tap" size="651" crc="1cebd393" sha1="0cc4ee4b58d38cf96dcd05eec3ae8469b337fef9" offset="0x0000" />
+				<rom name="monitor (1983)(jupiter cantab)(gb)[3k].tap" size="651" crc="1cebd393" sha1="0cc4ee4b58d38cf96dcd05eec3ae8469b337fef9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1193,7 +1193,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="537">
-				<rom name="monitor (1983-10-20)(popular computing weekly)(gb)[3k].tap" size="537" crc="d3a5e73f" sha1="3725c4623fd3227459460c0be93e9e0ee2f966c9" offset="0x0000" />
+				<rom name="monitor (1983-10-20)(popular computing weekly)(gb)[3k].tap" size="537" crc="d3a5e73f" sha1="3725c4623fd3227459460c0be93e9e0ee2f966c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1205,13 +1205,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Moo)"/>
 			<dataarea name="cass" size="867">
-				<rom name="moo + hangman (1983)(jupiter cantab)(gb)(file 1 of 2)[moo][3k].tap" size="867" crc="4e89bbf3" sha1="e0802ea058f6932545493b449ecec68d3bbc5814" offset="0x0000" />
+				<rom name="moo + hangman (1983)(jupiter cantab)(gb)(file 1 of 2)[moo][3k].tap" size="867" crc="4e89bbf3" sha1="e0802ea058f6932545493b449ecec68d3bbc5814"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Hangman)"/>
 			<dataarea name="cass" size="1113">
-				<rom name="moo + hangman (1983)(jupiter cantab)(gb)(file 2 of 2)[hangman][3k].tap" size="1113" crc="3403a247" sha1="97c9068ec1e31abcad58e115d8e2a8b600fc28c3" offset="0x0000" />
+				<rom name="moo + hangman (1983)(jupiter cantab)(gb)(file 2 of 2)[hangman][3k].tap" size="1113" crc="3403a247" sha1="97c9068ec1e31abcad58e115d8e2a8b600fc28c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1222,7 +1222,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16986">
-				<rom name="moon buggy (1984)(plasma software)(gb)[unreleased][19k].tap" size="16986" crc="8a824119" sha1="1673d33bc78223f28ff2cf85a52a9d0f3d4a9f1a" offset="0x0000" />
+				<rom name="moon buggy (1984)(plasma software)(gb)[unreleased][19k].tap" size="16986" crc="8a824119" sha1="1673d33bc78223f28ff2cf85a52a9d0f3d4a9f1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1233,7 +1233,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1265">
-				<rom name="morse code tutor (19xx)(-)[19k].tap" size="1265" crc="e39c1d77" sha1="89ecfb6831c1cfe4d2d96888e9a41cad46f096a3" offset="0x0000" />
+				<rom name="morse code tutor (19xx)(-)[19k].tap" size="1265" crc="e39c1d77" sha1="89ecfb6831c1cfe4d2d96888e9a41cad46f096a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1244,7 +1244,7 @@
 		<publisher>Jupiter Ace Archive Team</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="952">
-				<rom name="multi key press demo (2009)(jupiter ace archive team)(gb)[3k].tap" size="952" crc="ee2d0b6d" sha1="0576765f17656af8752e0cd3f6e3064b81b45b79" offset="0x0000" />
+				<rom name="multi key press demo (2009)(jupiter ace archive team)(gb)[3k].tap" size="952" crc="ee2d0b6d" sha1="0576765f17656af8752e0cd3f6e3064b81b45b79"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1255,7 +1255,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="426">
-				<rom name="music (1983)(popular computing weekly)(gb)[3k].tap" size="426" crc="2eabab10" sha1="bdbed2da4a986ec3a6726bc89bd0fac766aa36b1" offset="0x0000" />
+				<rom name="music (1983)(popular computing weekly)(gb)[3k].tap" size="426" crc="2eabab10" sha1="bdbed2da4a986ec3a6726bc89bd0fac766aa36b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1266,7 +1266,7 @@
 		<publisher>Jupiter Cantab</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2686">
-				<rom name="othello (1983)(jupiter cantab)(gb)[19k].tap" size="2686" crc="52c4d4a8" sha1="2bf56bb00593c812122e6cdcce30e20ddec620a3" offset="0x0000" />
+				<rom name="othello (1983)(jupiter cantab)(gb)[19k].tap" size="2686" crc="52c4d4a8" sha1="2bf56bb00593c812122e6cdcce30e20ddec620a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1278,13 +1278,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Overtaker)"/>
 			<dataarea name="cass" size="896">
-				<rom name="overtaker + brands hatch (1983)(jupiter cantab)(gb)(file 1 of 2)[overtaker][3k].tap" size="896" crc="0734cac9" sha1="522e61fb8df29758b1fb0743bb0750a267aebe77" offset="0x0000" />
+				<rom name="overtaker + brands hatch (1983)(jupiter cantab)(gb)(file 1 of 2)[overtaker][3k].tap" size="896" crc="0734cac9" sha1="522e61fb8df29758b1fb0743bb0750a267aebe77"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Brands Hatch)"/>
 			<dataarea name="cass" size="897">
-				<rom name="overtaker + brands hatch (1983)(jupiter cantab)(gb)(file 2 of 2)[brands hatch][3k].tap" size="897" crc="0cc21258" sha1="db49354c09b4d0ea3bef0f7145f833942d9f5c4a" offset="0x0000" />
+				<rom name="overtaker + brands hatch (1983)(jupiter cantab)(gb)(file 2 of 2)[brands hatch][3k].tap" size="897" crc="0cc21258" sha1="db49354c09b4d0ea3bef0f7145f833942d9f5c4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1295,7 +1295,7 @@
 		<publisher>Callisto Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14885">
-				<rom name="owler (1984)(callisto software)[32k].tap" size="14885" crc="7e93c42f" sha1="893dc5a34ab3a4c260304ade09191a24fc08d33b" offset="0x0000" />
+				<rom name="owler (1984)(callisto software)[32k].tap" size="14885" crc="7e93c42f" sha1="893dc5a34ab3a4c260304ade09191a24fc08d33b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1307,13 +1307,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Puzzle)"/>
 			<dataarea name="cass" size="1686">
-				<rom name="puzzle - bombs (1984)(boldfield computing)(gb)(file 1 of 2)[puzzle][3k].tap" size="1686" crc="594132c8" sha1="bb9b8f16e3c4aefeb600006e21b5e0d36f056d2e" offset="0x0000" />
+				<rom name="puzzle - bombs (1984)(boldfield computing)(gb)(file 1 of 2)[puzzle][3k].tap" size="1686" crc="594132c8" sha1="bb9b8f16e3c4aefeb600006e21b5e0d36f056d2e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Bombs)"/>
 			<dataarea name="cass" size="1693">
-				<rom name="puzzle - bombs (1984)(boldfield computing)(gb)(file 2 of 2)[bombs][3k].tap" size="1693" crc="f78a48f9" sha1="efff47ef9bb42a745c2ef0c8eadcde9eca17f0b4" offset="0x0000" />
+				<rom name="puzzle - bombs (1984)(boldfield computing)(gb)(file 2 of 2)[bombs][3k].tap" size="1693" crc="f78a48f9" sha1="efff47ef9bb42a745c2ef0c8eadcde9eca17f0b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1324,7 +1324,7 @@
 		<publisher>Brian Bates</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14757">
-				<rom name="quick-draw (1983-11)(bates, brian)[unreleased][19k].tap" size="14757" crc="a7ee7cfe" sha1="dd5c530defde838bdc4a02cdf8b168864d6ad971" offset="0x0000" />
+				<rom name="quick-draw (1983-11)(bates, brian)[unreleased][19k].tap" size="14757" crc="a7ee7cfe" sha1="dd5c530defde838bdc4a02cdf8b168864d6ad971"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1335,7 +1335,7 @@
 		<publisher>Brian Bates</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="15106">
-				<rom name="quick-draw practice (1983-11)(bates, brian)[unreleased][19k].tap" size="15106" crc="32b350e4" sha1="5c5e2bc35bf96f226076ef8a5cb9ce735921bb86" offset="0x0000" />
+				<rom name="quick-draw practice (1983-11)(bates, brian)[unreleased][19k].tap" size="15106" crc="32b350e4" sha1="5c5e2bc35bf96f226076ef8a5cb9ce735921bb86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1346,7 +1346,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14200">
-				<rom name="robohench (1984)(plasma software)(gb)[unreleased][19k].tap" size="14200" crc="77b2fb21" sha1="df8ce9460aa1129cdaa3c479f28496df28b6920e" offset="0x0000" />
+				<rom name="robohench (1984)(plasma software)(gb)[unreleased][19k].tap" size="14200" crc="77b2fb21" sha1="df8ce9460aa1129cdaa3c479f28496df28b6920e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1357,7 +1357,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="15678">
-				<rom name="robohunt (1984)(plasma software)(gb)[unreleased][19k].tap" size="15678" crc="e80c6db2" sha1="b5f82d7aa494fda7af6d6a096aac28fa1bfae16e" offset="0x0000" />
+				<rom name="robohunt (1984)(plasma software)(gb)[unreleased][19k].tap" size="15678" crc="e80c6db2" sha1="b5f82d7aa494fda7af6d6a096aac28fa1bfae16e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1368,7 +1368,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="715">
-				<rom name="sallors' hornpipe (1982-12-16)(popular computing weekly)(gb)[3k].tap" size="715" crc="770a5f4d" sha1="faca2f968632c04d46c7a46bc412b697f14cc85e" offset="0x0000" />
+				<rom name="sallors' hornpipe (1982-12-16)(popular computing weekly)(gb)[3k].tap" size="715" crc="770a5f4d" sha1="faca2f968632c04d46c7a46bc412b697f14cc85e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1379,7 +1379,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="12654">
-				<rom name="sam and the time bombs (1984)(plasma software)(gb)[unreleased][19k].tap" size="12654" crc="edc5d37a" sha1="65289d38c4f902805edef5750247d231d42ef2ab" offset="0x0000" />
+				<rom name="sam and the time bombs (1984)(plasma software)(gb)[unreleased][19k].tap" size="12654" crc="edc5d37a" sha1="65289d38c4f902805edef5750247d231d42ef2ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1390,7 +1390,7 @@
 		<publisher>Electronics &amp; Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="729">
-				<rom name="scrambler (1982-05)(electronics &amp; computing)(gb)[3k].tap" size="729" crc="7a06c3bc" sha1="d0d1082b230633950535de09df4f2da575a38b7c" offset="0x0000" />
+				<rom name="scrambler (1982-05)(electronics &amp; computing)(gb)[3k].tap" size="729" crc="7a06c3bc" sha1="d0d1082b230633950535de09df4f2da575a38b7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1401,7 +1401,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="116">
-				<rom name="security (1982-09-01)(popular computing weekly)(gb)[3k].tap" size="116" crc="1e49ad67" sha1="10b516f8714b29b35c50e493d23b041f17e6545c" offset="0x0000" />
+				<rom name="security (1982-09-01)(popular computing weekly)(gb)[3k].tap" size="116" crc="1e49ad67" sha1="10b516f8714b29b35c50e493d23b041f17e6545c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1412,7 +1412,7 @@
 		<publisher>Personal Computer World</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="146">
-				<rom name="sine wave generator (1984-03)(personal computer world)(gb)[3k].tap" size="146" crc="6cff7c9c" sha1="7d552596df4f2f529c04df209a93d5cfcb54081a" offset="0x0000" />
+				<rom name="sine wave generator (1984-03)(personal computer world)(gb)[3k].tap" size="146" crc="6cff7c9c" sha1="7d552596df4f2f529c04df209a93d5cfcb54081a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1424,13 +1424,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Side A (Snake)"/>
 			<dataarea name="cass" size="5909">
-				<rom name="snake + superbat+ (1985)(waylandsoft)(side a)[snake][16k].tap" size="5909" crc="691e427f" sha1="d96ae780b32324df04e2cb9ede360fa759b3d276" offset="0x0000" />
+				<rom name="snake + superbat+ (1985)(waylandsoft)(side a)[snake][16k].tap" size="5909" crc="691e427f" sha1="d96ae780b32324df04e2cb9ede360fa759b3d276"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Side A (Superbat)"/>
 			<dataarea name="cass" size="1575">
-				<rom name="snake + superbat+ (1985)(waylandsoft)(side a)[superbat][16k].tap" size="1575" crc="de48091a" sha1="46ca3a9bd63cc036cb1d5825d172677c20f225a4" offset="0x0000" />
+				<rom name="snake + superbat+ (1985)(waylandsoft)(side a)[superbat][16k].tap" size="1575" crc="de48091a" sha1="46ca3a9bd63cc036cb1d5825d172677c20f225a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1441,7 +1441,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14367">
-				<rom name="sokoace (2006)(lopes, ricardo fernandes)(pd)[19k].tap" size="14367" crc="b02e398d" sha1="fcda8a2a50ca573d972cc635204fe36ed2cc4f4b" offset="0x0000" />
+				<rom name="sokoace (2006)(lopes, ricardo fernandes)(pd)[19k].tap" size="14367" crc="b02e398d" sha1="fcda8a2a50ca573d972cc635204fe36ed2cc4f4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1452,7 +1452,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2160">
-				<rom name="sokoace map editor (2006)(lopes, ricardo fernandes)(pd)[19k].tap" size="2160" crc="76a356e5" sha1="5f80ea127fd48e4d442cc46061dad30e2e4df1c7" offset="0x0000" />
+				<rom name="sokoace map editor (2006)(lopes, ricardo fernandes)(pd)[19k].tap" size="2160" crc="76a356e5" sha1="5f80ea127fd48e4d442cc46061dad30e2e4df1c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1463,7 +1463,7 @@
 		<publisher>Hi-Tech Microsoft</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1224">
-				<rom name="space battle (1982)(hi-tech microsoft)(gb)[3k].tap" size="1224" crc="1569208e" sha1="b53fedd4b227ab995a15f64b595ba2a124e57062" offset="0x0000" />
+				<rom name="space battle (1982)(hi-tech microsoft)(gb)[3k].tap" size="1224" crc="1569208e" sha1="b53fedd4b227ab995a15f64b595ba2a124e57062"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1474,7 +1474,7 @@
 		<publisher>Boldfield Computing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="9882">
-				<rom name="spreadsheet (1984)(boldfield computing)(gb)[19k].tap" size="9882" crc="df789644" sha1="53a4545d04ebadbea98797684bac261a0a5b6b81" offset="0x0000" />
+				<rom name="spreadsheet (1984)(boldfield computing)(gb)[19k].tap" size="9882" crc="df789644" sha1="53a4545d04ebadbea98797684bac261a0a5b6b81"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1485,7 +1485,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14756">
-				<rom name="star trek (1984)(plasma software)(gb)[unreleased][19k].tap" size="14756" crc="6d084e74" sha1="53450a452cdf9b7fd70f1ef9539ff1ec581043ea" offset="0x0000" />
+				<rom name="star trek (1984)(plasma software)(gb)[unreleased][19k].tap" size="14756" crc="6d084e74" sha1="53450a452cdf9b7fd70f1ef9539ff1ec581043ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1496,7 +1496,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="3887">
-				<rom name="sudoku (2007)(lopes, ricardo fernandes)(pd)[19k].tap" size="3887" crc="a994a6fd" sha1="e1915263651eae3d5a953aa9f8f8cb39b9d31f0c" offset="0x0000" />
+				<rom name="sudoku (2007)(lopes, ricardo fernandes)(pd)[19k].tap" size="3887" crc="a994a6fd" sha1="e1915263651eae3d5a953aa9f8f8cb39b9d31f0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1507,7 +1507,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14380">
-				<rom name="tank battle (1984)(plasma software)(gb)[unreleased][19k].tap" size="14380" crc="27b07d5d" sha1="12448adfad4e0ab5abacd0f9c7f8d6852cad567d" offset="0x0000" />
+				<rom name="tank battle (1984)(plasma software)(gb)[unreleased][19k].tap" size="14380" crc="27b07d5d" sha1="12448adfad4e0ab5abacd0f9c7f8d6852cad567d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1518,7 +1518,7 @@
 		<publisher>Viscount</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="18676">
-				<rom name="teach yourself forth on the jupiter ace (1982)(viscount)[3k].tap" size="18676" crc="85aecda2" sha1="2ef64991e6a961a9942a7442d0d49003741c015a" offset="0x0000" />
+				<rom name="teach yourself forth on the jupiter ace (1982)(viscount)[3k].tap" size="18676" crc="85aecda2" sha1="2ef64991e6a961a9942a7442d0d49003741c015a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1529,7 +1529,7 @@
 		<publisher>Jupiter Ace Archive Team</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1398">
-				<rom name="tetris (2009)(jupiter ace archive team)(gb)(pd)[19k].tap" size="1398" crc="f4b103d4" sha1="a7f264ec1375cc2befc64203f516ae5861bda40b" offset="0x0000" />
+				<rom name="tetris (2009)(jupiter ace archive team)(gb)(pd)[19k].tap" size="1398" crc="f4b103d4" sha1="a7f264ec1375cc2befc64203f516ae5861bda40b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1541,13 +1541,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Side A (Titan Defender)"/>
 			<dataarea name="cass" size="16538">
-				<rom name="titan defender + dual duel (1985)(stusoft)(side a)[titan defender][16k].tap" size="16538" crc="0b0da908" sha1="547e6954e5f6100397e27ea5b1568b1e6917bc18" offset="0x0000" />
+				<rom name="titan defender + dual duel (1985)(stusoft)(side a)[titan defender][16k].tap" size="16538" crc="0b0da908" sha1="547e6954e5f6100397e27ea5b1568b1e6917bc18"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Side B (Dual Duel)"/>
 			<dataarea name="cass" size="3692">
-				<rom name="titan defender + dual duel (1985)(stusoft)(side b)[dual duel][16k].tap" size="3692" crc="abde8634" sha1="af404fa7619682f09f64c7915bf2ddade46952cb" offset="0x0000" />
+				<rom name="titan defender + dual duel (1985)(stusoft)(side b)[dual duel][16k].tap" size="3692" crc="abde8634" sha1="af404fa7619682f09f64c7915bf2ddade46952cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1558,7 +1558,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="835">
-				<rom name="towers of hanoi (2006)(lopes, ricardo fernandes)(pd)[3k].tap" size="835" crc="43c2ed79" sha1="6be70c75aaf9f6f548e29e8f874208d455d065c7" offset="0x0000" />
+				<rom name="towers of hanoi (2006)(lopes, ricardo fernandes)(pd)[3k].tap" size="835" crc="43c2ed79" sha1="6be70c75aaf9f6f548e29e8f874208d455d065c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1570,19 +1570,19 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Balloon Pilot)"/>
 			<dataarea name="cass" size="801">
-				<rom name="triple pack (1984)(boldfield computing)(gb)(file 1 of 3)[balloon pilot][3k].tap" size="801" crc="ab09efb0" sha1="adc4169d975fb029c8feb9435587ebe387a027c6" offset="0x0000" />
+				<rom name="triple pack (1984)(boldfield computing)(gb)(file 1 of 3)[balloon pilot][3k].tap" size="801" crc="ab09efb0" sha1="adc4169d975fb029c8feb9435587ebe387a027c6"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Shuttlecock)"/>
 			<dataarea name="cass" size="887">
-				<rom name="triple pack (1984)(boldfield computing)(gb)(file 2 of 3)[shuttlecock][3k].tap" size="887" crc="7d01c879" sha1="1b6606256fba11c1b783fe428b1df9dc579da77f" offset="0x0000" />
+				<rom name="triple pack (1984)(boldfield computing)(gb)(file 2 of 3)[shuttlecock][3k].tap" size="887" crc="7d01c879" sha1="1b6606256fba11c1b783fe428b1df9dc579da77f"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass"> <!-- not available in TAP format -->
 			<feature name="part_id" value="Tape 3 (Computer Weaving)"/>
 			<dataarea name="cass" size="887">
-				<rom name="triple pack (1984)(boldfield computing)(gb)(file 3 of 3)[computer weaving][3k].tap" size="0" offset="0x0000" status="nodump" />
+				<rom name="triple pack (1984)(boldfield computing)(gb)(file 3 of 3)[computer weaving][3k].tap" size="0" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1593,7 +1593,7 @@
 		<publisher>Plasma Software</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16958">
-				<rom name="turbo (1984)(plasma software)(gb)[unreleased][19k].tap" size="16958" crc="b1d5aad0" sha1="6f23ddf66bcd4cb6a7bfc0f2b88b6282e7136a2e" offset="0x0000" />
+				<rom name="turbo (1984)(plasma software)(gb)[unreleased][19k].tap" size="16958" crc="b1d5aad0" sha1="6f23ddf66bcd4cb6a7bfc0f2b88b6282e7136a2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1606,86 +1606,86 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Turtle)"/>
 			<dataarea name="cass" size="6993">
-				<rom name="utilities (1985)(boldfield computing)(file 01 of 15)(gb)[turtle][19k].tap" size="6993" crc="76f6d6fa" sha1="fc157e4fe5b5ad25ab0293c1b76f65ae9ac47fba" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 01 of 15)(gb)[turtle][19k].tap" size="6993" crc="76f6d6fa" sha1="fc157e4fe5b5ad25ab0293c1b76f65ae9ac47fba" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Copy)"/>
 			<dataarea name="cass" size="370">
-				<rom name="utilities (1985)(boldfield computing)(file 02 of 15)(gb)[copy][19k].tap" size="370" crc="19c0c6c4" sha1="051999462b8a589b0b1fdfb8698a1ffdf204c880" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 02 of 15)(gb)[copy][19k].tap" size="370" crc="19c0c6c4" sha1="051999462b8a589b0b1fdfb8698a1ffdf204c880" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="jupace_cass">
 			<feature name="part_id" value="Tape 3 (Lprint)"/>
 			<dataarea name="cass" size="455">
-				<rom name="utilities (1985)(boldfield computing)(file 03 of 15)(gb)[lprint][19k].tap" size="455" crc="5183a818" sha1="f96f2642b40db6d3d4fa58428be1b3c2420b6c93" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 03 of 15)(gb)[lprint][19k].tap" size="455" crc="5183a818" sha1="f96f2642b40db6d3d4fa58428be1b3c2420b6c93" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="jupace_cass">
 			<feature name="part_id" value="Tape 4 (Invert)"/>
 			<dataarea name="cass" size="153">
-				<rom name="utilities (1985)(boldfield computing)(file 04 of 15)(gb)[invert][19k].tap" size="153" crc="15d5e373" sha1="39c426fcae2f9860669dfee38bbcf81dea93c8cb" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 04 of 15)(gb)[invert][19k].tap" size="153" crc="15d5e373" sha1="39c426fcae2f9860669dfee38bbcf81dea93c8cb" status="baddump" />
 			</dataarea>
 		</part>
 		<!-- file 5 missing -->
 		<part name="cass5" interface="jupace_cass">
 			<feature name="part_id" value="Tape 6 (Wordace)"/>
 			<dataarea name="cass" size="16448">
-				<rom name="utilities (1985)(boldfield computing)(file 06 of 15)(gb)[wordace][19k].tap" size="16448" crc="4c67cba4" sha1="6f389762ee0c1b3c9f0c1702c02e7fb9b4b24ff2" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 06 of 15)(gb)[wordace][19k].tap" size="16448" crc="4c67cba4" sha1="6f389762ee0c1b3c9f0c1702c02e7fb9b4b24ff2" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass6" interface="jupace_cass">
 			<feature name="part_id" value="Tape 7 (Printline)"/>
 			<dataarea name="cass" size="396">
-				<rom name="utilities (1985)(boldfield computing)(file 07 of 15)(gb)[printline][19k].tap" size="396" crc="167c1b3a" sha1="1d7d48ba6be62543ec7733db522879380a4e504f" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 07 of 15)(gb)[printline][19k].tap" size="396" crc="167c1b3a" sha1="1d7d48ba6be62543ec7733db522879380a4e504f" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass7" interface="jupace_cass">
 			<feature name="part_id" value="Tape 8 (Ace-Logo)"/>
 			<dataarea name="cass" size="814">
-				<rom name="utilities (1985)(boldfield computing)(file 08 of 15)(gb)[ace-logo][19k].tap" size="814" crc="f9282553" sha1="85b822b31e814e7e413bb20ea9de36e9901559c3" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 08 of 15)(gb)[ace-logo][19k].tap" size="814" crc="f9282553" sha1="85b822b31e814e7e413bb20ea9de36e9901559c3" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass8" interface="jupace_cass">
 			<feature name="part_id" value="Tape 9 (Charset) [Bad]"/>
 			<dataarea name="cass" size="183">
-				<rom name="utilities (1985)(boldfield computing)(file 09 of 15)(gb)[b][charset][19k].tap" size="183" crc="54eb5546" sha1="145bc7913f734a977e228b953370e9dbf720e8c2" offset="0x0000" status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 09 of 15)(gb)[b][charset][19k].tap" size="183" crc="54eb5546" sha1="145bc7913f734a977e228b953370e9dbf720e8c2" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass9" interface="jupace_cass">
 			<feature name="part_id" value="Tape 10 (Printscan)"/>
 			<dataarea name="cass" size="492">
-				<rom name="utilities (1985)(boldfield computing)(file 10 of 15)(gb)[printscan][19k].tap" size="492" crc="c83f0b99" sha1="e6fb48fa2d4e983f41f832fba658b53ee459e9c7" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 10 of 15)(gb)[printscan][19k].tap" size="492" crc="c83f0b99" sha1="e6fb48fa2d4e983f41f832fba658b53ee459e9c7" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass10" interface="jupace_cass">
 			<feature name="part_id" value="Tape 11 (Lprint-42)"/>
 			<dataarea name="cass" size="1373">
-				<rom name="utilities (1985)(boldfield computing)(file 11 of 15)(gb)[lprint-42][19k].tap" size="1373" crc="3f174d26" sha1="e16908517b9d5277ae3070db87296cbaa2efbc72" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 11 of 15)(gb)[lprint-42][19k].tap" size="1373" crc="3f174d26" sha1="e16908517b9d5277ae3070db87296cbaa2efbc72" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass11" interface="jupace_cass">
 			<feature name="part_id" value="Tape 12 (Centronics) [Bad]"/>
 			<dataarea name="cass" size="152">
-				<rom name="utilities (1985)(boldfield computing)(file 12 of 15)(gb)[b][centronics][19k].tap" size="152" crc="b5e91ad7" sha1="7fc53d76cf7b1d2987b0e633c7b3d9216e59e015" offset="0x0000" status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 12 of 15)(gb)[b][centronics][19k].tap" size="152" crc="b5e91ad7" sha1="7fc53d76cf7b1d2987b0e633c7b3d9216e59e015" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass12" interface="jupace_cass">
 			<feature name="part_id" value="Tape 13 (RS232)"/>
 			<dataarea name="cass" size="961">
-				<rom name="utilities (1985)(boldfield computing)(file 13 of 15)(gb)[rs232][19k].tap" size="961" crc="6d5bba35" sha1="9b418fc0ba1500c0db8199acede0dac318df6cb1" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 13 of 15)(gb)[rs232][19k].tap" size="961" crc="6d5bba35" sha1="9b418fc0ba1500c0db8199acede0dac318df6cb1" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass13" interface="jupace_cass">
 			<feature name="part_id" value="Tape 14 (Soundbox)"/>
 			<dataarea name="cass" size="1213">
-				<rom name="utilities (1985)(boldfield computing)(file 14 of 15)(gb)[soundbox][19k].tap" size="1213" crc="0da77372" sha1="4790110c1df9f4a8336944d288d5698b02f32d62" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 14 of 15)(gb)[soundbox][19k].tap" size="1213" crc="0da77372" sha1="4790110c1df9f4a8336944d288d5698b02f32d62" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass14" interface="jupace_cass">
 			<feature name="part_id" value="Tape 15 (Bagpipes)"/>
 			<dataarea name="cass" size="394">
-				<rom name="utilities (1985)(boldfield computing)(file 15 of 15)(gb)[bagpipes][19k].tap" size="394" crc="7dc04697" sha1="eb9e5386b0d7da542df53c2632ed9d86a5a29a59" offset="0x0000"  status="baddump" />
+				<rom name="utilities (1985)(boldfield computing)(file 15 of 15)(gb)[bagpipes][19k].tap" size="394" crc="7dc04697" sha1="eb9e5386b0d7da542df53c2632ed9d86a5a29a59" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1697,13 +1697,13 @@
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Valkyr)"/>
 			<dataarea name="cass" size="12855">
-				<rom name="valkyr + life (1985)(colinsoft)(file 1 of 2)[unreleased][valkyr][16k].tap" size="12855" crc="fb1ed671" sha1="6cacdfcb7c4feb7adb1c8b36a36603d1c8bcc402" offset="0x0000" />
+				<rom name="valkyr + life (1985)(colinsoft)(file 1 of 2)[unreleased][valkyr][16k].tap" size="12855" crc="fb1ed671" sha1="6cacdfcb7c4feb7adb1c8b36a36603d1c8bcc402"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Life)"/>
 			<dataarea name="cass" size="12855">
-				<rom name="valkyr + life (1985)(colinsoft)(file 2 of 2)[unreleased][life][16k].tap" size="0" offset="0x0000" status="nodump" />
+				<rom name="valkyr + life (1985)(colinsoft)(file 2 of 2)[unreleased][life][16k].tap" size="0" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1714,7 +1714,7 @@
 		<publisher>Popular Computing Weekly</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="217">
-				<rom name="words (1983-10-27)(popular computing weekly)(gb)[3k].tap" size="217" crc="26dde89c" sha1="7160df6c1014124467482843f8df4165a083bcab" offset="0x0000" />
+				<rom name="words (1983-10-27)(popular computing weekly)(gb)[3k].tap" size="217" crc="26dde89c" sha1="7160df6c1014124467482843f8df4165a083bcab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1725,7 +1725,7 @@
 		<publisher>Ricardo Fernandes Lopes</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="614">
-				<rom name="wrd (2006)(lopes, ricardo fernandes)(pd)[3k].tap" size="614" crc="11dfa38f" sha1="ece1603e9e81093092aae91fcf19b7d45b9496cb" offset="0x0000" />
+				<rom name="wrd (2006)(lopes, ricardo fernandes)(pd)[3k].tap" size="614" crc="11dfa38f" sha1="ece1603e9e81093092aae91fcf19b7d45b9496cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1736,7 +1736,7 @@
 		<publisher>Micro Marketing</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="943">
-				<rom name="zapem (1983)(micro marketing)(gb)[3k].tap" size="943" crc="f14dcfec" sha1="8f60e73a34ec2f967caffd37e9cc6d2c44b919c8" offset="0x0000" />
+				<rom name="zapem (1983)(micro marketing)(gb)[3k].tap" size="943" crc="f14dcfec" sha1="8f60e73a34ec2f967caffd37e9cc6d2c44b919c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1747,7 +1747,7 @@
 		<publisher>Jupiter Cantab</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7961">
-				<rom name="zombies &amp; potholes (1983)(jupiter cantab)(gb)[19k].tap" size="7961" crc="3a60a598" sha1="bc26562c10583be35e322dbdad666d19b7e27822" offset="0x0000" />
+				<rom name="zombies &amp; potholes (1983)(jupiter cantab)(gb)[19k].tap" size="7961" crc="3a60a598" sha1="bc26562c10583be35e322dbdad666d19b7e27822"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1758,7 +1758,7 @@
 		<publisher>Remsoft</publisher>
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2882">
-				<rom name="zx printer driver (1983)(remsoft)(gb)[tape 11][3k].tap" size="2882" crc="ed237c12" sha1="76f10c96a056edc1151a24f9e87209ec379b73d5" offset="0x0000" />
+				<rom name="zx printer driver (1983)(remsoft)(gb)[tape 11][3k].tap" size="2882" crc="ed237c12" sha1="76f10c96a056edc1151a24f9e87209ec379b73d5"/>
 			</dataarea>
 		</part>
 	</software>

@@ -1987,7 +1987,7 @@ static const uint16_t vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 void snes_ppu_device::set_latch_hv(int16_t x, int16_t y)
 {
 	m_beam.latch_vert = y;
-	m_beam.latch_horz = x;
+	m_beam.latch_horz = x / m_htmult;
 	m_stat78 |= 0x40;   // indicate we latched
 
 //  printf("latched @ H %d V %d\n", m_beam.latch_horz, m_beam.latch_vert);
@@ -2012,12 +2012,12 @@ void snes_ppu_device::dynamic_res_change()
 	if ((m_stat78 & 0x10) == SNES_NTSC)
 	{
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_NTSC) * SNES_HTOTAL * SNES_VTOTAL_NTSC;
-		screen().configure(SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
+		screen().configure(SNES_HTOTAL * m_htmult, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
 	}
 	else
 	{
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
-		screen().configure(SNES_HTOTAL * 2, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
+		screen().configure(SNES_HTOTAL * m_htmult, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
 	}
 }
 
@@ -2312,7 +2312,7 @@ uint8_t snes_ppu_device::read(address_space &space, uint32_t offset, uint8_t wri
 				return m_ppu1_open_bus;
 			}
 		case SLHV:      /* Software latch for H/V counter */
-			set_latch_hv(screen().hpos() / m_htmult, screen().vpos());
+			set_latch_hv(screen().hpos(), screen().vpos());
 			return m_openbus_cb(space, 0);       /* Return value is meaningless */
 
 		case ROAMDATA:  /* Read data from OAM (DR) */

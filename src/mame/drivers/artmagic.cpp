@@ -128,7 +128,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		update_irq_state();
 		break;
 	default:
-		assert_always(false, "Unknown id in artmagic_state::device_timer");
+		throw emu_fatalerror("Unknown id in artmagic_state::device_timer");
 	}
 }
 
@@ -452,7 +452,7 @@ void artmagic_state::shtstar_map(address_map &map)
 	map(0x200000, 0x27ffff).ram();
 	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 
-	map(0x300000, 0x300001).nopr(); //AM_READ_PORT("300000")
+	map(0x300000, 0x300001).nopr(); //.portr("300000");
 	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
 	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
 	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));

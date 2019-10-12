@@ -141,6 +141,35 @@ class SchemaQueries(object):
             '    size            INTEGER NOT NULL,\n' \
             '    FOREIGN KEY (machine) REFERENCES machine (id),\n' \
             '    FOREIGN KEY (machine, size) REFERENCES ramoption (machine, size))'
+    CREATE_ROM = \
+            'CREATE TABLE rom (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    crc             INTEGER NOT NULL,\n' \
+            '    sha1            TEXT    NOT NULL,\n' \
+            '    UNIQUE (crc ASC, sha1 ASC))'
+    CREATE_ROMDUMP = \
+            'CREATE TABLE romdump (\n' \
+            '    machine         INTEGER NOT NULL,\n' \
+            '    rom             INTEGER NOT NULL,\n' \
+            '    name            TEXT NOT NULL,\n' \
+            '    bad             INTEGER NOT NULL,\n' \
+            '    FOREIGN KEY (machine) REFERENCES machine (id),\n' \
+            '    FOREIGN KEY (rom) REFERENCES rom (id),\n' \
+            '    UNIQUE (machine, rom, name))'
+    CREATE_DISK = \
+            'CREATE TABLE disk (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    sha1            TEXT    NOT NULL,\n' \
+            '    UNIQUE (sha1 ASC))'
+    CREATE_DISKDUMP = \
+            'CREATE TABLE diskdump (\n' \
+            '    machine         INTEGER NOT NULL,\n' \
+            '    disk            INTEGER NOT NULL,\n' \
+            '    name            TEXT NOT NULL,\n' \
+            '    bad             INTEGER NOT NULL,\n' \
+            '    FOREIGN KEY (machine) REFERENCES machine (id),\n' \
+            '    FOREIGN KEY (disk) REFERENCES disk (id),\n' \
+            '    UNIQUE (machine, disk, name))'
 
     CREATE_TEMPORARY_DEVICEREFERENCE = 'CREATE TEMPORARY TABLE temp_devicereference (id INTEGER PRIMARY KEY, machine INTEGER NOT NULL, device TEXT NOT NULL, UNIQUE (machine, device))'
     CREATE_TEMPORARY_SLOTOPTION = 'CREATE TEMPORARY TABLE temp_slotoption (id INTEGER PRIMARY KEY, slot INTEGER NOT NULL, device TEXT NOT NULL, name TEXT NOT NULL)'
@@ -164,6 +193,10 @@ class SchemaQueries(object):
 
     INDEX_DIPSWITCH_MACHINE_ISCONFIG = 'CREATE INDEX dipswitch_machine_isconfig ON dipswitch (machine ASC, isconfig ASC)'
 
+    INDEX_ROMDUMP_ROM = 'CREATE INDEX romdump_rom ON romdump (rom ASC)'
+
+    INDEX_DISKDUMP_DISK = 'CREATE INDEX diskdump_disk ON diskdump (disk ASC)'
+
     DROP_MACHINE_ISDEVICE_SHORTNAME = 'DROP INDEX IF EXISTS machine_isdevice_shortname'
     DROP_MACHINE_ISDEVICE_DESCRIPTION = 'DROP INDEX IF EXISTS machine_isdevice_description'
     DROP_MACHINE_RUNNABLE_SHORTNAME = 'DROP INDEX IF EXISTS machine_runnable_shortname'
@@ -177,6 +210,10 @@ class SchemaQueries(object):
     DROP_CLONEOF_PARENT = 'DROP INDEX IF EXISTS cloneof_parent'
 
     DROP_DIPSWITCH_MACHINE_ISCONFIG = 'DROP INDEX IF EXISTS dipswitch_machine_isconfig'
+
+    DROP_ROMDUMP_ROM = 'DROP INDEX IF EXISTS romdump_rom'
+
+    DROP_DISKDUMP_DISK = 'DROP INDEX IF EXISTS diskdump_disk'
 
     CREATE_TABLES = (
             CREATE_FEATURETYPE,
@@ -196,7 +233,11 @@ class SchemaQueries(object):
             CREATE_SLOTOPTION,
             CREATE_SLOTDEFAULT,
             CREATE_RAMOPTION,
-            CREATE_RAMDEFAULT)
+            CREATE_RAMDEFAULT,
+            CREATE_ROM,
+            CREATE_ROMDUMP,
+            CREATE_DISK,
+            CREATE_DISKDUMP)
 
     CREATE_TEMPORARY_TABLES = (
             CREATE_TEMPORARY_DEVICEREFERENCE,
@@ -212,7 +253,9 @@ class SchemaQueries(object):
             INDEX_SYSTEM_MANUFACTURER,
             INDEX_ROMOF_PARENT,
             INDEX_CLONEOF_PARENT,
-            INDEX_DIPSWITCH_MACHINE_ISCONFIG)
+            INDEX_DIPSWITCH_MACHINE_ISCONFIG,
+            INDEX_ROMDUMP_ROM,
+            INDEX_DISKDUMP_DISK)
 
     DROP_INDEXES = (
             DROP_MACHINE_ISDEVICE_SHORTNAME,
@@ -223,7 +266,9 @@ class SchemaQueries(object):
             DROP_SYSTEM_MANUFACTURER,
             DROP_ROMOF_PARENT,
             DROP_CLONEOF_PARENT,
-            DROP_DIPSWITCH_MACHINE_ISCONFIG)
+            DROP_DIPSWITCH_MACHINE_ISCONFIG,
+            DROP_ROMDUMP_ROM,
+            DROP_DISKDUMP_DISK)
 
 
 class UpdateQueries(object):
@@ -242,6 +287,10 @@ class UpdateQueries(object):
     ADD_SLOT = 'INSERT INTO slot (machine, name) VALUES (?, ?)'
     ADD_RAMOPTION = 'INSERT INTO ramoption (machine, size, name) VALUES (?, ?, ?)'
     ADD_RAMDEFAULT = 'INSERT INTO ramdefault (machine, size) VALUES (?, ?)'
+    ADD_ROM = 'INSERT OR IGNORE INTO rom (crc, sha1) VALUES (?, ?)'
+    ADD_ROMDUMP = 'INSERT OR IGNORE INTO romdump (machine, rom, name, bad) SELECT ?, id, ?, ? FROM rom WHERE crc = ? AND sha1 = ?'
+    ADD_DISK = 'INSERT OR IGNORE INTO disk (sha1) VALUES (?)'
+    ADD_DISKDUMP = 'INSERT OR IGNORE INTO diskdump (machine, disk, name, bad) SELECT ?, id, ?, ? FROM disk WHERE sha1 = ?'
 
     ADD_TEMPORARY_DEVICEREFERENCE = 'INSERT OR IGNORE INTO temp_devicereference (machine, device) VALUES (?, ?)'
     ADD_TEMPORARY_SLOTOPTION = 'INSERT INTO temp_slotoption (slot, device, name) VALUES (?, ?, ?)'
@@ -458,6 +507,20 @@ class QueryCursor(object):
                 'ORDER BY ramoption.size',
                 (machine, ))
 
+    def get_rom_dumps(self, crc, sha1):
+        return self.dbcurs.execute(
+                'SELECT machine.shortname AS shortname, machine.description AS description, romdump.name AS label, romdump.bad AS bad ' \
+                'FROM romdump LEFT JOIN machine ON romdump.machine = machine.id ' \
+                'WHERE romdump.rom = (SELECT id FROM rom WHERE crc = ? AND sha1 = ?)',
+                (crc, sha1))
+
+    def get_disk_dumps(self, sha1):
+        return self.dbcurs.execute(
+                'SELECT machine.shortname AS shortname, machine.description AS description, diskdump.name AS label, diskdump.bad AS bad ' \
+                'FROM diskdump LEFT JOIN machine ON diskdump.machine = machine.id ' \
+                'WHERE diskdump.disk = (SELECT id FROM disk WHERE sha1 = ?)',
+                (sha1, ))
+
 
 class UpdateCursor(object):
     def __init__(self, dbconn, **kwargs):
@@ -536,14 +599,30 @@ class UpdateCursor(object):
         self.dbcurs.execute(UpdateQueries.ADD_RAMDEFAULT, (machine, size))
         return self.dbcurs.lastrowid
 
+    def add_rom(self, crc, sha1):
+        self.dbcurs.execute(UpdateQueries.ADD_ROM, (crc, sha1))
+        return self.dbcurs.lastrowid
+
+    def add_romdump(self, machine, name, crc, sha1, bad):
+        self.dbcurs.execute(UpdateQueries.ADD_ROMDUMP, (machine, name, 1 if bad else 0, crc, sha1))
+        return self.dbcurs.lastrowid
+
+    def add_disk(self, sha1):
+        self.dbcurs.execute(UpdateQueries.ADD_DISK, (sha1, ))
+        return self.dbcurs.lastrowid
+
+    def add_diskdump(self, machine, name, sha1, bad):
+        self.dbcurs.execute(UpdateQueries.ADD_DISKDUMP, (machine, name, 1 if bad else 0, sha1))
+        return self.dbcurs.lastrowid
+
 
 class QueryConnection(object):
     def __init__(self, database, **kwargs):
         super(QueryConnection, self).__init__(**kwargs)
         if sys.version_info >= (3, 4):
-            self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True)
+            self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True, check_same_thread=False)
         else:
-            self.dbconn = sqlite3.connect(database)
+            self.dbconn = sqlite3.connect(database, check_same_thread=False)
         self.dbconn.row_factory = sqlite3.Row
         self.dbconn.execute('PRAGMA foreign_keys = ON')
 

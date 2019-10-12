@@ -61,7 +61,7 @@ protected:
 	void data_map(address_map &map);
 
 	void decode();
-	void secondary(u64 bus);
+	void secondary();
 
 	void set_int(bool state)
 	{
@@ -136,7 +136,7 @@ private:
 
 	// dynamic state
 	u64 m_bus;
-	u64 m_bus_latch;
+	u32 m_fpu_data;
 	bool m_fpu_c_latch;
 };
 

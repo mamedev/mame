@@ -334,7 +334,7 @@ void crgolf_state::mastrglf_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
-//  AM_RANGE(0x20, 0x20) AM_WRITE(rom_bank_select_w)
+//  map(0x20, 0x20).w(FUNC(crgolf_state::rom_bank_select_w));
 	map(0x40, 0x40).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xa0, 0xa0).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }

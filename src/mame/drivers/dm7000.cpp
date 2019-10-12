@@ -244,7 +244,7 @@ void dm7000_state::dm7000_mem(address_map &map)
 
 	map(0x7f800000, 0x7ffdffff).rom().region("user2", 0);
 	map(0x7ffe0000, 0x7fffffff).rom().region("user1", 0);
-	//AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1",0)
+	//map(0xfffe0000, 0xffffffff).rom().region("user1",0);
 }
 
 /* Input ports */

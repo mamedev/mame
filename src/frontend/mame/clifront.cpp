@@ -252,7 +252,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	if (option_errors.tellp() > 0)
 	{
 		std::string option_errors_string = option_errors.str();
-		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors_string).c_str());
+		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors_string));
 	}
 
 	// if we can't find it, give an appropriate error
@@ -284,7 +284,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	{
 		std::string str(fatal.string());
 		strtrimspace(str);
-		osd_printf_error("%s\n", str.c_str());
+		osd_printf_error("%s\n", str);
 		m_result = (fatal.exitcode() != 0) ? fatal.exitcode() : EMU_ERR_FATALERROR;
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the
@@ -313,7 +313,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 				if (0 <= match)
 				{
 					game_driver const &drv(drivlist.driver(match));
-					osd_printf_error("%s", util::string_format("%-18s%-*s(%s, %s)\n", drv.name, titlelen + 2, drv.type.fullname(), drv.manufacturer, drv.year).c_str());
+					osd_printf_error("%-18s%-*s(%s, %s)\n", drv.name, titlelen + 2, drv.type.fullname(), drv.manufacturer, drv.year);
 				}
 			}
 		}
@@ -392,7 +392,7 @@ void cli_frontend::listsource(const std::vector<std::string> &args)
 {
 	auto const list_system_source = [] (device_type type)
 	{
-		osd_printf_info("%-16s %s\n", type.shortname(), core_filename_extract_base(type.source()).c_str());
+		osd_printf_info("%-16s %s\n", type.shortname(), core_filename_extract_base(type.source()));
 	};
 	apply_action(
 			args,
@@ -493,9 +493,9 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	{
 		int clone_of = drivlist.clone();
 		if (clone_of != -1)
-			osd_printf_info("%-20s %-16s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+			osd_printf_info("%-20s %-16s %s\n", core_filename_extract_base(drivlist.driver().type.source()), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
 		else
-			osd_printf_info("%-20s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name);
+			osd_printf_info("%-20s %s\n", core_filename_extract_base(drivlist.driver().type.source()), drivlist.driver().name);
 	}
 }
 
@@ -580,7 +580,7 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 							{
 								if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 									osd_printf_info(" BAD");
-								osd_printf_info(" %s", hashes.macro_string().c_str());
+								osd_printf_info(" %s", hashes.macro_string());
 							}
 							else
 								osd_printf_info(" NO GOOD DUMP KNOWN");
@@ -1615,7 +1615,7 @@ void cli_frontend::execute_commands(const char *exename)
 	if (m_options.command() == CLICOMMAND_SHOWUSAGE)
 	{
 		osd_printf_info("Usage:  %s [machine] [media] [software] [options]",exename);
-		osd_printf_info("\n\nOptions:\n%s", m_options.output_help().c_str());
+		osd_printf_info("\n\nOptions:\n%s", m_options.output_help());
 		return;
 	}
 
@@ -1640,7 +1640,7 @@ void cli_frontend::execute_commands(const char *exename)
 	std::ostringstream option_errors;
 	mame_options::parse_standard_inis(m_options,option_errors);
 	if (option_errors.tellp() > 0)
-		osd_printf_error("%s\n", option_errors.str().c_str());
+		osd_printf_error("%s\n", option_errors.str());
 
 	// createconfig?
 	if (m_options.command() == CLICOMMAND_CREATECONFIG)

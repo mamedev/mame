@@ -1188,11 +1188,11 @@ void mpu4vid_state::mpu4_68k_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rom();
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
-//  map(0x810000, 0x81ffff) AM_RAM /* ? */
+//  map(0x810000, 0x81ffff).ram(); /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
-/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
@@ -1202,9 +1202,9 @@ void mpu4vid_state::mpu4_68k_map(address_map &map)
 
 void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 {
-	map(0x000000, 0x5fffff).rom(); //AM_WRITENOP
+	map(0x000000, 0x5fffff).rom(); //.nopw();
 	map(0x600000, 0x63ffff).ram(); /* The Mating Game has an extra 256kB RAM on the program card */
-//  map(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
+//  map(0x640000, 0x7fffff).noprw(); /* Possible bug, reads and writes here */
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
@@ -1217,7 +1217,7 @@ void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 	map(0xffa040, 0xffa04f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
 	map(0xffa060, 0xffa067).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);    // PIA6821 on sampled sound board
 	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
-//  map(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
+//  map(0xfff000, 0xffffff).noprw(); /* Possible bug, reads and writes here */
 }
 
 void mpu4vid_state::bwbvid_68k_map(address_map &map)
@@ -1228,13 +1228,13 @@ void mpu4vid_state::bwbvid_68k_map(address_map &map)
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
-//  map(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
-/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+//  map(0xa00000, 0xa0000f).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)); //Some games use this
+//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	//map(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	//map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::bwb_characteriser16_r), FUNC(mpu4vid_state::bwb_characteriser16_w)); //.rw(FUNC(mpu4vid_state::adpcm_r), FUNC(mpu4vid_state::adpcm_w));  CHR ?
 }
 
 void mpu4vid_state::bwbvid5_68k_map(address_map &map)
@@ -1245,8 +1245,8 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
-	//map(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
-/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+//  map(0xa00000, 0xa00003).rw(FUNC(mpu4vid_state::bt471_r), FUNC(mpu4vid_state::bt471_w)).umask16(0x00ff); Some games use this
+//  map(0xa00004, 0xa0000f).rw(FUNC(mpu4vid_state::mpu4_vid_unmap_r), FUNC(mpu4vid_state::mpu4_vid_unmap_w));
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
@@ -1254,7 +1254,7 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00); //Seems odd...
 	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
 	map(0xe03000, 0xe0300f).w(FUNC(mpu4vid_state::ic3ss_w)).umask16(0xff00);  // 6840PTM on sampled sound board
-	map(0xe04000, 0xe0400f).rw(FUNC(mpu4vid_state::bwb_characteriser_r), FUNC(mpu4vid_state::bwb_characteriser_w)).umask16(0x00ff);//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	map(0xe04000, 0xe0400f).rw(FUNC(mpu4vid_state::bwb_characteriser_r), FUNC(mpu4vid_state::bwb_characteriser_w)).umask16(0x00ff); //.rw(FUNC(mpu4vid_state::adpcm_r), FUNC(mpu4vid_state::adpcm_w));  CHR ?
 }
 
 /* TODO: Fix up MPU4 map*/

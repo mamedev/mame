@@ -166,8 +166,8 @@ void nbmj8688_state::secolove_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(nbmj8688_state::barline_output_w)
 void nbmj8688_state::barline_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
+//  map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
 	map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::sndrombank1_w));
 	map(0x70, 0x70).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
 	map(0x80, 0x81).rw("psg", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
@@ -207,7 +207,7 @@ void nbmj8688_state::barline_io_map(address_map &map)
 	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(FUNC(nbmj8688_state::barline_output_w));
 	map(0xc0, 0xcf).w(FUNC(nbmj8688_state::clut_w));
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
-//  AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_byte_interface, data_w) //not used
+//  map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w)); //not used
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
 	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r)).w(FUNC(nbmj8688_state::scrolly_w));
 	map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
@@ -228,9 +228,9 @@ void nbmj8688_state::crystalg_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::crystalg_romsel_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf0, 0xf0).nopw();
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 }
 
 
@@ -292,8 +292,8 @@ void nbmj8688_state::iemoto_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::mjsikaku_gfxflag2_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
@@ -315,8 +315,8 @@ void nbmj8688_state::seiha_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::mjsikaku_gfxflag2_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
@@ -336,8 +336,8 @@ void nbmj8688_state::mjgaiden_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::mjsikaku_gfxflag2_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
@@ -362,8 +362,8 @@ void nbmj8688_state::p16bit_LCD_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::secolove_romsel_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 
@@ -407,8 +407,8 @@ void nbmj8688_state::mmsikaku_io_map(address_map &map)
 	map(0xd0, 0xd0).r(FUNC(nbmj8688_state::ff_r));  // irq ack? watchdog?
 	map(0xd0, 0xd0).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).w(FUNC(nbmj8688_state::mjsikaku_gfxflag2_w));
-//  AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
-//  AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
+//  map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
+//  map(0xf1, 0xf1).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));
 	map(0xf0, 0xf0).w(FUNC(nbmj8688_state::scrolly_w));
 }
 

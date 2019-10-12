@@ -195,7 +195,7 @@ WRITE8_MEMBER(taito_en_device::duart_output)
 void taito_en_device::device_add_mconfig(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_audiocpu, XTAL(30'476'100) / 2);
+	M68000(config, m_audiocpu, XTAL(30'476'180) / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taito_en_device::en_sound_map);
 	m_audiocpu->set_addrmap(m68000_device::AS_CPU_SPACE, &taito_en_device::fc7_map);
 
@@ -216,12 +216,12 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'100) / (2 * 16 * 32));
+	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'180) / (2 * 16 * 32));
 	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
-	ES5505(config, m_ensoniq, XTAL(30'476'100) / 2);
+	ES5505(config, m_ensoniq, XTAL(30'476'180) / 2);
 	m_ensoniq->sample_rate_changed().set(FUNC(taito_en_device::es5505_clock_changed));
 	m_ensoniq->set_region0("ensoniq.0");
 	m_ensoniq->set_region1("ensoniq.0");

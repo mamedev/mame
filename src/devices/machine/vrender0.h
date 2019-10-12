@@ -62,25 +62,25 @@ private:
 	DECLARE_WRITE32_MEMBER( control_w );
 	DECLARE_READ32_MEMBER( baud_rate_div_r );
 	DECLARE_WRITE32_MEMBER( baud_rate_div_w );
-	DECLARE_READ32_MEMBER( status_r ); 
+	DECLARE_READ32_MEMBER( status_r );
 	DECLARE_WRITE32_MEMBER( transmit_buffer_w );
 	DECLARE_READ32_MEMBER( receive_buffer_r );
 	TIMER_CALLBACK_MEMBER( break_timer_cb );
-	
+
 	uint32_t m_ucon; // control
 	uint32_t m_ubdr; // baud rate
 	uint32_t m_ustat; // status
 	util::fifo<uint8_t, 16> m_urxb_fifo; // receive FIFO
-	
+
 	void update_serial_config();
 	inline uint32_t calculate_baud_rate();
-	
+
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
 
 	inline void tx_send_byte(uint8_t val);
-	int m_channel_num;	
+	int m_channel_num;
 	vrender0soc_device *m_parent;
 };
 
@@ -98,8 +98,8 @@ public:
 	void regs_map(address_map &map);
 	void audiovideo_map(address_map &map);
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
-	void set_external_vclk(const uint32_t vclk) { m_ext_vclk = vclk; } 
-	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); } 
+	void set_external_vclk(const uint32_t vclk) { m_ext_vclk = vclk; }
+	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); }
 	bool crt_is_blanked() { return ((m_crtcregs[0] & 0x0200) == 0x0200); }
 	bool crt_active_vblank_irq();
 	void IntReq( int num );
@@ -108,7 +108,7 @@ public:
 	void write_line_tx(int port, uint8_t value);
 	template <int Port> auto tx_callback() { return write_tx[Port].bind(); }
 	template <int Port> DECLARE_WRITE_LINE_MEMBER(rx_w) { m_uart[Port]->rx_w((uint8_t)state); }
-	
+
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -128,7 +128,7 @@ private:
 	required_shared_ptr <uint32_t> m_crtcregs;
 	uint16_t *m_textureram;
 	uint16_t *m_frameram;
-	
+
 	address_space *m_host_space;
 	uint32_t m_ext_vclk;
 
@@ -185,10 +185,10 @@ private:
 	// Misc
 	DECLARE_READ32_MEMBER( sysid_r );
 	DECLARE_READ32_MEMBER( cfgr_r );
-	
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	
+
 	DECLARE_READ16_MEMBER( textureram_r );
 	DECLARE_WRITE16_MEMBER( textureram_w );
 	DECLARE_READ16_MEMBER( frameram_r );

@@ -904,7 +904,7 @@ WRITE8_MEMBER(vicdual_state::digger_io_w)
 void vicdual_state::headon2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x6000).rom();
-	/* AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x3f00) */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
+	/* map(0x8000, 0x80ff).mirror(0x3f00); */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
 	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
 	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");

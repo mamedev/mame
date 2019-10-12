@@ -2034,12 +2034,12 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	if (params.size() > 4 && !validate_number_parameter(params[4], ascii))
 		return;
 
-	u64 rowsize = 16;
-	if (params.size() > 5 && !validate_number_parameter(params[5], rowsize))
-		return;
-
 	address_space *space;
 	if (!validate_cpu_space_parameter((params.size() > 6) ? params[6].c_str() : nullptr, ref, space))
+		return;
+
+	u64 rowsize = space->byte_to_address(16);
+	if (params.size() > 5 && !validate_number_parameter(params[5], rowsize))
 		return;
 
 	int shift = space->addr_shift();
@@ -2060,9 +2060,9 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		m_console.printf("Invalid width! (must be at least %d)\n", granularity);
 		return;
 	}
-	if (rowsize == 0 || (rowsize % width) != 0)
+	if (rowsize == 0 || (rowsize % space->byte_to_address(width)) != 0)
 	{
-		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", width);
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", space->byte_to_address(width));
 		return;
 	}
 
@@ -2081,10 +2081,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	util::ovectorstream output;
 	output.reserve(200);
 
-	if (shift > 0)
-		width <<= shift;
-	else if(shift < 0)
-		width >>= -shift;
+	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
 
 	auto dis = space->device().machine().disable_side_effects();
 	bool be = space->endianness() == ENDIANNESS_BIG;
@@ -2098,7 +2095,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		util::stream_format(output, "%0*X: ", space->logaddrchars(), i);
 
 		/* print the bytes */
-		for (u64 j = 0; j < rowsize; j += width)
+		for (u64 j = 0; j < rowsize; j += delta)
 		{
 			if (i + j <= endoffset)
 			{
@@ -2134,7 +2131,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		if (ascii)
 		{
 			util::stream_format(output, "  ");
-			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += width)
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += delta)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))

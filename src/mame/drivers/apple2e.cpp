@@ -1658,8 +1658,8 @@ READ8_MEMBER(apple2e_state::c000_r)
 				return rv;
 			}
 
-		case 0x11:  // read LCRAM2 (LC Dxxx bank), also reads like $C010 without strobe reset
-			return (m_lcram2 ? 0x80 : 0x00) | m_strobe | m_transchar;
+		case 0x11:  // read LCRAM2 (LC Dxxx bank)
+			return (m_lcram2 ? 0x80 : 0x00) | m_transchar;
 
 		case 0x12:  // read LCRAM (is LC readable?)
 			return (m_lcram ? 0x80 : 0x00) | m_transchar;
@@ -2909,8 +2909,8 @@ void apple2e_state::laser128_map(address_map &map)
 	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
 	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
-//  AM_RANGE(0xc098, 0xc09b) AM_DEVREADWRITE(IIC_ACIA1_TAG, mos6551_device, read, write)
-//  AM_RANGE(0xc0a8, 0xc0ab) AM_DEVREADWRITE(IIC_ACIA2_TAG, mos6551_device, read, write)
+//  map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+//  map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0d0, 0xc0d3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
 	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::bus_r), FUNC(applefdc_base_device::bus_w));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));

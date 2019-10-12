@@ -1013,7 +1013,7 @@ void seibuspi_state::base_map(address_map &map)
 
 void seibuspi_state::sei252_map(address_map &map)
 {
-	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", sei252_device, read_xor, write_xor, 0xffffffff)
+	//map(0x00000500, 0x0000057f).rw("obj", FUNC(sei252_device::read_xor), FUNC(sei252_device::write_xor));
 	map(0x0000050e, 0x0000050f).w(FUNC(seibuspi_state::sprite_dma_start_w));
 	map(0x00000524, 0x00000527).nopw(); // SEI252 sprite decryption key, see machine/spisprit.c
 	map(0x00000528, 0x0000052b).nopw(); // SEI252 sprite decryption unknown
@@ -1024,7 +1024,7 @@ void seibuspi_state::sei252_map(address_map &map)
 
 void seibuspi_state::rise_map(address_map &map)
 {
-	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", seibu_encrypted_sprite_device, read, write, 0xffffffff)
+	//map(0x00000500, 0x0000057f).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
 	map(0x0000054c, 0x0000054f).nopw(); // RISE10/11 sprite decryption key, see machine/seibuspi.c
 	map(0x00000562, 0x00000563).w(FUNC(seibuspi_state::sprite_dma_start_w));
 }

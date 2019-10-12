@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="arch1.img" size="1474560" crc="599291b5" sha1="e0059300c85287416960a4b04a29a171fef9fd73" offset="0" />
+				<rom name="arch1.img" size="1474560" crc="599291b5" sha1="e0059300c85287416960a4b04a29a171fef9fd73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="arch2.img" size="1474560" crc="c408196e" sha1="7da1bebbf0b72975449c3c95ab81a3b3f4ff605c" offset="0" />
+				<rom name="arch2.img" size="1474560" crc="c408196e" sha1="7da1bebbf0b72975449c3c95ab81a3b3f4ff605c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="arch3.img" size="1474560" crc="9f8c04a3" sha1="3e5ad3ee8a313838c4dad852f234601442615de7" offset="0" />
+				<rom name="arch3.img" size="1474560" crc="9f8c04a3" sha1="3e5ad3ee8a313838c4dad852f234601442615de7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="arch4.img" size="1474560" crc="485b0468" sha1="2155c61f8220ba9a592c56bd06ce2b89d83bae1a" offset="0" />
+				<rom name="arch4.img" size="1474560" crc="485b0468" sha1="2155c61f8220ba9a592c56bd06ce2b89d83bae1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="arch5.img" size="1474560" crc="3c8febd0" sha1="c6f12d50d2660a20d40dd36ec4a0345607f05a1f" offset="0" />
+				<rom name="arch5.img" size="1474560" crc="3c8febd0" sha1="c6f12d50d2660a20d40dd36ec4a0345607f05a1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="arch6.img" size="1474560" crc="86941e6b" sha1="0424b8b4007c42379c97ea77b13851bffc4f0223" offset="0" />
+				<rom name="arch6.img" size="1474560" crc="86941e6b" sha1="0424b8b4007c42379c97ea77b13851bffc4f0223"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,7 +74,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="arch7.img" size="1474560" crc="7b68d0b5" sha1="3077e9f08d76a7514802bf9ad1de23472649388b" offset="0" />
+				<rom name="arch7.img" size="1474560" crc="7b68d0b5" sha1="3077e9f08d76a7514802bf9ad1de23472649388b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
-				<rom name="disk2.img" size="737280" crc="59893e2b" sha1="7c10d4352012a0224dabe3fc8772eaeb96630028" offset="0" />
+				<rom name="disk2.img" size="737280" crc="59893e2b" sha1="7c10d4352012a0224dabe3fc8772eaeb96630028"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
-				<rom name="disk3.img" size="737280" crc="577ca2ca" sha1="2d78bf13bfaa91aab66488d7ec4ef05a2dda398f" offset="0" />
+				<rom name="disk3.img" size="737280" crc="577ca2ca" sha1="2d78bf13bfaa91aab66488d7ec4ef05a2dda398f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +107,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
-				<rom name="disk4.img" size="737280" crc="3e15e083" sha1="3d793d10c0de62e1aac6c3ed4db8ceb65e14938f" offset="0" />
+				<rom name="disk4.img" size="737280" crc="3e15e083" sha1="3d793d10c0de62e1aac6c3ed4db8ceb65e14938f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
-				<rom name="disk5.img" size="737280" crc="edbc93bc" sha1="f9a0056c1c22388754367c39fac6c584bffc753f" offset="0" />
+				<rom name="disk5.img" size="737280" crc="edbc93bc" sha1="f9a0056c1c22388754367c39fac6c584bffc753f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
-				<rom name="games.img" size="737280" crc="c30180ff" sha1="08805812491e0991cac0890a9f467d2da6099f80" offset="0" />
+				<rom name="games.img" size="737280" crc="c30180ff" sha1="08805812491e0991cac0890a9f467d2da6099f80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,7 +140,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sys1.img" size="368640" crc="031d41f7" sha1="171b0df7430346d313584ba7885b29711af6f686" offset="0" />
+				<rom name="sys1.img" size="368640" crc="031d41f7" sha1="171b0df7430346d313584ba7885b29711af6f686"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,7 +151,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
-				<rom name="system.img" size="737280" crc="b28312a4" sha1="21c7af90355b93af0bb02a925c21fcba5a7316e0" offset="0" />
+				<rom name="system.img" size="737280" crc="b28312a4" sha1="21c7af90355b93af0bb02a925c21fcba5a7316e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -162,7 +162,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
-				<rom name="sash.img" size="737280" crc="cc5a1d3d" sha1="cb9e833d56ce5d7629cb417e51769cbc9c0a9e24" offset="0" />
+				<rom name="sash.img" size="737280" crc="cc5a1d3d" sha1="cb9e833d56ce5d7629cb417e51769cbc9c0a9e24"/>
 			</dataarea>
 		</part>
 	</software>

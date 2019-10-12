@@ -21,37 +21,109 @@ namespace netlist
 {
 namespace devices
 {
-	/* FIXME: these should become proper devices */
+	P_ENUM(matrix_sort_type_e,
+		NOSORT,
+		ASCENDING,
+		DESCENDING,
+		PREFER_IDENTITY_TOP_LEFT,
+		PREFER_BAND_MATRIX
+	)
+
+	P_ENUM(matrix_type_e,
+		SOR_MAT,
+		MAT_CR,
+		MAT,
+		SM,
+		W,
+		SOR,
+		GMRES
+	)
 
 	struct solver_parameters_t
 	{
-		bool m_pivot;
-		nl_double m_accuracy;
-		nl_double m_dynamic_lte;
+		solver_parameters_t(device_t &parent)
+		: m_freq(parent, "FREQ", 48000.0)
+
+		/* iteration parameters */
+		, m_gs_sor(parent, "SOR_FACTOR", 1.059)
+		, m_method(parent, "METHOD", matrix_type_e::MAT_CR)
+		, m_accuracy(parent, "ACCURACY", 1e-7)
+		, m_gs_loops(parent, "GS_LOOPS", 9)              // Gauss-Seidel loops
+
+		/* general parameters */
+		, m_gmin(parent, "GMIN", 1e-9)
+		, m_pivot(parent, "PIVOT", false)                    // use pivoting - on supported solvers
+		, m_nr_loops(parent, "NR_LOOPS", 250)            // Newton-Raphson loops
+		, m_nr_recalc_delay(parent, "NR_RECALC_DELAY", netlist_time::quantum().as_double()) // Delay to next solve attempt if nr loops exceeded
+		, m_parallel(parent, "PARALLEL", 0)
+
+		/* automatic time step */
+		, m_dynamic_ts(parent, "DYNAMIC_TS", false)
+		, m_dynamic_lte(parent, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
+		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
+
+		/* matrix sorting */
+		, m_sort_type(parent, "SORT_TYPE", matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT)
+
+		/* special */
+		, m_use_gabs(parent, "USE_GABS", true)
+		, m_use_linear_prediction(parent, "USE_LINEAR_PREDICTION", false) // // savings are eaten up by effort
+
+		{
+			m_min_timestep = m_dynamic_min_ts();
+			m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
+
+			if (m_dynamic_ts)
+			{
+				m_max_timestep *= 1;//NL_FCONST(1000.0);
+			}
+			else
+			{
+				m_min_timestep = m_max_timestep;
+			}
+		}
+
+		param_double_t m_freq;
+		param_double_t m_gs_sor;
+		param_enum_t<matrix_type_e> m_method;
+		param_double_t m_accuracy;
+		param_num_t<std::size_t> m_gs_loops;
+		param_double_t m_gmin;
+		param_logic_t  m_pivot;
+		param_num_t<std::size_t> m_nr_loops;
+		param_double_t m_nr_recalc_delay;
+		param_int_t m_parallel;
+		param_logic_t  m_dynamic_ts;
+		param_double_t m_dynamic_lte;
+		param_double_t m_dynamic_min_ts;
+		param_enum_t<matrix_sort_type_e> m_sort_type;
+
+		param_logic_t m_use_gabs;
+		param_logic_t m_use_linear_prediction;
+
 		nl_double m_min_timestep;
 		nl_double m_max_timestep;
-		nl_double m_gs_sor;
-		bool m_dynamic_ts;
-		std::size_t m_gs_loops;
-		std::size_t m_nr_loops;
-		netlist_time m_nr_recalc_delay;
-		bool m_use_gabs;
-		bool m_use_linear_prediction;
 	};
 
 
 	class terms_for_net_t : plib::nocopyassignmove
 	{
 	public:
-		terms_for_net_t();
+		terms_for_net_t(analog_net_t * net = nullptr);
 
 		void clear();
 
-		void add(terminal_t *term, int net_other, bool sorted);
+		void add_terminal(terminal_t *term, int net_other, bool sorted);
 
 		std::size_t count() const { return m_terms.size(); }
 
 		terminal_t **terms() { return m_terms.data(); }
+
+		nl_double getV() const { return m_net->Q_Analog(); }
+
+		void setV(nl_double v) { m_net->set_Q_Analog(v); }
+
+		bool isNet(const analog_net_t * net) const { return net == m_net; }
 
 		std::size_t m_railstart;
 
@@ -66,6 +138,7 @@ namespace devices
 
 		std::vector<int> m_connected_net_idx;
 	private:
+		analog_net_t * m_net;
 		std::vector<terminal_t *> m_terms;
 
 	};
@@ -88,15 +161,6 @@ namespace devices
 	{
 	public:
 		using list_t = std::vector<matrix_solver_t *>;
-
-		enum eSortType
-		{
-			NOSORT,
-			ASCENDING,
-			DESCENDING,
-			PREFER_IDENTITY_TOP_LEFT,
-			PREFER_BAND_MATRIX
-		};
 
 		void setup(analog_net_t::list_t &nets)
 		{
@@ -125,7 +189,7 @@ namespace devices
 		NETLIB_RESETI();
 
 	public:
-		int get_net_idx(detail::net_t *net);
+		int get_net_idx(const analog_net_t *net) const;
 		std::pair<int, int> get_left_right_of_diag(std::size_t row, std::size_t diag);
 		double get_weight_around_diag(std::size_t row, std::size_t diag);
 
@@ -142,9 +206,9 @@ namespace devices
 	protected:
 
 		matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
-				eSortType sort, const solver_parameters_t *params);
+			const solver_parameters_t *params);
 
-		void sort_terms(eSortType sort);
+		void sort_terms(matrix_sort_type_e sort);
 
 		void setup_base(analog_net_t::list_t &nets);
 		void update_dynamic();
@@ -168,7 +232,7 @@ namespace devices
 
 		void set_pointers()
 		{
-			const std::size_t iN = this->m_nets.size();
+			const std::size_t iN = this->m_terms.size();
 
 			std::size_t max_count = 0;
 			std::size_t max_rail = 0;
@@ -240,6 +304,52 @@ namespace devices
 
 		}
 
+		template <typename T, typename M>
+		void log_fill(const T &fill, M &mat)
+		{
+			/* FIXME: move this to the cr matrix class and use computed
+			 * parallel ordering once it makes sense.
+			 */
+
+			const std::size_t iN = fill.size();
+
+			std::vector<unsigned> levL(iN, 0);
+			std::vector<unsigned> levU(iN, 0);
+
+			// parallel scheme for L x = y
+			for (std::size_t k = 0; k < iN; k++)
+			{
+				unsigned lm=0;
+				for (std::size_t j = 0; j<k; j++)
+					if (fill[k][j] < M::FILL_INFINITY)
+						lm = std::max(lm, levL[j]);
+				levL[k] = 1+lm;
+			}
+
+			// parallel scheme for U x = y
+			for (std::size_t k = iN; k-- > 0; )
+			{
+				unsigned lm=0;
+				for (std::size_t j = iN; --j > k; )
+					if (fill[k][j] < M::FILL_INFINITY)
+						lm = std::max(lm, levU[j]);
+				levU[k] = 1+lm;
+			}
+			for (std::size_t k = 0; k < iN; k++)
+			{
+				unsigned fm = 0;
+				pstring ml = "";
+				for (std::size_t j = 0; j < iN; j++)
+				{
+					ml += fill[k][j] == 0 ? 'X' : fill[k][j] < M::FILL_INFINITY ? '+' : '.';
+					if (fill[k][j] < M::FILL_INFINITY)
+						if (fill[k][j] > fm)
+							fm = fill[k][j];
+				}
+				this->log().verbose("{1:4} {2} {3:4} {4:4} {5:4} {6:4}", k, ml, levL[k], levU[k], mat.get_parallel_level(k), fm);
+			}
+		}
+
 		template <typename T>
 		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
 
@@ -249,10 +359,8 @@ namespace devices
 		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_mat_ptr;
 		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_connected_net_Vn;
 
-		plib::pmatrix2d<nl_double>          m_test;
-
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_terms;
-		std::vector<analog_net_t *> m_nets;
+
 		std::vector<pool_owned_ptr<proxied_analog_output_t>> m_inps;
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_rails_temp;
@@ -280,7 +388,6 @@ namespace devices
 		void step(const netlist_time &delta);
 
 		std::size_t m_ops;
-		const eSortType m_sort;
 	};
 
 	template <typename T>
@@ -294,7 +401,7 @@ namespace devices
 		const std::size_t iN = this->m_terms.size();
 		typename std::decay<decltype(V[0])>::type cerr = 0;
 		for (std::size_t i = 0; i < iN; i++)
-			cerr = std::max(cerr, std::abs(V[i] - this->m_nets[i]->Q_Analog()));
+			cerr = std::max(cerr, std::abs(V[i] - this->m_terms[i]->getV()));
 		return cerr;
 	}
 
@@ -303,7 +410,7 @@ namespace devices
 	{
 		const std::size_t iN = this->m_terms.size();
 		for (std::size_t i = 0; i < iN; i++)
-			this->m_nets[i]->set_Q_Analog(V[i]);
+			this->m_terms[i]->setV(V[i]);
 	}
 
 	template <typename T>

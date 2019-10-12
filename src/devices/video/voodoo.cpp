@@ -144,7 +144,7 @@ bits(7:4) and bit(24)), X, and Y:
 
 #include "emu.h"
 #include "voodoo.h"
-#include "vooddefs.h"
+#include "vooddefs.ipp"
 
 #include "screen.h"
 
@@ -242,7 +242,7 @@ uint32_t voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, (((tex0) == 0xffffffff) ? 0 : ((tex1) == 0xffffffff) ? 1 : 2), fbzcp, fbz, alpha, fog, tex0, tex1)
 
-#include "voodoo_rast.hxx"
+#include "voodoo_rast.ipp"
 
 #undef RASTERIZER_ENTRY
 
@@ -259,7 +259,7 @@ uint32_t voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 
 const voodoo_device::raster_info voodoo_device::predef_raster_table[] =
 {
-#include "voodoo_rast.hxx"
+#include "voodoo_rast.ipp"
 	{ nullptr }
 };
 
@@ -5751,7 +5751,8 @@ voodoo_device::raster_info *voodoo_device::add_rasterizer(voodoo_device *vd, con
 	raster_info *info = &vd->rasterizer[vd->next_rasterizer++];
 	int hash = cinfo->compute_hash();
 
-	assert_always(vd->next_rasterizer <= MAX_RASTERIZERS, "Out of space for new rasterizers!");
+	if (vd->next_rasterizer > MAX_RASTERIZERS)
+		throw emu_fatalerror("voodoo_device::add_rasterizer: Out of space for new rasterizers!");
 
 	/* make a copy of the info */
 	*info = *cinfo;

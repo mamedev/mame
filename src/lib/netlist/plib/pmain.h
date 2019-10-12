@@ -45,9 +45,6 @@ namespace plib {
 		virtual pstring usage() = 0;
 		virtual int execute() = 0;
 
-		plib::pstdout pout_strm;
-		plib::pstderr perr_strm;
-
 		plib::putf8_fmt_writer pout;
 		plib::putf8_fmt_writer perr;
 

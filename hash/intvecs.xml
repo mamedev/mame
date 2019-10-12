@@ -100,7 +100,7 @@
 			</dataarea>
 			<!-- two ROM pages -->
 			<dataarea name="F000" size="0x4000">
-				<rom name="world series major league baseball (page 0).f0" size="0x2000" crc="a0f2fe49" sha1="fab397b49c5a7db53a501caea42fce169da5a31a"/>
+				<rom name="world series major league baseball (page 0).f0" size="0x2000" crc="a0f2fe49" sha1="fab397b49c5a7db53a501caea42fce169da5a31a" offset="0x0000"/>
 				<rom name="world series major league baseball (page 1).f0" size="0x2000" crc="94d6b056" sha1="df2a8c950dd1c398db901a624c04322d2b4f2782" offset="0x2000"/>
 			</dataarea>
 		</part>

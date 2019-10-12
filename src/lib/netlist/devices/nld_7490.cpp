@@ -81,7 +81,7 @@ namespace netlist
 		m_last_B = 0;
 	}
 
-	static constexpr const netlist_time delay[4] =
+	static constexpr const std::array<netlist_time, 4> delay =
 	{
 			NLTIME_FROM_NS(18),
 			NLTIME_FROM_NS(36) - NLTIME_FROM_NS(18),

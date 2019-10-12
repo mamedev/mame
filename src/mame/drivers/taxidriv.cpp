@@ -129,7 +129,7 @@ void taxidriv_state::main_map(address_map &map)
 	map(0xf480, 0xf483).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite1" placement */
 	map(0xf500, 0xf503).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite2" placement */
 	map(0xf580, 0xf583).rw("ppi8255_4", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* "sprite3" placement */
-	//AM_RANGE(0xf780, 0xf781) AM_WRITEONLY     /* more scroll registers? */
+	//map(0xf780, 0xf781).writeonly();    /* more scroll registers? */
 	map(0xf782, 0xf787).writeonly().share("scroll");    /* bg scroll (three copies always identical) */
 	map(0xf800, 0xffff).ram();
 }

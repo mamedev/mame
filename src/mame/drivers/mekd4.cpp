@@ -828,14 +828,14 @@ MC6845_UPDATE_ROW(mekd4_state::update_row)
 		  int pixel = ((ra & 0x0c) >> 1) + 1;
 		  int dout = BIT(code, pixel);
 		  int grey = BIT(code, 6);
-		  int color = ((dcursor ^ dout) && de) << !grey;
+		  int color = ((dcursor ^ dout) && de) << (grey ^ 1);
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  pixel--;
 		  dout = BIT(code, pixel);
-		  color = ((dcursor ^ dout) && de) << !grey;
+		  color = ((dcursor ^ dout) && de) << (grey ^ 1);
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];

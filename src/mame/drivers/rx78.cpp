@@ -278,7 +278,7 @@ void rx78_state::rx78_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom().region("roms", 0);
-	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
+	//map(0x2000, 0x5fff)      // mapped by the cartslot
 	map(0x6000, 0xafff).ram(); //ext RAM
 	map(0xb000, 0xebff).ram();
 	map(0xec00, 0xffff).rw(FUNC(rx78_state::vram_r), FUNC(rx78_state::vram_w));
@@ -288,8 +288,8 @@ void rx78_state::rx78_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
-//  AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
+//  map(0xe2, 0xe2).noprw(); //printer
+//  map(0xe3, 0xe3).nopw(); //printer
 	map(0xf0, 0xf0).rw(FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
 	map(0xf1, 0xf1).w(FUNC(rx78_state::vram_read_bank_w));
 	map(0xf2, 0xf2).w(FUNC(rx78_state::vram_write_bank_w));

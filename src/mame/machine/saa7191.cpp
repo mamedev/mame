@@ -6,8 +6,8 @@
 
     Philips SAA7191B Digital Multistandard Colour Decoder (DMSD)
 
-	TODO:
-	- Actual functionality
+    TODO:
+    - Actual functionality
 
 *********************************************************************/
 
@@ -17,8 +17,8 @@
 #define LOG_UNKNOWN     (1 << 0)
 #define LOG_READS       (1 << 1)
 #define LOG_WRITES      (1 << 2)
-#define LOG_ERRORS		(1 << 3)
-#define LOG_I2C_IGNORES	(1 << 4)
+#define LOG_ERRORS      (1 << 3)
+#define LOG_I2C_IGNORES (1 << 4)
 #define LOG_DEFAULT     (LOG_READS | LOG_WRITES | LOG_ERRORS | LOG_I2C_IGNORES | LOG_UNKNOWN)
 
 #define VERBOSE         (LOG_DEFAULT)

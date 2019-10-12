@@ -68,6 +68,125 @@ mos8580_device::mos8580_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+//-------------------------------------------------
+//  save_state - add save states
+//-------------------------------------------------
+
+void mos6581_device::save_state(SID6581_t *token)
+{
+	save_item(NAME(token->type));
+	save_item(NAME(token->clock));
+
+	save_item(NAME(token->PCMfreq));
+	save_item(NAME(token->PCMsid));
+	save_item(NAME(token->PCMsidNoise));
+
+	save_item(NAME(token->reg));
+	//save_item(NAME(token->sidKeysOn));
+	//save_item(NAME(token->sidKeysOff));
+
+	save_item(NAME(token->masterVolume));
+	save_item(NAME(token->masterVolumeAmplIndex));
+
+	save_item(NAME(token->filter.Enabled));
+	save_item(NAME(token->filter.Type));
+	save_item(NAME(token->filter.CurType));
+	save_item(NAME(token->filter.Dy));
+	save_item(NAME(token->filter.ResDy));
+	save_item(NAME(token->filter.Value));
+
+	for (int v = 0; v < m_token->max_voices; v++)
+	{
+		save_item(NAME(token->optr[v].reg), v);
+
+		save_item(NAME(token->optr[v].SIDfreq), v);
+		save_item(NAME(token->optr[v].SIDpulseWidth), v);
+		save_item(NAME(token->optr[v].SIDctrl), v);
+		save_item(NAME(token->optr[v].SIDAD), v);
+		save_item(NAME(token->optr[v].SIDSR), v);
+
+		save_item(NAME(token->optr[v].sync), v);
+
+		save_item(NAME(token->optr[v].pulseIndex), v);
+		save_item(NAME(token->optr[v].newPulseIndex), v);
+
+		save_item(NAME(token->optr[v].curSIDfreq), v);
+		save_item(NAME(token->optr[v].curNoiseFreq), v);
+
+		save_item(NAME(token->optr[v].output), v);
+		//save_item(NAME(token->optr[v].outputMask), v);
+
+		save_item(NAME(token->optr[v].filtVoiceMask), v);
+		save_item(NAME(token->optr[v].filtEnabled), v);
+		save_item(NAME(token->optr[v].filtLow), v);
+		save_item(NAME(token->optr[v].filtRef), v);
+		save_item(NAME(token->optr[v].filtIO), v);
+
+		save_item(NAME(token->optr[v].cycleLenCount), v);
+#if defined(DIRECT_FIXPOINT)
+		save_item(NAME(token->optr[v].cycleLen.l), v);
+		save_item(NAME(token->optr[v].cycleAddLen.l), v);
+#else
+		save_item(NAME(token->optr[v].cycleAddLenPnt), v);
+		save_item(NAME(token->optr[v].cycleLen), v);
+		save_item(NAME(token->optr[v].cycleLenPnt), v);
+#endif
+
+#if defined(DIRECT_FIXPOINT)
+		save_item(NAME(token->optr[v].waveStep.l), v);
+		save_item(NAME(token->optr[v].waveStepAdd.l), v);
+#else
+		save_item(NAME(token->optr[v].waveStep), v);
+		save_item(NAME(token->optr[v].waveStepAdd), v);
+		save_item(NAME(token->optr[v].waveStepPnt), v);
+		save_item(NAME(token->optr[v].waveStepAddPnt), v);
+#endif
+		save_item(NAME(token->optr[v].waveStepOld), v);
+		for (int n = 0; n < 2; n++)
+		{
+			save_item(NAME(token->optr[v].wavePre[n].len), v | (n << 4));
+#if defined(DIRECT_FIXPOINT)
+			save_item(NAME(token->optr[v].wavePre[n].stp), v | (n << 4));
+#else
+			save_item(NAME(token->optr[v].wavePre[n].pnt), v | (n << 4));
+			save_item(NAME(token->optr[v].wavePre[n].stp), v | (n << 4));
+#endif
+		}
+
+#if defined(DIRECT_FIXPOINT)
+		save_item(NAME(token->optr[v].noiseReg.l), v);
+#else
+		save_item(NAME(token->optr[v].noiseReg), v);
+#endif
+		save_item(NAME(token->optr[v].noiseStep), v);
+		save_item(NAME(token->optr[v].noiseStepAdd), v);
+		save_item(NAME(token->optr[v].noiseOutput), v);
+		save_item(NAME(token->optr[v].noiseIsLocked), v);
+
+		save_item(NAME(token->optr[v].ADSRctrl), v);
+		//save_item(NAME(token->optr[v].gateOnCtrl), v);
+		//save_item(NAME(token->optr[v].gateOffCtrl), v);
+
+#ifdef SID_FPUENVE
+		save_item(NAME(token->optr[v].fenveStep), v);
+		save_item(NAME(token->optr[v].fenveStepAdd), v);
+		save_item(NAME(token->optr[v].enveStep), v);
+#elif defined(DIRECT_FIXPOINT)
+		save_item(NAME(token->optr[v].enveStep.l), v);
+		save_item(NAME(token->optr[v].enveStepAdd.l), v);
+#else
+		save_item(NAME(token->optr[v].enveStep), v);
+		save_item(NAME(token->optr[v].enveStepAdd), v);
+		save_item(NAME(token->optr[v].enveStepPnt), v);
+		save_item(NAME(token->optr[v].enveStepAddPnt), v);
+#endif
+		save_item(NAME(token->optr[v].enveVol), v);
+		save_item(NAME(token->optr[v].enveSusVol), v);
+		save_item(NAME(token->optr[v].enveShortAttackCount), v);
+	}
+
+	save_item(NAME(token->optr3_outputmask));
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -91,6 +210,7 @@ void mos6581_device::device_start()
 
 	m_token->init();
 	sidInitWaveformTables(m_variant);
+	save_state(m_token.get());
 }
 
 
@@ -101,6 +221,16 @@ void mos6581_device::device_start()
 void mos6581_device::device_reset()
 {
 	m_token->reset();
+}
+
+
+//-------------------------------------------------
+//  device_post_load - device-specific post-load
+//-------------------------------------------------
+
+void mos6581_device::device_post_load()
+{
+	m_token->postload();
 }
 
 

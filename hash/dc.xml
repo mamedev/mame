@@ -828,7 +828,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="aerodijsmm" cloneof="aerodi" >
+	<software name="aerodijsmm" cloneof="aerodi">
 		<!-- http://redump.org/disc/41915/
 		<rom name="Aero Dancing i - Jikai-saku made Matemasen (Japan).gdi" size="433" crc="15e602fe" md5="a4db3a809f8edab42873cf760c16e953" sha1="83ad51211aac9dbbee67bb15a18707a88b2d6cd1"/>
 		<rom name="Aero Dancing i - Jikai-saku made Matemasen (Japan) (Track 1).bin" size="719712" crc="7bfc9cd3" md5="d808b8e61ed195281e795b6f24cdcf8d" sha1="22df00b2b6c1c0dcfbcd1c44586cb01b6a2c2296"/>
@@ -3066,7 +3066,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 
 	<!-- The Limited Edition (T-23204M) comes in a cardboard slipcase and includes an audio CD. -->
-	<software name="bsbsg" > <!-- cloneof="bsb" --> <!-- Sega Rating: Suitable for All Ages -->
+	<software name="bsbsg"> <!-- cloneof="bsb" --> <!-- Sega Rating: Suitable for All Ages -->
 		<!-- http://redump.org/disc/43713/ http://redump.org/disc/43714/
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan).gdi" size="243" crc="3494ccc6" md5="aede4489a8f62e9146a5d489110993da" sha1="ecacde76f17665539d69629c14d52218cb42766a"/>
 		<rom name="Blue-Sky-Blue[s] - Sora o Mau Tsubasa (Japan) (Track 1).bin" size="2241456" crc="e607e01e" md5="93ae63a963ad44c86a023dafde9a63f1" sha1="b47a76464907cbd06ddf85345950f145782d00ba"/>

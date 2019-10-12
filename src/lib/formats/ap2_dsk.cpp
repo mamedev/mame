@@ -678,6 +678,10 @@ bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 			{
 				m_prodos_order = true;
 			}
+			else if (!memcmp("PRODOS", &sector_data[0x40], 6))
+			{
+				m_prodos_order = true;
+			}
 		}
 
 		fpos += 256*16;

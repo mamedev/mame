@@ -469,7 +469,7 @@ public:
 
 			// Register and add the device
 			devinfo = create_lightgun_device(machine, index);
-			osd_printf_verbose("%i: %s\n", index, name.c_str());
+			osd_printf_verbose("%i: %s\n", index, name);
 
 			// Find the device info associated with the name
 			info = find_device_info(m_display, name.c_str(), 0);
@@ -477,7 +477,7 @@ public:
 			// If we couldn't find the device, skip
 			if (info == nullptr)
 			{
-				osd_printf_verbose("Can't find device %s!\n", name.c_str());
+				osd_printf_verbose("Can't find device %s!\n", name);
 				continue;
 			}
 

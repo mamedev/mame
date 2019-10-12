@@ -164,7 +164,6 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	MC6809E(config, m_audiocpu, 3072000); /* Sound */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(namco_de_pcbstack_device::irq0_line_hold), attotime::from_hz(2*60));
-	m_audiocpu->set_periodic_int(FUNC(namco_de_pcbstack_device::irq1_line_hold), attotime::from_hz(120));
 
 	configure_c68_namcos21(config);
 
@@ -205,6 +204,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 
 	C140(config, m_c140, 8000000/374);
 	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
 

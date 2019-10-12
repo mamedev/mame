@@ -68,7 +68,7 @@ void if800_state::if800_map(address_map &map)
 void if800_state::if800_io(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x0640, 0x065f) dma?
+//  map(0x0640, 0x065f) dma?
 	map(0x0660, 0x0663).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
 }
 

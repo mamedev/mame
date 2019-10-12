@@ -310,8 +310,8 @@ void scobra_state::rescuefe_map(address_map &map)
 	map(0xc220, 0xc223).w(m_ppi8255_1, FUNC(i8255_device::write)); // ^
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
-//  AM_RANGE(0xf802, 0xf802) AM_WRITE(galaxold_coin_counter_w)
-//  AM_RANGE(0xf000, 0xf000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
+//  map(0xf802, 0xf802).w(FUNC(scobra_state::galaxold_coin_counter_w));
+//  map(0xf000, 0xf000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
 void scobra_state::minefldfe_map(address_map &map)

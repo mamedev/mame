@@ -28,7 +28,7 @@
 	static plib::unique_ptr<factory::element_t> NETLIB_NAME(p_alias ## _c) \
 			(const pstring &classname) \
 	{ \
-		return plib::make_unique<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(p_name, classname, p_def_param, pstring(__FILE__)); \
+		return plib::make_unique<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(p_name, classname, p_def_param, __FILE__); \
 	} \
 	\
 	factory::constructor_ptr_t decl_ ## p_alias = NETLIB_NAME(p_alias ## _c);

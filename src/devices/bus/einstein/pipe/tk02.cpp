@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(TK02_80COL, tk02_device, "tk02", "TK02 80 Column Monochrome U
 
 void tk02_device::map(address_map &map)
 {
-//  AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(ram_r, ram_w) // no AM_SELECT (or AM_MASK) support here
+//  map(0x00, 0x07).select(0xff00).rw(FUNC(tk02_device::ram_r), FUNC(tk02_device::ram_w)); // no select() (or mask()) support here
 	map(0x08, 0x08).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::register_w));
 	map(0x0c, 0x0c).mirror(0xff00).r(FUNC(tk02_device::status_r));

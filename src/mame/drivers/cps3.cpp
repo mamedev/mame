@@ -15,10 +15,6 @@ SCSI code by ElSemi
 
 Known Issues:
 
-Tilemap Global X/Y flip not emulated
-    Street Fighter 3 2nd Impact uses Y-flipped tilemaps during flashing.
-    Warzard uses X-flipped tilemaps during special effects.
-
 Whole screen flip not emulated
 
 Miscellaneous TO-DOs:
@@ -162,9 +158,13 @@ key and it didn't run so it is known that the custom CPU will not run standard (
 The flashROM in the cart contains an encrypted program which is decrypted by the CPU in the cart. The CPU has built-in
 decryption and the key is held in some static RAM on the CPU die and kept there by a battery. The code is executed by
 the CPU to boot the system. Even though the code in the flashROM is encrypted, the cart can run it even if it is
-dead/suicided because it has been discovered that the program contains a hidden security menu allowing the cart to be
-loaded with the security data. This proves the cart runs the code even if the battery is dead. The special security
-menu is not normally available but is likely accessed with a special key/button combination which is currently unknown.
+dead/suicided.
+It is thought that when a cartridge dies it will set the decryption keys identical to the ones of SFIII-2nd Impact, so
+removing the battery and changing the content of the flashROM (if it's not a 2nd Impact) will make it run as a normal
+SFIII-2nd Impact cartridge (verified).
+Decryption always applied when reading boot flash ROM or SH-2's On-chip cache areas. Based of the fact, what SFIII-2nd uses
+encrypted boot ROM but plain not encrypted SIMMs 1&2 code&data - besides of key, static RAM inside of CPU also
+should contain decryption range for SIMMs1&2, or some flag which enable or disable it.
 
 Because the CPU in the cart is always powered by the battery, it has stealth capability that allows it to continually
 monitor the situation. If the custom CPU detects any tampering (generally things such as voltage fluctuation or voltage
@@ -172,10 +172,6 @@ dropping or even removal of the cart with the power on), it immediately erases t
 inside the CPU which effectively kills the security cart. It is known (from decapping it) that the CPU in the security
 cart contains an amount of static RAM for data storage and a SH2 core based on the Hitachi SH7010-series (SH7014)
 SuperH RISC engine family of Microprocessors.
-
-It is thought that when a cartridge dies it will set the decryption keys identical to the ones of SFIII-2nd Impact, so
-removing the battery and changing the content of the flashROM (if it's not a 2nd Impact) will make it run as a normal
-SFIII-2nd Impact cartridge (verified).
 
 The main board uses the familiar Capcom SIMM modules to hold the data from the CDROM so that the life of the CD drive
 is maximized. The SIMMs don't contain RAM, but instead TSOP48 surface mounted flashROMs that can be updated with
@@ -377,10 +373,7 @@ Cartridge types A/B are identical and cartridge types C/D are identical.
 Type A/B have extra space on the back side to solder a 28F400 SOP44 flashROM which shares all electrical connections
 with the 29F400 TSOP48 flashROM on the front side of the PCB. Either chip can be used to store the 512k cart program,
 but no cart has been seen with a SOP44 flashROM populated, nor with both SOP44 and TSOP48 populated on one cart.
-A and B cartridges also contain a FM1208S NVRAM which holds game settings or other per-game data. It is definitely
-used. If the NVRAM data is not present when the game boots or the NVRAM is not working or inaccessible a message is
-displayed 'EEPROM ERROR' and the game halts. This error can also occur if the security cart edge connector is dirty
-and not contacting properly.
+A and B cartridges also contain a FM1208S NVRAM, it is NOT used to save settings or game data, purpose is unknown.
 C and D cartridges lack the extra space to solder a SOP44 flashROM. A space is available on the back side for a FM1208S
 NVRAM but it is not populated. A MACH111 CPLD is present on the back side and stamped 'CP3B1A'
 
@@ -461,111 +454,111 @@ hardware modification to the security cart.....
 Hardware registers info
 ----------------------
 
-		PPU registers (read only)
-		0x040C0000 - 0x040C000D
+        PPU registers (read only)
+        0x040C0000 - 0x040C000D
 
-		Offset:	Bits:				Desc:
-		0C		---- ---- ---- -2--	Palette DMA active   |
-				---- ---- ---- --1-	Character DMA active | several parts of game code assume only 1 of these might be active at the same time
-				---- ---- ---- ---0	Sprite list DMA/copy active, see register 82 description
+        Offset: Bits:               Desc:
+        0C      ---- ---- ---- -2-- Palette DMA active   |
+                ---- ---- ---- --1- Character DMA active | several parts of game code assume only 1 of these might be active at the same time
+                ---- ---- ---- ---0 Sprite list DMA/copy active, see register 82 description
 
-		PPU registers (write only)
-		0x040C0000 - 0x040C00AF
+        PPU registers (write only)
+        0x040C0000 - 0x040C00AF
 
-		Offset:	Bits:				Desc:
-		00		---- --xx xxxx xxxx Global Scroll 0 X
-		02		---- --xx xxxx xxxx Global Scroll 0 Y
-		04-1F					Global Scrolls 1-7
-		20		xxxx xxxx xxxx xxxx Tilemap 0 Scroll X
-		22		xxxx xxxx xxxx xxxx Tilemap 0 Scroll Y
-		24		---- -a98 76-- ---- Tilemap 0 ?? always 0
-				---- ---- ---4 3210 Tilemap 0 Width (in tiles)
-		26		f--- ---- ---- ---- Tilemap 0 Enable
-				-e-- ---- ---- ---- Tilemap 0 Line Scroll Enable
-				--d- ---- ---- ---- Tilemap 0 Line Zoom Enable (seems unused in games, but might be enabled in jojo dev.menu BG test)
-				---c ---- ---- ---- Tilemap 0 ?? set together with Zoom
-				---- b--- ---- ---- Tilemap 0 Flip X (not implemented, Warzard demo fights during special moves)
-				---- -a-- ---- ---- Tilemap 0 Flip Y (not implemented, Capcom logos background during sfiii2 flashing)
-				---- --98 7654 3210	Tilemap 0 ?? always 0
-		28		-edc ba98 ---- ---- Tilemap 0 Line Scroll and Zoom Base address (1st word is scroll, 2nd word is zoom)
-				---- ---- -654 3210 Tilemap 0 Tiles Base address
-		2A-2F	unused
-		30-5F					Tilemaps 1-3
-												Values: 384		495 "wide"
-		60		xxxx xxxx xxxx xxxx	H Sync end*			42		35
-		62		xxxx xxxx xxxx xxxx	H Blank end			111		118
-		64		xxxx xxxx xxxx xxxx	H Screen end		495		613
-		66		xxxx xxxx xxxx xxxx	H Total end*		454		454
-		68		---- --xx xxxx xxxx	H ?? Zoom Master?	0		0		+128 if flip screen, might be not zoom-related but global H scroll
-		6A		xxxx xxxx xxxx xxxx	H ?? Zoom Offset?	0		0
-		6C		xxxx xxxx xxxx xxxx	H ?? Zoom Size?		1023	1023	(511 at BIOS init)
-		6E		xxxx xxxx xxxx xxxx	H Zoom Scale		64		64
-		70		xxxx xxxx xxxx xxxx	V Sync end			3		3
-		72		xxxx xxxx xxxx xxxx	V Blank end			21		21
-		74		xxxx xxxx xxxx xxxx	V Screen end		245		245
-		76		xxxx xxxx xxxx xxxx	V Total end			262		262
-		78		---- --xx xxxx xxxx	V ?? Zoom Master?	0		0		might be not zoom-related but global V scroll
-		7A		xxxx xxxx xxxx xxxx	V ?? Zoom Offset?	0		0
-		7C		xxxx xxxx xxxx xxxx	V ?? Zoom Size?		1023	1023	(261 at BIOS init)
-		7E		xxxx xxxx xxxx xxxx	V Zoom Scale		64		64
-		80		---- ---- ---- -210	Pixel clock			3		5		base clock is 42.954545MHz, 3 = /5 divider, 5 = /4 divider.
-				---- ---- ---4 3---	Flip screen X/Y (or Y/X)
-				---- ---- --5- ----	?? always set to 1, 0 in unused 24KHz mode (pixel clock divider?)
-				---- ---- -6-- ----	?? set to 0 by BIOS init, then set to 1 after video mode selection, 0 in unused 24KHz mode (pixel clock divider?)
-				f--- ---- ---- ---- ?? always 0, but there is code which may set it
-		82		---- ---- ---- 3--0 Sprite list DMA/copy to onchip RAM ? after new list upload to sprite RAM games write here 8/9/8/9 pattern, then wait until register 0C bit 0 became 0, then write 0.
-		84		---- b--- ---- ---- ?? always set to 0x0800
-		86		---- ---- ---- 3210 Character RAM bank
-		88		---- ---- --54 3210 Gfx flash ROM bank
-		8A		---- ---- ---- ---- ?? set to 0 by BIOS init, never writen later
-		8E		---- ---- 7-5- ---- ?? set to 0x00A0 by BIOS init after Pal/Char DMA registers, never writen later (Char/Pal DMA IRQ enable ?)
-		96		xxxx xxxx xxxx xxxx Character DMA Source low bits
-		98		---- ---- --54 3210 Character DMA Source high bits
-				---- ---- -6-- ---- Character DMA Start
-		A0		---- -a98 7654 3210 Palette DMA Source high bits
-		A2		xxxx xxxx xxxx xxxx Palette DMA Source low bits
-		A4		---- ---- ---- ---0 Palette DMA Destination high bit
-		A6		xxxx xxxx xxxx xxxx Palette DMA Destination low bits
-		A8		-edc ba98 -654 3210 Palette DMA Fade low bits
-		AA		---- ---- -654 3210 Palette DMA Fade high bits
-		AC		xxxx xxxx xxxx xxxx Palette DMA Lenght low bits
-		AE		---- ---- ---- ---0 Palette DMA Lenght high bit
-				---- ---- ---- --1- Palette DMA Start
+        Offset: Bits:               Desc:
+        00      ---- --xx xxxx xxxx Global Scroll 0 X
+        02      ---- --xx xxxx xxxx Global Scroll 0 Y
+        04-1F                   Global Scrolls 1-7
+        20      xxxx xxxx xxxx xxxx Tilemap 0 Scroll X
+        22      xxxx xxxx xxxx xxxx Tilemap 0 Scroll Y
+        24      ---- -a98 76-- ---- Tilemap 0 ?? always 0
+                ---- ---- ---4 3210 Tilemap 0 Width (in tiles)
+        26      f--- ---- ---- ---- Tilemap 0 Enable
+                -e-- ---- ---- ---- Tilemap 0 Line Scroll Enable
+                --d- ---- ---- ---- Tilemap 0 Line Zoom Enable (seems unused in games, but might be enabled in jojo dev.menu BG test)
+                ---c ---- ---- ---- Tilemap 0 ?? set together with Zoom
+                ---- b--- ---- ---- Tilemap 0 Flip X
+                ---- -a-- ---- ---- Tilemap 0 Flip Y
+                ---- --98 7654 3210 Tilemap 0 ?? always 0
+        28      -edc ba98 ---- ---- Tilemap 0 Line Scroll and Zoom Base address (1st word is scroll, 2nd word is zoom)
+                ---- ---- -654 3210 Tilemap 0 Tiles Base address
+        2A-2F   unused
+        30-5F                   Tilemaps 1-3
+                                                Values: 384     495 "wide"
+        60      xxxx xxxx xxxx xxxx H Sync end*         42      35
+        62      xxxx xxxx xxxx xxxx H Blank end         111     118
+        64      xxxx xxxx xxxx xxxx H Screen end        495     613
+        66      xxxx xxxx xxxx xxxx H Total end*        454     454
+        68      ---- --xx xxxx xxxx H ?? Zoom Master?   0       0       +128 if flip screen, might be not zoom-related but global H scroll
+        6A      xxxx xxxx xxxx xxxx H ?? Zoom Offset?   0       0
+        6C      xxxx xxxx xxxx xxxx H ?? Zoom Size?     1023    1023    (511 at BIOS init)
+        6E      xxxx xxxx xxxx xxxx H Zoom Scale        64      64
+        70      xxxx xxxx xxxx xxxx V Sync end          3       3
+        72      xxxx xxxx xxxx xxxx V Blank end         21      21
+        74      xxxx xxxx xxxx xxxx V Screen end        245     245
+        76      xxxx xxxx xxxx xxxx V Total end         262     262
+        78      ---- --xx xxxx xxxx V ?? Zoom Master?   0       0       might be not zoom-related but global V scroll
+        7A      xxxx xxxx xxxx xxxx V ?? Zoom Offset?   0       0
+        7C      xxxx xxxx xxxx xxxx V ?? Zoom Size?     1023    1023    (261 at BIOS init)
+        7E      xxxx xxxx xxxx xxxx V Zoom Scale        64      64
+        80      ---- ---- ---- -210 Pixel clock         3       5       base clock is 42.954545MHz, 3 = /5 divider, 5 = /4 divider.
+                ---- ---- ---4 3--- Flip screen X/Y (or Y/X)
+                ---- ---- --5- ---- ?? always set to 1, 0 in unused 24KHz mode (pixel clock divider?)
+                ---- ---- -6-- ---- ?? set to 0 by BIOS init, then set to 1 after video mode selection, 0 in unused 24KHz mode (pixel clock divider?)
+                f--- ---- ---- ---- ?? always 0, but there is code which may set it
+        82      ---- ---- ---- 3--0 Sprite list DMA/copy to onchip RAM ? after new list upload to sprite RAM games write here 8/9/8/9 pattern, then wait until register 0C bit 0 became 0, then write 0.
+        84      ---- b--- ---- ---- ?? always set to 0x0800
+        86      ---- ---- ---- 3210 Character RAM bank
+        88      ---- ---- --54 3210 Gfx flash ROM bank
+        8A      ---- ---- ---- ---- ?? set to 0 by BIOS init, never writen later
+        8E      ---- ---- 7-5- ---- ?? set to 0x00A0 by BIOS init after Pal/Char DMA registers, never writen later (Char/Pal DMA IRQ enable ?)
+        96      xxxx xxxx xxxx xxxx Character DMA Source low bits
+        98      ---- ---- --54 3210 Character DMA Source high bits
+                ---- ---- -6-- ---- Character DMA Start
+        A0      ---- -a98 7654 3210 Palette DMA Source high bits
+        A2      xxxx xxxx xxxx xxxx Palette DMA Source low bits
+        A4      ---- ---- ---- ---0 Palette DMA Destination high bit
+        A6      xxxx xxxx xxxx xxxx Palette DMA Destination low bits
+        A8      -edc ba98 -654 3210 Palette DMA Fade low bits
+        AA      ---- ---- -654 3210 Palette DMA Fade high bits
+        AC      xxxx xxxx xxxx xxxx Palette DMA Lenght low bits
+        AE      ---- ---- ---- ---0 Palette DMA Lenght high bit
+                ---- ---- ---- --1- Palette DMA Start
 
-		All CRTC-related values is last clock/line of given area, i.e. actual sizes is +1 to value.
+        All CRTC-related values is last clock/line of given area, i.e. actual sizes is +1 to value.
 
-	(*) H Total value is same for all 15KHz modes, uses fixed clock (not affected by pixel clock modifier) -
-		42.954545MHz/6 (similar to SSV) /(454+1) = 15734.25Hz /(262+1) = 59.826Hz
-		unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.954545MHz/6 /(293+1) = 24350.62Hz /(424+1) = 57.29Hz)
+    (*) H Total value is same for all 15KHz modes, uses fixed clock (not affected by pixel clock modifier) -
+        42.954545MHz/6 (similar to SSV) /(454+1) = 15734.25Hz /(262+1) = 59.826Hz
+        unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.954545MHz/6 /(293+1) = 24350.62Hz /(424+1) = 57.29Hz)
 
 
-		'SS' foreground tilemap layer generator (presumable located in 'SSU' chip) registers (write only?)
-		0x05050000 - 0x05050029 area, even bytes only.
+        'SS' foreground tilemap layer generator (presumable located in 'SSU' chip) registers (write only?)
+        0x05050000 - 0x05050029 area, even bytes only.
 
-		Offset:	Bits:		Desc:	Values: 384		495 "wide"
-		00		xxxx xxxx	H Sync*			42		35		same as PPU
-		01		xxxx xxxx	H Start L
-		02		xxxx xxxx	H Start H		62		64
-		03		xxxx xxxx	H Blank L
-		04		xxxx xxxx	H Blank H		534		671
-		05		xxxx xxxx	H Total L*
-		06		xxxx xxxx	H Total H*		454		454*	same as PPU
-		07		xxxx xxxx	H Scroll L
-		08		xxxx xxxx	H Scroll H		-101	-107	+128 if flip screen
-		09		xxxx xxxx	V Sync			3		3		same as PPU
-		0a		xxxx xxxx	V Start L
-		0b		xxxx xxxx	V Start H		21		21		same as PPU
-		0c		xxxx xxxx	V Blank L
-		0d		xxxx xxxx	V Blank H		247		247		PPU value +2
-		0e		xxxx xxxx	V Total L
-		0f		xxxx xxxx	V Total H		262		262		same as PPU
-		10		xxxx xxxx	V Scroll L
-		11		xxxx xxxx	V Scroll H		-24		-24		+288 if flip screen
-		12		xxxx xxxx	Palette base
-		13		---- -210	Pixel clock		3		5		not clear how it works
-		14		---- --10	Flip screen X/Y (or Y/X?)
+        Offset: Bits:       Desc:   Values: 384     495 "wide"
+        00      xxxx xxxx   H Sync*         42      35      same as PPU
+        01      xxxx xxxx   H Start L
+        02      xxxx xxxx   H Start H       62      64
+        03      xxxx xxxx   H Blank L
+        04      xxxx xxxx   H Blank H       534     671
+        05      xxxx xxxx   H Total L*
+        06      xxxx xxxx   H Total H*      454     454*    same as PPU
+        07      xxxx xxxx   H Scroll L
+        08      xxxx xxxx   H Scroll H      -101    -107    +128 if flip screen
+        09      xxxx xxxx   V Sync          3       3       same as PPU
+        0a      xxxx xxxx   V Start L
+        0b      xxxx xxxx   V Start H       21      21      same as PPU
+        0c      xxxx xxxx   V Blank L
+        0d      xxxx xxxx   V Blank H       247     247     PPU value +2
+        0e      xxxx xxxx   V Total L
+        0f      xxxx xxxx   V Total H       262     262     same as PPU
+        10      xxxx xxxx   V Scroll L
+        11      xxxx xxxx   V Scroll H      -24     -24     +288 if flip screen
+        12      xxxx xxxx   Palette base
+        13      ---- -210   Pixel clock     3       5       not clear how it works
+        14      ---- --10   Flip screen X/Y (or Y/X?)
 
-	(*) H Total value is same for all 15KHz modes, same as PPU.
+    (*) H Total value is same for all 15KHz modes, same as PPU.
 */
 
 #include "emu.h"
@@ -582,8 +575,6 @@ Hardware registers info
 #include <algorithm>
 
 #include "sfiii2.lh"
-
-#define MASTER_CLOCK    42954500
 
 #define DEBUG_PRINTF 0
 
@@ -765,17 +756,24 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 								if (c != transparent_color)
 								{
 									/* blending isn't 100% understood */
-									// is it really ORed or bits should be replaced same as in Seta/SSV hardware ?
+									// is it really ORed or bits should be replaced same as in Seta/SSV hardware ? both produce same results in games
 									if (gfx->granularity() == 64)
 									{
-										// OK for sfiii2 spotlight
+										// OK for sfiii world map spotlight
+#if 1
 										dest[x] |= (c & 0xf) << 13;
-										//if (c & 0xf0) dest[x] = machine().rand(); // ?? not used?
+#else
+										dest[x] = (dest[x] & 0x01fff) | ((c & 0xf) << 13);
+#endif
 									}
 									else
 									{
 										// OK for jojo intro, and warzard swords, and various shadows in sf games
+#if 1
 										dest[x] |= ((c & 1) << 15) | ((color & 1) << 16);
+#else
+										dest[x] = (dest[x] & 0x07fff) | ((c & 1) << 15) | ((color & 1) << 16);
+#endif
 									}
 								}
 								x_index += dx;
@@ -891,8 +889,7 @@ void cps3_state::init_crypt(u32 key1, u32 key2, int altEncryption)
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY);
 	m_maincpu->sh2drc_add_fastram(0x02000000, 0x0207ffff, 0, &m_mainram[0]);
 	m_maincpu->sh2drc_add_fastram(0x04000000, 0x0407ffff, 0, &m_spriteram[0]);
-	m_maincpu->sh2drc_add_fastram(0x040C0020, 0x040C002b, 0, &m_tilemap20_regs_base[0]);
-	m_maincpu->sh2drc_add_fastram(0x040C0030, 0x040C003b, 0, &m_tilemap30_regs_base[0]);
+	m_maincpu->sh2drc_add_fastram(0x040C0020, 0x040C005f, 0, &m_tilemap_regs[0]);
 
 	decrypt_bios();
 }
@@ -937,16 +934,12 @@ static const gfx_layout cps3_tiles8x8_layout =
 
 static inline u8 get_fade(int c, int f)
 {
-	// bit 7 unknown
+	// bit 7 unused, explicit masked out
 	// bit 6 fade enable / disable
-	// bit 5 fade mode
+	// bit 5 fade mode (1 = invert input values and output)
 	// bit 4-0 fade value
 	if (f & 0x40) // Fading enable / disable
-	{
-		f &= 0x3f;
-		c = (f & 0x20) ? (c + (((0x1f - c) * (f & 0x1f)) / 0x1f)) : ((c * f) / 0x1f);
-		c = std::max(0, std::min(0x1f, c));
-	}
+		c = (f & 0x20) ? ((((c ^ 0x1f) * (~f & 0x1f)) >> 5) ^ 0x1f) : (c * (f & 0x1f) >> 5);
 	return c;
 }
 
@@ -959,8 +952,6 @@ void cps3_state::set_mame_colours(int colournum, u16 data, u32 fadeval)
 	/* is this 100% correct? */
 	if (fadeval & 0x40400040)
 	{
-		//logerror("fadeval %08x\n",fadeval);
-
 		r = get_fade(r, (fadeval & 0x7f000000)>>24);
 		g = get_fade(g, (fadeval & 0x007f0000)>>16);
 		b = get_fade(b, (fadeval & 0x0000007f)>>0);
@@ -1009,82 +1000,61 @@ void cps3_state::video_start()
 	save_pointer(NAME(m_spritelist), 0x80000/4);
 }
 
-static inline int to_s10(int data)
+void cps3_state::draw_tilemapsprite_line(u32 *regs, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return (data & 0x1ff) - (data & 0x200);
-}
+	if (!(regs[1] & 0x00008000)) return;
 
-// the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
+	int scrollx =            (regs[0] & 0xffff0000) >> 16;
+	int scrolly =            (regs[0] & 0x0000ffff) >> 0;
+	bool linescroll_enable = (regs[1] & 0x00004000) >> 14;
+	int global_flip_x =      (regs[1] & 0x00000800) >> 11; // warzard special moves
+	int global_flip_y =      (regs[1] & 0x00000400) >> 10; // sfiii2 loading screens (capcom background and title logo during flashing)
+	u32 linebase =           (regs[2] & 0x7f000000) >> 24;
+	u32 mapbase =            (regs[2] & 0x007f0000) >> 16;
 
-void cps3_state::draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	u32* tmapregs[4] = { m_tilemap20_regs_base, m_tilemap30_regs_base, m_tilemap40_regs_base, m_tilemap50_regs_base };
-	if (tmnum > 3)
-	{
-		logerror("draw_tilemapsprite_line Illegal tilemap number %d\n", tmnum);
-		return;
-	}
-	u32* regs = tmapregs[tmnum];
+	mapbase <<= 10;
+	linebase <<= 10;
+	scrolly += 4;
 
-	int scrolly = ((regs[0] & 0x0000ffff) >> 0) + 4;
 	int line = drawline + scrolly;
 	line &= 0x3ff;
 
-	if (!(regs[1] & 0x00008000)) return;
+	if (global_flip_y) line ^= 0x3ff;   // these probably needs compensation of our scrolly and tileline tweaks, but it's fine for sfiii2.
+	int xflip_mask = (global_flip_x) ? 0x3f : 0;
 
-	u32 mapbase = (regs[2] & 0x007f0000) >> 16;
-	u32 linebase = (regs[2] & 0x7f000000) >> 24;
-	int linescroll_enable = (regs[1] & 0x00004000);
-
-	int scrollx;
 	int tileline = (line / 16) + 1;
 	int tilesubline = line % 16;
-	rectangle clip;
 
-	mapbase = mapbase << 10;
-	linebase = linebase << 10;
+	if (linescroll_enable)
+		scrollx += (m_spriteram[linebase + ((line + 16) & 0x3ff)] >> 16) & 0x3ff; // test case: sfiii Ryu's stage 2nd round floor
 
-	if (!linescroll_enable)
-	{
-		scrollx = (regs[0] & 0xffff0000) >> 16;
-	}
-	else
-	{
-		//logerror("linebase %08x\n", linebase);
-
-		scrollx = (regs[0] & 0xffff0000) >> 16;
-		scrollx += (m_spriteram[linebase + ((line + 16 - 4) & 0x3ff)] >> 16) & 0x3ff;
-
-	}
-
-	//zoombase = (layerregs[1] & 0xffff0000)>>16;
-
-	drawline &= 0x3ff;
-
-	if (drawline > cliprect.bottom() + 4) return;
-
-	clip.set(cliprect.left(), cliprect.right(), drawline, drawline);
+	rectangle clip(cliprect.left(), cliprect.right(), drawline, drawline);
 
 	for (int x = cliprect.left() / 16; x < (cliprect.right() / 16) + 2; x++)
 	{
-		u32 const dat = m_spriteram[mapbase + ((tileline & 63) * 64) + ((x + scrollx / 16) & 63)];
+		u32 const dat = m_spriteram[mapbase + ((tileline & 63) * 64) + (((x + scrollx / 16) & 63) ^ xflip_mask)];
 		u32 const tileno = (dat & 0xfffe0000) >> 17;
-		bool const xflip = (dat & 0x00001000) >> 12;
+		//u32 tilenoH =    (dat & 0x00008000) >> 15; // games put here tile number's bit 16, probably for (unreleased) mobos with expanded to 16Mbyte character RAM
+		int xflip =        (dat & 0x00001000) >> 12;
 		bool const yflip = (dat & 0x00000800) >> 11;
+		bool const alpha = (dat & 0x00000400) >> 10; // enabled at jojo's "country town" and "in air plane" stages, but associated tile is empty - shadowing have no effect, why ?
 		bool const bpp =   (dat & 0x00000200) >> 9;
 		u32 const colour = (dat & 0x000001ff) >> 0;
 
-		if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
-		else m_gfxdecode->gfx(1)->set_granularity(64);
+		int trans = alpha ? CPS3_TRANSPARENCY_PEN_INDEX_BLEND : CPS3_TRANSPARENCY_PEN_INDEX;
 
-		cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(1), tileno, colour, xflip, yflip, (x * 16) - scrollx % 16, drawline - tilesubline, CPS3_TRANSPARENCY_PEN_INDEX, 0, 0x10000, 0x10000);
+		m_gfxdecode->gfx(1)->set_granularity(bpp ? 64 : 256);
+
+		xflip ^= xflip_mask & 1;
+
+		cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(1), tileno, colour, xflip, yflip, (x * 16) - scrollx % 16, drawline - tilesubline, trans, 0, 0x10000, 0x10000);
 	}
 }
 
 // fg layer (TODO: this could be handled with an actual tilemap)
 void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int scrolly = (-m_ss_vscroll) & 0x100; // TODO properly handle scroll value 
+	int scrolly = (-m_ss_vscroll) & 0x100; // TODO properly handle scroll value
 
 	for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 	{
@@ -1102,8 +1072,8 @@ void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, cons
 			u16 data = m_ss_ram[offset] | (m_ss_ram[offset + 1] << 8) ;
 			u32 tile =  (data & 0x01ff) >> 0;
 			int pal =   (data & 0x3e00) >> 9;
-			int flipy = (data & 0x4000) >> 14; // 
-			int flipx = (data & 0x8000) >> 15; // is this right or should be vice versa ?
+			int flipy = (data & 0x4000) >> 14;
+			int flipx = (data & 0x8000) >> 15;
 			pal += m_ss_pal_base << 5;
 
 			cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000);
@@ -1159,7 +1129,7 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		u8 const gscroll = (m_spritelist[i + 0] & 0x70000000) >> 28;
 		u32 const length = (m_spritelist[i + 0] & 0x01ff0000) >> 16; // how many entries in the sprite table
 		u32 start =        (m_spritelist[i + 0] & 0x00007ff0) >> 4;
-		
+
 		int const xpos =   (m_spritelist[i + 1] & 0x03ff0000) >> 16;
 		int const ypos =    m_spritelist[i + 1] & 0x000003ff;
 
@@ -1167,13 +1137,13 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		bool const whichpal =     (m_spritelist[i + 2] & 0x20000000) >> 29;
 		u8 const global_xflip =   (m_spritelist[i + 2] & 0x10000000) >> 28;
 		u8 const global_yflip =   (m_spritelist[i + 2] & 0x08000000) >> 27;
-		bool const global_alpha = (m_spritelist[i + 2] & 0x04000000) >> 26; // alpha / shadow? set on sfiii2 shadows, and big black image in jojo intro
+		bool const global_alpha = (m_spritelist[i + 2] & 0x04000000) >> 26; // all games except warzard
 		bool const global_bpp =   (m_spritelist[i + 2] & 0x02000000) >> 25;
 		u32 const global_pal =    (m_spritelist[i + 2] & 0x01ff0000) >> 16;
 		//int const tilemapnum =  (m_spritelist[i + 2] & 0x00000030) >> 4; // jojo and jojoba only
 
-		int const gscrollx = (m_ppu_gscroll[gscroll] & 0x03ff0000) >> 16;
-		int const gscrolly = (m_ppu_gscroll[gscroll] & 0x000003ff) >> 0;
+		int const gscrollx = (m_ppu_gscroll_buff[gscroll] & 0x03ff0000) >> 16;
+		int const gscrolly = (m_ppu_gscroll_buff[gscroll] & 0x000003ff) >> 0;
 		start = (start * 0x100) >> 2;
 
 		for (int j = 0; j < (length) * 4; j += 4)
@@ -1185,9 +1155,10 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			static const int tilestable[4] = { 8,1,2,4 };
 
 			u32 const tileno = (value1 & 0xfffe0000) >> 17;
+			//u8 unk2000 =     (value1 & 0x00002000) >> 13); //? sfiii2/3 bonus stages - score numbers and balls icons, sfiii3 staff roll texts
 			u8 flipx =         (value1 & 0x00001000) >> 12;
 			u8 flipy =         (value1 & 0x00000800) >> 11;
-			bool const alpha = (value1 & 0x00000400) >> 10; //? this one is used for alpha effects on warzard
+			bool const alpha = (value1 & 0x00000400) >> 10; // warzard alpha effects
 			bool const bpp =   (value1 & 0x00000200) >> 9;
 			u32 const pal =    (value1 & 0x000001ff);
 
@@ -1210,16 +1181,18 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			if (xsize2 == 0) // xsize of 0 tiles seems to be a special command to draw tilemaps
 			{
 				int tilemapnum = ((value3 & 0x00000030) >> 4);
-
-				/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
-				    which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
+				u32* regs = &m_tilemap_regs[tilemapnum * 4];
 
 				for (int yy = 0; yy < ysizedraw2; yy++)
 				{
-					int cury_pos = to_s10(yy - (to_s10(ypos2) + to_s10(gscrolly)) - 19); // OK for sfiii Alex's stage, but not sure if hardware realy works this way
+					// positioning similar to sprites Y coord, but relative to edge, not center
+					int cury_pos = ypos2 + gscrolly - yy;
+					cury_pos = ~cury_pos;
+					cury_pos -= 18;
+					cury_pos &= 0x3ff;
 
 					if (cury_pos >= m_renderbuffer_clip.top() && cury_pos <= m_renderbuffer_clip.bottom())
-						draw_tilemapsprite_line(tilemapnum, cury_pos, m_renderbuffer_bitmap, m_renderbuffer_clip);
+						draw_tilemapsprite_line(regs, cury_pos, m_renderbuffer_bitmap, m_renderbuffer_clip);
 				}
 			}
 			else
@@ -1414,8 +1387,8 @@ WRITE16_MEMBER(cps3_state::spritedma_w)
 	u16 prev = m_spritelist_dma;
 	COMBINE_DATA(&m_spritelist_dma);
 
-	// display list caching (into PPU on-chip RAM ?)
-	if ((m_spritelist_dma & 8) && !(prev & 8)) // 0->1
+	// display list DMA. actual DMA probably combine coordinates and control fields from main/sub list records and gscroll registers, we just save them for further processing.
+	if (!(m_dma_status & 1) && (m_spritelist_dma & 9) == 8 && (prev & 9) == 9) // 0->1
 	{
 		for (int i = 0; i < 0x2000/4; i += 4)
 		{
@@ -1427,6 +1400,10 @@ WRITE16_MEMBER(cps3_state::spritedma_w)
 			u32 length = (dat & 0x01ff0000) >> 16;
 			std::copy(&m_spriteram[offs], &m_spriteram[offs + length*4], &m_spritelist[offs]); // copy sublist
 		}
+		std::copy(&m_ppu_gscroll[0], &m_ppu_gscroll[8], &m_ppu_gscroll_buff[0]);
+
+		m_dma_status |= 1;
+		m_spritelist_dma_timer->adjust(attotime::from_usec(4)); // slight delay to skip multiple 8/9 writes. actual DMA speed is unknown.
 	}
 }
 
@@ -1762,7 +1739,7 @@ WRITE32_MEMBER(cps3_state::eeprom_w)
 	}
 	else if (addr >= 0x180 && addr <= 0x1ff)
 	{
-		// always 00000000 ? incrememnt access?
+		// write 0 before data word write, erase ? which also means above probably may only reset data bits.
 	}
 	else
 	{
@@ -2041,32 +2018,43 @@ void cps3_state::process_character_dma(u32 address)
 		u32 dat1 = little_endianize_int32(m_char_ram[i + 0 + (address)]);
 		u32 dat2 = little_endianize_int32(m_char_ram[i + 1 + (address)]);
 		u32 dat3 = little_endianize_int32(m_char_ram[i + 2 + (address)]);
-		u32 real_source      = (dat3 << 1) - 0x400000;
-		u32 real_destination =  dat2 << 3;
-		u32 real_length      = (((dat1 & 0x001fffff) + 1) << 3);
 
-		/* 0x01000000 is the end of list marker, 0x13131313 is our default fill */
-		if ((dat1 == 0x01000000) || (dat1 == 0x13131313)) break;
+		// 0x01000000 is the end of list marker
+		if (dat1 & 0x01000000) break;
+
+		u32 dma_command      = (dat1 & 0x00e00000) >> 21;
+		u32 real_length      = (((dat1 & 0x001fffff) + 1) << 3); // for command 4 here is number of 16bit words -1
+		u32 real_destination = dat2 << 3;
+		u32 real_source      = (dat3 << 1) - 0x400000;
 
 		//logerror("%08x %08x %08x real_source %08x (rom %d offset %08x) real_destination %08x, real_length %08x\n", dat1, dat2, dat3, real_source, real_source/0x800000, real_source%0x800000, real_destination, real_length);
 
-		switch ((dat1 >> 21) & 7)
+		switch (dma_command)
 		{
-		case 4:	/* Sets a table used by the decompression routines */
+		case 4: /* Sets a table used by the decompression routines */
 			/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
 			m_current_table_address = real_source;
 			break;
-		case 2:	/* 6bpp DMA decompression
-			  - this is used for the majority of sprites and backgrounds */
+		case 2: /* 6bpp DMA decompression
+		      - this is used for the majority of sprites and backgrounds */
 			do_char_dma(real_source, real_destination, real_length);
 			break;
-		case 3:	/* 8bpp DMA decompression
-			  - this is used on SFIII NG Sean's Stage ONLY */
+		case 3: /* 8bpp DMA decompression
+		      - this is used on SFIII NG Sean's Stage ONLY */
 			do_alt_char_dma(real_source, real_destination, real_length);
 			break;
+		case 0: // not compressed DMA
+			// warzard use this at stage's start, code looks intent, not a game bug
+			for (u8* dest = (u8*)m_char_ram.get(); real_length; --real_length)
+			{
+				dest[(real_destination & 0x7fffff) ^ 3] = m_user5[DMA_XOR(real_source)];
+				m_gfxdecode->gfx(1)->mark_dirty((real_destination & 0x7fffff) / 0x100);
+				real_source++;
+				real_destination++;
+			}
+			break;
 		default:
-			// warzard uses command 0, uncompressed? but for what?
-			logerror("Unknown DMA List Command Type %d\n", (dat1 >> 21) & 7);
+			logerror("Unknown DMA List Command Type %d\n", dma_command);
 			break;
 		}
 	}
@@ -2119,11 +2107,6 @@ WRITE32_MEMBER(cps3_state::characterdma_w)
 	}
 }
 
-WRITE32_MEMBER(cps3_state::ppu_gscroll_w)
-{
-	COMBINE_DATA(&m_ppu_gscroll[offset]);
-}
-
 READ16_MEMBER(cps3_state::colourram_r)
 {
 	return m_colourram[offset];
@@ -2149,12 +2132,8 @@ void cps3_state::cps3_map(address_map &map)
 	// PPU registers
 	map(0x040c0000, 0x040c0007).nopr(); // ?? warzard reads this but not use values, dev/debug leftovers ?
 	map(0x040c000c, 0x040c000d).r(FUNC(cps3_state::dma_status_r));
-
-	map(0x040c0000, 0x040c001f).w(FUNC(cps3_state::ppu_gscroll_w));
-	map(0x040c0020, 0x040c002b).writeonly().share("tmap20_regs");
-	map(0x040c0030, 0x040c003b).writeonly().share("tmap30_regs");
-	map(0x040c0040, 0x040c004b).writeonly().share("tmap40_regs");
-	map(0x040c0050, 0x040c005b).writeonly().share("tmap50_regs");
+	map(0x040c0000, 0x040c001f).writeonly().share("ppu_gscroll_regs");
+	map(0x040c0020, 0x040c005f).writeonly().share("ppu_tmap_regs");
 	map(0x040c0060, 0x040c007f).writeonly().share("ppu_crtc_zoom");
 	map(0x040c0080, 0x040c0083).w(FUNC(cps3_state::spritedma_w)).umask32(0x0000ffff);
 	map(0x040c0084, 0x040c0087).w(FUNC(cps3_state::cram_bank_w));
@@ -2280,6 +2259,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps3_state::dma_interrupt)
 	m_maincpu->set_input_line(10, ASSERT_LINE);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(cps3_state::sprite_dma_cb)
+{
+	m_dma_status &= ~1;
+}
+
 
 void cps3_state::machine_start()
 {
@@ -2299,7 +2283,7 @@ void cps3_state::machine_start()
 	save_item(NAME(m_chardma_other));
 	save_item(NAME(m_current_table_address));
 	save_item(NAME(m_dma_status));
-	save_item(NAME(m_ppu_gscroll));
+	save_item(NAME(m_ppu_gscroll_buff));
 	save_item(NAME(m_ss_hscroll));
 	save_item(NAME(m_ss_vscroll));
 	save_item(NAME(m_ss_pal_base));
@@ -2532,6 +2516,7 @@ void cps3_state::cps3(machine_config &config)
 */
 
 	TIMER(config, m_dma_timer).configure_generic(FUNC(cps3_state::dma_interrupt));
+	TIMER(config, m_spritelist_dma_timer).configure_generic(FUNC(cps3_state::sprite_dma_cb));
 
 	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
 	PALETTE(config, m_palette).set_entries(0x10000); // actually 0x20000 ...
@@ -2542,7 +2527,7 @@ void cps3_state::cps3(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	CPS3(config, m_cps3sound, MASTER_CLOCK / 3);
+	CPS3(config, m_cps3sound, XTAL(42'954'545) / 3);
 	m_cps3sound->add_route(1, "lspeaker", 1.0);
 	m_cps3sound->add_route(0, "rspeaker", 1.0);
 }
@@ -2813,7 +2798,7 @@ ROM_START( jojobar1 )
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-jjm-0", 0, BAD_DUMP SHA1(0678a0baeb853dcff1d230c14f0873cc9f143d7b) )
+	DISK_IMAGE_READONLY( "cap-jjm-0", 0, SHA1(1651896d127dbf32af99175ae91227cd90675aaa) )
 ROM_END
 
 

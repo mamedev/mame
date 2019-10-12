@@ -268,7 +268,7 @@ void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in tmnt_state::device_timer");
+		throw emu_fatalerror("Unknown id in tmnt_state::device_timer");
 	}
 }
 
@@ -508,7 +508,7 @@ void tmnt_state::mia_main_map(address_map &map)
 	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::tmnt_priority_w));
 #endif
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
-//  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
+//  map(0x10e800, 0x10e801).nopw(); ???
 	map(0x140000, 0x140007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
 	map(0x140400, 0x1407ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
 }
@@ -530,7 +530,7 @@ void tmnt_state::tmnt_main_map(address_map &map)
 	map(0x0a0018, 0x0a0019).portr("DSW3");
 	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::tmnt_priority_w));
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
-//  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
+//  map(0x10e800, 0x10e801).nopw(); ???
 	map(0x140000, 0x140007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
 	map(0x140400, 0x1407ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
 }
@@ -920,7 +920,7 @@ void tmnt_state::tmnt2_main_map(address_map &map)
 	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
 	map(0x1c0400, 0x1c0401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0x1c0500, 0x1c057f).ram(); /* TMNT2 only (1J) unknown, mostly MCU blit offsets */
-//  AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r) /* protection device */
+//  map(0x1c0800, 0x1c0801).r(FUNC(tmnt_state::ssriders_protection_r)); /* protection device */
 	map(0x1c0800, 0x1c081f).w(FUNC(tmnt_state::tmnt2_1c0800_w)).share("tmnt2_1c0800");  /* protection device */
 	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);

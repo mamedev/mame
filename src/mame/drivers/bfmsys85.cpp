@@ -402,7 +402,7 @@ void bfmsys85_state::memmap(address_map &map)
 
 void bfmsys85_state::bfmsys85(machine_config &config)
 {
-	M6809(config, m_maincpu, MASTER_CLOCK/4);          // 6809 CPU at 1 Mhz
+	MC6809(config, m_maincpu, MASTER_CLOCK);          // 6809 CPU, 1 Mhz Q/E
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfmsys85_state::memmap);                        // setup read and write memorymap
 	m_maincpu->set_periodic_int(FUNC(bfmsys85_state::timer_irq), attotime::from_hz(1000));              // generate 1000 IRQ's per second
 
