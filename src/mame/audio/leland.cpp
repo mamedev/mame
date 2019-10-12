@@ -271,7 +271,7 @@ void wsf_80186_sound_device::device_add_mconfig(machine_config &config)
 		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i], 0); // unknown DAC
 		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_VREF_POS_INPUT);
 		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_VREF_NEG_INPUT); // unknown DAC
-		vref.add_route(0, m_dacvol[i], DAC_VREF_POS_INPUT);
+		vref.add_route(0, m_dacvol[i], 1.0, DAC_VREF_POS_INPUT);
 	}
 	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 	vref.add_route(0, "dac9", 1.0, DAC_VREF_POS_INPUT);
