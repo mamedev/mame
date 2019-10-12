@@ -43,12 +43,12 @@ SHADER_PATH=shaders/dx11/$(SHADERS_DIR)
 else
 ifeq ($(TARGET), 2)
 VS_FLAGS=--platform nacl
-FS_FLAGS=--platform nacl
+FS_FLAGS=--platform nacl --define TRANSPOSED_XYZ_TO_sRGB
 SHADER_PATH=shaders/essl/$(SHADERS_DIR)
 else
 ifeq ($(TARGET), 3)
 VS_FLAGS=--platform android
-FS_FLAGS=--platform android
+FS_FLAGS=--platform android --define TRANSPOSED_XYZ_TO_sRGB
 CS_FLAGS=--platform android
 SHADER_PATH=shaders/essl/$(SHADERS_DIR)
 else
