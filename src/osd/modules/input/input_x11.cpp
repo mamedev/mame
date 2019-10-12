@@ -312,22 +312,22 @@ public:
 		std::lock_guard<std::mutex> scope_lock(m_lock);
 		XEvent xevent;
 
-		if (m_display != nullptr)
+		// If X11 has become invalid for some reason, XPending will crash. Assert instead.
+		assert(m_display != nullptr)
+
+		//Get XInput events
+		while (XPending(m_display) != 0)
 		{
-			//Get XInput events
-			while (XPending(m_display) != 0)
+			XNextEvent(m_display, &xevent);
+
+			// Find all subscribers for the event type
+			auto subscribers = m_subscription_index.equal_range(xevent.type);
+
+			// Dispatch the events
+			std::for_each(subscribers.first, subscribers.second, [&xevent](auto &pair)
 			{
-				XNextEvent(m_display, &xevent);
-
-				// Find all subscribers for the event type
-				auto subscribers = m_subscription_index.equal_range(xevent.type);
-
-				// Dispatch the events
-				std::for_each(subscribers.first, subscribers.second, [&xevent](auto &pair)
-				{
-					pair.second->handle_event(xevent);
-				});
-			}
+				pair.second->handle_event(xevent);
+			});
 		}
 	}
 };
@@ -468,11 +468,8 @@ public:
 		x11_event_manager::instance().initialize();
 		m_display = x11_event_manager::instance().display();
 
-		if (m_display == nullptr)
-		{
-			osd_printf_verbose("Unable to connect to X server\n");
-			return;
-		}
+		// If the X server has become invalid, a crash can occur
+		assert(m_display != nullptr)
 
 		// Loop through all 8 possible devices
 		for (index = 0; index < 8; index++)
