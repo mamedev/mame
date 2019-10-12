@@ -1035,7 +1035,7 @@ ROM_START( karnovjbl )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "7.bin",         0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* NEC D8748HD MCU */
 	ROM_LOAD( "mcu.bin", 0x0000, 0x1000, NO_DUMP ) // labeled 19 on PCB (yes, they labeled two chips as 19)
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
