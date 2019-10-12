@@ -1852,7 +1852,7 @@ cppcheck:
 .PHONY: shaders bgfx-tools
 
 bgfx-tools:
-	$(SILENT) $(MAKE) -C 3rdparty/bgfx -f makefile shaderc CC="$(CC)" CXX="$(CXX)" MINGW="$(MINGW)"
+	$(SILENT) $(MAKE) -C 3rdparty/bgfx -f makefile shaderc CC="$(CC)" CXX="$(CXX)" MINGW="$(MINGW)" SILENT="$(SILENT)"
 
 shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/dx11)
@@ -1862,7 +1862,7 @@ shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/essl)
 	-$(call MKDIR,build/shaders/glsl)
 	-$(call MKDIR,build/shaders/spirv)
-	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)"
+	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)" SILENT="$(SILENT)"
 
 #-------------------------------------------------
 # Translation
