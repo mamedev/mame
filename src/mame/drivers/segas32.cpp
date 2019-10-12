@@ -1242,7 +1242,7 @@ void segas32_state::system32_sound_portmap(address_map &map)
 void segas32_state::rf5c68_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("rf5c68_mem");
 }
 
 
@@ -5432,6 +5432,9 @@ void segas32_state::segas32_common_init()
 	m_sw1_output = nullptr;
 	m_sw2_output = nullptr;
 	m_sw3_output = nullptr;
+
+	// needs to be initialized to 0xff, otherwise f1en has bad sound (MT04531)
+	memset(memshare("rf5c68_mem")->ptr(), 0xff, memshare("rf5c68_mem")->bytes());
 }
 
 
