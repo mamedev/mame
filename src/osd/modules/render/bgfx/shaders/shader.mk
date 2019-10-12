@@ -54,7 +54,7 @@ SHADER_PATH=shaders/essl/$(SHADERS_DIR)
 else
 ifeq ($(TARGET), 4)
 VS_FLAGS=--platform linux -p 120
-FS_FLAGS=--platform linux -p 120
+FS_FLAGS=--platform linux -p 120 --define TRANSPOSED_XYZ_TO_sRGB
 CS_FLAGS=--platform linux -p 430
 SHADER_PATH=shaders/glsl/$(SHADERS_DIR)
 else
