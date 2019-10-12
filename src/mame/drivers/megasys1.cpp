@@ -545,11 +545,21 @@ void megasys1_state::p47b_sound_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x040001).r(m_soundlatch[0], FUNC(generic_latch_16_device::read));
-	map(0x060000, 0x060001).w(m_soundlatch[1], FUNC(generic_latch_16_device::write));   // to main cpu
+	map(0x060000, 0x060001).w(m_soundlatch[1], FUNC(generic_latch_16_device::write));   // to main cpu?
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
 	map(0x0a0000, 0x0a0003).noprw(); // OKI1 on the original
 	map(0x0c0000, 0x0c0003).noprw(); // OKI2 on the original
 	map(0x0e0000, 0x0fffff).ram();
+}
+
+void megasys1_state::p47b_extracpu_prg_map(address_map &map) // TODO
+{
+	map(0x0000, 0xffff).rom();
+}
+
+void megasys1_state::p47b_extracpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 }
 
 /***************************************************************************
@@ -1773,10 +1783,13 @@ void megasys1_state::p47b(machine_config &config)
 
 	subdevice<ym2203_device>("ymsnd")->set_clock(7.2_MHz_XTAL / 2);
 
-	// what's this for? SFX?
-	//z80_device &extracpu(Z80(config, "extracpu", 7.2_MHz_XTAL / 2)); // divisor not verified
-	//extracpu.set_addrmap(AS_PROGRAM, &megasys1_state::p47b_extracpu_prg_map);
-	//extracpu.set_addrmap(AS_IO, &megasys1_state::p47b_extracpu_io_map);
+	// probably for driving the OKI M5205
+	z80_device &extracpu(Z80(config, "extracpu", 7.2_MHz_XTAL / 2)); // divisor not verified
+	extracpu.set_periodic_int(FUNC(megasys1_state::irq0_line_hold), attotime::from_hz(4*56));
+	extracpu.set_addrmap(AS_PROGRAM, &megasys1_state::p47b_extracpu_prg_map);
+	extracpu.set_addrmap(AS_IO, &megasys1_state::p47b_extracpu_io_map);
+
+	// OKI M5205
 }
 
 void megasys1_state::system_B(machine_config &config)
@@ -3590,7 +3603,7 @@ ROM_START( p47je )
 	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
-ROM_START( p47b ) // very similar to original hardware but for the sound system (only a YM2203 with a Y3014B DAC with unpopulated spaces for another pair) and an extra Z80 (purpose unknown)
+ROM_START( p47b ) // very similar to original hardware but for the sound system (a YM2203 with a Y3014B DAC with unpopulated spaces for another pair + an OKI M5205) and an extra Z80
 	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code, identical to p47 set but with smaller ROMs */
 	ROM_LOAD16_BYTE( "12.bin", 0x000000, 0x010000, CRC(cc81abd8) SHA1(223d205ee5120d16b997b0788fcb81c0de52da04) )
 	ROM_LOAD16_BYTE( "13.bin", 0x020000, 0x010000, CRC(f3ea8a3e) SHA1(b2ea6661f7a3653ac6d92e07176546a41178eaff) )

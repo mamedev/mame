@@ -192,6 +192,8 @@ private:
 	void stdragona_gfx_unmangle(const char *region);
 	void kickoffb_sound_map(address_map &map);
 	void p47b_sound_map(address_map &map);
+	void p47b_extracpu_prg_map(address_map &map);
+	void p47b_extracpu_io_map(address_map &map);
 	void megasys1A_map(address_map &map);
 	void megasys1A_sound_map(address_map &map);
 	void megasys1A_jitsupro_sound_map(address_map &map);
