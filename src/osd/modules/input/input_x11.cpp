@@ -313,7 +313,7 @@ public:
 		XEvent xevent;
 
 		// If X11 has become invalid for some reason, XPending will crash. Assert instead.
-		assert(m_display != nullptr)
+		assert(m_display != nullptr);
 
 		//Get XInput events
 		while (XPending(m_display) != 0)
@@ -469,7 +469,7 @@ public:
 		m_display = x11_event_manager::instance().display();
 
 		// If the X server has become invalid, a crash can occur
-		assert(m_display != nullptr)
+		assert(m_display != nullptr);
 
 		// Loop through all 8 possible devices
 		for (index = 0; index < 8; index++)
