@@ -2125,7 +2125,7 @@ void dec8_state::ghostb(machine_config &config)
 	DECO_222(config, m_audiocpu, 1500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::dec8_s_map); /* NMIs are caused by the main CPU */
 
-	I8751(config, m_mcu, 3000000*4);
+	I8751(config, m_mcu, XTAL(8'000'000)); /* 8.0MHz OSC next to MCU - clock unverified */
 	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
