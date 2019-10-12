@@ -51,7 +51,7 @@ FL-02     s    SM5A    Flagman (aka Flag Man)
 MT-03     s    SM5A    Vermin (aka The Exterminator)
 RC-04     s    SM5A    Fire (aka Fireman Fireman)
 IP-05     s    SM5A    Judge
-MN-06*    g    SM5A?   Manhole
+MN-06     g    SM5A    Manhole
 CN-07     g    SM5A    Helmet (aka Headache)
 LN-08     g    SM5A    Lion
 PR-21     ws   SM5A    Parachute
@@ -847,6 +847,77 @@ ROM_START( gnw_judge )
 
 	ROM_REGION( 104950, "screen", 0)
 	ROM_LOAD( "gnw_judge.svg", 0, 104950, CRC(fb51e31b) SHA1(c78e6d80aa5b59de1955ba5f83cc138b83bf714c) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Manhole (model MH-06)
+  * PCB label MH-06
+  * Sharp SM5A label MH-06 5104 (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the Gold Series version, there's also a new wide screen version
+  (NH-103)
+
+***************************************************************************/
+
+class gnw_manholeg_state : public hh_sm510_state
+{
+public:
+	gnw_manholeg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_manholeg(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_manholeg )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_manholeg_state::gnw_manholeg(machine_config &config)
+{
+	sm5a_common(config, 1667, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_manholeg )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mh-06", 0x0000, 0x0740, CRC(ae52c425) SHA1(8da8a714ecbdde7d0f257b52a5014993675a5f3f) )
+
+	ROM_REGION( 125447, "screen", 0)
+	ROM_LOAD( "gnw_manholeg.svg", 0, 125447, CRC(ac5d6807) SHA1(3392644edf35cfcbf8e56aca8bfca3ce380aad05) )
 ROM_END
 
 
@@ -3006,7 +3077,9 @@ ROM_END
   * Sharp SM510 label NH-103 538A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
-  This is the new wide screen version, there's also a Gold Series version (MH-06)
+  This is the new wide screen version, there's also a Gold Series version
+  (MH-06). The both games are using different MCU types so this version seems
+  to be a complete rewrite.
 
 ***************************************************************************/
 
@@ -8526,6 +8599,7 @@ CONS( 1980, gnw_flagman, 0,          0, gnw_flagman, gnw_flagman, gnw_flagman_st
 CONS( 1980, gnw_vermin,  0,          0, gnw_vermin,  gnw_vermin,  gnw_vermin_state,  empty_init, "Nintendo", "Game & Watch: Vermin", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_fires,   0,          0, gnw_fires,   gnw_fires,   gnw_fires_state,   empty_init, "Nintendo", "Game & Watch: Fire (silver)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_judge,   0,          0, gnw_judge,   gnw_judge,   gnw_judge_state,   empty_init, "Nintendo", "Game & Watch: Judge (green)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_manholeg,0,          0, gnw_manholeg,gnw_manholeg,gnw_manholeg_state,empty_init, "Nintendo", "Game & Watch: Manhole (gold)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_helmet,  0,          0, gnw_helmet,  gnw_helmet,  gnw_helmet_state,  empty_init, "Nintendo", "Game & Watch: Helmet (Rev. 2)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_lion,    0,          0, gnw_lion,    gnw_lion,    gnw_lion_state,    empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE )
 
