@@ -558,16 +558,17 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
 segas32_state::segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_PCB, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_PCB, tag, owner, clock, false)
 {
 }
 
-segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_multi32)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_z80_shared_ram(*this,"z80_shared_ram")
 	, m_system32_workram(*this,"workram")
 	, m_videoram(*this,"videoram", 0)
 	, m_spriteram(*this,"spriteram", 0)
+	, m_soundram(*this, "soundram")
 	, m_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
 	, m_maincpu(*this, "maincpu")
 	, m_soundcpu(*this, "soundcpu")
@@ -583,6 +584,7 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	, m_soundrom_bank(*this, "soundbank")
 	, m_multipcm_bank_hi(*this, "multipcmbankhi")
 	, m_multipcm_bank_lo(*this, "multipcmbanklo")
+	, m_is_multi32(is_multi32)
 {
 }
 
@@ -618,47 +620,22 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
  *
  *************************************/
 
-void segas32_state::device_start()
-{
-	common_start(0);
-}
-
-void segas32_trackball_state::device_start()
-{
-	common_start(0);
-}
-
 void segas32_v25_state::device_start()
 {
-	common_start(0);
+	segas32_4player_state::device_start();
 	decrypt_protrom();
-}
-
-void segas32_upd7725_state::device_start()
-{
-	common_start(0);
 }
 
 void segas32_cd_state::device_start()
 {
-	common_start(0);
+	segas32_state::device_start();
 	m_lamps.resolve();
-}
-
-void sega_multi32_state::device_start()
-{
-	common_start(1);
 }
 
 void sega_multi32_analog_state::device_start()
 {
-	common_start(1);
+	sega_multi32_state::device_start();
 	m_analog_bank = 0;
-}
-
-void sega_multi32_6player_state::device_start()
-{
-	common_start(1);
 }
 
 void segas32_state::device_reset()
@@ -1242,7 +1219,7 @@ void segas32_state::system32_sound_portmap(address_map &map)
 void segas32_state::rf5c68_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("soundram");
 }
 
 
@@ -2371,7 +2348,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
 
 segas32_regular_state::segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, tag, owner, clock, false)
 {
 }
 
@@ -2407,7 +2384,7 @@ segas32_analog_state::segas32_analog_state(const machine_config &mconfig, const 
 }
 
 segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, type, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock, false)
 {
 }
 
@@ -2449,7 +2426,7 @@ void segas32_trackball_state::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
 
 segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock, false)
 {
 }
 
@@ -2484,7 +2461,7 @@ segas32_4player_state::segas32_4player_state(const machine_config &mconfig, cons
 }
 
 segas32_4player_state::segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, type, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock, false)
 {
 }
 
@@ -2614,7 +2591,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")
 
 segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock, false)
 	, m_lamps(*this, "lamp%u", 0U)
 {
 }
@@ -2705,7 +2682,7 @@ sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char
 }
 
 sega_multi32_state::sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, type, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock, true)
 {
 }
 
@@ -5703,7 +5680,7 @@ void segas32_new_state::init_f1lapt()
 	m_mainpcb->init_f1lapt();
 }
 
-void segas32_state::init_alien3(void)
+void segas32_state::init_alien3()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::alien3_sw1_output;
@@ -5741,13 +5718,13 @@ void segas32_state::init_arescue(int m_hasdsp)
 }
 
 
-void segas32_state::init_arabfgt(void)
+void segas32_state::init_arabfgt()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_brival(void)
+void segas32_state::init_brival()
 {
 	segas32_common_init();
 
@@ -5758,7 +5735,7 @@ void segas32_state::init_brival(void)
 }
 
 
-void segas32_state::init_darkedge(void)
+void segas32_state::init_darkedge()
 {
 	segas32_common_init();
 
@@ -5768,7 +5745,7 @@ void segas32_state::init_darkedge(void)
 }
 
 
-void segas32_state::init_dbzvrvs(void)
+void segas32_state::init_dbzvrvs()
 {
 	segas32_common_init();
 
@@ -5778,7 +5755,7 @@ void segas32_state::init_dbzvrvs(void)
 }
 
 
-void segas32_state::init_f1en(void)
+void segas32_state::init_f1en()
 {
 	segas32_common_init();
 
@@ -5787,7 +5764,7 @@ void segas32_state::init_f1en(void)
 }
 
 
-void segas32_state::init_f1lap(void)
+void segas32_state::init_f1lap()
 {
 	segas32_common_init();
 	m_system32_prot_vblank = &segas32_state::f1lap_fd1149_vblank;
@@ -5798,7 +5775,7 @@ void segas32_state::init_f1lap(void)
 }
 
 
-void segas32_state::init_f1lapt(void)
+void segas32_state::init_f1lapt()
 {
 	segas32_common_init();
 
@@ -5808,13 +5785,13 @@ void segas32_state::init_f1lapt(void)
 }
 
 
-void segas32_state::init_ga2(void)
+void segas32_state::init_ga2()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_harddunk(void)
+void segas32_state::init_harddunk()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::harddunk_sw1_output;
@@ -5823,13 +5800,13 @@ void segas32_state::init_harddunk(void)
 }
 
 
-void segas32_state::init_holo(void)
+void segas32_state::init_holo()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_jpark(void)
+void segas32_state::init_jpark()
 {
 	/* Temp. Patch until we emulate the 'Drive Board', thanks to Malice */
 	uint16_t *pROM = (uint16_t *)m_maincpu_region->base();
@@ -5843,7 +5820,7 @@ void segas32_state::init_jpark(void)
 }
 
 
-void segas32_state::init_orunners(void)
+void segas32_state::init_orunners()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::orunners_sw1_output;
@@ -5853,7 +5830,7 @@ void segas32_state::init_orunners(void)
 }
 
 
-void segas32_state::init_radm(void)
+void segas32_state::init_radm()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::radm_sw1_output;
@@ -5861,7 +5838,7 @@ void segas32_state::init_radm(void)
 }
 
 
-void segas32_state::init_radr(void)
+void segas32_state::init_radr()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::radm_sw1_output;
@@ -5871,7 +5848,7 @@ void segas32_state::init_radr(void)
 }
 
 
-void segas32_state::init_scross(void)
+void segas32_state::init_scross()
 {
 	segas32_common_init();
 	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(FUNC(segas32_state::scross_bank_w),this));
@@ -5883,13 +5860,13 @@ void segas32_state::init_scross(void)
 }
 
 
-void segas32_state::init_slipstrm(void)
+void segas32_state::init_slipstrm()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_sonic(void)
+void segas32_state::init_sonic()
 {
 	segas32_common_init();
 
@@ -5898,32 +5875,32 @@ void segas32_state::init_sonic(void)
 }
 
 
-void segas32_state::init_sonicp(void)
+void segas32_state::init_sonicp()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_spidman(void)
+void segas32_state::init_spidman()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_svf(void)
+void segas32_state::init_svf()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_jleague(void)
+void segas32_state::init_jleague()
 {
 	segas32_common_init();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(FUNC(segas32_state::jleague_protection_w),this));
 }
 
 
-void segas32_state::init_titlef(void)
+void segas32_state::init_titlef()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::titlef_sw1_output;

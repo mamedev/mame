@@ -63,10 +63,6 @@ void rf5c68_device::device_start()
 	m_cache = space().cache<0, 0, ENDIANNESS_LITTLE>();
 	m_sample_end_cb.bind_relative_to(*owner());
 
-	// needs to be initialized to 0xff, otherwise f1en has bad sound (MT04531)
-	for (int i = 0; i < 0x10000; i++)
-		m_data->write_byte(i, 0xff);
-
 	/* allocate the stream */
 	m_stream = stream_alloc(0, 2, clock() / 384);
 
