@@ -2475,6 +2475,7 @@ ec1849                          //
 ev1806                          // Everex EV-1806
 ev1815                          // Everex EV-1815
 ews286                          // 1986 Ericsson WS286
+ficgiovt2                       // FIC 486-GIO-VT2
 ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
@@ -2596,11 +2597,24 @@ zito4dps                        // ZIDA Tomato board 4DPS (486)
 alator2                         // Alaris Tornado 2 motherboard (486)
 ochipvlp                        // Octek Hippo VL+ motherboard (486)
 sto486wb                        // Auva-Cam-33-P2 = See-Thru Sto486Wb motherboard (486)
+ga486vf                         // Gigabyte GA-486VF motherboard (486)
 ga486vs                         // Gigabyte GA-486VS motherboard (486)
 amibaby                         // AMI Mark V Baby Screamer motherboard (386)
 ecsfx3000                       // Elitegroup FX-3000 motherboard (386)
 frx386c                         // Micro-Express Inc. Forex 386 Cache
 um486v                          // Elitegroup UM486V-AIO motherboard (486)
+sm48650usc                      // Vintage Sprite SM 486-50USC motherboard (486)
+ch4slez1                        // Chaintech 486SLE M106 4SLE-Z1 motherboard (486)
+ec4915aio                       // Elitegroup ECS UC4915 A AIO motherboard (486)
+via4386vio                      // Via 4386 VIO / Highscreen universal board (486)
+hot433                          // Shuttle HOT-433 motherboard (486)
+abpb4                           // Abit AB-PB4 motherboard (486)
+abpw4                           // Abit AB-PW4 motherboard (486)
+ochawk                          // Octek Hawk motherboard (486)
+pt430                           // Pine Technology PT-430 motherboard (486)
+ch491e                          // Chicony CH-491E motherboard (486)
+a486sv2                     // Asus ISA-486SV2 motherboard (486)
+
 
 @source:atari_s1.cpp
 aavenger                        //
