@@ -3183,12 +3183,12 @@ ROM_END
 
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT  CLASS          INIT        COMPANY    FULLNAME                                   FLAGS */
 COMP( 1989, fmtowns,    0,        0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns (Model 1 / 2)",                  MACHINE_NOT_WORKING)
-COMP( 1991, fmtownsv03, fmtowns2, 0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns (unknown, V03 L01 00 91/07/09)", MACHINE_NOT_WORKING)
-COMP( 1991, fmtownsux,  fmtowns2, 0,      townsux,  towns, towns16_state, empty_init, "Fujitsu", "FM-Towns II UX",                          MACHINE_NOT_WORKING)
-COMP( 1992, fmtownshr,  fmtowns2, 0,      townshr,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II HR",                          MACHINE_NOT_WORKING)
-COMP( 1993, fmtownsmx,  fmtowns2, 0,      townsmx,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II MX",                          MACHINE_NOT_WORKING)
-COMP( 1994, fmtownsftv, fmtowns2, 0,      townsftv, towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II FreshTV",                     MACHINE_NOT_WORKING)
-COMP( 19??, fmtownssj,  fmtowns2, 0,      townssj,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II SJ",                          MACHINE_NOT_WORKING)
+COMP( 1991, fmtownsv03, fmtowns,  0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns (unknown, V03 L01 00 91/07/09)", MACHINE_NOT_WORKING)
+COMP( 1991, fmtownsux,  fmtowns,  0,      townsux,  towns, towns16_state, empty_init, "Fujitsu", "FM-Towns II UX",                          MACHINE_NOT_WORKING)
+COMP( 1992, fmtownshr,  fmtowns,  0,      townshr,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II HR",                          MACHINE_NOT_WORKING)
+COMP( 1993, fmtownsmx,  fmtowns,  0,      townsmx,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II MX",                          MACHINE_NOT_WORKING)
+COMP( 1994, fmtownsftv, fmtowns,  0,      townsftv, towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II FreshTV",                     MACHINE_NOT_WORKING)
+COMP( 19??, fmtownssj,  fmtowns,  0,      townssj,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II SJ",                          MACHINE_NOT_WORKING)
 CONS( 1993, fmtmarty,   0,        0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty",                          MACHINE_NOT_WORKING)
 CONS( 1993, fmtmarty2,  fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty 2",                        MACHINE_NOT_WORKING)
 CONS( 1994, carmarty,   fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Car Marty",                      MACHINE_NOT_WORKING)
