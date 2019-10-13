@@ -676,8 +676,8 @@ ROM_START( firetrap )
 	ROM_LOAD( "di-17.10j",    0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "di-18.12j",    0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // created from japanese version, patched init byte
-	ROM_LOAD( "di-12.16h",    0x00000, 0x1000, BAD_DUMP CRC(49eba102) SHA1(3c27117245b1f0b2bc995ddfae2cfb80be5f188b) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* 8751 protection MCU */
+	ROM_LOAD( "di-12.16h",    0x00000, 0x1000, CRC(6340a4d7) SHA1(3c896015a2416e3d664fedd07e42bdd40078c700) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "di-03.17c",    0x00000, 0x2000, CRC(46721930) SHA1(a605fe993166e95c1602a35b548649ceae77bff2) )
@@ -740,8 +740,8 @@ ROM_START( firetrapa )
 	ROM_LOAD( "di-17.10j",    0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "di-18.12j",    0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // created from japanese version, patched init byte
-	ROM_LOAD( "di-12.16h",    0x00000, 0x1000, BAD_DUMP CRC(49eba102) SHA1(3c27117245b1f0b2bc995ddfae2cfb80be5f188b) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* 8751 protection MCU */
+	ROM_LOAD( "di-12.16h",    0x00000, 0x1000, CRC(6340a4d7) SHA1(3c896015a2416e3d664fedd07e42bdd40078c700) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "di-03.17c",    0x00000, 0x2000, CRC(46721930) SHA1(a605fe993166e95c1602a35b548649ceae77bff2) )
