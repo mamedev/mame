@@ -239,11 +239,11 @@ void exedexes_state::exedexes(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.10);
+	AY8910(config, "aysnd", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.10); // 1.5 MHz, verified on PCB
 
-	SN76489(config, "sn1", 3000000).add_route(ALL_OUTPUTS, "mono", 0.36);
+	SN76489(config, "sn1", 12_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.36); // 3 MHz, verified on PCB
 
-	SN76489(config, "sn2", 3000000).add_route(ALL_OUTPUTS, "mono", 0.36);
+	SN76489(config, "sn2", 12_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.36); // 3 MHz, verified on PCB
 }
 
 
