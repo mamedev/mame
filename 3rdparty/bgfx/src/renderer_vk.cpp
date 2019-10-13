@@ -4880,7 +4880,7 @@ VK_DESTROY
 
 			dsl = s_renderVK->m_descriptorSetLayoutCache.find(m_descriptorSetLayoutHash);
 
-			if (NULL == dsl)
+			if (VK_NULL_HANDLE == dsl)
 			{
 				VkDescriptorSetLayoutBinding bindings[64];
 				bx::memCopy(
