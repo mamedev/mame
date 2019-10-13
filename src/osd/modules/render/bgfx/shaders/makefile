@@ -12,6 +12,7 @@ SUBDIRS := $(patsubst .,,$(patsubst ./,,$(shell find . -type d)))
 rebuild: main $(SUBDIRS)
 endif
 
+.NOTPARALLEL:
 $(SUBDIRS):
 	@echo $@
 ifeq ($(OS),windows)
