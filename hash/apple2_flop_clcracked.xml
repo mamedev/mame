@@ -35385,4 +35385,30 @@
 		</part>
 	</software>
 
+	<software name="balanact">
+		<description>Balancing Act (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="release" value="2019-10-13"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="balancing act (4am crack).dsk" size="143360" crc="a5dd929c" sha1="5e523ba9acc08d10f6bd000b982bfc5804013f1b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frcsubtr">
+		<description>Fractions: Subtraction (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2019-10-13"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fractions- subtraction (4am crack).dsk" size="143360" crc="dc619fdd" sha1="9053d4818485f0120b0ff9d701bfcf7b3b0f0962" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
