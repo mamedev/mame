@@ -13293,7 +13293,7 @@ carmarty                        // Fujitsu FM-Towns Car Marty
 fmtmarty                        // 1993 Fujitsu FM-Towns Marty
 fmtmarty2                       // 1993 Fujitsu FM-Towns Marty 2
 fmtowns                         // 1989 Fujitsu FM-Towns
-fmtownsa                        //
+fmtownsv03                      //
 fmtownsftv                      // 1994 FM-Towns II FreshTV
 fmtownshr                       // 1992 FM-Towns II HR
 fmtownsmx                       // FM-Towns II MX
@@ -38957,7 +38957,6 @@ tx0_8kw                         // 1962 MIT TX-0 (8kw RAM)
 
 @source:tx1.cpp
 buggyboy                        // (c) 1985 Tatsumi
-buggyboyb                       // (c) 1985 Tatsumi
 buggyboyjr                      // (c) 1986 Tatsumi
 tx1                             // (c) 1983 Tatsumi + Atari, Namco and Taito license
 tx1jb                           // (c) 1983 Tatsumi
