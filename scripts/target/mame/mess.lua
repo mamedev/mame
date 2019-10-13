@@ -3589,7 +3589,6 @@ files {
 createMESSProjects(_target, _subtarget, "toshiba")
 files {
 	MAME_DIR .. "src/mame/drivers/pasopia.cpp",
-	MAME_DIR .. "src/mame/includes/pasopia.h",
 	MAME_DIR .. "src/mame/drivers/pasopia7.cpp",
 	MAME_DIR .. "src/mame/drivers/paso1600.cpp",
 }
