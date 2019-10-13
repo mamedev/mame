@@ -2613,7 +2613,13 @@ abpw4                           // Abit AB-PW4 motherboard (486)
 ochawk                          // Octek Hawk motherboard (486)
 pt430                           // Pine Technology PT-430 motherboard (486)
 ch491e                          // Chicony CH-491E motherboard (486)
-a486sv2                     // Asus ISA-486SV2 motherboard (486)
+a486sv2                         // Asus ISA-486SV2 motherboard (486)
+mb4d33                          // Aquarius System (ASI) MB-4D33/50NR motherboard (486)
+uniwb4407                       // UNICHIP 486 WB 4407 REV 1.0 motherboard (486)
+px486p3							// QDI PX486P3 motherboard (486)
+um8886						    // 486 motherboards using the UMC UM8886BF/UM8881F chipset
+gete486vl                       // GENOA TurboExpress 486 VL motherboard (486)
+pck486dx						// Peacock PCK 486 DX motherboard
 
 
 @source:atari_s1.cpp
