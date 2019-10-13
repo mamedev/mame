@@ -559,14 +559,8 @@ namespace devices
 
 		if (m_params.m_dynamic_ts)
 		{
-#if 0
-			for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
-			{
-				terms_for_net_t *t = m_terms[k].get();
-#else
 			for (auto &t : m_terms)
 			{
-#endif
 				//const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 				// avoid floating point exceptions
 				const nl_double DD_n = std::max(-1e100, std::min(1e100,(t->getV() - t->m_last_V)));

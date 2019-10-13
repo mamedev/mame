@@ -14,7 +14,7 @@
 
 #define FAST_CLOCK  (1)
 
-NETLIST_START(pong_fast)
+NETLIST_START(pongf)
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers

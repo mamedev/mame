@@ -70,7 +70,7 @@ correctly.
 #include "screen.h"
 #include "speaker.h"
 
-#include "netlist/devices/net_lib.h"
+#include "audio/nl_1942.h"
 
 namespace {
 
@@ -86,84 +86,6 @@ constexpr XTAL SOUND_CPU_CLOCK_1942P(MASTER_CLOCK_1942P/5);
 constexpr XTAL AUDIO_CLOCK_1942P(MASTER_CLOCK_1942P/16);
 
 } // anonymous namespace
-
-#define NLFILT(RA, R1, C1, R2) \
-	NET_C(RA.1, V5)             \
-	NET_C(RA.2, R1.1)           \
-	NET_C(R1.2, GND)            \
-	NET_C(R1.1, C1.1)           \
-	NET_C(C1.2, R2.1)
-
-static NETLIST_START(nl_1942)
-
-	/* Standard stuff */
-
-	SOLVER(Solver, 48000)
-	ANALOG_INPUT(V5, 5)
-	PARAM(Solver.ACCURACY, 1e-6)
-	PARAM(Solver.GS_LOOPS, 6)
-	PARAM(Solver.SOR_FACTOR, 1.0)
-	//PARAM(Solver.DYNAMIC_TS, 1)
-	//PARAM(Solver.LTE, 5e-8)
-
-	/* AY 8910 internal resistors */
-
-	RES(R_AY1_1, 1000);
-	RES(R_AY1_2, 1000);
-	RES(R_AY1_3, 1000);
-	RES(R_AY2_1, 1000);
-	RES(R_AY2_2, 1000);
-	RES(R_AY2_3, 1000);
-
-	RES(R2, 220000)
-	RES(R3, 220000)
-	RES(R4, 220000)
-	RES(R5, 220000)
-	RES(R6, 220000)
-	RES(R7, 220000)
-
-	RES(R11, 10000)
-	RES(R12, 10000)
-	RES(R13, 10000)
-	RES(R14, 10000)
-	RES(R15, 10000)
-	RES(R16, 10000)
-
-	CAP(CC7, 10e-6)
-	CAP(CC8, 10e-6)
-	CAP(CC9, 10e-6)
-	CAP(CC10, 10e-6)
-	CAP(CC11, 10e-6)
-	CAP(CC12, 10e-6)
-
-	NLFILT(R_AY2_3, R13, CC7, R2)
-	NLFILT(R_AY2_2, R15, CC8, R3)
-	NLFILT(R_AY2_1, R11, CC9, R4)
-
-	NLFILT(R_AY1_3, R12, CC10, R5)
-	NLFILT(R_AY1_2, R14, CC11, R6)
-	NLFILT(R_AY1_1, R16, CC12, R7)
-
-	POT(VR, 2000)
-	NET_C(VR.3, GND)
-
-	NET_C(R2.2, VR.1)
-	NET_C(R3.2, VR.1)
-	NET_C(R4.2, VR.1)
-	NET_C(R5.2, VR.1)
-	NET_C(R6.2, VR.1)
-	NET_C(R7.2, VR.1)
-
-	CAP(CC6, 10e-6)
-	RES(R1, 100000)
-
-	NET_C(CC6.1, VR.2)
-	NET_C(CC6.2, R1.1)
-	CAP(CC3, 220e-6)
-	NET_C(R1.2, CC3.1)
-	NET_C(CC3.2, GND)
-
-NETLIST_END()
 
 WRITE8_MEMBER(_1942_state::_1942_bankswitch_w)
 {
@@ -612,7 +534,7 @@ void _1942_state::_1942(machine_config &config)
 
 	/* Minimize resampling between ay8910 and netlist */
 	NETLIST_SOUND(config, "snd_nl", AUDIO_CLOCK / 8 / 2)
-		.set_source(NETLIST_NAME(nl_1942))
+		.set_source(NETLIST_NAME(1942))
 		.add_route(ALL_OUTPUTS, "mono", 5.0);
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");

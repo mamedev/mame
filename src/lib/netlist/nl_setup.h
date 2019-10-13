@@ -393,8 +393,15 @@ namespace netlist
 
 		/* validation */
 
-		void enable_validation() { m_validation = true; }
-		bool is_validation() const { return m_validation; }
+		/* The extended validation mode is not intended for running.
+		 * The intention is to identify power pins which are not properly
+		 * connected. The downside is that this mode creates a netlist which
+		 * is different (and not able to run).
+		 *
+		 * Extended validation is supported by nltool validate option.
+		 */
+		void set_extended_validation(bool val) { m_validation = val; }
+		bool is_extended_validation() const { return m_validation; }
 	private:
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);

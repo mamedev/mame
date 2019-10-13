@@ -136,9 +136,13 @@ namespace devices
 			pstring symname = static_compile_name();
 			m_proc.load(this->state().lib(), symname);
 			if (m_proc.resolved())
+			{
 				this->log().info("External static solver {1} found ...", symname);
+			}
 			else
+			{
 				this->log().warning("External static solver {1} not found ...", symname);
+			}
 		}
 	}
 
@@ -213,7 +217,6 @@ namespace devices
 		plib::putf8_fmt_writer w(&t);
 		generate_code(w);
 		std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
-
 		return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
 	}
 

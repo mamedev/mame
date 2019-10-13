@@ -1084,7 +1084,7 @@ plib::unique_ptr<netlist::netlist_t> netlist_mame_device::base_validity_check(va
 		//netlist_mame_t lnetlist(*this, "netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		auto lnetlist = plib::make_unique<netlist::netlist_t>("netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		// enable validation mode
-		lnetlist->nlstate().setup().enable_validation();
+		lnetlist->nlstate().setup().set_extended_validation(false);
 		common_dev_start(lnetlist.get());
 
 		for (device_t &d : subdevices())
@@ -1101,6 +1101,7 @@ plib::unique_ptr<netlist::netlist_t> netlist_mame_device::base_validity_check(va
 	}
 	catch (memregion_not_set &err)
 	{
+		// Do not report an error. Validity check has no access to ROM area.
 		osd_printf_verbose("%s\n", err.what());
 	}
 	catch (emu_fatalerror &err)
