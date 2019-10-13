@@ -490,12 +490,12 @@ LLVM:
 #  define POSH_CPU_SPARC 1
 #endif
 
-#if defined ARM || defined __arm__ || defined _ARM
+#if defined ARM || defined __arm__ || defined _ARM || defined _M_ARM
 #  define POSH_CPU_STRONGARM 1
 #  define POSH_CPU_STRING "ARM"
 #endif
 
-#if defined __aarch64__
+#if defined __aarch64__ || defined _M_ARM64
 #  define POSH_CPU_AARCH64 1
 #  define POSH_CPU_STRING "ARM64"
 #endif

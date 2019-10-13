@@ -769,22 +769,18 @@ end
 local version = str_to_version(_OPTIONS["gcc_version"])
 if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["targetos"]=="macosx" and (version <= 60000))) then
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++1y",
 	}
 
 	buildoptions_objcpp {
-		"-x objective-c++",
 		"-std=c++1y",
 	}
 else
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 	}
 
 	buildoptions_objcpp {
-		"-x objective-c++",
 		"-std=c++14",
 	}
 end
@@ -1178,7 +1174,6 @@ configuration { "asmjs" }
 		"-s USE_SDL_TTF=2",
 	}
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 	}
 	linkoptions {
@@ -1194,7 +1189,6 @@ configuration { "android*" }
 		"-Wno-incompatible-ms-struct",
 	}
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 		"-Wno-extern-c-compat",
 		"-Wno-tautological-constant-out-of-range-compare",
@@ -1213,7 +1207,6 @@ configuration { "pnacl" }
 		"-Wno-inline-new-delete",
 	}
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 	}
 	archivesplit_size "20"

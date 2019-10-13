@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -216,8 +216,9 @@ namespace bgfx { namespace glsl
 					const char* typen = parse.getPtr();
 
 					char uniformType[256];
-					parse = bx::strWord(parse).getPtr();
-					bx::strCopy(uniformType, int32_t(parse.getPtr()-typen+1), typen);
+					parse = bx::strWord(parse);
+					bx::strCopy(uniformType, parse.getLength()+1, typen);
+					parse.set(parse.getPtr()+parse.getLength(),optShader.getTerm());
 					const char* name = bx::strLTrimSpace(parse).getPtr();
 					parse.set(name, optShader.getTerm() );
 
@@ -255,6 +256,60 @@ namespace bgfx { namespace glsl
 					}
 
 					parse = eol.getPtr() + 1;
+				}
+			}
+
+			bx::StringView mainEntry("xlatMtlShaderOutput xlatMtlMain (");
+			parse = bx::strFind(optimizedShader, mainEntry);
+			end = parse;
+			if (!parse.isEmpty())
+			{
+				parse.set(parse.getPtr() + mainEntry.getLength(), optShader.getTerm());
+				end = bx::strFind(parse, "{");
+			}
+
+			while (parse.getPtr() < end.getPtr()
+				&& !parse.isEmpty())
+			{
+				parse.set(bx::strLTrimSpace(parse).getPtr(), optShader.getTerm());
+				const bx::StringView textureNameMark("[[texture(");
+				const bx::StringView textureName = bx::strFind(parse, textureNameMark);
+
+				if (!textureName.isEmpty())
+				{
+					Uniform un;
+					un.type = nameToUniformTypeEnum("int");	// int for sampler
+					const char* varNameEnd = textureName.getPtr() - 1;
+					parse.set(parse.getPtr(), varNameEnd - 1);
+					const char* varNameBeg = parse.getPtr();
+					for (int ii = parse.getLength() - 1; 0 <= ii; --ii)
+					{
+						if (varNameBeg[ii] == ' ')
+						{
+							parse.set(varNameBeg + ii + 1, varNameEnd);
+							break;
+						}
+					}
+					char uniformName[256];
+					bx::strCopy(uniformName, parse.getLength() + 1, parse);					
+					un.name = uniformName;
+					const char* regIndexBeg = textureName.getPtr() + textureNameMark.getLength();
+					bx::StringView regIndex = bx::strFind(regIndexBeg, ")");
+
+					regIndex.set(regIndexBeg, regIndex.getPtr());
+					uint32_t tmp;
+					bx::fromString(&tmp, regIndex);
+					un.regIndex = uint16_t(tmp);
+					un.num = 1;
+					un.regCount = 1;
+
+					uniforms.push_back(un);
+
+					parse = regIndex.getPtr() + 1;
+				}
+				else
+				{
+					parse = textureName;
 				}
 			}
 		}

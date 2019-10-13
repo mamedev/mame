@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -48,7 +48,7 @@ namespace bx
 		}
 
 		char tmp[kMaxFilePath*2] = "\"";
-		strCat(tmp, BX_COUNTOF(tmp), _filePath.get() );
+		strCat(tmp, BX_COUNTOF(tmp), _filePath);
 		strCat(tmp, BX_COUNTOF(tmp), "\" ");
 		strCat(tmp, BX_COUNTOF(tmp), _args);
 
@@ -119,7 +119,7 @@ namespace bx
 		}
 
 		char tmp[kMaxFilePath*2] = "\"";
-		strCat(tmp, BX_COUNTOF(tmp), _filePath.get() );
+		strCat(tmp, BX_COUNTOF(tmp), _filePath);
 		strCat(tmp, BX_COUNTOF(tmp), "\" ");
 		strCat(tmp, BX_COUNTOF(tmp), _args);
 

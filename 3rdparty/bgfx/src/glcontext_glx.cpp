@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -164,17 +164,16 @@ namespace bgfx { namespace gl
 			m_context = glXCreateContext(m_display, m_visualInfo, 0, GL_TRUE);
 			BGFX_FATAL(NULL != m_context, Fatal::UnableToInitialize, "Failed to create GL 2.1 context.");
 
-#if BGFX_CONFIG_RENDERER_OPENGL >= 31
 			glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)glXGetProcAddress( (const GLubyte*)"glXCreateContextAttribsARB");
 
 			if (NULL != glXCreateContextAttribsARB)
 			{
-				BX_TRACE("Create GL 3.1 context.");
+				BX_TRACE("Create GL %d.%d context.", BGFX_CONFIG_RENDERER_OPENGL / 10, BGFX_CONFIG_RENDERER_OPENGL % 10);
 				int32_t flags = BGFX_CONFIG_DEBUG ? GLX_CONTEXT_DEBUG_BIT_ARB : 0;
 				const int contextAttrs[] =
 				{
-					GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-					GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+					GLX_CONTEXT_MAJOR_VERSION_ARB, BGFX_CONFIG_RENDERER_OPENGL / 10,
+					GLX_CONTEXT_MINOR_VERSION_ARB, BGFX_CONFIG_RENDERER_OPENGL % 10,
 					GLX_CONTEXT_FLAGS_ARB, flags,
 					GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
 					0,
@@ -188,9 +187,6 @@ namespace bgfx { namespace gl
 					m_context = context;
 				}
 			}
-#else
-			BX_UNUSED(bestConfig);
-#endif // BGFX_CONFIG_RENDERER_OPENGL >= 31
 
 			XUnlockDisplay(m_display);
 		}
