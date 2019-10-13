@@ -910,6 +910,7 @@ end
 configuration { "mingw-clang" }
 	buildoptions {
 		"-Xclang -flto-visibility-public-std", -- workround for __imp___ link errors
+		"-Wno-nonportable-include-path", -- workround for clang 9.0.0 case sensitivity bug when including GL/glext.h
 	}
 configuration {  }
 
