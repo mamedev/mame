@@ -260,7 +260,7 @@ const double XTAL::known_xtals[] = {
 	 18'720'000, /* 18.72_MHz_XTAL         Nokia MikroMikko 1 */
 	 18'867'000, /* 18.867_MHz_XTAL        Decision Data IS-482 */
 	 18'869'600, /* 18.8696_MHz_XTAL       Memorex 2178 */
-         19'170'000, /*                        Ericsson ISA8 Monochrome HR Graphics Board */
+	 19'170'000, /* 19.17_MHz_XTAL         Ericsson ISA8 Monochrome HR Graphics Board */
 	 19'339'600, /* 19.3396_MHz_XTAL       TeleVideo TVI-955 80-column display clock */
 	 19'584'000, /* 19.584_MHz_XTAL        ADM-42 */
 	 19'600'000, /* 19.6_MHz_XTAL          Universal Mr. Do - Model 8021 PCB */
