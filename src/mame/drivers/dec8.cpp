@@ -2412,7 +2412,7 @@ ROM_START( lastmisn )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) BAD_DUMP ) /* not verified to be the same data as the "A" MCU dump */
+	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) BAD_DUMP ) /* not verified to be the same data as the "A" MCU dump */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2448,7 +2448,7 @@ ROM_START( lastmisnu6 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2484,7 +2484,7 @@ ROM_START( lastmisnu5 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
