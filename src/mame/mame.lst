@@ -38957,6 +38957,7 @@ tx0_8kw                         // 1962 MIT TX-0 (8kw RAM)
 
 @source:tx1.cpp
 buggyboy                        // (c) 1985 Tatsumi
+buggyboyb                       // (c) 1985 Tatsumi
 buggyboyjr                      // (c) 1986 Tatsumi
 tx1                             // (c) 1983 Tatsumi + Atari, Namco and Taito license
 tx1jb                           // (c) 1983 Tatsumi
