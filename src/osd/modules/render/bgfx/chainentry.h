@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef __DRAWBGFX_CHAIN_ENTRY__
-#define __DRAWBGFX_CHAIN_ENTRY__
+#ifndef DRAWBGFX_CHAIN_ENTRY
+#define DRAWBGFX_CHAIN_ENTRY
 
 #include <bgfx/bgfx.h>
 

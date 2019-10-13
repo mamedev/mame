@@ -1140,8 +1140,10 @@ void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer
 				continue;
 			}
 			m_hash_to_entry[rect.hash()] = rect;
-			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base());
-			bgfx::updateTexture2D(m_texture_cache->texture(), 0, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
+			bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::RGBA8;
+			uint16_t pitch = rect.width();
+			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base(), &pitch);
+			bgfx::updateTexture2D(m_texture_cache->texture(), 0, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem, pitch);
 		}
 	}
 }

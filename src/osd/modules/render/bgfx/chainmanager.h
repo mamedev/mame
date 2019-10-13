@@ -77,6 +77,8 @@ private:
 	void destroy_chains();
 	void reload_chains();
 
+	void init_texture_converters();
+
 	void refresh_available_chains();
 	void destroy_unloaded_chains();
 	void find_available_chains(std::string root, std::string path);
@@ -106,6 +108,9 @@ private:
 	std::vector<ui::menu_item>  m_selection_sliders;
 	std::vector<std::unique_ptr<slider_state>> m_core_sliders;
 	std::vector<int32_t>        m_current_chain;
+	std::vector<bgfx_texture*>	m_screen_textures;
+	std::vector<bgfx_texture*>	m_screen_palettes;
+	std::vector<bgfx_effect*>   m_converters;
 
 	static const uint32_t       CHAIN_NONE;
 };
