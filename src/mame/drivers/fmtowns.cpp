@@ -34,33 +34,33 @@
 
 Regular models:
 
-            Model             | Form factor |     CPU    |        Standard RAM          | Max RAM |      Standard FDDs     |         Standard HDD
-FM Towns 1/2                  | Tower       | 386DX-16   | 1 MB (1) or 2 MB (2)         | 6 MB    | 1 or 2                 | No SCSI controller
-FM Towns 1F/2F/1H/2H          | Tower       | 386DX-16   | 1 MB (1F/1H) or 2 MB (2F/2H) | 8 MB    | 1 (1F) or 2 (others)   | 20 or 40 MB (H models only)
-FM Towns 10F/20F/40H/80H      | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 1 (10F) or 2 (others)  | 40 or 85 MB (H models only)
-FM Towns II CX10/20/40/100    | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 1 (CX10) or 2 (others) | No (CX10/20), 40 or 100 MB
-FM Towns II UX10/20/40        | All-in-one  | 386SX-16   | 2 MB                         | 10 MB   | 1 (UX10) or 2 (others) | No (UX10/20) or 40 MB
-FM Towns II HG20/40/100       | Desktop     | 386DX-20   | 2 MB                         | 26 MB   | 2                      | No (HG20), 40 or 80 MB
-FM Towns II HR20/100/200      | Desktop     | 486SX-20   | 4 MB                         | 28 MB   | 2                      | No (HR20) 100 or 200 MB
-FM Towns II UG10/20/40/80     | All-in-one  | 386SX-20   | 2 MB                         | 10 MB   | 1 (UG10) or 2 (others) | No (UG10/20), 40 or 80 MB
-FM Towns II UR20/40/80        | All-in-one  | 486SX-20   | 2 MB                         | 10 MB   | 2                      | No (UG20), 40 or 80 MB
-FM Towns II ME20/170          | Desktop     | 486SX-25   | 2 MB                         | 66 MB   | 2                      | No (ME20) or 170 MB
-FM Towns II MA170/340         | Desktop     | 486SX-33   | 4 MB                         | 100 MB  | 2                      | 170 or 340 MB
-FM Towns II MX20/170/340      | Desktop     | 486DX2-66  | 4 MB                         | 100 MB  | 2                      | No (MX20), 170 or 340 MB
-FM Towns II Fresh/MF20/MF170W | Desktop     | 486SX-33   | 4 MB (MF20) or 6 MB (others) | 68 MB   | 2                      | No (MF20), or 170 (others)
-FM Towns II MA170W/MA340W     | Desktop     | 486SX-33   | 8 MB                         | 100 MB  | 2                      | 170 or 340 MB
-FM Towns II MX170W/MA340W     | Desktop     | 486DX2-66  | 8 MB                         | 100 MB  | 2                      | 170 or 340 MB
-FM Towns II Fresh-TV          | Desktop     | 486SX-33   | 6 MB                         | 68 MB   | 2                      | 170 MB
-FM Towns II Fresh-E           | Desktop     | 486DX2-66  | 8 MB                         | 72 MB   | 2                      | 260 MB
-FM Towns II Fresh-T           | Desktop     | 486SX-33   | 8 MB                         | 72 MB   | 2                      | 260 MB
-FM Towns II EA2               | Desktop     | 486SX-33   | 4 MB                         | 68 MB   | 2                      | No
-FM Towns II HA2/HA53          | Desktop     | 486DX2-66  | 4 MB (HA2) or 8 MB (HA53)    | 100 MB  | 2                      | No (HA2) or 530 MB
-FM Towns II HB2/HB53/HB53M    | Desktop     | Pentium-60 | 8 MB                         | 136 MB  | 2                      | No (HB2) or 530 MB
-FM Towns II Fresh-ES/Fresh-ET | Desktop     | 486DX2-66  | 8 MB                         | 72 MB   | 1                      | 360 MB
-FM Towns II HC53/HC53M        | Desktop     | Pentium-90 | 8 MB                         | 136 MB  | 1                      | 540 MB
-FM Towns II Fresh-FS/Fresh-FT | Desktop     | 486DX4-100 | 8 MB                         | 72 MB   | 1                      | 540 MB
-FM Towns Marty / Marty 2      | Console     | 386SX-16   | 2 MB                         | 4 MB    | 1                      | No SCSI controller
-Car Marty                     | Car-mounted | 386SX-16   | 2 MB                         | ?       | No                     | No SCSI controller
+             Model              | Form factor |     CPU    |        Standard RAM          | Max RAM |      Standard FDDs     |         Standard HDD
+FM Towns 1/2                    | Tower       | 386DX-16   | 1 MB (1) or 2 MB (2)         | 6 MB    | 1 or 2                 | No SCSI controller
+FM Towns 1F/2F/1H/2H            | Tower       | 386DX-16   | 1 MB (1F/1H) or 2 MB (2F/2H) | 8 MB    | 1 (1F) or 2 (others)   | 20 or 40 MB (H models only)
+FM Towns 10F/20F/40H/80H        | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 1 (10F) or 2 (others)  | 40 or 85 MB (H models only)
+FM Towns II CX10/20/40/100      | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 1 (CX10) or 2 (others) | No (CX10/20), 40 or 100 MB
+FM Towns II UX10/20/40          | All-in-one  | 386SX-16   | 2 MB                         | 10 MB   | 1 (UX10) or 2 (others) | No (UX10/20) or 40 MB
+FM Towns II HG20/40/100         | Desktop     | 386DX-20   | 2 MB                         | 26 MB   | 2                      | No (HG20), 40 or 80 MB
+FM Towns II HR20/100/200        | Desktop     | 486SX-20   | 4 MB                         | 28 MB   | 2                      | No (HR20) 100 or 200 MB
+FM Towns II UG10/20/40/80       | All-in-one  | 386SX-20   | 2 MB                         | 10 MB   | 1 (UG10) or 2 (others) | No (UG10/20), 40 or 80 MB
+FM Towns II UR20/40/80          | All-in-one  | 486SX-20   | 2 MB                         | 10 MB   | 2                      | No (UG20), 40 or 80 MB
+FM Towns II ME20/170            | Desktop     | 486SX-25   | 2 MB                         | 66 MB   | 2                      | No (ME20) or 170 MB
+FM Towns II MA170/340           | Desktop     | 486SX-33   | 4 MB                         | 100 MB  | 2                      | 170 or 340 MB
+FM Towns II MX20/170/340        | Desktop     | 486DX2-66  | 4 MB                         | 100 MB  | 2                      | No (MX20), 170 or 340 MB
+FM Towns II Fresh/MF20/MF170W   | Desktop     | 486SX-33   | 4 MB (MF20) or 6 MB (others) | 68 MB   | 2                      | No (MF20), or 170 (others)
+FM Towns II MA170W/MA340W       | Desktop     | 486SX-33   | 8 MB                         | 100 MB  | 2                      | 170 or 340 MB
+FM Towns II MX170W/MA340W       | Desktop     | 486DX2-66  | 8 MB                         | 100 MB  | 2                      | 170 or 340 MB
+FM Towns II Fresh-TV            | Desktop     | 486SX-33   | 6 MB                         | 68 MB   | 2                      | 170 MB
+FM Towns II Fresh-E             | Desktop     | 486DX2-66  | 8 MB                         | 72 MB   | 2                      | 260 MB
+FM Towns II Fresh-T             | Desktop     | 486SX-33   | 8 MB                         | 72 MB   | 2                      | 260 MB
+FM Towns II EA2                 | Desktop     | 486SX-33   | 4 MB                         | 68 MB   | 2                      | No
+FM Towns II HA2/HA53            | Desktop     | 486DX2-66  | 4 MB (HA2) or 8 MB (HA53)    | 100 MB  | 2                      | No (HA2) or 530 MB
+FM Towns II HB2/HB53/HB53M      | Desktop     | Pentium-60 | 8 MB                         | 136 MB  | 2                      | No (HB2) or 530 MB
+FM Towns II Fresh-ES/Fresh-ET   | Desktop     | 486DX2-66  | 8 MB                         | 72 MB   | 1                      | 360 MB
+FM Towns II HC53/HC53M          | Desktop     | Pentium-90 | 8 MB                         | 136 MB  | 1                      | 540 MB
+FM Towns II Fresh-FS/Fresh-FT   | Desktop     | 486DX4-100 | 8 MB                         | 72 MB   | 1                      | 540 MB
+FM Towns Marty/Marty 2/TC Marty | Console     | 386SX-16   | 2 MB                         | 4 MB    | 1                      | No SCSI controller
+Car Marty                       | Car-mounted | 386SX-16   | 2 MB                         | ?       | No                     | No SCSI controller
 
 Education models:
 
