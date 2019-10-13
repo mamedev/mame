@@ -2119,10 +2119,10 @@ void dec8_state::garyoret(machine_config &config)
 void dec8_state::ghostb(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309E(config, m_maincpu, 3000000);  /* HD63C09EP */
+	HD6309E(config, m_maincpu, XTAL(12'000'000) / 4);  /* HD63C09EP, clock verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::meikyuh_map);
 
-	DECO_222(config, m_audiocpu, 1500000);
+	DECO_222(config, m_audiocpu, XTAL(12'000'000) / 8); /* also seen with stock M6502, clock verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::dec8_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000)); /* 8.0MHz OSC next to MCU - clock verified */
@@ -2164,13 +2164,13 @@ void dec8_state::ghostb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000) / 8)); // clock verified
 	ym1.add_route(0, "mono", 0.23);
 	ym1.add_route(1, "mono", 0.23);
 	ym1.add_route(2, "mono", 0.23);
 	ym1.add_route(3, "mono", 0.20);
 
-	ym3812_device &ym2(YM3812(config, "ym2", 3000000));
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4)); // clock verified
 	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
