@@ -3104,6 +3104,31 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="italy90">
+		<description>Italy '90 Soccer</description>
+		<year>1989</year>
+		<publisher>Simulmondo</publisher>
+		<info name="developer" value="Dardari Bros." />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7bfdc1e0" sha1="0dbbc892ce27ace5da144ff8c6a9a55a2f295c32"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="intkarat">
+		<description>International Karate</description>
+		<year>1990</year>
+		<publisher>System 3 Software</publisher>
+		<info name="developer" value="System 3 Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="International Karate (Prism Leisure release) [System 3] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="e8b3d837" sha1="a469f0bb4bdd27b7c72366dbc9223d532f9031de"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="jingdisk">
 		<description>Jingle Disk</description>
 		<year>1986</year>
@@ -3115,6 +3140,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="joeblade">
+		<description>Joe Blade (Smash16 release)</description>
+		<year>1992</year>
+		<publisher>Interceptor Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Joe Blade (Smash16 release) [Interceptor Software] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="69a11fc6" sha1="4a5265a03087ad94ee23f15de7896c9e1c069b7f"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="labelmag">
 		<!-- Dumped from a copied disk -->
 		<description>Label Magic (Shareware)</description>
@@ -6907,7 +6943,7 @@ has been replaced with an all-zero block. -->
 
 	<!-- dumped from an Olivetti Prodest PC1 branded release -->
 	<software name="actnserv" supported="no">
-		<description>Action Service</description>
+		<description>Action Service (5.25")</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="developer" value="Cobra Soft" />
@@ -6918,6 +6954,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="actnserv35" cloneof="actnserv">
+		<description>Action Service (Smash16 release) (3.5")</description>
+		<year>1990</year>
+		<publisher>Smash16</publisher>
+		<info name="developer" value="Cobra Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Action Service (Smash16 release) [Cobra Soft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="9e65ac5e" sha1="e300c2d745fe2ca765312b765352c69ee4b6b883"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="azurebnd">
 		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (V1.2)</description>
 		<year>1989</year>
