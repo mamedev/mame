@@ -14,7 +14,7 @@ newoption {
 premake.check_paths = true
 premake.make.override = { "TARGET" }
 
-premake.xcode.parameters = { 'CLANG_CXX_LANGUAGE_STANDARD = "c++14"', 'CLANG_CXX_LIBRARY = "libc++"' }
+premake.xcode.parameters = { 'CLANG_CXX_LIBRARY = "libc++"' }
 
 MAME_DIR = (path.getabsolute("..") .. "/")
 --MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
@@ -489,6 +489,7 @@ language "C++"
 
 flags {
 	"StaticRuntime",
+	"Cpp17",
 }
 
 configuration { "vs20*" }
@@ -774,14 +775,6 @@ if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["ta
 
 	buildoptions_objcpp {
 		"-std=c++1y",
-	}
-else
-	buildoptions_cpp {
-		"-std=c++14",
-	}
-
-	buildoptions_objcpp {
-		"-std=c++14",
 	}
 end
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
@@ -1173,9 +1166,6 @@ configuration { "asmjs" }
 		"-Wno-implicit-function-declaration",
 		"-s USE_SDL_TTF=2",
 	}
-	buildoptions_cpp {
-		"-std=c++14",
-	}
 	linkoptions {
 		"-Wl,--start-group",
 	}
@@ -1189,7 +1179,6 @@ configuration { "android*" }
 		"-Wno-incompatible-ms-struct",
 	}
 	buildoptions_cpp {
-		"-std=c++14",
 		"-Wno-extern-c-compat",
 		"-Wno-tautological-constant-out-of-range-compare",
 		"-Wno-tautological-pointer-compare",
@@ -1205,9 +1194,6 @@ configuration { "pnacl" }
 	buildoptions {
 		"-std=gnu89",
 		"-Wno-inline-new-delete",
-	}
-	buildoptions_cpp {
-		"-std=c++14",
 	}
 	archivesplit_size "20"
 
