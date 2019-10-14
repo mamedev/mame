@@ -9,24 +9,24 @@
 
 	* = dumped
 
-	 eM1    -
+	 eM1    - evio Selection 01
 	*eM2    - evio Selection 02 (translucent red)
 	*eM3    - Anime Mix 1 (yellow)
 	*eM4    - I Love Classic 1 (brown)
-	 eM5    -
-	 eM6    -
+	 eM5    - Healing Air 1
+	 eM6    - Drama Mix 1
 	*eM7    - Pure Kiss 1 (pink)
 	*eM8    - Hard Soul 1 (black)
 	*eM9    - evio Selection 03 (translucent red)
-	 eM10   -
-	 eM11   -
-	 eM12   -
-	 eM13   -
-	 eM14   -
-	 eM15   -
+	 eM10   - Anime Special - Pocket Monsters
+	 eM11   - Anime Mix 2
+	 eM12   - I Love Classic 2
+	 eM13   - Concerto Selection
+	 eM14   - Disney Special 1
+	 eM15   - evio Selection 04
 	*eM16   - Chisako Takashima Selection (cream/gold)
-	 eM17   -
-	*eM18   - (red/pink)
+	 eM17   - Minna no evio
+	*eM18   - Evio Challenge! (red/pink)
 
 	(more?)
 
@@ -111,7 +111,7 @@
 
 	<!-- has eeprom -->
 	<software name="em18" supported="no">
-		<description>eM18 - unknown</description>
+		<description>eM18 - Evio Challenge!</description>
 		<year>2003</year>
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
