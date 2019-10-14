@@ -22,6 +22,7 @@ TODO:
   the same)
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
 - confirm gnw_climber rom (assumed to be the same as gnw_climbern)
+- confirm gnw_smb rom (assumed to be the same as gnw_smbn)
 - dump/add purple version of gnw_judge
 - dump/add CN-07 version of gnw_helmet
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
@@ -102,7 +103,7 @@ UD-202*   sc   SM510?  Crab Grab
 BX-301    mvs  SM511   Boxing (aka Punch Out)
 AK-302*   mvs  SM511?  Donkey Kong 3
 HK-303*   mvs  SM511?  Donkey Kong Hockey
-YM-801*   cs   SM511   Super Mario Bros. (assume same ROM as nws version)
+YM-801    cs   SM511   Super Mario Bros. (assume same ROM as nws version)
 DR-802    cs   SM511   Climber            "
 BF-803    cs   SM511   Balloon Fight      "
 YM-901-S* x    SM511   Super Mario Bros.  "
@@ -3206,8 +3207,10 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Super Mario Bros. (model: see below)
-  * PCB label YM-105
-  * Sharp SM511 label YM-105 9024B (new wide screen version) (die label ?)
+  * PCB label YM-801 (Crystal Screen), YM-105 (New Wide Screen)
+  * Sharp SM511
+     - label YM-801 8034A (crystal screen) (not dumped yet)
+     - label YM-105 9024B (new wide screen version) (die label ?)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model YM-801), rereleased on
@@ -3226,6 +3229,7 @@ public:
 	{ }
 
 	void gnw_smb(machine_config &config);
+	void gnw_smbn(machine_config & config);
 };
 
 // config
@@ -3258,6 +3262,11 @@ INPUT_PORTS_END
 
 void gnw_smb_state::gnw_smb(machine_config &config)
 {
+	sm511_common(config, 1768, 1080);
+}
+
+void gnw_smb_state::gnw_smbn(machine_config &config)
+{
 	sm511_common(config, 1677, 1080);
 }
 
@@ -3265,13 +3274,24 @@ void gnw_smb_state::gnw_smb(machine_config &config)
 
 ROM_START( gnw_smb )
 	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ym-801.program", 0x0000, 0x1000, BAD_DUMP CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) ) // dumped from NWS version
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "ym-801.melody", 0x000, 0x100, BAD_DUMP CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) ) // dumped from NWS version
+
+	ROM_REGION( 341936, "screen", 0)
+	ROM_LOAD( "gnw_smb.svg", 0, 341936, CRC(66223e51) SHA1(b541ee14514ec9f08ccd63c4b4ebec88f1b3bece) )
+ROM_END
+
+ROM_START( gnw_smbn )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ym-105.program", 0x0000, 0x1000, CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "ym-105.melody", 0x000, 0x100, CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) )
 
 	ROM_REGION( 648209, "screen", 0)
-	ROM_LOAD( "gnw_smb.svg", 0, 648209, CRC(4a6fdb28) SHA1(0a0bc48d82d5b8bf8ef96ef9ce2f87ba6ea850c1) )
+	ROM_LOAD( "gnw_smbn.svg", 0, 648209, CRC(4a6fdb28) SHA1(0a0bc48d82d5b8bf8ef96ef9ce2f87ba6ea850c1) )
 ROM_END
 
 
@@ -8640,7 +8660,8 @@ CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state
 CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_manhole, 0,          0, gnw_manhole, gnw_manhole, gnw_manhole_state, empty_init, "Nintendo", "Game & Watch: Manhole (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1985, gnw_tfish,   0,          0, gnw_tfish,   gnw_tfish,   gnw_tfish_state,   empty_init, "Nintendo", "Game & Watch: Tropical Fish", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (crystal screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_smbn,    gnw_smb,    0, gnw_smbn,    gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1986, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (crystal screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_climbern,gnw_climber,0, gnw_climbern,gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1986, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (crystal screen)", MACHINE_SUPPORTS_SAVE )
