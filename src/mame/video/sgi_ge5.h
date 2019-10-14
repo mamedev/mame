@@ -42,15 +42,16 @@ public:
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override {}
 
-	u32 code_r(offs_t offset);
+	u32 buffer_r(offs_t offset) { return m_bus; }
+
+	template <bool High> u32 code_r(offs_t offset);
 	u32 data_r(offs_t offset);
-	void code_w(offs_t offset, u32 data, u32 mem_mask);
+	template <bool High> void code_w(offs_t offset, u32 data, u32 mem_mask);
 	void data_w(offs_t offset, u32 data, u32 mem_mask);
 
 	void command_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 pc_r() { return m_pc; }
 	void mar_w(offs_t offset, u32 data, u32 mem_mask) { m_mar = offset & 0x7f; }
-	void mar_msb_w(offs_t offset, u32 data, u32 mem_mask) { m_mar_msb = bool(offset); }
 	void cwen_w(int state) { m_cwen = bool(state); }
 
 	u32 finish_r(offs_t offset) { return m_finish[offset]; }
@@ -105,7 +106,6 @@ private:
 	bool m_re_drq;
 
 	// hq1 registers
-	bool m_mar_msb;
 	u8 m_mar;
 	u16 m_pc;
 	unsigned m_sp;
