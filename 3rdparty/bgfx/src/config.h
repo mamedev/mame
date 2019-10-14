@@ -97,7 +97,7 @@
 					|| BX_PLATFORM_LINUX      \
 					|| BX_PLATFORM_WINDOWS    \
 					|| BX_PLATFORM_NX         \
-					|| BX_PLATFORM_OSX        \
+					|| (BX_PLATFORM_OSX >= 101100) \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_VULKAN
 
