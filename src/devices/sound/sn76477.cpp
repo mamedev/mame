@@ -1996,7 +1996,7 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		 */
 		*buffer++ = (((voltage_out - OUT_LOW_CLIP_THRESHOLD) / (OUT_CENTER_LEVEL_VOLTAGE - OUT_LOW_CLIP_THRESHOLD)) - 1) * 32767;
 
-		if (LOG_WAV && LOG_WAV_ENABLED_ONLY && !m_enable)
+		if (LOG_WAV && (!LOG_WAV_ENABLED_ONLY || (LOG_WAV_ENABLED_ONLY && !m_enable)))
 		{
 			int16_t log_data_l;
 			int16_t log_data_r;
@@ -2005,30 +2005,48 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			{
 			case 0:
 				log_data_l = LOG_WAV_GAIN_FACTOR * voltage_out;
-				log_data_r = LOG_WAV_GAIN_FACTOR * voltage_out;
 				break;
 			case 1:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_enable;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_enable;
 				break;
 			case 2:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_one_shot_cap_voltage;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_one_shot_cap_voltage;
 				break;
 			case 3:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_attack_decay_cap_voltage;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_attack_decay_cap_voltage;
 				break;
 			case 4:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_slf_cap_voltage;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_slf_cap_voltage;
 				break;
 			case 5:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_vco_cap_voltage;
-				log_data_r = LOG_WAV_GAIN_FACTOR * m_vco_cap_voltage;
 				break;
 			case 6:
 				log_data_l = LOG_WAV_GAIN_FACTOR * m_noise_filter_cap_voltage;
+				break;
+			}
+
+			switch (LOG_WAV_VALUE_R)
+			{
+			case 0:
+				log_data_r = LOG_WAV_GAIN_FACTOR * voltage_out;
+				break;
+			case 1:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_enable;
+				break;
+			case 2:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_one_shot_cap_voltage;
+				break;
+			case 3:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_attack_decay_cap_voltage;
+				break;
+			case 4:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_slf_cap_voltage;
+				break;
+			case 5:
+				log_data_r = LOG_WAV_GAIN_FACTOR * m_vco_cap_voltage;
+				break;
+			case 6:
 				log_data_r = LOG_WAV_GAIN_FACTOR * m_noise_filter_cap_voltage;
 				break;
 			}
