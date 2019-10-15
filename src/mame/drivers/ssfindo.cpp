@@ -134,92 +134,6 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-enum
-{
-	IOCR=0,
-	KBDDAT,
-	KBDCR,
-	IOLINES,
-	IRQSTA,
-	IRQRQA,
-	IRQMSKA,
-	SUSMODE,
-	IRQSTB,
-	IRQRQB,
-	IRQMSKB,
-	STOPMODE,
-	FIQST,
-	FIQRQ,
-	FIQMSK,
-	CLKCTL,
-	T0low,
-	T0high,
-	T0GO,
-	T0LAT,
-	T1low,
-	T1high,
-	T1GO,
-	T1LAT,
-	IRQSTC,
-	IRQRQC,
-	IRQMSKC,
-	VIDMUX,
-	IRQSTD,
-	IRQRQD,
-	IRQMSKD,
-
-	ROMCR0=32,
-	ROMCR1,
-
-	REFCR=35,
-
-	ID0=37,
-	ID1,
-	VERSION,
-
-	MSEDAT=42,
-	MSECR,
-
-	IOTCR=49,
-	ECTCR,
-	ASTCR,
-	DRAMCR,
-	SELREF,
-
-	ATODICR=56,
-	ATODSR,
-	ATODCC,
-	ATODCNT1,
-	ATODCNT2,
-	ATODCNT3,
-	ATODCNT4,
-
-	SDCURA=96,
-	SDENDA,
-	SDCURB,
-	SDENDB,
-	SDCR,
-	SDST,
-
-	CURSCUR=112,
-	CURSINIT,
-	VIDCURB,
-
-	VIDCURA=116,
-	VIDEND,
-	VIDSTART,
-	VIDINITA,
-	VIDCR,
-
-	VIDINITB=122,
-
-	DMAST=124,
-	DMARQ,
-	DMASK,
-	MAXIO=128
-};
-
-
 class ssfindo_state : public driver_device
 {
 public:
@@ -275,19 +189,11 @@ private:
 	// ppcar
 	DECLARE_READ32_MEMBER(randomized_r);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_drq);
-
 	void ssfindo_speedups();
 	void ppcar_speedups();
 
 	void ppcar_map(address_map &map);
 	void ssfindo_map(address_map &map);
-	
-	uint32_t m_vidc_sndcur, m_vidc_sndend;
-	bool m_audio_dma_on;
-	uint8_t m_vidc_sndcur_buffer, m_vidc_snd_overrun, m_vidc_snd_int;
-	bool m_vidc_sndbuffer_ok[2];
-	inline void sound_swap_buffer();
 	
 	DECLARE_READ8_MEMBER(iolines_r);
 	DECLARE_WRITE8_MEMBER(iolines_w);
@@ -365,84 +271,6 @@ WRITE_LINE_MEMBER(tetfight_state::iocr_od0_w)
 	m_i2cmem->write_scl(m_i2cmem_clock);
 }
 
-#if 0
-inline void ssfindo_state::sound_swap_buffer()
-{
-	if (m_vidc_sndcur_buffer == 1)
-	{
-		m_vidc_sndcur = m_PS7500_IO[SDCURB] & 0x1fffffff;
-		m_vidc_sndend = m_vidc_sndcur + (m_PS7500_IO[SDENDB] + 0x10);
-		m_vidc_sndbuffer_ok[1] = true;
-	}
-	else
-	{
-		m_vidc_sndcur = m_PS7500_IO[SDCURA] & 0x1fffffff;
-		m_vidc_sndend = m_vidc_sndcur + (m_PS7500_IO[SDENDA] + 0x10);
-		m_vidc_sndbuffer_ok[0] = true;
-	}
-
-	// TODO: actual condition for int
-	m_vidc_snd_overrun = false;
-	m_vidc_snd_int = false;
-}
-#endif
-
-WRITE_LINE_MEMBER(ssfindo_state::sound_drq)
-{
-	if (!state)
-		return;
-	
-	#if 0
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	
-	if (m_vidc->get_dac_mode() == true)
-	{
-		for (int ch=0;ch<2;ch++)
-			m_vidc->write_dac32(ch, (space.read_word(m_vidc_sndcur + ch*2)));
-		
-		m_vidc_sndcur += 4;
-		
-		if (m_vidc_sndcur >= m_vidc_sndend)
-		{
-			// TODO: interrupt bit
-
-			m_vidc->update_sound_mode(m_audio_dma_on);
-			if (m_audio_dma_on)
-			{
-				m_vidc_sndbuffer_ok[m_vidc_sndcur_buffer] = false;
-				m_vidc_sndcur_buffer ^= 1;
-				m_vidc_snd_overrun = (m_vidc_sndbuffer_ok[m_vidc_sndcur_buffer] == false);				
-				sound_swap_buffer();
-			}
-			else
-			{
-				// ...
-			}
-		}
-	}
-	else
-	{
-		// ...
-	}
-	#endif
-}
-
-#if 0
-void ssfindo_state::PS7500_reset()
-{
-	m_PS7500_IO[IOCR]  = 0x3f;
-	m_PS7500_IO[VIDCR] = 0;
-	m_vidc_snd_overrun = 1;
-	m_vidc_snd_int = 1;
-	m_vidc_sndcur_buffer = 0;
-	m_vidc_sndbuffer_ok[0] = false;
-	m_vidc_sndbuffer_ok[1] = false;
-
-	m_PS7500timer0->adjust( attotime::never);
-	m_PS7500timer1->adjust( attotime::never);
-}
-#endif
-
 void ssfindo_state::ssfindo_speedups()
 {
 	if (m_maincpu->pc()==0x2d6c8) // ssfindo
@@ -458,160 +286,6 @@ void ssfindo_state::ppcar_speedups()
 	else if (m_maincpu->pc()==0x000bbc) // ppcar
 		m_maincpu->spin_until_time(attotime::from_usec(20));
 }
-
-#if 0
-READ32_MEMBER(ssfindo_state::PS7500_IO_r)
-{
-	switch(offset)
-	{
-		case MSECR:
-			return machine().rand();
-
-		case IOLINES: //TODO: eeprom  24c01
-#if 0
-		osd_printf_debug("IOLINESR %i @%x\n", offset, m_maincpu->pc());
-#endif
-
-		if(m_flashType == 1)
-			return 0;
-		else
-			return machine().rand();
-
-		case IRQSTA:
-			return (m_PS7500_IO[offset] & (~2)) | 0x80;
-
-		case IRQRQA:
-			return (m_PS7500_IO[IRQSTA] & m_PS7500_IO[IRQMSKA]) | 0x80;
-
-		case IOCR: //TODO: nINT1, OD[n] p.81
-			if (m_speedup) (this->*m_speedup)();
-
-			if( m_iocr_hack)
-			{
-				return (m_vidc->flyback_r()<<7) | 0x34 | (m_i2cmem->read_sda() ? 0x03 : 0x00); //eeprom read
-			}
-
-			return (m_vidc->flyback_r()<<7) | 0x37;
-
-		case VIDCR:
-			return (m_PS7500_IO[offset] | 0x50) & 0xfffffff0;
-
-		case T1low:
-		case T0low:
-		case T1high:
-		case T0high:
-		case IRQMSKA:
-		case VIDEND:
-		case VIDSTART:
-		case VIDINITA: //TODO: bits 29 ("equal") and 30 (last bit)  p.105
-		case SDCR:
-		case SDCURA:
-		case SDCURB:
-		case SDENDA:
-		case SDENDB:
-			return m_PS7500_IO[offset];
-		
-		case SDST:
-			return (m_vidc_snd_overrun<<2) | (m_vidc_snd_int<<1) | m_vidc_sndcur_buffer;
-	}
-	return machine().rand();//m_PS7500_IO[offset];
-}
-
-WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
-{
-	uint32_t temp=m_PS7500_IO[offset];
-
-	COMBINE_DATA(&temp);
-
-	switch(offset)
-	{
-		case IOLINES: //TODO: eeprom  24c01
-			m_PS7500_IO[offset]=data;
-				if(data&0xc0)
-					m_adrLatch=0;
-
-			if(m_maincpu->pc() == 0xbac0 && m_flashType == 1)
-			{
-				m_flashN=data&1;
-			}
-
-#if 0
-				logerror("IOLINESW %i = %x  @%x\n",offset,data,m_maincpu->pc());
-#endif
-			break;
-
-		case IRQRQA:
-			m_PS7500_IO[IRQSTA]&=~temp;
-			break;
-
-		case IRQMSKA:
-			m_PS7500_IO[IRQMSKA]=(temp&(~2))|0x80;
-			break;
-
-		case T1GO:
-			PS7500_startTimer1();
-			break;
-
-		case T0GO:
-			PS7500_startTimer0();
-			break;
-
-		case VIDEND:
-		case VIDSTART:
-			COMBINE_DATA(&m_PS7500_IO[offset]);
-			m_PS7500_IO[offset]&=0xfffffff0; // qword align
-			break;
-
-		case IOCR:
-			//popmessage("IOLINESW %i = %x  @%x\n",offset,data,m_maincpu->pc());
-			COMBINE_DATA(&m_PS7500_IO[offset]);
-			// TODO: correct hook-up
-			m_i2cmem->write_scl((data & 0x01) ? 1 : 0);
-			m_i2cmem->write_sda((data & 0x02) ? 1 : 0);
-			break;
-
-		case SDCR:
-			COMBINE_DATA(&m_PS7500_IO[offset]);
-			m_audio_dma_on = BIT(m_PS7500_IO[SDCR], 5);
-
-			m_vidc->update_sound_mode(m_audio_dma_on);
-			if (m_audio_dma_on)
-			{
-				m_vidc_sndcur_buffer = 0;
-				sound_swap_buffer();
-			}
-			else
-			{
-				// ...
-			}
-			break;
-
-		case SDCURA:
-		case SDENDA:
-			COMBINE_DATA(&m_PS7500_IO[offset]);
-			break;
-
-		case SDCURB:
-		case SDENDB:
-			COMBINE_DATA(&m_PS7500_IO[offset]);
-			break;
-
-		case REFCR:
-		case DRAMCR:
-		case ROMCR0:
-		case VIDMUX:
-		case CLKCTL:
-		case T1low:
-		case T0low:
-		case T1high:
-		case T0high:
-		case VIDCR:
-		case VIDINITA: //TODO: bit 30 (last bit) p.105ù
-			COMBINE_DATA(&m_PS7500_IO[offset]);
-			break;
-	}
-}
-#endif
 
 READ32_MEMBER(ssfindo_state::io_r)
 {
@@ -751,7 +425,7 @@ void ssfindo_state::machine_start()
 
 void ssfindo_state::machine_reset()
 {
-//	PS7500_reset();
+	// ...
 }
 
 static INPUT_PORTS_START( ssfindo )
@@ -875,10 +549,8 @@ INPUT_PORTS_END
 
 void ssfindo_state::ssfindo(machine_config &config)
 {
-	/* basic machine hardware */
-	ARM7(config, m_maincpu, 54000000); // guess...
+	ARM7(config, m_maincpu, 54000000); // TODO: can actually be internally divided from IOMD
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ssfindo_map);
-//	m_maincpu->set_vblank_int("screen", FUNC(ssfindo_state::interrupt));
 
 	I2C_24C01(config, m_i2cmem);
 
@@ -887,7 +559,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
-	m_vidc->sound_drq().set(FUNC(ssfindo_state::sound_drq));
+	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
 	
 	ARM_IOMD(config, m_iomd, 0);
 	m_iomd->set_host_cpu_tag(m_maincpu);
@@ -900,7 +572,6 @@ void ssfindo_state::ppcar(machine_config &config)
 {
 	ssfindo(config);
 
-	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ppcar_map);
 
 	config.device_remove("i2cmem");
@@ -910,7 +581,6 @@ void tetfight_state::tetfight(machine_config &config)
 {
 	ppcar(config);
 
-	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tetfight_state::tetfight_map);
 
 	I2C_24C02(config, m_i2cmem);

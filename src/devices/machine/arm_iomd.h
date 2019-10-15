@@ -40,6 +40,7 @@ public:
 	auto iolines_read() { return m_iolines_read_cb.bind(); }
 	auto iolines_write() { return m_iolines_write_cb.bind(); }
 	DECLARE_WRITE_LINE_MEMBER( vblank_irq );
+	DECLARE_WRITE_LINE_MEMBER( sound_drq );
 
 	// I/O operations
 	virtual void map(address_map &map);
@@ -59,7 +60,7 @@ private:
 	// TODO: convert to ARM7 device instead, enums shouldn't be public
 	required_device<cpu_device> m_host_cpu;
 	required_device<arm_vidc20_device> m_vidc;
-	address_space *m_host_space; /**< reference to the host cpu space */
+	address_space *m_host_space; /**< reference to the host cpu space for DMA ops */
 
 	devcb_read8 m_iolines_read_cb;
 	devcb_write8 m_iolines_write_cb;
@@ -68,34 +69,39 @@ private:
 	devcb_read_line m_iocr_read_id_cb;
 	devcb_write_line m_iocr_write_id_cb;
 
+	u8 m_iolines_ddr, m_iocr_ddr;
 	DECLARE_READ32_MEMBER( iolines_r );
 	DECLARE_WRITE32_MEMBER( iolines_w );
 	DECLARE_READ32_MEMBER( iocr_r );
 	DECLARE_WRITE32_MEMBER( iocr_w );
-	template <unsigned Which> DECLARE_READ32_MEMBER( irqst_r );
-	template <unsigned Which> DECLARE_READ32_MEMBER( irqrq_r );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( irqrq_w );
-	template <unsigned Which> DECLARE_READ32_MEMBER( irqmsk_r );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( irqmsk_w );
-	template <unsigned Which> DECLARE_READ32_MEMBER( tNlow_r );
-	template <unsigned Which> DECLARE_READ32_MEMBER( tNhigh_r );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNlow_w );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNhigh_w );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNgo_w );
-	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNlatch_w );
-
+	
+	u32 m_vidinita, m_vidend;
+	bool m_vidlast, m_videqual;
+	bool m_video_enable;
 	DECLARE_READ32_MEMBER( vidcr_r );
 	DECLARE_WRITE32_MEMBER( vidcr_w );
 	DECLARE_READ32_MEMBER( vidend_r );
 	DECLARE_WRITE32_MEMBER( vidend_w );
 	DECLARE_READ32_MEMBER( vidinita_r );
 	DECLARE_WRITE32_MEMBER( vidinita_w );
+	
+	static constexpr int sounddma_ch_size = 2;
+	u32 m_sndcur, m_sndend;
+	u32 m_sndcur_reg[sounddma_ch_size], m_sndend_reg[sounddma_ch_size];
+	bool m_sndstop_reg[sounddma_ch_size], m_sndlast_reg[sounddma_ch_size];
+	bool m_sndbuffer_ok[sounddma_ch_size];
+	bool m_sound_dma_on;
+	u8 m_sndcur_buffer;
+	bool m_snd_overrun, m_snd_int;
+	inline void sounddma_swap_buffer();
+	template <unsigned Which> DECLARE_READ32_MEMBER( sdcur_r );
+	template <unsigned Which> DECLARE_WRITE32_MEMBER( sdcur_w );
+	template <unsigned Which> DECLARE_READ32_MEMBER( sdend_r );
+	template <unsigned Which> DECLARE_WRITE32_MEMBER( sdend_w );
+	DECLARE_READ32_MEMBER( sdcr_r );
+	DECLARE_WRITE32_MEMBER( sdcr_w );
+	DECLARE_READ32_MEMBER( sdst_r );
 
-	u8 m_iolines_ddr, m_iocr_ddr;
-	
-	u32 m_vidinita, m_vidend;
-	bool m_video_enable;
-	
 	enum {
 		IRQA = 0,
 		IRQB,
@@ -108,7 +114,13 @@ private:
 	inline u8 update_irqa_type(u8 data);
 	inline void flush_irq(unsigned Which);
 	inline void trigger_irq(unsigned Which, u8 irq_type);
-	
+	template <unsigned Which> DECLARE_READ32_MEMBER( irqst_r );
+	template <unsigned Which> DECLARE_READ32_MEMBER( irqrq_r );
+	template <unsigned Which> DECLARE_WRITE32_MEMBER( irqrq_w );
+	template <unsigned Which> DECLARE_READ32_MEMBER( irqmsk_r );
+	template <unsigned Which> DECLARE_WRITE32_MEMBER( irqmsk_w );
+
+	static constexpr int timer_ch_size = 2;
 	enum {
 		T0_TIMER = 1,
 		T1_TIMER
@@ -119,6 +131,17 @@ private:
 	int m_timer_counter[2];
 	u8 	m_timer_readinc[2];
 	emu_timer *m_timer[2];
+	
+	template <unsigned Which> DECLARE_READ32_MEMBER( tNlow_r );
+	template <unsigned Which> DECLARE_READ32_MEMBER( tNhigh_r );
+	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNlow_w );
+	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNhigh_w );
+	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNgo_w );
+	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNlatch_w );
+	
+	// used in vidcr_r / sndcr_r, documentation hints this is a purged idea during chip development, to be checked out
+	static constexpr u8 dmaid_size = 0x10; // qword transfer
+//	constexpr u8 dmaid_mask = 0x1f;
 };
 
 

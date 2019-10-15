@@ -229,6 +229,7 @@ inline void acorn_vidc10_device::screen_vblank_line_update()
 
 inline void acorn_vidc10_device::screen_dynamic_res_change()
 {
+	// TODO: different for VIDC20
 	const int32_t pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
 
 	// sanity checks

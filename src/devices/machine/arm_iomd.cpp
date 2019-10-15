@@ -4,7 +4,7 @@
 
 	ARM IOMD device emulation
 	
-	ARM7 SoC, upgraded version(s) of the IOC found in Acorn Archimedes.
+	ARM7 SoC or stand-alone device, upgraded version(s) of the IOC found in Acorn Archimedes.
 
 	TODO:
 	- IOCR / IOLINES hookups can be further improved, also DDR bits needs verifying;
@@ -104,12 +104,12 @@ void arm_iomd_device::map(address_map &map)
 //	map(0x0f8, 0x0fb).r(FUNC(arm_iomd_device::atodcnt_r<3>));
 	// sound DMA
 	// note: sound DMA is actually labeled sd0* in the quick r/w sheet but there's no actual sd1, scrapped during HW dev?
-//	map(0x180, 0x183).rw(FUNC(arm_iomd_device::sdcur_r<0>), FUNC(arm_iomd_device::sdcur_w<0>));
-//	map(0x184, 0x187).rw(FUNC(arm_iomd_device::sdend_r<0>), FUNC(arm_iomd_device::sdend_w<0>));
-//	map(0x188, 0x18b).rw(FUNC(arm_iomd_device::sdcur_r<1>), FUNC(arm_iomd_device::sdcur_w<1>));
-//	map(0x18c, 0x18f).rw(FUNC(arm_iomd_device::sdend_r<1>), FUNC(arm_iomd_device::sdend_w<1>));
-//	map(0x190, 0x193).rw(FUNC(arm_iomd_device::sdcr_r), FUNC(arm_iomd_device::sdcr_w));
-//	map(0x194, 0x197).r(FUNC(arm_iomd_device::sdst_r));
+	map(0x180, 0x183).rw(FUNC(arm_iomd_device::sdcur_r<0>), FUNC(arm_iomd_device::sdcur_w<0>));
+	map(0x184, 0x187).rw(FUNC(arm_iomd_device::sdend_r<0>), FUNC(arm_iomd_device::sdend_w<0>));
+	map(0x188, 0x18b).rw(FUNC(arm_iomd_device::sdcur_r<1>), FUNC(arm_iomd_device::sdcur_w<1>));
+	map(0x18c, 0x18f).rw(FUNC(arm_iomd_device::sdend_r<1>), FUNC(arm_iomd_device::sdend_w<1>));
+	map(0x190, 0x193).rw(FUNC(arm_iomd_device::sdcr_r), FUNC(arm_iomd_device::sdcr_w));
+	map(0x194, 0x197).r(FUNC(arm_iomd_device::sdst_r));
 
 	// video DMA
 //	map(0x1c0, 0x1c3).rw(FUNC(arm_iomd_device::curscur_r), FUNC(arm_iomd_device::curscur_w));
@@ -179,6 +179,8 @@ void arm_iomd_device::device_start()
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_vidinita));
 	save_item(NAME(m_vidend));
+	save_item(NAME(m_vidlast));
+	save_item(NAME(m_videqual));
 	save_pointer(NAME(m_irq_mask), IRQ_SOURCES_SIZE);
 	save_pointer(NAME(m_irq_status), IRQ_SOURCES_SIZE);
 	
@@ -186,10 +188,23 @@ void arm_iomd_device::device_start()
 	
 	m_timer[0] = timer_alloc(T0_TIMER);
 	m_timer[1] = timer_alloc(T1_TIMER);
-	save_pointer(NAME(m_timer_in), 2);
-	save_pointer(NAME(m_timer_out), 2);
-	save_pointer(NAME(m_timer_counter), 2);
-	save_pointer(NAME(m_timer_readinc), 2);
+	save_pointer(NAME(m_timer_in), timer_ch_size);
+	save_pointer(NAME(m_timer_out), timer_ch_size);
+	save_pointer(NAME(m_timer_counter), timer_ch_size);
+	save_pointer(NAME(m_timer_readinc), timer_ch_size);
+	
+	save_item(NAME(m_sndcur));
+	save_item(NAME(m_sndend));
+	save_item(NAME(m_sound_dma_on));
+	save_item(NAME(m_sndcur_buffer));
+	save_item(NAME(m_snd_overrun));
+	save_item(NAME(m_snd_int));
+
+	save_pointer(NAME(m_sndcur_reg), sounddma_ch_size);
+	save_pointer(NAME(m_sndend_reg), sounddma_ch_size);
+	save_pointer(NAME(m_sndstop_reg), sounddma_ch_size);
+	save_pointer(NAME(m_sndlast_reg), sounddma_ch_size);
+	save_pointer(NAME(m_sndbuffer_ok), sounddma_ch_size);
 }
 
 
@@ -213,8 +228,13 @@ void arm_iomd_device::device_reset()
 		m_irq_mask[i] = 0;
 	}
 	
-	for (i=0; i<2; i++)
+	for (i=0; i<timer_ch_size; i++)
 		m_timer[i]->adjust(attotime::never);
+
+	m_sound_dma_on = false;
+	for (i=0; i<sounddma_ch_size; i++)
+		m_sndbuffer_ok[i] = false;
+	// ...
 }
 
 void arm_iomd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -301,7 +321,7 @@ template <unsigned Which> READ32_MEMBER( arm_iomd_device::irqmsk_r )
 template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::irqrq_w )
 {
 	u8 res = m_irq_status[Which] & ~data;
-	if (Which == 0)
+	if (Which == IRQA)
 		res = update_irqa_type(res);
 	m_irq_status[Which] = res;
 	flush_irq(Which);
@@ -366,13 +386,58 @@ template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::tNlatch_w )
 }
 
 
-// DMAs
+// sound DMA
+
+template <unsigned Which> READ32_MEMBER( arm_iomd_device::sdcur_r ) { return m_sndcur_reg[Which]; }
+template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::sdcur_w ) { COMBINE_DATA(&m_sndcur_reg[Which]); }
+template <unsigned Which> READ32_MEMBER( arm_iomd_device::sdend_r ) 
+{
+	return (m_sndstop_reg[Which] << 31) | (m_sndlast_reg[Which] << 30) | (m_sndend_reg[Which] & 0x00fffff0); 
+}
+
+template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::sdend_w ) 
+{ 
+	COMBINE_DATA(&m_sndend_reg[Which]); 
+	m_sndend_reg[Which] &= 0x00fffff0;
+	m_sndstop_reg[Which] = BIT(data, 31);
+	m_sndlast_reg[Which] = BIT(data, 30);
+}
+
+READ32_MEMBER( arm_iomd_device::sdcr_r )
+{
+	return (m_sound_dma_on << 5) | dmaid_size;
+}
+
+WRITE32_MEMBER( arm_iomd_device::sdcr_w )
+{
+	m_sound_dma_on = BIT(data, 5);
+
+	m_vidc->update_sound_mode(m_sound_dma_on);
+	if (m_sound_dma_on)
+	{
+		m_sndcur_buffer = 0;
+		sounddma_swap_buffer();
+	}
+	else
+	{
+		// ...
+	}
+	
+	// TODO: bit 7 resets sound DMA
+}
+
+READ32_MEMBER( arm_iomd_device::sdst_r )
+{
+	return (m_snd_overrun << 2) | (m_snd_int << 1) | m_sndcur_buffer;
+}
+
+// video DMA
 
 READ32_MEMBER( arm_iomd_device::vidcr_r )
 {
 	// bit 6: DRAM mode
 	// bits 4-0: qword transfer
-	return 0x40 | (m_video_enable << 5) | 0x10;
+	return 0x40 | (m_video_enable << 5) | dmaid_size;
 }
 
 WRITE32_MEMBER( arm_iomd_device::vidcr_w )
@@ -384,23 +449,26 @@ WRITE32_MEMBER( arm_iomd_device::vidcr_w )
 
 READ32_MEMBER( arm_iomd_device::vidend_r )
 {
-	return m_vidend;
+	return (m_vidend & 0x00fffff0);
 }
 
 WRITE32_MEMBER( arm_iomd_device::vidend_w )
 {
 	COMBINE_DATA(&m_vidend);
-	m_vidend &= 0x00fffff8;
+	m_vidend &= 0x00fffff0;
 }
 
 READ32_MEMBER( arm_iomd_device::vidinita_r )
 {
-	return m_vidinita;
+	return (m_vidlast << 30) | (m_videqual << 29) | (m_vidinita & 0x1ffffff0);
 }
 
 WRITE32_MEMBER( arm_iomd_device::vidinita_w )
 {
 	COMBINE_DATA(&m_vidinita);
+	m_vidinita &= 0x1ffffff0;
+	m_vidlast = BIT(data, 30);
+	m_videqual = BIT(data, 29);
 }
 
 
@@ -417,7 +485,7 @@ WRITE_LINE_MEMBER( arm_iomd_device::vblank_irq )
 	if (m_video_enable == true)
 	{
 		// TODO: much more complex, last/end regs, start regs and eventually LCD hooks
-		uint32_t src = m_vidinita & 0x1ffffff0;
+		uint32_t src = m_vidinita;
 		uint32_t size = m_vidend;
 
 		// TODO: vidcur can be readback, support it once anything makes use of the 0x1d0 reg for obvious reasons
@@ -428,6 +496,53 @@ WRITE_LINE_MEMBER( arm_iomd_device::vblank_irq )
 			src++;
 			src &= 0x1fffffff;
 		}
+	}
+}
+
+inline void arm_iomd_device::sounddma_swap_buffer()
+{
+	m_sndcur = m_sndcur_reg[m_sndcur_buffer];
+	m_sndend = m_sndcur + (m_sndend_reg[m_sndcur_buffer] + 0x10);
+	m_sndbuffer_ok[m_sndcur_buffer] = true;
+	
+	// TODO: actual condition for int
+	m_snd_overrun = false;
+	m_snd_int = false;
+}
+
+WRITE_LINE_MEMBER( arm_iomd_device::sound_drq )
+{
+	if (!state)
+		return;
+		
+	if (m_vidc->get_dac_mode() == true)
+	{
+		for (int ch=0;ch<2;ch++)
+			m_vidc->write_dac32(ch, (m_host_space->read_word(m_sndcur + ch*2)));
+		
+		m_sndcur += 4;
+		
+		if (m_sndcur >= m_sndend)
+		{
+			// TODO: interrupt bit
+
+			m_vidc->update_sound_mode(m_sound_dma_on);
+			if (m_sound_dma_on)
+			{
+				m_sndbuffer_ok[m_sndcur_buffer] = false;
+				m_sndcur_buffer ^= 1;
+				m_snd_overrun = (m_sndbuffer_ok[m_sndcur_buffer] == false);
+				sounddma_swap_buffer();
+			}
+			else
+			{
+				// ...
+			}
+		}
+	}
+	else
+	{
+		// ...
 	}
 }
 
