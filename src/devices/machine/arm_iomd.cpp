@@ -38,42 +38,95 @@ void arm_iomd_device::map(address_map &map)
 {
 	// I/O
 	map(0x000, 0x003).rw(FUNC(arm_iomd_device::iocr_r), FUNC(arm_iomd_device::iocr_w));
-	
+//	map(0x004, 0x007).rw(FUNC(arm_iomd_device::kbddat_r), FUNC(arm_iomd_device::kbddat_w));
+//	map(0x008, 0x00b).rw(FUNC(arm_iomd_device::kbdcr_r), FUNC(arm_iomd_device::kbdcr_w));
 	map(0x00c, 0x00f).rw(FUNC(arm_iomd_device::iolines_r), FUNC(arm_iomd_device::iolines_w));
 	// interrupt A/B/fiq
-	map(0x010, 0x013).r(FUNC(arm_iomd_device::irqst_r<0>));
-	map(0x014, 0x017).rw(FUNC(arm_iomd_device::irqrq_r<0>), FUNC(arm_iomd_device::irqrq_w<0>));
-	map(0x018, 0x01b).rw(FUNC(arm_iomd_device::irqmsk_r<0>), FUNC(arm_iomd_device::irqmsk_w<0>));
+	map(0x010, 0x013).r(FUNC(arm_iomd_device::irqst_r<IRQA>));
+	map(0x014, 0x017).rw(FUNC(arm_iomd_device::irqrq_r<IRQA>), FUNC(arm_iomd_device::irqrq_w<IRQA>));
+	map(0x018, 0x01b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQA>), FUNC(arm_iomd_device::irqmsk_w<IRQA>));
+//	map(0x01c, 0x01f).rw(FUNC(arm_iomd_device::susmode_r), FUNC(arm_iomd_device::susmode_w));
 
+	map(0x020, 0x023).r(FUNC(arm_iomd_device::irqst_r<IRQB>));
+	map(0x024, 0x027).rw(FUNC(arm_iomd_device::irqrq_r<IRQB>), FUNC(arm_iomd_device::irqrq_w<IRQB>));
+	map(0x028, 0x02b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQB>), FUNC(arm_iomd_device::irqmsk_w<IRQB>));
+//	map(0x02c, 0x02f).w(FUNC(arm_iomd_device::stopmode_w));
+
+//	map(0x030, 0x033).r(FUNC(arm_iomd_device::fiqst_r));
+//	map(0x034, 0x037).rw(FUNC(arm_iomd_device::fiqrq_r), FUNC(arm_iomd_device::fiqrq_w));
+//	map(0x038, 0x03b).rw(FUNC(arm_iomd_device::fiqmsk_r), FUNC(arm_iomd_device::fiqmsk_w));
+//	map(0x03c, 0x03f).rw(FUNC(arm_iomd_device::clkctl_r), FUNC(arm_iomd_device::clkctl_w));
 	// timers
 	map(0x040, 0x043).rw(FUNC(arm_iomd_device::tNlow_r<0>), FUNC(arm_iomd_device::tNlow_w<0>));
 	map(0x044, 0x047).rw(FUNC(arm_iomd_device::tNhigh_r<0>), FUNC(arm_iomd_device::tNhigh_w<0>));
 	map(0x048, 0x04b).w(FUNC(arm_iomd_device::tNgo_w<0>));
 	map(0x04c, 0x04f).w(FUNC(arm_iomd_device::tNlatch_w<0>));
+	
 	map(0x050, 0x053).rw(FUNC(arm_iomd_device::tNlow_r<1>), FUNC(arm_iomd_device::tNlow_w<1>));
 	map(0x054, 0x057).rw(FUNC(arm_iomd_device::tNhigh_r<1>), FUNC(arm_iomd_device::tNhigh_w<1>));
 	map(0x058, 0x05b).w(FUNC(arm_iomd_device::tNgo_w<1>));
 	map(0x05c, 0x05f).w(FUNC(arm_iomd_device::tNlatch_w<1>));
 	// interrupt C/D
-//	map(0x060, 0x063)
+	map(0x060, 0x063).r(FUNC(arm_iomd_device::irqst_r<IRQC>));
+	map(0x064, 0x067).rw(FUNC(arm_iomd_device::irqrq_r<IRQC>), FUNC(arm_iomd_device::irqrq_w<IRQC>));
+	map(0x068, 0x06b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQC>), FUNC(arm_iomd_device::irqmsk_w<IRQC>));	
+//	map(0x06c, 0x06f).rw(FUNC(arm_iomd_device::vidmux_r), FUNC(arm_iomd_device::vidmux_w));
+	map(0x070, 0x073).r(FUNC(arm_iomd_device::irqst_r<IRQD>));
+	map(0x074, 0x077).rw(FUNC(arm_iomd_device::irqrq_r<IRQD>), FUNC(arm_iomd_device::irqrq_w<IRQD>));
+	map(0x078, 0x07b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQD>), FUNC(arm_iomd_device::irqmsk_w<IRQD>));	
 	// ROM control
-//	map(0x080, 0x083)
+//	map(0x080, 0x083).rw(FUNC(arm_iomd_device::romcr_r<0>), FUNC(arm_iomd_device::romcr_w<0>));
+//	map(0x084, 0x087).rw(FUNC(arm_iomd_device::romcr_r<1>), FUNC(arm_iomd_device::romcr_w<1>));
+//	map(0x08c, 0x08f).rw(FUNC(arm_iomd_device::refcr_r), FUNC(arm_iomd_device::refcr_w));
+
 	// device identifiers
-//	map(0x094, 0x097)
-//	map(0x098, 0x09b)
-//	map(0x09c, 0x09f)
+//	map(0x094, 0x097).r(FUNC(arm_iomd_device::id_r<0>));
+//	map(0x098, 0x09b).r(FUNC(arm_iomd_device::id_r<1>));
+//	map(0x09c, 0x09f).r(FUNC(arm_iomd_device::version_r));
 	// mouse (for PS7500, others may differ)
+//	map(0x0a8, 0x0ab).rw(FUNC(arm_iomd_device::msedat_r), FUNC(arm_iomd_device::msedat_w));
+//	map(0x0ac, 0x0af).rw(FUNC(arm_iomd_device::msecr_r), FUNC(arm_iomd_device::msecr_w));
 
-	// ...
-	// DMA
-//	map(0x180, 0x183)
+	// I/O control
+//	map(0x0c4, 0x0c7).rw(FUNC(arm_iomd_device::iotcr_r), FUNC(arm_iomd_device::iotcr_w));
+//	map(0x0c8, 0x0cb).rw(FUNC(arm_iomd_device::ectcr_r), FUNC(arm_iomd_device::ectcr_w));
+//	map(0x0cc, 0x0cf).rw(FUNC(arm_iomd_device::astcr_r), FUNC(arm_iomd_device::astcr_w));
+	// RAM control
+//	map(0x0d0, 0x0d3).rw(FUNC(arm_iomd_device::dramctl_r), FUNC(arm_iomd_device::dramctl_w));
+//	map(0x0d4, 0x0d7).rw(FUNC(arm_iomd_device::selfref_r), FUNC(arm_iomd_device::selfref_w));
+	// A/D converter
+//	map(0x0e0, 0x0e3).rw(FUNC(arm_iomd_device::atodicr_r), FUNC(arm_iomd_device::atodicr_w));
+//	map(0x0e4, 0x0e7).r(FUNC(arm_iomd_device::atodsr_r));
+//	map(0x0e8, 0x0eb).rw(FUNC(arm_iomd_device::atodcc_r), FUNC(arm_iomd_device::atodcc_w));
+//	map(0x0ec, 0x0ef).r(FUNC(arm_iomd_device::atodcnt_r<0>)); 
+//	map(0x0f0, 0x0f3).r(FUNC(arm_iomd_device::atodcnt_r<1>));
+//	map(0x0f4, 0x0f7).r(FUNC(arm_iomd_device::atodcnt_r<2>));
+//	map(0x0f8, 0x0fb).r(FUNC(arm_iomd_device::atodcnt_r<3>));
+	// sound DMA
+	// note: sound DMA is actually labeled sd0* in the quick r/w sheet but there's no actual sd1, scrapped during HW dev?
+//	map(0x180, 0x183).rw(FUNC(arm_iomd_device::sdcur_r<0>), FUNC(arm_iomd_device::sdcur_w<0>));
+//	map(0x184, 0x187).rw(FUNC(arm_iomd_device::sdend_r<0>), FUNC(arm_iomd_device::sdend_w<0>));
+//	map(0x188, 0x18b).rw(FUNC(arm_iomd_device::sdcur_r<1>), FUNC(arm_iomd_device::sdcur_w<1>));
+//	map(0x18c, 0x18f).rw(FUNC(arm_iomd_device::sdend_r<1>), FUNC(arm_iomd_device::sdend_w<1>));
+//	map(0x190, 0x193).rw(FUNC(arm_iomd_device::sdcr_r), FUNC(arm_iomd_device::sdcr_w));
+//	map(0x194, 0x197).r(FUNC(arm_iomd_device::sdst_r));
 
-//	map(0x1d0, 0x1d3).rw(FUNC(arm_iomd_device::vidcur_r), FUNC(arm_iomd_device::vidcur_w));
+	// video DMA
+//	map(0x1c0, 0x1c3).rw(FUNC(arm_iomd_device::curscur_r), FUNC(arm_iomd_device::curscur_w));
+//	map(0x1c4, 0x1c7).rw(FUNC(arm_iomd_device::cursinit_r), FUNC(arm_iomd_device::cursinit_w));
+//	map(0x1c8, 0x1cb).rw(FUNC(arm_iomd_device::vidcurb_r), FUNC(arm_iomd_device::vidcurb_w));
+
+//	map(0x1d0, 0x1d3).rw(FUNC(arm_iomd_device::vidcura_r), FUNC(arm_iomd_device::vidcura_w));
 	map(0x1d4, 0x1d7).rw(FUNC(arm_iomd_device::vidend_r), FUNC(arm_iomd_device::vidend_w));
-
+//	map(0x1d8, 0x1db).rw(FUNC(arm_iomd_device::vidstart_r), FUNC(arm_iomd_device::vidstart_w));
 	map(0x1dc, 0x1df).rw(FUNC(arm_iomd_device::vidinita_r), FUNC(arm_iomd_device::vidinita_w));
 	map(0x1e0, 0x1e3).rw(FUNC(arm_iomd_device::vidcr_r), FUNC(arm_iomd_device::vidcr_w));
-	
+//	map(0x1e8, 0x1eb).rw(FUNC(arm_iomd_device::vidinitb_r), FUNC(arm_iomd_device::vidinitb_w));
+	// interrupt DMA
+	map(0x1f0, 0x1f3).r(FUNC(arm_iomd_device::irqst_r<IRQDMA>));
+	map(0x1f4, 0x1f7).rw(FUNC(arm_iomd_device::irqrq_r<IRQDMA>), FUNC(arm_iomd_device::irqrq_w<IRQDMA>));
+	map(0x1f8, 0x1fb).rw(FUNC(arm_iomd_device::irqmsk_r<IRQDMA>), FUNC(arm_iomd_device::irqmsk_w<IRQDMA>));	
+
 //  TODO: iomd2 has extra regs in 0x200-0x3ff area, others NOPs / mirrors?
 }
 
@@ -126,8 +179,8 @@ void arm_iomd_device::device_start()
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_vidinita));
 	save_item(NAME(m_vidend));
-	save_pointer(NAME(m_irq_mask), 4);
-	save_pointer(NAME(m_irq_status), 4);
+	save_pointer(NAME(m_irq_mask), IRQ_SOURCES_SIZE);
+	save_pointer(NAME(m_irq_status), IRQ_SOURCES_SIZE);
 	
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 	
@@ -154,7 +207,7 @@ void arm_iomd_device::device_reset()
 	m_vidinita = 0;
 	m_vidend = 0;
 
-	for (i=0; i<4; i++)
+	for (i=0; i<IRQ_SOURCES_SIZE; i++)
 	{
 		m_irq_status[i] = 0;
 		m_irq_mask[i] = 0;

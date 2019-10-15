@@ -100,9 +100,11 @@ private:
 		IRQA = 0,
 		IRQB,
 		IRQC,
-		IRQD
+		IRQD,
+		IRQDMA,
+		IRQ_SOURCES_SIZE
 	};
-	u8 m_irq_status[4], m_irq_mask[4];
+	u8 m_irq_status[IRQ_SOURCES_SIZE], m_irq_mask[IRQ_SOURCES_SIZE];
 	inline u8 update_irqa_type(u8 data);
 	inline void flush_irq(unsigned Which);
 	inline void trigger_irq(unsigned Which, u8 irq_type);
