@@ -16,7 +16,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11520">
-				<rom name="adventure game, the (1987)(juhasz, tamas)(hu).cas" size="11520" crc="1b701e01" sha1="f358d159cc50937844f1317bfa19406dabf79836" offset="0" />
+				<rom name="adventure game, the (1987)(juhasz, tamas)(hu).cas" size="11520" crc="1b701e01" sha1="f358d159cc50937844f1317bfa19406dabf79836"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28,7 +28,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11420">
-				<rom name="adventure game, the (1987)(juhasz, tamas)(hu)[a].cas" size="11420" crc="4204ce2d" sha1="885af9c0036681f811b9f90c2727ef0d259bda04" offset="0" />
+				<rom name="adventure game, the (1987)(juhasz, tamas)(hu)[a].cas" size="11420" crc="4204ce2d" sha1="885af9c0036681f811b9f90c2727ef0d259bda04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40,7 +40,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11410">
-				<rom name="adventure game, the (1987)(juhasz, tamas)(hu)[a2].cas" size="11410" crc="54744002" sha1="f606e4f0f9605d26979f38cac698447e54ac892b" offset="0" />
+				<rom name="adventure game, the (1987)(juhasz, tamas)(hu)[a2].cas" size="11410" crc="54744002" sha1="f606e4f0f9605d26979f38cac698447e54ac892b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7040">
-				<rom name="aknamezo (198x)(-)(hu).cas" size="7040" crc="b441bd1c" sha1="bc621ca25b3cd3aea28b4837bf2bec3a1135ce67" offset="0" />
+				<rom name="aknamezo (198x)(-)(hu).cas" size="7040" crc="b441bd1c" sha1="bc621ca25b3cd3aea28b4837bf2bec3a1135ce67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6942">
-				<rom name="aknamezo (198x)(-)(hu)[a].cas" size="6942" crc="8d586c9b" sha1="794aa11042ad7cbc3861a5ffb64392d9d4ab211e" offset="0" />
+				<rom name="aknamezo (198x)(-)(hu)[a].cas" size="6942" crc="8d586c9b" sha1="794aa11042ad7cbc3861a5ffb64392d9d4ab211e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -76,7 +76,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8309">
-				<rom name="alfa (198x)(jozsisoft)(hu).cas" size="8309" crc="1381773e" sha1="67cb49b6ef2078d26be63680c230e58a764cc3a1" offset="0" />
+				<rom name="alfa (198x)(jozsisoft)(hu).cas" size="8309" crc="1381773e" sha1="67cb49b6ef2078d26be63680c230e58a764cc3a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -88,7 +88,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2204">
-				<rom name="almatura (198x)(-)(hu).cas" size="2204" crc="03b40cb7" sha1="4922b5d82de592b965af7ed0d86b46aafaa99406" offset="0" />
+				<rom name="almatura (198x)(-)(hu).cas" size="2204" crc="03b40cb7" sha1="4922b5d82de592b965af7ed0d86b46aafaa99406"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8320">
-				<rom name="amoba (198x)(-)(hu).cas" size="8320" crc="bd667a7b" sha1="2ab8c1a6362a0ff4d11d507ec2dd273af71a5398" offset="0" />
+				<rom name="amoba (198x)(-)(hu).cas" size="8320" crc="bd667a7b" sha1="2ab8c1a6362a0ff4d11d507ec2dd273af71a5398"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8218">
-				<rom name="amoba (198x)(-)(hu)[a].cas" size="8218" crc="af5b27ab" sha1="55c34d00dd873534382b997be3efc07f1f5216b1" offset="0" />
+				<rom name="amoba (198x)(-)(hu)[a].cas" size="8218" crc="af5b27ab" sha1="55c34d00dd873534382b997be3efc07f1f5216b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +124,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13222">
-				<rom name="astro blaster (1991)(quicksilva - stv).cas" size="13222" crc="dbd0c9cf" sha1="962d548729a8de649cbbcc567fe2985408f06bab" offset="0" />
+				<rom name="astro blaster (1991)(quicksilva - stv).cas" size="13222" crc="dbd0c9cf" sha1="962d548729a8de649cbbcc567fe2985408f06bab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -136,7 +136,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3872">
-				<rom name="astro csata (1983)(sanders, c. )(hu).cas" size="3872" crc="9fa1bfb0" sha1="db661ab78c92983f3017884703db14533da10ef1" offset="0" />
+				<rom name="astro csata (1983)(sanders, c. )(hu).cas" size="3872" crc="9fa1bfb0" sha1="db661ab78c92983f3017884703db14533da10ef1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3511">
-				<rom name="atkeles (198x)(juhasz, i.)(hu).cas" size="3511" crc="306af65f" sha1="b6f416bd9e2f44468ec9397133d98ba674b540ee" offset="0" />
+				<rom name="atkeles (198x)(juhasz, i.)(hu).cas" size="3511" crc="306af65f" sha1="b6f416bd9e2f44468ec9397133d98ba674b540ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +160,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3448">
-				<rom name="atomeromu (198x)(-)(hu).cas" size="3448" crc="bb27c20c" sha1="23cdc6fad429b27895be4a87ce4cb9e370d93933" offset="0" />
+				<rom name="atomeromu (198x)(-)(hu).cas" size="3448" crc="bb27c20c" sha1="23cdc6fad429b27895be4a87ce4cb9e370d93933"/>
 			</dataarea>
 		</part>
 	</software>
@@ -172,7 +172,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="20096">
-				<rom name="atomix (1991)(stv)(hu).cas" size="20096" crc="5f304d25" sha1="c73a82d4bd4dbfe85440785c4014737b22c3bfe3" offset="0" />
+				<rom name="atomix (1991)(stv)(hu).cas" size="20096" crc="5f304d25" sha1="c73a82d4bd4dbfe85440785c4014737b22c3bfe3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +184,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="20020">
-				<rom name="atomix (1991)(stv)(hu)[a].cas" size="20020" crc="a62b1184" sha1="ee729e1421c9fffc26d6e4eef50cf42c5eeabef6" offset="0" />
+				<rom name="atomix (1991)(stv)(hu)[a].cas" size="20020" crc="a62b1184" sha1="ee729e1421c9fffc26d6e4eef50cf42c5eeabef6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -196,7 +196,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2983">
-				<rom name="auto mania (1990)(szeplaky studio)(hu).cas" size="2983" crc="5513317a" sha1="8f30e42b57abadf1a16c0d7ac74751a6abd54369" offset="0" />
+				<rom name="auto mania (1990)(szeplaky studio)(hu).cas" size="2983" crc="5513317a" sha1="8f30e42b57abadf1a16c0d7ac74751a6abd54369"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="12026">
-				<rom name="awari (198x)(-)(hu).cas" size="12026" crc="a30377d1" sha1="73ec5d00697f496fbc297b8a04c48049ab9903d5" offset="0" />
+				<rom name="awari (198x)(-)(hu).cas" size="12026" crc="a30377d1" sha1="73ec5d00697f496fbc297b8a04c48049ab9903d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -220,7 +220,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="10137">
-				<rom name="awari-jatek (198x)(-)(hu).cas" size="10137" crc="e3f5d4bb" sha1="830a5a94832256d211a9505287eeb157b9408b7c" offset="0" />
+				<rom name="awari-jatek (198x)(-)(hu).cas" size="10137" crc="e3f5d4bb" sha1="830a5a94832256d211a9505287eeb157b9408b7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +232,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="16234">
-				<rom name="bananfalo (198x)(novotrade)(hu).cas" size="16234" crc="afca2489" sha1="d96efc280806f063362f279568f7102779626cb8" offset="0" />
+				<rom name="bananfalo (198x)(novotrade)(hu).cas" size="16234" crc="afca2489" sha1="d96efc280806f063362f279568f7102779626cb8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -244,7 +244,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4089">
-				<rom name="banyasz jatek (198x)(-)(hu).cas" size="4089" crc="b56a51e1" sha1="96ad3ad0a4046256310180c3ec2a45f6238c6952" offset="0" />
+				<rom name="banyasz jatek (198x)(-)(hu).cas" size="4089" crc="b56a51e1" sha1="96ad3ad0a4046256310180c3ec2a45f6238c6952"/>
 			</dataarea>
 		</part>
 	</software>
@@ -256,7 +256,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3200">
-				<rom name="barchoba (198x)(-)(hu)[h].cas" size="3200" crc="ad675e58" sha1="e4dfff5d843ba4c01730e52ab4cb681313416d9a" offset="0" />
+				<rom name="barchoba (198x)(-)(hu)[h].cas" size="3200" crc="ad675e58" sha1="e4dfff5d843ba4c01730e52ab4cb681313416d9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -268,7 +268,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3130">
-				<rom name="barkochba (198x)(-)(hu).cas" size="3130" crc="d886e93e" sha1="32a41ac080880bd1296d2671344c01a895c90693" offset="0" />
+				<rom name="barkochba (198x)(-)(hu).cas" size="3130" crc="d886e93e" sha1="32a41ac080880bd1296d2671344c01a895c90693"/>
 			</dataarea>
 		</part>
 	</software>
@@ -280,7 +280,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2176">
-				<rom name="bazis (198x)(software in lux)(hu).cas" size="2176" crc="cf5d6669" sha1="13a283c6f228068b5b4cc34661fe19c53f7b9021" offset="0" />
+				<rom name="bazis (198x)(software in lux)(hu).cas" size="2176" crc="cf5d6669" sha1="13a283c6f228068b5b4cc34661fe19c53f7b9021"/>
 			</dataarea>
 		</part>
 	</software>
@@ -292,7 +292,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="beka-jatek (198x)(-)(hu).cas" size="8448" crc="835da94f" sha1="b531b6eb8680b63eef703ccf9da1dec840e33d76" offset="0" />
+				<rom name="beka-jatek (198x)(-)(hu).cas" size="8448" crc="835da94f" sha1="b531b6eb8680b63eef703ccf9da1dec840e33d76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -304,7 +304,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8442">
-				<rom name="beka-jatek (198x)(-)(hu)[a].cas" size="8442" crc="bf1a672f" sha1="974565639ea5da4a6d7f9c14a50f0000aa3922a3" offset="0" />
+				<rom name="beka-jatek (198x)(-)(hu)[a].cas" size="8442" crc="bf1a672f" sha1="974565639ea5da4a6d7f9c14a50f0000aa3922a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -316,7 +316,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1536">
-				<rom name="big bad john (1987)(dobrovics, zsolt)(hu).cas" size="1536" crc="bb5c8b4d" sha1="52532127b120d5dda38377503a28e19a700ba7a9" offset="0" />
+				<rom name="big bad john (1987)(dobrovics, zsolt)(hu).cas" size="1536" crc="bb5c8b4d" sha1="52532127b120d5dda38377503a28e19a700ba7a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -328,7 +328,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="10496">
-				<rom name="black (1989)(csanyi, laszlo)(hu).cas" size="10496" crc="3229b37a" sha1="9216569d513593fa1eddd39540c00f06188e528a" offset="0" />
+				<rom name="black (1989)(csanyi, laszlo)(hu).cas" size="10496" crc="3229b37a" sha1="9216569d513593fa1eddd39540c00f06188e528a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -340,7 +340,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1408">
-				<rom name="bogar jatek (198x)(-)(hu).cas" size="1408" crc="3c56cef0" sha1="272749fffa504e7f3dd3259ed9cbec9fb9dd195f" offset="0" />
+				<rom name="bogar jatek (198x)(-)(hu).cas" size="1408" crc="3c56cef0" sha1="272749fffa504e7f3dd3259ed9cbec9fb9dd195f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -352,7 +352,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7276">
-				<rom name="bombazd le ceausescut! (198x)(osmagyar software)(hu).cas" size="7276" crc="c6319041" sha1="cbb62a85c0bbc573dab43aee4c6e4a607dc883c6" offset="0" />
+				<rom name="bombazd le ceausescut! (198x)(osmagyar software)(hu).cas" size="7276" crc="c6319041" sha1="cbb62a85c0bbc573dab43aee4c6e4a607dc883c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -364,7 +364,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="25454">
-				<rom name="boszorkany ii (198x)(agilar)(hu).cas" size="25454" crc="82815bfb" sha1="b9d91422d547d3fbcc9131840ad631b293f7d099" offset="0" />
+				<rom name="boszorkany ii (198x)(agilar)(hu).cas" size="25454" crc="82815bfb" sha1="b9d91422d547d3fbcc9131840ad631b293f7d099"/>
 			</dataarea>
 		</part>
 	</software>
@@ -376,7 +376,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="23505">
-				<rom name="brake (1988)(fast &amp; force soft).cas" size="23505" crc="7e4420d4" sha1="7afe1398329b5e10c3a9ce99d20cf4be29d4295b" offset="0" />
+				<rom name="brake (1988)(fast &amp; force soft).cas" size="23505" crc="7e4420d4" sha1="7afe1398329b5e10c3a9ce99d20cf4be29d4295b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -388,7 +388,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="15427">
-				<rom name="buvarkaland (198x)(novotrade)(hu).cas" size="15427" crc="0a6b4ca0" sha1="d90805bf5ea0829da3a39ea1df6f9baa8fa41c99" offset="0" />
+				<rom name="buvarkaland (198x)(novotrade)(hu).cas" size="15427" crc="0a6b4ca0" sha1="d90805bf5ea0829da3a39ea1df6f9baa8fa41c99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -400,7 +400,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="26624">
-				<rom name="centaury-1 (198x)(novotrade)(hu).cas" size="26624" crc="1268ac0b" sha1="f6ed6d6c7e5bf42fa114f82632f6bb99fa054737" offset="0" />
+				<rom name="centaury-1 (198x)(novotrade)(hu).cas" size="26624" crc="1268ac0b" sha1="f6ed6d6c7e5bf42fa114f82632f6bb99fa054737"/>
 			</dataarea>
 		</part>
 	</software>
@@ -412,7 +412,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11776">
-				<rom name="centipede (1988)(stv).cas" size="11776" crc="81fea056" sha1="37fad3246e8856df3c7ad212bf31cee5a151dbeb" offset="0" />
+				<rom name="centipede (1988)(stv).cas" size="11776" crc="81fea056" sha1="37fad3246e8856df3c7ad212bf31cee5a151dbeb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -424,7 +424,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2392">
-				<rom name="chip (198x)(-)(hu).cas" size="2392" crc="4e147606" sha1="8c5e6e29c146877b5043921f0cee4a1387d5fd74" offset="0" />
+				<rom name="chip (198x)(-)(hu).cas" size="2392" crc="4e147606" sha1="8c5e6e29c146877b5043921f0cee4a1387d5fd74"/>
 			</dataarea>
 		</part>
 	</software>
@@ -436,7 +436,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8412">
-				<rom name="citadella (1988)(svs-software)(hu).cas" size="8412" crc="d70351f4" sha1="d65def056fcfdb3c81ec3612de9fb24cf9ac10ac" offset="0" />
+				<rom name="citadella (1988)(svs-software)(hu).cas" size="8412" crc="d70351f4" sha1="d65def056fcfdb3c81ec3612de9fb24cf9ac10ac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -448,7 +448,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4864">
-				<rom name="clementina a boszorkany (198x)(magyar, zsolt - nagy, zoltan)(hu).cas" size="4864" crc="f9c69eaf" sha1="b389b7bd9446fc8c2063e8b1e80f7c563a0db838" offset="0" />
+				<rom name="clementina a boszorkany (198x)(magyar, zsolt - nagy, zoltan)(hu).cas" size="4864" crc="f9c69eaf" sha1="b389b7bd9446fc8c2063e8b1e80f7c563a0db838"/>
 			</dataarea>
 		</part>
 	</software>
@@ -460,7 +460,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3962">
-				<rom name="clementina a boszorkany (198x)(magyar, zsolt - nagy, zoltan)(hu)[a].cas" size="3962" crc="b84b4a07" sha1="9b77d9dd2e72f3316c7d333ff68150971315945a" offset="0" />
+				<rom name="clementina a boszorkany (198x)(magyar, zsolt - nagy, zoltan)(hu)[a].cas" size="3962" crc="b84b4a07" sha1="9b77d9dd2e72f3316c7d333ff68150971315945a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -472,7 +472,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11484">
-				<rom name="commando (1989)(berysoft)(hu).cas" size="11484" crc="2cb101d1" sha1="1f6c21d2fd6937c2314e28d1587a2b82292c6c2c" offset="0" />
+				<rom name="commando (1989)(berysoft)(hu).cas" size="11484" crc="2cb101d1" sha1="1f6c21d2fd6937c2314e28d1587a2b82292c6c2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -484,7 +484,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3715">
-				<rom name="cowboy (1987)(-)(hu).cas" size="3715" crc="e0b083f4" sha1="03c5c5cf886301b6e19211c788c0251fd3633861" offset="0" />
+				<rom name="cowboy (1987)(-)(hu).cas" size="3715" crc="e0b083f4" sha1="03c5c5cf886301b6e19211c788c0251fd3633861"/>
 			</dataarea>
 		</part>
 	</software>
@@ -496,7 +496,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="22177">
-				<rom name="crazy kangaroo (1986)(videoton)(hu).cas" size="22177" crc="98e135b8" sha1="1d6828bf5ce260b4dfd1b9e769c5aa36d5b142c4" offset="0" />
+				<rom name="crazy kangaroo (1986)(videoton)(hu).cas" size="22177" crc="98e135b8" sha1="1d6828bf5ce260b4dfd1b9e769c5aa36d5b142c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -508,7 +508,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="19968">
-				<rom name="cyrus ii (1985)(intelligent chess software).cas" size="19968" crc="d181220c" sha1="2bef1ad73d7a77310c2cfa2012b92062f7b046fa" offset="0" />
+				<rom name="cyrus ii (1985)(intelligent chess software).cas" size="19968" crc="d181220c" sha1="2bef1ad73d7a77310c2cfa2012b92062f7b046fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -520,7 +520,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="19200">
-				<rom name="cyrus ii (1985)(intelligent chess software)[a].cas" size="19200" crc="e04df8f8" sha1="2d2e5c956613a81e8c9e1c4e7436c3a60ea6cf97" offset="0" />
+				<rom name="cyrus ii (1985)(intelligent chess software)[a].cas" size="19200" crc="e04df8f8" sha1="2d2e5c956613a81e8c9e1c4e7436c3a60ea6cf97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -532,7 +532,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6279">
-				<rom name="dama (198x)(-)(hu).cas" size="6279" crc="eee9ce20" sha1="0d021fe2454f9c51f13d4a76a70697b8ad313955" offset="0" />
+				<rom name="dama (198x)(-)(hu).cas" size="6279" crc="eee9ce20" sha1="0d021fe2454f9c51f13d4a76a70697b8ad313955"/>
 			</dataarea>
 		</part>
 	</software>
@@ -544,7 +544,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="18816">
-				<rom name="domino (198x)(agilar)(hu).cas" size="18816" crc="cf9887d0" sha1="1bf580d9731febae532448c8c1f381daaa8961d3" offset="0" />
+				<rom name="domino (198x)(agilar)(hu).cas" size="18816" crc="cf9887d0" sha1="1bf580d9731febae532448c8c1f381daaa8961d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -556,7 +556,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13568">
-				<rom name="ejtoernyo (198x)(software in lux)(hu).cas" size="13568" crc="7999b964" sha1="c7635d341a4bdace4ff0caf9099f134dae65a159" offset="0" />
+				<rom name="ejtoernyo (198x)(software in lux)(hu).cas" size="13568" crc="7999b964" sha1="c7635d341a4bdace4ff0caf9099f134dae65a159"/>
 			</dataarea>
 		</part>
 	</software>
@@ -568,7 +568,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13506">
-				<rom name="ejtoernyo (198x)(software in lux)(hu)[a].cas" size="13506" crc="684ceffc" sha1="12bf92b96d38bffecbe2b97d6a0621b13c91d98e" offset="0" />
+				<rom name="ejtoernyo (198x)(software in lux)(hu)[a].cas" size="13506" crc="684ceffc" sha1="12bf92b96d38bffecbe2b97d6a0621b13c91d98e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -580,7 +580,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7740">
-				<rom name="electric-man (1987)('a' studio software)(hu).cas" size="7740" crc="7e6164ad" sha1="0d73659668b3a2931dc62cd38ccb3450eb38dcc3" offset="0" />
+				<rom name="electric-man (1987)('a' studio software)(hu).cas" size="7740" crc="7e6164ad" sha1="0d73659668b3a2931dc62cd38ccb3450eb38dcc3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -592,7 +592,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4849">
-				<rom name="electronics cube (1988)(vgy).cas" size="4849" crc="7e3ca776" sha1="9f0da21ca620ae5e8dd2f482d93cde342ada9aca" offset="0" />
+				<rom name="electronics cube (1988)(vgy).cas" size="4849" crc="7e3ca776" sha1="9f0da21ca620ae5e8dd2f482d93cde342ada9aca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -604,7 +604,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2244">
-				<rom name="eletjatek (198x)(takacs, bela)(hu).cas" size="2244" crc="e223a6b5" sha1="5b785328944f4eca168c27a476d7d20fe1631508" offset="0" />
+				<rom name="eletjatek (198x)(takacs, bela)(hu).cas" size="2244" crc="e223a6b5" sha1="5b785328944f4eca168c27a476d7d20fe1631508"/>
 			</dataarea>
 		</part>
 	</software>
@@ -616,7 +616,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="14677">
-				<rom name="erod (198x)(-)(hu).cas" size="14677" crc="1db164dc" sha1="0db2f2809c04234668fd6c1384269415a883d8b6" offset="0" />
+				<rom name="erod (198x)(-)(hu).cas" size="14677" crc="1db164dc" sha1="0db2f2809c04234668fd6c1384269415a883d8b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -628,7 +628,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3712">
-				<rom name="faltoro jatek (1986)(sealprogram)(hu).cas" size="3712" crc="3740285e" sha1="1c07fa4ac114c6a71a07bb727277378daca94ba0" offset="0" />
+				<rom name="faltoro jatek (1986)(sealprogram)(hu).cas" size="3712" crc="3740285e" sha1="1c07fa4ac114c6a71a07bb727277378daca94ba0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -640,7 +640,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3702">
-				<rom name="faltoro jatek (1986)(sealprogram)(hu)[a].cas" size="3702" crc="6dd16ad8" sha1="3dabde7552ec606ba9b26f87ec15746b787d8b67" offset="0" />
+				<rom name="faltoro jatek (1986)(sealprogram)(hu)[a].cas" size="3702" crc="6dd16ad8" sha1="3dabde7552ec606ba9b26f87ec15746b787d8b67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -652,7 +652,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7424">
-				<rom name="fekete solyom (198x)(software in lux)(hu).cas" size="7424" crc="a408dd6a" sha1="d19f51b3b12b74a513056af48fbe8fb4e0482ec4" offset="0" />
+				<rom name="fekete solyom (198x)(software in lux)(hu).cas" size="7424" crc="a408dd6a" sha1="d19f51b3b12b74a513056af48fbe8fb4e0482ec4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -664,7 +664,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7349">
-				<rom name="fekete solyom (198x)(software in lux)(hu)[a].cas" size="7349" crc="eec898bc" sha1="3fe4e067d3aa5e7c9af755b8ffe3fa415f81b776" offset="0" />
+				<rom name="fekete solyom (198x)(software in lux)(hu)[a].cas" size="7349" crc="eec898bc" sha1="3fe4e067d3aa5e7c9af755b8ffe3fa415f81b776"/>
 			</dataarea>
 		</part>
 	</software>
@@ -676,7 +676,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4608">
-				<rom name="felkaru bandita (1986)(balogh, gabor)(hu).cas" size="4608" crc="aa15d43b" sha1="479893ff6e058dffe28edc8ea38593e2e656daac" offset="0" />
+				<rom name="felkaru bandita (1986)(balogh, gabor)(hu).cas" size="4608" crc="aa15d43b" sha1="479893ff6e058dffe28edc8ea38593e2e656daac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -688,7 +688,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4544">
-				<rom name="felkaru bandita (1986)(balogh, gabor)(hu)[a].cas" size="4544" crc="8ec066bd" sha1="1e448f81f1a19866e83d210ecc93ff621976825a" offset="0" />
+				<rom name="felkaru bandita (1986)(balogh, gabor)(hu)[a].cas" size="4544" crc="8ec066bd" sha1="1e448f81f1a19866e83d210ecc93ff621976825a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -700,7 +700,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="26014">
-				<rom name="festo jatek (198x)(novotrade)(hu).cas" size="26014" crc="28d0fab1" sha1="614ea406a386808fec2848ef67690e90ce08140e" offset="0" />
+				<rom name="festo jatek (198x)(novotrade)(hu).cas" size="26014" crc="28d0fab1" sha1="614ea406a386808fec2848ef67690e90ce08140e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -712,7 +712,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="9290">
-				<rom name="flopp (198x)(sebestyen, pal)(hu).cas" size="9290" crc="ec75598f" sha1="a0ad6932e17ac34c1a2bba94b7ed09806d435b2d" offset="0" />
+				<rom name="flopp (198x)(sebestyen, pal)(hu).cas" size="9290" crc="ec75598f" sha1="a0ad6932e17ac34c1a2bba94b7ed09806d435b2d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -724,7 +724,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3659">
-				<rom name="fogmosos jatek (198x)(-)(hu).cas" size="3659" crc="2365877f" sha1="ac51d266530d73a9678528e139bf47c31d58c916" offset="0" />
+				<rom name="fogmosos jatek (198x)(-)(hu).cas" size="3659" crc="2365877f" sha1="ac51d266530d73a9678528e139bf47c31d58c916"/>
 			</dataarea>
 		</part>
 	</software>
@@ -736,7 +736,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2976">
-				<rom name="fordits (198x)(-)(hu).cas" size="2976" crc="5372f2dd" sha1="c5e2d18cfea16466a64b2f57e0d5e96024e213c2" offset="0" />
+				<rom name="fordits (198x)(-)(hu).cas" size="2976" crc="5372f2dd" sha1="c5e2d18cfea16466a64b2f57e0d5e96024e213c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -748,7 +748,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2971">
-				<rom name="fordits (198x)(-)(hu)[a].cas" size="2971" crc="c635ac5d" sha1="d0300dcf358d7c82e95b260bd82945e3880576f5" offset="0" />
+				<rom name="fordits (198x)(-)(hu)[a].cas" size="2971" crc="c635ac5d" sha1="d0300dcf358d7c82e95b260bd82945e3880576f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -760,7 +760,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2960">
-				<rom name="fordits (198x)(-)(hu)[a2].cas" size="2960" crc="c1f68ba7" sha1="226d2490156539e6a90c54ae8d338a905a7ca205" offset="0" />
+				<rom name="fordits (198x)(-)(hu)[a2].cas" size="2960" crc="c1f68ba7" sha1="226d2490156539e6a90c54ae8d338a905a7ca205"/>
 			</dataarea>
 		</part>
 	</software>
@@ -772,7 +772,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="24468">
-				<rom name="forma-1 hungaroring (198x)(novotrade)(hu).cas" size="24468" crc="9bcb9ce5" sha1="c986fc4474d3065731b2c4464a026cd0df84f27a" offset="0" />
+				<rom name="forma-1 hungaroring (198x)(novotrade)(hu).cas" size="24468" crc="9bcb9ce5" sha1="c986fc4474d3065731b2c4464a026cd0df84f27a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -784,7 +784,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="35259">
-				<rom name="fuel (1988)(barabas, attila)(hu).cas" size="35259" crc="a315e81c" sha1="8436be078b92e441b2c6601a702d28c9bbfc03fa" offset="0" />
+				<rom name="fuel (1988)(barabas, attila)(hu).cas" size="35259" crc="a315e81c" sha1="8436be078b92e441b2c6601a702d28c9bbfc03fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -796,7 +796,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="35191">
-				<rom name="fuel (1988)(barabas, attila)(hu)[h].cas" size="35191" crc="2966720f" sha1="b157990a2c2a255c66d2707777f28901099418d6" offset="0" />
+				<rom name="fuel (1988)(barabas, attila)(hu)[h].cas" size="35191" crc="2966720f" sha1="b157990a2c2a255c66d2707777f28901099418d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -808,7 +808,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="21518">
-				<rom name="gall asterix (198x)(-)(hu).cas" size="21518" crc="0ac6f2b9" sha1="77db52e42362f51ef117a1231f56f8e9995131aa" offset="0" />
+				<rom name="gall asterix (198x)(-)(hu).cas" size="21518" crc="0ac6f2b9" sha1="77db52e42362f51ef117a1231f56f8e9995131aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -820,7 +820,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="17792">
-				<rom name="geo (1987)(videoton)(hu).cas" size="17792" crc="d8f793d7" sha1="89f41dc0a975409eb63a5cc80cf53fc5dcd2aaec" offset="0" />
+				<rom name="geo (1987)(videoton)(hu).cas" size="17792" crc="d8f793d7" sha1="89f41dc0a975409eb63a5cc80cf53fc5dcd2aaec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -832,7 +832,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="17765">
-				<rom name="geo (1987)(videoton)(hu)[a].cas" size="17765" crc="e8ecba79" sha1="db600bd38c186441a1384bb3097745ac78186792" offset="0" />
+				<rom name="geo (1987)(videoton)(hu)[a].cas" size="17765" crc="e8ecba79" sha1="db600bd38c186441a1384bb3097745ac78186792"/>
 			</dataarea>
 		</part>
 	</software>
@@ -844,7 +844,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="17280">
-				<rom name="geo (1987)(videoton)(hu)[a2].cas" size="17280" crc="45a8b2b0" sha1="94832f636501081b0600e392151501b7587f3023" offset="0" />
+				<rom name="geo (1987)(videoton)(hu)[a2].cas" size="17280" crc="45a8b2b0" sha1="94832f636501081b0600e392151501b7587f3023"/>
 			</dataarea>
 		</part>
 	</software>
@@ -856,7 +856,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="12326">
-				<rom name="goblin kastelya (198x)(-)(hu).cas" size="12326" crc="a9afe3e9" sha1="23d89c89be1bc651fe35c599beac228256fa03d6" offset="0" />
+				<rom name="goblin kastelya (198x)(-)(hu).cas" size="12326" crc="a9afe3e9" sha1="23d89c89be1bc651fe35c599beac228256fa03d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -868,7 +868,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6262">
-				<rom name="gombocfalo (198x)(-)(hu).cas" size="6262" crc="5de49f72" sha1="3fe6cc3a0aaeed674168da0adc6c014c15cf6964" offset="0" />
+				<rom name="gombocfalo (198x)(-)(hu).cas" size="6262" crc="5de49f72" sha1="3fe6cc3a0aaeed674168da0adc6c014c15cf6964"/>
 			</dataarea>
 		</part>
 	</software>
@@ -880,7 +880,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="5459">
-				<rom name="gombocfalo (198x)(-)(hu)[a].cas" size="5459" crc="21d715be" sha1="6e3239db02dfdbd0b05a5dbdba17a70309a674d3" offset="0" />
+				<rom name="gombocfalo (198x)(-)(hu)[a].cas" size="5459" crc="21d715be" sha1="6e3239db02dfdbd0b05a5dbdba17a70309a674d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -892,7 +892,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2688">
-				<rom name="griff (198x)(software in lux).cas" size="2688" crc="b9e5ffdb" sha1="63d5656f37941394f0434812cbab9ced6e2709dd" offset="0" />
+				<rom name="griff (198x)(software in lux).cas" size="2688" crc="b9e5ffdb" sha1="63d5656f37941394f0434812cbab9ced6e2709dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -904,7 +904,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1851">
-				<rom name="gunfight (198x)(-)(hu).cas" size="1851" crc="936b36de" sha1="27dbd608c03c7d23595c4f456286d524ba727b89" offset="0" />
+				<rom name="gunfight (198x)(-)(hu).cas" size="1851" crc="936b36de" sha1="27dbd608c03c7d23595c4f456286d524ba727b89"/>
 			</dataarea>
 		</part>
 	</software>
@@ -916,7 +916,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3712">
-				<rom name="gyufajatek (198x)(-)(hu).cas" size="3712" crc="b467be44" sha1="76ae8e45e9c40fc03b7535e8536aabc5fd570f18" offset="0" />
+				<rom name="gyufajatek (198x)(-)(hu).cas" size="3712" crc="b467be44" sha1="76ae8e45e9c40fc03b7535e8536aabc5fd570f18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -928,7 +928,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3696">
-				<rom name="gyufajatek (198x)(-)(hu)[a].cas" size="3696" crc="c9ea210b" sha1="5980d2053e561169738371ccedee98e0e891d2c7" offset="0" />
+				<rom name="gyufajatek (198x)(-)(hu)[a].cas" size="3696" crc="c9ea210b" sha1="5980d2053e561169738371ccedee98e0e891d2c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -940,7 +940,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8960">
-				<rom name="hamburger (198x)(-)(hu).cas" size="8960" crc="f71ef24a" sha1="3e0c070be43de1576dbf2f383dbc261064d48bcc" offset="0" />
+				<rom name="hamburger (198x)(-)(hu).cas" size="8960" crc="f71ef24a" sha1="3e0c070be43de1576dbf2f383dbc261064d48bcc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -952,7 +952,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8950">
-				<rom name="hamburger (198x)(-)(hu)[a].cas" size="8950" crc="06ff4f4a" sha1="4c580522ceced1d05f848da8597d103db149f97e" offset="0" />
+				<rom name="hamburger (198x)(-)(hu)[a].cas" size="8950" crc="06ff4f4a" sha1="4c580522ceced1d05f848da8597d103db149f97e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -964,7 +964,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8887">
-				<rom name="hamburger (198x)(-)(hu)[a2].cas" size="8887" crc="a30b9a1f" sha1="c987ab7d60cf9fbf5896306ab554a5a1213b93c1" offset="0" />
+				<rom name="hamburger (198x)(-)(hu)[a2].cas" size="8887" crc="a30b9a1f" sha1="c987ab7d60cf9fbf5896306ab554a5a1213b93c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -976,7 +976,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="26496">
-				<rom name="hamm (198x)(-)(hu).cas" size="26496" crc="daae4e3f" sha1="e3c8fcc571d18765ea26eb3ea5ea675658d05b42" offset="0" />
+				<rom name="hamm (198x)(-)(hu).cas" size="26496" crc="daae4e3f" sha1="e3c8fcc571d18765ea26eb3ea5ea675658d05b42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -988,7 +988,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3878">
-				<rom name="hanoi tornyai (1986)(zmkmf szoftver csoki)(hu).cas" size="3878" crc="79294aaf" sha1="923990223023ef89a994adb3147ebc5a853b697d" offset="0" />
+				<rom name="hanoi tornyai (1986)(zmkmf szoftver csoki)(hu).cas" size="3878" crc="79294aaf" sha1="923990223023ef89a994adb3147ebc5a853b697d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1000,7 +1000,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4608">
-				<rom name="hanoi torony (1985)(horvath, janos - vamos, gyorgy)(hu).cas" size="4608" crc="e9511839" sha1="ec4cc38b95320bf0f734fe8936dbb4f751e8a2bb" offset="0" />
+				<rom name="hanoi torony (1985)(horvath, janos - vamos, gyorgy)(hu).cas" size="4608" crc="e9511839" sha1="ec4cc38b95320bf0f734fe8936dbb4f751e8a2bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1012,7 +1012,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4552">
-				<rom name="hanoi torony (1985)(horvath, janos - vamos, gyorgy)(hu)[a].cas" size="4552" crc="b3ff7b58" sha1="665404ce083849147e76a9e6b72705272200fdd5" offset="0" />
+				<rom name="hanoi torony (1985)(horvath, janos - vamos, gyorgy)(hu)[a].cas" size="4552" crc="b3ff7b58" sha1="665404ce083849147e76a9e6b72705272200fdd5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1024,7 +1024,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4267">
-				<rom name="helikopter (198x)(solti, csaba)(hu).cas" size="4267" crc="acb7e513" sha1="f3e1372eca3df5fcc873daf5cc7820e604f8fec8" offset="0" />
+				<rom name="helikopter (198x)(solti, csaba)(hu).cas" size="4267" crc="acb7e513" sha1="f3e1372eca3df5fcc873daf5cc7820e604f8fec8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1036,7 +1036,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="5376">
-				<rom name="invaders (198x)(-).cas" size="5376" crc="91214ffb" sha1="31691e8e1511485c00e95eaa3eba80f7e4808eb2" offset="0" />
+				<rom name="invaders (198x)(-).cas" size="5376" crc="91214ffb" sha1="31691e8e1511485c00e95eaa3eba80f7e4808eb2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1048,7 +1048,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="5372">
-				<rom name="invaders (198x)(-)[a].cas" size="5372" crc="6ec0d267" sha1="4300d222408e8a7010a688db7efb0c8d38e05a25" offset="0" />
+				<rom name="invaders (198x)(-)[a].cas" size="5372" crc="6ec0d267" sha1="4300d222408e8a7010a688db7efb0c8d38e05a25"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1060,7 +1060,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13056">
-				<rom name="invazio (198x)(-)(hu).cas" size="13056" crc="a6982097" sha1="f2b35f3f821370a1e324e76f7f69a9f665040e3b" offset="0" />
+				<rom name="invazio (198x)(-)(hu).cas" size="13056" crc="a6982097" sha1="f2b35f3f821370a1e324e76f7f69a9f665040e3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1072,7 +1072,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7710">
-				<rom name="iq teszt (198x)(-)(hu).cas" size="7710" crc="39803e6a" sha1="3d4e1b9b8df69b7c46e272ca6a9b055f77c02ac7" offset="0" />
+				<rom name="iq teszt (198x)(-)(hu).cas" size="7710" crc="39803e6a" sha1="3d4e1b9b8df69b7c46e272ca6a9b055f77c02ac7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1084,7 +1084,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="19712">
-				<rom name="jancsi a varban (1988)(vipera szoftver - vindics)(hu).cas" size="19712" crc="6e329cd4" sha1="06ec7d10d69b2935c0c2d45338b09e74ef31239b" offset="0" />
+				<rom name="jancsi a varban (1988)(vipera szoftver - vindics)(hu).cas" size="19712" crc="6e329cd4" sha1="06ec7d10d69b2935c0c2d45338b09e74ef31239b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1096,7 +1096,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="14230">
-				<rom name="jatekok 01 (1987)(petrovszki, jozsef - rota, szabolcs)(hu).cas" size="14230" crc="f39f3e53" sha1="a6a0f52ebebb5c2c11e98fb6b1144f831b6e3ef8" offset="0" />
+				<rom name="jatekok 01 (1987)(petrovszki, jozsef - rota, szabolcs)(hu).cas" size="14230" crc="f39f3e53" sha1="a6a0f52ebebb5c2c11e98fb6b1144f831b6e3ef8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1108,7 +1108,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2816">
-				<rom name="jet pack (198x)(software in lux)(hu).cas" size="2816" crc="0f04937e" sha1="8af14d401d6c12a419b2d95e87423a9947e5b073" offset="0" />
+				<rom name="jet pack (198x)(software in lux)(hu).cas" size="2816" crc="0f04937e" sha1="8af14d401d6c12a419b2d95e87423a9947e5b073"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1120,7 +1120,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2786">
-				<rom name="jet pack (198x)(software in lux)(hu)[a].cas" size="2786" crc="71d126fb" sha1="b203e89e0403e0ba5afb78da5468fcadb83ffe86" offset="0" />
+				<rom name="jet pack (198x)(software in lux)(hu)[a].cas" size="2786" crc="71d126fb" sha1="b203e89e0403e0ba5afb78da5468fcadb83ffe86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1132,7 +1132,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2048">
-				<rom name="jumping jack (198x)(-)(hu).cas" size="2048" crc="9e9d2b58" sha1="dbb6ae284f5dc059c637f827c0c8ca5062e5ccf5" offset="0" />
+				<rom name="jumping jack (198x)(-)(hu).cas" size="2048" crc="9e9d2b58" sha1="dbb6ae284f5dc059c637f827c0c8ca5062e5ccf5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1144,7 +1144,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="5760">
-				<rom name="jupiter (198x)(dorner, peter)(hu).cas" size="5760" crc="86108372" sha1="dd78d7b24d1b0d319a123652d0bca4a5c171be74" offset="0" />
+				<rom name="jupiter (198x)(dorner, peter)(hu).cas" size="5760" crc="86108372" sha1="dd78d7b24d1b0d319a123652d0bca4a5c171be74"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1156,7 +1156,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="5738">
-				<rom name="jupiter (198x)(dorner, peter)(hu)[a].cas" size="5738" crc="2cfd2686" sha1="a6644dd905d78c37e0d604264d4d108b1d33b5bc" offset="0" />
+				<rom name="jupiter (198x)(dorner, peter)(hu)[a].cas" size="5738" crc="2cfd2686" sha1="a6644dd905d78c37e0d604264d4d108b1d33b5bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1168,7 +1168,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="16111">
-				<rom name="kalan (1989)(suma software service)(hu).cas" size="16111" crc="79e1383e" sha1="42eb188eae73d46b7977730445c163e2818c0244" offset="0" />
+				<rom name="kalan (1989)(suma software service)(hu).cas" size="16111" crc="79e1383e" sha1="42eb188eae73d46b7977730445c163e2818c0244"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1180,7 +1180,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="26240">
-				<rom name="kalandozz velem! (198x)(-)(hu).cas" size="26240" crc="cf4a36fe" sha1="f7e16f36fdda6582a38e1d2dfe915577c30543d4" offset="0" />
+				<rom name="kalandozz velem! (198x)(-)(hu).cas" size="26240" crc="cf4a36fe" sha1="f7e16f36fdda6582a38e1d2dfe915577c30543d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1192,7 +1192,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="9856">
-				<rom name="karate (198x)(-)(hu).cas" size="9856" crc="0ec589b7" sha1="a6ccafb08c22867c1dfdcc7f50231a19a69810d8" offset="0" />
+				<rom name="karate (198x)(-)(hu).cas" size="9856" crc="0ec589b7" sha1="a6ccafb08c22867c1dfdcc7f50231a19a69810d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1204,7 +1204,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13279">
-				<rom name="kardhalak es kincsek (198x)(-)(hu).cas" size="13279" crc="9c559a06" sha1="d7aee871ab7eabe63f789bfa9bc70b90a68a27e2" offset="0" />
+				<rom name="kardhalak es kincsek (198x)(-)(hu).cas" size="13279" crc="9c559a06" sha1="d7aee871ab7eabe63f789bfa9bc70b90a68a27e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1216,7 +1216,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="14848">
-				<rom name="keljfeljancsi (198x)(-)(hu).cas" size="14848" crc="eb3f28aa" sha1="e500ca95de8c0ecc8d02d77595e610b55ae92cae" offset="0" />
+				<rom name="keljfeljancsi (198x)(-)(hu).cas" size="14848" crc="eb3f28aa" sha1="e500ca95de8c0ecc8d02d77595e610b55ae92cae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1228,7 +1228,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="17838">
-				<rom name="kem (1988)(spt)(hu).cas" size="17838" crc="93c904d1" sha1="5ccb35d22a1204debdec31477f850e05ed6d605e" offset="0" />
+				<rom name="kem (1988)(spt)(hu).cas" size="17838" crc="93c904d1" sha1="5ccb35d22a1204debdec31477f850e05ed6d605e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1240,7 +1240,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3201">
-				<rom name="kigyo (198x)(-)(hu).cas" size="3201" crc="b5b7a713" sha1="267cbf53231425dcaa8c720d644445c3eb65a4a8" offset="0" />
+				<rom name="kigyo (198x)(-)(hu).cas" size="3201" crc="b5b7a713" sha1="267cbf53231425dcaa8c720d644445c3eb65a4a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1252,7 +1252,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3712">
-				<rom name="kigyos jatek (198x)(-)(hu).cas" size="3712" crc="242565c1" sha1="473647d4cac46e3e15534e064d1af0a4c8f8aee6" offset="0" />
+				<rom name="kigyos jatek (198x)(-)(hu).cas" size="3712" crc="242565c1" sha1="473647d4cac46e3e15534e064d1af0a4c8f8aee6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1264,7 +1264,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3643">
-				<rom name="kigyos jatek (198x)(-)(hu)[a].cas" size="3643" crc="99b93c2a" sha1="b6d4d6efd06e3b051c2ca308c0d24cb5fa34d558" offset="0" />
+				<rom name="kigyos jatek (198x)(-)(hu)[a].cas" size="3643" crc="99b93c2a" sha1="b6d4d6efd06e3b051c2ca308c0d24cb5fa34d558"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1276,7 +1276,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6912">
-				<rom name="kis csavargo (198x)(-)(hu).cas" size="6912" crc="ad3daa37" sha1="6be910a71f05709885a7dd4df9b64e3ef9a000e0" offset="0" />
+				<rom name="kis csavargo (198x)(-)(hu).cas" size="6912" crc="ad3daa37" sha1="6be910a71f05709885a7dd4df9b64e3ef9a000e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1288,7 +1288,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6820">
-				<rom name="kis csavargo (198x)(-)(hu)[a].cas" size="6820" crc="aae9123d" sha1="726d102d9084b4346a2e1a110ca78818e7f4ed2b" offset="0" />
+				<rom name="kis csavargo (198x)(-)(hu)[a].cas" size="6820" crc="aae9123d" sha1="726d102d9084b4346a2e1a110ca78818e7f4ed2b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1300,7 +1300,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="15616">
-				<rom name="kismozdony (198x)(-)(hu).cas" size="15616" crc="c0021665" sha1="06a9fc65f639bf0b09193f8cb6f42dfc3d8c2957" offset="0" />
+				<rom name="kismozdony (198x)(-)(hu).cas" size="15616" crc="c0021665" sha1="06a9fc65f639bf0b09193f8cb6f42dfc3d8c2957"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1312,7 +1312,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4013">
-				<rom name="kocka poker (198x)(-)(hu).cas" size="4013" crc="552b1478" sha1="ae1f082f307b3174e9254bf48807949643ebc7c6" offset="0" />
+				<rom name="kocka poker (198x)(-)(hu).cas" size="4013" crc="552b1478" sha1="ae1f082f307b3174e9254bf48807949643ebc7c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1324,7 +1324,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4096">
-				<rom name="kocka poker (198x)(-)(hu)[a].cas" size="4096" crc="9f0b31f0" sha1="40197f9f43e29f7e0446b949b56e4724c0c7409e" offset="0" />
+				<rom name="kocka poker (198x)(-)(hu)[a].cas" size="4096" crc="9f0b31f0" sha1="40197f9f43e29f7e0446b949b56e4724c0c7409e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1336,7 +1336,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="26273">
-				<rom name="kormoci arany (198x)(novotrade)(hu).cas" size="26273" crc="53edabb8" sha1="ec456d6a32b191e93316ed20114769bc752370e4" offset="0" />
+				<rom name="kormoci arany (198x)(novotrade)(hu).cas" size="26273" crc="53edabb8" sha1="ec456d6a32b191e93316ed20114769bc752370e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1348,7 +1348,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8060">
-				<rom name="kulcs (198x)(-)(hu).cas" size="8060" crc="2ef8b373" sha1="5f61d9c06a6d3131d371c7be73e043f3285a52a8" offset="0" />
+				<rom name="kulcs (198x)(-)(hu).cas" size="8060" crc="2ef8b373" sha1="5f61d9c06a6d3131d371c7be73e043f3285a52a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1360,7 +1360,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="17613">
-				<rom name="kulcshaz ii (198x)(k&amp;k soft)(hu).cas" size="17613" crc="fd092662" sha1="7d026279dd76862aae6798938a3104dc6bfffa52" offset="0" />
+				<rom name="kulcshaz ii (198x)(k&amp;k soft)(hu).cas" size="17613" crc="fd092662" sha1="7d026279dd76862aae6798938a3104dc6bfffa52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1372,7 +1372,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2130">
-				<rom name="labirint leslie (1987)(dobrovics, zsolt).cas" size="2130" crc="d013bf40" sha1="027734648b450ee54a44c75e0fd895dd4164a73b" offset="0" />
+				<rom name="labirint leslie (1987)(dobrovics, zsolt).cas" size="2130" crc="d013bf40" sha1="027734648b450ee54a44c75e0fd895dd4164a73b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1384,7 +1384,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4312">
-				<rom name="labirintus (1987)(piret, endre - vekony, sandor)(hu).cas" size="4312" crc="493a1043" sha1="9b45c61d5e8a074ea8d286937fc5cf863cfad534" offset="0" />
+				<rom name="labirintus (1987)(piret, endre - vekony, sandor)(hu).cas" size="4312" crc="493a1043" sha1="9b45c61d5e8a074ea8d286937fc5cf863cfad534"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1396,7 +1396,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4174">
-				<rom name="labirintus (198x)(gugi, zoltan)(hu).cas" size="4174" crc="09e79577" sha1="e0fc9dc261e62bb1812da1ff767e63c5c4ce56c7" offset="0" />
+				<rom name="labirintus (198x)(gugi, zoltan)(hu).cas" size="4174" crc="09e79577" sha1="e0fc9dc261e62bb1812da1ff767e63c5c4ce56c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1408,7 +1408,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11264">
-				<rom name="labirintus (198x)(-)(hu).cas" size="11264" crc="21cb865d" sha1="c6678f1db65b7b46febd0c34f8781e6e91b788ff" offset="0" />
+				<rom name="labirintus (198x)(-)(hu).cas" size="11264" crc="21cb865d" sha1="c6678f1db65b7b46febd0c34f8781e6e91b788ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1420,7 +1420,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8206">
-				<rom name="labirintus (198x)(-)(hu)[a].cas" size="8206" crc="ffed2fd9" sha1="d4d5371f2e1f8de7d4599b84d6c4c14b9e2bc4fd" offset="0" />
+				<rom name="labirintus (198x)(-)(hu)[a].cas" size="8206" crc="ffed2fd9" sha1="d4d5371f2e1f8de7d4599b84d6c4c14b9e2bc4fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1432,7 +1432,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4992">
-				<rom name="labirintus (198x)(-)(hu)[a2].cas" size="4992" crc="ed8959d8" sha1="239601a90860a008ad9c43cb6c69e81014c09b4f" offset="0" />
+				<rom name="labirintus (198x)(-)(hu)[a2].cas" size="4992" crc="ed8959d8" sha1="239601a90860a008ad9c43cb6c69e81014c09b4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1444,7 +1444,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3231">
-				<rom name="lampak (1986)(nemeth, istvan)(hu).cas" size="3231" crc="d6526163" sha1="fd4549f776892d36642b566d4e49a3b199053488" offset="0" />
+				<rom name="lampak (1986)(nemeth, istvan)(hu).cas" size="3231" crc="d6526163" sha1="fd4549f776892d36642b566d4e49a3b199053488"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1456,7 +1456,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11776">
-				<rom name="letra jatek (198x)(novotrade)(hu).cas" size="11776" crc="5e8b9d77" sha1="fe17628a6bc15e52078d632d85207af89c2de0fb" offset="0" />
+				<rom name="letra jatek (198x)(novotrade)(hu).cas" size="11776" crc="5e8b9d77" sha1="fe17628a6bc15e52078d632d85207af89c2de0fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1468,7 +1468,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="9479">
-				<rom name="letra jatek (198x)(novotrade)(hu)[a].cas" size="9479" crc="e2381655" sha1="fc343ff3f0fa6f404d6bfca3ff372b57c13d1d27" offset="0" />
+				<rom name="letra jatek (198x)(novotrade)(hu)[a].cas" size="9479" crc="e2381655" sha1="fc343ff3f0fa6f404d6bfca3ff372b57c13d1d27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1480,7 +1480,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8542">
-				<rom name="level three (198x)(software in lux)(hu).cas" size="8542" crc="a78c3de8" sha1="601d6fa9af56acbea72d09035d9f36cee8bf25b0" offset="0" />
+				<rom name="level three (198x)(software in lux)(hu).cas" size="8542" crc="a78c3de8" sha1="601d6fa9af56acbea72d09035d9f36cee8bf25b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1492,7 +1492,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1536">
-				<rom name="lift (198x)(software in lux)(hu).cas" size="1536" crc="aef5fc7a" sha1="86274f4c0b4a26acfb4e9386f026a30692c8eaa3" offset="0" />
+				<rom name="lift (198x)(software in lux)(hu).cas" size="1536" crc="aef5fc7a" sha1="86274f4c0b4a26acfb4e9386f026a30692c8eaa3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1504,7 +1504,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11392">
-				<rom name="lina (1985)(tik-tak)(hu).cas" size="11392" crc="d8f7c95f" sha1="7189914e8b94714ba063f995d61ecec87a017b55" offset="0" />
+				<rom name="lina (1985)(tik-tak)(hu).cas" size="11392" crc="d8f7c95f" sha1="7189914e8b94714ba063f995d61ecec87a017b55"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1516,7 +1516,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2176">
-				<rom name="loverseny (198x)(-)(hu).cas" size="2176" crc="5a1eff0f" sha1="243241919e26463cd9912dabc3cb87f723dca916" offset="0" />
+				<rom name="loverseny (198x)(-)(hu).cas" size="2176" crc="5a1eff0f" sha1="243241919e26463cd9912dabc3cb87f723dca916"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1528,7 +1528,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8832">
-				<rom name="magyarorszag (198x)(king ec software - software in lux)(hu).cas" size="8832" crc="3a6b2ad9" sha1="1d9e5fdd7f407c87860299752b150eb7396e1202" offset="0" />
+				<rom name="magyarorszag (198x)(king ec software - software in lux)(hu).cas" size="8832" crc="3a6b2ad9" sha1="1d9e5fdd7f407c87860299752b150eb7396e1202"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1540,7 +1540,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="5357">
-				<rom name="malom (198x)(-)(hu).cas" size="5357" crc="042bf279" sha1="9fec9ee8d94d92372306ea52aba638b92365e018" offset="0" />
+				<rom name="malom (198x)(-)(hu).cas" size="5357" crc="042bf279" sha1="9fec9ee8d94d92372306ea52aba638b92365e018"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1552,7 +1552,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="26272">
-				<rom name="mario a labirintusban (198x)(takacs, bela)(hu).cas" size="26272" crc="dd5d5ad7" sha1="95e0120f3efc24af7614ef9a19bad2239f0a96ca" offset="0" />
+				<rom name="mario a labirintusban (198x)(takacs, bela)(hu).cas" size="26272" crc="dd5d5ad7" sha1="95e0120f3efc24af7614ef9a19bad2239f0a96ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1564,7 +1564,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8576">
-				<rom name="marokko (198x)(videoton)(hu).cas" size="8576" crc="8691c343" sha1="55b5b00f4f94b5978354ee45171ee66121c7a794" offset="0" />
+				<rom name="marokko (198x)(videoton)(hu).cas" size="8576" crc="8691c343" sha1="55b5b00f4f94b5978354ee45171ee66121c7a794"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1576,7 +1576,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8197">
-				<rom name="marokko (198x)(videoton)(hu)[a].cas" size="8197" crc="49b1e2d0" sha1="fe4a25716da8e283dc85eac0edce3fa7516165ba" offset="0" />
+				<rom name="marokko (198x)(videoton)(hu)[a].cas" size="8197" crc="49b1e2d0" sha1="fe4a25716da8e283dc85eac0edce3fa7516165ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1588,7 +1588,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4224">
-				<rom name="mastermind (198x)(-)(hu).cas" size="4224" crc="95c7cf94" sha1="608537406e4654e8e6246231ed4c3b9d41b7c58f" offset="0" />
+				<rom name="mastermind (198x)(-)(hu).cas" size="4224" crc="95c7cf94" sha1="608537406e4654e8e6246231ed4c3b9d41b7c58f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1600,7 +1600,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3957">
-				<rom name="mastermind (198x)(-)(hu)[a].cas" size="3957" crc="d00667a0" sha1="d3f07b934949fa7c19b83e54a7cabec852400c5a" offset="0" />
+				<rom name="mastermind (198x)(-)(hu)[a].cas" size="3957" crc="d00667a0" sha1="d3f07b934949fa7c19b83e54a7cabec852400c5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1612,7 +1612,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="27806">
-				<rom name="meh jatek (198x)(-)(hu).cas" size="27806" crc="fdfd88f0" sha1="2acd1250081b31b7509f4e1cad9b89e3d58879e7" offset="0" />
+				<rom name="meh jatek (198x)(-)(hu).cas" size="27806" crc="fdfd88f0" sha1="2acd1250081b31b7509f4e1cad9b89e3d58879e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1624,7 +1624,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2959">
-				<rom name="memoria (198x)(-)(hu).cas" size="2959" crc="5a91a1a9" sha1="f695321846ff0efddf53a2759bfe917f80f32126" offset="0" />
+				<rom name="memoria (198x)(-)(hu).cas" size="2959" crc="5a91a1a9" sha1="f695321846ff0efddf53a2759bfe917f80f32126"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1636,7 +1636,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7040">
-				<rom name="memory (1986)(vgy)(hu).cas" size="7040" crc="b940b8e9" sha1="828fafaed6523025ea0fa95245a6d0167ee46271" offset="0" />
+				<rom name="memory (1986)(vgy)(hu).cas" size="7040" crc="b940b8e9" sha1="828fafaed6523025ea0fa95245a6d0167ee46271"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1648,7 +1648,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4723">
-				<rom name="mese-adventure (198x)(-)(hu).cas" size="4723" crc="a120f63b" sha1="4a5b5fe15e5feb1146799064de619fbb973b17bc" offset="0" />
+				<rom name="mese-adventure (198x)(-)(hu).cas" size="4723" crc="a120f63b" sha1="4a5b5fe15e5feb1146799064de619fbb973b17bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1660,7 +1660,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2012">
-				<rom name="mini golf (198x)(-)(hu).cas" size="2012" crc="963ba7cf" sha1="572309d641a6c5d4b8e03b6b62a6ec62e660ec2e" offset="0" />
+				<rom name="mini golf (198x)(-)(hu).cas" size="2012" crc="963ba7cf" sha1="572309d641a6c5d4b8e03b6b62a6ec62e660ec2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1672,7 +1672,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="17833">
-				<rom name="minotaurusz (198x)(novotrade)(hu).cas" size="17833" crc="cc981e44" sha1="2ff24c65d088a37ddfef6ce508e016b551b32dd6" offset="0" />
+				<rom name="minotaurusz (198x)(novotrade)(hu).cas" size="17833" crc="cc981e44" sha1="2ff24c65d088a37ddfef6ce508e016b551b32dd6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1684,7 +1684,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3363">
-				<rom name="mission galaktic (1987)(hungarie software).cas" size="3363" crc="afd087af" sha1="80f17309fc8fe1f18325e017bf3115eeff9b7db6" offset="0" />
+				<rom name="mission galaktic (1987)(hungarie software).cas" size="3363" crc="afd087af" sha1="80f17309fc8fe1f18325e017bf3115eeff9b7db6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1696,7 +1696,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="15616">
-				<rom name="motorodeo (198x)(ehreth, imre - stv).cas" size="15616" crc="0a35606f" sha1="a0004dfc937c059b6a21cdf22ea5ce54f76aaf54" offset="0" />
+				<rom name="motorodeo (198x)(ehreth, imre - stv).cas" size="15616" crc="0a35606f" sha1="a0004dfc937c059b6a21cdf22ea5ce54f76aaf54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1708,7 +1708,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="15525">
-				<rom name="motorodeo (198x)(ehreth, imre - stv)[a].cas" size="15525" crc="68b9fcb9" sha1="5a3d7d1a25a6eae926a9efad08296ad65b87c6f1" offset="0" />
+				<rom name="motorodeo (198x)(ehreth, imre - stv)[a].cas" size="15525" crc="68b9fcb9" sha1="5a3d7d1a25a6eae926a9efad08296ad65b87c6f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1720,7 +1720,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="21504">
-				<rom name="mr. alex (1985)(videoton).cas" size="21504" crc="c75318dc" sha1="37a07949d6e5a8e2ae7b4a37890c0bd92c481f49" offset="0" />
+				<rom name="mr. alex (1985)(videoton).cas" size="21504" crc="c75318dc" sha1="37a07949d6e5a8e2ae7b4a37890c0bd92c481f49"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1732,7 +1732,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="19968">
-				<rom name="ninja (198x)(novotrade)(hu).cas" size="19968" crc="06311467" sha1="4dba1796655af05708ad96b7677ac5c342f69d08" offset="0" />
+				<rom name="ninja (198x)(novotrade)(hu).cas" size="19968" crc="06311467" sha1="4dba1796655af05708ad96b7677ac5c342f69d08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1744,7 +1744,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="19845">
-				<rom name="ninja (198x)(novotrade)(hu)[a].cas" size="19845" crc="071c081c" sha1="1f33e094afe97cd6d5b9afc9e10cf360594cad75" offset="0" />
+				<rom name="ninja (198x)(novotrade)(hu)[a].cas" size="19845" crc="071c081c" sha1="1f33e094afe97cd6d5b9afc9e10cf360594cad75"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1756,7 +1756,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="19822">
-				<rom name="ninja (198x)(novotrade)(hu)[a2].cas" size="19822" crc="62146427" sha1="8afec5d5b3fb073668f9f1b60f73f81bd262d35f" offset="0" />
+				<rom name="ninja (198x)(novotrade)(hu)[a2].cas" size="19822" crc="62146427" sha1="8afec5d5b3fb073668f9f1b60f73f81bd262d35f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1768,7 +1768,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6016">
-				<rom name="nyulvadaszat (198x)(-)(hu).cas" size="6016" crc="7861cf16" sha1="a7f0fb18aea1f084a0634ee58784a91f5df3eddb" offset="0" />
+				<rom name="nyulvadaszat (198x)(-)(hu).cas" size="6016" crc="7861cf16" sha1="a7f0fb18aea1f084a0634ee58784a91f5df3eddb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1780,7 +1780,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6007">
-				<rom name="nyulvadaszat (198x)(-)(hu)[a].cas" size="6007" crc="b80c511a" sha1="c5714e8be58915414faa70970271f1c43a0501cc" offset="0" />
+				<rom name="nyulvadaszat (198x)(-)(hu)[a].cas" size="6007" crc="b80c511a" sha1="c5714e8be58915414faa70970271f1c43a0501cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1792,7 +1792,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6784">
-				<rom name="olajsejk (198x)(software in lux)(hu).cas" size="6784" crc="28ed90e2" sha1="cceb7cc303492e1d25958710bc2714d433950a99" offset="0" />
+				<rom name="olajsejk (198x)(software in lux)(hu).cas" size="6784" crc="28ed90e2" sha1="cceb7cc303492e1d25958710bc2714d433950a99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1804,7 +1804,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="17408">
-				<rom name="ordogmotor (1990)(vindics, istvan)(hu).cas" size="17408" crc="833bc29f" sha1="5165961dab80911f60f9b5ad296c2056d7cd6886" offset="0" />
+				<rom name="ordogmotor (1990)(vindics, istvan)(hu).cas" size="17408" crc="833bc29f" sha1="5165961dab80911f60f9b5ad296c2056d7cd6886"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1816,7 +1816,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="27024">
-				<rom name="orjarat (198x)(novotrade)(hu)[h].cas" size="27024" crc="d73d6a7f" sha1="1658040279db5bfeecea61c04cafea4975085616" offset="0" />
+				<rom name="orjarat (198x)(novotrade)(hu)[h].cas" size="27024" crc="d73d6a7f" sha1="1658040279db5bfeecea61c04cafea4975085616"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1828,7 +1828,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1792">
-				<rom name="ostrom (198x)(-)(hu).cas" size="1792" crc="6588213f" sha1="fb264103ed833707daa6408e411e2470b86bd843" offset="0" />
+				<rom name="ostrom (198x)(-)(hu).cas" size="1792" crc="6588213f" sha1="fb264103ed833707daa6408e411e2470b86bd843"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1840,7 +1840,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="23808">
-				<rom name="oszkar, a lovag (1986)(bartha, sandor)(hu).cas" size="23808" crc="f2773d3b" sha1="1629cff9b2704cb45686682a85545ad340404935" offset="0" />
+				<rom name="oszkar, a lovag (1986)(bartha, sandor)(hu).cas" size="23808" crc="f2773d3b" sha1="1629cff9b2704cb45686682a85545ad340404935"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1852,7 +1852,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4992">
-				<rom name="othello (198x)(-)(hu).cas" size="4992" crc="0d0238f8" sha1="d28280a0838fe6649875d04cc6ce26d12400995e" offset="0" />
+				<rom name="othello (198x)(-)(hu).cas" size="4992" crc="0d0238f8" sha1="d28280a0838fe6649875d04cc6ce26d12400995e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1864,7 +1864,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8948">
-				<rom name="otto, a lovag (198x)(giricz, laszlo)(hu).cas" size="8948" crc="04fd6190" sha1="ce5ca8f5fb42809009744a91e7f7bd3a3dbf76f2" offset="0" />
+				<rom name="otto, a lovag (198x)(giricz, laszlo)(hu).cas" size="8948" crc="04fd6190" sha1="ce5ca8f5fb42809009744a91e7f7bd3a3dbf76f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1876,7 +1876,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="10112">
-				<rom name="pack man (198x)(videoton).cas" size="10112" crc="6b403320" sha1="4d3a2d653bd694b9d55f75c6d4971284ede81ce6" offset="0" />
+				<rom name="pack man (198x)(videoton).cas" size="10112" crc="6b403320" sha1="4d3a2d653bd694b9d55f75c6d4971284ede81ce6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1888,7 +1888,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="10017">
-				<rom name="pack man (198x)(videoton)[a].cas" size="10017" crc="1d6603b8" sha1="43dd096d71aa2d14257f545b893a2658620ff113" offset="0" />
+				<rom name="pack man (198x)(videoton)[a].cas" size="10017" crc="1d6603b8" sha1="43dd096d71aa2d14257f545b893a2658620ff113"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1900,7 +1900,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="10014">
-				<rom name="pack man (198x)(videoton)[a2].cas" size="10014" crc="09cdd171" sha1="fba22e732cf9f6a50bb113e19fc2ae531befe8b2" offset="0" />
+				<rom name="pack man (198x)(videoton)[a2].cas" size="10014" crc="09cdd171" sha1="fba22e732cf9f6a50bb113e19fc2ae531befe8b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1912,7 +1912,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="16640">
-				<rom name="panik (1991)(vindics)(hu).cas" size="16640" crc="ede28aa3" sha1="ff96608f71c7acbbef74df6787e322dfebe4f3e7" offset="0" />
+				<rom name="panik (1991)(vindics)(hu).cas" size="16640" crc="ede28aa3" sha1="ff96608f71c7acbbef74df6787e322dfebe4f3e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1924,7 +1924,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="17000">
-				<rom name="parbaj (1991)(vindics)(hu).cas" size="17000" crc="21b9f1f3" sha1="2537237be5f65dd5f77342632db72acb808c8273" offset="0" />
+				<rom name="parbaj (1991)(vindics)(hu).cas" size="17000" crc="21b9f1f3" sha1="2537237be5f65dd5f77342632db72acb808c8273"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1936,7 +1936,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8832">
-				<rom name="poker (1986)(unisoft gmk)(hu).cas" size="8832" crc="2c949845" sha1="df0d1f81df6913b83ad6a04d507be5f2a6f06c18" offset="0" />
+				<rom name="poker (1986)(unisoft gmk)(hu).cas" size="8832" crc="2c949845" sha1="df0d1f81df6913b83ad6a04d507be5f2a6f06c18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1948,7 +1948,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8776">
-				<rom name="poker (1986)(unisoft gmk)(hu)[a].cas" size="8776" crc="29560e1d" sha1="566d32032d149b913de32ead20e62f15c81798e9" offset="0" />
+				<rom name="poker (1986)(unisoft gmk)(hu)[a].cas" size="8776" crc="29560e1d" sha1="566d32032d149b913de32ead20e62f15c81798e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1960,7 +1960,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6380">
-				<rom name="poker (198x)(-)(hu).cas" size="6380" crc="84a207bd" sha1="d904c78670b6a44e344200ab98360448679940d4" offset="0" />
+				<rom name="poker (198x)(-)(hu).cas" size="6380" crc="84a207bd" sha1="d904c78670b6a44e344200ab98360448679940d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1972,7 +1972,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6510">
-				<rom name="potty (198x)(sieben, nandor)(hu).cas" size="6510" crc="0197f454" sha1="a42697176e0facd22857d23ac7f3a7a935b9ba35" offset="0" />
+				<rom name="potty (198x)(sieben, nandor)(hu).cas" size="6510" crc="0197f454" sha1="a42697176e0facd22857d23ac7f3a7a935b9ba35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1984,7 +1984,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="9731">
-				<rom name="raiders of the lost ark (198x)(-)(hu).cas" size="9731" crc="e03b465b" sha1="bbf00f252da20cffb0b01edf41f84f24d0634e0f" offset="0" />
+				<rom name="raiders of the lost ark (198x)(-)(hu).cas" size="9731" crc="e03b465b" sha1="bbf00f252da20cffb0b01edf41f84f24d0634e0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1996,7 +1996,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7764">
-				<rom name="ramazuri (1988)(csatlos, bela - porosz, peter)(hu).cas" size="7764" crc="7c197ccc" sha1="a711982c063501ddfc5b869d6436d0d73b0cace2" offset="0" />
+				<rom name="ramazuri (1988)(csatlos, bela - porosz, peter)(hu).cas" size="7764" crc="7c197ccc" sha1="a711982c063501ddfc5b869d6436d0d73b0cace2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2008,7 +2008,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1664">
-				<rom name="reflex (198x)(software in lux).cas" size="1664" crc="6eb76d82" sha1="a3eff8c2d32c1ec1cf3a06961c39542cb9c05bcb" offset="0" />
+				<rom name="reflex (198x)(software in lux).cas" size="1664" crc="6eb76d82" sha1="a3eff8c2d32c1ec1cf3a06961c39542cb9c05bcb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2020,7 +2020,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8832">
-				<rom name="reversi (198x)(-)(hu).cas" size="8832" crc="d12ab698" sha1="fc89e6dec5dc68ee54a9e2485275fc39e400d958" offset="0" />
+				<rom name="reversi (198x)(-)(hu).cas" size="8832" crc="d12ab698" sha1="fc89e6dec5dc68ee54a9e2485275fc39e400d958"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2032,7 +2032,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8764">
-				<rom name="reversi (198x)(-)(hu)[a].cas" size="8764" crc="bac8108a" sha1="b715ab9cdcb6622b671ff45511f2a9105e35ed05" offset="0" />
+				<rom name="reversi (198x)(-)(hu)[a].cas" size="8764" crc="bac8108a" sha1="b715ab9cdcb6622b671ff45511f2a9105e35ed05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2044,7 +2044,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="10294">
-				<rom name="robin hood - ijaszverseny (198x)(novotrade)(hu).cas" size="10294" crc="7aaf6538" sha1="db59a52c4f1975954428fd7caedfe0a1ad1e56ad" offset="0" />
+				<rom name="robin hood - ijaszverseny (198x)(novotrade)(hu).cas" size="10294" crc="7aaf6538" sha1="db59a52c4f1975954428fd7caedfe0a1ad1e56ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2056,7 +2056,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="22016">
-				<rom name="rohamm (1989)(novotrade)(hu).cas" size="22016" crc="ff244477" sha1="fad7eac50c1b54984af9eae3ca6821d9a5f3afd9" offset="0" />
+				<rom name="rohamm (1989)(novotrade)(hu).cas" size="22016" crc="ff244477" sha1="fad7eac50c1b54984af9eae3ca6821d9a5f3afd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2068,7 +2068,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="21795">
-				<rom name="rohamm (1989)(novotrade)(hu)[h].cas" size="21795" crc="fd0dd656" sha1="a9fc50351c3d9e5741913b4b8010037f91831cc0" offset="0" />
+				<rom name="rohamm (1989)(novotrade)(hu)[h].cas" size="21795" crc="fd0dd656" sha1="a9fc50351c3d9e5741913b4b8010037f91831cc0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2080,7 +2080,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6784">
-				<rom name="rombolo (198x)(police sowtver)(hu).cas" size="6784" crc="02920fb1" sha1="62757709c61f4cf16cf127b45fcf8385665953ef" offset="0" />
+				<rom name="rombolo (198x)(police sowtver)(hu).cas" size="6784" crc="02920fb1" sha1="62757709c61f4cf16cf127b45fcf8385665953ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2092,7 +2092,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6727">
-				<rom name="rombolo (198x)(police sowtver)(hu)[a].cas" size="6727" crc="544e98b9" sha1="2efa494e9b5393be979c1dcfbae2c95ab919957f" offset="0" />
+				<rom name="rombolo (198x)(police sowtver)(hu)[a].cas" size="6727" crc="544e98b9" sha1="2efa494e9b5393be979c1dcfbae2c95ab919957f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2104,7 +2104,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="9216">
-				<rom name="rubik kocka (1988)(varga softver)(hu).cas" size="9216" crc="2660fc02" sha1="1cf0e94d504debd18ba91f7dab4bba9c51c675df" offset="0" />
+				<rom name="rubik kocka (1988)(varga softver)(hu).cas" size="9216" crc="2660fc02" sha1="1cf0e94d504debd18ba91f7dab4bba9c51c675df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2116,7 +2116,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="20352">
-				<rom name="sajtvajo (1991)(vindics)(hu).cas" size="20352" crc="97bf29c3" sha1="c18a4e7348d2e8a27e7c7a6628326c41bbb6f49e" offset="0" />
+				<rom name="sajtvajo (1991)(vindics)(hu).cas" size="20352" crc="97bf29c3" sha1="c18a4e7348d2e8a27e7c7a6628326c41bbb6f49e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2128,7 +2128,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="19909">
-				<rom name="sakk - cyrus ii (1985)(novotrade)(hu).cas" size="19909" crc="03a22add" sha1="e498e7f25061d4fb11f611f59acf05712a895c02" offset="0" />
+				<rom name="sakk - cyrus ii (1985)(novotrade)(hu).cas" size="19909" crc="03a22add" sha1="e498e7f25061d4fb11f611f59acf05712a895c02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2140,7 +2140,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="19614">
-				<rom name="samus' guest (1987)(csc software - skoda software).cas" size="19614" crc="4be0b4d6" sha1="26ca9f9486554b073d8a1a5d9a0661b1f9f838b5" offset="0" />
+				<rom name="samus' guest (1987)(csc software - skoda software).cas" size="19614" crc="4be0b4d6" sha1="26ca9f9486554b073d8a1a5d9a0661b1f9f838b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2152,7 +2152,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6656">
-				<rom name="sarkanybarlang (198x)(-)(hu).cas" size="6656" crc="a3a24679" sha1="127743090a424f4ed040c515eecf42f467203bfb" offset="0" />
+				<rom name="sarkanybarlang (198x)(-)(hu).cas" size="6656" crc="a3a24679" sha1="127743090a424f4ed040c515eecf42f467203bfb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2164,7 +2164,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6540">
-				<rom name="sarkanybarlang (198x)(-)(hu)[a].cas" size="6540" crc="a69d2de9" sha1="4202a1094ae477b766fb4c1c2efcd934bea1d721" offset="0" />
+				<rom name="sarkanybarlang (198x)(-)(hu)[a].cas" size="6540" crc="a69d2de9" sha1="4202a1094ae477b766fb4c1c2efcd934bea1d721"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2176,7 +2176,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="14336">
-				<rom name="satirozas (1991)(dgt software - vindics)(hu).cas" size="14336" crc="bc0a679d" sha1="0939d7b1244238e7af6dbf7c3b6b8371440419d1" offset="0" />
+				<rom name="satirozas (1991)(dgt software - vindics)(hu).cas" size="14336" crc="bc0a679d" sha1="0939d7b1244238e7af6dbf7c3b6b8371440419d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2188,7 +2188,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="14321">
-				<rom name="satirozas (1991)(dgt software - vindics)(hu)[a].cas" size="14321" crc="5fd630a4" sha1="c14719c65d8a71134df8d5662914481a7178d912" offset="0" />
+				<rom name="satirozas (1991)(dgt software - vindics)(hu)[a].cas" size="14321" crc="5fd630a4" sha1="c14719c65d8a71134df8d5662914481a7178d912"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2200,7 +2200,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="12414">
-				<rom name="sir arthur (198x)(-).cas" size="12414" crc="079596f0" sha1="0f25f7e36bd2ee9dba9745a14f3347a3ee31357f" offset="0" />
+				<rom name="sir arthur (198x)(-).cas" size="12414" crc="079596f0" sha1="0f25f7e36bd2ee9dba9745a14f3347a3ee31357f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2212,7 +2212,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="16308">
-				<rom name="space sapper (1987)(novotrade)(hu).cas" size="16308" crc="9ff523f0" sha1="7ad87a65e66c78ef7ea4dcef71ddaaa666a7c0da" offset="0" />
+				<rom name="space sapper (1987)(novotrade)(hu).cas" size="16308" crc="9ff523f0" sha1="7ad87a65e66c78ef7ea4dcef71ddaaa666a7c0da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2224,7 +2224,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6226">
-				<rom name="sprinter (198x)(bertok, zsolt - software in lux)(hu)[h].cas" size="6226" crc="f0583218" sha1="98d071e44eb496af829a3ffdba3442e537d1b564" offset="0" />
+				<rom name="sprinter (198x)(bertok, zsolt - software in lux)(hu)[h].cas" size="6226" crc="f0583218" sha1="98d071e44eb496af829a3ffdba3442e537d1b564"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2236,7 +2236,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13865">
-				<rom name="star trek (1987)(-)(hu).cas" size="13865" crc="fc4503c7" sha1="3aa19a456d4e61f8dd4e7a0359b03fa43e856e84" offset="0" />
+				<rom name="star trek (1987)(-)(hu).cas" size="13865" crc="fc4503c7" sha1="3aa19a456d4e61f8dd4e7a0359b03fa43e856e84"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2248,7 +2248,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="5504">
-				<rom name="star wars (198x)(software in lux)(hu).cas" size="5504" crc="70b9d1c4" sha1="a279d89426ee91d55c4b687979d2956c8e4a192b" offset="0" />
+				<rom name="star wars (198x)(software in lux)(hu).cas" size="5504" crc="70b9d1c4" sha1="a279d89426ee91d55c4b687979d2956c8e4a192b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2260,7 +2260,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="9657">
-				<rom name="steven's gambling, the (1986)(soon, steven).cas" size="9657" crc="ca15ffad" sha1="ab09184409d7c08ed9bc7f410a5f362166229132" offset="0" />
+				<rom name="steven's gambling, the (1986)(soon, steven).cas" size="9657" crc="ca15ffad" sha1="ab09184409d7c08ed9bc7f410a5f362166229132"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2272,7 +2272,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="10156">
-				<rom name="stone scamp (1988)(szijarto, zsolt).cas" size="10156" crc="34970f0f" sha1="f705a2459cb5b157a23f60c0b6bc7a17f4ba7bda" offset="0" />
+				<rom name="stone scamp (1988)(szijarto, zsolt).cas" size="10156" crc="34970f0f" sha1="f705a2459cb5b157a23f60c0b6bc7a17f4ba7bda"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2284,7 +2284,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8960">
-				<rom name="strip-forgo (198x)(ubisoft)(hu).cas" size="8960" crc="d5fd07b3" sha1="6140ef21e51445aeb77fcf1ea0c7db8203f9db7d" offset="0" />
+				<rom name="strip-forgo (198x)(ubisoft)(hu).cas" size="8960" crc="d5fd07b3" sha1="6140ef21e51445aeb77fcf1ea0c7db8203f9db7d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2296,7 +2296,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8887">
-				<rom name="strip-forgo (198x)(ubisoft)(hu)[a].cas" size="8887" crc="bfac1436" sha1="6916346b65109b4918831e8e0885f6edce1059fa" offset="0" />
+				<rom name="strip-forgo (198x)(ubisoft)(hu)[a].cas" size="8887" crc="bfac1436" sha1="6916346b65109b4918831e8e0885f6edce1059fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2308,7 +2308,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="25344">
-				<rom name="szankoverseny (1985)(videoton)(hu).cas" size="25344" crc="925a2274" sha1="3b265267abb427420f63cd04cade126a8d3d0bd6" offset="0" />
+				<rom name="szankoverseny (1985)(videoton)(hu).cas" size="25344" crc="925a2274" sha1="3b265267abb427420f63cd04cade126a8d3d0bd6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2320,7 +2320,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8492">
-				<rom name="szex teszt (198x)(-)(hu).cas" size="8492" crc="22f76370" sha1="328ecc645d2b182e3f7475ee5074dabbe024f5bf" offset="0" />
+				<rom name="szex teszt (198x)(-)(hu).cas" size="8492" crc="22f76370" sha1="328ecc645d2b182e3f7475ee5074dabbe024f5bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2332,7 +2332,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="21748">
-				<rom name="szinre-szint (198x)(bertok, zsolt)(hu).cas" size="21748" crc="1912c289" sha1="340c830a28c3bdb6d6d4aea20c3e6077384df492" offset="0" />
+				<rom name="szinre-szint (198x)(bertok, zsolt)(hu).cas" size="21748" crc="1912c289" sha1="340c830a28c3bdb6d6d4aea20c3e6077384df492"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2344,7 +2344,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="12572">
-				<rom name="szo-poker (1987)(szoldatics, jozsef)(hu).cas" size="12572" crc="a4f336d9" sha1="ba32839991d6a1e368e5a1a6a78ff04daacb79c8" offset="0" />
+				<rom name="szo-poker (1987)(szoldatics, jozsef)(hu).cas" size="12572" crc="a4f336d9" sha1="ba32839991d6a1e368e5a1a6a78ff04daacb79c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2356,7 +2356,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3388">
-				<rom name="szoliter (1992)(tvcm - vidisoft).cas" size="3388" crc="75027ad9" sha1="654a2d1bffc36ee27b51fe50c8d5b878abae262b" offset="0" />
+				<rom name="szoliter (1992)(tvcm - vidisoft).cas" size="3388" crc="75027ad9" sha1="654a2d1bffc36ee27b51fe50c8d5b878abae262b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2368,7 +2368,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3760">
-				<rom name="szoliter (2003)(jatekgyaros)(hu).cas" size="3760" crc="ea652416" sha1="046b2d4fc15d436c3947d1a83cf919024db36e82" offset="0" />
+				<rom name="szoliter (2003)(jatekgyaros)(hu).cas" size="3760" crc="ea652416" sha1="046b2d4fc15d436c3947d1a83cf919024db36e82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2380,7 +2380,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="21539">
-				<rom name="szornyek az utvesztoben (198x)(software, c.s.)(hu)[h].cas" size="21539" crc="51321360" sha1="6450f8eecda37e7e00d83929cca74100555efa72" offset="0" />
+				<rom name="szornyek az utvesztoben (198x)(software, c.s.)(hu)[h].cas" size="21539" crc="51321360" sha1="6450f8eecda37e7e00d83929cca74100555efa72"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2392,7 +2392,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6076">
-				<rom name="talalkozok (198x)(csatlos, bela - porosz, peter)(hu).cas" size="6076" crc="86c7e416" sha1="aa6933a9fadc8d6e9a67e91155b979d6af3d2da5" offset="0" />
+				<rom name="talalkozok (198x)(csatlos, bela - porosz, peter)(hu).cas" size="6076" crc="86c7e416" sha1="aa6933a9fadc8d6e9a67e91155b979d6af3d2da5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2404,7 +2404,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7562">
-				<rom name="tankcsata jatek (1988)(nagy, laszlo)(hu).cas" size="7562" crc="52100364" sha1="d5d7a8375a0c9d6c01bc0a4294a2f4d915a05e23" offset="0" />
+				<rom name="tankcsata jatek (1988)(nagy, laszlo)(hu).cas" size="7562" crc="52100364" sha1="d5d7a8375a0c9d6c01bc0a4294a2f4d915a05e23"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2416,7 +2416,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="14340">
-				<rom name="tapsi es a nagy vadasz (1988)(l&amp;m softver)(hu).cas" size="14340" crc="bcd24e3f" sha1="71b2c3f91501767de2d4787aa4c84d129c9fcf2f" offset="0" />
+				<rom name="tapsi es a nagy vadasz (1988)(l&amp;m softver)(hu).cas" size="14340" crc="bcd24e3f" sha1="71b2c3f91501767de2d4787aa4c84d129c9fcf2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2428,7 +2428,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="17111">
-				<rom name="telex - 1500 szo magyarul (1988)(novotrade)(hu).cas" size="17111" crc="2279dd3d" sha1="20add4d665ba7c76a5c2e568f3574ce6d4c04996" offset="0" />
+				<rom name="telex - 1500 szo magyarul (1988)(novotrade)(hu).cas" size="17111" crc="2279dd3d" sha1="20add4d665ba7c76a5c2e568f3574ce6d4c04996"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2440,7 +2440,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="16437">
-				<rom name="telex - 1500 szo magyarul (1988)(novotrade)(hu)[a].cas" size="16437" crc="4afa1cc5" sha1="fe747bd6d99e4a5a9e57d8bb4ab63fa758c965ea" offset="0" />
+				<rom name="telex - 1500 szo magyarul (1988)(novotrade)(hu)[a].cas" size="16437" crc="4afa1cc5" sha1="fe747bd6d99e4a5a9e57d8bb4ab63fa758c965ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2452,7 +2452,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="22196">
-				<rom name="ten brick (198x)(compread bt)(hu).cas" size="22196" crc="9d50de2a" sha1="81d954913f572e4c9fefb58442de00a577818549" offset="0" />
+				<rom name="ten brick (198x)(compread bt)(hu).cas" size="22196" crc="9d50de2a" sha1="81d954913f572e4c9fefb58442de00a577818549"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2464,7 +2464,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3514">
-				<rom name="tik-tak-to (198x)(-)(hu).cas" size="3514" crc="7ddb0bbf" sha1="100dead7599edafca070f1970300e3e8bf938ede" offset="0" />
+				<rom name="tik-tak-to (198x)(-)(hu).cas" size="3514" crc="7ddb0bbf" sha1="100dead7599edafca070f1970300e3e8bf938ede"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2476,7 +2476,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2816">
-				<rom name="tili-toli (198x)(-)(hu).cas" size="2816" crc="88d116b6" sha1="1d1130d0841883234db8ca8eee4e43eb36692d8b" offset="0" />
+				<rom name="tili-toli (198x)(-)(hu).cas" size="2816" crc="88d116b6" sha1="1d1130d0841883234db8ca8eee4e43eb36692d8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2488,7 +2488,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2664">
-				<rom name="tili-toli (198x)(-)(hu)[a].cas" size="2664" crc="9080b642" sha1="21863fd6633efe48a9446ac05e28a6d93629ee9a" offset="0" />
+				<rom name="tili-toli (198x)(-)(hu)[a].cas" size="2664" crc="9080b642" sha1="21863fd6633efe48a9446ac05e28a6d93629ee9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2500,7 +2500,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1792">
-				<rom name="tiszta lappal (1987)(king ec software - piret, endre)(hu).cas" size="1792" crc="60e97cc5" sha1="b459cfcff62b7d02b1925c70e2377c8013080b12" offset="0" />
+				<rom name="tiszta lappal (1987)(king ec software - piret, endre)(hu).cas" size="1792" crc="60e97cc5" sha1="b459cfcff62b7d02b1925c70e2377c8013080b12"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2512,7 +2512,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1693">
-				<rom name="tiszta lappal (1987)(king ec software - piret, endre)(hu)[a].cas" size="1693" crc="92fb8357" sha1="064d92b54e383f645c0b9f74d05d63c51ec5f665" offset="0" />
+				<rom name="tiszta lappal (1987)(king ec software - piret, endre)(hu)[a].cas" size="1693" crc="92fb8357" sha1="064d92b54e383f645c0b9f74d05d63c51ec5f665"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2524,7 +2524,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11169">
-				<rom name="tom &amp; jerry (198x)(gigasoft)(hu).cas" size="11169" crc="467ff365" sha1="00652a3fc1e2f444597e6d6af11ac3fe89f71ee9" offset="0" />
+				<rom name="tom &amp; jerry (198x)(gigasoft)(hu).cas" size="11169" crc="467ff365" sha1="00652a3fc1e2f444597e6d6af11ac3fe89f71ee9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2536,7 +2536,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13824">
-				<rom name="torpedo (1986)(unisoft)(hu)[b].cas" size="13824" crc="a28ac30d" sha1="cab7b69432f18e406b5743372754bdff11044a91" offset="0" />
+				<rom name="torpedo (1986)(unisoft)(hu)[b].cas" size="13824" crc="a28ac30d" sha1="cab7b69432f18e406b5743372754bdff11044a91"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2548,7 +2548,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="5630">
-				<rom name="torpedo (198x)(-)(hu).cas" size="5630" crc="4ccf00dc" sha1="84efd20629d6fa52cb3f6d6104148232654023e4" offset="0" />
+				<rom name="torpedo (198x)(-)(hu).cas" size="5630" crc="4ccf00dc" sha1="84efd20629d6fa52cb3f6d6104148232654023e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2560,7 +2560,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="24505">
-				<rom name="transversion (1991)(tvcm)(hu).cas" size="24505" crc="2357bade" sha1="d299b54a479d200f9eec20444c3ecc9c221719c0" offset="0" />
+				<rom name="transversion (1991)(tvcm)(hu).cas" size="24505" crc="2357bade" sha1="d299b54a479d200f9eec20444c3ecc9c221719c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2572,7 +2572,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11749">
-				<rom name="transversion (1991)(tvcm)(hu)[h].cas" size="11749" crc="09807ddb" sha1="bed60d830048b7dd464b46b14442008aa270017a" offset="0" />
+				<rom name="transversion (1991)(tvcm)(hu)[h].cas" size="11749" crc="09807ddb" sha1="bed60d830048b7dd464b46b14442008aa270017a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2584,7 +2584,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="18144">
-				<rom name="treasure (1988)(fast &amp; force software).cas" size="18144" crc="5c01ba8d" sha1="764b04bd51c6fcff161fbaa210645687e052fdcb" offset="0" />
+				<rom name="treasure (1988)(fast &amp; force software).cas" size="18144" crc="5c01ba8d" sha1="764b04bd51c6fcff161fbaa210645687e052fdcb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2596,7 +2596,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="19200">
-				<rom name="turbo jack - jetpac (1991)(vindics).cas" size="19200" crc="68ccd6de" sha1="4a422621d06f5856d833a998b8a78abb9aafce2e" offset="0" />
+				<rom name="turbo jack - jetpac (1991)(vindics).cas" size="19200" crc="68ccd6de" sha1="4a422621d06f5856d833a998b8a78abb9aafce2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2608,7 +2608,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13440">
-				<rom name="turbo rudi (1987)(novotrade)(hu).cas" size="13440" crc="2c4be8f9" sha1="59f59096358d3fe68fbe73aa34b38d81ad73f05a" offset="0" />
+				<rom name="turbo rudi (1987)(novotrade)(hu).cas" size="13440" crc="2c4be8f9" sha1="59f59096358d3fe68fbe73aa34b38d81ad73f05a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2620,7 +2620,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13315">
-				<rom name="turbo rudi (1987)(novotrade)(hu)[a].cas" size="13315" crc="f09d2e1b" sha1="e6b8b4c032983196344ce0ab3a77fdc49fc2511c" offset="0" />
+				<rom name="turbo rudi (1987)(novotrade)(hu)[a].cas" size="13315" crc="f09d2e1b" sha1="e6b8b4c032983196344ce0ab3a77fdc49fc2511c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2632,7 +2632,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="25216">
-				<rom name="tv ball (1988)(novotrade).cas" size="25216" crc="45d59560" sha1="427dd000928d9a536285bcb9c1fd33986efe2425" offset="0" />
+				<rom name="tv ball (1988)(novotrade).cas" size="25216" crc="45d59560" sha1="427dd000928d9a536285bcb9c1fd33986efe2425"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2644,7 +2644,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="3840">
-				<rom name="tv-computer faltoro jatek (198x)(-)(hu).cas" size="3840" crc="43e23051" sha1="47f7a3f58b4a711754b574bb085fe59c3cec79a8" offset="0" />
+				<rom name="tv-computer faltoro jatek (198x)(-)(hu).cas" size="3840" crc="43e23051" sha1="47f7a3f58b4a711754b574bb085fe59c3cec79a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2656,7 +2656,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="15872">
-				<rom name="tv-poker (198x)(novotrade)(hu).cas" size="15872" crc="8a302270" sha1="b989f06ec742e50371cc19cfb3b26ec4a907da48" offset="0" />
+				<rom name="tv-poker (198x)(novotrade)(hu).cas" size="15872" crc="8a302270" sha1="b989f06ec742e50371cc19cfb3b26ec4a907da48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2668,7 +2668,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="22177">
-				<rom name="tv-stack (1987)(novotrade)(hu)[h].cas" size="22177" crc="aaed803b" sha1="9addd24889a2eed979d90d2763f37516f0ffa165" offset="0" />
+				<rom name="tv-stack (1987)(novotrade)(hu)[h].cas" size="22177" crc="aaed803b" sha1="9addd24889a2eed979d90d2763f37516f0ffa165"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2680,7 +2680,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1664">
-				<rom name="tv-tenisz (1987)(dobrovics, zsolt)(hu).cas" size="1664" crc="ecaa0f4f" sha1="323560fa451a75620ad8c6c649d296593d0bf9d3" offset="0" />
+				<rom name="tv-tenisz (1987)(dobrovics, zsolt)(hu).cas" size="1664" crc="ecaa0f4f" sha1="323560fa451a75620ad8c6c649d296593d0bf9d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2692,7 +2692,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="8511">
-				<rom name="ubul es a pince (198x)(-)(hu).cas" size="8511" crc="33cb67e9" sha1="a6fa0b5382914cb4b44fa99f80b5be0531a471f2" offset="0" />
+				<rom name="ubul es a pince (198x)(-)(hu).cas" size="8511" crc="33cb67e9" sha1="a6fa0b5382914cb4b44fa99f80b5be0531a471f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2704,7 +2704,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="12416">
-				<rom name="ufo (1992)(stv)(hu).cas" size="12416" crc="aefa8b27" sha1="1c80958c66d55375ee1ae063b1d2b54f26113954" offset="0" />
+				<rom name="ufo (1992)(stv)(hu).cas" size="12416" crc="aefa8b27" sha1="1c80958c66d55375ee1ae063b1d2b54f26113954"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2716,7 +2716,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="12413">
-				<rom name="ufo (1992)(stv)(hu)[a].cas" size="12413" crc="6e7d5cac" sha1="2f2ac17d85a9ccf8d159bf23c0f811c978078c11" offset="0" />
+				<rom name="ufo (1992)(stv)(hu)[a].cas" size="12413" crc="6e7d5cac" sha1="2f2ac17d85a9ccf8d159bf23c0f811c978078c11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2728,7 +2728,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13985">
-				<rom name="unicum (1988)(compi system - red-green-blue software).cas" size="13985" crc="7ad8ae61" sha1="6e8522eaefe8a852d0ae2f4248ef79869b0b18e4" offset="0" />
+				<rom name="unicum (1988)(compi system - red-green-blue software).cas" size="13985" crc="7ad8ae61" sha1="6e8522eaefe8a852d0ae2f4248ef79869b0b18e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2740,7 +2740,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1408">
-				<rom name="urcsata (198x)(-).cas" size="1408" crc="b0f5f780" sha1="c1b6b4479894838a2ee42edf9d860a90d2eae527" offset="0" />
+				<rom name="urcsata (198x)(-).cas" size="1408" crc="b0f5f780" sha1="c1b6b4479894838a2ee42edf9d860a90d2eae527"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2752,7 +2752,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1288">
-				<rom name="urcsata (198x)(-)[a].cas" size="1288" crc="88571e12" sha1="3aaf1ff3e9581d0578afae4e9ec2b466ecf37987" offset="0" />
+				<rom name="urcsata (198x)(-)[a].cas" size="1288" crc="88571e12" sha1="3aaf1ff3e9581d0578afae4e9ec2b466ecf37987"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2764,7 +2764,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6219">
-				<rom name="ursiklo (198x)(software in lux)(hu).cas" size="6219" crc="d4b1f98e" sha1="ba4a7f6f9f0820a9b8db0e90e18371448c819db5" offset="0" />
+				<rom name="ursiklo (198x)(software in lux)(hu).cas" size="6219" crc="d4b1f98e" sha1="ba4a7f6f9f0820a9b8db0e90e18371448c819db5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2776,7 +2776,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4608">
-				<rom name="vadaszat (1987)(kiss, csaba)(hu).cas" size="4608" crc="471f9950" sha1="147accc26222e485f5fcd271b9cc36d55df4375c" offset="0" />
+				<rom name="vadaszat (1987)(kiss, csaba)(hu).cas" size="4608" crc="471f9950" sha1="147accc26222e485f5fcd271b9cc36d55df4375c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2788,7 +2788,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4556">
-				<rom name="vadaszat (1987)(kiss, csaba)(hu)[a].cas" size="4556" crc="ef19b6cc" sha1="4ad497cc129dba592e029cf81f4a588c4c33d80c" offset="0" />
+				<rom name="vadaszat (1987)(kiss, csaba)(hu)[a].cas" size="4556" crc="ef19b6cc" sha1="4ad497cc129dba592e029cf81f4a588c4c33d80c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2800,7 +2800,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6400">
-				<rom name="vadnyugat (1987)(pocze, szabolcs)(hu).cas" size="6400" crc="975188dc" sha1="e4be492372d244331774833228b0fc08c4cc36d9" offset="0" />
+				<rom name="vadnyugat (1987)(pocze, szabolcs)(hu).cas" size="6400" crc="975188dc" sha1="e4be492372d244331774833228b0fc08c4cc36d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2812,7 +2812,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6332">
-				<rom name="vadnyugat (1987)(pocze, szabolcs)(hu)[a].cas" size="6332" crc="07700ac8" sha1="5399dc1ee9d6a3cb40c8d925469596daf278d342" offset="0" />
+				<rom name="vadnyugat (1987)(pocze, szabolcs)(hu)[a].cas" size="6332" crc="07700ac8" sha1="5399dc1ee9d6a3cb40c8d925469596daf278d342"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2824,7 +2824,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7705">
-				<rom name="varazsgomb (198x)(bertok, zsolt)(hu).cas" size="7705" crc="9b100ff9" sha1="7d88c8ad55e9b41b0d3cb28ac7bd550aeb0cac5a" offset="0" />
+				<rom name="varazsgomb (198x)(bertok, zsolt)(hu).cas" size="7705" crc="9b100ff9" sha1="7d88c8ad55e9b41b0d3cb28ac7bd550aeb0cac5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2836,7 +2836,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4736">
-				<rom name="varos (1986)(centrum - dobai, ferenc)(hu).cas" size="4736" crc="aeb4bd34" sha1="a882ac401804f73fe117dbaacd71cf4d027db7a0" offset="0" />
+				<rom name="varos (1986)(centrum - dobai, ferenc)(hu).cas" size="4736" crc="aeb4bd34" sha1="a882ac401804f73fe117dbaacd71cf4d027db7a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2848,7 +2848,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4631">
-				<rom name="varos (1986)(centrum - dobai, ferenc)(hu)[a].cas" size="4631" crc="b3786055" sha1="a06028ce70e6bf31283ebf7b9600692d7ceca405" offset="0" />
+				<rom name="varos (1986)(centrum - dobai, ferenc)(hu)[a].cas" size="4631" crc="b3786055" sha1="a06028ce70e6bf31283ebf7b9600692d7ceca405"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2860,7 +2860,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="1960">
-				<rom name="vaterlo (198x)(-)(hu).cas" size="1960" crc="5e7530e0" sha1="640a2c805298b861d1d4484d5f880f2bc4639491" offset="0" />
+				<rom name="vaterlo (198x)(-)(hu).cas" size="1960" crc="5e7530e0" sha1="640a2c805298b861d1d4484d5f880f2bc4639491"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2872,7 +2872,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2304">
-				<rom name="vezetes (1987)(king ec software)(hu).cas" size="2304" crc="1175511d" sha1="204d827292d3a7406f4acdddf144ec9e2ddc642a" offset="0" />
+				<rom name="vezetes (1987)(king ec software)(hu).cas" size="2304" crc="1175511d" sha1="204d827292d3a7406f4acdddf144ec9e2ddc642a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2884,7 +2884,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="2225">
-				<rom name="vezetes (1987)(king ec software)(hu)[a].cas" size="2225" crc="b0eacf1e" sha1="5f507574d4af955ab2d320ed3f03f694152b1590" offset="0" />
+				<rom name="vezetes (1987)(king ec software)(hu)[a].cas" size="2225" crc="b0eacf1e" sha1="5f507574d4af955ab2d320ed3f03f694152b1590"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2896,7 +2896,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="4418">
-				<rom name="vigyori (198x)(software in lux)(hu).cas" size="4418" crc="f54b0d7f" sha1="27fc9d7ed604702bd84611fba10a618ebadb5bb2" offset="0" />
+				<rom name="vigyori (198x)(software in lux)(hu).cas" size="4418" crc="f54b0d7f" sha1="27fc9d7ed604702bd84611fba10a618ebadb5bb2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2908,7 +2908,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="20224">
-				<rom name="vili a banyasz (1991)(vindics)(hu).cas" size="20224" crc="f7a663c8" sha1="a0f819f67f7b4943a320c4d0dc450ced72c20b4f" offset="0" />
+				<rom name="vili a banyasz (1991)(vindics)(hu).cas" size="20224" crc="f7a663c8" sha1="a0f819f67f7b4943a320c4d0dc450ced72c20b4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2920,7 +2920,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="20153">
-				<rom name="vili a banyasz (1991)(vindics)(hu)[h].cas" size="20153" crc="55300ca3" sha1="7a8185e82b676d6e16c59b2612e68ad33fcedc54" offset="0" />
+				<rom name="vili a banyasz (1991)(vindics)(hu)[h].cas" size="20153" crc="55300ca3" sha1="7a8185e82b676d6e16c59b2612e68ad33fcedc54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2932,7 +2932,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="6969">
-				<rom name="volleyball (1990)(bery).cas" size="6969" crc="2af4cdf6" sha1="0bdf48df51b4b08bd42d6f1e3633a34e5a213e9e" offset="0" />
+				<rom name="volleyball (1990)(bery).cas" size="6969" crc="2af4cdf6" sha1="0bdf48df51b4b08bd42d6f1e3633a34e5a213e9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2944,7 +2944,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="20736">
-				<rom name="vt bridzs (1985)(intelligent software)(hu).cas" size="20736" crc="44d51c08" sha1="1ca692b1e55ff6f2fd0f3235e3ed8872f00017a9" offset="0" />
+				<rom name="vt bridzs (1985)(intelligent software)(hu).cas" size="20736" crc="44d51c08" sha1="1ca692b1e55ff6f2fd0f3235e3ed8872f00017a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2956,7 +2956,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="18177">
-				<rom name="vt bridzs (1985)(intelligent software)(hu)[a].cas" size="18177" crc="8d936ba2" sha1="fd38a85aa9ba9e3355c83f04dbc167fe6589282d" offset="0" />
+				<rom name="vt bridzs (1985)(intelligent software)(hu)[a].cas" size="18177" crc="8d936ba2" sha1="fd38a85aa9ba9e3355c83f04dbc167fe6589282d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2968,7 +2968,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11520">
-				<rom name="walltris (1992)(stv)(hu).cas" size="11520" crc="6c52d2a0" sha1="707f80f751e616108b43448327e1a53df6828296" offset="0" />
+				<rom name="walltris (1992)(stv)(hu).cas" size="11520" crc="6c52d2a0" sha1="707f80f751e616108b43448327e1a53df6828296"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2980,7 +2980,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="11499">
-				<rom name="walltris (1992)(stv)(hu)[a].cas" size="11499" crc="9afd0675" sha1="f0c441caaae109f1a64b6af345d76791757acbf0" offset="0" />
+				<rom name="walltris (1992)(stv)(hu)[a].cas" size="11499" crc="9afd0675" sha1="f0c441caaae109f1a64b6af345d76791757acbf0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2992,7 +2992,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="10400">
-				<rom name="wimbledon (198x)(software in lux)(hu).cas" size="10400" crc="27221858" sha1="48e1d2170633276c02a38cdcd953d5f1fbe3cdd4" offset="0" />
+				<rom name="wimbledon (198x)(software in lux)(hu).cas" size="10400" crc="27221858" sha1="48e1d2170633276c02a38cdcd953d5f1fbe3cdd4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3004,7 +3004,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="13986">
-				<rom name="windsurfer (198x)(novotrade)(hu).cas" size="13986" crc="5e1053cc" sha1="57556ad9b0075b2632e7b8664dafef74e2821ee4" offset="0" />
+				<rom name="windsurfer (198x)(novotrade)(hu).cas" size="13986" crc="5e1053cc" sha1="57556ad9b0075b2632e7b8664dafef74e2821ee4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3016,7 +3016,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7324">
-				<rom name="yogi (198x)(agilar)(hu).cas" size="7324" crc="68ee884f" sha1="0d25d8f28cc20340c40ab2bfdda358d6640b5547" offset="0" />
+				<rom name="yogi (198x)(agilar)(hu).cas" size="7324" crc="68ee884f" sha1="0d25d8f28cc20340c40ab2bfdda358d6640b5547"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3028,7 +3028,7 @@
 
 		<part name="cass1" interface="tvc_cass">
 			<dataarea name="cass" size="7630">
-				<rom name="zsaru, a (1990)(bl)(hu).cas" size="7630" crc="6ec7157e" sha1="964408b80a67696701b56b2d1cdaa4e08c50fea9" offset="0" />
+				<rom name="zsaru, a (1990)(bl)(hu).cas" size="7630" crc="6ec7157e" sha1="964408b80a67696701b56b2d1cdaa4e08c50fea9"/>
 			</dataarea>
 		</part>
 	</software>

@@ -84,7 +84,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 					texture_name = chains.options().value(option.c_str());
 				}
 
-				if (texture_name != "" && texture_name != "screen")
+				if (texture_name != "" && texture_name != "screen" && texture_name != "palette")
 				{
 					if (selection == "")
 					{

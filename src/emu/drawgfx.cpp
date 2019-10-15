@@ -8,18 +8,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "drawgfxm.h"
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-// if this line errors during compile, the size of NO_PRIORITY is wrong and I need to use something else
-u8 no_priority_size_is_wrong[2 * (sizeof(NO_PRIORITY) == 3) - 1];
-
-bitmap_ind8 drawgfx_dummy_priority_bitmap;
-
+#include "drawgfxt.ipp"
 
 
 /***************************************************************************
@@ -364,8 +353,7 @@ void gfx_element::opaque(bitmap_ind16 &dest, const rectangle &cliprect,
 {
 	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_OPAQUE, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_OPAQUE(destp, srcp); });
 }
 
 void gfx_element::opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -373,8 +361,7 @@ void gfx_element::opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
 {
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
 }
 
 
@@ -407,8 +394,7 @@ void gfx_element::transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [trans_pen, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
 }
 
 void gfx_element::transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -435,8 +421,7 @@ void gfx_element::transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [trans_pen, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN(destp, srcp); });
 }
 
 
@@ -456,8 +441,7 @@ void gfx_element::transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect,
 		return;
 
 	// render
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [trans_pen, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
 }
 
 void gfx_element::transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -470,8 +454,7 @@ void gfx_element::transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect,
 		return;
 
 	// render
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u32, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [trans_pen, color](u32 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
 }
 
 
@@ -505,8 +488,7 @@ void gfx_element::transmask(bitmap_ind16 &dest, const rectangle &cliprect,
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_TRANSMASK, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [trans_mask, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSMASK(destp, srcp); });
 }
 
 void gfx_element::transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -533,8 +515,7 @@ void gfx_element::transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANSMASK, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [trans_mask, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSMASK(destp, srcp); });
 }
 
 
@@ -554,8 +535,7 @@ void gfx_element::transtable(bitmap_ind16 &dest, const rectangle &cliprect,
 	color = colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_TRANSTABLE16, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [pentable, color, shadowtable](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSTABLE16(destp, srcp); });
 }
 
 void gfx_element::transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -568,8 +548,7 @@ void gfx_element::transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANSTABLE32, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [pentable, paldata, shadowtable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSTABLE32(destp, srcp); });
 }
 
 
@@ -594,8 +573,7 @@ void gfx_element::alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// get final code and color, and grab lookup tables
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANSPEN_ALPHA32, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [trans_pen, alpha_val, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_ALPHA32(destp, srcp); });
 }
 
 
@@ -620,8 +598,7 @@ void gfx_element::zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect,
 	// render
 	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_OPAQUE, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_OPAQUE(destp, srcp); });
 }
 
 void gfx_element::zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -635,8 +612,7 @@ void gfx_element::zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
 }
 
 
@@ -673,8 +649,7 @@ void gfx_element::zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
 }
 
 void gfx_element::zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -705,8 +680,7 @@ void gfx_element::zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN(destp, srcp); });
 }
 
 
@@ -730,8 +704,7 @@ void gfx_element::zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprec
 		return;
 
 	// render
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
 }
 
 void gfx_element::zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -748,8 +721,7 @@ void gfx_element::zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprec
 		return;
 
 	// render
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, color](u32 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
 }
 
 
@@ -787,8 +759,7 @@ void gfx_element::zoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect,
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_TRANSMASK, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_mask, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSMASK(destp, srcp); });
 }
 
 void gfx_element::zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -819,8 +790,7 @@ void gfx_element::zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_TRANSMASK, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_mask, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSMASK(destp, srcp); });
 }
 
 
@@ -844,8 +814,7 @@ void gfx_element::zoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect,
 	color = colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_TRANSTABLE16, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [pentable, color, shadowtable](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSTABLE16(destp, srcp); });
 }
 
 void gfx_element::zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -862,8 +831,7 @@ void gfx_element::zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_TRANSTABLE32, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [pentable, paldata, shadowtable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSTABLE32(destp, srcp); });
 }
 
 
@@ -892,8 +860,7 @@ void gfx_element::zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_TRANSPEN_ALPHA32, NO_PRIORITY);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, alpha_val, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_ALPHA32(destp, srcp); });
 }
 
 
@@ -918,7 +885,7 @@ void gfx_element::prio_opaque(bitmap_ind16 &dest, const rectangle &cliprect,
 	// render
 	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_OPAQUE_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -931,7 +898,7 @@ void gfx_element::prio_opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -968,7 +935,7 @@ void gfx_element::prio_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -998,7 +965,7 @@ void gfx_element::prio_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1021,7 +988,7 @@ void gfx_element::prio_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprec
 	pmask |= 1 << 31;
 
 	// render
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1037,7 +1004,7 @@ void gfx_element::prio_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprec
 	pmask |= 1 << 31;
 
 	// render
-	DRAWGFX_CORE(u32, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, trans_pen, color](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1074,7 +1041,7 @@ void gfx_element::prio_transmask(bitmap_ind16 &dest, const rectangle &cliprect,
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_TRANSMASK_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, trans_mask, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSMASK_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1104,7 +1071,7 @@ void gfx_element::prio_transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, trans_mask, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSMASK_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1128,7 +1095,7 @@ void gfx_element::prio_transtable(bitmap_ind16 &dest, const rectangle &cliprect,
 	color = colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	DRAWGFX_CORE(u16, PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, pentable, color, shadowtable](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1144,7 +1111,7 @@ void gfx_element::prio_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, pentable, paldata, shadowtable](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1173,7 +1140,7 @@ void gfx_element::prio_alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, trans_pen, alpha_val, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1202,7 +1169,7 @@ void gfx_element::prio_zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect
 	// render
 	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_OPAQUE_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1219,7 +1186,7 @@ void gfx_element::prio_zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1261,7 +1228,7 @@ void gfx_element::prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &clipre
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1296,7 +1263,7 @@ void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &clipre
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1325,7 +1292,7 @@ void gfx_element::prio_zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cl
 	pmask |= 1 << 31;
 
 	// render
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1346,7 +1313,7 @@ void gfx_element::prio_zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cl
 	pmask |= 1 << 31;
 
 	// render
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, color](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1389,7 +1356,7 @@ void gfx_element::prio_zoom_transmask(bitmap_ind16 &dest, const rectangle &clipr
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_TRANSMASK_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_mask, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSMASK_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1424,7 +1391,7 @@ void gfx_element::prio_zoom_transmask(bitmap_rgb32 &dest, const rectangle &clipr
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_mask, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSMASK_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1453,7 +1420,7 @@ void gfx_element::prio_zoom_transtable(bitmap_ind16 &dest, const rectangle &clip
 	color = colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	DRAWGFXZOOM_CORE(u16, PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, pentable, color, shadowtable](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY(destp, pri, srcp); });
 }
 
 void gfx_element::prio_zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1474,7 +1441,7 @@ void gfx_element::prio_zoom_transtable(bitmap_rgb32 &dest, const rectangle &clip
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, pentable, paldata, shadowtable](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1509,7 +1476,7 @@ void gfx_element::prio_zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, alpha_val, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1554,7 +1521,7 @@ void gfx_element::prio_transpen_additive(bitmap_rgb32 &dest, const rectangle &cl
 	pmask |= 1 << 31;
 
 	/* render based on dest bitmap depth */
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32, u8);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(destp, pri, srcp); });
 }
 
 
@@ -1594,14 +1561,14 @@ void gfx_element::prio_zoom_transpen_additive(bitmap_rgb32 &dest, const rectangl
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
 
-	DRAWGFXZOOM_CORE(u32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32, u8);
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(destp, pri, srcp); });
 }
 
 //#define MAKE_ARGB_RGB(a, rgb) rgb_t(a, rgb.r(), rgb.g(), rgb.b())
 #define MAKE_ARGB_RGB(a, rgb)   rgb_t(rgb).set_a(a)
 
 // combine in 'alpha' when copying to store in ARGB
-#define PIXEL_OP_REMAP_TRANS0_ALPHASTORE32(DEST, PRIORITY, SOURCE)                                  \
+#define PIXEL_OP_REMAP_TRANS0_ALPHASTORE32(DEST, SOURCE)                                  \
 do                                                                                                  \
 {                                                                                                   \
 	u32 srcdata = (SOURCE);                                                                         \
@@ -1610,7 +1577,7 @@ do                                                                              
 }                                                                                                   \
 while (0)
 // combine in 'alphatable' value to store in ARGB
-#define PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32(DEST, PRIORITY, SOURCE)                             \
+#define PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32(DEST, SOURCE)                             \
 do                                                                                                  \
 {                                                                                                   \
 	u32 srcdata = (SOURCE);                                                                         \
@@ -1619,7 +1586,7 @@ do                                                                              
 }                                                                                                   \
 while (0)
 // drawgfxm.h macro to render alpha into 32-bit buffer
-#define PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(DEST, PRIORITY, SOURCE)                                  \
+#define PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(DEST, SOURCE)                                  \
 do                                                                                                  \
 {                                                                                                   \
 	u32 srcdata = (SOURCE);                                                                         \
@@ -1637,7 +1604,6 @@ void gfx_element::alphastore(bitmap_rgb32 &dest, const rectangle &cliprect,
 		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
 		int fixedalpha, u8 *alphatable)
 {
-	DECLARE_NO_PRIORITY;
 	const pen_t *paldata;
 
 	assert(alphatable != nullptr);
@@ -1659,14 +1625,9 @@ void gfx_element::alphastore(bitmap_rgb32 &dest, const rectangle &cliprect,
 		return;
 
 	if (fixedalpha >= 0)
-	{
-		u8 alpha = fixedalpha;
-		DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANS0_ALPHASTORE32, NO_PRIORITY);
-	}
+		drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [paldata, alpha = fixedalpha](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANS0_ALPHASTORE32(destp, srcp); });
 	else
-	{
-		DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32, NO_PRIORITY);
-	}
+		drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [paldata, alphatable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32(destp, srcp); });
 }
 
 /*-------------------------------------------------
@@ -1678,8 +1639,6 @@ void gfx_element::alphatable(bitmap_rgb32 &dest, const rectangle &cliprect,
 		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
 		int fixedalpha, u8 *alphatable)
 {
-	DECLARE_NO_PRIORITY;
-
 	const pen_t *paldata;
 
 	/* if we have a fixed alpha, call the standard drawgfx_alpha */
@@ -1701,7 +1660,7 @@ void gfx_element::alphatable(bitmap_rgb32 &dest, const rectangle &cliprect,
 	if (has_pen_usage() && (pen_usage(code) & ~(1 << 0)) == 0)
 		return;
 
-	DRAWGFX_CORE(u32, PIXEL_OP_REMAP_TRANS0_ALPHATABLE32, NO_PRIORITY);
+	drawgfx_core(dest, cliprect, code, flipx, flipy, destx, desty, [paldata, alphatable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(destp, srcp); });
 }
 
 
@@ -1716,28 +1675,24 @@ void gfx_element::alphatable(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 void draw_scanline8(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata)
 {
-	DECLARE_NO_PRIORITY;
-
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [paldata](u16 &destp, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [](u16 &destp, const u8 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
 void draw_scanline8(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata)
 {
-	DECLARE_NO_PRIORITY;
-
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [](u32 &destp, const u8 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
 void prio_draw_scanline8(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
@@ -1747,11 +1702,11 @@ void prio_draw_scanline8(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length,
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pmask](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pmask](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void prio_draw_scanline8(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
@@ -1761,11 +1716,11 @@ void prio_draw_scanline8(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length,
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pmask](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pmask](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void primask_draw_scanline8(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -1775,11 +1730,11 @@ void primask_draw_scanline8(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 leng
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pcode, pmask](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIMASK(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pcode, pmask](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
 void primask_draw_scanline8(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -1789,11 +1744,11 @@ void primask_draw_scanline8(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 leng
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pcode, pmask](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIMASK(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pcode, pmask](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
 
@@ -1804,28 +1759,24 @@ void primask_draw_scanline8(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 leng
 
 void draw_scanline16(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata)
 {
-	DECLARE_NO_PRIORITY;
-
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [paldata](u16 &destp, const u16 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [](u16 &destp, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
 void draw_scanline16(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata)
 {
-	DECLARE_NO_PRIORITY;
-
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [paldata](u32 &destp, const u16 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [](u32 &destp, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
 void prio_draw_scanline16(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
@@ -1835,11 +1786,11 @@ void prio_draw_scanline16(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void prio_draw_scanline16(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
@@ -1849,11 +1800,11 @@ void prio_draw_scanline16(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pmask](u32 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pmask](u32 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void primask_draw_scanline16(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -1863,11 +1814,11 @@ void primask_draw_scanline16(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 len
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pcode, pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIMASK(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pcode, pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
 void primask_draw_scanline16(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -1877,11 +1828,11 @@ void primask_draw_scanline16(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 len
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pcode, pmask](u32 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIMASK(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pcode, pmask](u32 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
 
@@ -1892,28 +1843,24 @@ void primask_draw_scanline16(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 len
 
 void draw_scanline32(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata)
 {
-	DECLARE_NO_PRIORITY;
-
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [paldata](u16 &destp, const u32 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [](u16 &destp, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
 void draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata)
 {
-	DECLARE_NO_PRIORITY;
-
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [paldata](u32 &destp, const u32 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, [](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
 void prio_draw_scanline32(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
@@ -1923,11 +1870,11 @@ void prio_draw_scanline32(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pmask](u16 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pmask](u16 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void prio_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
@@ -1937,11 +1884,11 @@ void prio_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void primask_draw_scanline32(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -1951,11 +1898,11 @@ void primask_draw_scanline32(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 len
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pcode, pmask](u16 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIMASK(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pcode, pmask](u16 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
 void primask_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -1965,64 +1912,11 @@ void primask_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 len
 
 	// palette lookup case
 	if (paldata != nullptr)
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [paldata, pcode, pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIMASK(destp, pri, srcp); });
 
 	// raw copy case
 	else
-		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
-}
-
-
-
-/***************************************************************************
-    EXTRACT_SCANLINE IMPLEMENTATIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    extract_scanline8 - copy pixels from a single
-    scanline of a bitmap to an 8bpp buffer
--------------------------------------------------*/
-
-void extract_scanline8(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u8 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u16);
-}
-
-void extract_scanline8(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u8 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u32);
-}
-
-
-/*-------------------------------------------------
-    extract_scanline16 - copy pixels from a single
-    scanline of a bitmap to a 16bpp buffer
--------------------------------------------------*/
-
-void extract_scanline16(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u16 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u16);
-}
-
-void extract_scanline16(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u16 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u32);
-}
-
-
-/*-------------------------------------------------
-    extract_scanline32 - copy pixels from a single
-    scanline of a bitmap to a 32bpp buffer
--------------------------------------------------*/
-
-void extract_scanline32(const bitmap_ind16 &bitmap, s32 srcx, s32 srcy, s32 length, u32 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u16);
-}
-
-void extract_scanline32(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 length, u32 *destptr)
-{
-	EXTRACTSCANLINE_CORE(u32);
+		drawscanline_core(bitmap, destx, desty, length, srcptr, priority, [pcode, pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
 
@@ -2038,14 +1932,12 @@ void extract_scanline32(const bitmap_rgb32 &bitmap, s32 srcx, s32 srcy, s32 leng
 
 void copybitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect)
 {
-	DECLARE_NO_PRIORITY;
-	COPYBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+	copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, [](u16 &destp, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
 void copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect)
 {
-	DECLARE_NO_PRIORITY;
-	COPYBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+	copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, [](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
 void prio_copybitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask)
@@ -2053,7 +1945,7 @@ void prio_copybitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
 
-	COPYBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+	copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void prio_copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask)
@@ -2061,7 +1953,7 @@ void prio_copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
 
-	COPYBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+	copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 void primask_copybitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -2069,7 +1961,7 @@ void primask_copybitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, 
 	if (pcode == 0 && pmask == 0xff)
 		copybitmap(dest, src, flipx, flipy, destx, desty, cliprect);
 	else
-		COPYBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+		copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [pcode, pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
 void primask_copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -2077,7 +1969,7 @@ void primask_copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, 
 	if (pcode == 0 && pmask == 0xff)
 		copybitmap(dest, src, flipx, flipy, destx, desty, cliprect);
 	else
-		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+		copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [pcode, pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
 
@@ -2089,20 +1981,18 @@ void primask_copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, 
 
 void copybitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, u32 trans_pen)
 {
-	DECLARE_NO_PRIORITY;
 	if (trans_pen > 0xffff)
 		copybitmap(dest, src, flipx, flipy, destx, desty, cliprect);
 	else
-		COPYBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
+		copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, [trans_pen](u16 &destp, const u16 &srcp) { PIXEL_OP_COPY_TRANSPEN(destp, srcp); });
 }
 
 void copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, u32 trans_pen)
 {
-	DECLARE_NO_PRIORITY;
 	if (trans_pen == 0xffffffff)
 		copybitmap(dest, src, flipx, flipy, destx, desty, cliprect);
 	else
-		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
+		copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, [trans_pen](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN(destp, srcp); });
 }
 
 void prio_copybitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
@@ -2113,7 +2003,7 @@ void prio_copybitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, int flip
 	if (trans_pen > 0xffff)
 		prio_copybitmap(dest, src, flipx, flipy, destx, desty, cliprect, priority, pmask);
 	else
-		COPYBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN_PRIORITY, u8);
+		copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [pmask, trans_pen](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 void prio_copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
@@ -2124,7 +2014,7 @@ void prio_copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flip
 	if (trans_pen == 0xffffffff)
 		prio_copybitmap(dest, src, flipx, flipy, destx, desty, cliprect, priority, pmask);
 	else
-		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN_PRIORITY, u8);
+		copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [pmask, trans_pen](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 void primask_copybitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -2134,7 +2024,7 @@ void primask_copybitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, int f
 	else if (trans_pen > 0xffff)
 		primask_copybitmap(dest, src, flipx, flipy, destx, desty, cliprect, priority, pcode, pmask);
 	else
-		COPYBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN_PRIMASK, u8);
+		copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [trans_pen, pcode, pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIMASK(destp, pri, srcp); });
 }
 
 void primask_copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -2144,7 +2034,7 @@ void primask_copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int f
 	else if (trans_pen == 0xffffffff)
 		primask_copybitmap(dest, src, flipx, flipy, destx, desty, cliprect, priority, pcode, pmask);
 	else
-		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN_PRIMASK, u8);
+		copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [trans_pen, pcode, pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIMASK(destp, pri, srcp); });
 }
 
 
@@ -2156,8 +2046,7 @@ void primask_copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int f
 
 void copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect)
 {
-	DECLARE_NO_PRIORITY;
-	COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSALPHA, NO_PRIORITY);
+	copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, [](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSALPHA(destp, srcp); });
 }
 
 void prio_copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask)
@@ -2165,7 +2054,7 @@ void prio_copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
 
-	COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSALPHA_PRIORITY, u8);
+	copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_TRANSALPHA_PRIORITY(destp, pri, srcp); });
 }
 
 void primask_copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u8 pcode, u8 pmask)
@@ -2173,7 +2062,7 @@ void primask_copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, 
 	if (pcode == 0 && pmask == 0xff)
 		copybitmap_transalpha(dest, src, flipx, flipy, destx, desty, cliprect);
 	else
-		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSALPHA_PRIMASK, u8);
+		copybitmap_core(dest, src, flipx, flipy, destx, desty, cliprect, priority, [pcode, pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_TRANSALPHA_PRIMASK(destp, pri, srcp); });
 }
 
 
@@ -2566,48 +2455,46 @@ void primask_copyscrollbitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src,
     pixels
 -------------------------------------------------*/
 
-void copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound)
+void copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound)
 {
-	DECLARE_NO_PRIORITY;
-	COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, [](u16 &destp, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
-void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound)
+void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound)
 {
-	DECLARE_NO_PRIORITY;
-	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, [](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE(destp, srcp); });
 }
 
-void prio_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask)
+void prio_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
 
-	COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
-void prio_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask)
+void prio_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
 
-	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
-void primask_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+void primask_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
 {
 	if (pcode == 0 && pmask == 0xff)
 		copyrozbitmap(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound);
 	else
-		COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+		copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pcode, pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
-void primask_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+void primask_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
 {
 	if (pcode == 0 && pmask == 0xff)
 		copyrozbitmap(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound);
 	else
-		COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+		copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pcode, pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_OPAQUE_PRIMASK(destp, pri, srcp); });
 }
 
 
@@ -2618,46 +2505,44 @@ void primask_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const 
     transpen
 -------------------------------------------------*/
 
-void copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen)
+void copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 trans_pen)
 {
-	DECLARE_NO_PRIORITY;
-	COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
+	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, [trans_pen](u16 &destp, const u16 &srcp) { PIXEL_OP_COPY_TRANSPEN(destp, srcp); });
 }
 
-void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen)
+void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 trans_pen)
 {
-	DECLARE_NO_PRIORITY;
-	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
+	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, [trans_pen](u32 &destp, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN(destp, srcp); });
 }
 
-void prio_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+void prio_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
 
-	COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN_PRIORITY, u8);
+	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pmask, trans_pen](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
-void prio_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+void prio_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
 
-	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN_PRIORITY, u8);
+	copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [pmask, trans_pen](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
-void primask_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+void primask_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
 {
 	if (pcode == 0 && pmask == 0xff)
 		copyrozbitmap_trans(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, trans_pen);
 	else
-		COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN_PRIMASK, u8);
+		copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [trans_pen, pcode, pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIMASK(destp, pri, srcp); });
 }
 
-void primask_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+void primask_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, bool wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
 {
 	if (pcode == 0 && pmask == 0xff)
 		copyrozbitmap_trans(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, trans_pen);
 	else
-		COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN_PRIMASK, u8);
+		copyrozbitmap_core(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, priority, [trans_pen, pcode, pmask](u32 &destp, u8 &pri, const u32 &srcp) { PIXEL_OP_COPY_TRANSPEN_PRIMASK(destp, pri, srcp); });
 }

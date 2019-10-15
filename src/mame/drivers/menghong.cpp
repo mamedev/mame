@@ -9,11 +9,11 @@
     TODO:
     - HY04 protection (controls tile RNG, 8bpp colors, a few program flow bits)
     - 8bpp colors are washed, data from flash ROMs is XORed with contents
-      of NVRAM area 0x1400070b-80f in menghong, might be shared with 
-	  HY04 as well.
+      of NVRAM area 0x1400070b-80f in menghong, might be shared with
+      HY04 as well.
     - EEPROM hookup;
-    - extract password code when entering test mode in-game (assuming the 
-	  0x485 workaround isn't enough);
+    - extract password code when entering test mode in-game (assuming the
+      0x485 workaround isn't enough);
 
 =============================================================================
 
@@ -88,7 +88,7 @@ public:
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc"),
-//		m_nvram(*this, "nvram"),
+//      m_nvram(*this, "nvram"),
 		m_ds1302(*this, "rtc"),
 		m_eeprom(*this, "eeprom"),
 		m_prot_data(*this, "pic_data")
@@ -107,7 +107,7 @@ private:
 	/* devices */
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
-//	required_device<nvram_device> m_nvram;
+//  required_device<nvram_device> m_nvram;
 	required_device<ds1302_device> m_ds1302;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_region_ptr <uint8_t> m_prot_data;
@@ -135,7 +135,7 @@ private:
 	DECLARE_WRITE32_MEMBER(crzyddz2_PIOldat_w);
 	DECLARE_READ32_MEMBER(crzyddz2_PIOedat_r);
 	uint8_t m_crzyddz2_prot;
-	
+
 	DECLARE_READ8_MEMBER(menghong_shared_r);
 	DECLARE_WRITE8_MEMBER(menghong_shared_w);
 	DECLARE_READ8_MEMBER(crzyddz2_shared_r);
@@ -189,23 +189,23 @@ WRITE32_MEMBER(menghong_state::FlashCmd_w)
 // To do: HY04 (pic?) protection, 93C46 hookup
 
 READ8_MEMBER(menghong_state::menghong_shared_r)
-{	
+{
 	return m_sharedram[offset];
 }
 
 WRITE8_MEMBER(menghong_state::menghong_shared_w)
 {
 	m_sharedram[offset] = data;
-	
+
 	if (offset == 0x2a0)
 	{
 		if (data == 0x09)
 		{
 			// enables game settings by pressing start on password screen
 			m_sharedram[0x485] = 0x02;
-			
+
 			// start at 0x140071b, up to 0x806, rolls back at 0x70c
-			// we conveniently use an handcrafted ROM here, created by guessing colors from 
+			// we conveniently use an handcrafted ROM here, created by guessing colors from
 			// transparencies and shading.
 			// This will be useful for comparison when the actual PIC data will be extracted.
 			for (int i=0;i<0x100;i++)
@@ -230,7 +230,7 @@ READ8_MEMBER(menghong_state::crzyddz2_shared_r)
 WRITE8_MEMBER(menghong_state::crzyddz2_shared_w)
 {
 	m_sharedram[offset] = data;
-	
+
 	// State machine is unconfirmed
 	if (offset == 0x7e3)
 	{
@@ -242,8 +242,8 @@ WRITE8_MEMBER(menghong_state::crzyddz2_shared_w)
 				break;
 			case 0xbb:
 				// this actually affects color again, game checksums the NVRAM contents
-				// at PC=0x2011f9a, expecting a value of 0x7ebe otherwise locks up 
-				// after Sealy logo. Every single value is added to the routine and left 
+				// at PC=0x2011f9a, expecting a value of 0x7ebe otherwise locks up
+				// after Sealy logo. Every single value is added to the routine and left
 				// shifted by 1 (including the two values above)
 				for(int i=0;i<0x3f;i++)
 					m_sharedram[i+0x652] = 0xff;
@@ -316,7 +316,7 @@ void menghong_state::menghong_mem(address_map &map)
 	map(0x00000000, 0x003fffff).rom().nopw();
 
 	map(0x01280000, 0x01280003).w(FUNC(menghong_state::Banksw_w));
-//	map(0x01400000, 0x0140ffff).ram().share("nvram");
+//  map(0x01400000, 0x0140ffff).ram().share("nvram");
 	map(0x01400000, 0x0140ffff).rw(FUNC(menghong_state::menghong_shared_r), FUNC(menghong_state::menghong_shared_w));
 	map(0x01500000, 0x01500003).portr("P1_P2");
 	map(0x01500004, 0x01500007).r(FUNC(menghong_state::crzyddz2_key_r));
@@ -343,7 +343,7 @@ void menghong_state::crzyddz2_mem(address_map &map)
 void menghong_state::machine_start()
 {
 	m_sharedram = auto_alloc_array_clear(machine(), uint8_t, 0x10000);
-	
+
 	if (m_mainbank)
 	{
 		m_maxbank = (m_flash) ? m_flash.bytes() / 0x1000000 : 0;
@@ -473,7 +473,7 @@ void menghong_state::menghong(machine_config &config)
 
 	// HY04 running at 8 MHz
 
-//	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
@@ -499,7 +499,7 @@ ROM_START( menghong )
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04
 	ROM_LOAD("menghong_hy04", 0x000000, 0x4280, NO_DUMP )
-	
+
 	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
 	ROM_LOAD("hy04_fake_data.bin", 0, 0x100, BAD_DUMP CRC(73cc964b) SHA1(39d223c550e38c97135322e43ccabb70f04964b9) )
 ROM_END
@@ -513,7 +513,7 @@ ROM_START( crzyddz2 )
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04
 	ROM_LOAD("hy04", 0x000000, 0x4280, NO_DUMP )
-	
+
 	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
 ROM_END
 

@@ -1,5 +1,5 @@
 #
-# Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+# Copyright 2011-2019 Branimir Karadzic. All rights reserved.
 # License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 #
 
@@ -17,8 +17,8 @@ else
 OS=linux
 endif
 else
-CMD_MKDIR=cmd /C "if not exist "$(subst /,\,$(1))" mkdir "$(subst /,\,$(1))""
-CMD_RMDIR=cmd /C "if exist "$(subst /,\,$(1))" rmdir /S /Q "$(subst /,\,$(1))""
+CMD_MKDIR=cmd //C "if not exist "$(subst /,\,$(1))" mkdir "$(subst /,\,$(1))""
+CMD_RMDIR=cmd //C "if exist "$(subst /,\,$(1))" rmdir /S /Q "$(subst /,\,$(1))""
 OS=windows
 endif
 

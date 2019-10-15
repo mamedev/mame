@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="630784">
-				<rom name="flex.wta" size="630784" crc="c9a1ee8e" sha1="01cb600096fad3364d2ca3288a02797712fbc3d3" offset="0" />
+				<rom name="flex.wta" size="630784" crc="c9a1ee8e" sha1="01cb600096fad3364d2ca3288a02797712fbc3d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="630784">
-				<rom name="wtasys21.wta" size="630784" crc="5b022415" sha1="da167fbb85e65f848cb8f70d588e140a920049c6" offset="0" />
+				<rom name="wtasys21.wta" size="630784" crc="5b022415" sha1="da167fbb85e65f848cb8f70d588e140a920049c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="630784">
-				<rom name="wtasys22.wta" size="630784" crc="db0f7bc1" sha1="e61bb9b6b4aa6713f7d0875af9a6362817477a81" offset="0" />
+				<rom name="wtasys22.wta" size="630784" crc="db0f7bc1" sha1="e61bb9b6b4aa6713f7d0875af9a6362817477a81"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="630784">
-				<rom name="wtasys23.wta" size="630784" crc="f09d2fec" sha1="ba06f81c1b42ee3f324ca6d9867c3efdd7e89b9f" offset="0" />
+				<rom name="wtasys23.wta" size="630784" crc="f09d2fec" sha1="ba06f81c1b42ee3f324ca6d9867c3efdd7e89b9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="630784">
-				<rom name="wtasy233.wta" size="630784" crc="7b44bfb1" sha1="430578200ec986c4a470538fe93c4cfd5ef9a10d" offset="0" />
+				<rom name="wtasy233.wta" size="630784" crc="7b44bfb1" sha1="430578200ec986c4a470538fe93c4cfd5ef9a10d"/>
 			</dataarea>
 		</part>
 	</software>

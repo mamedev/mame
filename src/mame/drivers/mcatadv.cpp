@@ -182,7 +182,7 @@ void mcatadv_state::mcatadv_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
 
-//  AM_RANGE(0x180018, 0x18001f) AM_READNOP // ?
+//  map(0x180018, 0x18001f).nopr(); // ?
 
 	map(0x200000, 0x200005).ram().share("scroll1");
 	map(0x300000, 0x300005).ram().share("scroll2");
@@ -198,7 +198,7 @@ void mcatadv_state::mcatadv_map(address_map &map)
 
 	map(0x800000, 0x800001).portr("P1");
 	map(0x800002, 0x800003).portr("P2");
-//  AM_RANGE(0x900000, 0x900001) AM_WRITE(mcat_coin_w) // Lockout / Counter MCAT Only
+//  map(0x900000, 0x900001).w(FUNC(mcatadv_state::mcat_coin_w)); // Lockout / Counter MCAT Only
 	map(0xa00000, 0xa00001).portr("DSW1");
 	map(0xa00002, 0xa00003).portr("DSW2");
 
@@ -407,20 +407,9 @@ INPUT_PORTS_END
 
 /*** GFX Decode ***/
 
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*8,4) },
-	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_mcatadv )
-	GFXDECODE_ENTRY( "bg0", 0, layout_16x16x4, 0, 0x200 )
-	GFXDECODE_ENTRY( "bg1", 0, layout_16x16x4, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg0", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x200 )
 GFXDECODE_END
 
 

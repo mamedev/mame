@@ -19,7 +19,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10981">
-				<rom name="vorstell4.tap" size="10981" crc="e1319cf5" sha1="edcfb2e3f1556f3a8ebbc133007ce0564eebdf20" offset="0" />
+				<rom name="vorstell4.tap" size="10981" crc="e1319cf5" sha1="edcfb2e3f1556f3a8ebbc133007ce0564eebdf20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11755">
-				<rom name="lekt1.tap" size="11755" crc="0aa1f504" sha1="b6b7e66c636d487b56d15084a9650718f227f81c" offset="0" />
+				<rom name="lekt1.tap" size="11755" crc="0aa1f504" sha1="b6b7e66c636d487b56d15084a9650718f227f81c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="4789">
-				<rom name="othello.tap" size="4789" crc="c259c2db" sha1="c3a8be5566017beaf43ee623d2a84a7d19091481" offset="0" />
+				<rom name="othello.tap" size="4789" crc="c259c2db" sha1="c3a8be5566017beaf43ee623d2a84a7d19091481"/>
 			</dataarea>
 		</part>
 	</software>
@@ -55,7 +55,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9707">
-				<rom name="inter.tap" size="9707" crc="b38a281e" sha1="baa2a05985c5d7b307527e4023340e065c596fac" offset="0" />
+				<rom name="inter.tap" size="9707" crc="b38a281e" sha1="baa2a05985c5d7b307527e4023340e065c596fac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +67,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="7901">
-				<rom name="gatecr.tap" size="7901" crc="55f8c5e5" sha1="a34d91d8e68b20165600643005faed606ea2dc63" offset="0" />
+				<rom name="gatecr.tap" size="7901" crc="55f8c5e5" sha1="a34d91d8e68b20165600643005faed606ea2dc63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -80,7 +80,7 @@
 		<sharedfeat name="compatibility" value="4"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13577">
-				<rom name="house4.tap" size="13577" crc="603d2a73" sha1="b46f7d3beec299c2b083497c6c6f5b982c5e8bd5" offset="0" />
+				<rom name="house4.tap" size="13577" crc="603d2a73" sha1="b46f7d3beec299c2b083497c6c6f5b982c5e8bd5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13577">
-				<rom name="house3.853" size="13577" crc="9f4f27ef" sha1="d4f8a5f0dafab3c0f7c656b35f6bd3979faf9ff8" offset="0" />
+				<rom name="house3.853" size="13577" crc="9f4f27ef" sha1="d4f8a5f0dafab3c0f7c656b35f6bd3979faf9ff8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5692">
-				<rom name="pilze.tap" size="5692" crc="d62f565c" sha1="10096d81d92e08ace4cf294022979d3af80370fa" offset="0" />
+				<rom name="pilze.tap" size="5692" crc="d62f565c" sha1="10096d81d92e08ace4cf294022979d3af80370fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="7111">
-				<rom name="stadt.tap" size="7111" crc="b7839b5e" sha1="e517ca73129aa133cc7083bfb0176be6231da6d5" offset="0" />
+				<rom name="stadt.tap" size="7111" crc="b7839b5e" sha1="e517ca73129aa133cc7083bfb0176be6231da6d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6595">
-				<rom name="laby.tap" size="6595" crc="2cb7bc20" sha1="124bc8f605a08bb0cc503b6e423d464778cf6a7c" offset="0" />
+				<rom name="laby.tap" size="6595" crc="2cb7bc20" sha1="124bc8f605a08bb0cc503b6e423d464778cf6a7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5305">
-				<rom name="rennen.tap" size="5305" crc="7078ff5e" sha1="286e95614f616704f7c1c8b5d40ec9f88de693f7" offset="0" />
+				<rom name="rennen.tap" size="5305" crc="7078ff5e" sha1="286e95614f616704f7c1c8b5d40ec9f88de693f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="4918">
-				<rom name="schwloch.tap" size="4918" crc="0bee8622" sha1="284898fe4b82267ae4a37725d5085669282c87c8" offset="0" />
+				<rom name="schwloch.tap" size="4918" crc="0bee8622" sha1="284898fe4b82267ae4a37725d5085669282c87c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +165,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6724">
-				<rom name="perlen.tap" size="6724" crc="019307ae" sha1="c917d28ea8cd23a7dc1d5a34e43f9fa00d9cd91e" offset="0" />
+				<rom name="perlen.tap" size="6724" crc="019307ae" sha1="c917d28ea8cd23a7dc1d5a34e43f9fa00d9cd91e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -177,7 +177,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6079">
-				<rom name="pinguin.tap" size="6079" crc="ac38d62b" sha1="584c8b7c61f285939e4b51eb05d0e16db5d26c2c" offset="0" />
+				<rom name="pinguin.tap" size="6079" crc="ac38d62b" sha1="584c8b7c61f285939e4b51eb05d0e16db5d26c2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -189,7 +189,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6595">
-				<rom name="schiffsu.tap" size="6595" crc="3deb9f16" sha1="925dfe40cdc8c496a635d96d5c4cfff1da4ab964" offset="0" />
+				<rom name="schiffsu.tap" size="6595" crc="3deb9f16" sha1="925dfe40cdc8c496a635d96d5c4cfff1da4ab964"/>
 			</dataarea>
 		</part>
 	</software>
@@ -201,7 +201,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5305">
-				<rom name="sandburg.tap" size="5305" crc="5b8f8f81" sha1="c3f4a87f586b769ef7ba331ce8a97155bf3a2603" offset="0" />
+				<rom name="sandburg.tap" size="5305" crc="5b8f8f81" sha1="c3f4a87f586b769ef7ba331ce8a97155bf3a2603"/>
 			</dataarea>
 		</part>
 	</software>
@@ -213,7 +213,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="7240">
-				<rom name="ali.tap" size="7240" crc="ab361df4" sha1="b6a87e775acf579b9fa9971f34cbc4411c205f35" offset="0" />
+				<rom name="ali.tap" size="7240" crc="ab361df4" sha1="b6a87e775acf579b9fa9971f34cbc4411c205f35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -225,7 +225,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6466">
-				<rom name="frosch.tap" size="6466" crc="a678eb1c" sha1="8f321aa8d5fe7a84be0bfacef883a9e3ce69f008" offset="0" />
+				<rom name="frosch.tap" size="6466" crc="a678eb1c" sha1="8f321aa8d5fe7a84be0bfacef883a9e3ce69f008"/>
 			</dataarea>
 		</part>
 	</software>
@@ -237,7 +237,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6208">
-				<rom name="angeln.tap" size="6208" crc="2ccc97ab" sha1="8698002635e20c5663877e79b37c0efdf96f9803" offset="0" />
+				<rom name="angeln.tap" size="6208" crc="2ccc97ab" sha1="8698002635e20c5663877e79b37c0efdf96f9803"/>
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="7369">
-				<rom name="ski.tap" size="7369" crc="2c71e8f5" sha1="766b90f8773ef028fdf3def51bbcfb503fcc49ca" offset="0" />
+				<rom name="ski.tap" size="7369" crc="2c71e8f5" sha1="766b90f8773ef028fdf3def51bbcfb503fcc49ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="15496">
-				<rom name="gowa.tap" size="15496" crc="34dfd445" sha1="5e3c2bf9f256f065b9f8f5a818cac046bd25d5a4" offset="0" />
+				<rom name="gowa.tap" size="15496" crc="34dfd445" sha1="5e3c2bf9f256f065b9f8f5a818cac046bd25d5a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -274,7 +274,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14851">
-				<rom name="cockpit.tap" size="14851" crc="fdf93efb" sha1="a1c73de3822eb875c5a0370e434e2dee4e6eb714" offset="0" />
+				<rom name="cockpit.tap" size="14851" crc="fdf93efb" sha1="a1c73de3822eb875c5a0370e434e2dee4e6eb714"/>
 			</dataarea>
 		</part>
 	</software>
@@ -286,7 +286,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8014">
-				<rom name="orbit.tap" size="8014" crc="4f3cfa45" sha1="8f68ac50ed3ba35224b16be600e656d0a8992ec0" offset="0" />
+				<rom name="orbit.tap" size="8014" crc="4f3cfa45" sha1="8f68ac50ed3ba35224b16be600e656d0a8992ec0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -298,7 +298,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8014">
-				<rom name="enten.tap" size="8014" crc="608c4d73" sha1="855a75d0cc7b7bdfc2747a1f0220c66a132208c2" offset="0" />
+				<rom name="enten.tap" size="8014" crc="608c4d73" sha1="855a75d0cc7b7bdfc2747a1f0220c66a132208c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -310,7 +310,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13448">
-				<rom name="schach.tap" size="13448" crc="a61f06a0" sha1="634272bd886ec68b6457c4e2c1ace2617de02882" offset="0" />
+				<rom name="schach.tap" size="13448" crc="a61f06a0" sha1="634272bd886ec68b6457c4e2c1ace2617de02882"/>
 			</dataarea>
 		</part>
 	</software>
@@ -323,7 +323,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="29686">
-				<rom name="club-xm.tap" size="29686" crc="16d48f0d" sha1="9295df3012eb4b774e167082f62ab7668473c5d7" offset="0" />
+				<rom name="club-xm.tap" size="29686" crc="16d48f0d" sha1="9295df3012eb4b774e167082f62ab7668473c5d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -336,7 +336,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13319">
-				<rom name="pursuit4.tap" size="13319" crc="8da4f914" sha1="5e584c142c8d9ac62f55b6f06b8a4cba8d567ef0" offset="0" />
+				<rom name="pursuit4.tap" size="13319" crc="8da4f914" sha1="5e584c142c8d9ac62f55b6f06b8a4cba8d567ef0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -349,7 +349,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13319">
-				<rom name="pursuit3.853" size="13319" crc="c0aa039a" sha1="f26b02b4b0997863132dd137c43dfddad52417ca" offset="0" />
+				<rom name="pursuit3.853" size="13319" crc="c0aa039a" sha1="f26b02b4b0997863132dd137c43dfddad52417ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -362,7 +362,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6998">
-				<rom name="cave.tap" size="6998" crc="9e449df1" sha1="b354bd6b73bce2d2e4d147f2dca21edc27a9a2ad" offset="0" />
+				<rom name="cave.tap" size="6998" crc="9e449df1" sha1="b354bd6b73bce2d2e4d147f2dca21edc27a9a2ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -375,7 +375,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6998">
-				<rom name="cave3mh.853" size="6998" crc="eadc6f35" sha1="0d7c34a18c1dbdf1d49684cb552637547ff04675" offset="0" />
+				<rom name="cave3mh.853" size="6998" crc="eadc6f35" sha1="0d7c34a18c1dbdf1d49684cb552637547ff04675"/>
 			</dataarea>
 		</part>
 	</software>
@@ -387,7 +387,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="16673">
-				<rom name="deliro4.tap" size="16673" crc="ef52314d" sha1="96925dc7eb32aa2b7da50510809f432f68d2e18a" offset="0" />
+				<rom name="deliro4.tap" size="16673" crc="ef52314d" sha1="96925dc7eb32aa2b7da50510809f432f68d2e18a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -400,7 +400,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14222">
-				<rom name="pengo4.tap" size="14222" crc="bff08c58" sha1="50a13f2bdb0bad168c87e035bf093f0244c96086" offset="0" />
+				<rom name="pengo4.tap" size="14222" crc="bff08c58" sha1="50a13f2bdb0bad168c87e035bf093f0244c96086"/>
 			</dataarea>
 		</part>
 	</software>
@@ -413,7 +413,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14222">
-				<rom name="pengo3m.853" size="14222" crc="e1d607df" sha1="7f1d82efd172c6a720c3737bee7a86a5554a76ae" offset="0" />
+				<rom name="pengo3m.853" size="14222" crc="e1d607df" sha1="7f1d82efd172c6a720c3737bee7a86a5554a76ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -426,7 +426,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="21317">
-				<rom name="digger4.tap" size="21317" crc="af590459" sha1="937c4f00b20c2330be76af8d9173f240da9a607e" offset="0" />
+				<rom name="digger4.tap" size="21317" crc="af590459" sha1="937c4f00b20c2330be76af8d9173f240da9a607e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -439,7 +439,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="21317">
-				<rom name="digger3m.853" size="21317" crc="1ba98635" sha1="e84ef5b4b7b6c3bbba0f20b3622e33a902a7b07a" offset="0" />
+				<rom name="digger3m.853" size="21317" crc="1ba98635" sha1="e84ef5b4b7b6c3bbba0f20b3622e33a902a7b07a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -451,7 +451,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6611">
-				<rom name="4gewinnt.tap" size="6611" crc="91c9a4ac" sha1="fc142725aa4ca47f6cdac6d750305ff9ad30daf7" offset="0" />
+				<rom name="4gewinnt.tap" size="6611" crc="91c9a4ac" sha1="fc142725aa4ca47f6cdac6d750305ff9ad30daf7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -462,7 +462,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="15109">
-				<rom name="hallo.tap" size="15109" crc="06f645e4" sha1="ae7960a7d12d4c7806b6ec75e9311abb3aca4259" offset="0" />
+				<rom name="hallo.tap" size="15109" crc="06f645e4" sha1="ae7960a7d12d4c7806b6ec75e9311abb3aca4259"/>
 			</dataarea>
 		</part>
 	</software>
@@ -474,7 +474,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="32653">
-				<rom name="jungle4.tap" size="32653" crc="23fdca3d" sha1="b5a503272a492411abe29732edeab318c25aa7f6" offset="0" />
+				<rom name="jungle4.tap" size="32653" crc="23fdca3d" sha1="b5a503272a492411abe29732edeab318c25aa7f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -486,7 +486,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="31105">
-				<rom name="jungle.853" size="31105" crc="6cc0bb32" sha1="1e7e8395fbd4605a71e79c0efca92f3ff9462a03" offset="0" />
+				<rom name="jungle.853" size="31105" crc="6cc0bb32" sha1="1e7e8395fbd4605a71e79c0efca92f3ff9462a03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -498,7 +498,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="28267">
-				<rom name="jungle20.tap" size="28267" crc="68718148" sha1="c71878a91e5cbc2037aa250b71fc0b7d9d4733fc" offset="0" />
+				<rom name="jungle20.tap" size="28267" crc="68718148" sha1="c71878a91e5cbc2037aa250b71fc0b7d9d4733fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -510,7 +510,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="85720">
-				<rom name="vollgas.tap" size="85720" crc="2d631948" sha1="bb9b6e151ce52c21dbdcd4b01f734924e5479b4c" offset="0" />
+				<rom name="vollgas.tap" size="85720" crc="2d631948" sha1="bb9b6e151ce52c21dbdcd4b01f734924e5479b4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -521,7 +521,7 @@
 		<publisher>STS</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9820">
-				<rom name="bombjack.tap" size="9820" crc="46dd5023" sha1="dda548f45d4726a0e041082d33b2e566a4a842c9" offset="0" />
+				<rom name="bombjack.tap" size="9820" crc="46dd5023" sha1="dda548f45d4726a0e041082d33b2e566a4a842c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -532,7 +532,7 @@
 		<publisher>STS</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="7627">
-				<rom name="gunship.tap" size="7627" crc="e556bd57" sha1="2f701363e7a991db8a495b1728d59cdfe0397a90" offset="0" />
+				<rom name="gunship.tap" size="7627" crc="e556bd57" sha1="2f701363e7a991db8a495b1728d59cdfe0397a90"/>
 			</dataarea>
 		</part>
 	</software>
@@ -543,7 +543,7 @@
 		<publisher>STS</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="19624">
-				<rom name="karate.tap" size="19624" crc="fb7c7879" sha1="d118634a4a0a80cece78fba40092b0356390f185" offset="0" />
+				<rom name="karate.tap" size="19624" crc="fb7c7879" sha1="d118634a4a0a80cece78fba40092b0356390f185"/>
 			</dataarea>
 		</part>
 	</software>
@@ -554,7 +554,7 @@
 		<publisher>DM-Software</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14980">
-				<rom name="gold90.tap" size="14980" crc="40f5c243" sha1="6561fbf25965bfde4015f48d2660f6a4b9f139ad" offset="0" />
+				<rom name="gold90.tap" size="14980" crc="40f5c243" sha1="6561fbf25965bfde4015f48d2660f6a4b9f139ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -565,7 +565,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="16528">
-				<rom name="earth.tap" size="16528" crc="dfb0f136" sha1="482837a55da59348f28ceb84b000243752f3c9f6" offset="0" />
+				<rom name="earth.tap" size="16528" crc="dfb0f136" sha1="482837a55da59348f28ceb84b000243752f3c9f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -577,7 +577,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="16141">
-				<rom name="boulder4.tap" size="16141" crc="fd9dae9f" sha1="144304776ac9e8a393982a5e5bea37e7851b21bf" offset="0" />
+				<rom name="boulder4.tap" size="16141" crc="fd9dae9f" sha1="144304776ac9e8a393982a5e5bea37e7851b21bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -589,7 +589,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="22462">
-				<rom name="bennion.tap" size="22462" crc="469fc372" sha1="094fd67cf045650736817ff7d8d6a4c2a2a42012" offset="0" />
+				<rom name="bennion.tap" size="22462" crc="469fc372" sha1="094fd67cf045650736817ff7d8d6a4c2a2a42012"/>
 			</dataarea>
 		</part>
 	</software>
@@ -601,7 +601,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="22075">
-				<rom name="bennion.853" size="22075" crc="7def3fc7" sha1="ae839c629ac65e2e5152cfca949eb10b457a0bea" offset="0" />
+				<rom name="bennion.853" size="22075" crc="7def3fc7" sha1="ae839c629ac65e2e5152cfca949eb10b457a0bea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -613,7 +613,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="20785">
-				<rom name="gourmand.tap" size="20785" crc="c78ff932" sha1="3f3497cdccf2dc8bb623f8557538a2de313f87c6" offset="0" />
+				<rom name="gourmand.tap" size="20785" crc="c78ff932" sha1="3f3497cdccf2dc8bb623f8557538a2de313f87c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -625,7 +625,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6595">
-				<rom name="ladder.tap" size="6595" crc="787a611c" sha1="db35c3a7efbdad35d3236e64ab3e90de6a241620" offset="0" />
+				<rom name="ladder.tap" size="6595" crc="787a611c" sha1="db35c3a7efbdad35d3236e64ab3e90de6a241620"/>
 			</dataarea>
 		</part>
 	</software>
@@ -637,7 +637,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6595">
-				<rom name="ladder.853" size="6595" crc="c5e24a51" sha1="09b04e5671743ffd9b7fb5711f56c20938f3bb91" offset="0" />
+				<rom name="ladder.853" size="6595" crc="c5e24a51" sha1="09b04e5671743ffd9b7fb5711f56c20938f3bb91"/>
 			</dataarea>
 		</part>
 	</software>
@@ -648,7 +648,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="21430">
-				<rom name="kcladder.tap" size="21430" crc="582ea44e" sha1="743b85e56929fa178003e94ae8be31daf5718c5d" offset="0" />
+				<rom name="kcladder.tap" size="21430" crc="582ea44e" sha1="743b85e56929fa178003e94ae8be31daf5718c5d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -659,7 +659,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="19624">
-				<rom name="kcladdv1.tap" size="19624" crc="ef22742b" sha1="244beb6cb624eddbd6d42dca7058d11f4e9ce27f" offset="0" />
+				<rom name="kcladdv1.tap" size="19624" crc="ef22742b" sha1="244beb6cb624eddbd6d42dca7058d11f4e9ce27f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -670,7 +670,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="19882">
-				<rom name="kcladdv2.tap" size="19882" crc="3a5456c6" sha1="352c287d6466618ff86623eae077400e2af4cb0b" offset="0" />
+				<rom name="kcladdv2.tap" size="19882" crc="3a5456c6" sha1="352c287d6466618ff86623eae077400e2af4cb0b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -681,7 +681,7 @@
 		<publisher>STS</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="28525">
-				<rom name="mine-ii.tap" size="28525" crc="a562cf16" sha1="32d88949866f3b22781ed1d6f109d1dc8e448d1f" offset="0" />
+				<rom name="mine-ii.tap" size="28525" crc="a562cf16" sha1="32d88949866f3b22781ed1d6f109d1dc8e448d1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -692,7 +692,7 @@
 		<publisher>STS</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12400">
-				<rom name="perestro.tap" size="12400" crc="b2b8742c" sha1="8b436c729bb51a54270cabc5e0aa95469f7d51b7" offset="0" />
+				<rom name="perestro.tap" size="12400" crc="b2b8742c" sha1="8b436c729bb51a54270cabc5e0aa95469f7d51b7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -703,7 +703,7 @@
 		<publisher>wega-soft</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="29815">
-				<rom name="bigturn.tap" size="29815" crc="d6f9d416" sha1="3a17ec451a5db20a9d34d07ae891fd184adb73c5" offset="0" />
+				<rom name="bigturn.tap" size="29815" crc="d6f9d416" sha1="3a17ec451a5db20a9d34d07ae891fd184adb73c5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -715,7 +715,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="7885">
-				<rom name="bombswee.853" size="7885" crc="53dae558" sha1="a2a1c6d991bd257996f8c2235d43f72854df561d" offset="0" />
+				<rom name="bombswee.853" size="7885" crc="53dae558" sha1="a2a1c6d991bd257996f8c2235d43f72854df561d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -727,7 +727,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="20269">
-				<rom name="pharao.tap" size="20269" crc="393dc1a7" sha1="cef1a6009ebd8867aacfbd58124c530e37cdb652" offset="0" />
+				<rom name="pharao.tap" size="20269" crc="393dc1a7" sha1="cef1a6009ebd8867aacfbd58124c530e37cdb652"/>
 			</dataarea>
 		</part>
 	</software>
@@ -739,7 +739,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="27235">
-				<rom name="pharao3.853" size="27235" crc="839c71ee" sha1="a96d9a58d309199656c849e41925ce45aedfe285" offset="0" />
+				<rom name="pharao3.853" size="27235" crc="839c71ee" sha1="a96d9a58d309199656c849e41925ce45aedfe285"/>
 			</dataarea>
 		</part>
 	</software>
@@ -751,7 +751,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11497">
-				<rom name="thecastl.853" size="11497" crc="f1ac7017" sha1="4d317f82356e47a351e39ac496f857cac83d0e96" offset="0" />
+				<rom name="thecastl.853" size="11497" crc="f1ac7017" sha1="4d317f82356e47a351e39ac496f857cac83d0e96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -763,7 +763,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8659">
-				<rom name="pyramide.tap" size="8659" crc="cd321943" sha1="3511397028faa659bf107d4b7823d9d91ad642f0" offset="0" />
+				<rom name="pyramide.tap" size="8659" crc="cd321943" sha1="3511397028faa659bf107d4b7823d9d91ad642f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -775,7 +775,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8917">
-				<rom name="pyramide.853" size="8917" crc="104277cd" sha1="c479f02ced3ca7cc9ac64385bf8c353e72a60e22" offset="0" />
+				<rom name="pyramide.853" size="8917" crc="104277cd" sha1="c479f02ced3ca7cc9ac64385bf8c353e72a60e22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -786,7 +786,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5821">
-				<rom name="anaconda.tap" size="5821" crc="e058cac1" sha1="91de70a4ce3683f56d9cb20c325a66d4047ee16c" offset="0" />
+				<rom name="anaconda.tap" size="5821" crc="e058cac1" sha1="91de70a4ce3683f56d9cb20c325a66d4047ee16c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -797,7 +797,7 @@
 		<publisher>PAULIN</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9175">
-				<rom name="bellum.tap" size="9175" crc="f23fe8ab" sha1="df3747074b57a986ec5c07d329a4dcd3ee726958" offset="0" />
+				<rom name="bellum.tap" size="9175" crc="f23fe8ab" sha1="df3747074b57a986ec5c07d329a4dcd3ee726958"/>
 			</dataarea>
 		</part>
 	</software>
@@ -809,7 +809,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12013">
-				<rom name="breakout.854" size="12013" crc="ce3f515c" sha1="b99e3556357ed48e82a0fb2f0a2a609e4fe9d662" offset="0" />
+				<rom name="breakout.854" size="12013" crc="ce3f515c" sha1="b99e3556357ed48e82a0fb2f0a2a609e4fe9d662"/>
 			</dataarea>
 		</part>
 	</software>
@@ -821,7 +821,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12013">
-				<rom name="breakout.853" size="12013" crc="f43588a7" sha1="96f64f5240bfe1fee314177e5b276312ebaa0f9f" offset="0" />
+				<rom name="breakout.853" size="12013" crc="f43588a7" sha1="96f64f5240bfe1fee314177e5b276312ebaa0f9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -833,7 +833,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12013">
-				<rom name="pacman.853" size="12013" crc="40a98acc" sha1="c0275602cadb85423b27d16604df0a3bd5f89a2a" offset="0" />
+				<rom name="pacman.853" size="12013" crc="40a98acc" sha1="c0275602cadb85423b27d16604df0a3bd5f89a2a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -845,7 +845,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9949">
-				<rom name="labyrint(1).853" size="9949" crc="1075a152" sha1="6602bdfff15f67eccb21614ef5bf657e2f7c0f71" offset="0" />
+				<rom name="labyrint(1).853" size="9949" crc="1075a152" sha1="6602bdfff15f67eccb21614ef5bf657e2f7c0f71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -857,7 +857,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6466">
-				<rom name="heli4.tap" size="6466" crc="da4350cb" sha1="56a2676a0155165a453a19ad496fdf94144226ad" offset="0" />
+				<rom name="heli4.tap" size="6466" crc="da4350cb" sha1="56a2676a0155165a453a19ad496fdf94144226ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -869,7 +869,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6337">
-				<rom name="helicopt.853" size="6337" crc="bd9c1553" sha1="2b54233340a2288ebff78e5d33c8db6ba1b43063" offset="0" />
+				<rom name="helicopt.853" size="6337" crc="bd9c1553" sha1="2b54233340a2288ebff78e5d33c8db6ba1b43063"/>
 			</dataarea>
 		</part>
 	</software>
@@ -881,7 +881,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11368">
-				<rom name="mazes.tap" size="11368" crc="639f3e81" sha1="a5a805770e50ffcb1c5d6c5eec09609163c8ff56" offset="0" />
+				<rom name="mazes.tap" size="11368" crc="639f3e81" sha1="a5a805770e50ffcb1c5d6c5eec09609163c8ff56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -893,7 +893,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11239">
-				<rom name="mazes.853" size="11239" crc="9d11ff77" sha1="49e1d3c99849c5033aa6af2557d2f7c9f9838257" offset="0" />
+				<rom name="mazes.853" size="11239" crc="9d11ff77" sha1="49e1d3c99849c5033aa6af2557d2f7c9f9838257"/>
 			</dataarea>
 		</part>
 	</software>
@@ -905,7 +905,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9562">
-				<rom name="superski.853" size="9562" crc="7db8b38e" sha1="6fe09c9ac8e66f3cf16ca0771b5e6b787d13f95a" offset="0" />
+				<rom name="superski.853" size="9562" crc="7db8b38e" sha1="6fe09c9ac8e66f3cf16ca0771b5e6b787d13f95a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -917,7 +917,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="29557">
-				<rom name="bigfun.853" size="29557" crc="6dc80af4" sha1="a0e05a5200c07376e5387ac5144491ae532a3711" offset="0" />
+				<rom name="bigfun.853" size="29557" crc="6dc80af4" sha1="a0e05a5200c07376e5387ac5144491ae532a3711"/>
 			</dataarea>
 		</part>
 	</software>
@@ -929,7 +929,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="3499">
-				<rom name="wand.853" size="3499" crc="222e28b3" sha1="4e05543a4250e707169ee9f7514ab7408fd141c6" offset="0" />
+				<rom name="wand.853" size="3499" crc="222e28b3" sha1="4e05543a4250e707169ee9f7514ab7408fd141c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -940,7 +940,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="17818">
-				<rom name="burgbco.tap" size="17818" crc="71d71656" sha1="92045dd5d8d5e042377ef32598afc3ea34cd6d3b" offset="0" />
+				<rom name="burgbco.tap" size="17818" crc="71d71656" sha1="92045dd5d8d5e042377ef32598afc3ea34cd6d3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -952,7 +952,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="15625">
-				<rom name="bs-fv1.tap" size="15625" crc="98b32ec2" sha1="0cb42048a9ad31f3e29bbf8a6d605dc09dd0773d" offset="0" />
+				<rom name="bs-fv1.tap" size="15625" crc="98b32ec2" sha1="0cb42048a9ad31f3e29bbf8a6d605dc09dd0773d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -963,7 +963,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10723">
-				<rom name="bs-uvs.tap" size="10723" crc="b8deb73c" sha1="13f106a995c6986ce41cb2d8f76eb71b5c7add54" offset="0" />
+				<rom name="bs-uvs.tap" size="10723" crc="b8deb73c" sha1="13f106a995c6986ce41cb2d8f76eb71b5c7add54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -975,7 +975,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="22333">
-				<rom name="diamant.tap" size="22333" crc="251e32f6" sha1="2705a4212aa28fa92b0b0a1030c749609c1cb25b" offset="0" />
+				<rom name="diamant.tap" size="22333" crc="251e32f6" sha1="2705a4212aa28fa92b0b0a1030c749609c1cb25b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -987,7 +987,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="22462">
-				<rom name="diamant.853" size="22462" crc="1008dcf9" sha1="2b08a9259d41dce22b5121bb72c9cbc7923ac57e" offset="0" />
+				<rom name="diamant.853" size="22462" crc="1008dcf9" sha1="2b08a9259d41dce22b5121bb72c9cbc7923ac57e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -998,7 +998,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12803">
-				<rom name="bustle.tap" size="12803" crc="ac33ff49" sha1="0e49af8f87d59e97687396fa094705efce9a76e1" offset="0" />
+				<rom name="bustle.tap" size="12803" crc="ac33ff49" sha1="0e49af8f87d59e97687396fa094705efce9a76e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1010,7 +1010,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6095">
-				<rom name="hasewolf.855" size="6095" crc="e1ffba89" sha1="e12fae23777c764efafc7e16752cd02205fb1b0a" offset="0" />
+				<rom name="hasewolf.855" size="6095" crc="e1ffba89" sha1="e12fae23777c764efafc7e16752cd02205fb1b0a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1022,7 +1022,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5966">
-				<rom name="hasewolf.853" size="5966" crc="c46bf498" sha1="f1512da8cb0b83e99294903c6213dd2421aa9d3e" offset="0" />
+				<rom name="hasewolf.853" size="5966" crc="c46bf498" sha1="f1512da8cb0b83e99294903c6213dd2421aa9d3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1033,7 +1033,7 @@
 		<publisher>FD Soft</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6724">
-				<rom name="hibi.tap" size="6724" crc="a193b42f" sha1="84479d05d8fbb55d3ff5a600f17f9eef34a89888" offset="0" />
+				<rom name="hibi.tap" size="6724" crc="a193b42f" sha1="84479d05d8fbb55d3ff5a600f17f9eef34a89888"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1045,7 +1045,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10981">
-				<rom name="mrglobe.853" size="10981" crc="e23c29bf" sha1="de787829d24599b062e605eb389442487d517a6c" offset="0" />
+				<rom name="mrglobe.853" size="10981" crc="e23c29bf" sha1="de787829d24599b062e605eb389442487d517a6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1056,7 +1056,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14722">
-				<rom name="socob09r.tap" size="14722" crc="00a5a1f6" sha1="edd7fe9e76fb7d77ba75c6f2d11267caab2764a2" offset="0" />
+				<rom name="socob09r.tap" size="14722" crc="00a5a1f6" sha1="edd7fe9e76fb7d77ba75c6f2d11267caab2764a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1067,7 +1067,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14722">
-				<rom name="socob28r.tap" size="14722" crc="b8f0e12b" sha1="62e1edc9e029a19780ff99423ed3ea9bdd39a4fa" offset="0" />
+				<rom name="socob28r.tap" size="14722" crc="b8f0e12b" sha1="62e1edc9e029a19780ff99423ed3ea9bdd39a4fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1078,7 +1078,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="3628">
-				<rom name="sokoban.tap" size="3628" crc="05c53b83" sha1="2b6dd3d2813bc3eb5f02d70c763193ffe01baa56" offset="0" />
+				<rom name="sokoban.tap" size="3628" crc="05c53b83" sha1="2b6dd3d2813bc3eb5f02d70c763193ffe01baa56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1090,7 +1090,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14851">
-				<rom name="sokoban2.853" size="14851" crc="f228c01d" sha1="0f4d912869ec1a3c4dbcf74e483b71028da2639f" offset="0" />
+				<rom name="sokoban2.853" size="14851" crc="f228c01d" sha1="0f4d912869ec1a3c4dbcf74e483b71028da2639f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1101,7 +1101,7 @@
 		<publisher>Kurbelpower Megasoft</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12529">
-				<rom name="tetris2.tap" size="12529" crc="5997c57d" sha1="693e32a1da704cc3de3464a52dad0e321aec437a" offset="0" />
+				<rom name="tetris2.tap" size="12529" crc="5997c57d" sha1="693e32a1da704cc3de3464a52dad0e321aec437a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1113,7 +1113,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="16399">
-				<rom name="slider.tap" size="16399" crc="839fbdee" sha1="aba5f45fecd9cd1435b84082d278ce9d5b39c6e7" offset="0" />
+				<rom name="slider.tap" size="16399" crc="839fbdee" sha1="aba5f45fecd9cd1435b84082d278ce9d5b39c6e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1125,7 +1125,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="2983">
-				<rom name="snake.853" size="2983" crc="170c641f" sha1="e807096970b5cde67ce01c3ce3c83e1bdf6e1dd6" offset="0" />
+				<rom name="snake.853" size="2983" crc="170c641f" sha1="e807096970b5cde67ce01c3ce3c83e1bdf6e1dd6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1136,7 +1136,7 @@
 		<publisher>RJ-SOFT</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10594">
-				<rom name="snakes.tap" size="10594" crc="00fe872b" sha1="51c9d622551187d42bcd419c28bd1ab03c4fac87" offset="0" />
+				<rom name="snakes.tap" size="10594" crc="00fe872b" sha1="51c9d622551187d42bcd419c28bd1ab03c4fac87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1147,7 +1147,7 @@
 		<publisher>A.G. Soft</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12787">
-				<rom name="netz.tap" size="12787" crc="d66265b0" sha1="d51140f971d271d798efa2a3d16344466a26dfe6" offset="0" />
+				<rom name="netz.tap" size="12787" crc="d66265b0" sha1="d51140f971d271d798efa2a3d16344466a26dfe6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1158,7 +1158,7 @@
 		<publisher>MazeSoft</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="17818">
-				<rom name="rana.tap" size="17818" crc="b19246e4" sha1="0bddd539a392993451db9e9892d1056b64c85afa" offset="0" />
+				<rom name="rana.tap" size="17818" crc="b19246e4" sha1="0bddd539a392993451db9e9892d1056b64c85afa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1170,7 +1170,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8143">
-				<rom name="patience.tap" size="8143" crc="e9e8c5f0" sha1="ceec0a4ac9e7a95bdc6038f3dd2881ea52477a96" offset="0" />
+				<rom name="patience.tap" size="8143" crc="e9e8c5f0" sha1="ceec0a4ac9e7a95bdc6038f3dd2881ea52477a96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1182,7 +1182,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="1822">
-				<rom name="parcour.853" size="1822" crc="685cf2f1" sha1="1b95f7a8bcee4868760db470b23c33b007dd8c87" offset="0" />
+				<rom name="parcour.853" size="1822" crc="685cf2f1" sha1="1b95f7a8bcee4868760db470b23c33b007dd8c87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1194,7 +1194,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="18850">
-				<rom name="schatz.853" size="18850" crc="ed5c923e" sha1="1e45caca8288f74d827372908ff0da97fa3eefb5" offset="0" />
+				<rom name="schatz.853" size="18850" crc="ed5c923e" sha1="1e45caca8288f74d827372908ff0da97fa3eefb5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1206,7 +1206,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="4015">
-				<rom name="flatter.853" size="4015" crc="498b00f4" sha1="ad72109e44e9b5880381ae461a1c9b8a60f03cea" offset="0" />
+				<rom name="flatter.853" size="4015" crc="498b00f4" sha1="ad72109e44e9b5880381ae461a1c9b8a60f03cea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1217,7 +1217,7 @@
 		<publisher>Lehni</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8530">
-				<rom name="dschungl.tap" size="8530" crc="7733ab9e" sha1="0892dd955a315744fd46c115f6de7c15d6eaebc7" offset="0" />
+				<rom name="dschungl.tap" size="8530" crc="7733ab9e" sha1="0892dd955a315744fd46c115f6de7c15d6eaebc7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1228,7 +1228,7 @@
 		<publisher>Boe-Mie</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="20785">
-				<rom name="enterpri.tap" size="20785" crc="763e79b3" sha1="c3598ca3b349c2c6480378fb1d4bd7031863689e" offset="0" />
+				<rom name="enterpri.tap" size="20785" crc="763e79b3" sha1="c3598ca3b349c2c6480378fb1d4bd7031863689e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1240,7 +1240,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9691">
-				<rom name="eier.tap" size="9691" crc="9c95457c" sha1="e63c6408f4ce1b3c9fae37c81cda74511a5b2263" offset="0" />
+				<rom name="eier.tap" size="9691" crc="9c95457c" sha1="e63c6408f4ce1b3c9fae37c81cda74511a5b2263"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1252,7 +1252,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9949">
-				<rom name="eierfang.853" size="9949" crc="6f7beb33" sha1="893e360846a8ba8370aa8b9c0aa9aee3bcc0a109" offset="0" />
+				<rom name="eierfang.853" size="9949" crc="6f7beb33" sha1="893e360846a8ba8370aa8b9c0aa9aee3bcc0a109"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1265,7 +1265,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="20140">
-				<rom name="fya.tap" size="20140" crc="b7c99855" sha1="9e987fa20b9564ba06bfcd5774358c9f1b44345b" offset="0" />
+				<rom name="fya.tap" size="20140" crc="b7c99855" sha1="9e987fa20b9564ba06bfcd5774358c9f1b44345b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1276,7 +1276,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="32266">
-				<rom name="manager.tap" size="32266" crc="0cda4b36" sha1="3e8ad986fb6a65846fdb517e9a018bcf17029e49" offset="0" />
+				<rom name="manager.tap" size="32266" crc="0cda4b36" sha1="3e8ad986fb6a65846fdb517e9a018bcf17029e49"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1287,7 +1287,7 @@
 		<publisher>Bö Games</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9820">
-				<rom name="galaxie.tap" size="9820" crc="ff94f26e" sha1="8dbdd43bef45fc90b797b7e5e1af0ff31d85ac27" offset="0" />
+				<rom name="galaxie.tap" size="9820" crc="ff94f26e" sha1="8dbdd43bef45fc90b797b7e5e1af0ff31d85ac27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1299,7 +1299,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5579">
-				<rom name="geisterf.853" size="5579" crc="c8b7e3fb" sha1="e4e2857cd257952423674520293ff03bb412b980" offset="0" />
+				<rom name="geisterf.853" size="5579" crc="c8b7e3fb" sha1="e4e2857cd257952423674520293ff03bb412b980"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1310,7 +1310,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="4273">
-				<rom name="ghost.tap" size="4273" crc="a753fb4e" sha1="68a404fc90e3898e4a582e9c33b512d6a886a9fc" offset="0" />
+				<rom name="ghost.tap" size="4273" crc="a753fb4e" sha1="68a404fc90e3898e4a582e9c33b512d6a886a9fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1322,7 +1322,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="2741">
-				<rom name="jack.853" size="2741" crc="8f75e8cd" sha1="3bb3bc728d462dbb9471020eecd0f4b823938227" offset="0" />
+				<rom name="jack.853" size="2741" crc="8f75e8cd" sha1="3bb3bc728d462dbb9471020eecd0f4b823938227"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1334,7 +1334,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10723">
-				<rom name="duo.853" size="10723" crc="f6846b3a" sha1="308a300cebf4733480bf7a1671bd0b4fa69ef246" offset="0" />
+				<rom name="duo.853" size="10723" crc="f6846b3a" sha1="308a300cebf4733480bf7a1671bd0b4fa69ef246"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1346,7 +1346,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5563">
-				<rom name="goff.853" size="5563" crc="8fdeef01" sha1="56626343ecbc0385a74cfb5a3d60eb7c1f27ef65" offset="0" />
+				<rom name="goff.853" size="5563" crc="8fdeef01" sha1="56626343ecbc0385a74cfb5a3d60eb7c1f27ef65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1357,7 +1357,7 @@
 		<publisher>Gauß-Service</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="15883">
-				<rom name="p-fv1.tap" size="15883" crc="bc59689e" sha1="14d5479e8ac6eb593e87c06ad4048cea74d37a0a" offset="0" />
+				<rom name="p-fv1.tap" size="15883" crc="bc59689e" sha1="14d5479e8ac6eb593e87c06ad4048cea74d37a0a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1368,7 +1368,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5305">
-				<rom name="katzmaus.tap" size="5305" crc="72753166" sha1="f9d1568df56725486a29a3acef35dd0fce5f1449" offset="0" />
+				<rom name="katzmaus.tap" size="5305" crc="72753166" sha1="f9d1568df56725486a29a3acef35dd0fce5f1449"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1380,7 +1380,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="3886">
-				<rom name="irrgarte.853" size="3886" crc="88ff0a7f" sha1="38f06328caec63fd00a3882b4bcfba8dfd18a1c2" offset="0" />
+				<rom name="irrgarte.853" size="3886" crc="88ff0a7f" sha1="38f06328caec63fd00a3882b4bcfba8dfd18a1c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1392,7 +1392,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="4402">
-				<rom name="lunar.853" size="4402" crc="33ef333c" sha1="d506d86ecd8dcb141e9e85bd6643a9c7561af422" offset="0" />
+				<rom name="lunar.853" size="4402" crc="33ef333c" sha1="d506d86ecd8dcb141e9e85bd6643a9c7561af422"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1404,7 +1404,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5047">
-				<rom name="max.853" size="5047" crc="9540120d" sha1="c761cb42dcc92bc4272ab5d4dcc1e0296442f253" offset="0" />
+				<rom name="max.853" size="5047" crc="9540120d" sha1="c761cb42dcc92bc4272ab5d4dcc1e0296442f253"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1415,7 +1415,7 @@
 		<publisher>PAULIN</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14851">
-				<rom name="mach1.tap" size="14851" crc="a60451b3" sha1="465e7e4dafc701adcf6bac59e9ffd61eec7ad34e" offset="0" />
+				<rom name="mach1.tap" size="14851" crc="a60451b3" sha1="465e7e4dafc701adcf6bac59e9ffd61eec7ad34e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1426,7 +1426,7 @@
 		<publisher>PAULIN</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12529">
-				<rom name="maxiall.tap" size="12529" crc="51693a8f" sha1="c36d3c8ef1cb91a70e7287d2aa8e2178cf8360d8" offset="0" />
+				<rom name="maxiall.tap" size="12529" crc="51693a8f" sha1="c36d3c8ef1cb91a70e7287d2aa8e2178cf8360d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1437,7 +1437,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14077">
-				<rom name="memory.tap" size="14077" crc="b8fe8735" sha1="10219024b637e9a0b62029a977066f217a7836b5" offset="0" />
+				<rom name="memory.tap" size="14077" crc="b8fe8735" sha1="10219024b637e9a0b62029a977066f217a7836b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1449,7 +1449,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10223">
-				<rom name="raus.853" size="10223" crc="9fd10677" sha1="3e6f45a1118206688c9d05a5ffc36371ee797c9b" offset="0" />
+				<rom name="raus.853" size="10223" crc="9fd10677" sha1="3e6f45a1118206688c9d05a5ffc36371ee797c9b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1460,7 +1460,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12400">
-				<rom name="minigolf.tap" size="12400" crc="418452d2" sha1="3562dec33de72b7378c4ca337bc6ea26f69a8bfa" offset="0" />
+				<rom name="minigolf.tap" size="12400" crc="418452d2" sha1="3562dec33de72b7378c4ca337bc6ea26f69a8bfa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1471,7 +1471,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="21430">
-				<rom name="mensch2.tap" size="21430" crc="8afc1df5" sha1="4fb4b85b8c6d75125ce67e67cd8629bbf40ac375" offset="0" />
+				<rom name="mensch2.tap" size="21430" crc="8afc1df5" sha1="4fb4b85b8c6d75125ce67e67cd8629bbf40ac375"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1482,7 +1482,7 @@
 		<publisher>Gauß-Service</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="12400">
-				<rom name="nuclear2.tap" size="12400" crc="664467ae" sha1="1d2d8f58700f0a669843ef66d9dbbcb2abb6beed" offset="0" />
+				<rom name="nuclear2.tap" size="12400" crc="664467ae" sha1="1d2d8f58700f0a669843ef66d9dbbcb2abb6beed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1493,7 +1493,7 @@
 		<publisher>PAULIN</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6079">
-				<rom name="rallye.tap" size="6079" crc="cc00168a" sha1="980a5375237fabb206ad845306ed66683edbfeea" offset="0" />
+				<rom name="rallye.tap" size="6079" crc="cc00168a" sha1="980a5375237fabb206ad845306ed66683edbfeea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1504,7 +1504,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8401">
-				<rom name="schiess.tap" size="8401" crc="40fd9188" sha1="40c634f477183204cb979a71d24d19cfde168b79" offset="0" />
+				<rom name="schiess.tap" size="8401" crc="40fd9188" sha1="40c634f477183204cb979a71d24d19cfde168b79"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1515,7 +1515,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6079">
-				<rom name="auto4.tap" size="6079" crc="17139b8e" sha1="77b58a020bd5b2ced1a1cf68746bc687114b3ac1" offset="0" />
+				<rom name="auto4.tap" size="6079" crc="17139b8e" sha1="77b58a020bd5b2ced1a1cf68746bc687114b3ac1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1527,7 +1527,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8917">
-				<rom name="goldrush.853" size="8917" crc="a7f672ba" sha1="0da1f7fc5f47fa861b549541725dfc1cd5298cff" offset="0" />
+				<rom name="goldrush.853" size="8917" crc="a7f672ba" sha1="0da1f7fc5f47fa861b549541725dfc1cd5298cff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1538,7 +1538,7 @@
 		<publisher>Cancer Software</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="16915">
-				<rom name="diam.tap" size="16915" crc="4e91c783" sha1="9c4ad2db66ea2e38eed320a42476270df48a82f2" offset="0" />
+				<rom name="diam.tap" size="16915" crc="4e91c783" sha1="9c4ad2db66ea2e38eed320a42476270df48a82f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1549,7 +1549,7 @@
 		<publisher>Fe</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="4660">
-				<rom name="3d-othel.tap" size="4660" crc="f6d23d48" sha1="353bc813e18d3719a9a9adaf9be5742fd6b6a1b5" offset="0" />
+				<rom name="3d-othel.tap" size="4660" crc="f6d23d48" sha1="353bc813e18d3719a9a9adaf9be5742fd6b6a1b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1561,7 +1561,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11255">
-				<rom name="poligon.tap" size="11255" crc="8a06456c" sha1="fb6078596231ed687855be6870b0a210d7fa55dc" offset="0" />
+				<rom name="poligon.tap" size="11255" crc="8a06456c" sha1="fb6078596231ed687855be6870b0a210d7fa55dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1572,7 +1572,7 @@
 		<publisher>DK-Soft</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="26203">
-				<rom name="sahara.tap" size="26203" crc="f11b8f4c" sha1="ceac34c4a543ae854f7118ddc4bcca3128e13aa9" offset="0" />
+				<rom name="sahara.tap" size="26203" crc="f11b8f4c" sha1="ceac34c4a543ae854f7118ddc4bcca3128e13aa9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1583,7 +1583,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="3241">
-				<rom name="alliens.853" size="3241" crc="5d8e1520" sha1="b979c84327bada0ecba7a84b1876871736f4d151" offset="0" />
+				<rom name="alliens.853" size="3241" crc="5d8e1520" sha1="b979c84327bada0ecba7a84b1876871736f4d151"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1595,7 +1595,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="4418">
-				<rom name="mineswp.tap" size="4418" crc="4a725d04" sha1="b6a88ca082491c381867e1d35765ef3da3167f17" offset="0" />
+				<rom name="mineswp.tap" size="4418" crc="4a725d04" sha1="b6a88ca082491c381867e1d35765ef3da3167f17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1607,7 +1607,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="29041">
-				<rom name="grandpri.853" size="29041" crc="a1d8aa8d" sha1="3c6b9a92cc591e59f8d2cf30c6e1fc4c2d074461" offset="0" />
+				<rom name="grandpri.853" size="29041" crc="a1d8aa8d" sha1="3c6b9a92cc591e59f8d2cf30c6e1fc4c2d074461"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1619,7 +1619,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="28267">
-				<rom name="castle.tap" size="28267" crc="19f3047b" sha1="dd8af991d3d9b887c5850449c8c969258a49708c" offset="0" />
+				<rom name="castle.tap" size="28267" crc="19f3047b" sha1="dd8af991d3d9b887c5850449c8c969258a49708c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1630,7 +1630,7 @@
 		<publisher>Adler-Software</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="26332">
-				<rom name="jaeger.tap" size="26332" crc="af10e89e" sha1="64a439f31cf5cef741133e70b66be341297e8999" offset="0" />
+				<rom name="jaeger.tap" size="26332" crc="af10e89e" sha1="64a439f31cf5cef741133e70b66be341297e8999"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1642,7 +1642,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="24397">
-				<rom name="tennis.tap" size="24397" crc="fc92f97d" sha1="132743016df213695a323a2fdd94c0145dc59b61" offset="0" />
+				<rom name="tennis.tap" size="24397" crc="fc92f97d" sha1="132743016df213695a323a2fdd94c0145dc59b61"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1654,7 +1654,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="18108">
-				<rom name="seawar.853" size="18108" crc="e1357880" sha1="571ba3d060da0d9d788633329718dbe2ac32d07f" offset="0" />
+				<rom name="seawar.853" size="18108" crc="e1357880" sha1="571ba3d060da0d9d788633329718dbe2ac32d07f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1665,7 +1665,7 @@
 		<publisher>Alro Software</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="24397">
-				<rom name="dallas.tap" size="24397" crc="7c94b462" sha1="a67bc839d41c2bf071d55f6c1b49b1f05febe17a" offset="0" />
+				<rom name="dallas.tap" size="24397" crc="7c94b462" sha1="a67bc839d41c2bf071d55f6c1b49b1f05febe17a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1676,7 +1676,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="25429">
-				<rom name="paranoia.tap" size="25429" crc="18f9c54f" sha1="2c06415d00747a128c4d64c5f69c93ee160eacdf" offset="0" />
+				<rom name="paranoia.tap" size="25429" crc="18f9c54f" sha1="2c06415d00747a128c4d64c5f69c93ee160eacdf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1691,7 +1691,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11900">
-				<rom name="lektion1.tap" size="11900" crc="8ca8f79f" sha1="b00dd5ec7bbd48cfd5e4204ee3d986a63cb0fdd8" offset="0" />
+				<rom name="lektion1.tap" size="11900" crc="8ca8f79f" sha1="b00dd5ec7bbd48cfd5e4204ee3d986a63cb0fdd8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1703,7 +1703,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11771">
-				<rom name="lektion2.tap" size="11771" crc="9877089c" sha1="055dca67c33f9478645b37e13edc2c286c624839" offset="0" />
+				<rom name="lektion2.tap" size="11771" crc="9877089c" sha1="055dca67c33f9478645b37e13edc2c286c624839"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1715,7 +1715,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10094">
-				<rom name="lektion3.tap" size="10094" crc="691e2532" sha1="0196a792fd46433cec1067d08521b528137853df" offset="0" />
+				<rom name="lektion3.tap" size="10094" crc="691e2532" sha1="0196a792fd46433cec1067d08521b528137853df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1727,7 +1727,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8417">
-				<rom name="lektion4.tap" size="8417" crc="0b60b8a7" sha1="288c9548077b87f1ea8740ac2ae9547f147c48d9" offset="0" />
+				<rom name="lektion4.tap" size="8417" crc="0b60b8a7" sha1="288c9548077b87f1ea8740ac2ae9547f147c48d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1739,7 +1739,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="8546">
-				<rom name="lektion5.tap" size="8546" crc="9e58e690" sha1="2be698a4cb81d7665a8d200c9737cb70515ca5be" offset="0" />
+				<rom name="lektion5.tap" size="8546" crc="9e58e690" sha1="2be698a4cb81d7665a8d200c9737cb70515ca5be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1751,7 +1751,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9836">
-				<rom name="lektion6.tap" size="9836" crc="146a52c6" sha1="4cb6e2f11acd87937661ed44b6e2461a6dc5afc9" offset="0" />
+				<rom name="lektion6.tap" size="9836" crc="146a52c6" sha1="4cb6e2f11acd87937661ed44b6e2461a6dc5afc9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1763,7 +1763,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11771">
-				<rom name="lektion7.tap" size="11771" crc="1e88e985" sha1="75251d20b0c828e2b8ac0c2f45803a980a898866" offset="0" />
+				<rom name="lektion7.tap" size="11771" crc="1e88e985" sha1="75251d20b0c828e2b8ac0c2f45803a980a898866"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1775,7 +1775,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10223">
-				<rom name="lektion8.tap" size="10223" crc="80710860" sha1="33cdbf6ded26d5a171d0dec30c490b7820e0ea3f" offset="0" />
+				<rom name="lektion8.tap" size="10223" crc="80710860" sha1="33cdbf6ded26d5a171d0dec30c490b7820e0ea3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1787,7 +1787,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11642">
-				<rom name="lektion9.tap" size="11642" crc="dedfbd0f" sha1="eed099bcbd3821aa96673e19d8859bc4fd44ca00" offset="0" />
+				<rom name="lektion9.tap" size="11642" crc="dedfbd0f" sha1="eed099bcbd3821aa96673e19d8859bc4fd44ca00"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1799,7 +1799,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10481">
-				<rom name="lektiona.tap" size="10481" crc="9068c9a2" sha1="1f7c6cc1338913d6ad9fb19d805ff1d7bf6ee316" offset="0" />
+				<rom name="lektiona.tap" size="10481" crc="9068c9a2" sha1="1f7c6cc1338913d6ad9fb19d805ff1d7bf6ee316"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1811,7 +1811,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10868">
-				<rom name="lektionb.tap" size="10868" crc="bf193708" sha1="60e3f6f537df146fc717997f5cefe40849102c5a" offset="0" />
+				<rom name="lektionb.tap" size="10868" crc="bf193708" sha1="60e3f6f537df146fc717997f5cefe40849102c5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1823,7 +1823,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="15512">
-				<rom name="lektionc.tap" size="15512" crc="a2e5610b" sha1="c6bebd0ce40e500feb506926e7ed65b239295ce2" offset="0" />
+				<rom name="lektionc.tap" size="15512" crc="a2e5610b" sha1="c6bebd0ce40e500feb506926e7ed65b239295ce2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1835,7 +1835,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5176">
-				<rom name="fourpu.tap" size="5176" crc="fe175330" sha1="50c682bfa2adc5497cf807d965ed45f7fed0a20e" offset="0" />
+				<rom name="fourpu.tap" size="5176" crc="fe175330" sha1="50c682bfa2adc5497cf807d965ed45f7fed0a20e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1847,7 +1847,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5047">
-				<rom name="fourfu.tap" size="5047" crc="afe00e43" sha1="3562d7c7e6bdb618dd70d6fd85c856c664d2a96b" offset="0" />
+				<rom name="fourfu.tap" size="5047" crc="afe00e43" sha1="3562d7c7e6bdb618dd70d6fd85c856c664d2a96b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1859,7 +1859,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="5434">
-				<rom name="fourko.tap" size="5434" crc="13caeca4" sha1="727b345c587ddc2243b6002097db4408b8e41baa" offset="0" />
+				<rom name="fourko.tap" size="5434" crc="13caeca4" sha1="727b345c587ddc2243b6002097db4408b8e41baa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1871,7 +1871,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="4144">
-				<rom name="fft.tap" size="4144" crc="515f9452" sha1="5924dcd5886434636d6a7feb218ca68d340dd610" offset="0" />
+				<rom name="fft.tap" size="4144" crc="515f9452" sha1="5924dcd5886434636d6a7feb218ca68d340dd610"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1882,7 +1882,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="15496">
-				<rom name="lexikon.tap" size="15496" crc="e745a717" sha1="5e9fef67c6494d56525b6aa47b321d002e1dd29a" offset="0" />
+				<rom name="lexikon.tap" size="15496" crc="e745a717" sha1="5e9fef67c6494d56525b6aa47b321d002e1dd29a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1894,7 +1894,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13561">
-				<rom name="kcplus.tap" size="13561" crc="5af3b84d" sha1="d71a8e20087f543055fbfd11004eca676352fe84" offset="0" />
+				<rom name="kcplus.tap" size="13561" crc="5af3b84d" sha1="d71a8e20087f543055fbfd11004eca676352fe84"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1906,7 +1906,7 @@
 		<publisher>AKKU</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="26461">
-				<rom name="painter_.854" size="26461" crc="46f22145" sha1="af62e0611098640c0ba35a83f9acfd4965c181f5" offset="0" />
+				<rom name="painter_.854" size="26461" crc="46f22145" sha1="af62e0611098640c0ba35a83f9acfd4965c181f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1918,7 +1918,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10094">
-				<rom name="wp1989.tap" size="10094" crc="acf1e9f8" sha1="d4dfa399800896d28aaf39b697d18625bc3504fe" offset="0" />
+				<rom name="wp1989.tap" size="10094" crc="acf1e9f8" sha1="d4dfa399800896d28aaf39b697d18625bc3504fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1930,7 +1930,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9965">
-				<rom name="wp1986v1.tap" size="9965" crc="80a83f4f" sha1="b253f9e13d160c40536d7dcb2862b184a68c4781" offset="0" />
+				<rom name="wp1986v1.tap" size="9965" crc="80a83f4f" sha1="b253f9e13d160c40536d7dcb2862b184a68c4781"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1942,7 +1942,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9191">
-				<rom name="wp1986v2.tap" size="9191" crc="793f53a3" sha1="e6e3a1328042bf4a78c429395b9c87b5244b6154" offset="0" />
+				<rom name="wp1986v2.tap" size="9191" crc="793f53a3" sha1="e6e3a1328042bf4a78c429395b9c87b5244b6154"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1964,7 +1964,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="39103">
-				<rom name="spiele1m.tap" size="39103" crc="2c46887f" sha1="156720693c0b94b960e3a9113c4a45fca2d45299" offset="0" />
+				<rom name="spiele1m.tap" size="39103" crc="2c46887f" sha1="156720693c0b94b960e3a9113c4a45fca2d45299"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1983,7 +1983,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="42328">
-				<rom name="spiele2m.tap" size="42328" crc="5b87055a" sha1="7f6a13950bd9c201f4c86319d67987c75ba487e3" offset="0" />
+				<rom name="spiele2m.tap" size="42328" crc="5b87055a" sha1="7f6a13950bd9c201f4c86319d67987c75ba487e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2002,7 +2002,7 @@
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="44650">
-				<rom name="spiele3m.tap" size="44650" crc="07c91677" sha1="e4bed077974604fe50867ba98490815b1a3e42af" offset="0" />
+				<rom name="spiele3m.tap" size="44650" crc="07c91677" sha1="e4bed077974604fe50867ba98490815b1a3e42af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2015,7 +2015,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="24655">
-				<rom name="skymaste.853" size="24655" crc="01ddcf02" sha1="bb79611b66ad7b661aad6f11f66ea3636243e77a" offset="0" />
+				<rom name="skymaste.853" size="24655" crc="01ddcf02" sha1="bb79611b66ad7b661aad6f11f66ea3636243e77a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2028,7 +2028,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="28912">
-				<rom name="sport3.853" size="28912" crc="7365f470" sha1="11aa881461a4508a98d96548372f578d9905098e" offset="0" />
+				<rom name="sport3.853" size="28912" crc="7365f470" sha1="11aa881461a4508a98d96548372f578d9905098e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2040,7 +2040,7 @@
 		<publisher>Bö Games</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="28267">
-				<rom name="spiele1.tap" size="28267" crc="8a35d26c" sha1="762569355df5fb595dd275e278f7a16394edcc68" offset="0" />
+				<rom name="spiele1.tap" size="28267" crc="8a35d26c" sha1="762569355df5fb595dd275e278f7a16394edcc68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2052,7 +2052,7 @@
 		<publisher>Bö Games</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="28783">
-				<rom name="spiele2.tap" size="28783" crc="55e2025d" sha1="033aaa07b6dc1c23d37bcfaf70f0fe12d37b7047" offset="0" />
+				<rom name="spiele2.tap" size="28783" crc="55e2025d" sha1="033aaa07b6dc1c23d37bcfaf70f0fe12d37b7047"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2064,7 +2064,7 @@
 		<publisher>Bö Games</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="25429">
-				<rom name="spiele3.tap" size="25429" crc="f1fe5118" sha1="c19abb948bc957630e72ef27d53eaa3b7bbe4461" offset="0" />
+				<rom name="spiele3.tap" size="25429" crc="f1fe5118" sha1="c19abb948bc957630e72ef27d53eaa3b7bbe4461"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2077,7 +2077,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13819">
-				<rom name="spiele1k.853" size="13819" crc="4ed6ccd9" sha1="f5e5ba41a6d69c0dc034c5524e9b1b78016cb12e" offset="0" />
+				<rom name="spiele1k.853" size="13819" crc="4ed6ccd9" sha1="f5e5ba41a6d69c0dc034c5524e9b1b78016cb12e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2090,7 +2090,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9949">
-				<rom name="spiele2k.853" size="9949" crc="2e5d9b10" sha1="7ef4100ddd003056abc7a27f6d8a788ce01d09d8" offset="0" />
+				<rom name="spiele2k.853" size="9949" crc="2e5d9b10" sha1="7ef4100ddd003056abc7a27f6d8a788ce01d09d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2103,7 +2103,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="11239">
-				<rom name="spiele3k.853" size="11239" crc="1683b97e" sha1="c09a68765471e2ec9e0ce6c606155dfb7b282d09" offset="0" />
+				<rom name="spiele3k.853" size="11239" crc="1683b97e" sha1="c09a68765471e2ec9e0ce6c606155dfb7b282d09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2115,7 +2115,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="29815">
-				<rom name="games.tap" size="29815" crc="5e6dc04f" sha1="a1837b14723ed5d1969cace5452787567f238e77" offset="0" />
+				<rom name="games.tap" size="29815" crc="5e6dc04f" sha1="a1837b14723ed5d1969cace5452787567f238e77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2128,7 +2128,7 @@
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="16399">
-				<rom name="action.853" size="16399" crc="34f28ba8" sha1="2720d6faca5b7f999b84a034a972dc754a296160" offset="0" />
+				<rom name="action.853" size="16399" crc="34f28ba8" sha1="2720d6faca5b7f999b84a034a972dc754a296160"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2141,7 +2141,7 @@
 		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="20398">
-				<rom name="action_4.tap" size="20398" crc="5ec56334" sha1="47728fd1886518eea6b17aa2b0ea020fc16b4b3d" offset="0" />
+				<rom name="action_4.tap" size="20398" crc="5ec56334" sha1="47728fd1886518eea6b17aa2b0ea020fc16b4b3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2153,7 +2153,7 @@
 		<publisher>Bö Games</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="23494">
-				<rom name="animals.tap" size="23494" crc="61ab1ad3" sha1="74ae9ea8bae234933848dc3c046d6216e4a0036f" offset="0" />
+				<rom name="animals.tap" size="23494" crc="61ab1ad3" sha1="74ae9ea8bae234933848dc3c046d6216e4a0036f"/>
 			</dataarea>
 		</part>
 	</software>

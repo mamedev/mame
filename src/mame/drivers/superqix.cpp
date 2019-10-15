@@ -226,12 +226,12 @@ The MCU acts this way:
 
 **************************************************************************/
 
-CUSTOM_INPUT_MEMBER(superqix_state::fromz80_semaphore_input_r)
+READ_LINE_MEMBER(superqix_state::fromz80_semaphore_input_r)
 {
 	return (m_z80_has_written ? 1 : 0);
 }
 
-CUSTOM_INPUT_MEMBER(superqix_state::frommcu_semaphore_input_r)
+READ_LINE_MEMBER(superqix_state::frommcu_semaphore_input_r)
 {
 	return (m_mcu_has_written ? 1 : 0);
 }
@@ -991,7 +991,7 @@ void superqix_state_base::main_map(address_map &map)
 void hotsmash_state::pbillian_port_map(address_map &map)
 { // used by both pbillian and hotsmash
 	map(0x0000, 0x01ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 6116 sram near the jamma connector, "COLOR RAM" during POST
-	//AM_RANGE(0x0200, 0x03ff) AM_RAM // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
+	//map(0x0200, 0x03ff).ram(); // looks like leftover crap from a dev board which had double the color ram? zeroes written here, never read.
 	map(0x0401, 0x0401).r(m_ay1, FUNC(ay8910_device::data_r)); // ay i/o ports connect to "SYSTEM" and "BUTTONS" inputs which includes mcu semaphore flags
 	map(0x0402, 0x0403).w(m_ay1, FUNC(ay8910_device::data_address_w));
 	map(0x0408, 0x0408).rw(FUNC(hotsmash_state::hotsmash_z80_mcu_r), FUNC(hotsmash_state::hotsmash_z80_mcu_w));
@@ -1016,7 +1016,7 @@ void superqix_state::sqix_port_map(address_map &map)
 	// following two ranges are made of two 64kx4 4464 DRAM chips at 9L and 9M, "GRAPHICS RAM" or "GRP BIT" if there is an error in POST
 	map(0x0800, 0x77ff).ram().w(FUNC(superqix_state::superqix_bitmapram_w)).share("bitmapram");
 	map(0x8800, 0xf7ff).ram().w(FUNC(superqix_state::superqix_bitmapram2_w)).share("bitmapram2");
-	//AM_RANGE(0xf970, 0xfa6f) AM_RAM // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
+	//map(0xf970, 0xfa6f).ram(); // this is probably a portion of the remainder of the chips at 9L and 9M which isn't used or tested for graphics ram
 }
 
 void superqix_state::sqix_8031_map(address_map &map)
@@ -1093,7 +1093,7 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // P2 fire (M powerup) + high score initials
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(hotsmash_state, pbillian_semaphore_input_r)  // Z80 and MCU Semaphores
 
 	PORT_START("PLUNGER1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -1183,7 +1183,7 @@ static INPUT_PORTS_START( hotsmash )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  // p2 button 2, unused on this game?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hotsmash_state, pbillian_semaphore_input_r, nullptr)  /* Z80 and MCU Semaphores */
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(hotsmash_state, pbillian_semaphore_input_r)  // Z80 and MCU Semaphores
 
 	PORT_START("PLUNGER1")  // plunger isn't present on hotsmash though the pins exist for it
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
@@ -1261,7 +1261,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) // JAMMA #R ("Service")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT ) // JAMMA #S ("Tilt")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) // JAMMA #15 ("Test")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, fromz80_semaphore_input_r, nullptr)  // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(superqix_state, fromz80_semaphore_input_r)  // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
 
 	PORT_START("P1") /* AY-3-8910 #1 @3P Port A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY // JAMMA #18
@@ -1280,8 +1280,8 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL // JAMMA #Y
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // JAMMA #Z
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // JAMMA #a
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, frommcu_semaphore_input_r, nullptr) // 74ls174 @1J pin 5 (Q1), this is the mcu->z80 semaphore
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, superqix_state, fromz80_semaphore_input_r, nullptr) // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(superqix_state, frommcu_semaphore_input_r) // 74ls174 @1J pin 5 (Q1), this is the mcu->z80 semaphore
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(superqix_state, fromz80_semaphore_input_r) // 74ls74 @C2 pin 8 (/Q2), this is the z80->mcu semaphore
 
 INPUT_PORTS_END
 

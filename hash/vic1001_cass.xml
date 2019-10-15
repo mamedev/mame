@@ -9,7 +9,7 @@
 		<publisher>Mastertronic</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="309826">
-				<rom name="3d maze_0013.tap" size="309826" crc="d3b47af3" sha1="8376a9da24bdf3089567978852fed544ed6d1611" offset="0" />
+				<rom name="3d maze_0013.tap" size="309826" crc="d3b47af3" sha1="8376a9da24bdf3089567978852fed544ed6d1611"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +22,7 @@
 		<!-- Side A: PHONEME EDITOR/D, PHONEME SPEAK/D are not dumped -->
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="9356430">
-				<rom name="speakeasy (1983)(personal peripheral products).wav" size="9356430" crc="813d35a5" sha1="d8b9e1143f766f2000aa0d8c4a2984b886b81dbc" status="baddump" offset="0" />
+				<rom name="speakeasy (1983)(personal peripheral products).wav" size="9356430" crc="813d35a5" sha1="d8b9e1143f766f2000aa0d8c4a2984b886b81dbc" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

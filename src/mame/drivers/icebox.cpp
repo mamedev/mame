@@ -108,6 +108,9 @@ on the boards to say which of the four selects it responds to.
 The three byte fifo and a register jams a zero onto the data bus (when?), and we have the source for the CP/M version
 of the debugger/boot prom to see how interrupt handling occurs.
 
+When the floppy controller generates a DRQ or INTRQ it also generates a Z80 INT, which uses IM 0
+and forces a NOP (00) onto the bus. This allows firmware and/or disk routines to resume after a HALT.
+
 I can sort of piece together what Terse implements and what it evolved from. I think it started as the Caltech FORTH
 implemented for the PDP-10 and 11 with a lot of words stripped out, and others added. This was submitted to DECUS as
 submission 11-232 but much of the early DECUS stuff has been lost, so I've not been able to find a copy to see how the
@@ -176,6 +179,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void machine_reset() override;
@@ -286,8 +290,15 @@ void icebox_state::port_f1_w(u8 data)
 	m_fdc->dden_w(1);                 // single density?
 }
 
-// The next byte from floppy is available. Enable CPU so it can get the byte, via IM0.
+// The next byte from floppy is available. Enable CPU so it can get the NOP byte, via IM0.
 WRITE_LINE_MEMBER(icebox_state::drq_w)
+{
+	if (BIT(m_f1, 2))
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00); // Z80
+}
+
+// The next byte from floppy is available. Enable CPU so it can get the NOP byte, via IM0.
+WRITE_LINE_MEMBER(icebox_state::intrq_w)
 {
 	if (BIT(m_f1, 2))
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00); // Z80
@@ -343,6 +354,7 @@ void icebox_state::icebox(machine_config &config)
 
 	FD1771(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->drq_wr_callback().set(FUNC(icebox_state::drq_w));
+	m_fdc->intrq_wr_callback().set(FUNC(icebox_state::intrq_w));
 	FLOPPY_CONNECTOR(config, m_floppy0, floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
 }

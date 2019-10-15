@@ -424,7 +424,7 @@ void mz2000_state::mz80b_io(address_map &map)
 	map(0xe4, 0xe7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0xf0, 0xf3).w(FUNC(mz2000_state::timer_w));
-//  AM_RANGE(0xf4, 0xf4) AM_WRITE(vram_bank_w)
+//  map(0xf4, 0xf4).w(FUNC(mz2000_state::vram_bank_w));
 }
 
 void mz2000_state::mz2000_io(address_map &map)

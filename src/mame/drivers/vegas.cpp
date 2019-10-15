@@ -1516,7 +1516,7 @@ static INPUT_PORTS_START( nbashowt )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, vegas_state, i40_r, nullptr)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, i40_r)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
@@ -1575,8 +1575,8 @@ static INPUT_PORTS_START( sf2049 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 2") PORT_PLAYER(1)   /* view 2 */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("View 3") PORT_PLAYER(1)  /* view 3 */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Music") PORT_PLAYER(1)   /* music */
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, vegas_state, keypad_r, "KEYPAD" )
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, vegas_state, gearshift_r, "GEAR" )
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, keypad_r)
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, gearshift_r)
 
 	PORT_START("GEAR")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_PLAYER(1) /* 1st gear */
@@ -1670,7 +1670,7 @@ static INPUT_PORTS_START( cartfury )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 2") PORT_PLAYER(1)   /* view 2 */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("View 3") PORT_PLAYER(1)  /* view 3 */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Boost") PORT_PLAYER(1)   /* boost */
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, vegas_state, gearshift_r, "GEAR" )
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, gearshift_r)
 
 	PORT_START("GEAR")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_PLAYER(1) /* 1st gear */
@@ -1702,7 +1702,7 @@ void vegas_state::vegas_cs2_map(address_map &map)
 void vegas_state::vegas_cs3_map(address_map &map)
 {
 	map(0x00000000, 0x00000003).rw(FUNC(vegas_state::analog_port_r), FUNC(vegas_state::analog_port_w));
-	//AM_RANGE(0x00001000, 0x00001003) AM_READWRITE(lcd_r, lcd_w)
+	//map(0x00001000, 0x00001003).rw(FUNC(vegas_state::lcd_r), FUNC(vegas_state::lcd_w));
 }
 
 void vegas_state::vegas_cs4_map(address_map &map)
@@ -1727,7 +1727,7 @@ void vegas_state::vegas_cs6_map(address_map &map)
 
 void vegas_state::vegas_cs7_map(address_map &map)
 {
-	//AM_RANGE(0x00000000, 0x00000003) AM_READWRITE8(nss_r, nss_w, 0xffffffff)
+	//map(0x00000000, 0x00000003).rw(FUNC(vegas_state::nss_r), FUNC(vegas_state::nss_w));
 	map(0x00001000, 0x0000100f).rw(FUNC(vegas_state::ethernet_r), FUNC(vegas_state::ethernet_w));
 	map(0x00005000, 0x00005003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w)); // if (m_dcs_idma_cs == 7)
 	map(0x00007000, 0x00007003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w)); // if (m_dcs_idma_cs == 7)

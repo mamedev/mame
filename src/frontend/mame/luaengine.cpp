@@ -709,6 +709,11 @@ void lua_engine::on_frame_done()
 	execute_function("LUA_ON_FRAME_DONE");
 }
 
+void lua_engine::on_sound_update()
+{
+	execute_function("LUA_ON_SOUND_UPDATE");
+}
+
 void lua_engine::on_periodic()
 {
 	execute_function("LUA_ON_PERIODIC");
@@ -778,6 +783,7 @@ void lua_engine::initialize()
  * emu.register_resume(callback) - register callback at resume
  * emu.register_frame(callback) - register callback at end of frame
  * emu.register_frame_done(callback) - register callback after frame is drawn to screen (for overlays)
+ * emu.register_sound_update(callback) - register callback after sound update has generated new samples
  * emu.register_periodic(callback) - register periodic callback while program is running
  * emu.register_callback(callback, name) - register callback to be used by MAME via lua_engine::call_plugin()
  * emu.register_menu(event_callback, populate_callback, name) - register callbacks for plugin menu
@@ -821,6 +827,7 @@ void lua_engine::initialize()
 	emu["register_resume"] = [this](sol::function func){ register_function(func, "LUA_ON_RESUME"); };
 	emu["register_frame"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME"); };
 	emu["register_frame_done"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME_DONE"); };
+	emu["register_sound_update"] = [this](sol::function func){ register_function(func, "LUA_ON_SOUND_UPDATE"); };
 	emu["register_periodic"] = [this](sol::function func){ register_function(func, "LUA_ON_PERIODIC"); };
 	emu["register_mandatory_file_manager_override"] = [this](sol::function func) { register_function(func, "LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE"); };
 	emu["register_before_load_settings"] = [this](sol::function func) { register_function(func, "LUA_ON_BEFORE_LOAD_SETTINGS"); };
@@ -1224,7 +1231,6 @@ void lua_engine::initialize()
  * machine:popmessage(str) - print str as popup
  * machine:popmessage() - clear displayed popup message
  * machine:logerror(str) - print str to log
- *
  * machine:system() - get game_driver for running driver
  * machine:video() - get video_manager
  * machine:sound() - get sound_manager
@@ -1410,7 +1416,6 @@ void lua_engine::initialize()
  *
  * debugger.consolelog[] - get consolelog text buffer (wrap_textbuf)
  * debugger.errorlog[] - get errorlog text buffer (wrap_textbuf)
- *
  * debugger.visible_cpu - accessor for debugger active cpu for commands, affects debug views
  * debugger.execution_state - accessor for active cpu run state
  */
@@ -1722,6 +1727,7 @@ void lua_engine::initialize()
 					return port_table;
 				}));
 
+
 /*  natural_keyboard library
  *
  * manager:machine():ioport():natkeyboard()
@@ -1992,6 +1998,7 @@ void lua_engine::initialize()
 			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
 
+
 /*  sound_manager library
  *
  * manager:machine():sound()
@@ -2000,7 +2007,7 @@ void lua_engine::initialize()
  * sound:stop_recording() - end audio recording
  * sound:ui_mute(turn_off) - turns on/off UI sound
  * sound:system_mute() - turns on/off system sound
- * sound:samples() - get current frame's audio buffer contents in binary form as string
+ * sound:samples() - get current audio buffer contents in binary form as string (updates 50 times per second)
  *
  * sound.attenuation - sound attenuation
  */
@@ -2084,6 +2091,7 @@ void lua_engine::initialize()
 				return result;
 			}));
 
+
 /*  input_class library
  *
  * manager:machine():input().device_classes[devclass]
@@ -2093,6 +2101,7 @@ void lua_engine::initialize()
  * devclass.multi
  * devclass.devices[]
  */
+
 	sol().registry().new_usertype<input_class>("input_class", "new", sol::no_constructor,
 		"name", sol::property(&input_class::name),
 		"enabled", sol::property(&input_class::enabled, &input_class::enable),
@@ -2109,6 +2118,7 @@ void lua_engine::initialize()
 				}
 				return result;
 			}));
+
 
 /*  input_device library
  *
@@ -2135,6 +2145,7 @@ void lua_engine::initialize()
 			return result;
 		}));
 
+
 /*  input_device_item library
  *
  * manager:machine():input().device_classes[devclass].devices[index].items[item_id]
@@ -2142,6 +2153,7 @@ void lua_engine::initialize()
  * item.token
  * item:code()
  */
+
 	sol().registry().new_usertype<input_device_item>("input_device_item", "new", sol::no_constructor,
 		"name", sol::property(&input_device_item::name),
 		"token", sol::property(&input_device_item::token),
@@ -2150,6 +2162,7 @@ void lua_engine::initialize()
 			input_code code(item.device().devclass(), item.device().devindex(), item.itemclass(), ITEM_MODIFIER_NONE, item.itemid());
 			return sol::make_user(code);
 		});
+
 
 /*  ui_input_manager library
  *
@@ -2514,6 +2527,7 @@ void lua_engine::initialize()
 					return table;
 				}));
 
+
 /*  memory_region library
  *
  * manager:machine():memory().regions[region_tag]
@@ -2524,6 +2538,7 @@ void lua_engine::initialize()
  *
  * region.size
  */
+
 	sol().registry().new_usertype<memory_region>("region", "new", sol::no_constructor,
 			"read_i8", &region_read<int8_t>,
 			"read_u8", &region_read<uint8_t>,
@@ -2542,6 +2557,7 @@ void lua_engine::initialize()
 			"write_i64", &region_write<int64_t>,
 			"write_u64", &region_write<uint64_t>,
 			"size", sol::property(&memory_region::bytes));
+
 
 /*  memory_share library
  *

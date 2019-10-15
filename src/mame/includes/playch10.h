@@ -52,7 +52,7 @@ public:
 	void init_pckboard();
 	void init_pc_hrz();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
+	DECLARE_READ_LINE_MEMBER(int_detect_r);
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(up8w_w);

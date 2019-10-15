@@ -926,8 +926,8 @@ void rainbow_state::rainbow8088_map(address_map &map)
 	//    So NVRAM is hidden and loads & saves are triggered within the
 	//    'diagnostic_w' handler (similar to real hardware).
 
-	//  - Address bits 8-12 are ignored (-> AM_MIRROR).
-	map(0xed000, 0xed0ff).ram().share("vol_ram"); //AM_MIRROR(0x1f00)
+	//  - Address bits 8-12 are ignored (-> mirror()).
+	map(0xed000, 0xed0ff).ram().share("vol_ram"); //.mirror(0x1f00);
 	map(0xed100, 0xed1ff).ram().share("nvram");
 
 	map(0xee000, 0xeffff).ram().share("p_ram");
@@ -1022,7 +1022,7 @@ void rainbow_state::rainbow8088_io(address_map &map)
 	// ===========================================================
 	// 0x70 -> 0x7f ***** Option Select 4
 	// ===========================================================
-	// 0x10c -> (MHFU disable register handled by 0x0c + AM_SELECT)
+	// 0x10c -> (MHFU disable register handled by 0x0c + select())
 }
 
 void rainbow_state::rainbowz80_mem(address_map &map)
@@ -1152,11 +1152,11 @@ void rainbow_state::machine_reset()
 	// Verify RAM size matches hardware (DIP switches)
 
 #ifdef ASSUME_RAINBOW_A_HARDWARE
-	printf("\n*** RAINBOW A MODEL ASSUMED (64 - 832 K RAM).\n");
+	logerror("*** RAINBOW A MODEL ASSUMED (64 - 832 K RAM).\n");
 	if (unmap_start > 0xD0000)
 	{
 		unmap_start = 0xD0000; // hardware limit 832 K (possibly as low as 256 K)     [?]
-		printf("\nWARNING: 896 K is not a valid memory configuration on Rainbow 100 A!\n");
+		logerror("WARNING: 896 K is not a valid memory configuration on Rainbow 100 A!\n");
 	}
 
 	uint32_t check = (unmap_start >> 16)-1;  // guess.
@@ -1170,11 +1170,11 @@ void rainbow_state::machine_reset()
 	#endif
 
 #else
-	printf("\n*** RAINBOW B MODEL ASSUMED (128 - 896 K RAM)\n");
+	logerror("*** RAINBOW B MODEL ASSUMED (128 - 896 K RAM)\n");
 	if (unmap_start < 0x20000)
 	{
 		unmap_start = 0x20000; // 128 K minimum
-		printf("\nWARNING: 64 K is not a valid memory size on Rainbow 100-B!\n");
+		logerror("WARNING: 64 K is not a valid memory size on Rainbow 100-B!\n");
 	}
 
 	uint32_t check = (unmap_start >> 16) - 2;
@@ -1188,11 +1188,11 @@ void rainbow_state::machine_reset()
 	#endif
 #endif
 	if (check != nvram_location)
-		printf("\nNOTE: RAM configuration does not match NVRAM.\nUNMAP_START = %05x   NVRAM VALUE = %02x   SHOULD BE: %02x\n", unmap_start, nvram_location, check);
+		logerror("NOTE: RAM configuration does not match NVRAM.\nUNMAP_START = %05x   NVRAM VALUE = %02x   SHOULD BE: %02x\n", unmap_start, nvram_location, check);
 
 	if (END_OF_RAM > unmap_start)
 	{
-		logerror("\nUnmapping from %x to %x",unmap_start, END_OF_RAM);
+		logerror("Unmapping from %x to %x\n",unmap_start, END_OF_RAM);
 		program.unmap_readwrite(unmap_start, END_OF_RAM);
 	}
 
@@ -1305,11 +1305,11 @@ void rainbow_state::device_timer(emu_timer &timer, device_timer_id tid, int para
 		if (m_power_good == false)
 		{
 			m_power_good = true;
-			printf("\n**** POWER GOOD ****\n");
+			logerror("**** POWER GOOD ****\n");
 		}
 		else
 		{
-			printf("\n**** WATCHDOG: CPU RESET ****\n");
+			logerror("**** WATCHDOG: CPU RESET ****\n");
 			m_i8088->reset(); // gives 'ERROR_16 - INTERRUPTS OFF' (indicates hardware failure or software bug).
 		}
 		break; // case 0
@@ -1712,7 +1712,7 @@ hard_disk_file *rainbow_state::rainbow_hdc_file(int drv)
 					info->cylinders, RD51_MAX_CYLINDER,
 					info->sectors, RD51_SECTORS_PER_TRACK,
 					info->sectorbytes);
-		printf("\n <<< === HARD DISK IMAGE REJECTED = (invalid geometry) === >>> \n");
+		logerror("<<< === HARD DISK IMAGE REJECTED = (invalid geometry) === >>>\n");
 		return nullptr;
 	}
 }
@@ -2497,7 +2497,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	data = (data & (255 - 3)); // invalid drive = DRIVE 0 ?!
 
 	if (m_present_drive == INVALID_DRIVE)
-		printf("\n**** INVALID DRIVE ****");
+		logerror("**** INVALID DRIVE ****\n");
 	else
 		data = data | m_present_drive;
 
@@ -2678,13 +2678,13 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 
 	if ((m_diagnostic & 1) && !(data & 1)) // ZRESET goes LOW...
 	{
-		printf("\nFDC ** RESET ** ");
+		logerror("FDC ** RESET **\n");
 		m_fdc->reset();
 	}
 
 	if (!(m_diagnostic & 1) && (data & 1)) // ZRESET goes HIGH...
 	{
-		printf("\nFDC RESTORE ");
+		logerror("FDC RESTORE\n");
 		m_fdc->reset(); // See formatter description p.197 or 5-13
 	}
 
@@ -2698,10 +2698,10 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	{
 		if (m_inp7->read() == 1)
 		{
-			printf("\nHINT: GRAPHICS OPTION ON. TEXT ONLY (DC011/DC012) OUTPUT NOW DISABLED.\n");
+			logerror("HINT: GRAPHICS OPTION ON. TEXT ONLY (DC011/DC012) OUTPUT NOW DISABLED.\n");
 		}
 		else
-		{       printf("\nALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
+		{       logerror("ALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
 			m_onboard_video_selected = true;
 		}
 		logerror("DATA: %x (PC=%x)\n", data, m_i8088->pc());
@@ -2709,7 +2709,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 
 	// BIT 3: PARITY (1 enables parity test on memory board. Usually 64K per bank). -> ext_ram_w.
 	if (data & 0x08)
-		logerror("\n*** PARITY TEST [on RAM EXTENSION] - (bit 3 - diagnostic_w) ");
+		logerror("*** PARITY TEST [on RAM EXTENSION] - (bit 3 - diagnostic_w)\n");
 
 	// MISSING BITS (* not vital for normal operation, see diag.disk) -
 	// * BIT 4: DIAG LOOPBACK (0 at power-up; 1 directs RX50 and DC12 output to printer port)
@@ -2735,7 +2735,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	*/
 	if (data & 16)
 	{
-		logerror("\nWARNING: UNEMULATED DIAG LOOPBACK (directs RX50 and DC12 output to printer port) **** ");
+		logerror("WARNING: UNEMULATED DIAG LOOPBACK (directs RX50 and DC12 output to printer port) ****\n");
 	}
 
 	address_space &io = m_i8088->space(AS_IO);
@@ -2748,7 +2748,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 		PRT  RCV DATA.......KBD TXD...........PRT RDATA
 		KBD  RCV DATA.......PRT TXD...........KBD RXD
 		*/
-		logerror("\nWARNING: UNEMULATED PORT LOOPBACK (COMM, PRINTER, KEYBOARD ports) **** ");
+		logerror("WARNING: UNEMULATED PORT LOOPBACK (COMM, PRINTER, KEYBOARD ports) ****\n");
 
 		io.unmap_readwrite(0x40, 0x43);  // unmap MPSC handlers to prevent CPU crashes ("INTERRUPTS OFF")
 	}
@@ -3004,7 +3004,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			{
 				m_gdc_color_map_index = 0; // 0...31  (CPU accesses 32 bytes
 
-				printf("\n * COLOR MAP FULLY LOADED *");
+				logerror("* COLOR MAP FULLY LOADED *\n");
 				for (int zi = 0; zi < 16; zi++)
 				{
 					int g =  m_gdc_color_map[zi] & 0x0F;
@@ -3012,9 +3012,9 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 					int b =  m_gdc_color_map[zi + 16] & 0x0F;
 					int m =  (m_gdc_color_map[zi + 16] & 0xF0) >> 4;
-					printf("\n[%d] %1x %1x %1x  %1x (1:1)", zi, r   , g   , b   , m);
+					logerror("[%d] %1x %1x %1x  %1x (1:1)\n", zi, r, g, b, m);
 				}
-				printf("\n------------------------------");
+				logerror("------------------------------\n");
 			} // if all colors present
 			break;
 		}
@@ -3026,7 +3026,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 				m_gdc_scroll_buffer[m_gdc_scroll_index] = data; // // WRITE TO SCROLL_MAP ( 256 x 8 )
 
 				if (m_gdc_scroll_index == 255)
-					printf("\n ---- SCROLL MAP FULLY LOADED ---*");
+					logerror("---- SCROLL MAP FULLY LOADED ---*\n");
 				m_gdc_scroll_index++;
 				m_gdc_scroll_index &= 0xFF; // 0...255  (CPU accesses 256 bytes)
 			}
@@ -3070,7 +3070,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 				if (last_message != 2)
 				{
 					last_message = 2;
-					printf(" * HIGH RESOLUTION * ");
+					logerror("* HIGH RESOLUTION *\n");
 				}
 			}
 			else
@@ -3078,7 +3078,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 				if (last_message != 3)
 				{
 					last_message = 3;
-					printf(" MEDIUM RESOLUTION ");
+					logerror("MEDIUM RESOLUTION\n");
 				}
 			}
 

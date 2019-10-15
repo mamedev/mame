@@ -521,7 +521,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="u1" value="NUS-NASE-0" />
 			<feature name="u2" value="[empty]" />
 			<feature name="u3" value="CIC-NUS-6102A" />
-			<feature name="cart_model" value=" NUS-006(USA)" />
+			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
 				<rom name="nus-nase-0.u1" size="16777216" crc="3e8be0e0" sha1="353ad679666287988a0e645851ee01eff2048449" offset="000000" />

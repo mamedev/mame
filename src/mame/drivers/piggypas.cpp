@@ -37,7 +37,7 @@ public:
 	void piggypas(machine_config &config);
 	void fidlstix(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
+
 private:
 	void output_digits();
 	virtual void machine_start() override;
@@ -150,17 +150,12 @@ INPUT_CHANGED_MEMBER(piggypas_state::ball_sensor)
 	m_maincpu->set_input_line(1, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(piggypas_state::ticket_r)
-{
-	return m_ticket->line_r();
-}
-
 static INPUT_PORTS_START( piggypas )
 	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN3)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN4)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(DEVICE_SELF, piggypas_state, ticket_r, nullptr)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN2)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Gate sensor")   PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)

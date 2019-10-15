@@ -135,7 +135,7 @@ public:
 	void init_multigam();
 	void init_multigm3();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
+	DECLARE_READ_LINE_MEMBER(multigam_inputs_r);
 
 protected:
 	virtual void machine_start() override;
@@ -346,7 +346,7 @@ READ8_MEMBER(multigam_state::multigam_IN1_r)
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
 
-CUSTOM_INPUT_MEMBER(multigam_state::multigam_inputs_r)
+READ_LINE_MEMBER(multigam_state::multigam_inputs_r)
 {
 	/* bit 0: serial input (dsw)
 	   bit 1: coin */
@@ -1036,7 +1036,7 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, multigam_state,multigam_inputs_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(multigam_state, multigam_inputs_r)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 

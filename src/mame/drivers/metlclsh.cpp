@@ -121,8 +121,8 @@ void metlclsh_state::metlclsh_slave_map(address_map &map)
 	map(0xe301, 0xe301).w(FUNC(metlclsh_state::metlclsh_flipscreen_w));        // 0/1
 	map(0xe401, 0xe401).w(FUNC(metlclsh_state::metlclsh_rambank_w));
 	map(0xe402, 0xe403).writeonly().share("scrollx");
-//  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                            // ? 0
-//  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                            // ? 0 on startup only
+//  map(0xe404, 0xe404).nopw();                            // ? 0
+//  map(0xe410, 0xe410).nopw();                            // ? 0 on startup only
 	map(0xe417, 0xe417).w(FUNC(metlclsh_state::metlclsh_ack_nmi2));            // nmi ack
 	map(0xfff0, 0xffff).rom();                                 // Reset/IRQ vectors
 }

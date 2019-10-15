@@ -136,7 +136,7 @@ var fetch_bios_sets = (function ()
 				{
 					pending[device] = true;
 					var req = new XMLHttpRequest();
-					req.open('GET', appurl + 'rpc/bios/' + device, true);
+					req.open('GET', appurl + 'rpc/bios/' + encodeURIComponent(device), true);
 					req.responseType = 'json';
 					req.onload =
 							function ()
@@ -171,7 +171,7 @@ var fetch_machine_flags = (function ()
 				{
 					pending[device] = true;
 					var req = new XMLHttpRequest();
-					req.open('GET', appurl + 'rpc/flags/' + device, true);
+					req.open('GET', appurl + 'rpc/flags/' + encodeURIComponent(device), true);
 					req.responseType = 'json';
 					req.onload =
 							function ()
@@ -413,7 +413,7 @@ function make_slot_change_handler(name, slot, defaults, dfltbtn)
 			row.appendChild(document.createElement('th')).textContent = 'Short name:';
 			var link = row.appendChild(document.createElement('td')).appendChild(document.createElement('a'));
 			link.textContent = selection.device;
-			link.setAttribute('href', appurl + 'machine/' + selection.device);
+			link.setAttribute('href', appurl + 'machine/' + encodeURIComponent(selection.device));
 
 			// if we have emulation flags, populate now, otherwise fetch asynchronously
 			if (!Object.prototype.hasOwnProperty.call(machine_flags, selection.device))
@@ -487,7 +487,7 @@ function fetch_slots(machine)
 	function make_request(device)
 	{
 		var req = new XMLHttpRequest();
-		req.open('GET', appurl + 'rpc/slots/' + device, true);
+		req.open('GET', appurl + 'rpc/slots/' + encodeURIComponent(device), true);
 		req.responseType = 'json';
 		req.onload =
 				function ()

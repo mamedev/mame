@@ -846,24 +846,24 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 void riscpc_state::a7000_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
-//  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
+//  map(0x01000000, 0x01ffffff).noprw(); //expansion ROM
 	//
 //  map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM, not installed on A7000 models
 //  I/O 03000000 - 033fffff
-//  AM_RANGE(0x03010000, 0x03011fff) //Super IO
-//  AM_RANGE(0x03012000, 0x03029fff) //FDC
-//  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
-//  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
-//  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
+//  map(0x03010000, 0x03011fff) //Super IO
+//  map(0x03012000, 0x03029fff) //FDC
+//  map(0x0302b000, 0x0302bfff) //Network podule
+//  map(0x03040000, 0x0304ffff) //podule space 0,1,2,3
+//  map(0x03070000, 0x0307ffff) //podule space 4,5,6,7
 	map(0x03200000, 0x032001ff).rw(FUNC(riscpc_state::a7000_iomd_r), FUNC(riscpc_state::a7000_iomd_w)); //IOMD Registers //mirrored at 0x03000000-0x1ff?
 	map(0x03310000, 0x03310003).portr("MOUSE");
 
 	map(0x03400000, 0x037fffff).w(FUNC(riscpc_state::a7000_vidc20_w));
-//  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
+//  map(0x08000000, 0x08ffffff).mirror(0x07000000); //EASI space
 	map(0x10000000, 0x13ffffff).ram(); //SIMM 0 bank 0
 	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
-//  AM_RANGE(0x18000000, 0x18ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 0
-//  AM_RANGE(0x1c000000, 0x1cffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 1
+//  map(0x18000000, 0x18ffffff).mirror(0x03000000).ram(); //SIMM 1 bank 0
+//  map(0x1c000000, 0x1cffffff).mirror(0x03000000).ram(); //SIMM 1 bank 1
 }
 
 void riscpc_state::riscpc_map(address_map &map)
@@ -1009,7 +1009,7 @@ void riscpc_state::a7000p(machine_config &config)
 void riscpc_state::sarpc(machine_config &config)
 {
 	/* Basic machine hardware */
-	ARM7(config, m_maincpu, 202000000); // StrongARM
+	SA1110(config, m_maincpu, 202000000); // StrongARM
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 	base_config(config);
 }
@@ -1017,7 +1017,7 @@ void riscpc_state::sarpc(machine_config &config)
 void riscpc_state::sarpc_j233(machine_config &config)
 {
 	/* Basic machine hardware */
-	ARM7(config, m_maincpu, 233000000); // StrongARM
+	SA1110(config, m_maincpu, 233000000); // StrongARM
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 	base_config(config);
 }

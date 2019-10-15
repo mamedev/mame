@@ -3,6 +3,7 @@
 #ifndef MAME_INCLUDES_POWERINS_H
 #define MAME_INCLUDES_POWERINS_H
 
+#include "video/nmk16spr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -17,6 +18,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_spritegen(*this, "spritegen"),
 		m_vctrl_0(*this, "vctrl_0"),
 		m_vram(*this, "vram_%u", 0U),
 		m_spriteram(*this, "spriteram"),
@@ -36,6 +38,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<nmk_16bit_sprite_device> m_spritegen;
 
 	required_shared_ptr<uint16_t> m_vctrl_0;
 	required_shared_ptr_array<uint16_t, 2> m_vram;
@@ -64,8 +67,9 @@ private:
 
 	virtual void video_start() override;
 
+	void get_colour_6bit(u32 &colour, u32 &pri_mask);
+	void get_flip_extcode(u16 attr, int &flipx, int &flipy, int &code);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void powerins_map(address_map &map);
 	void powerins_sound_io_map(address_map &map);
 	void powerins_sound_map(address_map &map);

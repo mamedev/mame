@@ -1125,7 +1125,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			if (tone->count >= tone->period)
 			{
 				tone->duty_cycle = (tone->duty_cycle - 1) & 0x1f;
-				tone->output = BIT(duty_cycle[tone_duty(tone)], tone->duty_cycle);
+				tone->output = (m_feature & PSG_HAS_EXPANDED_MODE) ? BIT(duty_cycle[tone_duty(tone)], tone->duty_cycle) : BIT(tone->duty_cycle, 0);
 				tone->count = 0;
 			}
 		}
@@ -1147,7 +1147,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				// TODO : get actually algorithm for AY8930
 				m_rng ^= (((m_rng & 1) ^ ((m_rng >> 3) & 1)) << 17);
 				m_rng >>= 1;
-				m_prescale_noise = 16;
+				m_prescale_noise = (m_feature & PSG_HAS_EXPANDED_MODE) ? 16 : 1;
 			}
 			m_prescale_noise--;
 		}
@@ -1353,7 +1353,7 @@ void ay8910_device::device_start()
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a multipler of 2 here. */
-	m_channel = machine().sound().stream_alloc(*this, 0, m_streams, master_clock * 2);
+	m_channel = machine().sound().stream_alloc(*this, 0, m_streams, (m_feature & PSG_HAS_EXPANDED_MODE) ? master_clock * 2 : master_clock / 8);
 
 	ay_set_clock(master_clock);
 	ay8910_statesave();
@@ -1405,10 +1405,10 @@ void ay8910_device::set_volume(int channel,int volume)
 void ay8910_device::ay_set_clock(int clock)
 {
 	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
-	if ((m_feature & PSG_PIN26_IS_CLKSEL) && (m_flags & YM2149_PIN26_LOW))
-		m_channel->set_sample_rate(clock);
+	if (((m_feature & PSG_PIN26_IS_CLKSEL) && (m_flags & YM2149_PIN26_LOW)) || (m_feature & PSG_HAS_INTERNAL_DIVIDER))
+		m_channel->set_sample_rate((m_feature & PSG_HAS_EXPANDED_MODE) ? clock : clock / 16);
 	else
-		m_channel->set_sample_rate(clock * 2);
+		m_channel->set_sample_rate((m_feature & PSG_HAS_EXPANDED_MODE) ? clock * 2 : clock / 8);
 }
 
 void ay8910_device::device_clock_changed()
@@ -1634,7 +1634,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_rng(0),
 		m_mode(0),
 		m_env_step_mask((!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 0x0f : 0x1f),
-		m_step(         (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 32 : 16),
+		m_step(         (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 2 : 1),
 		m_zero_is_off(  (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? 1 : 0),
 		m_par(          (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param),
 		m_par_env(      (!(feature & PSG_HAS_EXPANDED_MODE)) && (psg_type == PSG_TYPE_AY) ? &ay8910_param : &ym2149_param_env),
@@ -1663,7 +1663,7 @@ void ay8910_device::set_type(psg_type_t psg_type)
 	if (psg_type == PSG_TYPE_AY)
 	{
 		m_env_step_mask = 0x0f;
-		m_step = 32;
+		m_step = 2;
 		m_zero_is_off = 1;
 		m_par = &ay8910_param;
 		m_par_env = &ay8910_param;
@@ -1671,11 +1671,13 @@ void ay8910_device::set_type(psg_type_t psg_type)
 	else
 	{
 		m_env_step_mask = 0x1f;
-		m_step = 16;
+		m_step = 1;
 		m_zero_is_off = 0;
 		m_par = &ym2149_param;
 		m_par_env = &ym2149_param_env;
 	}
+	if (m_feature & PSG_HAS_EXPANDED_MODE)
+		m_step *= 16;
 }
 
 DEFINE_DEVICE_TYPE(AY8912, ay8912_device, "ay8912", "AY-3-8912A PSG")
@@ -1738,5 +1740,13 @@ DEFINE_DEVICE_TYPE(YMZ294, ymz294_device, "ymz294", "YMZ294 SSGLP")
 
 ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, YMZ294, tag, owner, clock, PSG_TYPE_YM, 1, 0)
+{
+}
+
+
+DEFINE_DEVICE_TYPE(SUNSOFT_5B_SOUND, sunsoft_5b_sound_device, "sunsoft_5b_sound", "Sunsoft/Yamaha 5B 6630B (Sound)")
+
+sunsoft_5b_sound_device::sunsoft_5b_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: ay8910_device(mconfig, SUNSOFT_5B_SOUND, tag, owner, clock, PSG_TYPE_YM, 1, 0, PSG_HAS_INTERNAL_DIVIDER)
 {
 }

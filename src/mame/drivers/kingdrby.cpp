@@ -475,7 +475,7 @@ void kingdrby_state::slave_1986_map(address_map &map)
 	map(0x3000, 0x3fff).rom(); //sound rom tested for the post check
 	map(0x4000, 0x47ff).ram().share("nvram"); //backup ram
 	map(0x5000, 0x5003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
-//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE(m_ppi[1], i8255_device, read, write) /* I/O Ports */
+//  map(0x6000, 0x6003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write)); /* I/O Ports */
 	map(0x7000, 0x73ff).ram().share("share1");
 	map(0x7400, 0x74ff).ram().share("spriteram");
 	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));

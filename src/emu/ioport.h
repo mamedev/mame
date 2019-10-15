@@ -653,9 +653,9 @@ enum
 typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist, std::string &errorbuf);
 
 // I/O port callback function delegates
-typedef device_delegate<ioport_value (ioport_field &, void *)> ioport_field_read_delegate;
+typedef device_delegate<ioport_value ()> ioport_field_read_delegate;
 typedef device_delegate<void (ioport_field &, u32, ioport_value, ioport_value)> ioport_field_write_delegate;
-typedef device_delegate<float (ioport_field &, float)> ioport_field_crossmap_delegate;
+typedef device_delegate<float (float)> ioport_field_crossmap_delegate;
 
 
 // ======================> inp_header
@@ -1128,7 +1128,6 @@ private:
 	const char *                m_name;             // user-friendly name to display
 	input_seq                   m_seq[SEQ_TYPE_TOTAL];// sequences of all types
 	ioport_field_read_delegate  m_read;             // read callback routine
-	void *                      m_read_param;       // parameter for read callback routine
 	ioport_field_write_delegate m_write;            // write callback routine
 	u32                         m_write_param;      // parameter for write callback routine
 
@@ -1525,7 +1524,7 @@ public:
 	ioport_configurer& field_set_analog_wraps() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_WRAPS; return *this; }
 	ioport_configurer& field_set_remap_table(const ioport_value *table) { m_curfield->m_remap_table = table; return *this; }
 	ioport_configurer& field_set_analog_invert() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_INVERT; return *this; }
-	ioport_configurer& field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = nullptr) { m_curfield->m_read = delegate; m_curfield->m_read_param = param; return *this; }
+	ioport_configurer& field_set_dynamic_read(ioport_field_read_delegate delegate) { m_curfield->m_read = delegate; return *this; }
 	ioport_configurer& field_set_dynamic_write(ioport_field_write_delegate delegate, u32 param = 0) { m_curfield->m_write = delegate; m_curfield->m_write_param = param; return *this; }
 	ioport_configurer& field_set_diplocation(const char *location) { m_curfield->expand_diplocation(location, m_errorbuf); return *this; }
 
@@ -1556,16 +1555,16 @@ private:
 #define UCHAR_MAMEKEY(code) (UCHAR_MAMEKEY_BEGIN + ITEM_ID_##code)
 
 // macro for a read callback function (PORT_CUSTOM)
-#define CUSTOM_INPUT_MEMBER(name)   ioport_value name(ioport_field &field, void *param)
-#define DECLARE_CUSTOM_INPUT_MEMBER(name)   ioport_value name(ioport_field &field, void *param)
+#define CUSTOM_INPUT_MEMBER(name)   ioport_value name()
+#define DECLARE_CUSTOM_INPUT_MEMBER(name)   ioport_value name()
 
 // macro for port write callback functions (PORT_CHANGED)
 #define INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, u32 param, ioport_value oldval, ioport_value newval)
 #define DECLARE_INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, u32 param, ioport_value oldval, ioport_value newval)
 
 // macro for port changed callback functions (PORT_CROSSHAIR_MAPPER)
-#define CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
-#define DECLARE_CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
+#define CROSSHAIR_MAPPER_MEMBER(name)   float name(float linear_value)
+#define DECLARE_CROSSHAIR_MAPPER_MEMBER(name)   float name(float linear_value)
 
 // macro for wrapping a default string
 #define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
@@ -1710,18 +1709,24 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_analog_invert();
 
 // read callbacks
-#define PORT_CUSTOM_MEMBER(_device, _class, _member, _param) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr), (void *)(_param));
+#define PORT_CUSTOM_MEMBER(_class, _member) \
+	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, DEVICE_SELF, (_class *)nullptr));
+#define PORT_CUSTOM_DEVICE_MEMBER(_device, _class, _member) \
+	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr));
 
 // write callbacks
 #define PORT_CHANGED_MEMBER(_device, _class, _member, _param) \
 	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr), (_param));
 
 // input device handler
+#define PORT_READ_LINE_MEMBER(_class, _member) \
+	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, DEVICE_SELF, (_class *)nullptr));
 #define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device, ioport_field &field, void *param)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)nullptr));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)nullptr));
 
 // output device handler
+#define PORT_WRITE_LINE_MEMBER(_class, _member) \
+	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, DEVICE_SELF, (_class *)nullptr));
 #define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
 	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, _device, (_class *)nullptr));
 

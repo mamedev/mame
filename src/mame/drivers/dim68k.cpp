@@ -213,7 +213,7 @@ void dim68k_state::dim68k_mem(address_map &map)
 	map(0x00ffcc00, 0x00ffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
 	map(0x00ffd000, 0x00ffd003).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
 	map(0x00ffd004, 0x00ffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
-	//AM_RANGE(0x00ffd400, 0x00ffd403) emulation trap control
+	//map(0x00ffd400, 0x00ffd403) emulation trap control
 	map(0x00ffd800, 0x00ffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
 	map(0x00ffdc00, 0x00ffdc01).w(FUNC(dim68k_state::dim68k_banksw_w));
 }

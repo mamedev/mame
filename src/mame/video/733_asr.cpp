@@ -28,6 +28,8 @@
 #include "emu.h"
 #include "733_asr.h"
 
+#include <algorithm>
+
 enum
 {
 	/*ASROutQueueSize = 32,*/
@@ -201,9 +203,11 @@ void asr733_device::linefeed()
 {
 	uint8_t buf[asr_window_width];
 
+	assert(asr_window_offset_x + asr_window_width <= m_bitmap->width());
+	assert(asr_window_offset_y + asr_window_height <= m_bitmap->height());
 	for (int y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
-		extract_scanline8(*m_bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
+		std::copy_n(&m_bitmap->pix16(y+asr_scroll_step, asr_window_offset_x), asr_window_width, buf);
 		draw_scanline8(*m_bitmap, asr_window_offset_x, y, asr_window_width, buf, palette().pens());
 	}
 

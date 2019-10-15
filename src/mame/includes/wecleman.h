@@ -43,7 +43,7 @@ public:
 	void init_wecleman();
 	void init_hotchase();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hotchase_sound_status_r);
+	DECLARE_READ_LINE_MEMBER(hotchase_sound_status_r);
 
 private:
 	enum

@@ -933,6 +933,8 @@ void wd_fdc_device_base::write_sector_continue()
 
 void wd_fdc_device_base::interrupt_start()
 {
+	// technically we should re-execute this (at chip-specific rate) all the time while interrupt command code is in command register
+
 	LOGCOMMAND("cmd: forced interrupt (c=%02x)\n", command);
 
 	if(status & S_BUSY) {
@@ -949,20 +951,9 @@ void wd_fdc_device_base::interrupt_start()
 		status_type_1 = true;
 	}
 
-	int intcond = command & 0x0f;
-	if (!nonsticky_immint) {
-		if(intcond == 0)
-			intrq_cond = 0;
-		else
-			intrq_cond = (intrq_cond & I_IMM) | intcond;
-	} else {
-		if (intcond < 8)
-			intrq_cond = intcond;
-		else
-			intrq_cond = 0;
-	}
+	intrq_cond = command & 0x0f;
 
-	if(command & I_IMM) {
+	if(!intrq && (command & I_IMM)) {
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
@@ -1115,7 +1106,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 
 	LOGCOMP("Initiating command %02x\n", val);
 
-	if(intrq && !(intrq_cond & I_IMM)) {
+	if (intrq) {
 		intrq = false;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
@@ -1129,11 +1120,12 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 
 	if ((val & 0xf0) == 0xd0)
 	{
-		// force interrupt is executed instantly (?)
-		delay_cycles(t_cmd, 0);
+		// checkme
+		delay_cycles(t_cmd, dden ? delay_register_commit * 2 : delay_register_commit);
 	}
 	else
 	{
+		intrq_cond = 0;
 		// set busy, then set a timer to process the command
 		status |= S_BUSY;
 		delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
@@ -2518,7 +2510,6 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 int fd1771_device::calc_sector_size(uint8_t size, uint8_t command) const
@@ -2543,7 +2534,6 @@ fd1781_device::fd1781_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 int fd1781_device::calc_sector_size(uint8_t size, uint8_t command) const
@@ -2570,7 +2560,6 @@ fd1791_device::fd1791_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 fd1792_device::fd1792_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1792, tag, owner, clock)
@@ -2586,7 +2575,6 @@ fd1792_device::fd1792_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 fd1793_device::fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1793, tag, owner, clock)
@@ -2602,7 +2590,6 @@ fd1793_device::fd1793_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 kr1818vg93_device::kr1818vg93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, KR1818VG93, tag, owner, clock)
@@ -2618,7 +2605,6 @@ kr1818vg93_device::kr1818vg93_device(const machine_config &mconfig, const char *
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = true;
 }
 
 fd1794_device::fd1794_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1794, tag, owner, clock)
@@ -2634,7 +2620,6 @@ fd1794_device::fd1794_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 fd1795_device::fd1795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1795, tag, owner, clock)
@@ -2650,7 +2635,6 @@ fd1795_device::fd1795_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 int fd1795_device::calc_sector_size(uint8_t size, uint8_t command) const
@@ -2674,7 +2658,6 @@ fd1797_device::fd1797_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 int fd1797_device::calc_sector_size(uint8_t size, uint8_t command) const
@@ -2698,7 +2681,6 @@ mb8866_device::mb8866_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, MB8876, tag, owner, clock)
@@ -2714,7 +2696,6 @@ mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, MB8877, tag, owner, clock)
@@ -2730,7 +2711,6 @@ mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 fd1761_device::fd1761_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1761, tag, owner, clock)
@@ -2746,7 +2726,6 @@ fd1761_device::fd1761_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 fd1763_device::fd1763_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1763, tag, owner, clock)
@@ -2762,7 +2741,6 @@ fd1763_device::fd1763_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 fd1765_device::fd1765_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1765, tag, owner, clock)
@@ -2778,7 +2756,6 @@ fd1765_device::fd1765_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 int fd1765_device::calc_sector_size(uint8_t size, uint8_t command) const
@@ -2802,7 +2779,6 @@ fd1767_device::fd1767_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 int fd1767_device::calc_sector_size(uint8_t size, uint8_t command) const
@@ -2826,7 +2802,6 @@ wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, WD2793, tag, owner, clock)
@@ -2842,7 +2817,6 @@ wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 wd2795_device::wd2795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, WD2795, tag, owner, clock)
@@ -2858,7 +2832,6 @@ wd2795_device::wd2795_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 int wd2795_device::calc_sector_size(uint8_t size, uint8_t command) const
@@ -2882,7 +2855,6 @@ wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, dev
 	head_control = true;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }
 
 int wd2797_device::calc_sector_size(uint8_t size, uint8_t command) const
@@ -2906,7 +2878,6 @@ wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, dev
 	head_control = false;
 	motor_control = true;
 	ready_hooked = false;
-	nonsticky_immint = false;
 }
 
 wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1772, tag, owner, clock)
@@ -2924,7 +2895,6 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 	head_control = false;
 	motor_control = true;
 	ready_hooked = false;
-	nonsticky_immint = false;
 }
 
 int wd1772_device::settle_time() const
@@ -2945,5 +2915,4 @@ wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, dev
 	head_control = false;
 	motor_control = false;
 	ready_hooked = true;
-	nonsticky_immint = false;
 }

@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "machine/megacd.h"
 #include "machine/nvram.h"
+#include "video/315_5313.h"
 #include "megacd.lh"
 
 
@@ -81,7 +82,7 @@ void sega_segacd_device::segacd_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).ram().share("prgram");
 	map(0x080000, 0x0bffff).rw(FUNC(sega_segacd_device::segacd_sub_dataram_part1_r), FUNC(sega_segacd_device::segacd_sub_dataram_part1_w)).share("dataram");
-	map(0x0c0000, 0x0dffff).rw(FUNC(sega_segacd_device::segacd_sub_dataram_part2_r), FUNC(sega_segacd_device::segacd_sub_dataram_part2_w)); //AM_SHARE("dataram2")
+	map(0x0c0000, 0x0dffff).rw(FUNC(sega_segacd_device::segacd_sub_dataram_part2_r), FUNC(sega_segacd_device::segacd_sub_dataram_part2_w)); //.share("dataram2");
 
 	map(0xfe0000, 0xfe3fff).rw(FUNC(sega_segacd_device::backupram_r), FUNC(sega_segacd_device::backupram_w)).umask16(0x00ff); // backup RAM, odd bytes only!
 
@@ -117,10 +118,10 @@ void sega_segacd_device::segacd_map(address_map &map)
 	map(0xff8062, 0xff8063).rw(FUNC(sega_segacd_device::segacd_imagebuffer_hdot_size_r), FUNC(sega_segacd_device::segacd_imagebuffer_hdot_size_w)); // Image buffer H dot size
 	map(0xff8064, 0xff8065).rw(FUNC(sega_segacd_device::segacd_imagebuffer_vdot_size_r), FUNC(sega_segacd_device::segacd_imagebuffer_vdot_size_w)); // Image buffer V dot size
 	map(0xff8066, 0xff8067).w(FUNC(sega_segacd_device::segacd_trace_vector_base_address_w));// Trace vector base address
-//  AM_RANGE(0xff8068, 0xff8069) // Subcode address
+//  map(0xff8068, 0xff8069) // Subcode address
 
-//  AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
-//  AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
+//  map(0xff8100, 0xff817f) // Subcode buffer area
+//  map(0xff8180, 0xff81ff) // mirror of subcode buffer area
 
 }
 
@@ -273,22 +274,22 @@ _32x32_START
 _32x32_END
 
 static GFXDECODE_START( gfx_segacd )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f0_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f1_layout, 0, 0 )
-	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f1_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f0_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f1_layout, 0, (sega315_5313_device::PALETTE_PER_FRAME) / 16 )
 GFXDECODE_END
 
 

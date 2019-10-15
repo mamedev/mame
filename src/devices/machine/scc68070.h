@@ -266,6 +266,9 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) / 2; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 2); }
 
+	// m68000_base_device overrides
+	virtual void m68k_reset_peripherals() override;
+
 private:
 	void internal_map(address_map &map);
 	void cpu_space_map(address_map &map);
@@ -273,8 +276,49 @@ private:
 	void update_ipl();
 	uint8_t iack_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER(periphs_r);
-	DECLARE_WRITE16_MEMBER(periphs_w);
+	// Interrupts
+	uint8_t lir_r();
+	void lir_w(uint8_t data);
+	uint8_t picr1_r();
+	void picr1_w(uint8_t data);
+	uint8_t picr2_r();
+	void picr2_w(uint8_t data);
+
+	// I2C interface
+	uint8_t idr_r();
+	void idr_w(uint8_t data);
+	uint8_t iar_r();
+	void iar_w(uint8_t data);
+	uint8_t isr_r();
+	void isr_w(uint8_t data);
+	uint8_t icr_r();
+	void icr_w(uint8_t data);
+	uint8_t iccr_r();
+	void iccr_w(uint8_t data);
+
+	// UART interface
+	uint8_t umr_r();
+	void umr_w(uint8_t data);
+	uint8_t usr_r();
+	uint8_t ucsr_r();
+	void ucsr_w(uint8_t data);
+	uint8_t ucr_r();
+	void ucr_w(uint8_t data);
+	uint8_t uth_r();
+	void uth_w(uint8_t data);
+	uint8_t urh_r();
+
+	// Timers
+	uint16_t timer_r(offs_t offset, uint16_t mem_mask);
+	void timer_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	// DMA controller
+	uint16_t dma_r(offs_t offset, uint16_t mem_mask);
+	void dma_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	// MMU
+	uint16_t mmu_r(offs_t offset, uint16_t mem_mask);
+	void mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	void uart_rx_check();
 	void uart_tx_check();
@@ -297,7 +341,7 @@ private:
 	int m_int1_line;
 	int m_int2_line;
 
-	uint16_t m_lir;
+	uint8_t m_lir;
 	uint8_t m_picr1;
 	uint8_t m_picr2;
 	bool m_timer_int;

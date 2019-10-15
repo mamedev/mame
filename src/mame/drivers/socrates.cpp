@@ -399,7 +399,7 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		clear_irq_cb(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in socrates_state::device_timer");
+		throw emu_fatalerror("Unknown id in socrates_state::device_timer");
 	}
 }
 
@@ -1570,9 +1570,9 @@ void iqunlimz_state::iqunlimz(machine_config &config)
 
 ROM_START(socrates)
 	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASEVAL(0xF3)) /* can technically address 4mb of rom via bankswitching; open bus area reads as 0xF3 on fluke */
-	/* Socrates US NTSC */
-	/* all cart roms are 28 pin 23c1000/tc531000 128Kx8 roms */
-	/* cart port pinout:
+	/* Socrates English (same ROM for NTSC and PAL) */
+	/* All cart ROMs are 28 pin 23c1000/tc531000 128Kx8 ROMs */
+	/* Cart port pinout:
 	(looking into end of disk-shaped cartridge with label/top side pointing to the right)
 	A15 -> 19  18 -- VCC
 	A14 -> 20  17 <- A16
@@ -1595,9 +1595,9 @@ ROM_START(socrates)
 	Note that a17 goes to what would be pin 2 on a rom chip if a 32 pin rom were installed, which is not the case. (pins 1, 31 and 32 would be tied to vcc)
 	It is likely that at least one of the 6 unknown lines is R/W from the z80, and another may be phi1/m1/clock etc to allow for ram to live in cart space
 
-	Cartridge check procedure by socrates is, after screen init and check for speech synth,
+	Cartridge check procedure by Socrates is, after screen init and check for speech synth,
 	bankswitch to bank 0x10 (i.e. first 0x4000 of cart appears at 4000-7fff in z80 space),
-	do following tests; if any tests fail, jump to 0x0015 (socrates main menu)
+	do following tests; if any tests fail, jump to 0x0015 (Socrates main menu)
 	* read 0x7ff0(0x3ff0 in cart rom) and compare to 0xAA
 	* read 0x7ff1(0x3ff1 in cart rom) and compare to 0x55
 	* read 0x7ff2(0x3ff2 in cart rom) and compare to 0xE7
@@ -1692,7 +1692,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT           COMPANY                    FULLNAME                             FLAGS
-COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
+COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English, no title copyright, same ROM for NTSC and PAL
 COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
 // Yeno Professeur Saitout (French SECAM) matches the Socrates SAITOUT dump (same ROM 27-00884-001-000)
 COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, init_socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
@@ -1700,5 +1700,5 @@ COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, 
 
 COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1991, vpainter, 0,        0,      socrates_pal, socrates, socrates_state, init_vpainter, "Video Technology", "Video Painter (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, vpainter, 0,        0,      socrates_pal, socrates, socrates_state, init_vpainter, "Video Technology",        "Video Painter (PAL)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // Master Video Painter goes here

@@ -12,7 +12,7 @@
 #include "ptypes.h"
 
 #include <chrono>
-#include <cstdint>
+//#include <cstdint>
 
 namespace plib {
 namespace chrono {
@@ -31,8 +31,32 @@ namespace chrono {
 
 	#if defined(__x86_64__) &&  !defined(_clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
 
+	template <typename T, typename R>
+	struct base_ticks
+	{
+		using ret_type = R;
+		static ret_type per_second()
+		{
+			static ret_type persec = 0;
+			if (persec == 0)
+			{
+				ret_type x = 0;
+				system_ticks::type t = system_ticks::start();
+				system_ticks::type e;
+				x = - T :: start();
+				do {
+					e = system_ticks::stop();
+				} while (e - t < system_ticks::per_second() / 100 );
+				x += T :: stop();
+				persec = (ret_type)(double)((double) x * (double) system_ticks::per_second() / double (e - t));
+			}
+			return persec;
+		}
+	};
+
+
 	#if PHAS_RDTSCP
-	struct fast_ticks
+	struct fast_ticks : public base_ticks<fast_ticks, int64_t>
 	{
 		typedef int64_t type;
 		static inline type start()
@@ -52,11 +76,10 @@ namespace chrono {
 		{
 			return start();
 		}
-		static type per_second();
 	};
 
 	#else
-	struct fast_ticks
+	struct fast_ticks : public base_ticks<fast_ticks, int64_t>
 	{
 		typedef int64_t type;
 		static inline type start()
@@ -76,7 +99,6 @@ namespace chrono {
 		{
 			return start();
 		}
-		static type per_second();
 	};
 
 	#endif
@@ -93,7 +115,7 @@ namespace chrono {
 	 *
 	 */
 
-	struct exact_ticks
+	struct exact_ticks : public base_ticks<exact_ticks, int64_t>
 	{
 		typedef int64_t type;
 
@@ -129,8 +151,6 @@ namespace chrono {
 			);
 			return v;
 		}
-
-		static type per_second();
 	};
 	#else
 	using exact_ticks = fast_ticks;

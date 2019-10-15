@@ -648,20 +648,20 @@ void ms32_state::ms32_map(address_map &map)
 {
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
 	map(0xc0000000, 0xc0007fff).rw(FUNC(ms32_state::ms32_nvram_r8), FUNC(ms32_state::ms32_nvram_w8)).umask32(0x000000ff).mirror(0x3c1f8000);  // nvram is 8-bit wide, 0x2000 in size */
-/*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
+/*  map(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
 	map(0xc1180000, 0xc1187fff).rw(FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000).share("priram"); /* priram is 8-bit wide, 0x2000 in size */
-/*  AM_RANGE(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
+/*  map(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
 	map(0xc1400000, 0xc143ffff).rw(FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("palram"); /* palram is 16-bit wide, 0x20000 in size */
-/*  AM_RANGE(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
+/*  map(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
 	map(0xc2000000, 0xc201ffff).rw(FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("rozram"); /* rozram is 16-bit wide, 0x10000 in size */
-/*  AM_RANGE(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
+/*  map(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
 	map(0xc2200000, 0xc2201fff).rw(FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000).share("lineram"); /* lineram is 16-bit wide, 0x1000 in size */
-/*  AM_RANGE(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
+/*  map(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
 	map(0xc2800000, 0xc283ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("sprram"); /* spriteram is 16-bit wide, 0x20000 in size */
-/*  AM_RANGE(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
+/*  map(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
 	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("txram"); /* txram is 16-bit wide, 0x4000 in size */
 	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("bgram"); /* bgram is 16-bit wide, 0x4000 in size */
-/*  AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
+/*  map(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
 	map(0xc2e00000, 0xc2e1ffff).ram().share("mainram").mirror(0x3c0e0000); /* mainram is 32-bit wide, 0x20000 in size */
 	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000); // ROM is 32-bit wide, 0x200000 in size */
 
@@ -673,7 +673,7 @@ void ms32_state::ms32_map(address_map &map)
 	map(0xfce00034, 0xfce00037).nopw(); // irq ack?
 	map(0xfce00038, 0xfce0003b).w(FUNC(ms32_state::reset_sub_w));
 	map(0xfce00050, 0xfce0005f).nopw();    // watchdog? I haven't investigated
-//  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_SHARE("ms32_fce00000") /* registers not ram? */
+//  map(0xfce00000, 0xfce0007f).writeonly().share("ms32_fce00000"); /* registers not ram? */
 	map(0xfce00000, 0xfce00003).w(FUNC(ms32_state::ms32_gfxctrl_w));   /* flip screen + other unknown bits */
 	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w));    // global brightness control
 /**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");        /* roz control registers */
@@ -836,14 +836,14 @@ what the operations might be, my maths isn't up to much though...
 
 */
 
-//  AM_RANGE(0xfce00800, 0xfce0085f) // f1superb, roz #2 control?
-///**/AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM /* f1superb */
-///**/AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM /* f1superb */
-///**/AM_RANGE(0xfd440000, 0xfd47ffff) AM_RAM /* f1superb color */
-///**/AM_RANGE(0xfdc00000, 0xfdc006ff) AM_RAM /* f1superb */
-///**/AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM /* f1superb lineram #2? */
-///**/AM_RANGE(0xfe202000, 0xfe2fffff) AM_RAM /* f1superb vram */
-//  AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) /* analog controls in f1superb? */
+//  map(0xfce00800, 0xfce0085f) // f1superb, roz #2 control?
+///**/map(0xfd104000, 0xfd105fff).ram(); /* f1superb */
+///**/map(0xfd144000, 0xfd145fff).ram(); /* f1superb */
+///**/map(0xfd440000, 0xfd47ffff).ram(); /* f1superb color */
+///**/map(0xfdc00000, 0xfdc006ff).ram(); /* f1superb */
+///**/map(0xfde00000, 0xfde01fff).ram(); /* f1superb lineram #2? */
+///**/map(0xfe202000, 0xfe2fffff).ram(); /* f1superb vram */
+//  map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_state::ms32_read_inputs3)); /* analog controls in f1superb? */
 
 /*************************************
  *
@@ -934,7 +934,7 @@ static INPUT_PORTS_START( ms32_mahjong )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ms32_state,mahjong_ctrl_r, nullptr)    // here we read mahjong keys
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ms32_state, mahjong_ctrl_r)    // here we read mahjong keys
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )

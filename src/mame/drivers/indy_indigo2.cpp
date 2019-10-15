@@ -400,9 +400,11 @@ void ip24_state::ip24(machine_config &config)
 
 	SAA7191(config, m_dmsd);
 	VINO(config, m_vino);
+	m_vino->set_gio64_space(m_maincpu, AS_PROGRAM);
 	m_vino->i2c_data_out().set(m_dmsd, FUNC(saa7191_device::i2c_data_w));
 	m_vino->i2c_data_in().set(m_dmsd, FUNC(saa7191_device::i2c_data_r));
 	m_vino->i2c_stop().set(m_dmsd, FUNC(saa7191_device::i2c_stop_w));
+	m_vino->interrupt_cb().set(m_ioc2, FUNC(ioc2_device::video_int_w));
 
 	DS1386_8K(config, m_rtc, 32768);
 }

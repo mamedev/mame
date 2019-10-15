@@ -10647,6 +10647,10 @@ ROM_END
     Sets b and c:
       Turbo mode on SW(C):1.
       Press start to change character mid-game. (bug: screen goes dark when changing character, happens in attract mode as well).
+
+    MSTREET-6 repair info:
+    Frequent cause of dead board is u104 (gal/palce20v8) becoming corrupted somehow. Luckily a working unsecured chip was found and dumped :)
+    May also work for other bootlegs (there are many very similar bootlegs out there), in that case the reference (u104) may vary.
 */
 
 ROM_START( sf2cems6a )  /* 920313 USA (this set matches "sf2ceuab4" in FBA) */
@@ -10683,6 +10687,9 @@ ROM_START( sf2cems6a )  /* 920313 USA (this set matches "sf2ceuab4" in FBA) */
 
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // == loads other bootleg sets
+
+	ROM_REGION( 0x0200, "plds", 0 ) /* pld devices */
+	ROM_LOAD( "ms6_gal20v8a.u104", 0x0000, 0x0157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )
 ROM_END
 
 ROM_START( sf2cems6b )  /* 920322 USA */
@@ -10727,6 +10734,9 @@ ROM_START( sf2cems6b )  /* 920322 USA */
 
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+
+	ROM_REGION( 0x0200, "plds", 0 ) /* pld devices */
+	ROM_LOAD( "ms6_gal20v8a.u104", 0x0000, 0x0157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )
 ROM_END
 
 ROM_START( sf2cems6c )  /* 920322 USA */
@@ -10771,6 +10781,9 @@ ROM_START( sf2cems6c )  /* 920322 USA */
 
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+
+	ROM_REGION( 0x0200, "plds", 0 ) /* pld devices */
+	ROM_LOAD( "ms6_gal20v8a.u104", 0x0000, 0x0157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )
 ROM_END
 
 /* B-Board 89625B-1 */

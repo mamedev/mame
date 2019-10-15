@@ -10,7 +10,7 @@
 
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"
-#include "plib/mat_cr.h"
+#include "plib/parray.h"
 #include "plib/vector_ops.h"
 
 #include <algorithm>
@@ -30,7 +30,6 @@ namespace devices
 		using float_type = FT;
 
 		matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
-		matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
 
 		void vsetup(analog_net_t::list_t &nets) override;
 		void reset() override { matrix_solver_t::reset(); }
@@ -96,10 +95,10 @@ namespace devices
 				const auto &nzrd = m_terms[i]->m_nzrd;
 				const auto &nzbd = m_terms[i]->m_nzbd;
 
-				for (std::size_t j : nzbd)
+				for (const std::size_t j : nzbd)
 				{
 					const FT f1 = -f * A(j, i);
-					for (std::size_t k : nzrd)
+					for (const std::size_t k : nzrd)
 						A(j, k) += A(i, k) * f1;
 					//RHS(j) += RHS(i) * f1;
 				}
@@ -210,18 +209,7 @@ namespace devices
 	template <typename FT, int SIZE>
 	matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size)
-	: matrix_solver_t(anetlist, name, ASCENDING, params)
-	, m_new_V(size)
-	, m_dim(size)
-	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((m_dim + 1) + 7) / 8) * 8)
-	, m_A(size * m_pitch)
-	{
-	}
-
-	template <typename FT, int SIZE>
-	matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
-			const eSortType sort, const solver_parameters_t *params, const std::size_t size)
-	: matrix_solver_t(anetlist, name, sort, params)
+	: matrix_solver_t(anetlist, name, params)
 	, m_new_V(size)
 	, m_dim(size)
 	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((m_dim + 1) + 7) / 8) * 8)

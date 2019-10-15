@@ -134,7 +134,7 @@ void rsp_device::cop2_drc::cfunc_unimplemented_opcode()
 		std::ostringstream stream;
 		rspd.dasm_one(stream, ppc, m_rspcop2_state->op);
 		const std::string stream_string = stream.str();
-		osd_printf_debug("%08X: %s\n", ppc, stream_string.c_str());
+		osd_printf_debug("%08X: %s\n", ppc, stream_string);
 	}
 	fatalerror("RSP: unknown opcode %02X (%08X) at %08X\n", m_rspcop2_state->op >> 26, m_rspcop2_state->op, ppc);
 }

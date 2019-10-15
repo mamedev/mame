@@ -348,7 +348,7 @@ WRITE16_MEMBER(seicupbl_state::layer_disable_w)
 
 void seicupbl_state::cupsocbl_mem(address_map &map)
 {
-//  AM_IMPORT_FROM( legionna_cop_mem )
+//  legionna_cop_mem(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::read), FUNC(seibu_cop_bootleg_device::write));
 	map(0x10065c, 0x10065d).w(FUNC(seicupbl_state::layer_disable_w));

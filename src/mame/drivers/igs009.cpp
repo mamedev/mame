@@ -66,7 +66,7 @@ public:
 	void init_jingbell();
 	void init_jingbelli();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 private:
 	DECLARE_WRITE8_MEMBER(reel1_ram_w);
@@ -387,7 +387,7 @@ uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 ***************************************************************************/
 
 
-CUSTOM_INPUT_MEMBER(igs009_state::hopper_r)
+READ_LINE_MEMBER(igs009_state::hopper_r)
 {
 	return m_hopper && !(m_screen->frame_number()%10);
 }
@@ -698,7 +698,7 @@ static INPUT_PORTS_START( jingbell )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Memory Clear")    // stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igs009_state,hopper_r, nullptr)  // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(igs009_state, hopper_r)  // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
@@ -832,7 +832,7 @@ WRITE_LINE_MEMBER(igs009_state::vblank_irq)
 void igs009_state::jingbell(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 2);   /* HD64180RP8, 8 MHz? */
+	HD64180RP(config, m_maincpu, XTAL(12'000'000));   /* HD64180RP8, 8 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs009_state::jingbell_map);
 	m_maincpu->set_addrmap(AS_IO, &igs009_state::jingbell_portmap);
 

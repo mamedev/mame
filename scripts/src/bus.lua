@@ -761,7 +761,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/coleco/exp.h,BUSES["COLECO_CART"] = true
+--@src/devices/bus/coleco/cartridge/exp.h,BUSES["COLECO_CART"] = true
 ---------------------------------------------------
 
 if (BUSES["COLECO_CART"]~=null) then
@@ -2941,6 +2941,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/internal/evpcconn.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/genkbd.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/genkbd.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.h",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/busmouse.cpp",

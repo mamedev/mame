@@ -407,7 +407,7 @@ void wd1000_device::data_w(uint8_t data)
 	{
 		// Tranfer completed.
 		if ((m_command >> 4) == CMD_WRITE_SECTOR ||
-		    (m_command >> 4) == CMD_WRITE_FORMAT)
+			(m_command >> 4) == CMD_WRITE_FORMAT)
 		{
 			m_status |= S_BSY;
 			set_error(0);

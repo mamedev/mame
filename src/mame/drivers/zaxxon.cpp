@@ -350,24 +350,24 @@ READ8_MEMBER(zaxxon_state::razmataz_counter_r)
 }
 
 
+template <int Num>
 CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
 {
-	int num = (uintptr_t)param;
 	int res;
 
-	int delta = m_dials[num]->read();
+	int delta = m_dials[Num]->read();
 
 	if (delta < 0x80)
 	{
 		// right
-		m_razmataz_dial_pos[num] -= delta;
-		res = (m_razmataz_dial_pos[num] << 1) | 1;
+		m_razmataz_dial_pos[Num] -= delta;
+		res = (m_razmataz_dial_pos[Num] << 1) | 1;
 	}
 	else
 	{
 		// left
-		m_razmataz_dial_pos[num] += delta;
-		res = (m_razmataz_dial_pos[num] << 1);
+		m_razmataz_dial_pos[Num] += delta;
+		res = (m_razmataz_dial_pos[Num] << 1);
 	}
 
 	return res;
@@ -422,9 +422,10 @@ INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 }
 
 
-CUSTOM_INPUT_MEMBER(zaxxon_state::zaxxon_coin_r)
+template <int Num>
+READ_LINE_MEMBER(zaxxon_state::zaxxon_coin_r)
 {
-	return m_coin_status[(int)(uintptr_t)param];
+	return m_coin_status[Num];
 }
 
 
@@ -535,9 +536,9 @@ static INPUT_PORTS_START( zaxxon )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<2>)
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, 0)
@@ -696,7 +697,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( razmataz )
 	PORT_START("SW00")
-	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)0)
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(zaxxon_state, razmataz_dial_r<0>)
 
 	PORT_START("DIAL.0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(1)
@@ -711,7 +712,7 @@ static INPUT_PORTS_START( razmataz )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SW08")
-	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)1)
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(zaxxon_state, razmataz_dial_r<1>)
 
 	PORT_START("DIAL.1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(2)
@@ -724,9 +725,9 @@ static INPUT_PORTS_START( razmataz )
 
 	PORT_START("SW100")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<2>)
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, 0)
@@ -789,7 +790,7 @@ static INPUT_PORTS_START( ixion )
 	PORT_INCLUDE(zaxxon)
 
 	PORT_MODIFY("SW00")
-	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)0)
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(zaxxon_state, razmataz_dial_r<0>)
 
 	PORT_START("DIAL.0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_RESET

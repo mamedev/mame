@@ -6745,8 +6745,8 @@
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="4228062">
-				<rom name="jack nicklaus screen savers.mfm" size="4228062" crc="6fa0f8f9" sha1="5d1dd82b3e7993bc449b3583064b0aa3da391ef5"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="jack nicklaus screen savers.img" size="1474560" crc="175f8c1b" sha1="2da53c4d4b3de47d7f4eb31772caf39101790322"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7531,6 +7531,17 @@
 		</part>
 	</software>
 
+	<software name="quiklink2">
+		<description>QuickLink II Fax</description>
+		<year>1993</year>
+		<publisher>Smith Micro Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="quicklink ii fax.img" size="1474560" crc="184c21ee" sha1="011ec2c43527e7e153e013e36b8f16a0cac02ae5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moneynet">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Reuters Money Network</description>
@@ -7675,6 +7686,18 @@
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk3.img" size="737280" crc="86b13b21" sha1="4b4182380cdeaf8a327fa9c46263b0c911c814cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vinguide">
+		<description>Vinguiden 1.0 (Sweden)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="4229016">
+				<rom name="21-046-015472.mfm" size="4229016" crc="5387eea6" sha1="a25043518a0e30ca515324bc0a866945b9b9d383" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10310,14 +10333,14 @@
 		</part>
 		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "4227419">
-				<rom name="gilis presentask - diskett 2.mfm" size="4227419" crc="5d6167dd" sha1="3c13d298f68d0b5c98f3da64fa72df2c52658040"/>
+			<dataarea name="flop" size = "1477688">
+				<rom name="gilis presentask - diskett 2.imd" size="1477688" crc="6739361d" sha1="7bf0a4565ce4c342a498c914462fc53cf0b62353"/>
 			</dataarea>
 		</part>
 		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
 		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "4227928">
-				<rom name="gilis presentask - diskett 3.mfm" size="4227928" crc="87cb316c" sha1="561cf3024b3835e4893aa6a52a745f4ebe998392"/>
+			<dataarea name="flop" size = "1478710">
+				<rom name="gilis presentask - diskett 3.imd" size="1478710" crc="3ea9d9fe" sha1="8dabbfb2be7930eb0c269da5d882533fdf2ae54e"/>
 			</dataarea>
 		</part>
 	</software>

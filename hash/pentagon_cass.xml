@@ -18,7 +18,7 @@
 		<publisher>Firesoft</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="45895">
-				<rom name="boulder mix (19xx)(firesoft)(ru)[pentagon 128].tzx" size="45895" crc="dd36b3bf" sha1="26430d66baaf04c2e7757f23169ffb201190d5c6" offset="0"/>
+				<rom name="boulder mix (19xx)(firesoft)(ru)[pentagon 128].tzx" size="45895" crc="dd36b3bf" sha1="26430d66baaf04c2e7757f23169ffb201190d5c6"/>
 			</dataarea>
 		</part>
 	</software>

@@ -21,15 +21,14 @@
 
 void qixmcu_state::machine_start()
 {
+	qix_state::machine_start();
+
+	/* reset the coin counter register */
+	m_coinctrl = 0x00;
+
 	/* set up save states */
 	save_item(NAME(m_68705_porta_out));
 	save_item(NAME(m_coinctrl));
-}
-
-void qixmcu_state::machine_reset()
-{
-	/* reset the coin counter register */
-	m_coinctrl = 0x00;
 }
 
 void zookeep_state::machine_start()
@@ -37,9 +36,9 @@ void zookeep_state::machine_start()
 	qixmcu_state::machine_start();
 
 	/* configure the banking */
-	membank("bank1")->configure_entry(0, memregion("videocpu")->base() + 0xa000);
-	membank("bank1")->configure_entry(1, memregion("videocpu")->base() + 0x10000);
-	membank("bank1")->set_entry(0);
+	m_vidbank->configure_entry(0, memregion("videocpu")->base() + 0xa000);
+	m_vidbank->configure_entry(1, memregion("videocpu")->base() + 0x10000);
+	m_vidbank->set_entry(0);
 }
 
 /*************************************
@@ -63,7 +62,7 @@ WRITE_LINE_MEMBER(qix_state::qix_vsync_changed)
 
 WRITE8_MEMBER(zookeep_state::bankswitch_w)
 {
-	membank("bank1")->set_entry((data >> 2) & 1);
+	m_vidbank->set_entry(BIT(data, 2));
 	/* not necessary, but technically correct */
 	qix_palettebank_w(space, offset, data);
 }

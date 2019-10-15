@@ -22,7 +22,7 @@
 #include "plib/ptime.h"
 #include "plib/putil.h"
 
-#include <cstdint>
+//#include <cstdint>
 #include <unordered_map>
 
 namespace netlist
@@ -100,6 +100,12 @@ namespace netlist
 	 */
 	template <typename T>
 	using pool_owned_ptr = nlmempool::owned_pool_ptr<T>;
+
+	/*! Unique pointer type for pooled allocations.
+	 *
+	 */
+	template <typename T>
+	using unique_pool_ptr = nlmempool::unique_pool_ptr<T>;
 
 	inline nlmempool &pool()
 	{

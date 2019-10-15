@@ -156,7 +156,7 @@ uint8_t savquest_state::mtxc_config_r(int function, int reg)
 
 void savquest_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 
 	#if 1
 	switch(reg)
@@ -299,7 +299,7 @@ uint8_t savquest_state::piix4_config_r(int function, int reg)
 
 void savquest_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -740,7 +740,7 @@ void savquest_state::savquest_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw(FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	map(0x000a0000, 0x000bffff).rw(FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //.rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000f0000, 0x000fffff).bankr("bios_f0000").w(FUNC(savquest_state::bios_f0000_ram_w));
 	map(0x000e0000, 0x000e3fff).bankr("bios_e0000").w(FUNC(savquest_state::bios_e0000_ram_w));
@@ -770,7 +770,7 @@ void savquest_state::savquest_io(address_map &map)
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
-//  AM_RANGE(0x5000, 0x5007) // routes to port $eb
+//  map(0x5000, 0x5007) // routes to port $eb
 }
 
 #define AT_KEYB_HELPER(bit, text, key1) \

@@ -1015,10 +1015,25 @@ namespace netlist
 	public:
 		param_num_t(device_t &device, const pstring &name, const T val);
 
-		const T operator()() const NL_NOEXCEPT { return m_param; }
+		T operator()() const NL_NOEXCEPT { return m_param; }
+		operator T() const  NL_NOEXCEPT { return m_param; }
+
 		void setTo(const T &param) { set(m_param, param); }
 	private:
 		T m_param;
+	};
+
+	template <typename T>
+	class param_enum_t final: public param_t
+	{
+	public:
+		param_enum_t(device_t &device, const pstring &name, const T val);
+
+		T operator()() const NL_NOEXCEPT { return T(m_param); }
+		operator T() const NL_NOEXCEPT { return T(m_param); }
+		void setTo(const T &param) { set(m_param, static_cast<int>(param)); }
+	private:
+		int m_param;
 	};
 
 	/* FIXME: these should go as well */
@@ -1119,7 +1134,7 @@ namespace netlist
 		{
 		}
 
-		plib::unique_ptr<plib::pistream> stream();
+		plib::unique_ptr<std::istream> stream();
 	protected:
 		void changed() override { }
 	};
@@ -1139,7 +1154,7 @@ namespace netlist
 	protected:
 		void changed() override
 		{
-			stream()->read(reinterpret_cast<plib::pistream::value_type *>(&m_data[0]),1<<AW);
+			stream()->read(reinterpret_cast<std::istream::char_type *>(&m_data[0]),1<<AW);
 		}
 
 	private:
@@ -1201,7 +1216,7 @@ namespace netlist
 			nperfcount_t<true> m_stat_inc_active;
 		};
 
-		plib::unique_ptr<stats_t> m_stats;
+		unique_pool_ptr<stats_t> m_stats;
 
 		virtual void update() NL_NOEXCEPT { }
 		virtual void reset() { }
@@ -1369,12 +1384,12 @@ namespace netlist
 		template<typename O, typename C>
 		void save(O &owner, C &state, const pstring &module, const pstring &stname)
 		{
-			this->run_state_manager().save_item(static_cast<void *>(&owner), state, module + pstring(".") + stname);
+			this->run_state_manager().save_item(static_cast<void *>(&owner), state, module + "." + stname);
 		}
 		template<typename O, typename C>
 		void save(O &owner, C *state, const pstring &module, const pstring &stname, const std::size_t count)
 		{
-			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), module + pstring(".") + stname, plib::state_manager_t::dtype<C>(), count, state);
+			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), module + "." + stname, plib::state_manager_t::dtype<C>(), count, state);
 		}
 
 		detail::net_t *find_net(const pstring &name) const;
@@ -1474,7 +1489,7 @@ namespace netlist
 	// netlist_t
 	// -----------------------------------------------------------------------------
 
-	class netlist_t
+	class netlist_t // NOLINT(clang-analyzer-optin.performance.Padding)
 	{
 	public:
 
@@ -1495,16 +1510,16 @@ namespace netlist
 
 		void qpush(detail::queue_t::entry_t && e) noexcept
 		{
-			if (!USE_QUEUE_STATS || !m_stats)
-				m_queue.push_nostats(std::move(e));
+			if (!USE_QUEUE_STATS || !m_use_stats)
+				m_queue.push_nostats(std::move(e)); // NOLINT(performance-move-const-arg)
 			else
-				m_queue.push(std::move(e));
+				m_queue.push(std::move(e)); // NOLINT(performance-move-const-arg)
 		}
 
 		template <class R>
 		void qremove(const R &elem) noexcept
 		{
-			if (!USE_QUEUE_STATS || !m_stats)
+			if (!USE_QUEUE_STATS || !m_use_stats)
 				m_queue.remove_nostats(elem);
 			else
 				m_queue.remove(elem);
@@ -1538,8 +1553,8 @@ namespace netlist
 
 		void print_stats() const;
 
-		bool stats_enabled() const { return m_stats; }
-		void enable_stats(bool val) { m_stats = val; }
+		bool stats_enabled() const { return m_use_stats; }
+		void enable_stats(bool val) { m_use_stats = val; }
 
 	private:
 
@@ -1556,7 +1571,7 @@ namespace netlist
 
 		PALIGNAS_CACHELINE()
 		detail::queue_t                     m_queue;
-		bool                                m_stats;
+		bool                                m_use_stats;
 
 		// performance
 		nperftime_t<true>                   m_stat_mainloop;
@@ -1628,13 +1643,31 @@ namespace netlist
 		device.state().save(*this, m_param, this->name(), "m_param");
 	}
 
+	template <typename T>
+	param_enum_t<T>::param_enum_t(device_t &device, const pstring &name, const T val)
+	: param_t(device, name), m_param(val)
+	{
+		bool found = false;
+		pstring p = this->get_initial(device, &found);
+		if (found)
+		{
+			T temp(val);
+			bool ok = temp.set_from_string(p);
+			if (!ok)
+				device.state().log().fatal(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
+			m_param = temp;
+		}
+
+		device.state().save(*this, m_param, this->name(), "m_param");
+	}
+
 	template <typename ST, std::size_t AW, std::size_t DW>
 	param_rom_t<ST, AW, DW>::param_rom_t(device_t &device, const pstring &name)
 	: param_data_t(device, name)
 	{
 		auto f = stream();
 		if (f != nullptr)
-			f->read(reinterpret_cast<plib::pistream::value_type *>(&m_data[0]),1<<AW);
+			f->read(reinterpret_cast<std::istream::char_type *>(&m_data[0]),1<<AW);
 		else
 			device.state().log().warning(MW_ROM_NOT_FOUND(str()));
 	}

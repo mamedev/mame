@@ -37,7 +37,7 @@
 
 <softwarelist name="pockchalw" description="Pocket Challenge W cartridges">
 
-	<software name="chukomn1" supported="no" >
+	<software name="chukomn1" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Koumin (1K)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -58,7 +58,7 @@
 		</part>
 	</software>
 
-	<software name="chukomnn" supported="no" >
+	<software name="chukomnn" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Koumin (NK)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -79,7 +79,7 @@
 		</part>
 	</software>
 
-	<software name="chuchi" supported="no" >
+	<software name="chuchi" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri (9C)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -100,7 +100,7 @@
 		</part>
 	</software>
 
-	<software name="chuchire" supported="no" >
+	<software name="chuchire" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Chiri - Rekishi Pack (PS)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -128,7 +128,7 @@
 		</part>
 	</software>
 
-	<software name="churika" supported="no" >
+	<software name="churika" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Chuugaku Rika Pack (PL)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -156,7 +156,7 @@
 		</part>
 	</software>
 
-	<software name="chukkjuk" supported="no" >
+	<software name="chukkjuk" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Koukou Juken (Kuni - Suu) (0G2)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -177,7 +177,7 @@
 		</part>
 	</software>
 
-	<software name="chukkesr" supported="no" >
+	<software name="chukkesr" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Koukou Juken (Ei - Sha - Ri) (N-G1)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -202,7 +202,7 @@
 		</part>
 	</software>
 
-	<software name="jitsugi4" supported="no" >
+	<software name="jitsugi4" supported="no">
 		<description>Shinkenzemi Chuugaku Kouza - Jitsugi 4 Kyouka (BG)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -223,7 +223,7 @@
 		</part>
 	</software>
 
-	<software name="hineijuk" supported="no" >
+	<software name="hineijuk" supported="no">
 		<description>Shinkenzemi Koukou Kouza - Hinshutsu Ei Jukugo (J)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>
@@ -244,7 +244,7 @@
 		</part>
 	</software>
 
-	<software name="jukokor" supported="no" >
+	<software name="jukokor" supported="no">
 		<description>Shinkenzemi Koukou Kouza - Juuyou Kobun Kouryaku (A)</description>
 		<year>2000?</year>
 		<publisher>Benesse Corporation</publisher>

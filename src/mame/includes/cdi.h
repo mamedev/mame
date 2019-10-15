@@ -10,6 +10,7 @@
 #include "sound/dmadac.h"
 #include "video/mcd212.h"
 #include "cpu/mcs51/mcs51.h"
+#include "cpu/m6805/m68hc05.h"
 #include "screen.h"
 
 /*----------- driver state -----------*/
@@ -33,35 +34,6 @@ public:
 		, m_dmadac(*this, "dac%u", 1U)
 	{ }
 
-	enum m68hc05eg_io_reg_t
-	{
-		PORT_A_DATA = 0x00,
-		PORT_B_DATA = 0x01,
-		PORT_C_DATA = 0x02,
-		PORT_D_INPUT = 0x03,
-		PORT_A_DDR = 0x04,
-		PORT_B_DDR = 0x05,
-		PORT_C_DDR = 0x06,
-		SPI_CTRL = 0x0a,
-		SPI_STATUS = 0x0b,
-		SPI_DATA = 0x0c,
-		SCC_BAUD = 0x0d,
-		SCC_CTRL1 = 0x0e,
-		SCC_CTRL2 = 0x0f,
-		SCC_STATUS = 0x10,
-		SCC_DATA = 0x11,
-		TIMER_CTRL = 0x12,
-		TIMER_STATUS = 0x13,
-		ICAP_HI = 0x14,
-		ICAP_LO = 0x15,
-		OCMP_HI = 0x16,
-		OCMP_LO = 0x17,
-		COUNT_HI = 0x18,
-		COUNT_LO = 0x19,
-		ACOUNT_HI = 0x1a,
-		ACOUNT_LO = 0x1b
-	};
-
 	enum servo_portc_bit_t
 	{
 		INV_JUC_OUT = (1 << 2),
@@ -74,8 +46,8 @@ public:
 	optional_ioport m_input1;
 	optional_ioport m_input2;
 	optional_device<cdislave_device> m_slave_hle;
-	optional_device<cpu_device> m_servo;
-	optional_device<cpu_device> m_slave;
+	optional_device<m68hc05c8_device> m_servo;
+	optional_device<m68hc05c8_device> m_slave;
 	optional_device<cdicdic_device> m_cdic;
 	required_device<cdda_device> m_cdda;
 	required_device<mcd212_device> m_mcd212;
@@ -84,9 +56,6 @@ public:
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
 	INTERRUPT_GEN_MEMBER( mcu_frame );
-
-	uint8_t m_servo_io_regs[0x20];
-	uint8_t m_slave_io_regs[0x20];
 
 	uint8_t m_timer_set;
 	emu_timer *m_test_timer;
@@ -104,10 +73,6 @@ public:
 	DECLARE_MACHINE_RESET(quizard2);
 	DECLARE_MACHINE_RESET(quizard3);
 	DECLARE_MACHINE_RESET(quizard4);
-	DECLARE_READ8_MEMBER(servo_io_r);
-	DECLARE_WRITE8_MEMBER(servo_io_w);
-	DECLARE_READ8_MEMBER(slave_io_r);
-	DECLARE_WRITE8_MEMBER(slave_io_w);
 
 	DECLARE_READ8_MEMBER(quizard_mcu_p1_r);
 
@@ -127,8 +92,6 @@ public:
 	void cdi910_mem(address_map &map);
 	void cdimono1_mem(address_map &map);
 	void cdimono2_mem(address_map &map);
-	void cdimono2_servo_mem(address_map &map);
-	void cdimono2_slave_mem(address_map &map);
 	void cdi070_cpuspace(address_map &map);
 
 	// Quizard Protection HLE

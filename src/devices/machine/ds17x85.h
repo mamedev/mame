@@ -22,7 +22,7 @@
 **********************************************************************/
 
 #ifndef MAME_MACHINE_DS17X85_H
-#define MAME_MACHINE_DS17X85_H 1
+#define MAME_MACHINE_DS17X85_H
 
 #pragma once
 

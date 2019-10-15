@@ -342,7 +342,7 @@ void bpmmicro_state::i286_mem(address_map &map)
 	map(0x08401a, 0x8401b).w(FUNC(bpmmicro_state::unknown_8401a_w));
 	map(0x08401c, 0x8401d).w(FUNC(bpmmicro_state::eeprom_8401c_w));
 	map(0x0f0000, 0x0fffff).rom().region("bios", 0x10000);
-	//AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0) //?
+	//map(0xfe0000, 0xffffff).rom().region("bios", 0); //?
 	map(0xfffff0, 0xffffff).rom().region("bios", 0x1fff0); //?
 }
 

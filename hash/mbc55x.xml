@@ -10,7 +10,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="microsoft ms-dos 2.11 (sanyo).img" size="368640" crc="b64b0c3c" sha1="35a9a1e62ccefa3c66d912b4d58c1a132cd757d2" offset="0" status="baddump" />
+				<rom name="microsoft ms-dos 2.11 (sanyo).img" size="368640" crc="b64b0c3c" sha1="35a9a1e62ccefa3c66d912b4d58c1a132cd757d2" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +22,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sanyo_mbc555_ms-dos_2.11.ima" size="368640" crc="ab9dd1d4" sha1="eb5a5dd025e0e8efacea603daf37243986d92262" offset="0" />
+				<rom name="sanyo_mbc555_ms-dos_2.11.ima" size="368640" crc="ab9dd1d4" sha1="eb5a5dd025e0e8efacea603daf37243986d92262"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="msdos125" size="163840" crc="1ea744cc" sha1="dd8b41bb67d0b888cd70ded4b61701708caa5dac" offset="0" />
+				<rom name="msdos125" size="163840" crc="1ea744cc" sha1="dd8b41bb67d0b888cd70ded4b61701708caa5dac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +46,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sanyo_mbc555_calcstar.ima" size="368640" crc="422ff754" sha1="4d09a213d4a0dd2bdb26398beaed9bce070abbcd" offset="0" />
+				<rom name="sanyo_mbc555_calcstar.ima" size="368640" crc="422ff754" sha1="4d09a213d4a0dd2bdb26398beaed9bce070abbcd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -58,7 +58,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sanyo_mbc555_datastar.ima" size="368640" crc="93cad6c5" sha1="5e4ba8deb3995c57e37eda9f06841daff15b0e17" offset="0" />
+				<rom name="sanyo_mbc555_datastar.ima" size="368640" crc="93cad6c5" sha1="5e4ba8deb3995c57e37eda9f06841daff15b0e17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -70,7 +70,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sanyo_mbc555_easydraw.ima" size="368640" crc="e6c1ad15" sha1="d1e392b04a966264114d7965fd18a0a4742fa85c" offset="0" />
+				<rom name="sanyo_mbc555_easydraw.ima" size="368640" crc="e6c1ad15" sha1="d1e392b04a966264114d7965fd18a0a4742fa85c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -82,7 +82,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="larn.img" size="368640" crc="a57add87" sha1="696a0fb800d89d59a22381ddd399f1548fbd3646" offset="0" />
+				<rom name="larn.img" size="368640" crc="a57add87" sha1="696a0fb800d89d59a22381ddd399f1548fbd3646"/>
 			</dataarea>
 		</part>
 	</software>
@@ -94,7 +94,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="picasso.img" size="368640" crc="b4dad321" sha1="3d5555f5d7d6f49bb51e334c86783611dc131e06" offset="0" />
+				<rom name="picasso.img" size="368640" crc="b4dad321" sha1="3d5555f5d7d6f49bb51e334c86783611dc131e06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sanyo_mbc555_mailmerge_spelstar.ima" size="368640" crc="d555bebb" sha1="44de7c054533d5eac7db8802facfda3eea70a1f2" offset="0" />
+				<rom name="sanyo_mbc555_mailmerge_spelstar.ima" size="368640" crc="d555bebb" sha1="44de7c054533d5eac7db8802facfda3eea70a1f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sanyo_mbc555_reportstar.ima" size="368640" crc="2992d3a1" sha1="75d589d777c00db7c8364353817947d4ac95c582" offset="0" />
+				<rom name="sanyo_mbc555_reportstar.ima" size="368640" crc="2992d3a1" sha1="75d589d777c00db7c8364353817947d4ac95c582"/>
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="softse05.img" size="368640" crc="a5252da6" sha1="a840d6e2ef9aa840898cd02ec0eca217b1abef3d" offset="0" />
+				<rom name="softse05.img" size="368640" crc="a5252da6" sha1="a840d6e2ef9aa840898cd02ec0eca217b1abef3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +142,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sanyo_mbc555_wordstar.ima" size="368640" crc="71c29f9a" sha1="389215fbfab4c1e218d8ef08fa5f7c2bb2a4e6da" offset="0" />
+				<rom name="sanyo_mbc555_wordstar.ima" size="368640" crc="71c29f9a" sha1="389215fbfab4c1e218d8ef08fa5f7c2bb2a4e6da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +156,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sanyo_mbc555_basic_games.ima" size="368640" crc="e076efa4" sha1="a9fd7dcae96aca09206a4a8529e50cdb191739ba" offset="0" />
+				<rom name="sanyo_mbc555_basic_games.ima" size="368640" crc="e076efa4" sha1="a9fd7dcae96aca09206a4a8529e50cdb191739ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -170,7 +170,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="34844">
-				<rom name="cashman.td0" size="34844" crc="baecaef3" sha1="0a17be5ea8864e6bc9074acbea39d28a2828d53d" offset="0" />
+				<rom name="cashman.td0" size="34844" crc="baecaef3" sha1="0a17be5ea8864e6bc9074acbea39d28a2828d53d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -183,7 +183,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="29464">
-				<rom name="demonsd.td0" size="29464" crc="11d9577b" sha1="15a5927809aa5762a6289386935d1a2c24e8d239" offset="0" />
+				<rom name="demonsd.td0" size="29464" crc="11d9577b" sha1="15a5927809aa5762a6289386935d1a2c24e8d239"/>
 			</dataarea>
 		</part>
 	</software>
@@ -196,7 +196,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="zork.dsk" size="368640" crc="9b7daf44" sha1="34ca63dde2b4a85bac2e6391ca4d588e06058039" offset="0" />
+				<rom name="zork.dsk" size="368640" crc="9b7daf44" sha1="34ca63dde2b4a85bac2e6391ca4d588e06058039"/>
 			</dataarea>
 		</part>
 	</software>

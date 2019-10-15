@@ -70,7 +70,7 @@ void astrocde_home_state::astrocade_mem(address_map &map)
 	map(0x0000, 0x0fff).rom().w(FUNC(astrocde_home_state::astrocade_funcgen_w));
 	map(0x1000, 0x3fff).rom(); /* Star Fortress writes in here?? */
 	map(0x4000, 0x4fff).ram().share("videoram"); /* ASG */
-	//AM_RANGE(0x5000, 0xffff) AM_DEVREADWRITE("exp", astrocade_exp_device, read, write)
+	//map(0x5000, 0xffff).rw("exp", FUNC(astrocade_exp_device::read), FUNC(astrocade_exp_device::write));
 }
 
 

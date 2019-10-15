@@ -302,7 +302,7 @@ CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
 		return (ioport("CTRL")->read() & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
+READ_LINE_MEMBER(phoenix_state::pleiads_protection_r)
 {
 	/* handle Pleiads protection */
 	switch (m_pleiads_protection_question)

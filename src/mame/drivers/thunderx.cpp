@@ -42,6 +42,9 @@
 #include "sound/ym2151.h"
 #include "speaker.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 void thunderx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -51,12 +54,10 @@ void thunderx_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in thunderx_state::device_timer");
+		throw emu_fatalerror("Unknown id in thunderx_state::device_timer");
 	}
 }
 
-#define VERBOSE 0
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 #define PMC_BK (m_1f98_latch & 0x02)
 
 READ8_MEMBER(thunderx_state::pmc_r)
@@ -68,7 +69,7 @@ READ8_MEMBER(thunderx_state::pmc_r)
 	}
 	else
 	{
-		LOG(("%04x read pmc internal ram %04x\n",m_audiocpu->pc(),offset));
+		LOG("%04x read pmc internal ram %04x\n",m_audiocpu->pc(),offset);
 		return 0;
 	}
 }
@@ -77,12 +78,12 @@ WRITE8_MEMBER(thunderx_state::pmc_w)
 {
 	if (PMC_BK)
 	{
-		LOG(("%04x pmcram %04x = %02x\n",m_audiocpu->pc(),offset,data));
+		LOG("%04x pmcram %04x = %02x\n",m_audiocpu->pc(),offset,data);
 		m_pmcram[offset] = data;
 	}
 	else
 	{
-		LOG(("%04x pmc internal ram %04x = %02x\n",m_audiocpu->pc(),offset,data));
+		LOG("%04x pmc internal ram %04x = %02x\n",m_audiocpu->pc(),offset,data);
 	}
 }
 

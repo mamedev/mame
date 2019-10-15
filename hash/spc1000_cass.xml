@@ -10,17 +10,17 @@
 		<info name="usage" value="When asked for next demo, mount a new part" />
 		<part name="cass1" interface="spc1000_cass">
 			<dataarea name="cass" size="354254">
-				<rom name="demo1.tap" size="354254" crc="2d2d802f" sha1="8aa8101d27de44e4279f5aca8846f47f3115fbed" offset="0" />
+				<rom name="demo1.tap" size="354254" crc="2d2d802f" sha1="8aa8101d27de44e4279f5aca8846f47f3115fbed"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="spc1000_cass">
 			<dataarea name="cass" size="399434">
-				<rom name="demo2.tap" size="399434" crc="c2310624" sha1="87633e5897ae9a3d17b7528a97dce5dc0a2cb287" offset="0" />
+				<rom name="demo2.tap" size="399434" crc="c2310624" sha1="87633e5897ae9a3d17b7528a97dce5dc0a2cb287"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="spc1000_cass">
 			<dataarea name="cass" size="382226">
-				<rom name="demo3.tap" size="382226" crc="d56fe093" sha1="47b0ca315116552dd08a9d396dc7c8009146c280" offset="0" />
+				<rom name="demo3.tap" size="382226" crc="d56fe093" sha1="47b0ca315116552dd08a9d396dc7c8009146c280"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@
 		<info name="alt_title" value="방사능오염 ~ Bangsanenung Oyeom" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="110530">
-				<rom name="aldebaran-9518-mayhouse.tap" size="110530" crc="2c84e494" sha1="a6bbe41258cfbfa993134e84121392c1ea4fae9c" offset="0" />
+				<rom name="aldebaran-9518-mayhouse.tap" size="110530" crc="2c84e494" sha1="a6bbe41258cfbfa993134e84121392c1ea4fae9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -47,7 +47,7 @@
 		<info name="alt_title" value="사과도둑" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="221184">
-				<rom name="apple thief.tap" size="221184" crc="40bff01e" sha1="88185c6f3fb9378fdbb6875cbce33d63bae85f31" offset="0" />
+				<rom name="apple thief.tap" size="221184" crc="40bff01e" sha1="88185c6f3fb9378fdbb6875cbce33d63bae85f31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -59,7 +59,7 @@
 		<info name="alt_title" value="사과도둑" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="27465">
-				<rom name="apple thief.cas" size="27465" crc="5aa2c130" sha1="83ab88c1404f53269e03610f7f14b67ed7789359" offset="0" />
+				<rom name="apple thief.cas" size="27465" crc="5aa2c130" sha1="83ab88c1404f53269e03610f7f14b67ed7789359"/>
 			</dataarea>
 		</part>
 	</software>
@@ -71,7 +71,7 @@
 		<info name="alt_title" value="사과도둑" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="1359872">
-				<rom name="apple thief(ascii).tap" size="1359872" crc="8e18260c" sha1="68da1f631d393b36242911046d024219c0a131b5" offset="0" />
+				<rom name="apple thief(ascii).tap" size="1359872" crc="8e18260c" sha1="68da1f631d393b36242911046d024219c0a131b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +83,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="196633">
-				<rom name="asteroid.tap" size="196633" crc="cd1d84d0" sha1="6279aead257e1abbaf1bfd545d827c2a8bfe48b7" offset="0" />
+				<rom name="asteroid.tap" size="196633" crc="cd1d84d0" sha1="6279aead257e1abbaf1bfd545d827c2a8bfe48b7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +95,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="132276">
-				<rom name="asteroid belt.tap" size="132276" crc="9aefdaff" sha1="2274393bb92378468606dceb6193c28b79fc1f7a" offset="0" />
+				<rom name="asteroid belt.tap" size="132276" crc="9aefdaff" sha1="2274393bb92378468606dceb6193c28b79fc1f7a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@
 		<publisher>Sammi Computer</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="247035">
-				<rom name="a.v-6856-mayhouse.tap" size="247035" crc="5bf4e5ef" sha1="1b0c67e976895a362c4fc2457ef063fc37b41fcd" offset="0" />
+				<rom name="a.v-6856-mayhouse.tap" size="247035" crc="5bf4e5ef" sha1="1b0c67e976895a362c4fc2457ef063fc37b41fcd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@
 		<info name="alt_title" value="바주카" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="142106">
-				<rom name="bazooka.tap" size="142106" crc="f6a81b77" sha1="d5d0bf948f25238c611874da27bdbd1c07731e03" offset="0" />
+				<rom name="bazooka.tap" size="142106" crc="f6a81b77" sha1="d5d0bf948f25238c611874da27bdbd1c07731e03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@
 		<info name="alt_title" value="바주카" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="90945">
-				<rom name="bazooka alt.tap" size="90945" crc="65c5442a" sha1="ba2609486e79efeb6063f1a2e1b87b2a2100b568" offset="0" />
+				<rom name="bazooka alt.tap" size="90945" crc="65c5442a" sha1="ba2609486e79efeb6063f1a2e1b87b2a2100b568"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="66434">
-				<rom name="block-2788-mayhouse.tap" size="66434" crc="00d0c5ce" sha1="234ee09bcf7bdb9b62d0c806d978892ed8e0813a" offset="0" />
+				<rom name="block-2788-mayhouse.tap" size="66434" crc="00d0c5ce" sha1="234ee09bcf7bdb9b62d0c806d978892ed8e0813a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@
 		<info name="alt_title" value="블럭격파 ~ Beulleog Gyeogpa" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="121361">
-				<rom name="block game.tap" size="121361" crc="4114fac9" sha1="62171f381485df4a962d740fc5553eb522f156c2" offset="0" />
+				<rom name="block game.tap" size="121361" crc="4114fac9" sha1="62171f381485df4a962d740fc5553eb522f156c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +165,7 @@
 		<info name="alt_title" value="블럭격파 ~ Beulleog Gyeogpa" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="121429">
-				<rom name="[sim]block.tap" size="121429" crc="fb25de0e" sha1="083e2fecb2df4d9ef2bf7b436d8468586178c951" offset="0" />
+				<rom name="[sim]block.tap" size="121429" crc="fb25de0e" sha1="083e2fecb2df4d9ef2bf7b436d8468586178c951"/>
 			</dataarea>
 		</part>
 	</software>
@@ -177,7 +177,7 @@
 		<info name="alt_title" value="블럭격파 ~ Beulleog Gyeogpa" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="150422">
-				<rom name="block-game.tap" size="150422" crc="db6226ac" sha1="adddb1677400e033e03d6e1ba99038f81f1580e1" offset="0" />
+				<rom name="block-game.tap" size="150422" crc="db6226ac" sha1="adddb1677400e033e03d6e1ba99038f81f1580e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -192,7 +192,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="207723">
-				<rom name="boat-5239-mayhouse.tap" size="207723" crc="e913793c" sha1="1a7eb9c96a9c075e8444fabb1bd7d933d1048f43" offset="0" />
+				<rom name="boat-5239-mayhouse.tap" size="207723" crc="e913793c" sha1="1a7eb9c96a9c075e8444fabb1bd7d933d1048f43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -203,7 +203,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="63797">
-				<rom name="boat.tap" size="63797" crc="4f52be9c" sha1="f45b40b28f5e6abf65e908efeeb1af1c96e227bf" offset="0" />
+				<rom name="boat.tap" size="63797" crc="4f52be9c" sha1="f45b40b28f5e6abf65e908efeeb1af1c96e227bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -215,7 +215,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="97016">
-				<rom name="carrace.tap" size="97016" crc="b114205b" sha1="b9a060158332ba73e932b059ca6968216eaa3d82" offset="0" />
+				<rom name="carrace.tap" size="97016" crc="b114205b" sha1="b9a060158332ba73e932b059ca6968216eaa3d82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -226,7 +226,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="44103">
-				<rom name="computerorgan.tap" size="44103" crc="99ee05b0" sha1="c51c497d4bc87c33e312e70afe0a4d57358e8d1c" offset="0" />
+				<rom name="computerorgan.tap" size="44103" crc="99ee05b0" sha1="c51c497d4bc87c33e312e70afe0a4d57358e8d1c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -238,7 +238,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="119930">
-				<rom name="crushcircle-mayhouse.tap" size="119930" crc="ebcc8d56" sha1="a1659504857500f170f8347e47d899ae94e58808" offset="0" />
+				<rom name="crushcircle-mayhouse.tap" size="119930" crc="ebcc8d56" sha1="a1659504857500f170f8347e47d899ae94e58808"/>
 			</dataarea>
 		</part>
 	</software>
@@ -250,7 +250,7 @@
 		<info name="alt_title" value="대범람" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="80445">
-				<rom name="dae beom lam-826-mayhouse.tap" size="80445" crc="774ae653" sha1="8df85d727600dca7214aa5eaac4aea10002dda94" offset="0" />
+				<rom name="dae beom lam-826-mayhouse.tap" size="80445" crc="774ae653" sha1="8df85d727600dca7214aa5eaac4aea10002dda94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@
 		<info name="alt_title" value="당구" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="14785">
-				<rom name="dang_goo-mayhouse.cas" size="14785" crc="4728ddf1" sha1="d4837cba4479cccaf33b65122ae20b6880ae8c34" offset="0" />
+				<rom name="dang_goo-mayhouse.cas" size="14785" crc="4728ddf1" sha1="d4837cba4479cccaf33b65122ae20b6880ae8c34"/>
 			</dataarea>
 		</part>
 	</software>
@@ -275,7 +275,7 @@
 		<info name="usage" value="LOAD three times" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="595926">
-				<rom name="mtclimbing.tap" size="595926" crc="67490b71" sha1="5ebfcf6537bf1956cec508baea2c25a53fe38018" offset="0" />
+				<rom name="mtclimbing.tap" size="595926" crc="67490b71" sha1="5ebfcf6537bf1956cec508baea2c25a53fe38018"/>
 			</dataarea>
 		</part>
 	</software>
@@ -287,7 +287,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="315377">
-				<rom name="dex.tap" size="315377" crc="2c12b89a" sha1="f69b64a5cf6820ad8883e9b61d847f7399ae541f" offset="0" />
+				<rom name="dex.tap" size="315377" crc="2c12b89a" sha1="f69b64a5cf6820ad8883e9b61d847f7399ae541f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -299,7 +299,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="208385">
-				<rom name="dex alt.tap" size="208385" crc="88bd7ed1" sha1="f5ada47e7db4c84ce4dd8eb95fe0f144bb26b024" offset="0" />
+				<rom name="dex alt.tap" size="208385" crc="88bd7ed1" sha1="f5ada47e7db4c84ce4dd8eb95fe0f144bb26b024"/>
 			</dataarea>
 		</part>
 	</software>
@@ -311,12 +311,12 @@
 		<info name="alt_title" value="디즈니랜드" />
 		<part name="cass1" interface="spc1000_cass">
 			<dataarea name="cass" size="426369">
-				<rom name="adv0.tap" size="426369" crc="c2f6188b" sha1="b5f40655b793b62b63c5eb751762ee476de8f14c" offset="0" />
+				<rom name="adv0.tap" size="426369" crc="c2f6188b" sha1="b5f40655b793b62b63c5eb751762ee476de8f14c"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="spc1000_cass">
 			<dataarea name="cass" size="439830">
-				<rom name="adv1.tap" size="439830" crc="e9737081" sha1="39c866134c8a1a52b3f0dc2246a0ed255d5bfb90" offset="0" />
+				<rom name="adv1.tap" size="439830" crc="e9737081" sha1="39c866134c8a1a52b3f0dc2246a0ed255d5bfb90"/>
 			</dataarea>
 		</part>
 	</software>
@@ -328,12 +328,12 @@
 		<info name="alt_title" value="디즈니랜드 II" />
 		<part name="cass1" interface="spc1000_cass">
 			<dataarea name="cass" size="250406">
-				<rom name="adv2.tap" size="250406" crc="2828e88b" sha1="c31c3c929376b9c3ee586855fe0c298ddf413278" offset="0" />
+				<rom name="adv2.tap" size="250406" crc="2828e88b" sha1="c31c3c929376b9c3ee586855fe0c298ddf413278"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="spc1000_cass">
 			<dataarea name="cass" size="257079">
-				<rom name="adv3.tap" size="257079" crc="ec161f08" sha1="13ce92d95ae9392ba4af014bfeb9190011d1f814" offset="0" />
+				<rom name="adv3.tap" size="257079" crc="ec161f08" sha1="13ce92d95ae9392ba4af014bfeb9190011d1f814"/>
 			</dataarea>
 		</part>
 	</software>
@@ -345,12 +345,12 @@
 		<info name="alt_title" value="디즈니랜드 III" />
 		<part name="cass1" interface="spc1000_cass">
 			<dataarea name="cass" size="249752">
-				<rom name="adv4.tap" size="249752" crc="5fdfda33" sha1="53adc6be9a23d445e4f7d7ea320401c03c052cbf" offset="0" />
+				<rom name="adv4.tap" size="249752" crc="5fdfda33" sha1="53adc6be9a23d445e4f7d7ea320401c03c052cbf"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="spc1000_cass">
 			<dataarea name="cass" size="279497">
-				<rom name="adv5.tap" size="279497" crc="7da81060" sha1="aea1ac3d638baa1fb5569e15a29e76286ad2ee09" offset="0" />
+				<rom name="adv5.tap" size="279497" crc="7da81060" sha1="aea1ac3d638baa1fb5569e15a29e76286ad2ee09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -363,7 +363,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="176815">
-				<rom name="dooli.tap" size="176815" crc="741e0d60" sha1="afa322cc2e9dbe0979fb3f315666206fc74d0c20" offset="0" />
+				<rom name="dooli.tap" size="176815" crc="741e0d60" sha1="afa322cc2e9dbe0979fb3f315666206fc74d0c20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -375,7 +375,7 @@
 		<info name="alt_title" value="드래곤 슬래이어" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="639016">
-				<rom name="dragonslayer.tap" size="639016" crc="dba0073a" sha1="f6b8a4a3720c06bcaca067e002961c7aa9a8ad3b" offset="0" />
+				<rom name="dragonslayer.tap" size="639016" crc="dba0073a" sha1="f6b8a4a3720c06bcaca067e002961c7aa9a8ad3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -388,7 +388,7 @@
 		<info name="alt_title" value="달걀받기 ~ Dalgyal Badgi" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="77810">
-				<rom name="egg_catch_v1.1-mayhouse.tap" size="77810" crc="5a8136a0" sha1="2fd82c21bcc713b472ff6ea6d583b23fbefa7932" offset="0" />
+				<rom name="egg_catch_v1.1-mayhouse.tap" size="77810" crc="5a8136a0" sha1="2fd82c21bcc713b472ff6ea6d583b23fbefa7932"/>
 			</dataarea>
 		</part>
 	</software>
@@ -400,7 +400,7 @@
 		<info name="alt_title" value="로미티이" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="139143">
-				<rom name="et_miro-mayhouse.tap" size="139143" crc="34315901" sha1="78d4829ff91c86ae3cba7942eb7da51787c16e2f" offset="0" />
+				<rom name="et_miro-mayhouse.tap" size="139143" crc="34315901" sha1="78d4829ff91c86ae3cba7942eb7da51787c16e2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -412,7 +412,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="201058">
-				<rom name="fighter 201.tap" size="201058" crc="024808dc" sha1="25aba8f553fa131d71d478c6013080b8dab4a6c7" offset="0" />
+				<rom name="fighter 201.tap" size="201058" crc="024808dc" sha1="25aba8f553fa131d71d478c6013080b8dab4a6c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -424,7 +424,7 @@
 		<info name="alt_title" value="우주전자 피리아 ~ Ujujeonja Firia" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="199832">
-				<rom name="firia-1146-mayhouse.tap" size="199832" crc="88b76289" sha1="4e610b47ee3b9f99c1b93861a6a8b612bd041246" offset="0" />
+				<rom name="firia-1146-mayhouse.tap" size="199832" crc="88b76289" sha1="4e610b47ee3b9f99c1b93861a6a8b612bd041246"/>
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +435,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="114688">
-				<rom name="flyboat.tap" size="114688" crc="c68dbd6e" sha1="0c5e873eb3dcb1364bfdc8dfa85fec0f079b2277" offset="0" />
+				<rom name="flyboat.tap" size="114688" crc="c68dbd6e" sha1="0c5e873eb3dcb1364bfdc8dfa85fec0f079b2277"/>
 			</dataarea>
 		</part>
 	</software>
@@ -447,7 +447,7 @@
 		<info name="alt_title" value="겔럭워스" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="215358">
-				<rom name="galagwars-mayhouse.tap" size="215358" crc="9e48c6d3" sha1="22bdce20348cd1d09bc1862a4782c1e0a66e3d95" offset="0" />
+				<rom name="galagwars-mayhouse.tap" size="215358" crc="9e48c6d3" sha1="22bdce20348cd1d09bc1862a4782c1e0a66e3d95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -460,7 +460,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="488201">
-				<rom name="goldcavern.tap" size="488201" crc="b7f3707c" sha1="108dc61b342399a1a0aab726419f7155455f0a21" offset="0" />
+				<rom name="goldcavern.tap" size="488201" crc="b7f3707c" sha1="108dc61b342399a1a0aab726419f7155455f0a21"/>
 			</dataarea>
 		</part>
 	</software>
@@ -472,7 +472,7 @@
 		<info name="alt_title" value="이판사판공사판 ~ Ipan Sa Pan Gong Sa Pan" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="49515">
-				<rom name="gong sa pan-mayhouse.cas" size="49515" crc="45d90a67" sha1="ccf155881ee3e88479b3bcda06893b4068678e3f" offset="0" />
+				<rom name="gong sa pan-mayhouse.cas" size="49515" crc="45d90a67" sha1="ccf155881ee3e88479b3bcda06893b4068678e3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -484,12 +484,12 @@
 		<publisher>Samsung Software</publisher>
 		<part name="cass1" interface="spc1000_cass">
 			<dataarea name="cass" size="1774434">
-				<rom name="gongmo jakpumjip 4-gweon (1985) (samsung) [side a].tap" size="1774434" crc="9530bf3e" sha1="627e0281cdbd4231b2aa44665f9a6eaaa51baee7" offset="0" />
+				<rom name="gongmo jakpumjip 4-gweon (1985) (samsung) [side a].tap" size="1774434" crc="9530bf3e" sha1="627e0281cdbd4231b2aa44665f9a6eaaa51baee7"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="spc1000_cass">
 			<dataarea name="cass" size="1559118">
-				<rom name="gongmo jakpumjip 4-gweon (1985) (samsung) [side b].tap" size="1559118" crc="16c4aef1" sha1="02ff8de6d72f08f68e42b06b2d78946535567b55" offset="0" />
+				<rom name="gongmo jakpumjip 4-gweon (1985) (samsung) [side b].tap" size="1559118" crc="16c4aef1" sha1="02ff8de6d72f08f68e42b06b2d78946535567b55"/>
 			</dataarea>
 		</part>
 	</software>
@@ -501,7 +501,7 @@
 		<info name="alt_title" value="구니스" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="758623">
-				<rom name="goonies-mayhouse.tap" size="758623" crc="eb43a921" sha1="8fcfbd3c96ff7db76379485dc12876e0e898fdac" offset="0" />
+				<rom name="goonies-mayhouse.tap" size="758623" crc="eb43a921" sha1="8fcfbd3c96ff7db76379485dc12876e0e898fdac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -513,7 +513,7 @@
 		<info name="usage" value="Requires VDP unit in -ext1 expansion" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="614352">
-				<rom name="gunfright.tap" size="614352" crc="73cc58ef" sha1="ab09466a1cf2fc12faa2e18252e348b9cc56a7ff" offset="0" />
+				<rom name="gunfright.tap" size="614352" crc="73cc58ef" sha1="ab09466a1cf2fc12faa2e18252e348b9cc56a7ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -525,7 +525,7 @@
 		<info name="alt_title" value="헤드온" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="148842">
-				<rom name="headon-mayhouse.tap" size="148842" crc="fdc60fd6" sha1="c9cff9fae41e854584b4ff0104458e300354e233" offset="0" />
+				<rom name="headon-mayhouse.tap" size="148842" crc="fdc60fd6" sha1="c9cff9fae41e854584b4ff0104458e300354e233"/>
 			</dataarea>
 		</part>
 	</software>
@@ -536,7 +536,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="114688">
-				<rom name="icbm.tap" size="114688" crc="13006d21" sha1="c6584f77c66f05e200e03b3b30e8b7c1947e14a7" offset="0" />
+				<rom name="icbm.tap" size="114688" crc="13006d21" sha1="c6584f77c66f05e200e03b3b30e8b7c1947e14a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -548,7 +548,7 @@
 		<info name="alt_title" value="잠수함 키논" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="385174">
-				<rom name="keenon.tap" size="385174" crc="27b7712f" sha1="908ef73558a5d1c07cd4faf340842404d4e0248c" offset="0" />
+				<rom name="keenon.tap" size="385174" crc="27b7712f" sha1="908ef73558a5d1c07cd4faf340842404d4e0248c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -560,7 +560,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="135168">
-				<rom name="kangaroo.tap" size="135168" crc="64e37df3" sha1="e1d0ff3f6cf8d240b9c242f39489b7b20da22b8d" offset="0" />
+				<rom name="kangaroo.tap" size="135168" crc="64e37df3" sha1="e1d0ff3f6cf8d240b9c242f39489b7b20da22b8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -572,7 +572,7 @@
 		<info name="alt_title" value="킹스베리" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="454408">
-				<rom name="kings valley.tap" size="454408" crc="f16d43f9" sha1="ad3af8672c3a9d082ac3c8c6e61b99089ccb19c0" offset="0" />
+				<rom name="kings valley.tap" size="454408" crc="f16d43f9" sha1="ad3af8672c3a9d082ac3c8c6e61b99089ccb19c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -584,7 +584,7 @@
 		<info name="alt_title" value="나이트너어" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="52527">
-				<rom name="knight_lore-mayhouse.cas" size="52527" crc="645b558d" sha1="a2159064d5aabd0d9b99eb48d88ec8fff4b11f59" offset="0" />
+				<rom name="knight_lore-mayhouse.cas" size="52527" crc="645b558d" sha1="a2159064d5aabd0d9b99eb48d88ec8fff4b11f59"/>
 			</dataarea>
 		</part>
 	</software>
@@ -595,7 +595,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="28718">
-				<rom name="led.tap" size="28718" crc="fdf09523" sha1="eea097e189e0e7f1c7671bb6248a9a3db08f1598" offset="0" />
+				<rom name="led.tap" size="28718" crc="fdf09523" sha1="eea097e189e0e7f1c7671bb6248a9a3db08f1598"/>
 			</dataarea>
 		</part>
 	</software>
@@ -606,7 +606,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="57707">
-				<rom name="led1.tap" size="57707" crc="7fd973bc" sha1="484fe6aa67ed9c2aa506f082e205d36bd232ce82" offset="0" />
+				<rom name="led1.tap" size="57707" crc="7fd973bc" sha1="484fe6aa67ed9c2aa506f082e205d36bd232ce82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -619,12 +619,12 @@
 		<info name="usage" value="Load first cass1 (BASIC), then cass2 (MACHINE)" />
 		<part name="cass1" interface="spc1000_cass">
 			<dataarea name="cass" size="3659">
-				<rom name="lunar_city[b]-mayhouse.cas" size="3659" crc="dbbc13a3" sha1="7d8941753522ec11bb5bca64ece0370385073c51" offset="0" />
+				<rom name="lunar_city[b]-mayhouse.cas" size="3659" crc="dbbc13a3" sha1="7d8941753522ec11bb5bca64ece0370385073c51"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="spc1000_cass">
 			<dataarea name="cass" size="8290">
-				<rom name="lunar_city[m]-mayhouse.cas" size="8290" crc="5a5c976a" sha1="7d5d5381cf9d0b96a6ef3cd9c83b58bb5fddb9f0" offset="0" />
+				<rom name="lunar_city[m]-mayhouse.cas" size="8290" crc="5a5c976a" sha1="7d5d5381cf9d0b96a6ef3cd9c83b58bb5fddb9f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -636,7 +636,7 @@
 		<info name="alt_title" value="루팡" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="119984">
-				<rom name="lupan_4-mayhouse.tap" size="119984" crc="d52ff04b" sha1="e4fea515f93fd8fde822e27820639c9cbc431f0c" offset="0" />
+				<rom name="lupan_4-mayhouse.tap" size="119984" crc="d52ff04b" sha1="e4fea515f93fd8fde822e27820639c9cbc431f0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -647,7 +647,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="134973">
-				<rom name="mini organ.tap" size="134973" crc="61b1aadb" sha1="61c2a1c7b39f7a40a553bfaa3619f5465feef27f" offset="0" />
+				<rom name="mini organ.tap" size="134973" crc="61b1aadb" sha1="61c2a1c7b39f7a40a553bfaa3619f5465feef27f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -659,7 +659,7 @@
 		<info name="alt_title" value="미라클월드 / 외발자전거 (Unicycle)" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="20651">
-				<rom name="miracle_world-mayhouse.cas" size="20651" crc="b6e89880" sha1="59973308e275daab72792308e8e84731de3086d6" offset="0" />
+				<rom name="miracle_world-mayhouse.cas" size="20651" crc="b6e89880" sha1="59973308e275daab72792308e8e84731de3086d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -672,7 +672,7 @@
 		<info name="alt_title" value="미로" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="90605">
-				<rom name="miro2-1041-mayhouse.tap" size="90605" crc="cb53566d" sha1="5965bf679dafcea901adf7586d8a24c860385a38" offset="0" />
+				<rom name="miro2-1041-mayhouse.tap" size="90605" crc="cb53566d" sha1="5965bf679dafcea901adf7586d8a24c860385a38"/>
 			</dataarea>
 		</part>
 	</software>
@@ -684,7 +684,7 @@
 		<info name="alt_title" value="모자가방" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="272417">
-				<rom name="mojagabang-5678-mayhouse.tap" size="272417" crc="a1e8a572" sha1="7bfec6a512b9adf2f532e9178e11b4ef2adc5112" offset="0" />
+				<rom name="mojagabang-5678-mayhouse.tap" size="272417" crc="a1e8a572" sha1="7bfec6a512b9adf2f532e9178e11b4ef2adc5112"/>
 			</dataarea>
 		</part>
 	</software>
@@ -695,7 +695,7 @@
 		<publisher>Samsung Software</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="214298">
-				<rom name="morse.tap" size="214298" crc="b6c80f52" sha1="e11c44d6339294515f8c8596995df5c29f6f77d6" offset="0" />
+				<rom name="morse.tap" size="214298" crc="b6c80f52" sha1="e11c44d6339294515f8c8596995df5c29f6f77d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -706,7 +706,7 @@
 		<publisher>Samsung Software</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="276816">
-				<rom name="morse(2).tap" size="276816" crc="a4ac895d" sha1="b6d254f444a30bfafe6fc0fc4fb3aaf0ad81e714" offset="0" />
+				<rom name="morse(2).tap" size="276816" crc="a4ac895d" sha1="b6d254f444a30bfafe6fc0fc4fb3aaf0ad81e714"/>
 			</dataarea>
 		</part>
 	</software>
@@ -718,7 +718,7 @@
 		<info name="alt_title" value="명탐정 바베크 ~ Myeongtamjeong Vaveque" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="594539">
-				<rom name="baveque-mayhouse.tap" size="594539" crc="66230bc2" sha1="daba793f25fe2b91eaeee521c2d3a46a5a720331" offset="0" />
+				<rom name="baveque-mayhouse.tap" size="594539" crc="66230bc2" sha1="daba793f25fe2b91eaeee521c2d3a46a5a720331"/>
 			</dataarea>
 		</part>
 	</software>
@@ -730,7 +730,7 @@
 		<info name="alt_title" value="오리온" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="219419">
-				<rom name="orion.tap" size="219419" crc="58bec40a" sha1="02d0204f19b4dc299339b3393470c6a3960a7145" offset="0" />
+				<rom name="orion.tap" size="219419" crc="58bec40a" sha1="02d0204f19b4dc299339b3393470c6a3960a7145"/>
 			</dataarea>
 		</part>
 	</software>
@@ -742,7 +742,7 @@
 		<info name="alt_title" value="오델로" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="109850">
-				<rom name="othello.tap" size="109850" crc="3992160d" sha1="9dab81c3de4d3250c0c63de250fda71df6a1143f" offset="0" />
+				<rom name="othello.tap" size="109850" crc="3992160d" sha1="9dab81c3de4d3250c0c63de250fda71df6a1143f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -754,7 +754,7 @@
 		<info name="alt_title" value="팬저스피체" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="321812">
-				<rom name="panzerspitze-4135-mayhouse.tap" size="321812" crc="c29292a5" sha1="11f6b24f0bd5eaa9546c1a70f192f5de12cb88d8" offset="0" />
+				<rom name="panzerspitze-4135-mayhouse.tap" size="321812" crc="c29292a5" sha1="11f6b24f0bd5eaa9546c1a70f192f5de12cb88d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -767,7 +767,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="457126">
-				<rom name="pengo.tap" size="457126" crc="d3ea0b9e" sha1="b38139eddebb9630a83c119a7e0dc80877e7859b" offset="0" />
+				<rom name="pengo.tap" size="457126" crc="d3ea0b9e" sha1="b38139eddebb9630a83c119a7e0dc80877e7859b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -780,7 +780,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="310377">
-				<rom name="golf.tap" size="310377" crc="e49d27bf" sha1="a01dce8373d7a3e1884da0f81df28a212075e384" offset="0" />
+				<rom name="golf.tap" size="310377" crc="e49d27bf" sha1="a01dce8373d7a3e1884da0f81df28a212075e384"/>
 			</dataarea>
 		</part>
 	</software>
@@ -792,7 +792,7 @@
 		<info name="alt_title" value="람보" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="364888">
-				<rom name="rambo.tap" size="364888" crc="c9a14f67" sha1="6d71c8a0415e2ee02a96e0fcbafb6566c8f8f07f" offset="0" />
+				<rom name="rambo.tap" size="364888" crc="c9a14f67" sha1="6d71c8a0415e2ee02a96e0fcbafb6566c8f8f07f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -803,7 +803,7 @@
 		<publisher>Samsung Software</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="146588">
-				<rom name="ratter.tap" size="146588" crc="bf9eceb5" sha1="efe98fe77fb0159238de86d9f059d3525d8a5dbb" offset="0" />
+				<rom name="ratter.tap" size="146588" crc="bf9eceb5" sha1="efe98fe77fb0159238de86d9f059d3525d8a5dbb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -815,7 +815,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="152312">
-				<rom name="red ball.tap" size="152312" crc="3d229544" sha1="1ebec05b07db79019809a1b4f6d619fa5a9067d1" offset="0" />
+				<rom name="red ball.tap" size="152312" crc="3d229544" sha1="1ebec05b07db79019809a1b4f6d619fa5a9067d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -827,7 +827,7 @@
 		<info name="alt_title" value="스크렘블" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="217636">
-				<rom name="scramble-mayhouse.tap" size="217636" crc="6e4a96f7" sha1="44125c9b310bb053331a73d24b342296e784b6f4" offset="0" />
+				<rom name="scramble-mayhouse.tap" size="217636" crc="6e4a96f7" sha1="44125c9b310bb053331a73d24b342296e784b6f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -839,7 +839,7 @@
 		<info name="alt_title" value="시그레이프2" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="315009">
-				<rom name="sigrape2.tap" size="315009" crc="17ec74c8" sha1="cce8337daf278cdd4183f0d8bf005d47e514b4e4" offset="0" />
+				<rom name="sigrape2.tap" size="315009" crc="17ec74c8" sha1="cce8337daf278cdd4183f0d8bf005d47e514b4e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -851,7 +851,7 @@
 		<info name="alt_title" value="스낵 어택" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="264500">
-				<rom name="snake-9009-mayhouse.tap" size="264500" crc="2533df39" sha1="bb7a70e60b6ee6c4a1d8732dc4fa63bf0415dee9" offset="0" />
+				<rom name="snake-9009-mayhouse.tap" size="264500" crc="2533df39" sha1="bb7a70e60b6ee6c4a1d8732dc4fa63bf0415dee9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -862,7 +862,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="81921">
-				<rom name="spacegang-mayhouse.tap" size="81921" crc="dbdd196c" sha1="7bad6a38f6037174e56da5b51664802036f6e3f9" offset="0" />
+				<rom name="spacegang-mayhouse.tap" size="81921" crc="dbdd196c" sha1="7bad6a38f6037174e56da5b51664802036f6e3f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -874,7 +874,7 @@
 		<info name="alt_title" value="인베이더" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="145927">
-				<rom name="invaders.tap" size="145927" crc="9797102a" sha1="3c6f8910833290f7b29944118f780241a679a3bc" offset="0" />
+				<rom name="invaders.tap" size="145927" crc="9797102a" sha1="3c6f8910833290f7b29944118f780241a679a3bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -886,7 +886,7 @@
 		<info name="alt_title" value="인베이더" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="203741">
-				<rom name="space invader (198x) (honeybug) [f autostart mayhouse].tap" size="203741" crc="f23409b5" sha1="6a2bf66994d01a52f7820157c760e484e696d088" offset="0" />
+				<rom name="space invader (198x) (honeybug) [f autostart mayhouse].tap" size="203741" crc="f23409b5" sha1="6a2bf66994d01a52f7820157c760e484e696d088"/>
 			</dataarea>
 		</part>
 	</software>
@@ -898,7 +898,7 @@
 		<info name="alt_title" value="우주작전 ~ Ujujagjeon" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="120634">
-				<rom name="space mission.tap" size="120634" crc="11a119f1" sha1="64c36cf4e3b5dcc6188b0e2be554cb6790147d13" offset="0" />
+				<rom name="space mission.tap" size="120634" crc="11a119f1" sha1="64c36cf4e3b5dcc6188b0e2be554cb6790147d13"/>
 			</dataarea>
 		</part>
 	</software>
@@ -910,7 +910,7 @@
 		<info name="alt_title" value="Sinpan UFO?" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="231277">
-				<rom name="sinpanufo.tap" size="231277" crc="c1541ef4" sha1="49bea9f8ca016cc6d67ef3f9af6ac3858c5eba1b" offset="0" />
+				<rom name="sinpanufo.tap" size="231277" crc="c1541ef4" sha1="49bea9f8ca016cc6d67ef3f9af6ac3858c5eba1b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -922,7 +922,7 @@
 		<info name="alt_title" value="스파이패닉" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="16900">
-				<rom name="spypanic-mayhouse.cas" size="16900" crc="56c60b8b" sha1="ef0d792fe18dceeef56adec9886cec1ebc6e6570" offset="0" />
+				<rom name="spypanic-mayhouse.cas" size="16900" crc="56c60b8b" sha1="ef0d792fe18dceeef56adec9886cec1ebc6e6570"/>
 			</dataarea>
 		</part>
 	</software>
@@ -935,7 +935,7 @@
 		<info name="alt_title" value="스도쿠 2008" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="431906">
-				<rom name="sudoku.tap" size="431906" crc="529ab928" sha1="a855e1060ea7a1690e824788906a53feb52f1a9a" offset="0" />
+				<rom name="sudoku.tap" size="431906" crc="529ab928" sha1="a855e1060ea7a1690e824788906a53feb52f1a9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -947,7 +947,7 @@
 		<info name="alt_title" value="로드런너1" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="344867">
-				<rom name="lode_runner1-mayhouse.tap" size="344867" crc="8e43fbb4" sha1="4cab84d4a946596685ef1dfe0a007554770acbea" offset="0" />
+				<rom name="lode_runner1-mayhouse.tap" size="344867" crc="8e43fbb4" sha1="4cab84d4a946596685ef1dfe0a007554770acbea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -959,7 +959,7 @@
 		<info name="alt_title" value="로드런너2 ~ Lode Runner 2" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="563048">
-				<rom name="lode_runner-mayhouse.tap" size="563048" crc="098c69df" sha1="c333bd1611373a130c08a2cb7fc504ed850e3fee" offset="0" />
+				<rom name="lode_runner-mayhouse.tap" size="563048" crc="098c69df" sha1="c333bd1611373a130c08a2cb7fc504ed850e3fee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -971,7 +971,7 @@
 		<info name="alt_title" value="수퍼제비우스" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="378708">
-				<rom name="superxevious-mayhouse.tap" size="378708" crc="429c16bf" sha1="6411c9413e72c85d207121a72da7515d94140442" offset="0" />
+				<rom name="superxevious-mayhouse.tap" size="378708" crc="429c16bf" sha1="6411c9413e72c85d207121a72da7515d94140442"/>
 			</dataarea>
 		</part>
 	</software>
@@ -983,7 +983,7 @@
 		<info name="alt_title" value="탱크2" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="222596">
-				<rom name="tank2-7698-mayhouse.tap" size="222596" crc="1f977747" sha1="edd707761289c56c9f45aa1b1788eaea5e9f9973" offset="0" />
+				<rom name="tank2-7698-mayhouse.tap" size="222596" crc="1f977747" sha1="edd707761289c56c9f45aa1b1788eaea5e9f9973"/>
 			</dataarea>
 		</part>
 	</software>
@@ -995,7 +995,7 @@
 		<info name="usage" value="LOAD twice" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="312954">
-				<rom name="adventure.tap" size="312954" crc="24b175cd" sha1="adae14342d1deafb674a120610fc4bbeadea217c" offset="0" />
+				<rom name="adventure.tap" size="312954" crc="24b175cd" sha1="adae14342d1deafb674a120610fc4bbeadea217c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1008,7 +1008,7 @@
 		<info name="alt_title" value="토이야" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="68050">
-				<rom name="toyar-4852-mayhouse.cas" size="68050" crc="ed454d5c" sha1="18b1ac12709136e4e03d3a7d4ead4a1d00c232ca" offset="0" />
+				<rom name="toyar-4852-mayhouse.cas" size="68050" crc="ed454d5c" sha1="18b1ac12709136e4e03d3a7d4ead4a1d00c232ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1020,7 +1020,7 @@
 		<info name="usage" value="Requires VDP unit in -ext1 expansion" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="55619">
-				<rom name="vdp+twinbee.cas" size="55619" crc="b1882952" sha1="cee9e0e060ce3f17b0bcc1fa1ba5d86590cae4c3" offset="0" />
+				<rom name="vdp+twinbee.cas" size="55619" crc="b1882952" sha1="cee9e0e060ce3f17b0bcc1fa1ba5d86590cae4c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1031,7 +1031,7 @@
 		<publisher>Sammi Computer</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="542570">
-				<rom name="vela.tap" size="542570" crc="81a088c8" sha1="9848f89e916385b6688a1f458b153463300a881b" offset="0" />
+				<rom name="vela.tap" size="542570" crc="81a088c8" sha1="9848f89e916385b6688a1f458b153463300a881b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1042,7 +1042,7 @@
 		<publisher>Softvision</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="261691">
-				<rom name="wawa.tap" size="261691" crc="c7b107d8" sha1="d68738e2647e52f5e6e7aa8a69782055bd4ce067" offset="0" />
+				<rom name="wawa.tap" size="261691" crc="c7b107d8" sha1="d68738e2647e52f5e6e7aa8a69782055bd4ce067"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1054,7 +1054,7 @@
 		<info name="alt_title" value="위저드리" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="550138">
-				<rom name="wizardry (1986) (sammi computer).tap" size="550138" crc="d4555b51" sha1="19edbe1fa8c0b45fce8aa203b2c879abda77fbc4" offset="0" />
+				<rom name="wizardry (1986) (sammi computer).tap" size="550138" crc="d4555b51" sha1="19edbe1fa8c0b45fce8aa203b2c879abda77fbc4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1066,7 +1066,7 @@
 		<info name="alt_title" value="제비우스" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="1042369">
-				<rom name="xevious.tap" size="1042369" crc="0cfd5808" sha1="51eefa4b729dcfbcacf02b3d73afe4bc1f434d99" offset="0" />
+				<rom name="xevious.tap" size="1042369" crc="0cfd5808" sha1="51eefa4b729dcfbcacf02b3d73afe4bc1f434d99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1078,7 +1078,7 @@
 		<info name="alt_title" value="Z80 어쏌블러 v1.0" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="145775">
-				<rom name="z80assem.tap" size="145775" crc="79ae1ed2" sha1="8e094a55d6f6aa9f3b1014a626147c8e1d065e07" offset="0" />
+				<rom name="z80assem.tap" size="145775" crc="79ae1ed2" sha1="8e094a55d6f6aa9f3b1014a626147c8e1d065e07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1090,7 +1090,7 @@
 		<info name="alt_title" value="Z80 어쏌블러 v1.0" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="179633">
-				<rom name="assembler.tap" size="179633" crc="1b47a897" sha1="f9e8a8a493848ee67a30ace66c2294049de048c1" offset="0" />
+				<rom name="assembler.tap" size="179633" crc="1b47a897" sha1="f9e8a8a493848ee67a30ace66c2294049de048c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1102,7 +1102,7 @@
 		<info name="usage" value="Requires VDP unit in -ext1 expansion" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="774330">
-				<rom name="vdp-zanac-mayhouse.tap" size="774330" crc="c4b6ea48" sha1="c6d85f1e43285d42b00d47cf69d14629520595c7" offset="0" />
+				<rom name="vdp-zanac-mayhouse.tap" size="774330" crc="c4b6ea48" sha1="c6d85f1e43285d42b00d47cf69d14629520595c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1113,7 +1113,7 @@
 		<publisher>Aloe?</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="702072">
-				<rom name="zexas-5461-mayhouse.tap" size="702072" crc="9367b51e" sha1="d6da8e4ae2275dbd3ba1b9c7137944f5674daf26" offset="0" />
+				<rom name="zexas-5461-mayhouse.tap" size="702072" crc="9367b51e" sha1="d6da8e4ae2275dbd3ba1b9c7137944f5674daf26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1127,7 +1127,7 @@
 		<info name="alt_title" value="한글베이직" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="472694">
-				<rom name="hangul basic.tap" size="472694" crc="20c76317" sha1="103a8ab18da16911ab568c93b6bf1c8fd9f8feea" offset="0" />
+				<rom name="hangul basic.tap" size="472694" crc="20c76317" sha1="103a8ab18da16911ab568c93b6bf1c8fd9f8feea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1142,7 +1142,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="77824">
-				<rom name="dasm &amp; rlct.tap" size="77824" crc="05e70616" sha1="a2759898d2fcdfcb84386aa0a5ff778c40154d59" offset="0" />
+				<rom name="dasm &amp; rlct.tap" size="77824" crc="05e70616" sha1="a2759898d2fcdfcb84386aa0a5ff778c40154d59"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1153,7 +1153,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="81324">
-				<rom name="disassembler.tap" size="81324" crc="66ff120c" sha1="8071c4e436a9dd95d018e2fd2952e4b2af6ca415" offset="0" />
+				<rom name="disassembler.tap" size="81324" crc="66ff120c" sha1="8071c4e436a9dd95d018e2fd2952e4b2af6ca415"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1164,7 +1164,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="34332">
-				<rom name="graphic editor d.tap" size="34332" crc="fd9f6e0e" sha1="79697c274e3660d596a59f4dd730d53604575fdf" offset="0" />
+				<rom name="graphic editor d.tap" size="34332" crc="fd9f6e0e" sha1="79697c274e3660d596a59f4dd730d53604575fdf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1175,7 +1175,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="40899">
-				<rom name="hello.tap" size="40899" crc="bdbe31ab" sha1="70ea5b171357868aa7d9115d017bfa1c18c73edb" offset="0" />
+				<rom name="hello.tap" size="40899" crc="bdbe31ab" sha1="70ea5b171357868aa7d9115d017bfa1c18c73edb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1186,7 +1186,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="41146">
-				<rom name="relocater 1_1.tap" size="41146" crc="b5e8c0f9" sha1="ea92b7f29a3d6d5b58fa6c7c44bb130c815772de" offset="0" />
+				<rom name="relocater 1_1.tap" size="41146" crc="b5e8c0f9" sha1="ea92b7f29a3d6d5b58fa6c7c44bb130c815772de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1197,7 +1197,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="36384">
-				<rom name="relocater(2).tap" size="36384" crc="73c7593a" sha1="01f2e080b46254ce0ddef79a74c40594d934cb21" offset="0" />
+				<rom name="relocater(2).tap" size="36384" crc="73c7593a" sha1="01f2e080b46254ce0ddef79a74c40594d934cb21"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1208,7 +1208,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="44159">
-				<rom name="relocater.tap" size="44159" crc="97961e11" sha1="8d003344e5d02b5231b303d5f2c0dbc06980b92c" offset="0" />
+				<rom name="relocater.tap" size="44159" crc="97961e11" sha1="8d003344e5d02b5231b303d5f2c0dbc06980b92c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1219,7 +1219,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="44838">
-				<rom name="styx monitor.tap" size="44838" crc="63558644" sha1="db4f56a12a36b3f3d1a61fb3af5daf16467cca28" offset="0" />
+				<rom name="styx monitor.tap" size="44838" crc="63558644" sha1="db4f56a12a36b3f3d1a61fb3af5daf16467cca28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1230,7 +1230,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="47298">
-				<rom name="sub routine.tap" size="47298" crc="665c8aba" sha1="0b32e9539b64caec5561e8bff550966d64cb8fa3" offset="0" />
+				<rom name="sub routine.tap" size="47298" crc="665c8aba" sha1="0b32e9539b64caec5561e8bff550966d64cb8fa3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1242,7 +1242,7 @@
 		<info name="alt_title" value="한글" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="433186">
-				<rom name="hangeul.tap" size="433186" crc="489aa431" sha1="9e18d96e48e0ab7add0083ef0d64ee3c44ac6f5e" offset="0" />
+				<rom name="hangeul.tap" size="433186" crc="489aa431" sha1="9e18d96e48e0ab7add0083ef0d64ee3c44ac6f5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1254,7 +1254,7 @@
 		<info name="alt_title" value="한글" />
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="241916">
-				<rom name="hangeul alt.tap" size="241916" crc="0cfba467" sha1="ab19759cb267862475f3341c4eb1d2242b1cc759" offset="0" />
+				<rom name="hangeul alt.tap" size="241916" crc="0cfba467" sha1="ab19759cb267862475f3341c4eb1d2242b1cc759"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1265,7 +1265,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
 			<dataarea name="cass" size="2670">
-				<rom name="cassette_voice7ca0-mayhouse.cas" size="2670" crc="3d4f5c4f" sha1="72d4dfd8e8af7dfc92d80771cf6db0567b4f6eb7" offset="0" />
+				<rom name="cassette_voice7ca0-mayhouse.cas" size="2670" crc="3d4f5c4f" sha1="72d4dfd8e8af7dfc92d80771cf6db0567b4f6eb7"/>
 			</dataarea>
 		</part>
 	</software>

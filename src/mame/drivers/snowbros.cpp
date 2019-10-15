@@ -353,7 +353,7 @@ void snowbros_state::hyperpac_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram().share("hyperpac_ram");
 	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x400000, 0x400001) ???
+//  map(0x400000, 0x400001) ???
 	map(0x500000, 0x500001).portr("DSW1");
 	map(0x500002, 0x500003).portr("DSW2");
 	map(0x500004, 0x500005).portr("SYSTEM");
@@ -506,7 +506,7 @@ void snowbros_state::finalttr_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram().share("hyperpac_ram");
 	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x400000, 0x400001) ???
+//  map(0x400000, 0x400001) ???
 
 	map(0x500000, 0x500001).portr("DSW1");
 	map(0x500002, 0x500003).portr("DSW2");
@@ -558,9 +558,9 @@ void snowbros_state::yutnori_map(address_map &map)
 
 	// could be one of the OKIs? but gets value to write from RAM, always seems to be 0?
 	map(0x30000c, 0x30000d).nopw();
-	map(0x30000e, 0x30000f).nopr(); //AM_READ( yutnori_unk_r ) // ??
+	map(0x30000e, 0x30000f).nopr(); //.r(FUNC(snowbros_state::yutnori_unk_r)); // ??
 
-//  AM_RANGE(0x400000, 0x400001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // maybe?
+//  map(0x400000, 0x400001).w("watchdog", FUNC(watchdog_timer_device::reset16_w)); // maybe?
 	map(0x400000, 0x400001).noprw();
 
 	map(0x500000, 0x5001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -1635,19 +1635,8 @@ INPUT_PORTS_END
 
 /* SnowBros */
 
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ STEP8(0,4), STEP8(8*32,4) },
-	{ STEP8(0,32), STEP8(16*32,32) },
-	32*32
-};
-
 static GFXDECODE_START( gfx_snowbros )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 16 )
 GFXDECODE_END
 
 /* Honey Doll */
@@ -1664,13 +1653,13 @@ static const gfx_layout honeydol_tilelayout8bpp =
 };
 
 static GFXDECODE_START( gfx_honeydol )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 64 ) // how does it use 0-15
-	GFXDECODE_ENTRY( "gfx2", 0, honeydol_tilelayout8bpp,  0, 4 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 64 ) // how does it use 0-15
+	GFXDECODE_ENTRY( "gfx2", 0, honeydol_tilelayout8bpp,            0,  4 )
 
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_twinadv )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 64 )
 GFXDECODE_END
 
 /* Winter Bobble */
@@ -1687,7 +1676,7 @@ static const gfx_layout tilelayout_wb =
 };
 
 static GFXDECODE_START( gfx_wb )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_wb,  0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_wb, 0, 16 )
 GFXDECODE_END
 
 /* SemiCom */
@@ -1721,12 +1710,12 @@ static const gfx_layout sb3_tilebglayout =
 
 
 static GFXDECODE_START( gfx_sb3 )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, sb3_tilebglayout,  0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, sb3_tilebglayout,                   0,  2 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_hyperpac )
-	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout, 0, 16 )
 GFXDECODE_END
 
 MACHINE_RESET_MEMBER(snowbros_state,semiprot)
@@ -1963,6 +1952,7 @@ void snowbros_state::finalttr(machine_config &config)
 	ymsnd.add_route(1, "mono", 0.08);
 
 	m_oki->set_clock(999900);
+	m_oki->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.4);
 }
 
 

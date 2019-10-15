@@ -13,19 +13,23 @@
     broken out into several categories.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_OSD_OSDCORE_H
 #define MAME_OSD_OSDCORE_H
 
+#pragma once
+
+
 #include "osdcomm.h"
+
+#include "strformat.h"
 
 #include <chrono>
 #include <cstdarg>
 #include <cstdint>
+#include <iosfwd>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 
@@ -1013,30 +1017,55 @@ public:
 class osd_output
 {
 public:
-	osd_output() : m_chain(nullptr) { }
+	osd_output() { }
 	virtual ~osd_output() { }
 
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) = 0;
+	virtual void output_callback(osd_output_channel channel, util::format_argument_pack<std::ostream> const &args) = 0;
 
 	static void push(osd_output *delegate);
 	static void pop(osd_output *delegate);
+
 protected:
 
-	void chain_output(osd_output_channel channel, const char *msg, va_list args) const
+	void chain_output(osd_output_channel channel, util::format_argument_pack<std::ostream> const &args) const
 	{
-		if (m_chain != nullptr)
-			m_chain->output_callback(channel, msg, args);
+		if (m_chain)
+			m_chain->output_callback(channel, args);
 	}
+
 private:
-	osd_output *m_chain;
+	osd_output *m_chain = nullptr;
 };
 
-/* calls to be used by the code */
-void CLIB_DECL osd_printf_error(const char *format, ...) ATTR_PRINTF(1,2);
-void CLIB_DECL osd_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
-void CLIB_DECL osd_printf_info(const char *format, ...) ATTR_PRINTF(1,2);
-void CLIB_DECL osd_printf_verbose(const char *format, ...) ATTR_PRINTF(1,2);
-void CLIB_DECL osd_printf_debug(const char *format, ...) ATTR_PRINTF(1,2);
+
+// diagnostic output
+void osd_vprintf_error(util::format_argument_pack<std::ostream> const &args);
+void osd_vprintf_warning(util::format_argument_pack<std::ostream> const &args);
+void osd_vprintf_info(util::format_argument_pack<std::ostream> const &args);
+void osd_vprintf_verbose(util::format_argument_pack<std::ostream> const &args);
+void osd_vprintf_debug(util::format_argument_pack<std::ostream> const &args);
+
+template <typename Format, typename... Params> void osd_printf_error(Format &&fmt, Params &&...args)
+{
+	return osd_vprintf_error(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+}
+template <typename Format, typename... Params> void osd_printf_warning(Format &&fmt, Params &&...args)
+{
+	return osd_vprintf_warning(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+}
+template <typename Format, typename... Params> void osd_printf_info(Format &&fmt, Params &&...args)
+{
+	return osd_vprintf_info(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+}
+template <typename Format, typename... Params> void osd_printf_verbose(Format &&fmt, Params &&...args)
+{
+	return osd_vprintf_verbose(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+}
+template <typename Format, typename... Params> void osd_printf_debug(Format &&fmt, Params &&...args)
+{
+	return osd_vprintf_debug(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+}
+
 
 // returns command line arguments as an std::vector<std::string> in UTF-8
 std::vector<std::string> osd_get_command_line(int argc, char *argv[]);

@@ -689,7 +689,7 @@ void esq5505_state::vfxsd(machine_config &config)
 // 32-voice machines with the VFX-SD type config
 void esq5505_state::vfx32(machine_config &config)
 {
-	M68000(config, m_maincpu, 30.4761_MHz_XTAL / 2);
+	M68000(config, m_maincpu, 30.47618_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::cpu_space_map);
 
@@ -716,12 +716,12 @@ void esq5505_state::vfx32(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ESQ_5505_5510_PUMP(config, m_pump, 30.4761_MHz_XTAL / (2 * 16 * 32));
+	ESQ_5505_5510_PUMP(config, m_pump, 30.47618_MHz_XTAL / (2 * 16 * 32));
 	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
-	auto &es5505(ES5505(config, "otis", 30.4761_MHz_XTAL / 2));
+	auto &es5505(ES5505(config, "otis", 30.47618_MHz_XTAL / 2));
 	es5505.sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));
 	es5505.set_region0("waverom");  /* Bank 0 */
 	es5505.set_region1("waverom2"); /* Bank 1 */

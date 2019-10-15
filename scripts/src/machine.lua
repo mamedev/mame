@@ -65,7 +65,22 @@ files {
 	MAME_DIR .. "src/devices/imagedev/snapquik.h",
 	MAME_DIR .. "src/devices/imagedev/wafadrive.cpp",
 	MAME_DIR .. "src/devices/imagedev/wafadrive.h",
+	MAME_DIR .. "src/devices/imagedev/avivideo.cpp",
+	MAME_DIR .. "src/devices/imagedev/avivideo.h",
 }
+
+
+--------------------------------------------------
+--
+--@src/devices/machine/acorn_vidc.h,MACHINES["ACORN_VIDC"] = true
+--------------------------------------------------
+
+if (MACHINES["ACORN_VIDC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_vidc.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_vidc.h",
+	}
+end
 
 
 ---------------------------------------------------
@@ -4161,4 +4176,3 @@ if (MACHINES["VRENDER0"]~=null) then
 		MAME_DIR .. "src/devices/machine/vrender0.h",
 	}
 end
-

@@ -1343,7 +1343,7 @@ void segas18_state::system18(machine_config &config)
 	m_vdp->lv4_irq().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_pal_write_base(0x1000);
-	m_vdp->set_palette(m_palette);
+	m_vdp->set_ext_palette(m_palette);
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.0);
 
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "screen", 0, 1);
@@ -2683,6 +2683,9 @@ ROM_END
     Moonwalker, Sega System 18
     CPU: FD1094 (317-0159)
     ROM Board: 171-5873B
+   Main board: 837-7530-02
+      Game BD: 833-7528-02 MOONWALKER
+    ROM Board: 834-7529-02
 */
 ROM_START( mwalk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom cpu 317-0159

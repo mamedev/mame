@@ -390,8 +390,8 @@ void vcombat_state::main_map(address_map &map)
 	map(0x702000, 0x702001).r(FUNC(vcombat_state::control_3_r));
 	map(0x705000, 0x705001).ram().share("share4");      /* M1->M0 */
 
-	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
-	//AM_RANGE(0x704000, 0x704001)      /* Headset rotation axis? */
+	//map(0x703000, 0x703001)      /* Headset rotation axis? */
+	//map(0x704000, 0x704001)      /* Headset rotation axis? */
 
 	map(0x706000, 0x70601f).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 }

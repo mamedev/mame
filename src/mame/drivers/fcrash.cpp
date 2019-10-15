@@ -745,10 +745,10 @@ void cps_state::knightsb_map(address_map &map)
 	map(0x800004, 0x800005).nopw(); // writes 0000 here
 	map(0x800006, 0x800007).w(FUNC(cps_state::fcrash_soundlatch_w));    /* Sound command */
 	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
-	map(0x800030, 0x800037).nopw(); //AM_WRITE(cps1_coinctrl_w) only writes bit 15
+	map(0x800030, 0x800037).nopw(); //.w(FUNC(cps_state::cps1_coinctrl_w)); only writes bit 15
 	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");  /* CPS-B custom */
-	map(0x800180, 0x800181).nopw(); //AM_WRITE(cps1_soundlatch2_w)   /* Sound timer fade */
+	map(0x800180, 0x800181).nopw(); //.w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
 	map(0x880000, 0x880001).nopw(); // unknown
 	map(0x900000, 0x93ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98002f).w(FUNC(cps_state::knightsb_layer_w));
@@ -850,7 +850,7 @@ void cps_state::sf2mdt_map(address_map &map)
 	map(0x70c018, 0x70c01f).r(FUNC(cps_state::cps1_hack_dsw_r));
 	map(0x70c106, 0x70c107).w(FUNC(cps_state::cawingbl_soundlatch_w));
 	map(0x70d000, 0x70d001).nopw(); // writes FFFF
-	//AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
+	//map(0x800030, 0x800031).w(FUNC(cps_state::cps1_coinctrl_w));
 	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");  /* CPS-B custom */
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
@@ -866,7 +866,7 @@ void cps_state::sf2b_map(address_map &map)
 	map(0x70c018, 0x70c01f).r(FUNC(cps_state::cps1_hack_dsw_r));
 	map(0x70c106, 0x70c107).w(FUNC(cps_state::cawingbl_soundlatch_w));
 	map(0x70d000, 0x70d001).nopw(); // writes FFFF
-	//AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
+	//map(0x800030, 0x800031).w(FUNC(cps_state::cps1_coinctrl_w));
 	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");  /* CPS-B custom */
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
@@ -910,13 +910,13 @@ void cps_state::wofabl_map(address_map &map)
 void cps_state::slampic_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-	map(0x800006, 0x800007).nopw(); //AM_WRITE(cps1_soundlatch2_w)
+	map(0x800006, 0x800007).nopw(); //.w(FUNC(cps_state::cps1_soundlatch2_w));
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
 	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
 	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
 	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
-	map(0x880000, 0x880001).nopw(); //AM_WRITE(cps1_soundlatch_w)    /* Sound command */
+	map(0x880000, 0x880001).nopw(); //.w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98000d).w(FUNC(cps_state::slampic_layer_w));
 	map(0xf00000, 0xf0ffff).r(FUNC(cps_state::qsound_rom_r));          /* Slammasters protection */

@@ -556,8 +556,7 @@ void wallc_state::unkitpkr(machine_config &config)
 
 	/* sound hardware */
 	subdevice<ay8912_device>("aysnd")->port_a_read_callback().set_ioport("DSW2");
-	subdevice<ay8912_device>("aysnd")->reset_routes();
-	subdevice<ay8912_device>("aysnd")->add_route(ALL_OUTPUTS, "mono", 0.50);
+	subdevice<ay8912_device>("aysnd")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void wallc_state::sidampkr(machine_config &config)

@@ -170,7 +170,7 @@ void bagman_state::main_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x08, 0x09).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x0c, 0x0c).r("aysnd", FUNC(ay8910_device::data_r));
-	//AM_RANGE(0x56, 0x56) AM_WRITENOP
+	//map(0x56, 0x56).nopw();
 }
 
 
@@ -274,9 +274,9 @@ static INPUT_PORTS_START( pickin )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x40, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) /* Cabinet type set through edge connector, not dip switch (verified on real pcb) */
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_CONFNAME(0x80, 0x80, DEF_STR( Cabinet ) ) // sense line on wiring harness
+	PORT_CONFSETTING(   0x80, DEF_STR( Upright ) )
+	PORT_CONFSETTING(   0x00, DEF_STR( Cocktail ) )
 
 INPUT_PORTS_END
 
@@ -343,7 +343,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<0>, nullptr)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(squaitsa_state, dial_input_r<0>)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("P2")
@@ -352,7 +352,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<1>, nullptr)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(squaitsa_state, dial_input_r<1>)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW")

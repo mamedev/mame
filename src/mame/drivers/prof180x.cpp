@@ -12,7 +12,6 @@
 
     TODO:
 
-    - HD64180 CPU (DMA, MMU, SIO, etc) (Z80180 like)
     - memory banking
     - keyboard
     - floppy
@@ -26,8 +25,9 @@
 #include "emu.h"
 #include "includes/prof180x.h"
 
-#include "cpu/z80/z80.h"
+#include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
+#include "machine/74259.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "screen.h"
@@ -82,62 +82,44 @@ WRITE8_MEMBER( prof180x_state::write )
 	}
 }
 
-void prof180x_state::ls259_w(int flag, int value)
+WRITE_LINE_MEMBER(prof180x_state::c0_flag_w)
 {
-	switch (flag)
-	{
-	case 0: // C0
-		m_c0 = value;
-		break;
-
-	case 1: // C1
-		m_c1 = value;
-		break;
-
-	case 2: // C2
-		m_c2 = value;
-		break;
-
-	case 3: // MINI
-		break;
-
-	case 4: // MM0
-		m_mm0 = value;
-		break;
-
-	case 5: // RTC
-		break;
-
-	case 6: // PEPS
-		break;
-
-	case 7: // MM1
-		m_mm1 = value;
-		break;
-	}
+	// C0 (DATA)
+	m_c0 = state;
 }
 
-WRITE8_MEMBER( prof180x_state::flr_w )
+WRITE_LINE_MEMBER(prof180x_state::c1_flag_w)
 {
-	/*
+	// C1 (M0)
+	m_c1 = state;
+}
 
-	    bit     description
+WRITE_LINE_MEMBER(prof180x_state::c2_flag_w)
+{
+	// C2 (M1)
+	m_c2 = state;
+}
 
-	    0       VAL
-	    1       FLG0
-	    2       FLG1
-	    3       FLG2
-	    4
-	    5
-	    6
-	    7
+WRITE_LINE_MEMBER(prof180x_state::mini_flag_w)
+{
+}
 
-	*/
+WRITE_LINE_MEMBER(prof180x_state::mm0_flag_w)
+{
+	m_mm0 = state;
+}
 
-	int val = BIT(data, 0);
-	int flg = (data >> 1) & 0x07;
+WRITE_LINE_MEMBER(prof180x_state::rtc_ce_w)
+{
+}
 
-	ls259_w(flg, val);
+WRITE_LINE_MEMBER(prof180x_state::peps_flag_w)
+{
+}
+
+WRITE_LINE_MEMBER(prof180x_state::mm1_flag_w)
+{
+	m_mm1 = state;
 }
 
 READ8_MEMBER( prof180x_state::status0_r )
@@ -189,16 +171,19 @@ READ8_MEMBER( prof180x_state::status_r )
 
 void prof180x_state::prof180x_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(prof180x_state::read), FUNC(prof180x_state::write));
+	map(0x00000, 0x0ffff).rom().region(HD64180_TAG, 0);
+	map(0x4f000, 0x4ffff).ram();
+	//map(0x0000, 0xffff).rw(FUNC(prof180x_state::read), FUNC(prof180x_state::write));
 }
 
 void prof180x_state::prof180x_io(address_map &map)
 {
-	map(0x08, 0x08).mirror(0xff00).w(FUNC(prof180x_state::flr_w));
-	map(0x09, 0x09).select(0xff00).r(FUNC(prof180x_state::status_r));
-	map(0x0a, 0x0a).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
-	map(0x0b, 0x0b).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::bus_w));
-	map(0x0c, 0x0d).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
+	map(0x0000, 0x003f).noprw(); // Z180 internal registers
+	map(0x00d8, 0x00d8).mirror(0xff00).w("syslatch", FUNC(ls259_device::write_nibble_d0));
+	map(0x00d9, 0x00d9).select(0xff00).r(FUNC(prof180x_state::status_r));
+	map(0x00da, 0x00da).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
+	map(0x00db, 0x00db).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00dc, 0x00dd).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
 }
 
 /* Input ports */
@@ -232,18 +217,24 @@ void prof180x_state::machine_start()
 
 void prof180x_state::machine_reset()
 {
-	for (int i = 0; i < 8; i++)
-	{
-		ls259_w(i, 0);
-	}
 }
 
 void prof180x_state::prof180x(machine_config &config)
 {
 	/* basic machine hardware */
-	z80_device &maincpu(Z80(config, HD64180_TAG, XTAL(9'216'000)));
+	z180_device &maincpu(HD64180RP(config, HD64180_TAG, 18.432_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &prof180x_state::prof180x_mem);
 	maincpu.set_addrmap(AS_IO, &prof180x_state::prof180x_io);
+
+	ls259_device &syslatch(LS259(config, "syslatch")); // Z41
+	syslatch.q_out_cb<0>().set(FUNC(prof180x_state::c0_flag_w));
+	syslatch.q_out_cb<1>().set(FUNC(prof180x_state::c1_flag_w));
+	syslatch.q_out_cb<2>().set(FUNC(prof180x_state::c2_flag_w));
+	syslatch.q_out_cb<3>().set(FUNC(prof180x_state::mini_flag_w));
+	syslatch.q_out_cb<4>().set(FUNC(prof180x_state::mm0_flag_w));
+	syslatch.q_out_cb<5>().set(FUNC(prof180x_state::rtc_ce_w));
+	syslatch.q_out_cb<6>().set(FUNC(prof180x_state::peps_flag_w));
+	syslatch.q_out_cb<7>().set(FUNC(prof180x_state::mm1_flag_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));

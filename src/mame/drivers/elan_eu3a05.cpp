@@ -960,8 +960,7 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 
 	map(0x50a9, 0x50a9).rw(FUNC(radica_eu3a05_state::radicasi_50a9_r), FUNC(radica_eu3a05_state::radicasi_50a9_w));
 
-	//AM_RANGE(0x5000, 0x50ff) AM_RAM
-
+	//map(0x5000, 0x50ff).ram();
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x3f8000);

@@ -104,7 +104,8 @@ int nscsi_cdrom_device::to_msf(int frame)
 
 void nscsi_cdrom_device::set_block_size(u32 block_size)
 {
-	assert_always(bytes_per_sector % block_size == 0, "block size must be a factor of sector size");
+	if (bytes_per_sector % block_size)
+		throw emu_fatalerror("nscsi_cdrom_device(%s): block size must be a factor of sector size", tag());
 
 	bytes_per_block = block_size;
 };

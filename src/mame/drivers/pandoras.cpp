@@ -140,7 +140,7 @@ void pandoras_state::pandoras_slave_map(address_map &map)
 	map(0x1a02, 0x1a02).portr("P2");
 	map(0x1a03, 0x1a03).portr("DSW3");
 	map(0x1c00, 0x1c00).portr("DSW2");
-//  AM_RANGE(0x1e00, 0x1e00) AM_READNOP                                                     /* ??? seems to be important */
+//  map(0x1e00, 0x1e00).nopr();                                                     /* ??? seems to be important */
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));        /* watchdog reset */
 	map(0xa000, 0xa000).w(FUNC(pandoras_state::pandoras_cpua_irqtrigger_w));                           /* cause FIRQ on CPU A */
 	map(0xc000, 0xc7ff).ram().share("share4");                                      /* Shared RAM with the CPU A */

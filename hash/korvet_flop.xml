@@ -9,7 +9,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="disk.kdi" size="819200" crc="6653f383" sha1="e9e8ce49eea738835f63509944e81b4b42025d9e" offset="0x0000" />
+				<rom name="disk.kdi" size="819200" crc="6653f383" sha1="e9e8ce49eea738835f63509944e81b4b42025d9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20,7 +20,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="disk2.kdi" size="819200" crc="08b37038" sha1="17f90b127707fafdf262157d7c38542a1e9a5c7f" offset="0x0000" />
+				<rom name="disk2.kdi" size="819200" crc="08b37038" sha1="17f90b127707fafdf262157d7c38542a1e9a5c7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="disk3.kdi" size="819200" crc="a73c5d37" sha1="e4170136ca6132fac11f4cfbf12d1c9c2b6c093a" offset="0x0000" />
+				<rom name="disk3.kdi" size="819200" crc="a73c5d37" sha1="e4170136ca6132fac11f4cfbf12d1c9c2b6c093a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="disk4.kdi" size="819200" crc="999ed72a" sha1="035f5f7770b9de4c26d1bbbd119828d776b7d249" offset="0x0000" />
+				<rom name="disk4.kdi" size="819200" crc="999ed72a" sha1="035f5f7770b9de4c26d1bbbd119828d776b7d249"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="asm.kdi" size="819200" crc="e4306ce3" sha1="d3fd2eef87735ca450d05920666bb09edfd3a14e" offset="0x0000" />
+				<rom name="asm.kdi" size="819200" crc="e4306ce3" sha1="d3fd2eef87735ca450d05920666bb09edfd3a14e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="chiwork.kdi" size="819200" crc="87493dde" sha1="6c20b307196f1be55635211721276d5c8096e840" offset="0x0000" />
+				<rom name="chiwork.kdi" size="819200" crc="87493dde" sha1="6c20b307196f1be55635211721276d5c8096e840"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,52 +75,52 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="12_87_11_niijaf.kdi" size="819200" crc="0b7d15d4" sha1="8beb31ea7848bad04f0d3fd98e5949a766cd355a" offset="0x0000" />
+				<rom name="12_87_11_niijaf.kdi" size="819200" crc="0b7d15d4" sha1="8beb31ea7848bad04f0d3fd98e5949a766cd355a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="12_88_3_alternativa.kdi" size="819200" crc="b3873423" sha1="265e614e9ce74fc978c293c52830b2e64d0cd896" offset="0x0000" />
+				<rom name="12_88_3_alternativa.kdi" size="819200" crc="b3873423" sha1="265e614e9ce74fc978c293c52830b2e64d0cd896"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="12_88_3_niijaf.kdi" size="819200" crc="b6721613" sha1="bf931c27a091e0c27d014c1736d3273b43e2c97d" offset="0x0000" />
+				<rom name="12_88_3_niijaf.kdi" size="819200" crc="b6721613" sha1="bf931c27a091e0c27d014c1736d3273b43e2c97d"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="12_90_5_kontur.kdi" size="819200" crc="00f76f6a" sha1="e0059f39d06f0af6ab41b47be3e09820baae18d3" offset="0x0000" />
+				<rom name="12_90_5_kontur.kdi" size="819200" crc="00f76f6a" sha1="e0059f39d06f0af6ab41b47be3e09820baae18d3"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="20_88___miks.kdi" size="819200" crc="a22ddc81" sha1="01a7198eadf0f1030a0d5081bce2443038993968" offset="0x0000" />
+				<rom name="20_88___miks.kdi" size="819200" crc="a22ddc81" sha1="01a7198eadf0f1030a0d5081bce2443038993968"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="21_89___wiza.kdi" size="819200" crc="b6c28e9a" sha1="87c17e6c0ca105ca4ff426063323db675a6231f9" offset="0x0000" />
+				<rom name="21_89___wiza.kdi" size="819200" crc="b6c28e9a" sha1="87c17e6c0ca105ca4ff426063323db675a6231f9"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="21_89_2_niijaf.kdi" size="819200" crc="5faf5114" sha1="824c9f0f2835d709db7c65c510456f6fdab2150e" offset="0x0000" />
+				<rom name="21_89_2_niijaf.kdi" size="819200" crc="5faf5114" sha1="824c9f0f2835d709db7c65c510456f6fdab2150e"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="21_89_2_niijaf2.kdi" size="819200" crc="b8a208c9" sha1="e4fc313f827a2af81853f2fecd72a4cf4f0e75a9" offset="0x0000" />
+				<rom name="21_89_2_niijaf2.kdi" size="819200" crc="b8a208c9" sha1="e4fc313f827a2af81853f2fecd72a4cf4f0e75a9"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="21_91___lap.kdi" size="819200" crc="b1ad102b" sha1="036c0c0f6281eaaf996ced5994a5740208a773e7" offset="0x0000" />
+				<rom name="21_91___lap.kdi" size="819200" crc="b1ad102b" sha1="036c0c0f6281eaaf996ced5994a5740208a773e7"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="21m_____shkanov.kdi" size="819200" crc="31384822" sha1="cca8cc374ac672105a8f85f6bc9ca5bd8aa722d7" offset="0x0000" />
+				<rom name="21m_____shkanov.kdi" size="819200" crc="31384822" sha1="cca8cc374ac672105a8f85f6bc9ca5bd8aa722d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,12 +131,12 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="dictruen.kdi" size="819200" crc="38b173ce" sha1="37008dd87abdc09d7b5874759444667f7d2435de" offset="0x0000" />
+				<rom name="dictruen.kdi" size="819200" crc="38b173ce" sha1="37008dd87abdc09d7b5874759444667f7d2435de"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="dictenru.kdi" size="819200" crc="36a834fe" sha1="baec63f6f7c0012bbeb67d10fe820ccf0d38ed8f" offset="0x0000" />
+				<rom name="dictenru.kdi" size="819200" crc="36a834fe" sha1="baec63f6f7c0012bbeb67d10fe820ccf0d38ed8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -147,7 +147,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="editor.kdi" size="819200" crc="62e1e1b0" sha1="76ea1d0a64adbdd039d8228ece64f5a5b0a2febe" offset="0x0000" />
+				<rom name="editor.kdi" size="819200" crc="62e1e1b0" sha1="76ea1d0a64adbdd039d8228ece64f5a5b0a2febe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -158,7 +158,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="ep.kdi" size="819200" crc="bdaf18ed" sha1="4969b7b7c2710da1ffca2449aa8e96eecdf4f758" offset="0x0000" />
+				<rom name="ep.kdi" size="819200" crc="bdaf18ed" sha1="4969b7b7c2710da1ffca2449aa8e96eecdf4f758"/>
 			</dataarea>
 		</part>
 	</software>
@@ -169,7 +169,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="817152">
-				<rom name="games1.kdi" size="817152" crc="4ca17ed9" sha1="73955cb5a626650996d2b5018e8af482741e200e" offset="0x0000" />
+				<rom name="games1.kdi" size="817152" crc="4ca17ed9" sha1="73955cb5a626650996d2b5018e8af482741e200e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -180,7 +180,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="games2.kdi" size="819200" crc="9bb7bd5b" sha1="7bab756033d759dd2f62919d983111f7c0cc48b1" offset="0x0000" />
+				<rom name="games2.kdi" size="819200" crc="9bb7bd5b" sha1="7bab756033d759dd2f62919d983111f7c0cc48b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -191,7 +191,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="games3.kdi" size="819200" crc="705df204" sha1="81b9189dcaa239c45548efbe798f26e754625129" offset="0x0000" />
+				<rom name="games3.kdi" size="819200" crc="705df204" sha1="81b9189dcaa239c45548efbe798f26e754625129"/>
 			</dataarea>
 		</part>
 	</software>
@@ -202,7 +202,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="games4.kdi" size="819200" crc="cd1363cf" sha1="de85eff7a89c2ad8ed114ad8e5bef28676e9fa8b" offset="0x0000" />
+				<rom name="games4.kdi" size="819200" crc="cd1363cf" sha1="de85eff7a89c2ad8ed114ad8e5bef28676e9fa8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -213,22 +213,22 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="mdos1_861011.kdi" size="819200" crc="8467bf9a" sha1="af04472e545dd0db750e77c0819727ee4ade5c72" offset="0x0000" />
+				<rom name="mdos1_861011.kdi" size="819200" crc="8467bf9a" sha1="af04472e545dd0db750e77c0819727ee4ade5c72"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="mdos1_861115.kdi" size="819200" crc="abe06250" sha1="c4efd13463bbb152b7259c8db1c7b481f252363e" offset="0x0000" />
+				<rom name="mdos1_861115.kdi" size="819200" crc="abe06250" sha1="c4efd13463bbb152b7259c8db1c7b481f252363e"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="mdos1_870430.kdi" size="819200" crc="3df4c45c" sha1="38fc65653fb240c64bec5d82f7f6e3e750f5264f" offset="0x0000" />
+				<rom name="mdos1_870430.kdi" size="819200" crc="3df4c45c" sha1="38fc65653fb240c64bec5d82f7f6e3e750f5264f"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="mdos2_880630.kdi" size="819200" crc="4055d96f" sha1="cf98b44a7a5cfb9d236fc3d1c56186b2feede4bd" offset="0x0000" />
+				<rom name="mdos2_880630.kdi" size="819200" crc="4055d96f" sha1="cf98b44a7a5cfb9d236fc3d1c56186b2feede4bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -239,7 +239,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="system1.kdi" size="819200" crc="861309dd" sha1="b7455d32c09aaecb0ce37627b482198cb1fd83e3" offset="0x0000" />
+				<rom name="system1.kdi" size="819200" crc="861309dd" sha1="b7455d32c09aaecb0ce37627b482198cb1fd83e3"/>
 			</dataarea>
 		</part>
 	</software>

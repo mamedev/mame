@@ -216,7 +216,7 @@ void lethalj_state::lethalj_map(address_map &map)
 	map(0x04000000, 0x0400000f).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x04000010, 0x0400001f).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x04100000, 0x0410000f).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
+//  map(0x04100010, 0x0410001f).nopr();     /* read but never examined */
 	map(0x04200000, 0x0420001f).nopw();    /* clocks bits through here */
 	map(0x04300000, 0x0430007f).r(FUNC(lethalj_state::lethalj_gun_r));
 	map(0x04400000, 0x0440000f).nopw();    /* clocks bits through here */
@@ -514,7 +514,7 @@ static INPUT_PORTS_START( cclownz )
 	PORT_DIPSETTING(      0x0000, "3000" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, nullptr)
+	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(lethalj_state, cclownz_paddle)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )

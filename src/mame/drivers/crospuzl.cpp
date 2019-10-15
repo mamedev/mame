@@ -1,33 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /****************************************************************************
-	
-	Cross Puzzle
-	
-	driver by Angelo Salese, based off original crystal.cpp by ElSemi
 
-	TODO:
-	- Dies at POST with a SPU error, 
-	  supposedly it should print a "running system." instead of "Ok" at the 
-	  end of the POST routine.
-	  Update: it tries to load a "sdata.bin" file, which is nowhere to be found in the dump.
-	  Considering also that first $20000 block is empty and loading the flash linearly gives 
-	  the reference memory size but then game isn't detected at all.
-	- Hooking up nand_device instead of the custom implementation here
-	  makes the game to print having all memory available and no game 
-	  detected, fun
-	- I2C RTC interface should be correct but still doesn't work, sending
+    Cross Puzzle
+
+    driver by Angelo Salese, based off original crystal.cpp by ElSemi
+
+    TODO:
+    - Dies at POST with a SPU error,
+      supposedly it should print a "running system." instead of "Ok" at the
+      end of the POST routine.
+      Update: it tries to load a "sdata.bin" file, which is nowhere to be found in the dump.
+      Considering also that first $20000 block is empty and loading the flash linearly gives
+      the reference memory size but then game isn't detected at all.
+    - Hooking up nand_device instead of the custom implementation here
+      makes the game to print having all memory available and no game
+      detected, fun
+    - I2C RTC interface should be correct but still doesn't work, sending
       unrecognized slave address 0x30 (device type might be wrong as well)
 
-	Notes:
-	- Game enables UART1 receive irq, if that irq is enable it just prints 
-	  "___sysUART1_ISR<LF>___sysUART1_ISR_END<LF>"
-	
+    Notes:
+    - Game enables UART1 receive irq, if that irq is enable it just prints
+      "___sysUART1_ISR<LF>___sysUART1_ISR_END<LF>"
+
 =============================================================================
 
- This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been 
+ This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been
  seen with a standard VRenderZERO+ MagicEyes EISC chip
-	
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -71,7 +71,7 @@ private:
 	uint32_t   m_FlashAddr;
 	uint8_t    m_FlashShift;
 
-//	DECLARE_WRITE32_MEMBER(Banksw_w);
+//  DECLARE_WRITE32_MEMBER(Banksw_w);
 	DECLARE_READ8_MEMBER(FlashCmd_r);
 	DECLARE_WRITE8_MEMBER(FlashCmd_w);
 	DECLARE_WRITE8_MEMBER(FlashAddr_w);
@@ -81,7 +81,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void crospuzl_mem(address_map &map);
-	
+
 	// PIO
 	uint32_t m_PIO;
 	uint32_t m_ddr;
@@ -100,7 +100,7 @@ IRQ_CALLBACK_MEMBER(crospuzl_state::icallback)
 
 READ32_MEMBER(crospuzl_state::PIOedat_r)
 {
-	// TODO: this needs fixing in serflash_device 
+	// TODO: this needs fixing in serflash_device
 	// (has a laconic constant for the ready line)
 	return (m_rtc->sda_r() << 19)
 		| (machine().rand() & 0x04000000); // serial ready line
@@ -114,12 +114,12 @@ READ8_MEMBER(crospuzl_state::FlashCmd_r)
 	}
 	if ((m_FlashCmd & 0xff) == 0x90)
 	{
-		// Service Mode has the first two bytes of the ID printed, 
+		// Service Mode has the first two bytes of the ID printed,
 		// in format ****/ee81
-		// ee81 has no correspondence in the JEDEC flash vendor ID list, 
+		// ee81 has no correspondence in the JEDEC flash vendor ID list,
 		// and the standard claims that the ID is 7 + 1 parity bit.
 		// TODO: Retrieve ID from actual HW service mode screen.
-//		const uint8_t id[5] = { 0xee, 0x81, 0x00, 0x15, 0x00 };
+//      const uint8_t id[5] = { 0xee, 0x81, 0x00, 0x15, 0x00 };
 		const uint8_t id[5] = { 0xec, 0xf1, 0x00, 0x95, 0x40 };
 		uint8_t res = id[m_FlashAddr];
 		m_FlashAddr ++;
@@ -136,7 +136,7 @@ READ8_MEMBER(crospuzl_state::FlashCmd_r)
 }
 
 WRITE8_MEMBER(crospuzl_state::FlashCmd_w)
-{ 
+{
 	m_FlashPrevCommand = m_FlashCmd;
 	m_FlashCmd = data;
 	m_FlashShift = 0;
@@ -207,13 +207,13 @@ void crospuzl_state::crospuzl_mem(address_map &map)
 
 	map(0x03000000, 0x04ffffff).m(m_vr0soc, FUNC(vrender0soc_device::audiovideo_map));
 
-//	map(0x05000000, 0x05ffffff).bankr("mainbank");
-//	map(0x05000000, 0x05000003).rw(FUNC(crospuzl_state::FlashCmd_r), FUNC(crospuzl_state::FlashCmd_w));
+//  map(0x05000000, 0x05ffffff).bankr("mainbank");
+//  map(0x05000000, 0x05000003).rw(FUNC(crospuzl_state::FlashCmd_r), FUNC(crospuzl_state::FlashCmd_w));
 }
 
 void crospuzl_state::machine_start()
 {
-//	save_item(NAME(m_Bank));
+//  save_item(NAME(m_Bank));
 	save_item(NAME(m_FlashCmd));
 	save_item(NAME(m_PIO));
 	save_item(NAME(m_ddr));
@@ -374,13 +374,13 @@ void crospuzl_state::crospuzl(machine_config &config)
 
 //  ROM strings have references to a K9FXX08 device
 //  TODO: use this device, in machine/smartmed.h (has issues with is_busy() emulation)
-//	NAND(config, m_nand, 0);
-//	m_nand->set_nand_type(nand_device::chip::K9F1G08U0B); // TODO: exact flavor
+//  NAND(config, m_nand, 0);
+//  m_nand->set_nand_type(nand_device::chip::K9F1G08U0B); // TODO: exact flavor
 
 	PCF8583(config, m_rtc, 32.768_kHz_XTAL);
 }
 
-ROM_START( crospuzl ) 
+ROM_START( crospuzl )
 	ROM_REGION( 0x80010, "maincpu", 0 )
 	ROM_LOAD("en29lv040a.u5",  0x000000, 0x80010, CRC(d50e8500) SHA1(d681cd18cd0e48854c24291d417d2d6d28fe35c1) )
 

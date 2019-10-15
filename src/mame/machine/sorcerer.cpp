@@ -42,7 +42,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		sorcerer_reset(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in sorcerer_state::device_timer");
+		throw emu_fatalerror("Unknown id in sorcerer_state::device_timer");
 	}
 }
 
@@ -491,7 +491,7 @@ void sorcerer_state::machine_reset()
 	m_wait = false;
 	m_fe = 0xff;
 	m_2c = 0;
-	port_fe_w(space, 0, 0, 0xff);
+	port_fe_w(space, 0, 0, 0);
 
 	membank("boot")->set_entry(1);
 	timer_set(attotime::from_usec(10), TIMER_RESET);

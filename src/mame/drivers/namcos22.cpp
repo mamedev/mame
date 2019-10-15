@@ -3335,9 +3335,10 @@ INPUT_PORTS_END
 
 /*********************************************************************************************/
 
-CUSTOM_INPUT_MEMBER(namcos22s_state::alpine_motor_read)
+template <int N>
+READ_LINE_MEMBER(namcos22s_state::alpine_motor_r)
 {
-	return m_motor_status >> (uintptr_t)param & 1;
+	return BIT(m_motor_status, N);
 }
 
 static INPUT_PORTS_START( alpiner )
@@ -3349,8 +3350,8 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) // Decision / View Change
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22s_state, alpine_motor_read, 0) // steps are free
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22s_state, alpine_motor_read, 1) // steps are locked
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(namcos22s_state, alpine_motor_r<0>) // steps are free
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(namcos22s_state, alpine_motor_r<1>) // steps are locked
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC.0")
@@ -3965,9 +3966,8 @@ void namcos22s_state::airco22b(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "bodysonic").subwoofer();
-
-	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer
+	SPEAKER(config, "bodysonic").backrest();
+	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer behind back
 }
 
 void namcos22s_state::alpine(machine_config &config)
@@ -3991,7 +3991,6 @@ void namcos22s_state::cybrcycc(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "tank", 0.0, 0.0, 0.0);
-
 	m_c352->add_route(2, "tank", 1.00);
 }
 
@@ -4000,7 +3999,6 @@ void namcos22s_state::dirtdash(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "road", 0.0, 0.0, 0.0);
-
 	m_c352->add_route(3, "road", 1.00);
 }
 
@@ -4015,8 +4013,8 @@ void namcos22s_state::tokyowar(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "vibration").subwoofer();
-	SPEAKER(config, "seat").rear_center();
+	SPEAKER(config, "vibration").seat();
+	SPEAKER(config, "seat").headrest_center();
 
 	m_c352->add_route(2, "vibration", 0.50); // to "bass shaker"
 	m_c352->add_route(3, "seat", 1.00);

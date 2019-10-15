@@ -1017,9 +1017,9 @@ WRITE8_MEMBER( snes_console_state::pfest94_lo_w )
 
 void snes_console_state::snes_map(address_map &map)
 {
-//  AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes20_lo_r, snes20_lo_w)
+//  map(0x000000, 0x7dffff).rw(FUNC(snes_console_state::snes20_lo_r), FUNC(snes_console_state::snes20_lo_w));
 	map(0x7e0000, 0x7fffff).ram();                                     /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-//  AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes20_hi_r, snes20_hi_w)
+//  map(0x800000, 0xffffff).rw(FUNC(snes_console_state::snes20_hi_r), FUNC(snes_console_state::snes20_hi_w));
 }
 
 void snes_console_state::spc_map(address_map &map)
@@ -1249,7 +1249,8 @@ void snes_console_state::machine_start()
 				m_maincpu->space(AS_PROGRAM).install_read_handler(0x006000, 0x007fff, 0, 0xbf0000, 0, read8sm_delegate(FUNC(base_sns_cart_slot_device::chip_read),(base_sns_cart_slot_device*)m_cartslot));
 				m_maincpu->space(AS_PROGRAM).install_write_handler(0x006000, 0x007fff, 0, 0xbf0000, 0, write8sm_delegate(FUNC(base_sns_cart_slot_device::chip_write),(base_sns_cart_slot_device*)m_cartslot));
 				break;
-			case SNES_SFX:
+			case SNES_GSU1:
+			case SNES_GSU2:
 				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snes_console_state::snessfx_lo_r),this), write8_delegate(FUNC(snes_console_state::snessfx_lo_w),this));
 				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snes_console_state::snessfx_hi_r),this), write8_delegate(FUNC(snes_console_state::snessfx_hi_w),this));
 				m_maincpu->set_5a22_map();

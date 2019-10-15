@@ -598,7 +598,7 @@ void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		lynx_uart_timer(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in lynx_state::device_timer");
+		throw emu_fatalerror("Unknown id in lynx_state::device_timer");
 	}
 }
 

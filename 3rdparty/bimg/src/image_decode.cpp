@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -647,7 +647,10 @@ namespace bimg
 
 				for (uint32_t ii = 0; err.isOk() && ii < numEntries; ++ii)
 				{
-					// https://sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html
+					// Reference(s):
+					// - EXIF Tags
+					//   https://web.archive.org/web/20190218005249/https://sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html
+					//
 					uint16_t tag;
 					bx::readHE(&reader, tag, littleEndian, &err);
 

@@ -47,7 +47,7 @@ INPUT_PORTS_END
 
 void qs_state::qs7_prog_map(address_map &map)
 {
-	//ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
+	//map.global_mask(0x3ffff);
 	map(0x00000, 0x3ffff).rom();
 }
 

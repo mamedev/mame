@@ -62,7 +62,7 @@ public:
 	void init_spk116it();
 	void init_3super8();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ_LINE_MEMBER(hopper_r);
 
 protected:
 	virtual void machine_start() override;
@@ -169,7 +169,7 @@ uint32_t spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
                                Misc Handlers
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(spoker_state::hopper_r)
+READ_LINE_MEMBER(spoker_state::hopper_r)
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);
@@ -297,7 +297,7 @@ void spoker_state::spoker_portmap(address_map &map)
 
 void spoker_state::_3super8_portmap(address_map &map)
 {
-//  AM_RANGE(0x1000, 0x1fff) AM_WRITENOP
+//  map(0x1000, 0x1fff).nopw();
 	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share(m_bg_tile_ram);
@@ -306,7 +306,7 @@ void spoker_state::_3super8_portmap(address_map &map)
 	map(0x4002, 0x4002).portr("DSW3");
 	map(0x4003, 0x4003).portr("DSW4");
 	map(0x4004, 0x4004).portr("DSW5");
-//  AM_RANGE(0x4000, 0x40ff) AM_WRITENOP
+//  map(0x4000, 0x40ff).nopw();
 	map(0x5000, 0x5fff).ram().w(FUNC(spoker_state::fg_tile_w)).share(m_fg_tile_ram);
 
 //  The following one (0x6480) should be output. At beginning of code, there is a PPI initialization
@@ -409,7 +409,7 @@ static INPUT_PORTS_START( spoker )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear") // stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, nullptr) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(spoker_state, hopper_r) PORT_NAME("HPSW")   // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -478,7 +478,7 @@ static INPUT_PORTS_START( 3super8 )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, nullptr) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(spoker_state, hopper_r) PORT_NAME("HPSW")   // hopper sensor
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1   )
@@ -612,7 +612,7 @@ void spoker_state::machine_reset()
 void spoker_state::spoker(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 2);   /* HD64180RP8, 8 MHz? */
+	HD64180RP(config, m_maincpu, XTAL(12'000'000));   /* HD64180RP8, 8 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::spoker_map);
 	m_maincpu->set_addrmap(AS_IO, &spoker_state::spoker_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(spoker_state::nmi_line_assert));

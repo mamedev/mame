@@ -32,7 +32,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="bbc2_1.bin" size="8192" crc="ee348134" sha1="0528f7c935549f5fe7c033f1f5e58cba8a03736b" />
+				<rom name="bbc2_1.bin" size="8192" crc="ee348134" sha1="0528f7c935549f5fe7c033f1f5e58cba8a03736b" offset="0x0000" />
 				<rom name="bbc2_2.bin" size="8192" crc="358f6dea" sha1="b0f6afbef17727fbf5664b010cd7b70dd906ea80" offset="0x2000" />
 				<rom name="bbc2_3.bin" size="8192" crc="c94691ac" sha1="16f52712db0d7122b850bada6200408b22d95a43" offset="0x4000" />
 				<rom name="bbc2_4.bin" size="8192" crc="ec6405e2" sha1="eb59238b446e94428081fc5d3594eac60b873192" offset="0x6000" />
@@ -46,7 +46,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="bbc4a.0" size="16384" crc="d1f20bc0" sha1="368fa3ff5affea6ca355b09b4f00917299fa6a8e" />
+				<rom name="bbc4a.0" size="16384" crc="d1f20bc0" sha1="368fa3ff5affea6ca355b09b4f00917299fa6a8e" offset="0x0000" />
 				<rom name="bbc4a.1" size="16384" crc="2ee770f9" sha1="15e62090c2329954a41140041e73e953006be699" offset="0x4000" />
 			</dataarea>
 		</part>
@@ -58,7 +58,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="24576">
-				<rom name="cpc_2_1.bin" size="8192" crc="1efd1481" sha1="d0483da7ae3abff4a1141a89d066e2b5879a52c1" />
+				<rom name="cpc_2_1.bin" size="8192" crc="1efd1481" sha1="d0483da7ae3abff4a1141a89d066e2b5879a52c1" offset="0x0000" />
 				<rom name="cpc_2_2.bin" size="8192" crc="93b263ec" sha1="8d63244d91156a9d86da8460eb80d0b7d287675a" offset="0x2000" />
 				<rom name="cpc_2_3.bin" size="8192" crc="9ceb5493" sha1="ebed605d297e34f85c831c023e5925ce800d57a3" offset="0x4000" />
 			</dataarea>
@@ -127,7 +127,7 @@
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="mp_1_1.bin" size="16384" crc="d28d9995" sha1="4288eae32eaabbe489b549a30e4eb35a4e671ae7" />
+				<rom name="mp_1_1.bin" size="16384" crc="d28d9995" sha1="4288eae32eaabbe489b549a30e4eb35a4e671ae7" offset="0x0000" />
 				<rom name="mp_1_2.bin" size="16384" crc="b221ff05" sha1="95b13a2ce554a394a4139e868e5be9455b091b26" offset="0x4000" />
 			</dataarea>
 		</part>

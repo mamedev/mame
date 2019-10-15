@@ -143,7 +143,7 @@ void alesis_state::sr16_mem(address_map &map)
 
 void alesis_state::sr16_io(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
+	//map.unmap_value_high();
 	map(0x0000, 0x0000).mirror(0xff).w("dm3ag", FUNC(alesis_dm3ag_device::write));
 	map(0x0200, 0x0200).mirror(0xff).w(FUNC(alesis_state::sr16_lcd_w));
 	map(0x0300, 0x0300).mirror(0xff).w(FUNC(alesis_state::kb_matrix_w));

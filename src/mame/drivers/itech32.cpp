@@ -488,7 +488,7 @@ void itech32_state::color_w(u8 data)
  *************************************/
 
 
-CUSTOM_INPUT_MEMBER(itech32_state::special_port_r)
+READ_LINE_MEMBER(itech32_state::special_port_r)
 {
 	if (m_soundlatch->pending_r())
 		m_special_result ^= 1;
@@ -953,7 +953,7 @@ map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(itech32_state::test2_r), FUNC(it
 	map(0x080000, 0x080003).portr("80000");
 	map(0x082000, 0x082003).portr("82000");
 	map(0x084001, 0x084001).rw(FUNC(drivedge_state::sound_return_r), FUNC(drivedge_state::sound_data_w));
-//  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
+//  map(0x086000, 0x08623f).ram(); -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
 	map(0x088000, 0x088001).r(FUNC(drivedge_state::steering_r));
 	map(0x08a000, 0x08a001).r(FUNC(drivedge_state::gas_r));
 	map(0x08a000, 0x08a003).nopw();
@@ -969,7 +969,7 @@ map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(itech32_state::test2_r), FUNC(it
 	map(0x200000, 0x200003).portr("200000");
 	map(0x280000, 0x280fff).ram().w(FUNC(drivedge_state::tms1_68k_ram_w)).share("tms1_ram");
 	map(0x300000, 0x300fff).ram().w(FUNC(drivedge_state::tms2_68k_ram_w)).share("tms2_ram");
-	map(0x380000, 0x380003).nopw(); // AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	map(0x380000, 0x380003).nopw(); // .w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x600000, 0x607fff).rom().region("user1", 0).share("main_rom");
 }
 
@@ -1093,7 +1093,7 @@ static INPUT_PORTS_START( timekill )
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(itech32_state, special_port_r)
 	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "-" )
 	PORT_DIPSETTING(      0x0010, "+" )
@@ -1138,7 +1138,7 @@ static INPUT_PORTS_START( itech32_base_16bit )
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(itech32_state, special_port_r)
 	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, "-" )
 	PORT_DIPSETTING(      0x0010, "+" )
@@ -1357,7 +1357,7 @@ static INPUT_PORTS_START( itech32_base_32bit )
 	PORT_SERVICE_NO_TOGGLE( 0x00010000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(itech32_state, special_port_r)
 	PORT_DIPNAME( 0x00100000, 0x00000000, "Video Sync" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x00000000, "-" )
 	PORT_DIPSETTING(          0x00100000, "+" )

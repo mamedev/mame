@@ -621,6 +621,7 @@ Club Kart: European Session (Rev C)             ?          23704C  11 (128Mb)  ?
 Club Kart: European Session (Rev D)             840-0062C  23704D  11 (128Mb)  315-6319A  315-6213  317-0313-COM  present
 Crackin' DJ                                     840-0043C  23450   10 (128Mb)  315-6319   315-6213  317-0288-COM  ?            requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
 Derby Owners Club II Ver.2.1 (Japan, Rev B)     840-0083C  22306B  11 (128Mb)  315-6319A  315-6213  317-0327-JPN  present
+Derby Owners Club World Edition (Rev A)         840-0088C  22336A   7 (128Mb)  315-6319A  315-6213  not present   present
 Derby Owners Club World Edition (Rev B)         840-0088C  22336B   7 (128Mb)  315-6319A  315-6213  not present   present
 Derby Owners Club World Edition (Rev C)         840-0088C  22336C   7 (128Mb)  315-6319A  315-6213  not present   not present
 Derby Owners Club World Edition EX (Rev D)      840-0088C  22336D   7 (128Mb)  315-6319A  315-6213  not present   not present  2 MaskROM are different from Rev C
@@ -1753,13 +1754,13 @@ void naomi_state::naomi_map(address_map &map)
 	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
-	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
 
 	/* Area 6 */
-	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+	//map(0x18000000, 0x1bffffff).noprw(); // Unassigned
 
 	/* Area 7 */
-	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
+	//map(0x1c000000, 0x1fffffff).noprw(); // SH4 Internal
 }
 
 /*
@@ -1796,9 +1797,9 @@ void naomi2_state::naomi2_map(address_map &map)
 
 	map(0x025f7c00, 0x025f7cff).m(m_powervr2_slave, FUNC(powervr2_device::pd_dma_map));
 	map(0x025f8000, 0x025f9fff).m(m_powervr2_slave, FUNC(powervr2_device::ta_map));
-//  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
-//  AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVREADWRITE32("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w, 0xffffffffffffffffU)
-//  AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
+//  map(0x025f6800, 0x025f69ff).rw(FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w)); // second PVR DMA!
+//  map(0x025f7c00, 0x025f7cff).rw("powervr2", FUNC(powervr2_device::pvr_ctrl_r), FUNC(powervr2_device::pvr_ctrl_w));
+//  map(0x005f8000, 0x005f9fff).mirror(0x02000000).m("powervr2", FUNC(powervr2_device::ta_map));
 
 	/* Area 1 */
 	map(0x04000000, 0x04ffffff).ram().share("dc_texture_ram");      // texture memory 64 bit access
@@ -1810,7 +1811,7 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w)); // TODO: writes to BOTH PVRs
 	map(0x085f8000, 0x085f9fff).w(FUNC(naomi2_state::both_pvr2_ta_w));
 	map(0x08800000, 0x088000ff).rw(m_powervr2, FUNC(powervr2_device::elan_regs_r), FUNC(powervr2_device::elan_regs_w)); // T&L chip registers
-//  AM_RANGE(0x09000000, 0x09??????) T&L command processing
+//  map(0x09000000, 0x09??????) T&L command processing
 	map(0x0a000000, 0x0bffffff).ram().share("elan_ram"); // T&L chip RAM
 
 	/* Area 3 */
@@ -1824,13 +1825,13 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
-	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
 
 	/* Area 6 */
-	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+	//map(0x18000000, 0x1bffffff).noprw(); // Unassigned
 
 	/* Area 7 */
-	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
+	//map(0x1c000000, 0x1fffffff).noprw(); // SH4 Internal
 }
 
 
@@ -1878,7 +1879,7 @@ inline int atomiswave_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask,
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != 0xffffffff00000000U) && (mem_mask != 0x00000000ffffffffU))
 	{
-		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context().c_str());
+		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
 		//machine().debug_break();
 	}
 
@@ -1946,7 +1947,7 @@ WRITE64_MEMBER(atomiswave_state::aw_modem_w )
 	        0x0060028C rw POUT CN304 (EX. IO board)
 	*/
 
-	osd_printf_verbose("%s",string_format("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask).c_str());
+	osd_printf_verbose("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
 void atomiswave_state::aw_map(address_map &map)
@@ -1993,13 +1994,13 @@ void atomiswave_state::aw_map(address_map &map)
 
 
 	/* Area 5 */
-	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
 
 	/* Area 6 */
-	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+	//map(0x18000000, 0x1bffffff).noprw(); // Unassigned
 
 	/* Area 7 */
-	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
+	//map(0x1c000000, 0x1fffffff).noprw(); // SH4 Internal
 }
 
 void atomiswave_state::aw_port(address_map &map)
@@ -2534,7 +2535,7 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, 0)
 
 	PORT_START("P1")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY1\0KEY2\0KEY3\0KEY4\0KEY5")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, naomi_mp_r)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEY1")
@@ -2587,7 +2588,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( suchie3 )
 	PORT_INCLUDE( naomi_mp )
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY5\0KEY2\0KEY3\0KEY4\0KEY1")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, suchie3_mp_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_kb )
@@ -2615,7 +2616,7 @@ static INPUT_PORTS_START( naomi_kb )
 	// ---- ---x num lock
 
 	PORT_START("P1.KC1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state, naomi_kb_r, 0)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, naomi_kb_r)
 
 	PORT_START("P1.KC2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2988,18 +2989,7 @@ void naomi_state::naomi_base(machine_config &config)
 	MIE_JVS(config, "mie", 16000000);
 
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
-	sega837.set_port_tag<0>("TILT");
-	sega837.set_port_tag<1>("P1");
-	sega837.set_port_tag<2>("P2");
-	sega837.set_port_tag<3>("A0");
-	sega837.set_port_tag<4>("A1");
-	sega837.set_port_tag<5>("A2");
-	sega837.set_port_tag<6>("A3");
-	sega837.set_port_tag<7>("A4");
-	sega837.set_port_tag<8>("A5");
-	sega837.set_port_tag<9>("A6");
-	sega837.set_port_tag<10>("A7");
-	sega837.set_port_tag<11>("OUTPUT");
+	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
 
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
@@ -3072,23 +3062,9 @@ void naomi_state::naomim2_kb(machine_config &config)
 {
 	naomim2(config);
 	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
-	dcctrl0.set_port_tag<0>("P1.M");
-	dcctrl0.set_port_tag<1>("P1.LD");
-	dcctrl0.set_port_tag<2>("P1.KC1");
-	dcctrl0.set_port_tag<3>("P1.KC2");
-	dcctrl0.set_port_tag<4>("P1.KC3");
-	dcctrl0.set_port_tag<5>("P1.KC4");
-	dcctrl0.set_port_tag<6>("P1.KC5");
-	dcctrl0.set_port_tag<7>("P1.KC6");
+	dcctrl0.set_port_tags("P1.M", "P1.LD", "P1.KC1", "P1.KC2", "P1.KC3", "P1.KC4", "P1.KC5", "P1.KC6");
 	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
-	dcctrl1.set_port_tag<0>("P2.M");
-	dcctrl1.set_port_tag<1>("P2.LD");
-	dcctrl1.set_port_tag<2>("P2.KC1");
-	dcctrl1.set_port_tag<3>("P2.KC2");
-	dcctrl1.set_port_tag<4>("P2.KC3");
-	dcctrl1.set_port_tag<5>("P2.KC4");
-	dcctrl1.set_port_tag<6>("P2.KC5");
-	dcctrl1.set_port_tag<7>("P2.KC6");
+	dcctrl1.set_port_tags("P2.M", "P2.LD", "P2.KC1", "P2.KC2", "P2.KC3", "P2.KC4", "P2.KC5", "P2.KC6");
 }
 
 /*
@@ -3099,23 +3075,9 @@ void naomi_state::naomigd_kb(machine_config &config)
 {
 	naomigd(config);
 	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
-	dcctrl0.set_port_tag<0>("P1.M");
-	dcctrl0.set_port_tag<1>("P1.LD");
-	dcctrl0.set_port_tag<2>("P1.KC1");
-	dcctrl0.set_port_tag<3>("P1.KC2");
-	dcctrl0.set_port_tag<4>("P1.KC3");
-	dcctrl0.set_port_tag<5>("P1.KC4");
-	dcctrl0.set_port_tag<6>("P1.KC5");
-	dcctrl0.set_port_tag<7>("P1.KC6");
+	dcctrl0.set_port_tags("P1.M", "P1.LD", "P1.KC1", "P1.KC2", "P1.KC3", "P1.KC4", "P1.KC5", "P1.KC6");
 	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
-	dcctrl1.set_port_tag<0>("P2.M");
-	dcctrl1.set_port_tag<1>("P2.LD");
-	dcctrl1.set_port_tag<2>("P2.KC1");
-	dcctrl1.set_port_tag<3>("P2.KC2");
-	dcctrl1.set_port_tag<4>("P2.KC3");
-	dcctrl1.set_port_tag<5>("P2.KC4");
-	dcctrl1.set_port_tag<6>("P2.KC5");
-	dcctrl1.set_port_tag<7>("P2.KC6");
+	dcctrl1.set_port_tags("P2.M", "P2.LD", "P2.KC1", "P2.KC2", "P2.KC3", "P2.KC4", "P2.KC5", "P2.KC6");
 }
 
 /*
@@ -3195,47 +3157,19 @@ void atomiswave_state::aw1c(machine_config &config)
 {
 	aw_base(config);
 	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tag<0>("P1.0");
-	dcctrl0.set_port_tag<1>("P1.1");
-	dcctrl0.set_port_tag<2>("P1.A0");
-	dcctrl0.set_port_tag<3>("P1.A1");
-	dcctrl0.set_port_tag<4>("P1.A2");
-	dcctrl0.set_port_tag<5>("P1.A3");
-	dcctrl0.set_port_tag<6>("P1.A4");
-	dcctrl0.set_port_tag<7>("P1.A5");
+	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
 	// TODO: isn't it supposed to be just one controller?
 	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tag<0>("P2.0");
-	dcctrl1.set_port_tag<1>("P2.1");
-	dcctrl1.set_port_tag<2>("P2.A0");
-	dcctrl1.set_port_tag<3>("P2.A1");
-	dcctrl1.set_port_tag<4>("P2.A2");
-	dcctrl1.set_port_tag<5>("P2.A3");
-	dcctrl1.set_port_tag<6>("P2.A4");
-	dcctrl1.set_port_tag<7>("P2.A5");
+	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
 }
 
 void atomiswave_state::aw2c(machine_config &config)
 {
 	aw_base(config);
 	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tag<0>("P1.0");
-	dcctrl0.set_port_tag<1>("P1.1");
-	dcctrl0.set_port_tag<2>("P1.A0");
-	dcctrl0.set_port_tag<3>("P1.A1");
-	dcctrl0.set_port_tag<4>("P1.A2");
-	dcctrl0.set_port_tag<5>("P1.A3");
-	dcctrl0.set_port_tag<6>("P1.A4");
-	dcctrl0.set_port_tag<7>("P1.A5");
+	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
 	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tag<0>("P2.0");
-	dcctrl1.set_port_tag<1>("P2.1");
-	dcctrl1.set_port_tag<2>("P2.A0");
-	dcctrl1.set_port_tag<3>("P2.A1");
-	dcctrl1.set_port_tag<4>("P2.A2");
-	dcctrl1.set_port_tag<5>("P2.A3");
-	dcctrl1.set_port_tag<6>("P2.A4");
-	dcctrl1.set_port_tag<7>("P2.A5");
+	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -4212,6 +4146,23 @@ ROM_START( drbyocwb )
 
 	ROM_REGION( 0x7800000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-22336b.ic22", 0x000000, 0x400000, CRC(8df5434b) SHA1(de310ad78e1c7325bd8237d1eea3d1050c368a7d) )
+	ROM_LOAD( "mpr-22328.ic1", 0x0800000, 0x1000000, CRC(179cec02) SHA1(cbaba86082370a082d2e9f18427691d5cfa0e4f0) )
+	ROM_LOAD( "mpr-22329.ic2", 0x1800000, 0x1000000, CRC(e0d5b98c) SHA1(5bf1ac0d895fd7725d170a54f01cd717a5e54110) )
+	ROM_LOAD( "mpr-22330.ic3", 0x2800000, 0x1000000, CRC(6737cd62) SHA1(08429ca39fef3b36cb491813ddcd0feef3b24372) )
+	ROM_LOAD( "mpr-22331.ic4", 0x3800000, 0x1000000, CRC(8fb5cbcf) SHA1(c4e6cbbe7d3549e1841654b41b1946b9bc356e74) )
+	ROM_LOAD( "mpr-22332.ic5", 0x4800000, 0x1000000, CRC(c5e365a8) SHA1(5839ea24b8fd02552931175d35e2ceca75fca089) )
+	ROM_LOAD( "mpr-22333.ic6", 0x5800000, 0x1000000, CRC(96f324aa) SHA1(bc41e2097c1841771d786ba9ad1a31df1494a856) )
+	ROM_LOAD( "mpr-22334.ic7", 0x6800000, 0x1000000, CRC(5389b05a) SHA1(e206e4d82d7b1a59c33043ec0812eb69be08d9b3) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
+ROM_END
+
+ROM_START( drbyocwa )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x7800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-22336a.ic22", 0x000000, 0x400000, CRC(56dee69a) SHA1(01be82e63951925ffac91f8c4d03d9b840f9b42a) )
 	ROM_LOAD( "mpr-22328.ic1", 0x0800000, 0x1000000, CRC(179cec02) SHA1(cbaba86082370a082d2e9f18427691d5cfa0e4f0) )
 	ROM_LOAD( "mpr-22329.ic2", 0x1800000, 0x1000000, CRC(e0d5b98c) SHA1(5bf1ac0d895fd7725d170a54f01cd717a5e54110) )
 	ROM_LOAD( "mpr-22330.ic3", 0x2800000, 0x1000000, CRC(6737cd62) SHA1(08429ca39fef3b36cb491813ddcd0feef3b24372) )
@@ -8093,6 +8044,7 @@ ROM_END
 // 834-14921, SHE-0010, communication? unit, not NAOMI-based, uses 2x Motorola MC68360 QUICC
 
 // currently we have only Satellite unit ROM board dumped, server/control and large screen units is missing.
+// Satellite, ID# 837-14926, SATL BD SHE PROG RET
 // ROM board ID# 840-0186B
 ROM_START( shorsepr )
 	NAOMI_BIOS
@@ -11214,6 +11166,7 @@ ROM_END
 /* 0078    */ GAME( 2002, shors2k1,  naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT270,"Sega", "Star Horse 2001 (satellite, Rev B)", GAME_FLAGS )
 /* 0083    */ GAME( 2001, derbyoc2,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club II Ver.2.1 (Japan, Rev B)", GAME_FLAGS )
 /* 0084    */ GAME( 2001, vtenis2c,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A)", GAME_FLAGS )
+/* 0088    */ GAME( 2001, drbyocwa,  derbyocw, naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club World Edition (Rev A)", GAME_FLAGS )
 /* 0088    */ GAME( 2001, drbyocwb,  derbyocw, naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club World Edition (Rev B)", GAME_FLAGS )
 /* 0088    */ GAME( 2001, drbyocwc,  derbyocw, naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club World Edition (Rev C)", GAME_FLAGS )
 /* 0088    */ GAME( 2005, derbyocw,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club World Edition EX (Rev D)", GAME_FLAGS )

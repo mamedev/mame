@@ -48,7 +48,7 @@ void ut88_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
 		break;
 	default:
-		assert_always(false, "Unknown id in ut88_state::device_timer");
+		throw emu_fatalerror("Unknown id in ut88_state::device_timer");
 	}
 }
 

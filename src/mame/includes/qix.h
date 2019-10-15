@@ -167,7 +167,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	DECLARE_READ8_MEMBER(coin_r);
@@ -190,7 +189,8 @@ class zookeep_state : public qixmcu_state
 {
 public:
 	zookeep_state(const machine_config &mconfig, device_type type, const char *tag) :
-		qixmcu_state(mconfig, type, tag)
+		qixmcu_state(mconfig, type, tag),
+		m_vidbank(*this, "bank1")
 	{ }
 
 	void zookeep(machine_config &config);
@@ -204,6 +204,8 @@ private:
 
 	void main_map(address_map &map);
 	void video_map(address_map &map);
+
+	required_memory_bank m_vidbank;
 };
 
 #endif // MAME_INCLUDES_QIX_H

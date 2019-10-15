@@ -3644,6 +3644,8 @@ void vgmplay_state::vgmplay(machine_config &config)
 
 	/// TODO: rewrite to generate audio without using DAC devices
 	SEGA_32X_NTSC(config, m_sega32x, 0, "sega32x_maincpu", "sega32x_scanline_timer");
+	m_sega32x->add_route(0, "lspeaker", 1.00);
+	m_sega32x->add_route(1, "rspeaker", 1.00);
 
 	auto& sega32x_maincpu(M68000(config, "sega32x_maincpu", 0));
 	sega32x_maincpu.set_disable();

@@ -23,7 +23,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(FLOWER_CUSTOM, flower_sound_device, "flower_sound", "Flower Custom Sound")
 
-// TODO: AM_SELECT unsupported by DEVICE_ADDRESS_MAP, so we need a trampoline here
+// TODO: select() unsupported by DEVICE_ADDRESS_MAP, so we need a trampoline here
 void flower_sound_device::regs_map(address_map &map)
 {
 	map(0x00, 0x03).select(0x38).w(FUNC(flower_sound_device::frequency_w));

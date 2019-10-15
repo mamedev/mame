@@ -771,6 +771,10 @@ void super80_state::super80d(machine_config &config)
 	super80(config);
 	m_gfxdecode->set_info(gfx_super80d);
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80d));
+
+	// software list
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("D");
 }
 
 void super80_state::super80e(machine_config &config)
@@ -779,6 +783,10 @@ void super80_state::super80e(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &super80_state::super80e_io);
 	m_gfxdecode->set_info(gfx_super80e);
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80e));
+
+	// software list
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("E");
 }
 
 void super80_state::super80m(machine_config &config)
@@ -790,6 +798,10 @@ void super80_state::super80m(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80m));
 	m_screen->screen_vblank().set(FUNC(super80_state::screen_vblank_super80m));
+
+	// software list
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("M");
 }
 
 void super80_state::super80v(machine_config &config)
@@ -876,6 +888,10 @@ void super80_state::super80r(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+
+	// software list
+	config.device_remove("cass_list");
+	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("R");
 }
 
 /**************************** ROMS *****************************************************************/

@@ -845,9 +845,9 @@ void norautp_state::norautp_portmap(address_map &map)
 	map(0x60, 0x63).mirror(0x1c).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa3).mirror(0x1c).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc0, 0xc3).mirror(0x3c).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	//AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
-	//AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
-	//AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
+	//map(0xc0, 0xc0).mirror(0x3c).rw(FUNC(norautp_state::vram_data_r), FUNC(norautp_state::vram_data_w));
+	//map(0xc1, 0xc1).mirror(0x3c).w(FUNC(norautp_state::vram_addr_w));
+	//map(0xc2, 0xc2).mirror(0x3c).r(FUNC(norautp_state::test_r));
 	map(0xef, 0xef).r(FUNC(norautp_state::test2_r));
 }
 
@@ -874,7 +874,7 @@ void norautp_state::nortest1_map(address_map &map)
 
 void norautp_state::norautxp_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(~0x4000)
+//  map.global_mask(~0x4000);
 	map.global_mask(0x7fff);
 	map(0x0000, 0x3fff).rom(); /* need to be checked */
 	map(0x6000, 0x67ff).ram().share("nvram"); /* HM6116 */
@@ -952,7 +952,7 @@ void norautp_state::ssjkrpkr_map(address_map &map)
 
 void norautp_state::dphltest_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
+//  map.global_mask(0x7fff); /* A15 not connected */
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram();
 	map(0x8000, 0x87ff).ram().share("nvram");

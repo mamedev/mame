@@ -21,14 +21,18 @@
 
 Z180 Info:
 
-Known clock speeds (from ZiLOG): 6, 8, 10, 20 & 33MHz
+Known clock speeds (from ZiLOG): 6 (actually ~6.15), 8, 10, 20 & 33MHz
+
+Much like the 80186/188, the operating frequency is generated from the
+XTAL/EXTAL clock by an internal divide-by-2 circuit. The maximum frequency of
+the EXTAL input is therefore twice the speed rating for the specific part.
 
 ZiLOG Z180 codes:
 
   Speed: 10 = 10MHZ
          20 = 20MHz
          33 = 33MHz
-Package: P = 60-Pin Plastic DIP
+Package: P = 64-Pin Plastic SDIP
          V = 68-Pin PLCC
          F = 80-Pin QFP
    Temp: S = 0C to +70C
@@ -78,15 +82,19 @@ Hitachi HD647180 series:
 /* register is calculated as follows: refresh=(Regs.R&127)|(Regs.R2&128)    */
 /****************************************************************************/
 
-DEFINE_DEVICE_TYPE(Z180, z180_device, "z180", "Zilog Z180")
+DEFINE_DEVICE_TYPE(Z80180, z80180_device, "z80180", "Zilog Z80180") // equivalent to Hitachi HD64180R or HD64180Z
+DEFINE_DEVICE_TYPE(HD64180RP, hd64180rp_device, "hd64180rp", "Hitachi HD64180RP") // DIP64 version, identical to Zilog Z80180xxPSC
+DEFINE_DEVICE_TYPE(Z8S180, z8s180_device, "z8s180", "Zilog Z8S180") // enhanced Z80180
+DEFINE_DEVICE_TYPE(Z80182, z80182_device, "z80182", "Zilog Z80182") // further enhanced Z8S180
 
 
-z180_device::z180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, Z180, tag, owner, clock)
+z180_device::z180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extended_io, address_map_constructor internal_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, 16, 12, internal_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_decrypted_opcodes_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
+	, m_decrypted_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 20, 0, 16, 12, internal_map)
+	, m_extended_io(extended_io)
 {
 	// some arbitrary initial values
 	m_asci_cntla[0] = m_asci_cntla[1] = 0;
@@ -108,6 +116,28 @@ z180_device::z180_device(const machine_config &mconfig, const char *tag, device_
 std::unique_ptr<util::disasm_interface> z180_device::create_disassembler()
 {
 	return std::make_unique<z180_disassembler>();
+}
+
+z80180_device::z80180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z180_device(mconfig, Z80180, tag, owner, clock, false, address_map_constructor())
+{
+}
+
+hd64180rp_device::hd64180rp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z180_device(mconfig, HD64180RP, tag, owner, clock, false, address_map_constructor())
+{
+	// 64-pin DIP versions omit A19
+	set_address_width(19);
+}
+
+z8s180_device::z8s180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z180_device(mconfig, Z8S180, tag, owner, clock, false, address_map_constructor())
+{
+}
+
+z80182_device::z80182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z180_device(mconfig, Z80182, tag, owner, clock, false, address_map_constructor())
+{
 }
 
 #define CF  0x01
@@ -388,8 +418,6 @@ bool z180_device::get_tend1()
 /* 3f I/O control register */
 #define Z180_IOCR_IOSTP         0x20
 
-#define Z180_IOCR_MASK          0xe0
-
 /***************************************************************************
     CPU PREFIXES
 
@@ -427,6 +455,12 @@ static std::unique_ptr<uint8_t[]> SZHVC_sub;
 #include "z180op.hxx"
 
 
+void z180_device::set_address_width(int bits)
+{
+	m_program_config.m_addr_width = bits;
+	m_decrypted_opcodes_config.m_addr_width = bits;
+}
+
 device_memory_interface::space_config_vector z180_device::memory_space_config() const
 {
 	if(has_configured_map(AS_OPCODES))
@@ -442,16 +476,29 @@ device_memory_interface::space_config_vector z180_device::memory_space_config() 
 		};
 }
 
+uint8_t z180_device::z180_read_memory(offs_t addr)
+{
+	return m_program->read_byte(addr);
+}
+
+void z180_device::z180_write_memory(offs_t addr, uint8_t data)
+{
+	m_program->write_byte(addr, data);
+}
+
 uint8_t z180_device::z180_readcontrol(offs_t port)
 {
-	/* normal external readport */
-	uint8_t data = m_iospace->read_byte(port);
+	// normal external readport (ignore the data)
+	(void)m_iospace->read_byte(port);
 
-	/* remap internal I/O registers */
-	if((port & (m_iocr & 0xc0)) == (m_iocr & 0xc0))
-		port = port - (m_iocr & 0xc0);
+	// read the internal register
+	return z180_internal_port_read(port & (m_extended_io ? 0x7f : 0x3f));
+}
 
-	/* but ignore the data and read the internal register */
+uint8_t z180_device::z180_internal_port_read(uint8_t port)
+{
+	uint8_t data = 0xff;
+
 	switch (port)
 	{
 	case 0x00:
@@ -512,7 +559,7 @@ uint8_t z180_device::z180_readcontrol(offs_t port)
 
 	case 0x0b:
 		data = m_csio_trdr;
-		logerror("Z180 TRDR   rd $%02x\n", data);
+		LOG("Z180 TRDR   rd $%02x\n", data);
 		break;
 
 	case 0x0c:
@@ -862,7 +909,7 @@ uint8_t z180_device::z180_readcontrol(offs_t port)
 		break;
 
 	case 0x3f:
-		data = m_iocr | ~Z180_IOCR_MASK;
+		data = m_iocr | ~(m_extended_io ? 0xa0 : 0xe0);
 		LOG("Z180 IOCR   rd $%02x ($%02x)\n", data, m_iocr);
 		break;
 	}
@@ -872,14 +919,15 @@ uint8_t z180_device::z180_readcontrol(offs_t port)
 
 void z180_device::z180_writecontrol(offs_t port, uint8_t data)
 {
-	/* normal external write port */
+	// normal external write port
 	m_iospace->write_byte(port, data);
 
-	/* remap internal I/O registers */
-	if((port & (m_iocr & 0xc0)) == (m_iocr & 0xc0))
-		port = port - (m_iocr & 0xc0);
+	// store the data in the internal register
+	z180_internal_port_write(port & (m_extended_io ? 0x7f : 0x3f), data);
+}
 
-	/* store the data in the internal register */
+void z180_device::z180_internal_port_write(uint8_t port, uint8_t data)
+{
 	switch (port)
 	{
 	case 0x00:
@@ -1223,8 +1271,8 @@ void z180_device::z180_writecontrol(offs_t port, uint8_t data)
 		break;
 
 	case 0x3f:
-		LOG("Z180 IOCR   wr $%02x ($%02x)\n", data,  data & Z180_IOCR_MASK);
-		m_iocr = data & Z180_IOCR_MASK;
+		LOG("Z180 IOCR   wr $%02x ($%02x)\n", data,  data & (m_extended_io ? 0xa0 : 0xe0));
+		m_iocr = data & (m_extended_io ? 0xa0 : 0xe0);
 		break;
 	}
 }
@@ -1259,24 +1307,24 @@ int z180_device::z180_dma0(int max_cycles)
 		switch( m_dmode & (Z180_DMODE_SM | Z180_DMODE_DM) )
 		{
 		case 0x00:  /* memory SAR0+1 to memory DAR0+1 */
-			m_program->write_byte(dar0++, m_program->read_byte(sar0++));
+			z180_write_memory(dar0++, z180_read_memory(sar0++));
 			cycles += memory_wait_states() * 2;
 			bcr0--;
 			break;
 		case 0x04:  /* memory SAR0-1 to memory DAR0+1 */
-			m_program->write_byte(dar0++, m_program->read_byte(sar0--));
+			z180_write_memory(dar0++, z180_read_memory(sar0--));
 			cycles += memory_wait_states() * 2;
 			bcr0--;
 			break;
 		case 0x08:  /* memory SAR0 fixed to memory DAR0+1 */
-			m_program->write_byte(dar0++, m_program->read_byte(sar0));
+			z180_write_memory(dar0++, z180_read_memory(sar0));
 			cycles += memory_wait_states() * 2;
 			bcr0--;
 			break;
 		case 0x0c:  /* I/O SAR0 fixed to memory DAR0+1 */
 			if (m_iol & Z180_DREQ0)
 			{
-				m_program->write_byte(dar0++, IN(sar0));
+				z180_write_memory(dar0++, IN(sar0));
 				cycles += memory_wait_states();
 				bcr0--;
 				/* edge sensitive DREQ0 ? */
@@ -1288,24 +1336,24 @@ int z180_device::z180_dma0(int max_cycles)
 			}
 			break;
 		case 0x10:  /* memory SAR0+1 to memory DAR0-1 */
-			m_program->write_byte(dar0--, m_program->read_byte(sar0++));
+			z180_write_memory(dar0--, z180_read_memory(sar0++));
 			cycles += memory_wait_states() * 2;
 			bcr0--;
 			break;
 		case 0x14:  /* memory SAR0-1 to memory DAR0-1 */
-			m_program->write_byte(dar0--, m_program->read_byte(sar0--));
+			z180_write_memory(dar0--, z180_read_memory(sar0--));
 			cycles += memory_wait_states() * 2;
 			bcr0--;
 			break;
 		case 0x18:  /* memory SAR0 fixed to memory DAR0-1 */
-			m_program->write_byte(dar0--, m_program->read_byte(sar0));
+			z180_write_memory(dar0--, z180_read_memory(sar0));
 			cycles += memory_wait_states() * 2;
 			bcr0--;
 			break;
 		case 0x1c:  /* I/O SAR0 fixed to memory DAR0-1 */
 			if (m_iol & Z180_DREQ0)
 			{
-				m_program->write_byte(dar0--, IN(sar0));
+				z180_write_memory(dar0--, IN(sar0));
 				cycles += memory_wait_states();
 				bcr0--;
 				/* edge sensitive DREQ0 ? */
@@ -1317,12 +1365,12 @@ int z180_device::z180_dma0(int max_cycles)
 			}
 			break;
 		case 0x20:  /* memory SAR0+1 to memory DAR0 fixed */
-			m_program->write_byte(dar0, m_program->read_byte(sar0++));
+			z180_write_memory(dar0, z180_read_memory(sar0++));
 			cycles += memory_wait_states() * 2;
 			bcr0--;
 			break;
 		case 0x24:  /* memory SAR0-1 to memory DAR0 fixed */
-			m_program->write_byte(dar0, m_program->read_byte(sar0--));
+			z180_write_memory(dar0, z180_read_memory(sar0--));
 			cycles += memory_wait_states() * 2;
 			bcr0--;
 			break;
@@ -1333,7 +1381,7 @@ int z180_device::z180_dma0(int max_cycles)
 		case 0x30:  /* memory SAR0+1 to I/O DAR0 fixed */
 			if (m_iol & Z180_DREQ0)
 			{
-				OUT(dar0, m_program->read_byte(sar0++));
+				OUT(dar0, z180_read_memory(sar0++));
 				cycles += memory_wait_states();
 				bcr0--;
 				/* edge sensitive DREQ0 ? */
@@ -1347,7 +1395,7 @@ int z180_device::z180_dma0(int max_cycles)
 		case 0x34:  /* memory SAR0-1 to I/O DAR0 fixed */
 			if (m_iol & Z180_DREQ0)
 			{
-				OUT(dar0, m_program->read_byte(sar0--));
+				OUT(dar0, z180_read_memory(sar0--));
 				cycles += memory_wait_states();
 				bcr0--;
 				/* edge sensitive DREQ0 ? */
@@ -1417,16 +1465,16 @@ int z180_device::z180_dma1()
 	switch (m_dcntl & (Z180_DCNTL_DIM1 | Z180_DCNTL_DIM0))
 	{
 	case 0x00:  /* memory MAR1+1 to I/O IAR1 fixed */
-		m_iospace->write_byte(iar1, m_program->read_byte(mar1++));
+		m_iospace->write_byte(iar1, z180_read_memory(mar1++));
 		break;
 	case 0x01:  /* memory MAR1-1 to I/O IAR1 fixed */
-		m_iospace->write_byte(iar1, m_program->read_byte(mar1--));
+		m_iospace->write_byte(iar1, z180_read_memory(mar1--));
 		break;
 	case 0x02:  /* I/O IAR1 fixed to memory MAR1+1 */
-		m_program->write_byte(mar1++, m_iospace->read_byte(iar1));
+		z180_write_memory(mar1++, m_iospace->read_byte(iar1));
 		break;
 	case 0x03:  /* I/O IAR1 fixed to memory MAR1-1 */
-		m_program->write_byte(mar1--, m_iospace->read_byte(iar1));
+		z180_write_memory(mar1--, m_iospace->read_byte(iar1));
 		break;
 	}
 
@@ -1742,7 +1790,7 @@ void z180_device::device_start()
 		state_add(Z180_BBR,        "BBR",       m_mmu_bbr).callimport();
 		state_add(Z180_CBAR,       "CBAR",      m_mmu_cbar).callimport();
 		state_add(Z180_OMCR,       "OMCR",      m_omcr).mask(Z180_OMCR_MASK);
-		state_add(Z180_IOCR,       "IOCR",      m_iocr).mask(Z180_IOCR_MASK);
+		state_add(Z180_IOCR,       "IOCR",      m_iocr).mask(m_extended_io ? 0xa0 : 0xe0);
 	}
 
 	save_item(NAME(m_AF.w.l));

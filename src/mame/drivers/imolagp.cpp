@@ -352,7 +352,7 @@ void imolagp_state::imolagp_master_map(address_map &map)
 	map(0x2800, 0x2803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x3000, 0x3000).w(FUNC(imolagp_state::vreg_control_w));
 	map(0x37f0, 0x37f0).w("aysnd", FUNC(ay8910_device::address_w));
-//  AM_RANGE(0x37f7, 0x37f7) AM_NOP
+//  map(0x37f7, 0x37f7).noprw();
 	map(0x3800, 0x3800).rw(FUNC(imolagp_state::vreg_data_r), FUNC(imolagp_state::vreg_data_w));
 	map(0x3810, 0x3810).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x4000, 0x4000).portr("DSWA");
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( imolagp )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(imolagp_state, imolagp_steerlatch_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -481,7 +481,7 @@ static INPUT_PORTS_START( imolagpo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(imolagp_state, imolagp_steerlatch_r)
 INPUT_PORTS_END
 
 

@@ -10,19 +10,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="309260">
-				<rom name="ccpmsys.td0" size="309260" crc="4b175438" sha1="948ec04358d2adf05f2c077556e2bd899e87cbca" offset="0" />
+				<rom name="ccpmsys.td0" size="309260" crc="4b175438" sha1="948ec04358d2adf05f2c077556e2bd899e87cbca"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Utilities Disk"/>
 			<dataarea name="flop" size="322414">
-				<rom name="ccpmutil.td0" size="322414" crc="f4b7332b" sha1="0e844b8c835370e2f8f095b0dc84dfdb7bc2135f" offset="0" />
+				<rom name="ccpmutil.td0" size="322414" crc="f4b7332b" sha1="0e844b8c835370e2f8f095b0dc84dfdb7bc2135f"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Graphics Disk"/>
 			<dataarea name="flop" size="193193">
-				<rom name="ccpmgsx.td0" size="193193" crc="62c0668b" sha1="84ed7179defc3ee513c600cbd97078da2b529705" offset="0" />
+				<rom name="ccpmgsx.td0" size="193193" crc="62c0668b" sha1="84ed7179defc3ee513c600cbd97078da2b529705"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204393">
-				<rom name="cpmv11.td0" size="204393" crc="38f9ad05" sha1="ec39d974cdb757573ce026de84056dad08df3ce3" offset="0" />
+				<rom name="cpmv11.td0" size="204393" crc="38f9ad05" sha1="ec39d974cdb757573ce026de84056dad08df3ce3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,7 +44,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="342476">
-				<rom name="cpmv21.td0" size="342476" crc="efb74351" sha1="4ef27aff24793f0dfcdc38b1bb8238994d439eec" offset="0" />
+				<rom name="cpmv21.td0" size="342476" crc="efb74351" sha1="4ef27aff24793f0dfcdc38b1bb8238994d439eec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -55,7 +55,7 @@
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="208780">
-				<rom name="msdos201.td0" size="208780" crc="7d652459" sha1="cb2f6f4a181032f69bdf339f2555dcfdfd1e7ef7" offset="0" />
+				<rom name="msdos201.td0" size="208780" crc="7d652459" sha1="cb2f6f4a181032f69bdf339f2555dcfdfd1e7ef7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="msdos211.img" size="409600" crc="52f98712" sha1="83608857b38351fff99d65bb28b7cf8454668bbb" offset="0" />
+				<rom name="msdos211.img" size="409600" crc="52f98712" sha1="83608857b38351fff99d65bb28b7cf8454668bbb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -77,7 +77,7 @@
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="338752">
-				<rom name="msdos31b.td0" size="338752" crc="d12d5719" sha1="ec0c50ba812b45cc22503f2611e7abbcd8ba54f8" offset="0" />
+				<rom name="msdos31b.td0" size="338752" crc="d12d5719" sha1="ec0c50ba812b45cc22503f2611e7abbcd8ba54f8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -90,32 +90,32 @@
 		<!-- The Order of these needs to be sorted later-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="8086kit.img" size="409600" crc="64577e4f" sha1="ee4ba05bd8fbce8cac609589fc031cb5e0073564" offset="0" />
+				<rom name="8086kit.img" size="409600" crc="64577e4f" sha1="ee4ba05bd8fbce8cac609589fc031cb5e0073564"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="fort_sys.img" size="409600" crc="d3ec79b2" sha1="96ac1bc6ffdb4067ec17b777ff1fb1dffcfbc958" offset="0" />
+				<rom name="fort_sys.img" size="409600" crc="d3ec79b2" sha1="96ac1bc6ffdb4067ec17b777ff1fb1dffcfbc958"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="pas_sys.img" size="409600" crc="302ecaf5" sha1="8e5b63ba1afde500c93431d96039811544a08ce3" offset="0" />
+				<rom name="pas_sys.img" size="409600" crc="302ecaf5" sha1="8e5b63ba1afde500c93431d96039811544a08ce3"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="pascal.img" size="409600" crc="42f485ad" sha1="f9ca68a56f598a1ad59ad8916635305a2cafa7bd" offset="0" />
+				<rom name="pascal.img" size="409600" crc="42f485ad" sha1="f9ca68a56f598a1ad59ad8916635305a2cafa7bd"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="toolkit.img" size="409600" crc="a23b3aa0" sha1="07be31bec922697f337a5c2dfab1eb4125cf6e86" offset="0" />
+				<rom name="toolkit.img" size="409600" crc="a23b3aa0" sha1="07be31bec922697f337a5c2dfab1eb4125cf6e86"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="utils.img" size="409600" crc="45642488" sha1="912af05ed55b73a5b456d6e3166d9af576f3e60b" offset="0" />
+				<rom name="utils.img" size="409600" crc="45642488" sha1="912af05ed55b73a5b456d6e3166d9af576f3e60b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -126,7 +126,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195486">
-				<rom name="rb100dia.td0" size="195486" crc="35f80248" sha1="00b818aec539a48e433ba3385d31caa1e486e99b" offset="0" />
+				<rom name="rb100dia.td0" size="195486" crc="35f80248" sha1="00b818aec539a48e433ba3385d31caa1e486e99b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -137,7 +137,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="223736">
-				<rom name="rx50diag.td0" size="223736" crc="8a2d541b" sha1="f9538d844b649df9814a9d5b53d5b977b7016d6b" offset="0" />
+				<rom name="rx50diag.td0" size="223736" crc="8a2d541b" sha1="f9538d844b649df9814a9d5b53d5b977b7016d6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="264183">
-				<rom name="dmtd.td0" size="264183" crc="047db08b" sha1="179a256474467f9bb6eeb110b104d9d01beedc1e" offset="0" />
+				<rom name="dmtd.td0" size="264183" crc="047db08b" sha1="179a256474467f9bb6eeb110b104d9d01beedc1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -159,7 +159,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="332683">
-				<rom name="gr_diag.td0" size="332683" crc="9a0ff10e" sha1="b31eb25c3d48342cfb82d3c989d776b7f7144c4e" offset="0" />
+				<rom name="gr_diag.td0" size="332683" crc="9a0ff10e" sha1="b31eb25c3d48342cfb82d3c989d776b7f7144c4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -170,7 +170,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="125169">
-				<rom name="mem_diag.td0" size="125169" crc="f681744f" sha1="a412c0a65d6299cb1c2e43d6599cc4ebd285ec4e" offset="0" />
+				<rom name="mem_diag.td0" size="125169" crc="f681744f" sha1="a412c0a65d6299cb1c2e43d6599cc4ebd285ec4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -181,17 +181,17 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="312742">
-				<rom name="decnet1.td0" size="312742" crc="4068fae1" sha1="533385591c2fed287589ddf661d506c24d541648" offset="0" />
+				<rom name="decnet1.td0" size="312742" crc="4068fae1" sha1="533385591c2fed287589ddf661d506c24d541648"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="314356">
-				<rom name="decnet2.td0" size="314356" crc="e13f5873" sha1="cd843a9f292f43107bde99df13525393a9c82c71" offset="0" />
+				<rom name="decnet2.td0" size="314356" crc="e13f5873" sha1="cd843a9f292f43107bde99df13525393a9c82c71"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="199060">
-				<rom name="decnet3.td0" size="199060" crc="3046077d" sha1="991dc285190f8de2fe23bba18274dc621459b594" offset="0" />
+				<rom name="decnet3.td0" size="199060" crc="3046077d" sha1="991dc285190f8de2fe23bba18274dc621459b594"/>
 			</dataarea>
 		</part>
 	</software>
@@ -202,7 +202,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="282100">
-				<rom name="gsx86.td0" size="282100" crc="c58fca47" sha1="1642700cb8125ceb55b35bf0e3df19b9cdd46ca3" offset="0" />
+				<rom name="gsx86.td0" size="282100" crc="c58fca47" sha1="1642700cb8125ceb55b35bf0e3df19b9cdd46ca3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -213,7 +213,7 @@
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="47810">
-				<rom name="mbasic86.td0" size="47810" crc="81638111" sha1="72886292cf8b1c54da58fba65672b2a0ca5bd3bd" offset="0" />
+				<rom name="mbasic86.td0" size="47810" crc="81638111" sha1="72886292cf8b1c54da58fba65672b2a0ca5bd3bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -224,7 +224,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="305087">
-				<rom name="sysover.td0" size="305087" crc="5a56f0fc" sha1="2ad1f28cc03963c182549940d23f3a11920fef98" offset="0" />
+				<rom name="sysover.td0" size="305087" crc="5a56f0fc" sha1="2ad1f28cc03963c182549940d23f3a11920fef98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -235,12 +235,12 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="247602">
-				<rom name="disk a.td0" size="247602" crc="82fd50a9" sha1="8748d955f0db7829a52ddf13d7e18478bc6d3f3f" offset="0" />
+				<rom name="disk a.td0" size="247602" crc="82fd50a9" sha1="8748d955f0db7829a52ddf13d7e18478bc6d3f3f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="312916">
-				<rom name="disk b.td0" size="312916" crc="40178798" sha1="b6bd1999921bbe0aa500949e7ee967d071b50f85" offset="0" />
+				<rom name="disk b.td0" size="312916" crc="40178798" sha1="b6bd1999921bbe0aa500949e7ee967d071b50f85"/>
 			</dataarea>
 		</part>
 	</software>

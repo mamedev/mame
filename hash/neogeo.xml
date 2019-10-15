@@ -9346,7 +9346,7 @@
 	     p1.bin                  270-p1c.p1              90.607002%
 	     p2.bin                  270-p2c.sp2             99.999763% (all bytes that differ do so by only bits 0x20 or 0x02, which is suspicious)
 	-->
-	<software name="samsho5a" cloneof="samsho5" >
+	<software name="samsho5a" cloneof="samsho5">
 		<description>Samurai Shodown V / Samurai Spirits Zero (NGM-2700, set 2)</description>
 		<year>2003</year>
 		<publisher>Yuki Enterprise / SNK Playmore</publisher>
@@ -11001,7 +11001,7 @@
 		</part>
 	</software>
 
-	<software name="kf2k3bla" cloneof="kof2003" >
+	<software name="kf2k3bla" cloneof="kof2003">
 		<description>The King of Fighters 2003 (bootleg, set 2)</description>
 		<year>2003</year>
 		<publisher>bootleg</publisher>

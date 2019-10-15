@@ -221,7 +221,7 @@ void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
-		assert_always(false, "Unknown id in tugboat_state::device_timer");
+		throw emu_fatalerror("Unknown id in tugboat_state::device_timer");
 	}
 }
 
@@ -240,7 +240,7 @@ void tugboat_state::main_map(address_map &map)
 	map(0x10c0, 0x10c1).w(FUNC(tugboat_state::hd46505_1_w));
 	map(0x11e4, 0x11e7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x11e8, 0x11eb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	//AM_RANGE(0x1700, 0x1fff) AM_RAM
+	//map(0x1700, 0x1fff).ram();
 	map(0x18e0, 0x18ef).w(FUNC(tugboat_state::score_w));
 	map(0x2000, 0x2fff).ram(); /* tilemap RAM */
 	map(0x4000, 0x7fff).rom();

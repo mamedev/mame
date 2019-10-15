@@ -53,8 +53,8 @@ public:
 		, m_led_outputs(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(korokoro_hopper_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tjumpman_hopper_r);
+	DECLARE_READ_LINE_MEMBER(korokoro_hopper_r);
+	DECLARE_READ_LINE_MEMBER(tjumpman_hopper_r);
 
 	void init_uopoko();
 	void init_donpachi();

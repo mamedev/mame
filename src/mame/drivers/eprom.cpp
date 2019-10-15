@@ -178,7 +178,7 @@ void eprom_state::guts_map(address_map &map)
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
-//  AM_RANGE(0x360010, 0x360011) AM_WRITE(eprom_latch_w)
+//  map(0x360010, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
 	map(0x3e0000, 0x3e0fff).ram().share("paletteram");

@@ -154,6 +154,10 @@ project "softfloat"
 		"ForceCPP",
 	}
 
+	buildoptions_cpp {
+		"-x c++",
+	}
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
@@ -186,6 +190,10 @@ kind "StaticLib"
 
 options {
 	"ForceCPP",
+}
+
+buildoptions_cpp {
+	"-x c++",
 }
 
 includedirs {
@@ -1198,6 +1206,14 @@ project "bimg"
 
 	configuration { }
 
+	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" then
+		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+			buildoptions_cpp {
+				"-Wno-unused-const-variable",
+			}
+		end
+	end
+
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
@@ -1206,11 +1222,25 @@ project "bimg"
 
 	includedirs {
 		MAME_DIR .. "3rdparty/bimg/include",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/include",
 	}
 
 	files {
 		MAME_DIR .. "3rdparty/bimg/src/image.cpp",
 		MAME_DIR .. "3rdparty/bimg/src/image_gnf.cpp",
+
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/astc_file.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/codec.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/endpoint_codec.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/footprint.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/integer_sequence_codec.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/intermediate_astc_block.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/logical_astc_block.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/partition.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/physical_astc_block.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/quantization.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/weight_infill.cc",
 	}
 
 --------------------------------------------------
@@ -1227,6 +1257,7 @@ project "bgfx"
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4310", -- warning C4310: cast truncates constant value
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
 		}
 
 	configuration { "vsllvm" }
@@ -1335,6 +1366,14 @@ end
 		end
 	end
 
+	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
+		if string.find(_OPTIONS["gcc"], "clang") and (version < 80000) then
+			defines {
+				"TARGET_OS_OSX=1",
+			}
+		end
+	end
+
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
@@ -1355,6 +1394,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gnm.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_nvn.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
@@ -1374,6 +1414,9 @@ end
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
+		}
+		buildoptions {
+			"-x objective-c++",
 		}
 	end
 

@@ -2713,64 +2713,67 @@ void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, co
 
 	UML_LABEL(block, label++);              // label:
 
-	for (auto & elem : m_fastram)
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
-		if (elem.base != nullptr && (!iswrite || !elem.readonly))
+		for (auto & elem : m_fastram)
 		{
-			void *fastbase = (uint8_t *)elem.base - elem.start;
-			uint32_t skip = label++;
-			if (elem.end != 0xffffffff)
+			if (elem.base != nullptr && (!iswrite || !elem.readonly))
 			{
-				UML_CMP(block, I0, elem.end);   // cmp     i0,end
-				UML_JMPc(block, COND_A, skip);                                      // ja      skip
-			}
-			if (elem.start != 0x00000000)
-			{
-				UML_CMP(block, I0, elem.start);// cmp     i0,fastram_start
-				UML_JMPc(block, COND_B, skip);                                      // jb      skip
-			}
+				void *fastbase = (uint8_t *)elem.base - elem.start;
+				uint32_t skip = label++;
+				if (elem.end != 0xffffffff)
+				{
+					UML_CMP(block, I0, elem.end);   // cmp     i0,end
+					UML_JMPc(block, COND_A, skip);                                      // ja      skip
+				}
+				if (elem.start != 0x00000000)
+				{
+					UML_CMP(block, I0, elem.start);// cmp     i0,fastram_start
+					UML_JMPc(block, COND_B, skip);                                      // jb      skip
+				}
 
-			if (!iswrite)
-			{
-				if (size == 1)
+				if (!iswrite)
 				{
-					UML_XOR(block, I0, I0, m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0));
-					UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
-				}
-				else if (size == 2)
-				{
-					UML_XOR(block, I0, I0, m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0));
-					UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
-				}
-				else if (size == 4)
-				{
+					if (size == 1)
+					{
+						UML_XOR(block, I0, I0, m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0));
+						UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
+					}
+					else if (size == 2)
+					{
+						UML_XOR(block, I0, I0, m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0));
+						UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
+					}
+					else if (size == 4)
+					{
 
-					UML_XOR(block, I0, I0, m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0));
-					UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
+						UML_XOR(block, I0, I0, m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0));
+						UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
+					}
+					UML_RET(block);                                                     // ret
 				}
-				UML_RET(block);                                                     // ret
-			}
-			else
-			{
-				if (size == 1)
+				else
 				{
-					UML_XOR(block, I0, I0, m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0));
-					UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
+					if (size == 1)
+					{
+						UML_XOR(block, I0, I0, m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0));
+						UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
+					}
+					else if (size == 2)
+					{
+						UML_XOR(block, I0, I0, m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0));
+						UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
+					}
+					else if (size == 4)
+					{
+						UML_XOR(block, I0, I0, m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0));
+						UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
+					}
+					UML_RET(block);                                                     // ret
 				}
-				else if (size == 2)
-				{
-					UML_XOR(block, I0, I0, m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0));
-					UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
-				}
-				else if (size == 4)
-				{
-					UML_XOR(block, I0, I0, m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0));
-					UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
-				}
-				UML_RET(block);                                                     // ret
-			}
 
-			UML_LABEL(block, skip);                                             // skip:
+				UML_LABEL(block, skip);                                             // skip:
+			}
 		}
 	}
 

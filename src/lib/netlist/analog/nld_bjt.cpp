@@ -134,7 +134,7 @@ namespace analog
 			BJT_PNP
 		};
 
-		NETLIB_CONSTRUCTOR_EX(QBJT, pstring model = "NPN")
+		NETLIB_CONSTRUCTOR_EX(QBJT, const pstring &model = "NPN")
 		, m_model(*this, "MODEL", model)
 		, m_qtype(BJT_NPN)
 		{

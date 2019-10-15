@@ -448,7 +448,7 @@ void alphatro_state::alphatro_io(address_map &map)
 	// 8257 DMAC
 	map(0x60, 0x68).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	// 8259 PIT
-	//AM_RANGE(0x70, 0x72) AM_DEVREADWRITE("
+	//map(0x70, 0x72).r(FUNC(alphatro_state::)).w(FUNC(alphatro_state::));
 	map(0xf0, 0xf0).r(FUNC(alphatro_state::portf0_r)).w(FUNC(alphatro_state::portf0_w));
 	map(0xf8, 0xf8).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0xf9, 0xf9).r(m_fdc, FUNC(upd765a_device::msr_r));

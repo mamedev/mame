@@ -466,7 +466,7 @@ void atronic_state::ramdac_map(address_map &map)
 void atronic_state::atronic(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, 6000000);
+	Z80180(config, m_maincpu, 18.432_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atronic_state::atronic_map);
 	m_maincpu->set_addrmap(AS_IO, &atronic_state::atronic_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(atronic_state::irq0_line_hold));

@@ -166,15 +166,15 @@ INTERRUPT_GEN_MEMBER(psikyo4_state::interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
+template <int P>
 CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 {
-	int player = (uintptr_t)param;
 	int ret = 0xff;
 
-	if (m_io_select & 1) ret &= m_keys[player+0]->read();
-	if (m_io_select & 2) ret &= m_keys[player+1]->read();
-	if (m_io_select & 4) ret &= m_keys[player+2]->read();
-	if (m_io_select & 8) ret &= m_keys[player+3]->read();
+	if (m_io_select & 1) ret &= m_keys[P+0]->read();
+	if (m_io_select & 2) ret &= m_keys[P+1]->read();
+	if (m_io_select & 4) ret &= m_keys[P+2]->read();
+	if (m_io_select & 8) ret &= m_keys[P+3]->read();
 
 	return ret;
 }
@@ -305,14 +305,14 @@ CUSTOM_INPUT_MEMBER(psikyo4_state::system_r)
 
 static INPUT_PORTS_START( hotgmck )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, system_r, nullptr)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, system_r)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, mahjong_ctrl_r, (void *)0)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, mahjong_ctrl_r<0>)
 
 	PORT_START("P3_P4")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, system_r, nullptr)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, system_r)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, mahjong_ctrl_r, (void *)4)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, mahjong_ctrl_r<4>)
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */

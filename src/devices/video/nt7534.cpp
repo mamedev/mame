@@ -2,7 +2,7 @@
 // copyright-holders:Felipe Sanches, Sandro Ronco
 /***************************************************************************
 
-        NT7534 LCD controller
+        Novatek NT7534 LCD controller
 
         TODO:
         - determine video timings and busy flag duration

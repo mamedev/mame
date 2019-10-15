@@ -4,9 +4,11 @@
 /* 8080bw.c *******************************************/
 
 #include "emu.h"
+#include "includes/8080bw.h"
+
 #include "sound/samples.h"
 #include "sound/discrete.h"
-#include "includes/8080bw.h"
+#include "speaker.h"
 
 
 /*******************************************************/
@@ -20,6 +22,67 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 	save_item(NAME(m_port_1_last_extra));
 	save_item(NAME(m_port_2_last_extra));
 	save_item(NAME(m_port_3_last_extra));
+}
+
+
+
+/*************************************
+ *
+ *  Space Invaders
+ *
+ *  Author      : Tormod Tjaberg
+ *  Created     : 1997-04-09
+ *  Description : Sound routines for the 'invaders' games
+ *
+ *  Note:
+ *  The samples were taken from Michael Strutt's (mstrutt@pixie.co.za)
+ *  excellent space invader emulator and converted to signed samples so
+ *  they would work under SEAL. The port info was also gleaned from
+ *  his emulator. These sounds should also work on all the invader games.
+ *
+ *************************************/
+
+static const char *const invaders_sample_names[] =
+{
+	"*invaders",
+	"1",        /* shot/missle */
+	"2",        /* base hit/explosion */
+	"3",        /* invader hit */
+	"4",        /* fleet move 1 */
+	"5",        /* fleet move 2 */
+	"6",        /* fleet move 3 */
+	"7",        /* fleet move 4 */
+	"8",        /* UFO/saucer hit */
+	"9",        /* bonus base */
+	nullptr
+};
+
+
+/* left in for all games that hack into invaders samples for audio */
+void _8080bw_state::invaders_samples_audio(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, RES_K(100));
+	m_sn->set_amp_res(RES_K(56));
+	m_sn->set_feedback_res(RES_K(10));
+	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(invaders_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

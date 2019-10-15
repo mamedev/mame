@@ -28,6 +28,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_cps3sound(*this, "cps3sound")
 		, m_dma_timer(*this, "dma_timer")
+		, m_spritelist_dma_timer(*this, "spritelist_dma_timer")
 		, m_simm{{*this, "simm1.%u", 0U},
 				 {*this, "simm2.%u", 0U},
 				 {*this, "simm3.%u", 0U},
@@ -38,10 +39,8 @@ public:
 		, m_mainram(*this, "mainram")
 		, m_spriteram(*this, "spriteram")
 		, m_colourram(*this, "colourram", 0)
-		, m_tilemap20_regs_base(*this, "tmap20_regs")
-		, m_tilemap30_regs_base(*this, "tmap30_regs")
-		, m_tilemap40_regs_base(*this, "tmap40_regs")
-		, m_tilemap50_regs_base(*this, "tmap50_regs")
+		, m_ppu_gscroll(*this, "ppu_gscroll_regs")
+		, m_tilemap_regs(*this, "ppu_tmap_regs")
 		, m_ppu_crtc_zoom(*this, "ppu_crtc_zoom")
 		, m_sh2cache_ram(*this, "sh2cache_ram")
 		, m_decrypted_gamerom(*this, "decrypted_gamerom")
@@ -88,15 +87,14 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<cps3_sound_device> m_cps3sound;
 	required_device<timer_device> m_dma_timer;
+	required_device<timer_device> m_spritelist_dma_timer;
 	optional_device_array<fujitsu_29f016a_device, 8> m_simm[7];
 
 	required_shared_ptr<u32> m_mainram;
 	required_shared_ptr<u32> m_spriteram;
 	required_shared_ptr<u16> m_colourram;
-	required_shared_ptr<u32> m_tilemap20_regs_base;
-	required_shared_ptr<u32> m_tilemap30_regs_base;
-	required_shared_ptr<u32> m_tilemap40_regs_base;
-	required_shared_ptr<u32> m_tilemap50_regs_base;
+	required_shared_ptr<u32> m_ppu_gscroll;
+	required_shared_ptr<u32> m_tilemap_regs;
 	required_shared_ptr<u32> m_ppu_crtc_zoom;
 	required_shared_ptr<u32> m_sh2cache_ram;
 	required_shared_ptr<u32> m_decrypted_gamerom;
@@ -111,7 +109,7 @@ private:
 	std::unique_ptr<u32[]> m_eeprom;
 	std::unique_ptr<u8[]>  m_ss_ram;
 	std::unique_ptr<u32[]> m_spritelist;
-	u32 m_ppu_gscroll[0x20/4];
+	u32 m_ppu_gscroll_buff[0x20/4];
 	s16 m_ss_hscroll;
 	s16 m_ss_vscroll;
 	u8  m_ss_pal_base;
@@ -161,7 +159,6 @@ private:
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(palettedma_w);
 	DECLARE_WRITE32_MEMBER(characterdma_w);
-	DECLARE_WRITE32_MEMBER(ppu_gscroll_w);
 	DECLARE_READ16_MEMBER(colourram_r);
 	DECLARE_WRITE16_MEMBER(colourram_w);
 	DECLARE_WRITE16_MEMBER(outport_w);
@@ -171,13 +168,14 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	WRITE_LINE_MEMBER(vbl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(dma_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(sprite_dma_cb);
 	u16 rotate_left(u16 value, int n);
 	u16 rotxor(u16 val, u16 xorval);
 	u32 cps3_mask(u32 address, u32 key1, u32 key2);
 	void decrypt_bios();
 	void init_crypt(u32 key1, u32 key2, int altEncryption);
 	void set_mame_colours(int colournum, u16 data, u32 fadeval);
-	void draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void draw_tilemapsprite_line(u32* regs, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	u32 flashmain_r(int which, u32 offset, u32 mem_mask);
 	void flashmain_w(int which, u32 offset, u32 data, u32 mem_mask);
 	u32 process_byte( u8 real_byte, u32 destination, int max_length );

@@ -60,7 +60,7 @@ READ8_MEMBER(pastelg_state::pastelg_irq_ack_r)
 void pastelg_state::pastelg_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x00) AM_WRITENOP
+//  map(0x00, 0x00).nopw();
 	map(0x00, 0x7f).r(m_nb1413m3, FUNC(nb1413m3_device::sndrom_r));
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));

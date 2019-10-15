@@ -18,8 +18,7 @@ protected:
 	segacrp2_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void decrypt();
+	virtual void decrypt() = 0;
 
 	required_shared_ptr<uint8_t> m_decrypted;
 };

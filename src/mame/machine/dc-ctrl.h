@@ -16,6 +16,13 @@ public:
 
 	template <uint8_t Which, typename T>
 	void set_port_tag(T &&port_tag) { port[Which].set_tag(std::forward<T>(port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_port_tags(T &&first_tag, U &&... other_tags)
+	{
+		set_port_tag<First>(std::forward<T>(first_tag));
+		set_port_tags<First + 1>(std::forward<U>(other_tags)...);
+	}
+
 	// TODO: we probably don't need these setters
 	void set_model(const char *new_id) { model = new_id; }
 	void set_license(const char *new_license) { license = new_license; }
@@ -24,6 +31,8 @@ public:
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 
 protected:
+	template <uint8_t First> void set_port_tags() { }
+
 	// device-level overrides
 	virtual void device_start() override;
 

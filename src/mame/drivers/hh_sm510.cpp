@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Henrik Algestam
-// thanks-to:Sean Riddle, Igor
+// thanks-to:Sean Riddle, Igor, Lee Robson
 /***************************************************************************
 
 Sharp SM5xx family handhelds.
@@ -17,15 +17,18 @@ Use -autosave to at least make them remember the highscores.
 TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
-- improve/redo SVGs of: gnw_mmouse, gnw_egg, exospace
-- confirm gnw_mmouse/gnw_egg rom (dumped from Soviet clone, but pretty
-  confident that it's same)
-- confirm gnw_climbcs rom (assumed to be the same as gnw_climber)
+- improve/redo SVGs of: gnw_egg, exospace
+- confirm gnw_egg rom (now using gnw_mmouse rom, but pretty confident that it's
+  the same)
+- confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
+- confirm gnw_climber rom (assumed to be the same as gnw_climbern)
+- confirm gnw_smb rom (assumed to be the same as gnw_smbn)
+- dump/add purple version of gnw_judge
 - dump/add CN-07 version of gnw_helmet
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
-  verification is wanted for: gnw_bfight, gnw_bjack, gnw_bsweep, gnw_climber,
+  verification is wanted for: gnw_bfightn, gnw_bjack, gnw_bsweep, gnw_climbern,
   gnw_dkjrp, gnw_gcliff, gnw_mbaway, gnw_sbuster, gnw_zelda
 
 ****************************************************************************
@@ -45,13 +48,13 @@ Game list (* denotes not emulated yet)
 Serial  Series MCU     Title
 ---------------------------------------------
 AC-01     s    SM5A    Ball (aka Toss-Up)
-FL-02     s    SM5A    Flagman
+FL-02     s    SM5A    Flagman (aka Flag Man)
 MT-03     s    SM5A    Vermin (aka The Exterminator)
 RC-04     s    SM5A    Fire (aka Fireman Fireman)
-IP-05*    s    SM5A?   Judge
-MN-06*    g    SM5A?   Manhole
+IP-05     s    SM5A    Judge
+MN-06     g    SM5A    Manhole
 CN-07     g    SM5A    Helmet (aka Headache)
-LN-08*    g    SM5A?   Lion
+LN-08     g    SM5A    Lion
 PR-21     ws   SM5A    Parachute
 OC-22     ws   SM5A    Octopus
 PP-23     ws   SM5A    Popeye
@@ -95,14 +98,14 @@ YM-105    nws  SM511   Super Mario Bros.
 DR-106    nws  SM511   Climber
 BF-107    nws  SM511   Balloon Fight
 MJ-108*   nws  SM511?  Mario The Juggler
-BU-201*   sc   SM510?  Spitball Sparky
+BU-201    sc   SM510   Spitball Sparky
 UD-202*   sc   SM510?  Crab Grab
 BX-301    mvs  SM511   Boxing (aka Punch Out)
 AK-302*   mvs  SM511?  Donkey Kong 3
 HK-303*   mvs  SM511?  Donkey Kong Hockey
-YM-801*   cs   SM511   Super Mario Bros. (assume same ROM as nws version)
+YM-801    cs   SM511   Super Mario Bros. (assume same ROM as nws version)
 DR-802    cs   SM511   Climber            "
-BF-803*   cs   SM511   Balloon Fight      "
+BF-803    cs   SM511   Balloon Fight      "
 YM-901-S* x    SM511   Super Mario Bros.  "
 
 RGW-001 (2010 Ball remake) is on different hardware, ATmega169PV MCU.
@@ -145,9 +148,9 @@ void hh_sm510_state::machine_start()
 		}
 	}
 
-	// 1ms display decay ticks
+	// 1kHz display decay ticks
 	m_display_decay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hh_sm510_state::display_decay_tick),this));
-	m_display_decay_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	m_display_decay_timer->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
 
 	// zerofill
 	m_inp_mux = 0;
@@ -167,11 +170,14 @@ void hh_sm510_state::machine_start()
 	save_item(NAME(m_speaker_data));
 	save_item(NAME(m_s));
 	save_item(NAME(m_r));
+
 	save_item(NAME(m_display_x_len));
 	save_item(NAME(m_display_y_len));
 	save_item(NAME(m_display_z_len));
 	save_item(NAME(m_display_state));
 	save_item(NAME(m_display_decay));
+	save_item(NAME(m_decay_pivot));
+	save_item(NAME(m_decay_len));
 }
 
 void hh_sm510_state::machine_reset()
@@ -201,12 +207,12 @@ TIMER_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
 			// delay lcd segment on/off state
 			if (m_display_state[zx] >> y & 1)
 			{
-				if (m_display_decay[y][zx] < (2 * m_display_wait - 1))
+				if (m_display_decay[y][zx] < (m_decay_pivot + m_decay_len))
 					m_display_decay[y][zx]++;
 			}
 			else if (m_display_decay[y][zx] > 0)
 				m_display_decay[y][zx]--;
-			u8 active_state = (m_display_decay[y][zx] < m_display_wait) ? 0 : 1;
+			u8 active_state = (m_display_decay[y][zx] < m_decay_pivot) ? 0 : 1;
 
 			// SM510 series: output to x.y.z, where:
 			// x = group a/b/bs/c (0/1/2/3)
@@ -238,7 +244,7 @@ WRITE16_MEMBER(hh_sm510_state::sm510_lcd_segment_w)
 	m_display_state[offset] = data;
 }
 
-WRITE8_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
+WRITE16_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
 {
 	set_display_size(4, 4, 1);
 	m_display_state[offset] = data;
@@ -246,6 +252,9 @@ WRITE8_MEMBER(hh_sm510_state::sm500_lcd_segment_w)
 
 
 // generic input handlers - usually S output is input mux, and K input for buttons
+
+#define PORT_CHANGED_CB(x) \
+	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, 0)
 
 u8 hh_sm510_state::read_inputs(int columns, int fixed)
 {
@@ -312,8 +321,6 @@ WRITE8_MEMBER(hh_sm510_state::piezo_input_w)
 	input_w(space, 0, data >> 1);
 }
 
-static const s16 piezo2bit_r1_120k_s1_39k[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff }; // R via 120K resistor, S1 via 39K resistor (eg. tsonic, tsonic2, tbatmana)
-
 WRITE8_MEMBER(hh_sm510_state::piezo2bit_r1_w)
 {
 	// R1(+S1) to piezo
@@ -333,887 +340,196 @@ WRITE8_MEMBER(hh_sm510_state::piezo2bit_input_w)
 
 /***************************************************************************
 
+  Common Machine Configurations
+
+***************************************************************************/
+
+// building blocks
+
+void hh_sm510_state::mcfg_cpu_common(machine_config &config)
+{
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->read_ba().set([this] () { return m_io_ba.read_safe(1); });
+	m_maincpu->read_b().set([this] () { return m_io_b.read_safe(1); });
+}
+
+void hh_sm510_state::mcfg_cpu_sm5a(machine_config &config)
+{
+	SM5A(config, m_maincpu);
+	mcfg_cpu_common(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+}
+
+void hh_sm510_state::mcfg_cpu_kb1013vk12(machine_config &config)
+{
+	KB1013VK12(config, m_maincpu);
+	mcfg_cpu_common(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+}
+
+void hh_sm510_state::mcfg_cpu_sm510(machine_config &config)
+{
+	SM510(config, m_maincpu);
+	mcfg_cpu_common(config);
+	m_maincpu->set_r_mask_option(2);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+}
+
+void hh_sm510_state::mcfg_cpu_sm511(machine_config &config)
+{
+	SM511(config, m_maincpu);
+	mcfg_cpu_common(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+}
+
+void hh_sm510_state::mcfg_cpu_sm512(machine_config &config)
+{
+	SM512(config, m_maincpu);
+	mcfg_cpu_common(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+}
+
+void hh_sm510_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
+{
+	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(width, height);
+	screen.set_visarea_full();
+}
+
+void hh_sm510_state::mcfg_sound_r1(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+}
+
+
+// common presets
+
+void hh_sm510_state::sm5a_common(machine_config &config, u16 width, u16 height)
+{
+	mcfg_cpu_sm5a(config);
+	mcfg_sound_r1(config);
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	mcfg_svg_screen(config, width, height);
+}
+
+void hh_sm510_state::kb1013vk12_common(machine_config &config, u16 width, u16 height)
+{
+	mcfg_cpu_kb1013vk12(config);
+	mcfg_sound_r1(config);
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	mcfg_svg_screen(config, width, height);
+}
+
+void hh_sm510_state::sm510_common(machine_config &config, u16 width, u16 height)
+{
+	mcfg_cpu_sm510(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, width, height);
+}
+
+void hh_sm510_state::sm511_common(machine_config &config, u16 width, u16 height)
+{
+	mcfg_cpu_sm511(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, width, height);
+}
+
+
+// deviations
+
+// multi-screen
+
+void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight)
+{
+	mcfg_cpu_sm510(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
+	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
+
+	config.set_default_layout(layout_gnw_dualh);
+}
+
+void hh_sm510_state::sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
+{
+	mcfg_cpu_sm510(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
+	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
+
+	config.set_default_layout(layout_gnw_dualv);
+}
+
+void hh_sm510_state::sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
+{
+	mcfg_cpu_sm511(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
+	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
+
+	config.set_default_layout(layout_gnw_dualv);
+}
+
+void hh_sm510_state::sm512_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
+{
+	mcfg_cpu_sm512(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
+	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
+
+	config.set_default_layout(layout_gnw_dualv);
+}
+
+
+// Tiger (SM510 R mask is direct, BA/B pins always connected)
+
+void hh_sm510_state::sm510_tiger(machine_config &config, u16 width, u16 height)
+{
+	sm510_common(config, width, height);
+
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+}
+
+void hh_sm510_state::sm511_tiger1bit(machine_config &config, u16 width, u16 height)
+{
+	sm511_common(config, width, height);
+
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+}
+
+void hh_sm510_state::sm511_tiger2bit(machine_config &config, u16 width, u16 height)
+{
+	sm511_tiger1bit(config, width, height);
+
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
+
+	// R via 120K resistor, S1 via 39K resistor (eg. tsonic, tsonic2, tbatmana)
+	static const s16 speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff };
+	m_speaker->set_levels(4, speaker_levels);
+}
+
+
+
+/***************************************************************************
+
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
 
 namespace {
-
-#define PORT_CHANGED_CB(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, 0)
-
-/***************************************************************************
-
-  Konami Double Dribble
-  * Sharp SM510 under epoxy (die label CMS54C, KMS584)
-  * lcd screen with custom segments, 1-bit sound
-
-  BTANB: At the basket, the ball goes missing sometimes for 1 frame, or
-  may show 2 balls at the same time. It's the same on the real handheld.
-  Another BTANB? If a period is over at the same time a defender on the
-  2nd column grabs the ball, his arm won't be erased until it's redrawn.
-
-***************************************************************************/
-
-class kdribble_state : public hh_sm510_state
-{
-public:
-	kdribble_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void kdribble(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( kdribble )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Level Select")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void kdribble_state::kdribble(machine_config &config)
-{
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1524, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( kdribble )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "584", 0x0000, 0x1000, CRC(1d9022c8) SHA1(64567f9f161e830a0634d5c89917ab866c26c0f8) )
-
-	ROM_REGION( 450339, "screen", 0)
-	ROM_LOAD( "kdribble.svg", 0, 450339, CRC(86c3ecc4) SHA1(8dfaeb0f3b35d4b680daaa9f478a6f3decf6ea0a) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami Top Gun
-  * PCB label BH003
-  * Sharp SM510 under epoxy (die label CMS54C, KMS598)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class ktopgun_state : public hh_sm510_state
-{
-public:
-	ktopgun_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void ktopgun(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( ktopgun )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void ktopgun_state::ktopgun(machine_config &config)
-{
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1515, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( ktopgun ) // except for filler/unused bytes, ROM listing in patent US5137277 "BH003 Top Gun" is same
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "598", 0x0000, 0x1000, CRC(50870b35) SHA1(cda1260c2e1c180995eced04b7d7ff51616dcef5) )
-
-	ROM_REGION( 425832, "screen", 0)
-	ROM_LOAD( "ktopgun.svg", 0, 425832, CRC(dc488ac0) SHA1(5a47e5639cb1e61dad3f2169efb99efe3d75896f) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami Contra
-  * PCB label BH002
-  * Sharp SM511 under epoxy (die label KMS73B, KMS773)
-  * lcd screen with custom segments, 1-bit sound
-
-  Contra handheld is titled simply "C" in the USA.
-
-***************************************************************************/
-
-class kcontra_state : public hh_sm510_state
-{
-public:
-	kcontra_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void kcontra(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( kcontra )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void kcontra_state::kcontra(machine_config &config)
-{
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1505, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( kcontra ) // except for filler/unused bytes, ROM listing in patent US5120057 "BH002 C (Contra)" program/melody is same
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "773.program", 0x0000, 0x1000, CRC(bf834877) SHA1(055dd56ec16d63afba61ab866481fd9c029fb54d) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "773.melody", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
-
-	ROM_REGION( 721005, "screen", 0)
-	ROM_LOAD( "kcontra.svg", 0, 721005, CRC(b5370d0f) SHA1(2f401222d24fa32a4659ef2b64ddac8ac3973c69) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami Teenage Mutant Ninja Turtles
-  * PCB label BH005
-  * Sharp SM511 under epoxy (die label KMS73B, KMS774)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class ktmnt_state : public hh_sm510_state
-{
-public:
-	ktmnt_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void ktmnt(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( ktmnt )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void ktmnt_state::ktmnt(machine_config &config)
-{
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1505, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( ktmnt ) // except for filler/unused bytes, ROM listing in patent US5150899 "BH005 TMNT" program/melody is same
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "774.program", 0x0000, 0x1000, CRC(a1064f87) SHA1(92156c35fbbb414007ee6804fe635128a741d5f1) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "774.melody", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
-
-	ROM_REGION( 610270, "screen", 0)
-	ROM_LOAD( "ktmnt.svg", 0, 610270, CRC(ad9412ed) SHA1(154ee44efcd340dafa1cb84c37a9c3cd42cb42ab) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami Gradius
-  * PCB label BH004
-  * Sharp SM511 under epoxy (die label KMS73B, KMS774)
-  * lcd screen with custom segments, 1-bit sound
-
-  Known in Japan as Nemesis.
-
-***************************************************************************/
-
-class kgradius_state : public hh_sm510_state
-{
-public:
-	kgradius_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void kgradius(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( kgradius )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void kgradius_state::kgradius(machine_config &config)
-{
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1420, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( kgradius )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "771.program", 0x0000, 0x1000, CRC(830c2afc) SHA1(bb9ebd4e52831cc02cd92dd4b37675f34cf37b8c) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "771.melody", 0x000, 0x100, CRC(4c586b73) SHA1(14c5ab2898013a577f678970a648c374749cc66d) )
-
-	ROM_REGION( 638097, "screen", 0)
-	ROM_LOAD( "kgradius.svg", 0, 638097, CRC(3adbc0f1) SHA1(fe426bf2335ce30395ea14ecab6399a93c67816a) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami Lone Ranger
-  * PCB label BH009
-  * Sharp SM511 under epoxy (die label KMS73B, KMS781)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class kloneran_state : public hh_sm510_state
-{
-public:
-	kloneran_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void kloneran(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( kloneran )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void kloneran_state::kloneran(machine_config &config)
-{
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1497, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( kloneran )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "781.program", 0x0000, 0x1000, CRC(52b9735f) SHA1(06c5ef6e7e781b1176d4c1f2445f765ccf18b3f7) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "781.melody", 0x000, 0x100, CRC(a393de36) SHA1(55089f04833ccb318524ab2b584c4817505f4019) )
-
-	ROM_REGION( 633120, "screen", 0)
-	ROM_LOAD( "kloneran.svg", 0, 633120, CRC(f55e5292) SHA1(d0a91b5cd8a1894e7abc9c505fff4a8e1d3bec7a) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami Blades of Steel
-  * PCB label BH011
-  * Sharp SM511 under epoxy (die label KMS73B, KMS782)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class kblades_state : public hh_sm510_state
-{
-public:
-	kblades_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void kblades(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( kblades )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void kblades_state::kblades(machine_config &config)
-{
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1516, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( kblades )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "782.program", 0x0000, 0x1000, CRC(3351a35d) SHA1(84c64b65d3cabfa20c18f4649c9ede2578b82523) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "782.melody", 0x000, 0x100, CRC(e8bf48ba) SHA1(3852c014dc9136566322b4f9e2aab0e3ec3a7387) )
-
-	ROM_REGION( 455113, "screen", 0)
-	ROM_LOAD( "kblades.svg", 0, 455113, CRC(e22f44c8) SHA1(ac95a837e20f87f3afc6c234f7407cbfcc438011) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami NFL Football
-  * Sharp SM511 under epoxy (die label KMS73B, KMS786)
-  * lcd screen with custom segments, 1-bit sound
-
-  This is the 1989 version. It was rereleased in 1992, assumed to be the same
-  game underneath.
-
-***************************************************************************/
-
-class knfl_state : public hh_sm510_state
-{
-public:
-	knfl_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void knfl(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( knfl )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void knfl_state::knfl(machine_config &config)
-{
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1449, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( knfl )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "786.program", 0x0000, 0x1000, CRC(0535c565) SHA1(44cdcd284713ff0b194b24beff9f1b94c8bc63b2) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "786.melody", 0x000, 0x100, CRC(6c80263b) SHA1(d3c21e2f8491fef101907b8e0871b1e1c1ed58f5) )
-
-	ROM_REGION( 571134, "screen", 0)
-	ROM_LOAD( "knfl.svg", 0, 571134, CRC(f2c63235) SHA1(70b9232700f5498d3c63c63dd5904c0e19482cc2) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami The Adventures of Bayou Billy
-  * Sharp SM511 under epoxy (die label KMS73B, KMS788)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class kbilly_state : public hh_sm510_state
-{
-public:
-	kbilly_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void kbilly(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( kbilly )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void kbilly_state::kbilly(machine_config &config)
-{
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1490, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( kbilly )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "788.program", 0x0000, 0x1000, CRC(b8b1f734) SHA1(619dd527187b43276d081cdb1b13e0a9a81f2c6a) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "788.melody", 0x000, 0x100, CRC(cd488bea) SHA1(8fc60081f46e392978d6950c74711fb7ebd154de) )
-
-	ROM_REGION( 598276, "screen", 0)
-	ROM_LOAD( "kbilly.svg", 0, 598276, CRC(2969319e) SHA1(5cd1b0a6eee3168142c1d24f167b9ef38ad88402) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami Bucky O'Hare
-  * Sharp SM511 under epoxy (die label KMS73B, N58)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class kbucky_state : public hh_sm510_state
-{
-public:
-	kbucky_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void kbucky(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( kbucky )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void kbucky_state::kbucky(machine_config &config)
-{
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1490, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( kbucky )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "n58.program", 0x0000, 0x1000, CRC(7c36a0c4) SHA1(1b55ac64a71af746fd0a0f44266fcc92cca77482) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "n58.melody", 0x000, 0x100, CRC(7e99e469) SHA1(3e9a3843c6ab392f5989f3366df87a2d26cb8620) )
-
-	ROM_REGION( 727841, "screen", 0)
-	ROM_LOAD( "kbucky.svg", 0, 727841, CRC(c1d78488) SHA1(9ba4fdbce977455b8f1ad4bd2b01faa44bd05bc7) )
-ROM_END
-
-
-
-
-
-/***************************************************************************
-
-  Konami Garfield
-  * Sharp SM511 under epoxy (die label KMS73B, N62)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class kgarfld_state : public hh_sm510_state
-{
-public:
-	kgarfld_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{ }
-
-	void kgarfld(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( kgarfld )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
-INPUT_PORTS_END
-
-void kgarfld_state::kgarfld(machine_config &config)
-{
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1500, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-// roms
-
-ROM_START( kgarfld )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "n62.program", 0x0000, 0x1000, CRC(5a762049) SHA1(26d4d891160d254dfd752734e1047126243f88dd) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "n62.melody", 0x000, 0x100, CRC(232b7d55) SHA1(76f6a19e8182ee3f00c9f4ef007b5dde75a9c00d) )
-
-	ROM_REGION( 581107, "screen", 0)
-	ROM_LOAD( "kgarfld.svg", 0, 581107, CRC(bf09a170) SHA1(075cb95535873018409eb15675183490c61b29b9) )
-ROM_END
-
-
-
-
 
 /***************************************************************************
 
@@ -1261,25 +577,7 @@ INPUT_PORTS_END
 
 void gnw_ball_state::gnw_ball(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1671, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1671, 1080); // R option mask confirmed
 }
 
 // roms
@@ -1324,10 +622,10 @@ static INPUT_PORTS_START( gnw_flagman )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("1") // 1
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("2") // 2
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("3") // 3
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("4") // 4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("4")
 
 	PORT_START("IN.2") // R4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
@@ -1344,24 +642,7 @@ INPUT_PORTS_END
 
 void gnw_flagman_state::gnw_flagman(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1511, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1511, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1424,25 +705,7 @@ INPUT_PORTS_END
 
 void gnw_vermin_state::gnw_vermin(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1650, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1650, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1507,25 +770,7 @@ INPUT_PORTS_END
 
 void gnw_fires_state::gnw_fires(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1646, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1646, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1536,6 +781,144 @@ ROM_START( gnw_fires )
 
 	ROM_REGION( 102509, "screen", 0)
 	ROM_LOAD( "gnw_fires.svg", 0, 102509, CRC(314152ca) SHA1(bb6cd7dfba54d8cd5698c0cf2f381a1489cd8286) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Judge (model IP-05)
+  * PCB label IP-05
+  * Sharp SM5A label IP-05 5010 (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  The first (green) issue of the game contains a bug where the players are
+  scored differently when wrongly dodging a win. This issue is fixed in the
+  second (purple) issue.
+
+***************************************************************************/
+
+class gnw_judge_state : public hh_sm510_state
+{
+public:
+	gnw_judge_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_judge(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_judge )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P2 Dodge")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P2 Hit")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P1 Dodge")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P1 Hit")
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B") // 2-Player
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A") // 1-Player
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_judge_state::gnw_judge(machine_config &config)
+{
+	sm5a_common(config, 1647, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_judge )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ip-05", 0x0000, 0x0740, CRC(1b28a834) SHA1(cb8dbbf678ba22c4484d18cc1a6b99c1d34d1951) )
+
+	ROM_REGION( 104950, "screen", 0)
+	ROM_LOAD( "gnw_judge.svg", 0, 104950, CRC(fb51e31b) SHA1(c78e6d80aa5b59de1955ba5f83cc138b83bf714c) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Manhole (model MH-06)
+  * PCB label MH-06
+  * Sharp SM5A label MH-06 5104 (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the Gold Series version, there's also a new wide screen version
+  (NH-103)
+
+***************************************************************************/
+
+class gnw_manholeg_state : public hh_sm510_state
+{
+public:
+	gnw_manholeg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_manholeg(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_manholeg )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_manholeg_state::gnw_manholeg(machine_config &config)
+{
+	sm5a_common(config, 1667, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_manholeg )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mh-06", 0x0000, 0x0740, CRC(ae52c425) SHA1(8da8a714ecbdde7d0f257b52a5014993675a5f3f) )
+
+	ROM_REGION( 125447, "screen", 0)
+	ROM_LOAD( "gnw_manholeg.svg", 0, 125447, CRC(ac5d6807) SHA1(3392644edf35cfcbf8e56aca8bfca3ce380aad05) )
 ROM_END
 
 
@@ -1597,25 +980,7 @@ INPUT_PORTS_END
 
 void gnw_helmet_state::gnw_helmet(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1657, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1657, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1626,6 +991,78 @@ ROM_START( gnw_helmet )
 
 	ROM_REGION( 109241, "screen", 0)
 	ROM_LOAD( "gnw_helmet.svg", 0, 109241, CRC(fa8294a3) SHA1(05b734ac0126d3bffe160a23753a0a7e6f82996e) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Lion (model LN-08)
+  * PCB label LN-08
+  * Sharp SM5A label LN-08 519A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  BTANB: The game doesn't support simultaneous button presses for the controls,
+  it's the same as in eg. gnw_mmouse but in this game it doesn't make much sense
+  with the 2 separate guys. More likely a bad game design choice than bug.
+
+***************************************************************************/
+
+class gnw_lion_state : public hh_sm510_state
+{
+public:
+	gnw_lion_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_lion(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_lion )
+	PORT_START("IN.0") // R2
+	PORT_CONFNAME( 0x01, 0x00, "Increase Speed (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // "
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_lion_state::gnw_lion(machine_config &config)
+{
+	sm5a_common(config, 1646, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_lion )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ln-08", 0x0000, 0x0740, CRC(9677681d) SHA1(6f7c960e04b63f1b7d926b598413f4c818b8fe53) )
+
+	ROM_REGION( 155699, "screen", 0)
+	ROM_LOAD( "gnw_lion.svg", 0, 155699, CRC(32b28c6f) SHA1(95aa397ed39408c80957f0f850e36dfe73e337fd) )
 ROM_END
 
 
@@ -1683,25 +1120,7 @@ INPUT_PORTS_END
 
 void gnw_pchute_state::gnw_pchute(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1602, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1602, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1725,8 +1144,9 @@ ROM_END
   * Sharp SM5A label OC-22 204A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
-  Also cloned in 1989 by Elektronika(USSR) as Тайны океана (Tayny okeana),
-  it is close to identical, graphics as well.
+  Also cloned in 1989 by Elektronika(USSR) as Тайны океана (Tayny okeana, export
+  version: Mysteries of the Ocean), ROM is identical, graphics as well except
+  for the AM/PM/GAME segments.
 
 ***************************************************************************/
 
@@ -1772,25 +1192,7 @@ INPUT_PORTS_END
 
 void gnw_octopus_state::gnw_octopus(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1586, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1586, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1860,25 +1262,7 @@ INPUT_PORTS_END
 
 void gnw_popeye_state::gnw_popeye(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1604, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1604, 1080); // R mask option confirmed
 }
 
 // roms
@@ -1948,42 +1332,12 @@ INPUT_PORTS_END
 
 void gnw_chef_state::gnw_chef(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // assuming same as merry cook
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1666, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1666, 1080); // assuming same R mask option as merry cook
 }
 
 void gnw_chef_state::merrycook(machine_config & config)
 {
-	gnw_chef(config);
-
-	/* basic machine hardware */
-	KB1013VK12(config.replace(), m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1679, 1080);
-	screen->set_visarea_full();
+	kb1013vk12_common(config, 1679, 1080); // R mask option confirmed
 }
 
 // roms
@@ -2012,7 +1366,7 @@ ROM_END
 
   Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
   * PCB label MC-25 EG-26 (yes, both listed)
-  * Sharp SM5A label MC-25 51YD / ?
+  * Sharp SM5A label MC-25 51YD (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
@@ -2075,77 +1429,37 @@ INPUT_PORTS_END
 
 void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // ?
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1711, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1684, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::gnw_egg(machine_config &config)
 {
-	gnw_mmouse(config);
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1694, 1080);
-	screen->set_visarea_full();
+	sm5a_common(config, 1694, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::nupogodi(machine_config &config)
 {
-	gnw_mmouse(config);
-
-	/* basic machine hardware */
-	KB1013VK12(config.replace(), m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // ?
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1715, 1080);
-	screen->set_visarea_full();
+	kb1013vk12_common(config, 1715, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::exospace(machine_config &config)
 {
-	nupogodi(config);
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1756, 1080);
-	screen->set_visarea_full();
+	kb1013vk12_common(config, 1756, 1080); // R mask option ?
 }
 
 // roms
 
 ROM_START( gnw_mmouse )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mc-25", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
+	ROM_LOAD( "mc-25", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 102453, "screen", 0)
-	ROM_LOAD( "gnw_mmouse.svg", 0, 102453, BAD_DUMP CRC(88cc7c49) SHA1(c000d51d1b99750116b97f9bafc0314ea506366d) )
+	ROM_REGION( 181536, "screen", 0)
+	ROM_LOAD( "gnw_mmouse.svg", 0, 181536, CRC(ee87484f) SHA1(f30c504066fa7ef098184cd490c9409f7e672c02) )
 ROM_END
 
 ROM_START( gnw_egg )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from Soviet clone
+	ROM_LOAD( "eg-26", 0x0000, 0x0740, BAD_DUMP CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) ) // dumped from MC-25
 
 	ROM_REGION( 102848, "screen", 0)
 	ROM_LOAD( "gnw_egg.svg", 0, 102848, BAD_DUMP CRC(742c2605) SHA1(984d430ad2ff47ad7a3f9b25b7d3f3d51b10cca5) )
@@ -2178,7 +1492,9 @@ ROM_END
   * Sharp SM5A label FR-27 523B (no decap)
   * lcd screen with custom segments, 1-bit sound
 
-  This is the wide screen version, there's also a silver version.
+  This is the wide screen version, there's also a silver version. Doing a
+  hex-compare between the two, this one seems to be a complete rewrite.
+  FR-27 is the last G&W on SM5A, they were followed with SM51x.
 
   In 1989 Elektronika(USSR) released a clone: Космический мост (Kosmicheskiy most,
   export version: Space Bridge). This game shares the same ROM, though the
@@ -2229,44 +1545,12 @@ INPUT_PORTS_END
 
 void gnw_fire_state::gnw_fire(machine_config &config)
 {
-	/* basic machine hardware */
-	SM5A(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1624, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm5a_common(config, 1624, 1080); // R mask option confirmed
 }
 
 void gnw_fire_state::spacebridge(machine_config & config)
 {
-	gnw_fire(config);
-
-	/* basic machine hardware */
-	KB1013VK12(config.replace(), m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1673, 1080);
-	screen->set_visarea_full();
+	kb1013vk12_common(config, 1673, 1080); // R mask option confirmed
 }
 
 // roms
@@ -2305,7 +1589,11 @@ class gnw_tbridge_state : public hh_sm510_state
 public:
 	gnw_tbridge_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
-	{ }
+	{
+		// increase lcd decay: unwanted segments light up
+		m_decay_pivot = 25;
+		m_decay_len = 25;
+	}
 
 	void gnw_tbridge(machine_config &config);
 };
@@ -2341,26 +1629,7 @@ INPUT_PORTS_END
 
 void gnw_tbridge_state::gnw_tbridge(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1587, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_common(config, 1587, 1080); // R mask option confirmed
 }
 
 // roms
@@ -2427,26 +1696,7 @@ INPUT_PORTS_END
 
 void gnw_fireatk_state::gnw_fireatk(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1655, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_common(config, 1655, 1080); // R mask option confirmed
 }
 
 // roms
@@ -2513,26 +1763,7 @@ INPUT_PORTS_END
 
 void gnw_stennis_state::gnw_stennis(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1581, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_common(config, 1581, 1080); // R mask option confirmed
 }
 
 // roms
@@ -2599,33 +1830,7 @@ INPUT_PORTS_END
 
 void gnw_opanic_state::gnw_opanic(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1292/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1230/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_dualv(config, 1920/2, 1292/2, 1920/2, 1230/2); // R mask option confirmed
 }
 
 // roms
@@ -2694,32 +1899,7 @@ INPUT_PORTS_END
 
 void gnw_dkong_state::gnw_dkong(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1266/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1266/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_dualv(config, 1920/2, 1266/2, 1920/2, 1266/2); // R mask option confirmed
 }
 
 // roms
@@ -2784,32 +1964,9 @@ INPUT_PORTS_END
 
 void gnw_mickdon_state::gnw_mickdon(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r2_w));
-	m_maincpu->read_b().set_ioport("B");
+	sm510_dualv(config, 1920/2, 1281/2, 1920/2, 1236/2); // R mask option confirmed
 
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1281/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1236/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_maincpu->write_r().set(FUNC(gnw_mickdon_state::piezo_r2_w));
 }
 
 // roms
@@ -2883,33 +2040,7 @@ INPUT_PORTS_END
 
 void gnw_ghouse_state::gnw_ghouse(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1303/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1274/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_dualv(config, 1920/2, 1303/2, 1920/2, 1274/2); // R mask option confirmed
 }
 
 // roms
@@ -2978,32 +2109,7 @@ INPUT_PORTS_END
 
 void gnw_dkong2_state::gnw_dkong2(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1241/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1237/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_dualv(config, 1920/2, 1241/2, 1920/2, 1237/2); // R mask option confirmed
 }
 
 // roms
@@ -3026,7 +2132,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Mario Bros. (model MW-56)
-  * PCB label MW-56-M
+  * PCB label MW-56-M-I (left), MW-56-S (right)
   * Sharp SM510 label MW-56 533C (no decap)
   * horizontal dual lcd screens with custom segments, 1-bit sound
 
@@ -3073,33 +2179,7 @@ INPUT_PORTS_END
 
 void gnw_mario_state::gnw_mario(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_SVG));
-	screen_left.set_refresh_hz(60);
-	screen_left.set_size(2258/2, 1440/2);
-	screen_left.set_visarea_full();
-
-	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_SVG));
-	screen_right.set_refresh_hz(60);
-	screen_right.set_size(2261/2, 1440/2);
-	screen_right.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualh);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_dualh(config, 2258/2, 1440/2, 2261/2, 1440/2); // R mask option confirmed
 }
 
 // roms
@@ -3175,33 +2255,7 @@ INPUT_PORTS_END
 
 void gnw_rshower_state::gnw_rshower(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_SVG));
-	screen_left.set_refresh_hz(60);
-	screen_left.set_size(2126/2, 1440/2);
-	screen_left.set_visarea_full();
-
-	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_SVG));
-	screen_right.set_refresh_hz(60);
-	screen_right.set_size(2146/2, 1440/2);
-	screen_right.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualh);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_dualh(config, 2126/2, 1440/2, 2146/2, 1440/2); // R mask option confirmed
 }
 
 // roms
@@ -3271,33 +2325,7 @@ INPUT_PORTS_END
 
 void gnw_lboat_state::gnw_lboat(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_SVG));
-	screen_left.set_refresh_hz(60);
-	screen_left.set_size(2116/2, 1440/2);
-	screen_left.set_visarea_full();
-
-	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_SVG));
-	screen_right.set_refresh_hz(60);
-	screen_right.set_size(2057/2, 1440/2);
-	screen_right.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualh);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_dualh(config, 2116/2, 1440/2, 2057/2, 1440/2); // R mask option confirmed
 }
 
 // roms
@@ -3357,30 +2385,7 @@ INPUT_PORTS_END
 
 void gnw_bjack_state::gnw_bjack(machine_config &config)
 {
-	/* basic machine hardware */
-	SM512(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1290/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1297/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm512_dualv(config, 1920/2, 1290/2, 1920/2, 1297/2);
 }
 
 // roms
@@ -3417,7 +2422,10 @@ class gnw_squish_state : public hh_sm510_state
 public:
 	gnw_squish_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
-	{ }
+	{
+		// increase lcd decay: unwanted segments light up
+		m_decay_pivot = 17;
+	}
 
 	void gnw_squish(machine_config &config);
 };
@@ -3453,33 +2461,7 @@ INPUT_PORTS_END
 
 void gnw_squish_state::gnw_squish(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1285/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1287/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_dualv(config, 1920/2, 1285/2, 1920/2, 1287/2); // R mask option confirmed
 }
 
 // roms
@@ -3549,32 +2531,7 @@ INPUT_PORTS_END
 
 void gnw_bsweep_state::gnw_bsweep(machine_config &config)
 {
-	/* basic machine hardware */
-	SM512(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1291/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1239/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm512_dualv(config, 1920/2, 1291/2, 1920/2, 1239/2);
 }
 
 // roms
@@ -3646,32 +2603,7 @@ INPUT_PORTS_END
 
 void gnw_sbuster_state::gnw_sbuster(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1246/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1269/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_dualv(config, 1920/2, 1246/2, 1920/2, 1269/2);
 }
 
 // roms
@@ -3748,32 +2680,7 @@ INPUT_PORTS_END
 
 void gnw_gcliff_state::gnw_gcliff(machine_config &config)
 {
-	/* basic machine hardware */
-	SM512(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1257/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1239/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm512_dualv(config, 1920/2, 1257/2, 1920/2, 1239/2);
 }
 
 // roms
@@ -3850,32 +2757,7 @@ INPUT_PORTS_END
 
 void gnw_zelda_state::gnw_zelda(machine_config &config)
 {
-	/* basic machine hardware */
-	SM512(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
-	screen_top.set_refresh_hz(60);
-	screen_top.set_size(1920/2, 1346/2);
-	screen_top.set_visarea_full();
-
-	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_refresh_hz(60);
-	screen_bottom.set_size(1920/2, 1291/2);
-	screen_bottom.set_visarea_full();
-
-	config.set_default_layout(layout_gnw_dualv);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm512_dualv(config, 1920/2, 1346/2, 1920/2, 1291/2);
 }
 
 // roms
@@ -3958,25 +2840,7 @@ INPUT_PORTS_END
 
 void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1920, 1049);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_common(config, 1920, 1049);
 }
 
 // roms
@@ -4046,25 +2910,7 @@ INPUT_PORTS_END
 
 void gnw_mbaway_state::gnw_mbaway(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1920, 1031);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_common(config, 1920, 1031);
 }
 
 // roms
@@ -4140,26 +2986,7 @@ INPUT_PORTS_END
 
 void gnw_dkjr_state::gnw_dkjr(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1647, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_common(config, 1647, 1080); // R mask option confirmed
 }
 
 // roms
@@ -4227,26 +3054,7 @@ INPUT_PORTS_END
 
 void gnw_mariocm_state::gnw_mariocm(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1647, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_common(config, 1647, 1080); // R mask option confirmed
 }
 
 // roms
@@ -4270,7 +3078,9 @@ ROM_END
   * Sharp SM510 label NH-103 538A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
-  This is the new wide screen version, there's also a Gold Series version (MH-06)
+  This is the new wide screen version, there's also a Gold Series version
+  (MH-06). The two games are using different MCU types so this version seems
+  to be a complete rewrite.
 
 ***************************************************************************/
 
@@ -4315,26 +3125,7 @@ INPUT_PORTS_END
 
 void gnw_manhole_state::gnw_manhole(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1560, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_common(config, 1560, 1080); // R mask option confirmed
 }
 
 // roms
@@ -4396,25 +3187,7 @@ INPUT_PORTS_END
 
 void gnw_tfish_state::gnw_tfish(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1572, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_common(config, 1572, 1080); // R mask option confirmed
 }
 
 // roms
@@ -4434,8 +3207,10 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Super Mario Bros. (model: see below)
-  * PCB label YM-105
-  * Sharp SM511 label YM-105 9024B (new wide screen version) (die label ?)
+  * PCB label YM-801 (Crystal Screen), YM-105 (New Wide Screen)
+  * Sharp SM511
+     - label YM-801 8034A (crystal screen) (not dumped yet)
+     - label YM-105 9024B (new wide screen version) (die label ?)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model YM-801), rereleased on
@@ -4454,6 +3229,7 @@ public:
 	{ }
 
 	void gnw_smb(machine_config &config);
+	void gnw_smbn(machine_config & config);
 };
 
 // config
@@ -4486,29 +3262,28 @@ INPUT_PORTS_END
 
 void gnw_smb_state::gnw_smb(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_b().set_ioport("B");
+	sm511_common(config, 1768, 1080);
+}
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1677, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+void gnw_smb_state::gnw_smbn(machine_config &config)
+{
+	sm511_common(config, 1677, 1080);
 }
 
 // roms
 
 ROM_START( gnw_smb )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ym-801.program", 0x0000, 0x1000, BAD_DUMP CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) ) // dumped from NWS version
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "ym-801.melody", 0x000, 0x100, BAD_DUMP CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) ) // dumped from NWS version
+
+	ROM_REGION( 341936, "screen", 0)
+	ROM_LOAD( "gnw_smb.svg", 0, 341936, CRC(66223e51) SHA1(b541ee14514ec9f08ccd63c4b4ebec88f1b3bece) )
+ROM_END
+
+ROM_START( gnw_smbn )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ym-105.program", 0x0000, 0x1000, CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) )
 
@@ -4516,7 +3291,7 @@ ROM_START( gnw_smb )
 	ROM_LOAD( "ym-105.melody", 0x000, 0x100, CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) )
 
 	ROM_REGION( 648209, "screen", 0)
-	ROM_LOAD( "gnw_smb.svg", 0, 648209, CRC(4a6fdb28) SHA1(0a0bc48d82d5b8bf8ef96ef9ce2f87ba6ea850c1) )
+	ROM_LOAD( "gnw_smbn.svg", 0, 648209, CRC(4a6fdb28) SHA1(0a0bc48d82d5b8bf8ef96ef9ce2f87ba6ea850c1) )
 ROM_END
 
 
@@ -4525,19 +3300,19 @@ ROM_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Climber New Wide Screen (model DR-106),
-  Nintendo Game & Watch: Climber Crystal Screen (model DR-802)
-  * PCB label DR-106 (New Wide Screen), DR-802 (Crystal Screen)
+  Nintendo Game & Watch: Climber Crystal Screen (model DR-802),
+  Nintendo Game & Watch: Climber New Wide Screen (model DR-106)
+  * PCB label DR-802 (Crystal Screen), DR-106 (New Wide Screen)
   * Sharp SM511
-     - label DR-106 9038B (new wide screen version) (no decap)
      - label DR-802 8626A (crystal screen) (not dumped yet)
+     - label DR-106 9038B (new wide screen version) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model DR-802), rereleased on
   New Wide Screen in 1988 (model DR-106). The graphic LCD elements look the same
   in both versions but the display aspect ratio and the graphical background is
-  slightly different.
-  Until further proof, it's assumed that the ROM is the same for both models.
+  slightly different. Until further proof, it's assumed that the ROM is the same
+  for both models.
 
 ***************************************************************************/
 
@@ -4549,7 +3324,7 @@ public:
 	{ }
 
 	void gnw_climber(machine_config &config);
-	void gnw_climbcs(machine_config &config);
+	void gnw_climbern(machine_config &config);
 };
 
 // config
@@ -4582,39 +3357,28 @@ INPUT_PORTS_END
 
 void gnw_climber_state::gnw_climber(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1677, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_common(config, 1756, 1080);
 }
 
-void gnw_climber_state::gnw_climbcs(machine_config &config)
+void gnw_climber_state::gnw_climbern(machine_config &config)
 {
-	gnw_climber(config);
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1756, 1080);
-	screen->set_visarea_full();
+	sm511_common(config, 1677, 1080);
 }
 
 // roms
 
 ROM_START( gnw_climber )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dr-802.program", 0x0000, 0x1000, BAD_DUMP CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) ) // dumped from NWS version
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "dr-802.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // dumped from NWS version
+
+	ROM_REGION( 564704, "screen", 0)
+	ROM_LOAD( "gnw_climber.svg", 0, 564704, CRC(60b25cc5) SHA1(1c101539a861257c5b0334ffdf9491c877759fa1) )
+ROM_END
+
+ROM_START( gnw_climbern )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) )
 
@@ -4622,18 +3386,7 @@ ROM_START( gnw_climber )
 	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // decap needed for verification
 
 	ROM_REGION( 542332, "screen", 0)
-	ROM_LOAD( "gnw_climber.svg", 0, 542332, CRC(d7e84c21) SHA1(a5b5b68c8cdb3a09966bfb91b281791bef311248) )
-ROM_END
-
-ROM_START( gnw_climbcs )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, BAD_DUMP CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) ) // dumped from NWS version
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // dumped from NWS version
-
-	ROM_REGION( 564704, "screen", 0)
-	ROM_LOAD( "gnw_climbcs.svg", 0, 564704, CRC(60b25cc5) SHA1(1c101539a861257c5b0334ffdf9491c877759fa1) )
+	ROM_LOAD( "gnw_climbern.svg", 0, 542332, CRC(d7e84c21) SHA1(a5b5b68c8cdb3a09966bfb91b281791bef311248) )
 ROM_END
 
 
@@ -4642,15 +3395,23 @@ ROM_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Balloon Fight (model: see below)
-  * PCB label DR-106 (same PCB as in Climber (new wide screen version))
-  * Sharp SM511 label BF-107 9031B (new wide screen version) (no decap)
+  Nintendo Game & Watch: Balloon Fight Crystal Screen (model BF-803),
+  Nintendo Game & Watch: Balloon Fight New Wide Screen (model BF-107)
+  * PCB labels
+     - DR-802-2 (Crystal Screen)
+     - DR-106 (new wide screen version)
+  * Sharp SM511
+     - label BF-803 8646A (crystal screen) (not dumped yet)
+     - label BF-107 9031B (new wide screen version) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model BF-803), rereleased on
   New Wide Screen in 1988 (model BF-107). The graphic LCD elements look the same
   in both versions but the graphical background is slightly different.
   Until further proof, it's assumed that the ROM is the same for both models.
+
+  The PCB design for the different editions seems to be shared with the
+  corresponding editions of Climber.
 
 ***************************************************************************/
 
@@ -4662,6 +3423,7 @@ public:
 	{ }
 
 	void gnw_bfight(machine_config &config);
+	void gnw_bfightn(machine_config &config);
 };
 
 // config
@@ -4694,37 +3456,103 @@ INPUT_PORTS_END
 
 void gnw_bfight_state::gnw_bfight(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_b().set_ioport("B");
+	sm511_common(config, 1771, 1080);
+}
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1549, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+void gnw_bfight_state::gnw_bfightn(machine_config &config)
+{
+	sm511_common(config, 1549, 1080);
 }
 
 // roms
 
 ROM_START( gnw_bfight )
 	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bf-803.program", 0x0000, 0x1000, BAD_DUMP CRC(4c8d07ed) SHA1(a8974dff85d5f3bacaadb71b86e9b30994b6d129) ) // dumped from NWS version
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bf-803.melody", 0x000, 0x100, BAD_DUMP CRC(ffddf9ed) SHA1(e9cb3a340924363eeef5ab453c452b9cc69207b9) ) // dumped from NWS version
+
+	ROM_REGION( 586284, "screen", 0)
+	ROM_LOAD( "gnw_bfight.svg", 0, 586284, CRC(e4ca7a48) SHA1(5f425183ee8d347d93d11a611f3726230e83859c) )
+ROM_END
+
+ROM_START( gnw_bfightn )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "bf-107.program", 0x0000, 0x1000, CRC(4c8d07ed) SHA1(a8974dff85d5f3bacaadb71b86e9b30994b6d129) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "bf-107.melody", 0x000, 0x100, BAD_DUMP CRC(ffddf9ed) SHA1(e9cb3a340924363eeef5ab453c452b9cc69207b9) ) // decap needed for verification
 
-	ROM_REGION( 558341, "screen", 0)
-	ROM_LOAD( "gnw_bfight.svg", 0, 558341, CRC(f0d61fe8) SHA1(b0b56224a967e4b26836c0f7e3015d13b42ae5cc) )
+	ROM_REGION( 558342, "screen", 0)
+	ROM_LOAD( "gnw_bfightn.svg", 0, 558342, CRC(361e03c3) SHA1(2883bc3de07f71fff8ea95dbc4f6955fd13abacd) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Spitball Sparky (model BU-201)
+  * PCB label BU-201
+  * Sharp SM510 label BU-201 542A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_ssparky_state : public hh_sm510_state
+{
+public:
+	gnw_ssparky_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_ssparky(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_ssparky )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Shooter
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_ssparky_state::gnw_ssparky(machine_config &config)
+{
+	sm510_common(config, 627, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( gnw_ssparky )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bu-201", 0x0000, 0x1000, CRC(ae0d28e7) SHA1(1427cca1f3aaf3ef6fc3499171a5220428d9894f) )
+
+	ROM_REGION( 136760, "screen", 0)
+	ROM_LOAD( "gnw_ssparky.svg", 0, 136760, CRC(7488bc84) SHA1(32f41a7f50b7c4a92e023b7bf4c184dd87398f87) )
 ROM_END
 
 
@@ -4804,25 +3632,7 @@ INPUT_PORTS_END
 
 void gnw_boxing_state::gnw_boxing(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1920, 524);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_common(config, 1920, 524);
 }
 
 // roms
@@ -4836,6 +3646,715 @@ ROM_START( gnw_boxing )
 
 	ROM_REGION( 265174, "screen", 0)
 	ROM_LOAD( "gnw_boxing.svg", 0, 265174, CRC(e8a3ab25) SHA1(53e32542b582dcdf4ddd051f182738eee6c732c9) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Double Dribble
+  * Sharp SM510 under epoxy (die label CMS54C, KMS584)
+  * lcd screen with custom segments, 1-bit sound
+
+  BTANB: At the basket, the ball goes missing sometimes for 1 frame, or
+  may show 2 balls at the same time. It's the same on the real handheld.
+  BTANB: players flicker (increasing LCD delay won't improve it much)
+  Another BTANB? If a period is over at the same time a defender on the
+  2nd column grabs the ball, his arm won't be erased until it's redrawn.
+
+***************************************************************************/
+
+class kdribble_state : public hh_sm510_state
+{
+public:
+	kdribble_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void kdribble(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( kdribble )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Level Select")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void kdribble_state::kdribble(machine_config &config)
+{
+	sm510_common(config, 1524, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( kdribble )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "584", 0x0000, 0x1000, CRC(1d9022c8) SHA1(64567f9f161e830a0634d5c89917ab866c26c0f8) )
+
+	ROM_REGION( 450339, "screen", 0)
+	ROM_LOAD( "kdribble.svg", 0, 450339, CRC(86c3ecc4) SHA1(8dfaeb0f3b35d4b680daaa9f478a6f3decf6ea0a) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Top Gun
+  * PCB label BH003
+  * Sharp SM510 under epoxy (die label CMS54C, KMS598)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class ktopgun_state : public hh_sm510_state
+{
+public:
+	ktopgun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void ktopgun(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( ktopgun )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void ktopgun_state::ktopgun(machine_config &config)
+{
+	sm510_common(config, 1515, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( ktopgun ) // except for filler/unused bytes, ROM listing in patent US5137277 "BH003 Top Gun" is same
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "598", 0x0000, 0x1000, CRC(50870b35) SHA1(cda1260c2e1c180995eced04b7d7ff51616dcef5) )
+
+	ROM_REGION( 425832, "screen", 0)
+	ROM_LOAD( "ktopgun.svg", 0, 425832, CRC(dc488ac0) SHA1(5a47e5639cb1e61dad3f2169efb99efe3d75896f) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Contra
+  * PCB label BH002
+  * Sharp SM511 under epoxy (die label KMS73B, KMS773)
+  * lcd screen with custom segments, 1-bit sound
+
+  Contra handheld is titled simply "C" in the USA.
+
+***************************************************************************/
+
+class kcontra_state : public hh_sm510_state
+{
+public:
+	kcontra_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		// increase lcd decay: score digit flickers
+		m_decay_len = 20;
+	}
+
+	void kcontra(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( kcontra )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void kcontra_state::kcontra(machine_config &config)
+{
+	sm511_common(config, 1505, 1080);
+}
+
+// roms
+
+ROM_START( kcontra ) // except for filler/unused bytes, ROM listing in patent US5120057 "BH002 C (Contra)" program/melody is same
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "773.program", 0x0000, 0x1000, CRC(bf834877) SHA1(055dd56ec16d63afba61ab866481fd9c029fb54d) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "773.melody", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
+
+	ROM_REGION( 721005, "screen", 0)
+	ROM_LOAD( "kcontra.svg", 0, 721005, CRC(b5370d0f) SHA1(2f401222d24fa32a4659ef2b64ddac8ac3973c69) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Teenage Mutant Ninja Turtles
+  * PCB label BH005
+  * Sharp SM511 under epoxy (die label KMS73B, KMS774)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class ktmnt_state : public hh_sm510_state
+{
+public:
+	ktmnt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void ktmnt(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( ktmnt )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void ktmnt_state::ktmnt(machine_config &config)
+{
+	sm511_common(config, 1505, 1080);
+}
+
+// roms
+
+ROM_START( ktmnt ) // except for filler/unused bytes, ROM listing in patent US5150899 "BH005 TMNT" program/melody is same
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "774.program", 0x0000, 0x1000, CRC(a1064f87) SHA1(92156c35fbbb414007ee6804fe635128a741d5f1) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "774.melody", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
+
+	ROM_REGION( 610270, "screen", 0)
+	ROM_LOAD( "ktmnt.svg", 0, 610270, CRC(ad9412ed) SHA1(154ee44efcd340dafa1cb84c37a9c3cd42cb42ab) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Gradius
+  * PCB label BH004
+  * Sharp SM511 under epoxy (die label KMS73B, KMS774)
+  * lcd screen with custom segments, 1-bit sound
+
+  Known in Japan as Nemesis.
+
+***************************************************************************/
+
+class kgradius_state : public hh_sm510_state
+{
+public:
+	kgradius_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void kgradius(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( kgradius )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void kgradius_state::kgradius(machine_config &config)
+{
+	sm511_common(config, 1420, 1080);
+}
+
+// roms
+
+ROM_START( kgradius )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "771.program", 0x0000, 0x1000, CRC(830c2afc) SHA1(bb9ebd4e52831cc02cd92dd4b37675f34cf37b8c) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "771.melody", 0x000, 0x100, CRC(4c586b73) SHA1(14c5ab2898013a577f678970a648c374749cc66d) )
+
+	ROM_REGION( 638097, "screen", 0)
+	ROM_LOAD( "kgradius.svg", 0, 638097, CRC(3adbc0f1) SHA1(fe426bf2335ce30395ea14ecab6399a93c67816a) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Lone Ranger
+  * PCB label BH009
+  * Sharp SM511 under epoxy (die label KMS73B, KMS781)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class kloneran_state : public hh_sm510_state
+{
+public:
+	kloneran_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void kloneran(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( kloneran )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void kloneran_state::kloneran(machine_config &config)
+{
+	sm511_common(config, 1497, 1080);
+}
+
+// roms
+
+ROM_START( kloneran )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "781.program", 0x0000, 0x1000, CRC(52b9735f) SHA1(06c5ef6e7e781b1176d4c1f2445f765ccf18b3f7) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "781.melody", 0x000, 0x100, CRC(a393de36) SHA1(55089f04833ccb318524ab2b584c4817505f4019) )
+
+	ROM_REGION( 633120, "screen", 0)
+	ROM_LOAD( "kloneran.svg", 0, 633120, CRC(f55e5292) SHA1(d0a91b5cd8a1894e7abc9c505fff4a8e1d3bec7a) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Blades of Steel
+  * PCB label BH011
+  * Sharp SM511 under epoxy (die label KMS73B, KMS782)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class kblades_state : public hh_sm510_state
+{
+public:
+	kblades_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		// increase lcd decay: too much overall flicker
+		m_decay_len = 25;
+	}
+
+	void kblades(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( kblades )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void kblades_state::kblades(machine_config &config)
+{
+	sm511_common(config, 1516, 1080);
+}
+
+// roms
+
+ROM_START( kblades )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "782.program", 0x0000, 0x1000, CRC(3351a35d) SHA1(84c64b65d3cabfa20c18f4649c9ede2578b82523) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "782.melody", 0x000, 0x100, CRC(e8bf48ba) SHA1(3852c014dc9136566322b4f9e2aab0e3ec3a7387) )
+
+	ROM_REGION( 455113, "screen", 0)
+	ROM_LOAD( "kblades.svg", 0, 455113, CRC(e22f44c8) SHA1(ac95a837e20f87f3afc6c234f7407cbfcc438011) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami NFL Football
+  * Sharp SM511 under epoxy (die label KMS73B, KMS786)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the 1989 version. It was rereleased in 1992, assumed to be the same
+  game underneath.
+
+***************************************************************************/
+
+class knfl_state : public hh_sm510_state
+{
+public:
+	knfl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		// increase lcd decay: too much overall flicker
+		m_decay_len = 35;
+	}
+
+	void knfl(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( knfl )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void knfl_state::knfl(machine_config &config)
+{
+	sm511_common(config, 1449, 1080);
+}
+
+// roms
+
+ROM_START( knfl )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "786.program", 0x0000, 0x1000, CRC(0535c565) SHA1(44cdcd284713ff0b194b24beff9f1b94c8bc63b2) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "786.melody", 0x000, 0x100, CRC(6c80263b) SHA1(d3c21e2f8491fef101907b8e0871b1e1c1ed58f5) )
+
+	ROM_REGION( 571134, "screen", 0)
+	ROM_LOAD( "knfl.svg", 0, 571134, CRC(f2c63235) SHA1(70b9232700f5498d3c63c63dd5904c0e19482cc2) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami The Adventures of Bayou Billy
+  * Sharp SM511 under epoxy (die label KMS73B, KMS788)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class kbilly_state : public hh_sm510_state
+{
+public:
+	kbilly_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void kbilly(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( kbilly )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void kbilly_state::kbilly(machine_config &config)
+{
+	sm511_common(config, 1490, 1080);
+}
+
+// roms
+
+ROM_START( kbilly )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "788.program", 0x0000, 0x1000, CRC(b8b1f734) SHA1(619dd527187b43276d081cdb1b13e0a9a81f2c6a) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "788.melody", 0x000, 0x100, CRC(cd488bea) SHA1(8fc60081f46e392978d6950c74711fb7ebd154de) )
+
+	ROM_REGION( 598276, "screen", 0)
+	ROM_LOAD( "kbilly.svg", 0, 598276, CRC(2969319e) SHA1(5cd1b0a6eee3168142c1d24f167b9ef38ad88402) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Bucky O'Hare
+  * Sharp SM511 under epoxy (die label KMS73B, N58)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class kbucky_state : public hh_sm510_state
+{
+public:
+	kbucky_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void kbucky(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( kbucky )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void kbucky_state::kbucky(machine_config &config)
+{
+	sm511_common(config, 1490, 1080);
+}
+
+// roms
+
+ROM_START( kbucky )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "n58.program", 0x0000, 0x1000, CRC(7c36a0c4) SHA1(1b55ac64a71af746fd0a0f44266fcc92cca77482) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "n58.melody", 0x000, 0x100, CRC(7e99e469) SHA1(3e9a3843c6ab392f5989f3366df87a2d26cb8620) )
+
+	ROM_REGION( 727841, "screen", 0)
+	ROM_LOAD( "kbucky.svg", 0, 727841, CRC(c1d78488) SHA1(9ba4fdbce977455b8f1ad4bd2b01faa44bd05bc7) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Konami Garfield
+  * Sharp SM511 under epoxy (die label KMS73B, N62)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class kgarfld_state : public hh_sm510_state
+{
+public:
+	kgarfld_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		// increase lcd decay: too much overall flicker
+		m_decay_len = 30;
+	}
+
+	void kgarfld(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( kgarfld )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
+INPUT_PORTS_END
+
+void kgarfld_state::kgarfld(machine_config &config)
+{
+	sm511_common(config, 1500, 1080);
+}
+
+// roms
+
+ROM_START( kgarfld )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "n62.program", 0x0000, 0x1000, CRC(5a762049) SHA1(26d4d891160d254dfd752734e1047126243f88dd) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "n62.melody", 0x000, 0x100, CRC(232b7d55) SHA1(76f6a19e8182ee3f00c9f4ef007b5dde75a9c00d) )
+
+	ROM_REGION( 581107, "screen", 0)
+	ROM_LOAD( "kgarfld.svg", 0, 581107, CRC(bf09a170) SHA1(075cb95535873018409eb15675183490c61b29b9) )
 ROM_END
 
 
@@ -4923,36 +4442,12 @@ INPUT_PORTS_END
 
 void tgaunt_state::tgaunt(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1425, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1425, 1080);
 }
 
 void tgaunt_state::trobhood(machine_config &config)
 {
-	tgaunt(config);
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1468, 1080);
-	screen->set_visarea_full();
+	sm510_tiger(config, 1468, 1080);
 }
 
 // roms
@@ -5041,26 +4536,7 @@ INPUT_PORTS_END
 
 void tddragon_state::tddragon(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1467, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1467, 1080); // R mask option confirmed
 }
 
 // roms
@@ -5142,26 +4618,7 @@ INPUT_PORTS_END
 
 void tkarnov_state::tkarnov(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1477, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1477, 1080);
 }
 
 // roms
@@ -5242,26 +4699,7 @@ INPUT_PORTS_END
 
 void tvindictr_state::tvindictr(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1459, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1459, 1080);
 }
 
 // roms
@@ -5353,27 +4791,9 @@ INPUT_PORTS_END
 
 void tgaiden_state::tgaiden(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	sm510_tiger(config, 1476, 1080);
+
 	m_maincpu->write_r().append(FUNC(tgaiden_state::led_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1476, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // roms
@@ -5450,26 +4870,7 @@ INPUT_PORTS_END
 
 void tbatman_state::tbatman(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1442, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1442, 1080);
 }
 
 // roms
@@ -5550,26 +4951,7 @@ INPUT_PORTS_END
 
 void tsharr2_state::tsharr2(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1493, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1493, 1080); // R mask option confirmed
 }
 
 // roms
@@ -5647,26 +5029,7 @@ INPUT_PORTS_END
 
 void tstrider_state::tstrider(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1479, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1479, 1080);
 }
 
 // roms
@@ -5748,26 +5111,7 @@ INPUT_PORTS_END
 
 void tgoldnaxe_state::tgoldnaxe(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1456, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1456, 1080);
 }
 
 // roms
@@ -5866,36 +5210,12 @@ INPUT_PORTS_END
 
 void trobocop2_state::trobocop2(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1487, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1487, 1080);
 }
 
 void trobocop2_state::trockteer(machine_config &config)
 {
-	trobocop2(config);
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1463, 1080);
-	screen->set_visarea_full();
+	sm510_tiger(config, 1463, 1080);
 }
 
 // roms
@@ -5989,26 +5309,7 @@ INPUT_PORTS_END
 
 void taltbeast_state::taltbeast(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1455, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1455, 1080); // R mask option confirmed
 }
 
 // roms
@@ -6090,26 +5391,7 @@ INPUT_PORTS_END
 
 void tsf2010_state::tsf2010(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1465, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1465, 1080);
 }
 
 // roms
@@ -6187,26 +5469,7 @@ INPUT_PORTS_END
 
 void tswampt_state::tswampt(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1450, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1450, 1080);
 }
 
 // roms
@@ -6288,26 +5551,7 @@ INPUT_PORTS_END
 
 void tspidman_state::tspidman(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1440, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1440, 1080);
 }
 
 // roms
@@ -6389,26 +5633,7 @@ INPUT_PORTS_END
 
 void txmen_state::txmen(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1467, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1467, 1080);
 }
 
 // roms
@@ -6490,26 +5715,7 @@ INPUT_PORTS_END
 
 void tddragon3_state::tddragon3(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1514, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1514, 1080);
 }
 
 // roms
@@ -6591,26 +5797,7 @@ INPUT_PORTS_END
 
 void tflash_state::tflash(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1444, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1444, 1080);
 }
 
 // roms
@@ -6693,25 +5880,7 @@ INPUT_PORTS_END
 
 void tmchammer_state::tmchammer(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1471, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_tiger1bit(config, 1471, 1080);
 }
 
 // roms
@@ -6796,26 +5965,7 @@ INPUT_PORTS_END
 
 void tbtoads_state::tbtoads(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1454, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1454, 1080);
 }
 
 // roms
@@ -6897,26 +6047,7 @@ INPUT_PORTS_END
 
 void thook_state::thook(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1489, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1489, 1080);
 }
 
 // roms
@@ -6997,26 +6128,7 @@ INPUT_PORTS_END
 
 void tbttf_state::tbttf(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1466, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1466, 1080);
 }
 
 // roms
@@ -7100,26 +6212,7 @@ INPUT_PORTS_END
 
 void taddams_state::taddams(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1464, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1464, 1080);
 }
 
 // roms
@@ -7201,26 +6294,7 @@ INPUT_PORTS_END
 
 void thalone_state::thalone(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1448, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1448, 1080);
 }
 
 // roms
@@ -7298,26 +6372,7 @@ INPUT_PORTS_END
 
 void txmenpx_state::txmenpx(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1464, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1464, 1080);
 }
 
 // roms
@@ -7399,26 +6454,7 @@ INPUT_PORTS_END
 
 void thalone2_state::thalone2(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1454, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1454, 1080);
 }
 
 // roms
@@ -7495,26 +6531,7 @@ INPUT_PORTS_END
 
 void tsonic_state::tsonic(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1517, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, piezo2bit_r1_120k_s1_39k);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_tiger2bit(config, 1517, 1080);
 }
 
 // roms
@@ -7599,26 +6616,7 @@ INPUT_PORTS_END
 
 void trobocop3_state::trobocop3(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1464, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1464, 1080);
 }
 
 // roms
@@ -7696,26 +6694,7 @@ INPUT_PORTS_END
 
 void tdummies_state::tdummies(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1441, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1441, 1080);
 }
 
 // roms
@@ -7797,26 +6776,7 @@ INPUT_PORTS_END
 
 void tsfight2_state::tsfight2(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1444, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1444, 1080);
 }
 
 // roms
@@ -7898,26 +6858,7 @@ INPUT_PORTS_END
 
 void twworld_state::twworld(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1429, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1429, 1080);
 }
 
 // roms
@@ -7995,26 +6936,7 @@ INPUT_PORTS_END
 
 void tjpark_state::tjpark(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1454, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1454, 1080);
 }
 
 // roms
@@ -8091,26 +7013,7 @@ INPUT_PORTS_END
 
 void tsonic2_state::tsonic2(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1475, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, piezo2bit_r1_120k_s1_39k);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_tiger2bit(config, 1475, 1080);
 }
 
 // roms
@@ -8200,26 +7103,7 @@ INPUT_PORTS_END
 
 void tsddragon_state::tsddragon(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1503, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1503, 1080);
 }
 
 // roms
@@ -8302,26 +7186,7 @@ INPUT_PORTS_END
 
 void tdennis_state::tdennis(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1467, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1467, 1080);
 }
 
 // roms
@@ -8407,26 +7272,7 @@ INPUT_PORTS_END
 
 void tnmarebc_state::tnmarebc(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(tnmarebc_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1456, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1456, 1080);
 }
 
 // roms
@@ -8508,26 +7354,7 @@ INPUT_PORTS_END
 
 void ttransf2_state::ttransf2(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1476, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1476, 1080);
 }
 
 // roms
@@ -8605,26 +7432,7 @@ INPUT_PORTS_END
 
 void topaliens_state::topaliens(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1450, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1450, 1080);
 }
 
 // roms
@@ -8707,26 +7515,7 @@ INPUT_PORTS_END
 
 void tmkombat_state::tmkombat(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1468, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1468, 1080);
 }
 
 // roms
@@ -8808,26 +7597,7 @@ INPUT_PORTS_END
 
 void tshadow_state::tshadow(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1484, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1484, 1080);
 }
 
 // roms
@@ -8909,26 +7679,7 @@ INPUT_PORTS_END
 
 void tskelwarr_state::tskelwarr(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1444, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1444, 1080);
 }
 
 // roms
@@ -9011,26 +7762,7 @@ INPUT_PORTS_END
 
 void tbatfor_state::tbatfor(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1493, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1493, 1080);
 }
 
 // roms
@@ -9113,26 +7845,7 @@ INPUT_PORTS_END
 
 void tjdredd_state::tjdredd(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1444, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1444, 1080);
 }
 
 // roms
@@ -9215,26 +7928,7 @@ INPUT_PORTS_END
 
 void tapollo13_state::tapollo13(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1467, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1467, 1080);
 }
 
 // roms
@@ -9317,26 +8011,7 @@ INPUT_PORTS_END
 
 void tgoldeye_state::tgoldeye(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1461, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1461, 1080);
 }
 
 // roms
@@ -9419,26 +8094,7 @@ INPUT_PORTS_END
 
 void tkazaam_state::tkazaam(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu); // no external XTAL
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1452, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1452, 1080); // no external XTAL
 }
 
 // roms
@@ -9516,26 +8172,7 @@ INPUT_PORTS_END
 
 void tsjam_state::tsjam(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu); // no external XTAL
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1421, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1421, 1080); // no external XTAL
 }
 
 // roms
@@ -9613,26 +8250,7 @@ INPUT_PORTS_END
 
 void tinday_state::tinday(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1463, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_tiger(config, 1463, 1080);
 }
 
 // roms
@@ -9684,7 +8302,7 @@ static INPUT_PORTS_START( tbatmana )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // S5
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed)  PORT_NAME("Throw/Attack")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Throw/Attack")
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // S6
@@ -9710,26 +8328,7 @@ INPUT_PORTS_END
 
 void tbatmana_state::tbatmana(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1478, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, piezo2bit_r1_120k_s1_39k);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_tiger2bit(config, 1478, 1080);
 }
 
 // roms
@@ -9827,34 +8426,12 @@ INPUT_PORTS_END
 
 void trshutvoy_state::trshutvoy(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1496, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_common(config, 1496, 1080); // R mask options confirmed
 }
 
 void trshutvoy_state::tigarden(machine_config &config)
 {
-	trshutvoy(config);
-
-	/* video hardware */
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(1515, 1080);
-	screen->set_visarea_full();
+	sm510_common(config, 1515, 1080);
 }
 
 // roms
@@ -9919,24 +8496,7 @@ INPUT_PORTS_END
 
 void trsrescue_state::trsrescue(machine_config &config)
 {
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(2); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1533, 1080);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm510_common(config, 1533, 1080); // R mask options confirmed
 }
 
 // roms
@@ -9979,7 +8539,7 @@ static INPUT_PORTS_START( nummunch )
 
 	PORT_START("IN.1") // S2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CHANGED_CB(input_changed)  PORT_NAME("Calc. / Clear")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CHANGED_CB(input_changed) PORT_NAME("Calc. / Clear")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("=")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -10025,23 +8585,7 @@ INPUT_PORTS_END
 
 void nummunch_state::nummunch(machine_config &config)
 {
-	/* basic machine hardware */
-	SM511(config, m_maincpu);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(1920, 875);
-	screen.set_visarea_full();
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	sm511_common(config, 1920, 875);
 }
 
 // roms
@@ -10068,25 +8612,16 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME         PARENT   COMP  MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
-// Konami
-CONS( 1989, kdribble,    0,          0, kdribble,    kdribble,    kdribble_state,    empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktopgun,     0,          0, ktopgun,     ktopgun,     ktopgun_state,     empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kcontra,     0,          0, kcontra,     kcontra,     kcontra_state,     empty_init, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktmnt,       0,          0, ktmnt,       ktmnt,       ktmnt_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kgradius,    0,          0, kgradius,    kgradius,    kgradius_state,    empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kloneran,    0,          0, kloneran,    kloneran,    kloneran_state,    empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kblades,     0,          0, kblades,     kblades,     kblades_state,     empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, knfl,        0,          0, knfl,        knfl,        knfl_state,        empty_init, "Konami", "NFL Football (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kbilly,      0,          0, kbilly,      kbilly,      kbilly_state,      empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state,      empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: silver/gold (initial series is uncategorized, "silver" was made up later)
 CONS( 1980, gnw_ball,    0,          0, gnw_ball,    gnw_ball,    gnw_ball_state,    empty_init, "Nintendo", "Game & Watch: Ball", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_flagman, 0,          0, gnw_flagman, gnw_flagman, gnw_flagman_state, empty_init, "Nintendo", "Game & Watch: Flagman", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_vermin,  0,          0, gnw_vermin,  gnw_vermin,  gnw_vermin_state,  empty_init, "Nintendo", "Game & Watch: Vermin", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_fires,   0,          0, gnw_fires,   gnw_fires,   gnw_fires_state,   empty_init, "Nintendo", "Game & Watch: Fire (silver)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_helmet,  0,          0, gnw_helmet,  gnw_helmet,  gnw_helmet_state,  empty_init, "Nintendo", "Game & Watch: Helmet", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gnw_judge,   0,          0, gnw_judge,   gnw_judge,   gnw_judge_state,   empty_init, "Nintendo", "Game & Watch: Judge (green)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_manholeg,0,          0, gnw_manholeg,gnw_manholeg,gnw_manholeg_state,empty_init, "Nintendo", "Game & Watch: Manhole (gold)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_helmet,  0,          0, gnw_helmet,  gnw_helmet,  gnw_helmet_state,  empty_init, "Nintendo", "Game & Watch: Helmet (Rev. 2)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_lion,    0,          0, gnw_lion,    gnw_lion,    gnw_lion_state,    empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: wide screen
 CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE )
@@ -10094,7 +8629,7 @@ CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_st
 CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE)
-CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
@@ -10125,17 +8660,35 @@ CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state
 CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_manhole, 0,          0, gnw_manhole, gnw_manhole, gnw_manhole_state, empty_init, "Nintendo", "Game & Watch: Manhole (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1985, gnw_tfish,   0,          0, gnw_tfish,   gnw_tfish,   gnw_tfish_state,   empty_init, "Nintendo", "Game & Watch: Tropical Fish", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1986, gnw_climbcs, gnw_climber,0, gnw_climbcs, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (crystal screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (crystal screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_smbn,    gnw_smb,    0, gnw_smbn,    gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1986, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (crystal screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_climbern,gnw_climber,0, gnw_climbern,gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1986, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (crystal screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_bfightn, gnw_bfight, 0, gnw_bfightn, gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (new wide screen)", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: table top / panorama screen
 CONS( 1983, gnw_dkjrp,   0,          0, gnw_dkjrp,   gnw_dkjrp,   gnw_dkjrp_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (panorama screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mbaway,  0,          0, gnw_mbaway,  gnw_mbaway,  gnw_mbaway_state,  empty_init, "Nintendo", "Game & Watch: Mario's Bombs Away", MACHINE_SUPPORTS_SAVE )
 
+// Nintendo G&W: super color
+CONS( 1984, gnw_ssparky, 0,          0, gnw_ssparky, gnw_ssparky, gnw_ssparky_state, empty_init, "Nintendo", "Game & Watch: Spitball Sparky", MACHINE_SUPPORTS_SAVE )
+
 // Nintendo G&W: micro vs. system (actually, no official Game & Watch logo anywhere)
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE )
+
+// Konami
+CONS( 1989, kdribble,    0,          0, kdribble,    kdribble,    kdribble_state,    empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktopgun,     0,          0, ktopgun,     ktopgun,     ktopgun_state,     empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kcontra,     0,          0, kcontra,     kcontra,     kcontra_state,     empty_init, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktmnt,       0,          0, ktmnt,       ktmnt,       ktmnt_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kgradius,    0,          0, kgradius,    kgradius,    kgradius_state,    empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kloneran,    0,          0, kloneran,    kloneran,    kloneran_state,    empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kblades,     0,          0, kblades,     kblades,     kblades_state,     empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, knfl,        0,          0, knfl,        knfl,        knfl_state,        empty_init, "Konami", "NFL Football (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kbilly,      0,          0, kbilly,      kbilly,      kbilly_state,      empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state,      empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
 
 // Tiger 7-xxx/78-xxx models
 CONS( 1989, tgaunt,      0,          0, tgaunt,      tgaunt,      tgaunt_state,      empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE )

@@ -309,7 +309,7 @@ void tecmosys_state::main_map(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("spriteram"); // obj ram
 	map(0x880000, 0x88000b).r(FUNC(tecmosys_state::unk880000_r));
 	map(0x880000, 0x88002f).w(FUNC(tecmosys_state::unk880000_w)).share("880000regs");  // 10 byte dta@88000c, 880022=watchdog?
-	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // AM_WRITEONLY // obj pal
+	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // .writeonly(); // obj pal
 
 	//map(0x980000, 0x9807ff).writeonly(); // bg pal
 	//map(0x980800, 0x980fff).w(FUNC(tecmosys_state::paletteram_xGGGGGRRRRRBBBBB_word_w)).share("paletteram"); // fix pal
@@ -411,34 +411,11 @@ static INPUT_PORTS_START( tecmosys )
 INPUT_PORTS_END
 
 
-
-static const gfx_layout gfxlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
-static const gfx_layout gfxlayout2 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(8*8*4,4) },
-	{ STEP8(0,4*8), STEP8(8*8*4*2,4*8) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_tecmosys )
-	GFXDECODE_ENTRY( "layer0", 0, gfxlayout,   0x4400, 0x40 )
-	GFXDECODE_ENTRY( "layer1", 0, gfxlayout2,  0x4000, 0x40 )
-	GFXDECODE_ENTRY( "layer2", 0, gfxlayout2,  0x4000, 0x40 )
-	GFXDECODE_ENTRY( "layer3", 0, gfxlayout2,  0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb,               0x4400, 0x40 )
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
 GFXDECODE_END
 
 

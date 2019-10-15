@@ -538,7 +538,7 @@ void mtech_state::megatech_bios_map(address_map &map)
 	map(0x6400, 0x6407).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x6800, 0x6807).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x7000, 0x77ff).rom(); // from bios rom (0x7000-0x77ff populated in ROM)
-	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
+	//map(0x7800, 0x7fff).ram(); // ?
 	map(0x8000, 0x9fff).rw(FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
 }
 

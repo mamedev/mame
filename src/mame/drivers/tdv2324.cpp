@@ -138,8 +138,8 @@ void tdv2324_state::tdv2324_mem(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x0800).rom().region(P8085AH_0_TAG, 0);
 	/* when copying code to 4000 area it runs right off the end of rom;
 	 * I'm not sure if its supposed to mirror or read as open bus */
-//  AM_RANGE(0x4000, 0x5fff) AM_RAM // 0x4000 has the boot code copied to it, 5fff and down are the stack
-//  AM_RANGE(0x6000, 0x6fff) AM_RAM // used by the relocated boot code; shared?
+//  map(0x4000, 0x5fff).ram(); // 0x4000 has the boot code copied to it, 5fff and down are the stack
+//  map(0x6000, 0x6fff).ram(); // used by the relocated boot code; shared?
 	map(0x0800, 0xffff).ram();
 }
 
@@ -150,16 +150,16 @@ void tdv2324_state::tdv2324_mem(address_map &map)
 
 void tdv2324_state::tdv2324_io(address_map &map)
 {
-	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//map.global_mask(0xff);
 	/* 0x30 is read by main code and if high bit isn't set at some point it will never get anywhere */
 	/* e0, e2, e8, ea are written to */
 	/* 30, e6 and e2 are readable */
 	map(0x30, 0x30).r(FUNC(tdv2324_state::tdv2324_main_io_30));
-//  AM_RANGE(0xe2, 0xe2) AM_WRITE(tdv2324_main_io_e2) console output
+//  map(0xe2, 0xe2).w(FUNC(tdv2324_state::tdv2324_main_io_e2)); console output
 	map(0xe6, 0xe6).r(FUNC(tdv2324_state::tdv2324_main_io_e6));
-//  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8253_5_0_TAG, pit8253_device, read, write)
-//  AM_RANGE(0x, 0x) AM_DEVREADWRITE(MK3887N4_TAG, z80dart_device, ba_cd_r, ba_cd_w)
-//  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8259A_TAG, pic8259_device, read, write)
+//  map(0x, 0x).rw(P8253_5_0_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+//  map(0x, 0x).rw(MK3887N4_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+//  map(0x, 0x).rw(P8259A_TAG, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }
 
 
@@ -182,7 +182,7 @@ void tdv2324_state::tdv2324_sub_mem(address_map &map)
 
 void tdv2324_state::tdv2324_sub_io(address_map &map)
 {
-	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//map.global_mask(0xff);
 	/* 20, 23, 30-36, 38, 3a, 3c, 3e, 60, 70 are written to */
 	map(0x20, 0x23).rw(m_pit1, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x3f).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write)); // TODO: this is supposed to be a 9937, which is not quite the same as 9927
@@ -196,10 +196,10 @@ void tdv2324_state::tdv2324_sub_io(address_map &map)
 void tdv2324_state::tdv2324_fdc_mem(address_map &map)
 {
 	// the following two are probably enabled/disabled via the JP2 jumper block next to the fdc cpu
-	//AM_RANGE(0x0000, 0x001f) AM_RAM // on-6802-die ram (optionally battery backed)
-	//AM_RANGE(0x0020, 0x007f) AM_RAM // on-6802-die ram
+	//map(0x0000, 0x001f).ram(); // on-6802-die ram (optionally battery backed)
+	//map(0x0020, 0x007f).ram(); // on-6802-die ram
 	map(0x0000, 0x07ff).ram(); // TMM2016AP-12 @ U14, tested with A5,5A pattern
-	//AM_RANGE(0x1000, 0x17ff) AM_RAM // TMM2016AP-12 @ U80, address is wrong
+	//map(0x1000, 0x17ff).ram(); // TMM2016AP-12 @ U80, address is wrong
 	// the 3xxx area appears to be closely involved in fdc or other i/o
 	// in particular, reads from 30xx, 38xx, 3Cxx may be actually writes to certain fdc registers with data xx?
 	// 0x2101 is something writable

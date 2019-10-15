@@ -212,7 +212,7 @@ public:
 	void init_rongrong();
 	void init_momotaro();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_blitter_irq_r);
+	DECLARE_READ_LINE_MEMBER(blitter_irq_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
@@ -1748,7 +1748,7 @@ uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_r)
+READ_LINE_MEMBER(ddenlovr_state::blitter_irq_r)
 {
 	return m_ddenlovr_blitter_irq_flag;
 }
@@ -1945,7 +1945,7 @@ void ddenlovr_state::quiz365_map(address_map &map)
 
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::quiz365_protection_r));                          // Protection
 	map(0x200e0a, 0x200e0d).w(FUNC(ddenlovr_state::quiz365_protection_w));                         // Protection
-//  map(0x201000, 0x2017ff) AM_WRITEONLY                                      // ?
+//  map(0x201000, 0x2017ff).writeonly();                                      // ?
 
 	map(0x300201, 0x300201).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
 	map(0x300203, 0x300203).w(FUNC(ddenlovr_state::quiz365_coincounter_w));                        // Coin Counters + more stuff written on startup
@@ -1999,7 +1999,7 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 	map(0x000000, 0x07ffff).rom(); // ROM
 
 	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
-//  map(0x201000, 0x2017ff) AM_WRITEONLY                                      // ? B0 on startup, then 00
+//  map(0x201000, 0x2017ff).writeonly();                                      // ? B0 on startup, then 00
 
 	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2058,7 +2058,7 @@ void ddenlovr_state::ddenlovrk_map(address_map &map)
 	map(0x200000, 0x200001).rw(FUNC(ddenlovr_state::ddenlovrk_protection2_r), FUNC(ddenlovr_state::ddenlovrk_protection2_w)).share("protection2");
 
 	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
-//  map(0xd01000, 0xd017ff) AM_RAM                                                    // ? B0 on startup, then 00
+//  map(0xd01000, 0xd017ff).ram();                                                    // ? B0 on startup, then 00
 
 	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2094,7 +2094,7 @@ void ddenlovr_state::ddenlovr_map(address_map &map)
 	map(0x300001, 0x300001).w(FUNC(ddenlovr_state::ddenlovr_oki_bank_w));
 
 	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::rongrong_palette_w)).umask16(0x00ff);
-//  map(0xd01000, 0xd017ff) AM_RAM                                                   // ? B0 on startup, then 00
+//  map(0xd01000, 0xd017ff).ram();                                                   // ? B0 on startup, then 00
 
 	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2824,14 +2824,14 @@ void ddenlovr_state::kotbinyo_portmap(address_map &map)
 	map(0x83, 0x84).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0xb0, 0xb0).portr("SYSTEM");
-//  map(0xb1, 0xb2) AM_READ(hanakanz_keyb_r)
+//  map(0xb1, 0xb2).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
 	map(0xb1, 0xb1).portr("KEYB0");
 	map(0xb2, 0xb2).portr("KEYB1");
 	map(0xb3, 0xb3).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-//  map(0xb4, 0xb4) AM_WRITE(hanakanz_keyb_w)
+//  map(0xb4, 0xb4).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
 	map(0xb6, 0xb6).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-//  map(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+//  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 
@@ -2849,14 +2849,14 @@ void ddenlovr_state::kotbinsp_portmap(address_map &map)
 	map(0x83, 0x84).r(FUNC(ddenlovr_state::hanakanz_gfxrom_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0x90, 0x90).portr("SYSTEM");
-//  map(0x91, 0x91) AM_READ(hanakanz_keyb_r)
+//  map(0x91, 0x91).r(FUNC(ddenlovr_state::hanakanz_keyb_r));
 	map(0x91, 0x91).portr("KEYB0");
 	map(0x92, 0x92).portr("KEYB1");
 	map(0x93, 0x93).w(FUNC(ddenlovr_state::hanakanz_coincounter_w));
-//  map(0x94, 0x94) AM_WRITE(hanakanz_keyb_w)
+//  map(0x94, 0x94).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
 	map(0x96, 0x96).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-//  map(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+//  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 
@@ -4548,7 +4548,7 @@ static INPUT_PORTS_START( ddenlovj )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,ddenlovj_blitter_r, nullptr) // blitter irq flag? (bit 5) & RTC (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, ddenlovj_blitter_r) // blitter irq flag? (bit 5) & RTC (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("DSW1")
@@ -4654,7 +4654,7 @@ static INPUT_PORTS_START( ddenlovr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,ddenlovr_blitter_irq_r, nullptr) // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r) // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW")
@@ -4709,7 +4709,7 @@ static INPUT_PORTS_START( nettoqc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,nettoqc_special_r, nullptr)  // ? (bit 5) & blitter irq flag (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, nettoqc_special_r)  // ? (bit 5) & blitter irq flag (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("DSW1")
@@ -4807,7 +4807,7 @@ static INPUT_PORTS_START( ultrchmp )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,ddenlovr_blitter_irq_r, nullptr) // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r) // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW")
@@ -4987,7 +4987,7 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,ddenlovr_blitter_irq_r, nullptr) // blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ddenlovr_state, blitter_irq_r) // blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("DSW1")
@@ -8089,7 +8089,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddenlovr_state,mjflove_blitter_r, nullptr)  // RTC (bit 5) & blitter irq flag (bit 6)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ddenlovr_state, mjflove_blitter_r)  // RTC (bit 5) & blitter irq flag (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
 	PORT_START("KEY0")

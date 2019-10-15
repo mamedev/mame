@@ -382,7 +382,7 @@ public:
 		m_ds2430_bit_timer(*this, "ds2430_timer2"),
 		m_workram(*this, "workram"),
 		m_ds2430_rom(*this, "ds2430"),
-		m_io_ports(*this, {"IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7"})
+		m_io_ports(*this, "IN%u", 0U)
 	{
 	}
 
@@ -392,7 +392,7 @@ public:
 	void init_vipercf();
 	void init_viperhd();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
+	DECLARE_READ_LINE_MEMBER(ds2430_unk_r);
 
 private:
 	DECLARE_READ32_MEMBER(epic_r);
@@ -2101,7 +2101,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 
 void viper_state::viper_map(address_map &map)
 {
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map(0x00000000, 0x00ffffff).mirror(0x1000000).ram().share("workram");
 	map(0x80000000, 0x800fffff).rw(FUNC(viper_state::epic_r), FUNC(viper_state::epic_w));
 	map(0x82000000, 0x83ffffff).rw(FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
@@ -2112,7 +2112,7 @@ void viper_state::viper_map(address_map &map)
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
-//  AM_RANGE(0xff400xxx, 0xff400xxx) ppp2nd sense device
+//  map(0xff400xxx, 0xff400xxx) ppp2nd sense device
 	map(0xffe00000, 0xffe00007).r(FUNC(viper_state::e00000_r));
 	map(0xffe00008, 0xffe0000f).rw(FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
 	map(0xffe08000, 0xffe08007).noprw();
@@ -2132,7 +2132,7 @@ void viper_state::viper_map(address_map &map)
 
 /*****************************************************************************/
 
-CUSTOM_INPUT_MEMBER(viper_state::ds2430_unk_r)
+READ_LINE_MEMBER(viper_state::ds2430_unk_r)
 {
 	return m_ds2430_unk_status;
 }
@@ -2159,7 +2159,7 @@ static INPUT_PORTS_START( viper )
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, viper_state, ds2430_unk_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(viper_state, ds2430_unk_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // if this bit is 0, loads a disk copier instead
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 

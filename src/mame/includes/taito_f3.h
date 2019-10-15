@@ -132,8 +132,8 @@ public:
 	void init_scfinals();
 	void init_pbobbl2x();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
+	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
+	template <int Num> DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
 
 protected:

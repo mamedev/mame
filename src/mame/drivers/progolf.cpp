@@ -278,7 +278,7 @@ void progolf_state::main_cpu(address_map &map)
 	map(0x9800, 0x9800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x9801, 0x9801).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x9a00, 0x9a00).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
+//  map(0x9e00, 0x9e00).nopw();
 	map(0xb000, 0xffff).rom();
 }
 

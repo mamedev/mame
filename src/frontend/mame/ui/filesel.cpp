@@ -421,7 +421,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	// build the menu for each item
 	if (osd_file::error::NONE != err)
 	{
-		osd_printf_verbose("menu_file_selector::populate: error opening directory '%s' (%d)\n", m_current_directory.c_str(), int(err));
+		osd_printf_verbose("menu_file_selector::populate: error opening directory '%s' (%d)\n", m_current_directory, int(err));
 	}
 	else
 	{

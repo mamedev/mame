@@ -82,7 +82,8 @@ void ym3526_device::device_start()
 
 	/* stream system initialize */
 	m_chip = ym3526_init(this, clock(), rate);
-	assert_always(m_chip != nullptr, "Error creating YM3526 chip");
+	if (!m_chip)
+		throw emu_fatalerror("ym3526_device(%s): Error creating YM3526 chip", tag());
 
 	calculate_rates();
 

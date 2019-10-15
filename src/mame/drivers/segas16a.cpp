@@ -689,27 +689,6 @@ void segas16a_state::dumpmtmt_i8751_sim()
 }
 
 
-//-------------------------------------------------
-//  quartet_i8751_sim - simulate the I8751
-//  from Quartet
-//-------------------------------------------------
-
-void segas16a_state::quartet_i8751_sim()
-{
-	// signal a VBLANK to the main CPU
-	m_maincpu->set_input_line(4, HOLD_LINE);
-
-	// X scroll values
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_segaic16vid->textram_w(space, 0xff8/2, m_workram[0x0d14/2], 0xffff);
-	m_segaic16vid->textram_w(space, 0xffa/2, m_workram[0x0d18/2], 0xffff);
-
-	// page values
-	m_segaic16vid->textram_w(space, 0xe9e/2, m_workram[0x0d1c/2], 0xffff);
-	m_segaic16vid->textram_w(space, 0xe9c/2, m_workram[0x0d1e/2], 0xffff);
-}
-
-
 
 //**************************************************************************
 //  CUSTOM I/O HANDLERS
@@ -1242,7 +1221,7 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_INCLUDE( afighter )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_accel_r, nullptr)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(afighter_16a_analog_state, afighter_accel_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // SHOT
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // WEAPON1
@@ -1250,10 +1229,10 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) // WEAPON3
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_handl_left_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(afighter_16a_analog_state, afighter_handl_left_r)
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16a_analog_state, afighter_handl_right_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(afighter_16a_analog_state, afighter_handl_right_r)
 
 	PORT_START("STEER")  // steering
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
@@ -2604,6 +2583,8 @@ ROM_END
 //  CPU: 68000
 //  i8751 317-0015
 //
+//  GAME NUMBER: 833-6072 BODY SLAM
+//
 ROM_START( bodyslam )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10066.b9",  0x000000, 0x8000, CRC(6cd53290) SHA1(68ef83ad99a26a507d9bc4cd715462169f4ac41f) )
@@ -2722,6 +2703,9 @@ ROM_START( fantzone )
 	ROM_LOAD( "epr-7535a.12", 0x0000, 0x8000, CRC(bc1374fa) SHA1(ed2c87ae024dc251e175239f1bccc728fc096548) )
 ROM_END
 
+// Sega game ID: 834-5939-01 FANTASY ZONE
+// Top board:    837-5941-01
+// Bottom board: 837-5942-01
 ROM_START( fantzone1 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-7385.43",  0x000000, 0x8000, CRC(5cb64450) SHA1(5831405359975dd7d8c6614b20fd9b18a5d6410d) )
@@ -2987,7 +2971,7 @@ ROM_START( quartet )
 	ROM_LOAD( "epr-7476.4c",  0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, CRC(b7298f66) SHA1(9c579903bcf48a72ad9dfe7bf3962729dabe2d34) )
 
 	ROM_REGION( 0x0500, "plds", 0 ) // Unknown & undumped PAL 315-5202 @ 8L, 315-5107 @ 22G & 315-5141 @ 3C
 	ROM_LOAD( "315-5147.pal16r6a.23g", 0x0000, 0x0104, NO_DUMP ) // PAL is read protected
@@ -3042,7 +3026,7 @@ ROM_START( quarteta )
 	ROM_LOAD( "epr-7476.4c",  0x18000, 0x8000, CRC(5eba655a) SHA1(6713ef12037cba3139d0f469c82bd90b44bae8ce) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "315-5194.mcu", 0x00000, 0x1000, CRC(b7298f66) SHA1(9c579903bcf48a72ad9dfe7bf3962729dabe2d34) )
 
 	ROM_REGION( 0x0500, "plds", 0 ) // Unknown & undumped PAL 315-5202 @ 8L, 315-5107 @ 22G & 315-5141 @ 3C
 	ROM_LOAD( "315-5147.pal16r6a.23g", 0x0000, 0x0104, NO_DUMP ) // PAL is read protected
@@ -3648,7 +3632,7 @@ ROM_END
 //  Time Scanner, Sega System 16A
 //  CPU: FD1089B (317-0024)
 //
-//  GAME NUMBER: TOP 837-5941-01, BOTTOM 837-5942-01
+//  GAME NUMBER: 834-6207 TIME SCANNER
 //  CPU: FD1089B 6J2 317-0024
 //
 //  BOARD: SYSTEM 16B
@@ -3941,13 +3925,6 @@ void segas16a_state::init_passsht16a()
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::passsht16a_custom_io_r), this);
 }
 
-void segas16a_state::init_quartet()
-{
-	init_generic();
-	m_i8751_vblank_hook = i8751_sim_delegate(&segas16a_state::quartet_i8751_sim, this);
-}
-
-
 void segas16a_state::init_sdi()
 {
 	init_generic();
@@ -3974,9 +3951,8 @@ GAME( 1986, dumpmtmt,   bodyslam, system16a_i8751,          bodyslam,        seg
 
 GAME( 1985, mjleague,   0,        system16a,                mjleague,        segas16a_state,            init_mjleague,    ROT270, "Sega", "Major League", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, quartet,    0,        system16a_i8751,          quartet,         segas16a_state,            init_quartet,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-
-GAME( 1986, quarteta,   quartet,  system16a_i8751,          quartet,         segas16a_state,            init_quartet,     ROT0,   "Sega", "Quartet (8751 315-5194)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quartet,    0,        system16a_i8751,          quartet,         segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quarteta,   quartet,  system16a_i8751,          quartet,         segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet (8751 315-5194)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, quartet2,   quartet,  system16a_i8751,          quart2,          segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet 2 (8751 317-0010)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, quartet2a,  quartet,  system16a,                quart2,          segas16a_state,            init_generic,     ROT0,   "Sega", "Quartet 2 (unprotected)", MACHINE_SUPPORTS_SAVE )
 

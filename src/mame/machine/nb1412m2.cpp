@@ -204,7 +204,7 @@ void nb1412m2_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 			break;
 		default:
-			assert_always(false, "Unknown id in nb1412m2_device::device_timer");
+			throw emu_fatalerror("Unknown id in nb1412m2_device::device_timer");
 	}
 }
 

@@ -69,8 +69,6 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(mainflag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
 	void firefox(machine_config &config);
 
 private:
@@ -330,16 +328,6 @@ WRITE8_MEMBER(firefox_state::firefox_objram_bank_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(firefox_state::mainflag_r)
-{
-	return m_soundlatch->pending_r() ? 1 : 0;
-}
-
-CUSTOM_INPUT_MEMBER(firefox_state::soundflag_r)
-{
-	return m_soundlatch2->pending_r() ? 1 : 0;
-}
-
 WRITE_LINE_MEMBER(firefox_state::sound_reset_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
@@ -540,8 +528,8 @@ static INPUT_PORTS_START( firefox )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("rdin1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firefox_state,mainflag_r, nullptr)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firefox_state,soundflag_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch2", generic_latch_8_device, pending_r)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )

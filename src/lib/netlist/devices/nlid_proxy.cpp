@@ -126,7 +126,7 @@ namespace netlist
 		else
 		{
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
-			if (setup().is_validation())
+			if (setup().is_extended_validation())
 			{
 				// During validation, don't connect to terminals found
 				// This will cause terminals not connected to a rail net to

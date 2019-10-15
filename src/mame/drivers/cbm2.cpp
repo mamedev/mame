@@ -2367,10 +2367,8 @@ void p500_state::p500_ntsc(machine_config &config)
 	_128k(config);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop");
-	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop").set_filter("NTSC");
 }
 
 
@@ -2500,10 +2498,8 @@ void p500_state::p500_pal(machine_config &config)
 	_128k(config);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop");
-	subdevice<software_list_device>("cart_list")->set_filter("PAL");
-	subdevice<software_list_device>("flop_list")->set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("PAL");
+	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop").set_filter("PAL");
 }
 
 
@@ -2629,10 +2625,8 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(cbm2_state::quickload_cbmb), this);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("cbm2_flop");
-	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list").set_original("cbm2_flop").set_filter("NTSC");
 }
 
 

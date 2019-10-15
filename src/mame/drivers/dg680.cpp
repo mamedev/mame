@@ -191,9 +191,9 @@ void dg680_state::dg680_io(address_map &map)
 	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x04, 0x07).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x08, 0x08).rw(FUNC(dg680_state::port08_r), FUNC(dg680_state::port08_w)); //SWP Control and Status
-	//AM_RANGE(0x09,0x09) parallel input port
+	//map(0x09,0x09) parallel input port
 	// Optional AM9519 Programmable Interrupt Controller (port c = data, port d = control)
-	//AM_RANGE(0x0c,0x0d) AM_DEVREADWRITE("am9519", am9519_device, read, write)
+	//map(0x0c,0x0d).rw("am9519", FUNC(am9519_device::read), FUNC(am9519_device::write));
 }
 
 void dg680_state::machine_reset()

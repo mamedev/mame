@@ -125,7 +125,7 @@ void sagitta180_state::maincpu_map(address_map &map)
 {
 	map.global_mask(0xffff);
 	map(0x0000, 0x07ff).rom();
-//  AM_RANGE(0x0800, 0x17ff) AM_ROM
+//  map(0x0800, 0x17ff).rom();
 	map(0x1800, 0xffff).ram();
 }
 

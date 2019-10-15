@@ -685,7 +685,7 @@ INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
 void cntsteer_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-//  AM_RANGE(0x1000, 0x1000) AM_WRITE(nmiack_w)
+//  map(0x1000, 0x1000).w(FUNC(cntsteer_state::nmiack_w));
 	map(0x2000, 0x2000).w("ay1", FUNC(ym2149_device::data_w));
 	map(0x4000, 0x4000).w("ay1", FUNC(ym2149_device::address_w));
 	map(0x6000, 0x6000).w("ay2", FUNC(ym2149_device::data_w));

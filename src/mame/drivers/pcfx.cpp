@@ -99,7 +99,7 @@ WRITE8_MEMBER(pcfx_state::extio_w)
 void pcfx_state::pcfx_mem(address_map &map)
 {
 	map(0x00000000, 0x001FFFFF).ram();   /* RAM */
-//  AM_RANGE( 0x80000000, 0x807FFFFF ) AM_READWRITE8(extio_r,extio_w,0xffffffff)    /* EXTIO */
+//  map(0x80000000, 0x807FFFFF).rw(FUNC(pcfx_state::extio_r), FUNC(pcfx_state::extio_w));    /* EXTIO */
 	map(0xE0000000, 0xE7FFFFFF).noprw();   /* BackUp RAM */
 	map(0xE8000000, 0xE9FFFFFF).noprw();   /* Extended BackUp RAM */
 	map(0xF8000000, 0xF8000007).noprw();   /* PIO */
@@ -145,7 +145,7 @@ void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		pad_func(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in pcfx_state::device_timer");
+		throw emu_fatalerror("Unknown id in pcfx_state::device_timer");
 	}
 }
 
@@ -200,7 +200,7 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000C80, 0x00000C83).noprw();
 	map(0x00000E00, 0x00000EFF).rw(FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
 	map(0x00000F00, 0x00000FFF).noprw();
-//  AM_RANGE( 0x00600000, 0x006FFFFF ) AM_READ(scsi_ctrl_r)
+//  map(0x00600000, 0x006FFFFF).r(FUNC(pcfx_state::scsi_ctrl_r));
 	map(0x00780000, 0x007FFFFF).rom().region("scsi_rom", 0);
 	map(0x80500000, 0x805000FF).noprw();   /* HuC6273 */
 }

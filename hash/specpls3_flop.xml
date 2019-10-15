@@ -9,7 +9,7 @@
 
 	<!-- SPS / CAPS Releases -->
 
-	<software name="aforce" >
+	<software name="aforce">
 		<!-- SPS (CAPS) release 3500 -->
 		<description>Action Force - International Heroes</description>
 		<year>1987</year>
@@ -4502,7 +4502,7 @@
 
 <!-- From "Sinclair ZX Spectrum - Compilations - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="heroes00">
-		<description>Heroes - </description>
+		<description>Heroes</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
 		<part name="flop1" interface="floppy_3">

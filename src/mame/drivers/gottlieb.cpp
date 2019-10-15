@@ -277,12 +277,10 @@ void gottlieb_state::machine_reset()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
+template <int N>
+CUSTOM_INPUT_MEMBER(gottlieb_state::track_delta_r)
 {
-	const char *string = (const char *)param;
-	int which = string[0] - '0';
-
-	return ioport(&string[1])->read() - m_track[which];
+	return (N ? m_track_y : m_track_x)->read() - m_track[N];
 }
 
 
@@ -709,7 +707,7 @@ void gottlieb_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		nmi_clear(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in gottlieb_state::device_timer");
+		throw emu_fatalerror("Unknown id in gottlieb_state::device_timer");
 	}
 }
 
@@ -759,7 +757,7 @@ void gottlieb_state::reactor_map(address_map &map)
 	map(0x2000, 0x20ff).mirror(0x0f00).writeonly().share("spriteram");                           /* FRSEL */
 	map(0x3000, 0x33ff).mirror(0x0c00).ram().w(FUNC(gottlieb_state::videoram_w)).share("videoram");       /* BRSEL */
 	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share("charram");               /* BOJRSEL1 */
-/*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */                                                               /* BOJRSEL2 */
+//  map(0x5000, 0x5fff).w(FUNC(gottlieb_state::));                                                   /* BOJRSEL2 */
 	map(0x6000, 0x601f).mirror(0x0fe0).w(FUNC(gottlieb_state::palette_w)).share("paletteram");       /* COLSEL */
 	map(0x7000, 0x7000).mirror(0x0ff8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7001, 0x7001).mirror(0x0ff8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
@@ -788,7 +786,7 @@ void gottlieb_state::gottlieb_map(address_map &map)
 	map(0x5801, 0x5801).mirror(0x07f8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
 	map(0x5802, 0x5802).mirror(0x07f8).w(FUNC(gottlieb_state::sound_w));                                  /* OP20-27 */
 	map(0x5803, 0x5803).mirror(0x07f8).w(FUNC(gottlieb_state::general_output_w));                               /* OP30-37 */
-/*  AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE()*/                                              /* OP40-47 */
+//  map(0x5804, 0x5804).mirror(0x07f8).w(FUNC(gottlieb_state::));                                            /* OP40-47 */
 	map(0x5800, 0x5800).mirror(0x07f8).portr("DSW");
 	map(0x5801, 0x5801).mirror(0x07f8).portr("IN1");                                      /* IP10-17 */
 	map(0x5802, 0x5802).mirror(0x07f8).portr("IN2");                                      /* trackball H */
@@ -837,10 +835,10 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT ( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")   /* trackball H */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<0>)
 
 	PORT_START("IN3")   /* trackball V */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<1>)
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -1048,10 +1046,10 @@ static INPUT_PORTS_START( argusg )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")   /* trackball H */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<0>)
 
 	PORT_START("IN3")   /* trackball V */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<1>)
 
 /* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
 	PORT_START("IN4")
@@ -1105,7 +1103,7 @@ static INPUT_PORTS_START( mplanets )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* trackball V (dial) */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<1>)
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1584,7 +1582,7 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN4")   /* joystick inputs */
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,stooges_joystick_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, stooges_joystick_r)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -1696,7 +1694,7 @@ static INPUT_PORTS_START( wizwarz )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* trackball V is a dial input */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<1>)
 
 	PORT_START("IN4")   /* ? */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY

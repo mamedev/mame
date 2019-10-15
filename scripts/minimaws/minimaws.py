@@ -26,6 +26,12 @@
 ## $ python minimaws.py listclones "unkch*"
 ## $ python minimaws.py listbrothers superx
 ##
+## The romident command does not support archives or software lists, but
+## it's far faster than using MAME as it has optimised indexes, and
+## results are grouped by machine rather than by file:
+##
+## $ python minimaws.py romident 27c64.bin dump-dir
+##
 ## One more sophisticated query command is provided that MAME has no
 ## equivalent for.  The listaffected command shows all runnable machines
 ## that reference devices defined in specified source files:
@@ -72,15 +78,9 @@
 ## and see dependent slots update.  Required command-line arguments to
 ## produce the selected configuration are also displayed.
 
-import lib.auxverbs
-import lib.lxparse
-import lib.wsgiserve
-
-import argparse
-import sys
-
-
 if __name__ == '__main__':
+    import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--database', metavar='<dbfile>', default='minimaws.sqlite3', help='SQLite 3 info database file (defaults to minimaws.sqlite3)')
     subparsers = parser.add_subparsers(title='commands', dest='command', metavar='<command>')
@@ -100,6 +100,9 @@ if __name__ == '__main__':
     subparser = subparsers.add_parser('listaffected', help='show drivers affected by source change(s)')
     subparser.add_argument('pattern', nargs='+', metavar='<pat>', help='source file glob pattern')
 
+    subparser = subparsers.add_parser('romident', help='identify ROM dump(s)')
+    subparser.add_argument('path', nargs='+', metavar='<path>', help='ROM dump file/directory path')
+
     subparser = subparsers.add_parser('serve', help='serve over HTTP')
     subparser.add_argument('--port', metavar='<port>', default=8080, type=int, help='server TCP port')
     subparser.add_argument('--host', metavar='<host>', default='', help='server TCP hostname')
@@ -110,6 +113,8 @@ if __name__ == '__main__':
     group.add_argument('--file', metavar='<xmlfile>', help='XML machine information file')
 
     options = parser.parse_args()
+
+    import lib.auxverbs
     if options.command == 'listfull':
         lib.auxverbs.do_listfull(options)
     elif options.command == 'listsource':
@@ -120,7 +125,17 @@ if __name__ == '__main__':
         lib.auxverbs.do_listbrothers(options)
     elif options.command == 'listaffected':
         lib.auxverbs.do_listaffected(options)
+    elif options.command == 'romident':
+        lib.auxverbs.do_romident(options)
     elif options.command == 'serve':
-        lib.wsgiserve.run_server(options)
+        import wsgiref.simple_server
+        import lib.wsgiserve
+        application = lib.wsgiserve.MiniMawsApp(options.database)
+        server = wsgiref.simple_server.make_server(options.host, options.port, application)
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
     elif options.command == 'load':
+        import lib.lxparse
         lib.lxparse.load_info(options)

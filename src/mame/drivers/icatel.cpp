@@ -99,7 +99,7 @@ void icatel_state::i80c31_io(address_map &map)
 
 void icatel_state::i80c31_data(address_map &map)
 {
-//  AM_RANGE(0x0056,0x005A) AM_READ(magic_string) /* This is a hack! */
+//  map(0x0056,0x005A).r(FUNC(icatel_state::magic_string)); /* This is a hack! */
 }
 
 void icatel_state::init_icatel()

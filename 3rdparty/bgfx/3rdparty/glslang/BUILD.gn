@@ -37,6 +37,8 @@ spirv_tools_dir = glslang_spirv_tools_dir
 
 config("glslang_public") {
   include_dirs = [ "." ]
+
+  defines = [ "ENABLE_HLSL=1" ]
 }
 
 source_set("glslang_sources") {
@@ -58,6 +60,8 @@ source_set("glslang_sources") {
     "SPIRV/SpvBuilder.cpp",
     "SPIRV/SpvBuilder.h",
     "SPIRV/SpvPostProcess.cpp",
+    "SPIRV/SpvTools.cpp",
+    "SPIRV/SpvTools.h",
     "SPIRV/bitutils.h",
     "SPIRV/disassemble.cpp",
     "SPIRV/disassemble.h",
@@ -104,7 +108,6 @@ source_set("glslang_sources") {
     "glslang/MachineIndependent/attribute.cpp",
     "glslang/MachineIndependent/attribute.h",
     "glslang/MachineIndependent/gl_types.h",
-    "glslang/MachineIndependent/glslang.y",
     "glslang/MachineIndependent/glslang_tab.cpp",
     "glslang/MachineIndependent/glslang_tab.cpp.h",
     "glslang/MachineIndependent/intermOut.cpp",
@@ -128,9 +131,25 @@ source_set("glslang_sources") {
     "glslang/MachineIndependent/reflection.h",
     "glslang/OSDependent/osinclude.h",
     "glslang/Public/ShaderLang.h",
+    "hlsl/hlslAttributes.cpp",
+    "hlsl/hlslAttributes.h",
+    "hlsl/hlslGrammar.cpp",
+    "hlsl/hlslGrammar.h",
+    "hlsl/hlslOpMap.cpp",
+    "hlsl/hlslOpMap.h",
+    "hlsl/hlslParseHelper.cpp",
+    "hlsl/hlslParseHelper.h",
+    "hlsl/hlslParseables.cpp",
+    "hlsl/hlslParseables.h",
+    "hlsl/hlslScanContext.cpp",
+    "hlsl/hlslScanContext.h",
+    "hlsl/hlslTokenStream.cpp",
+    "hlsl/hlslTokenStream.h",
+    "hlsl/hlslTokens.h",
   ]
 
-  defines = []
+  defines = [ "ENABLE_OPT=1" ]
+
   if (is_win) {
     sources += [ "glslang/OSDependent/Windows/ossource.cpp" ]
     defines += [ "GLSLANG_OSINCLUDE_WIN32" ]
@@ -141,13 +160,61 @@ source_set("glslang_sources") {
 
   if (is_clang) {
     cflags_cc = [
-      "-Wno-implicit-fallthrough",
+      "-Wno-extra-semi",
       "-Wno-ignored-qualifiers",
+      "-Wno-implicit-fallthrough",
+      "-Wno-inconsistent-missing-override",
+      "-Wno-sign-compare",
       "-Wno-unused-variable",
+      "-Wno-missing-field-initializers",
+      "-Wno-newline-eof",
+    ]
+  }
+  if (is_win && !is_clang) {
+    cflags = [
+      "/wd4018",  # signed/unsigned mismatch
+      "/wd4189",  # local variable is initialized but not referenced
     ]
   }
 
   deps = [
     "${spirv_tools_dir}:spvtools_opt",
+    "${spirv_tools_dir}:spvtools_val",
+  ]
+}
+
+source_set("glslang_default_resource_limits_sources") {
+  sources = [
+    "StandAlone/ResourceLimits.cpp",
+    "StandAlone/ResourceLimits.h",
+  ]
+  deps = [
+    ":glslang_sources",
+  ]
+  public_configs = [ ":glslang_public" ]
+}
+
+executable("glslang_validator") {
+  sources = [
+    "StandAlone/DirStackFileIncluder.h",
+    "StandAlone/StandAlone.cpp",
+  ]
+  if (!is_win) {
+    cflags = [ "-Woverflow" ]
+  }
+  defines = [ "ENABLE_OPT=1" ]
+  deps = [
+    ":glslang_default_resource_limits_sources",
+    ":glslang_sources",
+  ]
+}
+
+executable("spirv-remap") {
+  sources = [
+    "StandAlone/spirv-remap.cpp",
+  ]
+  defines = [ "ENABLE_OPT=1" ]
+  deps = [
+    ":glslang_sources",
   ]
 }

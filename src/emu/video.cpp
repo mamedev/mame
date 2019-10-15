@@ -166,16 +166,7 @@ video_manager::video_manager(running_machine &machine)
 	// extract snap resolution if present
 	if (sscanf(machine.options().snap_size(), "%dx%d", &m_snap_width, &m_snap_height) != 2)
 		m_snap_width = m_snap_height = 0;
-
-	// start recording movie if specified
-	const char *filename = machine.options().mng_write();
-	if (filename[0] != 0)
-		begin_recording(filename, MF_MNG);
-
-	filename = machine.options().avi_write();
-	if (filename[0] != 0)
-		begin_recording(filename, MF_AVI);
-
+	
 	// if no screens, create a periodic timer to drive updates
 	if (no_screens)
 	{
@@ -808,7 +799,7 @@ int video_manager::effective_frameskip() const
 inline bool video_manager::effective_throttle() const
 {
 	// if we're paused, or if the UI is active, we always throttle
-	if (machine().paused()) //|| machine().ui().is_menu_active())
+	if (machine().paused() && !machine().options().update_in_pause()) //|| machine().ui().is_menu_active())
 		return true;
 
 	// if we're fast forwarding, we don't throttle

@@ -303,7 +303,7 @@ WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
 void kron180_state::kron180(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'288'000));
+	HD64180RP(config, m_maincpu, XTAL(12'288'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &kron180_state::kron180_mem);
 	m_maincpu->set_addrmap(AS_IO, &kron180_state::kron180_iomap);
 

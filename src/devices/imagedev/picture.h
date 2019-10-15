@@ -19,7 +19,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> microdrive_image_device
+// ======================> picture_image_device
 
 class picture_image_device : public device_t,
 								public device_image_interface

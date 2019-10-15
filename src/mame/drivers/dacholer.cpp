@@ -62,7 +62,7 @@ public:
 	void itaten(machine_config &config);
 	void dacholer(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
+	DECLARE_READ_LINE_MEMBER(snd_ack_r);
 
 private:
 	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
@@ -302,7 +302,7 @@ WRITE8_MEMBER(dacholer_state::snd_ack_w)
 	m_snd_ack = data;
 }
 
-CUSTOM_INPUT_MEMBER(dacholer_state::snd_ack_r)
+READ_LINE_MEMBER(dacholer_state::snd_ack_r)
 {
 	return m_snd_ack;       //guess ...
 }
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dacholer_state,snd_ack_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dacholer_state, snd_ack_r)
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* table at 0x0a9c */

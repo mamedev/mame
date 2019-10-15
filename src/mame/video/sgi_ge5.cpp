@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
+// thanks-to:Happy
 
 /*
  * Silicon Graphics GE5 and HQ1 devices.
@@ -10,11 +11,14 @@
  * communication.
  *
  * The undocumented HQ1 microcode instruction format is relatively well decoded
- * now, but the exact timing and function of many operations remains incomplete.
+ * now, but the exact timing and function of some operations remains unknown.
  *
  * TODO:
- *   - skeleton only
- *
+ *   - implement host dma
+ *   - verify some operations
+ *   - implement single stepping
+ *   - redo disassembly
+ *   - save state
  */
 
 #include "emu.h"
@@ -22,9 +26,106 @@
 #include "sgi_ge5.h"
 
 #define LOG_GENERAL   (1U << 0)
+#define LOG_TOKEN     (1U << 1)
+#define LOG_MEMORY    (1U << 2)
+#define LOG_DMA       (1U << 3)
 
 //#define VERBOSE       (LOG_GENERAL)
 #include "logmacro.h"
+
+static char const *const token_diag[] =
+{
+	"DIAG_DATA",          "DIAG_INIT",          "DIAG_DRAMTEST",      "DIAG_DMA_IG",
+	"DIAG_DMA_IB",        "DIAG_DMA_GB",        "DIAG_CHARPOS",       "DIAG_WRITEFULLPIX",
+	"DIAG_DRAWLINE",      "DIAG_DK3_FIFO",      "DIAG_DK3_FINFLGS",   "DIAG_DRAW4SPANS",
+	"DIAG_DRAWFLATSPAN",  "DIAG_DRAWSPAN",      "DIAG_LIFECHECK",     "DIAG_LOADRE",
+	"DIAG_READPIXDMA",    "DIAG_READPIXELS",    "DIAG_SCREENCLEAR",   "DIAG_WRITEPIXDMA",
+	"DIAG_FASTCLEAR20",   "DIAG_DRAWCHAR",      "DIAG_STRINGINIT",    "DIAG_STRINGEND",
+	"DIAG_FASTCHAR",      "DIAG_DRAWLONGSPANS", nullptr,              nullptr,
+
+	// turbo option
+	nullptr,              nullptr,              "DIAG_DSPLOAD",       "DIAG_DSPRAMDATA",
+	"DIAG_DSPRAMADDR",    "DIAG_DSPFIFO",       "DIAG_DSPSPAN",       "DIAG_DSPRD",
+	"DIAG_DSPWR",         "DIAG_DSPINTRAM",     "DIAG_DSPSCOPE",      "DIAG_RESCOPE",
+};
+
+static char const *const token_puc[] =
+{
+	"PUC_DATA",           "PUC_INIT",           nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              "PUC_COLOR",          "PUC_FINISH",
+	"PUC_PNT2I",          "PUC_RECTI2D",        "PUC_CMOV2I",         "PUC_DRAWCHAR",
+	"PUC_HAND",           "PUC_FBOPT",          "PUC_ZBOPT",          "PUC_TOPSCAN",
+	"DIAG_READPIXELS",    "DIAG_WRITEFULLPIX",  "DIAG_LOADRE",        "DIAG_CHARPOS",
+};
+
+static char const *const token_gl[] =
+{
+	"GE_DATA",            "GE_INIT",            nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              "GE_COLOR",           "GE_FINISH0",
+	"GE_PNT2I",           "GE_SBOXI",           "GE_CMOV2I",          "GE_DRAWCHAR",
+	"GE_HAND",            "GE_FBOPT",           "GE_ZBOPT",           "GE_TOPSCAN",
+	"GE_READPIXELS",      "GE_WRITEPIXELS",     "GE_LOADRE",          "GE_GETCPOS",
+	"GE_PICKMODE",        "GE_PIXTYPE",         "GE_PIXWRITEMASK",    "GE_POPNAME",
+	"GE_PUSHNAME",        "GE_READBLOCK",       "GE_RECTREAD",        "GE_READBUF",
+	"GE_READPIXDMA",      "GE_AUXWRITEMASK",    "GE_READRGB",         "GE_RECTCOPY",
+	"GE_RGBCOLOR",        "GE_RGBSHADERANGE",   "GE_RWMODE",          "GE_SCREENCLEAR",
+	"GE_SHADEMODEL",      "GE_SHADERANGE",      "GE_WRITEBLOCK",      "GE_RECTWRITE",
+	"GE_WRITEPIXDMA",     "GE_BEGINBBOX",       "GE_ZBUFFER",         "GE_ZCLEAR",
+	"GE_ZOOMFACTOR",      "GE_READSOURCE",      "GE_DRAWMODE",        "GE_CZCLEAR",
+	"GE_HQMSAV",          "GE_ZFUNCTION",       "GE_SETPIECES",       "GE_FLATMODE",
+	"GE_LMCOLOR",         "GE_LOADAMBIENT",     "GE_DEPTHFN",         "GE_LOADDIFFUSE",
+	"GE_LOADMATRIX",      "GE_MULTMATRIX",      "GE_PUSHMATRIX",      "GE_POPMATRIX",
+	"GE_LOADSPECULAR",    "GE_LOADEMISSION",    "GE_LOADASUM",        "GE_LOADLCOLOR",
+	nullptr,              nullptr,              "GE_CURVEIT",         "GE_LOADVIEWP",
+	"GE_POLYGON",         "GE_ENDPOLYGON",      "GE_TRANSLATEI",      "GE_TRANSLATE",
+	"GE_LINESTYLE",       "GE_LINEWIDTH",       "GE_VERTEX2I",        "GE_VERTEX2",
+	"GE_VERTEX3I",        "GE_VERTEX3",         "GE_VERTEX4I",        "GE_VERTEX4",
+	"GE_RVERTEX2I",       "GE_RVERTEX2",        "GE_RVERTEX3I",       "GE_RVERTEX3",
+	"GE_CLOSEDLINE",      "GE_ENDCLOSEDLINE",   "GE_LSREPEAT",        "GE_ANTIALIAS",
+	"GE_COLORF",          "GE_PNT2",            "GE_PNT3I",           "GE_PNT3",
+	"GE_PNT4I",           "GE_PNT4",            nullptr,              nullptr,
+	"GE_MOVE2I",          "GE_MOVE2",           "GE_MOVE3I",          "GE_MOVE3",
+	"GE_MOVE4I",          "GE_MOVE4",           "GE_RMOVE2I",         "GE_RMOVE2",
+	"GE_RMOVE3I",         "GE_RMOVE3",          "GE_DRAW2I",          "GE_DRAW2",
+	"GE_DRAW3I",          "GE_DRAW3",           "GE_DRAW4I",          "GE_DRAW4",
+	"GE_RDRAW2I",         "GE_RDRAW2",          "GE_RDRAW3I",         "GE_RDRAW3",
+	"GE_ENABLWID",        "GE_LOADGE",          nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              "GE_FRONTFACE",       "GE_BACKFACE",        "GE_CONCAVE",
+	"GE_PATTERN",         "GE_SETPATTERN",      "GE_LOADNORMAL",      "GE_MULTNORMAL",
+	"GE_INITSTACK",       "GE_MMODE",           "GE_NORMAL",          "GE_ABNORMAL",
+	"GE_LIGHTATTR1",      "GE_LIGHTATTR2",      "GE_LIGHTATTR3",      "GE_BINDLIGHT",
+	"GE_LIGHTDATA4",      "GE_LIGHTMEMPTR",     "GE_LIGHTDIRECTION",  "GE_LIGHTPOSITION",
+	"GE_LIGHTMOVEDATA",   "GE_BEGINMESH",       "GE_ENDMESH",         "GE_SWAPMESH",
+	"GE_SBOXF",           "GE_SBOXFI",          "GE_FATPOLY",         "GE_ENDOLDPOLYGON",
+	"GE_SBOX",            "GE_CURRENTWID",      nullptr,              nullptr,
+	"GE_DEPTHCUE",        "GE_CMOV2",           "GE_CMOV3I",          "GE_CMOV3",
+	"GE_CMOV4I",          "GE_CMOV4",           "GE_ENABDITH",        "GE_ENABWID",
+	nullptr,              nullptr,              "GE_SETMATRIX",       "GE_COMPOSEMATRIX",
+	"GE_LOADTOPMATRIX",   "GE_COPYMATRIX",      "GE_FEEDBACK",        "GE_ENDFEEDBACK",
+	"GE_PASSTHROUGH",     "GE_FMOVE",           "GE_FDRAW",           "GE_FLINE",
+	"GE_SCRMASK",         "GE_ZSOURCE",         "GE_SUBPIXEL",        "GE_SMOOTHPOINT",
+	"GE_RASTEROP",        "GE_RESETLS",         nullptr,              nullptr,
+	nullptr,              nullptr,              "GE_SETSURFSCALE",    "GE_SETV",
+	"GE_PUSHV",           "GE_SURFP1",          "GE_SURFNTURF",       "GE_SETVHI",
+	"GE_STRIP",           "GE_1LOAD1",          "GE_1LOAD3",          "GE_1LOAD4",
+	"GE_SURFMODE",        "GE_DSPRD",           "GE_DSPWR",           "GE_DSPNEXT",
+	"GE_DSPDUMMY",        "GE_PICKTYPE",        "GE_VERSION",         "GE_ENDBBOX",
+	"GE_ENDPICKMODE",     "GE_INITNAMES",       "GE_LOADNAME",        nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	"GE_CTX0",            nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              nullptr,
+	nullptr,              nullptr,              nullptr,              "GE_CTX1",
+};
 
 DEFINE_DEVICE_TYPE(SGI_GE5, sgi_ge5_device, "ge5", "SGI Geometry Engine 5")
 
@@ -40,15 +141,13 @@ sgi_ge5_device::sgi_ge5_device(machine_config const &mconfig, char const *tag, d
 	, m_re_w(*this)
 	, m_icount(0)
 {
-	(void)m_dma_count;
 }
 
 void sgi_ge5_device::device_add_mconfig(machine_config &config)
 {
 	WTL3132(config, m_fpu, clock());
-	m_fpu->out_fpcn().set([this](int state) { m_fpu_c = state; });
-	m_fpu->out_zero().set([this](int state) { m_fpu_z = state; });
-	m_fpu->out_port_x().set([this](u32 data) { m_bus = data; LOG("m_bus = %x\n", data); });
+	m_fpu->out_fpcn().set([this](int state) { m_fpu_c = bool(state); });
+	m_fpu->out_port_x().set([this](u32 data) { m_fpu_data = data; });
 }
 
 
@@ -77,33 +176,34 @@ void sgi_ge5_device::device_start()
 
 	state_add(1, "MEMPTR", m_memptr).formatstr("%04X");
 	state_add(2, "REPTR",  m_reptr).formatstr("%04X");
+	state_add(3, "BUS",    m_bus).formatstr("%08X");
+	state_add(4, "DMACNT", m_dma_count).formatstr("%04X");
+
+	m_fpu->state_add(*this, 5);
 
 	set_icountptr(m_icount);
 }
 
 void sgi_ge5_device::device_reset()
 {
+	m_pc = 0;
+	m_sp = 0;
 	m_reptr = 0;
 	m_memptr = 0;
+	m_memptr_temp = 0;
 
-	m_sp = 0;
+	set_int(false);
 
-	if (m_int_state)
-	{
-		m_int_state = 0;
-		m_int_cb(m_int_state);
-	}
-
+	m_state = DECODE;
 	suspend(SUSPEND_REASON_HALT, false);
-	LOG("stalled\n");
 }
 
 device_memory_interface::space_config_vector sgi_ge5_device::memory_space_config() const
 {
 	return space_config_vector
 	{
-		std::make_pair(AS_PROGRAM, &m_code_config),
-		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(0, &m_code_config),
+		std::make_pair(1, &m_data_config),
 	};
 }
 
@@ -112,258 +212,371 @@ std::unique_ptr<util::disasm_interface> sgi_ge5_device::create_disassembler()
 	return std::make_unique<sgi_ge5_disassembler>();
 }
 
-enum cx_mask : u8
-{
-	INCMEM = 0x08, // increment memptr
-	FIELD2 = 0x10, // second field active
-	INCRE  = 0x20, // increment reptr
-	SRC    = 0xc0, // data bus source
-	DST    = 0x06, // data bus source
-	STALL  = 0x01,
-};
-
 void sgi_ge5_device::execute_run()
 {
-	if (m_fetch)
-	{
-		// stall if fifo empty
-		if (m_fifo_empty())
-		{
-			suspend(SUSPEND_REASON_HALT, false);
-			return;
-		}
-
-		// fetch from fifo and set pc
-		u64 data = m_fifo_read();
-		m_bus = u32(data);
-		m_pc = (data >> 31) & 0x1fe;
-		m_fetch = false;
-	}
-
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(m_pc);
-
-		u64 const insn = space(AS_PROGRAM).read_qword(m_pc);
-		LOG("pc 0x%04x code 0x%011x\n", m_pc, insn);
-
-		u8 const hq1_op = (insn >> 32) & 0xff;
-		unsigned const src = (hq1_op & SRC) >> 6;
-		unsigned const dst = (hq1_op & DST) >> 1;
-		bool const stall = (hq1_op & STALL);
-		if (hq1_op & FIELD2)
-			LOG("hq1 op 0x%02x src %d dst %d stall %d branch %d\n", hq1_op, src, dst, stall, (insn >> 29) & 7);
-		else
-			LOG("hq1 op 0x%02x src %d dst %d stall %d\n", hq1_op, src, dst, stall);
-
-		// stall when fifo empty and reading from fifo or stall flag
-		if (((src == 1) || stall) && m_fifo_empty())
+		switch (m_state)
 		{
-			// enter fetch mode if destination is fetch
-			m_fetch = (dst == 1);
-			LOG(m_fetch ? "FETCH\n" : "STALL\n");
-			suspend(SUSPEND_REASON_HALT, false);
-			m_icount = 0;
-			continue;
-		}
+		case DECODE:
+			debugger_instruction_hook(m_pc);
 
-		u16 branch = 0;
-		if (hq1_op & FIELD2)
-		{
-			// handle field2
-			u64 const field2 = space(AS_PROGRAM).read_qword(++m_pc);
-			u16 const immediate = (field2 >> 19) & 0x7fff;
+			// decode instruction
+			decode();
 
-			LOG("pc 0x%04x pref 0x%011x immediate 0x%04x\n", m_pc, field2, immediate);
+			// execute secondary operation
+			if (m_decode.secondary)
+				secondary();
 
-			switch ((field2 >> 32) & 0xfc)
+			// increment memptr
+			if (m_decode.inc_memptr)
+				m_memptr = (m_memptr + 1) & 0x7fff;
+
+			// increment reptr
+			if (m_decode.inc_reptr)
+				m_reptr = (m_reptr + 1) & 0x3f;
+
+			// update pc to next sequential instruction
+			m_pc += m_decode.secondary ? 2 : 1;
+			m_state = READ;
+			break;
+
+		case READ:
+			m_state = CONTROL;
+
+			// fetch source
+			switch (m_decode.source)
 			{
-			case 0x8c:
-				m_reptr = m_bus;
-				LOG("REPTR=0x%04x\n", m_reptr);
-				break;
-			case 0x9c:
-				m_reptr = immediate;
-				LOG("REPTR=0x%04x\n", m_reptr);
-				break;
-			case 0xb0:
-				m_memptr = m_bus;
-				branch = immediate;
-				LOG("MEMPTR=0x%04x BRANCH=0x%04x\n", m_memptr, branch);
-				break;
-			case 0xb4:
-				m_memptr = immediate;
-				LOG("MEMPTR=0x%04x\n", m_memptr);
-				break;
-			case 0xb8:
-				m_memptr_temp = immediate;
-				LOG("MEMPTR_TMP=0x%04x\n", m_memptr_temp);
-				break;
-			case 0xbc:
-				branch = immediate;
-				LOG("BRANCH=0x%04x\n", branch);
-				break;
-			case 0xfc: // also clear interrupt?
-				if (!m_int_state)
+			case 0: // reptr
+				if (m_reptr == 0x20 && !m_re_drq)
 				{
-					LOG("ge interrupt asserted\n");
-					m_int_state = 1;
-					m_int_cb(m_int_state);
+					// re read stall
+					m_state = READ;
+					m_icount = 0;
 				}
+				else
+					m_bus = m_re_r(m_reptr);
 				break;
-			//case 0xfe: // set dma count?
-			default:
-				LOG("unknown pref 0x%02x\n", (field2 >> 32) & 0xfc);
+			case 1: // fifo
+				if (m_fifo_empty())
+				{
+					// fifo read stall
+					m_state = READ;
+					m_icount = 0;
+					suspend(SUSPEND_REASON_TRIGGER, false);
+				}
+				else
+					m_bus = m_fifo_read();
+				break;
+			case 2: // memptr
+				m_bus = space(1).read_dword(m_memptr);
+				break;
+			case 3: // fpu
+				m_decode.fpu |= (2ULL << wtl3132_device::S_IOCT);
+				m_bus = m_fpu_data;
 				break;
 			}
-		}
-
-		// increment memptr
-		if (hq1_op & INCMEM)
-		{
-			m_memptr++;
-			LOG("MEMPTR++\n");
-		}
-
-		// increment reptr
-		if (hq1_op & INCRE)
-		{
-			m_reptr++;
-			LOG("REPTR++\n");
-		}
-
-		// xx          - source (re, fifo, ram, fpu)
-		//   x         - increment reptr
-		//    x        - field2
-		//     x       - increment memptr
-		//      xx     - destination (re, fetch, ram, fpu)
-		//        x    - stall? (if fifo empty)
-		//         xxx - branch
-
-		// 00xx xxxx -> ?
-		// 01xx xxxx -> read fifo
-		// 10xx xxxx -> read ram
-		// 11xx xxxx -> read fpu
-
-		u64 fpu_ctrl =
-			(m_cwen ? wtl3132_device::M_CWEN : 0) |
-			(2ULL << wtl3132_device::S_ENCN);
-
-		// 43 - get fifo tag
-		// 46 - get fifo data
-		// 83 - stall?
-		// generally reading the fifo causes stalls
-		// 83 also causes a stall (because can't read code from data ram?
-
-		switch (src)
-		{
-		case 0:
-			m_bus = m_re_r(m_reptr);
-			LOG("LOAD RE offset 0x%08x data 0x%08x\n", m_reptr, m_bus);
 			break;
-		case 1:
-			m_bus = m_fifo_read();
-			LOG("LOAD FIFO 0x%08x\n", m_bus);
-			break;
-		case 2:
-			m_bus = space(AS_DATA).read_dword(m_memptr);
-			LOG("LOAD MEM offset 0x%04x data 0x%08x\n", m_memptr, m_bus);
-			break;
-		case 3:
-			// tells this instruction to write to the bus in two cycles from now
-			LOG("FSTORE\n");
-			fpu_ctrl |= (2ULL << wtl3132_device::S_IOCT);
-			break;
-		}
 
-		// i/o dst
-		switch (dst)
-		{
-		case 0:
-			LOG("STORE RE offset 0x%02x data 0x%08x\n", m_reptr, m_bus);
-			m_re_w(m_reptr, m_bus);
-			break;
-		case 1: // fetch
-			if (stall)
+		case CONTROL:
+			m_state = WRITE;
+
+			switch (m_decode.control)
 			{
-				m_pc = (m_bus >> 31) & 0x1fe;
-				m_icount--;
-				// skip pc update and fpu step?
-				continue;
-			}
-			break;
-		case 2:
-			space(AS_DATA).write_dword(m_memptr, m_bus);
-			LOG("STORE MEM offset 0x%02x data 0x%08x\n", m_memptr, m_bus);
-			break;
-		case 3:
-			m_fpu->x_port_w(m_bus);
-			fpu_ctrl |= (3ULL << wtl3132_device::S_IOCT);
-			LOG("FLOAD 0x%08x\n", m_bus);
-			break;
-		}
-
-		// hq1 branch
-		if (hq1_op & FIELD2)
-		{
-			switch ((insn >> 29) & 7)
-			{
-			case 0: m_pc++; break;
-			case 1:
-				m_pc = branch;
-				LOG("J 0x%04x\n", m_pc);
+			case 0x0: // sequential execution
 				break;
-			case 2:
-				if (m_fpu_c)
-				{
-					m_pc = branch;
-					LOG("JC 0x%04x\n", m_pc);
-				}
+			case 0x1: // unconditional branch
+				m_pc = m_decode.immediate;
 				break;
-			case 3:
-				if (!m_fpu_c)
-				{
-					m_pc = branch;
-					LOG("JNC 0x%04x\n", m_pc);
-				}
+			case 0x2: // branch fpu less than
+				if (m_fpu_c_latch)
+					m_pc = m_decode.immediate;
 				break;
-			case 4:
-				m_stack[m_sp] = m_pc + 1;
+			case 0x3: // branch fpu greater or equal
+				if (!m_fpu_c_latch)
+					m_pc = m_decode.immediate;
+				break;
+			case 0x4: // unconditional call
+				m_stack[m_sp] = m_pc;
 				m_sp = (m_sp + 1) & 7;
-				m_pc = branch;
-				LOG("CALL 0x%04x\n", m_pc);
+				m_pc = m_decode.immediate;
 				break;
-			case 5:
-				if (m_fpu_z)
+			case 0x5: // call fpu less than
+				if (m_fpu_c_latch)
 				{
-					m_pc = branch;
-					LOG("JZ 0x%04x\n", m_pc);
+					m_stack[m_sp] = m_pc;
+					m_sp = (m_sp + 1) & 7;
+					m_pc = m_decode.immediate;
 				}
 				break;
-			case 6:
-				if (!m_fpu_z)
+			case 0x6: // call fpu greater or equal
+				if (!m_fpu_c_latch)
 				{
-					m_pc = branch;
-					LOG("JNZ 0x%04x\n", m_pc);
+					m_stack[m_sp] = m_pc;
+					m_sp = (m_sp + 1) & 7;
+					m_pc = m_decode.immediate;
 				}
 				break;
-			case 7:
+			case 0x7: // return
 				m_sp = (m_sp + 7) & 7;
 				m_pc = m_stack[m_sp];
-				LOG("RET 0x%04x\n", m_pc);
+				break;
+			case 0x8: // fetch
+				m_pc = (m_bus >> 31) & 0x1fe;
+
+				debugger_exception_hook(m_bus >> 32);
+
+				if (VERBOSE & LOG_TOKEN)
+				{
+					auto const suppressor(machine().disable_side_effects());
+
+					u8 const token = m_bus >> 32;
+					char const *string = nullptr;
+
+					/*
+					 * Magic numbers stored at specific data memory locations
+					 * are used to identify specific microcode programs. Other
+					 * variations may exist but are not known at this time.
+					 */
+					if (space(1).read_dword(0x50b) == 0x004d0003)
+					{
+						if (token < ARRAY_LENGTH(token_puc))
+							string = token_puc[token];
+					}
+					else if (space(1).read_dword(0x50d) == 0x004d0005
+						|| space(1).read_dword(0x536) == 0x12345678
+						|| space(1).read_dword(0x540) == 0x12345678)
+					{
+						if (token < ARRAY_LENGTH(token_gl))
+							string = token_gl[token];
+					}
+					else if (token < ARRAY_LENGTH(token_diag))
+						string = token_diag[token];
+
+					if (string)
+						LOGMASKED(LOG_TOKEN, "fetch 0x%02x (%s)\n", token, string);
+					else
+						LOGMASKED(LOG_TOKEN, "fetch 0x%02x (unknown)\n", token);
+				}
+				else
+					LOG("fetch 0x%02x\n", m_bus >> 32);
+
+				// neutralize previous instruction writeback
+				m_fpu->neut_w(0);
+				break;
+			case 0x9: // branch indirect
+				// TODO: verify value
+				m_pc = m_bus;
+				break;
+			case 0xa: // branch less than
+				if (BIT(m_bus, 31))
+					m_pc = m_decode.immediate;
+				break;
+			case 0xb: // branch greater or equal
+				if (!BIT(m_bus, 31))
+					m_pc = m_decode.immediate;
+				break;
+			case 0xc: // stall
+				LOG("stall\n");
+				suspend(SUSPEND_REASON_HALT, false);
+				m_icount = 0;
+				break;
+			case 0xd: // call less than
+				if (BIT(m_bus, 31))
+				{
+					m_stack[m_sp] = m_pc;
+					m_sp = (m_sp + 1) & 7;
+					m_pc = m_decode.immediate;
+				}
+				break;
+			case 0xe: // call greater or equal
+				if (!BIT(m_bus, 31))
+				{
+					m_stack[m_sp] = m_pc;
+					m_sp = (m_sp + 1) & 7;
+					m_pc = m_decode.immediate;
+				}
+				break;
+			case 0xf: // dma cycle
+				if (--m_dma_count)
+					m_pc -= m_decode.secondary ? 2 : 1;
+				else
+					LOGMASKED(LOG_DMA, "dma complete\n");
 				break;
 			}
+			break;
+
+		case WRITE:
+			m_state = COMPLETE;
+
+			// store destination
+			switch (m_decode.destination)
+			{
+			case 0: // reptr
+				if (m_reptr == 0x20 && !m_re_rdy && !m_re_drq)
+				{
+					// re write stall
+					m_state = WRITE;
+					m_icount = 0;
+				}
+				else if (m_reptr > 0x20 && !m_re_rdy)
+				{
+					// re unbuffered register write stall
+					m_state = WRITE;
+					m_icount = 0;
+				}
+				else
+					m_re_w(m_reptr, m_bus);
+				break;
+			case 1: // TODO: bus?
+				break;
+			case 2: // memptr
+				space(1).write_dword(m_memptr, m_bus);
+				break;
+			case 3: // fpu
+				m_fpu->x_port_w(m_bus);
+				m_decode.fpu |= (3ULL << wtl3132_device::S_IOCT);
+				break;
+			}
+			break;
+
+		case COMPLETE:
+			m_state = DECODE;
+
+			// restore memptr
+			if (m_memptr_temp & 0x8000)
+			{
+				m_memptr = m_memptr_temp & 0x7fff;
+				m_memptr_temp = 0;
+			}
+
+			// FIXME: fpu condition has additional 1 cycle latency
+			m_fpu_c_latch = m_fpu_c;
+
+			// fpu operation
+			m_fpu->c_port_w(m_decode.fpu);
+			m_fpu->clk_w(1);
+			m_fpu->neut_w(1);
+
+			m_icount--;
+			break;
 		}
-		else
-			m_pc++;
+	}
+}
 
-		// step fpu
-		u64 const fpu = ((insn & 0x1fff'f800ULL) << 5) | ((insn & 0x0000'07ffULL) << 2);
+void sgi_ge5_device::decode()
+{
+	// fetch primary word
+	u64 const primary = space(0).read_qword(m_pc + 0);
 
-		m_fpu->c_port_w(fpu | fpu_ctrl);
-		m_fpu->clk_w(1);
+	// decode primary word
+	m_decode.source = (primary >> 38) & 3;
+	m_decode.inc_reptr = BIT(primary, 37);
+	m_decode.secondary = BIT(primary, 36);
+	m_decode.inc_memptr = BIT(primary, 35);
+	m_decode.destination = (primary >> 33) & 3;
+	m_decode.control = (primary >> 29) & 0xf;
 
-		m_icount--;
+	// decode fpu instruction
+	m_decode.fpu = ((primary & 0x1fff'f800ULL) << 5) | ((primary & 0x0000'07ffULL) << 2) | (2ULL << wtl3132_device::S_ENCN);
+	if (m_cwen)
+		m_decode.fpu |= wtl3132_device::M_CWEN;
+
+	// decode secondary word
+	if (m_decode.secondary)
+	{
+		u64 const secondary = space(0).read_qword(m_pc + 1);
+
+		m_decode.operation = (secondary >> 32) & 0xfe;
+		m_decode.immediate = (secondary >> 19) & 0x3fff;
+	}
+}
+
+void sgi_ge5_device::secondary()
+{
+	switch (m_decode.operation)
+	{
+	case 0x3c: // store register
+		switch (m_decode.immediate)
+		{
+		case 0: // TODO: store pcsave?
+			break;
+
+		case 1: // store memptr
+			m_bus = m_memptr;
+			break;
+
+		case 2: // store reptr
+			m_bus = m_reptr;
+		}
+		break;
+
+	case 0x8c: // load reptr
+		m_reptr = m_bus & 0x3f;
+		break;
+
+	case 0x90: // load memptr; set reptr
+		m_memptr = m_bus & 0x7fff;
+		m_reptr = m_decode.immediate & 0x3f;
+		break;
+
+	case 0x9c: // set reptr
+		m_reptr = m_decode.immediate & 0x3f;
+		break;
+
+	case 0xb0: // load memptr
+		m_memptr = m_bus & 0x7fff;
+		break;
+
+	case 0xb4: // set memptr
+		m_memptr = m_decode.immediate & 0x7fff;
+		break;
+
+	case 0xb6: // set memptr; set finish flag
+		m_memptr = m_decode.immediate & 0x7fff;
+		LOG("finish flag %d set (%s)\n", m_decode.immediate & 1, machine().describe_context());
+		m_finish[m_decode.immediate & 1] = 1;
+		break;
+
+	case 0xb8: // set memptr_temp
+		m_memptr_temp = m_memptr | 0x8000;
+		m_memptr = m_decode.immediate & 0x7fff;
+		break;
+
+	case 0xbc: // nop?
+		break;
+
+	case 0xfc:
+		switch (m_decode.immediate)
+		{
+		case 0: // TODO: assert dma ready
+			LOGMASKED(LOG_DMA, "dma ready\n");
+			break;
+
+		default: // assert interrupt
+			LOG("interrupt asserted\n");
+			set_int(true);
+			break;
+		}
+		break;
+
+	case 0xfe:
+		switch (m_decode.immediate)
+		{
+		case 0: // TODO: reset dma?
+			LOGMASKED(LOG_DMA, "dma reset\n");
+			break;
+
+		default: // load dma count
+			m_dma_count = m_bus;
+			LOGMASKED(LOG_DMA, "dma count %d\n", m_dma_count);
+			break;
+		}
+		break;
+
+	default:
+		logerror("unknown secondary operation 0x%02x\n", m_decode.operation);
+		break;
 	}
 }
 
@@ -372,138 +585,155 @@ void sgi_ge5_device::command_w(offs_t offset, u16 data, u16 mem_mask)
 	switch (offset)
 	{
 	case 0x00: // clear stall
-		//resume(SUSPEND_REASON_HALT);
-		LOG("unstalled\n");
+		LOG("clear stall\n");
+		resume(SUSPEND_REASON_HALT);
+		debugger_exception_hook(0);
 		break;
 
-	case 0x10: // setss
-	case 0x20: // clearss
-	case 0x30: // executess
+	case 0x10: // set single step
+	case 0x20: // clear single step
+	case 0x30: // execute single step
 		break;
 
-	case 0x50: // clearintr
-		if (m_int_state)
-		{
-			LOG("ge interrupt cleared\n");
-			m_int_state = 0;
-			m_int_cb(m_int_state);
-		}
+	case 0x50: // clear interrupt
+		LOG("interrupt cleared\n");
+		set_int(false);
 		break;
 	}
 }
+template u32 sgi_ge5_device::code_r<false>(offs_t offset);
+template u32 sgi_ge5_device::code_r<true>(offs_t offset);
+template void sgi_ge5_device::code_w<false>(offs_t offset, u32 data, u32 mem_mask);
+template void sgi_ge5_device::code_w<true>(offs_t offset, u32 data, u32 mem_mask);
 
-u32 sgi_ge5_device::code_r(offs_t offset)
+template <bool High> u32 sgi_ge5_device::code_r(offs_t offset)
 {
 	m_pc = offset | offs_t(m_mar & 0x7f) << 8;
-	u64 const data = space(AS_PROGRAM).read_qword(m_pc);
+	u64 const data = space(0).read_qword(m_pc);
 
-	return m_mar_msb ? u32(data >> 32) : u32(data);
+	return High ? u32(data >> 32) : u32(data);
 }
 
-void sgi_ge5_device::code_w(offs_t offset, u32 data, u32 mem_mask)
+template <bool High> void sgi_ge5_device::code_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_pc = offset | offs_t(m_mar & 0x7f) << 8;
 
-	LOG("code_w msb %d offset 0x%08x data 0x%08x mask 0x%08x (%s)\n", m_mar_msb, m_pc, data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_MEMORY, "code_w msb %d offset 0x%08x data 0x%08x mask 0x%08x (%s)\n", High, m_pc, data, mem_mask, machine().describe_context());
 
-	if (m_mar_msb)
+	if (High)
 	{
 		u64 const mask = u64(mem_mask & 0x000000ffU) << 32;
 
-		space(AS_PROGRAM).write_qword(m_pc, u64(data) << 32, mask);
+		if (BIT(data, 8) && !BIT(data, 4))
+		{
+			// FIXME: this is required, but not very satisfactory
+			LOGMASKED(LOG_MEMORY, "correcting unset secondary instruction bit\n");
+			data |= 0x10;
+		}
+
+		space(0).write_qword(m_pc, u64(data) << 32, mask);
 	}
 	else
-		space(AS_PROGRAM).write_qword(m_pc, data, mem_mask);
+		space(0).write_qword(m_pc, data, mem_mask);
 }
 
 u32 sgi_ge5_device::data_r(offs_t offset)
 {
-	m_memptr = offset | offs_t(m_mar & 0x1f) << 8;
+	m_memptr = offset | offs_t(m_mar & 0x3f) << 8;
 
-	return space(AS_DATA).read_dword(m_memptr);
+	return space(1).read_dword(m_memptr);
 }
 
 void sgi_ge5_device::data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_memptr = offset | offs_t(m_mar & 0x1f) << 8;
+	m_memptr = offset | offs_t(m_mar & 0x3f) << 8;
 
-	LOG("data_w offset 0x%08x data 0x%08x mask 0x%08x (%s)\n", m_memptr, data, mem_mask, machine().describe_context());
-
-	space(AS_DATA).write_dword(m_memptr, data, mem_mask);
+	space(1).write_dword(m_memptr, data, mem_mask);
 }
 
 offs_t sgi_ge5_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buffer const &opcodes, data_buffer const &params)
 {
-	std::string prefix = "";
 	std::string src, dst;
-	u16 branch;
+	u16 immediate = 0;
+	u32 flags = 0;
 
-	u64 const insn = opcodes.r64(pc);
+	u64 const primary = opcodes.r64(pc);
 
-	if (BIT(insn, 36))
+	if (BIT(primary, 36))
 	{
-		u64 const insn_prefix = opcodes.r64(pc + 1);
-		u16 const immediate = (insn_prefix >> 19) & 0x7fff;
+		std::string prefix;
 
-		switch ((insn_prefix >> 32) & 0xfc)
+		u64 const secondary = opcodes.r64(pc + 1);
+		u8 const opcode = (secondary >> 32) & 0xfe;
+		immediate = (secondary >> 19) & 0x3fff;
+
+		switch (opcode)
 		{
+		case 0x3c:
+			switch (immediate)
+			{
+			case 0: prefix = std::string("STORE PCSAVE"); break;
+			case 1: prefix = std::string("STORE MEMPTR"); break;
+			case 2: prefix = std::string("STORE REPTR"); break;
+			}
+			break;
 		case 0x8c: prefix = std::string("LOAD REPTR"); break;
-		case 0x9c: prefix = util::string_format("REPTR=%04x", immediate); break;
-		case 0xb0: prefix = std::string("LOAD MEMPTR"); branch = immediate; break;
-		case 0xb4: prefix = util::string_format("MEMPTR=%04x", immediate); break;
-		case 0xb8: prefix = util::string_format("MEMPTR_TEMP=%04x", immediate); break;
-		case 0xbc: branch = immediate; break;
-		case 0xfc: prefix = std::string("SET_INT"); break;
-		//case 0xfe: // set dma count?
+		case 0x8e: prefix = std::string("LOAD MEMPTR"); break;
+		case 0x90: prefix = util::string_format("LOAD MEMPTR; SET REPTR,0x%04x", immediate); break;
+		case 0x9c: prefix = util::string_format("SET REPTR,0x%04x", immediate); break;
+		case 0xb0: prefix = std::string("LOAD MEMPTR"); break;
+		case 0xb4: prefix = util::string_format("SET MEMPTR,0x%04x", immediate); break;
+		case 0xb6: prefix = util::string_format("SET MEMPTR,0x%04x; SET FF%d", immediate, immediate & 1); break;
+		case 0xb8: prefix = util::string_format("SET MEMPTR_TEMP,0x%04x", immediate); break;
+		case 0xbc: break;
+		case 0xfc: prefix = immediate ? std::string("SET INT") : std::string("SET DMARDY"); break;
+		case 0xfe: prefix = immediate ? std::string("LOAD DMACNT") : std::string("RESET DMA"); break;
 		}
+
+		if (!prefix.empty())
+			stream << prefix << "; ";
 	}
 
-	u8 const hq1_op = (insn >> 32) & 0xff;
+	u8 const opcode = (primary >> 32) & 0xff;
 
-	// pre-increment memptr
-	//if (BIT(hq1_op, 3))
-	//  ;
+	u64 fpu_ctrl = 0; // ENCN=0, IOCT=0
 
-	// pre-increment reptr
-	//if (BIT(hq1_op, 5))
-	//  ;
-
-	// xx       - source (?, fifo, ram, fpu)
-	//   x      - increment reptr
-	//    x     - ?
-	//     x    - increment memptr
-	//      xxx - destination (re, ?, bus, stall?, ram, ?, fpu, ?)
-
-	// 00xx xxxx -> ?
-	// 01xx xxxx -> read fifo
-	// 10xx xxxx -> read ram
-	// 11xx xxxx -> read fpu
-
-	u64 fpu_ctrl = 0x2'8000'0000; // ENCN=2, IOCT=2
-
-	switch (hq1_op >> 6)
+	switch ((primary >> 29) & 0xf)
 	{
-	case 0: src = std::string("0?"); break;
-	case 1: src = std::string("fifo"); break;
-	case 2: src = std::string("bus"); break;
-	case 3: src = std::string("fpu"); break; // IOCT=2
+	case 2:
+	case 3:
+	case 5:
+	case 6:
+		fpu_ctrl |= 0x1'0000'0000; // ENCN=1
+		break;
 	}
 
-	// i/o dst
-	switch (hq1_op & 7)
+	// fstore
+	if (((primary >> 38) & 3) == 3)
+		fpu_ctrl |= 0x8000'0000;
+
+	// fload
+	if (((primary >> 33) & 3) == 3)
+		fpu_ctrl |= 0xc000'0000;
+
+	switch (opcode >> 6)
 	{
-	case 0: dst = std::string("REPTR"); break;
-	case 1: dst = std::string("1?"); break;
-	case 2: dst = std::string("bus?"); break;
-	case 3: dst = std::string("stall?"); break;
-	case 4: dst = std::string("MEMPTR"); break;
-	case 5: dst = std::string("5?"); break;
-	case 6: dst = std::string("FPU"); fpu_ctrl |= 0x4000'0000; break; // fpu IOCT=3
-	case 7: dst = std::string("7?"); break;
+	case 0: src = std::string("RE"); break;
+	case 1: src = std::string("FIFO"); break;
+	case 2: src = std::string("MEM"); break;
+	case 3: src = std::string("FPU"); break;
 	}
 
-	std::string fpu = wtl3132_device::disassemble(
-		bitswap<34>((insn & 0x0fff'ffff) | fpu_ctrl,
+	switch ((opcode >> 1) & 3)
+	{
+	case 0: dst = std::string("RE"); break;
+	case 1: dst = std::string("BUS"); break;
+	case 2: dst = std::string("MEM"); break;
+	case 3: dst = std::string("FPU"); break;
+	}
+
+	stream << wtl3132_device::disassemble(
+		bitswap<34>((primary & 0x0fff'ffff) | fpu_ctrl,
 			28, 27, 26,          // f
 			25, 24, 23, 22, 21,  // aadd
 			20, 19, 18, 17, 16,  // badd
@@ -514,20 +744,37 @@ offs_t sgi_ge5_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 			5, 4, 3,             // abin
 			2, 1,                // adst
 			0,                   // mbin
-			33, 32));            // encn*
+			33, 32))             // encn*
+		<< "; ";
 
-	// hq1 branch
-	switch ((insn >> 29) & 7)
+	switch ((primary >> 29) & 0x140)
 	{
-	case 0: util::stream_format(stream, "%s; %s; R:%s, W:%s", prefix, fpu, src, dst); break;
-	case 1: util::stream_format(stream, "%s; %s; R:%s, W:%s; J:%04x", prefix, fpu, src, dst, branch); break;
-	case 2: util::stream_format(stream, "%s; %s; R:%s, W:%s; JC:%04x", prefix, fpu, src, dst, branch); break;
-	case 3: util::stream_format(stream, "%s; %s; R:%s, W:%s; JNC:%04x", prefix, fpu, src, dst, branch); break;
-	case 4: util::stream_format(stream, "%s; %s; R:%s, W:%s; CALL:%04x", prefix, fpu, src, dst, branch); break;
-	case 5: util::stream_format(stream, "%s; %s; R:%s, W:%s; JZ:%04x", prefix, fpu, src, dst, branch); break;
-	case 6: util::stream_format(stream, "%s; %s; R:%s, W:%s; JNZ:%04x", prefix, fpu, src, dst, branch); break;
-	case 7: util::stream_format(stream, "%s; %s; R:%s, W:%s; RET", prefix, fpu, src, dst); break;
+	case 0x040: stream << std::string("MEMPTR++; "); break;
+	case 0x100: stream << std::string("REPTR++; "); break;
+	case 0x140: stream << std::string("MEMPTR++; REPTR++; "); break;
 	}
 
-	return BIT(insn, 36) ? 2 : 1;
+	stream << util::string_format("R:%s; W:%s", src, dst);
+
+	// branch
+	switch ((primary >> 29) & 0xf)
+	{
+	case 0x1: stream << util::string_format("; BRA 0x%04x", immediate); break;
+	case 0x2: stream << util::string_format("; BLTF 0x%04x", immediate); break;
+	case 0x3: stream << util::string_format("; BGEF 0x%04x", immediate); break;
+	case 0x4: stream << util::string_format("; CALL 0x%04x", immediate); flags = STEP_OVER; break;
+	case 0x5: stream << util::string_format("; CLTF 0x%04x", immediate); flags = STEP_OVER; break;
+	case 0x6: stream << util::string_format("; CGEF 0x%04x", immediate); flags = STEP_OVER; break;
+	case 0x7: stream << "; RET"; flags = STEP_OUT; break;
+	case 0x8: stream << "; FETCH"; break;
+	case 0x9: stream << util::string_format("; BRI 0x%04x", immediate); break;
+	case 0xa: stream << util::string_format("; BLT 0x%04x", immediate); break;
+	case 0xb: stream << util::string_format("; BGE 0x%04x", immediate); break;
+	case 0xc: stream << "; STALL"; break;
+	case 0xd: stream << util::string_format("; CLT 0x%04x", immediate); flags = STEP_OVER; break;
+	case 0xe: stream << util::string_format("; CGE 0x%04x", immediate); flags = STEP_OVER; break;
+	case 0xf: stream << "; DMA?"; flags = STEP_OVER; break;
+	}
+
+	return SUPPORTED | flags | (BIT(primary, 36) ? 2 : 1);
 }

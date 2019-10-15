@@ -54,7 +54,7 @@ int osd_setenv(const char *name, const char *value, int overwrite);
 
 
 /*-----------------------------------------------------------------------------
-	osd_get_clipboard_text: retrieves text from the clipboard
+    osd_get_clipboard_text: retrieves text from the clipboard
 -----------------------------------------------------------------------------*/
 std::string osd_get_clipboard_text(void);
 

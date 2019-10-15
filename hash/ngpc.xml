@@ -651,7 +651,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00630" />
 		<info name="release" value="20000120" />
-		<info name="alt_title" value="めざせ!漢字王" />
+		<info name="alt_title" value="めざせ！漢字王" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="mezase! kanji ou (japan).bin" size="2097152" crc="a52e1c82" sha1="030a59f990e96649001582be2d5acc9af18424fe" />
@@ -1348,7 +1348,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00300" />
 		<info name="release" value="19990610 (JPN)" />
-		<info name="alt_title" value="ポケット格闘シリーズ サムライスピリッツ!2" />
+		<info name="alt_title" value="ポケット格闘シリーズ サムライスピリッツ！2" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="samurai shodown! 2 - pocket fighting series (world) (en,ja).bin" size="2097152" crc="4f7fb156" sha1="2ec4da369d3b91af15defa64429bd9daac7ee9b5" />
@@ -1490,7 +1490,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>Dyna</publisher>
 		<info name="serial" value="NeoP00780" />
 		<info name="release" value="19991216" />
-		<info name="alt_title" value="それいけ!!花札道" />
+		<info name="alt_title" value="それいけ!!花札道場" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="soreike!! hanafuda doujou (japan).bin" size="524288" crc="05fa3eb0" sha1="f4a4264eaf1605086ccbc526f21da222aa6341bf" />
@@ -1633,7 +1633,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00490" />
 		<info name="release" value="19991111" />
-		<info name="alt_title" value="つなげてポンッ!2" />
+		<info name="alt_title" value="つなげてポンツ！2" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tsunagete pon! 2 (japan).bin" size="1048576" crc="129091bb" sha1="db030e02819d50315f15c00b93c3a46f1f89d126" />

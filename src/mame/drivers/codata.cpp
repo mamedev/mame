@@ -43,9 +43,9 @@ void codata_state::mem_map(address_map &map)
 	map(0x600000, 0x600007).mirror(0x1ffff8).rw("uart", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0xff00);
 	map(0x800000, 0x800003).mirror(0x1ffffc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	map(0xe00000, 0xe00001).mirror(0x1ffffe).portr("INPUT");
-	//AM_RANGE(0xa00000, 0xbfffff) page map (rw)
-	//AM_RANGE(0xc00000, 0xdfffff) segment map (rw), context register (r)
-	//AM_RANGE(0xe00000, 0xffffff) context register (w), 16-bit parallel input port (r)
+	//map(0xa00000, 0xbfffff) page map (rw)
+	//map(0xc00000, 0xdfffff) segment map (rw), context register (r)
+	//map(0xe00000, 0xffffff) context register (w), 16-bit parallel input port (r)
 }
 
 /* Input ports */

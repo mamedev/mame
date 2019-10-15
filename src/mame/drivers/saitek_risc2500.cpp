@@ -332,5 +332,5 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME              FLAGS */
-CONS( 1992, risc2500, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
-CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener + Glaser
+CONS( 1992, risc2500, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener + Glaser

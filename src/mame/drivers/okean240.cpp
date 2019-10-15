@@ -258,16 +258,16 @@ void okean240_state::okean240a_io(address_map &map)
 	map(0xa0, 0xa1).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xc0, 0xc3).rw("ppic", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe0, 0xe3).rw("ppie", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	// AM_RANGE(0x00, 0x1f)=ppa00.data
-	// AM_RANGE(0x20, 0x23)=dsk.data
-	// AM_RANGE(0x24, 0x24)=dsk.wait
-	// AM_RANGE(0x25, 0x25)=dskctl.data
-	// AM_RANGE(0x40, 0x5f)=ppa40.data
-	// AM_RANGE(0x60, 0x7f)=tim.data
-	// AM_RANGE(0x80, 0x81)=intctl.data
-	// AM_RANGE(0xa0, 0xa1)=comport.data
-	// AM_RANGE(0xc0, 0xdf)=ppaC0.data
-	// AM_RANGE(0xe0, 0xff)=ppaE0.data
+	// map(0x00, 0x1f)=ppa00.data
+	// map(0x20, 0x23)=dsk.data
+	// map(0x24, 0x24)=dsk.wait
+	// map(0x25, 0x25)=dskctl.data
+	// map(0x40, 0x5f)=ppa40.data
+	// map(0x60, 0x7f)=tim.data
+	// map(0x80, 0x81)=intctl.data
+	// map(0xa0, 0xa1)=comport.data
+	// map(0xc0, 0xdf)=ppaC0.data
+	// map(0xe0, 0xff)=ppaE0.data
 }
 
 void okean240_state::okean240t_io(address_map &map)
@@ -414,7 +414,7 @@ void okean240_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in okean240_state::device_timer");
+		throw emu_fatalerror("Unknown id in okean240_state::device_timer");
 	}
 }
 

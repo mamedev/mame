@@ -7955,6 +7955,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="colossus4">
+		<description>Colossus Bridge 4</description>
+		<year>1988</year>
+		<publisher>CDS Software</publisher>
+		<info name="usage" value="Turn power on load system Insert COLOSSUS disk type BRIDGE or TUTOR" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="colossus 4 bridge.img" size="737280" crc="e8d92247" sha1="fa6ff45a9314a66e6eadc57f0a242f2e35edf391"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="keen123">
 		<description>Commander Keen in Invasion of the Vorticons (v1.31, 5.25")</description>
 		<year>1991</year>
@@ -9300,7 +9312,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="lombrall35" cloneof="lombrall"  supported="partial">
+	<software name="lombrall35" cloneof="lombrall" supported="partial">
 		<description>Lombard RAC Rally (3.5")</description>
 		<year>1989</year>
 		<publisher>Mandarin Software</publisher>
@@ -11136,6 +11148,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="starpack">
+		<description>Star Pack</description>
+		<year>1992</year>
+		<publisher>Prism Leisure</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="star pack.img" size="737280" crc="c355fed7" sha1="3b3aef860f05cea1cfd880a2e5fb20ddde5b92fa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strek5">
 		<description>Star Trek V: The Final Frontier (5.25")</description>
 		<year>1989</year>
@@ -11573,6 +11596,24 @@ has been replaced with an all-zero block. -->
 			<dataarea name="flop" size = "368640">
 				<!-- modified with high scores, user-created circuits, etc. -->
 				<rom name="[PC] Turbo Driver [5.25].img" size="368640" crc="cac778cc" sha1="e2d725c8dc3d530231489cab827bc1b938af4bdc" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ums2pe">
+		<description>UMS II: Nations at War - Planet Editor</description>
+		<year>1992</year>
+		<publisher>Microplay Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "2223360">
+				<rom name="50591 a.mfm" size="2223360" crc="fef2a244" sha1="d6575e480990fa13997258ddeb5e07b2deca4b50"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="50591 b.img" size="737280" crc="a8a8f3eb" sha1="d4ffef36418332516eb125d56956113e04968579"/>
 			</dataarea>
 		</part>
 	</software>

@@ -319,9 +319,9 @@ void snk6502_sound_device::set_music_clock(double clock_time)
 	m_tone_clock = 0;
 }
 
-CUSTOM_INPUT_MEMBER(snk6502_sound_device::music0_playing)
+READ_LINE_MEMBER(snk6502_sound_device::music0_playing)
 {
-	return m_tone_channels[0].mute ? 0x01 : 0x00;
+	return m_tone_channels[0].mute ? 1 : 0;
 }
 
 void snk6502_sound_device::set_channel_base(int channel, int base, int mask)

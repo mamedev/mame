@@ -22,7 +22,7 @@ ______|___________|______
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="4in1.bin" size="0x400000" crc="6e467279" sha1="09ba40524f0b5ee65b9aa8742df9c39baf1046d8" offset="0" />
+				<rom name="4in1.bin" size="0x400000" crc="6e467279" sha1="09ba40524f0b5ee65b9aa8742df9c39baf1046d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@ ______|___________|______
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="tennis.bin" size="0x400000" crc="39883db2" sha1="91f9319339eb2ccb4a2e16308ea505775dc82bfc" offset="0" />
+				<rom name="tennis.bin" size="0x400000" crc="39883db2" sha1="91f9319339eb2ccb4a2e16308ea505775dc82bfc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,7 +44,7 @@ ______|___________|______
 		<publisher>Toyquest</publisher>
 		<part name="cart" interface="tvgogo_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="whac-a-mole.bin" size="0x400000" crc="62625c62" sha1="846045308e242aff347f93fab1e9b2e8ef46386f" offset="0" />
+				<rom name="whac-a-mole.bin" size="0x400000" crc="62625c62" sha1="846045308e242aff347f93fab1e9b2e8ef46386f"/>
 			</dataarea>
 		</part>
 	</software>

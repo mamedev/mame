@@ -392,7 +392,7 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/ym2151.h"
@@ -663,7 +663,7 @@ void toaplan2_state::shared_ram_w(offs_t offset, u8 data)
 }
 
 
-CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
+READ_LINE_MEMBER(toaplan2_state::c2map_r)
 {
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
@@ -1453,17 +1453,12 @@ u8 toaplan2_state::tekipaki_cmdavailable_r()
 	else return 0x00;
 };
 
-void toaplan2_state::hd647180_mem_map(address_map &map)
-{
-	map(0x00000, 0x03fff).rom();   /* Internal 16k byte ROM */
-	map(0x0fe00, 0x0ffff).ram();   /* Internal 512 byte RAM */
-}
-
 void toaplan2_state::hd647180_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x60, 0x60).r(FUNC(toaplan2_state::tekipaki_cmdavailable_r));
+	map(0x60, 0x60).nopr();
+	map(0x70, 0x75).nopw(); // DDRs are written with the wrong upper addresses!
 	map(0x84, 0x84).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
 	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
@@ -1473,10 +1468,6 @@ void toaplan2_state::hd647180_io_map(address_map &map)
 
 void toaplan2_state::ghox_hd647180_mem_map(address_map &map)
 {
-	map(0x00000, 0x03fff).rom();   // Internal 16k byte ROM
-	map(0x0fe00, 0x0ffff).ram();   // Internal 512 byte RAM
-	map(0x3fe00, 0x3ffff).ram();   // Relocated internal RAM (RMCR = 30)
-
 	map(0x40000, 0x407ff).ram().share("shared_ram");
 
 	map(0x80002, 0x80002).portr("DSWA");
@@ -1632,7 +1623,7 @@ static INPUT_PORTS_START( tekipaki )
 //  PORT_CONFSETTING(        0x000d, DEF_STR( Japan ) )
 //  PORT_CONFSETTING(        0x000e, DEF_STR( Japan ) )
 	PORT_CONFSETTING(       0x000f, "Japan (Distributed by Tecmo)" )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, nullptr)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(toaplan2_state, c2map_r)
 INPUT_PORTS_END
 
 
@@ -2045,7 +2036,7 @@ static INPUT_PORTS_START( whoopee )
 	PORT_INCLUDE( pipibibs )
 
 	PORT_MODIFY("JMPR")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state,c2map_r, nullptr)   // bit 0x10 sound ready
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(toaplan2_state, c2map_r)   // bit 0x10 sound ready
 INPUT_PORTS_END
 
 
@@ -3216,9 +3207,10 @@ void toaplan2_state::tekipaki(machine_config &config)
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // 10MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::tekipaki_68k_mem);
 
-	Z180(config, m_audiocpu, 10_MHz_XTAL);          // HD647180 CPU actually
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::hd647180_mem_map);
-	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::hd647180_io_map);
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, 10_MHz_XTAL));
+	// 16k byte ROM and 512 byte RAM are internal
+	audiocpu.set_addrmap(AS_IO, &toaplan2_state::hd647180_io_map);
+	audiocpu.in_pa_callback().set(FUNC(toaplan2_state::tekipaki_cmdavailable_r));
 
 	config.m_minimum_quantum = attotime::from_hz(600);
 
@@ -3259,7 +3251,7 @@ void toaplan2_state::ghox(machine_config &config)
 	M68000(config, m_maincpu, 10_MHz_XTAL);         /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_68k_mem);
 
-	Z180(config, m_audiocpu, 10_MHz_XTAL);          /* HD647180 CPU actually */
+	HD647180X(config, m_audiocpu, 10_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_hd647180_mem_map);
 
 	config.m_minimum_quantum = attotime::from_hz(600);

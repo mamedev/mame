@@ -100,7 +100,7 @@ const tiny_rom_entry *wangpc_keyboard_device::device_rom_region() const
 
 void wangpc_keyboard_device::wangpc_keyboard_io(address_map &map)
 {
-	//AM_RANGE(0x0000, 0xfeff) AM_READNOP
+	//map(0x0000, 0xfeff).nopr();
 	map(0x47, 0x58).mirror(0xff00).nopr();
 	map(0x00, 0x00).mirror(0xff00).w(SN76496_TAG, FUNC(sn76496_device::write));
 }

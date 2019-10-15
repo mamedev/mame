@@ -216,7 +216,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_n_int_cb(*this)
 	, m_n_nmi_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
-	, m_palette(*this, "palette")
+	, m_palette_lut(*this, "palette_lut")
 	, m_snsnd(*this, "snsnd")
 {
 }
@@ -427,7 +427,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			/* Draw left border */
 			rec.min_x = LBORDER_START;
 			rec.max_x = LBORDER_START + LBORDER_WIDTH - 1;
-			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+			m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
 			m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 		}
 		break;
@@ -442,7 +442,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			/* Draw right border */
 			rec.min_x = LBORDER_START + LBORDER_WIDTH + 256;
 			rec.max_x = rec.min_x + RBORDER_WIDTH - 1;
-			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+			m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
 			m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 		}
 		break;
@@ -1677,7 +1677,7 @@ void sega315_5124_device::draw_scanline(int pixel_offset_x, int pixel_plot_y, in
 
 		rec.min_x = pixel_offset_x;
 		rec.max_x = pixel_offset_x + 255;
-		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+		m_tmpbitmap.fill(m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill((m_reg[0x07] & 0x0f) ? 1 : 0, rec);
 	}
 	else
@@ -1698,7 +1698,7 @@ void sega315_5124_device::blit_scanline(int *line_buffer, int *priority_selected
 		/* Fill column 0 with overscan color from m_reg[0x07] */
 		do
 		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_bitmap[x] = m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 		}
 		while(++x < 8);
@@ -1706,7 +1706,7 @@ void sega315_5124_device::blit_scanline(int *line_buffer, int *priority_selected
 
 	do
 	{
-		p_bitmap[x] = m_palette->pen(line_buffer[x]);
+		p_bitmap[x] = m_palette_lut->pen(line_buffer[x]);
 		p_y1[x] = (priority_selected[x] & 0x0f) ? 1 : 0;
 	}
 	while(++x < 256);
@@ -1728,7 +1728,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 		/* border on left side of the GG active screen */
 		do
 		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_bitmap[x] = m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 		}
 		while (++x < 48);
@@ -1737,7 +1737,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 		{
 			do
 			{
-				p_bitmap[x] = m_palette->pen(line_buffer[x]);
+				p_bitmap[x] = m_palette_lut->pen(line_buffer[x]);
 				p_y1[x] = (priority_selected[x] & 0x0f) ? 1 : 0;
 			}
 			while (++x < 208);
@@ -1747,7 +1747,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 			/* top/bottom GG border */
 			do
 			{
-				p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+				p_bitmap[x] = m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]);
 				p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 			}
 			while (++x < 208);
@@ -1756,7 +1756,7 @@ void sega315_5377_device::blit_scanline(int *line_buffer, int *priority_selected
 		/* border on right side of the GG active screen */
 		do
 		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_bitmap[x] = m_palette_lut->pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = (m_reg[0x07] & 0x0f) ? 1 : 0;
 		}
 		while (++x < 256);
@@ -2013,7 +2013,7 @@ void sega315_5124_device::device_reset()
 
 void sega315_5124_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, m_palette, FUNC(sega315_5124_device::sega315_5124_palette), SEGA315_5124_PALETTE_SIZE);
+	PALETTE(config, m_palette_lut, FUNC(sega315_5124_device::sega315_5124_palette), SEGA315_5124_PALETTE_SIZE);
 
 	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 3)).add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 }
@@ -2032,8 +2032,8 @@ void sega315_5377_device::device_add_mconfig(machine_config &config)
 {
 	sega315_5246_device::device_add_mconfig(config);
 
-	m_palette->set_entries(SEGA315_5377_PALETTE_SIZE);
-	m_palette->set_init(FUNC(sega315_5377_device::sega315_5377_palette));
+	m_palette_lut->set_entries(SEGA315_5377_PALETTE_SIZE);
+	m_palette_lut->set_init(FUNC(sega315_5377_device::sega315_5377_palette));
 
 	GAMEGEAR(config.replace(), m_snsnd, DERIVED_CLOCK(1, 3));
 	m_snsnd->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
@@ -2048,6 +2048,6 @@ void sega315_5313_mode4_device::device_add_mconfig(machine_config &config)
 {
 	sega315_5246_device::device_add_mconfig(config);
 
-	m_palette->set_entries((512 * 3) + 64);
-	m_palette->set_init(FUNC(sega315_5313_mode4_device::sega315_5313_palette));
+	m_palette_lut->set_entries((512 * 3) + 64);
+	m_palette_lut->set_init(FUNC(sega315_5313_mode4_device::sega315_5313_palette));
 }

@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mikro80_cass">
 			<dataarea name="cass" size="6665">
-				<rom name="mikro-80 basic (1984)(-).rk8" size="6665" crc="38d15a6a" sha1="df9e126fa8d118a1ff4b883115b7f10c393a765d" offset="0" />
+				<rom name="mikro-80 basic (1984)(-).rk8" size="6665" crc="38d15a6a" sha1="df9e126fa8d118a1ff4b883115b7f10c393a765d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mikro80_cass">
 			<dataarea name="cass" size="6665">
-				<rom name="mikro-80 basic (1984)(-)[a].rk8" size="6665" crc="751a4063" sha1="67fb4fbaefbcbe774413c79e4fecc4626f5a3d76" offset="0" />
+				<rom name="mikro-80 basic (1984)(-)[a].rk8" size="6665" crc="751a4063" sha1="67fb4fbaefbcbe774413c79e4fecc4626f5a3d76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 
 		<part name="cass1" interface="mikro80_cass">
 			<dataarea name="cass" size="217">
-				<rom name="programma proverki (19xx)(-).rk8" size="217" crc="d4718cad" sha1="03f466d6ebd7b6c1ffea766461bb8cb13466f085" offset="0" />
+				<rom name="programma proverki (19xx)(-).rk8" size="217" crc="d4718cad" sha1="03f466d6ebd7b6c1ffea766461bb8cb13466f085"/>
 			</dataarea>
 		</part>
 	</software>

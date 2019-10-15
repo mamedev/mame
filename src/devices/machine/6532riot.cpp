@@ -510,6 +510,6 @@ void riot6532_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			timer_end();
 			break;
 		default:
-			assert_always(false, "Unknown id in riot6532_device::device_timer");
+			throw emu_fatalerror("Unknown id in riot6532_device::device_timer");
 	}
 }

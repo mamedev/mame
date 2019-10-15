@@ -146,6 +146,8 @@ public:
 		m_biosbank(*this, TO8_BIOS_BANK),
 		m_cartlobank(*this, MO6_CART_LO),
 		m_carthibank(*this, MO6_CART_HI),
+		m_cart_rom(*this, "cartridge"),
+		m_thmfc(*this, "thmfc"),
 		m_floppy_led(*this, "floppy"),
 		m_floppy_image(*this, "floppy%u", 0U)
 	{
@@ -349,9 +351,6 @@ private:
 	DECLARE_WRITE8_MEMBER( to7_5p14sd_w );
 	DECLARE_READ8_MEMBER( to7_qdd_r );
 	DECLARE_WRITE8_MEMBER( to7_qdd_w );
-	TIMER_CALLBACK_MEMBER( thmfc_floppy_cmd_complete_cb );
-	DECLARE_READ8_MEMBER( thmfc_floppy_r );
-	DECLARE_WRITE8_MEMBER( thmfc_floppy_w );
 	TIMER_CALLBACK_MEMBER( ans4 );
 	TIMER_CALLBACK_MEMBER( ans3 );
 	TIMER_CALLBACK_MEMBER( ans2 );
@@ -429,7 +428,9 @@ private:
 	optional_memory_bank m_biosbank;
 	optional_memory_bank m_cartlobank;
 	optional_memory_bank m_carthibank;
+	required_region_ptr<uint8_t> m_cart_rom;
 
+	required_device<thmfc1_device> m_thmfc;
 	output_finder<> m_floppy_led;
 	required_device_array<legacy_floppy_image_device, 4> m_floppy_image;
 
@@ -609,12 +610,6 @@ private:
 	unsigned to7_lightpen_gpl( int decx, int decy );
 	void thom_configure_palette( double gamma, const uint16_t* pal, palette_device& palette );
 
-	int thom_floppy_make_addr( chrn_id id, uint8_t* dst, int sector_size );
-	int thom_floppy_make_sector( legacy_floppy_image_device* img, chrn_id id, uint8_t* dst, int sector_size );
-	int thom_floppy_make_track( legacy_floppy_image_device* img, uint8_t* dst, int sector_size, int side );
-	int thom_qdd_make_addr( int sector, uint8_t* dst );
-	int thom_qdd_make_sector( legacy_floppy_image_device* img, int sector, uint8_t* dst );
-	int thom_qdd_make_disk ( legacy_floppy_image_device* img, uint8_t* dst );
 	void to7_5p14_reset();
 	void to7_5p14_init();
 	void to7_5p14_index_pulse_callback( int state );
@@ -627,23 +622,11 @@ private:
 	void to7_qdd_write_byte( uint8_t data );
 	void to7_qdd_reset();
 	void to7_qdd_init();
-	legacy_floppy_image_device * thmfc_floppy_image();
-	int thmfc_floppy_is_qdd( legacy_floppy_image_device *image );
-	void thmfc_floppy_index_pulse_cb( int index, int state );
-	int thmfc_floppy_find_sector( chrn_id* dst );
-	void thmfc_floppy_cmd_complete();
-	uint8_t thmfc_floppy_read_byte();
-	uint8_t thmfc_floppy_raw_read_byte();
-	void thmfc_floppy_qdd_write_byte( uint8_t data );
-	void thmfc_floppy_write_byte( uint8_t data );
-	void thmfc_floppy_format_byte( uint8_t data );
-	void thmfc_floppy_reset();
-	void thmfc_floppy_init();
 	void to7_network_init();
 	void to7_network_reset();
-	void to7_floppy_init( void* base );
+	void to7_floppy_init();
 	void to7_floppy_reset();
-	void to9_floppy_init(void* int_base, void* ext_base);
+	void to9_floppy_init(void* int_base);
 	void to9_floppy_reset();
 };
 

@@ -97,18 +97,20 @@ protected:
 
 
 private:
+	template <typename T, std::size_t N, std::size_t M>
+	using array2D = std::array<std::array<T, M>, N>;
 	static constexpr std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
-	float_ext_type m_A[storage_N][m_pitch];
-	float_ext_type m_Ainv[storage_N][m_pitch];
-	float_ext_type m_W[storage_N][m_pitch];
+	array2D<float_ext_type, storage_N, m_pitch> m_A;
+	array2D<float_ext_type, storage_N, m_pitch> m_Ainv;
+	array2D<float_ext_type, storage_N, m_pitch> m_W;
 	std::array<float_ext_type, storage_N> m_RHS; // right hand side - contains currents
 
-	float_ext_type m_lA[storage_N][m_pitch];
+	array2D<float_ext_type, storage_N, m_pitch> m_lA;
 
 	/* temporary */
-	float_type H[storage_N][m_pitch] ;
+	array2D<float_ext_type, storage_N, m_pitch> H;
 	std::array<unsigned, storage_N> rows;
-	unsigned cols[storage_N][m_pitch];
+	array2D<unsigned, storage_N, m_pitch> cols;
 	std::array<unsigned, storage_N> colcount;
 
 	unsigned m_cnt;
@@ -222,7 +224,12 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 {
 	const auto iN = size();
 
-	std::array<float_type, storage_N> new_V; // = { 0.0 };
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+	std::array<float_type, storage_N> new_V;
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+	std::array<float_type, storage_N> t;  // FIXME: convert to member
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+	std::array<float_type, storage_N> w;
 
 	if ((m_cnt % 50) == 0)
 	{
@@ -260,7 +267,6 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 			/* construct w = transform(V) * y
 			 * dim: rowcount x iN
 			 * */
-			std::array<float_type, storage_N> w;
 			for (unsigned i = 0; i < rowcount; i++)
 			{
 				const unsigned r = rows[i];
@@ -310,7 +316,6 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 			}
 			/* Back substitution */
 			//inv(H) w = t     w = H t
-			std::array<float_type, storage_N> t;  // FIXME: convert to member
 			for (unsigned j = rowcount; j-- > 0; )
 			{
 				float_type tmp = 0;
@@ -367,7 +372,7 @@ unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphs
 template <typename FT, int SIZE>
 matrix_solver_w_t<FT, SIZE>::matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
-	: matrix_solver_t(anetlist, name, NOSORT, params)
+	: matrix_solver_t(anetlist, name, params)
 	, m_cnt(0)
 	, m_dim(size)
 {

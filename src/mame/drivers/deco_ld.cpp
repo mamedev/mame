@@ -140,7 +140,7 @@ public:
 
 	void rblaster(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
+	DECLARE_READ_LINE_MEMBER(begas_vblank_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
@@ -278,7 +278,7 @@ void deco_ld_state::rblaster_map(address_map &map)
 	map(0x1003, 0x1003).portr("IN1");
 	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(FUNC(deco_ld_state::decold_sound_cmd_w));
 	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
-	//AM_RANGE(0x1006, 0x1007) AM_DEVREADWRITE("acia", acia6850_device, read, write)
+	//map(0x1006, 0x1007).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
 	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -318,7 +318,7 @@ void deco_ld_state::rblaster_sound_map(address_map &map)
 	map(0xe000, 0xffff).rom();
 }
 
-CUSTOM_INPUT_MEMBER( deco_ld_state::begas_vblank_r )
+READ_LINE_MEMBER( deco_ld_state::begas_vblank_r )
 {
 	return m_screen->vpos() >= 240*2;
 }
@@ -361,7 +361,7 @@ static INPUT_PORTS_START( begas )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, nullptr) // TODO: IPT_VBLANK doesn't seem to work fine?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(deco_ld_state, begas_vblank_r) // TODO: IPT_VBLANK doesn't seem to work fine?
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )

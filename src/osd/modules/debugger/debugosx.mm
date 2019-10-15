@@ -24,7 +24,11 @@
 // MAMEOS headers
 #include "modules/lib/osdobj_common.h"
 #include "osx/debugosx.h"
+#ifdef OSD_MAC
+#include "osdmac.h"
+#else
 #include "osdsdl.h"
+#endif
 #include "debug_module.h"
 
 #import "osx/debugconsole.h"

@@ -127,9 +127,9 @@ void mmodular_state::van16_mem(address_map &map)
 
 	map(0x000000, 0x03ffff).rom();
 
-//  AM_RANGE( 0xe80004, 0xe80005 )  AM_WRITE(write_unknown2 )   // Bavaria sensors
-//  AM_RANGE( 0xe80002, 0xe80003 )  AM_READ(read_unknown1 )     // Bavaria sensors
-//  AM_RANGE( 0xe80006, 0xe80007 )  AM_READ(read_unknown3 )     // Bavaria sensors
+//  map(0xe80004, 0xe80005).w(FUNC(mmodular_state::write_unknown2));   // Bavaria sensors
+//  map(0xe80002, 0xe80003).r(FUNC(mmodular_state::read_unknown1));    // Bavaria sensors
+//  map(0xe80006, 0xe80007).r(FUNC(mmodular_state::read_unknown3));    // Bavaria sensors
 }
 
 void mmodular_state::alm32_mem(address_map &map)
@@ -156,9 +156,9 @@ void mmodular_state::van32_mem(address_map &map)
 
 	map(0x00000000, 0x0003ffff).rom();
 
-//  AM_RANGE( 0x98000008, 0x9800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
-//  AM_RANGE( 0x98000004, 0x98000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
-//  AM_RANGE( 0x9800000c, 0x9800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
+//  map(0x98000008, 0x9800000b).w(FUNC(mmodular_state::write_unknown2));   // Bavaria sensors
+//  map(0x98000004, 0x98000007).r(FUNC(mmodular_state::read_unknown1));    // Bavaria sensors
+//  map(0x9800000c, 0x9800000f).r(FUNC(mmodular_state::read_unknown3));    // Bavaria sensors
 }
 
 void mmodular_state::gen32_mem(address_map &map)
@@ -174,9 +174,9 @@ void mmodular_state::gen32_mem(address_map &map)
 	map(0xe0000000, 0xe0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
 	map(0xe0000010, 0xe0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
 
-//  AM_RANGE( 0xd8000008, 0xd800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
-//  AM_RANGE( 0xd8000004, 0xd8000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
-//  AM_RANGE( 0xd800000c, 0xd800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
+//  map(0xd8000008, 0xd800000b).w(FUNC(mmodular_state::write_unknown2));   // Bavaria sensors
+//  map(0xd8000004, 0xd8000007).r(FUNC(mmodular_state::read_unknown1));    // Bavaria sensors
+//  map(0xd800000c, 0xd800000f).r(FUNC(mmodular_state::read_unknown3));    // Bavaria sensors
 
 	map(0x40000000, 0x4007ffff).ram();
 	map(0x80000000, 0x8003ffff).ram();

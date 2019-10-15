@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="boot.dsk" size="655360" crc="788c23a8" sha1="06c8d388a8e19ddfa267537454f3c65e72a80d80" offset="0" />
+				<rom name="boot.dsk" size="655360" crc="788c23a8" sha1="06c8d388a8e19ddfa267537454f3c65e72a80d80"/>
 			</dataarea>
 		</part>
 	</software>

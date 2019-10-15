@@ -349,7 +349,7 @@ void zookeep_state::video_map(address_map &map)
 	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
 	map(0x9c00, 0x9c00).mirror(0x03fe).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x9c01, 0x9c01).mirror(0x03fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xa000, 0xbfff).bankr(m_vidbank);
 	map(0xc000, 0xffff).rom();
 }
 

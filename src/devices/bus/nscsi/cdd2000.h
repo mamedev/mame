@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 
 #ifndef MAME_BUS_NSCSI_CDD2000_H
-#define MAME_BUS_NSCSI_CDD2000_H 1
+#define MAME_BUS_NSCSI_CDD2000_H
 
 #pragma once
 

@@ -489,16 +489,16 @@ void apc_state::apc_map(address_map &map)
 {
 	map(0x00000, 0x9ffff).ram();
 	map(0xa0000, 0xa0fff).ram().share("cmos");
-//  AM_RANGE(0xa1000, 0xbffff) mirror CMOS
-//  AM_RANGE(0xc0000, 0xcffff) standard character ROM
+//  map(0xa1000, 0xbffff) mirror CMOS
+//  map(0xc0000, 0xcffff) standard character ROM
 	map(0xd8000, 0xd9fff).ram().region("aux_pcg", 0); // AUX character RAM
-//  AM_RANGE(0xe0000, 0xeffff) Special Character RAM
+//  map(0xe0000, 0xeffff) Special Character RAM
 	map(0xfe000, 0xfffff).rom().region("ipl", 0);
 }
 
 void apc_state::apc_io(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 	map(0x00, 0x1f).rw(FUNC(apc_state::apc_dma_r), FUNC(apc_state::apc_dma_w)).umask16(0xff00);
 	map(0x20, 0x23).rw(m_i8259_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
 	map(0x28, 0x2f).rw(FUNC(apc_state::apc_port_28_r), FUNC(apc_state::apc_port_28_w)); // i8259 (even) / pit8253 (odd)
@@ -514,8 +514,8 @@ void apc_state::apc_io(address_map &map)
 //  0x5b, Power Off
 //  0x5e  APU status/command
 	map(0x60, 0x60).rw(m_sound, FUNC(upd1771c_device::read), FUNC(upd1771c_device::write));
-//  AM_RANGE(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
-//  0x70, 0x76 AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
+//  map(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
+//  map(0x70, 0x76).rw("upd7220_btm", FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
 //  0x71, 0x77 IDA Controller
 //  0x80, 0x90 Communication Adapter
 //  0xf0, 0xf6 ASOP Controller

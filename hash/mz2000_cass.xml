@@ -10,7 +10,7 @@
 		<publisher>Sharp</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="26752">
-				<rom name="mz-1z001.mzt" size="19675" crc="1324490f" sha1="88e19a54011f2ab2a7a882302bcb98c03338a739" offset="0" status="baddump" />
+				<rom name="mz-1z001.mzt" size="19675" crc="1324490f" sha1="88e19a54011f2ab2a7a882302bcb98c03338a739" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>Sharp</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="26752">
-				<rom name="mz-1z002.mzt" size="23911" crc="1b2bd21d" sha1="c116b54abb4aac0cc32d000be287a10bf832e6ee" offset="0" status="baddump" />
+				<rom name="mz-1z002.mzt" size="23911" crc="1b2bd21d" sha1="c116b54abb4aac0cc32d000be287a10bf832e6ee" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<publisher>マイクロネット (Micronet)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="47808">
-				<rom name="harvest_color.mzt" size="47808" crc="7e50de6f" sha1="646450d817f3b27ced3a5f34d62d76e1d29bff57" offset="0" />
+				<rom name="harvest_color.mzt" size="47808" crc="7e50de6f" sha1="646450d817f3b27ced3a5f34d62d76e1d29bff57"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@
 		<publisher>マイクロネット (Micronet)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="47808">
-				<rom name="harvest_green.mzt" size="47808" crc="fe0b6a0b" sha1="5ba88252496cc12a1f9807b36a664aa32d7dc1a4" offset="0" />
+				<rom name="harvest_green.mzt" size="47808" crc="fe0b6a0b" sha1="5ba88252496cc12a1f9807b36a664aa32d7dc1a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +56,7 @@
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="3676194">
-				<rom name="jelda.wav" size="3676194" crc="5812e3f2" sha1="d751932064f53a764b756846393526dd511f5cff" offset="0" />
+				<rom name="jelda.wav" size="3676194" crc="5812e3f2" sha1="d751932064f53a764b756846393526dd511f5cff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="6435154">
-				<rom name="jelda2.wav" size="6435154" crc="b7d61f11" sha1="8ff3932682e70f74f5d542059450e1a83b987c6a" offset="0" />
+				<rom name="jelda2.wav" size="6435154" crc="b7d61f11" sha1="8ff3932682e70f74f5d542059450e1a83b987c6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -80,7 +80,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="26752">
-				<rom name="star stream.mzt" size="21248" crc="28e2db60" sha1="f309b5803e8e5241301f2e738d00d0975bbfc00f" offset="0" />
+				<rom name="star stream.mzt" size="21248" crc="28e2db60" sha1="f309b5803e8e5241301f2e738d00d0975bbfc00f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -91,7 +91,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="26752">
-				<rom name="vosque2000.mzt" size="26752" crc="56f9000e" sha1="93319cecc92ffe7305ff1b8ecb26d0fd2db3bd47" offset="0" />
+				<rom name="vosque2000.mzt" size="26752" crc="56f9000e" sha1="93319cecc92ffe7305ff1b8ecb26d0fd2db3bd47"/>
 			</dataarea>
 		</part>
 	</software>

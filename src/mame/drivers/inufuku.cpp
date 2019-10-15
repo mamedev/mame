@@ -100,7 +100,7 @@ WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
 
 ******************************************************************************/
 
-CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
+READ_LINE_MEMBER(inufuku_state::soundflag_r)
 {
 	return m_soundlatch->pending_r() ? 0 : 1;
 }
@@ -115,7 +115,7 @@ void inufuku_state::inufuku_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();         // main rom
 
-//  AM_RANGE(0x100000, 0x100007) AM_WRITENOP    // ?
+//  map(0x100000, 0x100007).nopw();    // ?
 
 	map(0x180000, 0x180001).portr("P1");
 	map(0x180002, 0x180003).portr("P2");
@@ -137,7 +137,7 @@ void inufuku_state::inufuku_map(address_map &map)
 
 	map(0x780000, 0x780013).w(FUNC(inufuku_state::inufuku_palettereg_w)); // bg & text palettebank register
 	map(0x7a0000, 0x7a0023).w(FUNC(inufuku_state::inufuku_scrollreg_w));  // bg & text scroll register
-//  AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP                    // ?
+//  map(0x7e0000, 0x7e0001).nopw();                    // ?
 
 	map(0x800000, 0xbfffff).rom(); // data rom
 	map(0xfd0000, 0xfdffff).ram(); // work ram
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( inufuku )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, nullptr)    // pending sound command
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(inufuku_state, soundflag_r)    // pending sound command
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 3on3dunk cares about something in here, possibly a vblank flag
 
 	PORT_START( "EEPROMOUT" )

@@ -86,15 +86,15 @@ void instantm_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8000); //AM_WRITE
-	map(0xc000, 0xc000); //AM_WRITE
-	map(0xc400, 0xc400); //AM_WRITE
-	map(0xc800, 0xc800); //AM_WRITE
-	map(0xcc00, 0xcc00); //AM_WRITE
-	map(0xec00, 0xec00); //AM_READ
-	map(0xf000, 0xf000); //AM_READ
-	map(0xf400, 0xf400); //AM_READ
-	map(0xfc00, 0xfc00); //AM_READ
+	map(0x8000, 0x8000); //.w(FUNC(instantm_state::));
+	map(0xc000, 0xc000); //.w(FUNC(instantm_state::));
+	map(0xc400, 0xc400); //.w(FUNC(instantm_state::));
+	map(0xc800, 0xc800); //.w(FUNC(instantm_state::));
+	map(0xcc00, 0xcc00); //.w(FUNC(instantm_state::));
+	map(0xec00, 0xec00); //.r(FUNC(instantm_state::));
+	map(0xf000, 0xf000); //.r(FUNC(instantm_state::));
+	map(0xf400, 0xf400); //.r(FUNC(instantm_state::));
+	map(0xfc00, 0xfc00); //.r(FUNC(instantm_state::));
 }
 
 // doesn't use ram

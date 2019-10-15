@@ -98,7 +98,7 @@ TODO:
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(champbas_state::watchdog_bit2)
+READ_LINE_MEMBER(champbas_state::watchdog_bit2)
 {
 	return (0x10 - m_watchdog->get_vblank_counter()) >> 2 & 1;
 }
@@ -280,7 +280,7 @@ void exctsccr_state::exctsccr_sound_map(address_map &map)
 	map(0xc009, 0xc009).w("dac2", FUNC(dac_byte_interface::data_w));
 	map(0xc00c, 0xc00c).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
 	map(0xc00d, 0xc00d).r("soundlatch", FUNC(generic_latch_8_device::read));
-//  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
+//  map(0xc00f, 0xc00f).nopw(); // ?
 }
 
 void exctsccr_state::exctsccr_sound_io_map(address_map &map)
@@ -337,7 +337,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, watchdog_bit2, nullptr) // bit 2 of the watchdog counter
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(champbas_state, watchdog_bit2) // bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )

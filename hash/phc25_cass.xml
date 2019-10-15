@@ -11,7 +11,7 @@
 		<info name="serial" value="No.13"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="3628">
-				<rom name="alunissage.phc" size="3628" crc="76757bb3" sha1="0ae0252a07c231f0efd7d1a2d3593b602818177a" offset="0"/>
+				<rom name="alunissage.phc" size="3628" crc="76757bb3" sha1="0ae0252a07c231f0efd7d1a2d3593b602818177a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24,7 +24,7 @@
 		<info name="serial" value="No.65"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="2165">
-				<rom name="attack.phc" size="2165" crc="a2b3d113" sha1="bdc49eb9262edc0fe2a8b2e01525d67a4900862b" offset="0"/>
+				<rom name="attack.phc" size="2165" crc="a2b3d113" sha1="bdc49eb9262edc0fe2a8b2e01525d67a4900862b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36,7 +36,7 @@
 		<part name="cass1" interface="phc25_cass">
 			<feature name="part_id" value="BASIC1 - Leçon de BASIC 1 (chap.1 et 2)"/>
 			<dataarea name="cass" size="14152">
-				<rom name="basic1.phc" size="14152" crc="5385fae8" sha1="83c844103ce08d3c1043ea75de0734740a24e8ed" offset="0"/>
+				<rom name="basic1.phc" size="14152" crc="5385fae8" sha1="83c844103ce08d3c1043ea75de0734740a24e8ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48,7 +48,7 @@
 		<info name="usage" value="Screen 1 then CLOAD"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="6063">
-				<rom name="theme_bioastral.phc" size="6063" crc="de1fcbdc" sha1="3ece824d18a7c8da0140ab58b23c0f7b855f4865" offset="0"/>
+				<rom name="theme_bioastral.phc" size="6063" crc="de1fcbdc" sha1="3ece824d18a7c8da0140ab58b23c0f7b855f4865"/>
 			</dataarea>
 		</part>
 	</software>
@@ -61,7 +61,7 @@
 		<info name="serial" value="No.15"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="4808">
-				<rom name="blackjack.phc" size="4808" crc="a97b8329" sha1="8c3afef6d158e5b53f0bc1eeacf6a20bbc4a4717" offset="0"/>
+				<rom name="blackjack.phc" size="4808" crc="a97b8329" sha1="8c3afef6d158e5b53f0bc1eeacf6a20bbc4a4717"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,7 +74,7 @@
 		<info name="serial" value="No.58"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="4074">
-				<rom name="budget_familial.phc" size="4074" crc="3c82da4c" sha1="67084e8e4590b1e406ed5037d1977de4a0e64360" offset="0"/>
+				<rom name="budget_familial.phc" size="4074" crc="3c82da4c" sha1="67084e8e4590b1e406ed5037d1977de4a0e64360"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@
 		<info name="serial" value="No.61"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="1457">
-				<rom name="cancer.phc" size="1457" crc="55d7d0d3" sha1="1b42f843feccd5387bff3b5ca2ad95d2bb95d7f1" offset="0"/>
+				<rom name="cancer.phc" size="1457" crc="55d7d0d3" sha1="1b42f843feccd5387bff3b5ca2ad95d2bb95d7f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@
 		<info name="serial" value="No.43"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="3768">
-				<rom name="capitale.phc" size="3768" crc="8c810deb" sha1="fbef4155089fba14e5283dd60206792114170851" offset="0"/>
+				<rom name="capitale.phc" size="3768" crc="8c810deb" sha1="fbef4155089fba14e5283dd60206792114170851"/>
 			</dataarea>
 		</part>
 	</software>
@@ -113,25 +113,25 @@
 		<part name="cass1" interface="phc25_cass">
 			<feature name="part_id" value="Partie 1"/>
 			<dataarea name="cass" size="12253">
-				<rom name="ORAN.phc" size="12253" crc="17f6f206" sha1="b271f8fe4750cfa14396400a780405ecdd3fcd37" offset="0"/>
+				<rom name="ORAN.phc" size="12253" crc="17f6f206" sha1="b271f8fe4750cfa14396400a780405ecdd3fcd37"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="phc25_cass">
 			<feature name="part_id" value="Intro"/>
 			<dataarea name="cass" size="6722">
-				<rom name="INTRO.phc" size="6722" crc="a1fce06e" sha1="156ddfb4c798ceba9688b8fc43654e93deef47af" offset="0"/>
+				<rom name="INTRO.phc" size="6722" crc="a1fce06e" sha1="156ddfb4c798ceba9688b8fc43654e93deef47af"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="phc25_cass">
 			<feature name="part_id" value="Partie 2"/>
 			<dataarea name="cass" size="12620">
-				<rom name="KRAN.phc" size="12620" crc="8cc3eafb" sha1="229b8437f7443eda3cab0399d3541643f31ee9b5" offset="0"/>
+				<rom name="KRAN.phc" size="12620" crc="8cc3eafb" sha1="229b8437f7443eda3cab0399d3541643f31ee9b5"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="phc25_cass">
 			<feature name="part_id" value="Partie 3"/>
 			<dataarea name="cass" size="12809">
-				<rom name="IRUN.phc" size="12809" crc="45cc88dd" sha1="955d002d6de4756b24bd460a3f0f2d7f54a126a4" offset="0"/>
+				<rom name="IRUN.phc" size="12809" crc="45cc88dd" sha1="955d002d6de4756b24bd460a3f0f2d7f54a126a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +144,7 @@
 		<info name="serial" value="No.35"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="3185">
-				<rom name="crash.phc" size="3185" crc="c00e4f30" sha1="08e6c72c3cdf869034e27252f0db7151cdbfe472" offset="0"/>
+				<rom name="crash.phc" size="3185" crc="c00e4f30" sha1="08e6c72c3cdf869034e27252f0db7151cdbfe472"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +156,7 @@
 		<info name="usage" value="Screen 1 then CLOAD"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="5191">
-				<rom name="demonstration.phc" size="5191" crc="7f0a61e2" sha1="e45da47cfd1783a787c8637285b9c985f7c15b37" offset="0"/>
+				<rom name="demonstration.phc" size="5191" crc="7f0a61e2" sha1="e45da47cfd1783a787c8637285b9c985f7c15b37"/>
 			</dataarea>
 		</part>
 	</software>
@@ -169,7 +169,7 @@
 		<info name="serial" value="No.44"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="7877">
-				<rom name="departement.phc" size="7877" crc="c9fde70c" sha1="c60d99c8e0dd79919c8099aa763a221094f7171d" offset="0"/>
+				<rom name="departement.phc" size="7877" crc="c9fde70c" sha1="c60d99c8e0dd79919c8099aa763a221094f7171d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -182,7 +182,7 @@
 		<info name="serial" value="No.45"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="4500">
-				<rom name="france.phc" size="4500" crc="6d7168e7" sha1="f747f9585f7859335623764089e4dc0a1a4ba866" offset="0"/>
+				<rom name="france.phc" size="4500" crc="6d7168e7" sha1="f747f9585f7859335623764089e4dc0a1a4ba866"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@
 		<info name="serial" value="No.21"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="6361">
-				<rom name="invasion.phc" size="6361" crc="2009ed2f" sha1="b35bfa48b934f70e8586e3b40ca1b46bc2176b45" offset="0"/>
+				<rom name="invasion.phc" size="6361" crc="2009ed2f" sha1="b35bfa48b934f70e8586e3b40ca1b46bc2176b45"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@
 		<info name="serial" value="No.19"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="2029">
-				<rom name="jeu_de_lespace.phc" size="2029" crc="0ea3dbd9" sha1="63ae36478633095c663fc984a9527bb714e211d2" offset="0"/>
+				<rom name="jeu_de_lespace.phc" size="2029" crc="0ea3dbd9" sha1="63ae36478633095c663fc984a9527bb714e211d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -221,7 +221,7 @@
 		<info name="serial" value="No.11"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="4750">
-				<rom name="jeu_du_pendu.phc" size="4750" crc="a56b2bb5" sha1="807b2dffede694e48f115db1d5bd147b9fe4e445" offset="0"/>
+				<rom name="jeu_du_pendu.phc" size="4750" crc="a56b2bb5" sha1="807b2dffede694e48f115db1d5bd147b9fe4e445"/>
 			</dataarea>
 		</part>
 	</software>
@@ -234,7 +234,7 @@
 		<info name="serial" value="No.60"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="7696">
-				<rom name="jeux_de_mots.phc" size="7696" crc="3cd715ed" sha1="75b8694e14de8c41de315a1420faac1a22e221fa" offset="0"/>
+				<rom name="jeux_de_mots.phc" size="7696" crc="3cd715ed" sha1="75b8694e14de8c41de315a1420faac1a22e221fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -247,7 +247,7 @@
 		<info name="serial" value="No.69"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="13081">
-				<rom name="la_guerre_du_feu.phc" size="13081" crc="488bb981" sha1="60cacf4c68ea54e5cdb911b16cf9727236b8507d" offset="0"/>
+				<rom name="la_guerre_du_feu.phc" size="13081" crc="488bb981" sha1="60cacf4c68ea54e5cdb911b16cf9727236b8507d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -260,7 +260,7 @@
 		<info name="serial" value="No.29"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="7871">
-				<rom name="labyrinthe.phc" size="7871" crc="05a45424" sha1="981788bb686eac485a8289e42bc2244d159a5f24" offset="0"/>
+				<rom name="labyrinthe.phc" size="7871" crc="05a45424" sha1="981788bb686eac485a8289e42bc2244d159a5f24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -273,7 +273,7 @@
 		<info name="serial" value="No.12"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="3552">
-				<rom name="laser.phc" size="3552" crc="918a6c95" sha1="07cc1a668eadb02fb9005634613247e93716fb64" offset="0"/>
+				<rom name="laser.phc" size="3552" crc="918a6c95" sha1="07cc1a668eadb02fb9005634613247e93716fb64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -286,7 +286,7 @@
 		<info name="serial" value="No.59"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="2577">
-				<rom name="missile.phc" size="2577" crc="9d7fb967" sha1="5728d54837ded4d58b531d3f090ece21d4c0984d" offset="0"/>
+				<rom name="missile.phc" size="2577" crc="9d7fb967" sha1="5728d54837ded4d58b531d3f090ece21d4c0984d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -298,7 +298,7 @@
 		<info name="usage" value="Screen 1 then CLOAD"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="4197">
-				<rom name="morpion.phc" size="4197" crc="b82eed53" sha1="97b83cc9609321d40b64ab03d12ce90b9b1baae0" offset="0"/>
+				<rom name="morpion.phc" size="4197" crc="b82eed53" sha1="97b83cc9609321d40b64ab03d12ce90b9b1baae0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -311,7 +311,7 @@
 		<info name="serial" value="No.23"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="5443">
-				<rom name="packman.phc" size="5443" crc="37d65e7b" sha1="6dae14ab1210b194b9fcac4e24f96290e934f526" offset="0"/>
+				<rom name="packman.phc" size="5443" crc="37d65e7b" sha1="6dae14ab1210b194b9fcac4e24f96290e934f526"/>
 			</dataarea>
 		</part>
 	</software>
@@ -324,7 +324,7 @@
 		<info name="serial" value="No.66"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="2572">
-				<rom name="pmu.phc" size="2572" crc="d8f497c9" sha1="c7e5cf9f7614ce8bb7e88d9c565ce8b28a1fb057" offset="0"/>
+				<rom name="pmu.phc" size="2572" crc="d8f497c9" sha1="c7e5cf9f7614ce8bb7e88d9c565ce8b28a1fb057"/>
 			</dataarea>
 		</part>
 	</software>
@@ -337,7 +337,7 @@
 		<info name="serial" value="No.20"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="7063">
-				<rom name="raid_aerien.phc" size="7063" crc="25bbf959" sha1="dd242e96cbb2735374f616e9fb3dff1bd28307ff" offset="0"/>
+				<rom name="raid_aerien.phc" size="7063" crc="25bbf959" sha1="dd242e96cbb2735374f616e9fb3dff1bd28307ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -350,7 +350,7 @@
 		<info name="serial" value="No.67"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="6197">
-				<rom name="super_mind.phc" size="6197" crc="cbd7cae4" sha1="1d7d6f6b9dd4534378c86f8e4fed263909907c7e" offset="0"/>
+				<rom name="super_mind.phc" size="6197" crc="cbd7cae4" sha1="1d7d6f6b9dd4534378c86f8e4fed263909907c7e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -363,7 +363,7 @@
 		<info name="serial" value="No.64"/>
 		<part name="cass" interface="phc25_cass">
 			<dataarea name="cass" size="2238">
-				<rom name="tirs.phc" size="2238" crc="0253827b" sha1="d0031c0e3c81c73624faf79d4024019458a2b64d" offset="0"/>
+				<rom name="tirs.phc" size="2238" crc="0253827b" sha1="d0031c0e3c81c73624faf79d4024019458a2b64d"/>
 			</dataarea>
 		</part>
 	</software>

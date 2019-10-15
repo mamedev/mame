@@ -72,12 +72,12 @@ void cfx9850_state::cfx9850_mem(address_map &map)
 {
 	map(0x000000, 0x007fff).rom();
 	map(0x080000, 0x0807ff).ram().share("video_ram");
-//  AM_RANGE( 0x100000, 0x10ffff ) // some memory mapped i/o???
-//  AM_RANGE( 0x110000, 0x11ffff ) // some memory mapped i/o???
+//  map(0x100000, 0x10ffff) // some memory mapped i/o???
+//  map(0x110000, 0x11ffff) // some memory mapped i/o???
 	map(0x200000, 0x27ffff).rom().region("bios", 0);
-	map(0x400000, 0x40ffff).ram();
+	map(0x400000, 0x407fff).mirror(0x008000).ram();
 	map(0x600000, 0x6007ff).mirror(0xf800).ram().share("display_ram");
-//  AM_RANGE( 0xe10000, 0xe1ffff ) // some memory mapped i/o???
+//  map(0xe10000, 0xe1ffff) // some memory mapped i/o???
 }
 
 

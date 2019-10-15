@@ -35,13 +35,13 @@ Rädda disketten (198x)(sv)
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="197368">
-				<rom name="cpm224dd.imd" size="197368" crc="a99b6ecc" sha1="2326ad4de147638194645df82ea9e803cea4eb79" offset="0x0000" />
+				<rom name="cpm224dd.imd" size="197368" crc="a99b6ecc" sha1="2326ad4de147638194645df82ea9e803cea4eb79"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="145870">
-				<rom name="cpm224sd.imd" size="145870" crc="96bb2a7b" sha1="9cc4d5501abb83c586ede91161750b8718394b9a" offset="0x0000" />
+				<rom name="cpm224sd.imd" size="145870" crc="96bb2a7b" sha1="9cc4d5501abb83c586ede91161750b8718394b9a"/>
 			</dataarea>
 		</part>
 	</software>

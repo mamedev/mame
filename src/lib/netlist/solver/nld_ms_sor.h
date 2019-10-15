@@ -30,7 +30,7 @@ public:
 	using float_type = FT;
 
 	matrix_solver_SOR_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
+		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, params, size)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		, w(size, 0.0)
 		, one_m_w(size, 0.0)
@@ -90,7 +90,7 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 		const float_type * const Idr = this->m_Idrn[k];
 		auto other_cur_analog = this->m_connected_net_Vn[k];
 
-		this->m_new_V[k] = this->m_nets[k]->Q_Analog();
+		this->m_new_V[k] = this->m_terms[k]->getV();
 
 		for (std::size_t i = 0; i < term_count; i++)
 		{

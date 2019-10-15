@@ -776,7 +776,7 @@ uint8_t mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
   assume that most hardware will use port 2 for 8bit access as well.
 
   On configurations where 8 bit access in conjunction with other ports is used,
-  it is up to the driver to use AM_MIRROR to mask out the high level address and
+  it is up to the driver to use mirror() to mask out the high level address and
   provide it's own mapping.
 */
 

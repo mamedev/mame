@@ -46,7 +46,6 @@ public:
 	void ncrpc4i(machine_config &config);
 	void kaypro16(machine_config &config);
 	void kaypropc(machine_config &config);
-	void epc(machine_config &config);
 	void m15(machine_config &config);
 	void bondwell(machine_config &config);
 	void siemens(machine_config &config);
@@ -86,7 +85,6 @@ private:
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_720K(device_t *device);
 
-	void epc_io(address_map &map);
 	void ibm5550_io(address_map &map);
 	void pc16_io(address_map &map);
 	void pc16_map(address_map &map);
@@ -486,6 +484,22 @@ ROM_START( eagle1600 )
 	ROM_LOAD("eagle 1600 video char gen u301.bin", 0x00000, 0x1000, CRC(1a7e552f) SHA1(749058783eec9d96a70dc5fdbfccb56196f889dc))
 ROM_END
 
+/*************************************************************** Eagle PC-2 ***
+
+Links: http://www.digibarn.com/collections/systems/eagle-pc/index.html , https://www.atarimagazines.com/creative/v10n2/28_Eagle_PC2.php http://www.old-computers.com/museum/computer.asp?st=1&c=529
+Form Factor: Desktop
+
+Error message: Cannot read boot sector
+******************************************************************************/
+
+ROM_START( eaglepc2 )
+	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_LOAD("eagle_pc-2_bios_2.812_1986_u1101.bin", 0xe000, 0x2000, CRC(cd0fc034) SHA1(883cb4808c565f2582873a51cc637ab25b457f88))
+
+	ROM_REGION(0x8000,"gfx1", 0)
+	ROM_LOAD("eagle_pc-2_cga_char_rom_u401.bin", 0x00000, 0x1000, CRC(e85da08d) SHA1(176a7027bd14cc7efbb5cec5c2ac89ba002912d0))
+
+ROM_END
 
 /********************************************************** Eagle PC Spirit ***
 
@@ -514,55 +528,6 @@ ROM_START( mc1702 )
 	ROM_LOAD16_BYTE("2764_2,573rf4.rom", 0xc000,  0x2000, CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
 	ROM_LOAD16_BYTE("2764_3,573rf4.rom", 0xc001, 0x2000, CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
 	ROM_LOAD("ba1m,573rf5.rom", 0x0000, 0x0800, CRC(08d938e8) SHA1(957b6c691dbef75c1c735e8e4e81669d056971e4))
-ROM_END
-
-
-/************************************************************** Ericsson PC ***
-
-Links: https://youtu.be/6uilOdMJc24
-Form Factor: Desktop
-CPU: 8088 @ 4.77MHz
-RAM: 256K
-Bus: 6x ISA
-Video: Monchrome or Color 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
-Display: Orange Gas Plasma (GP) display
-Mass storage: 2 x 5.25" 360K or 1 20Mb HDD
-On board ports: Beeper,
-Ports: serial, parallel
-Internal Options: Up to 640K RAM through add-on RAM card
-Misc: The hardware was not 100% PC compatible so non BIOS based software would not run. 50.000+ units sold
-
-******************************************************************************/
-
-void pc_state::epc_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x0070, 0x0071).rw("i8251", FUNC(i8251_device::read), FUNC(i8251_device::write));
-}
-
-void pc_state::epc(machine_config &config)
-{
-	pccga(config);
-
-	i8088_cpu_device &maincpu(I8088(config.replace(), "maincpu", 4772720));
-	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
-	maincpu.set_addrmap(AS_IO, &pc_state::epc_io);
-	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
-
-	subdevice<isa8_slot_device>("isa1")->set_default_option("ega");
-	I8251(config, "i8251", 0); // clock?
-}
-
-ROM_START( epc )
-	ROM_REGION(0x10000,"bios", 0)
-	ROM_DEFAULT_BIOS("p860110")
-	ROM_SYSTEM_BIOS(0, "p840705", "P840705")
-	ROMX_LOAD("ericsson_8088.bin", 0xe000, 0x2000, CRC(3953c38d) SHA1(2bfc1f1d11d0da5664c3114994fc7aa3d6dd010d), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "p860110", "P860110")
-	ROMX_LOAD("epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55), ROM_BIOS(1))
-	ROMX_LOAD("epcbios2.bin",  0xa000, 0x02000, CRC(3ca764ca) SHA1(02232fedef22d31a641f4b65933b9e269afce19e), ROM_BIOS(1))
-	ROMX_LOAD("epcbios3.bin",  0xc000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f), ROM_BIOS(1))
 ROM_END
 
 
@@ -1291,6 +1256,48 @@ ROM_START( nixpc01 )
 	ROM_LOAD( "nx01.bin", 0xc000, 0x4000, CRC(b0a75d1f) SHA1(7c2890eced917969968fc2e7491cda90a9734e03))
 ROM_END
 
+/******************************************************Leading Edge Model M ***
+
+aka the Sperry PC, the "Sperry HT - 4.71 Bios" that can be found online is identical to the v.4.71 below
+E-TD10 - TOD Error
+acording to http://www.o3one.org/hwdocs/bios_doc/dosref22.html this machine had AT-like RTC services
+The "M" stood for a Mitsubishi made machine, the "Leading Edge Model D" was made by Daewoo
+Works with the "siemens" config, so instead of duplicating it until more is known we'll use that.
+
+******************************************************************************/
+
+ROM_START( ledgmodm )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v330", "Version 3.30")
+	ROMX_LOAD( "leading_edge-model_m-version_3.30.bin", 0xc000, 0x4000, CRC(386dd187) SHA1(848ccdc8209c24478a4f75dd941760c43d3bc732), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "v471", "Version 4.71")
+	ROMX_LOAD( "leading_edge-model_m-version_4.71.bin", 0xc000, 0x4000, CRC(0d5d8bee) SHA1(6c35adf6a8da149e420b5aa8dd0e18e02488cfa0), ROM_BIOS(1) )
+ROM_END
+
+/************************************** CCI Micromint MPX-16 PC Motherboard ***
+
+Circuit Cellar Project
+The ROMs are marked "Micromint MPX16 5/8 PC/Term 3/1/84"
+hangs on boot, maybe they are waiting for a serial connection
+
+******************************************************************************/
+
+ROM_START( mpx16 )
+	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_LOAD("mpx16u84.bin", 0xe000, 0x1000, CRC(8a557a25) SHA1(90f8112c094cc0ac44c2d5d43fbb577333dfc165))
+	ROM_LOAD("mpx16u85.bin", 0xf000, 0x1000, CRC(42097571) SHA1(2acaca033242e35e512b30b2233da02bde561cc3))
+ROM_END
+
+/*************************************************** Vendex HeadStart Plus ***
+
+Samsung manufactured - Chipset: Faraday FE2010A - "Keyboard Error or no keyboard present"
+On-board: FDC
+
+******************************************************************************/
+ROM_START( hstrtpls )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD("bios.bin",  0xc000, 0x04000, CRC(19d705f8) SHA1(5e607fec6b533bc59d8d804e399bb9d438d6999d))
+ROM_END
 
 /***************************************************************************
 
@@ -1300,7 +1307,6 @@ ROM_END
 
 //    YEAR  NAME            PARENT   COMPAT  MACHINE         INPUT     CLASS     INIT           COMPANY                            FULLNAME                 FLAGS
 COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,     MACHINE_NOT_WORKING )
-COMP( 1985, epc,            ibm5150, 0,      epc,            pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson PC" ,          MACHINE_NOT_WORKING )
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
@@ -1333,3 +1339,7 @@ COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state,
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
 COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kyocera",                         "XT",                    MACHINE_NOT_WORKING )
 COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )
+COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Leading Edge",                    "Model M",               MACHINE_NOT_WORKING )
+COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "PC-2",                  MACHINE_NOT_WORKING )
+COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Micromint",                       "MPX-16",                MACHINE_NOT_WORKING )
+COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
