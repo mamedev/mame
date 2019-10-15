@@ -7947,4 +7947,231 @@
 		</part>
 	</software>
 
+	<software name="wntgames">
+		<description>Winter Games</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2019-10-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235443">
+				<rom name="winter games side a.woz" size="235443" crc="f4efaabf" sha1="b48d6598ca98a213a39a6d65827e63020092481d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235443">
+				<rom name="winter games side b.woz" size="235443" crc="c27d43fa" sha1="8e79d61971ad57c919e3b691c9a3d8999e4fbac7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplstinv">
+		<description>Apple Stellar Invaders</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2019-10-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235460">
+				<rom name="apple stellar invaders.woz" size="235460" crc="edf89d17" sha1="12ffab9535d9a98b26638b7d8de72de8556efa71" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ulysgflc">
+		<description>Ulysses and the Golden Fleece</description>
+		<year>1981</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2019-10-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="242146">
+				<rom name="ulysses and the golden fleece side a.woz" size="242146" crc="21d6194d" sha1="86ef1ae8cbeb738c9167adefbbc87a85ed5f7615" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235510">
+				<rom name="ulysses and the golden fleece side b.woz" size="235510" crc="7168c183" sha1="e5b2b512c68a98ee4d436acaeaab33aa4e5798b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simlineq">
+		<description>Simultaneous Linear Equations</description>
+		<year>1984</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2019-10-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="252755">
+				<rom name="simultaneous linear equations.woz" size="252755" crc="de565e61" sha1="6f11ae0b7b74e130503cea4a347b662db6fdc9b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="covetmir">
+		<description>The Coveted Mirror</description>
+		<year>1985</year>
+		<publisher>Polarware</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- This re-release requires a 64K Apple ][+ or later;
+		the optional double hi-res graphics mode requires a
+		128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234878">
+				<rom name="the coveted mirror 2.0 side a.woz" size="234878" crc="c8f37420" sha1="3409d2d539e5b24217e512e0f4d379a4a12ed4a5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B (Boot disk)"/>
+			<dataarea name="flop" size="234878">
+				<rom name="the coveted mirror 2.0 side b (boot).woz" size="234878" crc="bb03d3d6" sha1="00570626b8b6ebf5ab04185744704f13a0af8b97" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alibi">
+		<description>Alibi</description>
+		<year>1981</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248803">
+				<rom name="alibi.woz" size="248803" crc="12ac7a0b" sha1="38e38af85103b666b8d610a18d18ccd344a4a302" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversal">
+		<description>Reversal</description>
+		<year>1980</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- The disk label says it requires a 32K Apple ][, but under
+		emulation I could not get it to work on less than a 48K Apple ][+. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="reversal.woz" size="234813" crc="ec850ca7" sha1="e6726b394b80467052b698c6c71941dd569082e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hntpalac">
+		<description>The Haunted Palace</description>
+		<year>1982</year>
+		<publisher>Crystalware</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235480">
+				<rom name="the haunted palace side a.woz" size="235480" crc="c50da672" sha1="76a1137940f17495b8ff4b336fccafed7b78067a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235480">
+				<rom name="the haunted palace side b.woz" size="235480" crc="b078bc2b" sha1="8fec41306ab05b395df33b88c337609b66ad7a15" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sherhlms">
+		<description>Sherlock Holmes in Another Bow</description>
+		<year>1985</year>
+		<publisher>Bantam Software</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235540">
+				<rom name="sherlock holmes in another bow side a.woz" size="235540" crc="1732e581" sha1="09700ab41f161d7ae85dce73d6caaed2dbf84cdb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235560">
+				<rom name="sherlock holmes in another bow side b.woz" size="235560" crc="9a3f6312" sha1="ee2a62b36982f5a09c81d353f0aebf6ded2123dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dogfght2">
+		<description>Dogfight II</description>
+		<year>1981</year>
+		<publisher>Micro Lab</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P" />
+
+		<!-- It requires a 48K Apple ][ or Apple ][+.
+		Due to compatibility issues created by the copy protection,
+		it will not run on later models. -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="188158">
+				<rom name="dogfight ii.woz" size="188158" crc="789c1c34" sha1="234fb379e91e741c7533d65e01f65547d942432d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masksun">
+		<description>The Mask of the Sun (Version 2.1)</description>
+		<year>1982</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234816">
+				<rom name="the mask of the sun v2.1 side a.woz" size="234816" crc="6f53a1a8" sha1="be0a62cac5e1b658b531a3a72e081be38bb3f50f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234816">
+				<rom name="the mask of the sun v2.1 side b.woz" size="234816" crc="74c541b4" sha1="2e8b846c425685718135391fdbb16ce53cacaa06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pulsar2">
+		<description>Pulsar ][</description>
+		<year>1981</year>
+		<publisher></publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="168203">
+				<rom name="pulsar ][.woz" size="168203" crc="d7ca2e40" sha1="a2558764c118dc708c2306cbaac6d353815127d4" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
