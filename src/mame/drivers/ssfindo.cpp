@@ -155,7 +155,7 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
-	required_device<arm_iomd_device> m_iomd;
+	required_device<arm7500fe_iomd_device> m_iomd;
 	optional_device<i2cmem_device> m_i2cmem;
 	required_region_ptr<uint16_t> m_flashrom;
 	
@@ -356,7 +356,7 @@ READ32_MEMBER(ssfindo_state::randomized_r)
 void ssfindo_state::ssfindo_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
 	map(0x03012e60, 0x03012e67).noprw();
 	map(0x03012fe0, 0x03012fe3).w(FUNC(ssfindo_state::debug_w));
 	map(0x03012ff0, 0x03012ff3).noprw();
@@ -375,7 +375,7 @@ void ssfindo_state::ssfindo_map(address_map &map)
 void ssfindo_state::ppcar_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
 	map(0x03012b00, 0x03012bff).r(FUNC(ssfindo_state::randomized_r)).nopw();
 	map(0x03012e60, 0x03012e67).nopw();
 	map(0x03012ff8, 0x03012ffb).portr("IN0").nopw();
@@ -402,7 +402,7 @@ WRITE32_MEMBER(tetfight_state::tetfight_unk_w)
 void tetfight_state::tetfight_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
 	map(0x03240000, 0x03240003).portr("IN0");
 	map(0x03240004, 0x03240007).portr("IN1");
 	map(0x03240008, 0x0324000b).portr("DSW2");
@@ -560,7 +560,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
 	
-	ARM_IOMD(config, m_iomd, 54000000);
+	ARM7500FE_IOMD(config, m_iomd, 54000000);
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));

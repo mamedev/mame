@@ -24,6 +24,8 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(ARM_IOMD, arm_iomd_device, "arm_iomd", "ARM IOMD controller")
+// TODO: ssfindo.cpp actually uses a Cirrus Logic 7500FE, is it rebadged?
+DEFINE_DEVICE_TYPE(ARM7500FE_IOMD, arm7500fe_iomd_device, "arm_7500FE_SoC", "ARM 7500FE SoC")
 
 
 //**************************************************************************
@@ -34,28 +36,27 @@ DEFINE_DEVICE_TYPE(ARM_IOMD, arm_iomd_device, "arm_iomd", "ARM IOMD controller")
 //  arm_iomd_device - constructor
 //-------------------------------------------------
 
-void arm_iomd_device::map(address_map &map)
+void arm_iomd_device::base_map(address_map &map)
 {
 	// I/O
 	map(0x000, 0x003).rw(FUNC(arm_iomd_device::iocr_r), FUNC(arm_iomd_device::iocr_w));
 //	map(0x004, 0x007).rw(FUNC(arm_iomd_device::kbddat_r), FUNC(arm_iomd_device::kbddat_w));
 //	map(0x008, 0x00b).rw(FUNC(arm_iomd_device::kbdcr_r), FUNC(arm_iomd_device::kbdcr_w));
+	// TODO: iolines are 7500 only
 	map(0x00c, 0x00f).rw(FUNC(arm_iomd_device::iolines_r), FUNC(arm_iomd_device::iolines_w));
 	// interrupt A/B/fiq + master clock controls
 	map(0x010, 0x013).r(FUNC(arm_iomd_device::irqst_r<IRQA>));
 	map(0x014, 0x017).rw(FUNC(arm_iomd_device::irqrq_r<IRQA>), FUNC(arm_iomd_device::irqrq_w<IRQA>));
 	map(0x018, 0x01b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQA>), FUNC(arm_iomd_device::irqmsk_w<IRQA>));
-//	map(0x01c, 0x01f).rw(FUNC(arm_iomd_device::susmode_r), FUNC(arm_iomd_device::susmode_w));
 
 	map(0x020, 0x023).r(FUNC(arm_iomd_device::irqst_r<IRQB>));
 	map(0x024, 0x027).rw(FUNC(arm_iomd_device::irqrq_r<IRQB>), FUNC(arm_iomd_device::irqrq_w<IRQB>));
 	map(0x028, 0x02b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQB>), FUNC(arm_iomd_device::irqmsk_w<IRQB>));
-//	map(0x02c, 0x02f).w(FUNC(arm_iomd_device::stopmode_w));
 
 //	map(0x030, 0x033).r(FUNC(arm_iomd_device::fiqst_r));
 //	map(0x034, 0x037).rw(FUNC(arm_iomd_device::fiqrq_r), FUNC(arm_iomd_device::fiqrq_w));
 //	map(0x038, 0x03b).rw(FUNC(arm_iomd_device::fiqmsk_r), FUNC(arm_iomd_device::fiqmsk_w));
-	map(0x03c, 0x03f).rw(FUNC(arm_iomd_device::clkctl_r), FUNC(arm_iomd_device::clkctl_w));
+
 	// timers
 	map(0x040, 0x043).rw(FUNC(arm_iomd_device::tNlow_r<0>), FUNC(arm_iomd_device::tNlow_w<0>));
 	map(0x044, 0x047).rw(FUNC(arm_iomd_device::tNhigh_r<0>), FUNC(arm_iomd_device::tNhigh_w<0>));
@@ -66,44 +67,23 @@ void arm_iomd_device::map(address_map &map)
 	map(0x054, 0x057).rw(FUNC(arm_iomd_device::tNhigh_r<1>), FUNC(arm_iomd_device::tNhigh_w<1>));
 	map(0x058, 0x05b).w(FUNC(arm_iomd_device::tNgo_w<1>));
 	map(0x05c, 0x05f).w(FUNC(arm_iomd_device::tNlatch_w<1>));
-	// interrupt C/D
-	map(0x060, 0x063).r(FUNC(arm_iomd_device::irqst_r<IRQC>));
-	map(0x064, 0x067).rw(FUNC(arm_iomd_device::irqrq_r<IRQC>), FUNC(arm_iomd_device::irqrq_w<IRQC>));
-	map(0x068, 0x06b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQC>), FUNC(arm_iomd_device::irqmsk_w<IRQC>));	
-//	map(0x06c, 0x06f).rw(FUNC(arm_iomd_device::vidmux_r), FUNC(arm_iomd_device::vidmux_w));
-	map(0x070, 0x073).r(FUNC(arm_iomd_device::irqst_r<IRQD>));
-	map(0x074, 0x077).rw(FUNC(arm_iomd_device::irqrq_r<IRQD>), FUNC(arm_iomd_device::irqrq_w<IRQD>));
-	map(0x078, 0x07b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQD>), FUNC(arm_iomd_device::irqmsk_w<IRQD>));	
 	// ROM control
 //	map(0x080, 0x083).rw(FUNC(arm_iomd_device::romcr_r<0>), FUNC(arm_iomd_device::romcr_w<0>));
 //	map(0x084, 0x087).rw(FUNC(arm_iomd_device::romcr_r<1>), FUNC(arm_iomd_device::romcr_w<1>));
 //	map(0x08c, 0x08f).rw(FUNC(arm_iomd_device::refcr_r), FUNC(arm_iomd_device::refcr_w));
 
 	// device identifiers
-//	map(0x094, 0x097).r(FUNC(arm_iomd_device::id_r<0>));
-//	map(0x098, 0x09b).r(FUNC(arm_iomd_device::id_r<1>));
-//	map(0x09c, 0x09f).r(FUNC(arm_iomd_device::version_r));
-	// mouse (for PS7500, others may differ)
-//	map(0x0a8, 0x0ab).rw(FUNC(arm_iomd_device::msedat_r), FUNC(arm_iomd_device::msedat_w));
-//	map(0x0ac, 0x0af).rw(FUNC(arm_iomd_device::msecr_r), FUNC(arm_iomd_device::msecr_w));
+	map(0x094, 0x097).r(FUNC(arm_iomd_device::id_r<0>));
+	map(0x098, 0x09b).r(FUNC(arm_iomd_device::id_r<1>));
+	map(0x09c, 0x09f).r(FUNC(arm_iomd_device::version_r));
+	// mouse
+//	map(0x0a0, 0x0a3) // ...
 
 	// I/O control
 //	map(0x0c4, 0x0c7).rw(FUNC(arm_iomd_device::iotcr_r), FUNC(arm_iomd_device::iotcr_w));
 //	map(0x0c8, 0x0cb).rw(FUNC(arm_iomd_device::ectcr_r), FUNC(arm_iomd_device::ectcr_w));
-//	map(0x0cc, 0x0cf).rw(FUNC(arm_iomd_device::astcr_r), FUNC(arm_iomd_device::astcr_w));
-	// RAM control
-//	map(0x0d0, 0x0d3).rw(FUNC(arm_iomd_device::dramctl_r), FUNC(arm_iomd_device::dramctl_w));
-//	map(0x0d4, 0x0d7).rw(FUNC(arm_iomd_device::selfref_r), FUNC(arm_iomd_device::selfref_w));
-	// A/D converter
-//	map(0x0e0, 0x0e3).rw(FUNC(arm_iomd_device::atodicr_r), FUNC(arm_iomd_device::atodicr_w));
-//	map(0x0e4, 0x0e7).r(FUNC(arm_iomd_device::atodsr_r));
-//	map(0x0e8, 0x0eb).rw(FUNC(arm_iomd_device::atodcc_r), FUNC(arm_iomd_device::atodcc_w));
-//	map(0x0ec, 0x0ef).r(FUNC(arm_iomd_device::atodcnt_r<0>)); 
-//	map(0x0f0, 0x0f3).r(FUNC(arm_iomd_device::atodcnt_r<1>));
-//	map(0x0f4, 0x0f7).r(FUNC(arm_iomd_device::atodcnt_r<2>));
-//	map(0x0f8, 0x0fb).r(FUNC(arm_iomd_device::atodcnt_r<3>));
 	// sound DMA
-	// note: sound DMA is actually labeled sd0* in the quick r/w sheet but there's no actual sd1, scrapped during HW dev?
+	// TODO: IOMD actually have a sd1* register, rework this
 	map(0x180, 0x183).rw(FUNC(arm_iomd_device::sdcur_r<0>), FUNC(arm_iomd_device::sdcur_w<0>));
 	map(0x184, 0x187).rw(FUNC(arm_iomd_device::sdend_r<0>), FUNC(arm_iomd_device::sdend_w<0>));
 	map(0x188, 0x18b).rw(FUNC(arm_iomd_device::sdcur_r<1>), FUNC(arm_iomd_device::sdcur_w<1>));
@@ -114,14 +94,13 @@ void arm_iomd_device::map(address_map &map)
 	// video DMA
 //	map(0x1c0, 0x1c3).rw(FUNC(arm_iomd_device::curscur_r), FUNC(arm_iomd_device::curscur_w));
 //	map(0x1c4, 0x1c7).rw(FUNC(arm_iomd_device::cursinit_r), FUNC(arm_iomd_device::cursinit_w));
-//	map(0x1c8, 0x1cb).rw(FUNC(arm_iomd_device::vidcurb_r), FUNC(arm_iomd_device::vidcurb_w));
 
 //	map(0x1d0, 0x1d3).rw(FUNC(arm_iomd_device::vidcura_r), FUNC(arm_iomd_device::vidcura_w));
 	map(0x1d4, 0x1d7).rw(FUNC(arm_iomd_device::vidend_r), FUNC(arm_iomd_device::vidend_w));
 //	map(0x1d8, 0x1db).rw(FUNC(arm_iomd_device::vidstart_r), FUNC(arm_iomd_device::vidstart_w));
 	map(0x1dc, 0x1df).rw(FUNC(arm_iomd_device::vidinita_r), FUNC(arm_iomd_device::vidinita_w));
 	map(0x1e0, 0x1e3).rw(FUNC(arm_iomd_device::vidcr_r), FUNC(arm_iomd_device::vidcr_w));
-//	map(0x1e8, 0x1eb).rw(FUNC(arm_iomd_device::vidinitb_r), FUNC(arm_iomd_device::vidinitb_w));
+
 	// interrupt DMA
 	map(0x1f0, 0x1f3).r(FUNC(arm_iomd_device::irqst_r<IRQDMA>));
 	map(0x1f4, 0x1f7).rw(FUNC(arm_iomd_device::irqrq_r<IRQDMA>), FUNC(arm_iomd_device::irqrq_w<IRQDMA>));
@@ -130,9 +109,33 @@ void arm_iomd_device::map(address_map &map)
 //  TODO: iomd2 has extra regs in 0x200-0x3ff area, others NOPs / mirrors?
 }
 
+void arm_iomd_device::map(address_map &map)
+{
+	arm_iomd_device::base_map(map);
+//	map(0x088, 0x08b).rw(FUNC(arm_iomd_device::dramcr_r), FUNC(arm_iomd_device::dramcr_w));
+	// VRAM control
+//	map(0x08c, 0x08f).rw(FUNC(arm_iomd_device::vrefcr_r), FUNC(arm_iomd_device::vrefcr_w));
+	// flyback line size
+//	map(0x090, 0x093).rw(FUNC(arm_iomd_device::fsize_r), FUNC(arm_iomd_device::fsize_w));
+	// quadrature mouse control
+//	map(0x0a0, 0x0a3).rw(FUNC(arm_iomd_device::mousex_r), FUNC(arm_iomd_device::mousex_w));
+//	map(0x0a4, 0x0a7).rw(FUNC(arm_iomd_device::mousey_r), FUNC(arm_iomd_device::mousey_w));
+	// DACK timing control
+//	map(0x0c0, 0x0c3).rw(FUNC(arm_iomd_device::dmatcr_r), FUNC(arm_iomd_device::dmatcr_w));
+	// DMA external control
+//	map(0x0cc, 0x0cf).rw(FUNC(arm_iomd_device::dmaext_r), FUNC(arm_iomd_device::dmaext_w));
+	// I/O DMA, similar structure as sound DMA
+//	map(0x100, 0x11f) ch 0
+//	map(0x120, 0x13f) ch 1
+//	map(0x140, 0x15f) ch 2
+//	map(0x160, 0x17f) ch 3
+	// sound DMA
+//	map(0x1a0, 0x1bf) ch 1
 
-arm_iomd_device::arm_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ARM_IOMD, tag, owner, clock)
+}
+
+arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
 	, m_iolines_read_cb(*this)
@@ -142,8 +145,62 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, const char *tag,
 	, m_iocr_read_id_cb(*this)
 	, m_iocr_write_id_cb(*this)
 {
+}
+
+arm_iomd_device::arm_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm_iomd_device(mconfig, ARM_IOMD, tag, owner, clock)
+{
+	m_id = 0xd4e7;
+	m_version = 0;	
+}
+
+void arm7500fe_iomd_device::map(address_map &map)
+{
+	arm_iomd_device::base_map(map);
+	// master clock controls
+//	map(0x01c, 0x01f).rw(FUNC(arm7500fe_iomd_device::susmode_r), FUNC(arm7500fe_iomd_device::susmode_w));
+//	map(0x02c, 0x02f).w(FUNC(arm7500fe_iomd_device::stopmode_w));
+	map(0x03c, 0x03f).rw(FUNC(arm7500fe_iomd_device::clkctl_r), FUNC(arm7500fe_iomd_device::clkctl_w));
+	// interrupt C/D
+	map(0x060, 0x063).r(FUNC(arm7500fe_iomd_device::irqst_r<IRQC>));
+	map(0x064, 0x067).rw(FUNC(arm7500fe_iomd_device::irqrq_r<IRQC>), FUNC(arm7500fe_iomd_device::irqrq_w<IRQC>));
+	map(0x068, 0x06b).rw(FUNC(arm7500fe_iomd_device::irqmsk_r<IRQC>), FUNC(arm7500fe_iomd_device::irqmsk_w<IRQC>));	
+//	map(0x06c, 0x06f).rw(FUNC(arm7500fe_iomd_device::vidmux_r), FUNC(arm7500fe_iomd_device::vidmux_w));
+	map(0x070, 0x073).r(FUNC(arm7500fe_iomd_device::irqst_r<IRQD>));
+	map(0x074, 0x077).rw(FUNC(arm7500fe_iomd_device::irqrq_r<IRQD>), FUNC(arm7500fe_iomd_device::irqrq_w<IRQD>));
+	map(0x078, 0x07b).rw(FUNC(arm7500fe_iomd_device::irqmsk_r<IRQD>), FUNC(arm7500fe_iomd_device::irqmsk_w<IRQD>));	
+	
+	// PS/2 mouse
+//	map(0x0a8, 0x0ab).rw(FUNC(arm7500fe_iomd_device::msedat_r), FUNC(arm7500fe_iomd_device::msedat_w));
+//	map(0x0ac, 0x0af).rw(FUNC(arm7500fe_iomd_device::msecr_r), FUNC(arm7500fe_iomd_device::msecr_w));
+	// I/O control
+//	map(0x0cc, 0x0cf).rw(FUNC(arm7500fe_iomd_device::astcr_r), FUNC(arm7500fe_iomd_device::astcr_w));
+	// RAM control
+//	map(0x0d0, 0x0d3).rw(FUNC(arm7500fe_iomd_device::dramctl_r), FUNC(arm7500fe_iomd_device::dramctl_w));
+//	map(0x0d4, 0x0d7).rw(FUNC(arm7500fe_iomd_device::selfref_r), FUNC(arm7500fe_iomd_device::selfref_w));
+	// A/D converter
+//	map(0x0e0, 0x0e3).rw(FUNC(arm7500fe_iomd_device::atodicr_r), FUNC(arm7500fe_iomd_device::atodicr_w));
+//	map(0x0e4, 0x0e7).r(FUNC(arm7500fe_iomd_device::atodsr_r));
+//	map(0x0e8, 0x0eb).rw(FUNC(arm7500fe_iomd_device::atodcc_r), FUNC(arm7500fe_iomd_device::atodcc_w));
+//	map(0x0ec, 0x0ef).r(FUNC(arm7500fe_iomd_device::atodcnt_r<0>)); 
+//	map(0x0f0, 0x0f3).r(FUNC(arm7500fe_iomd_device::atodcnt_r<1>));
+//	map(0x0f4, 0x0f7).r(FUNC(arm7500fe_iomd_device::atodcnt_r<2>));
+//	map(0x0f8, 0x0fb).r(FUNC(arm7500fe_iomd_device::atodcnt_r<3>));
+	// video DMA
+//	map(0x1c8, 0x1cb).rw(FUNC(arm7500fe_iomd_device::vidcurb_r), FUNC(arm7500fe_iomd_device::vidcurb_w));
+//	map(0x1e8, 0x1eb).rw(FUNC(arm7500fe_iomd_device::vidinitb_r), FUNC(arm7500fe_iomd_device::vidinitb_w));
 
 }
+
+arm7500fe_iomd_device::arm7500fe_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: arm_iomd_device(mconfig, ARM7500FE_IOMD, tag, owner, clock)
+{
+	m_id = 0xaa7c;
+	m_version = 0;
+}
+
+// vanilla ARM7500 m_id = 0x5b98; m_version = 0;
+// IOMD2 m_id = 0xd5e8; m_version = 1;
 
 //-------------------------------------------------
 //  device_add_mconfig - device-specific machine
@@ -205,12 +262,15 @@ void arm_iomd_device::device_start()
 	save_pointer(NAME(m_sndstop_reg), sounddma_ch_size);
 	save_pointer(NAME(m_sndlast_reg), sounddma_ch_size);
 	save_pointer(NAME(m_sndbuffer_ok), sounddma_ch_size);
-	
-	save_item(NAME(m_cpuclk_divider));
-	save_item(NAME(m_memclk_divider));
-	save_item(NAME(m_ioclk_divider));
 }
 
+void arm7500fe_iomd_device::device_start()
+{
+	arm_iomd_device::device_start();
+	save_item(NAME(m_cpuclk_divider));
+	save_item(NAME(m_memclk_divider));
+	save_item(NAME(m_ioclk_divider));	
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -239,9 +299,14 @@ void arm_iomd_device::device_reset()
 	for (i=0; i<sounddma_ch_size; i++)
 		m_sndbuffer_ok[i] = false;
 
-	m_cpuclk_divider = m_ioclk_divider = m_memclk_divider = false;
-	refresh_host_cpu_clocks();
 	// ...
+}
+
+void arm7500fe_iomd_device::device_reset()
+{
+	arm_iomd_device::device_reset();
+	m_cpuclk_divider = m_ioclk_divider = m_memclk_divider = false;
+	refresh_host_cpu_clocks();	
 }
 
 void arm_iomd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -341,17 +406,17 @@ template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::irqmsk_w )
 }
 
 // master clock control
-inline void arm_iomd_device::refresh_host_cpu_clocks()
+inline void arm7500fe_iomd_device::refresh_host_cpu_clocks()
 {
 	m_host_cpu->set_unscaled_clock(this->clock() >> (m_cpuclk_divider == false));
 }
 
-READ32_MEMBER( arm_iomd_device::clkctl_r )
+READ32_MEMBER( arm7500fe_iomd_device::clkctl_r )
 {
 	return (m_cpuclk_divider << 2) | (m_memclk_divider << 1) | (m_ioclk_divider);
 }
 
-WRITE32_MEMBER( arm_iomd_device::clkctl_w )
+WRITE32_MEMBER( arm7500fe_iomd_device::clkctl_w )
 {
 	m_cpuclk_divider = BIT(data, 2);
 	m_memclk_divider = BIT(data, 1);
@@ -411,6 +476,18 @@ template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::tNlatch_w )
 	}
 }
 
+// device identifiers
+template <unsigned Nibble> READ32_MEMBER( arm_iomd_device::id_r )
+{
+	return (m_id >> (Nibble*8)) & 0xff;
+}
+
+READ32_MEMBER( arm_iomd_device::version_r )
+{
+	return m_version;
+}
+
+DECLARE_READ32_MEMBER( version_r );
 
 // sound DMA
 
