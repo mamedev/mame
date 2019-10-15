@@ -17,8 +17,6 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
-#include "sound/sn76477.h"
-#include "sound/samples.h"
 #include "screen.h"
 
 
@@ -53,20 +51,15 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_main_ram(*this, "main_ram"),
 		m_discrete(*this, "discrete"),
-		m_samples(*this, "samples"),
 		m_screen(*this, "screen")
 	{ }
 
 	void blueshrk(machine_config &config);
-	void boothill(machine_config &config);
 	void bowler(machine_config &config);
 	void checkmat(machine_config &config);
 	void dogpatch(machine_config &config);
-	void dplay(machine_config &config);
-	void gmissile(machine_config &config);
 	void invad2ct(machine_config &config);
 	void invaders(machine_config &config);
-	void m4(machine_config &config);
 	void maze(machine_config &config);
 	void mw8080bw_root(machine_config &config);
 	void phantom2(machine_config &config);
@@ -81,8 +74,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_left_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_right_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_score_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_left_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_right_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
@@ -98,7 +89,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
+	u8 mw8080bw_shift_result_rev_r();
 
 	int invaders_is_cabinet_cocktail();
 
@@ -111,9 +102,6 @@ protected:
 	optional_device<watchdog_timer_device> m_watchdog;
 	required_shared_ptr<uint8_t> m_main_ram;
 	optional_device<discrete_sound_device> m_discrete;
-
-	// other devices
-	optional_device<samples_device> m_samples;
 	required_device<screen_device> m_screen;
 
 	// misc game specific
@@ -122,7 +110,6 @@ protected:
 private:
 	// misc game specific
 	uint16_t      m_phantom2_cloud_counter;
-	uint8_t       m_rev_shift_res;
 	uint8_t       m_maze_tone_timing_state;   // output of IC C1, pin 5
 
 	// timers
@@ -131,8 +118,6 @@ private:
 
 	attotime m_interrupt_time;
 
-	DECLARE_READ8_MEMBER(mw8080bw_reversable_shift_result_r);
-	DECLARE_WRITE8_MEMBER(mw8080bw_reversable_shift_count_w);
 	DECLARE_WRITE8_MEMBER(tornbase_io_w);
 	DECLARE_WRITE8_MEMBER(maze_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(maze_io_w);
@@ -148,55 +133,40 @@ private:
 	DECLARE_WRITE8_MEMBER(bowler_audio_5_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_6_w);
 	DECLARE_MACHINE_START(maze);
-	DECLARE_MACHINE_START(boothill);
-	DECLARE_MACHINE_START(gmissile);
-	DECLARE_MACHINE_START(m4);
 	DECLARE_MACHINE_START(phantom2);
 	DECLARE_MACHINE_START(invaders);
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_trigger);
-	DECLARE_WRITE8_MEMBER(midway_tone_generator_lo_w);
-	DECLARE_WRITE8_MEMBER(midway_tone_generator_hi_w);
 	DECLARE_WRITE8_MEMBER(tornbase_audio_w);
-	DECLARE_WRITE8_MEMBER(boothill_audio_w);
 	DECLARE_WRITE8_MEMBER(checkmat_audio_w);
-	DECLARE_WRITE8_MEMBER(dplay_audio_w);
 	DECLARE_WRITE8_MEMBER(shuffle_audio_1_w);
 	DECLARE_WRITE8_MEMBER(shuffle_audio_2_w);
-	DECLARE_WRITE8_MEMBER(dogpatch_audio_w);
 	DECLARE_WRITE8_MEMBER(bowler_audio_1_w);
 	DECLARE_WRITE8_MEMBER(blueshrk_audio_w);
 	void maze_update_discrete();
 	void maze_write_discrete(uint8_t maze_tone_timing_state);
-	uint8_t vpos_to_vysnc_chain_counter( int vpos );
-	int vysnc_chain_counter_to_vpos( uint8_t counter, int vblank );
-	void mw8080bw_create_interrupt_timer(  );
-	void mw8080bw_start_interrupt_timer(  );
+	uint8_t vpos_to_vysnc_chain_counter(int vpos);
+	int vysnc_chain_counter_to_vpos(uint8_t counter, int vblank);
+	void mw8080bw_create_interrupt_timer();
+	void mw8080bw_start_interrupt_timer();
 	uint8_t tornbase_get_cabinet_type();
 
 	void blueshrk_audio(machine_config &config);
-	void boothill_audio(machine_config &config);
 	void bowler_audio(machine_config &config);
 	void checkmat_audio(machine_config &config);
-	void dogpatch_audio(machine_config &config);
-	void dplay_audio(machine_config &config);
 	void maze_audio(machine_config &config);
 	void shuffle_audio(machine_config &config);
 	void tornbase_audio(machine_config &config);
 	void zzzap_audio(machine_config &config);
 
 	void blueshrk_io_map(address_map &map);
-	void boothill_io_map(address_map &map);
 	void bowler_io_map(address_map &map);
 	void checkmat_io_map(address_map &map);
 	void dogpatch_io_map(address_map &map);
-	void dplay_io_map(address_map &map);
-	void gmissile_io_map(address_map &map);
 	void invad2ct_io_map(address_map &map);
 	void invaders_io_map(address_map &map);
-	void m4_io_map(address_map &map);
 	void main_map(address_map &map);
 	void maze_io_map(address_map &map);
 	void phantom2_io_map(address_map &map);
@@ -265,6 +235,33 @@ private:
 };
 
 
+class boothill_state : public mw8080bw_state
+{
+public:
+	boothill_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag)
+	{
+	}
+
+	void boothill(machine_config &config);
+	void gmissile(machine_config &config);
+	void m4(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	u8 reversible_shift_result_r();
+	void reversible_shift_count_w(u8 data);
+
+	void boothill_io_map(address_map &map);
+	void gmissile_io_map(address_map &map);
+	void m4_io_map(address_map &map);
+
+	u8 m_rev_shift_res;
+};
+
+
 #define DESERTGU_GUN_X_PORT_TAG         ("GUNX")
 #define DESERTGU_GUN_Y_PORT_TAG         ("GUNY")
 
@@ -295,6 +292,35 @@ private:
 	required_ioport_array<2> m_gun_port;
 	required_ioport_array<2> m_dip_sw_0_1;
 	u8 m_controller_select;
+};
+
+
+#define DPLAY_L_PITCH_PORT_TAG      ("LPITCH")
+#define DPLAY_R_PITCH_PORT_TAG      ("RPITCH")
+#define DPLAY_CAB_TYPE_PORT_TAG     ("CAB")
+
+class dplay_state : public mw8080bw_state
+{
+public:
+	dplay_state(machine_config const &mconfig, device_type type, char const *tag) :
+		mw8080bw_state(mconfig, type, tag),
+		m_l_pitch(*this, DPLAY_L_PITCH_PORT_TAG),
+		m_r_pitch(*this, DPLAY_L_PITCH_PORT_TAG),
+		m_cab_type(*this, DPLAY_CAB_TYPE_PORT_TAG)
+	{
+	}
+
+	void dplay(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_left_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_right_input_r);
+
+private:
+	void io_map(address_map &map);
+
+	required_ioport m_l_pitch;
+	required_ioport m_r_pitch;
+	required_ioport m_cab_type;
 };
 
 

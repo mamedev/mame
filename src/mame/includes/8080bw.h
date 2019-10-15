@@ -15,6 +15,7 @@
 
 #include "machine/eepromser.h"
 #include "machine/timer.h"
+#include "sound/samples.h"
 #include "sound/sn76477.h"
 #include "sound/spkrdev.h"
 
@@ -35,6 +36,7 @@ public:
 		, m_schaser_effect_555_timer(*this, "schaser_sh_555")
 		, m_claybust_gun_on(*this, "claybust_gun")
 		, m_sn(*this, "snsnd")
+		, m_samples(*this, "samples")
 		, m_speaker(*this, "speaker")
 		, m_eeprom(*this, "eeprom")
 		, m_palette(*this, "palette")
@@ -93,6 +95,7 @@ private:
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
 	optional_device<sn76477_device> m_sn;
+	optional_device<samples_device> m_samples;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<palette_device> m_palette;

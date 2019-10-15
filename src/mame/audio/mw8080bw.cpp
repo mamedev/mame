@@ -559,11 +559,14 @@ discrete_mixer_desc const invaders_mixer =
 
 DEFINE_DEVICE_TYPE(SEAWOLF_AUDIO,  seawolf_audio_device,  "seawolf_audio",  "Midway Sea Wolf Audio")
 DEFINE_DEVICE_TYPE(GUNFIGHT_AUDIO, gunfight_audio_device, "gunfight_audio", "Midway Gun Fight Audio")
+DEFINE_DEVICE_TYPE(BOOTHILL_AUDIO, boothill_audio_device, "boothill_audio", "Midway Boot Hill Audio")
 DEFINE_DEVICE_TYPE(DESERTGU_AUDIO, desertgu_audio_device, "desertgu_audio", "Midway Desert Gun Audio")
+DEFINE_DEVICE_TYPE(DPLAY_AUDIO,    dplay_audio_device,    "dplay_audio",    "Midway Double Play Audio")
 DEFINE_DEVICE_TYPE(GMISSILE_AUDIO, gmissile_audio_device, "gmissile_audio", "Midway Guided Missile Audio")
 DEFINE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device,       "m4_audio",       "Midway M-4 Audio")
 DEFINE_DEVICE_TYPE(CLOWNS_AUDIO,   clowns_audio_device,   "clowns_audio",   "Midway Clowns Audio")
 DEFINE_DEVICE_TYPE(SPACWALK_AUDIO, spacwalk_audio_device, "spacwalk_audio", "Midway Space Walk Audio")
+DEFINE_DEVICE_TYPE(DOGPATCH_AUDIO, dogpatch_audio_device, "dogpatch_audio", "Midway Dog Patch Audio")
 DEFINE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device, "spcenctr_audio", "Midway Space Encounters Audio")
 DEFINE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device, "phantom2_audio", "Midway Phantom 2 Audio")
 DEFINE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device, "invaders_audio", "Taito Space Invaders Audio")
@@ -767,6 +770,264 @@ void gunfight_audio_device::device_add_mconfig(machine_config &config)
 }
 
 void gunfight_audio_device::device_start()
+{
+}
+
+
+/*************************************
+ *
+ *  Boot Hill
+ *
+ *  Discrete sound emulation: Jan 2007, D.R.
+ *
+ *************************************/
+
+// nodes - inputs
+#define BOOTHILL_GAME_ON_EN         NODE_01
+#define BOOTHILL_LEFT_SHOT_EN       NODE_02
+#define BOOTHILL_RIGHT_SHOT_EN      NODE_03
+#define BOOTHILL_LEFT_HIT_EN        NODE_04
+#define BOOTHILL_RIGHT_HIT_EN       NODE_05
+
+// nodes - sounds
+#define BOOTHILL_NOISE              NODE_06
+#define BOOTHILL_L_SHOT_SND         NODE_07
+#define BOOTHILL_R_SHOT_SND         NODE_08
+#define BOOTHILL_L_HIT_SND          NODE_09
+#define BOOTHILL_R_HIT_SND          NODE_10
+
+// nodes - adjusters
+#define BOOTHILL_MUSIC_ADJ          NODE_11
+
+static discrete_op_amp_tvca_info const boothill_tone_tvca_info =
+{
+	RES_M(3.3),
+	RES_K(100) + RES_K(680),
+	0,
+	RES_K(680),
+	RES_K(10),
+	0,
+	RES_K(680),
+	0,
+	0,
+	0,
+	0,
+	CAP_U(.001),
+	0,
+	0, 0,
+	12,
+	0,
+	0,
+	12,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+static discrete_op_amp_tvca_info const boothill_shot_tvca_info =
+{
+	RES_M(2.7),
+	RES_K(510),
+	0,
+	RES_K(510),
+	RES_K(10),
+	0,
+	RES_K(510),
+	0,
+	0,
+	0,
+	0,
+	CAP_U(0.22),
+	0,
+	0, 0,
+	12,
+	0,
+	0,
+	12,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+static discrete_op_amp_tvca_info const boothill_hit_tvca_info =
+{
+	RES_M(2.7),
+	RES_K(510),
+	0,
+	RES_K(510),
+	RES_K(10),
+	0,
+	RES_K(510),
+	0,
+	0,
+	0,
+	0, 0,
+	CAP_U(1),
+	0,
+	0,
+	12,
+	0,
+	0,
+	12,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+static discrete_mixer_desc const boothill_l_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,
+	{ RES_K(12) + RES_K(68) + RES_K(33),
+		RES_K(12) + RES_K(100) + RES_K(33) },
+	{ 0 },
+	{ 0 },
+	0,
+	RES_K(100),
+	0,
+	CAP_U(0.1),
+	0,
+	7200            // final gain
+};
+
+static discrete_mixer_desc const boothill_r_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,
+	{ RES_K(12) + RES_K(68) + RES_K(33),
+		RES_K(12) + RES_K(100) + RES_K(33),
+		RES_K(33) },
+	{ 0,
+		0,
+		BOOTHILL_MUSIC_ADJ },
+	{ 0 },
+	0,
+	RES_K(100),
+	0,
+	CAP_U(0.1),
+	0,
+	7200            // final gain
+};
+
+static DISCRETE_SOUND_START(boothill_discrete)
+
+	/************************************************
+	 * Input register mapping
+	 ************************************************/
+	DISCRETE_INPUT_LOGIC(BOOTHILL_GAME_ON_EN)
+	DISCRETE_INPUT_LOGIC(BOOTHILL_LEFT_SHOT_EN)
+	DISCRETE_INPUT_LOGIC(BOOTHILL_RIGHT_SHOT_EN)
+	DISCRETE_INPUT_LOGIC(BOOTHILL_LEFT_HIT_EN)
+	DISCRETE_INPUT_LOGIC(BOOTHILL_RIGHT_HIT_EN)
+
+	/* The low value of the pot is set to 75000.  A real 1M pot will never go to 0 anyways.
+	   This will give the control more apparent volume range.
+	   The music way overpowers the rest of the sounds anyways. */
+	DISCRETE_ADJUSTMENT(BOOTHILL_MUSIC_ADJ, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
+
+	/************************************************
+	 * Tone generator
+	 ************************************************/
+	MIDWAY_TONE_GENERATOR(boothill_tone_tvca_info)
+
+	/************************************************
+	 * Shot sounds
+	 ************************************************/
+	/* Noise clock was breadboarded and measured at 7700Hz */
+	DISCRETE_LFSR_NOISE(BOOTHILL_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
+
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, BOOTHILL_LEFT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(BOOTHILL_L_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
+
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_35, BOOTHILL_RIGHT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
+	DISCRETE_RCFILTER(NODE_36, NODE_35, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(BOOTHILL_R_SHOT_SND, NODE_36, RES_K(12) + RES_K(68), CAP_U(.0033))
+
+	/************************************************
+	 * Hit sounds
+	 ************************************************/
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_40, BOOTHILL_LEFT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
+	DISCRETE_RCFILTER(NODE_41, NODE_40, RES_K(12), CAP_U(.033))
+	DISCRETE_RCFILTER(BOOTHILL_L_HIT_SND, NODE_41, RES_K(12) + RES_K(100), CAP_U(.0033))
+
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_45, BOOTHILL_RIGHT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
+	DISCRETE_RCFILTER(NODE_46, NODE_45, RES_K(12), CAP_U(.0033))
+	DISCRETE_RCFILTER(BOOTHILL_R_HIT_SND, NODE_46, RES_K(12) + RES_K(100), CAP_U(.0022))
+
+	/************************************************
+	 * Combine all sound sources.
+	 ************************************************/
+	/* There is a 1uF cap on the input to the amp that I was too lazy to simulate.
+	 * It is just a DC blocking cap needed by the Norton amp.  Doing the extra
+	 * work to simulate it is not going to make a difference to the waveform
+	 * or to how it sounds.  Also I use a regular amp in place of the Norton
+	 * for the same reasons.  Ease of coding/simulation. */
+
+	/* The schematics show the Hit sounds as shown.
+	 * This makes the death of the enemy sound on the players side.
+	 * This should be verified. */
+
+	DISCRETE_MIXER2(NODE_91, BOOTHILL_GAME_ON_EN, BOOTHILL_L_SHOT_SND, BOOTHILL_L_HIT_SND, &boothill_l_mixer)
+
+	/* Music is only added to the right channel per schematics */
+	/* This should be verified on the real game */
+	DISCRETE_MIXER3(NODE_92, BOOTHILL_GAME_ON_EN, BOOTHILL_R_SHOT_SND, BOOTHILL_R_HIT_SND, MIDWAY_TONE_SND, &boothill_r_mixer)
+
+	DISCRETE_OUTPUT(NODE_91, 1)
+	DISCRETE_OUTPUT(NODE_92, 1)
+DISCRETE_SOUND_END
+
+static INPUT_PORTS_START(boothill_audio)
+	PORT_START("MUSIC_ADJ")
+	PORT_ADJUSTER( 35, "Music Volume" )
+INPUT_PORTS_END
+
+boothill_audio_device::boothill_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	midway_tone_generator_device_base(mconfig, BOOTHILL_AUDIO, tag, owner, clock)
+{
+}
+
+void boothill_audio_device::write(u8 data)
+{
+	// D0 and D1 are not connected
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+
+	m_discrete->write(BOOTHILL_GAME_ON_EN, BIT(data, 3));
+
+	m_discrete->write(BOOTHILL_LEFT_SHOT_EN, BIT(data, 4));
+
+	m_discrete->write(BOOTHILL_RIGHT_SHOT_EN, BIT(data, 5));
+
+	m_discrete->write(BOOTHILL_LEFT_HIT_EN, BIT(data, 6));
+
+	m_discrete->write(BOOTHILL_RIGHT_HIT_EN, BIT(data, 7));
+}
+
+void boothill_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	DISCRETE(config, m_discrete, boothill_discrete);
+	m_discrete->add_route(0, "lspeaker", 1.0);
+	m_discrete->add_route(1, "rspeaker", 1.0);
+}
+
+ioport_constructor boothill_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(boothill_audio);
+}
+
+void boothill_audio_device::device_start()
 {
 }
 
@@ -1018,6 +1279,265 @@ void desertgu_audio_device::device_start()
 	m_p2 = 0U;
 
 	save_item(NAME(m_p2));
+}
+
+
+/*************************************
+ *
+ *  Double Play / Extra Inning
+ *
+ *  Discrete sound emulation: Jan 2007, D.R.
+ *
+ *************************************/
+
+// nodes - inputs
+#define DPLAY_GAME_ON_EN      NODE_01
+#define DPLAY_TONE_ON_EN      NODE_02
+#define DPLAY_SIREN_EN        NODE_03
+#define DPLAY_WHISTLE_EN      NODE_04
+#define DPLAY_CHEER_EN        NODE_05
+
+// nodes - sounds
+#define DPLAY_NOISE           NODE_06
+#define DPLAY_TONE_SND        NODE_07
+#define DPLAY_SIREN_SND       NODE_08
+#define DPLAY_WHISTLE_SND     NODE_09
+#define DPLAY_CHEER_SND       NODE_10
+
+// nodes - adjusters
+#define DPLAY_MUSIC_ADJ       NODE_11
+
+static discrete_lfsr_desc const dplay_lfsr =
+{
+	DISC_CLK_IS_FREQ,
+	17,                 // bit length
+						// the RC network fed into pin 4, has the effect of presetting all bits high at power up
+	0x1ffff,            // reset value
+	4,                  // use bit 4 as XOR input 0
+	16,                 // use bit 16 as XOR input 1
+	DISC_LFSR_XOR,      // feedback stage1 is XOR
+	DISC_LFSR_OR,       // feedback stage2 is just stage 1 output OR with external feed
+	DISC_LFSR_REPLACE,  // feedback stage3 replaces the shifted register contents
+	0x000001,           // everything is shifted into the first bit only
+	0,                  // output is not inverted
+	8                   // output bit
+};
+
+static discrete_integrate_info const dplay_siren_integrate_info =
+{
+	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(1),
+	RES_K(100),
+	0,
+	CAP_U(3.3),
+	12,
+	12,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+static discrete_op_amp_osc_info const dplay_siren_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,  // type
+	RES_K(390),         // r1
+	RES_M(5.6),         // r2
+	RES_M(1),           // r3
+	RES_M(1.5),         // r4
+	RES_M(3.3),         // r5
+	RES_K(56),          // r6
+	0,                  // no r7
+	0,                  // no r8
+	CAP_U(0.0022),      // c
+	12                  // vP
+};
+
+static discrete_integrate_info const dplay_whistle_integrate_info =
+{
+	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(1),
+	RES_K(220) + RES_K(10),
+	0,
+	CAP_U(3.3),
+	12,
+	12,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+static discrete_op_amp_osc_info const dplay_whistle_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,  // type
+	RES_K(510),         // r1
+	RES_M(5.6),         // r2
+	RES_M(1),           // r3
+	RES_M(1.5),         // r4
+	RES_M(3.3),         // r5
+	RES_K(300),         // r6
+	0,                  // no r7
+	0,                  // no r8
+	CAP_P(220),         // c
+	12                  // vP
+};
+
+static discrete_integrate_info const dplay_cheer_integrate_info =
+{
+	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
+	RES_M(1.5),
+	RES_K(100),
+	0,
+	CAP_U(4.7),
+	12,
+	12,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+static discrete_op_amp_filt_info const dplay_cheer_filter =
+{
+	RES_K(100),
+	0,
+	RES_K(100),
+	0,
+	RES_K(150),
+	CAP_U(0.0047),
+	CAP_U(0.0047),
+	0,
+	0,
+	12,
+	0
+};
+
+static discrete_mixer_desc const dplay_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,
+	{ RES_K(68),
+		RES_K(68),
+		RES_K(68),
+		RES_K(18),
+		RES_K(68) },
+	{ 0,
+		0,
+		0,
+		0,
+		DPLAY_MUSIC_ADJ },
+	{ CAP_U(0.1),
+		CAP_U(0.1),
+		CAP_U(0.1),
+		CAP_U(0.1),
+		CAP_U(0.1) }
+	, 0, RES_K(100), 0, CAP_U(0.1), 0,
+	2000    /* final gain */
+};
+
+static DISCRETE_SOUND_START(dplay_discrete)
+	/************************************************
+	 * Input register mapping
+	 ************************************************/
+	DISCRETE_INPUT_LOGIC (DPLAY_GAME_ON_EN)
+	DISCRETE_INPUT_LOGIC (DPLAY_TONE_ON_EN)
+	DISCRETE_INPUTX_LOGIC(DPLAY_SIREN_EN, 5, 0, 0)
+	DISCRETE_INPUTX_LOGIC(DPLAY_WHISTLE_EN, 12, 0, 0)
+	DISCRETE_INPUTX_LOGIC(DPLAY_CHEER_EN, 5, 0, 0)
+
+	// The low value of the pot is set to 1000.  A real 1M pot will never go to 0 anyways.
+	// This will give the control more apparent volume range.
+	// The music way overpowers the rest of the sounds anyways.
+	DISCRETE_ADJUSTMENT(DPLAY_MUSIC_ADJ, RES_M(1), 1000, DISC_LOGADJ, "MUSIC_ADJ")
+
+	/************************************************
+	 * Music and Tone Generator
+	 ************************************************/
+	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
+
+	DISCRETE_OP_AMP_TRIG_VCA(DPLAY_TONE_SND, MIDWAY_TONE_BEFORE_AMP_SND, DPLAY_TONE_ON_EN, 0, 12, 0, &midway_music_tvca_info)
+
+	/************************************************
+	 * Siren
+	 ************************************************/
+	DISCRETE_INTEGRATE(NODE_30,
+			DPLAY_SIREN_EN,                 // TRG0
+			0,                              // TRG1
+			&dplay_siren_integrate_info)
+	DISCRETE_OP_AMP_VCO1(DPLAY_SIREN_SND,
+			1,                              // ENAB
+			NODE_30,                        // VMOD1
+			&dplay_siren_osc)
+
+	/************************************************
+	 * Whistle
+	 ************************************************/
+	DISCRETE_INTEGRATE(NODE_40,
+			DPLAY_WHISTLE_EN,               // TRG0
+			0,                              // TRG1
+			&dplay_whistle_integrate_info)
+	DISCRETE_OP_AMP_VCO1(DPLAY_WHISTLE_SND,
+			1,                              // ENAB
+			NODE_40,                        // VMOD1
+			&dplay_whistle_osc)
+
+	/************************************************
+	 * Cheer
+	 ************************************************/
+	// Noise clock was breadboarded and measured at 7700Hz
+	DISCRETE_LFSR_NOISE(DPLAY_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &dplay_lfsr)
+
+	DISCRETE_INTEGRATE(NODE_50, DPLAY_CHEER_EN, 0, &dplay_cheer_integrate_info)
+	DISCRETE_SWITCH(NODE_51, 1, DPLAY_NOISE, 0, NODE_50)
+	DISCRETE_OP_AMP_FILTER(DPLAY_CHEER_SND, 1, NODE_51, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &dplay_cheer_filter)
+
+	/************************************************
+	 * Combine all sound sources.
+	 ************************************************/
+	DISCRETE_MIXER5(NODE_91, DPLAY_GAME_ON_EN, DPLAY_TONE_SND, DPLAY_SIREN_SND, DPLAY_WHISTLE_SND, DPLAY_CHEER_SND, MIDWAY_TONE_SND, &dplay_mixer)
+
+	DISCRETE_OUTPUT(NODE_91, 1)
+DISCRETE_SOUND_END
+
+static INPUT_PORTS_START(dplay_audio)
+	PORT_START("MUSIC_ADJ")  // 3
+	PORT_ADJUSTER( 60, "Music Volume" )
+INPUT_PORTS_END
+
+dplay_audio_device::dplay_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	midway_tone_generator_device_base(mconfig, DPLAY_AUDIO, tag, owner, clock)
+{
+}
+
+void dplay_audio_device::write(u8 data)
+{
+	m_discrete->write(DPLAY_TONE_ON_EN, BIT(data, 0));
+
+	m_discrete->write(DPLAY_CHEER_EN, BIT(data, 1));
+
+	m_discrete->write(DPLAY_SIREN_EN, BIT(data, 2));
+
+	m_discrete->write(DPLAY_WHISTLE_EN, BIT(data, 3));
+
+	m_discrete->write(DPLAY_GAME_ON_EN, BIT(data, 4));
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
+
+	// D6 and D7 are not connected
+}
+
+void dplay_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	DISCRETE(config, m_discrete, dplay_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.8);
+}
+
+ioport_constructor dplay_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(dplay_audio);
+}
+
+void dplay_audio_device::device_start()
+{
 }
 
 
@@ -1834,6 +2354,178 @@ void spacwalk_audio_device::device_start()
 	m_p1 = 0U;
 
 	save_item(NAME(m_p1));
+}
+
+
+/*************************************
+ *
+ *  Dog Patch
+ *
+ *  Discrete sound emulation:
+ *   Sept 2011, D.R.
+ *
+ *************************************/
+
+// nodes - inputs
+#define DOGPATCH_GAME_ON_EN         NODE_01
+#define DOGPATCH_LEFT_SHOT_EN       NODE_02
+#define DOGPATCH_RIGHT_SHOT_EN      NODE_03
+#define DOGPATCH_HIT_EN             NODE_04
+#define DOGPATCH_PAN_DATA           NODE_05
+
+// nodes - sounds
+#define DOGPATCH_NOISE              NODE_06
+#define DOGPATCH_L_SHOT_SND         NODE_07
+#define DOGPATCH_R_SHOT_SND         NODE_08
+#define DOGPATCH_HIT_SND            NODE_09
+#define DOGPATCH_L_HIT_SND          NODE_10
+#define DOGPATCH_R_HIT_SND          NODE_11
+
+static discrete_op_amp_tvca_info const dogpatch_shot_tvca_info =
+{
+	RES_M(2.7),
+	RES_K(510),
+	0,
+	RES_K(510),
+	RES_K(10),
+	0,
+	RES_K(510),
+	0,
+	0,
+	0,
+	0,
+	CAP_U(0.22),
+	0,
+	0, 0,
+	12,
+	0,
+	0,
+	12,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
+};
+
+static discrete_mixer_desc const dogpatch_l_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,
+	{ RES_K(12) + RES_K(68) + RES_K(33),
+		RES_K(33) },
+	{ 0 },
+	{ 0 },
+	0,
+	RES_K(100),
+	0,
+	CAP_U(0.1),
+	0,
+	1               // final gain
+};
+
+static discrete_mixer_desc const dogpatch_r_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,
+	{ RES_K(12) + RES_K(68) + RES_K(33),
+		RES_K(33),
+		RES_K(510) + RES_K(33) },
+	{ 0 },
+	{ 0 },
+	0,
+	RES_K(100),
+	0,
+	CAP_U(0.1),
+	0,
+	1               // final gain
+};
+
+static DISCRETE_SOUND_START(dogpatch_discrete)
+	/************************************************
+	 * Input register mapping
+	 ************************************************/
+	DISCRETE_INPUT_LOGIC(DOGPATCH_GAME_ON_EN)
+	DISCRETE_INPUT_LOGIC(DOGPATCH_LEFT_SHOT_EN)
+	DISCRETE_INPUT_LOGIC(DOGPATCH_RIGHT_SHOT_EN)
+	DISCRETE_INPUT_LOGIC(DOGPATCH_HIT_EN)
+
+	/************************************************
+	 * Tone generator
+	 ************************************************/
+	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
+
+	// Noise clock was breadboarded and measured at 7700Hz
+	DISCRETE_LFSR_NOISE(DOGPATCH_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
+
+	/************************************************
+	 * Shot sounds
+	 ************************************************/
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_20, DOGPATCH_LEFT_SHOT_EN, 0, 0, DOGPATCH_NOISE, 0, &dogpatch_shot_tvca_info)
+	DISCRETE_RCFILTER(NODE_21, NODE_20, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(DOGPATCH_L_SHOT_SND, NODE_21, RES_K(12) + RES_K(68), CAP_U(.0022))
+
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, DOGPATCH_RIGHT_SHOT_EN, 0, 0, DOGPATCH_NOISE, 0, &dogpatch_shot_tvca_info)
+	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
+	DISCRETE_RCFILTER(DOGPATCH_R_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0033))
+
+	/************************************************
+	 * Target hit sounds
+	 ************************************************/
+	DISCRETE_CONSTANT(DOGPATCH_L_HIT_SND, 0)
+	DISCRETE_CONSTANT(DOGPATCH_R_HIT_SND, 0)
+
+	/************************************************
+	 * Combine all sound sources.
+	 ************************************************/
+	/* There is a 1uF cap on the input to the amp that I was too lazy to simulate.
+	 * It is just a DC blocking cap needed by the Norton amp.  Doing the extra
+	 * work to simulate it is not going to make a difference to the waveform
+	 * or to how it sounds.  Also I use a regular amp in place of the Norton
+	 * for the same reasons.  Ease of coding/simulation. */
+
+	DISCRETE_MIXER2(NODE_91, DOGPATCH_GAME_ON_EN, DOGPATCH_L_SHOT_SND, DOGPATCH_L_HIT_SND, &dogpatch_l_mixer)
+
+	// Music is only added to the right channel per schematics
+	// This should be verified on the real game
+	DISCRETE_MIXER3(NODE_92, DOGPATCH_GAME_ON_EN, DOGPATCH_R_SHOT_SND, DOGPATCH_R_HIT_SND, MIDWAY_TONE_SND, &dogpatch_r_mixer)
+
+	DISCRETE_OUTPUT(NODE_91, 32760.0 / 5.8)
+	DISCRETE_OUTPUT(NODE_92, 32760.0 / 5.8)
+DISCRETE_SOUND_END
+
+dogpatch_audio_device::dogpatch_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	midway_tone_generator_device_base(mconfig, DOGPATCH_AUDIO, tag, owner, clock)
+{
+}
+
+void dogpatch_audio_device::write(u8 data)
+{
+	// D0, D1 and D7 are not used
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+
+	machine().sound().system_enable(BIT(data, 3));
+	m_discrete->write(DOGPATCH_GAME_ON_EN, BIT(data, 3));
+
+	m_discrete->write(DOGPATCH_LEFT_SHOT_EN, BIT(data, 4));
+
+	m_discrete->write(DOGPATCH_RIGHT_SHOT_EN, BIT(data, 5));
+
+	m_discrete->write(DOGPATCH_HIT_EN, BIT(data, 6));
+}
+
+void dogpatch_audio_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	DISCRETE(config, m_discrete, dogpatch_discrete);
+	m_discrete->add_route(0, "lspeaker", 1.0);
+	m_discrete->add_route(1, "rspeaker", 1.0);
+}
+
+void dogpatch_audio_device::device_start()
+{
 }
 
 
@@ -2815,30 +3507,6 @@ void invad2ct_audio_device::device_start()
 
 /*************************************
  *
- *  Audio setup
- *
- *************************************/
-
-WRITE8_MEMBER(mw8080bw_state::midway_tone_generator_lo_w)
-{
-	m_discrete->write(MIDWAY_TONE_EN, (data >> 0) & 0x01);
-
-	m_discrete->write(MIDWAY_TONE_DATA_L, (data >> 1) & 0x1f);
-
-	/* D6 and D7 are not connected */
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::midway_tone_generator_hi_w)
-{
-	m_discrete->write(MIDWAY_TONE_DATA_H, data & 0x3f);
-
-	/* D6 and D7 are not connected */
-}
-
-
-/*************************************
- *
  *  Tornado Baseball
  *
  *************************************/
@@ -3166,253 +3834,6 @@ void mw8080bw_state::maze_write_discrete(uint8_t maze_tone_timing_state)
 
 /*************************************
  *
- *  Boot Hill
- *
- *  Discrete sound emulation: Jan 2007, D.R.
- *
- *************************************/
-
-/* nodes - inputs */
-#define BOOTHILL_GAME_ON_EN         NODE_01
-#define BOOTHILL_LEFT_SHOT_EN       NODE_02
-#define BOOTHILL_RIGHT_SHOT_EN      NODE_03
-#define BOOTHILL_LEFT_HIT_EN        NODE_04
-#define BOOTHILL_RIGHT_HIT_EN       NODE_05
-
-/* nodes - sounds */
-#define BOOTHILL_NOISE              NODE_06
-#define BOOTHILL_L_SHOT_SND         NODE_07
-#define BOOTHILL_R_SHOT_SND         NODE_08
-#define BOOTHILL_L_HIT_SND          NODE_09
-#define BOOTHILL_R_HIT_SND          NODE_10
-
-/* nodes - adjusters */
-#define BOOTHILL_MUSIC_ADJ          NODE_11
-
-
-static const discrete_op_amp_tvca_info boothill_tone_tvca_info =
-{
-	RES_M(3.3),
-	RES_K(100) + RES_K(680),
-	0,
-	RES_K(680),
-	RES_K(10),
-	0,
-	RES_K(680),
-	0,
-	0,
-	0,
-	0,
-	CAP_U(.001),
-	0,
-	0, 0,
-	12,
-	0,
-	0,
-	12,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG1,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-static const discrete_op_amp_tvca_info boothill_shot_tvca_info =
-{
-	RES_M(2.7),
-	RES_K(510),
-	0,
-	RES_K(510),
-	RES_K(10),
-	0,
-	RES_K(510),
-	0,
-	0,
-	0,
-	0,
-	CAP_U(0.22),
-	0,
-	0, 0,
-	12,
-	0,
-	0,
-	12,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-static const discrete_op_amp_tvca_info boothill_hit_tvca_info =
-{
-	RES_M(2.7),
-	RES_K(510),
-	0,
-	RES_K(510),
-	RES_K(10),
-	0,
-	RES_K(510),
-	0,
-	0,
-	0,
-	0, 0,
-	CAP_U(1),
-	0,
-	0,
-	12,
-	0,
-	0,
-	12,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-static const discrete_mixer_desc boothill_l_mixer =
-{
-	DISC_MIXER_IS_OP_AMP,
-	{ RES_K(12) + RES_K(68) + RES_K(33),
-		RES_K(12) + RES_K(100) + RES_K(33) },
-	{ 0 },
-	{ 0 },
-	0,
-	RES_K(100),
-	0,
-	CAP_U(0.1),
-	0,
-	7200    /* final gain */
-};
-
-
-static const discrete_mixer_desc boothill_r_mixer =
-{
-	DISC_MIXER_IS_OP_AMP,
-	{ RES_K(12) + RES_K(68) + RES_K(33),
-		RES_K(12) + RES_K(100) + RES_K(33),
-		RES_K(33) },
-	{ 0,
-		0,
-		BOOTHILL_MUSIC_ADJ },
-	{ 0 },
-	0,
-	RES_K(100),
-	0,
-	CAP_U(0.1),
-	0,
-	7200    /* final gain */
-};
-
-
-static DISCRETE_SOUND_START(boothill_discrete)
-
-	/************************************************
-	 * Input register mapping
-	 ************************************************/
-	DISCRETE_INPUT_LOGIC(BOOTHILL_GAME_ON_EN)
-	DISCRETE_INPUT_LOGIC(BOOTHILL_LEFT_SHOT_EN)
-	DISCRETE_INPUT_LOGIC(BOOTHILL_RIGHT_SHOT_EN)
-	DISCRETE_INPUT_LOGIC(BOOTHILL_LEFT_HIT_EN)
-	DISCRETE_INPUT_LOGIC(BOOTHILL_RIGHT_HIT_EN)
-
-	/* The low value of the pot is set to 75000.  A real 1M pot will never go to 0 anyways.
-	   This will give the control more apparent volume range.
-	   The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT(BOOTHILL_MUSIC_ADJ, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
-
-	/************************************************
-	 * Tone generator
-	 ************************************************/
-	MIDWAY_TONE_GENERATOR(boothill_tone_tvca_info)
-
-	/************************************************
-	 * Shot sounds
-	 ************************************************/
-	/* Noise clock was breadboarded and measured at 7700Hz */
-	DISCRETE_LFSR_NOISE(BOOTHILL_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
-
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, BOOTHILL_LEFT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
-	DISCRETE_RCFILTER(BOOTHILL_L_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0022))
-
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_35, BOOTHILL_RIGHT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_36, NODE_35, RES_K(12), CAP_U(.01))
-	DISCRETE_RCFILTER(BOOTHILL_R_SHOT_SND, NODE_36, RES_K(12) + RES_K(68), CAP_U(.0033))
-
-	/************************************************
-	 * Hit sounds
-	 ************************************************/
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_40, BOOTHILL_LEFT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
-	DISCRETE_RCFILTER(NODE_41, NODE_40, RES_K(12), CAP_U(.033))
-	DISCRETE_RCFILTER(BOOTHILL_L_HIT_SND, NODE_41, RES_K(12) + RES_K(100), CAP_U(.0033))
-
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_45, BOOTHILL_RIGHT_HIT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_hit_tvca_info)
-	DISCRETE_RCFILTER(NODE_46, NODE_45, RES_K(12), CAP_U(.0033))
-	DISCRETE_RCFILTER(BOOTHILL_R_HIT_SND, NODE_46, RES_K(12) + RES_K(100), CAP_U(.0022))
-
-	/************************************************
-	 * Combine all sound sources.
-	 ************************************************/
-	/* There is a 1uF cap on the input to the amp that I was too lazy to simulate.
-	 * It is just a DC blocking cap needed by the Norton amp.  Doing the extra
-	 * work to simulate it is not going to make a difference to the waveform
-	 * or to how it sounds.  Also I use a regular amp in place of the Norton
-	 * for the same reasons.  Ease of coding/simulation. */
-
-	/* The schematics show the Hit sounds as shown.
-	 * This makes the death of the enemy sound on the players side.
-	 * This should be verified. */
-
-	DISCRETE_MIXER2(NODE_91, BOOTHILL_GAME_ON_EN, BOOTHILL_L_SHOT_SND, BOOTHILL_L_HIT_SND, &boothill_l_mixer)
-
-	/* Music is only added to the right channel per schematics */
-	/* This should be verified on the real game */
-	DISCRETE_MIXER3(NODE_92, BOOTHILL_GAME_ON_EN, BOOTHILL_R_SHOT_SND, BOOTHILL_R_HIT_SND, MIDWAY_TONE_SND, &boothill_r_mixer)
-
-	DISCRETE_OUTPUT(NODE_91, 1)
-	DISCRETE_OUTPUT(NODE_92, 1)
-DISCRETE_SOUND_END
-
-
-void mw8080bw_state::boothill_audio(machine_config &config)
-{
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DISCRETE(config, m_discrete, boothill_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::boothill_audio_w)
-{
-	/* D0 and D1 are not connected */
-
-	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
-
-	m_discrete->write(BOOTHILL_GAME_ON_EN, (data >> 3) & 0x01);
-
-	m_discrete->write(BOOTHILL_LEFT_SHOT_EN, (data >> 4) & 0x01);
-
-	m_discrete->write(BOOTHILL_RIGHT_SHOT_EN, (data >> 5) & 0x01);
-
-	m_discrete->write(BOOTHILL_LEFT_HIT_EN, (data >> 6) & 0x01);
-
-	m_discrete->write(BOOTHILL_RIGHT_HIT_EN, (data >> 7) & 0x01);
-}
-
-
-
-/*************************************
- *
  *  Checkmate
  *
  *************************************/
@@ -3633,257 +4054,6 @@ WRITE8_MEMBER(mw8080bw_state::checkmat_audio_w)
 
 	m_discrete->write(CHECKMAT_TONE_DATA_45, (data >> 4) & 0x03);
 	m_discrete->write(CHECKMAT_TONE_DATA_67, (data >> 6) & 0x03);
-}
-
-
-
-/*************************************
- *
- *  Double Play / Extra Inning
- *
- *  Discrete sound emulation: Jan 2007, D.R.
- *
- *************************************/
-
-/* nodes - inputs */
-#define DPLAY_GAME_ON_EN      NODE_01
-#define DPLAY_TONE_ON_EN      NODE_02
-#define DPLAY_SIREN_EN        NODE_03
-#define DPLAY_WHISTLE_EN      NODE_04
-#define DPLAY_CHEER_EN        NODE_05
-
-/* nodes - sounds */
-#define DPLAY_NOISE           NODE_06
-#define DPLAY_TONE_SND        NODE_07
-#define DPLAY_SIREN_SND       NODE_08
-#define DPLAY_WHISTLE_SND     NODE_09
-#define DPLAY_CHEER_SND       NODE_10
-
-/* nodes - adjusters */
-#define DPLAY_MUSIC_ADJ       NODE_11
-
-
-static const discrete_lfsr_desc dplay_lfsr =
-{
-	DISC_CLK_IS_FREQ,
-	17,                 /* bit length */
-						/* the RC network fed into pin 4, has the effect
-						   of presetting all bits high at power up */
-	0x1ffff,            /* reset value */
-	4,                  /* use bit 4 as XOR input 0 */
-	16,                 /* use bit 16 as XOR input 1 */
-	DISC_LFSR_XOR,      /* feedback stage1 is XOR */
-	DISC_LFSR_OR,       /* feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,  /* feedback stage3 replaces the shifted register contents */
-	0x000001,           /* everything is shifted into the first bit only */
-	0,                  /* output is not inverted */
-	8                   /* output bit */
-};
-
-
-static const discrete_integrate_info dplay_siren_integrate_info =
-{
-	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(1),
-	RES_K(100),
-	0,
-	CAP_U(3.3),
-	12,
-	12,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-static const discrete_op_amp_osc_info dplay_siren_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,  /* type */
-	RES_K(390),     /* r1 */
-	RES_M(5.6),     /* r2 */
-	RES_M(1),       /* r3 */
-	RES_M(1.5),     /* r4 */
-	RES_M(3.3),     /* r5 */
-	RES_K(56),      /* r6 */
-	0,              /* no r7 */
-	0,              /* no r8 */
-	CAP_U(0.0022),  /* c */
-	12              /* vP */
-};
-
-static const discrete_integrate_info dplay_whistle_integrate_info =
-{
-	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(1),
-	RES_K(220) + RES_K(10),
-	0,
-	CAP_U(3.3),
-	12,
-	12,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-static const discrete_op_amp_osc_info dplay_whistle_osc =
-{
-	DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,  /* type */
-	RES_K(510),     /* r1 */
-	RES_M(5.6),     /* r2 */
-	RES_M(1),       /* r3 */
-	RES_M(1.5),     /* r4 */
-	RES_M(3.3),     /* r5 */
-	RES_K(300),     /* r6 */
-	0,              /* no r7 */
-	0,              /* no r8 */
-	CAP_P(220),     /* c */
-	12              /* vP */
-};
-
-
-static const discrete_integrate_info dplay_cheer_integrate_info =
-{
-	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
-	RES_M(1.5),
-	RES_K(100),
-	0,
-	CAP_U(4.7),
-	12,
-	12,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-static const discrete_op_amp_filt_info dplay_cheer_filter =
-{
-	RES_K(100),
-	0,
-	RES_K(100),
-	0,
-	RES_K(150),
-	CAP_U(0.0047),
-	CAP_U(0.0047),
-	0,
-	0,
-	12,
-	0
-};
-
-
-static const discrete_mixer_desc dplay_mixer =
-{
-	DISC_MIXER_IS_OP_AMP,
-	{ RES_K(68),
-		RES_K(68),
-		RES_K(68),
-		RES_K(18),
-		RES_K(68) },
-	{ 0,
-		0,
-		0,
-		0,
-		DPLAY_MUSIC_ADJ },
-	{ CAP_U(0.1),
-		CAP_U(0.1),
-		CAP_U(0.1),
-		CAP_U(0.1),
-		CAP_U(0.1) }
-	, 0, RES_K(100), 0, CAP_U(0.1), 0,
-	2000    /* final gain */
-};
-
-
-static DISCRETE_SOUND_START(dplay_discrete)
-
-	/************************************************
-	 * Input register mapping
-	 ************************************************/
-	DISCRETE_INPUT_LOGIC (DPLAY_GAME_ON_EN)
-	DISCRETE_INPUT_LOGIC (DPLAY_TONE_ON_EN)
-	DISCRETE_INPUTX_LOGIC(DPLAY_SIREN_EN, 5, 0, 0)
-	DISCRETE_INPUTX_LOGIC(DPLAY_WHISTLE_EN, 12, 0, 0)
-	DISCRETE_INPUTX_LOGIC(DPLAY_CHEER_EN, 5, 0, 0)
-
-	/* The low value of the pot is set to 1000.  A real 1M pot will never go to 0 anyways. */
-	/* This will give the control more apparent volume range. */
-	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT(DPLAY_MUSIC_ADJ, RES_M(1), 1000, DISC_LOGADJ, "MUSIC_ADJ")
-
-	/************************************************
-	 * Music and Tone Generator
-	 ************************************************/
-	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
-
-	DISCRETE_OP_AMP_TRIG_VCA(DPLAY_TONE_SND, MIDWAY_TONE_BEFORE_AMP_SND, DPLAY_TONE_ON_EN, 0, 12, 0, &midway_music_tvca_info)
-
-	/************************************************
-	 * Siren
-	 ************************************************/
-	DISCRETE_INTEGRATE(NODE_30,
-					DPLAY_SIREN_EN,                 /* TRG0 */
-					0           ,                   /* TRG1 */
-					&dplay_siren_integrate_info)
-	DISCRETE_OP_AMP_VCO1(DPLAY_SIREN_SND,
-					1,                              /* ENAB */
-					NODE_30,                        /* VMOD1 */
-					&dplay_siren_osc)
-
-	/************************************************
-	 * Whistle
-	 ************************************************/
-	DISCRETE_INTEGRATE(NODE_40,
-					DPLAY_WHISTLE_EN,               /* TRG0 */
-					0           ,                   /* TRG1 */
-					&dplay_whistle_integrate_info)
-	DISCRETE_OP_AMP_VCO1(DPLAY_WHISTLE_SND,
-					1,                              /* ENAB */
-					NODE_40,                        /* VMOD1 */
-					&dplay_whistle_osc)
-
-	/************************************************ * Cheer
-	************************************************/ /* Noise clock was
-	breadboarded and measured at 7700Hz */ DISCRETE_LFSR_NOISE(DPLAY_NOISE, 1,
-	1, 7700, 12.0, 0, 12.0/2, &dplay_lfsr)
-
-	DISCRETE_INTEGRATE(NODE_50, DPLAY_CHEER_EN, 0, &dplay_cheer_integrate_info)
-	DISCRETE_SWITCH(NODE_51, 1, DPLAY_NOISE, 0, NODE_50)
-	DISCRETE_OP_AMP_FILTER(DPLAY_CHEER_SND, 1, NODE_51, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &dplay_cheer_filter)
-
-	/************************************************
-	 * Combine all sound sources.
-	 ************************************************/
-	DISCRETE_MIXER5(NODE_91, DPLAY_GAME_ON_EN, DPLAY_TONE_SND, DPLAY_SIREN_SND, DPLAY_WHISTLE_SND, DPLAY_CHEER_SND, MIDWAY_TONE_SND, &dplay_mixer)
-
-	DISCRETE_OUTPUT(NODE_91, 1)
-DISCRETE_SOUND_END
-
-
-void mw8080bw_state::dplay_audio(machine_config &config)
-{
-	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, dplay_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.8);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::dplay_audio_w)
-{
-	m_discrete->write(DPLAY_TONE_ON_EN, (data >> 0) & 0x01);
-
-	m_discrete->write(DPLAY_CHEER_EN, (data >> 1) & 0x01);
-
-	m_discrete->write(DPLAY_SIREN_EN, (data >> 2) & 0x01);
-
-	m_discrete->write(DPLAY_WHISTLE_EN, (data >> 3) & 0x01);
-
-	m_discrete->write(DPLAY_GAME_ON_EN, (data >> 4) & 0x01);
-
-	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
-
-	/* D6 and D7 are not connected */
 }
 
 
@@ -4115,176 +4285,6 @@ WRITE8_MEMBER(mw8080bw_state::shuffle_audio_2_w)
 	machine().bookkeeping().coin_counter_w(0, (data >> 1) & 0x01);
 
 	/* D2-D7 are not connected */
-}
-
-
-
-/*************************************
- *
- *  Dog Patch
- *
- *  Discrete sound emulation:
- *   Sept 2011, D.R.
- *
- *************************************/
-
-/* nodes - inputs */
-#define DOGPATCH_GAME_ON_EN         NODE_01
-#define DOGPATCH_LEFT_SHOT_EN       NODE_02
-#define DOGPATCH_RIGHT_SHOT_EN      NODE_03
-#define DOGPATCH_HIT_EN             NODE_04
-#define DOGPATCH_PAN_DATA           NODE_05
-
-/* nodes - sounds */
-#define DOGPATCH_NOISE              NODE_06
-#define DOGPATCH_L_SHOT_SND         NODE_07
-#define DOGPATCH_R_SHOT_SND         NODE_08
-#define DOGPATCH_HIT_SND            NODE_09
-#define DOGPATCH_L_HIT_SND          NODE_10
-#define DOGPATCH_R_HIT_SND          NODE_11
-
-
-static const discrete_op_amp_tvca_info dogpatch_shot_tvca_info =
-{
-	RES_M(2.7),
-	RES_K(510),
-	0,
-	RES_K(510),
-	RES_K(10),
-	0,
-	RES_K(510),
-	0,
-	0,
-	0,
-	0,
-	CAP_U(0.22),
-	0,
-	0, 0,
-	12,
-	0,
-	0,
-	12,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,
-	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
-};
-
-
-static const discrete_mixer_desc dogpatch_l_mixer =
-{
-	DISC_MIXER_IS_OP_AMP,
-	{ RES_K(12) + RES_K(68) + RES_K(33),
-		RES_K(33) },
-	{ 0 },
-	{ 0 },
-	0,
-	RES_K(100),
-	0,
-	CAP_U(0.1),
-	0,
-	1   /* final gain */
-};
-
-
-static const discrete_mixer_desc dogpatch_r_mixer =
-{
-	DISC_MIXER_IS_OP_AMP,
-	{ RES_K(12) + RES_K(68) + RES_K(33),
-		RES_K(33),
-		RES_K(510) + RES_K(33) },
-	{ 0 },
-	{ 0 },
-	0,
-	RES_K(100),
-	0,
-	CAP_U(0.1),
-	0,
-	1   /* final gain */
-};
-
-
-static DISCRETE_SOUND_START(dogpatch_discrete)
-	/************************************************
-	 * Input register mapping
-	 ************************************************/
-	DISCRETE_INPUT_LOGIC(DOGPATCH_GAME_ON_EN)
-	DISCRETE_INPUT_LOGIC(DOGPATCH_LEFT_SHOT_EN)
-	DISCRETE_INPUT_LOGIC(DOGPATCH_RIGHT_SHOT_EN)
-	DISCRETE_INPUT_LOGIC(DOGPATCH_HIT_EN)
-
-	/************************************************
-	 * Tone generator
-	 ************************************************/
-	MIDWAY_TONE_GENERATOR(midway_music_tvca_info)
-
-	/* Noise clock was breadboarded and measured at 7700Hz */
-	DISCRETE_LFSR_NOISE(DOGPATCH_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
-
-	/************************************************
-	 * Shot sounds
-	 ************************************************/
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_20, DOGPATCH_LEFT_SHOT_EN, 0, 0, DOGPATCH_NOISE, 0, &dogpatch_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_21, NODE_20, RES_K(12), CAP_U(.01))
-	DISCRETE_RCFILTER(DOGPATCH_L_SHOT_SND, NODE_21, RES_K(12) + RES_K(68), CAP_U(.0022))
-
-	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, DOGPATCH_RIGHT_SHOT_EN, 0, 0, DOGPATCH_NOISE, 0, &dogpatch_shot_tvca_info)
-	DISCRETE_RCFILTER(NODE_31, NODE_30, RES_K(12), CAP_U(.01))
-	DISCRETE_RCFILTER(DOGPATCH_R_SHOT_SND, NODE_31, RES_K(12) + RES_K(68), CAP_U(.0033))
-
-	/************************************************
-	 * Target hit sounds
-	 ************************************************/
-	DISCRETE_CONSTANT(DOGPATCH_L_HIT_SND, 0)
-	DISCRETE_CONSTANT(DOGPATCH_R_HIT_SND, 0)
-
-	/************************************************
-	 * Combine all sound sources.
-	 ************************************************/
-	/* There is a 1uF cap on the input to the amp that I was too lazy to simulate.
-	 * It is just a DC blocking cap needed by the Norton amp.  Doing the extra
-	 * work to simulate it is not going to make a difference to the waveform
-	 * or to how it sounds.  Also I use a regular amp in place of the Norton
-	 * for the same reasons.  Ease of coding/simulation. */
-
-	DISCRETE_MIXER2(NODE_91, DOGPATCH_GAME_ON_EN, DOGPATCH_L_SHOT_SND, DOGPATCH_L_HIT_SND, &dogpatch_l_mixer)
-
-	/* Music is only added to the right channel per schematics */
-	/* This should be verified on the real game */
-	DISCRETE_MIXER3(NODE_92, DOGPATCH_GAME_ON_EN, DOGPATCH_R_SHOT_SND, DOGPATCH_R_HIT_SND, MIDWAY_TONE_SND, &dogpatch_r_mixer)
-
-	DISCRETE_OUTPUT(NODE_91, 32760.0 / 5.8)
-	DISCRETE_OUTPUT(NODE_92, 32760.0 / 5.8)
-
-DISCRETE_SOUND_END
-
-
-void mw8080bw_state::dogpatch_audio(machine_config &config)
-{
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DISCRETE(config, m_discrete, dogpatch_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
-}
-
-
-WRITE8_MEMBER(mw8080bw_state::dogpatch_audio_w)
-{
-	/* D0, D1 and D7 are not used */
-
-	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
-
-	machine().sound().system_enable((data >> 3) & 0x01);
-	m_discrete->write(DOGPATCH_GAME_ON_EN, (data >> 3) & 0x01);
-
-	m_discrete->write(DOGPATCH_LEFT_SHOT_EN, (data >> 4) & 0x01);
-
-	m_discrete->write(DOGPATCH_RIGHT_SHOT_EN, (data >> 5) & 0x01);
-
-	m_discrete->write(DOGPATCH_HIT_EN, (data >> 6) & 0x01);
 }
 
 
