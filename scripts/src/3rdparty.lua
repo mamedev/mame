@@ -154,13 +154,15 @@ project "softfloat"
 		"ForceCPP",
 	}
 
-	buildoptions_cpp {
-		"-x c++",
-	}
-
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
+
+	configuration { "gmake or ninja" }
+		buildoptions_cpp {
+			"-x c++",
+		}
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
@@ -192,16 +194,17 @@ options {
 	"ForceCPP",
 }
 
-buildoptions_cpp {
-	"-x c++",
-}
-
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "3rdparty/softfloat3/build/MAME",
 	MAME_DIR .. "3rdparty/softfloat3/source",
 	MAME_DIR .. "3rdparty/softfloat3/source/include",
 	MAME_DIR .. "3rdparty/softfloat3/source/8086",
+}
+
+configuration { "gmake or ninja" }
+buildoptions_cpp {
+	"-x c++",
 }
 
 configuration { "vs*" }
