@@ -1560,7 +1560,7 @@ ROM_START( neat )
 	ROM_SYSTEM_BIOS(1, "pb800", "Packard Bell PB800")
 	ROMX_LOAD( "3.10.12-1.bin", 0x10001, 0x8000, CRC(e6bb54c5) SHA1(fa5a376dd44696c78dcc8994e18938b5e1b3e45a),ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "3.10.12-2.bin", 0x10000, 0x8000, CRC(bde46933) SHA1(c7221192f48d6f2f5b773c3c7d2a52b635cb473e),ROM_SKIP(1) | ROM_BIOS(1))
-	// 2: DTK Corp. 286 Computer - DTK 286 Chipset ROM BIOS Version 3.26 - #24062890N
+	// 2: DTK Corp. 286 Computer - DTK 286 Chipset ROM BIOS Version 3.26 - #24062890N - ISA8: 3, ISA16: 5, RAM: 1MB DIP, 4xSIMM30
 	ROM_SYSTEM_BIOS(2, "ptm1632c", "UNIT PTM1632C DTK V.3.26")
 	ROMX_LOAD( "ptm1632c_l.bin", 0x10000, 0x8000, CRC(df0bc27c) SHA1(f94e2decd13c285c23b6a61c035cab88fa00ba6e), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "ptm1632c_h.bin", 0x10001, 0x8000, CRC(a80136e0) SHA1(5edc2d387efb42cf70361197de808ce1b06d8aec), ROM_SKIP(1) | ROM_BIOS(2))
@@ -1649,7 +1649,7 @@ ROM_START( pccm216 ) // no display
 	ROM_LOAD( "2pcm001.bin", 0x10000, 0x10000, CRC(9c7c9f05) SHA1(39cb6645d9aab846f7e64d1d44610ea3cbe52581))
 ROM_END
 
-// Unknown 80C286 motherboard (4 SIMM, 6 16-bit ISA)
+// Unknown 80C286 motherboard (RAM: 4xSIMM30, 1MB DIP, ISA16: 6) - CPU: Harris CS80C286-16, FPU: 80287 - OSC: 32.000MHz, 14.31818
 // SARC RC2015; HM6818P; 82C042 or JETkey Keyboard BIOS; 1MB onboard RAM (8x LH64256AD-80)
 ROM_START( sarcpc )
 	ROM_REGION(0x20000,"bios", 0) // 27C512
@@ -1658,7 +1658,7 @@ ROM_START( sarcpc )
 	ROM_LOAD( "sarcrev12.bin", 0x10000, 0x10000, CRC(1c5e3f2d) SHA1(1fcc8b1b9d9383467223dd41e420f9352beca654) )
 ROM_END
 
-// Everex EV-1806 (6 16-bit ISA, 1 8-bit ISA)
+// Everex EV-1806 (6 16-bit ISA, 1 8-bit ISA) - OSC: 14.31818MHz, 24.000MHz, 30.000MHz - RAM: 4 banks of 9xKM41C256P-8, sockets for 1MBit chips provided
 // Everex IC-00121-0 + IC-00122-0; CHIPS P82C206; Intel 8272A(?); 146818A RTC
 ROM_START( ev1806 )
 	ROM_REGION(0x20000, "bios", 0)
@@ -1667,8 +1667,8 @@ ROM_START( ev1806 )
 ROM_END
 
 
-// MAT286 REV.D (5 16-bit ISA, 1 8-bit ISA, 2 memory slots)
-// Headland Technology HT12P-16/A; HM6818P RTC; JETkey keyboard BIOS; unmarked 40-pin DIP
+// MAT286 REV.D (5 16-bit ISA, 1 8-bit ISA, RAM: DIP 1MB, 2xSIPP30) - CPU: Siemens SAB 80286-16-N - OSC: 32.000MHz, 14.31818
+// Headland Technology HT12P-16/A; HM6818P RTC; JETkey keyboard BIOS; unmarked 40-pin DIP (prob. 80287)
 ROM_START( mat286 )
 	ROM_REGION(0x20000, "bios", 0)
 	// BIOS-String: DH12-1112-061390-K0 - HT-12 286 BIOS - Board is also used in Polish Optimus 286 computer with a special Hercules character ROM (also available)
@@ -1748,11 +1748,11 @@ ROM_END
 
 // ***** 286 motherboards using the Headland G2 chipset
 
-// LM-103S (1 8-bit ISA, 6 16-bit ISA, 4 memory slots)
-// Headland Technology G2 chipset: HT101A + 2x HT102; HM6818P RTC; AMI keyboard BIOS
+// LM-103S - 1 8-bit ISA, 6 16-bit ISA - RAM: 4xSIPP30, 2 banks DIP (each bank has 4xV53C104AP80 and 2x16pin empty sockets)
+// Headland Technology G2 chipset: HT101A + 2x HT102; HM6818P RTC; AMI keyboard BIOS 904189, BIOS AMI 904189
+// BIOS-String: D286-1234-121589-K0 - CPU: AMD N80L286-16/S - OSC: 32.000MHz, 14.31818MHz
 ROM_START( lm103s )
 	ROM_REGION(0x20000, "bios", 0)
-	// BIOS-String: D286-1234-121589-K0
 	ROMX_LOAD( "ami_lm103-s_lo.bin", 0x10000, 0x8000, CRC(a24be20b) SHA1(ffc5faf6d773154bf2f037556d2e381e81a28a58), ROM_SKIP(1) )
 	ROMX_LOAD( "ami_lm103-s_hi.bin", 0x10001, 0x8000, CRC(7b63e60c) SHA1(da78b95b12051b6d4701a412fdc5e7874595c188), ROM_SKIP(1) )
 ROM_END
@@ -1885,7 +1885,7 @@ ROM_START( mba009)
 	ROMX_LOAD( "hlb-286h.bin", 0x18001, 0x4000, CRC(03cdbee8) SHA1(9ea5f91a76bc8861fdc7e5381e8dc15f8fb428f5), ROM_SKIP(1))
 ROM_END
 
-// Everex EV-1815 (C & T/Suntac)
+// Everex EV-1815 (C & T/Suntac) - RAM: 4xSIMM30, 512KB or 1MB total (2/4 SIMMs)
 ROM_START( ev1815 )
 	ROM_REGION(0x20000, "bios", 0)
 	// 0: Award 286 Modular BIOS Version 3.03 - GCH
@@ -1898,6 +1898,7 @@ ROM_START( ev1815 )
 	ROMX_LOAD( "award_v3.03gs_ev1815_even.bin", 0x10000, 0x8000, CRC(59489ec2) SHA1(b3c13ba53d4c4ee75a15703236a748121102ce84), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "award_v3.03gs_ev1815_odd.bin", 0x10001, 0x8000, CRC(5bcd9421) SHA1(f32e5a39da593c6982f964fb05b0802d54c3de45), ROM_SKIP(1) | ROM_BIOS(1) )
 ROM_END
+
 
 // ***** 286 motherboards using the 5 chip VLSI chipset
 
@@ -1935,8 +1936,8 @@ ROM_END
 
 // ***** 286 motherboards using the 5 chip Winbond chipset W83C201P + W83C202AP + W83C203AP + W83C204P + W83C205AP
 
-// KT216WB5-HI Rev.2 (1 8-bit ISA, 5 16-bit ISA)
-// Winbond W83C201P + W83C202AP + W83C203AP + W83C204P + W83C205AP; MC146818AP RTC; JETkey keyboard BIOS
+// KT216WB5-HI Rev.2 (1 8-bit ISA, 5 16-bit ISA) - CPU: Harris CS80C286-16, FPU: 80287 - OSC: 32.000MHz, 14.31818
+// Winbond W83C201P + W83C202AP + W83C203AP + W83C204P + W83C205AP; MC146818AP RTC; JETkey keyboard BIOS - RAM: 1MB DIP, 4xSIPP30
 ROM_START( kt216wb5 )
 	ROM_REGION(0x20000, "bios", 0)
 	// BIOS-String: D286-1149-083090-K0 - WIN 286 BIOS
@@ -2428,7 +2429,7 @@ ROM_START ( sy019hi )
 	ROM_LOAD( "ami_soyo_sy-19i.bin", 0x10000, 0x10000, CRC(369a040f) SHA1(3dbcbcb8b8a50717cae3b17f44ca1b7c394b75fc))
 ROM_END
 
-// PC-Chips M321
+// PC-Chips M321 - RAM: 8xSIMM30, Cache: 8 sockets, 4 sockets occupied by CY71C199-25PC - CPU: AM386-DX40, FPU: socket provided - OSC: 80.000MHz, 14.31818
 // Chipset: PCChips C206/306, CHIP6/4L04F1666, CHIP5/4L04F1282 (rev. 2.3, 2.5 and 2.7 boards) - ISA8: 2, ISA16: 6
 ROM_START( pccm321 )
 	ROM_REGION(0x20000, "bios", 0)
@@ -2458,8 +2459,9 @@ ROM_START( pccm326  )
 	ROMX_LOAD( "3sam005.bin", 0x10000, 0x10000, CRC(f232cd4b) SHA1(e005aa3a7d160223fb2912cf2cd5cc8af49e79a5), ROM_BIOS(2) )
 ROM_END
 
-// UMC UM82C482AF, UM82C391A, UM82C206F
-// 8x SIMM, 8x ISA
+// Elitegroup UM386 Rev. 1.1 - UMC UM82C482AF, UM82C391A, UM82C206F - OSC: 80.000MHz, 14.31818MHz
+// BIOS: AMI-1131 E-91844945 - Keyboard-BIOS: AMI KEYBOARD-BIOS-VER-F / Intel P8942AHP
+// RAM: SIMM30x8, Cache: 9xW2464AK-20, 1x ISA8, 7xISA16 - CPU: AM386DX/DXL-40
 ROM_START( ecsum386 )
 	ROM_REGION(0x20000, "bios", 0)
 	// BIOS-String: 30-0500-D01131-00101111-070791-UMCWB-0 / UM386 V1.1 03-06-92
@@ -2543,7 +2545,7 @@ ROM_END
 
 // 386 motherboards using the Chips & Technologies P82C351, P82C355, P82C356 chipset
 
-// ABIT FU340 - 6x 16-bit ISA + 2x 8-bit ISA
+// ABIT FU340 - 6x 16-bit ISA + 2x 8-bit ISA - RAM: SIMM30x8, Cache: 32/64/128/256KB with TAG (TULARC info)
 // BIOS-String: 30-0200-D01247-00101111-050591-PEAKDM_B-0 / FU340 REV-B PAGE MODE BIOS
 ROM_START( fu340 )
 	ROM_REGION(0x20000, "bios", 0)
@@ -2602,6 +2604,7 @@ ROM_START( cs8230 )
 	ROMX_LOAD( "3ctm004h.bin", 0x10001, 0x8000, CRC(f26c2672) SHA1(1d3a2554bbf3dc554970e0d62d9c5fad24977f55), ROM_SKIP(1) | ROM_BIOS(1) )
 ROM_END
 
+// ECS-386/32 - OSC: 40.000MHz, 32.000MHz, 14.318MHz - CPU: 386DX-20, FPU socket provided
 // 8x SIMM, 5x 16-bit ISA, 2x 8-bit ISA, 1x 32-bit proprietary memory expansion slot
 ROM_START( ecs38632 )
 	ROM_REGION(0x20000, "bios", 0)
@@ -2653,7 +2656,8 @@ ROM_START( frxc402 )
 	ROMX_LOAD( "386-imp82c206p.bin", 0x10000, 0x10000, CRC(6f340961) SHA1(393720e1bfe3d323a34106992a65dd593284bf95), ROM_BIOS(1))
 ROM_END
 
-// 8x SIMM, 8x ISA
+// RAM: 8xSIMM30, Cache: 10 sockets, 5xATT7C199P occupied - ISA8: 2, ISA16: 6 - CPU: AM386DX/DXL-40, FPU: IIT 3C87-25
+// OSC: 80.000MHz, 14.318180MHz - Keyboard-BIOS: AMI 386 BIOS ZA902884
 ROM_START( smih0107 )
 	ROM_REGION(0x20000, "bios", 0)
 	// BIOS-String: 30-0400-428005-00101111-070791-FORX-0 / BIOS ID SMIH0107 / IT9112
@@ -2890,7 +2894,7 @@ ROM_START( pt319a )
 ROM_END
 
 
-// CX Technology, Inc. Model SXD (4x SIMM, 4x 16-bit ISA) - Chipset: SARC RC2016A5; HM6818P; CX109; LT38C41 © Lance Corp. (keyboard controller?)
+// CX Technology, Inc. Model SXD (4x SIMM30, Cache: 64/128/256KB in 2 banks plus TAG, 4x 16-bit ISA) - Chipset: SARC RC2016A5; HM6818P; CX109; LT38C41 © Lance Corp. (keyboard controller?)
 // additional info from chukaev.ru54.com: Chipset: CYCLONE RC2016A5 - ISA16: 6 - ROM: CX109 340C3A62D0A - CPU/FPU: Am386SX/SXL-33, 387
 ROM_START( cxsxd )
 	ROM_REGION(0x20000,"bios", 0)
@@ -3211,12 +3215,24 @@ ROM_START( at486 )
 	// BIOS-String: 07/13/94--2C4X6H01-00 / Release 07/15/94'
 	ROM_SYSTEM_BIOS(21, "chips", "Chips")
 	ROMX_LOAD("486-pcchips.bin", 0x10000, 0x10000, CRC(4e49eca1) SHA1(2343ca9f4760037eb2ef6e7b011b9690e542d6ea), ROM_BIOS(21))
+	// 22: CAM/33(50)-P8 M458(A)P80 - Chipset: Opti 82C495SX, F82C206Q 82C392SX - CPU: 486DX-33 (solder pads for 486sx and 486DX) - OSC: 14.318MHz, 33.000MHz
+	// Keyboard-BIOS: AMI Keyboard BIOS PLUS A317473 - BIOS: AMI 486 BIOS PLUS 214097 (28pin) - RAM: SIMM30x8 - Cache: 1xIS61C256A, 8xUM61256BK-25 - ISA8: 1, ISA16: 6
+	// BIOS-String: X0-0101-001105-00101111-060692-495SX_A-0 / 486DX/SX CAM/33,50-P8, CPM/25,33-P8, 12/14/1992
+	ROM_SYSTEM_BIOS(22, "cam33", "CAM/33")
+	ROMX_LOAD("486-cam.bin", 0x10000, 0x10000, CRC(d36a13ea) SHA1(14db51dbcf8decf1cb333c57a36971ef578c89b4), ROM_BIOS(22))
 ROM_END
 
 
 //**************************************************************************
 //  80486 motherboard
 //**************************************************************************
+
+// QDI V4P895P3/SMT V5.0 - Chipset: Opti 82C895 82C602A - CPU: Am486DX2-66 - ISA8: 1, ISA16: 3, ISA16/VL: 3
+// RAM: 4xSIMM30, 2xSIMM72, Cache: 8xUM61256FK-15 - BIOS: AMI 486DX ISA BIOS Ac0928698 (28pin in a 32pin socket) - Keyboard-BIOS: AMIKEY-2
+ROM_START( v4p895p3 ) // no display
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "486-v4p895p3-smt.bin", 0x10000, 0x10000, CRC(683f8470) SHA1(eca1c21a8f8c57389d9fdf1cd76d2dec0928524a))
+ROM_END
 
 // Peacock PCK 486 DX DOC 50-60064-00 - Chipset: Symphony SL82C465 SL82C461 SL82C362 Chips F82C721 - CPU: i486DX-33, FPU socket privoded
 // BIOS: AMI 486DX ISA BIOS AA3364567 - Keyboard-BIOS: AMI/Intel P8942AHP - On board: 2xser, Floppy, IDE, par - OSC: 33.000MHz
@@ -3303,14 +3319,6 @@ ROM_START( sm48650usc ) // constant reset
 	ROM_LOAD( "mrbios_1150usc_um82c491f.bin", 0x10000, 0x10000, CRC(b6ef1220) SHA1(94511df49713ec30467c8d9b18eb04e83fa7a809))
 ROM_END
 
-// Elitegroup UM486V-AIO - Chipset: UMC UM82C482AF, UM82C481BF, UM82C863F, UM82C865F, UM82C206F - ISA16: 4, ISA16/VL: 2
-// BIOS: AMI - CPU: 486 - On board: Floppy, 1xIDE, parallel, 2x serial
-// BIOS-String: 40-0100-001131-00101111-111192-UMC480-0 / UM100 V2.1 04-26-93
-ROM_START( um486v )
-	ROM_REGION(0x20000, "bios", 0)
-	ROM_LOAD( "um486v.bin", 0x10000, 0x10000, CRC(eb52d3fd) SHA1(84f63904cfceca9171b5c469545068e19ae280a8))
-ROM_END
-
 // Auva-Cam-33-P2 = See-Thru Sto486Wb - CPU: 486 - ISA8: 1, ISA16: 7 - Chipset: OPTi 82C392, 82C493, 82C206
 // MR BIOS (tm) V1.30
 ROM_START( sto486wb )
@@ -3337,16 +3345,16 @@ ROM_START( ochipcom )
 	ROM_LOAD( "hippo_com_bios.bin", 0x10000, 0x10000, CRC(d35f65a1) SHA1(885f55f87d2070c6a846768e5cf76499dad8d15c))
 ROM_END
 
-// J-Bond A433C-C/A450C-C (8 SIMM, 2 8-bit ISA, 6 16-bit ISA)
-// Chipset: ETEQ ET82C491 + ET82C493; CHIPS P82C206; AMI KB-BIOS-VER-F P8042AHP
+// J-Bond A433C-C/A450C-C RAM: 8xSIMM30, Cache: 8xCY7199-25PC/2xCY7C166-20PC - 2 8-bit ISA, 6 16-bit ISA)
+// Chipset: ETEQ ET82C491 + ET82C493; CHIPS P82C206; AMI KB-BIOS-VER-F P8042AHP - OSC: 33.000MHz - CPU: i486DX-33
+// BIOS: AMI 486 BIOS ZZ566787 - BIOS-String: 40-0200-001353-0010111-070791-ETEQ4/1C-0 / ETEQ 486 Mar. 05, 1992
 ROM_START( a433cc )
 	ROM_REGION(0x20000, "bios", 0)
-	// BIOS-String: 40-0200-001353-0010111-070791-ETEQ4/1C-0 / ETEQ 486 Mar. 05, 1992
 	ROM_LOAD( "ami_j-bond_a433c-c.bin", 0x10000, 0x10000, CRC(66031e98) SHA1(d2d1a26837d3ca943a6ef09ec3e6fbfaaa62cc46))
 ROM_END
 
-// ASUS PVI-486AP4 (Socket 3, 4 SIMM, 4 PCI, 4 ISA, 1 VLB)
-// Intel Aries PCIset S82425EX + S82426EX; DS12887 RTC; VIA VT82C42N
+// ASUS PVI-486AP4 (Socket 3, 4xSIMM72, Cache: 128/256/512KB, 4 PCI, 4 ISA, 1 VLB)
+// Intel Aries PCIset S82425EX + S82426EX; DS12887 RTC; VIA VT82C42N - BIOS: 32pin
 ROM_START( a486ap4 )
 	ROM_REGION(0x20000, "bios", 0)
 	// 0: BIOS-String: 07/20/94-ARIES-P/I-AP4G-00 / #401A0-0104
@@ -3363,7 +3371,7 @@ ROM_START( a486ap4 )
 	ROMX_LOAD( "0205.002", 0x00000, 0x20000, CRC(632e8ee6) SHA1(3cf57b2654b0365e41ef5f5c82f68eeadf0e7a21), ROM_BIOS(3))
 ROM_END
 
-// ASUS PCI/I-486SP3G V3.02 (Socket 3, 4 SIMM, 1 IDE, 1 SCSI, 3 PCI, 4 ISA)
+// ASUS PCI/I-486SP3G V3.02 (Socket 3, RAM: 4xSIMM72, Cache: 128/256/512K, 1 IDE, 1 SCSI, 3 PCI, 4 ISA) - BIOS: 32pin
 // Intel Saturn II chipset: 82424ZX CDC + 82423TX DPU + 82378ZB SIO; NCR 53C820; National PC87332; DS12887 RTC; VIA VT82C42N
 ROM_START( a486sp3g )
 	ROM_REGION(0x20000, "bios", 0)
@@ -3375,7 +3383,7 @@ ROM_START( a486sp3g )
 	ROMX_LOAD( "awsg0304.bin", 0x00000, 0x20000, CRC(f4d830d2) SHA1(086ccd14c7b0c521be1958d58b3539c4bfe4721f), ROM_BIOS(1))
 ROM_END
 
-// ASUS VL/EISA-486SV1 (8 EISA, 1 VLB)
+// ASUS VL/EISA-486SV1 (8 EISA, 1 VLB) -
 ROM_START( a486sv1 )
 	ROM_REGION(0x20000, "bios", 0)
 	// BIOS-String: 05/20/94-SIS-486/EISA-E-486SV1-00 / #401A0-0112
@@ -3395,7 +3403,7 @@ ROM_START( ficvipio )
 	ROMX_LOAD( "427gn2a.awd",  0x00000, 0x20000, CRC(035ad56d) SHA1(0086db3eff711fc710b30e7f422fc5b4ab8d47aa), ROM_BIOS(1))
 ROM_END
 
-// Shuttle HOT-409 (6 16-bit ISA incl. 2 VLB, 2 8-bit ISA, 8 SIMM)
+// Shuttle HOT-409 (6 16-bit ISA incl. 2 VLB, 2 8-bit ISA, 8 SIMM30, Cache: 64/128/256K+Tag in 2 banks)
 // OPTi 82C495SX + 82C392SX + F82C206; MEGA-KB-1-WP
 ROM_START( hot409 )
 	ROM_REGION(0x20000, "bios", 0)
@@ -3469,7 +3477,7 @@ ROM_END
 
 // ***** 486 motherboards using the SiS 85C496/85C497 chipset
 
-// ASUS PCI/I-A486S (4 SIMM, 1 EISA)
+// ASUS PCI/I-A486S (4xSIMM72, Cache: 128/256/512KB, 1 EISA) - BIOS: 32pin
 // SiS 85C496/85C497 chipset; SMC 37C665 I/O; AMIKEY-2, S3 Trio 64 on board VGA, the manual also mentions Trio 32
 ROM_START( aa486s )
 	ROM_REGION(0x20000, "bios", 0)
@@ -3481,8 +3489,8 @@ ROM_START( aa486s )
 	ROMX_LOAD( "si4a0304.awd", 0x00000, 0x20000, CRC(a00ad907) SHA1(598d97ea29f930a9359429dc540d27bfdd0fcd20), ROM_BIOS(1))
 ROM_END
 
-// ASUS PVI-486SP3 (Socket 3, 2 SIMM, 2 IDE, 3 PCI, 4 ISA, 1 VLB)
-// SiS 85C496 + 85C497; UMC UM8669F; AMIKEY-2
+// ASUS PVI-486SP3 (Socket 3, 2xSIMM72, Cache: 128/256/512KB, 2 IDE, 3 PCI, 4 ISA, 1 VLB)
+// SiS 85C496 + 85C497; UMC UM8669F; AMIKEY-2; BIOS: 29EE010 (32pin)
 ROM_START( a486sp3 )
 	ROM_REGION(0x20000, "bios", 0) // Winbond W29EE011-15
 	// 0: BIOS-String: 07/22/94-SATURN-P/I-4SP3-00 / #401A0-0207
@@ -3521,7 +3529,7 @@ ROM_END
 
 // ***** 486 motherboards using the SiS 85C471 + 85C407 chipset
 
-// ASUS VL/I-486SV2G (GX4) (4 SIMM, 7 ISA, 2 VLB)
+// ASUS VL/I-486SV2G (GX4) (4xSIMM72, Cache: 128/256/512/1024KB, 7 ISA, 2 VLB)
 // SiS 85C471 + 85C407; AMIKEY-2
 ROM_START( a486sv2g )
 	ROM_REGION(0x20000, "bios", 0)
@@ -3618,6 +3626,25 @@ ROM_END
 ROM_START( um8498f ) // no display
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD( "deepgrn.bin", 0x10000, 0x10000, CRC(4a6dcc36) SHA1(f159f67eb662272244cd1781814ebcb5204a2625))
+ROM_END
+
+
+// ***** 486 motherboards using the UM82C482A UM82C481A chipset
+
+// Elitegroup UM486/UM486sx Rev.1.4. - Chipset: UMC UM82C482A UM82C481A UM82C206F - ISA8: 2, ISA16: 6 - CPU: i486DX-50, FPU socket provided
+// RAM: 8xSIMM30 in 2 banks, Cache: 8xW24256AK-25+4xCY7C164-20PC - OSC: 33.000MHz, 14.31818MHz - BIOS: AMI 486 BIOS ZZ364969 - Keyboard-BIOS: AMI KB-BIOS-VER-F
+// BIOS-String: 40-0500-D01131-00101111-070791-UMCWB-0 / UM486/486SX V1.3 09-24-91
+ROM_START( um486 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "486-um486-um486sx.bin", 0x10000, 0x10000, CRC(0f20d193) SHA1(e9c7365b0343a815e5abc9726d128353becc18d3))
+ROM_END
+
+// Elitegroup UM486V-AIO - Chipset: UMC UM82C482AF, UM82C481BF, UM82C863F, UM82C865F, UM82C206F - ISA16: 4, ISA16/VL: 2
+// BIOS: AMI - CPU: 486 - On board: Floppy, 1xIDE, parallel, 2x serial
+// BIOS-String: 40-0100-001131-00101111-111192-UMC480-0 / UM100 V2.1 04-26-93
+ROM_START( um486v )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "um486v.bin", 0x10000, 0x10000, CRC(eb52d3fd) SHA1(84f63904cfceca9171b5c469545068e19ae280a8))
 ROM_END
 
 
@@ -3740,7 +3767,7 @@ ROM_START( fic4386vchd )
 	ROM_SYSTEM_BIOS(0, "ami104", "AMI V1.04")
 	ROMX_LOAD( "3vim001.bin", 0x10000, 0x10000, CRC(668d8cab) SHA1(409b81e33ca07b0a9724dbb6ca395a3a0887aa02), ROM_BIOS(0))
 	// 1: BIOS: Award F0111730 v1.15K 03/12/93-VENUS-VIA - BIOS-String: Award Modular BIOS v4.20 / Version 1.15K
-	ROM_SYSTEM_BIOS(1, "awav115K", "Award V1.15k")// KEYBOARD ERROR OR NO KEYBOARD PRESENT
+	ROM_SYSTEM_BIOS(1, "awav115k", "Award V1.15k")// KEYBOARD ERROR OR NO KEYBOARD PRESENT
 	ROMX_LOAD( "4386-vc-hd v1.15k.bin", 0x10000, 0x10000, CRC(acc5db45) SHA1(cb93322735e96614d3c54fbfcd4291ff1b3ca57c), ROM_BIOS(1))
 	// 2: AWARD v4.20 F0166061 (28pin) - Keyboard-BIOS: Lance LT38C41 - CPU: 486 - BIOS-String
 	ROM_SYSTEM_BIOS(2, "awav110k", "Award V1.10K") // KEYBOARD ERROR OR NO KEYBOARD PRESENT
@@ -4006,7 +4033,8 @@ COMP( 199?, ch4slez1,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, ch491e,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Chicony",   "CH-491E", MACHINE_NOT_WORKING )
 COMP( 199?, 486ccv,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Diamond Flower, Inc. (DFI)", "486-CCV", MACHINE_NOT_WORKING )
 COMP( 199?, pkm0038s,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "DTK", "PKM-0038S aka Gemlight GMB-486SG", MACHINE_NOT_WORKING )
-COMP( 199?, um486v,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup",  "UM486V-AIO", MACHINE_NOT_WORKING )
+COMP( 199?, um486,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486/UM486sx", MACHINE_NOT_WORKING )
+COMP( 199?, um486v,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486V-AIO", MACHINE_NOT_WORKING )
 COMP( 199?, ec4915aio, ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UC4915 A AIO", MACHINE_NOT_WORKING )
 COMP( 199?, fic4386vcv,ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "4386-VC-V", MACHINE_NOT_WORKING )
 COMP( 1994, ficgiovt2, ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-GIO-VT2", MACHINE_NOT_WORKING )
@@ -4028,6 +4056,7 @@ COMP( 199?, pccm919,   ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, pck486dx,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Peacock",  "PCK 486 DX", MACHINE_NOT_WORKING )
 COMP( 199?, pt430,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Pine Technology", "PT-430", MACHINE_NOT_WORKING )
 COMP( 199?, px486p3,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "QDI", "PX486P3", MACHINE_NOT_WORKING )
+COMP( 199?, v4p895p3,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "QDI", "V4P895P3/SMT V5.0", MACHINE_NOT_WORKING )
 COMP( 199?, sto486wb,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "See-Thru", "Sto486Wb aka AUVA Cam-33-P2", MACHINE_NOT_WORKING )
 COMP( 199?, hot409,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-409", MACHINE_NOT_WORKING )
 COMP( 199?, hot433,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-433", MACHINE_NOT_WORKING )
