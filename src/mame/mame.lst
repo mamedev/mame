@@ -2602,6 +2602,7 @@ ga486vs                         // Gigabyte GA-486VS motherboard (486)
 amibaby                         // AMI Mark V Baby Screamer motherboard (386)
 ecsfx3000                       // Elitegroup FX-3000 motherboard (386)
 frx386c                         // Micro-Express Inc. Forex 386 Cache
+um486                           // Elitegroup UM486/UM486sx Rev.1.4. motherboard (486)
 um486v                          // Elitegroup UM486V-AIO motherboard (486)
 sm48650usc                      // Vintage Sprite SM 486-50USC motherboard (486)
 ch4slez1                        // Chaintech 486SLE M106 4SLE-Z1 motherboard (486)
@@ -2628,6 +2629,7 @@ alim1489                        // 486 motherboards using the ALi 1487/1489 chip
 ms4125                          // MSI MS-4125 motherboard (486)
 pkm0038s                        // DTK PKM-0038S aka Gemlight GMB-486SG motherboard (486)
 fic4386vcv                      // FIC 4386-VC-V motherboard (486)
+v4p895p3                        // QDI V4P895P3/SMT V5.0 motherboard (486)
 
 @source:atari_s1.cpp
 aavenger                        //
