@@ -139,6 +139,11 @@ private:
 	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNgo_w );
 	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNlatch_w );
 	
+	bool m_cpuclk_divider, m_memclk_divider, m_ioclk_divider;
+	inline void refresh_host_cpu_clocks();
+	DECLARE_READ32_MEMBER( clkctl_r );
+	DECLARE_WRITE32_MEMBER( clkctl_w );
+	
 	// used in vidcr_r / sndcr_r, documentation hints this is a purged idea during chip development, to be checked out
 	static constexpr u8 dmaid_size = 0x10; // qword transfer
 //	constexpr u8 dmaid_mask = 0x1f;

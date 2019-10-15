@@ -291,7 +291,6 @@ READ32_MEMBER(ssfindo_state::io_r)
 {
 	int adr=m_flashAdr*0x200+(m_flashOffset);
 
-
 	switch(m_flashType)
 	{
 		case 0:
@@ -549,7 +548,7 @@ INPUT_PORTS_END
 
 void ssfindo_state::ssfindo(machine_config &config)
 {
-	ARM7(config, m_maincpu, 54000000); // TODO: can actually be internally divided from IOMD
+	ARM7(config, m_maincpu, 54000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ssfindo_map);
 
 	I2C_24C01(config, m_i2cmem);
@@ -561,7 +560,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
 	
-	ARM_IOMD(config, m_iomd, 0);
+	ARM_IOMD(config, m_iomd, 54000000);
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));

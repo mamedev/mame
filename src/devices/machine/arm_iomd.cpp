@@ -41,7 +41,7 @@ void arm_iomd_device::map(address_map &map)
 //	map(0x004, 0x007).rw(FUNC(arm_iomd_device::kbddat_r), FUNC(arm_iomd_device::kbddat_w));
 //	map(0x008, 0x00b).rw(FUNC(arm_iomd_device::kbdcr_r), FUNC(arm_iomd_device::kbdcr_w));
 	map(0x00c, 0x00f).rw(FUNC(arm_iomd_device::iolines_r), FUNC(arm_iomd_device::iolines_w));
-	// interrupt A/B/fiq
+	// interrupt A/B/fiq + master clock controls
 	map(0x010, 0x013).r(FUNC(arm_iomd_device::irqst_r<IRQA>));
 	map(0x014, 0x017).rw(FUNC(arm_iomd_device::irqrq_r<IRQA>), FUNC(arm_iomd_device::irqrq_w<IRQA>));
 	map(0x018, 0x01b).rw(FUNC(arm_iomd_device::irqmsk_r<IRQA>), FUNC(arm_iomd_device::irqmsk_w<IRQA>));
@@ -55,7 +55,7 @@ void arm_iomd_device::map(address_map &map)
 //	map(0x030, 0x033).r(FUNC(arm_iomd_device::fiqst_r));
 //	map(0x034, 0x037).rw(FUNC(arm_iomd_device::fiqrq_r), FUNC(arm_iomd_device::fiqrq_w));
 //	map(0x038, 0x03b).rw(FUNC(arm_iomd_device::fiqmsk_r), FUNC(arm_iomd_device::fiqmsk_w));
-//	map(0x03c, 0x03f).rw(FUNC(arm_iomd_device::clkctl_r), FUNC(arm_iomd_device::clkctl_w));
+	map(0x03c, 0x03f).rw(FUNC(arm_iomd_device::clkctl_r), FUNC(arm_iomd_device::clkctl_w));
 	// timers
 	map(0x040, 0x043).rw(FUNC(arm_iomd_device::tNlow_r<0>), FUNC(arm_iomd_device::tNlow_w<0>));
 	map(0x044, 0x047).rw(FUNC(arm_iomd_device::tNhigh_r<0>), FUNC(arm_iomd_device::tNhigh_w<0>));
@@ -205,6 +205,10 @@ void arm_iomd_device::device_start()
 	save_pointer(NAME(m_sndstop_reg), sounddma_ch_size);
 	save_pointer(NAME(m_sndlast_reg), sounddma_ch_size);
 	save_pointer(NAME(m_sndbuffer_ok), sounddma_ch_size);
+	
+	save_item(NAME(m_cpuclk_divider));
+	save_item(NAME(m_memclk_divider));
+	save_item(NAME(m_ioclk_divider));
 }
 
 
@@ -234,6 +238,9 @@ void arm_iomd_device::device_reset()
 	m_sound_dma_on = false;
 	for (i=0; i<sounddma_ch_size; i++)
 		m_sndbuffer_ok[i] = false;
+
+	m_cpuclk_divider = m_ioclk_divider = m_memclk_divider = false;
+	refresh_host_cpu_clocks();
 	// ...
 }
 
@@ -331,6 +338,25 @@ template <unsigned Which> WRITE32_MEMBER( arm_iomd_device::irqmsk_w )
 {
 	m_irq_mask[Which] = data & 0xff;
 	flush_irq(Which);
+}
+
+// master clock control
+inline void arm_iomd_device::refresh_host_cpu_clocks()
+{
+	m_host_cpu->set_unscaled_clock(this->clock() >> (m_cpuclk_divider == false));
+}
+
+READ32_MEMBER( arm_iomd_device::clkctl_r )
+{
+	return (m_cpuclk_divider << 2) | (m_memclk_divider << 1) | (m_ioclk_divider);
+}
+
+WRITE32_MEMBER( arm_iomd_device::clkctl_w )
+{
+	m_cpuclk_divider = BIT(data, 2);
+	m_memclk_divider = BIT(data, 1);
+	m_ioclk_divider = BIT(data, 0);
+	refresh_host_cpu_clocks();
 }
 
 // timers

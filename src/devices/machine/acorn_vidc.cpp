@@ -227,10 +227,15 @@ inline void acorn_vidc10_device::screen_vblank_line_update()
 	m_video_timer->adjust((vline > 2) ? screen().time_until_pos(vline) : attotime::never);
 }
 
+u32 acorn_vidc10_device::get_pixel_clock()
+{
+	const int32_t pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
+	return pixel_rate[m_pixel_clock];
+}
+
 inline void acorn_vidc10_device::screen_dynamic_res_change()
 {
-	// TODO: different for VIDC20
-	const int32_t pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
+	const u32 pixel_clock = get_pixel_clock();
 
 	// sanity checks
 	if (m_crtc_regs[CRTC_HCR] <= 1 || m_crtc_regs[CRTC_VCR] <= 1)
@@ -263,7 +268,7 @@ inline void acorn_vidc10_device::screen_dynamic_res_change()
 		m_vidc_vblank_time);
 #endif
 
-	attoseconds_t const refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_pixel_clock]) * m_crtc_regs[CRTC_HCR] * m_crtc_regs[CRTC_VCR];
+	attoseconds_t const refresh = HZ_TO_ATTOSECONDS(pixel_clock) * m_crtc_regs[CRTC_HCR] * m_crtc_regs[CRTC_VCR];
 
 	screen().configure(m_crtc_regs[CRTC_HCR], m_crtc_regs[CRTC_VCR] * (m_crtc_interlace+1), visarea, refresh);
 }
@@ -582,8 +587,11 @@ uint32_t arm_vidc20_device::palette_entries() const
 void arm_vidc20_device::device_start()
 {
 	acorn_vidc10_device::device_start();
+
 	save_item(NAME(m_pal_data_index));
 	save_item(NAME(m_dac_serial_mode));
+	save_item(NAME(m_pixel_source));
+	save_item(NAME(m_pixel_rate));
 }
 
 void arm_vidc20_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -616,6 +624,14 @@ WRITE32_MEMBER(arm_vidc20_device::vidc20_pal_data_display_w)
 WRITE32_MEMBER(arm_vidc20_device::vidc20_pal_data_index_w)
 {
 	m_pal_data_index = data & 0xff;
+}
+
+u32 arm_vidc20_device::get_pixel_clock()
+{
+	// RCLK source: passes thru a r-modulus and a phase frequency (PCOMP), the full story is interesting if you're into maths.
+	// TODO: for now we just multiply source clock by 2, enough for ssfindo.cpp games.
+	//printf("%d %02x %02x\n",this->clock(), 1 << m_pixel_rate, m_pixel_source);
+	return (this->clock() << 1) >> m_pixel_rate;
 }
 
 WRITE32_MEMBER(arm_vidc20_device::vidc20_crtc_w)
@@ -656,8 +672,14 @@ WRITE32_MEMBER(arm_vidc20_device::vidc20_crtc_w)
 
 WRITE32_MEMBER( arm_vidc20_device::vidc20_control_w )
 {
-	// data & 0x3 pixel source
-	// (data & 0x1c) >> 2 pixel rate
+	// ---- --00: VCLK
+	// ---- --01: HCLK
+	// ---- --10: RCLK ("recommended" 24 MHz)
+	// ---- --11: undefined, prolly same as RCLK
+	m_pixel_source = data & 3;
+	if (m_pixel_source != 2)
+		logerror("%s: Warning pixel source select %02x\n",this->tag(), m_pixel_source);
+	m_pixel_rate = (data & 0x1c) >> 2;
 	// (data & 0x700) >> 8 FIFO load
 	// BIT(data, 13) enables Duplex LCD mode
 	// BIT(data, 14) power down
