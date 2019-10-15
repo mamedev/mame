@@ -114,9 +114,9 @@ namespace devices
 							{
 								pstring nname(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size())));
 								nl_assert(p->net().is_analog());
-								auto net_proxy_output_u = pool().make_poolptr<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
+								auto net_proxy_output_u = pool().make_unique<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
 								net_proxy_output = net_proxy_output_u.get();
-								m_inps.push_back(std::move(net_proxy_output_u));
+								m_inps.emplace_back(std::move(net_proxy_output_u));
 							}
 							net_proxy_output->net().add_terminal(*p);
 							// FIXME: repeated calling - kind of brute force

@@ -99,7 +99,7 @@ namespace netlist
 	 *
 	 */
 	template <typename T>
-	using pool_owned_ptr = nlmempool::owned_pool_ptr<T>;
+	using owned_pool_ptr = nlmempool::owned_pool_ptr<T>;
 
 	/*! Unique pointer type for pooled allocations.
 	 *

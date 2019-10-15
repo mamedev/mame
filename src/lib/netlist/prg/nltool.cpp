@@ -714,7 +714,7 @@ void tool_app_t::listdevices()
 
 	nt.setup().prepare_to_run();
 
-	std::vector<netlist::pool_owned_ptr<netlist::core_device_t>> devs;
+	std::vector<netlist::unique_pool_ptr<netlist::core_device_t>> devs;
 
 	for (auto & f : list)
 	{

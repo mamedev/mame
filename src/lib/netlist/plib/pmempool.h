@@ -189,7 +189,7 @@ namespace plib {
 		using unique_pool_ptr = std::unique_ptr<T, arena_deleter<mempool, T>>;
 
 		template<typename T, typename... Args>
-		owned_pool_ptr<T> make_poolptr(Args&&... args)
+		owned_pool_ptr<T> make_owned(Args&&... args)
 		{
 			auto *mem = this->allocate(alignof(T), sizeof(T));
 			try

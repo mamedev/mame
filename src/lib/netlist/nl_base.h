@@ -144,7 +144,7 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
 
 #define NETLIB_SUB(chip) nld_ ## chip
-#define NETLIB_SUBXX(ns, chip) pool_owned_ptr< ns :: nld_ ## chip >
+#define NETLIB_SUBXX(ns, chip) unique_pool_ptr< ns :: nld_ ## chip >
 
 #define NETLIB_HANDLER(chip, name) void NETLIB_NAME(chip) :: name() NL_NOEXCEPT
 #define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
@@ -249,9 +249,9 @@ namespace netlist
 
 		virtual ~logic_family_desc_t() noexcept = default;
 
-		virtual pool_owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
+		virtual unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
-		virtual pool_owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
+		virtual unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_input_t *proxied) const = 0;
 
 		double fixed_V() const { return m_fixed_V; }
@@ -698,14 +698,14 @@ namespace netlist
 			netlist_sig_t Q() const noexcept { return m_cur_Q; }
 
 			/* only used for logic nets */
-			void initial(const netlist_sig_t val) noexcept
+			void initial(netlist_sig_t val) noexcept
 			{
 				m_cur_Q = m_new_Q = val;
 				update_inputs();
 			}
 
 			/* only used for logic nets */
-			void set_Q_and_push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
+			void set_Q_and_push(netlist_sig_t newQ, netlist_time delay) NL_NOEXCEPT
 			{
 				if (newQ != m_new_Q)
 				{
@@ -715,7 +715,7 @@ namespace netlist
 			}
 
 			/* only used for logic nets */
-			void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
+			void set_Q_time(netlist_sig_t newQ, netlist_time at) NL_NOEXCEPT
 			{
 				if (newQ != m_new_Q)
 				{
@@ -935,14 +935,14 @@ namespace netlist
 
 		logic_output_t(core_device_t &dev, const pstring &aname);
 
-		void initial(const netlist_sig_t val);
+		void initial(netlist_sig_t val);
 
-		void push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
+		void push(netlist_sig_t newQ, netlist_time delay) NL_NOEXCEPT
 		{
 			m_my_net.set_Q_and_push(newQ, delay); // take the shortcut
 		}
 
-		void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
+		void set_Q_time(netlist_sig_t newQ, netlist_time at) NL_NOEXCEPT
 		{
 			m_my_net.set_Q_time(newQ, at); // take the shortcut
 		}
@@ -1260,9 +1260,9 @@ namespace netlist
 		const setup_t &setup() const;
 
 		template<class C, typename... Args>
-		void create_and_register_subdevice(const pstring &name, pool_owned_ptr<C> &dev, Args&&... args)
+		void create_and_register_subdevice(const pstring &name, unique_pool_ptr<C> &dev, Args&&... args)
 		{
-			dev = pool().make_poolptr<C>(*this, name, std::forward<Args>(args)...);
+			dev = pool().make_unique<C>(*this, name, std::forward<Args>(args)...);
 		}
 
 		void register_subalias(const pstring &name, detail::core_terminal_t &term);
@@ -1338,10 +1338,10 @@ namespace netlist
 	{
 	public:
 
-		using nets_collection_type = std::vector<pool_owned_ptr<detail::net_t>>;
+		using nets_collection_type = std::vector<owned_pool_ptr<detail::net_t>>;
 
 		/* need to preserve order of device creation ... */
-		using devices_collection_type = std::vector<std::pair<pstring, pool_owned_ptr<core_device_t>>>;
+		using devices_collection_type = std::vector<std::pair<pstring, owned_pool_ptr<core_device_t>>>;
 		netlist_state_t(const pstring &aname,
 			netlist_t & anetlist,
 			plib::unique_ptr<callbacks_t> &&callbacks);
@@ -1360,10 +1360,38 @@ namespace netlist
 
 		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
 
+		/**
+		 * @brief Get single device filtered by class and name
+		 *
+		 * @tparam C Device class for which devices will be returned
+		 * @param  name Name of the device
+		 *
+		 * @return pointers to device
+		 */
 		template<class C>
-		C *get_single_device(const pstring &classname) const
+		C *get_single_device(const pstring &name) const
 		{
-			return dynamic_cast<C *>(get_single_device(classname, check_class<C>));
+			return dynamic_cast<C *>(get_single_device(name, check_class<C>));
+		}
+
+		/**
+		 * @brief Get vector of devices
+		 *
+		 * @tparam C Device class for which devices will be returned
+		 *
+		 * @return vector with pointers to devices
+		 */
+		template<class C>
+		inline std::vector<C *> get_device_list()
+		{
+			std::vector<C *> tmp;
+			for (auto &d : m_devices)
+			{
+				auto dev = dynamic_cast<C *>(d.second.get());
+				if (dev != nullptr)
+					tmp.push_back(dev);
+			}
+			return tmp;
 		}
 
 		/* logging and name */
@@ -1396,21 +1424,16 @@ namespace netlist
 		std::size_t find_net_id(const detail::net_t *net) const;
 
 		template <typename T>
-		void register_net(pool_owned_ptr<T> &&net) { m_nets.push_back(std::move(net)); }
+		void register_net(owned_pool_ptr<T> &&net) { m_nets.push_back(std::move(net)); }
 
-		template<class device_class>
-		inline std::vector<device_class *> get_device_list()
-		{
-			std::vector<device_class *> tmp;
-			for (auto &d : m_devices)
-			{
-				auto dev = dynamic_cast<device_class *>(d.second.get());
-				if (dev != nullptr)
-					tmp.push_back(dev);
-			}
-			return tmp;
-		}
-
+		/**
+		 * @brief Get device pointer by name
+		 *
+		 *
+		 * @param name Name of the device
+		 *
+		 * @return core_device_t pointer if device exists, else nullptr
+		 */
 		core_device_t *find_device(const pstring &name)
 		{
 			for (auto & d : m_devices)
@@ -1419,8 +1442,17 @@ namespace netlist
 			return nullptr;
 		}
 
+		/**
+		 * @brief Register device using owned_ptr
+		 *
+		 * Used to register owned devices. These are devices declared as objects
+		 * in another devices.
+		 *
+		 * @param name Name of the device
+		 * @param dev Device to be registered
+		 */
 		template <typename T>
-		void add_dev(const pstring &name, pool_owned_ptr<T> &&dev)
+		void register_device(const pstring &name, owned_pool_ptr<T> &&dev)
 		{
 			for (auto & d : m_devices)
 				if (d.first == name)
@@ -1433,6 +1465,20 @@ namespace netlist
 		}
 
 		/**
+		 * @brief Register device using unique_ptr
+		 *
+		 * Used to register devices.
+		 *
+		 * @param name Name of the device
+		 * @param dev Device to be registered
+		 */
+		template <typename T>
+		void register_device(const pstring &name, unique_pool_ptr<T> &&dev)
+		{
+			register_device(name, owned_pool_ptr<T>(dev.release(), true, dev.get_deleter()));
+		}
+
+		/**
 		 * @brief Remove device
 		 *
 		 * Care needs to be applied if this is called to remove devices with
@@ -1440,7 +1486,7 @@ namespace netlist
 		 *
 		 * @param dev Device to be removed
 		 */
-		void remove_dev(core_device_t *dev)
+		void remove_device(core_device_t *dev)
 		{
 			for (auto it = m_devices.begin(); it != m_devices.end(); it++)
 				if (it->second.get() == dev)
@@ -1451,19 +1497,19 @@ namespace netlist
 				}
 		}
 
-		/* sole use is to manage lifetime of family objects */
-		std::unordered_map<pstring, plib::unique_ptr<logic_family_desc_t>> m_family_cache;
-
 		setup_t &setup() NL_NOEXCEPT { return *m_setup; }
 		const setup_t &setup() const NL_NOEXCEPT { return *m_setup; }
-
-		nets_collection_type & nets() { return m_nets; }
-		devices_collection_type & devices() { return m_devices; }
 
 		// FIXME: make a postload member and include code there
 		void rebuild_lists(); /* must be called after post_load ! */
 
 		static void compile_defines(std::vector<std::pair<pstring, pstring>> &defs);
+
+		nets_collection_type & nets() { return m_nets; }
+		devices_collection_type & devices() { return m_devices; }
+
+		/* sole use is to manage lifetime of family objects */
+		std::unordered_map<pstring, plib::unique_ptr<logic_family_desc_t>> m_family_cache;
 
 	private:
 
@@ -1503,7 +1549,7 @@ namespace netlist
 
 		netlist_time time() const NL_NOEXCEPT { return m_time; }
 
-		void process_queue(const netlist_time delta) NL_NOEXCEPT;
+		void process_queue(netlist_time delta) NL_NOEXCEPT;
 		void abort_current_queue_slice() NL_NOEXCEPT { m_queue.retime(detail::queue_t::entry_t(m_time, nullptr)); }
 
 		const detail::queue_t &queue() const NL_NOEXCEPT { return m_queue; }
@@ -1559,7 +1605,7 @@ namespace netlist
 	private:
 
 		template <bool KEEP_STATS>
-		void process_queue_stats(const netlist_time delta) NL_NOEXCEPT;
+		void process_queue_stats(netlist_time delta) NL_NOEXCEPT;
 
 		plib::unique_ptr<netlist_state_t>   m_state;
 		devices::NETLIB_NAME(solver) *      m_solver;
@@ -1708,27 +1754,25 @@ namespace netlist
 		}
 	}
 
-	inline void detail::net_t::push_to_queue(const netlist_time delay) NL_NOEXCEPT
+	inline void detail::net_t::push_to_queue(netlist_time delay) NL_NOEXCEPT
 	{
 		if ((num_cons() != 0))
 		{
-			auto &lexec(exec());
-			const auto nst(lexec.time() + delay);
+			m_next_scheduled_time = exec().time() + delay;
 
 			if (is_queued())
-				lexec.qremove(this);
+				exec().qremove(this);
 
 			if (!m_list_active.empty())
 			{
 				m_in_queue = queue_status::QUEUED;
-				lexec.qpush(queue_t::entry_t(nst, this));
+				exec().qpush(queue_t::entry_t(m_next_scheduled_time, this));
 			}
 			else
 			{
 				m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
 				update_inputs();
 			}
-			m_next_scheduled_time = nst;
 		}
 	}
 
