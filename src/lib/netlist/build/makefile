@@ -26,6 +26,7 @@ TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses,
 TIDY_FLAGSX += -modernize-use-trailing-return-type
 TIDY_FLAGSX += -bugprone-too-small-loop-variable
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+TIDY_FLAGSX += -modernize-use-trailing-return-type
 
 space := 
 space += 

@@ -98,7 +98,7 @@ class NETLIB_NAME(name) : public device_t
 	 *  device a dynamic device if parameter m_func is set.
 	 */
 #define NETLIB_IS_DYNAMIC(expr)                                                \
-	public: virtual bool is_dynamic() const override { return expr; }
+	public: virtual bool is_dynamic() const NL_NOEXCEPT override { return expr; }
 
 	/*! Add this to a device definition to mark the device as a time-stepping device.
 	 *
@@ -122,26 +122,26 @@ class NETLIB_NAME(name) : public device_t
 	 *
 	 */
 #define NETLIB_IS_TIMESTEP(expr)                                               \
-	public: virtual bool is_timestep() const override { return expr; }
+	public: virtual bool is_timestep() const  NL_NOEXCEPT override { return expr; }
 
 	/*! Used to implement the time stepping code.
 	 *
 	 * Please see NETLIB_IS_TIMESTEP for an example.
 	 */
 #define NETLIB_TIMESTEPI()                                                     \
-	public: virtual void timestep(const nl_double step) override
+	public: virtual void timestep(const nl_double step)  NL_NOEXCEPT override
 
 #define NETLIB_FAMILY(family) , m_famsetter(*this, family)
 
 #define NETLIB_DELEGATE(chip, name) nldelegate(&NETLIB_NAME(chip) :: name, this)
 
-#define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() override
+#define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() NL_NOEXCEPT override
 #define NETLIB_HANDLERI(name) virtual void name() NL_NOEXCEPT
 #define NETLIB_UPDATEI() virtual void update() NL_NOEXCEPT override
-#define NETLIB_UPDATE_PARAMI() virtual void update_param() override
+#define NETLIB_UPDATE_PARAMI() virtual void update_param() NL_NOEXCEPT override
 #define NETLIB_RESETI() virtual void reset() override
 
-#define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
+#define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(nl_double step) NL_NOEXCEPT
 
 #define NETLIB_SUB(chip) nld_ ## chip
 #define NETLIB_SUBXX(ns, chip) unique_pool_ptr< ns :: nld_ ## chip >
@@ -151,10 +151,10 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 
-#define NETLIB_UPDATE_PARAM(chip) void NETLIB_NAME(chip) :: update_param()
-#define NETLIB_FUNC_VOID(chip, name, params) void NETLIB_NAME(chip) :: name params
+#define NETLIB_UPDATE_PARAM(chip) void NETLIB_NAME(chip) :: update_param() NL_NOEXCEPT
+#define NETLIB_FUNC_VOID(chip, name, params) void NETLIB_NAME(chip) :: name params NL_NOEXCEPT
 
-#define NETLIB_UPDATE_TERMINALS(chip) void NETLIB_NAME(chip) :: update_terminals()
+#define NETLIB_UPDATE_TERMINALS(chip) void NETLIB_NAME(chip) :: update_terminals() NL_NOEXCEPT
 
 //============================================================
 //  Asserts
@@ -254,13 +254,13 @@ namespace netlist
 		virtual unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_input_t *proxied) const = 0;
 
-		double fixed_V() const { return m_fixed_V; }
-		double low_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_low_thresh_PCNT; }
-		double high_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_high_thresh_PCNT; }
-		double low_offset_V() const { return m_low_VO; }
-		double high_offset_V() const { return m_high_VO; }
-		double R_low() const { return m_R_low; }
-		double R_high() const { return m_R_high; }
+		double fixed_V() const noexcept{ return m_fixed_V; }
+		double low_thresh_V(const double VN, const double VP) const noexcept{ return VN + (VP - VN) * m_low_thresh_PCNT; }
+		double high_thresh_V(const double VN, const double VP) const noexcept{ return VN + (VP - VN) * m_high_thresh_PCNT; }
+		double low_offset_V() const noexcept{ return m_low_VO; }
+		double high_offset_V() const noexcept{ return m_high_VO; }
+		double R_low() const noexcept{ return m_R_low; }
+		double R_high() const noexcept{ return m_R_high; }
 
 		double m_fixed_V;           //!< For variable voltage families, specify 0. For TTL this would be 5. */
 		double m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
@@ -285,10 +285,8 @@ namespace netlist
 	class logic_family_t
 	{
 	public:
-
 		logic_family_t() : m_logic_family(nullptr) {}
 		COPYASSIGNMOVE(logic_family_t, delete)
-
 
 		const logic_family_desc_t *logic_family() const { return m_logic_family; }
 		void set_logic_family(const logic_family_desc_t *fam) { m_logic_family = fam; }
@@ -321,7 +319,7 @@ namespace netlist
 		template <typename O>
 		//! Constructor.
 		state_var(O &owner,             //!< owner must have a netlist() method.
-				const pstring &name,     //!< identifier/name for this state variable
+				const pstring &name,    //!< identifier/name for this state variable
 				const T &value          //!< Initial value after construction
 				);
 
@@ -332,7 +330,7 @@ namespace netlist
 		//! Move Constructor.
 		constexpr state_var(state_var &&rhs) noexcept = default;
 		//! Assignment operator to assign value of a state var.
-		C14CONSTEXPR state_var &operator=(const state_var &rhs) = default;
+		C14CONSTEXPR state_var &operator=(const state_var &rhs) /*noexcept*/ = default; // OSX doesn't like noexcept
 		//! Assignment move operator to assign value of a state var.
 		C14CONSTEXPR state_var &operator=(state_var &&rhs) noexcept = default;
 		//! Assignment operator to assign value of type T.
@@ -355,7 +353,7 @@ namespace netlist
 	 *  Please refer to \ref state_var.
 	 */
 	template <typename T, std::size_t N>
-	struct state_array
+	struct state_array : public std::array<T, N>
 	{
 	public:
 		//! Constructor.
@@ -372,12 +370,6 @@ namespace netlist
 		state_array(state_array &&rhs) noexcept = default;
 		state_array &operator=(const state_array &rhs) noexcept = default;
 		state_array &operator=(state_array &&rhs) noexcept = default;
-
-		state_array &operator=(const T &rhs) noexcept { m_value = rhs; return *this; }
-		T & operator[](const std::size_t i) noexcept { return m_value[i]; }
-		constexpr const T & operator[](const std::size_t i) const noexcept { return m_value[i]; }
-	private:
-		std::array<T, N> m_value;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -401,22 +393,22 @@ namespace netlist
 		template <typename C, typename T>
 		struct property_store_t
 		{
-			static void add(const C *obj, const T &aname)
+			static void add(const C *obj, const T &aname) noexcept
 			{
 				store().insert({obj, aname});
 			}
 
-			static const T get(const C *obj)
+			static const T get(const C *obj) noexcept
 			{
 				return store().find(obj)->second;
 			}
 
-			static void remove(const C *obj)
+			static void remove(const C *obj) noexcept
 			{
 				store().erase(store().find(obj));
 			}
 
-			static std::unordered_map<const C *, T> &store()
+			static std::unordered_map<const C *, T> &store() noexcept
 			{
 				static std::unordered_map<const C *, T> lstore;
 				return lstore;
@@ -453,7 +445,7 @@ namespace netlist
 			 *
 			 *  \returns name of the object.
 			 */
-			pstring name() const
+			pstring name() const noexcept
 			{
 				return props::get(this);
 			}
@@ -549,17 +541,14 @@ namespace netlist
 		{
 		public:
 
-			using list_t = std::vector<core_terminal_t *>;
-
 			static constexpr const unsigned int INP_HL_SHIFT = 0;
 			static constexpr const unsigned int INP_LH_SHIFT = 1;
-			static constexpr const unsigned int INP_ACTIVE_SHIFT = 2;
 
 			enum state_e {
 				STATE_INP_PASSIVE = 0,
 				STATE_INP_HL      = (1 << INP_HL_SHIFT),
 				STATE_INP_LH      = (1 << INP_LH_SHIFT),
-				STATE_INP_ACTIVE  = (1 << INP_ACTIVE_SHIFT),
+				STATE_INP_ACTIVE  = STATE_INP_HL | STATE_INP_LH,
 				STATE_OUT = 128,
 				STATE_BIDIR = 256
 			};
@@ -669,8 +658,8 @@ namespace netlist
 
 			/* setup stuff */
 
-			void add_terminal(core_terminal_t &terminal);
-			void remove_terminal(core_terminal_t &terminal);
+			void add_terminal(core_terminal_t &terminal) NL_NOEXCEPT;
+			void remove_terminal(core_terminal_t &terminal) NL_NOEXCEPT;
 
 			bool is_logic() const NL_NOEXCEPT;
 			bool is_analog() const NL_NOEXCEPT;
@@ -730,7 +719,7 @@ namespace netlist
 			 * FIXME: get rid of this and implement export/import in MAME
 			 */
 			/* only used for logic nets */
-			netlist_sig_t *Q_state_ptr() { return m_cur_Q.ptr(); }
+			netlist_sig_t *Q_state_ptr() noexcept { return m_cur_Q.ptr(); }
 
 		private:
 			state_var<netlist_sig_t> m_new_Q;
@@ -989,12 +978,12 @@ namespace netlist
 	protected:
 		virtual ~param_t() noexcept = default; /* not intended to be destroyed */
 
-		void update_param();
+		void update_param() NL_NOEXCEPT;
 
 		pstring get_initial(const device_t &dev, bool *found);
 
 		template<typename C>
-		void set(C &p, const C v)
+		void set(C &p, const C v) noexcept
 		{
 			if (p != v)
 			{
@@ -1018,7 +1007,7 @@ namespace netlist
 		T operator()() const NL_NOEXCEPT { return m_param; }
 		operator T() const  NL_NOEXCEPT { return m_param; }
 
-		void setTo(const T &param) { set(m_param, param); }
+		void setTo(const T &param) noexcept { set(m_param, param); }
 	private:
 		T m_param;
 	};
@@ -1031,7 +1020,7 @@ namespace netlist
 
 		T operator()() const NL_NOEXCEPT { return T(m_param); }
 		operator T() const NL_NOEXCEPT { return T(m_param); }
-		void setTo(const T &param) { set(m_param, static_cast<int>(param)); }
+		void setTo(const T &param) noexcept { set(m_param, static_cast<int>(param)); }
 	private:
 		int m_param;
 	};
@@ -1050,7 +1039,7 @@ namespace netlist
 	public:
 		param_ptr_t(device_t &device, const pstring &name, std::uint8_t* val);
 		std::uint8_t * operator()() const NL_NOEXCEPT { return m_param; }
-		void setTo(std::uint8_t *param) { set(m_param, param); }
+		void setTo(std::uint8_t *param) noexcept { set(m_param, param); }
 	private:
 		std::uint8_t* m_param;
 	};
@@ -1200,10 +1189,10 @@ namespace netlist
 				}
 		}
 
-		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
-		bool get_hint_deactivate() { return m_hint_deactivate; }
+		void set_hint_deactivate(bool v) noexcept { m_hint_deactivate = v; }
+		bool get_hint_deactivate() const noexcept { return m_hint_deactivate; }
 		/* Has to be set in device reset */
-		void set_active_outputs(int n) { m_active_outputs = n; }
+		void set_active_outputs(int n) noexcept { m_active_outputs = n; }
 
 		void set_default_delegate(detail::core_terminal_t &term);
 
@@ -1229,12 +1218,12 @@ namespace netlist
 		log_type & log();
 
 	public:
-		virtual void timestep(const nl_double st) { plib::unused_var(st); }
-		virtual void update_terminals() { }
+		virtual void timestep(const nl_double st) NL_NOEXCEPT { plib::unused_var(st); }
+		virtual void update_terminals() NL_NOEXCEPT { }
 
-		virtual void update_param() {}
-		virtual bool is_dynamic() const { return false; }
-		virtual bool is_timestep() const { return false; }
+		virtual void update_param() NL_NOEXCEPT {}
+		virtual bool is_dynamic() const NL_NOEXCEPT { return false; }
+		virtual bool is_timestep() const NL_NOEXCEPT { return false; }
 
 	private:
 		bool            m_hint_deactivate;
@@ -1303,12 +1292,12 @@ namespace netlist
 	 */
 	class detail::queue_t :
 			//public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
-			public timed_queue<pqentry_t<net_t *, netlist_time>, false, true>,
+			public timed_queue<pqentry_t<net_t *, netlist_time>, false>,
 			public detail::netlist_ref,
 			public plib::state_manager_t::callback_t
 	{
 	public:
-		using base_queue = timed_queue<pqentry_t<net_t *, netlist_time>, false, true>;
+		using base_queue = timed_queue<pqentry_t<net_t *, netlist_time>, false>;
 		using entry_t = pqentry_t<net_t *, netlist_time>;
 		explicit queue_t(netlist_state_t &nl);
 		virtual ~queue_t() noexcept = default;
@@ -1550,25 +1539,31 @@ namespace netlist
 		netlist_time time() const NL_NOEXCEPT { return m_time; }
 
 		void process_queue(netlist_time delta) NL_NOEXCEPT;
-		void abort_current_queue_slice() NL_NOEXCEPT { m_queue.retime(detail::queue_t::entry_t(m_time, nullptr)); }
+		void abort_current_queue_slice() NL_NOEXCEPT
+		{
+			if (!USE_QUEUE_STATS || !m_use_stats)
+				m_queue.retime<false>(detail::queue_t::entry_t(m_time, nullptr));
+			else
+				m_queue.retime<true>(detail::queue_t::entry_t(m_time, nullptr));
+		}
 
 		const detail::queue_t &queue() const NL_NOEXCEPT { return m_queue; }
 
 		void qpush(detail::queue_t::entry_t && e) noexcept
 		{
 			if (!USE_QUEUE_STATS || !m_use_stats)
-				m_queue.push_nostats(std::move(e)); // NOLINT(performance-move-const-arg)
+				m_queue.push<false>(std::move(e)); // NOLINT(performance-move-const-arg)
 			else
-				m_queue.push(std::move(e)); // NOLINT(performance-move-const-arg)
+				m_queue.push<true>(std::move(e)); // NOLINT(performance-move-const-arg)
 		}
 
 		template <class R>
 		void qremove(const R &elem) noexcept
 		{
 			if (!USE_QUEUE_STATS || !m_use_stats)
-				m_queue.remove_nostats(elem);
+				m_queue.remove<false>(elem);
 			else
-				m_queue.remove(elem);
+				m_queue.remove<true>(elem);
 		}
 
 		/* Control functions */
@@ -1905,9 +1900,9 @@ namespace netlist
 	template <typename O>
 	state_array<T,N>::state_array(O &owner, const pstring &name, const T & value)
 	{
-		owner.state().save(owner, m_value, owner.name(), name);
+		owner.state().save(owner, *static_cast<std::array<T, N> *>(this), owner.name(), name);
 		for (std::size_t i=0; i<N; i++)
-			m_value[i] = value;
+			(*this)[i] = value;
 	}
 } // namespace netlist
 

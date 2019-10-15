@@ -1184,7 +1184,7 @@ ATTR_COLD void netlist_mame_device::device_pre_save()
 	netlist().run_state_manager().pre_save();
 }
 
-void netlist_mame_device::update_icount(netlist::netlist_time time)
+void netlist_mame_device::update_icount(netlist::netlist_time time) noexcept
 {
 	const netlist::netlist_time newt(time);
 	const netlist::netlist_time delta(newt - m_old + m_rem);
@@ -1194,7 +1194,7 @@ void netlist_mame_device::update_icount(netlist::netlist_time time)
 	m_icount -= d;
 }
 
-void netlist_mame_device::check_mame_abort_slice()
+void netlist_mame_device::check_mame_abort_slice() noexcept
 {
 	if (m_icount <= 0)
 		netlist().abort_current_queue_slice();

@@ -36,7 +36,7 @@ namespace plib
 		using index_type = C;
 		using value_type = T;
 
-		static constexpr const int NSQ = (N > 0 ? -N * N : N * N);
+		static constexpr const int NSQ = (N < 0 ? -N * N : N * N);
 		static constexpr const int Np1 = (N == 0) ? 0 : (N < 0 ? N - 1 : N + 1);
 
 		COPYASSIGNMOVE(pmatrix_cr_t, default)
@@ -64,7 +64,9 @@ namespace plib
 		, m_size(n)
 		{
 			for (index_type i=0; i<n+1; i++)
+			{
 				row_idx[i] = 0;
+			}
 		}
 
 		~pmatrix_cr_t() = default;
@@ -495,19 +497,18 @@ namespace plib
 		{
 			index_type p(0);
 			/* build ilu_rows */
-			for (index_type i=1; i < fill.size(); i++)
+			for (decltype(fill.size()) i=1; i < fill.size(); i++)
 			{
 				bool found(false);
-				for (index_type k = 0; k < i; k++)
+				for (decltype(fill.size()) k = 0; k < i; k++)
 				{
 					// if (fill[i][k] < base::FILL_INFINITY)
 					if (fill[i][k] <= ilup)
 					{
 						// assume A[k][k]!=0
-						for (index_type j=k+1; j < fill.size(); j++)
+						for (decltype(fill.size()) j=k+1; j < fill.size(); j++)
 						{
 							auto f = std::min(fill[i][j], 1 + fill[i][k] + fill[k][j]);
-							//if (f < base::FILL_INFINITY)
 							if (f <= ilup)
 							{
 #if 0
@@ -522,7 +523,7 @@ namespace plib
 					}
 				}
 				if (found)
-					ilu_rows[p++] = i;
+					ilu_rows[p++] = static_cast<index_type>(i);
 			}
 			ilu_rows[p] = 0; // end of array
 			this->build_from_fill_mat(fill, ilup); //, m_band_width); // ILU(2)

@@ -176,13 +176,13 @@ namespace plib {
 			*reinterpret_cast<function_ptr *>(&m_func) = t;
 		}
 		template<typename O>
-		inline R call(O *obj, Targs... args)
+		inline R call(O *obj, Targs... args) const noexcept(true)
 		{
 			using function_ptr = R (O::*)(Targs...);
 			function_ptr t = *reinterpret_cast<function_ptr *>(&m_func);
 			return (obj->*t)(std::forward<Targs>(args)...);
 		}
-		bool is_set() {
+		bool is_set() const {
 #if defined(_MSC_VER) || (defined (__INTEL_COMPILER) && defined (_M_X64))
 			int *p = reinterpret_cast<int *>(&m_func);
 			int *e = p + sizeof(generic_function) / sizeof(int);
@@ -225,12 +225,12 @@ namespace plib {
 	#endif
 		}
 		template<typename O>
-		R call(O *obj, Targs... args) const
+		R call(O *obj, Targs... args) const noexcept(true)
 		{
 			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
 			return (reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);
 		}
-		bool is_set() noexcept { return m_func != nullptr; }
+		bool is_set() const noexcept { return m_func != nullptr; }
 		generic_function get_function() const noexcept { return m_func; }
 	private:
 		generic_function m_func;
@@ -244,7 +244,7 @@ namespace plib {
 		class generic_class;
 
 		template <class C>
-		using MemberFunctionType =  R (C::*)(Targs...);
+		using MemberFunctionType =  R (C::*)(Targs...); // noexcept(true) --> c++-17
 
 		pmfp() : pmfp_base<R, Targs...>(), m_obj(nullptr) {}
 
@@ -263,7 +263,7 @@ namespace plib {
 			m_obj = reinterpret_cast<generic_class *>(object);
 		}
 
-		inline R operator()(Targs ... args)
+		inline R operator()(Targs ... args) const noexcept(true)
 		{
 			return this->call(m_obj, std::forward<Targs>(args)...);
 		}

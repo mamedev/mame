@@ -319,8 +319,7 @@ namespace devices
 					}
 					else
 					{
-						log().fatal(MF_NETGROUP_SIZE_EXCEEDED_1(128));
-						return; /* tease compilers */
+						ms = create_solver<double, 0>(net_count, sname);
 					}
 					break;
 			}

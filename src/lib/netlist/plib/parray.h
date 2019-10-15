@@ -30,8 +30,9 @@ namespace plib {
 	template <typename FT>
 	struct sizeabs<FT, 0>
 	{
-		static constexpr const std::size_t ABS = 0;
-		using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
+		static constexpr std::size_t ABS() { return 0; }
+		//using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
+		using container = typename std::vector<FT>;
 	};
 
 	/**
@@ -63,27 +64,35 @@ namespace plib {
 		using value_type = typename base_type::value_type;
 
 		template <int X = SIZE >
-		parray(size_type size, typename std::enable_if<X==0, int>::type = 0)
+		parray(size_type size, typename std::enable_if<(X==0), int>::type = 0)
 		: m_a(size), m_size(size)
 		{
 		}
 
 #if 1
+#if 0
+		struct tag {};
 		/* allow construction in fixed size arrays */
 		template <int X = SIZE >
-		parray(typename std::enable_if<(X > 0), int>::type = 0)
+		parray(tag A = tag(), typename std::enable_if<(X >= 0), int>::type = 0)
 		: m_size(X)
 		{
 		}
+#else
+		/* allow construction in fixed size arrays */
+		parray()
+		: m_size(SIZEABS())
+		{
+		}
+#endif
 #endif
 		template <int X = SIZE >
-		parray(size_type size, typename std::enable_if<X!=0, int>::type = 0)
+		parray(size_type size, typename std::enable_if<(X != 0), int>::type = 0)
 		: m_size(size)
 		{
-			if (SIZE < 0 && size > SIZEABS())
-				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZEABS()));
-			else if (SIZE > 0 && size != SIZEABS())
-				throw plib::pexception("parray: size error");
+			if ((SIZE < 0 && size > SIZEABS())
+				|| (SIZE > 0 && size != SIZEABS()))
+				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
 		}
 
 		inline size_type size() const noexcept { return SIZE <= 0 ? m_size : SIZEABS(); }
@@ -122,6 +131,27 @@ namespace plib {
 		PALIGNAS_CACHELINE()
 		size_type               m_size;
 	};
+
+	template <typename FT, int SIZE1, int SIZE2>
+	struct parray2D : public parray<parray<FT, SIZE2>, SIZE1>
+	{
+	public:
+
+		using size_type = std::size_t;
+
+		parray2D(size_type size1, size_type size2)
+		: parray<parray<FT, SIZE2>, SIZE1>(size1)
+		{
+			if (SIZE2 <= 0)
+			{
+				for (size_type i=0; i < this->size(); i++)
+					(*this)[i] = parray<FT, SIZE2>(size2);
+			}
+		}
+	};
+
 } // namespace plib
+
+
 
 #endif /* PARRAY_H_ */

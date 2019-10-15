@@ -209,7 +209,7 @@ public:
 		explicit constexpr iter_t(LC* x) noexcept : p(x) { }
 		constexpr iter_t(iter_t &rhs) noexcept : p(rhs.p) { }
 		iter_t(iter_t &&rhs) noexcept { std::swap(*this, rhs);  }
-		iter_t& operator=(const iter_t &rhs) noexcept { iter_t t(rhs); std::swap(*this, t); return *this; }
+		iter_t& operator=(const iter_t &rhs) noexcept { p = rhs.p; return *this; }
 		iter_t& operator=(iter_t &&rhs) noexcept { std::swap(*this, rhs); return *this; }
 		iter_t& operator++() noexcept {p = p->next();return *this;}
 		// NOLINTNEXTLINE(cert-dcl21-cpp)
@@ -219,8 +219,8 @@ public:
 
 		constexpr bool operator==(const iter_t& rhs) const noexcept {return p == rhs.p;}
 		constexpr bool operator!=(const iter_t& rhs) const noexcept {return p != rhs.p;}
-		/* constexpr */ LC& operator*() noexcept {return *p;}
-		/* constexpr */ LC* operator->() noexcept {return p;}
+		constexpr LC& operator*() noexcept {return *p;}
+		constexpr LC* operator->() noexcept {return p;}
 
 		constexpr LC& operator*() const noexcept {return *p;}
 		constexpr LC* operator->() const noexcept {return p;}
@@ -269,8 +269,19 @@ public:
 	}
 
 	LC *front() const noexcept { return m_head; }
-	void clear() noexcept { m_head = nullptr; }
 	constexpr bool empty() const noexcept { return (m_head == nullptr); }
+	void clear() noexcept
+	{
+		LC *p(m_head);
+		while (p != nullptr)
+		{
+			LC *n(p->m_next);
+			p->m_next = nullptr;
+			p->m_prev = nullptr;
+			p = n;
+		}
+		m_head = nullptr;
+	}
 
 private:
 	LC *m_head;

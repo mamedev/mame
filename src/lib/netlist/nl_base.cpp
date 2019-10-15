@@ -107,7 +107,7 @@ const logic_family_desc_t *family_CD4XXX()
 // ----------------------------------------------------------------------------------------
 
 detail::queue_t::queue_t(netlist_state_t &nl)
-	: timed_queue<pqentry_t<net_t *, netlist_time>, false, true>(512)
+	: timed_queue<pqentry_t<net_t *, netlist_time>, false>(512)
 	, netlist_ref(nl)
 	, m_qsize(0)
 	, m_times(512)
@@ -142,7 +142,7 @@ void detail::queue_t::on_post_load(plib::state_manager_t &manager)
 	for (std::size_t i = 0; i < m_qsize; i++ )
 	{
 		detail::net_t *n = state().nets()[m_net_ids[i]].get();
-		this->push(queue_t::entry_t(netlist_time::from_raw(m_times[i]),n));
+		this->push<false>(queue_t::entry_t(netlist_time::from_raw(m_times[i]),n));
 	}
 }
 
@@ -740,7 +740,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 	{
 		case core_terminal_t::STATE_INP_HL:
 		case core_terminal_t::STATE_INP_LH:
-			process<KEEP_STATS>(mask | core_terminal_t::STATE_INP_ACTIVE, new_Q);
+			process<KEEP_STATS>(mask, new_Q);
 			break;
 		default:
 			/* do nothing */
@@ -749,20 +749,10 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 #else
 	nl_assert(this->isRailNet());
 
-	const unsigned int mask((m_new_Q << core_terminal_t::INP_LH_SHIFT)
-			| (m_cur_Q << core_terminal_t::INP_HL_SHIFT));
-
 	m_in_queue = queue_status::DELIVERED; /* mark as taken ... */
-	switch (mask)
-	{
-		case core_terminal_t::STATE_INP_HL:
-		case core_terminal_t::STATE_INP_LH:
-			process<KEEP_STATS>(mask | core_terminal_t::STATE_INP_ACTIVE, m_new_Q);
-			break;
-		default:
-			/* do nothing */
-			break;
-	}
+	if (m_new_Q ^ m_cur_Q)
+		process<KEEP_STATS>((m_new_Q << core_terminal_t::INP_LH_SHIFT)
+			| (m_cur_Q << core_terminal_t::INP_HL_SHIFT), m_new_Q);
 #endif
 }
 
@@ -791,7 +781,7 @@ void detail::net_t::reset()
 	}
 }
 
-void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
+void detail::net_t::add_terminal(detail::core_terminal_t &terminal) NL_NOEXCEPT
 {
 	for (auto &t : m_core_terms)
 		if (t == &terminal)
@@ -802,7 +792,7 @@ void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 	m_core_terms.push_back(&terminal);
 }
 
-void detail::net_t::remove_terminal(detail::core_terminal_t &terminal)
+void detail::net_t::remove_terminal(detail::core_terminal_t &terminal) NL_NOEXCEPT
 {
 	if (plib::container::contains(m_core_terms, &terminal))
 	{
@@ -1002,7 +992,7 @@ param_t::param_type_t param_t::param_type() const
 }
 
 
-void param_t::update_param()
+void param_t::update_param() NL_NOEXCEPT
 {
 	device().update_param();
 }
