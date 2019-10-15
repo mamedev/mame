@@ -333,9 +333,11 @@ const double XTAL::known_xtals[] = {
 	 29'491'200, /* 29.4912_MHz_XTAL       Xerox Alto-II system clock (tagged 29.4MHz in the schematics) */
 	 30'000'000, /* 30_MHz_XTAL            Impera Magic Card */
 	 30'209'800, /* 30.2098_MHz_XTAL       Philips CD-i NTSC (1920x NTSC line rate) */
+	 30'240'000, /* 30.24_MHz_XTAL         Macintosh IIci RBV, 12- or 13-inch display */
 	 30'476'180, /* 30.47618_MHz_XTAL      Taito F3, JC, Under Fire */
 	 30'800'000, /* 30.8_MHz_XTAL          15IE-00-013 */
 	 31'279'500, /* 31.2795_MHz_XTAL       Wyse WY-30+ */
+	 31'334'400, /* 31.3344_MHz_XTAL       Macintosh II */
 	 31'684'000, /* 31.684_MHz_XTAL        TeleVideo TVI-955 132-column display clock */
 	 31'948'800, /* 31.9488_MHz_XTAL       NEC PC-88xx, PC-98xx */
 	 32'000'000, /* 32_MHz_XTAL            - */
@@ -397,6 +399,7 @@ const double XTAL::known_xtals[] = {
 	 54'000'000, /* 54_MHz_XTAL            Taito JC */
 	 55'000'000, /* 55_MHz_XTAL            Eolith Vega */
 	 57'272'727, /* 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)*/
+	 57'283'200, /* 57.2832_MHz_XTAL       Macintosh IIci RBV, 15-inch portrait display */
 	 58'000'000, /* 58_MHz_XTAL            Magic Reel (Play System) */
 	 59'292'000, /* 59.292_MHz_XTAL        Data General D461 */
 	 60'000'000, /* 60_MHz_XTAL            ARM610 */
