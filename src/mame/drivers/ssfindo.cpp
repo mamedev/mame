@@ -234,24 +234,28 @@ public:
 
 	void ssfindo(machine_config &config);
 	void ppcar(machine_config &config);
-	void tetfight(machine_config &config);
 
 	void init_ssfindo();
 	void init_ppcar();
-	void init_tetfight();
 
-private:
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
 	required_device<arm_iomd_device> m_iomd;
-
 	optional_device<i2cmem_device> m_i2cmem;
-
 	required_region_ptr<uint16_t> m_flashrom;
+	
+	void init_common();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	// driver init configuration
+	typedef void (ssfindo_state::*speedup_func)();
+	speedup_func m_speedup;
+
 	uint32_t m_flashType;
-	int m_iocr_hack;
+
+	bool m_i2cmem_clock;
+private:
 
 	// ssfindo and ppcar
 	uint32_t m_flashAdr;
@@ -271,23 +275,13 @@ private:
 	// ppcar
 	DECLARE_READ32_MEMBER(randomized_r);
 
-	// tetfight
-	DECLARE_READ32_MEMBER(tetfight_unk_r);
-	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_drq);
-	void init_common();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	typedef void (ssfindo_state::*speedup_func)();
-	speedup_func m_speedup;
 
 	void ssfindo_speedups();
 	void ppcar_speedups();
 
 	void ppcar_map(address_map &map);
 	void ssfindo_map(address_map &map);
-	void tetfight_map(address_map &map);
 	
 	uint32_t m_vidc_sndcur, m_vidc_sndend;
 	bool m_audio_dma_on;
@@ -295,18 +289,37 @@ private:
 	bool m_vidc_sndbuffer_ok[2];
 	inline void sound_swap_buffer();
 	
+	DECLARE_READ8_MEMBER(iolines_r);
+	DECLARE_WRITE8_MEMBER(iolines_w);
+	bool m_flash_bank_select;
+};
+
+class tetfight_state : public ssfindo_state
+{
+public:
+	tetfight_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ssfindo_state(mconfig, type, tag)
+		{}
+
+	void init_tetfight();
+	void tetfight(machine_config &config);
+
+protected:
+
+private:
+	void tetfight_map(address_map &map);
+
 	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
 	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
 	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
 	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
-	DECLARE_READ8_MEMBER(iolines_r);
-	DECLARE_WRITE8_MEMBER(iolines_w);
-	bool m_flash_bank_select;
-	bool m_i2cmem_clock;
+	DECLARE_READ32_MEMBER(tetfight_unk_r);
+	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
+
 };
 
 //TODO: eeprom  24c01 & 24c02
-// TODO: untangle all these four
+// TODO: untangle, kill hacks
 READ8_MEMBER(ssfindo_state::iolines_r)
 {
 	if(m_flashType == 1)
@@ -326,33 +339,27 @@ WRITE8_MEMBER(ssfindo_state::iolines_w)
 	m_flash_bank_select = BIT(data, 0);
 }
 
-READ_LINE_MEMBER(ssfindo_state::iocr_od0_r)
+READ_LINE_MEMBER(tetfight_state::iocr_od1_r)
 {
-	// TODO: completely get rid or move anywhere else
+	// TODO: completely get rid of this speedup fn or move anywhere else
 	//if (m_speedup) (this->*m_speedup)();
-
-	if (m_iocr_hack)
-		return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
-
-	return 1;
+	// returning 0 here causes a tight loop with cyan border.
+	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
 }
 
-READ_LINE_MEMBER(ssfindo_state::iocr_od1_r)
+READ_LINE_MEMBER(tetfight_state::iocr_od0_r)
 {
 	// TODO: presuming same as Acorn Archimedes, where i2c clock can be readback
-	if (m_iocr_hack)
-		return m_i2cmem_clock;
-
-	return 1;
+	return m_i2cmem_clock;
 }
 
 // TODO: correct hookup
-WRITE_LINE_MEMBER(ssfindo_state::iocr_od0_w)
+WRITE_LINE_MEMBER(tetfight_state::iocr_od1_w)
 {
 	m_i2cmem->write_sda(state);
 }
 
-WRITE_LINE_MEMBER(ssfindo_state::iocr_od1_w)
+WRITE_LINE_MEMBER(tetfight_state::iocr_od0_w)
 {
 	m_i2cmem_clock = state;
 	m_i2cmem->write_scl(m_i2cmem_clock);
@@ -708,25 +715,25 @@ void ssfindo_state::ppcar_map(address_map &map)
 	map(0x10000000, 0x10ffffff).ram();
 }
 
-READ32_MEMBER(ssfindo_state::tetfight_unk_r)
+READ32_MEMBER(tetfight_state::tetfight_unk_r)
 {
 	//sound status ?
 	return machine().rand();
 }
 
-WRITE32_MEMBER(ssfindo_state::tetfight_unk_w)
+WRITE32_MEMBER(tetfight_state::tetfight_unk_w)
 {
 	//sound latch ?
 }
 
-void ssfindo_state::tetfight_map(address_map &map)
+void tetfight_state::tetfight_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
 	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
 	map(0x03240000, 0x03240003).portr("IN0");
 	map(0x03240004, 0x03240007).portr("IN1");
 	map(0x03240008, 0x0324000b).portr("DSW2");
-	map(0x03240020, 0x03240023).rw(FUNC(ssfindo_state::tetfight_unk_r), FUNC(ssfindo_state::tetfight_unk_w));
+	map(0x03240020, 0x03240023).rw(FUNC(tetfight_state::tetfight_unk_r), FUNC(tetfight_state::tetfight_unk_w));
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
 	map(0x10000000, 0x14ffffff).ram();
 }
@@ -887,10 +894,6 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));
 	m_iomd->iolines_write().set(FUNC(ssfindo_state::iolines_w));
-	m_iomd->iocr_read_od<0>().set(FUNC(ssfindo_state::iocr_od0_r));
-	m_iomd->iocr_read_od<1>().set(FUNC(ssfindo_state::iocr_od1_r));
-	m_iomd->iocr_write_od<0>().set(FUNC(ssfindo_state::iocr_od0_w));
-	m_iomd->iocr_write_od<1>().set(FUNC(ssfindo_state::iocr_od1_w));
 }
 
 void ssfindo_state::ppcar(machine_config &config)
@@ -903,14 +906,19 @@ void ssfindo_state::ppcar(machine_config &config)
 	config.device_remove("i2cmem");
 }
 
-void ssfindo_state::tetfight(machine_config &config)
+void tetfight_state::tetfight(machine_config &config)
 {
 	ppcar(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::tetfight_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tetfight_state::tetfight_map);
 
 	I2C_24C02(config, m_i2cmem);
+	
+	m_iomd->iocr_read_od<0>().set(FUNC(tetfight_state::iocr_od0_r));
+	m_iomd->iocr_read_od<1>().set(FUNC(tetfight_state::iocr_od1_r));
+	m_iomd->iocr_write_od<0>().set(FUNC(tetfight_state::iocr_od0_w));
+	m_iomd->iocr_write_od<1>().set(FUNC(tetfight_state::iocr_od1_w));
 }
 
 ROM_START( ssfindo )
@@ -998,7 +1006,6 @@ void ssfindo_state::init_ssfindo()
 	init_common();
 	m_flashType = 0;
 	m_speedup = &ssfindo_state::ssfindo_speedups;
-	m_iocr_hack = 0;
 }
 
 void ssfindo_state::init_ppcar()
@@ -1008,13 +1015,12 @@ void ssfindo_state::init_ppcar()
 	m_speedup = &ssfindo_state::ppcar_speedups;
 }
 
-void ssfindo_state::init_tetfight()
+void tetfight_state::init_tetfight()
 {
 	init_common();
 	m_flashType = 0;
-	m_iocr_hack = 1;
 }
 
 GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo_state, init_ssfindo,  ROT0, "Icarus", "See See Find Out", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ssfindo_state, init_ppcar,    ROT0, "Icarus", "Pang Pang Car",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, tetfight,0,        tetfight, tetfight, ssfindo_state, init_tetfight, ROT0, "Sego",   "Tetris Fighters",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, tetfight,0,        tetfight, tetfight, tetfight_state, init_tetfight, ROT0, "Sego",   "Tetris Fighters",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
