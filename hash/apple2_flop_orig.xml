@@ -8162,7 +8162,7 @@
 	<software name="pulsar2">
 		<description>Pulsar ][</description>
 		<year>1981</year>
-		<publisher></publisher>
+		<publisher>Sirius Software</publisher>
 		<info name="release" value="2019-10-14"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
