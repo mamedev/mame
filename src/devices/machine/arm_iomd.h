@@ -14,6 +14,9 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/acorn_vidc.h"
+#include "machine/at_keybc.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -38,15 +41,20 @@ public:
 	template <unsigned N> auto iocr_write_od() { return m_iocr_write_od_cb[N].bind(); }
 	auto iocr_read_id() { return m_iocr_read_id_cb.bind(); }
 	auto iocr_write_id() { return m_iocr_write_id_cb.bind(); }
-	auto iolines_read() { return m_iolines_read_cb.bind(); }
-	auto iolines_write() { return m_iolines_write_cb.bind(); }
+	// IRQA
 	DECLARE_WRITE_LINE_MEMBER( vblank_irq );
+	// IRQB
+	DECLARE_WRITE_LINE_MEMBER( keyboard_irq );
+	// DRQs
 	DECLARE_WRITE_LINE_MEMBER( sound_drq );
+	// Reset
+	DECLARE_WRITE_LINE_MEMBER( keyboard_reset );
 
 	// I/O operations
 	virtual void map(address_map &map);
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	template<class T> void set_vidc_tag(T &&tag) { m_vidc.set_tag(std::forward<T>(tag)); }
+	template<class T> void set_kbdc_tag(T &&tag) { m_kbdc.set_tag(std::forward<T>(tag)); }
 
 protected:
 	// device-level overrides
@@ -77,20 +85,23 @@ protected:
 	// TODO: convert to ARM7 device instead, enums shouldn't be public
 	required_device<cpu_device> m_host_cpu;
 	required_device<arm_vidc20_device> m_vidc;
+	optional_device<ps2_keyboard_controller_device> m_kbdc;
 	address_space *m_host_space; /**< reference to the host cpu space for DMA ops */
 private:
-	devcb_read8 m_iolines_read_cb;
-	devcb_write8 m_iolines_write_cb;
+	u8 m_iocr_ddr;
+
 	devcb_read_line m_iocr_read_od_cb[2];
 	devcb_write_line m_iocr_write_od_cb[2];
 	devcb_read_line m_iocr_read_id_cb;
 	devcb_write_line m_iocr_write_id_cb;
 
-	u8 m_iolines_ddr, m_iocr_ddr;
-	DECLARE_READ32_MEMBER( iolines_r );
-	DECLARE_WRITE32_MEMBER( iolines_w );
 	DECLARE_READ32_MEMBER( iocr_r );
 	DECLARE_WRITE32_MEMBER( iocr_w );
+	
+	DECLARE_READ32_MEMBER( kbddat_r );
+	DECLARE_WRITE32_MEMBER( kbddat_w );
+	DECLARE_READ32_MEMBER( kbdcr_r );
+	DECLARE_WRITE32_MEMBER( kbdcr_w );
 	
 	u32 m_vidinita, m_vidend;
 	bool m_vidlast, m_videqual;
@@ -158,14 +169,28 @@ public:
 	arm7500fe_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
+	auto iolines_read() { return m_iolines_read_cb.bind(); }
+	auto iolines_write() { return m_iolines_write_cb.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 private:
+	devcb_read8 m_iolines_read_cb;
+	devcb_write8 m_iolines_write_cb;
+
 	bool m_cpuclk_divider, m_memclk_divider, m_ioclk_divider;
 	inline void refresh_host_cpu_clocks();
 	DECLARE_READ32_MEMBER( clkctl_r );
 	DECLARE_WRITE32_MEMBER( clkctl_w );
+	
+	u8 m_iolines_ddr;
+	DECLARE_READ32_MEMBER( iolines_r );
+	DECLARE_WRITE32_MEMBER( iolines_w );
+	
+	DECLARE_READ32_MEMBER( msecr_r );
+	DECLARE_WRITE32_MEMBER( msecr_w );
 };
 
 // device type definition

@@ -69,6 +69,9 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, const ch
 	: acorn_vidc10_device(mconfig, ACORN_VIDC10, tag, owner, clock)
 {
   	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_device::regs_map), this));
+	m_pal_4bpp_base = 0x100;
+	m_pal_cursor_base = 0x10;
+	m_pal_border_base = 0x110;
 }
 
 
@@ -76,6 +79,10 @@ acorn_vidc10_lcd_device::acorn_vidc10_lcd_device(const machine_config &mconfig, 
 	: acorn_vidc10_device(mconfig, ACORN_VIDC10_LCD, tag, owner, clock)
 {
   	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_lcd_device::regs_map), this));
+	// TODO: confirm being identical to raster version
+	m_pal_4bpp_base = 0x100;
+	m_pal_cursor_base = 0x10;
+	m_pal_border_base = 0x110;
 }
 
 device_memory_interface::space_config_vector acorn_vidc10_device::memory_space_config() const
@@ -550,6 +557,7 @@ void arm_vidc20_device::regs_map(address_map &map)
 	map(0x80, 0x9f).w(FUNC(arm_vidc20_device::vidc20_crtc_w));
 	map(0xb0, 0xb0).w(FUNC(arm_vidc20_device::vidc20_sound_frequency_w));
 	map(0xb1, 0xb1).w(FUNC(arm_vidc20_device::vidc20_sound_control_w));
+	map(0xd0, 0xdf).w(FUNC(arm_vidc20_device::fsynreg_w));
 	map(0xe0, 0xef).w(FUNC(arm_vidc20_device::vidc20_control_w));
 }
 
@@ -557,6 +565,9 @@ arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *
 	: acorn_vidc10_device(mconfig, ARM_VIDC20, tag, owner, clock)
 {
   	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));
+	m_pal_4bpp_base = 0x000;
+	m_pal_cursor_base = 0x100;
+	m_pal_border_base = 0x100;
 }
 
 
@@ -588,10 +599,21 @@ void arm_vidc20_device::device_start()
 {
 	acorn_vidc10_device::device_start();
 
+	save_item(NAME(m_vco_r_modulo));
+	save_item(NAME(m_vco_v_modulo));
 	save_item(NAME(m_pal_data_index));
 	save_item(NAME(m_dac_serial_mode));
 	save_item(NAME(m_pixel_source));
 	save_item(NAME(m_pixel_rate));
+}
+
+void arm_vidc20_device::device_reset()
+{
+	acorn_vidc10_device::device_reset();
+
+	// TODO: sensible defaults
+	m_vco_r_modulo = 1;
+	m_vco_v_modulo = 1;
 }
 
 void arm_vidc20_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -630,8 +652,18 @@ u32 arm_vidc20_device::get_pixel_clock()
 {
 	// RCLK source: passes thru a r-modulus and a phase frequency (PCOMP), the full story is interesting if you're into maths.
 	// TODO: for now we just multiply source clock by 2, enough for ssfindo.cpp games.
-	//printf("%d %02x %02x\n",this->clock(), 1 << m_pixel_rate, m_pixel_source);
-	return (this->clock() << 1) >> m_pixel_rate;
+	//printf("%d %02x %02x %d %d\n",this->clock(), 1 << m_pixel_rate, m_pixel_source, m_vco_v_modulo, m_vco_r_modulo);
+	if (m_pixel_source == 2) // RCLK
+		return (this->clock() << 1) >> m_pixel_rate;
+	
+	// VCLK source is just an external connection
+	// TODO: get clock from outside world, understand how the modulos are really used, 
+	//       understand if SW do some VCO testing before setting CRTC params, 
+	//       if there isn't a monitor ID mechanism that copes with this
+	if (m_pixel_source == 0) // VCLK
+		return (25175000);
+	
+	throw emu_fatalerror("%s unhandled pixel source %02x selected",this->tag(), m_pixel_source);
 }
 
 WRITE32_MEMBER(arm_vidc20_device::vidc20_crtc_w)
@@ -670,6 +702,15 @@ WRITE32_MEMBER(arm_vidc20_device::vidc20_crtc_w)
 	screen_dynamic_res_change();
 }
 
+WRITE32_MEMBER( arm_vidc20_device::fsynreg_w )
+{
+	m_vco_r_modulo = data & 0x3f;
+	m_vco_v_modulo = (data >> 8) & 0x3f;
+	// bits 15-14 and 7-6 are test bits
+	
+	screen_dynamic_res_change();
+}
+
 WRITE32_MEMBER( arm_vidc20_device::vidc20_control_w )
 {
 	// ---- --00: VCLK
@@ -677,8 +718,6 @@ WRITE32_MEMBER( arm_vidc20_device::vidc20_control_w )
 	// ---- --10: RCLK ("recommended" 24 MHz)
 	// ---- --11: undefined, prolly same as RCLK
 	m_pixel_source = data & 3;
-	if (m_pixel_source != 2)
-		logerror("%s: Warning pixel source select %02x\n",this->tag(), m_pixel_source);
 	m_pixel_rate = (data & 0x1c) >> 2;
 	// (data & 0x700) >> 8 FIFO load
 	// BIT(data, 13) enables Duplex LCD mode

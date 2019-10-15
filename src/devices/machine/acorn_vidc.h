@@ -82,9 +82,9 @@ protected:
 	inline void screen_dynamic_res_change();
 	void refresh_sound_frequency();
 
-	const uint16_t m_pal_4bpp_base = 0x100;
-	const uint16_t m_pal_cursor_base = 0x10;
-	const uint16_t m_pal_border_base = 0x110;
+	u16 m_pal_4bpp_base;
+	u16 m_pal_cursor_base;
+	u16 m_pal_border_base;
 	const double m_sound_internal_divider = 8.0;
 
 	uint8_t m_bpp_mode, m_crtc_interlace;
@@ -159,14 +159,12 @@ protected:
 	void regs_map(address_map &map);
 	virtual uint32_t palette_entries() const override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_config_complete() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock() override;
 
-	const uint16_t m_pal_4bpp_base = 0x000;
-	const uint16_t m_pal_cursor_base = 0x100;
-	const uint16_t m_pal_border_base = 0x100;
 	const double m_sound_internal_divider = 1.0;
 
 private:
@@ -176,12 +174,15 @@ private:
 	DECLARE_WRITE32_MEMBER( vidc20_control_w );
 	DECLARE_WRITE32_MEMBER( vidc20_sound_frequency_w );
 	DECLARE_WRITE32_MEMBER( vidc20_sound_control_w );
+	DECLARE_WRITE32_MEMBER( fsynreg_w );
 	
 	uint8_t m_pal_data_index;
 	inline void update_8bpp_palette(uint16_t index, uint32_t paldata);
 	bool m_dac_serial_mode;
 	u8 m_pixel_source;
 	u8 m_pixel_rate;
+	u8 m_vco_r_modulo;
+	u8 m_vco_v_modulo;
 };
 
 DECLARE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device)

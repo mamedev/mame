@@ -40,10 +40,9 @@ void arm_iomd_device::base_map(address_map &map)
 {
 	// I/O
 	map(0x000, 0x003).rw(FUNC(arm_iomd_device::iocr_r), FUNC(arm_iomd_device::iocr_w));
-//	map(0x004, 0x007).rw(FUNC(arm_iomd_device::kbddat_r), FUNC(arm_iomd_device::kbddat_w));
-//	map(0x008, 0x00b).rw(FUNC(arm_iomd_device::kbdcr_r), FUNC(arm_iomd_device::kbdcr_w));
-	// TODO: iolines are 7500 only
-	map(0x00c, 0x00f).rw(FUNC(arm_iomd_device::iolines_r), FUNC(arm_iomd_device::iolines_w));
+	map(0x004, 0x007).rw(FUNC(arm_iomd_device::kbddat_r), FUNC(arm_iomd_device::kbddat_w));
+	map(0x008, 0x00b).rw(FUNC(arm_iomd_device::kbdcr_r), FUNC(arm_iomd_device::kbdcr_w));
+
 	// interrupt A/B/fiq + master clock controls
 	map(0x010, 0x013).r(FUNC(arm_iomd_device::irqst_r<IRQA>));
 	map(0x014, 0x017).rw(FUNC(arm_iomd_device::irqrq_r<IRQA>), FUNC(arm_iomd_device::irqrq_w<IRQA>));
@@ -138,8 +137,7 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
-	, m_iolines_read_cb(*this)
-	, m_iolines_write_cb(*this)
+	, m_kbdc(*this, finder_base::DUMMY_TAG)
 	, m_iocr_read_od_cb{{*this}, {*this}}
 	, m_iocr_write_od_cb{{*this}, {*this}}
 	, m_iocr_read_id_cb(*this)
@@ -157,6 +155,8 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, const char *tag,
 void arm7500fe_iomd_device::map(address_map &map)
 {
 	arm_iomd_device::base_map(map);
+
+	map(0x00c, 0x00f).rw(FUNC(arm7500fe_iomd_device::iolines_r), FUNC(arm7500fe_iomd_device::iolines_w));
 	// master clock controls
 //	map(0x01c, 0x01f).rw(FUNC(arm7500fe_iomd_device::susmode_r), FUNC(arm7500fe_iomd_device::susmode_w));
 //	map(0x02c, 0x02f).w(FUNC(arm7500fe_iomd_device::stopmode_w));
@@ -172,7 +172,7 @@ void arm7500fe_iomd_device::map(address_map &map)
 	
 	// PS/2 mouse
 //	map(0x0a8, 0x0ab).rw(FUNC(arm7500fe_iomd_device::msedat_r), FUNC(arm7500fe_iomd_device::msedat_w));
-//	map(0x0ac, 0x0af).rw(FUNC(arm7500fe_iomd_device::msecr_r), FUNC(arm7500fe_iomd_device::msecr_w));
+	map(0x0ac, 0x0af).rw(FUNC(arm7500fe_iomd_device::msecr_r), FUNC(arm7500fe_iomd_device::msecr_w));
 	// I/O control
 //	map(0x0cc, 0x0cf).rw(FUNC(arm7500fe_iomd_device::astcr_r), FUNC(arm7500fe_iomd_device::astcr_w));
 	// RAM control
@@ -194,6 +194,8 @@ void arm7500fe_iomd_device::map(address_map &map)
 
 arm7500fe_iomd_device::arm7500fe_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: arm_iomd_device(mconfig, ARM7500FE_IOMD, tag, owner, clock)
+	, m_iolines_read_cb(*this)
+	, m_iolines_write_cb(*this)
 {
 	m_id = 0xaa7c;
 	m_version = 0;
@@ -213,15 +215,18 @@ void arm_iomd_device::device_add_mconfig(machine_config &config)
 	//TODO: keyboard and mouse interfaces at very least, also they differs by device type
 }
 
+void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
+{
+	//DEVICE(config, ...);
+	//TODO: keyboard and mouse interfaces at very least, also they differs by device type
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void arm_iomd_device::device_start()
-{	
-	m_iolines_read_cb.resolve_safe(0xff);
-	m_iolines_write_cb.resolve_safe();
+{
 	for (devcb_read_line &cb : m_iocr_read_od_cb)
 		cb.resolve_safe(1);
 	
@@ -232,7 +237,6 @@ void arm_iomd_device::device_start()
 	m_iocr_write_id_cb.resolve_safe();
 
 	save_item(NAME(m_iocr_ddr));
-	save_item(NAME(m_iolines_ddr));
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_vidinita));
 	save_item(NAME(m_vidend));
@@ -262,11 +266,18 @@ void arm_iomd_device::device_start()
 	save_pointer(NAME(m_sndstop_reg), sounddma_ch_size);
 	save_pointer(NAME(m_sndlast_reg), sounddma_ch_size);
 	save_pointer(NAME(m_sndbuffer_ok), sounddma_ch_size);
+	
+	// TODO: jumps to EASI space at $0c0016xx for RiscPC if POR is on?
 }
 
 void arm7500fe_iomd_device::device_start()
 {
 	arm_iomd_device::device_start();
+	
+	m_iolines_read_cb.resolve_safe(0xff);
+	m_iolines_write_cb.resolve_safe();
+	save_item(NAME(m_iolines_ddr));
+
 	save_item(NAME(m_cpuclk_divider));
 	save_item(NAME(m_memclk_divider));
 	save_item(NAME(m_ioclk_divider));	
@@ -280,7 +291,6 @@ void arm_iomd_device::device_reset()
 {
 	int i;
 	m_iocr_ddr = 0x0b;
-	m_iolines_ddr = 0xff;
 	m_video_enable = false;
 	// TODO: defaults for these
 	m_vidinita = 0;
@@ -305,8 +315,11 @@ void arm_iomd_device::device_reset()
 void arm7500fe_iomd_device::device_reset()
 {
 	arm_iomd_device::device_reset();
+
 	m_cpuclk_divider = m_ioclk_divider = m_memclk_divider = false;
-	refresh_host_cpu_clocks();	
+	refresh_host_cpu_clocks();
+	
+	m_iolines_ddr = 0xff;
 }
 
 void arm_iomd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -344,12 +357,63 @@ WRITE32_MEMBER( arm_iomd_device::iocr_w )
 	m_iocr_write_od_cb[0](BIT(m_iocr_ddr,0));
 }
 
-READ32_MEMBER( arm_iomd_device::iolines_r )
+READ32_MEMBER( arm_iomd_device::kbddat_r )
+{
+	if (m_kbdc.found())
+		return m_kbdc->data_r();
+
+	logerror("%s attempted to read kbddat with no controller\n", this->tag());
+	return 0xff;
+}
+
+READ32_MEMBER( arm_iomd_device::kbdcr_r )
+{
+	if (m_kbdc.found())
+		return m_kbdc->status_r();
+	
+	logerror("%s attempted to read kbdcr with no controller\n", this->tag());
+	return 0xff;
+}
+
+WRITE32_MEMBER( arm_iomd_device::kbddat_w )
+{
+	if (m_kbdc.found())
+	{
+		m_kbdc->data_w(data & 0xff);
+		return;
+	}
+
+	logerror("%s attempted to write %02x on kbddat with no controller\n", this->tag(),data & 0xff);
+}
+
+WRITE32_MEMBER( arm_iomd_device::kbdcr_w )
+{
+	if (m_kbdc.found())
+	{
+		m_kbdc->command_w(data & 0xff);
+		return;
+	}
+	
+	logerror("%s attempted to write %02x on kbdcr with no controller\n", this->tag(),data & 0xff);
+}
+
+READ32_MEMBER( arm7500fe_iomd_device::msecr_r )
+{
+	// a7000p wants a TX empty otherwise it outright refuses to boot.
+	return 0x80;
+}
+
+WRITE32_MEMBER( arm7500fe_iomd_device::msecr_w )
+{
+	// ...
+}
+
+READ32_MEMBER( arm7500fe_iomd_device::iolines_r )
 {
 	return m_iolines_read_cb() & m_iolines_ddr;
 }
 
-WRITE32_MEMBER( arm_iomd_device::iolines_w )
+WRITE32_MEMBER( arm7500fe_iomd_device::iolines_w )
 {
 	m_iolines_ddr = data;
 	m_iolines_write_cb(m_iolines_ddr);
@@ -576,7 +640,7 @@ WRITE32_MEMBER( arm_iomd_device::vidinita_w )
 
 
 //**************************************************************************
-//  VIDC comms
+//  IRQ/DRQ/Reset signals
 //**************************************************************************
 
 WRITE_LINE_MEMBER( arm_iomd_device::vblank_irq )
@@ -648,4 +712,19 @@ WRITE_LINE_MEMBER( arm_iomd_device::sound_drq )
 		// ...
 	}
 }
+
+WRITE_LINE_MEMBER( arm_iomd_device::keyboard_irq )
+{
+	printf("IRQ %d\n",state);
+	if (!state)
+		return;
+
+	trigger_irq(IRQB, 0x80);
+}
+
+WRITE_LINE_MEMBER( arm_iomd_device::keyboard_reset )
+{
+	printf("RST %d\n",state);
+}
+
 

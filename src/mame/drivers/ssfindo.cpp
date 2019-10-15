@@ -138,12 +138,12 @@ class ssfindo_state : public driver_device
 {
 public:
 	ssfindo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_vidc(*this, "vidc"),
-		m_iomd(*this, "iomd"),
-		m_i2cmem(*this, "i2cmem"),
-		m_flashrom(*this, "flash")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_vidc(*this, "vidc")
+		, m_iomd(*this, "iomd")
+		, m_i2cmem(*this, "i2cmem")
+		, m_flashrom(*this, "flash")
 		{ }
 
 	void ssfindo(machine_config &config);
