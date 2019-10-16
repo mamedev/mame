@@ -166,17 +166,6 @@ static GFXDECODE_START( gfx_mustache )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 8 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::scanline)
-{
-	int scanline = param;
-
-	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* Z80 - RST 10h */
-
-	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* Z80 - RST 08h */
-}
-
 
 
 void mustache_state::mustache(machine_config &config)
@@ -185,7 +174,6 @@ void mustache_state::mustache(machine_config &config)
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mustache_state::memmap);
 	m_maincpu->set_addrmap(AS_OPCODES, &mustache_state::decrypted_opcodes_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(mustache_state::scanline), "screen", 0, 1);
 
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("maincpu");
 
@@ -194,11 +182,12 @@ void mustache_state::mustache(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(56.747);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(1*8, 31*8-1, 0, 31*8-1);
 	m_screen->set_screen_update(FUNC(mustache_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mustache);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);

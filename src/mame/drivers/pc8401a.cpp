@@ -57,7 +57,7 @@ void pc8401a_state::scan_keyboard()
 	if (!m_key_strobe && strobe)
 	{
 		/* trigger interrupt */
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0x28); // Z80
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xef); // Z80 - RST 28h
 		logerror("INTERRUPT\n");
 	}
 
