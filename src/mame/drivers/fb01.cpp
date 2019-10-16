@@ -70,7 +70,7 @@ private:
 void fb01_state::fb01_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).ram().share("nvram");  // 2 * 8KB S-RAM
+	map(0x8000, 0xbfff).mirror(0x4000).ram().share("nvram"); // 2 * 8KB S-RAM
 }
 
 

@@ -30,8 +30,8 @@
 namespace netlist
 {
 
-	static constexpr const char * sHINT_NO_DEACTIVATE = ".HINT_NO_DEACTIVATE";
-	static constexpr const char * sPowerDevRes = "_RVG";
+	static constexpr const char sHINT_NO_DEACTIVATE[] = ".HINT_NO_DEACTIVATE";
+	static constexpr const char sPowerDevRes[] = "_RVG";
 
 	// nl_base.cpp
 
@@ -124,9 +124,6 @@ namespace netlist
 	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1,     1, "NEWTON_LOOPS exceeded on net {1}... reschedule")
 
 	// nld_solver.cpp
-
-	PERRMSGV(MF_UNKNOWN_SOLVER_TYPE,                1, "Unknown solver type: {1}")
-	PERRMSGV(MF_NETGROUP_SIZE_EXCEEDED_1,           1, "Encountered netgroup with > {1} nets")
 
 	PERRMSGV(MI_NO_SPECIFIC_SOLVER,                 1, "No specific solver found for netlist of size {1}")
 

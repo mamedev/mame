@@ -63,7 +63,7 @@ void cybiko_state::cybikov1_mem(address_map &map)
 {
 	map(0x000000, 0x007fff).rom();
 	map(0x600000, 0x600001).rw(FUNC(cybiko_state::cybiko_lcd_r), FUNC(cybiko_state::cybiko_lcd_w));
-//  AM_RANGE( 0xe00000, 0xe07fff ) AM_READ( cybikov1_key_r )
+//  map(0xe00000, 0xe07fff).r(FUNC(cybiko_state::cybikov1_key_r));
 }
 
 /*

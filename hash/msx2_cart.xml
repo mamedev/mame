@@ -73,7 +73,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="pony canyon 8929e" size="131072" crc="c956e1df" sha1="5fd07ed5b7c0492d42ed91a54a0fe80ce6e4e40d" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="2048" >
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -169,7 +169,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="262144">
 				<rom name="lh532057" size="262144" crc="ae82a874" sha1="414fd2a22076f45502c2329b45bda9f8730dcaae" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -236,7 +236,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="lh534g63" size="524288" crc="ec7a8012" sha1="2a4aef32db28c059c30f5f972f1c09708ef6ce62" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@ LZ93A13 (32 pin) - 8KB banks
 				<rom name="lh531073" size="131072" crc="a987a0d8" sha1="10c38f91d8f5db2438414ea58f26dcac78352088" offset="0" />
 				<rom size="131072" offset="0x20000" loadflag="reload" />
 			</dataarea>
-			<dataarea name="sram" size="2048" >
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -287,7 +287,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="lh531090" size="131072" crc="5acbd591" sha1="1ba6b699b4e34c23ee60db4e58e1265dc03f0b50" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -417,7 +417,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="lh534g2s" size="524288" crc="c7521809" sha1="22f5998b4de47bf2ccc077d5881ac448e6b0484d" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +435,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="1048576">
 				<rom name="lh538a36" size="1048576" crc="413d4700" sha1="475c3af7495922759a5f424d2e22d7e4073d5992" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -607,7 +607,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="1048576">
 				<rom name="lh538f96" size="1048576" crc="075ab646" sha1="74d1c7f66242335c736da29413037bd23384efaa" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -625,7 +625,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<!-- TC534000P (4Mbit) or LH532077 (2Mbit) -->
 				<rom name="tc534000p" size="524288" crc="3b5b3fd8" sha1="8a4bcf0f38c9f243443a4d4865278f695bd83dc8" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -718,7 +718,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="1048576">
 				<rom name="lh5380sz" size="1048576" crc="881b3849" sha1="0cc6c30c6918fcf780e57d40f58a4cf2a82225cd" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -736,7 +736,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="hn62404p" size="524288" crc="8bc34dca" sha1="6420d61002da325403fcb6f41afb1d348eeba3b4" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -789,7 +789,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="lh5116-15" size="131072" crc="167a53da" sha1="2e2543ac99193f76b4f35463142294c016f0cf3d" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -970,7 +970,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="lh534a76" size="524288" crc="69c11d81" sha1="89943ae938fb308f4b5149ebc0cbea597b9b0223" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -988,7 +988,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="lh534045" size="524288" crc="653f1c73" sha1="fbfdd89ec183ceae63d3d66b0ab45faa951b525a" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -1006,7 +1006,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="1048576">
 				<rom name="lh53806j" size="1048576" crc="0ff8e2c7" sha1="cb6bd26961387def757c7faeec7563d77d404d01" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -1058,7 +1058,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="rp231024d" size="131072" crc="2abb1ec4" sha1="81143d2a8ef7cc593a604f3cc890312b42bdff01" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="2048" >
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -1201,7 +1201,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="1048576">
 				<rom name="lh538a01" size="1048576" crc="fb9e42e1" sha1="522a53034cf40448d441683f3308fcb4b65e6d7c" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -1235,7 +1235,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="1048576">
 				<rom name="lh538056" size="1048576" crc="c89b93b5" sha1="25ffc7e8ca90274566c31e10b5998cca6522673a" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -1284,7 +1284,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="262144">
 				<rom name="lh532053" size="262144" crc="39e1c37a" sha1="3194153a9c93aa24b37804a764f112bdef091bf8" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1316,7 +1316,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="lh534a1b" size="524288" crc="187d3a21" sha1="de251a0af1df3be18469578dc00d414e572ee33e" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -1334,7 +1334,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="262144">
 				<rom name="lh532097" size="262144" crc="8df9945a" sha1="d1cc2a77fb17608d542c50e2a1404cf5b4231521" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="2048" >
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -1383,7 +1383,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="1048576">
 				<rom name="lh53804y" size="1048576" crc="c31f459c" sha1="b2ce0bc86f82f727db956dfbbe2a3fd0cb72f5fc" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -1446,7 +1446,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="262144">
 				<rom name="r68y5552" size="262144" crc="37b9e10f" sha1="18be429f8b5c7bc4775c99292110aa09341cd644" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1918,7 +1918,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="elthlead (japan).rom" size="131072" crc="a8e9ac9b" sha1="caeca37113c56e696d7053d90f5f9f3e02de8ad1" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -2116,7 +2116,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="heroes of the lance (japan).rom" size="524288" crc="95f2eb6d" sha1="6e1d2d5b0688860b0a04d53fe9e5e3939dfba547" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -2252,7 +2252,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="jansei (japan).rom" size="131072" crc="00b8e82e" sha1="0eb3a48a8ab90826726f0c06daadf4bf13390758" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="2048" >
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -2268,7 +2268,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="jansei (japan) (alt 1).rom" size="131072" crc="2c2924ed" sha1="d78293133b075f48c9dc5c4cf0c4a985ae964b08" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="2048" >
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -2764,7 +2764,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="sangokushi (japan).rom" size="524288" crc="b83aa6f5" sha1="dab5a9f93a35fcb92c01e4250b01928fe8bd294b" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="32768" >
+			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -2914,7 +2914,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="131072">
 				<rom name="tanikawa hiroshi no shougi shinan 2 (japan).rom" size="131072" crc="f640670c" sha1="39d500fbf22168be2a12ac89ff5a50131bb1c30b" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3016,7 +3016,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="wizardry (japan).rom" size="524288" crc="08a5ca60" sha1="34635bf3518c7b33164f3d96da769c7a01102d28" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3132,7 +3132,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<dataarea name="rom" size="524288">
 				<rom name="japanese msx-write ii (japan) (program).rom" size="524288" crc="459478cb" sha1="9afdee40e7b243f99cc50dd1ad710ab0928dd820" status="baddump" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>

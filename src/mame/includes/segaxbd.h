@@ -60,8 +60,7 @@ public:
 
 protected:
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER(adc_r);
-	DECLARE_WRITE16_MEMBER(adc_w);
+	uint8_t analog_r();
 	DECLARE_WRITE16_MEMBER(iocontrol_w);
 
 	// video updates

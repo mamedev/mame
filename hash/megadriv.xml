@@ -11302,17 +11302,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="btlmanidp" cloneof="btlmanid">
-		<description>Battle Mania Daiginjou (Jpn, Prototype, 19910528)</description>
-		<year>1991</year>
-		<publisher>Big Evil Corp.</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="Battle Mania (May 28, 1991 prototype).bin" size="524288" crc="bf0a017f" sha1="5d707ba8dbbfa8ad7a6ec20735e41b2b84941efe"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="battlesqp" cloneof="battlesq">
 		<description>Battle Squadron (USA, Prototype 19910118)</description>
 		<year>1990</year>
@@ -22566,7 +22555,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 
-	<software name="puttsqup" >
+	<software name="puttsqup">
 		<description>Putty Squad (prototype)</description>
 		<year>1992</year>
 		<publisher>System 3 / Ocean</publisher>

@@ -50,7 +50,7 @@
  * This approach is stricter and should identify bugs in
  * the netlist core faster.
  * By default it is disabled since it is not as fast as
- * the default approach. It is up to 5% slower.
+ * the default approach. It is up to 10% slower.
  *
  */
 #ifndef USE_COPY_INSTEAD_OF_REFERENCE

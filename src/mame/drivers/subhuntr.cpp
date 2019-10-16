@@ -94,8 +94,8 @@ void subhuntr_state::subhuntr_io_map(address_map &map)
 
 void subhuntr_state::subhuntr_data_map(address_map &map)
 {
-//  AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( ,  )
-//  AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( ,  )
+//  map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(subhuntr_state::), FUNC(subhuntr_state::));
+//  map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(subhuntr_state::), FUNC(subhuntr_state::));
 }
 
 /***************************************************************************

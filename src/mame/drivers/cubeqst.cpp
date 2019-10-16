@@ -565,31 +565,19 @@ void cubeqst_state::cubeqst(machine_config &config)
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	for (int i = 0; i < 8; i++)
 	{
 		// ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c22 (34) + tl074cn.1b (53) + r10k.rn1 (30)
 		AD7521(config, m_dacs[i*2+0], 0).add_route(0, "rspeaker", 0.125);
+		vref.add_route(0, m_dacs[i*2+0], 1.0, DAC_VREF_POS_INPUT);
+		vref.add_route(0, m_dacs[i*2+0], -1.0, DAC_VREF_NEG_INPUT);
 
 		// ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c13 (34) + tl074cn.3b (53) + r10k.rn3 (30)
 		AD7521(config, m_dacs[i*2+1], 0).add_route(0, "lspeaker", 0.125);
+		vref.add_route(0, m_dacs[i*2+1], 1.0, DAC_VREF_POS_INPUT);
+		vref.add_route(0, m_dacs[i*2+1], -1.0, DAC_VREF_NEG_INPUT);
 	}
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "rdac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac0", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac6", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac6", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac7", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "ldac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac7", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 

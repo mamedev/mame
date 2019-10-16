@@ -303,7 +303,7 @@ const auto MASTER_CLOCK_25MHz = XTAL(25'174'800);
 READ8_MEMBER( segaorun_state::unknown_porta_r )
 {
 	//logerror("%06X:read from 8255 port A\n", m_maincpu->pc());
-	return 0;
+	return m_adc->intr_r() << 6;
 }
 
 READ8_MEMBER( segaorun_state::unknown_portb_r )
@@ -366,6 +366,7 @@ READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 	uint8_t ret = 0xff;
 
 	// PPI Input port A:
+	//  D6: ADC interrupt
 	//  D5: left limit
 	//  D4: center
 	//  D3: right limit
@@ -384,6 +385,9 @@ READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 		ret ^= 0x10;
 	else if (pos >= right_limit - tolerance)
 		ret ^= 0x08;
+
+	if (!m_adc->intr_r())
+		ret ^= 0x40;
 
 	return ret;
 }
@@ -650,9 +654,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 		}
 
 		case 0x30/2:
-		{
-			return m_adc_ports[m_adc_select].read_safe(0x0010);
-		}
+			return m_adc->read();
 
 		case 0x60/2:
 			return m_watchdog->reset_r(space);
@@ -698,7 +700,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			return;
 
 		case 0x30/2:
-			// ADC trigger
+			m_adc->write();
 			return;
 
 		case 0x60/2:
@@ -736,9 +738,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 		}
 
 		case 0x3020/2:
-		{
-			return m_adc_ports[m_adc_select].read_safe(0x0010);
-		}
+			return m_adc->read();
 
 		default:
 			break;
@@ -789,7 +789,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			return;
 
 		case 0x3020/2:
-			// ADC trigger
+			m_adc->write();
 			return;
 
 		default:
@@ -797,6 +797,16 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 	}
 
 	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  analog_r - read multiplexed analog ports
+//-------------------------------------------------
+
+uint8_t segaorun_state::analog_r()
+{
+	return m_adc_ports[m_adc_select].read_safe(0x10);
 }
 
 
@@ -1168,6 +1178,9 @@ void segaorun_state::outrun_base(machine_config &config)
 	m_i8255->out_pb_callback().set(FUNC(segaorun_state::bankmotor_control_w));
 	m_i8255->in_pc_callback().set(FUNC(segaorun_state::unknown_portc_r));
 	m_i8255->out_pc_callback().set(FUNC(segaorun_state::video_control_w));
+
+	ADC0804(config, m_adc, MASTER_CLOCK_25MHz/4/6);
+	m_adc->vin_callback().set(FUNC(segaorun_state::analog_r));
 
 	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK/4, m_maincpu);
 	m_mapper->set_mapper(FUNC(segaorun_state::memory_mapper), this);

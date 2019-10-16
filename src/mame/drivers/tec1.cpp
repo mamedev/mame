@@ -366,8 +366,8 @@ void tec1_state::tecjmon_io(address_map &map)
 	map(0x01, 0x01).w(FUNC(tec1_state::tecjmon_digit_w));
 	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
 	map(0x03, 0x03).r(FUNC(tec1_state::latch_r));
-	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
-	//AM_RANGE(0x84, 0x84) AM_WRITE(lcd_2nd_w)
+	//map(0x04, 0x04).w(FUNC(tec1_state::lcd_en_w));
+	//map(0x84, 0x84).w(FUNC(tec1_state::lcd_2nd_w));
 }
 
 

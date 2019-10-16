@@ -918,17 +918,17 @@ void subsino_state::crsbingo_map(address_map &map)
 	map(0x09005, 0x09005).w(FUNC(subsino_state::out_a_w));
 
 	map(0x09008, 0x09008).portr("SW4");
-	map(0x09009, 0x09009).portr("SW3");  // AM_WRITE(out_a_w )
+	map(0x09009, 0x09009).portr("SW3");  // .w(FUNC(subsino_state::out_a_w));
 	map(0x0900a, 0x0900a).rw(FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
 
 	map(0x09010, 0x09010).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
-//  AM_RANGE( 0x09011, 0x09011 ) //"flash" status, bit 0
-//  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
+//  map(0x09011, 0x09011) //"flash" status, bit 0
+//  map(0x0900c, 0x0900c).portr("INC");
 	map(0x0900c, 0x0900d).w("ymsnd", FUNC(ym2413_device::write));
 
-//  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE("oki", okim6295_device, write)
+//  map(0x09018, 0x09018).w("oki", FUNC(okim6295_device::write));
 
-//  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE(tiles_offset_w )
+//  map(0x0900d, 0x0900d).w(FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
 	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
@@ -969,7 +969,7 @@ void subsino_state::tisub_map(address_map &map)
 
 	map(0x09016, 0x09017).w("ymsnd", FUNC(ym3812_device::write));
 
-//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE("oki", okim6295_device, write)
+//  map(0x0900c, 0x0900c).w("oki", FUNC(okim6295_device::write));
 
 	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
 
@@ -1067,7 +1067,7 @@ void subsino_state::stbsub_map(address_map &map)
 
 	map(0x0d016, 0x0d017).w("ymsnd", FUNC(ym3812_device::write));
 
-//  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE(tiles_offset_w )
+//  map(0x0d01b, 0x0d01b).w(FUNC(subsino_state::tiles_offset_w));
 
 	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
 	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
@@ -1094,20 +1094,20 @@ void subsino_state::mtrainnv_map(address_map &map)
 	map(0x0d004, 0x0d006).r("ppi2", FUNC(i8255_device::read));
 
 	map(0x0d008, 0x0d008).ram().share("stbsub_out_c");
-//  AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE
-//  AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE
-//  AM_RANGE( 0x0d00b, 0x0d00b ) AM_WRITE
+//  map(0x0d009, 0x0d009).w(FUNC(subsino_state::));
+//  map(0x0d00a, 0x0d00a).w(FUNC(subsino_state::));
+//  map(0x0d00b, 0x0d00b).w(FUNC(subsino_state::));
 	map(0x0d00c, 0x0d00c).portr("INC");
 
 	map(0x0d010, 0x0d010).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x0d011, 0x0d011).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x0d012, 0x0d012).w("ramdac", FUNC(ramdac_device::mask_w));
 
-//  AM_RANGE( 0x0d012, 0x0d012 ) AM_WRITE
+//  map(0x0d012, 0x0d012).w(FUNC(subsino_state::));
 
 	map(0x0d016, 0x0d017).w("ymsnd", FUNC(ym3812_device::write));
 
-//  AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+//  map(0x0d018, 0x0d018).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
 	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");

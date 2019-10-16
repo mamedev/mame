@@ -13,6 +13,7 @@
 #include "plib/pchrono.h"
 #include "plib/plists.h"
 #include "plib/ptypes.h"
+#include "plib/parray.h"
 
 #include "nl_config.h"
 #include "nltypes.h"
@@ -69,37 +70,34 @@ namespace netlist
 			std::swap(m_object, other.m_object);
 		}
 #endif
-		struct QueueOp
+		inline bool operator ==(const pqentry_t &rhs) const noexcept
 		{
-			inline static constexpr bool less(const pqentry_t &lhs, const pqentry_t &rhs) noexcept
-			{
-				return (lhs.m_exec_time < rhs.m_exec_time);
-			}
+			return m_object == rhs.m_object;
+		}
 
-			inline static constexpr bool lessequal(const pqentry_t &lhs, const pqentry_t &rhs) noexcept
-			{
-				return (lhs.m_exec_time <= rhs.m_exec_time);
-			}
+		inline bool operator ==(const Element &rhs) const noexcept
+		{
+			return m_object == rhs;
+		}
 
-			inline static constexpr bool equal(const pqentry_t &lhs, const pqentry_t &rhs) noexcept
-			{
-				return lhs.m_object == rhs.m_object;
-			}
+		inline bool operator <=(const pqentry_t &rhs) const noexcept
+		{
+			return (m_exec_time <= rhs.m_exec_time);
+		}
 
-			inline static constexpr bool equal(const pqentry_t &lhs, const Element &rhs) noexcept
-			{
-				return lhs.m_object == rhs;
-			}
+		inline bool operator <(const pqentry_t &rhs) const noexcept
+		{
+			return (m_exec_time < rhs.m_exec_time);
+		}
 
-			inline static constexpr pqentry_t never() noexcept { return pqentry_t(Time::never(), nullptr); }
-		};
+		inline static constexpr pqentry_t never() noexcept { return pqentry_t(Time::never(), nullptr); }
 
 		Time m_exec_time;
 		Element m_object;
 	};
 
 	/* Use TS = true for a threadsafe queue */
-	template <class T, bool TS, bool KEEPSTAT, class QueueOp = typename T::QueueOp>
+	template <class T, bool TS>
 	class timed_queue_linear : plib::nocopyassignmove
 	{
 	public:
@@ -113,96 +111,64 @@ namespace netlist
 		std::size_t capacity() const noexcept { return m_list.capacity() - 1; }
 		bool empty() const noexcept { return (m_end == &m_list[1]); }
 
+		template<bool KEEPSTAT>
 		void push(T && e) noexcept
 		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
 			T * i(m_end-1);
-			for (; QueueOp::less(*(i), e); --i)
+			for (; *i < e; --i)
 			{
 				*(i+1) = *(i);
-				m_prof_sortmove.inc();
+				if (KEEPSTAT)
+					m_prof_sortmove.inc();
 			}
 			*(i+1) = std::move(e);
 			++m_end;
-			m_prof_call.inc();
-		}
-
-		void push_nostats(T && e) noexcept
-		{
-			/* Lock */
-			lock_guard_type lck(m_lock);
-#if 1
-			T * i(m_end-1);
-			for (; QueueOp::less(*(i), e); --i)
-			{
-				*(i+1) = *(i);
-			}
-			*(i+1) = std::move(e);
-			++m_end;
-#else
-			T * i(m_end++);
-			while (QueueOp::less(*(--i), e))
-			{
-				*(i+1) = *(i);
-			}
-			*(i+1) = std::move(e);
-#endif
+			if (KEEPSTAT)
+				m_prof_call.inc();
 		}
 
 		T pop() noexcept       { return *(--m_end); }
 		const T &top() const noexcept { return *(m_end-1); }
 
-		template <class R>
+		template <bool KEEPSTAT, class R>
 		void remove(const R &elem) noexcept
 		{
-			m_prof_remove.inc();
-			remove_nostats(elem);
-		}
-
-		template <class R>
-		void remove_nostats(const R &elem) noexcept
-		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
-#if 1
+			if (KEEPSTAT)
+				m_prof_remove.inc();
 			for (T * i = m_end - 1; i > &m_list[0]; --i)
 			{
-				if (QueueOp::equal(*i, elem))
+				// == operator ignores time!
+				if (*i == elem)
 				{
 					std::copy(i+1, m_end--, i);
 					return;
 				}
 			}
-#else
-			for (T * i = &m_list[1]; i < m_end; ++i)
-			{
-				if (QueueOp::equal(*i, elem))
-				{
-					std::copy(i+1, m_end--, i);
-					return;
-				}
-			}
-#endif
 		}
 
-		void retime(T && elem) noexcept
+		template <bool KEEPSTAT, class R>
+		void retime(R && elem) noexcept
 		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
-			m_prof_retime.inc();
+			if (KEEPSTAT)
+				m_prof_retime.inc();
 
-			for (T * i = m_end - 1; i > &m_list[0]; --i)
+			for (R * i = m_end - 1; i > &m_list[0]; --i)
 			{
-				if (QueueOp::equal(*i, elem)) // partial equal!
+				if (*i == elem) // partial equal!
 				{
 					*i = std::move(elem);
-					while (QueueOp::less(*(i-1), *i))
+					while (*(i-1) < *i)
 					{
 						std::swap(*(i-1), *i);
 						--i;
 					}
-					while (i < m_end && QueueOp::less(*i, *(i+1)))
+					while (i < m_end && *i < *(i+1))
 					{
 						std::swap(*(i+1), *i);
 						++i;
@@ -220,7 +186,7 @@ namespace netlist
 			 * the insert algo above will run into this element and doesn't
 			 * need a comparison with queue start.
 			 */
-			m_list[0] = QueueOp::never();
+			m_list[0] = T::never();
 			m_end++;
 		}
 
@@ -233,28 +199,27 @@ namespace netlist
 		using mutex_type = pspin_mutex<TS>;
 		using lock_guard_type = std::lock_guard<mutex_type>;
 
-		mutex_type      m_lock;
+		mutex_type    			m_lock;
 		PALIGNAS_CACHELINE()
-		T             * m_end;
-		//std::vector<T>  m_list;
-		plib::aligned_vector<T>  m_list;
+		T * 					m_end;
+		plib::aligned_vector<T> m_list;
 
 	public:
 		// profiling
-		nperfcount_t<KEEPSTAT> m_prof_sortmove;
-		nperfcount_t<KEEPSTAT> m_prof_call;
-		nperfcount_t<KEEPSTAT> m_prof_remove;
-		nperfcount_t<KEEPSTAT> m_prof_retime;
+		nperfcount_t<true> m_prof_sortmove;
+		nperfcount_t<true> m_prof_call;
+		nperfcount_t<true> m_prof_remove;
+		nperfcount_t<true> m_prof_retime;
 	};
 
-	template <class T, bool TS, bool KEEPSTAT, class QueueOp = typename T::QueueOp>
+	template <class T, bool TS>
 	class timed_queue_heap : plib::nocopyassignmove
 	{
 	public:
 
 		struct compare
 		{
-			constexpr bool operator()(const T &a, const T &b) const { return QueueOp::lessequal(b,a); }
+			constexpr bool operator()(const T &a, const T &b) const { return b <= a; }
 		};
 
 		explicit timed_queue_heap(const std::size_t list_size)
@@ -266,13 +231,15 @@ namespace netlist
 		std::size_t capacity() const noexcept { return m_list.capacity(); }
 		bool empty() const noexcept { return &m_list[0] == m_end; }
 
+		template <bool KEEPSTAT>
 		void push(T &&e) noexcept
 		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
 			*m_end++ = e;
 			std::push_heap(&m_list[0], m_end, compare());
-			m_prof_call.inc();
+			if (KEEPSTAT)
+				m_prof_call.inc();
 		}
 
 		T pop() noexcept
@@ -285,14 +252,16 @@ namespace netlist
 
 		const T &top() const noexcept { return m_list[0]; }
 
-		template <class R>
+		template <bool KEEPSTAT, class R>
 		void remove(const R &elem) noexcept
 		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
+			if (KEEPSTAT)
+				m_prof_remove.inc();
 			for (T * i = m_end - 1; i >= &m_list[0]; i--)
 			{
-				if (QueueOp::equal(*i, elem))
+				if (*i == elem)
 				{
 					m_end--;
 					for (;i < m_end; i++)
@@ -303,13 +272,16 @@ namespace netlist
 			}
 		}
 
+		template <bool KEEPSTAT>
 		void retime(const T &elem) noexcept
 		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
+			if (KEEPSTAT)
+				m_prof_retime.inc();
 			for (T * i = m_end - 1; i >= &m_list[0]; i--)
 			{
-				if (QueueOp::equal(*i, elem)) // partial equal!
+				if (*i == elem) // partial equal!
 				{
 					*i = elem;
 					std::make_heap(&m_list[0], m_end, compare());
@@ -340,9 +312,14 @@ namespace netlist
 
 	public:
 		// profiling
-		nperfcount_t<KEEPSTAT> m_prof_sortmove;
-		nperfcount_t<KEEPSTAT> m_prof_call;
+		nperfcount_t<true> m_prof_sortmove;
+		nperfcount_t<true> m_prof_call;
+		nperfcount_t<true> m_prof_remove;
+		nperfcount_t<true> m_prof_retime;
 	};
+
+	template <class T, bool TS>
+	using timed_queue = timed_queue_linear<T, TS>;
 
 	/*
 	 * Use timed_queue_heap to use stdc++ heap functions instead of linear processing.
@@ -350,8 +327,8 @@ namespace netlist
 	 * This slows down processing by about 25% on a Kaby Lake.
 	 */
 
-	template <class T, bool TS, bool KEEPSTAT, class QueueOp = typename T::QueueOp>
-	using timed_queue = timed_queue_linear<T, TS, KEEPSTAT, QueueOp>;
+	//template <class T, bool TS>
+	//using timed_queue = timed_queue_heap<T, TS>;
 
 } // namespace netlist
 

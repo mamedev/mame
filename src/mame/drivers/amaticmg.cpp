@@ -680,7 +680,7 @@ WRITE8_MEMBER( amaticmg_state::unk80_w )
 void amaticmg_state::amaticmg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).ram(); // AM_SHARE("nvram")
+	map(0x8000, 0x9fff).ram(); // .share("nvram");
 	map(0xa000, 0xafff).ram().share("vram");
 	map(0xb000, 0xbfff).ram().share("attr");
 	map(0xc000, 0xffff).bankr("bank1");
@@ -696,14 +696,14 @@ void amaticmg_state::amaticmg_portmap(address_map &map)
 	map(0x61, 0x61).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x80, 0x80).w(FUNC(amaticmg_state::unk80_w));
 	map(0xc0, 0xc0).w(FUNC(amaticmg_state::rombank_w));
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_byte_interface, data_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, data_w)
+//  map(0x00, 0x00).w("dac1", FUNC(dac_byte_interface::data_w));
+//  map(0x00, 0x00).w("dac2", FUNC(dac_byte_interface::data_w));
 }
 
 void amaticmg_state::amaticmg2_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x23).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x41).w("ymsnd", FUNC(ym3812_device::write));
@@ -719,14 +719,14 @@ void amaticmg_state::amaticmg2_portmap(address_map &map)
 void amaticmg_state::amaticmg4_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x50, 0x51).w("ymsnd", FUNC(ym3812_device::write));
 	map(0x0e, 0x0e).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0f, 0x0f).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-//  AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
+//  map(0xc0, 0xc0).w(FUNC(amaticmg_state::rombank_w));
 	map(0xe6, 0xe6).w(FUNC(amaticmg_state::nmi_mask_w));
 }
 

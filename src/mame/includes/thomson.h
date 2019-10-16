@@ -146,6 +146,7 @@ public:
 		m_biosbank(*this, TO8_BIOS_BANK),
 		m_cartlobank(*this, MO6_CART_LO),
 		m_carthibank(*this, MO6_CART_HI),
+		m_cart_rom(*this, "cartridge"),
 		m_thmfc(*this, "thmfc"),
 		m_floppy_led(*this, "floppy"),
 		m_floppy_image(*this, "floppy%u", 0U)
@@ -427,6 +428,7 @@ private:
 	optional_memory_bank m_biosbank;
 	optional_memory_bank m_cartlobank;
 	optional_memory_bank m_carthibank;
+	required_region_ptr<uint8_t> m_cart_rom;
 
 	required_device<thmfc1_device> m_thmfc;
 	output_finder<> m_floppy_led;

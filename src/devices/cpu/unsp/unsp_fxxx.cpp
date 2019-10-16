@@ -341,6 +341,16 @@ void unsp_device::execute_fxxx_101_group(uint16_t op)
 		m_core->m_enable_fiq = 1;
 		return;
 
+	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
+		logerror("fir_mov on (shouldn't exist on 1.0, is this 1.2 or does it act as a NOP?)\n");
+		//unimplemented_opcode(op); // jak_care triggers this, which again strongly suggests that everything we have is 1.2 or above even if most new features are unused
+		return;
+
+	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
+		logerror("fir_mov off (shouldn't exist on 1.0, is this 1.2 or does it act as a NOP?)\n");
+		//unimplemented_opcode(op); // jak_care triggers this, see above
+		return;
+
 	case 0xf160: case 0xf360: case 0xf560: case 0xf760: case 0xf960: case 0xfb60: case 0xfd60: case 0xff60:
 	case 0xf168: case 0xf368: case 0xf568: case 0xf768: case 0xf968: case 0xfb68: case 0xfd68: case 0xff68:
 	case 0xf170: case 0xf370: case 0xf570: case 0xf770: case 0xf970: case 0xfb70: case 0xfd70: case 0xff70:

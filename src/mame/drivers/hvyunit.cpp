@@ -435,8 +435,8 @@ void hvyunit_state::slave_io(address_map &map)
 	map(0x0c, 0x0c).r(FUNC(hvyunit_state::mermaid_status_r));
 	map(0x0e, 0x0e).w(FUNC(hvyunit_state::coin_count_w));
 
-//  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
-//  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
+//  map(0x22, 0x22).r(FUNC(hvyunit_state::hu_scrolly_hi_reset)); //22/a2 taken from ram $f065
+//  map(0xa2, 0xa2).r(FUNC(hvyunit_state::hu_scrolly_hi_set));
 }
 
 

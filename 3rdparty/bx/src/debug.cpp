@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -24,8 +24,8 @@ extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _
 #		include <CoreFoundation/CFString.h>
 extern "C" void NSLog(CFStringRef _format, ...);
 #	endif // defined(__OBJC__)
-#elif 0 // BX_PLATFORM_EMSCRIPTEN
-#	include <emscripten.h>
+#elif BX_PLATFORM_EMSCRIPTEN
+#	include <emscripten/emscripten.h>
 #else
 #	include <stdio.h> // fputs, fflush
 #endif // BX_PLATFORM_WINDOWS
@@ -43,6 +43,11 @@ namespace bx
 		// NaCl doesn't like int 3:
 		// NativeClient: NaCl module load failed: Validation failure. File violates Native Client safety rules.
 		__asm__ ("int $3");
+#elif BX_PLATFORM_EMSCRIPTEN
+		emscripten_log(EM_LOG_CONSOLE | EM_LOG_ERROR | EM_LOG_C_STACK | EM_LOG_JS_STACK | EM_LOG_DEMANGLE, "debugBreak!");
+		// Doing emscripten_debugger() disables asm.js validation due to an emscripten bug
+		//emscripten_debugger();
+		EM_ASM({ debugger; });
 #else // cross platform implementation
 		int* int3 = (int*)3L;
 		*int3 = 3;
@@ -69,7 +74,7 @@ namespace bx
 #	else
 		NSLog(__CFStringMakeConstantString("%s"), _out);
 #	endif // defined(__OBJC__)
-#elif 0 // BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_EMSCRIPTEN
 		emscripten_log(EM_LOG_CONSOLE, "%s", _out);
 #else
 		fputs(_out, stdout);

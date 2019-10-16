@@ -634,7 +634,7 @@ void ampoker2_state::io_map(address_map &map)
 	map(0x15, 0x15).portr("IN5");
 	map(0x16, 0x16).portr("IN6");
 	map(0x17, 0x17).portr("IN7");
-//  AM_RANGE(0x21, 0x21) AM_WRITENOP                    /* undocumented, write 0x1a after each reset */
+//  map(0x21, 0x21).nopw();                    /* undocumented, write 0x1a after each reset */
 	map(0x30, 0x30).w(FUNC(ampoker2_state::port30_w));    /* see write handlers */
 	map(0x31, 0x31).w(FUNC(ampoker2_state::port31_w));    /* see write handlers */
 	map(0x32, 0x32).w(FUNC(ampoker2_state::port32_w));    /* see write handlers */

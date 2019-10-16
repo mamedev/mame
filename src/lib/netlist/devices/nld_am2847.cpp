@@ -27,7 +27,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void shift();
+		void shift() NL_NOEXCEPT;
 
 		logic_input_t m_RC;
 		logic_input_t m_IN;

@@ -538,7 +538,7 @@ void mtech_state::megatech_bios_map(address_map &map)
 	map(0x6400, 0x6407).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x6800, 0x6807).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x7000, 0x77ff).rom(); // from bios rom (0x7000-0x77ff populated in ROM)
-	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
+	//map(0x7800, 0x7fff).ram(); // ?
 	map(0x8000, 0x9fff).rw(FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
 }
 
@@ -691,12 +691,12 @@ void mtech_state::megatech(machine_config &config)
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mtech_state::megatech_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mtech_state::megatech_bios_portmap);
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("BIOS_DSW0");
 	io1.in_portb_cb().set_ioport("BIOS_DSW1");
 	io1.out_porte_cb().set(FUNC(mtech_state::cart_select_w));
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("BIOS_IN0");
 	io2.in_portb_cb().set_ioport("BIOS_IN1");
 	io2.in_portc_cb().set(FUNC(mtech_state::bios_portc_r));

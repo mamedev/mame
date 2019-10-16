@@ -22,37 +22,43 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// configuration
-	auto out_vblank() { return m_vblank_cb.bind(); }
-	auto out_int_ge() { return subdevice<sgi_ge5_device>("ge5")->out_int(); }
+	auto out_vblank() { return subdevice<screen_device>("screen")->screen_vblank(); }
+	auto out_int() { return subdevice<sgi_ge5_device>("ge5")->out_int(); }
 	auto out_int_fifo() { return m_int_fifo_cb.bind(); }
+
+	u32 dma_r() { return subdevice<sgi_ge5_device>("ge5")->buffer_r(0); }
+	void dma_w(u32 data) { fifo_w(0, data, 0xffffffffU); }
 
 	void reset_w(int state);
 
-	virtual void map(address_map &map);
+	void map(address_map &map);
 
 protected:
+	void map_bank(address_map& map);
+
 	// device_t overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	u8 dr0_r() { return m_dr0; }
-	u8 dr1_r() { return m_dr1; }
-	u8 dr2_r() { return m_dr2; }
-	u8 dr3_r() { return m_dr3; }
-	u8 dr4_r() { return (m_dr4 | (m_ge->suspended() ? 0 : DR4_GESTALL)) & DR4_RM; }
-	void dr0_w(u8 data) { m_dr0 = (m_dr0 & ~DR0_WM) | (data & DR0_WM); }
-	void dr1_w(u8 data) { m_dr1 = (m_dr1 & ~DR1_WM) | (data & DR1_WM); m_ge->cwen_w(BIT(data, 1)); }
-	void dr2_w(u8 data) { m_dr2 = (m_dr2 & ~DR2_WM) | (data & DR2_WM); }
-	void dr3_w(u8 data) { m_dr3 = (m_dr3 & ~DR3_WM) | (data & DR3_WM); }
+	// display registers
+	u8 dr0_r();
+	u8 dr1_r();
+	u8 dr2_r();
+	u8 dr3_r();
+	u8 dr4_r();
+	void dr0_w(u8 data);
+	void dr1_w(u8 data);
+	void dr2_w(u8 data);
+	void dr3_w(u8 data);
 	void dr4_w(u8 data);
 
-	u64 ge_fifo_r();
-	u32 fifo_r() { return u32(ge_fifo_r()); }
+	u64 fifo_r();
 	void fifo_w(offs_t offset, u32 data, u32 mem_mask);
 
 private:
+	required_device<address_map_bank_device> m_bank;
 	required_device<screen_device> m_screen;
 	required_device<sgi_ge5_device> m_ge;
 	required_device<sgi_re2_device> m_re;
@@ -60,7 +66,6 @@ private:
 	required_device_array<bt431_device, 2> m_cursor;
 	required_device_array<bt457_device, 3> m_ramdac;
 
-	devcb_write_line m_vblank_cb;
 	devcb_write_line m_int_fifo_cb;
 
 	enum dr0_mask : u8

@@ -18,7 +18,7 @@
  *        define a model param on core device
  */
 /* Format: external name,netlist device,model */
-static const char * s_lib_map =
+static constexpr const char s_lib_map[] =
 "SN74LS00D,   TTL_7400_DIP,  74LSXX\n"
 "SN74LS04D,   TTL_7404_DIP,  74LSXX\n"
 "SN74ALS08D,  TTL_7408_DIP,  74ALSXX\n"
@@ -337,7 +337,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				 */
 				pstring model;
 				pstring pins ="CBE";
-				bool err;
+				bool err(false);
 				auto nval = plib::pstonum_ne<long, true>(tt[4], err);
 				plib::unused_var(nval);
 

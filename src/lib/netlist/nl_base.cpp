@@ -49,17 +49,17 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	pool_owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
-	pool_owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-pool_owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
+unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
 {
-	return pool().make_poolptr<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	return pool().make_unique<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-pool_owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
-	return pool().make_poolptr<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	return pool().make_unique<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
 
 class logic_family_cd4xxx_t : public logic_family_desc_t
@@ -76,18 +76,18 @@ public:
 		m_R_low = 10.0;
 		m_R_high = 10.0;
 	}
-	pool_owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
-	pool_owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-pool_owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
+unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const
 {
-	return pool().make_poolptr<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	return pool().make_unique<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
 
-pool_owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
+unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
-	return pool().make_poolptr<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	return pool().make_unique<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
 
 const logic_family_desc_t *family_TTL()
@@ -107,7 +107,7 @@ const logic_family_desc_t *family_CD4XXX()
 // ----------------------------------------------------------------------------------------
 
 detail::queue_t::queue_t(netlist_state_t &nl)
-	: timed_queue<pqentry_t<net_t *, netlist_time>, false, true>(512)
+	: timed_queue<pqentry_t<net_t *, netlist_time>, false>(512)
 	, netlist_ref(nl)
 	, m_qsize(0)
 	, m_times(512)
@@ -142,7 +142,7 @@ void detail::queue_t::on_post_load(plib::state_manager_t &manager)
 	for (std::size_t i = 0; i < m_qsize; i++ )
 	{
 		detail::net_t *n = state().nets()[m_net_ids[i]].get();
-		this->push(queue_t::entry_t(netlist_time::from_raw(m_times[i]),n));
+		this->push<false>(queue_t::entry_t(netlist_time::from_raw(m_times[i]),n));
 	}
 }
 
@@ -190,7 +190,7 @@ netlist_t::netlist_t(const pstring &aname, plib::unique_ptr<callbacks_t> callbac
 	, m_time(netlist_time::zero())
 	, m_mainclock(nullptr)
 	, m_queue(*m_state)
-	, m_stats(false)
+	, m_use_stats(false)
 {
 	devices::initialize_factory(nlstate().setup().factory());
 	NETLIST_NAME(base)(nlstate().setup());
@@ -386,7 +386,7 @@ void netlist_state_t::reset()
 
 void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 {
-	if (!m_stats)
+	if (!m_use_stats)
 		process_queue_stats<false>(delta);
 	else
 	{
@@ -409,7 +409,8 @@ void netlist_t::process_queue_stats(const netlist_time delta) NL_NOEXCEPT
 		while (e.m_object != nullptr)
 		{
 			e.m_object->template update_devs<KEEP_STATS>();
-			if (KEEP_STATS) m_perf_out_processed.inc();
+			if (KEEP_STATS)
+				m_perf_out_processed.inc();
 			e = m_queue.pop();
 			m_time = e.m_exec_time;
 		}
@@ -435,7 +436,8 @@ void netlist_t::process_queue_stats(const netlist_time delta) NL_NOEXCEPT
 			if (e.m_object != nullptr)
 			{
 				e.m_object->template update_devs<KEEP_STATS>();
-				if (KEEP_STATS) m_perf_out_processed.inc();
+				if (KEEP_STATS)
+					m_perf_out_processed.inc();
 			}
 			else
 				break;
@@ -446,7 +448,7 @@ void netlist_t::process_queue_stats(const netlist_time delta) NL_NOEXCEPT
 
 void netlist_t::print_stats() const
 {
-	if (m_stats)
+	if (m_use_stats)
 	{
 		std::vector<size_t> index;
 		for (size_t i=0; i < m_state->m_devices.size(); i++)
@@ -555,7 +557,7 @@ core_device_t::core_device_t(netlist_state_t &owner, const pstring &name)
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
 	if (exec().stats_enabled())
-		m_stats = plib::make_unique<stats_t>();
+		m_stats = pool().make_unique<stats_t>();
 }
 
 core_device_t::core_device_t(core_device_t &owner, const pstring &name)
@@ -568,9 +570,9 @@ core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 	set_logic_family(owner.logic_family());
 	if (logic_family() == nullptr)
 		set_logic_family(family_TTL());
-	state().add_dev(this->name(), pool_owned_ptr<core_device_t>(this, false));
+	state().register_device(this->name(), owned_pool_ptr<core_device_t>(this, false));
 	if (exec().stats_enabled())
-		m_stats = plib::make_unique<stats_t>();
+		m_stats = pool().make_unique<stats_t>();
 }
 
 void core_device_t::set_default_delegate(detail::core_terminal_t &term)
@@ -725,6 +727,7 @@ void detail::net_t::process(const T mask, netlist_sig_t sig)
 template <bool KEEP_STATS>
 void detail::net_t::update_devs() NL_NOEXCEPT
 {
+#if 0
 	nl_assert(this->isRailNet());
 
 	const unsigned int new_Q(m_new_Q);
@@ -737,12 +740,20 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 	{
 		case core_terminal_t::STATE_INP_HL:
 		case core_terminal_t::STATE_INP_LH:
-			process<KEEP_STATS>(mask | core_terminal_t::STATE_INP_ACTIVE, new_Q);
+			process<KEEP_STATS>(mask, new_Q);
 			break;
 		default:
 			/* do nothing */
 			break;
 	}
+#else
+	nl_assert(this->isRailNet());
+
+	m_in_queue = queue_status::DELIVERED; /* mark as taken ... */
+	if (m_new_Q ^ m_cur_Q)
+		process<KEEP_STATS>((m_new_Q << core_terminal_t::INP_LH_SHIFT)
+			| (m_cur_Q << core_terminal_t::INP_HL_SHIFT), m_new_Q);
+#endif
 }
 
 void detail::net_t::reset()
@@ -770,7 +781,7 @@ void detail::net_t::reset()
 	}
 }
 
-void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
+void detail::net_t::add_terminal(detail::core_terminal_t &terminal) NL_NOEXCEPT
 {
 	for (auto &t : m_core_terms)
 		if (t == &terminal)
@@ -781,7 +792,7 @@ void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 	m_core_terms.push_back(&terminal);
 }
 
-void detail::net_t::remove_terminal(detail::core_terminal_t &terminal)
+void detail::net_t::remove_terminal(detail::core_terminal_t &terminal) NL_NOEXCEPT
 {
 	if (plib::container::contains(m_core_terms, &terminal))
 	{
@@ -897,7 +908,7 @@ logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
 	, m_my_net(dev.state(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
-	state().register_net(pool_owned_ptr<logic_net_t>(&m_my_net, false));
+	state().register_net(owned_pool_ptr<logic_net_t>(&m_my_net, false));
 	set_logic_family(dev.logic_family());
 	state().setup().register_term(*this);
 }
@@ -927,7 +938,7 @@ analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	: analog_t(dev, aname, STATE_OUT)
 	, m_my_net(dev.state(), name() + ".net", this)
 {
-	state().register_net(pool_owned_ptr<analog_net_t>(&m_my_net, false));
+	state().register_net(owned_pool_ptr<analog_net_t>(&m_my_net, false));
 	this->set_net(&m_my_net);
 
 	//net().m_cur_Analog = NL_FCONST(0.0);
@@ -981,7 +992,7 @@ param_t::param_type_t param_t::param_type() const
 }
 
 
-void param_t::update_param()
+void param_t::update_param() NL_NOEXCEPT
 {
 	device().update_param();
 }

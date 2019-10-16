@@ -187,10 +187,13 @@ device_memory_interface::space_config_vector tms340x0_device::memory_space_confi
 #define OFFSET()       BREG(4)
 #define WSTART_X()     BREG_X(5)
 #define WSTART_Y()     BREG_Y(5)
+#define WSTART_XY()    BREG_XY(5)
 #define WEND_X()       BREG_X(6)
 #define WEND_Y()       BREG_Y(6)
+#define WEND_XY()      BREG_XY(6)
 #define DYDX_X()       BREG_X(7)
 #define DYDX_Y()       BREG_Y(7)
+#define DYDX_XY()      BREG_XY(7)
 #define COLOR0()       BREG(8)
 #define COLOR1()       BREG(9)
 #define COUNT()        BREG(10)
@@ -1496,7 +1499,7 @@ u16 tms34020_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
-	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
+	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg020_name[offset]);
 
 	switch (offset)
 	{

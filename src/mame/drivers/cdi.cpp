@@ -85,16 +85,16 @@ void cdi_state::cdimono2_mem(address_map &map)
 #if ENABLE_UART_PRINTING
 	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
-	//AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
-	//AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
-	//AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave", cdislave_device, slave_r, slave_w)
-	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
+	//map(0x00300000, 0x00303bff).rw("cdic", FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
+	//map(0x00303c00, 0x00303fff).rw("cdic", FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
+	//map(0x00310000, 0x00317fff).rw("slave", FUNC(cdislave_device::slave_r), FUNC(cdicdic_device::slave_w));
+	//map(0x00318000, 0x0031ffff).noprw();
 	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x00400000, 0x0047ffff).rom().region("maincpu", 0);
 	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
-	//AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
+	//map(0x00500000, 0x0057ffff).ram();
 	map(0x00500000, 0x00ffffff).noprw();
-	//AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
+	//map(0x00e00000, 0x00efffff).ram(); // DVC
 }
 
 void cdi_state::cdi910_mem(address_map &map)
@@ -106,15 +106,15 @@ void cdi_state::cdi910_mem(address_map &map)
 #if ENABLE_UART_PRINTING
 	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
-//  AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
-//  AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
-//  AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave_hle", cdislave_device, slave_r, slave_w)
-//  AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
+//  map(0x00300000, 0x00303bff).rw("cdic", FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
+//  map(0x00303c00, 0x00303fff).rw("cdic", FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
+//  map(0x00310000, 0x00317fff).rw("slave_hle", FUNC(cdislave_device::slave_r), FUNC(cdicdic_device::slave_w));
+//  map(0x00318000, 0x0031ffff).noprw();
 	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
-//  AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
+//  map(0x00500000, 0x0057ffff).ram(); 
 	map(0x00500000, 0x00ffffff).noprw();
-//  AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
+//  map(0x00e00000, 0x00efffff).ram(); // DVC
 }
 
 

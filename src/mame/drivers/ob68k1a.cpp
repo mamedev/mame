@@ -114,8 +114,8 @@ void ob68k1a_state::ob68k1a_mem(address_map &map)
 	map(0xffff00, 0xffff03).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xffff10, 0xffff10).w(COM8116_TAG, FUNC(com8116_device::str_stt_w));
 	map(0xffff20, 0xffff23).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
-//  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_0_TAG, pia6821_device, read, write, 0x00ff)
-//  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_1_TAG, pia6821_device, read, write, 0xff00)
+//  map(0xffff40, 0xffff47).rw(MC6821_0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
+//  map(0xffff40, 0xffff47).rw(MC6821_1_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00);
 	map(0xffff40, 0xffff47).rw(FUNC(ob68k1a_state::pia_r), FUNC(ob68k1a_state::pia_w));
 	map(0xffff60, 0xffff6f).rw(MC6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 }

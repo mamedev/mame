@@ -738,7 +738,7 @@ void suna8_state::brickzn11_map(address_map &map)
 	map(0xc060, 0xc060).w(FUNC(suna8_state::brickzn_rombank_w));   // ROM Bank
 	map(0xc080, 0xc080).w(FUNC(suna8_state::brickzn_leds_w));   // Leds
 	map(0xc0a0, 0xc0a0).w(FUNC(suna8_state::brickzn_palbank_w));   // Palette RAM Bank
-//  AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(brickzn_prot2_w       )   // Protection 2
+//  map(0xc0c0, 0xc0c0).w(FUNC(suna8_state::brickzn_prot2_w));   // Protection 2
 
 	map(0xc100, 0xc100).portr("P1");                 // P1 (Buttons)
 	map(0xc101, 0xc101).portr("P2");                 // P2 (Buttons)

@@ -199,11 +199,11 @@ namespace plib
 			//&& (ret == T(0) || std::abs(ret) >= std::numeric_limits<T>::min() ))
 		{
 			if (cstr[idx] != 0)
-				throw pexception(pstring("Continuation after numeric value ends: ") + cstr);
+				throw pexception(pstring("Continuation after numeric value ends: ") + pstring(cstr));
 		}
 		else
 		{
-			throw pexception(pstring("Out of range: ") + cstr);
+			throw pexception(pstring("Out of range: ") + pstring(cstr));
 		}
 		return static_cast<T>(ret);
 	}
@@ -230,8 +230,8 @@ namespace plib
 	struct penum_base
 	{
 	protected:
-		static int from_string_int(const char *str, const char *x);
-		static std::string nthstr(int n, const char *str);
+		static int from_string_int(const pstring &str, const pstring &x);
+		static std::string nthstr(int n, const pstring &str);
 	};
 
 } // namespace plib
@@ -241,19 +241,22 @@ namespace plib
 		enum E { __VA_ARGS__ }; \
 		ename (E v) : m_v(v) { } \
 		template <typename T> explicit ename(T val) { m_v = static_cast<E>(val); } \
-		bool set_from_string (const std::string &s) { \
-			static char const *const strings = # __VA_ARGS__; \
-			int f = from_string_int(strings, s.c_str()); \
+		bool set_from_string (const pstring &s) { \
+			int f = from_string_int(strings(), s); \
 			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
 		} \
 		operator E() const {return m_v;} \
 		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
 		bool operator==(const E &rhs) const {return m_v == rhs;} \
 		std::string name() const { \
-			static char const *const strings = # __VA_ARGS__; \
-			return nthstr(static_cast<int>(m_v), strings); \
+			return nthstr(static_cast<int>(m_v), strings()); \
 		} \
-		private: E m_v; };
+		private: E m_v; \
+		static pstring strings() {\
+			static const pstring lstrings = # __VA_ARGS__; \
+			return lstrings; \
+		} \
+	};
 
 
 #endif /* PUTIL_H_ */

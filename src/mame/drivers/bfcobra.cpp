@@ -1409,15 +1409,15 @@ void bfcobra_state::m6809_prog_map(address_map &map)
 	map(0x2200, 0x2200).ram();     // W 'F'
 	map(0x2600, 0x2600).rw(FUNC(bfcobra_state::meter_r), FUNC(bfcobra_state::meter_w));
 	map(0x2800, 0x2800).ram();     // W
-	map(0x2A00, 0x2A02).rw(FUNC(bfcobra_state::latch_r), FUNC(bfcobra_state::latch_w));
-	map(0x2E00, 0x2E00).r(FUNC(bfcobra_state::int_latch_r));
+	map(0x2a00, 0x2a02).rw(FUNC(bfcobra_state::latch_r), FUNC(bfcobra_state::latch_w));
+	map(0x2e00, 0x2e00).r(FUNC(bfcobra_state::int_latch_r));
 	map(0x3001, 0x3001).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3201, 0x3201).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x3404, 0x3405).rw(m_acia6850_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x3406, 0x3407).rw(m_acia6850_2, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-//  AM_RANGE(0x3408, 0x3408) AM_NOP
-//  AM_RANGE(0x340A, 0x340A) AM_NOP
-//  AM_RANGE(0x3600, 0x3600) AM_NOP
+//  map(0x3408, 0x3408).noprw();
+//  map(0x340a, 0x340a).noprw();
+//  map(0x3600, 0x3600).noprw();
 	map(0x3801, 0x3801).rw(FUNC(bfcobra_state::upd_r), FUNC(bfcobra_state::upd_w));
 	map(0x8000, 0xffff).rom();
 	map(0xf000, 0xf000).nopw();    /* Watchdog */

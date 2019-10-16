@@ -1754,13 +1754,13 @@ void naomi_state::naomi_map(address_map &map)
 	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
-	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
 
 	/* Area 6 */
-	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+	//map(0x18000000, 0x1bffffff).noprw(); // Unassigned
 
 	/* Area 7 */
-	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
+	//map(0x1c000000, 0x1fffffff).noprw(); // SH4 Internal
 }
 
 /*
@@ -1797,9 +1797,9 @@ void naomi2_state::naomi2_map(address_map &map)
 
 	map(0x025f7c00, 0x025f7cff).m(m_powervr2_slave, FUNC(powervr2_device::pd_dma_map));
 	map(0x025f8000, 0x025f9fff).m(m_powervr2_slave, FUNC(powervr2_device::ta_map));
-//  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
-//  AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVREADWRITE32("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w, 0xffffffffffffffffU)
-//  AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
+//  map(0x025f6800, 0x025f69ff).rw(FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w)); // second PVR DMA!
+//  map(0x025f7c00, 0x025f7cff).rw("powervr2", FUNC(powervr2_device::pvr_ctrl_r), FUNC(powervr2_device::pvr_ctrl_w));
+//  map(0x005f8000, 0x005f9fff).mirror(0x02000000).m("powervr2", FUNC(powervr2_device::ta_map));
 
 	/* Area 1 */
 	map(0x04000000, 0x04ffffff).ram().share("dc_texture_ram");      // texture memory 64 bit access
@@ -1811,7 +1811,7 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w)); // TODO: writes to BOTH PVRs
 	map(0x085f8000, 0x085f9fff).w(FUNC(naomi2_state::both_pvr2_ta_w));
 	map(0x08800000, 0x088000ff).rw(m_powervr2, FUNC(powervr2_device::elan_regs_r), FUNC(powervr2_device::elan_regs_w)); // T&L chip registers
-//  AM_RANGE(0x09000000, 0x09??????) T&L command processing
+//  map(0x09000000, 0x09??????) T&L command processing
 	map(0x0a000000, 0x0bffffff).ram().share("elan_ram"); // T&L chip RAM
 
 	/* Area 3 */
@@ -1825,13 +1825,13 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
-	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
 
 	/* Area 6 */
-	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+	//map(0x18000000, 0x1bffffff).noprw(); // Unassigned
 
 	/* Area 7 */
-	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
+	//map(0x1c000000, 0x1fffffff).noprw(); // SH4 Internal
 }
 
 
@@ -1994,13 +1994,13 @@ void atomiswave_state::aw_map(address_map &map)
 
 
 	/* Area 5 */
-	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
 
 	/* Area 6 */
-	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+	//map(0x18000000, 0x1bffffff).noprw(); // Unassigned
 
 	/* Area 7 */
-	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
+	//map(0x1c000000, 0x1fffffff).noprw(); // SH4 Internal
 }
 
 void atomiswave_state::aw_port(address_map &map)
@@ -2989,18 +2989,7 @@ void naomi_state::naomi_base(machine_config &config)
 	MIE_JVS(config, "mie", 16000000);
 
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
-	sega837.set_port_tag<0>("TILT");
-	sega837.set_port_tag<1>("P1");
-	sega837.set_port_tag<2>("P2");
-	sega837.set_port_tag<3>("A0");
-	sega837.set_port_tag<4>("A1");
-	sega837.set_port_tag<5>("A2");
-	sega837.set_port_tag<6>("A3");
-	sega837.set_port_tag<7>("A4");
-	sega837.set_port_tag<8>("A5");
-	sega837.set_port_tag<9>("A6");
-	sega837.set_port_tag<10>("A7");
-	sega837.set_port_tag<11>("OUTPUT");
+	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
 
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
@@ -3073,23 +3062,9 @@ void naomi_state::naomim2_kb(machine_config &config)
 {
 	naomim2(config);
 	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
-	dcctrl0.set_port_tag<0>("P1.M");
-	dcctrl0.set_port_tag<1>("P1.LD");
-	dcctrl0.set_port_tag<2>("P1.KC1");
-	dcctrl0.set_port_tag<3>("P1.KC2");
-	dcctrl0.set_port_tag<4>("P1.KC3");
-	dcctrl0.set_port_tag<5>("P1.KC4");
-	dcctrl0.set_port_tag<6>("P1.KC5");
-	dcctrl0.set_port_tag<7>("P1.KC6");
+	dcctrl0.set_port_tags("P1.M", "P1.LD", "P1.KC1", "P1.KC2", "P1.KC3", "P1.KC4", "P1.KC5", "P1.KC6");
 	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
-	dcctrl1.set_port_tag<0>("P2.M");
-	dcctrl1.set_port_tag<1>("P2.LD");
-	dcctrl1.set_port_tag<2>("P2.KC1");
-	dcctrl1.set_port_tag<3>("P2.KC2");
-	dcctrl1.set_port_tag<4>("P2.KC3");
-	dcctrl1.set_port_tag<5>("P2.KC4");
-	dcctrl1.set_port_tag<6>("P2.KC5");
-	dcctrl1.set_port_tag<7>("P2.KC6");
+	dcctrl1.set_port_tags("P2.M", "P2.LD", "P2.KC1", "P2.KC2", "P2.KC3", "P2.KC4", "P2.KC5", "P2.KC6");
 }
 
 /*
@@ -3100,23 +3075,9 @@ void naomi_state::naomigd_kb(machine_config &config)
 {
 	naomigd(config);
 	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
-	dcctrl0.set_port_tag<0>("P1.M");
-	dcctrl0.set_port_tag<1>("P1.LD");
-	dcctrl0.set_port_tag<2>("P1.KC1");
-	dcctrl0.set_port_tag<3>("P1.KC2");
-	dcctrl0.set_port_tag<4>("P1.KC3");
-	dcctrl0.set_port_tag<5>("P1.KC4");
-	dcctrl0.set_port_tag<6>("P1.KC5");
-	dcctrl0.set_port_tag<7>("P1.KC6");
+	dcctrl0.set_port_tags("P1.M", "P1.LD", "P1.KC1", "P1.KC2", "P1.KC3", "P1.KC4", "P1.KC5", "P1.KC6");
 	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
-	dcctrl1.set_port_tag<0>("P2.M");
-	dcctrl1.set_port_tag<1>("P2.LD");
-	dcctrl1.set_port_tag<2>("P2.KC1");
-	dcctrl1.set_port_tag<3>("P2.KC2");
-	dcctrl1.set_port_tag<4>("P2.KC3");
-	dcctrl1.set_port_tag<5>("P2.KC4");
-	dcctrl1.set_port_tag<6>("P2.KC5");
-	dcctrl1.set_port_tag<7>("P2.KC6");
+	dcctrl1.set_port_tags("P2.M", "P2.LD", "P2.KC1", "P2.KC2", "P2.KC3", "P2.KC4", "P2.KC5", "P2.KC6");
 }
 
 /*
@@ -3196,47 +3157,19 @@ void atomiswave_state::aw1c(machine_config &config)
 {
 	aw_base(config);
 	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tag<0>("P1.0");
-	dcctrl0.set_port_tag<1>("P1.1");
-	dcctrl0.set_port_tag<2>("P1.A0");
-	dcctrl0.set_port_tag<3>("P1.A1");
-	dcctrl0.set_port_tag<4>("P1.A2");
-	dcctrl0.set_port_tag<5>("P1.A3");
-	dcctrl0.set_port_tag<6>("P1.A4");
-	dcctrl0.set_port_tag<7>("P1.A5");
+	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
 	// TODO: isn't it supposed to be just one controller?
 	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tag<0>("P2.0");
-	dcctrl1.set_port_tag<1>("P2.1");
-	dcctrl1.set_port_tag<2>("P2.A0");
-	dcctrl1.set_port_tag<3>("P2.A1");
-	dcctrl1.set_port_tag<4>("P2.A2");
-	dcctrl1.set_port_tag<5>("P2.A3");
-	dcctrl1.set_port_tag<6>("P2.A4");
-	dcctrl1.set_port_tag<7>("P2.A5");
+	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
 }
 
 void atomiswave_state::aw2c(machine_config &config)
 {
 	aw_base(config);
 	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tag<0>("P1.0");
-	dcctrl0.set_port_tag<1>("P1.1");
-	dcctrl0.set_port_tag<2>("P1.A0");
-	dcctrl0.set_port_tag<3>("P1.A1");
-	dcctrl0.set_port_tag<4>("P1.A2");
-	dcctrl0.set_port_tag<5>("P1.A3");
-	dcctrl0.set_port_tag<6>("P1.A4");
-	dcctrl0.set_port_tag<7>("P1.A5");
+	dcctrl0.set_port_tags("P1.0", "P1.1", "P1.A0", "P1.A1", "P1.A2", "P1.A3", "P1.A4", "P1.A5");
 	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tag<0>("P2.0");
-	dcctrl1.set_port_tag<1>("P2.1");
-	dcctrl1.set_port_tag<2>("P2.A0");
-	dcctrl1.set_port_tag<3>("P2.A1");
-	dcctrl1.set_port_tag<4>("P2.A2");
-	dcctrl1.set_port_tag<5>("P2.A3");
-	dcctrl1.set_port_tag<6>("P2.A4");
-	dcctrl1.set_port_tag<7>("P2.A5");
+	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

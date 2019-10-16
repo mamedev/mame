@@ -224,7 +224,7 @@ WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 
 void tp84_state::cpu2_map(address_map &map)
 {
-//  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
+//  map(0x0000, 0x0000).ram(); /* Watch dog ?*/
 	map(0x2000, 0x2000).r(FUNC(tp84_state::tp84_scanline_r)); /* beam position */
 	map(0x4000, 0x4000).w(FUNC(tp84_state::sub_irq_mask_w));
 	map(0x6000, 0x679f).ram();

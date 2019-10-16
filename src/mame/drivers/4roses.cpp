@@ -238,7 +238,7 @@ private:
 
 void _4roses_state::_4roses_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
+	map(0x0000, 0x07ff).ram(); // .share("nvram");
 	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
@@ -290,7 +290,7 @@ void _4roses_state::_4roses_opcodes_map(address_map &map)
 
 void rugby_state::rugby_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
+	map(0x0000, 0x07ff).ram(); // .share("nvram");
 	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));

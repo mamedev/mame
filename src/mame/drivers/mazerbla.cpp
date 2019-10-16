@@ -474,7 +474,7 @@ void mazerbla_state::mazerbla_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x4c, 0x4f).rw(FUNC(mazerbla_state::ls670_1_r), FUNC(mazerbla_state::ls670_0_w));
-	map(0x60, 0x60).w(FUNC(mazerbla_state::zpu_bcd_decoder_w)); // AM_READ from protection pal, if populated
+	map(0x60, 0x60).w(FUNC(mazerbla_state::zpu_bcd_decoder_w)); // r(FUNC(mazerbla_state::) from protection pal, if populated
 	map(0x62, 0x62).r(FUNC(mazerbla_state::zpu_inputs_r));
 	// 64 is some sort of output latch, unpopulated?
 	// 66 is some sort of output latch, unpopulated?

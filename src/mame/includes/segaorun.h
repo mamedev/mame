@@ -8,6 +8,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0804.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
@@ -31,6 +32,7 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_i8255(*this, "i8255"),
+		m_adc(*this, "adc"),
 		m_nvram(*this, "nvram"),
 		m_watchdog(*this, "watchdog"),
 		m_sprites(*this, "sprites"),
@@ -124,6 +126,7 @@ protected:
 	DECLARE_WRITE16_MEMBER( outrun_custom_io_w );
 	DECLARE_READ16_MEMBER( shangon_custom_io_r );
 	DECLARE_WRITE16_MEMBER( shangon_custom_io_w );
+	uint8_t analog_r();
 
 	// devices
 	required_device<sega_315_5195_mapper_device> m_mapper;
@@ -131,6 +134,7 @@ protected:
 	required_device<m68000_device> m_subcpu;
 	required_device<z80_device> m_soundcpu;
 	required_device<i8255_device> m_i8255;
+	required_device<adc0804_device> m_adc;
 	optional_device<nvram_device> m_nvram;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<sega_16bit_sprite_device> m_sprites;

@@ -117,7 +117,7 @@ TODO:
 - Some games: battery backed portion of RAM (e.g. downtown, kiwame, zombraid)
 - the zombraid crosshair hack can go if the nvram regions are figured out.
 - Some games: programmable timer that generates IRQ. See e.g. gundhara:
-  lev 4 is triggerd by writes at d00000-6 and drives the sound.
+  lev 4 is triggered by writes at d00000-6 and drives the sound.
   See also msgundam.
 
 - tndrcade: lots of flickering sprites
@@ -488,7 +488,7 @@ Lithium battery x1
                             Daioh
 
 DAIOH
-Alumer 1993, Sammy license
+Allumer 1993, Sammy license
 P0-092A
 
 
@@ -670,9 +670,9 @@ CONN1 = 8 pin header for gun connection
 
 68HC000N -16N
 
-2)   Alumer  X1-012
-2)   Alumer  X1-011
-2)   Alumer  X1-014
+2)   Allumer  X1-012
+2)   Allumer  X1-011
+2)   Allumer  X1-014
 
 X1-010
 X1-007
@@ -819,7 +819,7 @@ RST1  : Reset
 
 CN1   : 7-Pin header to drive lights underneath buttons to show what cards are available to play
 CN2   : 8-Pin header to drive lights underneath buttons to show what cards are available to play
-CN3   : 5-Pin header connected to aucilliary PCB to drive lights about the cabinet
+CN3   : 5-Pin header connected to auxiliary PCB to drive lights about the cabinet
 
 PAL   :FU-011 @ U50
        FU-012 @ U51
@@ -3987,10 +3987,10 @@ static INPUT_PORTS_START( blandia )
 
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(      0x0200, "1" )
-	PORT_DIPSETTING(      0x0300, "2" )
-	PORT_DIPSETTING(      0x0100, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
+	PORT_DIPSETTING(      0x0200, "1, 1 Round" ) // Test mode shows 1 in both blandia and blandiap 
+	PORT_DIPSETTING(      0x0300, "1, 2 Rounds" ) // Test mode shows 0 in blandia, 2 in blandiap (neither match actual behaviour)
+	PORT_DIPSETTING(      0x0100, "2" ) // Test mode shows 2 in blandia, 3 in blandiap (blandiap test mode is wrong)
+	PORT_DIPSETTING(      0x0000, "3" ) // Test mode shows 3 in blandia, 4 in blandiap (blandiap test mode is wrong)
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy )    )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal )  )

@@ -321,11 +321,11 @@ void coinmvga_state::coinmvga_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x0fffff).rom().region("maincpu", 0); //maybe not
 
-//  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
-//  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
+//  map(0x0a0000, 0x0fffff).ram();
+//  map(0x100000, 0x1fffff).ram(); //colorama
 	map(0x210000, 0x21ffff).ram().share("vram");
-//  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
-//  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
+//  map(0x40746e, 0x40746f).r(FUNC(coinmvga_state::test_r)).nopw(); //touch screen related, colorama
+//  map(0x403afa, 0x403afb).r(FUNC(coinmvga_state::test_r)).nopw(); //touch screen related, cmrltv75
 	map(0x400000, 0x40ffff).ram();
 
 	map(0x600000, 0x600000).w("ramdac", FUNC(ramdac_device::index_w));
@@ -347,20 +347,20 @@ void coinmvga_state::coinmvga_map(address_map &map)
 void coinmvga_state::coinmvga_io_map(address_map &map)
 {
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
-//  AM_RANGE(h8_device::PORT_4, h8_device::PORT_4)
-//  AM_RANGE(h8_device::PORT_5, h8_device::PORT_5)
-//  AM_RANGE(h8_device::PORT_6, h8_device::PORT_6)
-//  AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) <---- 0006 RW colorama
-//  AM_RANGE(h8_device::PORT_8, h8_device::PORT_8)
-//  AM_RANGE(h8_device::PORT_9, h8_device::PORT_9)
-//  AM_RANGE(h8_device::PORT_A, h8_device::PORT_A)
-//  AM_RANGE(h8_device::PORT_B, h8_device::PORT_B)
+//  map(h8_device::PORT_4, h8_device::PORT_4)
+//  map(h8_device::PORT_5, h8_device::PORT_5)
+//  map(h8_device::PORT_6, h8_device::PORT_6)
+//  map(h8_device::PORT_7, h8_device::PORT_7) <---- 0006 RW colorama
+//  map(h8_device::PORT_8, h8_device::PORT_8)
+//  map(h8_device::PORT_9, h8_device::PORT_9)
+//  map(h8_device::PORT_A, h8_device::PORT_A)
+//  map(h8_device::PORT_B, h8_device::PORT_B)
 
 /*  Analog Inputs */
-//  AM_RANGE(h8_device::ADC_0, h8_device::ADC_0)
-//  AM_RANGE(h8_device::ADC_1, h8_device::ADC_1)
-//  AM_RANGE(h8_device::ADC_2, h8_device::ADC_2)
-//  AM_RANGE(h8_device::ADC_3, h8_device::ADC_3)
+//  map(h8_device::ADC_0, h8_device::ADC_0)
+//  map(h8_device::ADC_1, h8_device::ADC_1)
+//  map(h8_device::ADC_2, h8_device::ADC_2)
+//  map(h8_device::ADC_3, h8_device::ADC_3)
 }
 
 /*  unknown writes (cmrltv75):

@@ -1018,7 +1018,7 @@ void m72_state::m84_v33_portmap(address_map &map)
 	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
 	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
 	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
-//  AM_RANGE(0x8c, 0x8f) AM_WRITENOP    /* ??? */
+//  map(0x8c, 0x8f).nopw();    /* ??? */
 }
 
 
@@ -1130,7 +1130,7 @@ void m72_state::rtype2_sound_portmap(address_map &map)
 	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
 	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
-//  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
+//  map(0x87, 0x87).nopw();    /* ??? */
 }
 
 void m72_state::poundfor_sound_portmap(address_map &map)
@@ -2787,8 +2787,8 @@ ROM_START( imgfightj )
 	ROM_LOAD16_BYTE( "if-c-l3.bin",  0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "imgfightj_i8751h.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) )
+	ROM_REGION( 0x10000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "if_c-pr-.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) ) /* i8751 MCU labeled  IF C-PR- */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  /* sprites */

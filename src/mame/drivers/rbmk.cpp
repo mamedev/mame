@@ -207,7 +207,7 @@ void rbmk_state::rbspm_mem(address_map &map)
 
 void rbmk_state::mcu_mem(address_map &map)
 {
-//  AM_RANGE(0x0000, 0x0fff) AM_ROM
+//  map(0x0000, 0x0fff).rom();
 }
 
 READ8_MEMBER(rbmk_state::mcu_io_r)

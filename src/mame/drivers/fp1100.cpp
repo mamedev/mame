@@ -227,7 +227,7 @@ void fp1100_state::main_map(address_map &map)
 void fp1100_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x0000, 0xfeff) slot memory area
+	//map(0x0000, 0xfeff) slot memory area
 	map(0xff00, 0xff7f).rw(FUNC(fp1100_state::slot_id_r), FUNC(fp1100_state::slot_bank_w));
 	map(0xff80, 0xffff).r(FUNC(fp1100_state::sub_to_main_r));
 	map(0xff80, 0xff9f).w(FUNC(fp1100_state::irq_mask_w));
@@ -290,7 +290,7 @@ void fp1100_state::sub_map(address_map &map)
 	map(0xe001, 0xe001).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe400, 0xe7ff).portr("DSW").w(FUNC(fp1100_state::kbd_row_w));
 	map(0xe800, 0xebff).rw(FUNC(fp1100_state::main_to_sub_r), FUNC(fp1100_state::sub_to_main_w));
-	//AM_RANGE(0xec00, 0xefff) "Acknowledge of INT0" is coded in but isn't currently executed
+	//map(0xec00, 0xefff) "Acknowledge of INT0" is coded in but isn't currently executed
 	map(0xf000, 0xf3ff).w(FUNC(fp1100_state::colour_control_w));
 	map(0xf400, 0xff7f).rom().region("sub_ipl", 0x2400);
 }

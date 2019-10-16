@@ -73,9 +73,9 @@ public:
 	template <typename T, typename U, typename V>
 	void set_clock_sources(T &&sub_clock, U &&rc_clock, V &&cf_clock)
 	{
-		set_cpu_clock(lc8670_cpu_device::clock_source::SUB, sub_clock);
-		set_cpu_clock(lc8670_cpu_device::clock_source::RC, rc_clock);
-		set_cpu_clock(lc8670_cpu_device::clock_source::CF, cf_clock);
+		set_cpu_clock(lc8670_cpu_device::clock_source::SUB, std::forward<T>(sub_clock));
+		set_cpu_clock(lc8670_cpu_device::clock_source::RC, std::forward<U>(rc_clock));
+		set_cpu_clock(lc8670_cpu_device::clock_source::CF, std::forward<V>(cf_clock));
 	}
 
 	auto bank_cb() { return m_bankswitch_func.bind(); }

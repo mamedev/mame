@@ -80,7 +80,7 @@ private:
 
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
-	AGA_MODE m_jim_mode;
+	isa8_aga_device::mode_t m_jim_mode;
 	int m_port61; // bit 0,1 must be 0 for startup; reset?
 	uint8_t m_rtc_data[0x10];
 	int m_rtc_reg;
@@ -187,16 +187,16 @@ WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 			switch (data)
 			{
 			case 0x1f:
-			case 0x0b: m_jim_mode = AGA_MONO; break;
+			case 0x0b: m_jim_mode = isa8_aga_device::AGA_MONO; break;
 			case 0xe: //80 columns?
 			case 0xd: //40 columns?
 			case 0x18:
-			case 0x1a: m_jim_mode = AGA_COLOR; break;
-			default: m_jim_mode = AGA_OFF; break;
+			case 0x1a: m_jim_mode = isa8_aga_device::AGA_COLOR; break;
+			default: m_jim_mode = isa8_aga_device::AGA_OFF; break;
 			}
 		}
-//      mode= data&0x10?AGA_COLOR:AGA_MONO;
-//      mode= data&0x10?AGA_COLOR:AGA_OFF;
+//      mode = (data & 0x10) ? isa8_aga_device::AGA_COLOR : isa8_aga_device::AGA_MONO;
+//      mode = (data & 0x10) ? isa8_aga_device::AGA_COLOR : isa8_aga_device::AGA_OFF;
 		if (data & 0x80) m_jim_state = 0;
 		break;
 	case 4:
@@ -237,9 +237,9 @@ READ8_MEMBER( europc_pc_state::europc_jim2_r )
 		m_jim_state = 0;
 		switch (m_jim_mode)
 		{
-		case AGA_COLOR: return 0x87; // for color;
-		case AGA_MONO: return 0x90; //for mono
-		case AGA_OFF: return 0x80; // for vram
+		case isa8_aga_device::AGA_COLOR: return 0x87; // for color;
+		case isa8_aga_device::AGA_MONO: return 0x90; //for mono
+		case isa8_aga_device::AGA_OFF: return 0x80; // for vram
 //      return 0x97; //for error
 		}
 	}

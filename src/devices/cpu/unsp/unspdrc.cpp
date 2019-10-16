@@ -990,7 +990,14 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 						// nop
 						break;
 
+					case 4: // should be 1.2 only but jak_care triggers, see notes in non-drc
+						break;
+
+					case 5: // ^^
+						break;
+
 					default:
+						logerror("unsp drc interrupt flags %02x\n", op & 0x3f);
 						return false;
 				}
 				return true;

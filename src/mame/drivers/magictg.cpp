@@ -882,7 +882,7 @@ void magictg_state::adsp_program_map(address_map &map)
 void magictg_state::adsp_data_map(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
+//  map(0x0000, 0x03ff).bankrw("databank");
 	map(0x0400, 0x3fdf).ram();
 	map(0x3fe0, 0x3fff).rw(FUNC(magictg_state::adsp_control_r), FUNC(magictg_state::adsp_control_w));
 }

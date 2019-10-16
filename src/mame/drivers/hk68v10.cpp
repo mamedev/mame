@@ -235,8 +235,8 @@ void hk68v10_state::hk68v10_mem(address_map &map)
 	map(0xfea002, 0xfea002).rw(m_sccterm, FUNC(scc8530_device::cb_r), FUNC(scc8530_device::cb_w)); /* Dual serial port Z80-SCC */
 	map(0xfea004, 0xfea004).rw(m_sccterm, FUNC(scc8530_device::da_r), FUNC(scc8530_device::da_w)); /* Dual serial port Z80-SCC */
 	map(0xfea006, 0xfea006).rw(m_sccterm, FUNC(scc8530_device::db_r), FUNC(scc8530_device::db_w)); /* Dual serial port Z80-SCC */
-	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+	//map(0x100000, 0xfeffff).rw(FUNC(hk68v10_state::vme_a24_r), FUNC(hk68v10_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+	//map(0xff0000, 0xffffff).rw(FUNC(hk68v10_state::vme_a16_r), FUNC(hk68v10_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 /* Input ports */

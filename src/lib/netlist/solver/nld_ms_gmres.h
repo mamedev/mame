@@ -48,9 +48,11 @@ namespace devices
 
 	private:
 
-		using mattype = typename plib::matrix_compressed_rows_t<FT, SIZE>::index_type;
+		using mattype = typename plib::pmatrix_cr_t<FT, SIZE>::index_type;
 
+		//plib::mat_precondition_none<FT, SIZE> m_ops;
 		plib::mat_precondition_ILU<FT, SIZE> m_ops;
+		//plib::mat_precondition_diag<FT, SIZE> m_ops;
 		plib::gmres_t<FT, SIZE> m_gmres;
 	};
 
@@ -78,6 +80,7 @@ namespace devices
 		}
 
 		m_ops.build(fill);
+		this->log_fill(fill, m_ops.m_mat);
 
 		/* build pointers into the compressed row format matrix for each terminal */
 
@@ -113,7 +116,7 @@ namespace devices
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			this->m_new_V[k] = this->m_nets[k]->Q_Analog();
+			this->m_new_V[k] = this->m_terms[k]->getV();
 		}
 
 		const float_type accuracy = this->m_params.m_accuracy;

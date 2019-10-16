@@ -2033,7 +2033,7 @@ void goldnpkr_state::wildcard_map(address_map &map)
 
 void goldnpkr_state::wcrdxtnd_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); //AM_SHARE("nvram") /* battery backed RAM */
+	map(0x0000, 0x07ff).ram(); //.share("nvram"); /* battery backed RAM */
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -2069,7 +2069,7 @@ void goldnpkr_state::wildcrdb_map(address_map &map)
 
 void goldnpkr_state::wildcrdb_mcu_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+//  map.global_mask(0x3fff);
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x2fff).ram();
 }
@@ -4914,7 +4914,7 @@ WRITE8_MEMBER(blitz_state::mcu_portc_w)
 
 void blitz_state::megadpkr_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); //AM_SHARE("nvram")   /* battery backed RAM */
+	map(0x0000, 0x07ff).ram(); //.share("nvram");   /* battery backed RAM */
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));

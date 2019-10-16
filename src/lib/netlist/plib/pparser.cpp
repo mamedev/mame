@@ -120,7 +120,7 @@ double ptokenizer::get_number_double()
 	{
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	}
-	bool err;
+	bool err(false);
 	auto ret = plib::pstonum_ne<double, true>(tok.str(), err);
 	if (err)
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
@@ -134,7 +134,7 @@ long ptokenizer::get_number_long()
 	{
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	}
-	bool err;
+	bool err(false);
 	auto ret = plib::pstonum_ne<long, true>(tok.str(), err);
 	if (err)
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
@@ -465,7 +465,7 @@ pstring ppreprocessor::process_line(pstring line)
 
 	line = process_comments(m_line);
 
-	pstring lt = plib::trim(plib::replace_all(line, pstring("\t"), pstring(" ")));
+	pstring lt = plib::trim(plib::replace_all(line, "\t", " "));
 	pstring ret;
 	// FIXME ... revise and extend macro handling
 	if (plib::startsWith(lt, "#"))
@@ -476,7 +476,7 @@ pstring ppreprocessor::process_line(pstring line)
 			m_level++;
 			std::size_t start = 0;
 			lt = replace_macros(lt);
-			std::vector<pstring> t(psplit(replace_all(lt.substr(3), pstring(" "), pstring("")), m_expr_sep));
+			std::vector<pstring> t(psplit(replace_all(lt.substr(3), " ", ""), m_expr_sep));
 			auto val = static_cast<int>(expr(t, start, 255));
 			if (val == 0)
 				m_ifflag |= (1 << m_level);

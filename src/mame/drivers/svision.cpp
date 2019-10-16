@@ -558,7 +558,7 @@ void svision_state::tvlinkp(machine_config &config)
 	svisionp(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::tvlink_mem, tag(), this));
 
-	m_screen->set_palette(finder_base::DUMMY_TAG);
+	m_screen->set_no_palette();
 	m_screen->set_screen_update(FUNC(svision_state::screen_update_tvlink));
 
 	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink)

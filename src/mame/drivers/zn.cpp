@@ -1686,7 +1686,7 @@ void zn_state::psarc_snd_map(address_map &map)
 
 void zn_state::beastrzrb_snd_map(address_map &map)
 { // Internal ROM Not dumped
-//  AM_RANGE(0x0000, 0x0fff) AM_ROM
+//  map(0x0000, 0x0fff).rom();
 }
 
 void zn_state::oki_map(address_map &map)

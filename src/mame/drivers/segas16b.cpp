@@ -1354,27 +1354,6 @@ void segas16b_state::altbeasj_i8751_sim()
 }
 
 
-
-//-------------------------------------------------
-//  ddux_i8751_sim - simulate the I8751
-//  from Dynamite Dux
-//-------------------------------------------------
-
-void segas16b_state::ddux_i8751_sim()
-{
-	// signal a VBLANK to the main CPU
-	m_maincpu->set_input_line(4, HOLD_LINE);
-
-	// process any new sound data
-	uint16_t temp = m_workram[0x0bd0/2];
-	if ((temp & 0xff00) != 0x0000)
-	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		m_mapper->write(space, 0x03, temp >> 8);
-		m_workram[0x0bd0/2] = temp & 0x00ff;
-	}
-}
-
 //-------------------------------------------------
 //  tturf_i8751_sim - simulate the I8751
 //  from Tough Turf
@@ -3998,7 +3977,7 @@ void segas16b_state::aceattacb_fd1094(machine_config &config)
 	UPD4701A(config, m_upd4701a[0]);
 	UPD4701A(config, m_upd4701a[1]);
 
-	CXD1095(config, m_cxdio, 0);
+	CXD1095(config, m_cxdio);
 	m_cxdio->in_porta_cb().set_ioport("HANDX1");
 	m_cxdio->in_portb_cb().set_ioport("HANDX2");
 }
@@ -5230,6 +5209,7 @@ ROM_END
 //  Aurail, Sega System 16B
 //  CPU: FD1089A (317-0167)
 //  ROM Board type: 171-5704
+//  Sega ID# for ROM board: 834-7702
 //
 //  S1  - -
 //  S2  ---
@@ -5395,6 +5375,7 @@ ROM_END
 //  Bay Route, Sega System 16B
 //  CPU: FD1094 (317-0115)
 //  ROM Board type: 171-5704
+//  Sega ID# for ROM board: 834-7014-03
 //
 ROM_START( bayroutej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5740,7 +5721,8 @@ ROM_END
 //  Cotton (Japan), Sega System 16B
 //  CPU: FD1094 (317-0179B)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-8022-04
+//  Sega game ID: 833-8021-04 COTTON
+//     ROM board: 834-8022-04
 //
 ROM_START( cottonj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5825,7 +5807,8 @@ ROM_END
 //  Cotton (Japan), Sega System 16B
 //  CPU: FD1094 (317-0179A)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-8022-04
+//  Sega game ID: 833-8021-04 COTTON
+//     ROM board: 834-8022-04
 //
 
 ROM_START( cottonja )
@@ -6199,7 +6182,7 @@ ROM_START( ddux1 )
 	ROM_LOAD( "epr-11916.a10", 0x0000, 0x8000, CRC(7ab541cf) SHA1(feb88022ca1796d020e53e95ad345159bd415530) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "317-0095.c2", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "317-0095.c2", 0x00000, 0x1000, CRC(b06b4ca7) SHA1(563807dd8194179e25a2186f3572fb3738537c33) )
 ROM_END
 
 
@@ -9388,12 +9371,6 @@ void segas16b_state::init_altbeas4_5521()
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-void segas16b_state::init_ddux_5704()
-{
-	init_generic_5704();
-	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::ddux_i8751_sim, this);
-}
-
 void segas16b_state::init_dunkshot_5358_small()
 {
 	init_generic_5358_small();
@@ -9547,7 +9524,7 @@ GAME( 1991, cottonja,   cotton,   system16b_fd1094,      cotton,   segas16b_stat
 
 GAME( 1988, ddux,       0,        system16b_fd1094,      ddux,     segas16b_state, init_generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 3, World) (FD1094 317-0096)", 0 )
 GAME( 1988, dduxj,      ddux,     system16b_fd1094,      ddux,     segas16b_state, init_generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, Japan) (FD1094 317-0094)", 0 )
-GAME( 1988, ddux1,      ddux,     system16b_i8751,       ddux,     segas16b_state, init_ddux_5704,          ROT0,   "Sega", "Dynamite Dux (set 1) (8751 317-0095)", 0 )
+GAME( 1988, ddux1,      ddux,     system16b_i8751,       ddux,     segas16b_state, init_generic_5704,       ROT0,   "Sega", "Dynamite Dux (set 1) (8751 317-0095)", 0 )
 
 GAME( 1987, dunkshot,   0,        system16b_fd1089a,     dunkshot,  segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev C, FD1089A 317-0022)", 0 )
 GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,     dunkshot,  segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )

@@ -440,7 +440,7 @@ void maygay1b_state::m1_memmap(address_map &map)
 #else
 	//8051
 	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
-//  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+//  map(0x2050, 0x2050)// SCAN on M1B
 #endif
 
 	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
@@ -526,7 +526,7 @@ void maygay1b_state::m1_nec_memmap(address_map &map)
 #else
 	//8051
 	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
-//  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+//  map(0x2050, 0x2050)// SCAN on M1B
 #endif
 
 	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
@@ -856,7 +856,7 @@ void maygay1b_state::init_m1()
 {
 	init_m1common();
 
-	//AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
+	//map(0x2420, 0x2421).w(FUNC(maygay1b_state::latch_ch2_w)); // oki
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 
 	if (m_oki_region == nullptr) {

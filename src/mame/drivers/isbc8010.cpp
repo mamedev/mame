@@ -107,8 +107,8 @@ void isbc8010_state::isbc8010_io(address_map &map)
 	map(0xe4, 0xe7).rw(m_ppi_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe8, 0xeb).rw(m_ppi_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xec, 0xed).mirror(0x02).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	//AM_RANGE(0xf0, 0xf7) MCS0 - iSBX Multimodule
-	//AM_RANGE(0xf8, 0xff) MCS1 - iSBX Multimodule
+	//map(0xf0, 0xf7) MCS0 - iSBX Multimodule
+	//map(0xf8, 0xff) MCS1 - iSBX Multimodule
 }
 
 static INPUT_PORTS_START( isbc8010 )

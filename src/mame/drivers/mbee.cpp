@@ -330,15 +330,15 @@ void mbee_state::mbee256_io(address_map &map)
 	map(0x000b, 0x000b).mirror(0xff00).w(FUNC(mbee_state::port0b_w));
 	map(0x000c, 0x000c).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(mbee_state::m6545_index_w));
 	map(0x000d, 0x000d).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(mbee_state::m6545_data_w));
-	// AM_RANGE(0x0010, 0x0013) AM_MIRROR(0xff00) Optional SN76489AN audio chip
+	// map(0x0010, 0x0013).mirror(0xff00); Optional SN76489AN audio chip
 	map(0x0018, 0x001b).mirror(0xff00).r(FUNC(mbee_state::port18_r));
 	map(0x001c, 0x001f).mirror(0xff00).rw(FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
 	map(0x0044, 0x0047).mirror(0xff00).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x0048, 0x004f).mirror(0xff00).rw(FUNC(mbee_state::fdc_status_r), FUNC(mbee_state::fdc_motor_w));
 	map(0x0050, 0x0057).mirror(0xff00).w(FUNC(mbee_state::mbee256_50_w));
-	// AM_RANGE(0x0058, 0x005f) AM_MIRROR(0xff00) External options: floppy drive, hard drive and keyboard
-	// AM_RANGE(0x0060, 0x0067) AM_MIRROR(0xff00) Reserved for file server selection (unused)
-	// AM_RANGE(0x0068, 0x006f) AM_MIRROR(0xff00) Reserved for 8530 SCC (unused)
+	// map(0x0058, 0x005f).mirror(0xff00); External options: floppy drive, hard drive and keyboard
+	// map(0x0060, 0x0067).mirror(0xff00); Reserved for file server selection (unused)
+	// map(0x0068, 0x006f).mirror(0xff00); Reserved for 8530 SCC (unused)
 }
 
 static INPUT_PORTS_START( oldkb )

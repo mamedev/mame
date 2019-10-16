@@ -1539,14 +1539,10 @@ void c64_state::ntsc(machine_config &config)
 	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
-	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass");
-	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop");
-	subdevice<software_list_device>("cart_list_vic10")->set_filter("NTSC");
-	subdevice<software_list_device>("cart_list_c64")->set_filter("NTSC");
-	subdevice<software_list_device>("cass_list")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop").set_filter("NTSC");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1715,14 +1711,10 @@ void c64_state::pal(machine_config &config)
 	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
-	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass");
-	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop");
-	subdevice<software_list_device>("cart_list_vic10")->set_filter("PAL");
-	subdevice<software_list_device>("cart_list_c64")->set_filter("PAL");
-	subdevice<software_list_device>("cass_list")->set_filter("PAL");
-	subdevice<software_list_device>("flop_list")->set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("PAL");
+	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("PAL");
+	SOFTWARE_LIST(config, "flop_list").set_original("c64_flop").set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1865,10 +1857,8 @@ void c64gs_state::pal_gs(machine_config &config)
 	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
-	subdevice<software_list_device>("cart_list_vic10")->set_filter("PAL");
-	subdevice<software_list_device>("cart_list_c64")->set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

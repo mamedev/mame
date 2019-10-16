@@ -415,9 +415,9 @@ void sengokmj_state::sengokmj_io_map(address_map &map)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	map(0x8000, 0x804f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 
-//  AM_RANGE(0x8080, 0x8081) CRTC extra register?
-//  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?
-//  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
+//  map(0x8080, 0x8081) CRTC extra register?
+//  map(0x80c0, 0x80c1) CRTC extra register?
+//  map(0x8100, 0x8101).nopw(); // always 0
 	map(0x8180, 0x8181).w(FUNC(sengokmj_state::out_w));
 	map(0x8140, 0x8141).w(FUNC(sengokmj_state::mahjong_panel_w));
 	map(0xc000, 0xc001).portr("DSW");

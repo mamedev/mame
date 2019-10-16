@@ -186,8 +186,8 @@ void pv2000_state::pv2000_map(address_map &map)
 	map(0x4000, 0x4001).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 
 	map(0x7000, 0x7fff).ram();
-	//AM_RANGE(0x8000, 0xbfff) ext ram?
-	//AM_RANGE(0xc000, 0xffff)      // mapped by the cartslot
+	//map(0x8000, 0xbfff) ext ram?
+	//map(0xc000, 0xffff)      // mapped by the cartslot
 }
 
 

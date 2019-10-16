@@ -99,7 +99,7 @@ void gokidetor_state::main_map(address_map &map)
 	// d101 = ?output
 	// d1c0 = ?output
 	map(0xd800, 0xd80f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write));
-	//AM_RANGE(0xda00, 0xda01) AM_DEVWRITE("pwm", m66240_device, write)
+	//map(0xda00, 0xda01).w("pwm", FUNC(m66240_device::write));
 	// de00 ?input
 	// df00 ?input
 	map(0xe000, 0xe003).nopr(); // ?input

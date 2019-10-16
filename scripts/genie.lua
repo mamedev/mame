@@ -769,22 +769,18 @@ end
 local version = str_to_version(_OPTIONS["gcc_version"])
 if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["targetos"]=="macosx" and (version <= 60000))) then
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++1y",
 	}
 
 	buildoptions_objcpp {
-		"-x objective-c++",
 		"-std=c++1y",
 	}
 else
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 	}
 
 	buildoptions_objcpp {
-		"-x objective-c++",
 		"-std=c++14",
 	}
 end
@@ -914,6 +910,7 @@ end
 configuration { "mingw-clang" }
 	buildoptions {
 		"-Xclang -flto-visibility-public-std", -- workround for __imp___ link errors
+		"-Wno-nonportable-include-path", -- workround for clang 9.0.0 case sensitivity bug when including GL/glext.h
 	}
 configuration {  }
 
@@ -1178,7 +1175,6 @@ configuration { "asmjs" }
 		"-s USE_SDL_TTF=2",
 	}
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 	}
 	linkoptions {
@@ -1194,7 +1190,6 @@ configuration { "android*" }
 		"-Wno-incompatible-ms-struct",
 	}
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 		"-Wno-extern-c-compat",
 		"-Wno-tautological-constant-out-of-range-compare",
@@ -1213,7 +1208,6 @@ configuration { "pnacl" }
 		"-Wno-inline-new-delete",
 	}
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 	}
 	archivesplit_size "20"

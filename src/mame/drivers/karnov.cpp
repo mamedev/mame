@@ -29,9 +29,6 @@
     roms work fine.
     ^^ This should be added (DH, 30/03/11)
 
-    One of the two color PROMs for chelnov and chelnoj is different; one is most
-    likely a bad read, but I don't know which one.
-
     Thanks to Oliver Stabel <stabel@rhein-neckar.netsurf.de> for confirming some
     of the sprite & control information :)
 
@@ -919,7 +916,7 @@ ROM_START( karnov )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "dn05-5.f3", 0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "karnov_i8751.k13", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -958,7 +955,7 @@ ROM_START( karnova )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "dn05-5.f3", 0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "karnov_i8751.k13", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -997,7 +994,7 @@ ROM_START( karnovj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "kar5.f3", 0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "karnovj_i8751.k13", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1038,7 +1035,7 @@ ROM_START( karnovjbl )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "7.bin",         0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* NEC D8748HD MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* NEC D8748HD MCU */
 	ROM_LOAD( "mcu.bin", 0x0000, 0x1000, NO_DUMP ) // labeled 19 on PCB (yes, they labeled two chips as 19)
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1081,7 +1078,7 @@ ROM_START( wndrplnt )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound CPU */
 	ROM_LOAD( "ea05.f3",     0x8000, 0x8000, CRC(8dbb6231) SHA1(342faa020448ce916e820b3df18d44191983f7a6) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "wndrplnt_i8751.k13", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1120,7 +1117,7 @@ ROM_START( chelnov )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "ee-e.14k", 0x0000, 0x1000, CRC(b7045395) SHA1(a873de0978cbd169b481ee4c4512e47e7745df77) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
@@ -1155,8 +1152,8 @@ ROM_START( chelnovu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // created from the world version, id byte patched, sprite table adjusted, internal checksum hacked
-	ROM_LOAD( "ee-a.14k", 0x0000, 0x1000, BAD_DUMP CRC(15fc8b96) SHA1(44d60fc915cf10ca08a635c3c5fc17439977f498) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "ee-a.14k", 0x0000, 0x1000, CRC(95ea1e7b) SHA1(6d9e3107a2b90734c826c6915c1a3443a7eddfdb) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ee00-e.c5",    0x00000, 0x08000, CRC(e06e5c6b) SHA1(70166257da5be428cb8404d8e1063c59c7722365) )  /* Characters */
@@ -1190,7 +1187,7 @@ ROM_START( chelnovj ) /* at least 1 PCB found with all labels as 'EPR-EExx' like
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound CPU */
 	ROM_LOAD( "ee05.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "ee.14k", 0x0000, 0x1000, CRC(b3dc380c) SHA1(81cc4ded918da9f232481f4e67cf71de814efc48) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )

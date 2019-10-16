@@ -56,7 +56,9 @@ ROM_END
 
 void bml3bus_mp1802_device::device_add_mconfig(machine_config &config)
 {
-	MB8866(config, m_fdc, 1_MHz_XTAL);
+	constexpr auto CLK16M = 32.256_MHz_XTAL / 2;
+
+	MB8866(config, m_fdc, CLK16M / 16); // 16MCLK divided by IC628 (HD74LS93P)
 	m_fdc->intrq_wr_callback().set(FUNC(bml3bus_mp1802_device::bml3_wd17xx_intrq_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy0, mp1802_floppies, "dd", floppy_image_device::default_floppy_formats);

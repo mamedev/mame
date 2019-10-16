@@ -262,6 +262,9 @@ namespace plib {
 		using allocator_type = arena_allocator<aligned_arena, T, ALIGN>;
 
 		template <typename T>
+		using unique_pool_ptr = std::unique_ptr<T, arena_deleter<aligned_arena, T>>;
+
+		template <typename T>
 		using owned_pool_ptr = plib::owned_ptr<T, arena_deleter<aligned_arena, T>>;
 
 		static inline aligned_arena &instance()
@@ -300,16 +303,24 @@ namespace plib {
 			#endif
 		}
 
-#if 0
 		template<typename T, typename... Args>
-		owned_pool_ptr<T> make_poolptr(Args&&... args)
+		unique_pool_ptr<T> make_unique(Args&&... args)
 		{
 			auto *mem = allocate(alignof(T), sizeof(T));
-			return owned_pool_ptr<T>(new (mem) T(std::forward<Args>(args)...), true, arena_deleter<aligned_arena, T>(*this));
+			try
+			{
+				auto *mema = new (mem) T(std::forward<Args>(args)...);
+				return unique_pool_ptr<T>(mema, arena_deleter<aligned_arena, T>(*this));
+			}
+			catch (...)
+			{
+				deallocate(mem);
+				throw;
+			}
 		}
-#endif
+
 		template<typename T, typename... Args>
-		owned_pool_ptr<T> make_poolptr(Args&&... args)
+		owned_pool_ptr<T> make_owned(Args&&... args)
 		{
 			auto *mem = allocate(alignof(T), sizeof(T));
 			try
@@ -322,6 +333,12 @@ namespace plib {
 				deallocate(mem);
 				throw;
 			}
+		}
+
+		bool operator ==(const aligned_arena &rhs) const
+		{
+			plib::unused_var(rhs);
+			return true;
 		}
 
 	};

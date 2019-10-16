@@ -7024,7 +7024,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sakura Taisen - Teigeki Graph (Japan) (Disc 1)... -->
 	<!-- Identifying Sakura Taisen - Teigeki Graph (Japan) (Disc 2)... -->
-	<software name="teigekig"  supported="no">
+	<software name="teigekig" supported="no">
 		<description>Sakura Taisen - Teigeki Graph (Jpn)</description>
 		<year>1998</year>
 		<publisher>SIMS</publisher>
@@ -15351,7 +15351,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Bishoujo Senshi Sailormoon SuperS ~Various Emotion~ (T-15701G)... -->
-	<software name="sailorss"  supported="no">
+	<software name="sailorss" supported="no">
 		<description>Bishoujo Senshi Sailormoon Super S - Various Emotion (Jpn)</description>
 		<year>1996</year>
 		<publisher>Angel</publisher>
@@ -17485,7 +17485,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Game Ware Volume 5 Disc 1 (T-17006G)... -->
 	<!-- Identifying Game Ware Volume 5 Disc 2 (T-17006G)... -->
-	<software name="gware5a" cloneof="gware5"  supported="no">
+	<software name="gware5a" cloneof="gware5" supported="no">
 		<description>Game-Ware 5 (Jpn, Alt)</description>
 		<year>1997</year>
 		<publisher>General Entertainment</publisher>
@@ -20355,7 +20355,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sonic Jam (Satakore) (GS-9200)... -->
-	<software name="sonicjamjsa" cloneof="sonicjam"  supported="no">
+	<software name="sonicjamjsa" cloneof="sonicjam" supported="no">
 		<description>Sonic Jam (Jpn, Satakore)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
@@ -20658,7 +20658,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Taiheiyou no Arashi 2 (T-15018G)... -->
 	<!-- Identifying Taiheiyou no Arashi 2 Disc 1 (J) (T-15024G)... -->
 	<!-- Identifying Taiheiyou no Arashi 2 Disc 2 (J) (T-15024G)... -->
-	<software name="taiheiy2"  supported="no">
+	<software name="taiheiy2" supported="no">
 		<description>Taiheiyou no Arashi 2 - Shippuu no Moudou (Jpn)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
@@ -23416,7 +23416,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Idol Maajan Final Romance 4 (T-3003G)... -->
-	<software name="fromanc4"  supported="no">
+	<software name="fromanc4" supported="no">
 		<description>Idol Mahjong Final Romance 4 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Video System</publisher>
@@ -29206,7 +29206,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<year>1996</year>
 		<publisher>Hitachi</publisher>
 		<info name="serial" value="T-17811G"/>
-		<info name="alt_title" value=" ピクト　フラッシュ　どんどん"/>
+		<info name="alt_title" value="ピクト　フラッシュ　どんどん"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -38137,7 +38137,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying dw-sat-0764-Wing_Arms-usa... -->
-	<software name="wingarmsu" cloneof="wingarms"  supported="no">
+	<software name="wingarmsu" cloneof="wingarms" supported="no">
 		<description>Wing Arms (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>

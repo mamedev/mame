@@ -14,11 +14,12 @@
 #include <string>
 #include <type_traits>
 
+// noexcept on move operator -> issue with macosx clang
 #define COPYASSIGNMOVE(name, def)  \
 		name(const name &) = def; \
-		name(name &&) noexcept = def; \
+		name(name &&) /*noexcept*/ = def; \
 		name &operator=(const name &) = def; \
-		name &operator=(name &&) noexcept = def;
+		name &operator=(name &&) /*noexcept*/ = def;
 
 #define COPYASSIGN(name, def)  \
 		name(const name &) = def; \

@@ -108,7 +108,7 @@ void finalizr_state::main_map(address_map &map)
 	map(0x0001, 0x0001).writeonly().share("scroll");
 	map(0x0003, 0x0003).w(FUNC(finalizr_state::finalizr_videoctrl_w));
 	map(0x0004, 0x0004).w(FUNC(finalizr_state::finalizr_flipscreen_w));
-//  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_SHARE("scroll")
+//  map(0x0020, 0x003f).writeonly().share("scroll");
 	map(0x0800, 0x0800).portr("DSW3");
 	map(0x0808, 0x0808).portr("DSW2");
 	map(0x0810, 0x0810).portr("SYSTEM");
@@ -274,6 +274,7 @@ void finalizr_state::finalizr(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &finalizr_state::sound_io_map);
 	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_audiocpu->p2_out_cb().set(FUNC(finalizr_state::i8039_irqen_w));
+	//m_audiocpu->set_t0_clk_cb(finalizr_state::i8039_t0_w));
 	m_audiocpu->t1_in_cb().set(FUNC(finalizr_state::i8039_t1_r));
 
 	WATCHDOG_TIMER(config, "watchdog");

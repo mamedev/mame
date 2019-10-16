@@ -827,7 +827,7 @@ void royalmah_state::mjderngr_iomap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
-//  AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1")
+//  map(0x10, 0x10).portr("DSW1");
 	map(0x10, 0x10).w(FUNC(royalmah_state::mjderngr_coin_w));   // palette bank is set separately
 	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x20, 0x20).w(FUNC(royalmah_state::dynax_bank_w));
@@ -1122,7 +1122,7 @@ void royalmah_state::mjifb_map(address_map &map)
 	map(0x7000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0xbfff).rw(FUNC(royalmah_state::mjifb_rom_io_r), FUNC(royalmah_state::mjifb_rom_io_w)).share("videoram");
 	map(0xc000, 0xffff).rom().w(FUNC(royalmah_state::mjifb_videoram_w));
-//  AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITEONLY  This should, but doesn't work
+//  map(0xc000, 0xffff).rom().writeonly();  This should, but doesn't work
 }
 
 READ8_MEMBER(royalmah_state::mjifb_p3_r)

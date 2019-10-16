@@ -109,12 +109,12 @@ DEFINE_DEVICE_TYPE(SEGA_SCU, sega_scu_device, "sega_scu", "Sega System Control U
 //  LIVE DEVICE
 //**************************************************************************
 
-//AM_RANGE(0x0000, 0x0003) src
-//AM_RANGE(0x0004, 0x0007) dst
-//AM_RANGE(0x0008, 0x000b) size
-//AM_RANGE(0x000c, 0x000f) src/dst add values
-//AM_RANGE(0x0010, 0x0013) DMA enable
-//AM_RANGE(0x0014, 0x0017) DMA start factor
+//map(0x0000, 0x0003) src
+//map(0x0004, 0x0007) dst
+//map(0x0008, 0x000b) size
+//map(0x000c, 0x000f) src/dst add values
+//map(0x0010, 0x0013) DMA enable
+//map(0x0014, 0x0017) DMA start factor
 
 void sega_scu_device::regs_map(address_map &map)
 {
@@ -123,7 +123,7 @@ void sega_scu_device::regs_map(address_map &map)
 	map(0x0040, 0x0057).rw(FUNC(sega_scu_device::dma_lv2_r), FUNC(sega_scu_device::dma_lv2_w));
 	// Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
 	map(0x005c, 0x005f).r(FUNC(sega_scu_device::dma_status_r));
-//  AM_RANGE(0x0060, 0x0063) AM_WRITE(dma_force_stop_w)
+//  map(0x0060, 0x0063).w(FUNC(sega_scu_device::dma_force_stop_w));
 	map(0x007c, 0x007f).r(FUNC(sega_scu_device::dma_status_r));
 	map(0x0080, 0x0083).rw(m_scudsp, FUNC(scudsp_cpu_device::program_control_r), FUNC(scudsp_cpu_device::program_control_w));
 	map(0x0084, 0x0087).w(m_scudsp, FUNC(scudsp_cpu_device::program_w));
@@ -134,10 +134,10 @@ void sega_scu_device::regs_map(address_map &map)
 	map(0x009a, 0x009b).w(FUNC(sega_scu_device::t1_mode_w));
 	map(0x00a0, 0x00a3).rw(FUNC(sega_scu_device::irq_mask_r), FUNC(sega_scu_device::irq_mask_w));
 	map(0x00a4, 0x00a7).rw(FUNC(sega_scu_device::irq_status_r), FUNC(sega_scu_device::irq_status_w));
-//  AM_RANGE(0x00a8, 0x00ab) AM_WRITE(abus_irqack_w)
-//  AM_RANGE(0x00b0, 0x00b7) AM_READWRITE(abus_set_r,abus_set_w)
-//  AM_RANGE(0x00b8, 0x00bb) AM_READWRITE(abus_refresh_r,abus_refresh_w)
-//  AM_RANGE(0x00c4, 0x00c7) AM_READWRITE(sdram_r,sdram_w)
+//  map(0x00a8, 0x00ab).w(FUNC(sega_scu_device::abus_irqack_w));
+//  map(0x00b0, 0x00b7).rw(FUNC(sega_scu_device::abus_set_r), FUNC(sega_scu_device::abus_set_w));
+//  map(0x00b8, 0x00bb).rw(FUNC(sega_scu_device::abus_refresh_r), FUNC(sega_scu_device::abus_refresh_w));
+//  map(0x00c4, 0x00c7).rw(FUNC(sega_scu_device::sdram_r), FUNC(sega_scu_device::sdram_w));
 	map(0x00c8, 0x00cb).r(FUNC(sega_scu_device::version_r));
 }
 

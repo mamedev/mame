@@ -458,7 +458,7 @@ void joystand_state::joystand_map(address_map &map)
 	map(0x200010, 0x200011).portr("IN0"); // r/w
 	map(0x200012, 0x200013).ram().w(FUNC(joystand_state::outputs_w)).share("outputs"); // r/w
 	map(0x200014, 0x200015).rw(FUNC(joystand_state::fpga_r), FUNC(joystand_state::oki_bank_w)); // r/w
-//  AM_RANGE(0x200016, 0x200017) // write $9190 at boot
+//  map(0x200016, 0x200017) // write $9190 at boot
 
 	map(0x400000, 0x47ffff).ram().w(FUNC(joystand_state::bg15_0_w)).share("bg15_0_ram"); // r5g5b5 200x200 pixel-based
 	map(0x480000, 0x4fffff).ram(); // more rgb layers? (writes at offset 0)
@@ -473,7 +473,7 @@ void joystand_state::joystand_map(address_map &map)
 	map(0x60c00c, 0x60c00d).ram().share("enable"); // write
 
 	map(0x800000, 0xdfffff).rw(FUNC(joystand_state::cart_r), FUNC(joystand_state::cart_w)); // r/w (cart flash)
-//  AM_RANGE(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
+//  map(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
 	map(0xe00000, 0xe00001).r(FUNC(joystand_state::e00000_r)); // copy slot
 	map(0xe00020, 0xe00021).r(FUNC(joystand_state::e00020_r)); // master slot
 

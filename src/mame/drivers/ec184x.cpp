@@ -229,7 +229,7 @@ void ec184x_state::ec1847_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-//  AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender
+//  map(0x0210, 0x021f).ram(); // internal (non-standard?) bus extender
 }
 
 

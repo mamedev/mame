@@ -175,6 +175,7 @@ public:
 	using defines_map_type = std::unordered_map<pstring, define_t>;
 
 	explicit ppreprocessor(defines_map_type *defines = nullptr);
+
 	~ppreprocessor() override
 	{
 		delete rdbuf();

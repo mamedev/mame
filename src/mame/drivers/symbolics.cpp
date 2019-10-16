@@ -251,18 +251,18 @@ currently dies at context switch code loaded to ram around 38EE0, see patent 488
 void symbolics_state::m68k_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x000000, 0x01ffff) AM_ROM /* ROM lives here */
+	//map(0x000000, 0x01ffff).rom(); /* ROM lives here */
 	map(0x000000, 0x00bfff).rom();
 	// 0x00c000-0x00ffff is open bus but decoded/auto-DTACKed, does not cause bus error
 	map(0x010000, 0x01bfff).rom();
 	// 0x01c000-0x01ffff is open bus but decoded/auto-DTACKed, does not cause bus error
 	map(0x020000, 0x03ffff).ram().region("fepdram", 0); /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
-	//AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(ram_parity_hack_r, ram_parity_hack_w)
-	//AM_RANGE(0x020002, 0x03ffff) AM_RAM AM_REGION("fepdram", 0) /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
+	//map(0x020000, 0x03ffff).rw(FUNC(symbolics_state::ram_parity_hack_r), FUNC(symbolics_state::ram_parity_hack_w));
+	//map(0x020002, 0x03ffff).ram().region("fepdram", 0); /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
 	// 2x AM9128-10PC 2048x8 SRAMs @F7 and @G7 map somewhere
 	// 6x AM2148-50 1024x4bit SRAMs @F22-F27 map somewhere
-	//AM_RANGE(0x040000, 0xffffff) AM_READ(buserror_r);
-	//AM_RANGE(0x800000, 0xffffff) AM_RAM /* paged access to lispm ram? */
+	//map(0x040000, 0xffffff).r(FUNC(symbolics_state::buserror_r));
+	//map(0x800000, 0xffffff).ram(); /* paged access to lispm ram? */
 	//FF00B0 is readable, may be to read the MC/SQ/DP/AU continuity lines?
 	map(0xff00a0, 0xff00bf).rom().region("fep_paddle_prom",0);
 	map(0xff00c0, 0xff00df).rom().region("fep_prom",0);

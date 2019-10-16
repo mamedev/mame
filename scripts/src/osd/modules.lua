@@ -217,6 +217,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "3rdparty/bgfx/examples/common",
 		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 		MAME_DIR .. "3rdparty/bx/include",
 		ext_includedir("rapidjson")
 	}

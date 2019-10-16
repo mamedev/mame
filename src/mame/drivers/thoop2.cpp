@@ -105,13 +105,13 @@ WRITE_LINE_MEMBER(thoop2_state::coin2_counter_w)
 
 WRITE8_MEMBER(thoop2_state::shareram_w)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
 }
 
 READ8_MEMBER(thoop2_state::shareram_r)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 

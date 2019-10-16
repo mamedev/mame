@@ -405,8 +405,8 @@ void magic10_state::magic102_map(address_map &map)
 	map(0x500006, 0x500007).nopr(); // gives credits
 	map(0x50001a, 0x50001b).portr("IN0");
 	map(0x50001c, 0x50001d).portr("IN1");
-//  AM_RANGE(0x500002, 0x50001f) AM_READNOP
-//  AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
+//  map(0x500002, 0x50001f).nopr();
+//  map(0x500002, 0x50001f).nopw();
 	map(0x600000, 0x603fff).ram();
 	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700080, 0x700087).ram().share("vregs");   // video registers?

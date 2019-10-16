@@ -364,10 +364,10 @@ void trs80m16_state::m16_z80_io(address_map &map)
 
 void trs80m2_state::m68000_mem(address_map &map)
 {
-//  AM_RANGE(0x7800d0, 0x7800d1) 9519A (C/D = UDS)
-//  AM_RANGE(0x7800d2, 0x7800d3) limit/offset 2
-//  AM_RANGE(0x7800d4, 0x7800d5) limit/offset 1
-//  AM_RANGE(0x7800d6, 0x7800d7) Z80 IRQ
+//  map(0x7800d0, 0x7800d1) 9519A (C/D = UDS)
+//  map(0x7800d2, 0x7800d3) limit/offset 2
+//  map(0x7800d4, 0x7800d5) limit/offset 1
+//  map(0x7800d6, 0x7800d7) Z80 IRQ
 }
 
 

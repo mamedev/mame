@@ -59,7 +59,7 @@ void subs_state::main_map(address_map &map)
 	map(0x0000, 0x0007).r(FUNC(subs_state::control_r));
 	map(0x0020, 0x0020).w(FUNC(subs_state::steer_reset_w));
 	map(0x0020, 0x0027).r(FUNC(subs_state::coin_r));
-//  AM_RANGE(0x0040, 0x0040) AM_WRITE(timer_reset_w)
+//  map(0x0040, 0x0040).w(FUNC(subs_state::timer_reset_w));
 	map(0x0060, 0x0063).r(FUNC(subs_state::options_r));
 	map(0x0060, 0x006f).w("latch", FUNC(ls259_device::write_a0));
 	map(0x0090, 0x009f).ram().share("spriteram");

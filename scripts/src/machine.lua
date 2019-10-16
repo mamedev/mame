@@ -575,6 +575,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/adc0804.h,MACHINES["ADC0804"] = true
+---------------------------------------------------
+
+if (MACHINES["ADC0804"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/adc0804.cpp",
+		MAME_DIR .. "src/devices/machine/adc0804.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/adc0808.h,MACHINES["ADC0808"] = true
 ---------------------------------------------------
 

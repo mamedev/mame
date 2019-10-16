@@ -77,6 +77,15 @@ class address_map_entry
 	static std::enable_if_t<is_addrmap_method<T, Ret, Params...>::value, address_map_constructor> make_delegate(Ret (T::*func)(Params...), const char *name, T *obj)
 	{ return address_map_constructor(func, name, obj); }
 
+	template <typename T, bool Reqd>
+	static device_t &find_device(const device_finder<T, Reqd> &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		device_t *device(target.first.subdevice(target.second));
+		if (device == nullptr)
+			throw emu_fatalerror("Device %s not found in %s\n", target.second, target.first.tag());
+		return *device;
+	}
+
 	template <typename T, typename U>
 	static std::enable_if_t<std::is_convertible<std::add_pointer_t<U>, std::add_pointer_t<T> >::value, T *> make_pointer(U &obj)
 	{ return &downcast<T &>(obj); }
@@ -230,77 +239,53 @@ public:
 
 	// device finder -> delegate converter
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &r(device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name)
-	{
-		const std::pair<device_t &, const char *> target(finder.finder_target());
-		device_t *device(target.first.subdevice(target.second));
-		assert(device != nullptr);
-		return r(emu::detail::make_delegate(read, read_name, device->tag(), make_pointer<U>(*device)));
+	address_map_entry &r(device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name) {
+		device_t &device(find_device(finder));
+		return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device)));
 	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &r(const device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name)
-	{
-		const std::pair<device_t &, const char *> target(finder.finder_target());
-		device_t *device(target.first.subdevice(target.second));
-		assert(device != nullptr);
-		return r(emu::detail::make_delegate(read, read_name, device->tag(), make_pointer<U>(*device)));
+	address_map_entry &r(const device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name) {
+		device_t &device(find_device(finder));
+		return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device)));
 	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &w(device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name)
-	{
-		const std::pair<device_t &, const char *> target(finder.finder_target());
-		device_t *device(target.first.subdevice(target.second));
-		assert(device != nullptr);
-		return w(emu::detail::make_delegate(write, write_name, device->tag(), make_pointer<U>(*device)));
+	address_map_entry &w(device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name) {
+		device_t &device(find_device(finder));
+		return w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<U>(device)));
 	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &w(const device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name)
-	{
-		const std::pair<device_t &, const char *> target(finder.finder_target());
-		device_t *device(target.first.subdevice(target.second));
-		assert(device != nullptr);
-		return w(emu::detail::make_delegate(write, write_name, device->tag(), make_pointer<U>(*device)));
+	address_map_entry &w(const device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name) {
+		device_t &device(find_device(finder));
+		return w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<U>(device)));
 	}
 
 	template <typename T, bool Reqd, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
-	address_map_entry &rw(device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{
-		const std::pair<device_t &, const char *> target(finder.finder_target());
-		device_t *device(target.first.subdevice(target.second));
-		assert(device != nullptr);
-		return r(emu::detail::make_delegate(read, read_name, device->tag(), make_pointer<U>(*device)))
-			.w(emu::detail::make_delegate(write, write_name, device->tag(), make_pointer<V>(*device)));
+	address_map_entry &rw(device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name) {
+		device_t &device(find_device(finder));
+		return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device)))
+			.w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device)));
 	}
 
 	template <typename T, bool Reqd, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
-	address_map_entry &rw(const device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{
-		const std::pair<device_t &, const char *> target(finder.finder_target());
-		device_t *device(target.first.subdevice(target.second));
-		assert(device != nullptr);
-		return r(emu::detail::make_delegate(read, read_name, device->tag(), make_pointer<U>(*device)))
-			.w(emu::detail::make_delegate(write, write_name, device->tag(), make_pointer<V>(*device)));
+	address_map_entry &rw(const device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name) {
+		device_t &device(find_device(finder));
+		return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device)))
+			.w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device)));
 	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &m(device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name)
-	{
-		const std::pair<device_t &, const char *> target(finder.finder_target());
-		device_t *device(target.first.subdevice(target.second));
-		assert(device != nullptr);
-		return m(device, make_delegate(map, map_name, make_pointer<U>(*device)));
+	address_map_entry &m(device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name) {
+		device_t &device(find_device(finder));
+		return m(&device, make_delegate(map, map_name, make_pointer<U>(device)));
 	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &m(const device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name)
-	{
-		const std::pair<device_t &, const char *> target(finder.finder_target());
-		device_t *device(target.first.subdevice(target.second));
-		assert(device != nullptr);
-		return m(make_delegate(map, map_name, make_pointer<U>(*device)));
+	address_map_entry &m(const device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name) {
+		device_t &device(find_device(finder));
+		return m(&device, make_delegate(map, map_name, make_pointer<U>(device)));
 	}
 
 

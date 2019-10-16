@@ -241,13 +241,13 @@ void mvme147_state::mvme147_mem(address_map &map)
 	map(0x00000000, 0x00000007).ram().w(FUNC(mvme147_state::bootvect_w));       /* After first write we act as RAM */
 	map(0x00000000, 0x00000007).rom().r(FUNC(mvme147_state::bootvect_r));       /* ROM mirror just during reset */
 	map(0x00000008, 0x003fffff).ram(); /* 4 Mb RAM */
-	map(0xff800000, 0xff9fffff).rom().region("roms", 0x800000); //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 1 - 147bug */
-	map(0xffa00000, 0xffbfffff).rom().region("roms", 0xa00000); //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 2 - unpopulated */
+	map(0xff800000, 0xff9fffff).rom().region("roms", 0x800000); //mirror(0x00780000); /* ROM/EEPROM bank 1 - 147bug */
+	map(0xffa00000, 0xffbfffff).rom().region("roms", 0xa00000); //mirror(0x00780000); /* ROM/EEPROM bank 2 - unpopulated */
 
 		/*  SGS-Thompson M48T18 RAM and clock chip, only 4088 bytes used,  and 8 bytes for the RTC, out of 8Kb though */
 	map(0xfffe0000, 0xfffe0fff).rw("m48t18", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 
-		//AM_RANGE (0xfffe1000, 0xfffe100f) AM_READWRITE32(pcc32_r, pcc32_w, 0xffffffff) /* PCC 32 bits registers  - needs U64 cast defined to work */
+	//map(0xfffe1000, 0xfffe100f).rw(FUNC(mvme147_state::pcc32_r), FUNC(mvme147_state::pcc32_w)); /* PCC 32 bits registers  - needs U64 cast defined to work */
 	map(0xfffe1010, 0xfffe1017).rw(FUNC(mvme147_state::pcc16_r), FUNC(mvme147_state::pcc16_w)); /* PCC 16 bits registers */
 	map(0xfffe1018, 0xfffe102f).rw(FUNC(mvme147_state::pcc8_r), FUNC(mvme147_state::pcc8_w)); /* PCC 8 bits registers */
 	map(0xfffe2000, 0xfffe201b).rw(FUNC(mvme147_state::vmechip_r), FUNC(mvme147_state::vmechip_w)).umask32(0x00ff00ff); /* VMEchip 8 bits registers on odd adresses */
@@ -255,8 +255,8 @@ void mvme147_state::mvme147_mem(address_map &map)
 	map(0xfffe3000, 0xfffe3003).rw(m_sccterm, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w)); /* Port 1&2 - Dual serial port Z80-SCC */
 	map(0xfffe3800, 0xfffe3803).rw(m_sccterm2, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w)); /* Port 3&4 - Dual serial port Z80-SCC */
 
-	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+	//map(0x100000, 0xfeffff).rw(FUNC(mvme147_state::vme_a24_r), FUNC(mvme147_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+	//map(0xff0000, 0xffffff).rw(FUNC(mvme147_state::vme_a16_r), FUNC(mvme147_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 /* Input ports */

@@ -730,7 +730,7 @@ void m5_state::m5_io(address_map &map)
 	map(0x37, 0x37).mirror(0x08).portr("JOY");
 	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(m5_state::sts_r), FUNC(m5_state::com_w));
-//  AM_RANGE(0x60, 0x63) SIO
+//  map(0x60, 0x63) SIO
 	map(0x6c, 0x6c).rw(FUNC(m5_state::mem64KBI_r), FUNC(m5_state::mem64KBI_w)); //EM-64/64KBI paging
 	map(0x70, 0x73) /*.mirror(0x0c) don't know if necessary mirror this*/ .rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x7f, 0x7f).w(FUNC(m5_state::mem64KRX_w)); //64KRD/64KRX paging
@@ -1051,11 +1051,11 @@ void brno_state::brno_io(address_map &map)
 	map(0x37, 0x37).portr("JOY");
 	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
-//  AM_RANGE(0x60, 0x63)                                                                            //  SIO
+//  map(0x60, 0x63)                                                                            //  SIO
 	map(0x64, 0x67).rw(FUNC(brno_state::mmu_r), FUNC(brno_state::mmu_w));                           //  MMU - page select (ramdisk memory paging)
 	map(0x68, 0x6b).rw(FUNC(brno_state::ramsel_r), FUNC(brno_state::ramsel_w));                     //  CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
 	map(0x6c, 0x6f).rw(FUNC(brno_state::romsel_r), FUNC(brno_state::romsel_w));                     //  RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
-//  AM_RANGE(0x70, 0x73) AM_MIRROR(0x04) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)     //  PIO
+//  map(0x70, 0x73).mirror(0x04).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)); //  PIO
 	map(0x78, 0x7b).rw(m_fdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));     //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
 	map(0x7c, 0x7c).rw(FUNC(brno_state::fd_r), FUNC(brno_state::fd_w));                             //  drive select
 }

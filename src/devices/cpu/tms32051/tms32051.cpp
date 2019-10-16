@@ -57,7 +57,7 @@ DEFINE_DEVICE_TYPE(TMS32053, tms32053_device, "tms32053", "Texas Instruments TMS
 
 void tms32051_device::tms32051_internal_pgm(address_map &map)
 {
-//  AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
+//  map(0x0000, 0x1fff).rom();                       // ROM          TODO: is off-chip if MP/_MC = 0
 	map(0x2000, 0x23ff).ram().share("saram");       // SARAM        TODO: is off-chip if RAM bit = 0
 	map(0xfe00, 0xffff).ram().share("daram_b0");    // DARAM B0     TODO: is off-chip if CNF = 0
 }
@@ -101,7 +101,7 @@ device_memory_interface::space_config_vector tms32051_device::memory_space_confi
 
 void tms32053_device::tms32053_internal_pgm(address_map &map)
 {
-//  AM_RANGE(0x0000, 0x3fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
+//  map(0x0000, 0x3fff).rom();                       // ROM          TODO: is off-chip if MP/_MC = 0
 	map(0x4000, 0x4bff).ram().share("saram");       // SARAM        TODO: is off-chip if RAM bit = 0
 	map(0xfe00, 0xffff).ram().share("daram_b0");    // DARAM B0     TODO: is off-chip if CNF = 0
 }

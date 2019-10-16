@@ -170,7 +170,7 @@ void bagman_state::main_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x08, 0x09).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x0c, 0x0c).r("aysnd", FUNC(ay8910_device::data_r));
-	//AM_RANGE(0x56, 0x56) AM_WRITENOP
+	//map(0x56, 0x56).nopw();
 }
 
 

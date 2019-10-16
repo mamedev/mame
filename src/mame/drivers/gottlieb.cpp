@@ -757,7 +757,7 @@ void gottlieb_state::reactor_map(address_map &map)
 	map(0x2000, 0x20ff).mirror(0x0f00).writeonly().share("spriteram");                           /* FRSEL */
 	map(0x3000, 0x33ff).mirror(0x0c00).ram().w(FUNC(gottlieb_state::videoram_w)).share("videoram");       /* BRSEL */
 	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share("charram");               /* BOJRSEL1 */
-/*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */                                                               /* BOJRSEL2 */
+//  map(0x5000, 0x5fff).w(FUNC(gottlieb_state::));                                                   /* BOJRSEL2 */
 	map(0x6000, 0x601f).mirror(0x0fe0).w(FUNC(gottlieb_state::palette_w)).share("paletteram");       /* COLSEL */
 	map(0x7000, 0x7000).mirror(0x0ff8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7001, 0x7001).mirror(0x0ff8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
@@ -786,7 +786,7 @@ void gottlieb_state::gottlieb_map(address_map &map)
 	map(0x5801, 0x5801).mirror(0x07f8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
 	map(0x5802, 0x5802).mirror(0x07f8).w(FUNC(gottlieb_state::sound_w));                                  /* OP20-27 */
 	map(0x5803, 0x5803).mirror(0x07f8).w(FUNC(gottlieb_state::general_output_w));                               /* OP30-37 */
-/*  AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE()*/                                              /* OP40-47 */
+//  map(0x5804, 0x5804).mirror(0x07f8).w(FUNC(gottlieb_state::));                                            /* OP40-47 */
 	map(0x5800, 0x5800).mirror(0x07f8).portr("DSW");
 	map(0x5801, 0x5801).mirror(0x07f8).portr("IN1");                                      /* IP10-17 */
 	map(0x5802, 0x5802).mirror(0x07f8).portr("IN2");                                      /* trackball H */

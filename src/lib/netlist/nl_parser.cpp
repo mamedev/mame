@@ -28,7 +28,6 @@ bool parser_t::parse(const pstring &nlname)
 {
 	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
 		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
-		//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 		.whitespace(pstring("") + ' ' + static_cast<char>(9) + static_cast<char>(10) + static_cast<char>(13))
 		.comment("/*", "*/", "//");
 	m_tok_param_left = register_token("(");
@@ -414,10 +413,10 @@ void parser_t::device(const pstring &dev_type)
 
 nl_double parser_t::eval_param(const token_t &tok)
 {
-	static std::array<pstring, 6> macs = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
-	static std::array<nl_double, 6> facs = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
+	static std::array<pstring, 7> macs = {"", "RES_R", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
+	static std::array<nl_double, 7> facs = {1, 1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	std::size_t f=0;
-	nl_double ret;
+	nl_double ret(0);
 
 	for (std::size_t i=1; i<macs.size();i++)
 		if (tok.str() == macs[i])
@@ -430,7 +429,7 @@ nl_double parser_t::eval_param(const token_t &tok)
 	}
 	else
 	{
-		bool err;
+		bool err(false);
 		ret = plib::pstonum_ne<nl_double, true>(tok.str(), err);
 		if (err)
 			error(plib::pfmt("Parameter value <{1}> not double \n")(tok.str()));

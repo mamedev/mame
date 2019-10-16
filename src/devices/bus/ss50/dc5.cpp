@@ -132,12 +132,12 @@ static INPUT_PORTS_START( dc5 )
 	// 3.5" HD  -  2.0MHz
 	// 8" 360rpm  -  2.4MHz
 	PORT_START("expected_clock")
-	PORT_CONFNAME(0xffffff, 0, "FDC expected clock rate")
+	PORT_CONFNAME(0xf, 0, "FDC expected clock rate")
 	PORT_CONFSETTING(0, "-")
-	PORT_CONFSETTING(1000000, "1.0 MHz")
-	PORT_CONFSETTING(1200000, "1.2 MHz")
-	PORT_CONFSETTING(2000000, "2.0 MHz")
-	PORT_CONFSETTING(2400000, "2.4 MHz")
+	PORT_CONFSETTING(12, "1.0 MHz")
+	PORT_CONFSETTING(10, "1.2 MHz")
+	PORT_CONFSETTING(6, "2.0 MHz")
+	PORT_CONFSETTING(5, "2.4 MHz")
 
 	// It is not uncommon to see drivers using bit 7 of the control
 	// register as a side selection. This conflicts with the DC5, and
@@ -235,7 +235,7 @@ static void flex_floppies(device_slot_interface &device)
 
 void ss50_dc5_device::device_add_mconfig(machine_config &config)
 {
-	WD2797(config, m_fdc, 1_MHz_XTAL);
+	WD2797(config, m_fdc, 12_MHz_XTAL / 12); // divider is selectable
 	FLOPPY_CONNECTOR(config, "fdc:0", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
@@ -250,7 +250,7 @@ void ss50_dc5_device::device_reset()
 {
 	// Initialize to the expected rate if any, otherwise to 1MHz.
 	uint32_t clock = m_expected_clock->read();
-	clock = clock ? clock : 1000000;
+	clock = (12_MHz_XTAL / (clock ? clock : 12)).value();
 	m_fdc->set_unscaled_clock(clock);
 	m_fdc_clock = clock;
 
@@ -661,7 +661,7 @@ void ss50_dc5_device::register_write(offs_t offset, uint8_t data)
 			// Osc20 and osc12 control a clock divider.
 			uint8_t osc12 = BIT(data, 2);
 			uint8_t osc20 = BIT(data, 3);
-			uint32_t clock = 1000000;
+			uint32_t clock = 12'000'000 / 12;
 
 			// Note: supporting 2.4MHz is here is an extension to
 			// the published DC5 design, and appears necessary to
@@ -676,17 +676,17 @@ void ss50_dc5_device::register_write(offs_t offset, uint8_t data)
 			// 8" drives run at 300rpm; is there an error in the
 			// rates elsewhere?
 			if (osc20 && osc12)
-				clock = 2400000;
+				clock = 12'000'000 / 5;
 			else if (osc20)
-				clock = 2000000;
+				clock = 12'000'000 / 6;
 			else if (osc12)
-				clock = 1200000;
+				clock = 12'000'000 / 10;
 
 			// Compare to the expected clock rate if any.
 			uint32_t expected_clock = m_expected_clock->read();
-			if (expected_clock && clock != expected_clock)
+			if (expected_clock && clock != 12'000'000 / expected_clock)
 			{
-				logerror("%s Unexpected clock rate of %dHz expected %dHz.\n", machine().describe_context(), clock, expected_clock);
+				logerror("%s Unexpected clock rate of %dHz expected %dHz.\n", machine().describe_context(), clock, 12'000'000 / expected_clock);
 				clock = expected_clock;
 			}
 

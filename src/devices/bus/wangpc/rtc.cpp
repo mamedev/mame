@@ -73,19 +73,19 @@ void wangpc_rtc_device::wangpc_rtc_io(address_map &map)
 	map(0x00, 0x03).rw(m_sio, FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
 	map(0x10, 0x1f).rw(AM9517A_TAG, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x20, 0x23).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x30, 0x30); //AM_WRITE(clear_char_w)
-	map(0x31, 0x31); //AM_WRITE(set_char_w)
-	map(0x40, 0x40).portr("SW1"); //AM_WRITE(control_w)
-	map(0x44, 0x44); //AM_READ(i8086_status_r) AM_WRITE(reset_w)
-	map(0x48, 0x48); //AM_WRITE(dte_ready_w)
-	map(0x4c, 0x4c); //AM_READWRITE(8232_acu_r, 8232_acu_w)
-	map(0x50, 0x50); //AM_READ(outbound_data_r)
-	map(0x51, 0x52); //AM_WRITE(status_w)
-	map(0x54, 0x54); //AM_WRITE(enable_inbound_data_w)
-	map(0x51, 0x52); //AM_WRITE(inbound_data_w)
+	map(0x30, 0x30); //.w(FUNC(wangpc_rtc_device::clear_char_w));
+	map(0x31, 0x31); //.w(FUNC(wangpc_rtc_device::set_char_w));
+	map(0x40, 0x40).portr("SW1"); //.w(FUNC(wangpc_rtc_device::control_w));
+	map(0x44, 0x44); //.rw(FUNC(wangpc_rtc_device::i8086_status_r), FUNC(wangpc_rtc_device::reset_w));
+	map(0x48, 0x48); //.w(FUNC(wangpc_rtc_device::dte_ready_w));
+	map(0x4c, 0x4c); //.rw(FUNC(wangpc_rtc_device::8232_acu_r), FUNC(wangpc_rtc_device::8232_acu_w));
+	map(0x50, 0x50); //.r(FUNC(wangpc_rtc_device::outbound_data_r));
+	map(0x51, 0x52); //.w(FUNC(wangpc_rtc_device::status_w));
+	map(0x54, 0x54); //.w(FUNC(wangpc_rtc_device::enable_inbound_data_w));
+	map(0x51, 0x52); //.w(FUNC(wangpc_rtc_device::inbound_data_w));
 	map(0x60, 0x63).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x70, 0x70); //AM_READWRITE(led_toggle_r, odd_parity_w)
-	map(0x71, 0x71); //AM_WRITE(even_parity_w)
+	map(0x70, 0x70); //.rw(FUNC(wangpc_rtc_device::led_toggle_r), FUNC(wangpc_rtc_device::odd_parity_w));
+	map(0x71, 0x71); //.w(FUNC(wangpc_rtc_device::even_parity_w));
 }
 
 

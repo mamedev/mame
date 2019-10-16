@@ -343,7 +343,7 @@ void p8k_state::p8k_16_datamap(address_map &map)
 
 void p8k_state::p8k_16_iomap(address_map &map)
 {
-//  AM_RANGE(0x0fef0, 0x0feff) // clock
+//  map(0x0fef0, 0x0feff) // clock
 	map(0x0ff80, 0x0ff87).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0ff88, 0x0ff8f).rw("sio1", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0ff90, 0x0ff97).rw("pio0", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).umask16(0x00ff);
@@ -351,13 +351,13 @@ void p8k_state::p8k_16_iomap(address_map &map)
 	map(0x0ffa0, 0x0ffa7).rw(m_pio2, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).umask16(0x00ff);
 	map(0x0ffa8, 0x0ffaf).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 	map(0x0ffb0, 0x0ffb7).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
-//  AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
-//  AM_RANGE(0x0ffd0, 0x0ffd1) // NBR
-//  AM_RANGE(0x0ffd8, 0x0ffd9) // SNVR
+//  map(0x0ffc0, 0x0ffc1) // SCR
+//  map(0x0ffc8, 0x0ffc9) // SBR
+//  map(0x0ffd0, 0x0ffd1) // NBR
+//  map(0x0ffd8, 0x0ffd9) // SNVR
 	map(0x0ffe1, 0x0ffe1).w(m_daisy, FUNC(p8k_16_daisy_device::reti_w));
-//  AM_RANGE(0x0fff0, 0x0fff1) // TRPL
-//  AM_RANGE(0x0fff8, 0x0fff9) // IF1L
+//  map(0x0fff0, 0x0fff1) // TRPL
+//  map(0x0fff8, 0x0fff9) // IF1L
 }
 
 

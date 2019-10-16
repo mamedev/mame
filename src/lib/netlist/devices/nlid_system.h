@@ -131,7 +131,7 @@ namespace devices
 		, m_funcparam({0.0})
 		{
 			if (m_func() != "")
-				m_compiled.compile(std::vector<pstring>({{"T"}}), m_func());
+				m_compiled.compile(std::vector<pstring>({{pstring("T")}}), m_func());
 			connect(m_feedback, m_Q);
 		}
 		//NETLIB_RESETI();
@@ -369,7 +369,7 @@ namespace devices
 			for (int i=0; i < m_N(); i++)
 			{
 				pstring n = plib::pfmt("A{1}")(i);
-				m_I.push_back(pool().make_poolptr<analog_input_t>(*this, n));
+				m_I.push_back(pool().make_unique<analog_input_t>(*this, n));
 				inps.push_back(n);
 				m_vals.push_back(0.0);
 			}
@@ -386,7 +386,7 @@ namespace devices
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
-		std::vector<pool_owned_ptr<analog_input_t>> m_I;
+		std::vector<unique_pool_ptr<analog_input_t>> m_I;
 
 		std::vector<double> m_vals;
 		plib::pfunction m_compiled;
@@ -435,9 +435,10 @@ namespace devices
 	class nld_power_pins
 	{
 	public:
-		nld_power_pins(device_t &owner, const char *sVCC = "VCC", const char *sGND = "GND", bool force_analog_input = false)
+		nld_power_pins(device_t &owner, const pstring &sVCC = "VCC",
+			const pstring &sGND = "GND", bool force_analog_input = false)
 		{
-			if (owner.setup().is_validation() || force_analog_input)
+			if (owner.setup().is_extended_validation() || force_analog_input)
 			{
 				m_GND = plib::make_unique<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
 				m_VCC = plib::make_unique<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));

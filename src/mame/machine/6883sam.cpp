@@ -512,7 +512,7 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 		// name the bank
 		auto tag = string_format("bank%04X_%c", addrstart, is_write ? 'w' : 'r');
 
-		// determine "nop_addrstart" - where the bank ends, and above which is AM_NOP
+		// determine "nop_addrstart" - where the bank ends, and above which is .noprw();
 		uint32_t nop_addrstart = (length != ~0)
 			? std::min(addrend + 1, addrstart + length)
 			: addrend + 1;

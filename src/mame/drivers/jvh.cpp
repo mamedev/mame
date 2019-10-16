@@ -75,31 +75,31 @@ void jvh_state::escape_io(address_map &map)
 
 void jvh_state::movmastr_io(address_map &map)
 {
-	//AM_RANGE(0x01, 0x02) AM_READ(sw1_r)
-	//AM_RANGE(0x03, 0x05) AM_READ(dip_r)
-	//AM_RANGE(0x08, 0x09) AM_READ(sw6_r)
-	//AM_RANGE(0x00, 0x07) AM_WRITE(out0a2_w)
-	//AM_RANGE(0x08, 0x0f) AM_WRITE(out0b2_w)
-	//AM_RANGE(0x10, 0x17) AM_WRITE(out1a2_w)
-	//AM_RANGE(0x18, 0x1f) AM_WRITE(out1b2_w)
-	//AM_RANGE(0x20, 0x27) AM_WRITE(out2a2_w)
-	//AM_RANGE(0x28, 0x2f) AM_WRITE(out2b2_w)
-	//AM_RANGE(0x30, 0x30) AM_WRITE(out3a2_w)
-	//AM_RANGE(0x31, 0x36) AM_WRITE(snd_w)
-	//AM_RANGE(0x37, 0x37) AM_WRITE(latch_w)
-	//AM_RANGE(0x3e, 0x3e) AM_WRITE(irq_enable)
-	//AM_RANGE(0x3f, 0x3f) AM_WRITE(zc_enable)
-	//AM_RANGE(0x40, 0x47) AM_WRITE(out4a2_w)
-	//AM_RANGE(0x48, 0x4a) AM_WRITE(out4b2_w)
-	//AM_RANGE(0x4b, 0x4b) AM_WRITE(enable_w)
-	//AM_RANGE(0x4c, 0x4f) AM_WRITE(out4c2_w)
-	//AM_RANGE(0x50, 0x55) AM_WRITE(col_w)
-	//AM_RANGE(0x57, 0x5a) AM_WRITE(bcd_w)
-	//AM_RANGE(0x5b, 0x5f) AM_WRITE(panel_w)
-	//AM_RANGE(0x60, 0x67) AM_WRITE(digit_w)
-	//AM_RANGE(0x68, 0x6f) AM_WRITE(out6b2_w)
-	//AM_RANGE(0x70, 0x74) AM_WRITE(out7a2_w)
-	//AM_RANGE(0x75, 0x7f) AM_WRITE(sol_w)
+	//map(0x01, 0x02).r(FUNC(jvh_state::sw1_r));
+	//map(0x03, 0x05).r(FUNC(jvh_state::dip_r));
+	//map(0x08, 0x09).r(FUNC(jvh_state::sw6_r));
+	//map(0x00, 0x07).w(FUNC(jvh_state::out0a2_w));
+	//map(0x08, 0x0f).w(FUNC(jvh_state::out0b2_w));
+	//map(0x10, 0x17).w(FUNC(jvh_state::out1a2_w));
+	//map(0x18, 0x1f).w(FUNC(jvh_state::out1b2_w));
+	//map(0x20, 0x27).w(FUNC(jvh_state::out2a2_w));
+	//map(0x28, 0x2f).w(FUNC(jvh_state::out2b2_w));
+	//map(0x30, 0x30).w(FUNC(jvh_state::out3a2_w));
+	//map(0x31, 0x36).w(FUNC(jvh_state::snd_w));
+	//map(0x37, 0x37).w(FUNC(jvh_state::latch_w));
+	//map(0x3e, 0x3e).w(FUNC(jvh_state::irq_enable));
+	//map(0x3f, 0x3f).w(FUNC(jvh_state::zc_enable));
+	//map(0x40, 0x47).w(FUNC(jvh_state::out4a2_w));
+	//map(0x48, 0x4a).w(FUNC(jvh_state::out4b2_w));
+	//map(0x4b, 0x4b).w(FUNC(jvh_state::enable_w));
+	//map(0x4c, 0x4f).w(FUNC(jvh_state::out4c2_w));
+	//map(0x50, 0x55).w(FUNC(jvh_state::col_w));
+	//map(0x57, 0x5a).w(FUNC(jvh_state::bcd_w));
+	//map(0x5b, 0x5f).w(FUNC(jvh_state::panel_w));
+	//map(0x60, 0x67).w(FUNC(jvh_state::digit_w));
+	//map(0x68, 0x6f).w(FUNC(jvh_state::out6b2_w));
+	//map(0x70, 0x74).w(FUNC(jvh_state::out7a2_w));
+	//map(0x75, 0x7f).w(FUNC(jvh_state::sol_w));
 }
 
 void jvh_state::jvh_sub_map(address_map &map)

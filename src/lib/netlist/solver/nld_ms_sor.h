@@ -90,7 +90,7 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 		const float_type * const Idr = this->m_Idrn[k];
 		auto other_cur_analog = this->m_connected_net_Vn[k];
 
-		this->m_new_V[k] = this->m_nets[k]->Q_Analog();
+		this->m_new_V[k] = this->m_terms[k]->getV();
 
 		for (std::size_t i = 0; i < term_count; i++)
 		{

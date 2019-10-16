@@ -699,7 +699,7 @@ void apollo_state::dn3500_map(address_map &map)
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM /* 8MB RAM */
+		// map(DN3500_RAM_BASE, DN3500_RAM_END).ram(); /* 8MB RAM */
 		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
@@ -708,11 +708,11 @@ void apollo_state::dn3500_map(address_map &map)
 		map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
 		map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 
-//      AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
-//      AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
-//      AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
+//      map(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
+//      map(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
+//      map(0x0e000000, 0x0fffffff) FPA address space
 
-//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dsp3500_map(address_map &map)
@@ -745,7 +745,7 @@ void apollo_state::dsp3500_map(address_map &map)
 
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
-//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dn3000_map(address_map &map)
@@ -771,7 +771,7 @@ void apollo_state::dn3000_map(address_map &map)
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
+		// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
 		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
@@ -805,7 +805,7 @@ void apollo_state::dsp3000_map(address_map &map)
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
+		// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
 		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 }
@@ -841,7 +841,7 @@ void apollo_state::dn5500_map(address_map &map)
 	map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 	// FIXME: must match with RAM size in driver/apollo_sio.c
-	// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  /* 8MB RAM */
+	// map(DN3500_RAM_BASE, DN3500_RAM_END).ram();  /* 8MB RAM */
 	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 	map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
@@ -850,12 +850,12 @@ void apollo_state::dn5500_map(address_map &map)
 	map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
 	map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 
-//  AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
-//  AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
+//  map(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
+//  map(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
 	map(0x07000000, 0x0700FFFF).rw(FUNC(apollo_state::dn5500_io_protection_map_r), FUNC(apollo_state::dn5500_io_protection_map_w));
-//  AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
+//  map(0x0e000000, 0x0fffffff) FPA address space
 
-//  AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//  map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dsp5500_map(address_map &map)
@@ -891,7 +891,7 @@ void apollo_state::dsp5500_map(address_map &map)
 	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 	map(0x07000000, 0x0700FFFF).rw(FUNC(apollo_state::dn5500_io_protection_map_r), FUNC(apollo_state::dn5500_io_protection_map_w));
-//  AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//  map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 /***************************************************************************

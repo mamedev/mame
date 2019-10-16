@@ -874,13 +874,13 @@ void ngen_state::ngen_io(address_map &map)
 	map(0x0000, 0x0001).rw(FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
 
 	// Floppy/Hard disk module
-//  AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
-//  AM_RANGE(0x0108, 0x0109) AM_WRITE8(fdc_control_w,0x00ff)
-//  AM_RANGE(0x010a, 0x010b) AM_WRITE8(hdc_control_w,0x00ff)
-//  AM_RANGE(0x010e, 0x010f) AM_WRITE8(disk_addr_ext,0x00ff)  // X-Bus extended address register
-//  AM_RANGE(0x0110, 0x0117) AM_DEVREADWRITE8("fdc_timer",pit8253_device,read,write,0x00ff)
+//  map(0x0100, 0x0107).rw("fdc", FUNC(wd2797_t::read), FUNC(wd2797_t::write)).umask16(0x00ff);  // a guess for now
+//  map(0x0108, 0x0108).w(FUNC(ngen_state::fdc_control_w));
+//  map(0x010a, 0x010a).w(FUNC(ngen_state::hdc_control_w));
+//  map(0x010e, 0x010e).w(FUNC(ngen_state::disk_addr_ext));  // X-Bus extended address register
+//  map(0x0110, 0x0117).rw("fdc_timer", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	// 0x0120-0x012f - WD1010 Winchester disk controller (unemulated)
-//  AM_RANGE(0x0130, 0x0137) AM_DEVREADWRITE8("hdc_timer",pit8253_device,read,write,0x00ff)
+//  map(0x0130, 0x0137).rw("hdc_timer", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
 }
 
@@ -908,7 +908,7 @@ void ngen_state::ngen386i_mem(address_map &map)
 void ngen_state::ngen386_io(address_map &map)
 {
 	map(0x0000, 0x0001).rw(FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
-//  AM_RANGE(0xf800, 0xfeff) AM_READWRITE16(peripheral_r, peripheral_w,0xffffffff)
+//  map(0xf800, 0xfeff).rw(FUNC(ngen_state::peripheral_r), FUNC(ngen_state::peripheral_w));
 	map(0xfd08, 0xfd0b).rw(FUNC(ngen_state::b38_crtc_r), FUNC(ngen_state::b38_crtc_w));
 	map(0xfd0c, 0xfd0f).rw(FUNC(ngen_state::b38_keyboard_r), FUNC(ngen_state::b38_keyboard_w));
 }

@@ -358,7 +358,7 @@ Xyzolog - Electric Software
 			<dataarea name="rom" size="262144">
 				<rom name="lh532077" size="262144" crc="4ead5098" sha1="12b3c31f0fd10ff5823dcc8bf6dfeb785a8af2f7" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -628,7 +628,7 @@ Xyzolog - Electric Software
 			<dataarea name="rom" size="131072">
 				<rom name="lh531043" size="131072" crc="d8055f5f" sha1="da4b44c734029f60388b7cea4ab97c3d5c6a09e9" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -837,7 +837,7 @@ Xyzolog - Electric Software
 			<dataarea name="rom" size="262144">
 				<rom name="lh532038" size="262144" crc="3aa33a30" sha1="e6de8bbd60123444de2a90928853985ceb0b4cbf" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -977,7 +977,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="131072">
 				<rom name="lh23100y" size="131072" crc="0e691c47" sha1="16351e6a7d7fc38c23b54ee15ac6f0275621ba96" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1126,7 +1126,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="262144">
 				<rom name="lh532051" size="262144" crc="d640deaf" sha1="6c1814c70d69a50ec60e39ef281f0b8cd7bf8598" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4096,7 +4096,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="131072">
 				<rom name="deep dungeon (japan).rom" size="131072" crc="27fd8f9a" sha1="e6419519c2d3247ea395e4feaa494a2e23e469ce" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4112,7 +4112,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="131072">
 				<rom name="deep dungeon ii (japan).rom" size="131072" crc="101db19c" sha1="d82135a5e28b750c44995af116db890a15f6428a" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -6137,7 +6137,7 @@ kept for now until finding out what those bytes affect...
 				<rom name="harryfox msx special (japan).rom" size="131072" crc="96b7faca" sha1="a3de07612da7986387a4f5c41bbbc7e3b244e077" offset="0" />
 				<rom size="131072" offset="0x20000" loadflag="reload" />
 			</dataarea>
-			<dataarea name="sram" size="2048" >
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -6206,7 +6206,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="131072">
 				<rom name="hydlide ii - shine of darkness (japan) (alt 1).rom" size="131072" crc="b886d7f5" sha1="a3537934a4d9dfbf27aca5aaf42e0f18e4975366" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -9916,7 +9916,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="262144">
 				<rom name="psychic war - cosmic soldier 2 (japan).rom" size="262144" crc="b8fc19a4" sha1="16c692a2c9babfdadd8408d2f0f8fae3a8d96fd5" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -10475,7 +10475,7 @@ kept for now until finding out what those bytes affect...
 		<description>Scarlet 7 - The Mightiest Women (Jpn)</description>
 		<year>1986</year>
 		<publisher>Toshiba EMI</publisher>
-		<info name="serial" value=" PS-2019G" />
+		<info name="serial" value="PS-2019G" />
 		<info name="alt_title" value="スカーレット７" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
@@ -11945,7 +11945,7 @@ kept for now until finding out what those bytes affect...
 		<description>Thunderbolt (Jpn)</description>
 		<year>1986</year>
 		<publisher>Pixel</publisher>
-		<info name="serial" value=" AR-8601" />
+		<info name="serial" value="AR-8601" />
 		<info name="alt_title" value="サンダーボルト" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
@@ -11958,7 +11958,7 @@ kept for now until finding out what those bytes affect...
 		<description>Thunderbolt (Jpn, Alt)</description>
 		<year>1986</year>
 		<publisher>Pixel</publisher>
-		<info name="serial" value=" AR-8601" />
+		<info name="serial" value="AR-8601" />
 		<info name="alt_title" value="サンダーボルト" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
@@ -11971,7 +11971,7 @@ kept for now until finding out what those bytes affect...
 		<description>Thunderbolt (Jpn, Alt 2)</description>
 		<year>1986</year>
 		<publisher>Pixel</publisher>
-		<info name="serial" value=" AR-8601" />
+		<info name="serial" value="AR-8601" />
 		<info name="alt_title" value="サンダーボルト" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
@@ -13182,7 +13182,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="131072">
 				<rom name="game master ii (japan).rom" size="131072" crc="084c5803" sha1="5c00f9e3a48411e08fac89b1dfdd2a6e95853919" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -13199,7 +13199,7 @@ kept for now until finding out what those bytes affect...
 			<dataarea name="rom" size="131072">
 				<rom name="game master ii (japan) (alt 1).rom" size="131072" crc="2d93f9cc" sha1="fe74b4df9698a61dffd3ac88f47619675514ba1c" offset="0" />
 			</dataarea>
-			<dataarea name="sram" size="8192" >
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>

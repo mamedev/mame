@@ -36,7 +36,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs(unsigned v);
+		void update_outputs(unsigned v) NL_NOEXCEPT;
 
 		logic_input_t m_A;
 		logic_input_t m_B;

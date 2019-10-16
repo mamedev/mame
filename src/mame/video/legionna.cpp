@@ -85,10 +85,10 @@ void legionna_state::denjinmk_setgfxbank(u16 data)
 
 void legionna_state::videowrite_cb_w(offs_t offset, u16 data)
 {
-	//  AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(background_w) AM_SHARE("back_data")
-	//  AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(foreground_w) AM_SHARE("fore_data")
-	//  AM_RANGE(0x102000, 0x1027ff) AM_RAM // _WRITE(midground_w) AM_SHARE("mid_data")
-	//  AM_RANGE(0x102800, 0x1037ff) AM_RAM // _WRITE(text_w) AM_SHARE("textram")
+	//  map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
+	//  map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::foreground_w)).share("fore_data");
+	//  map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::midground_w)).share("mid_data");
+	//  map(0x102800, 0x1037ff).ram(); // .w(FUNC(legionna_state::text_w)).share("textram");
 
 	if (offset < 0x800 / 2)
 	{

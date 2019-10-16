@@ -48535,7 +48535,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- Glitched in NTSC -->
-	<software name="pirates" >
+	<software name="pirates">
 		<description>Pirates! (Euro)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
@@ -64476,7 +64476,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		<description>Happy Biqi III - World Fighter (Chi, Decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
-		<info name="alt_title" value=" 快乐比奇Ⅲ-地球战士"/>
+		<info name="alt_title" value="快乐比奇Ⅲ-地球战士"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" /> <!-- Header says mapper 4 but there are glitches -->

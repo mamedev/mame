@@ -41,7 +41,10 @@ public:
 		opt_grp2(*this,     "Options for run and static commands",   "These options apply to run and static commands."),
 		opt_name(*this,     "n", "name",        "",         "the netlist in file specified by ""-f"" option to run; default is first one"),
 
-		opt_grp3(*this,     "Options for run command",      "These options are only used by the run command."),
+		opt_grp3(*this,     "Options for static command",   "These options apply to static command."),
+		opt_dir(*this,      "d", "dir",        "",          "output directory for the generated files"),
+
+		opt_grp4(*this,     "Options for run command",      "These options are only used by the run command."),
 		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
 		opt_stats(*this,    "s", "statistics",              "gather runtime statistics"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
@@ -49,10 +52,13 @@ public:
 		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
 		opt_savestate(*this,"",  "savestate",   "",         "save state to file at end of run"),
 
-		opt_grp4(*this,     "Options for convert command",  "These options are only used by the convert command."),
+		opt_grp5(*this,     "Options for convert command",  "These options are only used by the convert command."),
 		opt_type(*this,     "y", "type",        0,          std::vector<pstring>({"spice","eagle","rinf"}), "type of file to be converted: spice,eagle,rinf"),
 
-		opt_grp5(*this,     "Options for header command",  "These options are only used by the header command."),
+		opt_grp6(*this,     "Options for validate command",  "These options are only used by the validate command."),
+		opt_extended_validation(*this, "", "extended",       "Identify issues with power terminals."),
+
+		opt_grp7(*this,     "Options for header command",  "These options are only used by the header command."),
 		opt_tabwidth(*this, "", "tab-width", 4,          "Tab width for output."),
 		opt_linewidth(*this,"", "line-width", 72,       "Line width for output."),
 
@@ -79,15 +85,19 @@ public:
 	plib::option_group  opt_grp2;
 	plib::option_str    opt_name;
 	plib::option_group  opt_grp3;
+	plib::option_str    opt_dir;
+	plib::option_group  opt_grp4;
 	plib::option_num<double> opt_ttr;
 	plib::option_bool   opt_stats;
 	plib::option_vec    opt_logs;
 	plib::option_str    opt_inp;
 	plib::option_str    opt_loadstate;
 	plib::option_str    opt_savestate;
-	plib::option_group  opt_grp4;
-	plib::option_str_limit<unsigned> opt_type;
 	plib::option_group  opt_grp5;
+	plib::option_str_limit<unsigned> opt_type;
+	plib::option_group  opt_grp6;
+	plib::option_bool   opt_extended_validation;
+	plib::option_group  opt_grp7;
 	plib::option_num<unsigned> opt_tabwidth;
 	plib::option_num<unsigned> opt_linewidth;
 	plib::option_example opt_ex1;
@@ -291,7 +301,7 @@ struct input_t
 	: m_value(0.0)
 	{
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
-		double t;
+		double t(0);
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
 		if (e != 3)
@@ -455,7 +465,7 @@ void tool_app_t::validate()
 	m_errors = 0;
 	m_warnings = 0;
 
-	nt.setup().enable_validation();
+	nt.setup().set_extended_validation(opt_extended_validation());
 
 	try
 	{
@@ -484,6 +494,9 @@ void tool_app_t::validate()
 
 void tool_app_t::static_compile()
 {
+	if (!opt_dir.was_specified())
+		throw netlist::nl_exception("--dir option needs to be specified");
+
 	netlist_tool_t nt(*this, "netlist");
 
 	nt.init();
@@ -506,7 +519,8 @@ void tool_app_t::static_compile()
 
 	for (auto &e : mp)
 	{
-		pout.write(e.second);
+		auto sout(std::ofstream(opt_dir() + "/" + e.first + ".c" ));
+		sout << e.second;
 	}
 
 	nt.stop();
@@ -622,7 +636,7 @@ void tool_app_t::create_header()
 		{
 			last_source = e->sourcefile();
 			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
-			pout("{1}{2}\n", pstring("// Source: "), plib::replace_all(e->sourcefile(), "../", ""));
+			pout("{1}{2}\n", "// Source: ", plib::replace_all(e->sourcefile(), "../", ""));
 			pout("{1}\n", plib::rpad(pstring("// "), pstring("-"), opt_linewidth()));
 		}
 		header_entry(e.get());
@@ -700,7 +714,7 @@ void tool_app_t::listdevices()
 
 	nt.setup().prepare_to_run();
 
-	std::vector<netlist::pool_owned_ptr<netlist::core_device_t>> devs;
+	std::vector<netlist::unique_pool_ptr<netlist::core_device_t>> devs;
 
 	for (auto & f : list)
 	{

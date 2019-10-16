@@ -62,7 +62,7 @@ public:
 		//return m_sym(args...);
 	}
 
-	bool resolved() { return m_sym != nullptr; }
+	bool resolved() const { return m_sym != nullptr; }
 private:
 	calltype m_sym;
 };

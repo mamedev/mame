@@ -1111,7 +1111,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 		{
 			// address map entries that reference regions but are NOPs are pointless
 			if (entry.m_read.m_type == AMH_NONE && entry.m_write.m_type == AMH_NONE)
-				osd_printf_error("%s space references memory region %s, but is AM_NOP\n", spaceconfig.m_name, entry.m_region);
+				osd_printf_error("%s space references memory region %s, but is noprw()\n", spaceconfig.m_name, entry.m_region);
 
 			// make sure we can resolve the full path to the region
 			bool found = false;

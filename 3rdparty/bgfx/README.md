@@ -22,6 +22,7 @@ Supported rendering backends:
  * OpenGL 3.1+
  * OpenGL ES 2
  * OpenGL ES 3.1
+ * Vulkan
  * WebGL 1.0
  * WebGL 2.0
 
@@ -53,10 +54,10 @@ Languages:
  * [Go language API bindings](https://github.com/james4k/go-bgfx)
  * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
  * [Lightweight Java Game Library 3 bindings](https://github.com/LWJGL/lwjgl3)
- * [Lua language API bindings 1](https://github.com/excessive/lua-bgfx)
- * [Lua language API bindings 2](https://github.com/cloudwu/lua-bgfx)
+ * [Lua language API bindings](https://github.com/cloudwu/lua-bgfx)
  * [Nim language API bindings](https://github.com/Halsys/nim-bgfx)
  * [Python language API bindings](https://github.com/jnadro/pybgfx#pybgf)
+ * [Python language API bindings (alternative)](https://github.com/fbertola/bgfx-python#-----bgfx-python--)
  * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
  * [Swift language API bindings](https://github.com/stuartcarnie/SwiftBGFX)
 
@@ -65,6 +66,9 @@ Languages:
 
  - AppVeyor https://ci.appveyor.com/project/bkaradzic/bgfx
  - TravisCI https://travis-ci.org/bkaradzic/bgfx
+
+[Getting involved](https://bkaradzic.github.io/bgfx/overview.html#getting-involved)
+-----------------------------------------------------------------------------------
 
 [Examples](https://bkaradzic.github.io/bgfx/examples.html)
 ----------------------------------------------------------
@@ -75,8 +79,8 @@ Languages:
 [Tools](https://bkaradzic.github.io/bgfx/tools.html)
 ----------------------------------------------------
 
-Who is using it? #madewithbgfx
-------------------------------
+Who is using it? [#madewithbgfx](https://twitter.com/search?q=%23madewithbgfx&f=live)
+-------------------------------------------------------------------------------------
 
 ## Airmech
 
@@ -110,12 +114,6 @@ derivative of the original Torque Engine.
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=p4LTM_QGK34" 
 target="_blank"><img src="http://img.youtube.com/vi/p4LTM_QGK34/0.jpg" 
 alt="Torque 6 Material Editor" width="640" height="480" border="0" /></a>
-
-## Lumix Engine
-
-https://github.com/nem0/LumixEngine LumixEngine is a MIT licensed 3D engine.
-The main goal is performance and Unity-like usability.  
-![LumixEngine screenshot](https://cloud.githubusercontent.com/assets/153526/12904252/3fcf130e-cece-11e5-878b-c9fe24c1b11a.png)
 
 ## Kepler Orbits
 
@@ -212,22 +210,6 @@ target="_blank"><img src="http://img.youtube.com/vi/ckbkQsB6RVY/0.jpg"
 alt="Go Rally"
 width="640" height="480" border="0" /></a>
 
-## Fiber2D
-
-https://github.com/s1ddok/Fiber2D#fiber2d - Fiber2D - Cross-platform 2D Game
-Engine in pure Swift  
-![Fiber2D Demo Gif](http://imgur.com/CP6d9kT.gif)
-
-## On the Hunt / Lumix Engine
-
-http://www.indiedb.com/games/on-the-hunt - On the Hunt is an open world hunting
-game in development. It's a combination of FPS and stealth.
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=cAsqLbqSDBg" 
-target="_blank"><img src="http://img.youtube.com/vi/cAsqLbqSDBg/0.jpg" 
-alt="Lumix Engine - new features v0.29 & v0.30"
-width="640" height="480" border="0" /></a>
-
 ## vg-renderer
 
 https://github.com/jdryg/vg-renderer#vg-renderer - A vector graphics renderer
@@ -280,9 +262,9 @@ target="_blank"><img src="http://img.youtube.com/vi/nY8y_dFolKo/0.jpg"
 alt="WonderWorlds"
 width="640" height="480" border="0" /></a>
 
-## mud
+## two-io / mud
 
-https://hugoam.github.io/mud-io/ - an all-purpose c++ app prototyping library,
+https://hugoam.github.io/two-io/ - an all-purpose c++ app prototyping library,
 focused towards live graphical apps and games.
 
 ![mud](https://raw.githubusercontent.com/hugoam/mud-io/master/media/14_live_gfx.png)
@@ -321,13 +303,58 @@ https://beardsvibe.com/ - Multiplayer PVP rhythm game.
 
 ![coal-burnout](https://beardsvibe.com/scr/0l.png)
 
-## Project Aero
+## My Talking Tom 2
 
-https://www.adobe.com/products/projectaero.html - Project Aero, a powerful new
-augmented reality (AR) authoring tool that makes it easier for designers to
-create immersive content.
+https://outfit7.com/apps/my-talking-tom-2/ - Many mini games for mobile devices.
 
-![project-aero](https://www.adobe.com/content/dam/acom/en/products/aero/pod2.jpg/_jcr_content/renditions/cq5dam.mobile_640.640.462.jpg)
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=I0U7EQKKDjw" 
+target="_blank"><img src="http://img.youtube.com/vi/I0U7EQKKDjw/0.jpg" 
+alt="My Talking Tom 2"
+width="640" height="480" border="0" /></a>
+
+## NeoAxis Engine
+
+https://www.neoaxis.com/ - Versatile 3D project development environment.
+
+![neoaxis-engine](https://www.neoaxis.com/files/NeoAxisEngine04.jpg)
+
+## xatlas
+
+https://github.com/jpcy/xatlas#xatlas - Mesh parameterization library 
+
+![xatlas](https://user-images.githubusercontent.com/3744372/43034066-53a62dee-8d18-11e8-9767-0b38ed3fa2d3.png)
+
+## Heroes of Hammerwatch
+
+https://store.steampowered.com/app/677120/Heroes_of_Hammerwatch/ Heroes of Hammerwatch
+is a rogue-lite action-adventure game set in the same universe as Hammerwatch.
+Encounter endless hordes of enemies, traps, puzzles, secrets and lots of loot,
+as you battle your way through procedurally generated levels to reach the top
+of the Forsaken Spire.
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=uTIVDKdNvms" 
+target="_blank"><img src="http://img.youtube.com/vi/uTIVDKdNvms/0.jpg" 
+alt="Heroes of Hammerwatch"
+width="640" height="480" border="0" /></a>
+
+## Babylon Native
+
+Build cross-platform native applications with the power of the Babylon.js
+JavaScript framework.
+
+[Babylon Native](https://github.com/BabylonJS/BabylonNative#babylon-native)
+
+## Nira
+
+Instantly load and view assets on any device. All you need is a web browser.
+
+[Nira](https://nira.app/)  
+[SIGGRAPH 2019: Project Nira: Instant Interactive Real-Time Access to Multi-Gigabyte Sized 3D Assets on Any Device](https://s2019.siggraph.org/presentation/?sess=sess104&id=real_130#038;id=real_130)
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=Gz9weuemhDA&t=3350" 
+target="_blank"><img src="http://img.youtube.com/vi/Gz9weuemhDA/0.jpg" 
+alt="Heroes of Hammerwatch"
+width="640" height="480" border="0" /></a>
 
 [License (BSD 2-clause)](https://bkaradzic.github.io/bgfx/license.html)
 -----------------------------------------------------------------------
@@ -336,27 +363,25 @@ create immersive content.
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-	Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+	Copyright 2010-2019 Branimir Karadzic
 	
-	https://github.com/bkaradzic/bgfx
+	Redistribution and use in source and binary forms, with or without modification,
+	are permitted provided that the following conditions are met:
 	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
+	   1. Redistributions of source code must retain the above copyright notice, this
+	      list of conditions and the following disclaimer.
 	
-	   1. Redistributions of source code must retain the above copyright notice,
-	      this list of conditions and the following disclaimer.
+	   2. Redistributions in binary form must reproduce the above copyright notice,
+	      this list of conditions and the following disclaimer in the documentation
+	      and/or other materials provided with the distribution.
 	
-	   2. Redistributions in binary form must reproduce the above copyright
-	      notice, this list of conditions and the following disclaimer in the
-	      documentation and/or other materials provided with the distribution.
-	
-	THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDER ``AS IS'' AND ANY EXPRESS OR
-	IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
-	EVENT SHALL COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-	INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-	ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-	THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+	IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+	INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+	BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+	DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+	OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+	OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+	OF THE POSSIBILITY OF SUCH DAMAGE.

@@ -86,14 +86,14 @@ private:
 void monty_state::monty_mem(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	//AM_RANGE(0x4000, 0x4000) // The main rom checks to see if another program is here on startup
+	//map(0x4000, 0x4000) // The main rom checks to see if another program is here on startup
 	map(0xf800, 0xffff).ram();
 }
 
 void monty_state::mmonty_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	//AM_RANGE(0xc000, 0xc000) // The main rom checks to see if another program is here on startup
+	//map(0xc000, 0xc000) // The main rom checks to see if another program is here on startup
 	map(0x8000, 0xffff).rom();
 	map(0x7800, 0x7fff).ram();
 }

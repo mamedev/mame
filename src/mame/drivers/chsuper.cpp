@@ -220,7 +220,7 @@ void chsuper_state::chsuper_prg_map(address_map &map)
 	map(0xfb000, 0xfbfff).ram().share("nvram");
 }
 
-//  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+//  map(0xaff8, 0xaff8).w("oki", FUNC(okim6295_device::write));
 
 void chsuper_state::chsuper_portmap(address_map &map)
 {

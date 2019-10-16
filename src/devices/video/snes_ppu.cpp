@@ -75,6 +75,12 @@
 #include "emu.h"
 #include "video/snes_ppu.h"
 
+#define KEYPRESS_DEBUG_PRINTS	(0)
+
+#if KEYPRESS_DEBUG_PRINTS
+static bool s_debug_prints = false;
+#endif
+
 #define SNES_MAINSCREEN    0
 #define SNES_SUBSCREEN     1
 #define SNES_CLIP_NEVER    0
@@ -82,7 +88,7 @@
 #define SNES_CLIP_OUT      2
 #define SNES_CLIP_ALWAYS   3
 
-#define SNES_VRAM_SIZE        0x20000   /* 128kb of video ram */
+#define SNES_VRAM_SIZE        0x10000   /* 128kb of video ram */
 #define SNES_CGRAM_SIZE       0x202     /* 256 16-bit colours + 1 tacked on 16-bit colour for fixed colour */
 #define SNES_OAM_SIZE         0x440     /* 1088 bytes of Object Attribute Memory */
 #define FIXED_COLOUR          256       /* Position in cgram for fixed colour */
@@ -753,13 +759,12 @@ inline uint32_t snes_ppu_device::get_tmap_addr( uint8_t layer, uint8_t tile_size
 
 inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8_t priority_b, uint8_t priority_a, uint8_t color_depth, uint8_t hires, uint8_t offset_per_tile, uint8_t direct_colors )
 {
-	uint32_t tmap, tile, xoff, yoff, charaddr, addr;
-	uint16_t ii = 0, vflip, hflip, pal, pal_direct, tilemap;
-	uint8_t xscroll, priority;
-	int8_t yscroll;
+#if KEYPRESS_DEBUG_PRINTS
+	if (s_debug_prints) printf("L:%d ", layer);
+#endif
+
 	int tile_incr = 0;
 	uint16_t opt_bit = (layer == SNES_BG1) ? 13 : (layer == SNES_BG2) ? 14 : 0;
-	uint8_t tile_size;
 	/* variables depending on color_depth */
 	uint8_t color_planes = 2 << color_depth;
 	/* below we cheat to simplify the code: 8BPP should have 0 pal offset, not 0x100 (but we take care of this by later using pal % FIXED_COLOUR) */
@@ -776,7 +781,12 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8
 	m_scanlines[SNES_SUBSCREEN].clip = m_layer[layer].sub_window_enabled;
 
 	if (!m_scanlines[SNES_MAINSCREEN].enable && !m_scanlines[SNES_SUBSCREEN].enable)
+	{
+#if KEYPRESS_DEBUG_PRINTS
+		if (s_debug_prints) printf("DA\n");
+#endif
 		return;
+	}
 
 	/* Handle Mosaic effects */
 	if (m_layer[layer].mosaic_enabled)
@@ -786,18 +796,23 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8
 		curline /= 2;
 
 	/* Find the size of the tiles (8x8 or 16x16) */
-	tile_size = m_layer[layer].tile_size;
+	uint8_t tile_size = m_layer[layer].tile_size;
 
 	/* Find scroll info */
-	xoff = m_layer[layer].hoffs;
-	yoff = m_layer[layer].voffs;
+	uint32_t xoff = m_layer[layer].hoffs;
+	uint32_t yoff = m_layer[layer].voffs;
 
-	xscroll = xoff & ((1 << (3 + tile_size)) - 1);
+	uint8_t xscroll = xoff & ((1 << (3 + tile_size)) - 1);
 
 	/* Jump to base map address */
-	tmap = m_layer[layer].tilemap << 9;
-	charaddr = m_layer[layer].charmap << 13;
+	uint32_t tmap = m_layer[layer].tilemap << 9;
+	uint32_t charaddr = m_layer[layer].charmap << 13;
 
+#if KEYPRESS_DEBUG_PRINTS
+	if (s_debug_prints) printf("TS:%d XO:%d YO:%d XS:%d TM:%08x CA:%08x\n", tile_size, xoff, yoff, xscroll, tmap, charaddr);
+#endif
+
+	uint16_t ii = 0;
 	while (ii < 256 + (8 << tile_size))
 	{
 		// determine the horizontal position (Bishojo Janshi Suchi Pai & Desert Figther have tile_size & hires == 1)
@@ -840,7 +855,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8
 			}
 		}
 
-		addr = get_tmap_addr(layer, tile_size, tmap, xpos, ypos);
+		uint32_t addr = get_tmap_addr(layer, tile_size, tmap, xpos, ypos);
 
 		/*
 		Tilemap format
@@ -851,14 +866,14 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8
 		  ppp  = Tile palette. The number of entries in the palette depends on the Mode and the BG.
 		  cccccccccc = Tile number.
 		*/
-		tilemap = m_vram[addr % SNES_VRAM_SIZE] | (m_vram[(addr + 1) % SNES_VRAM_SIZE] << 8);
-		vflip = BIT(tilemap, 15);
-		hflip = BIT(tilemap, 14);
-		priority = BIT(tilemap, 13) ? priority_a : priority_b;
-		pal_direct = ((tilemap & 0x1c00) >> 8);
-		tile = tilemap & 0x03ff;
+		uint16_t tilemap = m_vram[addr % SNES_VRAM_SIZE] | (m_vram[(addr + 1) % SNES_VRAM_SIZE] << 8);
+		uint16_t vflip = BIT(tilemap, 15);
+		uint16_t hflip = BIT(tilemap, 14);
+		uint8_t priority = BIT(tilemap, 13) ? priority_a : priority_b;
+		uint16_t pal_direct = ((tilemap & 0x1c00) >> 8);
+		uint32_t tile = tilemap & 0x03ff;
 
-		pal = ((pal_direct >> 2) << color_shift);
+		uint16_t pal = ((pal_direct >> 2) << color_shift);
 
 		/* Mode 0 palettes are layer specific */
 		if (m_mode == 0)
@@ -880,7 +895,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8
 #endif /* SNES_LAYER_DEBUG */
 
 		/* figure out which line to draw */
-		yscroll = ypos & ((8 << tile_size) - 1);
+		int8_t yscroll = ypos & ((8 << tile_size) - 1);
 
 		if (tile_size)
 			if (BIT(yscroll, 3) != vflip)
@@ -1818,18 +1833,16 @@ inline void snes_ppu_device::draw_blend( uint16_t offset, uint16_t *colour, uint
 
 void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 {
-	uint16_t ii;
-	int x;
-	int fade;
-	struct SNES_SCANLINE *scanline1, *scanline2;
-	uint16_t c;
-	uint16_t prev_colour = 0;
-	int blurring = m_options.read_safe(0) & 0x01;
+#if KEYPRESS_DEBUG_PRINTS
+	s_debug_prints = machine().input().code_pressed(KEYCODE_Q);
+#endif
+
+	bool blurring = m_options.read_safe(0) & 0x01;
 
 	g_profiler.start(PROFILER_VIDEO);
 
 	if (m_screen_disabled) /* screen is forced blank */
-		for (x = 0; x < SNES_SCR_WIDTH * 2; x++)
+		for (int x = 0; x < SNES_SCR_WIDTH * 2; x++)
 			bitmap.pix32(curline, x) = rgb_t::black();
 	else
 	{
@@ -1853,7 +1866,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 		memset(m_scanlines[SNES_SUBSCREEN].blend_exception, 0, SNES_SCR_WIDTH);
 
 		/* Draw back colour */
-		for (ii = 0; ii < SNES_SCR_WIDTH; ii++)
+		for (uint16_t ii = 0; ii < SNES_SCR_WIDTH; ii++)
 		{
 			if (m_mode == 5 || m_mode == 6 || m_pseudo_hires)
 				m_scanlines[SNES_SUBSCREEN].buffer[ii] = m_cgram[0];
@@ -1871,6 +1884,8 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 		update_obsel();
 
+		struct SNES_SCANLINE *scanline1 = &m_scanlines[SNES_MAINSCREEN];
+		struct SNES_SCANLINE *scanline2 = &m_scanlines[SNES_SUBSCREEN];
 #if SNES_LAYER_DEBUG
 		if (dbg_video(curline))
 		{
@@ -1884,35 +1899,29 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 			scanline1 = &m_scanlines[SNES_SUBSCREEN];
 			scanline2 = &m_scanlines[SNES_MAINSCREEN];
 		}
-		else
-#endif /* SNES_LAYER_DEBUG */
-		{
-			scanline1 = &m_scanlines[SNES_MAINSCREEN];
-			scanline2 = &m_scanlines[SNES_SUBSCREEN];
-		}
+#endif
 
 		/* Draw the scanline to screen */
 
-		fade = m_screen_brightness;
+		int fade = m_screen_brightness;
+		uint16_t prev_colour = 0;
 
-		for (x = 0; x < SNES_SCR_WIDTH; x++)
+		for (int x = 0; x < SNES_SCR_WIDTH; x++)
 		{
-			int r, g, b, hires;
-			uint16_t tmp_col[2];
-			hires = (m_mode != 5 && m_mode != 6 && !m_pseudo_hires) ? 0 : 1;
+			const bool hires = (m_mode != 5 && m_mode != 6 && !m_pseudo_hires) ? false : true;
 
 			/* in hires, the first pixel (of 512) is subscreen pixel, then the first mainscreen pixel follows, and so on... */
 			if (!hires)
 			{
-				c = scanline1->buffer[x];
+				uint16_t c = scanline1->buffer[x];
 
 				/* perform color math if the layer wants it (except if it's an object > 192) */
 				if (!scanline1->blend_exception[x] && m_layer[scanline1->layer[x]].color_math)
 					draw_blend(x, &c, m_prevent_color_math, m_clip_to_black, 0);
 
-				r = ((c & 0x1f) * fade) >> 4;
-				g = (((c & 0x3e0) >> 5) * fade) >> 4;
-				b = (((c & 0x7c00) >> 10) * fade) >> 4;
+				int r = ((c & 0x1f) * fade) >> 4;
+				int g = (((c & 0x3e0) >> 5) * fade) >> 4;
+				int b = (((c & 0x7c00) >> 10) * fade) >> 4;
 
 				bitmap.pix32(curline, x * 2 + 0) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 				bitmap.pix32(curline, x * 2 + 1) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
@@ -1920,13 +1929,13 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 			else
 			{
 				/* prepare the pixel from main screen */
-				c = scanline1->buffer[x];
+				uint16_t c = scanline1->buffer[x];
 
 				/* perform color math if the layer wants it (except if it's an object > 192) */
 				if (!scanline1->blend_exception[x] && m_layer[scanline1->layer[x]].color_math)
 					draw_blend(x, &c, m_prevent_color_math, m_clip_to_black, 0);
 
-				tmp_col[1] = c;
+				uint16_t tmp_col1 = c;
 
 				/* prepare the pixel from sub screen */
 				c = scanline2->buffer[x];
@@ -1941,33 +1950,33 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 				else if (x > 0  && !scanline1->blend_exception[x - 1] && m_layer[scanline1->layer[x - 1]].color_math)
 					draw_blend(x, &c, m_prevent_color_math, m_clip_to_black, 1);
 
-				tmp_col[0] = c;
+				uint16_t tmp_col0 = c;
 
 				/* average the first pixel if required, or draw it directly*/
 				if (blurring)
-					c = (prev_colour + tmp_col[0] - ((prev_colour ^ tmp_col[0]) & 0x0421)) >> 1;    // Hack code to mimic TV pixel blurring
+					c = (prev_colour + tmp_col0 - ((prev_colour ^ tmp_col0) & 0x0421)) >> 1;    // Hack code to mimic TV pixel blurring
 				else
-					c = tmp_col[0];
+					c = tmp_col0;
 
-				r = ((c & 0x1f) * fade) >> 4;
-				g = (((c & 0x3e0) >> 5) * fade) >> 4;
-				b = (((c & 0x7c00) >> 10) * fade) >> 4;
+				int r = ((c & 0x1f) * fade) >> 4;
+				int g = (((c & 0x3e0) >> 5) * fade) >> 4;
+				int b = (((c & 0x7c00) >> 10) * fade) >> 4;
 
 				bitmap.pix32(curline, x * 2 + 0) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
-				prev_colour = tmp_col[0];
+				prev_colour = tmp_col0;
 
 				/* average the second pixel if required, or draw it directly*/
 				if (blurring)
-					c = (prev_colour + tmp_col[1] - ((prev_colour ^ tmp_col[1]) & 0x0421)) >> 1;    // Hack code to mimic TV pixel blurring
+					c = (prev_colour + tmp_col1 - ((prev_colour ^ tmp_col1) & 0x0421)) >> 1;    // Hack code to mimic TV pixel blurring
 				else
-					c = tmp_col[1];
+					c = tmp_col1;
 
 				r = ((c & 0x1f) * fade) >> 4;
 				g = (((c & 0x3e0) >> 5) * fade) >> 4;
 				b = (((c & 0x7c00) >> 10) * fade) >> 4;
 
 				bitmap.pix32(curline, x * 2 + 1) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
-				prev_colour = tmp_col[1];
+				prev_colour = tmp_col1;
 			}
 		}
 	}

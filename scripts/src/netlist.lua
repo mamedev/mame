@@ -73,6 +73,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pstate.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.h",
+    MAME_DIR .. "src/lib/netlist/plib/pstrutil.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstream.h",
   	MAME_DIR .. "src/lib/netlist/plib/ptime.h",
 		MAME_DIR .. "src/lib/netlist/plib/ptypes.h",

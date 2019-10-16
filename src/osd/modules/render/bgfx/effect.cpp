@@ -52,11 +52,5 @@ void bgfx_effect::submit(int view, uint64_t blend)
 bgfx_uniform* bgfx_effect::uniform(std::string name)
 {
 	std::map<std::string, bgfx_uniform*>::iterator iter = m_uniforms.find(name);
-
-	if (iter != m_uniforms.end())
-	{
-		return iter->second;
-	}
-
-	return nullptr;
+	return iter != m_uniforms.end() ? iter->second : nullptr;
 }
