@@ -11,6 +11,7 @@
 #include "palloc.h"
 #include "pconfig.h"
 #include "pexception.h"
+#include "pstrutil.h"
 
 #include <array>
 #include <memory>
@@ -31,8 +32,7 @@ namespace plib {
 	struct sizeabs<FT, 0>
 	{
 		static constexpr std::size_t ABS() { return 0; }
-		//using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
-		using container = typename std::vector<FT>;
+		using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
 	};
 
 	/**
@@ -69,23 +69,12 @@ namespace plib {
 		{
 		}
 
-#if 1
-#if 0
-		struct tag {};
-		/* allow construction in fixed size arrays */
-		template <int X = SIZE >
-		parray(tag A = tag(), typename std::enable_if<(X >= 0), int>::type = 0)
-		: m_size(X)
-		{
-		}
-#else
 		/* allow construction in fixed size arrays */
 		parray()
 		: m_size(SIZEABS())
 		{
 		}
-#endif
-#endif
+
 		template <int X = SIZE >
 		parray(size_type size, typename std::enable_if<(X != 0), int>::type = 0)
 		: m_size(size)
@@ -101,18 +90,6 @@ namespace plib {
 
 		bool empty() const noexcept { return size() == 0; }
 
-#if 0
-		reference operator[](size_type i) /*noexcept*/
-		{
-			if (i >= m_size) throw plib::pexception("limits error " + to_string(i) + ">=" + to_string(m_size));
-			return m_a[i];
-		}
-		const_reference operator[](size_type i) const /*noexcept*/
-		{
-			if (i >= m_size) throw plib::pexception("limits error " + to_string(i) + ">=" + to_string(m_size));
-			return m_a[i];
-		}
-#else
 		C14CONSTEXPR reference operator[](size_type i) noexcept
 		{
 			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
@@ -121,7 +98,7 @@ namespace plib {
 		{
 			return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(&m_a[0])[i];
 		}
-#endif
+
 		FT * data() noexcept { return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(m_a.data()); }
 		const FT * data() const noexcept { return assume_aligned_ptr<FT, PALIGN_VECTOROPT>(m_a.data()); }
 

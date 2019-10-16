@@ -1219,7 +1219,10 @@ plib::unique_ptr<std::istream> source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	auto ret(plib::make_unique<std::ifstream>(plib::filesystem::u8path(m_filename)));
-	return std::move(ret);
+	if (ret->is_open())
+		return std::move(ret);
+	else
+		return plib::unique_ptr<std::istream>(nullptr);
 }
 
 bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
