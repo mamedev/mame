@@ -75,7 +75,11 @@
 #include "emu.h"
 #include "video/snes_ppu.h"
 
+#define KEYPRESS_DEBUG_PRINTS	(0)
+
+#if KEYPRESS_DEBUG_PRINTS
 static bool s_debug_prints = false;
+#endif
 
 #define SNES_MAINSCREEN    0
 #define SNES_SUBSCREEN     1
@@ -755,7 +759,9 @@ inline uint32_t snes_ppu_device::get_tmap_addr( uint8_t layer, uint8_t tile_size
 
 inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8_t priority_b, uint8_t priority_a, uint8_t color_depth, uint8_t hires, uint8_t offset_per_tile, uint8_t direct_colors )
 {
+#if KEYPRESS_DEBUG_PRINTS
 	if (s_debug_prints) printf("L:%d ", layer);
+#endif
 
 	int tile_incr = 0;
 	uint16_t opt_bit = (layer == SNES_BG1) ? 13 : (layer == SNES_BG2) ? 14 : 0;
@@ -776,7 +782,9 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8
 
 	if (!m_scanlines[SNES_MAINSCREEN].enable && !m_scanlines[SNES_SUBSCREEN].enable)
 	{
+#if KEYPRESS_DEBUG_PRINTS
 		if (s_debug_prints) printf("DA\n");
+#endif
 		return;
 	}
 
@@ -800,7 +808,9 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8
 	uint32_t tmap = m_layer[layer].tilemap << 9;
 	uint32_t charaddr = m_layer[layer].charmap << 13;
 
+#if KEYPRESS_DEBUG_PRINTS
 	if (s_debug_prints) printf("TS:%d XO:%d YO:%d XS:%d TM:%08x CA:%08x\n", tile_size, xoff, yoff, xscroll, tmap, charaddr);
+#endif
 
 	uint16_t ii = 0;
 	while (ii < 256 + (8 << tile_size))
@@ -1823,7 +1833,9 @@ inline void snes_ppu_device::draw_blend( uint16_t offset, uint16_t *colour, uint
 
 void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 {
+#if KEYPRESS_DEBUG_PRINTS
 	s_debug_prints = machine().input().code_pressed(KEYCODE_Q);
+#endif
 
 	bool blurring = m_options.read_safe(0) & 0x01;
 
