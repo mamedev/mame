@@ -92,6 +92,7 @@ public:
 	void ladylinr_map(address_map &map);
 	void lucky8_map(address_map &map);
 	void common_decrypted_opcodes_map(address_map &map);
+	void super972_decrypted_opcodes_map(address_map &map);
 	void mbstar_map(address_map &map);
 	void megaline_portmap(address_map &map);
 	void ncb3_readwriteport(address_map &map);
@@ -242,6 +243,7 @@ public:
 	void init_flaming7();
 	void init_flam7_tw();
 	void init_luckylad();
+	void init_super972();
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);
@@ -257,6 +259,7 @@ public:
 	void lucky8(machine_config &config);
 	void lucky8f(machine_config &config);
 	void lucky8k(machine_config &config);
+	void super972(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);
 	void flam7_w4(machine_config &config);

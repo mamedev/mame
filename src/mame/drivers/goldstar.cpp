@@ -968,6 +968,11 @@ void goldstar_state::common_decrypted_opcodes_map(address_map &map)
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
 }
 
+void goldstar_state::super972_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom().share("decrypted_opcodes");
+}
+
 void goldstar_state::flaming7_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -8998,6 +9003,13 @@ void wingco_state::lucky8k(machine_config &config)
 	maincpu.set_decrypted_tag(m_decrypted_opcodes);
 }
 
+void wingco_state::super972(machine_config &config)
+{
+	lucky8(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::super972_decrypted_opcodes_map);
+}
+
 void wingco_state::bingowng(machine_config &config)
 {
 	/* basic machine hardware */
@@ -12405,11 +12417,7 @@ ROM_END
 /*
   Super 97-2
 
-  Code jumps above $C000, so offset range C000-F7FF was defined
-  as ROM space. However, the game isn't working due to the high
-  memory code looks strange. Maybe the program needs some sort
-  of address/data descramble...
-
+  Offset range 0xc000 - 0xdfff is encrypted (see init_super972()).
 */
 ROM_START( super972 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -17217,6 +17225,20 @@ void wingco_state::init_lucky8f() // TODO: simplify
 	}
 }
 
+void wingco_state::init_super972()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0xf000; i++)
+		m_decrypted_opcodes[i] = rom [i];
+
+	for (int i = 0xc000; i < 0xe000; i++)
+		m_decrypted_opcodes[i] = bitswap<8>(m_decrypted_opcodes[i], 7, 4, 5, 6, 3, 0, 1, 2);;
+
+	for (int i = 0xc000; i < 0xe000; i++)
+		rom[i] = bitswap<8>(rom[i], 7, 2, 5, 0, 3, 6, 1, 4);
+}
+
 void cmaster_state::init_nfb96sea()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -17868,7 +17890,7 @@ GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   empty_init
 GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 198?, super972,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8 )    // ???
+GAMEL( 198?, super972,  ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8p1 )  // decrypted, needs correct inputs
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
 GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (set 1)",                                       0 )
