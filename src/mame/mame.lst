@@ -38386,6 +38386,9 @@ spellb79                        //
 @source:tk2000.cpp
 tk2000                          // Microdigital TK2000
 
+@source:tk635.cpp
+tk635                           // (c) 199? Termtek
+
 @source:tk80.cpp
 ics8080                         //
 mikrolab                        //

@@ -4151,6 +4151,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/terminal.cpp",
 	MAME_DIR .. "src/mame/drivers/textelcomp.cpp",
 	MAME_DIR .. "src/mame/drivers/ti630.cpp",
+	MAME_DIR .. "src/mame/drivers/tk635.cpp",
 	MAME_DIR .. "src/mame/drivers/tr175.cpp",
 	MAME_DIR .. "src/mame/drivers/trs80dt1.cpp",
 	MAME_DIR .. "src/mame/drivers/tsispch.cpp",
