@@ -815,7 +815,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer, uint8
 	uint16_t ii = 0;
 	while (ii < 256 + (8 << tile_size))
 	{
-		// determine the horizontal position (Bishojo Janshi Suchi Pai & Desert Figther have tile_size & hires == 1)
+		// determine the horizontal position (Bishoujo Janshi Suchie-Pai & Desert Fighter have tile_size & hires == 1)
 		uint32_t xpos = xoff + (ii << (tile_size * hires));
 		uint32_t ypos = yoff + curline;
 
