@@ -2582,7 +2582,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
-	cxd1095_device &cxdio(CXD1095(config, "cxdio", 0));
+	cxd1095_device &cxdio(CXD1095(config, "cxdio"));
 	cxdio.out_porta_cb().set(FUNC(segas32_cd_state::lamps1_w));
 	cxdio.out_portb_cb().set(FUNC(segas32_cd_state::lamps2_w));
 	cxdio.in_portd_cb().set_constant(0xff); // Ports C-E used for IEEE-488 printer interface

@@ -2911,7 +2911,7 @@ void model2b_state::rchase2(machine_config &config)
 	iocpu.set_addrmap(AS_PROGRAM, &model2b_state::rchase2_iocpu_map);
 	iocpu.set_addrmap(AS_IO, &model2b_state::rchase2_ioport_map);
 
-	CXD1095(config, "ioexp", 0);
+	CXD1095(config, "ioexp");
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.in_pd_callback().set(FUNC(model2b_state::rchase2_drive_board_r));
