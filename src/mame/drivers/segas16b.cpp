@@ -3977,7 +3977,7 @@ void segas16b_state::aceattacb_fd1094(machine_config &config)
 	UPD4701A(config, m_upd4701a[0]);
 	UPD4701A(config, m_upd4701a[1]);
 
-	CXD1095(config, m_cxdio, 0);
+	CXD1095(config, m_cxdio);
 	m_cxdio->in_porta_cb().set_ioport("HANDX1");
 	m_cxdio->in_portb_cb().set_ioport("HANDX2");
 }

@@ -691,12 +691,12 @@ void mtech_state::megatech(machine_config &config)
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mtech_state::megatech_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mtech_state::megatech_bios_portmap);
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("BIOS_DSW0");
 	io1.in_portb_cb().set_ioport("BIOS_DSW1");
 	io1.out_porte_cb().set(FUNC(mtech_state::cart_select_w));
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("BIOS_IN0");
 	io2.in_portb_cb().set_ioport("BIOS_IN1");
 	io2.in_portc_cb().set(FUNC(mtech_state::bios_portc_r));

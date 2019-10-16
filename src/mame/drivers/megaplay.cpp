@@ -675,14 +675,14 @@ void mplay_state::megaplay(machine_config &config)
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("DSW0");
 	io1.in_portb_cb().set_ioport("DSW1");
 	io1.out_portd_cb().set(FUNC(mplay_state::bios_banksel_w));
 	io1.in_porte_cb().set(FUNC(mplay_state::bios_6204_r));
 	io1.out_porte_cb().set(FUNC(mplay_state::bios_width_w));
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("TEST");
 	io2.in_portb_cb().set_ioport("COIN");
 	io2.in_portc_cb().set(FUNC(mplay_state::bios_6402_r));
