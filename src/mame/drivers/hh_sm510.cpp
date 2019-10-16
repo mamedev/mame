@@ -918,7 +918,7 @@ ROM_START( gnw_manholeg )
 	ROM_LOAD( "mh-06", 0x0000, 0x0740, CRC(ae52c425) SHA1(8da8a714ecbdde7d0f257b52a5014993675a5f3f) )
 
 	ROM_REGION( 125447, "screen", 0)
-	ROM_LOAD( "gnw_manholeg.svg", 0, 125447, CRC(ac5d6807) SHA1(3392644edf35cfcbf8e56aca8bfca3ce380aad05) )
+	ROM_LOAD( "gnw_manholeg.svg", 0, 125447, CRC(488e1574) SHA1(4c416930cef4b94bee1a38c5577384c876ac304b) )
 ROM_END
 
 
