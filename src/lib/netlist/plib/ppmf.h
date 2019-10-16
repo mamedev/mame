@@ -179,7 +179,7 @@ namespace plib {
 		inline R call(O *obj, Targs... args) const noexcept(true)
 		{
 			using function_ptr = R (O::*)(Targs...);
-			function_ptr t = *reinterpret_cast<function_ptr *>(&m_func);
+			function_ptr t = *reinterpret_cast<const function_ptr *>(&m_func);
 			return (obj->*t)(std::forward<Targs>(args)...);
 		}
 		bool is_set() const {
