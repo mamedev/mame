@@ -9,6 +9,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0804.h"
 #include "machine/i8255.h"
 #include "machine/gen_latch.h"
 #include "machine/segaic16.h"
@@ -31,6 +32,7 @@ public:
 		, m_mcu(*this, "mcu")
 		, m_i8255_1(*this, "i8255_1")
 		, m_i8255_2(*this, "i8255_2")
+		, m_adc(*this, "adc")
 		, m_sprites(*this, "sprites")
 		, m_segaic16vid(*this, "segaic16vid")
 		, m_segaic16road(*this, "segaic16road")
@@ -38,7 +40,7 @@ public:
 		, m_workram(*this, "workram")
 		, m_sharrier_video(false)
 		, m_adc_select(0)
-		, m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3"})
+		, m_adc_ports(*this, "ADC%u", 0U)
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -81,6 +83,9 @@ private:
 	DECLARE_WRITE16_MEMBER( hangon_io_w );
 	DECLARE_READ16_MEMBER( sharrier_io_r );
 	DECLARE_WRITE16_MEMBER( sharrier_io_w );
+
+	// ADC0804 read handler
+	uint8_t analog_r();
 
 	// Z80 sound CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
@@ -129,6 +134,7 @@ private:
 	optional_device<i8751_device> m_mcu;
 	required_device<i8255_device> m_i8255_1;
 	required_device<i8255_device> m_i8255_2;
+	required_device<adc0804_device> m_adc;
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;

@@ -149,7 +149,7 @@ READ8_MEMBER( segahang_state::adc_status_r )
 	// D5 = 0 (left open)
 	// D4 = 0 (left open)
 	//
-	return 0x00;
+	return m_adc->intr_r() << 6;
 }
 
 
@@ -179,7 +179,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 			return m_i8255_2->read(offset & 3);
 
 		case 0x3020/2: // ADC0804 data output
-			return m_adc_ports[m_adc_select].read_safe(0);
+			return m_adc->read();
 	}
 
 	//logerror("%06X:hangon_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
@@ -207,6 +207,7 @@ WRITE16_MEMBER( segahang_state::hangon_io_w )
 				return;
 
 			case 0x3020/2: // ADC0804
+				m_adc->write();
 				return;
 		}
 
@@ -237,7 +238,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 			return m_i8255_2->read(offset & 3);
 
 		case 0x0030/2: // ADC0804 data output
-			return m_adc_ports[m_adc_select].read_safe(0);
+			return m_adc->read();
 	}
 
 	//logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
@@ -266,10 +267,21 @@ WRITE16_MEMBER( segahang_state::sharrier_io_w )
 				return;
 
 			case 0x0030/2: // ADC0804
+				m_adc->write();
 				return;
 		}
 
 	//logerror("%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  analog_r - read multiplexed analog ports
+//-------------------------------------------------
+
+uint8_t segahang_state::analog_r()
+{
+	return m_adc_ports[m_adc_select].read_safe(0);
 }
 
 
@@ -777,6 +789,9 @@ void segahang_state::shared_base(machine_config &config)
 	I8255(config, m_i8255_2);
 	m_i8255_2->out_pa_callback().set(FUNC(segahang_state::sub_control_adc_w));
 	m_i8255_2->in_pc_callback().set(FUNC(segahang_state::adc_status_r));
+
+	ADC0804(config, m_adc, MASTER_CLOCK_25MHz/4/6);
+	m_adc->vin_callback().set(FUNC(segahang_state::analog_r));
 
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 	SEGAIC16_ROAD(config, m_segaic16road, 0);

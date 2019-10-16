@@ -272,7 +272,7 @@ READ16_MEMBER(polepos_state::polepos2_ic25_r)
 }
 
 
-READ8_MEMBER(polepos_state::adc_r)
+uint8_t polepos_state::analog_r()
 {
 	return ioport(m_adc_input ? "ACCEL" : "BRAKE")->read();
 }
@@ -284,7 +284,8 @@ READ8_MEMBER(polepos_state::ready_r)
 	if (m_screen->vpos() >= 128)
 		ret ^= 0x02;
 
-	ret ^= 0x08; /* ADC End Flag */
+	if (!m_adc->intr_r())
+		ret ^= 0x08; /* ADC End Flag */
 
 	return ret;
 }
@@ -440,7 +441,7 @@ void polepos_state::z80_map(address_map &map)
 void polepos_state::z80_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(polepos_state::adc_r)).nopw();
+	map(0x00, 0x00).rw(m_adc, FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 }
 
 
@@ -914,6 +915,9 @@ void polepos_state::polepos(machine_config &config)
 	m_latch->q_out_cb<6>().set(FUNC(polepos_state::sb0_w));
 	m_latch->q_out_cb<7>().set(FUNC(polepos_state::chacl_w));
 
+	ADC0804(config, m_adc, MASTER_CLOCK/8/8);
+	m_adc->vin_callback().set(FUNC(polepos_state::analog_r));
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16);
@@ -1019,6 +1023,9 @@ void polepos_state::topracern(machine_config &config)
 	m_latch->q_out_cb<5>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
 	m_latch->q_out_cb<6>().set(FUNC(polepos_state::sb0_w));
 	m_latch->q_out_cb<7>().set(FUNC(polepos_state::chacl_w));
+
+	ADC0804(config, m_adc, MASTER_CLOCK/8/8);
+	m_adc->vin_callback().set(FUNC(polepos_state::analog_r));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
