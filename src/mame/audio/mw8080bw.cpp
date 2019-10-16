@@ -940,7 +940,7 @@ static DISCRETE_SOUND_START(boothill_discrete)
 	/************************************************
 	 * Shot sounds
 	 ************************************************/
-	/* Noise clock was breadboarded and measured at 7700Hz */
+	// Noise clock was breadboarded and measured at 7700Hz
 	DISCRETE_LFSR_NOISE(BOOTHILL_NOISE, 1, 1, 7700, 12.0, 0, 12.0/2, &midway_lfsr)
 
 	DISCRETE_OP_AMP_TRIG_VCA(NODE_30, BOOTHILL_LEFT_SHOT_EN, 0, 0, BOOTHILL_NOISE, 0, &boothill_shot_tvca_info)
@@ -977,8 +977,8 @@ static DISCRETE_SOUND_START(boothill_discrete)
 
 	DISCRETE_MIXER2(NODE_91, BOOTHILL_GAME_ON_EN, BOOTHILL_L_SHOT_SND, BOOTHILL_L_HIT_SND, &boothill_l_mixer)
 
-	/* Music is only added to the right channel per schematics */
-	/* This should be verified on the real game */
+	// Music is only added to the right channel per schematics
+	// This should be verified on the real game
 	DISCRETE_MIXER3(NODE_92, BOOTHILL_GAME_ON_EN, BOOTHILL_R_SHOT_SND, BOOTHILL_R_HIT_SND, MIDWAY_TONE_SND, &boothill_r_mixer)
 
 	DISCRETE_OUTPUT(NODE_91, 1)
