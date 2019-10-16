@@ -554,6 +554,7 @@ void arm_vidc20_device::regs_map(address_map &map)
 {
 	map(0x00, 0x0f).w(FUNC(arm_vidc20_device::vidc20_pal_data_display_w));
 	map(0x10, 0x1f).w(FUNC(arm_vidc20_device::vidc20_pal_data_index_w));
+	map(0x40, 0x7f).w(FUNC(arm_vidc20_device::vidc20_pal_data_cursor_w));
 	map(0x80, 0x9f).w(FUNC(arm_vidc20_device::vidc20_crtc_w));
 	map(0xb0, 0xb0).w(FUNC(arm_vidc20_device::vidc20_sound_frequency_w));
 	map(0xb1, 0xb1).w(FUNC(arm_vidc20_device::vidc20_sound_control_w));
@@ -643,9 +644,16 @@ WRITE32_MEMBER(arm_vidc20_device::vidc20_pal_data_display_w)
 	m_pal_data_index &= 0xff;
 }
 
-WRITE32_MEMBER(arm_vidc20_device::vidc20_pal_data_index_w)
+WRITE32_MEMBER( arm_vidc20_device::vidc20_pal_data_index_w )
 {
 	m_pal_data_index = data & 0xff;
+}
+
+WRITE32_MEMBER( arm_vidc20_device::vidc20_pal_data_cursor_w )
+{
+	uint8_t ext_data = offset & 0xf;
+	uint8_t cursor_pal_index = (offset >> 4) & 3;
+	update_8bpp_palette(m_pal_cursor_base + cursor_pal_index, (ext_data<<24) | data);
 }
 
 u32 arm_vidc20_device::get_pixel_clock()

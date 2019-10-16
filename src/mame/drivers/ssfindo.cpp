@@ -245,6 +245,7 @@ WRITE8_MEMBER(ssfindo_state::iolines_w)
 	m_flash_bank_select = BIT(data, 0);
 }
 
+// inverted compared to riscpc.cpp?
 READ_LINE_MEMBER(tetfight_state::iocr_od1_r)
 {
 	// TODO: completely get rid of this speedup fn or move anywhere else

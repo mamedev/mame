@@ -112,6 +112,10 @@ private:
 	DECLARE_WRITE32_MEMBER( vidend_w );
 	DECLARE_READ32_MEMBER( vidinita_r );
 	DECLARE_WRITE32_MEMBER( vidinita_w );
+	u32 m_cursinit;
+	bool m_cursor_enable;
+	DECLARE_READ32_MEMBER( cursinit_r );
+	DECLARE_WRITE32_MEMBER( cursinit_w );
 	
 	static constexpr int sounddma_ch_size = 2;
 	u32 m_sndcur, m_sndend;

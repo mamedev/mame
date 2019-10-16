@@ -170,6 +170,7 @@ protected:
 private:
 	DECLARE_WRITE32_MEMBER( vidc20_pal_data_display_w );
 	DECLARE_WRITE32_MEMBER( vidc20_pal_data_index_w );
+	DECLARE_WRITE32_MEMBER( vidc20_pal_data_cursor_w );
 	DECLARE_WRITE32_MEMBER( vidc20_crtc_w );
 	DECLARE_WRITE32_MEMBER( vidc20_control_w );
 	DECLARE_WRITE32_MEMBER( vidc20_sound_frequency_w );

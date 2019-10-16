@@ -92,7 +92,7 @@ void arm_iomd_device::base_map(address_map &map)
 
 	// video DMA
 //	map(0x1c0, 0x1c3).rw(FUNC(arm_iomd_device::curscur_r), FUNC(arm_iomd_device::curscur_w));
-//	map(0x1c4, 0x1c7).rw(FUNC(arm_iomd_device::cursinit_r), FUNC(arm_iomd_device::cursinit_w));
+	map(0x1c4, 0x1c7).rw(FUNC(arm_iomd_device::cursinit_r), FUNC(arm_iomd_device::cursinit_w));
 
 //	map(0x1d0, 0x1d3).rw(FUNC(arm_iomd_device::vidcura_r), FUNC(arm_iomd_device::vidcura_w));
 	map(0x1d4, 0x1d7).rw(FUNC(arm_iomd_device::vidend_r), FUNC(arm_iomd_device::vidend_w));
@@ -242,6 +242,8 @@ void arm_iomd_device::device_start()
 	save_item(NAME(m_vidend));
 	save_item(NAME(m_vidlast));
 	save_item(NAME(m_videqual));
+	save_item(NAME(m_cursor_enable));
+	save_item(NAME(m_cursinit));
 	save_pointer(NAME(m_irq_mask), IRQ_SOURCES_SIZE);
 	save_pointer(NAME(m_irq_status), IRQ_SOURCES_SIZE);
 	
@@ -599,6 +601,18 @@ READ32_MEMBER( arm_iomd_device::sdst_r )
 }
 
 // video DMA
+READ32_MEMBER( arm_iomd_device::cursinit_r )
+{
+	return m_cursinit;
+}
+
+WRITE32_MEMBER( arm_iomd_device::cursinit_w )
+{
+	COMBINE_DATA(&m_cursinit);
+	m_cursinit &= 0x1ffffff0;
+	m_cursor_enable = true;
+	m_vidc->set_cursor_enable(m_cursor_enable);
+}
 
 READ32_MEMBER( arm_iomd_device::vidcr_r )
 {
@@ -610,6 +624,12 @@ READ32_MEMBER( arm_iomd_device::vidcr_r )
 WRITE32_MEMBER( arm_iomd_device::vidcr_w )
 {
 	m_video_enable = BIT(data, 5);
+	if (m_video_enable == false)
+	{
+		m_cursor_enable = false;
+		m_vidc->set_cursor_enable(m_cursor_enable);
+	}
+
 	if (data & 0x80)
 		throw emu_fatalerror("%s VIDCR LCD dual panel mode enabled", this->tag());
 }
@@ -652,16 +672,30 @@ WRITE_LINE_MEMBER( arm_iomd_device::vblank_irq )
 	if (m_video_enable == true)
 	{
 		// TODO: much more complex, last/end regs, start regs and eventually LCD hooks
-		uint32_t src = m_vidinita;
-		uint32_t size = m_vidend;
+		u32 src = m_vidinita;
+		u32 size = m_vidend;
 
 		// TODO: vidcur can be readback, support it once anything makes use of the 0x1d0 reg for obvious reasons
 		// (and using m_ prefix is intentional too)
-		for (uint32_t m_vidcur = 0; m_vidcur<size; m_vidcur++)
+		for (u32 m_vidcur = 0; m_vidcur<size; m_vidcur++)
 		{
 			m_vidc->write_vram(m_vidcur, m_host_space->read_byte(src));
 			src++;
 			src &= 0x1fffffff;
+		}
+		
+		if (m_cursor_enable == true)
+		{
+			src = m_cursinit;
+			size = m_vidc->get_cursor_size();
+			
+			// TODO: same as above
+			for (u32 m_curscur = 0; m_curscur<size; m_curscur++)
+			{
+				m_vidc->write_cram(m_curscur, m_host_space->read_byte(src));
+				src++;
+				src &= 0x1fffffff;
+			}
 		}
 	}
 }

@@ -73,7 +73,35 @@ private:
 
 	void a7000_map(address_map &map);
 	void riscpc_map(address_map &map);
+	
+	bool m_i2cmem_clock;
+	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
+	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
+	DECLARE_WRITE_LINE_MEMBER(iocr_od0_w);
+	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
 };
+
+READ_LINE_MEMBER(riscpc_state::iocr_od1_r)
+{
+	// TODO: presuming same as Acorn Archimedes, where i2c clock can be readback
+	return m_i2cmem_clock;
+}
+
+READ_LINE_MEMBER(riscpc_state::iocr_od0_r)
+{
+	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
+}
+
+WRITE_LINE_MEMBER(riscpc_state::iocr_od0_w)
+{
+	m_i2cmem->write_sda(state);
+}
+
+WRITE_LINE_MEMBER(riscpc_state::iocr_od1_w)
+{
+	m_i2cmem_clock = state;
+	m_i2cmem->write_scl(m_i2cmem_clock);
+}
 
 void riscpc_state::a7000_map(address_map &map)
 {
@@ -179,6 +207,10 @@ void riscpc_state::base_config(machine_config &config)
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->set_kbdc_tag(m_kbdc);
+	m_iomd->iocr_read_od<0>().set(FUNC(riscpc_state::iocr_od0_r));
+	m_iomd->iocr_read_od<1>().set(FUNC(riscpc_state::iocr_od1_r));
+	m_iomd->iocr_write_od<0>().set(FUNC(riscpc_state::iocr_od0_w));
+	m_iomd->iocr_write_od<1>().set(FUNC(riscpc_state::iocr_od1_w));
 }
 
 void riscpc_state::rpc600(machine_config &config)
