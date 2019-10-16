@@ -29,20 +29,13 @@ YM2151:
 . Pin 24 - 3577600.55 OSC1/4
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "includes/mustache.h"
 #include "audio/t5182.h"
 
 #include "cpu/z80/z80.h"
 #include "speaker.h"
-
-
-#define XTAL1  14318180
-#define XTAL2  18432000
-#define XTAL3  12000000
-
-#define CPU_CLOCK   (XTAL3/2)
-#define YM_CLOCK    (XTAL1/4)
 
 
 void mustache_state::memmap(address_map &map)
@@ -171,7 +164,7 @@ GFXDECODE_END
 void mustache_state::mustache(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, CPU_CLOCK);
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mustache_state::memmap);
 	m_maincpu->set_addrmap(AS_OPCODES, &mustache_state::decrypted_opcodes_map);
 
@@ -187,7 +180,7 @@ void mustache_state::mustache(machine_config &config)
 	m_screen->set_visarea(1*8, 31*8-1, 0, 31*8-1);
 	m_screen->set_screen_update(FUNC(mustache_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // causes 2 interrupts per frame
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mustache);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -195,7 +188,7 @@ void mustache_state::mustache(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", YM_CLOCK));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14.318181_MHz_XTAL/4));
 	ymsnd.irq_handler().set("t5182", FUNC(t5182_device::ym2151_irq_handler));
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
