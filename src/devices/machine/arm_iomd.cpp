@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
 	ARM IOMD device emulation
 	
@@ -10,8 +10,10 @@
 	- IOCR / IOLINES hookups can be further improved, also DDR bits needs verifying;
 	- word-boundary accesses for 8-bit ports;
 	- split into different types, add quick notes about where they diverges do in this header;
+	- keyboard/mouse interface hookup is wrong for PS/2 and unimplemented for quadrature. 
+	  I guess we can use connectors over a custom handling;
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "arm_iomd.h"

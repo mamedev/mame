@@ -2,23 +2,17 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-    Acorn Archimedes 7000/7000+
+    Acorn RiscPC line of computers
 
-    very preliminary driver by Angelo Salese,
+    preliminary driver by Angelo Salese,
     based on work by Tomasz Slanina and Sarah Walker
 
     TODO:
 	- IOMD currently hardwired with ARM7500FE flavour for all machines, needs information about 
 	  which uses what;
 	- PS/2 keyboard doesn't work properly;
-    - i2c device should actually be a pcf8583 RTC with i2c as slave
-      (and indeed CMOS settings doesn't work);
-    - Fix pendingUnd fatalerror from ARM7 core
-    - Fix per-machine configurations;
-
-    ???
-    bp (0382827C) (second trigger)
-    do R13 = SR13
+    - Fix pendingUnd fatalerror from ARM7 core;
+	- Fix pendingAbtD fatalerror for RiscOS 4.xx;
 
 ****************************************************************************/
 
