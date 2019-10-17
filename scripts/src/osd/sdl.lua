@@ -29,6 +29,10 @@ function maintargetosdoptions(_target,_subtarget)
 			"X11",
 			"Xinerama",
 		}
+	else
+		links {
+			"EGL",
+		}
 	end
 
 	if _OPTIONS["NO_USE_XINPUT"]~="1" then
