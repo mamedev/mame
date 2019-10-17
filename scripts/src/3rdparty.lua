@@ -1387,8 +1387,8 @@ end
 	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
 		if _OPTIONS["NO_X11"]=="1" then
 			defines {
-			"BGFX_CONFIG_RENDERER_OPENGLES=1",
-			"BGFX_CONFIG_RENDERER_OPENGL=0",
+				"BGFX_CONFIG_RENDERER_OPENGLES=1",
+				"BGFX_CONFIG_RENDERER_OPENGL=0",
 			}
 		end
 	end
