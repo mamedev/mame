@@ -30,9 +30,11 @@ function maintargetosdoptions(_target,_subtarget)
 			"Xinerama",
 		}
 	else
-		links {
-			"EGL",
-		}
+		if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+			links {
+				"EGL",
+			}
+		end
 	end
 
 	if _OPTIONS["NO_USE_XINPUT"]~="1" then
