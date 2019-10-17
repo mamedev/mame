@@ -1035,7 +1035,7 @@ void snes_state::snes_init_timers()
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
-	m_hblank_offset = 274;
+	m_hblank_offset = 128;
 	m_hblank_timer->adjust(m_screen->time_until_pos(m_ppu->vtotal() - 1, m_hblank_offset));
 }
 
