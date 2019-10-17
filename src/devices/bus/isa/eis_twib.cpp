@@ -91,6 +91,13 @@ WRITE8_MEMBER( isa8_eistwib_device::twib_w )
 	m_uart8274->cd_ba_w(offset, data);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(isa8_eistwib_device::tick_bitclock)
+{
+	m_uart8274->txca_w(m_bitclock);
+	m_uart8274->rxca_w(m_bitclock);
+	m_bitclock = !m_bitclock;
+}
+
 
 //----------------------------------------------------------
 //  UI I/O
@@ -192,6 +199,8 @@ ioport_constructor isa8_eistwib_device::device_input_ports() const
 void isa8_eistwib_device::device_add_mconfig(machine_config &config)
 {
 	I8274_NEW(config, m_uart8274, (XTAL(14'318'181)/ 3) / 2); // Half the 4,77 MHz ISA bus CLK signal
+	//m_uart8274->out_rtsa_callback().set([this] (int state) { m_rts = state; });
+	//m_uart8274->out_txda_callback().set([this] (int state) { printf("%d ", state); });
 	m_uart8274->out_int_callback().set([this] (int state)
 	{   // Jumper field W1 decides what IRQs to pull
 		if (m_isairq->read() & 0x01) { LOGIRQ("TWIB IRQ2: %d\n", state); m_isa->irq2_w(state); }
@@ -200,12 +209,16 @@ void isa8_eistwib_device::device_add_mconfig(machine_config &config)
 		if (m_isairq->read() & 0x08) { LOGIRQ("TWIB IRQ5: %d\n", state); m_isa->irq5_w(state); }
 		if (m_isairq->read() & 0x10) { LOGIRQ("TWIB IRQ6: %d\n", state); m_isa->irq6_w(state); }
 	});
+
+	TIMER(config, "bitclock").configure_periodic(FUNC(isa8_eistwib_device::tick_bitclock), attotime::from_hz(300000));
 }
 
 isa8_eistwib_device::isa8_eistwib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA8_EIS_TWIB, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_uart8274(*this, "terminal")
+	, m_bitclock(false)
+	, m_rts(false)
 	, m_sw1(*this, "SW1")
 	, m_isairq(*this, "W1")
 	, m_installed(false)
@@ -219,6 +232,9 @@ void isa8_eistwib_device::device_start()
 {
 	set_isa_device();
 	m_installed = false;
+	m_bitclock = false;
+	save_item(NAME(m_installed));
+	save_item(NAME(m_bitclock));
 }
 
 void isa8_eistwib_device::device_reset()
@@ -233,4 +249,7 @@ void isa8_eistwib_device::device_reset()
 				write8_delegate(FUNC( isa8_eistwib_device::twib_w ), this));
 		m_installed = true;
 	}
+	// CD and CTS input are tied to ground
+	m_uart8274->ctsa_w(0);
+	m_uart8274->dcda_w(0);
 }

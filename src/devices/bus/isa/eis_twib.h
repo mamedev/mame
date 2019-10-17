@@ -7,6 +7,7 @@
 
 #include "isa.h"
 #include "machine/z80sio.h"
+#include "machine/timer.h"
 
 class isa8_eistwib_device :
 		public device_t,
@@ -30,6 +31,11 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	// Timers
+	TIMER_DEVICE_CALLBACK_MEMBER(tick_bitclock);
+	bool m_bitclock;
+	bool m_rts;
 
 	// helpers
 	required_ioport m_sw1;
