@@ -34,8 +34,10 @@ namespace plib {
 	{
 		//using arena_storage_type = P *;
 		using arena_storage_type = typename std::conditional<P::is_stateless, P, P *>::type;
+
 		template <typename X, typename Y = void>
 		typename std::enable_if<!X::is_stateless, X&>::type getref(X *x) { return *x;}
+
 		template <typename X, typename Y = void *>
 		typename std::enable_if<std::remove_pointer<X>::type::is_stateless, X&>::type
 		getref(X &x, Y y = nullptr)
@@ -44,13 +46,18 @@ namespace plib {
 			return x;
 		}
 
-		constexpr arena_deleter(arena_storage_type a = arena_storage_type()) noexcept
+		constexpr arena_deleter(arena_storage_type a = arena_storage_type())
 		: m_a(a) { }
 
+#if 1
+		template<typename U, typename = typename
+			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
+		arena_deleter(const arena_deleter<P, U> &rhs) : m_a(rhs.m_a) { }
+#else
 		template<typename PU, typename U, typename = typename
 			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
-		arena_deleter(const arena_deleter<PU, U> &rhs) noexcept : m_a(rhs.m_a) { }
-
+		arena_deleter(const arena_deleter<PU, U> &rhs) : m_a(rhs.m_a) { }
+#endif
 		void operator()(T *p) //const
 		{
 			/* call destructor */
@@ -80,11 +87,11 @@ namespace plib {
 		template <typename, typename>
 		friend class owned_ptr;
 
-		owned_ptr(pointer p, bool owned) noexcept
+		owned_ptr(pointer p, bool owned)
 		: m_ptr(p), m_deleter(), m_is_owned(owned)
 		{ }
 
-		owned_ptr(pointer p, bool owned, D deleter) noexcept
+		owned_ptr(pointer p, bool owned, D deleter)
 		: m_ptr(p), m_deleter(deleter), m_is_owned(owned)
 		{ }
 
@@ -93,7 +100,7 @@ namespace plib {
 		owned_ptr & operator =(owned_ptr &r) = delete;
 
 		template<typename DC, typename DC_D>
-		owned_ptr & operator =(owned_ptr<DC, DC_D> &&r)
+		owned_ptr & operator =(owned_ptr<DC, DC_D> &&r)  noexcept
 		{
 			if (m_is_owned && (m_ptr != nullptr))
 				//delete m_ptr;
@@ -122,7 +129,7 @@ namespace plib {
 				m_deleter(m_ptr);
 			m_is_owned = r.m_is_owned;
 			m_ptr = r.m_ptr;
-			m_deleter = std::move(r.m_deleter);
+			m_deleter = r.m_deleter;
 			r.m_is_owned = false;
 			r.m_ptr = nullptr;
 			return *this;
@@ -197,18 +204,12 @@ namespace plib {
 
 		~arena_allocator() noexcept = default;
 
-		arena_allocator(const arena_allocator &rhs) noexcept = default;
-		arena_allocator& operator=(const arena_allocator&) noexcept = delete;
-
-		arena_allocator(arena_allocator&&) noexcept = default;
-		arena_allocator& operator=(arena_allocator&&) = delete;
-
 		arena_allocator(arena_type & a) noexcept : m_a(a)
 		{
 		}
 
 		template <class U>
-		arena_allocator(const arena_allocator<ARENA, U, ALIGN>& rhs) noexcept
+		arena_allocator(const arena_allocator<ARENA, U, ALIGN>& rhs)
 		: m_a(rhs.m_a)
 		{
 		}
@@ -223,7 +224,7 @@ namespace plib {
 			return reinterpret_cast<T *>(m_a.allocate(ALIGN, sizeof(T) * n));
 		}
 
-		void deallocate(T* p, std::size_t n) noexcept
+		void deallocate(T* p, std::size_t n)
 		{
 			unused_var(n);
 			m_a.deallocate(p);

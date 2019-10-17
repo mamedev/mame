@@ -190,7 +190,7 @@ public:
 		{
 			m_lineno++;
 			line = process_line(line);
-			m_buf += decltype(m_buf)(line.c_str()) + static_cast<char>(10);
+			m_outbuf += decltype(m_outbuf)(line.c_str()) + static_cast<char>(10);
 		}
 		return *this;
 	}
@@ -202,10 +202,10 @@ public:
 	: std::istream(new readbuffer(this))
 	, m_defines(std::move(s.m_defines))
 	, m_expr_sep(std::move(s.m_expr_sep))
-	, m_ifflag(s.m_ifflag)
-	, m_level(s.m_level)
+	, m_if_flag(s.m_if_flag)
+	, m_if_level(s.m_if_level)
 	, m_lineno(s.m_lineno)
-	, m_buf(std::move(s.m_buf))
+	, m_outbuf(std::move(s.m_outbuf))
 	, m_pos(s.m_pos)
 	, m_state(s.m_state)
 	, m_comment(s.m_comment)
@@ -225,15 +225,14 @@ protected:
 
 		int_type underflow() override
 		{
-			//printf("here\n");
 			if (this->gptr() == this->egptr())
 			{
 				/* clang reports sign error - weird */
-				std::size_t bytes = pstring_mem_t_size(m_strm->m_buf) - static_cast<std::size_t>(m_strm->m_pos);
+				std::size_t bytes = pstring_mem_t_size(m_strm->m_outbuf) - static_cast<std::size_t>(m_strm->m_pos);
 
 				if (bytes > m_buf.size())
 					bytes = m_buf.size();
-				std::copy(m_strm->m_buf.c_str() + m_strm->m_pos, m_strm->m_buf.c_str() + m_strm->m_pos + bytes, m_buf.data());
+				std::copy(m_strm->m_outbuf.c_str() + m_strm->m_pos, m_strm->m_outbuf.c_str() + m_strm->m_pos + bytes, m_buf.data());
 				//printf("%ld\n", (long int)bytes);
 				this->setg(m_buf.data(), m_buf.data(), m_buf.data() + bytes);
 
@@ -268,10 +267,10 @@ private:
 	defines_map_type m_defines;
 	std::vector<pstring> m_expr_sep;
 
-	std::uint_least64_t m_ifflag; // 31 if levels
-	int m_level;
+	std::uint_least64_t m_if_flag; // 31 if levels
+	int m_if_level;
 	int m_lineno;
-	pstring_t<pu8_traits> m_buf;
+	pstring_t<pu8_traits> m_outbuf;
 	std::istream::pos_type m_pos;
 	state_e m_state;
 	pstring m_line;

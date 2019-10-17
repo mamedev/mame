@@ -261,8 +261,8 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 
 ppreprocessor::ppreprocessor(defines_map_type *defines)
 : std::istream(new readbuffer(this))
-, m_ifflag(0)
-, m_level(0)
+, m_if_flag(0)
+, m_if_level(0)
 , m_lineno(0)
 , m_pos(0)
 , m_state(PROCESS)
@@ -473,34 +473,34 @@ pstring ppreprocessor::process_line(pstring line)
 		std::vector<pstring> lti(psplit(lt, " ", true));
 		if (lti[0] == "#if")
 		{
-			m_level++;
+			m_if_level++;
 			std::size_t start = 0;
 			lt = replace_macros(lt);
 			std::vector<pstring> t(psplit(replace_all(lt.substr(3), " ", ""), m_expr_sep));
 			auto val = static_cast<int>(expr(t, start, 255));
 			if (val == 0)
-				m_ifflag |= (1 << m_level);
+				m_if_flag |= (1 << m_if_level);
 		}
 		else if (lti[0] == "#ifdef")
 		{
-			m_level++;
+			m_if_level++;
 			if (get_define(lti[1]) == nullptr)
-				m_ifflag |= (1 << m_level);
+				m_if_flag |= (1 << m_if_level);
 		}
 		else if (lti[0] == "#ifndef")
 		{
-			m_level++;
+			m_if_level++;
 			if (get_define(lti[1]) != nullptr)
-				m_ifflag |= (1 << m_level);
+				m_if_flag |= (1 << m_if_level);
 		}
 		else if (lti[0] == "#else")
 		{
-			m_ifflag ^= (1 << m_level);
+			m_if_flag ^= (1 << m_if_level);
 		}
 		else if (lti[0] == "#endif")
 		{
-			m_ifflag &= ~(1 << m_level);
-			m_level--;
+			m_if_flag &= ~(1 << m_if_level);
+			m_if_level--;
 		}
 		else if (lti[0] == "#include")
 		{
@@ -508,7 +508,7 @@ pstring ppreprocessor::process_line(pstring line)
 		}
 		else if (lti[0] == "#pragma")
 		{
-			if (m_ifflag == 0 && lti.size() > 3 && lti[1] == "NETLIST")
+			if (m_if_flag == 0 && lti.size() > 3 && lti[1] == "NETLIST")
 			{
 				if (lti[2] == "warning")
 					error("NETLIST: " + catremainder(lti, 3, " "));
@@ -516,7 +516,7 @@ pstring ppreprocessor::process_line(pstring line)
 		}
 		else if (lti[0] == "#define")
 		{
-			if (m_ifflag == 0)
+			if (m_if_flag == 0)
 			{
 				if (lti.size() < 2)
 					error("PREPRO: define needs at least one argument: " + line);
@@ -534,14 +534,14 @@ pstring ppreprocessor::process_line(pstring line)
 		}
 		else
 		{
-			if (m_ifflag == 0)
+			if (m_if_flag == 0)
 				error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(replace_macros(line)));
 		}
 	}
 	else
 	{
 		lt = replace_macros(lt);
-		if (m_ifflag == 0)
+		if (m_if_flag == 0)
 			ret += lt;
 	}
 	return ret;

@@ -31,7 +31,6 @@
 #pragma GCC optimize "ivopts"
 #endif
 
-#include "netlist/nl_lists.h"
 #include "netlist/nl_factory.h"
 #include "nld_matrix_solver.h"
 #include "nld_ms_direct.h"

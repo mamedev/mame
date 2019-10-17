@@ -5579,7 +5579,10 @@ BX_TRACE("%d, %d, %d, %s", _array, _srgb, _mipAutogen, getName(_format) );
 
 					version = 0 == bx::strCmp(code, "#version 430", 12) ? 430 : version;
 
-					bx::write(&writer, &err, "#version %d\n", version);
+					if (version < 130)
+						bx::write(&writer, &err, "#version %d\n", 130);
+					else
+						bx::write(&writer, &err, "#version %d\n", version);
 
 					if (430 > version && usesTextureLod)
 					{

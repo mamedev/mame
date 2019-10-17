@@ -32,6 +32,7 @@ namespace plib {
 	struct sizeabs<FT, 0>
 	{
 		static constexpr std::size_t ABS() { return 0; }
+		//using container = typename std::vector<FT, arena_allocator<mempool, FT, 64>>;
 		using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
 	};
 
@@ -74,6 +75,15 @@ namespace plib {
 		: m_size(SIZEABS())
 		{
 		}
+
+		// osx clang doesn't like COPYASSIGNMOVE(parray, default)
+		// it will generate some weird error messages about move assignment
+		// constructor having a different noexcept status.
+
+		parray(const parray &rhs) : m_a(rhs.m_a), m_size(rhs.m_size) {}
+		parray(parray &&rhs) noexcept : m_a(std::move(rhs.m_a)), m_size(std::move(rhs.m_size)) {}
+		parray &operator=(const parray &rhs) { m_a = rhs.m_a; m_size = rhs.m_size; return *this; }
+		parray &operator=(parray &&rhs) noexcept { std::swap(m_a,rhs.m_a); std::swap(m_size, rhs.m_size); return *this; }
 
 		template <int X = SIZE >
 		parray(size_type size, typename std::enable_if<(X != 0), int>::type = 0)
@@ -125,6 +135,8 @@ namespace plib {
 					(*this)[i] = parray<FT, SIZE2>(size2);
 			}
 		}
+
+		COPYASSIGNMOVE(parray2D, default)
 	};
 
 } // namespace plib

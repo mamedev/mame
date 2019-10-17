@@ -123,6 +123,12 @@ namespace plib {
 			}
 		}
 
+		static inline mempool &instance()
+		{
+			static mempool s_mempool;
+			return s_mempool;
+		}
+
 		void *allocate(size_t align, size_t size)
 		{
 			block *b = nullptr;
@@ -219,6 +225,8 @@ namespace plib {
 				throw;
 			}
 		}
+
+		bool operator ==(const mempool &rhs) { return this == &rhs; }
 
 	};
 

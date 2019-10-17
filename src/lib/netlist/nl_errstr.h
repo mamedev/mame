@@ -14,7 +14,7 @@
 #define PERRMSG(name, str) \
 	struct name \
 	{ \
-		operator pstring() const { return str; } \
+		operator pstring() const noexcept { return str; } \
 	};
 
 #define PERRMSGV(name, narg, str) \
@@ -23,7 +23,7 @@
 		template<typename... Args> name(Args&&... args) \
 		: m_m(plib::pfmt(str)(std::forward<Args>(args)...)) \
 		{ static_assert(narg == sizeof...(args), "Argument count mismatch"); } \
-		operator pstring() const { return m_m; } \
+		operator pstring() const noexcept { return m_m; } \
 		pstring m_m; \
 	};
 

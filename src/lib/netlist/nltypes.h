@@ -68,17 +68,6 @@ namespace netlist
 
 	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
 
-
-	//============================================================
-	//  Performance tracking
-	//============================================================
-
-	template<bool enabled_>
-	using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, enabled_>;
-
-	template<bool enabled_>
-	using nperfcount_t = plib::chrono::counter<enabled_>;
-
 	//============================================================
 	//  Types needed by various includes
 	//============================================================
