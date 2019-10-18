@@ -629,6 +629,7 @@ if _OPTIONS["osd"]=="retro" then
 	configuration { "*" }
 		defines {
 			"__LIBRETRO__",
+			"NDEBUG",
 		}
 end
 -- RETRO HACK
