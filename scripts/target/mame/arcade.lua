@@ -961,6 +961,8 @@ files {
 	MAME_DIR .. "src/mame/video/avgdvg.h",
 	MAME_DIR .. "src/mame/video/awpvid.cpp",
 	MAME_DIR .. "src/mame/video/awpvid.h",
+	MAME_DIR .. "src/mame/video/tmap038.cpp",
+	MAME_DIR .. "src/mame/video/tmap038.h",
 	MAME_DIR .. "src/mame/audio/dcs.cpp",
 	MAME_DIR .. "src/mame/audio/dcs.h",
 	MAME_DIR .. "src/mame/audio/decobsmt.cpp",
