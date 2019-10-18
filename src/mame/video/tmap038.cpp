@@ -159,7 +159,7 @@ TILE_GET_INFO_MEMBER(tilemap038_device::get_tile_info)
 		if (!m_038_cb.isnull())
 			m_038_cb(true, color, pri, code);
 	}
-	else if (!m_tiledim)
+	else
 	{
 		tile  = (m_vram_8x8 != nullptr) ? ((m_vram_8x8[tile_index * 2] << 16) + m_vram_8x8[(tile_index * 2) + 1]) : 0;
 
