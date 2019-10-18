@@ -2306,8 +2306,8 @@ ROM_END
 // BIOS-String: 40-0301-000000-00101111-070791-SCREAMER-0 / BIOS RELEASE 42121691 - On board: 2xserial, parallel, floppy, 1xIDE
 ROM_START( amibaby )
 	ROM_REGION(0x20000, "bios", 0)
-	ROMX_LOAD( "ami_mark_v_baby_screamer_even.bin", 0x10000, 0x10000, CRC(50baacb7) SHA1(c9cb6bc3ab23f35050a7f079109005331eb5de2c), ROM_SKIP(1))
-	ROMX_LOAD( "ami_mark_v_baby_screamer_odd.bin", 0x10001, 0x10000, CRC(42050eed) SHA1(c5e1ed9717acb2e3adcb388ccecf90a74d495132), ROM_SKIP(1))
+	ROMX_LOAD( "ami_mark_v_baby_screamer_even.bin", 0x00000, 0x10000, CRC(50baacb7) SHA1(c9cb6bc3ab23f35050a7f079109005331eb5de2c), ROM_SKIP(1))
+	ROMX_LOAD( "ami_mark_v_baby_screamer_odd.bin", 0x00001, 0x10000, CRC(42050eed) SHA1(c5e1ed9717acb2e3adcb388ccecf90a74d495132), ROM_SKIP(1))
 ROM_END
 
 // AUVA TAM/25-P2 M31720P - Chipset: µC M19382, M19381A, Chips - CPU: 386DX 25Mhz - BIOS: DA058290 - Keyboard-BIOS: A179859
