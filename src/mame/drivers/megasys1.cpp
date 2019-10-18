@@ -504,6 +504,15 @@ READ8_MEMBER(megasys1_state::oki_status_r)
 		return m_oki[Chip]->read();
 }
 
+void megasys1_state::p47b_adpcm_w(offs_t offset, u8 data)
+{
+	// bit 6 is always set
+	m_p47b_adpcm[offset]->reset_w(BIT(data, 7));
+	m_p47b_adpcm[offset]->write_data(data & 0x0f);
+	m_p47b_adpcm[offset]->vclk_w(1);
+	m_p47b_adpcm[offset]->vclk_w(0);
+}
+
 /***************************************************************************
                             [ Sound CPU - System A ]
 ***************************************************************************/
@@ -548,18 +557,21 @@ void megasys1_state::p47b_sound_map(address_map &map)
 	map(0x060000, 0x060001).w(m_soundlatch[1], FUNC(generic_latch_16_device::write));   // to main cpu?
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
 	map(0x0a0000, 0x0a0003).noprw(); // OKI1 on the original
-	map(0x0c0000, 0x0c0003).noprw(); // OKI2 on the original
+	map(0x0c0001, 0x0c0001).w("soundlatch3", FUNC(generic_latch_8_device::write));
+	map(0x0c0002, 0x0c0003).noprw(); // OKI2 on the original
 	map(0x0e0000, 0x0fffff).ram();
 }
 
 void megasys1_state::p47b_extracpu_prg_map(address_map &map) // TODO
 {
-	map(0x0000, 0xffff).rom();
+	map(0x0000, 0xffff).rom().nopw();
 }
 
 void megasys1_state::p47b_extracpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x00, 0x01).w(FUNC(megasys1_state::p47b_adpcm_w));
+	map(0x01, 0x01).r("soundlatch3", FUNC(generic_latch_8_device::read));
 }
 
 /***************************************************************************
@@ -1785,11 +1797,22 @@ void megasys1_state::p47b(machine_config &config)
 
 	// probably for driving the OKI M5205
 	z80_device &extracpu(Z80(config, "extracpu", 7.2_MHz_XTAL / 2)); // divisor not verified
-	extracpu.set_periodic_int(FUNC(megasys1_state::irq0_line_hold), attotime::from_hz(4*56));
+	extracpu.set_periodic_int(FUNC(megasys1_state::irq0_line_hold), attotime::from_hz(8000));
 	extracpu.set_addrmap(AS_PROGRAM, &megasys1_state::p47b_extracpu_prg_map);
 	extracpu.set_addrmap(AS_IO, &megasys1_state::p47b_extracpu_io_map);
 
+	GENERIC_LATCH_8(config, "soundlatch3");
+
 	// OKI M5205
+	MSM5205(config, m_p47b_adpcm[0], 384000);
+	m_p47b_adpcm[0]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_p47b_adpcm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_p47b_adpcm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	MSM5205(config, m_p47b_adpcm[1], 384000);
+	m_p47b_adpcm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_p47b_adpcm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_p47b_adpcm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 void megasys1_state::system_B(machine_config &config)
@@ -3614,7 +3637,7 @@ ROM_START( p47b ) // very similar to original hardware but for the sound system 
 	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x010000, CRC(617906d6) SHA1(79b43de70a51840f9980b5e3b9c769df0ec23060) )
 	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x010000, CRC(cde8f971) SHA1(dc529799584065749d43c79a42a0296db015f810) )
 
-	ROM_REGION( 0x10000, "extracpu", 0 )        /* Extra Z80 CPU Code, what's this for? */
+	ROM_REGION( 0x10000, "extracpu", 0 )        /* Extra Z80 CPU Code, code very similar to Street Fighter */
 	ROM_LOAD( "1.bin", 0x000000, 0x010000, CRC(5c38bf63) SHA1(8d4750e0b54602c38041ee6dd17007c3cc5cc938) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0, identical to p47 set but with smaller ROMs */
@@ -4934,7 +4957,7 @@ GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  megasys1_state, emp
 GAME( 1988, p47,      0,        system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47j,     p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47je,    p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47b,     p47,      p47b,              p47,      megasys1_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing SFX
+GAME( 1988, p47b,     p47,      p47b,              p47,      megasys1_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoff,  0,        system_A,          kickoff,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Kick Off (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoffb, kickoff,  kickoffb,          kickoff,  megasys1_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
 GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
