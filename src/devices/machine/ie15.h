@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "bus/rs232/rs232.h"
 #include "cpu/ie15/ie15.h"
 #include "machine/ie15_kbd.h"
 #include "sound/beep.h"
