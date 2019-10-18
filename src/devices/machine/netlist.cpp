@@ -286,13 +286,13 @@ public:
 	: netlist::nl_exception(plib::pfmt(fmt)(std::forward<Args>(args)...)) { }
 };
 
-class netlist_source_memregion_t : public netlist::source_t
+class netlist_source_memregion_t : public netlist::source_netlist_t
 {
 public:
 
 
 	netlist_source_memregion_t(device_t &dev, pstring name)
-	: netlist::source_t(), m_dev(dev), m_name(name)
+	: netlist::source_netlist_t(), m_dev(dev), m_name(name)
 	{
 	}
 
@@ -302,7 +302,7 @@ private:
 	pstring m_name;
 };
 
-class netlist_data_memregions_t : public netlist::source_t
+class netlist_data_memregions_t : public netlist::source_data_t
 {
 public:
 	netlist_data_memregions_t(const device_t &dev);
@@ -333,7 +333,7 @@ plib::unique_ptr<std::istream> netlist_source_memregion_t::stream(const pstring 
 }
 
 netlist_data_memregions_t::netlist_data_memregions_t(const device_t &dev)
-	: netlist::source_t(netlist::source_t::DATA), m_dev(dev)
+	: netlist::source_data_t(), m_dev(dev)
 {
 }
 

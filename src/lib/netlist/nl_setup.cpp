@@ -87,11 +87,20 @@ namespace netlist
 
 	void nlparse_t::include(const pstring &netlist_name)
 	{
-		for (auto &source : m_sources)
+#if 0
+		for (auto &base : m_sources)
 		{
-			if (source->parse(*this, netlist_name))
+			auto source(dynamic_cast<source_netlist_t *>(base.get()));
+			if (source && source->parse(*this, netlist_name))
 				return;
 		}
+		log().fatal(MF_NOT_FOUND_IN_SOURCE_COLLECTION(netlist_name));
+#endif
+		if (m_sources.for_all<source_netlist_t>(netlist_name, [this, &netlist_name] (auto &src)
+			{
+				return src->parse(*this, netlist_name);
+			}))
+			return;
 		log().fatal(MF_NOT_FOUND_IN_SOURCE_COLLECTION(netlist_name));
 	}
 
@@ -206,9 +215,9 @@ namespace netlist
 		return false;
 	}
 
-	bool nlparse_t::parse_stream(plib::unique_ptr<std::istream> &&istrm, const pstring &name)
+	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
 	{
-		plib::ppreprocessor y(&m_defines);
+		plib::ppreprocessor y(m_includes, &m_defines);
 		plib::ppreprocessor &x(y.process(std::move(istrm)));
 		return parser_t(std::move(x), *this).parse(name);
 		//return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
@@ -239,12 +248,6 @@ setup_t::setup_t(netlist_state_t &nlstate)
 
 setup_t::~setup_t() noexcept
 {
-	// FIXME: can't see a need any longer
-	m_links.clear();
-	m_params.clear();
-	m_terminals.clear();
-	m_param_values.clear();
-	m_sources.clear();
 }
 
 pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
@@ -1019,19 +1022,13 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 // Sources
 // ----------------------------------------------------------------------------------------
 
-plib::unique_ptr<std::istream> setup_t::get_data_stream(const pstring &name)
+plib::psource_t::stream_ptr setup_t::get_data_stream(const pstring &name)
 {
-	for (auto &source : m_sources)
-	{
-		if (source->type() == source_t::DATA)
-		{
-			auto strm = source->stream(name);
-			if (strm)
-				return strm;
-		}
-	}
+	auto strm = m_sources.get_stream<source_data_t>(name);
+	if (strm)
+		return strm;
 	log().warning(MW_DATA_1_NOT_FOUND(name));
-	return plib::unique_ptr<std::istream>(nullptr);
+	return plib::psource_t::stream_ptr(nullptr);
 }
 
 
@@ -1185,21 +1182,16 @@ void setup_t::prepare_to_run()
 // base sources
 // ----------------------------------------------------------------------------------------
 
-bool source_t::parse(nlparse_t &setup, const pstring &name)
+bool source_netlist_t::parse(nlparse_t &setup, const pstring &name)
 {
-	if (m_type != SOURCE)
-		return false;
+	auto strm(stream(name));
+	if (strm)
+		return setup.parse_stream(std::move(strm), name);
 	else
-	{
-		auto strm(stream(name));
-		if (strm)
-			return setup.parse_stream(std::move(strm), name);
-		else
-			return false;
-	}
+		return false;
 }
 
-plib::unique_ptr<std::istream> source_string_t::stream(const pstring &name)
+source_string_t::stream_ptr source_string_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	auto ret(plib::make_unique<std::istringstream>(m_str));
@@ -1207,7 +1199,7 @@ plib::unique_ptr<std::istream> source_string_t::stream(const pstring &name)
 	return std::move(ret);
 }
 
-plib::unique_ptr<std::istream> source_mem_t::stream(const pstring &name)
+source_mem_t::stream_ptr source_mem_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	auto ret(plib::make_unique<std::istringstream>(m_str, std::ios_base::binary));
@@ -1215,14 +1207,14 @@ plib::unique_ptr<std::istream> source_mem_t::stream(const pstring &name)
 	return std::move(ret);
 }
 
-plib::unique_ptr<std::istream> source_file_t::stream(const pstring &name)
+source_file_t::stream_ptr source_file_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
 	auto ret(plib::make_unique<std::ifstream>(plib::filesystem::u8path(m_filename)));
 	if (ret->is_open())
 		return std::move(ret);
 	else
-		return plib::unique_ptr<std::istream>(nullptr);
+		return stream_ptr(nullptr);
 }
 
 bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
@@ -1236,10 +1228,10 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 		return false;
 }
 
-plib::unique_ptr<std::istream> source_proc_t::stream(const pstring &name)
+source_proc_t::stream_ptr source_proc_t::stream(const pstring &name)
 {
 	plib::unused_var(name);
-	plib::unique_ptr<std::istream> p(nullptr);
+	stream_ptr p(nullptr);
 	return p;
 }
 

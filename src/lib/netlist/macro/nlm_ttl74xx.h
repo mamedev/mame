@@ -209,7 +209,7 @@
 		NET_REGISTER_DEV(TTL_7437_DIP, name)
 
 
-#if (USE_TRUTHTABLE_7448)
+#if (NL_USE_TRUTHTABLE_7448)
 #define TTL_7448(name, cA0, cA1, cA2, cA3, cLTQ, cBIQ, cRBIQ)                  \
 		NET_REGISTER_DEV(TTL_7448, name)                                       \
 		NET_CONNECT(name, VCC, VCC)                                            \
@@ -240,7 +240,7 @@
 #define TTL_7486_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7486_DIP, name)
 
-#if (USE_TRUTHTABLE_74107)
+#if (NL_USE_TRUTHTABLE_74107)
 #define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                   \
 		NET_REGISTER_DEV(TTL_74107, name)                                      \
 		NET_CONNECT(name, GND, GND)                                            \

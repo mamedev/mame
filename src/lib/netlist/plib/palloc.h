@@ -276,7 +276,7 @@ namespace plib {
 
 		static inline void *allocate( size_t alignment, size_t size )
 		{
-			#if (USE_ALIGNED_ALLOCATION)
+			#if (PUSE_ALIGNED_ALLOCATION)
 			#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 				return _aligned_malloc(size, alignment);
 			#elif defined(__APPLE__)
@@ -296,7 +296,7 @@ namespace plib {
 
 		static inline void deallocate( void *ptr )
 		{
-			#if (USE_ALIGNED_ALLOCATION)
+			#if (PUSE_ALIGNED_ALLOCATION)
 				// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
 				free(ptr);
 			#else
@@ -352,7 +352,7 @@ namespace plib {
 		//auto t = reinterpret_cast<std::uintptr_t>(p);
 		//if (t & (ALIGN-1))
 		//  printf("alignment error!");
-#if (USE_ALIGNED_HINTS)
+#if (PUSE_ALIGNED_HINTS)
 		return reinterpret_cast<T *>(__builtin_assume_aligned(p, ALIGN));
 #else
 		return p;
@@ -364,7 +364,7 @@ namespace plib {
 	{
 		static_assert(ALIGN >= alignof(T), "Alignment must be greater or equal to alignof(T)");
 		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
-#if (USE_ALIGNED_HINTS)
+#if (PUSE_ALIGNED_HINTS)
 		return reinterpret_cast<const T *>(__builtin_assume_aligned(p, ALIGN));
 #else
 		return p;

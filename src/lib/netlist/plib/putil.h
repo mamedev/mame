@@ -10,6 +10,8 @@
 
 #include "pexception.h"
 #include "pstring.h"
+#include "palloc.h"
+
 #include <algorithm>
 #include <initializer_list>
 #include <iostream>
@@ -24,8 +26,118 @@
 namespace plib
 {
 
+	// ----------------------------------------------------------------------------------------
+	// A Generic netlist sources implementation
+	// ----------------------------------------------------------------------------------------
+
+	class psource_t
+	{
+	public:
+
+		using stream_ptr = plib::unique_ptr<std::istream>;
+
+		psource_t()
+		{}
+
+		COPYASSIGNMOVE(psource_t, delete)
+
+		virtual ~psource_t() noexcept = default;
+
+		virtual stream_ptr stream(const pstring &name) = 0;
+	private:
+	};
+
+	/**! Generic string source
+	 *
+	 * Will return the given string when name matches.
+	 * Is used in preprocessor code to eliminate inclusion of certain files.
+	 *
+	 * @tparam TS base stream class. Default is psource_t
+	 */
+	template <typename TS = psource_t>
+	class psource_str_t : public TS
+	{
+	public:
+		psource_str_t(pstring name, pstring str)
+		: m_name(name), m_str(str)
+		{}
+
+		COPYASSIGNMOVE(psource_str_t, delete)
+		virtual ~psource_str_t() noexcept = default;
+
+		typename TS::stream_ptr stream(const pstring &name) override
+		{
+			if (name == m_name)
+				return plib::make_unique<std::stringstream>(m_str);
+			else
+				return typename TS::stream_ptr(nullptr);
+		}
+	private:
+		pstring m_name;
+		pstring m_str;
+	};
+
+	/**! Generic sources collection
+	 *
+	 * @tparam TS base stream class. Default is psource_t
+	 */
+	template <typename TS = psource_t>
+	class psource_collection_t
+	{
+	public:
+		using source_type = plib::unique_ptr<TS>;
+		using list_t = std::vector<source_type>;
+
+		psource_collection_t()
+		{}
+
+		COPYASSIGNMOVE(psource_collection_t, delete)
+		virtual ~psource_collection_t() noexcept = default;
+
+		void add_source(source_type &&src)
+		{
+			m_collection.push_back(std::move(src));
+		}
+
+		template <typename S = TS>
+		typename S::stream_ptr get_stream(pstring name)
+		{
+			for (auto &s : m_collection)
+			{
+				auto source(dynamic_cast<S *>(s.get()));
+				if (source)
+				{
+					auto strm = source->stream(name);
+					if (strm)
+						return strm;
+				}
+			}
+			return typename S::stream_ptr(nullptr);
+		}
+
+		template <typename S, typename F>
+		bool for_all(pstring name, F lambda)
+		{
+			for (auto &s : m_collection)
+			{
+				auto source(dynamic_cast<S *>(s.get()));
+				if (source)
+				{
+					if (lambda(source))
+						return true;
+				}
+			}
+			return false;
+		}
+
+	private:
+		list_t m_collection;
+	};
+
 	namespace util
 	{
+		pstring basename(pstring filename);
+		pstring path(pstring filename);
 		pstring buildpath(std::initializer_list<pstring> list );
 		pstring environment(const pstring &var, const pstring &default_val);
 	} // namespace util

@@ -88,6 +88,28 @@ namespace plib
 	}
 
 	template<typename T>
+	typename T::size_type find_last_of(const T &str, const T &no)
+	{
+		typename T::size_type last_found = T::npos;
+		typename T::size_type pos = 0;
+		for (auto it = str.begin(); it != str.end(); ++it, ++pos)
+		{
+			bool f = false;
+			for (typename T::value_type const jt : no)
+			{
+				if (*it == jt)
+				{
+					f = true;
+					break;
+				}
+			}
+			if (f)
+				last_found = pos;
+		}
+		return last_found;
+	}
+
+	template<typename T>
 	T ltrim(const T &str, const T &ws = T(" \t\n\r"))
 	{
 		auto f = find_first_not_of(str, ws);

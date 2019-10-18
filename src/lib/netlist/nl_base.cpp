@@ -254,23 +254,46 @@ namespace netlist
 
 	void netlist_state_t::compile_defines(std::vector<std::pair<pstring, pstring>> &defs)
 	{
-	//#define ENTRY(x) { #x, PSTRINGIFY(x) }
-	#define ENTRY(x) std::pair<pstring, pstring>(#x, PSTRINGIFY(x))
-		defs.emplace_back(ENTRY(PHAS_RDTSCP));
-		defs.emplace_back(ENTRY(PUSE_ACCURATE_STATS));
-		defs.emplace_back(ENTRY(PHAS_INT128));
-		defs.emplace_back(ENTRY(USE_ALIGNED_OPTIMIZATIONS));
-		defs.emplace_back(ENTRY(NVCCBUILD));
-		defs.emplace_back(ENTRY(USE_MEMPOOL));
-		defs.emplace_back(ENTRY(USE_QUEUE_STATS));
-		defs.emplace_back(ENTRY(USE_COPY_INSTEAD_OF_REFERENCE));
-		defs.emplace_back(ENTRY(USE_TRUTHTABLE_7448));
-		defs.emplace_back(ENTRY(NL_DEBUG));
-		defs.emplace_back(ENTRY(HAS_OPENMP));
-		defs.emplace_back(ENTRY(USE_OPENMP));
+	#define ENTRY(x) if (pstring(#x) != PSTRINGIFY(x)) defs.emplace_back(std::pair<pstring, pstring>(#x, PSTRINGIFY(x)));
+		ENTRY(PHAS_RDTSCP)
+		ENTRY(PUSE_ACCURATE_STATS)
+		ENTRY(PHAS_INT128)
+		ENTRY(PUSE_ALIGNED_OPTIMIZATIONS)
+		ENTRY(PHAS_OPENMP)
+		ENTRY(PUSE_OPENMP)
+		ENTRY(PPMF_TYPE)
+		ENTRY(PHAS_PMF_INTERNAL)
+		ENTRY(NL_USE_MEMPOOL)
+		ENTRY(NL_USE_QUEUE_STATS)
+		ENTRY(NL_USE_COPY_INSTEAD_OF_REFERENCE)
+		ENTRY(NL_USE_TRUTHTABLE_7448)
+		ENTRY(NL_AUTO_DEVICES)
+		ENTRY(NL_DEBUG)
+		ENTRY(NVCCBUILD)
 
-		defs.emplace_back(ENTRY(PPMF_TYPE));
-		defs.emplace_back(ENTRY(PHAS_PMF_INTERNAL));
+		ENTRY(__cplusplus)
+		ENTRY(__VERSION__)
+
+		ENTRY(__GNUC__)
+		ENTRY(__GNUC_MINOR__)
+		ENTRY(__GNUC_PATCHLEVEL__)
+
+		ENTRY(__clang__)
+		ENTRY(__clang_major__)
+		ENTRY(__clang_minor__)
+		ENTRY(__clang_patchlevel__)
+		ENTRY(__clang_version__)
+
+		ENTRY(OPENMP )
+		ENTRY(_OPENMP )
+
+		ENTRY(__x86_64__ )
+		ENTRY(__i386__)
+		ENTRY(_WIN32)
+		ENTRY(_MSC_VER)
+		ENTRY(__APPLE__)
+		ENTRY(__unix__)
+		ENTRY(__linux__)
 
 	#undef ENTRY
 	}
@@ -417,7 +440,7 @@ namespace netlist
 			log().verbose("Total time     {1:15}", total_time);
 
 			// FIXME: clang complains about unreachable code without
-			const auto clang_workaround_unreachable_code = USE_QUEUE_STATS;
+			const auto clang_workaround_unreachable_code = NL_USE_QUEUE_STATS;
 			if (clang_workaround_unreachable_code)
 			{
 				/* Only one serialization should be counted in total time */
@@ -717,7 +740,7 @@ namespace netlist
 	: device_object_t(dev, dev.name() + "." + aname)
 	, plib::linkedlist_t<core_terminal_t>::element_t()
 	, m_delegate(delegate)
-	#if USE_COPY_INSTEAD_OF_REFERENCE
+	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 	, m_Q(*this, "m_Q", 0)
 	#endif
 	, m_net(nullptr)

@@ -31,6 +31,7 @@ public:
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
 		opt_cmd (*this,     "c", "cmd",         0,          std::vector<pstring>({"run","validate","convert","listdevices","static","header","docheader"}), "run|validate|convert|listdevices|static|header|docheader"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
+		opt_includes(*this, "I", "include",                 "Add the directory to the list of directories to be searched for header files. This option may be specified repeatedly."),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for data files"),
 		opt_verb(*this,     "v", "verbose",                 "be verbose - this produces lots of output"),
@@ -76,6 +77,7 @@ public:
 	plib::option_group  opt_grp1;
 	plib::option_str_limit<unsigned> opt_cmd;
 	plib::option_str    opt_file;
+	plib::option_vec    opt_includes;
 	plib::option_vec    opt_defines;
 	plib::option_vec    opt_rfolders;
 	plib::option_bool   opt_verb;
@@ -140,21 +142,21 @@ NETLIST_END()
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-class netlist_data_folder_t : public netlist::source_t
+class netlist_data_folder_t : public netlist::source_data_t
 {
 public:
 	netlist_data_folder_t(const pstring &folder)
-	: netlist::source_t(netlist::source_t::DATA)
+	: netlist::source_data_t()
 	, m_folder(folder)
 	{
 	}
 
-	plib::unique_ptr<std::istream> stream(const pstring &file) override
+	stream_ptr stream(const pstring &file) override
 	{
 		pstring name = m_folder + "/" + file;
 		auto strm(plib::make_unique<std::ifstream>(plib::filesystem::u8path(name)));
 		if (strm->fail())
-			return plib::unique_ptr<std::istream>(nullptr);
+			return stream_ptr(nullptr);
 		else
 		{
 			strm->imbue(std::locale::classic());
@@ -198,7 +200,8 @@ public:
 	void read_netlist(const pstring &filename, const pstring &name,
 			const std::vector<pstring> &logs,
 			const std::vector<pstring> &defines,
-			const std::vector<pstring> &roms)
+			const std::vector<pstring> &roms,
+			const std::vector<pstring> &includes)
 	{
 		// read the netlist ...
 
@@ -207,6 +210,11 @@ public:
 
 		for (auto & r : roms)
 			setup().register_source(plib::make_unique<netlist_data_folder_t>(r));
+
+		using a = plib::psource_str_t<plib::psource_t>;
+		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h",""));
+		for (auto & i : includes)
+			setup().add_include(plib::make_unique<netlist_data_folder_t>(i));
 
 		setup().register_source(plib::make_unique<netlist::source_file_t>(filename));
 		setup().include(name);
@@ -377,7 +385,7 @@ void tool_app_t::run()
 
 		nt.read_netlist(opt_file(), opt_name(),
 				opt_logs(),
-				m_options, opt_rfolders());
+				m_options, opt_rfolders(), opt_includes());
 
 		nt.reset();
 
@@ -473,7 +481,7 @@ void tool_app_t::validate()
 
 		nt.read_netlist(opt_file(), opt_name(),
 				opt_logs(),
-				m_options, opt_rfolders());
+				m_options, opt_rfolders(), opt_includes());
 	}
 	catch (netlist::nl_exception &e)
 	{
@@ -507,7 +515,7 @@ void tool_app_t::static_compile()
 
 	nt.read_netlist(opt_file(), opt_name(),
 			opt_logs(),
-			m_options, opt_rfolders());
+			m_options, opt_rfolders(), opt_includes());
 
 	// need to reset ...
 
@@ -824,8 +832,6 @@ int tool_app_t::execute()
 
 	if (opt_help())
 	{
-		pout(plib::pfmt("{:10.3}\n").f(20.0));
-		//pout(plib::pfmt("{10.3}\n").f(20));
 		pout(usage());
 		return 0;
 	}

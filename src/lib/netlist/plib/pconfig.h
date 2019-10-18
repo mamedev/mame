@@ -38,20 +38,20 @@
  * netlists like kidniki.
  */
 
-#ifndef USE_OPENMP
-#define USE_OPENMP              (0)
+#ifndef PUSE_OPENMP
+#define PUSE_OPENMP              (0)
 #endif
 
 /*
  * Set this to one if you want to use aligned storage optimizations.
  */
 
-#ifndef USE_ALIGNED_OPTIMIZATIONS
-#define USE_ALIGNED_OPTIMIZATIONS (0)
+#ifndef PUSE_ALIGNED_OPTIMIZATIONS
+#define PUSE_ALIGNED_OPTIMIZATIONS (0)
 #endif
 
-#define USE_ALIGNED_ALLOCATION (USE_ALIGNED_OPTIMIZATIONS)
-#define USE_ALIGNED_HINTS      (USE_ALIGNED_OPTIMIZATIONS)
+#define PUSE_ALIGNED_ALLOCATION (PUSE_ALIGNED_OPTIMIZATIONS)
+#define PUSE_ALIGNED_HINTS      (PUSE_ALIGNED_OPTIMIZATIONS)
 /*
  * Standard alignment macros
  */
@@ -114,11 +114,19 @@ typedef __int128_t INT128;
 //============================================================
 
 #if defined(OPENMP)
-#define HAS_OPENMP ( OPENMP >= 200805 )
-#elif defined(_OPENMP)
-#define HAS_OPENMP ( _OPENMP >= 200805 )
+#if ( OPENMP >= 200805 )
+#define PHAS_OPENMP (1)
 #else
-#define HAS_OPENMP (0)
+#define PHAS_OPENMP (0)
+#endif
+#elif defined(_OPENMP)
+#if ( _OPENMP >= 200805 )
+#define PHAS_OPENMP (1)
+#else
+#define PHAS_OPENMP (0)
+#endif
+#else
+#define PHAS_OPENMP (0)
 #endif
 
 
@@ -126,8 +134,8 @@ typedef __int128_t INT128;
 //  WARNINGS
 //============================================================
 
-#if (USE_OPENMP)
-#if (!(HAS_OPENMP))
+#if (PUSE_OPENMP)
+#if (!(PHAS_OPENMP))
 #error To use openmp compile and link with "-fopenmp"
 #endif
 #endif

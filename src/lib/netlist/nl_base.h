@@ -589,7 +589,7 @@ namespace netlist
 			void reset() noexcept { set_state(is_type(OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
 
 			nldelegate m_delegate;
-	#if USE_COPY_INSTEAD_OF_REFERENCE
+	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 			void set_copied_input(netlist_sig_t val) noexcept
 			{
 				m_Q = val;
@@ -667,7 +667,7 @@ namespace netlist
 			void move_connections(net_t &dest_net);
 
 			std::vector<core_terminal_t *> &core_terms() { return m_core_terms; }
-	#if USE_COPY_INSTEAD_OF_REFERENCE
+	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 			void update_inputs() noexcept
 			{
 				for (auto & term : m_core_terms)
@@ -1553,7 +1553,7 @@ namespace netlist
 		void process_queue(netlist_time delta) NL_NOEXCEPT;
 		void abort_current_queue_slice() NL_NOEXCEPT
 		{
-			if (!USE_QUEUE_STATS || !m_use_stats)
+			if (!NL_USE_QUEUE_STATS || !m_use_stats)
 				m_queue.retime<false>(detail::queue_t::entry_t(m_time, nullptr));
 			else
 				m_queue.retime<true>(detail::queue_t::entry_t(m_time, nullptr));
@@ -1564,7 +1564,7 @@ namespace netlist
 		template <typename E>
 		void qpush(E && e) noexcept
 		{
-			if (!USE_QUEUE_STATS || !m_use_stats)
+			if (!NL_USE_QUEUE_STATS || !m_use_stats)
 				m_queue.push<false>(std::forward<E>(e)); // NOLINT(performance-move-const-arg)
 			else
 				m_queue.push<true>(std::forward<E>(e)); // NOLINT(performance-move-const-arg)
@@ -1573,7 +1573,7 @@ namespace netlist
 		template <class R>
 		void qremove(const R &elem) noexcept
 		{
-			if (!USE_QUEUE_STATS || !m_use_stats)
+			if (!NL_USE_QUEUE_STATS || !m_use_stats)
 				m_queue.remove<false>(elem);
 			else
 				m_queue.remove<true>(elem);
@@ -1860,7 +1860,7 @@ namespace netlist
 		nl_assert(terminal_state() != STATE_INP_PASSIVE);
 		//if (net().Q() != m_Q)
 		//  printf("term: %s, %d %d TS %d\n", this->name().c_str(), net().Q(), m_Q, terminal_state());
-#if USE_COPY_INSTEAD_OF_REFERENCE
+#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 		return m_Q;
 #else
 		return net().Q();

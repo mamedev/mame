@@ -15,7 +15,7 @@ namespace netlist
 {
 	namespace devices
 	{
-	#if !(USE_TRUTHTABLE_7448)
+	#if !(NL_USE_TRUTHTABLE_7448)
 	NETLIB_OBJECT(7448)
 	{
 		NETLIB_CONSTRUCTOR(7448)
@@ -79,7 +79,7 @@ namespace netlist
 	#endif
 
 
-	#if !(USE_TRUTHTABLE_7448)
+	#if !(NL_USE_TRUTHTABLE_7448)
 
 #define BITS7(b6,b5,b4,b3,b2,b1,b0) ((b6)<<6) | ((b5)<<5) | ((b4)<<4) | ((b3)<<3) | ((b2)<<2) | ((b1)<<1) | ((b0)<<0)
 
