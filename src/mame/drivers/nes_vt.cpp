@@ -112,6 +112,7 @@ public:
 	void nes_vt_hum(machine_config &config);
 	void nes_vt_pjoy(machine_config &config);
 	void nes_vt_sp69(machine_config &config);
+	void nes_vt_ablping(machine_config &config);
 
 	void nes_vt_xx(machine_config &config);
 	void nes_vt_hh(machine_config &config);
@@ -138,6 +139,9 @@ private:
 	/* VT03 extension handling */
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
 	DECLARE_READ8_MEMBER(vt03_410x_r);
+
+	DECLARE_READ8_MEMBER(ablping_410f_r);
+	DECLARE_WRITE8_MEMBER(ablping_410f_w);
 
 	DECLARE_WRITE8_MEMBER(vt03_410x_pjoy_w);
 	DECLARE_WRITE8_MEMBER(vt03_410x_hum_w);
@@ -186,6 +190,7 @@ private:
 	void nes_vt_hum_map(address_map &map);
 	void nes_vt_pjoy_map(address_map &map);
 	void nes_vt_sp69_map(address_map &map);
+	void nes_vt_ablping_map(address_map &map);
 	void nes_vt_bt_map(address_map &map);
 	void nes_vt_cy_map(address_map &map);
 	void nes_vt_dg_map(address_map &map);
@@ -323,6 +328,20 @@ READ8_MEMBER(nes_vt_state::vt03_410x_r)
 	return m_410x[offset];
 }
 
+// ablping polls this (also writes here) what is it? 4-bit DAC? PCM? (inputs only start responding once it finishes writing data on startup but takes longer than a sample should)
+READ8_MEMBER(nes_vt_state::ablping_410f_r)
+{
+	// needs to change at least
+	return machine().rand();//0x00;
+};
+
+WRITE8_MEMBER(nes_vt_state::ablping_410f_w)
+{
+	popmessage("ablping_410f_w %02x", data);
+};
+
+
+
 WRITE8_MEMBER(nes_vt_state::vt03_410x_hum_w)
 {
 	scrambled_410x_w(offset, data, vt_scramble_mode::HUMMER);
@@ -337,6 +356,7 @@ WRITE8_MEMBER(nes_vt_state::vt03_410x_sp69_w)
 }
 // Source: https://wiki.nesdev.com/w/index.php/NES_2.0_submappers/Proposals#NES_2.0_Mapper_256
 
+// TODO: split this into per machine configs, not enum indexed table
 static const uint16_t descram_4107_4108[5][2] = {
 			{0x7, 0x8},
 			{0x7, 0x8},
@@ -954,6 +974,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
      some consoles have scrambled registers for crude copy protection
 */
 
+// TODO: split this into per machine configs, not enum indexed table
 static const uint8_t descram_8000_mmc3[5][8] = {
 			{0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8},
 			{0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8},
@@ -1208,6 +1229,13 @@ void nes_vt_state::nes_vt_sp69_map(address_map &map)
 	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_sp69_w));
 }
 
+void nes_vt_state::nes_vt_ablping_map(address_map &map)
+{
+	nes_vt_sp69_map(map);
+	map(0x410f, 0x410f).rw(FUNC(nes_vt_state::ablping_410f_r), FUNC(nes_vt_state::ablping_410f_w));
+}
+
+
 
 void nes_vt_state::nes_vt_cy_map(address_map &map)
 {
@@ -1431,6 +1459,12 @@ void nes_vt_state::nes_vt_sp69(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_sp69_map);
 
 	m_ppu->set_201x_descramble(descram_ppu_2012_2017[4]);
+}
+
+void nes_vt_state::nes_vt_ablping(machine_config &config)
+{
+	nes_vt_sp69(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_ablping_map);
 }
 
 void nes_vt_state::nes_vt_xx(machine_config &config)
@@ -1740,6 +1774,11 @@ ROM_START( ddrstraw )
 	ROM_LOAD( "straws-ddr.bin", 0x00000, 0x200000, CRC(ce94e53a) SHA1(10c6970205a4df28086029c0a348225f57bf0cc5) ) // 26LV160 Flash
 ROM_END
 
+ROM_START( ablping )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "abl_pingpong.bin", 0x00000, 0x200000, CRC(b31de1fb) SHA1(94e8afb2315ba1fa0892191c8e1832391e401c70) )
+ROM_END
+
 #if 0
 ROM_START( mc_15kin1 )
 	ROM_REGION( 0x200000, "mainrom", 0 )
@@ -1877,6 +1916,11 @@ CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Int
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
 CONS( 200?, mc_sp69,   0,  0,  nes_vt_sp69,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
+
+// this game was also sold by dreamGEAR and several others companies, each time with a different name and different case, although the dumped version was from ABL, and it hasn't been confirmed that the ROMs are identical for the other units
+// Super Ping Pong appears on the title screen, but not the box / product art which simply has "Ping Pong Plug & Play TV Game" on front/back/bottom/manual, and "Table Tennis Plug & Play TV Game" on left/right sides.  Product code is PP1100
+// PCB has PP1100-MB 061110 on it, possible date YYMMDD code? (pinball is 050329, guitar fever is 070516, air blaster 050423, kickboxing 061011 etc.)
+CONS( 2006, ablping,   0,        0,  nes_vt_ablping, nes_vt, nes_vt_state, empty_init, "Advance Bright Ltd", "Ping Pong / Table Tennis / Super Ping Pong (PP1100, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes?
 CONS( 200?, polmega,   0,  0,  nes_vt,        nes_vt, nes_vt_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
