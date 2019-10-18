@@ -66,7 +66,7 @@
 		else
 			_p(2, '<Keyword>Win32Proj</Keyword>')
 		end
-		if _ACTION:sub(3) == "2015" or _ACTION:sub(3) == "2017" or _ACTION:sub(3) == "llvm" then
+		if _ACTION:sub(3) == "2015" or _ACTION:sub(3) == "2017" or _ACTION:sub(3) == "2019" or _ACTION:sub(3) == "llvm" then
 			_p(2,'<PreferredToolArchitecture>x64</PreferredToolArchitecture>')
 		end
 		if (_ACTION:sub(3) == "2017" or _ACTION:sub(3) == "llvm")
