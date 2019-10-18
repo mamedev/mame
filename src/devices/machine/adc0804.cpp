@@ -26,6 +26,13 @@
     multiple other devices are also clocked through pin 19, which
     yields the output of the internal Schmitt trigger clock circuit.
 
+    The ADC0804's INTR semaphore output reflects not the actual busy
+    state of the converter (as EOC does on the ADC0808) but an
+    internal flip-flop attached to it. This flip-flop is reset by
+    pulling either RD or WR active low; therefore, INTR will never
+    toggle if RD is tied to GND to keep the data outputs continuously
+    active.
+
 **********************************************************************/
 
 #include "emu.h"
