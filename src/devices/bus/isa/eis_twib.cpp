@@ -95,6 +95,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(isa8_eistwib_device::tick_bitclock)
 {
 	m_uart8274->txca_w(m_bitclock);
 	m_uart8274->rxca_w(m_bitclock);
+	m_sdlclogger->clock_w(m_bitclock);
+
+	if (!m_bitclock)
+	{
+		m_shiftin = ((m_shiftin << 1) & 0xfe) | (m_txd ? 0x01 : 0);
+		if (m_shiftin == 0x7e)
+		{
+			if (!m_in_frame)
+				printf("SYNC found\n");
+			m_in_frame = !m_in_frame;
+		}
+		else if (m_in_frame);
+		{
+			printf("%d ", m_txd);
+		}
+	}
 	m_bitclock = !m_bitclock;
 }
 
@@ -198,9 +214,10 @@ ioport_constructor isa8_eistwib_device::device_input_ports() const
 //-------------------------------------------------
 void isa8_eistwib_device::device_add_mconfig(machine_config &config)
 {
+	SDLC_LOGGER(config, m_sdlclogger, 0); // To decode the frames
 	I8274_NEW(config, m_uart8274, (XTAL(14'318'181)/ 3) / 2); // Half the 4,77 MHz ISA bus CLK signal
 	//m_uart8274->out_rtsa_callback().set([this] (int state) { m_rts = state; });
-	//m_uart8274->out_txda_callback().set([this] (int state) { printf("%d ", state); });
+	m_uart8274->out_txda_callback().set([this] (int state) { m_txd = state; m_sdlclogger->data_w(state); });
 	m_uart8274->out_int_callback().set([this] (int state)
 	{   // Jumper field W1 decides what IRQs to pull
 		if (m_isairq->read() & 0x01) { LOGIRQ("TWIB IRQ2: %d\n", state); m_isa->irq2_w(state); }
@@ -217,8 +234,11 @@ isa8_eistwib_device::isa8_eistwib_device(const machine_config &mconfig, const ch
 	device_t(mconfig, ISA8_EIS_TWIB, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_uart8274(*this, "terminal")
+	, m_sdlclogger(*this, "logger")
 	, m_bitclock(false)
 	, m_rts(false)
+	, m_txd(false)
+	, m_in_frame(false)
 	, m_sw1(*this, "SW1")
 	, m_isairq(*this, "W1")
 	, m_installed(false)

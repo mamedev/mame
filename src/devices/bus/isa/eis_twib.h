@@ -8,6 +8,7 @@
 #include "isa.h"
 #include "machine/z80sio.h"
 #include "machine/timer.h"
+#include "machine/sdlc.h"
 
 class isa8_eistwib_device :
 		public device_t,
@@ -27,6 +28,7 @@ protected:
 
 	// devices
 	required_device<i8274_new_device> m_uart8274;
+	required_device<sdlc_logger_device> m_sdlclogger;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -36,6 +38,9 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(tick_bitclock);
 	bool m_bitclock;
 	bool m_rts;
+	bool m_txd;
+	bool m_in_frame;
+	uint8_t m_shiftin;
 
 	// helpers
 	required_ioport m_sw1;
