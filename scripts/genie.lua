@@ -42,6 +42,9 @@ function str_to_version(str)
 	end
 	local cnt = 10000
 	for word in string.gmatch(str, '([^.]+)') do
+		if(tonumber(word) == nil) then
+			return val
+		end
 		val = val + tonumber(word) * cnt
 		cnt = cnt / 100
 	end
