@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ATADEV_H
-#define MAME_MACHINE_ATADEV_H
+#ifndef MAME_BUS_ATA_ATADEV_H
+#define MAME_BUS_ATA_ATADEV_H
 
 #pragma once
 
@@ -44,4 +44,29 @@ protected:
 	devcb_write_line m_pdiag_handler;
 };
 
-#endif // MAME_MACHINE_ATADEV_H
+// ======================> ata_slot_device
+
+class ata_slot_device : public device_t,
+						public device_slot_interface
+{
+public:
+	// construction/destruction
+	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	device_ata_interface *dev() { return m_dev; }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
+
+private:
+	device_ata_interface *m_dev;
+};
+
+// device type definition
+DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
+
+void ata_devices(device_slot_interface &device);
+
+#endif // MAME_BUS_ATA_ATADEV_H

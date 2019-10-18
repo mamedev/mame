@@ -8,13 +8,13 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ATAPICDR_H
-#define MAME_MACHINE_ATAPICDR_H
+#ifndef MAME_BUS_ATA_ATAPICDR_H
+#define MAME_BUS_ATA_ATAPICDR_H
 
 #pragma once
 
 #include "atapihle.h"
-#include "t10mmc.h"
+#include "machine/t10mmc.h"
 
 class atapi_cdrom_device : public atapi_hle_device, public t10mmc
 {
@@ -51,4 +51,4 @@ protected:
 DECLARE_DEVICE_TYPE(ATAPI_CDROM,       atapi_cdrom_device)
 DECLARE_DEVICE_TYPE(ATAPI_FIXED_CDROM, atapi_fixed_cdrom_device)
 
-#endif // MAME_MACHINE_ATAPICDR_H
+#endif // MAME_BUS_ATA_ATAPICDR_H

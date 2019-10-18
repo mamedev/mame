@@ -22,12 +22,11 @@
 
 
 #include "emu.h"
+#include "bus/ata/atadev.h"
 #include "cpu/i386/athlon.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/intelfsh.h"
-#include "machine/atapicdr.h"
-#include "machine/idehd.h"
 #include "video/virge_pci.h"
 #include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
@@ -55,12 +54,6 @@ static const uint8_t test_spd_data[] = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 };
 #endif
-
-void nforcepc_ata_devices(device_slot_interface &device)
-{
-	device.option_add("hdd", IDE_HARDDISK);
-	device.option_add("cdrom", ATAPI_CDROM);
-}
 
 /*
   Pci devices
@@ -754,7 +747,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	mcpx_ide_device &ide(MCPX_IDE(config, ":pci:09.0", 0)); // 10de:01bc NVIDIA Corporation nForce IDE
 	ide.pri_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq14));
 	ide.sec_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq15));
-		/*subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(nforcepc_ata_devices, "hdd", "cdrom", true);*/
+		/*subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(ata_devices, "hdd", "cdrom", true);*/
 	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
 	VIRGEDX_PCI(config, ":pci:0a.0", 0);
 	SST_49LF020(config, "bios", 0);
