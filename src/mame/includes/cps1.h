@@ -362,6 +362,7 @@ protected:
 	int          m_stars2y;
 	int          m_last_sprite_offset;      /* Offset of the last sprite */
 
+	bitmap_ind16 m_dummy_bitmap;
 
 	/* fcrash sound hw */
 	int          m_sample_buffer1;
