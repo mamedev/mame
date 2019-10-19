@@ -895,7 +895,9 @@ void g65816_device::device_start()
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(g65816_device::g65816_restore_state), this));
 
-	m_divider = 1;
+	m_rw8_cycles = 1;
+	m_rw16_cycles = 2;
+	m_rw24_cycles = 3;
 
 	state_add( G65816_PC,        "PC", m_debugger_temp).callimport().callexport().formatstr("%06X");
 	state_add( G65816_S,         "S", m_s).callimport().formatstr("%04X");
@@ -1029,14 +1031,14 @@ int g65816_device::bus_5A22_cycle_burst(unsigned addr)
 
 	if(addr & 0x408000) {
 		if(addr & 0x800000)
-			return (m_fastROM & 1) ? 0 : 2;
+			return (m_fastROM & 1) ? 6 : 8;
 
-		return 2;
+		return 8;
 	}
-	if((addr + 0x6000) & 0x4000) return 2;
-	if((addr - 0x4000) & 0x7e00) return 0;
+	if((addr + 0x6000) & 0x4000) return 8;
+	if((addr - 0x4000) & 0x7e00) return 6;
 
-	return 6;
+	return 12;
 }
 
 
@@ -1046,7 +1048,9 @@ void _5a22_device::device_start()
 
 	state_add( _5A22_FASTROM, "fastROM", m_debugger_temp).mask(0x01).callimport().callexport().formatstr("%01X");
 
-	m_divider = 6;
+	m_rw8_cycles = 0;
+	m_rw16_cycles = 0;
+	m_rw24_cycles = 0;
 }
 
 void _5a22_device::state_import(const device_state_entry &entry)
