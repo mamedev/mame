@@ -13,7 +13,7 @@
 #define LOG_LINESTATE   (1U << 3)
 #define LOG_FRAMING     (1U << 4)
 
-//#define VERBOSE (LOG_GENERAL | LOG_RXBIT | LOG_RXFLAG | LOG_LINESTATE | LOG_FRAMING)
+//#define VERBOSE (LOG_GENERAL | LOG_RXFLAG | LOG_LINESTATE | LOG_FRAMING)
 #include "logmacro.h"
 
 #define LOGRXBIT(...)       LOGMASKED(LOG_RXBIT, __VA_ARGS__)
@@ -22,7 +22,8 @@
 #define LOGFRAMING(...)     LOGMASKED(LOG_FRAMING, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(SDLC_LOGGER, sdlc_logger_device, "sdlc_logger", "SDLC/HDLC logger")
+DEFINE_DEVICE_TYPE(SDLC_LOGGER,    sdlc_logger_device,    "sdlc_logger",    "SDLC/HDLC logger")
+DEFINE_DEVICE_TYPE(SDLC_BITBANGER, sdlc_bitbanger_device, "sdlc_bitbanger", "SDLC/HDLC bitbanger")
 
 
 constexpr std::uint16_t device_sdlc_consumer_interface::POLY_SDLC;
@@ -125,9 +126,8 @@ void device_sdlc_consumer_interface::rx_reset()
 	m_frame_check = 0xffffU;
 }
 
-
-sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, char const *tag, device_t *owner, std::uint32_t clock) :
-	device_t(mconfig, SDLC_LOGGER, tag, owner, clock),
+sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, std::uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_sdlc_consumer_interface(mconfig, *this),
 	m_data_nrzi(0U),
 	m_clock_active(1U),
@@ -137,6 +137,11 @@ sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, char const
 	m_frame_bits(0U),
 	m_expected_fcs(0U),
 	m_buffer()
+{
+}
+
+sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, char const *tag, device_t *owner, std::uint32_t clock) :
+	sdlc_logger_device(mconfig, SDLC_LOGGER, tag, owner, clock)
 {
 }
 
@@ -222,7 +227,7 @@ void sdlc_logger_device::shift_residual_bits()
 	}
 }
 
-void sdlc_logger_device::log_frame(bool partial) const
+void sdlc_logger_device::log_frame(bool partial)
 {
 	if (m_frame_bits)
 	{
@@ -296,6 +301,26 @@ void sdlc_logger_device::log_frame(bool partial) const
 			util::stream_format(msg, (i & 0x000fU) ? " %02X" : "\n    %02X", m_buffer[i]);
 		if (residual_bits && (BUFFER_BITS >= m_frame_bits))
 			util::stream_format(msg, (residual_bits > 4) ? "%s %02X&%02X" : "%s %01X&%01X", (frame_bytes & 0x000fU) ? "" : "\n   ", m_buffer[frame_bytes], (1U << residual_bits) - 1);
+
+		logerror("%s\n", msg.str());
+	}
+}
+
+sdlc_bitbanger_device::sdlc_bitbanger_device(machine_config const &mconfig, char const *tag, device_t *owner, std::uint32_t clock) : sdlc_logger_device(mconfig, SDLC_BITBANGER, tag, owner, clock)
+{
+}
+
+void sdlc_bitbanger_device::log_frame(bool partial)
+{
+	std::uint32_t const frame_bytes(get_frame_bits() >> 3);
+	if (frame_bytes)
+	{
+		std::ostringstream msg;
+		std::uint32_t const residual_bits(get_frame_bits() & 0x0007U);
+		for (std::uint32_t i = 0U; (frame_bytes > i) && (get_buffer_bytes() > i); ++i)
+			util::stream_format(msg, (i & 0x000fU) ? "-%02X" : "\n    %02X", get_buffer()[i]);
+		if (residual_bits && (get_buffer_bits() >= get_frame_bits()))
+		  util::stream_format(msg, (residual_bits > 4) ? "%s %02X&%02X" : "%s %01X&%01X", (frame_bytes & 0x000fU) ? "" : "\n   ", get_buffer()[frame_bytes], (1U << residual_bits) - 1);
 
 		logerror("%s\n", msg.str());
 	}
