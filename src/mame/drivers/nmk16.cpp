@@ -6697,7 +6697,7 @@ ROM_START( macross2k ) /* Title screen only shows Macross II, no Kanji.  Suspect
 	ROM_LOAD( "mcrs2j.2",    0x00000, 0x20000, CRC(b4aa8ac7) SHA1(73a6de56cbfb468450d9b39fcbae0362f242f37b) ) /* banked */
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
-	ROM_LOAD( "2.1",    0x000000, 0x020000, CRC(e8ab17f9) SHA1(9396e29a134698db59b7faae19dd8fb947cde752) ) /* 8x8 tiles - non descript ROM label "2" */
+	ROM_LOAD( "2.1",    0x000000, 0x020000, CRC(372dfa11) SHA1(92934128c82191a08a359ec690576bc5888f085e) ) /* 8x8 tiles - non descript ROM label "2" */
 
 	ROM_REGION( 0x200000, "bgtile", 0 )
 	ROM_LOAD( "bp932an.a04", 0x000000, 0x200000, CRC(c4d77ff0) SHA1(aca60a3f5f89265e7e3799e5d80ea8196fb11ff3) ) /* 16x16 tiles */
