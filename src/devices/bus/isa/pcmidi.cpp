@@ -183,7 +183,7 @@ void isa8_pcmidi_device::status_w(u8 data)
 
 void isa8_pcmidi_device::mpu_p3_w(u8 data)
 {
-	m_midiout->write_txd(BIT(data, 4));
+	m_midiout->write_txd(BIT(data, 7));
 
 	// P36 = error LED output?
 
