@@ -75,12 +75,6 @@
 #include "emu.h"
 #include "video/snes_ppu.h"
 
-#define KEYPRESS_DEBUG_PRINTS	(1)
-
-#if KEYPRESS_DEBUG_PRINTS
-static bool s_debug_prints = false;
-#endif
-
 #define SNES_MAINSCREEN    0
 #define SNES_SUBSCREEN     1
 #define SNES_CLIP_NEVER    0
@@ -740,7 +734,7 @@ inline uint32_t snes_ppu_device::get_tile( uint8_t layer_idx, uint32_t hoffset, 
 	if (tilex & 0x20) offset += screenx;
 	if (tiley & 0x20) offset += screeny;
 	uint32_t addr = ((self.tilemap + offset) & 0x7fff) << 1;
-	return m_vram[addr] | (m_vram[addr + 1] << 8);
+    return m_vram[addr] | (m_vram[addr + 1] << 8);
 }
 
 /*********************************************
@@ -776,6 +770,13 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 {
 	layer_t &layer = m_layer[layer_idx];
 
+    if (layer.tile_mode == SNES_COLOR_DEPTH_NONE) return;
+
+#if SNES_LAYER_DEBUG
+    if (m_debug_options.bg_disabled[layer_idx])
+        return;
+#endif /* SNES_LAYER_DEBUG */
+
 	m_scanlines[SNES_MAINSCREEN].enable = layer.main_bg_enabled;
 	m_scanlines[SNES_SUBSCREEN].enable = layer.sub_bg_enabled;
 	m_scanlines[SNES_MAINSCREEN].clip = layer.main_window_enabled;
@@ -783,9 +784,6 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 
 	if (!m_scanlines[SNES_MAINSCREEN].enable && !m_scanlines[SNES_SUBSCREEN].enable)
 	{
-#if KEYPRESS_DEBUG_PRINTS
-		if (s_debug_prints) printf("DA\n");
-#endif
 		return;
 	}
 
@@ -793,7 +791,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 	bool opt_mode = m_mode == 2 || m_mode == 4 || m_mode == 6;
 	bool direct_color_mode = direct_colors && layer_idx == SNES_BG1 && (m_mode == 3 || m_mode == 4);
 	uint32_t color_shift = 3 + layer.tile_mode;
-	int width = 256 << hires;
+	int width = 256 << (hires ? 1 : 0);
 
 	uint32_t tile_height = 3 + layer.tile_size;
 	uint32_t tile_width = !hires ? tile_height : 4;
@@ -805,15 +803,15 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 
 	uint32_t hscroll = layer.hoffs;
 	uint32_t vscroll = layer.voffs;
-	uint32_t hmask = (width << layer.tile_size << !!(layer.tilemap_size & 1)) - 1;
-	uint32_t vmask = (width << layer.tile_size << !!(layer.tilemap_size & 2)) - 1;
+	uint32_t hmask = (width << layer.tile_size << (layer.tilemap_size & 1)) - 1;
+	uint32_t vmask = (width << layer.tile_size << ((layer.tilemap_size & 2) >> 1)) - 1;
 
 	uint32_t y = layer.mosaic_enabled ? layer.mosaic_offset : curline;
 
 	if (hires)
 	{
 		hscroll <<= 1;
-		if (m_interlace) y = y << 1 | (m_stat78 >> 7);
+		if (m_interlace == 2) y = y << 1 | (m_stat78 >> 7);
 	}
 
 	uint32_t mosaic_counter = 1;
@@ -821,10 +819,10 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 	uint32_t mosaic_priority = 0;
 	uint32_t mosaic_color = 0;
 
-	int x = 0 - (hscroll & 7);
+    int x = 0 - (hscroll & 7);
 	while (x < width)
 	{
-		uint32_t hoffset = x + hscroll;
+        uint32_t hoffset = x + hscroll;
 		uint32_t voffset = y + vscroll;
 		if (opt_mode)
 		{
@@ -888,7 +886,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 		data |= (uint64_t)m_vram[address +  48] << 48;
 		data |= (uint64_t)m_vram[address +  49] << 56;
 
-		for (uint32_t tilex = 0; tilex < 8; tilex++, x++)
+        for (uint32_t tilex = 0; tilex < 8; tilex++, x++)
 		{
 			if (x & width) continue;
 			if (!layer.mosaic_enabled || --mosaic_counter == 0)
@@ -927,7 +925,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 
 			if (!hires)
 			{
-				if (layer.main_bg_enabled && mosaic_priority > m_scanlines[SNES_MAINSCREEN].priority[x])
+                if (layer.main_bg_enabled && mosaic_priority > m_scanlines[SNES_MAINSCREEN].priority[x])
 				{
 					if (!m_scanlines[SNES_MAINSCREEN].clip || m_clipmasks[layer_idx][x])
 					{
@@ -1616,8 +1614,6 @@ void snes_ppu_device::update_mode_7( uint16_t curline )
 
 void snes_ppu_device::draw_screens( uint16_t curline )
 {
-	if (s_debug_prints) printf("M:%d ", m_mode);
-
 	switch (m_mode)
 	{
 		case 0: update_mode_0(curline); break;     /* Mode 0 */
@@ -1863,10 +1859,6 @@ inline void snes_ppu_device::draw_blend( uint16_t offset, uint16_t *colour, uint
 
 void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 {
-#if KEYPRESS_DEBUG_PRINTS
-	s_debug_prints = machine().input().code_pressed(KEYCODE_Q);
-#endif
-
 	bool blurring = m_options.read_safe(0) & 0x01;
 
 	g_profiler.start(PROFILER_VIDEO);
@@ -2319,7 +2311,7 @@ void snes_ppu_device::cache_background()
 {
 	for (int i = SNES_BG1; i <= SNES_BG4; i++)
 	{
-		if (m_beam.current_vert == 0)
+		if (m_beam.current_vert == 1)
 		{
 			m_layer[i].mosaic_counter = m_mosaic_size + 1;
 			m_layer[i].mosaic_offset = 1;
