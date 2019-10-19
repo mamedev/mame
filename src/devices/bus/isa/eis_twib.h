@@ -28,7 +28,7 @@ protected:
 
 	// devices
 	required_device<i8274_new_device> m_uart8274;
-	required_device<sdlc_logger_device> m_sdlclogger;
+	required_device<sdlc_bitbanger_device> m_sdlcbitbanger;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -39,8 +39,6 @@ protected:
 	bool m_bitclock;
 	bool m_rts;
 	bool m_txd;
-	bool m_in_frame;
-	uint8_t m_shiftin;
 
 	// helpers
 	required_ioport m_sw1;
