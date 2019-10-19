@@ -2454,6 +2454,7 @@ ROM_START( rtypeb )
 	ROM_LOAD( "rt_b-b3.3f", 0x18000, 0x08000, CRC(ad89b072) SHA1(e2683d0e7415f3abd147e518bf6c87e44744cd4f) )
 ROM_END
 
+
 ROM_START( bchopper )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "c-h0-b.rom",   0x00001, 0x10000, CRC(f2feab16) SHA1(03ee874658e0f59957f8425e1ebf9c938737cc19) )
@@ -2465,8 +2466,8 @@ ROM_START( bchopper )
 	ROM_LOAD16_BYTE( "c-l3-b.rom",   0x60000, 0x10000, CRC(11562221) SHA1(a2f136a487fb6f30350e8d1e26c0729eb0686c7d) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "bchopper_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "mh-c-pr-b.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "c-00-a.rom",   0x00000, 0x10000, CRC(f6e6e660) SHA1(e066e5ed37719cf2b6fd36e0117f11325bb06f9c) )  /* sprites */
@@ -2505,7 +2506,7 @@ ROM_START( mrheli )
 	ROM_LOAD16_BYTE( "mh-c-l3.bin",  0x60000, 0x10000, CRC(c0982536) SHA1(45399f8d0577c6e2a277a69303954ce5d2de7c07) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "mh-c-pr.bin",  0x00000, 0x1000, CRC(897dc4ee) SHA1(05a24bf76e8fa9ca96ba9376cbf44d299df04138) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -2668,7 +2669,7 @@ ROM_START( nspirit )
 	ROM_LOAD16_BYTE( "nin_c-l3.6a", 0x60000, 0x10000, CRC(fd7408b8) SHA1(3cbe72835a561c50265a047f0f5cd62db48378fd) )
 	ROM_RELOAD(                     0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "nin_c-pr.1c", 0x00000, 0x01000, NO_DUMP ) // sldh - read protected
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -2702,7 +2703,6 @@ ROM_START( nspirit )
 	/* Located on M72-A-C CPU/Sound board */
 	ROM_LOAD( "m72_a-3d.3d", 0x0100, 0x0100, CRC(de85dac3) SHA1(af83b0325f28fbb1bcc424c1b58ff0f4b49f6b67) ) /* TBP16L8 */
 	ROM_LOAD( "m72_a-4d.4d", 0x0200, 0x0100, CRC(59676de1) SHA1(fcf35f5463c14a4b06d58684c47ea9de5216d1da) ) /* TBP16L8 */
-
 ROM_END
 
 ROM_START( nspiritj )
@@ -2718,7 +2718,7 @@ ROM_START( nspiritj )
 	ROM_LOAD16_BYTE( "c-l3",        0x60000, 0x10000, CRC(e754a87a) SHA1(9951d972ed13a0415c827beff122bc7ddb078447) )
 	ROM_RELOAD(                     0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "nin_c-pr.1c", 0x00000, 0x01000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) )  /* checksum correct for Japan version only (see test mode) */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -2743,6 +2743,7 @@ ROM_START( nspiritj )
 	ROM_LOAD( "nin-v0.7a",   0x00000, 0x10000, CRC(a32e8caf) SHA1(63d56ad3a63fb089056e4a170159120287594ea8) )
 ROM_END
 
+
 ROM_START( imgfight )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "if-c-h0-a.bin", 0x00001, 0x10000, CRC(f5c94464) SHA1(5964a00d21ebb358eecc0f10f6221fb684f284df) )
@@ -2752,7 +2753,7 @@ ROM_START( imgfight )
 	ROM_LOAD16_BYTE( "if-c-l3.bin",   0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "imgfight_i8751h.bin",  0x00000, 0x01000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -2858,15 +2859,15 @@ ROM_END
 
 ROM_START( loht )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "tom_c-h0.rom", 0x00001, 0x20000, CRC(a63204b6) SHA1(d217bc70650a1a1bbe0cf536ec3bb678f670718d) )
-	ROM_LOAD16_BYTE( "tom_c-l0.rom", 0x00000, 0x20000, CRC(e788002f) SHA1(35f509976b342fd47e645453381faa3d86645876) )
+	ROM_LOAD16_BYTE( "tom_c-h0.rom", 0x00001, 0x20000, CRC(a63204b6) SHA1(d217bc70650a1a1bbe0cf536ec3bb678f670718d) ) /* Should be TOM C-H0-B ?? */
+	ROM_LOAD16_BYTE( "tom_c-l0.rom", 0x00000, 0x20000, CRC(e788002f) SHA1(35f509976b342fd47e645453381faa3d86645876) ) /* Should be TOM C-L0-B ?? */
 	ROM_LOAD16_BYTE( "tom_c-h3-",    0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
 	ROM_LOAD16_BYTE( "tom_c-l3-",    0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "loht_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "loht_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected - Should be TOM C-PR-B ??
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "tom_m53.rom",  0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )  /* sprites */
@@ -2959,7 +2960,7 @@ ROM_START( lohtj )
 	ROM_LOAD16_BYTE( "tom_c-l3-", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
 	ROM_RELOAD(                   0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "tom_c-pr.bin",  0x00000, 0x01000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -3010,7 +3011,7 @@ ROM_START( lohtb )
 	ROM_LOAD( "lohtb16.13",  0x40000, 0x10000, CRC(25b85cfc) SHA1(c7a9962165379193dc6553ed1f977795a79e0f78) )
 	ROM_LOAD( "lohtb17.14",  0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) )
 	ROM_LOAD( "lohtb18.15",  0x10000, 0x10000, CRC(d7ecf849) SHA1(ab86a88eae21e054d4e8a740a60c7c6c198232d4) )
-	ROM_LOAD( "lohtb19.16",  0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4))
+	ROM_LOAD( "lohtb19.16",  0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4) )
 	ROM_LOAD( "lohtb20.17",  0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
 	ROM_LOAD( "lohtb21.18",  0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
 
@@ -3092,7 +3093,7 @@ ROM_START( lohtb3 ) // extremely similar to the original. Copyright changed to 1
 	ROM_LOAD16_BYTE( "i-3.3",    0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "c8751h.bin",  0x00000, 0x01000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -3359,12 +3360,12 @@ ROM_START( loht_ms ) // really similar to lohtb, even if it runs on 'Modular Har
 	ROM_LOAD( "1_lg_1.ic12",  0x00000, 0x10000, CRC(7aa26b54) SHA1(01df7ea6443bbc775d5592edc32816853c857189) )
 
 	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
-	ROM_LOAD( "5_lg_501.ic5",  0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
+	ROM_LOAD( "5_lg_501.ic5",   0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
 	ROM_LOAD( "5_lg_503.ic14",  0x20000, 0x10000, CRC(45220b01) SHA1(83715cf155f91c82067d69f14b3b01ed77777b7d) )
 	ROM_LOAD( "5_lg_505.ic20",  0x40000, 0x10000, CRC(25b85cfc) SHA1(c7a9962165379193dc6553ed1f977795a79e0f78) )
 	ROM_LOAD( "5_lg_507.ic26",  0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) )
 	ROM_LOAD( "5_lg_502.ic6",   0x10000, 0x10000, CRC(d7ecf849) SHA1(ab86a88eae21e054d4e8a740a60c7c6c198232d4) )
-	ROM_LOAD( "5_lg_504.ic15",  0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4))
+	ROM_LOAD( "5_lg_504.ic15",  0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4) )
 	ROM_LOAD( "5_lg_506.ic21",  0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
 	ROM_LOAD( "5_lg_508.ic27",  0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
 
@@ -3404,6 +3405,7 @@ ROM_START( loht_ms ) // really similar to lohtb, even if it runs on 'Modular Har
 	ROM_LOAD( "7_7636_gal20v8-25lp.ic44",  0x0, 0x1, NO_DUMP )
 ROM_END
 
+
 ROM_START( xmultiplm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ch3.h3",       0x00001, 0x20000, CRC(20685021) SHA1(92f4216320bf525045223b9454fb5bb224c536d8) )
@@ -3413,8 +3415,8 @@ ROM_START( xmultiplm72 )
 	ROM_LOAD16_BYTE( "cl0.l0",       0x40000, 0x10000, CRC(06a9e213) SHA1(9831c110814642703d6e71d49848d854095b7d3a) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "xmultipl_i8751h.bin",  0x00000, 0x01000, CRC(c8ceb3cd) SHA1(e5d20a3a9d7f0919604543c97643a03434d80130) )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "xm_c_pr-.mcu",  0x00000, 0x01000, CRC(c8ceb3cd) SHA1(e5d20a3a9d7f0919604543c97643a03434d80130) )
 
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "t44.00",       0x00000, 0x20000, CRC(db45186e) SHA1(8c8edeb4b7e6b0516f2597823dc27eba9c5d9528) )  /* sprites */
@@ -3443,9 +3445,6 @@ ROM_START( xmultiplm72 )
 ROM_END
 
 
-
-
-
 ROM_START( dbreedm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "db_c-h3.rom",  0x00001, 0x20000, CRC(4bf3063c) SHA1(3f970c9ece2ac700738e217e0b31b3aba2848ab2) )
@@ -3455,7 +3454,7 @@ ROM_START( dbreedm72 )
 	ROM_LOAD16_BYTE( "db_c-l0.rom",  0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "dbreedm72_i8751.mcu", 0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -3480,6 +3479,41 @@ ROM_START( dbreedm72 )
 	ROM_LOAD( "db_c-v0.rom",  0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
 ROM_END
 
+ROM_START( dbreedm72j ) // with matching i8751 this set boots with a Japanese warning screen
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "db_c-h3.ic43",  0x00001, 0x20000, CRC(43425d67) SHA1(a87339bf299f7e84b9a181f3827278f64a6a29ea) )
+	ROM_LOAD16_BYTE( "db_c-l3.ic34",  0x00000, 0x20000, CRC(9c1abc85) SHA1(6c73fbec12a7795e327381d886a87bca09a7dff0) )
+	ROM_LOAD16_BYTE( "db_c-h0.rom",   0x60001, 0x10000, CRC(5aa79fb2) SHA1(b7b862699ddccf90cf18d3822703078668aa1dc7) )
+	ROM_RELOAD(                       0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "db_c-l0.rom",   0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
+	ROM_RELOAD(                       0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "dbreedm72_i8751.mcu", 0x00000, 0x10000, NO_DUMP ) // read protected
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )   /* sprites */
+	ROM_LOAD( "db_k801m.10", 0x20000, 0x20000, CRC(093faf33) SHA1(2704f644cdce87daf975984f143b1d55ba731c3f) )
+	ROM_LOAD( "db_k802m.20", 0x40000, 0x20000, CRC(055b4c59) SHA1(71315dd7476612f138cb64b905648791d44eb7da) )
+	ROM_LOAD( "db_k803m.30", 0x60000, 0x20000, CRC(8ed63922) SHA1(51daa8a23e637f6b4394598ff4a1d26f65b59c8b) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) // same roms are duplicated at a0-a3 and b0-b3, confirmed
+	ROM_LOAD( "db_k804m.a0", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   /* tiles #1 */
+	ROM_LOAD( "db_k805m.a1", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
+	ROM_LOAD( "db_k806m.a2", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
+	ROM_LOAD( "db_k807m.a3", 0x60000, 0x20000, CRC(8eb0c978) SHA1(7fc55bbe4d0923db88492bb7160a89de34e11cd6) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD( "db_k804m.b0", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   /* tiles #2 */
+	ROM_LOAD( "db_k805m.b1", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
+	ROM_LOAD( "db_k806m.b2", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
+	ROM_LOAD( "db_k807m.b3", 0x60000, 0x20000, CRC(8eb0c978) SHA1(7fc55bbe4d0923db88492bb7160a89de34e11cd6) )
+
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_LOAD( "db_c-v0.rom",  0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
+ROM_END
+
+
 ROM_START( dkgensanm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ge72-h0.bin",  0x00001, 0x20000, CRC(a0ad992c) SHA1(6de4105d8454c4e4e62762fdd7e22829acc2442b) )
@@ -3489,7 +3523,7 @@ ROM_START( dkgensanm72 )
 	ROM_LOAD16_BYTE( "ge72-l3.bin",  0x60000, 0x10000, CRC(23d303a5) SHA1(b62010f34d71afb590deae458493454f9af38f7c) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "dkgenm72_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -3524,7 +3558,7 @@ ROM_START( airduelm72 )
 	ROM_LOAD16_BYTE( "ad-c-l3.ic34",  0x40000, 0x20000, CRC(9dd343f7) SHA1(9f499936b6d3807aa5b5c18e9811c73c9a2c99f9) )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
-	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "ad_c_pr.mcu",  0x00000, 0x1000, NO_DUMP ) // D8751H, read protected
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -3552,6 +3586,7 @@ ROM_START( airduelm72 )
 	ROM_LOAD( "ad-c-3f.ic13", 0x000, 0x104, NO_DUMP ) // unknown type of PAL
 ROM_END
 
+
 ROM_START( gallop )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cc-c-h0.bin",  0x00001, 0x20000, CRC(2217dcd0) SHA1(9485b6c3eec99e720439e69dcbe0e55798bbff1c) )
@@ -3561,7 +3596,7 @@ ROM_START( gallop )
 	ROM_LOAD16_BYTE( "cc-c-l3.bin",  0x40000, 0x20000, CRC(acd3278e) SHA1(83d7ddfbdb4bc9548a179b728351a21b3b0ac134) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "gallop_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -3587,12 +3622,9 @@ ROM_START( gallop )
 ROM_END
 
 
-
-
 /*****************************
   M81 sets
 ******************************/
-
 
 ROM_START( xmultipl )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -3668,6 +3700,7 @@ ROM_START( hharry )
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "a-v0-0.rom",   0x00000, 0x20000, CRC(faaacaff) SHA1(ea3a3920255c07aa9c0a7e0191eae257a9f7f558) )
 ROM_END
+
 
 ROM_START( dbreed )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -3773,6 +3806,7 @@ ROM_START( majtitlej )
 	ROM_LOAD( "mt_vo.bin",    0x00000, 0x20000, CRC(eb24bb2c) SHA1(9fca04fba0249e8213dd164eb6829e1a5acbee65) )
 ROM_END
 
+
 ROM_START( airduel )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ad_=m82=_a-h0-d.ic52", 0x00001, 0x20000, CRC(dbecc726) SHA1(526e9fdf0ca3af3eae462524df71af8e6bfa85d0) )
@@ -3842,6 +3876,7 @@ ROM_START( rtypem82b )
 	ROM_LOAD( "mt_vo.bin",    0x00000, 0x20000, CRC(eb24bb2c) SHA1(9fca04fba0249e8213dd164eb6829e1a5acbee65) )
 ROM_END
 
+
 ROM_START( rtype2m82b )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rt2_h0.bin",    0x00001, 0x20000, CRC(47639a78) SHA1(d7dd851fed96d46c850e5c8f24d9d1a081f6b297) )
@@ -3861,7 +3896,7 @@ ROM_START( rtype2m82b )
 	ROM_LOAD( "rt2_n3.bin",    0x60000, 0x20000, CRC(db6176fc) SHA1(1eaf72af0322490c98461aded202288e387caac1) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "rt2_c0.bin",    0x00000, 0x40000, CRC(f5bad5f2) SHA1(dc86b93f62e8947e3551f07e393e740e5dc43f5e))  /* tiles */
+	ROM_LOAD( "rt2_c0.bin",    0x00000, 0x40000, CRC(f5bad5f2) SHA1(dc86b93f62e8947e3551f07e393e740e5dc43f5e) )  /* tiles */
 	ROM_LOAD( "rt2_c1.bin",    0x40000, 0x40000, CRC(71451778) SHA1(52ca7aa8522b988a19556313041450c767dad054) )
 	ROM_LOAD( "rt2_c2.bin",    0x80000, 0x40000, CRC(c6b0c352) SHA1(eec4fa88c27815960106881e7ccb23e62556bf1c) )
 	ROM_LOAD( "rt2_c3.bin",    0xc0000, 0x40000, CRC(6d530a32) SHA1(4e4100e5e5d88e65fb5494474d3692ecd8f44343) )
@@ -3875,6 +3910,7 @@ ROM_START( rtype2m82b )
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "rt2_vo.bin",    0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
 ROM_END
+
 
 ROM_START( dkgensanm82 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -4080,7 +4116,6 @@ ROM_START( dkgensan )
 ROM_END
 
 
-
 ROM_START( cosmccop )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cc-d-h0b.bin", 0x00001, 0x40000, CRC(38958b01) SHA1(7d7e217742e33a1fe096adf5bbc93d63ddcfb375) )
@@ -4134,8 +4169,6 @@ ROM_START( ltswords )
 	ROM_LOAD( "ken_m14.rom",  0x00000, 0x20000, CRC(6651e9b7) SHA1(c42009f986c9a9f35732d5cd717d548536469b1c) )
 ROM_END
 
-
-
 ROM_START( kengo )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ken_d-h0.rom", 0x00001, 0x20000, CRC(f4ddeea5) SHA1(bcf016e40886e11c171f2f50de39ac0d8cabcdd1) )
@@ -4162,13 +4195,12 @@ ROM_START( kengo )
 	ROM_LOAD( "ken_m14.rom",  0x00000, 0x20000, CRC(6651e9b7) SHA1(c42009f986c9a9f35732d5cd717d548536469b1c) )
 ROM_END
 
-
 ROM_START( kengoa )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ken-d-h0-.ic55", 0x00001, 0x20000, CRC(ed3da88c) SHA1(536824eb3347eade2d3aad927e83eae51ee852b3) )
-	ROM_RELOAD(                      0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "ken-d-l0-.ic61", 0x00000, 0x20000, CRC(92c57d8e) SHA1(eb078a7b261e13cfb0a920b5115beee917b8d89c))
-	ROM_RELOAD(                      0xc0000, 0x20000 )
+	ROM_LOAD16_BYTE( "ken-d-h0-.ic55", 0x00001, 0x20000, CRC(ed3da88c) SHA1(536824eb3347eade2d3aad927e83eae51ee852b3) ) // shows 'for use in Japan' message, kengo set above doesn't
+	ROM_RELOAD(                        0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "ken-d-l0-.ic61", 0x00000, 0x20000, CRC(92c57d8e) SHA1(eb078a7b261e13cfb0a920b5115beee917b8d89c) )
+	ROM_RELOAD(                        0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ken_d-sp.rom", 0x00000, 0x10000, CRC(233ca1cf) SHA1(4ebb6162773bd586a10016ccd77998a9b880f474) )
@@ -4288,21 +4320,20 @@ ROM_END
 // despite having Japanese version MCU roms for several of them.  See notes next to the sets
 
 /* M72 */
-
 GAME( 1987, rtype,       0,        rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypej,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem", "R-Type (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypejp,     rtype,    rtype,        rtypep,       m72_state, empty_init,      ROT0,   "Irem", "R-Type (Japan prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypeu,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypeb,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, bchopper,    0,        m72,          bchopper,     m72_state, init_bchopper,   ROT0,   "Irem", "Battle Chopper", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mrheli,      bchopper, mrheli,     bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bchopper,    0,        m72,          bchopper,     m72_state, init_bchopper,   ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )                 // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
 GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_state, init_m72_8751,   ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // waits for japan warning screen, works with our mcu dump, corrupt warning screen due to priority / mixing errors (Japan Version)
 
 GAME( 1988, imgfight,    0,        m72,          imgfight,     m72_state, init_imgfight,   ROT270, "Irem", "Image Fight (World, revision A)", MACHINE_SUPPORTS_SAVE )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
-GAME( 1988, imgfightj,   imgfight, imgfightj,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )                         // waits for japan warning screen, works with our mcu dump, can't actually see warning screen due to priority / mixing errors, check tilemap viewer (Japan Version)
+GAME( 1988, imgfightj,   imgfight, imgfightj,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )                         // waits for japan warning screen, works with our mcu dump, can't actually see warning screen due to priority / mixing errors, check tilemap viewer (Japan Version)
 GAME( 1988, imgfightb,   imgfight, imgfightb,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU, which isn't hooked up correctly yet. Gives 'RAM NG 7' error
 
 GAME( 1989, loht,        0,        m72,          loht,         m72_state, init_loht,       ROT0,   "Irem", "Legend of Hero Tonma", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )         // fails rom check if used with Japan MCU rom (World version?)
@@ -4310,20 +4341,21 @@ GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_state, init_m
 GAME( 1989, lohtb2,      loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
 GAME( 1997, lohtb3,      loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "bootleg", "Legend of Hero Tonma (World, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m72_8751,   ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m72_8751,   ROT0,   "Irem", "X Multiply (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // probably Japan version
+GAME( 1989, dbreedm72j,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // Japan version with correct i8751 MCU
 
-GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, airduelm72,  airduel,  m72,          airduel,      m72_state, init_airduelm72, ROT270, "Irem", "Air Duel (Japan, M72)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, airduelm72,  airduel,  m72,          airduel,      m72_state, init_airduelm72, ROT270, "Irem", "Air Duel (Japan, M72 PCB version)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* M81 */
-GAME( 1989, xmultipl,    0,        m81_xmultipl, m81_xmultipl, m72_state, empty_init,      ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,   m72_state, empty_init,      ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharry,      0,        m81_hharry,   m81_hharry,   m72_state, empty_init,      ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultipl,    0,        m81_xmultipl, m81_xmultipl, m72_state, empty_init,      ROT0,   "Irem", "X Multiply (World, M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,   m72_state, empty_init,      ROT0,   "Irem", "Dragon Breed (World, M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharry,      0,        m81_hharry,   m81_hharry,   m72_state, empty_init,      ROT0,   "Irem", "Hammerin' Harry (World, M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* M82 */
 GAME( 1990, majtitle,    0,        m82,          rtype2,       m72_state, empty_init,      ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
@@ -4338,11 +4370,10 @@ GAME( 2009, rtypem82b,   rtype,    m82,          rtype,        m72_state, empty_
 GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m72_state, empty_init,      ROT0,   "bootleg", "R-Type II (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
 
 /* M84 */
+GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-
-GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2j,     rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2jc,    rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
@@ -4353,7 +4384,6 @@ GAME( 1991, kengo,       ltswords, kengo,        kengo,        m72_state, empty_
 GAME( 1991, kengoa,      ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
 
 /* M85 */
-
 GAME( 1990, poundfor,    0,        poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
 GAME( 1990, poundforj,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
 GAME( 1990, poundforu,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
