@@ -13,7 +13,7 @@
 #include "softlist.h"
 
 // Debugging
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(HP9825_OPTROM_CART, hp9825_optrom_cart_device, "hp9825_optrom_cart", "HP9825 optional ROM cartridge")
@@ -25,7 +25,7 @@ struct optrom_region_t {
 	const char *m_tag;
 };
 
-constexpr std::array<struct optrom_region_t , 7> region_tab =
+constexpr std::array<struct optrom_region_t , 8> region_tab =
 	{
 	 0x3000 , 0x400 , "rom3000" ,
 	 0x3400 , 0x400 , "rom3400" ,
@@ -33,7 +33,8 @@ constexpr std::array<struct optrom_region_t , 7> region_tab =
 	 0x3c00 , 0x400 , "rom3c00" ,
 	 0x4000 , 0x400 , "rom4000" ,
 	 0x4400 , 0x800 , "rom4400" ,
-	 0x4c00 , 0x400 , "rom4c00"
+	 0x4c00 , 0x400 , "rom4c00" ,
+	 0x5c00 ,0x2000 , "rom5c00"
 	};
 
 // +-------------------------+
@@ -70,6 +71,7 @@ hp9825_optrom_slot_device::hp9825_optrom_slot_device(const machine_config &mconf
 	, m_rom_limit(0xffffU)
 	, m_loaded_regions(0)
 	, m_space_r(nullptr)
+	, m_bank(*this , "rombank")
 {
 }
 
@@ -94,11 +96,31 @@ void hp9825_optrom_slot_device::install_rw_handlers(address_space *space_r , add
 		uint8_t *ptr = get_software_region(reg.m_tag);
 		if (ptr != nullptr) {
 			LOG("%s loaded\n" , reg.m_tag);
-			space_r->install_rom(reg.m_start , reg.m_start + reg.m_size - 1 , ptr);
+			if (reg.m_start == 0x5c00) {
+				space_r->install_rom(0x3000 , 0x33ff , ptr);
+				space_r->install_device(0x5c00 , 0x5fff , *m_bank , &address_map_bank_device::amap16);
+				m_bank->space(AS_PROGRAM).install_rom(0 , 0x1fff , ptr);
+			} else {
+				space_r->install_rom(reg.m_start , reg.m_start + reg.m_size - 1 , ptr);
+			}
 			m_loaded_regions |= mask;
 		}
 		mask <<= 1;
 	}
+	if (space_w != nullptr) {
+		space_w->install_write_tap(0 , 0x3ff , "bank_switch" ,
+								   [this](offs_t offset, u16 &data, u16 mem_mask) {
+									   if (BIT(offset , 5)) {
+										   LOG("bank = %u\n" , offset & 7);
+										   m_bank->set_bank(offset & 7);
+									   }
+								   });
+	}
+}
+
+void hp9825_optrom_slot_device::device_add_mconfig(machine_config &config)
+{
+	ADDRESS_MAP_BANK(config , m_bank).set_options(ENDIANNESS_BIG , 16 , 13 , 0x400).set_shift(-1);
 }
 
 void hp9825_optrom_slot_device::device_start()
@@ -139,7 +161,13 @@ void hp9825_optrom_slot_device::call_unload()
 
 		for (const struct optrom_region_t& reg : region_tab) {
 			if (m_loaded_regions & mask) {
-				m_space_r->unmap_read(reg.m_start , reg.m_start + reg.m_size - 1);
+				if (reg.m_start == 0x5c00) {
+					m_space_r->unmap_read(0x3000 , 0x33ff);
+					m_space_r->unmap_read(0x5c00 , 0x5fff);
+					m_bank->space(AS_PROGRAM).unmap_read(0 , 0x1fff);
+				} else {
+					m_space_r->unmap_read(reg.m_start , reg.m_start + reg.m_size - 1);
+				}
 				LOG("%s unloaded\n" , reg.m_tag);
 			}
 			mask <<= 1;

@@ -892,13 +892,16 @@ void hp9825b_state::cpu_mem_map(address_map &map)
 // +---------------+
 // | hp9825t_state |
 // +---------------+
-class hp9825t_state : public hp9825_state
+class hp9825t_state : public hp9825_state,
+					  public device_memory_interface
 {
 public:
 	hp9825t_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hp9825_state(mconfig , type , tag)
-		, m_rom_region(*this , "rom")
+		, device_memory_interface(mconfig , *this)
 		, m_skoalrom(*this , "skoalrom")
+		, m_ram_space_config("ram" , ENDIANNESS_BIG , 16 , 15 , -1)
+		, m_rom_space_config("rom" , ENDIANNESS_BIG , 16 , 15 , -1)
 	{
 	}
 
@@ -908,10 +911,15 @@ protected:
 	virtual void machine_start() override;
 	virtual void device_reset() override;
 
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
 private:
-	required_memory_region m_rom_region;
 	required_memory_region m_skoalrom;
-	std::unique_ptr<uint16_t[]> m_ram;
+	address_space_config m_ram_space_config;
+	address_space *m_ram_space;
+	address_space_config m_rom_space_config;
+	address_space *m_rom_space;
 
 	uint8_t m_cycle_type;
 
@@ -924,6 +932,8 @@ private:
 	uint16_t m_fetch_addr;
 
 	void cpu_mem_map(address_map &map);
+	void ram_mem_map(address_map &map);
+	void rom_mem_map(address_map &map);
 	DECLARE_READ16_MEMBER(cpu_mem_r);
 	DECLARE_WRITE16_MEMBER(cpu_mem_w);
 	void stm(uint8_t cycle_type);
@@ -939,30 +949,63 @@ void hp9825t_state::hp9825t(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM , &hp9825t_state::cpu_mem_map);
 	m_cpu->stm_cb().set(FUNC(hp9825t_state::stm));
 	m_cpu->opcode_cb().set(FUNC(hp9825t_state::opcode_fetch));
+	set_addrmap(0 , &hp9825t_state::ram_mem_map);
+	set_addrmap(1 , &hp9825t_state::rom_mem_map);
+
+	for (auto& finder : m_rom_drawers) {
+		finder->set_rom_limit(0x6000);
+	}
+
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp9825b_rom");
 }
 
 void hp9825t_state::machine_start()
 {
 	hp9825_state::machine_start();
 
-	// 32kw of RAM (the 1st kw is not accessible in normal operation)
-	m_ram = std::make_unique<uint16_t[]>(32768);
-	save_pointer(NAME(m_ram) , 32768);
+	m_ram_space = &space(0);
+	m_rom_space = &space(1);
 }
 
 void hp9825t_state::device_reset()
 {
 	hp9825_state::device_reset();
 
+	for (auto& finder : m_rom_drawers) {
+		finder->install_rw_handlers(m_rom_space , m_ram_space);
+	}
+
 	// This has to be done before CPU reset or first instruction won't be fetched correctly
 	m_cycle_type = 0;
 	m_special_opt = 0xf;
+}
+
+device_memory_interface::space_config_vector hp9825t_state::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0 , &m_ram_space_config),
+		std::make_pair(1 , &m_rom_space_config)
+	};
 }
 
 void hp9825t_state::cpu_mem_map(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x0000 , 0x7fff).rw(FUNC(hp9825t_state::cpu_mem_r) , FUNC(hp9825t_state::cpu_mem_w));
+}
+
+void hp9825t_state::ram_mem_map(address_map &map)
+{
+	// 32 kw of RAM covering the whole address space (1st kw not accessible)
+	map(0x0000 , 0x7fff).ram();
+}
+
+void hp9825t_state::rom_mem_map(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000 , 0x2fff).rom().region(":rom" , 0);
+	map(0x3400 , 0x3bff).rom().region(":rom" , 0x6800);
+	map(0x4000 , 0x53ff).rom().region(":rom" , 0x8000);
 }
 
 READ16_MEMBER(hp9825t_state::cpu_mem_r)
@@ -985,7 +1028,7 @@ READ16_MEMBER(hp9825t_state::cpu_mem_r)
 		from_rom = is_rom(offset , hp_hybrid_cpu_device::CYCLE_IFETCH_MASK);
 	}
 
-	return from_rom ? m_rom_region->as_u16(offset) : m_ram[ offset ];
+	return from_rom ? m_rom_space->read_word(offset , mem_mask) : m_ram_space->read_word(offset , mem_mask);
 }
 
 WRITE16_MEMBER(hp9825t_state::cpu_mem_w)
@@ -997,7 +1040,7 @@ WRITE16_MEMBER(hp9825t_state::cpu_mem_w)
 		m_cycle_type = 0;
 	}
 	// All write cycles go to RAM
-	m_ram[ offset ] = (m_ram[ offset ] & ~mem_mask) | (data & mem_mask);
+	m_ram_space->write_word(offset , data , mem_mask);
 }
 
 void hp9825t_state::stm(uint8_t cycle_type)
@@ -1118,11 +1161,10 @@ ROM_START(hp9825b)
 ROM_END
 
 ROM_START(hp9825t)
-	ROM_REGION(0xc000 , "rom" , ROMREGION_16BIT | ROMREGION_BE | ROMREGION_ERASE | ROMREGION_ERASE00)
+	ROM_REGION(0xa800 , ":rom" , ROMREGION_16BIT | ROMREGION_BE | ROMREGION_ERASE | ROMREGION_ERASE00)
 	ROM_LOAD("sysrom1.bin" , 0x0000 , 0x2000 , CRC(fe429268) SHA1(f2fe7c5abca92bd13f81b4385fc4fce0cafb0da0))
 	ROM_LOAD("sysrom2.bin" , 0x2000 , 0x2000 , CRC(96093b5d) SHA1(c6ec4cafd019887df0fa849b3c7070bb74faee54))
 	ROM_LOAD("sysrom3.bin" , 0x4000 , 0x2000 , CRC(f9470f67) SHA1(b80cb4a366d93bd7acc3508ce987bb11c5986b2a))
-	ROM_LOAD("98217.bin"   , 0x6000 , 0x0800 , BAD_DUMP CRC(ea1fcf63) SHA1(e535c82897210a1c67c1ca16f44f936d4c470463))
 	ROM_LOAD("genio_t.bin" , 0x6800 , 0x0800 , CRC(ade1d1ed) SHA1(9af74a65b29ef1885f74164238ecf8d16ac995d6))
 	ROM_LOAD("plot72.bin"  , 0x7000 , 0x0800 , CRC(0a9cb8db) SHA1(d0d126fca108f2715e1e408cb31b09ba69385ac4))
 	ROM_LOAD("advpgm_t.bin", 0x8000 , 0x0800 , CRC(965b5e5a) SHA1(ff44dd15f8fa4ca03dfd970ed8b200e8a071ec13))

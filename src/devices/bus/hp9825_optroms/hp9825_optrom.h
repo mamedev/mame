@@ -13,6 +13,7 @@
 #pragma once
 
 #include "softlist_dev.h"
+#include "machine/bankdev.h"
 
 class hp9825_optrom_cart_device : public device_t,
 								  public device_slot_card_interface
@@ -44,6 +45,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	// image-level overrides
@@ -67,6 +69,7 @@ protected:
 	offs_t m_rom_limit;
 	unsigned m_loaded_regions;
 	address_space *m_space_r;
+	required_device<address_map_bank_device> m_bank;
 };
 
 // device type definition
