@@ -9360,6 +9360,23 @@
 		</part>
 	</software>
 
+	<software name="corridr7">
+		<description>Corridor 7: Alien Invasion</description>
+		<year>1994</year>
+		<publisher>Capstone Software</publisher>
+		<info name="developer" value="Capstone Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Corridor 7 [Capstone Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="bd119818" sha1="e7fb3e97e70aaaa3b67d400172bf1d717581e03d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Corridor 7 [Capstone Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="6fb8e981" sha1="e7b1584b1e6597964d60eda42c1c0a275aad1333"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="cosmo">
 		<description>Cosmo's Cosmic Adventure - Forbidden Planet</description>
 		<year>1992</year>
