@@ -10154,6 +10154,17 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="outruna" cloneof="outrun">
+		<description>Out Run (Kixx release)</description>
+		<year>1989</year>
+		<publisher>Sega Computer Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Outrun (Kixx release) [Sega] [1989] [3.5DD]  [Disk 1 of 1].img" size="737280" crc="55bf00de" sha1="b48e9536263481ac283149c3ab679e9369027729"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="overnet">
 		<description>Over the Net</description>
@@ -11261,6 +11272,23 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="starflt">
+		<description>Starflight</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Binary Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Starflight [Electronic Arts] [1986] [5.25''DD] [Disk 1 of 2].img" size="368640" crc="9e50175b" sha1="496bea78bb92544882f4f3df2404482929f14d0d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Starflight [Electronic Arts] [1986] [5.25''DD] [Disk 2 of 2].img" size="368640" crc="a0d1c41d" sha1="7a2c8628736d376543c3ac12959050f3ae03c791"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="starflg2">
 		<description>Starflight 2: Trade Routes of the Cloud Nebula (5.25")</description>
 		<year>1989</year>
