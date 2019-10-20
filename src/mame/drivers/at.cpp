@@ -975,9 +975,14 @@ ROM_END
 
 //**************************************************************************
 //  Apricot systems
+//
+// http://bbs.actapricot.org/files/ , http://insight.actapricot.org/insight/products/main.htm
+//
 //**************************************************************************
 
 // Apricot XEN-S (Venus I Motherboard 286)
+// BIOS-String: apricot / Phoenix ROM BIOS PLUS Version 3.10.17 / Apricot XEN-S 25th June 1992
+// Gate A20 failure - MAME message: char SEL checker, contact MAMEdev
 ROM_START( xb42639 )
 	/* actual VGA BIOS not dumped*/
 	ROM_REGION(0x20000, "bios", 0)
@@ -987,6 +992,8 @@ ROM_START( xb42639 )
 ROM_END
 
 // Apricot XEN-S (Venus II Motherboard 286)
+// BIOS-String: apricot XEN-S Series Personal Computer / Phoenix ROM BIOS PLUS Version 3.10.04 / XEN-S II BIOS VR 1.2.17 16th October 1990
+// Gate A20 failure
 ROM_START( xb42639a )
 	/* actual VGA BIOS not dumped*/
 	ROM_REGION(0x20000, "bios", 0)
@@ -996,6 +1003,8 @@ ROM_START( xb42639a )
 ROM_END
 
 // Apricot XEN-S (Venus I Motherboard 386)
+// BIOS-String: apricot / Phoenix ROM BIOS PLUS Version 3.10.17 / Apricot XEN-S 25th June 1992
+// MAME message: char SEL checker, contact MAMEdev
 ROM_START( xb42664 )
 	/* actual VGA BIOS not dumped */
 	ROM_REGION(0x20000, "bios", 0)
@@ -1005,6 +1014,7 @@ ROM_START( xb42664 )
 ROM_END
 
 // Apricot XEN-S (Venus II Motherboard 386)
+// BIOS-String: apricot XEN-S Series Personal Computer / Phoenix ROM BIOS PLUS VERSION 3.10.04 / XEN-S II BIOS VR 1.2.17 16th October 1990
 ROM_START( xb42664a )
 	/* actual VGA BIOS not dumped*/
 	ROM_REGION(0x20000, "bios", 0)
@@ -1013,28 +1023,28 @@ ROM_START( xb42664a )
 	ROM_LOAD16_BYTE( "10217.hi", 0x10001, 0x8000, CRC(111725cf) SHA1(f6018a45bda4476d40c5881fb0a506ff75ec1688))
 ROM_END
 
-// Apricot Qi 300 (Rev D,E & F Motherboard)
+// Apricot Qi 300 (Rev D,E & F Motherboard) - no display
 ROM_START( xb42663 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "qi310223.lo", 0x00000, 0x10000, CRC(53047f49) SHA1(7b38e533f7f27295269549c63e5477d950239167))
 	ROM_LOAD16_BYTE( "qi310223.hi", 0x00001, 0x10000, CRC(4852869f) SHA1(98599d4691d40b3fac2936034c70b386ce4caf77))
 ROM_END
 
-// Apricot Qi 600 (Neptune Motherboard)
+// Apricot Qi 600 (Neptune Motherboard) - no display, beep code L-1-1-3 (Extended CMOS RAM failure)
 ROM_START( qi600 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "qi610223.lo", 0x00000, 0x10000, CRC(563114a9) SHA1(62932b3bf0b5502ff708f604c21773f00afda58e))
 	ROM_LOAD16_BYTE( "qi610223.hi", 0x00001, 0x10000, CRC(0ae133f6) SHA1(6039c366f7fe0ebf60b34c1a7d6b2d781b664001))
 ROM_END
 
-// Apricot Qi 900 (Scorpion Motherboard)
+// Apricot Qi 900 (Scorpion Motherboard)  - no display, beep code L-1-1-3 (Extended CMOS RAM failure)
 ROM_START( qi900 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "qi910224.lo", 0x00000, 0x10000, CRC(b012ad3c) SHA1(807e788a6bd03f5e983fe503af3d0b202c754b8a))
 	ROM_LOAD16_BYTE( "qi910224.hi", 0x00001, 0x10000, CRC(36e66d56) SHA1(0900c5272ec3ced550f18fb08db59ab7f67a621e))
 ROM_END
 
-// Apricot FTs (Scorpion)
+// Apricot FTs (Scorpion) - no display, beep code L-1-1-3 (Extended CMOS RAM failure)
 ROM_START( ftsserv )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "fts10226.lo", 0x00000, 0x10000, CRC(efbd738f) SHA1(d5258760bafdaf1bf13c4a49da76d4b5e7b4ccbd))
@@ -1044,14 +1054,14 @@ ROM_START( ftsserv )
 	ROM_LOAD( "fp10009.bin",     0x0000, 0x8000, CRC(8aa7f718) SHA1(9ee6c6a5bb92622ea8d3805196d42ff68887d820))
 ROM_END
 
-// Apricot XEN-LS (Venus IV Motherboard)
+// Apricot XEN-LS (Venus IV Motherboard) - no display
 ROM_START( apxenls3 )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "31020.lo", 0x10000, 0x8000, CRC(a19678d2) SHA1(d13c12fa7e94333555eabf58b81bad421e21cd91))
 	ROM_LOAD16_BYTE( "31020.hi", 0x10001, 0x8000, CRC(4922e020) SHA1(64e6448323dad2209e004cd93fa181582e768ed5))
 ROM_END
 
-// Apricot LANstation (Krypton Motherboard)
+// Apricot LANstation (Krypton Motherboard) - no display
 ROM_START( aplanst )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "31024", "Bios 3-10-24")
@@ -1065,40 +1075,45 @@ ROM_START( aplanst )
 	ROMX_LOAD( "31026i.hi", 0x10001, 0x8000, CRC(ef01c54f) SHA1(911f95d65ab96878e5e7ebccfc4b329db47a1351), ROM_SKIP(1) | ROM_BIOS(2))
 ROM_END
 
-// Apricot LANstation (Novell Remote Boot)
+// Apricot LANstation (Novell Remote Boot) - no display
 ROM_START( aplannb )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "lsl31025.lo", 0x00000, 0x10000, CRC(8bb7229b) SHA1(31449d12884ec4e7752e6c1ce7ce9e0d044eadf2))
 	ROM_LOAD16_BYTE( "lsh31025.hi", 0x00001, 0x10000, CRC(09e5c1b9) SHA1(d42be83b4181d3733268c29df04a4d2918370f4e))
 ROM_END
 
-// Apricot VX FT server
+// Apricot VX FT server - no display
 ROM_START( apvxft )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "ft10221.lo", 0x00000, 0x10000, CRC(8f339de0) SHA1(a6542406746eaf1ff7f9e3678c5cbe5522fb314a))
 	ROM_LOAD16_BYTE( "ft10221.hi", 0x00001, 0x10000, CRC(3b16bc31) SHA1(0592d1d81e7fd4715b0612083482db122d78c7f2))
 ROM_END
 
-// Apricot LS Pro (Caracal Motherboard)
+// Apricot LS Pro (Caracal Motherboard,Chipset: VLSI VL82C483, ROM: 256KB Flash ROM, PCMCIA Type 2/3 slots)
 ROM_START( aplscar )
 	ROM_REGION(0x40000,"bios", 0)
+	// 0: MAME exits with "Fatal error: i386: Called modrm_to_EA with modrm value C8!"
 	ROM_SYSTEM_BIOS(0, "car306", "Caracal 3.06")
 	ROMX_LOAD( "car306.bin",   0x00000, 0x40000, CRC(fc271dea) SHA1(6207cfd312c9957243b8157c90a952404e43b237), ROM_BIOS(0))
+	// 1: no display
 	ROM_SYSTEM_BIOS(1, "car307", "Caracal 3.07")
 	ROMX_LOAD( "car307.bin",   0x00000, 0x40000, CRC(66a01852) SHA1(b0a68c9d67921d27ba483a1c50463406c08d3085), ROM_BIOS(1))
 ROM_END
 
-// Apricot XEN PC (A1 Motherboard)
+// Apricot XEN PC (A1 Motherboard) - no display
 ROM_START( apxena1 )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD( "a1-r26.bin",   0x00000, 0x20000, CRC(d29e983e) SHA1(5977df7f8d7ac2a154aa043bb6f539d96d51fcad))
 ROM_END
 
-// Apricot XEN PC (P2 Motherboard)
+// Apricot XEN PC (P2 Motherboard, Chipset: M1429G/31, ROM: 128KB Flash ROM, on board: graphics Cirrus Logic GD5434 (via VL))
 ROM_START( apxenp2 )
 	ROM_REGION(0x20000,"bios", 0)
+	// 0: BIOS-String: ACR97E00-M00-951005-R02-G2 / BIOS V2.0 - Keyboard Interface Error - Pointing DeviceInterface Error
+	// after a while the boot continues to the message "Password Violated, System Halted !"
 	ROM_SYSTEM_BIOS(0, "p2r02g2", "p2r02g2")
 	ROMX_LOAD( "p2r02g2.bin",   0x00000, 0x20000, CRC(311bcc5a) SHA1(be6fa144322077dcf66b065e7f4e61aab8c278b4), ROM_BIOS(0))
+	// 1: BIOS-String: ACR97E00-M00-951005-R01-F0 / BIOS V2.0 (error messages as above)
 	ROM_SYSTEM_BIOS(1, "lep121s", "SCSI-Enabling ROMs")
 	ROMX_LOAD("p2r01f0.bin",   0x00000, 0x20000, CRC(bbc68f2e) SHA1(6954a52a7dda5521794151aff7a04225e9c7df77), ROM_BIOS(1))
 ROM_END
@@ -1106,27 +1121,33 @@ ROM_END
 // Apricot XEN-i 386 (Leopard Motherboard)
 ROM_START( apxeni )
 	ROM_REGION(0x20000,"bios", 0)
+	// 0: Phoenix 80386 ROM BIOS PLUS Version 1.10.01 / XEN-i 386 Business Microcomputer / VR 1.2.1 22nd July 1988
 	ROM_SYSTEM_BIOS(0, "lep121", "Rom Bios 1.2.1")
 	ROMX_LOAD( "lep121.bin", 0x18000, 0x8000, CRC(948c1927) SHA1(d06bdbd6292db73c815ad1060daf055293dfddf5), ROM_BIOS(0))
+	// 1: Phoenix 80386 ROM BIOS PLUS Version 1.10.01 / XEN-i 386 Business Microcomputer / VR 1.2.1 22nd January 1991
 	ROM_SYSTEM_BIOS(1, "lep121s", "SCSI-Enabling ROMs")
 	ROMX_LOAD( "lep121s.bin", 0x18000, 0x8000, CRC(296118e4) SHA1(d1feaa9704e6ce3bc10c900bdd310d9494b02304), ROM_BIOS(1))
 ROM_END
 
-// Apricot LS Pro (Bonsai Motherboard)
+// Apricot LS Pro (Bonsai Motherboard, on board: ethernet (Intel 82596), Chipset: VLSI SCAMP VL82C311 / VL82C333, ROM: 128KB)
 ROM_START( aplsbon )
 	ROM_REGION(0x20000,"bios", 0)
-	ROM_SYSTEM_BIOS(0, "bon106", "Boinsai 1-06")
+	// 0: BIOS-String: Phoenix BIOS A486 Version 1.01 / LS Pro BIOS Version 1.06, 4th July 1994 - Pointer device failure
+	ROM_SYSTEM_BIOS(0, "bon106", "Bonsai 1-06")
 	ROMX_LOAD( "bon106.bin",   0x00000, 0x20000, CRC(98a4eb76) SHA1(e0587afa78aeb9a8803f9b9f9e457e9847b0a2b2), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "bon203", "Boinsai 2-03")
+	// 1: flashing screen
+	ROM_SYSTEM_BIOS(1, "bon203", "Bonsai 2-03")
 	ROMX_LOAD( "bon203.bin",   0x00000, 0x20000, CRC(32a0e125) SHA1(a4fcbd76952599993fa8b76aa36a96386648abb2), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "bon10703", "Boinsai 1-07-03")
+	// 2: BIOS-String: Phoenix BIOS A486 Version 1.01 / LS Pro BIOS Version 1.07.03, 2nd February 1995
+	ROM_SYSTEM_BIOS(2, "bon10703", "Bonsai 1-07-03")
 	ROMX_LOAD( "bon10703.bin",   0x00000, 0x20000, CRC(0275b3c2) SHA1(55ef4cbb7f3166f678aaa478234a42049deaba5f), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "bon20402", "Boinsai 2.03")
+	// 3: flashing screen
+	ROM_SYSTEM_BIOS(3, "bon20402", "Bonsai 2.03")
 	ROMX_LOAD( "bon20402.bin",   0x00000, 0x20000, CRC(ac5803fb) SHA1(b8fe92711c6a38a5d9e6497e76a0929c1685c631), ROM_BIOS(3))
 ROM_END
 
-// Apricot XEN-LS II (Samurai Motherboard)
-ROM_START( apxlsam )
+// Apricot XEN-LS II (Samurai Motherboard, on board: CD-ROM, graphics, ethernet (Intel 82596), Chipset: VLSI 82C425, VLSI 82C486)
+ROM_START( apxlsam ) // no display
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "sam107", "ROM BIOS Version 1-07")
 	ROMX_LOAD( "sam1-07.bin",   0x00000, 0x20000, CRC(65e05a8e) SHA1(c3cd198a129122cb05a28798e54331b06cfdd310), ROM_BIOS(0))
@@ -1135,14 +1156,14 @@ ROM_START( apxlsam )
 ROM_END
 
 // Apricot FTs (Panther Rev F 1.02.26)
-ROM_START( aprpand )
+ROM_START( aprpand ) // no display
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "pf10226.std", 0x00000, 0x10000, CRC(7396fb87) SHA1(a109cbad2179eec55f86c0297a59bb015461da21))
 	ROM_CONTINUE( 0x00001, 0x10000 )
 ROM_END
 
-// Apricot FT//ex 486 (J3 Motherboard)
-ROM_START( aprfte )
+// Apricot FT//ex 486 (J3 Motherboard, Chipset: Opti 82C696)
+ROM_START( aprfte ) // no display
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD( "1-2r2-4.486", 0x00000, 0x20000, CRC(bccc236d) SHA1(0765299363e68cf65710a688c360a087856ece8f))
 ROM_END
