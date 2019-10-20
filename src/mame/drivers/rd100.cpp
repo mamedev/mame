@@ -85,6 +85,8 @@ void rd100_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
+	map(0x8404, 0x8407).rw("piax", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8408, 0x840b).rw("piay", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8608, 0x860f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x8610, 0x8611).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x8640, 0x8643).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -196,6 +198,8 @@ void rd100_state::rd100(machine_config &config)
 	pia1.writepb_handler().set(FUNC(rd100_state::key_scan_w));
 
 	PIA6821(config, "pia2");
+	PIA6821(config, "piax");
+	PIA6821(config, "piay");
 
 	ptm6840_device &timer(PTM6840(config, "timer", 4_MHz_XTAL / 4));
 	timer.o3_callback().set("acia", FUNC(acia6850_device::write_txc));
