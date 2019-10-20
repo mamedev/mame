@@ -20,8 +20,8 @@
 // - I/O expansion slots: 98032, 98034 & 98035 modules can be connected
 // - For 9825T: the so-called SKOAL mechanism that transparently overlays RAM & ROM
 //   in the same address space
-// What's not yet in:
 // - External expansion ROMs
+// What's not yet in:
 // - Configurable RAM size
 //
 // Thanks to Dyke Shaffer for publishing (on https://groups.io/g/VintHPcom)
@@ -32,6 +32,8 @@
 // For what regards the 9825T, I'd like to thank again Dyke Shaffer for
 // publishing a lot of internal HP docs about the SKOAL card. I recovered the
 // content of SKOAL ROM from its printed & scanned dump.
+// I'd also like to thank Paul Berger for providing the images of the optional
+// mass storage ROMs (see http://www.hpmuseum.net).
 //
 // 9825A can also be emulated. At the moment I haven't all the necessary
 // ROM dumps, though.
