@@ -630,7 +630,7 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	//m_vdp1->screen_update(screen, bitmap, cliprect);
 
 	// TODO : the overlay (256 pixels wide) is actually stretched over the 320 resolution genesis output, reference is https://youtu.be/Oir1Wp6yOq0.
-	// if it's meant to be stretched we'll have to multiply the entire outut x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
+	// if it's meant to be stretched we'll have to multiply the entire output x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
 
 	// overlay, only drawn for pixels != 0
 	for (int y = 0; y < 224; y++)

@@ -4751,7 +4751,7 @@ GAME( 1989, smgpja,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state
 GAME( 1990, abcop,    0,        sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,   ROT0, "Sega", "A.B. Cop (World) (FD1094 317-0169b)", 0 )
 GAME( 1990, abcopj,   abcop,    sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,   ROT0, "Sega", "A.B. Cop (Japan) (FD1094 317-0169b)", 0 )
 
-// wasn't officially available as a single PCB setup, but runs anyway albeit with messages suggesting you can compete against a nonexistant rival.
+// wasn't officially available as a single PCB setup, but runs anyway albeit with messages suggesting you can compete against a nonexistent rival.
 GAME( 1990, gpriders, gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider, ROT0, "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
 GAME( 1990, gpriderus,gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider, ROT0, "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
 GAME( 1990, gpriderjs,gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider, ROT0, "Sega", "GP Rider (Japan, FD1094 317-0161)", 0 )
