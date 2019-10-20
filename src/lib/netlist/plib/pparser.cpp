@@ -120,7 +120,7 @@ double ptokenizer::get_number_double()
 	{
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	}
-	bool err;
+	bool err(false);
 	auto ret = plib::pstonum_ne<double, true>(tok.str(), err);
 	if (err)
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
@@ -134,7 +134,7 @@ long ptokenizer::get_number_long()
 	{
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	}
-	bool err;
+	bool err(false);
 	auto ret = plib::pstonum_ne<long, true>(tok.str(), err);
 	if (err)
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
@@ -148,6 +148,23 @@ ptokenizer::token_t ptokenizer::get_token()
 		token_t ret = get_token_internal();
 		if (ret.is_type(ENDOFFILE))
 			return ret;
+
+		if (m_support_line_markers && ret.is_type(LINEMARKER))
+		{
+			// FIXME: do something with information gathered
+			ret = get_token_internal();
+			if (!ret.is_type(NUMBER))
+				error(pfmt("Expected line number after line marker but got <{1}>")(ret.str()) );
+			ret = get_token_internal();
+			if (!ret.is_type(STRING))
+				error(pfmt("Expected file name after line marker but got <{1}>")(ret.str()) );
+			ret = get_token_internal();
+			while (ret.is_type(NUMBER))
+			{
+				// FIXME: process flags; actually only 1 (file enter) and 2 (after file exit)
+				ret = get_token_internal();
+			}
+		}
 
 		if (ret.is(m_tok_comment_start))
 		{
@@ -184,7 +201,9 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			return token_t(ENDOFFILE);
 		}
 	}
-	if (m_number_chars_start.find(c) != pstring::npos)
+	if (m_support_line_markers && c == '#')
+		return token_t(LINEMARKER);
+	else if (m_number_chars_start.find(c) != pstring::npos)
 	{
 		/* read number while we receive number or identifier chars
 		 * treat it as an identifier when there are identifier chars in it
@@ -259,11 +278,11 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 // A simple preprocessor
 // ----------------------------------------------------------------------------------------
 
-ppreprocessor::ppreprocessor(defines_map_type *defines)
+ppreprocessor::ppreprocessor(psource_collection_t<> &sources, defines_map_type *defines)
 : std::istream(new readbuffer(this))
-, m_ifflag(0)
-, m_level(0)
-, m_lineno(0)
+, m_sources(sources)
+, m_if_flag(0)
+, m_if_level(0)
 , m_pos(0)
 , m_state(PROCESS)
 , m_comment(false)
@@ -289,7 +308,20 @@ ppreprocessor::ppreprocessor(defines_map_type *defines)
 
 void ppreprocessor::error(const pstring &err)
 {
-	throw pexception("PREPRO ERROR: " + err);
+	pstring s("");
+	pstring trail      ("                 from ");
+	pstring trail_first("In file included from ");
+	pstring e = plib::pfmt("PREPRO ERROR: {1}:{2}:0: error: {3}\n")
+			(m_stack.top().m_name, m_stack.top().m_lineno, err);
+	m_stack.pop();
+	while (m_stack.size() > 0)
+	{
+		if (m_stack.size() == 1)
+			trail = trail_first;
+		s = trail + plib::pfmt("{1}:{2}:0\n")(m_stack.top().m_name, m_stack.top().m_lineno) + s;
+		m_stack.pop();
+	}
+	throw pexception("\n" + s + e);
 }
 
 #define CHECKTOK2(p_op, p_prio) \
@@ -473,42 +505,73 @@ pstring ppreprocessor::process_line(pstring line)
 		std::vector<pstring> lti(psplit(lt, " ", true));
 		if (lti[0] == "#if")
 		{
-			m_level++;
+			m_if_level++;
 			std::size_t start = 0;
 			lt = replace_macros(lt);
 			std::vector<pstring> t(psplit(replace_all(lt.substr(3), " ", ""), m_expr_sep));
 			auto val = static_cast<int>(expr(t, start, 255));
 			if (val == 0)
-				m_ifflag |= (1 << m_level);
+				m_if_flag |= (1 << m_if_level);
 		}
 		else if (lti[0] == "#ifdef")
 		{
-			m_level++;
+			m_if_level++;
 			if (get_define(lti[1]) == nullptr)
-				m_ifflag |= (1 << m_level);
+				m_if_flag |= (1 << m_if_level);
 		}
 		else if (lti[0] == "#ifndef")
 		{
-			m_level++;
+			m_if_level++;
 			if (get_define(lti[1]) != nullptr)
-				m_ifflag |= (1 << m_level);
+				m_if_flag |= (1 << m_if_level);
 		}
 		else if (lti[0] == "#else")
 		{
-			m_ifflag ^= (1 << m_level);
+			m_if_flag ^= (1 << m_if_level);
 		}
 		else if (lti[0] == "#endif")
 		{
-			m_ifflag &= ~(1 << m_level);
-			m_level--;
+			m_if_flag &= ~(1 << m_if_level);
+			m_if_level--;
 		}
 		else if (lti[0] == "#include")
 		{
-			// ignore
+			if (m_if_flag == 0)
+			{
+				pstring arg("");
+				for (std::size_t i=1; i<lti.size(); i++)
+					arg += (lti[i] + " ");
+
+				arg = plib::trim(arg);
+
+				if (startsWith(arg, "\"") && endsWith(arg, "\""))
+				{
+					arg = arg.substr(1, arg.length() - 2);
+					/* first try local context */
+					auto l(plib::util::buildpath({m_stack.top().m_local_path, arg}));
+					auto lstrm(m_sources.get_stream<>(l));
+					if (lstrm)
+					{
+						m_stack.emplace(input_context(std::move(lstrm), plib::util::path(l), l));
+					}
+					else
+					{
+						auto strm(m_sources.get_stream<>(arg));
+						if (strm)
+						{
+							m_stack.emplace(input_context(std::move(strm), plib::util::path(arg), arg));
+						}
+						else
+							error("include not found:" + arg);
+					}
+				}
+				else
+					error("include misspelled:" + arg);
+			}
 		}
 		else if (lti[0] == "#pragma")
 		{
-			if (m_ifflag == 0 && lti.size() > 3 && lti[1] == "NETLIST")
+			if (m_if_flag == 0 && lti.size() > 3 && lti[1] == "NETLIST")
 			{
 				if (lti[2] == "warning")
 					error("NETLIST: " + catremainder(lti, 3, " "));
@@ -516,10 +579,10 @@ pstring ppreprocessor::process_line(pstring line)
 		}
 		else if (lti[0] == "#define")
 		{
-			if (m_ifflag == 0)
+			if (m_if_flag == 0)
 			{
 				if (lti.size() < 2)
-					error("PREPRO: define needs at least one argument: " + line);
+					error("define needs at least one argument: " + line);
 				else if (lti.size() == 2)
 					m_defines.insert({lti[1], define_t(lti[1], "")});
 				else
@@ -534,17 +597,39 @@ pstring ppreprocessor::process_line(pstring line)
 		}
 		else
 		{
-			if (m_ifflag == 0)
-				error(pfmt("unknown directive on line {1}: {2}")(m_lineno)(replace_macros(line)));
+			if (m_if_flag == 0)
+				error(pfmt("unknown directive on line {1}: {2}")(m_stack.top().m_lineno)(replace_macros(line)));
 		}
 	}
 	else
 	{
 		lt = replace_macros(lt);
-		if (m_ifflag == 0)
+		if (m_if_flag == 0)
 			ret += lt;
 	}
 	return ret;
+}
+
+void ppreprocessor::process_stack()
+{
+	while (m_stack.size() > 0)
+	{
+		pstring line;
+		pstring linemarker = pfmt("# {1} \"{2}\" 1\n")(m_stack.top().m_lineno, m_stack.top().m_name);
+		m_outbuf += decltype(m_outbuf)(linemarker.c_str());
+		while (m_stack.top().m_reader.readline(line))
+		{
+			m_stack.top().m_lineno++;
+			line = process_line(line);
+			m_outbuf += decltype(m_outbuf)(line.c_str()) + static_cast<char>(10);
+		}
+		m_stack.pop();
+		if (m_stack.size() > 0)
+		{
+			linemarker = pfmt("# {1} \"{2}\" 2\n")(m_stack.top().m_lineno, m_stack.top().m_name);
+			m_outbuf += decltype(m_outbuf)(linemarker.c_str());
+		}
+	}
 }
 
 

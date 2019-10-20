@@ -227,7 +227,7 @@ protected:
 		pstring::size_type p;
 		pstring::size_type sl;
 		char32_t pend;
-		pstring::size_type width;
+		int width;
 
 	};
 	rtype setfmt(std::stringstream &strm, char32_t cfmt_spec);
@@ -248,10 +248,14 @@ protected:
 				strm << std::forward<T>(val);
 				const pstring ps(strm.str());
 				pstring pad("");
-				if (ret.width > ps.length())
-					pad = pstring(ret.width - ps.length(), ' ');
+				std::size_t aw(std::abs(ret.width));
+				if (aw > ps.length())
+					pad = pstring(aw - ps.length(), ' ');
 
-				m_str = m_str.substr(0, ret.p) + pad + ps + m_str.substr(ret.p + ret.sl);
+				if (ret.width > 0)
+					m_str = m_str.substr(0, ret.p) + pad + ps + m_str.substr(ret.p + ret.sl);
+				else
+					m_str = m_str.substr(0, ret.p) + ps + pad + m_str.substr(ret.p + ret.sl);
 			}
 		} while (ret.ret == 1);
 

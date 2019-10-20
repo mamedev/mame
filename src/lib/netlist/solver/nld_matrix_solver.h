@@ -10,6 +10,7 @@
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
+#include "plib/mat_cr.h"
 #include "plib/palloc.h"
 #include "plib/pmatrix2d.h"
 #include "plib/putil.h"
@@ -307,12 +308,14 @@ namespace devices
 		template <typename T, typename M>
 		void log_fill(const T &fill, M &mat)
 		{
-			/* FIXME: move this to the cr matrix class and use computed
-			 * parallel ordering once it makes sense.
-			 */
-
 			const std::size_t iN = fill.size();
 
+			// FIXME: Not yet working, mat_cr.h needs some more work
+#if 0
+			auto mat_GE = dynamic_cast<plib::pGEmatrix_cr_t<typename M::base> *>(&mat);
+#else
+			plib::unused_var(mat);
+#endif
 			std::vector<unsigned> levL(iN, 0);
 			std::vector<unsigned> levU(iN, 0);
 
@@ -346,7 +349,13 @@ namespace devices
 						if (fill[k][j] > fm)
 							fm = fill[k][j];
 				}
-				this->log().verbose("{1:4} {2} {3:4} {4:4} {5:4} {6:4}", k, ml, levL[k], levU[k], mat.get_parallel_level(k), fm);
+#if 0
+				this->log().verbose("{1:4} {2} {3:4} {4:4} {5:4} {6:4}", k, ml,
+					levL[k], levU[k], mat_GE ? mat_GE->get_parallel_level(k) : 0, fm);
+#else
+				this->log().verbose("{1:4} {2} {3:4} {4:4} {5:4} {6:4}", k, ml,
+					levL[k], levU[k], 0, fm);
+#endif
 			}
 		}
 
@@ -361,7 +370,7 @@ namespace devices
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_terms;
 
-		std::vector<pool_owned_ptr<proxied_analog_output_t>> m_inps;
+		std::vector<unique_pool_ptr<proxied_analog_output_t>> m_inps;
 
 		std::vector<plib::unique_ptr<terms_for_net_t>> m_rails_temp;
 

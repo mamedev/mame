@@ -31,6 +31,7 @@ public:
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
 		opt_cmd (*this,     "c", "cmd",         0,          std::vector<pstring>({"run","validate","convert","listdevices","static","header","docheader"}), "run|validate|convert|listdevices|static|header|docheader"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
+		opt_includes(*this, "I", "include",                 "Add the directory to the list of directories to be searched for header files. This option may be specified repeatedly."),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for data files"),
 		opt_verb(*this,     "v", "verbose",                 "be verbose - this produces lots of output"),
@@ -41,7 +42,10 @@ public:
 		opt_grp2(*this,     "Options for run and static commands",   "These options apply to run and static commands."),
 		opt_name(*this,     "n", "name",        "",         "the netlist in file specified by ""-f"" option to run; default is first one"),
 
-		opt_grp3(*this,     "Options for run command",      "These options are only used by the run command."),
+		opt_grp3(*this,     "Options for static command",   "These options apply to static command."),
+		opt_dir(*this,      "d", "dir",        "",          "output directory for the generated files"),
+
+		opt_grp4(*this,     "Options for run command",      "These options are only used by the run command."),
 		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
 		opt_stats(*this,    "s", "statistics",              "gather runtime statistics"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
@@ -49,10 +53,13 @@ public:
 		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
 		opt_savestate(*this,"",  "savestate",   "",         "save state to file at end of run"),
 
-		opt_grp4(*this,     "Options for convert command",  "These options are only used by the convert command."),
+		opt_grp5(*this,     "Options for convert command",  "These options are only used by the convert command."),
 		opt_type(*this,     "y", "type",        0,          std::vector<pstring>({"spice","eagle","rinf"}), "type of file to be converted: spice,eagle,rinf"),
 
-		opt_grp5(*this,     "Options for header command",  "These options are only used by the header command."),
+		opt_grp6(*this,     "Options for validate command",  "These options are only used by the validate command."),
+		opt_extended_validation(*this, "", "extended",       "Identify issues with power terminals."),
+
+		opt_grp7(*this,     "Options for header command",  "These options are only used by the header command."),
 		opt_tabwidth(*this, "", "tab-width", 4,          "Tab width for output."),
 		opt_linewidth(*this,"", "line-width", 72,       "Line width for output."),
 
@@ -70,6 +77,7 @@ public:
 	plib::option_group  opt_grp1;
 	plib::option_str_limit<unsigned> opt_cmd;
 	plib::option_str    opt_file;
+	plib::option_vec    opt_includes;
 	plib::option_vec    opt_defines;
 	plib::option_vec    opt_rfolders;
 	plib::option_bool   opt_verb;
@@ -79,15 +87,19 @@ public:
 	plib::option_group  opt_grp2;
 	plib::option_str    opt_name;
 	plib::option_group  opt_grp3;
+	plib::option_str    opt_dir;
+	plib::option_group  opt_grp4;
 	plib::option_num<double> opt_ttr;
 	plib::option_bool   opt_stats;
 	plib::option_vec    opt_logs;
 	plib::option_str    opt_inp;
 	plib::option_str    opt_loadstate;
 	plib::option_str    opt_savestate;
-	plib::option_group  opt_grp4;
-	plib::option_str_limit<unsigned> opt_type;
 	plib::option_group  opt_grp5;
+	plib::option_str_limit<unsigned> opt_type;
+	plib::option_group  opt_grp6;
+	plib::option_bool   opt_extended_validation;
+	plib::option_group  opt_grp7;
 	plib::option_num<unsigned> opt_tabwidth;
 	plib::option_num<unsigned> opt_linewidth;
 	plib::option_example opt_ex1;
@@ -130,21 +142,21 @@ NETLIST_END()
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-class netlist_data_folder_t : public netlist::source_t
+class netlist_data_folder_t : public netlist::source_data_t
 {
 public:
 	netlist_data_folder_t(const pstring &folder)
-	: netlist::source_t(netlist::source_t::DATA)
+	: netlist::source_data_t()
 	, m_folder(folder)
 	{
 	}
 
-	plib::unique_ptr<std::istream> stream(const pstring &file) override
+	stream_ptr stream(const pstring &file) override
 	{
 		pstring name = m_folder + "/" + file;
 		auto strm(plib::make_unique<std::ifstream>(plib::filesystem::u8path(name)));
 		if (strm->fail())
-			return plib::unique_ptr<std::istream>(nullptr);
+			return stream_ptr(nullptr);
 		else
 		{
 			strm->imbue(std::locale::classic());
@@ -188,7 +200,8 @@ public:
 	void read_netlist(const pstring &filename, const pstring &name,
 			const std::vector<pstring> &logs,
 			const std::vector<pstring> &defines,
-			const std::vector<pstring> &roms)
+			const std::vector<pstring> &roms,
+			const std::vector<pstring> &includes)
 	{
 		// read the netlist ...
 
@@ -197,6 +210,11 @@ public:
 
 		for (auto & r : roms)
 			setup().register_source(plib::make_unique<netlist_data_folder_t>(r));
+
+		using a = plib::psource_str_t<plib::psource_t>;
+		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h",""));
+		for (auto & i : includes)
+			setup().add_include(plib::make_unique<netlist_data_folder_t>(i));
 
 		setup().register_source(plib::make_unique<netlist::source_file_t>(filename));
 		setup().include(name);
@@ -291,7 +309,7 @@ struct input_t
 	: m_value(0.0)
 	{
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
-		double t;
+		double t(0);
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
 		if (e != 3)
@@ -367,7 +385,7 @@ void tool_app_t::run()
 
 		nt.read_netlist(opt_file(), opt_name(),
 				opt_logs(),
-				m_options, opt_rfolders());
+				m_options, opt_rfolders(), opt_includes());
 
 		nt.reset();
 
@@ -455,7 +473,7 @@ void tool_app_t::validate()
 	m_errors = 0;
 	m_warnings = 0;
 
-	nt.setup().enable_validation();
+	nt.setup().set_extended_validation(opt_extended_validation());
 
 	try
 	{
@@ -463,7 +481,7 @@ void tool_app_t::validate()
 
 		nt.read_netlist(opt_file(), opt_name(),
 				opt_logs(),
-				m_options, opt_rfolders());
+				m_options, opt_rfolders(), opt_includes());
 	}
 	catch (netlist::nl_exception &e)
 	{
@@ -484,6 +502,9 @@ void tool_app_t::validate()
 
 void tool_app_t::static_compile()
 {
+	if (!opt_dir.was_specified())
+		throw netlist::nl_exception("--dir option needs to be specified");
+
 	netlist_tool_t nt(*this, "netlist");
 
 	nt.init();
@@ -494,7 +515,7 @@ void tool_app_t::static_compile()
 
 	nt.read_netlist(opt_file(), opt_name(),
 			opt_logs(),
-			m_options, opt_rfolders());
+			m_options, opt_rfolders(), opt_includes());
 
 	// need to reset ...
 
@@ -506,7 +527,8 @@ void tool_app_t::static_compile()
 
 	for (auto &e : mp)
 	{
-		pout.write(e.second);
+		auto sout(std::ofstream(opt_dir() + "/" + e.first + ".c" ));
+		sout << e.second;
 	}
 
 	nt.stop();
@@ -700,7 +722,7 @@ void tool_app_t::listdevices()
 
 	nt.setup().prepare_to_run();
 
-	std::vector<netlist::pool_owned_ptr<netlist::core_device_t>> devs;
+	std::vector<netlist::unique_pool_ptr<netlist::core_device_t>> devs;
 
 	for (auto & f : list)
 	{
@@ -810,8 +832,6 @@ int tool_app_t::execute()
 
 	if (opt_help())
 	{
-		pout(plib::pfmt("{:10.3}\n").f(20.0));
-		//pout(plib::pfmt("{10.3}\n").f(20));
 		pout(usage());
 		return 0;
 	}

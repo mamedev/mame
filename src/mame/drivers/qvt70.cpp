@@ -54,7 +54,7 @@ private:
 	void bank_map(address_map &map);
 	void io_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	void bankswitch_w(uint8_t data);
 };
 
 void qvt70_state::mem_map(address_map &map)
@@ -62,7 +62,8 @@ void qvt70_state::mem_map(address_map &map)
 	map(0x0000, 0x7fff).m(m_bank, FUNC(address_map_bank_device::amap8));
 	map(0x8000, 0x8000).w(FUNC(qvt70_state::bankswitch_w));
 	map(0xa000, 0xbfff).ram();
-//  map(0xc000, 0xffff).ram();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xffff).ram();
 }
 
 void qvt70_state::bank_map(address_map &map)
@@ -88,21 +89,24 @@ void qvt70_state::io_map(address_map &map)
 static INPUT_PORTS_START( qvt70 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(qvt70_state::bankswitch_w)
+void qvt70_state::bankswitch_w(uint8_t data)
 {
 	logerror("bankswitch_w: %02x\n", data);
 
 	// 765----- unknown
-	// ---43--- bankswitching?
+	// ---43--- bankswitching
 	// -----21- unknown
-	// -------0 bankswitching?
+	// -------0 bankswitching
 
-	// likely wrong
-	int bank = ((data >> 2) & 0x06) | BIT(data, 0);
-	logerror("bank = %02x\n", bank);
-
-	if (bank < 6)
-		m_bank->set_bank(bank);
+	switch (data & 0x19)
+	{
+		case 0x00: m_bank->set_bank(0); break;
+		case 0x08: m_bank->set_bank(1); break;
+		case 0x10: m_bank->set_bank(2); break;
+		case 0x18: m_bank->set_bank(3); break;
+		case 0x01: m_bank->set_bank(4); break;
+		case 0x11: m_bank->set_bank(5); break;
+	}
 }
 
 void qvt70_state::machine_start()

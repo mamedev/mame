@@ -4,19 +4,26 @@
 
     Toshiba Pasopia 7 (c) 1983 Toshiba
 
-    preliminary driver by Angelo Salese
+    Preliminary driver by Angelo Salese.
+    2019-10-14 added cassette & beeper [Robbbert]
+
+    Machine unusable due to issues with sound.
+    Cassette works.
+    Beeper is only used for the keyclick, and it works.
 
     TODO:
-    - floppy support (but floppy images are unobtainable at current time)
-    - cassette device;
-    - beeper
+    - floppy support (but floppy images are unobtainable at current time).
+    - SOUND command uses the SN76489 chip, however no sound is produced, and the next SOUND command
+      freezes the machine.
     - LCD version has gfx bugs, it must use a different ROM charset for instance (apparently a 8 x 4
-      one, 40/80 x 8 tilemap);
+      one, 40/80 x 8 tilemap).
+    - Allow BIN files to be loaded (via a rampac presumably).
+    - Allow CAS files to be loaded.
 
     Reading fdc has been commented out, until the code can be modified to
     work with new upd765 (was causing a hang at boot).
 
-    Schematics: https://archive.org/details/Io19839/page/n331
+    Schematics: https://archive.org/details/Io19839/page/n331 (fdc system not included)
 
 ***************************************************************************************************/
 
@@ -31,7 +38,8 @@
 #include "machine/z80pio.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
-
+#include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -44,18 +52,20 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_ppi0(*this, "ppi8255_0")
-		, m_ppi1(*this, "ppi8255_1")
-		, m_ppi2(*this, "ppi8255_2")
-		, m_ctc(*this, "z80ctc")
-		, m_pio(*this, "z80pio")
+		, m_ppi0(*this, "ppi0")
+		, m_ppi1(*this, "ppi1")
+		, m_ppi2(*this, "ppi2")
+		, m_ctc(*this, "ctc")
+		, m_pio(*this, "pio")
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0:525hd")
 		, m_sn1(*this, "sn1")
 		, m_sn2(*this, "sn2")
 		, m_palette(*this, "palette")
-		, m_keyboard(*this, "KEY.%u", 0)
+		, m_keyboard(*this, "KEY.%d", 0)
+		, m_cass(*this, "cassette")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	void p7_base(machine_config &config);
@@ -90,6 +100,7 @@ private:
 	DECLARE_WRITE8_MEMBER(nmi_reg_w);
 	DECLARE_READ8_MEMBER(nmi_porta_r);
 	DECLARE_READ8_MEMBER(nmi_portb_r);
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	TIMER_CALLBACK_MEMBER(pio_timer);
 	DECLARE_VIDEO_START(pasopia7);
 	void p7_lcd_palette(palette_device &palette) const;
@@ -123,6 +134,8 @@ private:
 	int m_addr_latch;
 	void pasopia_nmi_trap();
 	uint8_t m_mux_data;
+	u8 m_porta_2;
+	bool m_spr_sw;
 	emu_timer *m_pio_timer;
 	virtual void machine_reset() override;
 	void fdc_irq(bool state);
@@ -144,9 +157,11 @@ private:
 	required_device<sn76489a_device> m_sn2;
 	required_device<palette_device> m_palette;
 	required_ioport_array<12> m_keyboard;
+	required_device<cassette_image_device> m_cass;
+	required_device<speaker_sound_device> m_speaker;
 };
 
-#define VDP_CLOCK XTAL(3'579'545)/4
+#define VDP_CLOCK 14.318181_MHz_XTAL / 16
 #define LCD_CLOCK VDP_CLOCK/10
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.
@@ -515,7 +530,7 @@ READ8_MEMBER( pasopia7_state::pac2_r )
 		}
 		else
 		{
-			printf("%02x\n",m_pac2_bank_select);
+			//printf("RAMPAC bank_select = %02x\n",m_pac2_bank_select);
 		}
 	}
 
@@ -599,26 +614,28 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_fdc_w )
 
 READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 {
-	uint16_t io_port;
-
 	if(m_mio_sel)
 	{
 		address_space &ram_space = m_maincpu->space(AS_PROGRAM);
 
 		m_mio_sel = 0;
-		//printf("%08x\n",offset);
-		//return 0x0d; // hack: this is used for reading the keyboard data, we can fake it a little ... (modify fda4)
+			// hack: this is used for reading the keyboard data, we can fake it a little ... (modify fda4)
 		return ram_space.read_byte(offset);
 	}
 
-	io_port = offset & 0xff; //trim down to 8-bit bus
+	u8 io_port = offset & 0xff; //trim down to 8-bit bus
 
 	if(io_port >= 0x08 && io_port <= 0x0b)
 		return m_ppi0->read(io_port & 3);
 	else
 	if(io_port >= 0x0c && io_port <= 0x0f)
 		return m_ppi1->read(io_port & 3);
-//  else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
+	else
+	if(io_port == 0x10)
+		return m_crtc->status_r();
+	else
+	if(io_port == 0x11)
+		return m_crtc->register_r();
 	else
 	if(io_port >= 0x18 && io_port <= 0x1b)
 		return pac2_r(space, io_port & 3);
@@ -650,8 +667,6 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 
 WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 {
-	uint16_t io_port;
-
 	if(m_mio_sel)
 	{
 		address_space &ram_space = m_maincpu->space(AS_PROGRAM);
@@ -660,7 +675,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 		return;
 	}
 
-	io_port = offset & 0xff; //trim down to 8-bit bus
+	u8 io_port = offset & 0xff; //trim down to 8-bit bus
 
 	if(io_port >= 0x08 && io_port <= 0x0b)
 		m_ppi0->write(io_port & 3, data);
@@ -719,9 +734,32 @@ void pasopia7_state::pasopia7_io(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(pasopia7_state::pasopia7_io_r), FUNC(pasopia7_state::pasopia7_io_w));
 }
 
-/* TODO: where are SPACE and RETURN keys? */
 static INPUT_PORTS_START( pasopia7 )
 	PASOPIA_KEYBOARD
+	PORT_MODIFY("KEY.2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_DEL_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_MODIFY("KEY.3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("RIGHT")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Label") PORT_CODE(KEYCODE_END)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INS/DEL") PORT_CHAR(8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TAB/ESC") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_MODIFY("KEY.4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_NAME("HOME/CLS")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Kanji") // guess? key has a Japanese label
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Copy")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Stop")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("LEFT")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_NAME("UP/DOWN")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("SPACE") PORT_CHAR(' ')
 INPUT_PORTS_END
 
 static const gfx_layout p7_chars_8x8 =
@@ -753,20 +791,14 @@ GFXDECODE_END
 
 READ8_MEMBER( pasopia7_state::keyb_r )
 {
-	uint8_t i,j,res = 0;
-	for (j=0; j<3; j++)
-	{
+	u8 data = 0xff;
+	for (u8 j=0; j<3; j++)
 		if (BIT(m_mux_data, 4+j))
-		{
-			for (i=0; i<4; i++)
-			{
+			for (u8 i=0; i<4; i++)
 				if (BIT(m_mux_data, i))
-					res |= m_keyboard[j*4+i]->read();
-			}
-		}
-	}
+					data &= m_keyboard[j*4+i]->read();
 
-	return res ^ 0xff;
+	return data;
 }
 
 WRITE8_MEMBER( pasopia7_state::mux_w )
@@ -776,8 +808,8 @@ WRITE8_MEMBER( pasopia7_state::mux_w )
 
 static const z80_daisy_config p7_daisy[] =
 {
-	{ "z80ctc" },
-	{ "z80pio" },
+	{ "ctc" },
+	{ "pio" },
 //  { "fdc" }, /* TODO */
 	{ nullptr }
 };
@@ -840,7 +872,7 @@ WRITE8_MEMBER( pasopia7_state::video_misc_w )
 WRITE8_MEMBER( pasopia7_state::nmi_mask_w )
 {
 	/*
-	--x- ---- (related to the data rec)
+	--x- ---- tape motor
 	---x ---- data rec out
 	---- --x- sound off
 	---- ---x reset NMI & trap
@@ -853,7 +885,11 @@ WRITE8_MEMBER( pasopia7_state::nmi_mask_w )
 		m_nmi_trap &= ~2;
 		//m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); //guess
 	}
-
+	m_cass->output(BIT(data, 4) ? -1.0 : +1.0);
+	u8 changed = data ^ m_porta_2;
+	m_porta_2 = data;
+	if (BIT(changed, 5))
+		m_cass->change_state(BIT(data, 5) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 /* TODO: investigate on these. */
@@ -885,7 +921,18 @@ READ8_MEMBER( pasopia7_state::nmi_porta_r )
 
 READ8_MEMBER( pasopia7_state::nmi_portb_r )
 {
-	return 0xf9 | m_nmi_trap | m_nmi_reset;
+	u8 data = (m_cass->input() > +0.04) ? 0x20 : 0;
+	return 0xd9 | data | m_nmi_trap | m_nmi_reset;
+}
+
+WRITE_LINE_MEMBER( pasopia7_state::speaker_w )
+{
+	if (state)
+	{
+		m_spr_sw ^= 1;
+		if (BIT(m_mux_data, 7))
+			m_speaker->level_w(m_spr_sw);
+	}
 }
 
 void pasopia7_state::machine_reset()
@@ -898,6 +945,8 @@ void pasopia7_state::machine_reset()
 //  membank("bank4")->set_base(bios + 0x10000);
 
 	m_nmi_reset |= 4;
+	m_porta_2 = 0xFF;
+	m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 // TODO: palette values are mostly likely to be wrong in there
@@ -922,26 +971,29 @@ static void pasopia7_floppies(device_slot_interface &device)
 void pasopia7_state::p7_base(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
+	Z80(config, m_maincpu, 15.9744_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pasopia7_state::pasopia7_mem);
 	m_maincpu->set_addrmap(AS_IO, &pasopia7_state::pasopia7_io);
 	m_maincpu->set_daisy_config(p7_daisy);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	SN76489A(config, m_sn1, 1996800).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
+	SN76489A(config, m_sn1, 15.9744_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	SN76489A(config, m_sn2, 1996800).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
+	SN76489A(config, m_sn2, 15.9744_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	Z80CTC(config, m_ctc, XTAL(4'000'000));
+	Z80CTC(config, m_ctc, 15.9744_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->set_clk<0>(15.9744_MHz_XTAL / 4);
+	m_ctc->set_clk<2>(15.9744_MHz_XTAL / 4);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
-	m_ctc->zc_callback<1>().set(m_ctc, FUNC(z80ctc_device::trg2)); // beep interface
+	m_ctc->zc_callback<1>().set(FUNC(pasopia7_state::speaker_w));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 
-	Z80PIO(config, m_pio, XTAL(4'000'000));
+	Z80PIO(config, m_pio, 15.9744_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->out_pa_callback().set(FUNC(pasopia7_state::mux_w));
 	m_pio->in_pb_callback().set(FUNC(pasopia7_state::keyb_r));
@@ -966,6 +1018,10 @@ void pasopia7_state::p7_base(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	FLOPPY_CONNECTOR(config, "fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats);
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void pasopia7_state::p7_raster(machine_config &config)
@@ -984,7 +1040,7 @@ void pasopia7_state::p7_raster(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
-	MC6845(config, m_crtc, VDP_CLOCK); /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	HD6845S(config, m_crtc, VDP_CLOCK); // HD46505S
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -1007,7 +1063,7 @@ void pasopia7_state::p7_lcd(machine_config &config)
 	PALETTE(config, m_palette, FUNC(pasopia7_state::p7_lcd_palette), 8);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
-	MC6845(config, m_crtc, LCD_CLOCK); /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	HD6845S(config, m_crtc, LCD_CLOCK); /* unknown variant, unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

@@ -9,7 +9,7 @@
 #ifndef NLTOOL_VERSION
 #define USE_FRONTIERS 1
 #else
-#define USE_FRONTIERS 0
+#define USE_FRONTIERS 1
 #endif
 
 /* if we use frontiers, use fixed STV for smaller matrix sizes */

@@ -278,6 +278,11 @@ int renderer_bgfx::create()
 		{
 			init.type = bgfx::RendererType::Direct3D11;
 		}
+// Throws exception on exit
+//		else if (backend == "dx12" || backend == "d3d12")
+//		{
+//			init.type = bgfx::RendererType::Direct3D12;
+//		}
 		else if (backend == "gles")
 		{
 			init.type = bgfx::RendererType::OpenGLES;
@@ -285,6 +290,10 @@ int renderer_bgfx::create()
 		else if (backend == "glsl" || backend == "opengl")
 		{
 			init.type = bgfx::RendererType::OpenGL;
+		}
+		else if (backend == "vulkan")
+		{
+			init.type = bgfx::RendererType::Vulkan;
 		}
 		else if (backend == "metal")
 		{
@@ -441,7 +450,7 @@ int renderer_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  drawbgfx_window_draw
 //============================================================
 
-bgfx::VertexDecl ScreenVertex::ms_decl;
+bgfx::VertexLayout ScreenVertex::ms_decl;
 
 void renderer_bgfx::put_packed_quad(render_primitive *prim, uint32_t hash, ScreenVertex* vertices)
 {
@@ -1131,8 +1140,10 @@ void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer
 				continue;
 			}
 			m_hash_to_entry[rect.hash()] = rect;
-			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base());
-			bgfx::updateTexture2D(m_texture_cache->texture(), 0, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem);
+			bgfx::TextureFormat::Enum dst_format = bgfx::TextureFormat::RGBA8;
+			uint16_t pitch = rect.width();
+			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, rect.format(), rect.width(), rect.height(), rect.rowpixels(), rect.palette(), rect.base(), &pitch);
+			bgfx::updateTexture2D(m_texture_cache->texture(), 0, 0, rect.x(), rect.y(), rect.width(), rect.height(), mem, pitch);
 		}
 	}
 }

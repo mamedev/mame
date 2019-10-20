@@ -476,7 +476,7 @@ namespace analog
 
 		const nl_double Vctrl = (is_forward ? Vgs : Vgd) - Vth;
 
-		nl_double Ids, gm, gds, gmb;
+		nl_double Ids(0), gm(0), gds(0), gmb(0);
 		const nl_double absVds = std::abs(Vds);
 
 		if (Vctrl <= 0.0)

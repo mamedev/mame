@@ -438,7 +438,7 @@ namespace devices
 		nld_power_pins(device_t &owner, const pstring &sVCC = "VCC",
 			const pstring &sGND = "GND", bool force_analog_input = false)
 		{
-			if (owner.setup().is_validation() || force_analog_input)
+			if (owner.setup().is_extended_validation() || force_analog_input)
 			{
 				m_GND = plib::make_unique<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
 				m_VCC = plib::make_unique<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));

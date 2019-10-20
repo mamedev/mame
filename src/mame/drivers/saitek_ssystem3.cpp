@@ -343,8 +343,8 @@ ROM_START( ssystem3 )
 	ROM_REGION( 0x100, "nvram", 0 ) // default settings
 	ROM_LOAD( "nvram", 0, 0x100, CRC(b5dddc7b) SHA1(3be9ec8359cc9ef16a04f28dfd24f9ffe1a2fca9) )
 
-	ROM_REGION( 53469, "screen", 0)
-	ROM_LOAD( "ssystem3.svg", 0, 53469, CRC(0479eac3) SHA1(6f26c8dfab2c8456cf576ea4ca6ab7a8445bf5e5) )
+	ROM_REGION( 53552, "screen", 0)
+	ROM_LOAD( "ssystem3.svg", 0, 53552, CRC(6047f88f) SHA1(2ff9cfce01cd3811a3f46f84b47fdc4ea2cf2ba8) )
 ROM_END
 
 } // anonymous namespace

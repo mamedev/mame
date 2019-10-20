@@ -630,7 +630,7 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	//m_vdp1->screen_update(screen, bitmap, cliprect);
 
 	// TODO : the overlay (256 pixels wide) is actually stretched over the 320 resolution genesis output, reference is https://youtu.be/Oir1Wp6yOq0.
-	// if it's meant to be stretched we'll have to multiply the entire outut x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
+	// if it's meant to be stretched we'll have to multiply the entire output x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
 
 	// overlay, only drawn for pixels != 0
 	for (int y = 0; y < 224; y++)
@@ -675,14 +675,14 @@ void mplay_state::megaplay(machine_config &config)
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("DSW0");
 	io1.in_portb_cb().set_ioport("DSW1");
 	io1.out_portd_cb().set(FUNC(mplay_state::bios_banksel_w));
 	io1.in_porte_cb().set(FUNC(mplay_state::bios_6204_r));
 	io1.out_porte_cb().set(FUNC(mplay_state::bios_width_w));
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("TEST");
 	io2.in_portb_cb().set_ioport("COIN");
 	io2.in_portc_cb().set(FUNC(mplay_state::bios_6402_r));

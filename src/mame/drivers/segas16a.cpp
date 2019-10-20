@@ -151,6 +151,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "includes/segaipt.h"
 
 #include "machine/fd1089.h"
+#include "machine/fd1094.h"
 #include "machine/nvram.h"
 #include "machine/segacrp2_device.h"
 #include "sound/dac.h"
@@ -2034,7 +2035,7 @@ void segas16a_state::system16a_fd1094(machine_config &config)
 void segas16a_state::aceattaca_fd1094(machine_config &config)
 {
 	system16a_fd1094(config);
-	CXD1095(config, "cxdio", 0);
+	CXD1095(config, "cxdio");
 }
 
 void segas16a_state::system16a_i8751(machine_config &config)

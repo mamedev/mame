@@ -174,7 +174,7 @@ void korgm1_state::korgm1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &korgm1_state::korgm1_map);
 	m_maincpu->set_addrmap(AS_IO, &korgm1_state::korgm1_io);
 
-	CXD1095(config, "pio", 0);
+	CXD1095(config, "pio");
 
 	/* video hardware */
 	/* TODO: LCD actually */

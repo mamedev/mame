@@ -28,8 +28,8 @@
  * Your mileage may vary.
  *
  */
-#ifndef USE_MEMPOOL
-#define USE_MEMPOOL                 (1)
+#ifndef NL_USE_MEMPOOL
+#define NL_USE_MEMPOOL               (1)
 #endif
 
 /*! Enable queue statistics.
@@ -39,8 +39,8 @@
  * only needed during development.
  *
  */
-#ifndef USE_QUEUE_STATS
-#define USE_QUEUE_STATS             (0)
+#ifndef NL_USE_QUEUE_STATS
+#define NL_USE_QUEUE_STATS             (0)
 #endif
 
 /*! Store input values in logic_terminal_t.
@@ -50,11 +50,11 @@
  * This approach is stricter and should identify bugs in
  * the netlist core faster.
  * By default it is disabled since it is not as fast as
- * the default approach. It is up to 5% slower.
+ * the default approach. It is up to 10% slower.
  *
  */
-#ifndef USE_COPY_INSTEAD_OF_REFERENCE
-#define USE_COPY_INSTEAD_OF_REFERENCE (0)
+#ifndef NL_USE_COPY_INSTEAD_OF_REFERENCE
+#define NL_USE_COPY_INSTEAD_OF_REFERENCE (0)
 #endif
 
 /*
@@ -63,7 +63,9 @@
  *        setting param USE_DEACTIVATE for the device.
  */
 
-#define USE_TRUTHTABLE_7448 (0)
+#ifndef NL_USE_TRUTHTABLE_7448
+#define NL_USE_TRUTHTABLE_7448 (0)
+#endif
 
 /*
  * FIXME: The truthtable implementation of 74107 (JK-Flipflop)
@@ -72,7 +74,9 @@
  *        It will completely nuke performance for pong.
  */
 
-#define USE_TRUTHTABLE_74107 (0)
+#ifndef NL_USE_TRUTHTABLE_74107
+#define NL_USE_TRUTHTABLE_74107 (0)
+#endif
 
 //============================================================
 //  DEBUGGING

@@ -211,7 +211,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 		// I/O chip
 		case 0x0000/2:
 		case 0x1000/2:
-			return m_io->read(space, offset) | (open_bus_r(space) & 0xff00);
+			return m_io->read(space, offset) | (m_mapper->open_bus_r() & 0xff00);
 
 		// video control latch
 		case 0x2000/2:
@@ -224,7 +224,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 WRITE16_MEMBER( segas18_state::misc_io_w )
@@ -356,7 +356,7 @@ READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
 		case 0x3024/2:
 			return ioport("EXSERVICE")->read();
 	}
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -380,7 +380,7 @@ READ16_MEMBER( segas18_state::lghost_custom_io_r )
 			m_lghost_value <<= 1;
 			return result;
 	}
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
@@ -584,7 +584,7 @@ READ16_MEMBER( segas18_state::wwally_custom_io_r )
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
 		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(space, offset & 0x0006/2);
 
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 

@@ -14,7 +14,7 @@
 #define PERRMSG(name, str) \
 	struct name \
 	{ \
-		operator pstring() const { return str; } \
+		operator pstring() const noexcept { return str; } \
 	};
 
 #define PERRMSGV(name, narg, str) \
@@ -23,7 +23,7 @@
 		template<typename... Args> name(Args&&... args) \
 		: m_m(plib::pfmt(str)(std::forward<Args>(args)...)) \
 		{ static_assert(narg == sizeof...(args), "Argument count mismatch"); } \
-		operator pstring() const { return m_m; } \
+		operator pstring() const noexcept { return m_m; } \
 		pstring m_m; \
 	};
 
@@ -124,9 +124,6 @@ namespace netlist
 	PERRMSGV(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1,     1, "NEWTON_LOOPS exceeded on net {1}... reschedule")
 
 	// nld_solver.cpp
-
-	//PERRMSGV(MF_UNKNOWN_SOLVER_TYPE,                1, "Unknown solver type: {1}")
-	PERRMSGV(MF_NETGROUP_SIZE_EXCEEDED_1,           1, "Encountered netgroup with > {1} nets")
 
 	PERRMSGV(MI_NO_SPECIFIC_SOLVER,                 1, "No specific solver found for netlist of size {1}")
 

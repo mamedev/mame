@@ -312,6 +312,9 @@ public:
 		std::lock_guard<std::mutex> scope_lock(m_lock);
 		XEvent xevent;
 
+		// If X11 has become invalid for some reason, XPending will crash. Assert instead.
+		assert(m_display != nullptr);
+
 		//Get XInput events
 		while (XPending(m_display) != 0)
 		{
@@ -443,6 +446,17 @@ public:
 	{
 	}
 
+	virtual bool probe() override
+	{
+		// If there is no X server, X11 lightguns cannot be supported
+		if (XOpenDisplay(nullptr) == nullptr)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	void input_init(running_machine &machine) override
 	{
 		int index;
@@ -453,6 +467,9 @@ public:
 
 		x11_event_manager::instance().initialize();
 		m_display = x11_event_manager::instance().display();
+
+		// If the X server has become invalid, a crash can occur
+		assert(m_display != nullptr);
 
 		// Loop through all 8 possible devices
 		for (index = 0; index < 8; index++)
@@ -573,10 +590,9 @@ private:
 			if (m_lightgun_map.initialized)
 			{
 				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
-				devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
-			}
-
-			return nullptr;
+				return devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
+			} else
+				return nullptr;
 		}
 
 		return devicelist()->create_device<x11_lightgun_device>(machine, m_lightgun_map.map[index].name.c_str(), m_lightgun_map.map[index].name.c_str(), *this);

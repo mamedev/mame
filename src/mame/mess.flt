@@ -845,6 +845,7 @@ timex.cpp
 tispeak.cpp
 tispellb.cpp
 tk2000.cpp
+tk635.cpp
 tk80.cpp
 tk80bs.cpp
 tm990189.cpp

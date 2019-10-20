@@ -34,7 +34,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 
-		void update_outputs();
+		void update_outputs() NL_NOEXCEPT;
 
 		logic_input_t m_A;
 		logic_input_t m_B;

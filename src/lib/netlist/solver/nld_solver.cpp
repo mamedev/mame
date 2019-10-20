@@ -31,7 +31,6 @@
 #pragma GCC optimize "ivopts"
 #endif
 
-#include "netlist/nl_lists.h"
 #include "netlist/nl_factory.h"
 #include "nld_matrix_solver.h"
 #include "nld_ms_direct.h"
@@ -227,13 +226,13 @@ namespace devices
 
 			switch (net_count)
 			{
-	#if 1
 				case 1:
 					ms = plib::make_unique<matrix_solver_direct1_t<double>>(state(), sname, &m_params);
 					break;
 				case 2:
 					ms = plib::make_unique<matrix_solver_direct2_t<double>>(state(), sname, &m_params);
 					break;
+#if 1
 				case 3:
 					ms = create_solver<double, 3>(3, sname);
 					break;
@@ -319,8 +318,7 @@ namespace devices
 					}
 					else
 					{
-						log().fatal(MF_NETGROUP_SIZE_EXCEEDED_1(128));
-						return; /* tease compilers */
+						ms = create_solver<double, 0>(net_count, sname);
 					}
 					break;
 			}

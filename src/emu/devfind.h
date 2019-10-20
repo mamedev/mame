@@ -1,13 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles, Vas Crabb
-/**
- * \file devfind.h
- * Object auto-discovery helpers
- * \defgroup devfind
- * \{
- * Object auto-discovery helpers
- */
-
+/// \file
+/// \brief Object auto-discovery helpers
+/// \defgroup devfind Object auto-discovery helpers
+/// \{
 #ifndef __EMU_H__
 #error Dont include this file directly; include emu.h instead.
 #endif
@@ -1212,4 +1208,4 @@ extern template class shared_ptr_finder<s64, false>;
 extern template class shared_ptr_finder<s64, true>;
 
 #endif // MAME_EMU_DEVFIND_H
-/** \} */
+/// \}

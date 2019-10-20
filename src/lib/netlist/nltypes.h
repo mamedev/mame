@@ -68,17 +68,6 @@ namespace netlist
 
 	using log_type =  plib::plog_base<callbacks_t, NL_DEBUG>;
 
-
-	//============================================================
-	//  Performance tracking
-	//============================================================
-
-	template<bool enabled_>
-	using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, enabled_>;
-
-	template<bool enabled_>
-	using nperfcount_t = plib::chrono::counter<enabled_>;
-
 	//============================================================
 	//  Types needed by various includes
 	//============================================================
@@ -89,7 +78,7 @@ namespace netlist
 	 *
 	 */
 
-#if (USE_MEMPOOL)
+#if (NL_USE_MEMPOOL)
 	using nlmempool = plib::mempool;
 #else
 	using nlmempool = plib::aligned_arena;
@@ -99,7 +88,7 @@ namespace netlist
 	 *
 	 */
 	template <typename T>
-	using pool_owned_ptr = nlmempool::owned_pool_ptr<T>;
+	using owned_pool_ptr = nlmempool::owned_pool_ptr<T>;
 
 	/*! Unique pointer type for pooled allocations.
 	 *

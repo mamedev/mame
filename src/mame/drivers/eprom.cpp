@@ -69,14 +69,6 @@ void eprom_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER(eprom_state::special_port1_r)
-{
-	int result = ioport("260010")->read();
-	result ^= 0x0010;
-	return result;
-}
-
-
 READ8_MEMBER(eprom_state::adc_r)
 {
 	if (!m_adc.found())
@@ -147,7 +139,7 @@ void eprom_state::main_map(address_map &map)
 	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_base_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -173,7 +165,7 @@ void eprom_state::guts_map(address_map &map)
 	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -204,7 +196,7 @@ void eprom_state::extra_map(address_map &map)
 	map(0x160000, 0x16ffff).ram().share("share1");
 	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<false>));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_base_device::main_response_r));
 	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));

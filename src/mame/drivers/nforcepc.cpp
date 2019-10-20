@@ -28,6 +28,7 @@
 #include "machine/intelfsh.h"
 #include "machine/atapicdr.h"
 #include "machine/idehd.h"
+#include "video/virge_pci.h"
 #include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
 
@@ -755,6 +756,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	ide.sec_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq15));
 		/*subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(nforcepc_ata_devices, "hdd", "cdrom", true);*/
 	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
+	VIRGEDX_PCI(config, ":pci:0a.0", 0);
 	SST_49LF020(config, "bios", 0);
 }
 

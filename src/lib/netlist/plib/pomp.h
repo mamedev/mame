@@ -14,7 +14,7 @@
 
 #include <cstdint>
 
-#if HAS_OPENMP
+#if PHAS_OPENMP
 #include "omp.h"
 #endif
 
@@ -26,7 +26,7 @@ void for_static(std::size_t numops, const I start, const I end, const T &what)
 {
 	if (numops>1000)
 	{
-	#if HAS_OPENMP && USE_OPENMP
+	#if PHAS_OPENMP && PUSE_OPENMP
 		#pragma omp parallel for schedule(static)
 	#endif
 		for (I i = start; i <  end; i++)
@@ -40,7 +40,7 @@ void for_static(std::size_t numops, const I start, const I end, const T &what)
 template <typename I, class T>
 void for_static(const I start, const I end, const T &what)
 {
-#if HAS_OPENMP && USE_OPENMP
+#if PHAS_OPENMP && PUSE_OPENMP
 	#pragma omp parallel for schedule(static)
 #endif
 	for (I i = start; i <  end; i++)
@@ -57,7 +57,7 @@ void for_static_np(const I start, const I end, const T &what)
 
 inline void set_num_threads(const std::size_t threads)
 {
-#if HAS_OPENMP && USE_OPENMP
+#if PHAS_OPENMP && PUSE_OPENMP
 	omp_set_num_threads(threads);
 #else
 	plib::unused_var(threads);
@@ -66,7 +66,7 @@ inline void set_num_threads(const std::size_t threads)
 
 inline std::size_t get_max_threads()
 {
-#if HAS_OPENMP && USE_OPENMP
+#if PHAS_OPENMP && PUSE_OPENMP
 	return omp_get_max_threads();
 #else
 	return 1;

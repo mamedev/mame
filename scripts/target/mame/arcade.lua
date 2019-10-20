@@ -411,6 +411,7 @@ MACHINES["KBDC8042"] = true
 MACHINES["I8257"] = true
 MACHINES["AAKARTDEV"] = true
 --MACHINES["ACIA6850"] = true
+MACHINES["ADC0804"] = true
 MACHINES["ADC0808"] = true
 MACHINES["ADC083X"] = true
 MACHINES["ADC1038"] = true
@@ -960,6 +961,8 @@ files {
 	MAME_DIR .. "src/mame/video/avgdvg.h",
 	MAME_DIR .. "src/mame/video/awpvid.cpp",
 	MAME_DIR .. "src/mame/video/awpvid.h",
+	MAME_DIR .. "src/mame/video/tmap038.cpp",
+	MAME_DIR .. "src/mame/video/tmap038.h",
 	MAME_DIR .. "src/mame/audio/dcs.cpp",
 	MAME_DIR .. "src/mame/audio/dcs.h",
 	MAME_DIR .. "src/mame/audio/decobsmt.cpp",
@@ -1231,10 +1234,10 @@ files {
 	MAME_DIR .. "src/mame/audio/orbit.cpp",
 	MAME_DIR .. "src/mame/video/orbit.cpp",
 	MAME_DIR .. "src/mame/drivers/pong.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pong.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pong.h",
-	MAME_DIR .. "src/mame/machine/nl_pongd.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pongd.h",
+	MAME_DIR .. "src/mame/machine/nl_pongf.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pongf.h",
+	MAME_DIR .. "src/mame/machine/nl_pongdoubles.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pongdoubles.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
 	MAME_DIR .. "src/mame/machine/nl_breakout.h",
 	MAME_DIR .. "src/mame/machine/nl_rebound.cpp",
@@ -1437,6 +1440,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
 	MAME_DIR .. "src/mame/video/1942.cpp",
+  MAME_DIR .. "src/mame/audio/nl_1942.cpp",
+  MAME_DIR .. "src/mame/audio/nl_1942.h",
 	MAME_DIR .. "src/mame/drivers/1943.cpp",
 	MAME_DIR .. "src/mame/includes/1943.h",
 	MAME_DIR .. "src/mame/video/1943.cpp",
@@ -3074,6 +3079,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/popeye.cpp",
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
+  MAME_DIR .. "src/mame/audio/nl_popeye.cpp",
+  MAME_DIR .. "src/mame/audio/nl_popeye.h",
 	MAME_DIR .. "src/mame/drivers/punchout.cpp",
 	MAME_DIR .. "src/mame/includes/punchout.h",
 	MAME_DIR .. "src/mame/video/punchout.cpp",
@@ -3502,6 +3509,8 @@ files {
 	MAME_DIR .. "src/mame/includes/zaxxon.h",
 	MAME_DIR .. "src/mame/audio/zaxxon.cpp",
 	MAME_DIR .. "src/mame/video/zaxxon.cpp",
+	MAME_DIR .. "src/mame/machine/315_5195.cpp",
+	MAME_DIR .. "src/mame/machine/315_5195.h",
 	MAME_DIR .. "src/mame/machine/315_5296.cpp",
 	MAME_DIR .. "src/mame/machine/315_5296.h",
 	MAME_DIR .. "src/mame/machine/315_5338a.cpp",
@@ -4651,6 +4660,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/clowndwn.cpp",
 	MAME_DIR .. "src/mame/drivers/clpoker.cpp",
 	MAME_DIR .. "src/mame/drivers/cocoloco.cpp",
+  MAME_DIR .. "src/mame/audio/nl_cocoloco.h",
+  MAME_DIR .. "src/mame/audio/nl_cocoloco.cpp",
 	MAME_DIR .. "src/mame/drivers/coinmstr.cpp",
 	MAME_DIR .. "src/mame/drivers/coinmvga.cpp",
 	MAME_DIR .. "src/mame/drivers/comebaby.cpp",

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -12,7 +12,9 @@
 #		include <windows.h>
 #	endif // BX_PLATFORM_WINRT
 
-#	include <emmintrin.h> // _mm_fence
+#	if BX_CPU_X86
+#		include <emmintrin.h> // _mm_fence
+#	endif
 
 extern "C" void _ReadBarrier();
 #	pragma intrinsic(_ReadBarrier)

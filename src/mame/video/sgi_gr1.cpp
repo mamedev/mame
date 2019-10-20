@@ -70,68 +70,74 @@ DEFINE_DEVICE_TYPE(SGI_GR1, sgi_gr1_device, "sgi_gr1", "SGI GR1 Graphics")
 
 sgi_gr1_device::sgi_gr1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SGI_GR1, tag, owner, clock)
+	, m_bank(*this, "bank")
 	, m_screen(*this, "screen")
 	, m_ge(*this, "ge5")
 	, m_re(*this, "re2")
 	, m_xmap(*this, "xmap%u", 0U)
 	, m_cursor(*this, "cursor%u", 0U)
 	, m_ramdac(*this, "ramdac%u", 0U)
-	, m_vblank_cb(*this)
 	, m_int_fifo_cb(*this)
 {
 }
 
 static INPUT_PORTS_START(sgi_gr1)
 	PORT_START("options")
-	PORT_DIPNAME(0x08, 0x08, "Turbo")
-	PORT_DIPSETTING(0x00, DEF_STR(Yes))
-	PORT_DIPSETTING(0x08, DEF_STR(No))
-	PORT_DIPNAME(0x10, 0x00, "Z Buffer")
-	PORT_DIPSETTING(0x00, DEF_STR(Yes))
-	PORT_DIPSETTING(0x10, DEF_STR(No))
+	PORT_CONFNAME(0x08, 0x08, "Turbo")
+	PORT_CONFSETTING(0x00, DEF_STR(Yes))
+	PORT_CONFSETTING(0x08, DEF_STR(No))
+	PORT_CONFNAME(0x10, 0x00, "Z Buffer")
+	PORT_CONFSETTING(0x00, DEF_STR(Yes))
+	PORT_CONFSETTING(0x10, DEF_STR(No))
 INPUT_PORTS_END
 
 void sgi_gr1_device::map(address_map &map)
 {
-	// TODO: bank based on mar_msb
+	map(0x0000, 0x7fff).m(m_bank, FUNC(address_map_bank_device::amap32));
+}
 
-	map(0x0000, 0x03ff).rw(m_ge, FUNC(sgi_ge5_device::code_r), FUNC(sgi_ge5_device::code_w));
+void sgi_gr1_device::map_bank(address_map &map)
+{
+	// bit 15 of the map offset represents mar_msb
+	map(0x0000, 0x03ff).rw(m_ge, FUNC(sgi_ge5_device::code_r<false>), FUNC(sgi_ge5_device::code_w<false>));
+	map(0x8000, 0x83ff).rw(m_ge, FUNC(sgi_ge5_device::code_r<true>), FUNC(sgi_ge5_device::code_w<true>));
 
-	map(0x0400, 0x041f).rw(m_xmap[0], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
-	map(0x0420, 0x043f).rw(m_xmap[1], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
-	map(0x0440, 0x045f).rw(m_xmap[2], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
-	map(0x0460, 0x047f).rw(m_xmap[3], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
-	map(0x0480, 0x049f).rw(m_xmap[4], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
-	map(0x04a0, 0x04bf).lw8("xmap_broadcast",
+	map(0x8400, 0x841f).rw(m_xmap[0], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x8420, 0x843f).rw(m_xmap[1], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x8440, 0x845f).rw(m_xmap[2], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x8460, 0x847f).rw(m_xmap[3], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x8480, 0x849f).rw(m_xmap[4], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x84a0, 0x84bf).lw8("xmap_broadcast",
 		[this](offs_t offset, u8 data)
 		{
 			for (sgi_xmap2_device *xmap : m_xmap)
 				xmap->reg_w(offset, data);
 		}).umask32(0x000000ff);
 
-	map(0x04c0, 0x04c3).rw(FUNC(sgi_gr1_device::dr1_r), FUNC(sgi_gr1_device::dr1_w)).umask32(0xff000000);
-	map(0x04e0, 0x04e3).rw(FUNC(sgi_gr1_device::dr0_r), FUNC(sgi_gr1_device::dr0_w)).umask32(0xff000000);
+	map(0x84c0, 0x84c3).rw(FUNC(sgi_gr1_device::dr1_r), FUNC(sgi_gr1_device::dr1_w)).umask32(0xff000000);
+	map(0x84e0, 0x84e3).rw(FUNC(sgi_gr1_device::dr0_r), FUNC(sgi_gr1_device::dr0_w)).umask32(0xff000000);
 
-	map(0x0500, 0x050f).m(m_ramdac[0], FUNC(bt457_device::map)).umask32(0x000000ff);
-	map(0x0520, 0x052f).m(m_ramdac[1], FUNC(bt457_device::map)).umask32(0x000000ff);
-	map(0x0540, 0x054f).m(m_ramdac[2], FUNC(bt457_device::map)).umask32(0x000000ff);
+	map(0x8500, 0x850f).m(m_ramdac[0], FUNC(bt457_device::map)).umask32(0x000000ff);
+	map(0x8520, 0x852f).m(m_ramdac[1], FUNC(bt457_device::map)).umask32(0x000000ff);
+	map(0x8540, 0x854f).m(m_ramdac[2], FUNC(bt457_device::map)).umask32(0x000000ff);
 
-	map(0x0560, 0x056f).m(m_cursor[0], FUNC(bt431_device::map)).umask32(0x000000ff);
-	map(0x0580, 0x058f).m(m_cursor[1], FUNC(bt431_device::map)).umask32(0x000000ff);
+	map(0x8560, 0x856f).m(m_cursor[0], FUNC(bt431_device::map)).umask32(0x000000ff);
+	map(0x8580, 0x858f).m(m_cursor[1], FUNC(bt431_device::map)).umask32(0x000000ff);
 
-	map(0x05a0, 0x05a3).rw(FUNC(sgi_gr1_device::dr4_r), FUNC(sgi_gr1_device::dr4_w)).umask32(0xff000000);
-	map(0x05c0, 0x05c3).rw(FUNC(sgi_gr1_device::dr3_r), FUNC(sgi_gr1_device::dr3_w)).umask32(0xff000000);
-	map(0x05e0, 0x05e3).rw(FUNC(sgi_gr1_device::dr2_r), FUNC(sgi_gr1_device::dr2_w)).umask32(0xff000000);
+	map(0x85a0, 0x85a3).rw(FUNC(sgi_gr1_device::dr4_r), FUNC(sgi_gr1_device::dr4_w)).umask32(0xff000000);
+	map(0x85c0, 0x85c3).rw(FUNC(sgi_gr1_device::dr3_r), FUNC(sgi_gr1_device::dr3_w)).umask32(0xff000000);
+	map(0x85e0, 0x85e3).rw(FUNC(sgi_gr1_device::dr2_r), FUNC(sgi_gr1_device::dr2_w)).umask32(0xff000000);
 
-	map(0x0640, 0x783).w(m_ge, FUNC(sgi_ge5_device::command_w)).umask32(0xffff0000);
-	map(0x0740, 0x743).r(m_ge, FUNC(sgi_ge5_device::pc_r)).umask32(0xffff0000);
+	map(0x8640, 0x8783).w(m_ge, FUNC(sgi_ge5_device::command_w)).umask32(0xffff0000);
+	map(0x8740, 0x8743).r(m_ge, FUNC(sgi_ge5_device::pc_r)).umask32(0xffff0000);
 
-	map(0x0800, 0x0bff).rw(FUNC(sgi_gr1_device::fifo_r), FUNC(sgi_gr1_device::fifo_w));
-	map(0x0c00, 0x0dff).w(m_ge, FUNC(sgi_ge5_device::mar_w));
-	map(0x0e00, 0x0e07).w(m_ge, FUNC(sgi_ge5_device::mar_msb_w));
+	map(0x0800, 0x0bff).r(m_ge, FUNC(sgi_ge5_device::buffer_r)).mirror(0x8000);
+	map(0x0800, 0x0bff).w(FUNC(sgi_gr1_device::fifo_w)).mirror(0x8000);
+	map(0x0c00, 0x0dff).w(m_ge, FUNC(sgi_ge5_device::mar_w)).mirror(0x8000);
+	map(0x0e00, 0x0e07).lw32("mar_msb", [this](offs_t offset, u32 data) { m_bank->set_bank(offset); }).mirror(0x8000);
 
 	map(0x1400, 0x17ff).rw(m_ge, FUNC(sgi_ge5_device::data_r), FUNC(sgi_ge5_device::data_w));
-	map(0x2000, 0x2007).rw(m_ge, FUNC(sgi_ge5_device::finish_r), FUNC(sgi_ge5_device::finish_w));
+	map(0x2000, 0x2007).rw(m_ge, FUNC(sgi_ge5_device::finish_r), FUNC(sgi_ge5_device::finish_w)).mirror(0x8000);
 
 	//map(0x207c, 0x207f); // gr1 vs gr2
 }
@@ -140,7 +146,7 @@ void sgi_gr1_device::device_add_mconfig(machine_config &config)
 {
 	unsigned pixel_clock = 107'352'000;
 
-	//ADDRESS_MAP_BANK(config, m_ext).set_map(&lle_device_base::ext_map).set_options(ENDIANNESS_NATIVE, 8, 12, 0x100);
+	ADDRESS_MAP_BANK(config, m_bank).set_map(&sgi_gr1_device::map_bank).set_options(ENDIANNESS_NATIVE, 32, 32, 0x8000);
 
 	/*
 	 * 1280x1024 @ 60Hz
@@ -160,11 +166,10 @@ void sgi_gr1_device::device_add_mconfig(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(pixel_clock, 1680, 246, 246 + 1280, 1065, 39, 39 + 1024);
 	m_screen->set_screen_update(m_re.finder_tag(), FUNC(sgi_re2_device::screen_update));
-	m_screen->screen_vblank().set([this](int state) { m_vblank_cb(state); });
 
 	SGI_GE5(config, m_ge, 10_MHz_XTAL);
 	m_ge->fifo_empty().set([this]() { return int(m_fifo.empty()); });
-	m_ge->fifo_read().set(FUNC(sgi_gr1_device::ge_fifo_r));
+	m_ge->fifo_read().set(FUNC(sgi_gr1_device::fifo_r));
 	m_ge->re_r().set(m_re, FUNC(sgi_re2_device::reg_r));
 	m_ge->re_w().set(m_re, FUNC(sgi_re2_device::reg_w));
 
@@ -194,7 +199,6 @@ ioport_constructor sgi_gr1_device::device_input_ports() const
 
 void sgi_gr1_device::device_start()
 {
-	m_vblank_cb.resolve_safe();
 	m_int_fifo_cb.resolve_safe();
 
 	//save_item(NAME());
@@ -204,6 +208,8 @@ void sgi_gr1_device::device_start()
 
 void sgi_gr1_device::device_reset()
 {
+	m_bank->set_bank(0);
+
 	m_dr0 = DR0_GRF1EN | DR0_SMALLMON0;
 	m_dr1 = DR1_TURBO;
 	//m_dr2 = 0;
@@ -213,9 +219,74 @@ void sgi_gr1_device::device_reset()
 	m_fifo.clear();
 }
 
+u8 sgi_gr1_device::dr0_r()
+{
+	LOG("dr0_r 0x%02x (%s)\n", m_dr0, machine().describe_context());
+	
+	return m_dr0;
+}
+
+u8 sgi_gr1_device::dr1_r()
+{
+	LOG("dr1_r 0x%02x (%s)\n", m_dr1, machine().describe_context());
+	
+	return m_dr1;
+}
+
+u8 sgi_gr1_device::dr2_r()
+{
+	LOG("dr2_r 0x%02x (%s)\n", m_dr2, machine().describe_context());
+	
+	return m_dr2;
+}
+
+u8 sgi_gr1_device::dr3_r()
+{
+	LOG("dr3_r 0x%02x (%s)\n", m_dr3, machine().describe_context());
+	
+	return m_dr3;
+}
+
+u8 sgi_gr1_device::dr4_r()
+{
+	LOG("dr4_r 0x%02x (%s)\n", m_dr4, machine().describe_context());
+	
+	return (m_dr4 | (m_ge->suspended() ? 0 : DR4_GESTALL)) & DR4_RM;
+}
+
+void sgi_gr1_device::dr0_w(u8 data)
+{
+	LOG("dr0_w 0x%02x (%s)\n", data, machine().describe_context());
+	
+	m_dr0 = (m_dr0 & ~DR0_WM) | (data & DR0_WM);
+}
+
+void sgi_gr1_device::dr1_w(u8 data)
+{
+	LOG("dr1_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_dr1 = (m_dr1 & ~DR1_WM) | (data & DR1_WM);
+
+	m_ge->cwen_w(BIT(data, 1));
+}
+
+void sgi_gr1_device::dr2_w(u8 data)
+{
+	LOG("dr2_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_dr2 = (m_dr2 & ~DR2_WM) | (data & DR2_WM);
+}
+
+void sgi_gr1_device::dr3_w(u8 data)
+{
+	LOG("dr3_w 0x%02x (%s)\n", data, machine().describe_context());
+	
+	m_dr3 = (m_dr3 & ~DR3_WM) | (data & DR3_WM);
+}
+
 void sgi_gr1_device::dr4_w(u8 data)
 {
-	LOG("dr4_w 0x%02x\n", data);
+	LOG("dr4_w 0x%02x (%s)\n", data, machine().describe_context());
 
 	m_dr4 = (m_dr4 & ~DR4_WM) | (data & DR4_WM);
 
@@ -223,7 +294,7 @@ void sgi_gr1_device::dr4_w(u8 data)
 		xmap->map_select_w(m_dr4 & DR4_MS);
 }
 
-u64 sgi_gr1_device::ge_fifo_r()
+u64 sgi_gr1_device::fifo_r()
 {
 	u64 data = m_fifo.dequeue();
 
@@ -241,7 +312,7 @@ u64 sgi_gr1_device::ge_fifo_r()
 
 void sgi_gr1_device::fifo_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	LOG("fifo_w 0x%010x\n", (u64(offset) << 32) | data);
+	LOG("fifo_w 0x%010x (%s)\n", (u64(offset) << 32) | data, machine().describe_context());
 
 	m_fifo.enqueue((u64(offset) << 32) | data);
 

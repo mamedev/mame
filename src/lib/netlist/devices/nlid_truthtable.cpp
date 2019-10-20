@@ -223,7 +223,7 @@ namespace netlist
 		: netlist_base_factory_truthtable_t(name, classname, def_param, sourcefile)
 		{ }
 
-		pool_owned_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
+		unique_pool_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
 		{
 			using tt_type = nld_truthtable_t<m_NI, m_NO>;
 			truthtable_parser desc_s(m_NO, m_NI, &m_ttbl.m_initialized,
@@ -239,7 +239,7 @@ namespace netlist
 			if (m_family_desc == nullptr)
 				throw nl_exception("family description not found for {1}", m_family_name);
 
-			return pool().make_poolptr<tt_type>(anetlist, name, m_family_desc, m_ttbl, m_desc);
+			return pool().make_unique<tt_type>(anetlist, name, m_family_desc, m_ttbl, m_desc);
 		}
 	private:
 		typename nld_truthtable_t<m_NI, m_NO>::truthtable_t m_ttbl;

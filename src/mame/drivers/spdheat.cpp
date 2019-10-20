@@ -7,9 +7,7 @@
     driver by Phil Bennett
  
     TODO:
-      * Waiting to receive manual and schematics
-      * DIP switches (see above)
-      * Sound filtering
+      * Sound filters
 
 ***************************************************************************/
 
@@ -25,6 +23,10 @@
 #include "sound/flt_vol.h"
 #include "sound/volt_reg.h"
 
+
+static constexpr XTAL MASTER_CLOCK  = 16_MHz_XTAL;
+static constexpr XTAL SOUND_CLOCK   = 4_MHz_XTAL;
+static constexpr XTAL FM_CLOCK      = SOUND_CLOCK / 2;
 
 
 /*************************************
@@ -146,7 +148,7 @@ void spdheat_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			{
 				// 16 x 32 mode
 				gfx->transpen(bitmap, cliprect, code, color, flipx, flipy, x, y, 0);
-				gfx->transpen(bitmap, cliprect, code+1, color, flipx, flipy, x, y - 16, 0);
+				gfx->transpen(bitmap, cliprect, code + 1, color, flipx, flipy, x, y - 16, 0);
 			}
 			else
 			{
@@ -352,6 +354,68 @@ WRITE8_MEMBER(spdheat_state::sub_nmi_w)
  *
  *************************************/
 
+/*
+ 
+	 YM2203 IC62
+ 	 ===========
+ 
+	 PORT A
+	 .... xxxx  PGA[3:0]
+	 xxxx ....  PC010SA IC58 'VR'
+ 
+	 PORT B
+	 .... xxxx  PC010SA IC58 'BASS'
+	 xxxx ....  PC010SA IC58 TREBL
+ 
+	 PSG OUTPUT -> PC010SA IC58   (PSGA)
+ 
+ 
+	 YM2203 IC61
+ 	 ===========
+ 
+	 PORT A
+	 .... xxxx  PGB[3:0]
+	 xxxx ....  PC010SA IC59 'VR'
+ 
+	 PORT B
+	 .... xxxx  PC010SA IC59 'BASS'
+	 xxxx ....  PC010SA IC59 TREBL
+ 
+	 PSG OUTPUT -> PC010SA IC59   (PSGB)
+ 
+ 
+	 YM2149 IC57
+ 	 ===========
+ 
+	 PORT A
+	 .... xxxx  PGC[3:0]
+	 xxxx ....  PC010SA IC54 'VR'
+ 
+	 PORT B
+	 .... xxxx  PC010SA IC54 'BASS'
+	 xxxx ....  PC010SA IC54 TREBL
+ 
+	 PSG OUTPUT -> PC010SA IC54   (PSGC)
+ 
+ 
+ 	 YM2149 IC56
+ 	 ===========
+ 
+	 PORT A
+	 .... xxxx  PGD[3:0]
+	 xxxx ....  PC010SA IC55 'VR'
+ 
+	 PORT B
+	 .... xxxx  PC010SA IC55 'BASS'
+	 xxxx ....  PC010SA IC55 TREBL
+ 
+	 PSG OUTPUT -> PC010SA IC55   (PSGD)
+ 
+ 
+ 	PGC[3:0], PGD[3:0] = FMB BAL1
+ 	PGA[3:0], PGB[3:0] = FMB VR1
+ */
+
 WRITE8_MEMBER(spdheat_state::ym1_port_a_w)
 {
 	
@@ -411,33 +475,33 @@ static INPUT_PORTS_START( spdheat )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x0001, 0x0001, "Freeze" )
+	PORT_DIPNAME( 0x0001, 0x0001, "Screen Stop" ) PORT_DIPLOCATION("DSWA:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Stop Timer (Cheat)" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Timer Stop" ) PORT_DIPLOCATION("DSWA:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("DSWA:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Test ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Test ) ) PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Test Pattern" )
+	PORT_DIPNAME( 0x0020, 0x0020, "Color Bar Display" ) PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Finish Lap (Cheat)" ) // CHECKME
+	PORT_DIPNAME( 0x0040, 0x0040, "Round Skip (With Select Buttons)" ) PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "UNK7" )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Functions of CPU-Controlled Cars" ) PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPSETTING(      0x0080, "Continuous" )
+	PORT_DIPSETTING(      0x0000, "Not Continuous" )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x000F, 0x0000, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x000F, 0x0000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSWB:1,2,3,4")
 	PORT_DIPSETTING(      0x000F, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(      0x000E, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(      0x000D, DEF_STR( 7C_1C ) )
@@ -454,83 +518,86 @@ static INPUT_PORTS_START( spdheat )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
-
-	PORT_DIPNAME( 0x0010, 0x0010, "B_UNK4" )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "B_UNK5" )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWB:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "B_UNK6" )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "B_UNK7" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSWC")
-	PORT_DIPNAME( 0x0001, 0x0001, "Allow customizations" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "C_UNK1" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000C, 0x0004, "Timer Setting" )
+	PORT_DIPNAME( 0x0003, 0x0003, "Race Number of Setting Car Functions" ) PORT_DIPLOCATION("DSWC:1,2")
+	PORT_DIPSETTING(      0x0003, "1st Race" )
+	PORT_DIPSETTING(      0x0002, "2nd Race" )
+	PORT_DIPSETTING(      0x0001, "3rd Race" )
+	PORT_DIPSETTING(      0x0000, "4th Race" )
+	PORT_DIPNAME( 0x000C, 0x0004, "Timer Setting" ) PORT_DIPLOCATION("DSWC:3,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x000C, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Coin Display" )
+	PORT_DIPNAME( 0x0010, 0x0000, "Coin Display" ) PORT_DIPLOCATION("DSWC:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("DSWC:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWC:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Coin System" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Coin System" ) PORT_DIPLOCATION("DSWC:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSWD")
-	PORT_DIPNAME( 0x0001, 0x0001, "D_UNK0" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Drag Race" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "D_UNK2" )
+	PORT_DIPNAME( 0x0001, 0x0001, "Irrespective of Joining In Halfway" ) PORT_DIPLOCATION("DSWD:1")
+	PORT_DIPSETTING(      0x0001, "Game Over After Final" )
+	PORT_DIPSETTING(      0x0000, "All Races Playable" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Drag Race" ) PORT_DIPLOCATION("DSWD:2")
+	PORT_DIPSETTING(      0x0002, "First One Only" )
+	PORT_DIPSETTING(      0x0000, "Twice" )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWD:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "D_UNK3" )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWD:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "D_UNK4" )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWD:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "D_UNK5" )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWD:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "D_UNK6" )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWD:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "D_UNK7" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWD:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P1 Shift") PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P1 Shift") PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // if this is ACTIVE_HIGH gear in Service mode will always show low gear, but your start will be slow as if in high gear regardless of above
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("Reserved 2")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("Reserved 1")
-	PORT_BIT( 0x0030, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P2 Shift") PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P2 Shift") PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) // see above
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P3 Shift") PORT_PLAYER(3)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P3 Shift") PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // see above
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("Reserved 3")
-	PORT_BIT( 0x0030, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P4 Shift") PORT_PLAYER(4)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P4 Shift") PORT_PLAYER(4)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) // see above
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE4 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -613,14 +680,14 @@ GFXDECODE_END
 void spdheat_state::spdheat(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(16'000'000)/2); // 8 MHz?
+	M68000(config, m_maincpu, MASTER_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spdheat_state::main_map);
-	m_maincpu->set_vblank_int("screen0", FUNC(spdheat_state::irq1_line_hold)); // What is IRQ7?
+	m_maincpu->set_vblank_int("screen0", FUNC(spdheat_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(8'000'000)/2); // 4 MHz?
+	Z80(config, m_audiocpu, SOUND_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spdheat_state::sound_map);
 	
-	Z80(config, m_subcpu, XTAL(8'000'000)/2); // 4 MHz?
+	Z80(config, m_subcpu, SOUND_CLOCK);
 	m_subcpu->set_addrmap(AS_PROGRAM, &spdheat_state::sub_map);
 	m_subcpu->set_addrmap(AS_IO, &spdheat_state::sub_io_map);
 
@@ -672,7 +739,7 @@ void spdheat_state::spdheat(machine_config &config)
 	
 	INPUT_MERGER_ANY_HIGH(config, m_audio_irq).output_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 	
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(4'000'000)/2));
+	ym2203_device &ym1(YM2203(config, "ym1", FM_CLOCK));
 	ym1.irq_handler().set(m_audio_irq, FUNC(input_merger_any_high_device::in_w<0>));
 	ym1.port_a_write_callback().set(FUNC(spdheat_state::ym1_port_a_w));
 	ym1.port_b_write_callback().set(FUNC(spdheat_state::ym1_port_b_w));
@@ -681,7 +748,7 @@ void spdheat_state::spdheat(machine_config &config)
 	ym1.add_route(2, "mono", 0.3);
 	ym1.add_route(3, "mono", 0.3);
 	
-	ym2203_device &ym2(YM2203(config, "ym2", XTAL(4'000'000)/2));
+	ym2203_device &ym2(YM2203(config, "ym2", FM_CLOCK));
 	ym2.irq_handler().set(m_audio_irq, FUNC(input_merger_any_high_device::in_w<1>));
 	ym2.port_a_write_callback().set(FUNC(spdheat_state::ym2_port_a_w));
 	ym2.port_b_write_callback().set(FUNC(spdheat_state::ym2_port_b_w));
@@ -690,12 +757,12 @@ void spdheat_state::spdheat(machine_config &config)
 	ym2.add_route(2, "mono", 0.3);
 	ym2.add_route(3, "mono", 0.3);
 	
-	ym2149_device &ym3(YM2149(config, "ym3", XTAL(4'000'000)/2));
+	ym2149_device &ym3(YM2149(config, "ym3", SOUND_CLOCK));
 	ym3.port_a_write_callback().set(FUNC(spdheat_state::ym3_port_a_w));
 	ym3.port_b_write_callback().set(FUNC(spdheat_state::ym3_port_b_w));
 	ym3.add_route(ALL_OUTPUTS, "mono", 0.3);
 
-	ym2149_device &ym4(YM2149(config, "ym4", XTAL(4'000'000)/2));
+	ym2149_device &ym4(YM2149(config, "ym4", SOUND_CLOCK));
 	ym4.port_a_write_callback().set(FUNC(spdheat_state::ym4_port_a_w));
 	ym4.port_b_write_callback().set(FUNC(spdheat_state::ym4_port_b_w));
 	ym4.add_route(ALL_OUTPUTS, "mono", 0.3);
@@ -713,33 +780,33 @@ void spdheat_state::spdheat(machine_config &config)
  *
  *************************************/
 
-ROM_START( spdheat ) // TODO: Find correct labelling
+ROM_START( spdheat )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "4-1-ic37.cpu", 0x00000, 0x08000, CRC(bb1dd6b2) SHA1(f0d45f82e643fbc5cf6ec75fd8d7ae4c4b7d8b23) )
-	ROM_LOAD16_BYTE( "1-1-ic26.cpu", 0x00001, 0x08000, CRC(7ee12547) SHA1(79395cc622a315c3b3c3000224e150311da8073d) )
-	ROM_LOAD16_BYTE( "5-1-ic36.cpu", 0x10000, 0x08000, CRC(b396ef0b) SHA1(7a7f59faf4478c417f0928b22fb81462cb2628c2) )
-	ROM_LOAD16_BYTE( "2-1-ic25.cpu", 0x10001, 0x08000, CRC(4b76870a) SHA1(6bc1a594e37e2e3f2f0b4f23ba9bd7c87c3a27d9) )
-	ROM_LOAD16_BYTE( "6-ic34.cpu",   0x20000, 0x08000, CRC(900ecd44) SHA1(352b196bfe3b61cfbcdde72a03d3064be05be41e) )
-	ROM_LOAD16_BYTE( "3-ic23.cpu",   0x20001, 0x08000, CRC(6a5d2fe5) SHA1(595cc6028dbd0ceaf519b9a5eddfeffa74e2d27c) )
+	ROM_LOAD16_BYTE( "a55-04-1.ic37", 0x00000, 0x08000, CRC(bb1dd6b2) SHA1(f0d45f82e643fbc5cf6ec75fd8d7ae4c4b7d8b23) )
+	ROM_LOAD16_BYTE( "a55-01-1.ic26", 0x00001, 0x08000, CRC(7ee12547) SHA1(79395cc622a315c3b3c3000224e150311da8073d) )
+	ROM_LOAD16_BYTE( "a55-05-1.ic36", 0x10000, 0x08000, CRC(b396ef0b) SHA1(7a7f59faf4478c417f0928b22fb81462cb2628c2) )
+	ROM_LOAD16_BYTE( "a55-02-1.ic25", 0x10001, 0x08000, CRC(4b76870a) SHA1(6bc1a594e37e2e3f2f0b4f23ba9bd7c87c3a27d9) )
+	ROM_LOAD16_BYTE( "a55-06.ic34",   0x20000, 0x08000, CRC(900ecd44) SHA1(352b196bfe3b61cfbcdde72a03d3064be05be41e) )
+	ROM_LOAD16_BYTE( "a55-03.ic23",   0x20001, 0x08000, CRC(6a5d2fe5) SHA1(595cc6028dbd0ceaf519b9a5eddfeffa74e2d27c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ic11.snd", 0x00000, 0x08000, CRC(43c2318f) SHA1(472e9cc68bb8ff3c5c3d4ec475491ad1a97261e7) )
+	ROM_LOAD( "a55-17.ic11",  0x00000, 0x08000, CRC(43c2318f) SHA1(472e9cc68bb8ff3c5c3d4ec475491ad1a97261e7) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
-	ROM_LOAD( "ic5.snd", 0x00000, 0x08000, CRC(c43b85ee) SHA1(7d7ed6b5f3e48a38b3e387f2dbc2f2bb0662db94) )
-	ROM_LOAD( "ic6.snd", 0x08000, 0x08000, CRC(8f45edbd) SHA1(29a696691bd199b6fff0fe0e9fd9241cec9f3fbe) )
+	ROM_LOAD( "a55-15.ic5",   0x00000, 0x08000, CRC(c43b85ee) SHA1(7d7ed6b5f3e48a38b3e387f2dbc2f2bb0662db94) )
+	ROM_LOAD( "a55-16.ic6",   0x08000, 0x08000, CRC(8f45edbd) SHA1(29a696691bd199b6fff0fe0e9fd9241cec9f3fbe) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "7-ic6.vid",    0x00000, 0x04000, CRC(cf85d3a0) SHA1(8ad330fd33b94b7bc0eb49edc4e5eafd2df54010) )
-	ROM_LOAD( "8-ic5.vid",    0x04000, 0x04000, CRC(9ce4214d) SHA1(ea461d00af87bb0618604a02bd72338bcfb31f5b) )
-	ROM_LOAD( "9-ic22.vid",   0x08000, 0x04000, CRC(00d7fba1) SHA1(ff0418856f469aa0b570c7a9c9af6cd3442e9b97) )
-	ROM_LOAD( "10-ic21.vid",  0x0c000, 0x04000, CRC(743a04c5) SHA1(b878f4cdf1585eedddb8d18453474996a10b0804) )
+	ROM_LOAD( "a55-07.ic6",   0x00000, 0x04000, CRC(cf85d3a0) SHA1(8ad330fd33b94b7bc0eb49edc4e5eafd2df54010) )
+	ROM_LOAD( "a55-08.ic5",   0x04000, 0x04000, CRC(9ce4214d) SHA1(ea461d00af87bb0618604a02bd72338bcfb31f5b) )
+	ROM_LOAD( "a55-09.ic22",  0x08000, 0x04000, CRC(00d7fba1) SHA1(ff0418856f469aa0b570c7a9c9af6cd3442e9b97) )
+	ROM_LOAD( "a55-10.ic21",  0x0c000, 0x04000, CRC(743a04c5) SHA1(b878f4cdf1585eedddb8d18453474996a10b0804) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "11-ic55.vid",  0x00000, 0x08000, CRC(db979542) SHA1(a857e2ad12b07ccedd4453819fcb8f946893eedf) )
-	ROM_LOAD( "12-ic53.vid",  0x08000, 0x08000, CRC(3d8211c2) SHA1(587caaf5775001a9aa2f266b3d084bd93fa0d575) )
-	ROM_LOAD( "13-ic52.vid",  0x10000, 0x08000, CRC(38085e40) SHA1(5e4d6f9ce39a95bdddf5b2f4504fe3c34b5a8585) )
-	ROM_LOAD( "14-ic36.vid",  0x18000, 0x08000, CRC(31c38779) SHA1(42ce3441a540644d17f27e84f8c5693cbee3e9f1) )
+	ROM_LOAD( "a55-11.ic55",  0x00000, 0x08000, CRC(db979542) SHA1(a857e2ad12b07ccedd4453819fcb8f946893eedf) )
+	ROM_LOAD( "a55-12.ic53",  0x08000, 0x08000, CRC(3d8211c2) SHA1(587caaf5775001a9aa2f266b3d084bd93fa0d575) )
+	ROM_LOAD( "a55-13.ic52",  0x10000, 0x08000, CRC(38085e40) SHA1(5e4d6f9ce39a95bdddf5b2f4504fe3c34b5a8585) )
+	ROM_LOAD( "a55-14.ic36",  0x18000, 0x08000, CRC(31c38779) SHA1(42ce3441a540644d17f27e84f8c5693cbee3e9f1) )
 ROM_END
 
 

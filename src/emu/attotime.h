@@ -369,4 +369,4 @@ inline attotime attotime::from_double(double _time)
 }
 
 
-#endif  // MAME_EMU_ATTOTIME_H
+#endif // MAME_EMU_ATTOTIME_H

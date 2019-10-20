@@ -62,6 +62,20 @@ private:
 };
 
 
+class boothill_audio_device : public midway_tone_generator_device_base
+{
+public:
+	boothill_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+	void write(u8 data);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+};
+
+
 class desertgu_audio_device : public midway_tone_generator_device_base
 {
 public:
@@ -81,6 +95,20 @@ private:
 	devcb_write_line m_ctrl_sel_out;
 	output_finder<> m_recoil;
 	u8 m_p2;
+};
+
+
+class dplay_audio_device : public midway_tone_generator_device_base
+{
+public:
+	dplay_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+	void write(u8 data);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
 };
 
 
@@ -165,6 +193,19 @@ protected:
 private:
 	devcb_write_line m_ctrl_sel_out;
 	u8 m_p1;
+};
+
+
+class dogpatch_audio_device : public midway_tone_generator_device_base
+{
+public:
+	dogpatch_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+	void write(u8 data);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
 };
 
 
@@ -257,11 +298,14 @@ private:
 
 DECLARE_DEVICE_TYPE(SEAWOLF_AUDIO,  seawolf_audio_device)
 DECLARE_DEVICE_TYPE(GUNFIGHT_AUDIO, gunfight_audio_device)
+DECLARE_DEVICE_TYPE(BOOTHILL_AUDIO, boothill_audio_device)
 DECLARE_DEVICE_TYPE(DESERTGU_AUDIO, desertgu_audio_device)
+DECLARE_DEVICE_TYPE(DPLAY_AUDIO,    dplay_audio_device)
 DECLARE_DEVICE_TYPE(GMISSILE_AUDIO, gmissile_audio_device)
 DECLARE_DEVICE_TYPE(M4_AUDIO,       m4_audio_device)
 DECLARE_DEVICE_TYPE(CLOWNS_AUDIO,   clowns_audio_device)
 DECLARE_DEVICE_TYPE(SPACWALK_AUDIO, spacwalk_audio_device)
+DECLARE_DEVICE_TYPE(DOGPATCH_AUDIO, dogpatch_audio_device)
 DECLARE_DEVICE_TYPE(SPCENCTR_AUDIO, spcenctr_audio_device)
 DECLARE_DEVICE_TYPE(PHANTOM2_AUDIO, phantom2_audio_device)
 DECLARE_DEVICE_TYPE(INVADERS_AUDIO, invaders_audio_device)

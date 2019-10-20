@@ -245,7 +245,8 @@ void segas32_state::device_start()
 	memset(m_mixer_control, 0xff, sizeof(m_mixer_control[0][0]) * 0x80 );
 
 	/* needs to be initialized to 0xff, otherwise f1en has bad sound (MT04531) */
-	std::fill_n(&m_soundram[0], m_soundram.bytes() / sizeof(m_soundram[0]), 0xff);
+	if (m_soundram)
+		std::fill_n(&m_soundram[0], m_soundram.bytes() / sizeof(m_soundram[0]), 0xff);
 }
 
 

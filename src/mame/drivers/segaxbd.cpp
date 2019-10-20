@@ -269,6 +269,8 @@ ROMs:
 #include "includes/segaxbd.h"
 #include "includes/segaipt.h"
 
+#include "machine/adc0804.h"
+#include "machine/fd1094.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
@@ -469,14 +471,14 @@ WRITE_LINE_MEMBER(segaxbd_state::timer_irq_w)
 //**************************************************************************
 
 //-------------------------------------------------
-//  adc_w - handle reads from the ADC
+//  analog_r - provide input to the ADC
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::adc_r )
+uint8_t segaxbd_state::analog_r()
 {
 	// on the write, latch the selected input port and stash the value
 	int which = (m_pc_0 >> 2) & 7;
-	int value = m_adc_ports[which].read_safe(0x0010);
+	uint8_t value = m_adc_ports[which].read_safe(0x10);
 
 	// reverse some port values
 	if (m_adc_reverse[which])
@@ -484,15 +486,6 @@ READ16_MEMBER( segaxbd_state::adc_r )
 
 	// return the previously latched value
 	return value;
-}
-
-
-//-------------------------------------------------
-//  adc_w - handle writes to the ADC
-//-------------------------------------------------
-
-WRITE16_MEMBER( segaxbd_state::adc_w )
-{
 }
 
 
@@ -941,7 +934,7 @@ void segaxbd_state::main_map(address_map &map)
 	map(0x100000, 0x100fff).mirror(0x00f000).ram().share("sprites");
 	map(0x110000, 0x11ffff).w("sprites", FUNC(sega_xboard_sprite_device::draw_write));
 	map(0x120000, 0x123fff).mirror(0x00c000).ram().w(FUNC(segaxbd_state::paletteram_w)).share("paletteram");
-	map(0x130000, 0x13ffff).rw(FUNC(segaxbd_state::adc_r), FUNC(segaxbd_state::adc_w));
+	map(0x130001, 0x130001).mirror(0x00fffe).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x140000, 0x14000f).mirror(0x00fff0).rw(m_iochip[0], FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
 	map(0x150000, 0x15000f).mirror(0x00fff0).rw(m_iochip[1], FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
 	map(0x160000, 0x16ffff).w(FUNC(segaxbd_state::iocontrol_w));
@@ -1103,7 +1096,7 @@ void segaxbd_rascot_state::comm_map(address_map &map)
 static INPUT_PORTS_START( xboard_generic )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )    // D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // D6: /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc", adc0804_device, intr_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )     // D7: (Not connected)
 
 	// I/O port: CN C pins 17,15,13,11,9,7,5,3
@@ -1540,7 +1533,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gprider )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc", adc0804_device, intr_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:IO0PORTB")
@@ -1597,7 +1590,7 @@ static INPUT_PORTS_START( gprider_double )
 
 	PORT_START("subpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("subpcb:adc", adc0804_device, intr_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("subpcb:IO0PORTB")
@@ -1702,17 +1695,20 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 	SEGA_315_5250_COMPARE_TIMER(config, "cmptimer_subx", 0);
 
-	CXD1095(config, m_iochip[0], 0); // IC160
+	CXD1095(config, m_iochip[0]); // IC160
 	m_iochip[0]->in_porta_cb().set_ioport("IO0PORTA");
 	m_iochip[0]->in_portb_cb().set_ioport("IO0PORTB");
 	m_iochip[0]->out_portc_cb().set(FUNC(segaxbd_state::pc_0_w));
 	m_iochip[0]->out_portd_cb().set(FUNC(segaxbd_state::pd_0_w));
 
-	CXD1095(config, m_iochip[1], 0); // IC159
+	CXD1095(config, m_iochip[1]); // IC159
 	m_iochip[1]->in_porta_cb().set_ioport("IO1PORTA");
 	m_iochip[1]->in_portb_cb().set_ioport("IO1PORTB");
 	m_iochip[1]->in_portc_cb().set_ioport("IO1PORTC");
 	m_iochip[1]->in_portd_cb().set_ioport("IO1PORTD");
+
+	adc0804_device &adc(ADC0804(config, "adc", MASTER_CLOCK/4/10)); // uses E clock from main CPU
+	adc.vin_callback().set(FUNC(segaxbd_state::analog_r));
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaxbd);
@@ -4755,7 +4751,7 @@ GAME( 1989, smgpja,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state
 GAME( 1990, abcop,    0,        sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,   ROT0, "Sega", "A.B. Cop (World) (FD1094 317-0169b)", 0 )
 GAME( 1990, abcopj,   abcop,    sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,   ROT0, "Sega", "A.B. Cop (Japan) (FD1094 317-0169b)", 0 )
 
-// wasn't officially available as a single PCB setup, but runs anyway albeit with messages suggesting you can compete against a nonexistant rival.
+// wasn't officially available as a single PCB setup, but runs anyway albeit with messages suggesting you can compete against a nonexistent rival.
 GAME( 1990, gpriders, gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider, ROT0, "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
 GAME( 1990, gpriderus,gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider, ROT0, "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
 GAME( 1990, gpriderjs,gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider, ROT0, "Sega", "GP Rider (Japan, FD1094 317-0161)", 0 )

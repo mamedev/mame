@@ -9,16 +9,18 @@
 
 	These are for use with e-pitch / e-kara (e-pitch internal ROM is the same as e-kara Japan, just button layout is changed)
 
-  https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q10109392860
+	https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q10109392860
 
-	A-1   Pichi Pichi Pitch vol.1 / ぴちぴちピッチvol.1
-	A-2   Pichi Pichi Pitch vol.2 / ぴちぴちピッチvol.2
-	A-3   Pichi Pichi Pitch vol.3 / ぴちぴちピッチvol.3
-	A-4   Pichi Pichi Pitch Pure Chapter 1 / ぴちぴちピッチピュア第１章
-	A-5   Pichi Pichi Pitch Karaoke Party / ぴちぴちピッチカラオケパーティー
-	A-6   Pichi Pichi Pitch Pure Chapter 2 / ぴちぴちピッチピュア第２章
-	A-7   Pichi Pichi Pitch Pure Chapter 3 / ぴちぴちピッチピュア第３章
-	A-8   Pichi Pichi Pitch Karaoke Party 2 / ぴちぴちピッチカラオケパーティー２
+	* = dumped
+
+	*A-1   Pichi Pichi Pitch vol.1 / ぴちぴちピッチvol.1
+	 A-2   Pichi Pichi Pitch vol.2 / ぴちぴちピッチvol.2
+	*A-3   Pichi Pichi Pitch vol.3 / ぴちぴちピッチvol.3
+	*A-4   Pichi Pichi Pitch Pure Chapter 1 / ぴちぴちピッチピュア第１章
+	*A-5   Pichi Pichi Pitch Karaoke Party / ぴちぴちピッチカラオケパーティー
+	 A-6   Pichi Pichi Pitch Pure Chapter 2 / ぴちぴちピッチピュア第２章
+	*A-7   Pichi Pichi Pitch Pure Chapter 3 / ぴちぴちピッチピュア第３章
+	 A-8   Pichi Pichi Pitch Karaoke Party 2 / ぴちぴちピッチカラオケパーティー２
 
 	-->
 
@@ -30,6 +32,18 @@
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekaraa1.bin" size="0x200000" crc="5f69a977" sha1="33e7b453e1e78ac5e4a20c81c00f5c0c1260c6b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a3" supported="no">
+		<description>A-3 Pichi Pichi Pitch vol.3 (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24c08_epitch"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekara_a3.bin" size="0x200000" crc="19b79adf" sha1="31f82e8bf66f1b03df9d64061af628df3466c5ef"/>
 			</dataarea>
 		</part>
 	</software>

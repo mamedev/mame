@@ -123,6 +123,12 @@ namespace plib {
 			}
 		}
 
+		static inline mempool &instance()
+		{
+			static mempool s_mempool;
+			return s_mempool;
+		}
+
 		void *allocate(size_t align, size_t size)
 		{
 			block *b = nullptr;
@@ -189,7 +195,7 @@ namespace plib {
 		using unique_pool_ptr = std::unique_ptr<T, arena_deleter<mempool, T>>;
 
 		template<typename T, typename... Args>
-		owned_pool_ptr<T> make_poolptr(Args&&... args)
+		owned_pool_ptr<T> make_owned(Args&&... args)
 		{
 			auto *mem = this->allocate(alignof(T), sizeof(T));
 			try
@@ -219,6 +225,8 @@ namespace plib {
 				throw;
 			}
 		}
+
+		bool operator ==(const mempool &rhs) { return this == &rhs; }
 
 	};
 

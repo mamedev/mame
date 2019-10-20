@@ -2119,10 +2119,10 @@ void dec8_state::garyoret(machine_config &config)
 void dec8_state::ghostb(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309E(config, m_maincpu, 3000000);  /* HD63C09EP */
+	HD6309E(config, m_maincpu, XTAL(12'000'000) / 4);  /* HD63C09EP, clock verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::meikyuh_map);
 
-	DECO_222(config, m_audiocpu, 1500000);
+	DECO_222(config, m_audiocpu, XTAL(12'000'000) / 8); /* also seen with stock M6502, clock verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::dec8_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000)); /* 8.0MHz OSC next to MCU - clock verified */
@@ -2164,13 +2164,13 @@ void dec8_state::ghostb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000) / 8)); // clock verified
 	ym1.add_route(0, "mono", 0.23);
 	ym1.add_route(1, "mono", 0.23);
 	ym1.add_route(2, "mono", 0.23);
 	ym1.add_route(3, "mono", 0.20);
 
-	ym3812_device &ym2(YM3812(config, "ym2", 3000000));
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4)); // clock verified
 	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
@@ -2412,7 +2412,7 @@ ROM_START( lastmisn )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) BAD_DUMP ) /* not verified to be the same data as the "A" MCU dump */
+	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) BAD_DUMP ) /* not verified to be the same data as the "A" MCU dump */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2448,7 +2448,7 @@ ROM_START( lastmisnu6 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2484,7 +2484,7 @@ ROM_START( lastmisnu5 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )

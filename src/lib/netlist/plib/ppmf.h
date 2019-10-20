@@ -15,24 +15,24 @@
 
 /*
  *
- * NL_PMF_TYPE_GNUC_PMF
+ * PMF_TYPE_GNUC_PMF
  *      Use standard pointer to member function syntax C++11
  *
- *  NL_PMF_TYPE_GNUC_PMF_CONV
+ *  PMF_TYPE_GNUC_PMF_CONV
  *      Use gnu extension and convert the pmf to a function pointer.
  *      This is not standard compliant and needs
  *      -Wno-pmf-conversions to compile.
  *
- *  NL_PMF_TYPE_INTERNAL
+ *  PMF_TYPE_INTERNAL
  *      Use the same approach as MAME for deriving the function pointer.
  *      This is compiler-dependent as well
  *
  *  Benchmarks for ./nltool -c run -f src/mame/machine/nl_pong.cpp -t 10 -n pong_fast
  *
- *  NL_PMF_TYPE_INTERNAL:       215%    215%
- *  NL_PMF_TYPE_GNUC_PMF:       163%    196%
- *  NL_PMF_TYPE_GNUC_PMF_CONV:  215%    215%
- *  NL_PMF_TYPE_VIRTUAL:        213%    209%
+ *  PMF_TYPE_INTERNAL:       215%    215%
+ *  PMF_TYPE_GNUC_PMF:       163%    196%
+ *  PMF_TYPE_GNUC_PMF_CONV:  215%    215%
+ *  PMF_TYPE_VIRTUAL:        213%    209%
  *
  *  The whole exercise was done to avoid virtual calls. In prior versions of
  *  netlist, the INTERNAL and GNUC_PMF_CONV approach provided significant improvement.
@@ -40,6 +40,54 @@
  *  This may explain that the recent benchmarks show no difference at all.
  *
  */
+
+//============================================================
+//  Macro magic
+//============================================================
+
+//#define PPMF_TYPE 0
+
+#define PPMF_TYPE_PMF             0
+#define PPMF_TYPE_GNUC_PMF_CONV   1
+#define PPMF_TYPE_INTERNAL        2
+
+#if defined(__GNUC__)
+	/* does not work in versions over 4.7.x of 32bit MINGW  */
+	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
+		#define PHAS_PMF_INTERNAL 0
+	#elif defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
+		#define PHAS_PMF_INTERNAL 1
+		#define MEMBER_ABI _thiscall
+	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
+		#define PHAS_PMF_INTERNAL 0
+	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(__EMSCRIPTEN__)
+		#define PHAS_PMF_INTERNAL 2
+	#else
+		#define PHAS_PMF_INTERNAL 1
+	#endif
+#elif defined(_MSC_VER) && defined (_M_X64)
+	#define PHAS_PMF_INTERNAL 3
+#else
+	#define PHAS_PMF_INTERNAL 0
+#endif
+
+#ifndef MEMBER_ABI
+	#define MEMBER_ABI
+#endif
+
+#ifndef PPMF_TYPE
+	#if (PHAS_PMF_INTERNAL > 0)
+		#define PPMF_TYPE PPMF_TYPE_INTERNAL
+	#else
+		#define PPMF_TYPE PPMF_TYPE_PMF
+	#endif
+#else
+	#undef PHAS_PMF_INTERNAL
+	#define PHAS_PMF_INTERNAL 0
+	#undef MEMBER_ABI
+	#define MEMBER_ABI
+#endif
+
 
 #if (PPMF_TYPE == PPMF_TYPE_GNUC_PMF_CONV)
 #pragma GCC diagnostic ignored "-Wpmf-conversions"
@@ -176,13 +224,13 @@ namespace plib {
 			*reinterpret_cast<function_ptr *>(&m_func) = t;
 		}
 		template<typename O>
-		inline R call(O *obj, Targs... args)
+		inline R call(O *obj, Targs... args) const noexcept(true)
 		{
 			using function_ptr = R (O::*)(Targs...);
-			function_ptr t = *reinterpret_cast<function_ptr *>(&m_func);
+			function_ptr t = *reinterpret_cast<const function_ptr *>(&m_func);
 			return (obj->*t)(std::forward<Targs>(args)...);
 		}
-		bool is_set() {
+		bool is_set() const {
 #if defined(_MSC_VER) || (defined (__INTEL_COMPILER) && defined (_M_X64))
 			int *p = reinterpret_cast<int *>(&m_func);
 			int *e = p + sizeof(generic_function) / sizeof(int);
@@ -225,12 +273,12 @@ namespace plib {
 	#endif
 		}
 		template<typename O>
-		R call(O *obj, Targs... args) const
+		R call(O *obj, Targs... args) const noexcept(true)
 		{
 			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
 			return (reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);
 		}
-		bool is_set() noexcept { return m_func != nullptr; }
+		bool is_set() const noexcept { return m_func != nullptr; }
 		generic_function get_function() const noexcept { return m_func; }
 	private:
 		generic_function m_func;
@@ -244,7 +292,7 @@ namespace plib {
 		class generic_class;
 
 		template <class C>
-		using MemberFunctionType =  R (C::*)(Targs...);
+		using MemberFunctionType =  R (C::*)(Targs...); // noexcept(true) --> c++-17
 
 		pmfp() : pmfp_base<R, Targs...>(), m_obj(nullptr) {}
 
@@ -263,7 +311,7 @@ namespace plib {
 			m_obj = reinterpret_cast<generic_class *>(object);
 		}
 
-		inline R operator()(Targs ... args)
+		inline R operator()(Targs ... args) const noexcept(true)
 		{
 			return this->call(m_obj, std::forward<Targs>(args)...);
 		}

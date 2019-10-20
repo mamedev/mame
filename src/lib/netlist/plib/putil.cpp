@@ -3,17 +3,42 @@
 
 #include "putil.h"
 #include "plists.h"
+#include "pstrutil.h"
 #include "ptypes.h"
 
 #include <algorithm>
-//#include <cstdlib>
-//#include <cstring>
 #include <initializer_list>
 
 namespace plib
 {
 	namespace util
 	{
+		#ifdef _WIN32
+		static constexpr const char PATH_SEP = '\\';
+		#else
+		static constexpr const char PATH_SEP = '/';
+		#endif
+
+		pstring basename(pstring filename)
+		{
+			auto p=find_last_of(filename, pstring(1, PATH_SEP));
+			if (p == pstring::npos)
+				return filename;
+			else
+				return filename.substr(p+1);
+		}
+
+		pstring path(pstring filename)
+		{
+			auto p=find_last_of(filename, pstring(1, PATH_SEP));
+			if (p == pstring::npos)
+				return "";
+			else if (p == 0) // root case
+				return filename.substr(0, 1);
+			else
+				return filename.substr(0, p);
+		}
+
 		pstring buildpath(std::initializer_list<pstring> list )
 		{
 			pstring ret = "";
@@ -22,11 +47,7 @@ namespace plib
 				if (ret == "")
 					ret = elem;
 				else
-					#ifdef _WIN32
-					ret = ret + '\\' + elem;
-					#else
-					ret += ('/' + elem);
-					#endif
+					ret += (PATH_SEP + elem);
 			}
 			return ret;
 		}

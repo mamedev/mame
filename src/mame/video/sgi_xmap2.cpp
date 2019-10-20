@@ -84,6 +84,8 @@ u8 sgi_xmap2_device::reg_r(offs_t offset)
 			return m_wid_aux;
 		else if (m_addr == 0x21)
 			return m_options;
+		else
+			logerror("read unknown address 0x%04x\n", m_addr);
 		break;
 
 	case 6: // address msb
@@ -164,6 +166,8 @@ void sgi_xmap2_device::reg_w(offs_t offset, u8 data)
 		}
 		else if (m_addr == 0x20)
 			m_wid_aux = BIT(data, 0);
+		else
+			logerror("write unknown address 0x%04x\n", m_addr);
 		break;
 
 	case 6: // address msb

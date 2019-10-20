@@ -8,6 +8,7 @@
 #include "pfunction.h"
 #include "pexception.h"
 #include "pfmtlog.h"
+#include "pstrutil.h"
 #include "putil.h"
 
 #include <cmath>
@@ -71,7 +72,7 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 			if (rc.m_cmd != PUSH_INPUT)
 			{
 				rc.m_cmd = PUSH_CONST;
-				bool err;
+				bool err(false);
 				rc.m_param = plib::pstonum_ne<decltype(rc.m_param), true>(cmd, err);
 				if (err)
 					throw plib::pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));

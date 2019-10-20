@@ -286,13 +286,13 @@ public:
 	: netlist::nl_exception(plib::pfmt(fmt)(std::forward<Args>(args)...)) { }
 };
 
-class netlist_source_memregion_t : public netlist::source_t
+class netlist_source_memregion_t : public netlist::source_netlist_t
 {
 public:
 
 
 	netlist_source_memregion_t(device_t &dev, pstring name)
-	: netlist::source_t(), m_dev(dev), m_name(name)
+	: netlist::source_netlist_t(), m_dev(dev), m_name(name)
 	{
 	}
 
@@ -302,7 +302,7 @@ private:
 	pstring m_name;
 };
 
-class netlist_data_memregions_t : public netlist::source_t
+class netlist_data_memregions_t : public netlist::source_data_t
 {
 public:
 	netlist_data_memregions_t(const device_t &dev);
@@ -333,7 +333,7 @@ plib::unique_ptr<std::istream> netlist_source_memregion_t::stream(const pstring 
 }
 
 netlist_data_memregions_t::netlist_data_memregions_t(const device_t &dev)
-	: netlist::source_t(netlist::source_t::DATA), m_dev(dev)
+	: netlist::source_data_t(), m_dev(dev)
 {
 }
 
@@ -499,9 +499,9 @@ public:
 
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
-			m_channels[i].m_param_name = netlist::pool().make_poolptr<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
-			m_channels[i].m_param_mult = netlist::pool().make_poolptr<netlist::param_double_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
-			m_channels[i].m_param_offset = netlist::pool().make_poolptr<netlist::param_double_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
+			m_channels[i].m_param_name = netlist::pool().make_unique<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
+			m_channels[i].m_param_mult = netlist::pool().make_unique<netlist::param_double_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
+			m_channels[i].m_param_offset = netlist::pool().make_unique<netlist::param_double_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
 		}
 	}
 
@@ -548,11 +548,11 @@ public:
 
 	struct channel
 	{
-		netlist::pool_owned_ptr<netlist::param_str_t> m_param_name;
+		netlist::unique_pool_ptr<netlist::param_str_t> m_param_name;
 		netlist::param_double_t *m_param;
 		stream_sample_t *m_buffer;
-		netlist::pool_owned_ptr<netlist::param_double_t> m_param_mult;
-		netlist::pool_owned_ptr<netlist::param_double_t> m_param_offset;
+		netlist::unique_pool_ptr<netlist::param_double_t> m_param_mult;
+		netlist::unique_pool_ptr<netlist::param_double_t> m_param_offset;
 	};
 	channel m_channels[MAX_INPUT_CHANNELS];
 	netlist::netlist_time m_inc;
@@ -732,10 +732,10 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlis
 	if (owner()->has_running_machine())
 		m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	auto dev = netlist::pool().make_poolptr<NETLIB_NAME(analog_callback)>(nlstate, dfqn);
+	auto dev = netlist::pool().make_unique<NETLIB_NAME(analog_callback)>(nlstate, dfqn);
 	//static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(std::move(m_delegate));
 	dev->register_callback(std::move(m_delegate));
-	nlstate.add_dev(dfqn, std::move(dev));
+	nlstate.register_device(dfqn, std::move(dev));
 	nlstate.setup().register_link(dname + ".IN", pin);
 }
 
@@ -772,9 +772,9 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist
 	if (owner()->has_running_machine())
 		m_delegate.bind_relative_to(owner()->machine().root_device());
 
-	auto dev = netlist::pool().make_poolptr<NETLIB_NAME(logic_callback)>(nlstate, dfqn);
+	auto dev = netlist::pool().make_unique<NETLIB_NAME(logic_callback)>(nlstate, dfqn);
 	dev->register_callback(std::move(m_delegate));
-	nlstate.add_dev(dfqn, std::move(dev));
+	nlstate.register_device(dfqn, std::move(dev));
 	nlstate.setup().register_link(dname + ".IN", pin);
 }
 
@@ -1084,7 +1084,7 @@ plib::unique_ptr<netlist::netlist_t> netlist_mame_device::base_validity_check(va
 		//netlist_mame_t lnetlist(*this, "netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		auto lnetlist = plib::make_unique<netlist::netlist_t>("netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		// enable validation mode
-		lnetlist->nlstate().setup().enable_validation();
+		lnetlist->nlstate().setup().set_extended_validation(false);
 		common_dev_start(lnetlist.get());
 
 		for (device_t &d : subdevices())
@@ -1101,6 +1101,7 @@ plib::unique_ptr<netlist::netlist_t> netlist_mame_device::base_validity_check(va
 	}
 	catch (memregion_not_set &err)
 	{
+		// Do not report an error. Validity check has no access to ROM area.
 		osd_printf_verbose("%s\n", err.what());
 	}
 	catch (emu_fatalerror &err)
@@ -1126,7 +1127,7 @@ void netlist_mame_device::device_start()
 {
 	LOGDEVCALLS("device_start entry\n");
 
-	m_netlist = netlist::pool().make_poolptr<netlist_mame_t>(*this, "netlist");
+	m_netlist = netlist::pool().make_unique<netlist_mame_t>(*this, "netlist");
 	if (!machine().options().verbose())
 	{
 		m_netlist->nlstate().log().verbose.set_enabled(false);
@@ -1183,7 +1184,7 @@ ATTR_COLD void netlist_mame_device::device_pre_save()
 	netlist().run_state_manager().pre_save();
 }
 
-void netlist_mame_device::update_icount(netlist::netlist_time time)
+void netlist_mame_device::update_icount(netlist::netlist_time time) noexcept
 {
 	const netlist::netlist_time newt(time);
 	const netlist::netlist_time delta(newt - m_old + m_rem);
@@ -1193,7 +1194,7 @@ void netlist_mame_device::update_icount(netlist::netlist_time time)
 	m_icount -= d;
 }
 
-void netlist_mame_device::check_mame_abort_slice()
+void netlist_mame_device::check_mame_abort_slice() noexcept
 {
 	if (m_icount <= 0)
 		netlist().abort_current_queue_slice();

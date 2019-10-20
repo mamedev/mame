@@ -145,7 +145,7 @@ namespace netlist
 			m_clk.activate_hl();
 	}
 
-#if (!USE_TRUTHTABLE_74107)
+#if (!NL_USE_TRUTHTABLE_74107)
 	NETLIB_DEVICE_IMPL(74107,       "TTL_74107",    "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74107_dip,   "TTL_74107_DIP", "")
 #endif

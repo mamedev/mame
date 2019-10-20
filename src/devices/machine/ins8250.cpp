@@ -434,8 +434,11 @@ u8 ins8250_uart_device::ins8250_r(offs_t offset)
 			data = m_regs.iir;
 			/* The documentation says that reading this register will
 			clear the int if this is the source of the int */
-			if (!machine().side_effects_disabled() && (m_regs.ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY))
-				clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+			if (!machine().side_effects_disabled())
+			{
+				if (m_regs.iir == 0x02)
+					clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+			}
 			break;
 		case 3:
 			data = m_regs.lcr;

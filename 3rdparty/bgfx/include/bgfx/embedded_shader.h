@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -14,8 +14,9 @@
 #define BGFX_EMBEDDED_SHADER_PSSL(...)
 #define BGFX_EMBEDDED_SHADER_ESSL(...)
 #define BGFX_EMBEDDED_SHADER_GLSL(...)
-#define BGFX_EMBEDDED_SHADER_SPIRV(...)
 #define BGFX_EMBEDDED_SHADER_METAL(...)
+#define BGFX_EMBEDDED_SHADER_NVN(...)
+#define BGFX_EMBEDDED_SHADER_SPIRV(...)
 
 #define BGFX_PLATFORM_SUPPORTS_DX9BC (0 \
 		|| BX_PLATFORM_WINDOWS          \
@@ -48,10 +49,14 @@
 		|| BX_PLATFORM_IOS              \
 		|| BX_PLATFORM_OSX              \
 		)
+#define BGFX_PLATFORM_SUPPORTS_NVN (0   \
+		|| BX_PLATFORM_NX               \
+		)
 #define BGFX_PLATFORM_SUPPORTS_SPIRV (0 \
 		|| BX_PLATFORM_ANDROID          \
 		|| BX_PLATFORM_LINUX            \
 		|| BX_PLATFORM_WINDOWS          \
+		|| BX_PLATFORM_OSX              \
 		)
 
 #if BGFX_PLATFORM_SUPPORTS_DX9BC
@@ -105,6 +110,7 @@
 					BGFX_EMBEDDED_SHADER_DXBC (bgfx::RendererType::Direct3D12, _name)              \
 					BGFX_EMBEDDED_SHADER_PSSL (bgfx::RendererType::Gnm,        _name)              \
 					BGFX_EMBEDDED_SHADER_METAL(bgfx::RendererType::Metal,      _name)              \
+					BGFX_EMBEDDED_SHADER_NVN  (bgfx::RendererType::Nvn,        _name)              \
 					BGFX_EMBEDDED_SHADER_ESSL (bgfx::RendererType::OpenGLES,   _name)              \
 					BGFX_EMBEDDED_SHADER_GLSL (bgfx::RendererType::OpenGL,     _name)              \
 					BGFX_EMBEDDED_SHADER_SPIRV(bgfx::RendererType::Vulkan,     _name)              \

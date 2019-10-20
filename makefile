@@ -24,6 +24,7 @@
 # BENCHMARKS = 1
 # OSD = sdl
 
+# NO_OPENGL = 0
 # USE_DISPATCH_GL = 0
 # MODERN_WIN_API = 0
 # DIRECTINPUT = 7
@@ -711,6 +712,10 @@ endif
 
 ifdef DONT_USE_NETWORK
 PARAMS += --DONT_USE_NETWORK='$(DONT_USE_NETWORK)'
+endif
+
+ifdef NO_OPENGL
+PARAMS += --NO_OPENGL='$(NO_OPENGL)'
 endif
 
 ifdef USE_DISPATCH_GL
@@ -1852,7 +1857,7 @@ cppcheck:
 .PHONY: shaders bgfx-tools
 
 bgfx-tools:
-	$(SILENT) $(MAKE) -C 3rdparty/bgfx -f makefile shaderc CC="$(CC)" CXX="$(CXX)" MINGW="$(MINGW)"
+	$(SILENT) $(MAKE) -C 3rdparty/bgfx -f makefile shaderc CC="$(CC)" CXX="$(CXX)" MINGW="$(MINGW)" SILENT="$(SILENT)"
 
 shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/dx11)
@@ -1862,7 +1867,7 @@ shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/essl)
 	-$(call MKDIR,build/shaders/glsl)
 	-$(call MKDIR,build/shaders/spirv)
-	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)"
+	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)" SILENT="$(SILENT)"
 
 #-------------------------------------------------
 # Translation

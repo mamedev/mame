@@ -22,11 +22,20 @@ void main()
 	vec4 cin = texture2D(s_tex, v_texcoord0);
 	vec4 cout = vec4(0.0, 0.0, 0.0, cin.a);
 	mat3 xy = mat3(u_chroma_a.xyz, u_chroma_b.xyz, u_chroma_c.xyz);
+
+#ifdef TRANSPOSED_XYZ_TO_sRGB
 	const mat3 XYZ_TO_sRGB = mat3(
 		 3.2406, -0.9689,  0.0557,
 		-1.5372,  1.8758, -0.2040,
 		-0.4986,  0.0415,  1.0570
 	);
+#else
+	const mat3 XYZ_TO_sRGB = mat3(
+		 3.2406, -1.5372, -0.4986,
+		-0.9689,  1.8758,  0.0415,
+		 0.0557, -0.2040,  1.0570
+	);
+#endif
 
 	for (int i = 0; i < 3; ++i) {
 		float Y = u_y_gain[i] * cin[i];
