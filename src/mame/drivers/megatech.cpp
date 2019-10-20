@@ -4,7 +4,7 @@
 
 About MegaTech:
 
-Megatech games are identical to their Genesis/SMS equivlents, however the Megatech cartridges contain
+Megatech games are identical to their Genesis/SMS equivalents, however the Megatech cartridges contain
 a BIOS rom with the game instructions.  The last part number of the bios ROM is the cart/game ID code.
 
 The instruction rom appears to map at 0x300000 in the cart space.
@@ -17,8 +17,8 @@ with their Playchoice 10 system.
 The BIOS screen is based around SMS hardware, with an additional Z80 and SMS VDP chip not present on
 a standard Genesis.
 
-SMS games run on Megatech in the Genesis's SMS compatability mode, where the Genesis Z80 becomes the
-main CPU and the Genesis VDP acts in a mode mimicing the behavior of the SMS VDP. A pin on the carts
+SMS games run on Megatech in the Genesis's SMS compatibility mode, where the Genesis Z80 becomes the
+main CPU and the Genesis VDP acts in a mode mimicking the behavior of the SMS VDP. A pin on the carts
 determines which mode the game runs in.
 
 Additions will only be made to this driver if proof that the dumped set are original roms with original
@@ -1486,7 +1486,7 @@ ROM_END
 - Enduro Racer
 
 Games seen in auction (#122011114579) known not to be original but manufactured/bootlegged on actual megatech carts.
-The labels are noticably different than expected.  Be careful if thinking of obtaining!
+The labels are noticeably different than expected.  Be careful if thinking of obtaining!
 - After Burner II (GEN)
 - Castle of Illusion Starring Mickey Mouse (GEN)
 - Double Dragon (SMS)

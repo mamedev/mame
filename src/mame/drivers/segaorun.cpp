@@ -74,7 +74,7 @@ Notes:
       68000     - Clock Input 10.000MHz [40/4]
       Z80A      - Clock Input 4.000MHz [16/4]
       YM2151    - Yamaha YM2151 FM Operator Type M (OPM) Sound Generator IC. Clock Input 4.000MHz [16/4]
-      YM3012    - Yamaha YM3012 2-Channel Serial Input Floating Point Digital to Analog Convertor (DIP16)
+      YM3012    - Yamaha YM3012 2-Channel Serial Input Floating Point Digital to Analog Converter (DIP16)
       TMM2063   - Toshiba TMM2063 8kx8 SRAM (NDIP28)
       TMM2115   - Toshiba TMM2115 2kx8 SRAM (NDIP24)
       TL084     - Texas Instruments TL084 Quad JFET-Input General-Purpose Operational Amplifier (DIP14)
@@ -1306,7 +1306,7 @@ ROM_START( outrun )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10380b.133", 0x000000, 0x10000, CRC(1f6cadad) SHA1(31e870f307f44eb4f293b607123b623beee2bc3c) )
 	ROM_LOAD16_BYTE( "epr-10382b.118", 0x000001, 0x10000, CRC(c4c3fa1a) SHA1(69236cf9f27691dee290c79db1fc9b5e73ea77d7) )
-	ROM_LOAD16_BYTE( "epr-10381b.132", 0x020000, 0x10000, CRC(be8c412b) SHA1(bf3ff05bbf81bdd44567f3b9bb4919ed4a499624) ) // Same as the "A" version belown ???
+	ROM_LOAD16_BYTE( "epr-10381b.132", 0x020000, 0x10000, CRC(be8c412b) SHA1(bf3ff05bbf81bdd44567f3b9bb4919ed4a499624) ) // Same as the "A" version below ???
 	ROM_LOAD16_BYTE( "epr-10383b.117", 0x020001, 0x10000, CRC(10a2014a) SHA1(1970895145ad8b5735f66ed8c837d9d453ce9b23) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
@@ -1711,7 +1711,7 @@ ROM_START( outrundxj )
 ROM_END
 
 //*************************************************************************************************************************
-//  Outrun Deluxe (ealier??)
+//  Outrun Deluxe (earlier??)
 //  CPU: 68000
 //   GAME BD  834-6065 Rev A
 //   CPU BD   837-6063
@@ -1955,9 +1955,9 @@ ROM_END
 //   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, ROMs would be "OPR")
 //
 //  Manual states for this set:
-//      834-6277-01 (Object data (sprits) EPR type AKA EP-ROM type)
-//      834-6277-03 (Object data (sprits) MPR type AKA Mask-ROM type)
-//      834-6277-05 (Object data (sprits) OPR type AKA One Time ROM type)
+//      834-6277-01 (Object data (sprites) EPR type AKA EP-ROM type)
+//      834-6277-03 (Object data (sprites) MPR type AKA Mask-ROM type)
+//      834-6277-05 (Object data (sprites) OPR type AKA One Time ROM type)
 //
 ROM_START( shangon3 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code - protected
