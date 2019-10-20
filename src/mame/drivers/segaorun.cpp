@@ -491,7 +491,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 		return m_custom_io_r(space, offset, mem_mask);
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -664,7 +664,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	}
 
 	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -745,7 +745,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 	}
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 

@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "machine/segaic16.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
 #include "video/sega16sp.h"
@@ -22,6 +21,7 @@
 #include "machine/i8251.h"
 #include "machine/mb3773.h"
 #include "machine/mb8421.h"
+#include "machine/segaic16.h"
 #include "video/resnet.h"
 #include "emupal.h"
 #include "screen.h"

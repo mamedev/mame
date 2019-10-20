@@ -1005,7 +1005,7 @@ READ16_MEMBER( segas16b_state::rom_5797_bank_math_r )
 			// compare registers
 			return m_cmptimer_1->read(offset);
 	}
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -1080,7 +1080,7 @@ READ16_MEMBER( segas16b_state::standard_io_r )
 			return ioport((offset & 1) ? "DSW1" : "DSW2")->read();
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return m_mapper.found() ? m_mapper->open_bus_r() : 0xffff;
 }
 
 

@@ -8,15 +8,16 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/315_5195.h"
 #include "machine/adc0804.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
-#include "machine/segaic16.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
 #include "video/sega16sp.h"
+#include "screen.h"
 
 
 // ======================> segaorun_state
@@ -35,6 +36,7 @@ public:
 		m_adc(*this, "adc"),
 		m_nvram(*this, "nvram"),
 		m_watchdog(*this, "watchdog"),
+		m_screen(*this, "screen"),
 		m_sprites(*this, "sprites"),
 		m_segaic16vid(*this, "segaic16vid"),
 		m_segaic16road(*this, "segaic16road"),
@@ -137,6 +139,7 @@ protected:
 	required_device<adc0804_device> m_adc;
 	optional_device<nvram_device> m_nvram;
 	required_device<watchdog_timer_device> m_watchdog;
+	required_device<screen_device> m_screen;
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;

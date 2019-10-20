@@ -270,6 +270,7 @@ ROMs:
 #include "includes/segaipt.h"
 
 #include "machine/adc0804.h"
+#include "machine/fd1094.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"

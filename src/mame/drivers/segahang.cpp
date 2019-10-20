@@ -159,119 +159,38 @@ READ8_MEMBER( segahang_state::adc_status_r )
 //**************************************************************************
 
 //-------------------------------------------------
-//  hangon_io_r - I/O handler for Hang-On boards
+//  hangon_inputs_r - input port selector for
+//  Hang-On boards
 //-------------------------------------------------
 
-READ16_MEMBER( segahang_state::hangon_io_r )
+uint8_t segahang_state::hangon_inputs_r(offs_t offset)
 {
-	switch (offset & 0x3020/2)
-	{
-		case 0x0000/2: // PPI @ 4B
-			return m_i8255_1->read(offset & 3);
-
-		case 0x1000/2: // Input ports and DIP switches
-		{
-			static const char *const sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
-			return ioport(sysports[offset & 3])->read();
-		}
-
-		case 0x3000/2: // PPI @ 4C
-			return m_i8255_2->read(offset & 3);
-
-		case 0x3020/2: // ADC0804 data output
-			return m_adc->read();
-	}
-
-	//logerror("%06X:hangon_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	static const char *const sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
+	return ioport(sysports[offset & 3])->read();
 }
 
 
 //-------------------------------------------------
-//  hangon_io_w - I/O handler for Hang-On boards
+//  sharrier_inputs_r - input port selector for
+//  Space Harrier boards
 //-------------------------------------------------
 
-WRITE16_MEMBER( segahang_state::hangon_io_w )
+uint8_t segahang_state::sharrier_inputs_r(offs_t offset)
 {
-	if (ACCESSING_BITS_0_7)
-		switch (offset & 0x3020/2)
-		{
-			case 0x0000/2: // PPI @ 4B
-				// the port C handshaking signals control the Z80 NMI,
-				// so we have to sync whenever we access this PPI
-				synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | (data & 0xff));
-				return;
-
-			case 0x3000/2: // PPI @ 4C
-				m_i8255_2->write(offset & 3, data & 0xff);
-				return;
-
-			case 0x3020/2: // ADC0804
-				m_adc->write();
-				return;
-		}
-
-	//logerror("%06X:hangon_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
+	return ioport(sysports[offset & 3])->read();
 }
 
 
 //-------------------------------------------------
-//  sharrier_io_r - I/O handler for Space Harrier
-//  boards
+//  sync_ppi_w - helper for writes to the PPI @ 4B
 //-------------------------------------------------
 
-READ16_MEMBER( segahang_state::sharrier_io_r )
+void segahang_state::sync_ppi_w(offs_t offset, uint8_t data)
 {
-	switch (offset & 0x0030/2)
-	{
-		case 0x0000/2:
-			return m_i8255_1->read(offset & 3);
-
-		case 0x0010/2: // Input ports and DIP switches
-		{
-			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return ioport(sysports[offset & 3])->read();
-		}
-
-		case 0x0020/2: // PPI @ 4C
-			if (offset == 2) return 0;
-			return m_i8255_2->read(offset & 3);
-
-		case 0x0030/2: // ADC0804 data output
-			return m_adc->read();
-	}
-
-	//logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
-}
-
-
-//-------------------------------------------------
-//  sharrier_io_w - I/O handler for Space Harrier
-//  boards
-//-------------------------------------------------
-
-WRITE16_MEMBER( segahang_state::sharrier_io_w )
-{
-	if (ACCESSING_BITS_0_7)
-		switch (offset & 0x0030/2)
-		{
-			case 0x0000/2:
-				// the port C handshaking signals control the Z80 NMI,
-				// so we have to sync whenever we access this PPI
-				synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | (data & 0xff));
-				return;
-
-			case 0x0020/2: // PPI @ 4C
-				m_i8255_2->write(offset & 3, data & 0xff);
-				return;
-
-			case 0x0030/2: // ADC0804
-				m_adc->write();
-				return;
-		}
-
-	//logerror("%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	// the port C handshaking signals control the Z80 NMI,
+	// so we have to sync whenever we access this PPI
+	synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | data);
 }
 
 
@@ -420,7 +339,10 @@ void segahang_state::hangon_map(address_map &map)
 	map(0xc00000, 0xc3ffff).rom().region("subcpu", 0);
 	map(0xc68000, 0xc68fff).ram().share("segaic16road:roadram");
 	map(0xc7c000, 0xc7ffff).ram().share("subram");
-	map(0xe00000, 0xffffff).rw(FUNC(segahang_state::hangon_io_r), FUNC(segahang_state::hangon_io_w));
+	map(0xe00000, 0xe00007).mirror(0x1fcfd8).r(m_i8255_1, FUNC(i8255_device::read)).w(FUNC(segahang_state::sync_ppi_w)).umask16(0x00ff);
+	map(0xe01000, 0xe01007).mirror(0x1fcfd8).r(FUNC(segahang_state::hangon_inputs_r)).umask16(0x00ff);
+	map(0xe03000, 0xe03007).mirror(0x1fcfd8).rw(m_i8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0xe03021, 0xe03021).mirror(0x1fcfde).rw(m_adc, FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 }
 
 void segahang_state::decrypted_opcodes_map(address_map &map)
@@ -439,7 +361,10 @@ void segahang_state::sharrier_map(address_map &map)
 	map(0x110000, 0x110fff).ram().w(FUNC(segahang_state::paletteram_w)).share("paletteram");
 	map(0x124000, 0x127fff).ram().share("subram");
 	map(0x130000, 0x130fff).ram().share("sprites");
-	map(0x140000, 0x14ffff).rw(FUNC(segahang_state::sharrier_io_r), FUNC(segahang_state::sharrier_io_w));
+	map(0x140000, 0x140007).mirror(0xffc8).r(m_i8255_1, FUNC(i8255_device::read)).w(FUNC(segahang_state::sync_ppi_w)).umask16(0x00ff);
+	map(0x140010, 0x140017).mirror(0xffc8).r(FUNC(segahang_state::sharrier_inputs_r)).umask16(0x00ff);
+	map(0x140020, 0x140027).mirror(0xffc8).rw(m_i8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x140031, 0x140031).mirror(0xffce).rw(m_adc, FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0xc68000, 0xc68fff).ram().share("segaic16road:roadram");
 }
 
