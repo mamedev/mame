@@ -157,7 +157,7 @@
 
 #if SNES_LAYER_DEBUG
 /*                                    red   green  blue    purple  yellow cyan    grey    white */
-static const uint16_t dbg_mode_colours[8] = { 0x1f, 0x3e0, 0x7c00, 0x7c1f, 0x3ff, 0x7fe0, 0x4210, 0x7fff };
+//static const uint16_t dbg_mode_colours[8] = { 0x1f, 0x3e0, 0x7c00, 0x7c1f, 0x3ff, 0x7fe0, 0x4210, 0x7fff };
 #endif /* SNES_LAYER_DEBUG */
 
 static const uint16_t table_obj_offset[8][8] =
