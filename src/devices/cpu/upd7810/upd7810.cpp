@@ -1889,6 +1889,7 @@ void upd7801_device::device_reset()
 	upd7810_device::device_reset();
 	MA = 0;     /* Port A is output port on the uPD7801 */
 	m_ovc0 = 0;
+	m_int2 = 0;
 }
 
 void upd78c05_device::device_reset()
@@ -2005,19 +2006,19 @@ void upd7801_device::execute_set_input(int irqline, int state)
 		/* Check if the ES bit is set then check for rising edge, otherwise falling edge */
 		if ( MKL & 0x20 )
 		{
-			if ( m_int2 != CLEAR_LINE && state == ASSERT_LINE )
+			if ( m_int2 == CLEAR_LINE && state == ASSERT_LINE )
 			{
 				IRR |= INTF2;
 			}
 		}
 		else
 		{
-			if ( m_int2 != ASSERT_LINE && state == CLEAR_LINE )
+			if ( m_int2 == ASSERT_LINE && state == CLEAR_LINE )
 			{
 				IRR |= INTF2;
 			}
 		}
-		m_int2 = !state;
+		m_int2 = state;
 		break;
 	}
 }
