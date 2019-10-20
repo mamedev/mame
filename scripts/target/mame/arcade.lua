@@ -3509,6 +3509,8 @@ files {
 	MAME_DIR .. "src/mame/includes/zaxxon.h",
 	MAME_DIR .. "src/mame/audio/zaxxon.cpp",
 	MAME_DIR .. "src/mame/video/zaxxon.cpp",
+	MAME_DIR .. "src/mame/machine/315_5195.cpp",
+	MAME_DIR .. "src/mame/machine/315_5195.h",
 	MAME_DIR .. "src/mame/machine/315_5296.cpp",
 	MAME_DIR .. "src/mame/machine/315_5296.h",
 	MAME_DIR .. "src/mame/machine/315_5338a.cpp",
