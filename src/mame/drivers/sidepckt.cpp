@@ -440,8 +440,8 @@ ROM_START( sidepckt ) /* DE-0245-2 */
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dh04.3h", 0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "dh.6d", 0x00000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "dh.6d", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "dh07-e.13k", 0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) ) /* characters */
@@ -465,8 +465,8 @@ ROM_START( sidepcktj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dh04.3h", 0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "dh.6d", 0x00000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "dh.6d", 0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "dh07.13k", 0x00000, 0x8000, CRC(7d0ce858) SHA1(3a158f218a762e6841d2611f41ace67a1afefb35) ) /* characters */
