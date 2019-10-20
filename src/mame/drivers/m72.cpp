@@ -3489,7 +3489,7 @@ ROM_START( dbreedm72j ) // with matching i8751 this set boots with a Japanese wa
 	ROM_RELOAD(                       0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "dbreedm72_i8751.mcu", 0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_LOAD( "db_c-pr-.mcu", 0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )   /* sprites */
@@ -3597,7 +3597,7 @@ ROM_START( gallop )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "gallop_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
+	ROM_LOAD( "cc_c-pr-.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "cc-c-00.bin",  0x00000, 0x20000, CRC(9d99deaa) SHA1(acf16bea0f482306107d2a305c568406b6c21e9a) )  /* sprites */
