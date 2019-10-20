@@ -723,18 +723,18 @@ inline void snes_ppu_device::draw_tile( uint8_t planes, uint8_t layer, uint32_t 
 inline uint32_t snes_ppu_device::get_tile( uint8_t layer_idx, uint32_t hoffset, uint32_t voffset )
 {
 	layer_t &self = m_layer[layer_idx];
-	bool hires = m_mode == 5 || m_mode == 6;
-	uint32_t tile_height = 3 + self.tile_size;
-	uint32_t tile_width = !hires ? tile_height : 4;
-	uint32_t screenx = self.tilemap_size & 1 ? 32 << 5 : 0;
-	uint32_t screeny = self.tilemap_size & 2 ? 32 << (5 + (self.tilemap_size & 1)) : 0;
-	uint32_t tilex = hoffset >> tile_width;
-	uint32_t tiley = voffset >> tile_height;
+	bool const hires = m_mode == 5 || m_mode == 6;
+	uint32_t const tile_height = 3 + self.tile_size;
+	uint32_t const tile_width = !hires ? tile_height : 4;
+	uint32_t const screenx = self.tilemap_size & 1 ? 32 << 5 : 0;
+	uint32_t const screeny = self.tilemap_size & 2 ? 32 << (5 + (self.tilemap_size & 1)) : 0;
+	uint32_t const tilex = hoffset >> tile_width;
+	uint32_t const tiley = voffset >> tile_height;
 	uint32_t offset = (tiley & 0x1f) << 5 | (tilex & 0x1f);
 	if (tilex & 0x20) offset += screenx;
 	if (tiley & 0x20) offset += screeny;
-	uint32_t addr = ((self.tilemap + offset) & 0x7fff) << 1;
-    return m_vram[addr] | (m_vram[addr + 1] << 8);
+	uint32_t const addr = ((self.tilemap + offset) & 0x7fff) << 1;
+	return m_vram[addr] | (m_vram[addr + 1] << 8);
 }
 
 /*********************************************
@@ -770,11 +770,11 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 {
 	layer_t &layer = m_layer[layer_idx];
 
-    if (layer.tile_mode == SNES_COLOR_DEPTH_NONE) return;
+	if (layer.tile_mode == SNES_COLOR_DEPTH_NONE) return;
 
 #if SNES_LAYER_DEBUG
-    if (m_debug_options.bg_disabled[layer_idx])
-        return;
+	if (m_debug_options.bg_disabled[layer_idx])
+		return;
 #endif /* SNES_LAYER_DEBUG */
 
 	m_scanlines[SNES_MAINSCREEN].enable = layer.main_bg_enabled;
@@ -819,10 +819,10 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 	uint32_t mosaic_priority = 0;
 	uint32_t mosaic_color = 0;
 
-    int x = 0 - (hscroll & 7);
+	int x = 0 - (hscroll & 7);
 	while (x < width)
 	{
-        uint32_t hoffset = x + hscroll;
+		uint32_t hoffset = x + hscroll;
 		uint32_t voffset = y + vscroll;
 		if (opt_mode)
 		{
@@ -886,7 +886,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 		data |= (uint64_t)m_vram[address +  48] << 48;
 		data |= (uint64_t)m_vram[address +  49] << 56;
 
-        for (uint32_t tilex = 0; tilex < 8; tilex++, x++)
+		for (uint32_t tilex = 0; tilex < 8; tilex++, x++)
 		{
 			if (x & width) continue;
 			if (!layer.mosaic_enabled || --mosaic_counter == 0)
@@ -925,7 +925,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 
 			if (!hires)
 			{
-                if (layer.main_bg_enabled && mosaic_priority > m_scanlines[SNES_MAINSCREEN].priority[x])
+				if (layer.main_bg_enabled && mosaic_priority > m_scanlines[SNES_MAINSCREEN].priority[x])
 				{
 					if (!m_scanlines[SNES_MAINSCREEN].clip || m_clipmasks[layer_idx][x])
 					{
