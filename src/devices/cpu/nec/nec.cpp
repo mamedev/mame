@@ -125,6 +125,7 @@ DEFINE_DEVICE_TYPE(V33A, v33a_device, "v33a", "NEC V33A")
 nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, address_map_constructor internal_port_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, chip_type == V33_TYPE ? 24 : 20, 0, 20, chip_type == V33_TYPE ? 14 : 0)
+	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, chip_type == V33_TYPE ? 24 : 20, 0, 20, chip_type == V33_TYPE ? 14 : 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0, internal_port_map)
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
@@ -147,10 +148,13 @@ v30_device::v30_device(const machine_config &mconfig, const char *tag, device_t 
 
 device_memory_interface::space_config_vector nec_common_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
+	space_config_vector spaces = {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_IO,      &m_io_config)
+		};
+	if(has_configured_map(AS_OPCODES))
+		spaces.push_back(std::make_pair(AS_OPCODES, &m_opcodes_config));
+	return spaces;
 }
 
 
@@ -199,7 +203,7 @@ offs_t nec_common_device::v33_translate(offs_t addr)
 
 bool v33_base_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
-	if (spacenum == AS_PROGRAM)
+	if (spacenum == AS_PROGRAM || spacenum == AS_OPCODES)
 		address = v33_translate(address);
 	return true;
 }
@@ -253,7 +257,7 @@ void nec_common_device::do_prefetch(int previous_ICount)
 uint8_t nec_common_device::fetch()
 {
 	prefetch();
-	return m_dr8((Sreg(PS)<<4)+m_ip++);
+	return m_or8((Sreg(PS)<<4)+m_ip++);
 }
 
 uint16_t nec_common_device::fetchword()
@@ -273,7 +277,7 @@ static uint8_t parity_table[256];
 uint8_t nec_common_device::fetchop()
 {
 	prefetch();
-	return m_dr8((Sreg(PS)<<4)+m_ip++);
+	return m_or8((Sreg(PS)<<4)+m_ip++);
 }
 
 
@@ -480,21 +484,22 @@ void nec_common_device::device_start()
 	save_item(NAME(m_prefetch_reset));
 
 	m_program = &space(AS_PROGRAM);
-	if (m_program->data_width() == 8)
+	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
+	if (m_opcodes->data_width() == 8)
 	{
-		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		auto cache = m_opcodes->cache<0, 0, ENDIANNESS_LITTLE>();
+		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
 	}
 	else if (m_chip_type == V33_TYPE)
 	{
 		save_item(NAME(m_xa));
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache, this](offs_t address) -> u8 { return cache->read_byte(v33_translate(address)); };
+		auto cache = m_opcodes->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_or8 = [cache, this](offs_t address) -> u8 { return cache->read_byte(v33_translate(address)); };
 	}
 	else
 	{
-		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		auto cache = m_opcodes->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
 	}
 
 	m_io = &space(AS_IO);

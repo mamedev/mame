@@ -44,7 +44,7 @@ public:
 	auto syndet_handler_cb() { return device().subdevice<v5x_scu_device>("scu")->syndet_handler(); }
 
 protected:
-	device_v5x_interface(const machine_config &mconfig, nec_common_device &device);
+	device_v5x_interface(const machine_config &mconfig, nec_common_device &device, bool is_16bit);
 
 	// device_interface overrides
 	virtual void interface_post_start() override;
@@ -55,6 +55,27 @@ protected:
 	void v5x_add_mconfig(machine_config &config);
 
 	virtual void install_peripheral_io() = 0;
+
+	const int AS_INTERNAL_IO = AS_OPCODES + 1;
+	const u8 INTERNAL_IO_ADDR_WIDTH = (1 << 3);
+	const u8 INTERNAL_IO_ADDR_MASK = (1 << INTERNAL_IO_ADDR_WIDTH) - 1;
+	const u16 OPHA_MASK = INTERNAL_IO_ADDR_MASK << INTERNAL_IO_ADDR_WIDTH;
+
+	inline u16 OPHA() { return (m_OPHA << INTERNAL_IO_ADDR_WIDTH) & OPHA_MASK; }
+	inline u16 io_mask(u8 base) { return 0x00ff << ((base & 1) << 3); }
+	inline bool check_OPHA(offs_t a)
+	{
+		return ((m_OPSEL & OPSEL_MASK) != 0) && (m_OPHA != 0xff) && ((a & OPHA_MASK) == OPHA()); // 256 bytes boundary, ignore system io area
+	}
+
+	inline u8 internal_io_read_byte(offs_t a) { return m_internal_io->read_byte(a & INTERNAL_IO_ADDR_MASK); }
+	inline u16 internal_io_read_word(offs_t a) { return m_internal_io->read_word_unaligned(a & INTERNAL_IO_ADDR_MASK); }
+	inline void internal_io_write_byte(offs_t a, u8 v) { m_internal_io->write_byte(a & INTERNAL_IO_ADDR_MASK, v); }
+	inline void internal_io_write_word(offs_t a, u16 v) { m_internal_io->write_word_unaligned(a & INTERNAL_IO_ADDR_MASK, v); }
+
+	void remappable_io_map(address_map &map);
+	virtual u8 temp_io_byte_r(offs_t offset) = 0;
+	virtual void temp_io_byte_w(offs_t offset, u8 data) = 0;
 
 	DECLARE_WRITE8_MEMBER(BSEL_w) {}
 	DECLARE_WRITE8_MEMBER(BADR_w) {}
@@ -84,12 +105,16 @@ protected:
 	required_device<v5x_icu_device> m_icu;
 	required_device<v5x_scu_device> m_scu;
 
+	address_space_config m_internal_io_config;
+	address_space *m_internal_io;
+
 	enum opsel_mask
 	{
 		OPSEL_DS = 0x01, // dmau enabled
 		OPSEL_IS = 0x02, // icu enabled
 		OPSEL_TS = 0x04, // tcu enabled
 		OPSEL_SS = 0x08, // scu enabled
+		OPSEL_MASK = OPSEL_DS | OPSEL_IS | OPSEL_TS | OPSEL_SS
 	};
 	u8 m_OPSEL;
 
@@ -116,6 +141,17 @@ protected:
 
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+	virtual u8 temp_io_byte_r(offs_t offset) override { return nec_common_device::io_read_byte(OPHA() | (offset & INTERNAL_IO_ADDR_MASK)); }
+	virtual void temp_io_byte_w(offs_t offset, u8 data) override { nec_common_device::io_write_byte(OPHA() | (offset & INTERNAL_IO_ADDR_MASK), data); }
+
+	virtual u8 io_read_byte(offs_t a) override;
+	virtual u16 io_read_word(offs_t a) override;
+	virtual void io_write_byte(offs_t a, u8 v) override;
+	virtual void io_write_word(offs_t a, u16 v) override;
 
 	void internal_port_map(address_map &map);
 
@@ -172,6 +208,17 @@ protected:
 
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+	virtual u8 temp_io_byte_r(offs_t offset) override { return nec_common_device::io_read_byte(OPHA() | (offset & INTERNAL_IO_ADDR_MASK)); }
+	virtual void temp_io_byte_w(offs_t offset, u8 data) override { nec_common_device::io_write_byte(OPHA() | (offset & INTERNAL_IO_ADDR_MASK), data); }
+
+	virtual u8 io_read_byte(offs_t a) override;
+	virtual u16 io_read_word(offs_t a) override;
+	virtual void io_write_byte(offs_t a, u8 v) override;
+	virtual void io_write_word(offs_t a, u16 v) override;
 
 	void internal_port_map(address_map &map);
 	virtual void install_peripheral_io() override;

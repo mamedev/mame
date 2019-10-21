@@ -75,9 +75,12 @@ WRITE8_MEMBER(device_v5x_interface::DULA_w)
 WRITE8_MEMBER(device_v5x_interface::OPHA_w)
 {
 	if (VERBOSE)
+	{
 		device().logerror("OPHA_w %02x\n", data);
+		if (data == 0xff)
+			device().logerror("OPHA is mapped in system IO area!\n", data);
+	}
 	m_OPHA = data;
-	install_peripheral_io();
 }
 
 WRITE8_MEMBER(device_v5x_interface::OPSEL_w)
@@ -157,13 +160,72 @@ void device_v5x_interface::v5x_add_mconfig(machine_config &config)
 	V5X_SCU(config, m_scu, 0);
 }
 
-device_v5x_interface::device_v5x_interface(const machine_config &mconfig, nec_common_device &device)
+void device_v5x_interface::remappable_io_map(address_map &map)
+{
+	map(0, INTERNAL_IO_ADDR_MASK).rw(FUNC(device_v5x_interface::temp_io_byte_r), FUNC(device_v5x_interface::temp_io_byte_w));
+}
+
+device_v5x_interface::device_v5x_interface(const machine_config &mconfig, nec_common_device &device, bool is_16bit)
 	: device_interface(device, "v5x")
 	, m_tcu(device, "tcu")
 	, m_dmau(device, "dmau")
 	, m_icu(device, "icu")
 	, m_scu(device, "scu")
+	, m_internal_io_config("internal_io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, INTERNAL_IO_ADDR_WIDTH, 0, address_map_constructor(FUNC(device_v5x_interface::remappable_io_map), this))
 {
+}
+
+
+u8 v50_base_device::io_read_byte(offs_t a)
+{
+	if (check_OPHA(a))
+		return device_v5x_interface::internal_io_read_byte(a);
+	else
+		return nec_common_device::io_read_byte(a);
+}
+
+u16 v50_base_device::io_read_word(offs_t a)
+{
+	if (check_OPHA(a))
+	{
+		if ((a & INTERNAL_IO_ADDR_MASK) == INTERNAL_IO_ADDR_MASK)
+		{
+			return (device_v5x_interface::internal_io_read_byte(a) & 0x00ff)
+				| ((nec_common_device::io_read_byte(a + 1) << 8) & 0xff00);
+		}
+		else
+			return device_v5x_interface::internal_io_read_word(a);
+	}
+	else
+		return nec_common_device::io_read_word(a);
+}
+
+void v50_base_device::io_write_byte(offs_t a, u8 v)
+{
+	if (check_OPHA(a))
+	{
+		device_v5x_interface::internal_io_write_byte(a, v);
+	}
+	else
+		nec_common_device::io_write_byte(a, v);
+}
+
+void v50_base_device::io_write_word(offs_t a, u16 v)
+{
+	if (check_OPHA(a))
+	{
+		if ((a & INTERNAL_IO_ADDR_MASK) == INTERNAL_IO_ADDR_MASK)
+		{
+			device_v5x_interface::internal_io_write_byte(a, v & 0xff);
+			nec_common_device::io_write_byte(a + 1, (v >> 8) & 0xff);
+		}
+		else
+		{
+			device_v5x_interface::internal_io_write_word(a, v);
+		}
+	}
+	else
+		nec_common_device::io_write_word(a, v);
 }
 
 
@@ -193,6 +255,7 @@ void v50_base_device::device_reset()
 void v50_base_device::device_start()
 {
 	nec_common_device::device_start();
+	m_internal_io = &space(AS_INTERNAL_IO);
 
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(v5x_icu_device::inta_cb), m_icu.target()));
 
@@ -202,40 +265,47 @@ void v50_base_device::device_start()
 void v40_device::install_peripheral_io()
 {
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
-	space(AS_IO).unmap_readwrite(0x1000, 0xfeff);
+	space(AS_INTERNAL_IO).unmap_readwrite(0, INTERNAL_IO_ADDR_MASK);
+	space(AS_INTERNAL_IO).install_readwrite_handler(0, INTERNAL_IO_ADDR_MASK,
+		read8sm_delegate(FUNC(v40_device::temp_io_byte_r), this),
+		write8sm_delegate(FUNC(v40_device::temp_io_byte_w), this));
 
 	if (m_OPSEL & OPSEL_DS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_DULA) & 0xfff0;
+		u16 const base = m_DULA & INTERNAL_IO_ADDR_MASK;
 
-		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x0f,
+		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x0f, base | 0x0f);
+		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x0f, base | 0x0f,
 			read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
 			write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()));
 	}
 
 	if (m_OPSEL & OPSEL_IS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_IULA) & 0xfff0;
+		u16 const base = m_IULA & INTERNAL_IO_ADDR_MASK;
 
-		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x01,
+		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x01, base | 0x01);
+		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x01, base | 0x01,
 			read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
 			write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()));
 	}
 
 	if (m_OPSEL & OPSEL_TS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_TULA) & 0xfff0;
+		u16 const base = m_TULA & INTERNAL_IO_ADDR_MASK;
 
-		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
+		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
+		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
 			read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
 			write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()));
 	}
 
 	if (m_OPSEL & OPSEL_SS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_SULA) & 0xfff0;
+		u16 const base = m_SULA & INTERNAL_IO_ADDR_MASK;
 
-		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
+		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
+		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
 			read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
 			write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()));
 	}
@@ -244,42 +314,49 @@ void v40_device::install_peripheral_io()
 void v50_device::install_peripheral_io()
 {
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
-	space(AS_IO).unmap_readwrite(0x1000, 0xfeff);
+	space(AS_INTERNAL_IO).unmap_readwrite(0, INTERNAL_IO_ADDR_MASK);
+	space(AS_INTERNAL_IO).install_readwrite_handler(0, INTERNAL_IO_ADDR_MASK,
+		read8sm_delegate(FUNC(v50_device::temp_io_byte_r), this),
+		write8sm_delegate(FUNC(v50_device::temp_io_byte_w), this));
 
 	if (m_OPSEL & OPSEL_DS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_DULA) & 0xfffe;
+		u16 const base = m_DULA & INTERNAL_IO_ADDR_MASK;
 
-		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x0f,
+		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x0f, base | 0x0f);
+		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x0f, base | 0x0f,
 			read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
 			write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
 	}
 
 	if (m_OPSEL & OPSEL_IS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_IULA) & 0xfffe;
+		u16 const base = m_IULA & INTERNAL_IO_ADDR_MASK;
 
-		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
+		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
+		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
 			read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-			write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), 0x00ff);
+			write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), io_mask(base));
 	}
 
 	if (m_OPSEL & OPSEL_TS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_TULA) & 0xfffe;
+		u16 const base = m_TULA & INTERNAL_IO_ADDR_MASK;
 
-		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x07,
+		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x07, base | 0x07);
+		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x07, base | 0x07,
 			read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-			write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), 0x00ff);
+			write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), io_mask(base));
 	}
 
 	if (m_OPSEL & OPSEL_SS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_SULA) & 0xfffe;
+		u16 const base = m_SULA & INTERNAL_IO_ADDR_MASK;
 
-		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x07,
+		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x07, base | 0x07);
+		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x07, base | 0x07,
 			read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-			write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), 0x00ff);
+			write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), io_mask(base));
 	}
 }
 
@@ -315,9 +392,21 @@ void v50_base_device::device_add_mconfig(machine_config &config)
 	m_tcu->out_handler<0>().set(m_icu, FUNC(pic8259_device::ir0_w));
 }
 
+device_memory_interface::space_config_vector v50_base_device::memory_space_config() const
+{
+	space_config_vector spaces = {
+			std::make_pair(AS_PROGRAM,     &m_program_config),
+			std::make_pair(AS_IO,          &m_io_config),
+			std::make_pair(AS_INTERNAL_IO, &m_internal_io_config)
+		};
+	if(has_configured_map(AS_OPCODES))
+		spaces.push_back(std::make_pair(AS_OPCODES, &m_opcodes_config));
+	return spaces;
+}
+
 v50_base_device::v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
 	: nec_common_device(mconfig, type, tag, owner, clock, is_16bit, prefetch_size, prefetch_cycles, chip_type, address_map_constructor(FUNC(v50_base_device::internal_port_map), this))
-	, device_v5x_interface(mconfig, *this)
+	, device_v5x_interface(mconfig, *this, is_16bit)
 {
 }
 
@@ -329,6 +418,58 @@ v40_device::v40_device(const machine_config &mconfig, const char *tag, device_t 
 v50_device::v50_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: v50_base_device(mconfig, V50, tag, owner, clock, true, 6, 2, V30_TYPE)
 {
+}
+
+u8 v53_device::io_read_byte(offs_t a)
+{
+	if (check_OPHA(a))
+		return device_v5x_interface::internal_io_read_byte(a);
+	else
+		return nec_common_device::io_read_byte(a);
+}
+
+u16 v53_device::io_read_word(offs_t a)
+{
+	if (check_OPHA(a))
+	{
+		if ((a & INTERNAL_IO_ADDR_MASK) == INTERNAL_IO_ADDR_MASK)
+		{
+			return (device_v5x_interface::internal_io_read_byte(a) & 0x00ff)
+				| ((nec_common_device::io_read_byte(a + 1) << 8) & 0xff00);
+		}
+		else
+			return device_v5x_interface::internal_io_read_word(a);
+	}
+	else
+		return nec_common_device::io_read_word(a);
+}
+
+void v53_device::io_write_byte(offs_t a, u8 v)
+{
+	if (check_OPHA(a))
+	{
+		device_v5x_interface::internal_io_write_byte(a, v);
+	}
+	else
+		nec_common_device::io_write_byte(a, v);
+}
+
+void v53_device::io_write_word(offs_t a, u16 v)
+{
+	if (check_OPHA(a))
+	{
+		if ((a & INTERNAL_IO_ADDR_MASK) == INTERNAL_IO_ADDR_MASK)
+		{
+			device_v5x_interface::internal_io_write_byte(a, v & 0xff);
+			nec_common_device::io_write_byte(a + 1, (v >> 8) & 0xff);
+		}
+		else
+		{
+			device_v5x_interface::internal_io_write_word(a, v);
+		}
+	}
+	else
+		nec_common_device::io_write_word(a, v);
 }
 
 
@@ -358,6 +499,7 @@ void v53_device::device_reset()
 void v53_device::device_start()
 {
 	v33_base_device::device_start();
+	m_internal_io = &space(AS_INTERNAL_IO);
 
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(v5x_icu_device::inta_cb), m_icu.target()));
 
@@ -367,73 +509,99 @@ void v53_device::device_start()
 void v53_device::install_peripheral_io()
 {
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
-	space(AS_IO).unmap_readwrite(0x1000, 0xfeff);
+	space(AS_INTERNAL_IO).unmap_readwrite(0, INTERNAL_IO_ADDR_MASK);
+	space(AS_INTERNAL_IO).install_readwrite_handler(0, INTERNAL_IO_ADDR_MASK,
+		read8sm_delegate(FUNC(v53_device::temp_io_byte_r), this),
+		write8sm_delegate(FUNC(v53_device::temp_io_byte_w), this));
 
 	// IOAG determines if the handlers used 8-bit or 16-bit access
-	// the hng64.c games first set everything up in 8-bit mode, then
+	// the hng64.cpp games first set everything up in 8-bit mode, then
 	// do the procedure again in 16-bit mode before using them?!
 
-	int const IOAG = m_SCTL & 1;
+	bool const IOAG = m_SCTL & 1;
 
 	if (m_OPSEL & OPSEL_DS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_DULA) & 0xfffe;
+		u16 const base = m_DULA & INTERNAL_IO_ADDR_MASK;
 
 		if (m_SCTL & 0x02) // uPD71037 mode
 		{
 			if (IOAG) // 8-bit
 			{
+				space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x0f, base | 0x0f);
 			}
 			else
 			{
+				space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x1f, base | 0x1f);
 			}
 		}
 		else // uPD71071 mode
-			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x0f,
+		{
+			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x0f, base | 0x0f);
+			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x0f, base | 0x0f,
 				read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
 				write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
+		}
 	}
 
 	if (m_OPSEL & OPSEL_IS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_IULA) & 0xfffe;
+		u16 const base = m_IULA & INTERNAL_IO_ADDR_MASK;
 
 		if (IOAG) // 8-bit
-			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x01,
+		{
+			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x01, base | 0x01);
+			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x01, base | 0x01,
 				read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
 				write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), 0xffff);
+		}
 		else
-			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
+		{
+			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
+			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
 				read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-				write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), 0x00ff);
+				write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), io_mask(base));
+		}
 	}
 
 	if (m_OPSEL & OPSEL_TS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_TULA) & 0xfffe;
+		u16 const base = m_TULA & INTERNAL_IO_ADDR_MASK;
 
 		if (IOAG) // 8-bit
-			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
+		{
+			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
+			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
 				read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
 				write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), 0xffff);
+		}
 		else
-			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x07,
+		{
+			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x07, base | 0x07);
+			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x07, base | 0x07,
 				read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-				write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), 0x00ff);
+				write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), io_mask(base));
+		}
 	}
 
 	if (m_OPSEL & OPSEL_SS)
 	{
-		u16 const base = ((m_OPHA << 8) | m_SULA) & 0xfffe;
+		u16 const base = m_SULA & INTERNAL_IO_ADDR_MASK;
 
 		if (IOAG) // 8-bit
-			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
+		{
+			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
+			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
 				read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
 				write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), 0xffff);
+		}
 		else
-			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x07,
+		{
+			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x07, base | 0x07);
+			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x07, base | 0x07,
 				read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-				write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), 0x00ff);
+				write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), io_mask(base));
+		}
 	}
 }
 
@@ -486,9 +654,21 @@ void v53_device::device_add_mconfig(machine_config &config)
 	v5x_add_mconfig(config);
 }
 
+device_memory_interface::space_config_vector v53_device::memory_space_config() const
+{
+	space_config_vector spaces = {
+			std::make_pair(AS_PROGRAM,     &m_program_config),
+			std::make_pair(AS_IO,          &m_io_config),
+			std::make_pair(AS_INTERNAL_IO, &m_internal_io_config)
+		};
+	if(has_configured_map(AS_OPCODES))
+		spaces.push_back(std::make_pair(AS_OPCODES, &m_opcodes_config));
+	return spaces;
+}
+
 v53_device::v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: v33_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(v53_device::internal_port_map), this))
-	, device_v5x_interface(mconfig, *this)
+	, device_v5x_interface(mconfig, *this, true)
 {
 }
 
