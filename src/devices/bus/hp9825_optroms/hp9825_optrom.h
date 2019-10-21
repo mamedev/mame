@@ -39,7 +39,7 @@ public:
 	hp9825_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~hp9825_optrom_slot_device();
 
-	void set_rom_limit(offs_t rom_limit);
+	void set_rom_limit(offs_t rom_limit) { m_rom_limit = rom_limit; }
 
 	void install_rw_handlers(address_space *space_r , address_space *space_w);
 

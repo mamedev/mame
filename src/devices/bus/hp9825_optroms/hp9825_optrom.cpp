@@ -19,23 +19,23 @@
 DEFINE_DEVICE_TYPE(HP9825_OPTROM_CART, hp9825_optrom_cart_device, "hp9825_optrom_cart", "HP9825 optional ROM cartridge")
 DEFINE_DEVICE_TYPE(HP9825_OPTROM_SLOT, hp9825_optrom_slot_device, "hp9825_optrom_slot", "HP9825 optional ROM slot")
 
-struct optrom_region_t {
+struct optrom_region {
 	offs_t m_start;
 	offs_t m_size;
 	const char *m_tag;
 };
 
-constexpr std::array<struct optrom_region_t , 8> region_tab =
-	{
-	 0x3000 , 0x400 , "rom3000" ,
-	 0x3400 , 0x400 , "rom3400" ,
-	 0x3800 , 0x400 , "rom3800" ,
-	 0x3c00 , 0x400 , "rom3c00" ,
-	 0x4000 , 0x400 , "rom4000" ,
-	 0x4400 , 0x800 , "rom4400" ,
-	 0x4c00 , 0x400 , "rom4c00" ,
-	 0x5c00 ,0x2000 , "rom5c00"
-	};
+constexpr std::array<struct optrom_region , 8> region_tab =
+	{{
+	  { 0x3000 , 0x400 , "rom3000" },
+	  { 0x3400 , 0x400 , "rom3400" },
+	  { 0x3800 , 0x400 , "rom3800" },
+	  { 0x3c00 , 0x400 , "rom3c00" },
+	  { 0x4000 , 0x400 , "rom4000" },
+	  { 0x4400 , 0x800 , "rom4400" },
+	  { 0x4c00 , 0x400 , "rom4c00" },
+	  { 0x5c00 ,0x2000 , "rom5c00" }
+	}};
 
 // +-------------------------+
 // |hp9825_optrom_cart_device|
@@ -57,10 +57,6 @@ hp9825_optrom_cart_device::hp9825_optrom_cart_device(const machine_config &mconf
 hp9825_optrom_slot_device::hp9825_optrom_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
 	: hp9825_optrom_slot_device(mconfig, tag, owner, (uint32_t)0)
 {
-	option_reset();
-	option_add_internal("rom", HP9825_OPTROM_CART);
-	set_default_option(nullptr);
-	set_fixed(false);
 }
 
 hp9825_optrom_slot_device::hp9825_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -73,15 +69,14 @@ hp9825_optrom_slot_device::hp9825_optrom_slot_device(const machine_config &mconf
 	, m_space_r(nullptr)
 	, m_bank(*this , "rombank")
 {
+	option_reset();
+	option_add_internal("rom", HP9825_OPTROM_CART);
+	set_default_option(nullptr);
+	set_fixed(false);
 }
 
 hp9825_optrom_slot_device::~hp9825_optrom_slot_device()
 {
-}
-
-void hp9825_optrom_slot_device::set_rom_limit(offs_t rom_limit)
-{
-	m_rom_limit = rom_limit;
 }
 
 void hp9825_optrom_slot_device::install_rw_handlers(address_space *space_r , address_space *space_w)
@@ -92,7 +87,7 @@ void hp9825_optrom_slot_device::install_rw_handlers(address_space *space_r , add
 
 	unsigned mask = 1;
 
-	for (const struct optrom_region_t& reg : region_tab) {
+	for (const struct optrom_region& reg : region_tab) {
 		uint8_t *ptr = get_software_region(reg.m_tag);
 		if (ptr != nullptr) {
 			LOG("%s loaded\n" , reg.m_tag);
@@ -136,7 +131,7 @@ image_init_result hp9825_optrom_slot_device::call_load()
 		return image_init_result::FAIL;
 	}
 
-	for (const struct optrom_region_t& reg : region_tab) {
+	for (const struct optrom_region& reg : region_tab) {
 		auto len = get_software_region_length(reg.m_tag) / 2;
 		if (len != 0) {
 			if (len != reg.m_size) {
@@ -159,7 +154,7 @@ void hp9825_optrom_slot_device::call_unload()
 	if (m_space_r != nullptr && m_loaded_regions) {
 		unsigned mask = 1;
 
-		for (const struct optrom_region_t& reg : region_tab) {
+		for (const struct optrom_region& reg : region_tab) {
 			if (m_loaded_regions & mask) {
 				if (reg.m_start == 0x5c00) {
 					m_space_r->unmap_read(0x3000 , 0x33ff);
