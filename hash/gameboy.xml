@@ -2242,7 +2242,7 @@
 	</software>
 
 	<software name="bionicc">
-		<description>Bionic Commando (Euro, Chi)</description>
+		<description>Bionic Commando (Europe, China)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-BO-FAH, DMG-BO-UKV, DMG-202 CHN"/>
@@ -2388,10 +2388,11 @@
 	</software>
 
 	<software name="bmastjr">
-		<description>Blaster Master Jr. (Euro, Chi)</description>
+		<description>Blaster Master Jr. (Europe, China)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-115 CHN"/>
+		<info name="alt_title" value="BLASTER MASTER Jr. 炸弹王2·炸彈王2"/>
 		<sharedfeat name="compatibility" value="GB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-M11"/>
@@ -2405,14 +2406,13 @@
 	</software>
 
 	<software name="blockkuz">
-		<!-- Notes: SGB enhanced -->
 		<description>Block Kuzushi GB (Japan)</description>
 		<year>1995</year>
 		<publisher>Planning Office WADA</publisher>
 		<info name="serial" value="DMG-ABKJ-JPN"/>
 		<info name="release" value="19951229"/>
 		<info name="alt_title" value="ブロックくずしGB"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -2610,14 +2610,13 @@
 	</software>
 
 	<software name="bombcoll">
-		<!-- Notes: SGB enhanced -->
 		<description>Bomberman Collection (Japan)</description>
 		<year>1996</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-ABCJ-JPN"/>
 		<info name="release" value="19960721"/>
 		<info name="alt_title" value="ボンバーマンコレクション"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-M-BFAN-01"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -2630,12 +2629,11 @@
 	</software>
 
 	<software name="bombman">
-		<!-- Notes: SGB enhanced -->
 		<description>Bomberman GB (Europe, USA)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AB2E-USA, DMG-AB2P-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -2648,14 +2646,13 @@
 	</software>
 
 	<software name="bombmanj" cloneof="warblast">
-		<!-- Notes: SGB enhanced -->
 		<description>Bomberman GB (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-EEJ"/>
 		<info name="release" value="19940810"/>
 		<info name="alt_title" value="ボンバーマンGB"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -2668,14 +2665,13 @@
 	</software>
 
 	<software name="bombman2" cloneof="bombman">
-		<!-- Notes: SGB enhanced -->
 		<description>Bomberman GB 2 (Japan, China)</description>
 		<year>1995</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AB2J-JPN, DMG-217 CHN"/>
 		<info name="release" value="19950810"/>
 		<info name="alt_title" value="ボンバーマンGB2 (Japan), BOMBER MAN GB2 爆爆人GB2 (China)"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-M14"/>
 			<feature name="u1" value="U1 MBC1"/>
@@ -2695,7 +2691,7 @@
 		<info name="serial" value="DMG-AB3J-JPN"/>
 		<info name="release" value="19961202"/>
 		<info name="alt_title" value="ボンバーマンGB3"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -2719,12 +2715,11 @@
 	</software>
 
 	<software name="bonk2" cloneof="bckid2">
-		<!-- Notes: SGB enhanced -->
 		<description>Bonk's Revenge (USA)</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-RJ-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -2888,12 +2883,11 @@
 	</software>
 
 	<software name="braindrn">
-		<!-- Notes: SGB enhanced -->
 		<description>Brain Drain (Europe)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-ABRP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -2919,12 +2913,11 @@
 	</software>
 
 	<software name="braindrnu" cloneof="braindrn">
-		<!-- Notes: SGB enhanced -->
 		<description>Brain Drain (USA)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-ABRE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -3093,12 +3086,11 @@
 	</software>
 
 	<software name="bubsy2">
-		<!-- Notes: SGB enhanced -->
 		<description>Bubsy II (Europe)</description>
 		<year>1994</year>
 		<publisher>Telstar</publisher>
 		<info name="serial" value="DMG-ABBP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -3111,12 +3103,11 @@
 	</software>
 
 	<software name="bubsy2u" cloneof="bubsy2">
-		<!-- Notes: SGB enhanced -->
 		<description>Bubsy II (USA)</description>
 		<year>1998</year>
 		<publisher>Accolade</publisher>
 		<info name="serial" value="DMG-ABBE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -3126,14 +3117,13 @@
 	</software>
 
 	<software name="bugsbcol">
-		<!-- Notes: SGB enhanced -->
 		<description>Bugs Bunny Collection (Japan, Rev. 1)</description>
 		<year>1997</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-AWBJ-JPN"/>
 		<info name="release" value="19971219"/>
 		<info name="alt_title" value="バックス・バニー コレクション"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -3143,14 +3133,13 @@
 	</software>
 
 	<software name="bugsbcola" cloneof="bugsbcol">
-		<!-- Notes: SGB enhanced -->
 		<description>Bugs Bunny Collection (Japan)</description>
 		<year>1997</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-AWBJ-JPN"/>
 		<info name="release" value="19971219"/>
 		<info name="alt_title" value="バックス・バニー コレクション"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -3383,7 +3372,7 @@
 	</software>
 
 	<software name="caesarsu" cloneof="caesars">
-		<description>Caesars Palace (USA, Rev. A)</description>
+		<description>Caesars Palace (USA, Rev. 1)</description>
 		<year>1991</year>
 		<publisher>Arcadia Systems</publisher>
 		<info name="serial" value="DMG-CE-USA-1"/>
@@ -3447,14 +3436,13 @@
 	</software>
 
 	<software name="ctsubaj">
-		<!-- Notes: SGB enhanced -->
 		<description>Captain Tsubasa J - Zenkoku Seiha e no Chousen (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ACTJ-JPN"/>
 		<info name="release" value="19950914"/>
 		<info name="alt_title" value="キャプテン翼J 全国制覇への挑戦"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -3629,12 +3617,11 @@
 	</software>
 
 	<software name="cvanialg">
-		<!-- Notes: SGB enhanced -->
 		<description>Castlevania Legends (Europe, USA)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ADNE-USA, DMG-ADNP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -3677,12 +3664,11 @@
 	</software>
 
 	<software name="centipedm" cloneof="centiped">
-		<!-- Notes: SGB enhanced -->
 		<description>Centipede (USA, Majesco)</description>
 		<year>1998</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="DMG-AC4E-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -3833,7 +3819,7 @@
 	</software>
 
 	<software name="chessmstu" cloneof="chessmst">
-		<description>The Chessmaster (USA, Rev. A)</description>
+		<description>The Chessmaster (USA, Rev. 1)</description>
 		<year>1991</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="DMG-EM-USA?"/>
@@ -3868,7 +3854,7 @@
 		<info name="serial" value="DMG-ACMJ-JPN"/>
 		<info name="release" value="19950526"/>
 		<info name="alt_title" value="ちびまる子ちゃん まる子デラックス劇場"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -4062,14 +4048,13 @@
 	</software>
 
 	<software name="mazemon">
-		<!-- Notes: SGB enhanced -->
 		<description>Chou Mashin Eiyuu Den Wataru - Mazekko Monster (Japan)</description>
 		<year>1997</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-AWAJ-JPN"/>
 		<info name="release" value="19971212"/>
 		<info name="alt_title" value="超魔神英雄伝ワタル まぜっこモンスター"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -4094,7 +4079,7 @@
 		<info name="serial" value="DMG-AWMJ-JPN"/>
 		<info name="release" value="19980807"/>
 		<info name="alt_title" value="超魔神英雄伝ワタル まぜっこモンスター2"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -4113,14 +4098,13 @@
 
 	<!-- Game cart has an integrated infrared port for multiplayer play. -->
 	<software name="spinner">
-		<!-- Notes: SGB enhanced -->
 		<description>Chousoku Spinner (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AYYJ-JPN"/>
 		<info name="release" value="19980918"/>
 		<info name="alt_title" value="超速スピナー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-TEDN-01"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -4172,14 +4156,13 @@
 	</software>
 
 	<software name="collpock">
-		<!-- Notes: SGB enhanced -->
 		<description>Collection Pocket (Japan)</description>
 		<year>1997</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="DMG-ACOJ-JPN"/>
 		<info name="release" value="19971121"/>
 		<info name="alt_title" value="コレクションポケット"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -4219,12 +4202,11 @@
 	</software>
 
 	<software name="contraaw" cloneof="probot2">
-		<!-- Notes: SGB enhanced -->
 		<description>Contra - The Alien Wars (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ACSE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -4234,14 +4216,13 @@
 	</software>
 
 	<software name="contrasp" cloneof="probot2">
-		<!-- Notes: SGB enhanced -->
 		<description>Contra Spirits (Japan)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ACSJ-JPN"/>
 		<info name="release" value="19940923"/>
 		<info name="alt_title" value="魂斗羅スピリッツ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -4386,14 +4367,13 @@
 	</software>
 
 	<software name="crayoncl">
-		<!-- Notes: SGB enhanced -->
 		<description>Crayon Shin-chan - Ora no Gokigen Collection (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AK5J-JPN"/>
 		<info name="release" value="19961202"/>
 		<info name="alt_title" value="クレヨンしんちゃん −オラのごきげんコレクション−"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -4457,14 +4437,13 @@
 	</software>
 
 	<software name="crayon4">
-		<!-- Notes: SGB enhanced -->
 		<description>Crayon Shin-chan 4 - Ora no Itazura Daihenshin (Japan)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-H9J"/>
 		<info name="release" value="19940826"/>
 		<info name="alt_title" value="クレヨンしんちゃん4 ゛オラのいたずら大変身″"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -4565,12 +4544,11 @@
 	</software>
 
 	<software name="daffy">
-		<!-- Notes: SGB enhanced -->
 		<description>Daffy Duck - The Marvin Missions (USA)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-YS-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -4583,14 +4561,13 @@
 	</software>
 
 	<software name="daffyj" cloneof="daffy">
-		<!-- Notes: SGB enhanced -->
 		<description>Daffy Duck - The Marvin Missions (Japan)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-YSA"/>
 		<info name="release" value="19940930"/>
 		<info name="alt_title" value="ルーニー・テューンズシリーズ ダフィー・ダック ~ Looney Tunes Series - Daffy Duck (Box)"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -4600,12 +4577,11 @@
 	</software>
 
 	<software name="daffye" cloneof="daffy">
-		<!-- Notes: SGB enhanced -->
 		<description>Daffy Duck - The Marvin Missions (Europe)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-YS-NOE, DMG-YS-NOE-1"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02"/>   <!-- Also with DMG-BEAN-10 and DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG"/>
@@ -4618,14 +4594,13 @@
 	</software>
 
 	<software name="srobot2">
-		<!-- Notes: SGB enhanced -->
 		<description>Dai-2-ji Super Robot Taisen G (Japan)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-AG2J-JPN"/>
 		<info name="release" value="19950630"/>
 		<info name="alt_title" value="第2次スーパーロボット大戦G"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -4648,14 +4623,13 @@
 	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
 	-->
 	<software name="miraclzn">
-		<!-- Notes: SGB enhanced -->
 		<description>Daikaijuu Monogatari - The Miracle of the Zone (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AMZJ-JPN"/>
 		<info name="release" value="19980305"/>
 		<info name="alt_title" value="大貝獣物語 ザ・ミラクル オブ ザ・ゾーン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-TEDN-01"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -4909,12 +4883,11 @@
 	</software>
 
 	<software name="dstrikeu" cloneof="dstrike">
-		<!-- Notes: SGB enhanced -->
 		<description>Desert Strike - Return to the Gulf (USA)</description>
 		<year>1995</year>
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-ADSE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -5042,14 +5015,13 @@
 	</software>
 
 	<software name="dinobrd2">
-		<!-- Notes: SGB enhanced -->
 		<description>Dino Breeder 2 (Japan)</description>
 		<year>1998</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-A2DJ-JPN"/>
 		<info name="release" value="19980605"/>
 		<info name="alt_title" value="ディノブリーダー2"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -5125,7 +5097,7 @@
 
 	<software name="dkonga" cloneof="dkong">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
-		<description>Donkey Kong (Jpn, USA)</description>
+		<description>Donkey Kong (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-QDA, DMG-QD-USA"/>
@@ -5235,12 +5207,11 @@
 	</software>
 
 	<software name="dkland3a" cloneof="dkland3">
-		<!-- Notes: SGB enhanced -->
 		<description>Donkey Kong Land III (Europe, USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AD3E-USA, DMG-AD3P-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>  <!-- EUR carts -->
 			<feature name="u1" value="U1 PRG"/>
@@ -5258,11 +5229,10 @@
 	</software>
 
 	<software name="dkland3p" cloneof="dkland3">
-		<!-- Notes: SGB enhanced -->
 		<description>Donkey Kong Land III (prototype)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -5319,7 +5289,7 @@
 		<info name="serial" value="DMG-ADRJ-JPN"/>
 		<info name="release" value="19980320"/>
 		<info name="alt_title" value="ドラえもんカート"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-GDAN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -5343,7 +5313,7 @@
 		<info name="serial" value="DMG-ADPJ-JPN"/>
 		<info name="release" value="19981127"/>
 		<info name="alt_title" value="ドラえもんのGAMEBOYであそぼうよデラックス10"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="262144">
@@ -5752,14 +5722,13 @@
 	</software>
 
 	<software name="dbzgeki" supported="partial">
-		<!-- Notes: SGB enhanced -->
 		<description>Dragon Ball Z - Gokuu Gekitouden (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AZ2J-JPN"/>
 		<info name="release" value="19950825"/>
 		<info name="alt_title" value="ドラゴンボールZ 悟空激闘伝"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -5771,14 +5740,13 @@
 	</software>
 
 	<software name="dbzhisho">
-		<!-- Notes: SGB enhanced -->
 		<description>Dragon Ball Z - Goku Hishouden (Japan)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ADBJ-JPN"/>
 		<info name="release" value="19941125"/>
 		<info name="alt_title" value="ドラゴンボールZ 悟空飛翔伝"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="262144">
@@ -6518,7 +6486,7 @@
 	</software>
 
 	<software name="fastlap">
-		<description>Fastest Lap (Jpn, USA)</description>
+		<description>Fastest Lap (Japan, USA)</description>
 		<year>1991</year>
 		<publisher>Vap ~ NTVIC</publisher>
 		<info name="serial" value="DMG-F2A, DMG-F2-USA"/>
@@ -6617,12 +6585,11 @@
 	</software>
 
 	<software name="fifa">
-		<!-- Notes: SGB enhanced -->
 		<description>FIFA International Soccer (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-AFSE-USA, DMG-AFSP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -6632,12 +6599,11 @@
 	</software>
 
 	<software name="fifa98">
-		<!-- Notes: SGB enhanced -->
 		<description>FIFA Road to the World Cup '98 (Euro, Rev. A)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8SP-EUU"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -6650,12 +6616,11 @@
 	</software>
 
 	<software name="fifa98a" cloneof="fifa98">
-		<!-- Notes: SGB enhanced -->
 		<description>FIFA Road to the World Cup '98 (Europe)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8SP-EUU, DMG-A8SP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -6685,12 +6650,11 @@
 	</software>
 
 	<software name="fifa97">
-		<!-- Notes: SGB enhanced -->
 		<description>FIFA Soccer '97 (Europe, USA)</description>
 		<year>1997</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A7SE-USA, DMG-A7SP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -7089,14 +7053,13 @@
 	</software>
 
 	<software name="slamdunk">
-		<!-- Notes: SGB enhanced -->
 		<description>From TV Animation Slam Dunk - Gakeppuchi no Kesshou League (Japan)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-HXJ"/>
 		<info name="release" value="19940811"/>
 		<info name="alt_title" value="テレビアニメ スラムダンク がけっぷちの決勝リーグ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7109,14 +7072,13 @@
 	</software>
 
 	<software name="slamdnk2">
-		<!-- Notes: SGB enhanced -->
 		<description>From TV Animation Slam Dunk 2 - Zenkoku e no Tip Off (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AS2J-JPN"/>
 		<info name="release" value="19950317"/>
 		<info name="alt_title" value="テレビアニメ スラムダンク 2 全国へのTIPOFF"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -7165,7 +7127,7 @@
 		<info name="serial" value="DMG-AFDJ-JPN"/>
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="不思議のダンジョン 風来のシレンGB 月影村の怪物"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DEDN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7183,14 +7145,13 @@
 	</software>
 
 	<software name="galagag">
-		<!-- Notes: SGB enhanced -->
 		<description>Galaga &amp; Galaxian (Japan)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-AGCJ-JPN"/>
 		<info name="release" value="19950714"/>
 		<info name="alt_title" value="ギャラガ&amp;ギャラクシアン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -7200,12 +7161,11 @@
 	</software>
 
 	<software name="gwatch">
-		<!-- Notes: SGB enhanced -->
 		<description>Game &amp; Watch Gallery (Europe)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7223,12 +7183,11 @@
 	</software>
 
 	<software name="gwatchu" cloneof="gwatch">
-		<!-- Notes: SGB enhanced -->
 		<description>Game &amp; Watch Gallery (USA, Rev. A)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -7240,12 +7199,11 @@
 	</software>
 
 	<software name="gwatchua" cloneof="gwatch">
-		<!-- Notes: SGB enhanced -->
 		<description>Game &amp; Watch Gallery (USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -7293,7 +7251,7 @@
 		<info name="serial" value="DMG-AGAJ-JPN"/>
 		<info name="release" value="19970201"/>
 		<info name="alt_title" value="ゲームボーイギャラリー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7311,12 +7269,11 @@
 	</software>
 
 	<software name="gbgall2a" cloneof="gwatch">
-		<!-- Notes: SGB enhanced -->
 		<description>Game Boy Gallery 2 (Australia)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAU-AUS"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7341,7 +7298,7 @@
 		<info name="serial" value="DMG-AGIJ-JPN"/>
 		<info name="release" value="19970927"/>
 		<info name="alt_title" value="ゲームボーイギャラリー2"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7448,15 +7405,14 @@
 	</software>
 
 	<software name="tamaosu">
-		<!-- Notes: SGB enhanced.
-		    The game cart has an integrated speaker and a replaceable battery (CR2016). -->
+		<!-- The game cart has an integrated speaker and a replaceable battery (CR2016). -->
 		<description>Game de Hakken!! Tamagotchi - Osutchi to Mesutchi (Japan)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AOMJ-JPN"/>
 		<info name="release" value="19980115"/>
 		<info name="alt_title" value="ゲームで発見!!たまごっち オスっちとメスっち"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="BANDAI 020309E4-01-1"/>
 			<feature name="u1" value="U1 [TAMA7]"/>
@@ -7474,14 +7430,13 @@
 	</software>
 
 	<software name="tama2">
-		<!-- Notes: SGB enhanced -->
 		<description>Game de Hakken!! Tamagotchi 2 (Japan)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AT3J-JPN"/>
 		<info name="release" value="19971017"/>
 		<info name="alt_title" value="ゲームで発見!!たまごっち2"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7512,14 +7467,13 @@
 	</software>
 
 	<software name="gamera">
-		<!-- Notes: SGB enhanced -->
 		<description>Gamera - Daikaijuu Kuuchuu Kessen (Japan)</description>
 		<year>1995</year>
 		<publisher>Angel Studios</publisher>
 		<info name="serial" value="DMG-AGMJ-JPN"/>
 		<info name="release" value="19950303"/>
 		<info name="alt_title" value="ガメラ 大怪獣空中決戦"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -7529,14 +7483,13 @@
 	</software>
 
 	<software name="ggoemkur" cloneof="mystninj">
-		<!-- Notes: SGB enhanced -->
 		<description>Ganbare Goemon - Kurofunetou no Nazo (Japan)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AGDJ-JPN (RK139-J1)"/>
 		<info name="release" value="19971204"/>
 		<info name="alt_title" value="がんばれゴエモン 黒船党の謎"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -7683,7 +7636,7 @@
 		<info name="serial" value="DMG-RJJ, DMG-218 CHN"/>
 		<info name="release" value="19941021"/>
 		<info name="alt_title" value="GB原人2 (Japan), GB原人2 BONK'S REVENGE (China)"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-M14"/>
 			<feature name="u1" value="U1 MBC1"/>
@@ -7774,14 +7727,13 @@
 	</software>
 
 	<software name="gegege">
-		<!-- Notes: SGB enhanced -->
 		<description>GeGeGe no Kitarou - Youkai Souzoushu Arawaru! (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AKTJ-JPN"/>
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="ゲゲゲの鬼太郎 妖怪創造主現る!"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-GDAN-03"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7798,14 +7750,13 @@
 	</software>
 
 	<software name="gekipowm">
-		<!-- Notes: SGB enhanced -->
 		<description>Gekitou Power Modeller (Japan)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-APZJ-JPN"/>
 		<info name="release" value="19981127"/>
 		<info name="alt_title" value="激闘パワーモデラー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7841,14 +7792,13 @@
 	</software>
 
 	<software name="genjincl">
-		<!-- Notes: SGB enhanced -->
 		<description>Genjin Collection (Japan)</description>
 		<year>1996</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AG3J-JPN"/>
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="原人コレクション GB原人, GB原人2, GB原人ランド"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-M-BFAN-01"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -7861,14 +7811,13 @@
 	</software>
 
 	<software name="genjinct">
-		<!-- Notes: SGB enhanced -->
 		<description>Genjin Cottsu (Japan)</description>
 		<year>1995</year>
 		<publisher>B-AI</publisher>
 		<info name="serial" value="DMG-AGKJ-JPN"/>
 		<info name="release" value="19950324"/>
 		<info name="alt_title" value="原人コッツ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -7908,12 +7857,11 @@
 	</software>
 
 	<software name="getaway">
-		<!-- Notes: SGB enhanced -->
 		<description>The Getaway (USA)</description>
 		<year>1995</year>
 		<publisher>Williams</publisher>
 		<info name="serial" value="DMG-AGEE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -8016,14 +7964,13 @@
 	</software>
 
 	<software name="gogoack">
-		<!-- Notes: SGB enhanced -->
 		<description>Go Go Ackman (Japan)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-ACKJ-JPN"/>
 		<info name="release" value="19950825"/>
 		<info name="alt_title" value="ゴーゴーアックマン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -8036,14 +7983,13 @@
 	</software>
 
 	<software name="gogohitc">
-		<!-- Notes: SGB enhanced -->
 		<description>Go! Go! Hitchhike (Japan)</description>
 		<year>1998</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AJHJ-JPN"/>
 		<info name="release" value="19980710"/>
 		<info name="alt_title" value="ゴー!ゴー! ヒッチハイク"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -8151,14 +8097,13 @@
 	</software>
 
 	<software name="godmedfsf" cloneof="godmedfs">
-		<!-- Notes: SGB enhanced -->
 		<description>God Medicine - Fukkoku Ban (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AGHJ-JPN (RK155-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="ゴッドメディスン 復刻版"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -8230,12 +8175,11 @@
 	</software>
 
 	<software name="golfclas">
-		<!-- Notes: SGB enhanced -->
 		<description>Golf Classic (Europe)</description>
 		<year>1993</year>
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-AGFP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -8648,7 +8592,7 @@
 	</software>
 
 	<software name="gbskokugse" cloneof="gbskokug">
-		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Kokugo Battle Hen (Jpn, Special Edition)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Kokugo Battle Hen (Japan, Special Edition)</description>
 		<year>2002</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BF3J-JPN"/>
@@ -8686,7 +8630,7 @@
 	</software>
 
 	<software name="gbsrikbtse" cloneof="gbsrikbt">
-		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Rika Battle Hen (Jpn, Special Edition)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Rika Battle Hen (Japan, Special Edition)</description>
 		<year>2002</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BH4J-JPN"/>
@@ -8724,7 +8668,7 @@
 	</software>
 
 	<software name="gbssanbtse" cloneof="gbssanbt">
-		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Sansuu Battle Hen (Jpn, Special Edition)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Sansuu Battle Hen (Japan, Special Edition)</description>
 		<year>2002</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BB4J-JPN"/>
@@ -8762,7 +8706,7 @@
 	</software>
 
 	<software name="gbsshkbtse" cloneof="gbsshkbt">
-		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Shakai Battle Hen (Jpn, Special Edition)</description>
+		<description>Goukaku Boy Series - Shikakui Atama o Maruku Suru - Shakai Battle Hen (Japan, Special Edition)</description>
 		<year>2002</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BE3J-JPN"/>
@@ -9007,14 +8951,13 @@
 	</software>
 
 	<software name="grander">
-		<!-- Notes: SGB enhanced -->
 		<description>Grander Musashi RV (Japan)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ARVJ-JPN"/>
 		<info name="release" value="19980724"/>
 		<info name="alt_title" value="グランダー武蔵RV"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -9075,12 +9018,11 @@
 	</software>
 
 	<software name="harvmoon">
-		<!-- Notes: SGB enhanced -->
 		<description>Harvest Moon GB (USA)</description>
 		<year>1998</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-AYWE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -9092,7 +9034,7 @@
 	</software>
 
 	<software name="hatris">
-		<description>Hatris (Jpn, USA)</description>
+		<description>Hatris (Japan, USA)</description>
 		<year>1991</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="DMG-HTA, DMG-HT-USA"/>
@@ -9108,14 +9050,13 @@
 	</software>
 
 	<software name="hayaoshi">
-		<!-- Notes: SGB enhanced -->
 		<description>Hayaoshi Quiz - Ouza Ketteisen (Japan)</description>
 		<year>1998</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-AQZJ-JPN"/>
 		<info name="release" value="19980731"/>
 		<info name="alt_title" value="早押しクイズ 王座決定戦"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -9211,12 +9152,11 @@
 	</software>
 
 	<software name="hercules">
-		<!-- Notes: SGB enhanced -->
 		<description>Disney's Hercules (Europe, USA)</description>
 		<year>1997</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-AHCE-USA, DMG-AHCP-NOE"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -9414,14 +9354,13 @@
 	</software>
 
 	<software name="honshogi">
-		<!-- Notes: SGB enhanced -->
 		<description>Hon Shougi (Japan)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AHSJ-JPN"/>
 		<info name="release" value="19941125"/>
 		<info name="alt_title" value="本将棋"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="65536">
@@ -9688,13 +9627,12 @@
 	</software>
 
 	<software name="hunchbac">
-		<!-- Notes: SGB enhanced -->
 		<description>Disney's The Hunchback of Notre Dame - Topsy Turvy Games (Europe, USA)</description>
 		<year>1997</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-ANDE-USA, DMG-ANDP-NOE, DMG-ANDP-UKV"/>
 		<info name="alt_title" value="Disney's The Hunchback of Notre Dame - 5 Foolishly Fun Topsy Turvy Games (Box)"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -9890,12 +9828,11 @@
 	</software>
 
 	<software name="indienvl">
-		<!-- Notes: SGB enhanced -->
 		<description>Un Indien dans la Ville (France)</description>
 		<year>1995</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-A65P-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -10034,12 +9971,11 @@
 	</software>
 
 	<software name="iss">
-		<!-- Notes: SGB enhanced -->
 		<description>International Superstar Soccer (Europe, USA)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AIGE-USA, DMG-AIGP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -10186,14 +10122,13 @@
 	</software>
 
 	<software name="jlbigwav" cloneof="sammer">
-		<!-- Notes: SGB enhanced -->
 		<description>J.League Big Wave Soccer (Japan)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AJSJ-JPN"/>
 		<info name="release" value="19951124"/>
 		<info name="alt_title" value="Jリーグ ビッグウェイブサッカー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="262144">
@@ -10229,14 +10164,13 @@
 	</software>
 
 	<software name="jllive95">
-		<!-- Notes: SGB enhanced -->
 		<description>J.League Live '95 (Japan)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="DMG-AWGJ-JPN"/>
 		<info name="release" value="19950421"/>
 		<info name="alt_title" value="Jリーグライブ95"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -10452,12 +10386,11 @@
 	</software>
 
 	<software name="jeopardp">
-		<!-- Notes: SGB enhanced -->
 		<description>Jeopardy! - Platinum Edition (USA)</description>
 		<year>1996</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-AJPE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -10481,12 +10414,11 @@
 	</software>
 
 	<software name="jeopardt">
-		<!-- Notes: SGB enhanced -->
 		<description>Jeopardy! - Teen Tournament (USA)</description>
 		<year>1996</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-AJQE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -10574,7 +10506,7 @@
 		<info name="serial" value="DMG-AZGJ-JPN"/>
 		<info name="release" value="19950623"/>
 		<info name="alt_title" value="人生ゲーム"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="262144">
@@ -10734,14 +10666,13 @@
 	</software>
 
 	<software name="jungletc">
-		<!-- Notes: SGB enhanced -->
 		<description>Jungle no Ouja Tar-chan (Japan)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-J3J"/>
 		<info name="release" value="19940729"/>
 		<info name="alt_title" value="ジャングルの王者 ターちゃん"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -10751,12 +10682,11 @@
 	</software>
 
 	<software name="jstrike">
-		<!-- Notes: SGB enhanced -->
 		<description>Jungle Strike (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher> <!-- Malibu Games in USA -->
 		<info name="serial" value="DMG-AJGE-USA, DMG-AJGP-UKV"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -11020,14 +10950,13 @@
 	</software>
 
 	<software name="karamuch">
-		<!-- Notes: SGB enhanced -->
 		<description>Karamuchou no Daijiken (Japan)</description>
 		<year>1997</year>
 		<publisher>Starfish</publisher>
 		<info name="serial" value="DMG-AKDJ-JPN"/>
 		<info name="release" value="19971219"/>
 		<info name="alt_title" value="カラムー町の大事件"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -11037,14 +10966,13 @@
 	</software>
 
 	<software name="kaseki">
-		<!-- Notes: SGB enhanced -->
 		<description>Kaseki Sousei Reborn (Japan)</description>
 		<year>1998</year>
 		<publisher>Starfish</publisher>
 		<info name="serial" value="DMG-AKRJ-JPN"/>
 		<info name="release" value="19980717"/>
 		<info name="alt_title" value="化石創世リボーン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -11110,7 +11038,7 @@
 		<info name="serial" value="DMG-A7KJ-JPN"/>
 		<info name="release" value="19970919"/>
 		<info name="alt_title" value="川のぬし釣り3"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -11146,12 +11074,11 @@
 	</software>
 
 	<software name="kengriff">
-		<!-- Notes: SGB enhanced -->
-		<description>Ken Griffey Jr. presents Major League Baseball (Aus, USA)</description>
+		<description>Ken Griffey Jr. presents Major League Baseball (Australia, USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKGE-USA, DMG-AKGP-AUS"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>  <!-- AUS cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -11215,7 +11142,7 @@
 	</software>
 
 	<software name="kidicar">
-		<description>Kid Icarus - Of Myths and Monsters (Euro, USA, Can)</description>
+		<description>Kid Icarus - Of Myths and Monsters (Europe, Canada, USA)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-KA-USA, DMG-KA-UKV, DMG-KA-CAN"/>
@@ -11268,12 +11195,11 @@
 	</software>
 
 	<software name="kinst">
-		<!-- Notes: SGB enhanced -->
 		<description>Killer Instinct (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKLE-USA, DMG-AKLP-EUR, DMG-AKLP-UKV"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -11304,12 +11230,11 @@
 	</software>
 
 	<software name="kof95">
-		<!-- Notes: SGB enhanced -->
 		<description>The King of Fighters '95 (Europe)</description>
 		<year>1997</year>
 		<publisher>Laguna</publisher>
 		<info name="serial" value="DMG-AKFP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -11319,12 +11244,11 @@
 	</software>
 
 	<software name="kof95u" cloneof="kof95">
-		<!-- Notes: SGB enhanced -->
 		<description>The King of Fighters '95 (USA)</description>
 		<year>1997</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AKFE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -11334,12 +11258,11 @@
 	</software>
 
 	<software name="kofheat">
-		<!-- Notes: SGB enhanced -->
 		<description>The King of Fighters - Heat of Battle (Europe)</description>
 		<year>1998</year>
 		<publisher>Laguna</publisher>
 		<info name="serial" value="DMG-AK6P-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -11473,7 +11396,7 @@
 		<info name="serial" value="DMG-AKXJ-JPN"/>
 		<info name="release" value="19951214"/>
 		<info name="alt_title" value="カービィのブロックボール"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-20"/>
 			<feature name="u1" value="U1 PRG [MX23C4002-20]"/>
@@ -11498,7 +11421,7 @@
 		<info name="serial" value="DMG-AKCJ-JPN"/>
 		<info name="release" value="19970125"/>
 		<info name="alt_title" value="カービィのきらきらきっず"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -11534,12 +11457,11 @@
 	</software>
 
 	<software name="kirbyblc">
-		<!-- Notes: SGB enhanced -->
 		<description>Kirby's Block Ball (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKXE-USA, DMG-AKXP-UKV"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -11611,12 +11533,11 @@
 	</software>
 
 	<software name="kirbystr">
-		<!-- Notes: SGB enhanced -->
-		<description>Kirby's Star Stacker (Euro, Aus, USA)</description>
+		<description>Kirby's Star Stacker (Australia, Europe, USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKCE-USA, DMG-AKCP-AUS, DMG-AKCP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -11768,7 +11689,7 @@
 		<info name="serial" value="DMG-AJIJ-JPN (RK140-J1)"/>
 		<info name="release" value="19970925"/>
 		<info name="alt_title" value="コナミGBコレクションVol.1 グラディウス, ドラキュラ伝説, コナミレーシング, コントラ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -11785,7 +11706,7 @@
 		<info name="serial" value="DMG-AJJJ-JPN (RK141-J1)"/>
 		<info name="release" value="19971211"/>
 		<info name="alt_title" value="コナミGBコレクションVol.2 ツインビーだ!!, がんばれゴエモン, モトクロスマニアックス, ガッタンゴットン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -11795,14 +11716,13 @@
 	</software>
 
 	<software name="konamic3">
-		<!-- Notes: SGB enhanced-->
 		<description>Konami GB Collection Vol.3 (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AJKJ-JPN (RK142-J1)"/>
 		<info name="release" value="19980219 (JPN)"/>
 		<info name="alt_title" value="コナミGBコレクションVol.3  グラディウスII, ドラキュラ伝説II,  イー・アル・カンフー, けっきょく南極大冒険"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -11819,7 +11739,7 @@
 		<info name="serial" value="DMG-AJLJ-JPN (RK143-J1)"/>
 		<info name="release" value="19980319"/>
 		<info name="alt_title" value="コナミGBコレクションVol.4 パロディウスだ!, クォース, コナミックスポーツ, フロッガー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -11911,14 +11831,13 @@
 	</software>
 
 	<software name="konchuhk">
-		<!-- Notes: SGB enhanced -->
 		<description>Konchuu Hakase (Japan, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AKJJ-JPN"/>
 		<info name="release" value="19980828"/>
 		<info name="alt_title" value="昆虫博士"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -11930,14 +11849,13 @@
 	</software>
 
 	<software name="konchuhka" cloneof="konchuhk">
-		<!-- Notes: SGB enhanced -->
 		<description>Konchuu Hakase (Japan)</description>
 		<year>1998</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AKJJ-JPN"/>
 		<info name="release" value="19980828"/>
 		<info name="alt_title" value="昆虫博士"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -11964,14 +11882,13 @@
 	</software>
 
 	<software name="koukiats">
-		<!-- Notes: SGB enhanced -->
 		<description>Koukiatsu Boy (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AKEJ-JPN (RK150-J1)"/>
 		<info name="release" value="19980702"/>
 		<info name="alt_title" value="高気圧ボーイ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -12016,14 +11933,13 @@
 	</software>
 
 	<software name="kumapuut">
-		<!-- Notes: SGB enhanced -->
 		<description>Kuma no Puutarou - Takara Sagashi da Ooiri Game Battle! (Japan)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AKPJ-JPN"/>
 		<info name="release" value="19960322"/>
 		<info name="alt_title" value="クマのプー太郎 宝さがしだ大入りゲームバトル!"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -12068,14 +11984,13 @@
 	</software>
 
 	<software name="gulliver">
-		<!-- Notes: SGB enhanced -->
 		<description>Kuusou Kagaku Sekai Gulliver Boy - Kuusou Kagaku Puzzle Purittopon!! (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AGBJ-JPN"/>
 		<info name="release" value="19950428"/>
 		<info name="alt_title" value="空想科学世界ガリバーボーイ 空想科学パズル プリッとポン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -12214,12 +12129,11 @@
 	</software>
 
 	<software name="rivking">
-		<!-- Notes: SGB enhanced -->
 		<description>Legend of the River King GB (Australia)</description>
 		<year>1999</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-AFHU-AUS"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -12231,12 +12145,11 @@
 	</software>
 
 	<software name="rivkingu" cloneof="rivking">
-		<!-- Notes: SGB enhanced -->
 		<description>Legend of the River King GB (USA)</description>
 		<year>1999</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-AFHE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -12369,7 +12282,7 @@
 	</software>
 
 	<software name="lemmings">
-		<description>Lemmings (Euro, Rev. A)</description>
+		<description>Lemmings (Europe, Rev. 1)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-L8-NOE"/>
@@ -12497,13 +12410,12 @@
 	</software>
 
 	<software name="lionkingu" cloneof="lionking">
-		<!-- Notes: SGB enhanced -->
 		<description>The Lion King (USA)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="DMG-ALNE-USA"/>
 		<info name="alt_title" value="Disney's The Lion King (Box)"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -12608,7 +12520,7 @@
 		<info name="alt_title" value="ロックンチェイス ~ Lock 'n' Chase (Jpn Box), Lock n' Chase (Western Box), LOCK'N'CHASE 銀行大盗·银行大盗 (Chinese)"/>
 		<sharedfeat name="compatibility" value="GB"/>
  		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02"/>  <!-- UKV cart, also found with DMG-BBA-02 -->
+			<feature name="pcb" value="DMG-BEAN-02"/>  <!-- Also found with DMG-BBA-02 -->
 			<feature name="u1" value="U1 PRG"/>
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]"/>
 			<!-- Chinese cart
@@ -12687,12 +12599,11 @@
 	</software>
 
 	<software name="lostwrld">
-		<!-- Notes: SGB enhanced -->
 		<description>The Lost World - Jurassic Park (Europe, USA)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ALWE-USA, DMG-ALWP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -12705,12 +12616,11 @@
 	</software>
 
 	<software name="lostwrldf" cloneof="lostwrld">
-		<!-- Notes: SGB enhanced -->
 		<description>Le Mond Perdu - Jurassic Park (France)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ALWF-FRA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -12753,7 +12663,7 @@
 	</software>
 
 	<software name="lucle">
-		<description>Lucle (Euro, Jpn)</description>
+		<description>Lucle (Europe, Japan)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="DMG-LUA, DMG-LU-EUR"/>
@@ -12793,14 +12703,13 @@
 	</software>
 
 	<software name="machgogo">
-		<!-- Notes: SGB enhanced -->
 		<description>Mach Go Go Go (Japan)</description>
 		<year>1997</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AGJJ-JPN"/>
 		<info name="release" value="19970808"/>
 		<info name="alt_title" value="マッハゴーゴーゴー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="262144">
@@ -12812,12 +12721,11 @@
 	</software>
 
 	<software name="madden95">
-		<!-- Notes: SGB enhanced -->
 		<description>Madden '95 (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-ANLE-USA, DMG-ANLP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -12827,12 +12735,11 @@
 	</software>
 
 	<software name="madden96">
-		<!-- Notes: SGB enhanced -->
 		<description>Madden '96 (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A6ME-USA, DMG-A6MP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -12842,12 +12749,11 @@
 	</software>
 
 	<software name="madden97">
-		<!-- Notes: SGB enhanced -->
 		<description>Madden '97 (USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A7ME-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -12873,14 +12779,13 @@
 	</software>
 
 	<software name="rayearth">
-		<!-- Notes: SGB enhanced -->
 		<description>Magic Knight Rayearth (Japan)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-ARYJ-JPN"/>
 		<info name="release" value="19950602"/>
 		<info name="alt_title" value="マジックナイトレイアース"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -12892,14 +12797,13 @@
 	</software>
 
 	<software name="rayeart2">
-		<!-- Notes: SGB enhanced -->
 		<description>Magic Knight Rayearth 2nd. - The Missing Colors (Japan)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AR2J-JPN"/>
 		<info name="release" value="19951027"/>
 		<info name="alt_title" value="マジックナイトレイアース2nd ザ・ミッシング・カラーズ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="262144">
@@ -12966,14 +12870,13 @@
 	</software>
 
 	<software name="guruguru">
-		<!-- Notes: SGB enhanced -->
 		<description>Mahoujin Guruguru (Japan)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AMGJ-JPN"/>
 		<info name="release" value="19950428"/>
 		<info name="alt_title" value="魔法陣グルグル 勇者とククリの大冒険"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -13060,7 +12963,7 @@
 	</software>
 
 	<software name="4in1_601">
-		<description>Mani 4 in 1 (Chi, DMG-601 CHN)</description>
+		<description>Mani 4 in 1 (China, DMG-601 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
 		<info name="serial" value="DMG-601-CHN"/>
@@ -13074,7 +12977,7 @@
 	</software>
 
 	<software name="4in1_602" cloneof="varpack">
-		<description>Mani 4 in 1 (Chi, DMG-602 CHN)</description>
+		<description>Mani 4 in 1 (China, DMG-602 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
 		<info name="serial" value="DMG-602-CHN"/>
@@ -13088,7 +12991,7 @@
 	</software>
 
 	<software name="4in1_603">
-		<description>Mani 4 in 1 (Chi, DMG-603 CHN)</description>
+		<description>Mani 4 in 1 (China, DMG-603 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
 		<info name="serial" value="DMG-603-CHN"/>
@@ -13105,7 +13008,7 @@
 	</software>
 
 	<software name="4in1_604">
-		<description>Mani 4 in 1 (Chi, DMG-604 CHN)</description>
+		<description>Mani 4 in 1 (China, DMG-604 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
 		<info name="serial" value="DMG-604-CHN"/>
@@ -13119,7 +13022,7 @@
 	</software>
 
 	<software name="4in1_605">
-		<description>Mani 4 in 1 (Chi, DMG-605 CHN)</description>
+		<description>Mani 4 in 1 (China, DMG-605 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
 		<info name="serial" value="DMG-605-CHN"/>
@@ -13214,14 +13117,13 @@
 	</software>
 
 	<software name="marmalad">
-		<!-- Notes: SGB enhanced -->
 		<description>Marmalade Boy (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AMAJ-JPN"/>
 		<info name="release" value="19950127"/>
 		<info name="alt_title" value="ママレード・ボーイ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -13264,14 +13166,13 @@
 	</software>
 
 	<software name="masarpg">
-		<!-- Notes: SGB enhanced -->
 		<description>Masakari Densetsu - Kintarou RPG Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>Tonkin House</publisher>
 		<info name="serial" value="DMG-K2J"/>
 		<info name="release" value="19941028"/>
 		<info name="alt_title" value="マサカリ伝説−金太郎RPG編−"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -13319,13 +13220,12 @@
 	</software>
 
 	<software name="mauimall">
-		<!-- Notes: SGB enhanced -->
 		<description>Maui Mallard (USA)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AMIE-USA"/>
 		<info name="alt_title" value="Maui Mallard in Cold Shadow (Box)"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -13393,7 +13293,7 @@
 		<info name="serial" value="DMG-AMXJ-JPN"/>
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="メダロット カブトバージョン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DEDN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -13418,7 +13318,7 @@
 		<info name="serial" value="DMG-AMXJ-JPN"/>
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="メダロット カブトバージョン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DEDN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -13443,7 +13343,7 @@
 		<info name="serial" value="DMG-AMYJ-JPN"/>
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="メダロット クワガタバージョン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DEDN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -13468,7 +13368,7 @@
 		<info name="serial" value="DMG-AMYJ-JPN"/>
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="メダロット クワガタバージョン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -13487,7 +13387,7 @@
 		<info name="serial" value="DMG-AMPJ-JPN"/>
 		<info name="release" value="19980320"/>
 		<info name="alt_title" value="メダロット パーツコレクション"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -13499,14 +13399,13 @@
 	</software>
 
 	<software name="medacol2">
-		<!-- Notes: SGB enhanced -->
 		<description>Medarot - Parts Collection 2 (Japan)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-A4MJ-JPN"/>
 		<info name="release" value="19980529"/>
 		<info name="alt_title" value="メダロット パーツコレクション2"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -13748,14 +13647,13 @@
 	</software>
 
 	<software name="mconanch">
-		<!-- Notes: SGB enhanced -->
 		<description>Meitantei Conan - Chika Yuuenchi Satsujin Jiken (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ADCJ-JPN"/>
 		<info name="release" value="19961227"/>
 		<info name="alt_title" value="名探偵コナン 地下遊園地殺人事件"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -13765,14 +13663,13 @@
 	</software>
 
 	<software name="mconangi">
-		<!-- Notes: SGB enhanced -->
 		<description>Meitantei Conan - Giwaku no Gouka Ressha (Japan)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ADKJ-JPN"/>
 		<info name="release" value="19980807"/>
 		<info name="alt_title" value="名探偵コナン 疑惑の豪華列車"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -14042,14 +13939,13 @@
 	</software>
 
 	<software name="midori">
-		<!-- Notes: SGB enhanced -->
 		<description>Midori no Makibaou (Japan)</description>
 		<year>1996</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-ANAJ-JPN"/>
 		<info name="release" value="19961221"/>
 		<info name="alt_title" value="みどりのマキバオー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -14062,12 +13958,11 @@
 	</software>
 
 	<software name="mmpr">
-		<!-- Notes: SGB enhanced -->
 		<description>Mighty Morphin Power Rangers (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ZW-USA, DMG-ZW-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -14080,12 +13975,11 @@
 	</software>
 
 	<software name="mmprmov">
-		<!-- Notes: SGB enhanced -->
 		<description>Mighty Morphin Power Rangers - The Movie (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-A2RE-USA, DMG-A2RP-UKV"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -14192,14 +14086,13 @@
 	</software>
 
 	<software name="mini4boy">
-		<!-- Notes: SGB enhanced -->
 		<description>Mini 4 Boy (Japan)</description>
 		<year>1996</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AJ4J-JPN"/>
 		<info name="release" value="19961227"/>
 		<info name="alt_title" value="ミニ4ボーイ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -14211,14 +14104,13 @@
 	</software>
 
 	<software name="mini4bo2">
-		<!-- Notes: SGB enhanced -->
 		<description>Mini 4 Boy II - Final Evolution (Japan)</description>
 		<year>1997</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AJ2J-JPN"/>
 		<info name="release" value="19970926"/>
 		<info name="alt_title" value="ミニ4ボーイII ファイナルエボリューション"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -14252,14 +14144,13 @@
 	</software>
 
 	<software name="miniyonk">
-		<!-- Notes: SGB enhanced -->
 		<description>Mini Yonku GB Let's &amp; Go!! (Japan)</description>
 		<year>1997</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="DMG-AM4J-JPN"/>
 		<info name="release" value="19970523"/>
 		<info name="alt_title" value="ミニ四駆GB レッツ&amp;ゴー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DEDN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -14340,14 +14231,13 @@
 	</software>
 
 	<software name="mogumogu">
-		<!-- Notes: SGB enhanced -->
 		<description>Mogu Mogu Gombo (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AMMJ-JPN"/>
 		<info name="release" value="19950616"/>
 		<info name="alt_title" value="モグモグGOMBO 遥かなる超料理伝説"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="262144">
@@ -14381,7 +14271,7 @@
 		<info name="serial" value="DMG-AMOJ-JPN"/>
 		<info name="release" value="19960721"/>
 		<info name="alt_title" value="モグラーニャ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>  <!-- Also found on DMG-DECN(K)-02 pcb -->
 			<feature name="u1" value="U1 PRG"/>
@@ -14422,14 +14312,13 @@
 	</software>
 
 	<software name="momocol">
-		<!-- Notes: SGB enhanced -->
 		<description>Momotarou Collection (Japan)</description>
 		<year>1996</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AMDJ-JPN"/>
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="桃太郎コレクション"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-MC-DFCN-01"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -14494,7 +14383,7 @@
 		<info name="serial" value="DMG-AM2J-JPN"/>
 		<info name="release" value="19941216"/>
 		<info name="alt_title" value="桃太郎電劇2"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -14529,7 +14418,7 @@
 		<info name="serial" value="DMG-AD8J-JPN"/>
 		<info name="release" value="19980731"/>
 		<info name="alt_title" value="桃太郎電鉄Jr. 全国ラーメンめぐりの巻"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -14541,14 +14430,13 @@
 	</software>
 
 	<software name="moneyidl">
-		<!-- Notes: SGB enhanced -->
 		<description>Money Idol Exchanger (Japan)</description>
 		<year>1997</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="DMG-AMEJ-JPN"/>
 		<info name="release" value="19970829"/>
 		<info name="alt_title" value="マネーアイドル エクスチェンジャー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -14727,14 +14615,13 @@
 	</software>
 
 	<software name="monstrac">
-		<!-- Notes: SGB enhanced -->
 		<description>Monster Race (Japan)</description>
 		<year>1998</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="DMG-AMRJ-JPN"/>
 		<info name="release" value="19980306"/>
 		<info name="alt_title" value="もんすたあ★レース"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DEDN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -14752,14 +14639,13 @@
 	</software>
 
 	<software name="monstrco">
-		<!-- Notes: SGB enhanced -->
 		<description>Monster Race Okawari (Japan)</description>
 		<year>1998</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="DMG-AMFJ-JPN"/>
 		<info name="release" value="19981002"/>
 		<info name="alt_title" value="もんすたあ★レース おかわり"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DEDN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -14957,7 +14843,7 @@
 	</software>
 
 	<software name="motoxman">
-		<description>Motocross Maniacs (Euro, Re-release)</description>
+		<description>Motocross Maniacs (Euro, re-release)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-MX-NOE-1"/>
@@ -15252,12 +15138,11 @@
 	</software>
 
 	<software name="mystninj">
-		<!-- Notes: SGB enhanced -->
 		<description>Mystical Ninja Starring Goemon (Europe)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AGDP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -15267,12 +15152,11 @@
 	</software>
 
 	<software name="mystninju" cloneof="mystninj">
-		<!-- Notes: SGB enhanced -->
 		<description>Mystical Ninja Starring Goemon (USA)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AGDE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -15282,14 +15166,13 @@
 	</software>
 
 	<software name="nadakoji">
-		<!-- Notes: SGB enhanced -->
 		<description>Nada Asatarou &amp; Kojima Takeo no Jissen Mahjong Kyoushitsu (Japan)</description>
 		<year>1998</year>
 		<publisher>Gaps</publisher>
 		<info name="serial" value="DMG-ABIJ-JPN"/>
 		<info name="release" value="19981225"/>
 		<info name="alt_title" value="小島武夫・灘麻太郎の実践麻雀教室"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="131072">
@@ -15392,7 +15275,7 @@
 		<info name="serial" value="DMG-ANGJ-JPN"/>
 		<info name="release" value="19960721"/>
 		<info name="alt_title" value="ナムコギャラリーVOL.1 バトルシティー, ギャラガ, マッピー, ナムコクラシック"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -15402,14 +15285,13 @@
 	</software>
 
 	<software name="namcogl2">
-		<!-- Notes: SGB enhanced -->
 		<description>Namco Gallery Vol.2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-AN2J-JPN"/>
 		<info name="release" value="19961129"/>
 		<info name="alt_title" value="ナムコギャラリーVOL.2 ギャラクシアン, ディグダグ, ドルアーガの塔, ファミスタ4"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -15426,7 +15308,7 @@
 		<info name="serial" value="DMG-AV3J-JPN"/>
 		<info name="release" value="19970725"/>
 		<info name="alt_title" value="ナムコギャラリーVOL.3 スカイキッド, バベルの塔, ファミリーテニス, 雀卓ボーイ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -15616,12 +15498,11 @@
 	</software>
 
 	<software name="nbaliv96">
-		<!-- Notes: SGB enhanced -->
 		<description>NBA Live 96 (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A6BE-USA, DMG-A6BP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -15636,14 +15517,13 @@
 	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
 	-->
 	<software name="nectaris">
-		<!-- Notes: SGB enhanced -->
 		<description>Nectaris GB (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AN5J-JPN"/>
 		<info name="release" value="19980227"/>
 		<info name="alt_title" value="ネクタリスジービー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-TEDN-01"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -15709,14 +15589,13 @@
 	</software>
 
 	<software name="nekbvoll">
-		<!-- Notes: SGB enhanced -->
 		<description>Nekketsu! Beach Volley Da yo Kunio-kun (Japan)</description>
 		<year>1994</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-VXJ"/>
 		<info name="release" value="19940729"/>
 		<info name="alt_title" value="熱血!ビーチバレーだよ くにおくん"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -15825,14 +15704,13 @@
 	</software>
 
 	<software name="garou2">
-		<!-- Notes: SGB enhanced -->
 		<description>Nettou Garou Densetsu 2 - Aratanaru Tatakai (Japan)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-X3J"/>
 		<info name="release" value="19940729"/>
 		<info name="alt_title" value="熱闘 餓狼伝説2 -あらたなるたたかい-"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -15866,14 +15744,13 @@
 	</software>
 
 	<software name="samspira" cloneof="samspir">
-		<!-- Notes: SGB enhanced -->
 		<description>Nettou Samurai Spirits (Japan)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-X4J"/>
 		<info name="release" value="19940630"/>
 		<info name="alt_title" value="熱闘サムライスピリッツ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -15883,14 +15760,13 @@
 	</software>
 
 	<software name="samspirz">
-		<!-- Notes: SGB enhanced -->
 		<description>Nettou Samurai Spirits - Zankurou Musouken (Japan)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-ASZJ-JPN"/>
 		<info name="release" value="19960823"/>
 		<info name="alt_title" value="熱闘 サムライスピリッツ 斬紅郎無双剣"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BFAN-01"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -15903,14 +15779,13 @@
 	</software>
 
 	<software name="kof95j" cloneof="kof95">
-		<!-- Notes: SGB enhanced -->
 		<description>Nettou The King of Fighters '95 (Japan)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AKFJ-JPN"/>
 		<info name="release" value="19960426"/>
 		<info name="alt_title" value="熱闘ザ・キング・オブ・ファイターズ'95"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -15920,14 +15795,13 @@
 	</software>
 
 	<software name="kof96" cloneof="kofheat">
-		<!-- Notes: SGB enhanced -->
 		<description>Nettou The King of Fighters '96 (Japan)</description>
 		<year>1997</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AK6J-JPN"/>
 		<info name="release" value="19970808"/>
 		<info name="alt_title" value="熱闘 ザ・キング・オブ・ファイターズ'96"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -15947,7 +15821,7 @@
 		<info name="serial" value="DMG-ATDJ-JPN"/>
 		<info name="release" value="19960322"/>
 		<info name="alt_title" value="熱闘 闘神伝"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -15964,7 +15838,7 @@
 		<info name="serial" value="DMG-ATDJ-JPN"/>
 		<info name="release" value="19960322"/>
 		<info name="alt_title" value="熱闘 闘神伝"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -15974,14 +15848,13 @@
 	</software>
 
 	<software name="wh2j" cloneof="wh2">
-		<!-- Notes: SGB enhanced -->
 		<description>Nettou World Heroes 2 Jet (Japan)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AWJJ-JPN"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="熱闘ワールドヒーローズ2JET"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -15994,14 +15867,13 @@
 	</software>
 
 	<software name="newchessj" cloneof="newchess">
-		<!-- Notes: SGB enhanced -->
 		<description>The New Chessmaster (Japan)</description>
 		<year>1998</year>
 		<publisher>Altron</publisher>
 		<info name="serial" value="DMG-ACHJ-JPN"/>
 		<info name="release" value="19980130"/>
 		<info name="alt_title" value="ニューチェスマスター"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="65536">
@@ -16103,12 +15975,11 @@
 	</software>
 
 	<software name="nhl96">
-		<!-- Notes: SGB enhanced -->
 		<description>NHL '96 (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A6HE-USA, DMG-A6HP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02"/>   <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -16154,7 +16025,7 @@
 	</software>
 
 	<software name="mansell">
-		<description>Nigel Mansell's World Championship (Europe)</description>
+		<description>Nigel Mansell's World Championship (Europe, set 1)</description>
 		<year>1992</year>
 		<publisher>Gremlin Interactive</publisher>
 		<info name="serial" value="DMG-WC-NOE"/>
@@ -16182,13 +16053,13 @@
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]"/>
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
-				<rom name="DMG-WCE-0.u1" size="131072" crc="03e84d7d" sha1="beebc29ef505916a525fb9a5ab0d6d11bcbbfb47"/>
+				<rom name="dmg-wce-0.u1" size="131072" crc="03e84d7d" sha1="beebc29ef505916a525fb9a5ab0d6d11bcbbfb47"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mansell1" cloneof="mansell">
-		<description>Nigel Mansell's World Championship (Euro, Alt)</description>
+		<description>Nigel Mansell's World Championship (Europe, set 2)</description>
 		<year>1992</year>
 		<publisher>Gremlin Interactive</publisher>
 		<info name="serial" value="DMG-WC-FAH, DMG-WC-UKV, DMG-WC-ESP-1"/>
@@ -16203,14 +16074,13 @@
 	</software>
 
 	<software name="eikou11">
-		<!-- Notes: SGB enhanced -->
 		<description>Nihon Daihyou Team - Eikou no Eleven (Japan)</description>
 		<year>1998</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-ASKJ-JPN"/>
 		<info name="release" value="19980522"/>
 		<info name="alt_title" value="日本代表チーム 栄光のイレブン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -16220,14 +16090,13 @@
 	</software>
 
 	<software name="jlsupprt">
-		<!-- Notes: SGB enhanced -->
 		<description>Nihon Daihyou Team France de Ganbare! - J.League Supporter Soccer (Japan)</description>
 		<year>1998</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-ASJJ-JPN"/>
 		<info name="release" value="19980626"/>
 		<info name="alt_title" value="Jリーグサポーターサッカー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -16356,14 +16225,13 @@
 	</software>
 
 	<software name="ninku">
-		<!-- Notes: SGB enhanced -->
 		<description>Ninku (Japan)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-ANKJ-JPN"/>
 		<info name="release" value="19950714"/>
 		<info name="alt_title" value="−忍空−"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -16376,14 +16244,13 @@
 	</software>
 
 	<software name="ninkusen">
-		<!-- Notes: SGB enhanced -->
 		<description>Ninku Dai-2-dan - Ninku Sensou Hen (Japan)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-ANSJ-JPN"/>
 		<info name="release" value="19951124"/>
 		<info name="alt_title" value="−忍空− 第2弾 【忍空戦争編】"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -16393,14 +16260,13 @@
 	</software>
 
 	<software name="nintama">
-		<!-- Notes: SGB enhanced -->
 		<description>Nintama Rantarou (Japan)</description>
 		<year>1995</year>
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-AGNJ-JPN"/>
 		<info name="release" value="19951227"/>
 		<info name="alt_title" value="忍たま乱太郎GB ~ Nintama Rantarou GB"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -16413,14 +16279,13 @@
 	</software>
 
 	<software name="nintamec">
-		<!-- Notes: SGB enhanced -->
 		<description>Nintama Rantarou GB - Eawase Challenge Puzzle (Japan)</description>
 		<year>1998</year>
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-ACAJ-JPN"/>
 		<info name="release" value="19980619"/>
 		<info name="alt_title" value="忍たま乱太郎GB えあわせチャレンジパズル"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -16647,14 +16512,13 @@
 	</software>
 
 	<software name="oni5">
-		<!-- Notes: SGB enhanced -->
 		<description>Oni V - Innin o Tsugumono (Japan)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-AO5J-JPN"/>
 		<info name="release" value="19950324"/>
 		<info name="alt_title" value="ONI V 隠忍を継ぐ者"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -16752,7 +16616,7 @@
 		<info name="serial" value="DMG-ATOJ-JPN"/>
 		<info name="release" value="19940930"/>
 		<info name="alt_title" value="オセロワールド"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="65536">
@@ -16762,14 +16626,13 @@
 	</software>
 
 	<software name="otogiban">
-		<!-- Notes: SGB enhanced -->
 		<description>Otogibanashi Taisen (Japan)</description>
 		<year>1995</year>
 		<publisher>Yojigen</publisher>
 		<info name="serial" value="DMG-AY7J-JPN"/>
 		<info name="release" value="19950804"/>
 		<info name="alt_title" value="おとぎ話大戦"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="262144">
@@ -16900,14 +16763,13 @@
 	</software>
 
 	<software name="pacintimj" cloneof="pacintim">
-		<!-- Notes: SGB enhanced -->
 		<description>Pac-In-Time (Japan)</description>
 		<year>1995</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="DMG-APTJ-JPN"/>
 		<info name="release" value="19950103"/>
 		<info name="alt_title" value="パックインタイム"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -16985,12 +16847,11 @@
 	</software>
 
 	<software name="pacpanic">
-		<!-- Notes: SGB enhanced -->
 		<description>Pac-Panic (Europe)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-NO-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -17000,14 +16861,13 @@
 	</software>
 
 	<software name="pacpanicj" cloneof="pacpanic">
-		<!-- Notes: SGB enhanced -->
 		<description>Pac-Panic (Japan)</description>
 		<year>1994</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="DMG-NOA"/>
 		<info name="release" value="19941209"/>
 		<info name="alt_title" value="パックパニック"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -17017,14 +16877,13 @@
 	</software>
 
 	<software name="pslothg">
-		<!-- Notes: SGB enhanced -->
 		<description>Pachi-Slot Hisshou Guide GB (Japan)</description>
 		<year>1995</year>
 		<publisher>Magifact</publisher>
 		<info name="serial" value="DMG-APGJ-JPN"/>
 		<info name="release" value="19950127"/>
 		<info name="alt_title" value="パチスロ必勝ガイドGB"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="131072">
@@ -17100,14 +16959,13 @@
 	</software>
 
 	<software name="pachicr">
-		<!-- Notes: SGB enhanced -->
 		<description>Pachinko CR Daiku no Gen-san GB (Japan)</description>
 		<year>1998</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="DMG-AKZJ-JPN"/>
 		<info name="release" value="19980313"/>
 		<info name="alt_title" value="パチンコCR大工の源さんGB"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2"/>
 			<dataarea name="rom" size="262144">
@@ -17119,14 +16977,13 @@
 	</software>
 
 	<software name="pachidat">
-		<!-- Notes: SGB enhanced -->
 		<description>Pachinko Data Card - Chou Ataru-kun (Japan)</description>
 		<year>1999</year>
 		<publisher>Boss Communications</publisher>
 		<info name="serial" value="DMG-AXXJ-JPN"/>
 		<info name="release" value="19990128"/>
 		<info name="alt_title" value="Pachinko Data Card ちょ〜あたる君"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5"/>
 			<dataarea name="rom" size="1048576">
@@ -17154,14 +17011,13 @@
 	</software>
 
 	<software name="pachimon">
-		<!-- Notes: SGB enhanced -->
 		<description>Pachinko Monogatari Gaiden (Japan)</description>
 		<year>1995</year>
 		<publisher>KSS</publisher>
 		<info name="serial" value="DMG-APKJ-JPN"/>
 		<info name="release" value="19950623"/>
 		<info name="alt_title" value="パチンコ物語 外伝"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -17286,12 +17142,11 @@
 	</software>
 
 	<software name="pagemstr">
-		<!-- Notes: SGB enhanced -->
 		<description>The Pagemaster (Europe)</description>
 		<year>1994</year>
 		<publisher>Fox Interactive</publisher>
 		<info name="serial" value="DMG-APMP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -17952,14 +17807,13 @@
 	</software>
 
 	<software name="pbassfsh">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Bass Fishing (Japan)</description>
 		<year>1998</year>
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="DMG-ABFJ-JPN"/>
 		<info name="release" value="19980424"/>
 		<info name="alt_title" value="ポケットバスフィッシング"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -17985,12 +17839,11 @@
 	</software>
 
 	<software name="pockbman">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Bomberman (Europe)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AKQP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -18029,14 +17882,13 @@
 	</software>
 
 	<software name="pockdens">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Densha (Japan)</description>
 		<year>1998</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="DMG-ATNJ-JPN"/>
 		<info name="release" value="19981030"/>
 		<info name="alt_title" value="ポケット電車"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -18092,14 +17944,13 @@
 	</software>
 
 	<software name="poktknji">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Kanjirou (Japan)</description>
 		<year>1998</year>
 		<publisher>Shingakusha</publisher>
 		<info name="serial" value="DMG-ASAJ-JPN"/>
 		<info name="release" value="19980110"/>
 		<info name="alt_title" value="ポケット漢字郎"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -18345,14 +18196,13 @@
 	</software>
 
 	<software name="pokeao" cloneof="pokeblue">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Monsters Ao (Japan)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APEJ-JPN"/>
 		<info name="release" value="19961015"/>
 		<info name="alt_title" value="ポケットモンスター青"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -18388,14 +18238,13 @@
 	</software>
 
 	<software name="pokemidoa" cloneof="pokemido">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Monsters Midori (Japan)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APBJ-JPN"/>
 		<info name="release" value="19960227"/>
 		<info name="alt_title" value="ポケットモンスター緑"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -18407,14 +18256,13 @@
 	</software>
 
 	<software name="poktpuyo">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Puyo Puyo Tsuu (Japan)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="DMG-APYJ-JPN"/>
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="ぽけっとぷよぷよ通"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -18424,14 +18272,13 @@
 	</software>
 
 	<software name="poktshog">
-		<!-- Notes: SGB enhanced -->
 		<description>Pocket Shougi (Japan)</description>
 		<year>1998</year>
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="DMG-AP5J-JPN"/>
 		<info name="release" value="19980911"/>
 		<info name="alt_title" value="ポケット将棋"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -18483,12 +18330,11 @@
 	</software>
 
 	<software name="pokebluef" cloneof="pokeblue">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Version Bleue (France)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APEF-FRA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5"/>
 			<dataarea name="rom" size="1048576">
@@ -18544,12 +18390,11 @@
 	</software>
 
 	<software name="pokeblues" cloneof="pokeblue">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Edición Azul (Spain)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APES-ESP"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5"/>
 			<dataarea name="rom" size="1048576">
@@ -18649,12 +18494,11 @@
 	</software>
 
 	<software name="pokereds" cloneof="pokered">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Edición Roja (Spain)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAS-ESP"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5"/>
 			<dataarea name="rom" size="1048576">
@@ -18666,11 +18510,10 @@
 	</software>
 
 	<software name="pokecock" cloneof="pokered">
-		<!-- Notes: SGB enhanced -->
-		<description>Pokémon - Cock Version (Bootleg)</description>
+		<description>Pokémon - Cock Version (bootleg)</description>
 		<year>20??</year>
 		<publisher>bootleg</publisher>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3"/>
 			<dataarea name="rom" size = "1048576">
@@ -18749,12 +18592,11 @@
 	</software>
 
 	<software name="pokeyelli" cloneof="pokeyell">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Versione Gialla (Italy)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSI-ITA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A02-01"/>
 			<feature name="u1" value="U1 2M/4M/8M-MROM"/>
@@ -18772,12 +18614,11 @@
 	</software>
 
 	<software name="pokeyells" cloneof="pokeyell">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokémon - Edición Amarilla (Spain)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSS-ESP"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5"/>
 			<dataarea name="rom" size="1048576">
@@ -18789,14 +18630,13 @@
 	</software>
 
 	<software name="pokonyan">
-		<!-- Notes: SGB enhanced -->
 		<description>Pokonyan! - Yume no Daibouken (Japan)</description>
 		<year>1994</year>
 		<publisher>Toho</publisher>
 		<info name="serial" value="DMG-N7J"/>
 		<info name="release" value="19940805"/>
 		<info name="alt_title" value="ポコニャン! 夢の大冒険"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -18999,14 +18839,13 @@
 	</software>
 
 	<software name="powerpro">
-		<!-- Notes: SGB enhanced -->
 		<description>Power Pro GB (Japan, Rev. 1)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-APWJ-JPN (RK144-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="パワプロGB"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -19018,14 +18857,13 @@
 	</software>
 
 	<software name="powerproa" cloneof="powerpro">
-		<!-- Notes: SGB enhanced -->
 		<description>Power Pro GB (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-APWJ-JPN (RK144-J1)"/>
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="パワプロGB"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -19169,7 +19007,7 @@
 		<info name="serial" value="DMG-AZZJ-JPN"/>
 		<info name="release" value="19941223"/>
 		<info name="alt_title" value="プロ麻雀 極GB"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -19270,12 +19108,11 @@
 	</software>
 
 	<software name="probot2">
-		<!-- Notes: SGB enhanced -->
 		<description>Probotector 2 (Europe)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ACSP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -19285,11 +19122,10 @@
 	</software>
 
 	<software name="probot2s" cloneof="probot2">
-		<!-- Notes: SGB enhanced -->
 		<description>Probotector 2 (Euro, Sample)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -19351,7 +19187,7 @@
 		<info name="serial" value="DMG-APPJ-JPN"/>
 		<info name="release" value="19971017"/>
 		<info name="alt_title" value="プリクラポケット 不完全女子高生マニュアル"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -19370,7 +19206,7 @@
 		<info name="serial" value="DMG-A2PJ-JPN"/>
 		<info name="release" value="19971129"/>
 		<info name="alt_title" value="プリクラポケット2 彼氏改造大作戦"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -19389,7 +19225,7 @@
 		<info name="serial" value="DMG-A3PJ-JPN"/>
 		<info name="release" value="19981218"/>
 		<info name="alt_title" value="プリクラポケット3 タレントデビュー大作戦"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5"/>
 			<dataarea name="rom" size="1048576">
@@ -20061,14 +19897,13 @@
 	</software>
 
 	<software name="renju">
-		<!-- Notes: SGB enhanced -->
 		<description>Renju Club (Japan)</description>
 		<year>1996</year>
 		<publisher>Hect</publisher>
 		<info name="serial" value="DMG-AHRJ-JPN"/>
 		<info name="release" value="19960517"/>
 		<info name="alt_title" value="連珠倶楽部 五目ならべ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="renju club (japan).bin" size="32768" crc="52f5e960" sha1="d5d2a3f194af308a2e7fbbf0f893537bd9e44a68"/>
@@ -20400,14 +20235,13 @@
 	</software>
 
 	<software name="rockmon">
-		<!-- Notes: SGB enhanced -->
 		<description>Rock'n! Monster!! (Japan)</description>
 		<year>1994</year>
 		<publisher>Hori</publisher>
 		<info name="serial" value="DMG-HOJ"/>
 		<info name="release" value="19940701"/>
 		<info name="alt_title" value="ろっくん!もんすたぁ!!"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -20643,12 +20477,11 @@
 	</software>
 
 	<software name="rugrats">
-		<!-- Notes: SGB enhanced -->
 		<description>Rugrats - The Movie (USA)</description>
 		<year>1998</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ARGE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -20804,7 +20637,7 @@
 		<info name="serial" value="DMG-AS5J-JPN"/>
 		<info name="release" value="19970425"/>
 		<info name="alt_title" value="セームゲーム"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -21212,14 +21045,13 @@
 	</software>
 
 	<software name="select12">
-		<!-- Notes: SGB enhanced -->
 		<description>Selection I &amp; II (Japan)</description>
 		<year>1998</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-ASLJ-JPN"/>
 		<info name="release" value="19980501"/>
 		<info name="alt_title" value="セレクション1&amp;2 選ばれし者&amp;暗黒の封印"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -21355,14 +21187,13 @@
 	</software>
 
 	<software name="shangpok">
-		<!-- Notes: SGB enhanced -->
 		<description>Shanghai Pocket (Japan)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-ASEJ?"/>
 		<info name="release" value="19980806?"/>
 		<info name="alt_title" value="上海 ポケット"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -21372,12 +21203,11 @@
 	</software>
 
 	<software name="shaqfu">
-		<!-- Notes: SGB enhanced -->
 		<description>Shaq Fu (USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AQFE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -21443,14 +21273,13 @@
 	</software>
 
 	<software name="shinsdgg">
-		<!-- Notes: SGB enhanced -->
 		<description>Shin SD Gundam Gaiden - Knight Gundam Monogatari (Japan)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-UOJ"/>
 		<info name="release" value="19940909"/>
 		<info name="alt_title" value="新SDガンダム外伝 ナイトガンダム物語"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -21581,14 +21410,13 @@
 	</software>
 
 	<software name="shogisai">
-		<!-- Notes: SGB enhanced -->
 		<description>Shougi Saikyou (Japan, Rev. 1)</description>
 		<year>1994</year>
 		<publisher>Magical Company</publisher>
 		<info name="serial" value="DMG-AMSJ-JPN"/>
 		<info name="release" value="19941223"/>
 		<info name="alt_title" value="将棋最強"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -21915,14 +21743,13 @@
 	</software>
 
 	<software name="snoopyha">
-		<!-- Notes: SGB enhanced -->
 		<description>Snoopy no Hajimete no Otsukai (Japan)</description>
 		<year>1996</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-AFJJ-JPN"/>
 		<info name="release" value="19961221"/>
 		<info name="alt_title" value="スヌーピーのはじめてのおつかい"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -22789,12 +22616,11 @@
 	</software>
 
 	<software name="stgbeynu" cloneof="stgbeyn">
-		<!-- Notes: SGB enhanced-->
 		<description>Star Trek Generations - Beyond the Nexus (USA)</description>
 		<year>1994</year>
 		<publisher>Absolute Entertainment</publisher>
 		<info name="serial" value="DMG-ASTE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -22925,7 +22751,7 @@
 		<info name="serial" value="DMG-ASFJ-JPN (CGB-13)"/>
 		<info name="release" value="19950811"/>
 		<info name="alt_title" value="ストリートファイターII"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -23057,14 +22883,13 @@
 	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
 	-->
 	<software name="sbdaman">
-		<!-- Notes: SGB enhanced -->
 		<description>Super B-Daman - Fighting Phoenix (Japan)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-ABDJ-JPN"/>
 		<info name="release" value="19970711"/>
 		<info name="alt_title" value="スーパービーダマン ファイティングフェニックス"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-TEDN-01"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -23188,14 +23013,13 @@
 	</software>
 
 	<software name="sbomblis" cloneof="tetrisbl">
-		<!-- Notes: SGB enhanced -->
 		<description>Super Bombliss (Japan)</description>
 		<year>1995</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="DMG-ASBJ-JPN"/>
 		<info name="release" value="19950317 (reprinted on 19971010, 廉価版, DMGASBJ1)"/>
 		<info name="alt_title" value="スーパーボンブリス"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -23205,12 +23029,11 @@
 	</software>
 
 	<software name="sbrkout">
-		<!-- Notes: SGB enhanced -->
 		<description>Super Breakout (USA)</description>
 		<year>199?</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="DMG-ABOE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -23677,14 +23500,13 @@
 	</software>
 
 	<software name="suppachi">
-		<!-- Notes: SGB enhanced -->
 		<description>Super Pachinko Taisen (Japan)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-??"/>
 		<info name="release" value="19950630"/>
 		<info name="alt_title" value="スーパーパチンコ大戦"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -23740,14 +23562,13 @@
 	</software>
 
 	<software name="ssnakey" cloneof="wildsnak">
-		<!-- Notes: SGB enhanced -->
 		<description>Super Snakey (Japan)</description>
 		<year>1994</year>
 		<publisher>Yojigen</publisher>
 		<info name="serial" value="DMG-AWSJ-JPN"/>
 		<info name="release" value="19941220"/>
 		<info name="alt_title" value="スーパー・スネーキー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="65536">
@@ -23793,14 +23614,13 @@
 	</software>
 
 	<software name="sstretb2">
-		<!-- Notes: SGB enhanced -->
 		<description>Super Street Basketball 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>Vap</publisher>
 		<info name="serial" value="DMG-VBA"/>
 		<info name="release" value="19940916"/>
 		<info name="alt_title" value="スーパーストリートバスケットボール2"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -24160,12 +23980,11 @@
 	</software>
 
 	<software name="tama">
-		<!-- Notes: SGB enhanced -->
 		<description>Tamagotchi (Europe, USA)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ATAE-USA, DMG-ATAP-NOE"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -24183,12 +24002,11 @@
 	</software>
 
 	<software name="tamaf" cloneof="tama">
-		<!-- Notes: SGB enhanced -->
 		<description>Tamagotchi (France)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ATAF-FRA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -24646,12 +24464,11 @@
 	</software>
 
 	<software name="tetris2">
-		<!-- Notes: SGB enhanced -->
 		<description>Tetris 2 (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-EH-USA-1, DMG-EH-(ESP-1/UKV)"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02"/>   <!-- USA-1 cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -24723,14 +24540,13 @@
 	</software>
 
 	<software name="tetrisfl" cloneof="tetris2">
-		<!-- Notes: SGB enhanced -->
 		<description>Tetris Flash (Japan)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-EHJ"/>
 		<info name="release" value="19940614"/>
 		<info name="alt_title" value="テトリスフラッシュ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -24740,14 +24556,13 @@
 	</software>
 
 	<software name="tetrisplj" cloneof="tetrispl">
-		<!-- Notes: SGB enhanced -->
 		<description>Tetris Plus (Japan)</description>
 		<year>1996</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-ATRJ-JPN"/>
 		<info name="release" value="19961227"/>
 		<info name="alt_title" value="テトリスプラス"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -24759,12 +24574,11 @@
 	</software>
 
 	<software name="tetrispl">
-		<!-- Notes: SGB enhanced -->
 		<description>Tetris Plus (Europe, USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ATRE-USA, DMG-ATRP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-10"/>  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -24970,14 +24784,13 @@
 	</software>
 
 	<software name="tokoromj">
-		<!-- Notes: SGB enhanced -->
 		<description>Tokoro's Mahjong Jr. (Japan)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="DMG-??"/>
 		<info name="release" value="19941222"/>
 		<info name="alt_title" value="トコロ's まあじゃん ジュニア"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -24989,14 +24802,13 @@
 	</software>
 
 	<software name="tokyofan">
-		<!-- Notes: SGB enhanced -->
 		<description>Tokyo Disneyland - Fantasy Tour (Japan)</description>
 		<year>1998</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-ADFJ-JPN"/>
 		<info name="release" value="19980724"/>
 		<info name="alt_title" value="東京ディズニーランド ファンタジーツアー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -25219,14 +25031,13 @@
 	</software>
 
 	<software name="luckyman">
-		<!-- Notes: SGB enhanced -->
 		<description>Tottemo! Luckyman - Lucky Cookie Minna Daisuki!! (Japan)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ALKJ-JPN"/>
 		<info name="release" value="19940922"/>
 		<info name="alt_title" value="とっても!ラッキーマン ラッキークッキーみんな大好きー!!"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -25250,12 +25061,11 @@
 	</software>
 
 	<software name="toystory">
-		<!-- Notes: SGB enhanced -->
 		<description>Disney's Toy Story (Europe)</description>
 		<year>1996</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-AQHP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -25268,12 +25078,11 @@
 	</software>
 
 	<software name="toystoryu" cloneof="toystory">
-		<!-- Notes: SGB enhanced -->
-		<description>Disney's Toy Story (USA, Rev. A)</description>
+		<description>Disney's Toy Story (USA, Rev. 1)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AQHE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -25283,12 +25092,11 @@
 	</software>
 
 	<software name="toystoryua" cloneof="toystory">
-		<!-- Notes: SGB enhanced -->
 		<description>Disney's Toy Story (USA)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AQHE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -25468,14 +25276,13 @@
 	</software>
 
 	<software name="tsumego">
-		<!-- Notes: SGB enhanced -->
 		<description>Tsumego Series 1 - Fujisawa Hideyuki Meiyo Kisei (Japan)</description>
 		<year>1994</year>
 		<publisher>Mahou</publisher>
 		<info name="serial" value="DMG-ATGJ-JPN"/>
 		<info name="release" value="19941019"/>
 		<info name="alt_title" value="詰碁シリーズ1 藤沢秀行名誉棋聖"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -25514,14 +25321,13 @@
 	</software>
 
 	<software name="tshogika">
-		<!-- Notes: SGB enhanced -->
 		<description>Tsumeshougi - Kanki Godan (Japan)</description>
 		<year>1994</year>
 		<publisher>Mahou</publisher>
 		<info name="serial" value="DMG-ATKJ-JPN"/>
 		<info name="release" value="19941019"/>
 		<info name="alt_title" value="詰将棋 神吉五段"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -25547,14 +25353,13 @@
 	</software>
 
 	<software name="tsurisen">
-		<!-- Notes: SGB enhanced -->
 		<description>Tsuri Sensei (Japan)</description>
 		<year>1998</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AFWJ-JPN"/>
 		<info name="release" value="19980911"/>
 		<info name="alt_title" value="釣り先生"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -25646,7 +25451,7 @@
 	</software>
 
 	<software name="turrican">
-		<description>Turrican (Euro, Aus, USA)</description>
+		<description>Turrican (Australia, Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Accolade</publisher>
 		<info name="serial" value="DMG-TQ-USA, DMG-TQ-(NOE/ESP/AUS)"/>
@@ -25663,14 +25468,13 @@
 	</software>
 
 	<software name="tvchamp">
-		<!-- Notes: SGB enhanced -->
 		<description>TV Champion (Japan)</description>
 		<year>1994</year>
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="DMG-A9YJ-JPN"/>
 		<info name="release" value="19941028"/>
 		<info name="alt_title" value="TVチャンピオン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -25844,14 +25648,13 @@
 	</software>
 
 	<software name="ultrabal">
-		<!-- Notes: SGB enhanced -->
 		<description>Ultraman Ball (Japan)</description>
 		<year>1994</year>
 		<publisher>Interbec</publisher>
 		<info name="serial" value="DMG-AUMJ-JPN"/>
 		<info name="release" value="19941222"/>
 		<info name="alt_title" value="ウルトラマンボール"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -25903,7 +25706,7 @@
 		<info name="serial" value="DMG-A8UJ-JPN"/>
 		<info name="release" value="19980710"/>
 		<info name="alt_title" value="海のぬし釣り2"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -25961,14 +25764,13 @@
 	</software>
 
 	<software name="uno2">
-		<!-- Notes: SGB enhanced -->
 		<description>Uno 2 - Small World (Japan)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AUCJ-JPN"/>
 		<info name="release" value="19950303"/>
 		<info name="alt_title" value="UNO2 スモールワールド"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
@@ -25994,12 +25796,11 @@
 	</software>
 
 	<software name="ustrike">
-		<!-- Notes: SGB enhanced-->
 		<description>Urban Strike (Europe, USA)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AUSE-USA, DMG-AUSP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -26060,12 +25861,11 @@
 	</software>
 
 	<software name="vegastak">
-		<!-- Notes: SGB enhanced-->
 		<description>Vegas Stakes (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AVSE-USA, DMG-AVSP-GPS"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-DECN-02"/>  <!-- GPS cart -->
 			<feature name="u1" value="U1 PRG"/>
@@ -26344,14 +26144,13 @@
 	</software>
 
 	<software name="weddingp">
-		<!-- Notes: SGB enhanced -->
 		<description>Wedding Peach - Jamapii Panic (Japan)</description>
 		<year>1995</year>
 		<publisher>KSS</publisher>
 		<info name="serial" value="DMG-AWPJ-JPN"/>
 		<info name="release" value="19951208"/>
 		<info name="alt_title" value="ウェディングピーチ 〜じゃ魔ピーパニック〜"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -26436,12 +26235,11 @@
 	</software>
 
 	<software name="wildsnak">
-		<!-- Notes: SGB enhanced -->
 		<description>Wild Snake (USA)</description>
 		<year>1994</year>
 		<publisher>Spectrum Holobyte</publisher>
 		<info name="serial" value="DMG-AWSE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="65536">
@@ -26713,14 +26511,13 @@
 	</software>
 
 	<software name="wcup94j" cloneof="wcup94">
-		<!-- Notes: SGB enhanced -->
 		<description>World Cup USA '94 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-W9A"/>
 		<info name="release" value="19940729"/>
 		<info name="alt_title" value="ワールドカップUSA'94"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -26732,12 +26529,11 @@
 	</software>
 
 	<software name="wh2">
-		<!-- Notes: SGB enhanced -->
 		<description>World Heroes 2 Jet (Europe, USA)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AWJE-USA, DMG-AWJP-EUR"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -26763,14 +26559,13 @@
 	</software>
 
 	<software name="wsoccer" cloneof="iss">
-		<!-- Notes: SGB enhanced -->
 		<description>World Soccer GB (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AIGJ-JPN (RK160-J1)"/>
 		<info name="release" value="19980604"/>
 		<info name="alt_title" value="ワールドサッカーGB"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -26912,12 +26707,11 @@
 	</software>
 
 	<software name="wwfwarz">
-		<!-- Notes: SGB enhanced -->
 		<description>WWF War Zone (Europe, USA)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AWWE-USA, DMG-AWWP-EUR,"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -27165,7 +26959,7 @@
 		<info name="serial" value="DMG-AYLJ-JPN"/>
 		<info name="release" value="19961026"/>
 		<info name="alt_title" value="ヨッシーのパネポン"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="524288">
@@ -27270,14 +27064,13 @@
 	</software>
 
 	<software name="yuyu4">
-		<!-- Notes: SGB enhanced -->
 		<description>Yu Yu Hakusho Dai-4-dan - Makai Touitsu Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AUUJ-JPN"/>
 		<info name="release" value="19941209"/>
 		<info name="alt_title" value="幽☆遊☆白書 第4弾 魔界統一編"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -27303,7 +27096,7 @@
 	</software>
 
 	<software name="zeldalnkj" cloneof="zeldalnk">
-		<description>Zelda no Densetsu - Yume o Miru Shima (Jpn, Chi, Rev. A)</description>
+		<description>Zelda no Densetsu - Yume o Miru Shima (China, Japan, Rev. 1)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ZLJ, DMG-407 CHN"/>
@@ -27367,14 +27160,13 @@
 	</software>
 
 	<software name="zenprow">
-		<!-- Notes: SGB enhanced -->
 		<description>Zen-Nihon Pro Wrestling Jet (Japan)</description>
 		<year>1994</year>
 		<publisher>NCS</publisher>
 		<info name="serial" value="DMG-JZJ"/>
 		<info name="release" value="19940715"/>
 		<info name="alt_title" value="全日本プロレス ジェット"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="262144">
@@ -27496,14 +27288,13 @@
 	</software>
 
 	<software name="zoopj" cloneof="zoop">
-		<!-- Notes: SGB enhanced -->
 		<description>Zoop (Japan)</description>
 		<year>1997</year>
 		<publisher>Yanoman</publisher>
 		<info name="serial" value="DMG-AZPJ-JPN"/>
 		<info name="release" value="19970130"/>
 		<info name="alt_title" value="ズープ"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="65536">
@@ -27514,9 +27305,8 @@
 
 <!-- Sachen multi-carts -->
 
-	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1604 -->
 	<software name="4in1_001">
-		<description>4 in 1 (Euro, 4B-001)</description>
+		<description>4 in 1 (Europe, 4B-001)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-001"/>
@@ -27532,9 +27322,8 @@
 		</part>
 	</software>
 
-	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1558 -->
 	<software name="4in1_002">
-		<description>4 in 1 (Euro, 4B-002)</description>
+		<description>4 in 1 (Europe, 4B-002)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-002"/>
@@ -27550,9 +27339,8 @@
 		</part>
 	</software>
 
-	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1617 -->
 	<software name="4in1_003">
-		<description>4 in 1 (Twn, 4B-003)</description>
+		<description>4 in 1 (Taiwan, 4B-003)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-003"/>
@@ -27567,9 +27355,8 @@
 		</part>
 	</software>
 
-	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1606 -->
 	<software name="4in1_004">
-		<description>4 in 1 (Euro, 4B-004)</description>
+		<description>4 in 1 (Europe, 4B-004)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-004"/>
@@ -27586,9 +27373,8 @@
 		</part>
 	</software>
 
-	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1579 -->
 	<software name="4in1_005">
-		<description>4 in 1 (Euro, 4B-005)</description>
+		<description>4 in 1 (Europe, 4B-005)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-005"/>
@@ -27606,9 +27392,8 @@
 		</part>
 	</software>
 
-	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1607 -->
 	<software name="4in1_006">
-		<description>4 in 1 (Euro, 4B-006)</description>
+		<description>4 in 1 (Europe, 4B-006)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-006"/>
@@ -27623,9 +27408,8 @@
 		</part>
 	</software>
 
-	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1593 -->
 	<software name="4in1_007">
-		<description>4 in 1 (Euro, 4B-007)</description>
+		<description>4 in 1 (Europe, 4B-007)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-007"/>
@@ -27641,9 +27425,8 @@
 		</part>
 	</software>
 
-	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1605 -->
 	<software name="4in1_008">
-		<description>4 in 1 (Euro, 4B-008)</description>
+		<description>4 in 1 (Europe, 4B-008)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-008"/>
@@ -27660,9 +27443,8 @@
 		</part>
 	</software>
 
-	<!-- https://datomatic.no-intro.org/index.php?page=show_record&s=46&n=1608 -->
 	<software name="4in1_009">
-		<description>4 in 1 (Euro, 4B-009)</description>
+		<description>4 in 1 (Europe, 4B-009)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-009"/>
@@ -27680,7 +27462,7 @@
 <!-- Other Asian pirate carts -->
 
 	<software name="smw7" cloneof="advisln2">
-		<description>Super Mario World 7 (Chi, ripped from 18 in 1 multicart)</description>
+		<description>Super Mario World 7 (China, ripped from 18 in 1 multicart)</description>
 		<year>1998</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="GB"/>
@@ -27976,7 +27758,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="ggenie" supported="no">
-		<description>Game Genie BIOS (USA) (v2.1)</description>
+		<description>Game Genie BIOS (USA, v2.1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="GB"/>
@@ -28096,7 +27878,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="datenlog">
-		<description>Game Boy Datenlogger 1 (Ger, v1.0)</description>
+		<description>Game Boy Datenlogger 1 (Germany, v1.0)</description>
 		<year>200?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="GBD1"/>
@@ -28109,7 +27891,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="digitosc">
-		<description>Game Boy Digital Sampling Oscilloscope (Euro, v3.6)</description>
+		<description>Game Boy Digital Sampling Oscilloscope (Europe, v3.6)</description>
 		<year>200?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="GBDSO"/>
