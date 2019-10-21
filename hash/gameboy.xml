@@ -22779,12 +22779,11 @@
 	</software>
 
 	<software name="sf2a" cloneof="sf2">
-		<!-- Notes: SGB enhanced -->
 		<description>Street Fighter II (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ASFE-USA"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02"/>
 			<feature name="u1" value="U1 PRG"/>
@@ -22797,14 +22796,13 @@
 	</software>
 
 	<software name="sracerj" cloneof="sracer">
-		<!-- Notes: SGB enhanced -->
 		<description>Street Racer (Japan)</description>
 		<year>1996</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="DMG-ASRJ-JPN"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="ストリートレーサー"/>
-		<sharedfeat name="compatibility" value="GB"/>
+		<sharedfeat name="compatibility" value="GB,SGB"/>
  		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1"/>
 			<dataarea name="rom" size="131072">
